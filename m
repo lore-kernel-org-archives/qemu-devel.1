@@ -2,63 +2,79 @@ Return-Path: <SRS0=/4tE=TV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CBE80C04AAF
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 14:05:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 85180C04AAF
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 14:07:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 93A1D21479
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 14:05:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 93A1D21479
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 4DF4D21479
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 14:07:39 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="FWEr/jS9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4DF4D21479
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:54397 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:54425 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hT5Ou-0001aH-SP
-	for qemu-devel@archiver.kernel.org; Tue, 21 May 2019 10:05:56 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:34202)
+	id 1hT5QY-0002xk-IG
+	for qemu-devel@archiver.kernel.org; Tue, 21 May 2019 10:07:38 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:35731)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pagupta@redhat.com>) id 1hT5DZ-0000P3-TM
-	for qemu-devel@nongnu.org; Tue, 21 May 2019 09:54:16 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1hT5GA-0003A4-71
+	for qemu-devel@nongnu.org; Tue, 21 May 2019 09:56:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pagupta@redhat.com>) id 1hT50V-00010y-Q6
-	for qemu-devel@nongnu.org; Tue, 21 May 2019 09:40:45 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55928)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pagupta@redhat.com>) id 1hT50T-0000u7-O3
-	for qemu-devel@nongnu.org; Tue, 21 May 2019 09:40:43 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
-	[10.5.11.22])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 6B2D67FDFA;
-	Tue, 21 May 2019 13:40:30 +0000 (UTC)
-Received: from dhcp201-121.englab.pnq.redhat.com (ovpn-116-97.sin2.redhat.com
-	[10.67.116.97])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 848581001F5B;
-	Tue, 21 May 2019 13:39:47 +0000 (UTC)
-From: Pankaj Gupta <pagupta@redhat.com>
-To: linux-nvdimm@lists.01.org, linux-kernel@vger.kernel.org,
-	virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org, linux-acpi@vger.kernel.org,
-	qemu-devel@nongnu.org, linux-ext4@vger.kernel.org,
-	linux-xfs@vger.kernel.org, dm-devel@redhat.com
-Date: Tue, 21 May 2019 19:07:09 +0530
-Message-Id: <20190521133713.31653-4-pagupta@redhat.com>
-In-Reply-To: <20190521133713.31653-1-pagupta@redhat.com>
-References: <20190521133713.31653-1-pagupta@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.27]);
-	Tue, 21 May 2019 13:40:40 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v10 3/7] libnvdimm: add dax_dev sync flag
+	(envelope-from <peter.maydell@linaro.org>) id 1hT5G8-0008EV-Vw
+	for qemu-devel@nongnu.org; Tue, 21 May 2019 09:56:54 -0400
+Received: from mail-oi1-x233.google.com ([2607:f8b0:4864:20::233]:34749)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1hT5G8-0008CW-DV
+	for qemu-devel@nongnu.org; Tue, 21 May 2019 09:56:52 -0400
+Received: by mail-oi1-x233.google.com with SMTP id u64so3612964oib.1
+	for <qemu-devel@nongnu.org>; Tue, 21 May 2019 06:56:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+	:cc; bh=QOeA1VEcBG11WiPNZv+y111pQYyByw1kDnHYJuFpXdU=;
+	b=FWEr/jS9j5Hzgu6Sz6Ia1rKl2YPA4ozPwcWJjlc++urDHshA4JaEEK9NisXuSe4pPl
+	ikbfNm9sMLOIxYX/VFQzZZJ3/8gbs+3cUj94YGpOwWe1bAswO6k9Kuoi6ORgqfKsDyBJ
+	Q20y/KbHHKOkjMETKix1EIvaUd1tpPSnq5ep2kdlZopy3U2w907biSIb8AuzQ0/mGoZ/
+	5qU0ibVZS5VY2jydo3tV8r6x2SksspYP7Ao5z/HXVuxRppjXNJex4bz+t69LMhXzeXry
+	4C2VQp8N222FYGf7BOLxUS/5+Xbxh+EQ7SevS5l1yF5CiN3MejuWHBmIXcrAbnmUWjjC
+	McIg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+	:message-id:subject:to:cc;
+	bh=QOeA1VEcBG11WiPNZv+y111pQYyByw1kDnHYJuFpXdU=;
+	b=EHm7jkGnhDtKBuZ7eFJsW/CkeGXxtFvAva1vWRt2WbZgj+1Z1p7g3YDDjJxdQsW1tP
+	lQlhsopYeYcxunUQTSQqSb3KCkpqshnJ9ZKE/F1h4mdlyoB20s/7cjoisbWc1tD4W997
+	D/Hs2EI8qibfjiyykAsPFUwimpi2E6jEkPsFqd9OmveAp1ilvMRJgJ5YRycaBl8Dh0rw
+	l11QCJJj94M9K1bvyd7uMNO/KH56km+wOX3N+8SyGdEXoKIjX045ATMH6mYZTYRsduDn
+	1GoMPWKnR7I6uUmWlJHQcHKHrbogcKzujC5pHBfp4sl7u9cEEcJlq+4icnWsgyhaDrsq
+	J+sQ==
+X-Gm-Message-State: APjAAAX2+ZlmEx0WSgxdKcEAEp6IkZsx0B/r8B8sqaKVOQmcbUWx1Li3
+	B4ogoTM5l7JKMrn9FoIRrxOHnt2BRnC4CqpWovKpTA==
+X-Google-Smtp-Source: APXvYqxn1EQKTRczpIm0W8biEX4X6bhphBkm7WZiBIewnRDEpauzX7iPDk9c5kAggmeZjYtviPupmzKl2cFzhKYBTlg=
+X-Received: by 2002:aca:cd12:: with SMTP id d18mr3418369oig.146.1558447009689; 
+	Tue, 21 May 2019 06:56:49 -0700 (PDT)
+MIME-Version: 1.0
+References: <20190521105344.11637-1-thuth@redhat.com>
+In-Reply-To: <20190521105344.11637-1-thuth@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 21 May 2019 14:56:38 +0100
+Message-ID: <CAFEAcA_As+FEizNVnQ_Y0-xNixXj7d4myXwBxk2Y+SEVRz4N6Q@mail.gmail.com>
+To: Thomas Huth <thuth@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::233
+Subject: Re: [Qemu-devel] [PULL 00/13] qtests and some iotest patches
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -70,208 +86,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pagupta@redhat.com, rdunlap@infradead.org, jack@suse.cz, snitzer@redhat.com,
-	mst@redhat.com, jasowang@redhat.com, david@fromorbit.com,
-	lcapitulino@redhat.com, adilger.kernel@dilger.ca,
-	zwisler@kernel.org, aarcange@redhat.com, dave.jiang@intel.com,
-	jstaron@google.com, darrick.wong@oracle.com,
-	vishal.l.verma@intel.com, david@redhat.com, willy@infradead.org,
-	hch@infradead.org, jmoyer@redhat.com, nilal@redhat.com,
-	lenb@kernel.org, kilobyte@angband.pl, riel@surriel.com,
-	yuval.shaia@oracle.com, stefanha@redhat.com, pbonzini@redhat.com,
-	dan.j.williams@intel.com, kwolf@redhat.com, tytso@mit.edu,
-	xiaoguangrong.eric@gmail.com, cohuck@redhat.com,
-	rjw@rjwysocki.net, imammedo@redhat.com
+Cc: Kevin Wolf <kwolf@redhat.com>, Laurent Vivier <lvivier@redhat.com>,
+	QEMU Developers <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This patch adds 'DAXDEV_SYNC' flag which is set
-for nd_region doing synchronous flush. This later
-is used to disable MAP_SYNC functionality for
-ext4 & xfs filesystem for devices don't support
-synchronous flush.
+On Tue, 21 May 2019 at 11:53, Thomas Huth <thuth@redhat.com> wrote:
+>
+>  Hi Peter,
+>
+> the following changes since commit 2259637b95bef3116cc262459271de08e038cc66:
+>
+>   Merge remote-tracking branch 'remotes/kevin/tags/for-upstream' into staging (2019-05-20 17:22:05 +0100)
+>
+> are available in the Git repository at:
+>
+>   https://gitlab.com/huth/qemu.git tags/pull-request-2019-05-21
+>
+> for you to fetch changes up to b3763a195cc167152df1f762b3c3a73f7db7677b:
+>
+>   tests/qemu-iotests: Remove the "_supported_os Linux" line from many tests (2019-05-21 10:13:58 +0200)
+>
+> ----------------------------------------------------------------
+> I'll be away from keyboard starting next week, so I'd like to
+> get these patches merged before they bitrot again:
+> - some qtest patches to get rid of the global_qtest variable in
+>   more tests
+> - some iotests patches that have multiple reviews and thus should
+>   be ready to go
+> ----------------------------------------------------------------
 
-Signed-off-by: Pankaj Gupta <pagupta@redhat.com>
----
- drivers/dax/bus.c            |  2 +-
- drivers/dax/super.c          | 19 ++++++++++++++++++-
- drivers/md/dm.c              |  3 ++-
- drivers/nvdimm/pmem.c        |  5 ++++-
- drivers/nvdimm/region_devs.c |  7 +++++++
- include/linux/dax.h          |  9 +++++++--
- include/linux/libnvdimm.h    |  1 +
- 7 files changed, 40 insertions(+), 6 deletions(-)
 
-diff --git a/drivers/dax/bus.c b/drivers/dax/bus.c
-index 2109cfe80219..5f184e751c82 100644
---- a/drivers/dax/bus.c
-+++ b/drivers/dax/bus.c
-@@ -388,7 +388,7 @@ struct dev_dax *__devm_create_dev_dax(struct dax_region *dax_region, int id,
- 	 * No 'host' or dax_operations since there is no access to this
- 	 * device outside of mmap of the resulting character device.
- 	 */
--	dax_dev = alloc_dax(dev_dax, NULL, NULL);
-+	dax_dev = alloc_dax(dev_dax, NULL, NULL, DAXDEV_F_SYNC);
- 	if (!dax_dev)
- 		goto err;
- 
-diff --git a/drivers/dax/super.c b/drivers/dax/super.c
-index bbd57ca0634a..93b3718b5cfa 100644
---- a/drivers/dax/super.c
-+++ b/drivers/dax/super.c
-@@ -186,6 +186,8 @@ enum dax_device_flags {
- 	DAXDEV_ALIVE,
- 	/* gate whether dax_flush() calls the low level flush routine */
- 	DAXDEV_WRITE_CACHE,
-+	/* flag to check if device supports synchronous flush */
-+	DAXDEV_SYNC,
- };
- 
- /**
-@@ -354,6 +356,18 @@ bool dax_write_cache_enabled(struct dax_device *dax_dev)
- }
- EXPORT_SYMBOL_GPL(dax_write_cache_enabled);
- 
-+bool dax_synchronous(struct dax_device *dax_dev)
-+{
-+	return test_bit(DAXDEV_SYNC, &dax_dev->flags);
-+}
-+EXPORT_SYMBOL_GPL(dax_synchronous);
-+
-+void set_dax_synchronous(struct dax_device *dax_dev)
-+{
-+	set_bit(DAXDEV_SYNC, &dax_dev->flags);
-+}
-+EXPORT_SYMBOL_GPL(set_dax_synchronous);
-+
- bool dax_alive(struct dax_device *dax_dev)
- {
- 	lockdep_assert_held(&dax_srcu);
-@@ -508,7 +522,7 @@ static void dax_add_host(struct dax_device *dax_dev, const char *host)
- }
- 
- struct dax_device *alloc_dax(void *private, const char *__host,
--		const struct dax_operations *ops)
-+		const struct dax_operations *ops, unsigned long flags)
- {
- 	struct dax_device *dax_dev;
- 	const char *host;
-@@ -531,6 +545,9 @@ struct dax_device *alloc_dax(void *private, const char *__host,
- 	dax_add_host(dax_dev, host);
- 	dax_dev->ops = ops;
- 	dax_dev->private = private;
-+	if (flags & DAXDEV_F_SYNC)
-+		set_dax_synchronous(dax_dev);
-+
- 	return dax_dev;
- 
-  err_dev:
-diff --git a/drivers/md/dm.c b/drivers/md/dm.c
-index 1fb1333fefec..7eee7ddc73a8 100644
---- a/drivers/md/dm.c
-+++ b/drivers/md/dm.c
-@@ -1970,7 +1970,8 @@ static struct mapped_device *alloc_dev(int minor)
- 	sprintf(md->disk->disk_name, "dm-%d", minor);
- 
- 	if (IS_ENABLED(CONFIG_DAX_DRIVER)) {
--		md->dax_dev = alloc_dax(md, md->disk->disk_name, &dm_dax_ops);
-+		md->dax_dev = alloc_dax(md, md->disk->disk_name,
-+					&dm_dax_ops, 0);
- 		if (!md->dax_dev)
- 			goto bad;
- 	}
-diff --git a/drivers/nvdimm/pmem.c b/drivers/nvdimm/pmem.c
-index 0279eb1da3ef..bdbd2b414d3d 100644
---- a/drivers/nvdimm/pmem.c
-+++ b/drivers/nvdimm/pmem.c
-@@ -365,6 +365,7 @@ static int pmem_attach_disk(struct device *dev,
- 	struct gendisk *disk;
- 	void *addr;
- 	int rc;
-+	unsigned long flags = 0UL;
- 
- 	pmem = devm_kzalloc(dev, sizeof(*pmem), GFP_KERNEL);
- 	if (!pmem)
-@@ -462,7 +463,9 @@ static int pmem_attach_disk(struct device *dev,
- 	nvdimm_badblocks_populate(nd_region, &pmem->bb, &bb_res);
- 	disk->bb = &pmem->bb;
- 
--	dax_dev = alloc_dax(pmem, disk->disk_name, &pmem_dax_ops);
-+	if (is_nvdimm_sync(nd_region))
-+		flags = DAXDEV_F_SYNC;
-+	dax_dev = alloc_dax(pmem, disk->disk_name, &pmem_dax_ops, flags);
- 	if (!dax_dev) {
- 		put_disk(disk);
- 		return -ENOMEM;
-diff --git a/drivers/nvdimm/region_devs.c b/drivers/nvdimm/region_devs.c
-index b4ef7d9ff22e..f3ea5369d20a 100644
---- a/drivers/nvdimm/region_devs.c
-+++ b/drivers/nvdimm/region_devs.c
-@@ -1197,6 +1197,13 @@ int nvdimm_has_cache(struct nd_region *nd_region)
- }
- EXPORT_SYMBOL_GPL(nvdimm_has_cache);
- 
-+bool is_nvdimm_sync(struct nd_region *nd_region)
-+{
-+	return is_nd_pmem(&nd_region->dev) &&
-+		!test_bit(ND_REGION_ASYNC, &nd_region->flags);
-+}
-+EXPORT_SYMBOL_GPL(is_nvdimm_sync);
-+
- struct conflict_context {
- 	struct nd_region *nd_region;
- 	resource_size_t start, size;
-diff --git a/include/linux/dax.h b/include/linux/dax.h
-index 0dd316a74a29..2b106752b1b8 100644
---- a/include/linux/dax.h
-+++ b/include/linux/dax.h
-@@ -7,6 +7,9 @@
- #include <linux/radix-tree.h>
- #include <asm/pgtable.h>
- 
-+/* Flag for synchronous flush */
-+#define DAXDEV_F_SYNC (1UL << 0)
-+
- typedef unsigned long dax_entry_t;
- 
- struct iomap_ops;
-@@ -32,18 +35,20 @@ extern struct attribute_group dax_attribute_group;
- #if IS_ENABLED(CONFIG_DAX)
- struct dax_device *dax_get_by_host(const char *host);
- struct dax_device *alloc_dax(void *private, const char *host,
--		const struct dax_operations *ops);
-+		const struct dax_operations *ops, unsigned long flags);
- void put_dax(struct dax_device *dax_dev);
- void kill_dax(struct dax_device *dax_dev);
- void dax_write_cache(struct dax_device *dax_dev, bool wc);
- bool dax_write_cache_enabled(struct dax_device *dax_dev);
-+bool dax_synchronous(struct dax_device *dax_dev);
-+void set_dax_synchronous(struct dax_device *dax_dev);
- #else
- static inline struct dax_device *dax_get_by_host(const char *host)
- {
- 	return NULL;
- }
- static inline struct dax_device *alloc_dax(void *private, const char *host,
--		const struct dax_operations *ops)
-+		const struct dax_operations *ops, unsigned long flags)
- {
- 	/*
- 	 * Callers should check IS_ENABLED(CONFIG_DAX) to know if this
-diff --git a/include/linux/libnvdimm.h b/include/linux/libnvdimm.h
-index feb342d026f2..3238a206e563 100644
---- a/include/linux/libnvdimm.h
-+++ b/include/linux/libnvdimm.h
-@@ -264,6 +264,7 @@ void nvdimm_flush(struct nd_region *nd_region);
- int nvdimm_has_flush(struct nd_region *nd_region);
- int nvdimm_has_cache(struct nd_region *nd_region);
- int nvdimm_in_overwrite(struct nvdimm *nvdimm);
-+bool is_nvdimm_sync(struct nd_region *nd_region);
- 
- static inline int nvdimm_ctl(struct nvdimm *nvdimm, unsigned int cmd, void *buf,
- 		unsigned int buf_len, int *cmd_rc)
--- 
-2.20.1
+Applied, thanks.
 
+Please update the changelog at https://wiki.qemu.org/ChangeLog/4.1
+for any user-visible changes.
+
+-- PMM
 
