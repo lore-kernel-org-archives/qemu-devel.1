@@ -4,60 +4,59 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,T_FUZZY_SPRM,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 308B6C04AAF
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 06:40:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F34E0C04AAF
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 06:41:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E76FE21743
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 06:40:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C064421743
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 06:41:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="Qb6S8crd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E76FE21743
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="ATy1qFz1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C064421743
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:47477 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:47482 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hSyS1-0006RR-4t
-	for qemu-devel@archiver.kernel.org; Tue, 21 May 2019 02:40:41 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:48737)
+	id 1hSySL-0006nr-26
+	for qemu-devel@archiver.kernel.org; Tue, 21 May 2019 02:41:01 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:48726)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1hSyHV-0005sj-Re
-	for qemu-devel@nongnu.org; Tue, 21 May 2019 02:29:51 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1hSyHV-0005sf-KX
+	for qemu-devel@nongnu.org; Tue, 21 May 2019 02:29:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1hSyHU-0007mg-H4
+	(envelope-from <dgibson@ozlabs.org>) id 1hSyHT-0007kx-K4
 	for qemu-devel@nongnu.org; Tue, 21 May 2019 02:29:49 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:56457 helo=ozlabs.org)
+Received: from bilbo.ozlabs.org ([203.11.71.1]:45007 helo=ozlabs.org)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
-	id 1hSyHU-0007hW-4m; Tue, 21 May 2019 02:29:48 -0400
+	id 1hSyHT-0007h6-7J; Tue, 21 May 2019 02:29:47 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
-	id 457Qpf6xz7z9sNp; Tue, 21 May 2019 16:29:30 +1000 (AEST)
+	id 457Qpf3pTQz9sD4; Tue, 21 May 2019 16:29:30 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
 	d=gibson.dropbear.id.au; s=201602; t=1558420170;
-	bh=ytv6+2Za7txhjhng8BTf4vmasxIQT6D/X9uDYVn1uXM=;
+	bh=DhoK2motTlgMA6PD1KwSyR0Bct17q6LIWfIaLI4TIJE=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Qb6S8crd/ep/ZFbgYlur0SGUxUDprCHpxUmY6HgXwt5FgqUSQsXEvYOnwSkwvYKhK
-	A8qk+KCzG9X5i74K2ty7JgEFriUyFuvmOmArYDRyZS1gGAvfWQdasWET0Oh7dx2p3i
-	ne/IwSWhqzPAJeimPXSLcp5cuSyDfvzVhweC5vbM=
+	b=ATy1qFz148RznOdQjfMyFEZmSYFniH7Aggx3lo7+GvKSwp+gG7eotEHbcYJlVGsLK
+	bsXfwOViVu6L+AXek4KJKG+jSIhQlkTl6MM5IL7eSrqf2C4yPNA8ren7uPuMT97HKV
+	WQExDvKiRNyJQwoRaFXklQ6PMKEsICGSfYnD2cEw=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: peter.maydell@linaro.org
-Date: Tue, 21 May 2019 16:28:59 +1000
-Message-Id: <20190521062924.6930-14-david@gibson.dropbear.id.au>
+Date: Tue, 21 May 2019 16:28:53 +1000
+Message-Id: <20190521062924.6930-8-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190521062924.6930-1-david@gibson.dropbear.id.au>
 References: <20190521062924.6930-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 203.11.71.1
-Subject: [Qemu-devel] [PULL 13/38] spapr/xive: EQ page should be naturally
- aligned
+Subject: [Qemu-devel] [PULL 07/38] target/ppc: Add ibm, purr and ibm,
+ spurr device-tree properties
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -69,47 +68,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: lvivier@redhat.com, gkurz@kaod.org, Greg Kurz <groug@kaod.org>,
-	qemu-devel@nongnu.org, qemu-ppc@nongnu.org, clg@kaod.org,
+Cc: lvivier@redhat.com, gkurz@kaod.org, qemu-devel@nongnu.org,
+	qemu-ppc@nongnu.org, clg@kaod.org,
+	Suraj Jitindar Singh <sjitindarsingh@gmail.com>,
 	David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: C=C3=A9dric Le Goater <clg@kaod.org>
+From: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
 
-When the OS configures the EQ page in which to receive event
-notifications from the XIVE interrupt controller, the page should be
-naturally aligned. Add this check.
+The ibm,purr and ibm,spurr device tree properties are used to indicate
+that the processor implements the Processor Utilisation of Resources
+Register (PURR) and Scaled Processor Utilisation of Resources Registers
+(SPURR), respectively. Each property has a single value which represents
+the level of architecture supported. A value of 1 for ibm,purr means
+support for the version of the PURR defined in book 3 in version 2.02 of
+the architecture. A value of 1 for ibm,spurr means support for the
+version of the SPURR defined in version 2.05 of the architecture.
 
-Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
-Message-Id: <20190508171946.657-2-clg@kaod.org>
-Reviewed-by: Greg Kurz <groug@kaod.org>
-[dwg: Minor change for printf warning on some platforms]
+Add these properties for all processors for which the PURR and SPURR
+registers are generated.
+
+Fixes: 0da6f3fef9a "spapr: Reorganize CPU dt generation code"
+Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+Message-Id: <20190506014803.21299-1-sjitindarsingh@gmail.com>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/intc/spapr_xive.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ hw/ppc/spapr.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
-index 097f88d460..33da1a52c6 100644
---- a/hw/intc/spapr_xive.c
-+++ b/hw/intc/spapr_xive.c
-@@ -993,6 +993,12 @@ static target_ulong h_int_set_queue_config(PowerPCCP=
-U *cpu,
-     case 16:
-     case 21:
-     case 24:
-+        if (!QEMU_IS_ALIGNED(qpage, 1ul << qsize)) {
-+            qemu_log_mask(LOG_GUEST_ERROR, "XIVE: EQ @0x%" HWADDR_PRIx
-+                          " is not naturally aligned with %" HWADDR_PRIx=
- "\n",
-+                          qpage, (hwaddr)1 << qsize);
-+            return H_P4;
-+        }
-         end.w2 =3D cpu_to_be32((qpage >> 32) & 0x0fffffff);
-         end.w3 =3D cpu_to_be32(qpage & 0xffffffff);
-         end.w0 |=3D cpu_to_be32(END_W0_ENQUEUE);
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index 2ef3ce4362..8580a8dc67 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -500,7 +500,10 @@ static void spapr_populate_cpu_dt(CPUState *cs, void=
+ *fdt, int offset,
+     _FDT((fdt_setprop(fdt, offset, "64-bit", NULL, 0)));
+=20
+     if (env->spr_cb[SPR_PURR].oea_read) {
+-        _FDT((fdt_setprop(fdt, offset, "ibm,purr", NULL, 0)));
++        _FDT((fdt_setprop_cell(fdt, offset, "ibm,purr", 1)));
++    }
++    if (env->spr_cb[SPR_SPURR].oea_read) {
++        _FDT((fdt_setprop_cell(fdt, offset, "ibm,spurr", 1)));
+     }
+=20
+     if (ppc_hash64_has(cpu, PPC_HASH64_1TSEG)) {
 --=20
 2.21.0
 
