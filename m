@@ -2,111 +2,66 @@ Return-Path: <SRS0=/4tE=TV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7534BC04AAF
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 16:17:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 40299C04AAF
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 16:19:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 33200217D7
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 16:17:36 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="I7tOL1lq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 33200217D7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id 02EED217D7
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 16:19:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 02EED217D7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:56467 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:56483 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hT7SJ-00053A-Fz
-	for qemu-devel@archiver.kernel.org; Tue, 21 May 2019 12:17:35 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:40732)
+	id 1hT7Ty-0005wo-AX
+	for qemu-devel@archiver.kernel.org; Tue, 21 May 2019 12:19:18 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:41119)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hT7RE-0004Ze-12
-	for qemu-devel@nongnu.org; Tue, 21 May 2019 12:16:29 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1hT7Sj-0005Rv-NB
+	for qemu-devel@nongnu.org; Tue, 21 May 2019 12:18:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hT7RC-0003GT-Sv
-	for qemu-devel@nongnu.org; Tue, 21 May 2019 12:16:28 -0400
-Received: from mail-eopbgr70120.outbound.protection.outlook.com
-	([40.107.7.120]:5063
-	helo=EUR04-HE1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1hT7RC-0003Fr-3W
-	for qemu-devel@nongnu.org; Tue, 21 May 2019 12:16:26 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
-	s=selector1;
-	h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
-	bh=qgPf+4o9IywA5svLqZARPITvbJD6Tu6VzGNjzipOTuw=;
-	b=I7tOL1lqGTLb8vVWwF4kPJ9LmlbRHcEyTsAi6LhZ4A369tOUO8jh88bcsp10VF+x4zWUL+g1V7WuBtN5R3GqLbHVTJ1REhBN00zvWXPOo6dZWFXXJrtPx1wzOr4Hl9hem9Ag08bDojo/soE1eyQSP0qZx7w+6ObrESY1jyrJQYo=
-Received: from AM6PR08MB4675.eurprd08.prod.outlook.com (10.255.96.78) by
-	AM6PR08MB4343.eurprd08.prod.outlook.com (20.179.6.74) with Microsoft
-	SMTP
-	Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
-	15.20.1900.18; Tue, 21 May 2019 16:16:22 +0000
-Received: from AM6PR08MB4675.eurprd08.prod.outlook.com
-	([fe80::9051:3c85:28c6:a0c1]) by
-	AM6PR08MB4675.eurprd08.prod.outlook.com
-	([fe80::9051:3c85:28c6:a0c1%6]) with mapi id 15.20.1878.024;
-	Tue, 21 May 2019 16:16:22 +0000
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: "kraxel@redhat.com" <kraxel@redhat.com>
-Thread-Topic: qemu vga crash
-Thread-Index: AQHVCxmradqtfZ8GrUqnP/Tj0S9bcaZ11POA///vpgCAAAY+AA==
-Date: Tue, 21 May 2019 16:16:21 +0000
-Message-ID: <2bcaac7b-8bea-c87e-199d-5d40f9730d7b@virtuozzo.com>
-References: <c2a0ab8b-8229-29be-3658-1a2c52df65ad@virtuozzo.com>
-	<502cc23b-3c83-9f05-098c-7193085ce9ca@virtuozzo.com>
-	<20190521155358.bjxpi3dpilq3qtnx@sirius.home.kraxel.org>
-In-Reply-To: <20190521155358.bjxpi3dpilq3qtnx@sirius.home.kraxel.org>
-Accept-Language: ru-RU, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: HE1PR0501CA0009.eurprd05.prod.outlook.com
-	(2603:10a6:3:1a::19) To AM6PR08MB4675.eurprd08.prod.outlook.com
-	(2603:10a6:20b:c2::14)
-authentication-results: spf=none (sender IP is )
-	smtp.mailfrom=vsementsov@virtuozzo.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-tagtoolbar-keys: D20190521191618829
-x-originating-ip: [185.231.240.5]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 1c0dc4ac-32f1-4cd3-df75-08d6de07a9c3
-x-microsoft-antispam: BCL:0; PCL:0;
-	RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600141)(711020)(4605104)(2017052603328)(7193020);
-	SRVR:AM6PR08MB4343; 
-x-ms-traffictypediagnostic: AM6PR08MB4343:
-x-ms-exchange-purlcount: 1
-x-microsoft-antispam-prvs: <AM6PR08MB43430EFA1D2D70A658CAD9F9C1070@AM6PR08MB4343.eurprd08.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:2089;
-x-forefront-prvs: 0044C17179
-x-forefront-antispam-report: SFV:NSPM;
-	SFS:(10019020)(366004)(136003)(396003)(39850400004)(376002)(346002)(189003)(199004)(7736002)(478600001)(486006)(2906002)(6512007)(305945005)(99286004)(36756003)(102836004)(5640700003)(6306002)(476003)(2501003)(81166006)(8936002)(386003)(6506007)(966005)(81156014)(3480700005)(1730700003)(71190400001)(8676002)(71200400001)(52116002)(2616005)(53936002)(14454004)(6916009)(4326008)(54906003)(14444005)(76176011)(256004)(2351001)(86362001)(73956011)(6486002)(107886003)(66476007)(66946007)(6246003)(25786009)(68736007)(186003)(66066001)(11346002)(66446008)(446003)(31696002)(6116002)(3846002)(26005)(7116003)(6436002)(5660300002)(31686004)(66556008)(316002)(64756008)(229853002);
-	DIR:OUT; SFP:1102; SCL:1; SRVR:AM6PR08MB4343;
-	H:AM6PR08MB4675.eurprd08.prod.outlook.com; FPR:; SPF:None;
-	LANG:en; PTR:InfoNoRecords; MX:1; A:1; 
-received-spf: None (protection.outlook.com: virtuozzo.com does not designate
-	permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: yop3bnYQ0pnTUavfilQqNOlqFl75TcNN2j65k3RwPv62RSGss7PBxb+inuRSw3CqvLtTEXSRRzoZJ5zipQ/mOO08xwonGQwXdmSX2GBEJi2u0ngX93n5fREjuceVQEORYMBJf5azC6LGhBsjUDVMro1r2x7BUfYT5Z4oLnKgvQm5YmizEoSKrFLuIusJNdwHmKr/CDAuZhsuTrlT46Pv+NoaJboD8SvOzUVuRkd9Bsoom94H0uTzUwZRAohYja/qdnt9tcwyBmqBq7UTHmqJ8zeTTtNPn/Ak7tu5y6P+8UbR1aq336XuOtW024+vemG1rp1qM9ue/OkKDuu14HIyIqEC7hTf4S5nbpk/14ugbxWzHafrWV7OJ57zNfOFNtL99yAJ13W6UhJvbtPLpTtDWdEdIlI+mYd9wV895RHSErw=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <031072C99213114B80F5035199617AC0@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <ehabkost@redhat.com>) id 1hT7Sf-00043A-1l
+	for qemu-devel@nongnu.org; Tue, 21 May 2019 12:17:59 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49944)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hT7SZ-0003v4-8i
+	for qemu-devel@nongnu.org; Tue, 21 May 2019 12:17:53 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+	[10.5.11.23])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 2E40466988;
+	Tue, 21 May 2019 16:17:31 +0000 (UTC)
+Received: from localhost (ovpn-116-14.gru2.redhat.com [10.97.116.14])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 694C658C96;
+	Tue, 21 May 2019 16:17:26 +0000 (UTC)
+Date: Tue, 21 May 2019 13:17:24 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <20190521161724.GI10764@habkost.net>
+References: <20190520184108.GA10764@habkost.net>
+	<20190521085350.GF25835@redhat.com>
+	<e2395213-efaf-6d6c-6cfd-d949d071b4f6@redhat.com>
 MIME-Version: 1.0
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1c0dc4ac-32f1-4cd3-df75-08d6de07a9c3
-X-MS-Exchange-CrossTenant-originalarrivaltime: 21 May 2019 16:16:22.3132 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB4343
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.7.120
-Subject: Re: [Qemu-devel] qemu vga crash
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <e2395213-efaf-6d6c-6cfd-d949d071b4f6@redhat.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.38]);
+	Tue, 21 May 2019 16:17:31 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] Introducing GSoC project: API Documentation
+ Generation
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -118,43 +73,182 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Denis Lunev <den@virtuozzo.com>,
-	"ross.lagerwall@citrix.com" <ross.lagerwall@citrix.com>,
-	qemu-devel <qemu-devel@nongnu.org>,
-	"pjp@fedoraproject.org" <pjp@fedoraproject.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+	Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
+	Gabriel Barreto <sbarreto.gabriel@gmail.com>,
+	qemu-devel@nongnu.org, "Emilio G. Cota" <cota@braap.org>,
+	Stefan Hajnoczi <stefanha@redhat.com>,
+	Cleber Rosa <crosa@redhat.com>, John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-MjEuMDUuMjAxOSAxODo1Mywga3JheGVsQHJlZGhhdC5jb20gd3JvdGU6DQo+IE9uIFR1ZSwgTWF5
-IDIxLCAyMDE5IGF0IDAxOjUyOjMxUE0gKzAwMDAsIFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNr
-aXkgd3JvdGU6DQo+PiBDb3VsZCBhbnlib2R5IGhlbHA/DQo+IA0KPiBIb3cgYWJvdXQgZG9pbmcg
-eW91ciBob21ld29yayBwcm9wZXJseT8NCj4gDQo+Pj4gSGkgR2VyZCENCj4+Pg0KPj4+IFdyaXRp
-bmcgdG8geW91LCBhcyB5b3Ugd2VyZSB0aGUgbGFzdCBvbmUgd2hvIGNvbW1pdHRlZCB0byB2Z2Ff
-ZHJhd19ncmFwaGljLCBob3BlIHlvdSBjYW4gaGVscC4NCj4+Pg0KPj4+IFdlIGZhY2VkIHRoZSBm
-b2xsb3dpbmcgY3Jhc2ggaW4gMi4xMi1iYXNlZCBRZW11LCBidXQgY29kZSBzZWVtcyBub3QgcmVh
-bGx5IGNoYW5nZWQ6DQo+IA0KPiBQcmV0dHkgbGFtZSBleGN1c2UgZm9yIG5vdCB0ZXN0aW5nIGEg
-bW9yZSByZWNlbnQgcmVsZWFzZSBvciBnaXQgbWFzdGVyLg0KPiANCj4gQW5kIHlvdSBhcmUgd3Jv
-bmcuICBUaGUgY29kZSAqaGFzKiBjaGFuZ2VkLA0KPiBhbmQgdGhlIGJ1ZyBoYXMgYmVlbiBmaXhl
-ZCBhIHllYXIgYWdvIGFscmVhZHkuDQoNCk9vcHMsIHNlZW1zIGxpa2UgSSBqdXN0IGNvbXBhcmVk
-IHdyb25nIHZlcnNpb25zIHdoZW4gZm91bmQgbm8gcmVhbCBkaWZmZXJlbmNlLCBhcyBidWcgYWN0
-dWFsbHkgZnJvbSAyLjEwLA0KYW5kIGZpeGVkIGluIDIuMTIuDQoNClRoYW5rIHlvdSBhbmQgc29y
-cnkgZm9yIHRoZSBub2lzZS4NCg0KPiANCj4gY29tbWl0IGE4OWZlNmMzMjk3OTllNDdhYWExNjYz
-NjUwZjA3NmIyODgwOGUxODYNCj4gQXV0aG9yOiBHZXJkIEhvZmZtYW5uIDxrcmF4ZWxAcmVkaGF0
-LmNvbT4NCj4gRGF0ZTogICBNb24gTWF5IDE0IDEyOjMxOjE3IDIwMTggKzAyMDANCj4gDQo+ICAg
-ICAgdmdhOiBjYXRjaCBkZXB0aCAwDQo+ICAgICAgDQo+ICAgICAgZGVwdGggPT0gMCBpcyB1c2Vk
-IHRvIGluZGljYXRlIDI1NiBjb2xvciBtb2Rlcy4gIE91ciByZWdpb24gY2FsY3VsYXRpb24NCj4g
-ICAgICBnb2VzIHdyb25nIGluIHRoYXQgY2FzZS4gIFNvIGRldGVjdCB0aGF0IGFuZCBqdXN0IHRh
-a2UgdGhlIHNhZmUgY29kZQ0KPiAgICAgIHBhdGggd2UgYWxyZWFkeSBoYXZlIGZvciB0aGUgd3Jh
-cGFyb3VuZCBjYXNlLg0KPiAgICAgIA0KPiAgICAgIFdoaWxlIGJlaW5nIGF0IGl0IGFsc28gY2F0
-Y2ggZGVwdGggPT0gMTUgKHdoZXJlIG91ciByZWdpb24gc2l6ZQ0KPiAgICAgIGNhbGN1bGF0aW9u
-IGdvZXMgd3JvbmcgdG9vKS4gIEFuZCBtYWtlIHRoZSBjb21tZW50IG1vcmUgdmVyYm9zZSwNCj4g
-ICAgICBleHBsYWluaW5nIHdoYXQgaXMgZ29pbmcgb24gaGVyZS4NCj4gICAgICANCj4gICAgICBX
-aXRob3V0IHRoaXMgd2luZG93cyBndWVzdCBpbnN0YWxsIG1pZ2h0IHRyaWdnZXIgYW4gYXNzZXJ0
-IGR1ZSB0byB0cnlpbmcNCj4gICAgICB0byBjaGVjayBkaXJ0eSBiaXRtYXAgb3V0c2lkZSB0aGUg
-c25hcHNob3QgcmVnaW9uLg0KPiAgICAgIA0KPiAgICAgIEZpeGVzOiBodHRwczovL2J1Z3ppbGxh
-LnJlZGhhdC5jb20vc2hvd19idWcuY2dpP2lkPTE1NzU1NDENCj4gICAgICBTaWduZWQtb2ZmLWJ5
-OiBHZXJkIEhvZmZtYW5uIDxrcmF4ZWxAcmVkaGF0LmNvbT4NCj4gICAgICBNZXNzYWdlLWlkOiAy
-MDE4MDUxNDEwMzExNy4yMTA1OS0xLWtyYXhlbEByZWRoYXQuY29tDQo+IA0KPiBjaGVlcnMsDQo+
-ICAgIEdlcmQNCj4gDQoNCg0KLS0gDQpCZXN0IHJlZ2FyZHMsDQpWbGFkaW1pcg0K
+On Tue, May 21, 2019 at 12:55:36PM +0200, Paolo Bonzini wrote:
+> On 21/05/19 10:53, Daniel P. Berrang=E9 wrote:
+> > Hawkmoth seems pretty attractive in its output format, but doesn't ap=
+pear
+> > to be part of either Debian or Fedora distros, so we would have to bu=
+ndle
+> > it in QEMU I expect.  My big concern there is that there have only be=
+en
+> > 2 contributors to Hawkmoth in its entire 3 year existance, which make=
+s
+> > me fear for its long term viability if the main author gives up.
+>=20
+> On the plus side, I think the main author is among the people that
+> pushed rST and Sphinx in the kernel, so it's plausible that in the
+> future the kernel will pick Hawkmoth.  I agree that we should check wit=
+h
+> him about his plans.
+>=20
+> > QEMU should pick a tool which is well established / widely used & thu=
+s
+> > stands a good chance of being maintained for the long term, as we don=
+'t
+> > want to end up relying on abandonware in 5 years time.  The kernel-do=
+c
+> > project is not widely used, but its main user is significant enough t=
+hat
+> > it isn't likely to die through lack of maintainers.
+>=20
+> A couple years ago I didn't have problems modifying kerneldoc for QEMU'=
+s
+> syntax, it was a 10 lines patch.  Unfortunately I cannot find it anymor=
+e.
+
+Do you mean the following patch?
+
+----- Forwarded message from Paolo Bonzini <pbonzini@redhat.com> -----
+
+Date: Thu, 5 Jan 2017 17:47:30 +0100
+From: Paolo Bonzini <pbonzini@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel=
+@nongnu.org>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>
+Subject: Re: [Qemu-devel] Sphinx for QEMU docs? (and a doc-comment format=
+ question)
+
+
+
+On 07/11/2016 16:03, Peter Maydell wrote:
+> 2) some of the doc-comment format differences are irritating:
+>    . "function - short description" not "function: short description"
+>    . "&struct.fieldname" not ".@fieldname"
+>    . "&typename" not "#typename"
+> 3) the most awkward part of kernel-doc syntax is that it bakes
+>    in the kernel's style choice of always using "struct foo"
+>    for types -- I don't think there's any way to document
+>    'MemoryRegion' and 'AddressSpace' without the 'struct'
+>    coming out in the documentation output.
+>=20
+> We could fix (2) by loosening the kernel-doc script's
+> parsing if we were happy to carry around a forked version
+> of it. Fixing (3) requires more serious surgery on kernel-doc
+> I suspect.
+
+I've sent some changes to kernel-doc to simplify the implementation of
+these changes (http://www.spinics.net/lists/linux-doc/msg42354.html) and
+they were accepted.  So with 4.10 + those patches, the local changes to
+kernel-doc for QEMU would be limited to the following:
+
+diff --git a/scripts/kernel-doc b/scripts/kernel-doc
+index 4c9ada36fe6b..c43ac038398d 100755
+--- a/scripts/kernel-doc
++++ b/scripts/kernel-doc
+@@ -215,18 +215,18 @@ my $type_func =3D '(\w+)\(\)';
+ my $type_param =3D '\@(\w+(\.\.\.)?)';
+ my $type_fp_param =3D '\@(\w+)\(\)';  # Special RST handling for func pt=
+r params
+ my $type_env =3D '(\$\w+)';
+-my $type_enum =3D '\&(enum\s*([_\w]+))';
+-my $type_struct =3D '\&(struct\s*([_\w]+))';
+-my $type_typedef =3D '\&(typedef\s*([_\w]+))';
+-my $type_union =3D '\&(union\s*([_\w]+))';
+-my $type_member =3D '\&([_\w]+)(\.|->)([_\w]+)';
+-my $type_fallback =3D '\&([_\w]+)';
+-my $type_enum_xml =3D '\&amp;(enum\s*([_\w]+))';
+-my $type_struct_xml =3D '\&amp;(struct\s*([_\w]+))';
+-my $type_typedef_xml =3D '\&amp;(typedef\s*([_\w]+))';
+-my $type_union_xml =3D '\&amp;(union\s*([_\w]+))';
+-my $type_member_xml =3D '\&amp;([_\w]+)(\.|-\&gt;)([_\w]+)';
+-my $type_fallback_xml =3D '\&amp([_\w]+)';
++my $type_enum =3D '#(enum\s*([_\w]+))';
++my $type_struct =3D '#(struct\s*([_\w]+))';
++my $type_typedef =3D '#(([A-Z][_\w]*))';
++my $type_union =3D '#(union\s*([_\w]+))';
++my $type_member =3D '#([_\w]+)(\.|->)([_\w]+)';
++my $type_fallback =3D '(?!)';    # this never matches
++my $type_enum_xml =3D $type_enum;
++my $type_struct_xml =3D $type_struct;
++my $type_typedef_xml =3D $type_typedef;
++my $type_union_xml =3D $type_union;
++my $type_member_xml =3D $type_member;
++my $type_fallback_xml =3D $type_fallback;
+ my $type_member_func =3D $type_member . '\(\)';
+=20
+ # Output conversion substitutions.
+@@ -2143,6 +2143,14 @@ sub output_blockhead {
+ sub dump_declaration($$) {
+     no strict 'refs';
+     my ($prototype, $file) =3D @_;
++    if ($decl_type eq 'type name') {
++	if ($prototype =3D~ /^(enum|struct|union)\s+/) {
++	    $decl_type =3D $1;
++        } else {
++	    return;
++	}
++    }
++
+     my $func =3D "dump_" . $decl_type;
+     &$func(@_);
+ }
+@@ -2893,7 +2901,7 @@ sub process_file($) {
+ 	    }
+ 	    elsif (/$doc_decl/o) {
+ 		$identifier =3D $1;
+-		if (/\s*([\w\s]+?)\s*-/) {
++		if (/\s*([\w\s]+?)(\s*-|:)/) {
+ 		    $identifier =3D $1;
+ 		}
+=20
+@@ -2903,7 +2911,7 @@ sub process_file($) {
+ 		$contents =3D "";
+ 		$section =3D $section_default;
+ 		$new_start_line =3D $. + 1;
+-		if (/-(.*)/) {
++		if (/[-:](.*)/) {
+ 		    # strip leading/trailing/multiple spaces
+ 		    $descr=3D $1;
+ 		    $descr =3D~ s/^\s*//;
+@@ -2921,7 +2929,9 @@ sub process_file($) {
+ 			++$warnings;
+ 		}
+=20
+-		if ($identifier =3D~ m/^struct/) {
++		if ($identifier =3D~ m/^[A-Z]/) {
++		    $decl_type =3D 'type name';
++	        } elsif ($identifier =3D~ m/^struct/) {
+ 		    $decl_type =3D 'struct';
+ 		} elsif ($identifier =3D~ m/^union/) {
+ 		    $decl_type =3D 'union';
+
+which should be maintainable as a fork of Linux's kernel-doc.
+
+I also worked a bit on support for Texinfo manuals in Sphinx.  My
+current attempt is at http://people.redhat.com/pbonzini/qemu-test-doc/_bu=
+ild/.
+Because this uses a Texinfo->Docbook->Sphinx pipeline, I also tried some
+tools with native Docbook support (Publican), but despite Sphinx's quirks
+the output was less usable, and the tools were slower and harder to use.
+
+http://wiki.qemu-project.org/Features/Documentation is another place to
+brainstorm ideas on this.
+
+Paolo
+
+
+----- End forwarded message -----
+
+--=20
+Eduardo
 
