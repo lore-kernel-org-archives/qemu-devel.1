@@ -7,57 +7,56 @@ X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5FC9BC04AAF
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 06:42:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 17148C04AAF
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 06:43:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 28C9021743
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 06:42:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D81AC21743
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 06:43:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="VWyJk10/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 28C9021743
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="G4YazcHm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D81AC21743
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:47498 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:47504 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hSyTu-0008Jx-9o
-	for qemu-devel@archiver.kernel.org; Tue, 21 May 2019 02:42:38 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:48987)
+	id 1hSyUe-0000hi-29
+	for qemu-devel@archiver.kernel.org; Tue, 21 May 2019 02:43:24 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:48763)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1hSyHa-0005yH-Db
-	for qemu-devel@nongnu.org; Tue, 21 May 2019 02:29:55 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1hSyHW-0005t7-9J
+	for qemu-devel@nongnu.org; Tue, 21 May 2019 02:29:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1hSyHY-0007zU-VV
-	for qemu-devel@nongnu.org; Tue, 21 May 2019 02:29:54 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:36917 helo=ozlabs.org)
+	(envelope-from <dgibson@ozlabs.org>) id 1hSyHU-0007my-LO
+	for qemu-devel@nongnu.org; Tue, 21 May 2019 02:29:50 -0400
+Received: from ozlabs.org ([2401:3900:2:1::2]:37529)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
-	id 1hSyHY-0007tV-Jj; Tue, 21 May 2019 02:29:52 -0400
+	id 1hSyHU-0007iB-71; Tue, 21 May 2019 02:29:48 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
-	id 457Qpj1b7yz9sPG; Tue, 21 May 2019 16:29:31 +1000 (AEST)
+	id 457Qpg2lPSz9sNK; Tue, 21 May 2019 16:29:30 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-	d=gibson.dropbear.id.au; s=201602; t=1558420173;
-	bh=s7n9GOFMHz6jZbmXHbQuUX0/Qi9S9CpdqCJBOttcq4s=;
+	d=gibson.dropbear.id.au; s=201602; t=1558420171;
+	bh=6umsziP45kqLQbkhjysqubHMINrd6dPk0OGV7I94jHo=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=VWyJk10/5z47S7hHgSM31jiHhmBmzGx1a/l1PJqm7b08AJ+OrrxqZtl5Zv+9/b0b/
-	IltAa6tZjc7I0k2xFZ8NXWoOiofvH2QvvrOsRNW5N9aAjQN1MceTctFW+WC21VB0GB
-	RRlq0bJllaBl/zK9pkWRe+xRDm/mR4YH1ASMsJmA=
+	b=G4YazcHm7AdEHK8JMYwsWFQC/YXoKokHQ0I1604uZh++WotQH1u2ofEJ4jXrETrDW
+	jj8HOTvmCXMOTrJ37gDpKIs+EzddtS1JpM6Bkl1ZEg5HSWs8uOQVpv9jGBRsTZi+SI
+	bcJO8K5ng0zL1fOJkz3tkJwgrSFMlUYP60wiJDQw=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: peter.maydell@linaro.org
-Date: Tue, 21 May 2019 16:29:01 +1000
-Message-Id: <20190521062924.6930-16-david@gibson.dropbear.id.au>
+Date: Tue, 21 May 2019 16:28:55 +1000
+Message-Id: <20190521062924.6930-10-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190521062924.6930-1-david@gibson.dropbear.id.au>
 References: <20190521062924.6930-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 203.11.71.1
-Subject: [Qemu-devel] [PULL 15/38] spapr/xive: print out the EQ page address
- in the monitor
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2401:3900:2:1::2
+Subject: [Qemu-devel] [PULL 09/38] target/ppc: Fix xxbrq, xxbrw
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -69,52 +68,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: lvivier@redhat.com, gkurz@kaod.org, Greg Kurz <groug@kaod.org>,
-	qemu-devel@nongnu.org, qemu-ppc@nongnu.org, clg@kaod.org,
+Cc: lvivier@redhat.com, gkurz@kaod.org, qemu-devel@nongnu.org,
+	qemu-ppc@nongnu.org, clg@kaod.org, Anton Blanchard <anton@ozlabs.org>,
 	David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: C=C3=A9dric Le Goater <clg@kaod.org>
+From: Anton Blanchard <anton@ozlabs.org>
 
-This proved to be a useful information when debugging issues with OS
-event queues allocated above 64GB.
+Fix a typo in xxbrq and xxbrw where we put both results into the lower
+doubleword.
 
-Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
-Message-Id: <20190508171946.657-4-clg@kaod.org>
-Reviewed-by: Greg Kurz <groug@kaod.org>
+Fixes: 8b3b2d75c7c0 ("introduce get_cpu_vsr{l,h}() and set_cpu_vsr{l,h}()=
+ helpers for VSR register access")
+Signed-off-by: Anton Blanchard <anton@ozlabs.org>
+Message-Id: <20190507004811.29968-3-anton@ozlabs.org>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/intc/spapr_xive.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ target/ppc/translate/vsx-impl.inc.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
-index a19e998093..58cc6e2b50 100644
---- a/hw/intc/spapr_xive.c
-+++ b/hw/intc/spapr_xive.c
-@@ -120,6 +120,7 @@ static int spapr_xive_target_to_end(uint32_t target, =
-uint8_t prio,
- static void spapr_xive_end_pic_print_info(SpaprXive *xive, XiveEND *end,
-                                           Monitor *mon)
- {
-+    uint64_t qaddr_base =3D xive_end_qaddr(end);
-     uint32_t qindex =3D xive_get_field32(END_W1_PAGE_OFF, end->w1);
-     uint32_t qgen =3D xive_get_field32(END_W1_GENERATION, end->w1);
-     uint32_t qsize =3D xive_get_field32(END_W0_QSIZE, end->w0);
-@@ -127,9 +128,9 @@ static void spapr_xive_end_pic_print_info(SpaprXive *=
-xive, XiveEND *end,
-     uint32_t nvt =3D xive_get_field32(END_W6_NVT_INDEX, end->w6);
-     uint8_t priority =3D xive_get_field32(END_W7_F0_PRIORITY, end->w7);
+diff --git a/target/ppc/translate/vsx-impl.inc.c b/target/ppc/translate/v=
+sx-impl.inc.c
+index 4d8ca7cf32..d29f60e2f9 100644
+--- a/target/ppc/translate/vsx-impl.inc.c
++++ b/target/ppc/translate/vsx-impl.inc.c
+@@ -1192,7 +1192,7 @@ static void gen_xxbrq(DisasContext *ctx)
+     tcg_gen_bswap64_i64(xtl, xbh);
+     set_cpu_vsrl(xT(ctx->opcode), xtl);
+     tcg_gen_mov_i64(xth, t0);
+-    set_cpu_vsrl(xT(ctx->opcode), xth);
++    set_cpu_vsrh(xT(ctx->opcode), xth);
 =20
--    monitor_printf(mon, "%3d/%d % 6d/%5d ^%d",
-+    monitor_printf(mon, "%3d/%d % 6d/%5d @%"PRIx64" ^%d",
-                    spapr_xive_nvt_to_target(0, nvt),
--                   priority, qindex, qentries, qgen);
-+                   priority, qindex, qentries, qaddr_base, qgen);
+     tcg_temp_free_i64(t0);
+     tcg_temp_free_i64(xth);
+@@ -1220,7 +1220,7 @@ static void gen_xxbrw(DisasContext *ctx)
+     get_cpu_vsrl(xbl, xB(ctx->opcode));
 =20
-     xive_end_queue_pic_print_info(end, 6, mon);
-     monitor_printf(mon, "]");
+     gen_bswap32x4(xth, xtl, xbh, xbl);
+-    set_cpu_vsrl(xT(ctx->opcode), xth);
++    set_cpu_vsrh(xT(ctx->opcode), xth);
+     set_cpu_vsrl(xT(ctx->opcode), xtl);
+=20
+     tcg_temp_free_i64(xth);
 --=20
 2.21.0
 
