@@ -2,67 +2,70 @@ Return-Path: <SRS0=/4tE=TV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B0C92C04E87
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 20:11:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68D31C04AAF
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 20:12:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 88C63217F9
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 20:11:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 88C63217F9
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 34C7A217F9
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 20:12:59 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=ozlabs.org header.i=@ozlabs.org header.b="bxUPF4uH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 34C7A217F9
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=ozlabs.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:58879 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:58893 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hTB72-0007US-OR
-	for qemu-devel@archiver.kernel.org; Tue, 21 May 2019 16:11:52 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:57221)
+	id 1hTB86-0008OL-CZ
+	for qemu-devel@archiver.kernel.org; Tue, 21 May 2019 16:12:58 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:57426)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1hTB5o-0006ji-8d
-	for qemu-devel@nongnu.org; Tue, 21 May 2019 16:10:37 -0400
+	(envelope-from <anton@ozlabs.org>) id 1hTB6e-0007TO-E5
+	for qemu-devel@nongnu.org; Tue, 21 May 2019 16:11:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1hTB5m-0001ol-4F
-	for qemu-devel@nongnu.org; Tue, 21 May 2019 16:10:36 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42994)
+	(envelope-from <anton@ozlabs.org>) id 1hTB6d-000318-3Z
+	for qemu-devel@nongnu.org; Tue, 21 May 2019 16:11:28 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:57831 helo=ozlabs.org)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hTB5k-0001jX-43
-	for qemu-devel@nongnu.org; Tue, 21 May 2019 16:10:32 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
-	[10.5.11.23])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D923C2BDA;
-	Tue, 21 May 2019 20:10:11 +0000 (UTC)
-Received: from localhost (ovpn-116-14.gru2.redhat.com [10.97.116.14])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 61070799E;
-	Tue, 21 May 2019 20:10:04 +0000 (UTC)
-Date: Tue, 21 May 2019 17:10:02 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-To: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Message-ID: <20190521201002.GL10764@habkost.net>
-References: <20190520231910.12184-1-f4bug@amsat.org>
-	<20190520231910.12184-5-f4bug@amsat.org>
-	<CAL1e-=jfYuh4jLAacFeZcOes5A3PERNLqsE4_hiEci+x0XBTrw@mail.gmail.com>
-	<CAL1e-=heGtJj-30YsAVyGKSMULZ5ggVd42+c9caGqN3PBRddag@mail.gmail.com>
+	(Exim 4.71) (envelope-from <anton@ozlabs.org>)
+	id 1hTB6c-0002hm-HO; Tue, 21 May 2019 16:11:27 -0400
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits)
+	server-digest SHA256) (No client certificate requested)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 457n2p2bjwz9s3l;
+	Wed, 22 May 2019 06:11:13 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ozlabs.org; s=201707;
+	t=1558469475; bh=vbldDZJnrimtoFoAJ6UKMk/YrTCOYZ+2IEmNAcwLwdw=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=bxUPF4uHzzD+Cxsle7Hd38jR1tQK/fV5McsEZ1Dh/Uxq6jiThrVHScQD4qtumQuy8
+	/iqC252nFxpRJg1YEq3J8SzV49WNDIf5Ep++WrZuFWsXzDI9aOTkd+AphKONoxxTLc
+	ivdph2LW4+aPF9eqXQTKNQIuit8xuDiv+sFgEEmTxqir2TllRkb0MD7w5k2NioLmfQ
+	o99E3i85t0X0s3qPlSJrDbM+sg3giU+G4gWGOHzMYeUm9lnPpAW2f+KyBngVCtLG9Y
+	IAZ1HtB2jD3wHzjetuObSR8F0JZmLN0Vvh/bVyp1O6aZXPlrHdTtf1vFXoOUO5UNeI
+	i59FPTq089hXA==
+Date: Wed, 22 May 2019 06:11:12 +1000
+From: Anton Blanchard <anton@ozlabs.org>
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+	david@gibson.dropbear.id.au
+Message-ID: <20190522061112.3accdb76@kryten>
+In-Reply-To: <c1d2a4cf-a9a7-4dfa-ed80-987118043f08@ilande.co.uk>
+References: <20190507004811.29968-1-anton@ozlabs.org>
+	<20190507004811.29968-4-anton@ozlabs.org>
+	<c1d2a4cf-a9a7-4dfa-ed80-987118043f08@ilande.co.uk>
+X-Mailer: Mutt/1.8.0 (2017-02-23)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <CAL1e-=heGtJj-30YsAVyGKSMULZ5ggVd42+c9caGqN3PBRddag@mail.gmail.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.25]);
-	Tue, 21 May 2019 20:10:25 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 4/4] BootLinuxSshTest: Test some userspace
- commands on Malta
+X-Received-From: 203.11.71.1
+Subject: Re: [Qemu-devel] [PATCH 4/9] target/ppc: Fix lxvw4x,
+ lxvh8x and lxvb16x
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -74,47 +77,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Aleksandar Rikalo <arikalo@wavecomp.com>,
-	Caio Carrara <ccarrara@redhat.com>,
-	Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>,
-	qemu-devel@nongnu.org, Aleksandar Markovic <amarkovic@wavecomp.com>,
-	Cleber Rosa <crosa@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
+Cc: ego@linux.vnet.ibm.com, sandipandas1990@gmail.com,
+	richard.henderson@linaro.org, f4bug@amsat.org,
+	qemu-devel@nongnu.org, qemu-ppc@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, May 21, 2019 at 11:26:35AM +0200, Aleksandar Markovic wrote:
-> On May 21, 2019 10:18 AM, "Aleksandar Markovic" <aleksandar.m.mail@gmai=
-l.com>
-> wrote:
-> >
-> >
-> > On May 21, 2019 1:19 AM, "Philippe Mathieu-Daud=E9" <f4bug@amsat.org>=
- wrote:
-> > >
-> > > This tests boot a full VM and check the serial console until
-> > > the SSH daemon is running, then start a SSH session and run
-> > > some commands.
-> > >
->=20
-> If there is no objection from Cleber or others, I would like to apply t=
-his
-> patch to my next MIPS pull request. We in Wave just started regular
-> regression tests of various nature for QEMU 4.1 for MIPS, and would rea=
-lly
-> like to have this test integrated as soon as possible, that is why I am
-> rushing a bit. I am talking here about this patch only, since it is a s=
-ort
-> of an independant unit - I will not do anything with other remaining
-> patches from this series.
->=20
-> Please let me know if you have any concerns.
+Hi,
 
-No problem to me.  I don't expect any merge conflicts caused by
-the same patch being merged through both trees.
+> I've now had a bit of time to look through this and I believe it is
+> correct, so:
+> 
+> Reviewed-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
-Acked-by: Eduardo Habkost <ehabkost@redhat.com>
+Thanks Mark. David: any chance we could get this merged? I can't run a
+recent Ubuntu image successfully without it. sshd hangs when I try to
+ssh into it.
 
---=20
-Eduardo
+Thanks,
+Anton
 
