@@ -8,70 +8,70 @@ X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 82F69C04AAF
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 10:15:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D85FC04AAF
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 10:16:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4ECAB21773
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 10:15:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EDED021773
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 10:16:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="oAxb1BrA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4ECAB21773
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="uj377cmo"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EDED021773
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:50693 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:50703 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hT1o4-0001ae-Gf
-	for qemu-devel@archiver.kernel.org; Tue, 21 May 2019 06:15:40 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:44801)
+	id 1hT1pB-0002bV-0q
+	for qemu-devel@archiver.kernel.org; Tue, 21 May 2019 06:16:49 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:45006)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <arilou@gmail.com>) id 1hT1ZE-0005mx-3m
-	for qemu-devel@nongnu.org; Tue, 21 May 2019 06:00:21 -0400
+	(envelope-from <arilou@gmail.com>) id 1hT1ZT-000607-45
+	for qemu-devel@nongnu.org; Tue, 21 May 2019 06:00:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <arilou@gmail.com>) id 1hT1ZC-0007cA-Bo
-	for qemu-devel@nongnu.org; Tue, 21 May 2019 06:00:20 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:39515)
+	(envelope-from <arilou@gmail.com>) id 1hT1ZR-0007wm-PF
+	for qemu-devel@nongnu.org; Tue, 21 May 2019 06:00:35 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:40040)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <arilou@gmail.com>) id 1hT1ZC-0007Zv-3F
-	for qemu-devel@nongnu.org; Tue, 21 May 2019 06:00:18 -0400
-Received: by mail-wr1-x444.google.com with SMTP id w8so17870586wrl.6
-	for <qemu-devel@nongnu.org>; Tue, 21 May 2019 03:00:17 -0700 (PDT)
+	(Exim 4.71) (envelope-from <arilou@gmail.com>) id 1hT1ZR-0007vV-Hx
+	for qemu-devel@nongnu.org; Tue, 21 May 2019 06:00:33 -0400
+Received: by mail-wm1-x342.google.com with SMTP id 15so2208026wmg.5
+	for <qemu-devel@nongnu.org>; Tue, 21 May 2019 03:00:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
 	h=from:to:cc:subject:date:message-id:in-reply-to:references
 	:mime-version:content-transfer-encoding;
-	bh=V1QVJ4HRbWCoEeLavvf/S+Qb9vILZOoid3DZnX3FkwE=;
-	b=oAxb1BrAE6KTFqNW4wbh1u16wJ5p4bIGaSWxJpmnpaAr2xEDfCsuFzGyILD7ktpcYG
-	QahWobmPPPjDcWPIbkVTuggKxLxfQoUqib/AuHdpIIWYc4OiiVkoLTplu3KdTGfKLfQC
-	F39w8VVMs/yobNdp6DwjD3Wv7TIWF5Tod55zUBMkD5jregix1EvNGVciH3+OYoYqxxAE
-	4xZT/cWtY/oaw8xQ9NAUVQwBZz93sCi844q5Tj8kqIC0yyIr0M/QxvE3tsun/zHHbvmx
-	c3Vm33nvx4nxP1pIoF11hrB/wzfFEHNejNeQc76lJIIFrSpftrPw94FOHask6Bs5JmrT
-	M+9w==
+	bh=3B88NpQFOs8DC+2595MWdyNpg+oQZ5roeXs0f+YNp/4=;
+	b=uj377cmovNC3MowTVujPc6sQKKALoIIxOMeue2auAJvlqoV8yonCzPxqLQlRpPTN0C
+	ITNCsb3L5QqafH0Ie3OSIgKphCZx084dzi2Mzb+VlyIwVrryz0b9gsb5PwaHaTPGodzz
+	KX5AiksawrPKSp1n933M9WdXM4Y5dVsLKnIRPy7zQCwQ3zKQ7vn17yk8jgCG5rfw/BrA
+	fQOgbVtv1rdsX+iG6XZoChoEfUZ2/Lo4bijcPrACAEUjL8j6iv/ZMBXHTcb2m4xp1GBM
+	QEOONFdcKZC6HpNaMnLvd31pq/Vt6T0wHULL0yy7OrecSeBXub5Z8vY7KvR2WM/Joyl9
+	vZ+w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
 	:references:mime-version:content-transfer-encoding;
-	bh=V1QVJ4HRbWCoEeLavvf/S+Qb9vILZOoid3DZnX3FkwE=;
-	b=T5VFAg58/X/Arbjbgv8p9pD4lY0XRzSv7uGyrfuwvJgE/fJCGFbDBoCli6584CfZw0
-	GlKpt+IHoyXcJO2Z8FdvI7qhPEqVs2JJT/FVdIZWq9C1U8NAMba7inPdAxv/ygLg3qNf
-	pSRC5fEpS/9kYFAGP6ga3q6HAiYmklZdsz+S4IPaaMpLw5OkvRMTrtzf06gRzNrB58CC
-	gZqH4orIAEPpzy1UV35RkPF4pbNwLKSPrtwV+oxKbVWNOjaBqzqxTOI3aG2mdJHbkWjV
-	kFrF3I8iXWFBFoovXauQ+ADa6LvEk1VXz+AQPM9/ggO8CFmcPdGkozNNeEjAabtFHPH2
-	djXg==
-X-Gm-Message-State: APjAAAXCZxorf/5nFhAl2x4UkVkai7ULfQtqrLV9bA+ppBrkmPskJx4I
-	v55GfEF77Sdn79EYwGkuUxD4Skjr
-X-Google-Smtp-Source: APXvYqxmDuhVfySEZhkAzcIcGPpjZp5QUUl5K7yuEzEIPTAyEHCynUv9+7fiaWsFmK/HB82bqJM+hA==
-X-Received: by 2002:adf:ef83:: with SMTP id d3mr38294993wro.253.1558432816048; 
-	Tue, 21 May 2019 03:00:16 -0700 (PDT)
+	bh=3B88NpQFOs8DC+2595MWdyNpg+oQZ5roeXs0f+YNp/4=;
+	b=JdRBYqlRouy+KNpZ3hr49j1lnPp2CXb1XzSbxT+epBu3Plw72H6Nl/D0GpIvaOUalT
+	pjxPxCWsvalfvc7M2CWQ54nbokESPMNuyBQdnPhqOgkMZqYesR67nwEPTdjIT7YUpa7B
+	iW90I6NnwHTUtNEOtB0lI4L+MZg87+gPZUl8HBtD4ZreGQex+B21v+0A+L6cEp0QsmWw
+	Tv7MLdqALo1Oy6zHmNEmMMgygnATV7XklRXMWmQMGeh6FH/TA5TFARSo4c4Yw5gauqja
+	c9tjtGyBrkTiwUb4FPwmuDKbI5cTjTnoxwSqgwIiVCUFvIjHJnFZVwlC1VP2pVdxmnxG
+	9b3A==
+X-Gm-Message-State: APjAAAWGHPNCms3/41PvIWx+bUi1TuGd3TnIB2ONHLmqKEauogBwWrjL
+	CcSp7ULg5yAKU6ZfN3QKl41KGXcX
+X-Google-Smtp-Source: APXvYqwBMYC2cUwd/ype5NAqAB60UJEFVmeDNqJ1rfi6dcHCugODJZ9tyy3V2ahfBeOYwfbejMFOaw==
+X-Received: by 2002:a1c:4486:: with SMTP id r128mr2862041wma.90.1558432832464; 
+	Tue, 21 May 2019 03:00:32 -0700 (PDT)
 Received: from jondnuc.lan ([176.230.64.64])
-	by smtp.gmail.com with ESMTPSA id 65sm3080257wro.85.2019.05.21.03.00.14
+	by smtp.gmail.com with ESMTPSA id 65sm3080257wro.85.2019.05.21.03.00.31
 	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Tue, 21 May 2019 03:00:15 -0700 (PDT)
+	Tue, 21 May 2019 03:00:32 -0700 (PDT)
 From: Jon Doron <arilou@gmail.com>
 To: qemu-devel@nongnu.org
-Date: Tue, 21 May 2019 12:59:37 +0300
-Message-Id: <20190521095948.8204-10-arilou@gmail.com>
+Date: Tue, 21 May 2019 12:59:48 +0300
+Message-Id: <20190521095948.8204-21-arilou@gmail.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190521095948.8204-1-arilou@gmail.com>
 References: <20190521095948.8204-1-arilou@gmail.com>
@@ -79,9 +79,9 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2a00:1450:4864:20::444
-Subject: [Qemu-devel] [PATCH v10 09/20] gdbstub: Implement get register (p
- pkt) with new infra
+X-Received-From: 2a00:1450:4864:20::342
+Subject: [Qemu-devel] [PATCH v10 20/20] gdbstub: Implement qemu physical
+ memory mode
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -98,79 +98,118 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Add a new query/set which changes the memory GDB sees to physical memory
+only.
+
+gdb> maint packet qqemu.PhyMemMode
+will reply the current phy_mem_mode state (1 for enabled, 0 for disabled)
+gdb> maint packet Qqemu.PhyMemMode:1
+Will make GDB read/write only to physical memory, set to 0 to disable
+
 Signed-off-by: Jon Doron <arilou@gmail.com>
 ---
- gdbstub.c | 50 ++++++++++++++++++++++++++++++++++++++------------
- 1 file changed, 38 insertions(+), 12 deletions(-)
+ gdbstub.c | 62 +++++++++++++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 60 insertions(+), 2 deletions(-)
 
 diff --git a/gdbstub.c b/gdbstub.c
-index 1c210d671a..3284b3e01d 100644
+index 9dd934a079..c9269319d8 100644
 --- a/gdbstub.c
 +++ b/gdbstub.c
-@@ -1658,6 +1658,36 @@ static void handle_set_reg(GdbCmdContext *gdb_ctx, void *user_ctx)
-     put_packet(gdb_ctx->s, "OK");
- }
+@@ -46,11 +46,27 @@
+ #define GDB_ATTACHED "1"
+ #endif
  
-+static void handle_get_reg(GdbCmdContext *gdb_ctx, void *user_ctx)
-+{
-+    int reg_size;
++#ifndef CONFIG_USER_ONLY
++static int phy_memory_mode;
++#endif
 +
-+    /*
-+     * Older gdb are really dumb, and don't use 'g' if 'p' is avaialable.
-+     * This works, but can be very slow.  Anything new enough to
-+     * understand XML also knows how to use this properly.
-+     */
-+    if (!gdb_has_xml) {
-+        put_packet(gdb_ctx->s, "");
-+        return;
+ static inline int target_memory_rw_debug(CPUState *cpu, target_ulong addr,
+                                          uint8_t *buf, int len, bool is_write)
+ {
+-    CPUClass *cc = CPU_GET_CLASS(cpu);
++    CPUClass *cc;
+ 
++#ifndef CONFIG_USER_ONLY
++    if (phy_memory_mode) {
++        if (is_write) {
++            cpu_physical_memory_write(addr, buf, len);
++        } else {
++            cpu_physical_memory_read(addr, buf, len);
++        }
++        return 0;
 +    }
++#endif
 +
-+    if (!gdb_ctx->num_params) {
-+        put_packet(gdb_ctx->s, "E14");
-+        return;
-+    }
-+
-+    reg_size = gdb_read_register(gdb_ctx->s->g_cpu, gdb_ctx->mem_buf,
-+                                 gdb_ctx->params[0].val_ull);
-+    if (!reg_size) {
-+        put_packet(gdb_ctx->s, "E14");
-+        return;
-+    }
-+
-+    memtohex(gdb_ctx->str_buf, gdb_ctx->mem_buf, reg_size);
++    cc = CPU_GET_CLASS(cpu);
+     if (cc->memory_rw_debug) {
+         return cc->memory_rw_debug(cpu, addr, buf, len, is_write);
+     }
+@@ -2118,8 +2134,36 @@ static void handle_query_attached(GdbCmdContext *gdb_ctx, void *user_ctx)
+ 
+ static void handle_query_qemu_supported(GdbCmdContext *gdb_ctx, void *user_ctx)
+ {
+-    put_packet(gdb_ctx->s, "sstepbits;sstep");
++    snprintf(gdb_ctx->str_buf, sizeof(gdb_ctx->str_buf), "sstepbits;sstep");
++#ifndef CONFIG_USER_ONLY
++    pstrcat(gdb_ctx->str_buf, sizeof(gdb_ctx->str_buf), ";PhyMemMode");
++#endif
 +    put_packet(gdb_ctx->s, gdb_ctx->str_buf);
 +}
 +
- static int gdb_handle_packet(GDBState *s, const char *line_buf)
- {
-     CPUState *cpu;
-@@ -1887,18 +1917,14 @@ static int gdb_handle_packet(GDBState *s, const char *line_buf)
-         }
-         break;
-     case 'p':
--        /* Older gdb are really dumb, and don't use 'g' if 'p' is avaialable.
--           This works, but can be very slow.  Anything new enough to
--           understand XML also knows how to use this properly.  */
--        if (!gdb_has_xml)
--            goto unknown_command;
--        addr = strtoull(p, (char **)&p, 16);
--        reg_size = gdb_read_register(s->g_cpu, mem_buf, addr);
--        if (reg_size) {
--            memtohex(buf, mem_buf, reg_size);
--            put_packet(s, buf);
--        } else {
--            put_packet(s, "E14");
-+        {
-+            static const GdbCmdParseEntry get_reg_cmd_desc = {
-+                .handler = handle_get_reg,
-+                .cmd = "p",
-+                .cmd_startswith = 1,
-+                .schema = "L0"
-+            };
-+            cmd_parser = &get_reg_cmd_desc;
-         }
-         break;
-     case 'P':
++#ifndef CONFIG_USER_ONLY
++static void handle_query_qemu_phy_mem_mode(GdbCmdContext *gdb_ctx,
++                                           void *user_ctx)
++{
++    snprintf(gdb_ctx->str_buf, sizeof(gdb_ctx->str_buf), "%d", phy_memory_mode);
++    put_packet(gdb_ctx->s, gdb_ctx->str_buf);
++}
++
++static void handle_set_qemu_phy_mem_mode(GdbCmdContext *gdb_ctx, void *user_ctx)
++{
++    if (!gdb_ctx->num_params) {
++        put_packet(gdb_ctx->s, "E22");
++        return;
++    }
++
++    if (!gdb_ctx->params[0].val_ul) {
++        phy_memory_mode = 0;
++    } else {
++        phy_memory_mode = 1;
++    }
++    put_packet(gdb_ctx->s, "OK");
+ }
++#endif
+ 
+ static GdbCmdParseEntry gdb_gen_query_set_common_table[] = {
+     /* Order is important if has same prefix */
+@@ -2201,6 +2245,12 @@ static GdbCmdParseEntry gdb_gen_query_table[] = {
+         .handler = handle_query_qemu_supported,
+         .cmd = "qemu.Supported",
+     },
++#ifndef CONFIG_USER_ONLY
++    {
++        .handler = handle_query_qemu_phy_mem_mode,
++        .cmd = "qemu.PhyMemMode",
++    },
++#endif
+ };
+ 
+ static GdbCmdParseEntry gdb_gen_set_table[] = {
+@@ -2211,6 +2261,14 @@ static GdbCmdParseEntry gdb_gen_set_table[] = {
+         .cmd_startswith = 1,
+         .schema = "l0"
+     },
++#ifndef CONFIG_USER_ONLY
++    {
++        .handler = handle_set_qemu_phy_mem_mode,
++        .cmd = "qemu.PhyMemMode:",
++        .cmd_startswith = 1,
++        .schema = "l0"
++    },
++#endif
+ };
+ 
+ static void handle_gen_query(GdbCmdContext *gdb_ctx, void *user_ctx)
 -- 
 2.21.0
 
