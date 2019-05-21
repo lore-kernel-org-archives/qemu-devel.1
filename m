@@ -2,68 +2,72 @@ Return-Path: <SRS0=/4tE=TV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_NEOMUTT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AA313C46460
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 19:20:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 207D0C04AAF
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 19:36:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 857AF217D7
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 19:20:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 857AF217D7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id EE23A217F9
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 19:36:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EE23A217F9
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:58265 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:58438 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hTAJG-0002QE-Nc
-	for qemu-devel@archiver.kernel.org; Tue, 21 May 2019 15:20:26 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:47152)
+	id 1hTAYn-0006dE-3E
+	for qemu-devel@archiver.kernel.org; Tue, 21 May 2019 15:36:29 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:50061)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jfreimann@redhat.com>) id 1hTAH2-0000dW-Te
-	for qemu-devel@nongnu.org; Tue, 21 May 2019 15:18:09 -0400
+	(envelope-from <bounces@canonical.com>) id 1hTAXu-0006Ha-0O
+	for qemu-devel@nongnu.org; Tue, 21 May 2019 15:35:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jfreimann@redhat.com>) id 1hTAH1-00012y-EM
-	for qemu-devel@nongnu.org; Tue, 21 May 2019 15:18:08 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51754)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jfreimann@redhat.com>)
-	id 1hTAH1-00012M-8I
-	for qemu-devel@nongnu.org; Tue, 21 May 2019 15:18:07 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
-	[10.5.11.23])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 48FBFC05CDFC
-	for <qemu-devel@nongnu.org>; Tue, 21 May 2019 19:18:01 +0000 (UTC)
-Received: from localhost (ovpn-117-77.ams2.redhat.com [10.36.117.77])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 7BEBF19499;
-	Tue, 21 May 2019 19:17:56 +0000 (UTC)
-Date: Tue, 21 May 2019 21:17:54 +0200
-From: Jens Freimann <jfreimann@redhat.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20190521191754.pucxooeeema2hudu@jenstp.localdomain>
-References: <20190517125820.2885-1-jfreimann@redhat.com>
-	<20190521060725-mutt-send-email-mst@kernel.org>
+	(envelope-from <bounces@canonical.com>) id 1hTAXs-0007dX-7i
+	for qemu-devel@nongnu.org; Tue, 21 May 2019 15:35:33 -0400
+Received: from indium.canonical.com ([91.189.90.7]:47966)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1hTAXs-0007cL-1F
+	for qemu-devel@nongnu.org; Tue, 21 May 2019 15:35:32 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1hTAXo-0000H4-DG
+	for <qemu-devel@nongnu.org>; Tue, 21 May 2019 19:35:28 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 49A052E80CC
+	for <qemu-devel@nongnu.org>; Tue, 21 May 2019 19:35:28 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20190521060725-mutt-send-email-mst@kernel.org>
-User-Agent: NeoMutt/20180716-1376-5d6ed1
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.31]);
-	Tue, 21 May 2019 19:18:01 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 21 May 2019 19:25:50 -0000
+From: John Snow <1829498@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided;
+	assignee=jsnow@redhat.com; 
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: ffhguy jnsnow
+X-Launchpad-Bug-Reporter: arseniy (ffhguy)
+X-Launchpad-Bug-Modifier: John Snow (jnsnow)
+References: <155808951981.15307.7632909900341712173.malonedeb@gac.canonical.com>
+Message-Id: <155846675010.14626.5881653370030843443.malone@gac.canonical.com>
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="18962";
+	Instance="launchpad-lazr.conf"
+X-Launchpad-Hash: 011a1c78ef0a409bd978c7f8707adbcb9c3b51a4
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 0/4] add failover feature for assigned
- network devices
+X-Received-From: 91.189.90.7
+Subject: [Qemu-devel] [Bug 1829498] Re: window 8 stuck during boot on Qemu
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -72,34 +76,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pkrempa@redhat.com, berrange@redhat.com, ehabkost@redhat.com,
-	aadam@redhat.com, qemu-devel@nongnu.org, laine@redhat.com, ailan@redhat.com
+Reply-To: Bug 1829498 <1829498@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, May 21, 2019 at 06:10:19AM -0400, Michael S. Tsirkin wrote:
->On Fri, May 17, 2019 at 02:58:16PM +0200, Jens Freimann wrote:
->> I'm grateful for any remarks or ideas!
->>
->> Thanks!
->
->Hi Jens!
->Overall I like the patches. Thanks!
->
->Could you please tell us a bit more about other hardware: does this work
->more or less universally across vendors? were any other cards tested?
+Drats, okay. I will investigate. (I can always hope for the easy
+answer...)
 
-Thank you, I have tested only Mellanox and XL710 so far but am working
-on testing with more nics at the moment. I think there's a few more
-things to work out with the patches (especially the unplug before
-migration) which should give me a bit more time to test other cards.
+** Changed in: qemu
+     Assignee: (unassigned) =3D> John Snow (jnsnow)
 
-Also I haven't yet tested unplug with surprise removal. My understanding
-is that device_del was switched from using surprise removal to
-attention button etc. a while back. So I'll have to find out first how
-to try removing a card with surprise removal in qemu. 
+-- =
 
-regards,
-Jens  
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1829498
+
+Title:
+  window 8 stuck during boot on Qemu
+
+Status in QEMU:
+  New
+
+Bug description:
+  Description of problem:
+  I've got windows 8 image(64 bit), installed on Qemu(x86-64_softmmu) and t=
+hen i'm trying to boot/shutdown it in the same Qemu configuration. Windows =
+8 has feature - when you click "Shutdown" in UI, windows 8 doesn't actually=
+ power off, it goes to "Suspend to disc" ACPI state. After shutdown, i'm tr=
+ying to boot it again, but it stucks during boot.
+
+  I've discovered, that it hangs when windows 8 writes to AHCI's command re=
+gister, AHCI triggers irq, but windows 8 sends EOI, don't accessing AHCI re=
+gister,so irq line stills in high state, and irq will be injected again and=
+ again, while windows will send EOI on each AHCI interrupt. Strange thing i=
+s that it happens only on TCG mode or =
+
+  with option "kernel-irqchip=3Doff/split", with "kernel-irqchip=3Don" ever=
+ything works ok(windows 8 accesses AHCI register and line goes to low state=
+).
+
+  Version-Release number of selected component (if applicable):
+  Qemu revision: d8276573da58e8ce78dab8c46dd660efd664bcb7
+
+  =
+
+  Steps to Reproduce:
+  1. Install Windows 8 on QEMU(qemu command line: "-enable-kvm -m 1G -hda <=
+image>  -serial stdio  -cpu core2duo -machine q35,kernel-irqchip=3Doff"
+  2. Click shutdown in UI.
+  3. Try to boot again(it will stuck)
+  4. Kill Qemu and boot again, it will boot, now go to 2) :)
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1829498/+subscriptions
 
