@@ -5,78 +5,78 @@ X-Spam-Level:
 X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F91BC072B5
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 22:47:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8645FC072B5
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 22:48:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EA7D721773
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 22:47:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5227A21773
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 22:48:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TzHGpn2L"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EA7D721773
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QuiCX8cq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5227A21773
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:60346 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:60433 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hTDLD-0007mT-D4
-	for qemu-devel@archiver.kernel.org; Tue, 21 May 2019 18:34:39 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:52830)
+	id 1hTDSf-0001Jq-Ob
+	for qemu-devel@archiver.kernel.org; Tue, 21 May 2019 18:42:21 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:54459)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1hTDJx-0007BN-00
-	for qemu-devel@nongnu.org; Tue, 21 May 2019 18:33:21 -0400
+	(envelope-from <alistair23@gmail.com>) id 1hTDRe-0000cn-SD
+	for qemu-devel@nongnu.org; Tue, 21 May 2019 18:41:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1hTDJw-0005On-1m
-	for qemu-devel@nongnu.org; Tue, 21 May 2019 18:33:20 -0400
-Received: from mail-lj1-x243.google.com ([2a00:1450:4864:20::243]:38657)
+	(envelope-from <alistair23@gmail.com>) id 1hTDRd-0004js-Vq
+	for qemu-devel@nongnu.org; Tue, 21 May 2019 18:41:18 -0400
+Received: from mail-lf1-x141.google.com ([2a00:1450:4864:20::141]:36020)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
-	id 1hTDJt-0005N0-U9; Tue, 21 May 2019 18:33:18 -0400
-Received: by mail-lj1-x243.google.com with SMTP id 14so256848ljj.5;
-	Tue, 21 May 2019 15:33:17 -0700 (PDT)
+	id 1hTDRb-0004gX-QP; Tue, 21 May 2019 18:41:15 -0400
+Received: by mail-lf1-x141.google.com with SMTP id y10so167647lfl.3;
+	Tue, 21 May 2019 15:41:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
 	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-	:cc; bh=Qq8K7ub1MMu58My8La/+Jk01WXoSbdco5XkB1CZ5Nog=;
-	b=TzHGpn2LVD+QzGFnyCpaZcAdLLI2gYORYNiQSqTWQq/ncV2+9Xt2dq41nrTcB5nIBt
-	8sI3/rfexqe1r2jTrk7HwZtL2KGWeiMDCbKi7ddwJf/u6tp49gZ0BjQrGqGlHDoPm7cP
-	HVdgkySauOYsDpL4E48N2Cs6aIAhFkdnviIcEb3Kc+3VF/8iPoz7ZLPw1cL5oFiiMnbt
-	2Yp58j01um73YqYHzTwMvwbmA0k/WV/UMwOuY+SJCSJJUYugsFuw9xcdGYX1CIebS81l
-	z4yyFmW7nWdXTixuuqBJePOJx9tz1vz8bEFw+3ukdpkWVPGvY9xQLMHS3WmSoI1XPWos
-	awXg==
+	:cc; bh=qeS5ImG80zGyzgMtHMJ+UYhSUAWijmMWfvIC+znD4XQ=;
+	b=QuiCX8cqYzEQNvyf7QUjtfTXV+fOD4HrcwYR8oZo00iGUaezbzsa9W2q9NA6si2RgN
+	kBUo6BhS5q112CzBFLtxdxeJkq8ixVkYrvB2ioF9k9S8+680eG5IxgHL1cjkL35QDKUe
+	vg+pHw2IrM77g0iqY5pWOsWzfVNqq+7SFnQK1iSIDV/YsyGMHJnewkVVyFMucoYSbFaQ
+	aLzV16gUp+4bD73+y6eaxAFh3cboI64x5mHF54SIEFxFw+CEwpRCw4drr42h3zwdOg1C
+	BiNYf6G8/Fbk49dWovIziH0BuHI9jTnJPjPpv6YcIAoUc3X57cCMRITv3PHfm7N6u0AR
+	Zlsg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
 	:message-id:subject:to:cc;
-	bh=Qq8K7ub1MMu58My8La/+Jk01WXoSbdco5XkB1CZ5Nog=;
-	b=Kzb9cF7Ia4/8Vm3ml5TTPdehzPrAnTtGA7eCbT3Tx0fPuVEXKg6/pL4lkGsBsno3Pr
-	oagtq7+YLx48T+iZ0lUjG95U04reQIc23RvigLm5QlxdMD+Q+nR5KRpZ+72QENn5VM0w
-	5Yxf05Mxh8OATR+TsKLux94XWMlxSiUaA0P6nXQ8tEikgsfukjBXEfPel/NgXf9UR9OF
-	BFtrVLFFrqYuBpdilCseiAZ3M+2YgIpasIpeby1V68LvkZOK2oxqg6vczI2eupOskD/w
-	+TayXxQeSD4qNUv8grERLLVODkYO/QV4gGNZxyiwNQRlRIG7ES18Oj6V6ue9YGnZ4I1S
-	xfKQ==
-X-Gm-Message-State: APjAAAUgRTd3QW8KEejDbM2kB86RuHpqlAZXSUuRIPVEltzacx6g7imO
-	j4Y4pVVVpAFv3mCg6AxSjNe02/smUmcsJj2jKZ0=
-X-Google-Smtp-Source: APXvYqxAXz2dw5W6Pmzsp7bnMT8CZ+Pg7nD2PahVQZcbqlspIXEptLRzgxsDe7+mN0lUfPb7S84i1XgNg6KSVSmLmtA=
-X-Received: by 2002:a2e:8583:: with SMTP id b3mr17083058lji.136.1558477996615; 
-	Tue, 21 May 2019 15:33:16 -0700 (PDT)
+	bh=qeS5ImG80zGyzgMtHMJ+UYhSUAWijmMWfvIC+znD4XQ=;
+	b=nlcdhcNdORD5X6BYKRpq0DUcs+oxT98hY6MsGz2gydHSe7gs9TNvnBQ4naBLqxu/Mw
+	2cd8iPHM0m5U6HB9c2K035yDpi91nU1vKfe+vzk0q9iaCPAV+h/TXfEzecybfkeaO+BR
+	KNkFBpU5ik/KH969aoQdV+qYUz6jO4FNB9S9PwKfJ7DMA/gFQYkdteYGrWJAX4CyAbNK
+	CcUOeD3gdLJ3rPkjEzUhCAoyg4IsBivsUvOOHQVDDqNH5Oxixjppd3H/sSISDie8uZpy
+	OY4eRBRdEQK3W20l3I3aiXXEGaZpz8yigQEEUGD4t4KXcKRy+XRCB31vGYU2OlqSevoO
+	XiXw==
+X-Gm-Message-State: APjAAAUWPXLMptilg9QFYSSd7cOI2KlW5j89f50wzcfCKj/aQW8naXP/
+	aoIlVJnZiIDvj9JK4qFfbtHgU+MYAoPj4xnJ+Zk=
+X-Google-Smtp-Source: APXvYqwH+cxoIWuT6gMBcjKX5Wn2t1Xt97rvteNSfH7ri6Z7Oj6xY5atYNCRd2E7EQ7L+7lIlVjtfG/7WK4sdiOwghk=
+X-Received: by 2002:a19:4cd5:: with SMTP id
+	z204mr27126773lfa.113.1558478474426; 
+	Tue, 21 May 2019 15:41:14 -0700 (PDT)
 MIME-Version: 1.0
 References: <20190521104324.12835-1-Hesham.Almatary@cl.cam.ac.uk>
-	<20190521104324.12835-5-Hesham.Almatary@cl.cam.ac.uk>
-In-Reply-To: <20190521104324.12835-5-Hesham.Almatary@cl.cam.ac.uk>
+	<20190521104324.12835-4-Hesham.Almatary@cl.cam.ac.uk>
+In-Reply-To: <20190521104324.12835-4-Hesham.Almatary@cl.cam.ac.uk>
 From: Alistair Francis <alistair23@gmail.com>
-Date: Tue, 21 May 2019 15:31:00 -0700
-Message-ID: <CAKmqyKOaPEC=YdbwJkqZJBwTw++_9Cum5HSChtfnx7_uOmZ_HQ@mail.gmail.com>
+Date: Tue, 21 May 2019 15:38:58 -0700
+Message-ID: <CAKmqyKOZzfZBU-nkRzsP9G0J07S8PchMt4W8m+OrMdZKms907Q@mail.gmail.com>
 To: Hesham Almatary <Hesham.Almatary@cl.cam.ac.uk>
 Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2a00:1450:4864:20::243
-Subject: Re: [Qemu-devel] [PATCHv3 5/5] RISC-V: Fix a PMP check with the
- correct access size
+X-Received-From: 2a00:1450:4864:20::141
+Subject: Re: [Qemu-devel] [PATCHv3 4/5] RISC-V: Fix a PMP bug where it
+ succeeds even if PMP entry is off
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -98,11 +98,19 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, May 21, 2019 at 3:45 AM Hesham Almatary
+On Tue, May 21, 2019 at 3:47 AM Hesham Almatary
 <Hesham.Almatary@cl.cam.ac.uk> wrote:
 >
-> The PMP check should be of the memory access size rather
-> than TARGET_PAGE_SIZE.
+> The current implementation returns 1 (PMP check success) if the address is in
+> range even if the PMP entry is off. This is a bug.
+>
+> For example, if there is a PMP check in S-Mode which is in range, but its PMP
+> entry is off, this will succeed, which it should not.
+>
+> The patch fixes this bug by only checking the PMP permissions if the address is
+> in range and its corresponding PMP entry it not off. Otherwise, it will keep
+> the ret = -1 which will be checked and handled correctly at the end of the
+> function.
 >
 > Signed-off-by: Hesham Almatary <Hesham.Almatary@cl.cam.ac.uk>
 
@@ -111,22 +119,30 @@ Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 Alistair
 
 > ---
->  target/riscv/cpu_helper.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  target/riscv/pmp.c | 9 +++++----
+>  1 file changed, 5 insertions(+), 4 deletions(-)
 >
-> diff --git a/target/riscv/cpu_helper.c b/target/riscv/cpu_helper.c
-> index d0b0f9cf88..ce1f47e4e3 100644
-> --- a/target/riscv/cpu_helper.c
-> +++ b/target/riscv/cpu_helper.c
-> @@ -410,7 +410,7 @@ bool riscv_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
+> diff --git a/target/riscv/pmp.c b/target/riscv/pmp.c
+> index b11c4ae22f..8668f0dd7c 100644
+> --- a/target/riscv/pmp.c
+> +++ b/target/riscv/pmp.c
+> @@ -259,11 +259,12 @@ bool pmp_hart_has_privs(CPURISCVState *env, target_ulong addr,
+>          /* fully inside */
+>          const uint8_t a_field =
+>              pmp_get_a_field(env->pmp_state.pmp[i].cfg_reg);
+> -        if ((s + e) == 2) {
+> -            if (PMP_AMATCH_OFF == a_field) {
+> -                return 1;
+> -            }
 >
->      if (riscv_feature(env, RISCV_FEATURE_PMP) &&
->          (ret == TRANSLATE_SUCCESS) &&
-> -        !pmp_hart_has_privs(env, pa, TARGET_PAGE_SIZE, 1 << access_type)) {
-> +        !pmp_hart_has_privs(env, pa, size, 1 << access_type)) {
->          ret = TRANSLATE_PMP_FAIL;
->      }
->      if (ret == TRANSLATE_PMP_FAIL) {
+> +        /*
+> +         * If the PMP entry is not off and the address is in range, do the priv
+> +         * check
+> +         */
+> +        if (((s + e) == 2) && (PMP_AMATCH_OFF != a_field)) {
+>              allowed_privs = PMP_READ | PMP_WRITE | PMP_EXEC;
+>              if ((env->priv != PRV_M) || pmp_is_locked(env, i)) {
+>                  allowed_privs &= env->pmp_state.pmp[i].cfg_reg;
 > --
 > 2.17.1
 >
