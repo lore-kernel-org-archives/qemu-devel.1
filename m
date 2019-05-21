@@ -4,58 +4,60 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A2407C04AAF
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 06:38:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E0580C04AAF
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 06:38:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 61C3A21743
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 06:38:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id ABBD721743
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 06:38:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="lt/QO7Yh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 61C3A21743
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="DI7GK/Qo"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ABBD721743
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:47427 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:47431 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hSyPk-0004QQ-Ao
-	for qemu-devel@archiver.kernel.org; Tue, 21 May 2019 02:38:20 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:48706)
+	id 1hSyQK-0004ww-Rb
+	for qemu-devel@archiver.kernel.org; Tue, 21 May 2019 02:38:56 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:48928)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1hSyHV-0005sb-CA
-	for qemu-devel@nongnu.org; Tue, 21 May 2019 02:29:50 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1hSyHZ-0005x8-2q
+	for qemu-devel@nongnu.org; Tue, 21 May 2019 02:29:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1hSyHT-0007lC-QQ
-	for qemu-devel@nongnu.org; Tue, 21 May 2019 02:29:49 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:56593 helo=ozlabs.org)
+	(envelope-from <dgibson@ozlabs.org>) id 1hSyHX-0007up-Aa
+	for qemu-devel@nongnu.org; Tue, 21 May 2019 02:29:53 -0400
+Received: from ozlabs.org ([2401:3900:2:1::2]:48517)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
-	id 1hSyHT-0007hU-D9; Tue, 21 May 2019 02:29:47 -0400
+	id 1hSyHW-0007mm-Gn; Tue, 21 May 2019 02:29:51 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
-	id 457Qpf5w1tz9sBp; Tue, 21 May 2019 16:29:30 +1000 (AEST)
+	id 457Qpg5cYWz9sP9; Tue, 21 May 2019 16:29:31 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-	d=gibson.dropbear.id.au; s=201602; t=1558420170;
-	bh=q7EImbd+kCVeaNJFxTgkqCNMD8+yJyoKHqONDrvQuek=;
+	d=gibson.dropbear.id.au; s=201602; t=1558420171;
+	bh=BjiFSb1b89t8ZsTeXhXZ6WzYs2aJf3rKsJujYhnowoo=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=lt/QO7YhcIJBDS5QV5xrLGFfIQ/8LysJcD14jEOPatl0qG13ISfN/waPfnVm6IG7+
-	q4QKam/su2h1ekAjDGYFHj0ZiwuzHslo3PJ2Zd9qYua/dGVVv8C1SFsDUBEUaPqmrc
-	tikJ8UyD9cWoa+i08NqJqaB7dMY4xAjO1elgGZE0=
+	b=DI7GK/QooiZ3u71RhCQZuqCRiIxeVn4fqyHAkgh7J1+X8Cnq+jStHINuTh+VIfzmD
+	leDKWv0v9UAlKMY66zov6rTuYnve96T7N3RA8S+emb8QyBGG/HXrgXgus5WrGEUmoC
+	GwdVl2uEFz2PfPzBY2q4tms0DRtpxwXZKCgFgJVU=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: peter.maydell@linaro.org
-Date: Tue, 21 May 2019 16:28:58 +1000
-Message-Id: <20190521062924.6930-13-david@gibson.dropbear.id.au>
+Date: Tue, 21 May 2019 16:29:05 +1000
+Message-Id: <20190521062924.6930-20-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190521062924.6930-1-david@gibson.dropbear.id.au>
 References: <20190521062924.6930-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 203.11.71.1
-Subject: [Qemu-devel] [PULL 12/38] target/ppc: Fix xxspltib
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2401:3900:2:1::2
+Subject: [Qemu-devel] [PULL 19/38] spapr/xive: Sanity checks of OV5 during
+ CAS
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -67,49 +69,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: lvivier@redhat.com, gkurz@kaod.org, qemu-devel@nongnu.org,
-	qemu-ppc@nongnu.org, clg@kaod.org, Anton Blanchard <anton@ozlabs.org>,
+Cc: lvivier@redhat.com, gkurz@kaod.org, Greg Kurz <groug@kaod.org>,
+	qemu-devel@nongnu.org, qemu-ppc@nongnu.org, clg@kaod.org,
+	Satheesh Rajendran <sathnaga@linux.vnet.ibm.com>,
 	David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Anton Blanchard <anton@ozlabs.org>
+From: Greg Kurz <groug@kaod.org>
 
-xxspltib raises a VMX or a VSX exception depending on the register
-set it is operating on. We had a check, but it was backwards.
+If a machine is started with ic-mode=3Dxive but the guest only knows
+about XICS, eg. an RHEL 7.6 guest, the kernel panics. This is
+expected but a bit unfortunate since the crash doesn't provide
+much information for the end user to guess what's happening.
 
-Fixes: f113283525a4 ("target-ppc: add xxspltib instruction")
-Signed-off-by: Anton Blanchard <anton@ozlabs.org>
-Message-Id: <20190509061713.69490488@kryten>
+Detect that during CAS and exit QEMU with a proper error message
+instead, like it is already done for the MMU.
+
+Even if this is less likely to happen, the opposite case of a guest
+that only knows about XIVE would certainly fail all the same if the
+machine is started with ic-mode=3Dxics.
+
+Also, the only valid values a guest can pass in byte 23 of OV5 during
+CAS are 0b00 (XIVE legacy mode) and 0b01 (XIVE exploitation mode). Any
+other value is a bug, at least with the current spec. Again, it does
+not seem right to let the guest go on without a precise idea of the
+interrupt mode it asked for.
+
+Handle these cases as well.
+
+Reported-by: Satheesh Rajendran <sathnaga@linux.vnet.ibm.com>
+Signed-off-by: Greg Kurz <groug@kaod.org>
+Message-Id: <155793986451.464434.12887933000007255549.stgit@bahia.lan>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- target/ppc/translate/vsx-impl.inc.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ hw/ppc/spapr_hcall.c | 24 ++++++++++++++++++++++++
+ 1 file changed, 24 insertions(+)
 
-diff --git a/target/ppc/translate/vsx-impl.inc.c b/target/ppc/translate/v=
-sx-impl.inc.c
-index d29f60e2f9..4b8f6cefe3 100644
---- a/target/ppc/translate/vsx-impl.inc.c
-+++ b/target/ppc/translate/vsx-impl.inc.c
-@@ -1355,13 +1355,13 @@ static void gen_xxspltib(DisasContext *ctx)
-     int rt =3D xT(ctx->opcode);
+diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
+index 6c16d2b120..63a55614b8 100644
+--- a/hw/ppc/spapr_hcall.c
++++ b/hw/ppc/spapr_hcall.c
+@@ -1513,6 +1513,7 @@ static target_ulong h_client_architecture_support(P=
+owerPCCPU *cpu,
+     bool guest_radix;
+     Error *local_err =3D NULL;
+     bool raw_mode_supported =3D false;
++    bool guest_xive;
 =20
-     if (rt < 32) {
--        if (unlikely(!ctx->altivec_enabled)) {
--            gen_exception(ctx, POWERPC_EXCP_VPU);
-+        if (unlikely(!ctx->vsx_enabled)) {
-+            gen_exception(ctx, POWERPC_EXCP_VSXU);
-             return;
-         }
-     } else {
--        if (unlikely(!ctx->vsx_enabled)) {
--            gen_exception(ctx, POWERPC_EXCP_VSXU);
-+        if (unlikely(!ctx->altivec_enabled)) {
-+            gen_exception(ctx, POWERPC_EXCP_VPU);
-             return;
-         }
+     cas_pvr =3D cas_check_pvr(spapr, cpu, &addr, &raw_mode_supported, &l=
+ocal_err);
+     if (local_err) {
+@@ -1545,10 +1546,17 @@ static target_ulong h_client_architecture_support=
+(PowerPCCPU *cpu,
+         error_report("guest requested hash and radix MMU, which is inval=
+id.");
+         exit(EXIT_FAILURE);
      }
++    if (spapr_ovec_test(ov5_guest, OV5_XIVE_BOTH)) {
++        error_report("guest requested an invalid interrupt mode");
++        exit(EXIT_FAILURE);
++    }
++
+     /* The radix/hash bit in byte 24 requires special handling: */
+     guest_radix =3D spapr_ovec_test(ov5_guest, OV5_MMU_RADIX_300);
+     spapr_ovec_clear(ov5_guest, OV5_MMU_RADIX_300);
+=20
++    guest_xive =3D spapr_ovec_test(ov5_guest, OV5_XIVE_EXPLOIT);
++
+     /*
+      * HPT resizing is a bit of a special case, because when enabled
+      * we assume an HPT guest will support it until it says it
+@@ -1632,6 +1640,22 @@ static target_ulong h_client_architecture_support(=
+PowerPCCPU *cpu,
+                                           ov5_updates) !=3D 0);
+     }
+=20
++    /*
++     * Ensure the guest asks for an interrupt mode we support; otherwise
++     * terminate the boot.
++     */
++    if (guest_xive) {
++        if (spapr->irq->ov5 =3D=3D SPAPR_OV5_XIVE_LEGACY) {
++            error_report("Guest requested unavailable interrupt mode (XI=
+VE)");
++            exit(EXIT_FAILURE);
++        }
++    } else {
++        if (spapr->irq->ov5 =3D=3D SPAPR_OV5_XIVE_EXPLOIT) {
++            error_report("Guest requested unavailable interrupt mode (XI=
+CS)");
++            exit(EXIT_FAILURE);
++        }
++    }
++
+     /*
+      * Generate a machine reset when we have an update of the
+      * interrupt mode. Only required when the machine supports both
 --=20
 2.21.0
 
