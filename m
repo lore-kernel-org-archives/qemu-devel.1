@@ -2,56 +2,61 @@ Return-Path: <SRS0=/4tE=TV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C831EC04AAF
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 06:46:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 901CCC04AAF
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 06:47:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A04A321743
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 06:46:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A04A321743
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 5D1D221743
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 06:47:03 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="YNcm1gfz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5D1D221743
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:47574 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:47580 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hSyXU-0003FW-Ps
-	for qemu-devel@archiver.kernel.org; Tue, 21 May 2019 02:46:20 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:49141)
+	id 1hSyYA-0004ZZ-L2
+	for qemu-devel@archiver.kernel.org; Tue, 21 May 2019 02:47:02 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:48839)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richardw.yang@linux.intel.com>) id 1hSyHi-00068N-9k
-	for qemu-devel@nongnu.org; Tue, 21 May 2019 02:30:03 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1hSyHX-0005vH-O5
+	for qemu-devel@nongnu.org; Tue, 21 May 2019 02:29:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richardw.yang@linux.intel.com>) id 1hSyHg-0008BW-Fb
-	for qemu-devel@nongnu.org; Tue, 21 May 2019 02:30:01 -0400
-Received: from mga04.intel.com ([192.55.52.120]:33253)
+	(envelope-from <dgibson@ozlabs.org>) id 1hSyHW-0007ri-Gx
+	for qemu-devel@nongnu.org; Tue, 21 May 2019 02:29:51 -0400
+Received: from ozlabs.org ([2401:3900:2:1::2]:50805)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <richardw.yang@linux.intel.com>)
-	id 1hSyHc-00083f-Cq; Tue, 21 May 2019 02:29:56 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-	by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
-	20 May 2019 23:29:54 -0700
-X-ExtLoop1: 1
-Received: from richard.sh.intel.com (HELO localhost) ([10.239.159.54])
-	by orsmga004.jf.intel.com with ESMTP; 20 May 2019 23:29:50 -0700
-From: Wei Yang <richardw.yang@linux.intel.com>
-To: qemu-devel@nongnu.org,
-	qemu-arm@nongnu.org
-Date: Tue, 21 May 2019 14:28:34 +0800
-Message-Id: <20190521062836.6541-1-richardw.yang@linux.intel.com>
-X-Mailer: git-send-email 2.19.1
+	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
+	id 1hSyHW-0007ls-33; Tue, 21 May 2019 02:29:50 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+	id 457Qpg3PPzz9sNk; Tue, 21 May 2019 16:29:30 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+	d=gibson.dropbear.id.au; s=201602; t=1558420171;
+	bh=Q3OdL5JEc/xax8Ko3xFpbQldrSgTWaBBNtqg7R0C8TU=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=YNcm1gfzPJlD9lXPxoBBKecorMm+2d0T8vqpR5nlwu/I/EpJLPtvsU5zxSLfY478I
+	hmqOW/KBtPjYMKehdjLKUNx3bGhqwJLrQQhraF/EbwQE545UIH7DaN2rEwUmNyFUB6
+	+pNrIxzoWiT6G3C9QVpKlZtNyq/Z9jPs4dh7yVy8=
+From: David Gibson <david@gibson.dropbear.id.au>
+To: peter.maydell@linaro.org
+Date: Tue, 21 May 2019 16:28:57 +1000
+Message-Id: <20190521062924.6930-12-david@gibson.dropbear.id.au>
+X-Mailer: git-send-email 2.21.0
+In-Reply-To: <20190521062924.6930-1-david@gibson.dropbear.id.au>
+References: <20190521062924.6930-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 192.55.52.120
-Subject: [Qemu-devel] [PATCH v6 0/2] Extract build_mcfg Part 2
+X-Received-From: 2401:3900:2:1::2
+Subject: [Qemu-devel] [PULL 11/38] target/ppc: Fix vsum2sws
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -63,44 +68,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: yang.zhong@intel.com, peter.maydell@linaro.org, thuth@redhat.com,
-	mst@redhat.com, shannon.zhaosl@gmail.com,
-	Wei Yang <richardw.yang@linux.intel.com>, imammedo@redhat.com,
-	philmd@redhat.com
+Cc: lvivier@redhat.com, gkurz@kaod.org, qemu-devel@nongnu.org,
+	qemu-ppc@nongnu.org, clg@kaod.org, Anton Blanchard <anton@ozlabs.org>,
+	David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This patch set tries to generalize MCFG table build process. Several patches
-are already merged and these two are left for the following reasons:
+From: Anton Blanchard <anton@ozlabs.org>
 
-  * conflict with latest upstream
-  * ACPI_PCI dependency fix
-  * missed reserved[8] in MCFG
+A recent cleanup changed the pre zeroing of the result from 64 bit
+to 32 bit operations:
 
-v4->v5:
-    * ACPI_PCI depends on both ACPI and PCI
-    * rebase on latest master, adjust arm Kconfig
-    * miss the reserved[8] of MCFG, add it back
-    * make sure bios-tables-test all OK
+-        result.u64[i] =3D 0;
++        result.VsrW(i) =3D 0;
 
-Wei Yang (2):
-  hw/acpi: Consolidate build_mcfg to pci.c
-  acpi: pci: use build_append_foo() API to construct MCFG
+This corrupts the result.
 
- default-configs/i386-softmmu.mak |  1 +
- hw/acpi/Kconfig                  |  4 +++
- hw/acpi/Makefile.objs            |  1 +
- hw/acpi/pci.c                    | 61 ++++++++++++++++++++++++++++++++
- hw/arm/Kconfig                   |  1 +
- hw/arm/virt-acpi-build.c         | 17 ---------
- hw/i386/acpi-build.c             | 18 +---------
- include/hw/acpi/acpi-defs.h      | 18 ----------
- include/hw/acpi/pci.h            |  1 +
- 9 files changed, 70 insertions(+), 52 deletions(-)
- create mode 100644 hw/acpi/pci.c
+Fixes: 60594fea298d ("target/ppc: remove various HOST_WORDS_BIGENDIAN hac=
+ks in int_helper.c")
+Signed-off-by: Anton Blanchard <anton@ozlabs.org>
+Message-Id: <20190507004811.29968-9-anton@ozlabs.org>
+Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+---
+ target/ppc/int_helper.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
--- 
-2.19.1
+diff --git a/target/ppc/int_helper.c b/target/ppc/int_helper.c
+index fd715b4076..f5c81acd53 100644
+--- a/target/ppc/int_helper.c
++++ b/target/ppc/int_helper.c
+@@ -2038,7 +2038,7 @@ void helper_vsum2sws(CPUPPCState *env, ppc_avr_t *r=
+, ppc_avr_t *a, ppc_avr_t *b)
+     for (i =3D 0; i < ARRAY_SIZE(r->u64); i++) {
+         int64_t t =3D (int64_t)b->VsrSW(upper + i * 2);
+=20
+-        result.VsrW(i) =3D 0;
++        result.VsrD(i) =3D 0;
+         for (j =3D 0; j < ARRAY_SIZE(r->u64); j++) {
+             t +=3D a->VsrSW(2 * i + j);
+         }
+--=20
+2.21.0
 
 
