@@ -2,90 +2,83 @@ Return-Path: <SRS0=/4tE=TV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BD87C04AAF
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 16:10:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 39DB9C04AAF
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 16:12:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0A00C2173C
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 16:10:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 077482173C
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 16:12:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="YrgjOCdC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0A00C2173C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yandex-team.ru
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="fXIaqCVQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 077482173C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:56393 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:56413 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hT7Lj-0002V0-8M
-	for qemu-devel@archiver.kernel.org; Tue, 21 May 2019 12:10:47 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:38831)
+	id 1hT7Mx-0003Ey-6b
+	for qemu-devel@archiver.kernel.org; Tue, 21 May 2019 12:12:03 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:39309)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yury-kotov@yandex-team.ru>) id 1hT7KV-0001pO-5O
-	for qemu-devel@nongnu.org; Tue, 21 May 2019 12:09:33 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1hT7Lt-0002lU-0h
+	for qemu-devel@nongnu.org; Tue, 21 May 2019 12:10:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yury-kotov@yandex-team.ru>) id 1hT7KT-0006kG-BP
-	for qemu-devel@nongnu.org; Tue, 21 May 2019 12:09:31 -0400
-Received: from forwardcorp1j.mail.yandex.net ([5.45.199.163]:53816)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yury-kotov@yandex-team.ru>)
-	id 1hT7KT-0006iv-0Z
-	for qemu-devel@nongnu.org; Tue, 21 May 2019 12:09:29 -0400
-Received: from mxbackcorp1j.mail.yandex.net (mxbackcorp1j.mail.yandex.net
-	[IPv6:2a02:6b8:0:1619::162])
-	by forwardcorp1j.mail.yandex.net (Yandex) with ESMTP id 93ED12E14E3;
-	Tue, 21 May 2019 19:09:22 +0300 (MSK)
-Received: from localhost (localhost [::1])
-	by mxbackcorp1j.mail.yandex.net (nwsmtp/Yandex) with ESMTP id
-	FZHCzsTzhw-9MpWDfBp; Tue, 21 May 2019 19:09:22 +0300
-Precedence: bulk
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru;
-	s=default; 
-	t=1558454962; bh=ku/v1ZEdvxAkgj7g/lT+/mOqFmhEGn8+Xh+YuvfNsXU=;
-	h=Subject:In-Reply-To:Cc:Date:References:To:From:Message-Id;
-	b=YrgjOCdCIuKgQ5BUW27WFtOFaJin2E5WRR4l34PskX+AJFVBMQJebBbIlSsgj33w/
-	r2U0a0Jnq1IMv8GVZWHMhPQ65hUC1D8Byj+08GZYOsDBasewo+iIna3J3IULWsqzfY
-	AnW7Lkus5+i5jOTWf/UfuIU0w0WHhD0EeyhC7kmo=
-Authentication-Results: mxbackcorp1j.mail.yandex.net;
-	dkim=pass header.i=@yandex-team.ru
-X-Yandex-Sender-Uid: 1120000000071945
-X-Yandex-Avir: 1
-Received: from mxbackcorp1j.mail.yandex.net (mxbackcorp1j.mail.yandex.net
-	[2a02:6b8:0:1619::162])
-	by dlvcorp1p.mail.yandex.net with LMTP id aTXEVgaaEo-Uf2dqOpm
-	for <yury-kotov@yandex-team.ru>; Tue, 21 May 2019 19:09:11 +0300
-Received: by sas2-76706d252d16.qloud-c.yandex.net with HTTP;
-	Tue, 21 May 2019 19:09:11 +0300
-From: Yury Kotov <yury-kotov@yandex-team.ru>
-To: Dr. David Alan Gilbert <dgilbert@redhat.com>
-In-Reply-To: <346471557826571@vla1-9d3c37294942.qloud-c.yandex.net>
-References: <259551555324396@vla1-1374b6242101.qloud-c.yandex.net>
-	<20190415104725.GI5718@redhat.com> <20190415111511.GG2852@work-vm>
-	<20190415111911.GK5718@redhat.com> <20190415113045.GI2852@work-vm>
-	<612681555412465@iva6-8a76e93b6298.qloud-c.yandex.net>
-	<20190418141956.GF2984@work-vm>
-	<1285061555601789@iva6-8a76e93b6298.qloud-c.yandex.net>
-	<20190418160300.GI2984@work-vm>
-	<1201831555604730@vla1-1374b6242101.qloud-c.yandex.net>
-	<20190418170118.GK2984@work-vm>
-	<164761555609613@myt4-a988562a11ab.qloud-c.yandex.net>
-	<346471557826571@vla1-9d3c37294942.qloud-c.yandex.net>
+	(envelope-from <peter.maydell@linaro.org>) id 1hT7Ls-0007dK-15
+	for qemu-devel@nongnu.org; Tue, 21 May 2019 12:10:57 -0400
+Received: from mail-ot1-x32f.google.com ([2607:f8b0:4864:20::32f]:44902)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1hT7Lr-0007ck-O9
+	for qemu-devel@nongnu.org; Tue, 21 May 2019 12:10:55 -0400
+Received: by mail-ot1-x32f.google.com with SMTP id g18so16815822otj.11
+	for <qemu-devel@nongnu.org>; Tue, 21 May 2019 09:10:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+	:cc; bh=w93YfPrOmAs4qkCtdxZTOpiZve+07OEGjo48CrtsEC4=;
+	b=fXIaqCVQeMomJ9PAzfMg6o91BUxK/y5GhyN11kj9fnjw6TvjdYiuQUt7tiCULz+9UL
+	vTLMCw1yn8mBLwx8wqYq0YwMs/Tcq9kq2MDLL8hOy0iCj1/lDwo4p5+dx8xwzZ1b9h7n
+	dfv6xMwG41Pv7aKhH4cwq6EzNwx18GDaNkPJo+7XQVKPQh/tFDXNW0xFNI8RUIoHv2Ns
+	G6BbzP9xmzUg0wuWtZKDSyPydMlqhzLtgpcMSX85JrtZ2EYloxUbQRJyhqD910Na5ScI
+	DEL+LCYFpbF5ecur0dvf/oJwkEOJH0IIRqFDHk/TagBbJdnlUnNdzcan7UDBUqi/DIn+
+	g36w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+	:message-id:subject:to:cc;
+	bh=w93YfPrOmAs4qkCtdxZTOpiZve+07OEGjo48CrtsEC4=;
+	b=gdmkkQYcrKOKjQw1P1ISuDz7nv8KTDmfC/x/Az2kcsU3sg9LvBZXiIXJGuLhfm3Irz
+	Yz6Nx7fVfMKSwQ7oT2TiD+wyfu2Tv2GgS07gaDmGXRF4cTFHSD9CHu917H+TN43YXDjO
+	mCQkrx4sL3TSkIkcAaytE1kP9umIvbyvTsdiGWCjtaPE+sF330KyQe1e6yDEgjE3MJcd
+	+gQDBeBq5/JZkGbODirfuVW89JTGdA9ip9gOY9BWaAEA0l95UWEFpOwwhFRzQMdi/92a
+	BbiB8vlFJzvvbG5hhhQ6qYdAPaZw6L6Nr7QHkHZ2dJF8Z2Kmd+uslYiM5EE/EXWkdHjw
+	FBwQ==
+X-Gm-Message-State: APjAAAW5BWt1nzfqWp0NzWgOfLlhpA1DvhU4wxsKrS072i/w9NIvfkwY
+	a3eX6ueRSppW10bgyXrR6K65z9NCSaqx7uD4D3AV1Q==
+X-Google-Smtp-Source: APXvYqwO2rTM6Yne1cyTkxvqaspMgK4XGAYF6UroU51YgXHJFieWriGtOtpwJ+tC5nYqNikdCKyhMLr1r/nRqoKatc8=
+X-Received: by 2002:a05:6830:209a:: with SMTP id
+	y26mr20134327otq.232.1558455054654; 
+	Tue, 21 May 2019 09:10:54 -0700 (PDT)
 MIME-Version: 1.0
-X-Mailer: Yamail [ http://yandex.ru ] 5.0
-Date: Tue, 21 May 2019 19:09:21 +0300
-Message-Id: <677601558454951@sas2-76706d252d16.qloud-c.yandex.net>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-	[fuzzy]
-X-Received-From: 5.45.199.163
-Subject: Re: [Qemu-devel] [PATCH] migration: Fix handling fd protocol
+References: <20190521152810.21353-1-cohuck@redhat.com>
+In-Reply-To: <20190521152810.21353-1-cohuck@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 21 May 2019 17:10:43 +0100
+Message-ID: <CAFEAcA9e7SuNJeJvAOGXWSs_MGZer7on-EBdkDynasJeKvpv2A@mail.gmail.com>
+To: Cornelia Huck <cohuck@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::32f
+Subject: Re: [Qemu-devel] [PULL v3 00/55] s390x update
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -94,339 +87,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?utf-8?B?RGFuaWVsIFAuIEJlcnJhbmfDqQ==?= <berrange@redhat.com>,
-	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-	"yc-core@yandex-team.ru" <yc-core@yandex-team.ru>,
-	Juan Quintela <quintela@redhat.com>
+Cc: qemu-s390x <qemu-s390x@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Ping
+On Tue, 21 May 2019 at 16:28, Cornelia Huck <cohuck@redhat.com> wrote:
+>
+> [Third time's the charm, I hope. Split out the change in the update headers
+> script and copy to the right directory. Sending only these two patches; the
+> rest are unchanged save for the commit ids.]
+>
+> The following changes since commit d8276573da58e8ce78dab8c46dd660efd664bcb7:
+>
+>   Merge remote-tracking branch 'remotes/rth/tags/pull-tcg-20190510' into staging (2019-05-16 13:15:08 +0100)
+>
+> are available in the Git repository at:
+>
+>   https://github.com/cohuck/qemu tags/s390x-20190521-3
+>
+> for you to fetch changes up to c657e84faee48d6ab36665da5a008b8f0649593d:
+>
+>   s390x/cpumodel: wire up 8561 and 8562 as gen15 machines (2019-05-21 16:59:16 +0200)
+>
+> ----------------------------------------------------------------
+> s390x update:
+> - have the bios tolerate bootmap signature entries
+> - next chunk of vector instruction support in tcg
+> - a headers update against Linux 5.2-rc1
+> - add more facilities and gen15 machines to the cpu model
+>
 
-14.05.2019, 12:36, "Yury Kotov" <yury-kotov@yandex-team.ru>:
-> Ping
->
-> 18.04.2019, 20:46, "Yury Kotov" <yury-kotov@yandex-team.ru>:
->> =C2=A018.04.2019, 20:01, "Dr. David Alan Gilbert" <dgilbert@redhat.com=
->:
->>> =C2=A0=C2=A0* Yury Kotov (yury-kotov@yandex-team.ru) wrote:
->>>> =C2=A0=C2=A0=C2=A018.04.2019, 19:03, "Dr. David Alan Gilbert" <dgilb=
-ert@redhat.com>:
->>>> =C2=A0=C2=A0=C2=A0> * Yury Kotov (yury-kotov@yandex-team.ru) wrote:
->>>> =C2=A0=C2=A0=C2=A0>> =C2=A018.04.2019, 17:20, "Dr. David Alan Gilber=
-t" <dgilbert@redhat.com>:
->>>> =C2=A0=C2=A0=C2=A0>> =C2=A0> * Yury Kotov (yury-kotov@yandex-team.ru=
-) wrote:
->>>> =C2=A0=C2=A0=C2=A0>> =C2=A0>> =C2=A015.04.2019, 14:30, "Dr. David Al=
-an Gilbert" <dgilbert@redhat.com>:
->>>> =C2=A0=C2=A0=C2=A0>> =C2=A0>> =C2=A0> * Daniel P. Berrang=C3=A9 (ber=
-range@redhat.com) wrote:
->>>> =C2=A0=C2=A0=C2=A0>> =C2=A0>> =C2=A0>> =C2=A0On Mon, Apr 15, 2019 at=
- 12:15:12PM +0100, Dr. David Alan Gilbert wrote:
->>>> =C2=A0=C2=A0=C2=A0>> =C2=A0>> =C2=A0>> =C2=A0> * Daniel P. Berrang=C3=
-=A9 (berrange@redhat.com) wrote:
->>>> =C2=A0=C2=A0=C2=A0>> =C2=A0>> =C2=A0>> =C2=A0> > On Mon, Apr 15, 201=
-9 at 01:33:21PM +0300, Yury Kotov wrote:
->>>> =C2=A0=C2=A0=C2=A0>> =C2=A0>> =C2=A0>> =C2=A0> > > 15.04.2019, 13:25=
-, "Daniel P. Berrang=C3=A9" <berrange@redhat.com>:
->>>> =C2=A0=C2=A0=C2=A0>> =C2=A0>> =C2=A0>> =C2=A0> > > > On Mon, Apr 15,=
- 2019 at 01:17:06PM +0300, Yury Kotov wrote:
->>>> =C2=A0=C2=A0=C2=A0>> =C2=A0>> =C2=A0>> =C2=A0> > > >> =C2=A015.04.20=
-19, 13:11, "Daniel P. Berrang=C3=A9" <berrange@redhat.com>:
->>>> =C2=A0=C2=A0=C2=A0>> =C2=A0>> =C2=A0>> =C2=A0> > > >> =C2=A0> On Mon=
-, Apr 15, 2019 at 12:50:08PM +0300, Yury Kotov wrote:
->>>> =C2=A0=C2=A0=C2=A0>> =C2=A0>> =C2=A0>> =C2=A0> > > >> =C2=A0>> =C2=A0=
-Hi,
->>>> =C2=A0=C2=A0=C2=A0>> =C2=A0>> =C2=A0>> =C2=A0> > > >> =C2=A0>>
->>>> =C2=A0=C2=A0=C2=A0>> =C2=A0>> =C2=A0>> =C2=A0> > > >> =C2=A0>> =C2=A0=
-Just to clarify. I see two possible solutions:
->>>> =C2=A0=C2=A0=C2=A0>> =C2=A0>> =C2=A0>> =C2=A0> > > >> =C2=A0>>
->>>> =C2=A0=C2=A0=C2=A0>> =C2=A0>> =C2=A0>> =C2=A0> > > >> =C2=A0>> =C2=A0=
-1) Since the migration code doesn't receive fd, it isn't responsible for
->>>> =C2=A0=C2=A0=C2=A0>> =C2=A0>> =C2=A0>> =C2=A0> > > >> =C2=A0>> =C2=A0=
-closing it. So, it may be better to use migrate_fd_param for both
->>>> =C2=A0=C2=A0=C2=A0>> =C2=A0>> =C2=A0>> =C2=A0> > > >> =C2=A0>> =C2=A0=
-incoming/outgoing and add dupping for migrate_fd_param. Thus, clients mus=
-t
->>>> =C2=A0=C2=A0=C2=A0>> =C2=A0>> =C2=A0>> =C2=A0> > > >> =C2=A0>> =C2=A0=
-close the fd themselves. But existing clients will have a leak.
->>>> =C2=A0=C2=A0=C2=A0>> =C2=A0>> =C2=A0>> =C2=A0> > > >> =C2=A0>
->>>> =C2=A0=C2=A0=C2=A0>> =C2=A0>> =C2=A0>> =C2=A0> > > >> =C2=A0> We can=
-'t break existing clients in this way as they are correctly
->>>> =C2=A0=C2=A0=C2=A0>> =C2=A0>> =C2=A0>> =C2=A0> > > >> =C2=A0> using =
-the monitor with its current semantics.
->>>> =C2=A0=C2=A0=C2=A0>> =C2=A0>> =C2=A0>> =C2=A0> > > >> =C2=A0>
->>>> =C2=A0=C2=A0=C2=A0>> =C2=A0>> =C2=A0>> =C2=A0> > > >> =C2=A0>> =C2=A0=
-2) If we don't duplicate fd, then at least we should remove fd from
->>>> =C2=A0=C2=A0=C2=A0>> =C2=A0>> =C2=A0>> =C2=A0> > > >> =C2=A0>> =C2=A0=
-the corresponding list. Therefore, the solution is to fix qemu_close to f=
-ind
->>>> =C2=A0=C2=A0=C2=A0>> =C2=A0>> =C2=A0>> =C2=A0> > > >> =C2=A0>> =C2=A0=
-the list and remove fd from it. But qemu_close is currently consistent wi=
-th
->>>> =C2=A0=C2=A0=C2=A0>> =C2=A0>> =C2=A0>> =C2=A0> > > >> =C2=A0>> =C2=A0=
-qemu_open (which opens/dups fd), so adding additional logic might not be
->>>> =C2=A0=C2=A0=C2=A0>> =C2=A0>> =C2=A0>> =C2=A0> > > >> =C2=A0>> =C2=A0=
-a very good idea.
->>>> =C2=A0=C2=A0=C2=A0>> =C2=A0>> =C2=A0>> =C2=A0> > > >> =C2=A0>
->>>> =C2=A0=C2=A0=C2=A0>> =C2=A0>> =C2=A0>> =C2=A0> > > >> =C2=A0> qemu_c=
-lose is not appropriate place to deal with something speciifc
->>>> =C2=A0=C2=A0=C2=A0>> =C2=A0>> =C2=A0>> =C2=A0> > > >> =C2=A0> to the=
- montor.
->>>> =C2=A0=C2=A0=C2=A0>> =C2=A0>> =C2=A0>> =C2=A0> > > >> =C2=A0>
->>>> =C2=A0=C2=A0=C2=A0>> =C2=A0>> =C2=A0>> =C2=A0> > > >> =C2=A0>> =C2=A0=
-I don't see any other solution, but I might miss something.
->>>> =C2=A0=C2=A0=C2=A0>> =C2=A0>> =C2=A0>> =C2=A0> > > >> =C2=A0>> =C2=A0=
-What do you think?
->>>> =C2=A0=C2=A0=C2=A0>> =C2=A0>> =C2=A0>> =C2=A0> > > >> =C2=A0>
->>>> =C2=A0=C2=A0=C2=A0>> =C2=A0>> =C2=A0>> =C2=A0> > > >> =C2=A0> All ca=
-llers of monitor_get_fd() will close() the FD they get back.
->>>> =C2=A0=C2=A0=C2=A0>> =C2=A0>> =C2=A0>> =C2=A0> > > >> =C2=A0> Thus m=
-onitor_get_fd() should remove it from the list when it returns
->>>> =C2=A0=C2=A0=C2=A0>> =C2=A0>> =C2=A0>> =C2=A0> > > >> =C2=A0> it, an=
-d we should add API docs to monitor_get_fd() to explain this.
->>>> =C2=A0=C2=A0=C2=A0>> =C2=A0>> =C2=A0>> =C2=A0> > > >> =C2=A0>
->>>> =C2=A0=C2=A0=C2=A0>> =C2=A0>> =C2=A0>> =C2=A0> > > >> =C2=A0Ok, it s=
-ounds reasonable. But monitor_get_fd is only about outgoing migration.
->>>> =C2=A0=C2=A0=C2=A0>> =C2=A0>> =C2=A0>> =C2=A0> > > >> =C2=A0But what=
- about the incoming migration? It doesn't use monitor_get_fd but just
->>>> =C2=A0=C2=A0=C2=A0>> =C2=A0>> =C2=A0>> =C2=A0> > > >> =C2=A0converts=
- input string to int and use it as fd.
->>>> =C2=A0=C2=A0=C2=A0>> =C2=A0>> =C2=A0>> =C2=A0> > > >
->>>> =C2=A0=C2=A0=C2=A0>> =C2=A0>> =C2=A0>> =C2=A0> > > > The incoming mi=
-gration expects the FD to be passed into QEMU by the mgmt
->>>> =C2=A0=C2=A0=C2=A0>> =C2=A0>> =C2=A0>> =C2=A0> > > > app when it is =
-exec'ing the QEMU binary. It doesn't interact with the
->>>> =C2=A0=C2=A0=C2=A0>> =C2=A0>> =C2=A0>> =C2=A0> > > > monitor at all =
-AFAIR.
->>>> =C2=A0=C2=A0=C2=A0>> =C2=A0>> =C2=A0>> =C2=A0> > > >
->>>> =C2=A0=C2=A0=C2=A0>> =C2=A0>> =C2=A0>> =C2=A0> > >
->>>> =C2=A0=C2=A0=C2=A0>> =C2=A0>> =C2=A0>> =C2=A0> > > Oh, sorry. This u=
-se case is not obvious. We used add-fd to pass fd for
->>>> =C2=A0=C2=A0=C2=A0>> =C2=A0>> =C2=A0>> =C2=A0> > > migrate-incoming =
-and such way has described problems.
->>>> =C2=A0=C2=A0=C2=A0>> =C2=A0>> =C2=A0>> =C2=A0> >
->>>> =C2=A0=C2=A0=C2=A0>> =C2=A0>> =C2=A0>> =C2=A0> > That's a bug in you=
-r usage of QEMU IMHO, as the incoming code is not
->>>> =C2=A0=C2=A0=C2=A0>> =C2=A0>> =C2=A0>> =C2=A0> > designed to use add=
--fd.
->>>> =C2=A0=C2=A0=C2=A0>> =C2=A0>> =C2=A0>> =C2=A0>
->>>> =C2=A0=C2=A0=C2=A0>> =C2=A0>> =C2=A0>> =C2=A0> Hmm, that's true - al=
-though:
->>>> =C2=A0=C2=A0=C2=A0>> =C2=A0>> =C2=A0>> =C2=A0> a) It's very non-obvi=
-ous
->>>> =C2=A0=C2=A0=C2=A0>> =C2=A0>> =C2=A0>> =C2=A0> b) Unfortunate, since=
- it would go well with -incoming defer
->>>> =C2=A0=C2=A0=C2=A0>> =C2=A0>> =C2=A0>>
->>>> =C2=A0=C2=A0=C2=A0>> =C2=A0>> =C2=A0>> =C2=A0Yeah I think this is a =
-screw up on QMEU's part when introducing 'defer'.
->>>> =C2=A0=C2=A0=C2=A0>> =C2=A0>> =C2=A0>>
->>>> =C2=A0=C2=A0=C2=A0>> =C2=A0>> =C2=A0>> =C2=A0We should have mandated=
- use of 'add-fd' when using 'defer', since FD
->>>> =C2=A0=C2=A0=C2=A0>> =C2=A0>> =C2=A0>> =C2=A0inheritance-over-execve=
-() should only be used for command line args,
->>>> =C2=A0=C2=A0=C2=A0>> =C2=A0>> =C2=A0>> =C2=A0not monitor commands.
->>>> =C2=A0=C2=A0=C2=A0>> =C2=A0>> =C2=A0>>
->>>> =C2=A0=C2=A0=C2=A0>> =C2=A0>> =C2=A0>> =C2=A0Not sure how to best fi=
-x this is QEMU though without breaking back
->>>> =C2=A0=C2=A0=C2=A0>> =C2=A0>> =C2=A0>> =C2=A0compat for apps using '=
-defer' already.
->>>> =C2=A0=C2=A0=C2=A0>> =C2=A0>> =C2=A0>
->>>> =C2=A0=C2=A0=C2=A0>> =C2=A0>> =C2=A0> We could add mon-fd: transport=
-s that has the same behaviour as now for
->>>> =C2=A0=C2=A0=C2=A0>> =C2=A0>> =C2=A0> outgoing, and for incoming use=
-s the add-fd stash.
->>>> =C2=A0=C2=A0=C2=A0>> =C2=A0>> =C2=A0>
->>>> =C2=A0=C2=A0=C2=A0>> =C2=A0>>
->>>> =C2=A0=C2=A0=C2=A0>> =C2=A0>> =C2=A0Oh, I'm sorry again. I think my =
-suggestion about monitor_fd_param wasn't
->>>> =C2=A0=C2=A0=C2=A0>> =C2=A0>> =C2=A0relevant to this issue. If migra=
-te-incoming + "fd:" + add-fd is an invalid use
->>>> =C2=A0=C2=A0=C2=A0>> =C2=A0>> =C2=A0case, should we disallow this?
->>>> =C2=A0=C2=A0=C2=A0>> =C2=A0>> =C2=A0I may add a check to fd_start_in=
-coming_migration if fd is in mon fds list.
->>>> =C2=A0=C2=A0=C2=A0>> =C2=A0>> =C2=A0But I'm afraid there are users l=
-ike me who are already using this wrong use case.
->>>> =C2=A0=C2=A0=C2=A0>> =C2=A0>> =C2=A0Because currently nothing in QEM=
-U's docs disallow this.
->>>> =C2=A0=C2=A0=C2=A0>> =C2=A0>>
->>>> =C2=A0=C2=A0=C2=A0>> =C2=A0>> =C2=A0So which solution is better in y=
-our opinion?
->>>> =C2=A0=C2=A0=C2=A0>> =C2=A0>> =C2=A01) Disallow fd's from mon fds li=
-st in fd_start_incoming_migration
->>>> =C2=A0=C2=A0=C2=A0>> =C2=A0>
->>>> =C2=A0=C2=A0=C2=A0>> =C2=A0> I'm surprised anything could be doing t=
-hat - how would a user know what
->>>> =C2=A0=C2=A0=C2=A0>> =C2=A0> the correct fd index was?
->>>> =C2=A0=C2=A0=C2=A0>> =C2=A0>
->>>> =C2=A0=C2=A0=C2=A0>>
->>>> =C2=A0=C2=A0=C2=A0>> =C2=A0Hmm, add-fd returns correct fd value. May=
-be I din't catch you question...
->>>> =C2=A0=C2=A0=C2=A0>
->>>> =C2=A0=C2=A0=C2=A0> I don't understand, where does it return it?
->>>> =C2=A0=C2=A0=C2=A0>
->>>>
->>>> =C2=A0=C2=A0=C2=A0From misc.json:
->>>> =C2=A0=C2=A0=C2=A0# Example:
->>>> =C2=A0=C2=A0=C2=A0#
->>>> =C2=A0=C2=A0=C2=A0# -> { "execute": "add-fd", "arguments": { "fdset-=
-id": 1 } }
->>>> =C2=A0=C2=A0=C2=A0# <- { "return": { "fdset-id": 1, "fd": 3 } }
->>>> =C2=A0=C2=A0=C2=A0#
->>>>
->>>> =C2=A0=C2=A0=C2=A0"fd": 3 is a valid fd for migrate-incoming(uri =3D=
- "fd:3")
->>>
->>> =C2=A0=C2=A0Ah OK.
->>>
->>>> =C2=A0=C2=A0=C2=A0>> =C2=A0>> =C2=A02) Allow these fds, but dup them=
- or close them correctly
->>>> =C2=A0=C2=A0=C2=A0>> =C2=A0>
->>>> =C2=A0=C2=A0=C2=A0>> =C2=A0> I think I'd leave the current (confusin=
-g) fd: as it is, maybe put a note
->>>> =C2=A0=C2=A0=C2=A0>> =C2=A0> in the manual.
->>>> =C2=A0=C2=A0=C2=A0>> =C2=A0>
->>>> =C2=A0=C2=A0=C2=A0>>
->>>> =C2=A0=C2=A0=C2=A0>> =C2=A0So, using fd from fdset will be an undefi=
-ned behavior, right?
->>>> =C2=A0=C2=A0=C2=A0>
->>>> =C2=A0=C2=A0=C2=A0> For incoming, yes.
->>>> =C2=A0=C2=A0=C2=A0>
->>>> =C2=A0=C2=A0=C2=A0>> =C2=A0>> =C2=A0And how to migrate-incoming defe=
-r through fd correctly?
->>>> =C2=A0=C2=A0=C2=A0>> =C2=A0>> =C2=A01) Add "mon-fd:" protocol to wor=
-k with fds passed by "add-fd/remove-fd" commands
->>>> =C2=A0=C2=A0=C2=A0>> =C2=A0>> =C2=A0as suggested by Dave
->>>> =C2=A0=C2=A0=C2=A0>> =C2=A0>
->>>> =C2=A0=C2=A0=C2=A0>> =C2=A0> That's my preference; it's explicitly n=
-amed and consistent, and it
->>>> =C2=A0=C2=A0=C2=A0>> =C2=A0> doesn't touch the existing fd code.
->>>> =C2=A0=C2=A0=C2=A0>> =C2=A0>
->>>> =C2=A0=C2=A0=C2=A0>>
->>>> =C2=A0=C2=A0=C2=A0>> =C2=A0Ok, but please tell me what you think of =
-my suggestion (2) about using fd added
->>>> =C2=A0=C2=A0=C2=A0>> =C2=A0by the "getfd" command for incoming migra=
-tion. It doesn't requires introducing
->>>> =C2=A0=C2=A0=C2=A0>> =C2=A0new protocol and will be consistent with =
-outgoing migration through fd.
->>>> =C2=A0=C2=A0=C2=A0>
->>>> =C2=A0=C2=A0=C2=A0> I worry how qemu knows whether the command means=
- it comes from the getfd
->>>> =C2=A0=C2=A0=C2=A0> command or is actually a normal fd like now?
->>>> =C2=A0=C2=A0=C2=A0> Can you give an example.
->>>> =C2=A0=C2=A0=C2=A0>
->>>>
->>>> =C2=A0=C2=A0=C2=A0getfd manages naming fds list.
->>>> =C2=A0=C2=A0=C2=A0# -> { "execute": "getfd", "arguments": { "fdname"=
-: "fd1" } }
->>>> =C2=A0=C2=A0=C2=A0So, for migrate (not incoming) is now valid migrat=
-e(uri=3D"fd:fd1")
->>>>
->>>> =C2=A0=C2=A0=C2=A0I want the same for migrate-incoming. If fdname is=
- parseable int, then it is
->>>> =C2=A0=C2=A0=C2=A0an old format. Otherwise - it is a name of fd adde=
-d by addfd.
->>>>
->>>> =C2=A0=C2=A0=C2=A0There is a function "monitor_fd_param" which do ex=
-actly what I mean:
->>>> =C2=A0=C2=A0=C2=A0int monitor_fd_param(Monitor *mon, const char *fdn=
-ame, Error **errp) {
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0... local vars ...
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (!qemu_isdigit(fdname[0=
-]) && mon) {
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0fd=
- =3D monitor_get_fd(mon, fdname, &local_err);
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0} else {
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0fd=
- =3D qemu_parse_fd(fdname);
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0... report err to errp ...
->>>> =C2=A0=C2=A0=C2=A0}
->>>
->>> =C2=A0=C2=A0OK, if we're already using monitor_fd_param everywhere th=
-en I think
->>> =C2=A0=C2=A0we're already down the rat-hole of guessing whether we're=
- an add-fd or
->>> =C2=A0=C2=A0fd by whether it's an integer, and I agree with you that =
-we should
->>> =C2=A0=C2=A0just fix incoming to use that.
->>>
->>> =C2=A0=C2=A0Now, that means I guess we need to modify monitor_fd_para=
-m to tell us
->>> =C2=A0=C2=A0which type of fd it got, so we know whether to close it l=
-ater?
->>>
->>> =C2=A0=C2=A0Dave
->>> =C2=A0=C2=A0P.S. I'm out from tomorrow for a weekish.
->>
->> =C2=A0I think the right way is to check whether fd is added by add-fd =
-and if so then
->> =C2=A0return error. Because IIUC the only valid usage of add-fd is to =
-use
->> =C2=A0qemu_open("/dev/fdset/<fdset_id>") which finds suitable fd from =
-fdset.
->> =C2=A0Such behavior is incompatible with fd:<fd_num> at all, as such s=
-yntax
->> =C2=A0doesn't imply the using of particular fd. But if so, why add-fd =
-returns
->> =C2=A0the value of added fd?..
->>
->> =C2=A0But if I'm right it's enough to:
->> =C2=A01) Modify monitor_fd_param to check where fd comes from and disa=
-llow using
->> =C2=A0=C2=A0=C2=A0=C2=A0fd of "add-fd",
->> =C2=A02) As we discussed earlier, modify monitor_get_fd to remove name=
-d fd from its
->> =C2=A0=C2=A0=C2=A0=C2=A0list before return,
->
-> Omg, monitor_fd_param is already do so... Sorry, so the problem only in
-> incoming case.
->
->> =C2=A03) Use monitor_fd_param in migrate_incoming for "fd:" proto.
->>
->> =C2=A0I'm not insist. May be it's ok to use fd from fdset directly and=
- so qemu_close
->> =C2=A0should be modifyed.
->>
->> =C2=A0Just to clarify what I mean:
->> =C2=A0fdset is a struct:
->> =C2=A0struct MonFdset {
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0int64_t id;
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0QLIST_HEAD(, MonFdsetFd) fds;
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0QLIST_HEAD(, MonFdsetFd) dup_fds;
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0QLIST_ENTRY(MonFdset) next;
->> =C2=A0};
->>
->> =C2=A0* add-fd appends new fd to "->fds" list.
->> =C2=A0* qemu_open("/dev/fdset/X", int perms) is looking for suitable (=
-by perms) fd
->> =C2=A0=C2=A0=C2=A0from fdset with id X, dup it and append "->dup_fds" =
-list.
->> =C2=A0* qemu_close(int fd) tryes to find the fd in all "->dup_fds" lis=
-ts
->> =C2=A0=C2=A0=C2=A0of all fdsets and remove it. And closes fd anyway.
->>
->> =C2=A0If not to disallow using fds added by add-fd then there are thre=
-e
->> =C2=A0possible solutions:
->> =C2=A01) dup fd in monitor_fd_param it the fd is from some fdset,
->> =C2=A02) remove the fd from "->fds" list in qemu_close
->> =C2=A03) don't close it in qemu_close, so client is responsible to clo=
-se it by
->> =C2=A0=C2=A0=C2=A0=C2=A0remove-fd.
->>
->>>> =C2=A0=C2=A0=C2=A0>> =C2=A0>
->>>> =C2=A0=C2=A0=C2=A0>> =C2=A0>> =C2=A02) My suggestion about monitor_f=
-d_param and make "fd:" for
->>>> =C2=A0=C2=A0=C2=A0>> =C2=A0>> =C2=A0migrate/migrate-incoming consist=
-ent. So user will be able to use
->>>> =C2=A0=C2=A0=C2=A0>> =C2=A0>> =C2=A0getfd + migrate-incoming
->>>> =C2=A0=C2=A0=C2=A0>> =C2=A0>> =C2=A03) Both of them or something els=
-e
->>>> =C2=A0=C2=A0=C2=A0>> =C2=A0>>
->>>> =C2=A0=C2=A0=C2=A0>>
->
-> Regards,
-> Yury
+
+Applied, thanks.
+
+Please update the changelog at https://wiki.qemu.org/ChangeLog/4.1
+for any user-visible changes.
+
+-- PMM
 
