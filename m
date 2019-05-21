@@ -2,74 +2,64 @@ Return-Path: <SRS0=/4tE=TV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.0 required=3.0
+X-Spam-Status: No, score=-11.0 required=3.0
 	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5264CC04AAF
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 13:27:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F025C04E87
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 13:33:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 29A142173E
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 13:27:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 29A142173E
+	by mail.kernel.org (Postfix) with ESMTPS id 68AF02173C
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 13:33:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 68AF02173C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:53844 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:53922 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hT4nS-0007F1-FU
-	for qemu-devel@archiver.kernel.org; Tue, 21 May 2019 09:27:14 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:56856)
+	id 1hT4tC-0001VX-R8
+	for qemu-devel@archiver.kernel.org; Tue, 21 May 2019 09:33:10 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:57785)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1hT4mh-0006or-5y
-	for qemu-devel@nongnu.org; Tue, 21 May 2019 09:26:28 -0400
+	(envelope-from <cohuck@redhat.com>) id 1hT4rQ-0000NV-3c
+	for qemu-devel@nongnu.org; Tue, 21 May 2019 09:31:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1hT4mg-0006fM-6h
-	for qemu-devel@nongnu.org; Tue, 21 May 2019 09:26:27 -0400
-Received: from mail-qk1-f196.google.com ([209.85.222.196]:46196)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1hT4mg-0006e4-2j
-	for qemu-devel@nongnu.org; Tue, 21 May 2019 09:26:26 -0400
-Received: by mail-qk1-f196.google.com with SMTP id a132so10961724qkb.13
-	for <qemu-devel@nongnu.org>; Tue, 21 May 2019 06:26:25 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-	:mime-version:content-disposition:in-reply-to;
-	bh=uxWoQ9ZMCcHDwl1neJ1V6NeuwnaIjPih4pSztJWxDho=;
-	b=suZOokOH+uY4J7wy4191T76mFIqPUkpcMVk57KSTHi20Eee2TMjNgspAl7AUJ3mym2
-	z7A2ILuQgKv8rL5R6/kQiPJSRqVsmhuxV6yyaQioD4vGJmIATXRea4URxhb0ZXtvLsPQ
-	7DeKP8S0+EWEBwdUpFODKUq1AvmpXzvA87Y01epUIZ5xIX4+pDUoeI+3BphsOVQPwYxi
-	LaiQjAEcnh1+Ebo/zTTcXnHtK2dcGOg6lIPtbfxFk03LMZ54K9rXDozS3UpDUoh02i8z
-	GcFDmE9C79NEciT+a1/OLk9VeGINFr2KxtFIG5cM04SnQdIlbzRWL7wAEZZdKcB3Zyu4
-	zwsA==
-X-Gm-Message-State: APjAAAVAuEwpplQaou8yqzoED1e3NEBDQNaE/PrIdJrnFCkej2PMFG9n
-	6/1lMI1k8kYJLikDQqDiSE40lA==
-X-Google-Smtp-Source: APXvYqwtJpsr5iHaUNNYvGK3gfj5ZPzlUsU5MRR8wvM71rrwcmHOiSR6mByycXM4vY4FJ63YMbw42Q==
-X-Received: by 2002:a37:993:: with SMTP id 141mr33167162qkj.320.1558445184834; 
-	Tue, 21 May 2019 06:26:24 -0700 (PDT)
-Received: from redhat.com (pool-173-76-105-71.bstnma.fios.verizon.net.
-	[173.76.105.71]) by smtp.gmail.com with ESMTPSA id
-	j19sm6119630qkl.82.2019.05.21.06.26.23
-	(version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-	Tue, 21 May 2019 06:26:23 -0700 (PDT)
-Date: Tue, 21 May 2019 09:26:16 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
+	(envelope-from <cohuck@redhat.com>) id 1hT4rP-0005DK-10
+	for qemu-devel@nongnu.org; Tue, 21 May 2019 09:31:20 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55606)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>)
+	id 1hT4rO-0005CC-RP; Tue, 21 May 2019 09:31:18 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+	[10.5.11.22])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id B70E9820E9;
+	Tue, 21 May 2019 13:31:11 +0000 (UTC)
+Received: from gondolin (ovpn-204-120.brq.redhat.com [10.40.204.120])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 83F141001F5B;
+	Tue, 21 May 2019 13:31:08 +0000 (UTC)
+Date: Tue, 21 May 2019 15:31:04 +0200
+From: Cornelia Huck <cohuck@redhat.com>
 To: Peter Maydell <peter.maydell@linaro.org>
-Message-ID: <20190521092553-mutt-send-email-mst@kernel.org>
-References: <20190520231008.20140-1-mst@redhat.com>
-	<CAFEAcA80Q8zWxM4TBVMZHLuOzo0HSpT=4C76uAwdMjLn2Xye=w@mail.gmail.com>
+Message-ID: <20190521153104.403980b3.cohuck@redhat.com>
+In-Reply-To: <CAFEAcA_9QZRyx8_8qT208vsopquW5j-bkyZpmRCAhP-sqJ+0kg@mail.gmail.com>
+References: <20190521092048.28492-1-cohuck@redhat.com>
+	<CAFEAcA_9QZRyx8_8qT208vsopquW5j-bkyZpmRCAhP-sqJ+0kg@mail.gmail.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA80Q8zWxM4TBVMZHLuOzo0HSpT=4C76uAwdMjLn2Xye=w@mail.gmail.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.26]);
+	Tue, 21 May 2019 13:31:16 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-	[fuzzy]
-X-Received-From: 209.85.222.196
-Subject: Re: [Qemu-devel] [PULL v2 00/36] pci, pc, virtio: features, fixes
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PULL v2 00/54] s390x update
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -81,51 +71,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: imammedo@redhat.com, QEMU Developers <qemu-devel@nongnu.org>
+Cc: qemu-s390x <qemu-s390x@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, May 21, 2019 at 12:49:48PM +0100, Peter Maydell wrote:
-> On Tue, 21 May 2019 at 00:10, Michael S. Tsirkin <mst@redhat.com> wrote:
+On Tue, 21 May 2019 14:24:07 +0100
+Peter Maydell <peter.maydell@linaro.org> wrote:
+
+> On Tue, 21 May 2019 at 10:20, Cornelia Huck <cohuck@redhat.com> wrote:
 > >
-> > The following changes since commit 2259637b95bef3116cc262459271de08e038cc66:
+> > [Note: I'm only sending the changed headers update to spare everybody another
+> > patch avalanche. The remainder of the patches is unchanged, save for the
+> > changed commit ids of the cpumodel patches on top of the headers update.]
 > >
-> >   Merge remote-tracking branch 'remotes/kevin/tags/for-upstream' into staging (2019-05-20 17:22:05 +0100)
+> > The following changes since commit d8276573da58e8ce78dab8c46dd660efd664bcb7:
+> >
+> >   Merge remote-tracking branch 'remotes/rth/tags/pull-tcg-20190510' into staging (2019-05-16 13:15:08 +0100)
 > >
 > > are available in the Git repository at:
 > >
-> >   git://git.kernel.org/pub/scm/virt/kvm/mst/qemu.git tags/for_upstream
+> >   https://github.com/cohuck/qemu tags/s390x-20190521-2
 > >
-> > for you to fetch changes up to 0c05ec64c388aea59facbef740651afa78e04f50:
+> > for you to fetch changes up to 4d727d1aa0e5cbf9f5f00968698dfa34c7b47b08:
 > >
-> >   tests: acpi: print error unable to dump ACPI table during rebuild (2019-05-20 18:40:02 -0400)
-> >
-> > ----------------------------------------------------------------
-> > pci, pc, virtio: features, fixes
-> >
-> > reconnect for vhost blk
-> > tests for UEFI
-> > misc other stuff
-> >
-> > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> >   s390x/cpumodel: wire up 8561 and 8562 as gen15 machines (2019-05-21 10:40:03 +0200)
 > >
 > > ----------------------------------------------------------------
+> > s390x update:
+> > - have the bios tolerate bootmap signature entries
+> > - next chunk of vector instruction support in tcg
+> > - a headers update against Linux 5.2-rc1
+> > - add more facilities and gen15 machines to the cpu model  
 > 
-> Hi -- this failed 'make check' for 32-bit Arm hosts:
+> Hi -- looks like the update-linux-headers change isn't quite right:
 > 
-> ERROR:/home/peter.maydell/qemu/tests/acpi-utils.c:145:acpi_find_rsdp_address_uefi:
-> code should not be reached
-> Aborted
-> ERROR - too few tests run (expected 1, got 0)
-> /home/peter.maydell/qemu/tests/Makefile.include:885: recipe for target
-> 'check-qtest-aarch64' failed
+> --- a/scripts/update-linux-headers.sh
+> +++ b/scripts/update-linux-headers.sh
+> @@ -122,6 +122,9 @@ for arch in $ARCHLIST; do
+>          cp "$tmpdir/include/asm/unistd-oabi.h" "$output/linux-headers/asm-arm/"
+>          cp "$tmpdir/include/asm/unistd-common.h"
+> "$output/linux-headers/asm-arm/"
+>      fi
+> +    if [ $arch = arm64 ]; then
+> +        cp "$tmpdir/include/asm/sve_context.h" "$output/linux-headers/asm-arm/"
+> +    fi
+>      if [ $arch = x86 ]; then
+>          cp "$tmpdir/include/asm/unistd_32.h" "$output/linux-headers/asm-x86/"
+>          cp "$tmpdir/include/asm/unistd_x32.h" "$output/linux-headers/asm-x86/"
 > 
-> thanks
-> -- PMM
+> ...it's copying the file into asm-arm/ rather than asm-arm64/.
+> (I did a by-hand move of the file into the right directory and
+> that was sufficient for the compile to succeed.)
 
-Nothing jumps out ... Igor?
+I'm obviously not at my best at the moment :(
 
--- 
-MST
+> 
+> Also, can we keep the changes to scripts/ in a separate
+> commit, please? The idea of header-update commits is that they
+> should contain only the changes automatically generated
+> by the script, with no hand-written additions.
+
+This looks a bit like a chicken-and-egg problem, though... without the
+change, we cannot point the script at a current kernel tree. I'd prefer
+the two to stay together, but I can certainly point out the change to
+the script more prominently.
 
