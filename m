@@ -2,68 +2,89 @@ Return-Path: <SRS0=/4tE=TV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=FROM_EXCESS_BASE64,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F6E5C072AF
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 09:26:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F037C04AAF
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 09:27:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 173E521783
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 09:26:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 173E521783
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 5BC3221743
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 09:27:55 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mf5CbFAd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5BC3221743
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:50047 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:50059 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hT12T-0001Gv-6H
-	for qemu-devel@archiver.kernel.org; Tue, 21 May 2019 05:26:29 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:37301)
+	id 1hT13q-00027L-Iy
+	for qemu-devel@archiver.kernel.org; Tue, 21 May 2019 05:27:54 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:38243)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1hT0ze-0008Iz-LJ
-	for qemu-devel@nongnu.org; Tue, 21 May 2019 05:23:36 -0400
+	(envelope-from <aleksandar.m.mail@gmail.com>) id 1hT12f-0001Sf-L5
+	for qemu-devel@nongnu.org; Tue, 21 May 2019 05:26:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1hT0zd-0000uD-B2
-	for qemu-devel@nongnu.org; Tue, 21 May 2019 05:23:34 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33718)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1hT0zd-0000tA-2x
-	for qemu-devel@nongnu.org; Tue, 21 May 2019 05:23:33 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
-	[10.5.11.22])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 661BE87642;
-	Tue, 21 May 2019 09:23:32 +0000 (UTC)
-Received: from redhat.com (ovpn-112-26.ams2.redhat.com [10.36.112.26])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 493B8100200D;
-	Tue, 21 May 2019 09:23:26 +0000 (UTC)
-Date: Tue, 21 May 2019 10:23:22 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20190521092322.GG25835@redhat.com>
-References: <20190215103239.28640-1-berrange@redhat.com>
-	<20190215103239.28640-2-berrange@redhat.com>
-	<20190517190129.GA17245@habkost.net>
-	<20190520095611.GD21976@redhat.com>
-	<20190520205959.GC10764@habkost.net>
+	(envelope-from <aleksandar.m.mail@gmail.com>) id 1hT12c-0003tN-5V
+	for qemu-devel@nongnu.org; Tue, 21 May 2019 05:26:41 -0400
+Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:47024)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
+	id 1hT12b-0003sc-Sk
+	for qemu-devel@nongnu.org; Tue, 21 May 2019 05:26:38 -0400
+Received: by mail-ot1-x342.google.com with SMTP id j49so15646130otc.13
+	for <qemu-devel@nongnu.org>; Tue, 21 May 2019 02:26:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+	h=mime-version:in-reply-to:references:from:date:message-id:subject:to
+	:cc; bh=3WyN4XUrgC0VYYSTfn8zwXtZlFbV3BNdnAzzs3AUooo=;
+	b=mf5CbFAdp8yNDADlcKW1ymovjdMm/zmRgI+Q8UyYfqrRXWJdIuKIXri6HyF7A9ccWP
+	5Gwv34XKq7dh3q8Gn85H1EF8cbzjA33aaj1ZI9zZQNpMV+3UL+WhDnXkmunZjh9bOjS3
+	zIVM4Z+5taf//Fp4jqrHEm7WxVpOZrl5gBglq746tEAEpacsmvi6L2PW2+pTAQRq4Bm1
+	EjuM+Wol0Xt2CwxI8meWoX9m4hDb1F+bSjjmZ4dYG9FWLgK33iwxj7nAfZvMtQM5CZgJ
+	meWdo7+RSnbVpXqZnq0+aGYTDgoCtknikNPf1qaAjr6Jl8jegE6mgJUzYdywXJCmmHJq
+	3T2g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:mime-version:in-reply-to:references:from:date
+	:message-id:subject:to:cc;
+	bh=3WyN4XUrgC0VYYSTfn8zwXtZlFbV3BNdnAzzs3AUooo=;
+	b=bGHufCo6IFIcJ6wVvjnjV/DZyEZl41EpTZvUOpof1ubObVWgaOJo4bHttjTAB1ZaoF
+	aSbvGqbUaa+e3vH0Fz8Ik9dE3bALR5HRMF2MWanh2+8ujFC89d3Xai3Pm2LvP1U71qfD
+	s3XlNOYfje07j832gDbkC2m55ghKOrSYso3vKQfbfHZ15uHOUdzfzy3KoCM3hwom2QBQ
+	Vc/VYE+b5qPRWcXkZxQTiJEH/2YR6/40TvTQ1TEu9pslGRc+HX1VAUq+lmPqAWYJfbh4
+	+7DeU8VlWmpjbp1ktImX2qdI5ZhHl57D64NdCds+Ug/489GbwzI4pvpbW9WrVNcd0/ZV
+	oXng==
+X-Gm-Message-State: APjAAAV6N3joi+TCIR3hCIjqab/k9yBhkIDI4Oy5lJYTk06AgDrp7WTV
+	zxqBcmFIL3Etw3ztDBgbTa1JkXtrQriWLiAED+w=
+X-Google-Smtp-Source: APXvYqzxwDaPl3xEs99ApsLrC9P1ucq8dlAanM93j5Ela20mksAMVVwxEG5ZwkqYCJDBCQHnlswmxWcrnUB0FO/zVOc=
+X-Received: by 2002:a9d:7858:: with SMTP id c24mr167364otm.64.1558430796817;
+	Tue, 21 May 2019 02:26:36 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20190520205959.GC10764@habkost.net>
-User-Agent: Mutt/1.11.4 (2019-03-13)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.26]);
-	Tue, 21 May 2019 09:23:32 +0000 (UTC)
+Received: by 2002:a9d:410f:0:0:0:0:0 with HTTP; Tue, 21 May 2019 02:26:35
+	-0700 (PDT)
+Received: by 2002:a9d:410f:0:0:0:0:0 with HTTP; Tue, 21 May 2019 02:26:35
+	-0700 (PDT)
+In-Reply-To: <CAL1e-=jfYuh4jLAacFeZcOes5A3PERNLqsE4_hiEci+x0XBTrw@mail.gmail.com>
+References: <20190520231910.12184-1-f4bug@amsat.org>
+	<20190520231910.12184-5-f4bug@amsat.org>
+	<CAL1e-=jfYuh4jLAacFeZcOes5A3PERNLqsE4_hiEci+x0XBTrw@mail.gmail.com>
+From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Date: Tue, 21 May 2019 11:26:35 +0200
+Message-ID: <CAL1e-=heGtJj-30YsAVyGKSMULZ5ggVd42+c9caGqN3PBRddag@mail.gmail.com>
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::342
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2 1/2] hw: report invalid
- disable-legacy|modern usage for virtio-1-only devs
+X-Content-Filtered-By: Mailman/MimeDel 2.1.21
+Subject: Re: [Qemu-devel] [PATCH 4/4] BootLinuxSshTest: Test some userspace
+ commands on Malta
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -75,95 +96,384 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: Gonglei <arei.gonglei@huawei.com>, "Michael S. Tsirkin" <mst@redhat.com>,
-	Gerd Hoffmann <kraxel@redhat.com>,
-	Andreas =?utf-8?Q?F=C3=A4rber?= <afaerber@suse.de>, qemu-devel@nongnu.org
+Cc: Eduardo Habkost <ehabkost@redhat.com>,
+	Aleksandar Rikalo <arikalo@wavecomp.com>,
+	Caio Carrara <ccarrara@redhat.com>, qemu-devel@nongnu.org,
+	Aleksandar Markovic <amarkovic@wavecomp.com>,
+	Cleber Rosa <crosa@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, May 20, 2019 at 05:59:59PM -0300, Eduardo Habkost wrote:
-> On Mon, May 20, 2019 at 10:56:11AM +0100, Daniel P. Berrang=C3=A9 wrote=
-:
-> > On Fri, May 17, 2019 at 04:01:29PM -0300, Eduardo Habkost wrote:
-> > > Hi,
-> > >=20
-> > > Sorry for taking so long to look at this more closely:
-> > >=20
-> > > On Fri, Feb 15, 2019 at 10:32:38AM +0000, Daniel P. Berrang=C3=A9 w=
-rote:
-> > > > A number of virtio devices (gpu, crypto, mouse, keyboard, tablet)=
- only
-> > > > support the virtio-1 (aka modern) mode. Currently if the user lau=
-nches
-> > > > QEMU, setting those devices to enable legacy mode, QEMU will sile=
-ntly
-> > > > create them in modern mode, ignoring the user's (mistaken) reques=
-t.
-> > > >=20
-> > > > This patch introduces proper data validation so that an attempt t=
-o
-> > > > configure a virtio-1-only devices in legacy mode gets reported as=
- an
-> > > > error to the user.
-> > > >=20
-> > > > Checking this required introduction of a new field to explicitly =
-track
-> > > > what operating model is to be used for a device, separately from =
-the
-> > > > disable_modern and disable_legacy fields that record the user's
-> > > > requested configuration.
-> > >=20
-> > > I'm still trying to understand why we need to add a new field.
-> > >=20
-> > > If disable_modern, disable_legacy and mode are always expected to
-> > > be consistent with each other, why do we need another field?
-> > >=20
-> > > If they are not always consistent with each other, when exactly
-> > > do we want them to be inconsistent, and why?
-> >=20
-> > The pain point is that we're using the existing variables to record
-> > two distinct pieces of information
-> >=20
-> >  - The user's request for modern vs legacy
-> >  - The PCI bus requirements for modern vs legacy
-> >=20
-> > The existing code would overwrite the user's setting for
-> > "disable_legacy" when deciding whether the device is in
-> > a PCI or PCIe port. This happens in virtio_pci_realize.
-> >=20
-> > We can only report errors with the user's requested config
-> > after the sub-classes call virtio_pci_force_virtio_1, but
-> > this doesn't happen until virtio_${subclass}_pci_release.
-> >=20
-> > So by the time we're able to report errors, virtio_pci_realize
-> > has already overwritten the user's disable_legacy setting, so
-> > we've lost the very piece of info we need to check to report
-> > errors with.
->=20
-> Oh, that's the information I was missing.  Thanks!
->=20
-> >=20
-> > Given the ordering of virtio_pci_realize vs the calls
-> > to virtio_pci_force_virtio_1 by subclasses, I don't see any
-> > option other than to use separate variables for the two
-> > distinct pieces of information.
->=20
-> We could replace the virtio_pci_force_virtio_1() calls with a new
-> VirtioDeviceClass::virtio_1_only boolean field, to be handled by
-> virtio_pci_realize() before overriding disable_legacy.
+On May 21, 2019 10:18 AM, "Aleksandar Markovic" <aleksandar.m.mail@gmail.co=
+m>
+wrote:
+>
+>
+> On May 21, 2019 1:19 AM, "Philippe Mathieu-Daud=C3=A9" <f4bug@amsat.org> =
+wrote:
+> >
+> > This tests boot a full VM and check the serial console until
+> > the SSH daemon is running, then start a SSH session and run
+> > some commands.
+> >
 
-Yes, that would be a desirable thing todo in future to get the error
-checking done sooner in virtio_pci_realize() only.
+If there is no objection from Cleber or others, I would like to apply this
+patch to my next MIPS pull request. We in Wave just started regular
+regression tests of various nature for QEMU 4.1 for MIPS, and would really
+like to have this test integrated as soon as possible, that is why I am
+rushing a bit. I am talking here about this patch only, since it is a sort
+of an independant unit - I will not do anything with other remaining
+patches from this series.
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+Please let me know if you have any concerns.
 
+Sincerely, Aleksandar
+
+> > This test can be run using:
+> >
+> >   $ avocado --show=3Dssh run -t arch:mips
+tests/acceptance/linux_ssh_mips_malta.py
+> >   ssh: Entering interactive session.
+> >   ssh: # uname -a
+> >   ssh: Linux debian-mips 3.2.0-4-4kc-malta #1 Debian 3.2.51-1 mips
+GNU/Linux
+> >   ssh: # lspci -d 11ab:4620
+> >   ssh: 00:00.0 Host bridge: Marvell Technology Group Ltd.
+GT-64120/64120A/64121A System Controller (rev 10)
+> >   ssh: # cat /sys/bus/i2c/devices/i2c-0/name
+> >   ssh: SMBus PIIX4 adapter at 1100
+> >   ssh: # cat /proc/mtd
+> >   ssh: dev:    size   erasesize  name
+> >   ssh: mtd0: 00100000 00010000 "YAMON"
+> >   ssh: mtd1: 002e0000 00010000 "User FS"
+> >   ssh: mtd2: 00020000 00010000 "Board Config"
+> >   ssh: # md5sum /dev/mtd2ro
+> >   ssh: 0dfbe8aa4c20b52e1b8bf3cb6cbdf193  /dev/mtd2ro
+> >   ssh: # poweroff
+> >
+> > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> > ---
+>
+> Excelent! Frankly, this was something that we in MIPS needed and missed
+very much for a long time.
+>
+> I liked the idea that this test does not run as a default, giving us
+opportunity to extend and adjust it in future as we deem appropriate for
+our MIPS needs, but without affecting people running default test
+execution. In other words, this patch achieves =E2=80=9Cbest of both worlds=
+=E2=80=9D.
+>
+> Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+>
+> > TODO: do not run this tests by default, use the 'slow' tag
+> > ---
+> >  MAINTAINERS                              |   1 +
+> >  tests/acceptance/linux_ssh_mips_malta.py | 229 +++++++++++++++++++++++
+> >  tests/requirements.txt                   |   1 +
+> >  3 files changed, 231 insertions(+)
+> >  create mode 100644 tests/acceptance/linux_ssh_mips_malta.py
+> >
+> > diff --git a/MAINTAINERS b/MAINTAINERS
+> > index 9424a490d6..69fa4b3abc 100644
+> > --- a/MAINTAINERS
+> > +++ b/MAINTAINERS
+> > @@ -934,6 +934,7 @@ M: Aurelien Jarno <aurelien@aurel32.net>
+> >  R: Aleksandar Rikalo <arikalo@wavecomp.com>
+> >  S: Maintained
+> >  F: hw/mips/mips_malta.c
+> > +F: tests/acceptance/linux_ssh_mips_malta.py
+> >
+> >  Mipssim
+> >  M: Aleksandar Markovic <amarkovic@wavecomp.com>
+> > diff --git a/tests/acceptance/linux_ssh_mips_malta.py
+b/tests/acceptance/linux_ssh_mips_malta.py
+> > new file mode 100644
+> > index 0000000000..ceb530ff88
+> > --- /dev/null
+> > +++ b/tests/acceptance/linux_ssh_mips_malta.py
+> > @@ -0,0 +1,229 @@
+> > +# Functional test that boots a VM and run commands via a SSH session
+> > +#
+> > +# Copyright (c) Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> > +#
+> > +# This work is licensed under the terms of the GNU GPL, version 2 or
+> > +# later.  See the COPYING file in the top-level directory.
+> > +
+> > +import os
+> > +import re
+> > +import base64
+> > +import logging
+> > +import paramiko
+> > +import time
+> > +
+> > +from avocado_qemu import Test
+> > +from avocado.utils import process
+> > +from avocado.utils import archive
+> > +
+> > +
+> > +class LinuxSSH(Test):
+> > +
+> > +    timeout =3D 150 # Not for 'configure --enable-debug
+--enable-debug-tcg'
+> > +
+> > +    KERNEL_COMMON_COMMAND_LINE =3D 'printk.time=3D0 '
+> > +    VM_IP =3D '127.0.0.1'
+> > +
+> > +    IMAGE_INFO =3D {
+> > +        'be': {
+> > +            'image_url': 'https://people.debian.org/~aurel32/qemu/mips=
+/
+'
+> > +                         'debian_wheezy_mips_standard.qcow2',
+> > +            'image_hash': '8987a63270df67345b2135a6b7a4885a35e392d5',
+> > +            'rsa_hostkey':
+b'AAAAB3NzaC1yc2EAAAADAQABAAABAQCca1VitiyLAdQOld'
+> > +
+ b'zT43IOEVJZ0wHD78GJi8wDAjMiYWUzNSSn0rXGQsINHuH5'
+> > +
+ b'IlF+kBZsHinb/FtKCAyS9a8uCHhQI4SuB4QhAb0+39MlUw'
+> > +
+ b'Mm0CLkctgM2eUUZ6MQMQvDlqnue6CCkxN62EZYbaxmby7j'
+> > +
+ b'CQa1125o1HRKBvdGm2zrJWxXAfA+f1v6jHLyE8Jnu83eQ+'
+> > +
+ b'BFY25G+Vzx1PVc3zQBwJ8r0NGTRqy2//oWQP0h+bMsgeFe'
+> > +
+ b'KH/J3RJM22vg6+I4JAdBFcxnK+l781h1FuRxOn4O/Xslbg'
+> > +
+ b'go6WtB4V4TOsw2E/KfxI5IZ/icxF+swVcnvF46Hf3uQc/0'
+> > +                           b'BBqb',
+> > +        },
+> > +        'le': {
+> > +            'image_url': '
+https://people.debian.org/~aurel32/qemu/mipsel/'
+> > +                         'debian_wheezy_mipsel_standard.qcow2',
+> > +            'image_hash': '7866764d9de3ef536ffca24c9fb9f04ffdb45802',
+> > +            'rsa_hostkey':
+b'AAAAB3NzaC1yc2EAAAADAQABAAABAQClXJlBT71HL5yKvv'
+> > +
+ b'gfC7jmxSWx5zSBCzET6CLZczwAafSIs7YKfNOy/dQTxhuk'
+> > +
+ b'yIGFUugZFoF3E9PzdhunuyvyTd56MPoNIqFbb5rGokwU5I'
+> > +
+ b'TOx3dBHZR0mClypL6MVrwe0bsiIb8GhF1zioNwcsaAZnAi'
+> > +
+ b'KfXStVDtXvn/kLLq+xLABYt48CC5KYWoFaCoICskLAY+qo'
+> > +
+ b'L+LWyAnQisj4jAH8VSaSKIImFpfkHWEXPhHcC4ZBlDKtnH'
+> > +
+ b'po9vhfCHgnfW3Pzrqmk8BI4HysqPFVmJWkJGlGUL+sGeg3'
+> > +
+ b'ZZolAYuDXGuBrw8ooPJq2v2dOH+z6dyD2q/ypmAbyPqj5C'
+> > +                           b'rc8H',
+> > +        },
+> > +    }
+> > +
+> > +    def wait_for_console_pattern(self, success_message,
+> > +                                 failure_message=3D'Oops'):
+> > +        console =3D self.vm.console_socket.makefile()
+> > +        console_logger =3D logging.getLogger('console')
+> > +        while True:
+> > +            msg =3D console.readline()
+> > +            console_logger.debug(msg.strip())
+> > +            if success_message in msg:
+> > +                break
+> > +            if failure_message in msg:
+> > +                fail =3D 'Failure message found in console: %s' %
+failure_message
+> > +                self.fail(fail)
+> > +
+> > +    def get_portfwd(self):
+> > +        res =3D self.vm.command('human-monitor-command',
+> > +                              command_line=3D'info usernet')
+> > +        line =3D res.split('\r\n')[2]
+> > +        port =3D re.split(r'.*TCP.HOST_FORWARD.*127\.0\.0\.1
+(\d+)\s+10\..*',
+> > +                        line)[1]
+> > +        self.log.debug("sshd listening on port:" + port)
+> > +        return port
+> > +
+> > +    def ssh_connect(self, username, password, rsa_hostkey_b64=3DNone):
+> > +        self.ssh_logger =3D logging.getLogger('ssh')
+> > +        self.ssh_username =3D username
+> > +        self.ssh_ps1 =3D '# ' if username is 'root' else '$ '
+> > +        self.ssh_client =3D paramiko.SSHClient()
+> > +        port =3D self.get_portfwd()
+> > +        if rsa_hostkey_b64:
+> > +            rsa_hostkey_bin =3D base64.b64decode(rsa_hostkey_b64)
+> > +            rsa_hostkey =3D paramiko.RSAKey(data =3D rsa_hostkey_bin)
+> > +            ipport =3D '[%s]:%s' % (self.VM_IP, port)
+> > +            self.ssh_logger.debug('ipport ' + ipport)
+> > +            self.ssh_client.get_host_keys().add(ipport, 'ssh-rsa',
+rsa_hostkey)
+> > +        for i in range(10):
+> > +            try:
+> > +                self.ssh_client.connect(self.VM_IP, int(port),
+> > +                                        username, password,
+banner_timeout=3D90)
+> > +                self.ssh_logger.info("Entering interactive session.")
+> > +                return
+> > +            except:
+> > +                time.sleep(4)
+> > +                pass
+> > +        self.fail("sshd timeout")
+> > +
+> > +    def ssh_disconnect_vm(self):
+> > +        self.ssh_client.close()
+> > +
+> > +    def ssh_command(self, command, is_root=3DTrue):
+> > +        self.ssh_logger.info(self.ssh_ps1 + command)
+> > +        stdin, stdout, stderr =3D self.ssh_client.exec_command(command=
+)
+> > +        stdout_lines =3D [line.strip('\n') for line in stdout]
+> > +        for line in stdout_lines:
+> > +            self.ssh_logger.info(line)
+> > +        stderr_lines =3D [line.strip('\n') for line in stderr]
+> > +        for line in stderr_lines:
+> > +            self.ssh_logger.warning(line)
+> > +        return stdout_lines, stderr_lines
+> > +
+> > +    def boot_debian_wheezy_image_and_ssh_login(self, endianess,
+kernel_path):
+> > +        image_url =3D self.IMAGE_INFO[endianess]['image_url']
+> > +        image_hash =3D self.IMAGE_INFO[endianess]['image_hash']
+> > +        image_path =3D self.fetch_asset(image_url, asset_hash=3Dimage_=
+hash)
+> > +        rsa_hostkey_b64 =3D self.IMAGE_INFO[endianess]['rsa_hostkey']
+> > +
+> > +        self.vm.set_machine('malta')
+> > +        self.vm.set_console()
+> > +        kernel_command_line =3D (self.KERNEL_COMMON_COMMAND_LINE
+> > +                               + 'console=3DttyS0 root=3D/dev/sda1')
+> > +        self.vm.add_args('-no-reboot',
+> > +                         '-kernel', kernel_path,
+> > +                         '-append', kernel_command_line,
+> > +                         '-hda', image_path,
+> > +                         '-netdev', 'user,id=3Dvnet,hostfwd=3D:127.0.0=
+.1:0
+-:22',
+> > +                         '-device', 'pcnet,netdev=3Dvnet')
+> > +        self.vm.launch()
+> > +
+> > +        self.log.info('VM launched, waiting for sshd')
+> > +        console_pattern =3D 'Starting OpenBSD Secure Shell server: ssh=
+d'
+> > +        self.wait_for_console_pattern(console_pattern)
+> > +        self.log.info('sshd ready')
+> > +
+> > +        self.ssh_connect('root', 'root',
+rsa_hostkey_b64=3Drsa_hostkey_b64)
+> > +
+> > +    def shutdown_via_ssh(self):
+> > +        self.ssh_command('poweroff')
+> > +        self.ssh_disconnect_vm()
+> > +        self.wait_for_console_pattern('Power down')
+> > +
+> > +    def run_common_commands(self):
+> > +        stdout, stderr =3D self.ssh_command('lspci -d 11ab:4620')
+> > +        self.assertIn(True, ["GT-64120" in line for line in stdout])
+> > +
+> > +        stdout, stderr =3D self.ssh_command('cat
+/sys/bus/i2c/devices/i2c-0/name')
+> > +        self.assertIn(True, ["SMBus PIIX4 adapter" in line
+> > +                             for line in stdout])
+> > +
+> > +        stdout, stderr =3D self.ssh_command('cat /proc/mtd')
+> > +        self.assertIn(True, ["YAMON" in line
+> > +                             for line in stdout])
+> > +
+> > +        # Empty 'Board Config'
+> > +        stdout, stderr =3D self.ssh_command('md5sum /dev/mtd2ro')
+> > +        self.assertIn(True, ["0dfbe8aa4c20b52e1b8bf3cb6cbdf193" in lin=
+e
+> > +                             for line in stdout])
+> > +
+> > +    def do_test_mips_malta(self, endianess, kernel_path, uname_m):
+> > +        self.boot_debian_wheezy_image_and_ssh_login(endianess,
+kernel_path)
+> > +
+> > +        stdout, stderr =3D self.ssh_command('uname -a')
+> > +        self.assertIn(True, [uname_m + " GNU/Linux" in line for line
+in stdout])
+> > +
+> > +        self.run_common_commands()
+> > +        self.shutdown_via_ssh()
+> > +
+> > +    def test_mips_malta32eb_kernel3_2_0(self):
+> > +        """
+> > +        :avocado: tags=3Dslow
+> > +        :avocado: tags=3Darch:mips
+> > +        :avocado: tags=3Dmachine:malta
+> > +        :avocado: tags=3Dendian:big
+> > +        :avocado: tags=3Ddevice:pcnet32
+> > +        """
+> > +        kernel_url =3D ('https://people.debian.org/~aurel32/qemu/mips/=
+'
+> > +                      'vmlinux-3.2.0-4-4kc-malta')
+> > +        kernel_hash =3D '592e384a4edc16dade52a6cd5c785c637bcbc9ad'
+> > +        kernel_path =3D self.fetch_asset(kernel_url,
+asset_hash=3Dkernel_hash)
+> > +
+> > +        self.do_test_mips_malta('be', kernel_path, 'mips')
+> > +
+> > +    def test_mips_malta32el_kernel3_2_0(self):
+> > +        """
+> > +        :avocado: tags=3Dslow
+> > +        :avocado: tags=3Darch:mipsel
+> > +        :avocado: tags=3Dmachine:malta
+> > +        :avocado: tags=3Dendian:little
+> > +        :avocado: tags=3Ddevice:pcnet32
+> > +        """
+> > +        kernel_url =3D ('https://people.debian.org/~aurel32/qemu/mipse=
+l/'
+> > +                      'vmlinux-3.2.0-4-4kc-malta')
+> > +        kernel_hash =3D 'a66bea5a8adaa2cb3d36a1d4e0ccdb01be8f6c2a'
+> > +        kernel_path =3D self.fetch_asset(kernel_url,
+asset_hash=3Dkernel_hash)
+> > +
+> > +        self.do_test_mips_malta('le', kernel_path, 'mips')
+> > +
+> > +    def test_mips_malta64eb_kernel3_2_0(self):
+> > +        """
+> > +        :avocado: tags=3Dslow
+> > +        :avocado: tags=3Darch:mips64
+> > +        :avocado: tags=3Dmachine:malta
+> > +        :avocado: tags=3Dendian:big
+> > +        :avocado: tags=3Ddevice:pcnet32
+> > +        """
+> > +        kernel_url =3D ('https://people.debian.org/~aurel32/qemu/mips/=
+'
+> > +                      'vmlinux-3.2.0-4-5kc-malta')
+> > +        kernel_hash =3D 'db6eea7de35d36c77d8c165b6bcb222e16eb91db'
+> > +        kernel_path =3D self.fetch_asset(kernel_url,
+asset_hash=3Dkernel_hash)
+> > +        self.do_test_mips_malta('be', kernel_path, 'mips64')
+> > +
+> > +    def test_mips_malta64el_kernel3_2_0(self):
+> > +        """
+> > +        :avocado: tags=3Dslow
+> > +        :avocado: tags=3Darch:mips64el
+> > +        :avocado: tags=3Dmachine:malta
+> > +        :avocado: tags=3Dendian:little
+> > +        :avocado: tags=3Ddevice:pcnet32
+> > +        """
+> > +        kernel_url =3D ('https://people.debian.org/~aurel32/qemu/mipse=
+l/'
+> > +                      'vmlinux-3.2.0-4-5kc-malta')
+> > +        kernel_hash =3D '6a7f77245acf231415a0e8b725d91ed2f3487794'
+> > +        kernel_path =3D self.fetch_asset(kernel_url,
+asset_hash=3Dkernel_hash)
+> > +        self.do_test_mips_malta('le', kernel_path, 'mips64')
+> > diff --git a/tests/requirements.txt b/tests/requirements.txt
+> > index 002ded6a22..3ae0e29ad7 100644
+> > --- a/tests/requirements.txt
+> > +++ b/tests/requirements.txt
+> > @@ -2,3 +2,4 @@
+> >  # in the tests/venv Python virtual environment. For more info,
+> >  # refer to: https://pip.pypa.io/en/stable/user_guide/#id1
+> >  avocado-framework=3D=3D68.0
+> > +paramiko
+> > --
+> > 2.19.1
+> >
