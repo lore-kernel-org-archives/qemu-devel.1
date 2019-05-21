@@ -2,52 +2,50 @@ Return-Path: <SRS0=/4tE=TV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,URIBL_SBL,URIBL_SBL_A
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 63E3EC072B5
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 20:46:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C5B23C072B5
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 20:50:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2C697217D7
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 20:46:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2C697217D7
+	by mail.kernel.org (Postfix) with ESMTPS id 8B7942182B
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 20:50:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8B7942182B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:59271 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:59302 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hTBeU-0004y1-AE
-	for qemu-devel@archiver.kernel.org; Tue, 21 May 2019 16:46:26 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:34340)
+	id 1hTBi7-0007cM-Ok
+	for qemu-devel@archiver.kernel.org; Tue, 21 May 2019 16:50:11 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:34691)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1hTBa1-0000uG-IF
-	for qemu-devel@nongnu.org; Tue, 21 May 2019 16:41:50 -0400
+	(envelope-from <jsnow@redhat.com>) id 1hTBaH-0001Md-R5
+	for qemu-devel@nongnu.org; Tue, 21 May 2019 16:42:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1hTBRB-00011J-TG
-	for qemu-devel@nongnu.org; Tue, 21 May 2019 16:32:42 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42172)
+	(envelope-from <jsnow@redhat.com>) id 1hTBL6-0004qM-Da
+	for qemu-devel@nongnu.org; Tue, 21 May 2019 16:26:25 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42846)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1hTBRB-000112-Li
-	for qemu-devel@nongnu.org; Tue, 21 May 2019 16:32:41 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
+	(Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1hTBL6-0004o8-3d
+	for qemu-devel@nongnu.org; Tue, 21 May 2019 16:26:24 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id EF2D43086228;
-	Tue, 21 May 2019 20:32:40 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 82B0C8830F;
+	Tue, 21 May 2019 20:26:11 +0000 (UTC)
 Received: from [10.18.17.187] (dhcp-17-187.bos.redhat.com [10.18.17.187])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 92454608C2;
-	Tue, 21 May 2019 20:32:35 +0000 (UTC)
-To: Peter Maydell <peter.maydell@linaro.org>,
-	Markus Armbruster <armbru@redhat.com>
-References: <20190520184108.GA10764@habkost.net>
-	<20190521085350.GF25835@redhat.com>
-	<e2395213-efaf-6d6c-6cfd-d949d071b4f6@redhat.com>
-	<87pnobrg37.fsf@dusky.pond.sub.org>
-	<CAFEAcA8db=UsyU_kRBoatFT2ULQBqL318xRhg+CV4D_7hV76Og@mail.gmail.com>
+	by smtp.corp.redhat.com (Postfix) with ESMTP id F3F5018237;
+	Tue, 21 May 2019 20:26:09 +0000 (UTC)
+To: Eduardo Habkost <ehabkost@redhat.com>
+References: <8c0a113e959cc2419aa52253c261e111ac9caf4a.camel@gmail.com>
+	<81b5a062-2bb5-8b2f-6a33-1f886211fc09@redhat.com>
+	<58d6c6ea-cf6e-d6d4-0605-dee933acf0f1@redhat.com>
+	<20190520230447.GH10764@habkost.net>
 From: John Snow <jsnow@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
@@ -124,23 +122,23 @@ Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
 	i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
 	RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
 	glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
-Message-ID: <7e468375-ca5f-0048-789e-c41d09065eeb@redhat.com>
-Date: Tue, 21 May 2019 16:32:35 -0400
+Message-ID: <9497982d-c998-2433-72bd-c24bc5c1e6ed@redhat.com>
+Date: Tue, 21 May 2019 16:26:09 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8db=UsyU_kRBoatFT2ULQBqL318xRhg+CV4D_7hV76Og@mail.gmail.com>
+In-Reply-To: <20190520230447.GH10764@habkost.net>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.42]);
-	Tue, 21 May 2019 20:32:41 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.28]);
+	Tue, 21 May 2019 20:26:16 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] Introducing GSoC project: API Documentation
- Generation
+Subject: Re: [Qemu-devel] QMP Example Formatting in ReST, Sphinx,
+ and Pygments (was: Re: [Bug] Docs build fails at interop.rst)
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -152,37 +150,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
-	Eduardo Habkost <ehabkost@redhat.com>,
-	Gabriel Barreto <sbarreto.gabriel@gmail.com>,
-	QEMU Developers <qemu-devel@nongnu.org>, "Emilio G. Cota" <cota@braap.org>,
-	Stefan Hajnoczi <stefanha@redhat.com>, Cleber Rosa <crosa@redhat.com>,
-	Paolo Bonzini <pbonzini@redhat.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+	Aarushi Mehta <mehta.aaru20@gmail.com>,
+	Gabriel Barreto <sbarreto.gabriel@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
 
-On 5/21/19 11:27 AM, Peter Maydell wrote:
-> On Tue, 21 May 2019 at 16:18, Markus Armbruster <armbru@redhat.com> wrote:
->> Anyway.  What's so special about QEMU that justifies coming up with our
->> own doc syntax?  Other than "we made a hash of it, and cleaning it up
->> would be work".
+On 5/20/19 7:04 PM, Eduardo Habkost wrote:
+> On Mon, May 20, 2019 at 05:25:28PM -0400, John Snow wrote:
+>>
+>>
+>> On 5/20/19 12:37 PM, John Snow wrote:
+>>>
+>>>
+>>> On 5/20/19 7:30 AM, Aarushi Mehta wrote:
+>>>> https://paste.fedoraproject.org/paste/kOPx4jhtUli---TmxSLrlw
+>>>> running python3-sphinx-2.0.1-1.fc31.noarch on Fedora release 31
+>>>> (Rawhide)
+>>>>
+>>>> uname - a
+>>>> Linux iouring 5.1.0-0.rc6.git3.1.fc31.x86_64 #1 SMP Thu Apr 25 14:25:32
+>>>> UTC 2019 x86_64 x86_64 x86_64 GNU/Linux
+>>>>
+>>>> Reverting commmit 90edef80a0852cf8a3d2668898ee40e8970e431
+>>>> allows for the build to occur
+>>>>
+>>>> Regards
+>>>> Aarushi Mehta
+>>>>
+>>>>
+>>>
+>>> Ah, dang. The blocks aren't strictly conforming json, but the version I
+>>> tested this under didn't seem to care. Your version is much newer. (I
+>>> was using 1.7 as provided by Fedora 29.)
+>>>
+>>> For now, try reverting 9e5b6cb87db66dfb606604fe6cf40e5ddf1ef0e7 instead,
+>>> which should at least turn off the "warnings as errors" option, but I
+>>> don't think that reverting -n will turn off this warning.
+>>>
+>>> I'll try to get ahold of this newer version and see if I can't fix it
+>>> more appropriately.
+>>>
+>>> --js
+>>>
+>>
+>> ...Sigh, okay.
+>>
+>> So, I am still not actually sure what changed from pygments 2.2 and
+>> sphinx 1.7 to pygments 2.4 and sphinx 2.0.1, but it appears as if Sphinx
+>> by default always tries to do add a filter to the pygments lexer that
+>> raises an error on highlighting failure, instead of the default behavior
+>> which is to just highlight those errors in the output. There is no
+>> option to Sphinx that I am aware of to retain this lexing behavior.
+>> (Effectively, it's strict or nothing.)
+>>
+>> This approach, apparently, is broken in Sphinx 1.7/Pygments 2.2, so the
+>> build works with our malformed json.
+>>
+>> There are a few options:
+>>
+>> 1. Update conf.py to ignore these warnings (and all future lexing
+>> errors), and settle for the fact that there will be no QMP highlighting
+>> wherever we use the directionality indicators ('->', '<-').
+>>
+>> 2. Update bitmaps.rst to remove the directionality indicators.
+>>
+>> 3. Update bitmaps.rst to format the QMP blocks as raw text instead of JSON.
+>>
+>> 4. Update bitmaps.rst to remove the "json" specification from the code
+>> block. This will cause sphinx to "guess" the formatting, and the
+>> pygments guesser will decide it's Python3.
+>>
+>> This will parse well enough, but will mis-highlight 'true' and 'false'
+>> which are not python keywords. This approach may break in the future if
+>> the Python3 lexer is upgraded to be stricter (because '->' and '<-' are
+>> still invalid), and leaves us at the mercy of both the guesser and the
+>> lexer.
+>>
+>> I'm not actually sure what I dislike the least; I think I dislike #1 the
+>> most. #4 gets us most of what we want but is perhaps porcelain.
+>>
+>> I suspect if we attempt to move more of our documentation to ReST and
+>> Sphinx that we will need to answer for ourselves how we intend to
+>> document QMP code flow examples.
 > 
-> The major problem as far as kernel-doc is concerned is that
-> it somewhat bakes in the kernel's style choice that the
-> 'struct' keyword is not hidden behind typedefs, and so it
-> gets a bit confused by QEMU's "use typedefs for struct types"
-> style. The rest, as you say, is just a matter of fixing up
-> our syntax errors.
+> Writing a custom lexer that handles "<-" and "->" was simple (see below).
 > 
-> thanks
-> -- PMM
+> Now, is it possible to convince Sphinx to register and use a custom lexer?
 > 
 
-But this is the one we're going with? Do we have a plan for teaching it
-not to panic for our use of named custom types?
-
---js
+Spoilers, yes, and I've sent a patch to list. Thanks for your help!
 
