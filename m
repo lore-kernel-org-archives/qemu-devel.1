@@ -3,75 +3,61 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B0506C04AAF
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 14:35:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 08E7EC04AAF
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 14:35:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7840E217D7
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 14:35:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7840E217D7
+	by mail.kernel.org (Postfix) with ESMTPS id D3B8721773
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 14:35:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D3B8721773
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:54856 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:54580 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hT5rO-0007hd-Mc
-	for qemu-devel@archiver.kernel.org; Tue, 21 May 2019 10:35:22 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:44999)
+	id 1hT5YH-0007Qm-6J
+	for qemu-devel@archiver.kernel.org; Tue, 21 May 2019 10:15:37 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:39596)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1hT5qD-0007Km-4h
-	for qemu-devel@nongnu.org; Tue, 21 May 2019 10:34:10 -0400
+	(envelope-from <lvivier@redhat.com>) id 1hT5Uh-0005Ak-DO
+	for qemu-devel@nongnu.org; Tue, 21 May 2019 10:11:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1hT5qB-00033u-Si
-	for qemu-devel@nongnu.org; Tue, 21 May 2019 10:34:09 -0400
-Received: from mail-qt1-f195.google.com ([209.85.160.195]:43736)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1hT5qB-00033c-N5
-	for qemu-devel@nongnu.org; Tue, 21 May 2019 10:34:07 -0400
-Received: by mail-qt1-f195.google.com with SMTP id i26so20673618qtr.10
-	for <qemu-devel@nongnu.org>; Tue, 21 May 2019 07:34:07 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-	:mime-version:content-disposition:in-reply-to;
-	bh=SigsA1sP123ej8F2Zg21FNMenhvWldU7U/vGNqkotXI=;
-	b=FAAqsdUoxgZe1T8Nny2+DOii1qbwA4oRm83degFVExZCjZnhSdt10foVPG83REgmVU
-	Z9KeRn3vTJNRRpDpI68CGa1Spjb2ALuibgo7lrKOsYiOYyKNJRyCBx4F21cCx+sRp/Ej
-	xCF5cgt6YT2Tz88vvWMNeddnt4Dd7I6E3COrCt+HgfVpBfhITLYEi0gPbuC+CvVzdjVo
-	hj+GqOUUJHcM910E4vWUhn9kvOelatQ51nCT8HXVA+Ec5opifdO/7aaKT+wUy6hRxtU3
-	P1mCXs1ppWNsc8mTL40ABkwOr7a++UnwqZ1P0DQcGaVuqdxdBb59hYsAcfTiQlpvMrim
-	Cqwg==
-X-Gm-Message-State: APjAAAW6sB0QefNoaP8+Lr+V6cAHWZylLj8M7B3338bIUkxzF+7/wAvb
-	xTFVbnTxQuWfZaP1upHNEVeGuw==
-X-Google-Smtp-Source: APXvYqx19BKRuoOBO12XE8ICBpfYQiORkSUQt16ZG/MzDG9j1gU5yZtgjY0nr6khWDQA4U07NWWg4w==
-X-Received: by 2002:a0c:96b9:: with SMTP id a54mr21171889qvd.135.1558449247015;
-	Tue, 21 May 2019 07:34:07 -0700 (PDT)
-Received: from redhat.com (pool-173-76-105-71.bstnma.fios.verizon.net.
-	[173.76.105.71]) by smtp.gmail.com with ESMTPSA id
-	s17sm12145560qke.60.2019.05.21.07.34.05
-	(version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-	Tue, 21 May 2019 07:34:06 -0700 (PDT)
-Date: Tue, 21 May 2019 10:34:03 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20190521103215-mutt-send-email-mst@kernel.org>
-References: <20190521033249.1960-1-richardw.yang@linux.intel.com>
-	<20190521033249.1960-3-richardw.yang@linux.intel.com>
-	<20190520233614-mutt-send-email-mst@kernel.org>
-	<20190521162958.4415d4ac@redhat.com>
+	(envelope-from <lvivier@redhat.com>) id 1hT5Uf-0000kf-D3
+	for qemu-devel@nongnu.org; Tue, 21 May 2019 10:11:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48664)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1hT5Ud-0000j5-FP
+	for qemu-devel@nongnu.org; Tue, 21 May 2019 10:11:51 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id BA2B4308402A;
+	Tue, 21 May 2019 14:11:44 +0000 (UTC)
+Received: from thinkpad.redhat.com (unknown [10.40.205.57])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 0746E5E7AF;
+	Tue, 21 May 2019 14:11:39 +0000 (UTC)
+From: Laurent Vivier <lvivier@redhat.com>
+To: qemu-devel@nongnu.org
+Date: Tue, 21 May 2019 16:11:30 +0200
+Message-Id: <20190521141133.27380-2-lvivier@redhat.com>
+In-Reply-To: <20190521141133.27380-1-lvivier@redhat.com>
+References: <20190521141133.27380-1-lvivier@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190521162958.4415d4ac@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.40]);
+	Tue, 21 May 2019 14:11:44 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-	[fuzzy]
-X-Received-From: 209.85.160.195
-Subject: Re: [Qemu-devel] [PATCH v5 2/2] acpi: pci: use build_append_foo()
- API to construct MCFG
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PATCH v6 1/4] VirtIO-RNG: Update default entropy
+ source to `/dev/urandom`
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -83,154 +69,126 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: yang.zhong@intel.com, peter.maydell@linaro.org, thuth@redhat.com,
-	qemu-devel@nongnu.org, shannon.zhaosl@gmail.com,
-	qemu-arm@nongnu.org, Wei Yang <richardw.yang@linux.intel.com>,
-	philmd@redhat.com
+Cc: Laurent Vivier <lvivier@redhat.com>,
+	=?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+	Amit Shah <amit@kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>,
+	Richard Henderson <richard.henderson@linaro.org>,
+	Markus Armbruster <armbru@redhat.com>,
+	"Richard W . M . Jones" <rjones@redhat.com>,
+	Stefan Hajnoczi <stefanha@redhat.com>,
+	Kashyap Chamarthy <kchamart@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, May 21, 2019 at 04:29:58PM +0200, Igor Mammedov wrote:
-> On Mon, 20 May 2019 23:37:22 -0400
-> "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> 
-> > On Tue, May 21, 2019 at 11:32:49AM +0800, Wei Yang wrote:
-> > > build_append_foo() API doesn't need explicit endianness conversions
-> > > which eliminates a source of errors and it makes build_mcfg() look like
-> > > declarative definition of MCFG table in ACPI spec, which makes it easy
-> > > to review.
-> > > 
-> > > Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
-> > > Suggested-by: Igor Mammedov <imammedo@redhat.com>
-> > > Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-> > > 
-> > > ---
-> > > v5:
-> > >    * miss the reserved[8] of MCFG in last version, add it back
-> > >    * drop SOBs and make sure bios-tables-test all OK
-> > > ---  
-> > 
-> > 
-> > Please do not add two --- separators. It breaks git am.
-> that worked just fine for the last xx years and still works for me.
+From: Kashyap Chamarthy <kchamart@redhat.com>
 
-Because you don't use git am?
-It's true I often am forced to edit your patches to apply them.
-Pls do not do this it makes no sense.
+When QEMU exposes a VirtIO-RNG device to the guest, that device needs a
+source of entropy, and that source needs to be "non-blocking", like
+`/dev/urandom`.  However, currently QEMU defaults to the problematic
+`/dev/random`, which on Linux is "blocking" (as in, it waits until
+sufficient entropy is available).
 
-> > 
-> > One --- should come after the commit log. Anything after that and
-> > until diff is ignored anyway.
-> That's fine if we wish to commit change log into history, but
-> Typically we don't want change log to be committed (as it's useless from history pov),
-> hence we put it after separator to get it dropped on applying.
+Why prefer `/dev/urandom` over `/dev/random`?
+---------------------------------------------
 
-Then you should do
+The man pages of urandom(4) and random(4) state:
 
-build_append_foo() API doesn't need explicit endianness conversions
-which eliminates a source of errors and it makes build_mcfg() look like
-declarative definition of MCFG table in ACPI spec, which makes it easy
-to review.
+    "The /dev/random device is a legacy interface which dates back to a
+    time where the cryptographic primitives used in the implementation
+    of /dev/urandom were not widely trusted.  It will return random
+    bytes only within the estimated number of bits of fresh noise in the
+    entropy pool, blocking if necessary.  /dev/random is suitable for
+    applications that need high quality randomness, and can afford
+    indeterminate delays."
 
-Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
-Suggested-by: Igor Mammedov <imammedo@redhat.com>
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+Further, the "Usage" section of the said man pages state:
 
+    "The /dev/random interface is considered a legacy interface, and
+    /dev/urandom is preferred and sufficient in all use cases, with the
+    exception of applications which require randomness during early boot
+    time; for these applications, getrandom(2) must be used instead,
+    because it will block until the entropy pool is initialized.
+
+    "If a seed file is saved across reboots as recommended below (all
+    major Linux distributions have done this since 2000 at least), the
+    output is cryptographically secure against attackers without local
+    root access as soon as it is reloaded in the boot sequence, and
+    perfectly adequate for network encryption session keys.  Since reads
+    from /dev/random may block, users will usually want to open it in
+    nonblocking mode (or perform a read with timeout), and provide some
+    sort of user notification if the desired entropy is not immediately
+    available."
+
+And refer to random(7) for a comparison of `/dev/random` and
+`/dev/urandom`.
+
+What about other OSes?
+----------------------
+
+`/dev/urandom` exists and works on OS-X, FreeBSD, DragonFlyBSD, NetBSD
+and OpenBSD, which cover all the non-Linux platforms we explicitly
+support, aside from Windows.
+
+On Windows `/dev/random` doesn't work either so we don't regress.
+This is actually another argument in favour of using the newly
+proposed 'rng-builtin' backend by default, as that will work on
+Windows.
+
+    - - -
+
+Given the above, change the entropy source for VirtIO-RNG device to
+`/dev/urandom`.
+
+Related discussion in these[1][2] past threads.
+
+[1] https://lists.nongnu.org/archive/html/qemu-devel/2018-06/msg08335.htm=
+l
+    -- "RNG: Any reason QEMU doesn't default to `/dev/urandom`?"
+[2] https://lists.nongnu.org/archive/html/qemu-devel/2018-09/msg02724.htm=
+l
+    -- "[RFC] Virtio RNG: Consider changing the default entropy source to
+       /dev/urandom"
+
+Signed-off-by: Kashyap Chamarthy <kchamart@redhat.com>
+Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
+Signed-off-by: Laurent Vivier <lvivier@redhat.com>
 ---
-v5:
-   * miss the reserved[8] of MCFG in last version, add it back
-   * drop SOBs and make sure bios-tables-test all OK
+ backends/rng-random.c | 2 +-
+ qemu-options.hx       | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
- hw/acpi/pci.c               | 35 +++++++++++++++++++++++------------
- include/hw/acpi/acpi-defs.h | 18 ------------------
- 2 files changed, 23 insertions(+), 30 deletions(-)
+diff --git a/backends/rng-random.c b/backends/rng-random.c
+index e2a49b0571d7..eff36ef14084 100644
+--- a/backends/rng-random.c
++++ b/backends/rng-random.c
+@@ -112,7 +112,7 @@ static void rng_random_init(Object *obj)
+                             rng_random_set_filename,
+                             NULL);
+=20
+-    s->filename =3D g_strdup("/dev/random");
++    s->filename =3D g_strdup("/dev/urandom");
+     s->fd =3D -1;
+ }
+=20
+diff --git a/qemu-options.hx b/qemu-options.hx
+index 7ae3373a0094..73046f8274d1 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -4326,7 +4326,7 @@ Creates a random number generator backend which obt=
+ains entropy from
+ a device on the host. The @option{id} parameter is a unique ID that
+ will be used to reference this entropy backend from the @option{virtio-r=
+ng}
+ device. The @option{filename} parameter specifies which file to obtain
+-entropy from and if omitted defaults to @option{/dev/random}.
++entropy from and if omitted defaults to @option{/dev/urandom}.
+=20
+ @item -object rng-egd,id=3D@var{id},chardev=3D@var{chardevid}
+=20
+--=20
+2.20.1
 
-diff --git a/hw/acpi/pci.c b/hw/acpi/pci.c
-
-
-Anything between --- and diff is ignored. Second --- is poointless and
-harmful.
-
-> > 
-> > >  hw/acpi/pci.c               | 35 +++++++++++++++++++++++------------
-> > >  include/hw/acpi/acpi-defs.h | 18 ------------------
-> > >  2 files changed, 23 insertions(+), 30 deletions(-)
-> > > 
-> > > diff --git a/hw/acpi/pci.c b/hw/acpi/pci.c
-> > > index fa0fa30bb9..49df7b7d54 100644
-> > > --- a/hw/acpi/pci.c
-> > > +++ b/hw/acpi/pci.c
-> > > @@ -30,17 +30,28 @@
-> > >  
-> > >  void build_mcfg(GArray *table_data, BIOSLinker *linker, AcpiMcfgInfo *info)
-> > >  {
-> > > -    AcpiTableMcfg *mcfg;
-> > > -    int len = sizeof(*mcfg) + sizeof(mcfg->allocation[0]);
-> > > -
-> > > -    mcfg = acpi_data_push(table_data, len);
-> > > -    mcfg->allocation[0].address = cpu_to_le64(info->base);
-> > > -
-> > > -    /* Only a single allocation so no need to play with segments */
-> > > -    mcfg->allocation[0].pci_segment = cpu_to_le16(0);
-> > > -    mcfg->allocation[0].start_bus_number = 0;
-> > > -    mcfg->allocation[0].end_bus_number = PCIE_MMCFG_BUS(info->size - 1);
-> > > -
-> > > -    build_header(linker, table_data, (void *)mcfg, "MCFG", len, 1, NULL, NULL);
-> > > +    int mcfg_start = table_data->len;
-> > > +
-> > > +    acpi_data_push(table_data, sizeof(AcpiTableHeader));
-> > > +
-> > > +    /*
-> > > +     * PCI Firmware Specification, Revision 3.0
-> > > +     * 4.1.2 MCFG Table Description.
-> > > +     */
-> > > +    /* Reserved */
-> > > +    build_append_int_noprefix(table_data, 0, 8);
-> > > +    /* Base address, processor-relative */
-> > > +    build_append_int_noprefix(table_data, info->base, 8);
-> > > +    /* PCI segment group number */
-> > > +    build_append_int_noprefix(table_data, 0, 2);
-> > > +    /* Starting PCI Bus number */
-> > > +    build_append_int_noprefix(table_data, 0, 1);
-> > > +    /* Final PCI Bus number */
-> > > +    build_append_int_noprefix(table_data, PCIE_MMCFG_BUS(info->size - 1), 1);
-> > > +    /* Reserved */
-> > > +    build_append_int_noprefix(table_data, 0, 4);
-> > > +
-> > > +    build_header(linker, table_data, (void *)(table_data->data + mcfg_start),
-> > > +                 "MCFG", table_data->len - mcfg_start, 1, NULL, NULL);
-> > >  }
-> > >  
-> > > diff --git a/include/hw/acpi/acpi-defs.h b/include/hw/acpi/acpi-defs.h
-> > > index f9aa4bd398..57a3f58b0c 100644
-> > > --- a/include/hw/acpi/acpi-defs.h
-> > > +++ b/include/hw/acpi/acpi-defs.h
-> > > @@ -449,24 +449,6 @@ struct AcpiSratProcessorGiccAffinity {
-> > >  
-> > >  typedef struct AcpiSratProcessorGiccAffinity AcpiSratProcessorGiccAffinity;
-> > >  
-> > > -/* PCI fw r3.0 MCFG table. */
-> > > -/* Subtable */
-> > > -struct AcpiMcfgAllocation {
-> > > -    uint64_t address;                /* Base address, processor-relative */
-> > > -    uint16_t pci_segment;            /* PCI segment group number */
-> > > -    uint8_t start_bus_number;       /* Starting PCI Bus number */
-> > > -    uint8_t end_bus_number;         /* Final PCI Bus number */
-> > > -    uint32_t reserved;
-> > > -} QEMU_PACKED;
-> > > -typedef struct AcpiMcfgAllocation AcpiMcfgAllocation;
-> > > -
-> > > -struct AcpiTableMcfg {
-> > > -    ACPI_TABLE_HEADER_DEF;
-> > > -    uint8_t reserved[8];
-> > > -    AcpiMcfgAllocation allocation[0];
-> > > -} QEMU_PACKED;
-> > > -typedef struct AcpiTableMcfg AcpiTableMcfg;
-> > > -
-> > >  /*
-> > >   * TCPA Description Table
-> > >   *
-> > > -- 
-> > > 2.19.1  
 
