@@ -2,84 +2,65 @@ Return-Path: <SRS0=/4tE=TV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 82E85C04AAC
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 02:18:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CB39FC04AAF
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 02:29:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4E6F421479
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 02:18:43 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OHd50PMU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4E6F421479
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id A38042171F
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 02:29:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A38042171F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:45149 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:45233 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hSuMU-0004y5-ES
-	for qemu-devel@archiver.kernel.org; Mon, 20 May 2019 22:18:42 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:45139)
+	id 1hSuXJ-0007Ka-KH
+	for qemu-devel@archiver.kernel.org; Mon, 20 May 2019 22:29:53 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:46510)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liq3ea@gmail.com>) id 1hSuLV-0004f8-95
-	for qemu-devel@nongnu.org; Mon, 20 May 2019 22:17:42 -0400
+	(envelope-from <peterx@redhat.com>) id 1hSuWU-00071h-NE
+	for qemu-devel@nongnu.org; Mon, 20 May 2019 22:29:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liq3ea@gmail.com>) id 1hSuLT-00008a-Ud
-	for qemu-devel@nongnu.org; Mon, 20 May 2019 22:17:41 -0400
-Received: from mail-ot1-x334.google.com ([2607:f8b0:4864:20::334]:40804)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <liq3ea@gmail.com>) id 1hSuLT-00007w-Lk
-	for qemu-devel@nongnu.org; Mon, 20 May 2019 22:17:39 -0400
-Received: by mail-ot1-x334.google.com with SMTP id u11so14889768otq.7
-	for <qemu-devel@nongnu.org>; Mon, 20 May 2019 19:17:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-	:cc; bh=mCh+1nGlY43OB97ODgiSURJpwKAFtzjQ9Wk5DconRBU=;
-	b=OHd50PMUzD2DsoDBsg4rrMI/fhILyd2+kgTkIGz1LzApq2jwLTc7w6/BI3wu4tXl2h
-	8zlMIS1seNX2d7Erg9Ljef0ype8XOnMQotqdZkpnfAzLBiTlI8Clva/UGswKxCpeP2ET
-	h9gwrnxLi9EdnVbYRForoQhDVKHFIXZrm0pQoPu897aLZd8oJVH0xjxaUiJixjM//RnR
-	ic3/4rwX3CWFH5S+RN+vAxyhkx86k8KKE+e9SlmTjxMcqp3PPFg8Jk7aqJU/9w1y4h6x
-	rrhBb+PU+H4f+/4FpAzPdDDJEoSLcmTmwx38Vv+OTNe+IGfnjNfZoVOWKUXQR8TqNH1l
-	/q+Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-	:message-id:subject:to:cc;
-	bh=mCh+1nGlY43OB97ODgiSURJpwKAFtzjQ9Wk5DconRBU=;
-	b=RRlX99tUd5PqRnDbsnA34Jfvwvvh957bggO7HXqXxgkdusL2T+/8r83SoAAbQuYz7K
-	CHnERhZOqCF731Ha0NP3AKcYxbf6o7J2d+P58m2lUViX/xmuWWEM9gKz7Guaebywuk/u
-	zTpshsDMsT6CRff668D8TVeaQf60o+3kGkD1Mjr79VMSKQfNcQwXwYEZ/6Bup8ZR7gOJ
-	pLv1TgGUuh+VHKiF9V5Nj0E+TqEcm46UReImL6Rhp+db8XrplOk5gDnfiT9BMOVVNQUm
-	EsCGrYwlnuolgNRlr53veWve1VIJl4tmewg+1BKXJ0whK6FPzXUBAMteW3vHH/FxA+gr
-	PuvA==
-X-Gm-Message-State: APjAAAVuo8pdKAhAWXODyzSqxULzKwP4JW0afcv9NlBhUSkssncH3zml
-	mp7Os2io2iMljNMl1gIVXHakFLOkrCqRp+CX0Ro=
-X-Google-Smtp-Source: APXvYqxnoIrxvgIHOcGa4H1w5ic5SqFrEhqdk4k3IGdUdBszItAPIqGEL3x7vQPrRtT5sY3yG+OXmEYgZ+wUW4wYgo0=
-X-Received: by 2002:a9d:ec5:: with SMTP id 63mr18212636otj.333.1558405057931; 
-	Mon, 20 May 2019 19:17:37 -0700 (PDT)
+	(envelope-from <peterx@redhat.com>) id 1hSuWT-0005HZ-Tr
+	for qemu-devel@nongnu.org; Mon, 20 May 2019 22:29:02 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60324)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1hSuWT-0005H5-OG
+	for qemu-devel@nongnu.org; Mon, 20 May 2019 22:29:01 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id B36DC37EE7
+	for <qemu-devel@nongnu.org>; Tue, 21 May 2019 02:29:00 +0000 (UTC)
+Received: from xz-x1 (dhcp-15-205.nay.redhat.com [10.66.15.205])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id BFA075D9C8;
+	Tue, 21 May 2019 02:28:58 +0000 (UTC)
+Date: Tue, 21 May 2019 10:28:56 +0800
+From: Peter Xu <peterx@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <20190521022856.GQ16681@xz-x1>
+References: <20190520030839.6795-1-peterx@redhat.com>
+	<20190520030839.6795-4-peterx@redhat.com>
+	<30752917-8ec0-492c-bba2-e6a31a56e858@redhat.com>
 MIME-Version: 1.0
-References: <20190424140643.62457-1-liq3ea@163.com>
-	<CAKXe6S+J7OgqJkrDByo3y9M5BGTaCN0Cjb0_WYxDyTvFGg-w8w@mail.gmail.com>
-	<CAKXe6SL3x6S5Pco6ZdFvPpmwPhPj6d2B7mFLDbyGoSqcGB+KCQ@mail.gmail.com>
-	<c1153add-2518-ce69-1c83-eb46d6c643ac@redhat.com>
-In-Reply-To: <c1153add-2518-ce69-1c83-eb46d6c643ac@redhat.com>
-From: Li Qiang <liq3ea@gmail.com>
-Date: Tue, 21 May 2019 10:17:01 +0800
-Message-ID: <CAKXe6SKjJHPbM_2751bp=vHpdrYk44gVtzBnMZmQ65ev9EVhfw@mail.gmail.com>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::334
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Content-Filtered-By: Mailman/MimeDel 2.1.21
-Subject: Re: [Qemu-devel] [PATCH v2 0/5] fw_cfg_test refactor and add two
- test cases
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <30752917-8ec0-492c-bba2-e6a31a56e858@redhat.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.29]);
+	Tue, 21 May 2019 02:29:00 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v2 03/15] migration: No need to take rcu
+ during sync_dirty_bitmap
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -91,102 +72,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: lvivier@redhat.com, Thomas Huth <thuth@redhat.com>,
-	Li Qiang <liq3ea@163.com>, Qemu Developers <qemu-devel@nongnu.org>,
-	Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
-	Laszlo Ersek <lersek@redhat.com>
+Cc: Laurent Vivier <lvivier@redhat.com>, qemu-devel@nongnu.org,
+	"Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+	Juan Quintela <quintela@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> =E4=BA=8E2019=E5=B9=B45=E6=
-=9C=8821=E6=97=A5=E5=91=A8=E4=BA=8C =E4=B8=8A=E5=8D=885:29=E5=86=99=E9=81=
-=93=EF=BC=9A
+On Mon, May 20, 2019 at 12:48:01PM +0200, Paolo Bonzini wrote:
+> On 20/05/19 05:08, Peter Xu wrote:
+> > cpu_physical_memory_sync_dirty_bitmap() has one RAMBlock* as
+> > parameter, which means that it must be with RCU read lock held
+> > already.  Taking it again inside seems redundant.  Removing it.
+> > Instead comment on the functions about the RCU read lock.
+> > 
+> > Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+> > Signed-off-by: Peter Xu <peterx@redhat.com>
+> > ---
+> >  include/exec/ram_addr.h | 5 +----
+> >  migration/ram.c         | 1 +
+> >  2 files changed, 2 insertions(+), 4 deletions(-)
+> > 
+> > diff --git a/include/exec/ram_addr.h b/include/exec/ram_addr.h
+> > index 139ad79390..993fb760f3 100644
+> > --- a/include/exec/ram_addr.h
+> > +++ b/include/exec/ram_addr.h
+> > @@ -408,6 +408,7 @@ static inline void cpu_physical_memory_clear_dirty_range(ram_addr_t start,
+> >  }
+> >  
+> >  
+> > +/* Must be with rcu read lock held */
+> 
+> The usual way to spell this is "Called within RCU critical section.",
+> otherwise the patch looks good.
 
-> Hi Li,
->
-> On 5/17/19 4:28 AM, Li Qiang wrote:
-> > Ping.....
-> >
-> > Li Qiang <liq3ea@gmail.com <mailto:liq3ea@gmail.com>> =E4=BA=8E2019=E5=
-=B9=B45=E6=9C=889=E6=97=A5=E5=91=A8=E5=9B=9B
-> > =E4=B8=8B=E5=8D=885:57=E5=86=99=E9=81=93=EF=BC=9A
-> >
-> >     Ping.... this serials.
->
-> I apologize I hold this series for too long.
-> With your v1 I wanted to clarify the commit descriptions without asking
-> you to send a v2, then I reword your patches and the same day you sent
-> your v2, then I had mixed feeling about how to do to not frustrate you
-> asking to respin again, but I ended it worst :(
->
-
-
-Hi Philippe, not afraid to frustrate me next time, just send out the review
-email. I don't mind to make
-revisions to improve the patches.
-
-
-
-> I adapted the descriptions on your v2 and will repost as v3, then merge
-> if you are OK with v3.
->
->
-
-I have no objection for this, just merge it.
+Sure, I'm switching to this with the r-b kept.
 
 Thanks,
-Li Qiang
 
+-- 
+Peter Xu
 
-
-
-> Regards,
->
-> Phil.
->
-> >
-> >     Thanks,
-> >     Li Qiang
-> >
-> >     Li Qiang <liq3ea@163.com <mailto:liq3ea@163.com>> =E4=BA=8E2019=E5=
-=B9=B44=E6=9C=8824=E6=97=A5=E5=91=A8
-> >     =E4=B8=89 =E4=B8=8B=E5=8D=8810:07=E5=86=99=E9=81=93=EF=BC=9A
-> >
-> >         In the disscuss of adding reboot timeout test case:
-> >
-> https://lists.gnu.org/archive/html/qemu-devel/2019-04/msg03304.html
-> >
-> >         Philippe suggested we should uses the only related option for o=
-ne
-> >         specific test. However currently we uses one QTestState for all
-> the
-> >         test cases. In order to achieve Philippe's idea, I split the
-> >         test case
-> >         for its own QTestState. As this patchset has changed a lot, I
-> >         don't bump
-> >         the version.
-> >
-> >         Change since v1:
-> >         Add a patch to store the reboot_timeout as little endian
-> >         Fix the endian issue per Thomas's review
-> >
-> >         Li Qiang (5):
-> >           tests: refactor fw_cfg_test
-> >           tests: fw_cfg: add a function to get the fw_cfg file
-> >           fw_cfg: reboot: store reboot-timeout as little endian
-> >           tests: fw_cfg: add reboot_timeout test case
-> >           tests: fw_cfg: add splash time test case
-> >
-> >          hw/nvram/fw_cfg.c     |   4 +-
-> >          tests/fw_cfg-test.c   | 125
-> >         +++++++++++++++++++++++++++++++++++++++---
-> >          tests/libqos/fw_cfg.c |  55 +++++++++++++++++++
-> >          tests/libqos/fw_cfg.h |   9 +++
-> >          4 files changed, 184 insertions(+), 9 deletions(-)
-> >
-> >         --
-> >         2.17.1
-> >
-> >
->
