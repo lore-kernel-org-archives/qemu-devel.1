@@ -2,64 +2,80 @@ Return-Path: <SRS0=/4tE=TV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.0 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F025C04E87
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 13:33:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D7F62C04E87
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 13:33:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 68AF02173C
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 13:33:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 68AF02173C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id A2753217F5
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 13:33:27 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VE3fP8hY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A2753217F5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:53922 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:53930 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hT4tC-0001VX-R8
-	for qemu-devel@archiver.kernel.org; Tue, 21 May 2019 09:33:10 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:57785)
+	id 1hT4tS-0001fV-Qf
+	for qemu-devel@archiver.kernel.org; Tue, 21 May 2019 09:33:26 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:57832)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1hT4rQ-0000NV-3c
-	for qemu-devel@nongnu.org; Tue, 21 May 2019 09:31:21 -0400
+	(envelope-from <liq3ea@gmail.com>) id 1hT4rf-0000Y7-KX
+	for qemu-devel@nongnu.org; Tue, 21 May 2019 09:31:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1hT4rP-0005DK-10
-	for qemu-devel@nongnu.org; Tue, 21 May 2019 09:31:20 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55606)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>)
-	id 1hT4rO-0005CC-RP; Tue, 21 May 2019 09:31:18 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
-	[10.5.11.22])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B70E9820E9;
-	Tue, 21 May 2019 13:31:11 +0000 (UTC)
-Received: from gondolin (ovpn-204-120.brq.redhat.com [10.40.204.120])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 83F141001F5B;
-	Tue, 21 May 2019 13:31:08 +0000 (UTC)
-Date: Tue, 21 May 2019 15:31:04 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-Message-ID: <20190521153104.403980b3.cohuck@redhat.com>
-In-Reply-To: <CAFEAcA_9QZRyx8_8qT208vsopquW5j-bkyZpmRCAhP-sqJ+0kg@mail.gmail.com>
-References: <20190521092048.28492-1-cohuck@redhat.com>
-	<CAFEAcA_9QZRyx8_8qT208vsopquW5j-bkyZpmRCAhP-sqJ+0kg@mail.gmail.com>
-Organization: Red Hat GmbH
+	(envelope-from <liq3ea@gmail.com>) id 1hT4re-0005Vl-OP
+	for qemu-devel@nongnu.org; Tue, 21 May 2019 09:31:35 -0400
+Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:37349)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <liq3ea@gmail.com>) id 1hT4re-0005V9-Js
+	for qemu-devel@nongnu.org; Tue, 21 May 2019 09:31:34 -0400
+Received: by mail-oi1-x242.google.com with SMTP id f4so12787834oib.4
+	for <qemu-devel@nongnu.org>; Tue, 21 May 2019 06:31:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+	:cc; bh=vItEtQ+QxlS5/USu0/0rorN53TvHPQcHiBUKEpZ7mVc=;
+	b=VE3fP8hYsw5KJaOwjcY6xCxvDRdjM/OEpmqRTWYtOmrrEbmAzuaQhh+1vJorxLX6Na
+	waPEs/mMMpeZxUdwILPsz5iIV6o9g5GaGLuP9ZREqvRBLfTvU24yP6AbKQ9KVbSNICyu
+	L6YPKkGuoVL2VhbOnlGjmRA3N7EVuK6FzFd7hUWpBq2z6IeRhb8Wp+A3xe++S3JLTMb+
+	lf3+GgPZfYrdl4pROZiXYbKPa6ztdNxr4uZPlZ027TRLQjWjt/wOf3t3iIUEQ43epmUO
+	HWAqEEl7e/VAIEmwxjPttiJAjNRzHUOBQ2Y4pEIDfo7SXoLcXvHiTJXu1Yp24RW6FB/o
+	IBpw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+	:message-id:subject:to:cc;
+	bh=vItEtQ+QxlS5/USu0/0rorN53TvHPQcHiBUKEpZ7mVc=;
+	b=mpATCPmEcHK7CAQ6c++zp66hlyI0STCssYzOjGUOBHz36ApyxIaWpCRmasn3BMKDbo
+	Zlec/xtQ5iPb9IGPrhtTeCsNdMZX8T/R9W461/5fY74/1y1lIvdO/dxCGsfYcwC1Z+ID
+	ealx9ZOLvK6zgiJbYijx4Rg1OiSx83RV52lOqN78MTZViOhyWiQqGoOUA3zsRBeyX3LD
+	C9csThL0k3EDnb/tppUTxqCCPblE8Tjb4swjxpa2efsRkm4lF0LW4EoBQmtqe9J1pwE3
+	uKw1FQegGdKy48CjUIRQgHMi8bA/mArbnpnwKCII7cLMBIFyottc6Nxf7v0zx0XsfbSx
+	Z7iA==
+X-Gm-Message-State: APjAAAU4kHrcpnHDbwzhEqTjbz1skhMadlz1p4R6yJDDchI0imy+7IgS
+	rwqeGTcZKl2v5LLZ+tnxSv6rvkVJ46uRcwG9Qq0=
+X-Google-Smtp-Source: APXvYqyhg1HuBz1zbMTTQH5KrVwbLIpLCz1qZ6iiTxDhtgyyQgIho/YXl0dSGB5VS8m+sBXMse6R4JYqVPnPy2oBIug=
+X-Received: by 2002:aca:f582:: with SMTP id t124mr3602420oih.56.1558445493841; 
+	Tue, 21 May 2019 06:31:33 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.26]);
-	Tue, 21 May 2019 13:31:16 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PULL v2 00/54] s390x update
+References: <20190510164349.81507-1-liq3ea@163.com>
+In-Reply-To: <20190510164349.81507-1-liq3ea@163.com>
+From: Li Qiang <liq3ea@gmail.com>
+Date: Tue, 21 May 2019 21:30:56 +0800
+Message-ID: <CAKXe6SLe1_ppEACqKVesvfrieN=c28rj9ro_xSGZ6F=Rf7iWew@mail.gmail.com>
+To: Li Qiang <liq3ea@163.com>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::242
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Content-Filtered-By: Mailman/MimeDel 2.1.21
+Subject: Re: [Qemu-devel] [PATCH v4 0/3] hw: edu: some fixes
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -71,69 +87,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-s390x <qemu-s390x@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Jiri Slaby <jslaby@suse.cz>,
+	Qemu Developers <qemu-devel@nongnu.org>,
+	=?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 21 May 2019 14:24:07 +0100
-Peter Maydell <peter.maydell@linaro.org> wrote:
+Ping....
 
-> On Tue, 21 May 2019 at 10:20, Cornelia Huck <cohuck@redhat.com> wrote:
-> >
-> > [Note: I'm only sending the changed headers update to spare everybody another
-> > patch avalanche. The remainder of the patches is unchanged, save for the
-> > changed commit ids of the cpumodel patches on top of the headers update.]
-> >
-> > The following changes since commit d8276573da58e8ce78dab8c46dd660efd664bcb7:
-> >
-> >   Merge remote-tracking branch 'remotes/rth/tags/pull-tcg-20190510' into staging (2019-05-16 13:15:08 +0100)
-> >
-> > are available in the Git repository at:
-> >
-> >   https://github.com/cohuck/qemu tags/s390x-20190521-2
-> >
-> > for you to fetch changes up to 4d727d1aa0e5cbf9f5f00968698dfa34c7b47b08:
-> >
-> >   s390x/cpumodel: wire up 8561 and 8562 as gen15 machines (2019-05-21 10:40:03 +0200)
-> >
-> > ----------------------------------------------------------------
-> > s390x update:
-> > - have the bios tolerate bootmap signature entries
-> > - next chunk of vector instruction support in tcg
-> > - a headers update against Linux 5.2-rc1
-> > - add more facilities and gen15 machines to the cpu model  
-> 
-> Hi -- looks like the update-linux-headers change isn't quite right:
-> 
-> --- a/scripts/update-linux-headers.sh
-> +++ b/scripts/update-linux-headers.sh
-> @@ -122,6 +122,9 @@ for arch in $ARCHLIST; do
->          cp "$tmpdir/include/asm/unistd-oabi.h" "$output/linux-headers/asm-arm/"
->          cp "$tmpdir/include/asm/unistd-common.h"
-> "$output/linux-headers/asm-arm/"
->      fi
-> +    if [ $arch = arm64 ]; then
-> +        cp "$tmpdir/include/asm/sve_context.h" "$output/linux-headers/asm-arm/"
-> +    fi
->      if [ $arch = x86 ]; then
->          cp "$tmpdir/include/asm/unistd_32.h" "$output/linux-headers/asm-x86/"
->          cp "$tmpdir/include/asm/unistd_x32.h" "$output/linux-headers/asm-x86/"
-> 
-> ...it's copying the file into asm-arm/ rather than asm-arm64/.
-> (I did a by-hand move of the file into the right directory and
-> that was sufficient for the compile to succeed.)
+Paolo, could you merge these to your misc tree?
 
-I'm obviously not at my best at the moment :(
+Thanks,
+Li Qiang
 
-> 
-> Also, can we keep the changes to scripts/ in a separate
-> commit, please? The idea of header-update commits is that they
-> should contain only the changes automatically generated
-> by the script, with no hand-written additions.
+Li Qiang <liq3ea@163.com> =E4=BA=8E2019=E5=B9=B45=E6=9C=8811=E6=97=A5=E5=91=
+=A8=E5=85=AD =E4=B8=8A=E5=8D=8812:44=E5=86=99=E9=81=93=EF=BC=9A
 
-This looks a bit like a chicken-and-egg problem, though... without the
-change, we cannot point the script at a current kernel tree. I'd prefer
-the two to stay together, but I can certainly point out the change to
-the script more prominently.
-
+> Recently I am considering write a driver for edu device.
+> After reading the spec, I found these three small issue.
+> Two first two related the MMIO access and the third is
+> related the DMA operation.
+>
+> Change since v2:
+> Fix an error in patch 2
+> Fix some commit message and title.
+>
+> Change since v1:
+> Fix format compile error
+>
+> Li Qiang (3):
+>   edu: mmio: allow 64-bit access
+>   edu: mmio: allow 64-bit access in read dispatch
+>   edu: uses uint64_t in dma operation
+>
+>  hw/misc/edu.c | 32 +++++++++++++++++++++++---------
+>  1 file changed, 23 insertions(+), 9 deletions(-)
+>
+> --
+> 2.17.1
+>
+>
+>
