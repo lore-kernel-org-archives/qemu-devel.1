@@ -2,79 +2,91 @@ Return-Path: <SRS0=/4tE=TV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E9585C04AAF
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 12:01:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 60226C04AAF
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 12:03:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B2F132173E
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 12:01:26 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="eVwxB18q"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B2F132173E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 393442173E
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 12:03:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 393442173E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:52398 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:52430 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hT3SP-0004bS-UE
-	for qemu-devel@archiver.kernel.org; Tue, 21 May 2019 08:01:25 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:40604)
+	id 1hT3U9-0005fv-H8
+	for qemu-devel@archiver.kernel.org; Tue, 21 May 2019 08:03:13 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:41015)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hT3RM-0003pY-AU
-	for qemu-devel@nongnu.org; Tue, 21 May 2019 08:00:25 -0400
+	(envelope-from <eblake@redhat.com>) id 1hT3SP-0004mt-92
+	for qemu-devel@nongnu.org; Tue, 21 May 2019 08:01:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hT3RL-0005YU-97
-	for qemu-devel@nongnu.org; Tue, 21 May 2019 08:00:20 -0400
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:39193)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hT3RL-0005X7-2z
-	for qemu-devel@nongnu.org; Tue, 21 May 2019 08:00:19 -0400
-Received: by mail-ot1-x342.google.com with SMTP id r7so16056798otn.6
-	for <qemu-devel@nongnu.org>; Tue, 21 May 2019 05:00:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-	:cc; bh=ZO7whUSKyWkUiV2ngbKH5XUo+c4tErH5GJB9Y2tBsjA=;
-	b=eVwxB18qZ2ztJjBafgTt+/o93/t0tBhbwvucwsAaEWfZmV3yopjmUMJ4Jk6N1tFKh/
-	GGtskiZqhDDl9ND9gh6Fz+rsqb98Sm6PqKuZPiCerNcN2WEq+LZs3sTdchJ++mPsVLc5
-	9kxbfC8hNDqKcGrnSK8XiVNOma7VJyZRbo53xShx1gPrJhtUD1JxuiqBiH8i9ZxuKnLM
-	SSboRmLzdpcPvNToLEVs2gwTMC+5uASmfBLP61UUVpTPsQTNTwElS/WqVT6qB68bgWr2
-	Pbz5k5XQrGEpATSI0xItTHfdTgPLj23f46lqSjgSJd110byu8qU67Map3h6g06CPUhI3
-	tOkw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-	:message-id:subject:to:cc;
-	bh=ZO7whUSKyWkUiV2ngbKH5XUo+c4tErH5GJB9Y2tBsjA=;
-	b=QkSf36rzBAl/ydjGIpsPi41kN62jVo3sTNl5ShpqhOGJIqM6jNEh0DyCuPF4iVHVe/
-	r1YtEFS+78B/Q3tQk3B2kdbFvEApW1odOlpIJi+b/mzZTQA/apYoVVAx+cK4qBnKzbmS
-	o0sxzeCcKWr2x+M6RE3zxoL6UMnVh2/X3P7Fiwv332l2XXCBtWbYiEvkmHkCRZF5X2TH
-	jI/AeZpJ+W0cD6VByeXhQhtCLuC0ixLLCUuLYOPIrhv45mixYyNG8BXHDO0QrGVTWFWb
-	AowvHrninDtD/4pG/ROs2d85ZR3DnDvJBSbH2avc7Ke+yhenqBmcQt2I4LXOIyQVDOfC
-	z03A==
-X-Gm-Message-State: APjAAAW6LkgTjjLPj3494LZAxM8S+7cQW/Civ/rNJDwNC2QnpatcGuFD
-	iGT+BpmGHOX1E0VyGLzRuhgC0lQkkesbjSCqiMxyig==
-X-Google-Smtp-Source: APXvYqxd8C0NMMU9JxOE+9VXV99v8aPLJrPoV0PdTlXSpUUzHOAWI0T1iGwDyr7wk6Kfo6Joia8rW9foKAkJXEmiuDM=
-X-Received: by 2002:a9d:77d5:: with SMTP id w21mr203459otl.97.1558440018060;
-	Tue, 21 May 2019 05:00:18 -0700 (PDT)
+	(envelope-from <eblake@redhat.com>) id 1hT3SK-00072c-AF
+	for qemu-devel@nongnu.org; Tue, 21 May 2019 08:01:25 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34028)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1hT3SI-0006zA-PJ
+	for qemu-devel@nongnu.org; Tue, 21 May 2019 08:01:20 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 9DC4A85A03;
+	Tue, 21 May 2019 12:01:06 +0000 (UTC)
+Received: from [10.3.116.56] (ovpn-116-56.phx2.redhat.com [10.3.116.56])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 03BB55E7DE;
+	Tue, 21 May 2019 12:00:13 +0000 (UTC)
+To: Wei Yang <richardw.yang@linux.intel.com>, qemu-devel@nongnu.org
+References: <20190521081227.30799-1-richardw.yang@linux.intel.com>
+From: Eric Blake <eblake@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=eblake@redhat.com; keydata=
+	xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
+	xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
+	TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
+	GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
+	sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
+	AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
+	CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
+	RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
+	wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
+	Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
+	gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
+	pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
+	zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
+	pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
+	3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
+	NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
+	cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
+	SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
+	I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
+	mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
+	Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
+	2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
+Organization: Red Hat, Inc.
+Message-ID: <c184d4f7-686b-d54a-f969-a05ab965028a@redhat.com>
+Date: Tue, 21 May 2019 07:00:12 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-References: <20190521062924.6930-1-david@gibson.dropbear.id.au>
-In-Reply-To: <20190521062924.6930-1-david@gibson.dropbear.id.au>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 21 May 2019 13:00:07 +0100
-Message-ID: <CAFEAcA9bmghTq9uZVVruLmK8xhmq+mQzETwKPDz6=q-AJf7zFw@mail.gmail.com>
-To: David Gibson <david@gibson.dropbear.id.au>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::342
-Subject: Re: [Qemu-devel] [PULL 00/38] ppc-for-4.1 queue 20190521
+In-Reply-To: <20190521081227.30799-1-richardw.yang@linux.intel.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="31vSkqcqpZQbvqNP0pwJ6RRhV9wVD1wz4"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.26]);
+	Tue, 21 May 2019 12:01:11 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+X-Content-Filtered-By: Mailman/MimeDel 2.1.21
+Subject: Re: [Qemu-devel] [PATCH] Makefile: simplify qapi-py definition with
+ wildcard
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -86,47 +98,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, gkurz@kaod.org,
-	qemu-ppc <qemu-ppc@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>,
-	=?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>
+Cc: alex.bennee@linaro.org, berrange@redhat.com, philmd@redhat.com,
+	kraxel@redhat.com, Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 21 May 2019 at 07:29, David Gibson <david@gibson.dropbear.id.au> wrote:
->
-> The following changes since commit 2259637b95bef3116cc262459271de08e038cc66:
->
->   Merge remote-tracking branch 'remotes/kevin/tags/for-upstream' into staging (2019-05-20 17:22:05 +0100)
->
-> are available in the Git repository at:
->
->   git://github.com/dgibson/qemu.git tags/ppc-for-4.1-20190521
->
-> for you to fetch changes up to 271226c30a2128c563974dd359cb1e25a54e1cbf:
->
->   spapr/irq: add KVM support to the 'dual' machine (2019-05-21 10:55:47 +1000)
->
-> ----------------------------------------------------------------
-> ppc patch queue 2019-05-21
->
-> Next pull request against qemu-4.1.  Highlights:
->   * KVM accelerated support for the XIVE interrupt controller in PAPR
->     guests
->   * A number of TCG vector fixes
->   * Fixes for the PReP / 40p machine
->
-> Other than that it's just a bunch of assorted fixes, cleanups and
-> minor improvements.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--31vSkqcqpZQbvqNP0pwJ6RRhV9wVD1wz4
+From: Eric Blake <eblake@redhat.com>
+To: Wei Yang <richardw.yang@linux.intel.com>, qemu-devel@nongnu.org
+Cc: philmd@redhat.com, berrange@redhat.com, kraxel@redhat.com,
+ alex.bennee@linaro.org, Markus Armbruster <armbru@redhat.com>
+Message-ID: <c184d4f7-686b-d54a-f969-a05ab965028a@redhat.com>
+Subject: Re: [PATCH] Makefile: simplify qapi-py definition with wildcard
+References: <20190521081227.30799-1-richardw.yang@linux.intel.com>
+In-Reply-To: <20190521081227.30799-1-richardw.yang@linux.intel.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
->       linux-headers: Update linux headers to 5.2-rc1
+On 5/21/19 3:12 AM, Wei Yang wrote:
+> All the python script in scripts/qapi is used to generate qapi code. Us=
+e
+> wildcard to simplify it.
+>=20
+> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
+> ---
+>  Makefile | 8 +-------
+>  1 file changed, 1 insertion(+), 7 deletions(-)
 
-This doesn't build on aarch64 hosts, because of the new
-asm/sve_context.h header. Cornelia has a fix for the update
-script in her s390 pullreq, so probably the best thing to
-do is for you to wait for that to go in, rebase on that
-and drop your version of the update-headers patch.
+I'm not a fan of $(wildcard). It makes your tarball creation
+non-deterministic - if there is a leftover file from development that is
+no longer part of the build, wildcard will still pick it up.  Explicit
+lists are better.  I'm inclined to NACK this, but Markus has final say
+since he maintains the qapi generator.
 
-thanks
--- PMM
+>=20
+> diff --git a/Makefile b/Makefile
+> index 155f066a20..38b74782d9 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -541,13 +541,7 @@ qemu-ga$(EXESUF): QEMU_CFLAGS +=3D -I qga/qapi-gen=
+erated
+>  qemu-keymap$(EXESUF): LIBS +=3D $(XKBCOMMON_LIBS)
+>  qemu-keymap$(EXESUF): QEMU_CFLAGS +=3D $(XKBCOMMON_CFLAGS)
+> =20
+> -qapi-py =3D $(SRC_PATH)/scripts/qapi/commands.py \
+> -$(SRC_PATH)/scripts/qapi/events.py \
+> -$(SRC_PATH)/scripts/qapi/introspect.py \
+> -$(SRC_PATH)/scripts/qapi/types.py \
+> -$(SRC_PATH)/scripts/qapi/visit.py \
+> -$(SRC_PATH)/scripts/qapi/common.py \
+> -$(SRC_PATH)/scripts/qapi/doc.py \
+> +qapi-py =3D $(wildcard $(SRC_PATH)/scripts/qapi/*.py) \
+>  $(SRC_PATH)/scripts/qapi-gen.py
+> =20
+>  qga/qapi-generated/qga-qapi-types.c qga/qapi-generated/qga-qapi-types.=
+h \
+>=20
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
+
+--31vSkqcqpZQbvqNP0pwJ6RRhV9wVD1wz4
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlzj6EwACgkQp6FrSiUn
+Q2rlHAf+KxesHnNK2z+Rny/B0dWhqcBF12LlqDUjmtP7eQE43pTC4+U8c8C6coj6
+WFz8NtZ88yfbn2dzfat26jkr3d1y4a/aG/CSOZdh8Rls5zo4To5ipHIfsDF2bZ6B
+bZal7OgcNWqaS7HnKWdRN1Fe/9hP+7IYQJ4LggzjXpmvo2qX96dR9/cIjJMNIpP/
+DaJ3in2jtG+7fvMbYkUQtMUgg7FbBP7yNMZsJL8GfzrzOIwVlstbj8BNg/xEiYTk
+8kg5ObxW6Z2iesExae5FtYtfEa1qPtBKu4c2Te2Pv1eXfyNO7MClHy7NS+LQNI1B
+KYqoXyhaEz2Dp9+VGAZiZuVDNO71TA==
+=alBY
+-----END PGP SIGNATURE-----
+
+--31vSkqcqpZQbvqNP0pwJ6RRhV9wVD1wz4--
 
