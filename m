@@ -4,75 +4,75 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 69573C04AAF
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 12:33:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C8357C04AAF
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 12:33:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2ED402173C
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 12:33:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 901982173C
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 12:33:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="daR/x1bh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2ED402173C
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="X+NOGgcj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 901982173C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:52767 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:52770 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hT3xU-0007qD-DQ
-	for qemu-devel@archiver.kernel.org; Tue, 21 May 2019 08:33:32 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:45332)
+	id 1hT3xo-00083y-Q8
+	for qemu-devel@archiver.kernel.org; Tue, 21 May 2019 08:33:52 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:45337)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hT3q2-0001SH-RM
+	(envelope-from <peter.maydell@linaro.org>) id 1hT3q2-0001SK-S6
 	for qemu-devel@nongnu.org; Tue, 21 May 2019 08:25:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hT3px-0005HP-JL
+	(envelope-from <peter.maydell@linaro.org>) id 1hT3px-0005Gy-FE
 	for qemu-devel@nongnu.org; Tue, 21 May 2019 08:25:48 -0400
-Received: from mail-wr1-x435.google.com ([2a00:1450:4864:20::435]:38683)
+Received: from mail-wr1-x429.google.com ([2a00:1450:4864:20::429]:46306)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hT3px-00058d-8b
+	id 1hT3px-0005B2-6a
 	for qemu-devel@nongnu.org; Tue, 21 May 2019 08:25:45 -0400
-Received: by mail-wr1-x435.google.com with SMTP id d18so18397815wrs.5
-	for <qemu-devel@nongnu.org>; Tue, 21 May 2019 05:25:33 -0700 (PDT)
+Received: by mail-wr1-x429.google.com with SMTP id r7so18343869wrr.13
+	for <qemu-devel@nongnu.org>; Tue, 21 May 2019 05:25:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
 	h=from:to:cc:subject:date:message-id:in-reply-to:references
 	:mime-version:content-transfer-encoding;
-	bh=R2n/a/9G76Yi92R/Ho6SyZIUaGzncWttQDNv3ZwW0cE=;
-	b=daR/x1bhZwTFeUyso7yuHYeAUMb94czQdx2FJ7KWqJyV/COHfFzYYjHPcYgo8/xAh8
-	q6Vswi6pltIJLEga1/MYgPl0Tj8VdYBK12GzKyoxa4yDIH6Gf/EDPbql/QrEdQb0rdS1
-	yOSBheA22pIAhykYovCVWujL7Q1jodNedDxt2tHKaTVV+YL7DSSSCxADTGNF3gIqN1gI
-	X82qC/6tTjOQJHiPOMx/dR0nrvZjh2VVim7BqFL+Ug0G+jM2f+joxRNXtfY68fmDAI9q
-	Uev0clPsHD0edfp+bbPflz4jxj/TkZuzax1jJbjgkzV0uXxFWwGO4l9K15sX7aLbmI4m
-	CROA==
+	bh=tvS0J2CCwmAI9jtVGUfQ7GO5klgsA9PYzQhj1JC24zc=;
+	b=X+NOGgcjaXldgBS/tExqO4E64kbpEgbQAvgU9otTba+JyKhxqxB4dLmshB1r0Auxw4
+	PryiKx9CzgQKF6CzfjDu+oVq2xNltjxH5geoKY2/Kem/EtnvpWD6qY4AVgdRcZRcLvHu
+	J2uL1ofVtN+cJZRed+HBolGal9Fe/+Qsao3T1+PHewwoaOpIAiLY76XS5frjOvQWYG+i
+	Gb0SfcNcTLyzfpysxQjd+XTCR+dTiA7Yz1jYq7VUAUpWVn92rpG34naxisEvsSQqWTZi
+	uKzreecXSnfme+hleSj5P2roFD83GJ21FiW8gwREmsFUK8pBcBxp8tYYvJMom3SGdSXZ
+	xLrQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
 	:references:mime-version:content-transfer-encoding;
-	bh=R2n/a/9G76Yi92R/Ho6SyZIUaGzncWttQDNv3ZwW0cE=;
-	b=LaJni3of+sO9s4Ra9tmIJU04J9LVRDkOGekKilS3JJbWfwhl0GGM8ph+sCKttripfx
-	K74JSDtzE9W3LcxRIGA2fm2wS2xrHZyMi6a1JuRMZrpFrl6KdsgD81GUfA8r+aCPiVp2
-	vbzLItg8WT5e6psTQAC7mQYnuWd3DiVI/to4ROu35vQBtmsw/4wP0PHaWprI0BE/LhwL
-	HDmLXVtZJ8YRpsd/FKXJQkQTIFy4rJgLWIm4T5G5/2sK+V3UzbhcIB/LYENpuWJBezzC
-	IayP/dKm3tkfvxW6W8KhWWcAj553y/4OGbXzeBgQlYF21tKgC7bujO9Hy9FOa4MG6MRd
-	dwmQ==
-X-Gm-Message-State: APjAAAXnqAIHnx10gVDdBH7WVra77DjoCC9kFLtVK6Ha7RSQEwa2OOw2
-	zNhEa3P4wzCJ+npavue3v60lLb9+s6g=
-X-Google-Smtp-Source: APXvYqxSDXRoT40s5TujUbbb6L96UFY5Z5mh1MA7NUk5sdFbqt5ecPVa0EA+AYGXmclBi0BOJ/Y0bw==
-X-Received: by 2002:adf:9bd2:: with SMTP id e18mr577759wrc.210.1558441532719; 
-	Tue, 21 May 2019 05:25:32 -0700 (PDT)
+	bh=tvS0J2CCwmAI9jtVGUfQ7GO5klgsA9PYzQhj1JC24zc=;
+	b=czXhYVpNeIPat5MbvXQm/psoynpFZjpofV+1c2WHkRkI5Njwii9vp317XEweSQ9aB2
+	u2PDaKa9PdgIJIqO0W0s8z4a150wnfwHQFGSDFHanYXR+f2v8aQnoRJgHe4PT1JMpaBu
+	Yh5Aw7daTCaFq1uRUV/j3En0MI1Lm/B+YmEINaVQfh7OyB2ZoxrD2YbFBFEqdrwL6bmC
+	uranViGVtTsaUxFaMGmH4QVIFNyIri4OIfxN29t924xC12o10wZT29cICbPIdizwafzY
+	iYfXtKq7vAkb8RQbOejncLXyyvLloGHt0ZZKi81RGM0HPA3eIqVtCb+kvnXhbkxK/3FE
+	DKoA==
+X-Gm-Message-State: APjAAAV0J48WpD6lWv+2f7eGpguCTQZgSD1KVhHUPESkT+q1ffot2hoF
+	wqPE3r85ymR89XUGm1YscYH1dSkBw5Q=
+X-Google-Smtp-Source: APXvYqxxe+PwXfDEANRKCMnkI5mgr+PlLszaJrWn37UWC69YKCLeRqQt3QrngqmM7xqYb+i0rhf0AA==
+X-Received: by 2002:adf:8bc5:: with SMTP id w5mr7235335wra.132.1558441536416; 
+	Tue, 21 May 2019 05:25:36 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
 	by smtp.gmail.com with ESMTPSA id
-	u11sm12233393wrn.1.2019.05.21.05.25.31
+	u11sm12233393wrn.1.2019.05.21.05.25.35
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Tue, 21 May 2019 05:25:32 -0700 (PDT)
+	Tue, 21 May 2019 05:25:35 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Tue, 21 May 2019 13:25:16 +0100
-Message-Id: <20190521122519.12573-8-peter.maydell@linaro.org>
+Date: Tue, 21 May 2019 13:25:19 +0100
+Message-Id: <20190521122519.12573-11-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190521122519.12573-1-peter.maydell@linaro.org>
 References: <20190521122519.12573-1-peter.maydell@linaro.org>
@@ -80,8 +80,8 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2a00:1450:4864:20::435
-Subject: [Qemu-devel] [RFC 07/10] memory.h: Fix kerneldoc syntax issues
+X-Received-From: 2a00:1450:4864:20::429
+Subject: [Qemu-devel] [RFC 10/10] Makefile: disable Sphinx nitpicking
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -103,81 +103,28 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-If you try to use kerneldoc to extract the doc comments from
-memory.h and run sphinx on it, it generates some warnings:
- * various functions are missing a parameter in the docs
- * some 'unexpected indentation' warnings where a list
-   isn't marked up with the leading/trailing blank lines and
-   bullet markers that rST expects
-
-These aren't the only issues, but they are the only ones
-that are actually warned about (as opposed to generating
-misformatted output).
+Turn off Sphinx nitpicking as a temporary measure so
+sphinx builds complete even with warnings about missing
+references.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- include/exec/memory.h | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
+ Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/include/exec/memory.h b/include/exec/memory.h
-index 9144a47f571..8447a16ded1 100644
---- a/include/exec/memory.h
-+++ b/include/exec/memory.h
-@@ -907,6 +907,7 @@ void memory_region_init_rom(MemoryRegion *mr,
-  * @mr: the #MemoryRegion to be initialized.
-  * @owner: the object that tracks the region's reference count
-  * @ops: callbacks for write access handling (must not be NULL).
-+ * @opaque: passed to the read and write callbacks of the @ops structure.
-  * @name: Region name, becomes part of RAMBlock name used in migration stream
-  *        must be unique within any device
-  * @size: size of the region.
-@@ -995,7 +996,7 @@ static inline IOMMUMemoryRegion *memory_region_get_iommu(MemoryRegion *mr)
-  * Returns pointer to IOMMUMemoryRegionClass if a memory region is an iommu,
-  * otherwise NULL. This is fast path avoiding QOM checking, use with caution.
-  *
-- * @mr: the memory region being queried
-+ * @iommu_mr: the memory region being queried
-  */
- static inline IOMMUMemoryRegionClass *memory_region_get_iommu_class_nocheck(
-         IOMMUMemoryRegion *iommu_mr)
-@@ -1558,6 +1559,7 @@ void memory_region_add_subregion_overlap(MemoryRegion *mr,
- /**
-  * memory_region_get_ram_addr: Get the ram address associated with a memory
-  *                             region
-+ * @mr: the memory region to get the ram address for
-  */
- ram_addr_t memory_region_get_ram_addr(MemoryRegion *mr);
+diff --git a/Makefile b/Makefile
+index 155f066a206..b4be96ce9a6 100644
+--- a/Makefile
++++ b/Makefile
+@@ -932,7 +932,7 @@ docs/version.texi: $(SRC_PATH)/VERSION config-host.mak
+ sphinxdocs: $(MANUAL_BUILDDIR)/devel/index.html $(MANUAL_BUILDDIR)/interop/index.html
  
-@@ -1650,6 +1652,7 @@ bool memory_region_is_mapped(MemoryRegion *mr);
-  *
-  * Returns a #MemoryRegionSection that describes a contiguous overlap.
-  * It will have the following characteristics:
-+ *
-  *    .@size = 0 iff no overlap was found
-  *    .@mr is non-%NULL iff an overlap was found
-  *
-@@ -1657,11 +1660,12 @@ bool memory_region_is_mapped(MemoryRegion *mr);
-  * relative to the returned region (in the .@mr field), not to the
-  * @mr argument.
-  *
-- * Similarly, the .@offset_within_address_space is relative to the
-+ * Similarly, the @.offset_within_address_space is relative to the
-  * address space that contains both regions, the passed and the
-  * returned one.  However, in the special case where the @mr argument
-  * has no container (and thus is the root of the address space), the
-  * following will hold:
-+ *
-  *    .@offset_within_address_space >= @addr
-  *    .@offset_within_address_space + .@size <= @addr + @size
-  *
-@@ -2107,6 +2111,7 @@ static inline bool memory_access_is_direct(MemoryRegion *mr, bool is_write)
-  * @addr: address within that address space
-  * @attrs: memory transaction attributes
-  * @buf: buffer with the data transferred
-+ * @len: length of the buffer
-  */
- static inline __attribute__((__always_inline__))
- MemTxResult address_space_read(AddressSpace *as, hwaddr addr,
+ # Canned command to build a single manual
+-build-manual = $(call quiet-command,sphinx-build $(if $(V),,-q) -W -n -b html -D version=$(VERSION) -D release="$(FULL_VERSION)" -d .doctrees/$1 $(SRC_PATH)/docs/$1 $(MANUAL_BUILDDIR)/$1 ,"SPHINX","$(MANUAL_BUILDDIR)/$1")
++build-manual = $(call quiet-command,sphinx-build $(if $(V),,-q) -W -b html -D version=$(VERSION) -D release="$(FULL_VERSION)" -d .doctrees/$1 $(SRC_PATH)/docs/$1 $(MANUAL_BUILDDIR)/$1 ,"SPHINX","$(MANUAL_BUILDDIR)/$1")
+ # We assume all RST files in the manual's directory are used in it
+ manual-deps = $(wildcard $(SRC_PATH)/docs/$1/*.rst) $(SRC_PATH)/docs/$1/conf.py $(SRC_PATH)/docs/conf.py
+ 
 -- 
 2.20.1
 
