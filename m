@@ -2,174 +2,65 @@ Return-Path: <SRS0=/4tE=TV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	T_HK_NAME_DR,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B4F12C04AAF
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 17:08:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 37109C04AAF
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 17:13:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6F103208C3
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 17:08:39 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bvxCQJ3P"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6F103208C3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 0608F21019
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 17:13:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0608F21019
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:57033 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:57089 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hT8Fi-00046G-Hk
-	for qemu-devel@archiver.kernel.org; Tue, 21 May 2019 13:08:38 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:51089)
+	id 1hT8KN-0005KQ-7L
+	for qemu-devel@archiver.kernel.org; Tue, 21 May 2019 13:13:27 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:52052)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jan.bobek@gmail.com>) id 1hT8Eg-0003UV-8h
-	for qemu-devel@nongnu.org; Tue, 21 May 2019 13:07:35 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1hT8Jb-00051x-DK
+	for qemu-devel@nongnu.org; Tue, 21 May 2019 13:12:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jan.bobek@gmail.com>) id 1hT8Ef-0002iZ-Em
-	for qemu-devel@nongnu.org; Tue, 21 May 2019 13:07:34 -0400
-Received: from mail-it1-x143.google.com ([2607:f8b0:4864:20::143]:52120)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jan.bobek@gmail.com>) id 1hT8Ef-0002i9-8S
-	for qemu-devel@nongnu.org; Tue, 21 May 2019 13:07:33 -0400
-Received: by mail-it1-x143.google.com with SMTP id m3so6311204itl.1
-	for <qemu-devel@nongnu.org>; Tue, 21 May 2019 10:07:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=subject:to:cc:references:from:openpgp:autocrypt:message-id:date
-	:user-agent:mime-version:in-reply-to;
-	bh=33mOdc4psItJAMOLuRt4+3PczyOcFBUOA6Ue9sJGpks=;
-	b=bvxCQJ3PhB5C/GNUCvhanesS0iySK4kuPzOZofkDnFAAghhG4YA4YKBuo6dtsDMhCH
-	WGmCJU2DbfQ93YLDJD/4ASKOCANbhtOYE9vqYdgNq2cZOsNWP+u6HEFndkzRzRoBV5WE
-	fAQY1RCzCX/JaXZjR5EZNDgwbNaUfp+M0ck6GmZieuM8ikGu3K8dPnTqKdvoq4B6q67Q
-	q2H3ynJQxhHHg/3gBIwV6vgZYSNZJCb4nNfBoSsXE9p/EbNaRC7ZJ7d9PkLlcXT32cyY
-	3kFP6wGwjYlmNnWSnloBkZ7PJWO+QjAAQdOa/jUZ0Azb2Eq+Tu1U2zt82Xilrn6xHZc7
-	yliw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:subject:to:cc:references:from:openpgp:autocrypt
-	:message-id:date:user-agent:mime-version:in-reply-to;
-	bh=33mOdc4psItJAMOLuRt4+3PczyOcFBUOA6Ue9sJGpks=;
-	b=peIRE38iRwAj2fib5aATC3aCXx/sSO8VWK0Iu/udML+iH9PODRAogtPzFOOVEeljUG
-	w5/ui6brQ86W2wdRwVMqTXULZHqwBajI4JQM8+n9ztf3CVjyG6vrp54VTB52eRiTbUPJ
-	cfA0sRENq1neQJQGlF5bK3FACAPkIymBZ0klhgd5BJEfeUKxYVJlk6IpXd80pWHu3M52
-	ch+BatcHz2zOZGuy03yrqdx0EOHQs5xNb/1GkQh2uLkp3ZLhQ0/K0AEK+rxEMv/CqwPX
-	TvDrErVPSYVsp2UxJ0smmQmL3kSwt7Uyh8uDof6Ai4ttPWJ6jdyHx9BiicmnNn5EHL7+
-	7Waw==
-X-Gm-Message-State: APjAAAUX7Fr3vDXhoMFz9T7zJmdMkvDU4DyLOrGXQoLrDZThrRjS6mEs
-	ckU/5S7SaJEYQalLqCgxX0mzB1I+
-X-Google-Smtp-Source: APXvYqxulBxyeKQdJE1St16hz3BcgmtkLJfi++vSRkPwHwohEcbr5sCo8zPvvFgJGDDl9pEXFfnnpg==
-X-Received: by 2002:a24:d945:: with SMTP id p66mr4930890itg.38.1558458451417; 
-	Tue, 21 May 2019 10:07:31 -0700 (PDT)
-Received: from [192.168.1.96] (69-222-133-165.lightspeed.tukrga.sbcglobal.net.
-	[69.222.133.165]) by smtp.googlemail.com with ESMTPSA id
-	l136sm2025647itc.23.2019.05.21.10.07.28
-	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-	Tue, 21 May 2019 10:07:29 -0700 (PDT)
-To: Richard Henderson <richard.henderson@linaro.org>,
-	=?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-References: <20190517224450.15566-1-jan.bobek@gmail.com>
-	<20190517224450.15566-8-jan.bobek@gmail.com>
-	<87zhnhgw1c.fsf@zen.linaroharston>
-	<CAFXwXrkiShudOkAKks7VwB5-tUskeY1pfSeftvS8n=ez8Zgeog@mail.gmail.com>
-	<87h89ogoo0.fsf@zen.linaroharston>
-	<eb8797f0-c615-e60d-0bb4-990e08901883@linaro.org>
-	<87ftp7hljt.fsf@zen.linaroharston>
-	<a6b08718-4c64-eb8f-3663-ee4dfdaaa9fd@gmail.com>
-	<06dee3da-977b-4b7f-e96a-80cdbac4db99@linaro.org>
-From: Jan Bobek <jan.bobek@gmail.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=jan.bobek@gmail.com; prefer-encrypt=mutual; keydata=
-	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
-Message-ID: <96e76878-7838-80e4-cf0a-2f9804709e49@gmail.com>
-Date: Tue, 21 May 2019 13:07:27 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	(envelope-from <dgilbert@redhat.com>) id 1hT8Ja-0005ql-8b
+	for qemu-devel@nongnu.org; Tue, 21 May 2019 13:12:39 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36928)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hT8Ja-0005qM-0V
+	for qemu-devel@nongnu.org; Tue, 21 May 2019 13:12:38 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id BACDA308330B;
+	Tue, 21 May 2019 17:12:36 +0000 (UTC)
+Received: from work-vm (ovpn-117-210.ams2.redhat.com [10.36.117.210])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id E53FE53786;
+	Tue, 21 May 2019 17:12:32 +0000 (UTC)
+Date: Tue, 21 May 2019 18:12:30 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Like Xu <like.xu@linux.intel.com>
+Message-ID: <20190521171229.GD2824@work-vm>
+References: <20190520165056.175475-1-like.xu@linux.intel.com>
+	<20190520165056.175475-3-like.xu@linux.intel.com>
 MIME-Version: 1.0
-In-Reply-To: <06dee3da-977b-4b7f-e96a-80cdbac4db99@linaro.org>
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature";
-	boundary="vo15nlWVtUWOgGNF0ucJiCEYRIdRRZOfC"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::143
-X-Content-Filtered-By: Mailman/MimeDel 2.1.21
-Subject: Re: [Qemu-devel] [RISU v2 07/11] test_i386: change syntax from nasm
- to gas
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190520165056.175475-3-like.xu@linux.intel.com>
+User-Agent: Mutt/1.11.4 (2019-03-13)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.44]);
+	Tue, 21 May 2019 17:12:37 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v2 2/5] i386/cpu: Consolidate die-id
+ validity in smp context
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -181,96 +72,123 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+Cc: Andrew Jones <drjones@redhat.com>,
+	Daniel P =?iso-8859-1?Q?=2E_Berrang=E9?= <berrange@redhat.com>,
+	Eduardo Habkost <ehabkost@redhat.com>,
+	Peter Crosthwaite <crosthwaite.peter@gmail.com>,
+	Marcelo Tosatti <mtosatti@redhat.com>, qemu-devel@nongnu.org,
+	Markus Armbruster <armbru@redhat.com>,
+	Brice Goglin <Brice.Goglin@inria.fr>, Paolo Bonzini <pbonzini@redhat.com>,
+	Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---vo15nlWVtUWOgGNF0ucJiCEYRIdRRZOfC
-From: Jan Bobek <jan.bobek@gmail.com>
-To: Richard Henderson <richard.henderson@linaro.org>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
-Message-ID: <96e76878-7838-80e4-cf0a-2f9804709e49@gmail.com>
-Subject: Re: [RISU v2 07/11] test_i386: change syntax from nasm to gas
-References: <20190517224450.15566-1-jan.bobek@gmail.com>
- <20190517224450.15566-8-jan.bobek@gmail.com>
- <87zhnhgw1c.fsf@zen.linaroharston>
- <CAFXwXrkiShudOkAKks7VwB5-tUskeY1pfSeftvS8n=ez8Zgeog@mail.gmail.com>
- <87h89ogoo0.fsf@zen.linaroharston>
- <eb8797f0-c615-e60d-0bb4-990e08901883@linaro.org>
- <87ftp7hljt.fsf@zen.linaroharston>
- <a6b08718-4c64-eb8f-3663-ee4dfdaaa9fd@gmail.com>
- <06dee3da-977b-4b7f-e96a-80cdbac4db99@linaro.org>
-In-Reply-To: <06dee3da-977b-4b7f-e96a-80cdbac4db99@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+* Like Xu (like.xu@linux.intel.com) wrote:
+> Following the legacy smp check rules, the die_id validity is added to
+> the same contexts as leagcy smp variables such as hmp_hotpluggable_cpus(),
+> machine_set_cpu_numa_node(), cpu_slot_to_string() and pc_cpu_pre_plug().
+> 
+> Signed-off-by: Like Xu <like.xu@linux.intel.com>
+> ---
+>  hmp.c             |  3 +++
+>  hw/core/machine.c | 12 ++++++++++++
+>  hw/i386/pc.c      | 11 +++++++++++
+>  3 files changed, 26 insertions(+)
+> 
+> diff --git a/hmp.c b/hmp.c
+> index 56a3ed7375..7deb7b7226 100644
+> --- a/hmp.c
+> +++ b/hmp.c
+> @@ -3112,6 +3112,9 @@ void hmp_hotpluggable_cpus(Monitor *mon, const QDict *qdict)
+>          if (c->has_socket_id) {
+>              monitor_printf(mon, "    socket-id: \"%" PRIu64 "\"\n", c->socket_id);
+>          }
+> +        if (c->has_die_id) {
+> +            monitor_printf(mon, "    die-id: \"%" PRIu64 "\"\n", c->die_id);
+> +        }
+>          if (c->has_core_id) {
+>              monitor_printf(mon, "    core-id: \"%" PRIu64 "\"\n", c->core_id);
+>          }
+> diff --git a/hw/core/machine.c b/hw/core/machine.c
+> index 5d046a43e3..5116429732 100644
+> --- a/hw/core/machine.c
+> +++ b/hw/core/machine.c
+> @@ -659,6 +659,11 @@ void machine_set_cpu_numa_node(MachineState *machine,
+>              return;
+>          }
+>  
+> +        if (props->has_die_id && !slot->props.has_die_id) {
+> +            error_setg(errp, "die-id is not supported");
+> +            return;
+> +        }
+> +
+>          /* skip slots with explicit mismatch */
+>          if (props->has_thread_id && props->thread_id != slot->props.thread_id) {
+>                  continue;
+> @@ -668,6 +673,10 @@ void machine_set_cpu_numa_node(MachineState *machine,
+>                  continue;
+>          }
+>  
+> +        if (props->has_die_id && props->die_id != slot->props.die_id) {
+> +                continue;
+> +        }
+> +
+>          if (props->has_socket_id && props->socket_id != slot->props.socket_id) {
+>                  continue;
+>          }
+> @@ -925,6 +934,9 @@ static char *cpu_slot_to_string(const CPUArchId *cpu)
+>      if (cpu->props.has_socket_id) {
+>          g_string_append_printf(s, "socket-id: %"PRId64, cpu->props.socket_id);
+>      }
+> +    if (cpu->props.has_die_id) {
+> +        g_string_append_printf(s, "die-id: %"PRId64, cpu->props.die_id);
+> +    }
+>      if (cpu->props.has_core_id) {
+>          if (s->len) {
+>              g_string_append_printf(s, ", ");
+> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+> index 83ab53c814..00be2463af 100644
+> --- a/hw/i386/pc.c
+> +++ b/hw/i386/pc.c
+> @@ -2321,6 +2321,10 @@ static void pc_cpu_pre_plug(HotplugHandler *hotplug_dev,
+>              error_setg(errp, "Invalid CPU socket-id: %u must be in range 0:%u",
+>                         cpu->socket_id, max_socket);
+>              return;
+> +        } else if (cpu->die_id > max_socket) {
+> +            error_setg(errp, "Invalid CPU die-id: %u must be in range 0:%u",
+> +                       cpu->die_id, max_socket);
+> +            return;
 
-On 5/21/19 12:56 PM, Richard Henderson wrote:
-> On 5/21/19 12:48 PM, Jan Bobek wrote:
->> I get the same behavior, but it only occurs on 32bit builds of
->> RISU. Specifically, in risu_reginfo_i386.c, lines 172--178:
->>
->>     for (i =3D 0; i < nvecregs; ++i) {
->> #ifdef __x86_64__
->>         memcpy(&ri->vregs[i], &fp->xmm_space[i], 16);
->> #else
->>         memcpy(&ri->vregs[i], &fp->_xmm[i * 4], 16);
->> #endif
->>     }
->>
->> In the #else branch, fp->_xmm has type _libc_xmmreg[16], and
->> _libc_xmmreg itself is a struct with a 4-element array of uint32s. On
->> my box, this gets fixed by dropping the multiplication from the index,=
+Can you explain why the die_id is related to max_socket?
+I'd assumed you could have a 2 socket system where each socket has 4
+dies.
 
->> i.e.
->>
->>         memcpy(&ri->vregs[i], &fp->_xmm[i], 16);
->>
->> I wonder why Richard wrote it like this in the first place; did
->> fp->_xmm use to be an array of uint32s in previous versions of this
->> API?
->=20
-> I dunno what happened, but these indexes are backward.
->=20
->>From <asm/sigcontext.h>:
->=20
-> struct _fpstate_32 {
->     ...
->         struct _xmmreg _xmm[8];
->=20
->=20
-> struct _fpstate_64 {
->     ...
->         __u32 xmm_space[64];  /* 16x XMM registers, 16 bytes each */
-
-Indeed; that makes for one more fix in v3.
-
--Jan
+However, for the HMP side of it:
 
 
---vo15nlWVtUWOgGNF0ucJiCEYRIdRRZOfC
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+Acked-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCgAdFiEESPYOqtMR3qRZrEutZeg2ldrjNs8FAlzkME8ACgkQZeg2ldrj
-Ns/g9Q//TXEVv5KbWfowNgii/WS3F2/A2pQZdmMpgfRUikP14DeAKm1pW/SEh0Ch
-x6PvqbQGIQZ2Xqq3HYosOpgsS4Rdf1B7mp2UzS5TCRLjmvfXbHxUHGjiyQQ1R2pJ
-iHsPyzBeJr06WIkuOxR5SXXi9eSuAMagPxLSXxAKWLtOZi5Co30x18urYHgOG9UO
-TrQPY4nmUHzUXZoqQ5iwFAOEes+RUU9b+BdQbbkfi0jGh3Qcwozy/4b4nn5YS0lD
-DWKm61wILTJJnHzWb+sp/q6rBwv2C+POfGa4PRLaszJJF3ULe+plqtLhipUujMHv
-651kLX/wn+KyWS/oePOyGhxS2JIWFI7yOBYcm7WCCgEEkh4Y/aufZFkG3tKjD4Wp
-lsE4Ygio6fFO3r0wVD3JYxdpavgc1b/WnCOKR5v3LUnXpDlbdiJIRqavK6PHG11d
-gC3XrjsvH2zZnewAlP6fZo/TrLaRe6kMaFlEJ/fmC9Ot3Yo/MZdCqfcSdDudQ4Fv
-kW2BFf2PMmR8j/C2QjevNAB5RFtgXVnKiocPL8IJu+ZNW7jz+721wa7O08FELdDk
-yyld/2uuDQjsYhcxGD/2t5g19TUyjKlPPSJhSZHwO7uj8pxVFU63kI1FE10GFdfC
-/Wdg92mWa31WRyegiA8a7tvrcX9p44iL1BkjiuV3OaGGvc9dtKs=
-=vWOp
------END PGP SIGNATURE-----
-
---vo15nlWVtUWOgGNF0ucJiCEYRIdRRZOfC--
+>          }
+>          if (cpu->core_id < 0) {
+>              error_setg(errp, "CPU core-id is not set");
+> @@ -2378,6 +2382,13 @@ static void pc_cpu_pre_plug(HotplugHandler *hotplug_dev,
+>      }
+>      cpu->socket_id = topo.pkg_id;
+>  
+> +    if (cpu->die_id != -1 && cpu->die_id != topo.die_id) {
+> +        error_setg(errp, "property die-id: %u doesn't match set apic-id:"
+> +            " 0x%x (die-id: %u)", cpu->die_id, cpu->apic_id, topo.die_id);
+> +        return;
+> +    }
+> +    cpu->die_id = topo.die_id;
+> +
+>      if (cpu->core_id != -1 && cpu->core_id != topo.core_id) {
+>          error_setg(errp, "property core-id: %u doesn't match set apic-id:"
+>              " 0x%x (core-id: %u)", cpu->core_id, cpu->apic_id, topo.core_id);
+> -- 
+> 2.21.0
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
