@@ -2,71 +2,90 @@ Return-Path: <SRS0=/4tE=TV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D7AACC04AAF
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 05:56:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CA13C04AAF
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 06:18:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A343F20856
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 05:56:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A343F20856
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 19F8720863
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 06:18:49 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iAILzZqN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 19F8720863
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:46935 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:47154 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hSxlF-0007vN-E4
-	for qemu-devel@archiver.kernel.org; Tue, 21 May 2019 01:56:29 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:43788)
+	id 1hSy6q-0003FO-Tf
+	for qemu-devel@archiver.kernel.org; Tue, 21 May 2019 02:18:48 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:46771)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hSxkU-0007WE-0e
-	for qemu-devel@nongnu.org; Tue, 21 May 2019 01:55:43 -0400
+	(envelope-from <kernellwp@gmail.com>) id 1hSy5y-0002vY-GN
+	for qemu-devel@nongnu.org; Tue, 21 May 2019 02:17:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hSxkT-0000Zj-0l
-	for qemu-devel@nongnu.org; Tue, 21 May 2019 01:55:41 -0400
-Received: from indium.canonical.com ([91.189.90.7]:33950)
+	(envelope-from <kernellwp@gmail.com>) id 1hSy5x-00013a-HV
+	for qemu-devel@nongnu.org; Tue, 21 May 2019 02:17:54 -0400
+Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:44550)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hSxkS-0000ZN-Rk
-	for qemu-devel@nongnu.org; Tue, 21 May 2019 01:55:40 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hSxkQ-0007RI-HT
-	for <qemu-devel@nongnu.org>; Tue, 21 May 2019 05:55:38 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 761922E80DB
-	for <qemu-devel@nongnu.org>; Tue, 21 May 2019 05:55:38 +0000 (UTC)
+	(Exim 4.71) (envelope-from <kernellwp@gmail.com>) id 1hSy5x-00012l-BX
+	for qemu-devel@nongnu.org; Tue, 21 May 2019 02:17:53 -0400
+Received: by mail-pf1-x443.google.com with SMTP id g9so8477506pfo.11
+	for <qemu-devel@nongnu.org>; Mon, 20 May 2019 23:17:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+	h=from:to:cc:subject:date:message-id:mime-version
+	:content-transfer-encoding;
+	bh=J0uuieNJWIEqFucVVL6HHob/1V+xJ9X3pNwzM9VDJZ0=;
+	b=iAILzZqNIPswUqlH8JOZ7+vNDvmfXLVoXJIxX2pMr6K+W+bYWxejR2GHSWRq5E47A9
+	+VOfS8YbrQHfhFr7ihHe+UDBs8GsWPVm81gOqbikTXUXTinXaK5hYC9uAXP7euPrkAfO
+	W3z6pM1PlpsNwjc9CsNyroG7N/i0J/9W/pNuTtwQQA+p2+FPHbalQl4hDooMHBBpiEN5
+	2kicJrYTxu1HzkN0+pbwtNM4BG2RgcgDdPdSPEQ4ZAXh+ARZzdnmstNsaTbUrM8BeTh3
+	EawOZc3DzJIcULJcNysgL7W1kitDu+KytOK29j4bZlaQ3PjMG64tGQ/8f/P6Cc5JOZOR
+	NJ1Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+	:content-transfer-encoding;
+	bh=J0uuieNJWIEqFucVVL6HHob/1V+xJ9X3pNwzM9VDJZ0=;
+	b=EY6A81G1lEKnywancFNMjwdEl8mvpQdL5yb9+HWavO5GgM7W0XG9/SYF+c1nO0tJx2
+	YGqhhSiBrfMEY3Rdo19rmFajD7H1glfF0mR7S0M3YqbGQm75E/v/YSfuK7bMKvxof1B2
+	Qq/PEoRSYrukUkxMVk4iKOb4Q1tkHMNxvl7HYfECa3LaA/cTyU+JkJjjWxDOJP075GlL
+	4MT6f0wxOUfQD33kP8Z+hgCRahU8RpyFRuiEEKMtBxvtnEsemMzNp4fp2CfMVB1IyvIB
+	C86EJHs+wsOSBSSX5bGnmWDNo18lcO+QPFZ5kKkaL6KjZlwZTNpNiZkuf1o1LqL2WVel
+	Zz3Q==
+X-Gm-Message-State: APjAAAX+WF5JWBBwC3B1nwRxQGDm/HLvqf18PSwYd1A0i9AoHHkpxgam
+	YBRtIfBLCDQev+5+KCa5Wk1qrQCU
+X-Google-Smtp-Source: APXvYqw2zFKfTVHfge7XSBqtWwR0RD497wZjCcT/BNKF+0TPFWkQe97zoVI6lF5pwDcUzRZL6LH/JQ==
+X-Received: by 2002:a63:1460:: with SMTP id 32mr80416982pgu.319.1558419471484; 
+	Mon, 20 May 2019 23:17:51 -0700 (PDT)
+Received: from localhost.localdomain ([203.205.141.123])
+	by smtp.googlemail.com with ESMTPSA id
+	o66sm23112295pfb.184.2019.05.20.23.17.49
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
+	Mon, 20 May 2019 23:17:51 -0700 (PDT)
+From: Wanpeng Li <kernellwp@gmail.com>
+X-Google-Original-From: Wanpeng Li <wanpengli@tencent.com>
+To: qemu-devel@nongnu.org,
+	kvm@vger.kernel.org
+Date: Tue, 21 May 2019 14:17:47 +0800
+Message-Id: <1558419467-7155-1-git-send-email-wanpengli@tencent.com>
+X-Mailer: git-send-email 2.7.4
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 21 May 2019 05:42:03 -0000
-From: arseniy <1829498@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: ffhguy jnsnow
-X-Launchpad-Bug-Reporter: arseniy (ffhguy)
-X-Launchpad-Bug-Modifier: arseniy (ffhguy)
-References: <155808951981.15307.7632909900341712173.malonedeb@gac.canonical.com>
-Message-Id: <155841732343.15101.340068642172654860.malone@gac.canonical.com>
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="18962";
-	Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: 7ec94c4c08c330c34ac8167ee1f33989bf1f55d8
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1829498] Re: window 8 stuck during boot on Qemu
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::443
+Subject: [Qemu-devel] [PATCH] kvm: support guest access CORE cstate
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -75,56 +94,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1829498 <1829498@bugs.launchpad.net>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
+	=?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-My host kernel is 4.15.0-47. Windows 8 version is 6.3.9600. About KVM,
-i've got same problem in TCG mode.
+From: Wanpeng Li <wanpengli@tencent.com>
 
--- =
+Allow guest reads CORE cstate when exposing host CPU power management capabilities 
+to the guest. PKG cstate is restricted to avoid a guest to get the whole package 
+information in multi-tenant scenario.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1829498
+Cc: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Radim Krčmář <rkrcmar@redhat.com>
+Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
+---
+ linux-headers/linux/kvm.h | 4 +++-
+ target/i386/kvm.c         | 3 ++-
+ 2 files changed, 5 insertions(+), 2 deletions(-)
 
-Title:
-  window 8 stuck during boot on Qemu
+diff --git a/linux-headers/linux/kvm.h b/linux-headers/linux/kvm.h
+index b53ee59..d648fde 100644
+--- a/linux-headers/linux/kvm.h
++++ b/linux-headers/linux/kvm.h
+@@ -696,9 +696,11 @@ struct kvm_ioeventfd {
+ #define KVM_X86_DISABLE_EXITS_MWAIT          (1 << 0)
+ #define KVM_X86_DISABLE_EXITS_HLT            (1 << 1)
+ #define KVM_X86_DISABLE_EXITS_PAUSE          (1 << 2)
++#define KVM_X86_DISABLE_EXITS_CSTATE         (1 << 3)
+ #define KVM_X86_DISABLE_VALID_EXITS          (KVM_X86_DISABLE_EXITS_MWAIT | \
+                                               KVM_X86_DISABLE_EXITS_HLT | \
+-                                              KVM_X86_DISABLE_EXITS_PAUSE)
++                                              KVM_X86_DISABLE_EXITS_PAUSE | \
++                                              KVM_X86_DISABLE_EXITS_CSTATE)
+ 
+ /* for KVM_ENABLE_CAP */
+ struct kvm_enable_cap {
+diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+index 3b29ce5..49a0cc1 100644
+--- a/target/i386/kvm.c
++++ b/target/i386/kvm.c
+@@ -1645,7 +1645,8 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
+         if (disable_exits) {
+             disable_exits &= (KVM_X86_DISABLE_EXITS_MWAIT |
+                               KVM_X86_DISABLE_EXITS_HLT |
+-                              KVM_X86_DISABLE_EXITS_PAUSE);
++                              KVM_X86_DISABLE_EXITS_PAUSE |
++                              KVM_X86_DISABLE_EXITS_CSTATE);
+         }
+ 
+         ret = kvm_vm_enable_cap(s, KVM_CAP_X86_DISABLE_EXITS, 0,
+-- 
+2.7.4
 
-Status in QEMU:
-  New
-
-Bug description:
-  Description of problem:
-  I've got windows 8 image(64 bit), installed on Qemu(x86-64_softmmu) and t=
-hen i'm trying to boot/shutdown it in the same Qemu configuration. Windows =
-8 has feature - when you click "Shutdown" in UI, windows 8 doesn't actually=
- power off, it goes to "Suspend to disc" ACPI state. After shutdown, i'm tr=
-ying to boot it again, but it stucks during boot.
-
-  I've discovered, that it hangs when windows 8 writes to AHCI's command re=
-gister, AHCI triggers irq, but windows 8 sends EOI, don't accessing AHCI re=
-gister,so irq line stills in high state, and irq will be injected again and=
- again, while windows will send EOI on each AHCI interrupt. Strange thing i=
-s that it happens only on TCG mode or =
-
-  with option "kernel-irqchip=3Doff/split", with "kernel-irqchip=3Don" ever=
-ything works ok(windows 8 accesses AHCI register and line goes to low state=
-).
-
-  Version-Release number of selected component (if applicable):
-  Qemu revision: d8276573da58e8ce78dab8c46dd660efd664bcb7
-
-  =
-
-  Steps to Reproduce:
-  1. Install Windows 8 on QEMU(qemu command line: "-enable-kvm -m 1G -hda <=
-image>  -serial stdio  -cpu core2duo -machine q35,kernel-irqchip=3Doff"
-  2. Click shutdown in UI.
-  3. Try to boot again(it will stuck)
-  4. Kill Qemu and boot again, it will boot, now go to 2) :)
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1829498/+subscriptions
 
