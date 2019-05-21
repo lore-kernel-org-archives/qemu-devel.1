@@ -2,64 +2,56 @@ Return-Path: <SRS0=/4tE=TV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 456BAC04AAC
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 03:23:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1591DC04AAC
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 03:35:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1CF48213F2
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 03:23:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1CF48213F2
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id DD0BE2081C
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 03:35:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DD0BE2081C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:45723 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:45843 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hSvN1-0004Db-Dx
-	for qemu-devel@archiver.kernel.org; Mon, 20 May 2019 23:23:19 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:53898)
+	id 1hSvYs-0006rK-ST
+	for qemu-devel@archiver.kernel.org; Mon, 20 May 2019 23:35:34 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:55331)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1hSvMB-0003qh-5t
-	for qemu-devel@nongnu.org; Mon, 20 May 2019 23:22:28 -0400
+	(envelope-from <richardw.yang@linux.intel.com>) id 1hSvXA-0005qT-Vg
+	for qemu-devel@nongnu.org; Mon, 20 May 2019 23:33:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1hSvMA-0007Qi-9k
-	for qemu-devel@nongnu.org; Mon, 20 May 2019 23:22:27 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39530)
+	(envelope-from <richardw.yang@linux.intel.com>) id 1hSvX9-0004JT-AS
+	for qemu-devel@nongnu.org; Mon, 20 May 2019 23:33:48 -0400
+Received: from mga04.intel.com ([192.55.52.120]:10740)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>)
-	id 1hSvM8-0007P8-7y; Mon, 20 May 2019 23:22:24 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
-	[10.5.11.22])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 60281F74A0;
-	Tue, 21 May 2019 03:22:22 +0000 (UTC)
-Received: from [10.72.12.36] (ovpn-12-36.pek2.redhat.com [10.72.12.36])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 907A71001E66;
-	Tue, 21 May 2019 03:22:19 +0000 (UTC)
-To: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-References: <20190520181111.20407-1-clg@kaod.org>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <57879890-1587-f66f-7947-6fade53f542f@redhat.com>
-Date: Tue, 21 May 2019 11:22:17 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	(Exim 4.71) (envelope-from <richardw.yang@linux.intel.com>)
+	id 1hSvX6-0004IZ-6X; Mon, 20 May 2019 23:33:44 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+	by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+	20 May 2019 20:33:42 -0700
+X-ExtLoop1: 1
+Received: from richard.sh.intel.com (HELO localhost) ([10.239.159.54])
+	by fmsmga005.fm.intel.com with ESMTP; 20 May 2019 20:33:40 -0700
+From: Wei Yang <richardw.yang@linux.intel.com>
+To: qemu-devel@nongnu.org,
+	qemu-arm@nongnu.org
+Date: Tue, 21 May 2019 11:32:47 +0800
+Message-Id: <20190521033249.1960-1-richardw.yang@linux.intel.com>
+X-Mailer: git-send-email 2.19.1
 MIME-Version: 1.0
-In-Reply-To: <20190520181111.20407-1-clg@kaod.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.38]);
-	Tue, 21 May 2019 03:22:22 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH] ftgmac100: do not link to netdev
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 192.55.52.120
+Subject: [Qemu-devel] [PATCH v5 0/2] Extract build_mcfg Part 2
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -71,44 +63,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Andrew Jeffery <andrew@aj.id.au>,
-	qemu-devel@nongnu.org, Wim Vervoorn <wvervoorn@eltan.com>,
-	qemu-arm@nongnu.org, Joel Stanley <joel@jms.id.au>
+Cc: yang.zhong@intel.com, peter.maydell@linaro.org, thuth@redhat.com,
+	mst@redhat.com, shannon.zhaosl@gmail.com,
+	Wei Yang <richardw.yang@linux.intel.com>, imammedo@redhat.com,
+	philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+This patch set tries to generalize MCFG table build process. Several patches
+are already merged and these two are left for the following reasons:
 
-On 2019/5/21 =E4=B8=8A=E5=8D=882:11, C=C3=A9dric Le Goater wrote:
-> qdev_set_nic_properties() is already used in the Aspeed SoC level to
-> bind the ftgmac100 device to the netdev.
->
-> This is fixing support for multiple net devices.
->
-> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
-> ---
->   hw/net/ftgmac100.c | 2 --
->   1 file changed, 2 deletions(-)
->
-> diff --git a/hw/net/ftgmac100.c b/hw/net/ftgmac100.c
-> index 790430346b51..d9986c6baa92 100644
-> --- a/hw/net/ftgmac100.c
-> +++ b/hw/net/ftgmac100.c
-> @@ -1016,8 +1016,6 @@ static void ftgmac100_realize(DeviceState *dev, E=
-rror **errp)
->       sysbus_init_irq(sbd, &s->irq);
->       qemu_macaddr_default_if_unset(&s->conf.macaddr);
->  =20
-> -    s->conf.peers.ncs[0] =3D nd_table[0].netdev;
-> -
->       s->nic =3D qemu_new_nic(&net_ftgmac100_info, &s->conf,
->                             object_get_typename(OBJECT(dev)), DEVICE(de=
-v)->id,
->                             s);
+  * conflict with latest upstream
+  * ACPI_PCI dependency fix
+  * missed reserved[8] in MCFG
 
+v4->v5:
+    * ACPI_PCI depends on both ACPI and PCI
+    * rebase on latest master, adjust arm Kconfig
+    * miss the reserved[8] of MCFG, add it back
+    * make sure bios-tables-test all OK
 
-Applied.
+Wei Yang (2):
+  hw/acpi: Consolidate build_mcfg to pci.c
+  acpi: pci: use build_append_foo() API to construct MCFG
 
-Thanks
+ default-configs/i386-softmmu.mak |  1 +
+ hw/acpi/Kconfig                  |  4 +++
+ hw/acpi/Makefile.objs            |  1 +
+ hw/acpi/pci.c                    | 57 ++++++++++++++++++++++++++++++++
+ hw/arm/Kconfig                   |  1 +
+ hw/arm/virt-acpi-build.c         | 17 ----------
+ hw/i386/acpi-build.c             | 18 +---------
+ include/hw/acpi/acpi-defs.h      | 18 ----------
+ include/hw/acpi/pci.h            |  1 +
+ 9 files changed, 66 insertions(+), 52 deletions(-)
+ create mode 100644 hw/acpi/pci.c
+
+-- 
+2.19.1
 
 
