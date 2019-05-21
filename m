@@ -2,63 +2,74 @@ Return-Path: <SRS0=/4tE=TV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.0 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C94F2C04AAF
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 14:03:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C328C04AAF
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 14:03:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A21C220862
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 14:03:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A21C220862
+	by mail.kernel.org (Postfix) with ESMTPS id 6438A21479
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 14:03:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6438A21479
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:54343 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:54347 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hT5ME-0007tv-VN
-	for qemu-devel@archiver.kernel.org; Tue, 21 May 2019 10:03:11 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:34555)
+	id 1hT5Mb-0008FJ-Mn
+	for qemu-devel@archiver.kernel.org; Tue, 21 May 2019 10:03:33 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:34202)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pagupta@redhat.com>) id 1hT5DX-0000fX-Ks
+	(envelope-from <mst@redhat.com>) id 1hT5DX-0000P3-HG
 	for qemu-devel@nongnu.org; Tue, 21 May 2019 09:54:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pagupta@redhat.com>) id 1hT52Q-0004Ye-AV
+	(envelope-from <mst@redhat.com>) id 1hT52R-0004ZV-0g
 	for qemu-devel@nongnu.org; Tue, 21 May 2019 09:42:43 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:24194)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pagupta@redhat.com>) id 1hT52Q-0004Xg-5k
+Received: from mail-qt1-f196.google.com ([209.85.160.196]:40589)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1hT52Q-0004Yq-TH
 	for qemu-devel@nongnu.org; Tue, 21 May 2019 09:42:42 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
-	[10.5.11.22])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id DB98B3003C76;
-	Tue, 21 May 2019 13:42:20 +0000 (UTC)
-Received: from dhcp201-121.englab.pnq.redhat.com (ovpn-116-97.sin2.redhat.com
-	[10.67.116.97])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 893ED100200D;
-	Tue, 21 May 2019 13:40:31 +0000 (UTC)
-From: Pankaj Gupta <pagupta@redhat.com>
-To: linux-nvdimm@lists.01.org, linux-kernel@vger.kernel.org,
-	virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org, linux-acpi@vger.kernel.org,
-	qemu-devel@nongnu.org, linux-ext4@vger.kernel.org,
-	linux-xfs@vger.kernel.org, dm-devel@redhat.com
-Date: Tue, 21 May 2019 19:07:10 +0530
-Message-Id: <20190521133713.31653-5-pagupta@redhat.com>
-In-Reply-To: <20190521133713.31653-1-pagupta@redhat.com>
-References: <20190521133713.31653-1-pagupta@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.44]);
-	Tue, 21 May 2019 13:42:36 +0000 (UTC)
+Received: by mail-qt1-f196.google.com with SMTP id k24so20498744qtq.7
+	for <qemu-devel@nongnu.org>; Tue, 21 May 2019 06:42:42 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+	:mime-version:content-disposition:in-reply-to;
+	bh=dTNyFHuH2EKIMK78fAWwlvAi/ly3eXI7flF+iJg1tKw=;
+	b=YGe/BGCMCz3rTleF+eMbD62+TwTtY8E1jK7GBkiKvbLZTmxsidUE1fjENdr3VeBH+c
+	1/Bx+y/EExzs8WlVbdmSvkptuyAYAsr0DI872znRLQOdaYqX6bmvzJWHZok+dW2mLfJr
+	uCnMcIpWgicnb45aZYWeLFQWyCzHVtuO/fpkG3ucLNaHZb2nhJcVWMZoTs1OZ6Q1l7GC
+	WTu9G2Vv+AKkCnh/5R/cHXsYI/QXKk19wZ5z9OJ6W1OyhTzYPxBKHpbIV2MtnOdhoTye
+	HCSi4j9kTVdeT6wcCIAtcnlYg2uv9HuJNfP5zoR/+/W2XVInxRN7jniviMygAE5+xBVt
+	OwVw==
+X-Gm-Message-State: APjAAAVlJTQrrkpPg4Cc2YKOQEmF28WPayHFKdnUYXerhkC41hfFMVJa
+	rb177I43FSCU0cfSUhICXuLxhw==
+X-Google-Smtp-Source: APXvYqzEu9BHjuJbZeF9ZzElOutd5KyWnd8KSNAHrKegtYGQU+TVhtjtEC3FAexH2udRMnSSMrQrCg==
+X-Received: by 2002:a0c:d909:: with SMTP id p9mr52742360qvj.42.1558446162297; 
+	Tue, 21 May 2019 06:42:42 -0700 (PDT)
+Received: from redhat.com (pool-173-76-105-71.bstnma.fios.verizon.net.
+	[173.76.105.71]) by smtp.gmail.com with ESMTPSA id
+	e133sm8039422qkb.76.2019.05.21.06.42.40
+	(version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+	Tue, 21 May 2019 06:42:41 -0700 (PDT)
+Date: Tue, 21 May 2019 09:42:39 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Message-ID: <20190521094218-mutt-send-email-mst@kernel.org>
+References: <20190520231008.20140-1-mst@redhat.com>
+	<CAFEAcA80Q8zWxM4TBVMZHLuOzo0HSpT=4C76uAwdMjLn2Xye=w@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA80Q8zWxM4TBVMZHLuOzo0HSpT=4C76uAwdMjLn2Xye=w@mail.gmail.com>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v10 4/7] dm: enable synchronous dax
+	[fuzzy]
+X-Received-From: 209.85.160.196
+Subject: Re: [Qemu-devel] [PULL v2 00/36] pci, pc, virtio: features, fixes
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -70,70 +81,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pagupta@redhat.com, rdunlap@infradead.org, jack@suse.cz, snitzer@redhat.com,
-	mst@redhat.com, jasowang@redhat.com, david@fromorbit.com,
-	lcapitulino@redhat.com, adilger.kernel@dilger.ca,
-	zwisler@kernel.org, aarcange@redhat.com, dave.jiang@intel.com,
-	jstaron@google.com, darrick.wong@oracle.com,
-	vishal.l.verma@intel.com, david@redhat.com, willy@infradead.org,
-	hch@infradead.org, jmoyer@redhat.com, nilal@redhat.com,
-	lenb@kernel.org, kilobyte@angband.pl, riel@surriel.com,
-	yuval.shaia@oracle.com, stefanha@redhat.com, pbonzini@redhat.com,
-	dan.j.williams@intel.com, kwolf@redhat.com, tytso@mit.edu,
-	xiaoguangrong.eric@gmail.com, cohuck@redhat.com,
-	rjw@rjwysocki.net, imammedo@redhat.com
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
- This patch sets dax device 'DAXDEV_SYNC' flag if all the target
- devices of device mapper support synchrononous DAX. If device
- mapper consists of both synchronous and asynchronous dax devices,
- we don't set 'DAXDEV_SYNC' flag. 
+On Tue, May 21, 2019 at 12:49:48PM +0100, Peter Maydell wrote:
+> On Tue, 21 May 2019 at 00:10, Michael S. Tsirkin <mst@redhat.com> wrote:
+> >
+> > The following changes since commit 2259637b95bef3116cc262459271de08e038cc66:
+> >
+> >   Merge remote-tracking branch 'remotes/kevin/tags/for-upstream' into staging (2019-05-20 17:22:05 +0100)
+> >
+> > are available in the Git repository at:
+> >
+> >   git://git.kernel.org/pub/scm/virt/kvm/mst/qemu.git tags/for_upstream
+> >
+> > for you to fetch changes up to 0c05ec64c388aea59facbef740651afa78e04f50:
+> >
+> >   tests: acpi: print error unable to dump ACPI table during rebuild (2019-05-20 18:40:02 -0400)
+> >
+> > ----------------------------------------------------------------
+> > pci, pc, virtio: features, fixes
+> >
+> > reconnect for vhost blk
+> > tests for UEFI
+> > misc other stuff
+> >
+> > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> >
+> > ----------------------------------------------------------------
+> 
+> Hi -- this failed 'make check' for 32-bit Arm hosts:
+> 
+> ERROR:/home/peter.maydell/qemu/tests/acpi-utils.c:145:acpi_find_rsdp_address_uefi:
+> code should not be reached
+> Aborted
+> ERROR - too few tests run (expected 1, got 0)
+> /home/peter.maydell/qemu/tests/Makefile.include:885: recipe for target
+> 'check-qtest-aarch64' failed
+> 
+> thanks
+> -- PMM
 
-Signed-off-by: Pankaj Gupta <pagupta@redhat.com>
----
- drivers/md/dm-table.c | 14 ++++++++++++++
- 1 file changed, 14 insertions(+)
+Dropped ARM and re-pushed.
 
-diff --git a/drivers/md/dm-table.c b/drivers/md/dm-table.c
-index cde3b49b2a91..1cce626ff576 100644
---- a/drivers/md/dm-table.c
-+++ b/drivers/md/dm-table.c
-@@ -886,10 +886,17 @@ static int device_supports_dax(struct dm_target *ti, struct dm_dev *dev,
- 	return bdev_dax_supported(dev->bdev, PAGE_SIZE);
- }
- 
-+static int device_synchronous(struct dm_target *ti, struct dm_dev *dev,
-+			       sector_t start, sector_t len, void *data)
-+{
-+	return dax_synchronous(dev->dax_dev);
-+}
-+
- static bool dm_table_supports_dax(struct dm_table *t)
- {
- 	struct dm_target *ti;
- 	unsigned i;
-+	bool dax_sync = true;
- 
- 	/* Ensure that all targets support DAX. */
- 	for (i = 0; i < dm_table_get_num_targets(t); i++) {
-@@ -901,7 +908,14 @@ static bool dm_table_supports_dax(struct dm_table *t)
- 		if (!ti->type->iterate_devices ||
- 		    !ti->type->iterate_devices(ti, device_supports_dax, NULL))
- 			return false;
-+
-+		/* Check devices support synchronous DAX */
-+		if (dax_sync &&
-+		    !ti->type->iterate_devices(ti, device_synchronous, NULL))
-+			dax_sync = false;
- 	}
-+	if (dax_sync)
-+		set_dax_synchronous(t->md->dax_dev);
- 
- 	return true;
- }
 -- 
-2.20.1
-
+MST
 
