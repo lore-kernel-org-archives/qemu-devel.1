@@ -2,62 +2,58 @@ Return-Path: <SRS0=/4tE=TV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 73D0CC04AAF
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 06:50:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C097BC04AAF
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 06:52:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E31F221743
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 06:50:34 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="h1QXq1Pc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E31F221743
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	by mail.kernel.org (Postfix) with ESMTPS id 881E121743
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 06:52:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 881E121743
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:47631 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:47674 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hSybZ-0007Ke-PX
-	for qemu-devel@archiver.kernel.org; Tue, 21 May 2019 02:50:33 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:49070)
+	id 1hSyd0-0000E1-Qf
+	for qemu-devel@archiver.kernel.org; Tue, 21 May 2019 02:52:02 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:49206)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1hSyHe-000634-JC
-	for qemu-devel@nongnu.org; Tue, 21 May 2019 02:30:02 -0400
+	(envelope-from <richardw.yang@linux.intel.com>) id 1hSyHp-0006Kx-Tg
+	for qemu-devel@nongnu.org; Tue, 21 May 2019 02:30:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1hSyHc-00088H-7m
-	for qemu-devel@nongnu.org; Tue, 21 May 2019 02:29:58 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:33093 helo=ozlabs.org)
+	(envelope-from <richardw.yang@linux.intel.com>) id 1hSyHm-0008GM-1F
+	for qemu-devel@nongnu.org; Tue, 21 May 2019 02:30:08 -0400
+Received: from mga09.intel.com ([134.134.136.24]:50783)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
-	id 1hSyHb-00080T-KN; Tue, 21 May 2019 02:29:56 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
-	id 457Qpk5DXqz9sPV; Tue, 21 May 2019 16:29:32 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-	d=gibson.dropbear.id.au; s=201602; t=1558420174;
-	bh=7aMwEc/K7U7fFcyDgJ7x3XIzmXqCoehQFLdOQob6q2Q=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=h1QXq1PccSgr+L4/fj6vsE768FMMmc++vSt+i/60sREWQRyQmVh/hbjOXWacZvBGq
-	mx21ANFBb39SpXC1tRDJIPVOp3HZocSk238yqqqtFNv+u5wQ/DQ9JMxp6eiJO3mGJ/
-	8B4fvVfXz2n6e+7eysIVLC3XnDyVPmUQbDGotmQo=
-From: David Gibson <david@gibson.dropbear.id.au>
-To: peter.maydell@linaro.org
-Date: Tue, 21 May 2019 16:29:13 +1000
-Message-Id: <20190521062924.6930-28-david@gibson.dropbear.id.au>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20190521062924.6930-1-david@gibson.dropbear.id.au>
-References: <20190521062924.6930-1-david@gibson.dropbear.id.au>
+	(Exim 4.71) (envelope-from <richardw.yang@linux.intel.com>)
+	id 1hSyHg-0008AJ-Lp; Tue, 21 May 2019 02:30:01 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+	by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+	20 May 2019 23:29:58 -0700
+X-ExtLoop1: 1
+Received: from richard.sh.intel.com (HELO localhost) ([10.239.159.54])
+	by orsmga001.jf.intel.com with ESMTP; 20 May 2019 23:29:55 -0700
+From: Wei Yang <richardw.yang@linux.intel.com>
+To: qemu-devel@nongnu.org,
+	qemu-arm@nongnu.org
+Date: Tue, 21 May 2019 14:28:35 +0800
+Message-Id: <20190521062836.6541-2-richardw.yang@linux.intel.com>
+X-Mailer: git-send-email 2.19.1
+In-Reply-To: <20190521062836.6541-1-richardw.yang@linux.intel.com>
+References: <20190521062836.6541-1-richardw.yang@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 203.11.71.1
-Subject: [Qemu-devel] [PULL 27/38] spapr/xive: add hcall support when under
- KVM
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 134.134.136.24
+Subject: [Qemu-devel] [PATCH v6 1/2] hw/acpi: Consolidate build_mcfg to pci.c
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -69,462 +65,212 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: lvivier@redhat.com, gkurz@kaod.org, qemu-devel@nongnu.org,
-	qemu-ppc@nongnu.org, clg@kaod.org,
-	David Gibson <david@gibson.dropbear.id.au>
+Cc: yang.zhong@intel.com, peter.maydell@linaro.org, thuth@redhat.com,
+	mst@redhat.com, shannon.zhaosl@gmail.com,
+	Wei Yang <richardw.yang@linux.intel.com>, imammedo@redhat.com,
+	philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: C=C3=A9dric Le Goater <clg@kaod.org>
+Now we have two identical build_mcfg functions.
 
-XIVE hcalls are all redirected to QEMU as none are on a fast path.
-When necessary, QEMU invokes KVM through specific ioctls to perform
-host operations. QEMU should have done the necessary checks before
-calling KVM and, in case of failure, H_HARDWARE is simply returned.
+Consolidate them in acpi/pci.c.
 
-H_INT_ESB is a special case that could have been handled under KVM
-but the impact on performance was low when under QEMU. Here are some
-figures :
+Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
 
-    kernel irqchip      OFF          ON
-    H_INT_ESB                    KVM   QEMU
-
-    rtl8139 (LSI )      1.19     1.24  1.23  Gbits/sec
-    virtio             31.80    42.30   --   Gbits/sec
-
-Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
-Message-Id: <20190513084245.25755-4-clg@kaod.org>
-Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+v4:
+  * ACPI_PCI depends on both ACPI and PCI
+  * rebase on latest master, adjust arm Kconfig
+v3:
+  * adjust changelog based on Igor's suggestion
 ---
- hw/intc/spapr_xive.c        |  90 ++++++++++++++--
- hw/intc/spapr_xive_kvm.c    | 197 ++++++++++++++++++++++++++++++++++++
- include/hw/ppc/spapr_xive.h |  15 +++
- 3 files changed, 294 insertions(+), 8 deletions(-)
+ default-configs/i386-softmmu.mak |  1 +
+ hw/acpi/Kconfig                  |  4 +++
+ hw/acpi/Makefile.objs            |  1 +
+ hw/acpi/pci.c                    | 46 ++++++++++++++++++++++++++++++++
+ hw/arm/Kconfig                   |  1 +
+ hw/arm/virt-acpi-build.c         | 17 ------------
+ hw/i386/acpi-build.c             | 18 +------------
+ include/hw/acpi/pci.h            |  1 +
+ 8 files changed, 55 insertions(+), 34 deletions(-)
+ create mode 100644 hw/acpi/pci.c
 
-diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
-index 27632683e6..03f92c3e65 100644
---- a/hw/intc/spapr_xive.c
-+++ b/hw/intc/spapr_xive.c
-@@ -86,6 +86,22 @@ static int spapr_xive_target_to_nvt(uint32_t target,
-  * sPAPR END indexing uses a simple mapping of the CPU vcpu_id, 8
-  * priorities per CPU
-  */
-+int spapr_xive_end_to_target(uint8_t end_blk, uint32_t end_idx,
-+                             uint32_t *out_server, uint8_t *out_prio)
-+{
+diff --git a/default-configs/i386-softmmu.mak b/default-configs/i386-softmmu.mak
+index ba3fb3ff50..cd5ea391e8 100644
+--- a/default-configs/i386-softmmu.mak
++++ b/default-configs/i386-softmmu.mak
+@@ -25,3 +25,4 @@
+ CONFIG_ISAPC=y
+ CONFIG_I440FX=y
+ CONFIG_Q35=y
++CONFIG_ACPI_PCI=y
+diff --git a/hw/acpi/Kconfig b/hw/acpi/Kconfig
+index eca3beed75..7c59cf900b 100644
+--- a/hw/acpi/Kconfig
++++ b/hw/acpi/Kconfig
+@@ -23,6 +23,10 @@ config ACPI_NVDIMM
+     bool
+     depends on ACPI
+ 
++config ACPI_PCI
++    bool
++    depends on ACPI && PCI
 +
-+    assert(end_blk =3D=3D SPAPR_XIVE_BLOCK_ID);
-+
-+    if (out_server) {
-+        *out_server =3D end_idx >> 3;
-+    }
-+
-+    if (out_prio) {
-+        *out_prio =3D end_idx & 0x7;
-+    }
-+    return 0;
-+}
-+
- static void spapr_xive_cpu_to_end(PowerPCCPU *cpu, uint8_t prio,
-                                   uint8_t *out_end_blk, uint32_t *out_en=
-d_idx)
- {
-@@ -792,6 +808,16 @@ static target_ulong h_int_set_source_config(PowerPCC=
-PU *cpu,
-         new_eas.w =3D xive_set_field64(EAS_END_DATA, new_eas.w, eisn);
-     }
-=20
-+    if (kvm_irqchip_in_kernel()) {
-+        Error *local_err =3D NULL;
-+
-+        kvmppc_xive_set_source_config(xive, lisn, &new_eas, &local_err);
-+        if (local_err) {
-+            error_report_err(local_err);
-+            return H_HARDWARE;
-+        }
-+    }
-+
- out:
-     xive->eat[lisn] =3D new_eas;
-     return H_SUCCESS;
-@@ -1103,6 +1129,16 @@ static target_ulong h_int_set_queue_config(PowerPC=
-CPU *cpu,
-      */
-=20
- out:
-+    if (kvm_irqchip_in_kernel()) {
-+        Error *local_err =3D NULL;
-+
-+        kvmppc_xive_set_queue_config(xive, end_blk, end_idx, &end, &loca=
-l_err);
-+        if (local_err) {
-+            error_report_err(local_err);
-+            return H_HARDWARE;
-+        }
-+    }
-+
-     /* Update END */
-     memcpy(&xive->endt[end_idx], &end, sizeof(XiveEND));
-     return H_SUCCESS;
-@@ -1194,6 +1230,16 @@ static target_ulong h_int_get_queue_config(PowerPC=
-CPU *cpu,
-         args[2] =3D 0;
-     }
-=20
-+    if (kvm_irqchip_in_kernel()) {
-+        Error *local_err =3D NULL;
-+
-+        kvmppc_xive_get_queue_config(xive, end_blk, end_idx, end, &local=
-_err);
-+        if (local_err) {
-+            error_report_err(local_err);
-+            return H_HARDWARE;
-+        }
-+    }
-+
-     /* TODO: do we need any locking on the END ? */
-     if (flags & SPAPR_XIVE_END_DEBUG) {
-         /* Load the event queue generation number into the return flags =
-*/
-@@ -1346,15 +1392,20 @@ static target_ulong h_int_esb(PowerPCCPU *cpu,
-         return H_P3;
-     }
-=20
--    mmio_addr =3D xive->vc_base + xive_source_esb_mgmt(xsrc, lisn) + off=
-set;
-+    if (kvm_irqchip_in_kernel()) {
-+        args[0] =3D kvmppc_xive_esb_rw(xsrc, lisn, offset, data,
-+                                     flags & SPAPR_XIVE_ESB_STORE);
-+    } else {
-+        mmio_addr =3D xive->vc_base + xive_source_esb_mgmt(xsrc, lisn) +=
- offset;
-=20
--    if (dma_memory_rw(&address_space_memory, mmio_addr, &data, 8,
--                      (flags & SPAPR_XIVE_ESB_STORE))) {
--        qemu_log_mask(LOG_GUEST_ERROR, "XIVE: failed to access ESB @0x%"
--                      HWADDR_PRIx "\n", mmio_addr);
--        return H_HARDWARE;
-+        if (dma_memory_rw(&address_space_memory, mmio_addr, &data, 8,
-+                          (flags & SPAPR_XIVE_ESB_STORE))) {
-+            qemu_log_mask(LOG_GUEST_ERROR, "XIVE: failed to access ESB @=
-0x%"
-+                          HWADDR_PRIx "\n", mmio_addr);
-+            return H_HARDWARE;
-+        }
-+        args[0] =3D (flags & SPAPR_XIVE_ESB_STORE) ? -1 : data;
-     }
--    args[0] =3D (flags & SPAPR_XIVE_ESB_STORE) ? -1 : data;
-     return H_SUCCESS;
- }
-=20
-@@ -1411,7 +1462,20 @@ static target_ulong h_int_sync(PowerPCCPU *cpu,
-      * This is not needed when running the emulation under QEMU
-      */
-=20
--    /* This is not real hardware. Nothing to be done */
-+    /*
-+     * This is not real hardware. Nothing to be done unless when
-+     * under KVM
-+     */
-+
-+    if (kvm_irqchip_in_kernel()) {
-+        Error *local_err =3D NULL;
-+
-+        kvmppc_xive_sync_source(xive, lisn, &local_err);
-+        if (local_err) {
-+            error_report_err(local_err);
-+            return H_HARDWARE;
-+        }
-+    }
-     return H_SUCCESS;
- }
-=20
-@@ -1446,6 +1510,16 @@ static target_ulong h_int_reset(PowerPCCPU *cpu,
-     }
-=20
-     device_reset(DEVICE(xive));
-+
-+    if (kvm_irqchip_in_kernel()) {
-+        Error *local_err =3D NULL;
-+
-+        kvmppc_xive_reset(xive, &local_err);
-+        if (local_err) {
-+            error_report_err(local_err);
-+            return H_HARDWARE;
-+        }
-+    }
-     return H_SUCCESS;
- }
-=20
-diff --git a/hw/intc/spapr_xive_kvm.c b/hw/intc/spapr_xive_kvm.c
-index 7d9e771e8a..964bad0c23 100644
---- a/hw/intc/spapr_xive_kvm.c
-+++ b/hw/intc/spapr_xive_kvm.c
-@@ -89,6 +89,50 @@ void kvmppc_xive_cpu_connect(XiveTCTX *tctx, Error **e=
-rrp)
-  * XIVE Interrupt Source (KVM)
-  */
-=20
-+void kvmppc_xive_set_source_config(SpaprXive *xive, uint32_t lisn, XiveE=
-AS *eas,
-+                                   Error **errp)
-+{
-+    uint32_t end_idx;
-+    uint32_t end_blk;
-+    uint8_t priority;
-+    uint32_t server;
-+    bool masked;
-+    uint32_t eisn;
-+    uint64_t kvm_src;
-+    Error *local_err =3D NULL;
-+
-+    assert(xive_eas_is_valid(eas));
-+
-+    end_idx =3D xive_get_field64(EAS_END_INDEX, eas->w);
-+    end_blk =3D xive_get_field64(EAS_END_BLOCK, eas->w);
-+    eisn =3D xive_get_field64(EAS_END_DATA, eas->w);
-+    masked =3D xive_eas_is_masked(eas);
-+
-+    spapr_xive_end_to_target(end_blk, end_idx, &server, &priority);
-+
-+    kvm_src =3D priority << KVM_XIVE_SOURCE_PRIORITY_SHIFT &
-+        KVM_XIVE_SOURCE_PRIORITY_MASK;
-+    kvm_src |=3D server << KVM_XIVE_SOURCE_SERVER_SHIFT &
-+        KVM_XIVE_SOURCE_SERVER_MASK;
-+    kvm_src |=3D ((uint64_t) masked << KVM_XIVE_SOURCE_MASKED_SHIFT) &
-+        KVM_XIVE_SOURCE_MASKED_MASK;
-+    kvm_src |=3D ((uint64_t)eisn << KVM_XIVE_SOURCE_EISN_SHIFT) &
-+        KVM_XIVE_SOURCE_EISN_MASK;
-+
-+    kvm_device_access(xive->fd, KVM_DEV_XIVE_GRP_SOURCE_CONFIG, lisn,
-+                      &kvm_src, true, &local_err);
-+    if (local_err) {
-+        error_propagate(errp, local_err);
-+        return;
-+    }
-+}
-+
-+void kvmppc_xive_sync_source(SpaprXive *xive, uint32_t lisn, Error **err=
-p)
-+{
-+    kvm_device_access(xive->fd, KVM_DEV_XIVE_GRP_SOURCE_SYNC, lisn,
-+                      NULL, true, errp);
-+}
-+
- /*
-  * At reset, the interrupt sources are simply created and MASKED. We
-  * only need to inform the KVM XIVE device about their type: LSI or
-@@ -125,6 +169,64 @@ void kvmppc_xive_source_reset(XiveSource *xsrc, Erro=
-r **errp)
-     }
- }
-=20
+ config ACPI_VMGENID
+     bool
+     default y
+diff --git a/hw/acpi/Makefile.objs b/hw/acpi/Makefile.objs
+index 2d46e3789a..661a9b8c2f 100644
+--- a/hw/acpi/Makefile.objs
++++ b/hw/acpi/Makefile.objs
+@@ -11,6 +11,7 @@ common-obj-$(call lnot,$(CONFIG_ACPI_X86)) += acpi-stub.o
+ common-obj-y += acpi_interface.o
+ common-obj-y += bios-linker-loader.o
+ common-obj-y += aml-build.o
++common-obj-$(CONFIG_ACPI_PCI) += pci.o
+ common-obj-$(CONFIG_TPM) += tpm.o
+ 
+ common-obj-$(CONFIG_IPMI) += ipmi.o
+diff --git a/hw/acpi/pci.c b/hw/acpi/pci.c
+new file mode 100644
+index 0000000000..fa0fa30bb9
+--- /dev/null
++++ b/hw/acpi/pci.c
+@@ -0,0 +1,46 @@
 +/*
-+ * This is used to perform the magic loads on the ESB pages, described
-+ * in xive.h.
++ * Support for generating PCI related ACPI tables and passing them to Guests
 + *
-+ * Memory barriers should not be needed for loads (no store for now).
++ * Copyright (C) 2006 Fabrice Bellard
++ * Copyright (C) 2008-2010  Kevin O'Connor <kevin@koconnor.net>
++ * Copyright (C) 2013-2019 Red Hat Inc
++ * Copyright (C) 2019 Intel Corporation
++ *
++ * Author: Wei Yang <richardw.yang@linux.intel.com>
++ * Author: Michael S. Tsirkin <mst@redhat.com>
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++
++ * You should have received a copy of the GNU General Public License along
++ * with this program; if not, see <http://www.gnu.org/licenses/>.
 + */
-+static uint64_t xive_esb_rw(XiveSource *xsrc, int srcno, uint32_t offset=
-,
-+                            uint64_t data, bool write)
-+{
-+    uint64_t *addr =3D xsrc->esb_mmap + xive_source_esb_mgmt(xsrc, srcno=
-) +
-+        offset;
 +
-+    if (write) {
-+        *addr =3D cpu_to_be64(data);
-+        return -1;
-+    } else {
-+        /* Prevent the compiler from optimizing away the load */
-+        volatile uint64_t value =3D be64_to_cpu(*addr);
-+        return value;
-+    }
++#include "qemu/osdep.h"
++#include "hw/acpi/aml-build.h"
++#include "hw/acpi/pci.h"
++#include "hw/pci/pcie_host.h"
++
++void build_mcfg(GArray *table_data, BIOSLinker *linker, AcpiMcfgInfo *info)
++{
++    AcpiTableMcfg *mcfg;
++    int len = sizeof(*mcfg) + sizeof(mcfg->allocation[0]);
++
++    mcfg = acpi_data_push(table_data, len);
++    mcfg->allocation[0].address = cpu_to_le64(info->base);
++
++    /* Only a single allocation so no need to play with segments */
++    mcfg->allocation[0].pci_segment = cpu_to_le16(0);
++    mcfg->allocation[0].start_bus_number = 0;
++    mcfg->allocation[0].end_bus_number = PCIE_MMCFG_BUS(info->size - 1);
++
++    build_header(linker, table_data, (void *)mcfg, "MCFG", len, 1, NULL, NULL);
 +}
 +
-+static uint8_t xive_esb_read(XiveSource *xsrc, int srcno, uint32_t offse=
-t)
-+{
-+    return xive_esb_rw(xsrc, srcno, offset, 0, 0) & 0x3;
-+}
-+
-+static void xive_esb_trigger(XiveSource *xsrc, int srcno)
-+{
-+    uint64_t *addr =3D xsrc->esb_mmap + xive_source_esb_page(xsrc, srcno=
-);
-+
-+    *addr =3D 0x0;
-+}
-+
-+uint64_t kvmppc_xive_esb_rw(XiveSource *xsrc, int srcno, uint32_t offset=
-,
-+                            uint64_t data, bool write)
-+{
-+    if (write) {
-+        return xive_esb_rw(xsrc, srcno, offset, data, 1);
-+    }
-+
-+    /*
-+     * Special Load EOI handling for LSI sources. Q bit is never set
-+     * and the interrupt should be re-triggered if the level is still
-+     * asserted.
-+     */
-+    if (xive_source_irq_is_lsi(xsrc, srcno) &&
-+        offset =3D=3D XIVE_ESB_LOAD_EOI) {
-+        xive_esb_read(xsrc, srcno, XIVE_ESB_SET_PQ_00);
-+        if (xsrc->status[srcno] & XIVE_STATUS_ASSERTED) {
-+            xive_esb_trigger(xsrc, srcno);
-+        }
-+        return 0;
-+    } else {
-+        return xive_esb_rw(xsrc, srcno, offset, 0, 0);
-+    }
-+}
-+
- void kvmppc_xive_source_set_irq(void *opaque, int srcno, int val)
- {
-     XiveSource *xsrc =3D opaque;
-@@ -155,6 +257,101 @@ void kvmppc_xive_source_set_irq(void *opaque, int s=
-rcno, int val)
+diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
+index af8cffde9c..9aced9d54d 100644
+--- a/hw/arm/Kconfig
++++ b/hw/arm/Kconfig
+@@ -19,6 +19,7 @@ config ARM_VIRT
+     select PLATFORM_BUS
+     select SMBIOS
+     select VIRTIO_MMIO
++    select ACPI_PCI
+ 
+ config CHEETAH
+     bool
+diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+index e7c96d658e..4a64f9985c 100644
+--- a/hw/arm/virt-acpi-build.c
++++ b/hw/arm/virt-acpi-build.c
+@@ -546,23 +546,6 @@ build_srat(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
+                  "SRAT", table_data->len - srat_start, 3, NULL, NULL);
+ }
+ 
+-static void
+-build_mcfg(GArray *table_data, BIOSLinker *linker, AcpiMcfgInfo *info)
+-{
+-    AcpiTableMcfg *mcfg;
+-    int len = sizeof(*mcfg) + sizeof(mcfg->allocation[0]);
+-
+-    mcfg = acpi_data_push(table_data, len);
+-    mcfg->allocation[0].address = cpu_to_le64(info->base);
+-
+-    /* Only a single allocation so no need to play with segments */
+-    mcfg->allocation[0].pci_segment = cpu_to_le16(0);
+-    mcfg->allocation[0].start_bus_number = 0;
+-    mcfg->allocation[0].end_bus_number = PCIE_MMCFG_BUS(info->size - 1);
+-
+-    build_header(linker, table_data, (void *)mcfg, "MCFG", len, 1, NULL, NULL);
+-}
+-
+ /* GTDT */
+ static void
+ build_gtdt(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
+diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+index 0d78d73894..85dc1640bc 100644
+--- a/hw/i386/acpi-build.c
++++ b/hw/i386/acpi-build.c
+@@ -2405,22 +2405,6 @@ build_srat(GArray *table_data, BIOSLinker *linker, MachineState *machine)
+                  table_data->len - srat_start, 1, NULL, NULL);
+ }
+ 
+-static void
+-build_mcfg_q35(GArray *table_data, BIOSLinker *linker, AcpiMcfgInfo *info)
+-{
+-    AcpiTableMcfg *mcfg;
+-    int len = sizeof(*mcfg) + 1 * sizeof(mcfg->allocation[0]);
+-
+-    mcfg = acpi_data_push(table_data, len);
+-    mcfg->allocation[0].address = cpu_to_le64(info->base);
+-    /* Only a single allocation so no need to play with segments */
+-    mcfg->allocation[0].pci_segment = cpu_to_le16(0);
+-    mcfg->allocation[0].start_bus_number = 0;
+-    mcfg->allocation[0].end_bus_number = PCIE_MMCFG_BUS(info->size - 1);
+-
+-    build_header(linker, table_data, (void *)mcfg, "MCFG", len, 1, NULL, NULL);
+-}
+-
  /*
-  * sPAPR XIVE interrupt controller (KVM)
-  */
-+void kvmppc_xive_get_queue_config(SpaprXive *xive, uint8_t end_blk,
-+                                  uint32_t end_idx, XiveEND *end,
-+                                  Error **errp)
-+{
-+    struct kvm_ppc_xive_eq kvm_eq =3D { 0 };
-+    uint64_t kvm_eq_idx;
-+    uint8_t priority;
-+    uint32_t server;
-+    Error *local_err =3D NULL;
-+
-+    assert(xive_end_is_valid(end));
-+
-+    /* Encode the tuple (server, prio) as a KVM EQ index */
-+    spapr_xive_end_to_target(end_blk, end_idx, &server, &priority);
-+
-+    kvm_eq_idx =3D priority << KVM_XIVE_EQ_PRIORITY_SHIFT &
-+            KVM_XIVE_EQ_PRIORITY_MASK;
-+    kvm_eq_idx |=3D server << KVM_XIVE_EQ_SERVER_SHIFT &
-+        KVM_XIVE_EQ_SERVER_MASK;
-+
-+    kvm_device_access(xive->fd, KVM_DEV_XIVE_GRP_EQ_CONFIG, kvm_eq_idx,
-+                      &kvm_eq, false, &local_err);
-+    if (local_err) {
-+        error_propagate(errp, local_err);
-+        return;
-+    }
-+
-+    /*
-+     * The EQ index and toggle bit are updated by HW. These are the
-+     * only fields from KVM we want to update QEMU with. The other END
-+     * fields should already be in the QEMU END table.
-+     */
-+    end->w1 =3D xive_set_field32(END_W1_GENERATION, 0ul, kvm_eq.qtoggle)=
- |
-+        xive_set_field32(END_W1_PAGE_OFF, 0ul, kvm_eq.qindex);
-+}
-+
-+void kvmppc_xive_set_queue_config(SpaprXive *xive, uint8_t end_blk,
-+                                  uint32_t end_idx, XiveEND *end,
-+                                  Error **errp)
-+{
-+    struct kvm_ppc_xive_eq kvm_eq =3D { 0 };
-+    uint64_t kvm_eq_idx;
-+    uint8_t priority;
-+    uint32_t server;
-+    Error *local_err =3D NULL;
-+
-+    /*
-+     * Build the KVM state from the local END structure.
-+     */
-+
-+    kvm_eq.flags =3D 0;
-+    if (xive_get_field32(END_W0_UCOND_NOTIFY, end->w0)) {
-+        kvm_eq.flags |=3D KVM_XIVE_EQ_ALWAYS_NOTIFY;
-+    }
-+
-+    /*
-+     * If the hcall is disabling the EQ, set the size and page address
-+     * to zero. When migrating, only valid ENDs are taken into
-+     * account.
-+     */
-+    if (xive_end_is_valid(end)) {
-+        kvm_eq.qshift =3D xive_get_field32(END_W0_QSIZE, end->w0) + 12;
-+        kvm_eq.qaddr  =3D xive_end_qaddr(end);
-+        /*
-+         * The EQ toggle bit and index should only be relevant when
-+         * restoring the EQ state
-+         */
-+        kvm_eq.qtoggle =3D xive_get_field32(END_W1_GENERATION, end->w1);
-+        kvm_eq.qindex  =3D xive_get_field32(END_W1_PAGE_OFF, end->w1);
-+    } else {
-+        kvm_eq.qshift =3D 0;
-+        kvm_eq.qaddr  =3D 0;
-+    }
-+
-+    /* Encode the tuple (server, prio) as a KVM EQ index */
-+    spapr_xive_end_to_target(end_blk, end_idx, &server, &priority);
-+
-+    kvm_eq_idx =3D priority << KVM_XIVE_EQ_PRIORITY_SHIFT &
-+            KVM_XIVE_EQ_PRIORITY_MASK;
-+    kvm_eq_idx |=3D server << KVM_XIVE_EQ_SERVER_SHIFT &
-+        KVM_XIVE_EQ_SERVER_MASK;
-+
-+    kvm_device_access(xive->fd, KVM_DEV_XIVE_GRP_EQ_CONFIG, kvm_eq_idx,
-+                      &kvm_eq, true, &local_err);
-+    if (local_err) {
-+        error_propagate(errp, local_err);
-+        return;
-+    }
-+}
-+
-+void kvmppc_xive_reset(SpaprXive *xive, Error **errp)
-+{
-+    kvm_device_access(xive->fd, KVM_DEV_XIVE_GRP_CTRL, KVM_DEV_XIVE_RESE=
-T,
-+                      NULL, true, errp);
-+}
-=20
- static void *kvmppc_xive_mmap(SpaprXive *xive, int pgoff, size_t len,
-                               Error **errp)
-diff --git a/include/hw/ppc/spapr_xive.h b/include/hw/ppc/spapr_xive.h
-index 0edcc762de..03685910e7 100644
---- a/include/hw/ppc/spapr_xive.h
-+++ b/include/hw/ppc/spapr_xive.h
-@@ -55,9 +55,24 @@ void spapr_xive_set_tctx_os_cam(XiveTCTX *tctx);
- void spapr_xive_mmio_set_enabled(SpaprXive *xive, bool enable);
- void spapr_xive_map_mmio(SpaprXive *xive);
-=20
-+int spapr_xive_end_to_target(uint8_t end_blk, uint32_t end_idx,
-+                             uint32_t *out_server, uint8_t *out_prio);
-+
- /*
-  * KVM XIVE device helpers
-  */
- void kvmppc_xive_connect(SpaprXive *xive, Error **errp);
-+void kvmppc_xive_reset(SpaprXive *xive, Error **errp);
-+void kvmppc_xive_set_source_config(SpaprXive *xive, uint32_t lisn, XiveE=
-AS *eas,
-+                                   Error **errp);
-+void kvmppc_xive_sync_source(SpaprXive *xive, uint32_t lisn, Error **err=
-p);
-+uint64_t kvmppc_xive_esb_rw(XiveSource *xsrc, int srcno, uint32_t offset=
-,
-+                            uint64_t data, bool write);
-+void kvmppc_xive_set_queue_config(SpaprXive *xive, uint8_t end_blk,
-+                                 uint32_t end_idx, XiveEND *end,
-+                                 Error **errp);
-+void kvmppc_xive_get_queue_config(SpaprXive *xive, uint8_t end_blk,
-+                                 uint32_t end_idx, XiveEND *end,
-+                                 Error **errp);
-=20
- #endif /* PPC_SPAPR_XIVE_H */
---=20
-2.21.0
+  * VT-d spec 8.1 DMA Remapping Reporting Structure
+  * (version Oct. 2014 or later)
+@@ -2690,7 +2674,7 @@ void acpi_build(AcpiBuildTables *tables, MachineState *machine)
+     }
+     if (acpi_get_mcfg(&mcfg)) {
+         acpi_add_table(table_offsets, tables_blob);
+-        build_mcfg_q35(tables_blob, tables->linker, &mcfg);
++        build_mcfg(tables_blob, tables->linker, &mcfg);
+     }
+     if (x86_iommu_get_default()) {
+         IommuType IOMMUType = x86_iommu_get_type();
+diff --git a/include/hw/acpi/pci.h b/include/hw/acpi/pci.h
+index 124af7d32a..8bbd32cf45 100644
+--- a/include/hw/acpi/pci.h
++++ b/include/hw/acpi/pci.h
+@@ -30,4 +30,5 @@ typedef struct AcpiMcfgInfo {
+     uint32_t size;
+ } AcpiMcfgInfo;
+ 
++void build_mcfg(GArray *table_data, BIOSLinker *linker, AcpiMcfgInfo *info);
+ #endif
+-- 
+2.19.1
 
 
