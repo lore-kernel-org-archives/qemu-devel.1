@@ -2,109 +2,51 @@ Return-Path: <SRS0=/4tE=TV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 12C08C04AAF
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 08:50:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C519C04AAF
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 08:50:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DC7012173C
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 08:50:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DC7012173C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id ED1CA2173C
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 08:50:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ED1CA2173C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:49053 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:49059 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hT0TY-0006tJ-4f
-	for qemu-devel@archiver.kernel.org; Tue, 21 May 2019 04:50:24 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:49544)
+	id 1hT0Ta-0006vD-7B
+	for qemu-devel@archiver.kernel.org; Tue, 21 May 2019 04:50:26 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:48868)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hT0Rk-0005yt-RF
-	for qemu-devel@nongnu.org; Tue, 21 May 2019 04:48:33 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1hT0Oq-0003dc-UA
+	for qemu-devel@nongnu.org; Tue, 21 May 2019 04:45:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hT0Rj-0005sf-1g
-	for qemu-devel@nongnu.org; Tue, 21 May 2019 04:48:31 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53340)
+	(envelope-from <vsementsov@virtuozzo.com>) id 1hT0Op-0004ID-BX
+	for qemu-devel@nongnu.org; Tue, 21 May 2019 04:45:32 -0400
+Received: from relay.sw.ru ([185.231.240.75]:60604)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1hT0Ri-0005sF-QA
-	for qemu-devel@nongnu.org; Tue, 21 May 2019 04:48:30 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 9E4D5308218D;
-	Tue, 21 May 2019 08:48:29 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-116-22.ams2.redhat.com [10.36.116.22])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id D0301600C6;
-	Tue, 21 May 2019 08:48:22 +0000 (UTC)
-To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
-References: <20190521082010.29756-1-stefanha@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=thuth@redhat.com; keydata=
-	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
-Organization: Red Hat
-Message-ID: <76f165e8-a657-03d1-2b62-77f7d3b2ca26@redhat.com>
-Date: Tue, 21 May 2019 10:48:21 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
-MIME-Version: 1.0
-In-Reply-To: <20190521082010.29756-1-stefanha@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.47]);
-	Tue, 21 May 2019 08:48:29 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH qemu-web] Add a blog post about micro:bit
- emulation
+	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+	id 1hT0Ol-0004AK-Kb; Tue, 21 May 2019 04:45:27 -0400
+Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
+	by relay.sw.ru with esmtp (Exim 4.91)
+	(envelope-from <vsementsov@virtuozzo.com>)
+	id 1hT0Oh-0003ut-IG; Tue, 21 May 2019 11:45:23 +0300
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: qemu-block@nongnu.org,
+	qemu-devel@nongnu.org
+Date: Tue, 21 May 2019 11:45:20 +0300
+Message-Id: <20190521084522.15050-2-vsementsov@virtuozzo.com>
+X-Mailer: git-send-email 2.18.0
+In-Reply-To: <20190521084522.15050-1-vsementsov@virtuozzo.com>
+References: <20190521084522.15050-1-vsementsov@virtuozzo.com>
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
+X-Received-From: 185.231.240.75
+Subject: [Qemu-devel] [RFC PATCH 1/3] block/io: introduce bdrv_co_preadv_part
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -116,30 +58,285 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu.ml@steffen-goertz.de, Paolo Bonzini <pbonzini@redhat.com>,
-	jim@groklearning.com, Julia Suvorova <jusual@mail.ru>, joel@jms.id.au
+Cc: kwolf@redhat.com, fam@euphon.net, vsementsov@virtuozzo.com,
+	mreitz@redhat.com, stefanha@redhat.com, den@openvz.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 21/05/2019 10.20, Stefan Hajnoczi wrote:
-> QEMU 4.0 ships the core micro:bit emulation that was implemented during
-> Outreachy and GSoC 2018.  This blog posts explains how to use it and
-> describes the current status.
-[...]
-> +* Boot, device driver, and language runtime code can be tested
+Introduce extended variant of bdrv_co_preadv with qiov_offset
+parameter, to finally get rid of (most of) local_qiov workarounds.
 
-Nit: "run-time" instead of "runtime" ... at least according to my spell
-checker here.
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+---
+ include/block/block_int.h |  6 +++
+ block/io.c                | 87 ++++++++++++++++++++++++++-------------
+ 2 files changed, 64 insertions(+), 29 deletions(-)
 
-> diff --git a/screenshots/makecode.png b/screenshots/makecode.png
-> new file mode 100644
-> index 0000000..f675768
-> Binary files /dev/null and b/screenshots/makecode.png differ
+diff --git a/include/block/block_int.h b/include/block/block_int.h
+index 94d45c9708..d66929d5ad 100644
+--- a/include/block/block_int.h
++++ b/include/block/block_int.h
+@@ -211,6 +211,9 @@ struct BlockDriver {
+      */
+     int coroutine_fn (*bdrv_co_preadv)(BlockDriverState *bs,
+         uint64_t offset, uint64_t bytes, QEMUIOVector *qiov, int flags);
++    int coroutine_fn (*bdrv_co_preadv_part)(BlockDriverState *bs,
++        uint64_t offset, uint64_t bytes,
++        QEMUIOVector *qiov, size_t qiov_offset, int flags);
+     int coroutine_fn (*bdrv_co_writev)(BlockDriverState *bs,
+         int64_t sector_num, int nb_sectors, QEMUIOVector *qiov, int flags);
+     /**
+@@ -921,6 +924,9 @@ extern BlockDriver bdrv_qcow2;
+ int coroutine_fn bdrv_co_preadv(BdrvChild *child,
+     int64_t offset, unsigned int bytes, QEMUIOVector *qiov,
+     BdrvRequestFlags flags);
++int coroutine_fn bdrv_co_preadv_part(BdrvChild *child,
++    int64_t offset, unsigned int bytes,
++    QEMUIOVector *qiov, size_t qiov_offset, BdrvRequestFlags flags);
+ int coroutine_fn bdrv_co_pwritev(BdrvChild *child,
+     int64_t offset, unsigned int bytes, QEMUIOVector *qiov,
+     BdrvRequestFlags flags);
+diff --git a/block/io.c b/block/io.c
+index 396d5364ba..785a2b07f8 100644
+--- a/block/io.c
++++ b/block/io.c
+@@ -979,11 +979,14 @@ static void bdrv_co_io_em_complete(void *opaque, int ret)
+ 
+ static int coroutine_fn bdrv_driver_preadv(BlockDriverState *bs,
+                                            uint64_t offset, uint64_t bytes,
+-                                           QEMUIOVector *qiov, int flags)
++                                           QEMUIOVector *qiov,
++                                           size_t qiov_offset, int flags)
+ {
+     BlockDriver *drv = bs->drv;
+     int64_t sector_num;
+     unsigned int nb_sectors;
++    QEMUIOVector local_qiov;
++    int ret;
+ 
+     assert(!(flags & ~BDRV_REQ_MASK));
+     assert(!(flags & BDRV_REQ_NO_FALLBACK));
+@@ -992,8 +995,20 @@ static int coroutine_fn bdrv_driver_preadv(BlockDriverState *bs,
+         return -ENOMEDIUM;
+     }
+ 
++    if (drv->bdrv_co_preadv_part) {
++        return drv->bdrv_co_preadv_part(bs, offset, bytes, qiov, qiov_offset,
++                                        flags);
++    }
++
++    if (qiov_offset > 0) {
++        qemu_iovec_init(&local_qiov, qiov->niov);
++        qemu_iovec_concat(&local_qiov, qiov, qiov_offset, bytes);
++        qiov = &local_qiov;
++    }
++
+     if (drv->bdrv_co_preadv) {
+-        return drv->bdrv_co_preadv(bs, offset, bytes, qiov, flags);
++        ret = drv->bdrv_co_preadv(bs, offset, bytes, qiov, flags);
++        goto out;
+     }
+ 
+     if (drv->bdrv_aio_preadv) {
+@@ -1005,10 +1020,12 @@ static int coroutine_fn bdrv_driver_preadv(BlockDriverState *bs,
+         acb = drv->bdrv_aio_preadv(bs, offset, bytes, qiov, flags,
+                                    bdrv_co_io_em_complete, &co);
+         if (acb == NULL) {
+-            return -EIO;
++            ret = -EIO;
++            goto out;
+         } else {
+             qemu_coroutine_yield();
+-            return co.ret;
++            ret = co.ret;
++            goto out;
+         }
+     }
+ 
+@@ -1020,7 +1037,14 @@ static int coroutine_fn bdrv_driver_preadv(BlockDriverState *bs,
+     assert((bytes >> BDRV_SECTOR_BITS) <= BDRV_REQUEST_MAX_SECTORS);
+     assert(drv->bdrv_co_readv);
+ 
+-    return drv->bdrv_co_readv(bs, sector_num, nb_sectors, qiov);
++    ret = drv->bdrv_co_readv(bs, sector_num, nb_sectors, qiov);
++
++out:
++    if (qiov == &local_qiov) {
++        qemu_iovec_destroy(&local_qiov);
++    }
++
++    return ret;
+ }
+ 
+ static int coroutine_fn bdrv_driver_pwritev(BlockDriverState *bs,
+@@ -1103,7 +1127,8 @@ bdrv_driver_pwritev_compressed(BlockDriverState *bs, uint64_t offset,
+ }
+ 
+ static int coroutine_fn bdrv_co_do_copy_on_readv(BdrvChild *child,
+-        int64_t offset, unsigned int bytes, QEMUIOVector *qiov)
++        int64_t offset, unsigned int bytes,
++        QEMUIOVector *qiov, size_t qiov_offset)
+ {
+     BlockDriverState *bs = child->bs;
+ 
+@@ -1183,7 +1208,7 @@ static int coroutine_fn bdrv_co_do_copy_on_readv(BdrvChild *child,
+             qemu_iovec_init_buf(&local_qiov, bounce_buffer, pnum);
+ 
+             ret = bdrv_driver_preadv(bs, cluster_offset, pnum,
+-                                     &local_qiov, 0);
++                                     &local_qiov, 0, 0);
+             if (ret < 0) {
+                 goto err;
+             }
+@@ -1214,15 +1239,15 @@ static int coroutine_fn bdrv_co_do_copy_on_readv(BdrvChild *child,
+                 goto err;
+             }
+ 
+-            qemu_iovec_from_buf(qiov, progress, bounce_buffer + skip_bytes,
++            qemu_iovec_from_buf(qiov, qiov_offset + progress,
++                                bounce_buffer + skip_bytes,
+                                 pnum - skip_bytes);
+         } else {
+             /* Read directly into the destination */
+-            qemu_iovec_init(&local_qiov, qiov->niov);
+-            qemu_iovec_concat(&local_qiov, qiov, progress, pnum - skip_bytes);
+-            ret = bdrv_driver_preadv(bs, offset + progress, local_qiov.size,
+-                                     &local_qiov, 0);
+-            qemu_iovec_destroy(&local_qiov);
++            ret = bdrv_driver_preadv(bs, offset + progress,
++                                     MAX(pnum - skip_bytes,
++                                         qiov->size - qiov_offset - progress),
++                                     qiov, qiov_offset + progress, 0);
+             if (ret < 0) {
+                 goto err;
+             }
+@@ -1247,7 +1272,7 @@ err:
+  */
+ static int coroutine_fn bdrv_aligned_preadv(BdrvChild *child,
+     BdrvTrackedRequest *req, int64_t offset, unsigned int bytes,
+-    int64_t align, QEMUIOVector *qiov, int flags)
++    int64_t align, QEMUIOVector *qiov, size_t qiov_offset, int flags)
+ {
+     BlockDriverState *bs = child->bs;
+     int64_t total_bytes, max_bytes;
+@@ -1258,7 +1283,6 @@ static int coroutine_fn bdrv_aligned_preadv(BdrvChild *child,
+     assert(is_power_of_2(align));
+     assert((offset & (align - 1)) == 0);
+     assert((bytes & (align - 1)) == 0);
+-    assert(!qiov || bytes == qiov->size);
+     assert((bs->open_flags & BDRV_O_NO_IO) == 0);
+     max_transfer = QEMU_ALIGN_DOWN(MIN_NON_ZERO(bs->bl.max_transfer, INT_MAX),
+                                    align);
+@@ -1295,7 +1319,8 @@ static int coroutine_fn bdrv_aligned_preadv(BdrvChild *child,
+         }
+ 
+         if (!ret || pnum != bytes) {
+-            ret = bdrv_co_do_copy_on_readv(child, offset, bytes, qiov);
++            ret = bdrv_co_do_copy_on_readv(child, offset, bytes,
++                                           qiov, qiov_offset);
+             goto out;
+         }
+     }
+@@ -1309,7 +1334,7 @@ static int coroutine_fn bdrv_aligned_preadv(BdrvChild *child,
+ 
+     max_bytes = ROUND_UP(MAX(0, total_bytes - offset), align);
+     if (bytes <= max_bytes && bytes <= max_transfer) {
+-        ret = bdrv_driver_preadv(bs, offset, bytes, qiov, 0);
++        ret = bdrv_driver_preadv(bs, offset, bytes, qiov, qiov_offset, 0);
+         goto out;
+     }
+ 
+@@ -1317,17 +1342,12 @@ static int coroutine_fn bdrv_aligned_preadv(BdrvChild *child,
+         int num;
+ 
+         if (max_bytes) {
+-            QEMUIOVector local_qiov;
+-
+             num = MIN(bytes_remaining, MIN(max_bytes, max_transfer));
+             assert(num);
+-            qemu_iovec_init(&local_qiov, qiov->niov);
+-            qemu_iovec_concat(&local_qiov, qiov, bytes - bytes_remaining, num);
+ 
+             ret = bdrv_driver_preadv(bs, offset + bytes - bytes_remaining,
+-                                     num, &local_qiov, 0);
++                                     num, qiov, bytes - bytes_remaining, 0);
+             max_bytes -= num;
+-            qemu_iovec_destroy(&local_qiov);
+         } else {
+             num = bytes_remaining;
+             ret = qemu_iovec_memset(qiov, bytes - bytes_remaining, 0,
+@@ -1346,8 +1366,9 @@ out:
+ /*
+  * Handle a read request in coroutine context
+  */
+-int coroutine_fn bdrv_co_preadv(BdrvChild *child,
+-    int64_t offset, unsigned int bytes, QEMUIOVector *qiov,
++int coroutine_fn bdrv_co_preadv_part(BdrvChild *child,
++    int64_t offset, unsigned int bytes,
++    QEMUIOVector *qiov, size_t qiov_offset,
+     BdrvRequestFlags flags)
+ {
+     BlockDriverState *bs = child->bs;
+@@ -1407,6 +1428,7 @@ int coroutine_fn bdrv_co_preadv(BdrvChild *child,
+     tracked_request_begin(&req, bs, offset, bytes, BDRV_TRACKED_READ);
+     ret = bdrv_aligned_preadv(child, &req, offset, bytes, align,
+                               use_local_qiov ? &local_qiov : qiov,
++                              use_local_qiov ? 0 : qiov_offset,
+                               flags);
+     tracked_request_end(&req);
+     bdrv_dec_in_flight(bs);
+@@ -1420,6 +1442,13 @@ int coroutine_fn bdrv_co_preadv(BdrvChild *child,
+     return ret;
+ }
+ 
++int coroutine_fn bdrv_co_preadv(BdrvChild *child,
++    int64_t offset, unsigned int bytes, QEMUIOVector *qiov,
++    BdrvRequestFlags flags)
++{
++    return bdrv_co_preadv_part(child, offset, bytes, qiov, 0, flags);
++}
++
+ static int coroutine_fn bdrv_co_do_pwrite_zeroes(BlockDriverState *bs,
+     int64_t offset, int bytes, BdrvRequestFlags flags)
+ {
+@@ -1734,7 +1763,7 @@ static int coroutine_fn bdrv_co_do_zero_pwritev(BdrvChild *child,
+         wait_serialising_requests(req);
+         bdrv_debug_event(bs, BLKDBG_PWRITEV_RMW_HEAD);
+         ret = bdrv_aligned_preadv(child, req, offset & ~(align - 1), align,
+-                                  align, &local_qiov, 0);
++                                  align, &local_qiov, 0, 0);
+         if (ret < 0) {
+             goto fail;
+         }
+@@ -1772,7 +1801,7 @@ static int coroutine_fn bdrv_co_do_zero_pwritev(BdrvChild *child,
+         wait_serialising_requests(req);
+         bdrv_debug_event(bs, BLKDBG_PWRITEV_RMW_TAIL);
+         ret = bdrv_aligned_preadv(child, req, offset, align,
+-                                  align, &local_qiov, 0);
++                                  align, &local_qiov, 0, 0);
+         if (ret < 0) {
+             goto fail;
+         }
+@@ -1839,7 +1868,7 @@ int coroutine_fn bdrv_co_pwritev(BdrvChild *child,
+ 
+         bdrv_debug_event(bs, BLKDBG_PWRITEV_RMW_HEAD);
+         ret = bdrv_aligned_preadv(child, &req, offset & ~(align - 1), align,
+-                                  align, &head_qiov, 0);
++                                  align, &head_qiov, 0, 0);
+         if (ret < 0) {
+             goto fail;
+         }
+@@ -1876,7 +1905,7 @@ int coroutine_fn bdrv_co_pwritev(BdrvChild *child,
+ 
+         bdrv_debug_event(bs, BLKDBG_PWRITEV_RMW_TAIL);
+         ret = bdrv_aligned_preadv(child, &req, (offset + bytes) & ~(align - 1),
+-                                  align, align, &tail_qiov, 0);
++                                  align, align, &tail_qiov, 0, 0);
+         if (ret < 0) {
+             goto fail;
+         }
+-- 
+2.18.0
 
-The PNG is missing - could you please either attach it, or create a
-proper git binary patch for it?
-
- Thanks,
-  Thomas
 
