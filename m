@@ -2,82 +2,65 @@ Return-Path: <SRS0=/4tE=TV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=FROM_EXCESS_BASE64,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 668E9C04AAF
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 14:58:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 97D99C04E87
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 15:01:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 31A302173E
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 14:58:03 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="iUELP4dy"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 31A302173E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 6C89921743
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 15:01:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6C89921743
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:55183 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:55231 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hT6DK-0002FN-F4
-	for qemu-devel@archiver.kernel.org; Tue, 21 May 2019 10:58:02 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:50033)
+	id 1hT6Gz-00038g-7T
+	for qemu-devel@archiver.kernel.org; Tue, 21 May 2019 11:01:49 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:50794)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hT6CC-0001fA-Ik
-	for qemu-devel@nongnu.org; Tue, 21 May 2019 10:56:53 -0400
+	(envelope-from <berrange@redhat.com>) id 1hT6G7-0002lb-TI
+	for qemu-devel@nongnu.org; Tue, 21 May 2019 11:00:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hT6CB-0003DO-4D
-	for qemu-devel@nongnu.org; Tue, 21 May 2019 10:56:52 -0400
-Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:35465)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hT6CA-0003Cw-Va
-	for qemu-devel@nongnu.org; Tue, 21 May 2019 10:56:51 -0400
-Received: by mail-ot1-x344.google.com with SMTP id n14so16621922otk.2
-	for <qemu-devel@nongnu.org>; Tue, 21 May 2019 07:56:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-	:cc; bh=Kle1G+IhkMcIxmQmaSHBb8I19c07Nb4mlkvkHrJKkDc=;
-	b=iUELP4dyULPE0BUF4xPpa0wHFa/U5CEjEGXQuddnMhWPgIYsw75Yyq5Ezaj6kd31Aw
-	fOhCbnmsnYAN+3PDXzb109hNXN+mtOeoz7OSASB/5YtCjvjZA8hwFHwLqbx9gMM4u/GW
-	dyUVIh8wgXSEncc+7SBfQazHLcpuyixYv83K1Wijq8dYeAxlrk2lyjLclZtFvSVGALDp
-	folQmMr7ix/X59UyElveP64T3HoORHkmi45p29wpm++/FdcVMjz1T4ij4HI9EUkf7Qjq
-	AQBw5Yjkiqu4IQDyVVMN23OtXpZTRZ1Bb6xK07tfoN8kJWwT58ponOXMgzKLv3CNHkeO
-	9ZHg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-	:message-id:subject:to:cc;
-	bh=Kle1G+IhkMcIxmQmaSHBb8I19c07Nb4mlkvkHrJKkDc=;
-	b=OiIlSAt3ouN/wsMs1UP6PpaSITrFFzL6x437NmE4LgJETUQUurbSiZu1yIz5xhJycX
-	ZdjrggIp2LrucU4PRxyKunX3bHkeJ9ZSoqkTffGio3NVDyf3yAXADWuOAE393lPwfZcj
-	fI98EVsewrIPDHUev7f4rb4gB7/89qjYp8+RqNW8c59sb6ffwCYyEuz0Ajq2NODXDCi/
-	2jh3vKIuLnBJlKKtL6QyDed8mgOusRSw+mZXLP97N0KFiqheyna7/BPOhwyqM3NUsyoH
-	GHmeDO2LaCp+rx09FnsDeltSCtPb07koyXaLrIhtVzy3pkLj6yvO451pQ8HMtPTWKm/+
-	baqQ==
-X-Gm-Message-State: APjAAAXX4X+FmjrH5NZQt29I4uIa0/C3fHBktqoyE5vKV0YiBIS09Ww2
-	TSukvGWa/1DRf/j96Sz5fbEqFp2eO5C1EUulIiTRTBRxnQQ=
-X-Google-Smtp-Source: APXvYqyW8djSxAX+dLAVdmasyASetLrVwGV1Ah8YZ06dQAnCR/mgdEE0cjUgiW7k4IChIecdRJyuqasca72tHsMiiBs=
-X-Received: by 2002:a05:6830:209a:: with SMTP id
-	y26mr19824889otq.232.1558450610404; 
-	Tue, 21 May 2019 07:56:50 -0700 (PDT)
+	(envelope-from <berrange@redhat.com>) id 1hT6G2-0005ri-If
+	for qemu-devel@nongnu.org; Tue, 21 May 2019 11:00:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49684)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1hT6G0-0005qj-Gy
+	for qemu-devel@nongnu.org; Tue, 21 May 2019 11:00:50 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id BFFEC30B4A5E;
+	Tue, 21 May 2019 15:00:45 +0000 (UTC)
+Received: from redhat.com (ovpn-112-26.ams2.redhat.com [10.36.112.26])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 4417766846;
+	Tue, 21 May 2019 15:00:41 +0000 (UTC)
+Date: Tue, 21 May 2019 16:00:38 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20190521150038.GP25835@redhat.com>
+References: <20190521145318.12787-1-stefanha@redhat.com>
 MIME-Version: 1.0
-References: <20190520231008.20140-1-mst@redhat.com>
-	<CAFEAcA80Q8zWxM4TBVMZHLuOzo0HSpT=4C76uAwdMjLn2Xye=w@mail.gmail.com>
-	<20190521094218-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20190521094218-mutt-send-email-mst@kernel.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 21 May 2019 15:56:39 +0100
-Message-ID: <CAFEAcA-1Y050aYg+TBv-ALCaSAFJdv_YP_eQFZt+2KrkTLDviw@mail.gmail.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::344
-Subject: Re: [Qemu-devel] [PULL v2 00/36] pci, pc, virtio: features, fixes
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20190521145318.12787-1-stefanha@redhat.com>
+User-Agent: Mutt/1.11.4 (2019-03-13)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.49]);
+	Tue, 21 May 2019 15:00:45 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH] build: use $(DESTDIR)x instead of
+ $(DESTDIR)/x
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -89,57 +72,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 21 May 2019 at 14:42, Michael S. Tsirkin <mst@redhat.com> wrote:
->
-> On Tue, May 21, 2019 at 12:49:48PM +0100, Peter Maydell wrote:
-> > On Tue, 21 May 2019 at 00:10, Michael S. Tsirkin <mst@redhat.com> wrote:
-> > >
-> > > The following changes since commit 2259637b95bef3116cc262459271de08e038cc66:
-> > >
-> > >   Merge remote-tracking branch 'remotes/kevin/tags/for-upstream' into staging (2019-05-20 17:22:05 +0100)
-> > >
-> > > are available in the Git repository at:
-> > >
-> > >   git://git.kernel.org/pub/scm/virt/kvm/mst/qemu.git tags/for_upstream
-> > >
-> > > for you to fetch changes up to 0c05ec64c388aea59facbef740651afa78e04f50:
-> > >
-> > >   tests: acpi: print error unable to dump ACPI table during rebuild (2019-05-20 18:40:02 -0400)
-> > >
-> > > ----------------------------------------------------------------
-> > > pci, pc, virtio: features, fixes
-> > >
-> > > reconnect for vhost blk
-> > > tests for UEFI
-> > > misc other stuff
-> > >
-> > > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-> > >
-> > > ----------------------------------------------------------------
-> >
-> > Hi -- this failed 'make check' for 32-bit Arm hosts:
-> >
-> > ERROR:/home/peter.maydell/qemu/tests/acpi-utils.c:145:acpi_find_rsdp_address_uefi:
-> > code should not be reached
-> > Aborted
-> > ERROR - too few tests run (expected 1, got 0)
-> > /home/peter.maydell/qemu/tests/Makefile.include:885: recipe for target
-> > 'check-qtest-aarch64' failed
-> >
-> > thanks
-> > -- PMM
->
-> Dropped ARM and re-pushed.
+On Tue, May 21, 2019 at 03:53:18PM +0100, Stefan Hajnoczi wrote:
+> The GNU make manual[1] demonstrates $(DESTDIR)$(bindir)/foo and QEMU
+> mostly follows that.  There are just a few instances of
+> $(DESTDIR)/$(bindir)/foo.  Fix these inconsistencies.
+>=20
+> [1] https://www.gnu.org/software/make/manual/html_node/DESTDIR.html
+>=20
+> Cc: Daniel P. Berrange <berrange@redhat.com>
+> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> ---
+>  Makefile | 16 ++++++++--------
+>  1 file changed, 8 insertions(+), 8 deletions(-)
+>=20
+> diff --git a/Makefile b/Makefile
+> index 155f066a20..57b786d238 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -840,19 +840,19 @@ ifneq ($(DESCS),)
+>  	done
+>  endif
+>  	for s in $(ICON_SIZES); do \
+> -		mkdir -p "$(DESTDIR)/$(qemu_icondir)/hicolor/$${s}/apps"; \
+> +		mkdir -p "$(DESTDIR)$(qemu_icondir)/hicolor/$${s}/apps"; \
+>  		$(INSTALL_DATA) $(SRC_PATH)/ui/icons/qemu_$${s}.png \
+> -			"$(DESTDIR)/$(qemu_icondir)/hicolor/$${s}/apps/qemu.png"; \
+> +			"$(DESTDIR)$(qemu_icondir)/hicolor/$${s}/apps/qemu.png"; \
+>  	done; \
+> -	mkdir -p "$(DESTDIR)/$(qemu_icondir)/hicolor/32x32/apps"; \
+> +	mkdir -p "$(DESTDIR)$(qemu_icondir)/hicolor/32x32/apps"; \
+>  	$(INSTALL_DATA) $(SRC_PATH)/ui/icons/qemu_32x32.bmp \
+> -		"$(DESTDIR)/$(qemu_icondir)/hicolor/32x32/apps/qemu.bmp"; \
+> -	mkdir -p "$(DESTDIR)/$(qemu_icondir)/hicolor/scalable/apps"; \
+> +		"$(DESTDIR)$(qemu_icondir)/hicolor/32x32/apps/qemu.bmp"; \
+> +	mkdir -p "$(DESTDIR)$(qemu_icondir)/hicolor/scalable/apps"; \
+>  	$(INSTALL_DATA) $(SRC_PATH)/ui/icons/qemu.svg \
+> -		"$(DESTDIR)/$(qemu_icondir)/hicolor/scalable/apps/qemu.svg"
+> -	mkdir -p "$(DESTDIR)/$(qemu_desktopdir)"
+> +		"$(DESTDIR)$(qemu_icondir)/hicolor/scalable/apps/qemu.svg"
+> +	mkdir -p "$(DESTDIR)$(qemu_desktopdir)"
+>  	$(INSTALL_DATA) $(SRC_PATH)/ui/qemu.desktop \
+> -		"$(DESTDIR)/$(qemu_desktopdir)/qemu.desktop"
+> +		"$(DESTDIR)$(qemu_desktopdir)/qemu.desktop"
+>  ifdef CONFIG_GTK
+>  	$(MAKE) -C po $@
+>  endif
 
-Fixed up version applied, thanks.
+Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/4.1
-for any user-visible changes.
 
--- PMM
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
 
