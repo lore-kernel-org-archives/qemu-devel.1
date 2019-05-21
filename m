@@ -3,70 +3,64 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 83330C04AAF
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 16:25:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E801FC04AAF
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 16:34:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 58ABE208C3
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 16:25:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 58ABE208C3
+	by mail.kernel.org (Postfix) with ESMTPS id BFA61208C3
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 16:34:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BFA61208C3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:56608 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:56681 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hT7a4-0000Ri-CC
-	for qemu-devel@archiver.kernel.org; Tue, 21 May 2019 12:25:36 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:42614)
+	id 1hT7iC-0003Qo-Kr
+	for qemu-devel@archiver.kernel.org; Tue, 21 May 2019 12:34:00 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:44419)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pagupta@redhat.com>) id 1hT7ZH-0008T0-8R
-	for qemu-devel@nongnu.org; Tue, 21 May 2019 12:24:48 -0400
+	(envelope-from <cohuck@redhat.com>) id 1hT7hB-000340-TQ
+	for qemu-devel@nongnu.org; Tue, 21 May 2019 12:32:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pagupta@redhat.com>) id 1hT7ZG-0008RC-C9
-	for qemu-devel@nongnu.org; Tue, 21 May 2019 12:24:47 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44404)
+	(envelope-from <cohuck@redhat.com>) id 1hT7hA-0008Tf-QS
+	for qemu-devel@nongnu.org; Tue, 21 May 2019 12:32:57 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43624)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pagupta@redhat.com>) id 1hT7ZG-0008OY-4R
-	for qemu-devel@nongnu.org; Tue, 21 May 2019 12:24:46 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>)
+	id 1hT7hA-0008SV-HL; Tue, 21 May 2019 12:32:56 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 4368830833AF;
-	Tue, 21 May 2019 16:24:29 +0000 (UTC)
-Received: from colo-mx.corp.redhat.com
-	(colo-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.21])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 1465F4387;
-	Tue, 21 May 2019 16:24:24 +0000 (UTC)
-Received: from zmail21.collab.prod.int.phx2.redhat.com
-	(zmail21.collab.prod.int.phx2.redhat.com [10.5.83.24])
-	by colo-mx.corp.redhat.com (Postfix) with ESMTP id C3F6A5B423;
-	Tue, 21 May 2019 16:24:14 +0000 (UTC)
-Date: Tue, 21 May 2019 12:24:14 -0400 (EDT)
-From: Pankaj Gupta <pagupta@redhat.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <176786650.30122184.1558455854322.JavaMail.zimbra@redhat.com>
-In-Reply-To: <20190521094543-mutt-send-email-mst@kernel.org>
-References: <20190521133713.31653-1-pagupta@redhat.com>
-	<20190521133713.31653-3-pagupta@redhat.com>
-	<20190521094543-mutt-send-email-mst@kernel.org>
+	by mx1.redhat.com (Postfix) with ESMTPS id F36B581F0F;
+	Tue, 21 May 2019 16:32:46 +0000 (UTC)
+Received: from gondolin (ovpn-204-120.brq.redhat.com [10.40.204.120])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id B05D8600CC;
+	Tue, 21 May 2019 16:32:39 +0000 (UTC)
+Date: Tue, 21 May 2019 18:32:35 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+To: Eric Farman <farman@linux.ibm.com>
+Message-ID: <20190521183235.7c3d0b37.cohuck@redhat.com>
+In-Reply-To: <f2c65517-f6d8-41a4-3f8a-88a530cdcd41@linux.ibm.com>
+References: <20190507154733.28604-1-cohuck@redhat.com>
+	<20190507154733.28604-3-cohuck@redhat.com>
+	<f2c65517-f6d8-41a4-3f8a-88a530cdcd41@linux.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.67.116.105, 10.4.195.14]
-Thread-Topic: virtio-pmem: Add virtio pmem driver
-Thread-Index: 3AiQ7PJb9jLe5p+DRlEZBNdQ18HFYA==
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.44]);
-	Tue, 21 May 2019 16:24:39 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.27]);
+	Tue, 21 May 2019 16:32:52 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v10 2/7] virtio-pmem: Add virtio pmem driver
+Subject: Re: [Qemu-devel] [PATCH v4 2/2] vfio-ccw: support async command
+ subregion
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -78,94 +72,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: rdunlap@infradead.org, jack@suse.cz, kvm@vger.kernel.org, david@redhat.com,
-	jasowang@redhat.com, david@fromorbit.com, qemu-devel@nongnu.org,
-	virtualization@lists.linux-foundation.org, dm-devel@redhat.com,
-	adilger kernel <adilger.kernel@dilger.ca>, zwisler@kernel.org,
-	aarcange@redhat.com, dave jiang <dave.jiang@intel.com>,
-	jstaron@google.com, linux-nvdimm@lists.01.org,
-	vishal l verma <vishal.l.verma@intel.com>, willy@infradead.org,
-	hch@infradead.org, linux-acpi@vger.kernel.org, jmoyer@redhat.com,
-	linux-ext4@vger.kernel.org, lenb@kernel.org, kilobyte@angband.pl,
-	riel@surriel.com, yuval shaia <yuval.shaia@oracle.com>,
-	stefanha@redhat.com, imammedo@redhat.com,
-	dan j williams <dan.j.williams@intel.com>,
-	lcapitulino@redhat.com, kwolf@redhat.com, nilal@redhat.com,
-	tytso@mit.edu, xiaoguangrong eric <xiaoguangrong.eric@gmail.com>,
-	snitzer@redhat.com, cohuck@redhat.com, rjw@rjwysocki.net,
-	linux-kernel@vger.kernel.org, linux-xfs@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org, pbonzini@redhat.com,
-	darrick wong <darrick.wong@oracle.com>
+Cc: Pierre Morel <pmorel@linux.ibm.com>, Farhan Ali <alifm@linux.ibm.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	qemu-devel@nongnu.org, Halil Pasic <pasic@linux.ibm.com>,
+	qemu-s390x@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Mon, 20 May 2019 12:29:56 -0400
+Eric Farman <farman@linux.ibm.com> wrote:
 
-> > diff --git a/include/uapi/linux/virtio_pmem.h
-> > b/include/uapi/linux/virtio_pmem.h
-> > new file mode 100644
-> > index 000000000000..7a3e2fe52415
-> > --- /dev/null
-> > +++ b/include/uapi/linux/virtio_pmem.h
-> > @@ -0,0 +1,35 @@
-> > +/* SPDX-License-Identifier: GPL-2.0 OR BSD-3-Clause */
-> > +/*
-> > + * Definitions for virtio-pmem devices.
-> > + *
-> > + * Copyright (C) 2019 Red Hat, Inc.
-> > + *
-> > + * Author(s): Pankaj Gupta <pagupta@redhat.com>
-> > + */
-> > +
-> > +#ifndef _UAPI_LINUX_VIRTIO_PMEM_H
-> > +#define _UAPI_LINUX_VIRTIO_PMEM_H
-> > +
-> > +#include <linux/types.h>
-> > +#include <linux/virtio_types.h>
-> > +#include <linux/virtio_ids.h>
-> > +#include <linux/virtio_config.h>
-> > +
-> > +struct virtio_pmem_config {
-> > +	__le64 start;
-> > +	__le64 size;
-> > +};
-> > +
-> 
-> config generally should be __u64.
-> Are you sure sparse does not complain?
+> On 5/7/19 11:47 AM, Cornelia Huck wrote:
+> > A vfio-ccw device may provide an async command subregion for
+> > issuing halt/clear subchannel requests. If it is present, use
+> > it for sending halt/clear request to the device; if not, fall
+> > back to emulation (as done today).
+> > 
+> > Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+> > ---
+> >  hw/s390x/css.c              |  27 +++++++--
+> >  hw/vfio/ccw.c               | 110 +++++++++++++++++++++++++++++++++++-
+> >  include/hw/s390x/s390-ccw.h |   3 +
+> >  3 files changed, 134 insertions(+), 6 deletions(-)
+> > 
 
-I used this because VIRTIO 1.1 spec says: 
-"The device configuration space uses the little-endian format for multi-byte fields. "
-
-and __le64 looks ok to me. Also, its used in other driver config as welle.g virtio-vsock
-
-> 
-> 
-> > +#define VIRTIO_PMEM_REQ_TYPE_FLUSH      0
+> > +int vfio_ccw_handle_clear(SubchDev *sch)
+> > +{
+> > +    S390CCWDevice *cdev = sch->driver_data;
+> > +    VFIOCCWDevice *vcdev = DO_UPCAST(VFIOCCWDevice, cdev, cdev);
+> > +    struct ccw_cmd_region *region = vcdev->async_cmd_region;
+> > +    int ret;
 > > +
-> > +struct virtio_pmem_resp {
-> > +	/* Host return status corresponding to flush request */
-> > +	__virtio32 ret;
-> > +};
+> > +    if (!vcdev->async_cmd_region) {
+> > +        /* Async command region not available, fall back to emulation */
+> > +        return -ENOSYS;
+> > +    }
 > > +
-> > +struct virtio_pmem_req {
-> > +	/* command type */
-> > +	__virtio32 type;
-> > +};
-> > +
-> > +#endif
-> > --
-> > 2.20.1
+> > +    memset(region, 0, sizeof(*region));
+> > +    region->command = VFIO_CCW_ASYNC_CMD_CSCH;  
 > 
-> Sorry why are these __virtio32 not __le32?
+> Considering the serialization you added on the kernel side, what happens
+> if another vcpu runs this code (or _halt) and clears the async region
+> before the kernel code gains control from the pwrite() call below?
+> Asked another way, there's nothing preventing us from issuing more than
+> one asynchronous command concurrently, so how do we make sure the
+> command gets to the kernel rather than "current command wins"  ?
 
-I used __virtio32 for data fields for guest and host supporting different endianess.
- 
-Thanks,
-Pankaj
+This send me digging through the code, because if two threads can call
+this at the same time for passthrough, we'd also have the same problem
+for virtual.
+
+If I followed the code correctly, all I/O instruction interpretation is
+currently serialized via qemu_mutex_{lock,unlock}_iothread() (see
+target/s390x/kvm.c respectively target/s390x/misc_helper.c). This
+should mostly be enough to avoid stepping on each other's toes.
+
+Why mostly? I'm not sure yet whether we handling multiple requests for
+passthrough devices correctly yet (virtual should be fine.)
+
+Start vs. (start|halt|clear) is fine, as the code checks whether
+something is already pending before poking the kernel interface.
+Likewise, halt vs. (start|halt|clear) is fine, as the code checks for
+halt or clear and start and halt use different regions. The problematic
+one is clear, as that's something that's always supposed to go through.
+Probably fine if clear should always "win", but I need to think some
+more about that.
+
 > 
-> --
-> MST
+> That possibly worrisome question aside, this seems generally fine.
 > 
 > 
+> > +
+> > +again:
+> > +    ret = pwrite(vcdev->vdev.fd, region,
+> > +                 vcdev->async_cmd_region_size, vcdev->async_cmd_region_offset);
+> > +    if (ret != vcdev->async_cmd_region_size) {
+> > +        if (errno == EAGAIN) {
+> > +            goto again;
+> > +        }
+> > +        error_report("vfio-ccw: write cmd region failed with errno=%d", errno);
+> > +        ret = -errno;
+> > +    } else {
+> > +        ret = region->ret_code;
+> > +    }
+> > +    switch (ret) {
+> > +    case 0:
+> > +    case -ENODEV:
+> > +    case -EACCES:
+> > +        return 0;
+> > +    case -EFAULT:
+> > +    default:
+> > +        sch_gen_unit_exception(sch);
+> > +        css_inject_io_interrupt(sch);
+> > +        return 0;
+> > +    }
+> > +}
 
