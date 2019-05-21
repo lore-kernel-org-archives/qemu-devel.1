@@ -2,73 +2,95 @@ Return-Path: <SRS0=/4tE=TV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D320C04AAF
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 14:37:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D2A0C04AAF
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 14:40:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F3CE82173E
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 14:37:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F3CE82173E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=twiddle.net
+	by mail.kernel.org (Postfix) with ESMTPS id 66CBB2173E
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 14:40:08 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="sqXpH/mU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 66CBB2173E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:54912 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:54924 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hT5th-0001KD-7u
-	for qemu-devel@archiver.kernel.org; Tue, 21 May 2019 10:37:45 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:45499)
+	id 1hT5vz-0001xt-Oe
+	for qemu-devel@archiver.kernel.org; Tue, 21 May 2019 10:40:07 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:46162)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hT5s3-0000CO-BZ
-	for qemu-devel@nongnu.org; Tue, 21 May 2019 10:36:04 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hT5vA-0001h3-Ts
+	for qemu-devel@nongnu.org; Tue, 21 May 2019 10:39:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hT5s1-000481-Nm
-	for qemu-devel@nongnu.org; Tue, 21 May 2019 10:36:03 -0400
-Received: from indium.canonical.com ([91.189.90.7]:57424)
+	(envelope-from <richard.henderson@linaro.org>) id 1hT5vA-0005vj-3W
+	for qemu-devel@nongnu.org; Tue, 21 May 2019 10:39:16 -0400
+Received: from mail-yw1-xc42.google.com ([2607:f8b0:4864:20::c42]:38763)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hT5s1-00047Y-IQ
-	for qemu-devel@nongnu.org; Tue, 21 May 2019 10:36:01 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hT5rz-0003LE-K4
-	for <qemu-devel@nongnu.org>; Tue, 21 May 2019 14:35:59 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 96DCD2E80C7
-	for <qemu-devel@nongnu.org>; Tue, 21 May 2019 14:35:59 +0000 (UTC)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1hT5v9-0005v0-Up
+	for qemu-devel@nongnu.org; Tue, 21 May 2019 10:39:16 -0400
+Received: by mail-yw1-xc42.google.com with SMTP id b74so7389185ywe.5
+	for <qemu-devel@nongnu.org>; Tue, 21 May 2019 07:39:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=subject:to:references:from:openpgp:message-id:date:user-agent
+	:mime-version:in-reply-to:content-language:content-transfer-encoding;
+	bh=j5Rah+6Q75wopDyu7ozt7odh9sY2HzdrLAVaV59VWPo=;
+	b=sqXpH/mU7slhIdl/mIQHEqg7BT9eNaOhr0fvTVcWqZQaBORByAGp5m9YkYqpWnFFzz
+	+1g7RBne9RceVpR8JZTgEF6AQbCv1Q9vNPau7NBl7BAfgvCEaXtdsjOxkOmIrSKr9ImV
+	kcqVKoBgfTtxTlqHRH8PvFXvK5hZWTR9AunekxkIC61L2hAzeuoOoZmY4ruzJgI3Jh2u
+	GYm/gC33H6izru+33tp9fs8Ym5x4XlUv3SaRQdjnryCEZFth+7Uld5HmkRqrusuzoQDy
+	BTYGPFz26Uxa0nLyuPlFQTf1hPUo0+ETxHzt9OfvYcPhX6zaA8cz1Gr84RksLcaY4cEv
+	xyAA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:subject:to:references:from:openpgp:message-id
+	:date:user-agent:mime-version:in-reply-to:content-language
+	:content-transfer-encoding;
+	bh=j5Rah+6Q75wopDyu7ozt7odh9sY2HzdrLAVaV59VWPo=;
+	b=FRtQFxwEEu5ulCaNtqDLMmLmfQMdTojVz13TGjVcDVe8ey1aWIgXVdCf8WQT8eiDWA
+	bMiAxZssjdGcpvF1Vt8Bcy+9cbVgSbazRBsEF4BQHgQ0KqgS7JUwZ3JSgknMjwCVZuAq
+	tRZVnw9eYcz3At3ceH65Io2UNxOC71WCY96INzUGHTCXmxbWW/6NJyQYDL1hV9WgvF63
+	8oVuch2bIOzUTDvzYuaSipYnUauzXEbG9sE8YVxpV1rSim/jQ/tIQZ88Y9FdYeT6OcGC
+	ArrK3Uz/a2N35GyBgAH5hmiLltXp88fQaP3dAihmMishDAGi0mWVC2mem8sJokAluGFB
+	SxqQ==
+X-Gm-Message-State: APjAAAVWaHiNsRE5FwH5FKlOkUK8dftROghjVvke8UoeGfQ3R+ElW8I+
+	UsN0xQiVMfme6vF5UGTX2EXcnTxFfFw=
+X-Google-Smtp-Source: APXvYqz0PN7TvwqeDJy3ABJkyH4R/VoBtbG1tfIhfDGBva86wyB8KP3IFv1JW6CVT+jywjQCsSUOew==
+X-Received: by 2002:a0d:cc17:: with SMTP id o23mr39389620ywd.29.1558449554578; 
+	Tue, 21 May 2019 07:39:14 -0700 (PDT)
+Received: from [10.240.180.184] ([71.46.56.58])
+	by smtp.gmail.com with ESMTPSA id
+	u73sm5011702ywf.62.2019.05.21.07.39.13
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Tue, 21 May 2019 07:39:13 -0700 (PDT)
+To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+	qemu-devel@nongnu.org
+References: <20190521093227.4661-1-berrange@redhat.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Openpgp: preference=signencrypt
+Message-ID: <10d9f115-337e-f14e-c79a-93d98d72248b@linaro.org>
+Date: Tue, 21 May 2019 10:39:12 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 21 May 2019 14:24:38 -0000
-From: Richard Henderson <rth@twiddle.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Fix Committed; importance=Undecided;
-	assignee=rth@twiddle.net; 
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: bruno-clisp rth stefanrin th-huth
-X-Launchpad-Bug-Reporter: Bruno Haible (bruno-clisp)
-X-Launchpad-Bug-Modifier: Richard Henderson (rth)
-References: <149893001258.15852.11258418521313176097.malonedeb@wampee.canonical.com>
-Message-Id: <155844867851.21087.17245901897431348417.malone@chaenomeles.canonical.com>
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="18962";
-	Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: d9b6fe6dadbdc139cbc1305bc8589fd09008145f
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1701835] Re: floating-point operation bugs in
- qemu-alpha
+In-Reply-To: <20190521093227.4661-1-berrange@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::c42
+Subject: Re: [Qemu-devel] [PATCH] authz: optimize linking of objects for
+ authorization services
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -77,221 +99,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1701835 <1701835@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Patch now merged to master and will be in QEMU 4.1.
+On 5/21/19 5:32 AM, Daniel P. Berrangé wrote:
+> The core authorization API is a dependancy of the crypto code for the
+> TLS servers. The TLS server code is pulled into anything which links
+> to the crypto objects, which is every QEMU tool. This in turns means
+> that every tool ended up linking to the authz code, which in turn
+> pulls in the PAM library dep.
+> 
+> This splits the authz code so that everything links to the base object
+> which defines the API. Only the system emulators and qemu-nbd link to
+> the object classes providing the implementations of the authz object
+> API. This has the effect of removing the PAM library dep from qemu-img,
+> qemu-io and other helper tools.
+> 
+> Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+> ---
+>  Makefile            | 5 +++--
+>  Makefile.objs       | 1 +
+>  Makefile.target     | 3 ++-
+>  authz/Makefile.objs | 9 +++++----
+>  4 files changed, 11 insertions(+), 7 deletions(-)
 
-** Changed in: qemu
-       Status: In Progress =3D> Fix Committed
+No changes to tests/?  Surely that means some tests no longer link?
 
--- =
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1701835
-
-Title:
-  floating-point operation bugs in qemu-alpha
-
-Status in QEMU:
-  Fix Committed
-
-Bug description:
-  When running the gnulib testsuite, I'm seeing test failures in the tests =
-for libm functions
-    cbrt
-    cbrtf
-    ceil
-    ceilf
-    coshf
-    exp2
-    exp2f
-    floor
-    floorf
-    fma
-    fmaf
-    fmal
-    frexp
-    frexpf
-    hypot
-    hypotf
-    hypotl
-    ilogb
-    ilogbf
-    isfinite
-    isinf
-    isnan
-    isnand
-    isnanf
-    ldexp
-    ldexpf
-    ldexpl
-    log1p
-    log1pf
-    log2
-    log2f
-    logb
-    logbf
-    logbl
-    rint
-    rintf
-    rintl
-    signbit
-    sqrt
-    sqrtf
-    strtod
-  that I don't see when running the same (statically linked) executables in=
- a VM, through qemu-system-alpha.
-
-  How to reproduce:
-  - Using gnulib, run ./gnulib-tool --create-testdir --dir=3D../testdir-mat=
-h --single-configure cbrt cbrtf ceil ceilf coshf exp2 exp2f float floor flo=
-orf fma fmaf fmal frexp frexpf hypot hypotf hypotl ilogb ilogbf isfinite is=
-inf isnan isnand isnanf ldexp ldexpf ldexpl log1p log1pf log2 log2f logb lo=
-gbf logbl math printf-frexp rint rintf rintl round roundf signbit sqrt sqrt=
-f strtod trunc truncf
-  - Copy the resulting directory to a VM running Linux 2.6.26 with qemu-sys=
-tem-alpha.
-  - There, configure and build the package:
-    mkdir build-native-static; cd build-native-static; ../configure CPPFLAG=
-S=3D"-Wall" LDFLAGS=3D"-static"; make; make check
-    Only 4 tests fail.
-  - Copy the resulting binaries back to the original x86_64 machine.
-  - Set environment variables for using qemu-alpha.
-  - Here, 50 tests fail that did not fail originally:
-
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-cbrt
-  ../../gltests/test-cbrt.h:39: assertion 'err > - L_(4.0) * L_(16.0) / TWO=
-_MANT_DIG && err < L_(4.0) * L_(16.0) / TWO_MANT_DIG' failed
-  Aborted (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-ceil1
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-ceil2
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-ceilf1
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-ceilf2
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-coshf =
-
-  ../../gltests/test-coshf.c:37: assertion 'y >=3D 1.1854652f && y <=3D 1.1=
-854653f' failed
-  Aborted (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-float
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-floor1
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-floor2
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-floorf1
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-floorf2
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-fma1   =
-
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-fma2
-  ../../gltests/test-fma2.h:116: assertion 'result =3D=3D expected' failed
-  Aborted (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-fmaf1
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-fmaf2
-  ../../gltests/test-fma2.h:116: assertion 'result =3D=3D expected' failed
-  Aborted (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-fmal2
-  ../../gltests/test-fma2.h:116: assertion 'result =3D=3D expected' failed
-  Aborted (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-frexp
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-frexpf
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-hypot =
-
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-hypotf
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-hypotl
-  ../../gltests/test-hypot.h:41: assertion 'z =3D=3D HUGEVAL' failed
-  Aborted (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-ilogb =
-
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-ilogbf
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-isfinite
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-isinf   =
-
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-isnan
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-isnand-nolibm
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-isnand       =
-
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-isnanf-nolibm
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-isnanf       =
-
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-ldexp =
-
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-ldexpf
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-ldexpl
-  ../../gltests/test-ldexp.h:99: assertion 'y =3D=3D expected' failed
-  Aborted (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-log1p =
-
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-log1pf
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-log2  =
-
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-log2f
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-logb =
-
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-logbf
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-math =
-
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-printf-frexp
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-rint        =
-
-  ../../gltests/test-rint.c:63: assertion 'rint (0.7) =3D=3D 1.0' failed
-  Aborted (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-rintf
-  ../../gltests/test-rintf.c:63: assertion 'rintf (0.7f) =3D=3D 1.0f' failed
-  Aborted (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-rintl
-  ../../gltests/test-rintl.c:68: assertion 'rintl (0.7L) =3D=3D 1.0L' failed
-  Aborted (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-round1
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-roundf1
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-signbit
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-sqrt   =
-
-  ../../gltests/test-sqrt.h:40: assertion 'err > - L_(16.0) / TWO_MANT_DIG =
-&& err < L_(16.0) / TWO_MANT_DIG' failed
-  Aborted (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-trunc1
-  Floating point exception (core dumped)
-  $ ~/inst-qemu/2.9.0/bin/qemu-alpha test-truncf1
-  Floating point exception (core dumped)
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1701835/+subscriptions
+r~
 
