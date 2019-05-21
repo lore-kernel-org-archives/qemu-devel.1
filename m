@@ -2,81 +2,68 @@ Return-Path: <SRS0=/4tE=TV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C07C2C04AAF
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 14:26:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 76BC6C04AAF
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 14:26:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8E5AE21773
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 14:26:31 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Qp+Q+scM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8E5AE21773
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 4C10621773
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 14:26:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4C10621773
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:54734 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:54616 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hT5io-0004hG-Tg
-	for qemu-devel@archiver.kernel.org; Tue, 21 May 2019 10:26:30 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:43110)
+	id 1hT5bo-0001Bt-2F
+	for qemu-devel@archiver.kernel.org; Tue, 21 May 2019 10:19:16 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:41205)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hT5hs-00047h-Qi
-	for qemu-devel@nongnu.org; Tue, 21 May 2019 10:25:33 -0400
+	(envelope-from <armbru@redhat.com>) id 1hT5aF-0000Qb-Iw
+	for qemu-devel@nongnu.org; Tue, 21 May 2019 10:17:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hT5hr-0003dZ-Kt
-	for qemu-devel@nongnu.org; Tue, 21 May 2019 10:25:32 -0400
-Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:45066)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hT5hr-0003ci-BU
-	for qemu-devel@nongnu.org; Tue, 21 May 2019 10:25:31 -0400
-Received: by mail-oi1-x243.google.com with SMTP id w144so12893232oie.12
-	for <qemu-devel@nongnu.org>; Tue, 21 May 2019 07:25:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=mime-version:references:in-reply-to:from:date:message-id:subject:to; 
-	bh=b8hMg6Mf31pTr8e2qazKiIGVX2fefsXToDRaN2vaHcA=;
-	b=Qp+Q+scMuNBTWnOXtlLGWMX3ZhQYML8IQyIvRVFzS+Z75e2feI49VGmMhBNjcT6M1S
-	h2lt37r660Sj8cHivKhgkhLhgHD3slldn85jmbHqomgOGY28+BExXsGY1zqHzwpWJ5TR
-	sOSXPOjJwc27Ol+8oVuqOD/IiRBNI9dgI2yh7iKMRAO5FgYA+vBN0ZwaCW3CEnAtw9du
-	tuOork1S1wdA3cBkcRgkEL2Grh2PbsTmP+TDsStq9gLFDUgnq4n52QQDRJc+PZO9Ppm6
-	5QIO9YOXt4UF4VxB7FNF3wNzf22z/aZtDHPuwqHGuqhNXDwCywnf/FRDqr1X2L8LxgA/
-	rgZQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-	:message-id:subject:to;
-	bh=b8hMg6Mf31pTr8e2qazKiIGVX2fefsXToDRaN2vaHcA=;
-	b=uLcvntiNMTNBrJF0Uzausv00+94KVkdW7KATkL6bOoQmKXYnPjS02cq8Rhmem7KXur
-	hsPRWcprPgAU9yo/7u2i0NEboHScW2TJ3kfJ1gDWbp/sgO9mbkXDgwOKcV2nhM4cZxmK
-	MNwOEa8Sd5nHvHeGmwUmtMidHmf2H+dfc1iDKExIEmv/iAlpyjc2CRUebBYVto31PSwY
-	if5VOu+JG8C9mH59phyH6yAr6XMmigPN9oal42sg0SRzwNaSd24LCIu60xG7hLvp0tWc
-	9tZ+ZMeXjbV4fCES0im5DiydWYyEsA+vO8BlZuBuB1sSCNAmrJcdKhfQQEEn1IQ2GGI7
-	lMFw==
-X-Gm-Message-State: APjAAAV8beI5EQC/vQupFnokKPfBCMWQ8xtWqQ0oP/ojPMmbJ62uiTIR
-	i/Fi3JaYEg2kvnigUJPebU1ZSEDvEKoCI79qJpzDKA==
-X-Google-Smtp-Source: APXvYqwoczvRGHUlmS1rrzkBznC1wpOVMXzAG7/s6Izf1iIbFi6YJnKiOl4SVzdiY0ly/fW8KroVHD0ZDDUR35xSrM8=
-X-Received: by 2002:aca:b1c1:: with SMTP id a184mr3682643oif.98.1558448730586; 
-	Tue, 21 May 2019 07:25:30 -0700 (PDT)
+	(envelope-from <armbru@redhat.com>) id 1hT5aB-0003D6-Pk
+	for qemu-devel@nongnu.org; Tue, 21 May 2019 10:17:37 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48552)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hT5a9-0002pT-Tw
+	for qemu-devel@nongnu.org; Tue, 21 May 2019 10:17:34 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+	[10.5.11.22])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id D96D88830A;
+	Tue, 21 May 2019 14:17:21 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-28.ams2.redhat.com
+	[10.36.116.28])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 0F9371001F5B;
+	Tue, 21 May 2019 14:17:15 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+	id 854301138648; Tue, 21 May 2019 16:17:13 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+References: <20190409161009.6322-1-marcandre.lureau@redhat.com>
+Date: Tue, 21 May 2019 16:17:13 +0200
+In-Reply-To: <20190409161009.6322-1-marcandre.lureau@redhat.com>
+	(=?utf-8?Q?=22Marc-Andr=C3=A9?=
+	Lureau"'s message of "Tue, 9 Apr 2019 18:09:49 +0200")
+Message-ID: <87sgt7sxhy.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1 (gnu/linux)
 MIME-Version: 1.0
-References: <20190520162809.2677-1-peter.maydell@linaro.org>
-	<20190520162809.2677-2-peter.maydell@linaro.org>
-In-Reply-To: <20190520162809.2677-2-peter.maydell@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 21 May 2019 15:25:19 +0100
-Message-ID: <CAFEAcA-pZEgQ8z61gxxJW=-Oc8O_Eg9Q5vwa=1iU4e11LSePAg@mail.gmail.com>
-To: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::243
-Subject: Re: [Qemu-devel] [PATCH 1/4] hw/intc/arm_gicv3: Fix decoding of ID
- register range
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.28]);
+	Tue, 21 May 2019 14:17:21 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v4 00/20] monitor: add asynchronous command
+ type
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -88,52 +75,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Kevin Wolf <kwolf@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>,
+	qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+	Gerd Hoffmann <kraxel@redhat.com>, John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 20 May 2019 at 17:28, Peter Maydell <peter.maydell@linaro.org> wrote:
->
-> The GIC ID registers cover an area 0x30 bytes in size
-> (12 registers, 4 bytes each). We were incorrectly decoding
-> only the first 0x20 bytes.
->
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
->  hw/intc/arm_gicv3_dist.c   | 2 +-
->  hw/intc/arm_gicv3_redist.c | 2 +-
->  2 files changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/hw/intc/arm_gicv3_dist.c b/hw/intc/arm_gicv3_dist.c
-> index 53c55c57291..335386ff3ac 100644
-> --- a/hw/intc/arm_gicv3_dist.c
-> +++ b/hw/intc/arm_gicv3_dist.c
-> @@ -533,7 +533,7 @@ static MemTxResult gicd_readl(GICv3State *s, hwaddr offset,
->          }
->          return MEMTX_OK;
->      }
-> -    case GICD_IDREGS ... GICD_IDREGS + 0x1f:
-> +    case GICD_IDREGS ... GICD_IDREGS + 0x2f:
->          /* ID registers */
->          *data = gicv3_idreg(offset - GICD_IDREGS);
->          return MEMTX_OK;
-> diff --git a/hw/intc/arm_gicv3_redist.c b/hw/intc/arm_gicv3_redist.c
-> index 3b0ba6de1ab..9bb11423382 100644
-> --- a/hw/intc/arm_gicv3_redist.c
-> +++ b/hw/intc/arm_gicv3_redist.c
-> @@ -233,7 +233,7 @@ static MemTxResult gicr_readl(GICv3CPUState *cs, hwaddr offset,
->          }
->          *data = cs->gicr_nsacr;
->          return MEMTX_OK;
-> -    case GICR_IDREGS ... GICR_IDREGS + 0x1f:
-> +    case GICR_IDREGS ... GICR_IDREGS + 0x2f:
->          *data = gicv3_idreg(offset - GICR_IDREGS);
->          return MEMTX_OK;
->      default:
+Marc-Andr=C3=A9, before you invest your time to answer my questions below: =
+my
+bandwidth for non-trivial QAPI features like this one is painfully
+limited.  To get your QAPI conditionals in, I had to postpone other QAPI
+projects.  I don't regret doing that, I'm rather pleased with how QAPI
+conditionals turned out.  But I can't keep postponing all other QAPI
+projects.  Because of that, this one will be slow going, at best.  Sorry
+about that.
 
-Just noticed that I forgot to also update the case statements
-in the *writel functions :-(
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
 
-thanks
--- PMM
+> Hi,
+>
+> HMP and QMP commands are handled synchronously in qemu today. But
+> there are benefits allowing the command handler to re-enter the main
+> loop if the command cannot be handled synchronously, or if it is
+> long-lasting. Some bugs such as rhbz#1230527 are difficult to solve
+> without it.
+>
+> The common solution is to use a pair of command+event in this case.
+
+In particular, background jobs (qapi/jobs.json).  They grew out of block
+jobs, and are still used only for "blocky" things.  Using them more
+widely would probably make sense.
+
+> But this approach has a number of issues:
+> - you can't "fix" an existing command: you need a new API, and ad-hoc
+>   documentation for that command+signal association, and old/broken
+>   command deprecation
+
+Making a synchronous command asynchronous is an incompatible change.  We
+need to let the client needs opt in.  How is that done in this series?
+
+> - since the reply event is broadcasted and 'id' is used for matching the
+>   request, it may conflict with other clients request 'id' space
+
+Any event that does that now is broken and needs to be fixed.  The
+obvious fix is to include a monitor ID with the command ID.  For events
+that can only ever be useful in the context of one particular monitor,
+we could unicast to that monitor instead; see below.
+
+Corollary: this is just a fixable bug, not a fundamental advantage of
+the async feature.
+
+> - it is arguably less efficient and elegant (weird API, useless return
+>   in most cases, broadcast reply, no cancelling on disconnect etc)
+
+The return value is useful for synchronously reporting failure to start
+the background task.  I grant you that background tasks may exist that
+won't ever fail to start.  I challenge the idea that it's most of them.
+
+Broadcast reply could be avoided by unicasting events.  If I remember
+correctly, Peter Xu even posted patches some time ago.  We ended up not
+using them, because we found a better solution for the problem at hand.
+My point is: this isn't a fundamental problem, it's just the way we
+coded things up.
+
+What do you mean by "no cancelling on disconnect"?
+
+I'm ignoring "etc" unless you expand it into something specific.
+
+I'm also not taking the "weird" bait :)
+
+> The following series implements an async command solution instead. By
+> introducing a session context and a command return handler, it can:
+> - defer the return, allowing the mainloop to reenter
+> - return only to the caller (instead of broadcast events for reply)
+> - optionnally allow cancellation when the client is gone
+> - track on-going qapi command(s) per client/session
+>
+> and without introduction of new QMP APIs or client visible change.
+
+What do async commands provide that jobs lack?
+
+Why do we want both?
+
+I started to write a feature-by-feature comparison, but realized I don't
+have the time to figure out either jobs or async from their (rather
+sparse) documentation, let alone from code.
+
+> Existing qemu commands can be gradually replaced by async:true
+> variants when needed, while carefully reviewing the concurrency
+> aspects. The async:true commands marshaller helpers are splitted in
+> half, the calling and return functions. The command is called with a
+> QmpReturn context, that can return immediately or later, using the
+> generated return helper, which allows for a step-by-step conversion.
+>
+> The screendump command is converted to an async:true version to solve
+> rhbz#1230527. The command shows basic cancellation (this could be
+> extended if needed). It could be further improved to do asynchronous
+> IO writes as well.
+
+What is "basic cancellation"?
+
+What extension(s) do you have in mind?
+
+What's the impact of screendump writing synchronously?
 
