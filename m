@@ -2,79 +2,73 @@ Return-Path: <SRS0=/4tE=TV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.0 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 10416C04E87
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 20:19:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D2D2C072B5
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 20:26:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DCB1E2183F
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 20:18:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DCB1E2183F
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id 7111F2173E
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 20:26:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7111F2173E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:58970 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:59090 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hTBDv-0003hu-2H
-	for qemu-devel@archiver.kernel.org; Tue, 21 May 2019 16:18:59 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:58503)
+	id 1hTBLd-0007SK-Ec
+	for qemu-devel@archiver.kernel.org; Tue, 21 May 2019 16:26:57 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:60492)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hTBBl-0002Sq-31
-	for qemu-devel@nongnu.org; Tue, 21 May 2019 16:16:46 -0400
+	(envelope-from <bounces@canonical.com>) id 1hTBKZ-0006am-3g
+	for qemu-devel@nongnu.org; Tue, 21 May 2019 16:25:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hTBBh-00033c-57
-	for qemu-devel@nongnu.org; Tue, 21 May 2019 16:16:45 -0400
-Received: from mout.kundenserver.de ([217.72.192.75]:35327)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1hTBBg-00030d-SP
-	for qemu-devel@nongnu.org; Tue, 21 May 2019 16:16:41 -0400
-Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
-	(mreue106 [213.165.67.119]) with ESMTPSA (Nemesis) id
-	1MvrVJ-1gcAuu3FRP-00suNA; Tue, 21 May 2019 22:16:07 +0200
-To: =?UTF-8?Q?Daniel_P._Berrang=c3=a9?= <berrange@redhat.com>,
-	Laurent Vivier <lvivier@redhat.com>
-References: <1557953433-19663-1-git-send-email-pbonzini@redhat.com>
-	<1557953433-19663-19-git-send-email-pbonzini@redhat.com>
-	<20190521115259.GK25835@redhat.com>
-	<f0d7e267-5f21-927a-ee38-2330fde5a419@redhat.com>
-	<20190521125408.GL25835@redhat.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <9d0def85-3e5c-71ca-0e25-e07fbc7d90c2@vivier.eu>
-Date: Tue, 21 May 2019 22:16:06 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
-	Thunderbird/52.8.0
+	(envelope-from <bounces@canonical.com>) id 1hTBKW-0004R9-N7
+	for qemu-devel@nongnu.org; Tue, 21 May 2019 16:25:50 -0400
+Received: from indium.canonical.com ([91.189.90.7]:57422)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1hTBKV-0004PY-N4
+	for qemu-devel@nongnu.org; Tue, 21 May 2019 16:25:48 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1hTBKS-0005sR-C1
+	for <qemu-devel@nongnu.org>; Tue, 21 May 2019 20:25:44 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 58B842E80CC
+	for <qemu-devel@nongnu.org>; Tue, 21 May 2019 20:25:44 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20190521125408.GL25835@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:bAMY4SBMqxyPylYSTBroRXIqgVOytJ5bxQArdEWtlYHJHMUv0mG
-	gsV1ZMXXcBHKxECSvgaUCil9+R2BRzUGD74ZhIJEkehf3z09TlvV+Od6ffLJ05ksphr8jh3
-	vTxUTlZfXhPhNTIytnJ+VDlKKwz9IojOOEar1U0PrQMm+9DLrnOFwpZZ+ltepPVhGVGtN4U
-	ID3sXniMDmkMUzzZLpZ1w==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:GQ832xHr7KU=:pceUZi9+yFcE4SdN2qY47j
-	wiAbxHpRgjeU2B4A+VKdZwHSZ+nT2j48HEbJmRvN2CL/qvTYwkIFmRTnx8r9ToR3EimLtDv0i
-	HVJ0t5DrFUquqsWRn6r/WbkCfb4TKPBq7/kaOS3wrFMjdJSUBowHQdgsgFXSu/aqM4QjS9cJ5
-	nllDBGYmM/pY5xQcirR1Vjp2xlnVhIQeLeABkAg7/86DZPSqYYJ4l6gPOzdpeMS3X+AmotsQ7
-	lPecXTn1hYB4ZgwpuLGYu5oAVZrBwa3bUhBZbdGMRmE69XRIp3HWmuPDSJ7rpItLBmBclvkx7
-	U3uFU+tJo3wI8KWhalO2I7pV9hcoxeQ2kZRTUdIHIYqSmVGXbWKuXKJqE8YKEp3nUvW3vpcMW
-	4K6hKaPRL7L+9aSYnN4tLZvpuR6THrrDhRbn9OoYG2ydEJLjhPvtfDx/fWbVsFgFQp0X4THc8
-	lGGWctISinBVAcdCHS7TLZHL5Y8dhAfk7rRrCG1qWMipR2gLL2764IdeQw1R3hPHKz6pyJGd/
-	4kJuG1FFVMLTy+4fYsMP8vZVCFkOxDjksBdDV5YsOIg5GjMdhiEXBq75jiVbuYZLceF51iwmC
-	VrsXiH3cyS+44UQFl3mbMKk1sIzqIK9pbzF26fe6mj4XCoAs2oElvQnW1BeFIcExV1FAIGR2Y
-	FTvwfIEYLo9+6Q5J9vboKhpg12ibQ8ZUoATnGdqpduvQdlJqo6jO8IggMmT5P3pYlsQzGGHcb
-	v1kZks0BE+4aSFxn9ifk6xHDt0KlTTpqknMQ5wKqnhRcVZA7uNOYIpEm004=
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 21 May 2019 20:13:10 -0000
+From: Cleber Rosa <cleber.gnu@gmail.com>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: cleber-gnu
+X-Launchpad-Bug-Reporter: Cleber Rosa (cleber-gnu)
+X-Launchpad-Bug-Modifier: Cleber Rosa (cleber-gnu)
+References: <155837363818.14706.8629235118425908874.malonedeb@gac.canonical.com>
+Message-Id: <155846959097.14626.2372761268748658434.malone@gac.canonical.com>
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="18962";
+	Instance="launchpad-lazr.conf"
+X-Launchpad-Hash: 8c04226898678de5daf1299eb792fe1ec991e5ab
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 217.72.192.75
-Subject: Re: [Qemu-devel] [PULL 18/21] build: don't build hardware objects
- with linux-user
+X-Received-From: 91.189.90.7
+Subject: [Qemu-devel] [Bug 1829779] Re: qemu-system-arm and
+ qemu-system-aarch64 QMP hangs after kernel boots
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -83,69 +77,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Reply-To: Bug 1829779 <1829779@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 21/05/2019 14:54, Daniel P. Berrangé wrote:
-> On Tue, May 21, 2019 at 02:52:42PM +0200, Laurent Vivier wrote:
->> On 21/05/2019 13:52, Daniel P. Berrangé wrote:
->>> On Wed, May 15, 2019 at 10:50:30PM +0200, Paolo Bonzini wrote:
->>>> From: Laurent Vivier <lvivier@redhat.com>
->>>>
->>>> Some objects are only needed for system emulation and tools.
->>>> We can ignore them for the user mode case
->>>>
->>>> Update tests to run accordingly: conditionally build some tests
->>>> on CONFIG_BLOCK.
->>>>
->>>> Some tests use components that are only built when softmmu or
->>>> block tools are enabled, not for linux-user. So, if these components
->>>> are not available, disable the tests.
->>>>
->>>> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
->>>> Message-Id: <20190401141222.30034-6-lvivier@redhat.com>
->>>> ---
->>>>    Makefile               |  4 +++
->>>>    Makefile.objs          | 14 +++++---
->>>>    tests/Makefile.include | 90 +++++++++++++++++++++++++-------------------------
->>>>    3 files changed, 58 insertions(+), 50 deletions(-)
->>>>
->>>> diff --git a/Makefile b/Makefile
->>>> index 1851f8c..155f066 100644
->>>> --- a/Makefile
->>>> +++ b/Makefile
->>>> @@ -87,6 +87,10 @@ endif
->>>>    include $(SRC_PATH)/rules.mak
->>>> +# notempy and lor are defined in rules.mak
->>>> +CONFIG_TOOLS := $(call notempty,$(TOOLS))
->>>> +CONFIG_BLOCK := $(call lor,$(CONFIG_SOFTMMU),$(CONFIG_TOOLS))
->>>
->>> IMHO calling this CONFIG_BLOCK is a really poor choice, as
->>> the decision is completely unrelated to block modules. It
->>> made really confused when trying to understand why all the
->>> crypto or auth code had been made conditional on the block
->>> drivers.  The block code is just one part of QEMU that
->>> is used in tools & softmmu.
->>>
->>> It would be better as CONFIG_SOFTMMU_TOOLS, or
->>> CONFIG_NOT_USER, or something else.
->>
->> Do you think it's worth a patch to change the name?
-> 
-> Personally I'd like to see a patch to give it a better name.
+I have an update on this.  Eric and myself attempted to zero in the
+exact cause.  A few things we discovered:
 
-I'm wondering which name to use.
+ 1) It has nothing to do with having a kernel running
+ 2) It has to do with having a chardev that is a server socket.  This
+    test produces command line arguments such as:
 
-CONFIG_NOT_USER is not correct because the flag can be 'y' with 
-CONFIG_USER_ONLY set.
-CONFIG_SOFTMMU_TOOLS is too fuzzy.
+   -chardev socket,id=3Dconsole,path=3D<path>.sock,server,nowait \
+   -serial chardev:console
 
-CONFIG_HW ?
-CONFIG_IO ?
-CONFIG_DEVICE ?
+ 3) It doesn't seem to have a connection to the test infrastructure code
+    (python/qemu/qmp/*), as a I made a number of experiments which
+    yielded no differences in behavior.
 
-Thanks,
-Laurent
+So, the reproducer given at:
+
+https://github.com/clebergnu/qemu/commit/c778e28c24030c4a36548b714293b319f4=
+bf18df
+
+Continues to be be valid (and continues to be limited to arm and aarch64).
+Now, after a number of experiments, the following was found to be a 100%
+reproducible *workaround*:
+
+https://github.com/clebergnu/qemu/commit/e1713f3b91972ad57c089f276c54db3f3f=
+a63423
+
+That basically shutdowns the *console* socket before proceeding with furthe=
+r QMP
+interaction.  The effectiveness of the workaround can be seen here:
+
+ aarch64 command line:
+  - https://travis-ci.org/clebergnu/qemu/jobs/535459499#L3633
+ aarch64 QMP interaction:
+  - https://travis-ci.org/clebergnu/qemu/jobs/535459499#L3663
+
+ arm command line:
+  - https://travis-ci.org/clebergnu/qemu/jobs/535459499#L3747
+ arm QMP interaction:
+  - https://travis-ci.org/clebergnu/qemu/jobs/535459499#L3767
+
+I hope this provides a few more hints into the real issue.
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1829779
+
+Title:
+  qemu-system-arm and qemu-system-aarch64 QMP hangs after kernel boots
+
+Status in QEMU:
+  New
+
+Bug description:
+  After booting a Linux kernel on both arm and aarch64, the QMP sockets get=
+s unresponsive. Initially, this was thought to be limited to "quit" command=
+s, but it reproduced with others (such as in this
+  reproducer).  This is a partial log output:
+
+  =C2=A0=C2=A0=C2=A0>>> {'execute': 'qmp_capabilities'}
+  =C2=A0=C2=A0=C2=A0<<< {'return': {}}
+  =C2=A0=C2=A0=C2=A0Booting Linux on physical CPU 0x0000000000 [0x410fd034]
+  =C2=A0=C2=A0=C2=A0Linux version 4.18.16-300.fc29.aarch64 (mockbuild@build=
+vm-aarch64-02.arm.fedoraproject.org) (gcc version 8.2.1 20180801 (Red Hat 8=
+.2.1-2) (GCC)) #1 SMP Sat Oct 20 23:12:22 UTC 2018
+  =C2=A0=C2=A0=C2=A0...
+  =C2=A0=C2=A0=C2=A0Policy zone: DMA32
+  =C2=A0=C2=A0=C2=A0Kernel command line: printk.time=3D0 console=3DttyAMA0
+  =C2=A0=C2=A0=C2=A0>>> {'execute': 'stop'}
+  =C2=A0=C2=A0=C2=A0<<< {'timestamp': {'seconds': 1558370331, 'microseconds=
+': 470173}, 'event': 'STOP'}
+  =C2=A0=C2=A0=C2=A0<<< {'return': {}}
+  =C2=A0=C2=A0=C2=A0>>> {'execute': 'cont'}
+  =C2=A0=C2=A0=C2=A0<<< {'timestamp': {'seconds': 1558370331, 'microseconds=
+': 470849}, 'event': 'RESUME'}
+  =C2=A0=C2=A0=C2=A0<<< {'return': {}}
+  =C2=A0=C2=A0=C2=A0>>> {'execute': 'stop'}
+
+  Sometimes it takes just the first "stop" command.  Overall, I was able
+  to reproduce 100% of times when applied on top of
+  6d8e75d41c58892ccc5d4ad61c4da476684c1c83.
+
+  The reproducer test can be seen/fetched at:
+  =C2=A0- https://github.com/clebergnu/qemu/commit/c778e28c24030c4a36548b71=
+4293b319f4bf18df
+
+  And test results from Travis CI can be seen at:
+  =C2=A0- https://travis-ci.org/clebergnu/qemu/jobs/534915669
+
+  For convenience purposes, here's qemu-system-aarch64 launching and hangin=
+g on the first "stop":
+  =C2=A0- https://travis-ci.org/clebergnu/qemu/jobs/534915669#L3634
+  =C2=A0- https://travis-ci.org/clebergnu/qemu/jobs/534915669#L3664
+
+  And here's qemu-system-arm hanging the very same way:
+  =C2=A0- https://travis-ci.org/clebergnu/qemu/jobs/534915669#L3799
+  =C2=A0- https://travis-ci.org/clebergnu/qemu/jobs/534915669#L3819
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1829779/+subscriptions
 
