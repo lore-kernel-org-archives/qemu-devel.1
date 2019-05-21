@@ -2,63 +2,59 @@ Return-Path: <SRS0=/4tE=TV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B744C04AAF
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 06:57:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C206C04AAF
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 06:57:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3EF8020863
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 06:57:17 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="GI/7nM1l"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3EF8020863
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	by mail.kernel.org (Postfix) with ESMTPS id 3488420863
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 06:57:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3488420863
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:47755 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:47759 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hSyi4-0005Ys-Et
-	for qemu-devel@archiver.kernel.org; Tue, 21 May 2019 02:57:16 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:49471)
+	id 1hSyiB-0005fi-D4
+	for qemu-devel@archiver.kernel.org; Tue, 21 May 2019 02:57:23 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:49232)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1hSyI3-0006dI-5h
-	for qemu-devel@nongnu.org; Tue, 21 May 2019 02:30:24 -0400
+	(envelope-from <richardw.yang@linux.intel.com>) id 1hSyHt-0006QE-SL
+	for qemu-devel@nongnu.org; Tue, 21 May 2019 02:30:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1hSyI2-0000A4-5k
-	for qemu-devel@nongnu.org; Tue, 21 May 2019 02:30:23 -0400
-Received: from ozlabs.org ([2401:3900:2:1::2]:34393)
+	(envelope-from <richardw.yang@linux.intel.com>) id 1hSyHr-0008JO-RV
+	for qemu-devel@nongnu.org; Tue, 21 May 2019 02:30:13 -0400
+Received: from mga09.intel.com ([134.134.136.24]:50783)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
-	id 1hSyI1-00088s-Op; Tue, 21 May 2019 02:30:22 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
-	id 457Qpl0R51z9sPQ; Tue, 21 May 2019 16:29:31 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-	d=gibson.dropbear.id.au; s=201602; t=1558420175;
-	bh=DkXn+bse8wGpz2JktjAb3Ez34ACjE6wQs4QiOTPh7SQ=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=GI/7nM1lRdBFNvqlswHkYXEkvdXwuOwyIMoAPrl5J7qS8jsQ/BVjnLZX9DXn7lg0n
-	esOcS+9xiBv2OhGs84N/rWQGIXszsueZVHl96ttMvLCwnhsjLVQouv5+OmvZ/bk/zP
-	0sx8zT4+X/YyCDJ/MYF567bNiIS3wJ2PHDiDbBBU=
-From: David Gibson <david@gibson.dropbear.id.au>
-To: peter.maydell@linaro.org
-Date: Tue, 21 May 2019 16:29:09 +1000
-Message-Id: <20190521062924.6930-24-david@gibson.dropbear.id.au>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20190521062924.6930-1-david@gibson.dropbear.id.au>
-References: <20190521062924.6930-1-david@gibson.dropbear.id.au>
+	(Exim 4.71) (envelope-from <richardw.yang@linux.intel.com>)
+	id 1hSyHk-0008AJ-A8; Tue, 21 May 2019 02:30:05 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+	by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+	20 May 2019 23:30:03 -0700
+X-ExtLoop1: 1
+Received: from richard.sh.intel.com (HELO localhost) ([10.239.159.54])
+	by orsmga001.jf.intel.com with ESMTP; 20 May 2019 23:30:00 -0700
+From: Wei Yang <richardw.yang@linux.intel.com>
+To: qemu-devel@nongnu.org,
+	qemu-arm@nongnu.org
+Date: Tue, 21 May 2019 14:28:36 +0800
+Message-Id: <20190521062836.6541-3-richardw.yang@linux.intel.com>
+X-Mailer: git-send-email 2.19.1
+In-Reply-To: <20190521062836.6541-1-richardw.yang@linux.intel.com>
+References: <20190521062836.6541-1-richardw.yang@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2401:3900:2:1::2
-Subject: [Qemu-devel] [PULL 23/38] spapr: Fix phb_placement backwards
- compatibility
+X-Received-From: 134.134.136.24
+Subject: [Qemu-devel] [PATCH v6 2/2] acpi: pci: use build_append_foo() API
+ to construct MCFG
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -70,93 +66,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: lvivier@redhat.com, gkurz@kaod.org, qemu-devel@nongnu.org,
-	Greg Kurz <groug@kaod.org>, qemu-ppc@nongnu.org, clg@kaod.org,
-	David Gibson <david@gibson.dropbear.id.au>
+Cc: yang.zhong@intel.com, peter.maydell@linaro.org, thuth@redhat.com,
+	mst@redhat.com, shannon.zhaosl@gmail.com,
+	Wei Yang <richardw.yang@linux.intel.com>, imammedo@redhat.com,
+	philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-When we added support for NVLink2 passthrough devices, we changed the
-phb_placement hook to handle the placement of NVLink2 bridges' specific
-resources.  For compatibility we use a version that doesn't do this
-allocation  for old machine types.
+build_append_foo() API doesn't need explicit endianness conversions
+which eliminates a source of errors and it makes build_mcfg() look like
+declarative definition of MCFG table in ACPI spec, which makes it easy
+to review.
 
-However, because of the delay between when the patch was posted and when
-it was merged, we ended up with that compatibility hook applying for
-machine versions 3.1 and earlier whereas it should apply for 4.0 and
-earlier (since the patch was applied early in the 4.1 tree).
+Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
+Suggested-by: Igor Mammedov <imammedo@redhat.com>
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 
-Fixes: ec132efaa81 "spapr: Support NVIDIA V100 GPU with NVLink2"
-
-Reported-by: Laurent Vivier <lvivier@redhat.com>
-Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
-Reviewed-by: Greg Kurz <groug@kaod.org>
-Reviewed-by: Laurent Vivier <lvivier@redhat.com>
+v3:
+   * add some comment on the Configuration Space base address allocation
+     structure
+v2:
+   * miss the reserved[8] of MCFG in last version, add it back
+   * drop SOBs and make sure bios-tables-test all OK
 ---
- hw/ppc/spapr.c | 28 +++++++++++++++-------------
- 1 file changed, 15 insertions(+), 13 deletions(-)
+ hw/acpi/pci.c               | 39 +++++++++++++++++++++++++------------
+ include/hw/acpi/acpi-defs.h | 18 -----------------
+ 2 files changed, 27 insertions(+), 30 deletions(-)
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index bcae30ad26..39e698e9b0 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -4411,18 +4411,7 @@ DEFINE_SPAPR_MACHINE(4_1, "4.1", true);
- /*
-  * pseries-4.0
-  */
--static void spapr_machine_4_0_class_options(MachineClass *mc)
--{
--    spapr_machine_4_1_class_options(mc);
--    compat_props_add(mc->compat_props, hw_compat_4_0, hw_compat_4_0_len)=
-;
--}
--
--DEFINE_SPAPR_MACHINE(4_0, "4.0", false);
--
--/*
-- * pseries-3.1
-- */
--static void phb_placement_3_1(SpaprMachineState *spapr, uint32_t index,
-+static void phb_placement_4_0(SpaprMachineState *spapr, uint32_t index,
-                               uint64_t *buid, hwaddr *pio,
-                               hwaddr *mmio32, hwaddr *mmio64,
-                               unsigned n_dma, uint32_t *liobns,
-@@ -4434,6 +4423,20 @@ static void phb_placement_3_1(SpaprMachineState *s=
-papr, uint32_t index,
-     *nv2atsd =3D 0;
- }
-=20
-+static void spapr_machine_4_0_class_options(MachineClass *mc)
-+{
-+    SpaprMachineClass *smc =3D SPAPR_MACHINE_CLASS(mc);
-+
-+    spapr_machine_4_1_class_options(mc);
-+    compat_props_add(mc->compat_props, hw_compat_4_0, hw_compat_4_0_len)=
-;
-+    smc->phb_placement =3D phb_placement_4_0;
-+}
-+
-+DEFINE_SPAPR_MACHINE(4_0, "4.0", false);
-+
-+/*
-+ * pseries-3.1
-+ */
- static void spapr_machine_3_1_class_options(MachineClass *mc)
+diff --git a/hw/acpi/pci.c b/hw/acpi/pci.c
+index fa0fa30bb9..9510597a19 100644
+--- a/hw/acpi/pci.c
++++ b/hw/acpi/pci.c
+@@ -30,17 +30,32 @@
+ 
+ void build_mcfg(GArray *table_data, BIOSLinker *linker, AcpiMcfgInfo *info)
  {
-     SpaprMachineClass *smc =3D SPAPR_MACHINE_CLASS(mc);
-@@ -4449,7 +4452,6 @@ static void spapr_machine_3_1_class_options(Machine=
-Class *mc)
-     smc->default_caps.caps[SPAPR_CAP_SBBC] =3D SPAPR_CAP_BROKEN;
-     smc->default_caps.caps[SPAPR_CAP_IBS] =3D SPAPR_CAP_BROKEN;
-     smc->default_caps.caps[SPAPR_CAP_LARGE_DECREMENTER] =3D SPAPR_CAP_OF=
-F;
--    smc->phb_placement =3D phb_placement_3_1;
+-    AcpiTableMcfg *mcfg;
+-    int len = sizeof(*mcfg) + sizeof(mcfg->allocation[0]);
+-
+-    mcfg = acpi_data_push(table_data, len);
+-    mcfg->allocation[0].address = cpu_to_le64(info->base);
+-
+-    /* Only a single allocation so no need to play with segments */
+-    mcfg->allocation[0].pci_segment = cpu_to_le16(0);
+-    mcfg->allocation[0].start_bus_number = 0;
+-    mcfg->allocation[0].end_bus_number = PCIE_MMCFG_BUS(info->size - 1);
+-
+-    build_header(linker, table_data, (void *)mcfg, "MCFG", len, 1, NULL, NULL);
++    int mcfg_start = table_data->len;
++
++    /*
++     * PCI Firmware Specification, Revision 3.0
++     * 4.1.2 MCFG Table Description.
++     */
++    acpi_data_push(table_data, sizeof(AcpiTableHeader));
++    /* Reserved */
++    build_append_int_noprefix(table_data, 0, 8);
++
++    /*
++     * Memory Mapped Enhanced Configuration Space Base Address Allocation
++     * Structure
++     */
++    /* Base address, processor-relative */
++    build_append_int_noprefix(table_data, info->base, 8);
++    /* PCI segment group number */
++    build_append_int_noprefix(table_data, 0, 2);
++    /* Starting PCI Bus number */
++    build_append_int_noprefix(table_data, 0, 1);
++    /* Final PCI Bus number */
++    build_append_int_noprefix(table_data, PCIE_MMCFG_BUS(info->size - 1), 1);
++    /* Reserved */
++    build_append_int_noprefix(table_data, 0, 4);
++
++    build_header(linker, table_data, (void *)(table_data->data + mcfg_start),
++                 "MCFG", table_data->len - mcfg_start, 1, NULL, NULL);
  }
-=20
- DEFINE_SPAPR_MACHINE(3_1, "3.1", false);
---=20
-2.21.0
+ 
+diff --git a/include/hw/acpi/acpi-defs.h b/include/hw/acpi/acpi-defs.h
+index f9aa4bd398..57a3f58b0c 100644
+--- a/include/hw/acpi/acpi-defs.h
++++ b/include/hw/acpi/acpi-defs.h
+@@ -449,24 +449,6 @@ struct AcpiSratProcessorGiccAffinity {
+ 
+ typedef struct AcpiSratProcessorGiccAffinity AcpiSratProcessorGiccAffinity;
+ 
+-/* PCI fw r3.0 MCFG table. */
+-/* Subtable */
+-struct AcpiMcfgAllocation {
+-    uint64_t address;                /* Base address, processor-relative */
+-    uint16_t pci_segment;            /* PCI segment group number */
+-    uint8_t start_bus_number;       /* Starting PCI Bus number */
+-    uint8_t end_bus_number;         /* Final PCI Bus number */
+-    uint32_t reserved;
+-} QEMU_PACKED;
+-typedef struct AcpiMcfgAllocation AcpiMcfgAllocation;
+-
+-struct AcpiTableMcfg {
+-    ACPI_TABLE_HEADER_DEF;
+-    uint8_t reserved[8];
+-    AcpiMcfgAllocation allocation[0];
+-} QEMU_PACKED;
+-typedef struct AcpiTableMcfg AcpiTableMcfg;
+-
+ /*
+  * TCPA Description Table
+  *
+-- 
+2.19.1
 
 
