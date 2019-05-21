@@ -2,64 +2,81 @@ Return-Path: <SRS0=/4tE=TV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CF61AC04AAF
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 14:26:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C07C2C04AAF
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 14:26:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A6ECA21773
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 14:26:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A6ECA21773
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 8E5AE21773
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 14:26:31 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Qp+Q+scM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8E5AE21773
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:54592 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:54734 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hT5Zq-0008Fj-M3
-	for qemu-devel@archiver.kernel.org; Tue, 21 May 2019 10:17:14 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:40596)
+	id 1hT5io-0004hG-Tg
+	for qemu-devel@archiver.kernel.org; Tue, 21 May 2019 10:26:30 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:43110)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1hT5YG-0007Wv-1T
-	for qemu-devel@nongnu.org; Tue, 21 May 2019 10:15:37 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1hT5hs-00047h-Qi
+	for qemu-devel@nongnu.org; Tue, 21 May 2019 10:25:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1hT5YE-0007Vs-2n
-	for qemu-devel@nongnu.org; Tue, 21 May 2019 10:15:35 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34452)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>)
-	id 1hT5Y4-0006tg-Ip; Tue, 21 May 2019 10:15:25 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id F25FC3098557;
-	Tue, 21 May 2019 14:15:14 +0000 (UTC)
-Received: from localhost (unknown [10.43.2.182])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 1974C4387;
-	Tue, 21 May 2019 14:15:08 +0000 (UTC)
-Date: Tue, 21 May 2019 16:15:04 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20190521161504.75ca268c@redhat.com>
-In-Reply-To: <20190520233730-mutt-send-email-mst@kernel.org>
-References: <20190521033249.1960-1-richardw.yang@linux.intel.com>
-	<20190521033249.1960-2-richardw.yang@linux.intel.com>
-	<20190520233730-mutt-send-email-mst@kernel.org>
+	(envelope-from <peter.maydell@linaro.org>) id 1hT5hr-0003dZ-Kt
+	for qemu-devel@nongnu.org; Tue, 21 May 2019 10:25:32 -0400
+Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:45066)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1hT5hr-0003ci-BU
+	for qemu-devel@nongnu.org; Tue, 21 May 2019 10:25:31 -0400
+Received: by mail-oi1-x243.google.com with SMTP id w144so12893232oie.12
+	for <qemu-devel@nongnu.org>; Tue, 21 May 2019 07:25:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=mime-version:references:in-reply-to:from:date:message-id:subject:to; 
+	bh=b8hMg6Mf31pTr8e2qazKiIGVX2fefsXToDRaN2vaHcA=;
+	b=Qp+Q+scMuNBTWnOXtlLGWMX3ZhQYML8IQyIvRVFzS+Z75e2feI49VGmMhBNjcT6M1S
+	h2lt37r660Sj8cHivKhgkhLhgHD3slldn85jmbHqomgOGY28+BExXsGY1zqHzwpWJ5TR
+	sOSXPOjJwc27Ol+8oVuqOD/IiRBNI9dgI2yh7iKMRAO5FgYA+vBN0ZwaCW3CEnAtw9du
+	tuOork1S1wdA3cBkcRgkEL2Grh2PbsTmP+TDsStq9gLFDUgnq4n52QQDRJc+PZO9Ppm6
+	5QIO9YOXt4UF4VxB7FNF3wNzf22z/aZtDHPuwqHGuqhNXDwCywnf/FRDqr1X2L8LxgA/
+	rgZQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+	:message-id:subject:to;
+	bh=b8hMg6Mf31pTr8e2qazKiIGVX2fefsXToDRaN2vaHcA=;
+	b=uLcvntiNMTNBrJF0Uzausv00+94KVkdW7KATkL6bOoQmKXYnPjS02cq8Rhmem7KXur
+	hsPRWcprPgAU9yo/7u2i0NEboHScW2TJ3kfJ1gDWbp/sgO9mbkXDgwOKcV2nhM4cZxmK
+	MNwOEa8Sd5nHvHeGmwUmtMidHmf2H+dfc1iDKExIEmv/iAlpyjc2CRUebBYVto31PSwY
+	if5VOu+JG8C9mH59phyH6yAr6XMmigPN9oal42sg0SRzwNaSd24LCIu60xG7hLvp0tWc
+	9tZ+ZMeXjbV4fCES0im5DiydWYyEsA+vO8BlZuBuB1sSCNAmrJcdKhfQQEEn1IQ2GGI7
+	lMFw==
+X-Gm-Message-State: APjAAAV8beI5EQC/vQupFnokKPfBCMWQ8xtWqQ0oP/ojPMmbJ62uiTIR
+	i/Fi3JaYEg2kvnigUJPebU1ZSEDvEKoCI79qJpzDKA==
+X-Google-Smtp-Source: APXvYqwoczvRGHUlmS1rrzkBznC1wpOVMXzAG7/s6Izf1iIbFi6YJnKiOl4SVzdiY0ly/fW8KroVHD0ZDDUR35xSrM8=
+X-Received: by 2002:aca:b1c1:: with SMTP id a184mr3682643oif.98.1558448730586; 
+	Tue, 21 May 2019 07:25:30 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.49]);
-	Tue, 21 May 2019 14:15:20 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v5 1/2] hw/acpi: Consolidate build_mcfg to
- pci.c
+References: <20190520162809.2677-1-peter.maydell@linaro.org>
+	<20190520162809.2677-2-peter.maydell@linaro.org>
+In-Reply-To: <20190520162809.2677-2-peter.maydell@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 21 May 2019 15:25:19 +0100
+Message-ID: <CAFEAcA-pZEgQ8z61gxxJW=-Oc8O_Eg9Q5vwa=1iU4e11LSePAg@mail.gmail.com>
+To: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::243
+Subject: Re: [Qemu-devel] [PATCH 1/4] hw/intc/arm_gicv3: Fix decoding of ID
+ register range
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -71,40 +88,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: yang.zhong@intel.com, peter.maydell@linaro.org, thuth@redhat.com,
-	qemu-devel@nongnu.org, shannon.zhaosl@gmail.com,
-	qemu-arm@nongnu.org, Wei Yang <richardw.yang@linux.intel.com>,
-	philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 20 May 2019 23:37:46 -0400
-"Michael S. Tsirkin" <mst@redhat.com> wrote:
+On Mon, 20 May 2019 at 17:28, Peter Maydell <peter.maydell@linaro.org> wrote:
+>
+> The GIC ID registers cover an area 0x30 bytes in size
+> (12 registers, 4 bytes each). We were incorrectly decoding
+> only the first 0x20 bytes.
+>
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+>  hw/intc/arm_gicv3_dist.c   | 2 +-
+>  hw/intc/arm_gicv3_redist.c | 2 +-
+>  2 files changed, 2 insertions(+), 2 deletions(-)
+>
+> diff --git a/hw/intc/arm_gicv3_dist.c b/hw/intc/arm_gicv3_dist.c
+> index 53c55c57291..335386ff3ac 100644
+> --- a/hw/intc/arm_gicv3_dist.c
+> +++ b/hw/intc/arm_gicv3_dist.c
+> @@ -533,7 +533,7 @@ static MemTxResult gicd_readl(GICv3State *s, hwaddr offset,
+>          }
+>          return MEMTX_OK;
+>      }
+> -    case GICD_IDREGS ... GICD_IDREGS + 0x1f:
+> +    case GICD_IDREGS ... GICD_IDREGS + 0x2f:
+>          /* ID registers */
+>          *data = gicv3_idreg(offset - GICD_IDREGS);
+>          return MEMTX_OK;
+> diff --git a/hw/intc/arm_gicv3_redist.c b/hw/intc/arm_gicv3_redist.c
+> index 3b0ba6de1ab..9bb11423382 100644
+> --- a/hw/intc/arm_gicv3_redist.c
+> +++ b/hw/intc/arm_gicv3_redist.c
+> @@ -233,7 +233,7 @@ static MemTxResult gicr_readl(GICv3CPUState *cs, hwaddr offset,
+>          }
+>          *data = cs->gicr_nsacr;
+>          return MEMTX_OK;
+> -    case GICR_IDREGS ... GICR_IDREGS + 0x1f:
+> +    case GICR_IDREGS ... GICR_IDREGS + 0x2f:
+>          *data = gicv3_idreg(offset - GICR_IDREGS);
+>          return MEMTX_OK;
+>      default:
 
-> On Tue, May 21, 2019 at 11:32:48AM +0800, Wei Yang wrote:
-> > Now we have two identical build_mcfg functions.
-> > 
-> > Consolidate them in acpi/pci.c.
-> > 
-> > Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
-> > 
-> > ---
-> > v5:
-> >   * ACPI_PCI depends on both ACPI and PCI
-> >   * rebase on latest master, adjust arm Kconfig
-> > v3:
-> >   * adjust changelog based on Igor's suggestion
-> > ---  
-> 
-> 
-> same as 2/2 - do not use two --- separators pls.
+Just noticed that I forgot to also update the case statements
+in the *writel functions :-(
 
-I don't really get this requirement, it's common practice on
-list(s) and used to work just fine.
-
-The 1st separator is added by hand when editing commit message
-to separate change log from main commit message so that 'git am'
-would drop change log. While the second separator is added
-automatically by git when patch is created.
+thanks
+-- PMM
 
