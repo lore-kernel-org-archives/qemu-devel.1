@@ -2,75 +2,63 @@ Return-Path: <SRS0=/4tE=TV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_NEOMUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=FROM_EXCESS_BASE64,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DC99C04AAF
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 09:00:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 79DCAC04AAF
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 09:02:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 44D252173E
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 09:00:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 44D252173E
+	by mail.kernel.org (Postfix) with ESMTPS id 52D6021479
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 09:02:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 52D6021479
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:49529 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:49661 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hT0dB-00072Z-Hv
-	for qemu-devel@archiver.kernel.org; Tue, 21 May 2019 05:00:21 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:54192)
+	id 1hT0fQ-0000KI-Mm
+	for qemu-devel@archiver.kernel.org; Tue, 21 May 2019 05:02:40 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:52558)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sgarzare@redhat.com>) id 1hT0Zf-0004U9-Gl
-	for qemu-devel@nongnu.org; Tue, 21 May 2019 04:56:44 -0400
+	(envelope-from <berrange@redhat.com>) id 1hT0XK-0002My-4T
+	for qemu-devel@nongnu.org; Tue, 21 May 2019 04:54:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sgarzare@redhat.com>) id 1hT0Zd-0003YY-RD
-	for qemu-devel@nongnu.org; Tue, 21 May 2019 04:56:43 -0400
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:45834)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1hT0Zd-0003Hf-Ki
-	for qemu-devel@nongnu.org; Tue, 21 May 2019 04:56:41 -0400
-Received: by mail-wr1-f67.google.com with SMTP id b18so17552678wrq.12
-	for <qemu-devel@nongnu.org>; Tue, 21 May 2019 01:56:19 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-	:mime-version:content-disposition:in-reply-to:user-agent;
-	bh=xINJbtsj2QLLlbU59Adhhs5ucDu8KPI7qOkhEmQ2I8c=;
-	b=Vq6gYiqCU9Esk+jL+ITci7Jz6LP3vKDdahk4b8M3YaXGBcSv6lwY1c/yeQ0yM4fiKo
-	E6UXi6UB8W5S0z4L08d4xVlybij2tsY7PB7fJ8kb59bMJKrxMmGZhoVVlntNWggvjz3m
-	ktTM2wVkNF2ynVAcEmZZOPb4fos8pb5I1yjJ50vWZLPChMnt0rOXEQ576iWBt93qhZ7G
-	II3lUEdRURsM4kERh4IFUhhW3zBMuLw0iqzE0FtMWM8uC6ame/KQRR1iiRHpKF96Wrnu
-	5RWj5ZSxlfntSPG6ZydQTm3F5a95NttKeI+91QeO+RH5N/BRmjz4xCzZG8w+Olwu8beH
-	2MEw==
-X-Gm-Message-State: APjAAAXGpFwfgxx51rRvf8HnAwet1AcVyzbq9HiRrCjjiAawvxy5QeXu
-	gEDZGbe7ciKMsbpQw3tQsS9T4zPpm7A=
-X-Google-Smtp-Source: APXvYqyylZdNx9xi3SrSjih3jkHqzgzP3R7zedYt/X+n7K4A328ThNxr/7i8kl7MdROfpppSPbOlnA==
-X-Received: by 2002:a5d:4f0b:: with SMTP id c11mr11651216wru.35.1558428978274; 
-	Tue, 21 May 2019 01:56:18 -0700 (PDT)
-Received: from steredhat.homenet.telecomitalia.it
-	(host253-229-dynamic.248-95-r.retail.telecomitalia.it.
-	[95.248.229.253])
-	by smtp.gmail.com with ESMTPSA id a9sm2866729wmh.5.2019.05.21.01.56.17
-	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Tue, 21 May 2019 01:56:17 -0700 (PDT)
-Date: Tue, 21 May 2019 10:56:15 +0200
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: qemu-devel@nongnu.org
-Message-ID: <20190521085615.lsckrdbfjdz5mzy4@steredhat.homenet.telecomitalia.it>
-References: <20190509145927.293369-1-sgarzare@redhat.com>
+	(envelope-from <berrange@redhat.com>) id 1hT0XI-0001b4-PO
+	for qemu-devel@nongnu.org; Tue, 21 May 2019 04:54:18 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37160)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1hT0XI-0001aT-GC
+	for qemu-devel@nongnu.org; Tue, 21 May 2019 04:54:16 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id ABFB98830E;
+	Tue, 21 May 2019 08:54:07 +0000 (UTC)
+Received: from redhat.com (ovpn-112-26.ams2.redhat.com [10.36.112.26])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id E59A160FBE;
+	Tue, 21 May 2019 08:53:53 +0000 (UTC)
+Date: Tue, 21 May 2019 09:53:50 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20190521085350.GF25835@redhat.com>
+References: <20190520184108.GA10764@habkost.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20190509145927.293369-1-sgarzare@redhat.com>
-User-Agent: NeoMutt/20180716
+In-Reply-To: <20190520184108.GA10764@habkost.net>
+User-Agent: Mutt/1.11.4 (2019-03-13)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.28]);
+	Tue, 21 May 2019 08:54:07 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-	[fuzzy]
-X-Received-From: 209.85.221.67
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v3] block/rbd: increase
- dynamically the image size
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] Introducing GSoC project: API Documentation
+ Generation
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -82,134 +70,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Josh Durgin <jdurgin@redhat.com>,
-	Jason Dillaman <jdillama@redhat.com>, qemu-block@nongnu.org,
-	Max Reitz <mreitz@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+	Gabriel Barreto <sbarreto.gabriel@gmail.com>,
+	qemu-devel@nongnu.org, "Emilio G. Cota" <cota@braap.org>,
+	Stefan Hajnoczi <stefanha@redhat.com>, Cleber Rosa <crosa@redhat.com>,
+	Paolo Bonzini <pbonzini@redhat.com>, John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Kindly ping.
+On Mon, May 20, 2019 at 03:41:08PM -0300, Eduardo Habkost wrote:
+> Please welcome GSoC student Gabriel Barreto.  Gabriel is going to
+> work on QEMU API Documentation Generation[1].
+> 
+> Gabriel's first task is to evaluate our options for extract doc
+> comments from C source code and integrate them into Sphinx
+> documentation.  I saw that Peter has experimented with kernel-doc
+> in the past[2][3].  Has anybody evaluated other alternatives?
+> (e.g. Hawkmoth[4])
 
-Thanks,
-Stefano
+In the past I tested both GTK-DOC and Doxygen.
 
-On Thu, May 09, 2019 at 04:59:27PM +0200, Stefano Garzarella wrote:
-> RBD APIs don't allow us to write more than the size set with
-> rbd_create() or rbd_resize().
-> In order to support growing images (eg. qcow2), we resize the
-> image before write operations that exceed the current size.
-> 
-> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
-> ---
-> v3:
->   - add 'image_size' field in the BDRVRBDState to keep track of the
->     current size of the RBD image [Jason, Kevin]
-> ---
->  block/rbd.c | 42 +++++++++++++++++++++++++++++++++++++++---
->  1 file changed, 39 insertions(+), 3 deletions(-)
-> 
-> diff --git a/block/rbd.c b/block/rbd.c
-> index 0c549c9935..b0355a2ce0 100644
-> --- a/block/rbd.c
-> +++ b/block/rbd.c
-> @@ -102,6 +102,7 @@ typedef struct BDRVRBDState {
->      rbd_image_t image;
->      char *image_name;
->      char *snap;
-> +    uint64_t image_size;
->  } BDRVRBDState;
->  
->  static int qemu_rbd_connect(rados_t *cluster, rados_ioctx_t *io_ctx,
-> @@ -777,6 +778,14 @@ static int qemu_rbd_open(BlockDriverState *bs, QDict *options, int flags,
->          goto failed_open;
->      }
->  
-> +    r = rbd_get_size(s->image, &s->image_size);
-> +    if (r < 0) {
-> +        error_setg_errno(errp, -r, "error getting image size from %s",
-> +                         s->image_name);
-> +        rbd_close(s->image);
-> +        goto failed_open;
-> +    }
-> +
->      /* If we are using an rbd snapshot, we must be r/o, otherwise
->       * leave as-is */
->      if (s->snap != NULL) {
-> @@ -833,6 +842,22 @@ static void qemu_rbd_close(BlockDriverState *bs)
->      rados_shutdown(s->cluster);
->  }
->  
-> +/* Resize the RBD image and update the 'image_size' with the current size */
-> +static int qemu_rbd_resize(BlockDriverState *bs, uint64_t size)
-> +{
-> +    BDRVRBDState *s = bs->opaque;
-> +    int r;
-> +
-> +    r = rbd_resize(s->image, size);
-> +    if (r < 0) {
-> +        return r;
-> +    }
-> +
-> +    s->image_size = size;
-> +
-> +    return 0;
-> +}
-> +
->  static const AIOCBInfo rbd_aiocb_info = {
->      .aiocb_size = sizeof(RBDAIOCB),
->  };
-> @@ -934,13 +959,25 @@ static BlockAIOCB *rbd_start_aio(BlockDriverState *bs,
->      }
->  
->      switch (cmd) {
-> -    case RBD_AIO_WRITE:
-> +    case RBD_AIO_WRITE: {
-> +        /*
-> +         * RBD APIs don't allow us to write more than actual size, so in order
-> +         * to support growing images, we resize the image before write
-> +         * operations that exceed the current size.
-> +         */
-> +        if (off + size > s->image_size) {
-> +            r = qemu_rbd_resize(bs, off + size);
-> +            if (r < 0) {
-> +                goto failed_completion;
-> +            }
-> +        }
->  #ifdef LIBRBD_SUPPORTS_IOVEC
->              r = rbd_aio_writev(s->image, qiov->iov, qiov->niov, off, c);
->  #else
->              r = rbd_aio_write(s->image, off, size, rcb->buf, c);
->  #endif
->          break;
-> +    }
->      case RBD_AIO_READ:
->  #ifdef LIBRBD_SUPPORTS_IOVEC
->              r = rbd_aio_readv(s->image, qiov->iov, qiov->niov, off, c);
-> @@ -1051,7 +1088,6 @@ static int coroutine_fn qemu_rbd_co_truncate(BlockDriverState *bs,
->                                               PreallocMode prealloc,
->                                               Error **errp)
->  {
-> -    BDRVRBDState *s = bs->opaque;
->      int r;
->  
->      if (prealloc != PREALLOC_MODE_OFF) {
-> @@ -1060,7 +1096,7 @@ static int coroutine_fn qemu_rbd_co_truncate(BlockDriverState *bs,
->          return -ENOTSUP;
->      }
->  
-> -    r = rbd_resize(s->image, offset);
-> +    r = qemu_rbd_resize(bs, offset);
->      if (r < 0) {
->          error_setg_errno(errp, -r, "Failed to resize file");
->          return r;
-> -- 
-> 2.20.1
-> 
-> 
+GTK-DOC has assumptions that you're following "normal" GTK/GLib style and
+can't cope with many C type decls if you diverge, which rules it out on
+practical grounds.
 
+Doxygen can parse more or less anything which I really dislike the output
+structure it generates for docs as it is not at all friendly to browser and
+find the info you actually want compared to other docs tools
+
+Hawkmoth seems pretty attractive in its output format, but doesn't appear
+to be part of either Debian or Fedora distros, so we would have to bundle
+it in QEMU I expect.  My big concern there is that there have only been
+2 contributors to Hawkmoth in its entire 3 year existance, which makes
+me fear for its long term viability if the main author gives up.
+
+QEMU should pick a tool which is well established / widely used & thus
+stands a good chance of being maintained for the long term, as we don't
+want to end up relying on abandonware in 5 years time.  The kernel-doc
+project is not widely used, but its main user is significant enough that
+it isn't likely to die through lack of maintainers.
+
+If we're using sphinx for the rest of our docs, then I think it is pretty
+compelling to have a docs tool that integrates well with sphinx.
+
+I personally don't care much about the source comment annotation syntax.
+It is mostly just a matter of bikeshed colour picking, and no matter
+which tool we pick will require updates to the source. The style /
+layout / readability of the output is more important to me.
+
+> [1] https://wiki.qemu.org/Google_Summer_of_Code_2019#API_documentation_generation
+> [2] https://www.mail-archive.com/qemu-devel@nongnu.org/msg411643.html
+> [3] https://www.mail-archive.com/qemu-devel@nongnu.org/msg411841.html
+> [4] https://readthedocs.org/projects/hawkmoth/
+
+Regards,
+Daniel
 -- 
-
-Stefano Garzarella
-Software Engineer @ Red Hat
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
