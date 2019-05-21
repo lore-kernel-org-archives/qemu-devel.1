@@ -2,74 +2,84 @@ Return-Path: <SRS0=/4tE=TV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8752DC04AAF
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 03:45:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 25EDCC04AAF
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 04:48:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 570E621479
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 03:45:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 570E621479
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id C47A4216B7
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 04:48:56 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="C4B89qhW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C47A4216B7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:45950 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:46443 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hSviM-0002et-L0
-	for qemu-devel@archiver.kernel.org; Mon, 20 May 2019 23:45:22 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:57007)
+	id 1hSwhr-00050N-I8
+	for qemu-devel@archiver.kernel.org; Tue, 21 May 2019 00:48:55 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:35394)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1hSvhb-0002Gm-04
-	for qemu-devel@nongnu.org; Mon, 20 May 2019 23:44:36 -0400
+	(envelope-from <arilou@gmail.com>) id 1hSwh2-0004hL-T0
+	for qemu-devel@nongnu.org; Tue, 21 May 2019 00:48:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1hSvhZ-0000CY-5T
-	for qemu-devel@nongnu.org; Mon, 20 May 2019 23:44:34 -0400
-Received: from mail-qt1-f194.google.com ([209.85.160.194]:39384)
+	(envelope-from <arilou@gmail.com>) id 1hSwh1-0008KD-Ll
+	for qemu-devel@nongnu.org; Tue, 21 May 2019 00:48:04 -0400
+Received: from mail-ed1-x541.google.com ([2a00:1450:4864:20::541]:34422)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1hSvhZ-0000Bu-05
-	for qemu-devel@nongnu.org; Mon, 20 May 2019 23:44:33 -0400
-Received: by mail-qt1-f194.google.com with SMTP id y42so18915709qtk.6
-	for <qemu-devel@nongnu.org>; Mon, 20 May 2019 20:44:31 -0700 (PDT)
+	(Exim 4.71) (envelope-from <arilou@gmail.com>) id 1hSwh1-0008IG-CU
+	for qemu-devel@nongnu.org; Tue, 21 May 2019 00:48:03 -0400
+Received: by mail-ed1-x541.google.com with SMTP id p27so27319099eda.1
+	for <qemu-devel@nongnu.org>; Mon, 20 May 2019 21:48:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+	:cc:content-transfer-encoding;
+	bh=1zCVgd5kypxgGbVAIP+vwPM2UHntr6IerTr49YGyuc8=;
+	b=C4B89qhWLOvQQYJajAMrItcv/gIKO50QHnU+t+hkHEyvjIEnVE0T9OSl5p/T4OTKuH
+	msnZ15wnaJoq327JXjk72tJjjC+zPLWBL+zRWRbc2MkG62zyifVyMcuMtz10f0BdOjNH
+	5oaBqCWJrItmJ69X+LZHOVZxl38++DiIdIf7FsyIV39Ug84c5ruxBQyNXB8ME3as7GyL
+	ljJiBttk39VeoROPCceykV/6SyYh8rTYY3rYIdzD0CU+vq0o6jk1Nok8qNIcYWpV13CI
+	f4H1zPGSfXR5JPXlTKul1viPabJBrkjEA2+hQ1Qbl/axFHlscoMpWepT02CdHI2kffnt
+	wpHg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-	:mime-version:content-disposition:in-reply-to;
-	bh=DZVYioWw98UXUc29bUL+2l331EhUGaozKZ3YRr3ZzbI=;
-	b=GAIQ3sgBUM50JB2eGyyPPqyaQvwP4P8XwSyTYO2PkwWBKMrM3M4R9QtgNHSwP0RDKh
-	Y1rWotGo9F8fAlA8iHop2jc60qp3XPk/LeOlSsxg30roREF2jfZtlybwguC1og5ghNR6
-	IE/abzCNOQxdn7gNijGrNQf7hPrnpvDovaYNr7VDdK9JqkL4LnIXBXBsPgAqPAkrferW
-	x88yp6lBsnwAVTrAtxK2XNq7bgqAdjhQ/6Xa9LvweRhwHH/5ubu43dqXVHXLU16RnbjO
-	nMSWaLwMPAHNFvOSGuuTGyIcvwKjh/Se7DUCqiyyupDhZLKhMhl+JAo84xiMLpb5vnWd
-	7nng==
-X-Gm-Message-State: APjAAAV4CN7wLQAZa147BDSgN0MRAPYbjRcVpfNpzHwVzw67lcw5IeRe
-	6PF+Bs9NPyGdANfolHhe+svp6g==
-X-Google-Smtp-Source: APXvYqwig+nPHeMINWWhazBS5zX+gBYsjMPi8Xt7aYvrVIzTxg2Xbh9y9XDOAczv2KFwEQVc54TlfQ==
-X-Received: by 2002:ac8:228e:: with SMTP id f14mr32860415qta.79.1558410271447; 
-	Mon, 20 May 2019 20:44:31 -0700 (PDT)
-Received: from redhat.com (pool-173-76-105-71.bstnma.fios.verizon.net.
-	[173.76.105.71]) by smtp.gmail.com with ESMTPSA id
-	d85sm10057983qkc.64.2019.05.20.20.44.29
-	(version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-	Mon, 20 May 2019 20:44:30 -0700 (PDT)
-Date: Mon, 20 May 2019 23:44:28 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Wei Yang <richardw.yang@linux.intel.com>
-Message-ID: <20190520234407-mutt-send-email-mst@kernel.org>
-References: <20190521033249.1960-1-richardw.yang@linux.intel.com>
-	<20190521033249.1960-3-richardw.yang@linux.intel.com>
+	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+	:message-id:subject:to:cc:content-transfer-encoding;
+	bh=1zCVgd5kypxgGbVAIP+vwPM2UHntr6IerTr49YGyuc8=;
+	b=RdU0VPmK0BMTH57/yoCsrWY/F7S7yOkkCuQaaV98Ej7xX/ME/utxkBzRTz/vZFLe9z
+	r5Y3gMUoGEcb0uU/nPuCgjsOvO0FsV30Te7qHr8okysMSsaJHHN/vUi5n5L9JcEWjEnq
+	+ojqh1M6oK3FnR9rsA2V9/4tXXJjAFQbrZlY2zhy0kCxGq+zaYKhWDl8DrrNFJACGbkW
+	1hC9tX1GBZiW8mG71Dy2yvTfb9Us4BA6nDkIqUVP6EqAA8UEFm4hGGL8tqQIEMEAkOml
+	77T6XSPK0HTa8GuCOAfW7CDl95YFE9xO4OucJ1Jqvo41JEskUnBmJeD6Mn28AJ8RCEA3
+	i/Ig==
+X-Gm-Message-State: APjAAAVSt00ql4i3oRHE2d/ucjp/5UTDUNprHD6muk9lgtgzHCgxS1H8
+	+xfI8hfVDtm7q9EfFppGydfzSgv5zcw+7kYdZzY=
+X-Google-Smtp-Source: APXvYqwrEzq+8rXgVjVwKJHDm4FEIi/3+Y+KeOdX6SRJIOHapK25h2SvrN4kjNG+zGYfZtdhw2VSY87E93e0UZU9NAs=
+X-Received: by 2002:a50:9184:: with SMTP id g4mr69263269eda.65.1558414081455; 
+	Mon, 20 May 2019 21:48:01 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190521033249.1960-3-richardw.yang@linux.intel.com>
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-	[fuzzy]
-X-Received-From: 209.85.160.194
-Subject: Re: [Qemu-devel] [PATCH v5 2/2] acpi: pci: use build_append_foo()
- API to construct MCFG
+References: <20190502081554.5521-1-arilou@gmail.com>
+	<20190502081554.5521-3-arilou@gmail.com>
+	<877easooi3.fsf@zen.linaroharston>
+In-Reply-To: <877easooi3.fsf@zen.linaroharston>
+From: Jon Doron <arilou@gmail.com>
+Date: Tue, 21 May 2019 07:47:50 +0300
+Message-ID: <CAP7QCoha=nGJQGGDVkdVtrKNxmP9gyCEekHFH37O5yj6QYHz6Q@mail.gmail.com>
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2a00:1450:4864:20::541
+Subject: Re: [Qemu-devel] [PATCH v9 02/27] gdbstub: Implement deatch (D pkt)
+ with new infra
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -81,112 +91,178 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: yang.zhong@intel.com, peter.maydell@linaro.org, thuth@redhat.com,
-	qemu-devel@nongnu.org, shannon.zhaosl@gmail.com,
-	qemu-arm@nongnu.org, imammedo@redhat.com, philmd@redhat.com
+Cc: QEMU <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, May 21, 2019 at 11:32:49AM +0800, Wei Yang wrote:
-> build_append_foo() API doesn't need explicit endianness conversions
-> which eliminates a source of errors and it makes build_mcfg() look like
-> declarative definition of MCFG table in ACPI spec, which makes it easy
-> to review.
-> 
-> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
-> Suggested-by: Igor Mammedov <imammedo@redhat.com>
-> Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-> 
-> ---
-> v5:
->    * miss the reserved[8] of MCFG in last version, add it back
->    * drop SOBs and make sure bios-tables-test all OK
-> ---
->  hw/acpi/pci.c               | 35 +++++++++++++++++++++++------------
->  include/hw/acpi/acpi-defs.h | 18 ------------------
->  2 files changed, 23 insertions(+), 30 deletions(-)
-> 
-> diff --git a/hw/acpi/pci.c b/hw/acpi/pci.c
-> index fa0fa30bb9..49df7b7d54 100644
-> --- a/hw/acpi/pci.c
-> +++ b/hw/acpi/pci.c
-> @@ -30,17 +30,28 @@
->  
->  void build_mcfg(GArray *table_data, BIOSLinker *linker, AcpiMcfgInfo *info)
->  {
-> -    AcpiTableMcfg *mcfg;
-> -    int len = sizeof(*mcfg) + sizeof(mcfg->allocation[0]);
-> -
-> -    mcfg = acpi_data_push(table_data, len);
-> -    mcfg->allocation[0].address = cpu_to_le64(info->base);
-> -
-> -    /* Only a single allocation so no need to play with segments */
-> -    mcfg->allocation[0].pci_segment = cpu_to_le16(0);
-> -    mcfg->allocation[0].start_bus_number = 0;
-> -    mcfg->allocation[0].end_bus_number = PCIE_MMCFG_BUS(info->size - 1);
-> -
-> -    build_header(linker, table_data, (void *)mcfg, "MCFG", len, 1, NULL, NULL);
-> +    int mcfg_start = table_data->len;
-> +
-> +    acpi_data_push(table_data, sizeof(AcpiTableHeader));
-> +
-> +    /*
-> +     * PCI Firmware Specification, Revision 3.0
-> +     * 4.1.2 MCFG Table Description.
-> +     */
-> +    /* Reserved */
-> +    build_append_int_noprefix(table_data, 0, 8);
+Hi Alex, I implemented this change but i'm having second guesses on
+this, basically a NULL packet means the command is not supported (as
+far as i understand from the protocol documentation and implementation
+of GDB)
+That being said I think it's correct to send back a NULL packet if
+process_string_cmd fails for any reason, or you would prefer ill just
+omit it?
 
-below is in fact
-	Memory Mapped Enhanced Configuration Space Base Address Allocation Structure
+Snippet of the change I did according to your review:
+-    if (cmd_parser &&
+-        process_string_cmd(s, NULL, line_buf, cmd_parser, 1)) {
+-        put_packet(s, "");
++    if (!cmd_parser) {
++        return RS_IDLE;
+     }
 
-maybe document this?
++    process_string_cmd(s, NULL, line_buf, cmd_parser, 1);
 
-> +    /* Base address, processor-relative */
-> +    build_append_int_noprefix(table_data, info->base, 8);
-> +    /* PCI segment group number */
-> +    build_append_int_noprefix(table_data, 0, 2);
-> +    /* Starting PCI Bus number */
-> +    build_append_int_noprefix(table_data, 0, 1);
-> +    /* Final PCI Bus number */
-> +    build_append_int_noprefix(table_data, PCIE_MMCFG_BUS(info->size - 1), 1);
-> +    /* Reserved */
-> +    build_append_int_noprefix(table_data, 0, 4);
-> +
-> +    build_header(linker, table_data, (void *)(table_data->data + mcfg_start),
-> +                 "MCFG", table_data->len - mcfg_start, 1, NULL, NULL);
->  }
->  
-> diff --git a/include/hw/acpi/acpi-defs.h b/include/hw/acpi/acpi-defs.h
-> index f9aa4bd398..57a3f58b0c 100644
-> --- a/include/hw/acpi/acpi-defs.h
-> +++ b/include/hw/acpi/acpi-defs.h
-> @@ -449,24 +449,6 @@ struct AcpiSratProcessorGiccAffinity {
->  
->  typedef struct AcpiSratProcessorGiccAffinity AcpiSratProcessorGiccAffinity;
->  
-> -/* PCI fw r3.0 MCFG table. */
-> -/* Subtable */
-> -struct AcpiMcfgAllocation {
-> -    uint64_t address;                /* Base address, processor-relative */
-> -    uint16_t pci_segment;            /* PCI segment group number */
-> -    uint8_t start_bus_number;       /* Starting PCI Bus number */
-> -    uint8_t end_bus_number;         /* Final PCI Bus number */
-> -    uint32_t reserved;
-> -} QEMU_PACKED;
-> -typedef struct AcpiMcfgAllocation AcpiMcfgAllocation;
-> -
-> -struct AcpiTableMcfg {
-> -    ACPI_TABLE_HEADER_DEF;
-> -    uint8_t reserved[8];
-> -    AcpiMcfgAllocation allocation[0];
-> -} QEMU_PACKED;
-> -typedef struct AcpiTableMcfg AcpiTableMcfg;
-> -
->  /*
->   * TCPA Description Table
->   *
-> -- 
-> 2.19.1
+-- Jon.
+
+On Tue, May 14, 2019 at 9:54 PM Alex Benn=C3=A9e <alex.bennee@linaro.org> w=
+rote:
+>
+>
+> Jon Doron <arilou@gmail.com> writes:
+>
+> > Signed-off-by: Jon Doron <arilou@gmail.com>
+> > ---
+> >  gdbstub.c | 90 ++++++++++++++++++++++++++++++-------------------------
+> >  1 file changed, 50 insertions(+), 40 deletions(-)
+> >
+> > diff --git a/gdbstub.c b/gdbstub.c
+> > index d5e0f3878a..621d689868 100644
+> > --- a/gdbstub.c
+> > +++ b/gdbstub.c
+> > @@ -1418,11 +1418,6 @@ static inline int startswith(const char *string,=
+ const char *pattern)
+> >    return !strncmp(string, pattern, strlen(pattern));
+> >  }
+> >
+> > -static int process_string_cmd(
+> > -        GDBState *s, void *user_ctx, const char *data,
+> > -        const GdbCmdParseEntry *cmds, int num_cmds)
+> > -        __attribute__((unused));
+> > -
+> >  static int process_string_cmd(GDBState *s, void *user_ctx, const char =
+*data,
+> >                                const GdbCmdParseEntry *cmds, int num_cm=
+ds)
+> >  {
+> > @@ -1468,6 +1463,41 @@ static int process_string_cmd(GDBState *s, void =
+*user_ctx, const char *data,
+> >      return -1;
+> >  }
+> >
+> > +static void handle_detach(GdbCmdContext *gdb_ctx, void *user_ctx)
+> > +{
+> > +    GDBProcess *process;
+> > +    GDBState *s =3D gdb_ctx->s;
+> > +    uint32_t pid =3D 1;
+> > +
+> > +    if (s->multiprocess) {
+> > +        if (!gdb_ctx->num_params) {
+> > +            put_packet(s, "E22");
+> > +            return;
+> > +        }
+> > +
+> > +        pid =3D gdb_ctx->params[0].val_ul;
+> > +    }
+> > +
+> > +    process =3D gdb_get_process(s, pid);
+> > +    gdb_process_breakpoint_remove_all(s, process);
+> > +    process->attached =3D false;
+> > +
+> > +    if (pid =3D=3D gdb_get_cpu_pid(s, s->c_cpu)) {
+> > +        s->c_cpu =3D gdb_first_attached_cpu(s);
+> > +    }
+> > +
+> > +    if (pid =3D=3D gdb_get_cpu_pid(s, s->g_cpu)) {
+> > +        s->g_cpu =3D gdb_first_attached_cpu(s);
+> > +    }
+> > +
+> > +    if (!s->c_cpu) {
+> > +        /* No more process attached */
+> > +        gdb_syscall_mode =3D GDB_SYS_DISABLED;
+> > +        gdb_continue(s);
+> > +    }
+> > +    put_packet(s, "OK");
+> > +}
+> > +
+> >  static int gdb_handle_packet(GDBState *s, const char *line_buf)
+> >  {
+> >      CPUState *cpu;
+> > @@ -1482,6 +1512,7 @@ static int gdb_handle_packet(GDBState *s, const c=
+har *line_buf)
+> >      uint8_t *registers;
+> >      target_ulong addr, len;
+> >      GDBThreadIdKind thread_kind;
+> > +    const GdbCmdParseEntry *cmd_parser =3D NULL;
+> >
+> >      trace_gdbstub_io_command(line_buf);
+> >
+> > @@ -1582,42 +1613,15 @@ static int gdb_handle_packet(GDBState *s, const=
+ char *line_buf)
+> >          error_report("QEMU: Terminated via GDBstub");
+> >          exit(0);
+> >      case 'D':
+> > -        /* Detach packet */
+> > -        pid =3D 1;
+> > -
+> > -        if (s->multiprocess) {
+> > -            unsigned long lpid;
+> > -            if (*p !=3D ';') {
+> > -                put_packet(s, "E22");
+> > -                break;
+> > -            }
+> > -
+> > -            if (qemu_strtoul(p + 1, &p, 16, &lpid)) {
+> > -                put_packet(s, "E22");
+> > -                break;
+> > -            }
+> > -
+> > -            pid =3D lpid;
+> > -        }
+> > -
+> > -        process =3D gdb_get_process(s, pid);
+> > -        gdb_process_breakpoint_remove_all(s, process);
+> > -        process->attached =3D false;
+> > -
+> > -        if (pid =3D=3D gdb_get_cpu_pid(s, s->c_cpu)) {
+> > -            s->c_cpu =3D gdb_first_attached_cpu(s);
+> > -        }
+> > -
+> > -        if (pid =3D=3D gdb_get_cpu_pid(s, s->g_cpu)) {
+> > -            s->g_cpu =3D gdb_first_attached_cpu(s);
+> > -        }
+> > -
+> > -        if (s->c_cpu =3D=3D NULL) {
+> > -            /* No more process attached */
+> > -            gdb_syscall_mode =3D GDB_SYS_DISABLED;
+> > -            gdb_continue(s);
+> > +        {
+> > +            static const GdbCmdParseEntry detach_cmd_desc =3D {
+> > +                .handler =3D handle_detach,
+> > +                .cmd =3D "D",
+> > +                .cmd_startswith =3D 1,
+> > +                .schema =3D "?.l0"
+> > +            };
+> > +            cmd_parser =3D &detach_cmd_desc;
+> >          }
+> > -        put_packet(s, "OK");
+> >          break;
+> >      case 's':
+> >          if (*p !=3D '\0') {
+> > @@ -1990,6 +1994,12 @@ static int gdb_handle_packet(GDBState *s, const =
+char *line_buf)
+> >          put_packet(s, buf);
+> >          break;
+> >      }
+> > +
+> > +    if (cmd_parser &&
+> > +        process_string_cmd(s, NULL, line_buf, cmd_parser, 1)) {
+> > +        put_packet(s, "");
+>
+> Why this null put_packet at the end? You've passed the handling of the
+> OK reply back to your handler so this seems superfluous.
+>
+> --
+> Alex Benn=C3=A9e
 
