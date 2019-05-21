@@ -2,64 +2,83 @@ Return-Path: <SRS0=/4tE=TV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=FROM_EXCESS_BASE64,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.7 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	FROM_EXCESS_BASE64,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B13CC04AAF
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 15:05:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EBAE8C04AAF
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 15:16:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E4C78208C3
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 15:04:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E4C78208C3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id B64A22173E
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 15:16:45 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NNPoearn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B64A22173E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:55251 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:55384 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hT6K3-0004O3-9P
-	for qemu-devel@archiver.kernel.org; Tue, 21 May 2019 11:04:59 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:51735)
+	id 1hT6VQ-00076l-Nz
+	for qemu-devel@archiver.kernel.org; Tue, 21 May 2019 11:16:44 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:53755)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1hT6JG-00047L-Su
-	for qemu-devel@nongnu.org; Tue, 21 May 2019 11:04:11 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1hT6UI-0006Q8-6r
+	for qemu-devel@nongnu.org; Tue, 21 May 2019 11:15:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1hT6JF-0007pO-Rf
-	for qemu-devel@nongnu.org; Tue, 21 May 2019 11:04:10 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:8281)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1hT6JF-0007oi-M5
-	for qemu-devel@nongnu.org; Tue, 21 May 2019 11:04:09 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 08C38309266B;
-	Tue, 21 May 2019 15:04:09 +0000 (UTC)
-Received: from redhat.com (ovpn-112-26.ams2.redhat.com [10.36.112.26])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id B6AED5E7B6;
-	Tue, 21 May 2019 15:04:05 +0000 (UTC)
-Date: Tue, 21 May 2019 16:04:02 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <20190521150402.GQ25835@redhat.com>
-References: <20190517023924.1686-1-richard.henderson@linaro.org>
-	<20190517023924.1686-3-richard.henderson@linaro.org>
+	(envelope-from <marcandre.lureau@gmail.com>) id 1hT6UH-0000PP-B5
+	for qemu-devel@nongnu.org; Tue, 21 May 2019 11:15:34 -0400
+Received: from mail-wr1-x42a.google.com ([2a00:1450:4864:20::42a]:45756)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1hT6UH-0000O7-1s
+	for qemu-devel@nongnu.org; Tue, 21 May 2019 11:15:33 -0400
+Received: by mail-wr1-x42a.google.com with SMTP id b18so19011767wrq.12
+	for <qemu-devel@nongnu.org>; Tue, 21 May 2019 08:15:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+	:cc:content-transfer-encoding;
+	bh=32NCbMyAorIOPfPUUwwMRPAH1PvCGu8FCy5oWX8Xds4=;
+	b=NNPoearnaCpXaeM4EphBqxlD6dWs4MuToNYWBzXAA8vO8qlMXNGbKX8VMhNmH85k3J
+	HPKnW6JpeZu4IgOzHOjWLn59rC+hZecPU8XfbJewrYf91hFALrvOgBidLf+aeMgYrAxj
+	+3zCZK60rAmeZNL6S87XBuCJa7LNga/+mmooliJZ99oia5tBET2QJukgefZc1lIFAytw
+	psHxph7LKkV3Lh4xnNeE0bFRdpEeqPpK/ZnXA/MXGv5q3OWrs+uFXo7csDtvDgpK16zC
+	CP2VcNov9souZuAp56zUIBzc1kZ+kauUKIfuB6O/4X5IboYKY+Dq0dZyWaF2plCb5ZkU
+	xf6Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+	:message-id:subject:to:cc:content-transfer-encoding;
+	bh=32NCbMyAorIOPfPUUwwMRPAH1PvCGu8FCy5oWX8Xds4=;
+	b=W/3nGeK+lpmYdJgVViLBgak9VI7GOvXqC26Xxeq143ek8zd+mQJgXKYm53iQ6MLvll
+	ItwjR9grrKtDpotQEcft/dhOUe5TzovYFsCAFQ9Mo59z+zyEOAsKJBqBA6WSZwo/UTWM
+	OpZPk/SvOs0sQTJvU6yGr6jykwG18gRwGCCUzPKMmf4Dz4SRQ38w0N4EMhrw2i5yEXug
+	wK0zCPcJYwCi4mWCOXeZ/c9NfowYDQnExTKtJaq+vHH09qEotZc+InxLxczZdwEbTlmo
+	7ZFyjbL4OSDe/rg56logJwQ6Tkqbjh5+w/tfBBE+3QJqL1o0I7r84C1zE+6OK/coD5j/
+	7l2g==
+X-Gm-Message-State: APjAAAWZMhBNRMA4F6xVwQ8zIhdgo6Foi/9BnQUJ0vgnaB8xYPVBy/r3
+	xTC3Rhn9POikIt4eTQ4PdHN82yW/B3Tkqq39rDY=
+X-Google-Smtp-Source: APXvYqwn23Aa2kCIIscduxwLbjfIgsuvlZBDt2MxjAabmAowwzOz4+iapn+Dga9ytsU96hQMJ212XRI1jwSuyRDOwg4=
+X-Received: by 2002:adf:9d8a:: with SMTP id p10mr23223105wre.31.1558451731797; 
+	Tue, 21 May 2019 08:15:31 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20190517023924.1686-3-richard.henderson@linaro.org>
-User-Agent: Mutt/1.11.4 (2019-03-13)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.43]);
-	Tue, 21 May 2019 15:04:09 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v8 02/25] build: Link user-only with crypto
- random number objects
+References: <CAFEAcA-vSebWjhbFTdfOSGHJtr8-a+DKG22JU3tS-1OoGR=VXQ@mail.gmail.com>
+In-Reply-To: <CAFEAcA-vSebWjhbFTdfOSGHJtr8-a+DKG22JU3tS-1OoGR=VXQ@mail.gmail.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Tue, 21 May 2019 17:15:20 +0200
+Message-ID: <CAJ+F1C+zsiicj2Bwx51viSzr+f-m8+5tCBX97oCwU0YPtfoMiw@mail.gmail.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2a00:1450:4864:20::42a
+Subject: Re: [Qemu-devel] is anybody experimenting with the idea of rust
+ code in QEMU?
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -71,32 +90,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: lvivier@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+	QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, May 16, 2019 at 07:39:01PM -0700, Richard Henderson wrote:
-> For user-only, we require only the random number bits of the
-> crypto subsystem.  Rename crypto-aes-obj-y to crypto-user-obj-y,
-> and add the random number objects, plus init.o to handle any
-> extra stuff the crypto library requires.
+Hi Peter
 
-If you pull in my authz patch first:
+On Tue, May 21, 2019 at 4:40 PM Peter Maydell <peter.maydell@linaro.org> wr=
+ote:
+>
+> Hi; I have on my todo list the idea of some experimentation/prototyping
+> of whether being able to write some components of QEMU in Rust would
+> be (a) feasible (b) beneficial (c) fun to play around with even if
+> it is likely that it doesn't go anywhere :-)
 
-  https://lists.gnu.org/archive/html/qemu-devel/2019-05/msg04863.html
+I wrote slirp bindings, and a helper process that can be used by qemu
+(https://github.com/elmarco/libslirp-rs &
+https://www.redhat.com/archives/libvir-list/2019-April/msg01233.html).
 
-then we can just kill crypto-aes-obj-y entirely, and make
-linux-user reference crypto-obj-y as normal. My patch avoids
-pulling in PAM, and your previous patch takes care of the
-static linking problem.
+I have done some experimentation slowly replacing slirp C code with
+rust (https://gitlab.freedesktop.org/slirp/libslirp/issues/3). I
+decided to try from scratch as well, using smoltcp. I have
+dhcp/udp/tcp working to some extent so far (I keep in mind a future
+libslirp compatible ABI, if needed).
 
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+--=20
+Marc-Andr=C3=A9 Lureau
 
