@@ -2,93 +2,84 @@ Return-Path: <SRS0=/4tE=TV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 543FAC04AAC
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 02:04:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 82E85C04AAC
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 02:18:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1A72C2173C
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 02:04:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4E6F421479
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 02:18:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="sBTWUTQa"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1A72C2173C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OHd50PMU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4E6F421479
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:45030 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:45149 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hSu8S-0001td-AV
-	for qemu-devel@archiver.kernel.org; Mon, 20 May 2019 22:04:12 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:43660)
+	id 1hSuMU-0004y5-ES
+	for qemu-devel@archiver.kernel.org; Mon, 20 May 2019 22:18:42 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:45139)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hSu7Z-0001Z0-41
-	for qemu-devel@nongnu.org; Mon, 20 May 2019 22:03:18 -0400
+	(envelope-from <liq3ea@gmail.com>) id 1hSuLV-0004f8-95
+	for qemu-devel@nongnu.org; Mon, 20 May 2019 22:17:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hSu7Y-0000g8-3V
-	for qemu-devel@nongnu.org; Mon, 20 May 2019 22:03:17 -0400
-Received: from mail-yw1-xc42.google.com ([2607:f8b0:4864:20::c42]:42266)
+	(envelope-from <liq3ea@gmail.com>) id 1hSuLT-00008a-Ud
+	for qemu-devel@nongnu.org; Mon, 20 May 2019 22:17:41 -0400
+Received: from mail-ot1-x334.google.com ([2607:f8b0:4864:20::334]:40804)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hSu7X-0000fe-SV
-	for qemu-devel@nongnu.org; Mon, 20 May 2019 22:03:15 -0400
-Received: by mail-yw1-xc42.google.com with SMTP id s5so6673697ywd.9
-	for <qemu-devel@nongnu.org>; Mon, 20 May 2019 19:03:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
-	:mime-version:in-reply-to:content-language:content-transfer-encoding;
-	bh=6eAO8b4W8KjvB9OJIraiMTNs2abxecW6FltAacsk2MM=;
-	b=sBTWUTQahKn2dTf4kprJ5vAfSYh7+RnoKvOnwKm87hgDD1lU35bv1X8Aa3ZN8+xrGu
-	GOJsfvPXU0MSMltRYHJ1SrzCOHwLN4vLotbS+gOnhbuL/xLt6YsKKD7CTkBJsab8uO/E
-	l/oOpgEorvanz0bvb8xs8UPWKHF4rf+V9LhfTB9xdhtf3ALPnrMC9onkVn1IG57NX9mu
-	VBTqb4vc9hUHrL5gecOag1LWHYiQw4ucBp7VrMEiDY5VxuSjmdOS2omcsnGSX6ScItXw
-	ot4/kxylb+uhvBNO1bGHVAPJRVEbeccnZzu4ZOWUzbnyDRJnO1HwH2iv/kyshQ0MiQ4Z
-	L73Q==
+	(Exim 4.71) (envelope-from <liq3ea@gmail.com>) id 1hSuLT-00007w-Lk
+	for qemu-devel@nongnu.org; Mon, 20 May 2019 22:17:39 -0400
+Received: by mail-ot1-x334.google.com with SMTP id u11so14889768otq.7
+	for <qemu-devel@nongnu.org>; Mon, 20 May 2019 19:17:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+	:cc; bh=mCh+1nGlY43OB97ODgiSURJpwKAFtzjQ9Wk5DconRBU=;
+	b=OHd50PMUzD2DsoDBsg4rrMI/fhILyd2+kgTkIGz1LzApq2jwLTc7w6/BI3wu4tXl2h
+	8zlMIS1seNX2d7Erg9Ljef0ype8XOnMQotqdZkpnfAzLBiTlI8Clva/UGswKxCpeP2ET
+	h9gwrnxLi9EdnVbYRForoQhDVKHFIXZrm0pQoPu897aLZd8oJVH0xjxaUiJixjM//RnR
+	ic3/4rwX3CWFH5S+RN+vAxyhkx86k8KKE+e9SlmTjxMcqp3PPFg8Jk7aqJU/9w1y4h6x
+	rrhBb+PU+H4f+/4FpAzPdDDJEoSLcmTmwx38Vv+OTNe+IGfnjNfZoVOWKUXQR8TqNH1l
+	/q+Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-	:date:user-agent:mime-version:in-reply-to:content-language
-	:content-transfer-encoding;
-	bh=6eAO8b4W8KjvB9OJIraiMTNs2abxecW6FltAacsk2MM=;
-	b=KPSNN1jxafFntLLPY1z68HszARuN5V3FiRC5+ppvFeLAD/AcmXDB1p2w7PkUKsNl+V
-	giA5yLZlRkiUcIGhi8u2gjXqK1HU31wZX5ftad8lPlIsVbo7tpjH2u9nOTpZsjtMCjYa
-	PaRbUwNdM23lm+tnL2jltD8kJlA+i5Bp3Ml0MSOM0mDIlydweTErWLW05YPXX25GUhOg
-	ODzmJNtrvjHI+OLi1QWP+/3tt+VrKc59UG4gyX4hSsZmsSQpRKdc2YfL9k/qvi/bk/eW
-	2OrkQ8ULS8qPj5VEilFXplSr5MQ84/Wlo6gSwMxJwjFqNrpurCJNBlzEhoqF+jv8mN/W
-	TXUA==
-X-Gm-Message-State: APjAAAW3D5rmESEc9y0oyiwEnT2FOfJ+dgaIwS4AQU2RNN1KRT18xJl9
-	770vPP2Ba7kWOnNSLowpC8s4gzcLBjs=
-X-Google-Smtp-Source: APXvYqye0QHOBW+HXBg3dBcmPkjsP6OOcw01FRii1r66ZM7/l/HZk1NsQF4yUcggWteyhHK9EDyaOw==
-X-Received: by 2002:a81:4915:: with SMTP id w21mr20244233ywa.310.1558404194924;
-	Mon, 20 May 2019 19:03:14 -0700 (PDT)
-Received: from [10.241.221.248] ([71.46.56.86])
-	by smtp.gmail.com with ESMTPSA id
-	c85sm6393849ywa.90.2019.05.20.19.03.13
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Mon, 20 May 2019 19:03:13 -0700 (PDT)
-To: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-References: <20190518191430.21686-1-richard.henderson@linaro.org>
-	<20190518191430.21686-2-richard.henderson@linaro.org>
-	<CAL1e-=h02FkYaKp0r2h0ihY=g2i=JityFyt6Jjw60ZB44=QRLw@mail.gmail.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <12f91287-0af7-97e0-2333-beb4cae3532e@linaro.org>
-Date: Mon, 20 May 2019 22:03:11 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+	:message-id:subject:to:cc;
+	bh=mCh+1nGlY43OB97ODgiSURJpwKAFtzjQ9Wk5DconRBU=;
+	b=RRlX99tUd5PqRnDbsnA34Jfvwvvh957bggO7HXqXxgkdusL2T+/8r83SoAAbQuYz7K
+	CHnERhZOqCF731Ha0NP3AKcYxbf6o7J2d+P58m2lUViX/xmuWWEM9gKz7Guaebywuk/u
+	zTpshsDMsT6CRff668D8TVeaQf60o+3kGkD1Mjr79VMSKQfNcQwXwYEZ/6Bup8ZR7gOJ
+	pLv1TgGUuh+VHKiF9V5Nj0E+TqEcm46UReImL6Rhp+db8XrplOk5gDnfiT9BMOVVNQUm
+	EsCGrYwlnuolgNRlr53veWve1VIJl4tmewg+1BKXJ0whK6FPzXUBAMteW3vHH/FxA+gr
+	PuvA==
+X-Gm-Message-State: APjAAAVuo8pdKAhAWXODyzSqxULzKwP4JW0afcv9NlBhUSkssncH3zml
+	mp7Os2io2iMljNMl1gIVXHakFLOkrCqRp+CX0Ro=
+X-Google-Smtp-Source: APXvYqxnoIrxvgIHOcGa4H1w5ic5SqFrEhqdk4k3IGdUdBszItAPIqGEL3x7vQPrRtT5sY3yG+OXmEYgZ+wUW4wYgo0=
+X-Received: by 2002:a9d:ec5:: with SMTP id 63mr18212636otj.333.1558405057931; 
+	Mon, 20 May 2019 19:17:37 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CAL1e-=h02FkYaKp0r2h0ihY=g2i=JityFyt6Jjw60ZB44=QRLw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+References: <20190424140643.62457-1-liq3ea@163.com>
+	<CAKXe6S+J7OgqJkrDByo3y9M5BGTaCN0Cjb0_WYxDyTvFGg-w8w@mail.gmail.com>
+	<CAKXe6SL3x6S5Pco6ZdFvPpmwPhPj6d2B7mFLDbyGoSqcGB+KCQ@mail.gmail.com>
+	<c1153add-2518-ce69-1c83-eb46d6c643ac@redhat.com>
+In-Reply-To: <c1153add-2518-ce69-1c83-eb46d6c643ac@redhat.com>
+From: Li Qiang <liq3ea@gmail.com>
+Date: Tue, 21 May 2019 10:17:01 +0800
+Message-ID: <CAKXe6SKjJHPbM_2751bp=vHpdrYk44gVtzBnMZmQ65ev9EVhfw@mail.gmail.com>
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2607:f8b0:4864:20::c42
-Subject: Re: [Qemu-devel] [PATCH 1/2] target/ppc: Use vector variable shifts
- for VSL, VSR, VSRA
+X-Received-From: 2607:f8b0:4864:20::334
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Content-Filtered-By: Mailman/MimeDel 2.1.21
+Subject: Re: [Qemu-devel] [PATCH v2 0/5] fw_cfg_test refactor and add two
+ test cases
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -100,50 +91,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: mark.cave-ayland@ilande.co.uk, qemu-ppc@nongnu.org, qemu-devel@nongnu.org,
-	david@gibson.dropbear.id.au
+Cc: lvivier@redhat.com, Thomas Huth <thuth@redhat.com>,
+	Li Qiang <liq3ea@163.com>, Qemu Developers <qemu-devel@nongnu.org>,
+	Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+	Laszlo Ersek <lersek@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/20/19 2:49 AM, Aleksandar Markovic wrote:
-> 
-> On May 18, 2019 9:21 PM, "Richard Henderson" <richard.henderson@linaro.org
-> <mailto:richard.henderson@linaro.org>> wrote:
->>
->> The gvec expanders take care of masking the shift amount
->> against the element width.
->>
->> Signed-off-by: Richard Henderson <richard.henderson@linaro.org
-> <mailto:richard.henderson@linaro.org>>
->> ---
->>  target/ppc/helper.h                 | 12 ----------
->>  target/ppc/int_helper.c             | 37 -----------------------------
->>  target/ppc/translate/vmx-impl.inc.c | 24 +++++++++----------
-> 
-> You changed the line
-> 
-> -GEN_VXFORM(vslw, 2, 6);
-> 
-> to be:
-> 
-> +GEN_VXFORM_V(vslw, MO_32, tcg_gen_gvec_shlv, 2, 6);
-> 
-> and left this line unchanged (even though it deals with the same vslw instruction):
-> 
-> GEN_VXFORM_DUAL(vslw, PPC_ALTIVEC, PPC_NONE, \                 vrlwnm,
-> PPC_NONE, PPC2_ISA300)
-> 
-> I just want to doublecheck - is this really what you wanted to do?
+Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> =E4=BA=8E2019=E5=B9=B45=E6=
+=9C=8821=E6=97=A5=E5=91=A8=E4=BA=8C =E4=B8=8A=E5=8D=885:29=E5=86=99=E9=81=
+=93=EF=BC=9A
 
-Yes, the macros do two different things.
-
-The first defines a function using tcg_gen_gvec_shlv as the implementation.
-
-The second defines a function that chooses between two overloaded encodings,
-depending on whether PPC_ALTIVEC or PPC2_ISA300 is enabled.  If PPC_ALTIVEC, it
-will forward the implementation to the function defined with the first macro.
+> Hi Li,
+>
+> On 5/17/19 4:28 AM, Li Qiang wrote:
+> > Ping.....
+> >
+> > Li Qiang <liq3ea@gmail.com <mailto:liq3ea@gmail.com>> =E4=BA=8E2019=E5=
+=B9=B45=E6=9C=889=E6=97=A5=E5=91=A8=E5=9B=9B
+> > =E4=B8=8B=E5=8D=885:57=E5=86=99=E9=81=93=EF=BC=9A
+> >
+> >     Ping.... this serials.
+>
+> I apologize I hold this series for too long.
+> With your v1 I wanted to clarify the commit descriptions without asking
+> you to send a v2, then I reword your patches and the same day you sent
+> your v2, then I had mixed feeling about how to do to not frustrate you
+> asking to respin again, but I ended it worst :(
+>
 
 
-r~
+Hi Philippe, not afraid to frustrate me next time, just send out the review
+email. I don't mind to make
+revisions to improve the patches.
 
+
+
+> I adapted the descriptions on your v2 and will repost as v3, then merge
+> if you are OK with v3.
+>
+>
+
+I have no objection for this, just merge it.
+
+Thanks,
+Li Qiang
+
+
+
+
+> Regards,
+>
+> Phil.
+>
+> >
+> >     Thanks,
+> >     Li Qiang
+> >
+> >     Li Qiang <liq3ea@163.com <mailto:liq3ea@163.com>> =E4=BA=8E2019=E5=
+=B9=B44=E6=9C=8824=E6=97=A5=E5=91=A8
+> >     =E4=B8=89 =E4=B8=8B=E5=8D=8810:07=E5=86=99=E9=81=93=EF=BC=9A
+> >
+> >         In the disscuss of adding reboot timeout test case:
+> >
+> https://lists.gnu.org/archive/html/qemu-devel/2019-04/msg03304.html
+> >
+> >         Philippe suggested we should uses the only related option for o=
+ne
+> >         specific test. However currently we uses one QTestState for all
+> the
+> >         test cases. In order to achieve Philippe's idea, I split the
+> >         test case
+> >         for its own QTestState. As this patchset has changed a lot, I
+> >         don't bump
+> >         the version.
+> >
+> >         Change since v1:
+> >         Add a patch to store the reboot_timeout as little endian
+> >         Fix the endian issue per Thomas's review
+> >
+> >         Li Qiang (5):
+> >           tests: refactor fw_cfg_test
+> >           tests: fw_cfg: add a function to get the fw_cfg file
+> >           fw_cfg: reboot: store reboot-timeout as little endian
+> >           tests: fw_cfg: add reboot_timeout test case
+> >           tests: fw_cfg: add splash time test case
+> >
+> >          hw/nvram/fw_cfg.c     |   4 +-
+> >          tests/fw_cfg-test.c   | 125
+> >         +++++++++++++++++++++++++++++++++++++++---
+> >          tests/libqos/fw_cfg.c |  55 +++++++++++++++++++
+> >          tests/libqos/fw_cfg.h |   9 +++
+> >          4 files changed, 184 insertions(+), 9 deletions(-)
+> >
+> >         --
+> >         2.17.1
+> >
+> >
+>
