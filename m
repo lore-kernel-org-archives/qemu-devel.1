@@ -2,69 +2,67 @@ Return-Path: <SRS0=/4tE=TV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C9B53C04AAF
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 15:22:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0262FC04AAF
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 15:22:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A205320863
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 15:22:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A205320863
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id C3DFC2173C
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 15:22:54 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=163.com header.i=@163.com header.b="d0Eb1yX2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C3DFC2173C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=163.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:55467 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:55473 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hT6at-0002gq-Rg
-	for qemu-devel@archiver.kernel.org; Tue, 21 May 2019 11:22:23 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:54845)
+	id 1hT6bO-00035i-0p
+	for qemu-devel@archiver.kernel.org; Tue, 21 May 2019 11:22:54 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:54099)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hT6Xa-0000Wy-CB
-	for qemu-devel@nongnu.org; Tue, 21 May 2019 11:18:59 -0400
+	(envelope-from <liq3ea@163.com>) id 1hT6VR-0007Vw-4Z
+	for qemu-devel@nongnu.org; Tue, 21 May 2019 11:16:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hT6XZ-0003QN-FY
-	for qemu-devel@nongnu.org; Tue, 21 May 2019 11:18:58 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43892)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hT6XZ-0003PB-9A
-	for qemu-devel@nongnu.org; Tue, 21 May 2019 11:18:57 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
-	[10.5.11.22])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 3C63081E15;
-	Tue, 21 May 2019 15:18:48 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-28.ams2.redhat.com
-	[10.36.116.28])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 423A3101E26A;
-	Tue, 21 May 2019 15:18:39 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
-	id ABD551138648; Tue, 21 May 2019 17:18:36 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-References: <20190520184108.GA10764@habkost.net>
-	<20190521085350.GF25835@redhat.com>
-	<e2395213-efaf-6d6c-6cfd-d949d071b4f6@redhat.com>
-Date: Tue, 21 May 2019 17:18:36 +0200
-In-Reply-To: <e2395213-efaf-6d6c-6cfd-d949d071b4f6@redhat.com> (Paolo
-	Bonzini's message of "Tue, 21 May 2019 12:55:36 +0200")
-Message-ID: <87pnobrg37.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1 (gnu/linux)
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.25]);
-	Tue, 21 May 2019 15:18:48 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] Introducing GSoC project: API Documentation
- Generation
+	(envelope-from <liq3ea@163.com>) id 1hT6VQ-0001Z5-2c
+	for qemu-devel@nongnu.org; Tue, 21 May 2019 11:16:45 -0400
+Received: from m12-16.163.com ([220.181.12.16]:57272)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <liq3ea@163.com>)
+	id 1hT6VP-0001Un-1W; Tue, 21 May 2019 11:16:44 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:Subject:Date:Message-Id; bh=UttzqMXxBg3C9gsY9v
+	k62bseHEktjhLCwusQrF5t6iU=; b=d0Eb1yX2cEeDo3yIo2BrterEh+AAV6fDzV
+	VTRe/lWxAmdG9E5Zwi5PAZs6gffxwxxyK+yxSdxIvZc2pDcFuHt1QD8W0q1OBria
+	ZPZ8OmzX0kbT4q85tYlyahUrLO7vh+Q9CG+UcE/4OKDyD1+dxYsa6iILwY4cUTfi
+	t9dmrfi1Q=
+Received: from localhost.localdomain (unknown [115.192.71.0])
+	by smtp12 (Coremail) with SMTP id EMCowAC31lxJFuRcie7uGw--.4521S4;
+	Tue, 21 May 2019 23:16:33 +0800 (CST)
+From: Li Qiang <liq3ea@163.com>
+To: alex.williamson@redhat.com,
+	lvivier@redhat.com
+Date: Tue, 21 May 2019 08:15:41 -0700
+Message-Id: <20190521151543.92274-3-liq3ea@163.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20190521151543.92274-1-liq3ea@163.com>
+References: <20190521151543.92274-1-liq3ea@163.com>
+X-CM-TRANSID: EMCowAC31lxJFuRcie7uGw--.4521S4
+X-Coremail-Antispam: 1Uf129KBjvJXoW7CFW7tFy5Wr48JFy5Kr13twb_yoW8KrykpF
+	n7Ja4fWF1jgr4Yvw4xC3W5AFZ8GF4kG347K34kCw1ay3W5Gr17ZrWjyF4UArZ8Cry5ZFWa
+	vF42yr4rAa1Fvr7anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07jcMa8UUUUU=
+X-Originating-IP: [115.192.71.0]
+X-CM-SenderInfo: 5oltjvrd6rljoofrz/xtbBaxS7bVetvgGjDgAAsB
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
+X-Received-From: 220.181.12.16
+Subject: [Qemu-devel] [PATCH v2 2/4] hw: vfio: drop TYPE_FOO MACRO in
+ VMStateDescription
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -76,36 +74,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
-	"Daniel P. =?utf-8?Q?Berrang=C3=A9?=" <berrange@redhat.com>,
-	Eduardo Habkost <ehabkost@redhat.com>,
-	Gabriel Barreto <sbarreto.gabriel@gmail.com>,
-	qemu-devel@nongnu.org, "Emilio G. Cota" <cota@braap.org>,
-	Stefan Hajnoczi <stefanha@redhat.com>,
-	Cleber Rosa <crosa@redhat.com>, John Snow <jsnow@redhat.com>
+Cc: qemu-trivial@nongnu.org, philmd@redhat.com, liq3ea@gmail.com,
+	qemu-devel@nongnu.org, Li Qiang <liq3ea@163.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Paolo Bonzini <pbonzini@redhat.com> writes:
+It's recommended that VMStateDescription names are decoupled from QOM
+type names as the latter may freely change without consideration of
+migration compatibility.
 
-> On 21/05/19 10:53, Daniel P. Berrang=C3=A9 wrote:
-[...]
->> QEMU should pick a tool which is well established / widely used & thus
->> stands a good chance of being maintained for the long term, as we don't
->> want to end up relying on abandonware in 5 years time.  The kernel-doc
->> project is not widely used, but its main user is significant enough that
->> it isn't likely to die through lack of maintainers.
->
-> A couple years ago I didn't have problems modifying kerneldoc for QEMU's
-> syntax, it was a 10 lines patch.  Unfortunately I cannot find it anymore.
+Link: https://lists.gnu.org/archive/html/qemu-devel/2018-10/msg02175.html
 
-"QEMU's syntax" --- excuse me while I guffaw.
+CC: qemu-trivial@nongnu.org
+Signed-off-by: Li Qiang <liq3ea@163.com>
+---
+ hw/vfio/amd-xgbe.c      | 2 +-
+ hw/vfio/ap.c            | 2 +-
+ hw/vfio/calxeda-xgmac.c | 2 +-
+ hw/vfio/ccw.c           | 2 +-
+ hw/vfio/platform.c      | 2 +-
+ 5 files changed, 5 insertions(+), 5 deletions(-)
 
-What you (quite charitably) call "syntax", I call a habit of imitating
-examples.
+diff --git a/hw/vfio/amd-xgbe.c b/hw/vfio/amd-xgbe.c
+index ee64a3b4a2..1b06c0f3ea 100644
+--- a/hw/vfio/amd-xgbe.c
++++ b/hw/vfio/amd-xgbe.c
+@@ -26,7 +26,7 @@ static void amd_xgbe_realize(DeviceState *dev, Error **errp)
+ }
+ 
+ static const VMStateDescription vfio_platform_amd_xgbe_vmstate = {
+-    .name = TYPE_VFIO_AMD_XGBE,
++    .name = "vfio-amd-xgbe",
+     .unmigratable = 1,
+ };
+ 
+diff --git a/hw/vfio/ap.c b/hw/vfio/ap.c
+index d8b79ebe53..564751650f 100644
+--- a/hw/vfio/ap.c
++++ b/hw/vfio/ap.c
+@@ -155,7 +155,7 @@ static void vfio_ap_reset(DeviceState *dev)
+ }
+ 
+ static const VMStateDescription vfio_ap_vmstate = {
+-    .name = VFIO_AP_DEVICE_TYPE,
++    .name = "vfio-ap",
+     .unmigratable = 1,
+ };
+ 
+diff --git a/hw/vfio/calxeda-xgmac.c b/hw/vfio/calxeda-xgmac.c
+index e7767c4b02..6cc608b6ca 100644
+--- a/hw/vfio/calxeda-xgmac.c
++++ b/hw/vfio/calxeda-xgmac.c
+@@ -26,7 +26,7 @@ static void calxeda_xgmac_realize(DeviceState *dev, Error **errp)
+ }
+ 
+ static const VMStateDescription vfio_platform_calxeda_xgmac_vmstate = {
+-    .name = TYPE_VFIO_CALXEDA_XGMAC,
++    .name = "vfio-calxeda-xgmac",
+     .unmigratable = 1,
+ };
+ 
+diff --git a/hw/vfio/ccw.c b/hw/vfio/ccw.c
+index 31dd3a2a87..d9e39552e2 100644
+--- a/hw/vfio/ccw.c
++++ b/hw/vfio/ccw.c
+@@ -468,7 +468,7 @@ static Property vfio_ccw_properties[] = {
+ };
+ 
+ static const VMStateDescription vfio_ccw_vmstate = {
+-    .name = TYPE_VFIO_CCW,
++    .name = "vfio-ccw",
+     .unmigratable = 1,
+ };
+ 
+diff --git a/hw/vfio/platform.c b/hw/vfio/platform.c
+index 398db38f14..e59a0234dd 100644
+--- a/hw/vfio/platform.c
++++ b/hw/vfio/platform.c
+@@ -697,7 +697,7 @@ out:
+ }
+ 
+ static const VMStateDescription vfio_platform_vmstate = {
+-    .name = TYPE_VFIO_PLATFORM,
++    .name = "vfio-platform",
+     .unmigratable = 1,
+ };
+ 
+-- 
+2.17.1
 
-Anyway.  What's so special about QEMU that justifies coming up with our
-own doc syntax?  Other than "we made a hash of it, and cleaning it up
-would be work".
+
 
