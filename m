@@ -2,59 +2,88 @@ Return-Path: <SRS0=/4tE=TV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A0703C04AAF
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 08:25:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EECD9C04AAF
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 08:38:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 58B96216B7
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 08:25:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 58B96216B7
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id AB0562173C
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 08:38:15 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VAXJiRdh"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AB0562173C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:48793 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:48903 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hT05p-0005Cd-KJ
-	for qemu-devel@archiver.kernel.org; Tue, 21 May 2019 04:25:53 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:44732)
+	id 1hT0Hm-0000nh-Mo
+	for qemu-devel@archiver.kernel.org; Tue, 21 May 2019 04:38:14 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:47184)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1hT04f-0004Xu-5k
-	for qemu-devel@nongnu.org; Tue, 21 May 2019 04:24:43 -0400
+	(envelope-from <aleksandar.m.mail@gmail.com>) id 1hT0Gt-0000Wm-Od
+	for qemu-devel@nongnu.org; Tue, 21 May 2019 04:37:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1hT04c-0005rt-Bg
-	for qemu-devel@nongnu.org; Tue, 21 May 2019 04:24:41 -0400
-Received: from 18.mo3.mail-out.ovh.net ([87.98.172.162]:43386)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1hT04a-0005Du-PM
-	for qemu-devel@nongnu.org; Tue, 21 May 2019 04:24:37 -0400
-Received: from player773.ha.ovh.net (unknown [10.108.42.184])
-	by mo3.mail-out.ovh.net (Postfix) with ESMTP id CCE3E2152F4
-	for <qemu-devel@nongnu.org>; Tue, 21 May 2019 10:24:23 +0200 (CEST)
-Received: from kaod.org (lfbn-1-10649-41.w90-89.abo.wanadoo.fr [90.89.235.41])
-	(Authenticated sender: clg@kaod.org)
-	by player773.ha.ovh.net (Postfix) with ESMTPSA id 407C55FB8CA5;
-	Tue, 21 May 2019 08:24:15 +0000 (UTC)
-From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-To: David Gibson <david@gibson.dropbear.id.au>
-Date: Tue, 21 May 2019 10:24:11 +0200
-Message-Id: <20190521082411.24719-1-clg@kaod.org>
-X-Mailer: git-send-email 2.20.1
+	(envelope-from <aleksandar.m.mail@gmail.com>) id 1hT0Gr-0005bH-Qk
+	for qemu-devel@nongnu.org; Tue, 21 May 2019 04:37:19 -0400
+Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:39840)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
+	id 1hT0Gr-0005an-HO
+	for qemu-devel@nongnu.org; Tue, 21 May 2019 04:37:17 -0400
+Received: by mail-ot1-x343.google.com with SMTP id r7so15587850otn.6
+	for <qemu-devel@nongnu.org>; Tue, 21 May 2019 01:37:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+	h=mime-version:in-reply-to:references:from:date:message-id:subject:to
+	:cc; bh=yO3PF3UtYMtf4SMw0p+gc6JQod5AakYaCn+z4E2DrJM=;
+	b=VAXJiRdh0vXcFjtuodr6Rrvce7jIcPW7n8ZAbQ/Zbv2GaCCNtErbZtAygbYVtOIR8B
+	5NQYxUojXS2RQx9gZ+96bcl36mEbY+tUFoql+CwwAoYvqRhKarRHvsAZmL1t75SqNvcQ
+	MaEikj45IZFeVD0/avv71nBN8Q+/FwpzQVWvSLjpHAdcdxA9r3WAn6kmUx8+kaA6aElm
+	A/46frqR1ciAfBK/iqbmbF6+7u7kA5JBHasgX27jY3ML2TZD7JNqGGsK8TBP7L+D6rMM
+	Fm5eaxIOX3A0ADEBxlJ0/gGy6lNDM5GXZpY+57gESXZBOGTp5U3xtGCb7BkVyZ47h8Bf
+	O9oQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:mime-version:in-reply-to:references:from:date
+	:message-id:subject:to:cc;
+	bh=yO3PF3UtYMtf4SMw0p+gc6JQod5AakYaCn+z4E2DrJM=;
+	b=FcotxubE+HEuRCDTQJkdeYpLlU2pIETSxlI6JOZzg6Gh1VpxZFyKVeVaAt5gM6FnuZ
+	IXR0nHZXakNWHpZMMuGWVeT9hU5881V40212GUx2Fj9IyrLpG5GCrKGdcm5/IfHgEaZq
+	0M+3C/m1qn45ic1LNTsYuDNdLLiLXyp1rvMiuzFOo5m5rO11qevqbVYN2yguFBkPFhVw
+	MP5K/CZvwsvvD6zWUHJeCmY9v7h6NPTd6NRzPiEp4x3elxNabfELf/lpn+3lXwXw0Y3h
+	Dhxk5UxcewWJDAkhcI1R4WAnV528O+D2p8jrXXcJuxdPxdv0Yb0xQTNJ0lKae35ddhLj
+	gIEw==
+X-Gm-Message-State: APjAAAW1m+LjXC8BJx4k7Rzb8EOLKss6VsInD4y3zyrQHSMqkyHyRINj
+	jD51CPrZ0Pe/KAOrQY5UIrjhQhY87UeRSvMXCmg=
+X-Google-Smtp-Source: APXvYqyFzgL5PRv2sm1gHjfTXMtfEXVYq0RfjsuOt8cxwcOyZTJz6MqJvm+lLVfCfQtXdWAMSWJL00X+eenKUtc3I4E=
+X-Received: by 2002:a9d:63c1:: with SMTP id e1mr15371726otl.341.1558427836300; 
+	Tue, 21 May 2019 01:37:16 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Ovh-Tracer-Id: 13093934443890510822
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduuddruddutddgtdefucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddm
+Received: by 2002:a9d:410f:0:0:0:0:0 with HTTP; Tue, 21 May 2019 01:37:15
+	-0700 (PDT)
+Received: by 2002:a9d:410f:0:0:0:0:0 with HTTP; Tue, 21 May 2019 01:37:15
+	-0700 (PDT)
+In-Reply-To: <20190520231910.12184-3-f4bug@amsat.org>
+References: <20190520231910.12184-1-f4bug@amsat.org>
+	<20190520231910.12184-3-f4bug@amsat.org>
+From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Date: Tue, 21 May 2019 10:37:15 +0200
+Message-ID: <CAL1e-=hx+Dvfdyv3Nx+fPt8KfQ3T8y_iXeyYAXWoYfNPf+cKUQ@mail.gmail.com>
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::343
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 87.98.172.162
-Subject: [Qemu-devel] [PATCH v3] docs: provide documentation on the POWER9
- XIVE interrupt controller
+X-Content-Filtered-By: Mailman/MimeDel 2.1.21
+Subject: Re: [Qemu-devel] [PATCH 2/4] BootLinuxConsoleTest: Test nanoMIPS
+ kernels on the I7200 CPU
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -66,494 +95,171 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org,
-	Greg Kurz <groug@kaod.org>,
-	Satheesh Rajendran <sathnaga@linux.vnet.ibm.com>,
-	=?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>, qemu-ppc@nongnu.org
+Cc: Eduardo Habkost <ehabkost@redhat.com>,
+	Aleksandar Rikalo <arikalo@wavecomp.com>,
+	Caio Carrara <ccarrara@redhat.com>, qemu-devel@nongnu.org,
+	Aleksandar Markovic <amarkovic@wavecomp.com>,
+	Cleber Rosa <crosa@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This documents the overall XIVE architecture and the XIVE support for
-sPAPR guest machines (pseries).
+On May 21, 2019 1:19 AM, "Philippe Mathieu-Daud=C3=A9" <f4bug@amsat.org> wr=
+ote:
+>
+> Similar to the x86_64/pc test, it boots a Linux kernel on a Malta
+> machine and verify the serial is working.
+>
+> Use the documentation added in commit f7d257cb4a17 to test
+> nanoMIPS kernels and the I7200 CPU.
+>
+> This test can be run using:
+>
+>   $ avocado --show=3Dconsole run -t arch:mipsel
+tests/acceptance/boot_linux_console.py
+>   console: [    0.000000] Linux version 4.15.18-00432-gb2eb9a8b
+(emubuild@mipscs563) (gcc version 6.3.0 (Codescape GNU Tools 2018.04-02 for
+nanoMIPS Linux)) #1 SMP Wed Jun 27 11:10:08 PDT 2018
+>   console: [    0.000000] GCRs appear to have been moved (expected them
+at 0x1fbf8000)!
+>   console: [    0.000000] GCRs appear to have been moved (expected them
+at 0x1fbf8000)!
+>   console: [    0.000000] CPU0 revision is: 00010000 (MIPS GENERIC QEMU)
+>   console: [    0.000000] MIPS: machine is mti,malta
+>   console: [    0.000000] Determined physical RAM map:
+>   console: [    0.000000]  memory: 08000000 @ 00000000 (usable)
+>   console: [    0.000000] earlycon: ns16550a0 at I/O port 0x3f8 (options
+'38400n8')
+>   console: [    0.000000] bootconsole [ns16550a0] enabled
+>   console: [    0.000000] User-defined physical RAM map:
+>   console: [    0.000000]  memory: 10000000 @ 00000000 (usable)
+>   console: [    0.000000] Initrd not found or empty - disabling initrd
+>   console: [    0.000000] MIPS CPS SMP unable to proceed without a CM
+>   console: [    0.000000] Primary instruction cache 32kB, VIPT, 4-way,
+linesize 32 bytes.
+>   console: [    0.000000] Primary data cache 32kB, 4-way, VIPT, cache
+aliases, linesize 32 bytes
+>   console: [    0.000000] This processor doesn't support highmem.
+-262144k highmem ignored
+>   console: [    0.000000] Zone ranges:
+>   console: [    0.000000]   Normal   [mem
+0x0000000000000000-0x000000000fffffff]
+>   console: [    0.000000]   HighMem  empty
+>   console: [    0.000000] Movable zone start for each node
+>   console: [    0.000000] Early memory node ranges
+>   console: [    0.000000]   node   0: [mem
+0x0000000000000000-0x000000000fffffff]
+>   console: [    0.000000] Initmem setup node 0 [mem
+0x0000000000000000-0x000000000fffffff]
+>   console: [    0.000000] random: get_random_bytes called from
+start_kernel+0x60/0x2f0 with crng_init=3D0
+>   console: [    0.000000] percpu: Embedded 16 pages/cpu @(ptrval) s36620
+r8192 d20724 u65536
+>   console: [    0.000000] Built 1 zonelists, mobility grouping on.  Total
+pages: 64960
+>   console: [    0.000000] Kernel command line: printk.time=3D0 mem=3D256m=
+@@0x0
+console=3DttyS0 earlycon
+>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> ---
 
-It also provides documentation on the 'info pic' command.
+Fantastiquement.
 
-Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
----
+Acked-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 
- Changes since v2:
-
- - fixed typos.
-
- Changes since v1:
-
- - reorganized into different files and directories. I don't think the
-   'info pic' documentation belongs to 'interop' nor 'devel' and so
-   the ppc-spapr-xive.rst file seemed like the best place for it.
-  =20
- docs/index.rst                |   1 +
- docs/specs/index.rst          |  13 +++
- docs/specs/ppc-spapr-xive.rst | 174 +++++++++++++++++++++++++++++
- docs/specs/ppc-xive.rst       | 199 ++++++++++++++++++++++++++++++++++
- MAINTAINERS                   |   1 +
- 5 files changed, 388 insertions(+)
- create mode 100644 docs/specs/index.rst
- create mode 100644 docs/specs/ppc-spapr-xive.rst
- create mode 100644 docs/specs/ppc-xive.rst
-
-diff --git a/docs/index.rst b/docs/index.rst
-index 3690955dd1f5..baa5791c174b 100644
---- a/docs/index.rst
-+++ b/docs/index.rst
-@@ -12,4 +12,5 @@ Welcome to QEMU's documentation!
-=20
-    interop/index
-    devel/index
-+   specs/index
-=20
-diff --git a/docs/specs/index.rst b/docs/specs/index.rst
-new file mode 100644
-index 000000000000..2e927519c2e7
---- /dev/null
-+++ b/docs/specs/index.rst
-@@ -0,0 +1,13 @@
-+. This is the top level page for the 'specs' manual
-+
-+
-+QEMU full-system emulation guest hardware specifications
-+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D
-+
-+
-+Contents:
-+
-+.. toctree::
-+   :maxdepth: 2
-+
-+   xive
-diff --git a/docs/specs/ppc-spapr-xive.rst b/docs/specs/ppc-spapr-xive.rs=
-t
-new file mode 100644
-index 000000000000..539ce7ca4e90
---- /dev/null
-+++ b/docs/specs/ppc-spapr-xive.rst
-@@ -0,0 +1,174 @@
-+XIVE for sPAPR (pseries machines)
-+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D
-+
-+The POWER9 processor comes with a new interrupt controller
-+architecture, called XIVE as "eXternal Interrupt Virtualization
-+Engine". It supports a larger number of interrupt sources and offers
-+virtualization features which enables the HW to deliver interrupts
-+directly to virtual processors without hypervisor assistance.
-+
-+A QEMU ``pseries`` machine (which is PAPR compliant) using POWER9
-+processors can run under two interrupt modes:
-+
-+- *Legacy Compatibility Mode*
-+
-+  the hypervisor provides identical interfaces and similar
-+  functionality to PAPR+ Version 2.7.  This is the default mode
-+
-+  It is also referred as *XICS* in QEMU.
-+
-+- *XIVE native exploitation mode*
-+
-+  the hypervisor provides new interfaces to manage the XIVE control
-+  structures, and provides direct control for interrupt management
-+  through MMIO pages.
-+
-+Which interrupt modes can be used by the machine is negotiated with
-+the guest O/S during the Client Architecture Support negotiation
-+sequence. The two modes are mutually exclusive.
-+
-+Both interrupt mode share the same IRQ number space. See below for the
-+layout.
-+
-+CAS Negotiation
-+---------------
-+
-+QEMU advertises the supported interrupt modes in the device tree
-+property "ibm,arch-vec-5-platform-support" in byte 23 and the OS
-+Selection for XIVE is indicated in the "ibm,architecture-vec-5"
-+property byte 23.
-+
-+The interrupt modes supported by the machine depend on the CPU type
-+(POWER9 is required for XIVE) but also on the machine property
-+``ic-mode`` which can be set on the command line. It can take the
-+following values: ``xics``, ``xive``, ``dual`` and currently ``xics``
-+is the default but it may change in the future.
-+
-+The choosen interrupt mode is activated after a reconfiguration done
-+in a machine reset.
-+
-+XIVE Device tree properties
-+---------------------------
-+
-+The properties for the PAPR interrupt controller node when the *XIVE
-+native exploitation mode* is selected shoud contain:
-+
-+- ``device_type``
-+
-+  value should be "power-ivpe".
-+
-+- ``compatible``
-+
-+  value should be "ibm,power-ivpe".
-+
-+- ``reg``
-+
-+  contains the base address and size of the thread interrupt
-+  managnement areas (TIMA), for the User level and for the Guest OS
-+  level. Only the Guest OS level is taken into account today.
-+
-+- ``ibm,xive-eq-sizes``
-+
-+  the size of the event queues. One cell per size supported, contains
-+  log2 of size, in ascending order.
-+
-+- ``ibm,xive-lisn-ranges``
-+
-+  the IRQ interrupt number ranges assigned to the guest for the IPIs.
-+
-+The root node also exports :
-+
-+- ``ibm,plat-res-int-priorities``
-+
-+  contains a list of priorities that the hypervisor has reserved for
-+  its own use.
-+
-+IRQ number space
-+----------------
-+
-+IRQ Number space of the ``pseries`` machine is 8K wide and is the same
-+for both interrupt mode. The different ranges are defined as follow :
-+
-+- ``0x0000 .. 0x0FFF`` 4K CPU IPIs (only used under XIVE)
-+- ``0x1000 .. 0x1000`` 1 EPOW
-+- ``0x1001 .. 0x1001`` 1 HOTPLUG
-+- ``0x1100 .. 0x11FF`` 256 VIO devices
-+- ``0x1200 .. 0x127F`` 32 PHBs devices
-+- ``0x1280 .. 0x12FF`` unused
-+- ``0x1300 .. 0x1FFF`` PHB MSIs
-+
-+Monitoring XIVE
-+---------------
-+
-+The state of the XIVE interrupt controller can be queried through the
-+monitor commands ``info pic``. The output comes in two parts.
-+
-+First, the state of the thread interrupt context registers is dumped
-+for each CPU :
-+
-+::
-+
-+   (qemu) info pic
-+   CPU[0000]:   QW   NSR CPPR IPB LSMFB ACK# INC AGE PIPR  W2
-+   CPU[0000]: USER    00   00  00    00   00  00  00   00  00000000
-+   CPU[0000]:   OS    00   ff  00    00   ff  00  ff   ff  80000400
-+   CPU[0000]: POOL    00   00  00    00   00  00  00   00  00000000
-+   CPU[0000]: PHYS    00   00  00    00   00  00  00   ff  00000000
-+   ...
-+
-+In the case of a ``pseries`` machine, QEMU acts as the hypervisor and on=
-ly
-+the O/S and USER register rings make sense. ``W2`` contains the vCPU CAM
-+line which is set to the VP identifier.
-+
-+Then comes the routing information which aggregates the EAS and the
-+END configuration:
-+
-+::
-+
-+   ...
-+   LISN         PQ    EISN     CPU/PRIO EQ
-+   00000000 MSI --    00000010   0/6    380/16384 @1fe3e0000 ^1 [ 800000=
-10 ... ]
-+   00000001 MSI --    00000010   1/6    305/16384 @1fc230000 ^1 [ 800000=
-10 ... ]
-+   00000002 MSI --    00000010   2/6    220/16384 @1fc2f0000 ^1 [ 800000=
-10 ... ]
-+   00000003 MSI --    00000010   3/6    201/16384 @1fc390000 ^1 [ 800000=
-10 ... ]
-+   00000004 MSI -Q  M 00000000
-+   00000005 MSI -Q  M 00000000
-+   00000006 MSI -Q  M 00000000
-+   00000007 MSI -Q  M 00000000
-+   00001000 MSI --    00000012   0/6    380/16384 @1fe3e0000 ^1 [ 800000=
-10 ... ]
-+   00001001 MSI --    00000013   0/6    380/16384 @1fe3e0000 ^1 [ 800000=
-10 ... ]
-+   00001100 MSI --    00000100   1/6    305/16384 @1fc230000 ^1 [ 800000=
-10 ... ]
-+   00001101 MSI -Q  M 00000000
-+   00001200 LSI -Q  M 00000000
-+   00001201 LSI -Q  M 00000000
-+   00001202 LSI -Q  M 00000000
-+   00001203 LSI -Q  M 00000000
-+   00001300 MSI --    00000102   1/6    305/16384 @1fc230000 ^1 [ 800000=
-10 ... ]
-+   00001301 MSI --    00000103   2/6    220/16384 @1fc2f0000 ^1 [ 800000=
-10 ... ]
-+   00001302 MSI --    00000104   3/6    201/16384 @1fc390000 ^1 [ 800000=
-10 ... ]
-+
-+The source information and configuration:
-+
-+- The ``LISN`` column outputs the interrupt number of the source in
-+  range ``[ 0x0 ... 0x1FFF ]`` and its type : ``MSI`` or ``LSI``
-+- The ``PQ`` column reflects the state of the PQ bits of the source :
-+
-+  - ``--`` source is ready to take events
-+  - ``P-`` an event was sent and an EOI is PENDING
-+  - ``PQ`` an event was QUEUED
-+  - ``-Q`` source is OFF
-+
-+  a ``M`` indicates that source is *MASKED* at the EAS level,
-+
-+The targeting configuration :
-+
-+- The ``EISN`` column is the event data that will be queued in the event
-+  queue of the O/S.
-+- The ``CPU/PRIO`` column is the tuple defining the CPU number and
-+  priority queue serving the source.
-+- The ``EQ`` column outputs :
-+
-+  - the current index of the event queue/ the max number of entries
-+  - the O/S event queue address
-+  - the toggle bit
-+  - the last entries that were pushed in the event queue.
-diff --git a/docs/specs/ppc-xive.rst b/docs/specs/ppc-xive.rst
-new file mode 100644
-index 000000000000..b997dc062910
---- /dev/null
-+++ b/docs/specs/ppc-xive.rst
-@@ -0,0 +1,199 @@
-+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D
-+POWER9 XIVE interrupt controller
-+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D
-+
-+The POWER9 processor comes with a new interrupt controller
-+architecture, called XIVE as "eXternal Interrupt Virtualization
-+Engine".
-+
-+Compared to the previous architecture, the main characteristics of
-+XIVE are to support a larger number of interrupt sources and to
-+deliver interrupts directly to virtual processors without hypervisor
-+assistance. This removes the context switches required for the
-+delivery process.
-+
-+
-+XIVE architecture
-+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-+
-+The XIVE IC is composed of three sub-engines, each taking care of a
-+processing layer of external interrupts:
-+
-+- Interrupt Virtualization Source Engine (IVSE), or Source Controller
-+  (SC). These are found in PCI PHBs, in the PSI host bridge
-+  controller, but also inside the main controller for the core IPIs
-+  and other sub-chips (NX, CAP, NPU) of the chip/processor. They are
-+  configured to feed the IVRE with events.
-+- Interrupt Virtualization Routing Engine (IVRE) or Virtualization
-+  Controller (VC). It handles event coalescing and perform interrupt
-+  routing by matching an event source number with an Event
-+  Notification Descriptor (END).
-+- Interrupt Virtualization Presentation Engine (IVPE) or Presentation
-+  Controller (PC). It maintains the interrupt context state of each
-+  thread and handles the delivery of the external interrupt to the
-+  thread.
-+
-+::
-+
-+                XIVE Interrupt Controller
-+                +------------------------------------+      IPIs
-+                | +---------+ +---------+ +--------+ |    +-------+
-+                | |IVRE     | |Common Q | |IVPE    |----> | CORES |
-+                | |     esb | |         | |        |----> |       |
-+                | |     eas | |  Bridge | |   tctx |----> |       |
-+                | |SC   end | |         | |    nvt | |    |       |
-+    +------+    | +---------+ +----+----+ +--------+ |    +-+-+-+-+
-+    | RAM  |    +------------------|-----------------+      | | |
-+    |      |                       |                        | | |
-+    |      |                       |                        | | |
-+    |      |  +--------------------v------------------------v-v-v--+    =
-other
-+    |      <--+                     Power Bus                      +--> =
-chips
-+    |  esb |  +---------+-----------------------+------------------+
-+    |  eas |            |                       |
-+    |  end |         +--|------+                |
-+    |  nvt |       +----+----+ |           +----+----+
-+    +------+       |IVSE     | |           |IVSE     |
-+                   |         | |           |         |
-+                   | PQ-bits | |           | PQ-bits |
-+                   | local   |-+           |  in VC  |
-+                   +---------+             +---------+
-+                      PCIe                 NX,NPU,CAPI
-+
-+
-+    PQ-bits: 2 bits source state machine (P:pending Q:queued)
-+    esb: Event State Buffer (Array of PQ bits in an IVSE)
-+    eas: Event Assignment Structure
-+    end: Event Notification Descriptor
-+    nvt: Notification Virtual Target
-+    tctx: Thread interrupt Context registers
-+
-+
-+
-+XIVE internal tables
-+--------------------
-+
-+Each of the sub-engines uses a set of tables to redirect interrupts
-+from event sources to CPU threads.
-+
-+::
-+
-+                                            +-------+
-+    User or O/S                             |  EQ   |
-+        or                          +------>|entries|
-+    Hypervisor                      |       |  ..   |
-+      Memory                        |       +-------+
-+                                    |           ^
-+                                    |           |
-+               +-------------------------------------------------+
-+                                    |           |
-+    Hypervisor      +------+    +---+--+    +---+--+   +------+
-+      Memory        | ESB  |    | EAT  |    | ENDT |   | NVTT |
-+     (skiboot)      +----+-+    +----+-+    +----+-+   +------+
-+                      ^  |        ^  |        ^  |       ^
-+                      |  |        |  |        |  |       |
-+               +-------------------------------------------------+
-+                      |  |        |  |        |  |       |
-+                      |  |        |  |        |  |       |
-+                 +----|--|--------|--|--------|--|-+   +-|-----+    +---=
----+
-+                 |    |  |        |  |        |  | |   | | tctx|    |Thr=
-ead|
-+     IPI or   ---+    +  v        +  v        +  v |---| +  .. |----->  =
-   |
-+    HW events    |                                 |   |       |    |   =
-   |
-+                 |             IVRE                |   | IVPE  |    +---=
----+
-+                 +---------------------------------+   +-------+
-+
-+
-+The IVSE have a 2-bits state machine, P for pending and Q for queued,
-+for each source that allows events to be triggered. They are stored in
-+an Event State Buffer (ESB) array and can be controlled by MMIOs.
-+
-+If the event is let through, the IVRE looks up in the Event Assignment
-+Structure (EAS) table for an Event Notification Descriptor (END)
-+configured for the source. Each Event Notification Descriptor defines
-+a notification path to a CPU and an in-memory Event Queue, in which
-+will be enqueued an EQ data for the O/S to pull.
-+
-+The IVPE determines if a Notification Virtual Target (NVT) can handle
-+the event by scanning the thread contexts of the VCPUs dispatched on
-+the processor HW threads. It maintains the interrupt context state of
-+each thread in a NVT table.
-+
-+XIVE thread interrupt context
-+-----------------------------
-+
-+The XIVE presenter can generate four different exceptions to its
-+HW threads:
-+
-+- hypervisor exception
-+- O/S exception
-+- Event-Based Branch (user level)
-+- msgsnd (doorbell)
-+
-+Each exception has a state independent from the others called a Thread
-+Interrupt Management context. This context is a set of registers which
-+lets the thread handle priority management and interrupt
-+acknowledgment among other things. The most important ones being :
-+
-+- Interrupt Priority Register  (PIPR)
-+- Interrupt Pending Buffer     (IPB)
-+- Current Processor Priority   (CPPR)
-+- Notification Source Register (NSR)
-+
-+TIMA
-+~~~~
-+
-+The Thread Interrupt Management registers are accessible through a
-+specific MMIO region, called the Thread Interrupt Management Area
-+(TIMA), four aligned pages, each exposing a different view of the
-+registers. First page (page address ending in ``0b00``) gives access
-+to the entire context and is reserved for the ring 0 view for the
-+physical thread context. The second (page address ending in ``0b01``)
-+is for the hypervisor, ring 1 view. The third (page address ending in
-+``0b10``) is for the operating system, ring 2 view. The fourth (page
-+address ending in ``0b11``) is for user level, ring 3 view.
-+
-+Interrupt flow from an O/S perspective
-+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-+
-+After an event data has been enqueued in the O/S Event Queue, the IVPE
-+raises the bit corresponding to the priority of the pending interrupt
-+in the register IBP (Interrupt Pending Buffer) to indicate that an
-+event is pending in one of the 8 priority queues. The Pending
-+Interrupt Priority Register (PIPR) is also updated using the IPB. This
-+register represent the priority of the most favored pending
-+notification.
-+
-+The PIPR is then compared to the the Current Processor Priority
-+Register (CPPR). If it is more favored (numerically less than), the
-+CPU interrupt line is raised and the EO bit of the Notification Source
-+Register (NSR) is updated to notify the presence of an exception for
-+the O/S. The O/S acknowledges the interrupt with a special load in the
-+Thread Interrupt Management Area.
-+
-+The O/S handles the interrupt and when done, performs an EOI using a
-+MMIO operation on the ESB management page of the associate source.
-+
-+Overview of the QEMU models for XIVE
-+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-+
-+The XiveSource models the IVSE in general, internal and external. It
-+handles the source ESBs and the MMIO interface to control them.
-+
-+The XiveNotifier is a small helper interface interconnecting the
-+XiveSource to the XiveRouter.
-+
-+The XiveRouter is an abstract model acting as a combined IVRE and
-+IVPE. It routes event notifications using the EAS and END tables to
-+the IVPE sub-engine which does a CAM scan to find a CPU to deliver the
-+exception. Storage should be provided by the inheriting classes.
-+
-+XiveEnDSource is a special source object. It exposes the END ESB MMIOs
-+of the Event Queues which are used for coalescing event notifications
-+and for escalation. Not used on the field, only to sync the EQ cache
-+in OPAL.
-+
-+Finally, the XiveTCTX contains the interrupt state context of a thread,
-+four sets of registers, one for each exception that can be delivered
-+to a CPU. These contexts are scanned by the IVPE to find a matching VP
-+when a notification is triggered. It also models the Thread Interrupt
-+Management Area (TIMA), which exposes the thread context registers to
-+the CPU for interrupt management.
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 9424a490d647..82ac0415b493 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -1708,6 +1708,7 @@ L: qemu-ppc@nongnu.org
- S: Supported
- F: hw/*/*xive*
- F: include/hw/*/*xive*
-+F: docs/*/*xive*
-=20
- Subsystems
- ----------
---=20
-2.20.1
-
-
+>  tests/acceptance/boot_linux_console.py | 58 ++++++++++++++++++++++++++
+>  1 file changed, 58 insertions(+)
+>
+> diff --git a/tests/acceptance/boot_linux_console.py
+b/tests/acceptance/boot_linux_console.py
+> index 6aa084e049..1c330871c0 100644
+> --- a/tests/acceptance/boot_linux_console.py
+> +++ b/tests/acceptance/boot_linux_console.py
+> @@ -10,6 +10,8 @@
+>
+>  import os
+>  import logging
+> +import lzma
+> +import shutil
+>
+>  from avocado_qemu import Test
+>  from avocado.utils import process
+> @@ -136,6 +138,62 @@ class BootLinuxConsole(Test):
+>          console_pattern =3D 'Kernel command line: %s' % kernel_command_l=
+ine
+>          self.wait_for_console_pattern(console_pattern)
+>
+> +    def do_test_mips_malta32el_nanomips(self, kernel_url, kernel_hash):
+> +        kernel_path_xz =3D self.fetch_asset(kernel_url,
+asset_hash=3Dkernel_hash)
+> +        kernel_path =3D self.workdir + "kernel"
+> +        with lzma.open(kernel_path_xz, 'rb') as f_in:
+> +            with open(kernel_path, 'wb') as f_out:
+> +                shutil.copyfileobj(f_in, f_out)
+> +
+> +        self.vm.set_machine('malta')
+> +        self.vm.set_console()
+> +        kernel_command_line =3D (self.KERNEL_COMMON_COMMAND_LINE
+> +                               + 'mem=3D256m@@0x0 '
+> +                               + 'console=3DttyS0')
+> +        self.vm.add_args('-no-reboot',
+> +                         '-cpu', 'I7200',
+> +                         '-kernel', kernel_path,
+> +                         '-append', kernel_command_line)
+> +        self.vm.launch()
+> +        console_pattern =3D 'Kernel command line: %s' % kernel_command_l=
+ine
+> +        self.wait_for_console_pattern(console_pattern)
+> +
+> +    def test_mips_malta32el_nanomips_4k(self):
+> +        """
+> +        :avocado: tags=3Darch:mipsel
+> +        :avocado: tags=3Dmachine:malta
+> +        :avocado: tags=3Dendian:little
+> +        """
+> +        kernel_url =3D ('https://mipsdistros.mips.com/LinuxDistro/nanomi=
+ps/
+'
+> +
+'kernels/v4.15.18-432-gb2eb9a8b07a1-20180627102142/'
+> +                      'generic_nano32r6el_page4k.xz')
+> +        kernel_hash =3D '477456aafd2a0f1ddc9482727f20fe9575565dd6'
+> +        self.do_test_mips_malta32el_nanomips(kernel_url, kernel_hash)
+> +
+> +    def test_mips_malta32el_nanomips_16k_up(self):
+> +        """
+> +        :avocado: tags=3Darch:mipsel
+> +        :avocado: tags=3Dmachine:malta
+> +        :avocado: tags=3Dendian:little
+> +        """
+> +        kernel_url =3D ('https://mipsdistros.mips.com/LinuxDistro/nanomi=
+ps/
+'
+> +
+'kernels/v4.15.18-432-gb2eb9a8b07a1-20180627102142/'
+> +                      'generic_nano32r6el_page16k_up.xz')
+> +        kernel_hash =3D 'e882868f944c71c816e832e2303b7874d044a7bc'
+> +        self.do_test_mips_malta32el_nanomips(kernel_url, kernel_hash)
+> +
+> +    def test_mips_malta32el_nanomips_64k_dbg(self):
+> +        """
+> +        :avocado: tags=3Darch:mipsel
+> +        :avocado: tags=3Dmachine:malta
+> +        :avocado: tags=3Dendian:little
+> +        """
+> +        kernel_url =3D ('https://mipsdistros.mips.com/LinuxDistro/nanomi=
+ps/
+'
+> +
+'kernels/v4.15.18-432-gb2eb9a8b07a1-20180627102142/'
+> +                      'generic_nano32r6el_page64k_dbg.xz')
+> +        kernel_hash =3D '18d1c68f2e23429e266ca39ba5349ccd0aeb7180'
+> +        self.do_test_mips_malta32el_nanomips(kernel_url, kernel_hash)
+> +
+>      def test_aarch64_virt(self):
+>          """
+>          :avocado: tags=3Darch:aarch64
+> --
+> 2.19.1
+>
