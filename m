@@ -2,64 +2,108 @@ Return-Path: <SRS0=/4tE=TV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	T_HK_NAME_DR,USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E13FCC04AAF
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 09:35:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 30CE1C04AAF
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 09:39:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BA6AF21743
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 09:35:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BA6AF21743
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id EFE4A21479
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 09:39:53 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="FbPC9Soi"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EFE4A21479
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:50116 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:50170 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hT1Al-0004cY-4C
-	for qemu-devel@archiver.kernel.org; Tue, 21 May 2019 05:35:03 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:39808)
+	id 1hT1FR-0005n0-8L
+	for qemu-devel@archiver.kernel.org; Tue, 21 May 2019 05:39:53 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:40673)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1hT19f-00044k-LP
-	for qemu-devel@nongnu.org; Tue, 21 May 2019 05:33:56 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1hT1EW-0005QV-0t
+	for qemu-devel@nongnu.org; Tue, 21 May 2019 05:38:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1hT19e-0001Rr-NE
-	for qemu-devel@nongnu.org; Tue, 21 May 2019 05:33:55 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44242)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hT19e-0001NJ-Hv
-	for qemu-devel@nongnu.org; Tue, 21 May 2019 05:33:54 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 1AF965AFD9
-	for <qemu-devel@nongnu.org>; Tue, 21 May 2019 09:33:48 +0000 (UTC)
-Received: from work-vm (ovpn-117-210.ams2.redhat.com [10.36.117.210])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 298F45C269;
-	Tue, 21 May 2019 09:33:38 +0000 (UTC)
-Date: Tue, 21 May 2019 10:33:36 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Jens Freimann <jfreimann@redhat.com>
-Message-ID: <20190521093336.GA2915@work-vm>
-References: <20190517125820.2885-1-jfreimann@redhat.com>
-	<20190517125820.2885-2-jfreimann@redhat.com>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1hT1EV-0005bV-7I
+	for qemu-devel@nongnu.org; Tue, 21 May 2019 05:38:56 -0400
+Received: from mail-am5eur02on0700.outbound.protection.outlook.com
+	([2a01:111:f400:fe07::700]:65251
+	helo=EUR02-AM5-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+	id 1hT1ES-0005Z2-PO; Tue, 21 May 2019 05:38:53 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+	s=selector1;
+	h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+	bh=/3eBWs6f8bqcbiMVtxPsPs76Y7CIQSios09ZUNhB/NE=;
+	b=FbPC9SoiNoNPT3Po52pHbMcxhbIKqfCdGc5PDEd3yCEzTHeVF7ZuG0TzyiICn9ZM5vOzruhqwn7l9m3Qy4vzEagcczZUJsM2YBb1T5OHSznNYRDcf8GEk30CVQ4K7RKITNjuBsceGQbgXVNllm55SRAMKjf0NGPX7ZzhnYmv9js=
+Received: from AM6PR08MB4675.eurprd08.prod.outlook.com (10.255.96.78) by
+	AM6PR08MB3031.eurprd08.prod.outlook.com (52.135.163.140) with Microsoft
+	SMTP
+	Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+	15.20.1922.15; Tue, 21 May 2019 09:38:50 +0000
+Received: from AM6PR08MB4675.eurprd08.prod.outlook.com
+	([fe80::9051:3c85:28c6:a0c1]) by
+	AM6PR08MB4675.eurprd08.prod.outlook.com
+	([fe80::9051:3c85:28c6:a0c1%6]) with mapi id 15.20.1878.024;
+	Tue, 21 May 2019 09:38:50 +0000
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org"
+	<qemu-block@nongnu.org>
+Thread-Topic: [PATCH v5 0/3] Fix overflow bug in qcow2 discard
+Thread-Index: AQHU+dQTIRtQy84OJ0+wrrxOKT4l3aZ1flGA
+Date: Tue, 21 May 2019 09:38:49 +0000
+Message-ID: <4d40c6f9-36c3-076e-16e2-84b8344704b1@virtuozzo.com>
+References: <20190423125706.26989-1-vsementsov@virtuozzo.com>
+In-Reply-To: <20190423125706.26989-1-vsementsov@virtuozzo.com>
+Accept-Language: ru-RU, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-clientproxiedby: HE1PR05CA0136.eurprd05.prod.outlook.com
+	(2603:10a6:7:28::23) To AM6PR08MB4675.eurprd08.prod.outlook.com
+	(2603:10a6:20b:c2::14)
+authentication-results: spf=none (sender IP is )
+	smtp.mailfrom=vsementsov@virtuozzo.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-tagtoolbar-keys: D20190521123847277
+x-originating-ip: [185.231.240.5]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: f7723d20-2255-4624-a0ab-08d6ddd020e2
+x-microsoft-antispam: BCL:0; PCL:0;
+	RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600141)(711020)(4605104)(2017052603328)(7193020);
+	SRVR:AM6PR08MB3031; 
+x-ms-traffictypediagnostic: AM6PR08MB3031:
+x-microsoft-antispam-prvs: <AM6PR08MB30315035108D568A8E3E7610C1070@AM6PR08MB3031.eurprd08.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:2887;
+x-forefront-prvs: 0044C17179
+x-forefront-antispam-report: SFV:NSPM;
+	SFS:(10019020)(396003)(136003)(366004)(376002)(346002)(39850400004)(199004)(189003)(66446008)(5660300002)(64756008)(66476007)(66556008)(31686004)(4744005)(256004)(31696002)(66066001)(478600001)(86362001)(14454004)(446003)(11346002)(186003)(26005)(486006)(66946007)(73956011)(476003)(2616005)(316002)(99286004)(3846002)(6116002)(6512007)(6246003)(7736002)(2501003)(54906003)(53936002)(305945005)(110136005)(8676002)(2906002)(6486002)(102836004)(6436002)(6506007)(386003)(25786009)(229853002)(4326008)(8936002)(81156014)(68736007)(76176011)(52116002)(71200400001)(71190400001)(81166006)(36756003);
+	DIR:OUT; SFP:1102; SCL:1; SRVR:AM6PR08MB3031;
+	H:AM6PR08MB4675.eurprd08.prod.outlook.com; FPR:; SPF:None;
+	LANG:en; PTR:InfoNoRecords; A:1; MX:1; 
+received-spf: None (protection.outlook.com: virtuozzo.com does not designate
+	permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: sfdA7SQhyDnMaCZBx4gQYo/lThyBvPUXFr3E2LKJRxBUWGL219pEw4Z7HnwJWWJoH5KXRPCRB+hDfGu0RFndT98bdfP0L1anbrmb55jGCo/y1Qs3/g+saFhOXtwx3mdBMH/otueGd26XrDNitbNqEZxxToUGWoIEIB96DBRfmDS35Z//n1yq4fQmXFsgAf9sleIY0KVjJralQSsh5a+OFUkAoIa9oaKPKKNVAgx1Cj1UzKikXlBLR35NoQK0bvBUH6ss3D1i4R5fJ618awMBNFF5FRSe1cYGoVnjqJaX//55kfSFZYac3SPQkDwBZJ4laXKOYpEnJYOtWYX4VCj1AUEYVE/n1tzlZb93WotyOPdSrvxOc9+mvPhbXz6vYCC6BqFU4+zCxXXSREPo9OF6gtegfwJJddXk4TO3duQYCT4=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <4471156A33B99F41B2FF572741361821@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190517125820.2885-2-jfreimann@redhat.com>
-User-Agent: Mutt/1.11.4 (2019-03-13)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.39]);
-	Tue, 21 May 2019 09:33:49 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 1/4] migration: allow unplug during
- migration for failover devices
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: f7723d20-2255-4624-a0ab-08d6ddd020e2
+X-MS-Exchange-CrossTenant-originalarrivaltime: 21 May 2019 09:38:49.8609 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB3031
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 2a01:111:f400:fe07::700
+Subject: Re: [Qemu-devel] [PATCH v5 0/3] Fix overflow bug in qcow2 discard
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -71,79 +115,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pkrempa@redhat.com, berrange@redhat.com, ehabkost@redhat.com,
-	mst@redhat.com, aadam@redhat.com, qemu-devel@nongnu.org,
-	laine@redhat.com, ailan@redhat.com
+Cc: "kwolf@redhat.com" <kwolf@redhat.com>, "fam@euphon.net" <fam@euphon.net>,
+	Denis Lunev <den@virtuozzo.com>, "mreitz@redhat.com" <mreitz@redhat.com>,
+	"stefanha@redhat.com" <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Jens Freimann (jfreimann@redhat.com) wrote:
-> In "b06424de62 migration: Disable hotplug/unplug during migration" we
-> added a check to disable unplug for all devices until we have figured
-> out what works. For failover primary devices qdev_unplug() is called
-> from the migration handler, i.e. during migration.
-> 
-> This patch adds a flag to DeviceState which is set to false for all
-> devices and makes an exception for vfio-pci devices that are also
-> primary devices in a failover pair.
-> 
-> Signed-off-by: Jens Freimann <jfreimann@redhat.com>
-
-So I think this is safe in your case, because you trigger the unplug
-right at the start of migration during setup and plug after failure;
-however it's not generally safe - I can't unplug a device while the
-migration is actually in progress.
-
-Dave
-
-> ---
->  hw/core/qdev.c         | 1 +
->  include/hw/qdev-core.h | 1 +
->  qdev-monitor.c         | 2 +-
->  3 files changed, 3 insertions(+), 1 deletion(-)
-> 
-> diff --git a/hw/core/qdev.c b/hw/core/qdev.c
-> index f9b6efe509..98cdaa6bf7 100644
-> --- a/hw/core/qdev.c
-> +++ b/hw/core/qdev.c
-> @@ -954,6 +954,7 @@ static void device_initfn(Object *obj)
->  
->      dev->instance_id_alias = -1;
->      dev->realized = false;
-> +    dev->allow_unplug_during_migration = false;
->  
->      object_property_add_bool(obj, "realized",
->                               device_get_realized, device_set_realized, NULL);
-> diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
-> index 33ed3b8dde..5437395779 100644
-> --- a/include/hw/qdev-core.h
-> +++ b/include/hw/qdev-core.h
-> @@ -146,6 +146,7 @@ struct DeviceState {
->      bool pending_deleted_event;
->      QemuOpts *opts;
->      int hotplugged;
-> +    bool allow_unplug_during_migration;
->      BusState *parent_bus;
->      QLIST_HEAD(, NamedGPIOList) gpios;
->      QLIST_HEAD(, BusState) child_bus;
-> diff --git a/qdev-monitor.c b/qdev-monitor.c
-> index 373b9ad445..9cce8b93c2 100644
-> --- a/qdev-monitor.c
-> +++ b/qdev-monitor.c
-> @@ -867,7 +867,7 @@ void qdev_unplug(DeviceState *dev, Error **errp)
->          return;
->      }
->  
-> -    if (!migration_is_idle()) {
-> +    if (!migration_is_idle() && !dev->allow_unplug_during_migration) {
->          error_setg(errp, "device_del not allowed while migrating");
->          return;
->      }
-> -- 
-> 2.21.0
-> 
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+cGluZw0KDQoyMy4wNC4yMDE5IDE1OjU3LCBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IHdy
+b3RlOg0KPiB2NTogYnkgS2V2aW4ncyBjb21tZW50cw0KPiAwMjogYWRkIGNoZWNrIGZvciBpbnZh
+bGlkIEBieXRlcyBwYXJhbWV0ZXIsIGRyb3Agci1iDQo+IDAzOiBtb3ZlIGZyb20gcWVtdS1pbWcg
+aW5mbyB0byBxZW11LWltZyBtYXAgLWYgcmF3LCBkcm9wIHItYiBhbmQgdC1iDQo+IA0KPiBWbGFk
+aW1pciBTZW1lbnRzb3YtT2dpZXZza2l5ICgzKToNCj4gICAgYmxvY2svcWNvdzItcmVmY291bnQ6
+IGFkZCB0cmFjZS1wb2ludCB0byBxY293Ml9wcm9jZXNzX2Rpc2NhcmRzDQo+ICAgIGJsb2NrL2lv
+OiBiZHJ2X3BkaXNjYXJkOiBzdXBwb3J0IGludDY0X3QgYnl0ZXMgcGFyYW1ldGVyDQo+ICAgIGlv
+dGVzdHM6IHRlc3QgYmlnIHFjb3cyIHNocmluaw0KPiANCj4gICBpbmNsdWRlL2Jsb2NrL2Jsb2Nr
+LmggICAgICB8ICA0ICstLQ0KPiAgIGJsb2NrL2lvLmMgICAgICAgICAgICAgICAgIHwgMTYgKysr
+Ky0tLS0tDQo+ICAgYmxvY2svcWNvdzItcmVmY291bnQuYyAgICAgfCAgNyArKystDQo+ICAgYmxv
+Y2svdHJhY2UtZXZlbnRzICAgICAgICAgfCAgMyArKw0KPiAgIHRlc3RzL3FlbXUtaW90ZXN0cy8y
+NTAgICAgIHwgNzMgKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysNCj4gICB0
+ZXN0cy9xZW11LWlvdGVzdHMvMjUwLm91dCB8IDIzICsrKysrKysrKysrKw0KPiAgIHRlc3RzL3Fl
+bXUtaW90ZXN0cy9ncm91cCAgIHwgIDEgKw0KPiAgIDcgZmlsZXMgY2hhbmdlZCwgMTE2IGluc2Vy
+dGlvbnMoKyksIDExIGRlbGV0aW9ucygtKQ0KPiAgIGNyZWF0ZSBtb2RlIDEwMDc1NSB0ZXN0cy9x
+ZW11LWlvdGVzdHMvMjUwDQo+ICAgY3JlYXRlIG1vZGUgMTAwNjQ0IHRlc3RzL3FlbXUtaW90ZXN0
+cy8yNTAub3V0DQo+IA0KDQoNCi0tIA0KQmVzdCByZWdhcmRzLA0KVmxhZGltaXINCg==
 
