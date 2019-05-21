@@ -7,58 +7,57 @@ X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FF13C04AAF
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AD1DAC46460
 	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 06:31:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 45C2E217D7
+	by mail.kernel.org (Postfix) with ESMTPS id 62FC5217D8
 	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 06:31:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="WbxQVwV5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 45C2E217D7
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="NQHUsCSM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 62FC5217D8
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:47327 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:47325 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hSyJY-0007e4-EG
+	id 1hSyJY-0007dy-Ez
 	for qemu-devel@archiver.kernel.org; Tue, 21 May 2019 02:31:56 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:48616)
+Received: from eggs.gnu.org ([209.51.188.92]:48622)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1hSyHS-0005s5-K9
+	(envelope-from <dgibson@ozlabs.org>) id 1hSyHS-0005s7-RD
 	for qemu-devel@nongnu.org; Tue, 21 May 2019 02:29:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1hSyHR-0007gm-Db
+	(envelope-from <dgibson@ozlabs.org>) id 1hSyHR-0007hH-Me
 	for qemu-devel@nongnu.org; Tue, 21 May 2019 02:29:46 -0400
-Received: from ozlabs.org ([2401:3900:2:1::2]:53285)
+Received: from ozlabs.org ([2401:3900:2:1::2]:37915)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
-	id 1hSyHQ-0007V4-EU; Tue, 21 May 2019 02:29:45 -0400
+	id 1hSyHQ-0007UP-HU; Tue, 21 May 2019 02:29:45 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
-	id 457Qpf1sPPz9sB8; Tue, 21 May 2019 16:29:30 +1000 (AEST)
+	id 457Qpd6fLhz9s5c; Tue, 21 May 2019 16:29:29 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-	d=gibson.dropbear.id.au; s=201602; t=1558420170;
-	bh=wYkYWuH7ycMxiKGkoDj9ZRZOWZRg8x2Va/UMRnZg9lM=;
+	d=gibson.dropbear.id.au; s=201602; t=1558420169;
+	bh=RiYF6y127JDdRmGpDivNEvRY1BoNuZWjbpiaLNBb2Kk=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=WbxQVwV53zZg7kRoijhiL1xrh2xkNhmo4jVQ5kR9uCovCaDCx8iDDZyARe3ijc4GC
-	nOrKRz9ivXX5wapRIpEegbzqqlB8Sz6BLt5gjYO65PLIQCYl71OZJAvE0Jek/G0aoS
-	qqTEl41nxRuFY4SeT1nlvpwZt8GdtR4t7ITy4Bqo=
+	b=NQHUsCSM8zVwEP6WhJGrWhOF4g9f19lGRJA289Mkb6x/VRh1MgWOWFLANmAm/aT+t
+	cZ4prqkHckdrWz5cGVJGXzqlIayU09IxMsNfJC9b8Naqsk9ZWXe+uGoHMWJMJkWCvu
+	dh0Luh1fyOA5jHVBUuAw/6uTg3kw2lFceAuuYz2s=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: peter.maydell@linaro.org
-Date: Tue, 21 May 2019 16:28:51 +1000
-Message-Id: <20190521062924.6930-6-david@gibson.dropbear.id.au>
+Date: Tue, 21 May 2019 16:28:49 +1000
+Message-Id: <20190521062924.6930-4-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190521062924.6930-1-david@gibson.dropbear.id.au>
 References: <20190521062924.6930-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
 X-Received-From: 2401:3900:2:1::2
-Subject: [Qemu-devel] [PULL 05/38] hw/ppc/40p: Move the MC146818 RTC to the
- board where it belongs
+Subject: [Qemu-devel] [PULL 03/38] configure: Use quotes around uses of
+ $CPU_CFLAGS
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -70,69 +69,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: lvivier@redhat.com, gkurz@kaod.org, qemu-devel@nongnu.org,
-	qemu-ppc@nongnu.org, clg@kaod.org,
-	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+Cc: lvivier@redhat.com, gkurz@kaod.org,
+	Richard Henderson <richard.henderson@linaro.org>,
+	qemu-devel@nongnu.org, qemu-ppc@nongnu.org, clg@kaod.org,
 	David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+From: Richard Henderson <richard.henderson@linaro.org>
 
-The MC146818 RTC was incorrectly added to the i82378 chipset in
-commit a04ff940974a. In the next commit (506b7ddf8893) the PReP
-machine use the i82378.
-Since the MC146818 is specific to the PReP machine, move its use
-there.
+About half of the values to which CPU_CFLAGS is set
+have multiple space separated arguments.
 
-Fixes: a04ff940974a
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Message-Id: <20190505152839.18650-3-philmd@redhat.com>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Message-Id: <20190501223819.8584-3-richard.henderson@linaro.org>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/isa/i82378.c | 4 ----
- hw/ppc/prep.c   | 3 +++
- 2 files changed, 3 insertions(+), 4 deletions(-)
+ configure | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
 
-diff --git a/hw/isa/i82378.c b/hw/isa/i82378.c
-index a5d67bc6d7..c08970b24a 100644
---- a/hw/isa/i82378.c
-+++ b/hw/isa/i82378.c
-@@ -21,7 +21,6 @@
- #include "hw/pci/pci.h"
- #include "hw/i386/pc.h"
- #include "hw/timer/i8254.h"
--#include "hw/timer/mc146818rtc.h"
- #include "hw/audio/pcspk.h"
-=20
- #define TYPE_I82378 "i82378"
-@@ -105,9 +104,6 @@ static void i82378_realize(PCIDevice *pci, Error **er=
-rp)
-=20
-     /* 2 82C37 (dma) */
-     isa =3D isa_create_simple(isabus, "i82374");
--
--    /* timer */
--    isa_create_simple(isabus, TYPE_MC146818_RTC);
- }
-=20
- static void i82378_init(Object *obj)
-diff --git a/hw/ppc/prep.c b/hw/ppc/prep.c
-index ebee321148..7a0d311d43 100644
---- a/hw/ppc/prep.c
-+++ b/hw/ppc/prep.c
-@@ -675,6 +675,9 @@ static void ibm_40p_init(MachineState *machine)
-     qdev_prop_set_uint32(dev, "ram-size", machine->ram_size);
-     qdev_init_nofail(dev);
-=20
-+    /* RTC */
-+    isa_create_simple(isa_bus, TYPE_MC146818_RTC);
-+
-     /* initialize CMOS checksums */
-     cmos_checksum =3D 0x6aa9;
-     qbus_walk_children(BUS(isa_bus), prep_set_cmos_checksum, NULL, NULL,=
- NULL,
+diff --git a/configure b/configure
+index 69402f18b8..d0050f9afc 100755
+--- a/configure
++++ b/configure
+@@ -1556,37 +1556,37 @@ case "$cpu" in
+            CPU_CFLAGS=3D"-m64"
+            LDFLAGS=3D"-m64 $LDFLAGS"
+            cross_cc_ppc64=3D$cc
+-           cross_cc_cflags_ppc64=3D$CPU_CFLAGS
++           cross_cc_cflags_ppc64=3D"$CPU_CFLAGS"
+            ;;
+     sparc)
+            CPU_CFLAGS=3D"-m32 -mv8plus -mcpu=3Dultrasparc"
+            LDFLAGS=3D"-m32 -mv8plus $LDFLAGS"
+            cross_cc_sparc=3D$cc
+-           cross_cc_cflags_sparc=3D$CPU_CFLAGS
++           cross_cc_cflags_sparc=3D"$CPU_CFLAGS"
+            ;;
+     sparc64)
+            CPU_CFLAGS=3D"-m64 -mcpu=3Dultrasparc"
+            LDFLAGS=3D"-m64 $LDFLAGS"
+            cross_cc_sparc64=3D$cc
+-           cross_cc_cflags_sparc64=3D$CPU_CFLAGS
++           cross_cc_cflags_sparc64=3D"$CPU_CFLAGS"
+            ;;
+     s390)
+            CPU_CFLAGS=3D"-m31"
+            LDFLAGS=3D"-m31 $LDFLAGS"
+            cross_cc_s390=3D$cc
+-           cross_cc_cflags_s390=3D$CPU_CFLAGS
++           cross_cc_cflags_s390=3D"$CPU_CFLAGS"
+            ;;
+     s390x)
+            CPU_CFLAGS=3D"-m64"
+            LDFLAGS=3D"-m64 $LDFLAGS"
+            cross_cc_s390x=3D$cc
+-           cross_cc_cflags_s390x=3D$CPU_CFLAGS
++           cross_cc_cflags_s390x=3D"$CPU_CFLAGS"
+            ;;
+     i386)
+            CPU_CFLAGS=3D"-m32"
+            LDFLAGS=3D"-m32 $LDFLAGS"
+            cross_cc_i386=3D$cc
+-           cross_cc_cflags_i386=3D$CPU_CFLAGS
++           cross_cc_cflags_i386=3D"$CPU_CFLAGS"
+            ;;
+     x86_64)
+            # ??? Only extremely old AMD cpus do not have cmpxchg16b.
+@@ -1595,13 +1595,13 @@ case "$cpu" in
+            CPU_CFLAGS=3D"-m64 -mcx16"
+            LDFLAGS=3D"-m64 $LDFLAGS"
+            cross_cc_x86_64=3D$cc
+-           cross_cc_cflags_x86_64=3D$CPU_CFLAGS
++           cross_cc_cflags_x86_64=3D"$CPU_CFLAGS"
+            ;;
+     x32)
+            CPU_CFLAGS=3D"-mx32"
+            LDFLAGS=3D"-mx32 $LDFLAGS"
+            cross_cc_i386=3D$cc
+-           cross_cc_cflags_i386=3D$CPU_CFLAGS
++           cross_cc_cflags_i386=3D"$CPU_CFLAGS"
+            ;;
+     # No special flags required for other host CPUs
+ esac
 --=20
 2.21.0
 
