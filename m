@@ -4,50 +4,50 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B415C04AAF
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 06:44:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0030CC04AAF
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 06:46:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 484F121743
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 06:44:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C386921743
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 06:46:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="WxU91dHN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 484F121743
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="iZbjrjlm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C386921743
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:47523 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:47570 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hSyVw-0001uh-FC
-	for qemu-devel@archiver.kernel.org; Tue, 21 May 2019 02:44:44 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:49020)
+	id 1hSyXJ-00037m-UB
+	for qemu-devel@archiver.kernel.org; Tue, 21 May 2019 02:46:10 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:48893)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1hSyHb-0005zx-P1
-	for qemu-devel@nongnu.org; Tue, 21 May 2019 02:29:57 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1hSyHY-0005wN-Jn
+	for qemu-devel@nongnu.org; Tue, 21 May 2019 02:29:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1hSyHa-00082L-9q
-	for qemu-devel@nongnu.org; Tue, 21 May 2019 02:29:55 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:49961 helo=ozlabs.org)
+	(envelope-from <dgibson@ozlabs.org>) id 1hSyHX-0007uB-3i
+	for qemu-devel@nongnu.org; Tue, 21 May 2019 02:29:52 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:44911 helo=ozlabs.org)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
-	id 1hSyHZ-0007wm-MZ; Tue, 21 May 2019 02:29:54 -0400
+	id 1hSyHW-0007nK-FD; Tue, 21 May 2019 02:29:51 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
-	id 457Qpk3yMQz9sPX; Tue, 21 May 2019 16:29:32 +1000 (AEST)
+	id 457Qph1lL5z9sP8; Tue, 21 May 2019 16:29:30 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-	d=gibson.dropbear.id.au; s=201602; t=1558420174;
-	bh=LzYwwIlGfEvhgV7PTNG3ZY/kRSi2/VUEFH8zizDsTrY=;
+	d=gibson.dropbear.id.au; s=201602; t=1558420172;
+	bh=BDmxZb8/fuq570SYItgaSbQcITu2aaOYY38yS/5ivek=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=WxU91dHN6JnsE3LlWfoNpPFaMS5Y8npYBq/XoKa6BvDCjOa/aBXYD6SwAVqxtucAL
-	+BU18a0A9cqBpaHi9fdIgOBk8l9nGK6iKbFdYqA255fDhwbVv5pImEnrC00+96BIlI
-	3IngQfd5uK6ddaRlU5K9GtiCnZEHBQs5tupYEqxk=
+	b=iZbjrjlmJAWkdXaEx2rrpXGbNhWgoKozJDpnygzBp4cfjYzboyMvOqs/0vjUYCviD
+	DyfyMf54Vz+PCTNntvB4+tT1izIQ6y7/4LVJfuQ8n1dVcoyHS5RpMLPqluJ0lCgadJ
+	CtJ2pP6VNLX4/u6C0znkvnlF7lvcP3Sw6SZibRS0=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: peter.maydell@linaro.org
-Date: Tue, 21 May 2019 16:29:15 +1000
-Message-Id: <20190521062924.6930-30-david@gibson.dropbear.id.au>
+Date: Tue, 21 May 2019 16:29:00 +1000
+Message-Id: <20190521062924.6930-15-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190521062924.6930-1-david@gibson.dropbear.id.au>
 References: <20190521062924.6930-1-david@gibson.dropbear.id.au>
@@ -56,8 +56,8 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 203.11.71.1
-Subject: [Qemu-devel] [PULL 29/38] spapr/xive: introduce a VM state change
- handler
+Subject: [Qemu-devel] [PULL 14/38] spapr/xive: fix EQ page addresses above
+ 64GB
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -69,8 +69,8 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: lvivier@redhat.com, gkurz@kaod.org, qemu-devel@nongnu.org,
-	qemu-ppc@nongnu.org, clg@kaod.org,
+Cc: lvivier@redhat.com, gkurz@kaod.org, Greg Kurz <groug@kaod.org>,
+	qemu-devel@nongnu.org, qemu-ppc@nongnu.org, clg@kaod.org,
 	David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
@@ -78,164 +78,108 @@ Sender: "Qemu-devel"
 
 From: C=C3=A9dric Le Goater <clg@kaod.org>
 
-This handler is in charge of stabilizing the flow of event notifications
-in the XIVE controller before migrating a guest. This is a requirement
-before transferring the guest EQ pages to a destination.
+The high order bits of the address of the OS event queue is stored in
+bits [4-31] of word2 of the XIVE END internal structures and the low
+order bits in word3. This structure is using Big Endian ordering and
+computing the value requires some simple arithmetic which happens to
+be wrong. The mask removing bits [0-3] of word2 is applied to the
+wrong value and the resulting address is bogus when above 64GB.
 
-When the VM is stopped, the handler sets the source PQs to PENDING to
-stop the flow of events and to possibly catch a triggered interrupt
-occuring while the VM is stopped. Their previous state is saved. The
-XIVE controller is then synced through KVM to flush any in-flight
-event notification and to stabilize the EQs. At this stage, the EQ
-pages are marked dirty to make sure the EQ pages are transferred if a
-migration sequence is in progress.
+Guests with more than 64GB of RAM will allocate pages for the OS event
+queues which will reside above the 64GB limit. In this case, the XIVE
+device model will wake up the CPUs in case of a notification, such as
+IPIs, but the update of the event queue will be written at the wrong
+place in memory. The result is uncertain as the guest memory is
+trashed and IPI are not delivered.
 
-The previous configuration of the sources is restored when the VM
-resumes, after a migration or a stop. If an interrupt was queued while
-the VM was stopped, the handler simply generates the missing trigger.
+Introduce a helper xive_end_qaddr() to compute this value correctly in
+all places where it is used.
 
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
-Message-Id: <20190513084245.25755-6-clg@kaod.org>
+Message-Id: <20190508171946.657-3-clg@kaod.org>
+Reviewed-by: Greg Kurz <groug@kaod.org>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/intc/spapr_xive_kvm.c    | 96 ++++++++++++++++++++++++++++++++++++-
- include/hw/ppc/spapr_xive.h |  1 +
- 2 files changed, 96 insertions(+), 1 deletion(-)
+ hw/intc/spapr_xive.c       | 3 +--
+ hw/intc/xive.c             | 9 +++------
+ include/hw/ppc/xive_regs.h | 6 ++++++
+ 3 files changed, 10 insertions(+), 8 deletions(-)
 
-diff --git a/hw/intc/spapr_xive_kvm.c b/hw/intc/spapr_xive_kvm.c
-index 8dd4f96e0b..735577a6f8 100644
---- a/hw/intc/spapr_xive_kvm.c
-+++ b/hw/intc/spapr_xive_kvm.c
-@@ -433,9 +433,100 @@ static void kvmppc_xive_get_queues(SpaprXive *xive,=
- Error **errp)
+diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
+index 33da1a52c6..a19e998093 100644
+--- a/hw/intc/spapr_xive.c
++++ b/hw/intc/spapr_xive.c
+@@ -1150,8 +1150,7 @@ static target_ulong h_int_get_queue_config(PowerPCC=
+PU *cpu,
      }
- }
 =20
-+/*
-+ * The primary goal of the XIVE VM change handler is to mark the EQ
-+ * pages dirty when all XIVE event notifications have stopped.
-+ *
-+ * Whenever the VM is stopped, the VM change handler sets the source
-+ * PQs to PENDING to stop the flow of events and to possibly catch a
-+ * triggered interrupt occuring while the VM is stopped. The previous
-+ * state is saved in anticipation of a migration. The XIVE controller
-+ * is then synced through KVM to flush any in-flight event
-+ * notification and stabilize the EQs.
-+ *
-+ * At this stage, we can mark the EQ page dirty and let a migration
-+ * sequence transfer the EQ pages to the destination, which is done
-+ * just after the stop state.
-+ *
-+ * The previous configuration of the sources is restored when the VM
-+ * runs again. If an interrupt was queued while the VM was stopped,
-+ * simply generate a trigger.
-+ */
-+static void kvmppc_xive_change_state_handler(void *opaque, int running,
-+                                             RunState state)
+     if (xive_end_is_enqueue(end)) {
+-        args[1] =3D (uint64_t) be32_to_cpu(end->w2 & 0x0fffffff) << 32
+-            | be32_to_cpu(end->w3);
++        args[1] =3D xive_end_qaddr(end);
+         args[2] =3D xive_get_field32(END_W0_QSIZE, end->w0) + 12;
+     } else {
+         args[1] =3D 0;
+diff --git a/hw/intc/xive.c b/hw/intc/xive.c
+index a0b87001da..dcf2fcd108 100644
+--- a/hw/intc/xive.c
++++ b/hw/intc/xive.c
+@@ -1042,8 +1042,7 @@ static const TypeInfo xive_source_info =3D {
+=20
+ void xive_end_queue_pic_print_info(XiveEND *end, uint32_t width, Monitor=
+ *mon)
+ {
+-    uint64_t qaddr_base =3D (uint64_t) be32_to_cpu(end->w2 & 0x0fffffff)=
+ << 32
+-        | be32_to_cpu(end->w3);
++    uint64_t qaddr_base =3D xive_end_qaddr(end);
+     uint32_t qsize =3D xive_get_field32(END_W0_QSIZE, end->w0);
+     uint32_t qindex =3D xive_get_field32(END_W1_PAGE_OFF, end->w1);
+     uint32_t qentries =3D 1 << (qsize + 10);
+@@ -1072,8 +1071,7 @@ void xive_end_queue_pic_print_info(XiveEND *end, ui=
+nt32_t width, Monitor *mon)
+=20
+ void xive_end_pic_print_info(XiveEND *end, uint32_t end_idx, Monitor *mo=
+n)
+ {
+-    uint64_t qaddr_base =3D (uint64_t) be32_to_cpu(end->w2 & 0x0fffffff)=
+ << 32
+-        | be32_to_cpu(end->w3);
++    uint64_t qaddr_base =3D xive_end_qaddr(end);
+     uint32_t qindex =3D xive_get_field32(END_W1_PAGE_OFF, end->w1);
+     uint32_t qgen =3D xive_get_field32(END_W1_GENERATION, end->w1);
+     uint32_t qsize =3D xive_get_field32(END_W0_QSIZE, end->w0);
+@@ -1101,8 +1099,7 @@ void xive_end_pic_print_info(XiveEND *end, uint32_t=
+ end_idx, Monitor *mon)
+=20
+ static void xive_end_enqueue(XiveEND *end, uint32_t data)
+ {
+-    uint64_t qaddr_base =3D (uint64_t) be32_to_cpu(end->w2 & 0x0fffffff)=
+ << 32
+-        | be32_to_cpu(end->w3);
++    uint64_t qaddr_base =3D xive_end_qaddr(end);
+     uint32_t qsize =3D xive_get_field32(END_W0_QSIZE, end->w0);
+     uint32_t qindex =3D xive_get_field32(END_W1_PAGE_OFF, end->w1);
+     uint32_t qgen =3D xive_get_field32(END_W1_GENERATION, end->w1);
+diff --git a/include/hw/ppc/xive_regs.h b/include/hw/ppc/xive_regs.h
+index bf36678a24..1a8c5b5e64 100644
+--- a/include/hw/ppc/xive_regs.h
++++ b/include/hw/ppc/xive_regs.h
+@@ -208,6 +208,12 @@ typedef struct XiveEND {
+ #define xive_end_is_backlog(end)  (be32_to_cpu((end)->w0) & END_W0_BACKL=
+OG)
+ #define xive_end_is_escalate(end) (be32_to_cpu((end)->w0) & END_W0_ESCAL=
+ATE_CTL)
+=20
++static inline uint64_t xive_end_qaddr(XiveEND *end)
 +{
-+    SpaprXive *xive =3D opaque;
-+    XiveSource *xsrc =3D &xive->source;
-+    Error *local_err =3D NULL;
-+    int i;
-+
-+    /*
-+     * Restore the sources to their initial state. This is called when
-+     * the VM resumes after a stop or a migration.
-+     */
-+    if (running) {
-+        for (i =3D 0; i < xsrc->nr_irqs; i++) {
-+            uint8_t pq =3D xive_source_esb_get(xsrc, i);
-+            uint8_t old_pq;
-+
-+            old_pq =3D xive_esb_read(xsrc, i, XIVE_ESB_SET_PQ_00 + (pq <=
-< 8));
-+
-+            /*
-+             * An interrupt was queued while the VM was stopped,
-+             * generate a trigger.
-+             */
-+            if (pq =3D=3D XIVE_ESB_RESET && old_pq =3D=3D XIVE_ESB_QUEUE=
-D) {
-+                xive_esb_trigger(xsrc, i);
-+            }
-+        }
-+
-+        return;
-+    }
-+
-+    /*
-+     * Mask the sources, to stop the flow of event notifications, and
-+     * save the PQs locally in the XiveSource object. The XiveSource
-+     * state will be collected later on by its vmstate handler if a
-+     * migration is in progress.
-+     */
-+    for (i =3D 0; i < xsrc->nr_irqs; i++) {
-+        uint8_t pq =3D xive_esb_read(xsrc, i, XIVE_ESB_GET);
-+
-+        /*
-+         * PQ is set to PENDING to possibly catch a triggered
-+         * interrupt occuring while the VM is stopped (hotplug event
-+         * for instance) .
-+         */
-+        if (pq !=3D XIVE_ESB_OFF) {
-+            pq =3D xive_esb_read(xsrc, i, XIVE_ESB_SET_PQ_10);
-+        }
-+        xive_source_esb_set(xsrc, i, pq);
-+    }
-+
-+    /*
-+     * Sync the XIVE controller in KVM, to flush in-flight event
-+     * notification that should be enqueued in the EQs and mark the
-+     * XIVE EQ pages dirty to collect all updates.
-+     */
-+    kvm_device_access(xive->fd, KVM_DEV_XIVE_GRP_CTRL,
-+                      KVM_DEV_XIVE_EQ_SYNC, NULL, true, &local_err);
-+    if (local_err) {
-+        error_report_err(local_err);
-+        return;
-+    }
++    return ((uint64_t) be32_to_cpu(end->w2) & 0x0fffffff) << 32 |
++        be32_to_cpu(end->w3);
 +}
 +
- void kvmppc_xive_synchronize_state(SpaprXive *xive, Error **errp)
- {
--    kvmppc_xive_source_get_state(&xive->source);
-+    /*
-+     * When the VM is stopped, the sources are masked and the previous
-+     * state is saved in anticipation of a migration. We should not
-+     * synchronize the source state in that case else we will override
-+     * the saved state.
-+     */
-+    if (runstate_is_running()) {
-+        kvmppc_xive_source_get_state(&xive->source);
-+    }
-=20
-     /* EAT: there is no extra state to query from KVM */
-=20
-@@ -515,6 +606,9 @@ void kvmppc_xive_connect(SpaprXive *xive, Error **err=
-p)
-                                       "xive.tima", tima_len, xive->tm_mm=
-ap);
-     sysbus_init_mmio(SYS_BUS_DEVICE(xive), &xive->tm_mmio);
-=20
-+    xive->change =3D qemu_add_vm_change_state_handler(
-+        kvmppc_xive_change_state_handler, xive);
-+
-     kvm_kernel_irqchip =3D true;
-     kvm_msi_via_irqfd_allowed =3D true;
-     kvm_gsi_direct_mapping =3D true;
-diff --git a/include/hw/ppc/spapr_xive.h b/include/hw/ppc/spapr_xive.h
-index 7e49badd8c..734662c12a 100644
---- a/include/hw/ppc/spapr_xive.h
-+++ b/include/hw/ppc/spapr_xive.h
-@@ -42,6 +42,7 @@ typedef struct SpaprXive {
-     /* KVM support */
-     int           fd;
-     void          *tm_mmap;
-+    VMChangeStateEntry *change;
- } SpaprXive;
-=20
- /*
+ /* Notification Virtual Target (NVT) */
+ typedef struct XiveNVT {
+         uint32_t        w0;
 --=20
 2.21.0
 
