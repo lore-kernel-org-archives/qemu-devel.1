@@ -2,58 +2,63 @@ Return-Path: <SRS0=/4tE=TV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C097BC04AAF
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 06:52:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 50000C04AAF
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 06:52:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 881E121743
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 06:52:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 881E121743
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 0CFAC21773
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 06:52:35 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="KpBFgTBr"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0CFAC21773
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:47674 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:47680 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hSyd0-0000E1-Qf
-	for qemu-devel@archiver.kernel.org; Tue, 21 May 2019 02:52:02 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:49206)
+	id 1hSydX-0000xJ-29
+	for qemu-devel@archiver.kernel.org; Tue, 21 May 2019 02:52:35 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:49502)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richardw.yang@linux.intel.com>) id 1hSyHp-0006Kx-Tg
-	for qemu-devel@nongnu.org; Tue, 21 May 2019 02:30:11 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1hSyI7-0006gE-Qa
+	for qemu-devel@nongnu.org; Tue, 21 May 2019 02:30:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richardw.yang@linux.intel.com>) id 1hSyHm-0008GM-1F
-	for qemu-devel@nongnu.org; Tue, 21 May 2019 02:30:08 -0400
-Received: from mga09.intel.com ([134.134.136.24]:50783)
+	(envelope-from <dgibson@ozlabs.org>) id 1hSyI6-0000Bk-Fr
+	for qemu-devel@nongnu.org; Tue, 21 May 2019 02:30:27 -0400
+Received: from ozlabs.org ([2401:3900:2:1::2]:40331)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <richardw.yang@linux.intel.com>)
-	id 1hSyHg-0008AJ-Lp; Tue, 21 May 2019 02:30:01 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-	by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
-	20 May 2019 23:29:58 -0700
-X-ExtLoop1: 1
-Received: from richard.sh.intel.com (HELO localhost) ([10.239.159.54])
-	by orsmga001.jf.intel.com with ESMTP; 20 May 2019 23:29:55 -0700
-From: Wei Yang <richardw.yang@linux.intel.com>
-To: qemu-devel@nongnu.org,
-	qemu-arm@nongnu.org
-Date: Tue, 21 May 2019 14:28:35 +0800
-Message-Id: <20190521062836.6541-2-richardw.yang@linux.intel.com>
-X-Mailer: git-send-email 2.19.1
-In-Reply-To: <20190521062836.6541-1-richardw.yang@linux.intel.com>
-References: <20190521062836.6541-1-richardw.yang@linux.intel.com>
+	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
+	id 1hSyI5-0008FH-R7; Tue, 21 May 2019 02:30:26 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+	id 457Qpl1dYDz9sPP; Tue, 21 May 2019 16:29:33 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+	d=gibson.dropbear.id.au; s=201602; t=1558420175;
+	bh=fqUWx+o0fahs3svnKmwnawbbhOdSX72WeDfqhKOGZrs=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=KpBFgTBrsVUZ4DcTy/P3q600Cn8DmI1bD3wRc2uy715lmX4hU31rHZ0/JuD/nsV6V
+	XEXIHRdJ6qvaJdIJNvXIG8td2lW437BrwxTNoGno1JpSVywffQQatlqmybktWKXyX4
+	1n4UqmvQYHlTWC1QpPYij4mGjk8AXkb66agLPIjE=
+From: David Gibson <david@gibson.dropbear.id.au>
+To: peter.maydell@linaro.org
+Date: Tue, 21 May 2019 16:29:19 +1000
+Message-Id: <20190521062924.6930-34-david@gibson.dropbear.id.au>
+X-Mailer: git-send-email 2.21.0
+In-Reply-To: <20190521062924.6930-1-david@gibson.dropbear.id.au>
+References: <20190521062924.6930-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 134.134.136.24
-Subject: [Qemu-devel] [PATCH v6 1/2] hw/acpi: Consolidate build_mcfg to pci.c
+X-Received-From: 2401:3900:2:1::2
+Subject: [Qemu-devel] [PULL 33/38] spapr: introduce routines to delete the
+ KVM IRQ device
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -65,212 +70,203 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: yang.zhong@intel.com, peter.maydell@linaro.org, thuth@redhat.com,
-	mst@redhat.com, shannon.zhaosl@gmail.com,
-	Wei Yang <richardw.yang@linux.intel.com>, imammedo@redhat.com,
-	philmd@redhat.com
+Cc: lvivier@redhat.com, gkurz@kaod.org, qemu-devel@nongnu.org,
+	qemu-ppc@nongnu.org, clg@kaod.org,
+	David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Now we have two identical build_mcfg functions.
+From: C=C3=A9dric Le Goater <clg@kaod.org>
 
-Consolidate them in acpi/pci.c.
+If a new interrupt mode is chosen by CAS, the machine generates a
+reset to reconfigure. At this point, the connection with the previous
+KVM device needs to be closed and a new connection needs to opened
+with the KVM device operating the chosen interrupt mode.
 
-Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
+New routines are introduced to destroy the XICS and the XIVE KVM
+devices. They make use of a new KVM device ioctl which destroys the
+device and also disconnects the IRQ presenters from the vCPUs.
 
-v4:
-  * ACPI_PCI depends on both ACPI and PCI
-  * rebase on latest master, adjust arm Kconfig
-v3:
-  * adjust changelog based on Igor's suggestion
+Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+Message-Id: <20190513084245.25755-10-clg@kaod.org>
+Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- default-configs/i386-softmmu.mak |  1 +
- hw/acpi/Kconfig                  |  4 +++
- hw/acpi/Makefile.objs            |  1 +
- hw/acpi/pci.c                    | 46 ++++++++++++++++++++++++++++++++
- hw/arm/Kconfig                   |  1 +
- hw/arm/virt-acpi-build.c         | 17 ------------
- hw/i386/acpi-build.c             | 18 +------------
- include/hw/acpi/pci.h            |  1 +
- 8 files changed, 55 insertions(+), 34 deletions(-)
- create mode 100644 hw/acpi/pci.c
+ hw/intc/spapr_xive_kvm.c    | 56 +++++++++++++++++++++++++++++++++++++
+ hw/intc/xics_kvm.c          | 51 +++++++++++++++++++++++++++++++++
+ include/hw/ppc/spapr_xive.h |  1 +
+ include/hw/ppc/xics_spapr.h |  1 +
+ 4 files changed, 109 insertions(+)
 
-diff --git a/default-configs/i386-softmmu.mak b/default-configs/i386-softmmu.mak
-index ba3fb3ff50..cd5ea391e8 100644
---- a/default-configs/i386-softmmu.mak
-+++ b/default-configs/i386-softmmu.mak
-@@ -25,3 +25,4 @@
- CONFIG_ISAPC=y
- CONFIG_I440FX=y
- CONFIG_Q35=y
-+CONFIG_ACPI_PCI=y
-diff --git a/hw/acpi/Kconfig b/hw/acpi/Kconfig
-index eca3beed75..7c59cf900b 100644
---- a/hw/acpi/Kconfig
-+++ b/hw/acpi/Kconfig
-@@ -23,6 +23,10 @@ config ACPI_NVDIMM
-     bool
-     depends on ACPI
- 
-+config ACPI_PCI
-+    bool
-+    depends on ACPI && PCI
-+
- config ACPI_VMGENID
-     bool
-     default y
-diff --git a/hw/acpi/Makefile.objs b/hw/acpi/Makefile.objs
-index 2d46e3789a..661a9b8c2f 100644
---- a/hw/acpi/Makefile.objs
-+++ b/hw/acpi/Makefile.objs
-@@ -11,6 +11,7 @@ common-obj-$(call lnot,$(CONFIG_ACPI_X86)) += acpi-stub.o
- common-obj-y += acpi_interface.o
- common-obj-y += bios-linker-loader.o
- common-obj-y += aml-build.o
-+common-obj-$(CONFIG_ACPI_PCI) += pci.o
- common-obj-$(CONFIG_TPM) += tpm.o
- 
- common-obj-$(CONFIG_IPMI) += ipmi.o
-diff --git a/hw/acpi/pci.c b/hw/acpi/pci.c
-new file mode 100644
-index 0000000000..fa0fa30bb9
---- /dev/null
-+++ b/hw/acpi/pci.c
-@@ -0,0 +1,46 @@
-+/*
-+ * Support for generating PCI related ACPI tables and passing them to Guests
-+ *
-+ * Copyright (C) 2006 Fabrice Bellard
-+ * Copyright (C) 2008-2010  Kevin O'Connor <kevin@koconnor.net>
-+ * Copyright (C) 2013-2019 Red Hat Inc
-+ * Copyright (C) 2019 Intel Corporation
-+ *
-+ * Author: Wei Yang <richardw.yang@linux.intel.com>
-+ * Author: Michael S. Tsirkin <mst@redhat.com>
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License as published by
-+ * the Free Software Foundation; either version 2 of the License, or
-+ * (at your option) any later version.
-+
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+
-+ * You should have received a copy of the GNU General Public License along
-+ * with this program; if not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "hw/acpi/aml-build.h"
-+#include "hw/acpi/pci.h"
-+#include "hw/pci/pcie_host.h"
-+
-+void build_mcfg(GArray *table_data, BIOSLinker *linker, AcpiMcfgInfo *info)
+diff --git a/hw/intc/spapr_xive_kvm.c b/hw/intc/spapr_xive_kvm.c
+index 3999e4b7ed..259cd1db95 100644
+--- a/hw/intc/spapr_xive_kvm.c
++++ b/hw/intc/spapr_xive_kvm.c
+@@ -58,6 +58,16 @@ static void kvm_cpu_enable(CPUState *cs)
+     QLIST_INSERT_HEAD(&kvm_enabled_cpus, enabled_cpu, node);
+ }
+=20
++static void kvm_cpu_disable_all(void)
 +{
-+    AcpiTableMcfg *mcfg;
-+    int len = sizeof(*mcfg) + sizeof(mcfg->allocation[0]);
++    KVMEnabledCPU *enabled_cpu, *next;
 +
-+    mcfg = acpi_data_push(table_data, len);
-+    mcfg->allocation[0].address = cpu_to_le64(info->base);
-+
-+    /* Only a single allocation so no need to play with segments */
-+    mcfg->allocation[0].pci_segment = cpu_to_le16(0);
-+    mcfg->allocation[0].start_bus_number = 0;
-+    mcfg->allocation[0].end_bus_number = PCIE_MMCFG_BUS(info->size - 1);
-+
-+    build_header(linker, table_data, (void *)mcfg, "MCFG", len, 1, NULL, NULL);
++    QLIST_FOREACH_SAFE(enabled_cpu, &kvm_enabled_cpus, node, next) {
++        QLIST_REMOVE(enabled_cpu, node);
++        g_free(enabled_cpu);
++    }
 +}
 +
-diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
-index af8cffde9c..9aced9d54d 100644
---- a/hw/arm/Kconfig
-+++ b/hw/arm/Kconfig
-@@ -19,6 +19,7 @@ config ARM_VIRT
-     select PLATFORM_BUS
-     select SMBIOS
-     select VIRTIO_MMIO
-+    select ACPI_PCI
- 
- config CHEETAH
-     bool
-diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-index e7c96d658e..4a64f9985c 100644
---- a/hw/arm/virt-acpi-build.c
-+++ b/hw/arm/virt-acpi-build.c
-@@ -546,23 +546,6 @@ build_srat(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
-                  "SRAT", table_data->len - srat_start, 3, NULL, NULL);
- }
- 
--static void
--build_mcfg(GArray *table_data, BIOSLinker *linker, AcpiMcfgInfo *info)
--{
--    AcpiTableMcfg *mcfg;
--    int len = sizeof(*mcfg) + sizeof(mcfg->allocation[0]);
--
--    mcfg = acpi_data_push(table_data, len);
--    mcfg->allocation[0].address = cpu_to_le64(info->base);
--
--    /* Only a single allocation so no need to play with segments */
--    mcfg->allocation[0].pci_segment = cpu_to_le16(0);
--    mcfg->allocation[0].start_bus_number = 0;
--    mcfg->allocation[0].end_bus_number = PCIE_MMCFG_BUS(info->size - 1);
--
--    build_header(linker, table_data, (void *)mcfg, "MCFG", len, 1, NULL, NULL);
--}
--
- /* GTDT */
- static void
- build_gtdt(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
-diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-index 0d78d73894..85dc1640bc 100644
---- a/hw/i386/acpi-build.c
-+++ b/hw/i386/acpi-build.c
-@@ -2405,22 +2405,6 @@ build_srat(GArray *table_data, BIOSLinker *linker, MachineState *machine)
-                  table_data->len - srat_start, 1, NULL, NULL);
- }
- 
--static void
--build_mcfg_q35(GArray *table_data, BIOSLinker *linker, AcpiMcfgInfo *info)
--{
--    AcpiTableMcfg *mcfg;
--    int len = sizeof(*mcfg) + 1 * sizeof(mcfg->allocation[0]);
--
--    mcfg = acpi_data_push(table_data, len);
--    mcfg->allocation[0].address = cpu_to_le64(info->base);
--    /* Only a single allocation so no need to play with segments */
--    mcfg->allocation[0].pci_segment = cpu_to_le16(0);
--    mcfg->allocation[0].start_bus_number = 0;
--    mcfg->allocation[0].end_bus_number = PCIE_MMCFG_BUS(info->size - 1);
--
--    build_header(linker, table_data, (void *)mcfg, "MCFG", len, 1, NULL, NULL);
--}
--
  /*
-  * VT-d spec 8.1 DMA Remapping Reporting Structure
-  * (version Oct. 2014 or later)
-@@ -2690,7 +2674,7 @@ void acpi_build(AcpiBuildTables *tables, MachineState *machine)
-     }
-     if (acpi_get_mcfg(&mcfg)) {
-         acpi_add_table(table_offsets, tables_blob);
--        build_mcfg_q35(tables_blob, tables->linker, &mcfg);
-+        build_mcfg(tables_blob, tables->linker, &mcfg);
-     }
-     if (x86_iommu_get_default()) {
-         IommuType IOMMUType = x86_iommu_get_type();
-diff --git a/include/hw/acpi/pci.h b/include/hw/acpi/pci.h
-index 124af7d32a..8bbd32cf45 100644
---- a/include/hw/acpi/pci.h
-+++ b/include/hw/acpi/pci.h
-@@ -30,4 +30,5 @@ typedef struct AcpiMcfgInfo {
-     uint32_t size;
- } AcpiMcfgInfo;
- 
-+void build_mcfg(GArray *table_data, BIOSLinker *linker, AcpiMcfgInfo *info);
- #endif
--- 
-2.19.1
+  * XIVE Thread Interrupt Management context (KVM)
+  */
+@@ -709,3 +719,49 @@ void kvmppc_xive_connect(SpaprXive *xive, Error **er=
+rp)
+     /* Map all regions */
+     spapr_xive_map_mmio(xive);
+ }
++
++void kvmppc_xive_disconnect(SpaprXive *xive, Error **errp)
++{
++    XiveSource *xsrc;
++    size_t esb_len;
++
++    /* The KVM XIVE device is not in use */
++    if (!xive || xive->fd =3D=3D -1) {
++        return;
++    }
++
++    if (!kvmppc_has_cap_xive()) {
++        error_setg(errp, "IRQ_XIVE capability must be present for KVM");
++        return;
++    }
++
++    /* Clear the KVM mapping */
++    xsrc =3D &xive->source;
++    esb_len =3D (1ull << xsrc->esb_shift) * xsrc->nr_irqs;
++
++    sysbus_mmio_unmap(SYS_BUS_DEVICE(xive), 0);
++    munmap(xsrc->esb_mmap, esb_len);
++
++    sysbus_mmio_unmap(SYS_BUS_DEVICE(xive), 1);
++
++    sysbus_mmio_unmap(SYS_BUS_DEVICE(xive), 2);
++    munmap(xive->tm_mmap, 4ull << TM_SHIFT);
++
++    /*
++     * When the KVM device fd is closed, the KVM device is destroyed
++     * and removed from the list of devices of the VM. The VCPU
++     * presenters are also detached from the device.
++     */
++    close(xive->fd);
++    xive->fd =3D -1;
++
++    kvm_kernel_irqchip =3D false;
++    kvm_msi_via_irqfd_allowed =3D false;
++    kvm_gsi_direct_mapping =3D false;
++
++    /* Clear the local list of presenter (hotplug) */
++    kvm_cpu_disable_all();
++
++    /* VM Change state handler is not needed anymore */
++    qemu_del_vm_change_state_handler(xive->change);
++}
+diff --git a/hw/intc/xics_kvm.c b/hw/intc/xics_kvm.c
+index 78a252e6df..1185846ff1 100644
+--- a/hw/intc/xics_kvm.c
++++ b/hw/intc/xics_kvm.c
+@@ -51,6 +51,16 @@ typedef struct KVMEnabledICP {
+ static QLIST_HEAD(, KVMEnabledICP)
+     kvm_enabled_icps =3D QLIST_HEAD_INITIALIZER(&kvm_enabled_icps);
+=20
++static void kvm_disable_icps(void)
++{
++    KVMEnabledICP *enabled_icp, *next;
++
++    QLIST_FOREACH_SAFE(enabled_icp, &kvm_enabled_icps, node, next) {
++        QLIST_REMOVE(enabled_icp, node);
++        g_free(enabled_icp);
++    }
++}
++
+ /*
+  * ICP-KVM
+  */
+@@ -360,3 +370,44 @@ fail:
+     kvmppc_define_rtas_kernel_token(0, "ibm,int-off");
+     return -1;
+ }
++
++void xics_kvm_disconnect(SpaprMachineState *spapr, Error **errp)
++{
++    /* The KVM XICS device is not in use */
++    if (kernel_xics_fd =3D=3D -1) {
++        return;
++    }
++
++    if (!kvm_enabled() || !kvm_check_extension(kvm_state, KVM_CAP_IRQ_XI=
+CS)) {
++        error_setg(errp,
++                   "KVM and IRQ_XICS capability must be present for KVM =
+XICS device");
++        return;
++    }
++
++    /*
++     * Only on P9 using the XICS-on XIVE KVM device:
++     *
++     * When the KVM device fd is closed, the device is destroyed and
++     * removed from the list of devices of the VM. The VCPU presenters
++     * are also detached from the device.
++     */
++    close(kernel_xics_fd);
++    kernel_xics_fd =3D -1;
++
++    spapr_rtas_unregister(RTAS_IBM_SET_XIVE);
++    spapr_rtas_unregister(RTAS_IBM_GET_XIVE);
++    spapr_rtas_unregister(RTAS_IBM_INT_OFF);
++    spapr_rtas_unregister(RTAS_IBM_INT_ON);
++
++    kvmppc_define_rtas_kernel_token(0, "ibm,set-xive");
++    kvmppc_define_rtas_kernel_token(0, "ibm,get-xive");
++    kvmppc_define_rtas_kernel_token(0, "ibm,int-on");
++    kvmppc_define_rtas_kernel_token(0, "ibm,int-off");
++
++    kvm_kernel_irqchip =3D false;
++    kvm_msi_via_irqfd_allowed =3D false;
++    kvm_gsi_direct_mapping =3D false;
++
++    /* Clear the presenter from the VCPUs */
++    kvm_disable_icps();
++}
+diff --git a/include/hw/ppc/spapr_xive.h b/include/hw/ppc/spapr_xive.h
+index 04294b0ca2..0b5e972d52 100644
+--- a/include/hw/ppc/spapr_xive.h
++++ b/include/hw/ppc/spapr_xive.h
+@@ -71,6 +71,7 @@ int spapr_xive_end_to_target(uint8_t end_blk, uint32_t =
+end_idx,
+  * KVM XIVE device helpers
+  */
+ void kvmppc_xive_connect(SpaprXive *xive, Error **errp);
++void kvmppc_xive_disconnect(SpaprXive *xive, Error **errp);
+ void kvmppc_xive_reset(SpaprXive *xive, Error **errp);
+ void kvmppc_xive_set_source_config(SpaprXive *xive, uint32_t lisn, XiveE=
+AS *eas,
+                                    Error **errp);
+diff --git a/include/hw/ppc/xics_spapr.h b/include/hw/ppc/xics_spapr.h
+index 15a8dcff66..2476b540ed 100644
+--- a/include/hw/ppc/xics_spapr.h
++++ b/include/hw/ppc/xics_spapr.h
+@@ -34,6 +34,7 @@
+ void spapr_dt_xics(SpaprMachineState *spapr, uint32_t nr_servers, void *=
+fdt,
+                    uint32_t phandle);
+ int xics_kvm_init(SpaprMachineState *spapr, Error **errp);
++void xics_kvm_disconnect(SpaprMachineState *spapr, Error **errp);
+ void xics_spapr_init(SpaprMachineState *spapr);
+=20
+ #endif /* XICS_SPAPR_H */
+--=20
+2.21.0
 
 
