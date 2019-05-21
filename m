@@ -2,68 +2,64 @@ Return-Path: <SRS0=/4tE=TV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_MUTT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_MUTT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A313C072B5
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 20:43:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0949FC072B5
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 20:43:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 00F79217D7
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 20:43:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 00F79217D7
+	by mail.kernel.org (Postfix) with ESMTPS id D2492217D7
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 20:43:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D2492217D7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:59212 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:59214 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hTBbZ-00024Z-UV
-	for qemu-devel@archiver.kernel.org; Tue, 21 May 2019 16:43:25 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:34240)
+	id 1hTBc3-0002Ts-Pq
+	for qemu-devel@archiver.kernel.org; Tue, 21 May 2019 16:43:55 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:34340)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1hTBZn-0000pa-78
-	for qemu-devel@nongnu.org; Tue, 21 May 2019 16:41:36 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1hTBa7-0000uG-V4
+	for qemu-devel@nongnu.org; Tue, 21 May 2019 16:41:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1hTBVw-0003vq-UM
-	for qemu-devel@nongnu.org; Tue, 21 May 2019 16:37:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38070)
+	(envelope-from <ehabkost@redhat.com>) id 1hTBNA-0006nb-Ar
+	for qemu-devel@nongnu.org; Tue, 21 May 2019 16:28:33 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:32892)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hTBVu-0003q6-9J
-	for qemu-devel@nongnu.org; Tue, 21 May 2019 16:37:34 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>)
+	id 1hTBN9-0006mG-6M; Tue, 21 May 2019 16:28:31 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id ABB11C04B2F6;
-	Tue, 21 May 2019 20:37:20 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 785D0307D988;
+	Tue, 21 May 2019 20:28:30 +0000 (UTC)
 Received: from localhost (ovpn-116-14.gru2.redhat.com [10.97.116.14])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 224436012E;
-	Tue, 21 May 2019 20:37:14 +0000 (UTC)
-Date: Tue, 21 May 2019 17:37:12 -0300
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 0803460C18;
+	Tue, 21 May 2019 20:28:27 +0000 (UTC)
+Date: Tue, 21 May 2019 17:28:26 -0300
 From: Eduardo Habkost <ehabkost@redhat.com>
 To: John Snow <jsnow@redhat.com>
-Message-ID: <20190521203712.GO10764@habkost.net>
-References: <20190520184108.GA10764@habkost.net>
-	<20190521085350.GF25835@redhat.com>
-	<e2395213-efaf-6d6c-6cfd-d949d071b4f6@redhat.com>
-	<87pnobrg37.fsf@dusky.pond.sub.org>
-	<CAFEAcA8db=UsyU_kRBoatFT2ULQBqL318xRhg+CV4D_7hV76Og@mail.gmail.com>
-	<7e468375-ca5f-0048-789e-c41d09065eeb@redhat.com>
+Message-ID: <20190521202826.GN10764@habkost.net>
+References: <20190521200657.5377-1-jsnow@redhat.com>
+	<20190521200657.5377-3-jsnow@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <7e468375-ca5f-0048-789e-c41d09065eeb@redhat.com>
+In-Reply-To: <20190521200657.5377-3-jsnow@redhat.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.32]);
-	Tue, 21 May 2019 20:37:20 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.48]);
+	Tue, 21 May 2019 20:28:30 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] Introducing GSoC project: API Documentation
- Generation
+Subject: Re: [Qemu-devel] [PATCH 2/2] docs/bitmaps: use QMP lexer instead of
+ json
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -75,43 +71,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
-	Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
-	Gabriel Barreto <sbarreto.gabriel@gmail.com>,
-	QEMU Developers <qemu-devel@nongnu.org>,
-	Markus Armbruster <armbru@redhat.com>, "Emilio G. Cota" <cota@braap.org>,
-	Stefan Hajnoczi <stefanha@redhat.com>, Cleber Rosa <crosa@redhat.com>,
-	Paolo Bonzini <pbonzini@redhat.com>
+Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
+	qemu-devel@nongnu.org, qemu-block@nongnu.org,
+	Aarushi Mehta <mehta.aaru20@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, May 21, 2019 at 04:32:35PM -0400, John Snow wrote:
+On Tue, May 21, 2019 at 04:06:57PM -0400, John Snow wrote:
+> The annotated style json we use in QMP documentation is not strict json
+> and depending on the version of Sphinx (2.0+) or Pygments installed,
+> might cause the build to fail.
 > 
+> Use the new QMP lexer.
 > 
-> On 5/21/19 11:27 AM, Peter Maydell wrote:
-> > On Tue, 21 May 2019 at 16:18, Markus Armbruster <armbru@redhat.com> wrote:
-> >> Anyway.  What's so special about QEMU that justifies coming up with our
-> >> own doc syntax?  Other than "we made a hash of it, and cleaning it up
-> >> would be work".
-> > 
-> > The major problem as far as kernel-doc is concerned is that
-> > it somewhat bakes in the kernel's style choice that the
-> > 'struct' keyword is not hidden behind typedefs, and so it
-> > gets a bit confused by QEMU's "use typedefs for struct types"
-> > style. The rest, as you say, is just a matter of fixing up
-> > our syntax errors.
-> > 
-> > thanks
-> > -- PMM
-> > 
+> Further, some versions of Sphinx can not apply custom lexers to "code"
+> directives and require the use of "code-block" directives instead, so
+> make that change at this time as well.
 > 
-> But this is the one we're going with? Do we have a plan for teaching it
-> not to panic for our use of named custom types?
+> Tested under:
+> - Sphinx 1.3.6 and Pygments 2.4
+> - Sphinx 1.7.6 and Pygments 2.2
+> - Sphinx 2.0.1 and Pygments 2.4
+> 
+> Reported-by: Aarushi Mehta <mehta.aaru20@gmail.com>
+> Signed-off-by: John Snow <jsnow@redhat.com>
 
-If I understood correctly, the patch from Paolo that I have
-forwarded to this thread is all we need.  Are there other issues
-with kernel-doc we would still need to address?
+Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
 
 -- 
 Eduardo
