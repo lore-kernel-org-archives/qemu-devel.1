@@ -2,80 +2,83 @@ Return-Path: <SRS0=/4tE=TV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	FROM_EXCESS_BASE64,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 78F8DC04AAF
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 14:49:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A561C04AAF
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 14:51:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 510FE2173E
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 14:49:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 510FE2173E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id E9D3D21743
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 14:51:52 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ODXxVFVv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E9D3D21743
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:55062 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:55104 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hT64x-0006Hb-MV
-	for qemu-devel@archiver.kernel.org; Tue, 21 May 2019 10:49:23 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:48270)
+	id 1hT67M-0007qs-30
+	for qemu-devel@archiver.kernel.org; Tue, 21 May 2019 10:51:52 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:48789)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1hT63u-0005y8-Gi
-	for qemu-devel@nongnu.org; Tue, 21 May 2019 10:48:20 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1hT66Q-00074Q-J6
+	for qemu-devel@nongnu.org; Tue, 21 May 2019 10:50:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1hT63s-0004Ej-EQ
-	for qemu-devel@nongnu.org; Tue, 21 May 2019 10:48:18 -0400
-Received: from mail-wr1-f47.google.com ([209.85.221.47]:41166)
+	(envelope-from <marcandre.lureau@gmail.com>) id 1hT66O-00077O-UT
+	for qemu-devel@nongnu.org; Tue, 21 May 2019 10:50:54 -0400
+Received: from mail-wr1-x433.google.com ([2a00:1450:4864:20::433]:45525)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hT63q-0004Bd-Od
-	for qemu-devel@nongnu.org; Tue, 21 May 2019 10:48:15 -0400
-Received: by mail-wr1-f47.google.com with SMTP id g12so18669638wro.8
-	for <qemu-devel@nongnu.org>; Tue, 21 May 2019 07:48:14 -0700 (PDT)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1hT66O-00075R-Nd
+	for qemu-devel@nongnu.org; Tue, 21 May 2019 10:50:52 -0400
+Received: by mail-wr1-x433.google.com with SMTP id b18so18907377wrq.12
+	for <qemu-devel@nongnu.org>; Tue, 21 May 2019 07:50:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+	:cc:content-transfer-encoding;
+	bh=JS0X1WDIBQo2R/MfIEWtzIZuPRBkLpAYO9SK+5tqQ/I=;
+	b=ODXxVFVvlphZATvQl2VIsZ8aGWxRmnggDPgyMa0+PaqlfELh+Ala71AXLgYzOG+jRv
+	LpTJRLjhafJm/Fk347kRjR6QghH+dI2aw0QWglg26AE9eKKMyzGwKXyQw6y+PEyE4ytC
+	8A821lQwoq1YZWjARjF5X9gzmowq7UchiGjrleY3to0VPG0B1VDNHJiALKSjk9+gIei6
+	owa6Ae5k59xbwjpcg/JdZHHWJ3eWbL5pPQkPSG8UbkIFEAT5tolDEkwogZbi6zDJUOHY
+	yHmaV595T8OZgNomjAFwJKgxyyGAjhxkcdD1VD2dXsHdNTcWCaoF1JQlAuK+LuwqvLkB
+	L7iQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:subject:to:references:from:message-id:date
-	:user-agent:mime-version:in-reply-to:content-language
-	:content-transfer-encoding;
-	bh=oY3ydw4E29eSLqPmuzOulk06hJZ1kCgcs0s+vlC2jTo=;
-	b=jrc9KcXQD8ISymlBBIoyA7DCg34+nGU0zbhBSlZsefTEnrU/PdukEE8IBLjlrB5Rd0
-	PkUK7y7ALjhYLcBHlS74nEEpF8cByIF53lYnK6N9gc7GmNQJQH6Bpwki+3GYpOgGoRVW
-	Tqz9yhuH9JCbZtKYxZ47lBVELtBw1VyBEgo7i8VEPJITG00fPrMCFOMo/4k8vkS34/fW
-	VTAMUYbIq4ddCZLoqZzlp0VxHFS8A2iG2fUrQr3e6JzqmvI/oG7FrkmrjrwPwmS9FZ6n
-	rkgO8b4d4L0i/R1xrZv8ujRQJcU+qZ2WXYDu9r7Y3aZFDOooxjnTRPwBsrPnkSG7SKDh
-	0LRA==
-X-Gm-Message-State: APjAAAWFgrzJGdt93Upup6iEe80X9fhlGkcqBtDghDgh6vdTPjkMFnLX
-	SV6SZ4YvuxaBe2pIN80QRI9FzRuoxlwDaw==
-X-Google-Smtp-Source: APXvYqxvq6WnLWPLY9kKM9/3En63uke55VnttHX0gls2/ugmZArdagJ4U9zxjYaI7D9hJzW8AiyoCA==
-X-Received: by 2002:a05:6000:1201:: with SMTP id
-	e1mr49045959wrx.136.1558450093322; 
-	Tue, 21 May 2019 07:48:13 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:ac04:eef9:b257:b844?
-	([2001:b07:6468:f312:ac04:eef9:b257:b844])
-	by smtp.gmail.com with ESMTPSA id
-	f6sm23000355wro.12.2019.05.21.07.48.12
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Tue, 21 May 2019 07:48:12 -0700 (PDT)
-To: Peter Maydell <peter.maydell@linaro.org>,
-	QEMU Developers <qemu-devel@nongnu.org>
-References: <CAFEAcA-vSebWjhbFTdfOSGHJtr8-a+DKG22JU3tS-1OoGR=VXQ@mail.gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <8c07524e-3d2b-da06-2aac-b0eaf3e1c179@redhat.com>
-Date: Tue, 21 May 2019 16:48:12 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+	:message-id:subject:to:cc:content-transfer-encoding;
+	bh=JS0X1WDIBQo2R/MfIEWtzIZuPRBkLpAYO9SK+5tqQ/I=;
+	b=ICUMy5eKFfOvnkDfrilw3mvaYNRhe87CxiJeE/lhpVhVSiqdZkPYe+wx0ly8BfQOnE
+	05eofMgojC9EbzXwwu81NEd/KL3TDxPGwZcYMg4QI8Xh8Z7BWLfe82FeSxOSQ6b0uZL7
+	4ygZNISyWVPEOrt1Qncg6hFZdiz84KkiqtuGGEhlRlXuJBmY0XR66iBUD15X/000Z3fm
+	4cob1t/saSa87lsyNBYoxcrhhS7RvF2aKhElcEt61jeb62CHNoe2peVtEJ0AA+73HCOd
+	oeC4hqXCtBmoueBO7zziBmYFb51bRFI163l+ZLYUX9OQfESDqA8OdFxajvx7WLqbDzif
+	jj0A==
+X-Gm-Message-State: APjAAAXmssTRxOmMd/n79ezoXoHGCezxTBVU/+rwvJCF2aj2rUbIrOxA
+	v6PA1VFP8QQleE0ST8VeIvdw6HCUDmZhhOckAhsua37A2Lc=
+X-Google-Smtp-Source: APXvYqx467aCG6QU+PTODQwHzgpAf7hGfqIf2oxW3Si5P5pnjBjFG17S0mSquReTpgojx2x/ID0V0bpP1SuHQCLP9a8=
+X-Received: by 2002:adf:9d8a:: with SMTP id p10mr23111249wre.31.1558450250382; 
+	Tue, 21 May 2019 07:50:50 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-vSebWjhbFTdfOSGHJtr8-a+DKG22JU3tS-1OoGR=VXQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-	[fuzzy]
-X-Received-From: 209.85.221.47
-Subject: Re: [Qemu-devel] is anybody experimenting with the idea of rust
- code in QEMU?
+References: <20190409161009.6322-1-marcandre.lureau@redhat.com>
+	<87sgt7sxhy.fsf@dusky.pond.sub.org>
+In-Reply-To: <87sgt7sxhy.fsf@dusky.pond.sub.org>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Tue, 21 May 2019 16:50:38 +0200
+Message-ID: <CAJ+F1CJ6hpQZf6199_-rAW98HwEssNT_kXBJF9he9NZFvWaGPA@mail.gmail.com>
+To: Markus Armbruster <armbru@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2a00:1450:4864:20::433
+Subject: Re: [Qemu-devel] [PATCH v4 00/20] monitor: add asynchronous command
+ type
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -87,33 +90,159 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Kevin Wolf <kwolf@redhat.com>, QEMU <qemu-devel@nongnu.org>,
+	Michael Roth <mdroth@linux.vnet.ibm.com>,
+	"Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+	Gerd Hoffmann <kraxel@redhat.com>, John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 21/05/19 16:39, Peter Maydell wrote:
-> Hi; I have on my todo list the idea of some experimentation/prototyping
-> of whether being able to write some components of QEMU in Rust would
-> be (a) feasible (b) beneficial (c) fun to play around with even if
-> it is likely that it doesn't go anywhere :-)
-> 
-> I know Paolo has had a look at how you might write some makefiles
-> to integrate rust into a C program (https://github.com/bonzini/rust-and-c/).
-> Has anybody else been doing anything in this general area ?
+Hi
 
-I have a version of QEMU's RCU that can be called from Rust code with a
-nice API (https://github.com/bonzini/rust-rcu-qemu).  The idea was to
-continue with a port of the memory API, and then to use rust-vmm's
-virtio code.
+On Tue, May 21, 2019 at 4:18 PM Markus Armbruster <armbru@redhat.com> wrote=
+:
+>
+> Marc-Andr=C3=A9, before you invest your time to answer my questions below=
+: my
+> bandwidth for non-trivial QAPI features like this one is painfully
+> limited.  To get your QAPI conditionals in, I had to postpone other QAPI
+> projects.  I don't regret doing that, I'm rather pleased with how QAPI
+> conditionals turned out.  But I can't keep postponing all other QAPI
+> projects.  Because of that, this one will be slow going, at best.  Sorry
+> about that.
 
-Paolo
+We have different priorities, fair enough.
 
-> (I went to two good talks locally recently about rust-vmm and Amazon's
-> 'firecracker' VMM by Andreea Florescu and Diana Popa -- I
-> definitely plan to look at rust-vmm as part of this.)
-> 
-> thanks
-> -- PMM
-> 
+>
+> Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
+>
+> > Hi,
+> >
+> > HMP and QMP commands are handled synchronously in qemu today. But
+> > there are benefits allowing the command handler to re-enter the main
+> > loop if the command cannot be handled synchronously, or if it is
+> > long-lasting. Some bugs such as rhbz#1230527 are difficult to solve
+> > without it.
+> >
+> > The common solution is to use a pair of command+event in this case.
+>
+> In particular, background jobs (qapi/jobs.json).  They grew out of block
+> jobs, and are still used only for "blocky" things.  Using them more
+> widely would probably make sense.
+>
+> > But this approach has a number of issues:
+> > - you can't "fix" an existing command: you need a new API, and ad-hoc
+> >   documentation for that command+signal association, and old/broken
+> >   command deprecation
+>
+> Making a synchronous command asynchronous is an incompatible change.  We
+> need to let the client needs opt in.  How is that done in this series?
 
+No change visible on client side. I dropped the async command support
+a while ago already, based on your recommendations. I can dig the
+archive for the discussion if necessary.
+
+>
+> > - since the reply event is broadcasted and 'id' is used for matching th=
+e
+> >   request, it may conflict with other clients request 'id' space
+>
+> Any event that does that now is broken and needs to be fixed.  The
+> obvious fix is to include a monitor ID with the command ID.  For events
+> that can only ever be useful in the context of one particular monitor,
+> we could unicast to that monitor instead; see below.
+>
+> Corollary: this is just a fixable bug, not a fundamental advantage of
+> the async feature.
+
+I am just pointing out today drawbacks of turning a function async by
+introducing new commands and signals.
+
+>
+> > - it is arguably less efficient and elegant (weird API, useless return
+> >   in most cases, broadcast reply, no cancelling on disconnect etc)
+>
+> The return value is useful for synchronously reporting failure to start
+> the background task.  I grant you that background tasks may exist that
+> won't ever fail to start.  I challenge the idea that it's most of them.
+>
+> Broadcast reply could be avoided by unicasting events.  If I remember
+> correctly, Peter Xu even posted patches some time ago.  We ended up not
+> using them, because we found a better solution for the problem at hand.
+> My point is: this isn't a fundamental problem, it's just the way we
+> coded things up.
+>
+> What do you mean by "no cancelling on disconnect"?
+
+When the client disconnects, the background task keeps running, and
+there is no simple way to know about that event afaik. My proposal has
+a simple API for that (see "qmp: add qmp_return_is_cancelled()"
+patch).
+
+>
+> I'm ignoring "etc" unless you expand it into something specific.
+>
+> I'm also not taking the "weird" bait :)
+> > The following series implements an async command solution instead. By
+> > introducing a session context and a command return handler, it can:
+> > - defer the return, allowing the mainloop to reenter
+> > - return only to the caller (instead of broadcast events for reply)
+> > - optionnally allow cancellation when the client is gone
+> > - track on-going qapi command(s) per client/session
+> >
+> > and without introduction of new QMP APIs or client visible change.
+>
+> What do async commands provide that jobs lack?
+>
+> Why do we want both?
+
+They are different things, last we discussed it: jobs are geared
+toward block device operations, and do not provide simple qmp-level
+facilities that I listed above. What I introduce is a way for an
+*existing* QMP command to be splitted, so it can re-enter the main
+loop sanely (and not by introducing new commands or signals or making
+things unnecessarily more complicated).
+
+My proposal is fairly small:
+  27 files changed, 877 insertions(+), 260 deletions(-)
+
+Including test, and the qxl screendump fix, which account for about
+1/3 of the series.
+
+> I started to write a feature-by-feature comparison, but realized I don't
+> have the time to figure out either jobs or async from their (rather
+> sparse) documentation, let alone from code.
+>
+> > Existing qemu commands can be gradually replaced by async:true
+> > variants when needed, while carefully reviewing the concurrency
+> > aspects. The async:true commands marshaller helpers are splitted in
+> > half, the calling and return functions. The command is called with a
+> > QmpReturn context, that can return immediately or later, using the
+> > generated return helper, which allows for a step-by-step conversion.
+> >
+> > The screendump command is converted to an async:true version to solve
+> > rhbz#1230527. The command shows basic cancellation (this could be
+> > extended if needed). It could be further improved to do asynchronous
+> > IO writes as well.
+>
+> What is "basic cancellation"?
+> What extension(s) do you have in mind?
+
+It checks for cancellation in a few places, between IO. Full
+cancellation would allow to cancel at any time.
+
+>
+> What's the impact of screendump writing synchronously?
+
+It can be pretty bad, think about 4k screens. It is 33177600 bytes,
+written in PPM format, blocking the main loop..
+
+QMP operation doing large IO (dumps), or blocking on events, could be
+switched to this async form without introducing user-visible change,
+and with minimal effort compared to jobs.
+
+
+--=20
+Marc-Andr=C3=A9 Lureau
 
