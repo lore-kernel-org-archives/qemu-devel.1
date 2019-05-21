@@ -7,72 +7,72 @@ X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DD5AC04AAF
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 12:27:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ED873C04AAF
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 12:27:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6BCB2217D7
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 12:27:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B6AF12173C
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 12:27:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="woYXkPI3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6BCB2217D7
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="npj4YbrO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B6AF12173C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:52679 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:52681 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hT3rm-0002Yz-Bc
-	for qemu-devel@archiver.kernel.org; Tue, 21 May 2019 08:27:38 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:45251)
+	id 1hT3rt-0002ej-Sg
+	for qemu-devel@archiver.kernel.org; Tue, 21 May 2019 08:27:45 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:45331)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hT3py-0001P4-3i
-	for qemu-devel@nongnu.org; Tue, 21 May 2019 08:25:47 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1hT3q2-0001SG-RJ
+	for qemu-devel@nongnu.org; Tue, 21 May 2019 08:25:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hT3pw-0005Fr-Tm
-	for qemu-devel@nongnu.org; Tue, 21 May 2019 08:25:46 -0400
-Received: from mail-wm1-x32f.google.com ([2a00:1450:4864:20::32f]:40122)
+	(envelope-from <peter.maydell@linaro.org>) id 1hT3px-0005GA-0V
+	for qemu-devel@nongnu.org; Tue, 21 May 2019 08:25:48 -0400
+Received: from mail-wm1-x329.google.com ([2a00:1450:4864:20::329]:50611)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hT3pw-00055e-M6
+	id 1hT3pw-00056N-Ii
 	for qemu-devel@nongnu.org; Tue, 21 May 2019 08:25:44 -0400
-Received: by mail-wm1-x32f.google.com with SMTP id 15so2679193wmg.5
-	for <qemu-devel@nongnu.org>; Tue, 21 May 2019 05:25:28 -0700 (PDT)
+Received: by mail-wm1-x329.google.com with SMTP id f204so2799900wme.0
+	for <qemu-devel@nongnu.org>; Tue, 21 May 2019 05:25:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
 	h=from:to:cc:subject:date:message-id:in-reply-to:references
 	:mime-version:content-transfer-encoding;
-	bh=/E+PaSgrUlg3SFZHIuAu/lXW6yDb2qBLwoSSs8XJ8AE=;
-	b=woYXkPI33taUXzNCellJQiMx4dJlvYOHYHquJieBhU0SL6NDBJHRELujQpegBSR5P6
-	2vjq5ZnHbtyYWTbYtfOJ9t2jrQWrN9PaqMzxDMeCqkGznCsgybv7gmOG478DTDBIKrpj
-	DJGh41W2kwiOPLhUfG5CVneJNQ/l0T0jwXHvlsXHcOtStQILelU/HHcL7+9n0HWCCr0A
-	T5sDarpB3Exsco8HL2s3Vju3xHPsKYKMXDH2/660JwsDiaHhzk16T7iTdnLihOs78zF5
-	04aFwTB0B+Gdnv00x4PKGX+leVmsXCdIJVCFvz/J7fLQ6KQxKdPqY1ilb5XgVrdFfaT/
-	GgHw==
+	bh=6OFDFvuvQviFWUA+ErkQZRrbDM3t1pANZfkvzqmBlg8=;
+	b=npj4YbrO4P/rhMjEvX/1V6DzWudQYkMfQHNy5tszxjNs7loGgjR/IyshL2nc3YjMUk
+	4vi94cWZEmGyS5GlHzV5BMvAUFsI78B+ur4qTvirFuwOK4GSWsnpquL+SoFnzCn/zQTZ
+	KWQlBxUgOT2uZwFHoj0kvUkHVds1h1nSoRL7oWWdIaZgL+1ww+FE7d9F8llWL5JNUiVK
+	5kTpz5LzyAG2FFh3sSjdfd3P/ggiAhKnPZ8hVsYg/2+MTO7tZ6HbwlBgUWduC+4ATNM/
+	omRvkt20z2Xk2Aieqv/dT7DftF9oT6/Sh1nevREJBzekv/7CBAnhlGkL8Qxyzn60Zigz
+	sFWg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
 	:references:mime-version:content-transfer-encoding;
-	bh=/E+PaSgrUlg3SFZHIuAu/lXW6yDb2qBLwoSSs8XJ8AE=;
-	b=Xqcz4ZTtGrclnJMbi6KFxlAZWHPJtURTvclZriUxrcXLUt8KvdCyBkrURU/XBozfRq
-	HnLK5tGbLXKoz8nvE8yDPIp67es3W7nPV9wOYv9I8xTFoajT7HFKXJz3xTUKOEs1ek8x
-	ab3OGphkM1LHOJlR8LP787x0kPRTuua6I9hJZiLN85enO2HoxCvuvtykudOjHb9AQSPx
-	GaUkyz304qwbnL7LaLzfsRb44CQctukYGLEo7E6h1l2aa6/KDomeD34TloYxb/76sY4C
-	O+gMvN8z0cftUWiIFre3+Nf4sGiM59hfeGHa1gCDlHnlmOe56MpLjBgryMEN/N3yK9xY
-	bTZw==
-X-Gm-Message-State: APjAAAUgH+ZTBcImwi7B8zegjVWK0ek8zj4iDCYZt1e5jZ0T0jxsEEmi
-	jgAbllED8yjVFEblUWhXzZo6FTRmkr0=
-X-Google-Smtp-Source: APXvYqxO8+EW8HKLAFM03N7tLOE32wY+OeT6QDl2JfVv/zPiDCHnJ9cS5Jv57LIh5U4QEfkSS1/rgA==
-X-Received: by 2002:a7b:c301:: with SMTP id k1mr2727972wmj.43.1558441527480;
-	Tue, 21 May 2019 05:25:27 -0700 (PDT)
+	bh=6OFDFvuvQviFWUA+ErkQZRrbDM3t1pANZfkvzqmBlg8=;
+	b=UBWGbD44tCd3DabT/42zg7p4cuVZdbOQW7Na/T6KB1T4uEYd525K26N+MBdVaXtoDa
+	+WP6t058Rn6RPNisiWKxzfdI8wp87Q3LB6B0VTC9AUXGHbYGGUABWtYVUw+ZmMlpAiqE
+	1mhLbqGY+QI8NHQ36zbLf4tfqAs485BJJjYJr2J+JQ5nX3IMyHFa6KHWhJ//bH7SXsrA
+	QSuT6Kb2M9TQGgcB5JOILyYzma8HqA75ccBZ4XMkx5n17L++5mt1Md1gVFIw8oRrzNxv
+	RI8xUETIfvBKRsFU0Wv0JmvJKckcZgztSp8U3tthV6TW7O6jKFBCpl2bO6bLF4dZ6ZMt
+	DZ5w==
+X-Gm-Message-State: APjAAAUjDCBcKtcw72t9pDshurTB0IbZmpeCUFidNeAbPIJ4wdGIg/je
+	bSgOqj6bh6yHpYkJHLtQrMHPeBJ0D9I=
+X-Google-Smtp-Source: APXvYqzjq+WcreGHSWFCJripDUnJoHtJtqy/sJs6FhTF6YHhHKwak7m8z+8KUdSvcIvrMLtDHCd01w==
+X-Received: by 2002:a1c:740d:: with SMTP id p13mr3389604wmc.2.1558441528747;
+	Tue, 21 May 2019 05:25:28 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
 	by smtp.gmail.com with ESMTPSA id
-	u11sm12233393wrn.1.2019.05.21.05.25.26
+	u11sm12233393wrn.1.2019.05.21.05.25.27
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Tue, 21 May 2019 05:25:26 -0700 (PDT)
+	Tue, 21 May 2019 05:25:28 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Tue, 21 May 2019 13:25:12 +0100
-Message-Id: <20190521122519.12573-4-peter.maydell@linaro.org>
+Date: Tue, 21 May 2019 13:25:13 +0100
+Message-Id: <20190521122519.12573-5-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190521122519.12573-1-peter.maydell@linaro.org>
 References: <20190521122519.12573-1-peter.maydell@linaro.org>
@@ -80,9 +80,9 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2a00:1450:4864:20::32f
-Subject: [Qemu-devel] [RFC 03/10] docs/conf.py: Enable use of kerneldoc
- sphinx extension
+X-Received-From: 2a00:1450:4864:20::329
+Subject: [Qemu-devel] [RFC 04/10] docs/conf.py: Ignore some missing
+ references in nitpick mode
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -104,45 +104,41 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+We enable Sphinx's 'nitpick' mode via the command line -n switch, which
+means it warns about references to things it doesn't know about. Add
+a whitelist of expected-not-to-be-present types, to avoid false
+positives when C function prototypes use standard integer types.
+
+If this whitelist gets too long and unmanageable we might be better
+off switching to non-nitpick mode instead.
+
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- docs/conf.py | 11 ++++++++---
- 1 file changed, 8 insertions(+), 3 deletions(-)
+ docs/conf.py | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
 diff --git a/docs/conf.py b/docs/conf.py
-index befbcc6c3e1..9109edbcb97 100644
+index 9109edbcb97..388299fb25b 100644
 --- a/docs/conf.py
 +++ b/docs/conf.py
-@@ -41,8 +41,7 @@ except NameError:
- # add these directories to sys.path here. If the directory is relative to the
- # documentation root, use an absolute path starting from qemu_docdir.
- #
--# sys.path.insert(0, os.path.join(qemu_docdir, "my_subdir"))
--
-+sys.path.insert(0, os.path.join(qemu_docdir, "sphinx"))
+@@ -114,6 +114,17 @@ todo_include_todos = False
+ # with "option::" in the document being processed. Turn that off.
+ suppress_warnings = ["ref.option"]
  
- # -- General configuration ------------------------------------------------
++nitpick_ignore = [
++    ("c:type", "int8_t"),
++    ("c:type", "int16_t"),
++    ("c:type", "int32_t"),
++    ("c:type", "int64_t"),
++    ("c:type", "uint8_t"),
++    ("c:type", "uint16_t"),
++    ("c:type", "uint32_t"),
++    ("c:type", "uint64_t"),
++]
++
+ # -- Options for HTML output ----------------------------------------------
  
-@@ -54,7 +53,7 @@ needs_sphinx = '1.3'
- # Add any Sphinx extension module names here, as strings. They can be
- # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
- # ones.
--extensions = []
-+extensions = ['kerneldoc']
- 
- # Add any paths that contain templates here, relative to this directory.
- templates_path = ['_templates']
-@@ -213,4 +212,10 @@ texinfo_documents = [
- ]
- 
- 
-+# -- Options for configuring kerneldoc extension  -------------------------
- 
-+# We use paths starting from qemu_docdir here so that you can run
-+# sphinx-build from anywhere and the kerneldoc extension can still
-+# find everything.
-+kerneldoc_bin = os.path.join(qemu_docdir, '../scripts/kernel-doc')
-+kerneldoc_srctree = os.path.join(qemu_docdir, '..')
+ # The theme to use for HTML and HTML Help pages.  See the documentation for
 -- 
 2.20.1
 
