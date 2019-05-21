@@ -2,81 +2,85 @@ Return-Path: <SRS0=/4tE=TV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8645FC072B5
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 22:48:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 28EF4C072B5
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 23:58:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5227A21773
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 22:48:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E1E18216B7
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 23:58:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QuiCX8cq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5227A21773
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GNjvQEzu"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E1E18216B7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:60433 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:32821 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hTDSf-0001Jq-Ob
-	for qemu-devel@archiver.kernel.org; Tue, 21 May 2019 18:42:21 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:54459)
+	id 1hTEeL-0007BI-1a
+	for qemu-devel@archiver.kernel.org; Tue, 21 May 2019 19:58:29 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:36767)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1hTDRe-0000cn-SD
-	for qemu-devel@nongnu.org; Tue, 21 May 2019 18:41:19 -0400
+	(envelope-from <mehta.aaru20@gmail.com>) id 1hTEcI-0005iQ-4L
+	for qemu-devel@nongnu.org; Tue, 21 May 2019 19:56:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1hTDRd-0004js-Vq
-	for qemu-devel@nongnu.org; Tue, 21 May 2019 18:41:18 -0400
-Received: from mail-lf1-x141.google.com ([2a00:1450:4864:20::141]:36020)
+	(envelope-from <mehta.aaru20@gmail.com>) id 1hTEZ9-0001tW-Sx
+	for qemu-devel@nongnu.org; Tue, 21 May 2019 19:53:08 -0400
+Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:39668)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
-	id 1hTDRb-0004gX-QP; Tue, 21 May 2019 18:41:15 -0400
-Received: by mail-lf1-x141.google.com with SMTP id y10so167647lfl.3;
-	Tue, 21 May 2019 15:41:15 -0700 (PDT)
+	(Exim 4.71) (envelope-from <mehta.aaru20@gmail.com>)
+	id 1hTEZ7-0001rk-Vs; Tue, 21 May 2019 19:53:06 -0400
+Received: by mail-pl1-x641.google.com with SMTP id g9so118152plm.6;
+	Tue, 21 May 2019 16:53:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-	:cc; bh=qeS5ImG80zGyzgMtHMJ+UYhSUAWijmMWfvIC+znD4XQ=;
-	b=QuiCX8cqYzEQNvyf7QUjtfTXV+fOD4HrcwYR8oZo00iGUaezbzsa9W2q9NA6si2RgN
-	kBUo6BhS5q112CzBFLtxdxeJkq8ixVkYrvB2ioF9k9S8+680eG5IxgHL1cjkL35QDKUe
-	vg+pHw2IrM77g0iqY5pWOsWzfVNqq+7SFnQK1iSIDV/YsyGMHJnewkVVyFMucoYSbFaQ
-	aLzV16gUp+4bD73+y6eaxAFh3cboI64x5mHF54SIEFxFw+CEwpRCw4drr42h3zwdOg1C
-	BiNYf6G8/Fbk49dWovIziH0BuHI9jTnJPjPpv6YcIAoUc3X57cCMRITv3PHfm7N6u0AR
-	Zlsg==
+	h=from:to:cc:subject:date:message-id:in-reply-to:references;
+	bh=UfXYBbV0s+nS162Op6TlJ/0zXxxvGFZzaHozLXuLUbw=;
+	b=GNjvQEzu0ShaumXDqu9+Ax4jI+mLHyxGbomG3LFH4WPDfRuwQIlOjDfS8kAFG2MWXo
+	fc5eWTLfE9EOCB/7hnHBRVQHhc+ig9DOgjyHvHuP0gPfj0THWepyv7FkTVChEP4jhVXR
+	StUZzDpgeiakKai6P4YXYRR22KpedVYJO0tQjw4n3b3rCQ5yOOmjfiLcT3TYfS1V/tII
+	AW5phh5rChFpU8XiaNWmWnBpdc4spiNUcek0e/fc8o1WzBPI+Jcx8MqFM/kE40SZoMtP
+	jjqdJ0nNZMtgeq6aI66Wl5pDLPVi0SegiP7dkvYfvMBNa5eOqNGZBEHn59BQqymoD/P7
+	YlzQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-	:message-id:subject:to:cc;
-	bh=qeS5ImG80zGyzgMtHMJ+UYhSUAWijmMWfvIC+znD4XQ=;
-	b=nlcdhcNdORD5X6BYKRpq0DUcs+oxT98hY6MsGz2gydHSe7gs9TNvnBQ4naBLqxu/Mw
-	2cd8iPHM0m5U6HB9c2K035yDpi91nU1vKfe+vzk0q9iaCPAV+h/TXfEzecybfkeaO+BR
-	KNkFBpU5ik/KH969aoQdV+qYUz6jO4FNB9S9PwKfJ7DMA/gFQYkdteYGrWJAX4CyAbNK
-	CcUOeD3gdLJ3rPkjEzUhCAoyg4IsBivsUvOOHQVDDqNH5Oxixjppd3H/sSISDie8uZpy
-	OY4eRBRdEQK3W20l3I3aiXXEGaZpz8yigQEEUGD4t4KXcKRy+XRCB31vGYU2OlqSevoO
-	XiXw==
-X-Gm-Message-State: APjAAAUWPXLMptilg9QFYSSd7cOI2KlW5j89f50wzcfCKj/aQW8naXP/
-	aoIlVJnZiIDvj9JK4qFfbtHgU+MYAoPj4xnJ+Zk=
-X-Google-Smtp-Source: APXvYqwH+cxoIWuT6gMBcjKX5Wn2t1Xt97rvteNSfH7ri6Z7Oj6xY5atYNCRd2E7EQ7L+7lIlVjtfG/7WK4sdiOwghk=
-X-Received: by 2002:a19:4cd5:: with SMTP id
-	z204mr27126773lfa.113.1558478474426; 
-	Tue, 21 May 2019 15:41:14 -0700 (PDT)
-MIME-Version: 1.0
-References: <20190521104324.12835-1-Hesham.Almatary@cl.cam.ac.uk>
-	<20190521104324.12835-4-Hesham.Almatary@cl.cam.ac.uk>
-In-Reply-To: <20190521104324.12835-4-Hesham.Almatary@cl.cam.ac.uk>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Tue, 21 May 2019 15:38:58 -0700
-Message-ID: <CAKmqyKOZzfZBU-nkRzsP9G0J07S8PchMt4W8m+OrMdZKms907Q@mail.gmail.com>
-To: Hesham Almatary <Hesham.Almatary@cl.cam.ac.uk>
-Content-Type: text/plain; charset="UTF-8"
+	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+	:references;
+	bh=UfXYBbV0s+nS162Op6TlJ/0zXxxvGFZzaHozLXuLUbw=;
+	b=IU2IN4NhZSwnsqLk2oyasxFqCFJvm9zTY6N/C2XL4KYDaT0KXqQrO5QqcUhBFmupff
+	WzLCh2FSWKzBhzxN5qAUCqcR7+JPJGJj7OejRFCmqt+bQjSxBhGMEEkNrIcp7pZf7qwT
+	nnB6sdKIYnd6kcIkC+BNEbykFVGBuBiJsa5dSS6yjoWM2mQWwdyOakicAl1+bn8J4ALS
+	78+kz/ZOA196EzUInR+CCXEVjnJDe8YBHZ9qidPMnWF/lM0Cndaj7Y7E6tcLrtXsmWry
+	h7h6xGK2X5jN7/up8FeSNMUvG8GpCxSxuMpMy2DLV0WL5JTXCZJDGMMiVN2426q4dcMs
+	fC5A==
+X-Gm-Message-State: APjAAAXhyn4j0mWXMHi+b0cgqIC8n8FYwzCYz9o+LA+hBGSnmrL0QlOa
+	iY0YxWkXsCvZJv0dJknFrpF5BfLwKXnMbw==
+X-Google-Smtp-Source: APXvYqxgyjVj4iQnjK1eW6bSc/j0CqkgqGPOHP3OVJ0+JWjtCoU0xkTHHWgn7AkFLz2jrPQvY7VO5w==
+X-Received: by 2002:a17:902:7082:: with SMTP id
+	z2mr63502540plk.176.1558482783536; 
+	Tue, 21 May 2019 16:53:03 -0700 (PDT)
+Received: from localhost.localdomain ([120.57.118.207])
+	by smtp.gmail.com with ESMTPSA id
+	e5sm51571752pgh.35.2019.05.21.16.53.00
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Tue, 21 May 2019 16:53:02 -0700 (PDT)
+From: Aarushi Mehta <mehta.aaru20@gmail.com>
+To: qemu-devel@nongnu.org
+Date: Wed, 22 May 2019 05:22:15 +0530
+Message-Id: <20190521235215.31341-10-mehta.aaru20@gmail.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20190521235215.31341-1-mehta.aaru20@gmail.com>
+References: <20190521235215.31341-1-mehta.aaru20@gmail.com>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2a00:1450:4864:20::141
-Subject: Re: [Qemu-devel] [PATCHv3 4/5] RISC-V: Fix a PMP bug where it
- succeeds even if PMP entry is off
+X-Received-From: 2607:f8b0:4864:20::641
+Subject: [Qemu-devel] [RFC PATCH 9/9] configure: permits use of io_uring
+ with probe
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -88,63 +92,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
-	Sagar Karandikar <sagark@eecs.berkeley.edu>,
-	Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
-	Palmer Dabbelt <palmer@sifive.com>,
-	"qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
-	Alistair Francis <Alistair.Francis@wdc.com>
+Cc: saket.sinha89@gmail.com, Julia Suvorova <jusual@mail.ru>,
+	qemu-block@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>,
+	Aarushi Mehta <mehta.aaru20@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, May 21, 2019 at 3:47 AM Hesham Almatary
-<Hesham.Almatary@cl.cam.ac.uk> wrote:
->
-> The current implementation returns 1 (PMP check success) if the address is in
-> range even if the PMP entry is off. This is a bug.
->
-> For example, if there is a PMP check in S-Mode which is in range, but its PMP
-> entry is off, this will succeed, which it should not.
->
-> The patch fixes this bug by only checking the PMP permissions if the address is
-> in range and its corresponding PMP entry it not off. Otherwise, it will keep
-> the ret = -1 which will be checked and handled correctly at the end of the
-> function.
->
-> Signed-off-by: Hesham Almatary <Hesham.Almatary@cl.cam.ac.uk>
+Signed-off-by: Aarushi Mehta <mehta.aaru20@gmail.com>
+---
+ configure | 27 +++++++++++++++++++++++++++
+ 1 file changed, 27 insertions(+)
 
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+diff --git a/configure b/configure
+index d2fc346302..25eb150cb5 100755
+--- a/configure
++++ b/configure
+@@ -365,6 +365,7 @@ xen=""
+ xen_ctrl_version=""
+ xen_pci_passthrough=""
+ linux_aio=""
++linux_io_uring=""
+ cap_ng=""
+ attr=""
+ libattr=""
+@@ -1255,6 +1256,10 @@ for opt do
+   ;;
+   --enable-linux-aio) linux_aio="yes"
+   ;;
++  --disable-linux-io-uring) linux_io_uring="no"
++  ;;
++  --enable-linux-io-uring) linux_io_uring="yes"
++  ;;
+   --disable-attr) attr="no"
+   ;;
+   --enable-attr) attr="yes"
+@@ -1773,6 +1778,7 @@ disabled with --disable-FEATURE, default is enabled if available:
+   vde             support for vde network
+   netmap          support for netmap network
+   linux-aio       Linux AIO support
++  linux-io-uring  Linux io_uring support
+   cap-ng          libcap-ng support
+   attr            attr and xattr support
+   vhost-net       vhost-net kernel acceleration support
+@@ -3949,6 +3955,23 @@ EOF
+     linux_aio=no
+   fi
+ fi
++##########################################
++# linux-io-uring probe
++
++if test "$linux_io_uring" != "no" ; then
++  cat > $TMPC <<EOF
++#include <liburing.h>
++int main(void) { io_uring_queue_init(0, NULL, 0); io_uring_submit(NULL); return 0; }
++EOF
++  if compile_prog "" "-luring" ; then
++    linux_io_uring=yes
++  else
++    if test "$linux_io_uring" = "yes" ; then
++      feature_not_found "linux io_uring" "Install liburing"
++    fi
++    linux_io_uring=no
++  fi
++fi
 
-Alistair
-
-> ---
->  target/riscv/pmp.c | 9 +++++----
->  1 file changed, 5 insertions(+), 4 deletions(-)
->
-> diff --git a/target/riscv/pmp.c b/target/riscv/pmp.c
-> index b11c4ae22f..8668f0dd7c 100644
-> --- a/target/riscv/pmp.c
-> +++ b/target/riscv/pmp.c
-> @@ -259,11 +259,12 @@ bool pmp_hart_has_privs(CPURISCVState *env, target_ulong addr,
->          /* fully inside */
->          const uint8_t a_field =
->              pmp_get_a_field(env->pmp_state.pmp[i].cfg_reg);
-> -        if ((s + e) == 2) {
-> -            if (PMP_AMATCH_OFF == a_field) {
-> -                return 1;
-> -            }
->
-> +        /*
-> +         * If the PMP entry is not off and the address is in range, do the priv
-> +         * check
-> +         */
-> +        if (((s + e) == 2) && (PMP_AMATCH_OFF != a_field)) {
->              allowed_privs = PMP_READ | PMP_WRITE | PMP_EXEC;
->              if ((env->priv != PRV_M) || pmp_is_locked(env, i)) {
->                  allowed_privs &= env->pmp_state.pmp[i].cfg_reg;
-> --
-> 2.17.1
->
->
+ ##########################################
+ # TPM emulation is only on POSIX
+@@ -6351,6 +6374,7 @@ echo "PIE               $pie"
+ echo "vde support       $vde"
+ echo "netmap support    $netmap"
+ echo "Linux AIO support $linux_aio"
++echo "Linux io_uring support $linux_io_uring"
+ echo "ATTR/XATTR support $attr"
+ echo "Install blobs     $blobs"
+ echo "KVM support       $kvm"
+@@ -6831,6 +6855,9 @@ fi
+ if test "$linux_aio" = "yes" ; then
+   echo "CONFIG_LINUX_AIO=y" >> $config_host_mak
+ fi
++if test "$linux_io_uring" = "yes" ; then
++  echo "CONFIG_LINUX_IO_URING=y" >> $config_host_mak
++fi
+ if test "$attr" = "yes" ; then
+   echo "CONFIG_ATTR=y" >> $config_host_mak
+ fi
+--
+2.17.1
 
