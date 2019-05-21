@@ -2,60 +2,59 @@ Return-Path: <SRS0=/4tE=TV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D22A3C04AAF
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 08:21:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A0703C04AAF
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 08:25:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9995A20863
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 08:21:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9995A20863
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 58B96216B7
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 08:25:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 58B96216B7
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:48743 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:48793 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hT01d-0003iW-TQ
-	for qemu-devel@archiver.kernel.org; Tue, 21 May 2019 04:21:33 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:43959)
+	id 1hT05p-0005Cd-KJ
+	for qemu-devel@archiver.kernel.org; Tue, 21 May 2019 04:25:53 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:44732)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1hT00n-0003P7-Iq
-	for qemu-devel@nongnu.org; Tue, 21 May 2019 04:20:43 -0400
+	(envelope-from <clg@kaod.org>) id 1hT04f-0004Xu-5k
+	for qemu-devel@nongnu.org; Tue, 21 May 2019 04:24:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1hT00l-0001Ql-0l
-	for qemu-devel@nongnu.org; Tue, 21 May 2019 04:20:41 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56598)
+	(envelope-from <clg@kaod.org>) id 1hT04c-0005rt-Bg
+	for qemu-devel@nongnu.org; Tue, 21 May 2019 04:24:41 -0400
+Received: from 18.mo3.mail-out.ovh.net ([87.98.172.162]:43386)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1hT00g-0001Ef-Uu
-	for qemu-devel@nongnu.org; Tue, 21 May 2019 04:20:35 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
-	[10.5.11.22])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 9093E7F746;
-	Tue, 21 May 2019 08:20:17 +0000 (UTC)
-Received: from localhost (ovpn-117-188.ams2.redhat.com [10.36.117.188])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 7EFF61001DE9;
-	Tue, 21 May 2019 08:20:11 +0000 (UTC)
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: <qemu-devel@nongnu.org>
-Date: Tue, 21 May 2019 09:20:10 +0100
-Message-Id: <20190521082010.29756-1-stefanha@redhat.com>
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1hT04a-0005Du-PM
+	for qemu-devel@nongnu.org; Tue, 21 May 2019 04:24:37 -0400
+Received: from player773.ha.ovh.net (unknown [10.108.42.184])
+	by mo3.mail-out.ovh.net (Postfix) with ESMTP id CCE3E2152F4
+	for <qemu-devel@nongnu.org>; Tue, 21 May 2019 10:24:23 +0200 (CEST)
+Received: from kaod.org (lfbn-1-10649-41.w90-89.abo.wanadoo.fr [90.89.235.41])
+	(Authenticated sender: clg@kaod.org)
+	by player773.ha.ovh.net (Postfix) with ESMTPSA id 407C55FB8CA5;
+	Tue, 21 May 2019 08:24:15 +0000 (UTC)
+From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+To: David Gibson <david@gibson.dropbear.id.au>
+Date: Tue, 21 May 2019 10:24:11 +0200
+Message-Id: <20190521082411.24719-1-clg@kaod.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.27]);
-	Tue, 21 May 2019 08:20:27 +0000 (UTC)
+X-Ovh-Tracer-Id: 13093934443890510822
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduuddruddutddgtdefucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddm
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH qemu-web] Add a blog post about micro:bit
- emulation
+X-Received-From: 87.98.172.162
+Subject: [Qemu-devel] [PATCH v3] docs: provide documentation on the POWER9
+ XIVE interrupt controller
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -67,213 +66,494 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, jim@groklearning.com,
-	qemu.ml@steffen-goertz.de, joel@jms.id.au,
-	Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
-	Julia Suvorova <jusual@mail.ru>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org,
+	Greg Kurz <groug@kaod.org>,
+	Satheesh Rajendran <sathnaga@linux.vnet.ibm.com>,
+	=?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>, qemu-ppc@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-QEMU 4.0 ships the core micro:bit emulation that was implemented during
-Outreachy and GSoC 2018.  This blog posts explains how to use it and
-describes the current status.
+This documents the overall XIVE architecture and the XIVE support for
+sPAPR guest machines (pseries).
 
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+It also provides documentation on the 'info pic' command.
+
+Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 ---
- _posts/2019-05-21-microbit.md | 132 ++++++++++++++++++++++++++++++++++
- screenshots/makecode.png      | Bin 0 -> 55960 bytes
- 2 files changed, 132 insertions(+)
- create mode 100644 _posts/2019-05-21-microbit.md
- create mode 100644 screenshots/makecode.png
 
-diff --git a/_posts/2019-05-21-microbit.md b/_posts/2019-05-21-microbit.m=
-d
+ Changes since v2:
+
+ - fixed typos.
+
+ Changes since v1:
+
+ - reorganized into different files and directories. I don't think the
+   'info pic' documentation belongs to 'interop' nor 'devel' and so
+   the ppc-spapr-xive.rst file seemed like the best place for it.
+  =20
+ docs/index.rst                |   1 +
+ docs/specs/index.rst          |  13 +++
+ docs/specs/ppc-spapr-xive.rst | 174 +++++++++++++++++++++++++++++
+ docs/specs/ppc-xive.rst       | 199 ++++++++++++++++++++++++++++++++++
+ MAINTAINERS                   |   1 +
+ 5 files changed, 388 insertions(+)
+ create mode 100644 docs/specs/index.rst
+ create mode 100644 docs/specs/ppc-spapr-xive.rst
+ create mode 100644 docs/specs/ppc-xive.rst
+
+diff --git a/docs/index.rst b/docs/index.rst
+index 3690955dd1f5..baa5791c174b 100644
+--- a/docs/index.rst
++++ b/docs/index.rst
+@@ -12,4 +12,5 @@ Welcome to QEMU's documentation!
+=20
+    interop/index
+    devel/index
++   specs/index
+=20
+diff --git a/docs/specs/index.rst b/docs/specs/index.rst
 new file mode 100644
-index 0000000..333a336
+index 000000000000..2e927519c2e7
 --- /dev/null
-+++ b/_posts/2019-05-21-microbit.md
-@@ -0,0 +1,132 @@
-+---
-+layout: post
-+title:  "QEMU 4.0 adds micro:bit emulation support"
-+date:   2019-05-21 07:45:00 +0200
-+categories: ['qemu 4', microbit, gsoc, outreachy, internships]
-+---
-+[micro:bit](http://microbit.org/) emulation support is available from QE=
-MU 4.0
-+onwards and can be used for low-level software testing and development. =
- Unlike
-+existing micro:bit simulators, QEMU performs full-system emulation and a=
-ctually
-+runs the same ARM code as the real hardware.  This blog post explains wh=
-at
-+full-system emulation means and why QEMU is now a useful tool for develo=
-ping
-+micro:bit software.
++++ b/docs/specs/index.rst
+@@ -0,0 +1,13 @@
++. This is the top level page for the 'specs' manual
 +
-+The [micro:bit is a tiny ARM board](https://tech.microbit.org/hardware/)
-+designed for teaching.  It is increasingly being used around the world t=
-o
-+expose children to computers, programming, and electronics in a low-cost=
- way
-+with an active online community that shares project ideas, lesson plans,=
- and
-+programming tips.
 +
-+![micro:bit board](https://pxt.azureedge.net/blob/12e4685e5f24df67255a24=
-2bccb4d1c8e1395e5f/static/courses/csintro/making/microbit-board.png)
++QEMU full-system emulation guest hardware specifications
++=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D
 +
-+## Simulators and emulators
-+*Simulators* are used for many tasks from mobile app development to
-+performance analysis of computer hardware.  It is possible to develop co=
-de
-+using a simulator without having access to real hardware.  Oftentimes us=
-ing a
-+simulator is more convenient than flashing and debugging programs on rea=
-l
-+hardware.
 +
-+*Emulators* allow programs written for one computer system to run on a
-+different computer system.  They use techniques like [machine code
-+interpreters](https://en.wikipedia.org/wiki/Interpreter_%28computing%29)=
- and
-+[just-in-time
-+compilers](https://en.wikipedia.org/wiki/Just-in-time_compilation) to ex=
-ecute
-+guest programs that do not run natively on the host computer.  Each CPU
-+instruction must be correctly implemented by the emulator so it can run =
-guest
-+software.
++Contents:
 +
-+## How existing micro:bit simulators work
-+Simulators can be implemented at various layers in the software stack.  =
-The
-+[MakeCode editor](https://makecode.microbit.org/#editor) for JavaScript
-+development includes a micro:bit simulator:
++.. toctree::
++   :maxdepth: 2
 +
-+![MakeCode editor](/screenshots/makecode.png)
-+
-+This simulator does not execute any ARM code and is therefore not runnin=
-g
-+the same CPU instructions as a real micro:bit.  Instead it reuses the Ja=
-vaScript
-+engine already available in your web browser to execute micro:bit JavaSc=
-ript
-+programs.  This is achieved by providing the micro:bit JavaScript APIs t=
-hat
-+micro:bit programs expect.  The programs don't need to know whether thos=
-e APIs
-+are implemented by the real micro:bit software stack or whether they are
-+actually calling into the MakeCode simulator.
-+
-+In the screenshot above the micro:bit program calls `showString("Hello
-+world!")` and this becomes a call into the MakeCode simulator code to
-+render images of LEDs in the web browser.  On real hardware the code pat=
-h is
-+different and eventually leads to an LED matrix driver that lights
-+up the LEDs by driving output pins on the micro:bit board.
-+
-+## Full-system emulation
-+Unlike the MakeCode simulator, QEMU emulates the micro:bit CPU and boots
-+from the same ARM code as the real micro:bit board.  The simulation happ=
-ens at
-+the CPU instruction and hardware interface level instead of at the JavaS=
-cript
-+API level.  This is called *full-system emulation* because the entire
-+guest software environment is present.
-+
-+What are the advantages of full-system emulation?
-+* Programs written in any language can run (MicroPython, mbed C/C++, etc=
-)
-+* Boot, device driver, and language runtime code can be tested
-+* Bugs in lower layers of the software stack can be reproduced
-+* CPU architecture-specific bugs can be reproduced (stack and memory cor=
-ruption bugs)
-+* A debugger can be connected to inspect the entire software stack
-+
-+The main disadvantage of full-system emulation is that the performance
-+overhead is higher since simulation happens at the CPU instruction level=
-.
-+Programs consist of many CPU instructions so the task of emulation is
-+performance-sensitive.  Luckily the micro:bit's CPU is much less powerfu=
-l than
-+CPUs available in our laptops and desktops, so programs execute at a rea=
-sonable
-+speed.
-+
-+## Running micro:bit programs on QEMU
-+QEMU emulates the core devices on the micro:bit, including the serial po=
-rt
-+(UART) and timers.  This is enough for developing and testing low-level
-+software but does not offer the LEDs, radio, and other devices that most
-+micro:bit programs rely on.  These devices might be emulated by QEMU in =
-the
-+future, but for now the main use of QEMU is for developing and testing
-+low-level micro:bit code.
-+
-+To run `test.hex`:
-+```shell
-+$ qemu-system-arm -M microbit -device loader,file=3Dtest.hex -serial std=
-io
-+```
-+
-+Any output written to the serial port is printed to the terminal by QEMU=
-.
-+
-+## Debugging micro:bit programs with QEMU and GDB
-+QEMU has GDB guest debugging support.  This means GDB can connect to QEM=
-U in
-+order to debug the guest software.  This is similar to debugging a real =
-system
-+over JTAG, except no hardware is necessary!
-+
-+Connect with GDB to debug the guest:
-+```
-+$ qemu-system-arm -M microbit -device loader,file=3Dtest.hex -s
-+$ gdb
-+(gdb) target remote tcp:127.0.0.1:1234
-+(gdb) x/10i $pc
-+=3D> 0x161c4:	ldr	r3, [r4, #0]
-+   0x161c6:	cmp	r3, #0
-+   0x161c8:	beq.n	0x161d2
-+   0x161ca:	ldr	r3, [pc, #48]	; (0x161fc)
-+   0x161cc:	ldr	r3, [r3, #0]
-+   0x161ce:	cmp	r3, #0
-+   0x161d0:	bne.n	0x161d8
-+   0x161d2:	movs	r0, #6
-+   0x161d4:	bl	0x16160
-+   0x161d8:	ldr	r0, [r4, #0]
-+```
-+
-+Having a debugger is very powerful.  QEMU can also load ELF files in
-+addition to the popular .hex files used for micro:bit programs.  ELF fil=
-es can
-+contain debugging information that enables source-level debugging so GDB=
- can
-+display function and variable names as well as listing the source code i=
-nstead
-+of showing assembly instructions.
-+
-+## Conclusion
-+QEMU now offers a platform for developing and testing micro:bit programs=
-.
-+It is open to future extension, hopefully to emulate more devices and of=
-fer
-+a graphical user interface.
-+
-+micro:bit emulation was contributed by Julia Suvorova and Steffen G=C3=B6=
-rtz as
-+part of their Outreachy and Google Summer of Code internships with QEMU.=
-  Jim
-+Mussared, Joel Stanley, and Stefan Hajnoczi acted as mentors and contrib=
-uted
-+patches as well.
-diff --git a/screenshots/makecode.png b/screenshots/makecode.png
++   xive
+diff --git a/docs/specs/ppc-spapr-xive.rst b/docs/specs/ppc-spapr-xive.rs=
+t
 new file mode 100644
-index 0000000..f675768
-Binary files /dev/null and b/screenshots/makecode.png differ
+index 000000000000..539ce7ca4e90
+--- /dev/null
++++ b/docs/specs/ppc-spapr-xive.rst
+@@ -0,0 +1,174 @@
++XIVE for sPAPR (pseries machines)
++=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D
++
++The POWER9 processor comes with a new interrupt controller
++architecture, called XIVE as "eXternal Interrupt Virtualization
++Engine". It supports a larger number of interrupt sources and offers
++virtualization features which enables the HW to deliver interrupts
++directly to virtual processors without hypervisor assistance.
++
++A QEMU ``pseries`` machine (which is PAPR compliant) using POWER9
++processors can run under two interrupt modes:
++
++- *Legacy Compatibility Mode*
++
++  the hypervisor provides identical interfaces and similar
++  functionality to PAPR+ Version 2.7.  This is the default mode
++
++  It is also referred as *XICS* in QEMU.
++
++- *XIVE native exploitation mode*
++
++  the hypervisor provides new interfaces to manage the XIVE control
++  structures, and provides direct control for interrupt management
++  through MMIO pages.
++
++Which interrupt modes can be used by the machine is negotiated with
++the guest O/S during the Client Architecture Support negotiation
++sequence. The two modes are mutually exclusive.
++
++Both interrupt mode share the same IRQ number space. See below for the
++layout.
++
++CAS Negotiation
++---------------
++
++QEMU advertises the supported interrupt modes in the device tree
++property "ibm,arch-vec-5-platform-support" in byte 23 and the OS
++Selection for XIVE is indicated in the "ibm,architecture-vec-5"
++property byte 23.
++
++The interrupt modes supported by the machine depend on the CPU type
++(POWER9 is required for XIVE) but also on the machine property
++``ic-mode`` which can be set on the command line. It can take the
++following values: ``xics``, ``xive``, ``dual`` and currently ``xics``
++is the default but it may change in the future.
++
++The choosen interrupt mode is activated after a reconfiguration done
++in a machine reset.
++
++XIVE Device tree properties
++---------------------------
++
++The properties for the PAPR interrupt controller node when the *XIVE
++native exploitation mode* is selected shoud contain:
++
++- ``device_type``
++
++  value should be "power-ivpe".
++
++- ``compatible``
++
++  value should be "ibm,power-ivpe".
++
++- ``reg``
++
++  contains the base address and size of the thread interrupt
++  managnement areas (TIMA), for the User level and for the Guest OS
++  level. Only the Guest OS level is taken into account today.
++
++- ``ibm,xive-eq-sizes``
++
++  the size of the event queues. One cell per size supported, contains
++  log2 of size, in ascending order.
++
++- ``ibm,xive-lisn-ranges``
++
++  the IRQ interrupt number ranges assigned to the guest for the IPIs.
++
++The root node also exports :
++
++- ``ibm,plat-res-int-priorities``
++
++  contains a list of priorities that the hypervisor has reserved for
++  its own use.
++
++IRQ number space
++----------------
++
++IRQ Number space of the ``pseries`` machine is 8K wide and is the same
++for both interrupt mode. The different ranges are defined as follow :
++
++- ``0x0000 .. 0x0FFF`` 4K CPU IPIs (only used under XIVE)
++- ``0x1000 .. 0x1000`` 1 EPOW
++- ``0x1001 .. 0x1001`` 1 HOTPLUG
++- ``0x1100 .. 0x11FF`` 256 VIO devices
++- ``0x1200 .. 0x127F`` 32 PHBs devices
++- ``0x1280 .. 0x12FF`` unused
++- ``0x1300 .. 0x1FFF`` PHB MSIs
++
++Monitoring XIVE
++---------------
++
++The state of the XIVE interrupt controller can be queried through the
++monitor commands ``info pic``. The output comes in two parts.
++
++First, the state of the thread interrupt context registers is dumped
++for each CPU :
++
++::
++
++   (qemu) info pic
++   CPU[0000]:   QW   NSR CPPR IPB LSMFB ACK# INC AGE PIPR  W2
++   CPU[0000]: USER    00   00  00    00   00  00  00   00  00000000
++   CPU[0000]:   OS    00   ff  00    00   ff  00  ff   ff  80000400
++   CPU[0000]: POOL    00   00  00    00   00  00  00   00  00000000
++   CPU[0000]: PHYS    00   00  00    00   00  00  00   ff  00000000
++   ...
++
++In the case of a ``pseries`` machine, QEMU acts as the hypervisor and on=
+ly
++the O/S and USER register rings make sense. ``W2`` contains the vCPU CAM
++line which is set to the VP identifier.
++
++Then comes the routing information which aggregates the EAS and the
++END configuration:
++
++::
++
++   ...
++   LISN         PQ    EISN     CPU/PRIO EQ
++   00000000 MSI --    00000010   0/6    380/16384 @1fe3e0000 ^1 [ 800000=
+10 ... ]
++   00000001 MSI --    00000010   1/6    305/16384 @1fc230000 ^1 [ 800000=
+10 ... ]
++   00000002 MSI --    00000010   2/6    220/16384 @1fc2f0000 ^1 [ 800000=
+10 ... ]
++   00000003 MSI --    00000010   3/6    201/16384 @1fc390000 ^1 [ 800000=
+10 ... ]
++   00000004 MSI -Q  M 00000000
++   00000005 MSI -Q  M 00000000
++   00000006 MSI -Q  M 00000000
++   00000007 MSI -Q  M 00000000
++   00001000 MSI --    00000012   0/6    380/16384 @1fe3e0000 ^1 [ 800000=
+10 ... ]
++   00001001 MSI --    00000013   0/6    380/16384 @1fe3e0000 ^1 [ 800000=
+10 ... ]
++   00001100 MSI --    00000100   1/6    305/16384 @1fc230000 ^1 [ 800000=
+10 ... ]
++   00001101 MSI -Q  M 00000000
++   00001200 LSI -Q  M 00000000
++   00001201 LSI -Q  M 00000000
++   00001202 LSI -Q  M 00000000
++   00001203 LSI -Q  M 00000000
++   00001300 MSI --    00000102   1/6    305/16384 @1fc230000 ^1 [ 800000=
+10 ... ]
++   00001301 MSI --    00000103   2/6    220/16384 @1fc2f0000 ^1 [ 800000=
+10 ... ]
++   00001302 MSI --    00000104   3/6    201/16384 @1fc390000 ^1 [ 800000=
+10 ... ]
++
++The source information and configuration:
++
++- The ``LISN`` column outputs the interrupt number of the source in
++  range ``[ 0x0 ... 0x1FFF ]`` and its type : ``MSI`` or ``LSI``
++- The ``PQ`` column reflects the state of the PQ bits of the source :
++
++  - ``--`` source is ready to take events
++  - ``P-`` an event was sent and an EOI is PENDING
++  - ``PQ`` an event was QUEUED
++  - ``-Q`` source is OFF
++
++  a ``M`` indicates that source is *MASKED* at the EAS level,
++
++The targeting configuration :
++
++- The ``EISN`` column is the event data that will be queued in the event
++  queue of the O/S.
++- The ``CPU/PRIO`` column is the tuple defining the CPU number and
++  priority queue serving the source.
++- The ``EQ`` column outputs :
++
++  - the current index of the event queue/ the max number of entries
++  - the O/S event queue address
++  - the toggle bit
++  - the last entries that were pushed in the event queue.
+diff --git a/docs/specs/ppc-xive.rst b/docs/specs/ppc-xive.rst
+new file mode 100644
+index 000000000000..b997dc062910
+--- /dev/null
++++ b/docs/specs/ppc-xive.rst
+@@ -0,0 +1,199 @@
++=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D
++POWER9 XIVE interrupt controller
++=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D
++
++The POWER9 processor comes with a new interrupt controller
++architecture, called XIVE as "eXternal Interrupt Virtualization
++Engine".
++
++Compared to the previous architecture, the main characteristics of
++XIVE are to support a larger number of interrupt sources and to
++deliver interrupts directly to virtual processors without hypervisor
++assistance. This removes the context switches required for the
++delivery process.
++
++
++XIVE architecture
++=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
++
++The XIVE IC is composed of three sub-engines, each taking care of a
++processing layer of external interrupts:
++
++- Interrupt Virtualization Source Engine (IVSE), or Source Controller
++  (SC). These are found in PCI PHBs, in the PSI host bridge
++  controller, but also inside the main controller for the core IPIs
++  and other sub-chips (NX, CAP, NPU) of the chip/processor. They are
++  configured to feed the IVRE with events.
++- Interrupt Virtualization Routing Engine (IVRE) or Virtualization
++  Controller (VC). It handles event coalescing and perform interrupt
++  routing by matching an event source number with an Event
++  Notification Descriptor (END).
++- Interrupt Virtualization Presentation Engine (IVPE) or Presentation
++  Controller (PC). It maintains the interrupt context state of each
++  thread and handles the delivery of the external interrupt to the
++  thread.
++
++::
++
++                XIVE Interrupt Controller
++                +------------------------------------+      IPIs
++                | +---------+ +---------+ +--------+ |    +-------+
++                | |IVRE     | |Common Q | |IVPE    |----> | CORES |
++                | |     esb | |         | |        |----> |       |
++                | |     eas | |  Bridge | |   tctx |----> |       |
++                | |SC   end | |         | |    nvt | |    |       |
++    +------+    | +---------+ +----+----+ +--------+ |    +-+-+-+-+
++    | RAM  |    +------------------|-----------------+      | | |
++    |      |                       |                        | | |
++    |      |                       |                        | | |
++    |      |  +--------------------v------------------------v-v-v--+    =
+other
++    |      <--+                     Power Bus                      +--> =
+chips
++    |  esb |  +---------+-----------------------+------------------+
++    |  eas |            |                       |
++    |  end |         +--|------+                |
++    |  nvt |       +----+----+ |           +----+----+
++    +------+       |IVSE     | |           |IVSE     |
++                   |         | |           |         |
++                   | PQ-bits | |           | PQ-bits |
++                   | local   |-+           |  in VC  |
++                   +---------+             +---------+
++                      PCIe                 NX,NPU,CAPI
++
++
++    PQ-bits: 2 bits source state machine (P:pending Q:queued)
++    esb: Event State Buffer (Array of PQ bits in an IVSE)
++    eas: Event Assignment Structure
++    end: Event Notification Descriptor
++    nvt: Notification Virtual Target
++    tctx: Thread interrupt Context registers
++
++
++
++XIVE internal tables
++--------------------
++
++Each of the sub-engines uses a set of tables to redirect interrupts
++from event sources to CPU threads.
++
++::
++
++                                            +-------+
++    User or O/S                             |  EQ   |
++        or                          +------>|entries|
++    Hypervisor                      |       |  ..   |
++      Memory                        |       +-------+
++                                    |           ^
++                                    |           |
++               +-------------------------------------------------+
++                                    |           |
++    Hypervisor      +------+    +---+--+    +---+--+   +------+
++      Memory        | ESB  |    | EAT  |    | ENDT |   | NVTT |
++     (skiboot)      +----+-+    +----+-+    +----+-+   +------+
++                      ^  |        ^  |        ^  |       ^
++                      |  |        |  |        |  |       |
++               +-------------------------------------------------+
++                      |  |        |  |        |  |       |
++                      |  |        |  |        |  |       |
++                 +----|--|--------|--|--------|--|-+   +-|-----+    +---=
+---+
++                 |    |  |        |  |        |  | |   | | tctx|    |Thr=
+ead|
++     IPI or   ---+    +  v        +  v        +  v |---| +  .. |----->  =
+   |
++    HW events    |                                 |   |       |    |   =
+   |
++                 |             IVRE                |   | IVPE  |    +---=
+---+
++                 +---------------------------------+   +-------+
++
++
++The IVSE have a 2-bits state machine, P for pending and Q for queued,
++for each source that allows events to be triggered. They are stored in
++an Event State Buffer (ESB) array and can be controlled by MMIOs.
++
++If the event is let through, the IVRE looks up in the Event Assignment
++Structure (EAS) table for an Event Notification Descriptor (END)
++configured for the source. Each Event Notification Descriptor defines
++a notification path to a CPU and an in-memory Event Queue, in which
++will be enqueued an EQ data for the O/S to pull.
++
++The IVPE determines if a Notification Virtual Target (NVT) can handle
++the event by scanning the thread contexts of the VCPUs dispatched on
++the processor HW threads. It maintains the interrupt context state of
++each thread in a NVT table.
++
++XIVE thread interrupt context
++-----------------------------
++
++The XIVE presenter can generate four different exceptions to its
++HW threads:
++
++- hypervisor exception
++- O/S exception
++- Event-Based Branch (user level)
++- msgsnd (doorbell)
++
++Each exception has a state independent from the others called a Thread
++Interrupt Management context. This context is a set of registers which
++lets the thread handle priority management and interrupt
++acknowledgment among other things. The most important ones being :
++
++- Interrupt Priority Register  (PIPR)
++- Interrupt Pending Buffer     (IPB)
++- Current Processor Priority   (CPPR)
++- Notification Source Register (NSR)
++
++TIMA
++~~~~
++
++The Thread Interrupt Management registers are accessible through a
++specific MMIO region, called the Thread Interrupt Management Area
++(TIMA), four aligned pages, each exposing a different view of the
++registers. First page (page address ending in ``0b00``) gives access
++to the entire context and is reserved for the ring 0 view for the
++physical thread context. The second (page address ending in ``0b01``)
++is for the hypervisor, ring 1 view. The third (page address ending in
++``0b10``) is for the operating system, ring 2 view. The fourth (page
++address ending in ``0b11``) is for user level, ring 3 view.
++
++Interrupt flow from an O/S perspective
++~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
++
++After an event data has been enqueued in the O/S Event Queue, the IVPE
++raises the bit corresponding to the priority of the pending interrupt
++in the register IBP (Interrupt Pending Buffer) to indicate that an
++event is pending in one of the 8 priority queues. The Pending
++Interrupt Priority Register (PIPR) is also updated using the IPB. This
++register represent the priority of the most favored pending
++notification.
++
++The PIPR is then compared to the the Current Processor Priority
++Register (CPPR). If it is more favored (numerically less than), the
++CPU interrupt line is raised and the EO bit of the Notification Source
++Register (NSR) is updated to notify the presence of an exception for
++the O/S. The O/S acknowledges the interrupt with a special load in the
++Thread Interrupt Management Area.
++
++The O/S handles the interrupt and when done, performs an EOI using a
++MMIO operation on the ESB management page of the associate source.
++
++Overview of the QEMU models for XIVE
++=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
++
++The XiveSource models the IVSE in general, internal and external. It
++handles the source ESBs and the MMIO interface to control them.
++
++The XiveNotifier is a small helper interface interconnecting the
++XiveSource to the XiveRouter.
++
++The XiveRouter is an abstract model acting as a combined IVRE and
++IVPE. It routes event notifications using the EAS and END tables to
++the IVPE sub-engine which does a CAM scan to find a CPU to deliver the
++exception. Storage should be provided by the inheriting classes.
++
++XiveEnDSource is a special source object. It exposes the END ESB MMIOs
++of the Event Queues which are used for coalescing event notifications
++and for escalation. Not used on the field, only to sync the EQ cache
++in OPAL.
++
++Finally, the XiveTCTX contains the interrupt state context of a thread,
++four sets of registers, one for each exception that can be delivered
++to a CPU. These contexts are scanned by the IVPE to find a matching VP
++when a notification is triggered. It also models the Thread Interrupt
++Management Area (TIMA), which exposes the thread context registers to
++the CPU for interrupt management.
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 9424a490d647..82ac0415b493 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -1708,6 +1708,7 @@ L: qemu-ppc@nongnu.org
+ S: Supported
+ F: hw/*/*xive*
+ F: include/hw/*/*xive*
++F: docs/*/*xive*
+=20
+ Subsystems
+ ----------
 --=20
-2.21.0
+2.20.1
 
 
