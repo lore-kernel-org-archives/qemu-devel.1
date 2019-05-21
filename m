@@ -2,66 +2,80 @@ Return-Path: <SRS0=/4tE=TV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=FROM_EXCESS_BASE64,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 03A6FC04AAF
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 11:08:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DD41DC04AAF
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 11:11:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CD2212081C
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 11:08:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CD2212081C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id A4C352081C
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 11:11:03 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="lqmgJzc3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A4C352081C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:51490 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:51546 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hT2cu-0002rB-Ro
-	for qemu-devel@archiver.kernel.org; Tue, 21 May 2019 07:08:12 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:59842)
+	id 1hT2fe-0005KS-Dj
+	for qemu-devel@archiver.kernel.org; Tue, 21 May 2019 07:11:02 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:58711)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1hT2bK-0001xj-8e
-	for qemu-devel@nongnu.org; Tue, 21 May 2019 07:06:35 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1hT2WT-0006eb-CN
+	for qemu-devel@nongnu.org; Tue, 21 May 2019 07:01:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1hT2bJ-0008Qo-2u
-	for qemu-devel@nongnu.org; Tue, 21 May 2019 07:06:34 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58334)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1hT2bI-0007Zr-U7
-	for qemu-devel@nongnu.org; Tue, 21 May 2019 07:06:33 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 2FE5888309;
-	Tue, 21 May 2019 11:06:14 +0000 (UTC)
-Received: from redhat.com (ovpn-112-26.ams2.redhat.com [10.36.112.26])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id E84127841F;
-	Tue, 21 May 2019 11:06:03 +0000 (UTC)
-Date: Tue, 21 May 2019 12:06:00 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-Message-ID: <20190521110600.GJ25835@redhat.com>
-References: <20190520184108.GA10764@habkost.net>
-	<20190521085350.GF25835@redhat.com>
-	<CAFEAcA8bs0M4Ofdq1tt8uZvWHK49PNRFz3SQhxEHT_uPGmBHOQ@mail.gmail.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1hT2WS-0003NY-4n
+	for qemu-devel@nongnu.org; Tue, 21 May 2019 07:01:33 -0400
+Received: from mail-ot1-x329.google.com ([2607:f8b0:4864:20::329]:40418)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1hT2WR-0003Mz-Ud
+	for qemu-devel@nongnu.org; Tue, 21 May 2019 07:01:32 -0400
+Received: by mail-ot1-x329.google.com with SMTP id u11so15898100otq.7
+	for <qemu-devel@nongnu.org>; Tue, 21 May 2019 04:01:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+	:cc; bh=i3pmNUokdSPzrXl5GpdoEGmFzwFoMlpkJKZfb60Rdt8=;
+	b=lqmgJzc3XST3HFyp3UQAKywhj8qqcdtvSqNFOX+uxTf/brpTNOCqNFA2uUXyb1KrNt
+	g62+yOrEjCQ9dNkG0PQ4I3vik0hSgtyNwPiBX1fLYSYrd1mud7lB4Ojx0pzJcUw5+Z0y
+	/wPFW/VOWD9X6CdEag2Kiut6MEMHeK2IIF588RkmvwhaBrxNGKMeIHD5WzAZ454mr6t+
+	1IPVXKbI8mh+5Aaf5ORFjdpUJ46fXaVvU+3LCNZdajLSMDVL4LJDZWzmE017rVlorH94
+	5w3mnNTEbHvZkC3gzAix6HSr64rfmBjTubhujFIalMzLEyQc8+NHEK9ZRiNf0nrqH1xy
+	qPRA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+	:message-id:subject:to:cc;
+	bh=i3pmNUokdSPzrXl5GpdoEGmFzwFoMlpkJKZfb60Rdt8=;
+	b=h12ehbiZ4dALv+2tVnKLXzY1Oz6z94ddBPohAWuulXkeOchRBTL9HCEkzEDgCAhNCm
+	DmkQFkNQnSbTP8S3S/aMsgwPivdDI8qOjDShDr+qKtOpC9eQ1BFR7Zb3I2A6S/qnfQcb
+	Jf7L5fh658Rf++EoFpDAUm9QUbxUj7A6ppDklhPZMsgs4MFORf3WMJLMYqyYs3RpKgS7
+	YCz4so4W91ZxWufNK2e8xprGaoVjyPTaY9hpamAaiD21KakE5dvnvSSL79i/zWytZ7xN
+	F/sKXTaDBaHK+CwjA90FPb73NViKlalbSQYumRuuXbHeGLif35LEVyEQCePy1+p4+NC2
+	Eteg==
+X-Gm-Message-State: APjAAAXlDX/HVnIVJeQoXBE4ZOwWV1j17/dJHsKk8IfdIGhOv6oBR6QG
+	X2S2JxKGzuoYTzJ+NCoS1QG0k6R3Ljztxs9A1XewxQ==
+X-Google-Smtp-Source: APXvYqyhuKTdxxjlf0ZyG4RLQGFji0MJCzCrqptwbh+IGbDI5b7pcSjtSCeNDodUGGIwGFG/07B4YqS06Fx96c5DzKk=
+X-Received: by 2002:a05:6830:149a:: with SMTP id
+	s26mr19251062otq.221.1558436491278; 
+	Tue, 21 May 2019 04:01:31 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA8bs0M4Ofdq1tt8uZvWHK49PNRFz3SQhxEHT_uPGmBHOQ@mail.gmail.com>
-User-Agent: Mutt/1.11.4 (2019-03-13)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.28]);
-	Tue, 21 May 2019 11:06:14 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] Introducing GSoC project: API Documentation
- Generation
+References: <20190520175837.4561-1-jcmvbkbc@gmail.com>
+In-Reply-To: <20190520175837.4561-1-jcmvbkbc@gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 21 May 2019 12:01:20 +0100
+Message-ID: <CAFEAcA-RRZ+GC6FL2V7U09SY4zUA1rE8f9JvM-3XQ2sLRLj1Ew@mail.gmail.com>
+To: Max Filippov <jcmvbkbc@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::329
+Subject: Re: [Qemu-devel] [PULL 0/9] target/xtensa queue
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -73,41 +87,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: Eduardo Habkost <ehabkost@redhat.com>,
-	Gabriel Barreto <sbarreto.gabriel@gmail.com>,
-	QEMU Developers <qemu-devel@nongnu.org>, "Emilio G. Cota" <cota@braap.org>,
-	Stefan Hajnoczi <stefanha@redhat.com>, Cleber Rosa <crosa@redhat.com>,
-	Paolo Bonzini <pbonzini@redhat.com>, John Snow <jsnow@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, May 21, 2019 at 10:43:04AM +0100, Peter Maydell wrote:
-> On Tue, 21 May 2019 at 09:54, Daniel P. Berrang=C3=A9 <berrange@redhat.=
-com> wrote:
-> > Hawkmoth seems pretty attractive in its output format, but doesn't ap=
-pear
-> > to be part of either Debian or Fedora distros, so we would have to bu=
-ndle
-> > it in QEMU I expect.  My big concern there is that there have only be=
-en
-> > 2 contributors to Hawkmoth in its entire 3 year existance, which make=
-s
-> > me fear for its long term viability if the main author gives up.
->=20
-> The dependency on clang 6 and the python bindings to it might also
-> be awkward for bundling it with QEMU...
+On Mon, 20 May 2019 at 18:58, Max Filippov <jcmvbkbc@gmail.com> wrote:
+>
+> Hi Peter,
+>
+> please pull the following batch of updates to target/xtensa:
+>
+> The following changes since commit efb4f3b62c69383a7308d7b739a3193e7c0ccae8:
+>
+>   Merge remote-tracking branch 'remotes/stefanha/tags/block-pull-request' into staging (2019-05-10 14:49:36 +0100)
+>
+> are available in the git repository at:
+>
+>   git://github.com/OSLL/qemu-xtensa.git tags/20190520-xtensa
+>
+> for you to fetch changes up to b345e140534ea17814b02bdf8798f18db6295304:
+>
+>   target/xtensa: implement exclusive access option (2019-05-15 10:31:52 -0700)
+>
+> ----------------------------------------------------------------
+> target/xtensa: SR reorganization and options for modern cores
+>
+> Reorganize special register handling to support configurations with
+> conflicting SR definitions.
+>
+> Implement options used by the modern xtensa cores:
+> - memory protection unit;
+> - block prefetch;
+> - exclusive access
+>
+> Add special register definitions and IRQ types for ECC/parity,
+> gather/scatter and IDMA.
+>
 
-Requiring a second C compiler to build docs is rather unappealing :-(
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+Applied, thanks.
+
+Please update the changelog at https://wiki.qemu.org/ChangeLog/4.1
+for any user-visible changes.
+
+-- PMM
 
