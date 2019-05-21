@@ -4,61 +4,60 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 49F20C04AAF
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 06:54:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B8244C04AAF
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 06:55:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1759720863
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 06:54:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 42E9420863
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 06:55:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="eNEOqZhA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1759720863
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="Lm89A6Wr"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 42E9420863
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:47705 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:47731 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hSyff-0002uw-8d
-	for qemu-devel@archiver.kernel.org; Tue, 21 May 2019 02:54:47 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:49233)
+	id 1hSygR-0003f0-8F
+	for qemu-devel@archiver.kernel.org; Tue, 21 May 2019 02:55:35 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:49579)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1hSyHt-0006QF-SN
-	for qemu-devel@nongnu.org; Tue, 21 May 2019 02:30:14 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1hSyIH-0006qX-KO
+	for qemu-devel@nongnu.org; Tue, 21 May 2019 02:30:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1hSyHs-0008Jg-1d
-	for qemu-devel@nongnu.org; Tue, 21 May 2019 02:30:13 -0400
-Received: from ozlabs.org ([2401:3900:2:1::2]:53523)
+	(envelope-from <dgibson@ozlabs.org>) id 1hSyIG-0000GK-Kb
+	for qemu-devel@nongnu.org; Tue, 21 May 2019 02:30:37 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:56223 helo=ozlabs.org)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
-	id 1hSyHq-0007nd-P3; Tue, 21 May 2019 02:30:11 -0400
+	id 1hSyIG-0008Ls-9m; Tue, 21 May 2019 02:30:36 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
-	id 457Qph10y2z9sPJ; Tue, 21 May 2019 16:29:31 +1000 (AEST)
+	id 457Qpm0wV5z9sPd; Tue, 21 May 2019 16:29:34 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-	d=gibson.dropbear.id.au; s=201602; t=1558420172;
-	bh=E0P7ZBTOsd78OXOu944+9bwwwlf8kjjxDpxXnr0T90s=;
+	d=gibson.dropbear.id.au; s=201602; t=1558420176;
+	bh=N4Msu5vC5ToRCfQzQVywNNY77GKEdiRxWk6vPULpnQw=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=eNEOqZhAYR4u+MHW1AAWRIxYXM48NZ69ulqEpdUjeFpkuIwPM+UiXDePYzSTZ5bys
-	Z9n3OiJeAubdiqehfh0e/A2YSAD6pR+Z4li9UVJx6Z+wA5VbJ7Kt5+ft+OFQQQe9+5
-	NI74eny8NG0S7xqsRMTGwNDQMgTe/a8IMnqADQi0=
+	b=Lm89A6Wr2hI7X5pMLlcy1EuIqK9QG33hjbDPZf3Ymgp9AOpU/fFKNBVXrb8l8yLH2
+	QGMzcLbUeN7I016RlUbuwEKecRa3ATW4FM+GlUy2v/T+0RCFnF7F8Loqcv+1ytvayL
+	Se1Dt3YXi2Ihx8Vz9pj07qltxwXAx2MuIGtmBkAY=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: peter.maydell@linaro.org
-Date: Tue, 21 May 2019 16:29:02 +1000
-Message-Id: <20190521062924.6930-17-david@gibson.dropbear.id.au>
+Date: Tue, 21 May 2019 16:29:23 +1000
+Message-Id: <20190521062924.6930-38-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190521062924.6930-1-david@gibson.dropbear.id.au>
 References: <20190521062924.6930-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2401:3900:2:1::2
-Subject: [Qemu-devel] [PULL 16/38] Fix typo on "info pic" monitor cmd output
- for xive
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 203.11.71.1
+Subject: [Qemu-devel] [PULL 37/38] ppc/xics: fix irq priority in
+ ics_set_irq_type()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -70,44 +69,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: lvivier@redhat.com, gkurz@kaod.org, qemu-devel@nongnu.org,
-	Greg Kurz <groug@kaod.org>,
-	Satheesh Rajendran <sathnaga@linux.vnet.ibm.com>, clg@kaod.org,
-	qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>,
-	Stefano Garzarella <sgarzare@redhat.com>
+Cc: lvivier@redhat.com, gkurz@kaod.org, Greg Kurz <groug@kaod.org>,
+	qemu-devel@nongnu.org, qemu-ppc@nongnu.org, clg@kaod.org,
+	David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Satheesh Rajendran <sathnaga@linux.vnet.ibm.com>
+From: C=C3=A9dric Le Goater <clg@kaod.org>
 
-Instead of LISN i.e "Logical Interrupt Source Number" as per
-Xive PAPR document "info pic" prints as LSIN, let's fix it.
+Recent commits changed the behavior of ics_set_irq_type() to
+initialize correctly LSIs at the KVM level. ics_set_irq_type() is also
+called by the realize routine of the different devices of the machine
+when initial interrupts are claimed, before the ICSState device is
+reseted.
 
-Signed-off-by: Satheesh Rajendran <sathnaga@linux.vnet.ibm.com>
-Message-Id: <20190509080750.21999-1-sathnaga@linux.vnet.ibm.com>
-Reviewed-by: Greg Kurz <groug@kaod.org>
-Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+In the case, the ICSIRQState priority is 0x0 and the call to
+ics_set_irq_type() results in configuring the target of the
+interrupt. On P9, when using the KVM XICS-on-XIVE device, the target
+is configured to be server 0, priority 0 and the event queue 0 is
+created automatically by KVM.
+
+With the dual interrupt mode creating the KVM device at reset, it
+leads to unexpected effects on the guest, mostly blocking IPIs. This
+is wrong, fix it by reseting the ICSIRQState structure when
+ics_set_irq_type() is called.
+
+Fixes: commit 6cead90c5c9c ("xics: Write source state to KVM at claim tim=
+e")
+Signed-off-by: Greg Kurz <groug@kaod.org>
+Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+Message-Id: <20190513084245.25755-14-clg@kaod.org>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/intc/spapr_xive.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ hw/intc/xics.c | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
 
-diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
-index 58cc6e2b50..62e13ac353 100644
---- a/hw/intc/spapr_xive.c
-+++ b/hw/intc/spapr_xive.c
-@@ -141,7 +141,7 @@ void spapr_xive_pic_print_info(SpaprXive *xive, Monit=
-or *mon)
-     XiveSource *xsrc =3D &xive->source;
-     int i;
+diff --git a/hw/intc/xics.c b/hw/intc/xics.c
+index af7dc709ab..79f5a8a916 100644
+--- a/hw/intc/xics.c
++++ b/hw/intc/xics.c
+@@ -610,6 +610,12 @@ static const TypeInfo ics_simple_info =3D {
+     .class_size =3D sizeof(ICSStateClass),
+ };
 =20
--    monitor_printf(mon, "  LSIN         PQ    EISN     CPU/PRIO EQ\n");
-+    monitor_printf(mon, "  LISN         PQ    EISN     CPU/PRIO EQ\n");
++static void ics_reset_irq(ICSIRQState *irq)
++{
++    irq->priority =3D 0xff;
++    irq->saved_priority =3D 0xff;
++}
++
+ static void ics_base_reset(DeviceState *dev)
+ {
+     ICSState *ics =3D ICS_BASE(dev);
+@@ -623,8 +629,7 @@ static void ics_base_reset(DeviceState *dev)
+     memset(ics->irqs, 0, sizeof(ICSIRQState) * ics->nr_irqs);
 =20
-     for (i =3D 0; i < xive->nr_irqs; i++) {
-         uint8_t pq =3D xive_source_esb_get(xsrc, i);
+     for (i =3D 0; i < ics->nr_irqs; i++) {
+-        ics->irqs[i].priority =3D 0xff;
+-        ics->irqs[i].saved_priority =3D 0xff;
++        ics_reset_irq(ics->irqs + i);
+         ics->irqs[i].flags =3D flags[i];
+     }
+ }
+@@ -760,6 +765,7 @@ void ics_set_irq_type(ICSState *ics, int srcno, bool =
+lsi)
+         lsi ? XICS_FLAGS_IRQ_LSI : XICS_FLAGS_IRQ_MSI;
+=20
+     if (kvm_irqchip_in_kernel()) {
++        ics_reset_irq(ics->irqs + srcno);
+         ics_set_kvm_state_one(ics, srcno);
+     }
+ }
 --=20
 2.21.0
 
