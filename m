@@ -2,108 +2,111 @@ Return-Path: <SRS0=/4tE=TV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D9782C04AAF
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 07:53:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 14301C04AAF
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 07:54:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 952902173C
-	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 07:53:11 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="fVn+Ab8/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 952902173C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id E0E572173C
+	for <qemu-devel@archiver.kernel.org>; Tue, 21 May 2019 07:54:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E0E572173C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:48405 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:48412 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hSzaA-00045X-Sw
-	for qemu-devel@archiver.kernel.org; Tue, 21 May 2019 03:53:10 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:38885)
+	id 1hSzbH-0004ib-7L
+	for qemu-devel@archiver.kernel.org; Tue, 21 May 2019 03:54:19 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:39249)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hSzZ3-0003Wi-9c
-	for qemu-devel@nongnu.org; Tue, 21 May 2019 03:52:02 -0400
+	(envelope-from <thuth@redhat.com>) id 1hSzaO-0004KF-4O
+	for qemu-devel@nongnu.org; Tue, 21 May 2019 03:53:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hSzZ1-00051x-BF
-	for qemu-devel@nongnu.org; Tue, 21 May 2019 03:52:01 -0400
-Received: from mail-eopbgr140120.outbound.protection.outlook.com
-	([40.107.14.120]:8318
-	helo=EUR01-VE1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1hSzYx-0004zh-NV; Tue, 21 May 2019 03:51:55 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
-	s=selector1;
-	h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
-	bh=OlsD/+Uxqxwv6NH728euTUYoVyuOC43n1/wLfHO9jz4=;
-	b=fVn+Ab8/doRaabBkC6wzWjtoz5seWnOQt5+3iyMHU3wjkcFQWTN52f6/Hz5a7C2X3qOUryLscMGbQGJLk9nI2OW2W0Ct4r7chnIGxrVY+oxTONiuhH53qxr0w3dxUyk+zMYcDLWcuyXkIyB5jRBqRdkk1SjCv7jVYGWLOcF27Ug=
-Received: from AM6PR08MB4675.eurprd08.prod.outlook.com (10.255.96.78) by
-	AM6PR08MB4487.eurprd08.prod.outlook.com (20.179.18.20) with Microsoft
-	SMTP
-	Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
-	15.20.1900.16; Tue, 21 May 2019 07:51:51 +0000
-Received: from AM6PR08MB4675.eurprd08.prod.outlook.com
-	([fe80::9051:3c85:28c6:a0c1]) by
-	AM6PR08MB4675.eurprd08.prod.outlook.com
-	([fe80::9051:3c85:28c6:a0c1%6]) with mapi id 15.20.1878.024;
-	Tue, 21 May 2019 07:51:51 +0000
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org"
-	<qemu-block@nongnu.org>
-Thread-Topic: [PATCH v6 0/3] block/stream: get rid of the base
-Thread-Index: AQHVBCE8/V/XOU2VJU++8IoKKmQQnKZ1S9SA
-Date: Tue, 21 May 2019 07:51:51 +0000
-Message-ID: <e04dd957-4b8f-eed4-f865-74fe2ccf45fd@virtuozzo.com>
-References: <20190506153429.52737-1-vsementsov@virtuozzo.com>
-In-Reply-To: <20190506153429.52737-1-vsementsov@virtuozzo.com>
-Accept-Language: ru-RU, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: HE1PR0102CA0047.eurprd01.prod.exchangelabs.com
-	(2603:10a6:7:7d::24) To AM6PR08MB4675.eurprd08.prod.outlook.com
-	(2603:10a6:20b:c2::14)
-authentication-results: spf=none (sender IP is )
-	smtp.mailfrom=vsementsov@virtuozzo.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-tagtoolbar-keys: D20190521105148982
-x-originating-ip: [185.231.240.5]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 06a22ee5-9d43-4c3e-e2e1-08d6ddc12f8c
-x-microsoft-antispam: BCL:0; PCL:0;
-	RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600141)(711020)(4605104)(2017052603328)(7193020);
-	SRVR:AM6PR08MB4487; 
-x-ms-traffictypediagnostic: AM6PR08MB4487:
-x-microsoft-antispam-prvs: <AM6PR08MB4487E854FAD9358C58442CE9C1070@AM6PR08MB4487.eurprd08.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:849;
-x-forefront-prvs: 0044C17179
-x-forefront-antispam-report: SFV:NSPM;
-	SFS:(10019020)(136003)(366004)(39850400004)(346002)(396003)(376002)(199004)(189003)(66946007)(71200400001)(71190400001)(76176011)(52116002)(73956011)(99286004)(102836004)(36756003)(229853002)(7736002)(66556008)(478600001)(7416002)(68736007)(6486002)(256004)(6506007)(386003)(66446008)(64756008)(66476007)(31686004)(305945005)(54906003)(8676002)(31696002)(81166006)(5660300002)(110136005)(81156014)(2616005)(6246003)(53936002)(476003)(11346002)(86362001)(4326008)(446003)(8936002)(6116002)(3846002)(486006)(316002)(6436002)(2906002)(2501003)(6512007)(14454004)(66066001)(25786009)(186003)(26005)(26583001);
-	DIR:OUT; SFP:1102; SCL:1; SRVR:AM6PR08MB4487;
-	H:AM6PR08MB4675.eurprd08.prod.outlook.com; FPR:; SPF:None;
-	LANG:en; PTR:InfoNoRecords; A:1; MX:1; 
-received-spf: None (protection.outlook.com: virtuozzo.com does not designate
-	permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: Gb201vej7qYwtrRRlEh/cGiKKRR18lM8zhfg+Be8g0bt31RJwRf3t2VdtNqXsU6y9Iwqc6G7ZNuqlwbfc2NdraJ/2yz7oDI0U5YEPFjpMzTbRfXtKldMK5JKn8BgxmJqPVgG1FvOYRD0Du5erS8dl/k8jPLGZHl9tLkaIHCxL3Dpg7zhYu/0WecyTFaa0Im7eEa4SevW0BS2DQ3+OgyVzYwMvaBbFheuVMHAL24kt9Ym7ADTxyMjbztWewGaGFPynYFI7F59VvvtFgvfFgMGEsPyA2QKdMXMDtr9mdLT+v99K+s9ARW6msTXhXi3/6++85tAPEUWwPk/ylQdBw2OOEOM43pR9oRdYFlg6vmjcyYMGQl3bX+6IaxGaevyhds9qNnXRx/6Pa5L8yOqUPe4TB8OtOkeIOSA5o4KdUGIBPw=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <9D4CCD398356AC4D96A4AC2388B7946D@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <thuth@redhat.com>) id 1hSzaN-0005qr-5U
+	for qemu-devel@nongnu.org; Tue, 21 May 2019 03:53:24 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46068)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1hSzaM-0005lR-G1
+	for qemu-devel@nongnu.org; Tue, 21 May 2019 03:53:23 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 1BDFF7FDC9
+	for <qemu-devel@nongnu.org>; Tue, 21 May 2019 07:53:10 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-116-22.ams2.redhat.com [10.36.116.22])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 863C6176C9;
+	Tue, 21 May 2019 07:53:04 +0000 (UTC)
+From: Thomas Huth <thuth@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+References: <20190514180311.16028-1-armbru@redhat.com>
+	<20190514180311.16028-3-armbru@redhat.com>
+	<dfe0cd4d-406b-b389-4838-d6c8274119a2@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=thuth@redhat.com; keydata=
+	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
+Organization: Red Hat
+Message-ID: <0e5cf8f4-c6e1-5ff4-e44a-b28581337b41@redhat.com>
+Date: Tue, 21 May 2019 09:52:57 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 06a22ee5-9d43-4c3e-e2e1-08d6ddc12f8c
-X-MS-Exchange-CrossTenant-originalarrivaltime: 21 May 2019 07:51:51.8331 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB4487
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.14.120
-Subject: Re: [Qemu-devel] [PATCH v6 0/3] block/stream: get rid of the base
+In-Reply-To: <dfe0cd4d-406b-b389-4838-d6c8274119a2@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.27]);
+	Tue, 21 May 2019 07:53:10 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v2 2/6] tests/vhost-user-bridge: Fix misuse
+ of isdigit()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -115,44 +118,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "fam@euphon.net" <fam@euphon.net>, "kwolf@redhat.com" <kwolf@redhat.com>,
-	"berto@igalia.com" <berto@igalia.com>, Denis Lunev <den@virtuozzo.com>,
-	"wencongyang2@huawei.com" <wencongyang2@huawei.com>,
-	"xiechanglong.d@gmail.com" <xiechanglong.d@gmail.com>,
-	"mreitz@redhat.com" <mreitz@redhat.com>,
-	"stefanha@redhat.com" <stefanha@redhat.com>,
-	Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>,
-	"jsnow@redhat.com" <jsnow@redhat.com>
+Cc: Victor Kaplansky <victork@redhat.com>, philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-cGluZw0KDQowNi4wNS4yMDE5IDE4OjM0LCBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IHdy
-b3RlOg0KPiBUaGlzIHNlcmllcyBpbnRyb2R1Y2VzIGEgYm90dG9tIGludGVybWVkaWF0ZSBub2Rl
-IHRoYXQgZWxpbWluYXRlcyB0aGUNCj4gZGVwZW5kZW5jeSBvbiB0aGUgYmFzZSB0aGF0IG1heSBj
-aGFuZ2Ugd2hpbGUgc3RyZWFtIGpvYiBpcyBydW5uaW5nLg0KPiBJdCBoYXBwZW5zIHdoZW4gc3Ry
-ZWFtL2NvbW1pdCBwYXJhbGxlbCBqb2JzIGFyZSBydW5uaW5nIG9uIHRoZSBzYW1lDQo+IGJhY2tp
-bmcgY2hhaW4uIFRoZSBiYXNlIG5vZGUgb2YgdGhlIHN0cmVhbSBqb2IgbWF5IGJlIGEgdG9wIG5v
-ZGUgb2YNCj4gdGhlIHBhcmFsbGVsIGNvbW1pdCBqb2IgYW5kIGNhbiBjaGFuZ2UgYmVmb3JlIHRo
-ZSBzdHJlYW0gam9iIGlzDQo+IGNvbXBsZXRlZC4gV2UgYXZvaWQgdGhhdCBkZXBlbmRlbmN5IGJ5
-IGludHJvZHVjaW5nIHRoZSBib3R0b20gbm9kZS4NCj4gDQo+IHY2OiBbcmVzZW5kIGJ5IFZsYWRp
-bWlyXQ0KPiAgICAwMTogaW1wcm92ZSBjb21tZW50IGluIGJsb2NrL2lvLmMsIHN1Z2dlc3RlZCBi
-eSBBbGJlcnRvDQo+IA0KPiB2NTogW3Jlc2VuZCBieSBWbGFkaW1pcl0NCj4gICAgMDE6IHVzZSBj
-b21tZW50IHdvcmRpbmcgaW4gYmxvY2svaW8uYyBzdWdnZXN0ZWQgYnkgQWxiZXJ0bw0KPiAgICBO
-b3cgdGhlIHdob2xlIHNlcmllcyBhcmUgcmV2aWV3ZWQtYnkgQWxiZXJ0byBhbmQgbWUuDQo+IA0K
-PiB2NDoNCj4gdHJhY2Vfc3RyZWFtX3N0YXJ0IHJldmVydGVkIHRvIHRoZSBiYXNlLg0KPiBiZHJ2
-X2lzX2FsbG9jYXRlZF9hYm92ZV9pbmNsdXNpdmUoKSBkZWxldGVkIGFuZCB0aGUgbmV3IHBhcmFt
-ZXRlcg0KPiAnYm9vbCBpbmNsdWRlX2Jhc2UnIHdhcyBhZGRlZCB0byB0aGUgYmRydl9pc19hbGxv
-Y2F0ZWRfYWJvdmUoKS4NCj4gDQo+IEFuZHJleSBTaGlua2V2aWNoICgyKToNCj4gICAgYmxvY2s6
-IGluY2x1ZGUgYmFzZSB3aGVuIGNoZWNraW5nIGltYWdlIGNoYWluIGZvciBibG9jayBhbGxvY2F0
-aW9uDQo+ICAgIGJsb2NrL3N0cmVhbTogaW50cm9kdWNlIGEgYm90dG9tIG5vZGUNCj4gDQo+IFZs
-YWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgKDEpOg0KPiAgICBibG9jay9zdHJlYW06IHJlZmFj
-dG9yIHN0cmVhbV9ydW46IGRyb3AgZ290bw0KPiANCj4gICBpbmNsdWRlL2Jsb2NrL2Jsb2NrLmgg
-IHwgIDMgKy0NCj4gICBibG9jay9jb21taXQuYyAgICAgICAgIHwgIDIgKy0NCj4gICBibG9jay9p
-by5jICAgICAgICAgICAgIHwgMjAgKysrKysrKysrKy0tLS0NCj4gICBibG9jay9taXJyb3IuYyAg
-ICAgICAgIHwgIDIgKy0NCj4gICBibG9jay9yZXBsaWNhdGlvbi5jICAgIHwgIDIgKy0NCj4gICBi
-bG9jay9zdHJlYW0uYyAgICAgICAgIHwgNjIgKysrKysrKysrKysrKysrKysrKystLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tDQo+ICAgdGVzdHMvcWVtdS1pb3Rlc3RzLzI0NSB8ICA0ICstLQ0KPiAgIDcg
-ZmlsZXMgY2hhbmdlZCwgNTAgaW5zZXJ0aW9ucygrKSwgNDUgZGVsZXRpb25zKC0pDQo+IA0KDQoN
-Ci0tIA0KQmVzdCByZWdhcmRzLA0KVmxhZGltaXINCg==
+On 14/05/2019 20.41, Thomas Huth wrote:
+> On 14/05/2019 20.03, Markus Armbruster wrote:
+>> vubr_set_host() passes char values to isdigit().  Undefined behavior
+>> when the value is negative.
+>>
+>> Fix by using qemu_isdigit() instead.
+>>
+>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>> ---
+>>  tests/vhost-user-bridge.c | 2 +-
+>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/tests/vhost-user-bridge.c b/tests/vhost-user-bridge.c
+>> index 0033b61f2e..d70b107ebc 100644
+>> --- a/tests/vhost-user-bridge.c
+>> +++ b/tests/vhost-user-bridge.c
+>> @@ -645,7 +645,7 @@ vubr_host_notifier_setup(VubrDev *dev)
+>>  static void
+>>  vubr_set_host(struct sockaddr_in *saddr, const char *host)
+>>  {
+>> -    if (isdigit(host[0])) {
+>> +    if (qemu_isdigit(host[0])) {
+>>          if (!inet_aton(host, &saddr->sin_addr)) {
+>>              fprintf(stderr, "inet_aton() failed.\n");
+>>              exit(1);
+> 
+> Reviewed-by: Thomas Huth <thuth@redhat.com>
+
+By the way, how do you compile / run this test? The original commit
+message say one should compile it with "make tests/vhost-user-bridge"
+but that does not work for me:
+
+$ make tests/vhost-user-bridge
+cc     tests/vhost-user-bridge.c   -o tests/vhost-user-bridge
+tests/vhost-user-bridge.c:32:24: fatal error: qemu/osdep.h: No such file
+or directory
+
+ Thomas
 
