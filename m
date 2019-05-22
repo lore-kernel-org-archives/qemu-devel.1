@@ -6,59 +6,61 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A1DFC18E7D
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 09:12:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 45271C193F2
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 09:12:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E579120856
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 09:12:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E579120856
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 08E3920856
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 09:12:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 08E3920856
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:38926 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:38928 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hTNIs-0001lc-3d
-	for qemu-devel@archiver.kernel.org; Wed, 22 May 2019 05:12:54 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:40688)
+	id 1hTNIv-0001oE-Aa
+	for qemu-devel@archiver.kernel.org; Wed, 22 May 2019 05:12:57 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:40697)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1hTNHb-000160-8P
-	for qemu-devel@nongnu.org; Wed, 22 May 2019 05:11:36 -0400
+	(envelope-from <clg@kaod.org>) id 1hTNHb-00016Q-Tr
+	for qemu-devel@nongnu.org; Wed, 22 May 2019 05:11:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1hTNHZ-0003Id-IX
+	(envelope-from <clg@kaod.org>) id 1hTNHa-0003K9-Mo
 	for qemu-devel@nongnu.org; Wed, 22 May 2019 05:11:35 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41024)
+Received: from 4.mo179.mail-out.ovh.net ([46.105.36.149]:44466)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>)
-	id 1hTNHW-0003Dm-0a; Wed, 22 May 2019 05:11:30 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 1EFCB3154860;
-	Wed, 22 May 2019 09:11:22 +0000 (UTC)
-Received: from localhost (unknown [10.43.2.182])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 051FD17CDA;
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1hTNHa-00035Y-F5
+	for qemu-devel@nongnu.org; Wed, 22 May 2019 05:11:34 -0400
+Received: from player798.ha.ovh.net (unknown [10.109.146.240])
+	by mo179.mail-out.ovh.net (Postfix) with ESMTP id 9F5AE1325B0
+	for <qemu-devel@nongnu.org>; Wed, 22 May 2019 11:11:21 +0200 (CEST)
+Received: from kaod.org (lfbn-1-10649-41.w90-89.abo.wanadoo.fr [90.89.235.41])
+	(Authenticated sender: clg@kaod.org)
+	by player798.ha.ovh.net (Postfix) with ESMTPSA id 5275A6209A0B;
 	Wed, 22 May 2019 09:11:15 +0000 (UTC)
-Date: Wed, 22 May 2019 11:11:15 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-To: Wei Yang <richardw.yang@linux.intel.com>
-Message-ID: <20190522111115.3a6205b8@redhat.com>
-In-Reply-To: <20190521062836.6541-2-richardw.yang@linux.intel.com>
-References: <20190521062836.6541-1-richardw.yang@linux.intel.com>
-	<20190521062836.6541-2-richardw.yang@linux.intel.com>
+To: Greg Kurz <groug@kaod.org>
+References: <20190522074016.10521-1-clg@kaod.org>
+	<20190522074016.10521-2-clg@kaod.org>
+	<20190522105248.71c5d72a@bahia.lan>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <9bf3b3fd-efe4-5e15-b205-31d0e4492ad6@kaod.org>
+Date: Wed, 22 May 2019 11:11:14 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.41]);
-	Wed, 22 May 2019 09:11:24 +0000 (UTC)
+In-Reply-To: <20190522105248.71c5d72a@bahia.lan>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+X-Ovh-Tracer-Id: 1313080768584321875
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduuddrudduvddguddvucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddm
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v6 1/2] hw/acpi: Consolidate build_mcfg to
- pci.c
+X-Received-From: 46.105.36.149
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH 1/2] spapr/xive: fix multiple
+ resets when using the 'dual' interrupt mode
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -70,215 +72,144 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: yang.zhong@intel.com, peter.maydell@linaro.org, thuth@redhat.com,
-	mst@redhat.com, qemu-devel@nongnu.org, shannon.zhaosl@gmail.com,
-	qemu-arm@nongnu.org, philmd@redhat.com
+Cc: qemu-ppc@nongnu.org, Peter Maydell <peter.maydell@linaro.org>,
+	Satheesh Rajendran <sathnaga@linux.vnet.ibm.com>, qemu-devel@nongnu.org,
+	David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 21 May 2019 14:28:35 +0800
-Wei Yang <richardw.yang@linux.intel.com> wrote:
+On 5/22/19 10:52 AM, Greg Kurz wrote:
+> On Wed, 22 May 2019 09:40:15 +0200
+> C=C3=A9dric Le Goater <clg@kaod.org> wrote:
+>=20
+>> Today, when a reset occurs on a pseries machine using the 'dual'
+>> interrupt mode, the KVM devices are released and recreated depending
+>> on the interrupt mode selected by CAS. If XIVE is selected, the SysBus
+>> memory regions of the SpaprXive model are initialized by the KVM
+>> backend initialization routine each time a reset occurs. This leads to
+>> a crash after a couple of resets because the machine reaches the
+>> QDEV_MAX_MMIO limit of SysBusDevice :
+>>
+>> qemu-system-ppc64: hw/core/sysbus.c:193: sysbus_init_mmio: Assertion `=
+dev->num_mmio < QDEV_MAX_MMIO' failed.
+>>
+>> To fix, initialize the SysBus memory regions in spapr_xive_realize()
+>> called only once and remove the same inits from the QEMU and KVM
+>> backend initialization routines which are called at each reset.
+>>
+>=20
+> Yeah, sysbus_init_mmio() simply records the memory region pointer into =
+the
+> mmio array of the sysbus device. It doesn't require the memory region t=
+o be
+> initialized beforehand and it really must be called only once during th=
+e
+> device life time. Certainly not a reset thing. Doing this at realize lo=
+oks
+> a lot better.
+>=20
+>> Reported-by: Satheesh Rajendran <sathnaga@linux.vnet.ibm.com>
+>> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+>> ---
+>>  hw/intc/spapr_xive.c     | 11 +++++------
+>>  hw/intc/spapr_xive_kvm.c |  4 ----
+>>  2 files changed, 5 insertions(+), 10 deletions(-)
+>>
+>> diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
+>> index f6f6c29d6ae4..62e0ef8fa5b4 100644
+>> --- a/hw/intc/spapr_xive.c
+>> +++ b/hw/intc/spapr_xive.c
+>> @@ -331,12 +331,16 @@ static void spapr_xive_realize(DeviceState *dev,=
+ Error **errp)
+>>                             xive->tm_base + XIVE_TM_USER_PAGE * (1 << =
+TM_SHIFT));
+>> =20
+>>      qemu_register_reset(spapr_xive_reset, dev);
+>> +
+>> +    /* Define all XIVE MMIO regions on SysBus */
+>> +    sysbus_init_mmio(SYS_BUS_DEVICE(xive), &xsrc->esb_mmio);
+>> +    sysbus_init_mmio(SYS_BUS_DEVICE(xive), &end_xsrc->esb_mmio);
+>> +    sysbus_init_mmio(SYS_BUS_DEVICE(xive), &xive->tm_mmio);
+>>  }
+>> =20
+>>  void spapr_xive_init(SpaprXive *xive, Error **errp)
+>>  {
+>>      XiveSource *xsrc =3D &xive->source;
+>> -    XiveENDSource *end_xsrc =3D &xive->end_source;
+>> =20
+>>      /*
+>>       * The emulated XIVE device can only be initialized once. If the
+>> @@ -351,11 +355,6 @@ void spapr_xive_init(SpaprXive *xive, Error **err=
+p)
+>>      memory_region_init_io(&xive->tm_mmio, OBJECT(xive), &xive_tm_ops,=
+ xive,
+>>                            "xive.tima", 4ull << TM_SHIFT);
+>> =20
+>> -    /* Define all XIVE MMIO regions on SysBus */
+>> -    sysbus_init_mmio(SYS_BUS_DEVICE(xive), &xsrc->esb_mmio);
+>> -    sysbus_init_mmio(SYS_BUS_DEVICE(xive), &end_xsrc->esb_mmio);
+>> -    sysbus_init_mmio(SYS_BUS_DEVICE(xive), &xive->tm_mmio);
+>> -
+>>      /* Map all regions */
+>>      spapr_xive_map_mmio(xive);
+>>  }
+>> diff --git a/hw/intc/spapr_xive_kvm.c b/hw/intc/spapr_xive_kvm.c
+>> index ec170b304555..b48f135838f2 100644
+>> --- a/hw/intc/spapr_xive_kvm.c
+>> +++ b/hw/intc/spapr_xive_kvm.c
+>> @@ -693,7 +693,6 @@ static void *kvmppc_xive_mmap(SpaprXive *xive, int=
+ pgoff, size_t len,
+>>  void kvmppc_xive_connect(SpaprXive *xive, Error **errp)
+>>  {
+>>      XiveSource *xsrc =3D &xive->source;
+>> -    XiveENDSource *end_xsrc =3D &xive->end_source;
+>>      Error *local_err =3D NULL;
+>>      size_t esb_len =3D (1ull << xsrc->esb_shift) * xsrc->nr_irqs;
+>>      size_t tima_len =3D 4ull << TM_SHIFT;
+>> @@ -731,12 +730,10 @@ void kvmppc_xive_connect(SpaprXive *xive, Error =
+**errp)
+>> =20
+>>      memory_region_init_ram_device_ptr(&xsrc->esb_mmio, OBJECT(xsrc),
+>>                                        "xive.esb", esb_len, xsrc->esb_=
+mmap);
+>> -    sysbus_init_mmio(SYS_BUS_DEVICE(xive), &xsrc->esb_mmio);
+>> =20
+>>      /*
+>>       * 2. END ESB pages (No KVM support yet)
+>>       */
+>> -    sysbus_init_mmio(SYS_BUS_DEVICE(xive), &end_xsrc->esb_mmio);
+>> =20
+>=20
+> It looks a bit weird to end up with a comment but no related code...
+> maybe simply drop it and s/3/2 in the other comment below ?
 
-> Now we have two identical build_mcfg functions.
-> 
-> Consolidate them in acpi/pci.c.
-> 
-> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
+I rather keep it that way. It reminds people that there are three
+distinct memory regions and one is currently not supported (by KVM=20
+and the guest OS)
 
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+> Apart from that, LGTM:
+>=20
+> Reviewed-by: Greg Kurz <groug@kaod.org>
 
-> 
-> v4:
->   * ACPI_PCI depends on both ACPI and PCI
->   * rebase on latest master, adjust arm Kconfig
-> v3:
->   * adjust changelog based on Igor's suggestion
-> ---
->  default-configs/i386-softmmu.mak |  1 +
->  hw/acpi/Kconfig                  |  4 +++
->  hw/acpi/Makefile.objs            |  1 +
->  hw/acpi/pci.c                    | 46 ++++++++++++++++++++++++++++++++
->  hw/arm/Kconfig                   |  1 +
->  hw/arm/virt-acpi-build.c         | 17 ------------
->  hw/i386/acpi-build.c             | 18 +------------
->  include/hw/acpi/pci.h            |  1 +
->  8 files changed, 55 insertions(+), 34 deletions(-)
->  create mode 100644 hw/acpi/pci.c
-> 
-> diff --git a/default-configs/i386-softmmu.mak b/default-configs/i386-softmmu.mak
-> index ba3fb3ff50..cd5ea391e8 100644
-> --- a/default-configs/i386-softmmu.mak
-> +++ b/default-configs/i386-softmmu.mak
-> @@ -25,3 +25,4 @@
->  CONFIG_ISAPC=y
->  CONFIG_I440FX=y
->  CONFIG_Q35=y
-> +CONFIG_ACPI_PCI=y
-> diff --git a/hw/acpi/Kconfig b/hw/acpi/Kconfig
-> index eca3beed75..7c59cf900b 100644
-> --- a/hw/acpi/Kconfig
-> +++ b/hw/acpi/Kconfig
-> @@ -23,6 +23,10 @@ config ACPI_NVDIMM
->      bool
->      depends on ACPI
->  
-> +config ACPI_PCI
-> +    bool
-> +    depends on ACPI && PCI
-> +
->  config ACPI_VMGENID
->      bool
->      default y
-> diff --git a/hw/acpi/Makefile.objs b/hw/acpi/Makefile.objs
-> index 2d46e3789a..661a9b8c2f 100644
-> --- a/hw/acpi/Makefile.objs
-> +++ b/hw/acpi/Makefile.objs
-> @@ -11,6 +11,7 @@ common-obj-$(call lnot,$(CONFIG_ACPI_X86)) += acpi-stub.o
->  common-obj-y += acpi_interface.o
->  common-obj-y += bios-linker-loader.o
->  common-obj-y += aml-build.o
-> +common-obj-$(CONFIG_ACPI_PCI) += pci.o
->  common-obj-$(CONFIG_TPM) += tpm.o
->  
->  common-obj-$(CONFIG_IPMI) += ipmi.o
-> diff --git a/hw/acpi/pci.c b/hw/acpi/pci.c
-> new file mode 100644
-> index 0000000000..fa0fa30bb9
-> --- /dev/null
-> +++ b/hw/acpi/pci.c
-> @@ -0,0 +1,46 @@
-> +/*
-> + * Support for generating PCI related ACPI tables and passing them to Guests
-> + *
-> + * Copyright (C) 2006 Fabrice Bellard
-> + * Copyright (C) 2008-2010  Kevin O'Connor <kevin@koconnor.net>
-> + * Copyright (C) 2013-2019 Red Hat Inc
-> + * Copyright (C) 2019 Intel Corporation
-> + *
-> + * Author: Wei Yang <richardw.yang@linux.intel.com>
-> + * Author: Michael S. Tsirkin <mst@redhat.com>
-> + *
-> + * This program is free software; you can redistribute it and/or modify
-> + * it under the terms of the GNU General Public License as published by
-> + * the Free Software Foundation; either version 2 of the License, or
-> + * (at your option) any later version.
-> +
-> + * This program is distributed in the hope that it will be useful,
-> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-> + * GNU General Public License for more details.
-> +
-> + * You should have received a copy of the GNU General Public License along
-> + * with this program; if not, see <http://www.gnu.org/licenses/>.
-> + */
-> +
-> +#include "qemu/osdep.h"
-> +#include "hw/acpi/aml-build.h"
-> +#include "hw/acpi/pci.h"
-> +#include "hw/pci/pcie_host.h"
-> +
-> +void build_mcfg(GArray *table_data, BIOSLinker *linker, AcpiMcfgInfo *info)
-> +{
-> +    AcpiTableMcfg *mcfg;
-> +    int len = sizeof(*mcfg) + sizeof(mcfg->allocation[0]);
-> +
-> +    mcfg = acpi_data_push(table_data, len);
-> +    mcfg->allocation[0].address = cpu_to_le64(info->base);
-> +
-> +    /* Only a single allocation so no need to play with segments */
-> +    mcfg->allocation[0].pci_segment = cpu_to_le16(0);
-> +    mcfg->allocation[0].start_bus_number = 0;
-> +    mcfg->allocation[0].end_bus_number = PCIE_MMCFG_BUS(info->size - 1);
-> +
-> +    build_header(linker, table_data, (void *)mcfg, "MCFG", len, 1, NULL, NULL);
-> +}
-> +
-> diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
-> index af8cffde9c..9aced9d54d 100644
-> --- a/hw/arm/Kconfig
-> +++ b/hw/arm/Kconfig
-> @@ -19,6 +19,7 @@ config ARM_VIRT
->      select PLATFORM_BUS
->      select SMBIOS
->      select VIRTIO_MMIO
-> +    select ACPI_PCI
->  
->  config CHEETAH
->      bool
-> diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-> index e7c96d658e..4a64f9985c 100644
-> --- a/hw/arm/virt-acpi-build.c
-> +++ b/hw/arm/virt-acpi-build.c
-> @@ -546,23 +546,6 @@ build_srat(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
->                   "SRAT", table_data->len - srat_start, 3, NULL, NULL);
->  }
->  
-> -static void
-> -build_mcfg(GArray *table_data, BIOSLinker *linker, AcpiMcfgInfo *info)
-> -{
-> -    AcpiTableMcfg *mcfg;
-> -    int len = sizeof(*mcfg) + sizeof(mcfg->allocation[0]);
-> -
-> -    mcfg = acpi_data_push(table_data, len);
-> -    mcfg->allocation[0].address = cpu_to_le64(info->base);
-> -
-> -    /* Only a single allocation so no need to play with segments */
-> -    mcfg->allocation[0].pci_segment = cpu_to_le16(0);
-> -    mcfg->allocation[0].start_bus_number = 0;
-> -    mcfg->allocation[0].end_bus_number = PCIE_MMCFG_BUS(info->size - 1);
-> -
-> -    build_header(linker, table_data, (void *)mcfg, "MCFG", len, 1, NULL, NULL);
-> -}
-> -
->  /* GTDT */
->  static void
->  build_gtdt(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
-> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-> index 0d78d73894..85dc1640bc 100644
-> --- a/hw/i386/acpi-build.c
-> +++ b/hw/i386/acpi-build.c
-> @@ -2405,22 +2405,6 @@ build_srat(GArray *table_data, BIOSLinker *linker, MachineState *machine)
->                   table_data->len - srat_start, 1, NULL, NULL);
->  }
->  
-> -static void
-> -build_mcfg_q35(GArray *table_data, BIOSLinker *linker, AcpiMcfgInfo *info)
-> -{
-> -    AcpiTableMcfg *mcfg;
-> -    int len = sizeof(*mcfg) + 1 * sizeof(mcfg->allocation[0]);
-> -
-> -    mcfg = acpi_data_push(table_data, len);
-> -    mcfg->allocation[0].address = cpu_to_le64(info->base);
-> -    /* Only a single allocation so no need to play with segments */
-> -    mcfg->allocation[0].pci_segment = cpu_to_le16(0);
-> -    mcfg->allocation[0].start_bus_number = 0;
-> -    mcfg->allocation[0].end_bus_number = PCIE_MMCFG_BUS(info->size - 1);
-> -
-> -    build_header(linker, table_data, (void *)mcfg, "MCFG", len, 1, NULL, NULL);
-> -}
-> -
->  /*
->   * VT-d spec 8.1 DMA Remapping Reporting Structure
->   * (version Oct. 2014 or later)
-> @@ -2690,7 +2674,7 @@ void acpi_build(AcpiBuildTables *tables, MachineState *machine)
->      }
->      if (acpi_get_mcfg(&mcfg)) {
->          acpi_add_table(table_offsets, tables_blob);
-> -        build_mcfg_q35(tables_blob, tables->linker, &mcfg);
-> +        build_mcfg(tables_blob, tables->linker, &mcfg);
->      }
->      if (x86_iommu_get_default()) {
->          IommuType IOMMUType = x86_iommu_get_type();
-> diff --git a/include/hw/acpi/pci.h b/include/hw/acpi/pci.h
-> index 124af7d32a..8bbd32cf45 100644
-> --- a/include/hw/acpi/pci.h
-> +++ b/include/hw/acpi/pci.h
-> @@ -30,4 +30,5 @@ typedef struct AcpiMcfgInfo {
->      uint32_t size;
->  } AcpiMcfgInfo;
->  
-> +void build_mcfg(GArray *table_data, BIOSLinker *linker, AcpiMcfgInfo *info);
->  #endif
+Thanks,
+
+C.=20
+
+
+>=20
+>>      /*
+>>       * 3. TIMA pages - KVM mapping
+>> @@ -749,7 +746,6 @@ void kvmppc_xive_connect(SpaprXive *xive, Error **=
+errp)
+>>      }
+>>      memory_region_init_ram_device_ptr(&xive->tm_mmio, OBJECT(xive),
+>>                                        "xive.tima", tima_len, xive->tm=
+_mmap);
+>> -    sysbus_init_mmio(SYS_BUS_DEVICE(xive), &xive->tm_mmio);
+>> =20
+>>      xive->change =3D qemu_add_vm_change_state_handler(
+>>          kvmppc_xive_change_state_handler, xive);
+>=20
 
 
