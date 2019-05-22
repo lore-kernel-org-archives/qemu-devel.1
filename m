@@ -2,74 +2,92 @@ Return-Path: <SRS0=8zLO=TW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 25314C282DD
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 19:07:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C5D20C282CE
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 19:10:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F0E5520868
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 19:07:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F0E5520868
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 8E96420868
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 19:10:59 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="OBFpmPi9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8E96420868
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:49808 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:49834 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hTWae-00035H-5a
-	for qemu-devel@archiver.kernel.org; Wed, 22 May 2019 15:07:52 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:35240)
+	id 1hTWde-0005MB-NB
+	for qemu-devel@archiver.kernel.org; Wed, 22 May 2019 15:10:58 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:35158)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hTWOl-0008P8-VL
-	for qemu-devel@nongnu.org; Wed, 22 May 2019 14:55:37 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hTWOr-0008Lh-Ag
+	for qemu-devel@nongnu.org; Wed, 22 May 2019 14:55:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hTWOk-0006jn-I2
-	for qemu-devel@nongnu.org; Wed, 22 May 2019 14:55:35 -0400
-Received: from indium.canonical.com ([91.189.90.7]:40230)
+	(envelope-from <richard.henderson@linaro.org>) id 1hTWCA-00082m-GE
+	for qemu-devel@nongnu.org; Wed, 22 May 2019 14:42:35 -0400
+Received: from mail-yb1-xb41.google.com ([2607:f8b0:4864:20::b41]:44893)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hTWOk-0006ic-B4
-	for qemu-devel@nongnu.org; Wed, 22 May 2019 14:55:34 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hTWOi-0004zs-Sn
-	for <qemu-devel@nongnu.org>; Wed, 22 May 2019 18:55:32 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id D23A32E80C0
-	for <qemu-devel@nongnu.org>; Wed, 22 May 2019 18:55:32 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 22 May 2019 18:49:49 -0000
-From: Alex Williamson <alex.l.williamson@gmail.com>
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1hTWCA-00082T-9q
+	for qemu-devel@nongnu.org; Wed, 22 May 2019 14:42:34 -0400
+Received: by mail-yb1-xb41.google.com with SMTP id x187so1239402ybc.11
+	for <qemu-devel@nongnu.org>; Wed, 22 May 2019 11:42:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=from:to:cc:subject:date:message-id:in-reply-to:references
+	:mime-version:content-transfer-encoding;
+	bh=p/AR+QB1/uCfqQ+ytrGBnYCYqwPtnBM3b7CBgieQEw0=;
+	b=OBFpmPi9AWbdbtlYgTZidrE4QnXMu+xB9Qsjq6MUEiJotntcRpE6196p4t87OpGn+w
+	tivMWHcZP1f/68eWfkTp0LXDzPcZJUyc09KvuhoG9+nyYzBW56wpJTlM6FJO9T2+0r4p
+	FD+8m5+R4gaVVJ30i0UBAu1RGbdbEUErxX3b6QEPzX72VuARHtLrucetpKP3LpnXXOfj
+	lZMnOJtEv17bB5VqpFK40bp9zNs7XONIKYOQKXB6NsMZM+6MJGC7Y+j8SC4vk6Yogrws
+	zyRgs6+gEBExms0b+JgU5qHT1hV5Fx5HhS3j0Af+MhWUH8Xtp3tPv6Kx2CkdjK1tsQ/s
+	RDKQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+	:references:mime-version:content-transfer-encoding;
+	bh=p/AR+QB1/uCfqQ+ytrGBnYCYqwPtnBM3b7CBgieQEw0=;
+	b=MnajBEt6gqhu4Fzxl5kO5YSoiNOzN4S4rmEZMqDOXkLwLs52CKFH8+SA8FQ1Un97y+
+	LsO9XpSzN2fCrLmPvKKcjM/YvEVqnn16nGSpYdwVXoTZiLspfNmz7fH8EcLgsVcsEwOD
+	SIuzwa0cuZbSTw3qfxPGZ8Kixk4H3FNgR1PoKRUNm+IZjNkoQhDmrM/WtMzkxISDfvDo
+	BqKFaDN2UnikFPE+RDqQ+8LjkXHVrNGf6MxdgwJI5SrL8l4U7c7plBCKWm0zspShYEOQ
+	2higDRMHC/Za5NHRmd2/8Bz31yaD1hVoDjOIcLW19iTTWDyuxGVtdR1O77hWMNcrUwyX
+	Kwvg==
+X-Gm-Message-State: APjAAAVuYIqPWBjG59/+EWfRxaAfwlrSaZ8Qc0oKE/wjSM4oykWvW01+
+	Y4OzJMYQXSlfFy8Kg6KofCb+mLi+FSk=
+X-Google-Smtp-Source: APXvYqxHn/Nv6iZ1tAHwIaEOxekjuUslKbVcIy+HZvDliwPpijCsPY0RNTYLWmEMMTW6Gu+u34ixDQ==
+X-Received: by 2002:a25:abf3:: with SMTP id
+	v106mr10653436ybi.123.1558550553422; 
+	Wed, 22 May 2019 11:42:33 -0700 (PDT)
+Received: from localhost.localdomain ([71.46.56.17])
+	by smtp.gmail.com with ESMTPSA id
+	206sm1299445ywq.74.2019.05.22.11.42.32
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Wed, 22 May 2019 11:42:32 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=In Progress; importance=Undecided;
-	assignee=alex.l.williamson@gmail.com; 
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: alex-l-williamson saveriomiroddi
-X-Launchpad-Bug-Reporter: Saverio Miroddi (saveriomiroddi)
-X-Launchpad-Bug-Modifier: Alex Williamson (alex-l-williamson)
-References: <155620554968.6380.13610580395862407350.malonedeb@chaenomeles.canonical.com>
-Message-Id: <155855098990.21894.5982983625055574571.malone@chaenomeles.canonical.com>
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="18962";
-	Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: 5ef78ed9afd8a84c5ee02f323d360f1017b9a17d
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1826422] Re: Regression: QEMU 4.0 hangs the host
- (*bisect included*)
+Date: Wed, 22 May 2019 14:42:06 -0400
+Message-Id: <20190522184226.17871-6-richard.henderson@linaro.org>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20190522184226.17871-1-richard.henderson@linaro.org>
+References: <20190522184226.17871-1-richard.henderson@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::b41
+Subject: [Qemu-devel] [PULL 05/25] crypto: Use O_CLOEXEC in
+ qcrypto_random_init
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -78,92 +96,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1826422 <1826422@bugs.launchpad.net>
+Cc: peter.maydell@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Just to provide an update, patches are posted to revert this change in
-both the q35 4.1 machine type for the next release as well as introduce
-a q35 4.0.1 machine type making the same change for 4.0-stable.
-References:
+Avoids leaking the /dev/urandom fd into any child processes.
 
-https://patchwork.ozlabs.org/patch/1099695/
-https://patchwork.ozlabs.org/patch/1099659/
+Reviewed-by: Laurent Vivier <lvivier@redhat.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ crypto/random-platform.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-** Changed in: qemu
-       Status: New =3D> In Progress
+diff --git a/crypto/random-platform.c b/crypto/random-platform.c
+index 260b64564d..6df40744c7 100644
+--- a/crypto/random-platform.c
++++ b/crypto/random-platform.c
+@@ -42,9 +42,9 @@ int qcrypto_random_init(Error **errp)
+ #else
+     /* TBD perhaps also add support for BSD getentropy / Linux
+      * getrandom syscalls directly */
+-    fd = open("/dev/urandom", O_RDONLY);
++    fd = open("/dev/urandom", O_RDONLY | O_CLOEXEC);
+     if (fd == -1 && errno == ENOENT) {
+-        fd = open("/dev/random", O_RDONLY);
++        fd = open("/dev/random", O_RDONLY | O_CLOEXEC);
+     }
+ 
+     if (fd < 0) {
+-- 
+2.17.1
 
-** Changed in: qemu
-     Assignee: (unassigned) =3D> Alex Williamson (alex-l-williamson)
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1826422
-
-Title:
-  Regression: QEMU 4.0 hangs the host (*bisect included*)
-
-Status in QEMU:
-  In Progress
-
-Bug description:
-  The commit b2fc91db84470a78f8e93f5b5f913c17188792c8 seemingly
-  introduced a regression on my system.
-
-  When I start QEMU, the guest and the host hang (I need a hard reset to
-  get back to a working system), before anything shows on the guest.
-
-  I use QEMU with GPU passthrough (which worked perfectly until the
-  commit above). This is the command I use:
-
-  ```
-  /path/to/qemu-system-x86_64
-    -drive if=3Dpflash,format=3Draw,readonly,file=3D/path/to/OVMF_CODE.fd
-    -drive if=3Dpflash,format=3Draw,file=3D/tmp/OVMF_VARS.fd.tmp
-    -enable-kvm
-    -machine q35,accel=3Dkvm,mem-merge=3Doff
-    -cpu host,kvm=3Doff,hv_vendor_id=3Dvgaptrocks,hv_relaxed,hv_spinlocks=
-=3D0x1fff,hv_vapic,hv_time
-    -smp 4,cores=3D4,sockets=3D1,threads=3D1
-    -m 10240
-    -vga none
-    -rtc base=3Dlocaltime
-    -serial none
-    -parallel none
-    -usb
-    -device usb-tablet
-    -device vfio-pci,host=3D01:00.0,multifunction=3Don
-    -device vfio-pci,host=3D01:00.1
-    -device usb-host,vendorid=3D<vid>,productid=3D<pid>
-    -device usb-host,vendorid=3D<vid>,productid=3D<pid>
-    -device usb-host,vendorid=3D<vid>,productid=3D<pid>
-    -device usb-host,vendorid=3D<vid>,productid=3D<pid>
-    -device usb-host,vendorid=3D<vid>,productid=3D<pid>
-    -device usb-host,vendorid=3D<vid>,productid=3D<pid>
-    -device virtio-scsi-pci,id=3Dscsi
-    -drive file=3D/path/to/guest.img,id=3Dhdd1,format=3Dqcow2,if=3Dnone,cac=
-he=3Dwriteback
-    -device scsi-hd,drive=3Dhdd1
-    -net nic,model=3Dvirtio
-    -net user,smb=3D/path/to/shared
-  ```
-
-  If I run QEMU without GPU passthrough, it runs fine.
-
-  Some details about my system:
-
-  - O/S: Mint 19.1 x86-64 (it's based on Ubuntu 18.04)
-  - Kernel: 4.15
-  - `configure` options: `--target-list=3Dx86_64-softmmu --enable-gtk --ena=
-ble-spice --audio-drv-list=3Dpa`
-  - EDK2 version: 1a734ed85fda71630c795832e6d24ea560caf739 (20/Apr/2019)
-  - CPU: i7-6700k
-  - Motherboard: ASRock Z170 Gaming-ITX/ac
-  - VGA: Gigabyte GTX 960 Mini-ITX
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1826422/+subscriptions
 
