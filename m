@@ -2,65 +2,74 @@ Return-Path: <SRS0=8zLO=TW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,T_HK_NAME_DR,
-	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CD320C282CE
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 13:56:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 58F40C282CE
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 13:58:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A98BA21479
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 13:56:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A98BA21479
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id E056721473
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 13:58:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E056721473
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:43837 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:43875 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hTRix-0005WE-V8
-	for qemu-devel@archiver.kernel.org; Wed, 22 May 2019 09:56:08 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:45071)
+	id 1hTRlM-0006pB-Sy
+	for qemu-devel@archiver.kernel.org; Wed, 22 May 2019 09:58:36 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:46334)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1hTRfa-0002uZ-PB
-	for qemu-devel@nongnu.org; Wed, 22 May 2019 09:52:39 -0400
+	(envelope-from <laurent@vivier.eu>) id 1hTRkN-0006Kf-TU
+	for qemu-devel@nongnu.org; Wed, 22 May 2019 09:57:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1hTRfZ-0005ks-JJ
-	for qemu-devel@nongnu.org; Wed, 22 May 2019 09:52:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:15530)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hTRfZ-0005Wa-Bw
-	for qemu-devel@nongnu.org; Wed, 22 May 2019 09:52:37 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E6F37C05CDFC;
-	Wed, 22 May 2019 13:52:09 +0000 (UTC)
-Received: from work-vm (unknown [10.36.118.8])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 5179E17519;
-	Wed, 22 May 2019 13:52:06 +0000 (UTC)
-Date: Wed, 22 May 2019 14:52:03 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <20190522135203.GE2666@work-vm>
-References: <CAFEAcA-vSebWjhbFTdfOSGHJtr8-a+DKG22JU3tS-1OoGR=VXQ@mail.gmail.com>
-	<20190522125348.GH27900@stefanha-x1.localdomain>
-	<95f2e1c8-5307-9aa0-601a-e4ee53c199fb@redhat.com>
+	(envelope-from <laurent@vivier.eu>) id 1hTRkM-0008Lc-O2
+	for qemu-devel@nongnu.org; Wed, 22 May 2019 09:57:35 -0400
+Received: from mout.kundenserver.de ([217.72.192.75]:42059)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>)
+	id 1hTRkM-0008L2-ET; Wed, 22 May 2019 09:57:34 -0400
+Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
+	(mreue106 [213.165.67.119]) with ESMTPSA (Nemesis) id
+	1MrPVJ-1gpAxe1rKJ-00oXuT; Wed, 22 May 2019 15:57:09 +0200
+To: Peter Maydell <peter.maydell@linaro.org>, Eric Blake <eblake@redhat.com>
+References: <20190503082728.16485-1-ao2@ao2.it>
+	<20190503082728.16485-3-ao2@ao2.it>
+	<541bfc5c-0e45-58e6-f0b1-81e9b0c8881d@redhat.com>
+	<CAFEAcA8An-KWOc3gOz2=45eCHCmUJEJw_bTrrCW6bYO23H8TPw@mail.gmail.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <a5f95284-2883-e6c0-54ad-d0ff018f68d7@vivier.eu>
+Date: Wed, 22 May 2019 15:57:06 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+	Thunderbird/52.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <95f2e1c8-5307-9aa0-601a-e4ee53c199fb@redhat.com>
-User-Agent: Mutt/1.11.4 (2019-03-13)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.31]);
-	Wed, 22 May 2019 13:52:10 +0000 (UTC)
+In-Reply-To: <CAFEAcA8An-KWOc3gOz2=45eCHCmUJEJw_bTrrCW6bYO23H8TPw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Provags-ID: V03:K1:7mnKqv+mccePQYCbVgI0nG/6TExsTjtBiFk/mNSC+UJjIA8xttw
+	tf4kdcxX+QIHk4tyDt4AkbwwBywjoJbC/uBcccj/yR0iRN3vlEy9FMuyAD0P1WZZa6IdzK+
+	u6VrvBuz66ArioGGoUj5HqTtAECHhhKLsowecB4LhChW+fReoihV/lsZvT7ujUWKMDoVLrl
+	pJzaHE1rvlIHxZiwayGEw==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:4IV3NIeEpoU=:qBD0hJzLMjnlrG0weM8J5P
+	pEkZoDcF6iqLlNh24j16i1zGdOxYhQb4dUuFIad2L8K3lg27ufjkylo05hFHyYErI/lWVZ+RV
+	6hCTFPDkdVwRLuQ9tN9oC5ljLzjnxemVjkA5hBaAXYjKV6v9DHr3lzFaAixtGrXObjvISENF3
+	nXdfEiHDsev3SwWJttRsrk88N3Ix/9UlBLaetjg99icCwONiVfCWbLKB94cjbsBYC0ObbqB+8
+	u96W93Sm42I7JzPNh3S324ujjZ6Q+sSRJNos/11Plou4YMZPl55MJGbIprgGXe3Mg/b5K23FV
+	y9wb13ot6le9cPjNJksIpr2MRoce+d+9cPMYUeVpsLhOtsCLBBkSXFul3pzhEsuZyEqNjxv1g
+	2IqMwu2B5PEgIfjjqqTLDDqOW3jpLgMist9L/Pu06QrcPWvOtNUGnhjg00MeZP104SgPJZdFM
+	1FpqR/XDkZLrowWrxknpYnhyrNJOOLmx1J4igugAfKrQVFwYXRpaUf4q7cYp4os4mtCwTKrxf
+	Rn+N6nnDLJpeeY+iGsqES2oyyGobTQB395HZORzEQpHbsToOa6RhB6vRHq3j1JVM5JuCbgF8V
+	traokJ1OUDIOLMRvZXMLeXVXO662bDBo9Xtz+SrSD7mC3ZG2zdos0KwYMVEaQ62Ja2Xfwn/ya
+	i+Y20z52G+uSCyMcGTHoXn85nlnTNhbE9CB7o816N94Lepb9Pd61is89hVhIabJx7Pm6hU1/5
+	WohX4UOih+dcmBa1fhQ1DCplFzfpB1EcsDNx61dU8VUVi7b5JmevXTfGxNY=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] is anybody experimenting with the idea of rust
- code in QEMU?
+X-Received-From: 217.72.192.75
+Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH v2 2/2] configure: disallow
+ spaces and colons in source path and build path
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -72,62 +81,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Stefan Hajnoczi <stefanha@gmail.com>,
-	QEMU Developers <qemu-devel@nongnu.org>, Sergio Lopez <slp@redhat.com>,
-	Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Trivial <qemu-trivial@nongnu.org>, Antonio Ospite <ao2@ao2.it>,
+	Antonio Ospite <antonio.ospite@collabora.com>,
+	QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Paolo Bonzini (pbonzini@redhat.com) wrote:
-> On 22/05/19 14:53, Stefan Hajnoczi wrote:
-> > On Tue, May 21, 2019 at 03:39:40PM +0100, Peter Maydell wrote:
-> >> Hi; I have on my todo list the idea of some experimentation/prototyping
-> >> of whether being able to write some components of QEMU in Rust would
-> >> be (a) feasible (b) beneficial (c) fun to play around with even if
-> >> it is likely that it doesn't go anywhere :-)
-> >>
-> >> I know Paolo has had a look at how you might write some makefiles
-> >> to integrate rust into a C program (https://github.com/bonzini/rust-and-c/).
-> >> Has anybody else been doing anything in this general area ?
-> >>
-> >> (I went to two good talks locally recently about rust-vmm and Amazon's
-> >> 'firecracker' VMM by Andreea Florescu and Diana Popa -- I
-> >> definitely plan to look at rust-vmm as part of this.)
-> > 
-> > There are some in-development vhost-user device backends in Rust.
-> > Sergio Lopez is working on a vhost-user-blk implementation.  David
-> > Gilbert is working on a vhost-user-fs implementation.
-> > 
-> > I think mixing Rust and C code in the main QEMU binary itself is
-> > probably more trouble than it's worth.  Think boilerplate, duplication,
-> > coming up with safe Rust APIs for QEMU's unsafe APIs.
+On 09/05/2019 16:42, Peter Maydell wrote:
+> On Mon, 6 May 2019 at 18:27, Eric Blake <eblake@redhat.com> wrote:
+>>
+>> On 5/3/19 3:27 AM, Antonio Ospite wrote:
+>>> From: Antonio Ospite <antonio.ospite@collabora.com>
+>>>
+>>> The configure script breaks when the qemu source directory is in a path
+>>> containing white spaces, in particular the list of targets is not
+>>> correctly generated when calling "./configure --help" because of how the
+>>> default_target_list variable is built.
+>>>
+>>> In addition to that, *building* qemu from a directory with spaces breaks
+>>> some assumptions in the Makefiles, even if the original source path does
+>>> not contain spaces like in the case of an out-of-tree build, or when
+>>> symlinks are involved.
+>>>
+>>> To avoid these issues, refuse to run the configure script and the
+>>> Makefile if there are spaces or colons in the source path or the build
+>>> path, taking as inspiration what the kbuild system in linux does.
+>>>
+>>> Buglink: https://bugs.launchpad.net/qemu/+bug/1817345
+>>>
+>>> Signed-off-by: Antonio Ospite <antonio.ospite@collabora.com>
+>>> ---
+>>>   Makefile  | 4 ++++
+>>>   configure | 6 ++++++
+>>>   2 files changed, 10 insertions(+)
+>>>
+>>
+>>> +++ b/Makefile
+>>> @@ -1,5 +1,9 @@
+>>>   # Makefile for QEMU.
+>>>
+>>> +ifneq ($(words $(subst :, ,$(CURDIR))), 1)
+>>> +  $(error main directory cannot contain spaces nor colons)
+>>> +endif
+>>> +
+>>>   # Always point to the root of the build tree (needs GNU make).
+>>>   BUILD_DIR=$(CURDIR)
+>>>
+>>> diff --git a/configure b/configure
+>>> index 9832cbca5c..f7ad4381bd 100755
+>>> --- a/configure
+>>> +++ b/configure
+>>> @@ -279,6 +279,12 @@ ld_has() {
+>>>   # make source path absolute
+>>>   source_path=$(cd "$(dirname -- "$0")"; pwd)
+>>>
+>>> +if printf "%s\n" "$source_path" | grep -q "[[:space:]:]" ||
+>>> +  printf "%s\n" "$PWD" | grep -q "[[:space:]:]";
+>>
+>> For less typing and fewer processes, you could shorten this to:
+>>
+>> if printf %s\\n "$source_path" "$PWD" | grep -q "[[:space:]:]";
+>>
+>> but that's trivial enough for a maintainer to fold in if desired.
+>>
+>> Reviewed-by: Eric Blake <eblake@redhat.com>
 > 
-> This is true.  The case I was playing with is where the QEMU APIs have a
-> more or less direct mapping to rust-vmm APIs and only have a limited
-> number of dependencies on other C APIs.  This way, you can either write
-> a Rust binding to the C code, or rewrite the C code in Rust with tiny C
-> wrapper APIs on top.
-> 
-> For example, the memory API (more or less) depends only on RCU and maps
-> to rust-vmm/vm-memory, and virtqueue processing in rust-vmm/vm-virtio
-> depends only on the memory API.
+> What tree is this going to go in via? I suggest the
+> -trivial tree.
 
-The other place might be places where we're autogenerating the C
-interfaces anyway - e.g. we could autogenerate rust bindings for qapi.
 
-Dave
+Applied (unchanged) to my trivial-patches branch.
 
-> Thanks,
-> 
-> Paolo
-> 
-> > I'm more interested in using Rust for separate processes that can be
-> > written from scratch.
-> > 
-> > Stefan
-> > 
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Thanks,
+Laurent
+
 
