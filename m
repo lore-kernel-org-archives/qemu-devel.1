@@ -2,83 +2,65 @@ Return-Path: <SRS0=8zLO=TW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5889AC282CE
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 22:50:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EBE3AC282CE
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 23:08:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DE08E20881
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 22:50:21 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VHcvMrqd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DE08E20881
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 9620E206BA
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 23:08:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9620E206BA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:53102 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:53719 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hTa3x-0000Oq-Cc
-	for qemu-devel@archiver.kernel.org; Wed, 22 May 2019 18:50:21 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:57480)
+	id 1hTaL5-0005ov-Dw
+	for qemu-devel@archiver.kernel.org; Wed, 22 May 2019 19:08:03 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:34994)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1hTa2q-0008Ka-3e
-	for qemu-devel@nongnu.org; Wed, 22 May 2019 18:49:13 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1hTaKJ-0005YK-1K
+	for qemu-devel@nongnu.org; Wed, 22 May 2019 19:07:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1hTa2n-0003HE-MR
-	for qemu-devel@nongnu.org; Wed, 22 May 2019 18:49:12 -0400
-Received: from mail-lf1-x143.google.com ([2a00:1450:4864:20::143]:34402)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
-	id 1hTa2n-0003FS-9y; Wed, 22 May 2019 18:49:09 -0400
-Received: by mail-lf1-x143.google.com with SMTP id v18so2929146lfi.1;
-	Wed, 22 May 2019 15:49:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-	:cc:content-transfer-encoding;
-	bh=RIMc85N6rhaq18c4x7fNSLfa1/l9Qg722/3bwnkkgDI=;
-	b=VHcvMrqd9SX8GY8FreTQZLK5FgQd5ZeFMJZJ5lDTn4mrruvj2+mKGHGZX3xW39RtHZ
-	5KjTsg7JUa1hJxlqo74JvdcJmkd/67B/wREu96J8V7noRH0M7lgf3rVQGRuz8UihTw35
-	uyi8a2229cylhuj+jvFOERPafgGzDqFpUFyAqbVba1sMPgzUpaDXLqe4FZxph79NUdS+
-	iv3NtRJ9PpdbNcPntGKi92NYBwRtZlY7XrU4VHbAsCj1H7IlIZtj2lt3hPzCExbUVeYf
-	n3vjd5mLZGOaR3I/cv8Ifr//CTMDJzzZIoeNuxCii9SzBhAXPCacxlkCMdFs+QZh40PT
-	PjBg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-	:message-id:subject:to:cc:content-transfer-encoding;
-	bh=RIMc85N6rhaq18c4x7fNSLfa1/l9Qg722/3bwnkkgDI=;
-	b=ICJVmH/OFM6NoVtUocwBQ7Gau2SN6IByqLjMcvTag3vahyHTNEPBWaaTggK409CXzF
-	Vewe68MNZ0RBm5MjLLFU2AgBjjWGJy6kw21Acr4FO+GO/tpvMlvzf/G6+91yWuToK1Sv
-	3OdIj+9GXS/BlDoafmitsxcB/A2cgA7hBsqEGaJxxZ/qeF85y5B6XLgsXY7F8qP/w2pN
-	JfKMex+zqYBrHesb24/R7YbLkTWYzpvU4GSo32M60IiGUWSuVuSMnQcqhS3XdMT2z79N
-	X9uar88jYBYCKSw+3LbQkHBLhq3ggMTVs7AKRtqlYxeXbS6T/FxIBFTjMKaNWyqF+LbF
-	4d3w==
-X-Gm-Message-State: APjAAAV9cgHIXuD3yUICks5UvBK1+iy0VMj6g6PpowZMht098hC1AfEj
-	rdZolHhhUpiwG+DZJNTffuY0L559ZzA08ruJcFI=
-X-Google-Smtp-Source: APXvYqz5FYtMxm7Cwm3dcAIihsvJ+xmxIVr1+36fX+0qFAVifIV7yFxBREgSxLMo5vvGUXj9Hyy2LBnUhEeB79Bhp0Y=
-X-Received: by 2002:a19:4cd5:: with SMTP id z204mr76150lfa.113.1558565345275; 
-	Wed, 22 May 2019 15:49:05 -0700 (PDT)
+	(envelope-from <ehabkost@redhat.com>) id 1hTaKH-0005Hc-Un
+	for qemu-devel@nongnu.org; Wed, 22 May 2019 19:07:15 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35582)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hTaKH-0005HF-Mp
+	for qemu-devel@nongnu.org; Wed, 22 May 2019 19:07:13 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 70F4C8666E;
+	Wed, 22 May 2019 23:07:12 +0000 (UTC)
+Received: from localhost (ovpn-116-14.gru2.redhat.com [10.97.116.14])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 8AA1D17CC0;
+	Wed, 22 May 2019 23:07:07 +0000 (UTC)
+Date: Wed, 22 May 2019 20:07:05 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+To: Cleber Rosa <crosa@redhat.com>
+Message-ID: <20190522230705.GB10764@habkost.net>
+References: <20190520231910.12184-1-f4bug@amsat.org>
+	<20190522211230.GA10764@habkost.net>
+	<1711852617.24204010.1558561566547.JavaMail.zimbra@redhat.com>
 MIME-Version: 1.0
-References: <20190520214342.13709-1-philmd@redhat.com>
-	<20190520214342.13709-5-philmd@redhat.com>
-In-Reply-To: <20190520214342.13709-5-philmd@redhat.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Wed, 22 May 2019 15:46:47 -0700
-Message-ID: <CAKmqyKPdmwF0+T4t6LyUMgoujoRvrXZFLhxsqwGZdW9vDqWVTA@mail.gmail.com>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <1711852617.24204010.1558561566547.JavaMail.zimbra@redhat.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.26]);
+	Wed, 22 May 2019 23:07:12 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2a00:1450:4864:20::143
-Subject: Re: [Qemu-devel] [PATCH 4/4] hw/arm/exynos4210: QOM'ify the
- Exynos4210 SoC
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH 0/4] mips: Add more Avocado tests
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -90,147 +72,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
-	Igor Mitsyanko <i.mitsyanko@gmail.com>,
-	Alistair Francis <alistair@alistair23.me>,
-	"qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
-	qemu-arm <qemu-arm@nongnu.org>, Guenter Roeck <linux@roeck-us.net>
+Cc: Aleksandar Rikalo <arikalo@wavecomp.com>,
+	Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>,
+	Wainer dos Santos Moschetta <wainersm@redhat.com>, qemu-devel@nongnu.org,
+	Aleksandar Markovic <aleksandar.m.mail@gmail.com>,
+	Aleksandar Markovic <amarkovic@wavecomp.com>,
+	Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, May 20, 2019 at 2:47 PM Philippe Mathieu-Daud=C3=A9
-<philmd@redhat.com> wrote:
->
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+On Wed, May 22, 2019 at 05:46:06PM -0400, Cleber Rosa wrote:
+>=20
+>=20
+> ----- Original Message -----
+> > From: "Eduardo Habkost" <ehabkost@redhat.com>
+> > To: "Philippe Mathieu-Daud=E9" <f4bug@amsat.org>
+> > Cc: qemu-devel@nongnu.org, "Aleksandar Rikalo" <arikalo@wavecomp.com>=
+, "Aleksandar Markovic"
+> > <aleksandar.m.mail@gmail.com>, "Aleksandar Markovic" <amarkovic@wavec=
+omp.com>, "Cleber Rosa" <crosa@redhat.com>,
+> > "Aurelien Jarno" <aurelien@aurel32.net>, "Wainer dos Santos Moschetta=
+" <wainersm@redhat.com>
+> > Sent: Wednesday, May 22, 2019 5:12:30 PM
+> > Subject: Re: [Qemu-devel] [PATCH 0/4] mips: Add more Avocado tests
+> >=20
+> > On Tue, May 21, 2019 at 01:19:06AM +0200, Philippe Mathieu-Daud=E9 wr=
+ote:
+> > > Hi,
+> > >=20
+> > > It was a rainy week-end here, so I invested it to automatize some
+> > > of my MIPS tests.
+> > >=20
+> > > The BootLinuxSshTest is not Global warming friendly, it is not
+> > > meant to run on a CI system but rather on a workstation previous
+> > > to post a pull request.
+> > > It can surely be improved, but it is a good starting point.
+> >=20
+> > Until we actually have a mechanism to exclude the test case on
+> > travis-ci, I will remove patch 4/4 from the queue.  Aleksandar,
+> > please don't merge patch 4/4 yet or it will break travis-ci.
+> >=20
+> > Cleber, Wainer, is it already possible to make "avocado run" skip
+> > tests tagged with "slow"?
+> >=20
+>=20
+> The mechanism exists, but we haven't tagged any test so far as slow.
+>=20
+> Should we define/document a criteria for a test to be slow?  Given
+> that this is highly subjective, we have to think of:
+>=20
+>  * Will we consider the average or maximum run time (the timeout
+>    definition)?
+> =20
+>  * For a single test, what is "slow"? Some rough numbers from Travis
+>    CI[1] to help us with guidelines:
+>    - boot_linux_console.py:BootLinuxConsole.test_x86_64_pc:  PASS (6.04=
+ s)
+>    - boot_linux_console.py:BootLinuxConsole.test_arm_virt:  PASS (2.91 =
+s)
+>    - linux_initrd.py:LinuxInitrd.test_with_2gib_file_should_work_with_l=
+inux_v4_16:  PASS (18.14 s)
+>    - boot_linux.py:BootLinuxAarch64.test_virt:  PASS (396.88 s)
 
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+I don't think we need to overthink this.  Whatever objective
+criteria we choose, I'm sure we'll have to adapt them later due
+to real world problems.
 
-Alistair
+e.g.: is 396 seconds too slow?  I don't know, it depends: does it
+break Travis and other CI systems often because of timeouts?  If
+yes, then we should probably tag it as slow.
 
-> ---
->  hw/arm/exynos4210.c         | 26 +++++++++++++++++++++++---
->  hw/arm/exynos4_boards.c     |  9 ++++++---
->  include/hw/arm/exynos4210.h |  9 +++++++--
->  3 files changed, 36 insertions(+), 8 deletions(-)
->
-> diff --git a/hw/arm/exynos4210.c b/hw/arm/exynos4210.c
-> index 19009b76e7c..0b09129eff8 100644
-> --- a/hw/arm/exynos4210.c
-> +++ b/hw/arm/exynos4210.c
-> @@ -178,9 +178,10 @@ static void pl330_create(uint32_t base, qemu_irq irq=
-, int nreq)
->      sysbus_connect_irq(busdev, 0, irq);
->  }
->
-> -Exynos4210State *exynos4210_init(MemoryRegion *system_mem)
-> +static void exynos4210_realize(DeviceState *socdev, Error **errp)
->  {
-> -    Exynos4210State *s =3D g_new0(Exynos4210State, 1);
-> +    Exynos4210State *s =3D EXYNOS4210_SOC(socdev);
-> +    MemoryRegion *system_mem =3D get_system_memory();
->      qemu_irq gate_irq[EXYNOS4210_NCPUS][EXYNOS4210_IRQ_GATE_NINPUTS];
->      SysBusDevice *busdev;
->      DeviceState *dev;
-> @@ -435,6 +436,25 @@ Exynos4210State *exynos4210_init(MemoryRegion *syste=
-m_mem)
->                   qemu_irq_invert(s->irq_table[exynos4210_get_irq(36, 1)]=
-), 32);
->      pl330_create(EXYNOS4210_PL330_BASE2_ADDR,
->                   qemu_irq_invert(s->irq_table[exynos4210_get_irq(34, 1)]=
-), 1);
-> +}
-> +
-> +static void exynos4210_class_init(ObjectClass *klass, void *data)
-> +{
-> +    DeviceClass *dc =3D DEVICE_CLASS(klass);
->
-> -    return s;
-> +    dc->realize =3D exynos4210_realize;
->  }
-> +
-> +static const TypeInfo exynos4210_info =3D {
-> +    .name =3D TYPE_EXYNOS4210_SOC,
-> +    .parent =3D TYPE_SYS_BUS_DEVICE,
-> +    .instance_size =3D sizeof(Exynos4210State),
-> +    .class_init =3D exynos4210_class_init,
-> +};
-> +
-> +static void exynos4210_register_types(void)
-> +{
-> +    type_register_static(&exynos4210_info);
-> +}
-> +
-> +type_init(exynos4210_register_types)
-> diff --git a/hw/arm/exynos4_boards.c b/hw/arm/exynos4_boards.c
-> index f824eef0d36..700e90d6671 100644
-> --- a/hw/arm/exynos4_boards.c
-> +++ b/hw/arm/exynos4_boards.c
-> @@ -45,7 +45,7 @@ typedef enum Exynos4BoardType {
->  } Exynos4BoardType;
->
->  typedef struct Exynos4BoardState {
-> -    Exynos4210State *soc;
-> +    Exynos4210State soc;
->      MemoryRegion dram0_mem;
->      MemoryRegion dram1_mem;
->  } Exynos4BoardState;
-> @@ -130,7 +130,10 @@ exynos4_boards_init_common(MachineState *machine,
->      exynos4_boards_init_ram(s, get_system_memory(),
->                              exynos4_board_ram_size[board_type]);
->
-> -    s->soc =3D exynos4210_init(get_system_memory());
-> +    object_initialize(&s->soc, sizeof(s->soc), TYPE_EXYNOS4210_SOC);
-> +    qdev_set_parent_bus(DEVICE(&s->soc), sysbus_get_default());
-> +    object_property_set_bool(OBJECT(&s->soc), true, "realized",
-> +                             &error_fatal);
->
->      return s;
->  }
-> @@ -148,7 +151,7 @@ static void smdkc210_init(MachineState *machine)
->                                                        EXYNOS4_BOARD_SMDK=
-C210);
->
->      lan9215_init(SMDK_LAN9118_BASE_ADDR,
-> -            qemu_irq_invert(s->soc->irq_table[exynos4210_get_irq(37, 1)]=
-));
-> +            qemu_irq_invert(s->soc.irq_table[exynos4210_get_irq(37, 1)])=
-);
->      arm_load_kernel(ARM_CPU(first_cpu), &exynos4_board_binfo);
->  }
->
-> diff --git a/include/hw/arm/exynos4210.h b/include/hw/arm/exynos4210.h
-> index 098a69ec73d..27c684e851d 100644
-> --- a/include/hw/arm/exynos4210.h
-> +++ b/include/hw/arm/exynos4210.h
-> @@ -85,6 +85,9 @@ typedef struct Exynos4210Irq {
->  } Exynos4210Irq;
->
->  typedef struct Exynos4210State {
-> +    /*< private >*/
-> +    SysBusDevice parent_obj;
-> +    /*< public >*/
->      ARMCPU *cpu[EXYNOS4210_NCPUS];
->      Exynos4210Irq irqs;
->      qemu_irq *irq_table;
-> @@ -98,11 +101,13 @@ typedef struct Exynos4210State {
->      I2CBus *i2c_if[EXYNOS4210_I2C_NUMBER];
->  } Exynos4210State;
->
-> +#define TYPE_EXYNOS4210_SOC "exynos4210"
-> +#define EXYNOS4210_SOC(obj) \
-> +    OBJECT_CHECK(Exynos4210State, obj, TYPE_EXYNOS4210_SOC)
-> +
->  void exynos4210_write_secondary(ARMCPU *cpu,
->          const struct arm_boot_info *info);
->
-> -Exynos4210State *exynos4210_init(MemoryRegion *system_mem);
-> -
->  /* Initialize exynos4210 IRQ subsystem stub */
->  qemu_irq *exynos4210_init_irq(Exynos4210Irq *env);
->
-> --
-> 2.20.1
->
->
+If having subjective criteria is really a problem (I don't think
+it is), then we can call the tag "skip_travis", and stop worrying
+about defining what exactly is "slow".
+
+
+>=20
+>  * Do we want to set a maximum job timeout?  This way we can skip
+>    tests after a given amount of time has passed.  Currently we interru=
+pt
+>    the test running when the job timeout is reached, but it's possible
+>    to add a option so that no new tests will be started, but currently
+>    running ones will be waited on.
+
+I'm not sure I understand the suggestion to skip tests.  If we
+skip tests after a timeout, how would we differentiate a test
+being expectedly slow from a QEMU hang?
+
+--=20
+Eduardo
 
