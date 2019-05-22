@@ -2,93 +2,62 @@ Return-Path: <SRS0=8zLO=TW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F21DC072A4
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 04:42:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D2812C072A4
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 04:48:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C751921019
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 04:42:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C751921019
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
+	by mail.kernel.org (Postfix) with ESMTPS id 8520D2075E
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 04:48:37 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="lspAQtN+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8520D2075E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:35624 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:35719 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hTJ4q-0002hD-27
-	for qemu-devel@archiver.kernel.org; Wed, 22 May 2019 00:42:08 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:46513)
+	id 1hTJB6-0004tT-MZ
+	for qemu-devel@archiver.kernel.org; Wed, 22 May 2019 00:48:36 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:47118)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hTJ3x-0002Fm-TC
-	for qemu-devel@nongnu.org; Wed, 22 May 2019 00:41:14 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1hTJ8p-0003Lu-RJ
+	for qemu-devel@nongnu.org; Wed, 22 May 2019 00:46:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hTJ3w-0003Ai-SA
-	for qemu-devel@nongnu.org; Wed, 22 May 2019 00:41:13 -0400
-Received: from mail.ilande.co.uk ([46.43.2.167]:33886
-	helo=mail.default.ilande.uk0.bigv.io)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1hTJ3r-0002Wu-HR; Wed, 22 May 2019 00:41:07 -0400
-Received: from host86-185-106-199.range86-185.btcentralplus.com
-	([86.185.106.199] helo=[192.168.1.65])
-	by mail.default.ilande.uk0.bigv.io with esmtpsa
-	(TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.89)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1hTIzx-000628-QI; Wed, 22 May 2019 05:37:07 +0100
-To: David Gibson <david@gibson.dropbear.id.au>,
-	Anton Blanchard <anton@ozlabs.org>
-References: <20190507004811.29968-1-anton@ozlabs.org>
-	<20190507004811.29968-4-anton@ozlabs.org>
-	<c1d2a4cf-a9a7-4dfa-ed80-987118043f08@ilande.co.uk>
-	<20190522061112.3accdb76@kryten>
-	<20190522004924.GF30423@umbus.fritz.box>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Openpgp: preference=signencrypt
-Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
-	mQENBFQJuzwBCADAYvxrwUh1p/PvUlNFwKosVtVHHplgWi5p29t58QlOUkceZG0DBYSNqk93
-	3JzBTbtd4JfFcSupo6MNNOrCzdCbCjZ64ik8ycaUOSzK2tKbeQLEXzXoaDL1Y7vuVO7nL9bG
-	E5Ru3wkhCFc7SkoypIoAUqz8EtiB6T89/D9TDEyjdXUacc53R5gu8wEWiMg5MQQuGwzbQy9n
-	PFI+mXC7AaEUqBVc2lBQVpAYXkN0EyqNNT12UfDLdxaxaFpUAE2pCa2LTyo5vn5hEW+i3VdN
-	PkmjyPvL6DdY03fvC01PyY8zaw+UI94QqjlrDisHpUH40IUPpC/NB0LwzL2aQOMkzT2NABEB
-	AAG0ME1hcmsgQ2F2ZS1BeWxhbmQgPG1hcmsuY2F2ZS1heWxhbmRAaWxhbmRlLmNvLnVrPokB
-	OAQTAQIAIgUCVAm7PAIbAwYLCQgHAwIGFQgCCQoLBBYCAwECHgECF4AACgkQW8LFb64PMh9f
-	NAgAuc3ObOEY8NbZko72AGrg2tWKdybcMVITxmcor4hb9155o/OWcA4IDbeATR6cfiDL/oxU
-	mcmtXVgPqOwtW3NYAKr5g/FrZZ3uluQ2mtNYAyTFeALy8YF7N3yhs7LOcpbFP7tEbkSzoXNG
-	z8iYMiYtKwttt40WaheWuRs0ZOLbs6yoczZBDhna3Nj0LA3GpeJKlaV03O4umjKJgACP1c/q
-	T2Pkg+FCBHHFP454+waqojHp4OCBo6HyK+8I4wJRa9Z0EFqXIu8lTDYoggeX0Xd6bWeCFHK3
-	DhD0/Xi/kegSW33unsp8oVcM4kcFxTkpBgj39dB4KwAUznhTJR0zUHf63LkBDQRUCbs8AQgA
-	y7kyevA4bpetM/EjtuqQX4U05MBhEz/2SFkX6IaGtTG2NNw5wbcAfhOIuNNBYbw6ExuaJ3um
-	2uLseHnudmvN4VSJ5Hfbd8rhqoMmmO71szgT/ZD9MEe2KHzBdmhmhxJdp+zQNivy215j6H27
-	14mbC2dia7ktwP1rxPIX1OOfQwPuqlkmYPuVwZP19S4EYnCELOrnJ0m56tZLn5Zj+1jZX9Co
-	YbNLMa28qsktYJ4oU4jtn6V79H+/zpERZAHmH40IRXdR3hA+Ye7iC/ZpWzT2VSDlPbGY9Yja
-	Sp7w2347L5G+LLbAfaVoejHlfy/msPeehUcuKjAdBLoEhSPYzzdvEQARAQABiQEfBBgBAgAJ
-	BQJUCbs8AhsMAAoJEFvCxW+uDzIfabYIAJXmBepHJpvCPiMNEQJNJ2ZSzSjhic84LTMWMbJ+
-	opQgr5cb8SPQyyb508fc8b4uD8ejlF/cdbbBNktp3BXsHlO5BrmcABgxSP8HYYNsX0n9kERv
-	NMToU0oiBuAaX7O/0K9+BW+3+PGMwiu5ml0cwDqljxfVN0dUBZnQ8kZpLsY+WDrIHmQWjtH+
-	Ir6VauZs5Gp25XLrL6bh/SL8aK0BX6y79m5nhfKI1/6qtzHAjtMAjqy8ChPvOqVVVqmGUzFg
-	KPsrrIoklWcYHXPyMLj9afispPVR8e0tMKvxzFBWzrWX1mzljbBlnV2n8BIwVXWNbgwpHSsj
-	imgcU9TTGC5qd9g=
-Message-ID: <566efe93-c7a5-b821-dcb3-8577d168ea5a@ilande.co.uk>
-Date: Wed, 22 May 2019 05:37:47 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	(envelope-from <dgibson@ozlabs.org>) id 1hTJ8o-0006aF-R1
+	for qemu-devel@nongnu.org; Wed, 22 May 2019 00:46:15 -0400
+Received: from ozlabs.org ([2401:3900:2:1::2]:52035)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
+	id 1hTJ8m-0006Wp-Mr; Wed, 22 May 2019 00:46:13 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+	id 4580Ss6gwhz9sNT; Wed, 22 May 2019 14:46:05 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+	d=gibson.dropbear.id.au; s=201602; t=1558500365;
+	bh=RiYF6y127JDdRmGpDivNEvRY1BoNuZWjbpiaLNBb2Kk=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=lspAQtN+ZT0irN2j+3s4Lm5742RbpBz+rIAIcdv/15GNfgVbbTQwaJXe0v+V7PKgQ
+	6DUWCZdA7uoi3TfkzNVm6bzXNciwcoI/ZsxietHqQaZISkRxohoPCmUa9dv/JC29LW
+	pX1TcxlMUoxwoXHFTbpn7Mj1CHzPYCzsvVMuzpWs=
+From: David Gibson <david@gibson.dropbear.id.au>
+To: peter.maydell@linaro.org
+Date: Wed, 22 May 2019 14:45:25 +1000
+Message-Id: <20190522044600.16534-4-david@gibson.dropbear.id.au>
+X-Mailer: git-send-email 2.21.0
+In-Reply-To: <20190522044600.16534-1-david@gibson.dropbear.id.au>
+References: <20190522044600.16534-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
-In-Reply-To: <20190522004924.GF30423@umbus.fritz.box>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-GB
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 86.185.106.199
-X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
-X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
-X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 46.43.2.167
-Subject: Re: [Qemu-devel] [PATCH 4/9] target/ppc: Fix lxvw4x,
- lxvh8x and lxvb16x
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2401:3900:2:1::2
+Subject: [Qemu-devel] [PULL 03/38] configure: Use quotes around uses of
+ $CPU_CFLAGS
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -100,35 +69,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: ego@linux.vnet.ibm.com, sandipandas1990@gmail.com,
-	richard.henderson@linaro.org, qemu-devel@nongnu.org,
-	f4bug@amsat.org, qemu-ppc@nongnu.org
+Cc: lvivier@redhat.com, Richard Henderson <richard.henderson@linaro.org>,
+	qemu-devel@nongnu.org, groug@kaod.org, qemu-ppc@nongnu.org,
+	clg@kaod.org, David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 22/05/2019 01:49, David Gibson wrote:
+From: Richard Henderson <richard.henderson@linaro.org>
 
-> On Wed, May 22, 2019 at 06:11:12AM +1000, Anton Blanchard wrote:
->> Hi,
->>
->>> I've now had a bit of time to look through this and I believe it is
->>> correct, so:
->>>
->>> Reviewed-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
->>
->> Thanks Mark. David: any chance we could get this merged? I can't run a
->> recent Ubuntu image successfully without it. sshd hangs when I try to
->> ssh into it.
-> 
-> I had a comment that was never addressed - it didn't look like the xth
-> and xtl temporaries were initialized after the patch.
+About half of the values to which CPU_CFLAGS is set
+have multiple space separated arguments.
 
-If it helps, here was my analysis at the time (looks like you were also included on
-the reply?): https://lists.gnu.org/archive/html/qemu-devel/2019-05/msg01515.html.
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Message-Id: <20190501223819.8584-3-richard.henderson@linaro.org>
+Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+---
+ configure | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
 
+diff --git a/configure b/configure
+index 69402f18b8..d0050f9afc 100755
+--- a/configure
++++ b/configure
+@@ -1556,37 +1556,37 @@ case "$cpu" in
+            CPU_CFLAGS=3D"-m64"
+            LDFLAGS=3D"-m64 $LDFLAGS"
+            cross_cc_ppc64=3D$cc
+-           cross_cc_cflags_ppc64=3D$CPU_CFLAGS
++           cross_cc_cflags_ppc64=3D"$CPU_CFLAGS"
+            ;;
+     sparc)
+            CPU_CFLAGS=3D"-m32 -mv8plus -mcpu=3Dultrasparc"
+            LDFLAGS=3D"-m32 -mv8plus $LDFLAGS"
+            cross_cc_sparc=3D$cc
+-           cross_cc_cflags_sparc=3D$CPU_CFLAGS
++           cross_cc_cflags_sparc=3D"$CPU_CFLAGS"
+            ;;
+     sparc64)
+            CPU_CFLAGS=3D"-m64 -mcpu=3Dultrasparc"
+            LDFLAGS=3D"-m64 $LDFLAGS"
+            cross_cc_sparc64=3D$cc
+-           cross_cc_cflags_sparc64=3D$CPU_CFLAGS
++           cross_cc_cflags_sparc64=3D"$CPU_CFLAGS"
+            ;;
+     s390)
+            CPU_CFLAGS=3D"-m31"
+            LDFLAGS=3D"-m31 $LDFLAGS"
+            cross_cc_s390=3D$cc
+-           cross_cc_cflags_s390=3D$CPU_CFLAGS
++           cross_cc_cflags_s390=3D"$CPU_CFLAGS"
+            ;;
+     s390x)
+            CPU_CFLAGS=3D"-m64"
+            LDFLAGS=3D"-m64 $LDFLAGS"
+            cross_cc_s390x=3D$cc
+-           cross_cc_cflags_s390x=3D$CPU_CFLAGS
++           cross_cc_cflags_s390x=3D"$CPU_CFLAGS"
+            ;;
+     i386)
+            CPU_CFLAGS=3D"-m32"
+            LDFLAGS=3D"-m32 $LDFLAGS"
+            cross_cc_i386=3D$cc
+-           cross_cc_cflags_i386=3D$CPU_CFLAGS
++           cross_cc_cflags_i386=3D"$CPU_CFLAGS"
+            ;;
+     x86_64)
+            # ??? Only extremely old AMD cpus do not have cmpxchg16b.
+@@ -1595,13 +1595,13 @@ case "$cpu" in
+            CPU_CFLAGS=3D"-m64 -mcx16"
+            LDFLAGS=3D"-m64 $LDFLAGS"
+            cross_cc_x86_64=3D$cc
+-           cross_cc_cflags_x86_64=3D$CPU_CFLAGS
++           cross_cc_cflags_x86_64=3D"$CPU_CFLAGS"
+            ;;
+     x32)
+            CPU_CFLAGS=3D"-mx32"
+            LDFLAGS=3D"-mx32 $LDFLAGS"
+            cross_cc_i386=3D$cc
+-           cross_cc_cflags_i386=3D$CPU_CFLAGS
++           cross_cc_cflags_i386=3D"$CPU_CFLAGS"
+            ;;
+     # No special flags required for other host CPUs
+ esac
+--=20
+2.21.0
 
-ATB,
-
-Mark.
 
