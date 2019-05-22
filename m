@@ -2,64 +2,76 @@ Return-Path: <SRS0=8zLO=TW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D39EC072A4
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 08:29:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AB2AFC072A4
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 08:31:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 56A85204EC
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 08:29:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 56A85204EC
+	by mail.kernel.org (Postfix) with ESMTPS id 7ED0A204EC
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 08:31:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7ED0A204EC
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:38360 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:38414 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hTMd2-0001ew-JI
-	for qemu-devel@archiver.kernel.org; Wed, 22 May 2019 04:29:40 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:59801)
+	id 1hTMev-0003Ns-Ow
+	for qemu-devel@archiver.kernel.org; Wed, 22 May 2019 04:31:37 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:60419)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1hTMbU-0000fn-Ps
-	for qemu-devel@nongnu.org; Wed, 22 May 2019 04:28:11 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1hTMdC-00027x-Ul
+	for qemu-devel@nongnu.org; Wed, 22 May 2019 04:29:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1hTMau-0005AI-Se
-	for qemu-devel@nongnu.org; Wed, 22 May 2019 04:28:04 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49450)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1hTMau-00059c-J1
-	for qemu-devel@nongnu.org; Wed, 22 May 2019 04:27:28 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E628281E06
-	for <qemu-devel@nongnu.org>; Wed, 22 May 2019 08:27:27 +0000 (UTC)
-Received: from sirius.home.kraxel.org (ovpn-117-74.ams2.redhat.com
-	[10.36.117.74])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 6F74B80E6;
-	Wed, 22 May 2019 08:27:19 +0000 (UTC)
-Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
-	id 410E5A206; Wed, 22 May 2019 10:27:17 +0200 (CEST)
-From: Gerd Hoffmann <kraxel@redhat.com>
-To: qemu-devel@nongnu.org
-Date: Wed, 22 May 2019 10:27:17 +0200
-Message-Id: <20190522082717.9354-4-kraxel@redhat.com>
-In-Reply-To: <20190522082717.9354-1-kraxel@redhat.com>
-References: <20190522082717.9354-1-kraxel@redhat.com>
+	(envelope-from <pbonzini@redhat.com>) id 1hTMd9-0007X5-Fu
+	for qemu-devel@nongnu.org; Wed, 22 May 2019 04:29:49 -0400
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:39956)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hTMd2-0007Nu-F4
+	for qemu-devel@nongnu.org; Wed, 22 May 2019 04:29:44 -0400
+Received: by mail-wr1-f67.google.com with SMTP id f10so1221279wre.7
+	for <qemu-devel@nongnu.org>; Wed, 22 May 2019 01:29:36 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+	:user-agent:mime-version:in-reply-to:content-language
+	:content-transfer-encoding;
+	bh=xX4jzD7rvGD1ipojV5aCpZ9JBCg71X2h8h8GHoavWvk=;
+	b=gyZecndetBMbVMVioMY3F1PsIr20BlqO6RGZztywwMVZgDkW8Mz4YaKu2tTyfhW1kv
+	HX05bfA/64/SZ6Lj/E5sOqFUkjw1t8Dzam4ZODN14d6KtF1vOYASy2Ogc83C7eC+jZxd
+	/zL740MMAWlsBL6h2XRDflvqtBDAA7Nfyi2ZWVX9f6+fplI5xYEEK82UIRaRPjt4x/mz
+	fbh9SZp7I8+x9em+4n8OEmAw+KFO/qm2kzERouhwe+9wG0Ujczhby/mopEw05L1FtC+b
+	XM1gzZcVV0xSDIHq0Ny745qmRmAR1LOfBzPhRMs+vcXCnlUELCeeF8PqA0pEF8qPvH40
+	wTxQ==
+X-Gm-Message-State: APjAAAXfnfL7yOl0HBWeck41+xZlxtVbadE+PNki5uhlf9PmJz3vL7kr
+	aJ6tqE1Jw7hIzWJC2e/swx/lZw==
+X-Google-Smtp-Source: APXvYqwa5WyEsCzm6U/I4ojUGRR+pvTh8b1Zaa3Il0pCttUKDiMJarRGYf0nHjjLzQG/zkb3SoYq2w==
+X-Received: by 2002:adf:9c8a:: with SMTP id d10mr37588041wre.9.1558513775776; 
+	Wed, 22 May 2019 01:29:35 -0700 (PDT)
+Received: from [10.32.181.147] (nat-pool-mxp-t.redhat.com. [149.6.153.186])
+	by smtp.gmail.com with ESMTPSA id 16sm3918173wmx.45.2019.05.22.01.29.35
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Wed, 22 May 2019 01:29:35 -0700 (PDT)
+To: Li Qiang <liq3ea@gmail.com>, Li Qiang <liq3ea@163.com>
+References: <20190510164349.81507-1-liq3ea@163.com>
+	<CAKXe6SLe1_ppEACqKVesvfrieN=c28rj9ro_xSGZ6F=Rf7iWew@mail.gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <e278d0cc-df8d-01c6-df02-79757134d35a@redhat.com>
+Date: Wed, 22 May 2019 10:29:35 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.25]);
-	Wed, 22 May 2019 08:27:27 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <CAKXe6SLe1_ppEACqKVesvfrieN=c28rj9ro_xSGZ6F=Rf7iWew@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 3/3] contrib: add vhost-user-input
+	[fuzzy]
+X-Received-From: 209.85.221.67
+Subject: Re: [Qemu-devel] [PATCH v4 0/3] hw: edu: some fixes
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -71,508 +83,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
-	Gerd Hoffmann <kraxel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+	Jiri Slaby <jslaby@suse.cz>, Qemu Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+On 21/05/19 15:30, Li Qiang wrote:
+> Ping....
+> 
+> Paolo, could you merge these to your misc tree?
 
-Add a vhost-user input backend example, based on virtio-input-host
-device. It takes an evdev path as argument, and can be associated with
-a vhost-user-input device via a UNIX socket:
+Queued now, thanks.
 
-$ vhost-user-input -p /dev/input/eventX -s /tmp/vui.sock
+Paolo
 
-$ qemu ... -chardev socket,id=3Dvuic,path=3D/tmp/vui.sock
-  -device vhost-user-input-pci,chardev=3Dvuic
-
-This example is intentionally not included in $TOOLS, and not
-installed by default.
-
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Message-id: 20190514104126.6294-4-marcandre.lureau@redhat.com
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
----
- Makefile                               |  11 +
- Makefile.objs                          |   1 +
- contrib/vhost-user-input/main.c        | 393 +++++++++++++++++++++++++
- MAINTAINERS                            |   1 +
- contrib/vhost-user-input/Makefile.objs |   1 +
- 5 files changed, 407 insertions(+)
- create mode 100644 contrib/vhost-user-input/main.c
- create mode 100644 contrib/vhost-user-input/Makefile.objs
-
-diff --git a/Makefile b/Makefile
-index 155f066a206f..8598ab9ec482 100644
---- a/Makefile
-+++ b/Makefile
-@@ -408,6 +408,7 @@ dummy :=3D $(call unnest-vars,, \
-                 libvhost-user-obj-y \
-                 vhost-user-scsi-obj-y \
-                 vhost-user-blk-obj-y \
-+                vhost-user-input-obj-y \
-                 qga-vss-dll-obj-y \
-                 block-obj-y \
-                 block-obj-m \
-@@ -618,6 +619,16 @@ rdmacm-mux$(EXESUF): LIBS +=3D "-libumad"
- rdmacm-mux$(EXESUF): $(rdmacm-mux-obj-y) $(COMMON_LDADDS)
- 	$(call LINK, $^)
-=20
-+ifdef CONFIG_VHOST_USER_INPUT
-+ifdef CONFIG_LINUX
-+vhost-user-input$(EXESUF): $(vhost-user-input-obj-y) libvhost-user.a lib=
-qemuutil.a
-+	$(call LINK, $^)
-+
-+# build by default, do not install
-+all: vhost-user-input$(EXESUF)
-+endif
-+endif
-+
- module_block.h: $(SRC_PATH)/scripts/modules/module_block.py config-host.=
-mak
- 	$(call quiet-command,$(PYTHON) $< $@ \
- 	$(addprefix $(SRC_PATH)/,$(patsubst %.mo,%.c,$(block-obj-m))), \
-diff --git a/Makefile.objs b/Makefile.objs
-index 2b0793ecc9ff..485f9624191a 100644
---- a/Makefile.objs
-+++ b/Makefile.objs
-@@ -122,6 +122,7 @@ vhost-user-scsi.o-libs :=3D $(LIBISCSI_LIBS)
- vhost-user-scsi-obj-y =3D contrib/vhost-user-scsi/
- vhost-user-blk-obj-y =3D contrib/vhost-user-blk/
- rdmacm-mux-obj-y =3D contrib/rdmacm-mux/
-+vhost-user-input-obj-y =3D contrib/vhost-user-input/
-=20
- ######################################################################
- trace-events-subdirs =3D
-diff --git a/contrib/vhost-user-input/main.c b/contrib/vhost-user-input/m=
-ain.c
-new file mode 100644
-index 000000000000..8d493f598e02
---- /dev/null
-+++ b/contrib/vhost-user-input/main.c
-@@ -0,0 +1,393 @@
-+/*
-+ * This work is licensed under the terms of the GNU GPL, version 2 or
-+ * (at your option) any later version.  See the COPYING file in the
-+ * top-level directory.
-+ */
-+
-+#include "qemu/osdep.h"
-+
-+#include <glib.h>
-+#include <linux/input.h>
-+
-+#include "qemu/iov.h"
-+#include "qemu/bswap.h"
-+#include "qemu/sockets.h"
-+#include "contrib/libvhost-user/libvhost-user.h"
-+#include "contrib/libvhost-user/libvhost-user-glib.h"
-+#include "standard-headers/linux/virtio_input.h"
-+#include "qapi/error.h"
-+
-+typedef struct virtio_input_event virtio_input_event;
-+typedef struct virtio_input_config virtio_input_config;
-+
-+typedef struct VuInput {
-+    VugDev dev;
-+    GSource *evsrc;
-+    int evdevfd;
-+    GArray *config;
-+    virtio_input_config *sel_config;
-+    struct {
-+        virtio_input_event event;
-+        VuVirtqElement *elem;
-+    } *queue;
-+    uint32_t qindex, qsize;
-+} VuInput;
-+
-+static void vi_input_send(VuInput *vi, struct virtio_input_event *event)
-+{
-+    VuDev *dev =3D &vi->dev.parent;
-+    VuVirtq *vq =3D vu_get_queue(dev, 0);
-+    VuVirtqElement *elem;
-+    int i, len;
-+
-+    /* queue up events ... */
-+    if (vi->qindex =3D=3D vi->qsize) {
-+        vi->qsize++;
-+        vi->queue =3D g_realloc_n(vi->queue, vi->qsize, sizeof(vi->queue=
-[0]));
-+    }
-+    vi->queue[vi->qindex++].event =3D *event;
-+
-+    /* ... until we see a report sync ... */
-+    if (event->type !=3D htole16(EV_SYN) ||
-+        event->code !=3D htole16(SYN_REPORT)) {
-+        return;
-+    }
-+
-+    /* ... then check available space ... */
-+    for (i =3D 0; i < vi->qindex; i++) {
-+        elem =3D vu_queue_pop(dev, vq, sizeof(VuVirtqElement));
-+        if (!elem) {
-+            while (--i >=3D 0) {
-+                vu_queue_unpop(dev, vq, vi->queue[i].elem, 0);
-+            }
-+            vi->qindex =3D 0;
-+            g_warning("virtio-input queue full");
-+            return;
-+        }
-+        vi->queue[i].elem =3D elem;
-+    }
-+
-+    /* ... and finally pass them to the guest */
-+    for (i =3D 0; i < vi->qindex; i++) {
-+        elem =3D vi->queue[i].elem;
-+        len =3D iov_from_buf(elem->in_sg, elem->in_num,
-+                           0, &vi->queue[i].event, sizeof(virtio_input_e=
-vent));
-+        vu_queue_push(dev, vq, elem, len);
-+        g_free(elem);
-+    }
-+
-+    vu_queue_notify(&vi->dev.parent, vq);
-+    vi->qindex =3D 0;
-+}
-+
-+static void
-+vi_evdev_watch(VuDev *dev, int condition, void *data)
-+{
-+    VuInput *vi =3D data;
-+    int fd =3D vi->evdevfd;
-+
-+    g_debug("Got evdev condition %x", condition);
-+
-+    struct virtio_input_event virtio;
-+    struct input_event evdev;
-+    int rc;
-+
-+    for (;;) {
-+        rc =3D read(fd, &evdev, sizeof(evdev));
-+        if (rc !=3D sizeof(evdev)) {
-+            break;
-+        }
-+
-+        g_debug("input %d %d %d", evdev.type, evdev.code, evdev.value);
-+
-+        virtio.type  =3D htole16(evdev.type);
-+        virtio.code  =3D htole16(evdev.code);
-+        virtio.value =3D htole32(evdev.value);
-+        vi_input_send(vi, &virtio);
-+    }
-+}
-+
-+
-+static void vi_handle_status(VuInput *vi, virtio_input_event *event)
-+{
-+    struct input_event evdev;
-+    int rc;
-+
-+    if (gettimeofday(&evdev.time, NULL)) {
-+        perror("vi_handle_status: gettimeofday");
-+        return;
-+    }
-+
-+    evdev.type =3D le16toh(event->type);
-+    evdev.code =3D le16toh(event->code);
-+    evdev.value =3D le32toh(event->value);
-+
-+    rc =3D write(vi->evdevfd, &evdev, sizeof(evdev));
-+    if (rc =3D=3D -1) {
-+        perror("vi_host_handle_status: write");
-+    }
-+}
-+
-+static void vi_handle_sts(VuDev *dev, int qidx)
-+{
-+    VuInput *vi =3D container_of(dev, VuInput, dev.parent);
-+    VuVirtq *vq =3D vu_get_queue(dev, qidx);
-+    virtio_input_event event;
-+    VuVirtqElement *elem;
-+    int len;
-+
-+    g_debug("%s", G_STRFUNC);
-+
-+    for (;;) {
-+        elem =3D vu_queue_pop(dev, vq, sizeof(VuVirtqElement));
-+        if (!elem) {
-+            break;
-+        }
-+
-+        memset(&event, 0, sizeof(event));
-+        len =3D iov_to_buf(elem->out_sg, elem->out_num,
-+                         0, &event, sizeof(event));
-+        vi_handle_status(vi, &event);
-+        vu_queue_push(dev, vq, elem, len);
-+        g_free(elem);
-+    }
-+
-+    vu_queue_notify(&vi->dev.parent, vq);
-+}
-+
-+static void
-+vi_panic(VuDev *dev, const char *msg)
-+{
-+    g_critical("%s\n", msg);
-+    exit(EXIT_FAILURE);
-+}
-+
-+static void
-+vi_queue_set_started(VuDev *dev, int qidx, bool started)
-+{
-+    VuInput *vi =3D container_of(dev, VuInput, dev.parent);
-+    VuVirtq *vq =3D vu_get_queue(dev, qidx);
-+
-+    g_debug("queue started %d:%d", qidx, started);
-+
-+    if (qidx =3D=3D 1) {
-+        vu_set_queue_handler(dev, vq, started ? vi_handle_sts : NULL);
-+    }
-+
-+    started =3D vu_queue_started(dev, vu_get_queue(dev, 0)) &&
-+        vu_queue_started(dev, vu_get_queue(dev, 1));
-+
-+    if (started && !vi->evsrc) {
-+        vi->evsrc =3D vug_source_new(&vi->dev, vi->evdevfd,
-+                                   G_IO_IN, vi_evdev_watch, vi);
-+    }
-+
-+    if (!started && vi->evsrc) {
-+        g_source_destroy(vi->evsrc);
-+        vi->evsrc =3D NULL;
-+    }
-+}
-+
-+static virtio_input_config *
-+vi_find_config(VuInput *vi, uint8_t select, uint8_t subsel)
-+{
-+    virtio_input_config *cfg;
-+    int i;
-+
-+    for (i =3D 0; i < vi->config->len; i++) {
-+        cfg =3D &g_array_index(vi->config, virtio_input_config, i);
-+        if (select =3D=3D cfg->select && subsel =3D=3D cfg->subsel) {
-+            return cfg;
-+        }
-+    }
-+
-+    return NULL;
-+}
-+
-+static int vi_get_config(VuDev *dev, uint8_t *config, uint32_t len)
-+{
-+    VuInput *vi =3D container_of(dev, VuInput, dev.parent);
-+
-+    g_return_val_if_fail(len <=3D sizeof(*vi->sel_config), -1);
-+
-+    if (vi->sel_config) {
-+        memcpy(config, vi->sel_config, len);
-+    } else {
-+        memset(config, 0, len);
-+    }
-+
-+    return 0;
-+}
-+
-+static int vi_set_config(VuDev *dev, const uint8_t *data,
-+                         uint32_t offset, uint32_t size,
-+                         uint32_t flags)
-+{
-+    VuInput *vi =3D container_of(dev, VuInput, dev.parent);
-+    virtio_input_config *config =3D (virtio_input_config *)data;
-+
-+    vi->sel_config =3D vi_find_config(vi, config->select, config->subsel=
-);
-+
-+    return 0;
-+}
-+
-+static const VuDevIface vuiface =3D {
-+    .queue_set_started =3D vi_queue_set_started,
-+    .get_config =3D vi_get_config,
-+    .set_config =3D vi_set_config,
-+};
-+
-+static void
-+vi_bits_config(VuInput *vi, int type, int count)
-+{
-+    virtio_input_config bits;
-+    int rc, i, size =3D 0;
-+
-+    memset(&bits, 0, sizeof(bits));
-+    rc =3D ioctl(vi->evdevfd, EVIOCGBIT(type, count / 8), bits.u.bitmap)=
-;
-+    if (rc < 0) {
-+        return;
-+    }
-+
-+    for (i =3D 0; i < count / 8; i++) {
-+        if (bits.u.bitmap[i]) {
-+            size =3D i + 1;
-+        }
-+    }
-+    if (size =3D=3D 0) {
-+        return;
-+    }
-+
-+    bits.select =3D VIRTIO_INPUT_CFG_EV_BITS;
-+    bits.subsel =3D type;
-+    bits.size   =3D size;
-+    g_array_append_val(vi->config, bits);
-+}
-+
-+static char *opt_evdev;
-+static int opt_fdnum =3D -1;
-+static char *opt_socket_path;
-+static gboolean opt_nograb;
-+static gboolean opt_print_caps;
-+
-+static GOptionEntry entries[] =3D {
-+    { "print-capabilities", 'c', 0, G_OPTION_ARG_NONE, &opt_print_caps,
-+      "Print capabilities", NULL },
-+    { "no-grab", 'n', 0, G_OPTION_ARG_NONE, &opt_nograb,
-+      "Don't grab device", NULL },
-+    { "fd", 'f', 0, G_OPTION_ARG_INT, &opt_fdnum,
-+      "Use inherited fd socket", "FDNUM" },
-+    { "socket-path", 's', 0, G_OPTION_ARG_FILENAME, &opt_socket_path,
-+      "Use UNIX socket path", "PATH" },
-+    { "evdev-path", 'p', 0, G_OPTION_ARG_FILENAME, &opt_evdev,
-+      "evdev input device path", "PATH" },
-+    { NULL, }
-+};
-+
-+int
-+main(int argc, char *argv[])
-+{
-+    GMainLoop *loop =3D NULL;
-+    VuInput vi =3D { 0, };
-+    int rc, ver, fd;
-+    virtio_input_config id;
-+    struct input_id ids;
-+    GError *error =3D NULL;
-+    GOptionContext *context;
-+
-+    context =3D g_option_context_new(NULL);
-+    g_option_context_add_main_entries(context, entries, NULL);
-+    if (!g_option_context_parse(context, &argc, &argv, &error)) {
-+        g_printerr("Option parsing failed: %s\n", error->message);
-+        exit(EXIT_FAILURE);
-+    }
-+    if (opt_print_caps) {
-+        g_print("{\n");
-+        g_print("  \"type\": \"input\",\n");
-+        g_print("  \"features\": [\n");
-+        g_print("    \"evdev-path\",\n");
-+        g_print("    \"no-grab\"\n");
-+        g_print("  ]\n");
-+        g_print("}\n");
-+        exit(EXIT_SUCCESS);
-+    }
-+    if (!opt_evdev) {
-+        g_printerr("Please specify an evdev path\n");
-+        exit(EXIT_FAILURE);
-+    }
-+    if ((!!opt_socket_path + (opt_fdnum !=3D -1)) !=3D 1) {
-+        g_printerr("Please specify either --fd or --socket-path\n");
-+        exit(EXIT_FAILURE);
-+    }
-+
-+    vi.evdevfd =3D open(opt_evdev, O_RDWR);
-+    if (vi.evdevfd < 0) {
-+        g_printerr("Failed to open evdev: %s\n", g_strerror(errno));
-+        exit(EXIT_FAILURE);
-+    }
-+
-+    rc =3D ioctl(vi.evdevfd, EVIOCGVERSION, &ver);
-+    if (rc < 0) {
-+        g_printerr("%s: is not an evdev device\n", argv[1]);
-+        exit(EXIT_FAILURE);
-+    }
-+
-+    if (!opt_nograb) {
-+        rc =3D ioctl(vi.evdevfd, EVIOCGRAB, 1);
-+        if (rc < 0) {
-+            g_printerr("Failed to grab device\n");
-+            exit(EXIT_FAILURE);
-+        }
-+    }
-+
-+    vi.config =3D g_array_new(false, false, sizeof(virtio_input_config))=
-;
-+    memset(&id, 0, sizeof(id));
-+    ioctl(vi.evdevfd, EVIOCGNAME(sizeof(id.u.string) - 1), id.u.string);
-+    id.select =3D VIRTIO_INPUT_CFG_ID_NAME;
-+    id.size =3D strlen(id.u.string);
-+    g_array_append_val(vi.config, id);
-+
-+    if (ioctl(vi.evdevfd, EVIOCGID, &ids) =3D=3D 0) {
-+        memset(&id, 0, sizeof(id));
-+        id.select =3D VIRTIO_INPUT_CFG_ID_DEVIDS;
-+        id.size =3D sizeof(struct virtio_input_devids);
-+        id.u.ids.bustype =3D cpu_to_le16(ids.bustype);
-+        id.u.ids.vendor  =3D cpu_to_le16(ids.vendor);
-+        id.u.ids.product =3D cpu_to_le16(ids.product);
-+        id.u.ids.version =3D cpu_to_le16(ids.version);
-+        g_array_append_val(vi.config, id);
-+    }
-+
-+    vi_bits_config(&vi, EV_KEY, KEY_CNT);
-+    vi_bits_config(&vi, EV_REL, REL_CNT);
-+    vi_bits_config(&vi, EV_ABS, ABS_CNT);
-+    vi_bits_config(&vi, EV_MSC, MSC_CNT);
-+    vi_bits_config(&vi, EV_SW,  SW_CNT);
-+    g_debug("config length: %u", vi.config->len);
-+
-+    if (opt_socket_path) {
-+        int lsock =3D unix_listen(opt_socket_path, &error_fatal);
-+        fd =3D accept(lsock, NULL, NULL);
-+        close(lsock);
-+    } else {
-+        fd =3D opt_fdnum;
-+    }
-+    if (fd =3D=3D -1) {
-+        g_printerr("Invalid socket");
-+        exit(EXIT_FAILURE);
-+    }
-+    vug_init(&vi.dev, fd, vi_panic, &vuiface);
-+
-+    loop =3D g_main_loop_new(NULL, FALSE);
-+    g_main_loop_run(loop);
-+    g_main_loop_unref(loop);
-+
-+    vug_deinit(&vi.dev);
-+
-+    if (vi.evsrc) {
-+        g_source_unref(vi.evsrc);
-+    }
-+    g_array_free(vi.config, TRUE);
-+    g_free(vi.queue);
-+    return 0;
-+}
-diff --git a/MAINTAINERS b/MAINTAINERS
-index a6948ebc63bc..73a010508251 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -1532,6 +1532,7 @@ S: Maintained
- F: hw/input/vhost-user-input.c
- F: hw/input/virtio-input*.c
- F: include/hw/virtio/virtio-input.h
-+F: contrib/vhost-user-input/*
-=20
- virtio-serial
- M: Amit Shah <amit@kernel.org>
-diff --git a/contrib/vhost-user-input/Makefile.objs b/contrib/vhost-user-=
-input/Makefile.objs
-new file mode 100644
-index 000000000000..b1fad90d51b6
---- /dev/null
-+++ b/contrib/vhost-user-input/Makefile.objs
-@@ -0,0 +1 @@
-+vhost-user-input-obj-y =3D main.o
---=20
-2.18.1
+> Thanks,
+> Li Qiang
+> 
+> Li Qiang <liq3ea@163.com <mailto:liq3ea@163.com>> 于2019年5月11日周六 上
+> 午12:44写道：
+> 
+>     Recently I am considering write a driver for edu device.
+>     After reading the spec, I found these three small issue.
+>     Two first two related the MMIO access and the third is
+>     related the DMA operation.
+> 
+>     Change since v2:
+>     Fix an error in patch 2
+>     Fix some commit message and title.
+> 
+>     Change since v1:
+>     Fix format compile error
+> 
+>     Li Qiang (3):
+>       edu: mmio: allow 64-bit access
+>       edu: mmio: allow 64-bit access in read dispatch
+>       edu: uses uint64_t in dma operation
+> 
+>      hw/misc/edu.c | 32 +++++++++++++++++++++++---------
+>      1 file changed, 23 insertions(+), 9 deletions(-)
+> 
+>     -- 
+>     2.17.1
+> 
+> 
 
 
