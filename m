@@ -2,66 +2,67 @@ Return-Path: <SRS0=8zLO=TW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A745C282CE
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 16:41:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 43559C282CE
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 16:44:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0FAF820879
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 16:41:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0FAF820879
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 08C4D20862
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 16:44:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 08C4D20862
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:47731 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:47744 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hTUJ5-0006vh-DG
-	for qemu-devel@archiver.kernel.org; Wed, 22 May 2019 12:41:35 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:37162)
+	id 1hTULn-0007oU-9t
+	for qemu-devel@archiver.kernel.org; Wed, 22 May 2019 12:44:23 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:37577)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hTUIL-0006a1-6Y
-	for qemu-devel@nongnu.org; Wed, 22 May 2019 12:40:50 -0400
+	(envelope-from <no-reply@patchew.org>) id 1hTUL2-0007VJ-NW
+	for qemu-devel@nongnu.org; Wed, 22 May 2019 12:43:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hTUIJ-00011x-Rr
-	for qemu-devel@nongnu.org; Wed, 22 May 2019 12:40:49 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60054)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hTUIJ-0000zO-IP
-	for qemu-devel@nongnu.org; Wed, 22 May 2019 12:40:47 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
-	[10.5.11.23])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 9A760307DA31;
-	Wed, 22 May 2019 16:40:40 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-28.ams2.redhat.com
-	[10.36.116.28])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id E45565B2CF;
-	Wed, 22 May 2019 16:40:38 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
-	id 6110E1138648; Wed, 22 May 2019 18:40:37 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Yury Kotov <yury-kotov@yandex-team.ru>
-References: <20190514151848.5677-1-yury-kotov@yandex-team.ru>
-Date: Wed, 22 May 2019 18:40:37 +0200
-In-Reply-To: <20190514151848.5677-1-yury-kotov@yandex-team.ru> (Yury Kotov's
-	message of "Tue, 14 May 2019 18:18:48 +0300")
-Message-ID: <87r28qjvcq.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1 (gnu/linux)
+	(envelope-from <no-reply@patchew.org>) id 1hTUL1-0005Lt-Ej
+	for qemu-devel@nongnu.org; Wed, 22 May 2019 12:43:36 -0400
+Resent-Date: Wed, 22 May 2019 12:43:36 -0400
+Resent-Message-Id: <E1hTUL1-0005Lt-Ej@eggs.gnu.org>
+Received: from sender4-of-o55.zoho.com ([136.143.188.55]:21589)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1hTUL1-0005G0-6q
+	for qemu-devel@nongnu.org; Wed, 22 May 2019 12:43:35 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1558540636; cv=none; d=zoho.com; s=zohoarc; 
+	b=fy3YqKhlM7Vu2NzkNNkY8usjhLyyIksLJoJvUmPdAqxTTpJA546WDR/ma9y8RG4HjwZGNTaoI0bRV7b9HZDXrJuiHdpYRidBAFpbw6RrCBD0Px3vwHEMn0y/TzSi61VQqM0QdPfxisP5XFo93GodKP5x9KFg5IT+n+uhNUVruwg=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
+	s=zohoarc; t=1558540636;
+	h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
+	bh=kB79zWPs7sQMij3ORY90muyHQtzvaIVi15w25jXetK0=; 
+	b=CxBC4uNxia7xPYhF8VY9rq7mJI/OmRUtT+vzQAdOS6osys2XtG697WJV2dbbLvw+38mDZaItdXd4ppRzzR4wBmBsKDca/k5Ykze2+VZxJDh1VwxUPHWDY/UiLUWf5MoOi4Kc162fgdTCJbFq9YfSbbPrFwmMj7QjL67/7NdUFUY=
+ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
+	spf=pass  smtp.mailfrom=no-reply@patchew.org;
+	dmarc=pass header.from=<no-reply@patchew.org>
+	header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+	mx.zohomail.com with SMTPS id 1558540630970161.018057671782;
+	Wed, 22 May 2019 08:57:10 -0700 (PDT)
+In-Reply-To: <20190522153631.17152-1-wens@kernel.org>
+Message-ID: <155854062960.24.17656832404160415256@549697c9ad12>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.48]);
-	Wed, 22 May 2019 16:40:45 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: wens@kernel.org
+Date: Wed, 22 May 2019 08:57:10 -0700 (PDT)
+X-ZohoMailClient: External
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2] monitor: Fix fdset_id & fd types for
- corresponding QMP commands
+X-Received-From: 136.143.188.55
+Subject: Re: [Qemu-devel] [PATCH v2] linux-user: Pass through nanosecond
+ timestamp components for stat syscalls
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -73,199 +74,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org,
-	"Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Reply-To: qemu-devel@nongnu.org
+Cc: riku.voipio@iki.fi, qemu-devel@nongnu.org, wens@kernel.org,
+	laurent@vivier.eu
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Yury Kotov <yury-kotov@yandex-team.ru> writes:
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDUyMjE1MzYzMS4xNzE1
+Mi0xLXdlbnNAa2VybmVsLm9yZy8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNv
+bWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9y
+bWF0aW9uOgoKTWVzc2FnZS1pZDogMjAxOTA1MjIxNTM2MzEuMTcxNTItMS13ZW5zQGtlcm5lbC5v
+cmcKVHlwZTogc2VyaWVzClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjJdIGxpbnV4LXVz
+ZXI6IFBhc3MgdGhyb3VnaCBuYW5vc2Vjb25kIHRpbWVzdGFtcCBjb21wb25lbnRzIGZvciBzdGF0
+IHN5c2NhbGxzCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCmdpdCByZXYt
+cGFyc2UgYmFzZSA+IC9kZXYvbnVsbCB8fCBleGl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYu
+cmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNv
+bmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2twYXRj
+aC5wbCAtLW1haWxiYWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKRnJvbSBodHRw
+czovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKICogW25ldyB0YWddICAgICAgICAg
+ICAgICAgcGF0Y2hldy8yMDE5MDUyMjE1MzYzMS4xNzE1Mi0xLXdlbnNAa2VybmVsLm9yZyAtPiBw
+YXRjaGV3LzIwMTkwNTIyMTUzNjMxLjE3MTUyLTEtd2Vuc0BrZXJuZWwub3JnClN3aXRjaGVkIHRv
+IGEgbmV3IGJyYW5jaCAndGVzdCcKMGFlMDNhZjNmOSBsaW51eC11c2VyOiBQYXNzIHRocm91Z2gg
+bmFub3NlY29uZCB0aW1lc3RhbXAgY29tcG9uZW50cyBmb3Igc3RhdCBzeXNjYWxscwoKPT09IE9V
+VFBVVCBCRUdJTiA9PT0KRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwoj
+MTA0OiBGSUxFOiBsaW51eC11c2VyL3N5c2NhbGxfZGVmcy5oOjExOTc6CiteSWFiaV91bG9uZyAg
+dGFyZ2V0X3N0X2F0aW1lX25zZWM7JAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1
+c2UgdGFicwojMTA3OiBGSUxFOiBsaW51eC11c2VyL3N5c2NhbGxfZGVmcy5oOjExOTk6CiteSWFi
+aV91bG9uZyAgdGFyZ2V0X3N0X210aW1lX25zZWM7JAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3Vs
+ZCBuZXZlciB1c2UgdGFicwojMTEwOiBGSUxFOiBsaW51eC11c2VyL3N5c2NhbGxfZGVmcy5oOjEy
+MDE6CiteSWFiaV91bG9uZyAgdGFyZ2V0X3N0X2N0aW1lX25zZWM7JAoKRVJST1I6IGNvZGUgaW5k
+ZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMTE5OiBGSUxFOiBsaW51eC11c2VyL3N5c2NhbGxf
+ZGVmcy5oOjEyMzM6CiteSWFiaV91bG9uZ15JdGFyZ2V0X3N0X2F0aW1lX25zZWM7JAoKRVJST1I6
+IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMTIzOiBGSUxFOiBsaW51eC11c2Vy
+L3N5c2NhbGxfZGVmcy5oOjEyMzY6CiteSWFiaV91bG9uZ15JdGFyZ2V0X3N0X210aW1lX25zZWM7
+JAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMTI3OiBGSUxFOiBs
+aW51eC11c2VyL3N5c2NhbGxfZGVmcy5oOjEyMzk6CiteSWFiaV91bG9uZ15JdGFyZ2V0X3N0X2N0
+aW1lX25zZWM7JAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMTM2
+OiBGSUxFOiBsaW51eC11c2VyL3N5c2NhbGxfZGVmcy5oOjEzMTg6CiteSWFiaV91bG9uZ15JdGFy
+Z2V0X3N0X2F0aW1lX25zZWM7JAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2Ug
+dGFicwojMTQwOiBGSUxFOiBsaW51eC11c2VyL3N5c2NhbGxfZGVmcy5oOjEzMjE6CiteSWFiaV91
+bG9uZ15JdGFyZ2V0X3N0X210aW1lX25zZWM7JAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBu
+ZXZlciB1c2UgdGFicwojMTQ0OiBGSUxFOiBsaW51eC11c2VyL3N5c2NhbGxfZGVmcy5oOjEzMjQ6
+CiteSWFiaV91bG9uZ15JdGFyZ2V0X3N0X2N0aW1lX25zZWM7JAoKRVJST1I6IGNvZGUgaW5kZW50
+IHNob3VsZCBuZXZlciB1c2UgdGFicwojMTYwOiBGSUxFOiBsaW51eC11c2VyL3N5c2NhbGxfZGVm
+cy5oOjEzNDI6CiteSWFiaV91bG9uZ15JdGFyZ2V0X3N0X2F0aW1lX25zZWM7JAoKRVJST1I6IGNv
+ZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMTYzOiBGSUxFOiBsaW51eC11c2VyL3N5
+c2NhbGxfZGVmcy5oOjEzNDQ6CiteSWFiaV91bG9uZ15JdGFyZ2V0X3N0X210aW1lX25zZWM7JAoK
+RVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMTY2OiBGSUxFOiBsaW51
+eC11c2VyL3N5c2NhbGxfZGVmcy5oOjEzNDY6CiteSWFiaV91bG9uZ15JdGFyZ2V0X3N0X2N0aW1l
+X25zZWM7JAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMTcwOiBG
+SUxFOiBsaW51eC11c2VyL3N5c2NhbGxfZGVmcy5oOjEzNDk6CiteSWFiaV91bG9uZ15JX191bnVz
+ZWQxWzJdOyQKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzE3OTog
+RklMRTogbGludXgtdXNlci9zeXNjYWxsX2RlZnMuaDoxMzc3OgorXkl1bnNpZ25lZCBpbnReSXRh
+cmdldF9zdF9hdGltZV9uc2VjOyQKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNl
+IHRhYnMKIzE4MzogRklMRTogbGludXgtdXNlci9zeXNjYWxsX2RlZnMuaDoxMzgwOgorXkl1bnNp
+Z25lZCBpbnReSXRhcmdldF9zdF9tdGltZV9uc2VjOyQKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91
+bGQgbmV2ZXIgdXNlIHRhYnMKIzE4NzogRklMRTogbGludXgtdXNlci9zeXNjYWxsX2RlZnMuaDox
+MzgzOgorXkl1bnNpZ25lZCBpbnReSXRhcmdldF9zdF9jdGltZV9uc2VjOyQKCkVSUk9SOiBjb2Rl
+IGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzE5MTogRklMRTogbGludXgtdXNlci9zeXNj
+YWxsX2RlZnMuaDoxMzg1OgorXkl1bnNpZ25lZCBpbnReSV9fdW51c2VkMTskCgpFUlJPUjogY29k
+ZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiMxOTI6IEZJTEU6IGxpbnV4LXVzZXIvc3lz
+Y2FsbF9kZWZzLmg6MTM4NjoKK15JdW5zaWduZWQgaW50XklfX3VudXNlZDI7JAoKdG90YWw6IDE4
+IGVycm9ycywgMCB3YXJuaW5ncywgMjExIGxpbmVzIGNoZWNrZWQKCkNvbW1pdCAwYWUwM2FmM2Y5
+N2YgKGxpbnV4LXVzZXI6IFBhc3MgdGhyb3VnaCBuYW5vc2Vjb25kIHRpbWVzdGFtcCBjb21wb25l
+bnRzIGZvciBzdGF0IHN5c2NhbGxzKSBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcu
+ICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0g
+dG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgo9PT0gT1VU
+UFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKVGhlIGZ1bGwg
+bG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDE5MDUyMjE1MzYz
+MS4xNzE1Mi0xLXdlbnNAa2VybmVsLm9yZy90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2Fn
+ZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8v
+cGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVs
+QHJlZGhhdC5jb20=
 
-> Now, fdset_id is int64, but in some places we work with it as int.
-> It seems that there is no sense to use int64 for fdset_id, so it's
-> better to fix inconsistency by changing fdset_id type to int and by
-> fixing the reference of corresponding QMP commands: add-fd, remove-fd,
-> query-fdsets.
->
-> Signed-off-by: Yury Kotov <yury-kotov@yandex-team.ru>
-> ---
->  include/monitor/monitor.h |  6 +++---
->  monitor.c                 | 18 +++++++++---------
->  qapi/misc.json            | 10 +++++-----
->  stubs/fdset.c             |  4 ++--
->  util/osdep.c              |  4 ++--
->  vl.c                      |  2 +-
->  6 files changed, 22 insertions(+), 22 deletions(-)
->
-> diff --git a/include/monitor/monitor.h b/include/monitor/monitor.h
-> index 86656297f1..06f9b6c217 100644
-> --- a/include/monitor/monitor.h
-> +++ b/include/monitor/monitor.h
-> @@ -39,11 +39,11 @@ void monitor_read_command(Monitor *mon, int show_prompt);
->  int monitor_read_password(Monitor *mon, ReadLineFunc *readline_func,
->                            void *opaque);
->  
-> -AddfdInfo *monitor_fdset_add_fd(int fd, bool has_fdset_id, int64_t fdset_id,
-> +AddfdInfo *monitor_fdset_add_fd(int fd, bool has_fdset_id, int fdset_id,
->                                  bool has_opaque, const char *opaque,
->                                  Error **errp);
-> -int monitor_fdset_get_fd(int64_t fdset_id, int flags);
-> -int monitor_fdset_dup_fd_add(int64_t fdset_id, int dup_fd);
-> +int monitor_fdset_get_fd(int fdset_id, int flags);
-> +int monitor_fdset_dup_fd_add(int fdset_id, int dup_fd);
->  void monitor_fdset_dup_fd_remove(int dup_fd);
->  int monitor_fdset_dup_fd_find(int dup_fd);
->  
-> diff --git a/monitor.c b/monitor.c
-> index bb48997913..b71ce816bc 100644
-> --- a/monitor.c
-> +++ b/monitor.c
-> @@ -160,7 +160,7 @@ struct MonFdsetFd {
->  /* file descriptor set containing fds passed via SCM_RIGHTS */
->  typedef struct MonFdset MonFdset;
->  struct MonFdset {
-> -    int64_t id;
-> +    int id;
-
-In C, you use int instead of int64_t for fdset IDs.
-
-
->      QLIST_HEAD(, MonFdsetFd) fds;
->      QLIST_HEAD(, MonFdsetFd) dup_fds;
->      QLIST_ENTRY(MonFdset) next;
-> @@ -2346,7 +2346,7 @@ static void monitor_fdsets_cleanup(void)
->      qemu_mutex_unlock(&mon_fdsets_lock);
->  }
->  
-> -AddfdInfo *qmp_add_fd(bool has_fdset_id, int64_t fdset_id, bool has_opaque,
-> +AddfdInfo *qmp_add_fd(bool has_fdset_id, int32_t fdset_id, bool has_opaque,
->                        const char *opaque, Error **errp)
->  {
->      int fd;
-> @@ -2372,7 +2372,7 @@ error:
->      return NULL;
->  }
->  
-> -void qmp_remove_fd(int64_t fdset_id, bool has_fd, int64_t fd, Error **errp)
-> +void qmp_remove_fd(int32_t fdset_id, bool has_fd, int fd, Error **errp)
->  {
->      MonFdset *mon_fdset;
->      MonFdsetFd *mon_fdset_fd;
-> @@ -2405,10 +2405,10 @@ void qmp_remove_fd(int64_t fdset_id, bool has_fd, int64_t fd, Error **errp)
->  error:
->      qemu_mutex_unlock(&mon_fdsets_lock);
->      if (has_fd) {
-> -        snprintf(fd_str, sizeof(fd_str), "fdset-id:%" PRId64 ", fd:%" PRId64,
-> +        snprintf(fd_str, sizeof(fd_str), "fdset-id:%" PRId32 ", fd:%" PRId32,
->                   fdset_id, fd);
->      } else {
-> -        snprintf(fd_str, sizeof(fd_str), "fdset-id:%" PRId64, fdset_id);
-> +        snprintf(fd_str, sizeof(fd_str), "fdset-id:%" PRId32, fdset_id);
->      }
->      error_setg(errp, QERR_FD_NOT_FOUND, fd_str);
->  }
-> @@ -2454,7 +2454,7 @@ FdsetInfoList *qmp_query_fdsets(Error **errp)
->      return fdset_list;
->  }
->  
-> -AddfdInfo *monitor_fdset_add_fd(int fd, bool has_fdset_id, int64_t fdset_id,
-> +AddfdInfo *monitor_fdset_add_fd(int32_t fd, bool has_fdset_id, int32_t fdset_id,
->                                  bool has_opaque, const char *opaque,
->                                  Error **errp)
->  {
-> @@ -2476,7 +2476,7 @@ AddfdInfo *monitor_fdset_add_fd(int fd, bool has_fdset_id, int64_t fdset_id,
->      }
->  
->      if (mon_fdset == NULL) {
-> -        int64_t fdset_id_prev = -1;
-> +        int fdset_id_prev = -1;
->          MonFdset *mon_fdset_cur = QLIST_FIRST(&mon_fdsets);
->  
->          if (has_fdset_id) {
-> @@ -2538,7 +2538,7 @@ AddfdInfo *monitor_fdset_add_fd(int fd, bool has_fdset_id, int64_t fdset_id,
->      return fdinfo;
->  }
->  
-> -int monitor_fdset_get_fd(int64_t fdset_id, int flags)
-> +int monitor_fdset_get_fd(int fdset_id, int flags)
->  {
->  #ifdef _WIN32
->      return -ENOENT;
-> @@ -2576,7 +2576,7 @@ out:
->  #endif
->  }
->  
-> -int monitor_fdset_dup_fd_add(int64_t fdset_id, int dup_fd)
-> +int monitor_fdset_dup_fd_add(int fdset_id, int dup_fd)
->  {
->      MonFdset *mon_fdset;
->      MonFdsetFd *mon_fdset_fd_dup;
-> diff --git a/qapi/misc.json b/qapi/misc.json
-> index 8b3ca4fdd3..b345e1458b 100644
-> --- a/qapi/misc.json
-> +++ b/qapi/misc.json
-> @@ -2179,7 +2179,7 @@
->  #
->  # Since: 1.2.0
->  ##
-> -{ 'struct': 'AddfdInfo', 'data': {'fdset-id': 'int', 'fd': 'int'} }
-> +{ 'struct': 'AddfdInfo', 'data': {'fdset-id': 'int32', 'fd': 'int32'} }
->  
->  ##
->  # @add-fd:
-> @@ -2209,7 +2209,7 @@
->  #
->  ##
->  { 'command': 'add-fd',
-> -  'data': { '*fdset-id': 'int',
-> +  'data': { '*fdset-id': 'int32',
->              '*opaque': 'str' },
->    'returns': 'AddfdInfo' }
->  
-> @@ -2238,7 +2238,7 @@
->  # <- { "return": {} }
->  #
->  ##
-> -{ 'command': 'remove-fd', 'data': {'fdset-id': 'int', '*fd': 'int'} }
-> +{ 'command': 'remove-fd', 'data': {'fdset-id': 'int32', '*fd': 'int32'} }
->  
->  ##
->  # @FdsetFdInfo:
-> @@ -2252,7 +2252,7 @@
->  # Since: 1.2.0
->  ##
->  { 'struct': 'FdsetFdInfo',
-> -  'data': {'fd': 'int', '*opaque': 'str'} }
-> +  'data': {'fd': 'int32', '*opaque': 'str'} }
->  
->  ##
->  # @FdsetInfo:
-> @@ -2266,7 +2266,7 @@
->  # Since: 1.2.0
->  ##
->  { 'struct': 'FdsetInfo',
-> -  'data': {'fdset-id': 'int', 'fds': ['FdsetFdInfo']} }
-> +  'data': {'fdset-id': 'int32', 'fds': ['FdsetFdInfo']} }
->  
->  ##
->  # @query-fdsets:
-
-In the schema, you use QAPI type 'int32' instead of 'int'.
-
-Before the patch, the two are consistent (except for the bugs you fixed
-in v1 of this patch): QAPI 'int' is C int64_t.
-
-After the patch, the two are inconsistent: QAPI 'int32' is C int32_t,
-not int.  They're usually the same, but it unclean.
-
-Two ways forward:
-
-1. Revise this patch to use int32_t instead of int.
-
-2. Revise v1 to address the few minor review comments I had.  Smaller
-   patch, easier to review.
-
-Your choice.  I'd choose 2.
-
-[...]
 
