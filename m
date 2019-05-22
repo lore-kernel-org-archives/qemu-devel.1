@@ -2,74 +2,69 @@ Return-Path: <SRS0=8zLO=TW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 671D1C072A4
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 08:23:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 767FDC072A4
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 08:24:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3D82121019
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 08:23:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3D82121019
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 39A4121019
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 08:24:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 39A4121019
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:38304 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:38311 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hTMWg-0007Xy-If
-	for qemu-devel@archiver.kernel.org; Wed, 22 May 2019 04:23:06 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:58299)
+	id 1hTMXu-0008Bo-Cf
+	for qemu-devel@archiver.kernel.org; Wed, 22 May 2019 04:24:22 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:58399)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hTMUb-0006S7-Be
-	for qemu-devel@nongnu.org; Wed, 22 May 2019 04:20:58 -0400
+	(envelope-from <imammedo@redhat.com>) id 1hTMUy-0006hX-CG
+	for qemu-devel@nongnu.org; Wed, 22 May 2019 04:21:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hTMUa-0007wa-5M
-	for qemu-devel@nongnu.org; Wed, 22 May 2019 04:20:57 -0400
-Received: from indium.canonical.com ([91.189.90.7]:36170)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hTMUZ-0007uP-Ve
-	for qemu-devel@nongnu.org; Wed, 22 May 2019 04:20:56 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hTMUW-00069g-GY
-	for <qemu-devel@nongnu.org>; Wed, 22 May 2019 08:20:52 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 7C38A2E80C9
-	for <qemu-devel@nongnu.org>; Wed, 22 May 2019 08:20:52 +0000 (UTC)
+	(envelope-from <imammedo@redhat.com>) id 1hTMUw-0008Fb-D5
+	for qemu-devel@nongnu.org; Wed, 22 May 2019 04:21:20 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47330)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>)
+	id 1hTMUq-00087Z-8s; Wed, 22 May 2019 04:21:12 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 73DA981E0B;
+	Wed, 22 May 2019 08:21:01 +0000 (UTC)
+Received: from localhost (unknown [10.43.2.182])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 40B21646DF;
+	Wed, 22 May 2019 08:20:54 +0000 (UTC)
+Date: Wed, 22 May 2019 10:20:50 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20190522102050.66515aa2@redhat.com>
+In-Reply-To: <20190521103215-mutt-send-email-mst@kernel.org>
+References: <20190521033249.1960-1-richardw.yang@linux.intel.com>
+	<20190521033249.1960-3-richardw.yang@linux.intel.com>
+	<20190520233614-mutt-send-email-mst@kernel.org>
+	<20190521162958.4415d4ac@redhat.com>
+	<20190521103215-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 22 May 2019 08:14:13 -0000
-From: Eunseok Choi <1829964@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Incomplete; importance=Undecided;
-	assignee=None; 
-X-Launchpad-Bug-Tags: android-x86 leak virt-gpu vram
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: riosnai th-huth
-X-Launchpad-Bug-Reporter: Eunseok Choi (riosnai)
-X-Launchpad-Bug-Modifier: Eunseok Choi (riosnai)
-References: <155849647074.15430.13880026935625975661.malonedeb@wampee.canonical.com>
-Message-Id: <155851285378.21734.3576635759181429633.malone@chaenomeles.canonical.com>
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="18962";
-	Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: 82ea2d36b1e26a74ed2566f3447362ff3f52e499
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.25]);
+	Wed, 22 May 2019 08:21:01 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1829964] Re: HOST VRAM Leak when performs
- android-x86 window rotation with Virt-GPU
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v5 2/2] acpi: pci: use build_append_foo()
+ API to construct MCFG
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -78,107 +73,175 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1829964 <1829964@bugs.launchpad.net>
+Cc: yang.zhong@intel.com, peter.maydell@linaro.org, thuth@redhat.com,
+	qemu-devel@nongnu.org, shannon.zhaosl@gmail.com,
+	qemu-arm@nongnu.org, Wei Yang <richardw.yang@linux.intel.com>,
+	philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-I tested many qemu & linux versions....
+On Tue, 21 May 2019 10:34:03 -0400
+"Michael S. Tsirkin" <mst@redhat.com> wrote:
 
-in case of qemu,
-2.12
-3.10
-3.12
-4.0.0
-All versions I tested have same problem....
+> On Tue, May 21, 2019 at 04:29:58PM +0200, Igor Mammedov wrote:
+> > On Mon, 20 May 2019 23:37:22 -0400
+> > "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> >   
+> > > On Tue, May 21, 2019 at 11:32:49AM +0800, Wei Yang wrote:  
+> > > > build_append_foo() API doesn't need explicit endianness conversions
+> > > > which eliminates a source of errors and it makes build_mcfg() look like
+> > > > declarative definition of MCFG table in ACPI spec, which makes it easy
+> > > > to review.
+> > > > 
+> > > > Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
+> > > > Suggested-by: Igor Mammedov <imammedo@redhat.com>
+> > > > Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+> > > > 
+> > > > ---
+> > > > v5:
+> > > >    * miss the reserved[8] of MCFG in last version, add it back
+> > > >    * drop SOBs and make sure bios-tables-test all OK
+> > > > ---    
+> > > 
+> > > 
+> > > Please do not add two --- separators. It breaks git am.  
+> > that worked just fine for the last xx years and still works for me.  
+> 
+> Because you don't use git am?
+> It's true I often am forced to edit your patches to apply them.
+> Pls do not do this it makes no sense.
 
-also I tested many versions of linux =
+I do not use it as much as you, but I do use git am to test patches from
+list and it works with double separator as expected (the second separator
+is ignored).
 
-ubuntu 18.04 18.10
-centos 7
-fedora 18 19
-rhel
+> > > One --- should come after the commit log. Anything after that and
+> > > until diff is ignored anyway.  
+> > That's fine if we wish to commit change log into history, but
+> > Typically we don't want change log to be committed (as it's useless from history pov),
+> > hence we put it after separator to get it dropped on applying.  
+> 
+> Then you should do
 
-Actually it is not only problem of windows rotation, if home launcher
-refreshed, vram usage is also up...
+the problem is that the second separator is added by git, so one
+would have to edit it out after format-patch (which is error prone in
+case of multi-patch series).
 
-I think it related gl related functions...
+I don't know much about git though, so could you suggest how to handle
+situation to avoid the second --- (i.e. how do you do it)?
 
-so I don't sure it is qemu-virt-gpu problem or virt-gpu driver...
+PS:
+There is 'git notes' to add/track per patch annotations, but it a bit
+tedious to use notes compared to in-lining change log in commit message.
 
-That is why I already report this problem to android-x86 devel forum and
-author of virt-gpu drvier...
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1829964
-
-Title:
-  HOST VRAM Leak when performs android-x86 window rotation with Virt-GPU
-
-Status in QEMU:
-  Incomplete
-
-Bug description:
-  I will report something strange thing about host VRAM leakage after
-  anroid-x86 window rotation when it runs with virt-gpu(+ virgl-
-  renderer)
-
-  Please watching below video link.
-
-  https://www.youtube.com/watch?v=3DmJIbGZLWF1s&feature=3Dyoutu.be
-
-  (orginal video file : https://drive.google.com/file/d
-  /1lkdTx_8yTbSVjKXlnxnnk96fWe-w6Mxb/view?usp=3Dsharing)
-
-  I don't sure what is the problem...
-
-  Here are my tested history
-  -------------------------------------------------------------------------=
--------------------------
-  Install android-x86 on I7 desktop PCs with intel UHD GPU  - No leak.
-  Install android-x86 on I7 desktop PCs with NVIDIA GTX GPU series - No lea=
-k.
-  Install android-x86 on guest machine emulated skylake cpu with QEMU(+virt=
--gpu, virgl-renderer) - Leak
-  (HOST CPU - I5, INTEL UHD GPU)
-  Install android-x86 on guest machine emulated skylake cpu with QEMU(+virt=
--gpu, virgl-renderer) - Leak
-  (HOST CPU - I7, NVIDIA GTX GPU)
-
-  COMMON:
-  In case of NVIDIA GPU : check vram using nvidia-smi
-  In case of intel UHD GPU : check shared-vram using free cmd
-
-  We checked guest android-x86 system down when vram is full after performi=
-ng many rotation
-  -------------------------------------------------------------------------=
-------------------
-
-  Is it virt-gpu driver's problem?
-
-  I hope someone can help me...
-
-  Thanks in advance!!
+> build_append_foo() API doesn't need explicit endianness conversions
+> which eliminates a source of errors and it makes build_mcfg() look like
+> declarative definition of MCFG table in ACPI spec, which makes it easy
+> to review.
+> 
+> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
+> Suggested-by: Igor Mammedov <imammedo@redhat.com>
+> Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+> 
+> ---
+> v5:
+>    * miss the reserved[8] of MCFG in last version, add it back
+>    * drop SOBs and make sure bios-tables-test all OK
 
 
-  PS
 
+> 
+>  hw/acpi/pci.c               | 35 +++++++++++++++++++++++------------
+>  include/hw/acpi/acpi-defs.h | 18 ------------------
+>  2 files changed, 23 insertions(+), 30 deletions(-)
+> 
+> diff --git a/hw/acpi/pci.c b/hw/acpi/pci.c
+> 
+> 
+> Anything between --- and diff is ignored. Second --- is poointless and
+> harmful.
+> 
+> > >   
+> > > >  hw/acpi/pci.c               | 35 +++++++++++++++++++++++------------
+> > > >  include/hw/acpi/acpi-defs.h | 18 ------------------
+> > > >  2 files changed, 23 insertions(+), 30 deletions(-)
+> > > > 
+> > > > diff --git a/hw/acpi/pci.c b/hw/acpi/pci.c
+> > > > index fa0fa30bb9..49df7b7d54 100644
+> > > > --- a/hw/acpi/pci.c
+> > > > +++ b/hw/acpi/pci.c
+> > > > @@ -30,17 +30,28 @@
+> > > >  
+> > > >  void build_mcfg(GArray *table_data, BIOSLinker *linker, AcpiMcfgInfo *info)
+> > > >  {
+> > > > -    AcpiTableMcfg *mcfg;
+> > > > -    int len = sizeof(*mcfg) + sizeof(mcfg->allocation[0]);
+> > > > -
+> > > > -    mcfg = acpi_data_push(table_data, len);
+> > > > -    mcfg->allocation[0].address = cpu_to_le64(info->base);
+> > > > -
+> > > > -    /* Only a single allocation so no need to play with segments */
+> > > > -    mcfg->allocation[0].pci_segment = cpu_to_le16(0);
+> > > > -    mcfg->allocation[0].start_bus_number = 0;
+> > > > -    mcfg->allocation[0].end_bus_number = PCIE_MMCFG_BUS(info->size - 1);
+> > > > -
+> > > > -    build_header(linker, table_data, (void *)mcfg, "MCFG", len, 1, NULL, NULL);
+> > > > +    int mcfg_start = table_data->len;
+> > > > +
+> > > > +    acpi_data_push(table_data, sizeof(AcpiTableHeader));
+> > > > +
+> > > > +    /*
+> > > > +     * PCI Firmware Specification, Revision 3.0
+> > > > +     * 4.1.2 MCFG Table Description.
+> > > > +     */
+> > > > +    /* Reserved */
+> > > > +    build_append_int_noprefix(table_data, 0, 8);
+> > > > +    /* Base address, processor-relative */
+> > > > +    build_append_int_noprefix(table_data, info->base, 8);
+> > > > +    /* PCI segment group number */
+> > > > +    build_append_int_noprefix(table_data, 0, 2);
+> > > > +    /* Starting PCI Bus number */
+> > > > +    build_append_int_noprefix(table_data, 0, 1);
+> > > > +    /* Final PCI Bus number */
+> > > > +    build_append_int_noprefix(table_data, PCIE_MMCFG_BUS(info->size - 1), 1);
+> > > > +    /* Reserved */
+> > > > +    build_append_int_noprefix(table_data, 0, 4);
+> > > > +
+> > > > +    build_header(linker, table_data, (void *)(table_data->data + mcfg_start),
+> > > > +                 "MCFG", table_data->len - mcfg_start, 1, NULL, NULL);
+> > > >  }
+> > > >  
+> > > > diff --git a/include/hw/acpi/acpi-defs.h b/include/hw/acpi/acpi-defs.h
+> > > > index f9aa4bd398..57a3f58b0c 100644
+> > > > --- a/include/hw/acpi/acpi-defs.h
+> > > > +++ b/include/hw/acpi/acpi-defs.h
+> > > > @@ -449,24 +449,6 @@ struct AcpiSratProcessorGiccAffinity {
+> > > >  
+> > > >  typedef struct AcpiSratProcessorGiccAffinity AcpiSratProcessorGiccAffinity;
+> > > >  
+> > > > -/* PCI fw r3.0 MCFG table. */
+> > > > -/* Subtable */
+> > > > -struct AcpiMcfgAllocation {
+> > > > -    uint64_t address;                /* Base address, processor-relative */
+> > > > -    uint16_t pci_segment;            /* PCI segment group number */
+> > > > -    uint8_t start_bus_number;       /* Starting PCI Bus number */
+> > > > -    uint8_t end_bus_number;         /* Final PCI Bus number */
+> > > > -    uint32_t reserved;
+> > > > -} QEMU_PACKED;
+> > > > -typedef struct AcpiMcfgAllocation AcpiMcfgAllocation;
+> > > > -
+> > > > -struct AcpiTableMcfg {
+> > > > -    ACPI_TABLE_HEADER_DEF;
+> > > > -    uint8_t reserved[8];
+> > > > -    AcpiMcfgAllocation allocation[0];
+> > > > -} QEMU_PACKED;
+> > > > -typedef struct AcpiTableMcfg AcpiTableMcfg;
+> > > > -
+> > > >  /*
+> > > >   * TCPA Description Table
+> > > >   *
+> > > > -- 
+> > > > 2.19.1    
 
-  Here are qemu options I used...
-
-  -machine type=3Dq35,accel=3Dkvm -cpu host --enable-kvm \
-  -smp cpus=3D4,cores=3D4,threads=3D1 -m 4096 \
-  -drive file=3Dctb0319.qcow2,format=3Dqcow2,if=3Dvirtio,aio=3Dthreads \
-  -device virtio-vga,virgl=3Don \
-  -device qemu-xhci,id=3Dxhci -device usb-mouse,bus=3Dxhci.0 -device usb-kb=
-d,bus=3Dxhci.0 \
-  -soundhw hda -display sdl,gl=3Don -netdev user,id=3Dqemunet0,hostfwd=3Dtc=
-p::4000-:7000,hostfwd=3Dtcp::5555-:5555,hostfwd=3Dtcp::4012-:7012,hostfwd=
-=3Dtcp::4013-:7013 -device virtio-net,netdev=3Dqemunet0 -boot menu=3Don
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1829964/+subscriptions
 
