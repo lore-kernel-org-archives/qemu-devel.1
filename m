@@ -2,83 +2,80 @@ Return-Path: <SRS0=8zLO=TW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-12.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A0E9C282CE
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 22:30:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C15A2C282CE
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 22:33:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EE9912089E
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 22:30:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 61A3B2089E
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 22:33:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="fIPiLh6h"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EE9912089E
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Ph137EOm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 61A3B2089E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:52502 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:52557 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hTZki-0004DQ-54
-	for qemu-devel@archiver.kernel.org; Wed, 22 May 2019 18:30:28 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:49786)
+	id 1hTZnk-0006rj-NS
+	for qemu-devel@archiver.kernel.org; Wed, 22 May 2019 18:33:36 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:49700)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hTZiv-00031a-PO
-	for qemu-devel@nongnu.org; Wed, 22 May 2019 18:28:38 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hTZin-0002vn-Po
+	for qemu-devel@nongnu.org; Wed, 22 May 2019 18:28:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hTZir-0007M9-W2
-	for qemu-devel@nongnu.org; Wed, 22 May 2019 18:28:35 -0400
-Received: from mail-yb1-xb43.google.com ([2607:f8b0:4864:20::b43]:40183)
+	(envelope-from <richard.henderson@linaro.org>) id 1hTZil-0007IQ-Pi
+	for qemu-devel@nongnu.org; Wed, 22 May 2019 18:28:29 -0400
+Received: from mail-yw1-xc2f.google.com ([2607:f8b0:4864:20::c2f]:33906)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hTZiq-0007Kd-1q
-	for qemu-devel@nongnu.org; Wed, 22 May 2019 18:28:33 -0400
-Received: by mail-yb1-xb43.google.com with SMTP id g62so1490373ybg.7
-	for <qemu-devel@nongnu.org>; Wed, 22 May 2019 15:28:31 -0700 (PDT)
+	id 1hTZik-0007HD-CQ
+	for qemu-devel@nongnu.org; Wed, 22 May 2019 18:28:27 -0400
+Received: by mail-yw1-xc2f.google.com with SMTP id n76so1497014ywd.1
+	for <qemu-devel@nongnu.org>; Wed, 22 May 2019 15:28:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=from:to:cc:subject:date:message-id:in-reply-to:references;
-	bh=Dp2wE06ppFvr7SDc7+wjEouETDXh/6Jd86FUlkd8ziE=;
-	b=fIPiLh6hCxAuH1koRb0SzwwUI/pJky6k/oG7kQyC5n9CWGBZUBZTj3hLS0kkJH0+k+
-	2QcPfGDNmec2gxWbNmyh7eyH59U8RwF+zAgPeQGT3eeWLEmVtLv43AswahPT1SPBLrwz
-	GwA7mrBbYxS2Mh0QY0rtsvvXIxC+OeJJCixj/DigvJSeiX35XdpbT+UKYaPk4GWD7Rtf
-	XEV6aVqkYfHPZsdnaq9Y+0wg4r3ytR4zirCq2esL1KY7n0LoD1G066kCHLm1UBw537wg
-	4rwr98apdk3ekolWwq7wZvSQ3FKKpNqNoKkXmeQvGm7PdhZJpBALhcLyhZvPaf0qUxC7
-	bmhg==
+	h=from:to:cc:subject:date:message-id;
+	bh=sUJqt3JD+gd9m8xwvhsWFnhtBjPCY6u0efzkuW7MTho=;
+	b=Ph137EOm7l+Tz1gykJyhksvjNPq/DG0kTI4bmBEh4EBM2dTaLlM6jXx8z8KHpESNrF
+	wUm4ERB7MCFhugS/3mRaGBfbfOFCrfHfOsL0b1wmdNBU0BkWDGCWc+nh2KVr+yTOBH1k
+	5qOUiXU0GnbAa0Md19CUg9c9wKVErKrBYAufks2kukRk2nqElG/Wsix4sQmE3/LcbqQY
+	MaP4Ba6WwNYxZUmlw2vPvDWQrPfb3yDc58GVSuDRZNPWlBK5LqysIc1MMaabBKooIxz4
+	nzBxqChH0UJsfbFNE1rnhOgJGcrJy2C1cq+aKoth6xb9umv+uwgJRBNY4ISSAHxgpW7K
+	Mr9A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-	:references;
-	bh=Dp2wE06ppFvr7SDc7+wjEouETDXh/6Jd86FUlkd8ziE=;
-	b=qUY4CvIoVCJAi7fXLB5UmYvEZYP70zz6XWcoR9re07eH25Vr194B7LWa3fCzb33SS/
-	fGc2N/bNvNbVMcx/snFW7rUHG7vKJ58B9tjVCryn77R01EL5ykxS97Lz9drLsx07owqh
-	q7yQlhJwfUsIAhzWQP4IoywBCUAoMH/hX+Y0c+MTyo9kWi2QLTbXDCx2XO10Qj3aMTAw
-	QnTgOknUxXeEAOJdTKTxoGTdAm9bmuj99sv7Uu0YFB283ZhADSkRY/tpfP95i4SgGvxj
-	WVWUPVjgi5S8TZhRxgT1QVzvDC+kM/eoYDpmCrMrV+MC2k31HbXWP8TebYVSQNkF8YG8
-	0vRQ==
-X-Gm-Message-State: APjAAAUHuHEh6fosFysyq53+Y9z13jyp9hTn9+L9PYMiwYplUAGzdv20
-	vwv/VaSAo7vDNfqlNPxJPKBCmz/g0gI=
-X-Google-Smtp-Source: APXvYqzWQBPuxNNMC2A3mH0zOR6sfXEzHdvIulzZp/fQi1YXDfKbTAbcDQiNNeLWXtfVyYY1KVbdyw==
-X-Received: by 2002:a25:ce8a:: with SMTP id
-	x132mr11836887ybe.239.1558564110477; 
-	Wed, 22 May 2019 15:28:30 -0700 (PDT)
+	h=x-gm-message-state:from:to:cc:subject:date:message-id;
+	bh=sUJqt3JD+gd9m8xwvhsWFnhtBjPCY6u0efzkuW7MTho=;
+	b=JWdBl08NRCi46fhJ+3W0TXjqYH100B9QAG8Kwls/Qf5rptqiGTKmdFZ0cKT2+BDk/C
+	C1GBLQ85oPb3qARZVltO6uONZG4dwOnV79jL3lQYzOfMl+FW8jxODz9utD0pgU6s7/gU
+	eE9lN2c4cczarB21gkKtAMYL5ES3z5d8Qb12KDnzJCx4+nbKa+Xaaku8LbFdbkqDH/yX
+	MybW6InYfCzNn7yh52YtXMCVm6AxLEgX+XvwlcQFpsuBtQ+4JI8F6sgAJEReRni3vqoX
+	s9CsO619VxUkcv+D3l5TKOQOESjfyxW0m1jwfHLAtTWO/noyecC6MVY6cyulU5sLmaGc
+	0pCA==
+X-Gm-Message-State: APjAAAXeXCCRgmSSsd0Kf3pPKY5kRahlTvwcKMSyZNHyzKEdTfErrI1i
+	230mrrmbAYaSzY4VHJKksnY6KBJJUGc=
+X-Google-Smtp-Source: APXvYqxLRe2v2NbfUXDtZLLt4Hyppz/MfHoi+uzMiicmInZjMqJwDajOgltOAIWxVY1zn5Re8q5X/g==
+X-Received: by 2002:a81:b3c4:: with SMTP id
+	r187mr16140627ywh.217.1558564104281; 
+	Wed, 22 May 2019 15:28:24 -0700 (PDT)
 Received: from localhost.localdomain ([71.46.56.17])
-	by smtp.gmail.com with ESMTPSA id q11sm2276453ywg.7.2019.05.22.15.28.29
+	by smtp.gmail.com with ESMTPSA id q11sm2276453ywg.7.2019.05.22.15.28.22
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Wed, 22 May 2019 15:28:29 -0700 (PDT)
+	Wed, 22 May 2019 15:28:23 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Wed, 22 May 2019 18:28:11 -0400
-Message-Id: <20190522222821.23850-7-richard.henderson@linaro.org>
+Date: Wed, 22 May 2019 18:28:05 -0400
+Message-Id: <20190522222821.23850-1-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20190522222821.23850-1-richard.henderson@linaro.org>
-References: <20190522222821.23850-1-richard.henderson@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2607:f8b0:4864:20::b43
-Subject: [Qemu-devel] [PULL 06/16] tcg: Expand vector minmax using cmp+cmpsel
+X-Received-From: 2607:f8b0:4864:20::c2f
+Subject: [Qemu-devel] [PULL 00/16] tcg queued patches
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -95,66 +92,53 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Provide a generic fallback for the min/max operations.
+The following changes since commit a4f667b6714916683408b983cfe0a615a725775f:
 
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- tcg/tcg-op-vec.c | 20 ++++++++++++++++----
- 1 file changed, 16 insertions(+), 4 deletions(-)
+  Merge remote-tracking branch 'remotes/cohuck/tags/s390x-20190521-3' into staging (2019-05-21 16:30:13 +0100)
 
-diff --git a/tcg/tcg-op-vec.c b/tcg/tcg-op-vec.c
-index 004a34935b..501d9630a2 100644
---- a/tcg/tcg-op-vec.c
-+++ b/tcg/tcg-op-vec.c
-@@ -120,6 +120,10 @@ bool tcg_can_emit_vecop_list(const TCGOpcode *list,
-             }
-             break;
-         case INDEX_op_cmpsel_vec:
-+        case INDEX_op_smin_vec:
-+        case INDEX_op_smax_vec:
-+        case INDEX_op_umin_vec:
-+        case INDEX_op_umax_vec:
-             if (tcg_can_emit_vec_op(INDEX_op_cmp_vec, type, vece)) {
-                 continue;
-             }
-@@ -632,24 +636,32 @@ void tcg_gen_ussub_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b)
-     do_op3_nofail(vece, r, a, b, INDEX_op_ussub_vec);
- }
- 
-+static void do_minmax(unsigned vece, TCGv_vec r, TCGv_vec a,
-+                      TCGv_vec b, TCGOpcode opc, TCGCond cond)
-+{
-+    if (!do_op3(vece, r, a, b, opc)) {
-+        tcg_gen_cmpsel_vec(cond, vece, r, a, b, a, b);
-+    }
-+}
-+
- void tcg_gen_smin_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b)
- {
--    do_op3_nofail(vece, r, a, b, INDEX_op_smin_vec);
-+    do_minmax(vece, r, a, b, INDEX_op_smin_vec, TCG_COND_LT);
- }
- 
- void tcg_gen_umin_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b)
- {
--    do_op3_nofail(vece, r, a, b, INDEX_op_umin_vec);
-+    do_minmax(vece, r, a, b, INDEX_op_umin_vec, TCG_COND_LTU);
- }
- 
- void tcg_gen_smax_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b)
- {
--    do_op3_nofail(vece, r, a, b, INDEX_op_smax_vec);
-+    do_minmax(vece, r, a, b, INDEX_op_smax_vec, TCG_COND_GT);
- }
- 
- void tcg_gen_umax_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b)
- {
--    do_op3_nofail(vece, r, a, b, INDEX_op_umax_vec);
-+    do_minmax(vece, r, a, b, INDEX_op_umax_vec, TCG_COND_GTU);
- }
- 
- void tcg_gen_shlv_vec(unsigned vece, TCGv_vec r, TCGv_vec a, TCGv_vec b)
--- 
-2.17.1
+are available in the Git repository at:
 
+  https://github.com/rth7680/qemu.git tags/pull-tcg-20190522
+
+for you to fetch changes up to 11e2bfef799024be4a08fcf6797fe0b22fb16b58:
+
+  tcg/i386: Use MOVDQA for TCG_TYPE_V128 load/store (2019-05-22 15:09:43 -0400)
+
+----------------------------------------------------------------
+Misc gvec improvements
+
+----------------------------------------------------------------
+Richard Henderson (16):
+      tcg/i386: Fix dupi/dupm for avx1 and 32-bit hosts
+      tcg: Fix missing checks and clears in tcg_gen_gvec_dup_mem
+      tcg: Add support for vector bitwise select
+      tcg: Add support for vector compare select
+      tcg: Introduce do_op3_nofail for vector expansion
+      tcg: Expand vector minmax using cmp+cmpsel
+      tcg: Add TCG_OPF_NOT_PRESENT if TCG_TARGET_HAS_foo is negative
+      tcg/i386: Support vector comparison select value
+      tcg/i386: Remove expansion for missing minmax
+      tcg/i386: Use umin/umax in expanding unsigned compare
+      tcg/aarch64: Support vector bitwise select value
+      tcg/aarch64: Split up is_fimm
+      tcg/aarch64: Use MVNI in tcg_out_dupi_vec
+      tcg/aarch64: Build vector immediates with two insns
+      tcg/aarch64: Allow immediates for vector ORR and BIC
+      tcg/i386: Use MOVDQA for TCG_TYPE_V128 load/store
+
+ accel/tcg/tcg-runtime.h      |   2 +
+ tcg/aarch64/tcg-target.h     |   2 +
+ tcg/i386/tcg-target.h        |   2 +
+ tcg/tcg-op-gvec.h            |   7 +
+ tcg/tcg-op.h                 |   5 +
+ tcg/tcg-opc.h                |   5 +-
+ tcg/tcg.h                    |   2 +
+ accel/tcg/tcg-runtime-gvec.c |  14 ++
+ tcg/aarch64/tcg-target.inc.c | 371 ++++++++++++++++++++++++++++++++-----------
+ tcg/i386/tcg-target.inc.c    | 169 +++++++++++++-------
+ tcg/tcg-op-gvec.c            |  71 ++++++---
+ tcg/tcg-op-vec.c             | 142 ++++++++++++++---
+ tcg/tcg.c                    |   5 +
+ tcg/README                   |  11 ++
+ 14 files changed, 620 insertions(+), 188 deletions(-)
 
