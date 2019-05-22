@@ -2,81 +2,71 @@ Return-Path: <SRS0=8zLO=TW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EC649C18E7D
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 09:04:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D8F66C18E7D
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 09:09:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B2916205ED
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 09:04:30 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=cam.ac.uk header.i=@cam.ac.uk header.b="blOOxGUB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B2916205ED
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=cl.cam.ac.uk
+	by mail.kernel.org (Postfix) with ESMTPS id A2AF8204EC
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 09:09:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A2AF8204EC
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:38815 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:38867 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hTNAk-0007UP-3L
-	for qemu-devel@archiver.kernel.org; Wed, 22 May 2019 05:04:30 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:38590)
+	id 1hTNFg-0000bB-Ts
+	for qemu-devel@archiver.kernel.org; Wed, 22 May 2019 05:09:36 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:40076)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <hmka2@hermes.cam.ac.uk>) id 1hTN7i-0005b1-9f
-	for qemu-devel@nongnu.org; Wed, 22 May 2019 05:01:23 -0400
+	(envelope-from <laurent@vivier.eu>) id 1hTNEc-00007R-8G
+	for qemu-devel@nongnu.org; Wed, 22 May 2019 05:08:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <hmka2@hermes.cam.ac.uk>) id 1hTN7d-0004rC-6t
-	for qemu-devel@nongnu.org; Wed, 22 May 2019 05:01:22 -0400
-Received: from ppsw-30.csi.cam.ac.uk ([131.111.8.130]:36190)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <hmka2@hermes.cam.ac.uk>)
-	id 1hTN2D-00082T-DX; Wed, 22 May 2019 04:55:41 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=cam.ac.uk; 
-	s=20180806.ppsw;
-	h=Sender:Content-Transfer-Encoding:Content-Type:Cc:To:
-	Subject:Message-ID:Date:From:In-Reply-To:References:MIME-Version:Reply-To:
-	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
-	Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
-	List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=hWICYit9ZoZqUVLQIM24sehgVFb9onayhJpo81di9Ig=;
-	b=blOOxGUBq9moB/M0Ta7X4tt7Ow
-	s7vmMf8syFgyozieQsFWIFgWgVk947PHCQCsJV98CHpa36YLpgxJeXcY73mMBoOS8NC5qX47NU41g
-	wmlgyqQ0mEWmKa+lM8zEKYRg36eyDf+Gb64+Y/mGTwkOja6S9BOEjNs/Bb1gn7h6uN5U=; 
-X-Cam-AntiVirus: no malware found
-X-Cam-ScannerInfo: http://help.uis.cam.ac.uk/email-scanner-virus
-Received: from mail-lj1-f178.google.com ([209.85.208.178]:40845)
-	by ppsw-30.csi.cam.ac.uk (smtp.hermes.cam.ac.uk [131.111.8.156]:587)
-	with esmtpsa (PLAIN:hmka2) (TLSv1.2:ECDHE-RSA-AES128-GCM-SHA256:128)
-	id 1hTN2A-000oM0-eS (Exim 4.91)
-	(return-path <hmka2@hermes.cam.ac.uk>); Wed, 22 May 2019 09:55:38 +0100
-Received: by mail-lj1-f178.google.com with SMTP id q62so1323350ljq.7;
-	Wed, 22 May 2019 01:55:38 -0700 (PDT)
-X-Gm-Message-State: APjAAAUur6NA7LCDqL/Vw7KLgCaQmwsLoGhNhzNa7Sv3BYvSNFF/aZhr
-	WzekODY+QZuegYj9OUoGInNjdVTE/lMl0iFb/q8=
-X-Google-Smtp-Source: APXvYqxZPGBeAuL9n6AAygEQn7VRf0yIZaxzq2ga5s1VBUMBcHK6qRlEaY0mpyPrsekkPYOSKwkSEXr9gxSZuC65wCQ=
-X-Received: by 2002:a2e:91c6:: with SMTP id u6mr26800701ljg.143.1558515338011; 
-	Wed, 22 May 2019 01:55:38 -0700 (PDT)
+	(envelope-from <laurent@vivier.eu>) id 1hTNEa-0007Mf-M8
+	for qemu-devel@nongnu.org; Wed, 22 May 2019 05:08:30 -0400
+Received: from mout.kundenserver.de ([217.72.192.75]:50101)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1hTNEa-0007KM-Ba
+	for qemu-devel@nongnu.org; Wed, 22 May 2019 05:08:28 -0400
+Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
+	(mreue108 [213.165.67.119]) with ESMTPSA (Nemesis) id
+	1MNso2-1hIR1c0cW0-00OFEJ; Wed, 22 May 2019 11:08:24 +0200
+To: Chen-Yu Tsai <wens@kernel.org>, qemu-devel@nongnu.org
+References: <20190514145346.20758-1-wens@kernel.org>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <42b910fa-ca78-0231-db54-f2179fbb827c@vivier.eu>
+Date: Wed, 22 May 2019 11:08:21 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+	Thunderbird/52.8.0
 MIME-Version: 1.0
-References: <20190521104324.12835-1-Hesham.Almatary@cl.cam.ac.uk>
-	<20190521104324.12835-5-Hesham.Almatary@cl.cam.ac.uk>
-	<CAKmqyKOaPEC=YdbwJkqZJBwTw++_9Cum5HSChtfnx7_uOmZ_HQ@mail.gmail.com>
-	<CANnJOVG-fqEsRqOu3e8Jd=OanGwi2eEKPK0_AqGcMV28QzVz+g@mail.gmail.com>
-In-Reply-To: <CANnJOVG-fqEsRqOu3e8Jd=OanGwi2eEKPK0_AqGcMV28QzVz+g@mail.gmail.com>
-From: Hesham Almatary <hesham.almatary@cl.cam.ac.uk>
-Date: Wed, 22 May 2019 09:55:01 +0100
-X-Gmail-Original-Message-ID: <CA+wsVCAiJ9i4yDooV3ZsAFM87m75Jx-hLbAMupfJdJvP-S-PGg@mail.gmail.com>
-Message-ID: <CA+wsVCAiJ9i4yDooV3ZsAFM87m75Jx-hLbAMupfJdJvP-S-PGg@mail.gmail.com>
-To: Jonathan Behrens <fintelia@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20190514145346.20758-1-wens@kernel.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Provags-ID: V03:K1:SrRNoyBymdppbX57B1yLuOC1Jq4+l0++2VWpOjxL2S8HEjzlMD6
+	kGfLFLp25hoIQhtHH43mhjhcmMZGxHjfvbvDL9xZJY/gPhWxaSi6FamEhz3CLp+WEpg4lMP
+	KWB8vOZdoho8INxrXc0Pujt2Gs+Qg7ZQkSEvcqAXgIVaHtuxbFeG1T0/bwxqaJ4r2koFyvj
+	tqukDXTdR52hjp38u+WOQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:f/Z9/8R+yLI=:KEb85anop8TCOZ+knvxi55
+	WhTt3lFL5gbk1qrfYveFgxTnkFOKONFRG3xZdgU4UGi+c9ntnKe4g8d2EVo3gNTt5E3rwMmnP
+	NmtNZQ0oko3cKElnqSKjkDt15Q7mRe8hQr51k/1MILQL5o3yPC9Gu7XRKGi/jof88f3L9+yVY
+	Jz6qPPwyjuU9iUt32NJjaTuQKXqPdJtG/+zEuWc7QMhuPAirOE4J7cTuPUEdmcGgVd3Sqv1FB
+	CT/paNi1uK3Hq4yigkaJemP8vayWsXcrfRAiDt8m31C4e7zFjk9JjguzF9/V2MIAj+6FtQ71f
+	1bvcI4LR60/KcpbtLxcF9sb+5sHDMr0WvkebMaG0H0Ifz6iZQdIevbliW2o3jVUo+IkZ6zxrL
+	C5afj/Vukb0kfuKgfYZf2zw6e6xXcx0v2yGHPA380zuHIRlHbZVXWlX5X5SaQR3s3Szs/F40j
+	/DTicrJFIZ3I24t+/ZdUnIROrF5l0GuDCyjxszTKKndtMWd5cCP3sYN0bZZgSgro/WZmJWpM6
+	tMq198HBGCm0xm8Ap2gDwbiqZ7am3XR9lflny2uLh0zHXs2ikwkPZ30Ph3xZgu9TGxHp9yv4V
+	b2eYPjWlMjxxIwEdeBHUBCbY1NcC4Q+J7w0zE02L+bdqamKc190QRyT0fYOx8srVcexlGohZq
+	qiIvasKEIQa8WMBLc/P9Lrp6AR65HgSAeZUtL99fjvdteyRhHZc9F5KRU2GIqlkObPSF7kdq5
+	96YsAyUQJLhPljCxx5nDBE5OQs2bQUGGb9R9ffPyRbzyKJNER7abw/idoLk=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 131.111.8.130
-Subject: Re: [Qemu-devel] [Qemu-riscv] [PATCHv3 5/5] RISC-V: Fix a PMP check
- with the correct access size
+X-Received-From: 217.72.192.75
+Subject: Re: [Qemu-devel] [PATCH] linux-user: Pass through nanosecond
+ timestamp components for stat syscalls
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -88,81 +78,215 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
-	Sagar Karandikar <sagark@eecs.berkeley.edu>,
-	Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
-	Palmer Dabbelt <palmer@sifive.com>,
-	"qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
-	Alistair Francis <Alistair.Francis@wdc.com>,
-	Alistair Francis <alistair23@gmail.com>
+Cc: Riku Voipio <riku.voipio@iki.fi>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 22 May 2019 at 03:25, Jonathan Behrens <fintelia@gmail.com> wrote:
->
-> Hesham,
->
-> I don't think this is quite right. If I understand correctly, PMP permiss=
-ions are only validated on TLB fills, not on all accesses. (Is anyone able =
-to confirm this?) If so, this function can't just validate the range of a s=
-ingle access and then place the entire page into the TLB. However, the curr=
-ent code is also wrong because an access should succeed/fail based on the p=
-ermissions only for the range it actually touches even regardless of the pe=
-rmissions on the rest of the page. Now that I think about it, I'd also expe=
-ct that somewhere in the PMP logic would flush the TLB every time any of th=
-e related control registers change though I can't find anywhere that this i=
-s happening...
->
-I believe the TLB fill function is called on all accesses, but I might
-be wrong. I will wait for someone to confirm otherwise.
+On 14/05/2019 16:53, Chen-Yu Tsai wrote:
+> From: Chen-Yu Tsai <wens@csie.org>
+> 
+> Since Linux 2.6 the stat syscalls have mostly supported nanosecond
+> components for each of the file-related timestamps.
+> 
+> QEMU user mode emulation currently does not pass through the nanosecond
+> portion of the timestamp, even when the host system fills in the value.
+> This results in a mismatch when run on subsecond resolution filesystems
+> such as ext4 or XFS.
+> 
+> An example of this leading to inconsistency is cross-debootstraping a
+> full desktop root filesystem of Debian Buster. Recent versions of
+> fontconfig store the full timestamp (instead of just the second portion)
+> of the directory in its per-directory cache file, and checks this against
+> the directory to see if the cache is up-to-date. With QEMU user mode
+> emulation, the timestamp stored is incorrect, and upon booting the rootfs
+> natively, fontconfig discovers the mismatch, and proceeds to rebuild the
+> cache on the comparatively slow machine (low-power ARM vs x86). This
+> stalls the first attempt to open whatever application that incorporates
+> fontconfig.
+> 
+> This patch renames the "unused" padding trailing each timestamp element
+> to its nanosecond counterpart name if such an element exists in the
+> kernel sources for the given platform. Not all do. Then have the syscall
+> wrapper fill in the nanosecond portion if the host supports it, as
+> specified by the _POSIX_C_SOURCE and _XOPEN_SOURCE feature macros.
+> 
+> Recent versions of glibc only use stat64 and newfstatat syscalls on
+> 32-bit and 64-bit platforms respectively. The changes in this patch
+> were tested by directly calling the stat, stat64 and newfstatat syscalls
+> directly, in addition to the glibc wrapper, on arm and aarch64 little
+> endian targets.
+> 
+> Signed-off-by: Chen-Yu Tsai <wens@csie.org>
+> 
+> ---
+> 
+> This issue was found while integrating some software that uses newer
+> versions of fontconfig into Raspbian images. We found that the first
+> launch of said software always stalls with fontconfig regenerating its
+> font cache files. Upon closer examination I found the timestamps were
+> not matching. The rest is explained above. Currently we're just working
+> around the problem by patching the correct timestamps into the cache
+> files after the fact.
+> 
+> Please consider this a drive-by scratch-my-own-itch contribution, but I
+> will stick around to deal with any comments raised during review. I'm
+> not on the mailing lists either, so please keep me in CC.
+> 
+> checkpatch returns "ERROR: code indent should never use tabs" for
+> linux-user/syscall_defs.h, however as far as I can tell the whole file
+> is indented with tabs. I'm not sure what to make of this.
 
-It's mentioned in the spec that sfence.vma has to be executed after
-changing PMP configs, so it's a SW concern (i.e., not QEMU's).
+Yes, the file is entirely indented with tabs, so you can let this as-is.
+Anyway, I plan to split the file in several ones so we will be able to 
+swap the tabs with spaces.
 
-> Sorry to keep raising complaints about this patch set, the interaction be=
-tween physical memory protection and paging is very subtle. Even some real =
-hardware has had errata related to it!
->
-> Jonathan
->
-> On Tue, May 21, 2019 at 6:33 PM Alistair Francis <alistair23@gmail.com> w=
-rote:
->>
->> On Tue, May 21, 2019 at 3:45 AM Hesham Almatary
->> <Hesham.Almatary@cl.cam.ac.uk> wrote:
->> >
->> > The PMP check should be of the memory access size rather
->> > than TARGET_PAGE_SIZE.
->> >
->> > Signed-off-by: Hesham Almatary <Hesham.Almatary@cl.cam.ac.uk>
->>
->> Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
->>
->> Alistair
->>
->> > ---
->> >  target/riscv/cpu_helper.c | 2 +-
->> >  1 file changed, 1 insertion(+), 1 deletion(-)
->> >
->> > diff --git a/target/riscv/cpu_helper.c b/target/riscv/cpu_helper.c
->> > index d0b0f9cf88..ce1f47e4e3 100644
->> > --- a/target/riscv/cpu_helper.c
->> > +++ b/target/riscv/cpu_helper.c
->> > @@ -410,7 +410,7 @@ bool riscv_cpu_tlb_fill(CPUState *cs, vaddr addres=
-s, int size,
->> >
->> >      if (riscv_feature(env, RISCV_FEATURE_PMP) &&
->> >          (ret =3D=3D TRANSLATE_SUCCESS) &&
->> > -        !pmp_hart_has_privs(env, pa, TARGET_PAGE_SIZE, 1 << access_ty=
-pe)) {
->> > +        !pmp_hart_has_privs(env, pa, size, 1 << access_type)) {
->> >          ret =3D TRANSLATE_PMP_FAIL;
->> >      }
->> >      if (ret =3D=3D TRANSLATE_PMP_FAIL) {
->> > --
->> > 2.17.1
->> >
->> >
->>
+Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+
+> 
+> Finally, I think this could be worth backporting to older versions.
+> ---
+>   linux-user/syscall.c      | 18 ++++++++++++++++++
+>   linux-user/syscall_defs.h | 36 ++++++++++++++++++------------------
+>   2 files changed, 36 insertions(+), 18 deletions(-)
+> 
+> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+> index f5ff6f5dc8..dcd6f5d806 100644
+> --- a/linux-user/syscall.c
+> +++ b/linux-user/syscall.c
+> @@ -6408,6 +6408,11 @@ static inline abi_long host_to_target_stat64(void *cpu_env,
+>           __put_user(host_st->st_atime, &target_st->target_st_atime);
+>           __put_user(host_st->st_mtime, &target_st->target_st_mtime);
+>           __put_user(host_st->st_ctime, &target_st->target_st_ctime);
+> +#if _POSIX_C_SOURCE >= 200809L || _XOPEN_SOURCE >= 700
+> +        __put_user(host_st->st_atim.tv_nsec, &target_st->target_st_atime_nsec);
+> +        __put_user(host_st->st_mtim.tv_nsec, &target_st->target_st_mtime_nsec);
+> +        __put_user(host_st->st_ctim.tv_nsec, &target_st->target_st_ctime_nsec);
+> +#endif
+>           unlock_user_struct(target_st, target_addr, 1);
+>       } else
+>   #endif
+> @@ -6438,6 +6443,11 @@ static inline abi_long host_to_target_stat64(void *cpu_env,
+>           __put_user(host_st->st_atime, &target_st->target_st_atime);
+>           __put_user(host_st->st_mtime, &target_st->target_st_mtime);
+>           __put_user(host_st->st_ctime, &target_st->target_st_ctime);
+> +#if _POSIX_C_SOURCE >= 200809L || _XOPEN_SOURCE >= 700
+> +        __put_user(host_st->st_atim.tv_nsec, &target_st->target_st_atime_nsec);
+> +        __put_user(host_st->st_mtim.tv_nsec, &target_st->target_st_mtime_nsec);
+> +        __put_user(host_st->st_ctim.tv_nsec, &target_st->target_st_ctime_nsec);
+> +#endif
+>           unlock_user_struct(target_st, target_addr, 1);
+>       }
+>   
+> @@ -8866,6 +8876,14 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
+>                   __put_user(st.st_atime, &target_st->target_st_atime);
+>                   __put_user(st.st_mtime, &target_st->target_st_mtime);
+>                   __put_user(st.st_ctime, &target_st->target_st_ctime);
+> +#if _POSIX_C_SOURCE >= 200809L || _XOPEN_SOURCE >= 700
+> +                __put_user(st.st_atim.tv_nsec,
+> +                           &target_st->target_st_atime_nsec);
+> +                __put_user(st.st_mtim.tv_nsec,
+> +                           &target_st->target_st_mtime_nsec);
+> +                __put_user(st.st_ctim.tv_nsec,
+> +                           &target_st->target_st_ctime_nsec);
+> +#endif
+>                   unlock_user_struct(target_st, arg2, 1);
+>               }
+>           }
+> diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
+> index 12c8407144..252e69b76e 100644
+> --- a/linux-user/syscall_defs.h
+> +++ b/linux-user/syscall_defs.h
+> @@ -1192,11 +1192,11 @@ struct target_stat {
+>   	abi_ulong  st_blksize;
+>   	abi_ulong  st_blocks;
+>   	abi_ulong  target_st_atime;
+> -	abi_ulong  __unused1;
+> +	abi_ulong  target_st_atime_nsec;
+>   	abi_ulong  target_st_mtime;
+> -	abi_ulong  __unused2;
+> +	abi_ulong  target_st_mtime_nsec;
+>   	abi_ulong  target_st_ctime;
+> -	abi_ulong  __unused3;
+> +	abi_ulong  target_st_ctime_nsec;
+>   	abi_ulong  __unused4;
+>   	abi_ulong  __unused5;
+>   };
+> @@ -1228,13 +1228,13 @@ struct target_stat64 {
+>   	abi_ulong	__pad4;		/* future possible st_blocks high bits */
+>   
+>   	abi_ulong	target_st_atime;
+> -	abi_ulong	__pad5;
+> +	abi_ulong	target_st_atime_nsec;
+>   
+>   	abi_ulong	target_st_mtime;
+> -	abi_ulong	__pad6;
+> +	abi_ulong	target_st_mtime_nsec;
+>   
+>   	abi_ulong	target_st_ctime;
+> -	abi_ulong	__pad7;		/* will be high 32 bits of ctime someday */
+> +	abi_ulong	target_st_ctime_nsec;
+>   
+>   	unsigned long long	st_ino;
+>   } QEMU_PACKED;
+> @@ -1313,13 +1313,13 @@ struct target_stat64 {
+>   	unsigned int	st_blocks;
+>   
+>   	abi_ulong	target_st_atime;
+> -	abi_ulong	__unused1;
+> +	abi_ulong	target_st_atime_nsec;
+>   
+>   	abi_ulong	target_st_mtime;
+> -	abi_ulong	__unused2;
+> +	abi_ulong	target_st_mtime_nsec;
+>   
+>   	abi_ulong	target_st_ctime;
+> -	abi_ulong	__unused3;
+> +	abi_ulong	target_st_ctime_nsec;
+>   
+>   	abi_ulong	__unused4[3];
+>   };
+> @@ -1336,14 +1336,14 @@ struct target_stat {
+>   	unsigned short	st_rdev;
+>   	abi_long	st_size;
+>   	abi_long	target_st_atime;
+> -	abi_ulong	__unused1;
+> +	abi_ulong	target_st_atime_nsec;
+>   	abi_long	target_st_mtime;
+> -	abi_ulong	__unused2;
+> +	abi_ulong	target_st_mtime_nsec;
+>   	abi_long	target_st_ctime;
+> -	abi_ulong	__unused3;
+> +	abi_ulong	target_st_ctime_nsec;
+>   	abi_long	st_blksize;
+>   	abi_long	st_blocks;
+> -	abi_ulong	__unused4[2];
+> +	abi_ulong	__unused1[2];
+>   };
+>   
+>   #define TARGET_HAS_STRUCT_STAT64
+> @@ -1371,16 +1371,16 @@ struct target_stat64 {
+>   	unsigned int	st_blocks;
+>   
+>   	unsigned int	target_st_atime;
+> -	unsigned int	__unused1;
+> +	unsigned int	target_st_atime_nsec;
+>   
+>   	unsigned int	target_st_mtime;
+> -	unsigned int	__unused2;
+> +	unsigned int	target_st_mtime_nsec;
+>   
+>   	unsigned int	target_st_ctime;
+> -	unsigned int	__unused3;
+> +	unsigned int	target_st_ctime_nsec;
+>   
+> -	unsigned int	__unused4;
+> -	unsigned int	__unused5;
+> +	unsigned int	__unused1;
+> +	unsigned int	__unused2;
+>   };
+>   
+>   #elif defined(TARGET_PPC)
+> 
+
 
