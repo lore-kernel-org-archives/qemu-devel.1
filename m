@@ -2,64 +2,91 @@ Return-Path: <SRS0=8zLO=TW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F569C072B5
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 02:53:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FBA9C072A4
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 03:31:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 275B120862
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 02:53:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 275B120862
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 5AADE217D9
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 03:31:55 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="tyctUt7k"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5AADE217D9
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:34536 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:34908 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hTHNz-00074V-AB
-	for qemu-devel@archiver.kernel.org; Tue, 21 May 2019 22:53:47 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:60944)
+	id 1hTHys-0006uT-Is
+	for qemu-devel@archiver.kernel.org; Tue, 21 May 2019 23:31:54 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:37674)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richardw.yang@linux.intel.com>) id 1hTHMh-0006Qw-KY
-	for qemu-devel@nongnu.org; Tue, 21 May 2019 22:52:28 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hTHxe-0005hQ-GE
+	for qemu-devel@nongnu.org; Tue, 21 May 2019 23:30:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richardw.yang@linux.intel.com>) id 1hTH8A-0006t0-4Y
-	for qemu-devel@nongnu.org; Tue, 21 May 2019 22:37:27 -0400
-Received: from mga03.intel.com ([134.134.136.65]:47774)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <richardw.yang@linux.intel.com>)
-	id 1hTH89-0006sM-4I
-	for qemu-devel@nongnu.org; Tue, 21 May 2019 22:37:25 -0400
-X-Amp-Result: UNSCANNABLE
-X-Amp-File-Uploaded: False
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-	by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
-	21 May 2019 19:37:23 -0700
-X-ExtLoop1: 1
-Received: from richard.sh.intel.com (HELO localhost) ([10.239.159.54])
-	by orsmga007.jf.intel.com with ESMTP; 21 May 2019 19:37:21 -0700
-Date: Wed, 22 May 2019 10:36:51 +0800
-From: Wei Yang <richardw.yang@linux.intel.com>
-To: Eric Blake <eblake@redhat.com>
-Message-ID: <20190522023651.GA27305@richard>
-References: <20190521081227.30799-1-richardw.yang@linux.intel.com>
-	<c184d4f7-686b-d54a-f969-a05ab965028a@redhat.com>
-	<87lfyzrfms.fsf@dusky.pond.sub.org>
-	<20190522005349.GC14030@richard>
-	<09538032-9453-9d09-2823-1515005b5516@redhat.com>
+	(envelope-from <richard.henderson@linaro.org>) id 1hTHxc-0004UJ-Q0
+	for qemu-devel@nongnu.org; Tue, 21 May 2019 23:30:38 -0400
+Received: from mail-yw1-xc41.google.com ([2607:f8b0:4864:20::c41]:45258)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1hTHxc-0004Sl-FM
+	for qemu-devel@nongnu.org; Tue, 21 May 2019 23:30:36 -0400
+Received: by mail-yw1-xc41.google.com with SMTP id w18so276918ywa.12
+	for <qemu-devel@nongnu.org>; Tue, 21 May 2019 20:30:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=subject:to:references:from:openpgp:message-id:date:user-agent
+	:mime-version:in-reply-to:content-language:content-transfer-encoding;
+	bh=ySDkliWlE1kyDr5KZZZU6xJaPfJ9Q+YlDGkST3IXHCM=;
+	b=tyctUt7kS4XDuuwgNRrfzymGUTNHlYP1roTCB4lgI175xVRnMVN9nlw0SaIG6UPzt+
+	MOU9QEk7gJ6macYyzOhWLKkf1KB4/5+2pbPm+q6iSIXEquphJtx0xRPwT7VVqJqX2Aqu
+	6K0XxWVFHjmvv2YUISmCzVtLMGo2xVeGtUP1hy4yuo/8cd372o3661X/xLN8KPNNYUVg
+	7DKBeWtGacnvue9pEgnvT3+VpZ1BDsxg///HdZGMlbIYPc/mnkzn5+El7+YCU5QJNfdZ
+	L3Nq4/59qNFTNf12w6HJC4oSKSaeS7R4mui3rzthZ+bI2cpQIp+XUtq1HZAF7+gPpgoL
+	UA7Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:subject:to:references:from:openpgp:message-id
+	:date:user-agent:mime-version:in-reply-to:content-language
+	:content-transfer-encoding;
+	bh=ySDkliWlE1kyDr5KZZZU6xJaPfJ9Q+YlDGkST3IXHCM=;
+	b=nnnS26XfrRH1L3uLfRMYMHgoVF6QLkdLoR4OpP54nsb9OqUthLMSBZKdVyTT0Oyr0R
+	79PqKGhDysc5hdk5urESFB66d8TCwvxTLc0Wt61MXQPfOHWjYheJ6rK0HKpVNJX57Cai
+	3j/UBAQ3uqIvr3UQnX7Fg/cKqJMOceOfYZ4dhmh6dP1GWB1UAMcSXfBqi5DOQcsHE1Ex
+	3mwP11O62qg5QGWRgro7oeIlYdXffHsnmAxiP+NloJ0GrAQ6pkginUqCdeiS3ZLGyZDG
+	JKnKjI//baZqF7fCMbkH/mwgqN5BTz9Vdtj8G5to0QlefD22t6ic7VD8ZgLrLffMf7uf
+	693g==
+X-Gm-Message-State: APjAAAXeTRdlENrn2EkJuTOCOs+ZcNW919rX1xLKDvgRYsvS3rytfjPp
+	7gCubPPg7VOk2q7F2xW8cgv5ZQ==
+X-Google-Smtp-Source: APXvYqyxHlK5VILkFrTWfttXeXKbxXOQguibzFmrVxKxrwHmMG3OJ8lBZpg/8UxGKCkLQdIQBpURMQ==
+X-Received: by 2002:a81:2894:: with SMTP id o142mr41663243ywo.55.1558495833923;
+	Tue, 21 May 2019 20:30:33 -0700 (PDT)
+Received: from [10.243.114.74] ([71.46.56.7]) by smtp.gmail.com with ESMTPSA id
+	196sm4652990ywg.103.2019.05.21.20.30.32
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Tue, 21 May 2019 20:30:33 -0700 (PDT)
+To: John Arbuckle <programmingkidx@gmail.com>, qemu-devel@nongnu.org,
+	qemu-ppc@nongnu.org, rth@twiddle.net, david@gibson.dropbear.id.au
+References: <20190522000617.21945-1-programmingkidx@gmail.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Openpgp: preference=signencrypt
+Message-ID: <b90278ec-ee66-76c6-32b5-d5aca1fb8d24@linaro.org>
+Date: Tue, 21 May 2019 23:30:31 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <09538032-9453-9d09-2823-1515005b5516@redhat.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <20190522000617.21945-1-programmingkidx@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 134.134.136.65
-Subject: Re: [Qemu-devel] [PATCH] Makefile: simplify qapi-py definition with
- wildcard
+X-Received-From: 2607:f8b0:4864:20::c41
+Subject: Re: [Qemu-devel] [PATCH] Implement Fraction Rounded bit in FPSCR
+ for PowerPC
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -71,80 +98,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Wei Yang <richardw.yang@linux.intel.com>
-Cc: berrange@redhat.com, alex.bennee@linaro.org, qemu-devel@nongnu.org,
-	Markus Armbruster <armbru@redhat.com>,
-	Wei Yang <richardw.yang@linux.intel.com>, philmd@redhat.com,
-	kraxel@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, May 21, 2019 at 08:36:42PM -0500, Eric Blake wrote:
->On 5/21/19 7:53 PM, Wei Yang wrote:
->> On Tue, May 21, 2019 at 05:28:27PM +0200, Markus Armbruster wrote:
->>> Eric Blake <eblake@redhat.com> writes:
->>>
->>>> On 5/21/19 3:12 AM, Wei Yang wrote:
->>>>> All the python script in scripts/qapi is used to generate qapi code. Use
->>>>> wildcard to simplify it.
->>>>>
->>>>> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
->>>>> ---
->>>>>  Makefile | 8 +-------
->>>>>  1 file changed, 1 insertion(+), 7 deletions(-)
->>>>
->>>> I'm not a fan of $(wildcard). It makes your tarball creation
->>>> non-deterministic - if there is a leftover file from development that is
->>>> no longer part of the build, wildcard will still pick it up.  Explicit
->>>
->>> Actually, in this case can "only" adds spurious prerequisites.
->> 
->> Hmm... which spurious prerequisites will be added? I may miss something here.
->
->If I touch the file scripts/qapi/foo.py, then that becomes a
->prerequisite, and will rebuild my files even though it doesn't need to.
->And if the definition of $(qapi-py) is ever applied to determining which
->files to include in a tarball, then my tarball will include foo.py, even
->though it is not essential to the tarball, while the next person, who
->does not have foo.py lying around in their directory, produces a
->different tarball.  Non-deterministic results are bad, hence our rule of
->thumb to avoid $(wildcard) when listing files in a Makefile.
->
+On 5/21/19 8:06 PM, John Arbuckle wrote:
+> Implement the PowerPC floating point status and control register flag Fraction Rounded.
+> 
+> Signed-off-by: John Arbuckle <programmingkidx@gmail.com>
+> ---
+>  fpu/softfloat.c               | 15 ++++++++++++---
+>  include/fpu/softfloat-types.h |  1 +
+>  target/ppc/fpu_helper.c       |  4 ++++
+>  3 files changed, 17 insertions(+), 3 deletions(-)
 
-Ok, so $(wildcard) should be avoided in Makefile. Will not try to do this next
-time.
+Please split the target/ppc part away from the softfloat part.
 
->> 
->>>
->>>> lists are better.  I'm inclined to NACK this, but Markus has final say
->>>> since he maintains the qapi generator.
->>>
->>> I consider use of $(wildcard) for the purpose of collecting sources a
->>> lazy mistake.
->
->Which is another polite way of saying that this patch should not be applied.
->
->If you WANT to factor things for less typing, you could use something like:
->
->var=commands.py events.py introspect.py types.py visit.py common.py doc.py
->$(addprefix $(SRC_PATH)/scripts/qapi/,$(var))
->
->for some suitably-named var.  Or even factor out the .py suffix as well.
->That doesn't use the problematic $(wildcard), but still lets you get
->away with easier maintenance of adding a new file to the explicit list
->should we add a file in the future.
->
->-- 
->Eric Blake, Principal Software Engineer
->Red Hat, Inc.           +1-919-301-3226
->Virtualization:  qemu.org | libvirt.org
->
+Also, we should note that there are more places within softfloat that need to
+be adjusted so that float_float_rounded is fully supported.
 
 
-
-
--- 
-Wei Yang
-Help you, Help me
+r~
 
