@@ -6,57 +6,57 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B0E43C282CE
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 17:13:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A4655C282CE
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 17:13:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 89BB520851
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 17:13:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 89BB520851
+	by mail.kernel.org (Postfix) with ESMTPS id 7A24720851
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 17:13:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7A24720851
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:48058 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:48060 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hTUnV-00019W-QZ
-	for qemu-devel@archiver.kernel.org; Wed, 22 May 2019 13:13:01 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:41956)
+	id 1hTUoC-0001eu-Qc
+	for qemu-devel@archiver.kernel.org; Wed, 22 May 2019 13:13:44 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:40840)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hTUjr-00076u-9t
-	for qemu-devel@nongnu.org; Wed, 22 May 2019 13:09:16 -0400
+	(envelope-from <mreitz@redhat.com>) id 1hTUfN-0003jT-69
+	for qemu-devel@nongnu.org; Wed, 22 May 2019 13:04:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hTUjo-0003rQ-Sv
-	for qemu-devel@nongnu.org; Wed, 22 May 2019 13:09:15 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46434)
+	(envelope-from <mreitz@redhat.com>) id 1hTUfI-0007xg-NM
+	for qemu-devel@nongnu.org; Wed, 22 May 2019 13:04:37 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43520)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mreitz@redhat.com>)
-	id 1hTUer-0007Nh-EH; Wed, 22 May 2019 13:04:05 -0400
+	id 1hTUfF-0007ov-M2; Wed, 22 May 2019 13:04:30 -0400
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
 	[10.5.11.23])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 01275330260;
-	Wed, 22 May 2019 17:04:01 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 3A70B3086258;
+	Wed, 22 May 2019 17:04:23 +0000 (UTC)
 Received: from localhost (ovpn-204-123.brq.redhat.com [10.40.204.123])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 8DDAF19C4F;
-	Wed, 22 May 2019 17:03:58 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id C827419C4F;
+	Wed, 22 May 2019 17:04:22 +0000 (UTC)
 From: Max Reitz <mreitz@redhat.com>
 To: qemu-block@nongnu.org
-Date: Wed, 22 May 2019 19:03:45 +0200
-Message-Id: <20190522170352.12020-2-mreitz@redhat.com>
+Date: Wed, 22 May 2019 19:03:52 +0200
+Message-Id: <20190522170352.12020-9-mreitz@redhat.com>
 In-Reply-To: <20190522170352.12020-1-mreitz@redhat.com>
 References: <20190522170352.12020-1-mreitz@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.29]);
-	Wed, 22 May 2019 17:04:01 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.49]);
+	Wed, 22 May 2019 17:04:23 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v3 1/8] file-posix: Update open_flags in
- raw_set_perm()
+Subject: [Qemu-devel] [PATCH v3 8/8] iotests: Test failure to loosen
+ restrictions
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -74,57 +74,61 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-raw_check_perm() + raw_set_perm() can change the flags associated with
-the current FD.  If so, we have to update BDRVRawState.open_flags
-accordingly.  Otherwise, we may keep reopening the FD even though the
-current one already has the correct flags.
-
 Signed-off-by: Max Reitz <mreitz@redhat.com>
-Reviewed-by: Kevin Wolf <kwolf@redhat.com>
 ---
- block/file-posix.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ tests/qemu-iotests/182     | 21 +++++++++++++++++++++
+ tests/qemu-iotests/182.out |  6 ++++++
+ 2 files changed, 27 insertions(+)
 
-diff --git a/block/file-posix.c b/block/file-posix.c
-index d018429672..5a54968183 100644
---- a/block/file-posix.c
-+++ b/block/file-posix.c
-@@ -145,6 +145,7 @@ typedef struct BDRVRawState {
-     uint64_t locked_shared_perm;
+diff --git a/tests/qemu-iotests/182 b/tests/qemu-iotests/182
+index 3a90ebfbfd..7f494eb9bb 100755
+--- a/tests/qemu-iotests/182
++++ b/tests/qemu-iotests/182
+@@ -152,6 +152,27 @@ success_or_failure=3Dy _send_qemu_cmd $QEMU_HANDLE \
 =20
-     int perm_change_fd;
-+    int perm_change_flags;
-     BDRVReopenState *reopen_state;
+ _cleanup_qemu
 =20
- #ifdef CONFIG_XFS
-@@ -2783,6 +2784,7 @@ static int raw_check_perm(BlockDriverState *bs, uin=
-t64_t perm, uint64_t shared,
-         assert(s->reopen_state->shared_perm =3D=3D shared);
-         rs =3D s->reopen_state->opaque;
-         s->perm_change_fd =3D rs->fd;
-+        s->perm_change_flags =3D rs->open_flags;
-     } else {
-         /* We may need a new fd if auto-read-only switches the mode */
-         ret =3D raw_reconfigure_getfd(bs, bs->open_flags, &open_flags, p=
-erm,
-@@ -2791,6 +2793,7 @@ static int raw_check_perm(BlockDriverState *bs, uin=
-t64_t perm, uint64_t shared,
-             return ret;
-         } else if (ret !=3D s->fd) {
-             s->perm_change_fd =3D ret;
-+            s->perm_change_flags =3D open_flags;
-         }
-     }
-=20
-@@ -2829,6 +2832,7 @@ static void raw_set_perm(BlockDriverState *bs, uint=
-64_t perm, uint64_t shared)
-     if (s->perm_change_fd && s->fd !=3D s->perm_change_fd) {
-         qemu_close(s->fd);
-         s->fd =3D s->perm_change_fd;
-+        s->open_flags =3D s->perm_change_flags;
-     }
-     s->perm_change_fd =3D 0;
-=20
++echo
++echo '=3D=3D=3D Testing failure to loosen restrictions =3D=3D=3D'
++echo
++
++_launch_qemu -drive file=3D$TEST_IMG,if=3Dnone,file.locking=3Don
++
++_send_qemu_cmd $QEMU_HANDLE \
++    "{'execute': 'qmp_capabilities'}" \
++    'return'
++
++_cleanup_test_img
++
++# When quitting qemu, it will try to drop its locks on the test image.
++# Because that file no longer exists, it will be unable to do so.
++# However, that is not fatal, so it should just move on.
++_send_qemu_cmd $QEMU_HANDLE \
++    "{'execute': 'quit'}" \
++    'return'
++
++wait=3D1 _cleanup_qemu
++
+ # success, all done
+ echo "*** done"
+ rm -f $seq.full
+diff --git a/tests/qemu-iotests/182.out b/tests/qemu-iotests/182.out
+index 33d41eea91..ffef23e32b 100644
+--- a/tests/qemu-iotests/182.out
++++ b/tests/qemu-iotests/182.out
+@@ -15,4 +15,10 @@ Formatting 'TEST_DIR/t.qcow2.overlay', fmt=3Dqcow2 siz=
+e=3D197120 backing_file=3DTEST_D
+ {"return": {}}
+ {"return": {}}
+ {"return": {}}
++
++=3D=3D=3D Testing failure to loosen restrictions =3D=3D=3D
++
++{"return": {}}
++{"return": {}}
++{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "even=
+t": "SHUTDOWN", "data": {"guest": false, "reason": "host-qmp-quit"}}
+ *** done
 --=20
 2.21.0
 
