@@ -3,47 +3,47 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2794C072A4
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 03:51:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 38554C072A4
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 03:53:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 97C81205ED
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 03:51:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 97C81205ED
+	by mail.kernel.org (Postfix) with ESMTPS id F27DB2173E
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 03:53:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F27DB2173E
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:35107 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:35117 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hTIIC-0002u8-HL
-	for qemu-devel@archiver.kernel.org; Tue, 21 May 2019 23:51:52 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:40400)
+	id 1hTIJM-0003Vc-Ac
+	for qemu-devel@archiver.kernel.org; Tue, 21 May 2019 23:53:04 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:40398)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hTIGy-0001kA-Kp
+	(envelope-from <bounces@canonical.com>) id 1hTIGy-0001k4-EU
 	for qemu-devel@nongnu.org; Tue, 21 May 2019 23:50:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hTIGx-0000uV-6d
+	(envelope-from <bounces@canonical.com>) id 1hTIGx-0000uM-4F
 	for qemu-devel@nongnu.org; Tue, 21 May 2019 23:50:36 -0400
-Received: from indium.canonical.com ([91.189.90.7]:58462)
+Received: from indium.canonical.com ([91.189.90.7]:58474)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hTIGx-0000tb-0j
+	id 1hTIGw-0000to-Uz
 	for qemu-devel@nongnu.org; Tue, 21 May 2019 23:50:35 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hTIGv-0000fg-9x
+	id 1hTIGv-0000ff-Ta
 	for <qemu-devel@nongnu.org>; Wed, 22 May 2019 03:50:33 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 487CF2E8024
+	by loganberry.canonical.com (Postfix) with ESMTP id DD0D72E80C7
 	for <qemu-devel@nongnu.org>; Wed, 22 May 2019 03:50:33 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 22 May 2019 03:41:10 -0000
+Date: Wed, 22 May 2019 03:45:05 -0000
 From: Eunseok Choi <1829964@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
@@ -55,16 +55,17 @@ X-Launchpad-Bug-Security-Vulnerability: no
 X-Launchpad-Bug-Commenters: riosnai
 X-Launchpad-Bug-Reporter: Eunseok Choi (riosnai)
 X-Launchpad-Bug-Modifier: Eunseok Choi (riosnai)
-Message-Id: <155849647074.15430.13880026935625975661.malonedeb@wampee.canonical.com>
+References: <155849647074.15430.13880026935625975661.malonedeb@wampee.canonical.com>
+Message-Id: <155849670573.15101.16014286335079778238.malone@gac.canonical.com>
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com); Revision="18962";
 	Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: a8a4a748a565dff393235b63310fe10249e6b519
+X-Launchpad-Hash: 5962a1036a3b3282d76e2b0dd9007a7d4273d628
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1829964] [NEW] HOST VRAM Leak when performs
+Subject: [Qemu-devel] [Bug 1829964] Re: HOST VRAM Leak when performs
  android-x86 window rotation with Virt-GPU
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
@@ -81,51 +82,6 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Public bug reported:
-
-I will report something strange thing about host VRAM leakage after
-anroid-x86 window rotation when it runs with virt-gpu(+ virgl-renderer)
-
-Please watching below video link.
-
-https://www.youtube.com/watch?v=3DmJIbGZLWF1s&feature=3Dyoutu.be
-
-(orginal video file : https://drive.google.com/file/d
-/1lkdTx_8yTbSVjKXlnxnnk96fWe-w6Mxb/view?usp=3Dsharing)
-
-I don't sure what is the problem...
-
-Here are my tested history
----------------------------------------------------------------------------=
------------------------
-Install android-x86 on I7 desktop PCs with intel UHD GPU  - No leak.
-Install android-x86 on I7 desktop PCs with NVIDIA GTX GPU series - No leak.
-Install android-x86 on guest machine emulated skylake cpu with QEMU(+virt-g=
-pu, virgl-renderer) - Leak
-(HOST CPU - I5, INTEL UHD GPU)
-Install android-x86 on guest machine emulated skylake cpu with QEMU(+virt-g=
-pu, virgl-renderer) - Leak
-(HOST CPU - I7, NVIDIA GTX GPU)
-
-COMMON:
-In case of NVIDIA GPU : check vram using nvidia-smi
-In case of intel UHD GPU : check shared-vram using free cmd
-
-We checked guest android-x86 system down when vram is full after performing=
- many rotation
----------------------------------------------------------------------------=
-----------------
-
-Is it virt-gpu driver's problem?
-
-I hope someone can help me...
-
-Thanks in advance!!
-
-
-PS
-
-
 Here are qemu options I used...
 
 -machine type=3Dq35,accel=3Dkvm -cpu host --enable-kvm \
@@ -138,12 +94,78 @@ bus=3Dxhci.0 \
 :4000-:7000,hostfwd=3Dtcp::5555-:5555,hostfwd=3Dtcp::4012-:7012,hostfwd=3Dt=
 cp::4013-:7013 -device virtio-net,netdev=3Dqemunet0 -boot menu=3Don
 
-** Affects: qemu
-     Importance: Undecided
-         Status: New
+** Description changed:
 
+  I will report something strange thing about host VRAM leakage after
+  anroid-x86 window rotation when it runs with virt-gpu(+ virgl-renderer)
+  =
 
-** Tags: android-x86 leak virt-gpu vram
+  Please watching below video link.
+  =
+
+  https://www.youtube.com/watch?v=3DmJIbGZLWF1s&feature=3Dyoutu.be
+  =
+
+  (orginal video file : https://drive.google.com/file/d
+  /1lkdTx_8yTbSVjKXlnxnnk96fWe-w6Mxb/view?usp=3Dsharing)
+  =
+
+  I don't sure what is the problem...
+  =
+
+  Here are my tested history
+  -------------------------------------------------------------------------=
+-------------------------
+  Install android-x86 on I7 desktop PCs with intel UHD GPU  - No leak.
+  Install android-x86 on I7 desktop PCs with NVIDIA GTX GPU series - No lea=
+k.
+  Install android-x86 on guest machine emulated skylake cpu with QEMU(+virt=
+-gpu, virgl-renderer) - Leak
+  (HOST CPU - I5, INTEL UHD GPU)
+  Install android-x86 on guest machine emulated skylake cpu with QEMU(+virt=
+-gpu, virgl-renderer) - Leak
+  (HOST CPU - I7, NVIDIA GTX GPU)
+  =
+
+  COMMON:
+  In case of NVIDIA GPU : check vram using nvidia-smi
+  In case of intel UHD GPU : check shared-vram using free cmd
+  =
+
+  We checked guest android-x86 system down when vram is full after performi=
+ng many rotation
+  -------------------------------------------------------------------------=
+------------------
+  =
+
+  Is it virt-gpu driver's problem?
+  =
+
+  I hope someone can help me...
+  =
+
+  Thanks in advance!!
++ =
+
++ =
+
++ PS
++ =
+
++ =
+
++ Here are qemu options I used...
++ =
+
++ -machine type=3Dq35,accel=3Dkvm -cpu host --enable-kvm \
++ -smp cpus=3D4,cores=3D4,threads=3D1 -m 4096 \
++ -drive file=3Dctb0319.qcow2,format=3Dqcow2,if=3Dvirtio,aio=3Dthreads \
++ -device virtio-vga,virgl=3Don \
++ -device qemu-xhci,id=3Dxhci -device usb-mouse,bus=3Dxhci.0 -device usb-kb=
+d,bus=3Dxhci.0 \
++ -soundhw hda -display sdl,gl=3Don -netdev user,id=3Dqemunet0,hostfwd=3Dtc=
+p::4000-:7000,hostfwd=3Dtcp::5555-:5555,hostfwd=3Dtcp::4012-:7012,hostfwd=
+=3Dtcp::4013-:7013 -device virtio-net,netdev=3Dqemunet0 -boot menu=3Don
 
 -- =
 
