@@ -6,68 +6,68 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8EEC4C18E7D
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 09:17:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B7AB2C18E7D
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 09:18:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 618EC20675
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 09:17:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 618EC20675
+	by mail.kernel.org (Postfix) with ESMTPS id 8C6C720675
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 09:18:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8C6C720675
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:39004 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:39008 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hTNNd-0005Am-Hp
-	for qemu-devel@archiver.kernel.org; Wed, 22 May 2019 05:17:49 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:41390)
+	id 1hTNOS-0005lK-Q9
+	for qemu-devel@archiver.kernel.org; Wed, 22 May 2019 05:18:40 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:41726)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hTNJt-0002ks-Oh
-	for qemu-devel@nongnu.org; Wed, 22 May 2019 05:13:58 -0400
+	(envelope-from <laurent@vivier.eu>) id 1hTNKl-0003Rx-O3
+	for qemu-devel@nongnu.org; Wed, 22 May 2019 05:14:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hTNJs-0006PJ-OX
-	for qemu-devel@nongnu.org; Wed, 22 May 2019 05:13:57 -0400
-Received: from mout.kundenserver.de ([217.72.192.74]:46555)
+	(envelope-from <laurent@vivier.eu>) id 1hTNKk-000853-4c
+	for qemu-devel@nongnu.org; Wed, 22 May 2019 05:14:51 -0400
+Received: from mout.kundenserver.de ([217.72.192.73]:46767)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1hTNJs-0006O3-FJ
-	for qemu-devel@nongnu.org; Wed, 22 May 2019 05:13:56 -0400
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1hTNKj-00081u-Rs
+	for qemu-devel@nongnu.org; Wed, 22 May 2019 05:14:50 -0400
 Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
-	(mreue107 [213.165.67.119]) with ESMTPSA (Nemesis) id
-	1MBV2f-1hLzr62O7j-00D3Jx; Wed, 22 May 2019 11:12:55 +0200
+	(mreue108 [213.165.67.119]) with ESMTPSA (Nemesis) id
+	1N17cq-1gWm7x3exO-012VyN; Wed, 22 May 2019 11:13:44 +0200
 To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, qemu-devel@nongnu.org
 References: <1558282527-22183-1-git-send-email-aleksandar.markovic@rt-rk.com>
-	<1558282527-22183-3-git-send-email-aleksandar.markovic@rt-rk.com>
+	<1558282527-22183-4-git-send-email-aleksandar.markovic@rt-rk.com>
 From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <cf487418-2f81-45b3-3c29-94f8b5edb47e@vivier.eu>
-Date: Wed, 22 May 2019 11:12:53 +0200
+Message-ID: <9fa4f5f8-d5ff-59b3-17b4-386cfb39062e@vivier.eu>
+Date: Wed, 22 May 2019 11:13:41 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
 	Thunderbird/52.8.0
 MIME-Version: 1.0
-In-Reply-To: <1558282527-22183-3-git-send-email-aleksandar.markovic@rt-rk.com>
+In-Reply-To: <1558282527-22183-4-git-send-email-aleksandar.markovic@rt-rk.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Provags-ID: V03:K1:nzNwOBj87EbADDeESs5OLwpVvT52rbZP/3vSdTae119NPZTEHHu
-	hTFLgFV4TL+gNqvEKx8890h5p22foPN7lDD5hzIncoYsWfwBuvpYFJmbhBtaBB843ZSuH3R
-	+v2GYevAR4cRS4tBRDsue12b+kS3mhwpNUiPKBGSd899sdKaF11qKgfcd1caIX5/me9aYxu
-	YDOt9/831M8i28rJExsYw==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:EdODHUzSxjM=:D0IJrh4u84UQZrAh4H2cfC
-	AjlyAolLRunIEQlQtADXBlIj6s93ZlPRNh/V6QleMsMWg5/TAcZ/PPWpL1GvTCwhKt06jRql7
-	LVHBUx8XISqw7KpB8Tx2UWxxfhF6jyAKxuWa7Mr2SSc5LC83fuzWeI6bIdrOG/O0hYl5/XGby
-	J3BagkGZwFnjLLK5LK/R9Dor7mapZXghkPXMD8LLUK4P3WBK7NovAE0s5ALXpcs0WLhp7R5w9
-	/keJ3LwzucTnbO9mlc4Wq5WcO/MG47tUifBbpUUA72zC7remhqvZNoYxnl9yapXMTSnjC5Fhh
-	QWjuwBqTI4/nvSbvlF9bksETToxwaaJjdxaABzBqo5A7V79kN0zSZ4/O6/rgrtna/v0VVVfIY
-	JXE+Kbm0bgLQYS/jVUgtV+kpJDRsYl6Um9D9w6P1whYsWQ6GA3yulOWF0Zwu7PCjNkYGSafpZ
-	AJMI37lnFtrVd5z/U6ZlGxeeoE1l/yOp8iriTLYsqGV+ppQVWy+MSY9oV5JofpaXPNuBi2/Du
-	LgUI7EOydxk3x44hU/jEXz5VmE7lKikgqpdONAAJxu2WeCvXUlEf4DMCG/8w/7pN7qpI+RLAh
-	NGv8K41nYBPAH54AfJC15Xi/2Zi7fVVAXb+1clCoKEGs4S2hCRAdVn/Irep9h3MvC2c11bl/G
-	hOVAHs+bEi56sIUSRGd394U7qMqFdxg4+msUokm0Zkh8fXjuIaeYielS84eD2AIIx1peicpBq
-	VUGS/Rcss1047ryEUAF2QGBL98vNd3zMZDohHne2/DW310cPbynFnNL+QI8=
+X-Provags-ID: V03:K1:ajbKMTYs2iv4ROHAZ7B9yAukJqSkF7phndQ03mRGbKB80ebTSpe
+	QS3M94pym300wJ7d+IwEew9hgXQQm1Xm1HLHqA2XfP+5W3ZPVxnIFYxd0AyZuJi0y/bLreo
+	BD+hyoAVHLHtrhXeCTnoUXsZs3wGCE9MwM4dcc7snJky1Ze2JmL15J6SZqZUiRzb8+ZXws1
+	xlQRF3n5JKadYbzrJOXIA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:dW0sSKcs8rY=:aNdzfg/jsSXuj1Nu9nAn9c
+	+A7eUTKG9bUXUWJRhtdDtnJ4jdeYves4U0TaisWJ6nXAiW5Lw7plZ5jInsy16LoPBubjg6akb
+	HBmayA3dlDCCLaIEUnvgpVNJte1B4Wt8HceWPGoJv2iJYExuFhcEjns/3zd70kLd3NF0lJLQS
+	5T6RkvtzO1cZWSmWruqr77tINPH5m4vsCGg6FJDKrrDFf2HInMpIR6qYrKHYLbuIYqa6S4h9L
+	efixxjSBBjYrYGBf7TcHZlf8GNofBAy5BHIfo+JSUcKPHF6eQeRf/hZCGLJILc7vLQ6xbBjyM
+	DNXzQiulQPPNXXuqCosGOOWIxnUIG5MRtVQWVnqitJeO3rg9bXqBkSHN+L6VAcOPbjPnpkPKy
+	0P2pfTvnQNmuVDp81l51KTfm7cfO0qLg9JdD3YU2xpPN9POH3k6GEtK9fF7mYURQqRkofkaGk
+	RSqdH+n1IJVijcqsgBHDjTeESsLSBaJLRsnnhvEfn4kH0esUjy6hyuvLgewERfR6BzYwYG7uM
+	ZpLOucqsDMK2xN8N8mAOQRhS8vdBwa0BEiViCoocLZCIas03L67bBmxyihXNB2a4yYgCIwZ9w
+	yi5N/mnW9eT7Q40MBb27PUXX26sSRZaWgn8FU4/f/dvccHqZPimb15adFIGQ7c2AGC+b9nrVT
+	TWlpMePb4T2NfTbtvONKJOrjMMj4dg1AXcNVEj1cNqqGMAVc52H+GyEs4hRP9hCOim+x4XpdZ
+	2GP1Tn8LLrZENYDZJZk36u28u1YNdSCrLZYpsfXJ7qhluI6u66q29bEqEZM=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 217.72.192.74
-Subject: Re: [Qemu-devel] [PATCH v6 2/6] linux-user: Add support for
- SIOCSPGRP ioctl for all targets
+X-Received-From: 217.72.192.73
+Subject: Re: [Qemu-devel] [PATCH v6 3/6] linux-user: Add support for
+ SIOC<G|S>IFPFLAGS ioctls for all targets
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -87,65 +87,57 @@ Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 19/05/2019 18:15, Aleksandar Markovic wrote:
-> From: Aleksandar Markovic <amarkovic@wavecomp.com>
+> From: Neng Chen <nchen@wavecomp.com>
 > 
-> Add support for setting the process (or process group) to receive SIGIO
-> or SIGURG signals when I/O becomes possible or urgent data is available,
-> using SIOCSPGRP ioctl.
+> Add support for getting and setting extended private flags of a
+> network device via SIOCSIFPFLAGS and SIOCGIFPFLAGS ioctls.
 > 
-> The ioctl numeric values for SIOCSPGRP are platform-dependent and are
-> determined by following files in Linux kernel source tree:
+> The ioctl numeric values are platform-independent and determined by
+> the file include/uapi/linux/sockios.h in Linux kernel source code:
 > 
-> arch/ia64/include/uapi/asm/sockios.h:#define SIOCSPGRP    0x8902
-> arch/mips/include/uapi/asm/sockios.h:#define SIOCSPGRP    _IOW('s', 8, pid_t)
-> arch/parisc/include/uapi/asm/sockios.h:#define SIOCSPGRP  0x8902
-> arch/sh/include/uapi/asm/sockios.h:#define SIOCSPGRP      _IOW('s', 8, pid_t)
-> arch/xtensa/include/uapi/asm/sockios.h:#define SIOCSPGRP  _IOW('s', 8, pid_t)
-> arch/alpha/include/uapi/asm/sockios.h:#define SIOCSPGRP   _IOW('s', 8, pid_t)
-> arch/sparc/include/uapi/asm/sockios.h:#define SIOCSPGRP   0x8902
-> include/uapi/asm-generic/sockios.h:#define SIOCSPGRP      0x8902
+>    #define SIOCSIFPFLAGS 0x8934
+>    #define SIOCGIFPFLAGS	0x8935
 > 
-> Hence the different definition for alpha, mips, sh4, and xtensa.
+> These ioctls get (or set) the field ifr_flags of type short in the
+> structure ifreq. Such functionality is achieved in QEMU by using
+> MK_STRUCT() and MK_PTR() macros with an appropriate argument, as
+> it was done for existing similar cases.
 > 
+> Signed-off-by: Neng Chen <nchen@wavecomp.com>
 > Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-> Reviewed-by: Max Filippov <jcmvbkbc@gmail.com>
 > Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+> Message-Id: <1554839486-3527-1-git-send-email-aleksandar.markovic@rt-rk.com>
 > ---
->   linux-user/ioctls.h       | 1 +
->   linux-user/syscall_defs.h | 3 +++
+>   linux-user/ioctls.h       | 2 ++
+>   linux-user/syscall_defs.h | 2 ++
 >   2 files changed, 4 insertions(+)
 > 
 > diff --git a/linux-user/ioctls.h b/linux-user/ioctls.h
-> index ae89516..c37adc5 100644
+> index c37adc5..76375df 100644
 > --- a/linux-user/ioctls.h
 > +++ b/linux-user/ioctls.h
-> @@ -218,6 +218,7 @@
->     IOCTL(SIOCSRARP, IOC_W, MK_PTR(MK_STRUCT(STRUCT_arpreq)))
->     IOCTL(SIOCGRARP, IOC_R, MK_PTR(MK_STRUCT(STRUCT_arpreq)))
->     IOCTL(SIOCGIWNAME, IOC_W | IOC_R, MK_PTR(MK_STRUCT(STRUCT_char_ifreq)))
-> +  IOCTL(SIOCSPGRP, IOC_W, MK_PTR(TYPE_INT)) /* pid_t */
->     IOCTL(SIOCGPGRP, IOC_R, MK_PTR(TYPE_INT)) /* pid_t */
->     IOCTL(SIOCGSTAMP, IOC_R, MK_PTR(MK_STRUCT(STRUCT_timeval)))
->     IOCTL(SIOCGSTAMPNS, IOC_R, MK_PTR(MK_STRUCT(STRUCT_timespec)))
+> @@ -206,6 +206,8 @@
+>     IOCTL(SIOCADDMULTI, IOC_W, MK_PTR(MK_STRUCT(STRUCT_sockaddr_ifreq)))
+>     IOCTL(SIOCDELMULTI, IOC_W, MK_PTR(MK_STRUCT(STRUCT_sockaddr_ifreq)))
+>     IOCTL(SIOCGIFINDEX, IOC_W | IOC_R, MK_PTR(MK_STRUCT(STRUCT_int_ifreq)))
+> +  IOCTL(SIOCSIFPFLAGS, IOC_W, MK_PTR(MK_STRUCT(STRUCT_short_ifreq)))
+> +  IOCTL(SIOCGIFPFLAGS, IOC_W | IOC_R, MK_PTR(MK_STRUCT(STRUCT_short_ifreq)))
+>     IOCTL(SIOCSIFLINK, 0, TYPE_NULL)
+>     IOCTL_SPECIAL(SIOCGIFCONF, IOC_W | IOC_R, do_ioctl_ifconf,
+>                   MK_PTR(MK_STRUCT(STRUCT_ifconf)))
 > diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
-> index 1e86fb9..2941231 100644
+> index 2941231..8904d35 100644
 > --- a/linux-user/syscall_defs.h
 > +++ b/linux-user/syscall_defs.h
-> @@ -739,11 +739,14 @@ struct target_pollfd {
->   #if defined(TARGET_ALPHA) || defined(TARGET_MIPS) || defined(TARGET_SH4) ||    \
->          defined(TARGET_XTENSA)
->   #define TARGET_SIOCATMARK      TARGET_IOR('s', 7, int)
-> +#define TARGET_SIOCSPGRP       TARGET_IOW('s', 8, pid_t)
->   #define TARGET_SIOCGPGRP       TARGET_IOR('s', 9, pid_t)
->   #else
->   #define TARGET_SIOCATMARK      0x8905
-> +#define TARGET_SIOCSPGRP       0x8902
->   #define TARGET_SIOCGPGRP       0x8904
->   #endif
-> +
->   #define TARGET_SIOCGSTAMP      0x8906          /* Get stamp (timeval) */
->   #define TARGET_SIOCGSTAMPNS    0x8907          /* Get stamp (timespec) */
+> @@ -781,6 +781,8 @@ struct target_pollfd {
+>   #define TARGET_SIOCADDMULTI    0x8931          /* Multicast address lists      */
+>   #define TARGET_SIOCDELMULTI    0x8932
+>   #define TARGET_SIOCGIFINDEX    0x8933
+> +#define TARGET_SIOCSIFPFLAGS   0x8934          /* set extended flags          */
+> +#define TARGET_SIOCGIFPFLAGS   0x8935          /* get extended flags          */
 >   
+>   /* Bridging control calls */
+>   #define TARGET_SIOCGIFBR       0x8940          /* Bridging support             */
 > 
 
 Applied to my linux-user branch.
