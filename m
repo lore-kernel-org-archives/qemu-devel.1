@@ -2,70 +2,63 @@ Return-Path: <SRS0=8zLO=TW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D575C282CE
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 16:21:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DBA44C282CE
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 16:23:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 24A3520868
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 16:21:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 24A3520868
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id 9AE8920675
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 16:23:25 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="iEEQJf/H"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9AE8920675
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:47449 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:47465 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hTTzN-0004Gl-EH
-	for qemu-devel@archiver.kernel.org; Wed, 22 May 2019 12:21:13 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:57823)
+	id 1hTU1U-0005qH-Q4
+	for qemu-devel@archiver.kernel.org; Wed, 22 May 2019 12:23:24 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:33352)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hTTnK-0002Zh-KX
-	for qemu-devel@nongnu.org; Wed, 22 May 2019 12:08:47 -0400
+	(envelope-from <wens@kernel.org>) id 1hTU0G-00057j-L2
+	for qemu-devel@nongnu.org; Wed, 22 May 2019 12:22:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hTTnH-0004z9-UU
-	for qemu-devel@nongnu.org; Wed, 22 May 2019 12:08:46 -0400
-Received: from mout.kundenserver.de ([217.72.192.75]:44271)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>)
-	id 1hTTn5-0004KQ-KP; Wed, 22 May 2019 12:08:32 -0400
-Received: from localhost.localdomain ([78.238.229.36]) by
-	mrelayeu.kundenserver.de (mreue108 [212.227.15.183]) with ESMTPSA
-	(Nemesis)
-	id 1Mwwm5-1gjc5k1Idf-00yPCy; Wed, 22 May 2019 18:07:43 +0200
-From: Laurent Vivier <laurent@vivier.eu>
+	(envelope-from <wens@kernel.org>) id 1hTU0E-0003UA-Q0
+	for qemu-devel@nongnu.org; Wed, 22 May 2019 12:22:08 -0400
+Received: from mail.kernel.org ([198.145.29.99]:53626)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <wens@kernel.org>) id 1hTU0E-0003CQ-AY
+	for qemu-devel@nongnu.org; Wed, 22 May 2019 12:22:06 -0400
+Received: from wens.tw (mirror2.csie.ntu.edu.tw [140.112.30.76])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mail.kernel.org (Postfix) with ESMTPSA id 8881B20868;
+	Wed, 22 May 2019 16:21:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1558542117;
+	bh=fdBrQmcN2kuU+kl2HLtdG9Wh8YdeldGbPV1yQPjOJHE=;
+	h=From:To:Cc:Subject:Date:From;
+	b=iEEQJf/HQKwD4kX3XEd9zVydl01aID+1JBfYcDB56MGX4HCHl8nrhYjAxWVUiFuMQ
+	lFJsYUCAKZbTlss1gsGI5dBHa2bFoX0+XIHiEXbiATZMK25tcim3iqyVMhq+n1Dn88
+	SMtRTlk/0AbKulf24h99b5sFH4uQOUtyWbzd5JvI=
+Received: by wens.tw (Postfix, from userid 1000)
+	id 3EFDD602F9; Thu, 23 May 2019 00:21:55 +0800 (CST)
+From: Chen-Yu Tsai <wens@kernel.org>
 To: qemu-devel@nongnu.org
-Date: Wed, 22 May 2019 18:07:23 +0200
-Message-Id: <20190522160723.31484-10-laurent@vivier.eu>
+Date: Thu, 23 May 2019 00:21:47 +0800
+Message-Id: <20190522162147.26303-1-wens@kernel.org>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190522160723.31484-1-laurent@vivier.eu>
-References: <20190522160723.31484-1-laurent@vivier.eu>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:Zm70E0oI1ZM4VhuVrV6GSk5Zq65TW0Q3iF4E6XyH5HYqU2h0Zao
-	p4Gh7WkJ1AE9pUSvPRL1YlWNjrdzSYh8FdCjmvRMoLCfw9KPU6Sok0uV4hNy7xUIW5nVKVy
-	kgkuWwcQ1s8zkijGCMNf5/Uv+hnybRRMj1xn1q4Qt3h6JkXZOaXqh9QjxGORSu44MxI8AS9
-	EEGIaFA2aQgx2F7Zb5H0g==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:VV0Ai4aLcXk=:8ScUNQP4QVS+RbxOT+RGB1
-	DiH86TvntWrDcy6rkHA7MLa0q2RhoJ12YrN9iwFQyBaxqw3jlFoyQjYB2lDw5vsGEuJraMWFO
-	izMyWb2xxbEhPbUe4gdPINcujXzFXZPsOBBfoZpG0ESB6iixJlMCsOtVTnAtdsdSFpNklt57H
-	kH7UYP61j4KR2X2N4xPtTbBNFu5vu0b6sk5yfSoOcmVni0chi8PKms5djeeXxJme6cUA1hFP0
-	ZCwpXwqt30loKwCQNPHFK73AIpJ+rxK8CAFhnzVbzsiwoxVnsQjLoYLp6ixKDBcXs9v2MHBwT
-	7huYWRKS1hxe6LznLJynCIbkYz+KSQkVmaJv/IR230HiRaJfUzl+TxyrOjzUcjjVRYfVirJCZ
-	RKqXlAJrJizmxyLedx+qb1xLDUtMSqrtfyBOeoROHjOK286vIFNi/BfNNL5aLt86Ul303hCof
-	naf0G/OUEoXH2EKkccneqxqwXtveUERP7VVQ1gQbLgBGMywcl6YaD6dle4A0RaqdnPkOwyNhb
-	dfh9z59kJczNq8IYTRXLlfBVz7QKNCB6CL6tHKX2vnXXyIpUkaKsrzq0yLS9oLWGNZS2emHw2
-	s+I9IqZj9NtzEF9sGofEwg1Tf1aTaMILtCE1q1tN2WUM5D4nkljRp68yvW6aJ/r3MhkKVYMvY
-	FNGqAGH5WAO0zUxXZeUG60i0eBJtYzhrUHQp96z9cUWZ2dudwUoNXlqP33IcKe27jk9KU+cfI
-	EHPESqNzJ0yrQIc+sXd2VVnW5kW3ijnKGioTYgsjd1ajNDDrt3bkmwR369g=
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 217.72.192.75
-Subject: [Qemu-devel] [PULL 9/9] pci: msix: move 'MSIX_CAP_LENGTH' to header
- file
+X-Received-From: 198.145.29.99
+Subject: [Qemu-devel] [PATCH v3] linux-user: Pass through nanosecond
+ timestamp components for stat syscalls
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -77,80 +70,341 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Tony Krowiak <akrowiak@linux.ibm.com>, Eric Farman <farman@linux.ibm.com>,
-	Farhan Ali <alifm@linux.ibm.com>, Pierre Morel <pmorel@linux.ibm.com>,
-	Juan Quintela <quintela@redhat.com>, qemu-trivial@nongnu.org,
-	Li Qiang <liq3ea@163.com>, Cornelia Huck <cohuck@redhat.com>,
-	Michael Tokarev <mjt@tls.msk.ru>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	Laurent Vivier <laurent@vivier.eu>, Halil Pasic <pasic@linux.ibm.com>,
-	Christian Borntraeger <borntraeger@de.ibm.com>,
-	qemu-s390x@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>,
-	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
-	Eric Auger <eric.auger@redhat.com>,
-	"Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Riku Voipio <riku.voipio@iki.fi>, Chen-Yu Tsai <wens@kernel.org>,
+	Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Li Qiang <liq3ea@163.com>
+From: Chen-Yu Tsai <wens@csie.org>
 
-'MSIX_CAP_LENGTH' is defined in two .c file. Move it
-to hw/pci/msix.h file to reduce duplicated code.
+Since Linux 2.6 the stat syscalls have mostly supported nanosecond
+components for each of the file-related timestamps.
 
-CC: qemu-trivial@nongnu.org
-Signed-off-by: Li Qiang <liq3ea@163.com>
-Message-Id: <20190521151543.92274-5-liq3ea@163.com>
-Acked-by: Alex Williamson <alex.williamson@redhat.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+QEMU user mode emulation currently does not pass through the nanosecond
+portion of the timestamp, even when the host system fills in the value.
+This results in a mismatch when run on subsecond resolution filesystems
+such as ext4 or XFS.
+
+An example of this leading to inconsistency is cross-debootstraping a
+full desktop root filesystem of Debian Buster. Recent versions of
+fontconfig store the full timestamp (instead of just the second portion)
+of the directory in its per-directory cache file, and checks this against
+the directory to see if the cache is up-to-date. With QEMU user mode
+emulation, the timestamp stored is incorrect, and upon booting the rootfs
+natively, fontconfig discovers the mismatch, and proceeds to rebuild the
+cache on the comparatively slow machine (low-power ARM vs x86). This
+stalls the first attempt to open whatever application that incorporates
+fontconfig.
+
+This patch renames the "unused" padding trailing each timestamp element
+to its nanosecond counterpart name if such an element exists in the
+kernel sources for the given platform. Not all do. Then have the syscall
+wrapper fill in the nanosecond portion if the host supports it, as
+specified by the _POSIX_C_SOURCE and _XOPEN_SOURCE feature macros.
+
+Recent versions of glibc only use stat64 and newfstatat syscalls on
+32-bit and 64-bit platforms respectively. The changes in this patch
+were tested by directly calling the stat, stat64 and newfstatat syscalls
+directly, in addition to the glibc wrapper, on arm and aarch64 little
+endian targets.
+
+Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+Signed-off-by: Chen-Yu Tsai <wens@csie.org>
+
 ---
- hw/pci/msix.c         | 2 --
- hw/vfio/pci.c         | 2 --
- include/hw/pci/msix.h | 2 ++
- 3 files changed, 2 insertions(+), 4 deletions(-)
 
-diff --git a/hw/pci/msix.c b/hw/pci/msix.c
-index 4e336416a78a..d39dcf32e8c9 100644
---- a/hw/pci/msix.c
-+++ b/hw/pci/msix.c
-@@ -24,8 +24,6 @@
- #include "qapi/error.h"
- #include "trace.h"
- 
--#define MSIX_CAP_LENGTH 12
--
- /* MSI enable bit and maskall bit are in byte 1 in FLAGS register */
- #define MSIX_CONTROL_OFFSET (PCI_MSIX_FLAGS + 1)
- #define MSIX_ENABLE_MASK (PCI_MSIX_FLAGS_ENABLE >> 8)
-diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-index 08729e5875a9..8e555db12ec0 100644
---- a/hw/vfio/pci.c
-+++ b/hw/vfio/pci.c
-@@ -35,8 +35,6 @@
- #include "trace.h"
- #include "qapi/error.h"
- 
--#define MSIX_CAP_LENGTH 12
--
- #define TYPE_VFIO_PCI "vfio-pci"
- #define PCI_VFIO(obj)    OBJECT_CHECK(VFIOPCIDevice, obj, TYPE_VFIO_PCI)
- 
-diff --git a/include/hw/pci/msix.h b/include/hw/pci/msix.h
-index 1f27658d352f..08acfa836e49 100644
---- a/include/hw/pci/msix.h
-+++ b/include/hw/pci/msix.h
-@@ -4,6 +4,8 @@
- #include "qemu-common.h"
- #include "hw/pci/pci.h"
- 
-+#define MSIX_CAP_LENGTH 12
-+
- void msix_set_message(PCIDevice *dev, int vector, MSIMessage msg);
- MSIMessage msix_get_message(PCIDevice *dev, unsigned int vector);
- int msix_init(PCIDevice *dev, unsigned short nentries,
--- 
+Changes since v2:
+
+  - Rename TARGET_STAT_HAS_NSEC to TARGET_STAT_HAVE_NSEC
+
+Changes since v1:
+
+  - Define TARGET_STAT_HAS_NSEC for targets that have the *_nsec fields
+    in their struct stat
+
+  - Only copy the *_nsec fields in the stat (not stat64) code path if
+    TARGET_STAT_HAS_NSEC is defined
+
+  - Picked up Reviewed-by from Laurent
+
+As Laurent mentioned, linux-user/syscall_defs.h is indented with tabs,
+so the checkpatch.pl errors can be ignored.
+
+Original cover letter:
+
+This issue was found while integrating some software that uses newer
+versions of fontconfig into Raspbian images. We found that the first
+launch of said software always stalls with fontconfig regenerating its
+font cache files. Upon closer examination I found the timestamps were
+not matching. The rest is explained above. Currently we're just working
+around the problem by patching the correct timestamps into the cache
+files after the fact.
+
+Please consider this a drive-by scratch-my-own-itch contribution, but I
+will stick around to deal with any comments raised during review. I'm
+not on the mailing lists either, so please keep me in CC.
+
+checkpatch returns "ERROR: code indent should never use tabs" for
+linux-user/syscall_defs.h, however as far as I can tell the whole file
+is indented with tabs. I'm not sure what to make of this.
+
+Finally, I think this could be worth backporting to older versions.
+---
+ linux-user/syscall.c      | 19 +++++++++++++++
+ linux-user/syscall_defs.h | 49 +++++++++++++++++++++++++--------------
+ 2 files changed, 50 insertions(+), 18 deletions(-)
+
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index efa3ec2837..c83a3648c9 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -6408,6 +6408,11 @@ static inline abi_long host_to_target_stat64(void =
+*cpu_env,
+         __put_user(host_st->st_atime, &target_st->target_st_atime);
+         __put_user(host_st->st_mtime, &target_st->target_st_mtime);
+         __put_user(host_st->st_ctime, &target_st->target_st_ctime);
++#if _POSIX_C_SOURCE >=3D 200809L || _XOPEN_SOURCE >=3D 700
++        __put_user(host_st->st_atim.tv_nsec, &target_st->target_st_atime=
+_nsec);
++        __put_user(host_st->st_mtim.tv_nsec, &target_st->target_st_mtime=
+_nsec);
++        __put_user(host_st->st_ctim.tv_nsec, &target_st->target_st_ctime=
+_nsec);
++#endif
+         unlock_user_struct(target_st, target_addr, 1);
+     } else
+ #endif
+@@ -6438,6 +6443,11 @@ static inline abi_long host_to_target_stat64(void =
+*cpu_env,
+         __put_user(host_st->st_atime, &target_st->target_st_atime);
+         __put_user(host_st->st_mtime, &target_st->target_st_mtime);
+         __put_user(host_st->st_ctime, &target_st->target_st_ctime);
++#if _POSIX_C_SOURCE >=3D 200809L || _XOPEN_SOURCE >=3D 700
++        __put_user(host_st->st_atim.tv_nsec, &target_st->target_st_atime=
+_nsec);
++        __put_user(host_st->st_mtim.tv_nsec, &target_st->target_st_mtime=
+_nsec);
++        __put_user(host_st->st_ctim.tv_nsec, &target_st->target_st_ctime=
+_nsec);
++#endif
+         unlock_user_struct(target_st, target_addr, 1);
+     }
+=20
+@@ -8866,6 +8876,15 @@ static abi_long do_syscall1(void *cpu_env, int num=
+, abi_long arg1,
+                 __put_user(st.st_atime, &target_st->target_st_atime);
+                 __put_user(st.st_mtime, &target_st->target_st_mtime);
+                 __put_user(st.st_ctime, &target_st->target_st_ctime);
++#if (_POSIX_C_SOURCE >=3D 200809L || _XOPEN_SOURCE >=3D 700) && \
++    defined(TARGET_STAT_HAVE_NSEC)
++                __put_user(st.st_atim.tv_nsec,
++                           &target_st->target_st_atime_nsec);
++                __put_user(st.st_mtim.tv_nsec,
++                           &target_st->target_st_mtime_nsec);
++                __put_user(st.st_ctim.tv_nsec,
++                           &target_st->target_st_ctime_nsec);
++#endif
+                 unlock_user_struct(target_st, arg2, 1);
+             }
+         }
+diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
+index 1f5b2d18db..0223724758 100644
+--- a/linux-user/syscall_defs.h
++++ b/linux-user/syscall_defs.h
+@@ -1179,6 +1179,7 @@ struct target_winsize {
+ #if (defined(TARGET_I386) && defined(TARGET_ABI32)) \
+     || (defined(TARGET_ARM) && defined(TARGET_ABI32)) \
+     || defined(TARGET_CRIS)
++#define TARGET_STAT_HAVE_NSEC
+ struct target_stat {
+ 	unsigned short st_dev;
+ 	unsigned short __pad1;
+@@ -1193,11 +1194,11 @@ struct target_stat {
+ 	abi_ulong  st_blksize;
+ 	abi_ulong  st_blocks;
+ 	abi_ulong  target_st_atime;
+-	abi_ulong  __unused1;
++	abi_ulong  target_st_atime_nsec;
+ 	abi_ulong  target_st_mtime;
+-	abi_ulong  __unused2;
++	abi_ulong  target_st_mtime_nsec;
+ 	abi_ulong  target_st_ctime;
+-	abi_ulong  __unused3;
++	abi_ulong  target_st_ctime_nsec;
+ 	abi_ulong  __unused4;
+ 	abi_ulong  __unused5;
+ };
+@@ -1229,13 +1230,13 @@ struct target_stat64 {
+ 	abi_ulong	__pad4;		/* future possible st_blocks high bits */
+=20
+ 	abi_ulong	target_st_atime;
+-	abi_ulong	__pad5;
++	abi_ulong	target_st_atime_nsec;
+=20
+ 	abi_ulong	target_st_mtime;
+-	abi_ulong	__pad6;
++	abi_ulong	target_st_mtime_nsec;
+=20
+ 	abi_ulong	target_st_ctime;
+-	abi_ulong	__pad7;		/* will be high 32 bits of ctime someday */
++	abi_ulong	target_st_ctime_nsec;
+=20
+ 	unsigned long long	st_ino;
+ } QEMU_PACKED;
+@@ -1314,19 +1315,20 @@ struct target_stat64 {
+ 	unsigned int	st_blocks;
+=20
+ 	abi_ulong	target_st_atime;
+-	abi_ulong	__unused1;
++	abi_ulong	target_st_atime_nsec;
+=20
+ 	abi_ulong	target_st_mtime;
+-	abi_ulong	__unused2;
++	abi_ulong	target_st_mtime_nsec;
+=20
+ 	abi_ulong	target_st_ctime;
+-	abi_ulong	__unused3;
++	abi_ulong	target_st_ctime_nsec;
+=20
+ 	abi_ulong	__unused4[3];
+ };
+=20
+ #elif defined(TARGET_SPARC)
+=20
++#define TARGET_STAT_HAVE_NSEC
+ struct target_stat {
+ 	unsigned short	st_dev;
+ 	abi_ulong	st_ino;
+@@ -1337,14 +1339,14 @@ struct target_stat {
+ 	unsigned short	st_rdev;
+ 	abi_long	st_size;
+ 	abi_long	target_st_atime;
+-	abi_ulong	__unused1;
++	abi_ulong	target_st_atime_nsec;
+ 	abi_long	target_st_mtime;
+-	abi_ulong	__unused2;
++	abi_ulong	target_st_mtime_nsec;
+ 	abi_long	target_st_ctime;
+-	abi_ulong	__unused3;
++	abi_ulong	target_st_ctime_nsec;
+ 	abi_long	st_blksize;
+ 	abi_long	st_blocks;
+-	abi_ulong	__unused4[2];
++	abi_ulong	__unused1[2];
+ };
+=20
+ #define TARGET_HAS_STRUCT_STAT64
+@@ -1372,20 +1374,21 @@ struct target_stat64 {
+ 	unsigned int	st_blocks;
+=20
+ 	unsigned int	target_st_atime;
+-	unsigned int	__unused1;
++	unsigned int	target_st_atime_nsec;
+=20
+ 	unsigned int	target_st_mtime;
+-	unsigned int	__unused2;
++	unsigned int	target_st_mtime_nsec;
+=20
+ 	unsigned int	target_st_ctime;
+-	unsigned int	__unused3;
++	unsigned int	target_st_ctime_nsec;
+=20
+-	unsigned int	__unused4;
+-	unsigned int	__unused5;
++	unsigned int	__unused1;
++	unsigned int	__unused2;
+ };
+=20
+ #elif defined(TARGET_PPC)
+=20
++#define TARGET_STAT_HAVE_NSEC
+ struct target_stat {
+ 	abi_ulong st_dev;
+ 	abi_ulong st_ino;
+@@ -1443,6 +1446,7 @@ struct QEMU_PACKED target_stat64 {
+=20
+ #elif defined(TARGET_MICROBLAZE)
+=20
++#define TARGET_STAT_HAVE_NSEC
+ struct target_stat {
+ 	abi_ulong st_dev;
+ 	abi_ulong st_ino;
+@@ -1558,6 +1562,7 @@ struct target_stat64 {
+=20
+ #elif defined(TARGET_ABI_MIPSN64)
+=20
++#define TARGET_STAT_HAVE_NSEC
+ /* The memory layout is the same as of struct stat64 of the 32-bit kerne=
+l.  */
+ struct target_stat {
+ 	unsigned int		st_dev;
+@@ -1597,6 +1602,7 @@ struct target_stat {
+=20
+ #elif defined(TARGET_ABI_MIPSN32)
+=20
++#define TARGET_STAT_HAVE_NSEC
+ struct target_stat {
+         abi_ulong    st_dev;
+         abi_ulong    st_pad0[3]; /* Reserved for st_dev expansion */
+@@ -1621,6 +1627,7 @@ struct target_stat {
+=20
+ #elif defined(TARGET_ABI_MIPSO32)
+=20
++#define TARGET_STAT_HAVE_NSEC
+ struct target_stat {
+ 	unsigned	st_dev;
+ 	abi_long	st_pad1[3];		/* Reserved for network id */
+@@ -1737,6 +1744,7 @@ struct target_stat64 {
+=20
+ #elif defined(TARGET_SH4)
+=20
++#define TARGET_STAT_HAVE_NSEC
+ struct target_stat {
+ 	abi_ulong  st_dev;
+ 	abi_ulong  st_ino;
+@@ -1796,6 +1804,7 @@ struct QEMU_PACKED target_stat64 {
+ };
+=20
+ #elif defined(TARGET_I386) && !defined(TARGET_ABI32)
++#define TARGET_STAT_HAVE_NSEC
+ struct target_stat {
+ 	abi_ulong	st_dev;
+ 	abi_ulong	st_ino;
+@@ -1841,6 +1850,7 @@ struct target_stat {
+     abi_ulong  __unused[3];
+ };
+ #elif defined(TARGET_AARCH64)
++#define TARGET_STAT_HAVE_NSEC
+ struct target_stat {
+     abi_ulong  st_dev;
+     abi_ulong  st_ino;
+@@ -1863,6 +1873,7 @@ struct target_stat {
+     unsigned int __unused[2];
+ };
+ #elif defined(TARGET_XTENSA)
++#define TARGET_STAT_HAVE_NSEC
+ struct target_stat {
+     abi_ulong       st_dev;
+     abi_ulong       st_ino;
+@@ -1912,6 +1923,7 @@ struct target_stat64  {
+=20
+ /* These are the asm-generic versions of the stat and stat64 structures =
+*/
+=20
++#define TARGET_STAT_HAVE_NSEC
+ struct target_stat {
+     abi_ulong st_dev;
+     abi_ulong st_ino;
+@@ -1963,6 +1975,7 @@ struct target_stat64 {
+=20
+ #elif defined(TARGET_HPPA)
+=20
++#define TARGET_STAT_HAVE_NSEC
+ struct target_stat {
+     abi_uint   st_dev;
+     abi_uint   st_ino;
+--=20
 2.20.1
 
 
