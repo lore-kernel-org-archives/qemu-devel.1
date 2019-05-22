@@ -6,56 +6,56 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 97CDCC282CE
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 17:06:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3626FC282CE
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 17:08:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6C5DA2070D
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 17:06:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6C5DA2070D
+	by mail.kernel.org (Postfix) with ESMTPS id 0593B2081C
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 17:08:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0593B2081C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:47973 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:47987 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hTUgo-0004XI-NA
-	for qemu-devel@archiver.kernel.org; Wed, 22 May 2019 13:06:06 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:40701)
+	id 1hTUil-0006Cr-A5
+	for qemu-devel@archiver.kernel.org; Wed, 22 May 2019 13:08:07 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:40745)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hTUfE-0003aC-Gn
-	for qemu-devel@nongnu.org; Wed, 22 May 2019 13:04:29 -0400
+	(envelope-from <mreitz@redhat.com>) id 1hTUfG-0003cN-I1
+	for qemu-devel@nongnu.org; Wed, 22 May 2019 13:04:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hTUfC-0007nF-DX
-	for qemu-devel@nongnu.org; Wed, 22 May 2019 13:04:28 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33118)
+	(envelope-from <mreitz@redhat.com>) id 1hTUfE-0007oy-Dn
+	for qemu-devel@nongnu.org; Wed, 22 May 2019 13:04:30 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57528)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mreitz@redhat.com>)
-	id 1hTUf6-0007ay-Ed; Wed, 22 May 2019 13:04:22 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
+	id 1hTUf4-0007Vb-J3; Wed, 22 May 2019 13:04:20 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D9F8F820E9;
-	Wed, 22 May 2019 17:04:04 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 3AA2481DF9;
+	Wed, 22 May 2019 17:04:08 +0000 (UTC)
 Received: from localhost (ovpn-204-123.brq.redhat.com [10.40.204.123])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 1E1E5600C0;
-	Wed, 22 May 2019 17:04:03 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id C8F43611A0;
+	Wed, 22 May 2019 17:04:06 +0000 (UTC)
 From: Max Reitz <mreitz@redhat.com>
 To: qemu-block@nongnu.org
-Date: Wed, 22 May 2019 19:03:46 +0200
-Message-Id: <20190522170352.12020-3-mreitz@redhat.com>
+Date: Wed, 22 May 2019 19:03:47 +0200
+Message-Id: <20190522170352.12020-4-mreitz@redhat.com>
 In-Reply-To: <20190522170352.12020-1-mreitz@redhat.com>
 References: <20190522170352.12020-1-mreitz@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.26]);
-	Wed, 22 May 2019 17:04:09 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.25]);
+	Wed, 22 May 2019 17:04:08 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v3 2/8] block: Add bdrv_child_refresh_perms()
+Subject: [Qemu-devel] [PATCH v3 3/8] block/mirror: Fix child permissions
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -73,88 +73,104 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-If a block node uses bdrv_child_try_set_perm() to change the permission
-it takes on its child, the result may be very short-lived.  If anything
-makes the block layer recalculate the permissions internally, it will
-invoke the node driver's .bdrv_child_perm() implementation.  The
-permission/shared permissions masks that returns will then override the
-values previously passed to bdrv_child_try_set_perm().
+We cannot use bdrv_child_try_set_perm() to give up all restrictions on
+the child edge, and still have bdrv_mirror_top_child_perm() request
+BLK_PERM_WRITE.  Fix this by making bdrv_mirror_top_child_perm() return
+0/BLK_PERM_ALL when we want to give up all permissions, and replacing
+bdrv_child_try_set_perm() by bdrv_child_refresh_perms().
 
-If drivers want a child edge to have specific values for the
-permissions/shared permissions mask, it must return them in
-.bdrv_child_perm().  Consequentially, there is no need for them to pass
-the same values to bdrv_child_try_set_perm() then: It is better to have
-a function that invokes .bdrv_child_perm() and calls
-bdrv_child_try_set_perm() with the result.  This patch adds such a
-function under the name of bdrv_child_refresh_perms().
+The bdrv_child_try_set_perm() before removing the node with
+bdrv_replace_node() is then unnecessary.  No permissions have changed
+since the previous invocation of bdrv_child_try_set_perm().
 
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 Reviewed-by: Kevin Wolf <kwolf@redhat.com>
 ---
- include/block/block_int.h | 15 +++++++++++++++
- block.c                   | 12 ++++++++++++
- 2 files changed, 27 insertions(+)
+ block/mirror.c | 32 +++++++++++++++++++++++---------
+ 1 file changed, 23 insertions(+), 9 deletions(-)
 
-diff --git a/include/block/block_int.h b/include/block/block_int.h
-index 1eebc7c8f3..e1f6d50b01 100644
---- a/include/block/block_int.h
-+++ b/include/block/block_int.h
-@@ -1167,9 +1167,24 @@ BdrvChild *bdrv_root_attach_child(BlockDriverState=
- *child_bs,
-                                   void *opaque, Error **errp);
- void bdrv_root_unref_child(BdrvChild *child);
+diff --git a/block/mirror.c b/block/mirror.c
+index ec4bd9f404..649ce55551 100644
+--- a/block/mirror.c
++++ b/block/mirror.c
+@@ -85,6 +85,7 @@ typedef struct MirrorBlockJob {
 =20
-+/**
-+ * Sets a BdrvChild's permissions.  Avoid if the parent is a BDS; use
-+ * bdrv_child_refresh_perms() instead and make the parent's
-+ * .bdrv_child_perm() implementation return the correct values.
-+ */
- int bdrv_child_try_set_perm(BdrvChild *c, uint64_t perm, uint64_t shared=
-,
-                             Error **errp);
+ typedef struct MirrorBDSOpaque {
+     MirrorBlockJob *job;
++    bool stop;
+ } MirrorBDSOpaque;
 =20
-+/**
-+ * Calls bs->drv->bdrv_child_perm() and updates the child's permission
-+ * masks with the result.
-+ * Drivers should invoke this function whenever an event occurs that
-+ * makes their .bdrv_child_perm() implementation return different
-+ * values than before, but which will not result in the block layer
-+ * automatically refreshing the permissions.
-+ */
-+int bdrv_child_refresh_perms(BlockDriverState *bs, BdrvChild *c, Error *=
-*errp);
-+
- /* Default implementation for BlockDriver.bdrv_child_perm() that can be =
-used by
-  * block filters: Forward CONSISTENT_READ, WRITE, WRITE_UNCHANGED and RE=
-SIZE to
-  * all children */
-diff --git a/block.c b/block.c
-index 4c3902508d..02157e0652 100644
---- a/block.c
-+++ b/block.c
-@@ -2083,6 +2083,18 @@ int bdrv_child_try_set_perm(BdrvChild *c, uint64_t=
- perm, uint64_t shared,
-     return 0;
- }
+ struct MirrorOp {
+@@ -656,8 +657,9 @@ static int mirror_exit_common(Job *job)
 =20
-+int bdrv_child_refresh_perms(BlockDriverState *bs, BdrvChild *c, Error *=
-*errp)
-+{
-+    uint64_t parent_perms, parent_shared;
-+    uint64_t perms, shared;
+     /* We don't access the source any more. Dropping any WRITE/RESIZE is
+      * required before it could become a backing file of target_bs. */
+-    bdrv_child_try_set_perm(mirror_top_bs->backing, 0, BLK_PERM_ALL,
+-                            &error_abort);
++    bs_opaque->stop =3D true;
++    bdrv_child_refresh_perms(mirror_top_bs, mirror_top_bs->backing,
++                             &error_abort);
+     if (!abort && s->backing_mode =3D=3D MIRROR_SOURCE_BACKING_CHAIN) {
+         BlockDriverState *backing =3D s->is_none_mode ? src : s->base;
+         if (backing_bs(target_bs) !=3D backing) {
+@@ -704,13 +706,12 @@ static int mirror_exit_common(Job *job)
+     g_free(s->replaces);
+     bdrv_unref(target_bs);
+=20
+-    /* Remove the mirror filter driver from the graph. Before this, get =
+rid of
++    /*
++     * Remove the mirror filter driver from the graph. Before this, get =
+rid of
+      * the blockers on the intermediate nodes so that the resulting stat=
+e is
+-     * valid. Also give up permissions on mirror_top_bs->backing, which =
+might
+-     * block the removal. */
++     * valid.
++     */
+     block_job_remove_all_bdrv(bjob);
+-    bdrv_child_try_set_perm(mirror_top_bs->backing, 0, BLK_PERM_ALL,
+-                            &error_abort);
+     bdrv_replace_node(mirror_top_bs, backing_bs(mirror_top_bs), &error_a=
+bort);
+=20
+     /* We just changed the BDS the job BB refers to (with either or both=
+ of the
+@@ -1459,6 +1460,18 @@ static void bdrv_mirror_top_child_perm(BlockDriver=
+State *bs, BdrvChild *c,
+                                        uint64_t perm, uint64_t shared,
+                                        uint64_t *nperm, uint64_t *nshare=
+d)
+ {
++    MirrorBDSOpaque *s =3D bs->opaque;
 +
-+    bdrv_get_cumulative_perm(bs, &parent_perms, &parent_shared);
-+    bdrv_child_perm(bs, c->bs, c, c->role, NULL, parent_perms, parent_sh=
-ared,
-+                    &perms, &shared);
++    if (s->stop) {
++        /*
++         * If the job is to be stopped, we do not need to forward
++         * anything to the real image.
++         */
++        *nperm =3D 0;
++        *nshared =3D BLK_PERM_ALL;
++        return;
++    }
 +
-+    return bdrv_child_try_set_perm(c, perms, shared, errp);
-+}
-+
- void bdrv_filter_default_perms(BlockDriverState *bs, BdrvChild *c,
-                                const BdrvChildRole *role,
-                                BlockReopenQueue *reopen_queue,
+     /* Must be able to forward guest writes to the real image */
+     *nperm =3D 0;
+     if (perm & BLK_PERM_WRITE) {
+@@ -1679,8 +1692,9 @@ fail:
+         job_early_fail(&s->common.job);
+     }
+=20
+-    bdrv_child_try_set_perm(mirror_top_bs->backing, 0, BLK_PERM_ALL,
+-                            &error_abort);
++    bs_opaque->stop =3D true;
++    bdrv_child_refresh_perms(mirror_top_bs, mirror_top_bs->backing,
++                             &error_abort);
+     bdrv_replace_node(mirror_top_bs, backing_bs(mirror_top_bs), &error_a=
+bort);
+=20
+     bdrv_unref(mirror_top_bs);
 --=20
 2.21.0
 
