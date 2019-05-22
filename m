@@ -2,87 +2,64 @@ Return-Path: <SRS0=8zLO=TW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,FROM_EXCESS_BASE64,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.0 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EAFD5C282CE
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 13:07:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1831CC282CE
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 13:08:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B4B29205ED
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 13:07:33 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XNbMccy5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B4B29205ED
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id E55A12089E
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 13:08:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E55A12089E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:43013 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:43019 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hTQxw-0004o6-Tg
-	for qemu-devel@archiver.kernel.org; Wed, 22 May 2019 09:07:32 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:33667)
+	id 1hTQyj-0005Nn-4a
+	for qemu-devel@archiver.kernel.org; Wed, 22 May 2019 09:08:21 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:33826)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1hTQx0-0003xK-FN
-	for qemu-devel@nongnu.org; Wed, 22 May 2019 09:06:35 -0400
+	(envelope-from <imammedo@redhat.com>) id 1hTQxc-0004mL-2Z
+	for qemu-devel@nongnu.org; Wed, 22 May 2019 09:07:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1hTQwy-0002nS-OG
-	for qemu-devel@nongnu.org; Wed, 22 May 2019 09:06:34 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:40796)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1hTQwy-0002kN-6F
-	for qemu-devel@nongnu.org; Wed, 22 May 2019 09:06:32 -0400
-Received: by mail-wm1-x342.google.com with SMTP id 15so2137732wmg.5
-	for <qemu-devel@nongnu.org>; Wed, 22 May 2019 06:06:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-	:cc:content-transfer-encoding;
-	bh=gok4u72BbEisv/vBRFjWD9ydNQf3TCYkN9ifNXoOnkU=;
-	b=XNbMccy5jyv1iiF8YHxgfqaubnxVE0RPQ91Eezf7w2m1tTJpaXbeyQAMo59uhrnOoX
-	l6xG23LLh+RGA4OXj5tgzjDKI2Fddcvtwl5NVlq7Lr7Mpq6spgsH4JnPi2i8mN3sXCMi
-	EYpMOC3bF6PwNnfIALcU9LHdiyqt+LN/ethSy4wsUF5FSHEjlMQxhvlcNv7sZnmaPbhz
-	lPX8sxXAsKyv7r4RFstMYfRzdZTaY/47coPrqZhG7nd/C1+hvXiaafU4UYRxJ5Y5yJtB
-	Eh+JKA1QPx8NtyND+wuesW8VBa0T/PQoAzQndJTx7on2tsDgP+jbzu3MtEPzDHFX0A13
-	DCEA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-	:message-id:subject:to:cc:content-transfer-encoding;
-	bh=gok4u72BbEisv/vBRFjWD9ydNQf3TCYkN9ifNXoOnkU=;
-	b=qBTmyuilGUt+Wj7Re7Zz4qYpfmUo7afnD8nWF//0jkYoIHijw0TR55tSj3Ag3PVE5Z
-	36CAYy1WnyojcPwAHyrAJAzeuO31H4lZl/Nh75cKckH2dhcPrsmQBjSYMP2ZH3ertdLA
-	2CnNy+64pPXXzU1xMqk3tpJqxI4emG41k8W2gHGoW00btdorjbkJKSpFNSZ9zPxDQViQ
-	O28TH7FEyTBlA2Rk4D/sQoLILoy0js/VNE9/aYMf6tGohMY4oFi4UrAOlTUV5sSn3eRH
-	qoU1l55A8ht7FHw+K9umeSPNIbfjlkWJ2ye5+KMfB0gTKqkZnaUl3rljncBcqnw+b3N3
-	Olbg==
-X-Gm-Message-State: APjAAAUIusWyrkvCxhyONrRY+kJ1IYoE/Ff8edL4isGfL0Q/8/x+CAER
-	adh9LZNpdQKHT02PiRK/G9wy7w/C+GdQ6aZ0zhk=
-X-Google-Smtp-Source: APXvYqyza9V2ewzJd/Ab5PvRZx/x8Fep1M29gH51x3ZqZB80EFU1uAYc57rmzTSp2NVyoNG3MVsZMN6JgHkI6QwGDt4=
-X-Received: by 2002:a1c:c706:: with SMTP id x6mr1564966wmf.35.1558530388999;
-	Wed, 22 May 2019 06:06:28 -0700 (PDT)
+	(envelope-from <imammedo@redhat.com>) id 1hTQxb-0003Vv-4f
+	for qemu-devel@nongnu.org; Wed, 22 May 2019 09:07:12 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40814)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1hTQxa-0003Sd-D1
+	for qemu-devel@nongnu.org; Wed, 22 May 2019 09:07:11 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id A8B3730C250E;
+	Wed, 22 May 2019 13:07:01 +0000 (UTC)
+Received: from localhost (unknown [10.43.2.182])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id A2CA36199B;
+	Wed, 22 May 2019 13:06:46 +0000 (UTC)
+Date: Wed, 22 May 2019 15:06:42 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20190522150642.3da34e6b@redhat.com>
+In-Reply-To: <20190521092553-mutt-send-email-mst@kernel.org>
+References: <20190520231008.20140-1-mst@redhat.com>
+	<CAFEAcA80Q8zWxM4TBVMZHLuOzo0HSpT=4C76uAwdMjLn2Xye=w@mail.gmail.com>
+	<20190521092553-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-References: <20190514104126.6294-1-marcandre.lureau@redhat.com>
-	<20190514104126.6294-3-marcandre.lureau@redhat.com>
-	<36d35842-d872-427b-accf-2d206a6c6b61@redhat.com>
-	<CAJ+F1CL3KJpE_+XCXUMyffuCPwUOaqZCzHpxqv2q_BKdQVF_4w@mail.gmail.com>
-	<20190522052322.wd4b5vynbd7ae6bm@sirius.home.kraxel.org>
-In-Reply-To: <20190522052322.wd4b5vynbd7ae6bm@sirius.home.kraxel.org>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Wed, 22 May 2019 15:06:17 +0200
-Message-ID: <CAJ+F1CKcb2v4J-qH2Buq_pFMVWHasrmapXufa95Fe+hK7uXQJw@mail.gmail.com>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2a00:1450:4864:20::342
-Subject: Re: [Qemu-devel] [PATCH v4 2/3] libvhost-user: fix -Werror=format=
- on ppc64
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.40]);
+	Wed, 22 May 2019 13:07:06 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PULL v2 00/36] pci, pc, virtio: features, fixes
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -94,99 +71,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
-	QEMU <qemu-devel@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Laszlo Ersek <lersek@redhat.com>,
+	QEMU Developers <qemu-devel@nongnu.org>,
+	Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi
+On Tue, 21 May 2019 09:26:16 -0400
+"Michael S. Tsirkin" <mst@redhat.com> wrote:
 
-On Wed, May 22, 2019 at 7:23 AM Gerd Hoffmann <kraxel@redhat.com> wrote:
->
-> On Tue, May 14, 2019 at 02:33:41PM +0200, Marc-Andr=C3=A9 Lureau wrote:
-> > Hi
-> >
-> > On Tue, May 14, 2019 at 2:10 PM Philippe Mathieu-Daud=C3=A9
-> > <philmd@redhat.com> wrote:
+> On Tue, May 21, 2019 at 12:49:48PM +0100, Peter Maydell wrote:
+> > On Tue, 21 May 2019 at 00:10, Michael S. Tsirkin <mst@redhat.com> wrote:  
 > > >
-> > > Hi Marc-Andr=C3=A9,
+> > > The following changes since commit 2259637b95bef3116cc262459271de08e038cc66:
 > > >
-> > > On 5/14/19 12:41 PM, Marc-Andr=C3=A9 Lureau wrote:
-> > > > That should fix the following warning:
-> > > >
-> > > > /home/pm215/qemu/contrib/libvhost-user/libvhost-user.c: In function
-> > > > =E2=80=98vu_set_mem_table_exec_postcopy=E2=80=99:
-> > > > /home/pm215/qemu/contrib/libvhost-user/libvhost-user.c:666:9: error=
-:
-> > > > format =E2=80=98%llx=E2=80=99 expects argument of type =E2=80=98lon=
-g long unsigned int=E2=80=99, but
-> > > > argument 5 has type =E2=80=98__u64=E2=80=99 [-Werror=3Dformat=3D]
-> > > >          DPRINT("%s: region %d: Registered userfault for %llx + %ll=
-x\n",
-> > > >          ^
-> > > > /home/pm215/qemu/contrib/libvhost-user/libvhost-user.c:666:9: error=
-:
-> > > > format =E2=80=98%llx=E2=80=99 expects argument of type =E2=80=98lon=
-g long unsigned int=E2=80=99, but
-> > > > argument 6 has type =E2=80=98__u64=E2=80=99 [-Werror=3Dformat=3D]
-> > > > cc1: all warnings being treated as errors
-> > > >
-> > > > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> > > > ---
-> > > >  contrib/libvhost-user/libvhost-user.c | 6 ++++--
-> > > >  1 file changed, 4 insertions(+), 2 deletions(-)
-> > > >
-> > > > diff --git a/contrib/libvhost-user/libvhost-user.c b/contrib/libvho=
-st-user/libvhost-user.c
-> > > > index 40443a3daa..ab85166b15 100644
-> > > > --- a/contrib/libvhost-user/libvhost-user.c
-> > > > +++ b/contrib/libvhost-user/libvhost-user.c
-> > > > @@ -663,8 +663,10 @@ vu_set_mem_table_exec_postcopy(VuDev *dev, Vho=
-stUserMsg *vmsg)
-> > > >                       __func__, i);
-> > > >              return false;
-> > > >          }
-> > > > -        DPRINT("%s: region %d: Registered userfault for %llx + %ll=
-x\n",
-> > > > -                __func__, i, reg_struct.range.start, reg_struct.ra=
-nge.len);
-> > > > +        DPRINT("%s: region %d: Registered userfault for %"
-> > > > +               PRIu64 " + %" PRIu64 "\n", __func__, i,
+> > >   Merge remote-tracking branch 'remotes/kevin/tags/for-upstream' into staging (2019-05-20 17:22:05 +0100)
 > > >
-> > > I guess you want PRIx64 in both places here.
+> > > are available in the Git repository at:
 > > >
-> > > I'd put the '%' on the next line:
+> > >   git://git.kernel.org/pub/scm/virt/kvm/mst/qemu.git tags/for_upstream
 > > >
-> > >            DPRINT("%s: region %d: Registered userfault for "
-> > >                   "%" PRIx64 " + %" PRIx64 "\n", __func__, i,
+> > > for you to fetch changes up to 0c05ec64c388aea59facbef740651afa78e04f50:
 > > >
-> > > Using PRIx64:
-> > > Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> >
-> > indeed, thanks
-> > Gerd, can you change it on commit?
->
-> Fixed & queued.
->
-> What is the status of the vhost-gpu series btw?
-> It doesn't apply cleanly (simliar to v3 of this series),
-> IIRC I've mentioned that a while back ...
+> > >   tests: acpi: print error unable to dump ACPI table during rebuild (2019-05-20 18:40:02 -0400)
+> > >
+> > > ----------------------------------------------------------------
+> > > pci, pc, virtio: features, fixes
+> > >
+> > > reconnect for vhost blk
+> > > tests for UEFI
+> > > misc other stuff
+> > >
+> > > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> > >
+> > > ----------------------------------------------------------------  
+> > 
+> > Hi -- this failed 'make check' for 32-bit Arm hosts:
+> > 
+> > ERROR:/home/peter.maydell/qemu/tests/acpi-utils.c:145:acpi_find_rsdp_address_uefi:
+> > code should not be reached
+> > Aborted
+> > ERROR - too few tests run (expected 1, got 0)
+> > /home/peter.maydell/qemu/tests/Makefile.include:885: recipe for target
+> > 'check-qtest-aarch64' failed
+> > 
+> > thanks
+> > -- PMM  
+> 
+> Nothing jumps out ... Igor?
+On 32-bit ARM host and it looks like UEFI crashes (CCing Laszlo) with:
 
-I thought I replied to you. It is strange, because the last series I
-sent did apply succesfully in patchew:
-https://patchew.org/QEMU/20190513184433.21038-1-marcandre.lureau@redhat.com=
-/
+InstallProtocolInterface: 5B1B31A1-9562-11D2-8E3F-00A0C969723B 469E52C0
+ASSERT [DxeCore] /home/lacos/src/upstream/qemu/roms/edk2/MdePkg/Library/BaseLib/String.c(1090): Length < _gPcd_FixedAtBuild_PcdMaximumAsciiStringLength
 
-It didn't change much since then, I updated the doc to mention the
-pixman format of bitmaps, and fixed some conflicts on rebase:
-https://github.com/elmarco/qemu/tree/vhost-user-gpu
+CLI to reproduce:
 
-I'll resend once the input series is merged, unless you have more
-comments to make on v7.
+qemu-system-aarch64  -display none -machine virt,accel=tcg -nodefaults -nographic -drive if=pflash,format=raw,file=pc-bios/edk2-aarch64-code.fd,readonly -drive if=pflash,format=raw,file=pc-bios/edk2-arm-vars.fd,snapshot=on -cdrom tests/data/uefi-boot-images/bios-tables-test.aarch64.iso.qcow2 -cpu cortex-a57 -serial stdio
 
-thanks!
 
---=20
-Marc-Andr=C3=A9 Lureau
 
