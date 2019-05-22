@@ -2,58 +2,84 @@ Return-Path: <SRS0=8zLO=TW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 35B1FC072A4
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 06:13:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DCBBC072A4
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 06:14:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EEE712173E
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 06:13:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EEE712173E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=birkelund.eu
+	by mail.kernel.org (Postfix) with ESMTPS id 3BBC22173E
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 06:14:14 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QMPtZYwk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3BBC22173E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:36994 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:36996 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hTKVI-0001ht-5A
-	for qemu-devel@archiver.kernel.org; Wed, 22 May 2019 02:13:32 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:38827)
+	id 1hTKVx-0002ap-G5
+	for qemu-devel@archiver.kernel.org; Wed, 22 May 2019 02:14:13 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:38695)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <klaus@birkelund.eu>) id 1hTKU6-00013S-P3
-	for qemu-devel@nongnu.org; Wed, 22 May 2019 02:12:20 -0400
+	(envelope-from <aleksandar.m.mail@gmail.com>) id 1hTKTZ-0000f7-Ve
+	for qemu-devel@nongnu.org; Wed, 22 May 2019 02:11:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <klaus@birkelund.eu>) id 1hTKU5-0000T4-Em
-	for qemu-devel@nongnu.org; Wed, 22 May 2019 02:12:18 -0400
-Received: from charlie.dont.surf ([128.199.63.193]:54654)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <klaus@birkelund.eu>)
-	id 1hTKU2-0000OK-GK; Wed, 22 May 2019 02:12:14 -0400
-Received: from apples.localdomain (soho-cph.cust-cnex.dsd101.net
-	[194.62.216.132])
-	by charlie.dont.surf (Postfix) with ESMTPSA id 46B8ABF513;
-	Wed, 22 May 2019 06:12:12 +0000 (UTC)
-Date: Wed, 22 May 2019 08:12:08 +0200
-From: Klaus Birkelund <klaus@birkelund.eu>
-To: qemu-block@nongnu.org
-Message-ID: <20190522061208.GA2180@apples.localdomain>
-Mail-Followup-To: qemu-block@nongnu.org,
-	Keith Busch <keith.busch@intel.com>, Kevin Wolf <kwolf@redhat.com>,
-	qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>
-References: <20190517084234.26923-1-klaus@birkelund.eu>
-	<20190517084234.26923-6-klaus@birkelund.eu>
+	(envelope-from <aleksandar.m.mail@gmail.com>) id 1hTKTY-00006S-0o
+	for qemu-devel@nongnu.org; Wed, 22 May 2019 02:11:45 -0400
+Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:38420)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
+	id 1hTKTX-00005y-Ql
+	for qemu-devel@nongnu.org; Wed, 22 May 2019 02:11:43 -0400
+Received: by mail-oi1-x242.google.com with SMTP id u199so718788oie.5
+	for <qemu-devel@nongnu.org>; Tue, 21 May 2019 23:11:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+	h=mime-version:in-reply-to:references:from:date:message-id:subject:to
+	:cc; bh=ReE5oeqA1/M05q4THKe6Ey+GCoNHwlVVghSDMkfAoeo=;
+	b=QMPtZYwk8DkZ2Qk/uZtP2pUQm0Y7JKIteguSr4TIBGoBgOvvLW7vbSBNS8GPNKDEAp
+	mmDDc9vxGoom6w7a+KINTvcoW0Ba/Ps4hWwG/jKYAkJZfUo1kHEllbd/8ddovR5HXVEV
+	sELBhH/6XdmWHZ+23yZQ/GC52Nq4MbeXf22zWd6hlW8elKnZ2UFiR+vTM/RtdvePG/Bx
+	fQqI1SjeELNRTkVNFO9cOR79dmcXMp7+zibuRcIwcZ7gCtNIk+ZGsTLEWR/1nJWSZB+R
+	m8dcFqO2rjlhclYpZcajGILAtQw7+IFqLlncpwPglymqUrFl9MPIKZunk53qMes6cUhr
+	eBPg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:mime-version:in-reply-to:references:from:date
+	:message-id:subject:to:cc;
+	bh=ReE5oeqA1/M05q4THKe6Ey+GCoNHwlVVghSDMkfAoeo=;
+	b=Terl2S1nsY1H0dox4B0UrgGPnucne2K4DEn2UlvVm4Kay/lleWARcrNupwkLcaBVY4
+	lDCsH5L6+ZFYoxLHOtsjKoRv9mIaBddA2tvLw9bFqRkxEFq4ClyqFiYDwhiYd5yMv3PL
+	4Y/yNzPv0ITRVllOWzu/O0eNxTWJgxrVahMuX+MEuviJr1om6IfRELOsz+X9cUci/w6s
+	a+B27OUK9xKkS3munN27rLlrnFiLnTorw0yNQlnZtD2nf2uEKQlilL+0FEyOQA3Gc2cD
+	ezySMG25TZygLaDWHj93pyquw7TQuiS1twrmXqpAz0HmT8TdfBUctI3Ce9M4KYnDJLhy
+	1bOw==
+X-Gm-Message-State: APjAAAUicMs1mT6qc0Ci/WBwLeqG+D8l7jFTgtZ/mdYsnM8SQXSKQfr8
+	Q3ja4pyGjqrCbDhoQADxHdSloUCFag5iegdWMT4=
+X-Google-Smtp-Source: APXvYqw9uAWvhf/BZ09JwTi8sIQAfNh7HdU3Z4nO+KlAOz7/Bm6IErQnIioCG4X4OZ3x7/GioIWg4McxjY79a0UVGGk=
+X-Received: by 2002:aca:c2c3:: with SMTP id s186mr3229314oif.79.1558505502816; 
+	Tue, 21 May 2019 23:11:42 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190517084234.26923-6-klaus@birkelund.eu>
-User-Agent: Mutt/1.11.4 (2019-03-13)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 128.199.63.193
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 5/8] nvme: add support for
- metadata
+Received: by 2002:a9d:410f:0:0:0:0:0 with HTTP; Tue, 21 May 2019 23:11:42
+	-0700 (PDT)
+Received: by 2002:a9d:410f:0:0:0:0:0 with HTTP; Tue, 21 May 2019 23:11:42
+	-0700 (PDT)
+In-Reply-To: <20190519203726.20729-1-richard.henderson@linaro.org>
+References: <20190519203726.20729-1-richard.henderson@linaro.org>
+From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Date: Wed, 22 May 2019 08:11:42 +0200
+Message-ID: <CAL1e-=hd+nuZmKms9AmCn8B4UqJ1M3D8A=WvbaM-UwpumkD4vQ@mail.gmail.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::242
+Content-Type: text/plain; charset="UTF-8"
+X-Content-Filtered-By: Mailman/MimeDel 2.1.21
+Subject: Re: [Qemu-devel] [PATCH v7 00/74] linux-user: Split do_syscall
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -65,169 +91,154 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Keith Busch <keith.busch@intel.com>, Kevin Wolf <kwolf@redhat.com>,
-	qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>
+Cc: qemu-devel@nongnu.org, laurent@vivier.eu
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, May 17, 2019 at 10:42:31AM +0200, Klaus Birkelund Jensen wrote:
-> The new `ms` parameter may be used to indicate the number of metadata
-> bytes provided per LBA.
-> 
-> Signed-off-by: Klaus Birkelund Jensen <klaus.jensen@cnexlabs.com>
-> ---
->  hw/block/nvme.c | 31 +++++++++++++++++++++++++++++--
->  hw/block/nvme.h | 11 ++++++++++-
->  2 files changed, 39 insertions(+), 3 deletions(-)
-> 
-> diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-> index c514f93f3867..675967a596d1 100644
-> --- a/hw/block/nvme.c
-> +++ b/hw/block/nvme.c
-> @@ -33,6 +33,8 @@
->   *   num_ns=<int>          : Namespaces to make out of the backing storage,
->   *                           Default:1
->   *   num_queues=<int>      : Number of possible IO Queues, Default:64
-> + *   ms=<int>              : Number of metadata bytes provided per LBA,
-> + *                           Default:0
->   *   cmb_size_mb=<int>     : Size of CMB in MBs, Default:0
->   *
->   * Parameters will be verified against conflicting capabilities and attributes
-> @@ -386,6 +388,8 @@ static uint16_t nvme_blk_map(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
->  
->      uint32_t unit_len = nvme_ns_lbads_bytes(ns);
->      uint32_t len = req->nlb * unit_len;
-> +    uint32_t meta_unit_len = nvme_ns_ms(ns);
-> +    uint32_t meta_len = req->nlb * meta_unit_len;
->      uint64_t prp1 = le64_to_cpu(cmd->prp1);
->      uint64_t prp2 = le64_to_cpu(cmd->prp2);
->  
-> @@ -399,6 +403,19 @@ static uint16_t nvme_blk_map(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
->          return err;
->      }
->  
-> +    qsg.nsg = 0;
-> +    qsg.size = 0;
-> +
-> +    if (cmd->mptr && n->params.ms) {
-> +        qemu_sglist_add(&qsg, le64_to_cpu(cmd->mptr), meta_len);
-> +
-> +        err = nvme_blk_setup(n, ns, &qsg, ns->blk_offset_md, meta_unit_len,
-> +            req);
-> +        if (err) {
-> +            return err;
-> +        }
-> +    }
-> +
->      qemu_sglist_destroy(&qsg);
->  
->      return NVME_SUCCESS;
-> @@ -1902,6 +1919,11 @@ static int nvme_check_constraints(NvmeCtrl *n, Error **errp)
->          return 1;
->      }
->  
-> +    if (params->ms && !is_power_of_2(params->ms)) {
-> +        error_setg(errp, "nvme: invalid metadata configuration");
-> +        return 1;
-> +    }
-> +
->      return 0;
->  }
->  
-> @@ -2066,17 +2088,20 @@ static void nvme_init_ctrl(NvmeCtrl *n)
->  
->  static uint64_t nvme_ns_calc_blks(NvmeCtrl *n, NvmeNamespace *ns)
->  {
-> -    return n->ns_size / nvme_ns_lbads_bytes(ns);
-> +    return n->ns_size / (nvme_ns_lbads_bytes(ns) + nvme_ns_ms(ns));
->  }
->  
->  static void nvme_ns_init_identify(NvmeCtrl *n, NvmeIdNs *id_ns)
->  {
-> +    NvmeParams *params = &n->params;
-> +
->      id_ns->nlbaf = 0;
->      id_ns->flbas = 0;
-> -    id_ns->mc = 0;
-> +    id_ns->mc = params->ms ? 0x2 : 0;
->      id_ns->dpc = 0;
->      id_ns->dps = 0;
->      id_ns->lbaf[0].lbads = BDRV_SECTOR_BITS;
-> +    id_ns->lbaf[0].ms = params->ms;
->  }
->  
->  static int nvme_init_namespace(NvmeCtrl *n, NvmeNamespace *ns, Error **errp)
-> @@ -2086,6 +2111,8 @@ static int nvme_init_namespace(NvmeCtrl *n, NvmeNamespace *ns, Error **errp)
->      nvme_ns_init_identify(n, id_ns);
->  
->      ns->ns_blks = nvme_ns_calc_blks(n, ns);
-> +    ns->blk_offset_md = ns->blk_offset + nvme_ns_lbads_bytes(ns) * ns->ns_blks;
-> +
->      id_ns->nuse = id_ns->ncap = id_ns->nsze = cpu_to_le64(ns->ns_blks);
->  
->      return 0;
-> diff --git a/hw/block/nvme.h b/hw/block/nvme.h
-> index 711ca249eac5..81ee0c5173d5 100644
-> --- a/hw/block/nvme.h
-> +++ b/hw/block/nvme.h
-> @@ -8,13 +8,15 @@
->      DEFINE_PROP_UINT32("cmb_size_mb", _state, _props.cmb_size_mb, 0), \
->      DEFINE_PROP_UINT32("num_queues", _state, _props.num_queues, 64), \
->      DEFINE_PROP_UINT32("num_ns", _state, _props.num_ns, 1), \
-> -    DEFINE_PROP_UINT8("mdts", _state, _props.mdts, 7)
-> +    DEFINE_PROP_UINT8("mdts", _state, _props.mdts, 7), \
-> +    DEFINE_PROP_UINT8("ms", _state, _props.ms, 0)
->  
->  typedef struct NvmeParams {
->      char     *serial;
->      uint32_t num_queues;
->      uint32_t num_ns;
->      uint8_t  mdts;
-> +    uint8_t  ms;
->      uint32_t cmb_size_mb;
->  } NvmeParams;
->  
-> @@ -91,6 +93,7 @@ typedef struct NvmeNamespace {
->      uint32_t        id;
->      uint64_t        ns_blks;
->      uint64_t        blk_offset;
-> +    uint64_t        blk_offset_md;
->  } NvmeNamespace;
->  
->  #define TYPE_NVME "nvme"
-> @@ -154,4 +157,10 @@ static inline size_t nvme_ns_lbads_bytes(NvmeNamespace *ns)
->      return 1 << nvme_ns_lbads(ns);
->  }
->  
-> +static inline uint16_t nvme_ns_ms(NvmeNamespace *ns)
-> +{
-> +    NvmeIdNs *id = &ns->id_ns;
-> +    return le16_to_cpu(id->lbaf[NVME_ID_NS_FLBAS_INDEX(id->flbas)].ms);
-> +}
-> +
->  #endif /* HW_NVME_H */
-> -- 
-> 2.21.0
-> 
+On May 19, 2019 10:38 PM, "Richard Henderson" <richard.henderson@linaro.org>
+wrote:
+>
+> Based-on: <20190519201953.20161-1-richard.henderson@linaro.org>
+> Aka "linux-user: path, clone, sparc, shmat fixes"
+>
+> Version 6 was
+> https://lists.gnu.org/archive/html/qemu-devel/2019-01/msg04794.html
+>
+> Since v5, I've fixed the ioctl failure that Laurent found, and
+> have done a few more syscalls.
+>
+> I've tried to do more testing with LTP, but it's a really annoying
+> testsuite.  There are at least 3 tests that hang forever (before
+> and after this patch set), and the host kernel's OOM handler kills
+> my login session, ending the test run.  This seems to be different
+> behaviour than I was seeing in January, when I did have test runs
+> that completed successfully.
+>
+> OTOH, looking back at the v6 cover letter, I now see that I was
+> testing armhf and i386 as guests, whereas this time I was trying
+> aarch64 and ppc64 as guests.  32-bit guests unable to trigger the
+> host OOM killer?
+>
+> Laurent, is there anything special that you're doing to see these
+> tests run to completion?
+>
 
-Hi Kevin,
+On surface, this series looks to be a refactoring series. However, this is
+not the case: burried in various patches, are removals of some features
+visible to the end user. Can you please list all such cases in the cover
+letter, so that they can be easier identified and evaluated by reviewers?
 
-I feel this patch that has nothing to do with ocssd also touches upon
-the core issue we are discussing in the ocssd thread.
+Thanks,
+Aleksandar
 
-As I understand it, QEMU does not support metadata pr LBA in the block
-layer. Thus, the approach in this patch is also flawed because it breaks
-the assumptions of other devices?
-
-The approach suggested in this patch is to split the image into a large
-data part and a trailing part for storing metadata bytes per data
-sector.
-
-  [                      data                        ][ meta ]
-
-How about I drop this patch and the ocssd patch from this series and
-just move forward with the other changes to the nvme device (i.e. v1.3
-and sgls) for now and we can continue the discussion on how to get
-metadata and ocssd support merged in another thread?
-
+>
+> r~
+>
+>
+> Richard Henderson (74):
+>   linux-user: Setup split syscall infrastructure
+>   linux-user: Split out open, open_at
+>   linux-user: Share more code for open and openat
+>   linux-user: Tidy do_openat loop over fakes
+>   linux-user: Split out readlink, readlinkat
+>   linux-user: Split out close
+>   linux-user: Split out read, write
+>   linux-user: Reduce regpairs_aligned & target_offset64 ifdefs
+>   linux-user: Split out readv, writev
+>   linux-user: Split out pread64, pwrite64
+>   linux-user: Split out preadv, pwritev
+>   linux-user: Split out name_to_handle_at, open_by_handle_at
+>   linux-user: Split out ipc syscalls
+>   linux-user: Split out memory syscalls
+>   linux-user: Split out exit
+>   linux-user: Split out brk
+>   linux-user: Split out clone, fork, vfork
+>   linux-user: Split out wait4, waitid, waitpid
+>   linux-user: Implement rusage argument to waitid
+>   linux-user: Split out creat
+>   linux-user: Split out link, linkat
+>   linux-user: Split out unlink, unlinkat, rmdir
+>   linux-user: Split out execve
+>   linux-user: Implement execveat
+>   linux-user: Split out chdir
+>   linux-user: Split out time
+>   linux-user: Split out mknod, mknodat
+>   linux-user: Split out chmod, fchmod, fchmodat
+>   linux-user: Split out lseek, llseek
+>   linux-user: Split out getpid, getppid, getxpid
+>   linux-user: Split out mount
+>   linux-user: Split out umount, umount2
+>   linux-user: Split out stime
+>   linux-user: Split out alarm, pause
+>   linux-user: Split out utime, utimes, futimesat
+>   linux-user: Split out access, faccessat
+>   linux-user: Split out nice
+>   linux-user: Split out sync, syncfs
+>   linux-user: Split out kill
+>   linux-user: Split out rename, renameat, renameat2
+>   linux-user: Split out mkdir, mkdirat
+>   linux-user: Split out dup, dup2, dup3
+>   linux-user: Split out pipe, pipe2
+>   linux-user: Split out times
+>   linux-user: Split out acct
+>   linux-user: Move syscall_init to the end
+>   linux-user: Split out ioctl
+>   linux-user: Fix types in ioctl logging
+>   linux-user: Remove sentinel from ioctl_entries
+>   linux-user: Split out fcntl, fcntl64
+>   linux-user: Split out setpgid
+>   linux-user: Split out umask
+>   linux-user: Split out chroot
+>   linux-user: Split out getpgid, getpgrp
+>   linux-user: Split out getsid, setsid
+>   linux-user: Split out sigaction, rt_sigaction
+>   linux-user: Split out sgetmask, ssetmask
+>   linux-user: Split out sigprocmask, rt_sigprocmask
+>   linux-user: Split out sigpending, rt_sigpending
+>   linux-user: Split out sigsuspend, rt_sigsuspend
+>   linux-user: Split out rt_sigtimedwait
+>   linux-user: Split out rt_sigqueueinfo, rt_tgsigqueueinfo
+>   linux-user: Split out sigreturn, rt_sigreturn
+>   linux-user: Split out gethostname, sethostname
+>   linux-user: Split out getrlimit, setrlimit
+>   linux-user: Split out getrusage
+>   linux-user: Split out gettimeofday, settimeofday
+>   linux-user: Split out select, _newselect
+>   linux-user: Split out pselect6
+>   linux-user: Split out symlink, symlinkat
+>   linux-user: Split out swapon, swapoff
+>   linux-user: Split out reboot
+>   linux-user: Split out truncate, truncate64, ftruncate, ftruncate64
+>   linux-user: Split out getpriority, setpriority
+>
+>  linux-user/syscall-defs.h      |  338 +++
+>  linux-user/syscall.h           |  103 +
+>  linux-user/strace.c            | 1569 +++-------
+>  linux-user/syscall-fcntl.inc.c |  322 ++
+>  linux-user/syscall-file.inc.c  | 1526 ++++++++++
+>  linux-user/syscall-ioctl.inc.c |  873 ++++++
+>  linux-user/syscall-ipc.inc.c   | 1088 +++++++
+>  linux-user/syscall-mem.inc.c   |  244 ++
+>  linux-user/syscall-proc.inc.c  |  758 +++++
+>  linux-user/syscall-sig.inc.c   |  549 ++++
+>  linux-user/syscall-time.inc.c  |   77 +
+>  linux-user/syscall.c           | 5045 ++------------------------------
+>  configure                      |   20 -
+>  linux-user/strace.list         |  414 ---
+>  14 files changed, 6512 insertions(+), 6414 deletions(-)
+>  create mode 100644 linux-user/syscall-defs.h
+>  create mode 100644 linux-user/syscall.h
+>  create mode 100644 linux-user/syscall-fcntl.inc.c
+>  create mode 100644 linux-user/syscall-file.inc.c
+>  create mode 100644 linux-user/syscall-ioctl.inc.c
+>  create mode 100644 linux-user/syscall-ipc.inc.c
+>  create mode 100644 linux-user/syscall-mem.inc.c
+>  create mode 100644 linux-user/syscall-proc.inc.c
+>  create mode 100644 linux-user/syscall-sig.inc.c
+>  create mode 100644 linux-user/syscall-time.inc.c
+>
+> --
+> 2.17.1
+>
+>
