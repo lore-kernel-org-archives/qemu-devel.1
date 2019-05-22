@@ -2,56 +2,88 @@ Return-Path: <SRS0=8zLO=TW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3408DC282CE
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 19:18:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E7AA8C282CE
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 19:18:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EC06B20879
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 19:18:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EC06B20879
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
+	by mail.kernel.org (Postfix) with ESMTPS id A49D220879
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 19:18:37 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Al34NMFF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A49D220879
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:49959 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:49961 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hTWkc-0002zq-4M
-	for qemu-devel@archiver.kernel.org; Wed, 22 May 2019 15:18:10 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:36571)
+	id 1hTWl2-0003Pl-Sq
+	for qemu-devel@archiver.kernel.org; Wed, 22 May 2019 15:18:36 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:35158)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1hTWRy-0003EL-Qk
-	for qemu-devel@nongnu.org; Wed, 22 May 2019 14:58:56 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hTWOp-0008Lh-J4
+	for qemu-devel@nongnu.org; Wed, 22 May 2019 14:55:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1hTWRw-0000N6-UK
-	for qemu-devel@nongnu.org; Wed, 22 May 2019 14:58:54 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:60468 helo=mail.rt-rk.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1hTWRw-0000M0-JJ
-	for qemu-devel@nongnu.org; Wed, 22 May 2019 14:58:52 -0400
-Received: from localhost (localhost [127.0.0.1])
-	by mail.rt-rk.com (Postfix) with ESMTP id 8F40A1A4531;
-	Wed, 22 May 2019 20:58:49 +0200 (CEST)
-X-Virus-Scanned: amavisd-new at rt-rk.com
-Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
-	[10.10.13.43])
-	by mail.rt-rk.com (Postfix) with ESMTPSA id 68EC01A2160;
-	Wed, 22 May 2019 20:58:49 +0200 (CEST)
-From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
+	(envelope-from <richard.henderson@linaro.org>) id 1hTWCJ-00086c-Ok
+	for qemu-devel@nongnu.org; Wed, 22 May 2019 14:42:45 -0400
+Received: from mail-yb1-xb44.google.com ([2607:f8b0:4864:20::b44]:45287)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1hTWCH-00085b-QA
+	for qemu-devel@nongnu.org; Wed, 22 May 2019 14:42:41 -0400
+Received: by mail-yb1-xb44.google.com with SMTP id e128so1238846ybc.12
+	for <qemu-devel@nongnu.org>; Wed, 22 May 2019 11:42:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=from:to:cc:subject:date:message-id:in-reply-to:references
+	:mime-version:content-transfer-encoding;
+	bh=ooMVwgAp+U7g50/jmMWyVcKo6lX9ghcSSdE6Ahl0IEA=;
+	b=Al34NMFFwEg5EiVi2K6FEftXDJw4RmI3y58uV7JjVoeXT2YQzGaA7a2sI8uHT1Ufab
+	U2oeO515vhz01R8i+RXsiywWmqInSvMYEr9Tit10iSzdDgc94MbrDHL+XikJ2SAb+hlh
+	2CPBsFB5vjp+QvMc3C4DLB9l9llXgBXCD/EVmAEe3phGSPIXX4flxGM8sZKFMW2Ig6qC
+	czN43c+45twodRlBzvQ/0MS8nFHyYcY9q5rGCtcRmgo4IxZrrKT+CBwVcZx3d5bv4LIG
+	M0p7m/sdKYWZ2ESbM0ozrzRDMxjL/BLTa8/EfCPbCXljYKg/JKHCcnhAl27Dt7rtFg7c
+	HbWA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+	:references:mime-version:content-transfer-encoding;
+	bh=ooMVwgAp+U7g50/jmMWyVcKo6lX9ghcSSdE6Ahl0IEA=;
+	b=ueE+2qgoAh83Cf1K6q9KFzJyAUBrLtEbp6TlIA16N122ASdhdZ/7Vp3jqcAJeQFiAx
+	ic/EzkaKR/Yesoqt6jAnPCyfSv0jIPmBfcNfUeGZdBBnT8EEJWvABCP10ypOKRMEhvhc
+	zQ+W75PqFDV2VTWjXv/cA/zhWMoQGKmW+s8Ay+X2/rXYSGmKZClXQmTWTZRj3Y3fk1Gi
+	lGZFyDXftEwaVnWI1BA7uDE0hlRC/FmRc36F8NdlbaDq1bcmo8rfB358lkMGN+NCe5Xc
+	yeOLBanTUhKdL8dPQsV5jtROoviQYdqzABjCwYlVUDFSgOtZcb9AxhHvNXJ0YdyvA+F6
+	3AdA==
+X-Gm-Message-State: APjAAAV8ixJmhiqH8fK/bzaaPf3SH3x6gwxED8GauLv5pgMJVD2upB5q
+	07OvqwTVLnY/PbqzH+hEOAx4G0H5YkY=
+X-Google-Smtp-Source: APXvYqyIZJVcRYU8Adotx95rMJayIEPS2/faSvVPEpjqinPgPrj6FWIf+amKSBXKiqStJ+Rm1gYqTA==
+X-Received: by 2002:a5b:c8e:: with SMTP id i14mr5679911ybq.12.1558550560144;
+	Wed, 22 May 2019 11:42:40 -0700 (PDT)
+Received: from localhost.localdomain ([71.46.56.17])
+	by smtp.gmail.com with ESMTPSA id
+	206sm1299445ywq.74.2019.05.22.11.42.39
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Wed, 22 May 2019 11:42:39 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Wed, 22 May 2019 20:58:35 +0200
-Message-Id: <1558551522-24147-5-git-send-email-aleksandar.markovic@rt-rk.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1558551522-24147-1-git-send-email-aleksandar.markovic@rt-rk.com>
-References: <1558551522-24147-1-git-send-email-aleksandar.markovic@rt-rk.com>
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 89.216.37.149
-Subject: [Qemu-devel] [PULL v2 04/11] target/mips: Fix MSA instructions
- ST.<B|H|W|D> on big endian host
+Date: Wed, 22 May 2019 14:42:12 -0400
+Message-Id: <20190522184226.17871-12-richard.henderson@linaro.org>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20190522184226.17871-1-richard.henderson@linaro.org>
+References: <20190522184226.17871-1-richard.henderson@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::b44
+Subject: [Qemu-devel] [PULL 11/25] cpus: Initialize pseudo-random seeds for
+ all guest cpus
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -63,241 +95,159 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, amarkovic@wavecomp.com
+Cc: peter.maydell@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Mateja Marjanovic <Mateja.Marjanovic@rt-rk.com>
+When the -seed option is given, call qemu_guest_random_seed_main,
+putting the subsystem into deterministic mode.  Pass derived seeds
+to each cpu created; which is a no-op unless the subsystem is in
+deterministic mode.
 
-Fix the case when the host is a big endian machine, and change
-the approach toward ST.<B|H|W|D> instruction helpers.
-
-Signed-off-by: Mateja Marjanovic <mateja.marjanovic@rt-rk.com>
-Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-Message-Id: <1554212605-16457-3-git-send-email-mateja.marjanovic@rt-rk.com>
+Reviewed-by: Laurent Vivier <lvivier@redhat.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/mips/op_helper.c | 200 +++++++++++++++++++++++++++++++++++++++++++-----
- 1 file changed, 180 insertions(+), 20 deletions(-)
+ include/qom/cpu.h |  1 +
+ cpus.c            |  9 +++++++++
+ vl.c              |  4 ++++
+ qemu-options.hx   | 10 ++++++++++
+ 4 files changed, 24 insertions(+)
 
-diff --git a/target/mips/op_helper.c b/target/mips/op_helper.c
-index a8ae438..3918027 100644
---- a/target/mips/op_helper.c
-+++ b/target/mips/op_helper.c
-@@ -4550,31 +4550,191 @@ static inline void ensure_writable_pages(CPUMIPSState *env,
- #endif
- }
+diff --git a/include/qom/cpu.h b/include/qom/cpu.h
+index 32983f27c3..98e12d914c 100644
+--- a/include/qom/cpu.h
++++ b/include/qom/cpu.h
+@@ -375,6 +375,7 @@ struct CPUState {
+     int singlestep_enabled;
+     int64_t icount_budget;
+     int64_t icount_extra;
++    uint64_t random_seed;
+     sigjmp_buf jmp_env;
  
--#define MSA_ST_DF(DF, TYPE, ST_INSN, ...)                               \
--void helper_msa_st_ ## TYPE(CPUMIPSState *env, uint32_t wd,             \
--                            target_ulong addr)                          \
--{                                                                       \
--    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);                          \
--    int mmu_idx = cpu_mmu_index(env, false);				\
--    int i;                                                              \
--    MEMOP_IDX(DF)                                                       \
--    ensure_writable_pages(env, addr, mmu_idx, GETPC());                 \
--    for (i = 0; i < DF_ELEMENTS(DF); i++) {                             \
--        ST_INSN(env, addr + (i << DF), pwd->TYPE[i], ##__VA_ARGS__);    \
--    }                                                                   \
-+void helper_msa_st_b(CPUMIPSState *env, uint32_t wd,
-+                     target_ulong addr)
-+{
-+    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
-+    int mmu_idx = cpu_mmu_index(env, false);
-+
-+    MEMOP_IDX(DF_BYTE)
-+    ensure_writable_pages(env, addr, mmu_idx, GETPC());
-+#if !defined(CONFIG_USER_ONLY)
-+#if !defined(HOST_WORDS_BIGENDIAN)
-+    helper_ret_stb_mmu(env, addr + (0  << DF_BYTE), pwd->b[0],  oi, GETPC());
-+    helper_ret_stb_mmu(env, addr + (1  << DF_BYTE), pwd->b[1],  oi, GETPC());
-+    helper_ret_stb_mmu(env, addr + (2  << DF_BYTE), pwd->b[2],  oi, GETPC());
-+    helper_ret_stb_mmu(env, addr + (3  << DF_BYTE), pwd->b[3],  oi, GETPC());
-+    helper_ret_stb_mmu(env, addr + (4  << DF_BYTE), pwd->b[4],  oi, GETPC());
-+    helper_ret_stb_mmu(env, addr + (5  << DF_BYTE), pwd->b[5],  oi, GETPC());
-+    helper_ret_stb_mmu(env, addr + (6  << DF_BYTE), pwd->b[6],  oi, GETPC());
-+    helper_ret_stb_mmu(env, addr + (7  << DF_BYTE), pwd->b[7],  oi, GETPC());
-+    helper_ret_stb_mmu(env, addr + (8  << DF_BYTE), pwd->b[8],  oi, GETPC());
-+    helper_ret_stb_mmu(env, addr + (9  << DF_BYTE), pwd->b[9],  oi, GETPC());
-+    helper_ret_stb_mmu(env, addr + (10 << DF_BYTE), pwd->b[10], oi, GETPC());
-+    helper_ret_stb_mmu(env, addr + (11 << DF_BYTE), pwd->b[11], oi, GETPC());
-+    helper_ret_stb_mmu(env, addr + (12 << DF_BYTE), pwd->b[12], oi, GETPC());
-+    helper_ret_stb_mmu(env, addr + (13 << DF_BYTE), pwd->b[13], oi, GETPC());
-+    helper_ret_stb_mmu(env, addr + (14 << DF_BYTE), pwd->b[14], oi, GETPC());
-+    helper_ret_stb_mmu(env, addr + (15 << DF_BYTE), pwd->b[15], oi, GETPC());
-+#else
-+    helper_ret_stb_mmu(env, addr + (7  << DF_BYTE), pwd->b[0],  oi, GETPC());
-+    helper_ret_stb_mmu(env, addr + (6  << DF_BYTE), pwd->b[1],  oi, GETPC());
-+    helper_ret_stb_mmu(env, addr + (5  << DF_BYTE), pwd->b[2],  oi, GETPC());
-+    helper_ret_stb_mmu(env, addr + (4  << DF_BYTE), pwd->b[3],  oi, GETPC());
-+    helper_ret_stb_mmu(env, addr + (3  << DF_BYTE), pwd->b[4],  oi, GETPC());
-+    helper_ret_stb_mmu(env, addr + (2  << DF_BYTE), pwd->b[5],  oi, GETPC());
-+    helper_ret_stb_mmu(env, addr + (1  << DF_BYTE), pwd->b[6],  oi, GETPC());
-+    helper_ret_stb_mmu(env, addr + (0  << DF_BYTE), pwd->b[7],  oi, GETPC());
-+    helper_ret_stb_mmu(env, addr + (15 << DF_BYTE), pwd->b[8],  oi, GETPC());
-+    helper_ret_stb_mmu(env, addr + (14 << DF_BYTE), pwd->b[9],  oi, GETPC());
-+    helper_ret_stb_mmu(env, addr + (13 << DF_BYTE), pwd->b[10], oi, GETPC());
-+    helper_ret_stb_mmu(env, addr + (12 << DF_BYTE), pwd->b[11], oi, GETPC());
-+    helper_ret_stb_mmu(env, addr + (11 << DF_BYTE), pwd->b[12], oi, GETPC());
-+    helper_ret_stb_mmu(env, addr + (10 << DF_BYTE), pwd->b[13], oi, GETPC());
-+    helper_ret_stb_mmu(env, addr + (9  << DF_BYTE), pwd->b[14], oi, GETPC());
-+    helper_ret_stb_mmu(env, addr + (8  << DF_BYTE), pwd->b[15], oi, GETPC());
-+#endif
-+#else
-+#if !defined(HOST_WORDS_BIGENDIAN)
-+    cpu_stb_data(env, addr + (0  << DF_BYTE), pwd->b[0]);
-+    cpu_stb_data(env, addr + (1  << DF_BYTE), pwd->b[1]);
-+    cpu_stb_data(env, addr + (2  << DF_BYTE), pwd->b[2]);
-+    cpu_stb_data(env, addr + (3  << DF_BYTE), pwd->b[3]);
-+    cpu_stb_data(env, addr + (4  << DF_BYTE), pwd->b[4]);
-+    cpu_stb_data(env, addr + (5  << DF_BYTE), pwd->b[5]);
-+    cpu_stb_data(env, addr + (6  << DF_BYTE), pwd->b[6]);
-+    cpu_stb_data(env, addr + (7  << DF_BYTE), pwd->b[7]);
-+    cpu_stb_data(env, addr + (8  << DF_BYTE), pwd->b[8]);
-+    cpu_stb_data(env, addr + (9  << DF_BYTE), pwd->b[9]);
-+    cpu_stb_data(env, addr + (10 << DF_BYTE), pwd->b[10]);
-+    cpu_stb_data(env, addr + (11 << DF_BYTE), pwd->b[11]);
-+    cpu_stb_data(env, addr + (12 << DF_BYTE), pwd->b[12]);
-+    cpu_stb_data(env, addr + (13 << DF_BYTE), pwd->b[13]);
-+    cpu_stb_data(env, addr + (14 << DF_BYTE), pwd->b[14]);
-+    cpu_stb_data(env, addr + (15 << DF_BYTE), pwd->b[15]);
-+#else
-+    cpu_stb_data(env, addr + (7  << DF_BYTE), pwd->b[0]);
-+    cpu_stb_data(env, addr + (6  << DF_BYTE), pwd->b[1]);
-+    cpu_stb_data(env, addr + (5  << DF_BYTE), pwd->b[2]);
-+    cpu_stb_data(env, addr + (4  << DF_BYTE), pwd->b[3]);
-+    cpu_stb_data(env, addr + (3  << DF_BYTE), pwd->b[4]);
-+    cpu_stb_data(env, addr + (2  << DF_BYTE), pwd->b[5]);
-+    cpu_stb_data(env, addr + (1  << DF_BYTE), pwd->b[6]);
-+    cpu_stb_data(env, addr + (0  << DF_BYTE), pwd->b[7]);
-+    cpu_stb_data(env, addr + (15 << DF_BYTE), pwd->b[8]);
-+    cpu_stb_data(env, addr + (14 << DF_BYTE), pwd->b[9]);
-+    cpu_stb_data(env, addr + (13 << DF_BYTE), pwd->b[10]);
-+    cpu_stb_data(env, addr + (12 << DF_BYTE), pwd->b[11]);
-+    cpu_stb_data(env, addr + (11 << DF_BYTE), pwd->b[12]);
-+    cpu_stb_data(env, addr + (10 << DF_BYTE), pwd->b[13]);
-+    cpu_stb_data(env, addr + (9  << DF_BYTE), pwd->b[14]);
-+    cpu_stb_data(env, addr + (8  << DF_BYTE), pwd->b[15]);
-+#endif
-+#endif
-+}
-+
-+void helper_msa_st_h(CPUMIPSState *env, uint32_t wd,
-+                     target_ulong addr)
-+{
-+    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
-+    int mmu_idx = cpu_mmu_index(env, false);
-+
-+    MEMOP_IDX(DF_HALF)
-+    ensure_writable_pages(env, addr, mmu_idx, GETPC());
-+#if !defined(CONFIG_USER_ONLY)
-+#if !defined(HOST_WORDS_BIGENDIAN)
-+    helper_ret_stw_mmu(env, addr + (0 << DF_HALF), pwd->h[0], oi, GETPC());
-+    helper_ret_stw_mmu(env, addr + (1 << DF_HALF), pwd->h[1], oi, GETPC());
-+    helper_ret_stw_mmu(env, addr + (2 << DF_HALF), pwd->h[2], oi, GETPC());
-+    helper_ret_stw_mmu(env, addr + (3 << DF_HALF), pwd->h[3], oi, GETPC());
-+    helper_ret_stw_mmu(env, addr + (4 << DF_HALF), pwd->h[4], oi, GETPC());
-+    helper_ret_stw_mmu(env, addr + (5 << DF_HALF), pwd->h[5], oi, GETPC());
-+    helper_ret_stw_mmu(env, addr + (6 << DF_HALF), pwd->h[6], oi, GETPC());
-+    helper_ret_stw_mmu(env, addr + (7 << DF_HALF), pwd->h[7], oi, GETPC());
-+#else
-+    helper_ret_stw_mmu(env, addr + (3 << DF_HALF), pwd->h[0], oi, GETPC());
-+    helper_ret_stw_mmu(env, addr + (2 << DF_HALF), pwd->h[1], oi, GETPC());
-+    helper_ret_stw_mmu(env, addr + (1 << DF_HALF), pwd->h[2], oi, GETPC());
-+    helper_ret_stw_mmu(env, addr + (0 << DF_HALF), pwd->h[3], oi, GETPC());
-+    helper_ret_stw_mmu(env, addr + (7 << DF_HALF), pwd->h[4], oi, GETPC());
-+    helper_ret_stw_mmu(env, addr + (6 << DF_HALF), pwd->h[5], oi, GETPC());
-+    helper_ret_stw_mmu(env, addr + (5 << DF_HALF), pwd->h[6], oi, GETPC());
-+    helper_ret_stw_mmu(env, addr + (4 << DF_HALF), pwd->h[7], oi, GETPC());
-+#endif
-+#else
-+#if !defined(HOST_WORDS_BIGENDIAN)
-+    cpu_stw_data(env, addr + (0 << DF_HALF), pwd->h[0]);
-+    cpu_stw_data(env, addr + (1 << DF_HALF), pwd->h[1]);
-+    cpu_stw_data(env, addr + (2 << DF_HALF), pwd->h[2]);
-+    cpu_stw_data(env, addr + (3 << DF_HALF), pwd->h[3]);
-+    cpu_stw_data(env, addr + (4 << DF_HALF), pwd->h[4]);
-+    cpu_stw_data(env, addr + (5 << DF_HALF), pwd->h[5]);
-+    cpu_stw_data(env, addr + (6 << DF_HALF), pwd->h[6]);
-+    cpu_stw_data(env, addr + (7 << DF_HALF), pwd->h[7]);
-+#else
-+    cpu_stw_data(env, addr + (3 << DF_HALF), pwd->h[0]);
-+    cpu_stw_data(env, addr + (2 << DF_HALF), pwd->h[1]);
-+    cpu_stw_data(env, addr + (1 << DF_HALF), pwd->h[2]);
-+    cpu_stw_data(env, addr + (0 << DF_HALF), pwd->h[3]);
-+    cpu_stw_data(env, addr + (7 << DF_HALF), pwd->h[4]);
-+    cpu_stw_data(env, addr + (6 << DF_HALF), pwd->h[5]);
-+    cpu_stw_data(env, addr + (5 << DF_HALF), pwd->h[6]);
-+    cpu_stw_data(env, addr + (4 << DF_HALF), pwd->h[7]);
-+#endif
-+#endif
- }
+     QemuMutex work_mutex;
+diff --git a/cpus.c b/cpus.c
+index e58e7ab0f6..ffc57119ca 100644
+--- a/cpus.c
++++ b/cpus.c
+@@ -50,6 +50,7 @@
+ #include "qemu/option.h"
+ #include "qemu/bitmap.h"
+ #include "qemu/seqlock.h"
++#include "qemu/guest-random.h"
+ #include "tcg.h"
+ #include "hw/nmi.h"
+ #include "sysemu/replay.h"
+@@ -1276,6 +1277,7 @@ static void *qemu_kvm_cpu_thread_fn(void *arg)
+     /* signal CPU creation */
+     cpu->created = true;
+     qemu_cond_signal(&qemu_cpu_cond);
++    qemu_guest_random_seed_thread_part2(cpu->random_seed);
  
-+void helper_msa_st_w(CPUMIPSState *env, uint32_t wd,
-+                     target_ulong addr)
-+{
-+    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
-+    int mmu_idx = cpu_mmu_index(env, false);
-+
-+    MEMOP_IDX(DF_WORD)
-+    ensure_writable_pages(env, addr, mmu_idx, GETPC());
- #if !defined(CONFIG_USER_ONLY)
--MSA_ST_DF(DF_BYTE,   b, helper_ret_stb_mmu, oi, GETPC())
--MSA_ST_DF(DF_HALF,   h, helper_ret_stw_mmu, oi, GETPC())
--MSA_ST_DF(DF_WORD,   w, helper_ret_stl_mmu, oi, GETPC())
--MSA_ST_DF(DF_DOUBLE, d, helper_ret_stq_mmu, oi, GETPC())
-+#if !defined(HOST_WORDS_BIGENDIAN)
-+    helper_ret_stl_mmu(env, addr + (0 << DF_WORD), oi, GETPC(), pwd->w[0]);
-+    helper_ret_stl_mmu(env, addr + (1 << DF_WORD), oi, GETPC(), pwd->w[1]);
-+    helper_ret_stl_mmu(env, addr + (2 << DF_WORD), oi, GETPC(), pwd->w[2]);
-+    helper_ret_stl_mmu(env, addr + (3 << DF_WORD), oi, GETPC(), pwd->w[3]);
- #else
--MSA_ST_DF(DF_BYTE,   b, cpu_stb_data)
--MSA_ST_DF(DF_HALF,   h, cpu_stw_data)
--MSA_ST_DF(DF_WORD,   w, cpu_stl_data)
--MSA_ST_DF(DF_DOUBLE, d, cpu_stq_data)
-+    helper_ret_stl_mmu(env, addr + (1 << DF_WORD), oi, GETPC(), pwd->w[0]);
-+    helper_ret_stl_mmu(env, addr + (0 << DF_WORD), oi, GETPC(), pwd->w[1]);
-+    helper_ret_stl_mmu(env, addr + (3 << DF_WORD), oi, GETPC(), pwd->w[2]);
-+    helper_ret_stl_mmu(env, addr + (2 << DF_WORD), oi, GETPC(), pwd->w[3]);
- #endif
-+#else
-+#if !defined(HOST_WORDS_BIGENDIAN)
-+    cpu_stl_data(env, addr + (0 << DF_WORD), pwd->w[0]);
-+    cpu_stl_data(env, addr + (1 << DF_WORD), pwd->w[1]);
-+    cpu_stl_data(env, addr + (2 << DF_WORD), pwd->w[2]);
-+    cpu_stl_data(env, addr + (3 << DF_WORD), pwd->w[3]);
-+#else
-+    cpu_stl_data(env, addr + (1 << DF_WORD), pwd->w[0]);
-+    cpu_stl_data(env, addr + (0 << DF_WORD), pwd->w[1]);
-+    cpu_stl_data(env, addr + (3 << DF_WORD), pwd->w[2]);
-+    cpu_stl_data(env, addr + (2 << DF_WORD), pwd->w[3]);
-+#endif
-+#endif
-+}
-+
-+void helper_msa_st_d(CPUMIPSState *env, uint32_t wd,
-+                     target_ulong addr)
-+{
-+    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
-+    int mmu_idx = cpu_mmu_index(env, false);
-+
-+    MEMOP_IDX(DF_DOUBLE)
-+    ensure_writable_pages(env, addr, mmu_idx, GETPC());
-+#if !defined(CONFIG_USER_ONLY)
-+    helper_ret_stq_mmu(env, addr + (0 << DF_DOUBLE), pwd->d[0], oi, GETPC());
-+    helper_ret_stq_mmu(env, addr + (1 << DF_DOUBLE), pwd->d[1], oi, GETPC());
-+#else
-+    cpu_stq_data(env, addr + (0 << DF_DOUBLE), pwd->d[0]);
-+    cpu_stq_data(env, addr + (1 << DF_DOUBLE), pwd->d[1]);
-+#endif
-+}
+     do {
+         if (cpu_can_run(cpu)) {
+@@ -1319,6 +1321,7 @@ static void *qemu_dummy_cpu_thread_fn(void *arg)
+     /* signal CPU creation */
+     cpu->created = true;
+     qemu_cond_signal(&qemu_cpu_cond);
++    qemu_guest_random_seed_thread_part2(cpu->random_seed);
  
- void helper_cache(CPUMIPSState *env, target_ulong addr, uint32_t op)
- {
+     do {
+         qemu_mutex_unlock_iothread();
+@@ -1478,6 +1481,7 @@ static void *qemu_tcg_rr_cpu_thread_fn(void *arg)
+     cpu->created = true;
+     cpu->can_do_io = 1;
+     qemu_cond_signal(&qemu_cpu_cond);
++    qemu_guest_random_seed_thread_part2(cpu->random_seed);
+ 
+     /* wait for initial kick-off after machine start */
+     while (first_cpu->stopped) {
+@@ -1592,6 +1596,7 @@ static void *qemu_hax_cpu_thread_fn(void *arg)
+ 
+     hax_init_vcpu(cpu);
+     qemu_cond_signal(&qemu_cpu_cond);
++    qemu_guest_random_seed_thread_part2(cpu->random_seed);
+ 
+     do {
+         if (cpu_can_run(cpu)) {
+@@ -1631,6 +1636,7 @@ static void *qemu_hvf_cpu_thread_fn(void *arg)
+     /* signal CPU creation */
+     cpu->created = true;
+     qemu_cond_signal(&qemu_cpu_cond);
++    qemu_guest_random_seed_thread_part2(cpu->random_seed);
+ 
+     do {
+         if (cpu_can_run(cpu)) {
+@@ -1671,6 +1677,7 @@ static void *qemu_whpx_cpu_thread_fn(void *arg)
+     /* signal CPU creation */
+     cpu->created = true;
+     qemu_cond_signal(&qemu_cpu_cond);
++    qemu_guest_random_seed_thread_part2(cpu->random_seed);
+ 
+     do {
+         if (cpu_can_run(cpu)) {
+@@ -1724,6 +1731,7 @@ static void *qemu_tcg_cpu_thread_fn(void *arg)
+     cpu->can_do_io = 1;
+     current_cpu = cpu;
+     qemu_cond_signal(&qemu_cpu_cond);
++    qemu_guest_random_seed_thread_part2(cpu->random_seed);
+ 
+     /* process any pending work */
+     cpu->exit_request = 1;
+@@ -2071,6 +2079,7 @@ void qemu_init_vcpu(CPUState *cpu)
+     cpu->nr_cores = smp_cores;
+     cpu->nr_threads = smp_threads;
+     cpu->stopped = true;
++    cpu->random_seed = qemu_guest_random_seed_thread_part1();
+ 
+     if (!cpu->as) {
+         /* If the target cpu hasn't set up any address spaces itself,
+diff --git a/vl.c b/vl.c
+index 201144b162..5550bd7693 100644
+--- a/vl.c
++++ b/vl.c
+@@ -128,6 +128,7 @@ int main(int argc, char **argv)
+ #include "qapi/qapi-commands-ui.h"
+ #include "qapi/qmp/qerror.h"
+ #include "sysemu/iothread.h"
++#include "qemu/guest-random.h"
+ 
+ #define MAX_VIRTIO_CONSOLES 1
+ 
+@@ -3349,6 +3350,9 @@ int main(int argc, char **argv, char **envp)
+             case QEMU_OPTION_DFILTER:
+                 qemu_set_dfilter_ranges(optarg, &error_fatal);
+                 break;
++            case QEMU_OPTION_seed:
++                qemu_guest_random_seed_main(optarg, &error_fatal);
++                break;
+             case QEMU_OPTION_s:
+                 add_device_config(DEV_GDB, "tcp::" DEFAULT_GDBSTUB_PORT);
+                 break;
+diff --git a/qemu-options.hx b/qemu-options.hx
+index 5daa5a8fb0..7ae3373a00 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -3641,6 +3641,16 @@ the 0x200 sized block starting at 0xffffffc000080000 and another 0x1000 sized
+ block starting at 0xffffffc00005f000.
+ ETEXI
+ 
++DEF("seed", HAS_ARG, QEMU_OPTION_seed, \
++    "-seed number       seed the pseudo-random number generator\n",
++    QEMU_ARCH_ALL)
++STEXI
++@item -seed @var{number}
++@findex -seed
++Force the guest to use a deterministic pseudo-random number generator, seeded
++with @var{number}.  This does not affect crypto routines within the host.
++ETEXI
++
+ DEF("L", HAS_ARG, QEMU_OPTION_L, \
+     "-L path         set the directory for the BIOS, VGA BIOS and keymaps\n",
+     QEMU_ARCH_ALL)
 -- 
-2.7.4
+2.17.1
 
 
