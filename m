@@ -2,56 +2,88 @@ Return-Path: <SRS0=8zLO=TW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F0C2AC282CE
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 19:23:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 67D11C282CE
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 19:23:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C63AC2184E
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 19:23:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C63AC2184E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
+	by mail.kernel.org (Postfix) with ESMTPS id 32FA6217D7
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 19:23:52 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="AdtUsywC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 32FA6217D7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:50044 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:50046 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hTWpo-0008J2-Vh
-	for qemu-devel@archiver.kernel.org; Wed, 22 May 2019 15:23:33 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:36606)
+	id 1hTWq7-0008W9-Ex
+	for qemu-devel@archiver.kernel.org; Wed, 22 May 2019 15:23:51 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:35052)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1hTWRz-0003FR-PV
-	for qemu-devel@nongnu.org; Wed, 22 May 2019 14:58:57 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hTWOr-0008Eq-8a
+	for qemu-devel@nongnu.org; Wed, 22 May 2019 14:55:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1hTWRy-0000Oi-9A
-	for qemu-devel@nongnu.org; Wed, 22 May 2019 14:58:55 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:60492 helo=mail.rt-rk.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1hTWRx-0000NP-SZ
-	for qemu-devel@nongnu.org; Wed, 22 May 2019 14:58:54 -0400
-Received: from localhost (localhost [127.0.0.1])
-	by mail.rt-rk.com (Postfix) with ESMTP id ACE3C1A4516;
-	Wed, 22 May 2019 20:58:49 +0200 (CEST)
-X-Virus-Scanned: amavisd-new at rt-rk.com
-Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
-	[10.10.13.43])
-	by mail.rt-rk.com (Postfix) with ESMTPSA id 852CD1A453C;
-	Wed, 22 May 2019 20:58:49 +0200 (CEST)
-From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
+	(envelope-from <richard.henderson@linaro.org>) id 1hTWCE-00084L-3I
+	for qemu-devel@nongnu.org; Wed, 22 May 2019 14:42:39 -0400
+Received: from mail-yb1-xb2b.google.com ([2607:f8b0:4864:20::b2b]:45668)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1hTWCD-00083b-Uk
+	for qemu-devel@nongnu.org; Wed, 22 May 2019 14:42:38 -0400
+Received: by mail-yb1-xb2b.google.com with SMTP id e128so1238772ybc.12
+	for <qemu-devel@nongnu.org>; Wed, 22 May 2019 11:42:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=from:to:cc:subject:date:message-id:in-reply-to:references
+	:mime-version:content-transfer-encoding;
+	bh=z+TkCJ+Ncy1KMgA4q+7eFD+GiqzlCrNmhclplUZOTOM=;
+	b=AdtUsywCFarbxNYqrewX5Po7UVveY81UBDxGa+6hX7qZjmyAQLpmsOAIiQ+/l3OcWo
+	UzJ5vyffFccwB1+HbqZkdmX64Gn7T5DSajnAayzDOYi/MTcC9r3PH7QdlhsXPC+BRPa6
+	30wvqhT4MXq2lPg/bVrNscj+fQzZy2pnMs2z4Sz/wpfObmwKh0HLeJMqSX55bkwtGe1/
+	S7mdAtvoZ03aAunGwKwzTPl1CHvFAQSE31/gKOFBf1vTHwU2cxvShhoL0LGy9j/H+uLx
+	640Ie3MZPeX7OBCTElgC9CKlqo0CVRCawbszF4VRPubRIIcvP/uQiKm0W8dN28RRfyay
+	KNaA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+	:references:mime-version:content-transfer-encoding;
+	bh=z+TkCJ+Ncy1KMgA4q+7eFD+GiqzlCrNmhclplUZOTOM=;
+	b=q/D2I5C+CB7TT//syXKuQMP+OV6CR06f6Es1COEeLbRj70O2u9IpItukWKvE9MQcUZ
+	/UJm+RlgloulytVk1ELn1x+V+jcFwixsrXjQUYwsPT8E9RcPqIBLOMTjIdSDzhB7sDng
+	UlNFiTW1tP6CAB67PIR/IbvNwN7fmo48aKK0ygJcb47wS0G1mTklWItYp36erD7EMiGy
+	FSf+oLxTiquhzVqp8U5nDTA2bigSltGiFwdjLk08ywK6D3j5/PWoY20ofg2Wu/w7LFMR
+	pytkbO9T/GLhuJJgzfKAH8RO2dJhxPXvKV4qXuvz1Iq14Ck5u56K7Tz8jwuxKNB5nuQl
+	5fJw==
+X-Gm-Message-State: APjAAAU+0enkcwNSOFQqqpZerC7Ktr2xZF78e3HgWFq6N3zWeLK5+1/Z
+	3M4IBLlNbwWhJfmms7l8wyg/SsEee4M=
+X-Google-Smtp-Source: APXvYqyKXPfBnn0yk5jIpWn0FfodD8ggVjtRDjV7M9kjN0idlBo1PQcYeXTxq0xRC4hjyQ7eA4J1lA==
+X-Received: by 2002:a25:4041:: with SMTP id n62mr2455760yba.388.1558550555780; 
+	Wed, 22 May 2019 11:42:35 -0700 (PDT)
+Received: from localhost.localdomain ([71.46.56.17])
+	by smtp.gmail.com with ESMTPSA id
+	206sm1299445ywq.74.2019.05.22.11.42.34
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Wed, 22 May 2019 11:42:35 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Wed, 22 May 2019 20:58:38 +0200
-Message-Id: <1558551522-24147-8-git-send-email-aleksandar.markovic@rt-rk.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1558551522-24147-1-git-send-email-aleksandar.markovic@rt-rk.com>
-References: <1558551522-24147-1-git-send-email-aleksandar.markovic@rt-rk.com>
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 89.216.37.149
-Subject: [Qemu-devel] [PULL v2 07/11] target/mips: Refactor and fix
- INSERT.<B|H|W|D> instructions
+Date: Wed, 22 May 2019 14:42:08 -0400
+Message-Id: <20190522184226.17871-8-richard.henderson@linaro.org>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20190522184226.17871-1-richard.henderson@linaro.org>
+References: <20190522184226.17871-1-richard.henderson@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::b2b
+Subject: [Qemu-devel] [PULL 07/25] crypto: Change the qcrypto_random_bytes
+ buffer type to void*
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -63,163 +95,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, amarkovic@wavecomp.com
+Cc: peter.maydell@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Mateja Marjanovic <Mateja.Marjanovic@rt-rk.com>
+Using uint8_t* merely requires useless casts for use with
+other types to be filled with randomness.
 
-The old version of the helper for the INSERT.<B|H|W|D> MSA instructions
-has been replaced with four helpers that don't use switch, and change
-the endianness of the given index, when executed on a big endian host.
-
-Signed-off-by: Mateja Marjanovic <mateja.marjanovic@rt-rk.com>
-Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-Message-Id: <1554212605-16457-6-git-send-email-mateja.marjanovic@rt-rk.com>
+Reviewed-by: Laurent Vivier <lvivier@redhat.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/mips/helper.h     |  5 +++-
- target/mips/msa_helper.c | 65 ++++++++++++++++++++++++++++++++++++------------
- target/mips/translate.c  | 19 +++++++++++++-
- 3 files changed, 71 insertions(+), 18 deletions(-)
+ include/crypto/random.h  | 2 +-
+ crypto/random-gcrypt.c   | 2 +-
+ crypto/random-gnutls.c   | 2 +-
+ crypto/random-platform.c | 4 ++--
+ 4 files changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/target/mips/helper.h b/target/mips/helper.h
-index c4a77e2..2863f60 100644
---- a/target/mips/helper.h
-+++ b/target/mips/helper.h
-@@ -877,7 +877,6 @@ DEF_HELPER_5(msa_hsub_u_df, void, env, i32, i32, i32, i32)
- DEF_HELPER_5(msa_sldi_df, void, env, i32, i32, i32, i32)
- DEF_HELPER_5(msa_splati_df, void, env, i32, i32, i32, i32)
+diff --git a/include/crypto/random.h b/include/crypto/random.h
+index 8764ca0562..fde592904e 100644
+--- a/include/crypto/random.h
++++ b/include/crypto/random.h
+@@ -34,7 +34,7 @@
+  *
+  * Returns 0 on success, -1 on error
+  */
+-int qcrypto_random_bytes(uint8_t *buf,
++int qcrypto_random_bytes(void *buf,
+                          size_t buflen,
+                          Error **errp);
  
--DEF_HELPER_5(msa_insert_df, void, env, i32, i32, i32, i32)
- DEF_HELPER_5(msa_insve_df, void, env, i32, i32, i32, i32)
- DEF_HELPER_3(msa_ctcmsa, void, env, tl, i32)
- DEF_HELPER_2(msa_cfcmsa, tl, env, i32)
-@@ -944,6 +943,10 @@ DEF_HELPER_4(msa_copy_s_d, void, env, i32, i32, i32)
- DEF_HELPER_4(msa_copy_u_b, void, env, i32, i32, i32)
- DEF_HELPER_4(msa_copy_u_h, void, env, i32, i32, i32)
- DEF_HELPER_4(msa_copy_u_w, void, env, i32, i32, i32)
-+DEF_HELPER_4(msa_insert_b, void, env, i32, i32, i32)
-+DEF_HELPER_4(msa_insert_h, void, env, i32, i32, i32)
-+DEF_HELPER_4(msa_insert_w, void, env, i32, i32, i32)
-+DEF_HELPER_4(msa_insert_d, void, env, i32, i32, i32)
+diff --git a/crypto/random-gcrypt.c b/crypto/random-gcrypt.c
+index 9f1c9ee60e..7aea4ac81f 100644
+--- a/crypto/random-gcrypt.c
++++ b/crypto/random-gcrypt.c
+@@ -24,7 +24,7 @@
  
- DEF_HELPER_4(msa_fclass_df, void, env, i32, i32, i32)
- DEF_HELPER_4(msa_ftrunc_s_df, void, env, i32, i32, i32)
-diff --git a/target/mips/msa_helper.c b/target/mips/msa_helper.c
-index 52680fe..ee1b1fa 100644
---- a/target/mips/msa_helper.c
-+++ b/target/mips/msa_helper.c
-@@ -1340,28 +1340,61 @@ void helper_msa_copy_u_w(CPUMIPSState *env, uint32_t rd,
-     env->active_tc.gpr[rd] = (uint32_t)env->active_fpu.fpr[ws].wr.w[n];
- }
+ #include <gcrypt.h>
  
--void helper_msa_insert_df(CPUMIPSState *env, uint32_t df, uint32_t wd,
-+void helper_msa_insert_b(CPUMIPSState *env, uint32_t wd,
-                           uint32_t rs_num, uint32_t n)
+-int qcrypto_random_bytes(uint8_t *buf,
++int qcrypto_random_bytes(void *buf,
+                          size_t buflen,
+                          Error **errp G_GNUC_UNUSED)
  {
-     wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
-     target_ulong rs = env->active_tc.gpr[rs_num];
-+    n %= 16;
-+#if defined(HOST_WORDS_BIGENDIAN)
-+    if (n < 8) {
-+        n = 8 - n - 1;
-+    } else {
-+        n = 24 - n - 1;
-+    }
-+#endif
-+    pwd->b[n] = (int8_t)rs;
-+}
+diff --git a/crypto/random-gnutls.c b/crypto/random-gnutls.c
+index 445fd6a30b..ed6c9ca12f 100644
+--- a/crypto/random-gnutls.c
++++ b/crypto/random-gnutls.c
+@@ -26,7 +26,7 @@
+ #include <gnutls/gnutls.h>
+ #include <gnutls/crypto.h>
  
--    switch (df) {
--    case DF_BYTE:
--        pwd->b[n] = (int8_t)rs;
--        break;
--    case DF_HALF:
--        pwd->h[n] = (int16_t)rs;
--        break;
--    case DF_WORD:
--        pwd->w[n] = (int32_t)rs;
--        break;
--    case DF_DOUBLE:
--        pwd->d[n] = (int64_t)rs;
--        break;
--    default:
--        assert(0);
-+void helper_msa_insert_h(CPUMIPSState *env, uint32_t wd,
-+                          uint32_t rs_num, uint32_t n)
-+{
-+    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
-+    target_ulong rs = env->active_tc.gpr[rs_num];
-+    n %= 8;
-+#if defined(HOST_WORDS_BIGENDIAN)
-+    if (n < 4) {
-+        n = 4 - n - 1;
-+    } else {
-+        n = 12 - n - 1;
-+    }
-+#endif
-+    pwd->h[n] = (int16_t)rs;
-+}
-+
-+void helper_msa_insert_w(CPUMIPSState *env, uint32_t wd,
-+                          uint32_t rs_num, uint32_t n)
-+{
-+    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
-+    target_ulong rs = env->active_tc.gpr[rs_num];
-+    n %= 4;
-+#if defined(HOST_WORDS_BIGENDIAN)
-+    if (n < 2) {
-+        n = 2 - n - 1;
-+    } else {
-+        n = 6 - n - 1;
-     }
-+#endif
-+    pwd->w[n] = (int32_t)rs;
-+}
-+
-+void helper_msa_insert_d(CPUMIPSState *env, uint32_t wd,
-+                          uint32_t rs_num, uint32_t n)
-+{
-+    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
-+    target_ulong rs = env->active_tc.gpr[rs_num];
-+    n %= 2;
-+    pwd->d[n] = (int64_t)rs;
+-int qcrypto_random_bytes(uint8_t *buf,
++int qcrypto_random_bytes(void *buf,
+                          size_t buflen,
+                          Error **errp)
+ {
+diff --git a/crypto/random-platform.c b/crypto/random-platform.c
+index cb3ca1bc09..66624106fe 100644
+--- a/crypto/random-platform.c
++++ b/crypto/random-platform.c
+@@ -64,8 +64,8 @@ int qcrypto_random_init(Error **errp)
+     return 0;
  }
  
- void helper_msa_insve_df(CPUMIPSState *env, uint32_t df, uint32_t wd,
-diff --git a/target/mips/translate.c b/target/mips/translate.c
-index 68ea6ee..dd706ad 100644
---- a/target/mips/translate.c
-+++ b/target/mips/translate.c
-@@ -28346,7 +28346,24 @@ static void gen_msa_elm_df(CPUMIPSState *env, DisasContext *ctx, uint32_t df,
-             }
-             break;
-         case OPC_INSERT_df:
--            gen_helper_msa_insert_df(cpu_env, tdf, twd, tws, tn);
-+            switch (df) {
-+            case DF_BYTE:
-+                gen_helper_msa_insert_b(cpu_env, twd, tws, tn);
-+                break;
-+            case DF_HALF:
-+                gen_helper_msa_insert_h(cpu_env, twd, tws, tn);
-+                break;
-+            case DF_WORD:
-+                gen_helper_msa_insert_w(cpu_env, twd, tws, tn);
-+                break;
-+#if defined(TARGET_MIPS64)
-+            case DF_DOUBLE:
-+                gen_helper_msa_insert_d(cpu_env, twd, tws, tn);
-+                break;
-+#endif
-+            default:
-+                assert(0);
-+            }
-             break;
-         }
-         break;
+-int qcrypto_random_bytes(uint8_t *buf G_GNUC_UNUSED,
+-                         size_t buflen G_GNUC_UNUSED,
++int qcrypto_random_bytes(void *buf,
++                         size_t buflen,
+                          Error **errp)
+ {
+ #ifdef _WIN32
 -- 
-2.7.4
+2.17.1
 
 
