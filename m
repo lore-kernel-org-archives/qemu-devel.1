@@ -3,85 +3,73 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C4E60C072A4
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 08:21:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 671D1C072A4
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 08:23:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9C33220856
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 08:21:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9C33220856
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 3D82121019
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 08:23:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3D82121019
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:38296 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:38304 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hTMVT-0006s9-OS
-	for qemu-devel@archiver.kernel.org; Wed, 22 May 2019 04:21:51 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:58271)
+	id 1hTMWg-0007Xy-If
+	for qemu-devel@archiver.kernel.org; Wed, 22 May 2019 04:23:06 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:58299)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1hTMUZ-0006Qu-Vh
-	for qemu-devel@nongnu.org; Wed, 22 May 2019 04:20:56 -0400
+	(envelope-from <bounces@canonical.com>) id 1hTMUb-0006S7-Be
+	for qemu-devel@nongnu.org; Wed, 22 May 2019 04:20:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1hTMUX-0007tj-3y
-	for qemu-devel@nongnu.org; Wed, 22 May 2019 04:20:55 -0400
-Received: from mail-wm1-f42.google.com ([209.85.128.42]:36997)
+	(envelope-from <bounces@canonical.com>) id 1hTMUa-0007wa-5M
+	for qemu-devel@nongnu.org; Wed, 22 May 2019 04:20:57 -0400
+Received: from indium.canonical.com ([91.189.90.7]:36170)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hTMUW-0007rh-TY
-	for qemu-devel@nongnu.org; Wed, 22 May 2019 04:20:53 -0400
-Received: by mail-wm1-f42.google.com with SMTP id 7so1182674wmo.2
-	for <qemu-devel@nongnu.org>; Wed, 22 May 2019 01:20:51 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-	:user-agent:mime-version:in-reply-to:content-language
-	:content-transfer-encoding;
-	bh=F91sqqIq9gYnXWJjfU3WtqxY/oByzJvaGiw3n0ouTgU=;
-	b=CoN6gmsPxYSdrcei7/e1ubE3Dfh6nG2gS3o0I/09NRaC58Nw6CzpNLuq+lcYGQr1w5
-	pCUNHTgngDUoMYnP0JnEq/5gdLTYWDXSlAvzLPzUIU4q6fUSKTQC4yqaP7SpP7be7AXH
-	D1/yZc3vbQcadGl6UixEIgIlA0Bmgj9R88L9oqDbbVK+7HaI5xg2z2ljBSfNoS4dZYuv
-	CqBpOn9xzPmema2WrFU5ZxeejXMNjEZbXVGmtUreabAfuaJlf1DppM9dBZ2X/bVRbnuh
-	gaTA/dAquMd3QeGWDUJXWSQSG8LaNkF8PrcfXdrrvOydO6SgQQZLaEa/Ri86FIFMFL5I
-	Qiwg==
-X-Gm-Message-State: APjAAAVeIPxtiqegOHy5N/FQeKiZmgaCem1niuFbnL09yIH4fl3J//t6
-	IXOfaVIapwcDHTIXgPpRkY4NKA==
-X-Google-Smtp-Source: APXvYqzcjRlGQTaBf1cKjuEnzZEvjA1y5Q7kwBTBZfYYWJHRKq8/FX92tnVG7s8Zff6l52xTFmsh7A==
-X-Received: by 2002:a1c:a755:: with SMTP id q82mr6323357wme.82.1558513250172; 
-	Wed, 22 May 2019 01:20:50 -0700 (PDT)
-Received: from [10.32.181.147] (nat-pool-mxp-t.redhat.com. [149.6.153.186])
-	by smtp.gmail.com with ESMTPSA id
-	n63sm6018413wmn.38.2019.05.22.01.20.48
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Wed, 22 May 2019 01:20:49 -0700 (PDT)
-To: Eduardo Habkost <ehabkost@redhat.com>, John Snow <jsnow@redhat.com>
-References: <20190520184108.GA10764@habkost.net>
-	<20190521085350.GF25835@redhat.com>
-	<e2395213-efaf-6d6c-6cfd-d949d071b4f6@redhat.com>
-	<87pnobrg37.fsf@dusky.pond.sub.org>
-	<CAFEAcA8db=UsyU_kRBoatFT2ULQBqL318xRhg+CV4D_7hV76Og@mail.gmail.com>
-	<7e468375-ca5f-0048-789e-c41d09065eeb@redhat.com>
-	<20190521203712.GO10764@habkost.net>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <dff30917-557a-cf41-e82e-03465d0209aa@redhat.com>
-Date: Wed, 22 May 2019 10:20:49 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1hTMUZ-0007uP-Ve
+	for qemu-devel@nongnu.org; Wed, 22 May 2019 04:20:56 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1hTMUW-00069g-GY
+	for <qemu-devel@nongnu.org>; Wed, 22 May 2019 08:20:52 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 7C38A2E80C9
+	for <qemu-devel@nongnu.org>; Wed, 22 May 2019 08:20:52 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20190521203712.GO10764@habkost.net>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 22 May 2019 08:14:13 -0000
+From: Eunseok Choi <1829964@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=Incomplete; importance=Undecided;
+	assignee=None; 
+X-Launchpad-Bug-Tags: android-x86 leak virt-gpu vram
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: riosnai th-huth
+X-Launchpad-Bug-Reporter: Eunseok Choi (riosnai)
+X-Launchpad-Bug-Modifier: Eunseok Choi (riosnai)
+References: <155849647074.15430.13880026935625975661.malonedeb@wampee.canonical.com>
+Message-Id: <155851285378.21734.3576635759181429633.malone@chaenomeles.canonical.com>
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="18962";
+	Instance="launchpad-lazr.conf"
+X-Launchpad-Hash: 82ea2d36b1e26a74ed2566f3447362ff3f52e499
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-	[fuzzy]
-X-Received-From: 209.85.128.42
-Subject: Re: [Qemu-devel] Introducing GSoC project: API Documentation
- Generation
+X-Received-From: 91.189.90.7
+Subject: [Qemu-devel] [Bug 1829964] Re: HOST VRAM Leak when performs
+ android-x86 window rotation with Virt-GPU
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -90,26 +78,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
-	=?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
-	Gabriel Barreto <sbarreto.gabriel@gmail.com>,
-	QEMU Developers <qemu-devel@nongnu.org>,
-	Markus Armbruster <armbru@redhat.com>, "Emilio G. Cota" <cota@braap.org>,
-	Stefan Hajnoczi <stefanha@redhat.com>, Cleber Rosa <crosa@redhat.com>
+Reply-To: Bug 1829964 <1829964@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 21/05/19 22:37, Eduardo Habkost wrote:
->> But this is the one we're going with? Do we have a plan for teaching it
->> not to panic for our use of named custom types?
->
-> If I understood correctly, the patch from Paolo that I have
-> forwarded to this thread is all we need.  Are there other issues
-> with kernel-doc we would still need to address?
+I tested many qemu & linux versions....
 
-We can find out, but that patch is a good starting point to understand
-that.  After all it's summer of code, not weekend of code. ;)
+in case of qemu,
+2.12
+3.10
+3.12
+4.0.0
+All versions I tested have same problem....
 
-Paolo
+also I tested many versions of linux =
+
+ubuntu 18.04 18.10
+centos 7
+fedora 18 19
+rhel
+
+Actually it is not only problem of windows rotation, if home launcher
+refreshed, vram usage is also up...
+
+I think it related gl related functions...
+
+so I don't sure it is qemu-virt-gpu problem or virt-gpu driver...
+
+That is why I already report this problem to android-x86 devel forum and
+author of virt-gpu drvier...
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1829964
+
+Title:
+  HOST VRAM Leak when performs android-x86 window rotation with Virt-GPU
+
+Status in QEMU:
+  Incomplete
+
+Bug description:
+  I will report something strange thing about host VRAM leakage after
+  anroid-x86 window rotation when it runs with virt-gpu(+ virgl-
+  renderer)
+
+  Please watching below video link.
+
+  https://www.youtube.com/watch?v=3DmJIbGZLWF1s&feature=3Dyoutu.be
+
+  (orginal video file : https://drive.google.com/file/d
+  /1lkdTx_8yTbSVjKXlnxnnk96fWe-w6Mxb/view?usp=3Dsharing)
+
+  I don't sure what is the problem...
+
+  Here are my tested history
+  -------------------------------------------------------------------------=
+-------------------------
+  Install android-x86 on I7 desktop PCs with intel UHD GPU  - No leak.
+  Install android-x86 on I7 desktop PCs with NVIDIA GTX GPU series - No lea=
+k.
+  Install android-x86 on guest machine emulated skylake cpu with QEMU(+virt=
+-gpu, virgl-renderer) - Leak
+  (HOST CPU - I5, INTEL UHD GPU)
+  Install android-x86 on guest machine emulated skylake cpu with QEMU(+virt=
+-gpu, virgl-renderer) - Leak
+  (HOST CPU - I7, NVIDIA GTX GPU)
+
+  COMMON:
+  In case of NVIDIA GPU : check vram using nvidia-smi
+  In case of intel UHD GPU : check shared-vram using free cmd
+
+  We checked guest android-x86 system down when vram is full after performi=
+ng many rotation
+  -------------------------------------------------------------------------=
+------------------
+
+  Is it virt-gpu driver's problem?
+
+  I hope someone can help me...
+
+  Thanks in advance!!
+
+
+  PS
+
+
+  Here are qemu options I used...
+
+  -machine type=3Dq35,accel=3Dkvm -cpu host --enable-kvm \
+  -smp cpus=3D4,cores=3D4,threads=3D1 -m 4096 \
+  -drive file=3Dctb0319.qcow2,format=3Dqcow2,if=3Dvirtio,aio=3Dthreads \
+  -device virtio-vga,virgl=3Don \
+  -device qemu-xhci,id=3Dxhci -device usb-mouse,bus=3Dxhci.0 -device usb-kb=
+d,bus=3Dxhci.0 \
+  -soundhw hda -display sdl,gl=3Don -netdev user,id=3Dqemunet0,hostfwd=3Dtc=
+p::4000-:7000,hostfwd=3Dtcp::5555-:5555,hostfwd=3Dtcp::4012-:7012,hostfwd=
+=3Dtcp::4013-:7013 -device virtio-net,netdev=3Dqemunet0 -boot menu=3Don
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1829964/+subscriptions
 
