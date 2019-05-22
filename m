@@ -2,81 +2,63 @@ Return-Path: <SRS0=8zLO=TW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_MUTT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B4251C282DC
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 21:12:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 42EE2C282CE
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 21:13:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 519CE2054F
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 21:12:23 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="rDukSJ1+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 519CE2054F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id DC12B20881
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 21:13:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DC12B20881
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:51530 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:51542 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hTYX8-0000xu-CQ
-	for qemu-devel@archiver.kernel.org; Wed, 22 May 2019 17:12:22 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:35424)
+	id 1hTYYI-0001Yo-5M
+	for qemu-devel@archiver.kernel.org; Wed, 22 May 2019 17:13:34 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:35641)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hTYWL-0000cN-TD
-	for qemu-devel@nongnu.org; Wed, 22 May 2019 17:11:34 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1hTYXS-0001C9-O1
+	for qemu-devel@nongnu.org; Wed, 22 May 2019 17:12:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hTYWK-0006e6-1W
-	for qemu-devel@nongnu.org; Wed, 22 May 2019 17:11:33 -0400
-Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:34118)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hTYWJ-0006cc-Pm
-	for qemu-devel@nongnu.org; Wed, 22 May 2019 17:11:31 -0400
-Received: by mail-oi1-x241.google.com with SMTP id u64so2763492oib.1
-	for <qemu-devel@nongnu.org>; Wed, 22 May 2019 14:11:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-	:cc; bh=X34nfF2/o2hgK0QQHwuDuWV3fypz8ERlJSXBq8CS/L8=;
-	b=rDukSJ1++tz2pyWRyg9Fwdys2PakdsUyEtMi1x+nKNqjCUllDuFb0MLZFEGv9zt1CY
-	qgdRQa95oXtyHk/uGiHFNsBXl2uJJ75KcOPNunRKH4wG2k4XGTkQMuvkyBIzGJUn1dOW
-	1JgUW3ZndJws632/0iaxEoIgE0Uwn4LBU+YPPruuGb9CKyRiWZLIxEAAP9ss5X7ydGZ9
-	cDFWhKxaWkqVKMdEFS7TWm7q/93+bY7oxFySvwCJ+AfxdjBUcVQ5jpwojT6Uc8IrYROF
-	fNlsHbmv40dc2zz5487JRbGVtSebFGspt7Qx0ifVkXMfbU/GW/s5s+nj7gqSk0hjGlvG
-	zuug==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-	:message-id:subject:to:cc;
-	bh=X34nfF2/o2hgK0QQHwuDuWV3fypz8ERlJSXBq8CS/L8=;
-	b=RfFb6oKaWnjiFVyZeymlO/vNbR6aapOcrvKym7lDkORRmbvzbHO55jh9a4n1qK5UOQ
-	G+lqWTrT9wjS6eEVksPD6DH47Qz41CsOXsh9P8qYFyYxQNZpzPBKlelhV2euuSHRzzRa
-	6njhMMeCqi8jgbE97wQC6Nhj2K5sg1W0bQPIy730oKPzlXxFt/WB0PF2QzGAaPVOQIi7
-	YFO+x7QtP/hp3x5YGNIehlLFtK5cX8BUIOCoXkEMyijcyeQBrudo6in+sjaIzEKTjCfO
-	943rbkHFFBBIJm1vPsgxps+nfbDuXp5QK62YqZbTZ2eDfGhCErYzUMYn0W7TCi2BS1RJ
-	dgmQ==
-X-Gm-Message-State: APjAAAUb1YDq0K2K8yKG/2AspSAWpQHYYp/bjZ796pDaXfb7LNTp1aNP
-	YxXFb41h2McCWHlou/7C+zvBNTczVv4MVuZibWQwuQ==
-X-Google-Smtp-Source: APXvYqzf74S/ZZDEEi8hDdFeT0uQT2xhNBkCsIj1gqSdPPyCWvNZ1IIAcUu9qz8cWTa3Zg7jBzm1OKopf65inCSjK8E=
-X-Received: by 2002:aca:b1c1:: with SMTP id a184mr497054oif.98.1558559488606; 
-	Wed, 22 May 2019 14:11:28 -0700 (PDT)
+	(envelope-from <ehabkost@redhat.com>) id 1hTYXO-00078H-1k
+	for qemu-devel@nongnu.org; Wed, 22 May 2019 17:12:42 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54754)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hTYXN-00077W-OO
+	for qemu-devel@nongnu.org; Wed, 22 May 2019 17:12:37 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id DCEAFC0A4F4C;
+	Wed, 22 May 2019 21:12:35 +0000 (UTC)
+Received: from localhost (ovpn-116-14.gru2.redhat.com [10.97.116.14])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 0E13760240;
+	Wed, 22 May 2019 21:12:32 +0000 (UTC)
+Date: Wed, 22 May 2019 18:12:30 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
+Message-ID: <20190522211230.GA10764@habkost.net>
+References: <20190520231910.12184-1-f4bug@amsat.org>
 MIME-Version: 1.0
-References: <20190521200657.5377-1-jsnow@redhat.com>
-	<20190521200657.5377-2-jsnow@redhat.com>
-	<CAFEAcA9mEHvQ9TBGpvfVoDx-pKB9Cyc-JWeUUh2Hc0Uxb1GjuQ@mail.gmail.com>
-	<4005ff30-2df3-c615-7fed-fd9d5de56e95@redhat.com>
-In-Reply-To: <4005ff30-2df3-c615-7fed-fd9d5de56e95@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 22 May 2019 22:11:17 +0100
-Message-ID: <CAFEAcA-o7oh3FqynmveJJA7aC+Jk2_Wdg0m-tYJW=981+ODdcg@mail.gmail.com>
-To: John Snow <jsnow@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::241
-Subject: Re: [Qemu-devel] [PATCH 1/2] sphinx: add qmp_lexer
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20190520231910.12184-1-f4bug@amsat.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.32]);
+	Wed, 22 May 2019 21:12:36 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH 0/4] mips: Add more Avocado tests
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -88,58 +70,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Qemu-block <qemu-block@nongnu.org>,
-	QEMU Developers <qemu-devel@nongnu.org>,
-	Eduardo Habkost <ehabkost@redhat.com>,
-	Aarushi Mehta <mehta.aaru20@gmail.com>
+Cc: Aleksandar Rikalo <arikalo@wavecomp.com>, qemu-devel@nongnu.org,
+	Wainer dos Santos Moschetta <wainersm@redhat.com>,
+	Aleksandar Markovic <aleksandar.m.mail@gmail.com>,
+	Aleksandar Markovic <amarkovic@wavecomp.com>,
+	Cleber Rosa <crosa@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 22 May 2019 at 20:02, John Snow <jsnow@redhat.com> wrote:
->
->
->
-> On 5/22/19 4:49 AM, Peter Maydell wrote:
-> > On Tue, 21 May 2019 at 21:07, John Snow <jsnow@redhat.com> wrote:
-> >>
-> >> Sphinx, through Pygments, does not like annotated json examples very
-> >> much. In some versions of Sphinx (1.7), it will render the non-json
-> >> portions of code blocks in red, but in newer versions (2.0) it will
-> >> throw an exception and not highlight the block at all. Though we can
-> >> suppress this warning, it doesn't bring back highlighting on non-strict
-> >> json blocks.
-> >>
-> >> We can alleviate this by creating a custom lexer for QMP examples that
-> >> allows us to properly highlight these examples in a robust way, keeping
-> >> our directionality notations.
-> >
-> >> diff --git a/docs/sphinx/qmp_lexer.py b/docs/sphinx/qmp_lexer.py
-> >> new file mode 100644
-> >> index 0000000000..f619f11139
-> >> --- /dev/null
-> >> +++ b/docs/sphinx/qmp_lexer.py
-> >> @@ -0,0 +1,34 @@
-> >> +# QEMU Monitor Protocol Lexer Extension
-> >> +#
-> >> +# Copyright (C) 2019, Red Hat Inc.
-> >> +#
-> >> +# Authors:
-> >> +#  Eduardo Habkost <ehabkost@redhat.com>
-> >> +#  John Snow <jsnow@redhat.com>
-> >> +#
-> >> +# This work is licensed under the terms of the GNU GPL, version 2.  See
-> >> +# the COPYING file in the top-level directory.
-> >
-> > Did you definitely mean 2-only and not 2-or-later ?
+On Tue, May 21, 2019 at 01:19:06AM +0200, Philippe Mathieu-Daud=E9 wrote:
+> Hi,
+>=20
+> It was a rainy week-end here, so I invested it to automatize some
+> of my MIPS tests.
+>=20
+> The BootLinuxSshTest is not Global warming friendly, it is not
+> meant to run on a CI system but rather on a workstation previous
+> to post a pull request.
+> It can surely be improved, but it is a good starting point.
 
-> Copy-paste pulled from another Python script. 2 or later is fine by me;
-> I can resend if desired (or, I'd be fine with anyone touching it up in
-> post.)
+Until we actually have a mechanism to exclude the test case on
+travis-ci, I will remove patch 4/4 from the queue.  Aleksandar,
+please don't merge patch 4/4 yet or it will break travis-ci.
 
-Our default-preference as a project is 2-or-later, so if
-you're both happy with that I think we should use that.
+Cleber, Wainer, is it already possible to make "avocado run" skip
+tests tagged with "slow"?
 
-thanks
--- PMM
+--=20
+Eduardo
 
