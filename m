@@ -4,61 +4,60 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,T_FUZZY_SPRM,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8AC37C072A4
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 05:03:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C7331C072A4
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 05:03:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 589CD20657
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 05:03:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 90C3820657
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 05:03:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="hzYupZFD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 589CD20657
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="Oxz5MIn3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 90C3820657
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:35973 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:35975 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hTJPl-00023p-Dn
-	for qemu-devel@archiver.kernel.org; Wed, 22 May 2019 01:03:45 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:47924)
+	id 1hTJPt-00029I-Qc
+	for qemu-devel@archiver.kernel.org; Wed, 22 May 2019 01:03:53 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:47237)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1hTJ9X-0003uV-UL
-	for qemu-devel@nongnu.org; Wed, 22 May 2019 00:47:01 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1hTJ8t-0003MW-5C
+	for qemu-devel@nongnu.org; Wed, 22 May 2019 00:46:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1hTJ9W-00074o-3h
-	for qemu-devel@nongnu.org; Wed, 22 May 2019 00:46:59 -0400
-Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:55971 helo=ozlabs.org)
+	(envelope-from <dgibson@ozlabs.org>) id 1hTJ8r-0006eu-Sn
+	for qemu-devel@nongnu.org; Wed, 22 May 2019 00:46:19 -0400
+Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:39157 helo=ozlabs.org)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
-	id 1hTJ9V-0006qt-JV; Wed, 22 May 2019 00:46:58 -0400
+	id 1hTJ8r-0006b4-Dp; Wed, 22 May 2019 00:46:17 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
-	id 4580Sz6Tjzz9sPl; Wed, 22 May 2019 14:46:07 +1000 (AEST)
+	id 4580St3xgKz9sNq; Wed, 22 May 2019 14:46:05 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-	d=gibson.dropbear.id.au; s=201602; t=1558500371;
-	bh=DkXn+bse8wGpz2JktjAb3Ez34ACjE6wQs4QiOTPh7SQ=;
+	d=gibson.dropbear.id.au; s=201602; t=1558500366;
+	bh=DhoK2motTlgMA6PD1KwSyR0Bct17q6LIWfIaLI4TIJE=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=hzYupZFDwnTaoU32PuLSCKAaZsPCm5eMybGkM7VzXcBMuxAbti3X5wO0z04Cf0zIk
-	ytppYAsm87jHLDrXQduFgVOuCmSb/w88WKgLIuhVUOjH+1Mj0xLoONFpzTidmCaGaj
-	C7upBVnpjpid2MzNrSsFVblQ6CovGABy4yWT0eLk=
+	b=Oxz5MIn3Z8LBogbiaPZX5ArmiFH6vbRXtC4a2x6mcDsZmA+gDZ47n58b2c1MLlZwJ
+	VzoEUI25HXzPRbOZDFQ1ULICt8VMDeMkXQbIYO2o1iLpsKsA6ViY601+WILZPG8PCX
+	POEIbWPd4yh35mNlHy14Egp/P9odHYjcaW1ayfiM=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: peter.maydell@linaro.org
-Date: Wed, 22 May 2019 14:45:45 +1000
-Message-Id: <20190522044600.16534-24-david@gibson.dropbear.id.au>
+Date: Wed, 22 May 2019 14:45:29 +1000
+Message-Id: <20190522044600.16534-8-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190522044600.16534-1-david@gibson.dropbear.id.au>
 References: <20190522044600.16534-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
 X-Received-From: 2401:3900:2:1::2
-Subject: [Qemu-devel] [PULL 23/38] spapr: Fix phb_placement backwards
- compatibility
+Subject: [Qemu-devel] [PULL 07/38] target/ppc: Add ibm, purr and ibm,
+ spurr device-tree properties
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -72,90 +71,51 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: lvivier@redhat.com, qemu-devel@nongnu.org, groug@kaod.org,
 	qemu-ppc@nongnu.org, clg@kaod.org,
+	Suraj Jitindar Singh <sjitindarsingh@gmail.com>,
 	David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-When we added support for NVLink2 passthrough devices, we changed the
-phb_placement hook to handle the placement of NVLink2 bridges' specific
-resources.  For compatibility we use a version that doesn't do this
-allocation  for old machine types.
+From: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
 
-However, because of the delay between when the patch was posted and when
-it was merged, we ended up with that compatibility hook applying for
-machine versions 3.1 and earlier whereas it should apply for 4.0 and
-earlier (since the patch was applied early in the 4.1 tree).
+The ibm,purr and ibm,spurr device tree properties are used to indicate
+that the processor implements the Processor Utilisation of Resources
+Register (PURR) and Scaled Processor Utilisation of Resources Registers
+(SPURR), respectively. Each property has a single value which represents
+the level of architecture supported. A value of 1 for ibm,purr means
+support for the version of the PURR defined in book 3 in version 2.02 of
+the architecture. A value of 1 for ibm,spurr means support for the
+version of the SPURR defined in version 2.05 of the architecture.
 
-Fixes: ec132efaa81 "spapr: Support NVIDIA V100 GPU with NVLink2"
+Add these properties for all processors for which the PURR and SPURR
+registers are generated.
 
-Reported-by: Laurent Vivier <lvivier@redhat.com>
+Fixes: 0da6f3fef9a "spapr: Reorganize CPU dt generation code"
+Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+Message-Id: <20190506014803.21299-1-sjitindarsingh@gmail.com>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
-Reviewed-by: Greg Kurz <groug@kaod.org>
-Reviewed-by: Laurent Vivier <lvivier@redhat.com>
 ---
- hw/ppc/spapr.c | 28 +++++++++++++++-------------
- 1 file changed, 15 insertions(+), 13 deletions(-)
+ hw/ppc/spapr.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
 diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index bcae30ad26..39e698e9b0 100644
+index 2ef3ce4362..8580a8dc67 100644
 --- a/hw/ppc/spapr.c
 +++ b/hw/ppc/spapr.c
-@@ -4411,18 +4411,7 @@ DEFINE_SPAPR_MACHINE(4_1, "4.1", true);
- /*
-  * pseries-4.0
-  */
--static void spapr_machine_4_0_class_options(MachineClass *mc)
--{
--    spapr_machine_4_1_class_options(mc);
--    compat_props_add(mc->compat_props, hw_compat_4_0, hw_compat_4_0_len)=
-;
--}
--
--DEFINE_SPAPR_MACHINE(4_0, "4.0", false);
--
--/*
-- * pseries-3.1
-- */
--static void phb_placement_3_1(SpaprMachineState *spapr, uint32_t index,
-+static void phb_placement_4_0(SpaprMachineState *spapr, uint32_t index,
-                               uint64_t *buid, hwaddr *pio,
-                               hwaddr *mmio32, hwaddr *mmio64,
-                               unsigned n_dma, uint32_t *liobns,
-@@ -4434,6 +4423,20 @@ static void phb_placement_3_1(SpaprMachineState *s=
-papr, uint32_t index,
-     *nv2atsd =3D 0;
- }
+@@ -500,7 +500,10 @@ static void spapr_populate_cpu_dt(CPUState *cs, void=
+ *fdt, int offset,
+     _FDT((fdt_setprop(fdt, offset, "64-bit", NULL, 0)));
 =20
-+static void spapr_machine_4_0_class_options(MachineClass *mc)
-+{
-+    SpaprMachineClass *smc =3D SPAPR_MACHINE_CLASS(mc);
-+
-+    spapr_machine_4_1_class_options(mc);
-+    compat_props_add(mc->compat_props, hw_compat_4_0, hw_compat_4_0_len)=
-;
-+    smc->phb_placement =3D phb_placement_4_0;
-+}
-+
-+DEFINE_SPAPR_MACHINE(4_0, "4.0", false);
-+
-+/*
-+ * pseries-3.1
-+ */
- static void spapr_machine_3_1_class_options(MachineClass *mc)
- {
-     SpaprMachineClass *smc =3D SPAPR_MACHINE_CLASS(mc);
-@@ -4449,7 +4452,6 @@ static void spapr_machine_3_1_class_options(Machine=
-Class *mc)
-     smc->default_caps.caps[SPAPR_CAP_SBBC] =3D SPAPR_CAP_BROKEN;
-     smc->default_caps.caps[SPAPR_CAP_IBS] =3D SPAPR_CAP_BROKEN;
-     smc->default_caps.caps[SPAPR_CAP_LARGE_DECREMENTER] =3D SPAPR_CAP_OF=
-F;
--    smc->phb_placement =3D phb_placement_3_1;
- }
+     if (env->spr_cb[SPR_PURR].oea_read) {
+-        _FDT((fdt_setprop(fdt, offset, "ibm,purr", NULL, 0)));
++        _FDT((fdt_setprop_cell(fdt, offset, "ibm,purr", 1)));
++    }
++    if (env->spr_cb[SPR_SPURR].oea_read) {
++        _FDT((fdt_setprop_cell(fdt, offset, "ibm,spurr", 1)));
+     }
 =20
- DEFINE_SPAPR_MACHINE(3_1, "3.1", false);
+     if (ppc_hash64_has(cpu, PPC_HASH64_1TSEG)) {
 --=20
 2.21.0
 
