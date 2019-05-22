@@ -2,64 +2,95 @@ Return-Path: <SRS0=8zLO=TW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=FROM_EXCESS_BASE64,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AE22DC282CE
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 10:59:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4775CC282DD
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 11:00:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 84B9B21479
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 10:59:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 84B9B21479
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 1753A21479
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 11:00:29 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Cm1IQkLa"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1753A21479
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:40158 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:40172 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hTOxm-00067z-PB
-	for qemu-devel@archiver.kernel.org; Wed, 22 May 2019 06:59:14 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:33332)
+	id 1hTOyy-0006zn-B2
+	for qemu-devel@archiver.kernel.org; Wed, 22 May 2019 07:00:28 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:33446)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1hTOwp-0005go-QF
-	for qemu-devel@nongnu.org; Wed, 22 May 2019 06:58:16 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hTOxP-000633-RH
+	for qemu-devel@nongnu.org; Wed, 22 May 2019 06:58:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1hTOwo-0000ps-Lb
-	for qemu-devel@nongnu.org; Wed, 22 May 2019 06:58:15 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48142)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1hTOwm-0000o3-Ix
-	for qemu-devel@nongnu.org; Wed, 22 May 2019 06:58:14 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 28A1F3004153;
-	Wed, 22 May 2019 10:58:10 +0000 (UTC)
-Received: from redhat.com (unknown [10.42.17.248])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 4C1D25427C;
-	Wed, 22 May 2019 10:58:09 +0000 (UTC)
-Date: Wed, 22 May 2019 11:58:07 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <20190522105807.GF32359@redhat.com>
+	(envelope-from <richard.henderson@linaro.org>) id 1hTOxO-00019d-Uj
+	for qemu-devel@nongnu.org; Wed, 22 May 2019 06:58:51 -0400
+Received: from mail-yb1-xb43.google.com ([2607:f8b0:4864:20::b43]:34991)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1hTOxO-00019J-OU
+	for qemu-devel@nongnu.org; Wed, 22 May 2019 06:58:50 -0400
+Received: by mail-yb1-xb43.google.com with SMTP id s69so519824ybi.2
+	for <qemu-devel@nongnu.org>; Wed, 22 May 2019 03:58:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
+	:mime-version:in-reply-to:content-language:content-transfer-encoding;
+	bh=jhYSWAzwRB6Gn5cpA8J3IK/mNGVfnivH8jBnesMeby8=;
+	b=Cm1IQkLaHp47u+I1HSMYRrtI0Rv957pQ8haAPn7ek8H0W6ikBVFE2oSJVt0ATvj2+L
+	DzjsR6s9qdHuKy46lhmPmDOE+5GxOSfoYvpDZq6/NfjAFgCN+C1DvjfI9FWOMDjiAgT8
+	rEYDLidU50F18pAJISHbHG27mylPShbgUAnUGOG3X8OKuTe5TJYl2griYgfRoKk8IEqn
+	dzTbRVmWJDakKn/3SAdPzLYiS8QyT/rhbYcS9AhTB/uWQ5mYCQlM22l00WeMNaZ6cpma
+	ujewRAtPw3tJaWh29t9VqJdkO2+GZfsOmCyAAom5PUEUOVz/5lqM2yS5upGz4SXXJ+Ej
+	X91A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+	:date:user-agent:mime-version:in-reply-to:content-language
+	:content-transfer-encoding;
+	bh=jhYSWAzwRB6Gn5cpA8J3IK/mNGVfnivH8jBnesMeby8=;
+	b=mVwpuWGBRMq9mpWoCjpZRLBMES/8r6jUvk7VYXSiG1iXdA6ryAFT9JOmHdgdhrWW9L
+	Hf61oFwv4QZWG5JaP5dv+IVfUIirvoLyYsX/lkqOsiUvTBibkVQSjMyTs6Qo805XwejR
+	1Zhj2vUIJSrpM2pqr+4xqIMgI39352zihrGdHnK2Dcb/7YbYpJ9l3ythfQ93j1Rw3viW
+	jn6n3w7JewjXaO1AuOoXYbUEPVeSCx9VVSmQp4HfMCnGwxnELuyYiZdkJ3S6I0zjNCcK
+	U4b0RAx3Bk+8Wy/LvwrLDkdSZPRAhKw8VnYjvCL5X62rYgPeZmbbucUsu0Crr+wypM+u
+	36vw==
+X-Gm-Message-State: APjAAAVTiIElOU9ZcwzcJ02MvqTxqVfledk2NIhWkqoyg/BtCzQLPEd+
+	P39bGkDQ7+nypkC9VDyoytcQvA==
+X-Google-Smtp-Source: APXvYqw7TG5Lqt8lJd4epe94lj8Iu8FNEUnoJSqBumtPR//Wo8wgNcPXqAonJldjG2Vwyh13uiqbqA==
+X-Received: by 2002:a5b:c01:: with SMTP id f1mr12972116ybq.518.1558522729921; 
+	Wed, 22 May 2019 03:58:49 -0700 (PDT)
+Received: from [10.243.202.139] ([71.46.56.72])
+	by smtp.gmail.com with ESMTPSA id
+	124sm6297222yws.102.2019.05.22.03.58.48
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Wed, 22 May 2019 03:58:49 -0700 (PDT)
+To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
 References: <20190517023924.1686-1-richard.henderson@linaro.org>
+	<20190517023924.1686-3-richard.henderson@linaro.org>
+	<20190521150402.GQ25835@redhat.com>
+	<a928e588-63dc-ed4c-fcdc-9001941559fd@linaro.org>
+	<20190522105614.GD32359@redhat.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Openpgp: preference=signencrypt
+Message-ID: <15223542-aef5-8a29-d5e6-b25ab5ee39b9@linaro.org>
+Date: Wed, 22 May 2019 06:58:46 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
+In-Reply-To: <20190522105614.GD32359@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20190517023924.1686-1-richard.henderson@linaro.org>
-User-Agent: Mutt/1.11.4 (2019-03-13)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.46]);
-	Wed, 22 May 2019 10:58:10 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v8 00/25] Add qemu_getrandom and
- ARMv8.5-RNG etc
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::b43
+Subject: Re: [Qemu-devel] [PATCH v8 02/25] build: Link user-only with crypto
+ random number objects
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -71,51 +102,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
 Cc: lvivier@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, May 16, 2019 at 07:38:59PM -0700, Richard Henderson wrote:
-> The change in v8 is to which objects are linked in to user-only
-> from the crypto directory.  Daniel asked for all of crypto-obj-y
-> to be added, but I have been unable to find a solution that works.
->=20
-> If I add crypto-obj-y, then authz-obj-y must be included to resolve
-> dependencies.  Daniel suggested splitting authz-obj-y into two, so
-> that linux-user plus some of the tools need not link against libpam.
->=20
-> However, I tried that, and in the process managed to break testing.
-> I'm not really sure what I did wrong:
->=20
->   TEST    check-speed: tests/benchmark-crypto-cipher
->   ERROR - too few tests run (expected 32, got 0)
->=20
-> Or maybe it was broken before, but at least this way I'm not touching
-> any of the variables that affect tests/Makefile.include.
->=20
-> Given that user-only *is* being linked against the enabled crypto libs,
-> the behaviour between static and non-static is identical, which is I
-> believe the major portion of Daniel's request.  I think further cleanup
-> to the makefiles can be done separately.
->
+On 5/22/19 6:56 AM, Daniel P. Berrangé wrote:
+>> I have a working configuration here in v8.  Can we please leave the bikeshed
+>> unpainted for the moment and you can adjust the makefiles as you see fit afterward?
+> 
+> Yep, ok. I'll be away on holiday for a while so don't have time to look
+> into it now. So lets get this merged as is & I'll investigate further
+> when I come back.
 
-For avoidance of any doubt
-
-  Acked-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-
-for Richard to send a pull request with any of the crypto related patches
-I'm tagged as maintainer for.
+Thanks.
 
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+r~
+
 
