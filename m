@@ -2,101 +2,70 @@ Return-Path: <SRS0=8zLO=TW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DBDA5C282CE
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 16:12:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4212EC282CE
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 16:13:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B405420868
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 16:12:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B405420868
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 1579920868
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 16:13:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1579920868
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:47290 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:47296 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hTTqc-0004y8-0D
-	for qemu-devel@archiver.kernel.org; Wed, 22 May 2019 12:12:10 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:57282)
+	id 1hTTrp-0006C2-7Z
+	for qemu-devel@archiver.kernel.org; Wed, 22 May 2019 12:13:25 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:57676)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <farosas@linux.ibm.com>) id 1hTTm3-0001b1-98
-	for qemu-devel@nongnu.org; Wed, 22 May 2019 12:07:28 -0400
+	(envelope-from <laurent@vivier.eu>) id 1hTTn6-0002Lt-IW
+	for qemu-devel@nongnu.org; Wed, 22 May 2019 12:08:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <farosas@linux.ibm.com>) id 1hTTm1-0001SV-6a
-	for qemu-devel@nongnu.org; Wed, 22 May 2019 12:07:27 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:40874
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <farosas@linux.ibm.com>)
-	id 1hTTm1-0001MF-1E
-	for qemu-devel@nongnu.org; Wed, 22 May 2019 12:07:25 -0400
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x4MG1oS0081382
-	for <qemu-devel@nongnu.org>; Wed, 22 May 2019 12:07:21 -0400
-Received: from e33.co.us.ibm.com (e33.co.us.ibm.com [32.97.110.151])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2sn8774vpj-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 22 May 2019 12:07:21 -0400
-Received: from localhost
-	by e33.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <farosas@linux.ibm.com>;
-	Wed, 22 May 2019 17:07:20 +0100
-Received: from b03cxnp08025.gho.boulder.ibm.com (9.17.130.17)
-	by e33.co.us.ibm.com (192.168.1.133) with IBM ESMTP SMTP Gateway:
-	Authorized Use Only! Violators will be prosecuted; 
-	(version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-	Wed, 22 May 2019 17:07:17 +0100
-Received: from b03ledav005.gho.boulder.ibm.com
-	(b03ledav005.gho.boulder.ibm.com [9.17.130.236])
-	by b03cxnp08025.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with
-	ESMTP id x4MG7GKQ24117726
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256
-	verify=OK); Wed, 22 May 2019 16:07:16 GMT
-Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 6C10BBE056;
-	Wed, 22 May 2019 16:07:16 +0000 (GMT)
-Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 32815BE04F;
-	Wed, 22 May 2019 16:07:16 +0000 (GMT)
-Received: from localhost (unknown [9.86.26.96])
-	by b03ledav005.gho.boulder.ibm.com (Postfix) with ESMTPS;
-	Wed, 22 May 2019 16:07:16 +0000 (GMT)
-From: Fabiano Rosas <farosas@linux.ibm.com>
-To: Shivaprasad G Bhat <sbhat@linux.ibm.com>, imammedo@redhat.com,
-	david@gibson.dropbear.id.au, xiaoguangrong.eric@gmail.com, mst@redhat.com
-In-Reply-To: <155773963257.49142.17067912880307967487.stgit@lep8c.aus.stglabs.ibm.com>
-References: <155773946961.49142.5208084426066783536.stgit@lep8c.aus.stglabs.ibm.com>
-	<155773963257.49142.17067912880307967487.stgit@lep8c.aus.stglabs.ibm.com>
-Date: Wed, 22 May 2019 13:07:13 -0300
+	(envelope-from <laurent@vivier.eu>) id 1hTTn5-0004P4-LA
+	for qemu-devel@nongnu.org; Wed, 22 May 2019 12:08:32 -0400
+Received: from mout.kundenserver.de ([212.227.17.24]:59251)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>)
+	id 1hTTn0-00049w-Mr; Wed, 22 May 2019 12:08:27 -0400
+Received: from localhost.localdomain ([78.238.229.36]) by
+	mrelayeu.kundenserver.de (mreue108 [212.227.15.183]) with ESMTPSA
+	(Nemesis)
+	id 1MbizQ-1gw4y03Q58-00dJan; Wed, 22 May 2019 18:07:35 +0200
+From: Laurent Vivier <laurent@vivier.eu>
+To: qemu-devel@nongnu.org
+Date: Wed, 22 May 2019 18:07:17 +0200
+Message-Id: <20190522160723.31484-4-laurent@vivier.eu>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190522160723.31484-1-laurent@vivier.eu>
+References: <20190522160723.31484-1-laurent@vivier.eu>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-TM-AS-GCONF: 00
-x-cbid: 19052216-0036-0000-0000-00000AC1603F
-X-IBM-SpamModules-Scores: 
-X-IBM-SpamModules-Versions: BY=3.00011143; HX=3.00000242; KW=3.00000007;
-	PH=3.00000004; SC=3.00000286; SDB=6.01207037; UDB=6.00633871;
-	IPR=6.00988012; 
-	MB=3.00027006; MTD=3.00000008; XFM=3.00000015; UTC=2019-05-22 16:07:19
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19052216-0037-0000-0000-00004BE69428
-Message-Id: <878suy5v7y.fsf@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
-	definitions=2019-05-22_08:, , signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
-	priorityscore=1501
-	malwarescore=0 suspectscore=5 phishscore=0 bulkscore=0 spamscore=0
-	clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
-	mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
-	scancount=1 engine=8.0.1-1810050000 definitions=main-1905220113
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.158.5
-Subject: Re: [Qemu-devel] [RFC v2 PATCH 2/3] spapr: Add NVDIMM device support
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:8/OIAyrTkqTcAuQg62h07r/34My5u/HfOdVK+CMrqTqlSdimxTP
+	ZN9Imj4FsLcoo6w8E/ebCTO63T8oC+fMWRQFtcUR82YJDFZ7UdjM1F62hTVMdvzZAM6JJS3
+	2jBe0h1O3cdmu4SKox2QqqB347ea+ISL4mSoHkdHw2pSnmPjwL9EDppgZtEixxcvTc653ef
+	+F4LRdCfRqcsnNfuI58Mg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:+bZ/mQYuGLo=:WTfh+LileZT1teCRAgNj+l
+	3CUWrZhNnyvhTqRaamczEFyclLbNnqEPSwA45I1k57+3nJZyKZ3fnGL26sKaECFisP2lj5CNm
+	29gWpXuLfRHL+qRmf80kRO5Rbl0rs03hqxmeFxgdGWQmGn7HK1gzib45/kA4Gx6a9hlemdq44
+	qlcctoMSPs00LS6CbpDSeuFT0JgyyTuOUJkH7aGtK8jKHfDf0bz1iM7CX5pGxvs5BArZGVbYn
+	8IsK5m/8DpdehiUG9bFMWxsadP7hCL6dAXMiy2JRo6SrnoQRHnpdQ9jpZvc2rFAbiMLzJEWF1
+	ZoBCLK5jAQrB5/QZgHdSQ0KYROvb0+aVHGNb7bA9bSpurTk+ZPLF9Ud0KkoeHqHto07/HUJ7B
+	uCEgYsGdlT9Z6LPZS+yuMM9Tt67ZpQBmPQ2WDu6v41UyhGX4bj1H9H83IsTBwURYFCc0Q9Mq8
+	hb85tF8UNKHbd2RMusVT8N7Nx9GKd5nsRO61qvEtwGSpiKbJwWOUGJ1m3ordjSrqEKTS3HGiC
+	emB4/SkwS5wTmrRCmJOnpBW1DuQSLMW3iJ+ghPJjZhQFm58RO+9/sAgAMv11JXNdzHj0D2J2w
+	TokD2EN8VrEFmjTU+A4Wyu+rA0NhYVNQx5MGcpCo7p/XDA4dGCKxW/NyfSPvXEiIEg/XC/isV
+	QYAiXicPcvVIAbUUWYm9/JldIBw2sGG2bpUrZJ+fIiYxOevk5C1FCWQyUipBLYRgvjBitVqzL
+	H7VrxprWILQXdkq1HUmCX6pjGP1aiLhPNF2BVOUZslzsfUIPiYxyEkK+2HA=
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 212.227.17.24
+Subject: [Qemu-devel] [PULL 3/9] roms: List and describe the Makefile
+ 'clean' rule
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -108,25 +77,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, sbhat@linux.ibm.com
+Cc: Tony Krowiak <akrowiak@linux.ibm.com>, Eric Farman <farman@linux.ibm.com>,
+	Farhan Ali <alifm@linux.ibm.com>, Pierre Morel <pmorel@linux.ibm.com>,
+	Juan Quintela <quintela@redhat.com>, qemu-trivial@nongnu.org,
+	Laszlo Ersek <lersek@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
+	Michael Tokarev <mjt@tls.msk.ru>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	Laurent Vivier <laurent@vivier.eu>, Halil Pasic <pasic@linux.ibm.com>,
+	Christian Borntraeger <borntraeger@de.ibm.com>,
+	qemu-s390x@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>,
+	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+	"Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Shivaprasad G Bhat <sbhat@linux.ibm.com> writes:
+From: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-> +    /* Create DT entries for cold plugged NVDIMM devices */
-> +    dimms = nvdimm_get_device_list();
-> +    for (; dimms; dimms = dimms->next) {
-> +        NVDIMMDevice *nvdimm = dimms->data;
-> +
-> +        spapr_populate_nvdimm_node(fdt, offset, nvdimm);
-> +    }
-> +    g_slist_free(dimms);
+Reviewed-by: Laszlo Ersek <lersek@redhat.com>
+Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Message-Id: <20190506141923.12183-3-philmd@redhat.com>
+Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+---
+ roms/Makefile | 2 ++
+ 1 file changed, 2 insertions(+)
 
-To free the whole list you'll need another variable in the loop above,
-right?
-
-Cheers
+diff --git a/roms/Makefile b/roms/Makefile
+index ea6aec56abdd..078d3fb70563 100644
+--- a/roms/Makefile
++++ b/roms/Makefile
+@@ -62,6 +62,8 @@ default:
+ 	@echo "  u-boot.e500    -- update u-boot.e500"
+ 	@echo "  u-boot.sam460  -- update u-boot.sam460"
+ 	@echo "  efi            -- update UEFI (edk2) platform firmware"
++	@echo "  clean          -- delete the files generated by the previous" \
++	                          "build targets"
+ 
+ bios: build-seabios-config-seabios-128k build-seabios-config-seabios-256k
+ 	cp seabios/builds/seabios-128k/bios.bin ../pc-bios/bios.bin
+-- 
+2.20.1
 
 
