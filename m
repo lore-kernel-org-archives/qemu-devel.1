@@ -2,78 +2,92 @@ Return-Path: <SRS0=8zLO=TW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1796AC282CE
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 14:52:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A863AC282CE
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 14:54:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DCF1320881
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 14:52:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DCF1320881
+	by mail.kernel.org (Postfix) with ESMTPS id 6CBD620879
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 14:54:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6CBD620879
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:44746 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:44414 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hTSbL-0000ik-83
-	for qemu-devel@archiver.kernel.org; Wed, 22 May 2019 10:52:19 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:33515)
+	id 1hTSOl-0007Wd-7H
+	for qemu-devel@archiver.kernel.org; Wed, 22 May 2019 10:39:19 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:53972)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hTSaU-0000PR-V6
-	for qemu-devel@nongnu.org; Wed, 22 May 2019 10:51:28 -0400
+	(envelope-from <mreitz@redhat.com>) id 1hTSHK-0001JX-85
+	for qemu-devel@nongnu.org; Wed, 22 May 2019 10:31:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hTSaT-0006AH-JK
-	for qemu-devel@nongnu.org; Wed, 22 May 2019 10:51:26 -0400
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:41938)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hTSaT-0004Il-AR
-	for qemu-devel@nongnu.org; Wed, 22 May 2019 10:51:25 -0400
-Received: by mail-wr1-f66.google.com with SMTP id g12so2629954wro.8
-	for <qemu-devel@nongnu.org>; Wed, 22 May 2019 07:50:44 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-	:date:user-agent:mime-version:in-reply-to:content-language
-	:content-transfer-encoding;
-	bh=by6dhmjpY2luTaGLOylIF5/4Kh1TMIZnGR9My4Wp+mc=;
-	b=KIfFhsX5R/OuRZ3DqXWcr/3fwH0SMTpsLSnXHZdMJWaBmzmYdXIPzBpmlC8gtXzr8w
-	Cp9ajJg+FsN3kAHh2U1KaZGrmTxOkMJUb6LIrXmQaXGq32SyVeghrPotMubI/bYNBP6s
-	jzacrigR5Wo+JMdzsGs/VYfwW1LqIJmx5ln42moWgDc9cOvrsHySPrMDG6rsMg9N4+ME
-	wM45qSznYiZc175X3vN0f16peAP3FPcw12OzdEUvzB6q0/zFoQmOY6Y/cIDJDITf5EZK
-	IZDPRZHN6ICVuTdCDBSW+amUzA3Ce+YzO81sZX6QC5Tw1XOPurFkcPBniiHc6kpYRgEB
-	G57Q==
-X-Gm-Message-State: APjAAAVDGzfrqQbARAhuVEWlV4SOggTvE8ZgPVqHEaCTl1x6Gk5aNmr2
-	c67mxWbvj4blSkoQkJS0GNP4Yg==
-X-Google-Smtp-Source: APXvYqzcQe5v5YxHI9HX6J2EULCcJhCr6Ge2kZSDGhmkBuj9UjqXVRcI0gP1X1ZEGe/RXM6GJLlTEQ==
-X-Received: by 2002:adf:e44b:: with SMTP id t11mr6193133wrm.151.1558536643489; 
-	Wed, 22 May 2019 07:50:43 -0700 (PDT)
-Received: from [10.201.33.53] ([195.166.127.210])
-	by smtp.gmail.com with ESMTPSA id
-	s10sm21905027wrt.66.2019.05.22.07.50.42
-	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-	Wed, 22 May 2019 07:50:43 -0700 (PDT)
-To: Yoshinori Sato <ysato@users.sourceforge.jp>, qemu-devel@nongnu.org
-References: <20190522142956.41916-1-ysato@users.sourceforge.jp>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
-	url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <dd7f9ae2-e7ae-790c-170b-81d127a6222c@redhat.com>
-Date: Wed, 22 May 2019 16:50:41 +0200
+	(envelope-from <mreitz@redhat.com>) id 1hTSHI-0002Al-DB
+	for qemu-devel@nongnu.org; Wed, 22 May 2019 10:31:37 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33118)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mreitz@redhat.com>)
+	id 1hTSH3-0001ZR-Nd; Wed, 22 May 2019 10:31:21 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id D3A163082163;
+	Wed, 22 May 2019 14:31:20 +0000 (UTC)
+Received: from dresden.str.redhat.com (unknown [10.40.205.176])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 2761C54474;
+	Wed, 22 May 2019 14:31:18 +0000 (UTC)
+To: qemu-block@nongnu.org
+References: <20190522142854.22983-1-mreitz@redhat.com>
+	<20190522142854.22983-3-mreitz@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+	mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+	/PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+	U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+	mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+	awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+	AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+	CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+	B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+	2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+	AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+	8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+	4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+	BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+	xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+	W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+	DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+	64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+	ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+	sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+	alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+	/ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+	bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+	R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <c5a3333f-c9d4-8e89-43f1-2cd50dc93fee@redhat.com>
+Date: Wed, 22 May 2019 16:31:17 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190522142956.41916-1-ysato@users.sourceforge.jp>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <20190522142854.22983-3-mreitz@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="hXBJBjzC5gaHZQPUpvWyCbgxmcWAH3AVq"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.47]);
+	Wed, 22 May 2019 14:31:20 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-	[fuzzy]
-X-Received-From: 209.85.221.66
-Subject: Re: [Qemu-devel] [PATCH v15 00/12] Add RX archtecture support
+X-Received-From: 209.132.183.28
+X-Content-Filtered-By: Mailman/MimeDel 2.1.21
+Subject: Re: [Qemu-devel] [PATCH 2/2] iotests: Test cancelling a job and
+ closing the VM
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -85,100 +99,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, richard.henderson@linaro.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org,
+	Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Yoshinori,
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--hXBJBjzC5gaHZQPUpvWyCbgxmcWAH3AVq
+From: Max Reitz <mreitz@redhat.com>
+To: qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <c5a3333f-c9d4-8e89-43f1-2cd50dc93fee@redhat.com>
+Subject: Re: [PATCH 2/2] iotests: Test cancelling a job and closing the VM
+References: <20190522142854.22983-1-mreitz@redhat.com>
+ <20190522142854.22983-3-mreitz@redhat.com>
+In-Reply-To: <20190522142854.22983-3-mreitz@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On 5/22/19 4:29 PM, Yoshinori Sato wrote:
-> Hello.
-> This patch series is added Renesas RX target emulation.
-> 
-> Fix is bellow.
-> - Reorder patches.
-> - Rewrite renesas_cmt.
->   Convert to RCMTChannelStatus
-> - Use CPUClass::tlb_fill
-> - Use tcg_gen_abs_i32
-> - Fix racw instructions.
-> - Cleanup for review comment.
->   target/rx/helper.c - fix spelling.
->   hw/intc/rx_icu.h - cleanup constant definition.
->   hw/registerfields.h - fix macro definion order.
+On 22.05.19 16:28, Max Reitz wrote:
+> This patch adds a test where we cancel a throttled mirror job and
+> immediately close the VM before it can be cancelled.  Doing so will
+> invoke bdrv_drain_all() while the mirror job tries to drain the
+> throttled node.  When bdrv_drain_all_end() tries to lift its drain on
+> the throttle node, the job will exit and replace the current root node
+> of the BB drive0 (which is the job's filter node) by the throttle node.=
 
-$ git backport-diff -u rx14 -r origin/master..rx15
-Key:
-[----] : patches are identical
-[####] : number of functional differences between upstream/downstream patch
-[down] : patch is downstream-only
-The flags [FC] indicate (F)unctional and (C)ontextual differences,
-respectively
+> Before the previous patch, this replacement did not increase drive0's
+> quiesce_counter by a sufficient amount, so when
+> bdrv_parent_drained_end() (invoked by bdrv_do_drained_end(), invoked by=
 
-001/12:[----] [--] 'qemu/bitops.h: Add extract8 and extract16'
-002/12:[0008] [FC] 'hw/registerfields.h: Add 8bit and 16bit register macros'
-003/12:[0018] [FC] 'target/rx: TCG translation'
-004/12:[0004] [FC] 'target/rx: TCG helper'
-005/12:[0030] [FC] 'target/rx: CPU definition'
-006/12:[----] [--] 'target/rx: RX disassembler'
-007/12:[0003] [FC] 'hw/intc: RX62N interrupt controller (ICUa)'
-008/12:[0178] [FC] 'hw/timer: RX62N internal timer modules'
-009/12:[----] [--] 'hw/char: RX62N serial communication interface (SCI)'
-010/12:[0004] [FC] 'hw/rx: RX Target hardware definition'
-011/12:[----] [--] 'Add rx-softmmu'
-012/12:[0004] [FC] 'MAINTAINERS: Add RX'
+> bdrv_drain_all_end()) tried to end the drain on all of the throttle
+> node's parents, it decreased drive0's quiesce_counter below 0 -- which
+> fails an assertion.
+>=20
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> ---
+>  tests/qemu-iotests/255     | 54 ++++++++++++++++++++++++++++++++++++++=
 
-- you removed rx_abs(),
-- one change in trans_RACW()
-- fixed typos (Richard fixe them)
-- LOT of changes in the timer device, you added RCMTChannelState()
+>  tests/qemu-iotests/255.out | 24 +++++++++++++++++
+>  2 files changed, 78 insertions(+)
+>=20
+> diff --git a/tests/qemu-iotests/255 b/tests/qemu-iotests/255
+> index c0bb37a9b0..b1bbe3ff0a 100755
+> --- a/tests/qemu-iotests/255
+> +++ b/tests/qemu-iotests/255
+> @@ -35,6 +35,10 @@ def blockdev_create(vm, options):
+>          vm.run_job('job0')
+>      iotests.log("")
+> =20
+> +iotests.log('Finishing a commit job with background reads')
+> +iotests.log('=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+')
+> +iotests.log('')
+> +
+>  with iotests.FilePath('t.qcow2') as disk_path, \
+>       iotests.FilePath('t.qcow2.mid') as mid_path, \
+>       iotests.FilePath('t.qcow2.base') as base_path, \
+> @@ -80,4 +84,54 @@ with iotests.FilePath('t.qcow2') as disk_path, \
+>      vm.run_job('job0', auto_finalize=3DFalse, pre_finalize=3Dstart_req=
+uests,
+>                  auto_dismiss=3DTrue)
+> =20
+> +    #vm.qmp_log('block-job-cancel', device=3D'job0')
+> +
+> +    vm.shutdown()
 
-Hmm you did reset some of the R-b T-b tags.
+Er, oops, I took so much time with the commit messages that I forgot
+this.  Let me try again...
+
+Shamefully,
+
+Max
 
 
-I guess Richard already prepared a pull request for your v14.
+--hXBJBjzC5gaHZQPUpvWyCbgxmcWAH3AVq
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-At this point I'd prefer the v14 get merged, and the v15 changes amended
-as new commits. This would ease review/testing.
+-----BEGIN PGP SIGNATURE-----
 
-Maybe Richard can still amend the 'trans_RACW' one-line fix on his pullreq.
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlzlXTUACgkQ9AfbAGHV
+z0DHhAgAmys9/3qjIE6M5u1Z8Up/Q2B4iVppPlFhWwFCclFEd6cvdDT3UKinfFlU
+/DUelJIqY5IUvlKqUpILiVysQSRlpOSCh4y0azWVwCpVXhJLifZte4vBr6vUEZsf
+jdfgIDvA5BR2QqmozhDXEOsGqe+D7uMsThwgYtj+O0lRYr8xR6RhPDKqca3KC/o3
+NUk6CUsOBxXnb7u7WJ5m0rxn0qEGDCt0bcH4F4Me2chW9JxpRz3CD2qFYwP0jQTG
+q4OMNqznJdxKPcxc7miMtnyhc7wgyCrX1rk/didzJ0JGzGH2Rd9S6eI8s7pYu1HC
+nwRlbxaDdSYwJhmlwl1RdQID3mfAEw==
+=Yuw+
+-----END PGP SIGNATURE-----
 
-Richard what's your take on this?
-
-Regards,
-
-Phil.
-
-> My git repository is bellow.
-> git://git.pf.osdn.net/gitroot/y/ys/ysato/qemu.git tags/rx-20190522
-> 
-> Testing binaries bellow.
-> u-boot
-> Download - https://osdn.net/users/ysato/pf/qemu/dl/u-boot.bin.gz
-> 
-> starting
-> $ gzip -d u-boot.bin.gz
-> $ qemu-system-rx -bios u-boot.bin
-> 
-> linux and pico-root (only sash)
-> Download - https://osdn.net/users/ysato/pf/qemu/dl/zImage (kernel)
->            https://osdn.net/users/ysato/pf/qemu/dl/rx-qemu.dtb (DeviceTree)
-> 
-> starting
-> $ qemu-system-rx -kernel zImage -dtb rx-qemu.dtb -append "earlycon"
-> 
-> Yoshinori Sato (12):
->   qemu/bitops.h: Add extract8 and extract16
->   hw/registerfields.h: Add 8bit and 16bit register macros.
->   target/rx: TCG translation
->   target/rx: TCG helper
->   target/rx: CPU definition
->   target/rx: RX disassembler
->   hw/intc: RX62N interrupt controller (ICUa)
->   hw/timer: RX62N internal timer modules
->   hw/char: RX62N serial communication interface (SCI)
->   hw/rx: RX Target hardware definition
->   Add rx-softmmu
->   MAINTAINERS: Add RX
+--hXBJBjzC5gaHZQPUpvWyCbgxmcWAH3AVq--
 
