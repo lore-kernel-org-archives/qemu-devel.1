@@ -2,60 +2,60 @@ Return-Path: <SRS0=8zLO=TW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 36606C282CE
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 17:05:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 97CDCC282CE
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 17:06:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0A87221473
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 17:05:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0A87221473
+	by mail.kernel.org (Postfix) with ESMTPS id 6C5DA2070D
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 17:06:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6C5DA2070D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:47968 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:47973 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hTUgO-0004F1-8Q
-	for qemu-devel@archiver.kernel.org; Wed, 22 May 2019 13:05:40 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:40602)
+	id 1hTUgo-0004XI-NA
+	for qemu-devel@archiver.kernel.org; Wed, 22 May 2019 13:06:06 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:40701)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hTUf6-0003Uw-FO
-	for qemu-devel@nongnu.org; Wed, 22 May 2019 13:04:21 -0400
+	(envelope-from <mreitz@redhat.com>) id 1hTUfE-0003aC-Gn
+	for qemu-devel@nongnu.org; Wed, 22 May 2019 13:04:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hTUf2-0007ZN-Bd
-	for qemu-devel@nongnu.org; Wed, 22 May 2019 13:04:18 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35492)
+	(envelope-from <mreitz@redhat.com>) id 1hTUfC-0007nF-DX
+	for qemu-devel@nongnu.org; Wed, 22 May 2019 13:04:28 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33118)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mreitz@redhat.com>)
-	id 1hTUep-0007K9-DV; Wed, 22 May 2019 13:04:04 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
+	id 1hTUf6-0007ay-Ed; Wed, 22 May 2019 13:04:22 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 9D44280F91;
-	Wed, 22 May 2019 17:03:56 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id D9F8F820E9;
+	Wed, 22 May 2019 17:04:04 +0000 (UTC)
 Received: from localhost (ovpn-204-123.brq.redhat.com [10.40.204.123])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 3600E5D9C3;
-	Wed, 22 May 2019 17:03:53 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 1E1E5600C0;
+	Wed, 22 May 2019 17:04:03 +0000 (UTC)
 From: Max Reitz <mreitz@redhat.com>
 To: qemu-block@nongnu.org
-Date: Wed, 22 May 2019 19:03:44 +0200
-Message-Id: <20190522170352.12020-1-mreitz@redhat.com>
+Date: Wed, 22 May 2019 19:03:46 +0200
+Message-Id: <20190522170352.12020-3-mreitz@redhat.com>
+In-Reply-To: <20190522170352.12020-1-mreitz@redhat.com>
+References: <20190522170352.12020-1-mreitz@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.27]);
-	Wed, 22 May 2019 17:04:01 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.26]);
+	Wed, 22 May 2019 17:04:09 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v3 0/8] block: Ignore loosening perm
- restrictions failures
+Subject: [Qemu-devel] [PATCH v3 2/8] block: Add bdrv_child_refresh_perms()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -73,93 +73,88 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi,
+If a block node uses bdrv_child_try_set_perm() to change the permission
+it takes on its child, the result may be very short-lived.  If anything
+makes the block layer recalculate the permissions internally, it will
+invoke the node driver's .bdrv_child_perm() implementation.  The
+permission/shared permissions masks that returns will then override the
+values previously passed to bdrv_child_try_set_perm().
 
-This series is mainly a fix for
-https://bugzilla.redhat.com/show_bug.cgi?id=3D1703793.  The problem
-described there is that mirroring to a gluster volume, then switching
-off the volume makes qemu crash.  There are two problems here:
+If drivers want a child edge to have specific values for the
+permissions/shared permissions mask, it must return them in
+.bdrv_child_perm().  Consequentially, there is no need for them to pass
+the same values to bdrv_child_try_set_perm() then: It is better to have
+a function that invokes .bdrv_child_perm() and calls
+bdrv_child_try_set_perm() with the result.  This patch adds such a
+function under the name of bdrv_child_refresh_perms().
 
-(1) file-posix reopens the FD all the time because it thinks the FD it
-    has is RDONLY.  It actually isn=E2=80=99t after the first reopen, we =
-just
-    forgot to change the internal flags.  That=E2=80=99s what patch 1 is =
-for.
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+Reviewed-by: Kevin Wolf <kwolf@redhat.com>
+---
+ include/block/block_int.h | 15 +++++++++++++++
+ block.c                   | 12 ++++++++++++
+ 2 files changed, 27 insertions(+)
 
-(2) Even then, when mirror completes, it drops its write permission on
-    the FD.  This requires a reopen, which will fail if the volume is
-    down.  Mirror doesn=E2=80=99t expect that.  Nobody ever expects that
-    dropping permissions can fail, and rightfully so because that=E2=80=99=
-s what
-    I think we have generally agreed on.
-    Therefore, the block layer should hide this error.  This is what the
-    last two patches are for.
-
-The penultimate patch adds two assertions: bdrv_replace_child() (for the
-old BDS) and bdrv_inactivate_recurse() assume they only ever drop
-assertions.  This is now substantiated by these new assertions.
-It turns out that this assumption was just plain wrong.  Patches 3 to 5
-make it right.
-
-
-v3:
-- Received no reply to my =E2=80=9CHm, warnings break 'make check', so ma=
-ybe we
-  should just keep quiet if loosening restrictions fails?=E2=80=9D questi=
-on, so
-  I assume silence means agreement.  Changed patch 7 accordingly.
-
-- Added a test: The fact how make check kind-of-but-not-really broke
-  showed a nice reproducer: Launching qemu with some file, then deleting
-  that file, then quitting qemu.
-
-- Rebase =E2=80=9Cconflict=E2=80=9D in patch 6: The forward declaration o=
-f
-  bdrv_get_cumulative_perm() is already in qemu thanks to commit
-  481e0eeef4f.
-
-
-git-backport-diff against v2:
-
-Key:
-[----] : patches are identical
-[####] : number of functional differences between upstream/downstream pat=
-ch
-[down] : patch is downstream-only
-The flags [FC] indicate (F)unctional and (C)ontextual differences, respec=
-tively
-
-001/8:[----] [--] 'file-posix: Update open_flags in raw_set_perm()'
-002/8:[----] [--] 'block: Add bdrv_child_refresh_perms()'
-003/8:[----] [--] 'block/mirror: Fix child permissions'
-004/8:[----] [--] 'block/commit: Drop bdrv_child_try_set_perm()'
-005/8:[0018] [FC] 'block: Fix order in bdrv_replace_child()'
-       ^^^^ Again confuses my v2 patch with 8aecf1d1bd250a, should be:
-      [----] : patches are identical
-006/8:[0002] [FC] 'block: Add *tighten_restrictions to *check*_perm()'
-007/8:[0018] [FC] 'block: Ignore loosening perm restrictions failures'
-008/8:[down] 'iotests: Test failure to loosen restrictions'
-
-
-Max Reitz (8):
-  file-posix: Update open_flags in raw_set_perm()
-  block: Add bdrv_child_refresh_perms()
-  block/mirror: Fix child permissions
-  block/commit: Drop bdrv_child_try_set_perm()
-  block: Fix order in bdrv_replace_child()
-  block: Add *tighten_restrictions to *check*_perm()
-  block: Ignore loosening perm restrictions failures
-  iotests: Test failure to loosen restrictions
-
- include/block/block_int.h  |  15 ++++
- block.c                    | 153 +++++++++++++++++++++++++++++++------
- block/commit.c             |   2 -
- block/file-posix.c         |   4 +
- block/mirror.c             |  32 +++++---
- tests/qemu-iotests/182     |  21 +++++
- tests/qemu-iotests/182.out |   6 ++
- 7 files changed, 198 insertions(+), 35 deletions(-)
-
+diff --git a/include/block/block_int.h b/include/block/block_int.h
+index 1eebc7c8f3..e1f6d50b01 100644
+--- a/include/block/block_int.h
++++ b/include/block/block_int.h
+@@ -1167,9 +1167,24 @@ BdrvChild *bdrv_root_attach_child(BlockDriverState=
+ *child_bs,
+                                   void *opaque, Error **errp);
+ void bdrv_root_unref_child(BdrvChild *child);
+=20
++/**
++ * Sets a BdrvChild's permissions.  Avoid if the parent is a BDS; use
++ * bdrv_child_refresh_perms() instead and make the parent's
++ * .bdrv_child_perm() implementation return the correct values.
++ */
+ int bdrv_child_try_set_perm(BdrvChild *c, uint64_t perm, uint64_t shared=
+,
+                             Error **errp);
+=20
++/**
++ * Calls bs->drv->bdrv_child_perm() and updates the child's permission
++ * masks with the result.
++ * Drivers should invoke this function whenever an event occurs that
++ * makes their .bdrv_child_perm() implementation return different
++ * values than before, but which will not result in the block layer
++ * automatically refreshing the permissions.
++ */
++int bdrv_child_refresh_perms(BlockDriverState *bs, BdrvChild *c, Error *=
+*errp);
++
+ /* Default implementation for BlockDriver.bdrv_child_perm() that can be =
+used by
+  * block filters: Forward CONSISTENT_READ, WRITE, WRITE_UNCHANGED and RE=
+SIZE to
+  * all children */
+diff --git a/block.c b/block.c
+index 4c3902508d..02157e0652 100644
+--- a/block.c
++++ b/block.c
+@@ -2083,6 +2083,18 @@ int bdrv_child_try_set_perm(BdrvChild *c, uint64_t=
+ perm, uint64_t shared,
+     return 0;
+ }
+=20
++int bdrv_child_refresh_perms(BlockDriverState *bs, BdrvChild *c, Error *=
+*errp)
++{
++    uint64_t parent_perms, parent_shared;
++    uint64_t perms, shared;
++
++    bdrv_get_cumulative_perm(bs, &parent_perms, &parent_shared);
++    bdrv_child_perm(bs, c->bs, c, c->role, NULL, parent_perms, parent_sh=
+ared,
++                    &perms, &shared);
++
++    return bdrv_child_try_set_perm(c, perms, shared, errp);
++}
++
+ void bdrv_filter_default_perms(BlockDriverState *bs, BdrvChild *c,
+                                const BdrvChildRole *role,
+                                BlockReopenQueue *reopen_queue,
 --=20
 2.21.0
 
