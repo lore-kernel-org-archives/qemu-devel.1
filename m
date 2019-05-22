@@ -7,58 +7,56 @@ X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 287BBC072A4
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 05:19:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 47B5CC072A4
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 05:21:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E96BB2075B
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 05:19:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 127FA2075B
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 05:21:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="KwvLJO3X"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E96BB2075B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="VMfdNHBb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 127FA2075B
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:36234 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:36300 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hTJek-0006pe-4p
-	for qemu-devel@archiver.kernel.org; Wed, 22 May 2019 01:19:14 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:48563)
+	id 1hTJgm-0000a0-AO
+	for qemu-devel@archiver.kernel.org; Wed, 22 May 2019 01:21:20 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:47691)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1hTJAU-0004l5-1B
-	for qemu-devel@nongnu.org; Wed, 22 May 2019 00:47:59 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1hTJ9J-0003iz-2j
+	for qemu-devel@nongnu.org; Wed, 22 May 2019 00:46:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1hTJAS-0007aV-SN
-	for qemu-devel@nongnu.org; Wed, 22 May 2019 00:47:57 -0400
-Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:49737 helo=ozlabs.org)
+	(envelope-from <dgibson@ozlabs.org>) id 1hTJ9H-0006vp-Ur
+	for qemu-devel@nongnu.org; Wed, 22 May 2019 00:46:45 -0400
+Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:53365 helo=ozlabs.org)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
-	id 1hTJAS-0007Jn-G3; Wed, 22 May 2019 00:47:56 -0400
+	id 1hTJ9H-0006i3-ID; Wed, 22 May 2019 00:46:43 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
-	id 4580T41Gz7z9sRG; Wed, 22 May 2019 14:46:11 +1000 (AEST)
+	id 4580Sy3K9Hz9sPQ; Wed, 22 May 2019 14:46:06 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-	d=gibson.dropbear.id.au; s=201602; t=1558500376;
-	bh=N4Msu5vC5ToRCfQzQVywNNY77GKEdiRxWk6vPULpnQw=;
+	d=gibson.dropbear.id.au; s=201602; t=1558500370;
+	bh=q7EImbd+kCVeaNJFxTgkqCNMD8+yJyoKHqONDrvQuek=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=KwvLJO3X7MndBDT0Sdq7ysQEtWylMk4dTCiBwIxviPMlY0UWg7d/q9UvtdavWbH0F
-	nExqzSYKdrPDRAVNDkKdRhhzTMPPspIwSaHssd6sDg84F9AexhQgh8Ol0rzceca7qn
-	JJUuk107msTKFfEpSDmblhjOplVWG5k1H/7/KCWs=
+	b=VMfdNHBbezw6ogXD/cHQ4r7AOHkg0R1CjLCvWq6/nVjVnou5mZkmAljoeuz1IXJKi
+	p5wDJDgUEqGNNmQB/uhCZgU5+XI6wxuA9Ap/WYzrmEZxw2npvRSCDgF2ajih0vudDX
+	Udy2kq3RlUSr646mpVqbnB/6sWh/I+OgFmy+AzMw=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: peter.maydell@linaro.org
-Date: Wed, 22 May 2019 14:45:58 +1000
-Message-Id: <20190522044600.16534-37-david@gibson.dropbear.id.au>
+Date: Wed, 22 May 2019 14:45:34 +1000
+Message-Id: <20190522044600.16534-13-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190522044600.16534-1-david@gibson.dropbear.id.au>
 References: <20190522044600.16534-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
 X-Received-From: 2401:3900:2:1::2
-Subject: [Qemu-devel] [PULL 36/38] ppc/xics: fix irq priority in
- ics_set_irq_type()
+Subject: [Qemu-devel] [PULL 12/38] target/ppc: Fix xxspltib
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -71,77 +69,48 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: lvivier@redhat.com, qemu-devel@nongnu.org, groug@kaod.org,
-	qemu-ppc@nongnu.org, clg@kaod.org,
+	qemu-ppc@nongnu.org, clg@kaod.org, Anton Blanchard <anton@ozlabs.org>,
 	David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: C=C3=A9dric Le Goater <clg@kaod.org>
+From: Anton Blanchard <anton@ozlabs.org>
 
-Recent commits changed the behavior of ics_set_irq_type() to
-initialize correctly LSIs at the KVM level. ics_set_irq_type() is also
-called by the realize routine of the different devices of the machine
-when initial interrupts are claimed, before the ICSState device is
-reseted.
+xxspltib raises a VMX or a VSX exception depending on the register
+set it is operating on. We had a check, but it was backwards.
 
-In the case, the ICSIRQState priority is 0x0 and the call to
-ics_set_irq_type() results in configuring the target of the
-interrupt. On P9, when using the KVM XICS-on-XIVE device, the target
-is configured to be server 0, priority 0 and the event queue 0 is
-created automatically by KVM.
-
-With the dual interrupt mode creating the KVM device at reset, it
-leads to unexpected effects on the guest, mostly blocking IPIs. This
-is wrong, fix it by reseting the ICSIRQState structure when
-ics_set_irq_type() is called.
-
-Fixes: commit 6cead90c5c9c ("xics: Write source state to KVM at claim tim=
-e")
-Signed-off-by: Greg Kurz <groug@kaod.org>
-Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
-Message-Id: <20190513084245.25755-14-clg@kaod.org>
+Fixes: f113283525a4 ("target-ppc: add xxspltib instruction")
+Signed-off-by: Anton Blanchard <anton@ozlabs.org>
+Message-Id: <20190509061713.69490488@kryten>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/intc/xics.c | 10 ++++++++--
- 1 file changed, 8 insertions(+), 2 deletions(-)
+ target/ppc/translate/vsx-impl.inc.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/hw/intc/xics.c b/hw/intc/xics.c
-index af7dc709ab..79f5a8a916 100644
---- a/hw/intc/xics.c
-+++ b/hw/intc/xics.c
-@@ -610,6 +610,12 @@ static const TypeInfo ics_simple_info =3D {
-     .class_size =3D sizeof(ICSStateClass),
- };
+diff --git a/target/ppc/translate/vsx-impl.inc.c b/target/ppc/translate/v=
+sx-impl.inc.c
+index d29f60e2f9..4b8f6cefe3 100644
+--- a/target/ppc/translate/vsx-impl.inc.c
++++ b/target/ppc/translate/vsx-impl.inc.c
+@@ -1355,13 +1355,13 @@ static void gen_xxspltib(DisasContext *ctx)
+     int rt =3D xT(ctx->opcode);
 =20
-+static void ics_reset_irq(ICSIRQState *irq)
-+{
-+    irq->priority =3D 0xff;
-+    irq->saved_priority =3D 0xff;
-+}
-+
- static void ics_base_reset(DeviceState *dev)
- {
-     ICSState *ics =3D ICS_BASE(dev);
-@@ -623,8 +629,7 @@ static void ics_base_reset(DeviceState *dev)
-     memset(ics->irqs, 0, sizeof(ICSIRQState) * ics->nr_irqs);
-=20
-     for (i =3D 0; i < ics->nr_irqs; i++) {
--        ics->irqs[i].priority =3D 0xff;
--        ics->irqs[i].saved_priority =3D 0xff;
-+        ics_reset_irq(ics->irqs + i);
-         ics->irqs[i].flags =3D flags[i];
+     if (rt < 32) {
+-        if (unlikely(!ctx->altivec_enabled)) {
+-            gen_exception(ctx, POWERPC_EXCP_VPU);
++        if (unlikely(!ctx->vsx_enabled)) {
++            gen_exception(ctx, POWERPC_EXCP_VSXU);
+             return;
+         }
+     } else {
+-        if (unlikely(!ctx->vsx_enabled)) {
+-            gen_exception(ctx, POWERPC_EXCP_VSXU);
++        if (unlikely(!ctx->altivec_enabled)) {
++            gen_exception(ctx, POWERPC_EXCP_VPU);
+             return;
+         }
      }
- }
-@@ -760,6 +765,7 @@ void ics_set_irq_type(ICSState *ics, int srcno, bool =
-lsi)
-         lsi ? XICS_FLAGS_IRQ_LSI : XICS_FLAGS_IRQ_MSI;
-=20
-     if (kvm_irqchip_in_kernel()) {
-+        ics_reset_irq(ics->irqs + srcno);
-         ics_set_kvm_state_one(ics, srcno);
-     }
- }
 --=20
 2.21.0
 
