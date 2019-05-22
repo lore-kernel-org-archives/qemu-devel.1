@@ -6,60 +6,57 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E1ECDC282DD
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 13:49:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 70BEEC282DC
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 13:49:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BB53D20863
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 13:49:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BB53D20863
+	by mail.kernel.org (Postfix) with ESMTPS id 4A69520863
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 13:49:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4A69520863
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:43654 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:43656 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hTRcj-00082Z-VU
-	for qemu-devel@archiver.kernel.org; Wed, 22 May 2019 09:49:42 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:43450)
+	id 1hTRcq-00084g-DL
+	for qemu-devel@archiver.kernel.org; Wed, 22 May 2019 09:49:48 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:43470)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hTRac-0006sD-9k
+	(envelope-from <armbru@redhat.com>) id 1hTRac-0006sR-PY
 	for qemu-devel@nongnu.org; Wed, 22 May 2019 09:47:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hTRab-0002ak-7h
+	(envelope-from <armbru@redhat.com>) id 1hTRab-0002bG-RQ
 	for qemu-devel@nongnu.org; Wed, 22 May 2019 09:47:30 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36104)
+Received: from mx1.redhat.com ([209.132.183.28]:49510)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hTRab-0002aF-0Q
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hTRab-0002aI-MI
 	for qemu-devel@nongnu.org; Wed, 22 May 2019 09:47:29 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
-	[10.5.11.22])
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 606B85D5FF
+	by mx1.redhat.com (Postfix) with ESMTPS id 5C807C0528B3
 	for <qemu-devel@nongnu.org>; Wed, 22 May 2019 13:47:28 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-116-28.ams2.redhat.com
 	[10.36.116.28])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 313741001281
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 2C7627839C
 	for <qemu-devel@nongnu.org>; Wed, 22 May 2019 13:47:28 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
-	id D63CD1132B6C; Wed, 22 May 2019 15:47:26 +0200 (CEST)
+	id CF0FC1132BB6; Wed, 22 May 2019 15:47:26 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Wed, 22 May 2019 15:47:24 +0200
-Message-Id: <20190522134726.19225-4-armbru@redhat.com>
+Date: Wed, 22 May 2019 15:47:22 +0200
+Message-Id: <20190522134726.19225-2-armbru@redhat.com>
 In-Reply-To: <20190522134726.19225-1-armbru@redhat.com>
 References: <20190522134726.19225-1-armbru@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.39]);
+	(mx1.redhat.com [10.5.110.31]);
 	Wed, 22 May 2019 13:47:28 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 3/5] gdbstub: Reject invalid RLE repeat counts
+Subject: [Qemu-devel] [PULL 1/5] qemu-bridge-helper: Fix misuse of isspace()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -75,45 +72,53 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-"Debugging with GDB / Appendix E GDB Remote Serial Protocol /
-Overview" specifies "The printable characters '#' and '$' or with a
-numeric value greater than 126 must not be used."  gdb_read_byte()
-only rejects values < 32.  This is wrong.  Impact depends on the caller:
+parse_acl_file() passes char values to isspace().  Undefined behavior
+when the value is negative.  Not a security issue, because the
+characters come from trusted $prefix/etc/qemu/bridge.conf and the
+files it includes.
 
-* gdb_handlesig() passes a char.  Incorrectly accepts '#', '$' and
-  '\127'.
+Furthermore, isspace()'s locale-dependence means qemu-bridge-helper
+uses the user's locale for parsing $prefix/etc/bridge.conf.  Feels
+wrong.
 
-* gdb_chr_receive() passes an uint8_t.  Additionally accepts
-  characters with the most-significant bit set.
-
-Correct the validity check to match the specification.
+Use g_ascii_isspace() instead.  This fixes the undefined behavior, and
+makes parsing of $prefix/etc/bridge.conf locale-independent.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Message-Id: <20190514180311.16028-4-armbru@redhat.com>
+Message-Id: <20190514180311.16028-2-armbru@redhat.com>
 ---
- gdbstub.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+ qemu-bridge-helper.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/gdbstub.c b/gdbstub.c
-index d54abd17cc..c41eb1de07 100644
---- a/gdbstub.c
-+++ b/gdbstub.c
-@@ -2064,7 +2064,11 @@ static void gdb_read_byte(GDBState *s, int ch)
-             }
-             break;
-         case RS_GETLINE_RLE:
--            if (ch < ' ') {
-+            /*
-+             * Run-length encoding is explained in "Debugging with GDB /
-+             * Appendix E GDB Remote Serial Protocol / Overview".
-+             */
-+            if (ch < ' ' || ch =3D=3D '#' || ch =3D=3D '$' || ch > 126) =
-{
-                 /* invalid RLE count encoding */
-                 trace_gdbstub_err_invalid_repeat((uint8_t)ch);
-                 s->state =3D RS_GETLINE;
---=20
+diff --git a/qemu-bridge-helper.c b/qemu-bridge-helper.c
+index 5396fbfbb6..f9940deefd 100644
+--- a/qemu-bridge-helper.c
++++ b/qemu-bridge-helper.c
+@@ -75,7 +75,7 @@ static int parse_acl_file(const char *filename, ACLList *acl_list)
+         char *ptr = line;
+         char *cmd, *arg, *argend;
+ 
+-        while (isspace(*ptr)) {
++        while (g_ascii_isspace(*ptr)) {
+             ptr++;
+         }
+ 
+@@ -99,12 +99,12 @@ static int parse_acl_file(const char *filename, ACLList *acl_list)
+ 
+         *arg = 0;
+         arg++;
+-        while (isspace(*arg)) {
++        while (g_ascii_isspace(*arg)) {
+             arg++;
+         }
+ 
+         argend = arg + strlen(arg);
+-        while (arg != argend && isspace(*(argend - 1))) {
++        while (arg != argend && g_ascii_isspace(*(argend - 1))) {
+             argend--;
+         }
+         *argend = 0;
+-- 
 2.17.2
 
 
