@@ -2,88 +2,56 @@ Return-Path: <SRS0=8zLO=TW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 77C52C282CE
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 19:22:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F0C2AC282CE
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 19:23:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 43F9E217D4
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 19:22:53 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="B/PcVJ5J"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 43F9E217D4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id C63AC2184E
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 19:23:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C63AC2184E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:50040 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:50044 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hTWpA-0007n4-Ht
-	for qemu-devel@archiver.kernel.org; Wed, 22 May 2019 15:22:52 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:35086)
+	id 1hTWpo-0008J2-Vh
+	for qemu-devel@archiver.kernel.org; Wed, 22 May 2019 15:23:33 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:36606)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hTWOo-0008Ga-QJ
-	for qemu-devel@nongnu.org; Wed, 22 May 2019 14:55:40 -0400
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1hTWRz-0003FR-PV
+	for qemu-devel@nongnu.org; Wed, 22 May 2019 14:58:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hTWCN-00089U-Vl
-	for qemu-devel@nongnu.org; Wed, 22 May 2019 14:42:49 -0400
-Received: from mail-yb1-xb44.google.com ([2607:f8b0:4864:20::b44]:35241)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hTWCN-00088Q-Qi
-	for qemu-devel@nongnu.org; Wed, 22 May 2019 14:42:47 -0400
-Received: by mail-yb1-xb44.google.com with SMTP id s69so1085143ybi.2
-	for <qemu-devel@nongnu.org>; Wed, 22 May 2019 11:42:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=from:to:cc:subject:date:message-id:in-reply-to:references
-	:mime-version:content-transfer-encoding;
-	bh=gZNiNYQQXuA93bC9AkQ3RkBuv003My9kgUQccuqjr10=;
-	b=B/PcVJ5JaoLFNLP3h/Y5MLrwQgrFOMJz4Nle0d731qT/PhTmK4OHsMjnEH3BY8zA+U
-	xtiaTZU8swftv8jVV9AXxlY4xxMJEczk2CJf7s8VhSkRU4uuXxnUSE+8T7UaoBivxq2q
-	RESa/ZuGE7xK+49GUAbv5u92GRVL+FS2ANCCHO2RrE62MRkGBsshub+9rINGYC1NmYEL
-	iD2a0nrkNHO46kzsLqk+oNDdMIZdb0g1hGsSq6lsOBJCi2R07691mMRlg1ghxpkr5Vc5
-	FrwEfZUKQDUm9IMBq1Nc6fsPesZ/btYu8+MNq28dR0hx47T2rvYxDzPFLYEJXilqmrfe
-	pRCg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-	:references:mime-version:content-transfer-encoding;
-	bh=gZNiNYQQXuA93bC9AkQ3RkBuv003My9kgUQccuqjr10=;
-	b=Rb7OjTBVOpljbu2yPJEsu8eJ07XUUZTrvk9YDioNNj91M9P2bM1ND3/F4YkmX5Qd2D
-	xYVw9Y+EQu+FBBS/f9RCaWzvhkEFAUbJ2TdjlYaEFo1yyz4pDjrBLZ0JEzYQgRjHgoE4
-	c9NC43rwNWnlGdVutyO2HHAqa44IkOG5oYU549i8c8w/1gImyqCqLqOLo5cV5tZefHqf
-	JXVdqkbfaaFvO478/ocwF+rGndI96NV4XJLbRXY9XnmwEXTZcSswBL20EI0TXiws71sg
-	It7P9VyFbkK6QT0A9BdjksR78q0YtTKhhmlUtwSPtY8A4/7a0WUSuyEBjxJ52cKlkhfg
-	0MGg==
-X-Gm-Message-State: APjAAAXoMiBb9XmG92txaCoq9WAl+/ppAGab3ZPm+UOs14y4/0uF3cYS
-	qgujCTMum7rv4BxoWEe9oRewHmXvSvo=
-X-Google-Smtp-Source: APXvYqz0C28LmVIKf8wvi/NNmWioaPE9eW+FGe61d+AcAE+ZlEzG2Qshe/kw2CE4GRBAngjyYe/W2Q==
-X-Received: by 2002:a25:7502:: with SMTP id q2mr22098191ybc.31.1558550566459; 
-	Wed, 22 May 2019 11:42:46 -0700 (PDT)
-Received: from localhost.localdomain ([71.46.56.17])
-	by smtp.gmail.com with ESMTPSA id
-	206sm1299445ywq.74.2019.05.22.11.42.45
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Wed, 22 May 2019 11:42:45 -0700 (PDT)
-From: Richard Henderson <richard.henderson@linaro.org>
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1hTWRy-0000Oi-9A
+	for qemu-devel@nongnu.org; Wed, 22 May 2019 14:58:55 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:60492 helo=mail.rt-rk.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
+	id 1hTWRx-0000NP-SZ
+	for qemu-devel@nongnu.org; Wed, 22 May 2019 14:58:54 -0400
+Received: from localhost (localhost [127.0.0.1])
+	by mail.rt-rk.com (Postfix) with ESMTP id ACE3C1A4516;
+	Wed, 22 May 2019 20:58:49 +0200 (CEST)
+X-Virus-Scanned: amavisd-new at rt-rk.com
+Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
+	[10.10.13.43])
+	by mail.rt-rk.com (Postfix) with ESMTPSA id 852CD1A453C;
+	Wed, 22 May 2019 20:58:49 +0200 (CEST)
+From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
 To: qemu-devel@nongnu.org
-Date: Wed, 22 May 2019 14:42:18 -0400
-Message-Id: <20190522184226.17871-18-richard.henderson@linaro.org>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20190522184226.17871-1-richard.henderson@linaro.org>
-References: <20190522184226.17871-1-richard.henderson@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::b44
-Subject: [Qemu-devel] [PULL 17/25] aspeed/scu: Use
- qemu_guest_getrandom_nofail
+Date: Wed, 22 May 2019 20:58:38 +0200
+Message-Id: <1558551522-24147-8-git-send-email-aleksandar.markovic@rt-rk.com>
+X-Mailer: git-send-email 2.7.4
+In-Reply-To: <1558551522-24147-1-git-send-email-aleksandar.markovic@rt-rk.com>
+References: <1558551522-24147-1-git-send-email-aleksandar.markovic@rt-rk.com>
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
+X-Received-From: 89.216.37.149
+Subject: [Qemu-devel] [PULL v2 07/11] target/mips: Refactor and fix
+ INSERT.<B|H|W|D> instructions
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -95,54 +63,163 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org
+Cc: peter.maydell@linaro.org, amarkovic@wavecomp.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The random number is intended for use by the guest.  As such, we should
-honor the -seed argument for reproducibility.  Use the *_nofail routine
-instead of rolling our own error handling locally.
+From: Mateja Marjanovic <Mateja.Marjanovic@rt-rk.com>
 
-Reviewed-by: Laurent Vivier <lvivier@redhat.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Reviewed-by: Cédric Le Goater <clg@kaod.org>
-Reviewed-by: Joel Stanley <joel@jms.id.au>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+The old version of the helper for the INSERT.<B|H|W|D> MSA instructions
+has been replaced with four helpers that don't use switch, and change
+the endianness of the given index, when executed on a big endian host.
+
+Signed-off-by: Mateja Marjanovic <mateja.marjanovic@rt-rk.com>
+Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+Message-Id: <1554212605-16457-6-git-send-email-mateja.marjanovic@rt-rk.com>
 ---
- hw/misc/aspeed_scu.c | 10 ++--------
- 1 file changed, 2 insertions(+), 8 deletions(-)
+ target/mips/helper.h     |  5 +++-
+ target/mips/msa_helper.c | 65 ++++++++++++++++++++++++++++++++++++------------
+ target/mips/translate.c  | 19 +++++++++++++-
+ 3 files changed, 71 insertions(+), 18 deletions(-)
 
-diff --git a/hw/misc/aspeed_scu.c b/hw/misc/aspeed_scu.c
-index c8217740ef..ab1e18ed4b 100644
---- a/hw/misc/aspeed_scu.c
-+++ b/hw/misc/aspeed_scu.c
-@@ -16,7 +16,7 @@
- #include "qapi/visitor.h"
- #include "qemu/bitops.h"
- #include "qemu/log.h"
--#include "crypto/random.h"
-+#include "qemu/guest-random.h"
- #include "trace.h"
+diff --git a/target/mips/helper.h b/target/mips/helper.h
+index c4a77e2..2863f60 100644
+--- a/target/mips/helper.h
++++ b/target/mips/helper.h
+@@ -877,7 +877,6 @@ DEF_HELPER_5(msa_hsub_u_df, void, env, i32, i32, i32, i32)
+ DEF_HELPER_5(msa_sldi_df, void, env, i32, i32, i32, i32)
+ DEF_HELPER_5(msa_splati_df, void, env, i32, i32, i32, i32)
  
- #define TO_REG(offset) ((offset) >> 2)
-@@ -157,14 +157,8 @@ static const uint32_t ast2500_a1_resets[ASPEED_SCU_NR_REGS] = {
+-DEF_HELPER_5(msa_insert_df, void, env, i32, i32, i32, i32)
+ DEF_HELPER_5(msa_insve_df, void, env, i32, i32, i32, i32)
+ DEF_HELPER_3(msa_ctcmsa, void, env, tl, i32)
+ DEF_HELPER_2(msa_cfcmsa, tl, env, i32)
+@@ -944,6 +943,10 @@ DEF_HELPER_4(msa_copy_s_d, void, env, i32, i32, i32)
+ DEF_HELPER_4(msa_copy_u_b, void, env, i32, i32, i32)
+ DEF_HELPER_4(msa_copy_u_h, void, env, i32, i32, i32)
+ DEF_HELPER_4(msa_copy_u_w, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_insert_b, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_insert_h, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_insert_w, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_insert_d, void, env, i32, i32, i32)
  
- static uint32_t aspeed_scu_get_random(void)
- {
--    Error *err = NULL;
-     uint32_t num;
--
--    if (qcrypto_random_bytes((uint8_t *)&num, sizeof(num), &err)) {
--        error_report_err(err);
--        exit(1);
--    }
--
-+    qemu_guest_getrandom_nofail(&num, sizeof(num));
-     return num;
+ DEF_HELPER_4(msa_fclass_df, void, env, i32, i32, i32)
+ DEF_HELPER_4(msa_ftrunc_s_df, void, env, i32, i32, i32)
+diff --git a/target/mips/msa_helper.c b/target/mips/msa_helper.c
+index 52680fe..ee1b1fa 100644
+--- a/target/mips/msa_helper.c
++++ b/target/mips/msa_helper.c
+@@ -1340,28 +1340,61 @@ void helper_msa_copy_u_w(CPUMIPSState *env, uint32_t rd,
+     env->active_tc.gpr[rd] = (uint32_t)env->active_fpu.fpr[ws].wr.w[n];
  }
  
+-void helper_msa_insert_df(CPUMIPSState *env, uint32_t df, uint32_t wd,
++void helper_msa_insert_b(CPUMIPSState *env, uint32_t wd,
+                           uint32_t rs_num, uint32_t n)
+ {
+     wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
+     target_ulong rs = env->active_tc.gpr[rs_num];
++    n %= 16;
++#if defined(HOST_WORDS_BIGENDIAN)
++    if (n < 8) {
++        n = 8 - n - 1;
++    } else {
++        n = 24 - n - 1;
++    }
++#endif
++    pwd->b[n] = (int8_t)rs;
++}
+ 
+-    switch (df) {
+-    case DF_BYTE:
+-        pwd->b[n] = (int8_t)rs;
+-        break;
+-    case DF_HALF:
+-        pwd->h[n] = (int16_t)rs;
+-        break;
+-    case DF_WORD:
+-        pwd->w[n] = (int32_t)rs;
+-        break;
+-    case DF_DOUBLE:
+-        pwd->d[n] = (int64_t)rs;
+-        break;
+-    default:
+-        assert(0);
++void helper_msa_insert_h(CPUMIPSState *env, uint32_t wd,
++                          uint32_t rs_num, uint32_t n)
++{
++    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
++    target_ulong rs = env->active_tc.gpr[rs_num];
++    n %= 8;
++#if defined(HOST_WORDS_BIGENDIAN)
++    if (n < 4) {
++        n = 4 - n - 1;
++    } else {
++        n = 12 - n - 1;
++    }
++#endif
++    pwd->h[n] = (int16_t)rs;
++}
++
++void helper_msa_insert_w(CPUMIPSState *env, uint32_t wd,
++                          uint32_t rs_num, uint32_t n)
++{
++    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
++    target_ulong rs = env->active_tc.gpr[rs_num];
++    n %= 4;
++#if defined(HOST_WORDS_BIGENDIAN)
++    if (n < 2) {
++        n = 2 - n - 1;
++    } else {
++        n = 6 - n - 1;
+     }
++#endif
++    pwd->w[n] = (int32_t)rs;
++}
++
++void helper_msa_insert_d(CPUMIPSState *env, uint32_t wd,
++                          uint32_t rs_num, uint32_t n)
++{
++    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
++    target_ulong rs = env->active_tc.gpr[rs_num];
++    n %= 2;
++    pwd->d[n] = (int64_t)rs;
+ }
+ 
+ void helper_msa_insve_df(CPUMIPSState *env, uint32_t df, uint32_t wd,
+diff --git a/target/mips/translate.c b/target/mips/translate.c
+index 68ea6ee..dd706ad 100644
+--- a/target/mips/translate.c
++++ b/target/mips/translate.c
+@@ -28346,7 +28346,24 @@ static void gen_msa_elm_df(CPUMIPSState *env, DisasContext *ctx, uint32_t df,
+             }
+             break;
+         case OPC_INSERT_df:
+-            gen_helper_msa_insert_df(cpu_env, tdf, twd, tws, tn);
++            switch (df) {
++            case DF_BYTE:
++                gen_helper_msa_insert_b(cpu_env, twd, tws, tn);
++                break;
++            case DF_HALF:
++                gen_helper_msa_insert_h(cpu_env, twd, tws, tn);
++                break;
++            case DF_WORD:
++                gen_helper_msa_insert_w(cpu_env, twd, tws, tn);
++                break;
++#if defined(TARGET_MIPS64)
++            case DF_DOUBLE:
++                gen_helper_msa_insert_d(cpu_env, twd, tws, tn);
++                break;
++#endif
++            default:
++                assert(0);
++            }
+             break;
+         }
+         break;
 -- 
-2.17.1
+2.7.4
 
 
