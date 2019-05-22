@@ -3,71 +3,71 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6677EC282DE
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 15:44:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 92EFBC46470
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 15:44:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3D17420881
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 15:44:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3D17420881
+	by mail.kernel.org (Postfix) with ESMTPS id 6AE5420881
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 15:44:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6AE5420881
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:46274 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:46276 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hTTPz-0002Jg-BE
-	for qemu-devel@archiver.kernel.org; Wed, 22 May 2019 11:44:39 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:47642)
+	id 1hTTQ9-0002Mj-LD
+	for qemu-devel@archiver.kernel.org; Wed, 22 May 2019 11:44:49 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:48062)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hTTM6-0006e9-AU
-	for qemu-devel@nongnu.org; Wed, 22 May 2019 11:40:39 -0400
+	(envelope-from <laurent@vivier.eu>) id 1hTTM9-0007Yy-V6
+	for qemu-devel@nongnu.org; Wed, 22 May 2019 11:40:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hTTAQ-0003Wi-Rs
-	for qemu-devel@nongnu.org; Wed, 22 May 2019 11:28:36 -0400
-Received: from mout.kundenserver.de ([212.227.17.10]:37321)
+	(envelope-from <laurent@vivier.eu>) id 1hTT7o-0002qQ-CB
+	for qemu-devel@nongnu.org; Wed, 22 May 2019 11:25:53 -0400
+Received: from mout.kundenserver.de ([217.72.192.74]:36681)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <laurent@vivier.eu>)
-	id 1hTTAQ-0003Qf-IH; Wed, 22 May 2019 11:28:34 -0400
+	id 1hTT7m-0001lp-3q; Wed, 22 May 2019 11:25:50 -0400
 Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
 	(mreue107 [213.165.67.119]) with ESMTPSA (Nemesis) id
-	1MA88C-1hNNIj19je-00BgYr; Wed, 22 May 2019 17:28:23 +0200
+	1MmU1H-1glIXQ3zBR-00iXHu; Wed, 22 May 2019 17:24:58 +0200
 To: Li Qiang <liq3ea@163.com>, alex.williamson@redhat.com, lvivier@redhat.com
 References: <20190521151543.92274-1-liq3ea@163.com>
-	<20190521151543.92274-5-liq3ea@163.com>
+	<20190521151543.92274-2-liq3ea@163.com>
 From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <79fbe9f0-9e9c-e336-6d8c-ace70910def8@vivier.eu>
-Date: Wed, 22 May 2019 17:28:22 +0200
+Message-ID: <95569030-88c3-bc93-3ca2-0df3cacfa87c@vivier.eu>
+Date: Wed, 22 May 2019 17:24:56 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
 	Thunderbird/52.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190521151543.92274-5-liq3ea@163.com>
+In-Reply-To: <20190521151543.92274-2-liq3ea@163.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Provags-ID: V03:K1:47S8TV6j+NyPoexXxIrNiMRl+f69Ut2upVf0LZ/I+GRojZOpPVG
-	uR2mCzp4iYcx303UJmdh/TcNDpglsj4pmrojftXFCKsh/HSNUAFA24jfJe6ieXKwcml5nte
-	PBzxfbSa/hBS0vEQLRp7sc1cMGlfVLzpEZIxtNP7APaVFfwq7nToChS/FSLuDe3boyzLkQb
-	7/U2uqw3Glynrz1XmMf2g==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:bhrVebz6tMo=:43BxW8/E8POmQ7p6HYI6+5
-	CiwEB/KB5wxBh0gMRmWsJauMi9PFicADfgai5Tw60rtFPr3hi9FVnEK3IUvUQaJDdEBg+juBB
-	waK/nVCpfmdixs84B1bZ1FWaUpbCJCRkTdG+l82aKCbKV17C6rS455eKAfzQyutybT+FfPpGc
-	fA50KsQuKauq4o1A5WeJSWJknxohwDryCQ3+QaseHZHRSLuTl1G4X9d7MpTmOF5sgjpiV3/bk
-	HkCYeMNtJzBE+Q4+5fetZ6hmdp0ZQVbrULHNlxf3j4fUdE3yEvO1Dztu9sXQyofJ3jypX1TMQ
-	lOckBdOJuCig3Gz55HgZ4Dnz85YAELujWpdLYZgXAr6keyfKBBY9KQnKSt1G6PidiYo2aWyUn
-	Sfz8xjsGB69ff53lCYTPbIUNY18cKMnGveBCCUYq8lUXInaFxYFSmt3ZMBDXWNMwdVs+FHOrW
-	opAXFo/bFxcnDigCVNiZlaxBar98NPpNKXO4wh23KW+u1wcpChvwZSAwI/ymRm1VrtcM3oHB+
-	hkfvW/cqHr4iOKEZwDkxOrraprgjRR4enkzdlPxsnAkTvpptvWBGG26v+iaagos8lmOEqHK+h
-	Hpd+tfa9otnFldbCRk961z31EDJRCYquOqADvHRB9jqo+AidnFTrl9ELCpV2XPS7KB8PhWFmR
-	5Ir9WmmaRPY9I4DpOTIBS2CCWE9zCE3juBJkRAq+VKzN6hkqMaXKlMgyvEAnda7Anjan3BaKa
-	BKvFp9EpoehG0GASeGzVHa4v5DpUeRI6pFDlSeTHckkVoQbcXhE91lavJu4=
+X-Provags-ID: V03:K1:YYxbT559wrmEiZSJXIiVTlz4XEHXiwJmOK1UTWuFTaGOwN+1KFO
+	wNgJvJ99l5T0GEnNhNmdJW8bEmz0/dxMjwQ/h7qeH9kZG+FZmz1K4KlFEq72bmNCQGfvkC8
+	hSBxou2f6cf8w/EupdmuzMP3USpf0tH7LuVxybJGcuJQVoWSfZLQNd0dbzz0jlq96OGUXsP
+	jBQ5TZj3o6J9mwRictxKw==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:QdWpZOooA34=:lbNjkF3IW9KFWZMyR9kbre
+	T9GuLeL69crLGUMqYDeGYRNNupR6jun7L4fmAohQhw4v/PhE1MudV1i17RM1k8j6LxC2VJI1A
+	Zv0qaGsx/wlDx9PPfze4v1v8TFZ2Xn1Z0UXEuOP/BOxclRQVMeyeUbQIEPtsIxziHoToEoVfu
+	mv8HwlO4z6+IqgAPioUxpSmPKoHmDCJdgTOOaEcvyVI7tQLDC2324QLYKOltHGqUhJM8wl6Uv
+	6ntE/juQXxzhz0kjqZkL+lFZhhegEo9vS1CFtrMeLZx86PBTCE7upKV3bZyrv8uKTUbhUNh5c
+	xmy1fCHEjHJ/HDM8uV+/dLTcjXcEgsJIp+Zc3S+EVouL2P5aGghea81PLTbd1sHcr/WQ61SDQ
+	jX3tq9EzzmTF6HX3QO2CYvBW7VsNi7d9WOQzjeKkKMDYE7l26Uc5JvwzRAQQqln4kGbxf88FB
+	2KR/ACmHS0MrYSIEF4JrUSaxkUZC3hjwAowv4Otuf1KOW60ApLkRQdP2aXJYcD93SFYyZ8RCb
+	U4S6rBjPTNYojMXv6lKCSLssFoBNZhQI0s7gjYHD8YSfJjXut8fSwA/ooN0FyeQbAHhXxwizH
+	bFderINdVIstOr73JHrZX/SgkVeQAgEp49PYE7EDqonKp6HBgnI8QpS1yXahilSKaI+/kd+T/
+	3YXVtn/j5nsYM1qPCQVgRp+tS3zK6frZoO+BosCsUxHZPbeL/jJxNH2s8Cbao7qAY36ddP/Zj
+	skQEF4cVCdBcaSpkHR84rf4agpm1X7pYzN02s2HDVSmjbxtIQNZEatEvmxc=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.17.10
-Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH v2 4/4] pci: msix: move
- 'MSIX_CAP_LENGTH' to header file
+X-Received-From: 217.72.192.74
+Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH v2 1/4] vfio: pci: make
+ "vfio-pci-nohotplug" as MACRO
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -86,56 +86,40 @@ Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 21/05/2019 17:15, Li Qiang wrote:
-> 'MSIX_CAP_LENGTH' is defined in two .c file. Move it
-> to hw/pci/msix.h file to reduce duplicated code.
+> The QOMConventions recommends we should use TYPE_FOO
+> for a TypeInfo's name. Though "vfio-pci-nohotplug" is not
+> used in other parts, for consistency we should make this change.
 > 
 > CC: qemu-trivial@nongnu.org
 > Signed-off-by: Li Qiang <liq3ea@163.com>
 > ---
->   hw/pci/msix.c         | 2 --
->   hw/vfio/pci.c         | 2 --
->   include/hw/pci/msix.h | 2 ++
->   3 files changed, 2 insertions(+), 4 deletions(-)
+>   hw/vfio/pci.c | 6 ++++--
+>   1 file changed, 4 insertions(+), 2 deletions(-)
 > 
-> diff --git a/hw/pci/msix.c b/hw/pci/msix.c
-> index 4e336416a7..d39dcf32e8 100644
-> --- a/hw/pci/msix.c
-> +++ b/hw/pci/msix.c
-> @@ -24,8 +24,6 @@
->   #include "qapi/error.h"
->   #include "trace.h"
->   
-> -#define MSIX_CAP_LENGTH 12
-> -
->   /* MSI enable bit and maskall bit are in byte 1 in FLAGS register */
->   #define MSIX_CONTROL_OFFSET (PCI_MSIX_FLAGS + 1)
->   #define MSIX_ENABLE_MASK (PCI_MSIX_FLAGS_ENABLE >> 8)
 > diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-> index 08729e5875..8e555db12e 100644
+> index 8cecb53d5c..08729e5875 100644
 > --- a/hw/vfio/pci.c
 > +++ b/hw/vfio/pci.c
-> @@ -35,8 +35,6 @@
->   #include "trace.h"
->   #include "qapi/error.h"
->   
-> -#define MSIX_CAP_LENGTH 12
-> -
+> @@ -40,6 +40,8 @@
 >   #define TYPE_VFIO_PCI "vfio-pci"
 >   #define PCI_VFIO(obj)    OBJECT_CHECK(VFIOPCIDevice, obj, TYPE_VFIO_PCI)
 >   
-> diff --git a/include/hw/pci/msix.h b/include/hw/pci/msix.h
-> index 1f27658d35..08acfa836e 100644
-> --- a/include/hw/pci/msix.h
-> +++ b/include/hw/pci/msix.h
-> @@ -4,6 +4,8 @@
->   #include "qemu-common.h"
->   #include "hw/pci/pci.h"
->   
-> +#define MSIX_CAP_LENGTH 12
+> +#define TYPE_VIFO_PCI_NOHOTPLUG "vfio-pci-nohotplug"
 > +
->   void msix_set_message(PCIDevice *dev, int vector, MSIMessage msg);
->   MSIMessage msix_get_message(PCIDevice *dev, unsigned int vector);
->   int msix_init(PCIDevice *dev, unsigned short nentries,
+>   static void vfio_disable_interrupts(VFIOPCIDevice *vdev);
+>   static void vfio_mmap_set_enabled(VFIOPCIDevice *vdev, bool enabled);
+>   
+> @@ -3304,8 +3306,8 @@ static void vfio_pci_nohotplug_dev_class_init(ObjectClass *klass, void *data)
+>   }
+>   
+>   static const TypeInfo vfio_pci_nohotplug_dev_info = {
+> -    .name = "vfio-pci-nohotplug",
+> -    .parent = "vfio-pci",
+> +    .name = TYPE_VIFO_PCI_NOHOTPLUG,
+> +    .parent = TYPE_VFIO_PCI,
+>       .instance_size = sizeof(VFIOPCIDevice),
+>       .class_init = vfio_pci_nohotplug_dev_class_init,
+>   };
 > 
 
 Applied to my trivial-patches branch.
