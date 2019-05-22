@@ -2,67 +2,72 @@ Return-Path: <SRS0=8zLO=TW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42B4BC18E7D
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 09:22:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4AADEC18E7D
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 09:22:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1173D2075B
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 09:22:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1173D2075B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 2028B2075B
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 09:22:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2028B2075B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:39065 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:39067 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hTNS7-0008CV-8R
-	for qemu-devel@archiver.kernel.org; Wed, 22 May 2019 05:22:27 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:41994)
+	id 1hTNSc-0008Vn-CR
+	for qemu-devel@archiver.kernel.org; Wed, 22 May 2019 05:22:58 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:42660)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1hTNMJ-0004by-V1
-	for qemu-devel@nongnu.org; Wed, 22 May 2019 05:16:29 -0400
+	(envelope-from <laurent@vivier.eu>) id 1hTNOp-0006DR-RD
+	for qemu-devel@nongnu.org; Wed, 22 May 2019 05:19:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1hTNMI-0001BN-PA
-	for qemu-devel@nongnu.org; Wed, 22 May 2019 05:16:27 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42842)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kwolf@redhat.com>)
-	id 1hTNMF-000187-Uh; Wed, 22 May 2019 05:16:24 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 3012A3058838;
-	Wed, 22 May 2019 09:16:18 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-117-92.ams2.redhat.com
-	[10.36.117.92])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 06448604D7;
-	Wed, 22 May 2019 09:16:12 +0000 (UTC)
-Date: Wed, 22 May 2019 11:16:11 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-To: Aarushi Mehta <mehta.aaru20@gmail.com>
-Message-ID: <20190522091611.GA6087@localhost.localdomain>
-References: <20190521235215.31341-1-mehta.aaru20@gmail.com>
-	<20190521235215.31341-2-mehta.aaru20@gmail.com>
-	<d932237b-03bc-5dbb-17dd-bcca5ce121c8@redhat.com>
-	<1c277edc76e47fbbaae0ecdd6774e24ac9a94ee5.camel@gmail.com>
+	(envelope-from <laurent@vivier.eu>) id 1hTNOo-0003ab-Pe
+	for qemu-devel@nongnu.org; Wed, 22 May 2019 05:19:03 -0400
+Received: from mout.kundenserver.de ([212.227.17.10]:36627)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1hTNOo-0003ZC-El
+	for qemu-devel@nongnu.org; Wed, 22 May 2019 05:19:02 -0400
+Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
+	(mreue107 [213.165.67.119]) with ESMTPSA (Nemesis) id
+	1MCsDe-1hKbxR42wi-008vTB; Wed, 22 May 2019 11:18:02 +0200
+To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, qemu-devel@nongnu.org
+References: <1558282527-22183-1-git-send-email-aleksandar.markovic@rt-rk.com>
+	<1558282527-22183-5-git-send-email-aleksandar.markovic@rt-rk.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <6358a49b-515d-92e6-d3dc-97f0adcaa23b@vivier.eu>
+Date: Wed, 22 May 2019 11:18:00 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+	Thunderbird/52.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1c277edc76e47fbbaae0ecdd6774e24ac9a94ee5.camel@gmail.com>
-User-Agent: Mutt/1.11.3 (2019-02-01)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.41]);
-	Wed, 22 May 2019 09:16:23 +0000 (UTC)
+In-Reply-To: <1558282527-22183-5-git-send-email-aleksandar.markovic@rt-rk.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Provags-ID: V03:K1:FNDZBDna56lF+w11k2G+dB0iIHREX14A79uSG2Af8O4AlUnt290
+	ISy3r4HOU8GHd9BTKbEm4dmqXZg3EoiePz66uCzoN43QTf0cnjygXMNyPEwdnWbxMZKBNhb
+	Iw2nAvjGXLoftS7IndTGY3iMcQ2SF/IU3uR+J60Igyq0mk4PcpIp75TFRw/1mRob0PnBQsw
+	qeAeJxCL8BvZo1kxYpS+w==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:BEH/wzH51jk=:SKTskUd3ozE4SU9SSoWeh7
+	VdVcii7Qo2tZqKfHF9HgpTi7mBVDZ8nsv7Edyn9KFQlgPSAJx/YSkogmvnEdHK7zhZ+65wg/1
+	mglze1bIP6UEQedRYdo7eHCam5bHxtRlbCUSatvS73LDZfDWvXW1NcjLCUy5YPVhKDHo2R6gD
+	aen3Fbi/7/f74tgr0++UjLg6IM5xPCqQchJUVAmvN4ZB44/3Zc2fOFdBwW37dKYeL1msPWtVc
+	OzVXhigEfMaHMVd95KuFexOImPI3L0WWTk/wiZDtw9xVjYrUajQNubxuqepWYCMnuNF0v3IGK
+	FTPNtzKYo/XLl0s9NIb+8zbFDbXt3PvRCxa5CHbptrxuZeH76AZA9HUIOG31X4G3NNIGYmu6r
+	4PKV56nksAcCRDNvLcU74VJUhd7tFPTF2ZbFkPNZfdcwr7DKZJcEYqQ1IDMMNqYBSAEU8K/o8
+	z+hOFuA3DR5nFOl1S31bELtYhMr1c7elU0vAOJ9SRlgRx5aaY5HzVb71aToprnXmoYYxz8qyk
+	r+qqLijYk2G8XUwLl8J/C4kOhDe2+SkwXw03I3KsCoNrI3pIJcGrqV9jkiAeAZmyqFA4rTTZW
+	ZKWF1wYpgBpYmL3zmtGVSuft+voIMkIcYtIOaRv6vapXjkgHr8YSDQyNtkza63VKBCfGBAeiq
+	f5UhY5Lae7+6KoobMvkq2E7SZ57pnsOUp6TxVunlgTVRMbVrU+qQgcHbmXNA7tABjNfAHUCU/
+	na3r9j4K8udO9zpvghOX96ggDKch3D70oawftF6MLcZOcJUCrD6k5G8uaEc=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [Qemu-block] [RFC PATCH 1/9] qapi/block-core: add
- option for io_uring
+X-Received-From: 212.227.17.10
+Subject: Re: [Qemu-devel] [PATCH v6 4/6] linux-user: Add support for
+ setsockopt() options IPV6_<ADD|DROP>_MEMBERSHIP
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -74,67 +79,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, saket.sinha89@gmail.com,
-	Stefan Hajnoczi <stefanha@redhat.com>, Julia Suvorova <jusual@mail.ru>
+Cc: lvivier@redhat.com, thuth@redhat.com, daniel.santos@pobox.com,
+	arikalo@wavecomp.com, jcmvbkbc@gmail.com, amarkovic@wavecomp.com,
+	nchen@wavecomp.com, philmd@redhat.com, aurelien@aurel32.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 22.05.2019 um 02:51 hat Aarushi Mehta geschrieben:
-> On Tue, 2019-05-21 at 19:39 -0500, Eric Blake wrote:
-> > On 5/21/19 6:52 PM, Aarushi Mehta wrote:
-> > > Signed-off-by: Aarushi Mehta <mehta.aaru20@gmail.com>
-> > 
-> > Sparse on the details. The subject line says what, but without a
-> > 'why'
-> > for how io_uring is different from existing aio options, it's hard to
-> > see why I'd want to use it. Do you have any benchmark numbers?
+On 19/05/2019 18:15, Aleksandar Markovic wrote:
+> From: Neng Chen <nchen@wavecomp.com>
 > 
-> For peak performance, io_uring helps us get to 1.7M 4k IOPS with
-> polling. aio reaches a performance cliff much lower than that, at 608K.
-> If we disable polling, io_uring is able to drive about 1.2M IOPS for
-> the (otherwise) same test case.
+> Add support for options IPV6_ADD_MEMBERSHIP and IPV6_DROP_MEMPEMBERSHIP
+> of the syscall setsockopt(). These options control membership in
+> multicast groups. Their argument is a pointer to a struct ipv6_mreq,
+> which is in turn defined in IP v6 header netinet/in.h as:
 > 
-> More details, and the source for the above is at
-> http://kernel.dk/io_uring.pdf
+>   struct ipv6_mreq {
+>       /* IPv6 multicast address of group */
+>       struct  in6_addr  ipv6mr_multiaddr;
+>       /* local IPv6 address of interface */
+>       int     ipv6mr_interface;
+>   };
 > 
-> > > ---
-> > >  qapi/block-core.json | 3 ++-
-> > >  1 file changed, 2 insertions(+), 1 deletion(-)
-> > > 
-> > > diff --git a/qapi/block-core.json b/qapi/block-core.json
-> > > index 7ccbfff9d0..116995810a 100644
-> > > --- a/qapi/block-core.json
-> > > +++ b/qapi/block-core.json
-> > > @@ -2776,11 +2776,12 @@
-> > >  #
-> > >  # @threads:     Use qemu's thread pool
-> > >  # @native:      Use native AIO backend (only Linux and Windows)
-> > > +# @io_uring:    Use linux io_uring
-> > 
-> > Missing a '(since 4.1)' tag.
-> > 
-> > >  #
-> > >  # Since: 2.9
-> > >  ##
-> > >  { 'enum': 'BlockdevAioOptions',
-> > > -  'data': [ 'threads', 'native' ] }
-> > > +  'data': [ 'threads', 'native','io_uring' ] }
-> > 
-> > Missing space after ',' (not essential, but matching style is nice).
-> > Should the new element be defined conditionally, so that
-> > introspection
-> > only sees the new enum member when compiled for Linux?
-> > 
-> I'm not sure what would be the benefits of that? We already check for
-> Linux at configure, and this would reduce readability. We aren't doing
-> this for native.
+> ...whereas its definition in kernel's include/uapi/linux/in6.h is:
+> 
+>   #if __UAPI_DEF_IPV6_MREQ
+>   struct ipv6_mreq {
+>       /* IPv6 multicast address of group */
+>           struct  in6_addr ipv6mr_multiaddr;
+>       /* local IPv6 address of interface */
+>       int     ipv6mr_ifindex;
+>   };
+>   #endif
+> 
+> The first field of ipv6_mreq has the same name ("ipv6mr_multiaddr")
+> and type ("in6_addr") in both cases. Moreover, the in6_addr structure
+> consists of fields that are always big-endian (on host of any endian),
+> therefore the ipv6_mreq's field ipv6mr_multiaddr doesn't need any
+> endian conversion.
+> 
+> The second field of ipv6_mreq may, however, depending on the build
+> environment, have different names. This is the reason why the line
+> "#if __UAPI_DEF_IPV6_MREQ" is used in this patch - to establish the
+> right choice for the field name. Also, endian conversion is needed
+> for this field, since it is of type "int".
+> 
+> Signed-off-by: Neng Chen <nchen@wavecomp.com>
+> Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+> ---
+>   linux-user/syscall.c | 23 +++++++++++++++++++++++
+>   1 file changed, 23 insertions(+)
+> 
+> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+> index 96cd4bf..acff14d 100644
+> --- a/linux-user/syscall.c
+> +++ b/linux-user/syscall.c
+> @@ -1892,6 +1892,29 @@ static abi_long do_setsockopt(int sockfd, int level, int optname,
+>                                          &pki, sizeof(pki)));
+>               break;
+>           }
+> +        case IPV6_ADD_MEMBERSHIP:
+> +        case IPV6_DROP_MEMBERSHIP:
+> +        {
+> +            struct ipv6_mreq ipv6mreq;
+> +
+> +            if (optlen < sizeof(ipv6mreq)) {
+> +                return -TARGET_EINVAL;
+> +            }
+> +
+> +            if (copy_from_user(&ipv6mreq, optval_addr, sizeof(ipv6mreq))) {
+> +                return -TARGET_EFAULT;
+> +            }
+> +
+> +#if __UAPI_DEF_IPV6_MREQ
+> +            ipv6mreq.ipv6mr_ifindex = tswap32(ipv6mreq.ipv6mr_ifindex);
+> +#else
+> +            ipv6mreq.ipv6mr_interface = tswap32(ipv6mreq.ipv6mr_interface);
+> +#endif /* __UAPI_DEF_IVP6_MREQ */
+> +
+> +            ret = get_errno(setsockopt(sockfd, level, optname,
+> +                                       &ipv6mreq, sizeof(ipv6mreq)));
+> +            break;
+> +        }
+>           default:
+>               goto unimplemented;
+>           }
+> 
 
-BlockdevAioOptions is used in BlockdevOptionsFile, which contains the
-options for two different drivers: file-posix and file-win32. Both of
-them support both 'threads' and 'native'. However, I don't think you'll
-add the new mode to the Windows driver. So I think making it conditional
-on CONFIG_POSIX at least is necessary.
+Applied to my linux-user branch.
 
-Kevin
+Thanks,
+Laurent
 
