@@ -2,61 +2,56 @@ Return-Path: <SRS0=8zLO=TW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C4D55C282CE
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 14:31:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C616C282CE
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 14:32:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 88F4F20863
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 14:31:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 88F4F20863
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id E6AD6206B6
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 14:32:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E6AD6206B6
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=users.sourceforge.jp
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:44316 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:44324 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hTSGp-0000R3-OL
-	for qemu-devel@archiver.kernel.org; Wed, 22 May 2019 10:31:07 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:53191)
+	id 1hTSII-0001pz-3r
+	for qemu-devel@archiver.kernel.org; Wed, 22 May 2019 10:32:38 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:53399)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hTSF9-0007fS-GI
-	for qemu-devel@nongnu.org; Wed, 22 May 2019 10:29:24 -0400
+	(envelope-from <ysato@users.sourceforge.jp>) id 1hTSG2-00006E-DP
+	for qemu-devel@nongnu.org; Wed, 22 May 2019 10:30:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hTSF8-0005PV-78
-	for qemu-devel@nongnu.org; Wed, 22 May 2019 10:29:23 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36272)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mreitz@redhat.com>)
-	id 1hTSF5-0005GH-8k; Wed, 22 May 2019 10:29:19 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 86B8881E06;
-	Wed, 22 May 2019 14:29:13 +0000 (UTC)
-Received: from localhost (unknown [10.40.205.176])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id E163466D3B;
-	Wed, 22 May 2019 14:29:09 +0000 (UTC)
-From: Max Reitz <mreitz@redhat.com>
-To: qemu-block@nongnu.org
-Date: Wed, 22 May 2019 16:28:54 +0200
-Message-Id: <20190522142854.22983-3-mreitz@redhat.com>
-In-Reply-To: <20190522142854.22983-1-mreitz@redhat.com>
-References: <20190522142854.22983-1-mreitz@redhat.com>
+	(envelope-from <ysato@users.sourceforge.jp>) id 1hTSFz-0007SE-G1
+	for qemu-devel@nongnu.org; Wed, 22 May 2019 10:30:18 -0400
+Received: from mail03.asahi-net.or.jp ([202.224.55.15]:35399)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <ysato@users.sourceforge.jp>) id 1hTSFz-000768-5P
+	for qemu-devel@nongnu.org; Wed, 22 May 2019 10:30:15 -0400
+Received: from h61-195-96-97.vps.ablenet.jp (h61-195-96-97.ablenetvps.ne.jp
+	[61.195.96.97]) (Authenticated sender: PQ4Y-STU)
+	by mail03.asahi-net.or.jp (Postfix) with ESMTPA id 3C45D42C5A;
+	Wed, 22 May 2019 23:30:05 +0900 (JST)
+Received: from yo-satoh-debian.localdomain
+	(v045049.dynamic.ppp.asahi-net.or.jp [124.155.45.49])
+	by h61-195-96-97.vps.ablenet.jp (Postfix) with ESMTPSA id 706F3240085; 
+	Wed, 22 May 2019 23:30:03 +0900 (JST)
+From: Yoshinori Sato <ysato@users.sourceforge.jp>
+To: qemu-devel@nongnu.org
+Date: Wed, 22 May 2019 23:29:44 +0900
+Message-Id: <20190522142956.41916-1-ysato@users.sourceforge.jp>
+X-Mailer: git-send-email 2.11.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.25]);
-	Wed, 22 May 2019 14:29:13 +0000 (UTC)
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH 2/2] iotests: Test cancelling a job and closing
- the VM
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 202.224.55.15
+Subject: [Qemu-devel] [PATCH v15 00/12] Add RX archtecture support
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -68,162 +63,130 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org,
-	Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>
+Cc: peter.maydell@linaro.org, richard.henderson@linaro.org,
+	Yoshinori Sato <ysato@users.sourceforge.jp>, philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This patch adds a test where we cancel a throttled mirror job and
-immediately close the VM before it can be cancelled.  Doing so will
-invoke bdrv_drain_all() while the mirror job tries to drain the
-throttled node.  When bdrv_drain_all_end() tries to lift its drain on
-the throttle node, the job will exit and replace the current root node
-of the BB drive0 (which is the job's filter node) by the throttle node.
-Before the previous patch, this replacement did not increase drive0's
-quiesce_counter by a sufficient amount, so when
-bdrv_parent_drained_end() (invoked by bdrv_do_drained_end(), invoked by
-bdrv_drain_all_end()) tried to end the drain on all of the throttle
-node's parents, it decreased drive0's quiesce_counter below 0 -- which
-fails an assertion.
+Hello.
+This patch series is added Renesas RX target emulation.
 
-Signed-off-by: Max Reitz <mreitz@redhat.com>
----
- tests/qemu-iotests/255     | 54 ++++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/255.out | 24 +++++++++++++++++
- 2 files changed, 78 insertions(+)
+Fix is bellow.
+- Reorder patches.
+- Rewrite renesas_cmt.
+  Convert to RCMTChannelStatus
+- Use CPUClass::tlb_fill
+- Use tcg_gen_abs_i32
+- Fix racw instructions.
+- Cleanup for review comment.
+  target/rx/helper.c - fix spelling.
+  hw/intc/rx_icu.h - cleanup constant definition.
+  hw/registerfields.h - fix macro definion order.
 
-diff --git a/tests/qemu-iotests/255 b/tests/qemu-iotests/255
-index c0bb37a9b0..b1bbe3ff0a 100755
---- a/tests/qemu-iotests/255
-+++ b/tests/qemu-iotests/255
-@@ -35,6 +35,10 @@ def blockdev_create(vm, options):
-         vm.run_job('job0')
-     iotests.log("")
-=20
-+iotests.log('Finishing a commit job with background reads')
-+iotests.log('=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D'=
-)
-+iotests.log('')
-+
- with iotests.FilePath('t.qcow2') as disk_path, \
-      iotests.FilePath('t.qcow2.mid') as mid_path, \
-      iotests.FilePath('t.qcow2.base') as base_path, \
-@@ -80,4 +84,54 @@ with iotests.FilePath('t.qcow2') as disk_path, \
-     vm.run_job('job0', auto_finalize=3DFalse, pre_finalize=3Dstart_reque=
-sts,
-                 auto_dismiss=3DTrue)
-=20
-+    #vm.qmp_log('block-job-cancel', device=3D'job0')
-+
-+    vm.shutdown()
-+
-+iotests.log('')
-+iotests.log('Closing the VM while a job is being cancelled')
-+iotests.log('=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-')
-+iotests.log('')
-+
-+with iotests.FilePath('src.qcow2') as src_path, \
-+     iotests.FilePath('dst.qcow2') as dst_path, \
-+     iotests.VM() as vm:
-+
-+    iotests.log('=3D=3D=3D Create images and start VM =3D=3D=3D')
-+    iotests.log('')
-+
-+    size =3D 128 * 1024 * 1024
-+    size_str =3D str(size)
-+
-+    iotests.qemu_img_log('create', '-f', iotests.imgfmt, src_path, size_=
-str)
-+    iotests.qemu_img_log('create', '-f', iotests.imgfmt, dst_path, size_=
-str)
-+
-+    iotests.log(iotests.qemu_io('-f', iotests.imgfmt, '-c', 'write 0 1M'=
-,
-+                                src_path),
-+                filters=3D[iotests.filter_test_dir, iotests.filter_qemu_=
-io])
-+
-+    vm.add_object('throttle-group,x-bps-read=3D4096,id=3Dthrottle0')
-+
-+    vm.add_blockdev('file,node-name=3Dsrc-file,filename=3D%s' % (src_pat=
-h))
-+    vm.add_blockdev('%s,node-name=3Dsrc,file=3Dsrc-file' % (iotests.imgf=
-mt))
-+
-+    vm.add_blockdev('file,node-name=3Ddst-file,filename=3D%s' % (dst_pat=
-h))
-+    vm.add_blockdev('%s,node-name=3Ddst,file=3Ddst-file' % (iotests.imgf=
-mt))
-+
-+    vm.add_blockdev('throttle,node-name=3Dsrc-throttled,' +
-+                    'throttle-group=3Dthrottle0,file=3Dsrc')
-+
-+    vm.add_device('virtio-blk,drive=3Dsrc-throttled')
-+
-+    vm.launch()
-+
-+    iotests.log('=3D=3D=3D Start a mirror job =3D=3D=3D')
-+    iotests.log('')
-+
-+    vm.qmp_log('blockdev-mirror', job_id=3D'job0', device=3D'src-throttl=
-ed',
-+                                  target=3D'dst', sync=3D'full')
-+
-+    vm.qmp_log('block-job-cancel', device=3D'job0')
-+    vm.qmp_log('quit')
-+
-     vm.shutdown()
-diff --git a/tests/qemu-iotests/255.out b/tests/qemu-iotests/255.out
-index 9a2d7cbb77..348909fdef 100644
---- a/tests/qemu-iotests/255.out
-+++ b/tests/qemu-iotests/255.out
-@@ -1,3 +1,6 @@
-+Finishing a commit job with background reads
-+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-+
- =3D=3D=3D Create backing chain and start VM =3D=3D=3D
-=20
- Formatting 'TEST_DIR/PID-t.qcow2.mid', fmt=3Dqcow2 size=3D134217728 clus=
-ter_size=3D65536 lazy_refcounts=3Doff refcount_bits=3D16
-@@ -14,3 +17,24 @@ Formatting 'TEST_DIR/PID-t.qcow2', fmt=3Dqcow2 size=3D=
-134217728 cluster_size=3D65536 l
- {"return": {}}
- {"data": {"id": "job0", "type": "commit"}, "event": "BLOCK_JOB_PENDING",=
- "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
- {"data": {"device": "job0", "len": 134217728, "offset": 134217728, "spee=
-d": 0, "type": "commit"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"=
-microseconds": "USECS", "seconds": "SECS"}}
-+
-+Closing the VM while a job is being cancelled
-+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-+
-+=3D=3D=3D Create images and start VM =3D=3D=3D
-+
-+Formatting 'TEST_DIR/PID-src.qcow2', fmt=3Dqcow2 size=3D134217728 cluste=
-r_size=3D65536 lazy_refcounts=3Doff refcount_bits=3D16
-+
-+Formatting 'TEST_DIR/PID-dst.qcow2', fmt=3Dqcow2 size=3D134217728 cluste=
-r_size=3D65536 lazy_refcounts=3Doff refcount_bits=3D16
-+
-+wrote 1048576/1048576 bytes at offset 0
-+1 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+=3D=3D=3D Start a mirror job =3D=3D=3D
-+
-+{"execute": "blockdev-mirror", "arguments": {"device": "src-throttled", =
-"job-id": "job0", "sync": "full", "target": "dst"}}
-+{"return": {}}
-+{"execute": "block-job-cancel", "arguments": {"device": "job0"}}
-+{"return": {}}
-+{"execute": "quit", "arguments": {}}
-+{"return": {}}
+My git repository is bellow.
+git://git.pf.osdn.net/gitroot/y/ys/ysato/qemu.git tags/rx-20190522
+
+Testing binaries bellow.
+u-boot
+Download - https://osdn.net/users/ysato/pf/qemu/dl/u-boot.bin.gz
+
+starting
+$ gzip -d u-boot.bin.gz
+$ qemu-system-rx -bios u-boot.bin
+
+linux and pico-root (only sash)
+Download - https://osdn.net/users/ysato/pf/qemu/dl/zImage (kernel)
+           https://osdn.net/users/ysato/pf/qemu/dl/rx-qemu.dtb (DeviceTre=
+e)
+
+starting
+$ qemu-system-rx -kernel zImage -dtb rx-qemu.dtb -append "earlycon"
+
+Yoshinori Sato (12):
+  qemu/bitops.h: Add extract8 and extract16
+  hw/registerfields.h: Add 8bit and 16bit register macros.
+  target/rx: TCG translation
+  target/rx: TCG helper
+  target/rx: CPU definition
+  target/rx: RX disassembler
+  hw/intc: RX62N interrupt controller (ICUa)
+  hw/timer: RX62N internal timer modules
+  hw/char: RX62N serial communication interface (SCI)
+  hw/rx: RX Target hardware definition
+  Add rx-softmmu
+  MAINTAINERS: Add RX
+
+ configure                      |    8 +
+ default-configs/rx-softmmu.mak |    3 +
+ include/disas/dis-asm.h        |    5 +
+ include/hw/char/renesas_sci.h  |   45 +
+ include/hw/intc/rx_icu.h       |   55 +
+ include/hw/registerfields.h    |   30 +-
+ include/hw/rx/rx.h             |    7 +
+ include/hw/rx/rx62n.h          |   94 ++
+ include/hw/timer/renesas_cmt.h |   44 +
+ include/hw/timer/renesas_tmr.h |   50 +
+ include/qemu/bitops.h          |   38 +
+ include/sysemu/arch_init.h     |    1 +
+ target/rx/cpu.h                |  227 ++++
+ target/rx/helper.h             |   31 +
+ arch_init.c                    |    2 +
+ hw/char/renesas_sci.c          |  340 ++++++
+ hw/intc/rx_icu.c               |  376 +++++++
+ hw/rx/rx-virt.c                |  105 ++
+ hw/rx/rx62n.c                  |  238 ++++
+ hw/timer/renesas_cmt.c         |  260 +++++
+ hw/timer/renesas_tmr.c         |  455 ++++++++
+ target/rx/cpu.c                |  239 ++++
+ target/rx/disas.c              | 1480 ++++++++++++++++++++++++
+ target/rx/gdbstub.c            |  112 ++
+ target/rx/helper.c             |  148 +++
+ target/rx/monitor.c            |   38 +
+ target/rx/op_helper.c          |  470 ++++++++
+ target/rx/translate.c          | 2420 ++++++++++++++++++++++++++++++++++=
+++++++
+ MAINTAINERS                    |   21 +
+ hw/Kconfig                     |    1 +
+ hw/char/Kconfig                |    3 +
+ hw/char/Makefile.objs          |    1 +
+ hw/intc/Kconfig                |    3 +
+ hw/intc/Makefile.objs          |    1 +
+ hw/rx/Kconfig                  |   14 +
+ hw/rx/Makefile.objs            |    2 +
+ hw/timer/Kconfig               |    6 +
+ hw/timer/Makefile.objs         |    3 +
+ target/rx/Makefile.objs        |   12 +
+ target/rx/insns.decode         |  621 +++++++++++
+ 40 files changed, 8008 insertions(+), 1 deletion(-)
+ create mode 100644 default-configs/rx-softmmu.mak
+ create mode 100644 include/hw/char/renesas_sci.h
+ create mode 100644 include/hw/intc/rx_icu.h
+ create mode 100644 include/hw/rx/rx.h
+ create mode 100644 include/hw/rx/rx62n.h
+ create mode 100644 include/hw/timer/renesas_cmt.h
+ create mode 100644 include/hw/timer/renesas_tmr.h
+ create mode 100644 target/rx/cpu.h
+ create mode 100644 target/rx/helper.h
+ create mode 100644 hw/char/renesas_sci.c
+ create mode 100644 hw/intc/rx_icu.c
+ create mode 100644 hw/rx/rx-virt.c
+ create mode 100644 hw/rx/rx62n.c
+ create mode 100644 hw/timer/renesas_cmt.c
+ create mode 100644 hw/timer/renesas_tmr.c
+ create mode 100644 target/rx/cpu.c
+ create mode 100644 target/rx/disas.c
+ create mode 100644 target/rx/gdbstub.c
+ create mode 100644 target/rx/helper.c
+ create mode 100644 target/rx/monitor.c
+ create mode 100644 target/rx/op_helper.c
+ create mode 100644 target/rx/translate.c
+ create mode 100644 hw/rx/Kconfig
+ create mode 100644 hw/rx/Makefile.objs
+ create mode 100644 target/rx/Makefile.objs
+ create mode 100644 target/rx/insns.decode
+
 --=20
-2.21.0
+2.11.0
 
 
