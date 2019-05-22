@@ -2,69 +2,60 @@ Return-Path: <SRS0=8zLO=TW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_MUTT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	UNPARSEABLE_RELAY,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B2E8C282CE
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 15:01:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A955C282CE
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 15:03:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B4A6020881
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 15:01:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B4A6020881
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 3265620879
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 15:03:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3265620879
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=collabora.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:44642 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:45570 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hTSYt-0007RI-Dz
-	for qemu-devel@archiver.kernel.org; Wed, 22 May 2019 10:49:47 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:58565)
+	id 1hTSmF-00049L-D9
+	for qemu-devel@archiver.kernel.org; Wed, 22 May 2019 11:03:35 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:39293)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1hTSTm-0003kA-1N
-	for qemu-devel@nongnu.org; Wed, 22 May 2019 10:44:31 -0400
+	(envelope-from <antonio.ospite@collabora.com>) id 1hTSkg-0003Qs-RX
+	for qemu-devel@nongnu.org; Wed, 22 May 2019 11:02:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1hTSTk-0005As-Is
-	for qemu-devel@nongnu.org; Wed, 22 May 2019 10:44:29 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55820)
+	(envelope-from <antonio.ospite@collabora.com>) id 1hTSkf-0003Gh-Jx
+	for qemu-devel@nongnu.org; Wed, 22 May 2019 11:01:58 -0400
+Received: from bhuna.collabora.co.uk ([2a00:1098:0:82:1000:25:2eeb:e3e3]:51980)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hTSTk-0004jQ-Aj
-	for qemu-devel@nongnu.org; Wed, 22 May 2019 10:44:28 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E281A5946F;
-	Wed, 22 May 2019 14:44:14 +0000 (UTC)
-Received: from localhost (ovpn-116-14.gru2.redhat.com [10.97.116.14])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 66010611A0;
-	Wed, 22 May 2019 14:44:14 +0000 (UTC)
-Date: Wed, 22 May 2019 11:44:12 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-To: Jiri Denemark <jdenemar@redhat.com>
-Message-ID: <20190522144412.GR10764@habkost.net>
-References: <20190422234742.15780-1-ehabkost@redhat.com>
-	<20190509133537.GK7181@orkuz.int.mamuti.net>
-	<20190509135617.GH4189@habkost.net>
-	<20190509180603.424c8277@Igors-MacBook-Pro>
-	<20190509163618.GN7181@orkuz.int.mamuti.net>
-	<20190510203203.GW4189@habkost.net>
-	<20190522082741.GI2545064@orkuz.int.mamuti.net>
+	(Exim 4.71) (envelope-from <antonio.ospite@collabora.com>)
+	id 1hTSkf-00039V-EH; Wed, 22 May 2019 11:01:57 -0400
+Received: from [127.0.0.1] (localhost [127.0.0.1]) (Authenticated sender: ao2)
+	with ESMTPSA id 6944F28009A
+To: Laurent Vivier <laurent@vivier.eu>,
+	Peter Maydell <peter.maydell@linaro.org>, Eric Blake <eblake@redhat.com>
+References: <20190503082728.16485-1-ao2@ao2.it>
+	<20190503082728.16485-3-ao2@ao2.it>
+	<541bfc5c-0e45-58e6-f0b1-81e9b0c8881d@redhat.com>
+	<CAFEAcA8An-KWOc3gOz2=45eCHCmUJEJw_bTrrCW6bYO23H8TPw@mail.gmail.com>
+	<a5f95284-2883-e6c0-54ad-d0ff018f68d7@vivier.eu>
+From: Antonio Ospite <antonio.ospite@collabora.com>
+Message-ID: <9349da74-b4a1-932d-227a-a63df1bb63a5@collabora.com>
+Date: Wed, 22 May 2019 17:01:51 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190522082741.GI2545064@orkuz.int.mamuti.net>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.39]);
-	Wed, 22 May 2019 14:44:14 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 0/2] i386: "unavailable-features" QOM
- property
+In-Reply-To: <a5f95284-2883-e6c0-54ad-d0ff018f68d7@vivier.eu>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2a00:1098:0:82:1000:25:2eeb:e3e3
+Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH v2 2/2] configure: disallow
+ spaces and colons in source path and build path
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -76,61 +67,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>,
-	qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
+Cc: QEMU Trivial <qemu-trivial@nongnu.org>, Antonio Ospite <ao2@ao2.it>,
+	QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, May 22, 2019 at 10:27:41AM +0200, Jiri Denemark wrote:
-> On Fri, May 10, 2019 at 17:32:03 -0300, Eduardo Habkost wrote:
-> > On Thu, May 09, 2019 at 06:36:18PM +0200, Jiri Denemark wrote:
-> > > On Thu, May 09, 2019 at 18:06:03 +0200, Igor Mammedov wrote:
-> > > > On Thu, 9 May 2019 10:56:17 -0300
-> > > > Eduardo Habkost <ehabkost@redhat.com> wrote:
-> > > > 
-> > > > > On Thu, May 09, 2019 at 03:35:37PM +0200, Jiri Denemark wrote:
-> > > > > > Would this unavailable-features property contain only canonical names of
-> > > > > > the features or all possible aliases of all features? For example,
-> > > > > > "tsc-adjust" can also be spelled as "tsc_adjust". When calling
-> > > > > > query-cpu-model-expansion, we have a way to request all variants by
-> > > > > > running full expansion on the result of a previous static expansion. Can
-> > > > > > we get something like this for unavailable-features too?
-> > > > > 
-> > > > > I'd like to avoid that, and refer only to the canonical names.
-> > > > 
-> > > > Can we deprecate aliases to avoid confusion in future?
-> > > > (there aren't that many of them that used pre-QOM name format)
-> > > 
-> > > If you come up with a way libvirt could use to detect which name it
-> > > should use when talking to QEMU...
-> > 
-> > The property names are part of the API, and deprecation would
-> > just be documented in the QEMU documentation.  Why would you need
-> > to enumerate them dynamically at runtime?
-> 
-> The tricky part is to know which variant of a particular feature name we
-> should use when talking to a specific version of QEMU. But I guess we
-> can use the new "unavailable-features" property for this purpose. [...]
+On 22/05/19 15:57, Laurent Vivier wrote:
+> On 09/05/2019 16:42, Peter Maydell wrote:
+>> On Mon, 6 May 2019 at 18:27, Eric Blake <eblake@redhat.com> wrote:
+>>>
+>>> On 5/3/19 3:27 AM, Antonio Ospite wrote:
+>>>> From: Antonio Ospite <antonio.ospite@collabora.com>
+>>>>
+>>>> The configure script breaks when the qemu source directory is in a p=
+ath
+>>>> containing white spaces, in particular the list of targets is not
+>>>> correctly generated when calling "./configure --help" because of how=
+=20
+>>>> the
+>>>> default_target_list variable is built.
+>>>>
+>>>> In addition to that, *building* qemu from a directory with spaces=20
+>>>> breaks
+>>>> some assumptions in the Makefiles, even if the original source path=20
+>>>> does
+>>>> not contain spaces like in the case of an out-of-tree build, or when
+>>>> symlinks are involved.
+>>>>
+>>>> To avoid these issues, refuse to run the configure script and the
+>>>> Makefile if there are spaces or colons in the source path or the bui=
+ld
+>>>> path, taking as inspiration what the kbuild system in linux does.
+>>>>
+>>>> Buglink: https://bugs.launchpad.net/qemu/+bug/1817345
+>>>>
+>>>> Signed-off-by: Antonio Ospite <antonio.ospite@collabora.com>
+>>>> ---
+>>>> =C2=A0 Makefile=C2=A0 | 4 ++++
+>>>> =C2=A0 configure | 6 ++++++
+>>>> =C2=A0 2 files changed, 10 insertions(+)
+>>>>
+>>>
+>>>> +++ b/Makefile
+>>>> @@ -1,5 +1,9 @@
+>>>> =C2=A0 # Makefile for QEMU.
+>>>>
+>>>> +ifneq ($(words $(subst :, ,$(CURDIR))), 1)
+>>>> +=C2=A0 $(error main directory cannot contain spaces nor colons)
+>>>> +endif
+>>>> +
+>>>> =C2=A0 # Always point to the root of the build tree (needs GNU make)=
+.
+>>>> =C2=A0 BUILD_DIR=3D$(CURDIR)
+>>>>
+>>>> diff --git a/configure b/configure
+>>>> index 9832cbca5c..f7ad4381bd 100755
+>>>> --- a/configure
+>>>> +++ b/configure
+>>>> @@ -279,6 +279,12 @@ ld_has() {
+>>>> =C2=A0 # make source path absolute
+>>>> =C2=A0 source_path=3D$(cd "$(dirname -- "$0")"; pwd)
+>>>>
+>>>> +if printf "%s\n" "$source_path" | grep -q "[[:space:]:]" ||
+>>>> +=C2=A0 printf "%s\n" "$PWD" | grep -q "[[:space:]:]";
+>>>
+>>> For less typing and fewer processes, you could shorten this to:
+>>>
+>>> if printf %s\\n "$source_path" "$PWD" | grep -q "[[:space:]:]";
+>>>
+>>> but that's trivial enough for a maintainer to fold in if desired.
+>>>
+>>> Reviewed-by: Eric Blake <eblake@redhat.com>
+>>
+>> What tree is this going to go in via? I suggest the
+>> -trivial tree.
+>=20
+>=20
+> Applied (unchanged) to my trivial-patches branch.
+>=20
 
-You can run device-list-properties on the typenames returned by
-query-cpu-definitions, to check which CPU properties exist in a
-QEMU binary.
+Thank you Laurent.
 
->                                                           [...]   When
-> the property is present, we can translate all feature names to their
-> canonical names (via a static translation table in libvirt). We'd be
-> using the old untranslated names when talking to any QEMU which does not
-> support the "unavailable-features" property.
+I'll think about sending a followup patch with the changes proposed by=20
+Eric and I'll CC you if I do.
 
-That would help us simplify the interface between QEMU and libvirt.
-
-> 
-> But I hope we won't get into a situation when some CPU feature needs to
-> be renamed again, that would make a big mess.
-
-I promise we'll try to avoid doing that.  :)
-
--- 
-Eduardo
+Ciao,
+    Antonio
 
