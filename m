@@ -2,62 +2,80 @@ Return-Path: <SRS0=8zLO=TW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C5992C18E7D
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 10:30:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 62466C18E7D
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 10:31:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9A340217D4
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 10:30:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9A340217D4
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 39009217D4
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 10:31:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 39009217D4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:39846 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:39848 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hTOWL-0002Br-RR
-	for qemu-devel@archiver.kernel.org; Wed, 22 May 2019 06:30:53 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:55815)
+	id 1hTOWj-0002Q5-F1
+	for qemu-devel@archiver.kernel.org; Wed, 22 May 2019 06:31:17 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:55873)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1hTOV7-0001ZS-5j
-	for qemu-devel@nongnu.org; Wed, 22 May 2019 06:29:38 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1hTOVQ-0001jS-GG
+	for qemu-devel@nongnu.org; Wed, 22 May 2019 06:29:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1hTOV5-0004xI-Q8
-	for qemu-devel@nongnu.org; Wed, 22 May 2019 06:29:37 -0400
-Received: from 1.mo7.mail-out.ovh.net ([178.33.45.51]:58020)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1hTOV5-0004wK-Ka
-	for qemu-devel@nongnu.org; Wed, 22 May 2019 06:29:35 -0400
-Received: from player770.ha.ovh.net (unknown [10.109.160.226])
-	by mo7.mail-out.ovh.net (Postfix) with ESMTP id 192B7115ED1
-	for <qemu-devel@nongnu.org>; Wed, 22 May 2019 12:29:32 +0200 (CEST)
-Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
-	[82.253.208.248]) (Authenticated sender: groug@kaod.org)
-	by player770.ha.ovh.net (Postfix) with ESMTPSA id BE4EE60B784E;
-	Wed, 22 May 2019 10:29:25 +0000 (UTC)
-Date: Wed, 22 May 2019 12:29:24 +0200
-From: Greg Kurz <groug@kaod.org>
-To: =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>
-Message-ID: <20190522122924.1d254c81@bahia.lan>
-In-Reply-To: <20190522074016.10521-3-clg@kaod.org>
-References: <20190522074016.10521-1-clg@kaod.org>
-	<20190522074016.10521-3-clg@kaod.org>
-X-Mailer: Claws Mail 3.16.0 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+	(envelope-from <pbonzini@redhat.com>) id 1hTOVP-00059H-In
+	for qemu-devel@nongnu.org; Wed, 22 May 2019 06:29:56 -0400
+Received: from mail-wm1-f67.google.com ([209.85.128.67]:50831)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hTOVP-00058Z-Cj
+	for qemu-devel@nongnu.org; Wed, 22 May 2019 06:29:55 -0400
+Received: by mail-wm1-f67.google.com with SMTP id f204so1659043wme.0
+	for <qemu-devel@nongnu.org>; Wed, 22 May 2019 03:29:55 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+	:user-agent:mime-version:in-reply-to:content-language
+	:content-transfer-encoding;
+	bh=FIJ17jfOhg95N8FH17P449CIgHx99VfxRPbLIeRnIVw=;
+	b=haJ44mSiTTSg3AC4LGMRjp5CuMzgZnDi9ZHIkvacVBqOdMsC0iB8FBe2usJqIN+ylr
+	KiCSPci5XC3Y++3D9owAXi2984CBEnfRCZkDyu/6vsqkQuFPETeuckFyGiZx12z90mLw
+	0gaHrNU7uQyHLqED50bgCM1uRGFzlXm2rC/KGNmk7J1INipFWn5Hl6L0UyNWu6XzgtPa
+	lI65vtTKIG+Rj7Su0fNuIwb9/gaFG6Di6WnJdltkfEvuaPfFGELY0WxD0F4Qqz8EuHdN
+	Y8w9kfyZ9T7gK91x/4ZznP8Hqfr0C9OPHE1WnbBKrzT/PeZ0z54ypwbtXU1ZpiGxgQqb
+	HhBg==
+X-Gm-Message-State: APjAAAW9NKsJeBtiJNSsSjJs97eNQD1vuecaTxr54pUII1F+pEsgHPTf
+	F87EWK5UMzx7+DW5hrYOzfmXWQ==
+X-Google-Smtp-Source: APXvYqynPS5UMMCQT+g0dIELP7726wnmy0u2E2xGgcd7y8qEWz63vZ0fvKwsypHRz6XG/dggP4i7iA==
+X-Received: by 2002:a05:600c:254e:: with SMTP id
+	e14mr6365781wma.70.1558520994382; 
+	Wed, 22 May 2019 03:29:54 -0700 (PDT)
+Received: from [10.32.181.147] (nat-pool-mxp-t.redhat.com. [149.6.153.186])
+	by smtp.gmail.com with ESMTPSA id
+	a128sm5368403wma.23.2019.05.22.03.29.53
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Wed, 22 May 2019 03:29:53 -0700 (PDT)
+To: Eduardo Habkost <ehabkost@redhat.com>
+References: <1557813999-9175-1-git-send-email-wanpengli@tencent.com>
+	<dcbf44c3-2fb9-02c0-79cc-c8a30373d35a@redhat.com>
+	<20190520210525.GE10764@habkost.net>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <ebc26122-d6a8-a3a0-1b42-aa2cc6522c2b@redhat.com>
+Date: Wed, 22 May 2019 12:29:52 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Ovh-Tracer-Id: 2633479885324720523
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduuddrudduvddgvdekucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddm
+In-Reply-To: <20190520210525.GE10764@habkost.net>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 178.33.45.51
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH 2/2] spapr: change default
- interrupt mode to 'dual'
+	[fuzzy]
+X-Received-From: 209.85.128.67
+Subject: Re: [Qemu-devel] [PATCH] i386: Enable IA32_MISC_ENABLE MWAIT bit
+ when exposing mwait/monitor
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -69,61 +87,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-ppc@nongnu.org,
-	qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+Cc: Wanpeng Li <kernellwp@gmail.com>, qemu-devel@nongnu.org,
+	kvm@vger.kernel.org, =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 22 May 2019 09:40:16 +0200
-C=C3=A9dric Le Goater <clg@kaod.org> wrote:
+On 20/05/19 23:05, Eduardo Habkost wrote:
+> What if enable_cpu_pm is false but we're running TCG, or if
+> enable_cpu_pm is true but we're not using -cpu host?
+> 
+> Shouldn't this be conditional on
+>   (env->features[FEAT_1_ECX] & CPUID_EXT_MONITOR)
+> instead?
 
-> Now that XIVE support is complete (QEMU emulated and KVM devices),
-> change the pseries machine to advertise both interrupt modes: XICS
-> (P7/P8) and XIVE (P9).
->=20
-> The machine default interrupt modes depends on the version. Current
-> settings are:
->=20
->     pseries   default interrupt mode
->=20
->     4.1       dual
->     4.0       xics
->     3.1       xics
->     3.0       legacy xics (different IRQ number space layout)
->=20
-> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
-> ---
+Yes, it should.  I fixed it locally.
 
-At last ! :)
-
-Reviewed-by: Greg Kurz <groug@kaod.org>
-
->  hw/ppc/spapr.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
->=20
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index 39e698e9b013..4fd16b43f014 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -4352,7 +4352,7 @@ static void spapr_machine_class_init(ObjectClass *o=
-c, void *data)
->      smc->default_caps.caps[SPAPR_CAP_LARGE_DECREMENTER] =3D SPAPR_CAP_ON;
->      smc->default_caps.caps[SPAPR_CAP_CCF_ASSIST] =3D SPAPR_CAP_OFF;
->      spapr_caps_add_properties(smc, &error_abort);
-> -    smc->irq =3D &spapr_irq_xics;
-> +    smc->irq =3D &spapr_irq_dual;
->      smc->dr_phb_enabled =3D true;
->  }
-> =20
-> @@ -4430,6 +4430,7 @@ static void spapr_machine_4_0_class_options(Machine=
-Class *mc)
->      spapr_machine_4_1_class_options(mc);
->      compat_props_add(mc->compat_props, hw_compat_4_0, hw_compat_4_0_len);
->      smc->phb_placement =3D phb_placement_4_0;
-> +    smc->irq =3D &spapr_irq_xics;
->  }
-> =20
->  DEFINE_SPAPR_MACHINE(4_0, "4.0", false);
-
+Paolo
 
