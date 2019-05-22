@@ -2,94 +2,72 @@ Return-Path: <SRS0=8zLO=TW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B4EDC282CE
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 13:36:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 49E22C282CE
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 13:38:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 453B020879
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 13:36:50 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="HQLrzORn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 453B020879
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 10FCC20851
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 13:38:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 10FCC20851
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:43427 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:43443 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hTRQH-0008BZ-HI
-	for qemu-devel@archiver.kernel.org; Wed, 22 May 2019 09:36:49 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:39809)
+	id 1hTRRl-0000YH-2I
+	for qemu-devel@archiver.kernel.org; Wed, 22 May 2019 09:38:21 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:39985)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hTRNC-0006DU-A3
-	for qemu-devel@nongnu.org; Wed, 22 May 2019 09:33:40 -0400
+	(envelope-from <laurent@vivier.eu>) id 1hTRNj-0006aC-0j
+	for qemu-devel@nongnu.org; Wed, 22 May 2019 09:34:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hTRNA-0003B7-Vn
-	for qemu-devel@nongnu.org; Wed, 22 May 2019 09:33:38 -0400
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:50216)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1hTRNA-0003A9-Ms
-	for qemu-devel@nongnu.org; Wed, 22 May 2019 09:33:36 -0400
-Received: by mail-wm1-x344.google.com with SMTP id f204so2273256wme.0
-	for <qemu-devel@nongnu.org>; Wed, 22 May 2019 06:33:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=references:user-agent:from:to:cc:subject:in-reply-to:date
-	:message-id:mime-version:content-transfer-encoding;
-	bh=YrPGmKxZA4m1RpvzZKEMR5NEJ4PT96bU1P5C+IYFgq0=;
-	b=HQLrzORnTeffncrOq+nY+qwXQFYDFgrWO3pQo0qkCBBB7ysNWLJjbXP86pwMzFhdoo
-	3GZ4+Obo0PwHkxGNXeKYOCrhPCXU0codW8OC91+3jIBVYdrHgdgj54Uwm6qF6P1CeFRO
-	ARaB4ddMcWP9urOeoysn4J6A5OXxqBGok6CZGkuZwBkmIrDEUaHt/n3SKoRPlL1vBA5c
-	kKui6VBR2hqz0kRLyHfuBddgZxtyiSUA8YW/e/t4zheIb/Y+VWhiE71nAL+vAjhDLJJq
-	f276lJbwhPqQzhMibUScawGf0M+LubWdOYVSObJgow0NgeZL00ca/lOfZWVaQ2JJU6vX
-	I8PQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:references:user-agent:from:to:cc:subject
-	:in-reply-to:date:message-id:mime-version:content-transfer-encoding;
-	bh=YrPGmKxZA4m1RpvzZKEMR5NEJ4PT96bU1P5C+IYFgq0=;
-	b=CTS5LTWlB/ONLZxP2cGLL+8eTQj5Y/5/2fSDbr83jwJpqSlLcrGL9zvZCIM+Nl3lBk
-	E6EZvOpnN4EEKhlgcKkMNvPSTqL38Cz3yqzpvSwasM00JdyFeLttUlj4qlEMVCMiiBkp
-	evA3Ki++8o+EYxLv3WEI9vVYdcv6HxnHL4QoDk4F1LvJdLAxa83Rja9sNFK/xvAUeyIO
-	vcVjZ67Ha+nTBXkZV9vMoRjbWvwJM7cIxBHuYvns7+R7hxpHlLu9CvJqtZKaiN1UpcTy
-	9KIlyPeKKOkf/R2TbCBoSDT5hruBD+hjEbAlweVUd97GnElWKy1C1fz/TEnZAZY3H/vu
-	dHog==
-X-Gm-Message-State: APjAAAV/bqacSSYn0z4aNcqmgSG8qqmur/qCsgquhrHUcMBIYtrGpjh9
-	nNTZIDMd1Z59X+LWswkb+AyoXw==
-X-Google-Smtp-Source: APXvYqyhc4JuEw3V29EPtHkC85rbAket5SL2QXEvdgUDcH+e6Mms9TPJJMNo6KtiqwAuctNN2Tch3w==
-X-Received: by 2002:a1c:3cc2:: with SMTP id j185mr7362555wma.26.1558532014533; 
-	Wed, 22 May 2019 06:33:34 -0700 (PDT)
-Received: from zen.linaroharston ([81.128.185.34])
-	by smtp.gmail.com with ESMTPSA id d6sm23014655wrp.9.2019.05.22.06.33.33
-	(version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-	Wed, 22 May 2019 06:33:33 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
-	by zen.linaroharston (Postfix) with ESMTP id 5FF721FF87;
-	Wed, 22 May 2019 14:33:33 +0100 (BST)
-References: <20190521152810.21353-1-cohuck@redhat.com>
-	<20190521152810.21353-3-cohuck@redhat.com>
-	<6e216877-60be-ddcd-3f15-604e870ca8ba@redhat.com>
-	<20190522140729.25970e17.cohuck@redhat.com>
-	<6b101b85-4985-4736-acad-59389b00de55@vivier.eu>
-	<20190522142421.746f7495.cohuck@redhat.com>
-User-agent: mu4e 1.3.2; emacs 26.1
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Cornelia Huck <cohuck@redhat.com>
-In-reply-to: <20190522142421.746f7495.cohuck@redhat.com>
-Date: Wed, 22 May 2019 14:33:33 +0100
-Message-ID: <87blzuhavm.fsf@zen.linaroharston>
+	(envelope-from <laurent@vivier.eu>) id 1hTRNh-0003Sr-Jd
+	for qemu-devel@nongnu.org; Wed, 22 May 2019 09:34:11 -0400
+Received: from mout.kundenserver.de ([217.72.192.75]:38623)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>)
+	id 1hTRNb-0003O3-T9; Wed, 22 May 2019 09:34:04 -0400
+Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
+	(mreue106 [213.165.67.119]) with ESMTPSA (Nemesis) id
+	1MbBQU-1gwZSs0UGm-00beSi; Wed, 22 May 2019 15:33:38 +0200
+To: Boxuan Li <liboxuan@connect.hku.hk>, qemu-devel@nongnu.org
+References: <20190503154424.73933-1-liboxuan@connect.hku.hk>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <1b3ff9fd-860b-1b14-ee74-03b6188f8a37@vivier.eu>
+Date: Wed, 22 May 2019 15:33:36 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+	Thunderbird/52.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2a00:1450:4864:20::344
-Subject: Re: [Qemu-devel] [PULL v3 47/55] linux headers: update against
- Linux 5.2-rc1
+In-Reply-To: <20190503154424.73933-1-liboxuan@connect.hku.hk>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Provags-ID: V03:K1:e4SQbxf5e1+cz5hk3NDUS30kkJqb3iHMyHerjECCMYLn4GFIwbr
+	ZmGfYCprhwR7PIlczWdqzieXHOFqmSLI4y5t1LR9ZPeVij98tM2uiYbf1p4rdgxQ7hzrQgn
+	kW49xsFPKp7Q5fcTM+M5nLK6jmA4PbdvJ9hSEe+Ab9p1hPClkiUsshOFv8DcFht/AGCeQ4S
+	BQybBYWzmi7T/E8Cf9rZg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:V2XC0DJNPUc=:wYr8VOkric2qJwCdJXdTqO
+	b4UPRXTx+lwrLyXuPX9OGJLUeWydYwP0qwR4QQ91qo2LaZ4xXnzA9t8BSivt8ZULACjS/eVxg
+	N03/w9HaXoiCMFHfQPK7gf8yHBGHKh/iIbjZ+p59yVQd6PRfP8C1iANCgCRo6C7h960IIqEpY
+	MBT8MKw7aWHk6/9U1QH5CoPIRht+A2xy41DwXolDr3uLFNa/csra1qRNn7w/VeOe4NVzP09L/
+	zMhmQHl/Fk5fv3H54LtFUeY4g0FFTjUzmyFAZVXFD9jXu3JKXNzPCH+foYibg6j6YSGPCHonT
+	o6Vd5m9ul4ps63TNDFF24jP7aeJU+3d5G4iwlSwG9++yL/5Zu8bV/L7hEm9DPwskCo2PTc+R9
+	QiTWzyS9LqftYaM46Jrg3al6IeGanMDnrq1nOnlpc7BwGJZJ1B50Uv5itrDmv+6CKzP3gzzE8
+	YlND0B8i3LAjC+ZVl3H/ea/fWHxcZ9gZFNiiWtSdLRxgIVdqDmFIJXPkMg4jtyBVt7+Q5Wy0I
+	A3Dip66yGvYrc5VgGxmrHfR/kSY3Tuk9kphe9oiw3oXXOrrmkZt+0jhH2LuVJV6N7Zr2E2SDe
+	0qHDsFltAbJ1nMeDTXh6HRmMVdQouregqzh0+jbdWLFzNNZdH2zUeA+R1LVrsUQNotP3gamcZ
+	DPhwpNdWMAc9dTBjaO9qEDNDNleKcGsSdJKh2it/6kc8AhK0cYjj5DTi4bg9qXHMZ5Uhq1xHT
+	ZXw1POp74YUfCIlPEdh2bR2gIo4V/tgBUaTxkqhcdyAxME918Bba05HJ7aM=
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 217.72.192.75
+Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH v4] hw/virtio/virtio-mmio:
+ Convert DPRINTF to trace and log
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -101,100 +79,168 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter
-	Maydell <peter.maydell@linaro.org>, Laurent Vivier <laurent@vivier.eu>,
-	qemu-devel@nongnu.org, qemu-s390x@nongnu.org,
-	Aleksandar Markovic <amarkovic@wavecomp.com>,
-	Philippe =?utf-8?Q?Mathieu-Daud?= =?utf-8?Q?=C3=A9?= <philmd@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, qemu-trivial@nongnu.org,
+	philmd@redhat.com, yuval.shaia@oracle.com, alex.bennee@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On 03/05/2019 17:44, Boxuan Li wrote:
+> Use traces for debug message and qemu_log_mask for errors.
+> 
+> Signed-off-by: Boxuan Li <liboxuan@connect.hku.hk>
+> ---
+> v1: https://patchew.org/QEMU/20190428110258.86681-1-liboxuan@connect.hku.hk/
+> v2: https://patchew.org/QEMU/20190501081039.58938-1-liboxuan@connect.hku.hk/
+> v3: https://patchew.org/QEMU/20190503084654.18413-1-liboxuan@connect.hku.hk/
+> v4: Fix indentation and do not convert uint64_t to int
+> ---
+>   hw/virtio/trace-events  |  7 +++++++
+>   hw/virtio/virtio-mmio.c | 44 +++++++++++++++++++++-----------------------
+>   2 files changed, 28 insertions(+), 23 deletions(-)
+> 
+> diff --git a/hw/virtio/trace-events b/hw/virtio/trace-events
+> index 60c649c4bc..e28ba48da6 100644
+> --- a/hw/virtio/trace-events
+> +++ b/hw/virtio/trace-events
+> @@ -46,3 +46,10 @@ virtio_balloon_handle_output(const char *name, uint64_t gpa) "section name: %s g
+>   virtio_balloon_get_config(uint32_t num_pages, uint32_t actual) "num_pages: %d actual: %d"
+>   virtio_balloon_set_config(uint32_t actual, uint32_t oldactual) "actual: %d oldactual: %d"
+>   virtio_balloon_to_target(uint64_t target, uint32_t num_pages) "balloon target: 0x%"PRIx64" num_pages: %d"
+> +
+> +# virtio-mmio.c
+> +virtio_mmio_read(uint64_t offset) "virtio_mmio_read offset 0x%" PRIx64
+> +virtio_mmio_write_offset(uint64_t offset, uint64_t value) "virtio_mmio_write offset 0x%" PRIx64 " value 0x%" PRIx64
+> +virtio_mmio_guest_page(uint64_t size, int shift) "guest page size 0x%" PRIx64 " shift %d"
+> +virtio_mmio_queue_write(uint64_t value, int max_size) "mmio_queue write 0x%" PRIx64 " max %d"
+> +virtio_mmio_setting_irq(int level) "virtio_mmio setting IRQ %d"
+> diff --git a/hw/virtio/virtio-mmio.c b/hw/virtio/virtio-mmio.c
+> index 5807aa87fe..96c762f0bf 100644
+> --- a/hw/virtio/virtio-mmio.c
+> +++ b/hw/virtio/virtio-mmio.c
+> @@ -27,16 +27,8 @@
+>   #include "sysemu/kvm.h"
+>   #include "hw/virtio/virtio-bus.h"
+>   #include "qemu/error-report.h"
+> -
+> -/* #define DEBUG_VIRTIO_MMIO */
+> -
+> -#ifdef DEBUG_VIRTIO_MMIO
+> -
+> -#define DPRINTF(fmt, ...) \
+> -do { printf("virtio_mmio: " fmt , ## __VA_ARGS__); } while (0)
+> -#else
+> -#define DPRINTF(fmt, ...) do {} while (0)
+> -#endif
+> +#include "qemu/log.h"
+> +#include "trace.h"
+>   
+>   /* QOM macros */
+>   /* virtio-mmio-bus */
+> @@ -107,7 +99,7 @@ static uint64_t virtio_mmio_read(void *opaque, hwaddr offset, unsigned size)
+>       VirtIOMMIOProxy *proxy = (VirtIOMMIOProxy *)opaque;
+>       VirtIODevice *vdev = virtio_bus_get_device(&proxy->bus);
+>   
+> -    DPRINTF("virtio_mmio_read offset 0x%x\n", (int)offset);
+> +    trace_virtio_mmio_read(offset);
+>   
+>       if (!vdev) {
+>           /* If no backend is present, we treat most registers as
+> @@ -144,7 +136,9 @@ static uint64_t virtio_mmio_read(void *opaque, hwaddr offset, unsigned size)
+>           }
+>       }
+>       if (size != 4) {
+> -        DPRINTF("wrong size access to register!\n");
+> +        qemu_log_mask(LOG_GUEST_ERROR,
+> +                      "%s: wrong size access to register!\n",
+> +                      __func__);
+>           return 0;
+>       }
+>       switch (offset) {
+> @@ -182,10 +176,12 @@ static uint64_t virtio_mmio_read(void *opaque, hwaddr offset, unsigned size)
+>       case VIRTIO_MMIO_QUEUE_ALIGN:
+>       case VIRTIO_MMIO_QUEUE_NOTIFY:
+>       case VIRTIO_MMIO_INTERRUPT_ACK:
+> -        DPRINTF("read of write-only register\n");
+> +        qemu_log_mask(LOG_GUEST_ERROR,
+> +                      "%s: read of write-only register\n",
+> +                      __func__);
+>           return 0;
+>       default:
+> -        DPRINTF("bad register offset\n");
+> +        qemu_log_mask(LOG_GUEST_ERROR, "%s: bad register offset\n", __func__);
+>           return 0;
+>       }
+>       return 0;
+> @@ -197,8 +193,7 @@ static void virtio_mmio_write(void *opaque, hwaddr offset, uint64_t value,
+>       VirtIOMMIOProxy *proxy = (VirtIOMMIOProxy *)opaque;
+>       VirtIODevice *vdev = virtio_bus_get_device(&proxy->bus);
+>   
+> -    DPRINTF("virtio_mmio_write offset 0x%x value 0x%" PRIx64 "\n",
+> -            (int)offset, value);
+> +    trace_virtio_mmio_write_offset(offset, value);
+>   
+>       if (!vdev) {
+>           /* If no backend is present, we just make all registers
+> @@ -226,7 +221,9 @@ static void virtio_mmio_write(void *opaque, hwaddr offset, uint64_t value,
+>           return;
+>       }
+>       if (size != 4) {
+> -        DPRINTF("wrong size access to register!\n");
+> +        qemu_log_mask(LOG_GUEST_ERROR,
+> +                      "%s: wrong size access to register!\n",
+> +                      __func__);
+>           return;
+>       }
+>       switch (offset) {
+> @@ -246,8 +243,7 @@ static void virtio_mmio_write(void *opaque, hwaddr offset, uint64_t value,
+>           if (proxy->guest_page_shift > 31) {
+>               proxy->guest_page_shift = 0;
+>           }
+> -        DPRINTF("guest page size %" PRIx64 " shift %d\n", value,
+> -                proxy->guest_page_shift);
+> +        trace_virtio_mmio_guest_page(value, proxy->guest_page_shift);
+>           break;
+>       case VIRTIO_MMIO_QUEUE_SEL:
+>           if (value < VIRTIO_QUEUE_MAX) {
+> @@ -255,7 +251,7 @@ static void virtio_mmio_write(void *opaque, hwaddr offset, uint64_t value,
+>           }
+>           break;
+>       case VIRTIO_MMIO_QUEUE_NUM:
+> -        DPRINTF("mmio_queue write %d max %d\n", (int)value, VIRTQUEUE_MAX_SIZE);
+> +        trace_virtio_mmio_queue_write(value, VIRTQUEUE_MAX_SIZE);
+>           virtio_queue_set_num(vdev, vdev->queue_sel, value);
+>           /* Note: only call this function for legacy devices */
+>           virtio_queue_update_rings(vdev, vdev->queue_sel);
+> @@ -303,11 +299,13 @@ static void virtio_mmio_write(void *opaque, hwaddr offset, uint64_t value,
+>       case VIRTIO_MMIO_DEVICE_FEATURES:
+>       case VIRTIO_MMIO_QUEUE_NUM_MAX:
+>       case VIRTIO_MMIO_INTERRUPT_STATUS:
+> -        DPRINTF("write to readonly register\n");
+> +        qemu_log_mask(LOG_GUEST_ERROR,
+> +                      "%s: write to readonly register\n",
+> +                      __func__);
+>           break;
+>   
+>       default:
+> -        DPRINTF("bad register offset\n");
+> +        qemu_log_mask(LOG_GUEST_ERROR, "%s: bad register offset\n", __func__);
+>       }
+>   }
+>   
+> @@ -327,7 +325,7 @@ static void virtio_mmio_update_irq(DeviceState *opaque, uint16_t vector)
+>           return;
+>       }
+>       level = (atomic_read(&vdev->isr) != 0);
+> -    DPRINTF("virtio_mmio setting IRQ %d\n", level);
+> +    trace_virtio_mmio_setting_irq(level);
+>       qemu_set_irq(proxy->irq, level);
+>   }
+>   
+> 
 
-Cornelia Huck <cohuck@redhat.com> writes:
+Applied to my trivial-patches branch.
 
-> On Wed, 22 May 2019 14:10:39 +0200
-> Laurent Vivier <laurent@vivier.eu> wrote:
->
->> On 22/05/2019 14:07, Cornelia Huck wrote:
->> > On Wed, 22 May 2019 13:47:25 +0200
->> > Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> wrote:
->> >
->> >> On 5/21/19 5:28 PM, Cornelia Huck wrote:
->> >>> commit a188339ca5a396acc588e5851ed7e19f66b0ebd9
->> >>>
->> >>> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
->> >>> ---
->> >> [...]
->> >>>   #define __NR_mq_notify 184
->> >>>   __SC_COMP(__NR_mq_notify, sys_mq_notify, compat_sys_mq_notify)
->> >>>   #define __NR_mq_getsetattr 185
->> >>> @@ -536,8 +567,10 @@ __SC_COMP(__NR_msgsnd, sys_msgsnd, compat_sys_m=
-sgsnd)
->> >>>   __SYSCALL(__NR_semget, sys_semget)
->> >>>   #define __NR_semctl 191
->> >>>   __SC_COMP(__NR_semctl, sys_semctl, compat_sys_semctl)
->> >>> +#if defined(__ARCH_WANT_TIME32_SYSCALLS) || __BITS_PER_LONG !=3D 32
->> >
->> > Eww. It seems only aarch64 sets __ARCH_WANT_TIME32_SYSCALLS, and the
->> > second condition probably catches others but not mipsel.
->> >
->> >>>   #define __NR_semtimedop 192
->> >>> -__SC_COMP(__NR_semtimedop, sys_semtimedop, compat_sys_semtimedop)
->> >>> +__SC_COMP(__NR_semtimedop, sys_semtimedop, sys_semtimedop_time32)
->> >>> +#endif
->> >>>   #define __NR_semop 193
->> >>>   __SYSCALL(__NR_semop, sys_semop)
->> >> [...]
->> >>
->> >> https://app.shippable.com/github/qemu/qemu/runs/1703/summary/console
->> >>
->> >> It seems this commit introduce a regression on mips32:
->> >>
->> >>    CC      mipsel-linux-user/linux-user/syscall.o
->> >> ./linux-user/syscall.c: In function 'safe_semtimedop':
->> >> ./linux-user/syscall.c:697:25: error: '__NR_semtimedop' undeclared
->> >> (first use in this function)
->> >>       return safe_syscall(__NR_##name, arg1, arg2, arg3, arg4); \
->> >
->> > So, we unconditionally deal with this syscall, i.e. we assume it is
->> > always present? (I'm not sure of the logic in linux-user code.)
->> >
->>
->> linux-user assumes it is present if __NR_msgsnd is present.
->
-> Hm. The kernel change seems to break that assumption. Does anyone with
-> mips knowledge have an idea whether that was intentional (and the
-> linux-user code needs to be changed), or whether that's an issue on the
-> kernel side?
-
-Well as far as I understand it the kernel has been introducing new
-individual syscalls across the board for all architectures (and may
-eventually allow kernels to be built without the legacy stuff).
-Meanwhile on the backend some architectures have never had a IPC syscall
-to multiplex these things.
-
-We could do:
-
-modified   linux-user/syscall.c
-@@ -761,7 +761,7 @@ safe_syscall2(int, nanosleep, const struct timespec *, =
-req,
- safe_syscall4(int, clock_nanosleep, const clockid_t, clock, int, flags,
-               const struct timespec *, req, struct timespec *, rem)
- #endif
--#ifdef __NR_msgsnd
-+#ifndef __NR_ipc
- safe_syscall4(int, msgsnd, int, msgid, const void *, msgp, size_t, sz,
-               int, flags)
-
-which would revert to the old behaviour for systems that had the ipc
-multiplexer while still using individual system calls for the systems
-that never had it. Chatting to the kernel devs on IRC also makes me
-wonder if our mapping between the single syscalls and the multiplexer
-might be a bit naive. The IPC_64 flags was mentioned as behaving
-differently on the new individual syscalls but I haven't been able to
-track down exactly what that difference is yet.
-
---
-Alex Benn=C3=A9e
+Thanks,
+Laurent
 
