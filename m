@@ -2,93 +2,87 @@ Return-Path: <SRS0=8zLO=TW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 231A0C282CE
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 15:55:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 565A7C282CE
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 15:56:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DF91620879
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 15:55:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 25DFF20879
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 15:56:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="RE/ZkAjq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DF91620879
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Uiff/gna"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 25DFF20879
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:46583 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:46585 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hTTaa-0002Oo-4M
-	for qemu-devel@archiver.kernel.org; Wed, 22 May 2019 11:55:36 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:48951)
+	id 1hTTax-0002cf-DN
+	for qemu-devel@archiver.kernel.org; Wed, 22 May 2019 11:55:59 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:50440)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hTTNN-0000VY-AA
-	for qemu-devel@nongnu.org; Wed, 22 May 2019 11:41:58 -0400
+	(envelope-from <stefanha@gmail.com>) id 1hTTRg-00040Z-Ek
+	for qemu-devel@nongnu.org; Wed, 22 May 2019 11:46:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hTTNL-000842-Fv
-	for qemu-devel@nongnu.org; Wed, 22 May 2019 11:41:57 -0400
-Received: from mail-vs1-xe34.google.com ([2607:f8b0:4864:20::e34]:39105)
+	(envelope-from <stefanha@gmail.com>) id 1hTTRf-0005NA-H5
+	for qemu-devel@nongnu.org; Wed, 22 May 2019 11:46:24 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:41028)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hTTNJ-0007mB-EQ
-	for qemu-devel@nongnu.org; Wed, 22 May 2019 11:41:55 -0400
-Received: by mail-vs1-xe34.google.com with SMTP id m1so1679397vsr.6
-	for <qemu-devel@nongnu.org>; Wed, 22 May 2019 08:41:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
-	:mime-version:in-reply-to:content-language:content-transfer-encoding;
-	bh=sRQTFPgHxy3uIYJo5ma2IAY1Aj3KCNIC0hUAp3ZFE8k=;
-	b=RE/ZkAjqCR8ZpTAuVAaNlNyvprdclVepeLNu29f0/VcUkEIoFwbSfKhbVP2IfFB+Cg
-	a6ciAddMMOkn0JcgNU16QK3w5SR6VjSqoQaCB+Bfj8OUgbAaRNrduEV719XphK6T+ZfL
-	MI5FWFrKL0p9V0W5rnA/YsP+Kv31i68YmzFMXbp/wzP1W/IWaYLRTH+TXWMJXOTBq3GZ
-	RvIiumd5PhBtj4eqweGO6E2T7WgtpR1w1iA4IBHRsQ6Q0hyVMX0VstjqzY+ZvYCnPYHP
-	RCcNgjhrEN7R5hThaPs/tnZADo/GPbyzvKLaJ/C/MhRh3w6+ae00XqYXvm/r7YsNBvyY
-	POXg==
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>)
+	id 1hTTRf-0005I7-9j; Wed, 22 May 2019 11:46:23 -0400
+Received: by mail-wr1-x444.google.com with SMTP id g12so2849513wro.8;
+	Wed, 22 May 2019 08:46:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+	h=date:from:to:cc:subject:message-id:references:mime-version
+	:content-disposition:in-reply-to:user-agent;
+	bh=V4OTrUDnUFdhkPJIZbmDI/lgnifrNG7tjecGshAcfU0=;
+	b=Uiff/gnaoZ+C6JABOPwEAoKQfME3jB6JEweWwmJb8gW+fpYX6M+D0C4WTdaU1YIrir
+	xDy8pkcR25MWWBozEgvNjtKKXiWHWoXbhs9SR/InPWA3boh2p9UIcnD30gJ3S25ZMGJ5
+	DnPEY/R7MXX4yGCCR6vB/zcpUnSWAqbe1ZPEJprwrhCHyI4Kj+eFH50/1x4GsNhHWpkO
+	0w8251XOV4N8MP1e5VeUMnT68kyINaWgBtwnDGJu3YZTBICwVTBIgb0cz9SZ1nIuPS4N
+	/MjITH79oBqrLltHmkUju04xfd51jeoxnUAaN/CZgg6M7pDH7h5mSmMpJfCZENTPfnrh
+	Zzsg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-	:date:user-agent:mime-version:in-reply-to:content-language
-	:content-transfer-encoding;
-	bh=sRQTFPgHxy3uIYJo5ma2IAY1Aj3KCNIC0hUAp3ZFE8k=;
-	b=KgqdQdgar1RZdKFZx9jEYdaxm+i3cMIX2TrcDbxDp7YjfL4yX2u2ML29+LEss1TQLa
-	7fKBCt08VCe7r01mAFszqu7SrlacrlLGR01dX0VC0PLNto1PkTvLyFJGYx4Gm2qxFBIN
-	udjBZ2Iv15sket02DYlILKfnRAMivRhYR9vfjbe4s1ivCVsdJoxa9K2itqa1T5gc/V9g
-	LoANwUL1SQTgAGlhowT2gB23q95W0Gc/quHkLClxwQM4cv6WHaTGXyp8V8pqWaxroIdh
-	lUf6ZWf/L4uVsw0BI4LLUHL+qX08in1QLPCQWW+bW/8OT/SgkuU+ftkv/dJm8UXqg2GI
-	jKXA==
-X-Gm-Message-State: APjAAAWxfSG87TbYqz7m5lt6alERiQPUl3xSa2gukfAV0FLilyqXJPk9
-	vMQnh/QXy9rPWc5AwBXewi67Ug==
-X-Google-Smtp-Source: APXvYqyBNOUfFROslZr5r/E6fulNNzVkZFTefZzKi2xILGKFmbNKWrX8eA2sIBt04Alr+NCl7zoODA==
-X-Received: by 2002:a67:1485:: with SMTP id 127mr15097942vsu.77.1558539709811; 
-	Wed, 22 May 2019 08:41:49 -0700 (PDT)
-Received: from [192.168.43.94] (ip-173-130-247-24.orldfl.spcsdns.net.
-	[173.130.247.24]) by smtp.gmail.com with ESMTPSA id
-	p75sm4797453vkf.29.2019.05.22.08.41.48
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Wed, 22 May 2019 08:41:49 -0700 (PDT)
-To: G 3 <programmingkidx@gmail.com>
-References: <20190522000617.21945-1-programmingkidx@gmail.com>
-	<b90278ec-ee66-76c6-32b5-d5aca1fb8d24@linaro.org>
-	<CAKyx-3M_zMPBuS3BntUGMd21d7xX_d1KOq_Yc21MVjEp+fZbRQ@mail.gmail.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <e48deeeb-310b-39b1-2396-48b0b81734ce@linaro.org>
-Date: Wed, 22 May 2019 11:41:46 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+	:mime-version:content-disposition:in-reply-to:user-agent;
+	bh=V4OTrUDnUFdhkPJIZbmDI/lgnifrNG7tjecGshAcfU0=;
+	b=p94wyXrsSyhZtDvdNcnEtQzw1xG7x28y9E97DQ3Ipri1+i1VKMgAeH5Dsp5U4A2WgR
+	K6aUQkAVPBWNq+6rGY7M9za2W+vFjvrejYPnXQ1GU1jK/BxtB2cz9+ApPRDE8nTiqrij
+	DXyzWOoU+Lg/FtKmdAI5CfREjIdO+egUuz3VIkHSaBVaAbYdTUVRMDh/RwGLHsT38oOT
+	6PyXeTyxMZuAIHAGGnSE9QZjsGEEWkld5l/ULohjnmrCqYslI6OTsF7e5PTl81bAOeuj
+	T51og0mUBeRl7plEGkO67phFAWyLoJR/XXCiPsWAvmQ7b6PtX002+GIF0D4fl1xJvhhm
+	jA1g==
+X-Gm-Message-State: APjAAAXQeY8KFJ5Jo32aC8518KNTclE6HlseCpoxUMVrKJ2B6qBq2fHp
+	o/dOjcPzmKKUvyHsJaiUa2o=
+X-Google-Smtp-Source: APXvYqwWCkYwKvJyqK3dkXpnZKlJDLJbnwweUok7Ivs78rLg/2F3e8F7AEJu6GLhH7KuXRJ2kVRGMQ==
+X-Received: by 2002:a05:6000:10c4:: with SMTP id
+	b4mr30109691wrx.145.1558539982310; 
+	Wed, 22 May 2019 08:46:22 -0700 (PDT)
+Received: from localhost ([51.15.41.238]) by smtp.gmail.com with ESMTPSA id
+	p17sm8433242wrq.95.2019.05.22.08.46.21
+	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+	Wed, 22 May 2019 08:46:21 -0700 (PDT)
+Date: Wed, 22 May 2019 16:46:20 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+To: Aarushi Mehta <mehta.aaru20@gmail.com>
+Message-ID: <20190522154620.GO27900@stefanha-x1.localdomain>
+References: <20190521235215.31341-1-mehta.aaru20@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <CAKyx-3M_zMPBuS3BntUGMd21d7xX_d1KOq_Yc21MVjEp+fZbRQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="oSMU0HVueUMCAvn0"
+Content-Disposition: inline
+In-Reply-To: <20190521235215.31341-1-mehta.aaru20@gmail.com>
+User-Agent: Mutt/1.11.4 (2019-03-13)
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2607:f8b0:4864:20::e34
-Subject: Re: [Qemu-devel] [PATCH] Implement Fraction Rounded bit in FPSCR
- for PowerPC
+X-Received-From: 2a00:1450:4864:20::444
+Subject: Re: [Qemu-devel] [RFC PATCH 0/9] Add support for io_uring
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -100,24 +94,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: David Gibson <david@gibson.dropbear.id.au>,
-	"qemu-ppc@nongnu.org list:PowerPC" <qemu-ppc@nongnu.org>,
-	qemu-devel qemu-devel <qemu-devel@nongnu.org>,
-	Richard Henderson <rth@twiddle.net>
+Cc: saket.sinha89@gmail.com, Stefan Hajnoczi <stefanha@redhat.com>,
+	Julia Suvorova <jusual@mail.ru>, qemu-devel@nongnu.org,
+	qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/22/19 11:25 AM, G 3 wrote:
-> Thank you for the suggestion.
-> 
-> For the added note, did you want specific places listed? If so please let me
-> know these places.
-> 
 
-They are round_to_int, and all of the legacy roundAndPack* routines.
-Basically anywhere that currently sets float_flag_inexact.
+--oSMU0HVueUMCAvn0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
+On Wed, May 22, 2019 at 05:22:06AM +0530, Aarushi Mehta wrote:
+> This patch series adds supports for the newly developed io_uring Linux AI=
+O interface. Testing it requires a host kernel with it and the liburing lib=
+rary. Use the option -drive aio=3Dio_uring to enable it.
+>=20
+> Aarushi Mehta (9):
+>   qapi/block-core: add option for io_uring
+>   block/block: add BDRV flag for io_uring
+>   include/block: declare interfaces for io_uring
+>   stubs: add aio interface stubs for io_uring
+>   util/asyn: add aio interfaces for io_uring
+>   block/io_uring: implements interfaces for io_uring
+>   blockdev: accept io_uring as option
+>   block/file-posix: extends to use with io_uring
+>   configure: permits use of io_uring with probe
+>=20
+>  block/Makefile.objs     |   2 +
+>  block/file-posix.c      |  63 ++++++-
+>  block/io_uring.c        | 385 ++++++++++++++++++++++++++++++++++++++++
+>  blockdev.c              |   4 +-
+>  configure               |  27 +++
+>  include/block/aio.h     |  16 +-
+>  include/block/block.h   |   1 +
+>  include/block/raw-aio.h |  15 ++
+>  qapi/block-core.json    |   3 +-
+>  stubs/Makefile.objs     |   1 +
+>  stubs/io_uring.c        |  32 ++++
+>  util/async.c            |  32 ++++
+>  12 files changed, 573 insertions(+), 8 deletions(-)
+>  create mode 100644 block/io_uring.c
+>  create mode 100644 stubs/io_uring.c
 
-r~
+Thanks, I've posted my review feedback!  Looking forward to the next
+revision.
+
+--oSMU0HVueUMCAvn0
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAlzlbswACgkQnKSrs4Gr
+c8g2cQf7BSSJ3RgZ299IaRLhqa4fvgEFnjC80uUQoqgMu5y/Jb7WOc7Os/GAg0mJ
+KQkl5mtKm+ah9vDXnYFfZYGehHsFiHZ0kuxzCETYBEXJPrXIzU6R7rZKazuDjZrV
+HxuT6JQc8iaXNh/AkMyyNhrZSVYwugJQPYh/gHHX1AVk7dI6QLGonSQINRrbd1dl
+QDE+8df4Un+pmlsEBjM1skPLfWzV/6YLD6MAdL2IXXUkNDKqjgzxNVPnqhNtJIOK
+PAu+chcgwcvm7RChxFcW9Z3WrcL8t2F+4X6AsVB9s7T7l3KL2UuwSnFMWQvvk59F
+JrmT1EzsEriI0XdUgsnDqVgwMpVgXg==
+=8EoX
+-----END PGP SIGNATURE-----
+
+--oSMU0HVueUMCAvn0--
 
