@@ -2,63 +2,58 @@ Return-Path: <SRS0=8zLO=TW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.7 required=3.0 tests=AC_FROM_MANY_DOTS,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DBA44C282CE
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 16:23:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BD96C282CE
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 16:26:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9AE8920675
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 16:23:25 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="iEEQJf/H"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9AE8920675
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTPS id 228F021473
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 16:26:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 228F021473
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:47465 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:47536 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hTU1U-0005qH-Q4
-	for qemu-devel@archiver.kernel.org; Wed, 22 May 2019 12:23:24 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:33352)
+	id 1hTU47-00078W-8e
+	for qemu-devel@archiver.kernel.org; Wed, 22 May 2019 12:26:07 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:33905)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wens@kernel.org>) id 1hTU0G-00057j-L2
-	for qemu-devel@nongnu.org; Wed, 22 May 2019 12:22:10 -0400
+	(envelope-from <shameerali.kolothum.thodi@huawei.com>)
+	id 1hTU2W-0006EK-Hb
+	for qemu-devel@nongnu.org; Wed, 22 May 2019 12:24:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wens@kernel.org>) id 1hTU0E-0003UA-Q0
-	for qemu-devel@nongnu.org; Wed, 22 May 2019 12:22:08 -0400
-Received: from mail.kernel.org ([198.145.29.99]:53626)
+	(envelope-from <shameerali.kolothum.thodi@huawei.com>)
+	id 1hTU2V-0000cy-6b
+	for qemu-devel@nongnu.org; Wed, 22 May 2019 12:24:28 -0400
+Received: from szxga06-in.huawei.com ([45.249.212.32]:41102 helo=huawei.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wens@kernel.org>) id 1hTU0E-0003CQ-AY
-	for qemu-devel@nongnu.org; Wed, 22 May 2019 12:22:06 -0400
-Received: from wens.tw (mirror2.csie.ntu.edu.tw [140.112.30.76])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPSA id 8881B20868;
-	Wed, 22 May 2019 16:21:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1558542117;
-	bh=fdBrQmcN2kuU+kl2HLtdG9Wh8YdeldGbPV1yQPjOJHE=;
-	h=From:To:Cc:Subject:Date:From;
-	b=iEEQJf/HQKwD4kX3XEd9zVydl01aID+1JBfYcDB56MGX4HCHl8nrhYjAxWVUiFuMQ
-	lFJsYUCAKZbTlss1gsGI5dBHa2bFoX0+XIHiEXbiATZMK25tcim3iqyVMhq+n1Dn88
-	SMtRTlk/0AbKulf24h99b5sFH4uQOUtyWbzd5JvI=
-Received: by wens.tw (Postfix, from userid 1000)
-	id 3EFDD602F9; Thu, 23 May 2019 00:21:55 +0800 (CST)
-From: Chen-Yu Tsai <wens@kernel.org>
-To: qemu-devel@nongnu.org
-Date: Thu, 23 May 2019 00:21:47 +0800
-Message-Id: <20190522162147.26303-1-wens@kernel.org>
-X-Mailer: git-send-email 2.20.1
+	(Exim 4.71) (envelope-from <shameerali.kolothum.thodi@huawei.com>)
+	id 1hTU2R-0007zo-Sw; Wed, 22 May 2019 12:24:24 -0400
+Received: from DGGEMS404-HUB.china.huawei.com (unknown [172.30.72.59])
+	by Forcepoint Email with ESMTP id F2929D413ED8CDFFE42B;
+	Thu, 23 May 2019 00:24:03 +0800 (CST)
+Received: from S00345302A-PC.china.huawei.com (10.202.227.237) by
+	DGGEMS404-HUB.china.huawei.com (10.3.19.204) with Microsoft SMTP Server
+	id 14.3.439.0; Thu, 23 May 2019 00:23:56 +0800
+From: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+To: <qemu-devel@nongnu.org>, <qemu-arm@nongnu.org>, <eric.auger@redhat.com>,
+	<imammedo@redhat.com>
+Date: Wed, 22 May 2019 17:22:44 +0100
+Message-ID: <20190522162252.28568-1-shameerali.kolothum.thodi@huawei.com>
+X-Mailer: git-send-email 2.12.0.windows.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
+X-Originating-IP: [10.202.227.237]
+X-CFilter-Loop: Reflected
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 198.145.29.99
-Subject: [Qemu-devel] [PATCH v3] linux-user: Pass through nanosecond
- timestamp components for stat syscalls
+X-Received-From: 45.249.212.32
+Subject: [Qemu-devel] [PATCH v5 0/8] ARM virt: ACPI memory hotplug support
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -70,341 +65,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Riku Voipio <riku.voipio@iki.fi>, Chen-Yu Tsai <wens@kernel.org>,
-	Laurent Vivier <laurent@vivier.eu>
+Cc: peter.maydell@linaro.org, sameo@linux.intel.com, ard.biesheuvel@linaro.org,
+	linuxarm@huawei.com, xuwei5@hisilicon.com,
+	shannon.zhaosl@gmail.com, sebastien.boeuf@intel.com, lersek@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Chen-Yu Tsai <wens@csie.org>
+This series is an attempt to provide device memory hotplug support 
+on ARM virt platform. This is based on Eric's recent works here[1]
+and carries some of the pc-dimm related patches dropped from his
+series.
 
-Since Linux 2.6 the stat syscalls have mostly supported nanosecond
-components for each of the file-related timestamps.
+The kernel support for arm64 memory hot add was added recently by
+Robin and hence the guest kernel should be => 5.0-rc1.
 
-QEMU user mode emulation currently does not pass through the nanosecond
-portion of the timestamp, even when the host system fills in the value.
-This results in a mismatch when run on subsecond resolution filesystems
-such as ext4 or XFS.
+NVDIM support is not included currently as we still have an unresolved
+issue while hot adding NVDIMM[2]. However NVDIMM cold plug patches
+can be included, but not done for now, for keeping it simple.
 
-An example of this leading to inconsistency is cross-debootstraping a
-full desktop root filesystem of Debian Buster. Recent versions of
-fontconfig store the full timestamp (instead of just the second portion)
-of the directory in its per-directory cache file, and checks this against
-the directory to see if the cache is up-to-date. With QEMU user mode
-emulation, the timestamp stored is incorrect, and upon booting the rootfs
-natively, fontconfig discovers the mismatch, and proceeds to rebuild the
-cache on the comparatively slow machine (low-power ARM vs x86). This
-stalls the first attempt to open whatever application that incorporates
-fontconfig.
+This makes use of GED device to sent hotplug ACPI events to the
+Guest. GED code is based on Nemu. Thanks to the efforts of Samuel and
+Sebastien to add the hardware-reduced support to Nemu using GED
+device[3]. (Please shout if I got the author/signed-off wrong for
+those patches or missed any names).
 
-This patch renames the "unused" padding trailing each timestamp element
-to its nanosecond counterpart name if such an element exists in the
-kernel sources for the given platform. Not all do. Then have the syscall
-wrapper fill in the nanosecond portion if the host supports it, as
-specified by the _POSIX_C_SOURCE and _XOPEN_SOURCE feature macros.
+This is sanity tested on a HiSilicon ARM64 platform and appreciate
+any further testing.
 
-Recent versions of glibc only use stat64 and newfstatat syscalls on
-32-bit and 64-bit platforms respectively. The changes in this patch
-were tested by directly calling the stat, stat64 and newfstatat syscalls
-directly, in addition to the glibc wrapper, on arm and aarch64 little
-endian targets.
+Thanks,
+Shameer
 
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
-Signed-off-by: Chen-Yu Tsai <wens@csie.org>
+[1] https://patchwork.kernel.org/cover/10837565/
+[2] https://patchwork.kernel.org/cover/10783589/
+[3] https://github.com/intel/nemu/blob/topic/virt-x86/hw/acpi/ged.c
+[4] http://lists.infradead.org/pipermail/linux-arm-kernel/2019-May/651763.html
 
----
+v4 --> v5
+-Removed gsi/ged-irq routing in virt.
+-Added Migration support.
+-Dropped support for DT coldplug case based on the discussions
+ here[4]
+-Added system_powerdown support through GED.
 
-Changes since v2:
+v3 --> v4
+Addressed comments from Igor and Eric,
+-Renamed "virt-acpi" to "acpi-ged".
+-Changed ged device parent to TYPE_DEVICE.
+-Introduced DT memory node property "hotpluggable" to resolve device
+ memory being treated as early boot memory issue(patch #7).
+-Combined patches #3 and #9 from v3 into #3.
 
-  - Rename TARGET_STAT_HAS_NSEC to TARGET_STAT_HAVE_NSEC
+v2 --> v3
 
-Changes since v1:
+Addressed comments from Igor and Eric,
+-Made virt acpi device platform independent and moved
+ to hw/acpi/generic_event_device.c
+-Moved ged specific code into hw/acpi/generic_event_device.c
+-Introduced an opt-in feature "fdt" to resolve device-memory being
+ treated as early boot memory.
+-Dropped patch #1 from v2.
 
-  - Define TARGET_STAT_HAS_NSEC for targets that have the *_nsec fields
-    in their struct stat
+RFC --> v2
 
-  - Only copy the *_nsec fields in the stat (not stat64) code path if
-    TARGET_STAT_HAS_NSEC is defined
+-Use GED device instead of GPIO for ACPI hotplug events.
+-Removed NVDIMM support for now.
+-Includes dropped patches from Eric's v9 series.
 
-  - Picked up Reviewed-by from Laurent
+Eric Auger (1):
+  hw/arm/virt: Add memory hotplug framework
 
-As Laurent mentioned, linux-user/syscall_defs.h is indented with tabs,
-so the checkpatch.pl errors can be ignored.
+Samuel Ortiz (2):
+  hw/acpi: Do not create memory hotplug method when handler is not
+    defined
+  hw/acpi: Add ACPI Generic Event Device Support
 
-Original cover letter:
+Shameer Kolothum (5):
+  hw/acpi: Make ACPI IO address space configurable
+  hw/arm/virt: Enable device memory cold/hot plug with ACPI boot
+  hw/arm/virt-acpi-build: Add PC-DIMM in SRAT
+  hw/acpi: Add system power down support to GED
+  hw/arm: Use GED for system_powerdown event
 
-This issue was found while integrating some software that uses newer
-versions of fontconfig into Raspbian images. We found that the first
-launch of said software always stalls with fontconfig regenerating its
-font cache files. Upon closer examination I found the timestamps were
-not matching. The rest is explained above. Currently we're just working
-around the problem by patching the correct timestamps into the cache
-files after the fact.
+ hw/acpi/Kconfig                        |   4 +
+ hw/acpi/Makefile.objs                  |   1 +
+ hw/acpi/generic_event_device.c         | 348 +++++++++++++++++++++++++
+ hw/acpi/memory_hotplug.c               |  35 +--
+ hw/arm/Kconfig                         |   4 +
+ hw/arm/virt-acpi-build.c               |  58 ++---
+ hw/arm/virt.c                          |  88 ++++++-
+ hw/i386/acpi-build.c                   |   3 +-
+ include/hw/acpi/generic_event_device.h | 106 ++++++++
+ include/hw/acpi/memory_hotplug.h       |   9 +-
+ include/hw/arm/virt.h                  |   3 +
+ 11 files changed, 603 insertions(+), 56 deletions(-)
+ create mode 100644 hw/acpi/generic_event_device.c
+ create mode 100644 include/hw/acpi/generic_event_device.h
 
-Please consider this a drive-by scratch-my-own-itch contribution, but I
-will stick around to deal with any comments raised during review. I'm
-not on the mailing lists either, so please keep me in CC.
+-- 
+2.17.1
 
-checkpatch returns "ERROR: code indent should never use tabs" for
-linux-user/syscall_defs.h, however as far as I can tell the whole file
-is indented with tabs. I'm not sure what to make of this.
-
-Finally, I think this could be worth backporting to older versions.
----
- linux-user/syscall.c      | 19 +++++++++++++++
- linux-user/syscall_defs.h | 49 +++++++++++++++++++++++++--------------
- 2 files changed, 50 insertions(+), 18 deletions(-)
-
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index efa3ec2837..c83a3648c9 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -6408,6 +6408,11 @@ static inline abi_long host_to_target_stat64(void =
-*cpu_env,
-         __put_user(host_st->st_atime, &target_st->target_st_atime);
-         __put_user(host_st->st_mtime, &target_st->target_st_mtime);
-         __put_user(host_st->st_ctime, &target_st->target_st_ctime);
-+#if _POSIX_C_SOURCE >=3D 200809L || _XOPEN_SOURCE >=3D 700
-+        __put_user(host_st->st_atim.tv_nsec, &target_st->target_st_atime=
-_nsec);
-+        __put_user(host_st->st_mtim.tv_nsec, &target_st->target_st_mtime=
-_nsec);
-+        __put_user(host_st->st_ctim.tv_nsec, &target_st->target_st_ctime=
-_nsec);
-+#endif
-         unlock_user_struct(target_st, target_addr, 1);
-     } else
- #endif
-@@ -6438,6 +6443,11 @@ static inline abi_long host_to_target_stat64(void =
-*cpu_env,
-         __put_user(host_st->st_atime, &target_st->target_st_atime);
-         __put_user(host_st->st_mtime, &target_st->target_st_mtime);
-         __put_user(host_st->st_ctime, &target_st->target_st_ctime);
-+#if _POSIX_C_SOURCE >=3D 200809L || _XOPEN_SOURCE >=3D 700
-+        __put_user(host_st->st_atim.tv_nsec, &target_st->target_st_atime=
-_nsec);
-+        __put_user(host_st->st_mtim.tv_nsec, &target_st->target_st_mtime=
-_nsec);
-+        __put_user(host_st->st_ctim.tv_nsec, &target_st->target_st_ctime=
-_nsec);
-+#endif
-         unlock_user_struct(target_st, target_addr, 1);
-     }
-=20
-@@ -8866,6 +8876,15 @@ static abi_long do_syscall1(void *cpu_env, int num=
-, abi_long arg1,
-                 __put_user(st.st_atime, &target_st->target_st_atime);
-                 __put_user(st.st_mtime, &target_st->target_st_mtime);
-                 __put_user(st.st_ctime, &target_st->target_st_ctime);
-+#if (_POSIX_C_SOURCE >=3D 200809L || _XOPEN_SOURCE >=3D 700) && \
-+    defined(TARGET_STAT_HAVE_NSEC)
-+                __put_user(st.st_atim.tv_nsec,
-+                           &target_st->target_st_atime_nsec);
-+                __put_user(st.st_mtim.tv_nsec,
-+                           &target_st->target_st_mtime_nsec);
-+                __put_user(st.st_ctim.tv_nsec,
-+                           &target_st->target_st_ctime_nsec);
-+#endif
-                 unlock_user_struct(target_st, arg2, 1);
-             }
-         }
-diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
-index 1f5b2d18db..0223724758 100644
---- a/linux-user/syscall_defs.h
-+++ b/linux-user/syscall_defs.h
-@@ -1179,6 +1179,7 @@ struct target_winsize {
- #if (defined(TARGET_I386) && defined(TARGET_ABI32)) \
-     || (defined(TARGET_ARM) && defined(TARGET_ABI32)) \
-     || defined(TARGET_CRIS)
-+#define TARGET_STAT_HAVE_NSEC
- struct target_stat {
- 	unsigned short st_dev;
- 	unsigned short __pad1;
-@@ -1193,11 +1194,11 @@ struct target_stat {
- 	abi_ulong  st_blksize;
- 	abi_ulong  st_blocks;
- 	abi_ulong  target_st_atime;
--	abi_ulong  __unused1;
-+	abi_ulong  target_st_atime_nsec;
- 	abi_ulong  target_st_mtime;
--	abi_ulong  __unused2;
-+	abi_ulong  target_st_mtime_nsec;
- 	abi_ulong  target_st_ctime;
--	abi_ulong  __unused3;
-+	abi_ulong  target_st_ctime_nsec;
- 	abi_ulong  __unused4;
- 	abi_ulong  __unused5;
- };
-@@ -1229,13 +1230,13 @@ struct target_stat64 {
- 	abi_ulong	__pad4;		/* future possible st_blocks high bits */
-=20
- 	abi_ulong	target_st_atime;
--	abi_ulong	__pad5;
-+	abi_ulong	target_st_atime_nsec;
-=20
- 	abi_ulong	target_st_mtime;
--	abi_ulong	__pad6;
-+	abi_ulong	target_st_mtime_nsec;
-=20
- 	abi_ulong	target_st_ctime;
--	abi_ulong	__pad7;		/* will be high 32 bits of ctime someday */
-+	abi_ulong	target_st_ctime_nsec;
-=20
- 	unsigned long long	st_ino;
- } QEMU_PACKED;
-@@ -1314,19 +1315,20 @@ struct target_stat64 {
- 	unsigned int	st_blocks;
-=20
- 	abi_ulong	target_st_atime;
--	abi_ulong	__unused1;
-+	abi_ulong	target_st_atime_nsec;
-=20
- 	abi_ulong	target_st_mtime;
--	abi_ulong	__unused2;
-+	abi_ulong	target_st_mtime_nsec;
-=20
- 	abi_ulong	target_st_ctime;
--	abi_ulong	__unused3;
-+	abi_ulong	target_st_ctime_nsec;
-=20
- 	abi_ulong	__unused4[3];
- };
-=20
- #elif defined(TARGET_SPARC)
-=20
-+#define TARGET_STAT_HAVE_NSEC
- struct target_stat {
- 	unsigned short	st_dev;
- 	abi_ulong	st_ino;
-@@ -1337,14 +1339,14 @@ struct target_stat {
- 	unsigned short	st_rdev;
- 	abi_long	st_size;
- 	abi_long	target_st_atime;
--	abi_ulong	__unused1;
-+	abi_ulong	target_st_atime_nsec;
- 	abi_long	target_st_mtime;
--	abi_ulong	__unused2;
-+	abi_ulong	target_st_mtime_nsec;
- 	abi_long	target_st_ctime;
--	abi_ulong	__unused3;
-+	abi_ulong	target_st_ctime_nsec;
- 	abi_long	st_blksize;
- 	abi_long	st_blocks;
--	abi_ulong	__unused4[2];
-+	abi_ulong	__unused1[2];
- };
-=20
- #define TARGET_HAS_STRUCT_STAT64
-@@ -1372,20 +1374,21 @@ struct target_stat64 {
- 	unsigned int	st_blocks;
-=20
- 	unsigned int	target_st_atime;
--	unsigned int	__unused1;
-+	unsigned int	target_st_atime_nsec;
-=20
- 	unsigned int	target_st_mtime;
--	unsigned int	__unused2;
-+	unsigned int	target_st_mtime_nsec;
-=20
- 	unsigned int	target_st_ctime;
--	unsigned int	__unused3;
-+	unsigned int	target_st_ctime_nsec;
-=20
--	unsigned int	__unused4;
--	unsigned int	__unused5;
-+	unsigned int	__unused1;
-+	unsigned int	__unused2;
- };
-=20
- #elif defined(TARGET_PPC)
-=20
-+#define TARGET_STAT_HAVE_NSEC
- struct target_stat {
- 	abi_ulong st_dev;
- 	abi_ulong st_ino;
-@@ -1443,6 +1446,7 @@ struct QEMU_PACKED target_stat64 {
-=20
- #elif defined(TARGET_MICROBLAZE)
-=20
-+#define TARGET_STAT_HAVE_NSEC
- struct target_stat {
- 	abi_ulong st_dev;
- 	abi_ulong st_ino;
-@@ -1558,6 +1562,7 @@ struct target_stat64 {
-=20
- #elif defined(TARGET_ABI_MIPSN64)
-=20
-+#define TARGET_STAT_HAVE_NSEC
- /* The memory layout is the same as of struct stat64 of the 32-bit kerne=
-l.  */
- struct target_stat {
- 	unsigned int		st_dev;
-@@ -1597,6 +1602,7 @@ struct target_stat {
-=20
- #elif defined(TARGET_ABI_MIPSN32)
-=20
-+#define TARGET_STAT_HAVE_NSEC
- struct target_stat {
-         abi_ulong    st_dev;
-         abi_ulong    st_pad0[3]; /* Reserved for st_dev expansion */
-@@ -1621,6 +1627,7 @@ struct target_stat {
-=20
- #elif defined(TARGET_ABI_MIPSO32)
-=20
-+#define TARGET_STAT_HAVE_NSEC
- struct target_stat {
- 	unsigned	st_dev;
- 	abi_long	st_pad1[3];		/* Reserved for network id */
-@@ -1737,6 +1744,7 @@ struct target_stat64 {
-=20
- #elif defined(TARGET_SH4)
-=20
-+#define TARGET_STAT_HAVE_NSEC
- struct target_stat {
- 	abi_ulong  st_dev;
- 	abi_ulong  st_ino;
-@@ -1796,6 +1804,7 @@ struct QEMU_PACKED target_stat64 {
- };
-=20
- #elif defined(TARGET_I386) && !defined(TARGET_ABI32)
-+#define TARGET_STAT_HAVE_NSEC
- struct target_stat {
- 	abi_ulong	st_dev;
- 	abi_ulong	st_ino;
-@@ -1841,6 +1850,7 @@ struct target_stat {
-     abi_ulong  __unused[3];
- };
- #elif defined(TARGET_AARCH64)
-+#define TARGET_STAT_HAVE_NSEC
- struct target_stat {
-     abi_ulong  st_dev;
-     abi_ulong  st_ino;
-@@ -1863,6 +1873,7 @@ struct target_stat {
-     unsigned int __unused[2];
- };
- #elif defined(TARGET_XTENSA)
-+#define TARGET_STAT_HAVE_NSEC
- struct target_stat {
-     abi_ulong       st_dev;
-     abi_ulong       st_ino;
-@@ -1912,6 +1923,7 @@ struct target_stat64  {
-=20
- /* These are the asm-generic versions of the stat and stat64 structures =
-*/
-=20
-+#define TARGET_STAT_HAVE_NSEC
- struct target_stat {
-     abi_ulong st_dev;
-     abi_ulong st_ino;
-@@ -1963,6 +1975,7 @@ struct target_stat64 {
-=20
- #elif defined(TARGET_HPPA)
-=20
-+#define TARGET_STAT_HAVE_NSEC
- struct target_stat {
-     abi_uint   st_dev;
-     abi_uint   st_ino;
---=20
-2.20.1
 
 
