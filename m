@@ -2,61 +2,78 @@ Return-Path: <SRS0=8zLO=TW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A09CFC282DC
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 14:51:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1796AC282CE
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 14:52:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6A47020821
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 14:51:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6A47020821
+	by mail.kernel.org (Postfix) with ESMTPS id DCF1320881
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 14:52:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DCF1320881
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:44586 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:44746 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hTSWa-0005dR-99
-	for qemu-devel@archiver.kernel.org; Wed, 22 May 2019 10:47:24 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:57010)
+	id 1hTSbL-0000ik-83
+	for qemu-devel@archiver.kernel.org; Wed, 22 May 2019 10:52:19 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:33515)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hTSQP-0000nk-IZ
-	for qemu-devel@nongnu.org; Wed, 22 May 2019 10:41:02 -0400
+	(envelope-from <philmd@redhat.com>) id 1hTSaU-0000PR-V6
+	for qemu-devel@nongnu.org; Wed, 22 May 2019 10:51:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hTSQN-0006Gz-Jk
-	for qemu-devel@nongnu.org; Wed, 22 May 2019 10:41:01 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40090)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mreitz@redhat.com>)
-	id 1hTSQG-0005zo-6L; Wed, 22 May 2019 10:40:53 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 806DC3004158;
-	Wed, 22 May 2019 14:40:51 +0000 (UTC)
-Received: from localhost (unknown [10.40.205.176])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 8ABC8648B7;
-	Wed, 22 May 2019 14:40:48 +0000 (UTC)
-From: Max Reitz <mreitz@redhat.com>
-To: qemu-block@nongnu.org
-Date: Wed, 22 May 2019 16:40:37 +0200
-Message-Id: <20190522144037.29454-3-mreitz@redhat.com>
-In-Reply-To: <20190522144037.29454-1-mreitz@redhat.com>
-References: <20190522144037.29454-1-mreitz@redhat.com>
+	(envelope-from <philmd@redhat.com>) id 1hTSaT-0006AH-JK
+	for qemu-devel@nongnu.org; Wed, 22 May 2019 10:51:26 -0400
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:41938)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hTSaT-0004Il-AR
+	for qemu-devel@nongnu.org; Wed, 22 May 2019 10:51:25 -0400
+Received: by mail-wr1-f66.google.com with SMTP id g12so2629954wro.8
+	for <qemu-devel@nongnu.org>; Wed, 22 May 2019 07:50:44 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+	:date:user-agent:mime-version:in-reply-to:content-language
+	:content-transfer-encoding;
+	bh=by6dhmjpY2luTaGLOylIF5/4Kh1TMIZnGR9My4Wp+mc=;
+	b=KIfFhsX5R/OuRZ3DqXWcr/3fwH0SMTpsLSnXHZdMJWaBmzmYdXIPzBpmlC8gtXzr8w
+	Cp9ajJg+FsN3kAHh2U1KaZGrmTxOkMJUb6LIrXmQaXGq32SyVeghrPotMubI/bYNBP6s
+	jzacrigR5Wo+JMdzsGs/VYfwW1LqIJmx5ln42moWgDc9cOvrsHySPrMDG6rsMg9N4+ME
+	wM45qSznYiZc175X3vN0f16peAP3FPcw12OzdEUvzB6q0/zFoQmOY6Y/cIDJDITf5EZK
+	IZDPRZHN6ICVuTdCDBSW+amUzA3Ce+YzO81sZX6QC5Tw1XOPurFkcPBniiHc6kpYRgEB
+	G57Q==
+X-Gm-Message-State: APjAAAVDGzfrqQbARAhuVEWlV4SOggTvE8ZgPVqHEaCTl1x6Gk5aNmr2
+	c67mxWbvj4blSkoQkJS0GNP4Yg==
+X-Google-Smtp-Source: APXvYqzcQe5v5YxHI9HX6J2EULCcJhCr6Ge2kZSDGhmkBuj9UjqXVRcI0gP1X1ZEGe/RXM6GJLlTEQ==
+X-Received: by 2002:adf:e44b:: with SMTP id t11mr6193133wrm.151.1558536643489; 
+	Wed, 22 May 2019 07:50:43 -0700 (PDT)
+Received: from [10.201.33.53] ([195.166.127.210])
+	by smtp.gmail.com with ESMTPSA id
+	s10sm21905027wrt.66.2019.05.22.07.50.42
+	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+	Wed, 22 May 2019 07:50:43 -0700 (PDT)
+To: Yoshinori Sato <ysato@users.sourceforge.jp>, qemu-devel@nongnu.org
+References: <20190522142956.41916-1-ysato@users.sourceforge.jp>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+	url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <dd7f9ae2-e7ae-790c-170b-81d127a6222c@redhat.com>
+Date: Wed, 22 May 2019 16:50:41 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.46]);
-	Wed, 22 May 2019 14:40:51 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20190522142956.41916-1-ysato@users.sourceforge.jp>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v2 2/2] iotests: Test cancelling a job and
- closing the VM
+	[fuzzy]
+X-Received-From: 209.85.221.66
+Subject: Re: [Qemu-devel] [PATCH v15 00/12] Add RX archtecture support
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -68,158 +85,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org,
-	Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>
+Cc: peter.maydell@linaro.org, richard.henderson@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This patch adds a test where we cancel a throttled mirror job and
-immediately close the VM before it can be cancelled.  Doing so will
-invoke bdrv_drain_all() while the mirror job tries to drain the
-throttled node.  When bdrv_drain_all_end() tries to lift its drain on
-the throttle node, the job will exit and replace the current root node
-of the BB drive0 (which is the job's filter node) by the throttle node.
-Before the previous patch, this replacement did not increase drive0's
-quiesce_counter by a sufficient amount, so when
-bdrv_parent_drained_end() (invoked by bdrv_do_drained_end(), invoked by
-bdrv_drain_all_end()) tried to end the drain on all of the throttle
-node's parents, it decreased drive0's quiesce_counter below 0 -- which
-fails an assertion.
+Hi Yoshinori,
 
-Signed-off-by: Max Reitz <mreitz@redhat.com>
----
- tests/qemu-iotests/255     | 52 ++++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/255.out | 24 ++++++++++++++++++
- 2 files changed, 76 insertions(+)
+On 5/22/19 4:29 PM, Yoshinori Sato wrote:
+> Hello.
+> This patch series is added Renesas RX target emulation.
+> 
+> Fix is bellow.
+> - Reorder patches.
+> - Rewrite renesas_cmt.
+>   Convert to RCMTChannelStatus
+> - Use CPUClass::tlb_fill
+> - Use tcg_gen_abs_i32
+> - Fix racw instructions.
+> - Cleanup for review comment.
+>   target/rx/helper.c - fix spelling.
+>   hw/intc/rx_icu.h - cleanup constant definition.
+>   hw/registerfields.h - fix macro definion order.
 
-diff --git a/tests/qemu-iotests/255 b/tests/qemu-iotests/255
-index c0bb37a9b0..49433ec122 100755
---- a/tests/qemu-iotests/255
-+++ b/tests/qemu-iotests/255
-@@ -35,6 +35,10 @@ def blockdev_create(vm, options):
-         vm.run_job('job0')
-     iotests.log("")
-=20
-+iotests.log('Finishing a commit job with background reads')
-+iotests.log('=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D'=
-)
-+iotests.log('')
-+
- with iotests.FilePath('t.qcow2') as disk_path, \
-      iotests.FilePath('t.qcow2.mid') as mid_path, \
-      iotests.FilePath('t.qcow2.base') as base_path, \
-@@ -81,3 +85,51 @@ with iotests.FilePath('t.qcow2') as disk_path, \
-                 auto_dismiss=3DTrue)
-=20
-     vm.shutdown()
-+
-+iotests.log('')
-+iotests.log('Closing the VM while a job is being cancelled')
-+iotests.log('=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-')
-+iotests.log('')
-+
-+with iotests.FilePath('src.qcow2') as src_path, \
-+     iotests.FilePath('dst.qcow2') as dst_path, \
-+     iotests.VM() as vm:
-+
-+    iotests.log('=3D=3D=3D Create images and start VM =3D=3D=3D')
-+    iotests.log('')
-+
-+    size =3D 128 * 1024 * 1024
-+    size_str =3D str(size)
-+
-+    iotests.qemu_img_log('create', '-f', iotests.imgfmt, src_path, size_=
-str)
-+    iotests.qemu_img_log('create', '-f', iotests.imgfmt, dst_path, size_=
-str)
-+
-+    iotests.log(iotests.qemu_io('-f', iotests.imgfmt, '-c', 'write 0 1M'=
-,
-+                                src_path),
-+                filters=3D[iotests.filter_test_dir, iotests.filter_qemu_=
-io])
-+
-+    vm.add_object('throttle-group,x-bps-read=3D4096,id=3Dthrottle0')
-+
-+    vm.add_blockdev('file,node-name=3Dsrc-file,filename=3D%s' % (src_pat=
-h))
-+    vm.add_blockdev('%s,node-name=3Dsrc,file=3Dsrc-file' % (iotests.imgf=
-mt))
-+
-+    vm.add_blockdev('file,node-name=3Ddst-file,filename=3D%s' % (dst_pat=
-h))
-+    vm.add_blockdev('%s,node-name=3Ddst,file=3Ddst-file' % (iotests.imgf=
-mt))
-+
-+    vm.add_blockdev('throttle,node-name=3Dsrc-throttled,' +
-+                    'throttle-group=3Dthrottle0,file=3Dsrc')
-+
-+    vm.add_device('virtio-blk,drive=3Dsrc-throttled')
-+
-+    vm.launch()
-+
-+    iotests.log('=3D=3D=3D Start a mirror job =3D=3D=3D')
-+    iotests.log('')
-+
-+    vm.qmp_log('blockdev-mirror', job_id=3D'job0', device=3D'src-throttl=
-ed',
-+                                  target=3D'dst', sync=3D'full')
-+
-+    vm.qmp_log('block-job-cancel', device=3D'job0')
-+    vm.qmp_log('quit')
-+
-+    vm.shutdown()
-diff --git a/tests/qemu-iotests/255.out b/tests/qemu-iotests/255.out
-index 9a2d7cbb77..348909fdef 100644
---- a/tests/qemu-iotests/255.out
-+++ b/tests/qemu-iotests/255.out
-@@ -1,3 +1,6 @@
-+Finishing a commit job with background reads
-+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-+
- =3D=3D=3D Create backing chain and start VM =3D=3D=3D
-=20
- Formatting 'TEST_DIR/PID-t.qcow2.mid', fmt=3Dqcow2 size=3D134217728 clus=
-ter_size=3D65536 lazy_refcounts=3Doff refcount_bits=3D16
-@@ -14,3 +17,24 @@ Formatting 'TEST_DIR/PID-t.qcow2', fmt=3Dqcow2 size=3D=
-134217728 cluster_size=3D65536 l
- {"return": {}}
- {"data": {"id": "job0", "type": "commit"}, "event": "BLOCK_JOB_PENDING",=
- "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
- {"data": {"device": "job0", "len": 134217728, "offset": 134217728, "spee=
-d": 0, "type": "commit"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"=
-microseconds": "USECS", "seconds": "SECS"}}
-+
-+Closing the VM while a job is being cancelled
-+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-+
-+=3D=3D=3D Create images and start VM =3D=3D=3D
-+
-+Formatting 'TEST_DIR/PID-src.qcow2', fmt=3Dqcow2 size=3D134217728 cluste=
-r_size=3D65536 lazy_refcounts=3Doff refcount_bits=3D16
-+
-+Formatting 'TEST_DIR/PID-dst.qcow2', fmt=3Dqcow2 size=3D134217728 cluste=
-r_size=3D65536 lazy_refcounts=3Doff refcount_bits=3D16
-+
-+wrote 1048576/1048576 bytes at offset 0
-+1 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+=3D=3D=3D Start a mirror job =3D=3D=3D
-+
-+{"execute": "blockdev-mirror", "arguments": {"device": "src-throttled", =
-"job-id": "job0", "sync": "full", "target": "dst"}}
-+{"return": {}}
-+{"execute": "block-job-cancel", "arguments": {"device": "job0"}}
-+{"return": {}}
-+{"execute": "quit", "arguments": {}}
-+{"return": {}}
---=20
-2.21.0
+$ git backport-diff -u rx14 -r origin/master..rx15
+Key:
+[----] : patches are identical
+[####] : number of functional differences between upstream/downstream patch
+[down] : patch is downstream-only
+The flags [FC] indicate (F)unctional and (C)ontextual differences,
+respectively
 
+001/12:[----] [--] 'qemu/bitops.h: Add extract8 and extract16'
+002/12:[0008] [FC] 'hw/registerfields.h: Add 8bit and 16bit register macros'
+003/12:[0018] [FC] 'target/rx: TCG translation'
+004/12:[0004] [FC] 'target/rx: TCG helper'
+005/12:[0030] [FC] 'target/rx: CPU definition'
+006/12:[----] [--] 'target/rx: RX disassembler'
+007/12:[0003] [FC] 'hw/intc: RX62N interrupt controller (ICUa)'
+008/12:[0178] [FC] 'hw/timer: RX62N internal timer modules'
+009/12:[----] [--] 'hw/char: RX62N serial communication interface (SCI)'
+010/12:[0004] [FC] 'hw/rx: RX Target hardware definition'
+011/12:[----] [--] 'Add rx-softmmu'
+012/12:[0004] [FC] 'MAINTAINERS: Add RX'
+
+- you removed rx_abs(),
+- one change in trans_RACW()
+- fixed typos (Richard fixe them)
+- LOT of changes in the timer device, you added RCMTChannelState()
+
+Hmm you did reset some of the R-b T-b tags.
+
+
+I guess Richard already prepared a pull request for your v14.
+
+At this point I'd prefer the v14 get merged, and the v15 changes amended
+as new commits. This would ease review/testing.
+
+Maybe Richard can still amend the 'trans_RACW' one-line fix on his pullreq.
+
+Richard what's your take on this?
+
+Regards,
+
+Phil.
+
+> My git repository is bellow.
+> git://git.pf.osdn.net/gitroot/y/ys/ysato/qemu.git tags/rx-20190522
+> 
+> Testing binaries bellow.
+> u-boot
+> Download - https://osdn.net/users/ysato/pf/qemu/dl/u-boot.bin.gz
+> 
+> starting
+> $ gzip -d u-boot.bin.gz
+> $ qemu-system-rx -bios u-boot.bin
+> 
+> linux and pico-root (only sash)
+> Download - https://osdn.net/users/ysato/pf/qemu/dl/zImage (kernel)
+>            https://osdn.net/users/ysato/pf/qemu/dl/rx-qemu.dtb (DeviceTree)
+> 
+> starting
+> $ qemu-system-rx -kernel zImage -dtb rx-qemu.dtb -append "earlycon"
+> 
+> Yoshinori Sato (12):
+>   qemu/bitops.h: Add extract8 and extract16
+>   hw/registerfields.h: Add 8bit and 16bit register macros.
+>   target/rx: TCG translation
+>   target/rx: TCG helper
+>   target/rx: CPU definition
+>   target/rx: RX disassembler
+>   hw/intc: RX62N interrupt controller (ICUa)
+>   hw/timer: RX62N internal timer modules
+>   hw/char: RX62N serial communication interface (SCI)
+>   hw/rx: RX Target hardware definition
+>   Add rx-softmmu
+>   MAINTAINERS: Add RX
 
