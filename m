@@ -4,81 +4,81 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0FCBDC282CE
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 22:37:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D07CC282CE
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 22:39:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A65D720881
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 22:37:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B64F020881
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 22:39:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="kloKS3sr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A65D720881
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="uUBBJxmv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B64F020881
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:52617 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:52631 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hTZrc-0001M0-3i
-	for qemu-devel@archiver.kernel.org; Wed, 22 May 2019 18:37:36 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:49839)
+	id 1hTZt9-0002Ok-1y
+	for qemu-devel@archiver.kernel.org; Wed, 22 May 2019 18:39:11 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:49911)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hTZiz-00035A-OB
-	for qemu-devel@nongnu.org; Wed, 22 May 2019 18:28:42 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hTZj4-00039v-J4
+	for qemu-devel@nongnu.org; Wed, 22 May 2019 18:28:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hTZiv-0007Ni-PV
-	for qemu-devel@nongnu.org; Wed, 22 May 2019 18:28:41 -0400
-Received: from mail-yb1-xb29.google.com ([2607:f8b0:4864:20::b29]:34528)
+	(envelope-from <richard.henderson@linaro.org>) id 1hTZj3-0007RF-FV
+	for qemu-devel@nongnu.org; Wed, 22 May 2019 18:28:46 -0400
+Received: from mail-yw1-xc43.google.com ([2607:f8b0:4864:20::c43]:41249)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hTZis-0007LP-0u
-	for qemu-devel@nongnu.org; Wed, 22 May 2019 18:28:35 -0400
-Received: by mail-yb1-xb29.google.com with SMTP id v78so1508084ybv.1
-	for <qemu-devel@nongnu.org>; Wed, 22 May 2019 15:28:32 -0700 (PDT)
+	id 1hTZiz-0007Mp-Np
+	for qemu-devel@nongnu.org; Wed, 22 May 2019 18:28:43 -0400
+Received: by mail-yw1-xc43.google.com with SMTP id o65so1483056ywd.8
+	for <qemu-devel@nongnu.org>; Wed, 22 May 2019 15:28:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
 	h=from:to:cc:subject:date:message-id:in-reply-to:references;
-	bh=h2THfX9yFXUdDN24lXnYzdU4v3sPNpuvs1LZ+ysU720=;
-	b=kloKS3sr0XYU/InhwH+l7vSipYhfurUNODSj/0nRtWyH1TlryQE6iCEvYC5JN76S4Y
-	QjT5mGLvMh3TVYXXjqhLDYtxxSn6mKoR3LISPBRzRruSxfH+C/wowE0APooPS/T1p8+b
-	5UXNm+DYewk3nq/q36yZtGQaQ1pSeTfwSwZIOSkI0dG13xKFOCmy0tfTqOATpJWmjjlX
-	uyINEgXB6g4fMMremipfHc1Nv7KpfmeYZLTKW4RjC1pNCwq2GzReHvbtF0WDQJHk1FZu
-	dFOqROyRQikAcRQr8N7Txc0/zCM5SovjNqSmfNbZAyb5UjyKvg7Vv2CRN6FZRRGiWk5/
-	jZMg==
+	bh=OLftcOa71o3SDWkHEvzuYmmBM81jvFAhtQKjy7MXc3g=;
+	b=uUBBJxmvsqRHbMy8XSdo6r5vF5HvwD48/t4WfqRF0g2PV7vA2RF2BKGARd+3PLeRAD
+	4JzeUXHypr+jbcec2ca4yxa9VNCu5NrZJSk2IVbYNLTCPi++5yE3D4//d+BrlaSM312+
+	UhdqRWPIH1Rwa1T1OkhEO9t6NLetYVY592p5CCgJPGnnO4hJIXdPXK2SUvM4DwvXLarz
+	fOo8dNksT6NFut81D5N066dGNKvIX0C7XtZrzcjMPj+0/2WcYDb6QLKZUJ+mBKHKjqE/
+	xpSdFH4i9YjNep2b6ZBLIcvaOr4ObusdfgLDPraa3rJiHAKJd3DXrZtgCpRR4Ukfhitc
+	fR2A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
 	:references;
-	bh=h2THfX9yFXUdDN24lXnYzdU4v3sPNpuvs1LZ+ysU720=;
-	b=a6EXEX7z7aeq42POTHslMhf+q4dHvUcm59aM5CdqlHSPVu9ErfE3s8mxxQG4yOyArd
-	+0CBQcsI9xa73XvYx4gfUWyp0FbT7Tm0GOHl9J2+dB9VzHVQB7NnjXyA7DzR1iMb6JUq
-	keyq/uWwoLTizKql1mpysYQ1AkPtnIC4Cy8rJMejbEmWbA0WI/DB7WJ3OxjAYKWrzPLU
-	70SngtjTok6UdlBmuqClEmXOXY8EM4J/Rn0f28NF4zLmtu/5EMSFqPygFOQQTURfSBLp
-	Ev0rIHVDNwLrPloRwsQldmLfRgq+qEZRMAFVq+V6Aed808VRsJx/u/paDTlb1CZJHZiw
-	6afg==
-X-Gm-Message-State: APjAAAVSCwCcvx7M+NhC31uR7ozGQuEBgyJwhPpuO1TycoLN+E15qjHc
-	T2JkoguTL5llmQ2NKz/STIOVtdXeXAw=
-X-Google-Smtp-Source: APXvYqxvl13RNClaE8ll1hnOI0i5FOY7lbvsMvnrdyz07jbKvwpVRKY7AB0WTSkdf9CR7NQ96I3hBg==
-X-Received: by 2002:a25:3302:: with SMTP id z2mr13908073ybz.437.1558564111712; 
-	Wed, 22 May 2019 15:28:31 -0700 (PDT)
+	bh=OLftcOa71o3SDWkHEvzuYmmBM81jvFAhtQKjy7MXc3g=;
+	b=a0aYa6NUUGd0R3UFPkL96JlYEeiyFB3WD/RftvXgX5aD1zj+AMiDBvLtYpikhWmwL9
+	L0RcWWi8UeQ3Tmu1KOx+ixhLGDqwOYaZPJljmgj/1cR7al8aCTDRc/MSTWTmzdZeruli
+	rWCT9NcYKRex5nrii/opib1oGnHbuGhG5yCKl3ei5YgyUzJrNzL/otQ8IBR+I4t8DADn
+	58mL6WtCtX8XBTEgZ8eVP3QZ88bUnCSkqbM/27yrUHrx1V60ROfeHRCxahUzwXN23mzY
+	mfAc5JzSCtqNe2+2YhiHfT6URD4bqO4Z0TTFi+8MGsdRPb0t8/fVJpHF9JSSobLXkWWe
+	hAww==
+X-Gm-Message-State: APjAAAW6la42w027q2Fb1rRNs0/IZITvWh8P6ljNyOGaJxfl1mW3+yWe
+	Dd15Wg7rBbKUkt9+JrKXEg3O5AO0JH4=
+X-Google-Smtp-Source: APXvYqwnVFFk/LIWzXbUfC7yy1mlo6A/35o/Gp3RT3FWqk39mZGfGHgAToBjGJJ09PBp8fJrcpFw6g==
+X-Received: by 2002:a0d:ea4c:: with SMTP id t73mr42896537ywe.472.1558564114807;
+	Wed, 22 May 2019 15:28:34 -0700 (PDT)
 Received: from localhost.localdomain ([71.46.56.17])
-	by smtp.gmail.com with ESMTPSA id q11sm2276453ywg.7.2019.05.22.15.28.30
+	by smtp.gmail.com with ESMTPSA id q11sm2276453ywg.7.2019.05.22.15.28.33
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Wed, 22 May 2019 15:28:31 -0700 (PDT)
+	Wed, 22 May 2019 15:28:34 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Wed, 22 May 2019 18:28:12 -0400
-Message-Id: <20190522222821.23850-8-richard.henderson@linaro.org>
+Date: Wed, 22 May 2019 18:28:15 -0400
+Message-Id: <20190522222821.23850-11-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190522222821.23850-1-richard.henderson@linaro.org>
 References: <20190522222821.23850-1-richard.henderson@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2607:f8b0:4864:20::b29
-Subject: [Qemu-devel] [PULL 07/16] tcg: Add TCG_OPF_NOT_PRESENT if
- TCG_TARGET_HAS_foo is negative
+X-Received-From: 2607:f8b0:4864:20::c43
+Subject: [Qemu-devel] [PULL 10/16] tcg/i386: Use umin/umax in expanding
+ unsigned compare
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -95,35 +95,116 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-If INDEX_op_foo is always expanded by tcg_expand_vec_op, then
-there may be no reasonable set of constraints to return from
-tcg_target_op_def for that opcode.
-
-Let TCG_TARGET_HAS_foo be specified as -1 in that case.  Thus a
-boolean test for TCG_TARGET_HAS_foo is true, but we will not
-assert within process_op_defs when no constraints are specified.
-
-Compare this with tcg_can_emit_vec_op, which already uses this
-tri-state indication.
+Using umin(a, b) == a as an expansion for TCG_COND_LEU is a
+better alternative to (a - INT_MIN) <= (b - INT_MIN).
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- tcg/tcg-opc.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ tcg/i386/tcg-target.inc.c | 80 +++++++++++++++++++++++++++++----------
+ 1 file changed, 61 insertions(+), 19 deletions(-)
 
-diff --git a/tcg/tcg-opc.h b/tcg/tcg-opc.h
-index c7d971fa3d..242d608e6d 100644
---- a/tcg/tcg-opc.h
-+++ b/tcg/tcg-opc.h
-@@ -35,7 +35,7 @@ DEF(call, 0, 0, 3, TCG_OPF_CALL_CLOBBER | TCG_OPF_NOT_PRESENT)
+diff --git a/tcg/i386/tcg-target.inc.c b/tcg/i386/tcg-target.inc.c
+index 569a2c2120..6ec5e60448 100644
+--- a/tcg/i386/tcg-target.inc.c
++++ b/tcg/i386/tcg-target.inc.c
+@@ -3468,28 +3468,61 @@ static bool expand_vec_cmp_noinv(TCGType type, unsigned vece, TCGv_vec v0,
+                                  TCGv_vec v1, TCGv_vec v2, TCGCond cond)
+ {
+     enum {
+-        NEED_SWAP = 1,
+-        NEED_INV  = 2,
+-        NEED_BIAS = 4
+-    };
+-    static const uint8_t fixups[16] = {
+-        [0 ... 15] = -1,
+-        [TCG_COND_EQ] = 0,
+-        [TCG_COND_NE] = NEED_INV,
+-        [TCG_COND_GT] = 0,
+-        [TCG_COND_LT] = NEED_SWAP,
+-        [TCG_COND_LE] = NEED_INV,
+-        [TCG_COND_GE] = NEED_SWAP | NEED_INV,
+-        [TCG_COND_GTU] = NEED_BIAS,
+-        [TCG_COND_LTU] = NEED_BIAS | NEED_SWAP,
+-        [TCG_COND_LEU] = NEED_BIAS | NEED_INV,
+-        [TCG_COND_GEU] = NEED_BIAS | NEED_SWAP | NEED_INV,
++        NEED_INV  = 1,
++        NEED_SWAP = 2,
++        NEED_BIAS = 4,
++        NEED_UMIN = 8,
++        NEED_UMAX = 16,
+     };
+     TCGv_vec t1, t2;
+     uint8_t fixup;
  
- DEF(br, 0, 0, 1, TCG_OPF_BB_END)
+-    fixup = fixups[cond & 15];
+-    tcg_debug_assert(fixup != 0xff);
++    switch (cond) {
++    case TCG_COND_EQ:
++    case TCG_COND_GT:
++        fixup = 0;
++        break;
++    case TCG_COND_NE:
++    case TCG_COND_LE:
++        fixup = NEED_INV;
++        break;
++    case TCG_COND_LT:
++        fixup = NEED_SWAP;
++        break;
++    case TCG_COND_GE:
++        fixup = NEED_SWAP | NEED_INV;
++        break;
++    case TCG_COND_LEU:
++        if (vece <= MO_32) {
++            fixup = NEED_UMIN;
++        } else {
++            fixup = NEED_BIAS | NEED_INV;
++        }
++        break;
++    case TCG_COND_GTU:
++        if (vece <= MO_32) {
++            fixup = NEED_UMIN | NEED_INV;
++        } else {
++            fixup = NEED_BIAS;
++        }
++        break;
++    case TCG_COND_GEU:
++        if (vece <= MO_32) {
++            fixup = NEED_UMAX;
++        } else {
++            fixup = NEED_BIAS | NEED_SWAP | NEED_INV;
++        }
++        break;
++    case TCG_COND_LTU:
++        if (vece <= MO_32) {
++            fixup = NEED_UMAX | NEED_INV;
++        } else {
++            fixup = NEED_BIAS | NEED_SWAP;
++        }
++        break;
++    default:
++        g_assert_not_reached();
++    }
  
--#define IMPL(X) (__builtin_constant_p(X) && !(X) ? TCG_OPF_NOT_PRESENT : 0)
-+#define IMPL(X) (__builtin_constant_p(X) && (X) <= 0 ? TCG_OPF_NOT_PRESENT : 0)
- #if TCG_TARGET_REG_BITS == 32
- # define IMPL64  TCG_OPF_64BIT | TCG_OPF_NOT_PRESENT
- #else
+     if (fixup & NEED_INV) {
+         cond = tcg_invert_cond(cond);
+@@ -3500,7 +3533,16 @@ static bool expand_vec_cmp_noinv(TCGType type, unsigned vece, TCGv_vec v0,
+     }
+ 
+     t1 = t2 = NULL;
+-    if (fixup & NEED_BIAS) {
++    if (fixup & (NEED_UMIN | NEED_UMAX)) {
++        t1 = tcg_temp_new_vec(type);
++        if (fixup & NEED_UMIN) {
++            tcg_gen_umin_vec(vece, t1, v1, v2);
++        } else {
++            tcg_gen_umax_vec(vece, t1, v1, v2);
++        }
++        v2 = t1;
++        cond = TCG_COND_EQ;
++    } else if (fixup & NEED_BIAS) {
+         t1 = tcg_temp_new_vec(type);
+         t2 = tcg_temp_new_vec(type);
+         tcg_gen_dupi_vec(vece, t2, 1ull << ((8 << vece) - 1));
 -- 
 2.17.1
 
