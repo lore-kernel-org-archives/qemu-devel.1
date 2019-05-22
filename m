@@ -2,50 +2,50 @@ Return-Path: <SRS0=8zLO=TW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EFF2BC072B5
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 01:18:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C11B3C072B5
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 01:43:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BF882217D9
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 01:18:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BF882217D9
+	by mail.kernel.org (Postfix) with ESMTPS id 7BB0E2173C
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 01:43:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7BB0E2173C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:33818 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:34037 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hTFtk-0007OB-L6
-	for qemu-devel@archiver.kernel.org; Tue, 21 May 2019 21:18:28 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:49545)
+	id 1hTGI0-0003R4-FV
+	for qemu-devel@archiver.kernel.org; Tue, 21 May 2019 21:43:32 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:52895)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1hTFsJ-0006PR-Rq
-	for qemu-devel@nongnu.org; Tue, 21 May 2019 21:17:00 -0400
+	(envelope-from <eblake@redhat.com>) id 1hTGH1-00035E-8H
+	for qemu-devel@nongnu.org; Tue, 21 May 2019 21:42:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1hTFdt-0007B8-U3
-	for qemu-devel@nongnu.org; Tue, 21 May 2019 21:02:06 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53214)
+	(envelope-from <eblake@redhat.com>) id 1hTGBX-0007f1-9o
+	for qemu-devel@nongnu.org; Tue, 21 May 2019 21:36:52 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60924)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>)
-	id 1hTFds-00079l-MY; Tue, 21 May 2019 21:02:04 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1hTGBX-0007eC-1M
+	for qemu-devel@nongnu.org; Tue, 21 May 2019 21:36:51 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+	[10.5.11.23])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 8DC143082E23;
-	Wed, 22 May 2019 01:02:03 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id F1018859FC;
+	Wed, 22 May 2019 01:36:49 +0000 (UTC)
 Received: from [10.3.116.56] (ovpn-116-56.phx2.redhat.com [10.3.116.56])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 46655226F4;
-	Wed, 22 May 2019 01:02:00 +0000 (UTC)
-To: Aarushi Mehta <mehta.aaru20@gmail.com>, qemu-devel@nongnu.org
-References: <20190521235215.31341-1-mehta.aaru20@gmail.com>
-	<20190521235215.31341-2-mehta.aaru20@gmail.com>
-	<d932237b-03bc-5dbb-17dd-bcca5ce121c8@redhat.com>
-	<1c277edc76e47fbbaae0ecdd6774e24ac9a94ee5.camel@gmail.com>
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id CB0B719744;
+	Wed, 22 May 2019 01:36:43 +0000 (UTC)
+To: Wei Yang <richardw.yang@linux.intel.com>,
+	Markus Armbruster <armbru@redhat.com>
+References: <20190521081227.30799-1-richardw.yang@linux.intel.com>
+	<c184d4f7-686b-d54a-f969-a05ab965028a@redhat.com>
+	<87lfyzrfms.fsf@dusky.pond.sub.org> <20190522005349.GC14030@richard>
 From: Eric Blake <eblake@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=eblake@redhat.com; keydata=
@@ -72,24 +72,24 @@ Autocrypt: addr=eblake@redhat.com; keydata=
 	Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
 	2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
 Organization: Red Hat, Inc.
-Message-ID: <b3cffe45-ffac-b010-189d-b852e632c8d9@redhat.com>
-Date: Tue, 21 May 2019 20:01:59 -0500
+Message-ID: <09538032-9453-9d09-2823-1515005b5516@redhat.com>
+Date: Tue, 21 May 2019 20:36:42 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <1c277edc76e47fbbaae0ecdd6774e24ac9a94ee5.camel@gmail.com>
+In-Reply-To: <20190522005349.GC14030@richard>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="v8FVpQZ3H3f9vjh6lYdplqZllAq7MbfHg"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+	boundary="MIiViPUKb04rXtqIDjgS7SfxCSCo3MucC"
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.46]);
-	Wed, 22 May 2019 01:02:03 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.26]);
+	Wed, 22 May 2019 01:36:50 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
 X-Content-Filtered-By: Mailman/MimeDel 2.1.21
-Subject: Re: [Qemu-devel] [RFC PATCH 1/9] qapi/block-core: add option for
- io_uring
+Subject: Re: [Qemu-devel] [PATCH] Makefile: simplify qapi-py definition with
+ wildcard
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -101,55 +101,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: saket.sinha89@gmail.com, Julia Suvorova <jusual@mail.ru>,
-	Stefan Hajnoczi <stefanha@redhat.com>, qemu-block@nongnu.org
+Cc: berrange@redhat.com, kraxel@redhat.com, alex.bennee@linaro.org,
+	qemu-devel@nongnu.org, philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---v8FVpQZ3H3f9vjh6lYdplqZllAq7MbfHg
+--MIiViPUKb04rXtqIDjgS7SfxCSCo3MucC
 From: Eric Blake <eblake@redhat.com>
-To: Aarushi Mehta <mehta.aaru20@gmail.com>, qemu-devel@nongnu.org
-Cc: saket.sinha89@gmail.com, Julia Suvorova <jusual@mail.ru>,
- qemu-block@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <b3cffe45-ffac-b010-189d-b852e632c8d9@redhat.com>
-Subject: Re: [Qemu-devel] [RFC PATCH 1/9] qapi/block-core: add option for
- io_uring
-References: <20190521235215.31341-1-mehta.aaru20@gmail.com>
- <20190521235215.31341-2-mehta.aaru20@gmail.com>
- <d932237b-03bc-5dbb-17dd-bcca5ce121c8@redhat.com>
- <1c277edc76e47fbbaae0ecdd6774e24ac9a94ee5.camel@gmail.com>
-In-Reply-To: <1c277edc76e47fbbaae0ecdd6774e24ac9a94ee5.camel@gmail.com>
+To: Wei Yang <richardw.yang@linux.intel.com>,
+ Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, alex.bennee@linaro.org, berrange@redhat.com,
+ philmd@redhat.com, kraxel@redhat.com
+Message-ID: <09538032-9453-9d09-2823-1515005b5516@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] Makefile: simplify qapi-py definition with
+ wildcard
+References: <20190521081227.30799-1-richardw.yang@linux.intel.com>
+ <c184d4f7-686b-d54a-f969-a05ab965028a@redhat.com>
+ <87lfyzrfms.fsf@dusky.pond.sub.org> <20190522005349.GC14030@richard>
+In-Reply-To: <20190522005349.GC14030@richard>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 5/21/19 7:51 PM, Aarushi Mehta wrote:
+On 5/21/19 7:53 PM, Wei Yang wrote:
+> On Tue, May 21, 2019 at 05:28:27PM +0200, Markus Armbruster wrote:
+>> Eric Blake <eblake@redhat.com> writes:
+>>
+>>> On 5/21/19 3:12 AM, Wei Yang wrote:
+>>>> All the python script in scripts/qapi is used to generate qapi code.=
+ Use
+>>>> wildcard to simplify it.
+>>>>
+>>>> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
+>>>> ---
+>>>>  Makefile | 8 +-------
+>>>>  1 file changed, 1 insertion(+), 7 deletions(-)
+>>>
+>>> I'm not a fan of $(wildcard). It makes your tarball creation
+>>> non-deterministic - if there is a leftover file from development that=
+ is
+>>> no longer part of the build, wildcard will still pick it up.  Explici=
+t
+>>
+>> Actually, in this case can "only" adds spurious prerequisites.
+>=20
+> Hmm... which spurious prerequisites will be added? I may miss something=
+ here.
 
->>> +# @io_uring:    Use linux io_uring
->>
->> Missing a '(since 4.1)' tag.
->>
->>>  #
->>>  # Since: 2.9
->>>  ##
->>>  { 'enum': 'BlockdevAioOptions',
->>> -  'data': [ 'threads', 'native' ] }
->>> +  'data': [ 'threads', 'native','io_uring' ] }
->>
->> Missing space after ',' (not essential, but matching style is nice).
->> Should the new element be defined conditionally, so that
->> introspection
->> only sees the new enum member when compiled for Linux?
->>
-> I'm not sure what would be the benefits of that? We already check for
-> Linux at configure, and this would reduce readability. We aren't doing
-> this for native.
+If I touch the file scripts/qapi/foo.py, then that becomes a
+prerequisite, and will rebuild my files even though it doesn't need to.
+And if the definition of $(qapi-py) is ever applied to determining which
+files to include in a tarball, then my tarball will include foo.py, even
+though it is not essential to the tarball, while the next person, who
+does not have foo.py lying around in their directory, produces a
+different tarball.  Non-deterministic results are bad, hence our rule of
+thumb to avoid $(wildcard) when listing files in a Makefile.
 
-Look at BlockdevOptionsFile in qapi/block-core.qapi. Telling the QAPI
-generator that something is only available on Linux means that it will
-be obvious to introspection (the QMP command query-qmp-schema) whether
-the feature is present in a particular binary.
+>=20
+>>
+>>> lists are better.  I'm inclined to NACK this, but Markus has final sa=
+y
+>>> since he maintains the qapi generator.
+>>
+>> I consider use of $(wildcard) for the purpose of collecting sources a
+>> lazy mistake.
+
+Which is another polite way of saying that this patch should not be appli=
+ed.
+
+If you WANT to factor things for less typing, you could use something lik=
+e:
+
+var=3Dcommands.py events.py introspect.py types.py visit.py common.py doc=
+=2Epy
+$(addprefix $(SRC_PATH)/scripts/qapi/,$(var))
+
+for some suitably-named var.  Or even factor out the .py suffix as well.
+That doesn't use the problematic $(wildcard), but still lets you get
+away with easier maintenance of adding a new file to the explicit list
+should we add a file in the future.
 
 --=20
 Eric Blake, Principal Software Engineer
@@ -157,22 +188,22 @@ Red Hat, Inc.           +1-919-301-3226
 Virtualization:  qemu.org | libvirt.org
 
 
---v8FVpQZ3H3f9vjh6lYdplqZllAq7MbfHg
+--MIiViPUKb04rXtqIDjgS7SfxCSCo3MucC
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlzkn4cACgkQp6FrSiUn
-Q2oYgAgAnFHzsi/NrlVhSdAVbl5Bzk2faJSupPqAHDM/KtHE8MD6KSDSBbVeDQQE
-wdbzb+pXVoroMxEmJlnLrdB+1IV0jeY7QYLPjvvfPvYqAtuME/H98V7eWlzDinaa
-JA9Yct8P0/49S0zqEVWCjd57S0N+OCIvj3YAt/WIjuPegtLVoOusO98Xcl3c1uCW
-lUtrYm98BYTJ1Y2vlXRI+IfzXuEjp3JCO2ubfD4W7KoBsxiJtmG8MEfBTFTyoxhL
-21OIBuMjuW7CCXw6eIE+zXazKVOjZs4nzNRx/nJDZDbaI5DM/lbuvG0NC2LltOPe
-mEnN0kOf7Escrqh8bj58Qmq9tvS53Q==
-=7BNf
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlzkp6oACgkQp6FrSiUn
+Q2rTBggAjiOTKLnLtyR+RG4UCmcOGlWe0gFjmZbm6WuqMg+6qevm5HVuMvPusItH
+P0gIY5RkpP0WmjsCheQ5rK7KeiWukQT2/M+Q1crAiFXfM50baLJGISU2vB/f2qDT
+53PxvmoQjphk6Dk2NVrC4GSC0ZIEnuoNGPIkPJ0ySfTMDsCPQzqTEvfx5Tx+br7t
+AHOil4sC3D1MI83isZSQCnzkVB+X33HZcnOuYUzR/zXJrfxUYSRGx5vAFnC5gmZX
+MUn579lvr91BIW0iShGUyPtdez7sH02U1n9popHTKuIN+ZdvFEUtfPWFffgpPErR
+sssc1lHpEyZ+Y5YFm25ZZKLVTKTkMg==
+=CX9T
 -----END PGP SIGNATURE-----
 
---v8FVpQZ3H3f9vjh6lYdplqZllAq7MbfHg--
+--MIiViPUKb04rXtqIDjgS7SfxCSCo3MucC--
 
