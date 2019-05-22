@@ -2,89 +2,94 @@ Return-Path: <SRS0=8zLO=TW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42863C282CE
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 10:52:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 690ECC18E7D
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 10:53:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1125B20856
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 10:52:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 343E721479
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 10:53:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Qz8Xj3XU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1125B20856
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Z/l878j1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 343E721479
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:40085 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:40097 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hTOr9-0003Bt-Ay
-	for qemu-devel@archiver.kernel.org; Wed, 22 May 2019 06:52:23 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:59593)
+	id 1hTOse-0003vO-IO
+	for qemu-devel@archiver.kernel.org; Wed, 22 May 2019 06:53:56 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:60529)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1hTOn7-000186-Ok
-	for qemu-devel@nongnu.org; Wed, 22 May 2019 06:48:14 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hTOrg-0003UP-8Z
+	for qemu-devel@nongnu.org; Wed, 22 May 2019 06:52:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1hTOn6-0002Ig-Qy
-	for qemu-devel@nongnu.org; Wed, 22 May 2019 06:48:13 -0400
-Received: from mail-wr1-x430.google.com ([2a00:1450:4864:20::430]:37142)
+	(envelope-from <richard.henderson@linaro.org>) id 1hTOrf-0005Yp-4Z
+	for qemu-devel@nongnu.org; Wed, 22 May 2019 06:52:56 -0400
+Received: from mail-yw1-xc41.google.com ([2607:f8b0:4864:20::c41]:46282)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1hTOn6-0002Hn-Hs
-	for qemu-devel@nongnu.org; Wed, 22 May 2019 06:48:12 -0400
-Received: by mail-wr1-x430.google.com with SMTP id e15so1739142wrs.4
-	for <qemu-devel@nongnu.org>; Wed, 22 May 2019 03:48:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=date:from:to:cc:subject:message-id:references:mime-version
-	:content-disposition:in-reply-to:user-agent;
-	bh=lGShna3XuYd+KBcAzAIqDjRt5KtAM5vXw6vBvhBjCk0=;
-	b=Qz8Xj3XUp7tWG94MwibVwcPR5gywD0MOUi2YK2vMUW7PQohkHPDL2cCuQNQS22AzH4
-	CdSKtCNp10XalbZhAsREYZlfE/XdtaX8qIbPLjY2yXiXSikXY+OBy1LvKmh0DpdoAFdC
-	us9i/c3HBDcJ0W5rNv7nSaBGGjc1xvMKaY14OcngmxxCuQdJJdk4zD+NEtO27tkbGFwn
-	eSAr814BF9i0rbB6wfMaUzJiw7eCuvQx56OetefiLmjcPT6NpsOf50KZ5g4HifddE2d3
-	XnE529cGyoy13HYO49X61pDbuHWUeo7qL5KKOS31Qy1inMxD1romaDONflw3bTY/Onq6
-	MXKw==
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1hTOre-0005Y9-Sr
+	for qemu-devel@nongnu.org; Wed, 22 May 2019 06:52:55 -0400
+Received: by mail-yw1-xc41.google.com with SMTP id a130so646349ywe.13
+	for <qemu-devel@nongnu.org>; Wed, 22 May 2019 03:52:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
+	:mime-version:in-reply-to:content-language:content-transfer-encoding;
+	bh=canbqKu23RF5p9R0mQ+WIbtMxNZxpUGa6JSvUz2EQ5g=;
+	b=Z/l878j1DjP05IxWbKvievwsEioMS66TpJN7i3VYacS1QSbAdfeM2eECqlVWIzALR+
+	oY4qHFMrVmDUYqihn5dSoziNCtNCvO67n9zO+K6Txbpqk1hbmClvsw6s4oValZQLzaZa
+	s979iOJbPI4Iq9pKQXeY9qZ6aSYE11zp9WgM6vv757l5JYzgrHG75WlPe98uvDAVctJP
+	rWfcmDaU/3vpl7xpHy9g+NwM+NtxEANkqV9+mivILSTjGahKifTyWsr6TI9xJCK0NegN
+	aXXP8XMMQsIr8jST7ouavliTtGKFnyJA7Mqm99JRQypIhhdER6OSmxifXcSYA8lckvA5
+	mj6A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-	:mime-version:content-disposition:in-reply-to:user-agent;
-	bh=lGShna3XuYd+KBcAzAIqDjRt5KtAM5vXw6vBvhBjCk0=;
-	b=jxddM+jMbq4CCT+f6Hj98hA54uX7DUiec37e9sQew05V+X3O0+YfK9CinJ9P4ZImZq
-	FARgGzkPLBRMBc9GLj6rv1m9Rq59iPNTmj0QCZ+NnnlFjRlgurGi/VnMVF03bhDyLfA7
-	MwxBKAMN7NfKySTjz8B+lVBv23ZXAoRr/QlM634w8Zy1saMRFCJlQl/6p3RhPWBUmZnT
-	eKB0HClN+05P6vqDrNYq2mijER3UIHP5eNVFeEaM4JXPy/bXZ0bM773AcPlqE0RS1FFv
-	BKHa6EBKKGnilEQ0N/KFY2p7Ukr95rqUBfzqJVlytwJmbXFyqsFBV7klHM5R8XPaxihp
-	WBkQ==
-X-Gm-Message-State: APjAAAXjLVCOzb3lczWaotEW0PG0greJ4K/dtdqxZm6gFvw/eI2V0y4D
-	FgsbO/nk8CFQdxAlT3y3YR4=
-X-Google-Smtp-Source: APXvYqxnOLt/B1s1fnTXW+rApOdQ4QrBRBfUbqENv6TwtJD7/YQ5V3G1pqw+tinQ+BpozTPcvms5bA==
-X-Received: by 2002:adf:9c8a:: with SMTP id d10mr126309wre.9.1558522091611;
-	Wed, 22 May 2019 03:48:11 -0700 (PDT)
-Received: from localhost ([51.15.41.238])
-	by smtp.gmail.com with ESMTPSA id v11sm617828wrr.87.2019.05.22.03.48.10
-	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Wed, 22 May 2019 03:48:10 -0700 (PDT)
-Date: Wed, 22 May 2019 11:48:09 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-To: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20190522104809.GG27900@stefanha-x1.localdomain>
-References: <20190521103650.18479-1-stefanha@redhat.com>
-	<0630a607-9216-6b75-54fa-0a1308f2eff0@redhat.com>
-	<20190521113059.GB4971@linux.fritz.box>
+	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+	:date:user-agent:mime-version:in-reply-to:content-language
+	:content-transfer-encoding;
+	bh=canbqKu23RF5p9R0mQ+WIbtMxNZxpUGa6JSvUz2EQ5g=;
+	b=caO273EMuW49ny660okA4IVOV8bzAWXUuIfjExOn/ZsA9BFA3moE7X/gcrZlKsboR9
+	TRefVX4sBkUfux2tPEHQbA5S5MKa40C09TmmcO+KiPY7jFV7YWffucErQLqu4fUcoX9r
+	GxElKxjo0n5ZWqR+WjL/HD6hibV5D6nmWHtrwLUSK6N8QJU0aGuGVqoHK5zVYQ/UTwoQ
+	4FkXbTG8So8/7QRCFM+C3Dmi7tOuE0tIVi1e6Zk9Scn8rbwy26jAT7GVuC/f7O1NKb++
+	HIcVcKktUt6Ubxr5a3EsVIrSS60WGtijeJEjexq8mqH8y9LoKoq2c45zaG+Z1FIfDJr/
+	UQ6A==
+X-Gm-Message-State: APjAAAXBtRtr6Wu1+C6M0BIGLloYlWCMR/DCzh7qoesgVOPrMkm4sN9/
+	kjcfdB/d4NLjOUTqH4naAkcLFw==
+X-Google-Smtp-Source: APXvYqzfZ7VuthelbykVUes9LerrTnKVjXXQAwTue0XqrkKoY60O84frZR1Ng9d60cf7VPCL1HR75A==
+X-Received: by 2002:a81:a981:: with SMTP id
+	g123mr29442586ywh.440.1558522373472; 
+	Wed, 22 May 2019 03:52:53 -0700 (PDT)
+Received: from [10.243.202.139] ([71.46.56.72])
+	by smtp.gmail.com with ESMTPSA id
+	e6sm6399455ywe.104.2019.05.22.03.52.52
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Wed, 22 May 2019 03:52:52 -0700 (PDT)
+To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
+References: <20190517023924.1686-1-richard.henderson@linaro.org>
+	<20190517023924.1686-3-richard.henderson@linaro.org>
+	<20190521150402.GQ25835@redhat.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Openpgp: preference=signencrypt
+Message-ID: <a928e588-63dc-ed4c-fcdc-9001941559fd@linaro.org>
+Date: Wed, 22 May 2019 06:52:45 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="2NLGdgz3UMHa/lqP"
-Content-Disposition: inline
-In-Reply-To: <20190521113059.GB4971@linux.fritz.box>
-User-Agent: Mutt/1.11.4 (2019-03-13)
+In-Reply-To: <20190521150402.GQ25835@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2a00:1450:4864:20::430
-Subject: Re: [Qemu-devel] [RFC] scsi: restart dma after vm change state
- handlers
+X-Received-From: 2607:f8b0:4864:20::c41
+Subject: Re: [Qemu-devel] [PATCH v8 02/25] build: Link user-only with crypto
+ random number objects
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -96,68 +101,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Paolo Bonzini <pbonzini@redhat.com>,
-	qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
+Cc: lvivier@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On 5/21/19 11:04 AM, Daniel P. Berrangé wrote:
+> On Thu, May 16, 2019 at 07:39:01PM -0700, Richard Henderson wrote:
+>> For user-only, we require only the random number bits of the
+>> crypto subsystem.  Rename crypto-aes-obj-y to crypto-user-obj-y,
+>> and add the random number objects, plus init.o to handle any
+>> extra stuff the crypto library requires.
+> 
+> If you pull in my authz patch first:
+> 
+>   https://lists.gnu.org/archive/html/qemu-devel/2019-05/msg04863.html
+> 
+> then we can just kill crypto-aes-obj-y entirely, and make
+> linux-user reference crypto-obj-y as normal. My patch avoids
+> pulling in PAM, and your previous patch takes care of the
+> static linking problem.
 
---2NLGdgz3UMHa/lqP
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+You would think so, wouldn't you.  And yet, not.
 
-On Tue, May 21, 2019 at 01:30:59PM +0200, Kevin Wolf wrote:
-> Am 21.05.2019 um 13:04 hat Paolo Bonzini geschrieben:
-> > On 21/05/19 12:36, Stefan Hajnoczi wrote:
-> > > This is RFC because I am waiting for a test result on the system where
-> > > the bug was originally discovered.  I'm also open to nicer solutions!
-> >=20
-> > I don't think it's too ugly; IDE is also using a bottom half for this.
->=20
-> I think the IDE case is different, see commit 213189ab65d. The case
-> we're protecting against there is stopping the VM from inside a VM state
-> handler, which can confuse other VM state callbacks that come later. The
-> actual order of the IDE callback vs. the other callback doesn't matter,
-> it's just important that all start callbacks are completed before stop
-> callbacks are called.
->=20
-> In our current case, the problem is not that we're confusing other
-> handlers, but that we rely on another handler to have completed resuming
-> something. If that other handler changes e.g. to use a BH itself, we get
-> an undefined order again.
->=20
-> The clean solution would probably be not to use a VM state handler in
-> scsi-bus, but a callback from the HBA that tells the bus that the HBA is
-> ready to receive requests again.
->=20
-> If we go with the not so clean solution, maybe at least a comment in
-> virtio-scsi would be in order.
+  CC      authz/base.o
+/home/rth/qemu/qemu/authz/base.c:23:10: fatal error: trace.h: No such file or
+directory
+ #include "trace.h"
+          ^~~~~~~~~
+compilation terminated.
 
-I explored this approach originally but found it hard to connect things
-together in an easy-to-understand way.  That's when I abandoned the idea
-and used a BH as a hack, but I find it problematic in the long-term (too
-many things could go wrong and cause a regression).
+We're missing some dependency somewhere, and I have no idea what's missing.
 
-Time for another look at a proper callback for DMA restart...
+This for
 
-Stefan
+../qemu/configure --static --disable-system --disable-tools
 
---2NLGdgz3UMHa/lqP
-Content-Type: application/pgp-signature; name="signature.asc"
+I have a working configuration here in v8.  Can we please leave the bikeshed
+unpainted for the moment and you can adjust the makefiles as you see fit afterward?
 
------BEGIN PGP SIGNATURE-----
+Otherwise, I'll pass the entire series off to you and leave it at that.
 
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAlzlKOkACgkQnKSrs4Gr
-c8jdbQf9HIAgA93DRG351VWIW0t+iGWlmJkABj8ZtaRnjLSwWBjXIgS8CxXEsFvq
-iPszZYVHgy4ixDxcMVH9cBNMlQO7oktYiBBkOosfnfdT/io91sBXHpUBdQmASr/A
-7qm0jkBkIZhBahgyTU27/gsbyEvj1FEk7nGDlK1gM9EzyNVcvPmH7331yH3T3/OY
-ZoUtqYo/Or37E4SPuSWGhR+o5hZ3IubRDsEiKavwTJj5A//F2f/ndhXILAnChB+V
-NYqatdoXfnew4zlcQaBGHjH0QxxFkzGinir6xhVa+LrBrVh/jR9QSf20TdbShQmf
-A8FPnHDE9G7PW/s8R75D2JdrviZiNw==
-=EcS5
------END PGP SIGNATURE-----
 
---2NLGdgz3UMHa/lqP--
+r~
 
