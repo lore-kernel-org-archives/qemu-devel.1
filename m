@@ -2,69 +2,60 @@ Return-Path: <SRS0=8zLO=TW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 76A68C282CE
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 16:32:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6CEC9C282CE
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 16:34:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 501D52081C
-	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 16:32:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 501D52081C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 3B6722081C
+	for <qemu-devel@archiver.kernel.org>; Wed, 22 May 2019 16:34:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3B6722081C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:47635 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:47649 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hTUAD-0003x2-Jr
-	for qemu-devel@archiver.kernel.org; Wed, 22 May 2019 12:32:25 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:34330)
+	id 1hTUBu-0004zG-Do
+	for qemu-devel@archiver.kernel.org; Wed, 22 May 2019 12:34:10 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:34132)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hTU41-0007U7-Ig
-	for qemu-devel@nongnu.org; Wed, 22 May 2019 12:26:02 -0400
+	(envelope-from <shameerali.kolothum.thodi@huawei.com>)
+	id 1hTU3G-0006lP-L9
+	for qemu-devel@nongnu.org; Wed, 22 May 2019 12:25:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hTU3z-0003vU-IG
-	for qemu-devel@nongnu.org; Wed, 22 May 2019 12:26:01 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56874)
+	(envelope-from <shameerali.kolothum.thodi@huawei.com>)
+	id 1hTU3D-0002J2-Ss
+	for qemu-devel@nongnu.org; Wed, 22 May 2019 12:25:14 -0400
+Received: from szxga04-in.huawei.com ([45.249.212.190]:2222 helo=huawei.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>)
-	id 1hTU3r-0002lK-8P; Wed, 22 May 2019 12:25:51 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E2D88300180C;
-	Wed, 22 May 2019 16:25:24 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-28.ams2.redhat.com
-	[10.36.116.28])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 8C69E5DE68;
-	Wed, 22 May 2019 16:25:24 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
-	id 1D1F01138648; Wed, 22 May 2019 18:25:18 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Stefano Garzarella <sgarzare@redhat.com>
-References: <20190427113625.46594-1-sgarzare@redhat.com>
-	<877eb2hiwk.fsf@dusky.pond.sub.org>
-	<20190507083615.as7shlq7fwjgwz54@steredhat>
-	<8736lp5fxg.fsf@dusky.pond.sub.org>
-	<CAGxU2F6r0hKy_Egwf=xfMkFH-3bxL8Yjz3z6GTT0QTrkYoHCDQ@mail.gmail.com>
-Date: Wed, 22 May 2019 18:25:17 +0200
-In-Reply-To: <CAGxU2F6r0hKy_Egwf=xfMkFH-3bxL8Yjz3z6GTT0QTrkYoHCDQ@mail.gmail.com>
-	(Stefano Garzarella's message of "Wed, 22 May 2019 10:57:39 +0200")
-Message-ID: <87woiijw2a.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1 (gnu/linux)
+	(Exim 4.71) (envelope-from <shameerali.kolothum.thodi@huawei.com>)
+	id 1hTU3A-000270-2S; Wed, 22 May 2019 12:25:08 -0400
+Received: from DGGEMS404-HUB.china.huawei.com (unknown [172.30.72.58])
+	by Forcepoint Email with ESMTP id 0CEED676E2640AC55D0D;
+	Thu, 23 May 2019 00:25:03 +0800 (CST)
+Received: from S00345302A-PC.china.huawei.com (10.202.227.237) by
+	DGGEMS404-HUB.china.huawei.com (10.3.19.204) with Microsoft SMTP Server
+	id 14.3.439.0; Thu, 23 May 2019 00:24:24 +0800
+From: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+To: <qemu-devel@nongnu.org>, <qemu-arm@nongnu.org>, <eric.auger@redhat.com>,
+	<imammedo@redhat.com>
+Date: Wed, 22 May 2019 17:22:52 +0100
+Message-ID: <20190522162252.28568-9-shameerali.kolothum.thodi@huawei.com>
+X-Mailer: git-send-email 2.12.0.windows.1
+In-Reply-To: <20190522162252.28568-1-shameerali.kolothum.thodi@huawei.com>
+References: <20190522162252.28568-1-shameerali.kolothum.thodi@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.40]);
-	Wed, 22 May 2019 16:25:24 +0000 (UTC)
+X-Originating-IP: [10.202.227.237]
+X-CFilter-Loop: Reflected
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] Use of PreallocMode in block drivers
+X-Received-From: 45.249.212.190
+Subject: [Qemu-devel] [PATCH v5 8/8] hw/arm: Use GED for system_powerdown
+ event
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -76,125 +67,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu devel list <qemu-devel@nongnu.org>, Qemu-block <qemu-block@nongnu.org>
+Cc: peter.maydell@linaro.org, sameo@linux.intel.com, ard.biesheuvel@linaro.org,
+	linuxarm@huawei.com, xuwei5@hisilicon.com,
+	shannon.zhaosl@gmail.com, sebastien.boeuf@intel.com, lersek@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Stefano Garzarella <sgarzare@redhat.com> writes:
+Use GED for system_powerdown event instead of GPIO for ACPI.
+Guest boot with DT still uses GPIO.
 
-> On Wed, May 8, 2019 at 1:44 PM Markus Armbruster <armbru@redhat.com> wrote:
->>
->> Stefano Garzarella <sgarzare@redhat.com> writes:
->>
->> > On Tue, May 07, 2019 at 08:34:51AM +0200, Markus Armbruster wrote:
-[...]
->> >> Let me review support in drivers:
->> >>
->> >> * file (file-win32.c)
->> >> * iscsi
->> >> * nfs
->> >> * qed
->> >> * ssh
->> >>
->> >>   - Reject all but PREALLOC_MODE_OFF
->> >>
->> >> * copy-on-read
->> >> * luks (crypto.c)
->> >> * raw
->> >>
->> >>   - Pass through only
->> >>
->> >> * file host_cdrom host_device (file-posix.c)
->> >>
->> >>   - Reject all but PREALLOC_MODE_OFF when shrinking and for non-regular
->> >>     files
->> >>   - Reject PREALLOC_MODE_FALLOC unless CONFIG_POSIX_FALLOCATE
->> >>   - Reject PREALLOC_MODE_METADATA
->> >>
->> >> * gluster
->> >>
->> >>   - Reject all but PREALLOC_MODE_OFF when shrinking
->> >>   - Reject PREALLOC_MODE_FALLOC unless CONFIG_GLUSTERFS_FALLOCATE
->> >>   - Reject PREALLOC_MODE_FULL unless CONFIG_GLUSTERFS_ZEROFILL
->> >>   - Reject PREALLOC_MODE_METADATA
->> >>
->> >> * qcow2
->> >>
->> >>   - Reject all but PREALLOC_MODE_OFF when shrinking and with a backing
->> >>     file
->> >>
->> >> * rbd with this patch
->> >>
->> >>   - Reject all but PREALLOC_MODE_OFF when shrinking
->> >>   - Reject PREALLOC_MODE_METADATA and PREALLOC_MODE_FALLOC
->> >>
->> >> * sheepdog
->> >>
->> >>   - Reject PREALLOC_MODE_METADATA and PREALLOC_MODE_FALLOC
->> >>   - Doesn't support shrinking
->> >>
->> >> * vdi
->> >>
->> >>   - Reject PREALLOC_MODE_FALLOC and PREALLOC_MODE_FULL
->> >>   - Doesn't support shrinking
->> >>
->> >> * blkdebug
->> >> * blklogwrites
->> >> * blkverify
->> >> * bochs
->> >> * cloop
->> >> * dmg
->> >> * ftp
->> >> * ftps
->> >> * http
->> >> * https
->> >> * luks
->> >> * nbd
->> >> * null-aio
->> >> * null-co
->> >> * nvme
->> >> * parallels
->> >> * qcow
->> >> * quorum
->> >> * replication
->> >> * throttle
->> >> * vhdx
->> >> * vmdk
->> >> * vpc
->> >> * vvfat
->> >> * vxhs
->> >>
->> >>   - These appear not to use PreallocMode: they don't implement
->> >>     .bdrv_co_truncate(), and either don't implement .bdrv_co_create() or
->> >>     implement it without a prealloc parameter.
->> >>
->> >> Looks good to me.
->> >>
->> >
->> > Thanks for the analysis!
-[...]
->> > If you agree, I can check and update the documentation of all drivers following
->> > your analysis.
->>
->> Yes, please!
->
->
-> Hi Markus,
-> I'm finally updating the documentation of preallocation modes
-> supported by block drivers and protocols in qapi/block-core.json.
-> As sheepdog and vdi I'm adding the supported values for each driver or
-> protocol that supports 'preallocation' parameter during the creation,
-> I'm also updating the '.help' in the QemuOptsList.
->
-> My doubt is: where is better to put the documentation about
-> preallocation modes supported during the resize? (e.g. some drivers
-> support only PREALLOC_MODE_OFF when shrinking)
+Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+---
+ hw/arm/virt-acpi-build.c | 37 +------------------------------------
+ hw/arm/virt.c            |  7 +++----
+ 2 files changed, 4 insertions(+), 40 deletions(-)
 
-As far as I can tell, no driver supports anything but PREALLOC_MODE_OFF
-when shrinking.  Suggest to ignore the shrinking case for now when
-documenting.
+diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+index ed8e0cee3a..f23b276d77 100644
+--- a/hw/arm/virt-acpi-build.c
++++ b/hw/arm/virt-acpi-build.c
+@@ -49,7 +49,6 @@
+ #include "kvm_arm.h"
+ 
+ #define ARM_SPI_BASE 32
+-#define ACPI_POWER_BUTTON_DEVICE "PWRB"
+ 
+ static void acpi_dsdt_add_cpus(Aml *scope, int smp_cpus)
+ {
+@@ -328,37 +327,6 @@ static void acpi_dsdt_add_pci(Aml *scope, const MemMapEntry *memmap,
+     aml_append(scope, dev);
+ }
+ 
+-static void acpi_dsdt_add_gpio(Aml *scope, const MemMapEntry *gpio_memmap,
+-                                           uint32_t gpio_irq)
+-{
+-    Aml *dev = aml_device("GPO0");
+-    aml_append(dev, aml_name_decl("_HID", aml_string("ARMH0061")));
+-    aml_append(dev, aml_name_decl("_ADR", aml_int(0)));
+-    aml_append(dev, aml_name_decl("_UID", aml_int(0)));
+-
+-    Aml *crs = aml_resource_template();
+-    aml_append(crs, aml_memory32_fixed(gpio_memmap->base, gpio_memmap->size,
+-                                       AML_READ_WRITE));
+-    aml_append(crs, aml_interrupt(AML_CONSUMER, AML_LEVEL, AML_ACTIVE_HIGH,
+-                                  AML_EXCLUSIVE, &gpio_irq, 1));
+-    aml_append(dev, aml_name_decl("_CRS", crs));
+-
+-    Aml *aei = aml_resource_template();
+-    /* Pin 3 for power button */
+-    const uint32_t pin_list[1] = {3};
+-    aml_append(aei, aml_gpio_int(AML_CONSUMER, AML_EDGE, AML_ACTIVE_HIGH,
+-                                 AML_EXCLUSIVE, AML_PULL_UP, 0, pin_list, 1,
+-                                 "GPO0", NULL, 0));
+-    aml_append(dev, aml_name_decl("_AEI", aei));
+-
+-    /* _E03 is handle for power button */
+-    Aml *method = aml_method("_E03", 0, AML_NOTSERIALIZED);
+-    aml_append(method, aml_notify(aml_name(ACPI_POWER_BUTTON_DEVICE),
+-                                  aml_int(0x80)));
+-    aml_append(dev, method);
+-    aml_append(scope, dev);
+-}
+-
+ static void acpi_dsdt_add_power_button(Aml *scope)
+ {
+     Aml *dev = aml_device(ACPI_POWER_BUTTON_DEVICE);
+@@ -761,9 +729,8 @@ build_dsdt(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
+                     (irqmap[VIRT_MMIO] + ARM_SPI_BASE), NUM_VIRTIO_TRANSPORTS);
+     acpi_dsdt_add_pci(scope, memmap, (irqmap[VIRT_PCIE] + ARM_SPI_BASE),
+                       vms->highmem, vms->highmem_ecam);
+-    acpi_dsdt_add_gpio(scope, &memmap[VIRT_GPIO],
+-                       (irqmap[VIRT_GPIO] + ARM_SPI_BASE));
+     if (vms->acpi_dev) {
++        acpi_dsdt_add_power_button(scope);
+         build_ged_aml(scope, "\\_SB."GED_DEVICE,
+                       HOTPLUG_HANDLER(vms->acpi_dev),
+                       irqmap[VIRT_ACPI_GED] + ARM_SPI_BASE, AML_SYSTEM_MEMORY);
+@@ -774,8 +741,6 @@ build_dsdt(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
+                                  AML_SYSTEM_MEMORY);
+     }
+ 
+-    acpi_dsdt_add_power_button(scope);
+-
+     aml_append(dsdt, scope);
+ 
+     /* copy AML table into ACPI tables blob and patch header there */
+diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+index 8dfd7537b9..bb83160888 100644
+--- a/hw/arm/virt.c
++++ b/hw/arm/virt.c
+@@ -525,7 +525,7 @@ static inline DeviceState *create_acpi_ged(VirtMachineState *vms, qemu_irq *pic)
+ {
+     DeviceState *dev;
+     int irq = vms->irqmap[VIRT_ACPI_GED];
+-    uint32_t event = ACPI_GED_MEM_HOTPLUG_EVT;
++    uint32_t event = ACPI_GED_MEM_HOTPLUG_EVT | ACPI_GED_PWR_DOWN_EVT;
+ 
+     dev = DEVICE(object_new(TYPE_ACPI_GED));
+     qdev_prop_set_uint64(dev, "memhp-base",
+@@ -1710,12 +1710,11 @@ static void machvirt_init(MachineState *machine)
+ 
+     create_pcie(vms, pic);
+ 
+-    create_gpio(vms, pic);
+-
+     if (aarch64 && firmware_loaded && acpi_enabled) {
+         vms->acpi_dev = create_acpi_ged(vms, pic);
++    } else {
++        create_gpio(vms, pic);
+     }
+-
+     /* Create mmio transports, so the user can create virtio backends
+      * (which will be automatically plugged in to the transports). If
+      * no backend is created the transport will just sit harmlessly idle.
+-- 
+2.17.1
 
-I'm not sure I fully answered your question.  Don't hesitate to ask for
-more advice.
+
 
