@@ -2,79 +2,121 @@ Return-Path: <SRS0=bvyN=TX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 27B5AC282DD
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 12:33:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EEFB4C282DD
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 12:36:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EFBAE20851
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 12:33:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EFBAE20851
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id A02C02177E
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 12:36:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A02C02177E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:35353 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:35430 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hTmuE-0005uI-81
-	for qemu-devel@archiver.kernel.org; Thu, 23 May 2019 08:33:10 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:47456)
+	id 1hTmx1-0007fB-Dr
+	for qemu-devel@archiver.kernel.org; Thu, 23 May 2019 08:36:03 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:48110)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hTmsV-00052e-TJ
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 08:31:24 -0400
+	(envelope-from <david@redhat.com>) id 1hTmvi-0006uu-2N
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 08:34:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hTmsU-0006Z2-UC
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 08:31:23 -0400
-Received: from mout.kundenserver.de ([217.72.192.74]:44441)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>)
-	id 1hTmsS-0006XN-JX; Thu, 23 May 2019 08:31:20 -0400
-Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
-	(mreue106 [213.165.67.119]) with ESMTPSA (Nemesis) id
-	1MAPBF-1hMxEb10wd-00BvOL; Thu, 23 May 2019 14:30:54 +0200
-To: Cornelia Huck <cohuck@redhat.com>,
-	Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-References: <20190521152810.21353-1-cohuck@redhat.com>
-	<20190521152810.21353-3-cohuck@redhat.com>
-	<6e216877-60be-ddcd-3f15-604e870ca8ba@redhat.com>
-	<20190522140729.25970e17.cohuck@redhat.com>
-	<6b101b85-4985-4736-acad-59389b00de55@vivier.eu>
-	<20190522142421.746f7495.cohuck@redhat.com>
-	<CAL1e-=j5joi3ssA-7Q2PVp841ywj41Ntz_MSKdB4w27Z9JvcEQ@mail.gmail.com>
-	<20190523135602.4c80c959.cohuck@redhat.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <e01100bc-50ee-5cc2-2802-a098acc720ac@vivier.eu>
-Date: Thu, 23 May 2019 14:30:52 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
-	Thunderbird/52.8.0
+	(envelope-from <david@redhat.com>) id 1hTmvh-0008Lm-0Q
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 08:34:42 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50406)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <david@redhat.com>)
+	id 1hTmvg-00083e-Q0; Thu, 23 May 2019 08:34:40 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 1FC69C004F42;
+	Thu, 23 May 2019 12:34:14 +0000 (UTC)
+Received: from [10.36.116.197] (ovpn-116-197.ams2.redhat.com [10.36.116.197])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id B93D15D9D2;
+	Thu, 23 May 2019 12:34:12 +0000 (UTC)
+To: Richard Henderson <rth@twiddle.net>,
+	Richard Henderson <richard.henderson@linaro.org>
+References: <20190515203112.506-1-david@redhat.com>
+	<20190515203112.506-2-david@redhat.com>
+	<b3611279-15c4-f9b7-2a91-051ac6431b2c@linaro.org>
+	<44d7ddb4-040f-6778-7439-043b94e354ec@redhat.com>
+	<0935643f-941f-5883-c481-8ac18d57c98d@linaro.org>
+	<1f6001a2-e1d3-2b6f-e84a-8b9963302a3c@redhat.com>
+	<CAFXwXr=YzSuVa9wMKAczhojU+sK5zzPqpWOaJXDLovLNcmkYqg@mail.gmail.com>
+	<db392f3c-2bb2-6e16-ebe8-3175ef7859f4@redhat.com>
+	<9b00d53e-d676-7d19-cab6-7fb7a6715d1e@twiddle.net>
+	<273c1e4f-3216-78aa-508e-b063c0612854@redhat.com>
+	<1c3a49f8-56bd-1577-60a4-7c29ca1c0d83@twiddle.net>
+From: David Hildenbrand <david@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+	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
+	SE+xAvmumFBY
+Organization: Red Hat GmbH
+Message-ID: <8ea05b5e-9d8d-f514-7336-8d7637188009@redhat.com>
+Date: Thu, 23 May 2019 14:34:06 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190523135602.4c80c959.cohuck@redhat.com>
+In-Reply-To: <1c3a49f8-56bd-1577-60a4-7c29ca1c0d83@twiddle.net>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:/F2ewAXnlg7FG7lTpEClw8Og+XDCUuOguY8/VQqSlhBp1mIKb6/
-	9q94af2so6VxvPC5fn6rlOq17Qh8xZ+t/Gu8xjuAY4CncqrqW99RslqO+hV30G1wferOIOC
-	TZGMMrmqu0Wh4Uk9b0s9/tyhTcqjCgjCp9LbRRP7Saa2EazxJvKUegY+ycP/1aj5VnJsJAW
-	ywdzODm29i35DvhVwPWZg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:hpYrWZKCLJY=:deFRc6qTEOE1/0wDIfHJkl
-	0jYqzzY6XsdRS7R/JByUloms36miFji2j+tYl+uGcipRXUwEGh1lRiGPrgCy4tkYJ4OwfvHiQ
-	33kyocOL2yrw+n/1LIZkhUdevDJKufH2H3oCeF9xP+aXVFzR4G2eDsZ2l4ZmbRA5eZnFUUqZC
-	LH/b2Q7iZWv1lBbsVxDoUDiNVRCTFq/spdliZ02iS++SsncvWH8lIQiZjonpcWvjpS1Omk6lf
-	AwcpS23fuZlUGaHOI3DBSXrD63rCNRKCBHSue5SrzgP81/Zln4Tm5+1SctwUyDTlrr7jcJUeg
-	pd1HGFYTNiHLAdqCB6OJ+pn7GiVqBS11fVM9ETgMhlFqfNMDqh3p0+HwaTssUx7TYIQeHsTf0
-	3RFbVPRQy+2ooqi32vHZihTHuCeUDI6jQUv0mdMZ8qCu1B5ntpTJlgHgzxfbhFuL+hY6yyHZF
-	65lFbHzcOYxlTbQIpo11K0RopeBo22vT43VEfttK1F+9Ll4j6F3SWKx6gih7Be+Sq0i5A48cG
-	pY1rhw0cyJWQUiC63c5r370wPnrTBM+moU/XaABJ9z0tqxXQkRFcuELbgkJrprgFK0JC08u7y
-	Os+OdtGY0E2ui+og8iwFrpbX3Hr9Sl3h8cqsjGJrhX1pu5cpskI3xOPyXHJdV5nPS7QL7fkuq
-	MVn4GnW0+dX4SIAWSnXpeOAXb2T1Gleyja5/ZzZz2C+jIPEk2ckMtRzob1qvpwIW9EyUKZtjC
-	BXk6lLbzuPS5xgpQjNYZw3ZOH4IPbNjXHiHERU7baffzGs+/+OcAYJyatYM=
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.32]);
+	Thu, 23 May 2019 12:34:14 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 217.72.192.74
-Subject: Re: [Qemu-devel] [PULL v3 47/55] linux headers: update against
- Linux 5.2-rc1
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v1 1/5] s390x/tcg: Implement VECTOR FIND
+ ANY ELEMENT EQUAL
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -86,82 +128,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
-	=?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
-	qemu-devel@nongnu.org, qemu-s390x@nongnu.org,
-	Aleksandar Markovic <amarkovic@wavecomp.com>,
-	=?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc: Thomas Huth <thuth@redhat.com>, qemu-s390x <qemu-s390x@nongnu.org>,
+	Cornelia Huck <cohuck@redhat.com>,
+	"qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 23/05/2019 13:56, Cornelia Huck wrote:
-> On Wed, 22 May 2019 15:22:23 +0200
-> Aleksandar Markovic <aleksandar.m.mail@gmail.com> wrote:
+On 23.05.19 14:27, Richard Henderson wrote:
+> On 5/23/19 3:50 AM, David Hildenbrand wrote:
+>> /*
+>>  * Returns the number of bits composing one element.
+>>  */
+>> static uint8_t get_element_bits(uint8_t es)
+>> {
+>>     return (1 << es) * BITS_PER_BYTE;
+>> }
+>>
+>> /*
+>>  * Returns the bitmask for a single element.
+>>  */
+>> static uint64_t get_single_element_mask(uint8_t es)
+>> {
+>>     return -1ull >> (64 - get_element_bits(es));
+>> }
+>>
+>> /*
+>>  * Returns the bitmask for a single element (excluding the MSB).
+>>  */
+>> static uint64_t get_single_element_lsbs_mask(uint8_t es)
+>> {
+>>     return -1ull >> (65 - get_element_bits(es));
+>> }
+>>
+>> /*
+>>  * Returns the bitmasks for multiple elements (excluding the MSBs).
+>>  */
+>> static uint64_t get_element_lsbs_mask(uint8_t es)
+>> {
+>>     return dup_const(es, get_single_element_lsbs_mask(es));
+>> }
+>>
+>> static int vfae(void *v1, const void *v2, const void *v3, bool in,
+>>                 bool rt, bool zs, uint8_t es)
+>> {
+>>     const uint64_t mask = get_element_lsbs_mask(es);
+>>     const int bits = get_element_bits(es);
+>>     uint64_t a0, a1, b0, b1, e0, e1, t0, t1, z0, z1;
+>>     uint64_t first_zero = 16;
+>>     uint64_t first_equal;
+>>     int i;
+>>
+>>     a0 = s390_vec_read_element64(v2, 0);
+>>     a1 = s390_vec_read_element64(v2, 1);
+>>     b0 = s390_vec_read_element64(v3, 0);
+>>     b1 = s390_vec_read_element64(v3, 1);
+>>     e0 = 0;
+>>     e1 = 0;
+>>     /* compare against equality with every other element */
+>>     for (i = 0; i < 64; i += bits) {
+>>         t0 = i ? rol64(b0, i) : b0;
+>>         t1 = i ? rol64(b1, i) : b1;
+>>         e0 |= zero_search(a0 ^ t0, mask);
+>>         e0 |= zero_search(a0 ^ t1, mask);
+>>         e1 |= zero_search(a1 ^ t0, mask);
+>>         e1 |= zero_search(a1 ^ t1, mask);
+>>     }
 > 
->> The alternative way of invoking via IPCV6 (else part of “ifdef
->> __NR_MSGSND”) should work for MIPS in the present stage of headers and
->> kernel.
+> I don't see that this is doing what you want.  You're shifting one element of B
+> down, but not broadcasting it so that it is compared against every element of A.
 > 
-> I tried to do that so that we have at least a workaround for now; but
-> this fails building on my x86 laptop (the safe_syscall6 for ipc
-> complains about missing __NR_ipc). Maybe I'm holding it wrong (should
-> that be conditional on the host?), but I think that really needs to be
-> done by the mips maintainers...
+> I'd expect something like
 > 
+> 	t0 = dup_const(es, b0 >> i);
+> 	t1 = dup_const(es, b1 >> i);
+> 
+> (I also don't see what rol is getting you that shift doesn't.)
 
-Perhaps a simple workaround could be:
+Let's assume
 
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index e311fcda0517..5b431736032c 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -761,14 +761,8 @@ safe_syscall2(int, nanosleep, const struct timespec *, req,
- safe_syscall4(int, clock_nanosleep, const clockid_t, clock, int, flags,
-               const struct timespec *, req, struct timespec *, rem)
- #endif
--#ifdef __NR_msgsnd
--safe_syscall4(int, msgsnd, int, msgid, const void *, msgp, size_t, sz,
--              int, flags)
--safe_syscall5(int, msgrcv, int, msgid, void *, msgp, size_t, sz,
--              long, msgtype, int, flags)
--safe_syscall4(int, semtimedop, int, semid, struct sembuf *, tsops,
--              unsigned, nsops, const struct timespec *, timeout)
--#else
-+
-+#ifdef __NR_ipc
- /* This host kernel architecture uses a single ipc syscall; fake up
-  * wrappers for the sub-operations to hide this implementation detail.
-  * Annoyingly we can't include linux/ipc.h to get the constant definitions
-@@ -783,14 +777,30 @@ safe_syscall4(int, semtimedop, int, semid, struct sembuf *, tsops,
- 
- safe_syscall6(int, ipc, int, call, long, first, long, second, long, third,
-               void *, ptr, long, fifth)
-+#endif
-+
-+#ifdef __NR_msgsnd
-+safe_syscall4(int, msgsnd, int, msgid, const void *, msgp, size_t, sz,
-+              int, flags)
-+#else
- static int safe_msgsnd(int msgid, const void *msgp, size_t sz, int flags)
- {
-     return safe_ipc(Q_IPCCALL(0, Q_MSGSND), msgid, sz, flags, (void *)msgp, 0);
- }
-+#endif
-+#ifdef __NR_msgrcv
-+safe_syscall5(int, msgrcv, int, msgid, void *, msgp, size_t, sz,
-+              long, msgtype, int, flags)
-+#else
- static int safe_msgrcv(int msgid, void *msgp, size_t sz, long type, int flags)
- {
-     return safe_ipc(Q_IPCCALL(1, Q_MSGRCV), msgid, sz, flags, msgp, type);
- }
-+#endif
-+#ifdef __NR_semtimedop
-+safe_syscall4(int, semtimedop, int, semid, struct sembuf *, tsops,
-+              unsigned, nsops, const struct timespec *, timeout)
-+#else
- static int safe_semtimedop(int semid, struct sembuf *tsops, unsigned nsops,
-                            const struct timespec *timeout)
- {
+a0 = [0, 1, 2, 3]
+a1 = [4, 5, 6, 7]
+
+b0 = [8, 8, 8, 4]
+b1 = [8, 8, 8, 8]
+
+What I would check is
+
+First iteration
+
+a0 == [8, 8, 8, 4] -> no match
+a0 == [8, 8, 8, 8] -> no match
+a1 == [8, 8, 8, 4] -> no match
+a1 == [8, 8, 8, 8] -> no match
+
+Second iteration
+
+a0 == [8, 8, 4, 8] -> no match
+a0 == [8, 8, 8, 8] -> no match
+a1 == [8, 8, 4, 8]
+a1 == [8, 8, 8, 8] -> no match
+
+...
+
+Last iteration
+
+a0 == [4, 8, 8, 8] -> no match
+a0 == [8, 8, 8, 8] -> no match
+a1 == [4, 8, 8, 8] -> match in first element
+a1 == [8, 8, 8, 8] -> no match
+
+What am i missing?
+
+
+-- 
+
+Thanks,
+
+David / dhildenb
 
