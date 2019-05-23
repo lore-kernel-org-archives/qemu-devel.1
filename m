@@ -6,115 +6,66 @@ X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D0F58C04AAC
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 07:52:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 121F1C04AAC
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 07:53:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8D5482133D
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 07:52:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8D5482133D
+	by mail.kernel.org (Postfix) with ESMTPS id C67E720862
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 07:53:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C67E720862
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:59442 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:59448 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hTiWB-0003cN-9x
-	for qemu-devel@archiver.kernel.org; Thu, 23 May 2019 03:52:03 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:39038)
+	id 1hTiXQ-0004Fk-1F
+	for qemu-devel@archiver.kernel.org; Thu, 23 May 2019 03:53:20 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:39467)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hTiVH-0003I9-Ew
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 03:51:08 -0400
+	(envelope-from <armbru@redhat.com>) id 1hTiWc-0003vd-OK
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 03:52:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hTiVG-0006Zt-B5
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 03:51:07 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44538)
+	(envelope-from <armbru@redhat.com>) id 1hTiWb-0007rq-9C
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 03:52:30 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42340)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>)
-	id 1hTiVG-0006Z9-3y; Thu, 23 May 2019 03:51:06 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
-	[10.5.11.22])
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hTiWa-0007qs-N1
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 03:52:28 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id A0337811BD;
-	Thu, 23 May 2019 07:50:56 +0000 (UTC)
-Received: from [10.36.117.198] (ovpn-117-198.ams2.redhat.com [10.36.117.198])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 232891001F41;
-	Thu, 23 May 2019 07:50:54 +0000 (UTC)
-To: Richard Henderson <rth@twiddle.net>,
-	Richard Henderson <richard.henderson@linaro.org>
-References: <20190515203112.506-1-david@redhat.com>
-	<20190515203112.506-2-david@redhat.com>
-	<b3611279-15c4-f9b7-2a91-051ac6431b2c@linaro.org>
-	<44d7ddb4-040f-6778-7439-043b94e354ec@redhat.com>
-	<0935643f-941f-5883-c481-8ac18d57c98d@linaro.org>
-	<1f6001a2-e1d3-2b6f-e84a-8b9963302a3c@redhat.com>
-	<CAFXwXr=YzSuVa9wMKAczhojU+sK5zzPqpWOaJXDLovLNcmkYqg@mail.gmail.com>
-	<db392f3c-2bb2-6e16-ebe8-3175ef7859f4@redhat.com>
-	<9b00d53e-d676-7d19-cab6-7fb7a6715d1e@twiddle.net>
-From: David Hildenbrand <david@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
-	xsFNBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
-	dBrn+lhhOYjjNefFQou6478faXE6o2AhmebqT4KiQoUQFV4R7y1KMEKoSyy8hQaK1umALTdL
-	QZLQMzNE74ap+GDK0wnacPQFpcG1AE9RMq3aeErY5tujekBS32jfC/7AnH7I0v1v1TbbK3Gp
-	XNeiN4QroO+5qaSr0ID2sz5jtBLRb15RMre27E1ImpaIv2Jw8NJgW0k/D1RyKCwaTsgRdwuK
-	Kx/Y91XuSBdz0uOyU/S8kM1+ag0wvsGlpBVxRR/xw/E8M7TEwuCZQArqqTCmkG6HGcXFT0V9
-	PXFNNgV5jXMQRwU0O/ztJIQqsE5LsUomE//bLwzj9IVsaQpKDqW6TAPjcdBDPLHvriq7kGjt
-	WhVhdl0qEYB8lkBEU7V2Yb+SYhmhpDrti9Fq1EsmhiHSkxJcGREoMK/63r9WLZYI3+4W2rAc
-	UucZa4OT27U5ZISjNg3Ev0rxU5UH2/pT4wJCfxwocmqaRr6UYmrtZmND89X0KigoFD/XSeVv
-	jwBRNjPAubK9/k5NoRrYqztM9W6sJqrH8+UWZ1Idd/DdmogJh0gNC0+N42Za9yBRURfIdKSb
-	B3JfpUqcWwE7vUaYrHG1nw54pLUoPG6sAA7Mehl3nd4pZUALHwARAQABzSREYXZpZCBIaWxk
-	ZW5icmFuZCA8ZGF2aWRAcmVkaGF0LmNvbT7CwX4EEwECACgFAljj9eoCGwMFCQlmAYAGCwkI
-	BwMCBhUIAgkKCwQWAgMBAh4BAheAAAoJEE3eEPcA/4Na5IIP/3T/FIQMxIfNzZshIq687qgG
-	8UbspuE/YSUDdv7r5szYTK6KPTlqN8NAcSfheywbuYD9A4ZeSBWD3/NAVUdrCaRP2IvFyELj
-	xoMvfJccbq45BxzgEspg/bVahNbyuBpLBVjVWwRtFCUEXkyazksSv8pdTMAs9IucChvFmmq3
-	jJ2vlaz9lYt/lxN246fIVceckPMiUveimngvXZw21VOAhfQ+/sofXF8JCFv2mFcBDoa7eYob
-	s0FLpmqFaeNRHAlzMWgSsP80qx5nWWEvRLdKWi533N2vC/EyunN3HcBwVrXH4hxRBMco3jvM
-	m8VKLKao9wKj82qSivUnkPIwsAGNPdFoPbgghCQiBjBe6A75Z2xHFrzo7t1jg7nQfIyNC7ez
-	MZBJ59sqA9EDMEJPlLNIeJmqslXPjmMFnE7Mby/+335WJYDulsRybN+W5rLT5aMvhC6x6POK
-	z55fMNKrMASCzBJum2Fwjf/VnuGRYkhKCqqZ8gJ3OvmR50tInDV2jZ1DQgc3i550T5JDpToh
-	dPBxZocIhzg+MBSRDXcJmHOx/7nQm3iQ6iLuwmXsRC6f5FbFefk9EjuTKcLMvBsEx+2DEx0E
-	UnmJ4hVg7u1PQ+2Oy+Lh/opK/BDiqlQ8Pz2jiXv5xkECvr/3Sv59hlOCZMOaiLTTjtOIU7Tq
-	7ut6OL64oAq+zsFNBFXLn5EBEADn1959INH2cwYJv0tsxf5MUCghCj/CA/lc/LMthqQ773ga
-	uB9mN+F1rE9cyyXb6jyOGn+GUjMbnq1o121Vm0+neKHUCBtHyseBfDXHA6m4B3mUTWo13nid
-	0e4AM71r0DS8+KYh6zvweLX/LL5kQS9GQeT+QNroXcC1NzWbitts6TZ+IrPOwT1hfB4WNC+X
-	2n4AzDqp3+ILiVST2DT4VBc11Gz6jijpC/KI5Al8ZDhRwG47LUiuQmt3yqrmN63V9wzaPhC+
-	xbwIsNZlLUvuRnmBPkTJwwrFRZvwu5GPHNndBjVpAfaSTOfppyKBTccu2AXJXWAE1Xjh6GOC
-	8mlFjZwLxWFqdPHR1n2aPVgoiTLk34LR/bXO+e0GpzFXT7enwyvFFFyAS0Nk1q/7EChPcbRb
-	hJqEBpRNZemxmg55zC3GLvgLKd5A09MOM2BrMea+l0FUR+PuTenh2YmnmLRTro6eZ/qYwWkC
-	u8FFIw4pT0OUDMyLgi+GI1aMpVogTZJ70FgV0pUAlpmrzk/bLbRkF3TwgucpyPtcpmQtTkWS
-	gDS50QG9DR/1As3LLLcNkwJBZzBG6PWbvcOyrwMQUF1nl4SSPV0LLH63+BrrHasfJzxKXzqg
-	rW28CTAE2x8qi7e/6M/+XXhrsMYG+uaViM7n2je3qKe7ofum3s4vq7oFCPsOgwARAQABwsFl
-	BBgBAgAPBQJVy5+RAhsMBQkJZgGAAAoJEE3eEPcA/4NagOsP/jPoIBb/iXVbM+fmSHOjEshl
-	KMwEl/m5iLj3iHnHPVLBUWrXPdS7iQijJA/VLxjnFknhaS60hkUNWexDMxVVP/6lbOrs4bDZ
-	NEWDMktAeqJaFtxackPszlcpRVkAs6Msn9tu8hlvB517pyUgvuD7ZS9gGOMmYwFQDyytpepo
-	YApVV00P0u3AaE0Cj/o71STqGJKZxcVhPaZ+LR+UCBZOyKfEyq+ZN311VpOJZ1IvTExf+S/5
-	lqnciDtbO3I4Wq0ArLX1gs1q1XlXLaVaA3yVqeC8E7kOchDNinD3hJS4OX0e1gdsx/e6COvy
-	qNg5aL5n0Kl4fcVqM0LdIhsubVs4eiNCa5XMSYpXmVi3HAuFyg9dN+x8thSwI836FoMASwOl
-	C7tHsTjnSGufB+D7F7ZBT61BffNBBIm1KdMxcxqLUVXpBQHHlGkbwI+3Ye+nE6HmZH7IwLwV
-	W+Ajl7oYF+jeKaH4DZFtgLYGLtZ1LDwKPjX7VAsa4Yx7S5+EBAaZGxK510MjIx6SGrZWBrrV
-	TEvdV00F2MnQoeXKzD7O4WFbL55hhyGgfWTHwZ457iN9SgYi1JLPqWkZB0JRXIEtjd4JEQcx
-	+8Umfre0Xt4713VxMygW0PnQt5aSQdMD58jHFxTk092mU+yIHj5LeYgvwSgZN4airXk5yRXl
-	SE+xAvmumFBY
-Organization: Red Hat GmbH
-Message-ID: <273c1e4f-3216-78aa-508e-b063c0612854@redhat.com>
-Date: Thu, 23 May 2019 09:50:54 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	by mx1.redhat.com (Postfix) with ESMTPS id DED883179165;
+	Thu, 23 May 2019 07:52:27 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-28.ams2.redhat.com
+	[10.36.116.28])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id D3E5867651;
+	Thu, 23 May 2019 07:52:22 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+	id 68BE81138648; Thu, 23 May 2019 09:52:21 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>
+References: <20190409161009.6322-1-marcandre.lureau@redhat.com>
+	<87sgt7sxhy.fsf@dusky.pond.sub.org>
+	<CAJ+F1CJ6hpQZf6199_-rAW98HwEssNT_kXBJF9he9NZFvWaGPA@mail.gmail.com>
+Date: Thu, 23 May 2019 09:52:21 +0200
+In-Reply-To: <CAJ+F1CJ6hpQZf6199_-rAW98HwEssNT_kXBJF9he9NZFvWaGPA@mail.gmail.com>
+	(=?utf-8?Q?=22Marc-Andr=C3=A9?= Lureau"'s message of "Tue, 21 May 2019
+	16:50:38 +0200")
+Message-ID: <87tvdlhakq.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1 (gnu/linux)
 MIME-Version: 1.0
-In-Reply-To: <9b00d53e-d676-7d19-cab6-7fb7a6715d1e@twiddle.net>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Content-Transfer-Encoding: quoted-printable
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.26]);
-	Thu, 23 May 2019 07:51:02 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.41]);
+	Thu, 23 May 2019 07:52:27 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v1 1/5] s390x/tcg: Implement VECTOR FIND
- ANY ELEMENT EQUAL
+Subject: Re: [Qemu-devel] [PATCH v4 00/20] monitor: add asynchronous command
+ type
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -126,150 +77,195 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, qemu-s390x <qemu-s390x@nongnu.org>,
-	Cornelia Huck <cohuck@redhat.com>,
-	"qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>,
+	QEMU <qemu-devel@nongnu.org>,
+	"Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+	Gerd Hoffmann <kraxel@redhat.com>, John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 22.05.19 20:46, Richard Henderson wrote:
-> On 5/22/19 2:16 PM, David Hildenbrand wrote:
->> On 22.05.19 17:59, Richard Henderson wrote:
->>> On Wed, 22 May 2019 at 07:16, David Hildenbrand <david@redhat.com> wrote:
->>>>> Also plausible.  I guess it would be good to know, anyway.
->>>>
->>>> I'll dump the parameters when booting Linux. My gut feeling is that the
->>>> cc option is basically never used ...
->>>
->>> It looks like our intuition is wrong about that.
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> writes:
+
+> Hi
+>
+> On Tue, May 21, 2019 at 4:18 PM Markus Armbruster <armbru@redhat.com> wro=
+te:
 >>
->> Thanks for checking!
+>> Marc-Andr=C3=A9, before you invest your time to answer my questions belo=
+w: my
+>> bandwidth for non-trivial QAPI features like this one is painfully
+>> limited.  To get your QAPI conditionals in, I had to postpone other QAPI
+>> projects.  I don't regret doing that, I'm rather pleased with how QAPI
+>> conditionals turned out.  But I can't keep postponing all other QAPI
+>> projects.  Because of that, this one will be slow going, at best.  Sorry
+>> about that.
+>
+> We have different priorities, fair enough.
+
+I wish I could give you better service.  But no use pretending.
+
+>> Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
 >>
->>>
->>> rth@cloudburst:~/glibc/src/sysdeps/s390$ grep -r vfaezbs * | wc -l
->>> 15
->>>
->>> These set cc, use zs, and do not use rt.
->>>
->>> rth@cloudburst:~/glibc/src/sysdeps/s390$ grep -r 'vfaeb' * | wc -l
->>> 3
->>>
->>> These do not set cc, do not use zs, and do use rt.
->>>
->>> Those are the only two VFAE forms used by glibc (note that the same
->>> variants as 'f' are used by the wide-character strings).
->>>
+>> > Hi,
+>> >
+>> > HMP and QMP commands are handled synchronously in qemu today. But
+>> > there are benefits allowing the command handler to re-enter the main
+>> > loop if the command cannot be handled synchronously, or if it is
+>> > long-lasting. Some bugs such as rhbz#1230527 are difficult to solve
+>> > without it.
+>> >
+>> > The common solution is to use a pair of command+event in this case.
 >>
->> I guess "rt" and "cc" make the biggest difference. Maybe special case
->> these two, result in 4 variants for each of the 3 element sizes?
-> 
-> Sounds good.
-> 
+>> In particular, background jobs (qapi/jobs.json).  They grew out of block
+>> jobs, and are still used only for "blocky" things.  Using them more
+>> widely would probably make sense.
+>>
+>> > But this approach has a number of issues:
+>> > - you can't "fix" an existing command: you need a new API, and ad-hoc
+>> >   documentation for that command+signal association, and old/broken
+>> >   command deprecation
+>>
+>> Making a synchronous command asynchronous is an incompatible change.  We
+>> need to let the client needs opt in.  How is that done in this series?
+>
+> No change visible on client side. I dropped the async command support
+> a while ago already, based on your recommendations. I can dig the
+> archive for the discussion if necessary.
 
-So .... after all it might not be necessary, at least not for this
-helper :) Using your crazy helper functions, I have this right now:
+Not right now.
 
-/*
- * Returns the number of bits composing one element.
- */
-static uint8_t get_element_bits(uint8_t es)
-{
-    return (1 << es) * BITS_PER_BYTE;
-}
+>> > - since the reply event is broadcasted and 'id' is used for matching t=
+he
+>> >   request, it may conflict with other clients request 'id' space
+>>
+>> Any event that does that now is broken and needs to be fixed.  The
+>> obvious fix is to include a monitor ID with the command ID.  For events
+>> that can only ever be useful in the context of one particular monitor,
+>> we could unicast to that monitor instead; see below.
+>>
+>> Corollary: this is just a fixable bug, not a fundamental advantage of
+>> the async feature.
+>
+> I am just pointing out today drawbacks of turning a function async by
+> introducing new commands and signals.
 
-/*
- * Returns the bitmask for a single element.
- */
-static uint64_t get_single_element_mask(uint8_t es)
-{
-    return -1ull >> (64 - get_element_bits(es));
-}
+And I'm just pointing out that some of today's drawbacks could also be
+addressed differently :)
 
-/*
- * Returns the bitmask for a single element (excluding the MSB).
- */
-static uint64_t get_single_element_lsbs_mask(uint8_t es)
-{
-    return -1ull >> (65 - get_element_bits(es));
-}
+>> > - it is arguably less efficient and elegant (weird API, useless return
+>> >   in most cases, broadcast reply, no cancelling on disconnect etc)
+>>
+>> The return value is useful for synchronously reporting failure to start
+>> the background task.  I grant you that background tasks may exist that
+>> won't ever fail to start.  I challenge the idea that it's most of them.
+>>
+>> Broadcast reply could be avoided by unicasting events.  If I remember
+>> correctly, Peter Xu even posted patches some time ago.  We ended up not
+>> using them, because we found a better solution for the problem at hand.
+>> My point is: this isn't a fundamental problem, it's just the way we
+>> coded things up.
+>>
+>> What do you mean by "no cancelling on disconnect"?
+>
+> When the client disconnects, the background task keeps running, and
+> there is no simple way to know about that event afaik. My proposal has
+> a simple API for that (see "qmp: add qmp_return_is_cancelled()"
+> patch).
 
-/*
- * Returns the bitmasks for multiple elements (excluding the MSBs).
- */
-static uint64_t get_element_lsbs_mask(uint8_t es)
-{
-    return dup_const(es, get_single_element_lsbs_mask(es));
-}
+Auto-cancellation on client disconnect may be exactly what's wanted for
+simple use cases.
 
-static int vfae(void *v1, const void *v2, const void *v3, bool in,
-                bool rt, bool zs, uint8_t es)
-{
-    const uint64_t mask = get_element_lsbs_mask(es);
-    const int bits = get_element_bits(es);
-    uint64_t a0, a1, b0, b1, e0, e1, t0, t1, z0, z1;
-    uint64_t first_zero = 16;
-    uint64_t first_equal;
-    int i;
+Jobs are designed with more use cases in mind.  Consider a backup job
+that's take some time.  We certainly don't want to cancel it just
+because the management application hiccups and disconnects.  Instead, we
+want to permit the management application to recover, reconnect, find
+the backup job, examine its state, and resume managing it.  To support
+this, jobs have a unique ID.  Job cancellation is explicit.
 
-    a0 = s390_vec_read_element64(v2, 0);
-    a1 = s390_vec_read_element64(v2, 1);
-    b0 = s390_vec_read_element64(v3, 0);
-    b1 = s390_vec_read_element64(v3, 1);
-    e0 = 0;
-    e1 = 0;
-    /* compare against equality with every other element */
-    for (i = 0; i < 64; i += bits) {
-        t0 = i ? rol64(b0, i) : b0;
-        t1 = i ? rol64(b1, i) : b1;
-        e0 |= zero_search(a0 ^ t0, mask);
-        e0 |= zero_search(a0 ^ t1, mask);
-        e1 |= zero_search(a1 ^ t0, mask);
-        e1 |= zero_search(a1 ^ t1, mask);
-    }
-    /* invert the result if requested - invert only the MSBs */
-    if (in) {
-        e0 = ~e0 & ~mask;
-        e1 = ~e1 & ~mask;
-    }
-    first_equal = match_index(e0, e1);
+Jobs could acquire a "auto-cancel on disconnect" feature if there's a
+need.
 
-    if (zs) {
-        z0 = zero_search(a0, mask);
-        z1 = zero_search(a1, mask);
-        first_zero = match_index(z0, z1);
-    }
+I'm not sure how asynchronous commands could support reconnect and
+resume.
 
-    if (rt) {
-        e0 = (e0 >> (bits - 1)) * get_single_element_mask(es);
-        e1 = (e1 >> (bits - 1)) * get_single_element_mask(es);
-        s390_vec_write_element64(v1, 0, e0);
-        s390_vec_write_element64(v1, 1, e1);
-    } else {
-        s390_vec_write_element64(v1, 0, MIN(first_equal, first_zero));
-        s390_vec_write_element64(v1, 1, 0);
-    }
+>> I'm ignoring "etc" unless you expand it into something specific.
+>>
+>> I'm also not taking the "weird" bait :)
+>> > The following series implements an async command solution instead. By
+>> > introducing a session context and a command return handler, it can:
+>> > - defer the return, allowing the mainloop to reenter
+>> > - return only to the caller (instead of broadcast events for reply)
+>> > - optionnally allow cancellation when the client is gone
+>> > - track on-going qapi command(s) per client/session
+>> >
+>> > and without introduction of new QMP APIs or client visible change.
+>>
+>> What do async commands provide that jobs lack?
+>>
+>> Why do we want both?
+>
+> They are different things, last we discussed it: jobs are geared
+> toward block device operations,
 
-    if (first_zero == 16 && first_equal == 16) {
-        return 3; /* no match */
-    } else if (first_zero == 16) {
-        return 1; /* matching elements, no match for zero */
-    } else if (first_equal < first_zero) {
-        return 2; /* matching elements before match for zero */
-    }
-    return 0; /* match for zero */
-}
+Historical accident.  We've discussed using them for non-blocky stuff,
+such as migration.  Of course, discussions are cheap, code is what
+counts.
 
+>                                 and do not provide simple qmp-level
+> facilities that I listed above. What I introduce is a way for an
+> *existing* QMP command to be splitted, so it can re-enter the main
+> loop sanely (and not by introducing new commands or signals or making
+> things unnecessarily more complicated).
+>
+> My proposal is fairly small:
+>   27 files changed, 877 insertions(+), 260 deletions(-)
+>
+> Including test, and the qxl screendump fix, which account for about
+> 1/3 of the series.
+>
+>> I started to write a feature-by-feature comparison, but realized I don't
+>> have the time to figure out either jobs or async from their (rather
+>> sparse) documentation, let alone from code.
+>>
+>> > Existing qemu commands can be gradually replaced by async:true
+>> > variants when needed, while carefully reviewing the concurrency
+>> > aspects. The async:true commands marshaller helpers are splitted in
+>> > half, the calling and return functions. The command is called with a
+>> > QmpReturn context, that can return immediately or later, using the
+>> > generated return helper, which allows for a step-by-step conversion.
+>> >
+>> > The screendump command is converted to an async:true version to solve
+>> > rhbz#1230527. The command shows basic cancellation (this could be
+>> > extended if needed). It could be further improved to do asynchronous
+>> > IO writes as well.
+>>
+>> What is "basic cancellation"?
+>> What extension(s) do you have in mind?
+>
+> It checks for cancellation in a few places, between IO. Full
+> cancellation would allow to cancel at any time.
+>
+>>
+>> What's the impact of screendump writing synchronously?
+>
+> It can be pretty bad, think about 4k screens. It is 33177600 bytes,
+> written in PPM format, blocking the main loop..
 
-At least the kernel boots with it - am i missing something or does this
-indeed work?
+My question was specifically about "could be further improved to do
+asynchronous IO writes as well".  What's the impact of not having this
+improvement?  I *guess* it means that even with the asynchronous
+command, the synchronous writes still block "something", but I'm not
+sure what "something" may be, and how it could impact behavior.  Hence
+my question.
 
-Cheers!
+> QMP operation doing large IO (dumps), or blocking on events, could be
+> switched to this async form without introducing user-visible change,
 
+Letting the next QMP command start before the current one is done is a
+user-visible change.  We can discuss whether the change is harmless.
 
--- 
+> and with minimal effort compared to jobs.
 
-Thanks,
-
-David / dhildenb
+To gauge the difference in effort, we'd need actual code to compare.
 
