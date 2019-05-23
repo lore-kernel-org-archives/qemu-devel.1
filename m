@@ -2,88 +2,104 @@ Return-Path: <SRS0=bvyN=TX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 90CA7C282DD
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 14:26:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D020EC282DD
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 14:28:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5E64B2081C
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 14:26:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 891CA20851
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 14:28:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="C+QdGa0+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5E64B2081C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="t56s7uO+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 891CA20851
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:37456 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:37487 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hTofe-00045d-Io
-	for qemu-devel@archiver.kernel.org; Thu, 23 May 2019 10:26:14 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:53814)
+	id 1hTohd-00061s-N5
+	for qemu-devel@archiver.kernel.org; Thu, 23 May 2019 10:28:17 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:49496)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hTodr-0002rB-1O
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 10:24:23 -0400
+	(envelope-from <shmuel.eiderman@oracle.com>) id 1hToQG-0005oW-Gl
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 10:10:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hTodp-00074D-9U
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 10:24:22 -0400
-Received: from mail-wm1-x334.google.com ([2a00:1450:4864:20::334]:53419)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hTodn-0006uR-6S
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 10:24:21 -0400
-Received: by mail-wm1-x334.google.com with SMTP id 198so6061130wme.3
-	for <qemu-devel@nongnu.org>; Thu, 23 May 2019 07:24:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=from:to:subject:date:message-id:in-reply-to:references:mime-version
-	:content-transfer-encoding;
-	bh=mSpvfYP0iVrT7e/S7QFK2UnkxPjj61LdvYVxaZGAQEM=;
-	b=C+QdGa0+FkUpBMlH/yrjt0Dfh40SrN66t4GZhH+9LAXnWVOt9S0veY6v2CdXpsLfm1
-	xY++Wu2955TorW0QwYkbkfiMA22QRSccs6l3ZksIA/hkzAiNsxb+5aBJjYPDhiGmXbH3
-	/DvqdzH2CyAGbBwXhYOMw3AzE2MdU/tI//a7CLtXJjPclwCrWP6BEFidrg8zs39Qy4GJ
-	siYKsy/CeElUHnmi1T2Wo8Oy/sltR5KLRqS2ogkDX6vNSYVHurVd9tL38Em/YpzR2v+d
-	TmZhjvGDLfgaW+gHgnKhMZOiyU40TeN/ZA2ckaGkeyIwD8QWEtYjlyd5v+ONd/mF2wIh
-	eTpw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
-	:references:mime-version:content-transfer-encoding;
-	bh=mSpvfYP0iVrT7e/S7QFK2UnkxPjj61LdvYVxaZGAQEM=;
-	b=LzjuUl7ojYr7p1YY/sEkGoUSFG49b5YzRFi5BIRVeUOndUT/qicuJOFwQ6jwwEAzJ1
-	qwhHnYQmKPSaHNsmsd07p90HksNwvTEx4cTpNzylcKgnrZ10bKOmhoSaZf+pUwzeDUrA
-	BfLuL+87fyFHdSp8KOLvJFdc8dxUtKrv/XJK1aw5q/1e6PQgJZgc7qC1b0ICfADRPzZb
-	K/Q5xqW0NyYPW+boLr4kOqh88B/SuKEhF69KvdHHkK1xUmQvt3SvuPz3sKc+NAuHL/sj
-	47rLgRmINLwJ+Nni7aAPjl4FWIbxO5CE7bP5L60hT4xowSxh6lvLHUFBYnHNI8b5KuRC
-	giOA==
-X-Gm-Message-State: APjAAAWOm9PYhLb3ZeLI7250Sulo+lwpQsj0qWL/djxlN/Z0kqZhEwg1
-	onXu/SIDnIlrfxJ8zrsk9rnDKLxWguT3AA==
-X-Google-Smtp-Source: APXvYqwmbUC/SISXpSy70jIsOuyoZHz6MSNCdtBkFEbirutlANT5Ql9xco4HyFlD5mVcz50bEQaDKQ==
-X-Received: by 2002:a7b:c762:: with SMTP id x2mr2874806wmk.144.1558621447659; 
-	Thu, 23 May 2019 07:24:07 -0700 (PDT)
-Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
-	by smtp.gmail.com with ESMTPSA id z5sm9700617wmi.34.2019.05.23.07.24.06
-	for <qemu-devel@nongnu.org>
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Thu, 23 May 2019 07:24:07 -0700 (PDT)
-From: Peter Maydell <peter.maydell@linaro.org>
-To: qemu-devel@nongnu.org
-Date: Thu, 23 May 2019 15:23:52 +0100
-Message-Id: <20190523142357.5175-8-peter.maydell@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190523142357.5175-1-peter.maydell@linaro.org>
-References: <20190523142357.5175-1-peter.maydell@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2a00:1450:4864:20::334
-Subject: [Qemu-devel] [PULL 07/12] hw/intc/arm_gicv3: Fix write of
- ICH_VMCR_EL2.{VBPR0, VBPR1}
+	(envelope-from <shmuel.eiderman@oracle.com>) id 1hToQB-0003vW-CX
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 10:10:20 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:43482)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <shmuel.eiderman@oracle.com>)
+	id 1hToQ4-0003kQ-Ch; Thu, 23 May 2019 10:10:08 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+	by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id
+	x4NE3x0L186615; Thu, 23 May 2019 14:10:06 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
+	h=from : message-id :
+	content-type : mime-version : subject : date : in-reply-to : cc : to :
+	references; s=corp-2018-07-02;
+	bh=fpZkLL/g0zAQZ/JImH0ODu6mVKnwWCQNTFMnu7rlM/k=;
+	b=t56s7uO+lQByObxnq0gzvgcwZPiUwzqX1OrzBD0Fgbfz0N2kxF+jD6u6g4a70qPCDI/z
+	qpck4NEjipdylXmykklGCqGyacnb9xrIMjTkWBRXDc8RLneVmqUhLwCnGofqFoyD6Xn8
+	y3s+okbx78zUkVqiJ80ELJVyOkWDwYIw932HV7TjdaH6C4B/AoRziPiX1fVSL/NjHkBI
+	nIPQz+rUPZKef9DvdhqQgBqbnSWpAuXwJv2+UWqOat29vB/pDUiMd++Up1oAI9K+oSod
+	jzd/u3V69IvB4DGzSTWW5LzLzJzSuC+2MvweP1Dn4yVoSuGWVXTvq+FPY/2RB+OjMp5L
+	3g== 
+Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
+	by userp2120.oracle.com with ESMTP id 2smsk5akf5-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 23 May 2019 14:10:06 +0000
+Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
+	by userp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id
+	x4NE9767067375; Thu, 23 May 2019 14:10:06 GMT
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+	by userp3030.oracle.com with ESMTP id 2smshf8sve-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 23 May 2019 14:10:06 +0000
+Received: from abhmp0014.oracle.com (abhmp0014.oracle.com [141.146.116.20])
+	by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x4NEA5nN031450;
+	Thu, 23 May 2019 14:10:05 GMT
+Received: from [10.0.5.157] (/213.57.127.10)
+	by default (Oracle Beehive Gateway v4.0)
+	with ESMTP ; Thu, 23 May 2019 14:10:04 +0000
+From: Sam Eiderman <shmuel.eiderman@oracle.com>
+Message-Id: <B8380028-641C-4355-AF16-2F881E25CF8D@oracle.com>
+Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.8\))
+Date: Thu, 23 May 2019 17:09:58 +0300
+In-Reply-To: <c117d2e2-eef2-df4f-ef3d-37a33426dd51@redhat.com>
+To: Max Reitz <mreitz@redhat.com>
+References: <20190502085029.30776-1-shmuel.eiderman@oracle.com>
+	<20190502135828.42797-1-shmuel.eiderman@oracle.com>
+	<20190502135828.42797-3-shmuel.eiderman@oracle.com>
+	<c117d2e2-eef2-df4f-ef3d-37a33426dd51@redhat.com>
+X-Mailer: Apple Mail (2.3445.104.8)
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9265
+	signatures=668687
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
+	malwarescore=0
+	phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+	adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+	engine=8.0.1-1810050000 definitions=main-1905230098
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9265
+	signatures=668687
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
+	priorityscore=1501 malwarescore=0
+	suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+	lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999
+	adultscore=0
+	classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+	definitions=main-1905230098
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 156.151.31.85
+Content-Type: text/plain;
+	charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Content-Filtered-By: Mailman/MimeDel 2.1.21
+Subject: Re: [Qemu-devel] [PATCH v2 2/3] qemu-img: rebase: Reduce reads on
+ in-chain rebase
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -95,37 +111,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: kwolf@redhat.com, eyal.moscovici@oracle.com, qemu-block@nongnu.org,
+	arbel.moshe@oracle.com, qemu-devel@nongnu.org,
+	liran.alon@oracle.com, sagi.amit@oracle.com, karl.heubaum@oracle.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-In ich_vmcr_write() we enforce "writes of BPR fields to less than
-their minimum sets them to the minimum" by doing a "read vbpr and
-write it back" operation.  A typo here meant that we weren't handling
-writes to these fields correctly, because we were reading from VBPR0
-but writing to VBPR1.
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-id: 20190520162809.2677-4-peter.maydell@linaro.org
----
- hw/intc/arm_gicv3_cpuif.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/hw/intc/arm_gicv3_cpuif.c b/hw/intc/arm_gicv3_cpuif.c
-index cbad6037f19..000bdbd6247 100644
---- a/hw/intc/arm_gicv3_cpuif.c
-+++ b/hw/intc/arm_gicv3_cpuif.c
-@@ -2366,7 +2366,7 @@ static void ich_vmcr_write(CPUARMState *env, const ARMCPRegInfo *ri,
-     /* Enforce "writing BPRs to less than minimum sets them to the minimum"
-      * by reading and writing back the fields.
-      */
--    write_vbpr(cs, GICV3_G1, read_vbpr(cs, GICV3_G0));
-+    write_vbpr(cs, GICV3_G0, read_vbpr(cs, GICV3_G0));
-     write_vbpr(cs, GICV3_G1, read_vbpr(cs, GICV3_G1));
- 
-     gicv3_cpuif_virt_update(cs);
--- 
-2.20.1
+> On 23 May 2019, at 17:01, Max Reitz <mreitz@redhat.com> wrote:
+>=20
+> On 02.05.19 15:58, Sam Eiderman wrote:
+>> In the following case:
+>>=20
+>> (base) A <- B <- C (tip)
+>>=20
+>> when running:
+>>=20
+>>    qemu-img rebase -b A C
+>>=20
+>> QEMU would read all sectors not allocated in the file being rebased =
+(C)
+>> and compare them to the new base image (A), regardless of whether =
+they
+>> were changed or even allocated anywhere along the chain between the =
+new
+>> base and the top image (B). This causes many unneeded reads when
+>> rebasing an image which represents a small diff of a large disk, as =
+it
+>> would read most of the disk's sectors.
+>>=20
+>> Instead, use bdrv_is_allocated_above() to reduce the number of
+>> unnecessary reads.
+>>=20
+>> Reviewed-by: Karl Heubaum <karl.heubaum@oracle.com>
+>> Signed-off-by: Sam Eiderman <shmuel.eiderman@oracle.com>
+>> Signed-off-by: Eyal Moscovici <eyal.moscovici@oracle.com>
+>> ---
+>> qemu-img.c | 25 ++++++++++++++++++++++++-
+>> 1 file changed, 24 insertions(+), 1 deletion(-)
+>>=20
+>> diff --git a/qemu-img.c b/qemu-img.c
+>> index d9b609b3f0..7f20858cb9 100644
+>> --- a/qemu-img.c
+>> +++ b/qemu-img.c
+>=20
+> [...]
+>=20
+>> @@ -3422,6 +3428,23 @@ static int img_rebase(int argc, char **argv)
+>>                 continue;
+>>             }
+>>=20
+>> +            if (prefix_chain_bs) {
+>> +                /*
+>> +                 * If cluster wasn't changed since prefix_chain, we =
+don't need
+>> +                 * to take action
+>> +                 */
+>> +                ret =3D bdrv_is_allocated_above(bs, prefix_chain_bs,
+>> +                                              offset, n, &n);
+>=20
+> This will always return true because it definitely is allocated in =
+@bs,
+> or we wouldn=E2=80=99t be here.  (We just checked that with
+> bdrv_is_allocated().)  I think @top should be backing_bs(bs).
+>=20
+> Max
 
+I don=E2=80=99t think that=E2=80=99s true:
+
+Examine the case where we have the following chain:
+
+A <- B <- C
+
+When we rebase C directly over A: qemu-img rebase -b A C
+
+We must check for every offset (sector): bdrv_is_allocated_above(C, A, =
+offset, n, &n);
+
+If a sector from C is allocated above A - it may have been changed - so =
+we need to do a read from A and a read from C and compare.
+If the sector is not allocated above, it was not changed - we don=E2=80=99=
+t need to read from A or C.
+
+Sam
+
+
+>=20
+>> +                if (ret < 0) {
+>> +                    error_report("error while reading image =
+metadata: %s",
+>> +                                 strerror(-ret));
+>> +                    goto out;
+>> +                }
+>> +                if (!ret) {
+>> +                    continue;
+>> +                }
+>> +            }
+>> +
+>>             /*
+>>              * Read old and new backing file and take into =
+consideration that
+>>              * backing files may be smaller than the COW image.
 
