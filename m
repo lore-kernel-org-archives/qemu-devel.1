@@ -5,74 +5,74 @@ X-Spam-Level:
 X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F58EC282DD
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 20:46:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 38665C282E1
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 20:46:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3A7F220645
+	by mail.kernel.org (Postfix) with ESMTPS id 05A2520645
 	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 20:46:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LaFtcPSz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3A7F220645
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="omd2HmvH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 05A2520645
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:43093 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:43095 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hTubo-0007PY-Fk
-	for qemu-devel@archiver.kernel.org; Thu, 23 May 2019 16:46:40 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:37332)
+	id 1hTubp-0007Rl-8R
+	for qemu-devel@archiver.kernel.org; Thu, 23 May 2019 16:46:41 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:37379)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jan.bobek@gmail.com>) id 1hTuZn-00061J-IA
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 16:44:36 -0400
+	(envelope-from <jan.bobek@gmail.com>) id 1hTuZr-00064V-Er
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 16:44:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jan.bobek@gmail.com>) id 1hTuZj-0002zt-Q7
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 16:44:33 -0400
-Received: from mail-yb1-xb43.google.com ([2607:f8b0:4864:20::b43]:33774)
+	(envelope-from <jan.bobek@gmail.com>) id 1hTuZp-00035s-It
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 16:44:39 -0400
+Received: from mail-yb1-xb42.google.com ([2607:f8b0:4864:20::b42]:35350)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jan.bobek@gmail.com>) id 1hTuZi-0002yQ-De
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 16:44:31 -0400
-Received: by mail-yb1-xb43.google.com with SMTP id w127so923166yba.0
-	for <qemu-devel@nongnu.org>; Thu, 23 May 2019 13:44:30 -0700 (PDT)
+	(Exim 4.71) (envelope-from <jan.bobek@gmail.com>) id 1hTuZn-000333-KJ
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 16:44:37 -0400
+Received: by mail-yb1-xb42.google.com with SMTP id s69so2620303ybi.2
+	for <qemu-devel@nongnu.org>; Thu, 23 May 2019 13:44:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
 	h=from:to:cc:subject:date:message-id:in-reply-to:references
 	:mime-version:content-transfer-encoding;
-	bh=LLAjkendyCCLXqfpTYsTCZfUvlnmPcJC9iKwt8jzfEU=;
-	b=LaFtcPSz5Z7d4hOwdFL2n/TzIHXq5p+GaPfe0yaYBUzpPybqrLR0fGjaTayr2nLlvW
-	TINZmupoiZV+6nIZiUO17KB1Dn8CGx1Qt7127YWYmOPeRFh+YX7kPib3A7y+NPC9b333
-	0QgEyyeVZn1bprty/7RgnBaJUWAKEe7Fr3Kg/gxW5zzqnCFg/pKgwqGxDJ2ubHwx34QC
-	325eVBnyilobLuqUe7BRiqr0ZPpWdjoIGlLDxTxFdpi4Yn49uEf1eERc3FtYvoiIBUFS
-	0Ebi/psNYxS+ND1dNU/kDiUbY9pokLmuu+IzmGkpfxL0ROcthVsbJ3x1UhJiyrFQMnR0
-	u2Ag==
+	bh=DWaxu9uiHa4VqUgpO4mPbqlseFRB8XqATreonAM1ocs=;
+	b=omd2HmvHUWB31GaHLP728PLGg48qZ7ELwgtPgcYJXYiFNo97N0QqsmQEubo0DpUtqw
+	WWa1jv1zeCpavvHRCHBbjK29hAf0fEqzCdJGb+wOoJyzkDBKj2FLrTLTMpRuYD/nelnf
+	VHsscQ5hnrc8d6o8F/Yzq24apajNtgmSlsQRcBVw8xxrWYshQXNJLOcgy+2gbTJzNBPl
+	BeKg95dtY3HS0yTU2a7XQL2r2CY0CzCygVBFHGBwCnQ43O0Jk2YP0m2Dyog+MklQ9q4n
+	azOyJk/bzMMk7N5NJzBU+GE/cN24CpYkZprFZgR0g2kUPCOuXj8PfND8eS+GVrb7clxH
+	myHw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
 	:references:mime-version:content-transfer-encoding;
-	bh=LLAjkendyCCLXqfpTYsTCZfUvlnmPcJC9iKwt8jzfEU=;
-	b=U7f5O3aV3TuJAQUaWvH5m745rIm8Qu+mBDkMdNGhFiiFwqi70YM//0IdcCJch2uj1H
-	kf6Lw0pVNEqJ/bLh4Jp0dPAJncqKPSC2xsv/3EvARXzl8UeYhpVC2RP78/Swbn+idCaK
-	ad8SbpfBrEFgbdjgdhUN7TnMKoSjZJopWXkNe9CR3bO7eHRpJZuc2tCOfmlrO2/gnAoO
-	pXEKis32hNppAqgJAwF4gxeCZBxv0B8oDfozf9Mh5bcycVJDsy9IBth8hDJ/7YlMQEkn
-	4Ggt5l3kkCTl8ppHBDc/aXYzhTVvVk8rz7tXhwJiweE3ZUhbiekphTZc9d5NJY6RbSWo
-	CmxQ==
-X-Gm-Message-State: APjAAAW3SDlteSgXz0CTc1El1LwUV5TIAsnjkEWXpPLOPUXS6qdxEzsx
-	LIq+EdQbPwFrjxX5nmoaz3FVnMbR
-X-Google-Smtp-Source: APXvYqzALE5y5yGNAofxJf8PgYr8o7vfs37hmxplafbF8QNX+ay07rxUSYIj85cShjhAZ5HykEqpRw==
-X-Received: by 2002:a25:cac6:: with SMTP id a189mr1069901ybg.74.1558644269385; 
-	Thu, 23 May 2019 13:44:29 -0700 (PDT)
+	bh=DWaxu9uiHa4VqUgpO4mPbqlseFRB8XqATreonAM1ocs=;
+	b=eS7oGA2KmDmznwaFRcbHzz8I936xUaevsA8MpmroQfdjX3vu3Ko16b/61GVyhShKE7
+	tXM0Pj2eGaCWDQrN069XazAVytD07Tzuj7NuWsRppxATcqWmvD4VwoRg8TDUA4QbgH8y
+	doAI0gwQPoFwdqhP2mXrPD19F6yzSpjiyhNJHELHk2d6CZZrKNwQn3sczgclgcRv3Vwb
+	Cb2pwj5yOIWSEUrkID3R/+rkhlRdsE9t/GdVBHyGzpTTGrWFGKGe4ejcYF+O4cmyBOPG
+	aYUNzFvQWrFrFnjZvz7V8jMGpFZzDDkgS580CWC4hvFD7o+EoS1j2/fkvj/b+KqEBeAa
+	Cnzw==
+X-Gm-Message-State: APjAAAXE04dfz49CqwWCFZdXb8nf4aydXi/JLSbfghYxEFJX2hBMaLGe
+	siEp/Pe3EpytUOQHeOBidPFXWibl
+X-Google-Smtp-Source: APXvYqzntVuupXDMaMa1iu+UoYxRRIOmiHWXUfxIbYzIRk+GIObfiwnwuYPkXyT/G/XJwCldK1lLjw==
+X-Received: by 2002:a25:cb43:: with SMTP id b64mr24063415ybg.509.1558644273827;
+	Thu, 23 May 2019 13:44:33 -0700 (PDT)
 Received: from dionysus.attlocal.net
 	(69-222-133-165.lightspeed.tukrga.sbcglobal.net. [69.222.133.165])
-	by smtp.gmail.com with ESMTPSA id p12sm87590ywg.72.2019.05.23.13.44.28
+	by smtp.gmail.com with ESMTPSA id p12sm87590ywg.72.2019.05.23.13.44.33
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Thu, 23 May 2019 13:44:28 -0700 (PDT)
+	Thu, 23 May 2019 13:44:33 -0700 (PDT)
 From: Jan Bobek <jan.bobek@gmail.com>
 To: qemu-devel@nongnu.org
-Date: Thu, 23 May 2019 16:44:01 -0400
-Message-Id: <20190523204409.21068-4-jan.bobek@gmail.com>
+Date: Thu, 23 May 2019 16:44:04 -0400
+Message-Id: <20190523204409.21068-7-jan.bobek@gmail.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190523204409.21068-1-jan.bobek@gmail.com>
 References: <20190523204409.21068-1-jan.bobek@gmail.com>
@@ -81,9 +81,8 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2607:f8b0:4864:20::b43
-Subject: [Qemu-devel] [RISU v3 03/11] risu_i386: move reginfo-related code
- to risu_reginfo_i386.c
+X-Received-From: 2607:f8b0:4864:20::b42
+Subject: [Qemu-devel] [RISU v3 06/11] risu_i386: remove old unused code
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -102,167 +101,90 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-In order to build risu successfully for i386, we need files
-risu_reginfo_i386.{h,c}; this patch adds the latter by extracting the
-relevant code from risu_i386.c.
-
-This patch is pure code motion; no functional changes were made.
+The code being removed is a remnant of the past implementation; it has
+since been replaced by its more powerful, architecture-independent
+counterpart in reginfo.c.
 
 Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Jan Bobek <jan.bobek@gmail.com>
 ---
- risu_i386.c         | 54 -----------------------------------
- risu_reginfo_i386.c | 68 +++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 68 insertions(+), 54 deletions(-)
- create mode 100644 risu_reginfo_i386.c
+ risu_i386.c | 58 -----------------------------------------------------
+ 1 file changed, 58 deletions(-)
 
 diff --git a/risu_i386.c b/risu_i386.c
-index 6798a78..2d2f325 100644
+index 06d95e5..9962b8f 100644
 --- a/risu_i386.c
 +++ b/risu_i386.c
-@@ -33,43 +33,6 @@ void advance_pc(void *vuc)
-     uc->uc_mcontext.gregs[REG_EIP] += 2;
- }
+@@ -16,13 +16,6 @@
+ #include "risu.h"
+ #include "risu_reginfo_i386.h"
  
--static void fill_reginfo(struct reginfo *ri, ucontext_t * uc)
+-struct reginfo master_ri, apprentice_ri;
+-
+-static int insn_is_ud2(uint32_t insn)
 -{
--    int i;
--    for (i = 0; i < NGREG; i++) {
--        switch (i) {
--        case REG_ESP:
--        case REG_UESP:
--        case REG_GS:
--        case REG_FS:
--        case REG_ES:
--        case REG_DS:
--        case REG_TRAPNO:
--        case REG_EFL:
--            /* Don't store these registers as it results in mismatches.
--             * In particular valgrind has different values for some
--             * segment registers, and they're boring anyway.
--             * We really shouldn't be ignoring EFL but valgrind doesn't
--             * seem to set it right and I don't care to investigate.
--             */
--            ri->gregs[i] = 0xDEADBEEF;
--            break;
--        case REG_EIP:
--            /* Store the offset from the start of the test image */
--            ri->gregs[i] = uc->uc_mcontext.gregs[i] - image_start_address;
--            break;
--        default:
--            ri->gregs[i] = uc->uc_mcontext.gregs[i];
--            break;
--        }
--    }
--    /* x86 insns aren't 32 bit but we're not really testing x86 so
--     * this is just to distinguish 'do compare' from 'stop'
--     */
--    ri->faulting_insn = *((uint32_t *) uc->uc_mcontext.gregs[REG_EIP]);
+-    return ((insn & 0xffff) == 0x0b0f);
 -}
 -
--
- int send_register_info(int sock, void *uc)
+ void advance_pc(void *vuc)
  {
-     struct reginfo ri;
-@@ -100,23 +63,6 @@ int recv_and_compare_register_info(int sock, void *uc)
-     return resp;
+     ucontext_t *uc = (ucontext_t *) vuc;
+@@ -57,54 +50,3 @@ uintptr_t get_pc(struct reginfo *ri)
+ {
+     return ri->gregs[REG_E(IP)];
  }
- 
--static char *regname[] = {
--    "GS", "FS", "ES", "DS", "EDI", "ESI", "EBP", "ESP",
--    "EBX", "EDX", "ECX", "EAX", "TRAPNO", "ERR", "EIP",
--    "CS", "EFL", "UESP", "SS", 0
--};
 -
--static void dump_reginfo(struct reginfo *ri)
+-int send_register_info(int sock, void *uc)
 -{
--    int i;
--    fprintf(stderr, "  faulting insn %x\n", ri->faulting_insn);
--    for (i = 0; i < NGREG; i++) {
--        fprintf(stderr, "  %s: %x\n", regname[i] ? regname[i] : "???",
--                ri->gregs[i]);
--    }
+-    struct reginfo ri;
+-    fill_reginfo(&ri, uc);
+-    return send_data_pkt(sock, &ri, sizeof(ri));
 -}
 -
+-/* Read register info from the socket and compare it with that from the
+- * ucontext. Return 0 for match, 1 for end-of-test, 2 for mismatch.
+- * NB: called from a signal handler.
+- */
+-int recv_and_compare_register_info(int sock, void *uc)
+-{
+-    int resp;
+-    fill_reginfo(&master_ri, uc);
+-    recv_data_pkt(sock, &apprentice_ri, sizeof(apprentice_ri));
+-    if (memcmp(&master_ri, &apprentice_ri, sizeof(master_ri)) != 0) {
+-        /* mismatch */
+-        resp = 2;
+-    } else if (insn_is_ud2(master_ri.faulting_insn)) {
+-        /* end of test */
+-        resp = 1;
+-    } else {
+-        /* either successful match or expected undef */
+-        resp = 0;
+-    }
+-    send_response_byte(sock, resp);
+-    return resp;
+-}
 -
- /* Print a useful report on the status of the last comparison
-  * done in recv_and_compare_register_info(). This is called on
-  * exit, so need not restrict itself to signal-safe functions.
-diff --git a/risu_reginfo_i386.c b/risu_reginfo_i386.c
-new file mode 100644
-index 0000000..e8d671f
---- /dev/null
-+++ b/risu_reginfo_i386.c
-@@ -0,0 +1,68 @@
-+/*******************************************************************************
-+ * Copyright (c) 2010 Linaro Limited
-+ * All rights reserved. This program and the accompanying materials
-+ * are made available under the terms of the Eclipse Public License v1.0
-+ * which accompanies this distribution, and is available at
-+ * http://www.eclipse.org/legal/epl-v10.html
-+ *
-+ * Contributors:
-+ *     Peter Maydell (Linaro) - initial implementation
-+ ******************************************************************************/
-+
-+#include <stdio.h>
-+#include <ucontext.h>
-+
-+#include "risu.h"
-+#include "risu_reginfo_i386.h"
-+
-+static void fill_reginfo(struct reginfo *ri, ucontext_t * uc)
-+{
-+    int i;
-+    for (i = 0; i < NGREG; i++) {
-+        switch (i) {
-+        case REG_ESP:
-+        case REG_UESP:
-+        case REG_GS:
-+        case REG_FS:
-+        case REG_ES:
-+        case REG_DS:
-+        case REG_TRAPNO:
-+        case REG_EFL:
-+            /* Don't store these registers as it results in mismatches.
-+             * In particular valgrind has different values for some
-+             * segment registers, and they're boring anyway.
-+             * We really shouldn't be ignoring EFL but valgrind doesn't
-+             * seem to set it right and I don't care to investigate.
-+             */
-+            ri->gregs[i] = 0xDEADBEEF;
-+            break;
-+        case REG_EIP:
-+            /* Store the offset from the start of the test image */
-+            ri->gregs[i] = uc->uc_mcontext.gregs[i] - image_start_address;
-+            break;
-+        default:
-+            ri->gregs[i] = uc->uc_mcontext.gregs[i];
-+            break;
-+        }
-+    }
-+    /* x86 insns aren't 32 bit but we're not really testing x86 so
-+     * this is just to distinguish 'do compare' from 'stop'
-+     */
-+    ri->faulting_insn = *((uint32_t *) uc->uc_mcontext.gregs[REG_EIP]);
-+}
-+
-+static char *regname[] = {
-+    "GS", "FS", "ES", "DS", "EDI", "ESI", "EBP", "ESP",
-+    "EBX", "EDX", "ECX", "EAX", "TRAPNO", "ERR", "EIP",
-+    "CS", "EFL", "UESP", "SS", 0
-+};
-+
-+static void dump_reginfo(struct reginfo *ri)
-+{
-+    int i;
-+    fprintf(stderr, "  faulting insn %x\n", ri->faulting_insn);
-+    for (i = 0; i < NGREG; i++) {
-+        fprintf(stderr, "  %s: %x\n", regname[i] ? regname[i] : "???",
-+                ri->gregs[i]);
-+    }
-+}
+-/* Print a useful report on the status of the last comparison
+- * done in recv_and_compare_register_info(). This is called on
+- * exit, so need not restrict itself to signal-safe functions.
+- * Should return 0 if it was a good match (ie end of test)
+- * and 1 for a mismatch.
+- */
+-int report_match_status(void)
+-{
+-    fprintf(stderr, "match status...\n");
+-    fprintf(stderr, "master reginfo:\n");
+-    dump_reginfo(&master_ri);
+-    fprintf(stderr, "apprentice reginfo:\n");
+-    dump_reginfo(&apprentice_ri);
+-    if (memcmp(&master_ri, &apprentice_ri, sizeof(master_ri)) == 0) {
+-        fprintf(stderr, "match!\n");
+-        return 0;
+-    }
+-    fprintf(stderr, "mismatch!\n");
+-    return 1;
+-}
 -- 
 2.20.1
 
