@@ -2,87 +2,89 @@ Return-Path: <SRS0=bvyN=TX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3194C282E1
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 10:27:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 97280C282DD
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 10:28:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 99D9E2133D
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 10:27:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4896321019
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 10:28:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="G5To9fk1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 99D9E2133D
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="IH/B4KbJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4896321019
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:33074 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:33076 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hTkwn-0006nK-Qc
-	for qemu-devel@archiver.kernel.org; Thu, 23 May 2019 06:27:41 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:49089)
+	id 1hTkxM-0007D6-Gr
+	for qemu-devel@archiver.kernel.org; Thu, 23 May 2019 06:28:16 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:49229)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hTkut-0005Qa-Dq
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 06:25:44 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1hTkv4-0005YU-9C
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 06:25:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hTkuo-0000uc-0a
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 06:25:41 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:40274)
+	(envelope-from <alex.bennee@linaro.org>) id 1hTkv0-00018A-B4
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 06:25:52 -0400
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:35842)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1hTkul-0000qf-Sd
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 06:25:36 -0400
-Received: by mail-wr1-x443.google.com with SMTP id f10so5657604wre.7
-	for <qemu-devel@nongnu.org>; Thu, 23 May 2019 03:25:34 -0700 (PDT)
+	id 1hTkv0-00011K-1c
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 06:25:50 -0400
+Received: by mail-wm1-x344.google.com with SMTP id j187so5195669wmj.1
+	for <qemu-devel@nongnu.org>; Thu, 23 May 2019 03:25:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=from:to:cc:subject:date:message-id:mime-version
-	:content-transfer-encoding;
-	bh=o9QeVVaANSkRPVE/lzeP8GOR0UaOCl88SpmnTYfV1Iw=;
-	b=G5To9fk1/h4mMwOJ4mcXNjFUZl+rfqzXwViIX9MnMo5D//wXjFQUN1yc1BsRD78gEG
-	GYf1AeT4vMVnIJHeQRUKXAiUyY8MgFstMKxIuYp2biUY0XSvn6fwrQDvqKb0ZW7bjb7v
-	qwieNQujjeVsmyJVtbsV/JpR7bcHCbEu0SRWwCnyWx+Kb0IKIzWcBcGadoAUP8HY25qg
-	T0FGLpTJdwtf5YFwNzeqU+uTIt09sGH0fRGb/VLZTNOu63h7XKJzQCsr30RWh7TXsLo7
-	gywCUS+OBbSu60UnMuGGlirCUFiVI7d93VnDlRSg9za9bxP9T2p/7iuU1ffR0KxCGN+0
-	HIhQ==
+	h=from:to:cc:subject:date:message-id:in-reply-to:references
+	:mime-version:content-transfer-encoding;
+	bh=r55nf64rXTYonXxnBwdRPnRpArKhgZe9MpWloO32Vxg=;
+	b=IH/B4KbJhaKHVR2wv1f5PDXbT9EdEFsDd1greHQ1xOGg8EYeoNbundtj9W3D4ECrG9
+	OlhinDfZZQHfXuUceZivphsit5vWSMn72y4iBEq/TivTO8rfXDkUU4xXFhUSKw91c7gH
+	hd6y0nvhN7+o6kEg2TJwJUhQGa777QAIqxnfXbIH5yT0SOAhbhL6IWeGCe4yMVPdtzwd
+	9Kt5u7RQ1ztfeUk8f3MZNdKcatO0V6+VKNg2LOU+Zt6nvBHpER69w9kN1M/efoeaD/Wz
+	9Hgj2bKIcUKBZioOIl1uznPy+ejVzJzCeDdxsJfeYAV2F7km9Ys79pKClUeU4ZtVx75V
+	R8IQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-	:content-transfer-encoding;
-	bh=o9QeVVaANSkRPVE/lzeP8GOR0UaOCl88SpmnTYfV1Iw=;
-	b=PPtLoeQd5g1nTJuR3LLFwyEQ/FBi2otMQnIHeOu0HGqwrOB9rZQZLTh7B0+/SPVOg9
-	V0yfV8lAGDA4Zt3PA7UVSLpjyPFqnyQtWsuswJV9d22uDuDtQjzs/2eJVkX2/lC4rtZ9
-	/HEySEl/0OTNhj7CnJou9YqGZOMbtIwu7AWSCGYGy3KMSfrKm6pDl5Qjt4UikLWF6WBN
-	Kd/Y52X7ZhkY7WTYc/WLCaqAdig2K5DoMsKdJXpQa4/aaw2pmzKR0tWXKB17OnXYKUSW
-	ZzfdNnMwUZnWY1k5ZNxSnEzdcx6tTInMLw4q3dAgjNasvKrzL5Bxeskjygd3bzeq3T7g
-	vGaw==
-X-Gm-Message-State: APjAAAXBoTdZmcGiZtYWO9KBKZt0zxZLCs5CHp0PNtZW4huakY6l0Tko
-	GBwIoI/63SBzSM45ocYNJtjeI530mXw=
-X-Google-Smtp-Source: APXvYqyuvDwwgvCwg7F36MI6ajc981jD8RK7NrCGvxdrLPIleH66JxHK9aGJwqN85eb8dpe6LCyA1w==
-X-Received: by 2002:a5d:618b:: with SMTP id j11mr14908470wru.36.1558607133172; 
-	Thu, 23 May 2019 03:25:33 -0700 (PDT)
+	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+	:references:mime-version:content-transfer-encoding;
+	bh=r55nf64rXTYonXxnBwdRPnRpArKhgZe9MpWloO32Vxg=;
+	b=asEP+M3ToFQty+n/ZUzmTE55zmla8LVzsJGyTT+5bTnUuKxJ9jofQapjy23NzxhB3k
+	+QRIYRHrekx9NhfB3DoSGmKeMtNuaPAWuoV2LkmLV6yjuGecookmwaQBcuqsRAEMml9R
+	ldNbmGo7ELVCVjAWk9ogz5ujSJJLvdmH1ZOWsaiBPQQOvk0OYJVJcaRUpxqtiQs5RxGp
+	XDvrO1DvfjCjk9w2MmVJKvJRM6ZaDRHZEAdTewAIq+guzADDOzF7SJPbW/A+UY6cLH5E
+	GfIkh6qsxGmvoW63BsL0ppWDBanJ4vDJZ9+YqQIE5jCX6uUHfQzsC48U4o15WVmsJYkP
+	oBzg==
+X-Gm-Message-State: APjAAAV8+y4oQTJAirSyaTrzGIQpRj8SbtdK9hxrStlpfbCJtfHAHMJo
+	MyuOisCnv2uX4craPHeoyvdNCg==
+X-Google-Smtp-Source: APXvYqwA8SC+C4ldbhsYCEmLytFs5wllhVgMoToJXSf/DA4wcuX3DEprlclG5LbKKCOpFRck+V8Muw==
+X-Received: by 2002:a1c:a815:: with SMTP id r21mr10515998wme.66.1558607145428; 
+	Thu, 23 May 2019 03:25:45 -0700 (PDT)
 Received: from zen.linaroharston ([81.128.185.34])
-	by smtp.gmail.com with ESMTPSA id
-	t6sm16729133wmt.34.2019.05.23.03.25.32
+	by smtp.gmail.com with ESMTPSA id s20sm2456989wrg.8.2019.05.23.03.25.37
 	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Thu, 23 May 2019 03:25:32 -0700 (PDT)
+	Thu, 23 May 2019 03:25:44 -0700 (PDT)
 Received: from zen.linaroharston. (localhost [127.0.0.1])
-	by zen.linaroharston (Postfix) with ESMTP id 439631FF87;
-	Thu, 23 May 2019 11:25:32 +0100 (BST)
+	by zen.linaroharston (Postfix) with ESMTP id ED6321FF9F;
+	Thu, 23 May 2019 11:25:33 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Thu, 23 May 2019 11:25:04 +0100
-Message-Id: <20190523102532.10486-1-alex.bennee@linaro.org>
+Date: Thu, 23 May 2019 11:25:21 +0100
+Message-Id: <20190523102532.10486-18-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190523102532.10486-1-alex.bennee@linaro.org>
+References: <20190523102532.10486-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2a00:1450:4864:20::443
-Subject: [Qemu-devel] [PATCH  v2 00/28] current testing/next queue
+X-Received-From: 2a00:1450:4864:20::344
+Subject: [Qemu-devel] [PATCH v2 17/28] tests/tcg/aarch64: add system boot.S
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -94,150 +96,347 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm@nongnu.org,
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
 	=?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+This provides the bootstrap and low level helper functions for an
+aarch64 kernel. We use semihosting to handle test output and exiting
+the emulation. semihosting's parameter passing is a little funky so we
+end up using the stack and pointing to that as the parameter block.
 
-Hi,
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 
-This is the current status of my testing/next tree. I had to delay
-sending a PR as I refactored the semihosting changes (used by softmmu
-tests) to be more generic. I've also addressed comments and merged in
-Kevin's tweaks to the iotest check script.
-
-The following patches still need review
- patch 0003/semihosting implement a semihosting console.patch
- patch 0004/semihosting enable chardev backed output for cons.patch
- patch 0006/target arm use the common interface for WRITE0 WR.patch
- patch 0017/tests tcg aarch64 add system boot.S.patch
- patch 0027/tests qemu iotests re format output to for make c.patch
-
-Alex Bennée (23):
-  semihosting: move semihosting configuration into its own directory
-  semihosting: introduce CONFIG_SEMIHOSTING
-  semihosting: implement a semihosting console
-  semihosting: enable chardev backed output for console
-  target/arm: fixup some of the commentary for arm-semi
-  target/arm: use the common interface for WRITE0/WRITEC in arm-semi
-  target/arm: add LOG_UNIMP messages to arm-semi
-  target/arm: correct return values for WRITE/READ in arm-semi
-  target/mips: only build mips-semi for softmmu
-  target/mips: convert UHI_plog to use common semihosting code
-  MAINTAINERS: update for semihostings new home
-  tests/tcg/multiarch: add support for multiarch system tests
-  tests/tcg/multiarch: add hello world system test
-  editorconfig: add settings for .s/.S files
-  tests/tcg/aarch64: add system boot.S
-  tests/tcg/multiarch: move the system memory test
-  tests/tcg/minilib: support %c format char
-  tests/tcg/multiarch: expand system memory test to cover more
-  .travis.yml: enable aarch64-softmmu and alpha-softmmu tcg tests
-  Makefile: fix coverage-report reference to BUILD_DIR
-  Makefile: include per-target build directories in coverage report
-  Makefile.target: support per-target coverage reports
-  tests/qemu-iotests: re-format output to for make check-block
-
-Gerd Hoffmann (1):
-  tests/docker: add ubuntu 18.04
-
-Philippe Mathieu-Daudé (1):
-  tests/docker: Test more components on the Fedora default image
-
-Richard Henderson (1):
-  tests/tcg/alpha: add system boot.S
-
-Thomas Huth (2):
-  tests/qemu-iotests/group: Re-use the "auto" group for tests that can
-    always run
-  tests: Run the iotests during "make check" again
-
- .editorconfig                                 |   5 +
- .travis.yml                                   |   2 +-
- MAINTAINERS                                   |   8 +
- Makefile                                      |   4 +-
- Makefile.target                               |  16 +
- default-configs/arm-softmmu.mak               |   1 +
- default-configs/lm32-softmmu.mak              |   2 +
- default-configs/m68k-softmmu.mak              |   2 +
- default-configs/mips-softmmu-common.mak       |   1 +
- default-configs/nios2-softmmu.mak             |   2 +
- default-configs/xtensa-softmmu.mak            |   2 +
- gdbstub.c                                     |   7 +-
- hw/Kconfig                                    |   1 +
- hw/Makefile.objs                              |   1 +
- hw/mips/mips_malta.c                          |   2 +-
- hw/semihosting/Kconfig                        |   3 +
- hw/semihosting/Makefile.objs                  |   2 +
- hw/semihosting/config.c                       | 186 +++++++
- hw/semihosting/console.c                      |  77 +++
- include/exec/gdbstub.h                        |  11 +
- include/hw/semihosting/console.h              |  38 ++
- include/{exec => hw/semihosting}/semihost.h   |  17 +-
- include/sysemu/sysemu.h                       |   1 +
- linux-user/Makefile.objs                      |   2 +
- linux-user/arm/semihost.c                     |  24 +
- qemu-options.hx                               |   6 +-
- stubs/Makefile.objs                           |   1 +
- stubs/semihost.c                              |  70 +++
- target/arm/arm-semi.c                         |  98 ++--
- target/arm/helper.c                           |   2 +-
- target/arm/translate-a64.c                    |   2 +-
- target/arm/translate.c                        |   2 +-
- target/lm32/helper.c                          |   2 +-
- target/m68k/op_helper.c                       |   2 +-
- target/mips/Makefile.objs                     |   3 +-
- target/mips/helper.h                          |   2 +
- target/mips/mips-semi.c                       |  14 +-
- target/mips/translate.c                       |  10 +-
- target/nios2/helper.c                         |   2 +-
- target/xtensa/translate.c                     |   2 +-
- target/xtensa/xtensa-semi.c                   |   2 +-
- tests/Makefile.include                        |   8 +-
- tests/check-block.sh                          |  44 +-
- tests/docker/dockerfiles/fedora.docker        |   7 +
- tests/docker/dockerfiles/ubuntu1804.docker    |  57 ++
- tests/qemu-iotests-quick.sh                   |   8 -
- tests/qemu-iotests/check                      | 179 +++---
- tests/qemu-iotests/group                      | 177 +++---
- tests/tcg/Makefile                            |   1 +
- tests/tcg/aarch64/Makefile.softmmu-target     |  34 ++
- tests/tcg/aarch64/system/boot.S               | 239 ++++++++
- tests/tcg/aarch64/system/kernel.ld            |  24 +
- tests/tcg/alpha/Makefile.softmmu-target       |  34 ++
- tests/tcg/alpha/system/boot.S                 | 511 ++++++++++++++++++
- tests/tcg/alpha/system/kernel.ld              |  30 +
- tests/tcg/i386/Makefile.softmmu-target        |   4 +-
- tests/tcg/i386/system/memory.c                | 243 ---------
- tests/tcg/minilib/printf.c                    |   3 +
- .../multiarch/system/Makefile.softmmu-target  |  14 +
- tests/tcg/{i386 => multiarch}/system/hello.c  |   0
- tests/tcg/multiarch/system/memory.c           | 449 +++++++++++++++
- vl.c                                          | 128 +----
- 62 files changed, 2226 insertions(+), 605 deletions(-)
- create mode 100644 hw/semihosting/Kconfig
- create mode 100644 hw/semihosting/Makefile.objs
- create mode 100644 hw/semihosting/config.c
- create mode 100644 hw/semihosting/console.c
- create mode 100644 include/hw/semihosting/console.h
- rename include/{exec => hw/semihosting}/semihost.h (78%)
- create mode 100644 linux-user/arm/semihost.c
- create mode 100644 stubs/semihost.c
- create mode 100644 tests/docker/dockerfiles/ubuntu1804.docker
- delete mode 100755 tests/qemu-iotests-quick.sh
+---
+v2
+  - fix tabs
+  - 2 stage table lookup with ro and nx sections
+  - set stack to back
+  - moar comments
+---
+ tests/tcg/aarch64/Makefile.softmmu-target |  32 +++
+ tests/tcg/aarch64/system/boot.S           | 239 ++++++++++++++++++++++
+ tests/tcg/aarch64/system/kernel.ld        |  24 +++
+ 3 files changed, 295 insertions(+)
  create mode 100644 tests/tcg/aarch64/Makefile.softmmu-target
  create mode 100644 tests/tcg/aarch64/system/boot.S
  create mode 100644 tests/tcg/aarch64/system/kernel.ld
- create mode 100644 tests/tcg/alpha/Makefile.softmmu-target
- create mode 100644 tests/tcg/alpha/system/boot.S
- create mode 100644 tests/tcg/alpha/system/kernel.ld
- delete mode 100644 tests/tcg/i386/system/memory.c
- create mode 100644 tests/tcg/multiarch/system/Makefile.softmmu-target
- rename tests/tcg/{i386 => multiarch}/system/hello.c (100%)
- create mode 100644 tests/tcg/multiarch/system/memory.c
 
+diff --git a/tests/tcg/aarch64/Makefile.softmmu-target b/tests/tcg/aarch64/Makefile.softmmu-target
+new file mode 100644
+index 00000000000..cdb836f7e1e
+--- /dev/null
++++ b/tests/tcg/aarch64/Makefile.softmmu-target
+@@ -0,0 +1,32 @@
++#
++# Aarch64 system tests
++#
++
++AARCH64_SYSTEM_SRC=$(SRC_PATH)/tests/tcg/aarch64/system
++VPATH+=$(AARCH64_SYSTEM_SRC)
++
++# These objects provide the basic boot code and helper functions for all tests
++CRT_OBJS=boot.o
++
++AARCH64_TEST_SRCS=$(wildcard $(AARCH64_SYSTEM_SRC)/*.c)
++AARCH64_TESTS = $(patsubst $(AARCH64_SYSTEM_SRC)/%.c, %, $(AARCH64_TEST_SRCS))
++
++CRT_PATH=$(AARCH64_SYSTEM_SRC)
++LINK_SCRIPT=$(AARCH64_SYSTEM_SRC)/kernel.ld
++LDFLAGS=-Wl,-T$(LINK_SCRIPT)
++TESTS+=$(AARCH64_TESTS) $(MULTIARCH_TESTS)
++CFLAGS+=-nostdlib -ggdb -O0 $(MINILIB_INC)
++LDFLAGS+=-static -nostdlib $(CRT_OBJS) $(MINILIB_OBJS) -lgcc
++
++# building head blobs
++.PRECIOUS: $(CRT_OBJS)
++
++%.o: $(CRT_PATH)/%.S
++	$(CC) $(CFLAGS) -x assembler-with-cpp -c $< -o $@
++
++# Build and link the tests
++%: %.c $(LINK_SCRIPT) $(CRT_OBJS) $(MINILIB_OBJS)
++	$(CC) $(CFLAGS) $< -o $@ $(LDFLAGS)
++
++# Running
++QEMU_OPTS+=-M virt -cpu max -display none -semihosting-config enable=on,target=native,chardev=output -kernel
+diff --git a/tests/tcg/aarch64/system/boot.S b/tests/tcg/aarch64/system/boot.S
+new file mode 100644
+index 00000000000..b14e94f332d
+--- /dev/null
++++ b/tests/tcg/aarch64/system/boot.S
+@@ -0,0 +1,239 @@
++/*
++ * Minimal AArch64 system boot code.
++ *
++ * Copyright Linaro Ltd 2019
++ *
++ * Loosely based on the newlib/libgloss setup stubs. Using semihosting
++ * for serial output and exit functions.
++ */
++
++/*
++ * Semihosting interface on ARM AArch64
++ * See "Semihosting for AArch32 and AArch64 Relase 2.0" by ARM
++ * w0 - semihosting call number
++ * x1 - semihosting parameter
++ */
++#define semihosting_call hlt 0xf000
++#define SYS_WRITEC	0x03	/* character to debug channel */
++#define SYS_WRITE0	0x04	/* string to debug channel */
++#define SYS_EXIT	0x18
++
++	.align	12
++
++	.macro	ventry	label
++	.align	7
++	b	\label
++	.endm
++
++vector_table:
++	/* Current EL with SP0.	 */
++	ventry	curr_sp0_sync		/* Synchronous	*/
++	ventry	curr_sp0_irq		/* Irq/vIRQ  */
++	ventry	curr_sp0_fiq		/* Fiq/vFIQ  */
++	ventry	curr_sp0_serror		/* SError/VSError  */
++
++	/* Current EL with SPx.	 */
++	ventry	curr_spx_sync		/* Synchronous	*/
++	ventry	curr_spx_irq		/* IRQ/vIRQ  */
++	ventry	curr_spx_fiq		/* FIQ/vFIQ  */
++	ventry	curr_spx_serror		/* SError/VSError  */
++
++	/* Lower EL using AArch64.  */
++	ventry	lower_a64_sync		/* Synchronous	*/
++	ventry	lower_a64_irq		/* IRQ/vIRQ  */
++	ventry	lower_a64_fiq		/* FIQ/vFIQ  */
++	ventry	lower_a64_serror	/* SError/VSError  */
++
++	/* Lower EL using AArch32.  */
++	ventry	lower_a32_sync		/* Synchronous	*/
++	ventry	lower_a32_irq		/* IRQ/vIRQ  */
++	ventry	lower_a32_fiq		/* FIQ/vFIQ  */
++	ventry	lower_a32_serror	/* SError/VSError  */
++
++	.text
++	.align 4
++
++	/* Common vector handling for now */
++curr_sp0_sync:
++curr_sp0_irq:
++curr_sp0_fiq:
++curr_sp0_serror:
++curr_spx_sync:
++curr_spx_irq:
++curr_spx_fiq:
++curr_spx_serror:
++lower_a64_sync:
++lower_a64_irq:
++lower_a64_fiq:
++lower_a64_serror:
++lower_a32_sync:
++lower_a32_irq:
++lower_a32_fiq:
++lower_a32_serror:
++	mov	x0, SYS_WRITE0
++	adr	x1, .error
++	semihosting_call
++	mov	x0, SYS_EXIT
++	mov	x1, 1
++	semihosting_call
++	/* never returns */
++
++	.section .rodata
++.error:
++	.string "Terminated by exception.\n"
++
++	.text
++	.align 4
++	.global __start
++__start:
++	/* Installs a table of exception vectors to catch and handle all
++	   exceptions by terminating the process with a diagnostic.  */
++	adr	x0, vector_table
++	msr	vbar_el1, x0
++
++	/* Page table setup (identity mapping). */
++	adrp	x0, ttb
++	add	x0, x0, :lo12:ttb
++	msr	ttbr0_el1, x0
++
++	/*
++	 * Setup a flat address mapping page-tables. Stage one simply
++	 * maps RAM to the first Gb. The stage2 tables have two 2mb
++	 * translation block entries covering a series of adjacent
++	 * 4k pages.
++	*/
++
++	/* Stage 1 entry: indexed by IA[38:30] */
++	adr	x1, .				/* phys address */
++	bic	x1, x1, #(1 << 30) - 1		/* 1GB alignment*/
++	add	x2, x0, x1, lsr #(30 - 3)	/* offset in l1 page table */
++
++	/* point to stage 2 table [47:12] */
++	adrp	x0, ttb_stage2
++	orr 	x1, x0, #3 			/* ptr to stage 2 */
++	str	x1, [x2]
++
++	/* Stage 2 entries: indexed by IA[29:21] */
++	ldr	x5, =(((1 << 9) - 1) << 21)
++
++	/* First block: .text/RO/execute enabled */
++	adr	x1, .				/* phys address */
++	bic	x1, x1, #(1 << 21) - 1		/* 2mb block alignment	*/
++	and	x4, x1, x5			/* IA[29:21] */
++	add	x2, x0, x4, lsr #(21 - 3)	/* offset in l2 page table */
++	ldr	x3, =0x401			/* attr(AF, block) */
++	orr	x1, x1, x3
++	str	x1, [x2]			/* 1st 2mb (.text & rodata) */
++
++	/* Second block: .data/RW/no execute */
++	adrp	x1, .data
++	add	x1, x1, :lo12:.data
++	bic	x1, x1, #(1 << 21) - 1		/* 2mb block alignment */
++	and	x4, x1, x5			/* IA[29:21] */
++	add	x2, x0, x4, lsr #(21 - 3)	/* offset in l2 page table */
++	ldr	x3, =(3 << 53) | 0x401		/* attr(AF, NX, block) */
++	orr	x1, x1, x3
++	str	x1, [x2]			/* 2nd 2mb (.data & .bss)*/
++
++	/* Setup/enable the MMU.  */
++
++	/*
++	 * TCR_EL1 - Translation Control Registers
++	 *
++	 * IPS[34:32] = 40-bit PA, 1TB
++	 * TG0[14:15] = b00 => 4kb granuale
++	 * ORGN0[11:10] = Outer: Normal, WB Read-Alloc No Write-Alloc Cacheable
++	 * IRGN0[9:8] = Inner: Normal, WB Read-Alloc No Write-Alloc Cacheable
++	 * T0SZ[5:0]  = 2^(64 - 25)
++	 *
++	 * The size of T0SZ controls what the initial lookup level. It
++	 * would be nice to start at level 2 but unfortunatly for a
++	 * flat-mapping on the virt machine we need to handle IA's
++	 * with at least 1gb range to see RAM. So we start with a
++	 * level 1 lookup.
++	 */
++	ldr	x0, = (2 << 32) | 25 | (3 << 10) | (3 << 8)
++	msr	tcr_el1, x0
++
++	mov	x0, #0xee			/* Inner/outer cacheable WB */
++	msr	mair_el1, x0
++	isb
++
++	/*
++	 * SCTLR_EL1 - System Control Register
++	 *
++	 * WXN[19] = 0 = no effect, Write does not imply XN (execute never)
++	 * I[12] = Instruction cachability control
++	 * SA[3] = SP alignment check
++	 * C[2] = Data cachability control
++	 * M[0] = 1, enable stage 1 address translation for EL0/1
++	 */
++	mrs	x0, sctlr_el1
++	ldr	x1, =0x100d			/* bits I(12) SA(3) C(2) M(0) */
++	bic	x0, x0, #(1 << 1)		/* clear bit A(1) */
++	bic	x0, x0, #(1 << 19)		/* clear WXN */
++	orr	x0, x0, x1			/* set bits */
++
++	dsb	sy
++	msr	sctlr_el1, x0
++	isb
++
++	/*
++	 * Enable FP registers. The standard C pre-amble will be
++	 * saving these and A-profile compilers will use AdvSIMD
++	 * registers unless we tell it not to.
++	*/
++	mrs	x0, cpacr_el1
++	orr	x0, x0, #(3 << 20)
++	msr	cpacr_el1, x0
++
++	/* Setup some stack space and enter the test code.
++	 * Assume everthing except the return value is garbage when we
++	 * return, we won't need it.
++	 */
++	adrp	x0, stack_end
++	add	x0, x0, :lo12:stack_end
++	mov	sp, x0
++	bl	main
++
++	/* pass return value to sys exit */
++	mov    x1, x0
++	ldr    x0, =0x20026 /* ADP_Stopped_ApplicationExit */
++	stp    x0, x1, [sp, #-16]!
++	mov    x1, sp
++	mov    x0, SYS_EXIT
++	semihosting_call
++	/* never returns */
++
++	/*
++	 * Helper Functions
++	*/
++
++	/* Output a single character to serial port */
++	.global __sys_outc
++__sys_outc:
++	stp x0, x1, [sp, #-16]!
++	/* pass address of c on stack */
++	mov x1, sp
++	mov x0, SYS_WRITEC
++	semihosting_call
++	ldp x0, x1, [sp], #16
++	ret
++
++	.data
++	.align	12
++
++	/* Translation table
++	 * @4k granuale: 9 bit lookup, 512 entries
++	*/
++ttb:
++	.space	4096, 0
++
++	.align	12
++ttb_stage2:
++	.space	4096, 0
++
++	.align	12
++stack:
++	.space 65536, 0
++stack_end:
+diff --git a/tests/tcg/aarch64/system/kernel.ld b/tests/tcg/aarch64/system/kernel.ld
+new file mode 100644
+index 00000000000..7b3a76dcbf3
+--- /dev/null
++++ b/tests/tcg/aarch64/system/kernel.ld
+@@ -0,0 +1,24 @@
++ENTRY(__start)
++
++SECTIONS
++{
++    /* virt machine, RAM starts at 1gb */
++    . = (1 << 30);
++    .text : {
++        *(.text)
++    }
++    .rodata : {
++        *(.rodata)
++    }
++    /* align r/w section to next 2mb */
++    . = ALIGN(1 << 21);
++    .data : {
++        *(.data)
++    }
++    .bss : {
++        *(.bss)
++    }
++    /DISCARD/ : {
++        *(.ARM.attributes)
++    }
++}
 -- 
 2.20.1
 
