@@ -2,66 +2,67 @@ Return-Path: <SRS0=bvyN=TX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 877A1C282CE
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 01:38:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 60840C282CE
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 02:05:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 26C9F2081C
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 01:38:16 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="b2qVBMpq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 26C9F2081C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	by mail.kernel.org (Postfix) with ESMTPS id 02AAA21019
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 02:05:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 02AAA21019
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:55919 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:56186 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hTcgR-0001p6-IN
-	for qemu-devel@archiver.kernel.org; Wed, 22 May 2019 21:38:15 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:34386)
+	id 1hTd6v-00073e-V6
+	for qemu-devel@archiver.kernel.org; Wed, 22 May 2019 22:05:38 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:38656)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1hTcfe-0001XG-BW
-	for qemu-devel@nongnu.org; Wed, 22 May 2019 21:37:27 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1hTd5e-0006Jm-F5
+	for qemu-devel@nongnu.org; Wed, 22 May 2019 22:04:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1hTcfc-0007Ws-MN
-	for qemu-devel@nongnu.org; Wed, 22 May 2019 21:37:26 -0400
-Received: from ozlabs.org ([2401:3900:2:1::2]:46283)
+	(envelope-from <ehabkost@redhat.com>) id 1hTctS-0001rc-G8
+	for qemu-devel@nongnu.org; Wed, 22 May 2019 21:51:44 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45604)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
-	id 1hTcfa-0007Lg-5F; Wed, 22 May 2019 21:37:24 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
-	id 458XDP12FXz9s5c; Thu, 23 May 2019 11:37:09 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-	d=gibson.dropbear.id.au; s=201602; t=1558575429;
-	bh=SjLABzlxT2WO4KtjRdP4Kiva31BwVExDA2uG8PprdK4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=b2qVBMpqbc1ifSGswLiI8pEts1OufHwfgJ+rSKpemHgtS9N2OQWiX6KAJpghyjmDp
-	MD4UTH091X3J31+MT2Lzxn5SgaLl3gBBvstQOCoKOVHZu6DYAJrRIleCtKXtcEWHNs
-	shfHChHpFSgSaieZ5NDoKyk5+twJ5NjN/e5j8g5o=
-Date: Thu, 23 May 2019 10:46:33 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-To: Fabiano Rosas <farosas@linux.ibm.com>
-Message-ID: <20190523004633.GQ30423@umbus.fritz.box>
-References: <155773946961.49142.5208084426066783536.stgit@lep8c.aus.stglabs.ibm.com>
-	<155773968985.49142.1164691973469833295.stgit@lep8c.aus.stglabs.ibm.com>
-	<875zq25plp.fsf@linux.ibm.com>
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hTctR-0001qW-OR
+	for qemu-devel@nongnu.org; Wed, 22 May 2019 21:51:41 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 5D0E66698A;
+	Thu, 23 May 2019 01:51:40 +0000 (UTC)
+Received: from localhost (ovpn-116-14.gru2.redhat.com [10.97.116.14])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id B36E9544F8;
+	Thu, 23 May 2019 01:51:36 +0000 (UTC)
+Date: Wed, 22 May 2019 22:51:34 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+To: Cleber Rosa <crosa@redhat.com>
+Message-ID: <20190523015134.GC10764@habkost.net>
+References: <20190520231910.12184-1-f4bug@amsat.org>
+	<20190522211230.GA10764@habkost.net>
+	<1711852617.24204010.1558561566547.JavaMail.zimbra@redhat.com>
+	<20190522230705.GB10764@habkost.net>
+	<1603108978.24224480.1558573457497.JavaMail.zimbra@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="DMLl6fZPX8o7hGmc"
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <875zq25plp.fsf@linux.ibm.com>
-User-Agent: Mutt/1.11.4 (2019-03-13)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2401:3900:2:1::2
-Subject: Re: [Qemu-devel] [RFC v2 PATCH 3/3] spapr: Add Hcalls to support
- PAPR NVDIMM device
+In-Reply-To: <1603108978.24224480.1558573457497.JavaMail.zimbra@redhat.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.38]);
+	Thu, 23 May 2019 01:51:40 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH 0/4] mips: Add more Avocado tests
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -73,343 +74,212 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: xiaoguangrong.eric@gmail.com, Shivaprasad G Bhat <sbhat@linux.ibm.com>,
-	mst@redhat.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org,
-	imammedo@redhat.com
+Cc: Aleksandar Rikalo <arikalo@wavecomp.com>,
+	Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>,
+	Wainer dos Santos Moschetta <wainersm@redhat.com>, qemu-devel@nongnu.org,
+	Aleksandar Markovic <aleksandar.m.mail@gmail.com>,
+	Aleksandar Markovic <amarkovic@wavecomp.com>,
+	Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Wed, May 22, 2019 at 09:04:17PM -0400, Cleber Rosa wrote:
+>=20
+>=20
+> ----- Original Message -----
+> > From: "Eduardo Habkost" <ehabkost@redhat.com>
+> > To: "Cleber Rosa" <crosa@redhat.com>
+> > Cc: "Philippe Mathieu-Daud=E9" <f4bug@amsat.org>, qemu-devel@nongnu.o=
+rg, "Aleksandar Rikalo" <arikalo@wavecomp.com>,
+> > "Aleksandar Markovic" <aleksandar.m.mail@gmail.com>, "Aleksandar Mark=
+ovic" <amarkovic@wavecomp.com>, "Aurelien
+> > Jarno" <aurelien@aurel32.net>, "Wainer dos Santos Moschetta" <wainers=
+m@redhat.com>
+> > Sent: Wednesday, May 22, 2019 7:07:05 PM
+> > Subject: Re: [Qemu-devel] [PATCH 0/4] mips: Add more Avocado tests
+> >=20
+> > On Wed, May 22, 2019 at 05:46:06PM -0400, Cleber Rosa wrote:
+> > >=20
+> > >=20
+> > > ----- Original Message -----
+> > > > From: "Eduardo Habkost" <ehabkost@redhat.com>
+> > > > To: "Philippe Mathieu-Daud=E9" <f4bug@amsat.org>
+> > > > Cc: qemu-devel@nongnu.org, "Aleksandar Rikalo" <arikalo@wavecomp.=
+com>,
+> > > > "Aleksandar Markovic"
+> > > > <aleksandar.m.mail@gmail.com>, "Aleksandar Markovic"
+> > > > <amarkovic@wavecomp.com>, "Cleber Rosa" <crosa@redhat.com>,
+> > > > "Aurelien Jarno" <aurelien@aurel32.net>, "Wainer dos Santos Mosch=
+etta"
+> > > > <wainersm@redhat.com>
+> > > > Sent: Wednesday, May 22, 2019 5:12:30 PM
+> > > > Subject: Re: [Qemu-devel] [PATCH 0/4] mips: Add more Avocado test=
+s
+> > > >=20
+> > > > On Tue, May 21, 2019 at 01:19:06AM +0200, Philippe Mathieu-Daud=E9=
+ wrote:
+> > > > > Hi,
+> > > > >=20
+> > > > > It was a rainy week-end here, so I invested it to automatize so=
+me
+> > > > > of my MIPS tests.
+> > > > >=20
+> > > > > The BootLinuxSshTest is not Global warming friendly, it is not
+> > > > > meant to run on a CI system but rather on a workstation previou=
+s
+> > > > > to post a pull request.
+> > > > > It can surely be improved, but it is a good starting point.
+> > > >=20
+> > > > Until we actually have a mechanism to exclude the test case on
+> > > > travis-ci, I will remove patch 4/4 from the queue.  Aleksandar,
+> > > > please don't merge patch 4/4 yet or it will break travis-ci.
+> > > >=20
+> > > > Cleber, Wainer, is it already possible to make "avocado run" skip
+> > > > tests tagged with "slow"?
+> > > >=20
+> > >=20
+> > > The mechanism exists, but we haven't tagged any test so far as slow=
+.
+> > >=20
+> > > Should we define/document a criteria for a test to be slow?  Given
+> > > that this is highly subjective, we have to think of:
+> > >=20
+> > >  * Will we consider the average or maximum run time (the timeout
+> > >    definition)?
+> > > =20
+> > >  * For a single test, what is "slow"? Some rough numbers from Travi=
+s
+> > >    CI[1] to help us with guidelines:
+> > >    - boot_linux_console.py:BootLinuxConsole.test_x86_64_pc:  PASS (=
+6.04 s)
+> > >    - boot_linux_console.py:BootLinuxConsole.test_arm_virt:  PASS (2=
+.91 s)
+> > >    -
+> > >    linux_initrd.py:LinuxInitrd.test_with_2gib_file_should_work_with=
+_linux_v4_16:
+> > >    PASS (18.14 s)
+> > >    - boot_linux.py:BootLinuxAarch64.test_virt:  PASS (396.88 s)
+> >=20
+> > I don't think we need to overthink this.  Whatever objective
+> > criteria we choose, I'm sure we'll have to adapt them later due
+> > to real world problems.
+> >=20
+> > e.g.: is 396 seconds too slow?  I don't know, it depends: does it
+> > break Travis and other CI systems often because of timeouts?  If
+> > yes, then we should probably tag it as slow.
+> >=20
+>=20
+> It's not only that.  We're close to a point where we'll need to
+> determine whether "make check-acceptance" will work as a generic
+> enough default for most user on their environments and most CI
+> systems.
+>=20
+> As an example, this job ran 5 fairly slow tests (which I'm preparing
+> to send):
+>=20
+>   https://travis-ci.org/clebergnu/qemu/jobs/535967210#L3518
+>=20
+> Those are justifiably slow, given the fact that they boot a full
+> Fedora 30 system using TCG.  The job has a cumulative execution time
+> of ~39 minutes.  That leaves only 11 minutes to spare on the Travis
+> CI environment.  If they all exercised close to their 600s allowances
+> (timeout), the Travis job would have failed.=20
+>=20
+> Having said that, if a CI failure is supposed to be a major breakage,
+> which I believe it's the right mind set and a worthy goal, we should
+> limit the amount of tests we run so that their *maximum* execution
+> time does not exceed the maximum job time limit.
+>=20
+> > If having subjective criteria is really a problem (I don't think
+> > it is), then we can call the tag "skip_travis", and stop worrying
+> > about defining what exactly is "slow".
+> >=20
+> >=20
+> > >=20
+> > >  * Do we want to set a maximum job timeout?  This way we can skip
+> > >    tests after a given amount of time has passed.  Currently we int=
+errupt
+> > >    the test running when the job timeout is reached, but it's possi=
+ble
+> > >    to add a option so that no new tests will be started, but curren=
+tly
+> > >    running ones will be waited on.
+> >=20
+> > I'm not sure I understand the suggestion to skip tests.  If we
+> > skip tests after a timeout, how would we differentiate a test
+> > being expectedly slow from a QEMU hang?
+> >=20
+> > --
+> > Eduardo
+> >=20
+>=20
+> Basically, what I meant is that we could attempt something like:
+>=20
+>  * Job "Brave"
+>   - 50 tests, each with 60 seconds timeout =3D 50 min max
+>   - 60 tests, each with 1 second timeout  =3D 1 min max
+>=20
+> If Job "Brave" is run on a system such as Travis, it *can* fail,
+> because it can go over the maximum Travis CI job limit of 50 min.
+> We could set an Avocado job timeout of say, 48 minutes, and tell
+> Avocado to mark the tests it wasn't able to spawn as "SKIPPED",
+> and do not report an overall error condition.
 
---DMLl6fZPX8o7hGmc
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Wed, May 22, 2019 at 03:08:34PM -0300, Fabiano Rosas wrote:
-> Shivaprasad G Bhat <sbhat@linux.ibm.com> writes:
->=20
-> > diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
-> > index 6c16d2b120..b6e7d04dcf 100644
-> > --- a/hw/ppc/spapr_hcall.c
-> > +++ b/hw/ppc/spapr_hcall.c
-> > @@ -3,11 +3,13 @@
-> >  #include "sysemu/hw_accel.h"
-> >  #include "sysemu/sysemu.h"
-> >  #include "qemu/log.h"
-> > +#include "qemu/range.h"
-> >  #include "qemu/error-report.h"
-> >  #include "cpu.h"
-> >  #include "exec/exec-all.h"
-> >  #include "helper_regs.h"
-> >  #include "hw/ppc/spapr.h"
-> > +#include "hw/ppc/spapr_drc.h"
-> >  #include "hw/ppc/spapr_cpu_core.h"
-> >  #include "mmu-hash64.h"
-> >  #include "cpu-models.h"
-> > @@ -16,6 +18,7 @@
-> >  #include "hw/ppc/spapr_ovec.h"
-> >  #include "mmu-book3s-v3.h"
-> >  #include "hw/mem/memory-device.h"
-> > +#include "hw/mem/nvdimm.h"
-> > =20
-> >  static bool has_spr(PowerPCCPU *cpu, int spr)
-> >  {
-> > @@ -1795,6 +1798,199 @@ static target_ulong h_update_dt(PowerPCCPU *cpu=
-, SpaprMachineState *spapr,
-> >      return H_SUCCESS;
-> >  }
-> > =20
-> > +static target_ulong h_scm_read_metadata(PowerPCCPU *cpu,
-> > +                                        SpaprMachineState *spapr,
-> > +                                        target_ulong opcode,
-> > +                                        target_ulong *args)
-> > +{
-> > +    uint32_t drc_index =3D args[0];
-> > +    uint64_t offset =3D args[1];
-> > +    uint64_t numBytesToRead =3D args[2];
->=20
-> This variable's case is inconsistent with the rest of the file.
->=20
-> > +    SpaprDrc *drc =3D spapr_drc_by_index(drc_index);
-> > +    NVDIMMDevice *nvdimm =3D NULL;
-> > +    NVDIMMClass *ddc =3D NULL;
-> > +
-> > +    if (drc && spapr_drc_type(drc) !=3D SPAPR_DR_CONNECTOR_TYPE_PMEM) {
-> > +        return H_PARAMETER;
-> > +    }
-> > +
-> > +    if (numBytesToRead !=3D 1 && numBytesToRead !=3D 2 &&
-> > +        numBytesToRead !=3D 4 && numBytesToRead !=3D 8) {
-> > +        return H_P3;
-> > +    }
-> > +
-> > +    nvdimm =3D NVDIMM(drc->dev);
-> > +    if ((offset + numBytesToRead < offset) ||
-> > +        (nvdimm->label_size < numBytesToRead + offset)) {
-> > +        return H_P2;
-> > +    }
->=20
-> Won't the first clause always be false? Considering they're both
-> uint64_t.
-
-Generally yes, but that's caleed supplied input, so we need to protect
-against 64-bit overflow.
+Oh, that would be a nice feature.  But while we don't have it,
+the following proposal would work too.
 
 >=20
-> > +
-> > +    ddc =3D NVDIMM_GET_CLASS(nvdimm);
-> > +    ddc->read_label_data(nvdimm, &args[0], numBytesToRead, offset);
-> > +
-> > +    return H_SUCCESS;
-> > +}
-> > +
-> > +
-> > +static target_ulong h_scm_write_metadata(PowerPCCPU *cpu,
-> > +                                         SpaprMachineState *spapr,
-> > +                                         target_ulong opcode,
-> > +                                         target_ulong *args)
-> > +{
-> > +    uint32_t drc_index =3D args[0];
-> > +    uint64_t offset =3D args[1];
-> > +    uint64_t data =3D args[2];
-> > +    int8_t numBytesToWrite =3D args[3];
+> But, if we want to be more conservative (which I now realize is
+> the best mindset for this situation), we should stick to something
+> like:
 >=20
-> Likewise.
+>  * Job "Coward"
+>   - 47 tests, each with 60 seconds timeout =3D 47 min max
+>   - 60 tests, each with 1 second timeout  =3D 1 min max
 >=20
-> > +    SpaprDrc *drc =3D spapr_drc_by_index(drc_index);
-> > +    NVDIMMDevice *nvdimm =3D NULL;
-> > +    DeviceState *dev =3D NULL;
-> > +    NVDIMMClass *ddc =3D NULL;
-> > +
-> > +    if (drc && spapr_drc_type(drc) !=3D SPAPR_DR_CONNECTOR_TYPE_PMEM) {
-> > +        return H_PARAMETER;
-> > +    }
-> > +
-> > +    if (numBytesToWrite !=3D 1 && numBytesToWrite !=3D 2 &&
-> > +        numBytesToWrite !=3D 4 && numBytesToWrite !=3D 8) {
-> > +        return H_P4;
-> > +    }
-> > +
-> > +    dev =3D drc->dev;
-> > +    nvdimm =3D NVDIMM(dev);
-> > +    if ((nvdimm->label_size < numBytesToWrite + offset) ||
-> > +        (offset + numBytesToWrite < offset)) {
-> > +        return H_P2;
-> > +    }
-> > +
-> > +    ddc =3D NVDIMM_GET_CLASS(nvdimm);
-> > +    ddc->write_label_data(nvdimm, &data, numBytesToWrite, offset);
-> > +
-> > +    return H_SUCCESS;
-> > +}
-> > +
-> > +static target_ulong h_scm_bind_mem(PowerPCCPU *cpu, SpaprMachineState =
-*spapr,
-> > +                                        target_ulong opcode,
-> > +                                        target_ulong *args)
-> > +{
-> > +    uint32_t drc_index =3D args[0];
-> > +    uint64_t starting_idx =3D args[1];
-> > +    uint64_t no_of_scm_blocks_to_bind =3D args[2];
-> > +    uint64_t target_logical_mem_addr =3D args[3];
-> > +    uint64_t continue_token =3D args[4];
-> > +    uint64_t size;
-> > +    uint64_t total_no_of_scm_blocks;
-> > +
-> > +    SpaprDrc *drc =3D spapr_drc_by_index(drc_index);
-> > +    hwaddr addr;
-> > +    DeviceState *dev =3D NULL;
-> > +    PCDIMMDevice *dimm =3D NULL;
-> > +    Error *local_err =3D NULL;
-> > +
-> > +    if (drc && spapr_drc_type(drc) !=3D SPAPR_DR_CONNECTOR_TYPE_PMEM) {
-> > +        return H_PARAMETER;
-> > +    }
-> > +
-> > +    dev =3D drc->dev;
-> > +    dimm =3D PC_DIMM(dev);
-> > +
-> > +    size =3D object_property_get_uint(OBJECT(dimm),
-> > +                                    PC_DIMM_SIZE_PROP, &local_err);
-> > +    if (local_err) {
-> > +        error_report_err(local_err);
-> > +        return H_PARAMETER;
-> > +    }
-> > +
-> > +    total_no_of_scm_blocks =3D size / SPAPR_MINIMUM_SCM_BLOCK_SIZE;
-> > +
-> > +    if ((starting_idx > total_no_of_scm_blocks) ||
-> > +        (no_of_scm_blocks_to_bind > total_no_of_scm_blocks)) {
-> > +        return H_P2;
-> > +    }
-> > +
-> > +    if (((starting_idx + no_of_scm_blocks_to_bind) < starting_idx) ||
-> > +        ((starting_idx + no_of_scm_blocks_to_bind) > total_no_of_scm_b=
-locks)) {
-> > +        return H_P3;
-> > +    }
+> So my proposal is that we should:
 >=20
-> Same here.
+>  * Give ample timeouts to test (at least 2x their average
+>    run time on Travis CI)
 >=20
-> > +
-> > +    /* Currently qemu assigns the address. */
-> > +    if (target_logical_mem_addr !=3D 0xffffffffffffffff) {
-> > +        return H_OVERLAP;
-> > +    }
-> > +
-> > +    /*
-> > +     * Currently continue token should be zero qemu has already bound
-> > +     * everything and this hcall doesnt return H_BUSY.
-> > +     */
-> > +    if (continue_token > 0) {
-> > +        return H_P5;
-> > +    }
-> > +
-> > +    /* NB : Already bound, Return target logical address in R4 */
-> > +    addr =3D object_property_get_uint(OBJECT(dimm),
-> > +                                    PC_DIMM_ADDR_PROP, &local_err);
-> > +    if (local_err) {
-> > +        error_report_err(local_err);
-> > +        return H_PARAMETER;
-> > +    }
-> > +
-> > +    args[1] =3D addr;
-> > +    args[2] =3D no_of_scm_blocks_to_bind;
-> > +
-> > +    return H_SUCCESS;
-> > +}
-> > +
-> > +static target_ulong h_scm_unbind_mem(PowerPCCPU *cpu, SpaprMachineStat=
-e *spapr,
-> > +                                        target_ulong opcode,
-> > +                                        target_ulong *args)
-> > +{
-> > +    uint32_t drc_index =3D args[0];
-> > +    uint64_t starting_scm_logical_addr =3D args[1];
-> > +    uint64_t no_of_scm_blocks_to_unbind =3D args[2];
-> > +    uint64_t size_to_unbind;
-> > +    uint64_t continue_token =3D args[3];
-> > +    Range blockrange =3D range_empty;
-> > +    Range nvdimmrange =3D range_empty;
-> > +    SpaprDrc *drc =3D spapr_drc_by_index(drc_index);
-> > +    DeviceState *dev =3D NULL;
-> > +    PCDIMMDevice *dimm =3D NULL;
-> > +    uint64_t size, addr;
-> > +
-> > +    if (drc && spapr_drc_type(drc) !=3D SPAPR_DR_CONNECTOR_TYPE_PMEM) {
-> > +        return H_PARAMETER;
-> > +    }
-> > +
-> > +    /* Check if starting_scm_logical_addr is block aligned */
-> > +    if (!QEMU_IS_ALIGNED(starting_scm_logical_addr,
-> > +                         SPAPR_MINIMUM_SCM_BLOCK_SIZE)) {
-> > +        return H_P2;
-> > +    }
-> > +
-> > +    dev =3D drc->dev;
-> > +    dimm =3D PC_DIMM(dev);
-> > +    size =3D object_property_get_int(OBJECT(dimm), PC_DIMM_SIZE_PROP, =
-NULL);
-> > +    addr =3D object_property_get_int(OBJECT(dimm), PC_DIMM_ADDR_PROP, =
-NULL);
-> > +
-> > +    range_init_nofail(&nvdimmrange, addr, size);
-> > +
-> > +    size_to_unbind =3D no_of_scm_blocks_to_unbind * SPAPR_MINIMUM_SCM_=
-BLOCK_SIZE;
-> > +
-> > +
-> > +    range_init_nofail(&blockrange, starting_scm_logical_addr, size_to_=
-unbind);
-> > +
-> > +    if (!range_contains_range(&nvdimmrange, &blockrange)) {
-> > +        return H_P3;
-> > +    }
-> > +
-> > +    if (continue_token > 0) {
-> > +        return H_P3;
-> > +    }
-> > +
-> > +    args[1] =3D no_of_scm_blocks_to_unbind;
-> > +
-> > +    /*NB : dont do anything, let object_del take care of this for now.=
- */
-> > +    return H_SUCCESS;
-> > +}
-> > +
-> >  static spapr_hcall_fn papr_hypercall_table[(MAX_HCALL_OPCODE / 4) + 1];
-> >  static spapr_hcall_fn kvmppc_hypercall_table[KVMPPC_HCALL_MAX - KVMPPC=
-_HCALL_BASE + 1];
-> > =20
-> > @@ -1894,6 +2090,12 @@ static void hypercall_register_types(void)
-> >      /* qemu/KVM-PPC specific hcalls */
-> >      spapr_register_hypercall(KVMPPC_H_RTAS, h_rtas);
-> > =20
-> > +    /* qemu/scm specific hcalls */
-> > +    spapr_register_hypercall(H_SCM_READ_METADATA, h_scm_read_metadata);
-> > +    spapr_register_hypercall(H_SCM_WRITE_METADATA, h_scm_write_metadat=
-a);
-> > +    spapr_register_hypercall(H_SCM_BIND_MEM, h_scm_bind_mem);
-> > +    spapr_register_hypercall(H_SCM_UNBIND_MEM, h_scm_unbind_mem);
-> > +
-> >      /* ibm,client-architecture-support support */
-> >      spapr_register_hypercall(KVMPPC_H_CAS, h_client_architecture_suppo=
-rt);
-> > =20
-> > diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-> > index 394ea26335..48e2cc9d67 100644
-> > --- a/include/hw/ppc/spapr.h
-> > +++ b/include/hw/ppc/spapr.h
-> > @@ -283,6 +283,7 @@ struct SpaprMachineState {
-> >  #define H_P7              -60
-> >  #define H_P8              -61
-> >  #define H_P9              -62
-> > +#define H_OVERLAP         -68
-> >  #define H_UNSUPPORTED_FLAG -256
-> >  #define H_MULTI_THREADS_ACTIVE -9005
-> > =20
-> > @@ -490,8 +491,12 @@ struct SpaprMachineState {
-> >  #define H_INT_ESB               0x3C8
-> >  #define H_INT_SYNC              0x3CC
-> >  #define H_INT_RESET             0x3D0
-> > +#define H_SCM_READ_METADATA     0x3E4
-> > +#define H_SCM_WRITE_METADATA    0x3E8
-> > +#define H_SCM_BIND_MEM          0x3EC
-> > +#define H_SCM_UNBIND_MEM        0x3F0
-> > =20
-> > -#define MAX_HCALL_OPCODE        H_INT_RESET
-> > +#define MAX_HCALL_OPCODE        H_SCM_UNBIND_MEM
-> > =20
-> >  /* The hcalls above are standardized in PAPR and implemented by pHyp
-> >   * as well.
+>  * Define the standard job (make check-acceptance) as a set
+>    of tests that can run under the Travis CI job (discounted
+>    the average QEMU build time)
+
+Agreed.
+
 >=20
+> This means that:
+>=20
+>  * We'd tag some tests as "not-default", filtering them out
+>    of "make check-acceptance"
+>=20
+>  * Supposing a developer is using a machine as least as powerful
+>    as the Travis CI environment, and assuming a build time of
+>    10 minutes, his "make check-acceptance" maximum execution
+>    time would be in the order of ~39 minutes.
+>=20
+> I can work on adding the missing Avocado features, such as
+> the ability to list/count the maximum job time for the given test
+> selection. This should help us to maintain sound CI jobs, and good
+> user experience.
+
+Sounds good to me.
+
+>=20
+> And finally, I'm sorry that I did overthink this... but I know
+> that the time for hard choices are coming fast.
+
+The above proposals are cool, I don't think they are
+overthinking.
+
+I only meant that we shouldn't be looking to a formal definition
+of "slow", because "what exactly is a slow job?" isn't the
+important question we should be asking.  "How to avoid timeouts
+on CI jobs" is the important question, and your proposals above
+help us address that.
 
 --=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---DMLl6fZPX8o7hGmc
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlzl7WYACgkQbDjKyiDZ
-s5L3hRAAk/RKZzZZ+S7upSbGX46pd2hiUbUXm9TYlsmzn5ICcFrAUcd60f1bVc5p
-vBv2LGGB0AfVJNijqgV0uu0zjtH5f+Env1CIFas7zAtouxQpOAk+sHL32qM8Ewwz
-qBzpKoqPNrL/Yyi0owwzzxfUgDnnr/c2Q0gpmMvJyXAWB1F+HD4Gj3eRdrEps5hj
-PXjcNihFWUuWNLzEBn/tkElTqQ4bf0HFpqZFDUvnLI4pXcWT9VOgJKVLrXj/Sp+D
-1O20KdB0nVxHPGvgUp4k88o7xoOUY9claGVEPBm2rMO0heFSLIjNUfpup+dAkIy3
-IuhmNHPDgLG7dk1wlboNmEMUzA6pAEbSQYYm7yUCeYEVUIM+fqCz+Re/Zs3U3WvP
-VZaTTshoAq7kt07OVG25SwgnGhc1VWFwHtuJAjomak9yc86DA5cxUJlIOihIbkQA
-VBvNlcmYPxUp6zzr9xMYwlFrSvc87zTfyCHlwonC9O8VHmzJJsRxG2m04IsyHRLc
-gLhttgH8BJ15+b+VRql7aXI0h2c35HC1XrUgrH2UVj+wjIhW7HunsNEyEC5HRiBK
-0t7zNqetChylkQrUBfQHroVc+6Ez5jKlZLtuhVujEg0s1ByKAuXP1QhGekzeS29q
-gjppMLOQGJQ0WA1F85A2Ay8/xLKIWuZ7NhmbDggkbWGcPiGYVNw=
-=Jr5P
------END PGP SIGNATURE-----
-
---DMLl6fZPX8o7hGmc--
+Eduardo
 
