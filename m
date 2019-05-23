@@ -2,110 +2,95 @@ Return-Path: <SRS0=bvyN=TX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 700DDC282DD
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 11:02:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 922ADC282DD
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 11:04:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2866D20862
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 11:02:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5338220868
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 11:04:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="C9KHl+NO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2866D20862
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Ax5/8cYj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5338220868
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:33728 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:33773 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hTlUi-0003JU-Dn
-	for qemu-devel@archiver.kernel.org; Thu, 23 May 2019 07:02:44 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:57311)
+	id 1hTlWN-0004S5-N4
+	for qemu-devel@archiver.kernel.org; Thu, 23 May 2019 07:04:27 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:58112)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rkagan@virtuozzo.com>) id 1hTlN9-0005H5-2h
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 06:54:55 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1hTlQb-00008B-Us
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 06:58:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rkagan@virtuozzo.com>) id 1hTlN7-0004ua-Lf
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 06:54:54 -0400
-Received: from mail-eopbgr10111.outbound.protection.outlook.com
-	([40.107.1.111]:47693
-	helo=EUR02-HE1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <rkagan@virtuozzo.com>)
-	id 1hTlN6-0004rv-Vz
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 06:54:53 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
-	s=selector1;
-	h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
-	bh=5dG8ZjdUTTrH2EUOGNc9iCD4YPcVF71jqGSB4UceVx8=;
-	b=C9KHl+NOHQF9XCMSXvv2uLHBRIFTgH1c8vCO22MRojOD9TsuC4sSz29au443siURmU1WPoqHC4AnIroge7suWTzWRMZWaOJwUl1gVJpXJWvfEXNZdiKKWHOT6R9Tu8sqWtm6aUpJi6zIY015sNKYveXkJsDEXpLKNA3FFpcoCcM=
-Received: from DBBPR08MB4854.eurprd08.prod.outlook.com (20.179.46.205) by
-	DBBPR08MB4425.eurprd08.prod.outlook.com (20.179.43.13) with Microsoft
-	SMTP
-	Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
-	15.20.1922.16; Thu, 23 May 2019 10:54:49 +0000
-Received: from DBBPR08MB4854.eurprd08.prod.outlook.com
-	([fe80::4d46:2c95:d6e:ab3f]) by DBBPR08MB4854.eurprd08.prod.outlook.com
-	([fe80::4d46:2c95:d6e:ab3f%7]) with mapi id 15.20.1900.010;
-	Thu, 23 May 2019 10:54:49 +0000
-From: Roman Kagan <rkagan@virtuozzo.com>
-To: Paolo Bonzini <pbonzini@redhat.com>, "qemu-devel@nongnu.org"
-	<qemu-devel@nongnu.org>
-Thread-Topic: [RFC PATCH 2/2] cpus-common: assert BQL nesting within
-	cpu-exclusive sections
-Thread-Index: AQHVEVXxmQM6pQZQ6EOMQW2xqwR+sg==
-Date: Thu, 23 May 2019 10:54:49 +0000
-Message-ID: <20190523105440.27045-3-rkagan@virtuozzo.com>
-References: <20190523105440.27045-1-rkagan@virtuozzo.com>
-In-Reply-To: <20190523105440.27045-1-rkagan@virtuozzo.com>
-Accept-Language: en-US, ru-RU
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [185.231.240.5]
-x-clientproxiedby: HE1PR0901CA0058.eurprd09.prod.outlook.com
-	(2603:10a6:3:45::26) To DBBPR08MB4854.eurprd08.prod.outlook.com
-	(2603:10a6:10:da::13)
-authentication-results: spf=none (sender IP is )
-	smtp.mailfrom=rkagan@virtuozzo.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-mailer: git-send-email 2.21.0
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 831b6e39-52ee-47ef-ecdc-08d6df6d1359
-x-microsoft-antispam: BCL:0; PCL:0;
-	RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600141)(711020)(4605104)(2017052603328)(7193020);
-	SRVR:DBBPR08MB4425; 
-x-ms-traffictypediagnostic: DBBPR08MB4425:
-x-microsoft-antispam-prvs: <DBBPR08MB4425534C833B6A1FE4D15280C9010@DBBPR08MB4425.eurprd08.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:5236;
-x-forefront-prvs: 00462943DE
-x-forefront-antispam-report: SFV:NSPM;
-	SFS:(10019020)(346002)(136003)(39840400004)(366004)(376002)(396003)(199004)(189003)(81166006)(81156014)(8676002)(8936002)(50226002)(7736002)(2501003)(305945005)(36756003)(53936002)(386003)(6506007)(102836004)(52116002)(6486002)(14454004)(316002)(76176011)(1076003)(478600001)(99286004)(86362001)(6512007)(11346002)(2616005)(476003)(446003)(186003)(66066001)(68736007)(2906002)(26005)(256004)(71200400001)(110136005)(25786009)(66946007)(64756008)(14444005)(71190400001)(66476007)(66556008)(73956011)(5660300002)(3846002)(6436002)(66446008)(486006)(6116002);
-	DIR:OUT; SFP:1102; SCL:1; SRVR:DBBPR08MB4425;
-	H:DBBPR08MB4854.eurprd08.prod.outlook.com; FPR:; SPF:None;
-	LANG:en; PTR:InfoNoRecords; A:1; MX:1; 
-received-spf: None (protection.outlook.com: virtuozzo.com does not designate
-	permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: aq/9XU/d3rSV3dXma8TF9AIF8h8T/SIyI2wkCI124H+iTpY8SmJyMqz+LksOV87TvDtWydfAlDgyjojN881adHNKmqwdLVKabIM1dWWWst0nsTsO3pCbq14adfmxqiBWs46P4AdfYnvyCWpu7QZ312NAbOwVbj/SsZGahj1eQmxKBQR+/h4MsWHGHwX9XiFjC2KmvtDhln/vgawbem53iexjzdHIsK//Z/oMTA4ItjoArbO9A+IRN1rkYReK5LZhqP6NInAzTJF1Z24ZkX1SpKNcdGo40LX8INwGBXhaY1fbuFgUe8ssAw51PUZ+ZZnDY9dbqr7FqSJfQ7xWRZDr6SzJKBhZ8ce8nw16oQya2IwDqp/18xHnOivJS52Fl87RCLjot8zTA1pI76ssDX0LBGbgQFDqVTrxni6oxHkynQo=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(envelope-from <alex.bennee@linaro.org>) id 1hTlQX-00073g-Jz
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 06:58:27 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:35163)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1hTlQV-00070h-M1
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 06:58:24 -0400
+Received: by mail-wr1-x442.google.com with SMTP id m3so5761062wrv.2
+	for <qemu-devel@nongnu.org>; Thu, 23 May 2019 03:58:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=references:user-agent:from:to:cc:subject:in-reply-to:date
+	:message-id:mime-version:content-transfer-encoding;
+	bh=QGXEl1MRbGuUWR3YTp2HAaTeKzvO6AugOLeNiqUyoBM=;
+	b=Ax5/8cYjJf2fhIXomRpQoosWaf0mnIAM0l6c4QKC0TZc31i0vD0BKS+vFriqxbWLza
+	EIUfw3iJjw/TcJwpgK0as9m27GmngfBZ/zW3jLnwz3q85Fs2ddm+zaCGksajaBl107VP
+	LVPleycOcYZDYpwFmXeMTJAJwaSmukVz1XvDVbPKPx7GiCl4OAUp+P/ns8me9if36N1h
+	p/aB4DlCEIA6ct7hqSbJAqRPthe8m5vXTBGhNsqBV9T6xELLA1pIIA9ULnPjEoklm79u
+	PWuMiO7DDWes1JvHntJhlGuP00JR7k5fO8ku5ulHgoC8aEwSMm+91fflIHLupVo6i5hZ
+	N85Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:references:user-agent:from:to:cc:subject
+	:in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+	bh=QGXEl1MRbGuUWR3YTp2HAaTeKzvO6AugOLeNiqUyoBM=;
+	b=rrG9BOZExniLXCsoW6D0zVRfGLyqbAKK1Y2lnFWQp4tCCPSWjJ3rbgOOhRV00uBniJ
+	9D3qhQR3YuCUXgy8kLdd1+o1GHWw8rb0FS2qjRygBBnzlsGUZt83LyAb+i944TO/nQbN
+	o+wbk6RC5yuRQJDdgwaG8wzTwFM6D/yxsaj6lQlxaIzGlKc7/sAObT4yQ+E1AQandzPE
+	hC79Nis0Z5RJMMvILrYbMrcKr7wgj+XvuGYyoOyk2eWY+h+mLuhJNNcslRWr2QGVMpPz
+	sJ+Txg5rn5f4aBUd7EHvdS3TBLVnwnwOXrdilnXl6er1f5QkwZWpSFA3QigSo24Lo71h
+	nCyQ==
+X-Gm-Message-State: APjAAAXlcDB41nYmPY+9ZZIrbt6zQMbrpnLUjQaJCn+1TOyAE5KyHcFs
+	yfHsdOkW1N9UlvHN1xWVmJyujw==
+X-Google-Smtp-Source: APXvYqx7JPPNMD+fe97IrcDS+FQMGMra1oOw5xIJp583j+6CqO5d9lK62WRdo5VAA2Qy9QRm4UJzuw==
+X-Received: by 2002:adf:e4d2:: with SMTP id v18mr18807137wrm.189.1558609098908;
+	Thu, 23 May 2019 03:58:18 -0700 (PDT)
+Received: from zen.linaroharston ([81.128.185.34])
+	by smtp.gmail.com with ESMTPSA id
+	s13sm20873328wrw.17.2019.05.23.03.58.18
+	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+	Thu, 23 May 2019 03:58:18 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+	by zen.linaroharston (Postfix) with ESMTP id C2B3E1FF87;
+	Thu, 23 May 2019 11:58:17 +0100 (BST)
+References: <20190515203112.506-1-david@redhat.com>
+	<20190515203112.506-2-david@redhat.com>
+	<b3611279-15c4-f9b7-2a91-051ac6431b2c@linaro.org>
+	<44d7ddb4-040f-6778-7439-043b94e354ec@redhat.com>
+	<0935643f-941f-5883-c481-8ac18d57c98d@linaro.org>
+	<1f6001a2-e1d3-2b6f-e84a-8b9963302a3c@redhat.com>
+User-agent: mu4e 1.3.2; emacs 26.1
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+In-reply-to: <1f6001a2-e1d3-2b6f-e84a-8b9963302a3c@redhat.com>
+Date: Thu, 23 May 2019 11:58:17 +0100
+Message-ID: <87k1eh1lpy.fsf@zen.linaroharston>
 MIME-Version: 1.0
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 831b6e39-52ee-47ef-ecdc-08d6df6d1359
-X-MS-Exchange-CrossTenant-originalarrivaltime: 23 May 2019 10:54:49.1342 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DBBPR08MB4425
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.1.111
-Subject: [Qemu-devel] [RFC PATCH 2/2] cpus-common: assert BQL nesting within
- cpu-exclusive sections
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2a00:1450:4864:20::442
+Subject: Re: [Qemu-devel] [PATCH v1 1/5] s390x/tcg: Implement VECTOR FIND
+ ANY ELEMENT EQUAL
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -117,34 +102,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>,
+	Richard Henderson <richard.henderson@linaro.org>,
+	Thomas Huth <thuth@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-QXNzZXJ0IHRoYXQgdGhlIGNwdS1leGNsdXNpdmUgc2VjdGlvbnMgYXJlIG5ldmVyIGVudGVyZWQv
-bGVmdCB3aXRoIHRoZQ0KQlFMIHRha2VuLg0KDQpTaWduZWQtb2ZmLWJ5OiBSb21hbiBLYWdhbiA8
-cmthZ2FuQHZpcnR1b3p6by5jb20+DQotLS0NCiBjcHVzLWNvbW1vbi5jIHwgNCArKysrDQogMSBm
-aWxlIGNoYW5nZWQsIDQgaW5zZXJ0aW9ucygrKQ0KDQpkaWZmIC0tZ2l0IGEvY3B1cy1jb21tb24u
-YyBiL2NwdXMtY29tbW9uLmMNCmluZGV4IDAyM2NmZWJmYTMuLjlhYTc1ZmUxYmEgMTAwNjQ0DQot
-LS0gYS9jcHVzLWNvbW1vbi5jDQorKysgYi9jcHVzLWNvbW1vbi5jDQpAQCAtMTc0LDYgKzE3NCw3
-IEBAIHZvaWQgc3RhcnRfZXhjbHVzaXZlKHZvaWQpDQogICAgIENQVVN0YXRlICpvdGhlcl9jcHU7
-DQogICAgIGludCBydW5uaW5nX2NwdXM7DQogDQorICAgIGFzc2VydCghcWVtdV9tdXRleF9pb3Ro
-cmVhZF9sb2NrZWQoKSk7DQogICAgIHFlbXVfbXV0ZXhfbG9jaygmcWVtdV9jcHVfbGlzdF9sb2Nr
-KTsNCiAgICAgZXhjbHVzaXZlX2lkbGUoKTsNCiANCkBAIC0yMDUsNiArMjA2LDcgQEAgdm9pZCBz
-dGFydF9leGNsdXNpdmUodm9pZCkNCiAvKiBGaW5pc2ggYW4gZXhjbHVzaXZlIG9wZXJhdGlvbi4g
-ICovDQogdm9pZCBlbmRfZXhjbHVzaXZlKHZvaWQpDQogew0KKyAgICBhc3NlcnQoIXFlbXVfbXV0
-ZXhfaW90aHJlYWRfbG9ja2VkKCkpOw0KICAgICBxZW11X211dGV4X2xvY2soJnFlbXVfY3B1X2xp
-c3RfbG9jayk7DQogICAgIGF0b21pY19zZXQoJnBlbmRpbmdfY3B1cywgMCk7DQogICAgIHFlbXVf
-Y29uZF9icm9hZGNhc3QoJmV4Y2x1c2l2ZV9yZXN1bWUpOw0KQEAgLTIxNCw2ICsyMTYsNyBAQCB2
-b2lkIGVuZF9leGNsdXNpdmUodm9pZCkNCiAvKiBXYWl0IGZvciBleGNsdXNpdmUgb3BzIHRvIGZp
-bmlzaCwgYW5kIGJlZ2luIGNwdSBleGVjdXRpb24uICAqLw0KIHZvaWQgY3B1X2V4ZWNfc3RhcnQo
-Q1BVU3RhdGUgKmNwdSkNCiB7DQorICAgIGFzc2VydCghcWVtdV9tdXRleF9pb3RocmVhZF9sb2Nr
-ZWQoKSk7DQogICAgIGF0b21pY19zZXQoJmNwdS0+cnVubmluZywgdHJ1ZSk7DQogDQogICAgIC8q
-IFdyaXRlIGNwdS0+cnVubmluZyBiZWZvcmUgcmVhZGluZyBwZW5kaW5nX2NwdXMuICAqLw0KQEAg
-LTI1NSw2ICsyNTgsNyBAQCB2b2lkIGNwdV9leGVjX3N0YXJ0KENQVVN0YXRlICpjcHUpDQogLyog
-TWFyayBjcHUgYXMgbm90IGV4ZWN1dGluZywgYW5kIHJlbGVhc2UgcGVuZGluZyBleGNsdXNpdmUg
-b3BzLiAgKi8NCiB2b2lkIGNwdV9leGVjX2VuZChDUFVTdGF0ZSAqY3B1KQ0KIHsNCisgICAgYXNz
-ZXJ0KCFxZW11X211dGV4X2lvdGhyZWFkX2xvY2tlZCgpKTsNCiAgICAgYXRvbWljX3NldCgmY3B1
-LT5ydW5uaW5nLCBmYWxzZSk7DQogDQogICAgIC8qIFdyaXRlIGNwdS0+cnVubmluZyBiZWZvcmUg
-cmVhZGluZyBwZW5kaW5nX2NwdXMuICAqLw0KLS0gDQoyLjIxLjANCg0K
+
+David Hildenbrand <david@redhat.com> writes:
+
+> On 22.05.19 13:09, Richard Henderson wrote:
+>> On 5/22/19 7:01 AM, David Hildenbrand wrote:
+>>>
+>>>> I also think that, if we create a bunch more of these wrappers:
+>>>>
+>>>>> +DEF_VFAE_HELPER(8)
+>>>>> +DEF_VFAE_HELPER(16)
+>>>>> +DEF_VFAE_HELPER(32)
+>>>>
+>>>> then RT and ZS can be passed in as constant parameters to the above, a=
+nd then
+>>>> the compiler will fold away all of the stuff that's not needed for each
+>>>> different case.  Which, I think, is significant.  These are practically
+>>>> different instructions with the different modifiers.
+>>>>
+>>>
+>>> So, we have 4 flags, resulting in 16 variants. Times 3 element sizes ...
+>>> 48 helpers in total. Do we really want to go down that path?
+>>
+>> Maybe?
+>
+> Hope my fingers won't bleed from all the copy-pasting ;)
+
+An alternative is to generalise the code into a helper and then just use
+macros to instantiate a series of calls to it (c.f. softfloat). The idea
+is you can use flatten/inline to keep it efficient but you don't have a
+bunch of logic obscured by macro stuff.
+
+
+--
+Alex Benn=C3=A9e
 
