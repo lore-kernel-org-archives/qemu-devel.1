@@ -4,59 +4,58 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ABDD0C04AAC
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 05:34:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F1A93C04AAC
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 05:36:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7677D20881
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 05:34:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BA00F20881
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 05:36:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="OEqKriCP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7677D20881
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="fxy8AIYO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BA00F20881
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:57958 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:58004 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hTgNL-0003Qd-MR
-	for qemu-devel@archiver.kernel.org; Thu, 23 May 2019 01:34:47 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:41313)
+	id 1hTgP1-0004ns-0n
+	for qemu-devel@archiver.kernel.org; Thu, 23 May 2019 01:36:31 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:41284)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1hTgIO-00080i-F2
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 01:29:43 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1hTgIM-00080J-Gj
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 01:29:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1hTgIM-0005jc-Hq
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 01:29:40 -0400
-Received: from ozlabs.org ([203.11.71.1]:52855)
+	(envelope-from <dgibson@ozlabs.org>) id 1hTgII-0005hN-NL
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 01:29:38 -0400
+Received: from ozlabs.org ([2401:3900:2:1::2]:52941)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
-	id 1hTgIK-0005hs-RR; Thu, 23 May 2019 01:29:38 -0400
+	id 1hTgIF-0005em-EA; Thu, 23 May 2019 01:29:33 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
-	id 458dNM3kl4z9sDX; Thu, 23 May 2019 15:29:23 +1000 (AEST)
+	id 458dNL3ZWLz9s6w; Thu, 23 May 2019 15:29:21 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-	d=gibson.dropbear.id.au; s=201602; t=1558589363;
-	bh=AW77xSAKbMiDidstLqWSYFs3Idt3X/vhTJyEOA0oYfY=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=OEqKriCPGaUmkaQdMd+OcUFPS4Yz1XSzrOKpSnjjL5h1LrexgWM/wjghHiIok1OxS
-	BuSZIZBY/IbZn3jN5zMjFGVuJHo2WXwguq68cOkZfzXCIJ/yVtyelqzPqgfufRbCH+
-	Y52UkPLHlr9rz3XlHZbysa4BJnLaIay6Qv+yIwZ0=
+	d=gibson.dropbear.id.au; s=201602; t=1558589362;
+	bh=gs+yX4Rpc3mi9205nXqZ5YZPkPALH1nmnc7QtQ5Y84A=;
+	h=From:To:Cc:Subject:Date:From;
+	b=fxy8AIYOGyegWUqWWNpsPQ3AOOh1inQeTIlpQLQRXe0iAFYAfMhQOiFTgljOILKr/
+	IFp2619X0l04Gy9kIFREYk/ORU1TiJMz0xj3LIzfM0tNOnTr/cN2u3Jtdeb8EPQfza
+	4pVY32c/oEX4+us5pwW3IzZHLmcpuWXFVqpybwpU=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: qemu-ppc@nongnu.org
-Date: Thu, 23 May 2019 15:29:17 +1000
-Message-Id: <20190523052918.1129-7-david@gibson.dropbear.id.au>
+Date: Thu, 23 May 2019 15:29:11 +1000
+Message-Id: <20190523052918.1129-1-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20190523052918.1129-1-david@gibson.dropbear.id.au>
-References: <20190523052918.1129-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 203.11.71.1
-Subject: [Qemu-devel] [PATCH 7/8] spapr: Direct all PCI hotplug to host
- bridge, rather than P2P bridge
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2401:3900:2:1::2
+Subject: [Qemu-devel] [PATCH 1/8] spapr: Clean up device node name
+ generation for PCI devices
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -74,41 +73,109 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-A P2P bridge will attempt to handle the hotplug with SHPC, which doesn't
-work in the PAPR environment.  Instead we want to direct all PCI hotplug
-actions to the PAPR specific host bridge which will use the PAPR hotplug
-mechanism.
+spapr_populate_pci_child_dt() adds a 'name' property to the device tree
+node for PCI devices.  This is never necessary for a flattened device tre=
+e,
+it is implicit in the name added when the node is constructed.  In fact
+anything we do add to a 'name' property will be overwritten with somethin=
+g
+derived from the structural name in the guest firmware (but in fact it is
+exactly the same bytes).
+
+So, remove that.  In addition, pci_get_node_name() is very simple, so fol=
+d
+it into its (also simple) sole caller spapr_create_pci_child_dt().
+
+While we're there rename pci_find_device_name() to the shorter and more
+accurate dt_name_from_class().
 
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/spapr.c | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+ hw/ppc/spapr_pci.c | 43 +++++++++++++++++--------------------------
+ 1 file changed, 17 insertions(+), 26 deletions(-)
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 507fd50dd5..6dd8aaac33 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -4094,6 +4094,17 @@ static HotplugHandler *spapr_get_hotplug_handler(M=
-achineState *machine,
-         object_dynamic_cast(OBJECT(dev), TYPE_SPAPR_PCI_HOST_BRIDGE)) {
-         return HOTPLUG_HANDLER(machine);
-     }
-+    if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_DEVICE)) {
-+        PCIDevice *pcidev =3D PCI_DEVICE(dev);
-+        PCIBus *root =3D pci_device_root_bus(pcidev);
-+        SpaprPhbState *phb =3D
-+            (SpaprPhbState *)object_dynamic_cast(OBJECT(BUS(root)->paren=
-t),
-+                                                 TYPE_SPAPR_PCI_HOST_BRI=
-DGE);
-+
-+        if (phb) {
-+            return HOTPLUG_HANDLER(phb);
-+        }
-+    }
-     return NULL;
+diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
+index 97961b0128..b2db46ef1d 100644
+--- a/hw/ppc/spapr_pci.c
++++ b/hw/ppc/spapr_pci.c
+@@ -1173,8 +1173,8 @@ static const PCIClass pci_classes[] =3D {
+     { "data-processing-controller", spc_subclass },
+ };
+=20
+-static const char *pci_find_device_name(uint8_t class, uint8_t subclass,
+-                                        uint8_t iface)
++static const char *dt_name_from_class(uint8_t class, uint8_t subclass,
++                                      uint8_t iface)
+ {
+     const PCIClass *pclass;
+     const PCISubClass *psubclass;
+@@ -1216,23 +1216,6 @@ static const char *pci_find_device_name(uint8_t cl=
+ass, uint8_t subclass,
+     return name;
  }
 =20
+-static gchar *pci_get_node_name(PCIDevice *dev)
+-{
+-    int slot =3D PCI_SLOT(dev->devfn);
+-    int func =3D PCI_FUNC(dev->devfn);
+-    uint32_t ccode =3D pci_default_read_config(dev, PCI_CLASS_PROG, 3);
+-    const char *name;
+-
+-    name =3D pci_find_device_name((ccode >> 16) & 0xff, (ccode >> 8) & 0=
+xff,
+-                                ccode & 0xff);
+-
+-    if (func !=3D 0) {
+-        return g_strdup_printf("%s@%x,%x", name, slot, func);
+-    } else {
+-        return g_strdup_printf("%s@%x", name, slot);
+-    }
+-}
+-
+ static uint32_t spapr_phb_get_pci_drc_index(SpaprPhbState *phb,
+                                             PCIDevice *pdev);
+=20
+@@ -1300,11 +1283,6 @@ static void spapr_populate_pci_child_dt(PCIDevice =
+*dev, void *fdt, int offset,
+         _FDT(fdt_setprop(fdt, offset, "udf-supported", NULL, 0));
+     }
+=20
+-    _FDT(fdt_setprop_string(fdt, offset, "name",
+-                            pci_find_device_name((ccode >> 16) & 0xff,
+-                                                 (ccode >> 8) & 0xff,
+-                                                 ccode & 0xff)));
+-
+     buf =3D spapr_phb_get_loc_code(sphb, dev);
+     _FDT(fdt_setprop_string(fdt, offset, "ibm,loc-code", buf));
+     g_free(buf);
+@@ -1348,10 +1326,23 @@ static int spapr_create_pci_child_dt(SpaprPhbStat=
+e *phb, PCIDevice *dev,
+                                      void *fdt, int node_offset)
+ {
+     int offset;
+-    gchar *nodename;
++    const gchar *basename;
++    char *nodename;
++    int slot =3D PCI_SLOT(dev->devfn);
++    int func =3D PCI_FUNC(dev->devfn);
++    uint32_t ccode =3D pci_default_read_config(dev, PCI_CLASS_PROG, 3);
++
++    basename =3D dt_name_from_class((ccode >> 16) & 0xff, (ccode >> 8) &=
+ 0xff,
++                                  ccode & 0xff);
++
++    if (func !=3D 0) {
++        nodename =3D g_strdup_printf("%s@%x,%x", basename, slot, func);
++    } else {
++        nodename =3D g_strdup_printf("%s@%x", basename, slot);
++    }
+=20
+-    nodename =3D pci_get_node_name(dev);
+     _FDT(offset =3D fdt_add_subnode(fdt, node_offset, nodename));
++
+     g_free(nodename);
+=20
+     spapr_populate_pci_child_dt(dev, fdt, offset, phb);
 --=20
 2.21.0
 
