@@ -2,88 +2,92 @@ Return-Path: <SRS0=bvyN=TX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 31E5CC282DD
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 17:32:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 118B2C282DD
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 17:35:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E39A120657
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 17:32:50 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Upyh2ci/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E39A120657
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id D1FA92133D
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 17:35:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D1FA92133D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:41117 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:41158 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hTraE-0007Al-96
-	for qemu-devel@archiver.kernel.org; Thu, 23 May 2019 13:32:50 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:55289)
+	id 1hTrd1-000898-55
+	for qemu-devel@archiver.kernel.org; Thu, 23 May 2019 13:35:43 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:56110)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.m.mail@gmail.com>) id 1hTrYl-0006Di-NC
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 13:31:21 -0400
+	(envelope-from <mreitz@redhat.com>) id 1hTrc1-0007kG-55
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 13:34:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.m.mail@gmail.com>) id 1hTrYj-0001W7-F2
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 13:31:19 -0400
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:37964)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
-	id 1hTrYj-0001VP-7Y
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 13:31:17 -0400
-Received: by mail-ot1-x341.google.com with SMTP id s19so6183713otq.5
-	for <qemu-devel@nongnu.org>; Thu, 23 May 2019 10:31:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=mime-version:in-reply-to:references:from:date:message-id:subject:to
-	:cc; bh=clVrA6rIPZQBqWjmmJ++R40bxGoKGYEOdR5siX9qp6U=;
-	b=Upyh2ci/APasqvjksS3CuyEZrNzc5iSJ3Kh5C+A2xGZ6wXBEUTHwEjj5V5YuGrAuxV
-	ccwjyQ30SXNX4txVIyK/Iin5uuPNm7OY7vQPoCAz5jE99U6KpxJu4Fk8GWXZv82Rcgb7
-	4/cbJnVFATTHieaA1+hlVi6Jk3Qs9sYW1FQltygspc+pk7WIPhNJhCMQamu2MUBhIRce
-	SWlIZxdlNm9gEGrEz6hZ52/ZJTgw5oJjFARij+BhwBL0Q+OabVsBuvNVUOqPB6I0Rkbn
-	IgvnVp6SZ/IHzVnXGRKzvKPHfc9ra38zowdsKVlt+B7BKJbI18ESLEjcLGq3lcVxjd7J
-	qeoQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:in-reply-to:references:from:date
-	:message-id:subject:to:cc;
-	bh=clVrA6rIPZQBqWjmmJ++R40bxGoKGYEOdR5siX9qp6U=;
-	b=kCtTw4dMrE6ib4zjlpjRO5Ahw5N/3ytJGnvcDpovGkkaAplbOsBnH0YuKqtRvQ7WVc
-	R2qHTLecnu1GkkqYd4cUCUfpN2X4AAid4XFSXibdGeEMHIIXybfeqT2TOGKcKVi14U8G
-	yon7G7CYYUWJlbe9jVwUiLUcXEnv8dkpxc/8YYOxiVo9NlIpr4/XQa+NCFrlGF7Ccn2k
-	oxx04gIk0Ds8xlPpaZfftSE4ACmUUP0DFTaCILx8gF1VH7GEBAkrfrLucUUKcYFhHDKz
-	8vo4D1MZGf0Odv2Oqt1CoQD4brVIDA/UKBGmSiYc5zCd6/i5ceQTy07mLPxXWHkSMMPR
-	F4RQ==
-X-Gm-Message-State: APjAAAXj7YmSrkBfEpsWwnV1GaXtdfz9xBLdHk2dhmJwppIKccNv8BQl
-	zqazAbwGpQpmhjxkTCZNfMiZfSHQtrXQ2fqXzje/uA/X
-X-Google-Smtp-Source: APXvYqyeO/mF4ea8eCOzYpcCjiUXsGyzZffediGFSPXElkSBupMu6deSEDnlIUeZ2DQ3Y1Bu+kfCh5nFUdFyXaDu7GI=
-X-Received: by 2002:a05:6830:160a:: with SMTP id
-	g10mr224348otr.121.1558632676216; 
-	Thu, 23 May 2019 10:31:16 -0700 (PDT)
+	(envelope-from <mreitz@redhat.com>) id 1hTrbz-0003h1-6j
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 13:34:41 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57082)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mreitz@redhat.com>)
+	id 1hTrbv-0003ed-0e; Thu, 23 May 2019 13:34:35 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 0F9393001749;
+	Thu, 23 May 2019 17:34:29 +0000 (UTC)
+Received: from dresden.str.redhat.com (unknown [10.40.205.176])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 0F7596134C;
+	Thu, 23 May 2019 17:34:26 +0000 (UTC)
+To: Sam Eiderman <shmuel.eiderman@oracle.com>, kwolf@redhat.com,
+	qemu-block@nongnu.org, qemu-devel@nongnu.org
+References: <20190523163337.4497-1-shmuel.eiderman@oracle.com>
+From: Max Reitz <mreitz@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+	mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+	/PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+	U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+	mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+	awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+	AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+	CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+	B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+	2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+	AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+	8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+	4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+	BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+	xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+	W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+	DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+	64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+	ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+	sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+	alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+	/ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+	bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+	R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <57f24d49-5834-07dc-908e-b8ce7f4b1e6e@redhat.com>
+Date: Thu, 23 May 2019 19:34:25 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-Received: by 2002:a9d:410f:0:0:0:0:0 with HTTP; Thu, 23 May 2019 10:31:15
-	-0700 (PDT)
-Received: by 2002:a9d:410f:0:0:0:0:0 with HTTP; Thu, 23 May 2019 10:31:15
-	-0700 (PDT)
-In-Reply-To: <155862937270.24.3313016521227492517@549697c9ad12>
-References: <20190523144336.13960-1-laurent@vivier.eu>
-	<155862937270.24.3313016521227492517@549697c9ad12>
-From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Thu, 23 May 2019 19:31:15 +0200
-Message-ID: <CAL1e-=j0tsaCs+QkRkcn+M62HJpsD-PtXWvZfPSnPNtn=64hfg@mail.gmail.com>
-To: qemu-devel@nongnu.org
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::341
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20190523163337.4497-1-shmuel.eiderman@oracle.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="PCI1vA4nPHWhbi1d9qagiMzxfQpjRSzKw"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.46]);
+	Thu, 23 May 2019 17:34:29 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
 X-Content-Filtered-By: Mailman/MimeDel 2.1.21
-Subject: Re: [Qemu-devel] [PULL 00/10] Linux user for 4.1 patches
+Subject: Re: [Qemu-devel] [PATCH v5 0/3] qemu-img: rebase: Improve/optimize
+ rebase operation
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -95,192 +99,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: arikalo@wavecomp.com, aurelien@aurel32.net, riku.voipio@iki.fi,
-	laurent@vivier.eu, amarkovic@wavecomp.com
+Cc: sagi.amit@oracle.com, arbel.moshe@oracle.com, liran.alon@oracle.com,
+	eyal.moscovici@oracle.com, karl.heubaum@oracle.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On May 23, 2019 6:51 PM, <no-reply@patchew.org> wrote:
->
-> Patchew URL:
-https://patchew.org/QEMU/20190523144336.13960-1-laurent@vivier.eu/
->
->
->
-> Hi,
->
-> This series seems to have some coding style problems. See output below fo=
-r
-> more information:
->
-> Message-id: 20190523144336.13960-1-laurent@vivier.eu
-> Type: series
-> Subject: [Qemu-devel] [PULL 00/10] Linux user for 4.1 patches
->
-> =3D=3D=3D TEST SCRIPT BEGIN =3D=3D=3D
-> #!/bin/bash
-> git rev-parse base > /dev/null || exit 0
-> git config --local diff.renamelimit 0
-> git config --local diff.renames True
-> git config --local diff.algorithm histogram
-> ./scripts/checkpatch.pl --mailback base..
-> =3D=3D=3D TEST SCRIPT END =3D=3D=3D
->
-> From https://github.com/patchew-project/qemu
->    d418238dca..8dc7fd56dd  master     -> master
-> From https://github.com/patchew-project/qemu
->  * [new tag]               patchew/
-20190523144336.13960-1-laurent@vivier.eu -> patchew/
-20190523144336.13960-1-laurent@vivier.eu
-> Switched to a new branch 'test'
-> 4770ccf734 linux-user: Pass through nanosecond timestamp components for
-stat syscalls
-> 1b5b9faa88 linux-user: Align mmap_find_vma to host page size
-> 874caa8bfb linux-user: Fix shmat emulation by honoring host SHMLBA
-> d907278358 linux-user: Add support for setsockopt() options
-IPV6_<ADD|DROP>_MEMBERSHIP
-> 57d45df330 linux-user: Sanitize interp_info and, for mips only, init
-field fp_abi
-> 7267248384 linux-user: Add support for SIOC<G|S>IFPFLAGS ioctls for all
-targets
-> 0eac2d71cc linux-user: Add support for SIOCSPGRP ioctl for all targets
-> f0e6b29b94 linux-user: Fix support for SIOCATMARK and SIOCGPGRP ioctls
-for xtensa
-> bd5d878a8c linux-user: add pseudo /proc/hardware for m68k
-> 1384b0eeee linux-user: add pseudo /proc/cpuinfo for sparc
->
-> =3D=3D=3D OUTPUT BEGIN =3D=3D=3D
-> 1/10 Checking commit 1384b0eeeeb5 (linux-user: add pseudo /proc/cpuinfo
-for sparc)
-> 2/10 Checking commit bd5d878a8cee (linux-user: add pseudo /proc/hardware
-for m68k)
-> 3/10 Checking commit f0e6b29b94d6 (linux-user: Fix support for SIOCATMARK
-and SIOCGPGRP ioctls for xtensa)
-> 4/10 Checking commit 0eac2d71ccfa (linux-user: Add support for SIOCSPGRP
-ioctl for all targets)
-> 5/10 Checking commit 72672483844f (linux-user: Add support for
-SIOC<G|S>IFPFLAGS ioctls for all targets)
-> 6/10 Checking commit 57d45df3304f (linux-user: Sanitize interp_info and,
-for mips only, init field fp_abi)
-> 7/10 Checking commit d907278358c4 (linux-user: Add support for
-setsockopt() options IPV6_<ADD|DROP>_MEMBERSHIP)
-> WARNING: architecture specific defines should be avoided
-> #70: FILE: linux-user/syscall.c:1929:
-> +#if __UAPI_DEF_IPV6_MREQ
->
-> total: 0 errors, 1 warnings, 29 lines checked
->
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--PCI1vA4nPHWhbi1d9qagiMzxfQpjRSzKw
+From: Max Reitz <mreitz@redhat.com>
+To: Sam Eiderman <shmuel.eiderman@oracle.com>, kwolf@redhat.com,
+ qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: eyal.moscovici@oracle.com, sagi.amit@oracle.com, karl.heubaum@oracle.com,
+ liran.alon@oracle.com, arbel.moshe@oracle.com
+Message-ID: <57f24d49-5834-07dc-908e-b8ce7f4b1e6e@redhat.com>
+Subject: Re: [PATCH v5 0/3] qemu-img: rebase: Improve/optimize rebase
+ operation
+References: <20190523163337.4497-1-shmuel.eiderman@oracle.com>
+In-Reply-To: <20190523163337.4497-1-shmuel.eiderman@oracle.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-This warning was known to us, but we can't do anything about it, the line
-in question is a =E2=80=9Cnecessary evil=E2=80=9D .
+On 23.05.19 18:33, Sam Eiderman wrote:
+> This patch series aims to improve the speed of qemu-img rebase.
+>=20
+>   1. Mainly by removing unnecessary reads when rebasing on the same
+>      chain.
+>   2. But also by minimizing the number of bdrv_open calls rebase
+>      requires.
+>=20
+> v2:
+>=20
+> * Added missing g_free in
+>   "qemu-img: rebase: Reuse in-chain BlockDriverState"
+>=20
+> v3:
+>=20
+> * Rebased on top of "Allow rebase with no input base" series
+>=20
+> v4 & v5:
+>=20
+> * Using backing_bs(bs) when a prefix was detected since bs was
+>   already checked for allocation.
+>=20
+> Sam Eiderman (3):
+>   qemu-img: rebase: Reuse parent BlockDriverState
+>   qemu-img: rebase: Reduce reads on in-chain rebase
+>   qemu-img: rebase: Reuse in-chain BlockDriverState
+>=20
+>  qemu-img.c | 85 ++++++++++++++++++++++++++++++++++++++++--------------=
+--------
+>  1 file changed, 55 insertions(+), 30 deletions(-)
 
-> Patch 7/10 has style problems, please review.  If any of these errors
-> are false positives report them to the maintainer, see
-> CHECKPATCH in MAINTAINERS.
-> 8/10 Checking commit 874caa8bfb4f (linux-user: Fix shmat emulation by
-honoring host SHMLBA)
-> WARNING: Block comments use a leading /* on a separate line
-> #54: FILE: linux-user/elfload.c:2070:
-> +            /* The same thing again, but with extra
->
-> total: 0 errors, 1 warnings, 221 lines checked
->
-> Patch 8/10 has style problems, please review.  If any of these errors
-> are false positives report them to the maintainer, see
-> CHECKPATCH in MAINTAINERS.
-> 9/10 Checking commit 1b5b9faa88bd (linux-user: Align mmap_find_vma to
-host page size)
-> 10/10 Checking commit 4770ccf73400 (linux-user: Pass through nanosecond
-timestamp components for stat syscalls)
-> ERROR: code indent should never use tabs
-> #105: FILE: linux-user/syscall_defs.h:1203:
-> +^Iabi_ulong  target_st_atime_nsec;$
->
-> ERROR: code indent should never use tabs
-> #108: FILE: linux-user/syscall_defs.h:1205:
-> +^Iabi_ulong  target_st_mtime_nsec;$
->
-> ERROR: code indent should never use tabs
-> #111: FILE: linux-user/syscall_defs.h:1207:
-> +^Iabi_ulong  target_st_ctime_nsec;$
->
-> ERROR: code indent should never use tabs
-> #120: FILE: linux-user/syscall_defs.h:1239:
-> +^Iabi_ulong^Itarget_st_atime_nsec;$
->
-> ERROR: code indent should never use tabs
-> #124: FILE: linux-user/syscall_defs.h:1242:
-> +^Iabi_ulong^Itarget_st_mtime_nsec;$
->
-> ERROR: code indent should never use tabs
-> #128: FILE: linux-user/syscall_defs.h:1245:
-> +^Iabi_ulong^Itarget_st_ctime_nsec;$
->
-> ERROR: code indent should never use tabs
-> #137: FILE: linux-user/syscall_defs.h:1324:
-> +^Iabi_ulong^Itarget_st_atime_nsec;$
->
-> ERROR: code indent should never use tabs
-> #141: FILE: linux-user/syscall_defs.h:1327:
-> +^Iabi_ulong^Itarget_st_mtime_nsec;$
->
-> ERROR: code indent should never use tabs
-> #145: FILE: linux-user/syscall_defs.h:1330:
-> +^Iabi_ulong^Itarget_st_ctime_nsec;$
->
-> ERROR: code indent should never use tabs
-> #161: FILE: linux-user/syscall_defs.h:1348:
-> +^Iabi_ulong^Itarget_st_atime_nsec;$
->
-> ERROR: code indent should never use tabs
-> #164: FILE: linux-user/syscall_defs.h:1350:
-> +^Iabi_ulong^Itarget_st_mtime_nsec;$
->
-> ERROR: code indent should never use tabs
-> #167: FILE: linux-user/syscall_defs.h:1352:
-> +^Iabi_ulong^Itarget_st_ctime_nsec;$
->
-> ERROR: code indent should never use tabs
-> #171: FILE: linux-user/syscall_defs.h:1355:
-> +^Iabi_ulong^I__unused1[2];$
->
-> ERROR: code indent should never use tabs
-> #180: FILE: linux-user/syscall_defs.h:1383:
-> +^Iunsigned int^Itarget_st_atime_nsec;$
->
-> ERROR: code indent should never use tabs
-> #184: FILE: linux-user/syscall_defs.h:1386:
-> +^Iunsigned int^Itarget_st_mtime_nsec;$
->
-> ERROR: code indent should never use tabs
-> #188: FILE: linux-user/syscall_defs.h:1389:
-> +^Iunsigned int^Itarget_st_ctime_nsec;$
->
-> ERROR: code indent should never use tabs
-> #192: FILE: linux-user/syscall_defs.h:1391:
-> +^Iunsigned int^I__unused1;$
->
-> ERROR: code indent should never use tabs
-> #193: FILE: linux-user/syscall_defs.h:1392:
-> +^Iunsigned int^I__unused2;$
->
-> total: 18 errors, 0 warnings, 211 lines checked
->
-> Patch 10/10 has style problems, please review.  If any of these errors
-> are false positives report them to the maintainer, see
-> CHECKPATCH in MAINTAINERS.
->
-> =3D=3D=3D OUTPUT END =3D=3D=3D
->
-> Test command exited with code: 1
->
->
-> The full log is available at
->
-http://patchew.org/logs/20190523144336.13960-1-laurent@vivier.eu/testing.ch=
-eckpatch/?type=3Dmessage
-.
-> ---
-> Email generated automatically by Patchew [https://patchew.org/].
-> Please send your feedback to patchew-devel@redhat.com
+Thanks, applied to my block branch:
+
+https://git.xanclic.moe/XanClic/qemu/commits/branch/block
+
+Max
+
+
+--PCI1vA4nPHWhbi1d9qagiMzxfQpjRSzKw
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlzm2aEACgkQ9AfbAGHV
+z0Crggf/SkHpX55FC+V0Tq32f8MbgdC49UTlBNt7sFVRyI3txTrUIiZoHo0LHLnN
+nmfdAVyX3x/OKWlYpr3eAWauakO2RrVu8xZr8szx7ZBMI4eb4u88aMnW9RNrwZx3
+YRq+QB37tvdrWE7MU1+qmtzjZiE7gwF5QZJ5NKyMraslvEP8WMW3097bszgp8xTW
+j8i6AowZPHCSuW+nfJUVpQDAf+1A1cKCgLWzXwni/NQ1lXf2qMuEGStPOucqeQFP
+i0b6HdFaXvJwDh0LHnRCVFFN6p/uMqFrh9qdRlRMkNdq3M26Hr6lkzbvsR+xVnPZ
+sKpOMxhIS1LKl4lLrNyC9MDF6CNtiQ==
+=S6fm
+-----END PGP SIGNATURE-----
+
+--PCI1vA4nPHWhbi1d9qagiMzxfQpjRSzKw--
+
