@@ -6,58 +6,58 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BEA76C282DD
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 13:08:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 61B69C282DD
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 13:09:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8BCF820851
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 13:08:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8BCF820851
+	by mail.kernel.org (Postfix) with ESMTPS id 350B320851
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 13:09:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 350B320851
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:35800 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:35806 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hTnSH-0005dU-Of
-	for qemu-devel@archiver.kernel.org; Thu, 23 May 2019 09:08:21 -0400
+	id 1hTnTD-0006it-D1
+	for qemu-devel@archiver.kernel.org; Thu, 23 May 2019 09:09:19 -0400
 Received: from eggs.gnu.org ([209.51.188.92]:51307)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hTnGz-0003rP-Io
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 08:56:42 -0400
+	(envelope-from <philmd@redhat.com>) id 1hTnH0-0003rP-Nu
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 08:56:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hTn5I-0002Uh-RR
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 08:44:37 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37592)
+	(envelope-from <philmd@redhat.com>) id 1hTn54-0001jc-77
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 08:44:23 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35780)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <philmd@redhat.com>)
-	id 1hTn5I-0002SR-Mt; Thu, 23 May 2019 08:44:36 -0400
+	id 1hTn54-0001hI-2R; Thu, 23 May 2019 08:44:22 -0400
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
 	[10.5.11.14])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D712DC04BE32;
-	Thu, 23 May 2019 12:44:35 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 4BF9A3024552;
+	Thu, 23 May 2019 12:44:16 +0000 (UTC)
 Received: from x1w.redhat.com (unknown [10.40.205.5])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id E45665D9D2;
-	Thu, 23 May 2019 12:44:22 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id DC70667C9D;
+	Thu, 23 May 2019 12:44:13 +0000 (UTC)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Thu, 23 May 2019 14:43:14 +0200
-Message-Id: <20190523124320.28726-10-philmd@redhat.com>
+Date: Thu, 23 May 2019 14:43:12 +0200
+Message-Id: <20190523124320.28726-8-philmd@redhat.com>
 In-Reply-To: <20190523124320.28726-1-philmd@redhat.com>
 References: <20190523124320.28726-1-philmd@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.31]);
-	Thu, 23 May 2019 12:44:35 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.49]);
+	Thu, 23 May 2019 12:44:21 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 09/15] tests/libqos: Add pc_fw_cfg_uninit() and
- use it
+Subject: [Qemu-devel] [PULL 07/15] hw/sparc64: Implement
+ fw_cfg_arch_key_name()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -69,11 +69,9 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>, Laszlo Ersek <lersek@redhat.com>,
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Laszlo Ersek <lersek@redhat.com>,
 	Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
 	qemu-ppc@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>,
-	Li Qiang <liq3ea@163.com>, Paolo Bonzini <pbonzini@redhat.com>,
 	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
 	Artyom Tarasenko <atar4qemu@gmail.com>,
 	David Gibson <david@gibson.dropbear.id.au>
@@ -81,48 +79,47 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The pc_fw_cfg_init() function allocates an IO QFWCFG object.
-Add the pc_fw_cfg_uninit() function to deallocate it (and use it).
+Implement fw_cfg_arch_key_name(), which returns the name of a
+sparc64-specific key.
 
-Signed-off-by: Li Qiang <liq3ea@163.com>
-Tested-by: Thomas Huth <thuth@redhat.com>
-Message-Id: <20190424140643.62457-2-liq3ea@163.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-[PMD: Split patch, fill commit description, call uninit in malloc-pc.c]
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Reviewed-by: Laszlo Ersek <lersek@redhat.com>
+Message-Id: <20190422195020.1494-8-philmd@redhat.com>
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- tests/libqos/fw_cfg.h    | 5 +++++
- tests/libqos/malloc-pc.c | 2 +-
- 2 files changed, 6 insertions(+), 1 deletion(-)
+ hw/sparc64/sun4u.c | 19 +++++++++++++++++++
+ 1 file changed, 19 insertions(+)
 
-diff --git a/tests/libqos/fw_cfg.h b/tests/libqos/fw_cfg.h
-index 391669031a..60de81e863 100644
---- a/tests/libqos/fw_cfg.h
-+++ b/tests/libqos/fw_cfg.h
-@@ -42,4 +42,9 @@ static inline QFWCFG *pc_fw_cfg_init(QTestState *qts)
-     return io_fw_cfg_init(qts, 0x510);
- }
+diff --git a/hw/sparc64/sun4u.c b/hw/sparc64/sun4u.c
+index 399f2d73c8..4230b17b87 100644
+--- a/hw/sparc64/sun4u.c
++++ b/hw/sparc64/sun4u.c
+@@ -91,6 +91,25 @@ typedef struct EbusState {
+ #define TYPE_EBUS "ebus"
+ #define EBUS(obj) OBJECT_CHECK(EbusState, (obj), TYPE_EBUS)
 =20
-+static inline void pc_fw_cfg_uninit(QFWCFG *fw_cfg)
++const char *fw_cfg_arch_key_name(uint16_t key)
 +{
-+    io_fw_cfg_uninit(fw_cfg);
++    static const struct {
++        uint16_t key;
++        const char *name;
++    } fw_cfg_arch_wellknown_keys[] =3D {
++        {FW_CFG_SPARC64_WIDTH, "width"},
++        {FW_CFG_SPARC64_HEIGHT, "height"},
++        {FW_CFG_SPARC64_DEPTH, "depth"},
++    };
++
++    for (size_t i =3D 0; i < ARRAY_SIZE(fw_cfg_arch_wellknown_keys); i++=
+) {
++        if (fw_cfg_arch_wellknown_keys[i].key =3D=3D key) {
++            return fw_cfg_arch_wellknown_keys[i].name;
++        }
++    }
++    return NULL;
 +}
 +
- #endif
-diff --git a/tests/libqos/malloc-pc.c b/tests/libqos/malloc-pc.c
-index 949a99361d..6f92ce4135 100644
---- a/tests/libqos/malloc-pc.c
-+++ b/tests/libqos/malloc-pc.c
-@@ -29,5 +29,5 @@ void pc_alloc_init(QGuestAllocator *s, QTestState *qts,=
- QAllocOpts flags)
-     alloc_init(s, flags, 1 << 20, MIN(ram_size, 0xE0000000), PAGE_SIZE);
-=20
-     /* clean-up */
--    g_free(fw_cfg);
-+    pc_fw_cfg_uninit(fw_cfg);
- }
+ static void fw_cfg_boot_set(void *opaque, const char *boot_device,
+                             Error **errp)
+ {
 --=20
 2.20.1
 
