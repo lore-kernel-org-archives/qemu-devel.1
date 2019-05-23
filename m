@@ -4,89 +4,96 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 41E00C282DD
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 16:28:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 92B8CC282DD
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 16:35:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0EE4C21019
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 16:28:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5C45720879
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 16:35:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pKxEwwbo"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0EE4C21019
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="TMJiLS4e"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5C45720879
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:40381 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:40475 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hTqa9-0001Ka-CV
-	for qemu-devel@archiver.kernel.org; Thu, 23 May 2019 12:28:41 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:37504)
+	id 1hTqgv-0004Jm-Hr
+	for qemu-devel@archiver.kernel.org; Thu, 23 May 2019 12:35:41 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:41780)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1hTqQQ-0002OF-7W
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 12:18:39 -0400
+	(envelope-from <shmuel.eiderman@oracle.com>) id 1hTqfJ-00037M-TA
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 12:34:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1hTqQP-0006TD-AL
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 12:18:38 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:37427)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1hTqQP-0006Sa-3L
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 12:18:37 -0400
-Received: by mail-wr1-x442.google.com with SMTP id e15so6963018wrs.4
-	for <qemu-devel@nongnu.org>; Thu, 23 May 2019 09:18:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
-	:mime-version:content-transfer-encoding;
-	bh=t+fpOzpoYMTvZREMygefSwOqjQyndhbSY04K2Iq39pg=;
-	b=pKxEwwboJZUmeKt5OoQX2Rivx1lS7LvoJgAtURLdWDf3ldBnS/Z4dBxnxSx2CRH6sC
-	MEjefgUTYU+Mg5fw4pfrFPMW8z/KPWkXrxh5xaIkhtWeezf1mjRXTPez5MTJjo2XrSGq
-	rEAORtBeXUPaAQPXdQ6kPRS/kvU46QOtbQyyubDcioUrKFqTsUoFKJKk8+Wzcp+5mNqy
-	1haJc8QDxs1azQ7KccQ7PvHihPNP3l5E5KBhgBXqlWt/QVEZmL5c5OpiMAod7eqLkfGo
-	YC8osiiSSk/WD71rQsowiRWYl4KIQV+bQTZLfRatqiVvOEJlMQ4uHHzz3wFUYI9h5Tl9
-	/pBA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
-	:in-reply-to:references:mime-version:content-transfer-encoding;
-	bh=t+fpOzpoYMTvZREMygefSwOqjQyndhbSY04K2Iq39pg=;
-	b=fGv8PYox//J+bm6/ISy7+oE9i6VkaxizTrr5Wv4NXosPlBqTfDvabb+8hCwJY5eSHc
-	v8Sa/e2Z0Ro6TX75zl3IQEznimVwwnm6BsDDLXquR0bKfMrubCNuy1zc6wu03SG1wfj9
-	/2RVrc62rVsof/YX/hTL0li356kdYFwX7O7qYyl2DO7FY/DqBD6LY9+O+rwBjst3SbUx
-	hYAZ09SmmPcs3HPoFMHKdvqfcE8/lb7TiyzYq2dB1fL2+gE4euLDeMiJtPWPVVB+dW4x
-	a8pqSXsimY4dztBk2M7HuDsKN+QFnaSYBYR11qlOJpG82ama8wLg5a4D2vnZoyNCt/N+
-	TlgA==
-X-Gm-Message-State: APjAAAWfbPTaDlHRF0zetUSMYK9uWUcmOpzoC1R1t6ysslimJR0lZl5H
-	Vc3qPHNMl8uBOk4evxo/kZM=
-X-Google-Smtp-Source: APXvYqyZOHTmTWBYjU7/FHaxxOBDtQLgthd1J+dX2g8Z3I4Wpqsb+3MyMEeXXQC87Ijp5BQ+JW7fxw==
-X-Received: by 2002:adf:e2c8:: with SMTP id d8mr7265314wrj.14.1558628316001;
-	Thu, 23 May 2019 09:18:36 -0700 (PDT)
-Received: from x1.local (228.red-83-52-173.dynamicip.rima-tde.net.
-	[83.52.173.228]) by smtp.gmail.com with ESMTPSA id
-	q16sm10273222wmj.17.2019.05.23.09.18.34
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Thu, 23 May 2019 09:18:35 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-To: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org,
-	Cleber Rosa <crosa@redhat.com>
-Date: Thu, 23 May 2019 18:18:29 +0200
-Message-Id: <20190523161832.22490-2-f4bug@amsat.org>
-X-Mailer: git-send-email 2.19.1
-In-Reply-To: <20190523161832.22490-1-f4bug@amsat.org>
-References: <20190523161832.22490-1-f4bug@amsat.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2a00:1450:4864:20::442
-Subject: [Qemu-devel] [PATCH v2 1/4] BootLinuxConsoleTest: Let
- extract_from_deb handle various compressions
+	(envelope-from <shmuel.eiderman@oracle.com>) id 1hTqfI-0000mV-Q0
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 12:34:01 -0400
+Received: from aserp2130.oracle.com ([141.146.126.79]:52906)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <shmuel.eiderman@oracle.com>)
+	id 1hTqfE-0000jG-V9; Thu, 23 May 2019 12:33:57 -0400
+Received: from pps.filterd (aserp2130.oracle.com [127.0.0.1])
+	by aserp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id
+	x4NGTV09132630; Thu, 23 May 2019 16:33:55 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
+	h=from : to : cc :
+	subject : date : message-id : in-reply-to : references;
+	s=corp-2018-07-02; 
+	bh=ud4KqU+M+aj77AvMEO2QAvfX1xgBXAKGcMA9RsIp7Vc=;
+	b=TMJiLS4eKhN+th8Mv60ow4GySI/ZOM3kdZZTdJBtVIIbWwpOmD0NjzRhQ4bhx2nEYHK0
+	UwZwrsGOozMhnlcfmosKb2y9U+N6OXhi25PNdRKptmJKlbKRhfOUf4ePpwQL6izFXE4A
+	O7uYk1zUK+pqoaHpLRlEf2qKHYAMflsa5NSCpWGLhKMZuIk5MfvH4l3aM3C4JjOqvsoO
+	8W2+dNQmU0BJoCxXbgRt6nuyGUbDAqS738VqsaO7i8QBLBQQnRQM3ZArLsUhIFya8E+H
+	j1LO9DMhFSZYjIQkcgbvBf09W09zK58QeGBleKI2cpYw7pGchHEmr6+d9IH/Qrmn/25n
+	eA== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+	by aserp2130.oracle.com with ESMTP id 2smsk5km3f-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 23 May 2019 16:33:55 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+	by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id
+	x4NGW71A182570; Thu, 23 May 2019 16:33:55 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+	by aserp3020.oracle.com with ESMTP id 2smsh2bvq5-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 23 May 2019 16:33:55 +0000
+Received: from abhmp0001.oracle.com (abhmp0001.oracle.com [141.146.116.7])
+	by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x4NGXtfi006082;
+	Thu, 23 May 2019 16:33:55 GMT
+Received: from nexus.ravello.local (/213.57.127.2)
+	by default (Oracle Beehive Gateway v4.0)
+	with ESMTP ; Thu, 23 May 2019 16:33:54 +0000
+From: Sam Eiderman <shmuel.eiderman@oracle.com>
+To: kwolf@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org,
+	mreitz@redhat.com
+Date: Thu, 23 May 2019 19:33:36 +0300
+Message-Id: <20190523163337.4497-3-shmuel.eiderman@oracle.com>
+X-Mailer: git-send-email 2.13.3
+In-Reply-To: <20190523163337.4497-1-shmuel.eiderman@oracle.com>
+References: <20190523163337.4497-1-shmuel.eiderman@oracle.com>
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9265
+	signatures=668687
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=2
+	malwarescore=0
+	phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=959
+	adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+	engine=8.0.1-1810050000 definitions=main-1905230112
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9265
+	signatures=668687
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
+	priorityscore=1501 malwarescore=0
+	suspectscore=2 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+	lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=997
+	adultscore=0
+	classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+	definitions=main-1905230112
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 141.146.126.79
+Subject: [Qemu-devel] [PATCH v5 2/3] qemu-img: rebase: Reduce reads on
+ in-chain rebase
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -98,62 +105,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Aleksandar Rikalo <arikalo@wavecomp.com>,
-	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
-	Aleksandar Markovic <aleksandar.m.mail@gmail.com>,
-	Aleksandar Markovic <amarkovic@wavecomp.com>,
-	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
-	Aurelien Jarno <aurelien@aurel32.net>
+Cc: eyal.moscovici@oracle.com, arbel.moshe@oracle.com, liran.alon@oracle.com,
+	shmuel.eiderman@oracle.com, sagi.amit@oracle.com, karl.heubaum@oracle.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Debian binary package format supports various compressions.
+In the following case:
 
-Per man deb(5):
+(base) A <- B <- C (tip)
 
-  NAME
-    deb - Debian binary package format
+when running:
 
-  FORMAT
-    ...
-    The third, last required member is named data.tar.  It contains the
-    filesystem as a tar archive, either not compressed (supported since
-    dpkg 1.10.24), or compressed with gzip (with .gz extension),
-    xz (with .xz extension, supported since dpkg 1.15.6),
-    bzip2 (with .bz2 extension, supported since dpkg 1.10.24) or
-    lzma (with .lzma extension, supported since dpkg 1.13.25).
+    qemu-img rebase -b A C
 
-List the archive files to have the 3rd name with the correct extension.
+QEMU would read all sectors not allocated in the file being rebased (C)
+and compare them to the new base image (A), regardless of whether they
+were changed or even allocated anywhere along the chain between the new
+base and the top image (B). This causes many unneeded reads when
+rebasing an image which represents a small diff of a large disk, as it
+would read most of the disk's sectors.
 
-The function avocado.utils.archive.extract() will handle the different
-compression format for us.
+Instead, use bdrv_is_allocated_above() to reduce the number of
+unnecessary reads.
 
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Reviewed-by: Karl Heubaum <karl.heubaum@oracle.com>
+Signed-off-by: Sam Eiderman <shmuel.eiderman@oracle.com>
+Signed-off-by: Eyal Moscovici <eyal.moscovici@oracle.com>
 ---
-This patch is already in Eduardo's queue, but is required in
-this series.
----
- tests/acceptance/boot_linux_console.py | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ qemu-img.c | 25 ++++++++++++++++++++++++-
+ 1 file changed, 24 insertions(+), 1 deletion(-)
 
-diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/boot_linux_console.py
-index d5c500ea30..6aa084e049 100644
---- a/tests/acceptance/boot_linux_console.py
-+++ b/tests/acceptance/boot_linux_console.py
-@@ -55,8 +55,9 @@ class BootLinuxConsole(Test):
-         """
-         cwd = os.getcwd()
-         os.chdir(self.workdir)
--        process.run("ar x %s data.tar.gz" % deb)
--        archive.extract("data.tar.gz", self.workdir)
-+        file_path = process.run("ar t %s" % deb).stdout_text.split()[2]
-+        process.run("ar x %s %s" % (deb, file_path))
-+        archive.extract(file_path, self.workdir)
-         os.chdir(cwd)
-         return self.workdir + path
+diff --git a/qemu-img.c b/qemu-img.c
+index 9bd0bb1e47..2d96a491e2 100644
+--- a/qemu-img.c
++++ b/qemu-img.c
+@@ -3164,7 +3164,7 @@ static int img_rebase(int argc, char **argv)
+     BlockBackend *blk = NULL, *blk_old_backing = NULL, *blk_new_backing = NULL;
+     uint8_t *buf_old = NULL;
+     uint8_t *buf_new = NULL;
+-    BlockDriverState *bs = NULL;
++    BlockDriverState *bs = NULL, *prefix_chain_bs = NULL;
+     char *filename;
+     const char *fmt, *cache, *src_cache, *out_basefmt, *out_baseimg;
+     int c, flags, src_flags, ret;
+@@ -3353,6 +3353,12 @@ static int img_rebase(int argc, char **argv)
+                 goto out;
+             }
  
++            /*
++             * Find out whether we rebase an image on top of a previous image
++             * in its chain.
++             */
++            prefix_chain_bs = bdrv_find_backing_image(bs, out_real_path);
++
+             blk_new_backing = blk_new_open(out_real_path, NULL,
+                                            options, src_flags, &local_err);
+             g_free(out_real_path);
+@@ -3437,6 +3443,23 @@ static int img_rebase(int argc, char **argv)
+                 continue;
+             }
+ 
++            if (prefix_chain_bs) {
++                /*
++                 * If cluster wasn't changed since prefix_chain, we don't need
++                 * to take action
++                 */
++                ret = bdrv_is_allocated_above(backing_bs(bs), prefix_chain_bs,
++                                              offset, n, &n);
++                if (ret < 0) {
++                    error_report("error while reading image metadata: %s",
++                                 strerror(-ret));
++                    goto out;
++                }
++                if (!ret) {
++                    continue;
++                }
++            }
++
+             /*
+              * Read old and new backing file and take into consideration that
+              * backing files may be smaller than the COW image.
 -- 
-2.19.1
+2.13.3
 
 
