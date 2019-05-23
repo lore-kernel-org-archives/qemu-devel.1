@@ -2,90 +2,60 @@ Return-Path: <SRS0=bvyN=TX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.0 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15686C282DD
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 13:12:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DB94C282DD
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 13:12:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D0D6220851
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 13:12:29 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="RI5P7NQu"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D0D6220851
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 416A72133D
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 13:12:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 416A72133D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:35873 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:35875 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hTnWG-0001Dh-SO
-	for qemu-devel@archiver.kernel.org; Thu, 23 May 2019 09:12:28 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:51592)
+	id 1hTnWS-0001N7-Es
+	for qemu-devel@archiver.kernel.org; Thu, 23 May 2019 09:12:40 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:51307)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hTnH7-0004CZ-IU
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 08:56:50 -0400
+	(envelope-from <philmd@redhat.com>) id 1hTnH5-0003rP-U7
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 08:56:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hTn2v-00082K-Ah
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 08:42:10 -0400
-Received: from mail-yb1-xb33.google.com ([2607:f8b0:4864:20::b33]:46794)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hTn2v-00081i-6W
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 08:42:09 -0400
-Received: by mail-yb1-xb33.google.com with SMTP id z22so2186771ybi.13
-	for <qemu-devel@nongnu.org>; Thu, 23 May 2019 05:42:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
-	:mime-version:in-reply-to:content-language:content-transfer-encoding;
-	bh=4tzaZe6740sC9VyGw+sR5MurSVwwCuOaEHnaoiytpns=;
-	b=RI5P7NQuyEdFvsNczDruBjwGO0oHOy7oBhKxuJm5uHB5hLw74m++Gwsi9CumIx8kix
-	qiuga8yao23HauVAJ6xcQqhh0VEalk74H7LsYhVhs36W2uujahpMxhXFyZF3ePKVLw39
-	3Vi2YMmL1jfFH/RWWgzFmUUHH68rBvs5oUyW7dZVijBTdYe9xAQiv1jWPZ7VHRafwF4I
-	lMFz7UyyqVTAOZgEBXBYIAPIMzmkBwBR3P3rMGNzD8642Y0btfhQUmOD3VWSEuGpJsNj
-	qDB8+7DALTcAzl/W0blhG5gDTICkVzaHxTUe9qeU0GuZHAInJmDbFcIP5kA/6CooPgrx
-	cOjA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-	:date:user-agent:mime-version:in-reply-to:content-language
-	:content-transfer-encoding;
-	bh=4tzaZe6740sC9VyGw+sR5MurSVwwCuOaEHnaoiytpns=;
-	b=jCNNCvazeU6OSQ3ncTjYnTjlXqMD4WUMYo4+yGDWi8bOmVYyEC3mkg+4ffYQZFq8yn
-	GFAg8Kh+Hgx4AqlePSUn6G3aQhyyTwxvH8rAX5XCfM1MwI8bX97Z4mkrW+eH6VIYWbr7
-	FIqhfoiwgJbb2+X5o3+DYI3APFT2arDV8mPqBPpXS79Ba0RmyOYxtDpkI21wQRFZ9Ejw
-	pjZxVf+QXCSTypu8JRzOis/q4LpoU6HS/pX3+Vh8MQ7Ve3apzozrTgPY7H+TEuY/t/cH
-	97BVn+ewCQyQsoGDPmFqFUkW3GXJzBnFV4g61/JwB5YxyUhNzv3NVIQty+QqQI8kvrq/
-	o8xA==
-X-Gm-Message-State: APjAAAWzeSTmPlo3hbpq3uKmcXstvtE04znjC94V4pAAA7kHiphRVqyH
-	Ep+2LMB9iQuZFnQcIBZH06mXkA==
-X-Google-Smtp-Source: APXvYqxIXbAB8K2xvwpR+kZROAUnZDtC09Jagjfe0M4w4JO+gyW7mVARaUr+za/sTTJ1t85hUo8jMA==
-X-Received: by 2002:a25:2d42:: with SMTP id s2mr18339391ybe.476.1558615327915; 
-	Thu, 23 May 2019 05:42:07 -0700 (PDT)
-Received: from [10.240.8.143] ([71.46.56.63]) by smtp.gmail.com with ESMTPSA id
-	196sm5738285ywg.103.2019.05.23.05.42.06
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Thu, 23 May 2019 05:42:07 -0700 (PDT)
-To: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-References: <20190522222821.23850-1-richard.henderson@linaro.org>
-	<CAL1e-=jzbtrbu6OnoAJ2Z7QyTGXfek4wFN-pzhQn9GJpXxLaMw@mail.gmail.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <aa495dcd-bd02-63ff-3db0-b3276e6f00b6@linaro.org>
-Date: Thu, 23 May 2019 08:42:05 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	(envelope-from <philmd@redhat.com>) id 1hTn4R-0000sd-Ms
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 08:43:45 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47608)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>)
+	id 1hTn4Q-0000rC-Hf; Thu, 23 May 2019 08:43:43 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id C60A2307EA98;
+	Thu, 23 May 2019 12:43:35 +0000 (UTC)
+Received: from x1w.redhat.com (unknown [10.40.205.5])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 3CEF45D9C3;
+	Thu, 23 May 2019 12:43:22 +0000 (UTC)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: qemu-devel@nongnu.org
+Date: Thu, 23 May 2019 14:43:05 +0200
+Message-Id: <20190523124320.28726-1-philmd@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAL1e-=jzbtrbu6OnoAJ2Z7QyTGXfek4wFN-pzhQn9GJpXxLaMw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::b33
-Subject: Re: [Qemu-devel] [PULL 00/16] tcg queued patches
+Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.44]);
+	Thu, 23 May 2019 12:43:41 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PULL 00/15] Fw cfg 20190523 patches
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -97,21 +67,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Laszlo Ersek <lersek@redhat.com>,
+	Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+	qemu-ppc@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>,
+	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+	Artyom Tarasenko <atar4qemu@gmail.com>,
+	David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/23/19 4:17 AM, Aleksandar Markovic wrote:
-> Why are “Reviewed-by:” lines missing from all patches of this pull request?
-> 
+The following changes since commit c4600d5d417ea13e0f1cc047b227a2b5b0e694=
+f5:
 
-Because it's hard to get people to review code under tcg/.
-I post patches and wait a few days to a week and then give a pull.
+  Merge remote-tracking branch 'remotes/vivier2/tags/trivial-branch-pull-=
+request' into staging (2019-05-23 12:00:37 +0100)
 
-This has been true since forever, when I was the only one giving
-reviews to Aurelien, and thus wound up with this job when he left.
+are available in the Git repository at:
 
+  https://gitlab.com/philmd/qemu.git tags/fw_cfg-20190523-pull-request
 
-r~
+for you to fetch changes up to 3ae9dd1a304248e1f6ca631cdd43eb44a3e9e7b4:
+
+  tests: fw_cfg: add 'splash-time' test case (2019-05-23 14:10:31 +0200)
+
+----------------------------------------------------------------
+
+fw_cfg patches for 2019-05-23
+
+- Add trace events
+- Get rid of globals in fw_cfg-test
+- Explicit 'reboot-timeout' is little endian
+- Add tests for 'reboot-timeout' and 'splash-time'
+
+----------------------------------------------------------------
+
+Li Qiang (5):
+  tests: refactor fw_cfg_test
+  tests: fw_cfg: add a function to get the fw_cfg file
+  hw/nvram/fw_cfg: Store 'reboot-timeout' as little endian
+  tests: fw_cfg: add 'reboot-timeout' test case
+  tests: fw_cfg: add 'splash-time' test case
+
+Philippe Mathieu-Daud=C3=A9 (10):
+  hw/nvram/fw_cfg: Add trace events
+  hw/nvram/fw_cfg: Add fw_cfg_arch_key_name()
+  hw/i386: Extract fw_cfg definitions to local "fw_cfg.h"
+  hw/i386: Implement fw_cfg_arch_key_name()
+  hw/ppc: Implement fw_cfg_arch_key_name()
+  hw/sparc: Implement fw_cfg_arch_key_name()
+  hw/sparc64: Implement fw_cfg_arch_key_name()
+  tests/libqos: Add io_fw_cfg_uninit() and mm_fw_cfg_uninit()
+  tests/libqos: Add pc_fw_cfg_uninit() and use it
+  tests/fw_cfg: Free QFWCFG object after qtest has run
+
+ MAINTAINERS               |   1 +
+ hw/i386/Makefile.objs     |   2 +-
+ hw/i386/fw_cfg.c          |  38 ++++++++++++
+ hw/i386/fw_cfg.h          |  20 ++++++
+ hw/i386/pc.c              |   7 +--
+ hw/nvram/fw_cfg.c         |  67 +++++++++++++++++++-
+ hw/nvram/trace-events     |   7 ++-
+ hw/ppc/Makefile.objs      |   2 +-
+ hw/ppc/fw_cfg.c           |  45 ++++++++++++++
+ hw/sparc/sun4m.c          |  19 ++++++
+ hw/sparc64/sun4u.c        |  19 ++++++
+ include/hw/nvram/fw_cfg.h |  14 +++++
+ stubs/Makefile.objs       |   1 +
+ stubs/fw_cfg.c            |  21 +++++++
+ tests/fw_cfg-test.c       | 127 ++++++++++++++++++++++++++++++++++----
+ tests/libqos/fw_cfg.c     |  55 +++++++++++++++++
+ tests/libqos/fw_cfg.h     |   9 +++
+ tests/libqos/malloc-pc.c  |   2 +-
+ 18 files changed, 433 insertions(+), 23 deletions(-)
+ create mode 100644 hw/i386/fw_cfg.c
+ create mode 100644 hw/i386/fw_cfg.h
+ create mode 100644 hw/ppc/fw_cfg.c
+ create mode 100644 stubs/fw_cfg.c
+
+--=20
+2.20.1
+
 
