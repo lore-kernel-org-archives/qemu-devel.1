@@ -2,90 +2,112 @@ Return-Path: <SRS0=bvyN=TX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E485AC282DD
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 11:40:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CD57C282DD
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 11:40:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AB51420851
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 11:40:18 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="yy5AbiKh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AB51420851
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 5EAF120881
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 11:40:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5EAF120881
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:34109 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:34111 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hTm53-0006D8-KW
-	for qemu-devel@archiver.kernel.org; Thu, 23 May 2019 07:40:17 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:36450)
+	id 1hTm56-0006F2-HJ
+	for qemu-devel@archiver.kernel.org; Thu, 23 May 2019 07:40:20 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:36469)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hTm30-0004ug-4M
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 07:38:11 -0400
+	(envelope-from <thuth@redhat.com>) id 1hTm34-0004um-0D
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 07:38:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hTlwN-0003Ac-8g
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 07:31:20 -0400
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:36351)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1hTlwN-00039j-2d
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 07:31:19 -0400
-Received: by mail-wm1-x344.google.com with SMTP id j187so5401534wmj.1
-	for <qemu-devel@nongnu.org>; Thu, 23 May 2019 04:31:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=references:user-agent:from:to:cc:subject:in-reply-to:date
-	:message-id:mime-version:content-transfer-encoding;
-	bh=DfzvVWpoSYYigX0xFrut6HZ2x0qn8dYKHJAFHTqbIeI=;
-	b=yy5AbiKhemIZ6jIxVQyK1hyxbmfOlOc9Nk84iNVt2+DhOc5JCcF7DFnokS2E9YbGbD
-	fYT9zLswMumN+qTFTuKbqd6se67KUWEuhSdZ1xBYbWrDgScv4g2zkvqxgNrWm8oru1ON
-	waIrRfpPIkbLF87Yw2Qvw6pEebZmCgtTE/LpMP9ki0oLtUF13WAadCGjdlr414MCDF5f
-	jAf0JNpurENmhMFiwU8zy18JpKebsreZojh3Hhfxe1MSsVxEMEjUzTz7eewmCh8QQZs2
-	eAJOA/1/G59sjeg+kWd9GCUSR2hIILePlDQsgYFGorSl1OYLU7XVT7oHL7cWHoybohgY
-	xU0Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:references:user-agent:from:to:cc:subject
-	:in-reply-to:date:message-id:mime-version:content-transfer-encoding;
-	bh=DfzvVWpoSYYigX0xFrut6HZ2x0qn8dYKHJAFHTqbIeI=;
-	b=s5NwEkVwpSX7CKxsyBMFMO9Pn8WWJdVzQneUxDeEQW7NxzGwbJxv2agU6GpTZzR1Kj
-	cz++FnVa4K4svKhbDnmUVr71tGiu95i3fk2dlHqfAwcq7WafTGW5W397sSniqyRzMlj/
-	2nj5Zuq6LNPQJGPrEulqGrqrs2t73FAIRnNABjLDZ1PUFYbgp4deHuQvykJ9vzj9YHIQ
-	6xmuzW2gkFm51CKN15Gdiw3wg6tYAXq1RcN3KnXf+tF8YUxeVFGENyw2voNPGi8CwadU
-	Qyl30P1z5QnrHZUuepeVyjxk6UrqgOmWBVbtxg6yhABUwb7P2y+E+aiHPbktNv5iuM08
-	uWew==
-X-Gm-Message-State: APjAAAVn7uWXS4FnukzSbXlRc4BjGsOHHbxfrCVfM7h+yjC5Y7wrd0iO
-	hTvxVifRd/P+wStHOlP1IzQkvA==
-X-Google-Smtp-Source: APXvYqxPVDXnQ4Wl2Sl/vtNkNtiHOJxWx4cXVqcWvVKyogatHORldMNOurCZzURjt4C8IZ2utWDH0w==
-X-Received: by 2002:a1c:5f02:: with SMTP id t2mr11996094wmb.19.1558611077446; 
-	Thu, 23 May 2019 04:31:17 -0700 (PDT)
-Received: from zen.linaroharston ([81.128.185.34])
-	by smtp.gmail.com with ESMTPSA id
-	m10sm9498477wmf.40.2019.05.23.04.31.16
-	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Thu, 23 May 2019 04:31:16 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
-	by zen.linaroharston (Postfix) with ESMTP id 716F61FF87;
-	Thu, 23 May 2019 12:31:16 +0100 (BST)
-References: <20190523105440.27045-1-rkagan@virtuozzo.com>
-User-agent: mu4e 1.3.2; emacs 26.1
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-devel@nongnu.org
-In-reply-to: <20190523105440.27045-1-rkagan@virtuozzo.com>
-Date: Thu, 23 May 2019 12:31:16 +0100
-Message-ID: <87imu11k6z.fsf@zen.linaroharston>
+	(envelope-from <thuth@redhat.com>) id 1hTlt2-0000wm-D6
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 07:27:53 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38878)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1hTlt2-0000vW-6Y
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 07:27:52 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 10F2130024B1;
+	Thu, 23 May 2019 11:27:44 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-116-124.ams2.redhat.com [10.36.116.124])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 087F17D951;
+	Thu, 23 May 2019 11:27:35 +0000 (UTC)
+To: Aaro Koskinen <aaro.koskinen@iki.fi>,
+	Corentin Labbe <clabbe.montjoie@gmail.com>
+References: <20190520190533.GA28160@Red>
+	<20190521232323.GD3621@darkstar.musicnaut.iki.fi>
+	<20190522093341.GA32154@Red>
+	<20190522181904.GE3621@darkstar.musicnaut.iki.fi>
+From: Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=thuth@redhat.com; keydata=
+	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
+Organization: Red Hat
+Message-ID: <8977e2bb-8d9e-f4fd-4c44-b4f67e0e7314@redhat.com>
+Date: Thu, 23 May 2019 13:27:34 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
+In-Reply-To: <20190522181904.GE3621@darkstar.musicnaut.iki.fi>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2a00:1450:4864:20::344
-Subject: Re: [Qemu-devel] [RFC PATCH 0/2] establish nesting rule of BQL vs
- cpu-exclusive
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.40]);
+	Thu, 23 May 2019 11:27:49 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] Running linux on qemu omap
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -97,61 +119,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, cota@braap.org,
-	richard.henderson@linaro.org
+Cc: Tony Lindgren <tony@atomide.com>, linux-omap@vger.kernel.org,
+	=?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+	qemu-devel@nongnu.org, linux-kernel@vger.kernel.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On 22/05/2019 20.19, Aaro Koskinen wrote:
+> Hi,
+> 
+> On Wed, May 22, 2019 at 11:33:41AM +0200, Corentin Labbe wrote:
+>> qemu-system-arm -M help |grep OMAP
+>> cheetah              Palm Tungsten|E aka. Cheetah PDA (OMAP310)
+>> n800                 Nokia N800 tablet aka. RX-34 (OMAP2420)
+>> n810                 Nokia N810 tablet aka. RX-44 (OMAP2420)
+>> sx1                  Siemens SX1 (OMAP310) V2
+>> sx1-v1               Siemens SX1 (OMAP310) V1
+>>
+>>>> The maximum I can get with omap1_defconfig is
+>>>> qemu-system-arm -kernel zImage -nographic -machine cheetah -append 'root=/dev/ram0 console=ttyO0'
+>>>> Uncompressing Linux... done, booting the kernel.
+>>>> then nothing more.
+> 
+> With N800/N810 omap2plus_defconfig should be used instead. However,
+> I don't think that works either (but haven't tried recently). Also with
+> N800/N810 you need to append the DTB file to the kernel image.
 
-Roman Kagan <rkagan@virtuozzo.com> writes:
+FWIW, Philippe recently posted a mail how to run older kernels on n810:
 
-> I came across the following AB-BA deadlock:
->
->     vCPU thread                             main thread
->     -----------                             -----------
-> async_safe_run_on_cpu(self,
->                       async_synic_update)
-> ...                                         [cpu hot-add]
-> process_queued_cpu_work()
->   qemu_mutex_unlock_iothread()
->                                             [grab BQL]
->   start_exclusive()                         cpu_list_add()
->   async_synic_update()                        finish_safe_work()
->     qemu_mutex_lock_iothread()                  cpu_exec_start()
->
-> ATM async_synic_update seems to be the only async safe work item that
-> grabs BQL.  However it isn't quite obvious that it shouldn't; in the
-> past there were more examples of this (e.g.
-> memory_region_do_invalidate_mmio_ptr).
->
-> It looks like the problem is generally in the lack of the nesting rule
-> for cpu-exclusive sections against BQL, so I thought I would try to
-> address that.  This patchset is my feeble attempt at this; I'm not sure
-> I fully comprehend all the consequences (rather, I'm sure I don't) hence
-> RFC.
+https://www.mail-archive.com/qemu-devel@nongnu.org/msg610653.html
 
-Hmm I think this is an area touched by:
-
-  Subject: [PATCH v7 00/73] per-CPU locks
-  Date: Mon,  4 Mar 2019 13:17:00 -0500
-  Message-Id: <20190304181813.8075-1-cota@braap.org>
-
-which has stalled on it's path into the tree. Last time I checked it
-explicitly handled the concept of work that needed the BQL and work that
-didn't.
-
-How do you trigger your deadlock? Just hot-pluging CPUs?
-
->
-> Roman Kagan (2):
->   cpus-common: nuke finish_safe_work
->   cpus-common: assert BQL nesting within cpu-exclusive sections
->
->  cpus-common.c | 12 ++++--------
->  1 file changed, 4 insertions(+), 8 deletions(-)
-
-
---
-Alex Benn=C3=A9e
+ HTH,
+  Thomas
 
