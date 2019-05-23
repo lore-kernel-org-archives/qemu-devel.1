@@ -2,83 +2,71 @@ Return-Path: <SRS0=bvyN=TX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A1921C282DD
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 13:48:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 24779C282DD
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 13:50:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6B3A320868
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 13:48:05 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="MHCeACP+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6B3A320868
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id EDD8120868
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 13:50:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EDD8120868
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:36691 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:36757 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hTo4i-0004j0-M7
-	for qemu-devel@archiver.kernel.org; Thu, 23 May 2019 09:48:04 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:37452)
+	id 1hTo7J-0006lP-14
+	for qemu-devel@archiver.kernel.org; Thu, 23 May 2019 09:50:45 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:43321)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hTno4-0001Do-5O
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 09:30:53 -0400
+	(envelope-from <crosa@redhat.com>) id 1hTo5Z-0005fP-0U
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 09:48:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hTno3-0002DI-Ce
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 09:30:52 -0400
-Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:40713)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hTno3-0002CS-6k
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 09:30:51 -0400
-Received: by mail-ot1-x344.google.com with SMTP id u11so5395286otq.7
-	for <qemu-devel@nongnu.org>; Thu, 23 May 2019 06:30:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-	:cc; bh=R9zX5EHeDdKap0pvoAfYKP3tPzU8Pqu0/MLm1hSEHiw=;
-	b=MHCeACP+QvRq0Yld21LhYoctUVrxKP1l8fmOAWrk8ZG+5uKO/IqQ01uKuSHeMNlPvG
-	TzKUsDi0sB9v8r54w+Duc3XRpUNWeqYlH79Ie7ELUaGHjRjlmLnHZ4nM2STYdxAP560D
-	3WJY5UNsgtmN9fgQzHsNnFTNGgpBlPjomfGzHBl5FyQ2Gmf/dQuh7QkS+QokHR2ChCon
-	kV7LN5A8RCGj6C8Tat7V7W+U6pt0/uZ9kZxXiSctHMrbmqrj88gKGOZTZX6/Qp4IVNlf
-	i2hpYBCebgDWz62nRHF3iO4l49cspzZoM/kSsb0bmp23Kw04D9NZ0NdmT6JUkLHQ93Gg
-	32Uw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-	:message-id:subject:to:cc;
-	bh=R9zX5EHeDdKap0pvoAfYKP3tPzU8Pqu0/MLm1hSEHiw=;
-	b=AZr//jDzFW+ZHLi4GT1ILuVVKJnF5f7bwHtOiBEz+TE+Mix05Qi7x7gNE0L1RjO2CI
-	nDng8oH6wM5UaLSiYq57Ts4AuLDXEpHsHZfpWeB0y/tgeQVToCFvF+6XSEDgzO8SkqEy
-	/HCSRBHFg4mirPCORB2qXGsBpw4muj9IjksrpAEIxO/jL4MkX1j3MehEX00d9JDazqRw
-	hi6cNi+8+fdIzicoAlgI50KU7RBBLs5qBmGGyDg1FKiAGDbyGhbpZO+Jtn5pNG1Vs3kN
-	rFTgNrvXvTzHD9JeW3hp+15Ovbsq82tJhiPjbLTLIm3U7sILjNr9Uh5YontbyeE33lbP
-	kBQQ==
-X-Gm-Message-State: APjAAAWq3mCbGgvflttev6KseqZEjZ+Z3g3dINxF17DKXskVcvQRBPM1
-	gtjF2l2BTCgjyqKFWgskL6f6DjxcDMjIH73Od7CpWg==
-X-Google-Smtp-Source: APXvYqxzVHGCvpYAb+gaMhX+jhMAmhhaxuLv0x01RauMvmBREoMXdMDw7vL0jbJpjZsd/v8Cdw2Q00RIkp/MArXipag=
-X-Received: by 2002:a9d:6b0d:: with SMTP id g13mr21226630otp.91.1558618250247; 
-	Thu, 23 May 2019 06:30:50 -0700 (PDT)
+	(envelope-from <crosa@redhat.com>) id 1hTo5Y-0002zl-30
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 09:48:56 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51626)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <crosa@redhat.com>)
+	id 1hTo5V-0002wj-UK; Thu, 23 May 2019 09:48:54 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 3C704307C719;
+	Thu, 23 May 2019 13:48:53 +0000 (UTC)
+Received: from colo-mx.corp.redhat.com
+	(colo-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.21])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 2D67A36F9;
+	Thu, 23 May 2019 13:48:53 +0000 (UTC)
+Received: from zmail17.collab.prod.int.phx2.redhat.com
+	(zmail17.collab.prod.int.phx2.redhat.com [10.5.83.19])
+	by colo-mx.corp.redhat.com (Postfix) with ESMTP id EDA365B423;
+	Thu, 23 May 2019 13:48:52 +0000 (UTC)
+Date: Thu, 23 May 2019 09:48:52 -0400 (EDT)
+From: Cleber Rosa <crosa@redhat.com>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Message-ID: <843987408.24357253.1558619332877.JavaMail.zimbra@redhat.com>
+In-Reply-To: <20190520220635.10961-2-f4bug@amsat.org>
+References: <20190520220635.10961-1-f4bug@amsat.org>
+	<20190520220635.10961-2-f4bug@amsat.org>
 MIME-Version: 1.0
-References: <20190518191934.21887-1-richard.henderson@linaro.org>
-	<20190518191934.21887-3-richard.henderson@linaro.org>
-	<CAFEAcA88nA_2u1Yc-9ZPAy2w6LVk5f9Rrss0e53E11W4Xb4YpA@mail.gmail.com>
-	<e177b43a-2abc-3aee-461c-2cfd9a8a0a20@linaro.org>
-	<CAFEAcA_1XuWqVu9gonn5_Y9x1V=UcWNHEXtwop2s0qyUbwiZpg@mail.gmail.com>
-	<13d9e22b-4ac5-fb87-622c-a99b5494d06c@linaro.org>
-In-Reply-To: <13d9e22b-4ac5-fb87-622c-a99b5494d06c@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 23 May 2019 14:30:39 +0100
-Message-ID: <CAFEAcA--wutvPH5xSRm7yNCQ9+TpjJ84qbSLTUa7YFgKnLmi=Q@mail.gmail.com>
-To: Richard Henderson <richard.henderson@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::344
-Subject: Re: [Qemu-devel] [PATCH 2/2] target/arm: Use tcg_gen_gvec_bitsel
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Originating-IP: [10.36.116.137, 10.4.195.29]
+Thread-Topic: BootLinuxConsoleTest: Do not log empty lines
+Thread-Index: mbTXbDfy49K2N5a/8d08Adqu9TptFA==
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.42]);
+	Thu, 23 May 2019 13:48:53 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH 1/2] BootLinuxConsoleTest: Do not log empty
+ lines
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -90,34 +78,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+	Eduardo Habkost <ehabkost@redhat.com>,
+	Alistair Francis <alistair@alistair23.me>, qemu-devel@nongnu.org,
+	Subbaraya Sundeep <sundeep.lkml@gmail.com>, qemu-arm@nongnu.org,
+	Caio Carrara <ccarrara@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 23 May 2019 at 14:16, Richard Henderson
-<richard.henderson@linaro.org> wrote:
->
-> On 5/23/19 9:08 AM, Peter Maydell wrote:
-> >> Because the three different instructions perform the same operation with
-> >> reshuffled register arguments.
-> >
-> > Ah, so they do. Next question, how do I find out what the
-> > order of arguments in the above code means so I can compare
-> > it against the pseudocode expression we're implementing?
->
-> >From tcg/README:
->
-> * bitsel_vec v0, v1, v2, v3
->
->   Bitwise select, v0 = (v2 & v1) | (v3 & ~v1), across the entire vector.
->
-> The "selector" is second, the first input operand.
 
-Oh, this series is based on another patchset.
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+----- Original Message -----
+> From: "Philippe Mathieu-Daud=C3=A9" <f4bug@amsat.org>
+> To: qemu-devel@nongnu.org
+> Cc: "Eduardo Habkost" <ehabkost@redhat.com>, "Caio Carrara" <ccarrara@red=
+hat.com>, "Alistair Francis"
+> <alistair@alistair23.me>, "Subbaraya Sundeep" <sundeep.lkml@gmail.com>, q=
+emu-arm@nongnu.org, "Cleber Rosa"
+> <crosa@redhat.com>, "Peter Maydell" <peter.maydell@linaro.org>, "Philippe=
+ Mathieu-Daud=C3=A9" <f4bug@amsat.org>
+> Sent: Monday, May 20, 2019 6:06:34 PM
+> Subject: [PATCH 1/2] BootLinuxConsoleTest: Do not log empty lines
+>=20
+> Avoid to log empty lines in console debug logs.
+>=20
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> ---
+>  tests/acceptance/boot_linux_console.py | 6 ++++--
+>  1 file changed, 4 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/tests/acceptance/boot_linux_console.py
+> b/tests/acceptance/boot_linux_console.py
+> index d5c500ea30..f593f3858e 100644
+> --- a/tests/acceptance/boot_linux_console.py
+> +++ b/tests/acceptance/boot_linux_console.py
+> @@ -37,8 +37,10 @@ class BootLinuxConsole(Test):
+>          console =3D self.vm.console_socket.makefile()
+>          console_logger =3D logging.getLogger('console')
+>          while True:
+> -            msg =3D console.readline()
+> -            console_logger.debug(msg.strip())
+> +            msg =3D console.readline().strip()
+> +            if not msg:
+> +                continue
+> +            console_logger.debug(msg)
+>              if success_message in msg:
+>                  break
+>              if failure_message in msg:
+> --
+> 2.19.1
+>=20
+>=20
 
-thanks
--- PMM
+Reviewed-by: Cleber Rosa <crosa@redhat.com>
 
