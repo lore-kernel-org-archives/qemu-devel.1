@@ -2,63 +2,72 @@ Return-Path: <SRS0=bvyN=TX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C156EC282CE
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 00:18:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9389BC282CE
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 01:05:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 673D62089E
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 00:18:45 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="X5BwGEts"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 673D62089E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	by mail.kernel.org (Postfix) with ESMTPS id 3C9662089E
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 01:05:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3C9662089E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:54801 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:55366 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hTbRU-0001yh-PU
-	for qemu-devel@archiver.kernel.org; Wed, 22 May 2019 20:18:44 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:49084)
+	id 1hTcAv-0000jz-Bd
+	for qemu-devel@archiver.kernel.org; Wed, 22 May 2019 21:05:41 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:56184)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1hTbQY-0001fC-Sw
-	for qemu-devel@nongnu.org; Wed, 22 May 2019 20:17:48 -0400
+	(envelope-from <crosa@redhat.com>) id 1hTc9n-0000Hx-De
+	for qemu-devel@nongnu.org; Wed, 22 May 2019 21:04:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1hTbQX-00006J-19
-	for qemu-devel@nongnu.org; Wed, 22 May 2019 20:17:46 -0400
-Received: from ozlabs.org ([203.11.71.1]:53125)
+	(envelope-from <crosa@redhat.com>) id 1hTc9i-0000wB-Cl
+	for qemu-devel@nongnu.org; Wed, 22 May 2019 21:04:29 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55106)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
-	id 1hTbLc-0005Wu-P6; Wed, 22 May 2019 20:12:42 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
-	id 458VLm4GLDz9s5c; Thu, 23 May 2019 10:12:32 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-	d=gibson.dropbear.id.au; s=201602; t=1558570352;
-	bh=Txq55GIENihYbZ5kE9Rl1OBq3l49PdIZk/ji01L+sKA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=X5BwGEts9f97yeiW7kj0gO/B2/UCBADVtPr3/S55ieRgsKKh/zrsnCuY8Qv+lOnqD
-	rDZ2+be2W4CTxKzHkkJPb9epkTbh2uRyyuBWuhBbzRP0c0tSkNbn6XhL6Klme6Aznt
-	TLw6vxICQ7RtYc+zRU6R/vucpDmI0ZLKJUUwj9zA=
-Date: Thu, 23 May 2019 09:24:30 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-To: Laurent Vivier <lvivier@redhat.com>
-Message-ID: <20190522232429.GM30423@umbus.fritz.box>
-References: <20190521073348.29657-1-lvivier@redhat.com>
+	(Exim 4.71) (envelope-from <crosa@redhat.com>) id 1hTc9e-0000u1-Ia
+	for qemu-devel@nongnu.org; Wed, 22 May 2019 21:04:24 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id CC6A63082A28;
+	Thu, 23 May 2019 01:04:20 +0000 (UTC)
+Received: from colo-mx.corp.redhat.com
+	(colo-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.21])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 97B056013C;
+	Thu, 23 May 2019 01:04:20 +0000 (UTC)
+Received: from zmail17.collab.prod.int.phx2.redhat.com
+	(zmail17.collab.prod.int.phx2.redhat.com [10.5.83.19])
+	by colo-mx.corp.redhat.com (Postfix) with ESMTP id 2EF8E5B423;
+	Thu, 23 May 2019 01:04:20 +0000 (UTC)
+Date: Wed, 22 May 2019 21:04:17 -0400 (EDT)
+From: Cleber Rosa <crosa@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <1603108978.24224480.1558573457497.JavaMail.zimbra@redhat.com>
+In-Reply-To: <20190522230705.GB10764@habkost.net>
+References: <20190520231910.12184-1-f4bug@amsat.org>
+	<20190522211230.GA10764@habkost.net>
+	<1711852617.24204010.1558561566547.JavaMail.zimbra@redhat.com>
+	<20190522230705.GB10764@habkost.net>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="JlJsEFsx9RQyiX4C"
-Content-Disposition: inline
-In-Reply-To: <20190521073348.29657-1-lvivier@redhat.com>
-User-Agent: Mutt/1.11.4 (2019-03-13)
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Originating-IP: [10.36.116.137, 10.4.195.19]
+Thread-Topic: mips: Add more Avocado tests
+Thread-Index: 8RyBM3uV/Q52wJzBBLBeid2iRe+6Bg==
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.45]);
+	Thu, 23 May 2019 01:04:21 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 203.11.71.1
-Subject: Re: [Qemu-devel] [PATCH v2] numa: improve cpu hotplug error message
- with a wrong node-id
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH 0/4] mips: Add more Avocado tests
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -70,130 +79,185 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
-	Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org,
-	qemu-arm@nongnu.org, qemu-ppc@nongnu.org,
-	Igor Mammedov <imammedo@redhat.com>
+Cc: Aleksandar Rikalo <arikalo@wavecomp.com>,
+	Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+	Wainer dos Santos Moschetta <wainersm@redhat.com>, qemu-devel@nongnu.org,
+	Aleksandar Markovic <aleksandar.m.mail@gmail.com>,
+	Aleksandar Markovic <amarkovic@wavecomp.com>,
+	Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---JlJsEFsx9RQyiX4C
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On Tue, May 21, 2019 at 09:33:48AM +0200, Laurent Vivier wrote:
-> On pseries, core-ids are strongly binded to a node-id by the command
-> line option. If an user tries to add a CPU to the wrong node, he has
-> an error but it is not really helpful:
+----- Original Message -----
+> From: "Eduardo Habkost" <ehabkost@redhat.com>
+> To: "Cleber Rosa" <crosa@redhat.com>
+> Cc: "Philippe Mathieu-Daud=C3=A9" <f4bug@amsat.org>, qemu-devel@nongnu.or=
+g, "Aleksandar Rikalo" <arikalo@wavecomp.com>,
+> "Aleksandar Markovic" <aleksandar.m.mail@gmail.com>, "Aleksandar Markovic=
+" <amarkovic@wavecomp.com>, "Aurelien
+> Jarno" <aurelien@aurel32.net>, "Wainer dos Santos Moschetta" <wainersm@re=
+dhat.com>
+> Sent: Wednesday, May 22, 2019 7:07:05 PM
+> Subject: Re: [Qemu-devel] [PATCH 0/4] mips: Add more Avocado tests
 >=20
->   qemu-system-ppc64 ... -smp 1,maxcpus=3D64,cores=3D1,threads=3D1,sockets=
-=3D1 \
->                         -numa node,nodeid=3D0 -numa node,nodeid=3D1 ...
+> On Wed, May 22, 2019 at 05:46:06PM -0400, Cleber Rosa wrote:
+> >=20
+> >=20
+> > ----- Original Message -----
+> > > From: "Eduardo Habkost" <ehabkost@redhat.com>
+> > > To: "Philippe Mathieu-Daud=C3=A9" <f4bug@amsat.org>
+> > > Cc: qemu-devel@nongnu.org, "Aleksandar Rikalo" <arikalo@wavecomp.com>=
+,
+> > > "Aleksandar Markovic"
+> > > <aleksandar.m.mail@gmail.com>, "Aleksandar Markovic"
+> > > <amarkovic@wavecomp.com>, "Cleber Rosa" <crosa@redhat.com>,
+> > > "Aurelien Jarno" <aurelien@aurel32.net>, "Wainer dos Santos Moschetta=
+"
+> > > <wainersm@redhat.com>
+> > > Sent: Wednesday, May 22, 2019 5:12:30 PM
+> > > Subject: Re: [Qemu-devel] [PATCH 0/4] mips: Add more Avocado tests
+> > >=20
+> > > On Tue, May 21, 2019 at 01:19:06AM +0200, Philippe Mathieu-Daud=C3=A9=
+ wrote:
+> > > > Hi,
+> > > >=20
+> > > > It was a rainy week-end here, so I invested it to automatize some
+> > > > of my MIPS tests.
+> > > >=20
+> > > > The BootLinuxSshTest is not Global warming friendly, it is not
+> > > > meant to run on a CI system but rather on a workstation previous
+> > > > to post a pull request.
+> > > > It can surely be improved, but it is a good starting point.
+> > >=20
+> > > Until we actually have a mechanism to exclude the test case on
+> > > travis-ci, I will remove patch 4/4 from the queue.  Aleksandar,
+> > > please don't merge patch 4/4 yet or it will break travis-ci.
+> > >=20
+> > > Cleber, Wainer, is it already possible to make "avocado run" skip
+> > > tests tagged with "slow"?
+> > >=20
+> >=20
+> > The mechanism exists, but we haven't tagged any test so far as slow.
+> >=20
+> > Should we define/document a criteria for a test to be slow?  Given
+> > that this is highly subjective, we have to think of:
+> >=20
+> >  * Will we consider the average or maximum run time (the timeout
+> >    definition)?
+> > =20
+> >  * For a single test, what is "slow"? Some rough numbers from Travis
+> >    CI[1] to help us with guidelines:
+> >    - boot_linux_console.py:BootLinuxConsole.test_x86_64_pc:  PASS (6.04=
+ s)
+> >    - boot_linux_console.py:BootLinuxConsole.test_arm_virt:  PASS (2.91 =
+s)
+> >    -
+> >    linux_initrd.py:LinuxInitrd.test_with_2gib_file_should_work_with_lin=
+ux_v4_16:
+> >    PASS (18.14 s)
+> >    - boot_linux.py:BootLinuxAarch64.test_virt:  PASS (396.88 s)
 >=20
->   (qemu) device_add power9_v2.0-spapr-cpu-core,core-id=3D30,node-id=3D1
->   Error: node-id=3D1 must match numa node specified with -numa option
+> I don't think we need to overthink this.  Whatever objective
+> criteria we choose, I'm sure we'll have to adapt them later due
+> to real world problems.
 >=20
-> This patch improves this error message by giving to the user the good
-> topology information (node-id, socket-id and thread-id if they are
-> available) to use with the core-id he's providing:
+> e.g.: is 396 seconds too slow?  I don't know, it depends: does it
+> break Travis and other CI systems often because of timeouts?  If
+> yes, then we should probably tag it as slow.
 >=20
->   Error: core-id 30 can only be plugged into node-id 0
+
+It's not only that.  We're close to a point where we'll need to
+determine whether "make check-acceptance" will work as a generic
+enough default for most user on their environments and most CI
+systems.
+
+As an example, this job ran 5 fairly slow tests (which I'm preparing
+to send):
+
+  https://travis-ci.org/clebergnu/qemu/jobs/535967210#L3518
+
+Those are justifiably slow, given the fact that they boot a full
+Fedora 30 system using TCG.  The job has a cumulative execution time
+of ~39 minutes.  That leaves only 11 minutes to spare on the Travis
+CI environment.  If they all exercised close to their 600s allowances
+(timeout), the Travis job would have failed.=20
+
+Having said that, if a CI failure is supposed to be a major breakage,
+which I believe it's the right mind set and a worthy goal, we should
+limit the amount of tests we run so that their *maximum* execution
+time does not exceed the maximum job time limit.
+
+> If having subjective criteria is really a problem (I don't think
+> it is), then we can call the tag "skip_travis", and stop worrying
+> about defining what exactly is "slow".
 >=20
-> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
-
-LGTM,
-
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
-
-> ---
 >=20
-> Notes:
->     v2: display full topology in the error message
+> >=20
+> >  * Do we want to set a maximum job timeout?  This way we can skip
+> >    tests after a given amount of time has passed.  Currently we interru=
+pt
+> >    the test running when the job timeout is reached, but it's possible
+> >    to add a option so that no new tests will be started, but currently
+> >    running ones will be waited on.
 >=20
->  numa.c | 28 ++++++++++++++++++++++++++--
->  1 file changed, 26 insertions(+), 2 deletions(-)
+> I'm not sure I understand the suggestion to skip tests.  If we
+> skip tests after a timeout, how would we differentiate a test
+> being expectedly slow from a QEMU hang?
 >=20
-> diff --git a/numa.c b/numa.c
-> index 3875e1efda3a..7413f821e2bb 100644
-> --- a/numa.c
-> +++ b/numa.c
-> @@ -458,6 +458,27 @@ void qmp_set_numa_node(NumaOptions *cmd, Error **err=
-p)
->      set_numa_options(MACHINE(qdev_get_machine()), cmd, errp);
->  }
-> =20
-> +static char *cpu_topology_to_string(const CPUArchId *cpu)
-> +{
-> +    GString *s =3D g_string_new(NULL);
-> +    if (cpu->props.has_socket_id) {
-> +        g_string_append_printf(s, "socket-id %"PRId64, cpu->props.socket=
-_id);
-> +    }
-> +    if (cpu->props.has_node_id) {
-> +        if (s->len) {
-> +            g_string_append_printf(s, ", ");
-> +        }
-> +        g_string_append_printf(s, "node-id %"PRId64, cpu->props.node_id);
-> +    }
-> +    if (cpu->props.has_thread_id) {
-> +        if (s->len) {
-> +            g_string_append_printf(s, ", ");
-> +        }
-> +        g_string_append_printf(s, "thread-id %"PRId64, cpu->props.thread=
-_id);
-> +    }
-> +    return g_string_free(s, false);
-> +}
-> +
->  void numa_cpu_pre_plug(const CPUArchId *slot, DeviceState *dev, Error **=
-errp)
->  {
->      int node_id =3D object_property_get_int(OBJECT(dev), "node-id", &err=
-or_abort);
-> @@ -470,8 +491,11 @@ void numa_cpu_pre_plug(const CPUArchId *slot, Device=
-State *dev, Error **errp)
->                                      "node-id", errp);
->          }
->      } else if (node_id !=3D slot->props.node_id) {
-> -        error_setg(errp, "node-id=3D%d must match numa node specified "
-> -                   "with -numa option", node_id);
-> +        char *topology =3D cpu_topology_to_string(slot);
-> +        error_setg(errp,
-> +                   "core-id %"PRId64" can only be plugged into %s",
-> +                   slot->props.core_id, topology);
-> +        g_free(topology);
->      }
->  }
-> =20
+> --
+> Eduardo
+>=20
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+Basically, what I meant is that we could attempt something like:
 
---JlJsEFsx9RQyiX4C
-Content-Type: application/pgp-signature; name="signature.asc"
+ * Job "Brave"
+  - 50 tests, each with 60 seconds timeout =3D 50 min max
+  - 60 tests, each with 1 second timeout  =3D 1 min max
 
------BEGIN PGP SIGNATURE-----
+If Job "Brave" is run on a system such as Travis, it *can* fail,
+because it can go over the maximum Travis CI job limit of 50 min.
+We could set an Avocado job timeout of say, 48 minutes, and tell
+Avocado to mark the tests it wasn't able to spawn as "SKIPPED",
+and do not report an overall error condition.
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlzl2i0ACgkQbDjKyiDZ
-s5K/Eg/+Ktn/r8CdwQVKwOJ8/xNwc34839VPxqDE1pdamxDGhQkrxNRngP8LTtQ7
-9E8K6iivHTrI/7nEYTHCm7ErVZZlod0Z5o7Lsq0WyZZI3vxxGwbPOpIv+uQb2OXO
-vk7fvzwLtDRusJDrJdlEXNbw2/30fWnhkmbshG2yIyD18xcEKZh2CeilntWpfQD5
-DZsZ+DiB44OWfoYag2m68HniMOF0K65r6ar2Edj4VsnE8lCq9Xq8NSR0zfndrADw
-XE0ZKz82tFzjcK5rPztG+B5tasDWMpeGQaDkZNiaBRNjXT0ZjKsC62W/8cpM2PGO
-21EWV2iFDbcwsHBDnxmM1uWut1hTtl/29fzakdNXMvIu0wSVRp9xZFoo5yFlML/d
-UOR8nNCI3uV2yhIvxsFLR5nGWlqkicWVMLeYMiDqixw3IHBgYQuFhu4CRgR8HN7C
-eY2+pp6f7aNVIFAhtjdwca97L31ig+KvhBfKLw4mqgCPIp5Qytwvqbco6sLulLhw
-GpnMD6AWMIZmo/IsJEmMrxq88hrPIAHloHQ/61HFPWAFgS2QLHLPb+wlrCzN267e
-a/acMZ0cMud8Z6fAQIBh48tkY/Fk8phobcHJaGxkpsZz5pGCEJyAfFr2WHi8QCVJ
-VBSb6vlTGvCVI/9kT+hVpFUdwnxjLDDtCzFWPJeZ56I6s/WACVc=
-=Ti2u
------END PGP SIGNATURE-----
+But, if we want to be more conservative (which I now realize is
+the best mindset for this situation), we should stick to something
+like:
 
---JlJsEFsx9RQyiX4C--
+ * Job "Coward"
+  - 47 tests, each with 60 seconds timeout =3D 47 min max
+  - 60 tests, each with 1 second timeout  =3D 1 min max
+
+So my proposal is that we should:
+
+ * Give ample timeouts to test (at least 2x their average
+   run time on Travis CI)
+
+ * Define the standard job (make check-acceptance) as a set
+   of tests that can run under the Travis CI job (discounted
+   the average QEMU build time)
+
+This means that:
+
+ * We'd tag some tests as "not-default", filtering them out
+   of "make check-acceptance"
+
+ * Supposing a developer is using a machine as least as powerful
+   as the Travis CI environment, and assuming a build time of
+   10 minutes, his "make check-acceptance" maximum execution
+   time would be in the order of ~39 minutes.
+
+I can work on adding the missing Avocado features, such as
+the ability to list/count the maximum job time for the given test
+selection. This should help us to maintain sound CI jobs, and good
+user experience.
+
+And finally, I'm sorry that I did overthink this... but I know
+that the time for hard choices are coming fast.
+
+Thanks,
+- Cleber.
 
