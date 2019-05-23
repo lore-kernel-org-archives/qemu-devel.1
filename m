@@ -2,94 +2,125 @@ Return-Path: <SRS0=bvyN=TX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B6458C282DD
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 12:29:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 777F0C282DD
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 12:32:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 79E3B20851
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 12:29:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 79E3B20851
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 2A79D21019
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 12:32:16 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DRwgO4VV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2A79D21019
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=twiddle.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:35280 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:35349 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hTmqu-0003bd-Ny
-	for qemu-devel@archiver.kernel.org; Thu, 23 May 2019 08:29:44 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:45833)
+	id 1hTmtL-0005Il-EU
+	for qemu-devel@archiver.kernel.org; Thu, 23 May 2019 08:32:15 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:46565)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pmorel@linux.ibm.com>) id 1hTmmZ-0008Hd-9O
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 08:25:16 -0400
+	(envelope-from <rth7680@gmail.com>) id 1hTmop-0002FJ-Pz
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 08:27:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pmorel@linux.ibm.com>) id 1hTmmX-0002UL-MP
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 08:25:15 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:42872)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pmorel@linux.ibm.com>)
-	id 1hTmmX-0002Sp-2j
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 08:25:13 -0400
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x4NC9G6A024182
-	for <qemu-devel@nongnu.org>; Thu, 23 May 2019 08:25:10 -0400
-Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2snrwvfg2a-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 23 May 2019 08:25:10 -0400
-Received: from localhost
-	by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pmorel@linux.ibm.com>;
-	Thu, 23 May 2019 13:25:08 +0100
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
-	by e06smtp05.uk.ibm.com (192.168.101.135) with IBM ESMTP SMTP Gateway:
-	Authorized Use Only! Violators will be prosecuted; 
-	(version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-	Thu, 23 May 2019 13:25:03 +0100
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com
-	(b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-	by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with
-	ESMTP id x4NCP2e610158292
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256
-	verify=OK); Thu, 23 May 2019 12:25:02 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 0AEB0A405B;
-	Thu, 23 May 2019 12:25:02 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id A478DA4054;
-	Thu, 23 May 2019 12:25:01 +0000 (GMT)
-Received: from morel-ThinkPad-W530.boeblingen.de.ibm.com (unknown
-	[9.152.222.40])
-	by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-	Thu, 23 May 2019 12:25:01 +0000 (GMT)
-From: Pierre Morel <pmorel@linux.ibm.com>
-To: cohuck@redhat.com
-Date: Thu, 23 May 2019 14:24:58 +0200
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1558614300-24574-1-git-send-email-pmorel@linux.ibm.com>
-References: <1558614300-24574-1-git-send-email-pmorel@linux.ibm.com>
-X-TM-AS-GCONF: 00
-x-cbid: 19052312-0020-0000-0000-0000033FAC96
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19052312-0021-0000-0000-0000219296CD
-Message-Id: <1558614300-24574-4-git-send-email-pmorel@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
-	definitions=2019-05-23_10:, , signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
-	priorityscore=1501
-	malwarescore=0 suspectscore=3 phishscore=0 bulkscore=0 spamscore=0
-	clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
-	mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
-	scancount=1 engine=8.0.1-1810050000 definitions=main-1905230087
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.156.1
-Subject: [Qemu-devel] [PATCH v2 3/5] s390: vfio_pci: Use a PCI Group
- structure
+	(envelope-from <rth7680@gmail.com>) id 1hTmoo-000431-Ow
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 08:27:35 -0400
+Received: from mail-yb1-xb41.google.com ([2607:f8b0:4864:20::b41]:34540)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>)
+	id 1hTmom-00040Q-7t; Thu, 23 May 2019 08:27:32 -0400
+Received: by mail-yb1-xb41.google.com with SMTP id v78so2201605ybv.1;
+	Thu, 23 May 2019 05:27:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+	h=sender:subject:to:cc:references:from:openpgp:autocrypt:message-id
+	:date:user-agent:mime-version:in-reply-to:content-language
+	:content-transfer-encoding;
+	bh=FANiTY/up6yJLM+G8m+j8Ux206U8nBBLK6uiTs1CeVM=;
+	b=DRwgO4VVXAQOSggM8A+qWysOYTPa7rR7GNFyuy7JJA5JT29bYVHDiRw+J89/Wztq2k
+	zcCBpqXBZ7okRYaig/dPXgFbNmT4c2GQmSmUi3NAlYvr2tr4NsToDojo9QB4ABwlUg+Y
+	vHxqw7qCxBa16f/VuM4986jgXt+cEIfgjnJS8vuvvmOtPnTHv6edkgSahDEEu5OEPXST
+	DV5wOABcWDQv1Lx0p/rKXnKVqTuJlEhkXwI4Yt5b9HgbPgOKVJ9QaNTo5cHeVR2BjrR+
+	IwptFICrWx9Gj5E/dVFt/hKD0evgErLwSsohKz53dfiHEh33GfpyT3phBnf/DvQ6snsX
+	/s1g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:sender:subject:to:cc:references:from:openpgp
+	:autocrypt:message-id:date:user-agent:mime-version:in-reply-to
+	:content-language:content-transfer-encoding;
+	bh=FANiTY/up6yJLM+G8m+j8Ux206U8nBBLK6uiTs1CeVM=;
+	b=WoOypVPbYVm9aeHiqRwTVXEz8AiYs/ob9TEmB99kugBd3VCnV1clau06cWwaGU1F2M
+	8OKJgwA7T1UHLQwZaGkgCW5qJLw2YdmU8n2evacKAagLaONjrfHbQglpwNy3gph27tvw
+	ds1iRcLbXuz9ZF0O3hGxnFBEc6E8q3tsX6EwZ0WEQnAvcMlUat8vQQZ9EHtdTxDPbX2c
+	8k/r5mPegltGpBwglKJZtpPkiWEMxRdXd+O/T2VD/vk8wSkgoCLcOLU9qUVllRTbQofW
+	dfBA3lpniyxC4AsH+p9sBXwkx0tfQcxGnoHWLHs33oefg0qXQVxvrKX6OiLKDzHXMFCm
+	EKzg==
+X-Gm-Message-State: APjAAAVJGjfHVD4Vho76VKIEWjlma0tRa+h8Dnuehyegg4mMbZSMR1OP
+	mMHoxuOJutQo3fRyuYMH9T8=
+X-Google-Smtp-Source: APXvYqyksVfDLtvincRrNSMwkxTywzUcpvP20VMLlY2iHB34ZyyseD7Y4IhwNXmlDvpEUwMpPbrdlQ==
+X-Received: by 2002:a25:850d:: with SMTP id w13mr18193785ybk.515.1558614451225;
+	Thu, 23 May 2019 05:27:31 -0700 (PDT)
+Received: from [10.240.8.143] ([71.46.56.63])
+	by smtp.googlemail.com with ESMTPSA id
+	m185sm6853738ywf.38.2019.05.23.05.27.29
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Thu, 23 May 2019 05:27:30 -0700 (PDT)
+To: David Hildenbrand <david@redhat.com>,
+	Richard Henderson <richard.henderson@linaro.org>
+References: <20190515203112.506-1-david@redhat.com>
+	<20190515203112.506-2-david@redhat.com>
+	<b3611279-15c4-f9b7-2a91-051ac6431b2c@linaro.org>
+	<44d7ddb4-040f-6778-7439-043b94e354ec@redhat.com>
+	<0935643f-941f-5883-c481-8ac18d57c98d@linaro.org>
+	<1f6001a2-e1d3-2b6f-e84a-8b9963302a3c@redhat.com>
+	<CAFXwXr=YzSuVa9wMKAczhojU+sK5zzPqpWOaJXDLovLNcmkYqg@mail.gmail.com>
+	<db392f3c-2bb2-6e16-ebe8-3175ef7859f4@redhat.com>
+	<9b00d53e-d676-7d19-cab6-7fb7a6715d1e@twiddle.net>
+	<273c1e4f-3216-78aa-508e-b063c0612854@redhat.com>
+From: Richard Henderson <rth@twiddle.net>
+Openpgp: preference=signencrypt
+Autocrypt: addr=rth@twiddle.net; prefer-encrypt=mutual; keydata=
+	mQENBFGuLC8BCADcAoWcnW9lTsDMzbO3MBU+KbiGaj5JPatEUscRDkQYM2fyNjJp2tIWDK5a
+	n4yngeXB3eX61WbYR3QraRK8mlYLGxyAdHMEQfPipbqf3TmN043fssT2bc82ApJcs1zvLYgI
+	rhMht7Dck7A0wNC1jo+ZjVVFig5gDTN7gOzaAdBtV8tVNUddwkLzzaGpfihhSD6U46NdqKOG
+	Wlnn6TrkMy0QGdQ5NaXHkRlUjnnUTSW/nKfoxD+EI+A9V4sYOd8mc/TL4aJh/i/AiU57eLbo
+	n17uQI6/VTWDUWl8USiz4x9c8vmqlywLx00tAFxxoRWqk4KVJlj+Sh0up/D/sJ+vPpgBABEB
+	AAG0I1JpY2hhcmQgSGVuZGVyc29uIDxydGhAdHdpZGRsZS5uZXQ+iQFBBBMBAgArAhsDBgsJ
+	CAcDAgYVCAIJCgsEFgIDAQIeAQIXgAUJC7UHogUCWaDNVgIZAQAKCRCtEnDMTdAnm9N5CADO
+	cB8F/SudJ72IupxQf40hbJdBK176+gb3sHMsixyLtrU59lee+lIM1OZmlNjsnCYmiSnbA5ks
+	Q7p0HfO7DgdmfLzcK6xsHZukqSZy5LByw348Y913ZyjOrJZFdPP7kDg1MnqRqH4+3ZdzxV4y
+	eYBWFU9GYMIF06JbUubossOOO4ArNVZbnIPu8Vn2tDZVVqsCBqkoCSBMj519xrvyOu5z4mHS
+	LkCglXmVDOXMbqLuNAC3rfNXSnyM4hYkLUyfALJlAAy1Ro+jUqYhu7XUFV/MiwRuFMh5GbtY
+	Urkx7tqsWQXLT3GeDk/LqvpWJQwk4cHHckYjRih+70CHIenm81PVuQENBFGuLC8BCACyEx3x
+	94HIkTX0CHu2sA0w75+h9wuoA8ggJ7+S4ri0y2YsijWad5TTt6z6MMiqxk9kSA5bppaj4HXh
+	86hBF/dWCtMpNr3Rb8FNOKyeA/qkYHVD6HiAiw9c6D8Dr9hWmOk3/HSmGrNURxeUFOckDXsv
+	I+yGGKBNshj59j7QZr7ZiuIi2rWlBL8dFN/OWa/o3x7HKsE4k6K8ngwvCKP/QbDLwLLBOWH+
+	VEUtpyeyxTr3OJ47ECTxdYvXoAV2iJaKr+6doVQiiR5eVFiMYrUPUECJeolOCwqc/JlWE18L
+	+PCAFaW1H+/mpPVfSpN4wnkJ5cQiQVB41IaCM4p20iRzx7ZJABEBAAGJASUEGAECAA8CGwwF
+	AlmgzYEFCQu1CEoACgkQrRJwzE3QJ5s7rggAwABzDAGrZ6uWsMxg5PeiiAYPy6LBnCBJSpB5
+	Tfy5jH8QTmLfXW+u4Ib4sWXG7PYNR7sIrtqUHjRqXLVXrSnBX9ASGcYw/Xil45khW6LsRpO1
+	prHv9gkwQfa6fTiWXVfSfm2Nant6u02q+MaYtQpCVTiz/9ki4FfftUwUHFLU0MhIQogjd11y
+	/E08RJsqBwaHQdt14PwU1HphDOzSkhOXRXQLSd3ysyeGUXvL+gqQoXl5XYdvk8IId4PoJRo4
+	jcyJ4VbnldvXh5gdGhFA/f9JgkLk9tPW+C3wNtNWyRUq8azR9hF2fg2HJUf4IXQlIu8OOgh1
+	VcROBqvtH3ecaIL9iw==
+Message-ID: <1c3a49f8-56bd-1577-60a4-7c29ca1c0d83@twiddle.net>
+Date: Thu, 23 May 2019 08:27:28 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
+MIME-Version: 1.0
+In-Reply-To: <273c1e4f-3216-78aa-508e-b063c0612854@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::b41
+Subject: Re: [Qemu-devel] [PATCH v1 1/5] s390x/tcg: Implement VECTOR FIND
+ ANY ELEMENT EQUAL
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -101,173 +132,118 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pasic@linux.vnet.ibm.com, mst@redhat.com, qemu-s390x@nongnu.org,
-	david@redhat.com, walling@linux.ibm.com, qemu-devel@nongnu.org,
-	borntraeger@de.ibm.com, alex.williamson@redhat.com,
-	pbonzini@redhat.com, rth@twiddle.net
+Cc: Thomas Huth <thuth@redhat.com>, qemu-s390x <qemu-s390x@nongnu.org>,
+	Cornelia Huck <cohuck@redhat.com>,
+	"qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We use a S390PCIGroup structure to hold the information
-related to zPCI Function group.
+On 5/23/19 3:50 AM, David Hildenbrand wrote:
+> /*
+>  * Returns the number of bits composing one element.
+>  */
+> static uint8_t get_element_bits(uint8_t es)
+> {
+>     return (1 << es) * BITS_PER_BYTE;
+> }
+> 
+> /*
+>  * Returns the bitmask for a single element.
+>  */
+> static uint64_t get_single_element_mask(uint8_t es)
+> {
+>     return -1ull >> (64 - get_element_bits(es));
+> }
+> 
+> /*
+>  * Returns the bitmask for a single element (excluding the MSB).
+>  */
+> static uint64_t get_single_element_lsbs_mask(uint8_t es)
+> {
+>     return -1ull >> (65 - get_element_bits(es));
+> }
+> 
+> /*
+>  * Returns the bitmasks for multiple elements (excluding the MSBs).
+>  */
+> static uint64_t get_element_lsbs_mask(uint8_t es)
+> {
+>     return dup_const(es, get_single_element_lsbs_mask(es));
+> }
+> 
+> static int vfae(void *v1, const void *v2, const void *v3, bool in,
+>                 bool rt, bool zs, uint8_t es)
+> {
+>     const uint64_t mask = get_element_lsbs_mask(es);
+>     const int bits = get_element_bits(es);
+>     uint64_t a0, a1, b0, b1, e0, e1, t0, t1, z0, z1;
+>     uint64_t first_zero = 16;
+>     uint64_t first_equal;
+>     int i;
+> 
+>     a0 = s390_vec_read_element64(v2, 0);
+>     a1 = s390_vec_read_element64(v2, 1);
+>     b0 = s390_vec_read_element64(v3, 0);
+>     b1 = s390_vec_read_element64(v3, 1);
+>     e0 = 0;
+>     e1 = 0;
+>     /* compare against equality with every other element */
+>     for (i = 0; i < 64; i += bits) {
+>         t0 = i ? rol64(b0, i) : b0;
+>         t1 = i ? rol64(b1, i) : b1;
+>         e0 |= zero_search(a0 ^ t0, mask);
+>         e0 |= zero_search(a0 ^ t1, mask);
+>         e1 |= zero_search(a1 ^ t0, mask);
+>         e1 |= zero_search(a1 ^ t1, mask);
+>     }
 
-This allows us to be ready to support multiple groups and to retrieve
-the group information from the host.
+I don't see that this is doing what you want.  You're shifting one element of B
+down, but not broadcasting it so that it is compared against every element of A.
 
-Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
----
- hw/s390x/s390-pci-bus.c  | 42 ++++++++++++++++++++++++++++++++++++++++++
- hw/s390x/s390-pci-bus.h  | 11 ++++++++++-
- hw/s390x/s390-pci-inst.c | 22 +++++++++++++---------
- 3 files changed, 65 insertions(+), 10 deletions(-)
+I'd expect something like
 
-diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
-index 2d0a28d..175ea8c 100644
---- a/hw/s390x/s390-pci-bus.c
-+++ b/hw/s390x/s390-pci-bus.c
-@@ -729,6 +729,46 @@ static void s390_pci_iommu_free(S390pciState *s, PCIBus *bus, int32_t devfn)
-     object_unref(OBJECT(iommu));
- }
- 
-+static S390PCIGroup *s390_grp_create(int ug)
-+{
-+    S390PCIGroup *grp;
-+    S390pciState *s = s390_get_phb();
-+
-+    grp = g_new0(S390PCIGroup, 1);
-+    grp->ug = ug;
-+    QTAILQ_INSERT_TAIL(&s->zpci_grps, grp, link);
-+    return grp;
-+}
-+
-+S390PCIGroup *s390_grp_find(int ug)
-+{
-+    S390PCIGroup *grp;
-+    S390pciState *s = s390_get_phb();
-+
-+    QTAILQ_FOREACH(grp, &s->zpci_grps, link) {
-+        if ((grp->ug & CLP_REQ_QPCIG_MASK_PFGID) == ug) {
-+            return grp;
-+        }
-+    }
-+    return NULL;
-+}
-+
-+static void s390_pci_init_default_group(void)
-+{
-+    S390PCIGroup *grp;
-+    ClpRspQueryPciGrp *resgrp;
-+
-+    grp = s390_grp_create(ZPCI_DEFAULT_FN_GRP);
-+    resgrp = &grp->zpci_grp;
-+    resgrp->fr = 1;
-+    stq_p(&resgrp->dasm, 0);
-+    stq_p(&resgrp->msia, ZPCI_MSI_ADDR);
-+    stw_p(&resgrp->mui, DEFAULT_MUI);
-+    stw_p(&resgrp->i, 128);
-+    stw_p(&resgrp->maxstbl, 128);
-+    resgrp->version = 0;
-+}
-+
- static void s390_pcihost_realize(DeviceState *dev, Error **errp)
- {
-     PCIBus *b;
-@@ -765,7 +805,9 @@ static void s390_pcihost_realize(DeviceState *dev, Error **errp)
-     s->bus_no = 0;
-     QTAILQ_INIT(&s->pending_sei);
-     QTAILQ_INIT(&s->zpci_devs);
-+    QTAILQ_INIT(&s->zpci_grps);
- 
-+    s390_pci_init_default_group();
-     css_register_io_adapters(CSS_IO_ADAPTER_PCI, true, false,
-                              S390_ADAPTER_SUPPRESSIBLE, &local_err);
-     error_propagate(errp, local_err);
-diff --git a/hw/s390x/s390-pci-bus.h b/hw/s390x/s390-pci-bus.h
-index a5d2049..e95a797 100644
---- a/hw/s390x/s390-pci-bus.h
-+++ b/hw/s390x/s390-pci-bus.h
-@@ -312,6 +312,14 @@ typedef struct ZpciFmb {
- } ZpciFmb;
- QEMU_BUILD_BUG_MSG(offsetof(ZpciFmb, fmt0) != 48, "padding in ZpciFmb");
- 
-+#define ZPCI_DEFAULT_FN_GRP 0x20
-+typedef struct S390PCIGroup {
-+    ClpRspQueryPciGrp zpci_grp;
-+    int ug;
-+    QTAILQ_ENTRY(S390PCIGroup) link;
-+} S390PCIGroup;
-+S390PCIGroup *s390_grp_find(int ug);
-+
- struct S390PCIBusDevice {
-     DeviceState qdev;
-     PCIDevice *pdev;
-@@ -327,8 +335,8 @@ struct S390PCIBusDevice {
-     QEMUTimer *fmb_timer;
-     uint8_t isc;
-     uint16_t noi;
--    uint16_t maxstbl;
-     uint8_t sum;
-+    S390PCIGroup *pci_grp;
-     S390MsixInfo msix;
-     AdapterRoutes routes;
-     S390PCIIOMMU *iommu;
-@@ -353,6 +361,7 @@ typedef struct S390pciState {
-     GHashTable *zpci_table;
-     QTAILQ_HEAD(, SeiContainer) pending_sei;
-     QTAILQ_HEAD(, S390PCIBusDevice) zpci_devs;
-+    QTAILQ_HEAD(, S390PCIGroup) zpci_grps;
- } S390pciState;
- 
- S390pciState *s390_get_phb(void);
-diff --git a/hw/s390x/s390-pci-inst.c b/hw/s390x/s390-pci-inst.c
-index be28962..8147847 100644
---- a/hw/s390x/s390-pci-inst.c
-+++ b/hw/s390x/s390-pci-inst.c
-@@ -284,21 +284,25 @@ int clp_service_call(S390CPU *cpu, uint8_t r2, uintptr_t ra)
-         stq_p(&resquery->edma, ZPCI_EDMA_ADDR);
-         stl_p(&resquery->fid, pbdev->fid);
-         stw_p(&resquery->pchid, 0);
--        stw_p(&resquery->ug, 1);
-+        stw_p(&resquery->ug, ZPCI_DEFAULT_FN_GRP);
-         stl_p(&resquery->uid, pbdev->uid);
-         stw_p(&resquery->hdr.rsp, CLP_RC_OK);
-         break;
-     }
-     case CLP_QUERY_PCI_FNGRP: {
-         ClpRspQueryPciGrp *resgrp = (ClpRspQueryPciGrp *)resh;
--        resgrp->fr = 1;
--        stq_p(&resgrp->dasm, 0);
--        stq_p(&resgrp->msia, ZPCI_MSI_ADDR);
--        stw_p(&resgrp->mui, DEFAULT_MUI);
--        stw_p(&resgrp->i, 128);
--        stw_p(&resgrp->maxstbl, 128);
--        resgrp->version = 0;
- 
-+        ClpReqQueryPciGrp *reqgrp = (ClpReqQueryPciGrp *)reqh;
-+        S390PCIGroup *grp;
-+
-+        grp = s390_grp_find(reqgrp->g);
-+        if (!grp) {
-+            /* We do not allow access to unknown groups */
-+            /* The group must have been obtained with a vfio device */
-+            stw_p(&resgrp->hdr.rsp, CLP_RC_QUERYPCIFG_PFGID);
-+            goto out;
-+        }
-+        memcpy(resgrp, &grp->zpci_grp, sizeof(ClpRspQueryPciGrp));
-         stw_p(&resgrp->hdr.rsp, CLP_RC_OK);
-         break;
-     }
-@@ -752,7 +756,7 @@ int pcistb_service_call(S390CPU *cpu, uint8_t r1, uint8_t r3, uint64_t gaddr,
-     }
-     /* Length must be greater than 8, a multiple of 8 */
-     /* and not greater than maxstbl */
--    if ((len <= 8) || (len % 8) || (len > pbdev->maxstbl)) {
-+    if ((len <= 8) || (len % 8) || (len > pbdev->pci_grp->zpci_grp.maxstbl)) {
-         goto specification_error;
-     }
-     /* Do not cross a 4K-byte boundary */
--- 
-2.7.4
+	t0 = dup_const(es, b0 >> i);
+	t1 = dup_const(es, b1 >> i);
 
+(I also don't see what rol is getting you that shift doesn't.)
+
+
+>     /* invert the result if requested - invert only the MSBs */
+>     if (in) {
+>         e0 = ~e0 & ~mask;
+>         e1 = ~e1 & ~mask;
+>     }
+>     first_equal = match_index(e0, e1);
+> 
+>     if (zs) {
+>         z0 = zero_search(a0, mask);
+>         z1 = zero_search(a1, mask);
+>         first_zero = match_index(z0, z1);
+>     }
+> 
+>     if (rt) {
+>         e0 = (e0 >> (bits - 1)) * get_single_element_mask(es);
+>         e1 = (e1 >> (bits - 1)) * get_single_element_mask(es);
+>         s390_vec_write_element64(v1, 0, e0);
+>         s390_vec_write_element64(v1, 1, e1);
+>     } else {
+>         s390_vec_write_element64(v1, 0, MIN(first_equal, first_zero));
+>         s390_vec_write_element64(v1, 1, 0);
+>     }
+> 
+>     if (first_zero == 16 && first_equal == 16) {
+>         return 3; /* no match */
+>     } else if (first_zero == 16) {
+>         return 1; /* matching elements, no match for zero */
+>     } else if (first_equal < first_zero) {
+>         return 2; /* matching elements before match for zero */
+>     }
+>     return 0; /* match for zero */
+> }
+
+The rest of this looks good.
+
+
+r~
 
