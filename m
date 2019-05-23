@@ -2,90 +2,57 @@ Return-Path: <SRS0=bvyN=TX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A93FC282DD
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 10:30:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BD264C282DD
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 10:30:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C174521019
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 10:30:37 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="k2BX6BdL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C174521019
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 8C70D21019
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 10:30:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8C70D21019
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:33120 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:33129 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hTkzc-00018T-AL
-	for qemu-devel@archiver.kernel.org; Thu, 23 May 2019 06:30:36 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:49127)
+	id 1hTkzi-0001Ah-Qa
+	for qemu-devel@archiver.kernel.org; Thu, 23 May 2019 06:30:42 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:49142)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hTkuy-0005SL-4U
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 06:25:49 -0400
+	(envelope-from <pagupta@redhat.com>) id 1hTkv0-0005Tr-1o
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 06:25:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hTkut-0000z7-Dq
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 06:25:47 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:37894)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1hTkuo-0000uC-5Z
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 06:25:41 -0400
-Received: by mail-wr1-x441.google.com with SMTP id d18so5650892wrs.5
-	for <qemu-devel@nongnu.org>; Thu, 23 May 2019 03:25:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=from:to:cc:subject:date:message-id:in-reply-to:references
-	:mime-version:content-transfer-encoding;
-	bh=3N082WaIffsJbYXIZ0a/9GfiR46w16xaqgWtZJxN1co=;
-	b=k2BX6BdL7AfVBVZGvxR6I1W5YQyw97rfN8y982CROeZA6WA5nEUyu0LNZ381uVK3mK
-	TEtZ0H7yj/B/AYZ7U3O24ZAej2MQM+RmX6gq6keUVDmGPEobLe1afslliZWeUcudmPFO
-	epO9GMf3Nbtq7cf9pryxXssNASaX2oR16yfEvQ3SPnI5AyrS12XSLGTDN3LuVxP+q/OL
-	hdI+/2zIUl1DiG6/Fn9UYaxCbybEHlTVeGrUKoLVvGGAxttNVkHxcqz48YVsR/HbWvpz
-	f3hj8UrsvPotAGg9UsxjNbAV/G5k+BesvT95b1BFgf2yS+TO4PA3UDR3YxqRl7WAyyjC
-	83nA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-	:references:mime-version:content-transfer-encoding;
-	bh=3N082WaIffsJbYXIZ0a/9GfiR46w16xaqgWtZJxN1co=;
-	b=P3PheMlv5H0QaZBHz52Zz3MCmBi8iJwGfyz1cr48OGtI1tzT+eL2/gGkef2ceu3t2c
-	AXKUHHn+hueENVZv3pbTq8OvXkV5tsXpDKH2i3UR2UjG9Quvo+n2Ov4gqy12Rr/mBKdq
-	4YmoRm1OKcuFZDvuH+ylbLG61u+ByNvB+M6jitbrMeDI93LHwbXKGw1MknNF4pYW2Cek
-	WeCGgCbhPPsDmCO71GS6ZtPpRSsbJgmqQ1+wDjb4GLmSqEFAsuOWu/5l5SGM4Brjo2Cu
-	dwHB2mUxOmwCjqM6rLwRAxJkZljJy9xxn0Uc2gHf7KgqgiGOmGO01xkiyhws7wzEuRPl
-	FELQ==
-X-Gm-Message-State: APjAAAWaHNyEl1+AzucP7LEVYfeASoL1GwRmpcYCaOrLTbC+Zgh9fcAp
-	TI9QfhUBFPYtt2LUr2e7GqSdWQ==
-X-Google-Smtp-Source: APXvYqzC5S1Os0KrZPLLqGnEcwfWecgVbIk8pHnT+ppk7+B+jAuIjYOBtAu+lDxr4kntsVZPMJNHdw==
-X-Received: by 2002:adf:ce07:: with SMTP id p7mr44958922wrn.241.1558607136866; 
-	Thu, 23 May 2019 03:25:36 -0700 (PDT)
-Received: from zen.linaroharston ([81.128.185.34])
-	by smtp.gmail.com with ESMTPSA id 19sm9345962wmk.3.2019.05.23.03.25.33
-	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Thu, 23 May 2019 03:25:35 -0700 (PDT)
-Received: from zen.linaroharston. (localhost [127.0.0.1])
-	by zen.linaroharston (Postfix) with ESMTP id 0B3E71FF93;
-	Thu, 23 May 2019 11:25:33 +0100 (BST)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+	(envelope-from <pagupta@redhat.com>) id 1hTkux-00012T-Fy
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 06:25:49 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55474)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pagupta@redhat.com>) id 1hTkut-0000cO-Bu
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 06:25:44 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 702A26749D;
+	Thu, 23 May 2019 10:25:19 +0000 (UTC)
+Received: from dhcp201-121.englab.pnq.redhat.com (ovpn-116-162.sin2.redhat.com
+	[10.67.116.162])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id F2AC054577;
+	Thu, 23 May 2019 10:24:57 +0000 (UTC)
+From: Pankaj Gupta <pagupta@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Thu, 23 May 2019 11:25:10 +0100
-Message-Id: <20190523102532.10486-7-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190523102532.10486-1-alex.bennee@linaro.org>
-References: <20190523102532.10486-1-alex.bennee@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2a00:1450:4864:20::441
-Subject: [Qemu-devel] [PATCH v2 06/28] target/arm: use the common interface
- for WRITE0/WRITEC in arm-semi
+Date: Thu, 23 May 2019 15:54:42 +0530
+Message-Id: <20190523102449.2642-1-pagupta@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.30]);
+	Thu, 23 May 2019 10:25:22 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PATCH 0/7] Qemu virtio pmem device
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -97,120 +64,131 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Riku Voipio <riku.voipio@iki.fi>,
-	qemu-arm@nongnu.org,
-	=?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
-	Laurent Vivier <laurent@vivier.eu>
+Cc: kwolf@redhat.com, aarcange@redhat.com, cohuck@redhat.com,
+	xiaoguangrong.eric@gmail.com, mst@redhat.com, pagupta@redhat.com,
+	riel@surriel.com, david@redhat.com, armbru@redhat.com,
+	ehabkost@redhat.com, lcapitulino@redhat.com, stefanha@redhat.com,
+	pbonzini@redhat.com, imammedo@redhat.com,
+	dan.j.williams@intel.com, nilal@redhat.com, dgilbert@redhat.com,
+	rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Now we have a common semihosting console interface use that for our
-string output. However ARM is currently unique in also supporting
-semihosting for linux-user so we need to replicate the API in
-linux-user. If other architectures gain this support we can move the
-file later.
+ This patch series has implementation for "virtio pmem"
+ device. "virtio pmem" is persistent memory(nvdimm) device in 
+ guest which allows to bypass the guest page cache. This
+ also implements a VIRTIO based asynchronous flush mechanism.  
+ Details of project idea for 'virtio pmem' flushing interface
+ is shared [2] & [3].
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
----
- linux-user/Makefile.objs  |  2 ++
- linux-user/arm/semihost.c | 24 ++++++++++++++++++++++++
- target/arm/arm-semi.c     | 31 ++++++-------------------------
- 3 files changed, 32 insertions(+), 25 deletions(-)
- create mode 100644 linux-user/arm/semihost.c
+ Sharing Qemu device emulation in this patchset. Tested with 
+ guest kernel driver [1]. This series is based on David's 
+ memory device refactoring [5] work with modified version of
+ my initial virtio pmem [4] series.
 
-diff --git a/linux-user/Makefile.objs b/linux-user/Makefile.objs
-index 769b8d83362..285c5dfa17a 100644
---- a/linux-user/Makefile.objs
-+++ b/linux-user/Makefile.objs
-@@ -6,4 +6,6 @@ obj-y = main.o syscall.o strace.o mmap.o signal.o \
- obj-$(TARGET_HAS_BFLT) += flatload.o
- obj-$(TARGET_I386) += vm86.o
- obj-$(TARGET_ARM) += arm/nwfpe/
-+obj-$(TARGET_ARM) += arm/semihost.o
-+obj-$(TARGET_AARCH64) += arm/semihost.o
- obj-$(TARGET_M68K) += m68k-sim.o
-diff --git a/linux-user/arm/semihost.c b/linux-user/arm/semihost.c
-new file mode 100644
-index 00000000000..9554102a855
---- /dev/null
-+++ b/linux-user/arm/semihost.c
-@@ -0,0 +1,24 @@
-+/*
-+ * ARM Semihosting Console Support
-+ *
-+ * Copyright (c) 2019 Linaro Ltd
-+ *
-+ * Currently ARM is unique in having support for semihosting support
-+ * in linux-user. So for now we implement the common console API but
-+ * just for arm linux-user.
-+ *
-+ * SPDX-License-Identifier: GPL-2.0-or-later
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "cpu.h"
-+#include "hw/semihosting/console.h"
-+#include "qemu.h"
-+
-+int qemu_semihosting_console_out(CPUArchState *env, target_ulong addr, int len)
-+{
-+    void *s = lock_user_string(addr);
-+    len = write(STDERR_FILENO, s, len ? len : strlen(s));
-+    unlock_user(s, addr, 0);
-+    return len;
-+}
-diff --git a/target/arm/arm-semi.c b/target/arm/arm-semi.c
-index 9e5a414dd89..253c66b172a 100644
---- a/target/arm/arm-semi.c
-+++ b/target/arm/arm-semi.c
-@@ -27,6 +27,7 @@
- 
- #include "cpu.h"
- #include "hw/semihosting/semihost.h"
-+#include "hw/semihosting/console.h"
- #ifdef CONFIG_USER_ONLY
- #include "qemu.h"
- 
-@@ -314,32 +315,12 @@ target_ulong do_arm_semihosting(CPUARMState *env)
-             return set_swi_errno(ts, close(arg0));
-         }
-     case TARGET_SYS_WRITEC:
--        {
--          char c;
--
--          if (get_user_u8(c, args))
--              /* FIXME - should this error code be -TARGET_EFAULT ? */
--              return (uint32_t)-1;
--          /* Write to debug console.  stderr is near enough.  */
--          if (use_gdb_syscalls()) {
--                return arm_gdb_syscall(cpu, arm_semi_cb, "write,2,%x,1", args);
--          } else {
--                return write(STDERR_FILENO, &c, 1);
--          }
--        }
-+    {
-+        qemu_semihosting_console_out(env, args, 1);
-+        return 0xdeadbeef;
-+    }
-     case TARGET_SYS_WRITE0:
--        if (!(s = lock_user_string(args)))
--            /* FIXME - should this error code be -TARGET_EFAULT ? */
--            return (uint32_t)-1;
--        len = strlen(s);
--        if (use_gdb_syscalls()) {
--            return arm_gdb_syscall(cpu, arm_semi_cb, "write,2,%x,%x",
--                                   args, len);
--        } else {
--            ret = write(STDERR_FILENO, s, len);
--        }
--        unlock_user(s, args, 0);
--        return ret;
-+        return qemu_semihosting_console_out(env, args, 0);
-     case TARGET_SYS_WRITE:
-         GET_ARG(0);
-         GET_ARG(1);
--- 
-2.20.1
+ Usage: 
+ ./qemu -name test -machine pc -m 8G,slots=240,maxmem=20G 
+ -object memory-backend-file,id=mem1,share,mem-path=test.img,
+  size=4G,share
+ -device virtio-pmem-pci,memdev=mem1,id=nv1
+
+ (qemu) info memory-devices
+  Memory device [virtio-pmem]: "nv1"
+  memaddr: 0x240000000
+  size: 4294967296
+  memdev: /objects/mem1
+
+ Implementation is divided into two parts:
+ New virtio pmem guest driver and qemu code changes for new 
+ virtio pmem paravirtualized device. In this series we are
+ sharing Qemu device emulation.
+
+1. Guest virtio-pmem kernel driver
+---------------------------------
+   - Reads persistent memory range from paravirt device and 
+     registers with 'nvdimm_bus'.  
+   - 'nvdimm/pmem' driver uses this information to allocate 
+     persistent memory region and setup filesystem operations 
+     to the allocated memory. 
+   - virtio pmem driver implements asynchronous flushing 
+     interface to flush from guest to host.
+
+2. Qemu virtio-pmem device
+---------------------------------
+   - Creates virtio pmem device and exposes a memory range to 
+     KVM guest. 
+   - At host side this is file backed memory which acts as 
+     persistent memory. 
+   - Qemu side flush uses aio thread pool API's and virtio 
+     for asynchronous guest multi request handling. 
+
+ Virtio-pmem security implications and suggested countermeasures:
+ ---------------------------------------------------------------
+
+ In previous posting of kernel driver, there was discussion [7]
+ on possible implications of page cache side channel attacks with 
+ virtio pmem. After thorough analysis of details of known side 
+ channel attacks, below are the suggestions:
+
+ - Depends entirely on how host backing image file is mapped 
+   into guest address space. 
+
+ - virtio-pmem device emulation, by default shared mapping is used
+   to map host backing file. It is recommended to use separate
+   backing file at host side for every guest. This will prevent
+   any possibility of executing common code from multiple guests
+   and any chance of inferring guest local data based based on 
+   execution time.
+
+ - If backing file is required to be shared among multiple guests 
+   it is recommended to don't support host page cache eviction 
+   commands from the guest driver. This will avoid any possibility
+   of inferring guest local data or host data from another guest. 
+
+ - Proposed device specification [6] for virtio-pmem device with 
+   details of possible security implications and suggested 
+   countermeasures for device emulation.
+
+[1] https://lkml.org/lkml/2019/5/21/569
+[2] https://www.spinics.net/lists/kvm/msg149761.html
+[3] https://www.spinics.net/lists/kvm/msg153095.html  
+[4] https://marc.info/?l=linux-kernel&m=153572228719237&w=2 
+[5] https://marc.info/?l=qemu-devel&m=153555721901824&w=2
+[6] https://lists.oasis-open.org/archives/virtio-dev/201903/msg00083.html
+[7] https://lkml.org/lkml/2019/1/9/1191
+
+ Pankaj Gupta (3):
+  virtio-pmem: add virtio device
+  virtio-pmem: sync linux headers
+  virtio-pci: proxy for virtio-pmem
+
+ David Hildenbrand (4):
+  virtio-pci: Allow to specify additional interfaces for the base type
+  hmp: Handle virtio-pmem when printing memory device infos
+  numa: Handle virtio-pmem in NUMA stats
+  pc: Support for virtio-pmem-pci
+
+ hmp.c                                        |   27 ++-
+ hw/i386/Kconfig                              |    1 
+ hw/i386/pc.c                                 |   72 ++++++++++
+ hw/virtio/Kconfig                            |   10 +
+ hw/virtio/Makefile.objs                      |    2 
+ hw/virtio/virtio-pci.c                       |    1 
+ hw/virtio/virtio-pci.h                       |    1 
+ hw/virtio/virtio-pmem-pci.c                  |  131 ++++++++++++++++++
+ hw/virtio/virtio-pmem-pci.h                  |   34 ++++
+ hw/virtio/virtio-pmem.c                      |  190 +++++++++++++++++++++++++++
+ include/hw/pci/pci.h                         |    1 
+ include/hw/virtio/virtio-pmem.h              |   49 ++++++
+ include/standard-headers/linux/virtio_ids.h  |    1 
+ include/standard-headers/linux/virtio_pmem.h |   35 ++++
+ numa.c                                       |   24 +--
+ qapi/misc.json                               |   28 +++
+ 16 files changed, 581 insertions(+), 26 deletions(-)
+----
+
+ P.S: Sending this patch series before going for vacations, please 
+ expect a delay in response.
 
 
