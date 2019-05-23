@@ -2,76 +2,94 @@ Return-Path: <SRS0=bvyN=TX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B6266C282DD
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 09:46:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68D05C282DD
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 10:07:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7C48C20862
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 09:46:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2804E20675
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 10:07:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="fSHGoPNt"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7C48C20862
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yandex-team.ru
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kpnmail.nl header.i=@kpnmail.nl header.b="O0N9ctex"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2804E20675
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=eltan.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:60875 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:32874 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hTkIW-0006Fe-QS
-	for qemu-devel@archiver.kernel.org; Thu, 23 May 2019 05:46:04 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:41525)
+	id 1hTkd0-0001W6-2d
+	for qemu-devel@archiver.kernel.org; Thu, 23 May 2019 06:07:14 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:45621)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yury-kotov@yandex-team.ru>) id 1hTkHJ-0005a4-68
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 05:44:50 -0400
+	(envelope-from <wvervoorn@eltan.com>) id 1hTkc3-0000qQ-Qt
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 06:06:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yury-kotov@yandex-team.ru>) id 1hTkHI-0007JN-8l
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 05:44:49 -0400
-Received: from forwardcorp1p.mail.yandex.net ([77.88.29.217]:47694)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yury-kotov@yandex-team.ru>)
-	id 1hTkHI-0007IN-2k
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 05:44:48 -0400
-Received: from mxbackcorp2j.mail.yandex.net (mxbackcorp2j.mail.yandex.net
-	[IPv6:2a02:6b8:0:1619::119])
-	by forwardcorp1p.mail.yandex.net (Yandex) with ESMTP id 3029C2E0AF3;
-	Thu, 23 May 2019 12:44:44 +0300 (MSK)
-Received: from smtpcorp1j.mail.yandex.net (smtpcorp1j.mail.yandex.net
-	[2a02:6b8:0:1619::137])
-	by mxbackcorp2j.mail.yandex.net (nwsmtp/Yandex) with ESMTP id
-	v7QKV5QSmA-ih5isQT1; Thu, 23 May 2019 12:44:44 +0300
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru;
-	s=default; 
-	t=1558604684; bh=SI0jxpLyVqp6a2uHfKYSeiX7vKJYR+MCO0k9TYvwkno=;
-	h=Message-Id:Date:Subject:To:From:Cc;
-	b=fSHGoPNtiqavFlkTxayfj7Rygy8eXW6cD7KqszxKVL7+dhXshywRSryjaifgJbfOk
-	PYjEqnIXHRNSb8amCqHYHN3nY/kreGcsabDpUvPf6tuHyV7SCMHHxTBBFgmkuHbV8V
-	mvk2M8/4XDJJC7irT8sgEHF2LxZf0EYoK4LX/Gm0=
-Authentication-Results: mxbackcorp2j.mail.yandex.net;
-	dkim=pass header.i=@yandex-team.ru
-Received: from dynamic-red.dhcp.yndx.net (dynamic-red.dhcp.yndx.net
-	[2a02:6b8:0:40c:d05b:c3b5:9878:7629])
-	by smtpcorp1j.mail.yandex.net (nwsmtp/Yandex) with ESMTPSA id
-	a66T7ncC5r-ih80rIK3; Thu, 23 May 2019 12:44:43 +0300
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
-	(Client certificate not present)
-From: Yury Kotov <yury-kotov@yandex-team.ru>
-To: Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>,
-	qemu-devel@nongnu.org
-Date: Thu, 23 May 2019 12:44:33 +0300
-Message-Id: <20190523094433.30297-1-yury-kotov@yandex-team.ru>
-X-Mailer: git-send-email 2.21.0
-MIME-Version: 1.0
+	(envelope-from <wvervoorn@eltan.com>) id 1hTkc2-0002lx-SC
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 06:06:15 -0400
+Received: from cpsmtpb-ews07.kpnxchange.com ([213.75.39.10]:62011)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <wvervoorn@eltan.com>)
+	id 1hTkc2-0002hn-BQ; Thu, 23 May 2019 06:06:14 -0400
+Received: from cpsps-ews12.kpnxchange.com ([10.94.84.179]) by
+	cpsmtpb-ews07.kpnxchange.com with Microsoft SMTPSVC(7.5.7601.17514); 
+	Thu, 23 May 2019 12:06:09 +0200
+X-Brand: /q/rzKX13g==
+X-KPN-SpamVerdict: e1=0;e2=0;e3=0;e4=(e4=10;e1=10;e3=10;e2=11);EVW:Whi
+	te;BM:NotScanned;FinalVerdict:Clean
+X-CMAE-Analysis: v=2.3 cv=TPaUtGta c=1 sm=1 tr=0 cx=a_idp_e
+	a=LO2mTXPAMClkaqVt2RTykg==:117 a=LO2mTXPAMClkaqVt2RTykg==:17
+	a=eIHzyqS2sMcA:10 a=8nJEP1OIZ-IA:10 a=xqWC_Br6kY4A:10
+	a=E5NmQfObTbMA:10 a=HncMbvH-hF9fpHxAu3oA:9 a=wPNLvfGTeEIA:10
+X-CM-AcctID: kpn@feedback.cloudmark.com
+Received: from smtp.kpnmail.nl ([195.121.84.12]) by cpsps-ews12.kpnxchange.com
+	over TLS secured channel with Microsoft SMTPSVC(8.5.9600.16384);
+	Thu, 23 May 2019 12:06:09 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=kpnmail.nl; s=kpnmail01;
+	h=mime-version:content-type:message-id:date:subject:to:from;
+	bh=dQCat8ZAYe8CLJv7VORLbgrgLOnjx91tvEE1R5Qiwso=;
+	b=O0N9ctex9lOPDD5ADR+Wi09+IZXSaEHvf+JUVmB18QoFkRg6rQPlHCSo6wX4KdlcdM6CypBNInXrB
+	VT5s+xVDaYj/Yq0LJwXT7EIgpTaBqFoCuw+YKbn38W8A6exZRaVq89CORMvzm9Zwx9gQMezN7mrSf1
+	P5DNNWNv72XgWG6A=
+Received: from Eltsrv03.Eltan.local (unknown [84.85.114.86])
+	by smtp.kpnmail.nl (Halon) with ESMTPS
+	id 62d1bb63-7d42-11e9-96e0-00505699772e;
+	Thu, 23 May 2019 12:06:09 +0200 (CEST)
+Received: from Eltsrv03.Eltan.local (192.168.100.3) by Eltsrv03.Eltan.local
+	(192.168.100.3) with Microsoft SMTP Server (TLS) id 15.0.847.32;
+	Thu, 23 May 2019 12:05:41 +0200
+Received: from Eltsrv03.Eltan.local ([fe80::24e7:1cc6:a76a:a3a8]) by
+	Eltsrv03.Eltan.local ([fe80::24e7:1cc6:a76a:a3a8%12]) with mapi id
+	15.00.0847.040; Thu, 23 May 2019 12:05:41 +0200
+From: Wim Vervoorn <wvervoorn@eltan.com>
+To: =?iso-8859-1?Q?C=E9dric_Le_Goater?= <clg@kaod.org>,
+	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-arm@nongnu.org"
+	<qemu-arm@nongnu.org>, Joel Stanley <joel@jms.id.au>, Andrew Jeffery
+	<andrew@aj.id.au>, Peter Maydell <peter.maydell@linaro.org>
+Thread-Topic: aspeed qemu question
+Thread-Index: AdULwnm8cADYiO1ZRNGvxixzeWIzuQAJZaCAACbA8VAAASgwgACVvbogAJv1XjA=
+Date: Thu, 23 May 2019 10:05:40 +0000
+Message-ID: <fed595d26ce54222b42e005566b70308@Eltsrv03.Eltan.local>
+References: <d0fea426e8b245769f3022dad121c17e@Eltsrv03.Eltan.local>
+	<3ee8eb5a-d38c-9570-3da5-a055e9f147e5@kaod.org> 
+Accept-Language: nl-NL, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [192.168.100.108]
+Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-	[fuzzy]
-X-Received-From: 77.88.29.217
-Subject: [Qemu-devel] [PATCH v3] monitor: Fix return type of
- monitor_fdset_dup_fd_find
+MIME-Version: 1.0
+X-OriginalArrivalTime: 23 May 2019 10:06:09.0351 (UTC)
+	FILETIME=[24B94D70:01D5114F]
+X-RcptDomain: nongnu.org
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8
+X-Received-From: 213.75.39.10
+Subject: Re: [Qemu-devel] aspeed qemu question
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -83,75 +101,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
-	"Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-monitor_fdset_dup_fd_find_remove() and monitor_fdset_dup_fd_find()
-return mon_fdset->id which is int64_t. Downcasting from int64_t to int
-leads to a bug with removing fd from fdset with id >=3D 2^32.
-So, fix return types for these function.
+Hello C=E9dric,
 
-Signed-off-by: Yury Kotov <yury-kotov@yandex-team.ru>
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
----
- include/monitor/monitor.h | 2 +-
- monitor.c                 | 4 ++--
- stubs/fdset.c             | 2 +-
- 3 files changed, 4 insertions(+), 4 deletions(-)
+I have another question regarding the ASPEED Qemu support. This is regardin=
+g the SPI support.
 
-diff --git a/include/monitor/monitor.h b/include/monitor/monitor.h
-index 86656297f1..51f048d61f 100644
---- a/include/monitor/monitor.h
-+++ b/include/monitor/monitor.h
-@@ -45,6 +45,6 @@ AddfdInfo *monitor_fdset_add_fd(int fd, bool has_fdset_=
-id, int64_t fdset_id,
- int monitor_fdset_get_fd(int64_t fdset_id, int flags);
- int monitor_fdset_dup_fd_add(int64_t fdset_id, int dup_fd);
- void monitor_fdset_dup_fd_remove(int dup_fd);
--int monitor_fdset_dup_fd_find(int dup_fd);
-+int64_t monitor_fdset_dup_fd_find(int dup_fd);
-=20
- #endif /* MONITOR_H */
-diff --git a/monitor.c b/monitor.c
-index 6428eb3b7e..a0e637f7d6 100644
---- a/monitor.c
-+++ b/monitor.c
-@@ -2602,7 +2602,7 @@ err:
-     return -1;
- }
-=20
--static int monitor_fdset_dup_fd_find_remove(int dup_fd, bool remove)
-+static int64_t monitor_fdset_dup_fd_find_remove(int dup_fd, bool remove)
- {
-     MonFdset *mon_fdset;
-     MonFdsetFd *mon_fdset_fd_dup;
-@@ -2630,7 +2630,7 @@ err:
-     return -1;
- }
-=20
--int monitor_fdset_dup_fd_find(int dup_fd)
-+int64_t monitor_fdset_dup_fd_find(int dup_fd)
- {
-     return monitor_fdset_dup_fd_find_remove(dup_fd, false);
- }
-diff --git a/stubs/fdset.c b/stubs/fdset.c
-index 4f3edf2ea4..a1b8f41f62 100644
---- a/stubs/fdset.c
-+++ b/stubs/fdset.c
-@@ -7,7 +7,7 @@ int monitor_fdset_dup_fd_add(int64_t fdset_id, int dup_fd=
-)
-     return -1;
- }
-=20
--int monitor_fdset_dup_fd_find(int dup_fd)
-+int64_t monitor_fdset_dup_fd_find(int dup_fd)
- {
-     return -1;
- }
---=20
-2.21.0
+I noticed that in general the fmc_model and the spi_model for the flash dev=
+ice are different even though there is only one flash device connected.
+
+I would expect that in this case the models used would be identical.
+
+Can you explain how this is works and how I select the correct model for th=
+e fmc and for the spi controller.
+
+Best regards,
+
+Wim Vervoorn
+
+
+
 
 
