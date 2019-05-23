@@ -2,86 +2,75 @@ Return-Path: <SRS0=bvyN=TX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A8D3C282CE
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 02:54:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A1F1FC04AAC
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 04:30:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0908520B1F
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 02:54:03 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="KUeoFYkO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0908520B1F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 6C30920868
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 04:30:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6C30920868
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:56577 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:57452 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hTdrm-0007ze-G4
-	for qemu-devel@archiver.kernel.org; Wed, 22 May 2019 22:54:02 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:44613)
+	id 1hTfNR-0006i3-KI
+	for qemu-devel@archiver.kernel.org; Thu, 23 May 2019 00:30:49 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:33879)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hTdoZ-0005Qx-32
-	for qemu-devel@nongnu.org; Wed, 22 May 2019 22:50:44 -0400
+	(envelope-from <bounces@canonical.com>) id 1hTfMd-0006Ju-RZ
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 00:30:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hTdgf-0001rV-Rt
-	for qemu-devel@nongnu.org; Wed, 22 May 2019 22:42:34 -0400
-Received: from mail-yw1-xc41.google.com ([2607:f8b0:4864:20::c41]:45837)
+	(envelope-from <bounces@canonical.com>) id 1hTfMc-0005s9-Lr
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 00:29:59 -0400
+Received: from indium.canonical.com ([91.189.90.7]:34500)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hTdgf-0001r9-OB
-	for qemu-devel@nongnu.org; Wed, 22 May 2019 22:42:33 -0400
-Received: by mail-yw1-xc41.google.com with SMTP id w18so1672540ywa.12
-	for <qemu-devel@nongnu.org>; Wed, 22 May 2019 19:42:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=from:to:cc:subject:date:message-id:in-reply-to:references;
-	bh=hJlj0a8T7befv3zY0YqLNtddqSz+Zz6qoIsCXjt90zc=;
-	b=KUeoFYkONNWEXXoOoL4p8rNYvG+crmpzm9fBPDSuRXJ31OPkA9RS7Ru875ij2ZtR0J
-	HTVdmIgqEoTPBRKcVdSnv11wa6eytshy2ybGP6Dlz8QmhHEhCvOxpB/6oV0NDqIWVUGd
-	LIqCSOOx8xYOspeVb14tsRFWmeyP1lI51w7uwXHKiioX6Qrc8CbkihMXKl0GRWQRkFTU
-	MR9wQXxtBEgJBbpbhTj078QlpKWlrYt2ETDh2vwSqc11FaMrDAI1PdaEknsYLydtRUpk
-	ehoejxfS2Bw8KYH050jXXO7XQYROco0MJ/nJP14P7Jwrxtzt6u1hgIbsdYVyhkebt8oM
-	GydA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-	:references;
-	bh=hJlj0a8T7befv3zY0YqLNtddqSz+Zz6qoIsCXjt90zc=;
-	b=RvlI+xDVPGhmtzPNrUCRbsX8hPkESQueYtGzCyyECc7pzd0smS15paHaTGzfYepRbz
-	8pCp18yxfTpTn47uyHDZmikCN1u6rGAwsxwOUbIhan5BzGLLlEF7BHgUkHxcIZfu61zu
-	p2qsg0M07N6bBvkPn6hvR67rrS3c/f4m/XVil8++EesKl5EN/g2S7tA9Fd2376Fczz8Q
-	XKhkLFttCpiTVIco5eukfDxbuu42YHq6XD1S9ATqgBUErID7+QxtpKb0u0cBW/Y7o79t
-	0VCLK7/CKCPh2YsMe7O8iJT5gWrZsIsjF1af9gzZKbj2/7w8X0WbKBo3s+veU3N05z+9
-	lFcg==
-X-Gm-Message-State: APjAAAW3VjhKHLTEvd7HA6myAUWr06oxybszKM85MpHNTDc6UuZUhe9l
-	rrdkT3y2RTzPd4DDtm8RNktOVzDvfO4=
-X-Google-Smtp-Source: APXvYqwwkrMPYF5OXZbpvbZI1pk/1VBuHTOimUBJJL7PXPN4Ktt8F5DKkK9twyASs3EdmSZCAurE9A==
-X-Received: by 2002:a81:4d42:: with SMTP id a63mr27652804ywb.346.1558579352684;
-	Wed, 22 May 2019 19:42:32 -0700 (PDT)
-Received: from localhost.localdomain ([71.46.56.17])
-	by smtp.gmail.com with ESMTPSA id
-	n12sm7559320ywn.81.2019.05.22.19.42.31
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Wed, 22 May 2019 19:42:32 -0700 (PDT)
-From: Richard Henderson <richard.henderson@linaro.org>
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1hTfMc-0005rV-Ga
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 00:29:58 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1hTfMa-0003AA-6L
+	for <qemu-devel@nongnu.org>; Thu, 23 May 2019 04:29:56 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 2A0D72E80C0
+	for <qemu-devel@nongnu.org>; Thu, 23 May 2019 04:29:56 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 23 May 2019 04:17:22 -0000
+From: Launchpad Bug Tracker <1562653@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
-Date: Wed, 22 May 2019 22:42:27 -0400
-Message-Id: <20190523024229.1158-2-richard.henderson@linaro.org>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20190523024229.1158-1-richard.henderson@linaro.org>
-References: <20190523024229.1158-1-richard.henderson@linaro.org>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::c41
-Subject: [Qemu-devel] [PATCH 1/3] capstone: Adjust include of capstone.h
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=Expired; importance=Undecided;
+	assignee=None; 
+X-Launchpad-Bug: distribution=ubuntu; sourcepackage=qemu; component=main;
+	status=Expired; importance=Undecided; assignee=None; 
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: changlimin janitor serge-hallyn th-huth
+X-Launchpad-Bug-Reporter: changlimin (changlimin)
+X-Launchpad-Bug-Modifier: Launchpad Janitor (janitor)
+References: <20160328013239.3708.98267.malonedeb@wampee.canonical.com>
+Message-Id: <155858504364.3863.15620074960510996280.malone@loganberry.canonical.com>
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="18962";
+	Instance="launchpad-lazr.conf"
+X-Launchpad-Hash: c8596b4c304d04353e740089c56053ddadf6a28a
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 91.189.90.7
+Subject: [Qemu-devel] [Bug 1562653] Re: Ubuntu 15.10: QEMU VM hang if memory
+ >= 1T
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -90,60 +79,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: alex.bennee@linaro.org, david@redhat.com
+Reply-To: Bug 1562653 <1562653@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Since v4.0, capstone.h has moved to <capstone/capstone.h>.
+[Expired for QEMU because there has been no activity for 60 days.]
 
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- include/disas/capstone.h | 4 ++++
- configure                | 6 ++++++
- 2 files changed, 10 insertions(+)
+** Changed in: qemu
+       Status: Incomplete =3D> Expired
 
-diff --git a/include/disas/capstone.h b/include/disas/capstone.h
-index e29068dd97..90631d84a9 100644
---- a/include/disas/capstone.h
-+++ b/include/disas/capstone.h
-@@ -3,7 +3,11 @@
- 
- #ifdef CONFIG_CAPSTONE
- 
-+#ifdef CONFIG_CAPSTONE_CAPSTONE_H
-+#include <capstone/capstone.h>
-+#else
- #include <capstone.h>
-+#endif
- 
- #else
- 
-diff --git a/configure b/configure
-index d2fc346302..eec7f061c3 100755
---- a/configure
-+++ b/configure
-@@ -5021,6 +5021,9 @@ case "$capstone" in
-   system)
-     QEMU_CFLAGS="$QEMU_CFLAGS $($pkg_config --cflags capstone)"
-     LIBS="$($pkg_config --libs capstone) $LIBS"
-+    if check_include capstone/capstone.h; then
-+      capstone_capstone_h=yes
-+    fi
-     ;;
- 
-   no)
-@@ -7197,6 +7200,9 @@ if test "$ivshmem" = "yes" ; then
- fi
- if test "$capstone" != "no" ; then
-   echo "CONFIG_CAPSTONE=y" >> $config_host_mak
-+  if test "$capstone_capstone_h" != "no" ; then
-+    echo "CONFIG_CAPSTONE_CAPSTONE_H=y" >> $config_host_mak
-+  fi
- fi
- if test "$debug_mutex" = "yes" ; then
-   echo "CONFIG_DEBUG_MUTEX=y" >> $config_host_mak
--- 
-2.17.1
+-- =
 
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1562653
+
+Title:
+  Ubuntu 15.10: QEMU VM hang if memory >=3D 1T
+
+Status in QEMU:
+  Expired
+Status in qemu package in Ubuntu:
+  Expired
+
+Bug description:
+  1. Ubuntu 15.10 x86_64 installed on HP SuperDome X with 8CPUs and 4T
+  memory.
+
+  2. Create a VM, install Ubuntu 15.10, if memory >=3D 1T , VM hang when st=
+art. If memory < 1T, it is good.
+  <domain type=3D'kvm'>
+    <name>u1510-1</name>
+    <uuid>39eefe1e-4829-4843-b892-026d143f3ec7</uuid>
+    <memory unit=3D'KiB'>1073741824</memory>
+    <currentMemory unit=3D'KiB'>1073741824</currentMemory>
+    <vcpu placement=3D'static'>16</vcpu>
+    <os>
+      <type arch=3D'x86_64' machine=3D'pc-i440fx-2.3'>hvm</type>
+      <boot dev=3D'hd'/>
+      <boot dev=3D'cdrom'/>
+    </os>
+    <features>
+      <acpi/>
+      <apic/>
+      <pae/>
+    </features>
+    <clock offset=3D'utc'/>
+    <on_poweroff>destroy</on_poweroff>
+    <on_reboot>restart</on_reboot>
+    <on_crash>restart</on_crash>
+    <devices>
+      <emulator>/usr/bin/kvm</emulator>
+      <disk type=3D'file' device=3D'disk'>
+        <driver name=3D'qemu' type=3D'qcow2' cache=3D'directsync'/>
+        <source file=3D'/vms/images/u1510-1.img'/>
+        <target dev=3D'vda' bus=3D'virtio'/>
+        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x08' =
+function=3D'0x0'/>
+      </disk>
+      <disk type=3D'file' device=3D'cdrom'>
+        <driver name=3D'qemu' type=3D'raw'/>
+        <target dev=3D'hdc' bus=3D'ide'/>
+        <readonly/>
+        <address type=3D'drive' controller=3D'0' bus=3D'1' target=3D'0' uni=
+t=3D'0'/>
+      </disk>
+      <controller type=3D'pci' index=3D'0' model=3D'pci-root'/>
+      <controller type=3D'ide' index=3D'0'>
+        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x01' =
+function=3D'0x1'/>
+      </controller>
+      <controller type=3D'usb' index=3D'0'>
+        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x01' =
+function=3D'0x2'/>
+      </controller>
+      <interface type=3D'bridge'>
+        <mac address=3D'0c:da:41:1d:ae:f1'/>
+        <source bridge=3D'vswitch0'/>
+        <model type=3D'virtio'/>
+        <driver name=3D'vhost'/>
+        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x03' =
+function=3D'0x0'/>
+      </interface>
+      <input type=3D'mouse' bus=3D'ps2'/>
+      <input type=3D'keyboard' bus=3D'ps2'/>
+      <graphics type=3D'vnc' port=3D'-1' autoport=3D'yes' listen=3D'0.0.0.0=
+'>
+        <listen type=3D'address' address=3D'0.0.0.0'/>
+      </graphics>
+      <video>
+        <model type=3D'cirrus' vram=3D'16384' heads=3D'1'/>
+        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x02' =
+function=3D'0x0'/>
+      </video>
+      <memballoon model=3D'virtio'>
+        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x09' =
+function=3D'0x0'/>
+      </memballoon>
+    </devices>
+  </domain>
+
+  3. The panic stack is
+    ... cannot show
+    async_page_fault+0x28
+    ioread32_rep+0x38
+    ata_sff_data_xfer32+0x8a
+    ata_pio_sector+0x93
+    ata_pio_sectors+0x34
+    ata_sff_hsm_move+0x226
+    RIP: kthread_data+0x10
+    CR2: FFFFFFFF_FFFFFFD8
+
+  4. Change the host os to Redhat 7.2 , the vm is good even memory
+  >=3D3.8T.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1562653/+subscriptions
 
