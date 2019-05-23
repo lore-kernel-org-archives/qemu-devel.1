@@ -2,87 +2,87 @@ Return-Path: <SRS0=bvyN=TX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E05FDC282DD
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 14:25:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 982E9C282DD
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 14:25:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AD6682081C
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 14:25:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 61A3E2081C
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 14:25:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CtSEzKKF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AD6682081C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="qx+qNk6R"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 61A3E2081C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:37418 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:37450 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hToeS-000329-QI
-	for qemu-devel@archiver.kernel.org; Thu, 23 May 2019 10:25:00 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:47405)
+	id 1hTofD-0003mk-Ht
+	for qemu-devel@archiver.kernel.org; Thu, 23 May 2019 10:25:47 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:53675)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.m.mail@gmail.com>) id 1hToK1-0008FY-NL
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 10:03:59 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1hTodX-0002Wa-FT
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 10:24:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.m.mail@gmail.com>) id 1hToJz-0006Bc-Ux
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 10:03:53 -0400
-Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:45495)
+	(envelope-from <peter.maydell@linaro.org>) id 1hTodW-0006pa-06
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 10:24:03 -0400
+Received: from mail-wm1-x330.google.com ([2a00:1450:4864:20::330]:39954)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
-	id 1hToJz-00068x-OT
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 10:03:51 -0400
-Received: by mail-ot1-x344.google.com with SMTP id t24so5477275otl.12
-	for <qemu-devel@nongnu.org>; Thu, 23 May 2019 07:03:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=mime-version:in-reply-to:references:from:date:message-id:subject:to
-	:cc; bh=/w5Igov04Qn3sR5EoOnVl+vg+to4ToAxYgQaSAYOiAE=;
-	b=CtSEzKKF7NVlow8zd8mnHnqu1MnInAHkLKnAxM+RszljNj1PDLktElRyFTIG5fGuCX
-	M2paMQjoUHN+0jiKSlODtxHszshxCBgfwe5a1hft95o5rpenRVGOmCpW3LXRdaAQRwhy
-	zODKQ4TQlqoJ+/BmFw2JMV7+/irOzT3JAxuosh/ChrQqqUljPb16AgXUBLowp328ei2W
-	11PPsVaR55J0rfr6TYevQyYJaaMC4m6gkchME+6W1BEAedzlmR0kGGazaeGIAEu+5SDU
-	0gTKs+ZafOvqmETwN9B+cNCoy92A/52S4mA1FidCq1zpbZx0hmhNIs6/tZ2GLuwg/Lev
-	9Tqw==
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1hTodV-0006nx-Nv
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 10:24:01 -0400
+Received: by mail-wm1-x330.google.com with SMTP id 15so5995176wmg.5
+	for <qemu-devel@nongnu.org>; Thu, 23 May 2019 07:24:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=from:to:subject:date:message-id:in-reply-to:references:mime-version
+	:content-transfer-encoding;
+	bh=GWOxRv/DyhNDr3+OGIc40iczzclis5p5MGykNCNdjFE=;
+	b=qx+qNk6RGzpErVHtUr7Vd0Dfz4OXlfxBnhsB9e8rjKMNJ6FDbdxmsi7yN6PUKrI/hG
+	WwUFZBO1QvxO017dSA/L4D88EW1sYBtfedsKuJa53kwIJiK4szRVVrwC9eSTEwJUf8rz
+	nTA1skNHpZSAKWRcKTkVg5CTuZwb5RlvY1v4oDiDzz78pNGhV1ARPc7qPgxKKudPfbUd
+	/f6cw6cr/i7pqn15RpJOwks+tN3C60DVllz3PqBaTwQxsiI/VzpjZ+x1cXAW7/W2b+zc
+	KXWrR7fhGgdvqxg9SuhvA8AJoH/CWTTOIPOtpoMg7r3J1U2x3dG7JQFne4ugHdgSUzGH
+	9X0w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:in-reply-to:references:from:date
-	:message-id:subject:to:cc;
-	bh=/w5Igov04Qn3sR5EoOnVl+vg+to4ToAxYgQaSAYOiAE=;
-	b=kewm5x2UM/us5kw5WOhPaNWguKWY6HArPgGlmm3oMeX4l9yW6lddl63v8IHkF2u6vX
-	AZbcZQKNyydyeiUR9qsGcMh//zwBk+aAsVLCko9fuFQ6eGYc+7xo7uErhVvN/+Z2P1Yx
-	0S7B8P42J0l4Qu+KgJ543bIy4kccbfpDq56njb7NISBf9+Wtuwr2tXIfWIeqwpzBLEs8
-	bAyO4Wmv6zJH7pcXoBu8CZ99Sw9J1Fb+gBezo+xIKyi0hlS/HKFZWQeX4nzRysb8Qrsd
-	1lHKGi/ndwDKhTgt8b6A/xTxrKvQvZ04bv/r0vzTqtRqRgy0asDr+bG/ThEbF3oPv0hi
-	SXnA==
-X-Gm-Message-State: APjAAAUnQ8DzJS1RM77RRqlquPS6nNcM1fVwAF/y6lTbhHRnvEpNrRlX
-	1skqqi2saTcoH/Oi/Tgi6RT6e6ZvR69U2KrYHig=
-X-Google-Smtp-Source: APXvYqxf1hJRc4WgV3Au7inRrrf0xv/1PDtMVZJJpleLTV0PTEVFgZoMDRUVeGJiXYNemDG0d97uzNctjgzKI/HoZpU=
-X-Received: by 2002:a9d:7858:: with SMTP id c24mr330034otm.64.1558620227672;
-	Thu, 23 May 2019 07:03:47 -0700 (PDT)
+	h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+	:references:mime-version:content-transfer-encoding;
+	bh=GWOxRv/DyhNDr3+OGIc40iczzclis5p5MGykNCNdjFE=;
+	b=DkD8HzYgL2szmdE1D74MP5XRC2wbmpbo1pGfZqkNf4/JUcj9NV9E+GkE9K8SC7Q99s
+	DFAiRXtC5wqYh+0ARf/TpsxQ2ZNOW1ojEsVwQ+u3nto8NG0+TblQZRMPTy/OvMU7nS07
+	PVcHQeA8bO8gmmnkO8RO9tHUk43lDcmJqjyD6/WwhwsRReBBvGYHvCzyfJPKG2/GnPqN
+	vOBhD5ztiikWh2Nw2tnEV3sLj6tGTXH0zTf43iMXF+i53LisKf9JuQR+fnhn5ISUb++n
+	9imA6r539Bj74Rwz4EKu00F/FlMDsdJU+VeEtpKfCd2qSsmzdQ83qkKQF/xnlpK5u0si
+	dTAw==
+X-Gm-Message-State: APjAAAX8wrJ90QxgMRxguh3ygH+JP+M+Hfhs2DjTX+24ow35fQbLQrW4
+	ZBKR3h8qfcLaXGkOMVMoJzwPQYGnOh+YYA==
+X-Google-Smtp-Source: APXvYqz/qnKaXRuT1on7Lusm+rHPYibtltF1L9ACIHdBh7JBpXsvZUCB7ylQC+LScyd8k68QAJs5zg==
+X-Received: by 2002:a1c:c7c8:: with SMTP id
+	x191mr11056686wmf.126.1558621440436; 
+	Thu, 23 May 2019 07:24:00 -0700 (PDT)
+Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
+	by smtp.gmail.com with ESMTPSA id z5sm9700617wmi.34.2019.05.23.07.23.59
+	for <qemu-devel@nongnu.org>
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Thu, 23 May 2019 07:23:59 -0700 (PDT)
+From: Peter Maydell <peter.maydell@linaro.org>
+To: qemu-devel@nongnu.org
+Date: Thu, 23 May 2019 15:23:46 +0100
+Message-Id: <20190523142357.5175-2-peter.maydell@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190523142357.5175-1-peter.maydell@linaro.org>
+References: <20190523142357.5175-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-Received: by 2002:a9d:410f:0:0:0:0:0 with HTTP; Thu, 23 May 2019 07:03:47
-	-0700 (PDT)
-Received: by 2002:a9d:410f:0:0:0:0:0 with HTTP; Thu, 23 May 2019 07:03:47
-	-0700 (PDT)
-In-Reply-To: <CAFEAcA_gW9PZFTB42LRXCPcD+aiWBdH3TQX7nHad_5=ioRm-ug@mail.gmail.com>
-References: <1558550785-20098-1-git-send-email-aleksandar.markovic@rt-rk.com>
-	<CAFEAcA_gW9PZFTB42LRXCPcD+aiWBdH3TQX7nHad_5=ioRm-ug@mail.gmail.com>
-From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Thu, 23 May 2019 16:03:47 +0200
-Message-ID: <CAL1e-=gaTv8rAFyN89OOoob8G1LpwtNGrvtaCnrMVT8G_2vbOQ@mail.gmail.com>
-To: Peter Maydell <peter.maydell@linaro.org>
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2607:f8b0:4864:20::344
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Content-Filtered-By: Mailman/MimeDel 2.1.21
-Subject: Re: [Qemu-devel] [PATCH 0/5] linux-user: Support signal passing for
- targets having more signals than host
+X-Received-From: 2a00:1450:4864:20::330
+Subject: [Qemu-devel] [PULL 01/12] target/arm: Use extract2 for EXTR
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -94,67 +94,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>,
-	Aleksandar Markovic <aleksandar.markovic@rt-rk.com>,
-	=?UTF-8?B?TWlsb8WhIFN0b2phbm92acSH?= <milos.stojanovic@rt-rk.com>,
-	QEMU Developers <qemu-devel@nongnu.org>,
-	Aleksandar Markovic <amarkovic@wavecomp.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On May 23, 2019 3:46 PM, "Peter Maydell" <peter.maydell@linaro.org> wrote:
->
-> On Wed, 22 May 2019 at 19:57, Aleksandar Markovic
-> <aleksandar.markovic@rt-rk.com> wrote:
-> >
-> > From: Aleksandar Markovic <amarkovic@wavecomp.com>
-> >
-> > Most of the targets (including Intel) define 64 signals. This
-> > creates difficulties for targets that define, for example, 128
-> > signals. This series adds support for signal passing even if
-> > the host defines less signals than the target.
->
-> Could you elaborate a bit on how much functionality
-> is provided for signal numbers which the target has
-> but the host does not? For instance, it seems likely
-> that attempts by the guest to kill(other_pid, sig) will
-> fail if sig is not in the supported-by-the-target range.
-> But is it possible for the guest process to deliver
-> one of these signals to itself ?
->
-> This patchset is interesting because in fact pretty much
-> every target supports more signals than our host code
-> can provide, because the host libc steals several
-> signals for its own purposes and QEMU can't use them.
-> Being able to multiplex several guest signals onto
-> one host signal might let us run some guest binaries
-> we currently can't handle correctly.
->
+From: Richard Henderson <richard.henderson@linaro.org>
 
-Hello, Peter.
+This is, after all, how we implement extract2 in tcg/aarch64.
 
-I would ask the author, Milos Stojanovic, to provide us with details you
-asked for.
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Message-id: 20190514011129.11330-2-richard.henderson@linaro.org
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ target/arm/translate-a64.c | 38 ++++++++++++++++++++------------------
+ 1 file changed, 20 insertions(+), 18 deletions(-)
 
-I am here just the integrator and the submitter, and even though I could
-perhaps answer your questions accurately, I would prefer Milos as the main
-person to talk to.
+diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+index b7c5a928b4a..2b135b938ce 100644
+--- a/target/arm/translate-a64.c
++++ b/target/arm/translate-a64.c
+@@ -4114,25 +4114,27 @@ static void disas_extract(DisasContext *s, uint32_t insn)
+             } else {
+                 tcg_gen_ext32u_i64(tcg_rd, cpu_reg(s, rm));
+             }
+-        } else if (rm == rn) { /* ROR */
+-            tcg_rm = cpu_reg(s, rm);
+-            if (sf) {
+-                tcg_gen_rotri_i64(tcg_rd, tcg_rm, imm);
+-            } else {
+-                TCGv_i32 tmp = tcg_temp_new_i32();
+-                tcg_gen_extrl_i64_i32(tmp, tcg_rm);
+-                tcg_gen_rotri_i32(tmp, tmp, imm);
+-                tcg_gen_extu_i32_i64(tcg_rd, tmp);
+-                tcg_temp_free_i32(tmp);
+-            }
+         } else {
+-            tcg_rm = read_cpu_reg(s, rm, sf);
+-            tcg_rn = read_cpu_reg(s, rn, sf);
+-            tcg_gen_shri_i64(tcg_rm, tcg_rm, imm);
+-            tcg_gen_shli_i64(tcg_rn, tcg_rn, bitsize - imm);
+-            tcg_gen_or_i64(tcg_rd, tcg_rm, tcg_rn);
+-            if (!sf) {
+-                tcg_gen_ext32u_i64(tcg_rd, tcg_rd);
++            tcg_rm = cpu_reg(s, rm);
++            tcg_rn = cpu_reg(s, rn);
++
++            if (sf) {
++                /* Specialization to ROR happens in EXTRACT2.  */
++                tcg_gen_extract2_i64(tcg_rd, tcg_rm, tcg_rn, imm);
++            } else {
++                TCGv_i32 t0 = tcg_temp_new_i32();
++
++                tcg_gen_extrl_i64_i32(t0, tcg_rm);
++                if (rm == rn) {
++                    tcg_gen_rotri_i32(t0, t0, imm);
++                } else {
++                    TCGv_i32 t1 = tcg_temp_new_i32();
++                    tcg_gen_extrl_i64_i32(t1, tcg_rn);
++                    tcg_gen_extract2_i32(t0, t0, t1, imm);
++                    tcg_temp_free_i32(t1);
++                }
++                tcg_gen_extu_i32_i64(tcg_rd, t0);
++                tcg_temp_free_i32(t0);
+             }
+         }
+     }
+-- 
+2.20.1
 
-I would like to add that this series is already in exploation here in Wave,
-for some internal projects involving QEMU. People are happy with it, it
-solved some long-standing problems, and there is no known open issue
-related to this code.
 
-The solution has its own limitations, as is spelled out in commit messages,
-just to keep your expectations realistic, but overall I find it incredibly
-useful, and very good, given the complex problem it tackles.
-
-I would like now to pass the =E2=80=9Cfloor=E2=80=9D to Milos.
-
-Yours,
-Aleksandar
-
-> thanks
-> -- PMM
->
