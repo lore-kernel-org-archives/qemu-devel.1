@@ -2,88 +2,69 @@ Return-Path: <SRS0=bvyN=TX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B9ECAC282DD
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 13:19:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5103BC282E1
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 13:19:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8CE192075B
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 13:19:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8CE192075B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 253322075B
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 13:19:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 253322075B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:36049 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:36052 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hTnco-0006t3-Ne
-	for qemu-devel@archiver.kernel.org; Thu, 23 May 2019 09:19:14 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:52101)
+	id 1hTncp-0006ut-8M
+	for qemu-devel@archiver.kernel.org; Thu, 23 May 2019 09:19:15 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:53602)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hTnIY-0005W1-UJ
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 08:58:22 -0400
+	(envelope-from <clg@kaod.org>) id 1hTnNV-0001GF-5N
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 09:03:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hTnIX-0003gH-J5
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 08:58:18 -0400
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:46652)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hTnIW-0003Z7-UW
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 08:58:17 -0400
-Received: by mail-wr1-f65.google.com with SMTP id r7so6145570wrr.13
-	for <qemu-devel@nongnu.org>; Thu, 23 May 2019 05:58:10 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-	:date:user-agent:mime-version:in-reply-to:content-language
-	:content-transfer-encoding;
-	bh=+t49dihkvC440Fv1Lq8bQbYkGfawugJ4sF+NR2cF2n8=;
-	b=RXvQoqpP892BomK3C8b7wQjQIRCSyutpFKean3wYeBCteOveDyrRY6bvVoNV9yKhyI
-	+y8QvxEsgtwdzHT55/fVcP3SVUFnKSjtAfTj8BZK4/tZ6Dz0/O79aa4HW5DzDKliwduI
-	153DGwLQUD7+pL5NKos5FGphLUrUupGUZO7ZU9vAqPP88PkrfkTCfLeN5lGJ7zGlje4g
-	rFblf9H6R7Y8jgKCJbMKxn8yMvupWtd5m7qTzdFcnPfVANRXUirvoLRi6hEahvVX4hJ+
-	i9ZdcxcfN3mpFibCLxgsAILP58qBe1HCg4Qsg5dlHGEPlN5oTODrHzG/rc4eKSNjWNB1
-	fA2g==
-X-Gm-Message-State: APjAAAVgmOcO/KY/2r/VMfHJksdNJZKOBn5KEz5tiNkfcPipfmNTGkRY
-	po0kU0bQ1S0CVBwVu8vEfB/wXw==
-X-Google-Smtp-Source: APXvYqwBVqvW+8npuzBxYXAI8PMiuu6mjUOwdP/2znU+6+akRcwHCqFFqD2fqc0T4qggy/UkXr/6fg==
-X-Received: by 2002:adf:ce90:: with SMTP id r16mr8017068wrn.156.1558616289841; 
-	Thu, 23 May 2019 05:58:09 -0700 (PDT)
-Received: from [192.168.1.38] (228.red-83-52-173.dynamicip.rima-tde.net.
-	[83.52.173.228]) by smtp.gmail.com with ESMTPSA id
-	x9sm12238668wmf.27.2019.05.23.05.58.08
-	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-	Thu, 23 May 2019 05:58:09 -0700 (PDT)
-To: Laurent Vivier <laurent@vivier.eu>, Cornelia Huck <cohuck@redhat.com>,
-	Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-References: <20190521152810.21353-1-cohuck@redhat.com>
-	<20190521152810.21353-3-cohuck@redhat.com>
-	<6e216877-60be-ddcd-3f15-604e870ca8ba@redhat.com>
-	<20190522140729.25970e17.cohuck@redhat.com>
-	<6b101b85-4985-4736-acad-59389b00de55@vivier.eu>
-	<20190522142421.746f7495.cohuck@redhat.com>
-	<CAL1e-=j5joi3ssA-7Q2PVp841ywj41Ntz_MSKdB4w27Z9JvcEQ@mail.gmail.com>
-	<20190523135602.4c80c959.cohuck@redhat.com>
-	<e01100bc-50ee-5cc2-2802-a098acc720ac@vivier.eu>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
-	url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <e3ce17c4-c1d6-20b4-0e7c-6c23e6a08e48@redhat.com>
-Date: Thu, 23 May 2019 14:58:08 +0200
+	(envelope-from <clg@kaod.org>) id 1hTnNU-0007Gn-2Z
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 09:03:25 -0400
+Received: from 1.mo173.mail-out.ovh.net ([178.33.111.180]:44170)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1hTnNT-0007FP-U7
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 09:03:24 -0400
+Received: from player755.ha.ovh.net (unknown [10.109.160.143])
+	by mo173.mail-out.ovh.net (Postfix) with ESMTP id 52CF710034F
+	for <qemu-devel@nongnu.org>; Thu, 23 May 2019 15:03:21 +0200 (CEST)
+Received: from kaod.org (deibp9eh1--blueice1n0.emea.ibm.com [195.212.29.162])
+	(Authenticated sender: clg@kaod.org)
+	by player755.ha.ovh.net (Postfix) with ESMTPSA id 3B88963078F5;
+	Thu, 23 May 2019 13:03:12 +0000 (UTC)
+To: Peter Maydell <peter.maydell@linaro.org>,
+	=?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+References: <20190506142042.28096-1-clg@kaod.org>
+	<b12201c8-7d5f-2108-6666-75543c38f243@kaod.org>
+	<f1ca56fd-c83d-8ad6-29c9-a8fc6af4531c@redhat.com>
+	<270e510b-687a-6b43-8cd6-c1eb1aea41e6@kaod.org>
+	<6161d982-0d21-99d6-680a-37ae300fd7cd@kaod.org>
+	<98d1e57f-c033-fdb4-51bd-4a6fc2223d58@redhat.com>
+	<CAFEAcA-eVECkPpxnvDtX3v6BFMSVCF4SU87r51PdG=E=hCYLfA@mail.gmail.com>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <c2597233-e1e3-6bed-e992-ec8ea250cedd@kaod.org>
+Date: Thu, 23 May 2019 15:03:11 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <e01100bc-50ee-5cc2-2802-a098acc720ac@vivier.eu>
+In-Reply-To: <CAFEAcA-eVECkPpxnvDtX3v6BFMSVCF4SU87r51PdG=E=hCYLfA@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+X-Ovh-Tracer-Id: 11103624882754390870
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduuddruddugedgieduucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddm
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-	[fuzzy]
-X-Received-From: 209.85.221.65
-Subject: Re: [Qemu-devel] [PULL v3 47/55] linux headers: update against
- Linux 5.2-rc1
+X-Received-From: 178.33.111.180
+Subject: Re: [Qemu-devel] [PATCH v2 0/3] aspeed: cleanups and extensions
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -95,90 +76,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-s390x@nongnu.org,
-	=?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
-	qemu-devel@nongnu.org, Aleksandar Markovic <amarkovic@wavecomp.com>
+Cc: Andrew Jeffery <andrew@aj.id.au>, qemu-arm <qemu-arm@nongnu.org>,
+	QEMU Developers <qemu-devel@nongnu.org>,
+	Eduardo Habkost <ehabkost@redhat.com>, Joel Stanley <joel@jms.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/23/19 2:30 PM, Laurent Vivier wrote:
-> On 23/05/2019 13:56, Cornelia Huck wrote:
->> On Wed, 22 May 2019 15:22:23 +0200
->> Aleksandar Markovic <aleksandar.m.mail@gmail.com> wrote:
+On 5/23/19 2:52 PM, Peter Maydell wrote:
+> On Mon, 20 May 2019 at 17:32, Philippe Mathieu-Daud=C3=A9 <philmd@redha=
+t.com> wrote:
 >>
->>> The alternative way of invoking via IPCV6 (else part of “ifdef
->>> __NR_MSGSND”) should work for MIPS in the present stage of headers and
->>> kernel.
+>> On 5/20/19 3:32 PM, C=C3=A9dric Le Goater wrote:
+>>>> Peter,
+>>>>
+>>>> do you want me to resend with only the two first patches and include
+>>>> Joel's in the same series ? I would leave out the part Philippe is
+>>>> covering in his object_initialize_child() patchset.
+>>>
+>>> Nope, we can not do that, conflicts arise. I suppose the easier is wa=
+it
+>>> for Philippe's patchset to be merged and then rebase.
 >>
->> I tried to do that so that we have at least a workaround for now; but
->> this fails building on my x86 laptop (the safe_syscall6 for ipc
->> complains about missing __NR_ipc). Maybe I'm holding it wrong (should
->> that be conditional on the host?), but I think that really needs to be
->> done by the mips maintainers...
->>
-> 
-> Perhaps a simple workaround could be:
-> 
-> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-> index e311fcda0517..5b431736032c 100644
-> --- a/linux-user/syscall.c
-> +++ b/linux-user/syscall.c
-> @@ -761,14 +761,8 @@ safe_syscall2(int, nanosleep, const struct timespec *, req,
->  safe_syscall4(int, clock_nanosleep, const clockid_t, clock, int, flags,
->                const struct timespec *, req, struct timespec *, rem)
->  #endif
-> -#ifdef __NR_msgsnd
-> -safe_syscall4(int, msgsnd, int, msgid, const void *, msgp, size_t, sz,
-> -              int, flags)
-> -safe_syscall5(int, msgrcv, int, msgid, void *, msgp, size_t, sz,
-> -              long, msgtype, int, flags)
-> -safe_syscall4(int, semtimedop, int, semid, struct sembuf *, tsops,
-> -              unsigned, nsops, const struct timespec *, timeout)
-> -#else
-> +
-> +#ifdef __NR_ipc
->  /* This host kernel architecture uses a single ipc syscall; fake up
->   * wrappers for the sub-operations to hide this implementation detail.
->   * Annoyingly we can't include linux/ipc.h to get the constant definitions
-> @@ -783,14 +777,30 @@ safe_syscall4(int, semtimedop, int, semid, struct sembuf *, tsops,
->  
->  safe_syscall6(int, ipc, int, call, long, first, long, second, long, third,
->                void *, ptr, long, fifth)
-> +#endif
-> +
-> +#ifdef __NR_msgsnd
-> +safe_syscall4(int, msgsnd, int, msgid, const void *, msgp, size_t, sz,
-> +              int, flags)
-> +#else
->  static int safe_msgsnd(int msgid, const void *msgp, size_t sz, int flags)
->  {
->      return safe_ipc(Q_IPCCALL(0, Q_MSGSND), msgid, sz, flags, (void *)msgp, 0);
->  }
-> +#endif
-> +#ifdef __NR_msgrcv
-> +safe_syscall5(int, msgrcv, int, msgid, void *, msgp, size_t, sz,
-> +              long, msgtype, int, flags)
-> +#else
->  static int safe_msgrcv(int msgid, void *msgp, size_t sz, long type, int flags)
->  {
->      return safe_ipc(Q_IPCCALL(1, Q_MSGRCV), msgid, sz, flags, msgp, type);
->  }
-> +#endif
-> +#ifdef __NR_semtimedop
-> +safe_syscall4(int, semtimedop, int, semid, struct sembuf *, tsops,
-> +              unsigned, nsops, const struct timespec *, timeout)
-> +#else
->  static int safe_semtimedop(int semid, struct sembuf *tsops, unsigned nsops,
->                             const struct timespec *timeout)
->  {
-> 
+>> Eduardo said he'll send a pull request during the week.
+>=20
+> I am now completely lost about the status of these patches,
+> so I'm just dropping this series from my to-review queue.
 
-Works for me!
-I have no idea if this is the proper fix, but this fix my test setup.
-Can you send a proper patch?
+yes. It's ok.
 
-Thanks :)
+> Please send a fresh patchset once any dependencies have
+> got into master.
 
-Phil.
+I plan to send a larger one once Eduardo's patchset is merged.
+
+Thanks,
+
+C.
 
