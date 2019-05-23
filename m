@@ -2,66 +2,67 @@ Return-Path: <SRS0=bvyN=TX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BFD0AC282DD
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 16:52:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FDC5C282DD
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 16:54:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8625421019
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 16:52:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8625421019
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 19A5B2133D
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 16:54:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 19A5B2133D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:40641 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:40661 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hTqxJ-0003xg-Pw
-	for qemu-devel@archiver.kernel.org; Thu, 23 May 2019 12:52:37 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:44877)
+	id 1hTqzE-0005Vs-CV
+	for qemu-devel@archiver.kernel.org; Thu, 23 May 2019 12:54:36 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:44739)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1hTqvR-0002Rk-6j
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 12:50:42 -0400
+	(envelope-from <armbru@redhat.com>) id 1hTqvU-0002R1-N4
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 12:50:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1hTqiF-0004Vo-Kl
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 12:37:05 -0400
-Resent-Date: Thu, 23 May 2019 12:37:05 -0400
-Resent-Message-Id: <E1hTqiF-0004Vo-Kl@eggs.gnu.org>
-Received: from sender4-of-o55.zoho.com ([136.143.188.55]:21584)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1hTqiF-0004NI-E8
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 12:37:03 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1558629375; cv=none; d=zoho.com; s=zohoarc; 
-	b=kzU1z2+AsmCFEGfKgtqqmJsg08ucourZrPF7j7/pNq3nsWEAAyfaeVZgDet9TYSELC7TD8pM/Uqui7BOGJoLLCuhF3H8Dth0jlsxdhUjgmugC6LtsQJCuPyqULwkE4Ad9mWTD5Gv8jv9UWrd5mkGCkC/uj4ZbdH8D13qNKijtpk=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
-	s=zohoarc; t=1558629375;
-	h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
-	bh=rNVS8ajT0H/DbAbFPCGAvTbx6nF+xvRH+/llOHen4Fg=; 
-	b=OJ5dvLdCUrMaK4u1NBElfyajWmrOENEC4HkvEBbA2WXSGFY/aEKLamVxAHGSgQwYJVWiiN/RLcvuhH/KrmCS5eycDniUP24mO9DkGlD4AFz+MD86O3PO7AGmay0fTwKrVDo1bjef4nbeQ+oM6UmAUQwtbQUCVUg1IifmLCMriwc=
-ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
-	spf=pass  smtp.mailfrom=no-reply@patchew.org;
-	dmarc=pass header.from=<no-reply@patchew.org>
-	header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
-	mx.zohomail.com with SMTPS id 1558629373881748.4750488742621;
-	Thu, 23 May 2019 09:36:13 -0700 (PDT)
-In-Reply-To: <20190523144336.13960-1-laurent@vivier.eu>
-Message-ID: <155862937270.24.3313016521227492517@549697c9ad12>
+	(envelope-from <armbru@redhat.com>) id 1hTqhS-0003ZR-3a
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 12:36:14 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38738)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>)
+	id 1hTqhR-0003X0-0U; Thu, 23 May 2019 12:36:13 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 4866581F35;
+	Thu, 23 May 2019 16:36:12 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-117-250.ams2.redhat.com
+	[10.36.117.250])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 1276A5B683;
+	Thu, 23 May 2019 16:36:12 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+	id D8D291138648; Thu, 23 May 2019 18:36:10 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Stefano Garzarella <sgarzare@redhat.com>
+References: <20190523152250.106717-1-sgarzare@redhat.com>
+	<20190523152250.106717-3-sgarzare@redhat.com>
+Date: Thu, 23 May 2019 18:36:10 +0200
+In-Reply-To: <20190523152250.106717-3-sgarzare@redhat.com> (Stefano
+	Garzarella's message of "Thu, 23 May 2019 17:22:49 +0200")
+Message-ID: <87tvdlgmbp.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1 (gnu/linux)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: laurent@vivier.eu
-Date: Thu, 23 May 2019 09:36:13 -0700 (PDT)
-X-ZohoMailClient: External
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.25]);
+	Thu, 23 May 2019 16:36:12 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 136.143.188.55
-Subject: Re: [Qemu-devel] [PULL 00/10] Linux user for 4.1 patches
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH 2/3] block/file-posix: update .help of
+ BLOCK_OPT_PREALLOC option
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -73,118 +74,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: arikalo@wavecomp.com, riku.voipio@iki.fi, qemu-devel@nongnu.org,
-	laurent@vivier.eu, amarkovic@wavecomp.com, aurelien@aurel32.net
+Cc: Kevin Wolf <kwolf@redhat.com>, integration@gluster.org,
+	qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDUyMzE0NDMzNi4xMzk2
-MC0xLWxhdXJlbnRAdml2aWVyLmV1LwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRvIGhhdmUg
-c29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1vcmUgaW5m
-b3JtYXRpb246CgpNZXNzYWdlLWlkOiAyMDE5MDUyMzE0NDMzNi4xMzk2MC0xLWxhdXJlbnRAdml2
-aWVyLmV1ClR5cGU6IHNlcmllcwpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BVTEwgMDAvMTBdIExp
-bnV4IHVzZXIgZm9yIDQuMSBwYXRjaGVzCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jp
-bi9iYXNoCmdpdCByZXYtcGFyc2UgYmFzZSA+IC9kZXYvbnVsbCB8fCBleGl0IDAKZ2l0IGNvbmZp
-ZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5h
-bWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQouL3Nj
-cmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5E
-ID09PQoKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKICAgZDQx
-ODIzOGRjYS4uOGRjN2ZkNTZkZCAgbWFzdGVyICAgICAtPiBtYXN0ZXIKRnJvbSBodHRwczovL2dp
-dGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKICogW25ldyB0YWddICAgICAgICAgICAgICAg
-cGF0Y2hldy8yMDE5MDUyMzE0NDMzNi4xMzk2MC0xLWxhdXJlbnRAdml2aWVyLmV1IC0+IHBhdGNo
-ZXcvMjAxOTA1MjMxNDQzMzYuMTM5NjAtMS1sYXVyZW50QHZpdmllci5ldQpTd2l0Y2hlZCB0byBh
-IG5ldyBicmFuY2ggJ3Rlc3QnCjQ3NzBjY2Y3MzQgbGludXgtdXNlcjogUGFzcyB0aHJvdWdoIG5h
-bm9zZWNvbmQgdGltZXN0YW1wIGNvbXBvbmVudHMgZm9yIHN0YXQgc3lzY2FsbHMKMWI1YjlmYWE4
-OCBsaW51eC11c2VyOiBBbGlnbiBtbWFwX2ZpbmRfdm1hIHRvIGhvc3QgcGFnZSBzaXplCjg3NGNh
-YThiZmIgbGludXgtdXNlcjogRml4IHNobWF0IGVtdWxhdGlvbiBieSBob25vcmluZyBob3N0IFNI
-TUxCQQpkOTA3Mjc4MzU4IGxpbnV4LXVzZXI6IEFkZCBzdXBwb3J0IGZvciBzZXRzb2Nrb3B0KCkg
-b3B0aW9ucyBJUFY2XzxBRER8RFJPUD5fTUVNQkVSU0hJUAo1N2Q0NWRmMzMwIGxpbnV4LXVzZXI6
-IFNhbml0aXplIGludGVycF9pbmZvIGFuZCwgZm9yIG1pcHMgb25seSwgaW5pdCBmaWVsZCBmcF9h
-YmkKNzI2NzI0ODM4NCBsaW51eC11c2VyOiBBZGQgc3VwcG9ydCBmb3IgU0lPQzxHfFM+SUZQRkxB
-R1MgaW9jdGxzIGZvciBhbGwgdGFyZ2V0cwowZWFjMmQ3MWNjIGxpbnV4LXVzZXI6IEFkZCBzdXBw
-b3J0IGZvciBTSU9DU1BHUlAgaW9jdGwgZm9yIGFsbCB0YXJnZXRzCmYwZTZiMjliOTQgbGludXgt
-dXNlcjogRml4IHN1cHBvcnQgZm9yIFNJT0NBVE1BUksgYW5kIFNJT0NHUEdSUCBpb2N0bHMgZm9y
-IHh0ZW5zYQpiZDVkODc4YThjIGxpbnV4LXVzZXI6IGFkZCBwc2V1ZG8gL3Byb2MvaGFyZHdhcmUg
-Zm9yIG02OGsKMTM4NGIwZWVlZSBsaW51eC11c2VyOiBhZGQgcHNldWRvIC9wcm9jL2NwdWluZm8g
-Zm9yIHNwYXJjCgo9PT0gT1VUUFVUIEJFR0lOID09PQoxLzEwIENoZWNraW5nIGNvbW1pdCAxMzg0
-YjBlZWVlYjUgKGxpbnV4LXVzZXI6IGFkZCBwc2V1ZG8gL3Byb2MvY3B1aW5mbyBmb3Igc3BhcmMp
-CjIvMTAgQ2hlY2tpbmcgY29tbWl0IGJkNWQ4NzhhOGNlZSAobGludXgtdXNlcjogYWRkIHBzZXVk
-byAvcHJvYy9oYXJkd2FyZSBmb3IgbTY4aykKMy8xMCBDaGVja2luZyBjb21taXQgZjBlNmIyOWI5
-NGQ2IChsaW51eC11c2VyOiBGaXggc3VwcG9ydCBmb3IgU0lPQ0FUTUFSSyBhbmQgU0lPQ0dQR1JQ
-IGlvY3RscyBmb3IgeHRlbnNhKQo0LzEwIENoZWNraW5nIGNvbW1pdCAwZWFjMmQ3MWNjZmEgKGxp
-bnV4LXVzZXI6IEFkZCBzdXBwb3J0IGZvciBTSU9DU1BHUlAgaW9jdGwgZm9yIGFsbCB0YXJnZXRz
-KQo1LzEwIENoZWNraW5nIGNvbW1pdCA3MjY3MjQ4Mzg0NGYgKGxpbnV4LXVzZXI6IEFkZCBzdXBw
-b3J0IGZvciBTSU9DPEd8Uz5JRlBGTEFHUyBpb2N0bHMgZm9yIGFsbCB0YXJnZXRzKQo2LzEwIENo
-ZWNraW5nIGNvbW1pdCA1N2Q0NWRmMzMwNGYgKGxpbnV4LXVzZXI6IFNhbml0aXplIGludGVycF9p
-bmZvIGFuZCwgZm9yIG1pcHMgb25seSwgaW5pdCBmaWVsZCBmcF9hYmkpCjcvMTAgQ2hlY2tpbmcg
-Y29tbWl0IGQ5MDcyNzgzNThjNCAobGludXgtdXNlcjogQWRkIHN1cHBvcnQgZm9yIHNldHNvY2tv
-cHQoKSBvcHRpb25zIElQVjZfPEFERHxEUk9QPl9NRU1CRVJTSElQKQpXQVJOSU5HOiBhcmNoaXRl
-Y3R1cmUgc3BlY2lmaWMgZGVmaW5lcyBzaG91bGQgYmUgYXZvaWRlZAojNzA6IEZJTEU6IGxpbnV4
-LXVzZXIvc3lzY2FsbC5jOjE5Mjk6CisjaWYgX19VQVBJX0RFRl9JUFY2X01SRVEKCnRvdGFsOiAw
-IGVycm9ycywgMSB3YXJuaW5ncywgMjkgbGluZXMgY2hlY2tlZAoKUGF0Y2ggNy8xMCBoYXMgc3R5
-bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBm
-YWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BB
-VENIIGluIE1BSU5UQUlORVJTLgo4LzEwIENoZWNraW5nIGNvbW1pdCA4NzRjYWE4YmZiNGYgKGxp
-bnV4LXVzZXI6IEZpeCBzaG1hdCBlbXVsYXRpb24gYnkgaG9ub3JpbmcgaG9zdCBTSE1MQkEpCldB
-Uk5JTkc6IEJsb2NrIGNvbW1lbnRzIHVzZSBhIGxlYWRpbmcgLyogb24gYSBzZXBhcmF0ZSBsaW5l
-CiM1NDogRklMRTogbGludXgtdXNlci9lbGZsb2FkLmM6MjA3MDoKKyAgICAgICAgICAgIC8qIFRo
-ZSBzYW1lIHRoaW5nIGFnYWluLCBidXQgd2l0aCBleHRyYQoKdG90YWw6IDAgZXJyb3JzLCAxIHdh
-cm5pbmdzLCAyMjEgbGluZXMgY2hlY2tlZAoKUGF0Y2ggOC8xMCBoYXMgc3R5bGUgcHJvYmxlbXMs
-IHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2
-ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5U
-QUlORVJTLgo5LzEwIENoZWNraW5nIGNvbW1pdCAxYjViOWZhYTg4YmQgKGxpbnV4LXVzZXI6IEFs
-aWduIG1tYXBfZmluZF92bWEgdG8gaG9zdCBwYWdlIHNpemUpCjEwLzEwIENoZWNraW5nIGNvbW1p
-dCA0NzcwY2NmNzM0MDAgKGxpbnV4LXVzZXI6IFBhc3MgdGhyb3VnaCBuYW5vc2Vjb25kIHRpbWVz
-dGFtcCBjb21wb25lbnRzIGZvciBzdGF0IHN5c2NhbGxzKQpFUlJPUjogY29kZSBpbmRlbnQgc2hv
-dWxkIG5ldmVyIHVzZSB0YWJzCiMxMDU6IEZJTEU6IGxpbnV4LXVzZXIvc3lzY2FsbF9kZWZzLmg6
-MTIwMzoKK15JYWJpX3Vsb25nICB0YXJnZXRfc3RfYXRpbWVfbnNlYzskCgpFUlJPUjogY29kZSBp
-bmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiMxMDg6IEZJTEU6IGxpbnV4LXVzZXIvc3lzY2Fs
-bF9kZWZzLmg6MTIwNToKK15JYWJpX3Vsb25nICB0YXJnZXRfc3RfbXRpbWVfbnNlYzskCgpFUlJP
-UjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiMxMTE6IEZJTEU6IGxpbnV4LXVz
-ZXIvc3lzY2FsbF9kZWZzLmg6MTIwNzoKK15JYWJpX3Vsb25nICB0YXJnZXRfc3RfY3RpbWVfbnNl
-YzskCgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiMxMjA6IEZJTEU6
-IGxpbnV4LXVzZXIvc3lzY2FsbF9kZWZzLmg6MTIzOToKK15JYWJpX3Vsb25nXkl0YXJnZXRfc3Rf
-YXRpbWVfbnNlYzskCgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiMx
-MjQ6IEZJTEU6IGxpbnV4LXVzZXIvc3lzY2FsbF9kZWZzLmg6MTI0MjoKK15JYWJpX3Vsb25nXkl0
-YXJnZXRfc3RfbXRpbWVfbnNlYzskCgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVz
-ZSB0YWJzCiMxMjg6IEZJTEU6IGxpbnV4LXVzZXIvc3lzY2FsbF9kZWZzLmg6MTI0NToKK15JYWJp
-X3Vsb25nXkl0YXJnZXRfc3RfY3RpbWVfbnNlYzskCgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxk
-IG5ldmVyIHVzZSB0YWJzCiMxMzc6IEZJTEU6IGxpbnV4LXVzZXIvc3lzY2FsbF9kZWZzLmg6MTMy
-NDoKK15JYWJpX3Vsb25nXkl0YXJnZXRfc3RfYXRpbWVfbnNlYzskCgpFUlJPUjogY29kZSBpbmRl
-bnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiMxNDE6IEZJTEU6IGxpbnV4LXVzZXIvc3lzY2FsbF9k
-ZWZzLmg6MTMyNzoKK15JYWJpX3Vsb25nXkl0YXJnZXRfc3RfbXRpbWVfbnNlYzskCgpFUlJPUjog
-Y29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiMxNDU6IEZJTEU6IGxpbnV4LXVzZXIv
-c3lzY2FsbF9kZWZzLmg6MTMzMDoKK15JYWJpX3Vsb25nXkl0YXJnZXRfc3RfY3RpbWVfbnNlYzsk
-CgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiMxNjE6IEZJTEU6IGxp
-bnV4LXVzZXIvc3lzY2FsbF9kZWZzLmg6MTM0ODoKK15JYWJpX3Vsb25nXkl0YXJnZXRfc3RfYXRp
-bWVfbnNlYzskCgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiMxNjQ6
-IEZJTEU6IGxpbnV4LXVzZXIvc3lzY2FsbF9kZWZzLmg6MTM1MDoKK15JYWJpX3Vsb25nXkl0YXJn
-ZXRfc3RfbXRpbWVfbnNlYzskCgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0
-YWJzCiMxNjc6IEZJTEU6IGxpbnV4LXVzZXIvc3lzY2FsbF9kZWZzLmg6MTM1MjoKK15JYWJpX3Vs
-b25nXkl0YXJnZXRfc3RfY3RpbWVfbnNlYzskCgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5l
-dmVyIHVzZSB0YWJzCiMxNzE6IEZJTEU6IGxpbnV4LXVzZXIvc3lzY2FsbF9kZWZzLmg6MTM1NToK
-K15JYWJpX3Vsb25nXklfX3VudXNlZDFbMl07JAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBu
-ZXZlciB1c2UgdGFicwojMTgwOiBGSUxFOiBsaW51eC11c2VyL3N5c2NhbGxfZGVmcy5oOjEzODM6
-CiteSXVuc2lnbmVkIGludF5JdGFyZ2V0X3N0X2F0aW1lX25zZWM7JAoKRVJST1I6IGNvZGUgaW5k
-ZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMTg0OiBGSUxFOiBsaW51eC11c2VyL3N5c2NhbGxf
-ZGVmcy5oOjEzODY6CiteSXVuc2lnbmVkIGludF5JdGFyZ2V0X3N0X210aW1lX25zZWM7JAoKRVJS
-T1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMTg4OiBGSUxFOiBsaW51eC11
-c2VyL3N5c2NhbGxfZGVmcy5oOjEzODk6CiteSXVuc2lnbmVkIGludF5JdGFyZ2V0X3N0X2N0aW1l
-X25zZWM7JAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMTkyOiBG
-SUxFOiBsaW51eC11c2VyL3N5c2NhbGxfZGVmcy5oOjEzOTE6CiteSXVuc2lnbmVkIGludF5JX191
-bnVzZWQxOyQKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzE5Mzog
-RklMRTogbGludXgtdXNlci9zeXNjYWxsX2RlZnMuaDoxMzkyOgorXkl1bnNpZ25lZCBpbnReSV9f
-dW51c2VkMjskCgp0b3RhbDogMTggZXJyb3JzLCAwIHdhcm5pbmdzLCAyMTEgbGluZXMgY2hlY2tl
-ZAoKUGF0Y2ggMTAvMTAgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55
-IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBt
-YWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCj09PSBPVVRQVVQgRU5E
-ID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgpUaGUgZnVsbCBsb2cgaXMg
-YXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMTkwNTIzMTQ0MzM2LjEzOTYw
-LTEtbGF1cmVudEB2aXZpZXIuZXUvdGVzdGluZy5jaGVja3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0t
-LQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwczovL3BhdGNo
-ZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRo
-YXQuY29t
+Stefano Garzarella <sgarzare@redhat.com> writes:
 
+> Show 'falloc' among the allowed values of 'preallocation'
+> option, only when it is supported (if defined CONFIG_POSIX_FALLOCATE)
+>
+> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+> ---
+>  block/file-posix.c | 6 +++++-
+>  1 file changed, 5 insertions(+), 1 deletion(-)
+>
+> diff --git a/block/file-posix.c b/block/file-posix.c
+> index d018429672..9632e3a87b 100644
+> --- a/block/file-posix.c
+> +++ b/block/file-posix.c
+> @@ -2751,7 +2751,11 @@ static QemuOptsList raw_create_opts = {
+>          {
+>              .name = BLOCK_OPT_PREALLOC,
+>              .type = QEMU_OPT_STRING,
+> -            .help = "Preallocation mode (allowed values: off, falloc, full)"
+> +            .help = "Preallocation mode (allowed values: off"
+> +#ifdef CONFIG_POSIX_FALLOCATE
+> +                    ", falloc"
+> +#endif
+> +                    ", full)"
+>          },
+>          { /* end of list */ }
+>      }
+
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
 
