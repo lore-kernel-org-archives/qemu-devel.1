@@ -2,91 +2,68 @@ Return-Path: <SRS0=bvyN=TX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 747B7C282DD
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 17:53:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C3F5C282DE
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 17:55:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 391FB2186A
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 17:53:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 391FB2186A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 753C32186A
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 17:55:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 753C32186A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:41331 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:41378 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hTrtl-0005zG-Hc
-	for qemu-devel@archiver.kernel.org; Thu, 23 May 2019 13:53:01 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:60041)
+	id 1hTrwW-0007ks-OX
+	for qemu-devel@archiver.kernel.org; Thu, 23 May 2019 13:55:52 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:32933)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hTrsW-0005Ch-4L
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 13:51:45 -0400
+	(envelope-from <laurent@vivier.eu>) id 1hTrvk-0007DA-SA
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 13:55:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hTrsV-0001t6-56
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 13:51:44 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35070)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mreitz@redhat.com>)
-	id 1hTrsQ-0001oX-Kh; Thu, 23 May 2019 13:51:38 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id EE8B630BC100;
-	Thu, 23 May 2019 17:51:37 +0000 (UTC)
-Received: from dresden.str.redhat.com (unknown [10.40.205.176])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id DE4AD600C8;
-	Thu, 23 May 2019 17:51:33 +0000 (UTC)
-To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-References: <20190523170643.20794-1-jsnow@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
-	mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
-	/PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
-	U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
-	mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
-	awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
-	AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
-	CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
-	B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
-	2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
-	AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
-	8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
-	4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
-	BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
-	xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
-	W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
-	DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
-	64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
-	ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
-	sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
-	alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
-	/ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
-	bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
-	R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <8ced8d39-6307-83d1-943b-ccfb22c68488@redhat.com>
-Date: Thu, 23 May 2019 19:51:32 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	(envelope-from <laurent@vivier.eu>) id 1hTrvj-000455-EP
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 13:55:04 -0400
+Received: from mout.kundenserver.de ([212.227.126.133]:59173)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1hTrvj-00044S-59
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 13:55:03 -0400
+Received: from localhost.localdomain ([78.238.229.36]) by
+	mrelayeu.kundenserver.de (mreue009 [212.227.15.167]) with ESMTPSA
+	(Nemesis)
+	id 1MORN0-1hH7OV01YU-00PwkK; Thu, 23 May 2019 19:54:21 +0200
+From: Laurent Vivier <laurent@vivier.eu>
+To: qemu-devel@nongnu.org
+Date: Thu, 23 May 2019 19:54:13 +0200
+Message-Id: <20190523175413.14448-1-laurent@vivier.eu>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-In-Reply-To: <20190523170643.20794-1-jsnow@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="Zfya8Fy3gDEIUKMwrzYh4DQh1pjYxiktr"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.45]);
-	Thu, 23 May 2019 17:51:38 +0000 (UTC)
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:SLwN8cRc5Nl8DSKyHNnXjJHJSabtIj4F3VwCbnhOE3/uZmfVLWY
+	isucfvQefJPt8jerEzgXTXdTvf8kZ/pbC7miQyutJPy6MStiYFs4P2tNaLZXYc/0DzmPorW
+	S5DVKZANJpsAT4pUwFmFH8/QYdO6pTmohYgguEtvtITBWCKeA8w+ZuMSbs0GAPg5x9tRRm9
+	shfJagnWZeqE2MkVVznRg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:nI17I7pbAWg=:btWKmcssONsqhBjqZxjAe0
+	gTjFseiCVcXfRu1fzfI1JQUMXT/tCKbQ4WlTs8TWxvHpwOipn3SI40TM1ul3J6IL4y4Tj/XJG
+	7GYUHedChAAHTz7nNs4ynU9XpULvPkJRtqFuL0mkJv854s7okD+Vbd/CKqhUKzlzAK846brB7
+	/UR5DkSnUhmrqnjfy5ku4nYb9Pp+GaZJRlFNJMlk+aZRjsn1jBnrgsclbEh5FOaKf0gxNbRPf
+	11D2X+IetwbfuWMOhb4F29qI7JOR07SgiMDOxb9n1bIeQ+XPnlJi3mmV0/Mi/GqlNwrNdWmXg
+	RNmjSS9jdKF+Lh0obEmtbM5cbmv05NpVx7iEmmCb2/xIJjM0AYEfkTW9Ua0CXY442HX2q1vqg
+	PW+CzzXXVPyeWqCN3JW6pVkNhurmIlryKcKyyKtuynz2JtdzQG9Yb2TXhaJgzMhkD8WTTZ0+3
+	QuIcj0JLAqPG31Ytqg9PR3YxUw4ph4kmnaiPHQ904nYyMQiACSO3TFA//d4Kl5XD3IiaS8e+d
+	XcJlqq1AZvk+Y4geDaH/wNLOFSOvKOB0QfAYC50GKqjwaee5wltU+RsKTfPk6pF00l+gCqreb
+	Pb2tiIEWFEZ3f5eq7WPJ1b51tIgOEDKACb/6YuOkQE21l2oAnWBEv+8EkqO7njggSBelQzJ5Y
+	/Za8Mu0M4UDLQ/R93fVM69U0w3CtCTtGVvOdPxZd2xRcy0eTTG0JZvrNwgXF2FdC6MlBqBXEi
+	w9mvhZUKl1eTBAY7nnG2kKUARwpNftBvy4i9D7Rna4N/6teoru0Z6UNmdco=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-X-Content-Filtered-By: Mailman/MimeDel 2.1.21
-Subject: Re: [Qemu-devel] [PATCH v3 0/5] blockdev-backup: don't check
- aio_context too early
+X-Received-From: 212.227.126.133
+Subject: [Qemu-devel] [PATCH] linux-user: fix __NR_semtimedop undeclared
+ error
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -98,88 +75,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>,
-	qemu-stable@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Cornelia Huck <cohuck@redhat.com>,
+	=?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+	Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>,
+	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+	Aleksandar Markovic <aleksandar.m.mail@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---Zfya8Fy3gDEIUKMwrzYh4DQh1pjYxiktr
-From: Max Reitz <mreitz@redhat.com>
-To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: Markus Armbruster <armbru@redhat.com>, eblake@redhat.com,
- qemu-stable@nongnu.org, Kevin Wolf <kwolf@redhat.com>
-Message-ID: <8ced8d39-6307-83d1-943b-ccfb22c68488@redhat.com>
-Subject: Re: [PATCH v3 0/5] blockdev-backup: don't check aio_context too early
-References: <20190523170643.20794-1-jsnow@redhat.com>
-In-Reply-To: <20190523170643.20794-1-jsnow@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+In current code, __NR_msgrcv and__NR_semtimedop are supposed to be
+defined if __NR_msgsnd is defined.
 
-On 23.05.19 19:06, John Snow wrote:
-> See patch one's commit message for justification.
-> Patches 2-5 are for testing, because that's always how these things go.=
+But linux headers 5.2-rc1 for MIPS define __NR_msgsnd without defining
+__NR_semtimedop and it breaks the QEMU build.
 
->=20
-> 001/5:[----] [--] 'blockdev-backup: don't check aio_context too early'
-> 002/5:[0004] [FC] 'iotests.py: do not use infinite waits'
-> 003/5:[down]      'QEMUMachine: add events_wait method'
-> 004/5:[0022] [FC] 'iotests.py: rewrite run_job to be pickier'
-> 005/5:[0017] [FC] 'iotests: add iotest 250 for testing blockdev-backup
->                    across iothread contexts'
->=20
-> v3: Rebased on Max's staging branch:
->     Rebase patch 2
->     added patch 3, to add events_wait.
->     Rework patch 4 to make run_job consume legacy events, too
->     Minorly edit patch 5 due to the two above.
-> v2: added patch 4, with iotest framework adjustments in patches 2/3.
->=20
-> John Snow (5):
->   blockdev-backup: don't check aio_context too early
->   iotests.py: do not use infinite waits
->   QEMUMachine: add events_wait method
->   iotests.py: rewrite run_job to be pickier
->   iotests: add iotest 250 for testing blockdev-backup across iothread
->     contexts
->=20
->  blockdev.c                    |   4 --
->  python/qemu/__init__.py       |  69 +++++++++++++------
->  tests/qemu-iotests/250        | 122 ++++++++++++++++++++++++++++++++++=
+__NR_semtimedop is defined in asm-mips/unistd_n64.h and asm-mips/unistd_n32.h
+but not in asm-mips/unistd_o32.h.
 
->  tests/qemu-iotests/250.out    | 119 +++++++++++++++++++++++++++++++++
->  tests/qemu-iotests/group      |   1 +
->  tests/qemu-iotests/iotests.py |  60 ++++++++++-------
->  6 files changed, 326 insertions(+), 49 deletions(-)
->  create mode 100755 tests/qemu-iotests/250
->  create mode 100644 tests/qemu-iotests/250.out
+Commit d9cb4336159a ("linux headers: update against Linux 5.2-rc1") has
+updated asm-mips/unistd_o32.h and added __NR_msgsnd but not __NR_semtimedop.
+It introduces __NR_semtimedop_time64 instead.
 
-Looks good to me (if it helps:
+This patch fixes the problem by checking for each __NR_XXX symbol
+before defining the corresponding syscall.
 
-Reviewed-by: Max Reitz <mreitz@redhat.com>
+Fixes: d9cb4336159a ("linux headers: update against Linux 5.2-rc1")
+Reported-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+---
+ linux-user/syscall.c | 24 ++++++++++++++++--------
+ 1 file changed, 16 insertions(+), 8 deletions(-)
 
-), just a question on patch 3 on pre-existing quirks.
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index e311fcda0517..d316de25c9f2 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -761,14 +761,7 @@ safe_syscall2(int, nanosleep, const struct timespec *, req,
+ safe_syscall4(int, clock_nanosleep, const clockid_t, clock, int, flags,
+               const struct timespec *, req, struct timespec *, rem)
+ #endif
+-#ifdef __NR_msgsnd
+-safe_syscall4(int, msgsnd, int, msgid, const void *, msgp, size_t, sz,
+-              int, flags)
+-safe_syscall5(int, msgrcv, int, msgid, void *, msgp, size_t, sz,
+-              long, msgtype, int, flags)
+-safe_syscall4(int, semtimedop, int, semid, struct sembuf *, tsops,
+-              unsigned, nsops, const struct timespec *, timeout)
+-#else
++#if !defined(__NR_msgsnd) || !defined(__NR_msgrcv) || !defined(__NR_semtimedop)
+ /* This host kernel architecture uses a single ipc syscall; fake up
+  * wrappers for the sub-operations to hide this implementation detail.
+  * Annoyingly we can't include linux/ipc.h to get the constant definitions
+@@ -783,14 +776,29 @@ safe_syscall4(int, semtimedop, int, semid, struct sembuf *, tsops,
+ 
+ safe_syscall6(int, ipc, int, call, long, first, long, second, long, third,
+               void *, ptr, long, fifth)
++#endif
++#ifdef __NR_msgsnd
++safe_syscall4(int, msgsnd, int, msgid, const void *, msgp, size_t, sz,
++              int, flags)
++#else
+ static int safe_msgsnd(int msgid, const void *msgp, size_t sz, int flags)
+ {
+     return safe_ipc(Q_IPCCALL(0, Q_MSGSND), msgid, sz, flags, (void *)msgp, 0);
+ }
++#endif
++#ifdef __NR_msgrcv
++safe_syscall5(int, msgrcv, int, msgid, void *, msgp, size_t, sz,
++              long, msgtype, int, flags)
++#else
+ static int safe_msgrcv(int msgid, void *msgp, size_t sz, long type, int flags)
+ {
+     return safe_ipc(Q_IPCCALL(1, Q_MSGRCV), msgid, sz, flags, msgp, type);
+ }
++#endif
++#ifdef __NR_semtimedop
++safe_syscall4(int, semtimedop, int, semid, struct sembuf *, tsops,
++              unsigned, nsops, const struct timespec *, timeout)
++#else
+ static int safe_semtimedop(int semid, struct sembuf *tsops, unsigned nsops,
+                            const struct timespec *timeout)
+ {
+-- 
+2.20.1
 
-Max
-
-
---Zfya8Fy3gDEIUKMwrzYh4DQh1pjYxiktr
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlzm3aQACgkQ9AfbAGHV
-z0AANgf+NAfhhrXwofJ3QTT4qpcz5a3rgSBnNUC9IMIAHa+3mDhI37vDTLMtBRR/
-uUJcEEgSe9dLZAUlJbIsTdliE2hvdCYBzHyFKT7HN4V6urN+AGyGv/X0Jhnnip8K
-bCAHLIKEd8Bq3mnFrwUbPbb/Jz5cFXlWxvkfxShqs0JfO+lAMawnOKvsoWc14E40
-Z7ibDBG4tAtbinynjYlBqNXwIZwyhDI2opUBTSpA/VCAdkzxzfbqEZdvOjvU4RUW
-BY2TI9DvF0WuHqRSIk01E41ZhPJmc+3W+GZsHP5xETD8BGCxW6EnnEbQ0j+ICJIx
-rW/Mn6Z1nmRStEqMm5ZSQqmxts6TCQ==
-=dH05
------END PGP SIGNATURE-----
-
---Zfya8Fy3gDEIUKMwrzYh4DQh1pjYxiktr--
 
