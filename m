@@ -2,93 +2,84 @@ Return-Path: <SRS0=bvyN=TX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D413CC282DD
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 15:17:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A48A7C282DD
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 15:17:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A08AD20665
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 15:17:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 723A720665
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 15:17:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="CsvkUwyd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A08AD20665
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Cdi80Ybw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 723A720665
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:38660 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:38662 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hTpTF-0006QB-N6
-	for qemu-devel@archiver.kernel.org; Thu, 23 May 2019 11:17:29 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:41397)
+	id 1hTpTK-0006XE-Mw
+	for qemu-devel@archiver.kernel.org; Thu, 23 May 2019 11:17:34 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:39732)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hTpOm-00037y-1x
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 11:12:52 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hTpKL-0007TY-3t
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 11:08:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hTpOl-0005vj-3T
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 11:12:52 -0400
-Received: from mail-vk1-xa43.google.com ([2607:f8b0:4864:20::a43]:45848)
+	(envelope-from <richard.henderson@linaro.org>) id 1hTpKK-0001uF-5v
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 11:08:17 -0400
+Received: from mail-ua1-x943.google.com ([2607:f8b0:4864:20::943]:42749)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hTpOk-0005vE-V5
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 11:12:51 -0400
-Received: by mail-vk1-xa43.google.com with SMTP id r23so1421980vkd.12
-	for <qemu-devel@nongnu.org>; Thu, 23 May 2019 08:12:50 -0700 (PDT)
+	id 1hTpKK-0001te-27
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 11:08:16 -0400
+Received: by mail-ua1-x943.google.com with SMTP id e9so2290451uar.9
+	for <qemu-devel@nongnu.org>; Thu, 23 May 2019 08:08:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
-	:mime-version:in-reply-to:content-language:content-transfer-encoding;
-	bh=QNQKpv2CPlGI9NxgyqLnOGzLix5RD0rVAppORD+LUIE=;
-	b=CsvkUwydNuPhla8uuhy1+uX1TPpYxfzKB56xJv/2mHBFUJHjQd6zUBr8mDvVGPbARm
-	+NPWnS79w0KyDvp4/FYY4n9K3AEDU7LjWLCucIOqMZACEifuB3+vDEk4uz29gM2GgsL6
-	Hv1+R1X07byI3F6mSqcLp5p35uJDFXCiSIJmuoo/+r+jZl8DDoNks4pE4Ar96B2IfUHU
-	QY4fNcmx80a7KGs0o3ONyt88tW3ZTYflFutCKfGwdJzEp3Wvrj6b85ijq2R1Ec2uCjjp
-	UxpkRYWrd8ck4pwz8jdlcnolr7rBdGz1F78dDxP/ZDoeEGJMKra/0d6c1tp2+kjZ2VbJ
-	1l5Q==
+	h=from:to:cc:subject:date:message-id:in-reply-to:references;
+	bh=xcihCMTg6jd3N0tSpSeDkVUUj/HYgQaaJEhimiQbbQQ=;
+	b=Cdi80Ybw8+jb/EdnRp2dqA8qJI8x0fiYppUCb697NL0GCj84d6jCBwHrmgtoRpeD29
+	VExKmV3BAGRuusj19+Hb1cQ+8nyXpZwJuU6+P/ayhHBlhFGIthz2FhODYYB3jXxHCRaR
+	iMyeDvt6KZ8P34i+1YueaTvZWVhptTo/2FO6Cl+EPSlCTld57/TuhEbl4CceGYabS0nJ
+	IXANE/KKkmzDdXn5GD4Py6IxYaGWUwt2HqjUylbsq69IG/UiosOELD98CMkJBL/uQwVw
+	3ZpRKBEMXTuu6/4pkKS9pPVbTY/LMPbmDeNkN2UYRS32vFauhaes6CE6QiQ4zsvSlj/f
+	cLoQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-	:date:user-agent:mime-version:in-reply-to:content-language
-	:content-transfer-encoding;
-	bh=QNQKpv2CPlGI9NxgyqLnOGzLix5RD0rVAppORD+LUIE=;
-	b=TXmm0s/3WPAZFH3QLb8u/nuAK//yae5GF6eonNkkLp8jrDmjZg/qz3sp2Yd12koyNH
-	a9oupNWh72K/y1ZoGtn8wILlv4/iHERffGukWn+zo0UpIIp6VtTwCahCIRxfEfncq4JW
-	AwSuB8iSdclulW7VaV/H3F9sT+aMIqmTbbfj9liTP85Wz+9v6V25QpacKaB1EDM9DZEP
-	aEsaa2ejWNGbFjq3mHOV3fjW3/PQQ04E0B+mogen+GNWUdLE7ue+LtCTmPHMHgu0u+Tx
-	/y6o0WW+Yfw4eisU/ficiuyRAeW5kNrJXNVrjZ/aK7V3broSvzqxL63BaNw3/1EnDxsx
-	nGCg==
-X-Gm-Message-State: APjAAAVGfWdeCl/jEpwZ4F81dS3X/IqMO29zlkfPDmhpCL6+fBVFLTTf
-	+rguPLRi5jirFClEibp9HTtj2Q==
-X-Google-Smtp-Source: APXvYqzWGkHUG0Grl78bAvYjrDbidLqxMD1YAiVKp3KJ5Db4/JGTEFV8e40Qs+PDU/sog4cDa+8P9Q==
-X-Received: by 2002:a1f:c2c1:: with SMTP id s184mr1944645vkf.65.1558624370062; 
-	Thu, 23 May 2019 08:12:50 -0700 (PDT)
-Received: from [192.168.43.94] (ip-173-130-215-183.orldfl.spcsdns.net.
+	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+	:references;
+	bh=xcihCMTg6jd3N0tSpSeDkVUUj/HYgQaaJEhimiQbbQQ=;
+	b=ccxLgb8T34BLBECF5AnNqt4mYA39nr5XQfMsADrfxI4kPA2uLpN+yHaujyWstUQe5J
+	o3oERcHPnXEQYDsc+N10xZrhP7NEiBqyrIrqXJOV7HeWMkjRx3L6dW6J4HdrdX7bk27R
+	Fb1qVzlXsaXVLbYfTbmAvr4hPre8RiB9EwunlpyRBofrNSvg1U4EHxFYsavVF9t8KNIU
+	/unHhJzZUsoQPVXxIEqPO3rtlQX2pHFuyN1J8k5v1xHAug/prLmrYJyAXW1KZ/8pme8z
+	I1iauwnKMZf6OERk0IIog95qJnAzRXXTzU7HYfBg0/CJtvKxU4bM/BPUVj6o5JLnbAxd
+	Ly9g==
+X-Gm-Message-State: APjAAAXQZfwDadIHeB1SBgR2fcqHZeUKnebMG8D1Dsv75BtHH4ENbF9d
+	uYSIYYHxcruGxtG8zFc4Emq/b795QyY=
+X-Google-Smtp-Source: APXvYqxrPmMj0lzKKA4NBIOaOHof6MCg8aKHPue/W9/FpE8wM3qqpChhNeh1vKeowR27MA36vsymog==
+X-Received: by 2002:ab0:29cc:: with SMTP id i12mr39566731uaq.12.1558624094878; 
+	Thu, 23 May 2019 08:08:14 -0700 (PDT)
+Received: from localhost.localdomain (ip-173-130-215-183.orldfl.spcsdns.net.
 	[173.130.215.183]) by smtp.gmail.com with ESMTPSA id
-	e19sm2927405vsc.24.2019.05.23.08.12.48
+	p70sm4227462vsd.25.2019.05.23.08.08.13
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Thu, 23 May 2019 08:12:49 -0700 (PDT)
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
-	qemu-devel@nongnu.org
-References: <20190523102532.10486-1-alex.bennee@linaro.org>
-	<20190523102532.10486-3-alex.bennee@linaro.org>
+	Thu, 23 May 2019 08:08:14 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <14e1cffb-9912-6752-1dc1-566ff86197a5@linaro.org>
-Date: Thu, 23 May 2019 11:12:46 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
-MIME-Version: 1.0
-In-Reply-To: <20190523102532.10486-3-alex.bennee@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+To: qemu-devel@nongnu.org
+Date: Thu, 23 May 2019 11:08:03 -0400
+Message-Id: <20190523150803.31504-7-richard.henderson@linaro.org>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20190523150803.31504-1-richard.henderson@linaro.org>
+References: <20190523150803.31504-1-richard.henderson@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2607:f8b0:4864:20::a43
-Subject: Re: [Qemu-devel] [PATCH v2 02/28] semihosting: introduce
- CONFIG_SEMIHOSTING
+X-Received-From: 2607:f8b0:4864:20::943
+Subject: [Qemu-devel] [PATCH 6/6] target/rx: Dump bytes for each insn during
+ disassembly
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -100,43 +91,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Marek Vasut <marex@denx.de>, Aleksandar Rikalo <arikalo@wavecomp.com>,
-	Chris Wulff <crwulff@gmail.com>,
-	Max Filippov <jcmvbkbc@gmail.com>, qemu-arm@nongnu.org,
-	Aleksandar Markovic <amarkovic@wavecomp.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	=?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
-	Aurelien Jarno <aurelien@aurel32.net>
+Cc: ysato@users.sourceforge.jp
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/23/19 6:25 AM, Alex Bennée wrote:
-> There isn't much point building semihosting for platforms that don't
-> support it. Introduce a new symbol and enable it only for the softmmu
-> targets that need it.
-> 
-> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-> Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-> Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-> ---
->  default-configs/arm-softmmu.mak         |  1 +
->  default-configs/lm32-softmmu.mak        |  2 +
->  default-configs/m68k-softmmu.mak        |  2 +
->  default-configs/mips-softmmu-common.mak |  1 +
->  default-configs/nios2-softmmu.mak       |  2 +
->  default-configs/xtensa-softmmu.mak      |  2 +
->  hw/Kconfig                              |  1 +
->  hw/semihosting/Kconfig                  |  3 ++
->  hw/semihosting/Makefile.objs            |  2 +-
->  stubs/Makefile.objs                     |  1 +
->  stubs/semihost.c                        | 66 +++++++++++++++++++++++++
->  11 files changed, 82 insertions(+), 1 deletion(-)
->  create mode 100644 hw/semihosting/Kconfig
->  create mode 100644 stubs/semihost.c
+There are so many different forms of each RX instruction
+that it will be very useful to be able to look at the bytes
+to see on which path a bug may lie.
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ target/rx/disas.c | 16 +++++++++++++++-
+ 1 file changed, 15 insertions(+), 1 deletion(-)
 
+diff --git a/target/rx/disas.c b/target/rx/disas.c
+index 5a32a87534..d73b53db44 100644
+--- a/target/rx/disas.c
++++ b/target/rx/disas.c
+@@ -102,7 +102,21 @@ static int bdsp_s(DisasContext *ctx, int d)
+ /* Include the auto-generated decoder.  */
+ #include "decode.inc.c"
+ 
+-#define prt(...) (ctx->dis->fprintf_func)((ctx->dis->stream), __VA_ARGS__)
++static void dump_bytes(DisasContext *ctx)
++{
++    int i, len = ctx->len;
++
++    for (i = 0; i < len; ++i) {
++        ctx->dis->fprintf_func(ctx->dis->stream, "%02x ", ctx->bytes[i]);
++    }
++    ctx->dis->fprintf_func(ctx->dis->stream, "%*c", (8 - i) * 3, '\t');
++}
++
++#define prt(...) \
++    do {                                                        \
++        dump_bytes(ctx);                                        \
++        ctx->dis->fprintf_func(ctx->dis->stream, __VA_ARGS__);  \
++    } while (0)
+ 
+ #define RX_MEMORY_BYTE 0
+ #define RX_MEMORY_WORD 1
+-- 
+2.17.1
 
-r~
 
