@@ -7,74 +7,76 @@ X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C2A6C282DD
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 10:42:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 826B4C282DD
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 10:43:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 447A720851
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 10:42:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 49A5120851
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 10:43:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="KknHiVSn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 447A720851
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="oYP46Kqn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 49A5120851
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:33329 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:33337 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hTlBa-0003cL-Bc
-	for qemu-devel@archiver.kernel.org; Thu, 23 May 2019 06:42:58 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:49412)
+	id 1hTlC8-000421-Jh
+	for qemu-devel@archiver.kernel.org; Thu, 23 May 2019 06:43:32 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:49603)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hTkvK-0005ue-0Z
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 06:26:11 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1hTkvO-0005zp-E7
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 06:26:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hTkvA-0001Jr-OO
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 06:26:06 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:34351)
+	(envelope-from <alex.bennee@linaro.org>) id 1hTkvM-0001WS-D4
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 06:26:13 -0400
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:39058)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1hTkv4-0000uS-DP
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 06:25:58 -0400
-Received: by mail-wm1-x342.google.com with SMTP id j187so6754165wma.1
-	for <qemu-devel@nongnu.org>; Thu, 23 May 2019 03:25:38 -0700 (PDT)
+	id 1hTkvM-0000yj-4X
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 06:26:12 -0400
+Received: by mail-wm1-x344.google.com with SMTP id z23so1126426wma.4
+	for <qemu-devel@nongnu.org>; Thu, 23 May 2019 03:25:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
 	h=from:to:cc:subject:date:message-id:in-reply-to:references
 	:mime-version:content-transfer-encoding;
-	bh=ClzRD6CI4ag8pii4JNWlYLGFqOxEmOFpGkxKaMBsRlY=;
-	b=KknHiVSn4tKPDo6MAF76n0trlEPaus08nEOmHAyxZyjfPBavs6gGNS91/oIaT2gpIO
-	OVDIrnkHSlhg46TQ33HUC1IyQ6Kp8c3TeqweRi6CLc0+f3JoaGKBw9i2pdQrsaTv1XgI
-	iEiTSCXZT1IPGZA7hImPvgfMxPOqSo8u56F5wc+mjPri58EbWhwgyQ2/f17rUKlNs+vS
-	1C8BRS2C06SFjGItDADj4591O7ByeD17TLfaWvbA39ECvi4hr+t9Ljvf4YIAQQTbmTKN
-	4dhM7wNKNsciMwbkrBb3Vs+VbQ88uUfVta+gk7D7Gc8389rPq8HRYN21iQoInY9rqMOk
-	trbA==
+	bh=fv7yjgipiPIa0iKuBxA7WsxKljcgZAsZBYR7nSKLcJ0=;
+	b=oYP46KqnsGKZxyofy6qTfPkl95SddVnioUefAwX/iBSZxtWeE599gY1vwK6vEbecmp
+	abFcOpYtLhjWrt+tI23Yh6V0p7z2GzE6ngxGpheOJFrlr8+ZaPrTxdgrs4Q8whv4hVvk
+	3TM+QbuJn+k28CqP96Ll9xEFKsn5TIfzu75/SP9C42GuzTDIKWzFcY1KjSk3NMgRbNrg
+	vnLknKtDCJEbd4vorkQhU9FLn51rtTqvCNTokPaRAcJqDFbW542Rv37iCjTCctBLr2Ps
+	onuWjwNXGkwLioSi0AQUEv9n+utxbIJvr4Oy7YfduhrWzAjy9MIlVaLyJXIXZ+6wDjg8
+	CxLA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
 	:references:mime-version:content-transfer-encoding;
-	bh=ClzRD6CI4ag8pii4JNWlYLGFqOxEmOFpGkxKaMBsRlY=;
-	b=ZwtT4suNyAqRkjyfiqaNr1Wg6wg1vwrE3VReH5aMN+Ld1r+zoetrtJ7XI0Lgi1S0N/
-	02DsUmRb6Hi5+n8psuT+bJyVpGYq5NBdposGKpXcz0G5RsRXx5rhjOED3TctKLsRN40s
-	+ukF+QM8lkoIsdf9FwHDZJhxEwnRgqgRQLEJs36GzpKh4leePtAUMhAzi8IhLB9e6X/0
-	fSfmXhIHj+SUvhlzMIQ0KJe4KmCAuBKrnzM/22S1ittgOyoZD+UvhnwKgLTRFbOeG8EG
-	NzPLMaAm0YSXk8VnnbqKOWhkynmfDamVTq1Mi/BGv3sqCm+gCtTzNtcNe1olK2fr+FRf
-	WcpQ==
-X-Gm-Message-State: APjAAAWPtEvA9imu58pNNdgW1I8lGUyHgDhVHFXrLv6xRmBm51hsY0T2
-	Zg84uxJ57bktOM15MhHXZQ8xnHC5dnQ=
-X-Google-Smtp-Source: APXvYqyWs78GUzteu2dAde2p7C6NOldmjHqQZBRLegw0J6EDkTlQOJCnkqSlf2pnbrrh29shMqvkYg==
-X-Received: by 2002:a1c:7303:: with SMTP id d3mr10893139wmb.119.1558607137301; 
-	Thu, 23 May 2019 03:25:37 -0700 (PDT)
+	bh=fv7yjgipiPIa0iKuBxA7WsxKljcgZAsZBYR7nSKLcJ0=;
+	b=TJBLLlRvwY3/mOpw9BJOPTWO0AwrOWn1A7j0a8MAFBIEilg30az3RVHyVh18h6AuzJ
+	mDMKE8aKKgEmn8U1I84PFDu8Uc3Yz3pg0BhdKKThQVFaRCbQ0P+GEtmU3gxMCeCtg3uC
+	WI71/zjU2H3l08ygzfq4DBoilMpznWhKMo3Q4m1QpFFUPHlGJSo/Ua27VNTFx1w+ZMHr
+	eskMVeeM5BxFAdPzegKjNxffAgKCll1PoXu9A4U7E9mioTK1ohqWOt0m+wVrKwsT40EK
+	TfztvpmdsPn0SYxFOeN66KUD7qfnbyvUy2dQDfrCo93VE+luS/w8zedXx4vEBECOBi1v
+	wo5g==
+X-Gm-Message-State: APjAAAVu2BEFVcspXBT+Ar9KdSzUpQs6VSiSkXHn88nQnSShaW82NVkD
+	8A54GKmlwnRZ1qChgibztJwVXw==
+X-Google-Smtp-Source: APXvYqyjuWv+zcr8wmpex7JhqyOizPdYqdIlAwuXXFES5XA624FYONJl9BdwtRINmqtI+yrrdQPcpA==
+X-Received: by 2002:a1c:2dd2:: with SMTP id
+	t201mr11012074wmt.136.1558607142564; 
+	Thu, 23 May 2019 03:25:42 -0700 (PDT)
 Received: from zen.linaroharston ([81.128.185.34])
-	by smtp.gmail.com with ESMTPSA id n5sm7077195wrj.27.2019.05.23.03.25.33
+	by smtp.gmail.com with ESMTPSA id
+	a10sm31509345wrm.94.2019.05.23.03.25.35
 	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Thu, 23 May 2019 03:25:35 -0700 (PDT)
+	Thu, 23 May 2019 03:25:40 -0700 (PDT)
 Received: from zen.linaroharston. (localhost [127.0.0.1])
-	by zen.linaroharston (Postfix) with ESMTP id E42081FF92;
-	Thu, 23 May 2019 11:25:32 +0100 (BST)
+	by zen.linaroharston (Postfix) with ESMTP id AFD191FF9D;
+	Thu, 23 May 2019 11:25:33 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Thu, 23 May 2019 11:25:09 +0100
-Message-Id: <20190523102532.10486-6-alex.bennee@linaro.org>
+Date: Thu, 23 May 2019 11:25:18 +0100
+Message-Id: <20190523102532.10486-15-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190523102532.10486-1-alex.bennee@linaro.org>
 References: <20190523102532.10486-1-alex.bennee@linaro.org>
@@ -83,9 +85,9 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2a00:1450:4864:20::342
-Subject: [Qemu-devel] [PATCH v2 05/28] target/arm: fixup some of the
- commentary for arm-semi
+X-Received-From: 2a00:1450:4864:20::344
+Subject: [Qemu-devel] [PATCH v2 14/28] tests/tcg/multiarch: add support for
+ multiarch system tests
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -97,127 +99,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
-	qemu-arm@nongnu.org,
+Cc: Richard Henderson <richard.henderson@linaro.org>, qemu-arm@nongnu.org,
 	=?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
-	Peter Maydell <peter.maydell@linaro.org>
+	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This cleans up a number of the block comments to fit the proper style.
-While we are at it we also reference the official specification and
-document what the return register value can be.
+We can certainly support some common tests for system emulation that
+make use of our minimal defined boot.S support. It will still be up to
+individual architectures to ensure they build so we provide a
+MULTIARCH_TESTS variable that they can tack onto TESTS themselves.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/arm-semi.c | 40 +++++++++++++++++++++++++++++++---------
- 1 file changed, 31 insertions(+), 9 deletions(-)
+ tests/tcg/Makefile                                 |  1 +
+ tests/tcg/multiarch/system/Makefile.softmmu-target | 14 ++++++++++++++
+ 2 files changed, 15 insertions(+)
+ create mode 100644 tests/tcg/multiarch/system/Makefile.softmmu-target
 
-diff --git a/target/arm/arm-semi.c b/target/arm/arm-semi.c
-index 3273306c8ea..9e5a414dd89 100644
---- a/target/arm/arm-semi.c
-+++ b/target/arm/arm-semi.c
-@@ -2,6 +2,7 @@
-  *  Arm "Angel" semihosting syscalls
-  *
-  *  Copyright (c) 2005, 2007 CodeSourcery.
-+ *  Copyright (c) 2019 Linaro
-  *  Written by Paul Brook.
-  *
-  *  This program is free software; you can redistribute it and/or modify
-@@ -16,6 +17,10 @@
-  *
-  *  You should have received a copy of the GNU General Public License
-  *  along with this program; if not, see <http://www.gnu.org/licenses/>.
-+ *
-+ *  ARM Semihosting is documented in:
-+ *     Semihosting for AArch32 and AArch64 Release 2.0
-+ *     https://static.docs.arm.com/100863/0200/semihosting.pdf
-  */
- 
- #include "qemu/osdep.h"
-@@ -240,6 +245,15 @@ static target_ulong arm_gdb_syscall(ARMCPU *cpu, gdb_syscall_complete_cb cb,
-      put_user_u64(val, args + (n) * 8) :                \
-      put_user_u32(val, args + (n) * 4))
- 
-+/*
-+ * Do a semihosting call.
-+ *
-+ * The specification always says that the "return register" either
-+ * returns a specific value or is corrupted, so we don't need to
-+ * report to our caller whether we are returning a value or trying to
-+ * leave the register unchanged. We use 0xdeadbeef as the return value
-+ * when there isn't a defined return value for the call.
-+ */
- target_ulong do_arm_semihosting(CPUARMState *env)
- {
-     ARMCPU *cpu = arm_env_get_cpu(env);
-@@ -510,14 +524,16 @@ target_ulong do_arm_semihosting(CPUARMState *env)
- 
-             output_size = ts->info->arg_end - ts->info->arg_start;
-             if (!output_size) {
--                /* We special-case the "empty command line" case (argc==0).
--                   Just provide the terminating 0. */
-+                /*
-+                 * We special-case the "empty command line" case (argc==0).
-+                 * Just provide the terminating 0.
-+                 */
-                 output_size = 1;
-             }
- #endif
- 
-             if (output_size > input_size) {
--                 /* Not enough space to store command-line arguments.  */
-+                /* Not enough space to store command-line arguments.  */
-                 return -1;
-             }
- 
-@@ -571,8 +587,10 @@ target_ulong do_arm_semihosting(CPUARMState *env)
-             GET_ARG(0);
- 
- #ifdef CONFIG_USER_ONLY
--            /* Some C libraries assume the heap immediately follows .bss, so
--               allocate it using sbrk.  */
-+            /*
-+             * Some C libraries assume the heap immediately follows .bss, so
-+             * allocate it using sbrk.
-+             */
-             if (!ts->heap_limit) {
-                 abi_ulong ret;
- 
-@@ -620,7 +638,8 @@ target_ulong do_arm_semihosting(CPUARMState *env)
-         }
-     case TARGET_SYS_EXIT:
-         if (is_a64(env)) {
--            /* The A64 version of this call takes a parameter block,
-+            /*
-+             * The A64 version of this call takes a parameter block,
-              * so the application-exit type can return a subcode which
-              * is the exit status code from the application.
-              */
-@@ -633,14 +652,17 @@ target_ulong do_arm_semihosting(CPUARMState *env)
-                 ret = 1;
-             }
-         } else {
--            /* ARM specifies only Stopped_ApplicationExit as normal
--             * exit, everything else is considered an error */
-+            /*
-+             * ARM specifies only Stopped_ApplicationExit as normal
-+             * exit, everything else is considered an error
-+             */
-             ret = (args == ADP_Stopped_ApplicationExit) ? 0 : 1;
-         }
-         gdb_exit(env, ret);
-         exit(ret);
-     case TARGET_SYS_SYNCCACHE:
--        /* Clean the D-cache and invalidate the I-cache for the specified
-+        /*
-+         * Clean the D-cache and invalidate the I-cache for the specified
-          * virtual address range. This is a nop for us since we don't
-          * implement caches. This is only present on A64.
-          */
+diff --git a/tests/tcg/Makefile b/tests/tcg/Makefile
+index 1cdd628e96f..6fa63cc8d53 100644
+--- a/tests/tcg/Makefile
++++ b/tests/tcg/Makefile
+@@ -96,6 +96,7 @@ else
+ # build options for bare programs are usually pretty different. They
+ # are expected to provide their own build recipes.
+ -include $(SRC_PATH)/tests/tcg/minilib/Makefile.target
++-include $(SRC_PATH)/tests/tcg/multiarch/system/Makefile.softmmu-target
+ -include $(SRC_PATH)/tests/tcg/$(TARGET_BASE_ARCH)/Makefile.softmmu-target
+ ifneq ($(TARGET_BASE_ARCH),$(TARGET_NAME))
+ -include $(SRC_PATH)/tests/tcg/$(TARGET_NAME)/Makefile.softmmu-target
+diff --git a/tests/tcg/multiarch/system/Makefile.softmmu-target b/tests/tcg/multiarch/system/Makefile.softmmu-target
+new file mode 100644
+index 00000000000..db4bbeda44c
+--- /dev/null
++++ b/tests/tcg/multiarch/system/Makefile.softmmu-target
+@@ -0,0 +1,14 @@
++# -*- Mode: makefile -*-
++#
++# Multiarch system tests
++#
++# We just collect the tests together here and rely on the actual guest
++# architecture to add to the test dependancies and deal with the
++# complications of building.
++#
++
++MULTIARCH_SYSTEM_SRC=$(SRC_PATH)/tests/tcg/multiarch/system
++VPATH+=$(MULTIARCH_SYSTEM_SRC)
++
++MULTIARCH_TEST_SRCS=$(wildcard $(MULTIARCH_SYSTEM_SRC)/*.c)
++MULTIARCH_TESTS = $(patsubst $(MULTIARCH_SYSTEM_SRC)/%.c, %, $(MULTIARCH_TEST_SRCS))
 -- 
 2.20.1
 
