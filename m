@@ -2,94 +2,84 @@ Return-Path: <SRS0=bvyN=TX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D4253C282DD
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 15:14:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9881EC282DD
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 15:15:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A07CD204EC
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 15:14:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 56172204EC
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 15:15:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="HMLIUHgJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A07CD204EC
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="zANyOXl8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 56172204EC
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:38605 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:38607 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hTpQo-0004ec-UN
-	for qemu-devel@archiver.kernel.org; Thu, 23 May 2019 11:14:58 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:41253)
+	id 1hTpQt-0004jQ-JT
+	for qemu-devel@archiver.kernel.org; Thu, 23 May 2019 11:15:03 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:39705)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hTpOV-0002sw-Tp
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 11:12:36 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hTpKJ-0007Sc-RR
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 11:08:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hTpOV-0005ho-1F
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 11:12:35 -0400
-Received: from mail-vs1-xe42.google.com ([2607:f8b0:4864:20::e42]:33678)
+	(envelope-from <richard.henderson@linaro.org>) id 1hTpKI-0001st-MR
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 11:08:15 -0400
+Received: from mail-ua1-x942.google.com ([2607:f8b0:4864:20::942]:36937)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hTpOU-0005h2-PL
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 11:12:34 -0400
-Received: by mail-vs1-xe42.google.com with SMTP id y6so3822488vsb.0
-	for <qemu-devel@nongnu.org>; Thu, 23 May 2019 08:12:34 -0700 (PDT)
+	id 1hTpKI-0001si-HS
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 11:08:14 -0400
+Received: by mail-ua1-x942.google.com with SMTP id t18so2299970uar.4
+	for <qemu-devel@nongnu.org>; Thu, 23 May 2019 08:08:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
-	:mime-version:in-reply-to:content-language:content-transfer-encoding;
-	bh=wC3UR6u8dZDnh7XynwOzXaqOC8XFwBxoBcdv7qIHYfE=;
-	b=HMLIUHgJih2oVMi2BlQb+ltJN/RC4l5uklDdKiGnrBr4vmtEeiQrMGfwOSmXJ18ONX
-	3/aSi6uZE38niukwdpXCqFi94JX4Gw6/oBYEklMSuNUEMeTVhX1OEKOUQvi+mXSChd35
-	4jn5Winh9cZTBSVWPTTFA5f9IlERokcFiVDUt7WlT/Gkepp6zqEijIYNj396Kh+vuJ7L
-	AGlxf+v4kHO2HW3ZkmcpRmNmRy1AtWi0qWi1/hU7aLfrbAlCBnhboWDe7TMPKQsJXSZ3
-	jmrEe9mHJknjhlnPHsgNnCVaBZ+EbIqvdPkgOUNvQm48jA9DfEkNHKkTnMx7jxF9pk48
-	8KyA==
+	h=from:to:cc:subject:date:message-id:in-reply-to:references;
+	bh=Ww2LSp6bczaair+HE3835uyxzaqJh3az+j6QKvIto98=;
+	b=zANyOXl868k1DZ2O2uw27Zc+Ij5525RFDlxmgzWpoaQyraKh2FMJKjBYjcd1AtCWhV
+	aEYdYaWntos3m5VseeFCeiatLTymiEoYaczJWghufdZrZvGihK1OGCQP2doidjLFJFmn
+	bCOrpZy349QfP+ep6P/n0AuJZez+sHHDby90Uh2kc7BP4Nv0c4l3ti1kl/PTfhDbi7Sp
+	udQJQXiWU/mEfa5W0VGVqHsKc8EKdz27zoteHp5xBtMTVd1ffejQ6QYWRo2SEj7QtXy4
+	3Oq5Ca5yTzsl5KrFp7q9iCAiaCXMYjCYzzgPsQ+4xPvr7duZd/Q9ej7bfx7o126jNvRO
+	tp6A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-	:date:user-agent:mime-version:in-reply-to:content-language
-	:content-transfer-encoding;
-	bh=wC3UR6u8dZDnh7XynwOzXaqOC8XFwBxoBcdv7qIHYfE=;
-	b=Y5yeqQJLwD9tSluGQ6jYeXwVCcQiEFL3WJ98pCQPhtaOBtluTF2dTTU0s2XUmwBKna
-	VqpZR7D6CIYXZuskwzOGlTVWB9WCa1bRXkA4WMr/RYVTb4szbtmltzWtCLcuHBU1OK9C
-	4eE3VEKw0X+ktFZJRlH+R6Oa0SD2hqXGKIyejOoIn8H8ixHWubyZJWhmObZuB3Qjb7Y+
-	CJnE5xGKg2WpywCRv90CYOZF1JL594PhhXmcyfVt9mQSNKzVvwnPh+uSgED8TDvVESXF
-	0RcCUh2dziErVkQuM1oc+uQjLTYdnVGm1UQFI+K8vHZ+ccrO5HVBBXcS28o0JSR9+fxu
-	z3vA==
-X-Gm-Message-State: APjAAAU/9OWwErmp8ZmN0m5UChFaGGMe52hfZE4CJYkNAzxBGWG3nndg
-	3uQ2/pbt5NDiH8Ts1/7YSBbkJg==
-X-Google-Smtp-Source: APXvYqw33ySFh92vOl0HjHAeIoMUhaFTBZCqbcBmpDxH4I+bv7tGDEiHjhX1LMrO79HwjfH4K/ysEg==
-X-Received: by 2002:a05:6102:1c7:: with SMTP id
-	s7mr31887879vsq.136.1558624353876; 
-	Thu, 23 May 2019 08:12:33 -0700 (PDT)
-Received: from [192.168.43.94] (ip-173-130-215-183.orldfl.spcsdns.net.
+	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+	:references;
+	bh=Ww2LSp6bczaair+HE3835uyxzaqJh3az+j6QKvIto98=;
+	b=Jx5gTrKIdfq+qTBTOrIXMsBvhAw/jEq+9uZifvBnO/48URiNYTSUWk5cMJ22fsYgvE
+	jsBdRq3vqP/ntia+x1Kijol0MePj04Yd878/Hc0Vz6o/vYPKS9ksLEMbf+SiihPYlxek
+	L6vzfhCFutsCiLSH2Ko8a1wRI+YU/9LhMMBk3+1DA6o6RPiqswuTLwsw8sdxcILKG/xa
+	q2n0sAR4Ij8KMHZ3xWM5jirK6veBbdXL+x685wXKJ5iblRv4fEtbl55cosSSeKx/Td86
+	G9cX3xZignD53e2k7b+n07ADORehwpiJbCuHqrjYpjlmsmwVatxz40sCXgpFfDs0138d
+	bt6g==
+X-Gm-Message-State: APjAAAVdSj4FSEUIMz6WXJeM0v2Rwry6FC/HOyyfBN51+sDY/+nXEHhw
+	a2rm/eNVpcQoY5h4nF8yb0yHulWkFTI=
+X-Google-Smtp-Source: APXvYqwkEQObKS7sJQO6zxIML2xyzIK5J0zAG6KzWH+yYwoTod0hZze4s/DtGdb683gloYP/639d2g==
+X-Received: by 2002:a9f:376e:: with SMTP id a43mr8798178uae.57.1558624093591; 
+	Thu, 23 May 2019 08:08:13 -0700 (PDT)
+Received: from localhost.localdomain (ip-173-130-215-183.orldfl.spcsdns.net.
 	[173.130.215.183]) by smtp.gmail.com with ESMTPSA id
-	143sm13796557vkj.44.2019.05.23.08.12.31
+	p70sm4227462vsd.25.2019.05.23.08.08.12
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Thu, 23 May 2019 08:12:33 -0700 (PDT)
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
-	qemu-devel@nongnu.org
-References: <20190523102532.10486-1-alex.bennee@linaro.org>
-	<20190523102532.10486-2-alex.bennee@linaro.org>
+	Thu, 23 May 2019 08:08:12 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <e6c89c18-48df-c85d-39a4-2299f1026cf4@linaro.org>
-Date: Thu, 23 May 2019 11:12:30 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
-MIME-Version: 1.0
-In-Reply-To: <20190523102532.10486-2-alex.bennee@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+To: qemu-devel@nongnu.org
+Date: Thu, 23 May 2019 11:08:02 -0400
+Message-Id: <20190523150803.31504-6-richard.henderson@linaro.org>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20190523150803.31504-1-richard.henderson@linaro.org>
+References: <20190523150803.31504-1-richard.henderson@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2607:f8b0:4864:20::e42
-Subject: Re: [Qemu-devel] [PATCH v2 01/28] semihosting: move semihosting
- configuration into its own directory
+X-Received-From: 2607:f8b0:4864:20::942
+Subject: [Qemu-devel] [PATCH 5/6] target/rx: Collect all bytes during
+ disassembly
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -101,30 +91,141 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Marek Vasut <marex@denx.de>, Peter Maydell <peter.maydell@linaro.org>,
-	Aleksandar Rikalo <arikalo@wavecomp.com>, Chris Wulff <crwulff@gmail.com>,
-	Laurent Vivier <laurent@vivier.eu>, Max Filippov <jcmvbkbc@gmail.com>,
-	Michael Walle <michael@walle.cc>, qemu-arm@nongnu.org,
-	Aleksandar Markovic <amarkovic@wavecomp.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	=?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
-	Aurelien Jarno <aurelien@aurel32.net>
+Cc: ysato@users.sourceforge.jp
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/23/19 6:25 AM, Alex Bennée wrote:
-> In preparation for having some more common semihosting code let's
-> excise the current config magic from vl.c into its own file. We shall
-> later add more conditionals to the build configurations so we can
-> avoid building this if we don't need it.
-> 
-> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-> Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-> Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-> ---
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Collected, to be used in the next patch.
 
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ target/rx/disas.c | 62 ++++++++++++++++++++++++++++++++---------------
+ 1 file changed, 42 insertions(+), 20 deletions(-)
 
-r~
+diff --git a/target/rx/disas.c b/target/rx/disas.c
+index ebc1a44249..5a32a87534 100644
+--- a/target/rx/disas.c
++++ b/target/rx/disas.c
+@@ -25,43 +25,59 @@ typedef struct DisasContext {
+     disassemble_info *dis;
+     uint32_t addr;
+     uint32_t pc;
++    uint8_t len;
++    uint8_t bytes[8];
+ } DisasContext;
+ 
+ 
+ static uint32_t decode_load_bytes(DisasContext *ctx, uint32_t insn,
+-                           int i, int n)
++                                  int i, int n)
+ {
+-    bfd_byte buf;
++    uint32_t addr = ctx->addr;
++
++    g_assert(ctx->len == i);
++    g_assert(n <= ARRAY_SIZE(ctx->bytes));
++
+     while (++i <= n) {
+-        ctx->dis->read_memory_func(ctx->addr++, &buf, 1, ctx->dis);
+-        insn |= buf << (32 - i * 8);
++        ctx->dis->read_memory_func(addr++, &ctx->bytes[i - 1], 1, ctx->dis);
++        insn |= ctx->bytes[i - 1] << (32 - i * 8);
+     }
++    ctx->addr = addr;
++    ctx->len = n;
++
+     return insn;
+ }
+ 
+ static int32_t li(DisasContext *ctx, int sz)
+ {
+-    int32_t addr;
+-    bfd_byte buf[4];
+-    addr = ctx->addr;
++    uint32_t addr = ctx->addr;
++    uintptr_t len = ctx->len;
+ 
+     switch (sz) {
+     case 1:
++        g_assert(len + 1 <= ARRAY_SIZE(ctx->bytes));
+         ctx->addr += 1;
+-        ctx->dis->read_memory_func(addr, buf, 1, ctx->dis);
+-        return (int8_t)buf[0];
++        ctx->len += 1;
++        ctx->dis->read_memory_func(addr, ctx->bytes + len, 1, ctx->dis);
++        return (int8_t)ctx->bytes[len];
+     case 2:
++        g_assert(len + 2 <= ARRAY_SIZE(ctx->bytes));
+         ctx->addr += 2;
+-        ctx->dis->read_memory_func(addr, buf, 2, ctx->dis);
+-        return ldsw_le_p(buf);
++        ctx->len += 2;
++        ctx->dis->read_memory_func(addr, ctx->bytes + len, 2, ctx->dis);
++        return ldsw_le_p(ctx->bytes + len);
+     case 3:
++        g_assert(len + 3 <= ARRAY_SIZE(ctx->bytes));
+         ctx->addr += 3;
+-        ctx->dis->read_memory_func(addr, buf, 3, ctx->dis);
+-        return (int8_t)buf[2] << 16 | lduw_le_p(buf);
++        ctx->len += 3;
++        ctx->dis->read_memory_func(addr, ctx->bytes + len, 3, ctx->dis);
++        return (int8_t)ctx->bytes[len + 2] << 16 | lduw_le_p(ctx->bytes + len);
+     case 0:
++        g_assert(len + 4 <= ARRAY_SIZE(ctx->bytes));
+         ctx->addr += 4;
+-        ctx->dis->read_memory_func(addr, buf, 4, ctx->dis);
+-        return ldl_le_p(buf);
++        ctx->len += 4;
++        ctx->dis->read_memory_func(addr, ctx->bytes + len, 4, ctx->dis);
++        return ldl_le_p(ctx->bytes + len);
+     default:
+         g_assert_not_reached();
+     }
+@@ -110,7 +126,7 @@ static const char psw[] = {
+ static void rx_index_addr(DisasContext *ctx, char out[8], int ld, int mi)
+ {
+     uint32_t addr = ctx->addr;
+-    uint8_t buf[2];
++    uintptr_t len = ctx->len;
+     uint16_t dsp;
+ 
+     switch (ld) {
+@@ -119,14 +135,18 @@ static void rx_index_addr(DisasContext *ctx, char out[8], int ld, int mi)
+         out[0] = '\0';
+         return;
+     case 1:
++        g_assert(len + 1 <= ARRAY_SIZE(ctx->bytes));
+         ctx->addr += 1;
+-        ctx->dis->read_memory_func(addr, buf, 1, ctx->dis);
+-        dsp = buf[0];
++        ctx->len += 1;
++        ctx->dis->read_memory_func(addr, ctx->bytes + len, 1, ctx->dis);
++        dsp = ctx->bytes[len];
+         break;
+     case 2:
++        g_assert(len + 2 <= ARRAY_SIZE(ctx->bytes));
+         ctx->addr += 2;
+-        ctx->dis->read_memory_func(addr, buf, 2, ctx->dis);
+-        dsp = lduw_le_p(buf);
++        ctx->len += 2;
++        ctx->dis->read_memory_func(addr, ctx->bytes + len, 2, ctx->dis);
++        dsp = lduw_le_p(ctx->bytes + len);
+         break;
+     default:
+         g_assert_not_reached();
+@@ -1392,8 +1412,10 @@ int print_insn_rx(bfd_vma addr, disassemble_info *dis)
+     DisasContext ctx;
+     uint32_t insn;
+     int i;
++
+     ctx.dis = dis;
+     ctx.pc = ctx.addr = addr;
++    ctx.len = 0;
+ 
+     insn = decode_load(&ctx);
+     if (!decode(&ctx, insn)) {
+-- 
+2.17.1
+
 
