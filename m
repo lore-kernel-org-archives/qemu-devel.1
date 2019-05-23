@@ -2,86 +2,62 @@ Return-Path: <SRS0=bvyN=TX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9ECA0C282DE
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 08:27:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 77E59C04AAC
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 08:27:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 62CEB20868
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 08:27:16 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mpH3i2CU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 62CEB20868
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 38D1F204FD
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 08:27:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 38D1F204FD
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:59726 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:59728 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hTj4F-0003uc-Af
-	for qemu-devel@archiver.kernel.org; Thu, 23 May 2019 04:27:15 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:47638)
+	id 1hTj4M-000407-Ck
+	for qemu-devel@archiver.kernel.org; Thu, 23 May 2019 04:27:22 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:47681)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.m.mail@gmail.com>) id 1hTj2Q-0002Ef-Gs
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 04:25:23 -0400
+	(envelope-from <armbru@redhat.com>) id 1hTj2U-0002Ev-Hy
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 04:25:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.m.mail@gmail.com>) id 1hTivA-0001xA-TO
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 04:17:54 -0400
-Received: from mail-oi1-x236.google.com ([2607:f8b0:4864:20::236]:45816)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
-	id 1hTiv8-0001vD-7u
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 04:17:51 -0400
-Received: by mail-oi1-x236.google.com with SMTP id w144so3698820oie.12
-	for <qemu-devel@nongnu.org>; Thu, 23 May 2019 01:17:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=mime-version:in-reply-to:references:from:date:message-id:subject:to
-	:cc; bh=rzEZJyqDmf7xVg8qHLD+pmzPhaiKNsJQgejt++rNI+A=;
-	b=mpH3i2CUJFYobNK9q859cRWvSUc0guUbZyydhnP3x7a6i11IFaCKRu/SBiDaTENXB5
-	aWCgNMLeVdI5gtVg2wiAGifmGOvnvUYalv+A/QRocObDBcZCM6BoQyBFWbNMfMDt31po
-	Wp7SxdFLC9LwdzApCWrxH4YK7KarqfdC47XcrwgCNT3hAtE12bIGYQP8JIfLoIscwP1L
-	ku6mhXECzx+Mpl8oZijf9R7n5jC0ipOAxQ+0rJqlw6LjbOrcvZctKHzwE/q8WB8fKQND
-	NJ2xj2Cn4xTQmPxFFy7WrwC/MIG8e3XntsAVj8ON1rT/kmVzTIwI1jk13B9eoeHOHKfU
-	KDfg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:in-reply-to:references:from:date
-	:message-id:subject:to:cc;
-	bh=rzEZJyqDmf7xVg8qHLD+pmzPhaiKNsJQgejt++rNI+A=;
-	b=p1PWP4+Z6soOdczC9v497Btm/GahOnrZYpDT9Hgo33woJWxsv/CGFI0g9KouPiHLz8
-	x+RGnK7OQwNBIPBE72Xo5SihPjmVCm4By0GS3f1Qj0IBgXs6JgQNQzJHIANMTSmytMO5
-	dHuJjvyYGZuopFFWVPwYTb9Z26YSYLEcsQXyyDQpZ95WMrIjqicfvjfZXgSF6ot6ddXz
-	P8AtoGokkJqIZxtFOq6lETJcdA2dCBmu9dc2HlwbzFrF1/u0Hhje7eTXiKPOXpgOx0dr
-	rc1j0z1rboVxm+lXyHj4n6w6a0VeWMtpF9YehihngH1BRXQxCAFW4/MS9bgO8HskN2M1
-	DvYw==
-X-Gm-Message-State: APjAAAXOEDAFaNmdd42R0vIEv8dCGAet+sLmMUlWSStc6YrCtPg8Qwmb
-	TWzxaf2nr72LuHsS+TWbfBuj+kB76iF6AbC6o3g=
-X-Google-Smtp-Source: APXvYqwfv9NQWiFz8tsJUbzbvB1hHv6HVfKZBWMm0F8w/+elHmYYYOsPCio3Ci2jvRuesZ9HBxd8xkKdKsctRnDB5C0=
-X-Received: by 2002:aca:1916:: with SMTP id l22mr2009152oii.136.1558599468317; 
-	Thu, 23 May 2019 01:17:48 -0700 (PDT)
-MIME-Version: 1.0
-Received: by 2002:a9d:410f:0:0:0:0:0 with HTTP; Thu, 23 May 2019 01:17:47
-	-0700 (PDT)
-Received: by 2002:a9d:410f:0:0:0:0:0 with HTTP; Thu, 23 May 2019 01:17:47
-	-0700 (PDT)
-In-Reply-To: <20190522222821.23850-1-richard.henderson@linaro.org>
-References: <20190522222821.23850-1-richard.henderson@linaro.org>
-From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Thu, 23 May 2019 10:17:47 +0200
-Message-ID: <CAL1e-=jzbtrbu6OnoAJ2Z7QyTGXfek4wFN-pzhQn9GJpXxLaMw@mail.gmail.com>
-To: Richard Henderson <richard.henderson@linaro.org>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::236
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Content-Filtered-By: Mailman/MimeDel 2.1.21
-Subject: Re: [Qemu-devel] [PULL 00/16] tcg queued patches
+	(envelope-from <armbru@redhat.com>) id 1hTit8-0000ts-Ph
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 04:15:48 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38278)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hTit8-0000t9-Ii
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 04:15:46 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+	[10.5.11.22])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id C68A9330260;
+	Thu, 23 May 2019 08:15:40 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-28.ams2.redhat.com
+	[10.36.116.28])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 5BCB21001E82;
+	Thu, 23 May 2019 08:15:40 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+	id E469F1132B6C; Thu, 23 May 2019 10:15:38 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: qemu-devel@nongnu.org
+Date: Thu, 23 May 2019 10:15:34 +0200
+Message-Id: <20190523081538.2291-4-armbru@redhat.com>
+In-Reply-To: <20190523081538.2291-1-armbru@redhat.com>
+References: <20190523081538.2291-1-armbru@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.29]);
+	Thu, 23 May 2019 08:15:40 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [RFC v4 3/7] Makefile: Rename targets for make
+ recursion
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -93,73 +69,172 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On May 23, 2019 12:32 AM, "Richard Henderson" <richard.henderson@linaro.org=
->
-wrote:
->
-> The following changes since commit
-a4f667b6714916683408b983cfe0a615a725775f:
->
->   Merge remote-tracking branch 'remotes/cohuck/tags/s390x-20190521-3'
-into staging (2019-05-21 16:30:13 +0100)
->
-> are available in the Git repository at:
->
->   https://github.com/rth7680/qemu.git tags/pull-tcg-20190522
->
-> for you to fetch changes up to 11e2bfef799024be4a08fcf6797fe0b22fb16b58:
->
->   tcg/i386: Use MOVDQA for TCG_TYPE_V128 load/store (2019-05-22 15:09:43
--0400)
->
-> ----------------------------------------------------------------
-> Misc gvec improvements
->
-> ----------------------------------------------------------------
+We make a few sub-directories recursively, in particular
+$(TARGET_DIRS).
 
-Why are =E2=80=9CReviewed-by:=E2=80=9D lines missing from all patches of th=
-is pull request?
+For goal "all", we do it the nice way: "all" has a prerequisite
+subdir-T for each T in $(TARGET_DIRS), and T's recipe runs make
+recursively.  Behaves nicely with -j and -k.
 
-Regerds,
-Aleksandar
+For other goals such as "clean" and "install", the recipe runs make
+recursively in a for loop.  Ignores -j and -k.
 
-> Richard Henderson (16):
->       tcg/i386: Fix dupi/dupm for avx1 and 32-bit hosts
->       tcg: Fix missing checks and clears in tcg_gen_gvec_dup_mem
->       tcg: Add support for vector bitwise select
->       tcg: Add support for vector compare select
->       tcg: Introduce do_op3_nofail for vector expansion
->       tcg: Expand vector minmax using cmp+cmpsel
->       tcg: Add TCG_OPF_NOT_PRESENT if TCG_TARGET_HAS_foo is negative
->       tcg/i386: Support vector comparison select value
->       tcg/i386: Remove expansion for missing minmax
->       tcg/i386: Use umin/umax in expanding unsigned compare
->       tcg/aarch64: Support vector bitwise select value
->       tcg/aarch64: Split up is_fimm
->       tcg/aarch64: Use MVNI in tcg_out_dupi_vec
->       tcg/aarch64: Build vector immediates with two insns
->       tcg/aarch64: Allow immediates for vector ORR and BIC
->       tcg/i386: Use MOVDQA for TCG_TYPE_V128 load/store
->
->  accel/tcg/tcg-runtime.h      |   2 +
->  tcg/aarch64/tcg-target.h     |   2 +
->  tcg/i386/tcg-target.h        |   2 +
->  tcg/tcg-op-gvec.h            |   7 +
->  tcg/tcg-op.h                 |   5 +
->  tcg/tcg-opc.h                |   5 +-
->  tcg/tcg.h                    |   2 +
->  accel/tcg/tcg-runtime-gvec.c |  14 ++
->  tcg/aarch64/tcg-target.inc.c | 371
-++++++++++++++++++++++++++++++++-----------
->  tcg/i386/tcg-target.inc.c    | 169 +++++++++++++-------
->  tcg/tcg-op-gvec.c            |  71 ++++++---
->  tcg/tcg-op-vec.c             | 142 ++++++++++++++---
->  tcg/tcg.c                    |   5 +
->  tcg/README                   |  11 ++
->  14 files changed, 620 insertions(+), 188 deletions(-)
->
+The next commit will fix that for "clean" and "install".  This commit
+prepares the ground by renaming the targets we use for "all" to
+include the goal for the sub-make.  This will permit reusing them for
+goals other than "all".
+
+Targets subdir-T for T in $(TARGET_DIRS) run "make all" in T.  Rename
+to T/all, and declare phony.
+
+Targets romsubdir-R for R in $(ROMS) run "make" in pc-bios/R.  Default
+goal is "all" for all R.  Rename to pc-bios/R/all, and declare phony.
+
+The remainder are renamed just for consistency.
+
+Target subdir-dtc runs "make libbft/libfdt.a" in dtc.  Rename to
+dtc/all, and declare phony.
+
+Target subdir-capstone runs make $(BUILD_DIR)/capstone/$(LIBCAPSTONE)
+in $(SRC_PATH)/capstone.  Rename to capstone/all, and declare phony.
+
+Target subdir-slirp runs "make" in $(SRC_PATH)/slirp.  Default goal is
+all, which builds $(BUILD_DIR)/libslirp.a.  Rename to slirp/all, and
+declare phony.
+
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+---
+ Makefile               | 30 ++++++++++++++++++------------
+ configure              |  6 +++---
+ tests/Makefile.include |  3 ++-
+ 3 files changed, 23 insertions(+), 16 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index 12e470fa03..09c726bcc2 100644
+--- a/Makefile
++++ b/Makefile
+@@ -436,8 +436,8 @@ config-host.h-timestamp: config-host.mak
+ qemu-options.def: $(SRC_PATH)/qemu-options.hx $(SRC_PATH)/scripts/hxtool
+ 	$(call quiet-command,sh $(SRC_PATH)/scripts/hxtool -h < $< > $@,"GEN","$@")
+ 
+-SUBDIR_RULES=$(patsubst %,subdir-%, $(TARGET_DIRS))
+-SOFTMMU_SUBDIR_RULES=$(filter %-softmmu,$(SUBDIR_RULES))
++SUBDIR_RULES=$(addsuffix /all, $(TARGET_DIRS))
++SOFTMMU_SUBDIR_RULES=$(filter %-softmmu/all,$(SUBDIR_RULES))
+ 
+ $(SOFTMMU_SUBDIR_RULES): $(authz-obj-y)
+ $(SOFTMMU_SUBDIR_RULES): $(block-obj-y)
+@@ -447,14 +447,16 @@ $(SOFTMMU_SUBDIR_RULES): $(io-obj-y)
+ $(SOFTMMU_SUBDIR_RULES): config-all-devices.mak
+ $(SOFTMMU_SUBDIR_RULES): $(edk2-decompressed)
+ 
+-subdir-%:
+-	$(call quiet-command,$(MAKE) $(SUBDIR_MAKEFLAGS) -C $* V="$(V)" TARGET_DIR="$*/" all,)
++.PHONY: $(SUBDIR_RULES)
++$(SUBDIR_RULES):
++	$(call quiet-command,$(MAKE) $(SUBDIR_MAKEFLAGS) -C $(dir $@) V="$(V)" TARGET_DIR="$(dir $@)" all,)
+ 
+ DTC_MAKE_ARGS=-I$(SRC_PATH)/dtc VPATH=$(SRC_PATH)/dtc -C dtc V="$(V)" LIBFDT_srcdir=$(SRC_PATH)/dtc/libfdt
+ DTC_CFLAGS=$(CFLAGS) $(QEMU_CFLAGS)
+ DTC_CPPFLAGS=-I$(BUILD_DIR)/dtc -I$(SRC_PATH)/dtc -I$(SRC_PATH)/dtc/libfdt
+ 
+-subdir-dtc: .git-submodule-status dtc/libfdt dtc/tests
++.PHONY: dtc/all
++dtc/all: .git-submodule-status dtc/libfdt dtc/tests
+ 	$(call quiet-command,$(MAKE) $(DTC_MAKE_ARGS) CPPFLAGS="$(DTC_CPPFLAGS)" CFLAGS="$(DTC_CFLAGS)" LDFLAGS="$(LDFLAGS)" ARFLAGS="$(ARFLAGS)" CC="$(CC)" AR="$(AR)" LD="$(LD)" $(SUBDIR_MAKEFLAGS) libfdt/libfdt.a,)
+ 
+ dtc/%: .git-submodule-status
+@@ -472,21 +474,25 @@ CAP_CFLAGS += -DCAPSTONE_HAS_ARM64
+ CAP_CFLAGS += -DCAPSTONE_HAS_POWERPC
+ CAP_CFLAGS += -DCAPSTONE_HAS_X86
+ 
+-subdir-capstone: .git-submodule-status
++.PHONY: capstone/all
++capstone/all: .git-submodule-status
+ 	$(call quiet-command,$(MAKE) -C $(SRC_PATH)/capstone CAPSTONE_SHARED=no BUILDDIR="$(BUILD_DIR)/capstone" CC="$(CC)" AR="$(AR)" LD="$(LD)" RANLIB="$(RANLIB)" CFLAGS="$(CAP_CFLAGS)" $(SUBDIR_MAKEFLAGS) $(BUILD_DIR)/capstone/$(LIBCAPSTONE))
+ 
+-subdir-slirp: .git-submodule-status
++.PHONY: slirp/all
++slirp/all: .git-submodule-status
+ 	$(call quiet-command,$(MAKE) -C $(SRC_PATH)/slirp BUILD_DIR="$(BUILD_DIR)/slirp" CC="$(CC)" AR="$(AR)" LD="$(LD)" RANLIB="$(RANLIB)" CFLAGS="$(QEMU_CFLAGS) $(CFLAGS)" LDFLAGS="$(LDFLAGS)")
+ 
+ $(SUBDIR_RULES): libqemuutil.a $(common-obj-y) \
+ 	$(qom-obj-y) $(crypto-aes-obj-$(CONFIG_USER_ONLY))
+ 
+-ROMSUBDIR_RULES=$(patsubst %,romsubdir-%, $(ROMS))
++ROM_DIRS = $(addprefix pc-bios/, $(ROMS))
++ROMSUBDIR_RULES=$(addsuffix /all, $(ROM_DIRS))
+ # Only keep -O and -g cflags
+-romsubdir-%:
+-	$(call quiet-command,$(MAKE) $(SUBDIR_MAKEFLAGS) -C pc-bios/$* V="$(V)" TARGET_DIR="$*/" CFLAGS="$(filter -O% -g%,$(CFLAGS))",)
++.PHONY: $(ROMSUBDIR_RULES)
++$(ROMSUBDIR_RULES):
++	$(call quiet-command,$(MAKE) $(SUBDIR_MAKEFLAGS) -C $(dir $@) V="$(V)" TARGET_DIR="$(dir $@)" CFLAGS="$(filter -O% -g%,$(CFLAGS))",)
+ 
+-ALL_SUBDIRS=$(TARGET_DIRS) $(patsubst %,pc-bios/%, $(ROMS))
++ALL_SUBDIRS=$(TARGET_DIRS) $(ROM_DIRS)
+ 
+ recurse-all: $(SUBDIR_RULES) $(ROMSUBDIR_RULES)
+ 
+@@ -1087,7 +1093,7 @@ endif
+ 	@$(if $(TARGET_DIRS), \
+ 		echo 'Architecture specific targets:'; \
+ 		$(foreach t, $(TARGET_DIRS), \
+-		printf "  %-30s - Build for %s\\n" $(patsubst %,subdir-%,$(t)) $(t);) \
++		printf "  %-30s - Build for %s\\n" $(t)/all $(t);) \
+ 		echo '')
+ 	@echo  'Cleaning targets:'
+ 	@echo  '  clean           - Remove most generated files but keep the config'
+diff --git a/configure b/configure
+index d2fc346302..2897434dda 100755
+--- a/configure
++++ b/configure
+@@ -6570,7 +6570,7 @@ if test "$slirp" != "no"; then
+   echo "SLIRP_LIBS=$slirp_libs" >> $config_host_mak
+ fi
+ if [ "$slirp" = "git" -o "$slirp" = "internal" ]; then
+-    echo "config-host.h: subdir-slirp" >> $config_host_mak
++    echo "config-host.h: slirp/all" >> $config_host_mak
+ fi
+ if test "$vde" = "yes" ; then
+   echo "CONFIG_VDE=y" >> $config_host_mak
+@@ -7836,10 +7836,10 @@ if test -n "$enabled_cross_compilers"; then
+ fi
+ 
+ if [ "$fdt" = "git" ]; then
+-  echo "config-host.h: subdir-dtc" >> $config_host_mak
++  echo "config-host.h: dtc/all" >> $config_host_mak
+ fi
+ if [ "$capstone" = "git" -o "$capstone" = "internal" ]; then
+-  echo "config-host.h: subdir-capstone" >> $config_host_mak
++  echo "config-host.h: capstone/all" >> $config_host_mak
+ fi
+ if test -n "$LIBCAPSTONE"; then
+   echo "LIBCAPSTONE=$LIBCAPSTONE" >> $config_host_mak
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index 1865f6b322..2b8d34ca25 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -1,3 +1,4 @@
++# -*- Mode: makefile -*-
+ 
+ .PHONY: check-help
+ check-help:
+@@ -880,7 +881,7 @@ define do_test_tap
+ endef
+ 
+ .PHONY: $(patsubst %, check-qtest-%, $(QTEST_TARGETS))
+-$(patsubst %, check-qtest-%, $(QTEST_TARGETS)): check-qtest-%: subdir-%-softmmu $(check-qtest-y)
++$(patsubst %, check-qtest-%, $(QTEST_TARGETS)): check-qtest-%: %-softmmu/all $(check-qtest-y)
+ 	$(call do_test_human,$(check-qtest-$*-y) $(check-qtest-generic-y), \
+ 	  QTEST_QEMU_BINARY=$*-softmmu/qemu-system-$* \
+ 	  QTEST_QEMU_IMG=qemu-img$(EXESUF))
+-- 
+2.17.2
+
+
