@@ -2,59 +2,90 @@ Return-Path: <SRS0=bvyN=TX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A897C282DE
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 10:41:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C2A6C282DD
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 10:42:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E00F320851
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 10:41:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E00F320851
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 447A720851
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 10:42:59 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="KknHiVSn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 447A720851
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:33317 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:33329 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hTlAJ-0002ai-3R
-	for qemu-devel@archiver.kernel.org; Thu, 23 May 2019 06:41:39 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:49639)
+	id 1hTlBa-0003cL-Bc
+	for qemu-devel@archiver.kernel.org; Thu, 23 May 2019 06:42:58 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:49412)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pagupta@redhat.com>) id 1hTkvP-00060Y-5b
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 06:26:18 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1hTkvK-0005ue-0Z
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 06:26:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pagupta@redhat.com>) id 1hTkvM-0001Vl-7v
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 06:26:14 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55640)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pagupta@redhat.com>) id 1hTkvK-00014n-3i
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 06:26:10 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D8F4A21BAA;
-	Thu, 23 May 2019 10:25:47 +0000 (UTC)
-Received: from dhcp201-121.englab.pnq.redhat.com (ovpn-116-162.sin2.redhat.com
-	[10.67.116.162])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 6D41A6606C;
-	Thu, 23 May 2019 10:25:20 +0000 (UTC)
-From: Pankaj Gupta <pagupta@redhat.com>
+	(envelope-from <alex.bennee@linaro.org>) id 1hTkvA-0001Jr-OO
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 06:26:06 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:34351)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1hTkv4-0000uS-DP
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 06:25:58 -0400
+Received: by mail-wm1-x342.google.com with SMTP id j187so6754165wma.1
+	for <qemu-devel@nongnu.org>; Thu, 23 May 2019 03:25:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=from:to:cc:subject:date:message-id:in-reply-to:references
+	:mime-version:content-transfer-encoding;
+	bh=ClzRD6CI4ag8pii4JNWlYLGFqOxEmOFpGkxKaMBsRlY=;
+	b=KknHiVSn4tKPDo6MAF76n0trlEPaus08nEOmHAyxZyjfPBavs6gGNS91/oIaT2gpIO
+	OVDIrnkHSlhg46TQ33HUC1IyQ6Kp8c3TeqweRi6CLc0+f3JoaGKBw9i2pdQrsaTv1XgI
+	iEiTSCXZT1IPGZA7hImPvgfMxPOqSo8u56F5wc+mjPri58EbWhwgyQ2/f17rUKlNs+vS
+	1C8BRS2C06SFjGItDADj4591O7ByeD17TLfaWvbA39ECvi4hr+t9Ljvf4YIAQQTbmTKN
+	4dhM7wNKNsciMwbkrBb3Vs+VbQ88uUfVta+gk7D7Gc8389rPq8HRYN21iQoInY9rqMOk
+	trbA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+	:references:mime-version:content-transfer-encoding;
+	bh=ClzRD6CI4ag8pii4JNWlYLGFqOxEmOFpGkxKaMBsRlY=;
+	b=ZwtT4suNyAqRkjyfiqaNr1Wg6wg1vwrE3VReH5aMN+Ld1r+zoetrtJ7XI0Lgi1S0N/
+	02DsUmRb6Hi5+n8psuT+bJyVpGYq5NBdposGKpXcz0G5RsRXx5rhjOED3TctKLsRN40s
+	+ukF+QM8lkoIsdf9FwHDZJhxEwnRgqgRQLEJs36GzpKh4leePtAUMhAzi8IhLB9e6X/0
+	fSfmXhIHj+SUvhlzMIQ0KJe4KmCAuBKrnzM/22S1ittgOyoZD+UvhnwKgLTRFbOeG8EG
+	NzPLMaAm0YSXk8VnnbqKOWhkynmfDamVTq1Mi/BGv3sqCm+gCtTzNtcNe1olK2fr+FRf
+	WcpQ==
+X-Gm-Message-State: APjAAAWPtEvA9imu58pNNdgW1I8lGUyHgDhVHFXrLv6xRmBm51hsY0T2
+	Zg84uxJ57bktOM15MhHXZQ8xnHC5dnQ=
+X-Google-Smtp-Source: APXvYqyWs78GUzteu2dAde2p7C6NOldmjHqQZBRLegw0J6EDkTlQOJCnkqSlf2pnbrrh29shMqvkYg==
+X-Received: by 2002:a1c:7303:: with SMTP id d3mr10893139wmb.119.1558607137301; 
+	Thu, 23 May 2019 03:25:37 -0700 (PDT)
+Received: from zen.linaroharston ([81.128.185.34])
+	by smtp.gmail.com with ESMTPSA id n5sm7077195wrj.27.2019.05.23.03.25.33
+	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+	Thu, 23 May 2019 03:25:35 -0700 (PDT)
+Received: from zen.linaroharston. (localhost [127.0.0.1])
+	by zen.linaroharston (Postfix) with ESMTP id E42081FF92;
+	Thu, 23 May 2019 11:25:32 +0100 (BST)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Thu, 23 May 2019 15:54:43 +0530
-Message-Id: <20190523102449.2642-2-pagupta@redhat.com>
-In-Reply-To: <20190523102449.2642-1-pagupta@redhat.com>
-References: <20190523102449.2642-1-pagupta@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.30]);
-	Thu, 23 May 2019 10:25:47 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH 1/7] virtio-pmem: add virtio device
+Date: Thu, 23 May 2019 11:25:09 +0100
+Message-Id: <20190523102532.10486-6-alex.bennee@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190523102532.10486-1-alex.bennee@linaro.org>
+References: <20190523102532.10486-1-alex.bennee@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2a00:1450:4864:20::342
+Subject: [Qemu-devel] [PATCH v2 05/28] target/arm: fixup some of the
+ commentary for arm-semi
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -66,375 +97,128 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, aarcange@redhat.com, cohuck@redhat.com,
-	xiaoguangrong.eric@gmail.com, mst@redhat.com, pagupta@redhat.com,
-	riel@surriel.com, david@redhat.com, armbru@redhat.com,
-	ehabkost@redhat.com, lcapitulino@redhat.com, stefanha@redhat.com,
-	pbonzini@redhat.com, imammedo@redhat.com,
-	dan.j.williams@intel.com, nilal@redhat.com, dgilbert@redhat.com,
-	rth@twiddle.net
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+	qemu-arm@nongnu.org,
+	=?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+	Peter Maydell <peter.maydell@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is the implementation of virtio-pmem device. Support will require
-machine changes for the architectures that will support it, so it will
-not yet be compiled. It can be unlocked with VIRTIO_PMEM_SUPPORTED per
-machine and disabled globally via VIRTIO_PMEM.
+This cleans up a number of the block comments to fit the proper style.
+While we are at it we also reference the official specification and
+document what the return register value can be.
 
-We cannot use the "addr" property as that is already used e.g. for
-virtio-pci/pci devices. And we will have e.g. virtio-pmem-pci as a proxy.
-So we have to choose a different one (unfortunately). "memaddr" it is.
-That name should ideally be used by all other virtio-* based memory
-devices in the future.
-    -device virtio-pmem-pci,id=p0,bus=bux0,addr=0x01,memaddr=0x1000000...
-
-Acked-by: Markus Armbruster <armbru@redhat.com>
-[ QAPI bits ]
-Signed-off-by: Pankaj Gupta <pagupta@redhat.com>
-[ MemoryDevice/MemoryRegion changes, cleanups, addr property "memaddr",
-  split up patches, unplug handler ]
-Signed-off-by: David Hildenbrand <david@redhat.com>
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 ---
- hw/virtio/Kconfig               |  10 +++
- hw/virtio/Makefile.objs         |   1 +
- hw/virtio/virtio-pmem.c         | 190 ++++++++++++++++++++++++++++++++++++++++
- include/hw/virtio/virtio-pmem.h |  49 +++++++++++
- qapi/misc.json                  |  28 +++++-
- 5 files changed, 277 insertions(+), 1 deletion(-)
- create mode 100644 hw/virtio/virtio-pmem.c
- create mode 100644 include/hw/virtio/virtio-pmem.h
+ target/arm/arm-semi.c | 40 +++++++++++++++++++++++++++++++---------
+ 1 file changed, 31 insertions(+), 9 deletions(-)
 
-diff --git a/hw/virtio/Kconfig b/hw/virtio/Kconfig
-index e0452de4ba..3724ff8bac 100644
---- a/hw/virtio/Kconfig
-+++ b/hw/virtio/Kconfig
-@@ -29,3 +29,13 @@ config VIRTIO_CRYPTO
-     bool
-     default y
-     depends on VIRTIO
-+
-+config VIRTIO_PMEM_SUPPORTED
-+    bool
-+
-+config VIRTIO_PMEM
-+    bool
-+    default y
-+    depends on VIRTIO
-+    depends on VIRTIO_PMEM_SUPPORTED
-+    select MEM_DEVICE
-diff --git a/hw/virtio/Makefile.objs b/hw/virtio/Makefile.objs
-index f2ab667a21..a5bdbb16aa 100644
---- a/hw/virtio/Makefile.objs
-+++ b/hw/virtio/Makefile.objs
-@@ -12,6 +12,7 @@ common-obj-$(CONFIG_VIRTIO_MMIO) += virtio-mmio.o
- obj-$(CONFIG_VIRTIO_BALLOON) += virtio-balloon.o
- obj-$(CONFIG_VIRTIO_CRYPTO) += virtio-crypto.o
- obj-$(call land,$(CONFIG_VIRTIO_CRYPTO),$(CONFIG_VIRTIO_PCI)) += virtio-crypto-pci.o
-+obj-$(CONFIG_VIRTIO_PMEM) += virtio-pmem.o
- obj-$(CONFIG_VHOST_VSOCK) += vhost-vsock.o
+diff --git a/target/arm/arm-semi.c b/target/arm/arm-semi.c
+index 3273306c8ea..9e5a414dd89 100644
+--- a/target/arm/arm-semi.c
++++ b/target/arm/arm-semi.c
+@@ -2,6 +2,7 @@
+  *  Arm "Angel" semihosting syscalls
+  *
+  *  Copyright (c) 2005, 2007 CodeSourcery.
++ *  Copyright (c) 2019 Linaro
+  *  Written by Paul Brook.
+  *
+  *  This program is free software; you can redistribute it and/or modify
+@@ -16,6 +17,10 @@
+  *
+  *  You should have received a copy of the GNU General Public License
+  *  along with this program; if not, see <http://www.gnu.org/licenses/>.
++ *
++ *  ARM Semihosting is documented in:
++ *     Semihosting for AArch32 and AArch64 Release 2.0
++ *     https://static.docs.arm.com/100863/0200/semihosting.pdf
+  */
  
- ifeq ($(CONFIG_VIRTIO_PCI),y)
-diff --git a/hw/virtio/virtio-pmem.c b/hw/virtio/virtio-pmem.c
-new file mode 100644
-index 0000000000..c462d2c942
---- /dev/null
-+++ b/hw/virtio/virtio-pmem.c
-@@ -0,0 +1,190 @@
+ #include "qemu/osdep.h"
+@@ -240,6 +245,15 @@ static target_ulong arm_gdb_syscall(ARMCPU *cpu, gdb_syscall_complete_cb cb,
+      put_user_u64(val, args + (n) * 8) :                \
+      put_user_u32(val, args + (n) * 4))
+ 
 +/*
-+ * Virtio PMEM device
++ * Do a semihosting call.
 + *
-+ * Copyright (C) 2018-2019 Red Hat, Inc.
-+ *
-+ * Authors:
-+ *  Pankaj Gupta <pagupta@redhat.com>
-+ *  David Hildenbrand <david@redhat.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2.
-+ * See the COPYING file in the top-level directory.
++ * The specification always says that the "return register" either
++ * returns a specific value or is corrupted, so we don't need to
++ * report to our caller whether we are returning a value or trying to
++ * leave the register unchanged. We use 0xdeadbeef as the return value
++ * when there isn't a defined return value for the call.
 + */
-+
-+#include "qemu/osdep.h"
-+#include "qapi/error.h"
-+#include "qemu-common.h"
-+#include "qemu/error-report.h"
-+#include "hw/virtio/virtio-pmem.h"
-+#include "hw/virtio/virtio-access.h"
-+#include "standard-headers/linux/virtio_ids.h"
-+#include "standard-headers/linux/virtio_pmem.h"
-+#include "block/aio.h"
-+#include "block/thread-pool.h"
-+
-+typedef struct VirtIODeviceRequest {
-+    VirtQueueElement elem;
-+    int fd;
-+    VirtIOPMEM *pmem;
-+    VirtIODevice *vdev;
-+    struct virtio_pmem_req req;
-+    struct virtio_pmem_resp resp;
-+} VirtIODeviceRequest;
-+
-+static int worker_cb(void *opaque)
-+{
-+    VirtIODeviceRequest *req_data = opaque;
-+    int err = 0;
-+
-+    /* flush raw backing image */
-+    err = fsync(req_data->fd);
-+    if (err != 0) {
-+        err = 1;
-+    }
-+
-+    virtio_stw_p(req_data->vdev, &req_data->resp.ret, err);
-+
-+    return 0;
-+}
-+
-+static void done_cb(void *opaque, int ret)
-+{
-+    VirtIODeviceRequest *req_data = opaque;
-+    int len = iov_from_buf(req_data->elem.in_sg, req_data->elem.in_num, 0,
-+                              &req_data->resp, sizeof(struct virtio_pmem_resp));
-+
-+    /* Callbacks are serialized, so no need to use atomic ops. */
-+    virtqueue_push(req_data->pmem->rq_vq, &req_data->elem, len);
-+    virtio_notify((VirtIODevice *)req_data->pmem, req_data->pmem->rq_vq);
-+    g_free(req_data);
-+}
-+
-+static void virtio_pmem_flush(VirtIODevice *vdev, VirtQueue *vq)
-+{
-+    VirtIODeviceRequest *req_data;
-+    VirtIOPMEM *pmem = VIRTIO_PMEM(vdev);
-+    HostMemoryBackend *backend = MEMORY_BACKEND(pmem->memdev);
-+    ThreadPool *pool = aio_get_thread_pool(qemu_get_aio_context());
-+
-+    req_data = virtqueue_pop(vq, sizeof(VirtIODeviceRequest));
-+    if (!req_data) {
-+        virtio_error(vdev, "virtio-pmem missing request data");
-+        return;
-+    }
-+
-+    if (req_data->elem.out_num < 1 || req_data->elem.in_num < 1) {
-+        virtio_error(vdev, "virtio-pmem request not proper");
-+        g_free(req_data);
-+        return;
-+    }
-+    req_data->fd   = memory_region_get_fd(&backend->mr);
-+    req_data->pmem = pmem;
-+    req_data->vdev = vdev;
-+    thread_pool_submit_aio(pool, worker_cb, req_data, done_cb, req_data);
-+}
-+
-+static void virtio_pmem_get_config(VirtIODevice *vdev, uint8_t *config)
-+{
-+    VirtIOPMEM *pmem = VIRTIO_PMEM(vdev);
-+    struct virtio_pmem_config *pmemcfg = (struct virtio_pmem_config *) config;
-+
-+    virtio_stq_p(vdev, &pmemcfg->start, pmem->start);
-+    virtio_stq_p(vdev, &pmemcfg->size, memory_region_size(&pmem->memdev->mr));
-+}
-+
-+static uint64_t virtio_pmem_get_features(VirtIODevice *vdev, uint64_t features,
-+                                        Error **errp)
-+{
-+    return features;
-+}
-+
-+static void virtio_pmem_realize(DeviceState *dev, Error **errp)
-+{
-+    VirtIODevice *vdev = VIRTIO_DEVICE(dev);
-+    VirtIOPMEM *pmem = VIRTIO_PMEM(dev);
-+
-+    if (!pmem->memdev) {
-+        error_setg(errp, "virtio-pmem memdev not set");
-+        return;
-+    }
-+
-+    if (host_memory_backend_is_mapped(pmem->memdev)) {
-+        char *path = object_get_canonical_path_component(OBJECT(pmem->memdev));
-+        error_setg(errp, "can't use already busy memdev: %s", path);
-+        g_free(path);
-+        return;
-+    }
-+
-+    host_memory_backend_set_mapped(pmem->memdev, true);
-+    virtio_init(vdev, TYPE_VIRTIO_PMEM, VIRTIO_ID_PMEM,
-+                sizeof(struct virtio_pmem_config));
-+    pmem->rq_vq = virtio_add_queue(vdev, 128, virtio_pmem_flush);
-+}
-+
-+static void virtio_pmem_unrealize(DeviceState *dev, Error **errp)
-+{
-+    VirtIODevice *vdev = VIRTIO_DEVICE(dev);
-+    VirtIOPMEM *pmem = VIRTIO_PMEM(dev);
-+
-+    host_memory_backend_set_mapped(pmem->memdev, false);
-+    pmem->rq_vq = virtio_add_queue(vdev, 128, virtio_pmem_flush);
-+    virtio_cleanup(vdev);
-+}
-+
-+static void virtio_pmem_fill_device_info(const VirtIOPMEM *pmem,
-+                                         VirtioPMEMDeviceInfo *vi)
-+{
-+    vi->memaddr = pmem->start;
-+    vi->size = pmem->memdev ? memory_region_size(&pmem->memdev->mr) : 0;
-+    vi->memdev = object_get_canonical_path(OBJECT(pmem->memdev));
-+}
-+
-+static MemoryRegion *virtio_pmem_get_memory_region(VirtIOPMEM *pmem,
-+                                                   Error **errp)
-+{
-+    if (!pmem->memdev) {
-+        error_setg(errp, "'%s' property must be set", VIRTIO_PMEM_MEMDEV_PROP);
-+        return NULL;
-+    }
-+
-+    return &pmem->memdev->mr;
-+}
-+
-+static Property virtio_pmem_properties[] = {
-+    DEFINE_PROP_UINT64(VIRTIO_PMEM_ADDR_PROP, VirtIOPMEM, start, 0),
-+    DEFINE_PROP_LINK(VIRTIO_PMEM_MEMDEV_PROP, VirtIOPMEM, memdev,
-+                     TYPE_MEMORY_BACKEND, HostMemoryBackend *),
-+    DEFINE_PROP_END_OF_LIST(),
-+};
-+
-+static void virtio_pmem_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+    VirtioDeviceClass *vdc = VIRTIO_DEVICE_CLASS(klass);
-+    VirtIOPMEMClass *vpc = VIRTIO_PMEM_CLASS(klass);
-+
-+    dc->props = virtio_pmem_properties;
-+
-+    vdc->realize = virtio_pmem_realize;
-+    vdc->unrealize = virtio_pmem_unrealize;
-+    vdc->get_config = virtio_pmem_get_config;
-+    vdc->get_features = virtio_pmem_get_features;
-+
-+    vpc->fill_device_info = virtio_pmem_fill_device_info;
-+    vpc->get_memory_region = virtio_pmem_get_memory_region;
-+}
-+
-+static TypeInfo virtio_pmem_info = {
-+    .name          = TYPE_VIRTIO_PMEM,
-+    .parent        = TYPE_VIRTIO_DEVICE,
-+    .class_size    = sizeof(VirtIOPMEMClass),
-+    .class_init    = virtio_pmem_class_init,
-+    .instance_size = sizeof(VirtIOPMEM),
-+};
-+
-+static void virtio_register_types(void)
-+{
-+    type_register_static(&virtio_pmem_info);
-+}
-+
-+type_init(virtio_register_types)
-diff --git a/include/hw/virtio/virtio-pmem.h b/include/hw/virtio/virtio-pmem.h
-new file mode 100644
-index 0000000000..19b6ee6d75
---- /dev/null
-+++ b/include/hw/virtio/virtio-pmem.h
-@@ -0,0 +1,49 @@
-+/*
-+ * Virtio PMEM device
-+ *
-+ * Copyright (C) 2018-2019 Red Hat, Inc.
-+ *
-+ * Authors:
-+ *  Pankaj Gupta <pagupta@redhat.com>
-+ *  David Hildenbrand <david@redhat.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2.
-+ * See the COPYING file in the top-level directory.
-+ */
-+
-+#ifndef HW_VIRTIO_PMEM_H
-+#define HW_VIRTIO_PMEM_H
-+
-+#include "hw/virtio/virtio.h"
-+#include "sysemu/hostmem.h"
-+
-+#define TYPE_VIRTIO_PMEM "virtio-pmem"
-+
-+#define VIRTIO_PMEM(obj) \
-+        OBJECT_CHECK(VirtIOPMEM, (obj), TYPE_VIRTIO_PMEM)
-+#define VIRTIO_PMEM_CLASS(oc) \
-+        OBJECT_CLASS_CHECK(VirtIOPMEMClass, (oc), TYPE_VIRTIO_PMEM)
-+#define VIRTIO_PMEM_GET_CLASS(obj) \
-+        OBJECT_GET_CLASS(VirtIOPMEMClass, (obj), TYPE_VIRTIO_PMEM)
-+
-+#define VIRTIO_PMEM_ADDR_PROP "memaddr"
-+#define VIRTIO_PMEM_MEMDEV_PROP "memdev"
-+
-+typedef struct VirtIOPMEM {
-+    VirtIODevice parent_obj;
-+
-+    VirtQueue *rq_vq;
-+    uint64_t start;
-+    HostMemoryBackend *memdev;
-+} VirtIOPMEM;
-+
-+typedef struct VirtIOPMEMClass {
-+    /* private */
-+    VirtIODevice parent;
-+
-+    /* public */
-+    void (*fill_device_info)(const VirtIOPMEM *pmem, VirtioPMEMDeviceInfo *vi);
-+    MemoryRegion *(*get_memory_region)(VirtIOPMEM *pmem, Error **errp);
-+} VirtIOPMEMClass;
-+
-+#endif
-diff --git a/qapi/misc.json b/qapi/misc.json
-index 8b3ca4fdd3..605c347003 100644
---- a/qapi/misc.json
-+++ b/qapi/misc.json
-@@ -2742,16 +2742,42 @@
-           }
- }
+ target_ulong do_arm_semihosting(CPUARMState *env)
+ {
+     ARMCPU *cpu = arm_env_get_cpu(env);
+@@ -510,14 +524,16 @@ target_ulong do_arm_semihosting(CPUARMState *env)
  
-+##
-+# @VirtioPMEMDeviceInfo:
-+#
-+# VirtioPMEM state information
-+#
-+# @id: device's ID
-+#
-+# @memaddr: physical address in memory, where device is mapped
-+#
-+# @size: size of memory that the device provides
-+#
-+# @memdev: memory backend linked with device
-+#
-+# Since: 4.0
-+##
-+{ 'struct': 'VirtioPMEMDeviceInfo',
-+  'data': { '*id': 'str',
-+            'memaddr': 'size',
-+            'size': 'size',
-+            'memdev': 'str'
-+          }
-+}
-+
- ##
- # @MemoryDeviceInfo:
- #
- # Union containing information about a memory device
- #
-+# nvdimm is included since 2.12. virtio-pmem is included since 4.0.
-+#
- # Since: 2.1
- ##
- { 'union': 'MemoryDeviceInfo',
-   'data': { 'dimm': 'PCDIMMDeviceInfo',
--            'nvdimm': 'PCDIMMDeviceInfo'
-+            'nvdimm': 'PCDIMMDeviceInfo',
-+            'virtio-pmem': 'VirtioPMEMDeviceInfo'
-           }
- }
+             output_size = ts->info->arg_end - ts->info->arg_start;
+             if (!output_size) {
+-                /* We special-case the "empty command line" case (argc==0).
+-                   Just provide the terminating 0. */
++                /*
++                 * We special-case the "empty command line" case (argc==0).
++                 * Just provide the terminating 0.
++                 */
+                 output_size = 1;
+             }
+ #endif
  
+             if (output_size > input_size) {
+-                 /* Not enough space to store command-line arguments.  */
++                /* Not enough space to store command-line arguments.  */
+                 return -1;
+             }
+ 
+@@ -571,8 +587,10 @@ target_ulong do_arm_semihosting(CPUARMState *env)
+             GET_ARG(0);
+ 
+ #ifdef CONFIG_USER_ONLY
+-            /* Some C libraries assume the heap immediately follows .bss, so
+-               allocate it using sbrk.  */
++            /*
++             * Some C libraries assume the heap immediately follows .bss, so
++             * allocate it using sbrk.
++             */
+             if (!ts->heap_limit) {
+                 abi_ulong ret;
+ 
+@@ -620,7 +638,8 @@ target_ulong do_arm_semihosting(CPUARMState *env)
+         }
+     case TARGET_SYS_EXIT:
+         if (is_a64(env)) {
+-            /* The A64 version of this call takes a parameter block,
++            /*
++             * The A64 version of this call takes a parameter block,
+              * so the application-exit type can return a subcode which
+              * is the exit status code from the application.
+              */
+@@ -633,14 +652,17 @@ target_ulong do_arm_semihosting(CPUARMState *env)
+                 ret = 1;
+             }
+         } else {
+-            /* ARM specifies only Stopped_ApplicationExit as normal
+-             * exit, everything else is considered an error */
++            /*
++             * ARM specifies only Stopped_ApplicationExit as normal
++             * exit, everything else is considered an error
++             */
+             ret = (args == ADP_Stopped_ApplicationExit) ? 0 : 1;
+         }
+         gdb_exit(env, ret);
+         exit(ret);
+     case TARGET_SYS_SYNCCACHE:
+-        /* Clean the D-cache and invalidate the I-cache for the specified
++        /*
++         * Clean the D-cache and invalidate the I-cache for the specified
+          * virtual address range. This is a nop for us since we don't
+          * implement caches. This is only present on A64.
+          */
 -- 
-2.14.5
+2.20.1
 
 
