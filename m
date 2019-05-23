@@ -6,91 +6,90 @@ X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3EFF8C282DD
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 12:27:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 67A41C282DD
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 12:27:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 103C720851
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 12:27:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 103C720851
+	by mail.kernel.org (Postfix) with ESMTPS id 24C8820851
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 12:27:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 24C8820851
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:35235 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:35237 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hTmoN-0001TC-AR
-	for qemu-devel@archiver.kernel.org; Thu, 23 May 2019 08:27:07 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:45724)
+	id 1hTmoP-0001W7-8S
+	for qemu-devel@archiver.kernel.org; Thu, 23 May 2019 08:27:09 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:45811)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pmorel@linux.ibm.com>) id 1hTmmV-00087L-0c
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 08:25:12 -0400
+	(envelope-from <pmorel@linux.ibm.com>) id 1hTmmY-0008GY-Fk
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 08:25:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pmorel@linux.ibm.com>) id 1hTmmT-0002Qa-T4
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 08:25:10 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:59034
-	helo=mx0a-001b2d01.pphosted.com)
+	(envelope-from <pmorel@linux.ibm.com>) id 1hTmmW-0002Tr-Qe
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 08:25:14 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:57420)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pmorel@linux.ibm.com>)
-	id 1hTmmT-0002Pt-P9
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 08:25:09 -0400
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x4NC8vXm091383
-	for <qemu-devel@nongnu.org>; Thu, 23 May 2019 08:25:08 -0400
-Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2sntaw3h0k-1
+	id 1hTmmW-0002SP-Ga
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 08:25:12 -0400
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+	x4NCARJK140885
+	for <qemu-devel@nongnu.org>; Thu, 23 May 2019 08:25:09 -0400
+Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2snsjhwe20-1
 	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 23 May 2019 08:25:07 -0400
+	for <qemu-devel@nongnu.org>; Thu, 23 May 2019 08:25:09 -0400
 Received: from localhost
-	by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <pmorel@linux.ibm.com>;
-	Thu, 23 May 2019 13:25:05 +0100
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (9.149.109.195)
-	by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway:
+	Thu, 23 May 2019 13:25:06 +0100
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
+	by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway:
 	Authorized Use Only! Violators will be prosecuted; 
 	(version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-	Thu, 23 May 2019 13:25:02 +0100
+	Thu, 23 May 2019 13:25:04 +0100
 Received: from b06wcsmtp001.portsmouth.uk.ibm.com
 	(b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-	by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with
-	ESMTP id x4NCP1KI45875242
+	by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with
+	ESMTP id x4NCP2Uq44040372
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256
-	verify=OK); Thu, 23 May 2019 12:25:01 GMT
+	verify=OK); Thu, 23 May 2019 12:25:03 GMT
 Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 28757A405F;
-	Thu, 23 May 2019 12:25:01 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id DD0DEA4065;
+	Thu, 23 May 2019 12:25:02 +0000 (GMT)
 Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id C0EBFA4054;
-	Thu, 23 May 2019 12:25:00 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id 821F9A4060;
+	Thu, 23 May 2019 12:25:02 +0000 (GMT)
 Received: from morel-ThinkPad-W530.boeblingen.de.ibm.com (unknown
 	[9.152.222.40])
 	by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-	Thu, 23 May 2019 12:25:00 +0000 (GMT)
+	Thu, 23 May 2019 12:25:02 +0000 (GMT)
 From: Pierre Morel <pmorel@linux.ibm.com>
 To: cohuck@redhat.com
-Date: Thu, 23 May 2019 14:24:56 +0200
+Date: Thu, 23 May 2019 14:25:00 +0200
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1558614300-24574-1-git-send-email-pmorel@linux.ibm.com>
 References: <1558614300-24574-1-git-send-email-pmorel@linux.ibm.com>
 X-TM-AS-GCONF: 00
-x-cbid: 19052312-0016-0000-0000-0000027EB35A
+x-cbid: 19052312-0028-0000-0000-00000370B03A
 X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19052312-0017-0000-0000-000032DBAA2D
-Message-Id: <1558614300-24574-2-git-send-email-pmorel@linux.ibm.com>
+x-cbparentid: 19052312-0029-0000-0000-000024306257
+Message-Id: <1558614300-24574-6-git-send-email-pmorel@linux.ibm.com>
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
 	definitions=2019-05-23_10:, , signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
 	priorityscore=1501
-	malwarescore=0 suspectscore=1 phishscore=0 bulkscore=0 spamscore=0
+	malwarescore=0 suspectscore=4 phishscore=0 bulkscore=0 spamscore=0
 	clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
-	mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+	mlxlogscore=925 adultscore=0 classifier=spam adjust=0 reason=mlx
 	scancount=1 engine=8.0.1-1810050000 definitions=main-1905230087
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.158.5
-Subject: [Qemu-devel] [PATCH v2 1/5] vfio: vfio_iommu_type1: linux header
- place holder
+X-Received-From: 148.163.156.1
+Subject: [Qemu-devel] [PATCH v2 5/5] s390: vfio_pci: Get zPCI function info
+ from host
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -110,106 +109,165 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This should be copied from Linux kernel UAPI includes.
-The version used here is Linux 5.1.0
+We use the VFIO_REGION_SUBTYPE_ZDEV_CLP subregion of
+PCI_VENDOR_ID_IBM to retrieve the CLP information the
+kernel exports.
 
-We define a new device region in vfio.h to be able to
-get the ZPCI CLP information by reading this region from
-userland.
+To be compatible with previous kernel versions we fall back
+on previous predefined values, same as the emulation values,
+when the region is not found or when any problem happens
+during the search for the information.
 
-We create a new file, vfio_zdev.h to define the structure
-of the new region we defined in vfio.h
+Once we retrieved the host device information, we take care to
+- use the virtual UID and FID
+- Disable all the IOMMU flags we do not support yet.
+  Just keeping the refresh bit.
 
 Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
 ---
- linux-headers/linux/vfio.h      | 14 +++++++++++---
- linux-headers/linux/vfio_zdev.h | 34 ++++++++++++++++++++++++++++++++++
- 2 files changed, 45 insertions(+), 3 deletions(-)
- create mode 100644 linux-headers/linux/vfio_zdev.h
+ hw/s390x/s390-pci-bus.c | 82 +++++++++++++++++++++++++++++++++++++++++++++++--
+ hw/s390x/s390-pci-bus.h |  2 ++
+ 2 files changed, 82 insertions(+), 2 deletions(-)
 
-diff --git a/linux-headers/linux/vfio.h b/linux-headers/linux/vfio.h
-index 12a7b1d..56595b8 100644
---- a/linux-headers/linux/vfio.h
-+++ b/linux-headers/linux/vfio.h
-@@ -9,8 +9,8 @@
-  * it under the terms of the GNU General Public License version 2 as
-  * published by the Free Software Foundation.
-  */
--#ifndef VFIO_H
--#define VFIO_H
-+#ifndef _UAPIVFIO_H
-+#define _UAPIVFIO_H
+diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
+index 6df80aa..c4f4b2a 100644
+--- a/hw/s390x/s390-pci-bus.c
++++ b/hw/s390x/s390-pci-bus.c
+@@ -16,6 +16,8 @@
+ #include "qapi/visitor.h"
+ #include "qemu-common.h"
+ #include "cpu.h"
++#include "s390-pci-clp.h"
++#include <linux/vfio_zdev.h>
+ #include "s390-pci-bus.h"
+ #include "s390-pci-inst.h"
+ #include "hw/pci/pci_bus.h"
+@@ -23,6 +25,9 @@
+ #include "hw/pci/msi.h"
+ #include "qemu/error-report.h"
  
- #include <linux/types.h>
- #include <linux/ioctl.h>
-@@ -306,6 +306,10 @@ struct vfio_region_info_cap_type {
- #define VFIO_REGION_TYPE_GFX                    (1)
- #define VFIO_REGION_SUBTYPE_GFX_EDID            (1)
++#include "hw/vfio/pci.h"
++#include <sys/ioctl.h>
++
+ #ifndef DEBUG_S390PCI_BUS
+ #define DEBUG_S390PCI_BUS  0
+ #endif
+@@ -780,6 +785,75 @@ static void set_pbdev_info(S390PCIBusDevice *pbdev)
+     pbdev->pci_grp = s390_grp_find(ZPCI_DEFAULT_FN_GRP);
+ }
  
-+/* IBM Subtypes */
-+#define VFIO_REGION_TYPE_IBM_ZDEV		(1)
-+#define VFIO_REGION_SUBTYPE_ZDEV_CLP		(1)
++static int get_pbdev_info(S390PCIBusDevice *pbdev)
++{
++    VFIOPCIDevice *vfio_pci;
++    VFIODevice *vdev;
++    struct vfio_region_info *info;
++    CLPRegion *clp_region;
++    int size;
++    int ret;
 +
- /**
-  * struct vfio_region_gfx_edid - EDID region layout.
-  *
-@@ -353,6 +357,10 @@ struct vfio_region_gfx_edid {
- #define VFIO_DEVICE_GFX_LINK_STATE_DOWN  2
- };
++    vfio_pci = container_of(pbdev->pdev, VFIOPCIDevice, pdev);
++    vdev = &vfio_pci->vbasedev;
++
++    if (vdev->num_regions < VFIO_PCI_NUM_REGIONS + 1) {
++        /* Fall back to old handling */
++        return -ENODEV;
++    }
++
++    ret = vfio_get_dev_region_info(vdev,
++                                   PCI_VENDOR_ID_IBM |
++                                   VFIO_REGION_TYPE_PCI_VENDOR_TYPE,
++                                   VFIO_REGION_SUBTYPE_ZDEV_CLP, &info);
++    if (ret) {
++        /* Fall back to old handling */
++        return -EIO;
++    }
++
++    if (info->size != sizeof(CLPRegion)) {
++        /* Fall back to old handling */
++        g_free(info);
++        return -ENOMEM;
++    }
++    clp_region = g_malloc0(sizeof(*clp_region));
++    size = pread(vdev->fd, clp_region, sizeof(*clp_region), info->offset);
++    if (size != sizeof(*clp_region)) {
++        goto end;
++    }
++
++    pbdev->zpci_fn.fid = pbdev->fid;
++    pbdev->zpci_fn.uid = pbdev->uid;
++    pbdev->zpci_fn.sdma = clp_region->start_dma;
++    pbdev->zpci_fn.edma = clp_region->end_dma;
++    pbdev->zpci_fn.pchid = clp_region->pchid;
++    pbdev->zpci_fn.ug = clp_region->gid;
++    pbdev->pci_grp = s390_grp_find(clp_region->gid);
++
++    if (!pbdev->pci_grp) {
++        ClpRspQueryPciGrp *resgrp;
++
++        pbdev->pci_grp = s390_grp_create(clp_region->gid);
++
++        resgrp = &pbdev->pci_grp->zpci_grp;
++        if (clp_region->flags & VFIO_PCI_ZDEV_FLAGS_REFRESH) {
++            resgrp->fr = 1;
++        }
++        stq_p(&resgrp->dasm, clp_region->dasm);
++        stq_p(&resgrp->msia, clp_region->msi_addr);
++        stw_p(&resgrp->mui, clp_region->mui);
++        stw_p(&resgrp->i, clp_region->noi);
++        /* These two must be queried in a next iteration */
++        stw_p(&resgrp->maxstbl, 128);
++        resgrp->version = 0;
++    }
++
++end:
++    g_free(info);
++    g_free(clp_region);
++    return ret;
++}
++
+ static void s390_pcihost_realize(DeviceState *dev, Error **errp)
+ {
+     PCIBus *b;
+@@ -852,7 +926,8 @@ static int s390_pci_msix_init(S390PCIBusDevice *pbdev)
+     name = g_strdup_printf("msix-s390-%04x", pbdev->uid);
+     memory_region_init_io(&pbdev->msix_notify_mr, OBJECT(pbdev),
+                           &s390_msi_ctrl_ops, pbdev, name, PAGE_SIZE);
+-    memory_region_add_subregion(&pbdev->iommu->mr, ZPCI_MSI_ADDR,
++    memory_region_add_subregion(&pbdev->iommu->mr,
++                                pbdev->pci_grp->zpci_grp.msia,
+                                 &pbdev->msix_notify_mr);
+     g_free(name);
  
-+#define VFIO_REGION_TYPE_CCW			(2)
-+/* ccw sub-types */
-+#define VFIO_REGION_SUBTYPE_CCW_ASYNC_CMD	(1)
-+
- /*
-  * 10de vendor sub-type
-  *
-@@ -910,4 +918,4 @@ struct vfio_iommu_spapr_tce_remove {
+@@ -1002,12 +1077,15 @@ static void s390_pcihost_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+         pbdev->iommu = s390_pci_get_iommu(s, pci_get_bus(pdev), pdev->devfn);
+         pbdev->iommu->pbdev = pbdev;
+         pbdev->state = ZPCI_FS_DISABLED;
+-        set_pbdev_info(pbdev);
  
- /* ***************************************************************** */
+         if (object_dynamic_cast(OBJECT(dev), "vfio-pci")) {
+             pbdev->fh |= FH_SHM_VFIO;
++            if (get_pbdev_info(pbdev) != 0) {
++                set_pbdev_info(pbdev);
++            }
+         } else {
+             pbdev->fh |= FH_SHM_EMUL;
++            set_pbdev_info(pbdev);
+         }
  
--#endif /* VFIO_H */
-+#endif /* _UAPIVFIO_H */
-diff --git a/linux-headers/linux/vfio_zdev.h b/linux-headers/linux/vfio_zdev.h
-new file mode 100644
-index 0000000..84b1a82
---- /dev/null
-+++ b/linux-headers/linux/vfio_zdev.h
-@@ -0,0 +1,34 @@
-+/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
-+/*
-+ * Region definition for ZPCI devices
-+ *
-+ * Copyright IBM Corp. 2019
-+ *
-+ * Author(s): Pierre Morel <pmorel@linux.ibm.com>
-+ */
+         if (s390_pci_msix_init(pbdev)) {
+diff --git a/hw/s390x/s390-pci-bus.h b/hw/s390x/s390-pci-bus.h
+index 8c969d1..151e2d0 100644
+--- a/hw/s390x/s390-pci-bus.h
++++ b/hw/s390x/s390-pci-bus.h
+@@ -320,6 +320,8 @@ typedef struct S390PCIGroup {
+ } S390PCIGroup;
+ S390PCIGroup *s390_grp_find(int ug);
+ 
++typedef struct vfio_region_zpci_info CLPRegion;
 +
-+#ifndef _VFIO_ZDEV_H_
-+#define _VFIO_ZDEV_H_
-+
-+#include <linux/types.h>
-+
-+/**
-+ * struct vfio_region_zpci_info - ZPCI information.
-+ *
-+ */
-+struct vfio_region_zpci_info {
-+	__u64 dasm;
-+	__u64 start_dma;
-+	__u64 end_dma;
-+	__u64 msi_addr;
-+	__u64 flags;
-+	__u16 pchid;
-+	__u16 mui;
-+	__u16 noi;
-+	__u8 gid;
-+	__u8 version;
-+#define VFIO_PCI_ZDEV_FLAGS_REFRESH 1
-+	__u8 util_str[CLP_UTIL_STR_LEN];
-+} __packed;
-+
-+#endif
+ struct S390PCIBusDevice {
+     DeviceState qdev;
+     PCIDevice *pdev;
 -- 
 2.7.4
 
