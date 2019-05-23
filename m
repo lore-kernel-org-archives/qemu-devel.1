@@ -2,98 +2,72 @@ Return-Path: <SRS0=bvyN=TX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D837C282DD
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 13:58:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8ABFEC282DD
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 13:59:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 33E3E2133D
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 13:58:57 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="wfPQvqVq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 33E3E2133D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
+	by mail.kernel.org (Postfix) with ESMTPS id 5EF382133D
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 13:59:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5EF382133D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:36889 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:36897 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hToFE-0004dT-GN
-	for qemu-devel@archiver.kernel.org; Thu, 23 May 2019 09:58:56 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:45510)
+	id 1hToG1-0005Dp-Nv
+	for qemu-devel@archiver.kernel.org; Thu, 23 May 2019 09:59:45 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:42586)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <shmuel.eiderman@oracle.com>) id 1hToDv-0003ql-Iw
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 09:57:36 -0400
+	(envelope-from <crosa@redhat.com>) id 1hTo1w-00037O-5k
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 09:45:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <shmuel.eiderman@oracle.com>) id 1hToDu-0002D0-LF
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 09:57:35 -0400
-Received: from userp2130.oracle.com ([156.151.31.86]:44966)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <shmuel.eiderman@oracle.com>)
-	id 1hTo92-0007Tu-8B; Thu, 23 May 2019 09:52:32 -0400
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-	by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id
-	x4NDhSf7155184; Thu, 23 May 2019 13:52:31 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
-	h=from : to : cc :
-	subject : date : message-id : in-reply-to : references;
-	s=corp-2018-07-02; 
-	bh=qe8PLR9/UiNEo6e1lHVkJVCotNDWuaHF+uQaPNfv3zg=;
-	b=wfPQvqVqGAYiRoWVnvG9bzkoCp+8hK4AXM2VMGk52k0bJtC25DZ0eeaDORFZspMdQRSb
-	cr2hi/+0VBhkB0POI3BloPhFCOE3jY3PFX/sc/HuMDnV9iBhK5ezf82dp9wUBfN3NE8N
-	svnhTqL5OmIBieVf7funlUneUuWWSDMUTztbhcqTjYO8HdNXimq7IRmqJbR5jP/vpnvw
-	61Le8K0OU+keaM1Vnjb40wVQjYBmf9tv+i8oI1YZPFna+R2MgEkPRons4v/QAja0aRMq
-	KVXV5Fl+uOm7x9VtMXo7yXB3or+3/I3PjdbapRCTf35REm37WiqpvVmwEhXRebVPoZzz
-	Xw== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
-	by userp2130.oracle.com with ESMTP id 2smsk5jfbb-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 23 May 2019 13:52:31 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
-	by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id
-	x4NDqCqj101169; Thu, 23 May 2019 13:52:30 GMT
-Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
-	by aserp3020.oracle.com with ESMTP id 2smsh28rgq-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 23 May 2019 13:52:30 +0000
-Received: from abhmp0012.oracle.com (abhmp0012.oracle.com [141.146.116.18])
-	by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x4NDqTZb000431;
-	Thu, 23 May 2019 13:52:29 GMT
-Received: from nexus.ravello.local (/213.57.127.2)
-	by default (Oracle Beehive Gateway v4.0)
-	with ESMTP ; Thu, 23 May 2019 13:52:29 +0000
-From: Sam Eiderman <shmuel.eiderman@oracle.com>
-To: kwolf@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org,
-	mreitz@redhat.com
-Date: Thu, 23 May 2019 16:51:39 +0300
-Message-Id: <20190523135139.2147-4-shmuel.eiderman@oracle.com>
-X-Mailer: git-send-email 2.13.3
-In-Reply-To: <20190523135139.2147-1-shmuel.eiderman@oracle.com>
-References: <20190523135139.2147-1-shmuel.eiderman@oracle.com>
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9265
-	signatures=668687
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=2
-	malwarescore=0
-	phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
-	adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
-	engine=8.0.1-1810050000 definitions=main-1905230096
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9265
-	signatures=668687
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
-	priorityscore=1501 malwarescore=0
-	suspectscore=2 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
-	lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999
-	adultscore=0
-	classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
-	definitions=main-1905230096
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 156.151.31.86
-Subject: [Qemu-devel] [PATCH v3 3/3] qemu-img: rebase: Reuse in-chain
- BlockDriverState
+	(envelope-from <crosa@redhat.com>) id 1hTo1u-0006TG-PK
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 09:45:12 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41076)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <crosa@redhat.com>) id 1hTo1u-0006SJ-I3
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 09:45:10 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id C37A17EBAE;
+	Thu, 23 May 2019 13:45:04 +0000 (UTC)
+Received: from colo-mx.corp.redhat.com
+	(colo-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.20])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id B511D5C69A;
+	Thu, 23 May 2019 13:45:02 +0000 (UTC)
+Received: from zmail17.collab.prod.int.phx2.redhat.com
+	(zmail17.collab.prod.int.phx2.redhat.com [10.5.83.19])
+	by colo-mx.corp.redhat.com (Postfix) with ESMTP id 956EB1806B12;
+	Thu, 23 May 2019 13:45:01 +0000 (UTC)
+Date: Thu, 23 May 2019 09:45:01 -0400 (EDT)
+From: Cleber Rosa <crosa@redhat.com>
+To: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Message-ID: <1094559891.24356881.1558619101528.JavaMail.zimbra@redhat.com>
+In-Reply-To: <CAL1e-=iW2honEgNfrsFoA0tU1wMq0mw5LuoRbWVmRDBMA22ELA@mail.gmail.com>
+References: <20190520231910.12184-1-f4bug@amsat.org>
+	<20190522211230.GA10764@habkost.net>
+	<1711852617.24204010.1558561566547.JavaMail.zimbra@redhat.com>
+	<CAL1e-=iW2honEgNfrsFoA0tU1wMq0mw5LuoRbWVmRDBMA22ELA@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Originating-IP: [10.36.116.137, 10.4.195.29]
+Thread-Topic: mips: Add more Avocado tests
+Thread-Index: qL03d4Fa+xRGiw5N1qPYZ47/U0zyvA==
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.27]);
+	Thu, 23 May 2019 13:45:09 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH 0/4] mips: Add more Avocado tests
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -105,73 +79,128 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: eyal.moscovici@oracle.com, arbel.moshe@oracle.com, liran.alon@oracle.com,
-	shmuel.eiderman@oracle.com, sagi.amit@oracle.com, karl.heubaum@oracle.com
+Cc: Eduardo Habkost <ehabkost@redhat.com>,
+	Aleksandar Rikalo <arikalo@wavecomp.com>, qemu-devel@nongnu.org,
+	Wainer dos Santos Moschetta <wainersm@redhat.com>,
+	Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+	Aleksandar Markovic <amarkovic@wavecomp.com>,
+	Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-If a chain was detected, don't open a new BlockBackend from the target
-backing file which will create a new BlockDriverState. Instead, create
-an empty BlockBackend and attach the already open BlockDriverState.
 
-Permissions for blk_new() were copied from blk_new_open() when
-flags = 0.
 
-Reviewed-by: Karl Heubaum <karl.heubaum@oracle.com>
-Reviewed-by: Eyal Moscovici <eyal.moscovici@oracle.com>
-Signed-off-by: Sagi Amit <sagi.amit@oracle.com>
-Co-developed-by: Sagi Amit <sagi.amit@oracle.com>
-Signed-off-by: Sam Eiderman <shmuel.eiderman@oracle.com>
----
- qemu-img.c | 33 +++++++++++++++++++++++----------
- 1 file changed, 23 insertions(+), 10 deletions(-)
+----- Original Message -----
+> From: "Aleksandar Markovic" <aleksandar.m.mail@gmail.com>
+> To: "Cleber Rosa" <crosa@redhat.com>
+> Cc: "Wainer dos Santos Moschetta" <wainersm@redhat.com>, "Aleksandar Mark=
+ovic" <amarkovic@wavecomp.com>,
+> qemu-devel@nongnu.org, "Aleksandar Rikalo" <arikalo@wavecomp.com>, "Eduar=
+do Habkost" <ehabkost@redhat.com>,
+> "Aurelien Jarno" <aurelien@aurel32.net>, "Philippe Mathieu-Daud=C3=A9" <f=
+4bug@amsat.org>
+> Sent: Wednesday, May 22, 2019 6:43:54 PM
+> Subject: Re: [Qemu-devel] [PATCH 0/4] mips: Add more Avocado tests
+>=20
+> On May 22, 2019 11:46 PM, "Cleber Rosa" <crosa@redhat.com> wrote:
+> >
+> >
+> >
+> > ----- Original Message -----
+> > > From: "Eduardo Habkost" <ehabkost@redhat.com>
+> > > To: "Philippe Mathieu-Daud=C3=A9" <f4bug@amsat.org>
+> > > Cc: qemu-devel@nongnu.org, "Aleksandar Rikalo" <arikalo@wavecomp.com>=
+,
+> "Aleksandar Markovic"
+> > > <aleksandar.m.mail@gmail.com>, "Aleksandar Markovic" <
+> amarkovic@wavecomp.com>, "Cleber Rosa" <crosa@redhat.com>,
+> > > "Aurelien Jarno" <aurelien@aurel32.net>, "Wainer dos Santos Moschetta=
+" <
+> wainersm@redhat.com>
+> > > Sent: Wednesday, May 22, 2019 5:12:30 PM
+> > > Subject: Re: [Qemu-devel] [PATCH 0/4] mips: Add more Avocado tests
+> > >
+> > > On Tue, May 21, 2019 at 01:19:06AM +0200, Philippe Mathieu-Daud=C3=A9=
+ wrote:
+> > > > Hi,
+> > > >
+> > > > It was a rainy week-end here, so I invested it to automatize some
+> > > > of my MIPS tests.
+> > > >
+> > > > The BootLinuxSshTest is not Global warming friendly, it is not
+> > > > meant to run on a CI system but rather on a workstation previous
+> > > > to post a pull request.
+> > > > It can surely be improved, but it is a good starting point.
+> > >
+> > > Until we actually have a mechanism to exclude the test case on
+> > > travis-ci, I will remove patch 4/4 from the queue.  Aleksandar,
+> > > please don't merge patch 4/4 yet or it will break travis-ci.
+> > >
+> > > Cleber, Wainer, is it already possible to make "avocado run" skip
+> > > tests tagged with "slow"?
+> > >
+> >
+> > The mechanism exists, but we haven't tagged any test so far as slow.
+> >
+>=20
+> Cleber,
+>=20
+> For the test from patch 4/4, there is no dilemma - it should be in the
+> =E2=80=9Cslow=E2=80=9D group, as Philippe envisioned and said, so that it=
+ is not humpered
+> with stricter requirements for =E2=80=9Cfast=E2=80=9D (default) group. Co=
+uld you explain us
+> how to do it, so that we can hopefully finally proceed?
+>=20
 
-diff --git a/qemu-img.c b/qemu-img.c
-index e6fd8e1a98..b3a1c76fb6 100644
---- a/qemu-img.c
-+++ b/qemu-img.c
-@@ -3358,16 +3358,29 @@ static int img_rebase(int argc, char **argv)
-              * in its chain.
-              */
-             prefix_chain_bs = bdrv_find_backing_image(bs, out_real_path);
--
--            blk_new_backing = blk_new_open(out_real_path, NULL,
--                                           options, src_flags, &local_err);
--            g_free(out_real_path);
--            if (!blk_new_backing) {
--                error_reportf_err(local_err,
--                                  "Could not open new backing file '%s': ",
--                                  out_baseimg);
--                ret = -1;
--                goto out;
-+            if (prefix_chain_bs) {
-+                g_free(out_real_path);
-+                blk_new_backing = blk_new(BLK_PERM_CONSISTENT_READ,
-+                                          BLK_PERM_ALL);
-+                ret = blk_insert_bs(blk_new_backing, prefix_chain_bs,
-+                                    &local_err);
-+                if (ret < 0) {
-+                    error_reportf_err(local_err,
-+                                      "Could not reuse backing file '%s': ",
-+                                      out_baseimg);
-+                    goto out;
-+                }
-+            } else {
-+                blk_new_backing = blk_new_open(out_real_path, NULL,
-+                                               options, src_flags, &local_err);
-+                g_free(out_real_path);
-+                if (!blk_new_backing) {
-+                    error_reportf_err(local_err,
-+                                      "Could not open new backing file '%s': ",
-+                                      out_baseimg);
-+                    ret = -1;
-+                    goto out;
-+                }
-             }
-         }
-     }
--- 
-2.13.3
+Hi Aleksandar,
 
+The point is that there's no "group" definition at this point.  This is the
+core of the discussion.
+
+I think we're close to converging to something simple and effective.  Pleas=
+e
+let us know what you think of the proposals given.
+
+Thanks!
+- Cleber.
+
+> Gratefully,
+> Aleksandar
+>=20
+> > Should we define/document a criteria for a test to be slow?  Given
+> > that this is highly subjective, we have to think of:
+> >
+> >  * Will we consider the average or maximum run time (the timeout
+> >    definition)?
+> >
+> >  * For a single test, what is "slow"? Some rough numbers from Travis
+> >    CI[1] to help us with guidelines:
+> >    - boot_linux_console.py:BootLinuxConsole.test_x86_64_pc:  PASS (6.04=
+ s)
+> >    - boot_linux_console.py:BootLinuxConsole.test_arm_virt:  PASS (2.91 =
+s)
+> >    -
+> linux_initrd.py:LinuxInitrd.test_with_2gib_file_should_work_with_linux_v4=
+_16:
+> PASS (18.14 s)
+> >    - boot_linux.py:BootLinuxAarch64.test_virt:  PASS (396.88 s)
+> >
+> >  * Do we want to set a maximum job timeout?  This way we can skip
+> >    tests after a given amount of time has passed.  Currently we interru=
+pt
+> >    the test running when the job timeout is reached, but it's possible
+> >    to add a option so that no new tests will be started, but currently
+> >    running ones will be waited on.
+> >
+> > Regards,
+> > - Cleber.
+> >
+> > [1] - https://travis-ci.org/clebergnu/qemu/jobs/535967210#L3518
+> >
+> > > --
+> > > Eduardo
+> > >
+>=20
 
