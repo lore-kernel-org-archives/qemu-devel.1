@@ -2,68 +2,69 @@ Return-Path: <SRS0=bvyN=TX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.0 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 74661C282DD
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 14:47:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 656FDC282DD
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 14:48:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4B8B1206BA
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 14:47:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4B8B1206BA
+	by mail.kernel.org (Postfix) with ESMTPS id 3CB6C2175B
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 14:48:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3CB6C2175B
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:38052 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:38071 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hTozo-00072x-Dl
-	for qemu-devel@archiver.kernel.org; Thu, 23 May 2019 10:47:04 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:60913)
+	id 1hTp16-00081l-H6
+	for qemu-devel@archiver.kernel.org; Thu, 23 May 2019 10:48:24 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:60994)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hTowt-0004Bw-99
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 10:44:04 -0400
+	(envelope-from <laurent@vivier.eu>) id 1hTowz-0004Ja-KM
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 10:44:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hTows-0006A1-7m
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 10:44:03 -0400
-Received: from mout.kundenserver.de ([212.227.126.133]:46643)
+	(envelope-from <laurent@vivier.eu>) id 1hTowy-0006Lp-GQ
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 10:44:09 -0400
+Received: from mout.kundenserver.de ([212.227.126.134]:46945)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1hTowq-00066W-K0
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 10:44:02 -0400
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1hTowy-0006L1-7i
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 10:44:08 -0400
 Received: from localhost.localdomain ([78.238.229.36]) by
 	mrelayeu.kundenserver.de (mreue010 [212.227.15.167]) with ESMTPSA
 	(Nemesis)
-	id 1MLRI3-1hC16t3ou3-00IWOV; Thu, 23 May 2019 16:43:41 +0200
+	id 1N3bnP-1gTqaZ16Jv-010gql; Thu, 23 May 2019 16:43:44 +0200
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Date: Thu, 23 May 2019 16:43:26 +0200
-Message-Id: <20190523144336.13960-1-laurent@vivier.eu>
+Date: Thu, 23 May 2019 16:43:31 +0200
+Message-Id: <20190523144336.13960-6-laurent@vivier.eu>
 X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190523144336.13960-1-laurent@vivier.eu>
+References: <20190523144336.13960-1-laurent@vivier.eu>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:HRooP9euUCJlkR+ci8KlUc0bMHht5F1NMkLaQyYItDitp1OSzZk
-	KsCOOInlqkw9ELToGuKqH9ON4tkUH3odW3moRJHJEvFlIQzDAxGtd6ZKB2LVOka1bUISM62
-	AAHJeeT24FyDGYeldCOSRdObSmlk4DIAf0frZN6dw8zdYH3twbbB/BAPbpXrXE3qBCHWVxI
-	YPyt/mrP4LSfz5v12SNEA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:qbxw/nq8opw=:ukNkV8XSDnIog9YR6iD/+u
-	afJFp2y7kph5artMswpVUzC9VTDL2jcrUDlMjb/gX8uXRuJA/JwoIjvIN7y0ZPndWc1agWZYc
-	3vuwwo2QBRi3dG9JpicFy1jceW4tBecHFIiz2PyqJbZ4D/wPO42AdsSSGRR8tULqLoGWB4kci
-	oIf/5p3QOdaMcBqlG51P/HHZBfA2TifDz9+w5Sj/P4rmquykJrSnRE13AgCHMZtg+2vp48mBI
-	D7cx8GxJNdHP++vRaMl308xRLi1j934P42oM0Pggw5sBM4C0EDdkMa841p3gMZAxIUYUF/hSN
-	85hlAWPKapyToXLhRlMqKPKKZNOXc8jvjHM7evrA6HVzFOyEZKkJIRc832JEO7c7zdpCepFbR
-	jhUHerxIwJ/wxiIEg121PmCylPk1TC10gTpcrsHipk/yW/n5+N3XHFPmuIkzv6FhrF660Ip6B
-	XWJ2jkB9gmPxBF5bgMToEqIOTlxGJ1PHJNuZLID4Aet4XKi7wK60kWmu6Xh/g/e5MqKeyHYvC
-	yxWFMOkZuk18K6j10Tsx6SBpL29o8szi4Vg6r8B14YWVh3duqO7G3qI1dNPTX0TYQl1YeyAPT
-	c+ZebXEMaIB1wiANl7MaZ8LslV+DymZmwpIald3BY3CMJC2Ldq8vDZDRVu/ZE/DpjXp/5lC/i
-	xQp6EprIc1OZfj/L0HygqZHmzWmChZQ1OdQni+Nlq1G8JmL2fmRY0aI0moARG1HRwkCtMrgC5
-	JcMQGoBR7JoTWDKdLNhjb02Omckyp5iSwROUW0D2SnI6j2O9fJPtx7cNc/0=
+X-Provags-ID: V03:K1:fIEHQdd0xLK6m76XJQ2KhMZcRti/qRyWCnr5W8HvJUbSHd5u++D
+	vjWkW1hlXmmXSjAP5XQcbX1ylBXrX8v9Fwy6bOTeoyIMwhz0jI7/kYSkpbTB8u8+rr/52go
+	/37KkzRC3qFCsEPhNoyDASRKt7Z+Xv4wQGzwmYTWwJlPzp1tZfs9dWZL+EHQ9+GJzvxCnem
+	udHo2gBPM1ijtz9sGtNcA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:9HCEEhfrL18=:FofsW3m17SvLq8lJsk2umn
+	+upCSqr3L6oF3FdboCgTbqlYhVsScsYBP/uEiD4GMolt2GOhh+OV7Sok4azni3RW/Bu+nXkai
+	b+Ap6L2POSzo9PLiJqUTOPxjApESJ6GBYIMxpahtKUGrVJed+JmYpnllhbKgRWiKt2KbkwSRL
+	4nDHX/uQVUrSA7Uv+EeRZvW0w05zBM7a7zQFvNaLBp9YgX6PfqB34q+qJP1Eggfl6aKMrQXrp
+	DXANhMWk3yfWHqzPMsUmfpOwnH8rp2Bp4pn2+NgC3Wcy1roxkVpDLX479D89FIckRAK3NGvWf
+	SF9uw42FQvdQSruCKUc/A/+iKkdJ5/MgEJWWgnkIbe356M89FHS+O9IlP4SD4ZeKXjVTuByS4
+	A3xWH44sZF7KO5i4LniMl0OkZ8549COJSh5zRpP6Aemsk+cWg1jAyMmzcHITKaQj/YQe7vO0C
+	5XMZlMMaMjS/tIs6Z5A5Yf24MXCJPOX5W4ClCluEhUeekNaQwG4R4aZch0q6ZWoP+RFbmqDMU
+	mOxxwERHk2z4dsR5z7XGH+9SQB8V2TjtdhE0d64FIpGYCmS9/WTTu21QAg9Ok0IAbfDkC/lgz
+	LMutEdiTDQFGmDiKUoYRbroRLfG0Kzy6wZ/Yiyy0QKg1jVRVbF3/3fmuaZsF7XU1mEdvDaUfs
+	5cSKK6CCaPzyb93Q4vTkC6z7LF71AeWG9TEYD1reuiodb1ZLesIP/rMHQxCCIO6XN6cD0EClV
+	0EwK/8ZUM3iMYmeuiIHsw5+3kzFvB4wqf9Ql1g==
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.126.133
-Subject: [Qemu-devel] [PULL 00/10] Linux user for 4.1 patches
+X-Received-From: 212.227.126.134
+Subject: [Qemu-devel] [PULL 05/10] linux-user: Add support for
+ SIOC<G|S>IFPFLAGS ioctls for all targets
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -75,68 +76,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Aleksandar Rikalo <arikalo@wavecomp.com>,
-	Aurelien Jarno <aurelien@aurel32.net>, Riku Voipio <riku.voipio@iki.fi>,
+Cc: Aleksandar Rikalo <arikalo@wavecomp.com>, Riku Voipio <riku.voipio@iki.fi>,
 	Laurent Vivier <laurent@vivier.eu>,
-	Aleksandar Markovic <amarkovic@wavecomp.com>
+	Aleksandar Markovic <amarkovic@wavecomp.com>,
+	Neng Chen <nchen@wavecomp.com>, Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The following changes since commit a4f667b6714916683408b983cfe0a615a725775f:
+From: Neng Chen <nchen@wavecomp.com>
 
-  Merge remote-tracking branch 'remotes/cohuck/tags/s390x-20190521-3' into staging (2019-05-21 16:30:13 +0100)
+Add support for getting and setting extended private flags of a
+network device via SIOCSIFPFLAGS and SIOCGIFPFLAGS ioctls.
 
-are available in the Git repository at:
+The ioctl numeric values are platform-independent and determined by
+the file include/uapi/linux/sockios.h in Linux kernel source code:
 
-  git://github.com/vivier/qemu.git tags/linux-user-for-4.1-pull-request
+  #define SIOCSIFPFLAGS 0x8934
+  #define SIOCGIFPFLAGS	0x8935
 
-for you to fetch changes up to 069a1504ee1e2943964d0357d798e11b66afd351:
+These ioctls get (or set) the field ifr_flags of type short in the
+structure ifreq. Such functionality is achieved in QEMU by using
+MK_STRUCT() and MK_PTR() macros with an appropriate argument, as
+it was done for existing similar cases.
 
-  linux-user: Pass through nanosecond timestamp components for stat syscalls (2019-05-22 20:50:55 +0200)
+Signed-off-by: Neng Chen <nchen@wavecomp.com>
+Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+Message-Id: <1554839486-3527-1-git-send-email-aleksandar.markovic@rt-rk.com>
+Message-Id: <1558282527-22183-4-git-send-email-aleksandar.markovic@rt-rk.com>
+Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+---
+ linux-user/ioctls.h       | 2 ++
+ linux-user/syscall_defs.h | 2 ++
+ 2 files changed, 4 insertions(+)
 
-----------------------------------------------------------------
-Add /proc/hardware and /proc/cpuinfo,
-update SIOCXXX ioctls,
-update IPV6 options,
-fix shmat emulation,
-add nanoseconds in stat,
-init field fp_abi on mips
-
-----------------------------------------------------------------
-
-Aleksandar Markovic (2):
-  linux-user: Fix support for SIOCATMARK and SIOCGPGRP ioctls for xtensa
-  linux-user: Add support for SIOCSPGRP ioctl for all targets
-
-Chen-Yu Tsai (1):
-  linux-user: Pass through nanosecond timestamp components for stat
-    syscalls
-
-Daniel Santos (1):
-  linux-user: Sanitize interp_info and, for mips only, init field fp_abi
-
-Laurent Vivier (2):
-  linux-user: add pseudo /proc/cpuinfo for sparc
-  linux-user: add pseudo /proc/hardware for m68k
-
-Neng Chen (2):
-  linux-user: Add support for SIOC<G|S>IFPFLAGS ioctls for all targets
-  linux-user: Add support for setsockopt() options
-    IPV6_<ADD|DROP>_MEMBERSHIP
-
-Richard Henderson (2):
-  linux-user: Fix shmat emulation by honoring host SHMLBA
-  linux-user: Align mmap_find_vma to host page size
-
- linux-user/elfload.c      | 22 ++++++++----
- linux-user/ioctls.h       |  3 ++
- linux-user/mmap.c         | 72 +++++++++++++++++++++------------------
- linux-user/qemu.h         |  2 +-
- linux-user/syscall.c      | 72 +++++++++++++++++++++++++++++++++++++--
- linux-user/syscall_defs.h | 57 ++++++++++++++++++++-----------
- 6 files changed, 166 insertions(+), 62 deletions(-)
-
+diff --git a/linux-user/ioctls.h b/linux-user/ioctls.h
+index 99ed9d982568..5e84dc7c3a77 100644
+--- a/linux-user/ioctls.h
++++ b/linux-user/ioctls.h
+@@ -206,6 +206,8 @@
+   IOCTL(SIOCADDMULTI, IOC_W, MK_PTR(MK_STRUCT(STRUCT_sockaddr_ifreq)))
+   IOCTL(SIOCDELMULTI, IOC_W, MK_PTR(MK_STRUCT(STRUCT_sockaddr_ifreq)))
+   IOCTL(SIOCGIFINDEX, IOC_W | IOC_R, MK_PTR(MK_STRUCT(STRUCT_int_ifreq)))
++  IOCTL(SIOCSIFPFLAGS, IOC_W, MK_PTR(MK_STRUCT(STRUCT_short_ifreq)))
++  IOCTL(SIOCGIFPFLAGS, IOC_W | IOC_R, MK_PTR(MK_STRUCT(STRUCT_short_ifreq)))
+   IOCTL(SIOCSIFLINK, 0, TYPE_NULL)
+   IOCTL_SPECIAL(SIOCGIFCONF, IOC_W | IOC_R, do_ioctl_ifconf,
+                 MK_PTR(MK_STRUCT(STRUCT_ifconf)))
+diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
+index 9470a5ce965b..cb40620114f8 100644
+--- a/linux-user/syscall_defs.h
++++ b/linux-user/syscall_defs.h
+@@ -782,6 +782,8 @@ struct target_pollfd {
+ #define TARGET_SIOCADDMULTI    0x8931          /* Multicast address lists      */
+ #define TARGET_SIOCDELMULTI    0x8932
+ #define TARGET_SIOCGIFINDEX    0x8933
++#define TARGET_SIOCSIFPFLAGS   0x8934          /* set extended flags          */
++#define TARGET_SIOCGIFPFLAGS   0x8935          /* get extended flags          */
+ 
+ /* Bridging control calls */
+ #define TARGET_SIOCGIFBR       0x8940          /* Bridging support             */
 -- 
 2.20.1
 
