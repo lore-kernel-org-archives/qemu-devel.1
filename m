@@ -2,104 +2,85 @@ Return-Path: <SRS0=bvyN=TX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D020EC282DD
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 14:28:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DDD3CC282DD
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 14:28:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 891CA20851
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 14:28:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9622E20851
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 14:28:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="t56s7uO+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 891CA20851
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="PFr3caxl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9622E20851
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:37487 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:37489 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hTohd-00061s-N5
-	for qemu-devel@archiver.kernel.org; Thu, 23 May 2019 10:28:17 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:49496)
+	id 1hTohw-0006Ij-Oz
+	for qemu-devel@archiver.kernel.org; Thu, 23 May 2019 10:28:36 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:53664)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <shmuel.eiderman@oracle.com>) id 1hToQG-0005oW-Gl
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 10:10:21 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1hTodX-0002WR-8O
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 10:24:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <shmuel.eiderman@oracle.com>) id 1hToQB-0003vW-CX
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 10:10:20 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:43482)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <shmuel.eiderman@oracle.com>)
-	id 1hToQ4-0003kQ-Ch; Thu, 23 May 2019 10:10:08 -0400
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
-	by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id
-	x4NE3x0L186615; Thu, 23 May 2019 14:10:06 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
-	h=from : message-id :
-	content-type : mime-version : subject : date : in-reply-to : cc : to :
-	references; s=corp-2018-07-02;
-	bh=fpZkLL/g0zAQZ/JImH0ODu6mVKnwWCQNTFMnu7rlM/k=;
-	b=t56s7uO+lQByObxnq0gzvgcwZPiUwzqX1OrzBD0Fgbfz0N2kxF+jD6u6g4a70qPCDI/z
-	qpck4NEjipdylXmykklGCqGyacnb9xrIMjTkWBRXDc8RLneVmqUhLwCnGofqFoyD6Xn8
-	y3s+okbx78zUkVqiJ80ELJVyOkWDwYIw932HV7TjdaH6C4B/AoRziPiX1fVSL/NjHkBI
-	nIPQz+rUPZKef9DvdhqQgBqbnSWpAuXwJv2+UWqOat29vB/pDUiMd++Up1oAI9K+oSod
-	jzd/u3V69IvB4DGzSTWW5LzLzJzSuC+2MvweP1Dn4yVoSuGWVXTvq+FPY/2RB+OjMp5L
-	3g== 
-Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
-	by userp2120.oracle.com with ESMTP id 2smsk5akf5-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 23 May 2019 14:10:06 +0000
-Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
-	by userp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id
-	x4NE9767067375; Thu, 23 May 2019 14:10:06 GMT
-Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
-	by userp3030.oracle.com with ESMTP id 2smshf8sve-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 23 May 2019 14:10:06 +0000
-Received: from abhmp0014.oracle.com (abhmp0014.oracle.com [141.146.116.20])
-	by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x4NEA5nN031450;
-	Thu, 23 May 2019 14:10:05 GMT
-Received: from [10.0.5.157] (/213.57.127.10)
-	by default (Oracle Beehive Gateway v4.0)
-	with ESMTP ; Thu, 23 May 2019 14:10:04 +0000
-From: Sam Eiderman <shmuel.eiderman@oracle.com>
-Message-Id: <B8380028-641C-4355-AF16-2F881E25CF8D@oracle.com>
-Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.8\))
-Date: Thu, 23 May 2019 17:09:58 +0300
-In-Reply-To: <c117d2e2-eef2-df4f-ef3d-37a33426dd51@redhat.com>
-To: Max Reitz <mreitz@redhat.com>
-References: <20190502085029.30776-1-shmuel.eiderman@oracle.com>
-	<20190502135828.42797-1-shmuel.eiderman@oracle.com>
-	<20190502135828.42797-3-shmuel.eiderman@oracle.com>
-	<c117d2e2-eef2-df4f-ef3d-37a33426dd51@redhat.com>
-X-Mailer: Apple Mail (2.3445.104.8)
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9265
-	signatures=668687
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
-	malwarescore=0
-	phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
-	adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
-	engine=8.0.1-1810050000 definitions=main-1905230098
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9265
-	signatures=668687
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
-	priorityscore=1501 malwarescore=0
-	suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
-	lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999
-	adultscore=0
-	classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
-	definitions=main-1905230098
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 156.151.31.85
-Content-Type: text/plain;
-	charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Content-Filtered-By: Mailman/MimeDel 2.1.21
-Subject: Re: [Qemu-devel] [PATCH v2 2/3] qemu-img: rebase: Reduce reads on
- in-chain rebase
+	(envelope-from <peter.maydell@linaro.org>) id 1hTodV-0006oW-Ey
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 10:24:03 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:37628)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1hTodV-0006n5-6Y
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 10:24:01 -0400
+Received: by mail-wr1-x443.google.com with SMTP id e15so6529735wrs.4
+	for <qemu-devel@nongnu.org>; Thu, 23 May 2019 07:24:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=from:to:subject:date:message-id:mime-version
+	:content-transfer-encoding;
+	bh=b12/iNlG/d9Vy90ENIOMpb6JzBZwigdlIPVxxnXJAUI=;
+	b=PFr3caxlrCC/uFVgqDXfJo2apmobepS4V9bx6XvdB/LHnzhfjr4FesnjAemdkitAlD
+	MqTT64zv5SXB7hwAqHRROY6HqFsVdKExqPk+ZmZi43zvGCbzaNB3v9bDkg0tQDYxZnsa
+	HmdLzf37MUmkTgpjMhSr+o7iXX/85WZhx9w8WQm/7TuE39wYpmluvt7h8Yiv32rzppn2
+	BVNgiyG2zZhrhhBMrJiapVwDfkGSeGOHLF2ehqd1YXua7B8hsA/CI87ha6AFIK+SZYrH
+	iv+GZT38VDXlHknHr3xHUYI7ng4KI7g+U4iln3JakrnBIH7HuUgPhDNQyqKw/hbbpZgx
+	P/aQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+	:content-transfer-encoding;
+	bh=b12/iNlG/d9Vy90ENIOMpb6JzBZwigdlIPVxxnXJAUI=;
+	b=DS4N/u9sa3gFyRYj0KsUKxo3TJq5NAt0eNmCaQmcquTSNTG14X3GNKFZF4Cvwmj7lK
+	oya+aG0RZ3ejZfFOykqVfZo3ftkJ9hjffCEFwGLYQ5Afy41biUPSR6xqm52RclUnbYk7
+	AqSsZWimYLr64C1kNfbFk0SDN33gR2TOkpGp7wHZ7KOxVFcKy1BSgacPxAKBX57fQgzG
+	ZY4msu+fzPNLwMxeOLewexR7axGIEFa+/gdhEcu/XjhmLeNzE8ZI7f1LL7EbFFlg9pA5
+	bZK3Mt1L7/BGScWHIVDTcq126TstvGw3PyCU0mtKf0FJLXG3tkORYY7E/71j1gW0IH+u
+	icsQ==
+X-Gm-Message-State: APjAAAVHlOZaOpuxF5CBOJmgGelHpTHUsGFF5vdCKB2+baEcyfqks9b8
+	GG98P4f+kzvW4Vh3B/nl5fWgZ/4U8pY17A==
+X-Google-Smtp-Source: APXvYqzrIbmCEgr4GaHg66UM2GekvvaZJkPB/ryQlS55tPAwyuy7Va5A4gikHpH+ECifL/b2FOPxxg==
+X-Received: by 2002:adf:9023:: with SMTP id h32mr46918500wrh.95.1558621439521; 
+	Thu, 23 May 2019 07:23:59 -0700 (PDT)
+Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
+	by smtp.gmail.com with ESMTPSA id z5sm9700617wmi.34.2019.05.23.07.23.58
+	for <qemu-devel@nongnu.org>
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Thu, 23 May 2019 07:23:58 -0700 (PDT)
+From: Peter Maydell <peter.maydell@linaro.org>
+To: qemu-devel@nongnu.org
+Date: Thu, 23 May 2019 15:23:45 +0100
+Message-Id: <20190523142357.5175-1-peter.maydell@linaro.org>
+X-Mailer: git-send-email 2.20.1
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2a00:1450:4864:20::443
+Subject: [Qemu-devel] [PULL 00/12] target-arm queue
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -111,107 +92,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, eyal.moscovici@oracle.com, qemu-block@nongnu.org,
-	arbel.moshe@oracle.com, qemu-devel@nongnu.org,
-	liran.alon@oracle.com, sagi.amit@oracle.com, karl.heubaum@oracle.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Not very much here, but several people have fallen over
+the vector operation segfault bug, so let's get the fix
+into master.
 
+thanks
+-- PMM
 
-> On 23 May 2019, at 17:01, Max Reitz <mreitz@redhat.com> wrote:
->=20
-> On 02.05.19 15:58, Sam Eiderman wrote:
->> In the following case:
->>=20
->> (base) A <- B <- C (tip)
->>=20
->> when running:
->>=20
->>    qemu-img rebase -b A C
->>=20
->> QEMU would read all sectors not allocated in the file being rebased =
-(C)
->> and compare them to the new base image (A), regardless of whether =
-they
->> were changed or even allocated anywhere along the chain between the =
-new
->> base and the top image (B). This causes many unneeded reads when
->> rebasing an image which represents a small diff of a large disk, as =
-it
->> would read most of the disk's sectors.
->>=20
->> Instead, use bdrv_is_allocated_above() to reduce the number of
->> unnecessary reads.
->>=20
->> Reviewed-by: Karl Heubaum <karl.heubaum@oracle.com>
->> Signed-off-by: Sam Eiderman <shmuel.eiderman@oracle.com>
->> Signed-off-by: Eyal Moscovici <eyal.moscovici@oracle.com>
->> ---
->> qemu-img.c | 25 ++++++++++++++++++++++++-
->> 1 file changed, 24 insertions(+), 1 deletion(-)
->>=20
->> diff --git a/qemu-img.c b/qemu-img.c
->> index d9b609b3f0..7f20858cb9 100644
->> --- a/qemu-img.c
->> +++ b/qemu-img.c
->=20
-> [...]
->=20
->> @@ -3422,6 +3428,23 @@ static int img_rebase(int argc, char **argv)
->>                 continue;
->>             }
->>=20
->> +            if (prefix_chain_bs) {
->> +                /*
->> +                 * If cluster wasn't changed since prefix_chain, we =
-don't need
->> +                 * to take action
->> +                 */
->> +                ret =3D bdrv_is_allocated_above(bs, prefix_chain_bs,
->> +                                              offset, n, &n);
->=20
-> This will always return true because it definitely is allocated in =
-@bs,
-> or we wouldn=E2=80=99t be here.  (We just checked that with
-> bdrv_is_allocated().)  I think @top should be backing_bs(bs).
->=20
-> Max
+The following changes since commit d418238dca7b4e0b124135827ead3076233052b1:
 
-I don=E2=80=99t think that=E2=80=99s true:
+  Merge remote-tracking branch 'remotes/rth/tags/pull-rng-20190522' into staging (2019-05-23 12:57:17 +0100)
 
-Examine the case where we have the following chain:
+are available in the Git repository at:
 
-A <- B <- C
+  https://git.linaro.org/people/pmaydell/qemu-arm.git tags/pull-target-arm-20190523
 
-When we rebase C directly over A: qemu-img rebase -b A C
+for you to fetch changes up to 98e4f4fdb8ea05d840f51f47125924c2bb9df2df:
 
-We must check for every offset (sector): bdrv_is_allocated_above(C, A, =
-offset, n, &n);
+  hw/arm/exynos4210: QOM'ify the Exynos4210 SoC (2019-05-23 14:47:44 +0100)
 
-If a sector from C is allocated above A - it may have been changed - so =
-we need to do a read from A and a read from C and compare.
-If the sector is not allocated above, it was not changed - we don=E2=80=99=
-t need to read from A or C.
+----------------------------------------------------------------
+target-arm queue:
+ * exynos4210: QOM'ify the Exynos4210 SoC
+ * exynos4210: Add DMA support for the Exynos4210
+ * arm_gicv3: Fix writes to ICC_CTLR_EL3
+ * arm_gicv3: Fix write of ICH_VMCR_EL2.{VBPR0, VBPR1}
+ * target/arm: Fix vector operation segfault
+ * target/arm: Minor improvements to BFXIL, EXTR
 
-Sam
+----------------------------------------------------------------
+Alistair Francis (1):
+      target/arm: Fix vector operation segfault
 
+Guenter Roeck (1):
+      hw/arm/exynos4210: Add DMA support for the Exynos4210
 
->=20
->> +                if (ret < 0) {
->> +                    error_report("error while reading image =
-metadata: %s",
->> +                                 strerror(-ret));
->> +                    goto out;
->> +                }
->> +                if (!ret) {
->> +                    continue;
->> +                }
->> +            }
->> +
->>             /*
->>              * Read old and new backing file and take into =
-consideration that
->>              * backing files may be smaller than the COW image.
+Peter Maydell (5):
+      arm: Move system_clock_scale to armv7m_systick.h
+      arm: Remove unnecessary includes of hw/arm/arm.h
+      arm: Rename hw/arm/arm.h to hw/arm/boot.h
+      hw/intc/arm_gicv3: Fix write of ICH_VMCR_EL2.{VBPR0, VBPR1}
+      hw/intc/arm_gicv3: Fix writes to ICC_CTLR_EL3
+
+Philippe Mathieu-Daudé (3):
+      hw/arm/exynos4: Remove unuseful debug code
+      hw/arm/exynos4: Use the IEC binary prefix definitions
+      hw/arm/exynos4210: QOM'ify the Exynos4210 SoC
+
+Richard Henderson (2):
+      target/arm: Use extract2 for EXTR
+      target/arm: Simplify BFXIL expansion
+
+ include/hw/arm/allwinner-a10.h    |  2 +-
+ include/hw/arm/aspeed_soc.h       |  1 -
+ include/hw/arm/bcm2836.h          |  1 -
+ include/hw/arm/{arm.h => boot.h}  | 12 +++------
+ include/hw/arm/exynos4210.h       |  9 +++++--
+ include/hw/arm/fsl-imx25.h        |  2 +-
+ include/hw/arm/fsl-imx31.h        |  2 +-
+ include/hw/arm/fsl-imx6.h         |  2 +-
+ include/hw/arm/fsl-imx6ul.h       |  2 +-
+ include/hw/arm/fsl-imx7.h         |  2 +-
+ include/hw/arm/virt.h             |  2 +-
+ include/hw/arm/xlnx-versal.h      |  2 +-
+ include/hw/arm/xlnx-zynqmp.h      |  2 +-
+ include/hw/timer/armv7m_systick.h | 22 ++++++++++++++++
+ hw/arm/armsse.c                   |  2 +-
+ hw/arm/armv7m.c                   |  2 +-
+ hw/arm/aspeed.c                   |  2 +-
+ hw/arm/boot.c                     |  2 +-
+ hw/arm/collie.c                   |  2 +-
+ hw/arm/exynos4210.c               | 54 ++++++++++++++++++++++++++++++++++++---
+ hw/arm/exynos4_boards.c           | 40 ++++++++---------------------
+ hw/arm/highbank.c                 |  2 +-
+ hw/arm/integratorcp.c             |  2 +-
+ hw/arm/mainstone.c                |  2 +-
+ hw/arm/microbit.c                 |  2 +-
+ hw/arm/mps2-tz.c                  |  2 +-
+ hw/arm/mps2.c                     |  2 +-
+ hw/arm/msf2-soc.c                 |  1 -
+ hw/arm/msf2-som.c                 |  2 +-
+ hw/arm/musca.c                    |  2 +-
+ hw/arm/musicpal.c                 |  2 +-
+ hw/arm/netduino2.c                |  2 +-
+ hw/arm/nrf51_soc.c                |  2 +-
+ hw/arm/nseries.c                  |  2 +-
+ hw/arm/omap1.c                    |  2 +-
+ hw/arm/omap2.c                    |  2 +-
+ hw/arm/omap_sx1.c                 |  2 +-
+ hw/arm/palm.c                     |  2 +-
+ hw/arm/raspi.c                    |  2 +-
+ hw/arm/realview.c                 |  2 +-
+ hw/arm/spitz.c                    |  2 +-
+ hw/arm/stellaris.c                |  2 +-
+ hw/arm/stm32f205_soc.c            |  2 +-
+ hw/arm/strongarm.c                |  2 +-
+ hw/arm/tosa.c                     |  2 +-
+ hw/arm/versatilepb.c              |  2 +-
+ hw/arm/vexpress.c                 |  2 +-
+ hw/arm/virt.c                     |  2 +-
+ hw/arm/xilinx_zynq.c              |  2 +-
+ hw/arm/xlnx-versal.c              |  2 +-
+ hw/arm/z2.c                       |  2 +-
+ hw/intc/arm_gicv3_cpuif.c         |  6 ++---
+ hw/intc/armv7m_nvic.c             |  1 -
+ target/arm/arm-semi.c             |  1 -
+ target/arm/cpu.c                  |  1 -
+ target/arm/cpu64.c                |  1 -
+ target/arm/kvm.c                  |  1 -
+ target/arm/kvm32.c                |  1 -
+ target/arm/kvm64.c                |  1 -
+ target/arm/translate-a64.c        | 44 ++++++++++++++++---------------
+ target/arm/translate.c            |  4 +--
+ 61 files changed, 164 insertions(+), 123 deletions(-)
+ rename include/hw/arm/{arm.h => boot.h} (96%)
 
