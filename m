@@ -4,77 +4,77 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F3BDC282DD
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 10:56:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B151C282DD
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 10:56:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4432020868
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 10:56:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1BEDE20868
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 10:56:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="bBCx6fa1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4432020868
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="BYBFYJlx"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1BEDE20868
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:33584 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:33602 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hTlOB-00064A-KE
-	for qemu-devel@archiver.kernel.org; Thu, 23 May 2019 06:55:59 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:52113)
+	id 1hTlOn-0006Ym-Dm
+	for qemu-devel@archiver.kernel.org; Thu, 23 May 2019 06:56:37 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:52137)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hTl2q-0004TK-OV
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 06:33:57 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1hTl2r-0004U5-FU
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 06:33:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hTl2p-0006gk-RX
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 06:33:56 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:34544)
+	(envelope-from <alex.bennee@linaro.org>) id 1hTl2q-0006hG-FI
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 06:33:57 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:37054)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1hTl2o-0006cu-Ds
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 06:33:54 -0400
-Received: by mail-wr1-x444.google.com with SMTP id f8so5699705wrt.1
-	for <qemu-devel@nongnu.org>; Thu, 23 May 2019 03:33:50 -0700 (PDT)
+	id 1hTl2o-0006dJ-FE
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 06:33:55 -0400
+Received: by mail-wm1-x341.google.com with SMTP id 7so5224145wmo.2
+	for <qemu-devel@nongnu.org>; Thu, 23 May 2019 03:33:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
 	h=from:to:cc:subject:date:message-id:in-reply-to:references
 	:mime-version:content-transfer-encoding;
-	bh=Tdq1lhooOg5isCiP/Tk4l5zr7fBDvEhDVLC+/j+f1ds=;
-	b=bBCx6fa1QtLXyXvYOhyVry/s/1iNd1OKFirniS+oQ+EuMi0qUP/1ztmvOQiQV2Xsdk
-	b3ek7jZE80QXAXYlZf+ZA7ZSapeUV/v65Twmv+F6bFVUm+JXocdph178JqahqcXy0Sgb
-	QTsgppuonSs0kF9H3lTnbcGizSQnnopv/6D4jQ8mJjr0FbdPuJVDfBHch6p8SOwBkHKb
-	B4vu6ncjiR09vPaGIkzZsKBMOmiQqENNdXul5KxbCJh+zPYvZxILmYYCLT18DiL3TeR2
-	hUwyMv5jubrrU0seU81YITeFHZnEesI0aVLWW+MCxJm9lAtTT8HbnaX20b8+uYSHB4Q7
-	/qhw==
+	bh=xuuMnNMpb8Xfi2k7UTaye3/+aCNPdHNH8EZgGhe/xVw=;
+	b=BYBFYJlxprKmCCsen8TmgK142cSTMkLUIQb5qqFJq0t6kSdYZ85XDCSueq4uBAhLSL
+	piGlLpifau8XKmqwxKXPl2fm+yDhRj77OKas4CKR1YEeAFD+EomgUDACuPJ/dghCCplq
+	/dzqPJlpFPdVc8PDuC3PFk6R7O6ZS0TCj6bensWWTN/zMvFpB6ScXwTkkAQx+JJIDhLF
+	A3x7aiCIuiwCw4Ozk46wAl/S+pduc+BEEw6UFNu8+/yBL4+3u2mMzJprkBd/cLA8Wo4n
+	2Yd6h8FALkqNF+BO23vYyIJYeRJqxAojJptwwpOkGPdG++3YtprRfwJXsgqA+Uf0owwU
+	/VtQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
 	:references:mime-version:content-transfer-encoding;
-	bh=Tdq1lhooOg5isCiP/Tk4l5zr7fBDvEhDVLC+/j+f1ds=;
-	b=CxtKvQMjQsEwyDHZBd+Y06U/rSgcZKywgjpsQDMNBz7Ems4bGBQTuiP2BRrvGY6GcM
-	0pIKXPmp5PDm72Dm5aDiux4js4m4zC7LUL8y9xRM9wnvb0w+/edSC8di2psv8oXi7+pZ
-	VUklvBoz+e1m+JoeMSN63IQm6Z4sA7d8I0ISTYlKr5GXWfAmWfe3hRi8alSfKv0xwGM4
-	5wJZwsdF/DbxHfTQwqv0UVP6dkjcGc/4cnz6n3j7FuVFBYnDNmkJ8bLDPpBrx1LCpAcl
-	IXOQRhX/ED9LCCDOBl1czYggi+eb9NSWzMRZUYSmGRAbD2jGcTx9MZmMxrwnisVRnGLe
-	UlUQ==
-X-Gm-Message-State: APjAAAW8TJufMQP/jIHlIbSfSZe4qLQxWoFbQgllxQ3XT4R0w0CbtFoy
-	yDtfzRQWZINrbUwkKOvULQbiwg==
-X-Google-Smtp-Source: APXvYqwOoY7nM/oyyiu1+JeGeKIORpp0neSVntzPM1GQ+Cl0OpmfvCk2ebvdkWaps0LlK8csbgUHzw==
-X-Received: by 2002:adf:eec9:: with SMTP id a9mr5500140wrp.281.1558607629430; 
-	Thu, 23 May 2019 03:33:49 -0700 (PDT)
+	bh=xuuMnNMpb8Xfi2k7UTaye3/+aCNPdHNH8EZgGhe/xVw=;
+	b=crAoodWXvFdhdTBYkI+uAtWjvtE1HtoMk4xP+ysfVBugxxLM6oElj+w204smcKt4Ty
+	/+LjVU7IV+KEW8EPn0F3WeCejsF0Pk/1NHR+PcxDkksShTWk/ude1tDJNgJxlne0nFwG
+	WiWleU4sRpI8qO7NVrcMh1WjjWflRW+NcvpQFWDbcGOt+Sy3iZ3aN6VkoUA5ImV71xx4
+	XqjxH/rgMzAedeK40PuM5i+4JJY6dQ5HL9rXhLQBQgQf/2cIw7xR/SxxhA1o/sG6GAYn
+	5323aopY9FcSuAfREIT9xjK8o7iYobcEb2LkJSTO4Ck4HhsVIfXoyZohr4nccYWy9zW6
+	pQrQ==
+X-Gm-Message-State: APjAAAX4qX3MJaZvci7E5A4s1jXnvqK7WohE5D92iAl3FxFRs9sWsOYk
+	wWiUJusd/xa5M0AmFT+qcQ9AFQ==
+X-Google-Smtp-Source: APXvYqyJWBnU3PZ06gqlap+TH01YZOeSjxihYgza3Hri1PSHV8oD9ZyeIdFmm4HQivQVdoLvr4ETtQ==
+X-Received: by 2002:a7b:cd12:: with SMTP id f18mr5791043wmj.103.1558607630142; 
+	Thu, 23 May 2019 03:33:50 -0700 (PDT)
 Received: from zen.linaroharston ([81.128.185.34])
-	by smtp.gmail.com with ESMTPSA id o8sm49092082wra.4.2019.05.23.03.33.44
+	by smtp.gmail.com with ESMTPSA id 74sm10695056wma.7.2019.05.23.03.33.44
 	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Thu, 23 May 2019 03:33:45 -0700 (PDT)
+	Thu, 23 May 2019 03:33:47 -0700 (PDT)
 Received: from zen.linaroharston. (localhost [127.0.0.1])
-	by zen.linaroharston (Postfix) with ESMTP id 201BB1FFA5;
-	Thu, 23 May 2019 11:25:34 +0100 (BST)
+	by zen.linaroharston (Postfix) with ESMTP id 86F721FF9B;
+	Thu, 23 May 2019 11:25:33 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Thu, 23 May 2019 11:25:23 +0100
-Message-Id: <20190523102532.10486-20-alex.bennee@linaro.org>
+Date: Thu, 23 May 2019 11:25:16 +0100
+Message-Id: <20190523102532.10486-13-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190523102532.10486-1-alex.bennee@linaro.org>
 References: <20190523102532.10486-1-alex.bennee@linaro.org>
@@ -83,9 +83,8 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2a00:1450:4864:20::444
-Subject: [Qemu-devel] [PATCH v2 19/28] tests/tcg/minilib: support %c format
- char
+X-Received-From: 2a00:1450:4864:20::341
+Subject: [Qemu-devel] [PATCH  v2 12/28] tests/docker: add ubuntu 18.04
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -97,32 +96,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Richard Henderson <richard.henderson@linaro.org>, qemu-arm@nongnu.org,
-	=?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: Fam Zheng <fam@euphon.net>,
+	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+	qemu-arm@nongnu.org,
+	=?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+	Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
----
- tests/tcg/minilib/printf.c | 3 +++
- 1 file changed, 3 insertions(+)
+From: Gerd Hoffmann <kraxel@redhat.com>
 
-diff --git a/tests/tcg/minilib/printf.c b/tests/tcg/minilib/printf.c
-index 121620cb162..10472b4f585 100644
---- a/tests/tcg/minilib/printf.c
-+++ b/tests/tcg/minilib/printf.c
-@@ -119,6 +119,9 @@ void ml_printf(const char *fmt, ...)
-             str = va_arg(ap, char*);
-             print_str(str);
-             break;
-+        case 'c':
-+            __sys_outc(va_arg(ap, int));
-+            break;
-         case '%':
-             __sys_outc(*fmt);
-             break;
+Based on the ubuntu.docker file.
+Used to reproduce the build failure Peter was seeing.
+Others might find this useful too ;)
+
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+Message-Id: <20190503070241.24786-1-kraxel@redhat.com>
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+---
+ tests/docker/dockerfiles/ubuntu1804.docker | 57 ++++++++++++++++++++++
+ 1 file changed, 57 insertions(+)
+ create mode 100644 tests/docker/dockerfiles/ubuntu1804.docker
+
+diff --git a/tests/docker/dockerfiles/ubuntu1804.docker b/tests/docker/dockerfiles/ubuntu1804.docker
+new file mode 100644
+index 00000000000..2e2900150b0
+--- /dev/null
++++ b/tests/docker/dockerfiles/ubuntu1804.docker
+@@ -0,0 +1,57 @@
++FROM ubuntu:18.04
++ENV PACKAGES flex bison \
++    ccache \
++    clang \
++    gcc \
++    gettext \
++    git \
++    glusterfs-common \
++    libaio-dev \
++    libattr1-dev \
++    libbluetooth-dev \
++    libbrlapi-dev \
++    libbz2-dev \
++    libcacard-dev \
++    libcap-dev \
++    libcap-ng-dev \
++    libcurl4-gnutls-dev \
++    libdrm-dev \
++    libepoxy-dev \
++    libfdt-dev \
++    libgbm-dev \
++    libgtk-3-dev \
++    libibverbs-dev \
++    libiscsi-dev \
++    libjemalloc-dev \
++    libjpeg-turbo8-dev \
++    liblzo2-dev \
++    libncurses5-dev \
++    libncursesw5-dev \
++    libnfs-dev \
++    libnss3-dev \
++    libnuma-dev \
++    libpixman-1-dev \
++    librados-dev \
++    librbd-dev \
++    librdmacm-dev \
++    libsasl2-dev \
++    libsdl2-dev \
++    libseccomp-dev \
++    libsnappy-dev \
++    libspice-protocol-dev \
++    libspice-server-dev \
++    libssh2-1-dev \
++    libusb-1.0-0-dev \
++    libusbredirhost-dev \
++    libvdeplug-dev \
++    libvte-2.91-dev \
++    libxen-dev \
++    make \
++    python-yaml \
++    sparse \
++    texinfo \
++    xfslibs-dev
++RUN apt-get update && \
++    apt-get -y install $PACKAGES
++RUN dpkg -l $PACKAGES | sort > /packages.txt
++ENV FEATURES clang pyyaml sdl2
 -- 
 2.20.1
 
