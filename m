@@ -2,83 +2,94 @@ Return-Path: <SRS0=bvyN=TX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 66322C282DD
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 14:12:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 60C60C282DD
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 14:12:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1140C20863
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 14:12:17 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ezVMS3I5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1140C20863
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 271A420863
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 14:12:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 271A420863
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:37119 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:37127 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hToS9-00080H-2O
-	for qemu-devel@archiver.kernel.org; Thu, 23 May 2019 10:12:17 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:46431)
+	id 1hToSo-000050-Ay
+	for qemu-devel@archiver.kernel.org; Thu, 23 May 2019 10:12:58 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:46786)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hToHV-0006Cq-Ah
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 10:01:21 -0400
+	(envelope-from <mreitz@redhat.com>) id 1hToIP-0006wo-2u
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 10:02:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hToHR-0004OS-8f
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 10:01:17 -0400
-Received: from mail-ua1-x930.google.com ([2607:f8b0:4864:20::930]:43662)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hToHP-0004Mr-73
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 10:01:13 -0400
-Received: by mail-ua1-x930.google.com with SMTP id u4so2195086uau.10
-	for <qemu-devel@nongnu.org>; Thu, 23 May 2019 07:01:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=from:to:cc:subject:date:message-id:in-reply-to:references;
-	bh=DLSTlL6ipwSUa07Ie1q+0ewVzHyis1A8deJmyXS8hdA=;
-	b=ezVMS3I5bLR/qce4buWgfqUf89nLCqVaENkwhmpYeAatmZFRjzbv2jxMJ0zKIo78YE
-	Wp7oZIioRlWFn49Ac2H4NNKlmXavpcZaTCeranzWD9v8EOOTrr2bgGWaLBt1a74X/AB1
-	HRCndOwp8zH5lDZQEIJXyEL4X9XQvT6DNmmrKie462hbCGBjc4pbKUkeon5PDO2XMHtr
-	uQzMFdM/o3fKukzqGxtoPYBF9oY8ZYruRB5HK1PsSTgAVIC1wsKiQyj263KTdsrVgUEM
-	J97z8qCNx898Yrz+vIGzLguqPKaNaA+PpIJv67BZWMwgC4qaTyl1zCge1hLusdnE5KfX
-	6gzA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-	:references;
-	bh=DLSTlL6ipwSUa07Ie1q+0ewVzHyis1A8deJmyXS8hdA=;
-	b=NcIFZkWYs/1vkVFruoWBOOfteuK8JPkYdBptpf3SBJF3q6MnFcyzhjozRGjo9Bfx9D
-	Z5WSPjxT0UCBkszwsdd6+opyWH6NLbIJAK40hkCjEckTHB7yeXsekyjFFwgSg3NbpHnR
-	myG7K+8PbVA2r1dMAGW5TKcjNi7KcCW73XhEDw137sh9d1ROdE8KwkdNWziRFVAHLCfq
-	30E+TGNUh3lNLb/tsDtL9+PWYCCpApMQOcCkFkK6wD+ZK+6TAcHX/XPXymC73wnw+LK7
-	B5Vlz6jDoCGkzkZPZE0a5DP50asXrP16qwn1ojIeDfPeMPoMORC+lTigK338fsNCLEH8
-	2jtA==
-X-Gm-Message-State: APjAAAX6f2NVJiecYKVNMBz0KLITsl7SlGrlEiuTESMHCwTruVzK/mL2
-	w1sHRrqtFbmAEVXMbRY0t8Yc59R86F0=
-X-Google-Smtp-Source: APXvYqxzFnJe5tx1AoEQy6kZ3eyTGx0BrEYUdDRCTtFnjBryTmIp8rWYGfhNbyWHwXVTyXMTcSoJng==
-X-Received: by 2002:ab0:138e:: with SMTP id m14mr4211989uae.71.1558620068346; 
-	Thu, 23 May 2019 07:01:08 -0700 (PDT)
-Received: from localhost.localdomain (ip-173-130-215-183.orldfl.spcsdns.net.
-	[173.130.215.183]) by smtp.gmail.com with ESMTPSA id
-	v133sm1984166vkv.5.2019.05.23.07.01.06
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Thu, 23 May 2019 07:01:07 -0700 (PDT)
-From: Richard Henderson <richard.henderson@linaro.org>
-To: qemu-devel@nongnu.org
-Date: Thu, 23 May 2019 10:00:49 -0400
-Message-Id: <20190523140059.18548-4-richard.henderson@linaro.org>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20190523140059.18548-1-richard.henderson@linaro.org>
-References: <20190523140059.18548-1-richard.henderson@linaro.org>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::930
-Subject: [Qemu-devel] [PULL 03/13] target/rx: CPU definition
+	(envelope-from <mreitz@redhat.com>) id 1hToIK-0004vr-7F
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 10:02:13 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55220)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mreitz@redhat.com>)
+	id 1hToIA-0004oY-7G; Thu, 23 May 2019 10:01:58 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id ED17F30C1217;
+	Thu, 23 May 2019 14:01:51 +0000 (UTC)
+Received: from dresden.str.redhat.com (unknown [10.40.205.176])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id C006568367;
+	Thu, 23 May 2019 14:01:49 +0000 (UTC)
+To: Sam Eiderman <shmuel.eiderman@oracle.com>, kwolf@redhat.com,
+	qemu-block@nongnu.org, qemu-devel@nongnu.org
+References: <20190502085029.30776-1-shmuel.eiderman@oracle.com>
+	<20190502135828.42797-1-shmuel.eiderman@oracle.com>
+	<20190502135828.42797-3-shmuel.eiderman@oracle.com>
+From: Max Reitz <mreitz@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+	mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+	/PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+	U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+	mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+	awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+	AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+	CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+	B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+	2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+	AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+	8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+	4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+	BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+	xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+	W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+	DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+	64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+	ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+	sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+	alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+	/ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+	bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+	R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <c117d2e2-eef2-df4f-ef3d-37a33426dd51@redhat.com>
+Date: Thu, 23 May 2019 16:01:48 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
+MIME-Version: 1.0
+In-Reply-To: <20190502135828.42797-3-shmuel.eiderman@oracle.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="s6sKGehxa1AM7u7r2jKzqX62fI2qScy63"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.46]);
+	Thu, 23 May 2019 14:01:52 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+X-Content-Filtered-By: Mailman/MimeDel 2.1.21
+Subject: Re: [Qemu-devel] [PATCH v2 2/3] qemu-img: rebase: Reduce reads on
+ in-chain rebase
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -90,652 +101,117 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, Yoshinori Sato <ysato@users.sourceforge.jp>
+Cc: sagi.amit@oracle.com, arbel.moshe@oracle.com, liran.alon@oracle.com,
+	eyal.moscovici@oracle.com, karl.heubaum@oracle.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Yoshinori Sato <ysato@users.sourceforge.jp>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--s6sKGehxa1AM7u7r2jKzqX62fI2qScy63
+From: Max Reitz <mreitz@redhat.com>
+To: Sam Eiderman <shmuel.eiderman@oracle.com>, kwolf@redhat.com,
+ qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: eyal.moscovici@oracle.com, sagi.amit@oracle.com, karl.heubaum@oracle.com,
+ liran.alon@oracle.com, arbel.moshe@oracle.com
+Message-ID: <c117d2e2-eef2-df4f-ef3d-37a33426dd51@redhat.com>
+Subject: Re: [PATCH v2 2/3] qemu-img: rebase: Reduce reads on in-chain rebase
+References: <20190502085029.30776-1-shmuel.eiderman@oracle.com>
+ <20190502135828.42797-1-shmuel.eiderman@oracle.com>
+ <20190502135828.42797-3-shmuel.eiderman@oracle.com>
+In-Reply-To: <20190502135828.42797-3-shmuel.eiderman@oracle.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-Id: <20190516055244.95559-4-ysato@users.sourceforge.jp>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- target/rx/cpu.h     | 227 ++++++++++++++++++++++++++++++++++++++++++++
- target/rx/cpu.c     | 222 +++++++++++++++++++++++++++++++++++++++++++
- target/rx/gdbstub.c | 112 ++++++++++++++++++++++
- target/rx/monitor.c |  38 ++++++++
- 4 files changed, 599 insertions(+)
- create mode 100644 target/rx/cpu.h
- create mode 100644 target/rx/cpu.c
- create mode 100644 target/rx/gdbstub.c
- create mode 100644 target/rx/monitor.c
+On 02.05.19 15:58, Sam Eiderman wrote:
+> In the following case:
+>=20
+> (base) A <- B <- C (tip)
+>=20
+> when running:
+>=20
+>     qemu-img rebase -b A C
+>=20
+> QEMU would read all sectors not allocated in the file being rebased (C)=
 
-diff --git a/target/rx/cpu.h b/target/rx/cpu.h
-new file mode 100644
-index 0000000000..fa07c25af4
---- /dev/null
-+++ b/target/rx/cpu.h
-@@ -0,0 +1,227 @@
-+/*
-+ *  RX emulation definition
-+ *
-+ *  Copyright (c) 2019 Yoshinori Sato
-+ *
-+ * This program is free software; you can redistribute it and/or modify it
-+ * under the terms and conditions of the GNU General Public License,
-+ * version 2 or later, as published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope it will be useful, but WITHOUT
-+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
-+ * more details.
-+ *
-+ * You should have received a copy of the GNU General Public License along with
-+ * this program.  If not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#ifndef RX_CPU_H
-+#define RX_CPU_H
-+
-+#include "qemu/bitops.h"
-+#include "qemu-common.h"
-+#include "hw/registerfields.h"
-+#include "qom/cpu.h"
-+
-+#define TYPE_RXCPU "rxcpu"
-+
-+#define RXCPU_CLASS(klass)                                     \
-+    OBJECT_CLASS_CHECK(RXCPUClass, (klass), TYPE_RXCPU)
-+#define RXCPU(obj) \
-+    OBJECT_CHECK(RXCPU, (obj), TYPE_RXCPU)
-+#define RXCPU_GET_CLASS(obj) \
-+    OBJECT_GET_CLASS(RXCPUClass, (obj), TYPE_RXCPU)
-+
-+/*
-+ * RXCPUClass:
-+ * @parent_realize: The parent class' realize handler.
-+ * @parent_reset: The parent class' reset handler.
-+ *
-+ * A RX CPU model.
-+ */
-+typedef struct RXCPUClass {
-+    /*< private >*/
-+    CPUClass parent_class;
-+    /*< public >*/
-+
-+    DeviceRealize parent_realize;
-+    void (*parent_reset)(CPUState *cpu);
-+
-+} RXCPUClass;
-+
-+#define TARGET_LONG_BITS 32
-+#define TARGET_PAGE_BITS 12
-+
-+#define CPUArchState struct CPURXState
-+
-+#include "exec/cpu-defs.h"
-+
-+#define TARGET_PHYS_ADDR_SPACE_BITS 32
-+#define TARGET_VIRT_ADDR_SPACE_BITS 32
-+
-+/* PSW define */
-+REG32(PSW, 0)
-+FIELD(PSW, C, 0, 1)
-+FIELD(PSW, Z, 1, 1)
-+FIELD(PSW, S, 2, 1)
-+FIELD(PSW, O, 3, 1)
-+FIELD(PSW, I, 16, 1)
-+FIELD(PSW, U, 17, 1)
-+FIELD(PSW, PM, 20, 1)
-+FIELD(PSW, IPL, 24, 4)
-+
-+/* FPSW define */
-+REG32(FPSW, 0)
-+FIELD(FPSW, RM, 0, 2)
-+FIELD(FPSW, CV, 2, 1)
-+FIELD(FPSW, CO, 3, 1)
-+FIELD(FPSW, CZ, 4, 1)
-+FIELD(FPSW, CU, 5, 1)
-+FIELD(FPSW, CX, 6, 1)
-+FIELD(FPSW, CE, 7, 1)
-+FIELD(FPSW, CAUSE, 2, 6)
-+FIELD(FPSW, DN, 8, 1)
-+FIELD(FPSW, EV, 10, 1)
-+FIELD(FPSW, EO, 11, 1)
-+FIELD(FPSW, EZ, 12, 1)
-+FIELD(FPSW, EU, 13, 1)
-+FIELD(FPSW, EX, 14, 1)
-+FIELD(FPSW, ENABLE, 10, 5)
-+FIELD(FPSW, FV, 26, 1)
-+FIELD(FPSW, FO, 27, 1)
-+FIELD(FPSW, FZ, 28, 1)
-+FIELD(FPSW, FU, 29, 1)
-+FIELD(FPSW, FX, 30, 1)
-+FIELD(FPSW, FLAGS, 26, 4)
-+FIELD(FPSW, FS, 31, 1)
-+
-+#define NB_MMU_MODES 1
-+#define MMU_MODE0_SUFFIX _all
-+
-+enum {
-+    NUM_REGS = 16,
-+};
-+
-+typedef struct CPURXState {
-+    /* CPU registers */
-+    uint32_t regs[NUM_REGS];    /* general registers */
-+    uint32_t psw_o;             /* O bit of status register */
-+    uint32_t psw_s;             /* S bit of status register */
-+    uint32_t psw_z;             /* Z bit of status register */
-+    uint32_t psw_c;             /* C bit of status register */
-+    uint32_t psw_u;
-+    uint32_t psw_i;
-+    uint32_t psw_pm;
-+    uint32_t psw_ipl;
-+    uint32_t bpsw;              /* backup status */
-+    uint32_t bpc;               /* backup pc */
-+    uint32_t isp;               /* global base register */
-+    uint32_t usp;               /* vector base register */
-+    uint32_t pc;                /* program counter */
-+    uint32_t intb;              /* interrupt vector */
-+    uint32_t fintv;
-+    uint32_t fpsw;
-+    uint64_t acc;
-+
-+    /* Fields up to this point are cleared by a CPU reset */
-+    struct {} end_reset_fields;
-+
-+    /* Internal use */
-+    uint32_t in_sleep;
-+    uint32_t req_irq;           /* Requested interrupt no (hard) */
-+    uint32_t req_ipl;           /* Requested interrupt level */
-+    uint32_t ack_irq;           /* execute irq */
-+    uint32_t ack_ipl;           /* execute ipl */
-+    float_status fp_status;
-+    qemu_irq ack;		/* Interrupt acknowledge */
-+
-+    CPU_COMMON
-+} CPURXState;
-+
-+/*
-+ * RXCPU:
-+ * @env: #CPURXState
-+ *
-+ * A RX CPU
-+ */
-+struct RXCPU {
-+    /*< private >*/
-+    CPUState parent_obj;
-+    /*< public >*/
-+
-+    CPURXState env;
-+};
-+
-+typedef struct RXCPU RXCPU;
-+
-+static inline RXCPU *rx_env_get_cpu(CPURXState *env)
-+{
-+    return container_of(env, RXCPU, env);
-+}
-+
-+#define ENV_GET_CPU(e) CPU(rx_env_get_cpu(e))
-+
-+#define ENV_OFFSET offsetof(RXCPU, env)
-+
-+#define RX_CPU_TYPE_SUFFIX "-" TYPE_RXCPU
-+#define RX_CPU_TYPE_NAME(model) model RX_CPU_TYPE_SUFFIX
-+#define CPU_RESOLVING_TYPE TYPE_RXCPU
-+
-+extern const char rx_crname[][6];
-+
-+void rx_cpu_do_interrupt(CPUState *cpu);
-+bool rx_cpu_exec_interrupt(CPUState *cpu, int int_req);
-+void rx_cpu_dump_state(CPUState *cpu, FILE *f, int flags);
-+int rx_cpu_gdb_read_register(CPUState *cpu, uint8_t *buf, int reg);
-+int rx_cpu_gdb_write_register(CPUState *cpu, uint8_t *buf, int reg);
-+hwaddr rx_cpu_get_phys_page_debug(CPUState *cpu, vaddr addr);
-+
-+void rx_translate_init(void);
-+int cpu_rx_signal_handler(int host_signum, void *pinfo,
-+                           void *puc);
-+
-+void rx_cpu_list(void);
-+void rx_load_image(RXCPU *cpu, const char *filename,
-+                   uint32_t start, uint32_t size);
-+void rx_cpu_unpack_psw(CPURXState *env, uint32_t psw, int rte);
-+
-+#define cpu_signal_handler cpu_rx_signal_handler
-+#define cpu_list rx_cpu_list
-+
-+#include "exec/cpu-all.h"
-+
-+#define CPU_INTERRUPT_SOFT CPU_INTERRUPT_TGT_INT_0
-+#define CPU_INTERRUPT_FIR  CPU_INTERRUPT_TGT_INT_1
-+
-+#define RX_CPU_IRQ 0
-+#define RX_CPU_FIR 1
-+
-+static inline void cpu_get_tb_cpu_state(CPURXState *env, target_ulong *pc,
-+                                        target_ulong *cs_base, uint32_t *flags)
-+{
-+    *pc = env->pc;
-+    *cs_base = 0;
-+    *flags = FIELD_DP32(0, PSW, PM, env->psw_pm);
-+}
-+
-+static inline int cpu_mmu_index(CPURXState *env, bool ifetch)
-+{
-+    return 0;
-+}
-+
-+static inline uint32_t rx_cpu_pack_psw(CPURXState *env)
-+{
-+    uint32_t psw = 0;
-+    psw = FIELD_DP32(psw, PSW, IPL, env->psw_ipl);
-+    psw = FIELD_DP32(psw, PSW, PM,  env->psw_pm);
-+    psw = FIELD_DP32(psw, PSW, U,   env->psw_u);
-+    psw = FIELD_DP32(psw, PSW, I,   env->psw_i);
-+    psw = FIELD_DP32(psw, PSW, O,   env->psw_o >> 31);
-+    psw = FIELD_DP32(psw, PSW, S,   env->psw_s >> 31);
-+    psw = FIELD_DP32(psw, PSW, Z,   env->psw_z == 0);
-+    psw = FIELD_DP32(psw, PSW, C,   env->psw_c);
-+    return psw;
-+}
-+
-+#endif /* RX_CPU_H */
-diff --git a/target/rx/cpu.c b/target/rx/cpu.c
-new file mode 100644
-index 0000000000..4b96f2e463
---- /dev/null
-+++ b/target/rx/cpu.c
-@@ -0,0 +1,222 @@
-+/*
-+ * QEMU RX CPU
-+ *
-+ * Copyright (c) 2019 Yoshinori Sato
-+ *
-+ * This program is free software; you can redistribute it and/or modify it
-+ * under the terms and conditions of the GNU General Public License,
-+ * version 2 or later, as published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope it will be useful, but WITHOUT
-+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
-+ * more details.
-+ *
-+ * You should have received a copy of the GNU General Public License along with
-+ * this program.  If not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qemu/qemu-print.h"
-+#include "qapi/error.h"
-+#include "cpu.h"
-+#include "qemu-common.h"
-+#include "migration/vmstate.h"
-+#include "exec/exec-all.h"
-+#include "hw/loader.h"
-+#include "fpu/softfloat.h"
-+
-+static void rx_cpu_set_pc(CPUState *cs, vaddr value)
-+{
-+    RXCPU *cpu = RXCPU(cs);
-+
-+    cpu->env.pc = value;
-+}
-+
-+static void rx_cpu_synchronize_from_tb(CPUState *cs, TranslationBlock *tb)
-+{
-+    RXCPU *cpu = RXCPU(cs);
-+
-+    cpu->env.pc = tb->pc;
-+}
-+
-+static bool rx_cpu_has_work(CPUState *cs)
-+{
-+    return cs->interrupt_request &
-+        (CPU_INTERRUPT_HARD | CPU_INTERRUPT_FIR);
-+}
-+
-+static void rx_cpu_reset(CPUState *s)
-+{
-+    RXCPU *cpu = RXCPU(s);
-+    RXCPUClass *rcc = RXCPU_GET_CLASS(cpu);
-+    CPURXState *env = &cpu->env;
-+    uint32_t *resetvec;
-+
-+    rcc->parent_reset(s);
-+
-+    memset(env, 0, offsetof(CPURXState, end_reset_fields));
-+
-+    resetvec = rom_ptr(0xfffffffc, 4);
-+    if (resetvec) {
-+        /* In the case of kernel, it is ignored because it is not set. */
-+        env->pc = ldl_p(resetvec);
-+    }
-+    rx_cpu_unpack_psw(env, 0, 1);
-+    env->regs[0] = env->isp = env->usp = 0;
-+    env->fpsw = 0;
-+    set_flush_to_zero(1, &env->fp_status);
-+    set_flush_inputs_to_zero(1, &env->fp_status);
-+}
-+
-+static void rx_cpu_list_entry(gpointer data, gpointer user_data)
-+{
-+    const char *typename = object_class_get_name(OBJECT_CLASS(data));
-+    int len = strlen(typename) - strlen(RX_CPU_TYPE_SUFFIX);
-+
-+    qemu_printf("%.*s\n", len, typename);
-+}
-+
-+void rx_cpu_list(void)
-+{
-+    GSList *list;
-+    list = object_class_get_list_sorted(TYPE_RXCPU, false);
-+    g_slist_foreach(list, rx_cpu_list_entry, NULL);
-+    g_slist_free(list);
-+}
-+
-+static ObjectClass *rx_cpu_class_by_name(const char *cpu_model)
-+{
-+    ObjectClass *oc;
-+    char *typename = NULL;
-+
-+    typename = g_strdup_printf(RX_CPU_TYPE_NAME(""));
-+    oc = object_class_by_name(typename);
-+    if (oc != NULL && object_class_is_abstract(oc)) {
-+        oc = NULL;
-+    }
-+
-+    g_free(typename);
-+    return oc;
-+}
-+
-+static void rx_cpu_realize(DeviceState *dev, Error **errp)
-+{
-+    CPUState *cs = CPU(dev);
-+    RXCPUClass *rcc = RXCPU_GET_CLASS(dev);
-+    Error *local_err = NULL;
-+
-+    cpu_exec_realizefn(cs, &local_err);
-+    if (local_err != NULL) {
-+        error_propagate(errp, local_err);
-+        return;
-+    }
-+
-+    cpu_reset(cs);
-+    qemu_init_vcpu(cs);
-+
-+    rcc->parent_realize(dev, errp);
-+}
-+
-+static void rx_cpu_set_irq(void *opaque, int no, int request)
-+{
-+    RXCPU *cpu = opaque;
-+    CPUState *cs = CPU(cpu);
-+    int irq = request & 0xff;
-+
-+    static const int mask[] = {
-+        [RX_CPU_IRQ] = CPU_INTERRUPT_HARD,
-+        [RX_CPU_FIR] = CPU_INTERRUPT_FIR,
-+    };
-+    if (irq) {
-+        cpu->env.req_irq = irq;
-+        cpu->env.req_ipl = (request >> 8) & 0x0f;
-+        cpu_interrupt(cs, mask[no]);
-+    } else {
-+        cpu_reset_interrupt(cs, mask[no]);
-+    }
-+}
-+
-+static void rx_cpu_disas_set_info(CPUState *cpu, disassemble_info *info)
-+{
-+    info->mach = bfd_mach_rx;
-+    info->print_insn = print_insn_rx;
-+}
-+
-+static void rx_cpu_init(Object *obj)
-+{
-+    CPUState *cs = CPU(obj);
-+    RXCPU *cpu = RXCPU(obj);
-+    CPURXState *env = &cpu->env;
-+
-+    cs->env_ptr = env;
-+    qdev_init_gpio_in(DEVICE(cpu), rx_cpu_set_irq, 2);
-+}
-+
-+static void rxcpu_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+    CPUClass *cc = CPU_CLASS(klass);
-+    RXCPUClass *rcc = RXCPU_CLASS(klass);
-+
-+    device_class_set_parent_realize(dc, rx_cpu_realize,
-+                                    &rcc->parent_realize);
-+
-+    rcc->parent_reset = cc->reset;
-+    cc->reset = rx_cpu_reset;
-+
-+    cc->class_by_name = rx_cpu_class_by_name;
-+    cc->has_work = rx_cpu_has_work;
-+    cc->do_interrupt = rx_cpu_do_interrupt;
-+    cc->cpu_exec_interrupt = rx_cpu_exec_interrupt;
-+    cc->dump_state = rx_cpu_dump_state;
-+    cc->set_pc = rx_cpu_set_pc;
-+    cc->synchronize_from_tb = rx_cpu_synchronize_from_tb;
-+    cc->gdb_read_register = rx_cpu_gdb_read_register;
-+    cc->gdb_write_register = rx_cpu_gdb_write_register;
-+    cc->get_phys_page_debug = rx_cpu_get_phys_page_debug;
-+    cc->disas_set_info = rx_cpu_disas_set_info;
-+    cc->tcg_initialize = rx_translate_init;
-+
-+    cc->gdb_num_core_regs = 26;
-+}
-+
-+static const TypeInfo rxcpu_info = {
-+    .name = TYPE_RXCPU,
-+    .parent = TYPE_CPU,
-+    .instance_size = sizeof(RXCPU),
-+    .instance_init = rx_cpu_init,
-+    .abstract = false,
-+    .class_size = sizeof(RXCPUClass),
-+    .class_init = rxcpu_class_init,
-+};
-+
-+static void rxcpu_register_types(void)
-+{
-+    type_register_static(&rxcpu_info);
-+}
-+
-+type_init(rxcpu_register_types)
-+
-+static uint32_t extable[32];
-+
-+void rx_load_image(RXCPU *cpu, const char *filename,
-+                   uint32_t start, uint32_t size)
-+{
-+    long kernel_size;
-+    int i;
-+
-+    kernel_size = load_image_targphys(filename, start, size);
-+    if (kernel_size < 0) {
-+        fprintf(stderr, "qemu: could not load kernel '%s'\n", filename);
-+        exit(1);
-+    }
-+    cpu->env.pc = start;
-+
-+    /* setup exception trap trampoline */
-+    /* linux kernel only works little-endian mode */
-+    for (i = 0; i < 32; i++) {
-+        extable[i] = cpu_to_le32(0x10 + i * 4);
-+    }
-+    rom_add_blob_fixed("extable", extable, sizeof(extable), 0xffffff80);
-+}
-diff --git a/target/rx/gdbstub.c b/target/rx/gdbstub.c
-new file mode 100644
-index 0000000000..d76ca52e82
---- /dev/null
-+++ b/target/rx/gdbstub.c
-@@ -0,0 +1,112 @@
-+/*
-+ * RX gdb server stub
-+ *
-+ * Copyright (c) 2019 Yoshinori Sato
-+ *
-+ * This program is free software; you can redistribute it and/or modify it
-+ * under the terms and conditions of the GNU General Public License,
-+ * version 2 or later, as published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope it will be useful, but WITHOUT
-+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
-+ * more details.
-+ *
-+ * You should have received a copy of the GNU General Public License along with
-+ * this program.  If not, see <http://www.gnu.org/licenses/>.
-+ */
-+#include "qemu/osdep.h"
-+#include "qemu-common.h"
-+#include "cpu.h"
-+#include "exec/gdbstub.h"
-+
-+int rx_cpu_gdb_read_register(CPUState *cs, uint8_t *mem_buf, int n)
-+{
-+    RXCPU *cpu = RXCPU(cs);
-+    CPURXState *env = &cpu->env;
-+
-+    switch (n) {
-+    case 0 ... 15:
-+        return gdb_get_regl(mem_buf, env->regs[n]);
-+    case 16:
-+        return gdb_get_regl(mem_buf, (env->psw_u) ? env->regs[0] : env->usp);
-+    case 17:
-+        return gdb_get_regl(mem_buf, (!env->psw_u) ? env->regs[0] : env->isp);
-+    case 18:
-+        return gdb_get_regl(mem_buf, rx_cpu_pack_psw(env));
-+    case 19:
-+        return gdb_get_regl(mem_buf, env->pc);
-+    case 20:
-+        return gdb_get_regl(mem_buf, env->intb);
-+    case 21:
-+        return gdb_get_regl(mem_buf, env->bpsw);
-+    case 22:
-+        return gdb_get_regl(mem_buf, env->bpc);
-+    case 23:
-+        return gdb_get_regl(mem_buf, env->fintv);
-+    case 24:
-+        return gdb_get_regl(mem_buf, env->fpsw);
-+    case 25:
-+        return 0;
-+    }
-+    return 0;
-+}
-+
-+int rx_cpu_gdb_write_register(CPUState *cs, uint8_t *mem_buf, int n)
-+{
-+    RXCPU *cpu = RXCPU(cs);
-+    CPURXState *env = &cpu->env;
-+    uint32_t psw;
-+    switch (n) {
-+    case 0 ... 15:
-+        env->regs[n] = ldl_p(mem_buf);
-+        if (n == 0) {
-+            if (env->psw_u) {
-+                env->usp = env->regs[0];
-+            } else {
-+                env->isp = env->regs[0];
-+            }
-+        }
-+        break;
-+    case 16:
-+        env->usp = ldl_p(mem_buf);
-+        if (env->psw_u) {
-+            env->regs[0] = ldl_p(mem_buf);
-+        }
-+        break;
-+    case 17:
-+        env->isp = ldl_p(mem_buf);
-+        if (!env->psw_u) {
-+            env->regs[0] = ldl_p(mem_buf);
-+        }
-+        break;
-+    case 18:
-+        psw = ldl_p(mem_buf);
-+        rx_cpu_unpack_psw(env, psw, 1);
-+        break;
-+    case 19:
-+        env->pc = ldl_p(mem_buf);
-+        break;
-+    case 20:
-+        env->intb = ldl_p(mem_buf);
-+        break;
-+    case 21:
-+        env->bpsw = ldl_p(mem_buf);
-+        break;
-+    case 22:
-+        env->bpc = ldl_p(mem_buf);
-+        break;
-+    case 23:
-+        env->fintv = ldl_p(mem_buf);
-+        break;
-+    case 24:
-+        env->fpsw = ldl_p(mem_buf);
-+        break;
-+    case 25:
-+        return 8;
-+    default:
-+        return 0;
-+    }
-+
-+    return 4;
-+}
-diff --git a/target/rx/monitor.c b/target/rx/monitor.c
-new file mode 100644
-index 0000000000..5d7a1e58b5
---- /dev/null
-+++ b/target/rx/monitor.c
-@@ -0,0 +1,38 @@
-+/*
-+ * QEMU monitor
-+ *
-+ * Copyright (c) 2003-2004 Fabrice Bellard
-+ *
-+ * Permission is hereby granted, free of charge, to any person obtaining a copy
-+ * of this software and associated documentation files (the "Software"), to deal
-+ * in the Software without restriction, including without limitation the rights
-+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-+ * copies of the Software, and to permit persons to whom the Software is
-+ * furnished to do so, subject to the following conditions:
-+ *
-+ * The above copyright notice and this permission notice shall be included in
-+ * all copies or substantial portions of the Software.
-+ *
-+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-+ * THE SOFTWARE.
-+ */
-+#include "qemu/osdep.h"
-+#include "cpu.h"
-+#include "monitor/monitor.h"
-+#include "monitor/hmp-target.h"
-+#include "hmp.h"
-+
-+void hmp_info_tlb(Monitor *mon, const QDict *qdict)
-+{
-+    CPUArchState *env = mon_get_cpu_env();
-+
-+    if (!env) {
-+        monitor_printf(mon, "No CPU available\n");
-+        return;
-+    }
-+}
--- 
-2.17.1
+> and compare them to the new base image (A), regardless of whether they
+> were changed or even allocated anywhere along the chain between the new=
 
+> base and the top image (B). This causes many unneeded reads when
+> rebasing an image which represents a small diff of a large disk, as it
+> would read most of the disk's sectors.
+>=20
+> Instead, use bdrv_is_allocated_above() to reduce the number of
+> unnecessary reads.
+>=20
+> Reviewed-by: Karl Heubaum <karl.heubaum@oracle.com>
+> Signed-off-by: Sam Eiderman <shmuel.eiderman@oracle.com>
+> Signed-off-by: Eyal Moscovici <eyal.moscovici@oracle.com>
+> ---
+>  qemu-img.c | 25 ++++++++++++++++++++++++-
+>  1 file changed, 24 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/qemu-img.c b/qemu-img.c
+> index d9b609b3f0..7f20858cb9 100644
+> --- a/qemu-img.c
+> +++ b/qemu-img.c
+
+[...]
+
+> @@ -3422,6 +3428,23 @@ static int img_rebase(int argc, char **argv)
+>                  continue;
+>              }
+> =20
+> +            if (prefix_chain_bs) {
+> +                /*
+> +                 * If cluster wasn't changed since prefix_chain, we do=
+n't need
+> +                 * to take action
+> +                 */
+> +                ret =3D bdrv_is_allocated_above(bs, prefix_chain_bs,
+> +                                              offset, n, &n);
+
+This will always return true because it definitely is allocated in @bs,
+or we wouldn=E2=80=99t be here.  (We just checked that with
+bdrv_is_allocated().)  I think @top should be backing_bs(bs).
+
+Max
+
+> +                if (ret < 0) {
+> +                    error_report("error while reading image metadata: =
+%s",
+> +                                 strerror(-ret));
+> +                    goto out;
+> +                }
+> +                if (!ret) {
+> +                    continue;
+> +                }
+> +            }
+> +
+>              /*
+>               * Read old and new backing file and take into considerati=
+on that
+>               * backing files may be smaller than the COW image.
+>=20
+
+
+
+--s6sKGehxa1AM7u7r2jKzqX62fI2qScy63
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlzmp8wACgkQ9AfbAGHV
+z0DC4AgArkNz2w/pi46i1kT3xZfnoFRLrPpZZ91hG/6HEurEb1/XN12F0/PeNRpZ
+0hnL2n5hVnrudqZPxk0sJ58s0utVBOaR0JKdA+x9LIHKNnLDx2zsMLEhp+6DneiN
+mg+nU8w+yBW0WM1dwr7st1gTmyhDWibTHuVOYXhE+t2lD/WpX0ymNTTp8VJrQ+rc
+kmJrv/1IS7VwUkGLlGpA0W34MexTOXs8o4cyyKYGGQBAbz6RMRU5g+dCNdKvU1WG
+7orAqWUfMx4dZmUAYf6/66wiNAjCLq9+ufM61miG0GwzAGEzpvTbuLKjuuc8QNME
+LRlMyS7E1EmV7HKAKfLDuhEUqBXD2A==
+=E2Q0
+-----END PGP SIGNATURE-----
+
+--s6sKGehxa1AM7u7r2jKzqX62fI2qScy63--
 
