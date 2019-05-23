@@ -2,60 +2,62 @@ Return-Path: <SRS0=bvyN=TX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.0 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DB94C282DD
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 13:12:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 48F2CC282DD
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 13:12:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 416A72133D
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 13:12:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 416A72133D
+	by mail.kernel.org (Postfix) with ESMTPS id 169B42133D
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 13:12:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 169B42133D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:35875 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:35877 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hTnWS-0001N7-Es
-	for qemu-devel@archiver.kernel.org; Thu, 23 May 2019 09:12:40 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:51307)
+	id 1hTnWe-0001Yf-98
+	for qemu-devel@archiver.kernel.org; Thu, 23 May 2019 09:12:52 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:51003)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hTnH5-0003rP-U7
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 08:56:49 -0400
+	(envelope-from <philmd@redhat.com>) id 1hTnH4-0003dW-3q
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 08:56:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hTn4R-0000sd-Ms
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 08:43:45 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47608)
+	(envelope-from <philmd@redhat.com>) id 1hTn4f-00010U-1Y
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 08:43:57 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39334)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <philmd@redhat.com>)
-	id 1hTn4Q-0000rC-Hf; Thu, 23 May 2019 08:43:43 -0400
+	id 1hTn4e-000108-TI; Thu, 23 May 2019 08:43:56 -0400
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
 	[10.5.11.14])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C60A2307EA98;
-	Thu, 23 May 2019 12:43:35 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 268E5308FBA9;
+	Thu, 23 May 2019 12:43:56 +0000 (UTC)
 Received: from x1w.redhat.com (unknown [10.40.205.5])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 3CEF45D9C3;
-	Thu, 23 May 2019 12:43:22 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 2C21B5D9C3;
+	Thu, 23 May 2019 12:43:44 +0000 (UTC)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Thu, 23 May 2019 14:43:05 +0200
-Message-Id: <20190523124320.28726-1-philmd@redhat.com>
+Date: Thu, 23 May 2019 14:43:08 +0200
+Message-Id: <20190523124320.28726-4-philmd@redhat.com>
+In-Reply-To: <20190523124320.28726-1-philmd@redhat.com>
+References: <20190523124320.28726-1-philmd@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.44]);
-	Thu, 23 May 2019 12:43:41 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.43]);
+	Thu, 23 May 2019 12:43:56 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 00/15] Fw cfg 20190523 patches
+Subject: [Qemu-devel] [PULL 03/15] hw/i386: Extract fw_cfg definitions to
+ local "fw_cfg.h"
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -67,9 +69,11 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Laszlo Ersek <lersek@redhat.com>,
+Cc: Eduardo Habkost <ehabkost@redhat.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>, Laszlo Ersek <lersek@redhat.com>,
 	Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
 	qemu-ppc@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>,
+	Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>,
 	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
 	Artyom Tarasenko <atar4qemu@gmail.com>,
 	David Gibson <david@gibson.dropbear.id.au>
@@ -77,74 +81,68 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The following changes since commit c4600d5d417ea13e0f1cc047b227a2b5b0e694=
-f5:
+Extract the architecture-specific fw_cfg definitions to "fw_cfg.h".
 
-  Merge remote-tracking branch 'remotes/vivier2/tags/trivial-branch-pull-=
-request' into staging (2019-05-23 12:00:37 +0100)
-
-are available in the Git repository at:
-
-  https://gitlab.com/philmd/qemu.git tags/fw_cfg-20190523-pull-request
-
-for you to fetch changes up to 3ae9dd1a304248e1f6ca631cdd43eb44a3e9e7b4:
-
-  tests: fw_cfg: add 'splash-time' test case (2019-05-23 14:10:31 +0200)
-
-----------------------------------------------------------------
-
-fw_cfg patches for 2019-05-23
-
-- Add trace events
-- Get rid of globals in fw_cfg-test
-- Explicit 'reboot-timeout' is little endian
-- Add tests for 'reboot-timeout' and 'splash-time'
-
-----------------------------------------------------------------
-
-Li Qiang (5):
-  tests: refactor fw_cfg_test
-  tests: fw_cfg: add a function to get the fw_cfg file
-  hw/nvram/fw_cfg: Store 'reboot-timeout' as little endian
-  tests: fw_cfg: add 'reboot-timeout' test case
-  tests: fw_cfg: add 'splash-time' test case
-
-Philippe Mathieu-Daud=C3=A9 (10):
-  hw/nvram/fw_cfg: Add trace events
-  hw/nvram/fw_cfg: Add fw_cfg_arch_key_name()
-  hw/i386: Extract fw_cfg definitions to local "fw_cfg.h"
-  hw/i386: Implement fw_cfg_arch_key_name()
-  hw/ppc: Implement fw_cfg_arch_key_name()
-  hw/sparc: Implement fw_cfg_arch_key_name()
-  hw/sparc64: Implement fw_cfg_arch_key_name()
-  tests/libqos: Add io_fw_cfg_uninit() and mm_fw_cfg_uninit()
-  tests/libqos: Add pc_fw_cfg_uninit() and use it
-  tests/fw_cfg: Free QFWCFG object after qtest has run
-
- MAINTAINERS               |   1 +
- hw/i386/Makefile.objs     |   2 +-
- hw/i386/fw_cfg.c          |  38 ++++++++++++
- hw/i386/fw_cfg.h          |  20 ++++++
- hw/i386/pc.c              |   7 +--
- hw/nvram/fw_cfg.c         |  67 +++++++++++++++++++-
- hw/nvram/trace-events     |   7 ++-
- hw/ppc/Makefile.objs      |   2 +-
- hw/ppc/fw_cfg.c           |  45 ++++++++++++++
- hw/sparc/sun4m.c          |  19 ++++++
- hw/sparc64/sun4u.c        |  19 ++++++
- include/hw/nvram/fw_cfg.h |  14 +++++
- stubs/Makefile.objs       |   1 +
- stubs/fw_cfg.c            |  21 +++++++
- tests/fw_cfg-test.c       | 127 ++++++++++++++++++++++++++++++++++----
- tests/libqos/fw_cfg.c     |  55 +++++++++++++++++
- tests/libqos/fw_cfg.h     |   9 +++
- tests/libqos/malloc-pc.c  |   2 +-
- 18 files changed, 433 insertions(+), 23 deletions(-)
- create mode 100644 hw/i386/fw_cfg.c
+Reviewed-by: Laszlo Ersek <lersek@redhat.com>
+Message-Id: <20190422195020.1494-4-philmd@redhat.com>
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+---
+ hw/i386/fw_cfg.h | 20 ++++++++++++++++++++
+ hw/i386/pc.c     |  7 +------
+ 2 files changed, 21 insertions(+), 6 deletions(-)
  create mode 100644 hw/i386/fw_cfg.h
- create mode 100644 hw/ppc/fw_cfg.c
- create mode 100644 stubs/fw_cfg.c
 
+diff --git a/hw/i386/fw_cfg.h b/hw/i386/fw_cfg.h
+new file mode 100644
+index 0000000000..17a4bc32f2
+--- /dev/null
++++ b/hw/i386/fw_cfg.h
+@@ -0,0 +1,20 @@
++/*
++ * QEMU fw_cfg helpers (X86 specific)
++ *
++ * Copyright (c) 2003-2004 Fabrice Bellard
++ *
++ * SPDX-License-Identifier: MIT
++ */
++
++#ifndef HW_I386_FW_CFG_H
++#define HW_I386_FW_CFG_H
++
++#include "hw/nvram/fw_cfg.h"
++
++#define FW_CFG_ACPI_TABLES      (FW_CFG_ARCH_LOCAL + 0)
++#define FW_CFG_SMBIOS_ENTRIES   (FW_CFG_ARCH_LOCAL + 1)
++#define FW_CFG_IRQ0_OVERRIDE    (FW_CFG_ARCH_LOCAL + 2)
++#define FW_CFG_E820_TABLE       (FW_CFG_ARCH_LOCAL + 3)
++#define FW_CFG_HPET             (FW_CFG_ARCH_LOCAL + 4)
++
++#endif
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index d98b737b8f..2632b73f80 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -30,6 +30,7 @@
+ #include "hw/char/parallel.h"
+ #include "hw/i386/apic.h"
+ #include "hw/i386/topology.h"
++#include "hw/i386/fw_cfg.h"
+ #include "sysemu/cpus.h"
+ #include "hw/block/fdc.h"
+ #include "hw/ide.h"
+@@ -88,12 +89,6 @@
+ #define DPRINTF(fmt, ...)
+ #endif
+=20
+-#define FW_CFG_ACPI_TABLES (FW_CFG_ARCH_LOCAL + 0)
+-#define FW_CFG_SMBIOS_ENTRIES (FW_CFG_ARCH_LOCAL + 1)
+-#define FW_CFG_IRQ0_OVERRIDE (FW_CFG_ARCH_LOCAL + 2)
+-#define FW_CFG_E820_TABLE (FW_CFG_ARCH_LOCAL + 3)
+-#define FW_CFG_HPET (FW_CFG_ARCH_LOCAL + 4)
+-
+ #define E820_NR_ENTRIES		16
+=20
+ struct e820_entry {
 --=20
 2.20.1
 
