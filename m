@@ -2,60 +2,79 @@ Return-Path: <SRS0=bvyN=TX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 80A47C282DD
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 13:46:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A46FCC282DD
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 13:46:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5310220881
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 13:46:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5310220881
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 6D7F420881
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 13:46:20 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="gk5/42pf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6D7F420881
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:36663 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:36665 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hTo2p-0003Xj-In
-	for qemu-devel@archiver.kernel.org; Thu, 23 May 2019 09:46:07 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:42291)
+	id 1hTo31-0003d6-MA
+	for qemu-devel@archiver.kernel.org; Thu, 23 May 2019 09:46:19 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:35860)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1hTo1a-0002op-Ie
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 09:44:52 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1hTnjq-0005DE-1S
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 09:26:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1hTo1Y-0005sN-RR
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 09:44:50 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60518)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1hTo1Y-0005ab-Fg
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 09:44:48 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
-	[10.5.11.22])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 14BF1300415C;
-	Thu, 23 May 2019 13:44:34 +0000 (UTC)
-Received: from localhost (ovpn-116-196.ams2.redhat.com [10.36.116.196])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 9CFE41001E80;
-	Thu, 23 May 2019 13:44:33 +0000 (UTC)
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: <qemu-devel@nongnu.org>
-Date: Thu, 23 May 2019 14:44:08 +0100
-Message-Id: <20190523134409.18673-3-stefanha@redhat.com>
-In-Reply-To: <20190523134409.18673-1-stefanha@redhat.com>
-References: <20190523134409.18673-1-stefanha@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1hTnjo-0007HX-RW
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 09:26:30 -0400
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:38926)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1hTnjo-0007HB-Nn
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 09:26:28 -0400
+Received: by mail-ot1-x341.google.com with SMTP id r7so5387626otn.6
+	for <qemu-devel@nongnu.org>; Thu, 23 May 2019 06:26:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+	:cc; bh=+msFrWg8pYsDoiAgT2Yt57n7J0ivFIp9RtalhZcUqvg=;
+	b=gk5/42pfe86K3GfnuSzlz2G5xyoGz0yDqNZouWBhUCsusL75HTvdQY5ZEt8J7ETarC
+	aq8AQ6qqIQP4dFmj5caRJeGsJawPiQIpKBG7R6MSlDPedz6VMguLluRBUabKkTEZkfsm
+	0U+t0fzIBGK5VshpbV3vkpZdqt4gIds3D8MGKp8EsOdAvs/AeHlIR8WgiNbJh56Q5uwh
+	QjUV88T9YM4eQl4FDLZ8IzItETeFVUkkXJ3un1XaxKQ5/v3RhPdKt9rDbOhfG2Y3R7hM
+	9dihCbisrmzWrkiuzQzz8RbBog8rb04mZ/ZVI8F3SG69kR4Gczg0Tq/Sbdh92hGsDVGE
+	WAQA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+	:message-id:subject:to:cc;
+	bh=+msFrWg8pYsDoiAgT2Yt57n7J0ivFIp9RtalhZcUqvg=;
+	b=IY+bezfIF4j2bZ1zP5Iu8HTTC65/jtcAjz7YWuSTQtB3KvEheo4yhiJGFf7QTmiAFP
+	rz43sH6mI/dbF28sxZa0YD6/PMN2JgqliSj8ThZLUlpr4BgGtiGv/eEO1KlNFp9eq31v
+	fvgHGPIAFtG7+bcWGXRIdNH9HrbTgIe0GVy0UerBjpSzcItbB6o3whUIB2ILzw6Um8hV
+	bq1hicYiKfsiuMu9k6NPMIU4ePdeYn6Nj3egpyfnfzz8Z7fKSLFIn+WGJ8glVHrXmyPf
+	rP5T8Q/cEupxh3QnOQFxwSu2Aa32xorgnPg0EVhqo9Fj6Uldmk59w4ampxM/YOv2ur1u
+	Hwnw==
+X-Gm-Message-State: APjAAAXjkt65YnafWNHDyfmBfO4RtT9HDOrJTGveug+vpTNbXe5gCoHb
+	/bfUwZzvcw28i+ziTpDXAaUMmOkbWU8keLL4bkv3Ws6qcN0=
+X-Google-Smtp-Source: APXvYqx6l7gLCrhREjRNayyV9qwIWKpfAjUAQjjkOsWIAq6wrErlIWBydFL0RqcpGTZMZwBlJ1DnRvhdA39Nql44sbw=
+X-Received: by 2002:a9d:5608:: with SMTP id e8mr204221oti.135.1558617987191;
+	Thu, 23 May 2019 06:26:27 -0700 (PDT)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.46]);
-	Thu, 23 May 2019 13:44:34 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [RFC v2 2/3] scsi: add scsi_bus_dma_restart()
+References: <1558550785-20098-1-git-send-email-aleksandar.markovic@rt-rk.com>
+In-Reply-To: <1558550785-20098-1-git-send-email-aleksandar.markovic@rt-rk.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 23 May 2019 14:26:16 +0100
+Message-ID: <CAFEAcA_gW9PZFTB42LRXCPcD+aiWBdH3TQX7nHad_5=ioRm-ug@mail.gmail.com>
+To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::341
+Subject: Re: [Qemu-devel] [PATCH 0/5] linux-user: Support signal passing for
+ targets having more signals than host
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -67,123 +86,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
-	Fam Zheng <fam@euphon.net>, Stefan Hajnoczi <stefanha@redhat.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>
+Cc: Laurent Vivier <lvivier@redhat.com>,
+	=?UTF-8?B?TWlsb8WhIFN0b2phbm92acSH?= <milos.stojanovic@rt-rk.com>,
+	QEMU Developers <qemu-devel@nongnu.org>,
+	Aleksandar Markovic <amarkovic@wavecomp.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-By default scsi-bus.c registers vm change state handlers for SCSIDevice
-instances and restarts DMA when guest execution is resumed.
+On Wed, 22 May 2019 at 19:57, Aleksandar Markovic
+<aleksandar.markovic@rt-rk.com> wrote:
+>
+> From: Aleksandar Markovic <amarkovic@wavecomp.com>
+>
+> Most of the targets (including Intel) define 64 signals. This
+> creates difficulties for targets that define, for example, 128
+> signals. This series adds support for signal passing even if
+> the host defines less signals than the target.
 
-Unfortunately virtio-scsi with iothreads has a special ordering
-requirement that the core virtio code's vm change state handler runs
-before scsi-bus.c's vm change state handler.
+Could you elaborate a bit on how much functionality
+is provided for signal numbers which the target has
+but the host does not? For instance, it seems likely
+that attempts by the guest to kill(other_pid, sig) will
+fail if sig is not in the supported-by-the-target range.
+But is it possible for the guest process to deliver
+one of these signals to itself ?
 
-This patch allows SCSI busses to disable the default vm change state
-handler for DMA restart.  The new scsi_bus_dma_restart() API allows them
-to manually restart DMA at a time of their choice.
+This patchset is interesting because in fact pretty much
+every target supports more signals than our host code
+can provide, because the host libc steals several
+signals for its own purposes and QEMU can't use them.
+Being able to multiplex several guest signals onto
+one host signal might let us run some guest binaries
+we currently can't handle correctly.
 
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
----
- include/hw/scsi/scsi.h |  5 +++++
- hw/scsi/scsi-bus.c     | 37 ++++++++++++++++++++++++++++++-------
- 2 files changed, 35 insertions(+), 7 deletions(-)
-
-diff --git a/include/hw/scsi/scsi.h b/include/hw/scsi/scsi.h
-index acef25faa4..e9cc563daa 100644
---- a/include/hw/scsi/scsi.h
-+++ b/include/hw/scsi/scsi.h
-@@ -120,6 +120,10 @@ struct SCSIReqOps {
- struct SCSIBusInfo {
-     int tcq;
-     int max_channel, max_target, max_lun;
-+
-+    /* Will the bus call scsi_bus_dma_restart() itself? */
-+    bool custom_dma_restart;
-+
-     int (*parse_cdb)(SCSIDevice *dev, SCSICommand *cmd, uint8_t *buf,
-                      void *hba_private);
-     void (*transfer_data)(SCSIRequest *req, uint32_t arg);
-@@ -160,6 +164,7 @@ SCSIDevice *scsi_bus_legacy_add_drive(SCSIBus *bus, B=
-lockBackend *blk,
-                                       const char *serial, Error **errp);
- void scsi_bus_legacy_handle_cmdline(SCSIBus *bus);
- void scsi_legacy_handle_cmdline(void);
-+void scsi_bus_dma_restart(SCSIBus *bus);
-=20
- SCSIRequest *scsi_req_alloc(const SCSIReqOps *reqops, SCSIDevice *d,
-                             uint32_t tag, uint32_t lun, void *hba_privat=
-e);
-diff --git a/hw/scsi/scsi-bus.c b/hw/scsi/scsi-bus.c
-index c480553083..d2c5a1652b 100644
---- a/hw/scsi/scsi-bus.c
-+++ b/hw/scsi/scsi-bus.c
-@@ -134,6 +134,27 @@ void scsi_req_retry(SCSIRequest *req)
-     req->retry =3D true;
- }
-=20
-+static void scsi_device_dma_restart(SCSIDevice *dev)
-+{
-+    if (!dev->bh) {
-+        AioContext *ctx =3D blk_get_aio_context(dev->conf.blk);
-+        dev->bh =3D aio_bh_new(ctx, scsi_dma_restart_bh, dev);
-+        qemu_bh_schedule(dev->bh);
-+    }
-+}
-+
-+void scsi_bus_dma_restart(SCSIBus *bus)
-+{
-+    BusChild *kid;
-+
-+    QTAILQ_FOREACH(kid, &bus->qbus.children, sibling) {
-+        DeviceState *qdev =3D kid->child;
-+        SCSIDevice *dev =3D SCSI_DEVICE(qdev);
-+
-+        scsi_device_dma_restart(dev);
-+    }
-+}
-+
- static void scsi_dma_restart_cb(void *opaque, int running, RunState stat=
-e)
- {
-     SCSIDevice *s =3D opaque;
-@@ -141,11 +162,8 @@ static void scsi_dma_restart_cb(void *opaque, int ru=
-nning, RunState state)
-     if (!running) {
-         return;
-     }
--    if (!s->bh) {
--        AioContext *ctx =3D blk_get_aio_context(s->conf.blk);
--        s->bh =3D aio_bh_new(ctx, scsi_dma_restart_bh, s);
--        qemu_bh_schedule(s->bh);
--    }
-+
-+    scsi_device_dma_restart(s);
- }
-=20
- static void scsi_qdev_realize(DeviceState *qdev, Error **errp)
-@@ -206,8 +224,13 @@ static void scsi_qdev_realize(DeviceState *qdev, Err=
-or **errp)
-         error_propagate(errp, local_err);
-         return;
-     }
--    dev->vmsentry =3D qemu_add_vm_change_state_handler(scsi_dma_restart_=
-cb,
--                                                     dev);
-+
-+    if (bus->info->custom_dma_restart) {
-+        dev->vmsentry =3D NULL;
-+    } else {
-+        dev->vmsentry =3D qemu_add_vm_change_state_handler(scsi_dma_rest=
-art_cb,
-+                                                         dev);
-+    }
- }
-=20
- static void scsi_qdev_unrealize(DeviceState *qdev, Error **errp)
---=20
-2.21.0
-
+thanks
+-- PMM
 
