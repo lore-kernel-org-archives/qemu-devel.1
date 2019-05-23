@@ -4,50 +4,50 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C7E91C04AAC
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 05:31:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BE7AC04AAC
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 05:32:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7876E20881
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 05:31:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5788620881
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 05:32:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="Z/Oa4yni"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7876E20881
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="hzdMxLQ+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5788620881
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:57924 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:57926 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hTgKS-0000pf-44
-	for qemu-devel@archiver.kernel.org; Thu, 23 May 2019 01:31:48 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:41252)
+	id 1hTgKo-0001EY-HH
+	for qemu-devel@archiver.kernel.org; Thu, 23 May 2019 01:32:10 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:41253)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1hTgIK-00080G-PN
+	(envelope-from <dgibson@ozlabs.org>) id 1hTgIK-00080H-PS
 	for qemu-devel@nongnu.org; Thu, 23 May 2019 01:29:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1hTgII-0005hD-Mi
+	(envelope-from <dgibson@ozlabs.org>) id 1hTgII-0005hH-Mz
 	for qemu-devel@nongnu.org; Thu, 23 May 2019 01:29:36 -0400
-Received: from ozlabs.org ([203.11.71.1]:54665)
+Received: from ozlabs.org ([203.11.71.1]:38483)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
-	id 1hTgIF-0005eS-8E; Thu, 23 May 2019 01:29:33 -0400
+	id 1hTgIF-0005eP-7q; Thu, 23 May 2019 01:29:33 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
-	id 458dNL6gYjz9s9T; Thu, 23 May 2019 15:29:22 +1000 (AEST)
+	id 458dNM0wh6z9s9y; Thu, 23 May 2019 15:29:22 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-	d=gibson.dropbear.id.au; s=201602; t=1558589362;
-	bh=++2hRuLAmTthhYEBcebKO3KnjRkOhQh3lcruno8xPDk=;
+	d=gibson.dropbear.id.au; s=201602; t=1558589363;
+	bh=fT2wZ0CY2xyh0IA/lNK7JougwtDvFHGZG6nrpkSyQ+o=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Z/Oa4ynimzhi/Q8KW2O4tgQXnaoXXpLe5PBSp9dQMRnoubij9iS6pAJhhzWEGpTzw
-	unR2a5pY6pE4JC9FFEcLQ/gpMO9jLY50bKCL1O4TRTDB1FfEpoY7sB+K0C/A2tLdyu
-	3mdH1gzm1tgvSVGNSL39dxp9m2arncfTa+iijXL0=
+	b=hzdMxLQ+jkCL/8c3CRoSQvq5rj6UAIBkyTVEavuaijHPk7aTiDNXWkg+aPhvm+Vkj
+	zakt9yCvBEIoTaAbzzTj6ZC7oMVVzzC/2GVWvahlaUa8XaoiIiGYCQt3e5A2N7od//
+	N4cUneahgwbGakGJpyDB2sk6cTxmGiXE77d9M7Jk=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: qemu-ppc@nongnu.org
-Date: Thu, 23 May 2019 15:29:13 +1000
-Message-Id: <20190523052918.1129-3-david@gibson.dropbear.id.au>
+Date: Thu, 23 May 2019 15:29:15 +1000
+Message-Id: <20190523052918.1129-5-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190523052918.1129-1-david@gibson.dropbear.id.au>
 References: <20190523052918.1129-1-david@gibson.dropbear.id.au>
@@ -55,7 +55,7 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 203.11.71.1
-Subject: [Qemu-devel] [PATCH 3/8] spapr: Clean up dt creation for PCI buses
+Subject: [Qemu-devel] [PATCH 5/8] spapr: Clean up DRC index construction
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -73,322 +73,252 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Device nodes for PCI bridges (both host and P2P) describe both the bridge
-device itself and the bus hanging off it, handling of this is a bit of a
-mess.
+spapr_pci.c currently has several confusingly similarly named functions f=
+or
+various conversions between representations of DRCs.  Make things clearer
+by renaming things in a more consistent XXX_from_YYY() manner and remove
+some called-only-once variants in favour of open coding.
 
-spapr_dt_pci_device() has a few things it only adds for non-bridges, but
-always adds #address-cells and #size-cells which should only appear for
-bridges.  But the walking down the subordinate PCI bus is done in one of
-its callers spapr_populate_pci_devices_dt().  The PHB dt creation in
-spapr_populate_pci_dt() open codes some similar logic to the bridge case.
-
-This patch consolidates things in a bunch of ways:
- * Bus specific dt info is now created in spapr_dt_pci_bus() used for bot=
-h
-   P2P bridges and the host bridge.  This includes walking subordinate
-   devices
- * spapr_dt_pci_device() now calls spapr_dt_pci_bus() when called on a
-   P2P bridge
- * We do detection of bridges with the is_bridge field of the device clas=
-s,
-   rather than checking PCI config space directly, for consistency with
-   qemu's core PCI code.
- * Several things are renamed for brevity and clarity
+While we're at it, move this code together in the file to avoid some extr=
+a
+forward references, and split out construction and removal of DRCs for th=
+e
+host bridge into helper functions.
 
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/spapr.c              |   7 +-
- hw/ppc/spapr_pci.c          | 140 +++++++++++++++++++-----------------
- include/hw/pci-host/spapr.h |   4 +-
- 3 files changed, 79 insertions(+), 72 deletions(-)
+ hw/ppc/spapr_pci.c | 124 +++++++++++++++++++++++++--------------------
+ 1 file changed, 68 insertions(+), 56 deletions(-)
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index e2b33e5890..44573adce7 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -1309,8 +1309,7 @@ static void *spapr_build_fdt(SpaprMachineState *spa=
-pr)
-     }
-=20
-     QLIST_FOREACH(phb, &spapr->phbs, list) {
--        ret =3D spapr_populate_pci_dt(phb, PHANDLE_INTC, fdt,
--                                    spapr->irq->nr_msis, NULL);
-+        ret =3D spapr_dt_phb(phb, PHANDLE_INTC, fdt, spapr->irq->nr_msis=
-, NULL);
-         if (ret < 0) {
-             error_report("couldn't setup PCI devices in fdt");
-             exit(1);
-@@ -3917,8 +3916,8 @@ int spapr_phb_dt_populate(SpaprDrc *drc, SpaprMachi=
-neState *spapr,
-         return -1;
-     }
-=20
--    if (spapr_populate_pci_dt(sphb, intc_phandle, fdt, spapr->irq->nr_ms=
-is,
--                              fdt_start_offset)) {
-+    if (spapr_dt_phb(sphb, intc_phandle, fdt, spapr->irq->nr_msis,
-+                     fdt_start_offset)) {
-         error_setg(errp, "unable to create FDT node for PHB %d", sphb->i=
-ndex);
-         return -1;
-     }
 diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
-index 4075b433fd..c166df4145 100644
+index 04855d3125..f799f8b423 100644
 --- a/hw/ppc/spapr_pci.c
 +++ b/hw/ppc/spapr_pci.c
-@@ -1219,6 +1219,60 @@ static const char *dt_name_from_class(uint8_t clas=
+@@ -1216,8 +1216,60 @@ static const char *dt_name_from_class(uint8_t clas=
 s, uint8_t subclass,
- static uint32_t spapr_phb_get_pci_drc_index(SpaprPhbState *phb,
-                                             PCIDevice *pdev);
+     return name;
+ }
 =20
-+typedef struct PciWalkFdt {
-+    void *fdt;
-+    int offset;
-+    SpaprPhbState *sphb;
-+    int err;
-+} PciWalkFdt;
+-static uint32_t spapr_phb_get_pci_drc_index(SpaprPhbState *phb,
+-                                            PCIDevice *pdev);
++/*
++ * DRC helper functions
++ */
 +
-+static int spapr_dt_pci_device(SpaprPhbState *sphb, PCIDevice *dev,
-+                               void *fdt, int parent_offset);
-+
-+static void spapr_dt_pci_device_cb(PCIBus *bus, PCIDevice *pdev,
-+                                   void *opaque)
++static uint32_t drc_id_from_devfn(SpaprPhbState *phb,
++                                  uint32_t busnr,
++                                  int32_t devfn)
 +{
-+    PciWalkFdt *p =3D opaque;
-+    int err;
++    return (phb->index << 16) | (busnr << 8) | devfn;
++}
 +
-+    if (p->err) {
-+        /* Something's already broken, don't keep going */
++static SpaprDrc *drc_from_devfn(SpaprPhbState *phb,
++                                uint32_t busnr, int32_t devfn)
++{
++    return spapr_drc_by_id(TYPE_SPAPR_DRC_PCI,
++                           drc_id_from_devfn(phb, busnr, devfn));
++}
++
++static SpaprDrc *drc_from_dev(SpaprPhbState *phb, PCIDevice *dev)
++{
++    uint32_t busnr =3D pci_bus_num(PCI_BUS(qdev_get_parent_bus(DEVICE(de=
+v))));
++    return drc_from_devfn(phb, busnr, dev->devfn);
++}
++
++static void add_drcs(SpaprPhbState *phb)
++{
++    int i;
++
++    if (!phb->dr_enabled) {
 +        return;
 +    }
 +
-+    err =3D spapr_dt_pci_device(p->sphb, pdev, p->fdt, p->offset);
-+    if (err < 0) {
-+        p->err =3D err;
++    for (i =3D 0; i < PCI_SLOT_MAX * PCI_FUNC_MAX; i++) {
++        spapr_dr_connector_new(OBJECT(phb), TYPE_SPAPR_DRC_PCI,
++                               drc_id_from_devfn(phb, 0, i));
 +    }
 +}
 +
-+/* Augment PCI device node with bridge specific information */
-+static int spapr_dt_pci_bus(SpaprPhbState *sphb, PCIBus *bus,
-+                               void *fdt, int offset)
++static void remove_drcs(SpaprPhbState *phb)
 +{
-+    PciWalkFdt cbinfo =3D {
-+        .fdt =3D fdt,
-+        .offset =3D offset,
-+        .sphb =3D sphb,
-+        .err =3D 0,
-+    };
++    int i;
 +
-+    _FDT(fdt_setprop_cell(fdt, offset, "#address-cells",
-+                          RESOURCE_CELLS_ADDRESS));
-+    _FDT(fdt_setprop_cell(fdt, offset, "#size-cells",
-+                          RESOURCE_CELLS_SIZE));
++    if (!phb->dr_enabled) {
++        return;
++    }
 +
-+    if (bus) {
-+        pci_for_each_device_reverse(bus, pci_bus_num(bus),
-+                                    spapr_dt_pci_device_cb, &cbinfo);
-+        if (cbinfo.err) {
-+            return cbinfo.err;
++    for (i =3D PCI_SLOT_MAX * PCI_FUNC_MAX - 1; i >=3D 0; i--) {
++        SpaprDrc *drc =3D drc_from_devfn(phb, 0, i);
++
++        if (drc) {
++            object_unparent(OBJECT(drc));
 +        }
 +    }
-+
-+    return offset;
 +}
-+
- /* create OF node for pci device and required OF DT properties */
- static int spapr_dt_pci_device(SpaprPhbState *sphb, PCIDevice *dev,
-                                void *fdt, int parent_offset)
-@@ -1228,10 +1282,9 @@ static int spapr_dt_pci_device(SpaprPhbState *sphb=
-, PCIDevice *dev,
-     char *nodename;
-     int slot =3D PCI_SLOT(dev->devfn);
+=20
+ typedef struct PciWalkFdt {
+     void *fdt;
+@@ -1284,7 +1336,7 @@ static int spapr_dt_pci_device(SpaprPhbState *sphb,=
+ PCIDevice *dev,
      int func =3D PCI_FUNC(dev->devfn);
-+    PCIDeviceClass *pc =3D PCI_DEVICE_GET_CLASS(dev);
+     PCIDeviceClass *pc =3D PCI_DEVICE_GET_CLASS(dev);
      ResourceProps rp;
-     uint32_t drc_index =3D spapr_phb_get_pci_drc_index(sphb, dev);
--    uint32_t header_type =3D pci_default_read_config(dev, PCI_HEADER_TYP=
-E, 1);
--    bool is_bridge =3D (header_type =3D=3D PCI_HEADER_TYPE_BRIDGE);
+-    uint32_t drc_index =3D spapr_phb_get_pci_drc_index(sphb, dev);
++    SpaprDrc *drc =3D drc_from_dev(sphb, dev);
      uint32_t vendor_id =3D pci_default_read_config(dev, PCI_VENDOR_ID, 2=
 );
      uint32_t device_id =3D pci_default_read_config(dev, PCI_DEVICE_ID, 2=
 );
      uint32_t revision_id =3D pci_default_read_config(dev, PCI_REVISION_I=
 D, 1);
-@@ -1268,13 +1321,6 @@ static int spapr_dt_pci_device(SpaprPhbState *sphb=
-, PCIDevice *dev,
-         _FDT(fdt_setprop_cell(fdt, offset, "interrupts", irq_pin));
-     }
+@@ -1351,8 +1403,9 @@ static int spapr_dt_pci_device(SpaprPhbState *sphb,=
+ PCIDevice *dev,
+     _FDT(fdt_setprop_string(fdt, offset, "ibm,loc-code", loc_code));
+     g_free(loc_code);
 =20
--    if (!is_bridge) {
--        uint32_t min_grant =3D pci_default_read_config(dev, PCI_MIN_GNT,=
- 1);
--        uint32_t max_latency =3D pci_default_read_config(dev, PCI_MAX_LA=
-T, 1);
--        _FDT(fdt_setprop_cell(fdt, offset, "min-grant", min_grant));
--        _FDT(fdt_setprop_cell(fdt, offset, "max-latency", max_latency));
--    }
--
-     if (subsystem_id) {
-         _FDT(fdt_setprop_cell(fdt, offset, "subsystem-id", subsystem_id)=
-);
-     }
-@@ -1309,11 +1355,6 @@ static int spapr_dt_pci_device(SpaprPhbState *sphb=
-, PCIDevice *dev,
-         _FDT(fdt_setprop_cell(fdt, offset, "ibm,my-drc-index", drc_index=
+-    if (drc_index) {
+-        _FDT(fdt_setprop_cell(fdt, offset, "ibm,my-drc-index", drc_index=
 ));
++    if (drc) {
++        _FDT(fdt_setprop_cell(fdt, offset, "ibm,my-drc-index",
++                              spapr_drc_index(drc)));
      }
 =20
--    _FDT(fdt_setprop_cell(fdt, offset, "#address-cells",
--                          RESOURCE_CELLS_ADDRESS));
--    _FDT(fdt_setprop_cell(fdt, offset, "#size-cells",
--                          RESOURCE_CELLS_SIZE));
--
      if (msi_present(dev)) {
-         uint32_t max_msi =3D msi_nr_vectors_allocated(dev);
-         if (max_msi) {
-@@ -1338,7 +1379,18 @@ static int spapr_dt_pci_device(SpaprPhbState *sphb=
-, PCIDevice *dev,
-=20
-     spapr_phb_nvgpu_populate_pcidev_dt(dev, fdt, offset, sphb);
-=20
--    return offset;
-+    if (!pc->is_bridge) {
-+        /* Properties only for non-bridges */
-+        uint32_t min_grant =3D pci_default_read_config(dev, PCI_MIN_GNT,=
- 1);
-+        uint32_t max_latency =3D pci_default_read_config(dev, PCI_MAX_LA=
-T, 1);
-+        _FDT(fdt_setprop_cell(fdt, offset, "min-grant", min_grant));
-+        _FDT(fdt_setprop_cell(fdt, offset, "max-latency", max_latency));
-+        return offset;
-+    } else {
-+        PCIBus *sec_bus =3D pci_bridge_get_sec_bus(PCI_BRIDGE(dev));
-+
-+        return spapr_dt_pci_bus(sphb, sec_bus, fdt, offset);
-+    }
+@@ -1402,33 +1455,6 @@ void spapr_phb_remove_pci_device_cb(DeviceState *d=
+ev)
+     object_unparent(OBJECT(dev));
  }
 =20
- /* Callback to be called during DRC release. */
-@@ -2063,44 +2115,6 @@ static const TypeInfo spapr_phb_info =3D {
-     }
- };
-=20
--typedef struct SpaprFdt {
--    void *fdt;
--    int node_off;
--    SpaprPhbState *sphb;
--} SpaprFdt;
--
--static void spapr_populate_pci_devices_dt(PCIBus *bus, PCIDevice *pdev,
--                                          void *opaque)
+-static SpaprDrc *spapr_phb_get_pci_func_drc(SpaprPhbState *phb,
+-                                                    uint32_t busnr,
+-                                                    int32_t devfn)
 -{
--    PCIBus *sec_bus;
--    SpaprFdt *p =3D opaque;
--    int offset;
--    SpaprFdt s_fdt;
--
--    offset =3D spapr_dt_pci_device(p->sphb, pdev, p->fdt, p->node_off);
--    if (!offset) {
--        error_report("Failed to create pci child device tree node");
--        return;
--    }
--
--    if ((pci_default_read_config(pdev, PCI_HEADER_TYPE, 1) !=3D
--         PCI_HEADER_TYPE_BRIDGE)) {
--        return;
--    }
--
--    sec_bus =3D pci_bridge_get_sec_bus(PCI_BRIDGE(pdev));
--    if (!sec_bus) {
--        return;
--    }
--
--    s_fdt.fdt =3D p->fdt;
--    s_fdt.node_off =3D offset;
--    s_fdt.sphb =3D p->sphb;
--    pci_for_each_device_reverse(sec_bus, pci_bus_num(sec_bus),
--                                spapr_populate_pci_devices_dt,
--                                &s_fdt);
+-    return spapr_drc_by_id(TYPE_SPAPR_DRC_PCI,
+-                           (phb->index << 16) | (busnr << 8) | devfn);
 -}
 -
- static void spapr_phb_pci_enumerate_bridge(PCIBus *bus, PCIDevice *pdev,
-                                            void *opaque)
+-static SpaprDrc *spapr_phb_get_pci_drc(SpaprPhbState *phb,
+-                                               PCIDevice *pdev)
+-{
+-    uint32_t busnr =3D pci_bus_num(PCI_BUS(qdev_get_parent_bus(DEVICE(pd=
+ev))));
+-    return spapr_phb_get_pci_func_drc(phb, busnr, pdev->devfn);
+-}
+-
+-static uint32_t spapr_phb_get_pci_drc_index(SpaprPhbState *phb,
+-                                            PCIDevice *pdev)
+-{
+-    SpaprDrc *drc =3D spapr_phb_get_pci_drc(phb, pdev);
+-
+-    if (!drc) {
+-        return 0;
+-    }
+-
+-    return spapr_drc_index(drc);
+-}
+-
+ int spapr_pci_dt_populate(SpaprDrc *drc, SpaprMachineState *spapr,
+                           void *fdt, int *fdt_start_offset, Error **errp=
+)
  {
-@@ -2138,8 +2152,8 @@ static void spapr_phb_pci_enumerate(SpaprPhbState *=
-phb)
-=20
- }
-=20
--int spapr_populate_pci_dt(SpaprPhbState *phb, uint32_t intc_phandle, voi=
-d *fdt,
--                          uint32_t nr_msis, int *node_offset)
-+int spapr_dt_phb(SpaprPhbState *phb, uint32_t intc_phandle, void *fdt,
-+                 uint32_t nr_msis, int *node_offset)
+@@ -1445,7 +1471,7 @@ static void spapr_pci_plug(HotplugHandler *plug_han=
+dler,
  {
-     int bus_off, i, j, ret;
-     uint32_t bus_range[] =3D { cpu_to_be32(0), cpu_to_be32(0xff) };
-@@ -2186,8 +2200,6 @@ int spapr_populate_pci_dt(SpaprPhbState *phb, uint3=
-2_t intc_phandle, void *fdt,
-                                 cpu_to_be32(0x0),
-                                 cpu_to_be32(phb->numa_node)};
-     SpaprTceTable *tcet;
--    PCIBus *bus =3D PCI_HOST_BRIDGE(phb)->bus;
--    SpaprFdt s_fdt;
-     SpaprDrc *drc;
-     Error *errp =3D NULL;
+     SpaprPhbState *phb =3D SPAPR_PCI_HOST_BRIDGE(DEVICE(plug_handler));
+     PCIDevice *pdev =3D PCI_DEVICE(plugged_dev);
+-    SpaprDrc *drc =3D spapr_phb_get_pci_drc(phb, pdev);
++    SpaprDrc *drc =3D drc_from_dev(phb, pdev);
+     Error *local_err =3D NULL;
+     PCIBus *bus =3D PCI_BUS(qdev_get_parent_bus(DEVICE(pdev)));
+     uint32_t slotnr =3D PCI_SLOT(pdev->devfn);
+@@ -1496,8 +1522,8 @@ static void spapr_pci_plug(HotplugHandler *plug_han=
+dler,
+             SpaprDrcClass *func_drck;
+             SpaprDREntitySense state;
 =20
-@@ -2200,8 +2212,6 @@ int spapr_populate_pci_dt(SpaprPhbState *phb, uint3=
-2_t intc_phandle, void *fdt,
-     /* Write PHB properties */
-     _FDT(fdt_setprop_string(fdt, bus_off, "device_type", "pci"));
-     _FDT(fdt_setprop_string(fdt, bus_off, "compatible", "IBM,Logical_PHB=
-"));
--    _FDT(fdt_setprop_cell(fdt, bus_off, "#address-cells", 0x3));
--    _FDT(fdt_setprop_cell(fdt, bus_off, "#size-cells", 0x2));
-     _FDT(fdt_setprop_cell(fdt, bus_off, "#interrupt-cells", 0x1));
-     _FDT(fdt_setprop(fdt, bus_off, "used-by-rtas", NULL, 0));
-     _FDT(fdt_setprop(fdt, bus_off, "bus-range", &bus_range, sizeof(bus_r=
-ange)));
-@@ -2266,13 +2276,11 @@ int spapr_populate_pci_dt(SpaprPhbState *phb, uin=
-t32_t intc_phandle, void *fdt,
-     spapr_phb_pci_enumerate(phb);
-     _FDT(fdt_setprop_cell(fdt, bus_off, "qemu,phb-enumerated", 0x1));
+-            func_drc =3D spapr_phb_get_pci_func_drc(phb, pci_bus_num(bus=
+),
+-                                                  PCI_DEVFN(slotnr, i));
++            func_drc =3D drc_from_devfn(phb, pci_bus_num(bus),
++                                      PCI_DEVFN(slotnr, i));
+             func_drck =3D SPAPR_DR_CONNECTOR_GET_CLASS(func_drc);
+             state =3D func_drck->dr_entity_sense(func_drc);
 =20
--    /* Populate tree nodes with PCI devices attached */
--    s_fdt.fdt =3D fdt;
--    s_fdt.node_off =3D bus_off;
--    s_fdt.sphb =3D phb;
--    pci_for_each_device_reverse(bus, pci_bus_num(bus),
--                                spapr_populate_pci_devices_dt,
--                                &s_fdt);
-+    /* Walk the bridge and subordinate buses */
-+    ret =3D spapr_dt_pci_bus(phb, PCI_HOST_BRIDGE(phb)->bus, fdt, bus_of=
-f);
-+    if (ret) {
-+        return ret;
-+    }
+@@ -1533,7 +1559,7 @@ static void spapr_pci_unplug_request(HotplugHandler=
+ *plug_handler,
+ {
+     SpaprPhbState *phb =3D SPAPR_PCI_HOST_BRIDGE(DEVICE(plug_handler));
+     PCIDevice *pdev =3D PCI_DEVICE(plugged_dev);
+-    SpaprDrc *drc =3D spapr_phb_get_pci_drc(phb, pdev);
++    SpaprDrc *drc =3D drc_from_dev(phb, pdev);
 =20
-     ret =3D spapr_drc_populate_dt(fdt, bus_off, OBJECT(phb),
-                                 SPAPR_DR_CONNECTOR_TYPE_PCI);
-diff --git a/include/hw/pci-host/spapr.h b/include/hw/pci-host/spapr.h
-index 53519c835e..1b61162f91 100644
---- a/include/hw/pci-host/spapr.h
-+++ b/include/hw/pci-host/spapr.h
-@@ -131,8 +131,8 @@ static inline qemu_irq spapr_phb_lsi_qirq(struct Spap=
-rPhbState *phb, int pin)
-     return spapr_qirq(spapr, phb->lsi_table[pin].irq);
- }
+     if (!phb->dr_enabled) {
+         error_setg(errp, QERR_BUS_NO_HOTPLUG,
+@@ -1555,8 +1581,8 @@ static void spapr_pci_unplug_request(HotplugHandler=
+ *plug_handler,
+         /* ensure any other present functions are pending unplug */
+         if (PCI_FUNC(pdev->devfn) =3D=3D 0) {
+             for (i =3D 1; i < 8; i++) {
+-                func_drc =3D spapr_phb_get_pci_func_drc(phb, pci_bus_num=
+(bus),
+-                                                      PCI_DEVFN(slotnr, =
+i));
++                func_drc =3D drc_from_devfn(phb, pci_bus_num(bus),
++                                          PCI_DEVFN(slotnr, i));
+                 func_drck =3D SPAPR_DR_CONNECTOR_GET_CLASS(func_drc);
+                 state =3D func_drck->dr_entity_sense(func_drc);
+                 if (state =3D=3D SPAPR_DR_ENTITY_SENSE_PRESENT
+@@ -1577,8 +1603,8 @@ static void spapr_pci_unplug_request(HotplugHandler=
+ *plug_handler,
+          */
+         if (PCI_FUNC(pdev->devfn) =3D=3D 0) {
+             for (i =3D 7; i >=3D 0; i--) {
+-                func_drc =3D spapr_phb_get_pci_func_drc(phb, pci_bus_num=
+(bus),
+-                                                      PCI_DEVFN(slotnr, =
+i));
++                func_drc =3D drc_from_devfn(phb, pci_bus_num(bus),
++                                          PCI_DEVFN(slotnr, i));
+                 func_drck =3D SPAPR_DR_CONNECTOR_GET_CLASS(func_drc);
+                 state =3D func_drck->dr_entity_sense(func_drc);
+                 if (state =3D=3D SPAPR_DR_ENTITY_SENSE_PRESENT) {
+@@ -1626,16 +1652,7 @@ static void spapr_phb_unrealize(DeviceState *dev, =
+Error **errp)
+         }
+     }
 =20
--int spapr_populate_pci_dt(SpaprPhbState *phb, uint32_t intc_phandle, voi=
-d *fdt,
--                          uint32_t nr_msis, int *node_offset);
-+int spapr_dt_phb(SpaprPhbState *phb, uint32_t intc_phandle, void *fdt,
-+                 uint32_t nr_msis, int *node_offset);
+-    if (sphb->dr_enabled) {
+-        for (i =3D PCI_SLOT_MAX * 8 - 1; i >=3D 0; i--) {
+-            SpaprDrc *drc =3D spapr_drc_by_id(TYPE_SPAPR_DRC_PCI,
+-                                                    (sphb->index << 16) =
+| i);
+-
+-            if (drc) {
+-                object_unparent(OBJECT(drc));
+-            }
+-        }
+-    }
++    remove_drcs(sphb);
 =20
- void spapr_pci_rtas_init(void);
+     for (i =3D PCI_NUM_PINS - 1; i >=3D 0; i--) {
+         if (sphb->lsi_table[i].irq) {
+@@ -1861,12 +1878,7 @@ static void spapr_phb_realize(DeviceState *dev, Er=
+ror **errp)
+     }
 =20
+     /* allocate connectors for child PCI devices */
+-    if (sphb->dr_enabled) {
+-        for (i =3D 0; i < PCI_SLOT_MAX * 8; i++) {
+-            spapr_dr_connector_new(OBJECT(phb), TYPE_SPAPR_DRC_PCI,
+-                                   (sphb->index << 16) | i);
+-        }
+-    }
++    add_drcs(sphb);
+=20
+     /* DMA setup */
+     for (i =3D 0; i < windows_supported; ++i) {
 --=20
 2.21.0
 
