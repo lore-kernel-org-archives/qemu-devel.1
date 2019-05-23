@@ -2,93 +2,62 @@ Return-Path: <SRS0=bvyN=TX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 06792C282DD
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 16:00:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A7F0C282DD
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 16:04:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CD6F020851
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 16:00:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CD6F020851
+	by mail.kernel.org (Postfix) with ESMTPS id F312820868
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 16:04:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F312820868
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:39607 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:39887 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hTq8n-0002wz-VF
-	for qemu-devel@archiver.kernel.org; Thu, 23 May 2019 12:00:26 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:58800)
+	id 1hTqDB-0006bW-4a
+	for qemu-devel@archiver.kernel.org; Thu, 23 May 2019 12:04:57 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:60123)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hTq6S-0001gv-Vm
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 11:58:01 -0400
+	(envelope-from <kwolf@redhat.com>) id 1hTqAB-0004Ln-66
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 12:01:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hTq6S-000863-3n
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 11:58:00 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45496)
+	(envelope-from <kwolf@redhat.com>) id 1hTqA8-0001y5-Dk
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 12:01:50 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56327)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mreitz@redhat.com>)
-	id 1hTq6Q-00084c-0v; Thu, 23 May 2019 11:57:58 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
+	(Exim 4.71) (envelope-from <kwolf@redhat.com>)
+	id 1hTqA3-0001pd-6R; Thu, 23 May 2019 12:01:45 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+	[10.5.11.22])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 46C529B37C;
-	Thu, 23 May 2019 15:57:52 +0000 (UTC)
-Received: from dresden.str.redhat.com (unknown [10.40.205.176])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 4F3B65C219;
-	Thu, 23 May 2019 15:57:51 +0000 (UTC)
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-References: <cover.1557754872.git.berto@igalia.com>
-	<6d1d5feaa53aa1ab127adb73d605dc4503e3abd5.1557754872.git.berto@igalia.com>
-	<w51ftp51992.fsf@maestria.local.igalia.com>
-From: Max Reitz <mreitz@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
-	mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
-	/PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
-	U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
-	mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
-	awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
-	AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
-	CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
-	B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
-	2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
-	AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
-	8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
-	4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
-	BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
-	xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
-	W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
-	DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
-	64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
-	ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
-	sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
-	alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
-	/ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
-	bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
-	R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <0820158d-ad7b-d091-1e93-dbaf3a672296@redhat.com>
-Date: Thu, 23 May 2019 17:57:49 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	by mx1.redhat.com (Postfix) with ESMTPS id 429BE81111;
+	Thu, 23 May 2019 16:01:32 +0000 (UTC)
+Received: from localhost.localdomain.com (ovpn-116-143.ams2.redhat.com
+	[10.36.116.143])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 2F1DB1001E6F;
+	Thu, 23 May 2019 16:01:31 +0000 (UTC)
+From: Kevin Wolf <kwolf@redhat.com>
+To: qemu-block@nongnu.org
+Date: Thu, 23 May 2019 18:00:58 +0200
+Message-Id: <20190523160104.21258-10-kwolf@redhat.com>
+In-Reply-To: <20190523160104.21258-1-kwolf@redhat.com>
+References: <20190523160104.21258-1-kwolf@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <w51ftp51992.fsf@maestria.local.igalia.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="SYa7y1p46duFLceJs6byuTZwoDi2wjmjT"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.39]);
-	Thu, 23 May 2019 15:57:52 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.28]);
+	Thu, 23 May 2019 16:01:32 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-X-Content-Filtered-By: Mailman/MimeDel 2.1.21
-Subject: Re: [Qemu-devel] [PATCH v3 1/2] block: Use bdrv_unref_child() for
- all children in bdrv_close()
+Subject: [Qemu-devel] [PATCH 09/15] block: Move node without parents to main
+ AioContext
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -100,61 +69,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---SYa7y1p46duFLceJs6byuTZwoDi2wjmjT
-From: Max Reitz <mreitz@redhat.com>
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>
-Message-ID: <0820158d-ad7b-d091-1e93-dbaf3a672296@redhat.com>
-Subject: Re: [PATCH v3 1/2] block: Use bdrv_unref_child() for all children in
- bdrv_close()
-References: <cover.1557754872.git.berto@igalia.com>
- <6d1d5feaa53aa1ab127adb73d605dc4503e3abd5.1557754872.git.berto@igalia.com>
- <w51ftp51992.fsf@maestria.local.igalia.com>
-In-Reply-To: <w51ftp51992.fsf@maestria.local.igalia.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+A node should only be in a non-default AioContext if a user is attached
+to it that requires this. When the last parent of a node is gone, it can
+move back to the main AioContext.
 
-On 23.05.19 17:27, Alberto Garcia wrote:
-> On Mon 13 May 2019 03:46:17 PM CEST, Alberto Garcia wrote:
->> Now bdrv_close() unrefs all children (before this patch it was only
->> bs->file and bs->backing). As a result, none of the callers of
->> brvd_attach_child() should remove their reference to child_bs (because=
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+---
+ block.c                     | 4 ++++
+ tests/test-bdrv-drain.c     | 2 +-
+ tests/test-block-iothread.c | 3 +--
+ 3 files changed, 6 insertions(+), 3 deletions(-)
 
->> this function effectively steals that reference). This patch updates a=
+diff --git a/block.c b/block.c
+index 5219f61279..19268f52f8 100644
+--- a/block.c
++++ b/block.c
+@@ -2235,6 +2235,10 @@ static void bdrv_replace_child(BdrvChild *child, B=
+lockDriverState *new_bs)
+         bdrv_get_cumulative_perm(old_bs, &perm, &shared_perm);
+         bdrv_check_perm(old_bs, NULL, perm, shared_perm, NULL, &error_ab=
+ort);
+         bdrv_set_perm(old_bs, perm, shared_perm);
++
++        /* When the parent requiring a non-default AioContext is removed=
+, the
++         * node moves back to the main AioContext */
++        bdrv_try_set_aio_context(old_bs, qemu_get_aio_context(), NULL);
+     }
+=20
+     if (new_bs) {
+diff --git a/tests/test-bdrv-drain.c b/tests/test-bdrv-drain.c
+index 447f6d12eb..2ff04db07a 100644
+--- a/tests/test-bdrv-drain.c
++++ b/tests/test-bdrv-drain.c
+@@ -1003,7 +1003,7 @@ static void test_blockjob_common_drain_node(enum dr=
+ain_type drain_type,
+=20
+     if (use_iothread) {
+         blk_set_aio_context(blk_src, qemu_get_aio_context(), &error_abor=
+t);
+-        blk_set_aio_context(blk_target, qemu_get_aio_context(), &error_a=
+bort);
++        assert(blk_get_aio_context(blk_target) =3D=3D qemu_get_aio_conte=
+xt());
+     }
+     aio_context_release(ctx);
+=20
+diff --git a/tests/test-block-iothread.c b/tests/test-block-iothread.c
+index f41082e3bd..79d9cf8a57 100644
+--- a/tests/test-block-iothread.c
++++ b/tests/test-block-iothread.c
+@@ -713,9 +713,8 @@ static void test_attach_preserve_blk_ctx(void)
+=20
+     /* Remove the node again */
+     blk_remove_bs(blk);
+-    /* TODO bs should move back to main context here */
+     g_assert(blk_get_aio_context(blk) =3D=3D ctx);
+-    g_assert(bdrv_get_aio_context(bs) =3D=3D ctx);
++    g_assert(bdrv_get_aio_context(bs) =3D=3D qemu_get_aio_context());
+=20
+     /* Re-attach the node */
+     blk_insert_bs(blk, bs, &error_abort);
+--=20
+2.20.1
 
->> couple of tests that where doing their own bdrv_unref().
->=20
-> s/that where doing/that were doing/
->=20
-> Max, if it's not too late can you fix that in your block branch?
-
-Sure.  It=E2=80=99s fixed now.
-
-Max
-
-
---SYa7y1p46duFLceJs6byuTZwoDi2wjmjT
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlzmwv0ACgkQ9AfbAGHV
-z0BhQgf+OZFzRTRv6Ic8CxWEJzOVNlIeGaIjNIAx1Eka3znPjyBsIkqvQMXEzd6T
-3M4J9HJfsHd69lmq0QpWMOjE5QyLXiTfGPpnN558TfJMLsmcACdbqnh/6/Ur0mkP
-g6bKSd6LXplQ00yjCaweRVQ4MUzM16LgS2E3PJ3yK15MdPaSmsQyOSsPbYF3eAct
-RirIC+c0obHqtFuOwJBjsp2/2AHPG+QW5ug3XYsWoB4oThgW2uZO3rMnS3bHB2bL
-O2j85Bji25/f99QYSAJotk/vWwm0ygv5c3DpnuyyCKyrH526F88lezdRSfjuGZ5R
-x4a98whir8GClwXfJX0VJz+2N9KlLw==
-=hLYm
------END PGP SIGNATURE-----
-
---SYa7y1p46duFLceJs6byuTZwoDi2wjmjT--
 
