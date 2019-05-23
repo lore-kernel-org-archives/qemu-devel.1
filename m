@@ -2,105 +2,66 @@ Return-Path: <SRS0=bvyN=TX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,T_HK_NAME_DR,
+	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 01672C282DD
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 15:38:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 73B8DC282DD
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 15:39:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ADC002133D
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 15:38:30 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="ttqzISK1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ADC002133D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
+	by mail.kernel.org (Postfix) with ESMTPS id 491D72133D
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 15:39:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 491D72133D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:39039 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:39045 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hTpna-0004Wd-14
-	for qemu-devel@archiver.kernel.org; Thu, 23 May 2019 11:38:30 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:48728)
+	id 1hTpoW-0005FK-Ib
+	for qemu-devel@archiver.kernel.org; Thu, 23 May 2019 11:39:28 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:49560)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <shmuel.eiderman@oracle.com>) id 1hTpme-00044P-Ep
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 11:37:33 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1hTpnQ-0004Z4-US
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 11:38:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <shmuel.eiderman@oracle.com>) id 1hTpmd-0008Vb-AQ
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 11:37:32 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:60562)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <shmuel.eiderman@oracle.com>)
-	id 1hTpma-0008RD-HZ; Thu, 23 May 2019 11:37:28 -0400
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
-	by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id
-	x4NFYA5V078760; Thu, 23 May 2019 15:37:26 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
-	h=content-type :
-	mime-version : subject : from : in-reply-to : date : cc :
-	content-transfer-encoding : message-id : references : to;
-	s=corp-2018-07-02; bh=wIwm0tx6igGNyP9tCC++3mP2y9OhPsB9sQVWYkyz8ZQ=;
-	b=ttqzISK1z979Nd9rSHDjlEyRcRfP2Lqc1nFNGzFXR1UPUAHAc8jrXcGcyMn9AgRuiVpp
-	3uyO1o8mV+5cjwFvpY7FUKK6CdSkB4lQVgcFccsxiWVwZ79lUf16YRVaWzbF+kA1gDiJ
-	PLzWP2a/BaSFsYhvEMZHiUP5bevytEv1AzjpHqQ42WekFke0n2RbNw6ldFsplR7mbRCY
-	dhPQ+WI+Qh8OTCN4T5kQj8WWs4ybAS2Qstqk83mfiDGK7LWSgjfNdEDCEEWuY8t5X0lh
-	t5ga16EbksET5hbwmPijCu3ejKHHPRZpYN3BrkLPiQ9k049Hzn39EFHl+blcq8s+Dh2M
-	/A== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
-	by userp2120.oracle.com with ESMTP id 2smsk5b834-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 23 May 2019 15:37:26 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
-	by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id
-	x4NFa8Wi022164; Thu, 23 May 2019 15:37:25 GMT
-Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
-	by aserp3020.oracle.com with ESMTP id 2smsh2atdu-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 23 May 2019 15:37:25 +0000
-Received: from abhmp0016.oracle.com (abhmp0016.oracle.com [141.146.116.22])
-	by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x4NFbOwg030322;
-	Thu, 23 May 2019 15:37:24 GMT
-Received: from [10.0.5.157] (/213.57.127.10)
-	by default (Oracle Beehive Gateway v4.0)
-	with ESMTP ; Thu, 23 May 2019 15:37:24 +0000
-Content-Type: text/plain;
-	charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.8\))
-From: Sam Eiderman <shmuel.eiderman@oracle.com>
-In-Reply-To: <f8b7c7b3-fe64-59cc-6b11-1a87270caf00@redhat.com>
-Date: Thu, 23 May 2019 18:37:18 +0300
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <B57B5689-1ABB-4770-9776-4F06E1F19E95@oracle.com>
-References: <20190502085029.30776-1-shmuel.eiderman@oracle.com>
-	<20190502135828.42797-1-shmuel.eiderman@oracle.com>
-	<20190502135828.42797-3-shmuel.eiderman@oracle.com>
-	<c117d2e2-eef2-df4f-ef3d-37a33426dd51@redhat.com>
-	<B8380028-641C-4355-AF16-2F881E25CF8D@oracle.com>
-	<f8b7c7b3-fe64-59cc-6b11-1a87270caf00@redhat.com>
-To: Max Reitz <mreitz@redhat.com>
-X-Mailer: Apple Mail (2.3445.104.8)
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9265
-	signatures=668687
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
-	malwarescore=0
-	phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=802
-	adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
-	engine=8.0.1-1810050000 definitions=main-1905230106
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9265
-	signatures=668687
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
-	priorityscore=1501 malwarescore=0
-	suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
-	lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=841
-	adultscore=0
-	classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
-	definitions=main-1905230106
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 156.151.31.85
-Subject: Re: [Qemu-devel] [PATCH v2 2/3] qemu-img: rebase: Reduce reads on
- in-chain rebase
+	(envelope-from <dgilbert@redhat.com>) id 1hTpnP-0000li-Uw
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 11:38:20 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53780)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hTpnP-0000kW-PN
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 11:38:19 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 0D6A330024AD
+	for <qemu-devel@nongnu.org>; Thu, 23 May 2019 15:38:11 +0000 (UTC)
+Received: from work-vm (ovpn-117-235.ams2.redhat.com [10.36.117.235])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 095605C69A;
+	Thu, 23 May 2019 15:38:00 +0000 (UTC)
+Date: Thu, 23 May 2019 16:37:58 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Jens Freimann <jfreimann@redhat.com>
+Message-ID: <20190523153756.GB2995@work-vm>
+References: <20190517125820.2885-1-jfreimann@redhat.com>
+	<20190517125820.2885-2-jfreimann@redhat.com>
+	<20190521093336.GA2915@work-vm>
+	<20190523080109.kwvr6ufmxufenshy@jenstp.localdomain>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190523080109.kwvr6ufmxufenshy@jenstp.localdomain>
+User-Agent: Mutt/1.11.4 (2019-03-13)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.40]);
+	Thu, 23 May 2019 15:38:16 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH 1/4] migration: allow unplug during
+ migration for failover devices
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -112,155 +73,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, eyal.moscovici@oracle.com, qemu-block@nongnu.org,
-	arbel.moshe@oracle.com, qemu-devel@nongnu.org,
-	liran.alon@oracle.com, sagi.amit@oracle.com, karl.heubaum@oracle.com
+Cc: pkrempa@redhat.com, berrange@redhat.com, ehabkost@redhat.com,
+	mst@redhat.com, aadam@redhat.com, qemu-devel@nongnu.org,
+	laine@redhat.com, ailan@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+* Jens Freimann (jfreimann@redhat.com) wrote:
+> On Tue, May 21, 2019 at 10:33:36AM +0100, Dr. David Alan Gilbert wrote:
+> > * Jens Freimann (jfreimann@redhat.com) wrote:
+> > > In "b06424de62 migration: Disable hotplug/unplug during migration" we
+> > > added a check to disable unplug for all devices until we have figured
+> > > out what works. For failover primary devices qdev_unplug() is called
+> > > from the migration handler, i.e. during migration.
+> > > 
+> > > This patch adds a flag to DeviceState which is set to false for all
+> > > devices and makes an exception for vfio-pci devices that are also
+> > > primary devices in a failover pair.
+> > > 
+> > > Signed-off-by: Jens Freimann <jfreimann@redhat.com>
+> > 
+> > So I think this is safe in your case, because you trigger the unplug
+> > right at the start of migration during setup and plug after failure;
+> > however it's not generally safe - I can't unplug a device while the
+> > migration is actually in progress.
+> 
+> I tried to limit it to only allow it in failover case. You're saying
+> it's missing something and not strict enough? I could allow it only
+> during migration setup. I guess we'll need a similar exception for
+> failover in libvirt.
 
+I might be wrong, but I think with your patch I could hot unplug your
+device part way through migration; where as I think you only care about
+it doing it at a very specific point during setup.
 
-> On 23 May 2019, at 17:26, Max Reitz <mreitz@redhat.com> wrote:
->=20
-> On 23.05.19 16:09, Sam Eiderman wrote:
->>=20
->>=20
->>> On 23 May 2019, at 17:01, Max Reitz <mreitz@redhat.com
->>> <mailto:mreitz@redhat.com>> wrote:
->>>=20
->>> On 02.05.19 15:58, Sam Eiderman wrote:
->>>> In the following case:
->>>>=20
->>>> (base) A <- B <- C (tip)
->>>>=20
->>>> when running:
->>>>=20
->>>>    qemu-img rebase -b A C
->>>>=20
->>>> QEMU would read all sectors not allocated in the file being rebased =
-(C)
->>>> and compare them to the new base image (A), regardless of whether =
-they
->>>> were changed or even allocated anywhere along the chain between the =
-new
->>>> base and the top image (B). This causes many unneeded reads when
->>>> rebasing an image which represents a small diff of a large disk, as =
-it
->>>> would read most of the disk's sectors.
->>>>=20
->>>> Instead, use bdrv_is_allocated_above() to reduce the number of
->>>> unnecessary reads.
->>>>=20
->>>> Reviewed-by: Karl Heubaum <karl.heubaum@oracle.com
->>>> <mailto:karl.heubaum@oracle.com>>
->>>> Signed-off-by: Sam Eiderman <shmuel.eiderman@oracle.com
->>>> <mailto:shmuel.eiderman@oracle.com>>
->>>> Signed-off-by: Eyal Moscovici <eyal.moscovici@oracle.com
->>>> <mailto:eyal.moscovici@oracle.com>>
->>>> ---
->>>> qemu-img.c | 25 ++++++++++++++++++++++++-
->>>> 1 file changed, 24 insertions(+), 1 deletion(-)
->>>>=20
->>>> diff --git a/qemu-img.c b/qemu-img.c
->>>> index d9b609b3f0..7f20858cb9 100644
->>>> --- a/qemu-img.c
->>>> +++ b/qemu-img.c
->>>=20
->>> [...]
->>>=20
->>>> @@ -3422,6 +3428,23 @@ static int img_rebase(int argc, char **argv)
->>>>                 continue;
->>>>             }
->>>>=20
->>>> +            if (prefix_chain_bs) {
->>>> +                /*
->>>> +                 * If cluster wasn't changed since prefix_chain, =
-we
->>>> don't need
->>>> +                 * to take action
->>>> +                 */
->>>> +                ret =3D bdrv_is_allocated_above(bs, =
-prefix_chain_bs,
->>>> +                                              offset, n, &n);
->>>=20
->>> This will always return true because it definitely is allocated in =
-@bs,
->>> or we wouldn=E2=80=99t be here.  (We just checked that with
->>> bdrv_is_allocated().)  I think @top should be backing_bs(bs).
->>>=20
->>> Max
->>=20
->> I don=E2=80=99t think that=E2=80=99s true:
->>=20
->> Examine the case where we have the following chain:
->>=20
->> A <- B <- C
->>=20
->> When we rebase C directly over A: qemu-img rebase -b A C
->>=20
->> We must check for every offset (sector): bdrv_is_allocated_above(C, =
-A,
->> offset, n, &n);
->>=20
->> If a sector from C is allocated above A - it may have been changed - =
-so
->> we need to do a read from A and a read from C and compare.
->> If the sector is not allocated above, it was not changed - we don=E2=80=
-=99t need
->> to read from A or C.
->=20
-> First: Oops, somehow I inverted the bdrv_is_allocated() check in my
-> head.  (For context: I mean this part above this hunk here:
->=20
->    /* If the cluster is allocated, we don't need to take action */
->    ret =3D bdrv_is_allocated(bs, offset, n, &n);
->    if (ret < 0) {
->        error_report("error while reading image metadata: %s",
->                     strerror(-ret));
->        goto out;
->    }
->=20
->=20
->=20
->    if (ret) {
->        continue;
->    }
->=20
-> )  So at this point, the range definitely is *not* allocated in @bs.
->=20
-> But second: That still means that we do not have to check @bs itself,
-> because we already did.  We know the range isn=E2=80=99t allocated =
-there, so we
-> can start at its backing file.
->=20
-> On a more abstract level: No, we do not need to read all sectors from =
-A
-> and C and compare them if they are allocated anywhere above A.  If =
-they
-> are allocated in C, we=E2=80=99re good, because all we=E2=80=99d do is =
-write them back
-> to C (which is a no-op).  That=E2=80=99s exactly what the existing
-> bdrv_is_allocated() check is for.
->=20
-> So we only need to know whether the sectors are allocated above the =
-base
-> (A) and below the top (C), so in your example, whether they are
-> allocated in B.  If they are, we need to compare and potentially copy,
-> if they are not, we can skip them.
->=20
-> So my claim that bdrv_is_allocated_above() would always return true is
-> wrong, but it still should use backing_bs(bs) for the top because we
-> have checked @bs already.
+(I still would prefer the hotplug to be done outside qemu, but still
+that's separate).
 
-I see your point, basically we save a single iteration in the loop at =
-bdrv_is_allocated_above.
-I=E2=80=99ll submit a v4 patch series.
-
-Sam
-
->=20
-> Max
->=20
-
+Dave
+> regards,
+> Jens
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
