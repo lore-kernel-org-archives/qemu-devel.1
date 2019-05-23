@@ -2,85 +2,62 @@ Return-Path: <SRS0=bvyN=TX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,FROM_EXCESS_BASE64,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8AF8EC282DD
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 14:40:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1045FC282DD
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 14:41:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 45FC920879
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 14:40:12 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Op8Ex2qe"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 45FC920879
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id C9E4220879
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 14:41:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C9E4220879
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:37826 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:37954 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hTot9-0008PL-IB
-	for qemu-devel@archiver.kernel.org; Thu, 23 May 2019 10:40:11 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:58381)
+	id 1hTouO-0001HO-3w
+	for qemu-devel@archiver.kernel.org; Thu, 23 May 2019 10:41:28 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:57509)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1hToqm-0006jo-RQ
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 10:37:48 -0400
+	(envelope-from <armbru@redhat.com>) id 1hTooQ-0004Z7-2H
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 10:35:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1hToqd-0001Hc-Q8
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 10:37:39 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:34879)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1hToqd-0001GM-Jk
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 10:37:35 -0400
-Received: by mail-wr1-x443.google.com with SMTP id m3so6569247wrv.2
-	for <qemu-devel@nongnu.org>; Thu, 23 May 2019 07:37:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-	:cc:content-transfer-encoding;
-	bh=eJIJDQqFppwljJjar5r90nYbVx2OX6wIQ7/uP+NLAPo=;
-	b=Op8Ex2qe/HzcpXRyRDQ0YodduQONy0F8eP4iZv/ZX9m1KZRAUVDLNAmJvTnn5Q8POD
-	5LmAr2XVOXg6v2rmE/YO9U4PZHVQpf2D7vmDwF2e2CVFVS7YFSv+F5DZxGEQURpUl1On
-	m1DpNWZeDCqaPH7i6qUKFzPifY7hJoxkXsXqftUU5NDo3b3ei1iBGdRK8VGCaPwdlAgH
-	NtrXRE7fKfExNUvucSUL/mRO+DNvGoKJYlpkQCPY/zswSR/cXuxlw3kTmNLJYlTuFCER
-	AU3+k/LUGekRmHq0+9R3pW4QNOSxsrky5xFIIf4ckC4fiqi07ZzRAU0hAt6ixLVdyF2c
-	6gzw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-	:message-id:subject:to:cc:content-transfer-encoding;
-	bh=eJIJDQqFppwljJjar5r90nYbVx2OX6wIQ7/uP+NLAPo=;
-	b=KzwjKotG0Wskerazpq/tWiNNQEuZJE5I7eUc9xTkdZGOYnoPp5FSFM51KfQ92ifwsv
-	bvXVXeGKuAf/ZHYTaBVj9JJfrp5UwIVy7Y0RSBEQ34nsebY4P3dstArsCChNGAem+8jL
-	r0sybkpYmtmHHvcMWr3TS3wM++4KLEBYYBfNZgESOlDdNOw63FlVdDeLDKv2o09cIkrw
-	Bw+tHD7WiW1Snvbqy9hCQa0xiJa2DGFSW8MbGGxQwWZbDEe5dEPLlDKoFECEwgmMgble
-	pfbuP5+rkP3gbpFlh59739z5Pl2PloQy90RV3kqJrGMswtRsr/1V0LXvxFO0t8BxaQhr
-	AE8Q==
-X-Gm-Message-State: APjAAAWXmf5sHuxmLaznENSJFinskQamgZl5D6AM8l2QmFhYZcZnVnCB
-	QZ+OnayJiDjWuKSETeQqL7Ykw0FVbmjvtIVcdcM=
-X-Google-Smtp-Source: APXvYqy7nQaV5+18pZpOl/PgQlu5j0qx73KDX5I3MTQOc4SxAXcOew5Eb8Mdalw81P3HxiC8keCxxKQ8U/xPbXrIE00=
-X-Received: by 2002:adf:9d8a:: with SMTP id p10mr32281777wre.31.1558622253987; 
-	Thu, 23 May 2019 07:37:33 -0700 (PDT)
-MIME-Version: 1.0
-References: <20190523110434.23830-1-gert.wollny@collabora.com>
-	<CAJ+F1C+=89nSeEyiBowdOsqr5HBtvvNnXp3ZWHBGV_WYYH9kgA@mail.gmail.com>
-	<721f520106a799afe003b3b8d3ce4de12daf04f5.camel@collabora.com>
-In-Reply-To: <721f520106a799afe003b3b8d3ce4de12daf04f5.camel@collabora.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Thu, 23 May 2019 16:37:22 +0200
-Message-ID: <CAJ+F1C+vjg47SyBdb7EtvM3JFPpddkko=gXGbsGNqbn0M1u1-Q@mail.gmail.com>
-To: Gert Wollny <gert.wollny@collabora.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2a00:1450:4864:20::443
-Subject: Re: [Qemu-devel] [PATCH] virtio_gpu_3d: make it possible to
- configure the fence poll time
+	(envelope-from <armbru@redhat.com>) id 1hTooO-0007YT-1f
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 10:35:18 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60514)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hTooN-0007XW-Qf
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 10:35:15 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id BEB6930821AE
+	for <qemu-devel@nongnu.org>; Thu, 23 May 2019 14:35:09 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-117-250.ams2.redhat.com
+	[10.36.117.250])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 689DA620BF
+	for <qemu-devel@nongnu.org>; Thu, 23 May 2019 14:35:09 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+	id 185AC1132BB6; Thu, 23 May 2019 16:35:08 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: qemu-devel@nongnu.org
+Date: Thu, 23 May 2019 16:35:06 +0200
+Message-Id: <20190523143508.25387-3-armbru@redhat.com>
+In-Reply-To: <20190523143508.25387-1-armbru@redhat.com>
+References: <20190523143508.25387-1-armbru@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.47]);
+	Thu, 23 May 2019 14:35:09 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PATCH 2/4] qemu-common: Move qemu_isalnum() etc. to
+ qemu/ctype.h
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -92,152 +69,367 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+---
+ block/ssh.c                |  1 +
+ block/vvfat.c              |  1 +
+ gdbstub.c                  |  2 ++
+ hw/core/bus.c              |  2 +-
+ hw/core/qdev-properties.c  |  1 +
+ hw/s390x/s390-virtio-ccw.c |  1 +
+ hw/scsi/scsi-generic.c     |  2 +-
+ include/qemu-common.h      | 16 ----------------
+ include/qemu/ctype.h       | 27 +++++++++++++++++++++++++++
+ monitor.c                  |  1 +
+ net/net.c                  |  1 +
+ net/tap-solaris.c          |  1 +
+ qapi/qapi-util.c           |  2 +-
+ qobject/json-parser.c      |  2 +-
+ target/ppc/monitor.c       |  2 ++
+ target/riscv/cpu.c         |  1 +
+ tests/libqtest.c           |  1 +
+ tests/vhost-user-bridge.c  |  2 +-
+ ui/keymaps.c               |  1 +
+ util/cutils.c              |  3 ++-
+ util/id.c                  |  2 +-
+ util/readline.c            |  2 +-
+ 22 files changed, 50 insertions(+), 24 deletions(-)
+ create mode 100644 include/qemu/ctype.h
 
-On Thu, May 23, 2019 at 4:17 PM Gert Wollny <gert.wollny@collabora.com> wro=
-te:
->
-> Am Donnerstag, den 23.05.2019, 16:01 +0200 schrieb Marc-Andr=C3=A9 Lureau=
-:
-> > Hi
-> >
-> > On Thu, May 23, 2019 at 3:27 PM Gert Wollny <
-> > gert.wollny@collabora.com> wrote:
-> > > The default fence poll time of 10ms (100 Hz) is sufficent for
-> > > normal
-> > > work loads, but if one wants to play games within the virtual
-> > > machine
-> > > this value might be too high, so make it possible to configure this
-> > > value by using the environment variable QEMU_VIRGL_POLL_FREQ where
-> > > the
-> > > poll is given in Hz. To acommodate higher poll frequencies also
-> > > change
-> > > the timer to use micro seconds as base instead of milliseconds.
-> > >
-> > >
-> >
-> > This is what VIRGL_RENDERER_THREAD_SYNC helps with. You don't need to
-> > do regular polling, but I think it is currently limited to
-> > Linux/eventfd only.
->
-> As far as I can see only vtest uses this, not qemu.
+diff --git a/block/ssh.c b/block/ssh.c
+index 12fd4f39e8..584c302fe6 100644
+--- a/block/ssh.c
++++ b/block/ssh.c
+@@ -32,6 +32,7 @@
+ #include "qapi/error.h"
+ #include "qemu/error-report.h"
+ #include "qemu/option.h"
++#include "qemu/ctype.h"
+ #include "qemu/cutils.h"
+ #include "qemu/sockets.h"
+ #include "qemu/uri.h"
+diff --git a/block/vvfat.c b/block/vvfat.c
+index 253cc716dd..f6c28805dd 100644
+--- a/block/vvfat.c
++++ b/block/vvfat.c
+@@ -34,6 +34,7 @@
+ #include "migration/blocker.h"
+ #include "qapi/qmp/qdict.h"
+ #include "qapi/qmp/qstring.h"
++#include "qemu/ctype.h"
+ #include "qemu/cutils.h"
+ #include "qemu/error-report.h"
+ 
+diff --git a/gdbstub.c b/gdbstub.c
+index b129df4e59..ae8f1f050a 100644
+--- a/gdbstub.c
++++ b/gdbstub.c
+@@ -16,9 +16,11 @@
+  * You should have received a copy of the GNU Lesser General Public
+  * License along with this library; if not, see <http://www.gnu.org/licenses/>.
+  */
++
+ #include "qemu/osdep.h"
+ #include "qapi/error.h"
+ #include "qemu/error-report.h"
++#include "qemu/ctype.h"
+ #include "qemu/cutils.h"
+ #include "trace-root.h"
+ #ifdef CONFIG_USER_ONLY
+diff --git a/hw/core/bus.c b/hw/core/bus.c
+index e09843f6ab..60c4720379 100644
+--- a/hw/core/bus.c
++++ b/hw/core/bus.c
+@@ -18,7 +18,7 @@
+  */
+ 
+ #include "qemu/osdep.h"
+-#include "qemu-common.h"
++#include "qemu/ctype.h"
+ #include "hw/qdev.h"
+ #include "qapi/error.h"
+ 
+diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
+index 5da1439a8b..81c97f48a7 100644
+--- a/hw/core/qdev-properties.c
++++ b/hw/core/qdev-properties.c
+@@ -4,6 +4,7 @@
+ #include "qapi/error.h"
+ #include "hw/pci/pci.h"
+ #include "qapi/qmp/qerror.h"
++#include "qemu/ctype.h"
+ #include "qemu/error-report.h"
+ #include "hw/block/block.h"
+ #include "net/hub.h"
+diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+index bbc6e8fa0b..3af9308789 100644
+--- a/hw/s390x/s390-virtio-ccw.c
++++ b/hw/s390x/s390-virtio-ccw.c
+@@ -23,6 +23,7 @@
+ #include "hw/s390x/css.h"
+ #include "virtio-ccw.h"
+ #include "qemu/config-file.h"
++#include "qemu/ctype.h"
+ #include "qemu/error-report.h"
+ #include "qemu/option.h"
+ #include "s390-pci-bus.h"
+diff --git a/hw/scsi/scsi-generic.c b/hw/scsi/scsi-generic.c
+index d82b462be4..e8a8706a4f 100644
+--- a/hw/scsi/scsi-generic.c
++++ b/hw/scsi/scsi-generic.c
+@@ -13,7 +13,7 @@
+ 
+ #include "qemu/osdep.h"
+ #include "qapi/error.h"
+-#include "qemu-common.h"
++#include "qemu/ctype.h"
+ #include "qemu/error-report.h"
+ #include "hw/scsi/scsi.h"
+ #include "hw/scsi/emulation.h"
+diff --git a/include/qemu-common.h b/include/qemu-common.h
+index d7f4a4e7eb..9b01f6e7cb 100644
+--- a/include/qemu-common.h
++++ b/include/qemu-common.h
+@@ -31,22 +31,6 @@ int qemu_main(int argc, char **argv, char **envp);
+ void qemu_get_timedate(struct tm *tm, int offset);
+ int qemu_timedate_diff(struct tm *tm);
+ 
+-#define qemu_isalnum(c)		isalnum((unsigned char)(c))
+-#define qemu_isalpha(c)		isalpha((unsigned char)(c))
+-#define qemu_iscntrl(c)		iscntrl((unsigned char)(c))
+-#define qemu_isdigit(c)		isdigit((unsigned char)(c))
+-#define qemu_isgraph(c)		isgraph((unsigned char)(c))
+-#define qemu_islower(c)		islower((unsigned char)(c))
+-#define qemu_isprint(c)		isprint((unsigned char)(c))
+-#define qemu_ispunct(c)		ispunct((unsigned char)(c))
+-#define qemu_isspace(c)		isspace((unsigned char)(c))
+-#define qemu_isupper(c)		isupper((unsigned char)(c))
+-#define qemu_isxdigit(c)	isxdigit((unsigned char)(c))
+-#define qemu_tolower(c)		tolower((unsigned char)(c))
+-#define qemu_toupper(c)		toupper((unsigned char)(c))
+-#define qemu_isascii(c)		isascii((unsigned char)(c))
+-#define qemu_toascii(c)		toascii((unsigned char)(c))
+-
+ void *qemu_oom_check(void *ptr);
+ 
+ ssize_t qemu_write_full(int fd, const void *buf, size_t count)
+diff --git a/include/qemu/ctype.h b/include/qemu/ctype.h
+new file mode 100644
+index 0000000000..3691f0984d
+--- /dev/null
++++ b/include/qemu/ctype.h
+@@ -0,0 +1,27 @@
++/*
++ * QEMU TCG support
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ */
++
++#ifndef QEMU_CTYPE_H
++#define QEMU_CTYPE_H
++
++#define qemu_isalnum(c)         isalnum((unsigned char)(c))
++#define qemu_isalpha(c)         isalpha((unsigned char)(c))
++#define qemu_iscntrl(c)         iscntrl((unsigned char)(c))
++#define qemu_isdigit(c)         isdigit((unsigned char)(c))
++#define qemu_isgraph(c)         isgraph((unsigned char)(c))
++#define qemu_islower(c)         islower((unsigned char)(c))
++#define qemu_isprint(c)         isprint((unsigned char)(c))
++#define qemu_ispunct(c)         ispunct((unsigned char)(c))
++#define qemu_isspace(c)         isspace((unsigned char)(c))
++#define qemu_isupper(c)         isupper((unsigned char)(c))
++#define qemu_isxdigit(c)        isxdigit((unsigned char)(c))
++#define qemu_tolower(c)         tolower((unsigned char)(c))
++#define qemu_toupper(c)         toupper((unsigned char)(c))
++#define qemu_isascii(c)         isascii((unsigned char)(c))
++#define qemu_toascii(c)         toascii((unsigned char)(c))
++
++#endif
+diff --git a/monitor.c b/monitor.c
+index 3650ceb574..5c5cbe254a 100644
+--- a/monitor.c
++++ b/monitor.c
+@@ -42,6 +42,7 @@
+ #include "sysemu/numa.h"
+ #include "monitor/monitor.h"
+ #include "qemu/config-file.h"
++#include "qemu/ctype.h"
+ #include "qemu/readline.h"
+ #include "ui/console.h"
+ #include "ui/input.h"
+diff --git a/net/net.c b/net/net.c
+index 2cf5e76469..3e65c93920 100644
+--- a/net/net.c
++++ b/net/net.c
+@@ -41,6 +41,7 @@
+ #include "qemu/sockets.h"
+ #include "qemu/cutils.h"
+ #include "qemu/config-file.h"
++#include "qemu/ctype.h"
+ #include "hw/qdev.h"
+ #include "qemu/iov.h"
+ #include "qemu/main-loop.h"
+diff --git a/net/tap-solaris.c b/net/tap-solaris.c
+index a2a92356c1..0e3f3e0a9b 100644
+--- a/net/tap-solaris.c
++++ b/net/tap-solaris.c
+@@ -26,6 +26,7 @@
+ #include "qapi/error.h"
+ #include "tap_int.h"
+ #include "sysemu/sysemu.h"
++#include "qemu/ctype.h"
+ #include "qemu/cutils.h"
+ 
+ #include <sys/ethernet.h>
+diff --git a/qapi/qapi-util.c b/qapi/qapi-util.c
+index e9b266bb70..29a6c98b53 100644
+--- a/qapi/qapi-util.c
++++ b/qapi/qapi-util.c
+@@ -12,7 +12,7 @@
+ 
+ #include "qemu/osdep.h"
+ #include "qapi/error.h"
+-#include "qemu-common.h"
++#include "qemu/ctype.h"
+ 
+ const char *qapi_enum_lookup(const QEnumLookup *lookup, int val)
+ {
+diff --git a/qobject/json-parser.c b/qobject/json-parser.c
+index d8eb210c0c..7d23e12e33 100644
+--- a/qobject/json-parser.c
++++ b/qobject/json-parser.c
+@@ -12,10 +12,10 @@
+  */
+ 
+ #include "qemu/osdep.h"
++#include "qemu/ctype.h"
+ #include "qemu/cutils.h"
+ #include "qemu/unicode.h"
+ #include "qapi/error.h"
+-#include "qemu-common.h"
+ #include "qapi/qmp/qbool.h"
+ #include "qapi/qmp/qdict.h"
+ #include "qapi/qmp/qlist.h"
+diff --git a/target/ppc/monitor.c b/target/ppc/monitor.c
+index ee9d6e81d2..7f8360d903 100644
+--- a/target/ppc/monitor.c
++++ b/target/ppc/monitor.c
+@@ -21,9 +21,11 @@
+  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+  * THE SOFTWARE.
+  */
++
+ #include "qemu/osdep.h"
+ #include "cpu.h"
+ #include "monitor/monitor.h"
++#include "qemu/ctype.h"
+ #include "monitor/hmp-target.h"
+ #include "hmp.h"
+ 
+diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
+index b7675707e0..b9ed694ab4 100644
+--- a/target/riscv/cpu.c
++++ b/target/riscv/cpu.c
+@@ -19,6 +19,7 @@
+ 
+ #include "qemu/osdep.h"
+ #include "qemu/qemu-print.h"
++#include "qemu/ctype.h"
+ #include "qemu/log.h"
+ #include "cpu.h"
+ #include "exec/exec-all.h"
+diff --git a/tests/libqtest.c b/tests/libqtest.c
+index 8ac0c02af4..0cc3ee697a 100644
+--- a/tests/libqtest.c
++++ b/tests/libqtest.c
+@@ -22,6 +22,7 @@
+ 
+ #include "libqtest.h"
+ #include "qemu-common.h"
++#include "qemu/ctype.h"
+ #include "qemu/cutils.h"
+ #include "qapi/error.h"
+ #include "qapi/qmp/json-parser.h"
+diff --git a/tests/vhost-user-bridge.c b/tests/vhost-user-bridge.c
+index 5b771de7a3..0bb03af0e5 100644
+--- a/tests/vhost-user-bridge.c
++++ b/tests/vhost-user-bridge.c
+@@ -30,8 +30,8 @@
+ #define _FILE_OFFSET_BITS 64
+ 
+ #include "qemu/osdep.h"
+-#include "qemu-common.h"
+ #include "qemu/atomic.h"
++#include "qemu/ctype.h"
+ #include "qemu/iov.h"
+ #include "standard-headers/linux/virtio_net.h"
+ #include "contrib/libvhost-user/libvhost-user.h"
+diff --git a/ui/keymaps.c b/ui/keymaps.c
+index 544b55c27b..38fd22ed2b 100644
+--- a/ui/keymaps.c
++++ b/ui/keymaps.c
+@@ -26,6 +26,7 @@
+ #include "keymaps.h"
+ #include "sysemu/sysemu.h"
+ #include "trace.h"
++#include "qemu/ctype.h"
+ #include "qemu/error-report.h"
+ #include "qapi/error.h"
+ #include "ui/input.h"
+diff --git a/util/cutils.c b/util/cutils.c
+index 9aacc422ca..53e4af59f8 100644
+--- a/util/cutils.c
++++ b/util/cutils.c
+@@ -21,14 +21,15 @@
+  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+  * THE SOFTWARE.
+  */
++
+ #include "qemu/osdep.h"
+-#include "qemu-common.h"
+ #include "qemu/host-utils.h"
+ #include <math.h>
+ 
+ #include "qemu/sockets.h"
+ #include "qemu/iov.h"
+ #include "net/net.h"
++#include "qemu/ctype.h"
+ #include "qemu/cutils.h"
+ #include "qemu/error-report.h"
+ 
+diff --git a/util/id.c b/util/id.c
+index 6141352955..af1c5f1b81 100644
+--- a/util/id.c
++++ b/util/id.c
+@@ -11,7 +11,7 @@
+  */
+ 
+ #include "qemu/osdep.h"
+-#include "qemu-common.h"
++#include "qemu/ctype.h"
+ #include "qemu/id.h"
+ 
+ bool id_wellformed(const char *id)
+diff --git a/util/readline.c b/util/readline.c
+index a7672b51c1..e534460da6 100644
+--- a/util/readline.c
++++ b/util/readline.c
+@@ -23,8 +23,8 @@
+  */
+ 
+ #include "qemu/osdep.h"
+-#include "qemu-common.h"
+ #include "qemu/readline.h"
++#include "qemu/ctype.h"
+ #include "qemu/cutils.h"
+ 
+ #define IS_NORM 0
+-- 
+2.17.2
 
-I don't think there is anything preventing qemu from using it, except
-the portability which should be taken care more carefully.
-
->
-> >
-> > fwiw, vhost-user-gpu uses it.
->
-> Yeah, I tested it on Intel, but AFAICS this hasn't landed yet, no? OTOH
-> the drm calls were only implemented for Intel, and I have no idea how
-> to implement this for other hardware, like e.g. radeonsi, or even the
-> Nvidia blob ...
-
-I just sent v8 for review today:
-https://patchew.org/QEMU/20190523132035.20559-1-marcandre.lureau@redhat.com=
-/
-
-The DRM bits were replaced by GBM usage, which will give some portability.
-
-Note that those bits are for 2d ops only, and have a simpler ram/mem fallba=
-ck.
-
-
-> Best,
-> Gert
->
->
-> >
-> >
-> > > Signed-off-by: Gert Wollny <gert.wollny@collabora.com>
-> > > ---
-> > >  hw/display/virtio-gpu-3d.c     | 18 ++++++++++++++++--
-> > >  include/hw/virtio/virtio-gpu.h |  1 +
-> > >  2 files changed, 17 insertions(+), 2 deletions(-)
-> > >
-> > > diff --git a/hw/display/virtio-gpu-3d.c b/hw/display/virtio-gpu-
-> > > 3d.c
-> > > index 5ee3566ae0..120e593e76 100644
-> > > --- a/hw/display/virtio-gpu-3d.c
-> > > +++ b/hw/display/virtio-gpu-3d.c
-> > > @@ -17,6 +17,7 @@
-> > >  #include "trace.h"
-> > >  #include "hw/virtio/virtio.h"
-> > >  #include "hw/virtio/virtio-gpu.h"
-> > > +#include "qemu/cutils.h"
-> > >
-> > >  #ifdef CONFIG_VIRGL
-> > >
-> > > @@ -580,7 +581,8 @@ static void virtio_gpu_fence_poll(void *opaque)
-> > >      virgl_renderer_poll();
-> > >      virtio_gpu_process_cmdq(g);
-> > >      if (!QTAILQ_EMPTY(&g->cmdq) || !QTAILQ_EMPTY(&g->fenceq)) {
-> > > -        timer_mod(g->fence_poll,
-> > > qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL) + 1);
-> > > +        timer_mod(g->fence_poll,
-> > > qemu_clock_get_us(QEMU_CLOCK_VIRTUAL) +
-> > > +                                 g->fence_poll_timeout);
-> > >      }
-> > >  }
-> > >
-> > > @@ -605,13 +607,25 @@ void virtio_gpu_virgl_reset(VirtIOGPU *g)
-> > >  int virtio_gpu_virgl_init(VirtIOGPU *g)
-> > >  {
-> > >      int ret;
-> > > +    const char *val;
-> > >
-> > >      ret =3D virgl_renderer_init(g, 0, &virtio_gpu_3d_cbs);
-> > >      if (ret !=3D 0) {
-> > >          return ret;
-> > >      }
-> > >
-> > > -    g->fence_poll =3D timer_new_ms(QEMU_CLOCK_VIRTUAL,
-> > > +    g->fence_poll_timeout =3D 10000; /* default 10 ms */
-> > > +    val =3D getenv("QEMU_VIRGL_POLL_FREQ");
-> > > +    if (val) {
-> > > +        unsigned long long poll_freq;
-> > > +        if (parse_uint_full(val, &poll_freq, 10) || poll_freq >
-> > > UINT32_MAX) {
-> > > +            fprintf(stderr, "VIRGL_POLL_FREQ: Invalid integer
-> > > `%s'\n", val);
-> > > +            exit(1);
-> > > +        }
-> > > +        g->fence_poll_timeout =3D 1000000 / (uint32_t)poll_freq;
-> > > +    }
-> > > +
-> > > +    g->fence_poll =3D timer_new_us(QEMU_CLOCK_VIRTUAL,
-> > >                                   virtio_gpu_fence_poll, g);
-> > >
-> > >      if (virtio_gpu_stats_enabled(g->conf)) {
-> > > diff --git a/include/hw/virtio/virtio-gpu.h
-> > > b/include/hw/virtio/virtio-gpu.h
-> > > index 60425c5d58..a9e03b25aa 100644
-> > > --- a/include/hw/virtio/virtio-gpu.h
-> > > +++ b/include/hw/virtio/virtio-gpu.h
-> > > @@ -116,6 +116,7 @@ typedef struct VirtIOGPU {
-> > >      bool renderer_reset;
-> > >      QEMUTimer *fence_poll;
-> > >      QEMUTimer *print_stats;
-> > > +    uint32_t fence_poll_timeout;
-> > >
-> > >      uint32_t inflight;
-> > >      struct {
-> > > --
-> > > 2.20.1
-> > >
-> > >
-> >
-> >
->
->
-
-
---=20
-Marc-Andr=C3=A9 Lureau
 
