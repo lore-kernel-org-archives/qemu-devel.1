@@ -2,82 +2,79 @@ Return-Path: <SRS0=bvyN=TX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E8344C282DE
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 09:30:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E110C282DD
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 09:32:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 02C6B2175B
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 09:30:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 02C6B2175B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 55B6520675
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 09:32:13 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="YU4kZ4cP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 55B6520675
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:60504 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:60538 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hTk3M-0007S4-PB
-	for qemu-devel@archiver.kernel.org; Thu, 23 May 2019 05:30:24 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:36502)
+	id 1hTk56-0000Cd-JT
+	for qemu-devel@archiver.kernel.org; Thu, 23 May 2019 05:32:12 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:36649)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hTk2R-000752-DG
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 05:29:28 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1hTk39-0007Tb-OS
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 05:30:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hTk2Q-0005nd-4U
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 05:29:27 -0400
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:36155)
+	(envelope-from <peter.maydell@linaro.org>) id 1hTk38-0006Zi-Gn
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 05:30:11 -0400
+Received: from mail-ot1-x331.google.com ([2607:f8b0:4864:20::331]:37757)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hTk2P-0005jN-ET
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 05:29:25 -0400
-Received: by mail-wm1-f66.google.com with SMTP id j187so5009944wmj.1
-	for <qemu-devel@nongnu.org>; Thu, 23 May 2019 02:29:25 -0700 (PDT)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1hTk38-0006ZN-AC
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 05:30:10 -0400
+Received: by mail-ot1-x331.google.com with SMTP id r10so4813860otd.4
+	for <qemu-devel@nongnu.org>; Thu, 23 May 2019 02:30:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+	:cc; bh=9f8jBWdzfHZ/m1QIVPpppB4fkIOceN0i3Ak6ZmNr/YY=;
+	b=YU4kZ4cPfEvlOr/CFV0py/a/5QXNvuefagiiemaD/lSrzYfFgCHvWl5SYSfSwy/L1t
+	BRkbhBYAetsUU1wNL+EALej+vtyhyiaV7hBCEbmYWE4dEfqzz4QYIjapz6ojYfrlJPDV
+	IcqCYSVOVgzveM1GTiiKoBJBj0LTHpsV0dmz+t1AFUgwkWZzTVWTjpg4ALVQm4O6mdLO
+	2D2G3hcERQ2jg4FwJZ+z+zxnWWvljQZ486ge5IpYazNOu8e62H1OxvRTI4J1C2eF2Jho
+	n3RqkKpsjzk3UeWWLURSGGrR1UcJwXbjCddnU1ZKpadmr46HGa3MjmY7OrNOuwV/0QLY
+	JWFw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-	:date:user-agent:mime-version:in-reply-to:content-language
-	:content-transfer-encoding;
-	bh=cd2Tqu1K8ZBcZpPPVYcjLx8XCLZjsoiUkNI6k5j8kv0=;
-	b=nbTAM7XQOLb5eYgUGwM+1lLCpjCU5tgg6SVJQWLqtMxQUH2nrEDlv4Do9YFP+vcbRs
-	aFIPvCtBF8lDFyEfv9n+e9GrfYEc/nCHlkBQBk2lshT6D/Rox49IcCY5mMcxdUzl41K4
-	Oc8ioQsWYAnOj34Vpi9kMxP2QFkeGO+YpjsqaEhipJ5jFpFgOGisvZ9eMu3vLeiOeZfO
-	0QZwO0JKU/EnJwNQP8h50f9nGq5JWp809D4aRIjQggeQHsoXiItKiUL9SBiV5FA6V01W
-	CZSjftByV0g+xZNlIFDfE1YcCTEC/VlAll2qPXeYfDP7myCLXmsoYSHA1jY9XNtRvNJx
-	9m+Q==
-X-Gm-Message-State: APjAAAUk2YMcTMqkLyNKbPCs14Uh4N9ZEbcoCKuy00hRQMbDQf5Q3vVm
-	U1VGwhnCjBre1TBFZaC2qTFG5A==
-X-Google-Smtp-Source: APXvYqyUsWPDD3C5IAGcAeGA+n8cS039aNJJSqClYNwTpN5OBNWLKq3RJFvG9iNbyumL156wcyrSPA==
-X-Received: by 2002:a7b:c7d5:: with SMTP id z21mr10932424wmk.56.1558603764243; 
-	Thu, 23 May 2019 02:29:24 -0700 (PDT)
-Received: from [192.168.1.38] (228.red-83-52-173.dynamicip.rima-tde.net.
-	[83.52.173.228]) by smtp.gmail.com with ESMTPSA id
-	a128sm10054948wmc.13.2019.05.23.02.29.23
-	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-	Thu, 23 May 2019 02:29:23 -0700 (PDT)
-To: Cleber Rosa <crosa@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
-References: <20190312234541.2887-1-philmd@redhat.com>
-	<20190312234541.2887-3-philmd@redhat.com>
-	<20190522205234.GY10764@habkost.net>
-	<1204725743.24201394.1558559144548.JavaMail.zimbra@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
-	url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <1088d160-20c1-00ed-b494-fede1a3a8410@redhat.com>
-Date: Thu, 23 May 2019 11:29:22 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+	:message-id:subject:to:cc;
+	bh=9f8jBWdzfHZ/m1QIVPpppB4fkIOceN0i3Ak6ZmNr/YY=;
+	b=OZGm3swQe5NEEMKtirdPRViwn4/HCmenFADQqhAvU14beximxLu8+vbN0JmJnb8S4t
+	N9AlVzOAwAtRWgTxhYs1iiJlq2F28wKOw7R4Z2tuUXOTgpUmCMNFDwgU4fMB597uP8Im
+	TTGaEf+hq1wAUu5ArHWDcy1PkAcb4D5RRqNjClvNwa3DCU6OlOC/HGQDDjI14V66djCo
+	3O3iqgvoO3r6e+8/71I4cYkpsv4ZVLvOM8jBnnpe4r/GUx7mxAH7YDB2E6VMxFZLYCES
+	c3XqDEjo6fqPgIwvsShQ7NOXnOkYlrS2eKe3UzjcxiImECpAVfb/r+p4bhmW72dZnH2v
+	ArAQ==
+X-Gm-Message-State: APjAAAUJZezWOpULHWGmgdqNTe2bDpeqGH/UoL94qWfYjpqlaWmJiOWS
+	wHZ6aoy6JDQV9H1xMsSVZCZ5VJoELHjEO6A7W3vvpQ==
+X-Google-Smtp-Source: APXvYqz/qNkK2UGYtmCYUo4+MwpExTrRp5fqjYaE9ogstRHIHKjWYg5At8ROMlQKYO2ZjLFJvmx9wpA0vIQL/n+2V60=
+X-Received: by 2002:a9d:77d5:: with SMTP id w21mr106945otl.97.1558603809298;
+	Thu, 23 May 2019 02:30:09 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <1204725743.24201394.1558559144548.JavaMail.zimbra@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-	[fuzzy]
-X-Received-From: 209.85.128.66
-Subject: Re: [Qemu-devel] [PATCH v2 2/2] Boot Linux Console Test: add a test
- for the Raspberry Pi 2
+References: <20190522044600.16534-1-david@gibson.dropbear.id.au>
+In-Reply-To: <20190522044600.16534-1-david@gibson.dropbear.id.au>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 23 May 2019 10:29:57 +0100
+Message-ID: <CAFEAcA_-O7AS-qBmj_Ba6N69WW5DBenPmxUATs3vQcdBW5Hj5w@mail.gmail.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::331
+Subject: Re: [Qemu-devel] [PULL 00/38] ppc-for-4.1 queue 20190522
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -89,66 +86,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org,
-	Andrew Baumann <Andrew.Baumann@microsoft.com>,
-	=?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
-	qemu-arm@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>
+Cc: Laurent Vivier <lvivier@redhat.com>,
+	=?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>,
+	qemu-ppc <qemu-ppc@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>,
+	Greg Kurz <groug@kaod.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/22/19 11:05 PM, Cleber Rosa wrote:
-> ----- Original Message -----
->> From: "Eduardo Habkost" <ehabkost@redhat.com>
->> On Wed, Mar 13, 2019 at 12:45:41AM +0100, Philippe Mathieu-Daudé wrote:
->>> From: Philippe Mathieu-Daudé <f4bug@amsat.org>
->>>
->>> Similar to the x86_64/pc test, it boots a Linux kernel on a raspi2
->>> board and verify the serial is working.
->>>
->>> If ARM is a target being built, "make check-acceptance" will
->>> automatically include this test by the use of the "arch:arm" tags.
->>>
->>> Alternatively, this test can be run using:
->>>
->>>     $ avocado run -t arch:arm tests/acceptance
->>>     $ avocado run -t machine:raspi2 tests/acceptance
->>>
->>> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
->>
->> We're getting timeouts on travis-ci:
->> https://travis-ci.org/ehabkost/qemu/jobs/535468057#L3289
->>
->> I don't know yet if the guest is hanging, or if we just need to
->> increase the timeout.  I could reproduce the timeout locally,
->> too.
+On Wed, 22 May 2019 at 05:46, David Gibson <david@gibson.dropbear.id.au> wrote:
+>
+> The following changes since commit a4f667b6714916683408b983cfe0a615a725775f:
+>
+>   Merge remote-tracking branch 'remotes/cohuck/tags/s390x-20190521-3' into staging (2019-05-21 16:30:13 +0100)
+>
+> are available in the Git repository at:
+>
+>   git://github.com/dgibson/qemu.git tags/ppc-for-4.1-20190522
+>
+> for you to fetch changes up to 885659103ad9e1b0460e89c548e9fb823b007b7e:
+>
+>   docs: provide documentation on the POWER9 XIVE interrupt controller (2019-05-22 10:38:22 +1000)
+>
+> ----------------------------------------------------------------
+> ppc patch queue 2019-05-22
+>
+> Next pull request against qemu-4.1.  Highlights:
+>   * KVM accelerated support for the XIVE interrupt controller in PAPR
+>     guests
+>   * A number of TCG vector fixes
+>   * Fixes for the PReP / 40p machine
+>
+> Other than that it's just a bunch of assorted fixes, cleanups and
+> minor improvements.
+>
+> This supersedes the pull request dated 2019-05-21.  I've dropped the
+> headers update, since it had a mistake, but is now made redundant by a
+> similar update in Cornelia's applied PR.  I've also added a patch with
+> extra documentation for the XIVE interrupt controller, and fixed a
+> couple of minor style errors in the previous PR.
+>
+> ----------------------------------------------------------------
 
-That's odd, I can't reproduce (this test is quicker than the following
-test_arm_emcraft_sf2 which start u-boot then timeouts and start the kernel).
+Hi -- this failed 'make check-tcg' for the linux-static build
+(x86-64 host):
 
-My guess is network issues, since this test use a different mirror:
-archive.raspberrypi.org
+  TEST    linux-test on ppc64abi32
+qemu-ppc64abi32:
+/home/petmay01/linaro/qemu-for-merges/accel/tcg/cpu-exec.c:700:
+cpu_exec: Assertion `!have_mmap_lock()' failed.
+qemu-ppc64abi32:
+/home/petmay01/linaro/qemu-for-merges/accel/tcg/cpu-exec.c:700:
+cpu_exec: Assertion `!have_mmap_lock()' failed.
+/home/petmay01/linaro/qemu-for-merges/tests/tcg/Makefile:122: recipe
+for target 'run-linux-test' failed
 
-Gerd already raised this problem (timeout reached while fetching
-artifacts) to Cleber.
-Cleber, can we add test_setup() methods that use different timeouts?
-
-Regards,
-
-Phil.
-
-> It may be related to:
-> 
->  https://bugs.launchpad.net/qemu/+bug/1829779
-> 
-> And this is a proof that we urgently need to have a better
-> way of presenting/storing test artifacts.  The brief output
-> is nice when everything goes well, but makes the test results
-> close to useless once a failure happens.
-> 
-> Philippe showed us how GitLab allows CI jobs to preserve
-> artifacts, so maybe the solution is to move the loads there.
-> 
-> - Cleber.
-> 
+thanks
+-- PMM
 
