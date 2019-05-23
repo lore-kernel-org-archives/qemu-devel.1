@@ -2,62 +2,59 @@ Return-Path: <SRS0=bvyN=TX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C5799C282DD
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 14:43:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D702DC282DD
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 14:45:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8D616206BA
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 14:43:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8D616206BA
+	by mail.kernel.org (Postfix) with ESMTPS id 6F1C7206BA
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 14:45:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6F1C7206BA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:37977 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:38011 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hTovy-0003DA-Sq
-	for qemu-devel@archiver.kernel.org; Thu, 23 May 2019 10:43:06 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:57512)
+	id 1hToyG-00053J-N7
+	for qemu-devel@archiver.kernel.org; Thu, 23 May 2019 10:45:28 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:57515)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hTooQ-0004ZB-6B
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 10:35:20 -0400
+	(envelope-from <armbru@redhat.com>) id 1hTooQ-0004ZG-9q
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 10:35:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hTooN-0007Y7-QP
+	(envelope-from <armbru@redhat.com>) id 1hTooL-0007Wp-Vu
 	for qemu-devel@nongnu.org; Thu, 23 May 2019 10:35:18 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58268)
+Received: from mx1.redhat.com ([209.132.183.28]:48112)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hTooL-0007T9-T2
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 10:35:14 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hTooK-0007RH-G6
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 10:35:13 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 2C2572E95A2;
-	Thu, 23 May 2019 14:35:11 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 371678F917
+	for <qemu-devel@nongnu.org>; Thu, 23 May 2019 14:35:10 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-117-250.ams2.redhat.com
 	[10.36.117.250])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 697296250A;
-	Thu, 23 May 2019 14:35:09 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 616AB5B681
+	for <qemu-devel@nongnu.org>; Thu, 23 May 2019 14:35:09 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
-	id 1539611384AA; Thu, 23 May 2019 16:35:08 +0200 (CEST)
+	id 129491138648; Thu, 23 May 2019 16:35:08 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Thu, 23 May 2019 16:35:05 +0200
-Message-Id: <20190523143508.25387-2-armbru@redhat.com>
-In-Reply-To: <20190523143508.25387-1-armbru@redhat.com>
-References: <20190523143508.25387-1-armbru@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Date: Thu, 23 May 2019 16:35:04 +0200
+Message-Id: <20190523143508.25387-1-armbru@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.29]);
-	Thu, 23 May 2019 14:35:11 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.26]);
+	Thu, 23 May 2019 14:35:10 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH 1/4] qemu-common: Move tcg_enabled() etc. to
- sysemu/tcg.h
+Subject: [Qemu-devel] [PATCH 0/4] Cleanups around qemu-common.h
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -69,566 +66,1269 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Other accelerators have their own headers: sysemu/hax.h, sysemu/hvf.h,
-sysemu/kvm.h, sysemu/whpx.h.  Only tcg_enabled() & friends sit in
-qemu-common.h.  This necessitates inclusion of qemu-common.h into
-headers, which is against the rules spelled out in qemu-common.h's
-file comment.
+qemu-common.h stipulates:
 
-Move tcg_enabled() & friends into their own header sysemu/tcg.h, and
-adjust #include directives.
+ * If a header file uses a definition from qemu-common.h, that definition
+ * must be moved to a separate header file, and the header that uses it
+ * must include that header.
 
-Cc: Richard Henderson <rth@twiddle.net>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
----
- MAINTAINERS                     |  1 +
- accel/tcg/cpu-exec-common.c     |  1 +
- accel/tcg/tcg-all.c             |  2 +-
- accel/tcg/translate-all.c       |  3 ++-
- bsd-user/main.c                 |  2 ++
- cpus.c                          |  1 +
- exec.c                          |  2 ++
- hw/i386/pc.c                    |  1 +
- hw/ppc/spapr_caps.c             |  2 ++
- hw/s390x/ipl.c                  |  1 +
- include/exec/ram_addr.h         |  1 +
- include/qemu-common.h           |  8 --------
- include/sysemu/tcg.h            | 19 +++++++++++++++++++
- linux-user/main.c               |  2 ++
- memory.c                        |  2 +-
- monitor.c                       |  1 +
- qemu-nbd.c                      |  1 +
- qom/cpu.c                       |  2 +-
- target/arm/cpu.c                |  2 +-
- target/i386/cpu.c               |  1 +
- target/i386/cpu.h               |  2 +-
- target/i386/helper.c            |  1 +
- target/i386/machine.c           |  2 +-
- target/ppc/translate_init.inc.c |  1 +
- target/s390x/cpu.c              |  2 +-
- target/s390x/cpu_models.c       |  1 +
- target/s390x/gdbstub.c          |  3 ++-
- target/s390x/helper.c           |  1 +
- target/s390x/interrupt.c        |  1 +
- target/s390x/machine.c          |  1 +
- target/s390x/mmu_helper.c       |  1 +
- target/s390x/sigp.c             |  2 +-
- vl.c                            |  1 +
- 33 files changed, 56 insertions(+), 18 deletions(-)
+I count 117 violations of that rule.  This series fixes them.  It also
+reduces the number of objects depending on qemu-common.h in my
+"everything" build from roughly 5800 out of 6500 to less than 600.
+
+I used my "[RFC v4 0/7] Baby steps towards saner headers" to check
+properly self-contained headers remain self-contained.
+
+Markus Armbruster (4):
+  qemu-common: Move tcg_enabled() etc. to sysemu/tcg.h
+  qemu-common: Move qemu_isalnum() etc. to qemu/ctype.h
+  Include qemu/module.h where needed, drop it from qemu-common.h
+  Include qemu-common.h exactly where needed
+
+ MAINTAINERS                                |  1 +
+ accel/kvm/kvm-all.c                        |  1 -
+ accel/stubs/hax-stub.c                     |  1 -
+ accel/stubs/hvf-stub.c                     |  1 -
+ accel/stubs/kvm-stub.c                     |  1 -
+ accel/stubs/whpx-stub.c                    |  1 -
+ accel/tcg/cpu-exec-common.c                |  1 +
+ accel/tcg/cpu-exec.c                       |  2 ++
+ accel/tcg/tcg-all.c                        |  2 +-
+ accel/tcg/translate-all.c                  |  4 ++-
+ accel/tcg/translator.c                     |  1 -
+ accel/tcg/user-exec-stub.c                 |  1 -
+ arch_init.c                                |  1 -
+ audio/alsaaudio.c                          |  3 ++-
+ audio/audio.c                              |  2 ++
+ audio/audio_legacy.c                       |  1 -
+ audio/audio_pt_int.c                       |  1 -
+ audio/coreaudio.c                          |  2 +-
+ audio/dsoundaudio.c                        |  2 +-
+ audio/mixeng.c                             |  1 -
+ audio/noaudio.c                            |  3 ++-
+ audio/ossaudio.c                           |  3 ++-
+ audio/paaudio.c                            |  3 ++-
+ audio/sdlaudio.c                           |  3 ++-
+ audio/spiceaudio.c                         |  1 +
+ audio/wavaudio.c                           |  2 ++
+ authz/base.c                               |  1 +
+ authz/list.c                               |  1 +
+ authz/listfile.c                           |  1 +
+ authz/pamacct.c                            |  1 +
+ authz/simple.c                             |  1 +
+ backends/hostmem-file.c                    |  3 ++-
+ backends/hostmem-memfd.c                   |  3 ++-
+ backends/hostmem-ram.c                     |  2 ++
+ backends/rng-egd.c                         |  1 +
+ backends/rng-random.c                      |  1 +
+ backends/rng.c                             |  1 +
+ backends/tpm.c                             |  1 +
+ balloon.c                                  |  1 -
+ block/blklogwrites.c                       |  1 +
+ block/blkreplay.c                          |  2 +-
+ block/blkverify.c                          |  1 +
+ block/bochs.c                              |  1 -
+ block/cloop.c                              |  1 -
+ block/copy-on-read.c                       |  1 +
+ block/crypto.c                             |  1 +
+ block/curl.c                               |  1 +
+ block/dirty-bitmap.c                       |  1 -
+ block/dmg-bz2.c                            |  1 -
+ block/dmg.c                                |  1 -
+ block/dmg.h                                |  1 -
+ block/file-posix.c                         |  1 +
+ block/gluster.c                            |  1 +
+ block/iscsi-opts.c                         |  2 +-
+ block/iscsi.c                              |  2 ++
+ block/linux-aio.c                          |  1 -
+ block/nbd-client.h                         |  1 -
+ block/nfs.c                                |  1 +
+ block/null.c                               |  1 +
+ block/nvme.c                               |  1 +
+ block/qapi.c                               |  1 +
+ block/qcow2-cache.c                        |  1 -
+ block/qcow2-cluster.c                      |  1 -
+ block/qcow2-refcount.c                     |  1 -
+ block/qed.c                                |  1 +
+ block/quorum.c                             |  1 +
+ block/raw-format.c                         |  1 +
+ block/rbd.c                                |  1 +
+ block/replication.c                        |  1 +
+ block/sheepdog.c                           |  2 ++
+ block/ssh.c                                |  2 ++
+ block/throttle.c                           |  1 +
+ block/vhdx-endian.c                        |  1 -
+ block/vhdx-log.c                           |  3 +--
+ block/vvfat.c                              |  1 +
+ block/vxhs.c                               |  1 +
+ block/win32-aio.c                          |  3 +--
+ blockjob.c                                 |  1 -
+ bsd-user/main.c                            |  3 +++
+ bt-vhci.c                                  |  1 -
+ chardev/baum.c                             |  3 ++-
+ chardev/char-console.c                     |  2 ++
+ chardev/char-fd.c                          |  4 ++-
+ chardev/char-file.c                        |  1 +
+ chardev/char-mux.c                         |  1 +
+ chardev/char-null.c                        |  2 ++
+ chardev/char-parallel.c                    |  1 +
+ chardev/char-pipe.c                        |  2 ++
+ chardev/char-pty.c                         |  4 ++-
+ chardev/char-ringbuf.c                     |  1 +
+ chardev/char-serial.c                      |  1 +
+ chardev/char-socket.c                      |  1 +
+ chardev/char-stdio.c                       |  1 +
+ chardev/char-udp.c                         |  1 +
+ chardev/char-win-stdio.c                   |  2 ++
+ chardev/char-win.c                         |  3 ++-
+ chardev/char.c                             |  1 +
+ chardev/msmouse.c                          |  3 ++-
+ chardev/spice.c                            |  1 +
+ chardev/testdev.c                          |  3 ++-
+ chardev/wctablet.c                         |  2 +-
+ contrib/ivshmem-client/ivshmem-client.c    |  1 -
+ contrib/ivshmem-client/main.c              |  1 -
+ contrib/ivshmem-server/ivshmem-server.c    |  1 -
+ cpus.c                                     |  2 ++
+ crypto/aes.c                               |  1 -
+ crypto/secret.c                            |  1 +
+ crypto/tlscreds.c                          |  1 +
+ crypto/tlscredsanon.c                      |  1 +
+ crypto/tlscredspsk.c                       |  1 +
+ crypto/tlscredsx509.c                      |  1 +
+ disas.c                                    |  1 -
+ disas/cris.c                               |  1 -
+ disas/i386.c                               |  1 -
+ disas/s390.c                               |  1 -
+ dump.c                                     |  1 +
+ exec.c                                     |  3 +++
+ fsdev/qemu-fsdev-dummy.c                   |  2 +-
+ gdbstub.c                                  |  4 +++
+ hmp.h                                      |  1 -
+ hw/9pfs/9p-proxy.c                         |  1 +
+ hw/9pfs/coth.c                             |  1 -
+ hw/9pfs/virtio-9p-device.c                 |  1 +
+ hw/acpi/bios-linker-loader.c               |  1 -
+ hw/acpi/core.c                             |  1 +
+ hw/acpi/tco.c                              |  1 -
+ hw/acpi/vmgenid.c                          |  1 +
+ hw/adc/stm32f2xx_adc.c                     |  1 +
+ hw/alpha/pci.c                             |  1 -
+ hw/alpha/typhoon.c                         |  1 +
+ hw/arm/allwinner-a10.c                     |  2 +-
+ hw/arm/armsse.c                            |  1 +
+ hw/arm/armv7m.c                            |  2 +-
+ hw/arm/aspeed.c                            |  1 -
+ hw/arm/aspeed_soc.c                        |  2 +-
+ hw/arm/bcm2835_peripherals.c               |  1 +
+ hw/arm/bcm2836.c                           |  2 +-
+ hw/arm/boot.c                              |  1 +
+ hw/arm/cubieboard.c                        |  1 -
+ hw/arm/digic.c                             |  1 +
+ hw/arm/exynos4210.c                        |  1 -
+ hw/arm/exynos4_boards.c                    |  1 -
+ hw/arm/fsl-imx25.c                         |  1 -
+ hw/arm/fsl-imx31.c                         |  1 -
+ hw/arm/fsl-imx6.c                          |  2 +-
+ hw/arm/fsl-imx6ul.c                        |  2 +-
+ hw/arm/fsl-imx7.c                          |  2 +-
+ hw/arm/highbank.c                          |  1 +
+ hw/arm/imx25_pdk.c                         |  1 -
+ hw/arm/integratorcp.c                      |  1 -
+ hw/arm/kzm.c                               |  1 -
+ hw/arm/mcimx6ul-evk.c                      |  1 -
+ hw/arm/mcimx7d-sabre.c                     |  1 -
+ hw/arm/msf2-soc.c                          |  1 -
+ hw/arm/musicpal.c                          |  1 -
+ hw/arm/nrf51_soc.c                         |  1 -
+ hw/arm/omap2.c                             |  1 -
+ hw/arm/pxa2xx.c                            |  3 ++-
+ hw/arm/pxa2xx_gpio.c                       |  1 +
+ hw/arm/pxa2xx_pic.c                        |  2 +-
+ hw/arm/raspi.c                             |  1 -
+ hw/arm/realview.c                          |  1 -
+ hw/arm/sabrelite.c                         |  1 -
+ hw/arm/smmu-common.c                       |  1 +
+ hw/arm/stm32f205_soc.c                     |  2 +-
+ hw/arm/strongarm.c                         |  1 +
+ hw/arm/sysbus-fdt.c                        |  1 -
+ hw/arm/versatilepb.c                       |  1 -
+ hw/arm/virt-acpi-build.c                   |  1 -
+ hw/arm/virt.c                              |  2 ++
+ hw/arm/xilinx_zynq.c                       |  1 -
+ hw/arm/xlnx-versal.c                       |  2 +-
+ hw/arm/xlnx-zcu102.c                       |  1 -
+ hw/arm/xlnx-zynqmp.c                       |  2 +-
+ hw/audio/ac97.c                            |  1 +
+ hw/audio/adlib.c                           |  1 +
+ hw/audio/cs4231.c                          |  1 +
+ hw/audio/cs4231a.c                         |  2 ++
+ hw/audio/es1370.c                          |  1 +
+ hw/audio/gus.c                             |  2 ++
+ hw/audio/hda-codec.c                       |  1 +
+ hw/audio/intel-hda.c                       |  1 +
+ hw/audio/marvell_88w8618.c                 |  2 ++
+ hw/audio/milkymist-ac97.c                  |  1 +
+ hw/audio/pcspk.c                           |  1 +
+ hw/audio/pl041.c                           |  1 +
+ hw/audio/sb16.c                            |  2 ++
+ hw/audio/soundhw.c                         |  1 -
+ hw/audio/wm8750.c                          |  1 +
+ hw/block/cdrom.c                           |  1 -
+ hw/block/fdc.c                             |  1 +
+ hw/block/m25p80.c                          |  1 +
+ hw/block/nand.c                            |  1 +
+ hw/block/nvme.c                            |  1 +
+ hw/block/onenand.c                         |  2 +-
+ hw/block/pflash_cfi01.c                    |  1 +
+ hw/block/pflash_cfi02.c                    |  1 +
+ hw/block/virtio-blk.c                      |  2 +-
+ hw/block/xen-block.c                       |  1 +
+ hw/bt/core.c                               |  1 -
+ hw/bt/hci-csr.c                            |  2 +-
+ hw/bt/hci.c                                |  1 -
+ hw/bt/hid.c                                |  1 -
+ hw/bt/l2cap.c                              |  1 -
+ hw/bt/sdp.c                                |  1 -
+ hw/char/bcm2835_aux.c                      |  1 +
+ hw/char/cadence_uart.c                     |  1 +
+ hw/char/cmsdk-apb-uart.c                   |  1 +
+ hw/char/debugcon.c                         |  1 +
+ hw/char/digic-uart.c                       |  1 +
+ hw/char/escc.c                             |  1 +
+ hw/char/etraxfs_ser.c                      |  1 +
+ hw/char/exynos4210_uart.c                  |  1 +
+ hw/char/grlib_apbuart.c                    |  1 +
+ hw/char/imx_serial.c                       |  1 +
+ hw/char/ipoctal232.c                       |  1 +
+ hw/char/lm32_juart.c                       |  1 +
+ hw/char/lm32_uart.c                        |  1 +
+ hw/char/mcf_uart.c                         |  2 ++
+ hw/char/milkymist-uart.c                   |  1 +
+ hw/char/nrf51_uart.c                       |  1 +
+ hw/char/parallel.c                         |  2 ++
+ hw/char/pl011.c                            |  1 +
+ hw/char/sclpconsole-lm.c                   |  1 +
+ hw/char/sclpconsole.c                      |  1 +
+ hw/char/serial-isa.c                       |  1 +
+ hw/char/serial-pci.c                       |  1 +
+ hw/char/spapr_vty.c                        |  2 +-
+ hw/char/stm32f2xx_usart.c                  |  1 +
+ hw/char/terminal3270.c                     |  1 +
+ hw/char/virtio-console.c                   |  1 +
+ hw/char/virtio-serial-bus.c                |  1 +
+ hw/char/xilinx_uartlite.c                  |  1 +
+ hw/core/bus.c                              |  3 ++-
+ hw/core/empty_slot.c                       |  1 +
+ hw/core/fw-path-provider.c                 |  1 +
+ hw/core/generic-loader.c                   |  1 +
+ hw/core/irq.c                              |  1 -
+ hw/core/loader.c                           |  1 +
+ hw/core/nmi.c                              |  1 +
+ hw/core/null-machine.c                     |  1 -
+ hw/core/or-irq.c                           |  1 +
+ hw/core/platform-bus.c                     |  1 +
+ hw/core/qdev-properties.c                  |  1 +
+ hw/core/register.c                         |  1 +
+ hw/core/split-irq.c                        |  1 +
+ hw/core/stream.c                           |  1 +
+ hw/core/sysbus.c                           |  1 +
+ hw/cpu/a15mpcore.c                         |  1 +
+ hw/cpu/a9mpcore.c                          |  1 +
+ hw/cpu/arm11mpcore.c                       |  1 +
+ hw/cpu/core.c                              |  2 ++
+ hw/cpu/realview_mpcore.c                   |  1 +
+ hw/cris/axis_dev88.c                       |  1 -
+ hw/cris/boot.c                             |  1 -
+ hw/display/ads7846.c                       |  1 +
+ hw/display/ati.c                           |  1 +
+ hw/display/bcm2835_fb.c                    |  1 +
+ hw/display/blizzard.c                      |  1 -
+ hw/display/bochs-display.c                 |  2 ++
+ hw/display/cg3.c                           |  3 ++-
+ hw/display/cirrus_vga.c                    |  2 ++
+ hw/display/cirrus_vga_isa.c                |  1 +
+ hw/display/dpcd.c                          |  1 +
+ hw/display/edid-generate.c                 |  1 -
+ hw/display/edid-region.c                   |  1 -
+ hw/display/exynos4210_fimd.c               |  2 +-
+ hw/display/g364fb.c                        |  1 +
+ hw/display/i2c-ddc.c                       |  2 +-
+ hw/display/jazz_led.c                      |  2 +-
+ hw/display/milkymist-tmu2.c                |  1 +
+ hw/display/milkymist-vgafb.c               |  1 +
+ hw/display/pl110.c                         |  1 +
+ hw/display/qxl.c                           |  2 +-
+ hw/display/qxl.h                           |  1 -
+ hw/display/ramfb-standalone.c              |  1 +
+ hw/display/sii9022.c                       |  2 +-
+ hw/display/sm501.c                         |  2 +-
+ hw/display/ssd0303.c                       |  2 ++
+ hw/display/ssd0323.c                       |  2 ++
+ hw/display/tcx.c                           |  3 ++-
+ hw/display/vga-isa.c                       |  2 ++
+ hw/display/vga-pci.c                       |  2 ++
+ hw/display/virtio-gpu-3d.c                 |  1 -
+ hw/display/virtio-gpu-pci.c                |  1 +
+ hw/display/virtio-gpu.c                    |  2 +-
+ hw/display/virtio-vga.c                    |  1 +
+ hw/display/vmware_vga.c                    |  2 ++
+ hw/display/xlnx_dp.c                       |  1 +
+ hw/dma/bcm2835_dma.c                       |  1 +
+ hw/dma/etraxfs_dma.c                       |  1 -
+ hw/dma/i82374.c                            |  1 +
+ hw/dma/i8257.c                             |  2 ++
+ hw/dma/omap_dma.c                          |  1 -
+ hw/dma/pl080.c                             |  1 +
+ hw/dma/pl330.c                             |  2 ++
+ hw/dma/puv3_dma.c                          |  2 ++
+ hw/dma/pxa2xx_dma.c                        |  1 +
+ hw/dma/rc4030.c                            |  1 +
+ hw/dma/soc_dma.c                           |  1 -
+ hw/dma/sparc32_dma.c                       |  1 +
+ hw/dma/xilinx_axidma.c                     |  1 +
+ hw/dma/xlnx-zdma.c                         |  1 +
+ hw/dma/xlnx-zynq-devcfg.c                  |  1 +
+ hw/dma/xlnx_dpdma.c                        |  2 ++
+ hw/gpio/bcm2835_gpio.c                     |  1 +
+ hw/gpio/gpio_key.c                         |  1 +
+ hw/gpio/imx_gpio.c                         |  1 +
+ hw/gpio/max7310.c                          |  1 +
+ hw/gpio/mpc8xxx.c                          |  1 +
+ hw/gpio/nrf51_gpio.c                       |  1 +
+ hw/gpio/omap_gpio.c                        |  1 +
+ hw/gpio/pl061.c                            |  1 +
+ hw/gpio/puv3_gpio.c                        |  2 ++
+ hw/gpio/zaurus.c                           |  2 ++
+ hw/hppa/dino.c                             |  1 +
+ hw/hppa/pci.c                              |  1 -
+ hw/hyperv/hyperv.c                         |  1 +
+ hw/hyperv/hyperv_testdev.c                 |  1 +
+ hw/i2c/aspeed_i2c.c                        |  1 +
+ hw/i2c/bitbang_i2c.c                       |  2 ++
+ hw/i2c/core.c                              |  1 +
+ hw/i2c/exynos4210_i2c.c                    |  1 +
+ hw/i2c/imx_i2c.c                           |  1 +
+ hw/i2c/microbit_i2c.c                      |  1 +
+ hw/i2c/mpc_i2c.c                           |  1 +
+ hw/i2c/omap_i2c.c                          |  2 ++
+ hw/i2c/ppc4xx_i2c.c                        |  2 +-
+ hw/i2c/smbus_ich9.c                        |  2 ++
+ hw/i2c/smbus_slave.c                       |  1 +
+ hw/i2c/versatile_i2c.c                     |  1 +
+ hw/i386/acpi-build.c                       |  1 -
+ hw/i386/kvm/apic.c                         |  3 ++-
+ hw/i386/kvm/clock.c                        |  2 +-
+ hw/i386/kvm/i8254.c                        |  1 +
+ hw/i386/kvm/i8259.c                        |  2 ++
+ hw/i386/kvmvapic.c                         |  3 ++-
+ hw/i386/pc.c                               |  1 +
+ hw/i386/pc_sysfw.c                         |  1 +
+ hw/i386/xen/xen_apic.c                     |  2 ++
+ hw/i386/xen/xen_platform.c                 |  1 +
+ hw/i386/xen/xen_pvdevice.c                 |  1 +
+ hw/ide/ahci-allwinner.c                    |  1 +
+ hw/ide/ahci.c                              |  1 +
+ hw/ide/cmd646.c                            |  2 ++
+ hw/ide/ich.c                               |  1 +
+ hw/ide/isa.c                               |  2 ++
+ hw/ide/macio.c                             |  2 ++
+ hw/ide/microdrive.c                        |  2 ++
+ hw/ide/mmio.c                              |  2 ++
+ hw/ide/pci.c                               |  2 ++
+ hw/ide/piix.c                              |  1 +
+ hw/ide/qdev.c                              |  2 ++
+ hw/ide/sii3112.c                           |  1 +
+ hw/ide/via.c                               |  2 ++
+ hw/input/adb-kbd.c                         |  2 ++
+ hw/input/adb-mouse.c                       |  2 ++
+ hw/input/adb.c                             |  2 ++
+ hw/input/lm832x.c                          |  1 +
+ hw/input/milkymist-softusb.c               |  1 +
+ hw/input/pl050.c                           |  1 +
+ hw/input/virtio-input-hid.c                |  1 +
+ hw/input/virtio-input-host.c               |  2 +-
+ hw/input/virtio-input.c                    |  1 +
+ hw/intc/allwinner-a10-pic.c                |  1 +
+ hw/intc/apic.c                             |  1 -
+ hw/intc/apic_common.c                      |  3 ++-
+ hw/intc/arm_gic.c                          |  1 +
+ hw/intc/arm_gic_common.c                   |  1 +
+ hw/intc/arm_gic_kvm.c                      |  2 +-
+ hw/intc/arm_gicv2m.c                       |  1 +
+ hw/intc/arm_gicv3.c                        |  1 +
+ hw/intc/arm_gicv3_common.c                 |  1 +
+ hw/intc/arm_gicv3_its_common.c             |  1 +
+ hw/intc/arm_gicv3_its_kvm.c                |  1 +
+ hw/intc/arm_gicv3_kvm.c                    |  1 +
+ hw/intc/armv7m_nvic.c                      |  2 +-
+ hw/intc/aspeed_vic.c                       |  1 +
+ hw/intc/bcm2835_ic.c                       |  1 +
+ hw/intc/bcm2836_control.c                  |  1 +
+ hw/intc/etraxfs_pic.c                      |  1 +
+ hw/intc/exynos4210_combiner.c              |  1 +
+ hw/intc/exynos4210_gic.c                   |  2 +-
+ hw/intc/grlib_irqmp.c                      |  1 +
+ hw/intc/heathrow_pic.c                     |  2 ++
+ hw/intc/imx_avic.c                         |  1 +
+ hw/intc/imx_gpcv2.c                        |  1 +
+ hw/intc/ioapic_common.c                    |  1 +
+ hw/intc/lm32_pic.c                         |  1 +
+ hw/intc/mips_gic.c                         |  1 +
+ hw/intc/nios2_iic.c                        |  2 +-
+ hw/intc/omap_intc.c                        |  2 ++
+ hw/intc/ompic.c                            |  1 +
+ hw/intc/openpic.c                          |  2 ++
+ hw/intc/openpic_kvm.c                      |  2 +-
+ hw/intc/pl190.c                            |  1 +
+ hw/intc/pnv_xive.c                         |  1 +
+ hw/intc/puv3_intc.c                        |  2 ++
+ hw/intc/realview_gic.c                     |  1 +
+ hw/intc/s390_flic.c                        |  1 +
+ hw/intc/s390_flic_kvm.c                    |  2 +-
+ hw/intc/sh_intc.c                          |  1 -
+ hw/intc/slavio_intctl.c                    |  1 +
+ hw/intc/spapr_xive.c                       |  1 +
+ hw/intc/xics.c                             |  2 +-
+ hw/intc/xics_pnv.c                         |  1 +
+ hw/intc/xilinx_intc.c                      |  1 +
+ hw/intc/xive.c                             |  1 +
+ hw/intc/xlnx-pmu-iomod-intc.c              |  1 +
+ hw/intc/xlnx-zynqmp-ipi.c                  |  1 +
+ hw/ipack/ipack.c                           |  1 +
+ hw/ipack/tpci200.c                         |  1 +
+ hw/ipmi/ipmi.c                             |  1 +
+ hw/ipmi/ipmi_bmc_extern.c                  |  1 +
+ hw/ipmi/ipmi_bmc_sim.c                     |  1 +
+ hw/ipmi/isa_ipmi_bt.c                      |  2 ++
+ hw/ipmi/isa_ipmi_kcs.c                     |  2 ++
+ hw/isa/isa-bus.c                           |  2 ++
+ hw/isa/isa-superio.c                       |  2 ++
+ hw/isa/lpc_ich9.c                          |  1 -
+ hw/isa/pc87312.c                           |  1 +
+ hw/isa/smc37c669-superio.c                 |  1 +
+ hw/isa/vt82c686.c                          |  1 +
+ hw/lm32/lm32_boards.c                      |  1 -
+ hw/lm32/lm32_hwsetup.h                     |  1 -
+ hw/m68k/an5206.c                           |  1 -
+ hw/m68k/mcf5206.c                          |  1 -
+ hw/m68k/mcf_intc.c                         |  3 ++-
+ hw/mem/nvdimm.c                            |  1 +
+ hw/mem/pc-dimm.c                           |  1 +
+ hw/microblaze/petalogix_ml605_mmu.c        |  1 -
+ hw/microblaze/petalogix_s3adsp1800_mmu.c   |  1 -
+ hw/microblaze/xlnx-zynqmp-pmu.c            |  1 -
+ hw/mips/boston.c                           |  1 -
+ hw/mips/cps.c                              |  1 +
+ hw/mips/mips_fulong2e.c                    |  1 +
+ hw/mips/mips_jazz.c                        |  1 +
+ hw/misc/a9scu.c                            |  1 +
+ hw/misc/applesmc.c                         |  1 +
+ hw/misc/arm11scu.c                         |  1 +
+ hw/misc/arm_integrator_debug.c             |  1 +
+ hw/misc/arm_l2x0.c                         |  1 +
+ hw/misc/arm_sysctl.c                       |  1 +
+ hw/misc/armsse-cpuid.c                     |  1 +
+ hw/misc/armsse-mhu.c                       |  1 +
+ hw/misc/aspeed_scu.c                       |  1 +
+ hw/misc/aspeed_sdmc.c                      |  1 +
+ hw/misc/auxbus.c                           |  1 +
+ hw/misc/bcm2835_mbox.c                     |  1 +
+ hw/misc/bcm2835_property.c                 |  1 +
+ hw/misc/bcm2835_rng.c                      |  1 +
+ hw/misc/debugexit.c                        |  1 +
+ hw/misc/eccmemctl.c                        |  1 +
+ hw/misc/edu.c                              |  1 +
+ hw/misc/exynos4210_clk.c                   |  1 +
+ hw/misc/exynos4210_pmu.c                   |  1 +
+ hw/misc/exynos4210_rng.c                   |  1 +
+ hw/misc/imx25_ccm.c                        |  1 +
+ hw/misc/imx2_wdt.c                         |  1 +
+ hw/misc/imx31_ccm.c                        |  1 +
+ hw/misc/imx6_ccm.c                         |  1 +
+ hw/misc/imx6_src.c                         |  1 +
+ hw/misc/imx6ul_ccm.c                       |  1 +
+ hw/misc/imx7_ccm.c                         |  1 +
+ hw/misc/imx7_gpr.c                         |  1 +
+ hw/misc/imx7_snvs.c                        |  1 +
+ hw/misc/imx_ccm.c                          |  1 +
+ hw/misc/iotkit-secctl.c                    |  1 +
+ hw/misc/iotkit-sysctl.c                    |  1 +
+ hw/misc/iotkit-sysinfo.c                   |  1 +
+ hw/misc/ivshmem.c                          |  2 ++
+ hw/misc/macio/cuda.c                       |  3 +++
+ hw/misc/macio/gpio.c                       |  1 +
+ hw/misc/macio/mac_dbdma.c                  |  2 ++
+ hw/misc/macio/macio.c                      |  2 ++
+ hw/misc/macio/pmu.c                        |  2 ++
+ hw/misc/max111x.c                          |  1 +
+ hw/misc/milkymist-hpdmc.c                  |  1 +
+ hw/misc/milkymist-pfpu.c                   |  1 +
+ hw/misc/mips_cmgcr.c                       |  1 +
+ hw/misc/mips_cpc.c                         |  1 +
+ hw/misc/mips_itu.c                         |  1 +
+ hw/misc/mos6522.c                          |  2 ++
+ hw/misc/mps2-fpgaio.c                      |  1 +
+ hw/misc/mps2-scc.c                         |  1 +
+ hw/misc/msf2-sysreg.c                      |  1 +
+ hw/misc/mst_fpga.c                         |  2 ++
+ hw/misc/nrf51_rng.c                        |  1 +
+ hw/misc/pc-testdev.c                       |  1 +
+ hw/misc/pca9552.c                          |  1 +
+ hw/misc/pci-testdev.c                      |  2 ++
+ hw/misc/puv3_pm.c                          |  2 ++
+ hw/misc/pvpanic.c                          |  1 +
+ hw/misc/sga.c                              |  2 ++
+ hw/misc/slavio_misc.c                      |  1 +
+ hw/misc/stm32f2xx_syscfg.c                 |  1 +
+ hw/misc/tmp105.c                           |  1 +
+ hw/misc/tmp421.c                           |  1 +
+ hw/misc/tz-mpc.c                           |  1 +
+ hw/misc/tz-msc.c                           |  1 +
+ hw/misc/tz-ppc.c                           |  1 +
+ hw/misc/unimp.c                            |  1 +
+ hw/misc/vmcoreinfo.c                       |  2 ++
+ hw/misc/zynq-xadc.c                        |  1 +
+ hw/misc/zynq_slcr.c                        |  1 +
+ hw/moxie/moxiesim.c                        |  1 -
+ hw/net/allwinner_emac.c                    |  2 ++
+ hw/net/cadence_gem.c                       |  1 +
+ hw/net/can/can_kvaser_pci.c                |  1 +
+ hw/net/can/can_mioe3680_pci.c              |  1 +
+ hw/net/can/can_pcm3680_pci.c               |  1 +
+ hw/net/dp8393x.c                           |  1 +
+ hw/net/e1000.c                             |  1 +
+ hw/net/e1000e.c                            |  1 +
+ hw/net/eepro100.c                          |  1 +
+ hw/net/etraxfs_eth.c                       |  1 +
+ hw/net/fsl_etsec/etsec.c                   |  1 +
+ hw/net/ftgmac100.c                         |  1 +
+ hw/net/imx_fec.c                           |  1 +
+ hw/net/lan9118.c                           |  1 +
+ hw/net/lance.c                             |  1 +
+ hw/net/mcf_fec.c                           |  2 ++
+ hw/net/milkymist-minimac2.c                |  2 +-
+ hw/net/mipsnet.c                           |  1 +
+ hw/net/ne2000-isa.c                        |  2 ++
+ hw/net/ne2000.c                            |  2 ++
+ hw/net/opencores_eth.c                     |  1 +
+ hw/net/pcnet-pci.c                         |  1 +
+ hw/net/rocker/qmp-norocker.c               |  1 -
+ hw/net/rocker/rocker.c                     |  1 +
+ hw/net/rtl8139.c                           |  2 ++
+ hw/net/smc91c111.c                         |  1 +
+ hw/net/spapr_llan.c                        |  3 ++-
+ hw/net/stellaris_enet.c                    |  2 ++
+ hw/net/sungem.c                            |  1 +
+ hw/net/sunhme.c                            |  1 +
+ hw/net/virtio-net.c                        |  1 +
+ hw/net/vmxnet3.c                           |  2 +-
+ hw/net/xgmac.c                             |  1 +
+ hw/net/xilinx_axienet.c                    |  1 +
+ hw/net/xilinx_ethlite.c                    |  2 +-
+ hw/nios2/10m50_devboard.c                  |  1 -
+ hw/nios2/cpu_pic.c                         |  1 -
+ hw/nvram/ds1225y.c                         |  1 +
+ hw/nvram/eeprom_at24c.c                    |  1 +
+ hw/nvram/fw_cfg.c                          |  1 +
+ hw/nvram/mac_nvram.c                       |  2 ++
+ hw/nvram/nrf51_nvm.c                       |  1 +
+ hw/nvram/spapr_nvram.c                     |  2 +-
+ hw/openrisc/openrisc_sim.c                 |  1 -
+ hw/pci-bridge/dec.c                        |  1 +
+ hw/pci-bridge/dec.h                        |  1 -
+ hw/pci-bridge/gen_pcie_root_port.c         |  1 +
+ hw/pci-bridge/i82801b11.c                  |  1 +
+ hw/pci-bridge/ioh3420.c                    |  1 +
+ hw/pci-bridge/pci_bridge_dev.c             |  1 +
+ hw/pci-bridge/pci_expander_bridge.c        |  1 +
+ hw/pci-bridge/pcie_pci_bridge.c            |  1 +
+ hw/pci-bridge/pcie_root_port.c             |  1 +
+ hw/pci-bridge/simba.c                      |  1 +
+ hw/pci-bridge/xio3130_downstream.c         |  1 +
+ hw/pci-bridge/xio3130_upstream.c           |  1 +
+ hw/pci-host/designware.c                   |  1 +
+ hw/pci-host/gpex.c                         |  2 ++
+ hw/pci-host/grackle.c                      |  1 +
+ hw/pci-host/ppce500.c                      |  1 +
+ hw/pci-host/prep.c                         |  1 +
+ hw/pci-host/q35.c                          |  2 ++
+ hw/pci-host/sabre.c                        |  1 +
+ hw/pci-host/uninorth.c                     |  2 ++
+ hw/pci-host/versatile.c                    |  1 +
+ hw/pci-host/xilinx-pcie.c                  |  1 +
+ hw/pci/pci.c                               |  1 +
+ hw/pci/pci_bridge.c                        |  1 +
+ hw/pci/pci_host.c                          |  1 +
+ hw/pci/pcie.c                              |  1 -
+ hw/pci/pcie_host.c                         |  1 +
+ hw/pci/pcie_port.c                         |  1 +
+ hw/pci/shpc.c                              |  1 -
+ hw/pcmcia/pcmcia.c                         |  2 +-
+ hw/pcmcia/pxa2xx.c                         |  1 +
+ hw/ppc/e500.c                              |  1 +
+ hw/ppc/e500plat.c                          |  1 -
+ hw/ppc/mac_newworld.c                      |  3 ++-
+ hw/ppc/mac_oldworld.c                      |  2 ++
+ hw/ppc/mpc8544_guts.c                      |  2 +-
+ hw/ppc/mpc8544ds.c                         |  1 -
+ hw/ppc/pnv.c                               |  1 +
+ hw/ppc/pnv_core.c                          |  2 ++
+ hw/ppc/pnv_lpc.c                           |  1 +
+ hw/ppc/pnv_occ.c                           |  1 +
+ hw/ppc/pnv_psi.c                           |  1 +
+ hw/ppc/pnv_xscom.c                         |  2 ++
+ hw/ppc/ppc.c                               |  1 -
+ hw/ppc/ppc405_uc.c                         |  1 -
+ hw/ppc/ppc440_pcix.c                       |  1 +
+ hw/ppc/ppc440_uc.c                         |  2 +-
+ hw/ppc/ppc4xx_pci.c                        |  1 +
+ hw/ppc/ppc_booke.c                         |  1 -
+ hw/ppc/ppce500_spin.c                      |  1 +
+ hw/ppc/prep_systemio.c                     |  1 +
+ hw/ppc/spapr.c                             |  3 ++-
+ hw/ppc/spapr_caps.c                        |  2 ++
+ hw/ppc/spapr_hcall.c                       |  1 +
+ hw/ppc/spapr_iommu.c                       |  2 ++
+ hw/ppc/spapr_pci.c                         |  3 ++-
+ hw/ppc/spapr_pci_vfio.c                    |  1 -
+ hw/ppc/spapr_rng.c                         |  2 +-
+ hw/ppc/spapr_rtas_ddw.c                    |  1 +
+ hw/ppc/spapr_rtc.c                         |  2 ++
+ hw/ppc/virtex_ml507.c                      |  1 +
+ hw/rdma/vmw/pvrdma_main.c                  |  1 +
+ hw/riscv/riscv_hart.c                      |  1 +
+ hw/riscv/sifive_clint.c                    |  1 +
+ hw/riscv/sifive_plic.c                     |  1 +
+ hw/riscv/sifive_prci.c                     |  1 +
+ hw/riscv/sifive_test.c                     |  1 +
+ hw/s390x/ap-bridge.c                       |  2 ++
+ hw/s390x/ccw-device.c                      |  2 ++
+ hw/s390x/css-bridge.c                      |  2 ++
+ hw/s390x/event-facility.c                  |  1 +
+ hw/s390x/ipl.c                             |  2 ++
+ hw/s390x/s390-ccw.c                        |  1 +
+ hw/s390x/s390-pci-bus.c                    |  2 +-
+ hw/s390x/s390-pci-inst.c                   |  1 -
+ hw/s390x/s390-skeys-kvm.c                  |  1 +
+ hw/s390x/s390-virtio-ccw.c                 |  1 +
+ hw/s390x/sclpcpu.c                         |  2 ++
+ hw/s390x/sclpquiesce.c                     |  2 ++
+ hw/s390x/tod-kvm.c                         |  1 +
+ hw/s390x/tod-qemu.c                        |  2 ++
+ hw/s390x/tod.c                             |  1 +
+ hw/s390x/vhost-vsock-ccw.c                 |  1 +
+ hw/s390x/virtio-ccw-9p.c                   |  1 +
+ hw/s390x/virtio-ccw-balloon.c              |  1 +
+ hw/s390x/virtio-ccw-blk.c                  |  1 +
+ hw/s390x/virtio-ccw-crypto.c               |  1 +
+ hw/s390x/virtio-ccw-gpu.c                  |  1 +
+ hw/s390x/virtio-ccw-input.c                |  1 +
+ hw/s390x/virtio-ccw-net.c                  |  1 +
+ hw/s390x/virtio-ccw-rng.c                  |  1 +
+ hw/s390x/virtio-ccw-scsi.c                 |  1 +
+ hw/s390x/virtio-ccw-serial.c               |  1 +
+ hw/s390x/virtio-ccw.c                      |  1 +
+ hw/scsi/esp-pci.c                          |  1 +
+ hw/scsi/esp.c                              |  1 +
+ hw/scsi/lsi53c895a.c                       |  1 +
+ hw/scsi/megasas.c                          |  2 ++
+ hw/scsi/mptsas.c                           |  1 +
+ hw/scsi/scsi-bus.c                         |  1 +
+ hw/scsi/scsi-disk.c                        |  1 +
+ hw/scsi/scsi-generic.c                     |  3 ++-
+ hw/scsi/spapr_vscsi.c                      |  3 ++-
+ hw/scsi/vhost-scsi-common.c                |  1 +
+ hw/scsi/vhost-scsi.c                       |  1 +
+ hw/scsi/virtio-scsi.c                      |  1 +
+ hw/scsi/vmw_pvscsi.c                       |  1 +
+ hw/sd/bcm2835_sdhost.c                     |  1 +
+ hw/sd/core.c                               |  1 +
+ hw/sd/milkymist-memcard.c                  |  1 +
+ hw/sd/pl181.c                              |  1 +
+ hw/sd/pxa2xx_mmci.c                        |  1 +
+ hw/sd/sd.c                                 |  1 +
+ hw/sd/sdhci-pci.c                          |  1 +
+ hw/sd/sdhci.c                              |  1 +
+ hw/sd/ssi-sd.c                             |  1 +
+ hw/sh4/r2d.c                               |  1 -
+ hw/sh4/sh_pci.c                            |  2 ++
+ hw/sh4/shix.c                              |  1 -
+ hw/smbios/smbios.c                         |  1 +
+ hw/sparc/sun4m_iommu.c                     |  1 +
+ hw/sparc64/niagara.c                       |  1 -
+ hw/sparc64/sun4u_iommu.c                   |  1 +
+ hw/ssi/aspeed_smc.c                        |  1 +
+ hw/ssi/imx_spi.c                           |  1 +
+ hw/ssi/mss-spi.c                           |  1 +
+ hw/ssi/pl022.c                             |  1 +
+ hw/ssi/ssi.c                               |  1 +
+ hw/ssi/stm32f2xx_spi.c                     |  1 +
+ hw/ssi/xilinx_spi.c                        |  1 +
+ hw/ssi/xilinx_spips.c                      |  1 +
+ hw/timer/a9gtimer.c                        |  1 +
+ hw/timer/allwinner-a10-pit.c               |  1 +
+ hw/timer/altera_timer.c                    |  2 +-
+ hw/timer/arm_mptimer.c                     |  1 +
+ hw/timer/arm_timer.c                       |  2 +-
+ hw/timer/armv7m_systick.c                  |  2 +-
+ hw/timer/aspeed_timer.c                    |  2 +-
+ hw/timer/cadence_ttc.c                     |  1 +
+ hw/timer/cmsdk-apb-dualtimer.c             |  1 +
+ hw/timer/cmsdk-apb-timer.c                 |  1 +
+ hw/timer/digic-timer.c                     |  1 +
+ hw/timer/ds1338.c                          |  1 +
+ hw/timer/etraxfs_timer.c                   |  2 ++
+ hw/timer/exynos4210_mct.c                  |  2 +-
+ hw/timer/exynos4210_pwm.c                  |  2 +-
+ hw/timer/exynos4210_rtc.c                  |  3 ++-
+ hw/timer/grlib_gptimer.c                   |  1 +
+ hw/timer/i8254.c                           |  2 ++
+ hw/timer/i8254_common.c                    |  2 ++
+ hw/timer/imx_epit.c                        |  1 +
+ hw/timer/imx_gpt.c                         |  1 +
+ hw/timer/lm32_timer.c                      |  1 +
+ hw/timer/m41t80.c                          |  2 ++
+ hw/timer/m48t59-isa.c                      |  2 ++
+ hw/timer/m48t59.c                          |  3 +++
+ hw/timer/mc146818rtc.c                     |  2 ++
+ hw/timer/milkymist-sysctl.c                |  1 +
+ hw/timer/mss-timer.c                       |  1 +
+ hw/timer/nrf51_timer.c                     |  1 +
+ hw/timer/pl031.c                           |  2 ++
+ hw/timer/puv3_ost.c                        |  2 ++
+ hw/timer/pxa2xx_timer.c                    |  1 +
+ hw/timer/slavio_timer.c                    |  1 +
+ hw/timer/stm32f2xx_timer.c                 |  1 +
+ hw/timer/sun4v-rtc.c                       |  1 +
+ hw/timer/twl92230.c                        |  2 ++
+ hw/timer/xilinx_timer.c                    |  1 +
+ hw/timer/xlnx-zynqmp-rtc.c                 |  2 ++
+ hw/tpm/tpm_crb.c                           |  2 +-
+ hw/tpm/tpm_emulator.c                      |  1 +
+ hw/tpm/tpm_passthrough.c                   |  1 +
+ hw/tpm/tpm_tis.c                           |  1 +
+ hw/tricore/tricore_testboard.c             |  1 -
+ hw/usb/bus.c                               |  1 +
+ hw/usb/ccid-card-emulated.c                |  1 +
+ hw/usb/ccid-card-passthru.c                |  2 ++
+ hw/usb/chipidea.c                          |  1 +
+ hw/usb/combined-packet.c                   |  1 -
+ hw/usb/core.c                              |  1 -
+ hw/usb/dev-audio.c                         |  2 +-
+ hw/usb/dev-bluetooth.c                     |  2 +-
+ hw/usb/dev-hid.c                           |  2 ++
+ hw/usb/dev-hub.c                           |  3 ++-
+ hw/usb/dev-mtp.c                           |  3 ++-
+ hw/usb/dev-network.c                       |  2 +-
+ hw/usb/dev-serial.c                        |  2 +-
+ hw/usb/dev-smartcard-reader.c              |  1 +
+ hw/usb/dev-storage.c                       |  2 +-
+ hw/usb/dev-uas.c                           |  2 +-
+ hw/usb/dev-wacom.c                         |  2 ++
+ hw/usb/hcd-ehci-pci.c                      |  1 +
+ hw/usb/hcd-ehci-sysbus.c                   |  1 +
+ hw/usb/hcd-musb.c                          |  1 -
+ hw/usb/hcd-ohci.c                          |  1 +
+ hw/usb/hcd-uhci.c                          |  2 ++
+ hw/usb/hcd-xhci-nec.c                      |  1 +
+ hw/usb/hcd-xhci.c                          |  2 ++
+ hw/usb/host-libusb.c                       |  2 +-
+ hw/usb/host-stub.c                         |  1 -
+ hw/usb/libhw.c                             |  1 -
+ hw/usb/redirect.c                          |  3 ++-
+ hw/usb/tusb6010.c                          |  3 ++-
+ hw/vfio/amd-xgbe.c                         |  1 +
+ hw/vfio/ap.c                               |  1 +
+ hw/vfio/calxeda-xgmac.c                    |  1 +
+ hw/vfio/ccw.c                              |  1 +
+ hw/vfio/pci-quirks.c                       |  1 +
+ hw/vfio/pci.c                              |  1 +
+ hw/vfio/pci.h                              |  1 -
+ hw/vfio/platform.c                         |  1 +
+ hw/virtio/vhost-scsi-pci.c                 |  1 +
+ hw/virtio/vhost-user-blk-pci.c             |  1 +
+ hw/virtio/vhost-user-scsi-pci.c            |  1 +
+ hw/virtio/vhost-vsock-pci.c                |  1 +
+ hw/virtio/vhost-vsock.c                    |  1 +
+ hw/virtio/virtio-9p-pci.c                  |  1 +
+ hw/virtio/virtio-balloon-pci.c             |  1 +
+ hw/virtio/virtio-balloon.c                 |  2 +-
+ hw/virtio/virtio-blk-pci.c                 |  1 +
+ hw/virtio/virtio-bus.c                     |  1 +
+ hw/virtio/virtio-crypto-pci.c              |  2 ++
+ hw/virtio/virtio-crypto.c                  |  2 ++
+ hw/virtio/virtio-input-host-pci.c          |  1 +
+ hw/virtio/virtio-input-pci.c               |  1 +
+ hw/virtio/virtio-mmio.c                    |  1 +
+ hw/virtio/virtio-net-pci.c                 |  1 +
+ hw/virtio/virtio-pci.c                     |  1 +
+ hw/virtio/virtio-rng-pci.c                 |  1 +
+ hw/virtio/virtio-rng.c                     |  1 +
+ hw/virtio/virtio-scsi-pci.c                |  1 +
+ hw/virtio/virtio-serial-pci.c              |  1 +
+ hw/virtio/virtio.c                         |  2 +-
+ hw/watchdog/cmsdk-apb-watchdog.c           |  1 +
+ hw/watchdog/wdt_aspeed.c                   |  1 +
+ hw/watchdog/wdt_diag288.c                  |  1 +
+ hw/watchdog/wdt_i6300esb.c                 |  2 +-
+ hw/watchdog/wdt_ib700.c                    |  2 +-
+ hw/xen/xen-bus.c                           |  1 +
+ hw/xen/xen-common.c                        |  1 +
+ hw/xen/xen-host-pci-device.c               |  1 -
+ hw/xen/xen_pt.h                            |  1 -
+ hw/xtensa/sim.c                            |  1 -
+ hw/xtensa/xtensa_memory.c                  |  1 -
+ hw/xtensa/xtensa_memory.h                  |  1 -
+ include/authz/base.h                       |  1 -
+ include/block/aio.h                        |  1 -
+ include/block/dirty-bitmap.h               |  1 -
+ include/block/write-threshold.h            |  1 -
+ include/chardev/char-io.h                  |  1 -
+ include/crypto/random.h                    |  1 -
+ include/crypto/xts.h                       |  1 -
+ include/disas/disas.h                      |  1 -
+ include/exec/cpu-all.h                     |  1 -
+ include/exec/exec-all.h                    |  1 -
+ include/exec/ram_addr.h                    |  1 +
+ include/hw/acpi/tco.h                      |  1 -
+ include/hw/arm/allwinner-a10.h             |  1 -
+ include/hw/arm/bcm2835_peripherals.h       |  1 -
+ include/hw/arm/exynos4210.h                |  1 -
+ include/hw/arm/virt.h                      |  1 -
+ include/hw/arm/xlnx-zynqmp.h               |  1 -
+ include/hw/block/fdc.h                     |  1 -
+ include/hw/boards.h                        |  1 +
+ include/hw/dma/bcm2835_dma.h               |  1 -
+ include/hw/fw-path-provider.h              |  1 -
+ include/hw/hw.h                            |  1 -
+ include/hw/i2c/ppc4xx_i2c.h                |  1 -
+ include/hw/i386/apic.h                     |  1 -
+ include/hw/i386/pc.h                       |  2 +-
+ include/hw/ipmi/ipmi.h                     |  1 -
+ include/hw/isa/apm.h                       |  1 -
+ include/hw/isa/superio.h                   |  1 -
+ include/hw/lm32/lm32_pic.h                 |  1 -
+ include/hw/nmi.h                           |  1 -
+ include/hw/pci-host/pam.h                  |  1 -
+ include/hw/pci/msi.h                       |  1 -
+ include/hw/pci/msix.h                      |  1 -
+ include/hw/pci/shpc.h                      |  1 -
+ include/hw/pci/slotid_cap.h                |  1 -
+ include/hw/ppc/openpic.h                   |  1 -
+ include/hw/ptimer.h                        |  1 -
+ include/hw/sd/sdhci.h                      |  1 -
+ include/hw/sh4/sh_intc.h                   |  1 -
+ include/hw/sparc/sun4m_iommu.h             |  1 -
+ include/hw/sparc/sun4u_iommu.h             |  1 -
+ include/hw/stream.h                        |  1 -
+ include/hw/timer/m48t59.h                  |  1 -
+ include/hw/vfio/vfio-common.h              |  1 -
+ include/hw/virtio/vhost-scsi-common.h      |  1 -
+ include/hw/virtio/vhost-scsi.h             |  1 -
+ include/hw/virtio/vhost-user-blk.h         |  1 -
+ include/hw/virtio/vhost-user-scsi.h        |  1 -
+ include/hw/xen/xen.h                       |  1 -
+ include/io/channel.h                       |  1 -
+ include/io/dns-resolver.h                  |  1 -
+ include/io/task.h                          |  1 -
+ include/migration/colo.h                   |  1 -
+ include/migration/failover.h               |  1 -
+ include/monitor/monitor.h                  |  1 -
+ include/net/announce.h                     |  1 -
+ include/net/filter.h                       |  1 -
+ include/net/queue.h                        |  1 -
+ include/net/tap.h                          |  1 -
+ include/qemu-common.h                      | 30 +---------------------
+ include/qemu-io.h                          |  1 -
+ include/qemu/base64.h                      |  1 -
+ include/qemu/buffer.h                      |  1 -
+ include/qemu/crc32c.h                      |  1 -
+ include/qemu/ctype.h                       | 27 +++++++++++++++++++
+ include/qemu/event_notifier.h              |  1 -
+ include/qemu/filemonitor.h                 |  1 -
+ include/qemu/mmap-alloc.h                  |  1 -
+ include/qemu/qdist.h                       |  1 -
+ include/qemu/throttle.h                    |  1 -
+ include/qemu/timer.h                       |  1 -
+ include/qemu/uuid.h                        |  1 -
+ include/qom/object.h                       |  1 +
+ include/sysemu/cryptodev-vhost.h           |  1 -
+ include/sysemu/cryptodev.h                 |  1 -
+ include/sysemu/hax.h                       |  1 -
+ include/sysemu/hvf.h                       |  1 -
+ include/sysemu/qtest.h                     |  1 -
+ include/sysemu/rng.h                       |  1 -
+ include/sysemu/tcg.h                       | 19 ++++++++++++++
+ include/sysemu/tpm_backend.h               |  1 -
+ include/sysemu/whpx.h                      |  1 -
+ io/channel-buffer.c                        |  1 +
+ io/channel-command.c                       |  1 +
+ io/channel-file.c                          |  1 +
+ io/channel-socket.c                        |  3 ++-
+ io/channel-tls.c                           |  1 +
+ io/channel-websock.c                       |  1 +
+ io/channel.c                               |  1 +
+ io/dns-resolver.c                          |  1 +
+ io/net-listener.c                          |  1 +
+ ioport.c                                   |  1 -
+ job-qmp.c                                  |  1 -
+ job.c                                      |  1 -
+ linux-user/aarch64/cpu_loop.c              |  1 +
+ linux-user/alpha/cpu_loop.c                |  1 +
+ linux-user/arm/cpu_loop.c                  |  1 +
+ linux-user/cris/cpu_loop.c                 |  1 +
+ linux-user/i386/cpu_loop.c                 |  1 +
+ linux-user/m68k/cpu_loop.c                 |  1 +
+ linux-user/main.c                          |  4 +++
+ linux-user/microblaze/cpu_loop.c           |  1 +
+ linux-user/mips/cpu_loop.c                 |  1 +
+ linux-user/mmap.c                          |  1 -
+ linux-user/openrisc/cpu_loop.c             |  1 +
+ linux-user/ppc/cpu_loop.c                  |  1 +
+ linux-user/riscv/cpu_loop.c                |  1 +
+ linux-user/s390x/cpu_loop.c                |  1 +
+ linux-user/sh4/cpu_loop.c                  |  1 +
+ linux-user/signal.c                        |  1 -
+ linux-user/sparc/cpu_loop.c                |  1 +
+ linux-user/syscall.c                       |  1 -
+ linux-user/tilegx/cpu_loop.c               |  1 +
+ memory.c                                   |  2 +-
+ memory_mapping.c                           |  1 -
+ migration/migration.h                      |  1 -
+ migration/page_cache.c                     |  1 -
+ migration/qemu-file.c                      |  1 -
+ migration/ram.h                            |  1 -
+ migration/rdma.c                           |  3 ++-
+ migration/socket.c                         |  1 -
+ migration/vmstate-types.c                  |  1 -
+ migration/vmstate.c                        |  1 -
+ monitor.c                                  |  2 ++
+ net/can/can_core.c                         |  2 ++
+ net/can/can_host.c                         |  2 ++
+ net/can/can_socketcan.c                    |  2 ++
+ net/checksum.c                             |  1 -
+ net/colo-compare.c                         |  2 +-
+ net/dump.c                                 |  3 ++-
+ net/eth.c                                  |  1 -
+ net/filter-buffer.c                        |  1 -
+ net/filter-mirror.c                        |  1 -
+ net/filter-replay.c                        |  2 +-
+ net/filter-rewriter.c                      |  1 -
+ net/filter.c                               |  2 +-
+ net/hub.h                                  |  1 -
+ net/l2tpv3.c                               |  1 -
+ net/net.c                                  |  1 +
+ net/tap-linux.c                            |  1 +
+ net/tap-solaris.c                          |  1 +
+ net/tap_int.h                              |  1 -
+ os-posix.c                                 |  1 +
+ os-win32.c                                 |  2 ++
+ qapi/qapi-dealloc-visitor.c                |  1 -
+ qapi/qapi-util.c                           |  2 +-
+ qapi/qapi-visit-core.c                     |  1 -
+ qapi/qmp-event.c                           |  1 -
+ qapi/qobject-input-visitor.c               |  1 -
+ qapi/qobject-output-visitor.c              |  1 -
+ qapi/string-input-visitor.c                |  1 -
+ qemu-edid.c                                |  1 -
+ qemu-img.c                                 |  2 ++
+ qemu-io.c                                  |  2 ++
+ qemu-keymap.c                              |  1 -
+ qemu-nbd.c                                 |  2 ++
+ qga/commands-posix.c                       |  1 +
+ qga/guest-agent-core.h                     |  1 -
+ qga/main.c                                 |  2 +-
+ qmp.c                                      |  1 +
+ qobject/json-parser.c                      |  2 +-
+ qom/cpu.c                                  |  2 +-
+ qom/qom-qobject.c                          |  1 -
+ qtest.c                                    |  2 +-
+ replay/replay-events.c                     |  1 -
+ replay/replay-input.c                      |  1 -
+ replay/replay-internal.c                   |  1 -
+ replay/replay-snapshot.c                   |  1 -
+ replay/replay-time.c                       |  1 -
+ replication.h                              |  1 +
+ scripts/modules/module_block.py            |  2 --
+ scripts/qapi/commands.py                   |  2 --
+ scripts/qapi/events.py                     |  1 -
+ scripts/qapi/visit.py                      |  2 --
+ scripts/tracetool/format/h.py              |  1 -
+ scripts/tracetool/format/tcg_helper_c.py   |  1 -
+ scripts/tracetool/format/ust_events_h.py   |  1 -
+ scsi/pr-manager-helper.c                   |  1 +
+ scsi/pr-manager.c                          |  1 +
+ scsi/qemu-pr-helper.c                      |  3 ++-
+ stubs/bdrv-next-monitor-owned.c            |  1 -
+ stubs/blk-commit-all.c                     |  1 -
+ stubs/change-state-handler.c               |  1 -
+ stubs/clock-warp.c                         |  1 -
+ stubs/cpu-get-clock.c                      |  1 -
+ stubs/cpu-get-icount.c                     |  1 -
+ stubs/dump.c                               |  1 -
+ stubs/error-printf.c                       |  1 -
+ stubs/fd-register.c                        |  1 -
+ stubs/fdset.c                              |  1 -
+ stubs/iothread-lock.c                      |  1 -
+ stubs/is-daemonized.c                      |  1 -
+ stubs/machine-init-done.c                  |  1 -
+ stubs/migr-blocker.c                       |  1 -
+ stubs/monitor.c                            |  1 -
+ stubs/notify-event.c                       |  1 -
+ stubs/set-fd-handler.c                     |  1 -
+ stubs/uuid.c                               |  1 -
+ stubs/vm-stop.c                            |  1 -
+ stubs/vmstate.c                            |  1 -
+ stubs/xen-common.c                         |  1 -
+ stubs/xen-hvm.c                            |  1 -
+ target/alpha/cpu.c                         |  1 -
+ target/alpha/cpu.h                         |  1 -
+ target/alpha/gdbstub.c                     |  1 -
+ target/alpha/machine.c                     |  1 -
+ target/arm/arm-semi.c                      |  1 -
+ target/arm/cpu.c                           |  4 ++-
+ target/arm/cpu.h                           |  1 -
+ target/arm/cpu64.c                         |  2 +-
+ target/arm/gdbstub.c                       |  1 -
+ target/arm/gdbstub64.c                     |  1 -
+ target/arm/kvm-stub.c                      |  1 -
+ target/arm/machine.c                       |  1 -
+ target/cris/cpu.c                          |  1 -
+ target/cris/cpu.h                          |  1 -
+ target/cris/gdbstub.c                      |  1 -
+ target/cris/machine.c                      |  1 -
+ target/hppa/cpu.c                          |  2 +-
+ target/hppa/cpu.h                          |  1 -
+ target/hppa/gdbstub.c                      |  1 -
+ target/hppa/machine.c                      |  1 -
+ target/i386/cpu.c                          |  2 ++
+ target/i386/cpu.h                          |  2 +-
+ target/i386/gdbstub.c                      |  1 -
+ target/i386/helper.c                       |  1 +
+ target/i386/kvm-stub.c                     |  1 -
+ target/i386/kvm.c                          |  1 -
+ target/i386/machine.c                      |  2 +-
+ target/i386/sev-stub.c                     |  1 -
+ target/i386/sev.c                          |  1 +
+ target/i386/xsave_helper.c                 |  1 -
+ target/lm32/cpu.c                          |  1 -
+ target/lm32/cpu.h                          |  1 -
+ target/lm32/gdbstub.c                      |  1 -
+ target/lm32/machine.c                      |  1 -
+ target/m68k/cpu.c                          |  1 -
+ target/m68k/cpu.h                          |  1 -
+ target/m68k/gdbstub.c                      |  1 -
+ target/m68k/m68k-semi.c                    |  1 -
+ target/microblaze/cpu.c                    |  2 +-
+ target/microblaze/cpu.h                    |  1 -
+ target/microblaze/gdbstub.c                |  1 -
+ target/mips/cpu.c                          |  2 +-
+ target/mips/cpu.h                          |  1 -
+ target/mips/gdbstub.c                      |  1 -
+ target/mips/machine.c                      |  1 -
+ target/moxie/cpu.c                         |  1 -
+ target/moxie/cpu.h                         |  1 -
+ target/moxie/machine.c                     |  1 -
+ target/nios2/cpu.c                         |  2 +-
+ target/nios2/cpu.h                         |  1 -
+ target/nios2/mmu.c                         |  1 -
+ target/openrisc/cpu.c                      |  1 -
+ target/openrisc/cpu.h                      |  1 -
+ target/openrisc/disas.c                    |  1 -
+ target/openrisc/exception.h                |  1 -
+ target/openrisc/gdbstub.c                  |  1 -
+ target/openrisc/interrupt.c                |  1 -
+ target/openrisc/machine.c                  |  1 -
+ target/openrisc/mmu.c                      |  1 -
+ target/openrisc/translate.c                |  1 -
+ target/ppc/cpu-models.c                    |  1 +
+ target/ppc/cpu.h                           |  1 -
+ target/ppc/gdbstub.c                       |  1 -
+ target/ppc/kvm-stub.c                      |  1 -
+ target/ppc/machine.c                       |  1 -
+ target/ppc/monitor.c                       |  2 ++
+ target/ppc/translate_init.inc.c            |  2 ++
+ target/riscv/cpu.c                         |  1 +
+ target/riscv/cpu.h                         |  1 -
+ target/riscv/gdbstub.c                     |  1 -
+ target/riscv/pmp.c                         |  1 -
+ target/s390x/cpu.c                         |  3 ++-
+ target/s390x/cpu.h                         |  1 -
+ target/s390x/cpu_models.c                  |  2 ++
+ target/s390x/gdbstub.c                     |  3 ++-
+ target/s390x/helper.c                      |  1 +
+ target/s390x/interrupt.c                   |  1 +
+ target/s390x/kvm-stub.c                    |  1 -
+ target/s390x/machine.c                     |  1 +
+ target/s390x/mmu_helper.c                  |  1 +
+ target/s390x/sigp.c                        |  2 +-
+ target/s390x/vec_helper.c                  |  1 -
+ target/sh4/cpu.c                           |  1 -
+ target/sh4/cpu.h                           |  1 -
+ target/sh4/gdbstub.c                       |  1 -
+ target/sparc/cpu.c                         |  1 +
+ target/sparc/cpu.h                         |  1 -
+ target/sparc/gdbstub.c                     |  1 -
+ target/sparc/machine.c                     |  1 -
+ target/tilegx/cpu.c                        |  2 +-
+ target/tilegx/cpu.h                        |  1 -
+ target/tilegx/helper.c                     |  1 -
+ target/tilegx/simd_helper.c                |  1 -
+ target/tricore/cpu.c                       |  1 -
+ target/tricore/cpu.h                       |  1 -
+ target/unicore32/cpu.c                     |  1 -
+ target/unicore32/cpu.h                     |  1 -
+ target/xtensa/core-dc233c.c                |  1 -
+ target/xtensa/core-de212.c                 |  1 -
+ target/xtensa/core-fsf.c                   |  1 -
+ target/xtensa/core-sample_controller.c     |  1 -
+ target/xtensa/core-test_kc705_be.c         |  1 -
+ target/xtensa/cpu.c                        |  2 +-
+ target/xtensa/cpu.h                        |  1 -
+ target/xtensa/gdbstub.c                    |  1 -
+ tcg/optimize.c                             |  1 -
+ tcg/tcg-common.c                           |  1 -
+ tcg/tcg-op-gvec.c                          |  1 -
+ tcg/tcg-op-vec.c                           |  1 -
+ tcg/tcg-op.c                               |  1 -
+ tcg/tcg.h                                  |  1 -
+ tests/ac97-test.c                          |  1 +
+ tests/crypto-tls-psk-helpers.h             |  1 -
+ tests/crypto-tls-x509-helpers.h            |  1 -
+ tests/e1000-test.c                         |  1 +
+ tests/e1000e-test.c                        |  2 ++
+ tests/eepro100-test.c                      |  1 +
+ tests/es1370-test.c                        |  1 +
+ tests/ipoctal232-test.c                    |  1 +
+ tests/libqos/aarch64-xlnx-zcu102-machine.c |  1 +
+ tests/libqos/arm-raspi2-machine.c          |  1 +
+ tests/libqos/arm-sabrelite-machine.c       |  1 +
+ tests/libqos/arm-smdkc210-machine.c        |  1 +
+ tests/libqos/arm-virt-machine.c            |  1 +
+ tests/libqos/arm-xilinx-zynq-a9-machine.c  |  1 +
+ tests/libqos/e1000e.c                      |  2 +-
+ tests/libqos/pci-pc.c                      |  2 +-
+ tests/libqos/pci-spapr.c                   |  2 +-
+ tests/libqos/ppc64_pseries-machine.c       |  3 ++-
+ tests/libqos/sdhci.c                       |  1 +
+ tests/libqos/tpci200.c                     |  1 +
+ tests/libqos/virtio-9p.c                   |  1 +
+ tests/libqos/virtio-balloon.c              |  1 +
+ tests/libqos/virtio-blk.c                  |  1 +
+ tests/libqos/virtio-mmio.c                 |  1 +
+ tests/libqos/virtio-net.c                  |  1 +
+ tests/libqos/virtio-rng.c                  |  1 +
+ tests/libqos/virtio-scsi.c                 |  1 +
+ tests/libqos/virtio-serial.c               |  1 +
+ tests/libqos/x86_64_pc-machine.c           |  1 +
+ tests/libqtest.c                           |  1 +
+ tests/megasas-test.c                       |  1 +
+ tests/migration-test.c                     |  1 +
+ tests/ne2000-test.c                        |  1 +
+ tests/nvme-test.c                          |  1 +
+ tests/pci-test.c                           |  1 +
+ tests/pcnet-test.c                         |  1 +
+ tests/qos-test.c                           |  1 +
+ tests/sdhci-test.c                         |  2 ++
+ tests/spapr-phb-test.c                     |  1 +
+ tests/test-authz-list.c                    |  1 +
+ tests/test-authz-listfile.c                |  1 +
+ tests/test-authz-pam.c                     |  1 +
+ tests/test-authz-simple.c                  |  1 +
+ tests/test-char.c                          |  1 +
+ tests/test-crypto-block.c                  |  1 +
+ tests/test-crypto-tlscredsx509.c           |  1 +
+ tests/test-crypto-tlssession.c             |  1 +
+ tests/test-filter-mirror.c                 |  1 +
+ tests/test-filter-redirector.c             |  1 +
+ tests/test-io-channel-buffer.c             |  1 +
+ tests/test-io-channel-command.c            |  1 +
+ tests/test-io-channel-file.c               |  1 +
+ tests/test-io-channel-socket.c             |  1 +
+ tests/test-io-channel-tls.c                |  1 +
+ tests/test-io-task.c                       |  1 +
+ tests/test-qmp-cmds.c                      |  2 --
+ tests/test-throttle.c                      |  1 +
+ tests/test-vmstate.c                       |  2 +-
+ tests/tpm-crb-swtpm-test.c                 |  1 +
+ tests/tpm-crb-test.c                       |  1 +
+ tests/tpm-tis-swtpm-test.c                 |  1 +
+ tests/tpm-tis-test.c                       |  1 +
+ tests/usb-hcd-ohci-test.c                  |  1 +
+ tests/vhost-user-bridge.c                  |  2 +-
+ tests/vhost-user-test.c                    |  1 +
+ tests/virtio-9p-test.c                     |  1 +
+ tests/virtio-blk-test.c                    |  1 +
+ tests/virtio-net-test.c                    |  2 ++
+ tests/virtio-rng-test.c                    |  1 +
+ tests/virtio-scsi-test.c                   |  1 +
+ tests/virtio-serial-test.c                 |  1 +
+ tests/virtio-test.c                        |  1 +
+ tests/vmxnet3-test.c                       |  1 +
+ trace/control.h                            |  1 -
+ ui/cocoa.m                                 |  2 +-
+ ui/console-gl.c                            |  1 -
+ ui/console.c                               |  1 +
+ ui/curses.c                                |  3 ++-
+ ui/cursor.c                                |  1 -
+ ui/egl-context.c                           |  1 -
+ ui/egl-headless.c                          |  2 +-
+ ui/gtk-egl.c                               |  1 -
+ ui/gtk-gl-area.c                           |  1 -
+ ui/gtk.c                                   |  1 -
+ ui/input-linux.c                           |  2 +-
+ ui/keymaps.c                               |  2 ++
+ ui/keymaps.h                               |  1 -
+ ui/qemu-pixman.c                           |  1 -
+ ui/sdl2-2d.c                               |  1 -
+ ui/sdl2-gl.c                               |  1 -
+ ui/sdl2-input.c                            |  1 -
+ ui/sdl2.c                                  |  2 +-
+ ui/shader.c                                |  1 -
+ ui/spice-app.c                             |  3 ++-
+ ui/spice-core.c                            |  1 +
+ ui/spice-input.c                           |  1 -
+ ui/vnc-enc-tight.c                         |  1 -
+ ui/vnc.c                                   |  1 +
+ ui/vnc.h                                   |  1 -
+ util/aio-posix.c                           |  1 -
+ util/async.c                               |  1 -
+ util/bufferiszero.c                        |  1 -
+ util/compatfd.c                            |  1 -
+ util/coroutine-ucontext.c                  |  1 -
+ util/crc32c.c                              |  1 -
+ util/cutils.c                              |  4 ++-
+ util/envlist.c                             |  1 -
+ util/error.c                               |  1 -
+ util/fifo8.c                               |  1 -
+ util/getauxval.c                           |  1 -
+ util/id.c                                  |  2 +-
+ util/iohandler.c                           |  1 -
+ util/log.c                                 |  1 -
+ util/module.c                              |  1 -
+ util/notify.c                              |  1 -
+ util/oslib-posix.c                         |  1 +
+ util/oslib-win32.c                         |  2 ++
+ util/qemu-config.c                         |  1 -
+ util/qemu-coroutine-lock.c                 |  1 -
+ util/qemu-coroutine.c                      |  1 -
+ util/qemu-option.c                         |  1 -
+ util/qemu-sockets.c                        |  1 +
+ util/rcu.c                                 |  1 -
+ util/readline.c                            |  2 +-
+ util/thread-pool.c                         |  1 -
+ util/uuid.c                                |  1 -
+ vl.c                                       |  2 ++
+ win_dump.c                                 |  1 +
+ 1236 files changed, 1080 insertions(+), 568 deletions(-)
+ create mode 100644 include/qemu/ctype.h
  create mode 100644 include/sysemu/tcg.h
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index a6948ebc63..5250521dff 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -124,6 +124,7 @@ F: include/exec/exec-all.h
- F: include/exec/helper*.h
- F: include/exec/tb-hash.h
- F: include/sysemu/cpus.h
-+F: include/sysemu/tcg.h
- 
- FPU emulation
- M: Aurelien Jarno <aurelien@aurel32.net>
-diff --git a/accel/tcg/cpu-exec-common.c b/accel/tcg/cpu-exec-common.c
-index 462a1f1865..12c1e3e974 100644
---- a/accel/tcg/cpu-exec-common.c
-+++ b/accel/tcg/cpu-exec-common.c
-@@ -20,6 +20,7 @@
- #include "qemu/osdep.h"
- #include "cpu.h"
- #include "sysemu/cpus.h"
-+#include "sysemu/tcg.h"
- #include "exec/exec-all.h"
- 
- bool tcg_allowed;
-diff --git a/accel/tcg/tcg-all.c b/accel/tcg/tcg-all.c
-index 3d25bdcc17..f0c95df5b8 100644
---- a/accel/tcg/tcg-all.c
-+++ b/accel/tcg/tcg-all.c
-@@ -26,8 +26,8 @@
- #include "qemu/osdep.h"
- #include "sysemu/accel.h"
- #include "sysemu/sysemu.h"
-+#include "sysemu/tcg.h"
- #include "qom/object.h"
--#include "qemu-common.h"
- #include "qom/cpu.h"
- #include "sysemu/cpus.h"
- #include "qemu/main-loop.h"
-diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
-index 20b59f93f4..5f832d788f 100644
---- a/accel/tcg/translate-all.c
-+++ b/accel/tcg/translate-all.c
-@@ -16,9 +16,9 @@
-  * You should have received a copy of the GNU Lesser General Public
-  * License along with this library; if not, see <http://www.gnu.org/licenses/>.
-  */
-+
- #include "qemu/osdep.h"
- 
--#include "qemu-common.h"
- #define NO_CPU_IO_DEFS
- #include "cpu.h"
- #include "trace.h"
-@@ -55,6 +55,7 @@
- #include "qemu/main-loop.h"
- #include "exec/log.h"
- #include "sysemu/cpus.h"
-+#include "sysemu/tcg.h"
- 
- /* #define DEBUG_TB_INVALIDATE */
- /* #define DEBUG_TB_FLUSH */
-diff --git a/bsd-user/main.c b/bsd-user/main.c
-index 6192e9d91e..5ec6f90af9 100644
---- a/bsd-user/main.c
-+++ b/bsd-user/main.c
-@@ -16,8 +16,10 @@
-  *  You should have received a copy of the GNU General Public License
-  *  along with this program; if not, see <http://www.gnu.org/licenses/>.
-  */
-+
- #include "qemu/osdep.h"
- #include "qemu/units.h"
-+#include "sysemu/tcg.h"
- #include "qemu-version.h"
- #include <machine/trap.h>
- 
-diff --git a/cpus.c b/cpus.c
-index e58e7ab0f6..e45be368c6 100644
---- a/cpus.c
-+++ b/cpus.c
-@@ -33,6 +33,7 @@
- #include "qemu/error-report.h"
- #include "qemu/qemu-print.h"
- #include "sysemu/sysemu.h"
-+#include "sysemu/tcg.h"
- #include "sysemu/block-backend.h"
- #include "exec/gdbstub.h"
- #include "sysemu/dma.h"
-diff --git a/exec.c b/exec.c
-index 4e734770c2..0bc59e9a30 100644
---- a/exec.c
-+++ b/exec.c
-@@ -16,6 +16,7 @@
-  * You should have received a copy of the GNU Lesser General Public
-  * License along with this library; if not, see <http://www.gnu.org/licenses/>.
-  */
-+
- #include "qemu/osdep.h"
- #include "qapi/error.h"
- 
-@@ -32,6 +33,7 @@
- #endif
- #include "sysemu/kvm.h"
- #include "sysemu/sysemu.h"
-+#include "sysemu/tcg.h"
- #include "qemu/timer.h"
- #include "qemu/config-file.h"
- #include "qemu/error-report.h"
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index d98b737b8f..06e4932d05 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -49,6 +49,7 @@
- #include "hw/pci/msi.h"
- #include "hw/sysbus.h"
- #include "sysemu/sysemu.h"
-+#include "sysemu/tcg.h"
- #include "sysemu/numa.h"
- #include "sysemu/kvm.h"
- #include "sysemu/qtest.h"
-diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
-index 9b1c10baa6..6d4e80cf26 100644
---- a/hw/ppc/spapr_caps.c
-+++ b/hw/ppc/spapr_caps.c
-@@ -21,6 +21,7 @@
-  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-  * THE SOFTWARE.
-  */
-+
- #include "qemu/osdep.h"
- #include "qemu/error-report.h"
- #include "qapi/error.h"
-@@ -32,6 +33,7 @@
- #include "cpu-models.h"
- #include "kvm_ppc.h"
- #include "sysemu/qtest.h"
-+#include "sysemu/tcg.h"
- 
- #include "hw/ppc/spapr.h"
- 
-diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
-index b93750c14e..1f3aef051b 100644
---- a/hw/s390x/ipl.c
-+++ b/hw/s390x/ipl.c
-@@ -14,6 +14,7 @@
- #include "qemu/osdep.h"
- #include "qapi/error.h"
- #include "sysemu/sysemu.h"
-+#include "sysemu/tcg.h"
- #include "cpu.h"
- #include "elf.h"
- #include "hw/loader.h"
-diff --git a/include/exec/ram_addr.h b/include/exec/ram_addr.h
-index 574427a505..507050a2e7 100644
---- a/include/exec/ram_addr.h
-+++ b/include/exec/ram_addr.h
-@@ -24,6 +24,7 @@
- 
- #ifndef CONFIG_USER_ONLY
- #include "hw/xen/xen.h"
-+#include "sysemu/tcg.h"
- #include "exec/ramlist.h"
- 
- struct RAMBlock {
-diff --git a/include/qemu-common.h b/include/qemu-common.h
-index f891e05e7e..d7f4a4e7eb 100644
---- a/include/qemu-common.h
-+++ b/include/qemu-common.h
-@@ -77,14 +77,6 @@ int qemu_openpty_raw(int *aslave, char *pty_name);
-     sendto(sockfd, buf, len, flags, destaddr, addrlen)
- #endif
- 
--extern bool tcg_allowed;
--void tcg_exec_init(unsigned long tb_size);
--#ifdef CONFIG_TCG
--#define tcg_enabled() (tcg_allowed)
--#else
--#define tcg_enabled() 0
--#endif
--
- void cpu_exec_init_all(void);
- void cpu_exec_step_atomic(CPUState *cpu);
- 
-diff --git a/include/sysemu/tcg.h b/include/sysemu/tcg.h
-new file mode 100644
-index 0000000000..7d116d2e80
---- /dev/null
-+++ b/include/sysemu/tcg.h
-@@ -0,0 +1,19 @@
-+/*
-+ * QEMU TCG support
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ */
-+
-+#ifndef SYSEMU_TCG_H
-+#define SYSEMU_TCG_H
-+
-+extern bool tcg_allowed;
-+void tcg_exec_init(unsigned long tb_size);
-+#ifdef CONFIG_TCG
-+#define tcg_enabled() (tcg_allowed)
-+#else
-+#define tcg_enabled() 0
-+#endif
-+
-+#endif
-diff --git a/linux-user/main.c b/linux-user/main.c
-index 3d2230320b..dae193fa7e 100644
---- a/linux-user/main.c
-+++ b/linux-user/main.c
-@@ -16,8 +16,10 @@
-  *  You should have received a copy of the GNU General Public License
-  *  along with this program; if not, see <http://www.gnu.org/licenses/>.
-  */
-+
- #include "qemu/osdep.h"
- #include "qemu/units.h"
-+#include "sysemu/tcg.h"
- #include "qemu-version.h"
- #include <sys/syscall.h>
- #include <sys/resource.h>
-diff --git a/memory.c b/memory.c
-index 3071c4bdad..fd32a1da29 100644
---- a/memory.c
-+++ b/memory.c
-@@ -15,7 +15,6 @@
- 
- #include "qemu/osdep.h"
- #include "qapi/error.h"
--#include "qemu-common.h"
- #include "cpu.h"
- #include "exec/memory.h"
- #include "exec/address-spaces.h"
-@@ -30,6 +29,7 @@
- #include "exec/ram_addr.h"
- #include "sysemu/kvm.h"
- #include "sysemu/sysemu.h"
-+#include "sysemu/tcg.h"
- #include "hw/qdev-properties.h"
- #include "migration/vmstate.h"
- 
-diff --git a/monitor.c b/monitor.c
-index 6428eb3b7e..3650ceb574 100644
---- a/monitor.c
-+++ b/monitor.c
-@@ -53,6 +53,7 @@
- #include "sysemu/hw_accel.h"
- #include "authz/list.h"
- #include "qapi/util.h"
-+#include "sysemu/tcg.h"
- #include "sysemu/tpm.h"
- #include "qapi/qmp/qdict.h"
- #include "qapi/qmp/qerror.h"
-diff --git a/qemu-nbd.c b/qemu-nbd.c
-index 081fcf74d5..25ce71e160 100644
---- a/qemu-nbd.c
-+++ b/qemu-nbd.c
-@@ -21,6 +21,7 @@
- #include <libgen.h>
- #include <pthread.h>
- 
-+#include "qemu-common.h"
- #include "qapi/error.h"
- #include "qemu/cutils.h"
- #include "sysemu/block-backend.h"
-diff --git a/qom/cpu.c b/qom/cpu.c
-index 3c5493c96c..eea08ccbae 100644
---- a/qom/cpu.c
-+++ b/qom/cpu.c
-@@ -20,7 +20,6 @@
- 
- #include "qemu/osdep.h"
- #include "qapi/error.h"
--#include "qemu-common.h"
- #include "qom/cpu.h"
- #include "sysemu/hw_accel.h"
- #include "qemu/notify.h"
-@@ -30,6 +29,7 @@
- #include "qemu/error-report.h"
- #include "qemu/qemu-print.h"
- #include "sysemu/sysemu.h"
-+#include "sysemu/tcg.h"
- #include "hw/boards.h"
- #include "hw/qdev-properties.h"
- #include "trace-root.h"
-diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-index 8eee1d8c59..27c8a09da4 100644
---- a/target/arm/cpu.c
-+++ b/target/arm/cpu.c
-@@ -24,7 +24,6 @@
- #include "qapi/visitor.h"
- #include "cpu.h"
- #include "internals.h"
--#include "qemu-common.h"
- #include "exec/exec-all.h"
- #include "hw/qdev-properties.h"
- #if !defined(CONFIG_USER_ONLY)
-@@ -32,6 +31,7 @@
- #endif
- #include "hw/arm/arm.h"
- #include "sysemu/sysemu.h"
-+#include "sysemu/tcg.h"
- #include "sysemu/hw_accel.h"
- #include "kvm_arm.h"
- #include "disas/capstone.h"
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index 2df56fa977..7548212f09 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -47,6 +47,7 @@
- #include "standard-headers/asm-x86/kvm_para.h"
- 
- #include "sysemu/sysemu.h"
-+#include "sysemu/tcg.h"
- #include "hw/qdev-properties.h"
- #include "hw/i386/topology.h"
- #ifndef CONFIG_USER_ONLY
-diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index f612681331..d6b78d46b3 100644
---- a/target/i386/cpu.h
-+++ b/target/i386/cpu.h
-@@ -24,7 +24,7 @@
- #ifndef I386_CPU_H
- #define I386_CPU_H
- 
--#include "qemu-common.h"
-+#include "sysemu/tcg.h"
- #include "cpu-qom.h"
- #include "hyperv-proto.h"
- 
-diff --git a/target/i386/helper.c b/target/i386/helper.c
-index 96336055f3..a3059a471b 100644
---- a/target/i386/helper.c
-+++ b/target/i386/helper.c
-@@ -25,6 +25,7 @@
- #include "kvm_i386.h"
- #ifndef CONFIG_USER_ONLY
- #include "sysemu/sysemu.h"
-+#include "sysemu/tcg.h"
- #include "sysemu/hw_accel.h"
- #include "monitor/monitor.h"
- #include "hw/i386/apic_internal.h"
-diff --git a/target/i386/machine.c b/target/i386/machine.c
-index 225b5d433b..1150967b97 100644
---- a/target/i386/machine.c
-+++ b/target/i386/machine.c
-@@ -1,5 +1,4 @@
- #include "qemu/osdep.h"
--#include "qemu-common.h"
- #include "cpu.h"
- #include "exec/exec-all.h"
- #include "hw/hw.h"
-@@ -10,6 +9,7 @@
- #include "hyperv.h"
- 
- #include "sysemu/kvm.h"
-+#include "sysemu/tcg.h"
- 
- #include "qemu/error-report.h"
- 
-diff --git a/target/ppc/translate_init.inc.c b/target/ppc/translate_init.inc.c
-index ad5e14b16f..f44e966a61 100644
---- a/target/ppc/translate_init.inc.c
-+++ b/target/ppc/translate_init.inc.c
-@@ -24,6 +24,7 @@
- #include "sysemu/arch_init.h"
- #include "sysemu/cpus.h"
- #include "sysemu/hw_accel.h"
-+#include "sysemu/tcg.h"
- #include "cpu-models.h"
- #include "mmu-hash32.h"
- #include "mmu-hash64.h"
-diff --git a/target/s390x/cpu.c b/target/s390x/cpu.c
-index b1df63d82c..3ee24b8541 100644
---- a/target/s390x/cpu.c
-+++ b/target/s390x/cpu.c
-@@ -26,7 +26,6 @@
- #include "internal.h"
- #include "kvm_s390x.h"
- #include "sysemu/kvm.h"
--#include "qemu-common.h"
- #include "qemu/timer.h"
- #include "qemu/error-report.h"
- #include "trace.h"
-@@ -39,6 +38,7 @@
- #include "hw/hw.h"
- #include "sysemu/arch_init.h"
- #include "sysemu/sysemu.h"
-+#include "sysemu/tcg.h"
- #endif
- #include "fpu/softfloat.h"
- 
-diff --git a/target/s390x/cpu_models.c b/target/s390x/cpu_models.c
-index 21ea819483..7478b04621 100644
---- a/target/s390x/cpu_models.c
-+++ b/target/s390x/cpu_models.c
-@@ -15,6 +15,7 @@
- #include "internal.h"
- #include "kvm_s390x.h"
- #include "sysemu/kvm.h"
-+#include "sysemu/tcg.h"
- #include "qapi/error.h"
- #include "qapi/visitor.h"
- #include "qemu/error-report.h"
-diff --git a/target/s390x/gdbstub.c b/target/s390x/gdbstub.c
-index df147596ce..3bb448cb48 100644
---- a/target/s390x/gdbstub.c
-+++ b/target/s390x/gdbstub.c
-@@ -17,14 +17,15 @@
-  * You should have received a copy of the GNU Lesser General Public
-  * License along with this library; if not, see <http://www.gnu.org/licenses/>.
-  */
-+
- #include "qemu/osdep.h"
--#include "qemu-common.h"
- #include "cpu.h"
- #include "internal.h"
- #include "exec/exec-all.h"
- #include "exec/gdbstub.h"
- #include "qemu/bitops.h"
- #include "sysemu/hw_accel.h"
-+#include "sysemu/tcg.h"
- 
- int s390_cpu_gdb_read_register(CPUState *cs, uint8_t *mem_buf, int n)
- {
-diff --git a/target/s390x/helper.c b/target/s390x/helper.c
-index 3c8f0a7615..1415478818 100644
---- a/target/s390x/helper.c
-+++ b/target/s390x/helper.c
-@@ -28,6 +28,7 @@
- #include "sysemu/hw_accel.h"
- #ifndef CONFIG_USER_ONLY
- #include "sysemu/sysemu.h"
-+#include "sysemu/tcg.h"
- #endif
- 
- #ifndef CONFIG_USER_ONLY
-diff --git a/target/s390x/interrupt.c b/target/s390x/interrupt.c
-index a17eff5ebc..f6cffb4371 100644
---- a/target/s390x/interrupt.c
-+++ b/target/s390x/interrupt.c
-@@ -14,6 +14,7 @@
- #include "internal.h"
- #include "exec/exec-all.h"
- #include "sysemu/kvm.h"
-+#include "sysemu/tcg.h"
- #include "hw/s390x/ioinst.h"
- #include "tcg_s390x.h"
- #if !defined(CONFIG_USER_ONLY)
-diff --git a/target/s390x/machine.c b/target/s390x/machine.c
-index cb792aa103..1392fd5eb4 100644
---- a/target/s390x/machine.c
-+++ b/target/s390x/machine.c
-@@ -21,6 +21,7 @@
- #include "kvm_s390x.h"
- #include "tcg_s390x.h"
- #include "sysemu/kvm.h"
-+#include "sysemu/tcg.h"
- 
- static int cpu_post_load(void *opaque, int version_id)
- {
-diff --git a/target/s390x/mmu_helper.c b/target/s390x/mmu_helper.c
-index 145b62a7ef..95cc87bd64 100644
---- a/target/s390x/mmu_helper.c
-+++ b/target/s390x/mmu_helper.c
-@@ -22,6 +22,7 @@
- #include "internal.h"
- #include "kvm_s390x.h"
- #include "sysemu/kvm.h"
-+#include "sysemu/tcg.h"
- #include "exec/exec-all.h"
- #include "trace.h"
- #include "hw/s390x/storage-keys.h"
-diff --git a/target/s390x/sigp.c b/target/s390x/sigp.c
-index c1f9245797..6873377661 100644
---- a/target/s390x/sigp.c
-+++ b/target/s390x/sigp.c
-@@ -9,13 +9,13 @@
-  */
- 
- #include "qemu/osdep.h"
--#include "qemu-common.h"
- #include "cpu.h"
- #include "internal.h"
- #include "sysemu/hw_accel.h"
- #include "exec/address-spaces.h"
- #include "exec/exec-all.h"
- #include "sysemu/sysemu.h"
-+#include "sysemu/tcg.h"
- #include "trace.h"
- #include "qapi/qapi-types-misc.h"
- 
-diff --git a/vl.c b/vl.c
-index 201144b162..8ec5979137 100644
---- a/vl.c
-+++ b/vl.c
-@@ -30,6 +30,7 @@
- #include "qemu/help_option.h"
- #include "qemu/uuid.h"
- #include "sysemu/seccomp.h"
-+#include "sysemu/tcg.h"
- 
- #ifdef CONFIG_SDL
- #if defined(__APPLE__) || defined(main)
 -- 
 2.17.2
 
