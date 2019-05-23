@@ -6,58 +6,57 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 19B67C282DD
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 13:01:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D2CBC282DD
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 13:02:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D9CC920879
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 13:01:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D9CC920879
+	by mail.kernel.org (Postfix) with ESMTPS id 50A2A20879
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 13:02:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 50A2A20879
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:35709 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:35711 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hTnLm-0007nV-43
-	for qemu-devel@archiver.kernel.org; Thu, 23 May 2019 09:01:38 -0400
+	id 1hTnMT-0008NE-G2
+	for qemu-devel@archiver.kernel.org; Thu, 23 May 2019 09:02:21 -0400
 Received: from eggs.gnu.org ([209.51.188.92]:51018)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hTnGl-0003dk-6V
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 08:56:28 -0400
+	(envelope-from <philmd@redhat.com>) id 1hTnGh-0003dk-Db
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 08:56:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hTn6K-0003zQ-5F
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 08:45:41 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47770)
+	(envelope-from <philmd@redhat.com>) id 1hTn6U-000459-7e
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 08:45:51 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34594)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <philmd@redhat.com>)
-	id 1hTn6K-0003yz-0x; Thu, 23 May 2019 08:45:40 -0400
+	id 1hTn6U-00044q-2T; Thu, 23 May 2019 08:45:50 -0400
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
 	[10.5.11.14])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 5F532301E12F;
-	Thu, 23 May 2019 12:45:38 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 59A389B3D9;
+	Thu, 23 May 2019 12:45:49 +0000 (UTC)
 Received: from x1w.redhat.com (unknown [10.40.205.5])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id BCA456836A;
-	Thu, 23 May 2019 12:44:57 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 3347C5D9C3;
+	Thu, 23 May 2019 12:45:42 +0000 (UTC)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Thu, 23 May 2019 14:43:18 +0200
-Message-Id: <20190523124320.28726-14-philmd@redhat.com>
+Date: Thu, 23 May 2019 14:43:20 +0200
+Message-Id: <20190523124320.28726-16-philmd@redhat.com>
 In-Reply-To: <20190523124320.28726-1-philmd@redhat.com>
 References: <20190523124320.28726-1-philmd@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.41]);
-	Thu, 23 May 2019 12:45:39 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.39]);
+	Thu, 23 May 2019 12:45:49 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 13/15] hw/nvram/fw_cfg: Store 'reboot-timeout'
- as little endian
+Subject: [Qemu-devel] [PULL 15/15] tests: fw_cfg: add 'splash-time' test case
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -69,11 +68,11 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
-	Laszlo Ersek <lersek@redhat.com>,
+Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>, Laszlo Ersek <lersek@redhat.com>,
 	Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
 	qemu-ppc@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>,
-	Li Qiang <liq3ea@163.com>,
+	Li Qiang <liq3ea@163.com>, Paolo Bonzini <pbonzini@redhat.com>,
 	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
 	Artyom Tarasenko <atar4qemu@gmail.com>,
 	David Gibson <david@gibson.dropbear.id.au>
@@ -83,60 +82,54 @@ Sender: "Qemu-devel"
 
 From: Li Qiang <liq3ea@163.com>
 
-The current codebase is not specific about the endianess of the
-fw_cfg 'file' entry 'reboot-timeout'.
-
-Per docs/specs/fw_cfg.txt:
-
-  =3D=3D=3D All Other Data Items =3D=3D=3D
-
-  Please consult the QEMU source for the most up-to-date
-  and authoritative list of selector keys and their respective
-  items' purpose, format and writeability.
-
-Checking the git history, this code was introduced in commit
-ac05f3492421, very similar to commit 3d3b8303c6f8 for the
-'boot-menu-wait' entry, which explicitely use little-endian.
-
-OVMF consumes 'boot-menu-wait' as little-endian, however it does
-not consume 'reboot-timeout'.
-
-Regarding the git history and OVMF use, we choose to explicit
-'reboot-timeout' endianess as little-endian.
-
 Signed-off-by: Li Qiang <liq3ea@163.com>
 Tested-by: Thomas Huth <thuth@redhat.com>
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Message-Id: <20190424140643.62457-4-liq3ea@163.com>
-[PMD: Reword commit description based on review comments]
+Message-Id: <20190424140643.62457-6-liq3ea@163.com>
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- hw/nvram/fw_cfg.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ tests/fw_cfg-test.c | 20 ++++++++++++++++++++
+ 1 file changed, 20 insertions(+)
 
-diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
-index b2dc0a80cb..9f7b7789bc 100644
---- a/hw/nvram/fw_cfg.c
-+++ b/hw/nvram/fw_cfg.c
-@@ -234,6 +234,7 @@ static void fw_cfg_reboot(FWCfgState *s)
- {
-     const char *reboot_timeout =3D NULL;
-     int64_t rt_val =3D -1;
-+    uint32_t rt_le32;
-=20
-     /* get user configuration */
-     QemuOptsList *plist =3D qemu_find_opts("boot-opts");
-@@ -250,7 +251,8 @@ static void fw_cfg_reboot(FWCfgState *s)
-         }
-     }
-=20
--    fw_cfg_add_file(s, "etc/boot-fail-wait", g_memdup(&rt_val, 4), 4);
-+    rt_le32 =3D cpu_to_le32(rt_val);
-+    fw_cfg_add_file(s, "etc/boot-fail-wait", g_memdup(&rt_le32, 4), 4);
+diff --git a/tests/fw_cfg-test.c b/tests/fw_cfg-test.c
+index 20b1eb75f4..1d3147f821 100644
+--- a/tests/fw_cfg-test.c
++++ b/tests/fw_cfg-test.c
+@@ -194,6 +194,25 @@ static void test_fw_cfg_reboot_timeout(void)
+     qtest_quit(s);
  }
 =20
- static void fw_cfg_write(FWCfgState *s, uint8_t value)
++static void test_fw_cfg_splash_time(void)
++{
++    QFWCFG *fw_cfg;
++    QTestState *s;
++    uint16_t splash_time =3D 0;
++    size_t filesize;
++
++    s =3D qtest_init("-boot splash-time=3D12");
++    fw_cfg =3D pc_fw_cfg_init(s);
++
++    filesize =3D qfw_cfg_get_file(fw_cfg, "etc/boot-menu-wait",
++                                &splash_time, sizeof(splash_time));
++    g_assert_cmpint(filesize, =3D=3D, sizeof(splash_time));
++    splash_time =3D le16_to_cpu(splash_time);
++    g_assert_cmpint(splash_time, =3D=3D, 12);
++    pc_fw_cfg_uninit(fw_cfg);
++    qtest_quit(s);
++}
++
+ int main(int argc, char **argv)
+ {
+     g_test_init(&argc, &argv, NULL);
+@@ -214,6 +233,7 @@ int main(int argc, char **argv)
+     qtest_add_func("fw_cfg/numa", test_fw_cfg_numa);
+     qtest_add_func("fw_cfg/boot_menu", test_fw_cfg_boot_menu);
+     qtest_add_func("fw_cfg/reboot_timeout", test_fw_cfg_reboot_timeout);
++    qtest_add_func("fw_cfg/splash_time", test_fw_cfg_splash_time);
+=20
+     return g_test_run();
+ }
 --=20
 2.20.1
 
