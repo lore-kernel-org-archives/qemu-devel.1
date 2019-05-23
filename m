@@ -2,63 +2,92 @@ Return-Path: <SRS0=bvyN=TX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 472FBC282DD
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 13:24:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5FCA3C282DD
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 13:25:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1ABF12133D
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 13:24:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1ABF12133D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 2931120862
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 13:25:44 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="kQb8qi2f"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2931120862
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:36153 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:36201 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hTnhh-0002s1-7X
-	for qemu-devel@archiver.kernel.org; Thu, 23 May 2019 09:24:17 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:54819)
+	id 1hTnj5-00044y-90
+	for qemu-devel@archiver.kernel.org; Thu, 23 May 2019 09:25:43 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:54109)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1hTnS4-0005z8-Hg
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 09:08:13 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hTnPp-0003HA-FY
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 09:05:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1hTnS0-0002TR-Ug
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 09:08:06 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40222)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1hTnRy-0002IH-FC
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 09:08:03 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id EA3C075733;
-	Thu, 23 May 2019 13:07:46 +0000 (UTC)
-Received: from localhost (unknown [10.43.2.182])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id E80995D705;
-	Thu, 23 May 2019 13:07:42 +0000 (UTC)
-Date: Thu, 23 May 2019 15:07:42 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-To: Tao Xu <tao3.xu@intel.com>
-Message-ID: <20190523150742.159efed1@redhat.com>
-In-Reply-To: <20190508061726.27631-3-tao3.xu@intel.com>
-References: <20190508061726.27631-1-tao3.xu@intel.com>
-	<20190508061726.27631-3-tao3.xu@intel.com>
+	(envelope-from <richard.henderson@linaro.org>) id 1hTnPn-0000pG-FP
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 09:05:49 -0400
+Received: from mail-yw1-xc41.google.com ([2607:f8b0:4864:20::c41]:39166)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1hTnPl-0000Zx-IN
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 09:05:46 -0400
+Received: by mail-yw1-xc41.google.com with SMTP id w21so2228093ywd.6
+	for <qemu-devel@nongnu.org>; Thu, 23 May 2019 06:05:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
+	:mime-version:in-reply-to:content-language:content-transfer-encoding;
+	bh=4hlWBSJm8/YnWP1+dZEH1htQbYquoD3x45ip40KalsY=;
+	b=kQb8qi2fe+l/dO5fcsxxkmXraxp7+AJkVvZbDAzdScAN3GdAmfXppbmKZDRQQ7LKfM
+	g7EM5bC6eLUs2MoOhw+ZQ8Xoz5/MoqcRa19mELj+ZwvNc7XPkJRW+rvtp4Z8hvM3XtP+
+	DqYiUu2kKjad42nWASp7l/3RC3ODxuTqBVnCVy5w0k1Sq5uDHDl2YSV587dg/9tdu9a1
+	P4paF4exR+HL8sGGEitw6DqX4S8jM6WAMNCQQhtcm1BxO1NCjR8MaaFHUeSCS8sYYOEI
+	PkorltBOwL17xL1iP+kPxrBYLUzhhdN0+1AFImgQtrMMTctPnKaFpsjAYG2PYeM41R72
+	xAZA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+	:date:user-agent:mime-version:in-reply-to:content-language
+	:content-transfer-encoding;
+	bh=4hlWBSJm8/YnWP1+dZEH1htQbYquoD3x45ip40KalsY=;
+	b=luXN+PNpFZ+Uc1Cm9yJGITDtSOdA5O0YXvd8T6BGpUNhW79YyM0kgsvgtW8ETrRpc5
+	JBvKVSN2t4mQvBCzsVC1rnup8WIZdxIDD/r6WFCUdqu7UtdCaiuKMdU3doT33cWteKyz
+	avhxQFkUSk111abS/BhjDJpzJ7hud0HGz74Gk2ZEuo1rlRMBgIB0xlpWjF5DYi90W9PU
+	HUq4b6dyyj0hfgadzAGEGF8kA+jy8m1/gPXkjY3JSBxCcayu3uaMTps7eI1Ps5kNukru
+	Pj4b51n9oXiE+/BNCpfvnTGT8A1BLcKDfRTblCnqD0diCh1hBMrI4sRBDS4OFej2647b
+	W5Lg==
+X-Gm-Message-State: APjAAAW/ogVLRk74EoSf9XEUnfz7mb+s+M4s3eFFM/exSQs0RxBqNsXt
+	aTKe/DvjhQMwhJnw2pGF52fTIei42pw=
+X-Google-Smtp-Source: APXvYqw42EHK+VAEzJXgCLmDIxcVSxR6KFXq3Rl61P4xlcU51igIbKXCZsMyVpwHn5gZDLMMUD+Bmg==
+X-Received: by 2002:a81:1bcc:: with SMTP id
+	b195mr43461581ywb.492.1558616719922; 
+	Thu, 23 May 2019 06:05:19 -0700 (PDT)
+Received: from [10.240.8.143] ([71.46.56.63]) by smtp.gmail.com with ESMTPSA id
+	v128sm7012499ywd.24.2019.05.23.06.05.18
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Thu, 23 May 2019 06:05:19 -0700 (PDT)
+To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
+References: <20190523024229.1158-1-richard.henderson@linaro.org>
+	<20190523024229.1158-2-richard.henderson@linaro.org>
+	<20190523110736.GD20973@redhat.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Openpgp: preference=signencrypt
+Message-ID: <8a9b53d9-0bcc-06c0-4eac-894b4d1208c3@linaro.org>
+Date: Thu, 23 May 2019 09:05:17 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.25]);
-	Thu, 23 May 2019 13:07:47 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v4 02/11] numa: move numa global variable
- have_numa_distance into MachineState
+In-Reply-To: <20190523110736.GD20973@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::c41
+Subject: Re: [Qemu-devel] [PATCH 1/3] capstone: Adjust include of capstone.h
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -70,134 +99,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: xiaoguangrong.eric@gmail.com, mst@redhat.com, jingqi.liu@intel.com,
-	qemu-devel@nongnu.org, ehabkost@redhat.com, pbonzini@redhat.com,
-	rth@twiddle.net
+Cc: alex.bennee@linaro.org, qemu-devel@nongnu.org, david@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed,  8 May 2019 14:17:17 +0800
-Tao Xu <tao3.xu@intel.com> wrote:
-
-> The aim of this patch is to move existing numa global have_numa_distance
-> into NumaState.
-
-s/The aim of this patch is to//
-
-> Reviewed-by: Liu Jingqi <jingqi.liu@intel.com>
-> Suggested-by: Igor Mammedov <imammedo@redhat.com>
-> Suggested-by: Eduardo Habkost <ehabkost@redhat.com>
-> Signed-off-by: Tao Xu <tao3.xu@intel.com>
-> ---
-
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-
-> Changes in v4 -> v3:
->     - send the patch together with HMAT patches
-> ---
->  hw/arm/virt-acpi-build.c | 2 +-
->  hw/arm/virt.c            | 2 +-
->  hw/i386/acpi-build.c     | 2 +-
->  include/hw/boards.h      | 2 ++
->  include/sysemu/numa.h    | 2 --
->  numa.c                   | 5 ++---
->  6 files changed, 7 insertions(+), 8 deletions(-)
+On 5/23/19 7:07 AM, Daniel P. Berrangé wrote:
+> On Wed, May 22, 2019 at 10:42:27PM -0400, Richard Henderson wrote:
+>> Since v4.0, capstone.h has moved to <capstone/capstone.h>.
 > 
-> diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-> index 6805b4de51..65f070843c 100644
-> --- a/hw/arm/virt-acpi-build.c
-> +++ b/hw/arm/virt-acpi-build.c
-> @@ -815,7 +815,7 @@ void virt_acpi_build(VirtMachineState *vms, AcpiBuildTables *tables)
->      if (nb_numa_nodes > 0) {
->          acpi_add_table(table_offsets, tables_blob);
->          build_srat(tables_blob, tables->linker, vms);
-> -        if (have_numa_distance) {
-> +        if (ms->numa_state->have_numa_distance) {
->              acpi_add_table(table_offsets, tables_blob);
->              build_slit(tables_blob, tables->linker, ms);
->          }
-> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-> index 70954b658d..f0818ef597 100644
-> --- a/hw/arm/virt.c
-> +++ b/hw/arm/virt.c
-> @@ -228,7 +228,7 @@ static void create_fdt(VirtMachineState *vms)
->                                  "clk24mhz");
->      qemu_fdt_setprop_cell(fdt, "/apb-pclk", "phandle", vms->clock_phandle);
->  
-> -    if (have_numa_distance) {
-> +    if (nb_numa_nodes > 0 && ms->numa_state->have_numa_distance) {
->          int size = nb_numa_nodes * nb_numa_nodes * 3 * sizeof(uint32_t);
->          uint32_t *matrix = g_malloc0(size);
->          int idx, i, j;
-> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-> index 7d9bc88ac9..43a807c483 100644
-> --- a/hw/i386/acpi-build.c
-> +++ b/hw/i386/acpi-build.c
-> @@ -2685,7 +2685,7 @@ void acpi_build(AcpiBuildTables *tables, MachineState *machine)
->      if (pcms->numa_nodes) {
->          acpi_add_table(table_offsets, tables_blob);
->          build_srat(tables_blob, tables->linker, machine);
-> -        if (have_numa_distance) {
-> +        if (machine->numa_state->have_numa_distance) {
->              acpi_add_table(table_offsets, tables_blob);
->              build_slit(tables_blob, tables->linker, machine);
->          }
-> diff --git a/include/hw/boards.h b/include/hw/boards.h
-> index 5f102e3075..c3c678b7ff 100644
-> --- a/include/hw/boards.h
-> +++ b/include/hw/boards.h
-> @@ -237,6 +237,8 @@ typedef struct NumaState {
->      /* Number of NUMA nodes */
->      int num_nodes;
->  
-> +    /* Allow setting NUMA distance for different NUMA nodes */
-> +    bool have_numa_distance;
->  } NumaState;
->  
->  /**
-> diff --git a/include/sysemu/numa.h b/include/sysemu/numa.h
-> index a55e2be563..1a29408db9 100644
-> --- a/include/sysemu/numa.h
-> +++ b/include/sysemu/numa.h
-> @@ -6,8 +6,6 @@
->  #include "sysemu/hostmem.h"
->  #include "hw/boards.h"
->  
-> -extern bool have_numa_distance;
-> -
->  struct NodeInfo {
->      uint64_t node_mem;
->      struct HostMemoryBackend *node_memdev;
-> diff --git a/numa.c b/numa.c
-> index 343fcaf13f..d4f5ff5193 100644
-> --- a/numa.c
-> +++ b/numa.c
-> @@ -52,7 +52,6 @@ static int have_memdevs = -1;
->  static int max_numa_nodeid; /* Highest specified NUMA node ID, plus one.
->                               * For all nodes, nodeid < max_numa_nodeid
->                               */
-> -bool have_numa_distance;
->  NodeInfo numa_info[MAX_NODES];
->  
->  
-> @@ -171,7 +170,7 @@ void parse_numa_distance(MachineState *ms, NumaDistOptions *dist, Error **errp)
->      }
->  
->      numa_info[src].distance[dst] = val;
-> -    have_numa_distance = true;
-> +    ms->numa_state->have_numa_distance = true;
->  }
->  
->  static
-> @@ -442,7 +441,7 @@ void numa_complete_configuration(MachineState *ms)
->           * asymmetric. In this case, the distances for both directions
->           * of all node pairs are required.
->           */
-> -        if (have_numa_distance) {
-> +        if (ms->numa_state->have_numa_distance) {
->              /* Validate enough NUMA distance information was provided. */
->              validate_numa_distance(ms);
->  
+> NB this was a regression bug in capstone pkg-config file which has been
+> fixed upstream
+> 
+>    https://github.com/aquynh/capstone/pull/1276
+> 
+> In Fedora we pulled in the fix to our v4.0 builds and I'd suggest
+> other distros should do the same
 
+Heh.  And here's me thinking this was an intentional change.
+
+
+r~
 
