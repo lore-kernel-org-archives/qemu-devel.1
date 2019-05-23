@@ -2,91 +2,60 @@ Return-Path: <SRS0=bvyN=TX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 80918C282DD
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 10:40:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0388BC282DD
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 10:40:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3145020851
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 10:40:00 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="hEJh9QgO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3145020851
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id C756320851
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 10:40:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C756320851
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:33267 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:33275 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hTl8h-0000VV-DH
-	for qemu-devel@archiver.kernel.org; Thu, 23 May 2019 06:39:59 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:49322)
+	id 1hTl8y-0000i7-4T
+	for qemu-devel@archiver.kernel.org; Thu, 23 May 2019 06:40:16 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:49562)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hTkvA-0005gP-Lq
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 06:26:02 -0400
+	(envelope-from <pagupta@redhat.com>) id 1hTkvN-0005zC-SE
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 06:26:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hTkv4-0001CR-CS
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 06:25:58 -0400
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:54678)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1hTkv2-0000ta-8Y
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 06:25:54 -0400
-Received: by mail-wm1-x344.google.com with SMTP id i3so5211842wml.4
-	for <qemu-devel@nongnu.org>; Thu, 23 May 2019 03:25:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=from:to:cc:subject:date:message-id:in-reply-to:references
-	:mime-version:content-transfer-encoding;
-	bh=hbC6Uuy+rCphFJXRN5GPHrqZRqXnqfdaGhA8RUCMKxg=;
-	b=hEJh9QgOdMqmyLe0c0khC2QOt9zDuLNDpB6Gh9jOzlcCy2PZFa9iNLia9iFXwYxzlH
-	BlS4456PzJwanNJmq07CK6WOM/uGZRjM20RfAjTbGYtoYcpfsvw5pA0hl8ms9ypguAHd
-	DPopycyQjW7E142KDeXCoz4XGCJD2W9gBT4jujJb1/a7mQ7rVMHnZNm2vcd9BC53tutK
-	JQM9IiKxnZmJqSkt5mFP1S59i72fQPAWC8XfztryW3uaUcwDtSEAwWtJxhw6xyQIcFWI
-	Qdn5jxM+ZKcAM2q5UYXMhHsTloFsTmekHd9Pmhy3z5Fivm2rCB7GG8imVcP1E9863zuQ
-	v6RA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-	:references:mime-version:content-transfer-encoding;
-	bh=hbC6Uuy+rCphFJXRN5GPHrqZRqXnqfdaGhA8RUCMKxg=;
-	b=c7UwldhGfEM/C4qjBN08YiKLRDC1/g0laiqhExi3W2TZ6/PmTdYIXmUO91Fp81+6EU
-	ZcvVmYwlm1XQlZ/PwEOxN+zd6IswBfedhH7vYi2vMCgA3iqmdREYK501ojj0WLAZEiEr
-	f4ICoPJrbSg4exMvdsQqjtF3I9tMTj9Kt7z+rNCZ7jIIWvw08WM4BoIIK7S1lGJ5Sgff
-	h3wnyIS72ZTPAP268wxMUHOy64wRkKD1+jXQw8d9ReDd6TVPqMTeLQ8lIJr93SWlIx6y
-	lGjKksY3ILD9JEbhcb07Zm4xRFPUwKh3d3PTla59GSDAF7xzUoryGIDQZeAwgGIU6bDu
-	hE3g==
-X-Gm-Message-State: APjAAAVsGMSWEhECQ2yL3pUks1eZScCSMYyttlukxpcRcBHBOck+S+XN
-	M2iLYzwnNnDjpl5SrfhR3TmQZ7aG1nQ=
-X-Google-Smtp-Source: APXvYqxitkzQC8NAz8+6BgaPWjudhYgHG9hHdmdVOz3KuxAqbQ2/anLlmr0ltpF5SbI4TKJrJWzMqw==
-X-Received: by 2002:a1c:3cc2:: with SMTP id j185mr10788632wma.26.1558607135796;
-	Thu, 23 May 2019 03:25:35 -0700 (PDT)
-Received: from zen.linaroharston ([81.128.185.34])
-	by smtp.gmail.com with ESMTPSA id
-	q68sm7037319wme.11.2019.05.23.03.25.33
-	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Thu, 23 May 2019 03:25:33 -0700 (PDT)
-Received: from zen.linaroharston. (localhost [127.0.0.1])
-	by zen.linaroharston (Postfix) with ESMTP id B25F01FF90;
-	Thu, 23 May 2019 11:25:32 +0100 (BST)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+	(envelope-from <pagupta@redhat.com>) id 1hTkvM-0001Vq-8H
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 06:26:13 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55444)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pagupta@redhat.com>) id 1hTkvK-0001RB-6Z
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 06:26:12 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 07CDC308FEE2;
+	Thu, 23 May 2019 10:26:09 +0000 (UTC)
+Received: from dhcp201-121.englab.pnq.redhat.com (ovpn-116-162.sin2.redhat.com
+	[10.67.116.162])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id CCA956767F;
+	Thu, 23 May 2019 10:25:48 +0000 (UTC)
+From: Pankaj Gupta <pagupta@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Thu, 23 May 2019 11:25:07 +0100
-Message-Id: <20190523102532.10486-4-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190523102532.10486-1-alex.bennee@linaro.org>
-References: <20190523102532.10486-1-alex.bennee@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2a00:1450:4864:20::344
-Subject: [Qemu-devel] [PATCH v2 03/28] semihosting: implement a semihosting
- console
+Date: Thu, 23 May 2019 15:54:44 +0530
+Message-Id: <20190523102449.2642-3-pagupta@redhat.com>
+In-Reply-To: <20190523102449.2642-1-pagupta@redhat.com>
+References: <20190523102449.2642-1-pagupta@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.49]);
+	Thu, 23 May 2019 10:26:09 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PATCH 2/7] virtio-pci: Allow to specify additional
+ interfaces for the base type
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -98,192 +67,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm@nongnu.org,
-	=?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: kwolf@redhat.com, aarcange@redhat.com, cohuck@redhat.com,
+	xiaoguangrong.eric@gmail.com, mst@redhat.com, pagupta@redhat.com,
+	riel@surriel.com, david@redhat.com, armbru@redhat.com,
+	ehabkost@redhat.com, lcapitulino@redhat.com, stefanha@redhat.com,
+	pbonzini@redhat.com, imammedo@redhat.com,
+	dan.j.williams@intel.com, nilal@redhat.com, dgilbert@redhat.com,
+	rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This provides two functions for handling console output that handle
-the common backend behaviour for semihosting.
+From: David Hildenbrand <david@redhat.com>
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Let's allow to specify additional interfaces for the base type (e.g.
+later TYPE_MEMORY_DEVICE), something that was possible before the
+rework of virtio PCI device instantiation.
+
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- gdbstub.c                        |  5 +++
- hw/semihosting/Makefile.objs     |  1 +
- hw/semihosting/console.c         | 70 ++++++++++++++++++++++++++++++++
- include/exec/gdbstub.h           | 11 +++++
- include/hw/semihosting/console.h | 38 +++++++++++++++++
- 5 files changed, 125 insertions(+)
- create mode 100644 hw/semihosting/console.c
- create mode 100644 include/hw/semihosting/console.h
+ hw/virtio/virtio-pci.c | 1 +
+ hw/virtio/virtio-pci.h | 1 +
+ 2 files changed, 2 insertions(+)
 
-diff --git a/gdbstub.c b/gdbstub.c
-index 793218bb43a..b4334014373 100644
---- a/gdbstub.c
-+++ b/gdbstub.c
-@@ -1987,6 +1987,11 @@ void gdb_do_syscall(gdb_syscall_complete_cb cb, const char *fmt, ...)
-     va_end(va);
- }
+diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
+index cb44e19b67..0ac451ed0f 100644
+--- a/hw/virtio/virtio-pci.c
++++ b/hw/virtio/virtio-pci.c
+@@ -1939,6 +1939,7 @@ void virtio_pci_types_register(const VirtioPCIDeviceTypeInfo *t)
+         .class_init    = virtio_pci_base_class_init,
+         .class_data    = (void *)t,
+         .abstract      = true,
++        .interfaces    = t->interfaces,
+     };
+     TypeInfo generic_type_info = {
+         .name = t->generic_name,
+diff --git a/hw/virtio/virtio-pci.h b/hw/virtio/virtio-pci.h
+index 18581854ca..292275acb1 100644
+--- a/hw/virtio/virtio-pci.h
++++ b/hw/virtio/virtio-pci.h
+@@ -233,6 +233,7 @@ typedef struct VirtioPCIDeviceTypeInfo {
+     size_t class_size;
+     void (*instance_init)(Object *obj);
+     void (*class_init)(ObjectClass *klass, void *data);
++    InterfaceInfo *interfaces;
+ } VirtioPCIDeviceTypeInfo;
  
-+void gdb_do_console_out(target_ulong s, int len)
-+{
-+    gdb_do_syscall(NULL, "write,2,%x,1", s, len);
-+}
-+
- static void gdb_read_byte(GDBState *s, int ch)
- {
-     uint8_t reply;
-diff --git a/hw/semihosting/Makefile.objs b/hw/semihosting/Makefile.objs
-index 09c19bf19ed..4ad47c05c06 100644
---- a/hw/semihosting/Makefile.objs
-+++ b/hw/semihosting/Makefile.objs
-@@ -1 +1,2 @@
- obj-$(CONFIG_SEMIHOSTING) += config.o
-+obj-$(CONFIG_SEMIHOSTING) += console.o
-diff --git a/hw/semihosting/console.c b/hw/semihosting/console.c
-new file mode 100644
-index 00000000000..ad6f67ecc71
---- /dev/null
-+++ b/hw/semihosting/console.c
-@@ -0,0 +1,70 @@
-+/*
-+ * Semihosting Console Support
-+ *
-+ * Copyright (c) 2015 Imagination Technologies
-+ * Copyright (c) 2019 Linaro Ltd
-+ *
-+ * This provides support for outputting to a semihosting console.
-+ *
-+ * While most semihosting implementations support reading and writing
-+ * to arbitrary file descriptors we treat the console as something
-+ * specifically for debugging interaction. This means messages can be
-+ * re-directed to gdb (if currently being used to debug) or even
-+ * re-directed elsewhere.
-+ *
-+ * SPDX-License-Identifier: GPL-2.0-or-later
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "cpu.h"
-+#include "hw/semihosting/console.h"
-+#include "exec/gdbstub.h"
-+#include "qemu/log.h"
-+
-+int qemu_semihosting_log_out(const char *s, int len)
-+{
-+    return write(STDERR_FILENO, s, len);
-+}
-+
-+/*
-+ * A re-implementation of lock_user_string that we can use locally
-+ * instead of relying on softmmu-semi. Hopefully we can deprecate that
-+ * in time. We either copy len bytes if specified or until we find a NULL.
-+ */
-+static GString *copy_user_string(CPUArchState *env, target_ulong addr, int len)
-+{
-+    CPUState *cpu = ENV_GET_CPU(env);
-+    GString *s = g_string_sized_new(len ? len : 128);
-+    uint8_t c;
-+    bool done;
-+
-+    do {
-+        if (cpu_memory_rw_debug(cpu, addr++, &c, 1, 0) == 0) {
-+            s = g_string_append_c(s, c);
-+            done = len ? s->len == len : c == 0;
-+        } else {
-+            qemu_log_mask(LOG_GUEST_ERROR,
-+                          "%s: passed inaccessible address " TARGET_FMT_lx,
-+                          __func__, addr);
-+            done = true;
-+        }
-+    } while (!done);
-+
-+    return s;
-+}
-+
-+
-+int qemu_semihosting_console_out(CPUArchState *env, target_ulong addr, int len)
-+{
-+    GString *s = copy_user_string(env, addr, len);
-+    int out = s->len;
-+
-+    if (use_gdb_syscalls()) {
-+        gdb_do_console_out(addr, s->len);
-+    } else {
-+        out = qemu_semihosting_log_out(s->str, s->len);
-+    }
-+
-+    g_string_free(s, true);
-+    return out;
-+}
-diff --git a/include/exec/gdbstub.h b/include/exec/gdbstub.h
-index 08363969c14..b2963547c48 100644
---- a/include/exec/gdbstub.h
-+++ b/include/exec/gdbstub.h
-@@ -44,6 +44,17 @@ void gdb_do_syscall(gdb_syscall_complete_cb cb, const char *fmt, ...);
-  * argument list.
-  */
- void gdb_do_syscallv(gdb_syscall_complete_cb cb, const char *fmt, va_list va);
-+/**
-+ * gdb_do_console_out:
-+ * @gs: guest address of string to send
-+ * @len: length of string
-+ *
-+ * Sends a string to gdb console. Unlike the system call interface
-+ * there is no callback and we assume the system call always
-+ * succeeds.
-+ */
-+void gdb_do_console_out(target_ulong s, int len);
-+
- int use_gdb_syscalls(void);
- void gdb_set_stop_cpu(CPUState *cpu);
- void gdb_exit(CPUArchState *, int);
-diff --git a/include/hw/semihosting/console.h b/include/hw/semihosting/console.h
-new file mode 100644
-index 00000000000..30e66ae20aa
---- /dev/null
-+++ b/include/hw/semihosting/console.h
-@@ -0,0 +1,38 @@
-+/*
-+ * Semihosting Console
-+ *
-+ * Copyright (c) 2019 Linaro Ltd
-+ *
-+ * SPDX-License-Identifier: GPL-2.0-or-later
-+ */
-+
-+#ifndef _SEMIHOST_CONSOLE_H_
-+#define _SEMIHOST_CONSOLE_H_
-+
-+/**
-+ * qemu_semihosting_console_out:
-+ * @env: CPUArchState
-+ * @s: host address of guest string
-+ * @len: length of string or 0 (string is null terminated)
-+ *
-+ * Send a guest string to the debug console. This may be the remote
-+ * gdb session if a softmmu guest is currently being debugged.
-+ *
-+ * Returns: number of bytes written.
-+ */
-+int qemu_semihosting_console_out(CPUArchState *env, target_ulong s, int len);
-+
-+/**
-+ * qemu_semihosting_log_out:
-+ * @s: pointer to string
-+ * @len: length of string
-+ *
-+ * Send a string to the debug output. Unlike console_out these strings
-+ * can't be sent to a remote gdb instance as they don't exist in guest
-+ * memory.
-+ *
-+ * Returns: number of bytes written
-+ */
-+int qemu_semihosting_log_out(const char *s, int len);
-+
-+#endif /* _SEMIHOST_CONSOLE_H_ */
+ /* Register virtio-pci type(s).  @t must be static. */
 -- 
-2.20.1
+2.14.5
 
 
