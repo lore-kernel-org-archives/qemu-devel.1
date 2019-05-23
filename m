@@ -2,80 +2,64 @@ Return-Path: <SRS0=bvyN=TX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.4 required=3.0 tests=FROM_EXCESS_BASE64,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 29979C282DD
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 11:06:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F356C282DD
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 11:08:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E659720868
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 11:06:16 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="nn3ujwZk"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E659720868
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 5D98221019
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 11:08:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5D98221019
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:33817 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:33851 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hTlY8-0005cp-7r
-	for qemu-devel@archiver.kernel.org; Thu, 23 May 2019 07:06:16 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:58605)
+	id 1hTlaY-0006k2-Ll
+	for qemu-devel@archiver.kernel.org; Thu, 23 May 2019 07:08:46 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:60337)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hTlSd-0001wa-H8
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 07:00:36 -0400
+	(envelope-from <berrange@redhat.com>) id 1hTlZn-0006RB-AD
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 07:08:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hTlSb-0008UZ-6q
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 07:00:34 -0400
-Received: from mail-ot1-x32e.google.com ([2607:f8b0:4864:20::32e]:41250)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hTlSa-0008TL-Jn
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 07:00:33 -0400
-Received: by mail-ot1-x32e.google.com with SMTP id l25so4986521otp.8
-	for <qemu-devel@nongnu.org>; Thu, 23 May 2019 04:00:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-	:cc; bh=Yhv+xi8WspiYJH56L/JUHWhHhG9zt3ZSFc9V098CUOg=;
-	b=nn3ujwZknruEWzcce8NLT2a1DWNBlCI+Is9u+QnTW8xL440e0djMaSZzDYCnC1ztQw
-	mmOxr4aT1RC86+6HgvQ58QboIy5k8FY98r89z52qwBbL3JrqQx2DuvFtLxkJtt4t5D1P
-	pbekmgGP62pAHMSH7VfpVaVdm2pCvXIgzSi2yYsamM6vOuV/yoevU9wUqDlBiWHexpBo
-	Cxfw7z5xb+rPJpdbLeZJYUlNJuD3ockC6guchiwzVnRQC43wWMIeDKScFT9lAEbVEvrW
-	vjoDNeNFwXId9RTsgH21ODTdrnSZuk1WoiIvP3gcWz4Ln6PYxG/lXaaW+1TILxMRTL4J
-	D/8g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-	:message-id:subject:to:cc;
-	bh=Yhv+xi8WspiYJH56L/JUHWhHhG9zt3ZSFc9V098CUOg=;
-	b=maLQ+j2nO4iPLqG3l4PAOBpn1qZCk8Sv+IWhwAQRahyovDxn+iu/zgbv6mzgG0M09Q
-	Tg1PIe2XT5RwKMbFtOtc1Rz5M/dSC/+fhNkqTu+fd1v0bwxpQ4kCgaT5el2jb5riIfeS
-	2kHlk3CskeG1z2EDxet9Merty7KSHbSbfVrdG+qC11UQ9vlWsVSoz2e70VnZ4gahWdI/
-	U5pjcoUl7cnrx8+7XZ0nvT3rtQTL8JlzdY8a2RWfQ6S1ZzTkd9ckbzJt9PmnZi4PqE2n
-	Szt62KCm/p4qrdpUPS98b7+PtnRG/7I8seyDWHZPWHvKJXvc8iUKSt1kS3udmwbVpyWO
-	R58Q==
-X-Gm-Message-State: APjAAAWAfqzlKG8faD7Kw9zGauaENwpw56hIMHpf0FWF+fl55N3OEPkC
-	9sOa1UzI/pFalrm3L9P6os9TTbCRNHHRnxfC0bzUSiKO9hQ=
-X-Google-Smtp-Source: APXvYqxvwRqpXICkKdXG0TMM+wx16Wqduz1whIU1NyNqZhPIzAGNCSmmP1s6SVMUOvRnE+/Ch7hYR1Bhl/OH0eodidc=
-X-Received: by 2002:a05:6830:149a:: with SMTP id
-	s26mr27394184otq.221.1558609231015; 
-	Thu, 23 May 2019 04:00:31 -0700 (PDT)
+	(envelope-from <berrange@redhat.com>) id 1hTlZm-0004bf-C8
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 07:07:59 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52444)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1hTlZm-0004Ye-7j
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 07:07:58 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 41705307E04E;
+	Thu, 23 May 2019 11:07:43 +0000 (UTC)
+Received: from redhat.com (ovpn-112-64.ams2.redhat.com [10.36.112.64])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 9F34865F65;
+	Thu, 23 May 2019 11:07:39 +0000 (UTC)
+Date: Thu, 23 May 2019 12:07:36 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <20190523110736.GD20973@redhat.com>
+References: <20190523024229.1158-1-richard.henderson@linaro.org>
+	<20190523024229.1158-2-richard.henderson@linaro.org>
 MIME-Version: 1.0
-References: <20190522134726.19225-1-armbru@redhat.com>
-In-Reply-To: <20190522134726.19225-1-armbru@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 23 May 2019 12:00:20 +0100
-Message-ID: <CAFEAcA9Q=q+eSQ=ppQU08kpj5ZoBxak1AdY8Rk=P25Jb0SAbdw@mail.gmail.com>
-To: Markus Armbruster <armbru@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::32e
-Subject: Re: [Qemu-devel] [PULL 0/5] Miscellaneous patches for 2019-05-22
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20190523024229.1158-2-richard.henderson@linaro.org>
+User-Agent: Mutt/1.11.4 (2019-03-13)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.42]);
+	Thu, 23 May 2019 11:07:43 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH 1/3] capstone: Adjust include of capstone.h
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -87,47 +71,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: alex.bennee@linaro.org, qemu-devel@nongnu.org, david@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 22 May 2019 at 14:51, Markus Armbruster <armbru@redhat.com> wrote:
->
-> The following changes since commit a4f667b6714916683408b983cfe0a615a725775f:
->
->   Merge remote-tracking branch 'remotes/cohuck/tags/s390x-20190521-3' into staging (2019-05-21 16:30:13 +0100)
->
-> are available in the Git repository at:
->
->   git://repo.or.cz/qemu/armbru.git tags/pull-misc-2019-05-22
->
-> for you to fetch changes up to db3d11ee3f0cb851124830172f0a93c3d77a450a:
->
->   cutils: Simplify how parse_uint() checks for whitespace (2019-05-22 15:00:04 +0200)
->
-> ----------------------------------------------------------------
-> Miscellaneous patches for 2019-05-22
->
-> ----------------------------------------------------------------
-> Markus Armbruster (5):
->       qemu-bridge-helper: Fix misuse of isspace()
->       tests/vhost-user-bridge: Fix misuse of isdigit()
->       gdbstub: Reject invalid RLE repeat counts
->       gdbstub: Fix misuse of isxdigit()
->       cutils: Simplify how parse_uint() checks for whitespace
->
->  gdbstub.c                 | 20 ++++++++++++--------
->  qemu-bridge-helper.c      |  6 +++---
->  tests/vhost-user-bridge.c |  3 ++-
->  util/cutils.c             |  2 +-
->  4 files changed, 18 insertions(+), 13 deletions(-)
+On Wed, May 22, 2019 at 10:42:27PM -0400, Richard Henderson wrote:
+> Since v4.0, capstone.h has moved to <capstone/capstone.h>.
 
+NB this was a regression bug in capstone pkg-config file which has been
+fixed upstream
 
-Applied, thanks.
+   https://github.com/aquynh/capstone/pull/1276
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/4.1
-for any user-visible changes.
+In Fedora we pulled in the fix to our v4.0 builds and I'd suggest
+other distros should do the same
 
--- PMM
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  include/disas/capstone.h | 4 ++++
+>  configure                | 6 ++++++
+>  2 files changed, 10 insertions(+)
+> 
+> diff --git a/include/disas/capstone.h b/include/disas/capstone.h
+> index e29068dd97..90631d84a9 100644
+> --- a/include/disas/capstone.h
+> +++ b/include/disas/capstone.h
+> @@ -3,7 +3,11 @@
+>  
+>  #ifdef CONFIG_CAPSTONE
+>  
+> +#ifdef CONFIG_CAPSTONE_CAPSTONE_H
+> +#include <capstone/capstone.h>
+> +#else
+>  #include <capstone.h>
+> +#endif
+>  
+>  #else
+>  
+> diff --git a/configure b/configure
+> index d2fc346302..eec7f061c3 100755
+> --- a/configure
+> +++ b/configure
+> @@ -5021,6 +5021,9 @@ case "$capstone" in
+>    system)
+>      QEMU_CFLAGS="$QEMU_CFLAGS $($pkg_config --cflags capstone)"
+>      LIBS="$($pkg_config --libs capstone) $LIBS"
+> +    if check_include capstone/capstone.h; then
+> +      capstone_capstone_h=yes
+> +    fi
+>      ;;
+>  
+>    no)
+> @@ -7197,6 +7200,9 @@ if test "$ivshmem" = "yes" ; then
+>  fi
+>  if test "$capstone" != "no" ; then
+>    echo "CONFIG_CAPSTONE=y" >> $config_host_mak
+> +  if test "$capstone_capstone_h" != "no" ; then
+> +    echo "CONFIG_CAPSTONE_CAPSTONE_H=y" >> $config_host_mak
+> +  fi
+>  fi
+>  if test "$debug_mutex" = "yes" ; then
+>    echo "CONFIG_DEBUG_MUTEX=y" >> $config_host_mak
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
