@@ -2,65 +2,79 @@ Return-Path: <SRS0=bvyN=TX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C7A3CC282DD
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 15:32:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F1690C282DD
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 15:36:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 964C12070D
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 15:32:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 964C12070D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id BE46121773
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 15:36:26 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="nz7IA0dH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BE46121773
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:38950 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:39029 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hTphh-0001WW-Rv
-	for qemu-devel@archiver.kernel.org; Thu, 23 May 2019 11:32:25 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:44649)
+	id 1hTpla-0003i8-0N
+	for qemu-devel@archiver.kernel.org; Thu, 23 May 2019 11:36:26 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:48039)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hTpZu-0003b9-24
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 11:24:22 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1hTpkh-0003Nh-VX
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 11:35:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hTpZt-0007Gw-6g
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 11:24:22 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52934)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>)
-	id 1hTpZt-0007GR-1S; Thu, 23 May 2019 11:24:21 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 569DF51145;
-	Thu, 23 May 2019 15:24:20 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-117-250.ams2.redhat.com
-	[10.36.117.250])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 248ED7BE78;
-	Thu, 23 May 2019 15:24:20 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
-	id AAA881138648; Thu, 23 May 2019 17:24:18 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Yuval Shaia <yuval.shaia@oracle.com>
-References: <20190505105112.22691-1-yuval.shaia@oracle.com>
-Date: Thu, 23 May 2019 17:24:18 +0200
-In-Reply-To: <20190505105112.22691-1-yuval.shaia@oracle.com> (Yuval Shaia's
-	message of "Sun, 5 May 2019 13:51:12 +0300")
-Message-ID: <871s0pjisd.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1 (gnu/linux)
+	(envelope-from <peter.maydell@linaro.org>) id 1hTpkg-0006WU-Nz
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 11:35:31 -0400
+Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:38397)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1hTpkg-0006Vz-Ho
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 11:35:30 -0400
+Received: by mail-oi1-x243.google.com with SMTP id u199so4692889oie.5
+	for <qemu-devel@nongnu.org>; Thu, 23 May 2019 08:35:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+	:cc; bh=eZiiQDvg04dzCzt56jsZ+MM8TN+mVrl0e4KLgW6VXiA=;
+	b=nz7IA0dHytUeM0k/3KjWPfBPC6NgQYCphpS2pxnCu4nTMjeCQKKTRvF1zvtKqiMSc+
+	BNm2naiCCkVk3UZzK7n+kMSSUQKKQjy8KdYz7jmz6d0M6OndFXWXT+Ic6FFN4KrSdg7c
+	1FD1QYJbloMXmGULJ1uV7bUtworyU1M3hQkjF6DOlLSMTFiWmcVcA0MXoZlsjhYUVy2J
+	NY/tDwz4LwmugSq0xcFnO/I0VnqtLeDgpj2l6BoIYpb8n8w1/xxzne8nnyGuP2VbrwJQ
+	jrd3917HBj4CVCZdVNWg2bq9erg402TE60dTPzFoA0QbEIANPTAZuutXdt7Q6SWm3Qx9
+	z9pA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+	:message-id:subject:to:cc;
+	bh=eZiiQDvg04dzCzt56jsZ+MM8TN+mVrl0e4KLgW6VXiA=;
+	b=MQ4iZB2ob2r5867/gJ+oqtITKvOyMT+vBLh7hhkvghE973Nh1RwZvhxNsg5bpi6B0I
+	0N+dEfG/aKZ1g71RUqq8xkRtIvxYN5dN9GWvwQ+Ck30WOeC8MjrO8dymDBiWCZdeA03e
+	jR78A1ScTBuG/XnZIUi23LmtH1+8rkVvl+Zsb/w8Ysy8OiUnLYxCSm+XX/CeDQsggBfe
+	JwBolZ3SF52p2ar/SuOPvscO811CuGkj5Gxzj0n5Yo/mJ5Br+gfijVZoIgdABdS4Hwpm
+	2sNgVUN5vxSqqmbkFSK3DK0P+zZl457BR+FUUzZFU3JKWhNOk9TvllI7dI8Hlb+oOBDj
+	EUlw==
+X-Gm-Message-State: APjAAAUaNNZcH30agYhkbfmq1ne61gljGhibVqIMJI5IDzr5+TV6YNDA
+	y1L3cQZq1NvjXZ6IfJ1IJ2bKivAoquPNbI1kTCEI7EH43Q4=
+X-Google-Smtp-Source: APXvYqwpTJBgUYT2vq3/1csTGqn9TwcSfS3wwRVaAFgmu71r530tBrFqR6e58hG+2/hUbMsj1xyCS3qb87f3VO34BeI=
+X-Received: by 2002:aca:cd12:: with SMTP id d18mr2923632oig.146.1558625729177; 
+	Thu, 23 May 2019 08:35:29 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.39]);
-	Thu, 23 May 2019 15:24:20 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH] hw/rdma: Delete unused headers inclusion
+References: <20190523140059.18548-1-richard.henderson@linaro.org>
+	<155862541672.24.12725600441391809811@549697c9ad12>
+In-Reply-To: <155862541672.24.12725600441391809811@549697c9ad12>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 23 May 2019 16:35:17 +0100
+Message-ID: <CAFEAcA-nZAW7QZNwtAEUXaLFzNr-Do9HAup9Sv-A8FzTp8zJkA@mail.gmail.com>
+To: QEMU Developers <qemu-devel@nongnu.org>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::243
+Subject: Re: [Qemu-devel] [PULL 00/13] Add RX architecture
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -72,41 +86,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, qemu-devel@nongnu.org
+Cc: Richard Henderson <richard.henderson@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Looks stuck.  Let's try qemu-trivial.
-
-Yuval Shaia <yuval.shaia@oracle.com> writes:
-
-> This is a trivial cleanup patch.
+On Thu, 23 May 2019 at 16:30, <no-reply@patchew.org> wrote:
 >
-> Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
-> ---
->  hw/rdma/rdma_backend.c | 7 -------
->  1 file changed, 7 deletions(-)
+
+> 3/13 Checking commit db39b054cd7e (target/rx: CPU definition)
+> WARNING: added, moved or deleted file(s), does MAINTAINERS need updating?
+> #14:
+> new file mode 100644
 >
-> diff --git a/hw/rdma/rdma_backend.c b/hw/rdma/rdma_backend.c
-> index d1660b6474..05f6b03221 100644
-> --- a/hw/rdma/rdma_backend.c
-> +++ b/hw/rdma/rdma_backend.c
-> @@ -14,16 +14,9 @@
->   */
->  
->  #include "qemu/osdep.h"
-> -#include "sysemu/sysemu.h"
-> -#include "qapi/error.h"
-> -#include "qapi/qmp/qlist.h"
-> -#include "qapi/qmp/qnum.h"
->  #include "qapi/qapi-events-rdma.h"
->  
->  #include <infiniband/verbs.h>
-> -#include <infiniband/umad_types.h>
-> -#include <infiniband/umad.h>
-> -#include <rdma/rdma_user_cm.h>
->  
->  #include "contrib/rdmacm-mux/rdmacm-mux.h"
->  #include "trace.h"
+> ERROR: code indent should never use tabs
+> #383: FILE: target/rx/cpu.h:137:
+> +    qemu_irq ack;^I^I/* Interrupt acknowledge */$
+>
+> total: 1 errors, 1 warnings, 599 lines checked
+>
+> Patch 3/13 has style problems, please review.  If any of these errors
+> are false positives report them to the maintainer, see
+> CHECKPATCH in MAINTAINERS.
+
+> 5/13 Checking commit c06f2e7abea6 (hw/intc: RX62N interrupt controller (ICUa))
+> WARNING: added, moved or deleted file(s), does MAINTAINERS need updating?
+> #39:
+> new file mode 100644
+>
+> ERROR: code indent should never use tabs
+> #434: FILE: include/hw/intc/rx_icu.h:9:
+> +    TRG_NEDGE = 1,^I/* Falling */$
+>
+> ERROR: code indent should never use tabs
+> #435: FILE: include/hw/intc/rx_icu.h:10:
+> +    TRG_PEDGE = 2,^I/* Raising */$
+>
+> ERROR: code indent should never use tabs
+> #436: FILE: include/hw/intc/rx_icu.h:11:
+> +    TRG_BEDGE = 3,^I/* Both */$
+>
+> total: 3 errors, 1 warnings, 442 lines checked
+
+I'm not going to block the pull request just for a code style
+issue, but it would be nice if you could send a followup patch
+once this has landed that fixes the hard-coded tabs.
+
+thanks
+-- PMM
 
