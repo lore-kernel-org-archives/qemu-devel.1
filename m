@@ -2,79 +2,80 @@ Return-Path: <SRS0=bvyN=TX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B5B81C282DD
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 11:05:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 29979C282DD
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 11:06:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8692720868
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 11:05:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8692720868
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id E659720868
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 11:06:16 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="nn3ujwZk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E659720868
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:33799 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:33817 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hTlXi-0005FK-RJ
-	for qemu-devel@archiver.kernel.org; Thu, 23 May 2019 07:05:50 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:59587)
+	id 1hTlY8-0005cp-7r
+	for qemu-devel@archiver.kernel.org; Thu, 23 May 2019 07:06:16 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:58605)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hTlWT-0004ZJ-AP
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 07:04:34 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1hTlSd-0001wa-H8
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 07:00:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hTlWS-0002L5-7y
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 07:04:33 -0400
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:39163)
+	(envelope-from <peter.maydell@linaro.org>) id 1hTlSb-0008UZ-6q
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 07:00:34 -0400
+Received: from mail-ot1-x32e.google.com ([2607:f8b0:4864:20::32e]:41250)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hTlWR-0002JQ-VX
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 07:04:32 -0400
-Received: by mail-wr1-f66.google.com with SMTP id w8so5787447wrl.6
-	for <qemu-devel@nongnu.org>; Thu, 23 May 2019 04:04:31 -0700 (PDT)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1hTlSa-0008TL-Jn
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 07:00:33 -0400
+Received: by mail-ot1-x32e.google.com with SMTP id l25so4986521otp.8
+	for <qemu-devel@nongnu.org>; Thu, 23 May 2019 04:00:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+	:cc; bh=Yhv+xi8WspiYJH56L/JUHWhHhG9zt3ZSFc9V098CUOg=;
+	b=nn3ujwZknruEWzcce8NLT2a1DWNBlCI+Is9u+QnTW8xL440e0djMaSZzDYCnC1ztQw
+	mmOxr4aT1RC86+6HgvQ58QboIy5k8FY98r89z52qwBbL3JrqQx2DuvFtLxkJtt4t5D1P
+	pbekmgGP62pAHMSH7VfpVaVdm2pCvXIgzSi2yYsamM6vOuV/yoevU9wUqDlBiWHexpBo
+	Cxfw7z5xb+rPJpdbLeZJYUlNJuD3ockC6guchiwzVnRQC43wWMIeDKScFT9lAEbVEvrW
+	vjoDNeNFwXId9RTsgH21ODTdrnSZuk1WoiIvP3gcWz4Ln6PYxG/lXaaW+1TILxMRTL4J
+	D/8g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-	:date:user-agent:mime-version:in-reply-to:content-language
-	:content-transfer-encoding;
-	bh=OwN+pwQUriCQg8TUCykP3vzy3AyHFTI8ShPIUrbCp3s=;
-	b=tvwBiukCV395TEebLdcoiNlI8Ze9jCceKH5FCHIKjFHJIXiwJzIG+5hMvZFUI3GsdK
-	OLMuzWDD41t/BkE8uvDER6yeGA9Rrl3o6U5+GLESuwDFrmbYb2mD8PXg9eV4+zHoCEKl
-	hPf5X15y3xZWhRkm6ojaFWjBqWyp0VVh8z0SdQ4DFosYnr3ERW6z3tu+H+5jeT692T0g
-	MQ5+P/oA4aCnbVuxuPs+S/rMtuASMZR56wi6Aw6fKb6wRgRCBALDK5NVutDK/W8RvEYx
-	+gErbEDEyaYcCfRDOEiaIz1onqc4GkbbKZE4KOfeN+iEgfJqmeRYsVcTg2VIHaXxC/DX
-	NhQA==
-X-Gm-Message-State: APjAAAUHTwROeVhjFoZEHW3oQ33wpgm67Rw3AalaXYMMSsPl+DpvxeuG
-	EyQxHSCcnpEFdo412VPe4G6iWA==
-X-Google-Smtp-Source: APXvYqwFJEdcLaMajC5/Ckj5dAtdtmA4IAYW8SyTx6tojYM71VUL+bOfCh5vZB7DIO+ncEOsBfLjkw==
-X-Received: by 2002:adf:cd0d:: with SMTP id w13mr57355907wrm.38.1558609470944; 
-	Thu, 23 May 2019 04:04:30 -0700 (PDT)
-Received: from [192.168.1.38] (228.red-83-52-173.dynamicip.rima-tde.net.
-	[83.52.173.228]) by smtp.gmail.com with ESMTPSA id
-	d17sm23309752wrw.18.2019.05.23.04.04.29
-	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-	Thu, 23 May 2019 04:04:30 -0700 (PDT)
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-References: <20190523024229.1158-1-richard.henderson@linaro.org>
-	<20190523024229.1158-2-richard.henderson@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
-	url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <576eff59-1691-cd13-b3a6-ce1cd378980f@redhat.com>
-Date: Thu, 23 May 2019 13:04:29 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+	:message-id:subject:to:cc;
+	bh=Yhv+xi8WspiYJH56L/JUHWhHhG9zt3ZSFc9V098CUOg=;
+	b=maLQ+j2nO4iPLqG3l4PAOBpn1qZCk8Sv+IWhwAQRahyovDxn+iu/zgbv6mzgG0M09Q
+	Tg1PIe2XT5RwKMbFtOtc1Rz5M/dSC/+fhNkqTu+fd1v0bwxpQ4kCgaT5el2jb5riIfeS
+	2kHlk3CskeG1z2EDxet9Merty7KSHbSbfVrdG+qC11UQ9vlWsVSoz2e70VnZ4gahWdI/
+	U5pjcoUl7cnrx8+7XZ0nvT3rtQTL8JlzdY8a2RWfQ6S1ZzTkd9ckbzJt9PmnZi4PqE2n
+	Szt62KCm/p4qrdpUPS98b7+PtnRG/7I8seyDWHZPWHvKJXvc8iUKSt1kS3udmwbVpyWO
+	R58Q==
+X-Gm-Message-State: APjAAAWAfqzlKG8faD7Kw9zGauaENwpw56hIMHpf0FWF+fl55N3OEPkC
+	9sOa1UzI/pFalrm3L9P6os9TTbCRNHHRnxfC0bzUSiKO9hQ=
+X-Google-Smtp-Source: APXvYqxvwRqpXICkKdXG0TMM+wx16Wqduz1whIU1NyNqZhPIzAGNCSmmP1s6SVMUOvRnE+/Ch7hYR1Bhl/OH0eodidc=
+X-Received: by 2002:a05:6830:149a:: with SMTP id
+	s26mr27394184otq.221.1558609231015; 
+	Thu, 23 May 2019 04:00:31 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20190523024229.1158-2-richard.henderson@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-	[fuzzy]
-X-Received-From: 209.85.221.66
-Subject: Re: [Qemu-devel] [PATCH 1/3] capstone: Adjust include of capstone.h
+References: <20190522134726.19225-1-armbru@redhat.com>
+In-Reply-To: <20190522134726.19225-1-armbru@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 23 May 2019 12:00:20 +0100
+Message-ID: <CAFEAcA9Q=q+eSQ=ppQU08kpj5ZoBxak1AdY8Rk=P25Jb0SAbdw@mail.gmail.com>
+To: Markus Armbruster <armbru@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::32e
+Subject: Re: [Qemu-devel] [PULL 0/5] Miscellaneous patches for 2019-05-22
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -86,62 +87,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: alex.bennee@linaro.org, david@redhat.com
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/23/19 4:42 AM, Richard Henderson wrote:
-> Since v4.0, capstone.h has moved to <capstone/capstone.h>.
-> 
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->  include/disas/capstone.h | 4 ++++
->  configure                | 6 ++++++
->  2 files changed, 10 insertions(+)
-> 
-> diff --git a/include/disas/capstone.h b/include/disas/capstone.h
-> index e29068dd97..90631d84a9 100644
-> --- a/include/disas/capstone.h
-> +++ b/include/disas/capstone.h
-> @@ -3,7 +3,11 @@
->  
->  #ifdef CONFIG_CAPSTONE
->  
-> +#ifdef CONFIG_CAPSTONE_CAPSTONE_H
-> +#include <capstone/capstone.h>
-> +#else
->  #include <capstone.h>
-> +#endif
->  
->  #else
->  
-> diff --git a/configure b/configure
-> index d2fc346302..eec7f061c3 100755
-> --- a/configure
-> +++ b/configure
-> @@ -5021,6 +5021,9 @@ case "$capstone" in
->    system)
->      QEMU_CFLAGS="$QEMU_CFLAGS $($pkg_config --cflags capstone)"
->      LIBS="$($pkg_config --libs capstone) $LIBS"
-> +    if check_include capstone/capstone.h; then
-> +      capstone_capstone_h=yes
-> +    fi
->      ;;
->  
->    no)
-> @@ -7197,6 +7200,9 @@ if test "$ivshmem" = "yes" ; then
->  fi
->  if test "$capstone" != "no" ; then
->    echo "CONFIG_CAPSTONE=y" >> $config_host_mak
-> +  if test "$capstone_capstone_h" != "no" ; then
-> +    echo "CONFIG_CAPSTONE_CAPSTONE_H=y" >> $config_host_mak
-> +  fi
->  fi
->  if test "$debug_mutex" = "yes" ; then
->    echo "CONFIG_DEBUG_MUTEX=y" >> $config_host_mak
-> 
+On Wed, 22 May 2019 at 14:51, Markus Armbruster <armbru@redhat.com> wrote:
+>
+> The following changes since commit a4f667b6714916683408b983cfe0a615a725775f:
+>
+>   Merge remote-tracking branch 'remotes/cohuck/tags/s390x-20190521-3' into staging (2019-05-21 16:30:13 +0100)
+>
+> are available in the Git repository at:
+>
+>   git://repo.or.cz/qemu/armbru.git tags/pull-misc-2019-05-22
+>
+> for you to fetch changes up to db3d11ee3f0cb851124830172f0a93c3d77a450a:
+>
+>   cutils: Simplify how parse_uint() checks for whitespace (2019-05-22 15:00:04 +0200)
+>
+> ----------------------------------------------------------------
+> Miscellaneous patches for 2019-05-22
+>
+> ----------------------------------------------------------------
+> Markus Armbruster (5):
+>       qemu-bridge-helper: Fix misuse of isspace()
+>       tests/vhost-user-bridge: Fix misuse of isdigit()
+>       gdbstub: Reject invalid RLE repeat counts
+>       gdbstub: Fix misuse of isxdigit()
+>       cutils: Simplify how parse_uint() checks for whitespace
+>
+>  gdbstub.c                 | 20 ++++++++++++--------
+>  qemu-bridge-helper.c      |  6 +++---
+>  tests/vhost-user-bridge.c |  3 ++-
+>  util/cutils.c             |  2 +-
+>  4 files changed, 18 insertions(+), 13 deletions(-)
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+
+Applied, thanks.
+
+Please update the changelog at https://wiki.qemu.org/ChangeLog/4.1
+for any user-visible changes.
+
+-- PMM
 
