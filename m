@@ -2,81 +2,63 @@ Return-Path: <SRS0=bvyN=TX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_MUTT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 18ED1C282DD
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 09:39:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F6A8C282DD
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 09:45:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CE5592070D
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 09:39:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CE5592070D
+	by mail.kernel.org (Postfix) with ESMTPS id 8A4D720862
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 09:45:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8A4D720862
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:60616 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:60837 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hTkC7-00048z-5J
-	for qemu-devel@archiver.kernel.org; Thu, 23 May 2019 05:39:27 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:38680)
+	id 1hTkHZ-0005aq-My
+	for qemu-devel@archiver.kernel.org; Thu, 23 May 2019 05:45:05 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:41411)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hTkBL-0003pc-5p
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 05:38:40 -0400
+	(envelope-from <stefanha@redhat.com>) id 1hTkGh-0005H0-OP
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 05:44:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hTkBJ-0003R3-N2
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 05:38:39 -0400
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:41269)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hTkBJ-0003Qc-Cs
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 05:38:37 -0400
-Received: by mail-wr1-f68.google.com with SMTP id u16so1594123wrn.8
-	for <qemu-devel@nongnu.org>; Thu, 23 May 2019 02:38:37 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-	:date:user-agent:mime-version:in-reply-to:content-language
-	:content-transfer-encoding;
-	bh=HzKe0VhfNL4llBZ3W4blN1UunpXuzs6goV8BEs0gpFc=;
-	b=cg0a9z282S9SzifamBVh7dWgsWFpXSnfAUwAUx2NBnh5BkpL9D+1z3celyIQalypst
-	z/4fXDVyzJGY7+OIBWLO/vKKeph6sppH/G297XaP9ZBLB1Q8c2ZTv0Mm4She0FKuhTkN
-	3RfqiPlv6xgCT47bUwWB+27HXFecUtYQCWZl9YBqIDpv5A3mxHTvSfYjMCb5EoCwxAI0
-	Hipxq+1z1sSHMQu0+txX1ED2oWxXnZAgzlDArDV57wZPi1qCA05YmHpdeVurL+eVwIXJ
-	g7e440kbhKFS7b6P/WjSDc4PFY96fPjk5Rozxqjr2kTxtnyDbKDBwzyC6XPvu5v/kw1Z
-	wdFQ==
-X-Gm-Message-State: APjAAAWzyvWZ9KJDlnI1dny45/kYFiEtrMr/52AlIvIVvxSxDRmzC+KO
-	BBVRZ42/3ZGmVK5JuHms5F1bqQ==
-X-Google-Smtp-Source: APXvYqy9QMDOcp0bu3yfy2AxOORF8e7cac4MFbI64T4USjDorZbwpJI1cRBRmqCgfOqTAFpbGUM8Ig==
-X-Received: by 2002:adf:e94b:: with SMTP id m11mr425545wrn.133.1558604316207; 
-	Thu, 23 May 2019 02:38:36 -0700 (PDT)
-Received: from [192.168.1.38] (228.red-83-52-173.dynamicip.rima-tde.net.
-	[83.52.173.228]) by smtp.gmail.com with ESMTPSA id
-	s10sm23738110wrt.66.2019.05.23.02.38.35
-	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-	Thu, 23 May 2019 02:38:35 -0700 (PDT)
-To: Eduardo Habkost <ehabkost@redhat.com>, Cleber Rosa <crosa@redhat.com>
-References: <20190520231910.12184-1-f4bug@amsat.org>
-	<20190522211230.GA10764@habkost.net>
-	<1711852617.24204010.1558561566547.JavaMail.zimbra@redhat.com>
-	<20190522230705.GB10764@habkost.net>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
-	url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <7a046f76-c892-a796-e7d0-b0eda92075d9@redhat.com>
-Date: Thu, 23 May 2019 11:38:34 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	(envelope-from <stefanha@redhat.com>) id 1hTkGg-0006oz-UR
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 05:44:11 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53440)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>)
+	id 1hTkGe-0006mq-JN; Thu, 23 May 2019 05:44:08 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 5CA7081E08;
+	Thu, 23 May 2019 09:44:02 +0000 (UTC)
+Received: from localhost (ovpn-116-196.ams2.redhat.com [10.36.116.196])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id D0E831802F;
+	Thu, 23 May 2019 09:43:58 +0000 (UTC)
+Date: Thu, 23 May 2019 10:43:57 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <20190523094357.GD26632@stefanha-x1.localdomain>
+References: <20190521084522.15050-1-vsementsov@virtuozzo.com>
 MIME-Version: 1.0
-In-Reply-To: <20190522230705.GB10764@habkost.net>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="IMjqdzrDRly81ofr"
+Content-Disposition: inline
+In-Reply-To: <20190521084522.15050-1-vsementsov@virtuozzo.com>
+User-Agent: Mutt/1.11.4 (2019-03-13)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.25]);
+	Thu, 23 May 2019 09:44:02 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-	[fuzzy]
-X-Received-From: 209.85.221.68
-Subject: Re: [Qemu-devel] [PATCH 0/4] mips: Add more Avocado tests
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [RFC PATCH 0/3] block: qiov_offset parameter for io
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -88,85 +70,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Aleksandar Rikalo <arikalo@wavecomp.com>,
-	=?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
-	Wainer dos Santos Moschetta <wainersm@redhat.com>,
-	qemu-devel@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>,
-	Aleksandar Markovic <amarkovic@wavecomp.com>,
-	Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Cc: kwolf@redhat.com, fam@euphon.net, qemu-block@nongnu.org,
+	qemu-devel@nongnu.org, mreitz@redhat.com, den@openvz.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/23/19 1:07 AM, Eduardo Habkost wrote:
-> On Wed, May 22, 2019 at 05:46:06PM -0400, Cleber Rosa wrote:
->> ----- Original Message -----
->>> From: "Eduardo Habkost" <ehabkost@redhat.com>
->>> On Tue, May 21, 2019 at 01:19:06AM +0200, Philippe Mathieu-Daudé wrote:
->>>> Hi,
->>>>
->>>> It was a rainy week-end here, so I invested it to automatize some
->>>> of my MIPS tests.
->>>>
->>>> The BootLinuxSshTest is not Global warming friendly, it is not
->>>> meant to run on a CI system but rather on a workstation previous
->>>> to post a pull request.
->>>> It can surely be improved, but it is a good starting point.
->>>
->>> Until we actually have a mechanism to exclude the test case on
->>> travis-ci, I will remove patch 4/4 from the queue.  Aleksandar,
->>> please don't merge patch 4/4 yet or it will break travis-ci.
->>>
->>> Cleber, Wainer, is it already possible to make "avocado run" skip
->>> tests tagged with "slow"?
->>>
->>
->> The mechanism exists, but we haven't tagged any test so far as slow.
->>
->> Should we define/document a criteria for a test to be slow?  Given
->> that this is highly subjective, we have to think of:
->>
->>  * Will we consider the average or maximum run time (the timeout
->>    definition)?
->>  
->>  * For a single test, what is "slow"? Some rough numbers from Travis
->>    CI[1] to help us with guidelines:
->>    - boot_linux_console.py:BootLinuxConsole.test_x86_64_pc:  PASS (6.04 s)
->>    - boot_linux_console.py:BootLinuxConsole.test_arm_virt:  PASS (2.91 s)
->>    - linux_initrd.py:LinuxInitrd.test_with_2gib_file_should_work_with_linux_v4_16:  PASS (18.14 s)
->>    - boot_linux.py:BootLinuxAarch64.test_virt:  PASS (396.88 s)
-> 
-> I don't think we need to overthink this.  Whatever objective
-> criteria we choose, I'm sure we'll have to adapt them later due
-> to real world problems.
-> 
-> e.g.: is 396 seconds too slow?  I don't know, it depends: does it
-> break Travis and other CI systems often because of timeouts?  If
-> yes, then we should probably tag it as slow.
-> 
-> If having subjective criteria is really a problem (I don't think
-> it is), then we can call the tag "skip_travis", and stop worrying
-> about defining what exactly is "slow".
 
-I'd go with a simpler "tags:travis-ci" whitelisting any job expecting to
-run smoothly there.
+--IMjqdzrDRly81ofr
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Then we can add "slow" tests without having to worry about blacklisting
-for Travis CI.
-Also, Other CI can set different timeouts.
+On Tue, May 21, 2019 at 11:45:19AM +0300, Vladimir Sementsov-Ogievskiy wrot=
+e:
+> Hi all!
+>=20
+> Here is idea of adding qiov_offset parameter to io path, to avoid
+> a lot of places with same pattern of creating local_qiov or hd_qiov
+> variables. Here is only read path for qcow2, if we like it, I'll
+> make v2 with both read and write paths for qcow2.
+>=20
+> Vladimir Sementsov-Ogievskiy (3):
+>   block/io: introduce bdrv_co_preadv_part
+>   block/qcow2: refactor qcow2_co_preadv to use buffer-based io
+>   block/qcow2: implement .bdrv_co_preadv_part
+>=20
+>  include/block/block_int.h |  6 +++
+>  block/io.c                | 87 ++++++++++++++++++++++++++-------------
+>  block/qcow2.c             | 67 +++++++++++++++---------------
+>  3 files changed, 97 insertions(+), 63 deletions(-)
 
-I'd like maintainers to add as many tests as they want to upstream, so
-these tests can eventually run by anyone, then each maintainer is free
-to select which particular set he wants to run as default.
+I like it!
 
->>  * Do we want to set a maximum job timeout?  This way we can skip
->>    tests after a given amount of time has passed.  Currently we interrupt
->>    the test running when the job timeout is reached, but it's possible
->>    to add a option so that no new tests will be started, but currently
->>    running ones will be waited on.
-> 
-> I'm not sure I understand the suggestion to skip tests.  If we
-> skip tests after a timeout, how would we differentiate a test
-> being expectedly slow from a QEMU hang?
-> 
+Stefan
+
+--IMjqdzrDRly81ofr
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAlzma10ACgkQnKSrs4Gr
+c8gPBggAsZcyFq0mGR0wVcMiIC6Z3p7B7SCMwZmNGiUUr10SV0T3dYkxouuGiIFM
+ooXiPLg2fnfdqxiYQidqUUt/kUO8creex7J3W2ro0VvAMJycvrdASV49AYrITcuS
+9e8/IgZ3k5FgIRqNQB+MxEvz2zJrVbfH3gvJK6QXQSbNwrZ3WLfopvK4o+rXXdTa
+xppa+mYRbJyL5UX5LKcE50PW/4VzWiyoXpX3S18UZeupnDGsPrFT6Q6jeZ8cISvt
+k7YjCID7vhrrc9kQNTIZVnlPNBXwbBNK4GuEmE23Fhw3kGjFnTkMqL33pKY8t009
+DHOEckKcfc640tPXJ5DG5ifxtRKW1w==
+=45c2
+-----END PGP SIGNATURE-----
+
+--IMjqdzrDRly81ofr--
 
