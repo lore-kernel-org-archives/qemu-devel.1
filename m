@@ -2,94 +2,60 @@ Return-Path: <SRS0=bvyN=TX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A57FC282DD
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 13:33:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DB9E0C282DD
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 13:34:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5351920B1F
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 13:33:25 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="yydjUWk7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5351920B1F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id A772F20863
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 13:34:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A772F20863
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:36351 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:36372 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hTnqU-00032g-92
-	for qemu-devel@archiver.kernel.org; Thu, 23 May 2019 09:33:22 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:60984)
+	id 1hTnrw-00047S-SQ
+	for qemu-devel@archiver.kernel.org; Thu, 23 May 2019 09:34:52 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:34114)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hTnaB-0005Ey-Ny
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 09:16:32 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1hTnea-0000Ev-Ks
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 09:21:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hTna9-0001xO-R5
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 09:16:31 -0400
-Received: from mail-ua1-x943.google.com ([2607:f8b0:4864:20::943]:37632)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hTna7-0001vJ-QT
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 09:16:29 -0400
-Received: by mail-ua1-x943.google.com with SMTP id t18so2158101uar.4
-	for <qemu-devel@nongnu.org>; Thu, 23 May 2019 06:16:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
-	:mime-version:in-reply-to:content-language:content-transfer-encoding;
-	bh=6KS9d5eT0YUL9nz8APaV1sldA/n7utywrrWd4/ev3xY=;
-	b=yydjUWk7RE6UHu0YchjMy59fZJv9VG1WnbKXFq6LnFu/6FZzfa+PrkFgX1G9AH0NRp
-	jNueNYOoDqY7KYqeHD9k3J13K2F3n7IDE5OJQMvwqS1yW0FMjhUlnj6saIGA01T4T5F5
-	ZMt+aEyE8dI2f3DqlyaUbCmnW/FEHTbPRC32eMkjHwdi+ccHOtQXfQk2JZdgIep1QX6K
-	oxbka8/f6EuX6T1waXXDRT8Qbn3z2zDFlHSAzOTjookm/D/VZuhlXCNltllmG5i/VASn
-	qHfOZPUhcgfN2QOuftgMHIIuoIrs6plkCwFqcypwkd3w7x0bd4YVBZ4YyzhFaX4fXTel
-	VfEw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-	:date:user-agent:mime-version:in-reply-to:content-language
-	:content-transfer-encoding;
-	bh=6KS9d5eT0YUL9nz8APaV1sldA/n7utywrrWd4/ev3xY=;
-	b=mnPHsOvUm7QZ/RmopzbKxnnaPgADDRzRPsr7ExAOvrv36IZasK5mhR0d9VkriPamGI
-	A0a1u0/kqSixbHWd3xZKxJ0M6BULRSJUXbH2J/V6fOzicxkvDVzGITVtrRnySb2tgghV
-	vgOqeIEzKaRYnRyPM+ov6Y5aVrBE6dH35X642JqOgYnLBqQmXAfuefDqyx07s7QT1vzH
-	6DF7yjHdLxAZ5pmtB59y++Q5Rl9yKyUXolMe3OsCRa1PiJofCVHbbusuLWXFU1NcK3cp
-	nS1yeCpJBIlQY+n5hoDGJFlGJE+40xOlkzyIfI0ysW8LadB4Noe20itGaCL8j8dcr+KK
-	pgLw==
-X-Gm-Message-State: APjAAAXYxZy1tQsL5RqZJOHVaYb3rKfxDu9U4By8AKvpreZTzi2/Xq/a
-	xoyP0ek1KBUJ+2Kdmoc2Cm+OqA==
-X-Google-Smtp-Source: APXvYqwR1B6t3pXGUj3KDctNsoVS0MHWpAm0485s/+Co/XKbz3JPE94an4CmqfFuNIkJW8Se54I2XA==
-X-Received: by 2002:ab0:1849:: with SMTP id j9mr191283uag.75.1558617386118;
-	Thu, 23 May 2019 06:16:26 -0700 (PDT)
-Received: from [192.168.43.94] (ip-173-130-215-183.orldfl.spcsdns.net.
-	[173.130.215.183]) by smtp.gmail.com with ESMTPSA id
-	o11sm13113027vkf.13.2019.05.23.06.16.24
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Thu, 23 May 2019 06:16:25 -0700 (PDT)
-To: Peter Maydell <peter.maydell@linaro.org>
-References: <20190518191934.21887-1-richard.henderson@linaro.org>
-	<20190518191934.21887-3-richard.henderson@linaro.org>
-	<CAFEAcA88nA_2u1Yc-9ZPAy2w6LVk5f9Rrss0e53E11W4Xb4YpA@mail.gmail.com>
-	<e177b43a-2abc-3aee-461c-2cfd9a8a0a20@linaro.org>
-	<CAFEAcA_1XuWqVu9gonn5_Y9x1V=UcWNHEXtwop2s0qyUbwiZpg@mail.gmail.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <13d9e22b-4ac5-fb87-622c-a99b5494d06c@linaro.org>
-Date: Thu, 23 May 2019 09:16:21 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	(envelope-from <marcandre.lureau@redhat.com>) id 1hTneZ-0004TO-Ei
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 09:21:04 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40850)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+	id 1hTneZ-0004KV-8D
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 09:21:03 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 8E82B30821BF
+	for <qemu-devel@nongnu.org>; Thu, 23 May 2019 13:20:43 +0000 (UTC)
+Received: from localhost (ovpn-112-51.ams2.redhat.com [10.36.112.51])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 7C80F5B681;
+	Thu, 23 May 2019 13:20:36 +0000 (UTC)
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+To: qemu-devel@nongnu.org
+Date: Thu, 23 May 2019 15:20:27 +0200
+Message-Id: <20190523132035.20559-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_1XuWqVu9gonn5_Y9x1V=UcWNHEXtwop2s0qyUbwiZpg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::943
-Subject: Re: [Qemu-devel] [PATCH 2/2] target/arm: Use tcg_gen_gvec_bitsel
+Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.47]);
+	Thu, 23 May 2019 13:20:43 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PATCH v8 0/8] Add vhost-user-gpu
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -101,27 +67,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
+	Paolo Bonzini <pbonzini@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/23/19 9:08 AM, Peter Maydell wrote:
->> Because the three different instructions perform the same operation with
->> reshuffled register arguments.
-> 
-> Ah, so they do. Next question, how do I find out what the
-> order of arguments in the above code means so I can compare
-> it against the pseudocode expression we're implementing?
+Hi,
 
->From tcg/README:
+vhost-user allows to drive a virtio device in a seperate
+process. After vhost-user-net, we have seen
+vhost-user-{scsi,blk,crypto,input} added more recently.
 
-* bitsel_vec v0, v1, v2, v3
+This series, initially proposed ~3 years ago, time flies
+(https://lists.gnu.org/archive/html/qemu-devel/2016-06/msg01905.html)
+contributes with vhost-user-gpu.
 
-  Bitwise select, v0 = (v2 & v1) | (v3 & ~v1), across the entire vector.
+You may start a vhost-user-gpu with virgl rendering in a separate
+process like this:
 
-The "selector" is second, the first input operand.
+$ ./vhost-user-gpu --virgl -s vgpu.sock &
+$ qemu...
+  -chardev socket,id=3Dchr,path=3Dvgpu.sock
+  -device vhost-user-vga,chardev=3Dchr
 
+v8:
+ - document protocol bitmaps format, with pixman format
+ - rebased, fixing a few conflicts
 
-r~
+v7:
+ - add "framed" replies to the vhost-user-gpu protocol
+ - use GBM library instead of drm-vendor APIs
+ - added "virtio-gpu: add a pixman helper header"
+
+v6:
+ - do not install vhost-user-input
+ - install vhost-user-gpu and json file following the spec
+ - fix the build when drm-intel-devel missing
+ - rebase (& resend without already applied patches)
+
+v5:
+ - remove user-creatable version of vhost-user-backend
+ - remove optinal management of sub-process in vhost-user-backend
+ - removed daemonize/pid code
+ - drop introduction of new input & gpu messages for PCI config space
+   handling, instead use VHOST_USER_PROTOCOL_F_CONFIG
+ - plain mem & udmabuf fallback for 2d rendering
+ - rebased, kconfig-ify, rst-ify
+
+Marc-Andr=C3=A9 Lureau (8):
+  vhost-user: add vhost_user_gpu_set_socket()
+  virtio-gpu: add bswap helpers header
+  virtio-gpu: add a pixman helper header
+  util: compile drm.o on Linux
+  contrib: add vhost-user-gpu
+  virtio-gpu: split virtio-gpu, introduce virtio-gpu-base
+  virtio-gpu: split virtio-gpu-pci & virtio-vga
+  hw/display: add vhost-user-vga & gpu-pci
+
+ configure                                  |   17 +
+ contrib/libvhost-user/libvhost-user.h      |    1 +
+ contrib/vhost-user-gpu/virgl.h             |   25 +
+ contrib/vhost-user-gpu/vugbm.h             |   67 ++
+ contrib/vhost-user-gpu/vugpu.h             |  177 +++
+ hw/display/virtio-vga.h                    |   32 +
+ include/hw/virtio/vhost-backend.h          |    2 +
+ include/hw/virtio/virtio-gpu-bswap.h       |   61 +
+ include/hw/virtio/virtio-gpu-pci.h         |   40 +
+ include/hw/virtio/virtio-gpu-pixman.h      |   45 +
+ include/hw/virtio/virtio-gpu.h             |   92 +-
+ contrib/libvhost-user/libvhost-user.c      |    1 +
+ contrib/vhost-user-gpu/main.c              | 1185 ++++++++++++++++++++
+ contrib/vhost-user-gpu/virgl.c             |  579 ++++++++++
+ contrib/vhost-user-gpu/vugbm.c             |  331 ++++++
+ hw/display/vhost-user-gpu-pci.c            |   51 +
+ hw/display/vhost-user-gpu.c                |  607 ++++++++++
+ hw/display/vhost-user-vga.c                |   52 +
+ hw/display/virtio-gpu-3d.c                 |   49 +-
+ hw/display/virtio-gpu-base.c               |  268 +++++
+ hw/display/virtio-gpu-pci.c                |   55 +-
+ hw/display/virtio-gpu.c                    |  444 ++------
+ hw/display/virtio-vga.c                    |  138 +--
+ hw/virtio/vhost-user.c                     |   11 +
+ vl.c                                       |    1 +
+ MAINTAINERS                                |   10 +-
+ Makefile                                   |   24 +-
+ Makefile.objs                              |    1 +
+ contrib/vhost-user-gpu/50-qemu-gpu.json.in |    5 +
+ contrib/vhost-user-gpu/Makefile.objs       |   10 +
+ docs/interop/index.rst                     |    1 +
+ docs/interop/vhost-user-gpu.rst            |  242 ++++
+ docs/interop/vhost-user.rst                |    9 +
+ hw/display/Kconfig                         |   10 +
+ hw/display/Makefile.objs                   |    5 +-
+ rules.mak                                  |    9 +-
+ util/Makefile.objs                         |    2 +-
+ 37 files changed, 4175 insertions(+), 484 deletions(-)
+ create mode 100644 contrib/vhost-user-gpu/virgl.h
+ create mode 100644 contrib/vhost-user-gpu/vugbm.h
+ create mode 100644 contrib/vhost-user-gpu/vugpu.h
+ create mode 100644 hw/display/virtio-vga.h
+ create mode 100644 include/hw/virtio/virtio-gpu-bswap.h
+ create mode 100644 include/hw/virtio/virtio-gpu-pci.h
+ create mode 100644 include/hw/virtio/virtio-gpu-pixman.h
+ create mode 100644 contrib/vhost-user-gpu/main.c
+ create mode 100644 contrib/vhost-user-gpu/virgl.c
+ create mode 100644 contrib/vhost-user-gpu/vugbm.c
+ create mode 100644 hw/display/vhost-user-gpu-pci.c
+ create mode 100644 hw/display/vhost-user-gpu.c
+ create mode 100644 hw/display/vhost-user-vga.c
+ create mode 100644 hw/display/virtio-gpu-base.c
+ create mode 100644 contrib/vhost-user-gpu/50-qemu-gpu.json.in
+ create mode 100644 contrib/vhost-user-gpu/Makefile.objs
+ create mode 100644 docs/interop/vhost-user-gpu.rst
+
+--=20
+2.22.0.rc1.1.g079e7d2849.dirty
+
 
