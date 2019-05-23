@@ -2,80 +2,81 @@ Return-Path: <SRS0=bvyN=TX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FC2CC282DD
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 09:37:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 18ED1C282DD
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 09:39:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3F5EF20675
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 09:37:13 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="YUHTu69m"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3F5EF20675
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yandex-team.ru
+	by mail.kernel.org (Postfix) with ESMTPS id CE5592070D
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 09:39:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CE5592070D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:60604 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:60616 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hTk9w-0003Sz-IA
-	for qemu-devel@archiver.kernel.org; Thu, 23 May 2019 05:37:12 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:38135)
+	id 1hTkC7-00048z-5J
+	for qemu-devel@archiver.kernel.org; Thu, 23 May 2019 05:39:27 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:38680)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yury-kotov@yandex-team.ru>) id 1hTk96-0003Bd-Hx
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 05:36:21 -0400
+	(envelope-from <philmd@redhat.com>) id 1hTkBL-0003pc-5p
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 05:38:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yury-kotov@yandex-team.ru>) id 1hTk95-0002fo-59
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 05:36:20 -0400
-Received: from forwardcorp1p.mail.yandex.net ([77.88.29.217]:42490)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yury-kotov@yandex-team.ru>)
-	id 1hTk94-0002d9-HG
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 05:36:19 -0400
-Received: from mxbackcorp1g.mail.yandex.net (mxbackcorp1g.mail.yandex.net
-	[IPv6:2a02:6b8:0:1402::301])
-	by forwardcorp1p.mail.yandex.net (Yandex) with ESMTP id 7721F2E0B08;
-	Thu, 23 May 2019 12:36:13 +0300 (MSK)
-Received: from localhost (localhost [::1])
-	by mxbackcorp1g.mail.yandex.net (nwsmtp/Yandex) with ESMTP id
-	ZCdohZaU6f-aDkW9uon; Thu, 23 May 2019 12:36:13 +0300
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru;
-	s=default; 
-	t=1558604173; bh=W4PVV4CPBJmlhwaOso9iLKILOHF0+pc+0NTgGEEvRMI=;
-	h=Subject:In-Reply-To:Cc:Date:References:To:From:Message-Id;
-	b=YUHTu69m3Fxz5zorHusTN4fdVdB5OOqGSLrv6H9vv3tM8BmqhsnnVbKAsiGYDpaTP
-	4YnE4XHm8W4+M8xMmwJQUu8BUyM4fugGUGr46c9gmh4uXKBCZtfqgKmQYrWDaHM7RR
-	OYgqmIbzCk3svz9/yCtJzzjkknGu7UWfZqnRs5cA=
-Authentication-Results: mxbackcorp1g.mail.yandex.net;
-	dkim=pass header.i=@yandex-team.ru
-X-Yandex-Sender-Uid: 1120000000071945
-X-Yandex-Avir: 1
-Received: from mxbackcorp1j.mail.yandex.net (mxbackcorp1j.mail.yandex.net
-	[2a02:6b8:0:1619::162])
-	by dlvcorp1j.mail.yandex.net with LMTP id ToPWQ61FCe-a6dsNQ3j
-	for <yury-kotov@yandex-team.ru>; Thu, 23 May 2019 12:36:02 +0300
-Received: by vla1-9d3c37294942.qloud-c.yandex.net with HTTP;
-	Thu, 23 May 2019 12:36:02 +0300
-From: Yury Kotov <yury-kotov@yandex-team.ru>
-To: Markus Armbruster <armbru@redhat.com>
-In-Reply-To: <87r28qjvcq.fsf@dusky.pond.sub.org>
-References: <20190514151848.5677-1-yury-kotov@yandex-team.ru>
-	<87r28qjvcq.fsf@dusky.pond.sub.org>
+	(envelope-from <philmd@redhat.com>) id 1hTkBJ-0003R3-N2
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 05:38:39 -0400
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:41269)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hTkBJ-0003Qc-Cs
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 05:38:37 -0400
+Received: by mail-wr1-f68.google.com with SMTP id u16so1594123wrn.8
+	for <qemu-devel@nongnu.org>; Thu, 23 May 2019 02:38:37 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+	:date:user-agent:mime-version:in-reply-to:content-language
+	:content-transfer-encoding;
+	bh=HzKe0VhfNL4llBZ3W4blN1UunpXuzs6goV8BEs0gpFc=;
+	b=cg0a9z282S9SzifamBVh7dWgsWFpXSnfAUwAUx2NBnh5BkpL9D+1z3celyIQalypst
+	z/4fXDVyzJGY7+OIBWLO/vKKeph6sppH/G297XaP9ZBLB1Q8c2ZTv0Mm4She0FKuhTkN
+	3RfqiPlv6xgCT47bUwWB+27HXFecUtYQCWZl9YBqIDpv5A3mxHTvSfYjMCb5EoCwxAI0
+	Hipxq+1z1sSHMQu0+txX1ED2oWxXnZAgzlDArDV57wZPi1qCA05YmHpdeVurL+eVwIXJ
+	g7e440kbhKFS7b6P/WjSDc4PFY96fPjk5Rozxqjr2kTxtnyDbKDBwzyC6XPvu5v/kw1Z
+	wdFQ==
+X-Gm-Message-State: APjAAAWzyvWZ9KJDlnI1dny45/kYFiEtrMr/52AlIvIVvxSxDRmzC+KO
+	BBVRZ42/3ZGmVK5JuHms5F1bqQ==
+X-Google-Smtp-Source: APXvYqy9QMDOcp0bu3yfy2AxOORF8e7cac4MFbI64T4USjDorZbwpJI1cRBRmqCgfOqTAFpbGUM8Ig==
+X-Received: by 2002:adf:e94b:: with SMTP id m11mr425545wrn.133.1558604316207; 
+	Thu, 23 May 2019 02:38:36 -0700 (PDT)
+Received: from [192.168.1.38] (228.red-83-52-173.dynamicip.rima-tde.net.
+	[83.52.173.228]) by smtp.gmail.com with ESMTPSA id
+	s10sm23738110wrt.66.2019.05.23.02.38.35
+	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+	Thu, 23 May 2019 02:38:35 -0700 (PDT)
+To: Eduardo Habkost <ehabkost@redhat.com>, Cleber Rosa <crosa@redhat.com>
+References: <20190520231910.12184-1-f4bug@amsat.org>
+	<20190522211230.GA10764@habkost.net>
+	<1711852617.24204010.1558561566547.JavaMail.zimbra@redhat.com>
+	<20190522230705.GB10764@habkost.net>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+	url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <7a046f76-c892-a796-e7d0-b0eda92075d9@redhat.com>
+Date: Thu, 23 May 2019 11:38:34 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-X-Mailer: Yamail [ http://yandex.ru ] 5.0
-Date: Thu, 23 May 2019 12:36:12 +0300
-Message-Id: <1269571558604162@vla1-9d3c37294942.qloud-c.yandex.net>
+In-Reply-To: <20190522230705.GB10764@habkost.net>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 	[fuzzy]
-X-Received-From: 77.88.29.217
-Subject: Re: [Qemu-devel] [PATCH v2] monitor: Fix fdset_id & fd types for
- corresponding QMP commands
+X-Received-From: 209.85.221.68
+Subject: Re: [Qemu-devel] [PATCH 0/4] mips: Add more Avocado tests
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -87,258 +88,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
-	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-	"Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Aleksandar Rikalo <arikalo@wavecomp.com>,
+	=?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+	Wainer dos Santos Moschetta <wainersm@redhat.com>,
+	qemu-devel@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>,
+	Aleksandar Markovic <amarkovic@wavecomp.com>,
+	Aleksandar Markovic <aleksandar.m.mail@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-22.05.2019, 19:40, "Markus Armbruster" <armbru@redhat.com>:
-> Yury Kotov <yury-kotov@yandex-team.ru> writes:
->
->> =C2=A0Now, fdset_id is int64, but in some places we work with it as in=
-t.
->> =C2=A0It seems that there is no sense to use int64 for fdset_id, so it=
-'s
->> =C2=A0better to fix inconsistency by changing fdset_id type to int and=
- by
->> =C2=A0fixing the reference of corresponding QMP commands: add-fd, remo=
-ve-fd,
->> =C2=A0query-fdsets.
+On 5/23/19 1:07 AM, Eduardo Habkost wrote:
+> On Wed, May 22, 2019 at 05:46:06PM -0400, Cleber Rosa wrote:
+>> ----- Original Message -----
+>>> From: "Eduardo Habkost" <ehabkost@redhat.com>
+>>> On Tue, May 21, 2019 at 01:19:06AM +0200, Philippe Mathieu-Daudé wrote:
+>>>> Hi,
+>>>>
+>>>> It was a rainy week-end here, so I invested it to automatize some
+>>>> of my MIPS tests.
+>>>>
+>>>> The BootLinuxSshTest is not Global warming friendly, it is not
+>>>> meant to run on a CI system but rather on a workstation previous
+>>>> to post a pull request.
+>>>> It can surely be improved, but it is a good starting point.
+>>>
+>>> Until we actually have a mechanism to exclude the test case on
+>>> travis-ci, I will remove patch 4/4 from the queue.  Aleksandar,
+>>> please don't merge patch 4/4 yet or it will break travis-ci.
+>>>
+>>> Cleber, Wainer, is it already possible to make "avocado run" skip
+>>> tests tagged with "slow"?
+>>>
 >>
->> =C2=A0Signed-off-by: Yury Kotov <yury-kotov@yandex-team.ru>
->> =C2=A0---
->> =C2=A0=C2=A0include/monitor/monitor.h | 6 +++---
->> =C2=A0=C2=A0monitor.c | 18 +++++++++---------
->> =C2=A0=C2=A0qapi/misc.json | 10 +++++-----
->> =C2=A0=C2=A0stubs/fdset.c | 4 ++--
->> =C2=A0=C2=A0util/osdep.c | 4 ++--
->> =C2=A0=C2=A0vl.c | 2 +-
->> =C2=A0=C2=A06 files changed, 22 insertions(+), 22 deletions(-)
+>> The mechanism exists, but we haven't tagged any test so far as slow.
 >>
->> =C2=A0diff --git a/include/monitor/monitor.h b/include/monitor/monitor=
-.h
->> =C2=A0index 86656297f1..06f9b6c217 100644
->> =C2=A0--- a/include/monitor/monitor.h
->> =C2=A0+++ b/include/monitor/monitor.h
->> =C2=A0@@ -39,11 +39,11 @@ void monitor_read_command(Monitor *mon, int =
-show_prompt);
->> =C2=A0=C2=A0int monitor_read_password(Monitor *mon, ReadLineFunc *read=
-line_func,
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0void *opaque);
+>> Should we define/document a criteria for a test to be slow?  Given
+>> that this is highly subjective, we have to think of:
 >>
->> =C2=A0-AddfdInfo *monitor_fdset_add_fd(int fd, bool has_fdset_id, int6=
-4_t fdset_id,
->> =C2=A0+AddfdInfo *monitor_fdset_add_fd(int fd, bool has_fdset_id, int =
-fdset_id,
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0bool has_opaque,=
- const char *opaque,
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0Error **errp);
->> =C2=A0-int monitor_fdset_get_fd(int64_t fdset_id, int flags);
->> =C2=A0-int monitor_fdset_dup_fd_add(int64_t fdset_id, int dup_fd);
->> =C2=A0+int monitor_fdset_get_fd(int fdset_id, int flags);
->> =C2=A0+int monitor_fdset_dup_fd_add(int fdset_id, int dup_fd);
->> =C2=A0=C2=A0void monitor_fdset_dup_fd_remove(int dup_fd);
->> =C2=A0=C2=A0int monitor_fdset_dup_fd_find(int dup_fd);
->>
->> =C2=A0diff --git a/monitor.c b/monitor.c
->> =C2=A0index bb48997913..b71ce816bc 100644
->> =C2=A0--- a/monitor.c
->> =C2=A0+++ b/monitor.c
->> =C2=A0@@ -160,7 +160,7 @@ struct MonFdsetFd {
->> =C2=A0=C2=A0/* file descriptor set containing fds passed via SCM_RIGHT=
-S */
->> =C2=A0=C2=A0typedef struct MonFdset MonFdset;
->> =C2=A0=C2=A0struct MonFdset {
->> =C2=A0- int64_t id;
->> =C2=A0+ int id;
->
-> In C, you use int instead of int64_t for fdset IDs.
->
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0QLIST_HEAD(, MonFdsetFd) fds;
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0QLIST_HEAD(, MonFdsetFd) dup_fds;
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0QLIST_ENTRY(MonFdset) next;
->> =C2=A0@@ -2346,7 +2346,7 @@ static void monitor_fdsets_cleanup(void)
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0qemu_mutex_unlock(&mon_fdsets_lock=
-);
->> =C2=A0=C2=A0}
->>
->> =C2=A0-AddfdInfo *qmp_add_fd(bool has_fdset_id, int64_t fdset_id, bool=
- has_opaque,
->> =C2=A0+AddfdInfo *qmp_add_fd(bool has_fdset_id, int32_t fdset_id, bool=
- has_opaque,
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0c=
-onst char *opaque, Error **errp)
->> =C2=A0=C2=A0{
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0int fd;
->> =C2=A0@@ -2372,7 +2372,7 @@ error:
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0return NULL;
->> =C2=A0=C2=A0}
->>
->> =C2=A0-void qmp_remove_fd(int64_t fdset_id, bool has_fd, int64_t fd, E=
-rror **errp)
->> =C2=A0+void qmp_remove_fd(int32_t fdset_id, bool has_fd, int fd, Error=
- **errp)
->> =C2=A0=C2=A0{
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0MonFdset *mon_fdset;
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0MonFdsetFd *mon_fdset_fd;
->> =C2=A0@@ -2405,10 +2405,10 @@ void qmp_remove_fd(int64_t fdset_id, boo=
-l has_fd, int64_t fd, Error **errp)
->> =C2=A0=C2=A0error:
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0qemu_mutex_unlock(&mon_fdsets_lock=
-);
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (has_fd) {
->> =C2=A0- snprintf(fd_str, sizeof(fd_str), "fdset-id:%" PRId64 ", fd:%" =
-PRId64,
->> =C2=A0+ snprintf(fd_str, sizeof(fd_str), "fdset-id:%" PRId32 ", fd:%" =
-PRId32,
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0fdset_id, fd);
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0} else {
->> =C2=A0- snprintf(fd_str, sizeof(fd_str), "fdset-id:%" PRId64, fdset_id=
-);
->> =C2=A0+ snprintf(fd_str, sizeof(fd_str), "fdset-id:%" PRId32, fdset_id=
-);
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0error_setg(errp, QERR_FD_NOT_FOUND=
-, fd_str);
->> =C2=A0=C2=A0}
->> =C2=A0@@ -2454,7 +2454,7 @@ FdsetInfoList *qmp_query_fdsets(Error **er=
-rp)
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0return fdset_list;
->> =C2=A0=C2=A0}
->>
->> =C2=A0-AddfdInfo *monitor_fdset_add_fd(int fd, bool has_fdset_id, int6=
-4_t fdset_id,
->> =C2=A0+AddfdInfo *monitor_fdset_add_fd(int32_t fd, bool has_fdset_id, =
-int32_t fdset_id,
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0bool has_opaque,=
- const char *opaque,
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0Error **errp)
->> =C2=A0=C2=A0{
->> =C2=A0@@ -2476,7 +2476,7 @@ AddfdInfo *monitor_fdset_add_fd(int fd, bo=
-ol has_fdset_id, int64_t fdset_id,
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}
->>
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (mon_fdset =3D=3D NULL) {
->> =C2=A0- int64_t fdset_id_prev =3D -1;
->> =C2=A0+ int fdset_id_prev =3D -1;
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0MonFdset *=
-mon_fdset_cur =3D QLIST_FIRST(&mon_fdsets);
->>
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (has_fd=
-set_id) {
->> =C2=A0@@ -2538,7 +2538,7 @@ AddfdInfo *monitor_fdset_add_fd(int fd, bo=
-ol has_fdset_id, int64_t fdset_id,
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0return fdinfo;
->> =C2=A0=C2=A0}
->>
->> =C2=A0-int monitor_fdset_get_fd(int64_t fdset_id, int flags)
->> =C2=A0+int monitor_fdset_get_fd(int fdset_id, int flags)
->> =C2=A0=C2=A0{
->> =C2=A0=C2=A0#ifdef _WIN32
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0return -ENOENT;
->> =C2=A0@@ -2576,7 +2576,7 @@ out:
->> =C2=A0=C2=A0#endif
->> =C2=A0=C2=A0}
->>
->> =C2=A0-int monitor_fdset_dup_fd_add(int64_t fdset_id, int dup_fd)
->> =C2=A0+int monitor_fdset_dup_fd_add(int fdset_id, int dup_fd)
->> =C2=A0=C2=A0{
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0MonFdset *mon_fdset;
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0MonFdsetFd *mon_fdset_fd_dup;
->> =C2=A0diff --git a/qapi/misc.json b/qapi/misc.json
->> =C2=A0index 8b3ca4fdd3..b345e1458b 100644
->> =C2=A0--- a/qapi/misc.json
->> =C2=A0+++ b/qapi/misc.json
->> =C2=A0@@ -2179,7 +2179,7 @@
->> =C2=A0=C2=A0#
->> =C2=A0=C2=A0# Since: 1.2.0
->> =C2=A0=C2=A0##
->> =C2=A0-{ 'struct': 'AddfdInfo', 'data': {'fdset-id': 'int', 'fd': 'int=
-'} }
->> =C2=A0+{ 'struct': 'AddfdInfo', 'data': {'fdset-id': 'int32', 'fd': 'i=
-nt32'} }
->>
->> =C2=A0=C2=A0##
->> =C2=A0=C2=A0# @add-fd:
->> =C2=A0@@ -2209,7 +2209,7 @@
->> =C2=A0=C2=A0#
->> =C2=A0=C2=A0##
->> =C2=A0=C2=A0{ 'command': 'add-fd',
->> =C2=A0- 'data': { '*fdset-id': 'int',
->> =C2=A0+ 'data': { '*fdset-id': 'int32',
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0'*opaque': 'str' },
->> =C2=A0=C2=A0=C2=A0=C2=A0'returns': 'AddfdInfo' }
->>
->> =C2=A0@@ -2238,7 +2238,7 @@
->> =C2=A0=C2=A0# <- { "return": {} }
->> =C2=A0=C2=A0#
->> =C2=A0=C2=A0##
->> =C2=A0-{ 'command': 'remove-fd', 'data': {'fdset-id': 'int', '*fd': 'i=
-nt'} }
->> =C2=A0+{ 'command': 'remove-fd', 'data': {'fdset-id': 'int32', '*fd': =
-'int32'} }
->>
->> =C2=A0=C2=A0##
->> =C2=A0=C2=A0# @FdsetFdInfo:
->> =C2=A0@@ -2252,7 +2252,7 @@
->> =C2=A0=C2=A0# Since: 1.2.0
->> =C2=A0=C2=A0##
->> =C2=A0=C2=A0{ 'struct': 'FdsetFdInfo',
->> =C2=A0- 'data': {'fd': 'int', '*opaque': 'str'} }
->> =C2=A0+ 'data': {'fd': 'int32', '*opaque': 'str'} }
->>
->> =C2=A0=C2=A0##
->> =C2=A0=C2=A0# @FdsetInfo:
->> =C2=A0@@ -2266,7 +2266,7 @@
->> =C2=A0=C2=A0# Since: 1.2.0
->> =C2=A0=C2=A0##
->> =C2=A0=C2=A0{ 'struct': 'FdsetInfo',
->> =C2=A0- 'data': {'fdset-id': 'int', 'fds': ['FdsetFdInfo']} }
->> =C2=A0+ 'data': {'fdset-id': 'int32', 'fds': ['FdsetFdInfo']} }
->>
->> =C2=A0=C2=A0##
->> =C2=A0=C2=A0# @query-fdsets:
->
-> In the schema, you use QAPI type 'int32' instead of 'int'.
->
-> Before the patch, the two are consistent (except for the bugs you fixed
-> in v1 of this patch): QAPI 'int' is C int64_t.
->
-> After the patch, the two are inconsistent: QAPI 'int32' is C int32_t,
-> not int. They're usually the same, but it unclean.
->
-> Two ways forward:
->
-> 1. Revise this patch to use int32_t instead of int.
->
-> 2. Revise v1 to address the few minor review comments I had. Smaller
-> =C2=A0=C2=A0=C2=A0patch, easier to review.
->
-> Your choice. I'd choose 2.
->
-> [...]
+>>  * Will we consider the average or maximum run time (the timeout
+>>    definition)?
+>>  
+>>  * For a single test, what is "slow"? Some rough numbers from Travis
+>>    CI[1] to help us with guidelines:
+>>    - boot_linux_console.py:BootLinuxConsole.test_x86_64_pc:  PASS (6.04 s)
+>>    - boot_linux_console.py:BootLinuxConsole.test_arm_virt:  PASS (2.91 s)
+>>    - linux_initrd.py:LinuxInitrd.test_with_2gib_file_should_work_with_linux_v4_16:  PASS (18.14 s)
+>>    - boot_linux.py:BootLinuxAarch64.test_virt:  PASS (396.88 s)
+> 
+> I don't think we need to overthink this.  Whatever objective
+> criteria we choose, I'm sure we'll have to adapt them later due
+> to real world problems.
+> 
+> e.g.: is 396 seconds too slow?  I don't know, it depends: does it
+> break Travis and other CI systems often because of timeouts?  If
+> yes, then we should probably tag it as slow.
+> 
+> If having subjective criteria is really a problem (I don't think
+> it is), then we can call the tag "skip_travis", and stop worrying
+> about defining what exactly is "slow".
 
-Sorry, I'm a little confused... I thought method 2 was not ok,
-but if it=E2=80=99s not, then I prefer it too.
+I'd go with a simpler "tags:travis-ci" whitelisting any job expecting to
+run smoothly there.
 
-So, I will send v3 which is v1 with grammar fixes
+Then we can add "slow" tests without having to worry about blacklisting
+for Travis CI.
+Also, Other CI can set different timeouts.
 
-Regards,
-Yury
+I'd like maintainers to add as many tests as they want to upstream, so
+these tests can eventually run by anyone, then each maintainer is free
+to select which particular set he wants to run as default.
 
+>>  * Do we want to set a maximum job timeout?  This way we can skip
+>>    tests after a given amount of time has passed.  Currently we interrupt
+>>    the test running when the job timeout is reached, but it's possible
+>>    to add a option so that no new tests will be started, but currently
+>>    running ones will be waited on.
+> 
+> I'm not sure I understand the suggestion to skip tests.  If we
+> skip tests after a timeout, how would we differentiate a test
+> being expectedly slow from a QEMU hang?
+> 
 
