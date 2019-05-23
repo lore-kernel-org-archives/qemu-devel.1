@@ -6,65 +6,65 @@ X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 656FDC282DD
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 14:48:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B54DCC282DD
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 14:49:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3CB6C2175B
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 14:48:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3CB6C2175B
+	by mail.kernel.org (Postfix) with ESMTPS id 49599206BA
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 14:49:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 49599206BA
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:38071 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:38073 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hTp16-00081l-H6
-	for qemu-devel@archiver.kernel.org; Thu, 23 May 2019 10:48:24 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:60994)
+	id 1hTp2F-0000PW-Bs
+	for qemu-devel@archiver.kernel.org; Thu, 23 May 2019 10:49:35 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:60932)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hTowz-0004Ja-KM
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 10:44:10 -0400
+	(envelope-from <laurent@vivier.eu>) id 1hTowu-0004Co-DP
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 10:44:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hTowy-0006Lp-GQ
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 10:44:09 -0400
-Received: from mout.kundenserver.de ([212.227.126.134]:46945)
+	(envelope-from <laurent@vivier.eu>) id 1hTowt-0006CJ-Ab
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 10:44:04 -0400
+Received: from mout.kundenserver.de ([212.227.126.134]:51701)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1hTowy-0006L1-7i
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 10:44:08 -0400
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1hTowt-0006AN-0x
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 10:44:03 -0400
 Received: from localhost.localdomain ([78.238.229.36]) by
 	mrelayeu.kundenserver.de (mreue010 [212.227.15.167]) with ESMTPSA
 	(Nemesis)
-	id 1N3bnP-1gTqaZ16Jv-010gql; Thu, 23 May 2019 16:43:44 +0200
+	id 1M8QiW-1hYCej2X6e-004PLo; Thu, 23 May 2019 16:43:41 +0200
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Date: Thu, 23 May 2019 16:43:31 +0200
-Message-Id: <20190523144336.13960-6-laurent@vivier.eu>
+Date: Thu, 23 May 2019 16:43:27 +0200
+Message-Id: <20190523144336.13960-2-laurent@vivier.eu>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190523144336.13960-1-laurent@vivier.eu>
 References: <20190523144336.13960-1-laurent@vivier.eu>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:fIEHQdd0xLK6m76XJQ2KhMZcRti/qRyWCnr5W8HvJUbSHd5u++D
-	vjWkW1hlXmmXSjAP5XQcbX1ylBXrX8v9Fwy6bOTeoyIMwhz0jI7/kYSkpbTB8u8+rr/52go
-	/37KkzRC3qFCsEPhNoyDASRKt7Z+Xv4wQGzwmYTWwJlPzp1tZfs9dWZL+EHQ9+GJzvxCnem
-	udHo2gBPM1ijtz9sGtNcA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:9HCEEhfrL18=:FofsW3m17SvLq8lJsk2umn
-	+upCSqr3L6oF3FdboCgTbqlYhVsScsYBP/uEiD4GMolt2GOhh+OV7Sok4azni3RW/Bu+nXkai
-	b+Ap6L2POSzo9PLiJqUTOPxjApESJ6GBYIMxpahtKUGrVJed+JmYpnllhbKgRWiKt2KbkwSRL
-	4nDHX/uQVUrSA7Uv+EeRZvW0w05zBM7a7zQFvNaLBp9YgX6PfqB34q+qJP1Eggfl6aKMrQXrp
-	DXANhMWk3yfWHqzPMsUmfpOwnH8rp2Bp4pn2+NgC3Wcy1roxkVpDLX479D89FIckRAK3NGvWf
-	SF9uw42FQvdQSruCKUc/A/+iKkdJ5/MgEJWWgnkIbe356M89FHS+O9IlP4SD4ZeKXjVTuByS4
-	A3xWH44sZF7KO5i4LniMl0OkZ8549COJSh5zRpP6Aemsk+cWg1jAyMmzcHITKaQj/YQe7vO0C
-	5XMZlMMaMjS/tIs6Z5A5Yf24MXCJPOX5W4ClCluEhUeekNaQwG4R4aZch0q6ZWoP+RFbmqDMU
-	mOxxwERHk2z4dsR5z7XGH+9SQB8V2TjtdhE0d64FIpGYCmS9/WTTu21QAg9Ok0IAbfDkC/lgz
-	LMutEdiTDQFGmDiKUoYRbroRLfG0Kzy6wZ/Yiyy0QKg1jVRVbF3/3fmuaZsF7XU1mEdvDaUfs
-	5cSKK6CCaPzyb93Q4vTkC6z7LF71AeWG9TEYD1reuiodb1ZLesIP/rMHQxCCIO6XN6cD0EClV
-	0EwK/8ZUM3iMYmeuiIHsw5+3kzFvB4wqf9Ql1g==
+X-Provags-ID: V03:K1:EYyeMyp13uTmvGMZg2AihT1bSicFMtThF1qZgcvqF+R+MAkVtRG
+	DKO+yke/QNIOaUjVTWiTJ7HuHl0tFxqQ9yK/1qel8x9HDu5C8PpMfuE8bag+1rXXHjuewDi
+	lUIzXjj2vlnLrcBnHQGx8+96ojjTxRr/VzKP55b6lYbps3IIIAmQcAlizYmkoQaTfJWK9xC
+	AnOjiTAKbgJtAnput3eSw==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:uYaPZKay5ao=:3rB1mJ2rhCqGcu39c3BwNT
+	n2MUHynEd0HPyeP1UkLfJ6RBCaAKoU3QIKFLHq86E5S/Z/LYQN6vMFCNRqJkEH4tKqWsoluHk
+	aGoQbkBD/8QQ5xwY4juckJ31haheKBZZnQB69OGhHXj8h6hV6T7ODhtQmNqhkOTEzBFUJjGDj
+	3LUzE5YpOp9u7uWeoWA2zBlkphrStYEeCAWRUd1HIBGh0YgEO8hWG92Ur7KpbMRph/oNluF/I
+	tMDI7kcB8YjlOnZe9IR4vz0Oq50TpWloIguU7cSPdBGJvwxiO3dbFgX8KF9yHNyxKC96t28tm
+	fD1208ttR15BFZE/WO6OaHKgjlz/Otf0mj5WUr5qNcFXQ27e93Tg8Y+M28j48nfXvsFbxpw+T
+	7twEovAMrwZDzhiqEVgHk3nI0y7G7f083tfm7WbOYqGTA/nWiNfVi+oHdByoz4fOk751VewsN
+	WpfrpLhl9v21jOFf7HgY1HbswMHDgJzDmRBL1IgReMR3MBfpjNtr+o439yHUuMBDTfmlR+6pR
+	3T11zOIqfPRtC9ydfTiH2PsEsEiAb6UPAE7wkRP68RXF5u1PjQORqh86tmuGen7msnTCPMN5l
+	DF+bLeDew9XJ3toZfCSk9kCt0Z8+QPl2crQFmJR4KR1pob6OMf59KJls+te+0YwAwEqNSkAXg
+	sNKVcjzyfdTmfzviYyCGK7KPZ0qgOx3qMWyLN3+uXtIjq8HIG6KYCpPpRnfdzkOXFIEys3JCw
+	VqG1elHsS13yCWbmsn6YEILXrfP0mkl9zJk0OA==
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 212.227.126.134
-Subject: [Qemu-devel] [PULL 05/10] linux-user: Add support for
- SIOC<G|S>IFPFLAGS ioctls for all targets
+Subject: [Qemu-devel] [PULL 01/10] linux-user: add pseudo /proc/cpuinfo for
+ sparc
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -77,66 +77,80 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Aleksandar Rikalo <arikalo@wavecomp.com>, Riku Voipio <riku.voipio@iki.fi>,
+	Richard Henderson <richard.henderson@linaro.org>,
 	Laurent Vivier <laurent@vivier.eu>,
 	Aleksandar Markovic <amarkovic@wavecomp.com>,
-	Neng Chen <nchen@wavecomp.com>, Aurelien Jarno <aurelien@aurel32.net>
+	Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Neng Chen <nchen@wavecomp.com>
+SPARC libc6 debian package wants to check the cpu level to be
+installed or not:
 
-Add support for getting and setting extended private flags of a
-network device via SIOCSIFPFLAGS and SIOCGIFPFLAGS ioctls.
+  WARNING: This machine has a SPARC V8 or earlier class processor.
+  Debian lenny and later does not support such old hardware
+  any longer.
 
-The ioctl numeric values are platform-independent and determined by
-the file include/uapi/linux/sockios.h in Linux kernel source code:
+To avoid this, it only needs to know if the machine type is sun4u or sun4v,
+for that it reads the information from /proc/cpuinfo.
 
-  #define SIOCSIFPFLAGS 0x8934
-  #define SIOCGIFPFLAGS	0x8935
-
-These ioctls get (or set) the field ifr_flags of type short in the
-structure ifreq. Such functionality is achieved in QEMU by using
-MK_STRUCT() and MK_PTR() macros with an appropriate argument, as
-it was done for existing similar cases.
-
-Signed-off-by: Neng Chen <nchen@wavecomp.com>
-Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
-Message-Id: <1554839486-3527-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Message-Id: <1558282527-22183-4-git-send-email-aleksandar.markovic@rt-rk.com>
+Fixes: 9a93c152fcdb4ab2cd85094487b33578fd693915
+       ("linux-user: fix UNAME_MACHINE for sparc/sparc64")
+Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Message-Id: <20190517133149.19593-2-laurent@vivier.eu>
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- linux-user/ioctls.h       | 2 ++
- linux-user/syscall_defs.h | 2 ++
- 2 files changed, 4 insertions(+)
+ linux-user/syscall.c | 16 +++++++++++++++-
+ 1 file changed, 15 insertions(+), 1 deletion(-)
 
-diff --git a/linux-user/ioctls.h b/linux-user/ioctls.h
-index 99ed9d982568..5e84dc7c3a77 100644
---- a/linux-user/ioctls.h
-+++ b/linux-user/ioctls.h
-@@ -206,6 +206,8 @@
-   IOCTL(SIOCADDMULTI, IOC_W, MK_PTR(MK_STRUCT(STRUCT_sockaddr_ifreq)))
-   IOCTL(SIOCDELMULTI, IOC_W, MK_PTR(MK_STRUCT(STRUCT_sockaddr_ifreq)))
-   IOCTL(SIOCGIFINDEX, IOC_W | IOC_R, MK_PTR(MK_STRUCT(STRUCT_int_ifreq)))
-+  IOCTL(SIOCSIFPFLAGS, IOC_W, MK_PTR(MK_STRUCT(STRUCT_short_ifreq)))
-+  IOCTL(SIOCGIFPFLAGS, IOC_W | IOC_R, MK_PTR(MK_STRUCT(STRUCT_short_ifreq)))
-   IOCTL(SIOCSIFLINK, 0, TYPE_NULL)
-   IOCTL_SPECIAL(SIOCGIFCONF, IOC_W | IOC_R, do_ioctl_ifconf,
-                 MK_PTR(MK_STRUCT(STRUCT_ifconf)))
-diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
-index 9470a5ce965b..cb40620114f8 100644
---- a/linux-user/syscall_defs.h
-+++ b/linux-user/syscall_defs.h
-@@ -782,6 +782,8 @@ struct target_pollfd {
- #define TARGET_SIOCADDMULTI    0x8931          /* Multicast address lists      */
- #define TARGET_SIOCDELMULTI    0x8932
- #define TARGET_SIOCGIFINDEX    0x8933
-+#define TARGET_SIOCSIFPFLAGS   0x8934          /* set extended flags          */
-+#define TARGET_SIOCGIFPFLAGS   0x8935          /* get extended flags          */
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index efa3ec283706..68484a83e69e 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -6786,12 +6786,15 @@ static int is_proc_myself(const char *filename, const char *entry)
+     return 0;
+ }
  
- /* Bridging control calls */
- #define TARGET_SIOCGIFBR       0x8940          /* Bridging support             */
+-#if defined(HOST_WORDS_BIGENDIAN) != defined(TARGET_WORDS_BIGENDIAN)
++#if defined(HOST_WORDS_BIGENDIAN) != defined(TARGET_WORDS_BIGENDIAN) || \
++    defined(TARGET_SPARC)
+ static int is_proc(const char *filename, const char *entry)
+ {
+     return strcmp(filename, entry) == 0;
+ }
++#endif
+ 
++#if defined(HOST_WORDS_BIGENDIAN) != defined(TARGET_WORDS_BIGENDIAN)
+ static int open_net_route(void *cpu_env, int fd)
+ {
+     FILE *fp;
+@@ -6836,6 +6839,14 @@ static int open_net_route(void *cpu_env, int fd)
+ }
+ #endif
+ 
++#if defined(TARGET_SPARC)
++static int open_cpuinfo(void *cpu_env, int fd)
++{
++    dprintf(fd, "type\t\t: sun4u\n");
++    return 0;
++}
++#endif
++
+ static int do_openat(void *cpu_env, int dirfd, const char *pathname, int flags, mode_t mode)
+ {
+     struct fake_open {
+@@ -6851,6 +6862,9 @@ static int do_openat(void *cpu_env, int dirfd, const char *pathname, int flags,
+         { "cmdline", open_self_cmdline, is_proc_myself },
+ #if defined(HOST_WORDS_BIGENDIAN) != defined(TARGET_WORDS_BIGENDIAN)
+         { "/proc/net/route", open_net_route, is_proc },
++#endif
++#if defined(TARGET_SPARC)
++        { "/proc/cpuinfo", open_cpuinfo, is_proc },
+ #endif
+         { NULL, NULL, NULL }
+     };
 -- 
 2.20.1
 
