@@ -2,103 +2,66 @@ Return-Path: <SRS0=bvyN=TX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9911AC282DD
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 16:52:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BFD0AC282DD
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 16:52:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6614421019
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 16:52:27 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="wobxsb4v"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6614421019
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
+	by mail.kernel.org (Postfix) with ESMTPS id 8625421019
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 16:52:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8625421019
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:40639 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:40641 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hTqx8-0003l1-ME
-	for qemu-devel@archiver.kernel.org; Thu, 23 May 2019 12:52:26 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:44751)
+	id 1hTqxJ-0003xg-Pw
+	for qemu-devel@archiver.kernel.org; Thu, 23 May 2019 12:52:37 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:44877)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <shmuel.eiderman@oracle.com>) id 1hTqvE-0002R3-10
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 12:50:32 -0400
+	(envelope-from <no-reply@patchew.org>) id 1hTqvR-0002Rk-6j
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 12:50:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <shmuel.eiderman@oracle.com>) id 1hTqke-0006al-9W
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 12:39:33 -0400
-Received: from userp2130.oracle.com ([156.151.31.86]:38826)
+	(envelope-from <no-reply@patchew.org>) id 1hTqiF-0004Vo-Kl
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 12:37:05 -0400
+Resent-Date: Thu, 23 May 2019 12:37:05 -0400
+Resent-Message-Id: <E1hTqiF-0004Vo-Kl@eggs.gnu.org>
+Received: from sender4-of-o55.zoho.com ([136.143.188.55]:21584)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <shmuel.eiderman@oracle.com>)
-	id 1hTqkc-0006Xq-P9; Thu, 23 May 2019 12:39:31 -0400
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-	by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id
-	x4NGdKD0130625; Thu, 23 May 2019 16:39:29 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
-	h=from : message-id :
-	content-type : mime-version : subject : date : in-reply-to : cc : to :
-	references; s=corp-2018-07-02;
-	bh=cmtRzb3GnCeEy3Gk6rPnVVp6uPabZlx0w4bmD7EjewM=;
-	b=wobxsb4vRu35xX6j12oBxCloN2novJEaNOvqclC09jY0b+CBLP+9SMYAjMepXXQQ8qGs
-	pJm4jpgR8VW3+HJW2c6386HWpsS1UJj6pzd3EgQ6/N0Ca/+LzbgORJc5W+3EnDn/g30x
-	O1c7s6YifuXCsrOlXb4ku8HckGDdJTTpJpZAu6EPGfvtN+KU7TNycLHbGcssOn4WGe3C
-	pcicqwXqPKTv31ghDYzSjbwYLKmko+1JkO/zE42jh+g1L5yoYe61mevPGzHFC272dOEo
-	9oMRqmUVKI8qrU4uag6gG40Gr336TbuZbRcCrLs9bJ4yXK/VTCf4jaegXBRvfACPuZnD
-	Cg== 
-Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
-	by userp2130.oracle.com with ESMTP id 2smsk5kp30-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 23 May 2019 16:39:29 +0000
-Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
-	by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id
-	x4NGbjht191249; Thu, 23 May 2019 16:39:28 GMT
-Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
-	by userp3020.oracle.com with ESMTP id 2smsgvkr3d-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 23 May 2019 16:39:28 +0000
-Received: from abhmp0020.oracle.com (abhmp0020.oracle.com [141.146.116.26])
-	by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x4NGdRvK002113;
-	Thu, 23 May 2019 16:39:27 GMT
-Received: from [192.168.43.218] (/2.53.191.8)
-	by default (Oracle Beehive Gateway v4.0)
-	with ESMTP ; Thu, 23 May 2019 16:39:26 +0000
-From: Sam Eiderman <shmuel.eiderman@oracle.com>
-Message-Id: <187CC767-4CB1-42AE-8C9C-6F0EF69F40AF@oracle.com>
-Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.8\))
-Date: Thu, 23 May 2019 19:35:20 +0300
-In-Reply-To: <fc179916-0fb5-bb50-da41-14789b020be9@redhat.com>
-To: Max Reitz <mreitz@redhat.com>
-References: <20190523154444.28783-1-shmuel.eiderman@oracle.com>
-	<20190523154444.28783-3-shmuel.eiderman@oracle.com>
-	<fc179916-0fb5-bb50-da41-14789b020be9@redhat.com>
-X-Mailer: Apple Mail (2.3445.104.8)
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9265
-	signatures=668687
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
-	malwarescore=0
-	phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
-	adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
-	engine=8.0.1-1810050000 definitions=main-1905230113
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9265
-	signatures=668687
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
-	priorityscore=1501 malwarescore=0
-	suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
-	lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999
-	adultscore=0
-	classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
-	definitions=main-1905230113
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 156.151.31.86
-Content-Type: text/plain;
-	charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
-X-Content-Filtered-By: Mailman/MimeDel 2.1.21
-Subject: Re: [Qemu-devel] [PATCH v4 2/3] qemu-img: rebase: Reduce reads on
- in-chain rebase
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1hTqiF-0004NI-E8
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 12:37:03 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1558629375; cv=none; d=zoho.com; s=zohoarc; 
+	b=kzU1z2+AsmCFEGfKgtqqmJsg08ucourZrPF7j7/pNq3nsWEAAyfaeVZgDet9TYSELC7TD8pM/Uqui7BOGJoLLCuhF3H8Dth0jlsxdhUjgmugC6LtsQJCuPyqULwkE4Ad9mWTD5Gv8jv9UWrd5mkGCkC/uj4ZbdH8D13qNKijtpk=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
+	s=zohoarc; t=1558629375;
+	h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
+	bh=rNVS8ajT0H/DbAbFPCGAvTbx6nF+xvRH+/llOHen4Fg=; 
+	b=OJ5dvLdCUrMaK4u1NBElfyajWmrOENEC4HkvEBbA2WXSGFY/aEKLamVxAHGSgQwYJVWiiN/RLcvuhH/KrmCS5eycDniUP24mO9DkGlD4AFz+MD86O3PO7AGmay0fTwKrVDo1bjef4nbeQ+oM6UmAUQwtbQUCVUg1IifmLCMriwc=
+ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
+	spf=pass  smtp.mailfrom=no-reply@patchew.org;
+	dmarc=pass header.from=<no-reply@patchew.org>
+	header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+	mx.zohomail.com with SMTPS id 1558629373881748.4750488742621;
+	Thu, 23 May 2019 09:36:13 -0700 (PDT)
+In-Reply-To: <20190523144336.13960-1-laurent@vivier.eu>
+Message-ID: <155862937270.24.3313016521227492517@549697c9ad12>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: laurent@vivier.eu
+Date: Thu, 23 May 2019 09:36:13 -0700 (PDT)
+X-ZohoMailClient: External
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 136.143.188.55
+Subject: Re: [Qemu-devel] [PULL 00/10] Linux user for 4.1 patches
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -110,86 +73,118 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, eyal.moscovici@oracle.com, qemu-block@nongnu.org,
-	arbel.moshe@oracle.com, QEMU <qemu-devel@nongnu.org>,
-	liran.alon@oracle.com, sagi.amit@oracle.com, karl.heubaum@oracle.com
+Reply-To: qemu-devel@nongnu.org
+Cc: arikalo@wavecomp.com, riku.voipio@iki.fi, qemu-devel@nongnu.org,
+	laurent@vivier.eu, amarkovic@wavecomp.com, aurelien@aurel32.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Yes, my bad, resending as v5.
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDUyMzE0NDMzNi4xMzk2
+MC0xLWxhdXJlbnRAdml2aWVyLmV1LwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRvIGhhdmUg
+c29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1vcmUgaW5m
+b3JtYXRpb246CgpNZXNzYWdlLWlkOiAyMDE5MDUyMzE0NDMzNi4xMzk2MC0xLWxhdXJlbnRAdml2
+aWVyLmV1ClR5cGU6IHNlcmllcwpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BVTEwgMDAvMTBdIExp
+bnV4IHVzZXIgZm9yIDQuMSBwYXRjaGVzCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jp
+bi9iYXNoCmdpdCByZXYtcGFyc2UgYmFzZSA+IC9kZXYvbnVsbCB8fCBleGl0IDAKZ2l0IGNvbmZp
+ZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5h
+bWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQouL3Nj
+cmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5E
+ID09PQoKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKICAgZDQx
+ODIzOGRjYS4uOGRjN2ZkNTZkZCAgbWFzdGVyICAgICAtPiBtYXN0ZXIKRnJvbSBodHRwczovL2dp
+dGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKICogW25ldyB0YWddICAgICAgICAgICAgICAg
+cGF0Y2hldy8yMDE5MDUyMzE0NDMzNi4xMzk2MC0xLWxhdXJlbnRAdml2aWVyLmV1IC0+IHBhdGNo
+ZXcvMjAxOTA1MjMxNDQzMzYuMTM5NjAtMS1sYXVyZW50QHZpdmllci5ldQpTd2l0Y2hlZCB0byBh
+IG5ldyBicmFuY2ggJ3Rlc3QnCjQ3NzBjY2Y3MzQgbGludXgtdXNlcjogUGFzcyB0aHJvdWdoIG5h
+bm9zZWNvbmQgdGltZXN0YW1wIGNvbXBvbmVudHMgZm9yIHN0YXQgc3lzY2FsbHMKMWI1YjlmYWE4
+OCBsaW51eC11c2VyOiBBbGlnbiBtbWFwX2ZpbmRfdm1hIHRvIGhvc3QgcGFnZSBzaXplCjg3NGNh
+YThiZmIgbGludXgtdXNlcjogRml4IHNobWF0IGVtdWxhdGlvbiBieSBob25vcmluZyBob3N0IFNI
+TUxCQQpkOTA3Mjc4MzU4IGxpbnV4LXVzZXI6IEFkZCBzdXBwb3J0IGZvciBzZXRzb2Nrb3B0KCkg
+b3B0aW9ucyBJUFY2XzxBRER8RFJPUD5fTUVNQkVSU0hJUAo1N2Q0NWRmMzMwIGxpbnV4LXVzZXI6
+IFNhbml0aXplIGludGVycF9pbmZvIGFuZCwgZm9yIG1pcHMgb25seSwgaW5pdCBmaWVsZCBmcF9h
+YmkKNzI2NzI0ODM4NCBsaW51eC11c2VyOiBBZGQgc3VwcG9ydCBmb3IgU0lPQzxHfFM+SUZQRkxB
+R1MgaW9jdGxzIGZvciBhbGwgdGFyZ2V0cwowZWFjMmQ3MWNjIGxpbnV4LXVzZXI6IEFkZCBzdXBw
+b3J0IGZvciBTSU9DU1BHUlAgaW9jdGwgZm9yIGFsbCB0YXJnZXRzCmYwZTZiMjliOTQgbGludXgt
+dXNlcjogRml4IHN1cHBvcnQgZm9yIFNJT0NBVE1BUksgYW5kIFNJT0NHUEdSUCBpb2N0bHMgZm9y
+IHh0ZW5zYQpiZDVkODc4YThjIGxpbnV4LXVzZXI6IGFkZCBwc2V1ZG8gL3Byb2MvaGFyZHdhcmUg
+Zm9yIG02OGsKMTM4NGIwZWVlZSBsaW51eC11c2VyOiBhZGQgcHNldWRvIC9wcm9jL2NwdWluZm8g
+Zm9yIHNwYXJjCgo9PT0gT1VUUFVUIEJFR0lOID09PQoxLzEwIENoZWNraW5nIGNvbW1pdCAxMzg0
+YjBlZWVlYjUgKGxpbnV4LXVzZXI6IGFkZCBwc2V1ZG8gL3Byb2MvY3B1aW5mbyBmb3Igc3BhcmMp
+CjIvMTAgQ2hlY2tpbmcgY29tbWl0IGJkNWQ4NzhhOGNlZSAobGludXgtdXNlcjogYWRkIHBzZXVk
+byAvcHJvYy9oYXJkd2FyZSBmb3IgbTY4aykKMy8xMCBDaGVja2luZyBjb21taXQgZjBlNmIyOWI5
+NGQ2IChsaW51eC11c2VyOiBGaXggc3VwcG9ydCBmb3IgU0lPQ0FUTUFSSyBhbmQgU0lPQ0dQR1JQ
+IGlvY3RscyBmb3IgeHRlbnNhKQo0LzEwIENoZWNraW5nIGNvbW1pdCAwZWFjMmQ3MWNjZmEgKGxp
+bnV4LXVzZXI6IEFkZCBzdXBwb3J0IGZvciBTSU9DU1BHUlAgaW9jdGwgZm9yIGFsbCB0YXJnZXRz
+KQo1LzEwIENoZWNraW5nIGNvbW1pdCA3MjY3MjQ4Mzg0NGYgKGxpbnV4LXVzZXI6IEFkZCBzdXBw
+b3J0IGZvciBTSU9DPEd8Uz5JRlBGTEFHUyBpb2N0bHMgZm9yIGFsbCB0YXJnZXRzKQo2LzEwIENo
+ZWNraW5nIGNvbW1pdCA1N2Q0NWRmMzMwNGYgKGxpbnV4LXVzZXI6IFNhbml0aXplIGludGVycF9p
+bmZvIGFuZCwgZm9yIG1pcHMgb25seSwgaW5pdCBmaWVsZCBmcF9hYmkpCjcvMTAgQ2hlY2tpbmcg
+Y29tbWl0IGQ5MDcyNzgzNThjNCAobGludXgtdXNlcjogQWRkIHN1cHBvcnQgZm9yIHNldHNvY2tv
+cHQoKSBvcHRpb25zIElQVjZfPEFERHxEUk9QPl9NRU1CRVJTSElQKQpXQVJOSU5HOiBhcmNoaXRl
+Y3R1cmUgc3BlY2lmaWMgZGVmaW5lcyBzaG91bGQgYmUgYXZvaWRlZAojNzA6IEZJTEU6IGxpbnV4
+LXVzZXIvc3lzY2FsbC5jOjE5Mjk6CisjaWYgX19VQVBJX0RFRl9JUFY2X01SRVEKCnRvdGFsOiAw
+IGVycm9ycywgMSB3YXJuaW5ncywgMjkgbGluZXMgY2hlY2tlZAoKUGF0Y2ggNy8xMCBoYXMgc3R5
+bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBm
+YWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BB
+VENIIGluIE1BSU5UQUlORVJTLgo4LzEwIENoZWNraW5nIGNvbW1pdCA4NzRjYWE4YmZiNGYgKGxp
+bnV4LXVzZXI6IEZpeCBzaG1hdCBlbXVsYXRpb24gYnkgaG9ub3JpbmcgaG9zdCBTSE1MQkEpCldB
+Uk5JTkc6IEJsb2NrIGNvbW1lbnRzIHVzZSBhIGxlYWRpbmcgLyogb24gYSBzZXBhcmF0ZSBsaW5l
+CiM1NDogRklMRTogbGludXgtdXNlci9lbGZsb2FkLmM6MjA3MDoKKyAgICAgICAgICAgIC8qIFRo
+ZSBzYW1lIHRoaW5nIGFnYWluLCBidXQgd2l0aCBleHRyYQoKdG90YWw6IDAgZXJyb3JzLCAxIHdh
+cm5pbmdzLCAyMjEgbGluZXMgY2hlY2tlZAoKUGF0Y2ggOC8xMCBoYXMgc3R5bGUgcHJvYmxlbXMs
+IHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2
+ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5U
+QUlORVJTLgo5LzEwIENoZWNraW5nIGNvbW1pdCAxYjViOWZhYTg4YmQgKGxpbnV4LXVzZXI6IEFs
+aWduIG1tYXBfZmluZF92bWEgdG8gaG9zdCBwYWdlIHNpemUpCjEwLzEwIENoZWNraW5nIGNvbW1p
+dCA0NzcwY2NmNzM0MDAgKGxpbnV4LXVzZXI6IFBhc3MgdGhyb3VnaCBuYW5vc2Vjb25kIHRpbWVz
+dGFtcCBjb21wb25lbnRzIGZvciBzdGF0IHN5c2NhbGxzKQpFUlJPUjogY29kZSBpbmRlbnQgc2hv
+dWxkIG5ldmVyIHVzZSB0YWJzCiMxMDU6IEZJTEU6IGxpbnV4LXVzZXIvc3lzY2FsbF9kZWZzLmg6
+MTIwMzoKK15JYWJpX3Vsb25nICB0YXJnZXRfc3RfYXRpbWVfbnNlYzskCgpFUlJPUjogY29kZSBp
+bmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiMxMDg6IEZJTEU6IGxpbnV4LXVzZXIvc3lzY2Fs
+bF9kZWZzLmg6MTIwNToKK15JYWJpX3Vsb25nICB0YXJnZXRfc3RfbXRpbWVfbnNlYzskCgpFUlJP
+UjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiMxMTE6IEZJTEU6IGxpbnV4LXVz
+ZXIvc3lzY2FsbF9kZWZzLmg6MTIwNzoKK15JYWJpX3Vsb25nICB0YXJnZXRfc3RfY3RpbWVfbnNl
+YzskCgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiMxMjA6IEZJTEU6
+IGxpbnV4LXVzZXIvc3lzY2FsbF9kZWZzLmg6MTIzOToKK15JYWJpX3Vsb25nXkl0YXJnZXRfc3Rf
+YXRpbWVfbnNlYzskCgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiMx
+MjQ6IEZJTEU6IGxpbnV4LXVzZXIvc3lzY2FsbF9kZWZzLmg6MTI0MjoKK15JYWJpX3Vsb25nXkl0
+YXJnZXRfc3RfbXRpbWVfbnNlYzskCgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVz
+ZSB0YWJzCiMxMjg6IEZJTEU6IGxpbnV4LXVzZXIvc3lzY2FsbF9kZWZzLmg6MTI0NToKK15JYWJp
+X3Vsb25nXkl0YXJnZXRfc3RfY3RpbWVfbnNlYzskCgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxk
+IG5ldmVyIHVzZSB0YWJzCiMxMzc6IEZJTEU6IGxpbnV4LXVzZXIvc3lzY2FsbF9kZWZzLmg6MTMy
+NDoKK15JYWJpX3Vsb25nXkl0YXJnZXRfc3RfYXRpbWVfbnNlYzskCgpFUlJPUjogY29kZSBpbmRl
+bnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiMxNDE6IEZJTEU6IGxpbnV4LXVzZXIvc3lzY2FsbF9k
+ZWZzLmg6MTMyNzoKK15JYWJpX3Vsb25nXkl0YXJnZXRfc3RfbXRpbWVfbnNlYzskCgpFUlJPUjog
+Y29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiMxNDU6IEZJTEU6IGxpbnV4LXVzZXIv
+c3lzY2FsbF9kZWZzLmg6MTMzMDoKK15JYWJpX3Vsb25nXkl0YXJnZXRfc3RfY3RpbWVfbnNlYzsk
+CgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiMxNjE6IEZJTEU6IGxp
+bnV4LXVzZXIvc3lzY2FsbF9kZWZzLmg6MTM0ODoKK15JYWJpX3Vsb25nXkl0YXJnZXRfc3RfYXRp
+bWVfbnNlYzskCgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiMxNjQ6
+IEZJTEU6IGxpbnV4LXVzZXIvc3lzY2FsbF9kZWZzLmg6MTM1MDoKK15JYWJpX3Vsb25nXkl0YXJn
+ZXRfc3RfbXRpbWVfbnNlYzskCgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0
+YWJzCiMxNjc6IEZJTEU6IGxpbnV4LXVzZXIvc3lzY2FsbF9kZWZzLmg6MTM1MjoKK15JYWJpX3Vs
+b25nXkl0YXJnZXRfc3RfY3RpbWVfbnNlYzskCgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5l
+dmVyIHVzZSB0YWJzCiMxNzE6IEZJTEU6IGxpbnV4LXVzZXIvc3lzY2FsbF9kZWZzLmg6MTM1NToK
+K15JYWJpX3Vsb25nXklfX3VudXNlZDFbMl07JAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBu
+ZXZlciB1c2UgdGFicwojMTgwOiBGSUxFOiBsaW51eC11c2VyL3N5c2NhbGxfZGVmcy5oOjEzODM6
+CiteSXVuc2lnbmVkIGludF5JdGFyZ2V0X3N0X2F0aW1lX25zZWM7JAoKRVJST1I6IGNvZGUgaW5k
+ZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMTg0OiBGSUxFOiBsaW51eC11c2VyL3N5c2NhbGxf
+ZGVmcy5oOjEzODY6CiteSXVuc2lnbmVkIGludF5JdGFyZ2V0X3N0X210aW1lX25zZWM7JAoKRVJS
+T1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMTg4OiBGSUxFOiBsaW51eC11
+c2VyL3N5c2NhbGxfZGVmcy5oOjEzODk6CiteSXVuc2lnbmVkIGludF5JdGFyZ2V0X3N0X2N0aW1l
+X25zZWM7JAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMTkyOiBG
+SUxFOiBsaW51eC11c2VyL3N5c2NhbGxfZGVmcy5oOjEzOTE6CiteSXVuc2lnbmVkIGludF5JX191
+bnVzZWQxOyQKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzE5Mzog
+RklMRTogbGludXgtdXNlci9zeXNjYWxsX2RlZnMuaDoxMzkyOgorXkl1bnNpZ25lZCBpbnReSV9f
+dW51c2VkMjskCgp0b3RhbDogMTggZXJyb3JzLCAwIHdhcm5pbmdzLCAyMTEgbGluZXMgY2hlY2tl
+ZAoKUGF0Y2ggMTAvMTAgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55
+IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBt
+YWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCj09PSBPVVRQVVQgRU5E
+ID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgpUaGUgZnVsbCBsb2cgaXMg
+YXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMTkwNTIzMTQ0MzM2LjEzOTYw
+LTEtbGF1cmVudEB2aXZpZXIuZXUvdGVzdGluZy5jaGVja3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0t
+LQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwczovL3BhdGNo
+ZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRo
+YXQuY29t
 
-Sam
-
-> On 23 May 2019, at 19:14, Max Reitz <mreitz@redhat.com> wrote:
->=20
-> On 23.05.19 17:44, Sam Eiderman wrote:
->> In the following case:
->>=20
->> (base) A <- B <- C (tip)
->>=20
->> when running:
->>=20
->>    qemu-img rebase -b A C
->>=20
->> QEMU would read all sectors not allocated in the file being rebased =
-(C)
->> and compare them to the new base image (A), regardless of whether =
-they
->> were changed or even allocated anywhere along the chain between the =
-new
->> base and the top image (B). This causes many unneeded reads when
->> rebasing an image which represents a small diff of a large disk, as =
-it
->> would read most of the disk's sectors.
->>=20
->> Instead, use bdrv_is_allocated_above() to reduce the number of
->> unnecessary reads.
->>=20
->> Reviewed-by: Karl Heubaum <karl.heubaum@oracle.com>
->> Signed-off-by: Sam Eiderman <shmuel.eiderman@oracle.com>
->> Signed-off-by: Eyal Moscovici <eyal.moscovici@oracle.com>
->> ---
->> qemu-img.c | 25 ++++++++++++++++++++++++-
->> 1 file changed, 24 insertions(+), 1 deletion(-)
->>=20
->> diff --git a/qemu-img.c b/qemu-img.c
->> index 9bd0bb1e47..e6fd8e1a98 100644
->> --- a/qemu-img.c
->> +++ b/qemu-img.c
->=20
-> [...]
->=20
->> @@ -3437,6 +3443,23 @@ static int img_rebase(int argc, char **argv)
->>                 continue;
->>             }
->>=20
->> +            if (prefix_chain_bs) {
->> +                /*
->> +                 * If cluster wasn't changed since prefix_chain, we =
-don't need
->> +                 * to take action
->> +                 */
->> +                ret =3D bdrv_is_allocated_above(bs, prefix_chain_bs,
->> +                                              offset, n, &n);
->=20
-> I think you forgot to update the patch...?
->=20
-> Max
->=20
->> +                if (ret < 0) {
->> +                    error_report("error while reading image =
-metadata: %s",
->> +                                 strerror(-ret));
->> +                    goto out;
->> +                }
->> +                if (!ret) {
->> +                    continue;
->> +                }
->> +            }
->> +
->>             /*
->>              * Read old and new backing file and take into =
-consideration that
->>              * backing files may be smaller than the COW image.
 
