@@ -2,63 +2,76 @@ Return-Path: <SRS0=bvyN=TX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_MUTT autolearn=ham
+X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F6A8C282DD
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 09:45:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B6266C282DD
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 09:46:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8A4D720862
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 09:45:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8A4D720862
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 7C48C20862
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 09:46:05 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="fSHGoPNt"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7C48C20862
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yandex-team.ru
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:60837 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:60875 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hTkHZ-0005aq-My
-	for qemu-devel@archiver.kernel.org; Thu, 23 May 2019 05:45:05 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:41411)
+	id 1hTkIW-0006Fe-QS
+	for qemu-devel@archiver.kernel.org; Thu, 23 May 2019 05:46:04 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:41525)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1hTkGh-0005H0-OP
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 05:44:12 -0400
+	(envelope-from <yury-kotov@yandex-team.ru>) id 1hTkHJ-0005a4-68
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 05:44:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1hTkGg-0006oz-UR
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 05:44:11 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53440)
+	(envelope-from <yury-kotov@yandex-team.ru>) id 1hTkHI-0007JN-8l
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 05:44:49 -0400
+Received: from forwardcorp1p.mail.yandex.net ([77.88.29.217]:47694)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>)
-	id 1hTkGe-0006mq-JN; Thu, 23 May 2019 05:44:08 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 5CA7081E08;
-	Thu, 23 May 2019 09:44:02 +0000 (UTC)
-Received: from localhost (ovpn-116-196.ams2.redhat.com [10.36.116.196])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id D0E831802F;
-	Thu, 23 May 2019 09:43:58 +0000 (UTC)
-Date: Thu, 23 May 2019 10:43:57 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <20190523094357.GD26632@stefanha-x1.localdomain>
-References: <20190521084522.15050-1-vsementsov@virtuozzo.com>
+	(Exim 4.71) (envelope-from <yury-kotov@yandex-team.ru>)
+	id 1hTkHI-0007IN-2k
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 05:44:48 -0400
+Received: from mxbackcorp2j.mail.yandex.net (mxbackcorp2j.mail.yandex.net
+	[IPv6:2a02:6b8:0:1619::119])
+	by forwardcorp1p.mail.yandex.net (Yandex) with ESMTP id 3029C2E0AF3;
+	Thu, 23 May 2019 12:44:44 +0300 (MSK)
+Received: from smtpcorp1j.mail.yandex.net (smtpcorp1j.mail.yandex.net
+	[2a02:6b8:0:1619::137])
+	by mxbackcorp2j.mail.yandex.net (nwsmtp/Yandex) with ESMTP id
+	v7QKV5QSmA-ih5isQT1; Thu, 23 May 2019 12:44:44 +0300
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru;
+	s=default; 
+	t=1558604684; bh=SI0jxpLyVqp6a2uHfKYSeiX7vKJYR+MCO0k9TYvwkno=;
+	h=Message-Id:Date:Subject:To:From:Cc;
+	b=fSHGoPNtiqavFlkTxayfj7Rygy8eXW6cD7KqszxKVL7+dhXshywRSryjaifgJbfOk
+	PYjEqnIXHRNSb8amCqHYHN3nY/kreGcsabDpUvPf6tuHyV7SCMHHxTBBFgmkuHbV8V
+	mvk2M8/4XDJJC7irT8sgEHF2LxZf0EYoK4LX/Gm0=
+Authentication-Results: mxbackcorp2j.mail.yandex.net;
+	dkim=pass header.i=@yandex-team.ru
+Received: from dynamic-red.dhcp.yndx.net (dynamic-red.dhcp.yndx.net
+	[2a02:6b8:0:40c:d05b:c3b5:9878:7629])
+	by smtpcorp1j.mail.yandex.net (nwsmtp/Yandex) with ESMTPSA id
+	a66T7ncC5r-ih80rIK3; Thu, 23 May 2019 12:44:43 +0300
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
+	(Client certificate not present)
+From: Yury Kotov <yury-kotov@yandex-team.ru>
+To: Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>,
+	qemu-devel@nongnu.org
+Date: Thu, 23 May 2019 12:44:33 +0300
+Message-Id: <20190523094433.30297-1-yury-kotov@yandex-team.ru>
+X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="IMjqdzrDRly81ofr"
-Content-Disposition: inline
-In-Reply-To: <20190521084522.15050-1-vsementsov@virtuozzo.com>
-User-Agent: Mutt/1.11.4 (2019-03-13)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.25]);
-	Thu, 23 May 2019 09:44:02 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [RFC PATCH 0/3] block: qiov_offset parameter for io
+	[fuzzy]
+X-Received-From: 77.88.29.217
+Subject: [Qemu-devel] [PATCH v3] monitor: Fix return type of
+ monitor_fdset_dup_fd_find
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -70,55 +83,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, fam@euphon.net, qemu-block@nongnu.org,
-	qemu-devel@nongnu.org, mreitz@redhat.com, den@openvz.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+	"Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+monitor_fdset_dup_fd_find_remove() and monitor_fdset_dup_fd_find()
+return mon_fdset->id which is int64_t. Downcasting from int64_t to int
+leads to a bug with removing fd from fdset with id >=3D 2^32.
+So, fix return types for these function.
 
---IMjqdzrDRly81ofr
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Signed-off-by: Yury Kotov <yury-kotov@yandex-team.ru>
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
+---
+ include/monitor/monitor.h | 2 +-
+ monitor.c                 | 4 ++--
+ stubs/fdset.c             | 2 +-
+ 3 files changed, 4 insertions(+), 4 deletions(-)
 
-On Tue, May 21, 2019 at 11:45:19AM +0300, Vladimir Sementsov-Ogievskiy wrot=
-e:
-> Hi all!
->=20
-> Here is idea of adding qiov_offset parameter to io path, to avoid
-> a lot of places with same pattern of creating local_qiov or hd_qiov
-> variables. Here is only read path for qcow2, if we like it, I'll
-> make v2 with both read and write paths for qcow2.
->=20
-> Vladimir Sementsov-Ogievskiy (3):
->   block/io: introduce bdrv_co_preadv_part
->   block/qcow2: refactor qcow2_co_preadv to use buffer-based io
->   block/qcow2: implement .bdrv_co_preadv_part
->=20
->  include/block/block_int.h |  6 +++
->  block/io.c                | 87 ++++++++++++++++++++++++++-------------
->  block/qcow2.c             | 67 +++++++++++++++---------------
->  3 files changed, 97 insertions(+), 63 deletions(-)
+diff --git a/include/monitor/monitor.h b/include/monitor/monitor.h
+index 86656297f1..51f048d61f 100644
+--- a/include/monitor/monitor.h
++++ b/include/monitor/monitor.h
+@@ -45,6 +45,6 @@ AddfdInfo *monitor_fdset_add_fd(int fd, bool has_fdset_=
+id, int64_t fdset_id,
+ int monitor_fdset_get_fd(int64_t fdset_id, int flags);
+ int monitor_fdset_dup_fd_add(int64_t fdset_id, int dup_fd);
+ void monitor_fdset_dup_fd_remove(int dup_fd);
+-int monitor_fdset_dup_fd_find(int dup_fd);
++int64_t monitor_fdset_dup_fd_find(int dup_fd);
+=20
+ #endif /* MONITOR_H */
+diff --git a/monitor.c b/monitor.c
+index 6428eb3b7e..a0e637f7d6 100644
+--- a/monitor.c
++++ b/monitor.c
+@@ -2602,7 +2602,7 @@ err:
+     return -1;
+ }
+=20
+-static int monitor_fdset_dup_fd_find_remove(int dup_fd, bool remove)
++static int64_t monitor_fdset_dup_fd_find_remove(int dup_fd, bool remove)
+ {
+     MonFdset *mon_fdset;
+     MonFdsetFd *mon_fdset_fd_dup;
+@@ -2630,7 +2630,7 @@ err:
+     return -1;
+ }
+=20
+-int monitor_fdset_dup_fd_find(int dup_fd)
++int64_t monitor_fdset_dup_fd_find(int dup_fd)
+ {
+     return monitor_fdset_dup_fd_find_remove(dup_fd, false);
+ }
+diff --git a/stubs/fdset.c b/stubs/fdset.c
+index 4f3edf2ea4..a1b8f41f62 100644
+--- a/stubs/fdset.c
++++ b/stubs/fdset.c
+@@ -7,7 +7,7 @@ int monitor_fdset_dup_fd_add(int64_t fdset_id, int dup_fd=
+)
+     return -1;
+ }
+=20
+-int monitor_fdset_dup_fd_find(int dup_fd)
++int64_t monitor_fdset_dup_fd_find(int dup_fd)
+ {
+     return -1;
+ }
+--=20
+2.21.0
 
-I like it!
-
-Stefan
-
---IMjqdzrDRly81ofr
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAlzma10ACgkQnKSrs4Gr
-c8gPBggAsZcyFq0mGR0wVcMiIC6Z3p7B7SCMwZmNGiUUr10SV0T3dYkxouuGiIFM
-ooXiPLg2fnfdqxiYQidqUUt/kUO8creex7J3W2ro0VvAMJycvrdASV49AYrITcuS
-9e8/IgZ3k5FgIRqNQB+MxEvz2zJrVbfH3gvJK6QXQSbNwrZ3WLfopvK4o+rXXdTa
-xppa+mYRbJyL5UX5LKcE50PW/4VzWiyoXpX3S18UZeupnDGsPrFT6Q6jeZ8cISvt
-k7YjCID7vhrrc9kQNTIZVnlPNBXwbBNK4GuEmE23Fhw3kGjFnTkMqL33pKY8t009
-DHOEckKcfc640tPXJ5DG5ifxtRKW1w==
-=45c2
------END PGP SIGNATURE-----
-
---IMjqdzrDRly81ofr--
 
