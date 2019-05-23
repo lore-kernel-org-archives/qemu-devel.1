@@ -4,88 +4,106 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 27D86C282DD
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 11:00:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 92573C282DD
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 11:00:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CFFB220868
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 11:00:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 49F2C20868
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 11:00:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="sii941Mu"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CFFB220868
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="WH8U7TUp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 49F2C20868
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:33663 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:33680 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hTlSN-0001Mp-6o
-	for qemu-devel@archiver.kernel.org; Thu, 23 May 2019 07:00:19 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:52036)
+	id 1hTlSj-0001l6-Ln
+	for qemu-devel@archiver.kernel.org; Thu, 23 May 2019 07:00:41 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:57301)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hTl2o-0004QS-Fm
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 06:33:56 -0400
+	(envelope-from <rkagan@virtuozzo.com>) id 1hTlN8-0005GH-4X
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 06:54:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hTl2j-0006cM-Kl
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 06:33:53 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:41521)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1hTl2i-0006ZM-Pv
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 06:33:49 -0400
-Received: by mail-wr1-x444.google.com with SMTP id u16so1791940wrn.8
-	for <qemu-devel@nongnu.org>; Thu, 23 May 2019 03:33:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=from:to:cc:subject:date:message-id:in-reply-to:references
-	:mime-version:content-transfer-encoding;
-	bh=vrwtCOpqdBqDBXlwjop6UemUPv70vtcui2uO3XkTdjU=;
-	b=sii941Mu6QsrXrF0zyHqIw9LtmqgBYkqqaqKyETsW9Xwm66KixYRsV9RaoLb7u1L1F
-	kGIHNwVxmN55Hs/gzeNyUXsqZ91icO5C1k4bP0mUsItOym3eTA39OjZZRt2IvuI4/47n
-	dgadRUE9Ox7l4lRZoEqBeS/IQiFtT8qfrum7jjxZmS9V7VkzrYGYGWxGlfQsmDNKv3vu
-	+jSJQ0J2nkG1vhrnRHVOdpl5SPAEgHkXyVEk0BqRchnjigHYYOBwdkZ/7usbYPMpCuZ+
-	egCPQJscgZ3QQx0wHzv6nGzNuo0g6p7F/26ZgZ+/t/RTCSTPORoO5Gr1PgNbSUQJO4PL
-	cCCw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-	:references:mime-version:content-transfer-encoding;
-	bh=vrwtCOpqdBqDBXlwjop6UemUPv70vtcui2uO3XkTdjU=;
-	b=o1Pj/JCpu75TOJnYAHnHcXdIl4C6Gh0/qYB6h47EXFgzIWbcFgbjjcTABVzKXmEcdW
-	6iCfHAfV9GjC98A3xBZxBHvKgKNygYn/vJn/EMlEpC/cepOaYIh9a2NLhrtUqnps6GLt
-	nbaAkWA8f9tkgK6aI3zY9E17FaD/Rk085tSg9KImuvk+IeedCGAGH4eLEcATtl23Lpoe
-	xXCbRaLIy8q6v6Q0ci/RP4awWcavrFc6f8LFdjIX9OXIz3xOrnV9R0tGfJMMCreA1LlF
-	qG17xERrllSudcG59JNERfLPHBTMRUTM/jcN8jPpmigXU0FwpHMkw+D+xh0KOFXf9ro6
-	3MmA==
-X-Gm-Message-State: APjAAAXQZIxRucWtvZ+MytCE75LvnLXIeKJjM98s9oB96tsqjB4K1vky
-	GXDlSkhv4YyXZs5WrbGFhnyn4g==
-X-Google-Smtp-Source: APXvYqyg6ZfKZtiW0dWjPxI9KT421mj7k/zXgKGPOyktTaJ0kXoTLIsa7zRoYnSU2LjOSx7nh2uJnA==
-X-Received: by 2002:adf:e902:: with SMTP id f2mr57951095wrm.301.1558607625918; 
-	Thu, 23 May 2019 03:33:45 -0700 (PDT)
-Received: from zen.linaroharston ([81.128.185.34])
-	by smtp.gmail.com with ESMTPSA id
-	a22sm7220172wma.41.2019.05.23.03.33.42
-	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Thu, 23 May 2019 03:33:44 -0700 (PDT)
-Received: from zen.linaroharston. (localhost [127.0.0.1])
-	by zen.linaroharston (Postfix) with ESMTP id 530A51FFA9;
-	Thu, 23 May 2019 11:25:34 +0100 (BST)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-devel@nongnu.org
-Date: Thu, 23 May 2019 11:25:25 +0100
-Message-Id: <20190523102532.10486-22-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190523102532.10486-1-alex.bennee@linaro.org>
-References: <20190523102532.10486-1-alex.bennee@linaro.org>
+	(envelope-from <rkagan@virtuozzo.com>) id 1hTlN6-0004tD-Jl
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 06:54:53 -0400
+Received: from mail-eopbgr10111.outbound.protection.outlook.com
+	([40.107.1.111]:47693
+	helo=EUR02-HE1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <rkagan@virtuozzo.com>)
+	id 1hTlN6-0004rv-CU
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 06:54:52 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+	s=selector1;
+	h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+	bh=Tv2Cbli/Tqvu7owPtK43D91girBk3sDgN7PJDxaDH2Y=;
+	b=WH8U7TUpwDL7M5fgaDthqF46qEihBfd/WGJeHI1c+gutrh7P7nt+pDqiJcAcavTSx2oP5awKIXeujLxXpDY6FYcFqtTdllWU/JsRLAzSNkyQ8p1+QxCIjrg/lk2F2Y/DGINE15bdixgisc3y42tE7fxuq4mJJ+0uS3d7WF8uDTg=
+Received: from DBBPR08MB4854.eurprd08.prod.outlook.com (20.179.46.205) by
+	DBBPR08MB4425.eurprd08.prod.outlook.com (20.179.43.13) with Microsoft
+	SMTP
+	Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+	15.20.1922.16; Thu, 23 May 2019 10:54:48 +0000
+Received: from DBBPR08MB4854.eurprd08.prod.outlook.com
+	([fe80::4d46:2c95:d6e:ab3f]) by DBBPR08MB4854.eurprd08.prod.outlook.com
+	([fe80::4d46:2c95:d6e:ab3f%7]) with mapi id 15.20.1900.010;
+	Thu, 23 May 2019 10:54:48 +0000
+From: Roman Kagan <rkagan@virtuozzo.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, "qemu-devel@nongnu.org"
+	<qemu-devel@nongnu.org>
+Thread-Topic: [RFC PATCH 1/2] cpus-common: nuke finish_safe_work
+Thread-Index: AQHVEVXwRYejWVDaoEKIMQ4+lvoMHA==
+Date: Thu, 23 May 2019 10:54:48 +0000
+Message-ID: <20190523105440.27045-2-rkagan@virtuozzo.com>
+References: <20190523105440.27045-1-rkagan@virtuozzo.com>
+In-Reply-To: <20190523105440.27045-1-rkagan@virtuozzo.com>
+Accept-Language: en-US, ru-RU
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [185.231.240.5]
+x-clientproxiedby: HE1PR0901CA0058.eurprd09.prod.outlook.com
+	(2603:10a6:3:45::26) To DBBPR08MB4854.eurprd08.prod.outlook.com
+	(2603:10a6:10:da::13)
+authentication-results: spf=none (sender IP is )
+	smtp.mailfrom=rkagan@virtuozzo.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-mailer: git-send-email 2.21.0
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 8f746d30-988c-4662-6c5a-08d6df6d12fe
+x-microsoft-antispam: BCL:0; PCL:0;
+	RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600141)(711020)(4605104)(2017052603328)(7193020);
+	SRVR:DBBPR08MB4425; 
+x-ms-traffictypediagnostic: DBBPR08MB4425:
+x-microsoft-antispam-prvs: <DBBPR08MB4425A3840062F138C09C1FC4C9010@DBBPR08MB4425.eurprd08.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:1443;
+x-forefront-prvs: 00462943DE
+x-forefront-antispam-report: SFV:NSPM;
+	SFS:(10019020)(346002)(136003)(39840400004)(366004)(376002)(396003)(199004)(189003)(81166006)(81156014)(8676002)(8936002)(50226002)(7736002)(2501003)(305945005)(36756003)(53936002)(386003)(6506007)(102836004)(52116002)(6486002)(14454004)(316002)(76176011)(1076003)(478600001)(99286004)(86362001)(6512007)(11346002)(2616005)(476003)(446003)(186003)(66066001)(68736007)(2906002)(26005)(256004)(71200400001)(110136005)(25786009)(66946007)(64756008)(14444005)(71190400001)(66476007)(66556008)(73956011)(5660300002)(3846002)(6436002)(66446008)(486006)(6116002);
+	DIR:OUT; SFP:1102; SCL:1; SRVR:DBBPR08MB4425;
+	H:DBBPR08MB4854.eurprd08.prod.outlook.com; FPR:; SPF:None;
+	LANG:en; PTR:InfoNoRecords; A:1; MX:1; 
+received-spf: None (protection.outlook.com: virtuozzo.com does not designate
+	permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: iQinH8RizUEZu28b2N8lSGYmFRqFrlge6WBPSDwQQf3+3XXRjgAdq9mSWruCLthVkX3cGulT+85GhzTxH7doXQHut5PQ8XKwYzt8FD+Vkimm1RmBRCdK8ttrFw1xMvgmmHEwtgbS19sE370yRtxVN10jqzYd73tSQTA5IkMwmOMpcuKjcF2FuUbNotBrW5x+XBR7ooXb2O1WyGXSP4eJM6RHVo0jlImaqnaZNtw20/Z8BwUOB6Kre7Ylnvk9eSzRmGrp4JN84LgP33fnj1asOTh4bDxgB/rcl8KN1/F3VrZVMiMAXCGDxVOuPw0m3l1yAs9p8G4OQF0VqGZ0vjE42DgZ7asNHn/q9KFX0ll44wG6HH4HtMPTMzz4fz8GbT0DSAosQ008zHXR8VLh1eo+Sh+SEfLeYoT5JfbbRtYCpdE=
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2a00:1450:4864:20::444
-Subject: [Qemu-devel] [PATCH  v2 21/28] tests/tcg/alpha: add system boot.S
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8f746d30-988c-4662-6c5a-08d6df6d12fe
+X-MS-Exchange-CrossTenant-originalarrivaltime: 23 May 2019 10:54:48.5235 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DBBPR08MB4425
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.1.111
+Subject: [Qemu-devel] [RFC PATCH 1/2] cpus-common: nuke finish_safe_work
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -97,638 +115,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
-	qemu-arm@nongnu.org, Richard Henderson <richard.henderson@linaro.org>,
-	Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Richard Henderson <richard.henderson@linaro.org>
-
-This provides the bootstrap and low level helper functions for an
-alpha kernel.  We use direct access to the DP264 serial port for
-test output, and hard machine halt to exit the emulation.
-
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-Message-Id: <20190501184306.15208-1-richard.henderson@linaro.org>
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
----
- MAINTAINERS                             |   1 +
- tests/tcg/alpha/Makefile.softmmu-target |  34 ++
- tests/tcg/alpha/system/boot.S           | 511 ++++++++++++++++++++++++
- tests/tcg/alpha/system/kernel.ld        |  30 ++
- 4 files changed, 576 insertions(+)
- create mode 100644 tests/tcg/alpha/Makefile.softmmu-target
- create mode 100644 tests/tcg/alpha/system/boot.S
- create mode 100644 tests/tcg/alpha/system/kernel.ld
-
-diff --git a/MAINTAINERS b/MAINTAINERS
-index c4f209898a9..546a1431ea3 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -470,6 +470,7 @@ M: Richard Henderson <rth@twiddle.net>
- S: Maintained
- F: hw/alpha/
- F: hw/isa/smc37c669-superio.c
-+F: tests/tcg/alpha/system/
- 
- ARM Machines
- ------------
-diff --git a/tests/tcg/alpha/Makefile.softmmu-target b/tests/tcg/alpha/Makefile.softmmu-target
-new file mode 100644
-index 00000000000..3c0f34cc692
---- /dev/null
-+++ b/tests/tcg/alpha/Makefile.softmmu-target
-@@ -0,0 +1,34 @@
-+#
-+# Alpha system tests
-+#
-+
-+ALPHA_SYSTEM_SRC=$(SRC_PATH)/tests/tcg/alpha/system
-+VPATH+=$(ALPHA_SYSTEM_SRC)
-+
-+# These objects provide the basic boot code and helper functions for all tests
-+CRT_OBJS=boot.o
-+
-+ALPHA_TEST_SRCS=$(wildcard $(ALPHA_SYSTEM_SRC)/*.c)
-+ALPHA_TESTS = $(patsubst $(ALPHA_SYSTEM_SRC)/%.c, %, $(ALPHA_TEST_SRCS))
-+
-+CRT_PATH=$(ALPHA_SYSTEM_SRC)
-+LINK_SCRIPT=$(ALPHA_SYSTEM_SRC)/kernel.ld
-+LDFLAGS=-Wl,-T$(LINK_SCRIPT)
-+TESTS+=$(ALPHA_TESTS) $(MULTIARCH_TESTS)
-+CFLAGS+=-nostdlib -g -O1 -mcpu=ev6 $(MINILIB_INC)
-+LDFLAGS+=-static -nostdlib $(CRT_OBJS) $(MINILIB_OBJS) -lgcc
-+
-+# building head blobs
-+.PRECIOUS: $(CRT_OBJS)
-+
-+%.o: $(CRT_PATH)/%.S
-+	$(CC) $(CFLAGS) -x assembler-with-cpp -c $< -o $@
-+
-+# Build and link the tests
-+%: %.c $(LINK_SCRIPT) $(CRT_OBJS) $(MINILIB_OBJS)
-+	$(CC) $(CFLAGS) $< -o $@ $(LDFLAGS)
-+
-+memory: CFLAGS+=-DCHECK_UNALIGNED=0
-+
-+# Running
-+QEMU_OPTS+=-serial chardev:output -kernel
-diff --git a/tests/tcg/alpha/system/boot.S b/tests/tcg/alpha/system/boot.S
-new file mode 100644
-index 00000000000..9791b1ef7c8
---- /dev/null
-+++ b/tests/tcg/alpha/system/boot.S
-@@ -0,0 +1,511 @@
-+/*
-+ * Minimal Alpha system boot code.
-+ *
-+ * Copyright Linaro Ltd 2019
-+ */
-+
-+	.set	noat
-+	.set	nomacro
-+	.arch	ev6
-+	.text
-+
-+.macro load_pci_io reg
-+	/* For typhoon, this is
-+	 *   0xfffffc0000000000  -- kseg identity map
-+	 * +      0x10000000000  -- typhoon pio base
-+	 * +        0x1fc000000  -- typhoon pchip0 pci base
-+	 * = 0xfffffd01fc000000
-+	 */
-+	ldah	\reg, -3		/* ff..fd0000 */
-+	lda	\reg, 0x1fc(\reg)	/* ff..fd01fc */
-+	sll	\reg, 24, \reg
-+.endm
-+
-+#define com1Rbr 0x3f8
-+#define com1Thr 0x3f8
-+#define com1Ier 0x3f9
-+#define com1Iir 0x3fa
-+#define com1Lcr 0x3fb
-+#define com1Mcr 0x3fc
-+#define com1Lsr 0x3fd
-+#define com1Msr 0x3fe
-+#define com1Scr 0x3ff
-+#define com1Dll 0x3f8
-+#define com1Dlm 0x3f9
-+
-+#define PAL_halt    0
-+#define PAL_wrent  52
-+#define PAL_wrkgp  55
-+
-+	.text
-+	.p2align 4
-+	.globl	_start
-+	.ent	_start
-+_start:
-+	br	$gp, .+4
-+	ldah	$gp, 0($gp)		!gpdisp!1
-+	lda	$gp, 0($gp)		!gpdisp!1
-+
-+	ldah	$sp, $stack_end($gp)	!gprelhigh
-+	lda	$sp, $stack_end($sp)	!gprellow
-+
-+	/* Install kernel gp for exception handlers.  */
-+	mov	$gp, $16
-+	call_pal PAL_wrkgp
-+
-+	/* Install exception handlers.  */
-+	ldah	$16, entInt($gp)	!gprelhigh
-+	lda	$16, entInt($16)	!gprellow
-+	lda	$17, 0
-+	call_pal PAL_wrent
-+
-+	ldah	$16, entArith($gp)	!gprelhigh
-+	lda	$16, entArith($16)	!gprellow
-+	lda	$17, 1
-+	call_pal PAL_wrent
-+
-+	ldah	$16, entMM($gp)		!gprelhigh
-+	lda	$16, entMM($16)		!gprellow
-+	lda	$17, 2
-+	call_pal PAL_wrent
-+
-+	ldah	$16, entIF($gp)		!gprelhigh
-+	lda	$16, entIF($16)		!gprellow
-+	lda	$17, 3
-+	call_pal PAL_wrent
-+
-+	ldah	$16, entUna($gp)	!gprelhigh
-+	lda	$16, entUna($16)	!gprellow
-+	lda	$17, 4
-+	call_pal PAL_wrent
-+
-+	ldah	$16, entSys($gp)	!gprelhigh
-+	lda	$16, entSys($16)	!gprellow
-+	lda	$17, 5
-+	call_pal PAL_wrent
-+
-+	/*
-+	 * Initialize COM1.
-+	 */
-+	load_pci_io $1
-+	lda	$2, 0x87		/* outb(0x87, com1Lcr); */
-+	stb	$2, com1Lcr($1)
-+	stb	$31, com1Dlm($1)	/* outb(0, com1Dlm); */
-+	lda	$2, 3			/* baudconst 3 => 56000 */
-+	stb	$2, com1Dll($1)		/* outb(baudconst, com1Dll); */
-+	lda	$2, 0x07
-+	stb	$2, com1Lcr($1)		/* outb(0x07, com1Lcr) */
-+	lda	$2, 0x0f
-+	stb	$2, com1Mcr($1)		/* outb(0x0f, com1Mcr) */
-+
-+	bsr	$26, main		!samegp
-+
-+	/* fall through to _exit */
-+	.end	_start
-+
-+	.globl	_exit
-+	.ent	_exit
-+_exit:
-+	.frame	$sp, 0, $26, 0
-+	.prologue 0
-+
-+	/* We cannot return an error code.  */
-+	call_pal PAL_halt
-+	.end	_exit
-+
-+/*
-+ * We have received an exception that we don't handle.  Log and exit.
-+ */
-+	.ent	log_exit
-+log_exit:
-+entInt:
-+entArith:
-+entMM:
-+entIF:
-+entUna:
-+entSys:
-+	ldah	$16, $errormsg($gp)	!gprelhigh
-+	lda	$16, $errormsg($16)	!gprellow
-+	bsr	$26, __sys_outs		!samegp
-+	bsr	$26, _exit		!samegp
-+	.end	log_exit
-+
-+	.section .rodata
-+$errormsg:
-+	.string "Terminated by exception.\n"
-+	.previous
-+
-+	/*
-+	 * Helper Functions
-+	 */
-+
-+	/* Output a single character to serial port */
-+	.global __sys_outc
-+	.ent	__sys_outc
-+__sys_outc:
-+	.frame	$sp, 0, $26, 0
-+	.prologue 0
-+
-+	load_pci_io $1
-+
-+	/* 
-+	 * while ((inb(com1Lsr) & 0x20) == 0)
-+	 *       continue;
-+	 */
-+1:	ldbu	$0, com1Lsr($1)
-+	and	$0, 0x20, $0
-+	beq	$0, 1b
-+
-+	/* outb(c, com1Thr); */
-+	stb	$16, com1Thr($1)
-+	ret
-+	.end	__sys_outc
-+
-+	/* Output a nul-terminated string to serial port */
-+	.global	__sys_outs
-+	.ent	__sys_outs
-+__sys_outs:
-+	.frame	$sp, 0, $26, 0
-+	.prologue 0
-+
-+	load_pci_io $1
-+
-+	ldbu	$2, 0($16)
-+	beq	$2, 9f
-+
-+	/* 
-+	 * while ((inb(com1Lsr) & 0x20) == 0)
-+	 *       continue;
-+	 */
-+1:	ldbu	$0, com1Lsr($1)
-+	and	$0, 0x20, $0
-+	beq	$0, 1b
-+
-+	/* outb(c, com1Thr); */
-+	stb	$2, com1Thr($1)
-+
-+	addq	$16, 1, $16
-+	ldbu	$2, 0($16)
-+	bne	$2, 1b
-+
-+9:	ret
-+	.end	__sys_outs
-+
-+/*
-+ * Division routines that are normally in libc.
-+ *
-+ * These do not follow the C calling convention.  Arguments are in $24+$25,
-+ * the result is in $27.  Register $28 may be clobbered; everything else
-+ * must be saved.
-+ *
-+ * We store the remainder in $28, so that we can share code.
-+ *
-+ * We do not signal divide by zero.
-+ */
-+
-+/*
-+ * Unsigned 64-bit division.
-+ */
-+
-+	.globl	__divqu
-+	.ent	__divqu
-+__divqu:
-+	.frame	$sp, 48, $23
-+	subq	$sp, 48, $sp
-+	stq	$0, 0($sp)
-+	stq	$1, 8($sp)
-+	stq	$2, 16($sp)
-+	stq	$3, 24($sp)
-+	stq	$4, 32($sp)
-+	.prologue 0
-+
-+#define mask     $0
-+#define divisor  $1
-+#define compare  $2
-+#define tmp1     $3
-+#define tmp2     $4
-+#define quotient $27
-+#define modulus  $28
-+
-+	mov	$24, modulus
-+	mov	$25, divisor
-+	mov	$31, quotient
-+	mov	1, mask
-+	beq	$25, 9f
-+
-+	/* Shift left until divisor >= modulus.  */
-+1:	cmpult	divisor, modulus, compare
-+	blt	divisor, 2f
-+	addq	divisor, divisor, divisor
-+	addq	mask, mask, mask
-+	bne	compare, 1b
-+
-+2:	addq	quotient, mask, tmp2
-+	srl	mask, 1, mask
-+	cmpule	divisor, modulus, compare
-+	subq	modulus, divisor, tmp1
-+	cmovne	compare, tmp2, quotient
-+	srl	divisor, 1, divisor
-+	cmovne	compare, tmp1, modulus
-+	bne	mask, 2b
-+
-+9:	ldq	$0, 0($sp)
-+	ldq	$1, 8($sp)
-+	ldq	$2, 16($sp)
-+	ldq	$3, 24($sp)
-+	ldq	$4, 32($sp)
-+	addq	$sp, 48, $sp
-+	ret	$31, ($23), 1
-+
-+#undef mask
-+#undef divisor
-+#undef compare
-+#undef tmp1
-+#undef tmp2
-+#undef quotient
-+#undef modulus
-+
-+	.end	__divqu
-+
-+/*
-+ * Unsigned 64-bit remainder.
-+ * Note that __divqu above leaves the result in $28.
-+ */
-+
-+	.globl	__remqu
-+	.ent	__remqu
-+__remqu:
-+	.frame	$sp, 16, $23
-+	subq	$sp, 16, $sp
-+	stq	$23, 0($sp)
-+	.prologue 0
-+
-+	bsr	$23, __divqu
-+
-+	ldq	$23, 0($sp)
-+	mov	$28, $27
-+	addq	$sp, 16, $sp
-+	ret	$31, ($23), 1
-+	.end	__remqu
-+
-+/*
-+ * Signed 64-bit division.
-+ */
-+
-+	.globl	__divqs
-+	.ent	__divqs
-+__divqs:
-+	.prologue 0
-+
-+	/* Common case: both arguments are positive.  */
-+	bis	$24, $25, $28
-+	bge	$28, __divqu
-+
-+	/* At least one argument is negative.  */
-+	subq	$sp, 32, $sp
-+	stq	$23, 0($sp)
-+	stq	$24, 8($sp)
-+	stq	$25, 16($sp)
-+
-+	/* Compute absolute values.  */
-+	subq	$31, $24, $28
-+	cmovlt	$24, $28, $24
-+	subq	$31, $25, $28
-+	cmovlt	$25, $28, $25
-+
-+	bsr	$23, __divqu
-+
-+	ldq	$24, 8($sp)
-+	ldq	$25, 16($sp)
-+
-+	/* -a / b = a / -b = -(a / b) */
-+	subq	$31, $27, $23
-+	xor	$24, $25, $28
-+	cmovlt	$28, $23, $27
-+
-+	ldq	$23, 0($sp)
-+	addq	$sp, 32, $sp
-+	ret	$31, ($23), 1
-+	.end	__divqs
-+
-+/*
-+ * Signed 64-bit remainder.
-+ */
-+
-+	.globl	__remqs
-+	.ent	__remqs
-+__remqs:
-+	.prologue 0
-+
-+	/* Common case: both arguments are positive.  */
-+	bis	$24, $25, $28
-+	bge	$28, __remqu
-+
-+	/* At least one argument is negative.  */
-+	subq	$sp, 32, $sp
-+	stq	$23, 0($sp)
-+	stq	$24, 8($sp)
-+	stq	$25, 16($sp)
-+
-+	/* Compute absolute values.  */
-+	subq	$31, $24, $28
-+	cmovlt	$24, $28, $24
-+	subq	$31, $25, $28
-+	cmovlt	$25, $28, $25
-+
-+	bsr	$23, __divqu
-+
-+	ldq	$23, 0($sp)
-+	ldq	$24, 8($sp)
-+	ldq	$25, 16($sp)
-+
-+	/* -a % b = -(a % b); a % -b = a % b.  */
-+	subq	$31, $28, $27
-+	cmovge	$24, $28, $27
-+
-+	addq	$sp, 32, $sp
-+	ret	$31, ($23), 1
-+	.end	__remqs
-+
-+/*
-+ * Unsigned 32-bit division.
-+ */
-+
-+	.globl	__divlu
-+	.ent	__divlu
-+__divlu:
-+	.frame	$sp, 32, $23
-+	subq	$sp, 32, $sp
-+	stq	$23, 0($sp)
-+	stq	$24, 8($sp)
-+	stq	$25, 16($sp)
-+	.prologue 0
-+
-+	/* Zero extend and use the 64-bit routine.  */
-+	zap	$24, 0xf0, $24
-+	zap	$25, 0xf0, $25
-+	bsr	$23, __divqu
-+
-+	addl	$27, 0, $27
-+	ldq	$23, 0($sp)
-+	ldq	$24, 8($sp)
-+	ldq	$25, 16($sp)
-+	addq	$sp, 32, $sp
-+	ret	$31, ($23), 1
-+	.end	__divlu
-+
-+/*
-+ * Unsigned 32-bit remainder.
-+ */
-+
-+	.globl	__remlu
-+	.ent	__remlu
-+__remlu:
-+	.frame	$sp, 32, $23
-+	subq	$sp, 32, $sp
-+	stq	$23, 0($sp)
-+	stq	$24, 8($sp)
-+	stq	$25, 16($sp)
-+	.prologue 0
-+
-+	/* Zero extend and use the 64-bit routine.  */
-+	zap	$24, 0xf0, $24
-+	zap	$25, 0xf0, $25
-+	bsr	$23, __divqu
-+
-+	/* Recall that the remainder is returned in $28.  */
-+	addl	$28, 0, $27
-+	ldq	$23, 0($sp)
-+	ldq	$24, 8($sp)
-+	ldq	$25, 16($sp)
-+	addq	$sp, 32, $sp
-+	ret	$31, ($23), 1
-+	.end	__remlu
-+
-+/*
-+ * Signed 32-bit division.
-+ */
-+
-+	.globl	__divls
-+	.ent	__divls
-+__divls:
-+	.frame	$sp, 32, $23
-+	subq	$sp, 32, $sp
-+	stq	$23, 0($sp)
-+	stq	$24, 8($sp)
-+	stq	$25, 16($sp)
-+	.prologue 0
-+
-+	/* Sign extend.  */
-+	addl	$24, 0, $24
-+	addl	$25, 0, $25
-+
-+	/* Compute absolute values.  */
-+	subq	$31, $24, $28
-+	cmovlt	$24, $28, $24
-+	subq	$31, $25, $28
-+	cmovlt	$25, $28, $25
-+
-+	bsr	$23, __divqu
-+
-+	ldq	$24, 8($sp)
-+	ldq	$25, 16($sp)
-+
-+	/* Negate the unsigned result, if necessary.  */
-+	xor	$24, $25, $28
-+	subl	$31, $27, $23
-+	addl	$27, 0, $27
-+	addl	$28, 0, $28
-+	cmovlt	$28, $23, $27
-+
-+	ldq	$23, 0($sp)
-+	addq	$sp, 32, $sp
-+	ret	$31, ($23), 1
-+	.end	__divls
-+
-+/*
-+ * Signed 32-bit remainder.
-+ */
-+
-+	.globl	__remls
-+	.ent	__remls
-+__remls:
-+	.frame	$sp, 32, $23
-+	subq	$sp, 32, $sp
-+	stq	$23, 0($sp)
-+	stq	$24, 8($sp)
-+	stq	$25, 16($sp)
-+	.prologue 0
-+
-+	/* Sign extend.  */
-+	addl	$24, 0, $24
-+	addl	$25, 0, $25
-+
-+	/* Compute absolute values.  */
-+	subq	$31, $24, $28
-+	cmovlt	$24, $28, $24
-+	subq	$31, $25, $28
-+	cmovlt	$25, $28, $25
-+
-+	bsr	$23, __divqu
-+
-+	ldq	$23, 0($sp)
-+	ldq	$24, 8($sp)
-+	ldq	$25, 16($sp)
-+
-+	/* Negate the unsigned result, if necessary.  */
-+	subl	$31, $28, $27
-+	addl	$28, 0, $28
-+	cmovge	$24, $28, $27
-+
-+	addq	$sp, 32, $sp
-+	ret	$31, ($23), 1
-+	.end	__remls
-+
-+	.data
-+	.p2align 4
-+stack:
-+	.skip	65536
-+$stack_end:
-+	.type	stack,@object
-+	.size	stack, . - stack
-diff --git a/tests/tcg/alpha/system/kernel.ld b/tests/tcg/alpha/system/kernel.ld
-new file mode 100644
-index 00000000000..d2ac6ecfeb8
---- /dev/null
-+++ b/tests/tcg/alpha/system/kernel.ld
-@@ -0,0 +1,30 @@
-+ENTRY(_start)
-+
-+SECTIONS
-+{
-+    /* Linux kernel legacy start address.  */
-+    . = 0xfffffc0000310000;
-+    _text = .;
-+    .text : {
-+        *(.text)
-+    }
-+    .rodata : {
-+        *(.rodata)
-+    }
-+    _etext = .;
-+
-+    . = ALIGN(8192);
-+    _data = .;
-+    .got : {
-+        *(.got)
-+    }
-+    .data : {
-+	*(.sdata)
-+        *(.data)
-+    }
-+    _edata = .;
-+    .bss : {
-+        *(.bss)
-+    }
-+    _end = .;
-+}
--- 
-2.20.1
-
+SXQgd2FzIGludHJvZHVjZWQgaW4gY29tbWl0IGIxMjk5NzJjOGI0MWUxNWIwNTIxODk1YTQ2ZmQ5
+Yzc1MmI2OGE1ZSwNCndpdGggdGhlIGZvbGxvd2luZyBtb3RpdmF0aW9uOg0KDQogIEJlY2F1c2Ug
+c3RhcnRfZXhjbHVzaXZlIHVzZXMgQ1BVX0ZPUkVBQ0gsIG1lcmdlIGV4Y2x1c2l2ZV9sb2NrIHdp
+dGgNCiAgcWVtdV9jcHVfbGlzdF9sb2NrOiB0b2dldGhlciB3aXRoIGEgY2FsbCB0byBleGNsdXNp
+dmVfaWRsZSAodmlhDQogIGNwdV9leGVjX3N0YXJ0L2VuZCkgaW4gY3B1X2xpc3RfYWRkLCB0aGlz
+IHByb3RlY3RzIGV4Y2x1c2l2ZSB3b3JrDQogIGFnYWluc3QgY29uY3VycmVudCBDUFUgYWRkaXRp
+b24gYW5kIHJlbW92YWwuDQoNCkhvd2V2ZXIsIGl0IHNlZW1zIHRvIGJlIHJlZHVuZGFudCwgYmVj
+YXVzZSB0aGUgY3B1LWV4Y2x1c2l2ZQ0KaW5mcmFzdHJ1Y3R1cmUgcHJvdmlkZXMgc3VmZmlmaWNl
+bnQgcHJvdGVjdGlvbiBhZ2FpbnN0IHRoZSBuZXdseSBhZGRlZA0KQ1BVIHN0YXJ0aW5nIGV4ZWN1
+dGlvbiB3aGlsZSB0aGUgY3B1LWV4Y2x1c2l2ZSB3b3JrIGlzIHJ1bm5pbmcsIGFuZCB0aGUNCmFm
+b3JlbWVudGlvbmVkIHRyYXZlcnNpbmcgb2YgdGhlIGNwdSBsaXN0IGlzIHByb3RlY3RlZCBieQ0K
+cWVtdV9jcHVfbGlzdF9sb2NrLg0KDQpCZXNpZGVzLCB0aGlzIGFwcGVhcnMgdG8gYmUgdGhlIG9u
+bHkgcGxhY2Ugd2hlcmUgdGhlIGNwdS1leGNsdXNpdmUNCnNlY3Rpb24gaXMgZW50ZXJlZCB3aXRo
+IHRoZSBCUUwgdGFrZW4sIHdoaWNoIGhhcyBiZWVuIGZvdW5kIHRvIHRyaWdnZXINCkFCLUJBIGRl
+YWRsb2NrIGFzIGZvbGxvd3M6DQoNCiAgICB2Q1BVIHRocmVhZCAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgbWFpbiB0aHJlYWQNCiAgICAtLS0tLS0tLS0tLSAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgLS0tLS0tLS0tLS0NCmFzeW5jX3NhZmVfcnVuX29uX2NwdShzZWxmLA0KICAgICAg
+ICAgICAgICAgICAgICAgIGFzeW5jX3N5bmljX3VwZGF0ZSkNCi4uLiAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgW2NwdSBob3QtYWRkXQ0KcHJvY2Vzc19xdWV1ZWRfY3B1
+X3dvcmsoKQ0KICBxZW11X211dGV4X3VubG9ja19pb3RocmVhZCgpDQogICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgIFtncmFiIEJRTF0NCiAgc3RhcnRfZXhjbHVzaXZl
+KCkgICAgICAgICAgICAgICAgICAgICAgICAgY3B1X2xpc3RfYWRkKCkNCiAgYXN5bmNfc3luaWNf
+dXBkYXRlKCkgICAgICAgICAgICAgICAgICAgICAgICBmaW5pc2hfc2FmZV93b3JrKCkNCiAgICBx
+ZW11X211dGV4X2xvY2tfaW90aHJlYWQoKSAgICAgICAgICAgICAgICAgIGNwdV9leGVjX3N0YXJ0
+KCkNCg0KU28gcmVtb3ZlIGl0LiAgVGhpcyBwYXZlcyB0aGUgd2F5IHRvIGVzdGFibGlzaGluZyBh
+IHN0cmljdCBuZXN0aW5nIHJ1bGUNCm9mIG5ldmVyIGVudGVyaW5nIHRoZSBleGNsdXNpdmUgc2Vj
+dGlvbiB3aXRoIHRoZSBCUUwgdGFrZW4uDQoNClNpZ25lZC1vZmYtYnk6IFJvbWFuIEthZ2FuIDxy
+a2FnYW5AdmlydHVvenpvLmNvbT4NCi0tLQ0KIGNwdXMtY29tbW9uLmMgfCA4IC0tLS0tLS0tDQog
+MSBmaWxlIGNoYW5nZWQsIDggZGVsZXRpb25zKC0pDQoNCmRpZmYgLS1naXQgYS9jcHVzLWNvbW1v
+bi5jIGIvY3B1cy1jb21tb24uYw0KaW5kZXggM2NhNThjNjRlOC4uMDIzY2ZlYmZhMyAxMDA2NDQN
+Ci0tLSBhL2NwdXMtY29tbW9uLmMNCisrKyBiL2NwdXMtY29tbW9uLmMNCkBAIC02OSwxMiArNjks
+NiBAQCBzdGF0aWMgaW50IGNwdV9nZXRfZnJlZV9pbmRleCh2b2lkKQ0KICAgICByZXR1cm4gY3B1
+X2luZGV4Ow0KIH0NCiANCi1zdGF0aWMgdm9pZCBmaW5pc2hfc2FmZV93b3JrKENQVVN0YXRlICpj
+cHUpDQotew0KLSAgICBjcHVfZXhlY19zdGFydChjcHUpOw0KLSAgICBjcHVfZXhlY19lbmQoY3B1
+KTsNCi19DQotDQogdm9pZCBjcHVfbGlzdF9hZGQoQ1BVU3RhdGUgKmNwdSkNCiB7DQogICAgIHFl
+bXVfbXV0ZXhfbG9jaygmcWVtdV9jcHVfbGlzdF9sb2NrKTsNCkBAIC04Niw4ICs4MCw2IEBAIHZv
+aWQgY3B1X2xpc3RfYWRkKENQVVN0YXRlICpjcHUpDQogICAgIH0NCiAgICAgUVRBSUxRX0lOU0VS
+VF9UQUlMX1JDVSgmY3B1cywgY3B1LCBub2RlKTsNCiAgICAgcWVtdV9tdXRleF91bmxvY2soJnFl
+bXVfY3B1X2xpc3RfbG9jayk7DQotDQotICAgIGZpbmlzaF9zYWZlX3dvcmsoY3B1KTsNCiB9DQog
+DQogdm9pZCBjcHVfbGlzdF9yZW1vdmUoQ1BVU3RhdGUgKmNwdSkNCi0tIA0KMi4yMS4wDQoNCg==
 
