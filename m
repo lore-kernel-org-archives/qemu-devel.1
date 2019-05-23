@@ -6,65 +6,65 @@ X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 772F9C282DD
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 14:45:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CE653C282DD
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 14:45:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4D013206BA
-	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 14:45:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4D013206BA
+	by mail.kernel.org (Postfix) with ESMTPS id 95644206BA
+	for <qemu-devel@archiver.kernel.org>; Thu, 23 May 2019 14:45:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 95644206BA
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:38044 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:38046 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hToya-0005S6-Hd
-	for qemu-devel@archiver.kernel.org; Thu, 23 May 2019 10:45:48 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:60945)
+	id 1hToyj-0005Z7-Rl
+	for qemu-devel@archiver.kernel.org; Thu, 23 May 2019 10:45:57 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:32780)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hTowv-0004DH-0r
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 10:44:06 -0400
+	(envelope-from <laurent@vivier.eu>) id 1hTox1-0004Kq-0p
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 10:44:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hTowt-0006Cm-Sk
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 10:44:04 -0400
-Received: from mout.kundenserver.de ([212.227.126.135]:49787)
+	(envelope-from <laurent@vivier.eu>) id 1hTowz-0006Me-DT
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 10:44:10 -0400
+Received: from mout.kundenserver.de ([212.227.126.135]:53799)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1hTowt-0006BX-Jk
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 10:44:03 -0400
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1hTowz-0006Lj-49
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 10:44:09 -0400
 Received: from localhost.localdomain ([78.238.229.36]) by
 	mrelayeu.kundenserver.de (mreue010 [212.227.15.167]) with ESMTPSA
 	(Nemesis)
-	id 1N3suW-1gU7aR2VpQ-00zrVE; Thu, 23 May 2019 16:43:43 +0200
+	id 1N17l4-1gVmX23mPq-012bag; Thu, 23 May 2019 16:43:47 +0200
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Date: Thu, 23 May 2019 16:43:30 +0200
-Message-Id: <20190523144336.13960-5-laurent@vivier.eu>
+Date: Thu, 23 May 2019 16:43:34 +0200
+Message-Id: <20190523144336.13960-9-laurent@vivier.eu>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190523144336.13960-1-laurent@vivier.eu>
 References: <20190523144336.13960-1-laurent@vivier.eu>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:fosqzI4IKyonWFKlDIrgHOJTQ95xdYWKrVKC8/cU5/xi+q9tDbb
-	u8Yfz02StRE9/5LpiJVzOcVnlmEfUIlwgW5XP2UdxxCnCWQkalT9o1rwWm23TygbGc2xuC9
-	u//TDzzwsp2nLioxm7Mew9Bugtmy9uAThw5ARlPo4Xfy/Q+Sjcj0m06zA+2ACvyI6MW6KED
-	PHHZcDwHjL8Ut8O5Px0tQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:n/TbAKfjseM=:ifwigjrhCyYJrEMH3pvAYf
-	+dXJ2c/8WPWZjM6LjxMOscOyxkcFL2ev5Wd10EJAdx1deIEHRgpNn8n79fPHZ/6mZoPGg8wLh
-	OupJyLskfwTcoXTH+lSgsQrrGmEWzTMwQIFMBZa6vyGWE1hvu2NVWRr2tIofV8qXyjBtLdH8Z
-	RvqguVi1xmPShYC/I6xVsNo8Y89NSacU8UiMfbx2SPWQCMfcnWz/jZNo7FKQ5K3dbdvoDjNXc
-	wv5OQoL1je6M5EJLqeKM2Mp2F0ts+3fTodJb/7DpgJZji9RJxR3kraenOpjNv2Ooiw3icQLas
-	xyAKNkQgajsJ2ZBvkmOuxRxr3hhDsLDHK74rtOnUejazD4nLVgN4/tWKU6QeTttusKbYJ040+
-	K/3EI9C7Dh4TnvUl9VRzn4V06VawB8bjNVZ0GqfywV2SeAj0k9e9aqkwgemNpsh2syZtAqGqC
-	RULGgqOyPa/GyjesEHRkcTNPw6FrVswrSoHPmZi9RnC521/Bi+NpZOQYxHsXTIlbImaTWmxbF
-	fCh+TQMbfKEB0OVKCs6atLm95aQXI1yDF/JRFXeubQ5dbsmg8vWzokR9lSB5ftlud5AXD5WT3
-	NpKjTeWUpzvXyNm9QpG4M8cSx4Qhn1MS5UqU/b9LECx3MFJWkC94h6tT6td8krxidak7xXlqZ
-	HgmW/u3xUtsbqTo/li8MnYvYdyGWgSTx/0IybvvT7xdBmukcWmMFEBrt39WGHsW61mC1RuhFh
-	JNxRW226uOcqynpo2HujTCHA1DClnmMhkQz9bg==
+X-Provags-ID: V03:K1:RfUqtwaq+SNTjIfAEcu3U45jOpyRrW+Lr1Rq/nN6AvmHsV2Av3x
+	3DhBtn7CdObLTJ2Sput6MQwePPrgXLX6+uwTfdRA0BemS98RAyA9R9DIoQvheYPPy4sSA59
+	MdApKaTjGjLeGHwqKeoWPla5pAMQn8UABonv8pXYnhsx3AmWUvIqssSUxfy8GtAKm6GtwhC
+	bIT6L1bNxB/OSE9gwgREg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:F+deb7E1NZ4=:Tq+MUOeXS9AUMRBpdloGWo
+	v5389u/hF2NDXvxJfbDY6S4qZfagoo3YfPpvHlj6yvuuC3f+AKSWIPpsl3MuKMpBFPq29WiUZ
+	HD6a5NuzLwIPA/eiN7PMV90ljhDpRtbe+dE9JK5Oy0rfxrdcPW7NS/wryJQqDPcJTuBrfVfRj
+	g5tfAZjhE29BU0Ag9/YmRznmIUQoHWEJsg7fB3AF50Lw96PcV+TB72tnlQJ1SLa7D42QZJ15T
+	Pei+N7lUttiGZCUE6ITOW7UX+BBUYUbjP63zTQ6ZEya4AZhkj6aK61qQ409vgKCPlLOxWn4ik
+	ZntBJ2BNGV25JBmIJNHDPbNBCTC4Ia+8Cuem1qXrDxGmLktObbYaG/AbomPYMRyF0euhYx+VQ
+	WripoieG3pc4T3mEWkVyaPwLIhi9TONMh8LInPkpAKatYAvnnIJHkXrfaU8CNDnmFUkIbe6uw
+	bivqG8nrIbXi/tzYJS0RQychaPt4j/Ior+0rH0npGNuSupomZ9wcMrJE/HRKJwD8FIHX21oJ5
+	fo134AqQabYf1mhui4+x744ER0hAwVSsgJwCxTUDNwGfb7+W38SREAhlsC4JnXZ29HXRJGF8K
+	/sXwAk0fK51RKwWOpkwwJDeuKygsCtTu2G3YLlzSS9xwXR9GdYXL54wOAcb+/MSgAMBuWlfz+
+	ztQBDjOE7DYTvaNOXV/yaBJsNd0naNcADJ570seQxDP8DI11zoeeDruW1Y6FhluhAB1Tmtz99
+	gJdOVN4NCnTHXp/E+4070nOMzz5hsxjX6AQRMQ==
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 212.227.126.135
-Subject: [Qemu-devel] [PULL 04/10] linux-user: Add support for SIOCSPGRP
- ioctl for all targets
+Subject: [Qemu-devel] [PULL 08/10] linux-user: Fix shmat emulation by
+ honoring host SHMLBA
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -77,74 +77,283 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Aleksandar Rikalo <arikalo@wavecomp.com>, Riku Voipio <riku.voipio@iki.fi>,
-	Laurent Vivier <laurent@vivier.eu>, Max Filippov <jcmvbkbc@gmail.com>,
+	Richard Henderson <richard.henderson@linaro.org>,
+	Laurent Vivier <laurent@vivier.eu>,
 	Aleksandar Markovic <amarkovic@wavecomp.com>,
 	Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
+From: Richard Henderson <richard.henderson@linaro.org>
 
-Add support for setting the process (or process group) to receive SIGIO
-or SIGURG signals when I/O becomes possible or urgent data is available,
-using SIOCSPGRP ioctl.
+For those hosts with SHMLBA > getpagesize, we don't automatically
+select a guest address that is compatible with the host.  We can
+achieve this by boosting the alignment of guest_base and by adding
+an extra alignment argument to mmap_find_vma.
 
-The ioctl numeric values for SIOCSPGRP are platform-dependent and are
-determined by following files in Linux kernel source tree:
-
-arch/ia64/include/uapi/asm/sockios.h:#define SIOCSPGRP    0x8902
-arch/mips/include/uapi/asm/sockios.h:#define SIOCSPGRP    _IOW('s', 8, pid_t)
-arch/parisc/include/uapi/asm/sockios.h:#define SIOCSPGRP  0x8902
-arch/sh/include/uapi/asm/sockios.h:#define SIOCSPGRP      _IOW('s', 8, pid_t)
-arch/xtensa/include/uapi/asm/sockios.h:#define SIOCSPGRP  _IOW('s', 8, pid_t)
-arch/alpha/include/uapi/asm/sockios.h:#define SIOCSPGRP   _IOW('s', 8, pid_t)
-arch/sparc/include/uapi/asm/sockios.h:#define SIOCSPGRP   0x8902
-include/uapi/asm-generic/sockios.h:#define SIOCSPGRP      0x8902
-
-Hence the different definition for alpha, mips, sh4, and xtensa.
-
-Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-Reviewed-by: Max Filippov <jcmvbkbc@gmail.com>
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
-Message-Id: <1558282527-22183-3-git-send-email-aleksandar.markovic@rt-rk.com>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Message-Id: <20190519201953.20161-13-richard.henderson@linaro.org>
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- linux-user/ioctls.h       | 1 +
- linux-user/syscall_defs.h | 3 +++
- 2 files changed, 4 insertions(+)
+ linux-user/elfload.c | 17 ++++++-----
+ linux-user/mmap.c    | 70 +++++++++++++++++++++++---------------------
+ linux-user/qemu.h    |  2 +-
+ linux-user/syscall.c |  3 +-
+ 4 files changed, 50 insertions(+), 42 deletions(-)
 
-diff --git a/linux-user/ioctls.h b/linux-user/ioctls.h
-index 37501f575cdd..99ed9d982568 100644
---- a/linux-user/ioctls.h
-+++ b/linux-user/ioctls.h
-@@ -218,6 +218,7 @@
-   IOCTL(SIOCSRARP, IOC_W, MK_PTR(MK_STRUCT(STRUCT_arpreq)))
-   IOCTL(SIOCGRARP, IOC_R, MK_PTR(MK_STRUCT(STRUCT_arpreq)))
-   IOCTL(SIOCGIWNAME, IOC_W | IOC_R, MK_PTR(MK_STRUCT(STRUCT_char_ifreq)))
-+  IOCTL(SIOCSPGRP, IOC_W, MK_PTR(TYPE_INT)) /* pid_t */
-   IOCTL(SIOCGPGRP, IOC_R, MK_PTR(TYPE_INT)) /* pid_t */
-   IOCTL(SIOCGSTAMP, IOC_R, MK_PTR(MK_STRUCT(STRUCT_timeval)))
-   IOCTL(SIOCGSTAMPNS, IOC_R, MK_PTR(MK_STRUCT(STRUCT_timespec)))
-diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
-index 5b530e04b8fd..9470a5ce965b 100644
---- a/linux-user/syscall_defs.h
-+++ b/linux-user/syscall_defs.h
-@@ -740,11 +740,14 @@ struct target_pollfd {
- #if defined(TARGET_ALPHA) || defined(TARGET_MIPS) || defined(TARGET_SH4) ||    \
-        defined(TARGET_XTENSA)
- #define TARGET_SIOCATMARK      TARGET_IOR('s', 7, int)
-+#define TARGET_SIOCSPGRP       TARGET_IOW('s', 8, pid_t)
- #define TARGET_SIOCGPGRP       TARGET_IOR('s', 9, pid_t)
- #else
- #define TARGET_SIOCATMARK      0x8905
-+#define TARGET_SIOCSPGRP       0x8902
- #define TARGET_SIOCGPGRP       0x8904
- #endif
-+
- #define TARGET_SIOCGSTAMP      0x8906          /* Get stamp (timeval) */
- #define TARGET_SIOCGSTAMPNS    0x8907          /* Get stamp (timespec) */
+diff --git a/linux-user/elfload.c b/linux-user/elfload.c
+index 02832adfbc0c..a23aa4493e72 100644
+--- a/linux-user/elfload.c
++++ b/linux-user/elfload.c
+@@ -3,6 +3,7 @@
+ #include <sys/param.h>
  
+ #include <sys/resource.h>
++#include <sys/shm.h>
+ 
+ #include "qemu.h"
+ #include "disas/disas.h"
+@@ -2012,6 +2013,8 @@ unsigned long init_guest_space(unsigned long host_start,
+                                unsigned long guest_start,
+                                bool fixed)
+ {
++    /* In order to use host shmat, we must be able to honor SHMLBA.  */
++    unsigned long align = MAX(SHMLBA, qemu_host_page_size);
+     unsigned long current_start, aligned_start;
+     int flags;
+ 
+@@ -2029,7 +2032,7 @@ unsigned long init_guest_space(unsigned long host_start,
+     }
+ 
+     /* Setup the initial flags and start address.  */
+-    current_start = host_start & qemu_host_page_mask;
++    current_start = host_start & -align;
+     flags = MAP_ANONYMOUS | MAP_PRIVATE | MAP_NORESERVE;
+     if (fixed) {
+         flags |= MAP_FIXED;
+@@ -2065,8 +2068,8 @@ unsigned long init_guest_space(unsigned long host_start,
+             return (unsigned long)-1;
+         }
+         munmap((void *)real_start, host_full_size);
+-        if (real_start & ~qemu_host_page_mask) {
+-            /* The same thing again, but with an extra qemu_host_page_size
++        if (real_start & (align - 1)) {
++            /* The same thing again, but with extra
+              * so that we can shift around alignment.
+              */
+             unsigned long real_size = host_full_size + qemu_host_page_size;
+@@ -2079,7 +2082,7 @@ unsigned long init_guest_space(unsigned long host_start,
+                 return (unsigned long)-1;
+             }
+             munmap((void *)real_start, real_size);
+-            real_start = HOST_PAGE_ALIGN(real_start);
++            real_start = ROUND_UP(real_start, align);
+         }
+         current_start = real_start;
+     }
+@@ -2106,7 +2109,7 @@ unsigned long init_guest_space(unsigned long host_start,
+         }
+ 
+         /* Ensure the address is properly aligned.  */
+-        if (real_start & ~qemu_host_page_mask) {
++        if (real_start & (align - 1)) {
+             /* Ideally, we adjust like
+              *
+              *    pages: [  ][  ][  ][  ][  ]
+@@ -2134,7 +2137,7 @@ unsigned long init_guest_space(unsigned long host_start,
+             if (real_start == (unsigned long)-1) {
+                 return (unsigned long)-1;
+             }
+-            aligned_start = HOST_PAGE_ALIGN(real_start);
++            aligned_start = ROUND_UP(real_start, align);
+         } else {
+             aligned_start = real_start;
+         }
+@@ -2171,7 +2174,7 @@ unsigned long init_guest_space(unsigned long host_start,
+          * because of trouble with ARM commpage setup.
+          */
+         munmap((void *)real_start, real_size);
+-        current_start += qemu_host_page_size;
++        current_start += align;
+         if (host_start == current_start) {
+             /* Theoretically possible if host doesn't have any suitably
+              * aligned areas.  Normally the first mmap will fail.
+diff --git a/linux-user/mmap.c b/linux-user/mmap.c
+index e0249efe4fed..10796b37ac7b 100644
+--- a/linux-user/mmap.c
++++ b/linux-user/mmap.c
+@@ -202,49 +202,52 @@ unsigned long last_brk;
+ 
+ /* Subroutine of mmap_find_vma, used when we have pre-allocated a chunk
+    of guest address space.  */
+-static abi_ulong mmap_find_vma_reserved(abi_ulong start, abi_ulong size)
++static abi_ulong mmap_find_vma_reserved(abi_ulong start, abi_ulong size,
++                                        abi_ulong align)
+ {
+-    abi_ulong addr;
+-    abi_ulong end_addr;
++    abi_ulong addr, end_addr, incr = qemu_host_page_size;
+     int prot;
+-    int looped = 0;
++    bool looped = false;
+ 
+     if (size > reserved_va) {
+         return (abi_ulong)-1;
+     }
+ 
+-    size = HOST_PAGE_ALIGN(size);
++    /* Note that start and size have already been aligned by mmap_find_vma. */
++
+     end_addr = start + size;
+-    if (end_addr > reserved_va) {
+-        end_addr = reserved_va;
++    if (start > reserved_va - size) {
++        /* Start at the top of the address space.  */
++        end_addr = ((reserved_va - size) & -align) + size;
++        looped = true;
+     }
+-    addr = end_addr - qemu_host_page_size;
+ 
++    /* Search downward from END_ADDR, checking to see if a page is in use.  */
++    addr = end_addr;
+     while (1) {
++        addr -= incr;
+         if (addr > end_addr) {
+             if (looped) {
++                /* Failure.  The entire address space has been searched.  */
+                 return (abi_ulong)-1;
+             }
+-            end_addr = reserved_va;
+-            addr = end_addr - qemu_host_page_size;
+-            looped = 1;
+-            continue;
+-        }
+-        prot = page_get_flags(addr);
+-        if (prot) {
+-            end_addr = addr;
+-        }
+-        if (addr && addr + size == end_addr) {
+-            break;
++            /* Re-start at the top of the address space.  */
++            addr = end_addr = ((reserved_va - size) & -align) + size;
++            looped = true;
++        } else {
++            prot = page_get_flags(addr);
++            if (prot) {
++                /* Page in use.  Restart below this page.  */
++                addr = end_addr = ((addr - size) & -align) + size;
++            } else if (addr && addr + size == end_addr) {
++                /* Success!  All pages between ADDR and END_ADDR are free.  */
++                if (start == mmap_next_start) {
++                    mmap_next_start = addr;
++                }
++                return addr;
++            }
+         }
+-        addr -= qemu_host_page_size;
+     }
+-
+-    if (start == mmap_next_start) {
+-        mmap_next_start = addr;
+-    }
+-
+-    return addr;
+ }
+ 
+ /*
+@@ -253,7 +256,7 @@ static abi_ulong mmap_find_vma_reserved(abi_ulong start, abi_ulong size)
+  * It must be called with mmap_lock() held.
+  * Return -1 if error.
+  */
+-abi_ulong mmap_find_vma(abi_ulong start, abi_ulong size)
++abi_ulong mmap_find_vma(abi_ulong start, abi_ulong size, abi_ulong align)
+ {
+     void *ptr, *prev;
+     abi_ulong addr;
+@@ -265,11 +268,12 @@ abi_ulong mmap_find_vma(abi_ulong start, abi_ulong size)
+     } else {
+         start &= qemu_host_page_mask;
+     }
++    start = ROUND_UP(start, align);
+ 
+     size = HOST_PAGE_ALIGN(size);
+ 
+     if (reserved_va) {
+-        return mmap_find_vma_reserved(start, size);
++        return mmap_find_vma_reserved(start, size, align);
+     }
+ 
+     addr = start;
+@@ -299,7 +303,7 @@ abi_ulong mmap_find_vma(abi_ulong start, abi_ulong size)
+         if (h2g_valid(ptr + size - 1)) {
+             addr = h2g(ptr);
+ 
+-            if ((addr & ~TARGET_PAGE_MASK) == 0) {
++            if ((addr & (align - 1)) == 0) {
+                 /* Success.  */
+                 if (start == mmap_next_start && addr >= TASK_UNMAPPED_BASE) {
+                     mmap_next_start = addr + size;
+@@ -313,12 +317,12 @@ abi_ulong mmap_find_vma(abi_ulong start, abi_ulong size)
+                 /* Assume the result that the kernel gave us is the
+                    first with enough free space, so start again at the
+                    next higher target page.  */
+-                addr = TARGET_PAGE_ALIGN(addr);
++                addr = ROUND_UP(addr, align);
+                 break;
+             case 1:
+                 /* Sometimes the kernel decides to perform the allocation
+                    at the top end of memory instead.  */
+-                addr &= TARGET_PAGE_MASK;
++                addr &= -align;
+                 break;
+             case 2:
+                 /* Start over at low memory.  */
+@@ -416,7 +420,7 @@ abi_long target_mmap(abi_ulong start, abi_ulong len, int prot,
+     if (!(flags & MAP_FIXED)) {
+         host_len = len + offset - host_offset;
+         host_len = HOST_PAGE_ALIGN(host_len);
+-        start = mmap_find_vma(real_start, host_len);
++        start = mmap_find_vma(real_start, host_len, TARGET_PAGE_SIZE);
+         if (start == (abi_ulong)-1) {
+             errno = ENOMEM;
+             goto fail;
+@@ -710,7 +714,7 @@ abi_long target_mremap(abi_ulong old_addr, abi_ulong old_size,
+     } else if (flags & MREMAP_MAYMOVE) {
+         abi_ulong mmap_start;
+ 
+-        mmap_start = mmap_find_vma(0, new_size);
++        mmap_start = mmap_find_vma(0, new_size, TARGET_PAGE_SIZE);
+ 
+         if (mmap_start == -1) {
+             errno = ENOMEM;
+diff --git a/linux-user/qemu.h b/linux-user/qemu.h
+index ef400cb78ac6..82d33d7e93d5 100644
+--- a/linux-user/qemu.h
++++ b/linux-user/qemu.h
+@@ -443,7 +443,7 @@ abi_long target_mremap(abi_ulong old_addr, abi_ulong old_size,
+                        abi_ulong new_addr);
+ extern unsigned long last_brk;
+ extern abi_ulong mmap_next_start;
+-abi_ulong mmap_find_vma(abi_ulong, abi_ulong);
++abi_ulong mmap_find_vma(abi_ulong, abi_ulong, abi_ulong);
+ void mmap_fork_start(void);
+ void mmap_fork_end(int child);
+ 
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index a0c2bf7db43c..e43255c29e56 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -3935,7 +3935,8 @@ static inline abi_ulong do_shmat(CPUArchState *cpu_env,
+     else {
+         abi_ulong mmap_start;
+ 
+-        mmap_start = mmap_find_vma(0, shm_info.shm_segsz);
++        /* In order to use the host shmat, we need to honor host SHMLBA.  */
++        mmap_start = mmap_find_vma(0, shm_info.shm_segsz, MAX(SHMLBA, shmlba));
+ 
+         if (mmap_start == -1) {
+             errno = ENOMEM;
 -- 
 2.20.1
 
