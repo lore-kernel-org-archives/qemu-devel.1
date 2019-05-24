@@ -2,92 +2,65 @@ Return-Path: <SRS0=oHhb=TY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B2CCC072B5
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 20:34:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 52C29C072B5
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 20:34:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D8B3920868
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 20:34:05 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZbPThJk+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D8B3920868
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 2A21E20868
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 20:34:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2A21E20868
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:59843 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:59847 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hUGtA-00022e-Ti
-	for qemu-devel@archiver.kernel.org; Fri, 24 May 2019 16:34:04 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:57539)
+	id 1hUGte-0002My-DA
+	for qemu-devel@archiver.kernel.org; Fri, 24 May 2019 16:34:34 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:56945)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.m.mail@gmail.com>) id 1hUGrp-0001Ih-Cr
-	for qemu-devel@nongnu.org; Fri, 24 May 2019 16:32:43 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1hUGpK-0007tJ-5m
+	for qemu-devel@nongnu.org; Fri, 24 May 2019 16:30:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.m.mail@gmail.com>) id 1hUGrn-00050R-HC
-	for qemu-devel@nongnu.org; Fri, 24 May 2019 16:32:41 -0400
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:38071)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
-	id 1hUGrn-0004zP-6T
-	for qemu-devel@nongnu.org; Fri, 24 May 2019 16:32:39 -0400
-Received: by mail-ot1-x343.google.com with SMTP id s19so9851414otq.5
-	for <qemu-devel@nongnu.org>; Fri, 24 May 2019 13:32:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=mime-version:in-reply-to:references:from:date:message-id:subject:to
-	:cc; bh=M2De66r36ffarReiDsq9zsHIwTVFhFn8Uv/cUuOYmc0=;
-	b=ZbPThJk+tSu+hrR4Enra+IdNk4txwg5qyvGNS3j0KriuqwZXoMDOGPA4ZAJSA/Z3dT
-	ESzC3qmpOK0Mil9Blf0Qu7+RAIJytwZqKC4SAb+yFWIl6zLFgpRMUxpQ1BOZqf3Ps0y+
-	hiMMd+mZ+X85Yw3+S0Jjv47uJHKq9kIYmr35FFjfa/n7of3zBDA64AhYKQDId3LjDCAX
-	ofgN9RVqfKnsgAXG60GwSvPre88gdR4bKObBcW9PdXWil4qWD7uWmJlyjEkac2WmbO68
-	z+wndXWPgLgNDQxq/31jd6AnakAQ6sqJTxJvirdwF4P9Xopn3YZ26Cr17sFqkxqANTA0
-	Swig==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:in-reply-to:references:from:date
-	:message-id:subject:to:cc;
-	bh=M2De66r36ffarReiDsq9zsHIwTVFhFn8Uv/cUuOYmc0=;
-	b=fA9SvfglZ9VlxFVpYU5XxqFKkbXUJsp/Orwp6JYqSzuJ/565VimFD9WU+w9dc93oKL
-	21DzH4ZWrigw3FEBuGjjr52d2cAXxcmz3K+W5UfwAkW9oVr/N6zyI+4S6n6vTGUQQuus
-	LrvT0Dp9LbxP6roUY6CWArQWL52LyDP6hYFRk9XAAmcFhH3e/h6WOouUbQ7ODDczyrMa
-	06psBLTWlnYW8XhIewXSkRb8x2nDN+EaQU4oB0SKWmlQaiB1OR0KnJ4lwLf6/JUWsaNC
-	x7AOcYL4Mq7S1vfWRR7yjF7FvrgGsTZtaPT0sPDxpy/VhbSgYE97bpki7WontTZjASnR
-	N9oA==
-X-Gm-Message-State: APjAAAXEfko/FcBDWMab6CxJSC7z7wu4ZILAW5Dd6+XxTsLxZ/8Nnbsd
-	rDOC8mm2TwRkspJgaLaDWogxFe2SU1nRArf2/lk=
-X-Google-Smtp-Source: APXvYqzjNWjWUkBr9wVpGTICCJgypoS8qtCIqu4ZqlCVhZCvC25RWicyqjJXp5Y7BCfG2xZrjOv59EL1JT8RMY+jh1s=
-X-Received: by 2002:a9d:7858:: with SMTP id c24mr230106otm.64.1558729957497;
-	Fri, 24 May 2019 13:32:37 -0700 (PDT)
+	(envelope-from <ehabkost@redhat.com>) id 1hUGaM-0004Bc-Ed
+	for qemu-devel@nongnu.org; Fri, 24 May 2019 16:14:39 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42296)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>)
+	id 1hUGaK-00049g-LK; Fri, 24 May 2019 16:14:36 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+	[10.5.11.22])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id A2160368E0;
+	Fri, 24 May 2019 20:14:35 +0000 (UTC)
+Received: from localhost (ovpn-116-14.gru2.redhat.com [10.97.116.14])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id A0F321001F5D;
+	Fri, 24 May 2019 20:14:34 +0000 (UTC)
+Date: Fri, 24 May 2019 17:14:32 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+To: Laurent Vivier <lvivier@redhat.com>
+Message-ID: <20190524201432.GP10764@habkost.net>
+References: <20190524103521.13847-1-lvivier@redhat.com>
+	<20190524161045.314fa2de@redhat.com>
+	<c1c017f2-84ed-bddf-abb9-7154d9edb372@redhat.com>
 MIME-Version: 1.0
-Received: by 2002:a9d:410f:0:0:0:0:0 with HTTP; Fri, 24 May 2019 13:32:36
-	-0700 (PDT)
-Received: by 2002:a9d:410f:0:0:0:0:0 with HTTP; Fri, 24 May 2019 13:32:36
-	-0700 (PDT)
-In-Reply-To: <20190524193955.GN10764@habkost.net>
-References: <20190520231910.12184-1-f4bug@amsat.org>
-	<20190522211230.GA10764@habkost.net>
-	<1711852617.24204010.1558561566547.JavaMail.zimbra@redhat.com>
-	<CAL1e-=iW2honEgNfrsFoA0tU1wMq0mw5LuoRbWVmRDBMA22ELA@mail.gmail.com>
-	<1094559891.24356881.1558619101528.JavaMail.zimbra@redhat.com>
-	<CAL1e-=ikyNrfwBR_UW8wwCNHQjLWxhcfrTdde54OP4phkdvqHA@mail.gmail.com>
-	<b4252e21-a82c-2e1b-7a3f-ed13cb3fba36@amsat.org>
-	<20190524193955.GN10764@habkost.net>
-From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Fri, 24 May 2019 22:32:36 +0200
-Message-ID: <CAL1e-=h-4RNGYtBPL9PEHux6qYUXAmi_2BqpgPM+j4MiWfn3iA@mail.gmail.com>
-To: Eduardo Habkost <ehabkost@redhat.com>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::343
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Content-Filtered-By: Mailman/MimeDel 2.1.21
-Subject: Re: [Qemu-devel] [PATCH 0/4] mips: Add more Avocado tests
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <c1c017f2-84ed-bddf-abb9-7154d9edb372@redhat.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.30]);
+	Fri, 24 May 2019 20:14:35 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v3] numa: improve cpu hotplug error message
+ with a wrong node-id
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -99,182 +72,133 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Aleksandar Rikalo <arikalo@wavecomp.com>, qemu-devel@nongnu.org,
-	Wainer dos Santos Moschetta <wainersm@redhat.com>,
-	=?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>,
-	Aleksandar Markovic <amarkovic@wavecomp.com>,
-	Cleber Rosa <crosa@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org,
+	qemu-arm@nongnu.org, qemu-ppc@nongnu.org,
+	Igor Mammedov <imammedo@redhat.com>,
+	David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On May 24, 2019 9:40 PM, "Eduardo Habkost" <ehabkost@redhat.com> wrote:
->
-> On Thu, May 23, 2019 at 07:27:35PM +0200, Philippe Mathieu-Daud=C3=A9 wro=
-te:
-> > On 5/23/19 7:11 PM, Aleksandar Markovic wrote:
-> > > On May 23, 2019 3:45 PM, "Cleber Rosa" <crosa@redhat.com> wrote:
-> > >>> From: "Aleksandar Markovic" <aleksandar.m.mail@gmail.com>
-> > >>> On May 22, 2019 11:46 PM, "Cleber Rosa" <crosa@redhat.com> wrote:
-> > >>>>> From: "Eduardo Habkost" <ehabkost@redhat.com>
-> > >>>>>
-> > >>>>> Until we actually have a mechanism to exclude the test case on
-> > >>>>> travis-ci, I will remove patch 4/4 from the queue.  Aleksandar,
-> > >>>>> please don't merge patch 4/4 yet or it will break travis-ci.
-> > >>>>>
-> > >>>>> Cleber, Wainer, is it already possible to make "avocado run" skip
-> > >>>>> tests tagged with "slow"?
-> > >>>>>
-> > >>>>
-> > >>>> The mechanism exists, but we haven't tagged any test so far as
-slow.
-> > >>>>
-> > >>>
-> > >>> Cleber,
-> > >>>
-> > >>> For the test from patch 4/4, there is no dilemma - it should be in
-the
-> > >>> =E2=80=9Cslow=E2=80=9D group, as Philippe envisioned and said, so t=
-hat it is not
-> > > humpered
-> > >>> with stricter requirements for =E2=80=9Cfast=E2=80=9D (default) gro=
-up. Could you
-> > > explain us
-> > >>> how to do it, so that we can hopefully finally proceed?
-> > >>>
-> > >>
-> > >> Hi Aleksandar,
-> > >>
-> > >> The point is that there's no "group" definition at this point.  This
-is
-> > > the
-> > >> core of the discussion.
-> > >>
-> > >> I think we're close to converging to something simple and effective.
-> > > Please
-> > >> let us know what you think of the proposals given.
-> > >>
-> > >> Thanks!
-> > >> - Cleber.
-> > >>
-> > >
-> > > Cleber, hi.
-> > >
-> > > Thanks for responding.
-> > >
-> > > My views are very similar to Philippe's, but I will provide you with
-more
-> > > details of our (mips) perspective.
-> > >
-> > > As far as black/whitelist issues that is a moot point for us - we
-only want
-> > > to be able to have a way to tag a test within the test itself (so,
-without
-> > > updating some common files, external lists,etc.)
-> > >
-> > > In general, we would like to have a test environment where we would
-be able
-> > > to test what WE deem suitable for us, without feeling that we bother
-you or
-> > > anybody else, or that we are bothered by others.
-> > >
-> > > Let me give you a little extreme example: Let's say we want a complex
-test
-> > > that downloads components from let's say fifty internet location,
-executes
-> > > zillion test cases, and last two days. I wouldn't like anybody to ask
-me
-> > > =E2=80=9CWhy would you that?=E2=80=9D or tell me =E2=80=9CYou can't d=
-o this.=E2=80=9D or say =E2=80=9CNo, we
-did
-> > > not anticipate such tests, patch rejected.=E2=80=9D I (we, people fro=
-m mips)
-should
-> > > be able to define what I (we) need.
-> >
-> > Maybe we can use subdirectory like we do for the TCG tests (Aleksandar
-> > maintains tests/tcg/mips/). We should try to keep contribution upstream=
-,
-> > so good idea/pattern can be reused by others.
-> >
-> > What I'd like to have with those tests is, at least:
-> >
-> > 1/ we don't need to run all the tests (but there is a set of 'quick'
-> > tests we can run on daily basis)
-> >
-> > 2/ maintainers can run their default tests easily (using a combination
-> > of Avocado tags)
-> >
-> > 3/ if a developer working on the PCI subsystem has to modify the MIPS
-> > subsystem (for example), he should be able to run the MIPS tests before
-> > sending his series.
->
-> Keeping the test cases organized in subdirectories are a good
-> idea, but don't think this is going to help us when we need to
-> quickly enable/disable specific test cases on some CI systems.
->
+On Fri, May 24, 2019 at 04:39:12PM +0200, Laurent Vivier wrote:
+> On 24/05/2019 16:10, Igor Mammedov wrote:
+> > On Fri, 24 May 2019 12:35:21 +0200
+> > Laurent Vivier <lvivier@redhat.com> wrote:
+> > 
+> > > On pseries, core-ids are strongly binded to a node-id by the command
+> > > line option. If an user tries to add a CPU to the wrong node, he has
+> > > an error but it is not really helpful:
+> > > 
+> > >    qemu-system-ppc64 ... -smp 1,maxcpus=64,cores=1,threads=1,sockets=1 \
+> > >                          -numa node,nodeid=0 -numa node,nodeid=1 ...
+> > > 
+> > >    (qemu) device_add power9_v2.0-spapr-cpu-core,core-id=30,node-id=1
+> > >    Error: node-id=1 must match numa node specified with -numa option
+> > > 
+> > > This patch improves this error message by giving to the user the good
+> > > topology information (node-id, socket-id and thread-id if they are
+> > > available) to use with the core-id he's providing:
+> > > 
+> > >    Error: node-id=1 must match numa node specified with -numa option 'node-id 0'
+> > > 
+> > > Signed-off-by: Laurent Vivier <lvivier@redhat.com>
+> > > ---
+> > > 
+> > > Notes:
+> > >      v3: only add the topology to the existing message
+> > >          As suggested by Igor replace
+> > >            Error: core-id 30 can only be plugged into node-id 0
+> > >          by
+> > >            Error: node-id=1 must match numa node specified with -numa option 'node-id 0'
+> > >      v2: display full topology in the error message
+> > > > > >   numa.c | 25 ++++++++++++++++++++++++-
+> > >   1 file changed, 24 insertions(+), 1 deletion(-)
+> > > 
+> > > diff --git a/numa.c b/numa.c
+> > > index 3875e1efda3a..7882ec294be4 100644
+> > > --- a/numa.c
+> > > +++ b/numa.c
+> > > @@ -458,6 +458,27 @@ void qmp_set_numa_node(NumaOptions *cmd, Error **errp)
+> > >       set_numa_options(MACHINE(qdev_get_machine()), cmd, errp);
+> > >   }
+> > > +static char *cpu_topology_to_string(const CPUArchId *cpu)
+> > > +{
+> > > +    GString *s = g_string_new(NULL);
+> > > +    if (cpu->props.has_socket_id) {
+> > > +        g_string_append_printf(s, "socket-id %"PRId64, cpu->props.socket_id);
+> > > +    }
+> > > +    if (cpu->props.has_node_id) {
+> > > +        if (s->len) {
+> > > +            g_string_append_printf(s, ", ");
+> > > +        }
+> > > +        g_string_append_printf(s, "node-id %"PRId64, cpu->props.node_id);
+> > > +    }
+> > > +    if (cpu->props.has_thread_id) {
+> > > +        if (s->len) {
+> > > +            g_string_append_printf(s, ", ");
+> > > +        }
+> > > +        g_string_append_printf(s, "thread-id %"PRId64, cpu->props.thread_id);
+> > > +    }
+> > > +    return g_string_free(s, false);
+> > > +}
+> > 
+> > turns out we already have such helper: cpu_slot_to_string()
+> 
+> It doesn't display the node-id but the core-id. And node-id is what we need
+> to know.
 
-Well, Eduardo, nobody said that directory locations should be used for
-enabling/disabling or tagging/untagging tests in the first place. I think
-it was clear for everybody from the outset that these features should have
-their own mechanisms, which Cleber says already exist, but can't be used
-because the test group still can't figure out (in some hamletesque way)
-whether to blacklist or to whitelist, or how to name the tag for travis,
-and tag for not travis, and if such tags should even exist, etc. - that is
-my layman impression from recent discussions. And now when Philippe
-suggested (in my opinion logical and reasonable) subdirectory, an endless
-discussion begins: =E2=80=9CTo subdirectory or not to subdirectory? That is=
- the
-question.=E2=80=9D Meanwhile, 4.1 is inexorably getting closer and closer, =
-and with
-each day, the value of any potential tests is decreasing.
+I'm confused about what you are trying to do here.
 
-Directory structure should be used in its usual and basic way: for
-clustering files of similar nature, purpose, or origin, and I do certainly
-support any reasonable subdirectory organization for your directory - and
-you should think about it, and probably while doing that consult a little
-bit other people from all walks of QEMU. We are ready to comply with your
-final decision.
+On v1, the message looked like:
+  Error: core-id 30 can only be plugged into node-id 0
 
-The good thing is that nothing is set in stone, everything can be changed
-and improved, moving files is easy in git.
-
-All that said, many thanks for reviewing patch 4/4.
-
-Aleksandar
+which is probably good for spapr.
 
 
+Then I suggested you added the other cpu->props fields.  e.g. on
+PC the message would look like:
+  Error: socket-id 20, core-id 30, thread-id 40 can only be plugged into node-id 0
 
-> Disabling a test case (or an entire category of test cases) known
-> to be failing on some CI systems should require a one line patch,
-> not moving files to a separate directory.
->
-> >
-> > > Having such test would be a big deal for me, not only that I could
-run it
-> > > manually or automatically every weekend, but I could ask submitters o=
-f
-> > > critical changes: =E2=80=9CDid you run this test that we have in Avoc=
-ado
-dir?=E2=80=9D,
-> > > without specifying test details, procedures, etc. All this is a BIG
-deal
-> > > for me.
-> > >
-> > > On the other hand, I agree that certain group of tests (envisioned fo=
-r
-> > > daily or so Travis CI) should have some stricter limitations and
-structure.
-> > > But right now I feel humpered by it, and this is counterproductive.
-> > >
-> > > So, we want freedom, responsibility and ownersheep of our tests.
-Please
-> > > give us the opportunity to get down on business and start writing
-tests and
-> > > start testing.
-> > >
-> > > Yours,
-> > > Aleksandar
->
-> --
-> Eduardo
+
+But you sent a v2 patch that would print this on PC:
+  Error: core-id 30 can only be plugged into socket-id 20, node-id 0, thread-id 40
+
+which doesn't make sense to me.
+
+
+Then in a reply to v2, Igor suggested:
+
+ error_setg(errp, "node-id=%d must match numa node specified "
+                   "with -numa option '%s'", node_id, topology);
+
+
+Igor suggest would address the problem above.  I expected it to become:
+  node-id=0 must match numa node specified with -numa option core-id=30
+and on PC:
+  node-id=0 must match numa node specified with -numa option socket-id=20,core-id=30,thread-id=40
+
+Or maybe it could include the input node-id too:
+  node-id=0 must match numa node specified with -numa option node-id=1,core-id=30
+and on PC:
+  node-id=0 must match numa node specified with -numa option node-id=1,socket-id=20,core-id=30,thread-id=40
+
+Both options would work.
+
+
+But you implemented code that would print:
+  Error: node-id=0 must match numa node specified with -numa option 'node-id 1'
+and on PC it would print:
+  Error: node-id=0 must match numa node specified with -numa option 'socket-id 20 node-id 1 thread-id=40'
+
+which doesn't make sense to me.
+
+
+I was expecting something like:
+  Error: CPU slot core-id=30 is bound to node-id 0, but node-id 1 was specified
+and on PC:
+  Error: CPU slot socket-id=20,core-id=30,thread-id=40 is bound to node-id 0, but node-id 1 was specified
+
+
+-- 
+Eduardo
+
