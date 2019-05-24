@@ -6,80 +6,58 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A3F43C072B5
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 13:15:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 83EFDC072B5
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 13:17:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6998520644
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 13:15:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6998520644
+	by mail.kernel.org (Postfix) with ESMTPS id 5B7CB2075E
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 13:17:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5B7CB2075E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:54480 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:54498 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hUA3C-00013B-K5
-	for qemu-devel@archiver.kernel.org; Fri, 24 May 2019 09:15:58 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:58529)
+	id 1hUA53-0002WQ-Hb
+	for qemu-devel@archiver.kernel.org; Fri, 24 May 2019 09:17:53 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:58631)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hUA0u-0007aO-Ki
-	for qemu-devel@nongnu.org; Fri, 24 May 2019 09:13:38 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1hUA19-0007kR-Sf
+	for qemu-devel@nongnu.org; Fri, 24 May 2019 09:13:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hU9z6-0002Cx-Cv
-	for qemu-devel@nongnu.org; Fri, 24 May 2019 09:11:46 -0400
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:47047)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hU9z4-00029I-AY
-	for qemu-devel@nongnu.org; Fri, 24 May 2019 09:11:44 -0400
-Received: by mail-wr1-f68.google.com with SMTP id r7so9957164wrr.13
-	for <qemu-devel@nongnu.org>; Fri, 24 May 2019 06:11:38 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:subject:to:references:from:openpgp:message-id
-	:date:user-agent:mime-version:in-reply-to:content-language
-	:content-transfer-encoding;
-	bh=UnpSL6wMxAxKNBlKTNYXQ4v0wpRW0lqEf4uxxLaEmeo=;
-	b=RneWhqhzDFF9AI/WHpgFCDjJS/vEXg13T3oaOdZRbaNhdxPFmI+BoJ+1MH7taPXwJt
-	7hIdS68ImjvXsRFT0pWkwR7BRK2xWTfeUNhJV34jDGU3Qm/JifrfnnvP7BNOhcHRrhqr
-	2JRLKv2FYwzGpm7wrB3t3RKN3LuUYDTe9EaTb0kS3w1Sn1EgM3UhiTrIKcDobn01jMks
-	7S9AFXqyzTuT9FJXH+G0CKZ53AiQstSCSwsB7I3iHjNtt7dXqvMtp57UE8JgobYCXcsN
-	5GRiwuqkb7SOalK+1Wu2qcIzhMzePFK5vl3O6gHa6FXxWwkMVelqL46uglAUjUwHGetC
-	Gn+w==
-X-Gm-Message-State: APjAAAUnLO60vogp4Hp21bUL1DNXx07E9ze9V/ftHn9D6ntwm3dBkmWt
-	2pGCdN38e83QrOOoH0EXeIiO8A==
-X-Google-Smtp-Source: APXvYqwpqMQqUzsPtV0SGEv9yTcm5cIw9e6WEnB8E98CFlxJBOELrRuU16dVI/v/XLqSpX/i6ynmhg==
-X-Received: by 2002:adf:c7d3:: with SMTP id y19mr545722wrg.298.1558703497533; 
-	Fri, 24 May 2019 06:11:37 -0700 (PDT)
-Received: from [192.168.1.38] (228.red-83-52-173.dynamicip.rima-tde.net.
-	[83.52.173.228]) by smtp.gmail.com with ESMTPSA id
-	j28sm4839397wrd.64.2019.05.24.06.11.36
-	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-	Fri, 24 May 2019 06:11:36 -0700 (PDT)
-To: Laszlo Ersek <lersek@redhat.com>, Peter Maydell
-	<peter.maydell@linaro.org>, qemu-devel@nongnu.org,
-	=?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
-	Richard Henderson <richard.henderson@linaro.org>
-References: <20181102171638.24069-1-peter.maydell@linaro.org>
-	<20181102171638.24069-9-peter.maydell@linaro.org>
-	<3e3d2018-3993-f651-8e94-5bea612bd776@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
-	url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <0d1c8338-a8b4-23b5-7297-e80428fbabff@redhat.com>
-Date: Fri, 24 May 2019 15:11:36 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	(envelope-from <marcandre.lureau@redhat.com>) id 1hU9yI-0001V9-81
+	for qemu-devel@nongnu.org; Fri, 24 May 2019 09:10:56 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60548)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+	id 1hU9yA-0001Qq-KC
+	for qemu-devel@nongnu.org; Fri, 24 May 2019 09:10:50 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 6819B30BBE98
+	for <qemu-devel@nongnu.org>; Fri, 24 May 2019 13:10:31 +0000 (UTC)
+Received: from localhost (ovpn-112-23.ams2.redhat.com [10.36.112.23])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id E3A1D7D901;
+	Fri, 24 May 2019 13:10:18 +0000 (UTC)
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+To: qemu-devel@nongnu.org
+Date: Fri, 24 May 2019 15:09:40 +0200
+Message-Id: <20190524130946.31736-4-marcandre.lureau@redhat.com>
+In-Reply-To: <20190524130946.31736-1-marcandre.lureau@redhat.com>
+References: <20190524130946.31736-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <3e3d2018-3993-f651-8e94-5bea612bd776@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.49]);
+	Fri, 24 May 2019 13:10:36 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-	[fuzzy]
-X-Received-From: 209.85.221.68
-Subject: Re: [Qemu-devel] [PULL 08/10] target/arm: Conditionalize some
- asserts on aarch32 support
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PATCH v9 3/9] virtio-gpu: add a pixman helper header
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -91,115 +69,141 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
+	Paolo Bonzini <pbonzini@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/24/19 2:33 PM, Laszlo Ersek wrote:
-> Hi,
-> 
-> On 11/02/18 18:16, Peter Maydell wrote:
->> From: Richard Henderson <richard.henderson@linaro.org>
->>
->> When populating id registers from kvm, on a host that doesn't support
->> aarch32 mode at all, neither arm_div nor jazelle will be supported either.
->>
->> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
->> Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
->> Tested-by: Alex Bennée <alex.bennee@linaro.org>
->> Message-id: 20181102102025.3546-1-richard.henderson@linaro.org
->> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
->> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
->> ---
->>  target/arm/cpu.h |  5 +++++
->>  target/arm/cpu.c | 15 +++++++++++++--
->>  2 files changed, 18 insertions(+), 2 deletions(-)
->>
->> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
->> index 8e6779936eb..b5eff79f73b 100644
->> --- a/target/arm/cpu.h
->> +++ b/target/arm/cpu.h
->> @@ -3296,6 +3296,11 @@ static inline bool isar_feature_aa64_fp16(const ARMISARegisters *id)
->>      return FIELD_EX64(id->id_aa64pfr0, ID_AA64PFR0, FP) == 1;
->>  }
->>  
->> +static inline bool isar_feature_aa64_aa32(const ARMISARegisters *id)
->> +{
->> +    return FIELD_EX64(id->id_aa64pfr0, ID_AA64PFR0, EL0) >= 2;
+This will allow to share the format conversion function with
+vhost-user-gpu.
 
-FWIW here we check EL0, ...
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+---
+ include/hw/virtio/virtio-gpu-pixman.h | 45 +++++++++++++++++++++++++++
+ hw/display/virtio-gpu.c               | 29 ++---------------
+ 2 files changed, 48 insertions(+), 26 deletions(-)
+ create mode 100644 include/hw/virtio/virtio-gpu-pixman.h
 
->> +}
->> +
->>  static inline bool isar_feature_aa64_sve(const ARMISARegisters *id)
->>  {
->>      return FIELD_EX64(id->id_aa64pfr0, ID_AA64PFR0, SVE) != 0;
->> diff --git a/target/arm/cpu.c b/target/arm/cpu.c
->> index 8f16e96b6c8..784a4c2dfcc 100644
->> --- a/target/arm/cpu.c
->> +++ b/target/arm/cpu.c
->> @@ -774,6 +774,7 @@ static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
->>      CPUARMState *env = &cpu->env;
->>      int pagebits;
->>      Error *local_err = NULL;
->> +    bool no_aa32 = false;
->>  
->>      /* If we needed to query the host kernel for the CPU features
->>       * then it's possible that might have failed in the initfn, but
->> @@ -820,6 +821,16 @@ static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
->>              set_feature(env, ARM_FEATURE_V7VE);
->>          }
->>      }
->> +
->> +    /*
->> +     * There exist AArch64 cpus without AArch32 support.  When KVM
->> +     * queries ID_ISAR0_EL1 on such a host, the value is UNKNOWN.
+diff --git a/include/hw/virtio/virtio-gpu-pixman.h b/include/hw/virtio/vi=
+rtio-gpu-pixman.h
+new file mode 100644
+index 0000000000..4dba782758
+--- /dev/null
++++ b/include/hw/virtio/virtio-gpu-pixman.h
+@@ -0,0 +1,45 @@
++/*
++ * Virtio GPU Device
++ *
++ * Copyright Red Hat, Inc. 2013-2014
++ *
++ * Authors:
++ *     Dave Airlie <airlied@redhat.com>
++ *     Gerd Hoffmann <kraxel@redhat.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or la=
+ter.
++ * See the COPYING file in the top-level directory.
++ */
++
++#ifndef HW_VIRTIO_GPU_PIXMAN_H
++#define HW_VIRTIO_GPU_PIXMAN_H
++
++#include "ui/qemu-pixman.h"
++#include "standard-headers/linux/virtio_gpu.h"
++
++static inline pixman_format_code_t
++virtio_gpu_get_pixman_format(uint32_t virtio_gpu_format)
++{
++    switch (virtio_gpu_format) {
++    case VIRTIO_GPU_FORMAT_B8G8R8X8_UNORM:
++        return PIXMAN_BE_b8g8r8x8;
++    case VIRTIO_GPU_FORMAT_B8G8R8A8_UNORM:
++        return PIXMAN_BE_b8g8r8a8;
++    case VIRTIO_GPU_FORMAT_X8R8G8B8_UNORM:
++        return PIXMAN_BE_x8r8g8b8;
++    case VIRTIO_GPU_FORMAT_A8R8G8B8_UNORM:
++        return PIXMAN_BE_a8r8g8b8;
++    case VIRTIO_GPU_FORMAT_R8G8B8X8_UNORM:
++        return PIXMAN_BE_r8g8b8x8;
++    case VIRTIO_GPU_FORMAT_R8G8B8A8_UNORM:
++        return PIXMAN_BE_r8g8b8a8;
++    case VIRTIO_GPU_FORMAT_X8B8G8R8_UNORM:
++        return PIXMAN_BE_x8b8g8r8;
++    case VIRTIO_GPU_FORMAT_A8B8G8R8_UNORM:
++        return PIXMAN_BE_a8b8g8r8;
++    default:
++        return 0;
++    }
++}
++
++#endif
+diff --git a/hw/display/virtio-gpu.c b/hw/display/virtio-gpu.c
+index c35025b6fb..3262f7f1f1 100644
+--- a/hw/display/virtio-gpu.c
++++ b/hw/display/virtio-gpu.c
+@@ -21,6 +21,7 @@
+ #include "hw/virtio/virtio.h"
+ #include "hw/virtio/virtio-gpu.h"
+ #include "hw/virtio/virtio-gpu-bswap.h"
++#include "hw/virtio/virtio-gpu-pixman.h"
+ #include "hw/virtio/virtio-bus.h"
+ #include "hw/display/edid.h"
+ #include "migration/blocker.h"
+@@ -298,30 +299,6 @@ void virtio_gpu_get_edid(VirtIOGPU *g,
+     virtio_gpu_ctrl_response(g, cmd, &edid.hdr, sizeof(edid));
+ }
+=20
+-static pixman_format_code_t get_pixman_format(uint32_t virtio_gpu_format=
+)
+-{
+-    switch (virtio_gpu_format) {
+-    case VIRTIO_GPU_FORMAT_B8G8R8X8_UNORM:
+-        return PIXMAN_BE_b8g8r8x8;
+-    case VIRTIO_GPU_FORMAT_B8G8R8A8_UNORM:
+-        return PIXMAN_BE_b8g8r8a8;
+-    case VIRTIO_GPU_FORMAT_X8R8G8B8_UNORM:
+-        return PIXMAN_BE_x8r8g8b8;
+-    case VIRTIO_GPU_FORMAT_A8R8G8B8_UNORM:
+-        return PIXMAN_BE_a8r8g8b8;
+-    case VIRTIO_GPU_FORMAT_R8G8B8X8_UNORM:
+-        return PIXMAN_BE_r8g8b8x8;
+-    case VIRTIO_GPU_FORMAT_R8G8B8A8_UNORM:
+-        return PIXMAN_BE_r8g8b8a8;
+-    case VIRTIO_GPU_FORMAT_X8B8G8R8_UNORM:
+-        return PIXMAN_BE_x8b8g8r8;
+-    case VIRTIO_GPU_FORMAT_A8B8G8R8_UNORM:
+-        return PIXMAN_BE_a8b8g8r8;
+-    default:
+-        return 0;
+-    }
+-}
+-
+ static uint32_t calc_image_hostmem(pixman_format_code_t pformat,
+                                    uint32_t width, uint32_t height)
+ {
+@@ -368,7 +345,7 @@ static void virtio_gpu_resource_create_2d(VirtIOGPU *=
+g,
+     res->format =3D c2d.format;
+     res->resource_id =3D c2d.resource_id;
+=20
+-    pformat =3D get_pixman_format(c2d.format);
++    pformat =3D virtio_gpu_get_pixman_format(c2d.format);
+     if (!pformat) {
+         qemu_log_mask(LOG_GUEST_ERROR,
+                       "%s: host couldn't handle guest format %d\n",
+@@ -1142,7 +1119,7 @@ static int virtio_gpu_load(QEMUFile *f, void *opaqu=
+e, size_t size,
+         res->iov_cnt =3D qemu_get_be32(f);
+=20
+         /* allocate */
+-        pformat =3D get_pixman_format(res->format);
++        pformat =3D virtio_gpu_get_pixman_format(res->format);
+         if (!pformat) {
+             g_free(res);
+             return -EINVAL;
+--=20
+2.22.0.rc1.1.g079e7d2849.dirty
 
-... then here the comment is about EL1.
-
->> +     * Similarly, we cannot check ID_AA64PFR0 without AArch64 support.
->> +     */
->> +    if (arm_feature(&cpu->env, ARM_FEATURE_AARCH64)) {
->> +        no_aa32 = !cpu_isar_feature(aa64_aa32, cpu);
->> +    }
->> +
->>      if (arm_feature(env, ARM_FEATURE_V7VE)) {
->>          /* v7 Virtualization Extensions. In real hardware this implies
->>           * EL2 and also the presence of the Security Extensions.
->> @@ -829,7 +840,7 @@ static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
->>           * Presence of EL2 itself is ARM_FEATURE_EL2, and of the
->>           * Security Extensions is ARM_FEATURE_EL3.
->>           */
->> -        assert(cpu_isar_feature(arm_div, cpu));
->> +        assert(no_aa32 || cpu_isar_feature(arm_div, cpu));
-> 
-> The assertion above fails on my AArch64 host (APM Mustang A3). Meaning
-> that my host CPU supports AArch32, but lacks "arm_div".
-> 
-> (My understanding is that this commit, i.e., 0f8d06f16c9d, relaxed the
-> assert originally added in commit 7e0cf8b47f0e ("target/arm: Convert
-> division from feature bits to isar0 tests", 2018-10-24). Can we relax it
-> even further?
-> 
-> Better yet: can we rework the code to emit a warning, rather than
-> aborting QEMU? Assertions are not the best tool IMHO for catching
-> unusual (or slightly non-conformant / early) hardware.)
-> 
-> Thanks,
-> Laszlo
-> 
->>          set_feature(env, ARM_FEATURE_LPAE);
->>          set_feature(env, ARM_FEATURE_V7);
->>      }
->> @@ -855,7 +866,7 @@ static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
->>      if (arm_feature(env, ARM_FEATURE_V6)) {
->>          set_feature(env, ARM_FEATURE_V5);
->>          if (!arm_feature(env, ARM_FEATURE_M)) {
->> -            assert(cpu_isar_feature(jazelle, cpu));
->> +            assert(no_aa32 || cpu_isar_feature(jazelle, cpu));
->>              set_feature(env, ARM_FEATURE_AUXCR);
->>          }
->>      }
->>
-> 
 
