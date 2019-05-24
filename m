@@ -2,68 +2,83 @@ Return-Path: <SRS0=oHhb=TY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.0 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,FROM_EXCESS_BASE64,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A439FC072B5
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 11:36:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E1D6C072B5
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 11:44:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7D87B217F9
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 11:36:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7D87B217F9
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id C2EF12168B
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 11:44:22 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kmsfPGIi"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C2EF12168B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:52859 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:52910 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hU8Uf-000513-Lb
-	for qemu-devel@archiver.kernel.org; Fri, 24 May 2019 07:36:13 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:40020)
+	id 1hU8cX-0006zJ-T2
+	for qemu-devel@archiver.kernel.org; Fri, 24 May 2019 07:44:21 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:42044)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hU8Px-0001vv-Ir
-	for qemu-devel@nongnu.org; Fri, 24 May 2019 07:31:22 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1hU8bn-0006ho-I8
+	for qemu-devel@nongnu.org; Fri, 24 May 2019 07:43:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hU8Pw-0003Rs-Id
-	for qemu-devel@nongnu.org; Fri, 24 May 2019 07:31:21 -0400
-Received: from mout.kundenserver.de ([212.227.17.10]:39695)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1hU8Pw-0003R9-9a
-	for qemu-devel@nongnu.org; Fri, 24 May 2019 07:31:20 -0400
-Received: from localhost.localdomain ([78.238.229.36]) by
-	mrelayeu.kundenserver.de (mreue109 [212.227.15.183]) with ESMTPSA
-	(Nemesis)
-	id 1MMoXC-1hBMUE1Xz2-00Ii3v; Fri, 24 May 2019 13:25:26 +0200
-From: Laurent Vivier <laurent@vivier.eu>
-To: qemu-devel@nongnu.org
-Date: Fri, 24 May 2019 13:25:11 +0200
-Message-Id: <20190524112520.17684-1-laurent@vivier.eu>
-X-Mailer: git-send-email 2.20.1
+	(envelope-from <marcandre.lureau@gmail.com>) id 1hU8bm-0003kT-OX
+	for qemu-devel@nongnu.org; Fri, 24 May 2019 07:43:35 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:34310)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1hU8bm-0003jI-GS
+	for qemu-devel@nongnu.org; Fri, 24 May 2019 07:43:34 -0400
+Received: by mail-wr1-x444.google.com with SMTP id f8so9710773wrt.1
+	for <qemu-devel@nongnu.org>; Fri, 24 May 2019 04:43:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+	:cc:content-transfer-encoding;
+	bh=raCyOECgaOQJXiHTsKuSPkgkL9udeBwdxOIqB7DIOk4=;
+	b=kmsfPGIiyDUYNGPdZB2HBAiEzMOMMvda58TjU32fkYqgLKf/jn1V3nEB7OhNsKpaBO
+	niVC/fIoU7AtywZjXRq/HeGExq9VJEtOHl6JrJ1cCTNllevYizKnKVqoV72r7TELxi8E
+	GFpRER/cptCj4X+xEZF80CatAGh4Q4kSB055cUTZBrg12LBPxJF8VyMICBMELZfc4RCe
+	S/AF8Zy/IRb/OyV53NEZTHd9+nfUMm4UEqE7EjBW/xVBfZrlrPYlRBvQ3RqybzvabVWp
+	JN+qZsbRSWDSSgZUBKRqlzUV3rYiFqtVyFy4dHUc/ydgsXkMbS3l2uAIreX3jw5t0iUC
+	aFnA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+	:message-id:subject:to:cc:content-transfer-encoding;
+	bh=raCyOECgaOQJXiHTsKuSPkgkL9udeBwdxOIqB7DIOk4=;
+	b=FzexSPEnNgCFS+0TR1r12/GmsIo4djZFkseoHOBHFh7oV3xRbT5LUlj2aciHmRVMen
+	W/ci422Cgn7KiUM4DRGgUytkzLIZvVAO6l4hsZJqCu96QHewyuSrc6HGdh21QX5lHlgh
+	7KnBp18cjxPMBdyeYtQBef04C7Jtf2eKabPLB/KZ8f4s6mqVJ78I0Fpw7J/UTTziawLb
+	k3kqsWqo+X/pfjwio+t/1QFQu+ZCXcY+TfNgx1JBdUWCwKBBPOHeh610VSwVlariyg9w
+	Bij4JJh8TdNGVKXbE4rKbkjqj1Aa+QoyvhoN2WPqe9KF3Hvt8kq5AnARN55xeHWZ60E2
+	hg9g==
+X-Gm-Message-State: APjAAAXiv6lgrKYzLNL3KOcIfnSK0ZQV/ngsN2HKrM0ta2DD7NdxxieG
+	bf291a1t2SCSS9gpqy3+6z0F5WtpllmpZcAWxu8=
+X-Google-Smtp-Source: APXvYqw8cUFzHjF92AzzrTwGGbOGvzSW3Qxa2BJ/ERlNIrVk9h7qXBw4i+VX2nhtGyPgI6jyNakO6DMTNFus2rDHovM=
+X-Received: by 2002:adf:c149:: with SMTP id w9mr52886546wre.40.1558698213336; 
+	Fri, 24 May 2019 04:43:33 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:EWFXffn87Sj/ccFFTBy1cmwbNR4kSBEn+xKNG6eYTwnxNfg3Is/
-	+p6fF8rKPwfv964D3dfa5CxvcGXV77RRE5sFDReE+CGYMGptWHl0scgn6SF5j04ZXyJc1GK
-	+5dwFdS/HCnoissDbcwRaASDu2Gl1HsyHpcF68LUvIbHSxhiu7tXynaHUbKR/NV/dLmPfsY
-	pNvMA/B+JeAolmbgIe2MA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:N8g5UsJ7N4o=:R92f/fp4uuinxVVuWeXQ5z
-	KhSkrPJ8xME/dlE1+LiZq3UM1/aTzsD6wSGVCet/Pl/k61UZ6iTAA1dO6Hc0axQsFOekv7hfK
-	elQ/MBsvuN/7osmcpAPPskAo5bpxNV2EFZB3xBEIbyiVbNH8t2vwzlebHEceNNylIxrrdus7X
-	po3bLPhpjmaUZjorp9XRQtG8HyyvDWT0Y24ynvWFMQkMhZ8slJioRv/+AEgaBR4S5uj5i08U7
-	nLll22eBkMggGdKeDdYLz8StgtVpX86q9iA1RmTUBi8RpqtIlPLDRMHTh7KS2yStSHpbjHiiG
-	TtnVpqQrW5J0ulQtI9DvufOb8Zl31AR4C1T11lRqpl/yXAVUeOGzHUAoSBXuXwuyhVaf4Ez4b
-	92A0wGH87CKcyA2W6WJr/k5fIumK8W7Yi2pPSHAzc13JkL6ffZlmwAKX9uq3Nc+joxtEnjDth
-	tyk/JZQ4lC9Co3CrVuiWrg0zpcWqwws/QTV9+ZouVaQwAkogMs8pxnlkHHEadHURnHmlZsTxh
-	nVzREE0irnd0lJbgN1xd2lfTDQe+Qtr8/yg4e4aXcIsRCgmzXUXcBQtbNN0tFnZ8tEo8Crufk
-	8GdSgZ8/FZI0lrgzsdWVnmAJwSBjj5lUEqmT9pqQoOpiPtkSEM1rEeJaBH4aGkwnvI+ALnFYk
-	Sv8K8d/Lpnr/UaBbQ2Q/1IQ8AP6VjEx4p4xdGthAnpT2OlWRF0nhIw5T7Lxoe3r+C+ju1uHEB
-	qH7sj0JVassZSQ+ei4qpE9TVmz1l0gTX3BOhQHy1t7kkSHPdaPzGFimiEds=
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.17.10
-Subject: [Qemu-devel] [PULL v2 0/9] Linux user for 4.1 patches
+References: <20190523132035.20559-1-marcandre.lureau@redhat.com>
+	<20190523132035.20559-6-marcandre.lureau@redhat.com>
+	<20190524102929.4s45fvjt65ia6af2@sirius.home.kraxel.org>
+In-Reply-To: <20190524102929.4s45fvjt65ia6af2@sirius.home.kraxel.org>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Fri, 24 May 2019 13:43:20 +0200
+Message-ID: <CAJ+F1CJNFueLT68wAumiZ_WS3pEVKfC6saZc6t8RbKCyp7fYOw@mail.gmail.com>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2a00:1450:4864:20::444
+Subject: Re: [Qemu-devel] [PATCH v8 5/8] contrib: add vhost-user-gpu
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -75,66 +90,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Aleksandar Rikalo <arikalo@wavecomp.com>,
-	Aleksandar Markovic <amarkovic@wavecomp.com>,
-	Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>,
-	Aurelien Jarno <aurelien@aurel32.net>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, QEMU <qemu-devel@nongnu.org>,
+	"Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The following changes since commit a4f667b6714916683408b983cfe0a615a725775f:
+On Fri, May 24, 2019 at 12:50 PM Gerd Hoffmann <kraxel@redhat.com> wrote:
+>
+> On Thu, May 23, 2019 at 03:20:32PM +0200, Marc-Andr=C3=A9 Lureau wrote:
+> > Add a vhost-user gpu backend, based on virtio-gpu/3d device. It is
+> > associated with a vhost-user-gpu device.
+> >
+> > Various TODO and nice to have items:
+> > - multi-head support
+> > - crash & resume handling
+> > - accelerated rendering/display that avoids the waiting round trips
+> > - edid support
+>
+> Fails to build with "configure --disable-opengl".
 
-  Merge remote-tracking branch 'remotes/cohuck/tags/s390x-20190521-3' into staging (2019-05-21 16:30:13 +0100)
+Oops, some leftovers from previous iterations:
 
-are available in the Git repository at:
+-//#include <xf86drm.h> /* not much to do with xf86 */
+-#include <drm_fourcc.h>
 
-  git://github.com/vivier/qemu.git tags/linux-user-for-4.1-pull-request
+thanks
 
-for you to fetch changes up to 5f992db605e2c9ed0c8816c2b0f68b9bc8698f1b:
-
-  linux-user: Pass through nanosecond timestamp components for stat syscalls (2019-05-24 13:16:21 +0200)
-
-----------------------------------------------------------------
-Add /proc/hardware and /proc/cpuinfo,
-update SIOCXXX ioctls,
-fix shmat emulation,
-add nanoseconds in stat,
-init field fp_abi on mips
-
-----------------------------------------------------------------
-
-Aleksandar Markovic (2):
-  linux-user: Fix support for SIOCATMARK and SIOCGPGRP ioctls for xtensa
-  linux-user: Add support for SIOCSPGRP ioctl for all targets
-
-Chen-Yu Tsai (1):
-  linux-user: Pass through nanosecond timestamp components for stat
-    syscalls
-
-Daniel Santos (1):
-  linux-user: Sanitize interp_info and, for mips only, init field fp_abi
-
-Laurent Vivier (2):
-  linux-user: add pseudo /proc/cpuinfo for sparc
-  linux-user: add pseudo /proc/hardware for m68k
-
-Neng Chen (1):
-  linux-user: Add support for SIOC<G|S>IFPFLAGS ioctls for all targets
-
-Richard Henderson (2):
-  linux-user: Fix shmat emulation by honoring host SHMLBA
-  linux-user: Align mmap_find_vma to host page size
-
- linux-user/elfload.c      | 22 ++++++++----
- linux-user/ioctls.h       |  3 ++
- linux-user/mmap.c         | 72 +++++++++++++++++++++------------------
- linux-user/qemu.h         |  2 +-
- linux-user/syscall.c      | 49 ++++++++++++++++++++++++--
- linux-user/syscall_defs.h | 57 ++++++++++++++++++++-----------
- 6 files changed, 143 insertions(+), 62 deletions(-)
-
--- 
-2.20.1
-
+--=20
+Marc-Andr=C3=A9 Lureau
 
