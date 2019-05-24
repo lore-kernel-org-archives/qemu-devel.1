@@ -3,90 +3,92 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BCA8CC072B5
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 15:13:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D4C2C072B5
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 15:14:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 90B6220815
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 15:13:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 90B6220815
+	by mail.kernel.org (Postfix) with ESMTPS id 250422075D
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 15:14:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 250422075D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:56076 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:56086 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hUBsr-00011o-QK
-	for qemu-devel@archiver.kernel.org; Fri, 24 May 2019 11:13:25 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:53886)
+	id 1hUBtR-0001U0-CH
+	for qemu-devel@archiver.kernel.org; Fri, 24 May 2019 11:14:01 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:54566)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1hUBoV-00051A-HW
-	for qemu-devel@nongnu.org; Fri, 24 May 2019 11:08:58 -0400
+	(envelope-from <mreitz@redhat.com>) id 1hUBp3-0006U1-2a
+	for qemu-devel@nongnu.org; Fri, 24 May 2019 11:09:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1hUBYY-0005M0-GG
-	for qemu-devel@nongnu.org; Fri, 24 May 2019 10:52:27 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35638)
+	(envelope-from <mreitz@redhat.com>) id 1hUBot-0000qg-Re
+	for qemu-devel@nongnu.org; Fri, 24 May 2019 11:09:23 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50488)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>)
-	id 1hUBYW-0005JX-Tm; Fri, 24 May 2019 10:52:25 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
+	(Exim 4.71) (envelope-from <mreitz@redhat.com>)
+	id 1hUBoV-0000TN-Ik; Fri, 24 May 2019 11:08:55 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 40DE03003E61;
-	Fri, 24 May 2019 14:52:24 +0000 (UTC)
-Received: from [10.3.116.169] (ovpn-116-169.phx2.redhat.com [10.3.116.169])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 4EB547D596;
-	Fri, 24 May 2019 14:52:23 +0000 (UTC)
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+	by mx1.redhat.com (Postfix) with ESMTPS id BC75C3006370;
+	Fri, 24 May 2019 15:08:40 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-204-150.brq.redhat.com
+	[10.40.204.150])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id AF0415F7C2;
+	Fri, 24 May 2019 15:08:36 +0000 (UTC)
+To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
 References: <20190508211820.17851-1-mreitz@redhat.com>
-	<20190508211820.17851-5-mreitz@redhat.com>
-From: Eric Blake <eblake@redhat.com>
+	<20190508211820.17851-2-mreitz@redhat.com>
+	<1ed0b731-cbbd-0cdd-32f6-913d2b57edfa@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
 Openpgp: preference=signencrypt
-Autocrypt: addr=eblake@redhat.com; keydata=
-	xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
-	xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
-	TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
-	GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
-	sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
-	AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
-	CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
-	RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
-	wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
-	Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
-	gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
-	pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
-	zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
-	pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
-	3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
-	NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
-	cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
-	SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
-	I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
-	mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
-	Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
-	2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
-Organization: Red Hat, Inc.
-Message-ID: <de96b74c-cf09-9b34-5602-2d4d8c256d80@redhat.com>
-Date: Fri, 24 May 2019 09:52:22 -0500
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+	mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+	/PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+	U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+	mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+	awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+	AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+	CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+	B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+	2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+	AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+	8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+	4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+	BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+	xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+	W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+	DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+	64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+	ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+	sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+	alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+	/ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+	bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+	R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <5f4cea24-87e1-0fb7-d47a-017bbe036bfe@redhat.com>
+Date: Fri, 24 May 2019 17:08:35 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190508211820.17851-5-mreitz@redhat.com>
+In-Reply-To: <1ed0b731-cbbd-0cdd-32f6-913d2b57edfa@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="tz7OoYlg6msVGg06RDvYPCcCEutp1HR62"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+	boundary="q383EWNzgURbU3ozrzRXJ5PxB5aJmEvfT"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.42]);
-	Fri, 24 May 2019 14:52:24 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.43]);
+	Fri, 24 May 2019 15:08:45 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
 X-Content-Filtered-By: Mailman/MimeDel 2.1.21
-Subject: Re: [Qemu-devel] [PATCH v3 4/5] iotests: Use qemu-nbd's --pid-file
+Subject: Re: [Qemu-devel] [PATCH v3 1/5] qemu-nbd: Add --pid-file option
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -106,70 +108,132 @@ Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---tz7OoYlg6msVGg06RDvYPCcCEutp1HR62
-From: Eric Blake <eblake@redhat.com>
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+--q383EWNzgURbU3ozrzRXJ5PxB5aJmEvfT
+From: Max Reitz <mreitz@redhat.com>
+To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, =?UTF-8?Q?Daniel_P_=2e_Berrang=c3=a9?=
  <berrange@redhat.com>, Kevin Wolf <kwolf@redhat.com>
-Message-ID: <de96b74c-cf09-9b34-5602-2d4d8c256d80@redhat.com>
-Subject: Re: [PATCH v3 4/5] iotests: Use qemu-nbd's --pid-file
+Message-ID: <5f4cea24-87e1-0fb7-d47a-017bbe036bfe@redhat.com>
+Subject: Re: [PATCH v3 1/5] qemu-nbd: Add --pid-file option
 References: <20190508211820.17851-1-mreitz@redhat.com>
- <20190508211820.17851-5-mreitz@redhat.com>
-In-Reply-To: <20190508211820.17851-5-mreitz@redhat.com>
+ <20190508211820.17851-2-mreitz@redhat.com>
+ <1ed0b731-cbbd-0cdd-32f6-913d2b57edfa@redhat.com>
+In-Reply-To: <1ed0b731-cbbd-0cdd-32f6-913d2b57edfa@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 5/8/19 4:18 PM, Max Reitz wrote:
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
-> ---
->  tests/qemu-iotests/common.rc | 6 ++----
->  1 file changed, 2 insertions(+), 4 deletions(-)
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
+On 24.05.19 17:07, Eric Blake wrote:
+> On 5/8/19 4:18 PM, Max Reitz wrote:
+>> --fork is a bit boring if there is no way to get the child's PID.  Thi=
+s
+>> option helps.
+>>
+>> Signed-off-by: Max Reitz <mreitz@redhat.com>
+>> ---
+>>  qemu-nbd.c    | 11 +++++++++++
+>>  qemu-nbd.texi |  2 ++
+>>  2 files changed, 13 insertions(+)
+>>
+>> diff --git a/qemu-nbd.c b/qemu-nbd.c
+>> index dca9e72cee..edb5195208 100644
+>> --- a/qemu-nbd.c
+>> +++ b/qemu-nbd.c
+>> @@ -59,6 +59,7 @@
+>>  #define QEMU_NBD_OPT_IMAGE_OPTS    262
+>>  #define QEMU_NBD_OPT_FORK          263
+>>  #define QEMU_NBD_OPT_TLSAUTHZ      264
+>> +#define QEMU_NBD_OPT_PID_FILE      265
+>> =20
+>>  #define MBR_SIZE 512
+>> =20
+>> @@ -111,6 +112,7 @@ static void usage(const char *name)
+>>  "                            specify tracing options\n"
+>>  "  --fork                    fork off the server process and exit the=
+ parent\n"
+>>  "                            once the server is running\n"
+>> +"  --pid-file=3DPATH           store the server's process ID in the g=
+iven file\n"
 >=20
-> diff --git a/tests/qemu-iotests/common.rc b/tests/qemu-iotests/common.r=
-c
-> index 93f87389b6..5502c3da2f 100644
-> --- a/tests/qemu-iotests/common.rc
-> +++ b/tests/qemu-iotests/common.rc
-> @@ -105,10 +105,8 @@ _qemu_io_wrapper()
-> =20
->  _qemu_nbd_wrapper()
->  {
-> -    (
-> -        echo $BASHPID > "${QEMU_TEST_DIR}/qemu-nbd.pid"
-> -        exec "$QEMU_NBD_PROG" $QEMU_NBD_OPTIONS "$@"
-> -    )
-> +    "$QEMU_NBD_PROG" --pid-file=3D"${QEMU_TEST_DIR}/qemu-nbd.pid" \
-> +                     $QEMU_NBD_OPTIONS "$@"
->  }
-> =20
->  _qemu_vxhs_wrapper()
+> Are we guaranteed that the pid file does not appear until after the
+> socket has been created?
 >=20
+> /me rereads full file...
+>=20
+>> @@ -876,6 +880,9 @@ int main(int argc, char **argv)
+>>          case 'L':
+>>              list =3D true;
+>>              break;
+>> +        case QEMU_NBD_OPT_PID_FILE:
+>> +            pid_file_name =3D optarg;
+>> +            break;
+>>          }
+>>      }
+>> =20
+> ...
+>     socket_activation =3D check_socket_activation();
+>     if (socket_activation =3D=3D 0) {
+>         setup_address_and_port(&bindto, &port);
+>     } else {
+>         /* Using socket activation - check user didn't use -p etc. */
+> ...
+>=20
+>> @@ -1196,6 +1203,10 @@ int main(int argc, char **argv)
+>> =20
+>>      nbd_update_server_watch();
+>> =20
+>> +    if (pid_file_name) {
+>> +        qemu_write_pidfile(pid_file_name, &error_fatal);
+>> +    }
+>=20
+> Yes, we are.  So,
+>=20
+>> +
+>>      /* now when the initialization is (almost) complete, chdir("/")
+>>       * to free any busy filesystems */
+>>      if (chdir("/") < 0) {
+>> diff --git a/qemu-nbd.texi b/qemu-nbd.texi
+>> index de342c76b8..7f55657722 100644
+>> --- a/qemu-nbd.texi
+>> +++ b/qemu-nbd.texi
+>> @@ -117,6 +117,8 @@ option; or provide the credentials needed for conn=
+ecting as a client
+>>  in list mode.
+>>  @item --fork
+>>  Fork off the server process and exit the parent once the server is ru=
+nning.
+>> +@item --pid-file=3DPATH
+>> +Store the server's process ID in the given file.
+>=20
+> since that is a useful trick to know (the pid file intentionally does
+> NOT appear until after the socket is ready to go), we should mention it=
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+> in the documentation.
+>=20
+> I can make that tweak while queueing, if you'd like.
+
+I don=E2=80=99t mind, but I personally find it more useful to just use --=
+fork
+and wait for the main process to exit.
+
+Max
 
 
---tz7OoYlg6msVGg06RDvYPCcCEutp1HR62
+--q383EWNzgURbU3ozrzRXJ5PxB5aJmEvfT
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlzoBSYACgkQp6FrSiUn
-Q2pT7wgAko+N7DuqiBJwyfsLY8jLyaUsXkzIodKxqXrt07GkIZNT7lZ48zyVnXFs
-LBTMt+o1FTyE6/a0KiyLd7+b9ymFCIUSXc+yr3tpOtkhrah+a87EKU9wPu64sW7L
-ChXgYmUoMwJWk05dhEa4etCJUeDUJxvkxrrjr4Hr9n4PDFCqBuEc9O3MuoAELByV
-21EafJBDR1hldBkuAMSE160K4LVuhU/cX1hUySL2GtZGHvA0nUZ4xcSjChFd+wsD
-1nqiTRNMA8MLQTxr3WOLbyrGcgergLnFyw1oAtomkv0zxCTUc72glXJ4AI0Sklh7
-I0V0vMYacs8wdj4EipW4hCsib5JEsQ==
-=BBAF
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlzoCPMACgkQ9AfbAGHV
+z0DVeAf/X4mDMceJcjHJQ9LxnT1ubfk+0Szqs+eOVUq0nHoJddwKe8GSAN5QX8xQ
+qmeR6bP5bwKcKvd2z31JJ7kNDCG2a5yBC/VIM2OcSsPYnPsKN2sqe35ZaAUnOxgr
+3Ipszb2eDGkY7b9KMKdZh/pPnwNZM37GZh3GqFKLp+xwsVG7XI+5IOT7MiFJfVxj
+zRoIx+Ru31FpAyg7+zjopicHZPnEr9aOd7SOAed6dSK38ge4v/i16WzPgn4qN1Pw
+JnrCBlAZ+9WHwFPuMqldBFqechOdVLg6ugQKcPcNVo7wRxR8ZFwwnGFEV2GhjjHS
+wgaabShdhkTrdjVV6iYXGEzsnpPN7Q==
+=Z4TV
 -----END PGP SIGNATURE-----
 
---tz7OoYlg6msVGg06RDvYPCcCEutp1HR62--
+--q383EWNzgURbU3ozrzRXJ5PxB5aJmEvfT--
 
