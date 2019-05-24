@@ -2,75 +2,68 @@ Return-Path: <SRS0=oHhb=TY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_MUTT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A5732C072B5
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 15:15:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 93B8FC072B5
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 15:15:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7C1BF2075D
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 15:15:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7C1BF2075D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 60F152075D
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 15:15:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 60F152075D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:56101 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:56139 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hUBuf-0002IY-Kp
-	for qemu-devel@archiver.kernel.org; Fri, 24 May 2019 11:15:17 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:54828)
+	id 1hUBvE-0002lS-LF
+	for qemu-devel@archiver.kernel.org; Fri, 24 May 2019 11:15:52 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:55504)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hUBrC-00007D-FM
-	for qemu-devel@nongnu.org; Fri, 24 May 2019 11:11:43 -0400
+	(envelope-from <stefanha@redhat.com>) id 1hUBsx-0001LO-8s
+	for qemu-devel@nongnu.org; Fri, 24 May 2019 11:13:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hUBr5-0002H5-25
-	for qemu-devel@nongnu.org; Fri, 24 May 2019 11:11:37 -0400
-Received: from indium.canonical.com ([91.189.90.7]:47344)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hUBr0-000191-4P
-	for qemu-devel@nongnu.org; Fri, 24 May 2019 11:11:31 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hUBpK-00022L-D1
-	for <qemu-devel@nongnu.org>; Fri, 24 May 2019 15:09:46 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 4B3122E807C
-	for <qemu-devel@nongnu.org>; Fri, 24 May 2019 15:09:46 +0000 (UTC)
+	(envelope-from <stefanha@redhat.com>) id 1hUBsw-0003SU-AT
+	for qemu-devel@nongnu.org; Fri, 24 May 2019 11:13:31 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42492)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>)
+	id 1hUBsu-00039E-1q; Fri, 24 May 2019 11:13:28 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id CA71D7FDFF;
+	Fri, 24 May 2019 15:12:57 +0000 (UTC)
+Received: from localhost (ovpn-117-142.ams2.redhat.com [10.36.117.142])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id ED2EA7BE8F;
+	Fri, 24 May 2019 15:12:56 +0000 (UTC)
+Date: Fri, 24 May 2019 16:12:55 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: Aarushi Mehta <mehta.aaru20@gmail.com>
+Message-ID: <20190524151255.GB31070@stefanha-x1.localdomain>
+References: <20190524140337.13415-1-mehta.aaru20@gmail.com>
+	<20190524140337.13415-3-mehta.aaru20@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 24 May 2019 14:58:45 -0000
-From: Lucas Meneghel Rodrigues <lookkas@gmail.com>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Incomplete; importance=Wishlist;
-	assignee=None; 
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: 8-roothorick-gmail-com andcycle-launchpad-net
-	anthony-codemonkey lmr th-huth
-X-Launchpad-Bug-Reporter: Lucas Meneghel Rodrigues (lmr)
-X-Launchpad-Bug-Modifier: Lucas Meneghel Rodrigues (lmr)
-References: <20100629211802.16137.10587.malonedeb@soybean.canonical.com>
-Message-Id: <155870992518.24947.13019860117533050337.malone@gac.canonical.com>
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="18968";
-	Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: 9e2a74986d95d68200d81dd2bd294426e62ccc1e
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="s/l3CgOIzMHHjg/5"
+Content-Disposition: inline
+In-Reply-To: <20190524140337.13415-3-mehta.aaru20@gmail.com>
+User-Agent: Mutt/1.11.4 (2019-03-13)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.27]);
+	Fri, 24 May 2019 15:13:02 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 599958] Re: Timedrift problems with Win7: hpet
- missing time drift fixups
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [RFC PATCH v2 2/9] block/block: add BDRV flag for
+ io_uring
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -79,72 +72,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 599958 <599958@bugs.launchpad.net>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org,
+	saket.sinha89@gmail.com, Julia Suvorova <jusual@mail.ru>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Absolutely, please close it.
 
--- =
+--s/l3CgOIzMHHjg/5
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/599958
+On Fri, May 24, 2019 at 07:33:30PM +0530, Aarushi Mehta wrote:
+> Signed-off-by: Aarushi Mehta <mehta.aaru20@gmail.com>
+> ---
+>  include/block/block.h | 1 +
+>  1 file changed, 1 insertion(+)
 
-Title:
-  Timedrift problems with Win7: hpet missing time drift fixups
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 
-Status in QEMU:
-  Incomplete
+--s/l3CgOIzMHHjg/5
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Bug description:
-  We've been finding timedrift issues witth Win7 under qemu-kvm on our
-  daily testing
+-----BEGIN PGP SIGNATURE-----
 
-  kvm.qemu-kvm-git.smp2.Win7.64.timedrift.with_load	FAIL	1	Time drift too l=
-arge after rest period: 38.63%
-  kvm.qemu-kvm-git.smp2.Win7.64.timedrift.with_reboot	FAIL	1	Time drift too=
- large at iteration 1: 17.77 seconds
-  kvm.qemu-kvm-git.smp2.Win7.64.timedrift.with_migration	FAIL	1	Time drift =
-too large at iteration 2: 3.08 seconds
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAlzoCfcACgkQnKSrs4Gr
+c8jfpAgAumNqEERlV2GXHmJPibH3F8F7L/WRO/TzHh0EhM0zLMCngm+H3mh593Ss
+H3X5uVJ02t0QhkJI/K1nAFi0FJLCGl2P4lrBLfOIJ0XPipbuiQOg9/j0Mfu62s5t
+PdB8M1i66yv3DCMKYIvZDn5Bjn14tEaOerK852sEJ8oyLxXsIJYC9VyoXVQeDHWe
+2GDGsQJ5wrC3HEqiyNpB+u0nRxduD00agWsUqO/WNAj6zsKuPKnEaHwha94Kxs8+
+FQ6Di8yEqMT3IRdYFDWcxRJ9XuzFziveHm2F7zGIB+Z6GzJLqk2qnbbhjC9GtMLR
+TTOi5Q8HgabnK/YQ/TOhmcIH+9dZpw==
+=Q5Sd
+-----END PGP SIGNATURE-----
 
-  Steps to reproduce:
-
-  timedrift.with_load
-
-  1) Log into a guest.
-  2) Take a time reading from the guest and host.
-  3) Run load on the guest and host.
-  4) Take a second time reading.
-  5) Stop the load and rest for a while.
-  6) Take a third time reading.
-  7) If the drift immediately after load is higher than a user-
-      specified value (in %), fail.
-      If the drift after the rest period is higher than a user-specified va=
-lue,
-      fail.
-
-  timedrift.with_migration
-
-  1) Log into a guest.
-  2) Take a time reading from the guest and host.
-  3) Migrate the guest.
-  4) Take a second time reading.
-  5) If the drift (in seconds) is higher than a user specified value, fail.
-
-  timedrift.with_reboot
-
-  1) Log into a guest.
-  2) Take a time reading from the guest and host.
-  3) Reboot the guest.
-  4) Take a second time reading.
-  5) If the drift (in seconds) is higher than a user specified value, fail.
-
-  This bug is to register those issues and keep an eye on them.
-
-  Attached, some logs from the autotest tests executed on the guest
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/599958/+subscriptions
+--s/l3CgOIzMHHjg/5--
 
