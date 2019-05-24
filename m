@@ -2,142 +2,88 @@ Return-Path: <SRS0=oHhb=TY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 08B1BC282E1
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 23:38:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 465D5C282E1
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 23:58:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BD6722184E
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 23:38:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BD6722184E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 0FC9B20674
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 23:58:31 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qzo/Jo3a"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0FC9B20674
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:33200 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:33361 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hUJlu-0002ii-KV
-	for qemu-devel@archiver.kernel.org; Fri, 24 May 2019 19:38:46 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:57618)
+	id 1hUK50-0006Cg-1y
+	for qemu-devel@archiver.kernel.org; Fri, 24 May 2019 19:58:30 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:60137)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1hUJkz-0002Na-8a
-	for qemu-devel@nongnu.org; Fri, 24 May 2019 19:37:50 -0400
+	(envelope-from <programmingkidx@gmail.com>) id 1hUK3M-0005Ao-PQ
+	for qemu-devel@nongnu.org; Fri, 24 May 2019 19:56:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1hUJkw-0001s1-4n
-	for qemu-devel@nongnu.org; Fri, 24 May 2019 19:37:48 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46242)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jsnow@redhat.com>)
-	id 1hUJkq-0001nD-V6; Fri, 24 May 2019 19:37:41 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E3209368E3;
-	Fri, 24 May 2019 23:37:39 +0000 (UTC)
-Received: from [10.10.123.140] (ovpn-123-140.rdu2.redhat.com [10.10.123.140])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id DD4D219069;
-	Fri, 24 May 2019 23:37:37 +0000 (UTC)
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
-	qemu-devel@nongnu.org, qemu-block@nongnu.org
-References: <20190523154733.54944-1-vsementsov@virtuozzo.com>
-	<20190523154733.54944-3-vsementsov@virtuozzo.com>
-From: John Snow <jsnow@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
-	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
-Message-ID: <2a5e3401-34fe-c0ba-7f73-5a05add965e9@redhat.com>
-Date: Fri, 24 May 2019 19:37:36 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
-MIME-Version: 1.0
-In-Reply-To: <20190523154733.54944-3-vsementsov@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.30]);
-	Fri, 24 May 2019 23:37:39 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 2/3] block/qcow2-bitmap: get rid of
- bdrv_has_changed_persistent_bitmaps
+	(envelope-from <programmingkidx@gmail.com>) id 1hUK2s-0001H9-4j
+	for qemu-devel@nongnu.org; Fri, 24 May 2019 19:56:19 -0400
+Received: from mail-it1-x141.google.com ([2607:f8b0:4864:20::141]:50593)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
+	id 1hUK2s-0001Gm-0E; Fri, 24 May 2019 19:56:18 -0400
+Received: by mail-it1-x141.google.com with SMTP id a186so8667363itg.0;
+	Fri, 24 May 2019 16:56:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+	h=mime-version:subject:from:in-reply-to:date:cc
+	:content-transfer-encoding:message-id:references:to;
+	bh=CB+e8mhR8tRn7BPOR/5uMsoccOyM3rz96Ecj0M0x5uc=;
+	b=qzo/Jo3aKk/ATLlkhLDXFudLeGt2OVKn1zoaUzpsNB2GpAsZJnqTGBB7d9dvMvPDIL
+	p2DQqdlETy0pT87+cCApuDz8DzDfA/ABaYwo305zd3zcotaYKk0MhJQLM760ByliMe5S
+	3zWaBzEzui8vaiU1Nnur9fflNuSpUQw8iQUcwfGfkudzTkomqU6B4rnnUp5SHnCIqbh0
+	N+8EvmqqCNUBU+uYHLfAsK36wMAmOY+XHREDnR1YABnzRtru6uaudzXb0Y0nzzkWno77
+	XkKHRsj+O4vCYu+9p6O55Gn5RNpUim59Efv52kuzmc0z9xXsYYD/P9YECvK7TNNjLSKp
+	Nc/w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
+	:content-transfer-encoding:message-id:references:to;
+	bh=CB+e8mhR8tRn7BPOR/5uMsoccOyM3rz96Ecj0M0x5uc=;
+	b=ULYUIilBkGlc6ejXo9CvbS1Zfcg+8+OvJQV4PCpKr35LpJAH3RAjGZS/CtF98fDec5
+	P/hgKLpmqPqZTLPd7X8kkHIHlldMUMLB046T0iLtM0POj5q7Bq3xIHbK+GnYGMWU92CH
+	ELb6BewDEJbaRlQ+6txH1h3maEzloyCLxepZutImg8Z9RNzVyO2uRzrfGZN8KsxT7pV3
+	K+fPD8udmvLoqEXdN8qfeZ0vZ0XvoCPxH3UI0vn0NSRI7N9eL3/EXo7M4fjnn0xWJxxy
+	vfU6A5RTB7cDMJTqP1k/wfzcp/YfzkDBWgbCq2AYw7VVy3QqLtPRubA54pNGXabou35B
+	XA+w==
+X-Gm-Message-State: APjAAAUhSoV63QDzfq1SmOrHYiqormYaWQAVxkI2xrwhHl1yiC7WBjtq
+	V9UBMWmDvxNFw7Ih0OAeFC+iGWdS
+X-Google-Smtp-Source: APXvYqybu+gAYRbRdlGhsGFZozCKuO08SqR8p14SQNpC4NuvL4N+Ip/tnFCxsxW4x8z/UAt4+2x8og==
+X-Received: by 2002:a24:e48c:: with SMTP id
+	o134mr19213297ith.171.1558742176646; 
+	Fri, 24 May 2019 16:56:16 -0700 (PDT)
+Received: from [192.168.0.6] (d14-69-20-184.try.wideopenwest.com.
+	[69.14.184.20]) by smtp.gmail.com with ESMTPSA id
+	t63sm1905059ita.42.2019.05.24.16.56.15
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Fri, 24 May 2019 16:56:15 -0700 (PDT)
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+From: Programmingkid <programmingkidx@gmail.com>
+In-Reply-To: <632b09de-c8e2-9907-9261-47b4de779a69@ilande.co.uk>
+Date: Fri, 24 May 2019 19:56:14 -0400
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <C2B311CF-3EE5-4093-8835-2BA464C2D8AC@gmail.com>
+References: <B954C7EE-DC27-433A-A271-D7ADF380550A@gmail.com>
+	<632b09de-c8e2-9907-9261-47b4de779a69@ilande.co.uk>
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+X-Mailer: Apple Mail (2.3273)
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::141
+Subject: Re: [Qemu-devel] Patch causing qemu-system-ppc to crash
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -149,142 +95,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, kwolf@redhat.com, den@openvz.org, mreitz@redhat.com
+Cc: Richard Henderson <rth@twiddle.net>, qemu-ppc <qemu-ppc@nongnu.org>,
+	qemu Developers <qemu-devel@nongnu.org>,
+	David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
+> On May 24, 2019, at 2:56 AM, Mark Cave-Ayland =
+<mark.cave-ayland@ilande.co.uk> wrote:
+>=20
+> On 24/05/2019 03:48, Programmingkid wrote:
+>=20
+>> Recently I have noticed that qemu-system-ppc is crashing while =
+booting up my Mac OS X VM. A bit of git bisecting shows this is the =
+patch that causes this issue:
+>>=20
+>> commit 1e262b49b5331441f697461e4305fe06719758a7
+>> Author: Richard Henderson <richard.henderson@linaro.org>
+>> Date:   Mon Mar 18 12:02:54 2019 -0700
+>>=20
+>>    tcg/i386: Implement tcg_out_dupm_vec
+>>=20
+>>    At the same time, improve tcg_out_dupi_vec wrt broadcast
+>>    from the constant pool.
+>>=20
+>>    Signed-off-by: Richard Henderson <richard.henderson@linaro.org
+>=20
+> I think this is the same issue I reported last week - does the patch =
+at
+> https://lists.gnu.org/archive/html/qemu-devel/2019-05/msg03767.html =
+help at all?
+>=20
+>=20
+> ATB,
+>=20
+> Mark.
 
-On 5/23/19 11:47 AM, Vladimir Sementsov-Ogievskiy wrote:
-> Firstly, no reason to optimize failure path. Then, function name is
-> ambiguous: it checks for readonly and similar things, but someone may
-> think that it will ignore normal bitmaps which was just unchanged, and
-> this is in bad relation with the fact that we should drop IN_USE flag
-> for unchanged bitmaps in the image.
-> 
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->  include/block/dirty-bitmap.h |  1 -
->  block/dirty-bitmap.c         | 12 ------------
->  block/qcow2-bitmap.c         | 23 +++++++++++++----------
->  3 files changed, 13 insertions(+), 23 deletions(-)
-> 
-> diff --git a/include/block/dirty-bitmap.h b/include/block/dirty-bitmap.h
-> index 8044ace63e..816022972b 100644
-> --- a/include/block/dirty-bitmap.h
-> +++ b/include/block/dirty-bitmap.h
-> @@ -105,7 +105,6 @@ bool bdrv_has_readonly_bitmaps(BlockDriverState *bs);
->  bool bdrv_dirty_bitmap_get_autoload(const BdrvDirtyBitmap *bitmap);
->  bool bdrv_dirty_bitmap_get_persistence(BdrvDirtyBitmap *bitmap);
->  bool bdrv_dirty_bitmap_inconsistent(const BdrvDirtyBitmap *bitmap);
-> -bool bdrv_has_changed_persistent_bitmaps(BlockDriverState *bs);
->  BdrvDirtyBitmap *bdrv_dirty_bitmap_next(BlockDriverState *bs,
->                                          BdrvDirtyBitmap *bitmap);
->  char *bdrv_dirty_bitmap_sha256(const BdrvDirtyBitmap *bitmap, Error **errp);
-> diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
-> index 59e6ebb861..eca2eed0bf 100644
-> --- a/block/dirty-bitmap.c
-> +++ b/block/dirty-bitmap.c
-> @@ -775,18 +775,6 @@ bool bdrv_dirty_bitmap_inconsistent(const BdrvDirtyBitmap *bitmap)
->      return bitmap->inconsistent;
->  }
->  
-> -bool bdrv_has_changed_persistent_bitmaps(BlockDriverState *bs)
-> -{
-> -    BdrvDirtyBitmap *bm;
-> -    QLIST_FOREACH(bm, &bs->dirty_bitmaps, list) {
-> -        if (bm->persistent && !bm->readonly && !bm->migration) {
+I think it fixed the problem. I just did a 'git pull' and the result was =
+a working qemu-system-ppc. This patch is present in the history.
 
-The loop down below has these conditionals for skipping bitmaps:
-
-        if (!bdrv_dirty_bitmap_get_persistence(bitmap) ||
-            bdrv_dirty_bitmap_readonly(bitmap) ||
-            bdrv_dirty_bitmap_inconsistent(bitmap)) {
-            continue;
-        }
-
-It looks like a semantic change, but hiding inside of get_persistence is
-this:
-
-bitmap->persistent && !bitmap->migration;
-
-So this is equivalent, actually. It's not readily apparent at a glance.
-
-> -            return true;
-> -        }
-> -    }
-> -
-> -    return false;
-> -}
-> -
->  BdrvDirtyBitmap *bdrv_dirty_bitmap_next(BlockDriverState *bs,
->                                          BdrvDirtyBitmap *bitmap)
->  {
-> diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
-> index 8a75366c92..2b84bfa007 100644
-> --- a/block/qcow2-bitmap.c
-> +++ b/block/qcow2-bitmap.c
-> @@ -1457,16 +1457,7 @@ void qcow2_store_persistent_dirty_bitmaps(BlockDriverState *bs, Error **errp)
->      Qcow2Bitmap *bm;
->      QSIMPLEQ_HEAD(, Qcow2BitmapTable) drop_tables;
->      Qcow2BitmapTable *tb, *tb_next;
-> -
-> -    if (!bdrv_has_changed_persistent_bitmaps(bs)) {
-> -        /* nothing to do */
-> -        return;
-> -    }
-> -
-> -    if (!can_write(bs)) {
-> -        error_setg(errp, "No write access");
-> -        return;
-> -    }
-> +    bool need_write = false;
->  
->      QSIMPLEQ_INIT(&drop_tables);
->  
-> @@ -1494,6 +1485,8 @@ void qcow2_store_persistent_dirty_bitmaps(BlockDriverState *bs, Error **errp)
->              continue;
->          }
->  
-> +        need_write = true;
-> +
->          if (check_constraints_on_bitmap(bs, name, granularity, errp) < 0) {
->              error_prepend(errp, "Bitmap '%s' doesn't satisfy the constraints: ",
->                            name);
-> @@ -1532,6 +1525,15 @@ void qcow2_store_persistent_dirty_bitmaps(BlockDriverState *bs, Error **errp)
->          bm->dirty_bitmap = bitmap;
->      }
->  
-> +    if (!need_write) {
-> +        goto success;
-> +    }
-> +
-> +    if (!can_write(bs)) {
-> +        error_setg(errp, "No write access");
-> +        goto fail;
-> +    }
-> +
->      /* allocate clusters and store bitmaps */
->      QSIMPLEQ_FOREACH(bm, bm_list, entry) {
->          if (bm->dirty_bitmap == NULL) {
-> @@ -1573,6 +1575,7 @@ void qcow2_store_persistent_dirty_bitmaps(BlockDriverState *bs, Error **errp)
->          bdrv_release_dirty_bitmap(bs, bm->dirty_bitmap);
->      }
->  
-> +success:
->      bitmap_list_free(bm_list);
->      return;
->  
-> 
-
-Alright, interesting. You're right that the function you're removing is
-pretty badly named for what it actually does. I got confused by that not
-too long ago.
-
-The rationale against optimizing the error path works for me, too.
-
-Seems like it's equivalent before and after, so:
-
-Reviewed-by: John Snow <jsnow@redhat.com>
+Thank you.=
 
