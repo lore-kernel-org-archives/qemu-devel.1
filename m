@@ -2,110 +2,90 @@ Return-Path: <SRS0=oHhb=TY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C5685C072B5
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 07:25:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 01EC7C072B5
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 07:30:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9D90520868
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 07:25:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9D90520868
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 7078220868
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 07:30:26 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="vw3ViYC4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7078220868
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:50350 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:50380 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hU4aS-0007WN-Vk
-	for qemu-devel@archiver.kernel.org; Fri, 24 May 2019 03:25:56 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:50548)
+	id 1hU4en-0000fD-J2
+	for qemu-devel@archiver.kernel.org; Fri, 24 May 2019 03:30:25 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:51086)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hU4Zf-00078Q-C4
-	for qemu-devel@nongnu.org; Fri, 24 May 2019 03:25:08 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1hU4dq-0008Vj-2L
+	for qemu-devel@nongnu.org; Fri, 24 May 2019 03:29:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1hU4Ze-0008H0-JM
-	for qemu-devel@nongnu.org; Fri, 24 May 2019 03:25:07 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34900)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1hU4Ze-0008GI-BY
-	for qemu-devel@nongnu.org; Fri, 24 May 2019 03:25:06 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 2D79F3092654
-	for <qemu-devel@nongnu.org>; Fri, 24 May 2019 07:25:00 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-116-33.ams2.redhat.com [10.36.116.33])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 4F3D35D9D3
-	for <qemu-devel@nongnu.org>; Fri, 24 May 2019 07:24:55 +0000 (UTC)
-To: qemu-devel@nongnu.org
-References: <20190523081538.2291-1-armbru@redhat.com>
-	<20190523081538.2291-7-armbru@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=thuth@redhat.com; keydata=
-	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
-Organization: Red Hat
-Message-ID: <d1a31149-6732-e7d6-e2c3-bf3d919c4c03@redhat.com>
-Date: Fri, 24 May 2019 09:24:55 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	(envelope-from <alex.bennee@linaro.org>) id 1hU4do-0002il-U6
+	for qemu-devel@nongnu.org; Fri, 24 May 2019 03:29:26 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:46135)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1hU4do-0002fx-Fr
+	for qemu-devel@nongnu.org; Fri, 24 May 2019 03:29:24 -0400
+Received: by mail-wr1-x443.google.com with SMTP id r7so8818853wrr.13
+	for <qemu-devel@nongnu.org>; Fri, 24 May 2019 00:29:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=references:user-agent:from:to:cc:subject:in-reply-to:date
+	:message-id:mime-version:content-transfer-encoding;
+	bh=fQL703gdUEPMSCkd66lFYZphWzwrH3He/fdhcnItNbc=;
+	b=vw3ViYC4bhIopqCYYUOx5cBExWY43PEN1/f7mbwXZiVpe7dHQJ9EwcY9UJf+tPIJPw
+	dVGVMws3tETM1juyHwFb3Addhw04808L0mLwyhBGnKD3XG3dhNeKFK06Br/DFVfhT0pe
+	kSsYa/AZDMrWcVS8bfyNY3Raj2PNCA0HSis3tn9JIrgWnbq1jc6C7ineTDYDURYIocrQ
+	qowEff9r51urWct1N8fjord1/wq83h1cKoosKUe2ow96KdjQ9cqHG5rL4AZGpIp1zQNb
+	fLTDlKO+Li8x5ESc5eCl30jOXhp7/XTSrwXVoogoMkdnIaM8R8Aox8gC658LaszOd6/O
+	RKSA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:references:user-agent:from:to:cc:subject
+	:in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+	bh=fQL703gdUEPMSCkd66lFYZphWzwrH3He/fdhcnItNbc=;
+	b=ACTQyw5DMCbHhht+WOD6ap+/fL0R8tdGx4D7og+FWMAXaOzmomTS1tHKsozpIwj8gc
+	DxiCvuwaE6w+17eLshRhuMS1iPrCnJPSeDRkIy3BkBVKyVr/RtYdy2h7Q2PGBNkjcOjL
+	lKnhye97ombkVmEf7brdD0NHTc9HLUJEbwaAkcr/CYqha/rylfCRx59/m7boA3c0ui/F
+	VZxzWFvgvDWyPG/Lk5/LigrHbTOQ5iHahXAdUiGl2nYM1pEpfP60bnJ4kneBaemMalA/
+	eDVxZkuJXGufkXHQYPOU94682l0cDUasyPk8nUPtGC9feDk4BByb7V2jtui0ZV5mM7ie
+	TwFw==
+X-Gm-Message-State: APjAAAV/zB6SO9O3XZI4MuMgdR7YtHwEAZ+FAE5SeSxB71T3Rbu3t/se
+	0EgWEThrayX0ZQ7+BXCzWLgHUQ==
+X-Google-Smtp-Source: APXvYqyYMN03btzYxuy5YN4JPfUZptvHKSi0Myjy7tkbntMjESHLE93O2BUdd809EqLjqsc7nqqwgg==
+X-Received: by 2002:adf:f8ce:: with SMTP id f14mr13152997wrq.110.1558682962579;
+	Fri, 24 May 2019 00:29:22 -0700 (PDT)
+Received: from zen.linaroharston ([81.128.185.34])
+	by smtp.gmail.com with ESMTPSA id q9sm3010226wmq.9.2019.05.24.00.29.21
+	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+	Fri, 24 May 2019 00:29:22 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+	by zen.linaroharston (Postfix) with ESMTP id 987681FF87;
+	Fri, 24 May 2019 08:29:21 +0100 (BST)
+References: <20190523175413.14448-1-laurent@vivier.eu>
+User-agent: mu4e 1.3.2; emacs 26.1
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Laurent Vivier <laurent@vivier.eu>
+In-reply-to: <20190523175413.14448-1-laurent@vivier.eu>
+Date: Fri, 24 May 2019 08:29:21 +0100
+Message-ID: <87ef4o1fam.fsf@zen.linaroharston>
 MIME-Version: 1.0
-In-Reply-To: <20190523081538.2291-7-armbru@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.43]);
-	Fri, 24 May 2019 07:25:05 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [RFC v4 6/7] tests: Don't limit check-headers to
- include/
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2a00:1450:4864:20::443
+Subject: Re: [Qemu-devel] [PATCH] linux-user: fix __NR_semtimedop undeclared
+ error
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -117,15 +97,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Cornelia Huck <cohuck@redhat.com>,
+	Riku Voipio <riku.voipio@iki.fi>, qemu-devel@nongnu.org,
+	Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+	Aleksandar Markovic <aleksandar.m.mail@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 23/05/2019 10.15, Markus Armbruster wrote:
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
 
-Please add a proper patch description. You don't really expect someone
-to review this monster patch without instructions where to look first?
+Laurent Vivier <laurent@vivier.eu> writes:
 
- Thomas
+> In current code, __NR_msgrcv and__NR_semtimedop are supposed to be
+> defined if __NR_msgsnd is defined.
+>
+> But linux headers 5.2-rc1 for MIPS define __NR_msgsnd without defining
+> __NR_semtimedop and it breaks the QEMU build.
+>
+> __NR_semtimedop is defined in asm-mips/unistd_n64.h and asm-mips/unistd_n=
+32.h
+> but not in asm-mips/unistd_o32.h.
+>
+> Commit d9cb4336159a ("linux headers: update against Linux 5.2-rc1") has
+> updated asm-mips/unistd_o32.h and added __NR_msgsnd but not __NR_semtimed=
+op.
+> It introduces __NR_semtimedop_time64 instead.
+>
+> This patch fixes the problem by checking for each __NR_XXX symbol
+> before defining the corresponding syscall.
+>
+> Fixes: d9cb4336159a ("linux headers: update against Linux 5.2-rc1")
+> Reported-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+Tested-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+
+> ---
+>  linux-user/syscall.c | 24 ++++++++++++++++--------
+>  1 file changed, 16 insertions(+), 8 deletions(-)
+>
+> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+> index e311fcda0517..d316de25c9f2 100644
+> --- a/linux-user/syscall.c
+> +++ b/linux-user/syscall.c
+> @@ -761,14 +761,7 @@ safe_syscall2(int, nanosleep, const struct timespec =
+*, req,
+>  safe_syscall4(int, clock_nanosleep, const clockid_t, clock, int, flags,
+>                const struct timespec *, req, struct timespec *, rem)
+>  #endif
+> -#ifdef __NR_msgsnd
+> -safe_syscall4(int, msgsnd, int, msgid, const void *, msgp, size_t, sz,
+> -              int, flags)
+> -safe_syscall5(int, msgrcv, int, msgid, void *, msgp, size_t, sz,
+> -              long, msgtype, int, flags)
+> -safe_syscall4(int, semtimedop, int, semid, struct sembuf *, tsops,
+> -              unsigned, nsops, const struct timespec *, timeout)
+> -#else
+> +#if !defined(__NR_msgsnd) || !defined(__NR_msgrcv) || !defined(__NR_semt=
+imedop)
+>  /* This host kernel architecture uses a single ipc syscall; fake up
+>   * wrappers for the sub-operations to hide this implementation detail.
+>   * Annoyingly we can't include linux/ipc.h to get the constant definitio=
+ns
+> @@ -783,14 +776,29 @@ safe_syscall4(int, semtimedop, int, semid, struct s=
+embuf *, tsops,
+>
+>  safe_syscall6(int, ipc, int, call, long, first, long, second, long, thir=
+d,
+>                void *, ptr, long, fifth)
+> +#endif
+> +#ifdef __NR_msgsnd
+> +safe_syscall4(int, msgsnd, int, msgid, const void *, msgp, size_t, sz,
+> +              int, flags)
+> +#else
+>  static int safe_msgsnd(int msgid, const void *msgp, size_t sz, int flags)
+>  {
+>      return safe_ipc(Q_IPCCALL(0, Q_MSGSND), msgid, sz, flags, (void *)ms=
+gp, 0);
+>  }
+> +#endif
+> +#ifdef __NR_msgrcv
+> +safe_syscall5(int, msgrcv, int, msgid, void *, msgp, size_t, sz,
+> +              long, msgtype, int, flags)
+> +#else
+>  static int safe_msgrcv(int msgid, void *msgp, size_t sz, long type, int =
+flags)
+>  {
+>      return safe_ipc(Q_IPCCALL(1, Q_MSGRCV), msgid, sz, flags, msgp, type=
+);
+>  }
+> +#endif
+> +#ifdef __NR_semtimedop
+> +safe_syscall4(int, semtimedop, int, semid, struct sembuf *, tsops,
+> +              unsigned, nsops, const struct timespec *, timeout)
+> +#else
+>  static int safe_semtimedop(int semid, struct sembuf *tsops, unsigned nso=
+ps,
+>                             const struct timespec *timeout)
+>  {
+
+
+--
+Alex Benn=C3=A9e
 
