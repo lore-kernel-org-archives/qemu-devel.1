@@ -2,84 +2,86 @@ Return-Path: <SRS0=oHhb=TY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CF0FFC282E3
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 16:07:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2006BC072B5
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 16:07:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8932520675
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 16:07:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E24C820675
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 16:07:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aPHn8Y8X"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8932520675
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZBX4tcJH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E24C820675
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:56954 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:56956 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hUCjR-0008Tb-Ni
-	for qemu-devel@archiver.kernel.org; Fri, 24 May 2019 12:07:45 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:37126)
+	id 1hUCjY-0000CD-4b
+	for qemu-devel@archiver.kernel.org; Fri, 24 May 2019 12:07:52 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:37204)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <arilou@gmail.com>) id 1hUCdZ-00040u-H2
-	for qemu-devel@nongnu.org; Fri, 24 May 2019 12:01:43 -0400
+	(envelope-from <arilou@gmail.com>) id 1hUCdl-0004BF-OS
+	for qemu-devel@nongnu.org; Fri, 24 May 2019 12:01:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <arilou@gmail.com>) id 1hUCdX-0001yQ-Fk
-	for qemu-devel@nongnu.org; Fri, 24 May 2019 12:01:41 -0400
-Received: from mail-wm1-x331.google.com ([2a00:1450:4864:20::331]:33493)
+	(envelope-from <arilou@gmail.com>) id 1hUCdf-00027l-F4
+	for qemu-devel@nongnu.org; Fri, 24 May 2019 12:01:51 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:37576)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <arilou@gmail.com>) id 1hUCdT-0001ro-3E
-	for qemu-devel@nongnu.org; Fri, 24 May 2019 12:01:37 -0400
-Received: by mail-wm1-x331.google.com with SMTP id v19so1524834wmh.0
-	for <qemu-devel@nongnu.org>; Fri, 24 May 2019 09:01:30 -0700 (PDT)
+	(Exim 4.71) (envelope-from <arilou@gmail.com>) id 1hUCdd-00020y-GF
+	for qemu-devel@nongnu.org; Fri, 24 May 2019 12:01:47 -0400
+Received: by mail-wr1-x443.google.com with SMTP id e15so10568581wrs.4
+	for <qemu-devel@nongnu.org>; Fri, 24 May 2019 09:01:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=from:to:cc:subject:date:message-id:mime-version
-	:content-transfer-encoding;
-	bh=w/5AzzgSm31hkbsLF/f98Nh4j5Hl7pf560kiGv1+cKk=;
-	b=aPHn8Y8XUF1T5v4fuzbYn81vsLz6X/O2xaheVSUrjvzCXKu0NJUJSf+z17X/MZdjBo
-	sv+Jb12Oj7qE/+pzhiHodJZJFGghF0g5zqfDsjyqJ4agnj92X6oiqytnOkyFpejly3DF
-	cylbOfCsZ2AEdDdPZmjSwiv1VqO5nrSEnLpO2fdCX3I3o7fgOBhsDITRWZAL5UOzsCer
-	RrzTxmJnRLBfoRdD1UkH+K57LkltBvKmbjdAKpdRXrxJCEWzj7RJfUlV/7CXPOzWMNbG
-	5AbrtTRcT296iOEiq/xNieCXbkGVTR7FeC4YbozqtXLCNEVd8Lvz3vC4FB3hzwtWhVSE
-	ZDow==
+	h=from:to:cc:subject:date:message-id:in-reply-to:references
+	:mime-version:content-transfer-encoding;
+	bh=V1QVJ4HRbWCoEeLavvf/S+Qb9vILZOoid3DZnX3FkwE=;
+	b=ZBX4tcJHGTry1Bu9qVmKJpuvDByKRheKsqPHCdmQvjj1P8mnnqET7KtPjxkV0nLElc
+	og0sd0BlZJDi8bAi0outphE6d/gz7TuMjoSkzbIXPgdWqCwRDKogX4aLPjHPdbmFNhHn
+	DqjtxBg+zZ6VmuhKXxBjOPaIrxJ2eBg47vQZxKkfMx3VxN5rWWGem6KAerAsKedPGP/s
+	d1E7fL6wLuEzqyu811bixBY7kWeAsu4AKGfzHoJ7tRiY2F3JgeJQKn0b2xNc2L/TOYPY
+	tUm4yrQDWUxuI5Pe17XDHioxDaD2YaU4xXKEwV+NrLwbcGkOPaJCt5RrznfCwSpDfBsl
+	M7ZA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-	:content-transfer-encoding;
-	bh=w/5AzzgSm31hkbsLF/f98Nh4j5Hl7pf560kiGv1+cKk=;
-	b=ryjCPKE7jbWyWSA/13p/EaQXAjnTdYYEOTMjxQab2DSp7Mry/E+mA4beg4JTvPcThr
-	50uZNHE0EonCpwkYKqWp4A0OddHpoUb8uKe/A0+2sPYROZ86U2MKGEZ49blCsnP1hb5t
-	ZCMfy2QYLAVES30iiHrQnjPBRvLE5W5SYLWI9HIQ4nfLgbf85SaWpIHG6fmZoMFLAwHz
-	lWYpAoh7ZW+QpbMQZIxhZrSqHTXBEdnolOcv8W5Bd1/4M1e1CsQ/zlO1Prz2XuJaxTQF
-	QLYtLQjbFt13tgWfEOvCjmcnQOk4cFAh7hIs30p1/lfxKdcsQNqKLWLedsxKzRLAhS9+
-	mv+A==
-X-Gm-Message-State: APjAAAXlSNbQShPacQv33QlahShoYsfObGchtp9HKq6/ingxKweXWjxr
-	nSiwY51b+l9K3DzJRmKx8ONXahvI
-X-Google-Smtp-Source: APXvYqwrMmBVr2468uI5WbNgWjZbTg7wGs2KT1Q7KwyM8Hw7T06eO7PEJZI63HTHOOV3H/xo29RcAA==
-X-Received: by 2002:a1c:7a0d:: with SMTP id v13mr446137wmc.44.1558713688944;
-	Fri, 24 May 2019 09:01:28 -0700 (PDT)
+	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+	:references:mime-version:content-transfer-encoding;
+	bh=V1QVJ4HRbWCoEeLavvf/S+Qb9vILZOoid3DZnX3FkwE=;
+	b=RueEqRc3KJk5wSbq1jO+k6/rGFEs5lwdyCynBZIBlskJu11zfSnspwJFdomGlQjDnZ
+	WrC1YRMVIegU92CL7o5zIj0heJNkJdLwd/2n32QbiWnU9nZP194Q1M9YxBU77sR09lUg
+	jyzIUdl/jfL545g6g5vEgIOBS48K8yEKn1uHo0Q1mmKIqzs2nNvzlr/73An/devvy74n
+	DTlCKyGBqP9djLMOmKJKhowV5nR1z8LiGVDOq0TocsXdmMeRRa6p3vIFvPxWVEYLGmmS
+	BcUrQ9ArH16fU/IJhWgktnxtXzJNZgSyKh5HZThTRv71h/VyA9D+MMk6+8k/LsKlUhXB
+	RECQ==
+X-Gm-Message-State: APjAAAVxgaJLO+jrXex0DF8afI5VAcNrhH9/2BRycPo4at3kfJ/nwU34
+	kJGzX2+f/GcbxC5xmAYcOZpeRn6w
+X-Google-Smtp-Source: APXvYqzLkTbyVvcULAjgs1kSo/ViyYQZxjmJAqArI1HLp0gtLXqqYlun63K15ghHhW/9z9eTPxqVfw==
+X-Received: by 2002:adf:eb89:: with SMTP id t9mr438118wrn.109.1558713700882;
+	Fri, 24 May 2019 09:01:40 -0700 (PDT)
 Received: from jondnuc.lan ([176.230.64.37])
-	by smtp.gmail.com with ESMTPSA id s11sm370863wro.17.2019.05.24.09.01.27
+	by smtp.gmail.com with ESMTPSA id s11sm370863wro.17.2019.05.24.09.01.39
 	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Fri, 24 May 2019 09:01:28 -0700 (PDT)
+	Fri, 24 May 2019 09:01:40 -0700 (PDT)
 From: Jon Doron <arilou@gmail.com>
 To: qemu-devel@nongnu.org
-Date: Fri, 24 May 2019 19:00:58 +0300
-Message-Id: <20190524160118.31134-1-arilou@gmail.com>
+Date: Fri, 24 May 2019 19:01:07 +0300
+Message-Id: <20190524160118.31134-10-arilou@gmail.com>
 X-Mailer: git-send-email 2.21.0
+In-Reply-To: <20190524160118.31134-1-arilou@gmail.com>
+References: <20190524160118.31134-1-arilou@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2a00:1450:4864:20::331
-Subject: [Qemu-devel] [PATCH v11 00/20] gdbstub: Refactor command packets
- handler
+X-Received-From: 2a00:1450:4864:20::443
+Subject: [Qemu-devel] [PATCH v11 09/20] gdbstub: Implement get register (p
+ pkt) with new infra
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -96,112 +98,79 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This patch series refactors the old gdbstub command packets handler
-with a new infrastructure which should ease extending and adding new
-and missing gdb command packets.
+Signed-off-by: Jon Doron <arilou@gmail.com>
+---
+ gdbstub.c | 50 ++++++++++++++++++++++++++++++++++++++------------
+ 1 file changed, 38 insertions(+), 12 deletions(-)
 
-version 11 changes:
-- Add reviewed by tag
-- Requires review:
-  gdbstub: Implement deatch (D pkt) with new infra
-  gdbstub: Implement breakpoint commands (Z/z pkt) with new infra
-  gdbstub: Implement set register (P pkt) with new infra
-  gdbstub: Implement get register (p pkt) with new infra
-  gdbstub: Implement file io (F pkt) with new infra
-  gdbstub: Implement v commands with new infra
-  gdbstub: Implement generic set/query (Q/q pkt) with new infra
-  gdbstub: Implement target halted (? pkt) with new infra
-  gdbstub: Implement qemu physical memory mode
-- Already reviewed:
-  gdbstub: Add infrastructure to parse cmd packets
-  gdbstub: Implement thread_alive (T pkt) with new infra
-  gdbstub: Implement continue (c pkt) with new infra
-  gdbstub: Implement continue with signal (C pkt) with new infra
-  gdbstub: Implement set_thread (H pkt) with new infra
-  gdbstub: Implement write memory (M pkt) with new infra
-  gdbstub: Implement read memory (m pkt) with new infra
-  gdbstub: Implement write all registers (G pkt) with new infra
-  gdbstub: Implement read all registers (g pkt) with new infra
-  gdbstub: Implement step (s pkt) with new infra
-  gdbstub: Clear unused variables in gdb_handle_packet
-
-version 10 changes:
-- Remove kvm added API as this is not really required and can be
-  accomplished by defining a coprocessor callback with a system
-  specific xml (see: 200bf5b7ffea635079cc05fdfb363372b9544ce7)
-- Remove the new QEMU extended commands to read KVM MSRs
-- Various fixes from Code Review by Alex Bennee
-- Change the QEMU specific command to read physical memory to non-User QEMU 
-- Per patch changes:
-  gdbstub: Add infrastructure to parse cmd packets
-    * remove the union for the flags in GdbCmdParseEntry
-  gdbstub: Implement deatch (D pkt) with new infra
-    * Changed default handling for error flow / command not found
-  gdbstub: Implement continue with signal (C pkt) with new infra
-    * Added comment we dont support C sig;[addr] commands
-  gdbstub: Implement set_thread (H pkt) with new infra
-    * Change num_params check to be equal and not less than
-  gdbstub: Implement breakpoint commands (Z/z pkt) with new infra
-    * Merged z/Z commands into a single patch
-  gdbstub: Implement read memory (m pkt) with new infra
-    * Change num_params check to be equal and not less than
-  gdbstub: Implement file io (F pkt) with new infra
-    * Changed to have a single command parser
-  gdbstub: Implement generic set/query (Q/q pkt) with new infra
-    * Merged q/Q and qemu.Supported patches into a single patch
-  gdbstub: Implement target halted (? pkt) with new infra
-    * Removed TODO comment and added a note about it in the commit msg
-  gdbstub: Implement qemu physical memory mode
-    * Added CONFIG_USER_ONLY where required
-
-version 9 changes:
-- checkpatch fixes
-
-version 8 changes:
-- Add new command to display the Supported qemu generic query/sets
-- kvm: Add API to read/write a MSR
-- Add new commands specific for qemu:
-  * Command to swap the memory GDB sees to be the physical memory
-  * Commands to read and write a MSR
-
-version 7 changes:
-- Fixed few checkpatch complaints
-- Feedback from Alex Bennee
-
-version 4-6 changes:
-- mostly feedback from Richard Henderson
-
-version 3 changes
-- Split the single patch to many individual patches for easier reviewing
-
-version 2 changes
-- Code convention fixes
-
-Jon Doron (20):
-  gdbstub: Add infrastructure to parse cmd packets
-  gdbstub: Implement deatch (D pkt) with new infra
-  gdbstub: Implement thread_alive (T pkt) with new infra
-  gdbstub: Implement continue (c pkt) with new infra
-  gdbstub: Implement continue with signal (C pkt) with new infra
-  gdbstub: Implement set_thread (H pkt) with new infra
-  gdbstub: Implement breakpoint commands (Z/z pkt) with new infra
-  gdbstub: Implement set register (P pkt) with new infra
-  gdbstub: Implement get register (p pkt) with new infra
-  gdbstub: Implement write memory (M pkt) with new infra
-  gdbstub: Implement read memory (m pkt) with new infra
-  gdbstub: Implement write all registers (G pkt) with new infra
-  gdbstub: Implement read all registers (g pkt) with new infra
-  gdbstub: Implement file io (F pkt) with new infra
-  gdbstub: Implement step (s pkt) with new infra
-  gdbstub: Implement v commands with new infra
-  gdbstub: Implement generic set/query (Q/q pkt) with new infra
-  gdbstub: Implement target halted (? pkt) with new infra
-  gdbstub: Clear unused variables in gdb_handle_packet
-  gdbstub: Implement qemu physical memory mode
-
- gdbstub.c | 1753 ++++++++++++++++++++++++++++++++++++++---------------
- 1 file changed, 1262 insertions(+), 491 deletions(-)
-
+diff --git a/gdbstub.c b/gdbstub.c
+index 1c210d671a..3284b3e01d 100644
+--- a/gdbstub.c
++++ b/gdbstub.c
+@@ -1658,6 +1658,36 @@ static void handle_set_reg(GdbCmdContext *gdb_ctx, void *user_ctx)
+     put_packet(gdb_ctx->s, "OK");
+ }
+ 
++static void handle_get_reg(GdbCmdContext *gdb_ctx, void *user_ctx)
++{
++    int reg_size;
++
++    /*
++     * Older gdb are really dumb, and don't use 'g' if 'p' is avaialable.
++     * This works, but can be very slow.  Anything new enough to
++     * understand XML also knows how to use this properly.
++     */
++    if (!gdb_has_xml) {
++        put_packet(gdb_ctx->s, "");
++        return;
++    }
++
++    if (!gdb_ctx->num_params) {
++        put_packet(gdb_ctx->s, "E14");
++        return;
++    }
++
++    reg_size = gdb_read_register(gdb_ctx->s->g_cpu, gdb_ctx->mem_buf,
++                                 gdb_ctx->params[0].val_ull);
++    if (!reg_size) {
++        put_packet(gdb_ctx->s, "E14");
++        return;
++    }
++
++    memtohex(gdb_ctx->str_buf, gdb_ctx->mem_buf, reg_size);
++    put_packet(gdb_ctx->s, gdb_ctx->str_buf);
++}
++
+ static int gdb_handle_packet(GDBState *s, const char *line_buf)
+ {
+     CPUState *cpu;
+@@ -1887,18 +1917,14 @@ static int gdb_handle_packet(GDBState *s, const char *line_buf)
+         }
+         break;
+     case 'p':
+-        /* Older gdb are really dumb, and don't use 'g' if 'p' is avaialable.
+-           This works, but can be very slow.  Anything new enough to
+-           understand XML also knows how to use this properly.  */
+-        if (!gdb_has_xml)
+-            goto unknown_command;
+-        addr = strtoull(p, (char **)&p, 16);
+-        reg_size = gdb_read_register(s->g_cpu, mem_buf, addr);
+-        if (reg_size) {
+-            memtohex(buf, mem_buf, reg_size);
+-            put_packet(s, buf);
+-        } else {
+-            put_packet(s, "E14");
++        {
++            static const GdbCmdParseEntry get_reg_cmd_desc = {
++                .handler = handle_get_reg,
++                .cmd = "p",
++                .cmd_startswith = 1,
++                .schema = "L0"
++            };
++            cmd_parser = &get_reg_cmd_desc;
+         }
+         break;
+     case 'P':
 -- 
 2.21.0
 
