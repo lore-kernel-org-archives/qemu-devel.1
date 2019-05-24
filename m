@@ -6,59 +6,59 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 68366C072B5
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 18:52:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9649AC072B5
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 18:52:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2DC5921773
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 18:52:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2DC5921773
+	by mail.kernel.org (Postfix) with ESMTPS id 6F72721773
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 18:52:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6F72721773
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:58869 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:58871 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hUFIU-0003pL-CC
-	for qemu-devel@archiver.kernel.org; Fri, 24 May 2019 14:52:06 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:40435)
+	id 1hUFIX-0003s2-NL
+	for qemu-devel@archiver.kernel.org; Fri, 24 May 2019 14:52:09 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:40399)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1hUFC5-000714-HU
-	for qemu-devel@nongnu.org; Fri, 24 May 2019 14:45:30 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1hUFBx-0006uP-Sw
+	for qemu-devel@nongnu.org; Fri, 24 May 2019 14:45:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1hUFC2-0006Kt-Ui
-	for qemu-devel@nongnu.org; Fri, 24 May 2019 14:45:28 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58602)
+	(envelope-from <ehabkost@redhat.com>) id 1hUFBw-0006DA-4O
+	for qemu-devel@nongnu.org; Fri, 24 May 2019 14:45:21 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43540)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hUFC1-0006G6-GN
-	for qemu-devel@nongnu.org; Fri, 24 May 2019 14:45:25 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hUFBv-00068n-Q1
+	for qemu-devel@nongnu.org; Fri, 24 May 2019 14:45:20 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+	[10.5.11.22])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 46A8759465;
-	Fri, 24 May 2019 18:45:24 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 5D7208667B;
+	Fri, 24 May 2019 18:45:17 +0000 (UTC)
 Received: from localhost (ovpn-116-14.gru2.redhat.com [10.97.116.14])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 1E3EA173DB;
-	Fri, 24 May 2019 18:45:18 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id B56531001E6F;
+	Fri, 24 May 2019 18:45:14 +0000 (UTC)
 From: Eduardo Habkost <ehabkost@redhat.com>
 To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org,
 	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Date: Fri, 24 May 2019 15:44:37 -0300
-Message-Id: <20190524184447.16678-8-ehabkost@redhat.com>
+Date: Fri, 24 May 2019 15:44:36 -0300
+Message-Id: <20190524184447.16678-7-ehabkost@redhat.com>
 In-Reply-To: <20190524184447.16678-1-ehabkost@redhat.com>
 References: <20190524184447.16678-1-ehabkost@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.39]);
-	Fri, 24 May 2019 18:45:24 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.26]);
+	Fri, 24 May 2019 18:45:17 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 07/17] hw/arm/bcm2835: Use
- object_initialize_child for correct ref. counting
+Subject: [Qemu-devel] [PULL 06/17] hw/arm/bcm2835: Use object_initialize()
+ on PL011State
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -77,218 +77,76 @@ Sender: "Qemu-devel"
 
 From: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
-As explained in commit aff39be0ed97:
+To be coherent with the other peripherals contained in the
+BCM2835PeripheralState structure, directly allocate the PL011State
+(instead of using the pl011 uart as a pointer to a SysBusDevice).
 
-  Both functions, object_initialize() and object_property_add_child()
-  increase the reference counter of the new object, so one of the
-  references has to be dropped afterwards to get the reference
-  counting right. Otherwise the child object will not be properly
-  cleaned up when the parent gets destroyed.
-  Thus let's use now object_initialize_child() instead to get the
-  reference counting here right.
+Initialize the PL011State with object_initialize() instead of
+object_new().
 
-This patch was generated using the following Coccinelle script
-(with a bit of manual fix-up for overly long lines):
-
- @use_object_initialize_child@
- expression parent_obj;
- expression child_ptr;
- expression child_name;
- expression child_type;
- expression child_size;
- expression errp;
- @@
- (
- -   object_initialize(child_ptr, child_size, child_type);
- +   object_initialize_child(parent_obj, child_name,  child_ptr, child_si=
-ze,
- +                           child_type, &error_abort, NULL);
-     ... when !=3D parent_obj
- -   object_property_add_child(parent_obj, child_name, OBJECT(child_ptr),=
- NULL);
-     ...
- ?-  object_unref(OBJECT(child_ptr));
- |
- -   object_initialize(child_ptr, child_size, child_type);
- +   object_initialize_child(parent_obj, child_name,  child_ptr, child_si=
-ze,
- +                            child_type, errp, NULL);
-     ... when !=3D parent_obj
- -   object_property_add_child(parent_obj, child_name, OBJECT(child_ptr),=
- errp);
-     ...
- ?-  object_unref(OBJECT(child_ptr));
- )
-
- @use_sysbus_init_child_obj@
- expression parent_obj;
- expression dev;
- expression child_ptr;
- expression child_name;
- expression child_type;
- expression child_size;
- expression errp;
- @@
- (
- -   object_initialize_child(parent_obj, child_name, child_ptr, child_siz=
-e,
- -                           child_type, errp, NULL);
- +   sysbus_init_child_obj(parent_obj, child_name, child_ptr, child_size,
- +                         child_type);
-     ...
- -   qdev_set_parent_bus(DEVICE(child_ptr), sysbus_get_default());
- |
- -   object_initialize_child(parent_obj, child_name, child_ptr, child_siz=
-e,
- -                           child_type, errp, NULL);
- +   sysbus_init_child_obj(parent_obj, child_name, child_ptr, child_size,
- +                         child_type);
- -   dev =3D DEVICE(child_ptr);
- -   qdev_set_parent_bus(dev, sysbus_get_default());
- )
-
-While the object_initialize() function doesn't take an
-'Error *errp' argument, the object_initialize_child() does.
-Since this code is used when a machine is created (and is not
-yet running), we deliberately choose to use the &error_abort
-argument instead of ignoring errors if an object creation failed.
-This choice also matches when using sysbus_init_child_obj(),
-since its code is:
-
-  void sysbus_init_child_obj(Object *parent,
-                             const char *childname, void *child,
-                             size_t childsize, const char *childtype)
-  {
-      object_initialize_child(parent, childname, child, childsize,
-                              childtype, &error_abort, NULL);
-
-      qdev_set_parent_bus(DEVICE(child), sysbus_get_default());
-  }
-
-Suggested-by: Eduardo Habkost <ehabkost@redhat.com>
-Inspired-by: Thomas Huth <thuth@redhat.com>
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Message-Id: <20190507163416.24647-7-philmd@redhat.com>
+Message-Id: <20190507163416.24647-6-philmd@redhat.com>
 Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
 Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- hw/arm/bcm2835_peripherals.c | 53 ++++++++++++++----------------------
- 1 file changed, 20 insertions(+), 33 deletions(-)
+ include/hw/arm/bcm2835_peripherals.h |  2 +-
+ hw/arm/bcm2835_peripherals.c         | 14 +++++++-------
+ 2 files changed, 8 insertions(+), 8 deletions(-)
 
+diff --git a/include/hw/arm/bcm2835_peripherals.h b/include/hw/arm/bcm283=
+5_peripherals.h
+index 959508d57d..e79c21771f 100644
+--- a/include/hw/arm/bcm2835_peripherals.h
++++ b/include/hw/arm/bcm2835_peripherals.h
+@@ -38,7 +38,7 @@ typedef struct BCM2835PeripheralState {
+     MemoryRegion ram_alias[4];
+     qemu_irq irq, fiq;
+=20
+-    SysBusDevice *uart0;
++    PL011State uart0;
+     BCM2835AuxState aux;
+     BCM2835FBState fb;
+     BCM2835DMAState dma;
 diff --git a/hw/arm/bcm2835_peripherals.c b/hw/arm/bcm2835_peripherals.c
-index 2931a82a25..0fb54c7964 100644
+index 7ffb51b692..2931a82a25 100644
 --- a/hw/arm/bcm2835_peripherals.c
 +++ b/hw/arm/bcm2835_peripherals.c
-@@ -41,44 +41,36 @@ static void bcm2835_peripherals_init(Object *obj)
-                        MBOX_CHAN_COUNT << MBOX_AS_CHAN_SHIFT);
-=20
-     /* Interrupt Controller */
--    object_initialize(&s->ic, sizeof(s->ic), TYPE_BCM2835_IC);
--    object_property_add_child(obj, "ic", OBJECT(&s->ic), NULL);
--    qdev_set_parent_bus(DEVICE(&s->ic), sysbus_get_default());
-+    sysbus_init_child_obj(obj, "ic", &s->ic, sizeof(s->ic), TYPE_BCM2835=
-_IC);
+@@ -46,9 +46,9 @@ static void bcm2835_peripherals_init(Object *obj)
+     qdev_set_parent_bus(DEVICE(&s->ic), sysbus_get_default());
 =20
      /* UART0 */
--    object_initialize(&s->uart0, sizeof(s->uart0), TYPE_PL011);
--    object_property_add_child(obj, "uart0", OBJECT(&s->uart0), NULL);
--    qdev_set_parent_bus(DEVICE(&s->uart0), sysbus_get_default());
-+    sysbus_init_child_obj(obj, "uart0", &s->uart0, sizeof(s->uart0),
-+                          TYPE_PL011);
+-    s->uart0 =3D SYS_BUS_DEVICE(object_new(TYPE_PL011));
+-    object_property_add_child(obj, "uart0", OBJECT(s->uart0), NULL);
+-    qdev_set_parent_bus(DEVICE(s->uart0), sysbus_get_default());
++    object_initialize(&s->uart0, sizeof(s->uart0), TYPE_PL011);
++    object_property_add_child(obj, "uart0", OBJECT(&s->uart0), NULL);
++    qdev_set_parent_bus(DEVICE(&s->uart0), sysbus_get_default());
 =20
      /* AUX / UART1 */
--    object_initialize(&s->aux, sizeof(s->aux), TYPE_BCM2835_AUX);
--    object_property_add_child(obj, "aux", OBJECT(&s->aux), NULL);
--    qdev_set_parent_bus(DEVICE(&s->aux), sysbus_get_default());
-+    sysbus_init_child_obj(obj, "aux", &s->aux, sizeof(s->aux),
-+                          TYPE_BCM2835_AUX);
+     object_initialize(&s->aux, sizeof(s->aux), TYPE_BCM2835_AUX);
+@@ -166,16 +166,16 @@ static void bcm2835_peripherals_realize(DeviceState=
+ *dev, Error **errp)
+     sysbus_pass_irq(SYS_BUS_DEVICE(s), SYS_BUS_DEVICE(&s->ic));
 =20
-     /* Mailboxes */
--    object_initialize(&s->mboxes, sizeof(s->mboxes), TYPE_BCM2835_MBOX);
--    object_property_add_child(obj, "mbox", OBJECT(&s->mboxes), NULL);
--    qdev_set_parent_bus(DEVICE(&s->mboxes), sysbus_get_default());
-+    sysbus_init_child_obj(obj, "mbox", &s->mboxes, sizeof(s->mboxes),
-+                          TYPE_BCM2835_MBOX);
+     /* UART0 */
+-    qdev_prop_set_chr(DEVICE(s->uart0), "chardev", serial_hd(0));
+-    object_property_set_bool(OBJECT(s->uart0), true, "realized", &err);
++    qdev_prop_set_chr(DEVICE(&s->uart0), "chardev", serial_hd(0));
++    object_property_set_bool(OBJECT(&s->uart0), true, "realized", &err);
+     if (err) {
+         error_propagate(errp, err);
+         return;
+     }
 =20
-     object_property_add_const_link(OBJECT(&s->mboxes), "mbox-mr",
-                                    OBJECT(&s->mbox_mr), &error_abort);
-=20
-     /* Framebuffer */
--    object_initialize(&s->fb, sizeof(s->fb), TYPE_BCM2835_FB);
--    object_property_add_child(obj, "fb", OBJECT(&s->fb), NULL);
-+    sysbus_init_child_obj(obj, "fb", &s->fb, sizeof(s->fb), TYPE_BCM2835=
-_FB);
-     object_property_add_alias(obj, "vcram-size", OBJECT(&s->fb), "vcram-=
-size",
-                               &error_abort);
--    qdev_set_parent_bus(DEVICE(&s->fb), sysbus_get_default());
-=20
-     object_property_add_const_link(OBJECT(&s->fb), "dma-mr",
-                                    OBJECT(&s->gpu_bus_mr), &error_abort)=
-;
-=20
-     /* Property channel */
--    object_initialize(&s->property, sizeof(s->property), TYPE_BCM2835_PR=
-OPERTY);
--    object_property_add_child(obj, "property", OBJECT(&s->property), NUL=
-L);
-+    sysbus_init_child_obj(obj, "property", &s->property, sizeof(s->prope=
-rty),
-+                          TYPE_BCM2835_PROPERTY);
-     object_property_add_alias(obj, "board-rev", OBJECT(&s->property),
-                               "board-rev", &error_abort);
--    qdev_set_parent_bus(DEVICE(&s->property), sysbus_get_default());
-=20
-     object_property_add_const_link(OBJECT(&s->property), "fb",
-                                    OBJECT(&s->fb), &error_abort);
-@@ -86,32 +78,27 @@ static void bcm2835_peripherals_init(Object *obj)
-                                    OBJECT(&s->gpu_bus_mr), &error_abort)=
-;
-=20
-     /* Random Number Generator */
--    object_initialize(&s->rng, sizeof(s->rng), TYPE_BCM2835_RNG);
--    object_property_add_child(obj, "rng", OBJECT(&s->rng), NULL);
--    qdev_set_parent_bus(DEVICE(&s->rng), sysbus_get_default());
-+    sysbus_init_child_obj(obj, "rng", &s->rng, sizeof(s->rng),
-+                          TYPE_BCM2835_RNG);
-=20
-     /* Extended Mass Media Controller */
--    object_initialize(&s->sdhci, sizeof(s->sdhci), TYPE_SYSBUS_SDHCI);
--    object_property_add_child(obj, "sdhci", OBJECT(&s->sdhci), NULL);
--    qdev_set_parent_bus(DEVICE(&s->sdhci), sysbus_get_default());
-+    sysbus_init_child_obj(obj, "sdhci", &s->sdhci, sizeof(s->sdhci),
-+                          TYPE_SYSBUS_SDHCI);
-=20
-     /* SDHOST */
--    object_initialize(&s->sdhost, sizeof(s->sdhost), TYPE_BCM2835_SDHOST=
-);
--    object_property_add_child(obj, "sdhost", OBJECT(&s->sdhost), NULL);
--    qdev_set_parent_bus(DEVICE(&s->sdhost), sysbus_get_default());
-+    sysbus_init_child_obj(obj, "sdhost", &s->sdhost, sizeof(s->sdhost),
-+                          TYPE_BCM2835_SDHOST);
-=20
-     /* DMA Channels */
--    object_initialize(&s->dma, sizeof(s->dma), TYPE_BCM2835_DMA);
--    object_property_add_child(obj, "dma", OBJECT(&s->dma), NULL);
--    qdev_set_parent_bus(DEVICE(&s->dma), sysbus_get_default());
-+    sysbus_init_child_obj(obj, "dma", &s->dma, sizeof(s->dma),
-+                          TYPE_BCM2835_DMA);
-=20
-     object_property_add_const_link(OBJECT(&s->dma), "dma-mr",
-                                    OBJECT(&s->gpu_bus_mr), &error_abort)=
-;
-=20
-     /* GPIO */
--    object_initialize(&s->gpio, sizeof(s->gpio), TYPE_BCM2835_GPIO);
--    object_property_add_child(obj, "gpio", OBJECT(&s->gpio), NULL);
--    qdev_set_parent_bus(DEVICE(&s->gpio), sysbus_get_default());
-+    sysbus_init_child_obj(obj, "gpio", &s->gpio, sizeof(s->gpio),
-+                          TYPE_BCM2835_GPIO);
-=20
-     object_property_add_const_link(OBJECT(&s->gpio), "sdbus-sdhci",
-                                    OBJECT(&s->sdhci.sdbus), &error_abort=
-);
+     memory_region_add_subregion(&s->peri_mr, UART0_OFFSET,
+-                                sysbus_mmio_get_region(s->uart0, 0));
+-    sysbus_connect_irq(s->uart0, 0,
++                sysbus_mmio_get_region(SYS_BUS_DEVICE(&s->uart0), 0));
++    sysbus_connect_irq(SYS_BUS_DEVICE(&s->uart0), 0,
+         qdev_get_gpio_in_named(DEVICE(&s->ic), BCM2835_IC_GPU_IRQ,
+                                INTERRUPT_UART));
+     /* AUX / UART1 */
 --=20
 2.18.0.rc1.1.g3f1ff2140
 
