@@ -2,49 +2,48 @@ Return-Path: <SRS0=oHhb=TY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A97AC072B5
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 15:10:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A779C072B5
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 15:11:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6E3782175B
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 15:10:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6E3782175B
+	by mail.kernel.org (Postfix) with ESMTPS id 55A7D20862
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 15:11:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 55A7D20862
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:55997 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:56036 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hUBq0-0006pH-Jm
-	for qemu-devel@archiver.kernel.org; Fri, 24 May 2019 11:10:28 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:53886)
+	id 1hUBqx-0007jO-H8
+	for qemu-devel@archiver.kernel.org; Fri, 24 May 2019 11:11:27 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:54536)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1hUBoE-00051A-Dq
-	for qemu-devel@nongnu.org; Fri, 24 May 2019 11:08:39 -0400
+	(envelope-from <eblake@redhat.com>) id 1hUBoz-0006RH-Oh
+	for qemu-devel@nongnu.org; Fri, 24 May 2019 11:09:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1hUBc3-0000ZF-2D
-	for qemu-devel@nongnu.org; Fri, 24 May 2019 10:56:03 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48914)
+	(envelope-from <eblake@redhat.com>) id 1hUBoh-0000ge-Kx
+	for qemu-devel@nongnu.org; Fri, 24 May 2019 11:09:13 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50616)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <eblake@redhat.com>)
-	id 1hUBXA-0003fc-2j; Fri, 24 May 2019 10:51:00 -0400
+	id 1hUBnN-00089f-VG; Fri, 24 May 2019 11:07:49 -0400
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
 	[10.5.11.22])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 6C5AA10F6F;
-	Fri, 24 May 2019 14:50:59 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 2DC063088A63;
+	Fri, 24 May 2019 15:07:31 +0000 (UTC)
 Received: from [10.3.116.169] (ovpn-116-169.phx2.redhat.com [10.3.116.169])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id D4243100200A;
-	Fri, 24 May 2019 14:50:57 +0000 (UTC)
-To: Markus Armbruster <armbru@redhat.com>, Kevin Wolf <kwolf@redhat.com>
-References: <20190517144232.18965-1-kwolf@redhat.com>
-	<20190517144232.18965-2-kwolf@redhat.com>
-	<874l5k7zvs.fsf@dusky.pond.sub.org>
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 738C11001E77;
+	Fri, 24 May 2019 15:07:28 +0000 (UTC)
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+References: <20190508211820.17851-1-mreitz@redhat.com>
+	<20190508211820.17851-2-mreitz@redhat.com>
 From: Eric Blake <eblake@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=eblake@redhat.com; keydata=
@@ -71,23 +70,23 @@ Autocrypt: addr=eblake@redhat.com; keydata=
 	Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
 	2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
 Organization: Red Hat, Inc.
-Message-ID: <4edee744-16eb-6add-367b-f51499b0630f@redhat.com>
-Date: Fri, 24 May 2019 09:50:56 -0500
+Message-ID: <1ed0b731-cbbd-0cdd-32f6-913d2b57edfa@redhat.com>
+Date: Fri, 24 May 2019 10:07:27 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <874l5k7zvs.fsf@dusky.pond.sub.org>
+In-Reply-To: <20190508211820.17851-2-mreitz@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="pWi90h7TnToOOE6ceAarPh9cY39q7m3CN"
+	boundary="Ilx6g9IlvnOjb9pFZDXHUYmqhiYVHep6w"
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.39]);
-	Fri, 24 May 2019 14:50:59 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.47]);
+	Fri, 24 May 2019 15:07:36 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
 X-Content-Filtered-By: Mailman/MimeDel 2.1.21
-Subject: Re: [Qemu-devel] [PATCH v2 1/6] qapi: Support features for structs
+Subject: Re: [Qemu-devel] [PATCH v3 1/5] qemu-nbd: Add --pid-file option
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -99,73 +98,138 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pkrempa@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>,
+	=?UTF-8?Q?Daniel_P_=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+	qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---pWi90h7TnToOOE6ceAarPh9cY39q7m3CN
+--Ilx6g9IlvnOjb9pFZDXHUYmqhiYVHep6w
 From: Eric Blake <eblake@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>, Kevin Wolf <kwolf@redhat.com>
-Cc: pkrempa@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Message-ID: <4edee744-16eb-6add-367b-f51499b0630f@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 1/6] qapi: Support features for structs
-References: <20190517144232.18965-1-kwolf@redhat.com>
- <20190517144232.18965-2-kwolf@redhat.com> <874l5k7zvs.fsf@dusky.pond.sub.org>
-In-Reply-To: <874l5k7zvs.fsf@dusky.pond.sub.org>
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, =?UTF-8?Q?Daniel_P_=2e_Berrang=c3=a9?=
+ <berrange@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+Message-ID: <1ed0b731-cbbd-0cdd-32f6-913d2b57edfa@redhat.com>
+Subject: Re: [PATCH v3 1/5] qemu-nbd: Add --pid-file option
+References: <20190508211820.17851-1-mreitz@redhat.com>
+ <20190508211820.17851-2-mreitz@redhat.com>
+In-Reply-To: <20190508211820.17851-2-mreitz@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 5/24/19 8:20 AM, Markus Armbruster wrote:
-> "Support features for structs" accidentally fits the "Do stuff"
-> commit message anti-pattern.  Suggest:
+On 5/8/19 4:18 PM, Max Reitz wrote:
+> --fork is a bit boring if there is no way to get the child's PID.  This=
+
+> option helps.
 >=20
->     qapi: Add feature flags to struct types
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> ---
+>  qemu-nbd.c    | 11 +++++++++++
+>  qemu-nbd.texi |  2 ++
+>  2 files changed, 13 insertions(+)
 >=20
+> diff --git a/qemu-nbd.c b/qemu-nbd.c
+> index dca9e72cee..edb5195208 100644
+> --- a/qemu-nbd.c
+> +++ b/qemu-nbd.c
+> @@ -59,6 +59,7 @@
+>  #define QEMU_NBD_OPT_IMAGE_OPTS    262
+>  #define QEMU_NBD_OPT_FORK          263
+>  #define QEMU_NBD_OPT_TLSAUTHZ      264
+> +#define QEMU_NBD_OPT_PID_FILE      265
+> =20
+>  #define MBR_SIZE 512
+> =20
+> @@ -111,6 +112,7 @@ static void usage(const char *name)
+>  "                            specify tracing options\n"
+>  "  --fork                    fork off the server process and exit the =
+parent\n"
+>  "                            once the server is running\n"
+> +"  --pid-file=3DPATH           store the server's process ID in the gi=
+ven file\n"
 
->> +# @features: names of features that are supported by this version and=
- build and
->> +#            aren't othervise visible through schema introspection (e=
-=2Eg. change
+Are we guaranteed that the pid file does not appear until after the
+socket has been created?
 
-s/othervise/otherwise/
+/me rereads full file...
 
->> +#            of behaviour related to an object type that didn't come =
-with a
+> @@ -876,6 +880,9 @@ int main(int argc, char **argv)
+>          case 'L':
+>              list =3D true;
+>              break;
+> +        case QEMU_NBD_OPT_PID_FILE:
+> +            pid_file_name =3D optarg;
+> +            break;
+>          }
+>      }
+> =20
+=2E..
+    socket_activation =3D check_socket_activation();
+    if (socket_activation =3D=3D 0) {
+        setup_address_and_port(&bindto, &port);
+    } else {
+        /* Using socket activation - check user didn't use -p etc. */
+=2E..
 
-Do we have a strong US or UK preference on spelling in user-visible
-docs? (US would use "behavior")
+> @@ -1196,6 +1203,10 @@ int main(int argc, char **argv)
+> =20
+>      nbd_update_server_watch();
+> =20
+> +    if (pid_file_name) {
+> +        qemu_write_pidfile(pid_file_name, &error_fatal);
+> +    }
 
->> +#            syntactic change in the schema of the object type) (sinc=
-e: 4.1)
->> +#
->=20
-> Specify "in no particular order", like we do elsewhere.
->=20
-> Let's wrap lines a little earlier.
+Yes, we are.  So,
+
+> +
+>      /* now when the initialization is (almost) complete, chdir("/")
+>       * to free any busy filesystems */
+>      if (chdir("/") < 0) {
+> diff --git a/qemu-nbd.texi b/qemu-nbd.texi
+> index de342c76b8..7f55657722 100644
+> --- a/qemu-nbd.texi
+> +++ b/qemu-nbd.texi
+> @@ -117,6 +117,8 @@ option; or provide the credentials needed for conne=
+cting as a client
+>  in list mode.
+>  @item --fork
+>  Fork off the server process and exit the parent once the server is run=
+ning.
+> +@item --pid-file=3DPATH
+> +Store the server's process ID in the given file.
+
+since that is a useful trick to know (the pid file intentionally does
+NOT appear until after the socket is ready to go), we should mention it
+in the documentation.
+
+I can make that tweak while queueing, if you'd like.
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
 --=20
 Eric Blake, Principal Software Engineer
 Red Hat, Inc.           +1-919-301-3226
 Virtualization:  qemu.org | libvirt.org
 
 
---pWi90h7TnToOOE6ceAarPh9cY39q7m3CN
+--Ilx6g9IlvnOjb9pFZDXHUYmqhiYVHep6w
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlzoBNAACgkQp6FrSiUn
-Q2ocugf+L7ZqQMnvGLpzc80BTNPEiDDXdmOCJK4KpfGV2mVD+RAm1uASNw527r1K
-/2STQJDjZlwoz4LIZTRYpQkGdMQ6nW4vXceBJeYEValBmobRP2hTooAqJC7qWnRw
-1HECFdnh3K1wMw8PANsv7rUQLt7QEqRMwSWcq25Mb8TOZrvJ72pPr7i4DJDp2kwj
-dR55E2t5+GBqlQTP3WjEgImLFAGYTI+jjYNevXnUyODG1x6JMitT9Fd4n+vef6kG
-Ce2890dy181eKBiaQ0nx9rXPN3mXCENpJDJc/eF3qtaWFw2qk375DLoD38X3kG56
-fDBR+a9vZ9w+jKRBnBBjIzmx5HYzcA==
-=0mMm
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlzoCK8ACgkQp6FrSiUn
+Q2rhQwgArK0cG3M1LWcIxJ4n9F00xZY3rZpRetoCxa26Cbn7lgmXqhn64mV/bm0j
+CkjAUbytyt8H02xboh6ogOlWpGsEhqgdnItRZ9CFOEoowxBPf1dUS0uN3lxh1GCu
+67HyXMk2S46S1xbfsiqZehbnSwvLDRjfywoWvk7cpV539fX/G0ET350JLEqgkf0/
+UZGuQFJikqLEr7X5LmPe06P+vg0GC/tRTRAS+1FcYZvyFmop1BKLghtKXOvmSbwr
+ZlhbLT1M4WLtuwggLmicxoMPwCxAtIEZFSm3Vi/jDePwUIw4A/GD43O93uaZzIuv
+RKkbTqHeEJNbS85IiofMcolxovOVTw==
+=2BxJ
 -----END PGP SIGNATURE-----
 
---pWi90h7TnToOOE6ceAarPh9cY39q7m3CN--
+--Ilx6g9IlvnOjb9pFZDXHUYmqhiYVHep6w--
 
