@@ -7,72 +7,72 @@ X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 669DCC282E5
-	for <qemu-devel@archiver.kernel.org>; Sat, 25 May 2019 00:11:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8220CC282E1
+	for <qemu-devel@archiver.kernel.org>; Sat, 25 May 2019 00:13:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 34B0221848
-	for <qemu-devel@archiver.kernel.org>; Sat, 25 May 2019 00:11:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4A80E21773
+	for <qemu-devel@archiver.kernel.org>; Sat, 25 May 2019 00:13:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="JJjCXtJU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 34B0221848
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="qk7ieMjJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4A80E21773
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:33612 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:33652 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hUKHi-0001Hk-B9
-	for qemu-devel@archiver.kernel.org; Fri, 24 May 2019 20:11:38 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:60399)
+	id 1hUKJb-0002lb-JN
+	for qemu-devel@archiver.kernel.org; Fri, 24 May 2019 20:13:35 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:60227)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <prvs=040baf4f1=alistair.francis@wdc.com>)
-	id 1hUK42-0005au-AX
-	for qemu-devel@nongnu.org; Fri, 24 May 2019 19:57:31 -0400
+	id 1hUK43-0005Im-Uo
+	for qemu-devel@nongnu.org; Fri, 24 May 2019 19:57:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <prvs=040baf4f1=alistair.francis@wdc.com>)
-	id 1hUJuw-0004Ub-Bp
-	for qemu-devel@nongnu.org; Fri, 24 May 2019 19:48:07 -0400
-Received: from esa1.hgst.iphmx.com ([68.232.141.245]:5520)
+	id 1hUJup-0004Pn-KM
+	for qemu-devel@nongnu.org; Fri, 24 May 2019 19:48:00 -0400
+Received: from esa5.hgst.iphmx.com ([216.71.153.144]:51627)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <prvs=040baf4f1=alistair.francis@wdc.com>)
-	id 1hUJuv-0004TN-W8; Fri, 24 May 2019 19:48:06 -0400
+	id 1hUJup-00046f-9T; Fri, 24 May 2019 19:47:59 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
 	d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-	t=1558741686; x=1590277686;
+	t=1558741680; x=1590277680;
 	h=from:to:cc:subject:date:message-id:in-reply-to:
 	references:mime-version:content-transfer-encoding;
-	bh=gGFuqft3Gy+jQsmp9J8ov+i4/Ieho2R14R8oFQ3Co8Y=;
-	b=JJjCXtJUdllU8tQwR/u5zZcFDk0sZaERhGLKxtVyPDf3RiPBuGjXJqdv
-	wAwf2oISyk7fl2yF9l4SwQKFPC4B6lsFDxYFyZKHlPdjwE1CNuV3ogdvd
-	fSVvEY0lDCbSifbNRQNq9tPkYGKYDKsIHG61k/FMRfBcqBmLrPcz/veUM
-	mMOznYVly02mO6CyEDdtDurEd5LsrnFkNMMXgUlCh5cweJ2pkU3AiQMJM
-	zF+T7hx9/Rjhn4SZyiO1fhIn8ZrFMOGepKUrdL7qAAbX2JB50oxI8ydks
-	4VcWWEKCtN0A03/JjPEiwVOq5EhYdSvX9ysmsWsZYDDkho2AHVUkbvd+A A==;
-X-IronPort-AV: E=Sophos;i="5.60,508,1549900800"; d="scan'208";a="215265016"
+	bh=al8LxCnIVbOOxV+CyVlDV2vfxMzKewDCHGGm9YaIPx8=;
+	b=qk7ieMjJMmcupPcrKB5VoMNFPOtFjUQNWa8ofJdYX9hqNXRfBGrDMvvy
+	Cz4tHx38/CL08bd9546e3H2xWhihqTxPSY1Xv595jbMg8ONw86lyqj+EW
+	sTqKW8/dmTIvhunpCHiTj6Pc67qO3oVZH5uvpN/TtPFYbr4BS0iOyeHpJ
+	Wr63rvXM4HY7Bhm8R1u9Cq0JYjMpH6u7rv2CFIKILx9BKnXy6CngtH0+/
+	y7zWlM2zwS7GvhgwXR9x1nqGxYMTmVW1xN9SufBO1T/3lYIXgizi23V96
+	pvehgBM31EDduiE25WS/NS3nsl9J8zXPFUm5xW+PB83FP3AxdJMgEOKqx Q==;
+X-IronPort-AV: E=Sophos;i="5.60,508,1549900800"; d="scan'208";a="110307768"
 Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com)
 	([199.255.45.15])
-	by ob1.hgst.iphmx.com with ESMTP; 25 May 2019 07:48:04 +0800
-IronPort-SDR: FIZK7D33MqSuWYJOMmcc+Gf+Fx4B8kzn0tVrJgzNN6cxfGxG9+MBEezQtBC/aCraz+y+fxK8kG
-	Zjb2dx7d0HXrJH4ooclj8pqfjh4awdTQBuh0v/O2NO4cN9wZ16eJifowUEruFI7/1E9V0cgc/z
-	3EXMBN2I0fAGhKko00TE/qIoHlP2Q34I7bo7ivIzSllLkI52gncGgQgILd2W/+p0eD346+ORU6
-	RvxS8obFhnpuVrsHuIns2taM3Pt/DfGDHHnGhEYvbw4/2j70NrvEdIoD+831og9eCPC0l4Zm8i
-	qWsRz2jVeRoP+WC/iPV013MV
+	by ob1.hgst.iphmx.com with ESMTP; 25 May 2019 07:47:59 +0800
+IronPort-SDR: KgtMtEoXYCkJJxzZmvKUg2rmvtu9pUqBnIQiR0zXFyV1Cy4XZcbYi1/hIaPPk2CYhpsrpNFydX
+	CiNqC07sKxCnAB8fE0QAWyrRiGoHhTK2iyl5kNmu7aB7HFn7yvHw+SK9iL7vgvY6nqXu+eupPR
+	a1T3JYTvGa8/Mq17YwxEuESJtkdWFPtGJERyy4BmWM5HOO9oU+UxtnEQmifM+k3WL5MVqSnkHa
+	qOx1so3cp21YExekbmzgNeIXWglVeVdQ09HtptqFalecR1TweTNCSWV5vqD228RQUhockR29wt
+	rrLjEjlRAG0ibpl8VcxX7BLw
 Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
-	by uls-op-cesaep02.wdc.com with ESMTP; 24 May 2019 16:25:43 -0700
-IronPort-SDR: 81Ph2PkovrGGzJ2Clj407IS1Bz6ZXeQ2fLQaR+kVh5zLkoLS3jKeCstSI40Nhrp6mS1qw4fAku
-	Po/qH1LwowgMelUcVonZ25TA07UChdRdDuJv9C7HMLFyWoUVIblehMRoGem2OTvjdGPYUP/rVU
-	1pdnpp1W6OL75Zr4UPtRUWLRntSPZs4utxpI1WVxZGEuOm9wFkTn584g/JkTnE+pwH/29dKR78
-	OKJ7alIKzIfvZQQAefs5bcv2pC4wP5+LcCreb+hgdrlAS0FtUNLkaSutK3c94UGeakB6IviqDi
-	Esk=
+	by uls-op-cesaep02.wdc.com with ESMTP; 24 May 2019 16:25:38 -0700
+IronPort-SDR: UNkXA2uZYN8Ntjqye84htA1ZmgQ6WCZfSpvGc0aW7/SqXxT1hc3WiaE+/TNTYvjkVm9P8A5Ey+
+	WW6QdQt343l7RsLMtHGRr3sq7qfYdI72eTdbNtjQJ85asM5fLe+EaTDZwehLOlbg2Q+Sk7+seU
+	/GYNK2KjQic80R4Cl4oHEkuHhWLzhA0l1gqKGLmxkyX5lAgFUBoTKOvdZiOxStA1PPCHnHiU9i
+	ALyPDMmFkJghmDqOPYBTJLJMhC3vLEYQde+D4812eGtRzYskV3Md2D8cp3p/J3VtKyGzPyPuQX
+	S6A=
 Received: from risc6-mainframe.sdcorp.global.sandisk.com (HELO
 	risc6-mainframe.int.fusionio.com) ([10.196.157.140])
-	by uls-op-cesaip01.wdc.com with ESMTP; 24 May 2019 16:48:04 -0700
+	by uls-op-cesaip01.wdc.com with ESMTP; 24 May 2019 16:47:59 -0700
 From: Alistair Francis <alistair.francis@wdc.com>
 To: qemu-devel@nongnu.org,
 	qemu-riscv@nongnu.org
-Date: Fri, 24 May 2019 16:46:09 -0700
-Message-Id: <e5110fbea0b6b10f0a8b2f165eb5d95b47fd2536.1558741334.git.alistair.francis@wdc.com>
+Date: Fri, 24 May 2019 16:46:04 -0700
+Message-Id: <65714aac56e24d23840b733f0245f9d0b5ecf450.1558741334.git.alistair.francis@wdc.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <cover.1558741334.git.alistair.francis@wdc.com>
 References: <cover.1558741334.git.alistair.francis@wdc.com>
@@ -80,9 +80,9 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 68.232.141.245
-Subject: [Qemu-devel] [RFC v1 13/23] target/riscv: Generate illegal
- instruction on WFI when V=1
+X-Received-From: 216.71.153.144
+Subject: [Qemu-devel] [RFC v1 11/23] target/riscv: Add background register
+ swapping function
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -101,26 +101,99 @@ Sender: "Qemu-devel"
 
 Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
 ---
- target/riscv/op_helper.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ target/riscv/cpu.h        |  1 +
+ target/riscv/cpu_bits.h   |  5 ++++
+ target/riscv/cpu_helper.c | 52 +++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 58 insertions(+)
 
-diff --git a/target/riscv/op_helper.c b/target/riscv/op_helper.c
-index 644d0fb35f..e08bb8dd5a 100644
---- a/target/riscv/op_helper.c
-+++ b/target/riscv/op_helper.c
-@@ -130,9 +130,10 @@ void helper_wfi(CPURISCVState *env)
- {
-     CPUState *cs = CPU(riscv_env_get_cpu(env));
+diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
+index b99d2b7af2..9897392ab7 100644
+--- a/target/riscv/cpu.h
++++ b/target/riscv/cpu.h
+@@ -319,6 +319,7 @@ void riscv_cpu_list(void);
+ #define cpu_mmu_index riscv_cpu_mmu_index
  
--    if (env->priv == PRV_S &&
-+    if ((env->priv == PRV_S &&
-         env->priv_ver >= PRIV_VERSION_1_10_0 &&
--        get_field(env->mstatus, MSTATUS_TW)) {
-+        get_field(env->mstatus, MSTATUS_TW)) ||
-+        riscv_cpu_virt_enabled(env)) {
-         riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
-     } else {
-         cs->halted = 1;
+ #ifndef CONFIG_USER_ONLY
++void riscv_cpu_swap_background_regs(CPURISCVState *env);
+ int riscv_cpu_claim_interrupts(RISCVCPU *cpu, uint32_t interrupts);
+ uint32_t riscv_cpu_update_mip(RISCVCPU *cpu, uint32_t mask, uint32_t value);
+ #define BOOL_TO_MASK(x) (-!!(x)) /* helper for riscv_cpu_update_mip value */
+diff --git a/target/riscv/cpu_bits.h b/target/riscv/cpu_bits.h
+index 9c27727e6f..28117bdd32 100644
+--- a/target/riscv/cpu_bits.h
++++ b/target/riscv/cpu_bits.h
+@@ -550,3 +550,8 @@
+ #define SIP_SSIP                           MIP_SSIP
+ #define SIP_STIP                           MIP_STIP
+ #define SIP_SEIP                           MIP_SEIP
++
++/* MIE masks */
++#define MIE_SEIE                           (1 << IRQ_S_EXT)
++#define MIE_STIE                           (1 << IRQ_S_TIMER)
++#define MIE_SSIE                           (1 << IRQ_S_SOFT)
+diff --git a/target/riscv/cpu_helper.c b/target/riscv/cpu_helper.c
+index 1f466effcf..0128546e6a 100644
+--- a/target/riscv/cpu_helper.c
++++ b/target/riscv/cpu_helper.c
+@@ -86,6 +86,58 @@ bool riscv_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
+ 
+ #if !defined(CONFIG_USER_ONLY)
+ 
++void riscv_cpu_swap_background_regs(CPURISCVState *env)
++{
++    RISCVCPU *cpu = riscv_env_get_cpu(env);
++    target_ulong tmp;
++    target_ulong mstatus_mask = MSTATUS_MXR | MSTATUS_SUM | MSTATUS_FS |
++                                MSTATUS_SPP | MSTATUS_SPIE | MSTATUS_SIE;
++    target_ulong sie_mask = MIE_SEIE | MIE_STIE | MIE_SSIE;
++
++    g_assert(riscv_has_ext(env, RVH));
++
++#if defined(TARGET_RISCV64)
++    mstatus_mask |= MSTATUS64_UXL;
++#endif
++
++    tmp = env->bsstatus & mstatus_mask;
++    env->bsstatus = env->mstatus & mstatus_mask;
++    env->mstatus = (env->mstatus & ~mstatus_mask) | tmp;
++
++    tmp = env->bsie & sie_mask;
++    env->bsie = env->mie & sie_mask;
++    env->mie = (env->mie & ~sie_mask) | tmp;
++
++    tmp = env->bstvec;
++    env->bstvec = env->stvec;
++    env->stvec = tmp;
++
++    tmp = env->bsscratch;
++    env->bsscratch = env->sscratch;
++    env->sscratch = tmp;
++
++    tmp = env->bsepc;
++    env->bsepc = env->sepc;
++    env->sepc = tmp;
++
++    tmp = env->bscause;
++    env->bscause = env->scause;
++    env->scause = tmp;
++
++    tmp = env->bstval;
++    env->bstval = env->sbadaddr;
++    env->sbadaddr = tmp;
++
++    tmp = env->bsatp;
++    env->bsatp = env->satp;
++    env->satp = tmp;
++
++    tmp = (target_ulong)atomic_read(&env->bsip);
++    tmp = riscv_cpu_update_mip(cpu, (MIP_SSIP | MIP_STIP | MIP_SEIP), tmp);
++    tmp &= MIP_SSIP | MIP_STIP | MIP_SEIP;
++    atomic_set(&env->bsip, tmp);
++}
++
+ bool riscv_cpu_virt_enabled(CPURISCVState *env)
+ {
+     bool tmp;
 -- 
 2.21.0
 
