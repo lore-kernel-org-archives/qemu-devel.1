@@ -2,61 +2,89 @@ Return-Path: <SRS0=oHhb=TY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 26470C282E3
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 09:39:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 47A59C072B5
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 09:43:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E55522175B
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 09:39:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E55522175B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 137B720645
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 09:43:22 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="SA8AzsfL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 137B720645
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:51685 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:51740 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hU6fT-0004DH-91
-	for qemu-devel@archiver.kernel.org; Fri, 24 May 2019 05:39:15 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:50478)
+	id 1hU6jR-0005Ue-D9
+	for qemu-devel@archiver.kernel.org; Fri, 24 May 2019 05:43:21 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:52098)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hU6aG-0000ET-GX
-	for qemu-devel@nongnu.org; Fri, 24 May 2019 05:33:54 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1hU6ii-0005CB-JQ
+	for qemu-devel@nongnu.org; Fri, 24 May 2019 05:42:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hU6aE-0005rd-Qn
-	for qemu-devel@nongnu.org; Fri, 24 May 2019 05:33:52 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59050)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>)
-	id 1hU6aE-0005r0-II; Fri, 24 May 2019 05:33:50 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 15C6E30C3182;
-	Fri, 24 May 2019 09:33:49 +0000 (UTC)
-Received: from t460s.redhat.com (ovpn-116-48.ams2.redhat.com [10.36.116.48])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id BA425620D8;
-	Fri, 24 May 2019 09:33:47 +0000 (UTC)
-From: David Hildenbrand <david@redhat.com>
-To: qemu-devel@nongnu.org
-Date: Fri, 24 May 2019 11:33:35 +0200
-Message-Id: <20190524093335.22241-6-david@redhat.com>
-In-Reply-To: <20190524093335.22241-1-david@redhat.com>
-References: <20190524093335.22241-1-david@redhat.com>
+	(envelope-from <alex.bennee@linaro.org>) id 1hU6ih-0003lI-Dl
+	for qemu-devel@nongnu.org; Fri, 24 May 2019 05:42:36 -0400
+Received: from mail-wm1-x332.google.com ([2a00:1450:4864:20::332]:51184)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1hU6ih-0003kg-6b
+	for qemu-devel@nongnu.org; Fri, 24 May 2019 05:42:35 -0400
+Received: by mail-wm1-x332.google.com with SMTP id f204so8668638wme.0
+	for <qemu-devel@nongnu.org>; Fri, 24 May 2019 02:42:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=references:user-agent:from:to:cc:subject:in-reply-to:date
+	:message-id:mime-version:content-transfer-encoding;
+	bh=87UVlqHRelfcNWXT3JdLqhYWn4DoNQaTwoM/bIGHYL8=;
+	b=SA8AzsfLgDOsyk+ULsSTkcpvUgZuNQCnJilKL7/OHTKJPAWB4CTbwCbqC3kr4+hy+M
+	pR0oa1TRMT4jAAQIm454jhiYbfkEhmpGDKVMiXG3OuXeGTgRdBBHeNL8ClEGRjG/WEwh
+	sFF3acWPk7G7/nCl4yRPu9Y8TNxF9bu+SEKnzrWZq3PfzIRzxHc4sVKIzjUJfxUfyYJC
+	KaoURXlvPhSso4vynuUILT1/krORIm+TxLox1Ea6reObMbJDANdGVX3sQkSxUq9qpZGY
+	HquRGRRzZjY6eqmEzt5LsQ61ESfeN0CFlS6oQ6jft8pbns1j+3Zqkkjq2/Ui27FPfIVy
+	N65A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:references:user-agent:from:to:cc:subject
+	:in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+	bh=87UVlqHRelfcNWXT3JdLqhYWn4DoNQaTwoM/bIGHYL8=;
+	b=prfnCRwNcvZnEszK9wF+X0iPWhZ74hCQpa00aCw2mXSKGuG0kb/BCktOyoBzhQ6Rhp
+	fc3Iiu0PfshlifNBDtUfB1hC5FENt+kY/5cLPoOmzf03lhTEzgIHWvi/MfueTvSw8+mx
+	Ycy5ZXfVnorur6UnL5Fnuk80sgBVu9H+uSiZwVomU4ErlY2eHuYn9Ii4Of4c4yr5QH0/
+	shmEzDgpUCHuJ1Wa0c7q+vdSnUSGq1zqezD2cynGXqANC6AjCZH06YGpoQK9KAm0+U+Z
+	+H9NxE6TmmwYOzlAFzHfSJTXUs65PLIEsnJbSoiODirP0ZpWSOC3BSfkQBoXeIhBKnGb
+	0sqw==
+X-Gm-Message-State: APjAAAXaacg9v0ITj4cYndl21Zi2/d2VSTmSrnabF/5BwYAKg9DWgcw0
+	u4ZRvxzMRBVSFtjpHnXmXzfTWw==
+X-Google-Smtp-Source: APXvYqxEypnfIuI/y8BIjwxsvMh7oifDDqtMhTqJE3tIwnQIFzUdlpESEg6vpSK/CLcezEoK3EZAyg==
+X-Received: by 2002:a1c:b789:: with SMTP id h131mr15024703wmf.71.1558690952296;
+	Fri, 24 May 2019 02:42:32 -0700 (PDT)
+Received: from zen.linaroharston ([81.128.185.34])
+	by smtp.gmail.com with ESMTPSA id 19sm2136412wmi.10.2019.05.24.02.42.31
+	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+	Fri, 24 May 2019 02:42:31 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+	by zen.linaroharston (Postfix) with ESMTP id 5CD591FF87;
+	Fri, 24 May 2019 10:42:31 +0100 (BST)
+References: <20190523204409.21068-1-jan.bobek@gmail.com>
+User-agent: mu4e 1.3.2; emacs 26.1
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Jan Bobek <jan.bobek@gmail.com>
+In-reply-to: <20190523204409.21068-1-jan.bobek@gmail.com>
+Date: Fri, 24 May 2019 10:42:31 +0100
+Message-ID: <878suw194o.fsf@zen.linaroharston>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.40]);
-	Fri, 24 May 2019 09:33:49 +0000 (UTC)
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v2 5/5] s390x/tcg: Implement VECTOR STRING
- RANGE COMPARE
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2a00:1450:4864:20::332
+Subject: Re: [Qemu-devel] [RISU v3 00/11] Support for i386/x86_64 with
+ vector extensions
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -68,384 +96,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>,
-	David Hildenbrand <david@redhat.com>, Thomas Huth <thuth@redhat.com>,
-	Richard Henderson <rth@twiddle.net>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+	Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Unfortunately, there is no easy way to avoid looping over all elements
-in v2. Provide specialized variants for !cc,!rt/!cc,rt/cc,!rt/cc,rt and
-all element types. Especially for different values of rt, the compiler
-might be able to optimize the code a lot.
 
-Add s390_vec_write_element().
+Jan Bobek <jan.bobek@gmail.com> writes:
 
-Signed-off-by: David Hildenbrand <david@redhat.com>
----
- target/s390x/helper.h            |  12 +++
- target/s390x/insn-data.def       |   2 +
- target/s390x/translate_vx.inc.c  |  59 +++++++++++++
- target/s390x/vec.h               |  21 +++++
- target/s390x/vec_string_helper.c | 143 +++++++++++++++++++++++++++++++
- 5 files changed, 237 insertions(+)
+> This patch series adds support for i386 and x86_64 architectures to
+> RISU. Notably, vector registers (SSE, AVX, AVX-512) are supported for
+> verification of the apprentice. This is V3 of the series posted in [1]
+> and [2].
 
-diff --git a/target/s390x/helper.h b/target/s390x/helper.h
-index 1f9f0b463b..5db67779d3 100644
---- a/target/s390x/helper.h
-+++ b/target/s390x/helper.h
-@@ -236,6 +236,18 @@ DEF_HELPER_FLAGS_3(gvec_vistr32, TCG_CALL_NO_RWG, vo=
-id, ptr, cptr, i32)
- DEF_HELPER_4(gvec_vistr_cc8, void, ptr, cptr, env, i32)
- DEF_HELPER_4(gvec_vistr_cc16, void, ptr, cptr, env, i32)
- DEF_HELPER_4(gvec_vistr_cc32, void, ptr, cptr, env, i32)
-+DEF_HELPER_FLAGS_5(gvec_vstrc8, TCG_CALL_NO_RWG, void, ptr, cptr, cptr, =
-cptr, i32)
-+DEF_HELPER_FLAGS_5(gvec_vstrc16, TCG_CALL_NO_RWG, void, ptr, cptr, cptr,=
- cptr, i32)
-+DEF_HELPER_FLAGS_5(gvec_vstrc32, TCG_CALL_NO_RWG, void, ptr, cptr, cptr,=
- cptr, i32)
-+DEF_HELPER_FLAGS_5(gvec_vstrc_rt8, TCG_CALL_NO_RWG, void, ptr, cptr, cpt=
-r, cptr, i32)
-+DEF_HELPER_FLAGS_5(gvec_vstrc_rt16, TCG_CALL_NO_RWG, void, ptr, cptr, cp=
-tr, cptr, i32)
-+DEF_HELPER_FLAGS_5(gvec_vstrc_rt32, TCG_CALL_NO_RWG, void, ptr, cptr, cp=
-tr, cptr, i32)
-+DEF_HELPER_6(gvec_vstrc_cc8, void, ptr, cptr, cptr, cptr, env, i32)
-+DEF_HELPER_6(gvec_vstrc_cc16, void, ptr, cptr, cptr, cptr, env, i32)
-+DEF_HELPER_6(gvec_vstrc_cc32, void, ptr, cptr, cptr, cptr, env, i32)
-+DEF_HELPER_6(gvec_vstrc_cc_rt8, void, ptr, cptr, cptr, cptr, env, i32)
-+DEF_HELPER_6(gvec_vstrc_cc_rt16, void, ptr, cptr, cptr, cptr, env, i32)
-+DEF_HELPER_6(gvec_vstrc_cc_rt32, void, ptr, cptr, cptr, cptr, env, i32)
-=20
- #ifndef CONFIG_USER_ONLY
- DEF_HELPER_3(servc, i32, env, i64, i64)
-diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
-index b4a6b59608..a2969fab58 100644
---- a/target/s390x/insn-data.def
-+++ b/target/s390x/insn-data.def
-@@ -1201,6 +1201,8 @@
-     F(0xe781, VFENE,   VRR_b, V,   0, 0, 0, 0, vfene, 0, IF_VEC)
- /* VECTOR ISOLATE STRING */
-     F(0xe75c, VISTR,   VRR_a, V,   0, 0, 0, 0, vistr, 0, IF_VEC)
-+/* VECTOR STRING RANGE COMPARE */
-+    F(0xe78a, VSTRC,   VRR_d, V,   0, 0, 0, 0, vstrc, 0, IF_VEC)
-=20
- #ifndef CONFIG_USER_ONLY
- /* COMPARE AND SWAP AND PURGE */
-diff --git a/target/s390x/translate_vx.inc.c b/target/s390x/translate_vx.=
-inc.c
-index 08a62eab52..f26ffa2895 100644
---- a/target/s390x/translate_vx.inc.c
-+++ b/target/s390x/translate_vx.inc.c
-@@ -217,6 +217,10 @@ static void get_vec_element_ptr_i64(TCGv_ptr ptr, ui=
-nt8_t reg, TCGv_i64 enr,
-     tcg_gen_gvec_4_ool(vec_full_reg_offset(v1), vec_full_reg_offset(v2),=
- \
-                        vec_full_reg_offset(v3), vec_full_reg_offset(v4),=
- \
-                        16, 16, data, fn)
-+#define gen_gvec_4_ptr(v1, v2, v3, v4, ptr, data, fn) \
-+    tcg_gen_gvec_4_ptr(vec_full_reg_offset(v1), vec_full_reg_offset(v2),=
- \
-+                       vec_full_reg_offset(v3), vec_full_reg_offset(v4),=
- \
-+                       ptr, 16, 16, data, fn)
- #define gen_gvec_dup_i64(es, v1, c) \
-     tcg_gen_gvec_dup_i64(es, vec_full_reg_offset(v1), 16, 16, c)
- #define gen_gvec_mov(v1, v2) \
-@@ -2479,3 +2483,58 @@ static DisasJumpType op_vistr(DisasContext *s, Dis=
-asOps *o)
-     }
-     return DISAS_NEXT;
- }
-+
-+static DisasJumpType op_vstrc(DisasContext *s, DisasOps *o)
-+{
-+    const uint8_t es =3D get_field(s->fields, m5);
-+    const uint8_t m6 =3D get_field(s->fields, m6);
-+    static gen_helper_gvec_4 * const g[3] =3D {
-+        gen_helper_gvec_vstrc8,
-+        gen_helper_gvec_vstrc16,
-+        gen_helper_gvec_vstrc32,
-+    };
-+    static gen_helper_gvec_4 * const g_rt[3] =3D {
-+        gen_helper_gvec_vstrc_rt8,
-+        gen_helper_gvec_vstrc_rt16,
-+        gen_helper_gvec_vstrc_rt32,
-+    };
-+    static gen_helper_gvec_4_ptr * const g_cc[3] =3D {
-+        gen_helper_gvec_vstrc_cc8,
-+        gen_helper_gvec_vstrc_cc16,
-+        gen_helper_gvec_vstrc_cc32,
-+    };
-+    static gen_helper_gvec_4_ptr * const g_cc_rt[3] =3D {
-+        gen_helper_gvec_vstrc_cc_rt8,
-+        gen_helper_gvec_vstrc_cc_rt16,
-+        gen_helper_gvec_vstrc_cc_rt32,
-+    };
-+
-+    if (es > ES_32) {
-+        gen_program_exception(s, PGM_SPECIFICATION);
-+        return DISAS_NORETURN;
-+    }
-+
-+    if (extract32(m6, 0, 1)) {
-+        if (extract32(m6, 2, 1)) {
-+            gen_gvec_4_ptr(get_field(s->fields, v1), get_field(s->fields=
-, v2),
-+                           get_field(s->fields, v3), get_field(s->fields=
-, v4),
-+                           cpu_env, m6, g_cc_rt[es]);
-+        } else {
-+            gen_gvec_4_ptr(get_field(s->fields, v1), get_field(s->fields=
-, v2),
-+                           get_field(s->fields, v3), get_field(s->fields=
-, v4),
-+                           cpu_env, m6, g_cc[es]);
-+        }
-+        set_cc_static(s);
-+    } else {
-+        if (extract32(m6, 2, 1)) {
-+            gen_gvec_4_ool(get_field(s->fields, v1), get_field(s->fields=
-, v2),
-+                           get_field(s->fields, v3), get_field(s->fields=
-, v4),
-+                           m6, g_rt[es]);
-+        } else {
-+            gen_gvec_4_ool(get_field(s->fields, v1), get_field(s->fields=
-, v2),
-+                           get_field(s->fields, v3), get_field(s->fields=
-, v4),
-+                           m6, g[es]);
-+        }
-+    }
-+    return DISAS_NEXT;
-+}
-diff --git a/target/s390x/vec.h b/target/s390x/vec.h
-index affc62874c..a6e361869b 100644
---- a/target/s390x/vec.h
-+++ b/target/s390x/vec.h
-@@ -117,4 +117,25 @@ static inline void s390_vec_write_element64(S390Vect=
-or *v, uint8_t enr,
-     v->doubleword[enr] =3D data;
- }
-=20
-+static inline void s390_vec_write_element(S390Vector *v, uint8_t enr,
-+                                          uint8_t es, uint64_t data)
-+{
-+    switch (es) {
-+    case MO_8:
-+        s390_vec_write_element8(v, enr, data);
-+        break;
-+    case MO_16:
-+        s390_vec_write_element16(v, enr, data);
-+        break;
-+    case MO_32:
-+        s390_vec_write_element32(v, enr, data);
-+        break;
-+    case MO_64:
-+        s390_vec_write_element64(v, enr, data);
-+        break;
-+    default:
-+        g_assert_not_reached();
-+    }
-+}
-+
- #endif /* S390X_VEC_H */
-diff --git a/target/s390x/vec_string_helper.c b/target/s390x/vec_string_h=
-elper.c
-index 6bafa23bd7..c516c0ceeb 100644
---- a/target/s390x/vec_string_helper.c
-+++ b/target/s390x/vec_string_helper.c
-@@ -328,3 +328,146 @@ void HELPER(gvec_vistr_cc##BITS)(void *v1, const vo=
-id *v2, CPUS390XState *env, \
- DEF_VISTR_CC_HELPER(8)
- DEF_VISTR_CC_HELPER(16)
- DEF_VISTR_CC_HELPER(32)
-+
-+static bool element_compare(uint32_t data, uint32_t l, uint8_t c)
-+{
-+    const bool equal =3D extract32(c, 7, 1);
-+    const bool lower =3D extract32(c, 6, 1);
-+    const bool higher =3D extract32(c, 5, 1);
-+
-+    if (data < l) {
-+        return lower;
-+    } else if (data > l) {
-+        return higher;
-+    }
-+    return equal;
-+}
-+
-+static int vstrc(void *v1, const void *v2, const void *v3, const void *v=
-4,
-+                 bool in, bool rt, bool zs, uint8_t es)
-+{
-+    const uint64_t mask =3D get_element_lsbs_mask(es);
-+    uint64_t a0 =3D s390_vec_read_element64(v2, 0);
-+    uint64_t a1 =3D s390_vec_read_element64(v2, 1);
-+    int first_zero =3D 16, first_match =3D 16;
-+    S390Vector rt_result =3D {};
-+    uint64_t z0, z1;
-+    int i, j;
-+
-+    if (zs) {
-+        z0 =3D zero_search(a0, mask);
-+        z1 =3D zero_search(a1, mask);
-+        first_zero =3D match_index(z0, z1);
-+    }
-+
-+    for (i =3D 0; i < 16 / (1 << es); i++) {
-+        const uint32_t data =3D s390_vec_read_element(v2, i, es);
-+        const int cur_byte =3D i * (1 << es);
-+        bool any_match =3D false;
-+
-+        /* if we don't need a bit vector, we can stop early */
-+        if (cur_byte =3D=3D first_zero && !rt) {
-+            break;
-+        }
-+
-+        for (j =3D 0; j < 16 / (1 << es); j +=3D 2) {
-+            const uint32_t l1 =3D s390_vec_read_element(v3, j, es);
-+            const uint32_t l2 =3D s390_vec_read_element(v3, j + 1, es);
-+            /* we are only interested in the highest byte of each elemen=
-t */
-+            const uint8_t c1 =3D s390_vec_read_element8(v4, j * (1 << es=
-));
-+            const uint8_t c2 =3D s390_vec_read_element8(v4, (j + 1) * (1=
- << es));
-+
-+            if (element_compare(data, l1, c1) &&
-+                element_compare(data, l2, c2)) {
-+                any_match =3D true;
-+                break;
-+            }
-+        }
-+        /* invert the result if requested */
-+        any_match =3D in ^ any_match;
-+
-+        if (any_match) {
-+            /* indicate bit vector if requested */
-+            if (rt) {
-+                const uint64_t val =3D -1ull;
-+
-+                first_match =3D MIN(cur_byte, first_match);
-+                s390_vec_write_element(&rt_result, i, es, val);
-+            } else {
-+                /* stop on the first match */
-+                first_match =3D cur_byte;
-+                break;
-+            }
-+        }
-+    }
-+
-+    if (rt) {
-+        *(S390Vector *)v1 =3D rt_result;
-+    } else {
-+        s390_vec_write_element64(v1, 0, MIN(first_match, first_zero));
-+        s390_vec_write_element64(v1, 1, 0);
-+    }
-+
-+    if (first_zero =3D=3D 16 && first_match =3D=3D 16) {
-+        return 3; /* no match */
-+    } else if (first_zero =3D=3D 16) {
-+        return 1; /* matching elements, no match for zero */
-+    } else if (first_match < first_zero) {
-+        return 2; /* matching elements before match for zero */
-+    }
-+    return 0; /* match for zero */
-+}
-+
-+#define DEF_VSTRC_HELPER(BITS)                                          =
-       \
-+void HELPER(gvec_vstrc##BITS)(void *v1, const void *v2, const void *v3, =
-       \
-+                              const void *v4, uint32_t desc)            =
-       \
-+{                                                                       =
-       \
-+    const bool in =3D extract32(simd_data(desc), 3, 1);                 =
-         \
-+    const bool zs =3D extract32(simd_data(desc), 1, 1);                 =
-         \
-+                                                                        =
-       \
-+    vstrc(v1, v2, v3, v4, in, 0, zs, MO_##BITS);                        =
-       \
-+}
-+DEF_VSTRC_HELPER(8)
-+DEF_VSTRC_HELPER(16)
-+DEF_VSTRC_HELPER(32)
-+
-+#define DEF_VSTRC_RT_HELPER(BITS)                                       =
-       \
-+void HELPER(gvec_vstrc_rt##BITS)(void *v1, const void *v2, const void *v=
-3,     \
-+                                 const void *v4, uint32_t desc)         =
-       \
-+{                                                                       =
-       \
-+    const bool in =3D extract32(simd_data(desc), 3, 1);                 =
-         \
-+    const bool zs =3D extract32(simd_data(desc), 1, 1);                 =
-         \
-+                                                                        =
-       \
-+    vstrc(v1, v2, v3, v4, in, 1, zs, MO_##BITS);                        =
-       \
-+}
-+DEF_VSTRC_RT_HELPER(8)
-+DEF_VSTRC_RT_HELPER(16)
-+DEF_VSTRC_RT_HELPER(32)
-+
-+#define DEF_VSTRC_CC_HELPER(BITS)                                       =
-       \
-+void HELPER(gvec_vstrc_cc##BITS)(void *v1, const void *v2, const void *v=
-3,     \
-+                                 const void *v4, CPUS390XState *env,    =
-       \
-+                                 uint32_t desc)                         =
-       \
-+{                                                                       =
-       \
-+    const bool in =3D extract32(simd_data(desc), 3, 1);                 =
-         \
-+    const bool zs =3D extract32(simd_data(desc), 1, 1);                 =
-         \
-+                                                                        =
-       \
-+    env->cc_op =3D vstrc(v1, v2, v3, v4, in, 0, zs, MO_##BITS);         =
-         \
-+}
-+DEF_VSTRC_CC_HELPER(8)
-+DEF_VSTRC_CC_HELPER(16)
-+DEF_VSTRC_CC_HELPER(32)
-+
-+#define DEF_VSTRC_CC_RT_HELPER(BITS)                                    =
-       \
-+void HELPER(gvec_vstrc_cc_rt##BITS)(void *v1, const void *v2, const void=
- *v3,  \
-+                                    const void *v4, CPUS390XState *env, =
-       \
-+                                    uint32_t desc)                      =
-       \
-+{                                                                       =
-       \
-+    const bool in =3D extract32(simd_data(desc), 3, 1);                 =
-         \
-+    const bool zs =3D extract32(simd_data(desc), 1, 1);                 =
-         \
-+                                                                        =
-       \
-+    env->cc_op =3D vstrc(v1, v2, v3, v4, in, 1, zs, MO_##BITS);         =
-         \
-+}
-+DEF_VSTRC_CC_RT_HELPER(8)
-+DEF_VSTRC_CC_RT_HELPER(16)
-+DEF_VSTRC_CC_RT_HELPER(32)
---=20
-2.20.1
+I've sent a patch to enable x86 in the build-all-arches tests script but
+otherwise I think this series looks good to merge.
 
+>
+> Changes is V3:
+>   - fix a matching bug caused by misplaced index multiplication [3]
+>   - print an error and exit when parse of the --xfeatures option fails [4]
+>
+> References:
+>   1. https://lists.nongnu.org/archive/html/qemu-devel/2019-04/msg01294.ht=
+ml
+>   2. https://lists.nongnu.org/archive/html/qemu-devel/2019-05/msg04089.ht=
+ml
+>   3. https://lists.nongnu.org/archive/html/qemu-devel/2019-05/msg04922.ht=
+ml
+>   4. https://lists.nongnu.org/archive/html/qemu-devel/2019-05/msg04903.ht=
+ml
+>
+> Jan Bobek (10):
+>   Makefile: undefine the arch name symbol
+>   risu_i386: move reginfo_t and related defines to risu_reginfo_i386.h
+>   risu_i386: move reginfo-related code to risu_reginfo_i386.c
+>   risu_reginfo_i386: implement arch-specific reginfo interface
+>   risu_i386: implement missing CPU-specific functions
+>   risu_i386: remove old unused code
+>   test_i386: change syntax from nasm to gas
+>   configure: add i386/x86_64 architectures
+>   risu_reginfo_i386: replace xfeature constants with symbolic names
+>   risu_reginfo_i386: rework --xfeatures value parsing
+>
+> Richard Henderson (1):
+>   i386: Add avx512 state to reginfo_t
+>
+>  configure           |  10 +-
+>  Makefile            |   5 +-
+>  risu_reginfo_i386.h |  49 ++++++
+>  risu_i386.c         | 142 ++--------------
+>  risu_reginfo_i386.c | 400 ++++++++++++++++++++++++++++++++++++++++++++
+>  test_i386.S         |  80 +++++++++
+>  test_i386.s         |  27 ---
+>  7 files changed, 556 insertions(+), 157 deletions(-)
+>  create mode 100644 risu_reginfo_i386.h
+>  create mode 100644 risu_reginfo_i386.c
+>  create mode 100644 test_i386.S
+>  delete mode 100644 test_i386.s
+
+
+--
+Alex Benn=C3=A9e
 
