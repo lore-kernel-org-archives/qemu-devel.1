@@ -6,56 +6,56 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B28DC282E1
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 18:38:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C7FE9C072B5
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 18:39:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 16A78217D7
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 18:38:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 16A78217D7
+	by mail.kernel.org (Postfix) with ESMTPS id 9E326217D7
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 18:39:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9E326217D7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:58650 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:58680 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hUF5J-00026o-DG
-	for qemu-devel@archiver.kernel.org; Fri, 24 May 2019 14:38:29 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:37992)
+	id 1hUF6g-00033c-W0
+	for qemu-devel@archiver.kernel.org; Fri, 24 May 2019 14:39:55 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:38011)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1hUF3v-0001Em-3l
-	for qemu-devel@nongnu.org; Fri, 24 May 2019 14:37:04 -0400
+	(envelope-from <stefanha@redhat.com>) id 1hUF3z-0001Hg-Pp
+	for qemu-devel@nongnu.org; Fri, 24 May 2019 14:37:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1hUF3s-0008Tk-RH
-	for qemu-devel@nongnu.org; Fri, 24 May 2019 14:37:02 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43454)
+	(envelope-from <stefanha@redhat.com>) id 1hUF3v-0008Uu-Bq
+	for qemu-devel@nongnu.org; Fri, 24 May 2019 14:37:05 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57030)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1hUF3r-0008QE-BL
-	for qemu-devel@nongnu.org; Fri, 24 May 2019 14:37:00 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
-	[10.5.11.23])
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1hUF3u-0008Tz-Ja
+	for qemu-devel@nongnu.org; Fri, 24 May 2019 14:37:03 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 1D5E33082B44;
-	Fri, 24 May 2019 18:36:51 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id A582F3092647;
+	Fri, 24 May 2019 18:36:57 +0000 (UTC)
 Received: from localhost (ovpn-117-142.ams2.redhat.com [10.36.117.142])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 5B2415B2F7;
-	Fri, 24 May 2019 18:36:46 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 7EAD984F7;
+	Fri, 24 May 2019 18:36:52 +0000 (UTC)
 From: Stefan Hajnoczi <stefanha@redhat.com>
 To: <qemu-devel@nongnu.org>
-Date: Fri, 24 May 2019 19:36:36 +0100
-Message-Id: <20190524183638.20745-2-stefanha@redhat.com>
+Date: Fri, 24 May 2019 19:36:37 +0100
+Message-Id: <20190524183638.20745-3-stefanha@redhat.com>
 In-Reply-To: <20190524183638.20745-1-stefanha@redhat.com>
 References: <20190524183638.20745-1-stefanha@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.45]);
-	Fri, 24 May 2019 18:36:51 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.43]);
+	Fri, 24 May 2019 18:36:57 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [RFC v3 1/3] virtio: add vdc->vmchange_state() callback
+Subject: [Qemu-devel] [RFC v3 2/3] scsi: add scsi_bus_dma_restart()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -74,79 +74,115 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The core virtio code invokes ->set_status() followed by
-->ioeventfd_start() when the guest resumes execution.  Both of these
-functions are also called in other cases unrelated to vm change state.
+By default scsi-bus.c registers vm change state handlers for SCSIDevice
+instances and restarts DMA when guest execution is resumed.
 
-This patch introduces ->vmstate_change() so that devices can act on
-guest pause/resume.  The existing qemu_add_vm_change_state_handler() API
-isn't usable by virtio devices since the ordering between vm change
-state handlers is undefined.  The new ->vmstate_change() callback is
-always invoked after ->set_status() and ->ioeventfd_start() when
-resuming a guest.
+Unfortunately virtio-scsi with iothreads has a special ordering
+requirement that the core virtio code's vm change state handler runs
+before scsi-bus.c's vm change state handler.
 
-A later patch makes use of this new callback.
+This patch allows SCSI busses to disable the default vm change state
+handler for DMA restart.  The new scsi_bus_dma_restart() API allows them
+to manually restart DMA at a time of their choice.
 
 Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- include/hw/virtio/virtio.h | 7 +++++++
- hw/virtio/virtio.c         | 9 +++++++++
- 2 files changed, 16 insertions(+)
+ include/hw/scsi/scsi.h |  5 +++++
+ hw/scsi/scsi-bus.c     | 37 ++++++++++++++++++++++++++++++-------
+ 2 files changed, 35 insertions(+), 7 deletions(-)
 
-diff --git a/include/hw/virtio/virtio.h b/include/hw/virtio/virtio.h
-index 27c0efc3d0..5742efa1d7 100644
---- a/include/hw/virtio/virtio.h
-+++ b/include/hw/virtio/virtio.h
-@@ -158,6 +158,13 @@ typedef struct VirtioDeviceClass {
-     void (*save)(VirtIODevice *vdev, QEMUFile *f);
-     int (*load)(VirtIODevice *vdev, QEMUFile *f, int version_id);
-     const VMStateDescription *vmsd;
+diff --git a/include/hw/scsi/scsi.h b/include/hw/scsi/scsi.h
+index acef25faa4..e9cc563daa 100644
+--- a/include/hw/scsi/scsi.h
++++ b/include/hw/scsi/scsi.h
+@@ -120,6 +120,10 @@ struct SCSIReqOps {
+ struct SCSIBusInfo {
+     int tcq;
+     int max_channel, max_target, max_lun;
 +
-+    /* Called when the device should start/stop running because the gues=
-t was
-+     * resumed/paused.  Note that this takes VIRTIO_CONFIG_S_DRIVER_OK i=
-nto
-+     * account so running is true iff the guest is resumed and the guest=
- driver
-+     * has already indicated it is ready.
-+     */
-+    void (*vmstate_change)(VirtIODevice *vdev, bool running);
- } VirtioDeviceClass;
++    /* Will the bus call scsi_bus_dma_restart() itself? */
++    bool custom_dma_restart;
++
+     int (*parse_cdb)(SCSIDevice *dev, SCSICommand *cmd, uint8_t *buf,
+                      void *hba_private);
+     void (*transfer_data)(SCSIRequest *req, uint32_t arg);
+@@ -160,6 +164,7 @@ SCSIDevice *scsi_bus_legacy_add_drive(SCSIBus *bus, B=
+lockBackend *blk,
+                                       const char *serial, Error **errp);
+ void scsi_bus_legacy_handle_cmdline(SCSIBus *bus);
+ void scsi_legacy_handle_cmdline(void);
++void scsi_bus_dma_restart(SCSIBus *bus);
 =20
- void virtio_instance_init_common(Object *proxy_obj, void *data,
-diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
-index 4805727b53..cdf869456b 100644
---- a/hw/virtio/virtio.c
-+++ b/hw/virtio/virtio.c
-@@ -2291,6 +2291,7 @@ static void virtio_vmstate_change(void *opaque, int=
- running, RunState state)
-     VirtIODevice *vdev =3D opaque;
-     BusState *qbus =3D qdev_get_parent_bus(DEVICE(vdev));
-     VirtioBusClass *k =3D VIRTIO_BUS_GET_CLASS(qbus);
-+    VirtioDeviceClass *vdc =3D VIRTIO_DEVICE_GET_CLASS(vdev);
-     bool backend_run =3D running && vdev->started;
-     vdev->vm_running =3D running;
+ SCSIRequest *scsi_req_alloc(const SCSIReqOps *reqops, SCSIDevice *d,
+                             uint32_t tag, uint32_t lun, void *hba_privat=
+e);
+diff --git a/hw/scsi/scsi-bus.c b/hw/scsi/scsi-bus.c
+index c480553083..d2c5a1652b 100644
+--- a/hw/scsi/scsi-bus.c
++++ b/hw/scsi/scsi-bus.c
+@@ -134,6 +134,27 @@ void scsi_req_retry(SCSIRequest *req)
+     req->retry =3D true;
+ }
 =20
-@@ -2298,10 +2299,18 @@ static void virtio_vmstate_change(void *opaque, i=
-nt running, RunState state)
-         virtio_set_status(vdev, vdev->status);
-     }
-=20
-+    if (!backend_run && vdc->vmstate_change) {
-+        vdc->vmstate_change(vdev, backend_run);
++static void scsi_device_dma_restart(SCSIDevice *dev)
++{
++    if (!dev->bh) {
++        AioContext *ctx =3D blk_get_aio_context(dev->conf.blk);
++        dev->bh =3D aio_bh_new(ctx, scsi_dma_restart_bh, dev);
++        qemu_bh_schedule(dev->bh);
 +    }
++}
 +
-     if (k->vmstate_change) {
-         k->vmstate_change(qbus->parent, backend_run);
-     }
-=20
-+    if (backend_run && vdc->vmstate_change) {
-+        vdc->vmstate_change(vdev, backend_run);
++void scsi_bus_dma_restart(SCSIBus *bus)
++{
++    BusChild *kid;
++
++    QTAILQ_FOREACH(kid, &bus->qbus.children, sibling) {
++        DeviceState *qdev =3D kid->child;
++        SCSIDevice *dev =3D SCSI_DEVICE(qdev);
++
++        scsi_device_dma_restart(dev);
 +    }
++}
 +
-     if (!backend_run) {
-         virtio_set_status(vdev, vdev->status);
+ static void scsi_dma_restart_cb(void *opaque, int running, RunState stat=
+e)
+ {
+     SCSIDevice *s =3D opaque;
+@@ -141,11 +162,8 @@ static void scsi_dma_restart_cb(void *opaque, int ru=
+nning, RunState state)
+     if (!running) {
+         return;
      }
+-    if (!s->bh) {
+-        AioContext *ctx =3D blk_get_aio_context(s->conf.blk);
+-        s->bh =3D aio_bh_new(ctx, scsi_dma_restart_bh, s);
+-        qemu_bh_schedule(s->bh);
+-    }
++
++    scsi_device_dma_restart(s);
+ }
+=20
+ static void scsi_qdev_realize(DeviceState *qdev, Error **errp)
+@@ -206,8 +224,13 @@ static void scsi_qdev_realize(DeviceState *qdev, Err=
+or **errp)
+         error_propagate(errp, local_err);
+         return;
+     }
+-    dev->vmsentry =3D qemu_add_vm_change_state_handler(scsi_dma_restart_=
+cb,
+-                                                     dev);
++
++    if (bus->info->custom_dma_restart) {
++        dev->vmsentry =3D NULL;
++    } else {
++        dev->vmsentry =3D qemu_add_vm_change_state_handler(scsi_dma_rest=
+art_cb,
++                                                         dev);
++    }
+ }
+=20
+ static void scsi_qdev_unrealize(DeviceState *qdev, Error **errp)
 --=20
 2.21.0
 
