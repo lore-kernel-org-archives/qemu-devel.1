@@ -2,79 +2,84 @@ Return-Path: <SRS0=oHhb=TY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 408C1C072B5
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 14:09:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DEFAEC072B5
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 14:09:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0F55120879
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 14:09:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B0ECC20879
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 14:09:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ungfwpkl"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0F55120879
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="a4855LGh"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B0ECC20879
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:55172 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:55174 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hUAtN-00076A-8n
-	for qemu-devel@archiver.kernel.org; Fri, 24 May 2019 10:09:53 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:40481)
+	id 1hUAtO-00078T-RG
+	for qemu-devel@archiver.kernel.org; Fri, 24 May 2019 10:09:54 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:40414)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mehta.aaru20@gmail.com>) id 1hUAoS-0003SB-5d
-	for qemu-devel@nongnu.org; Fri, 24 May 2019 10:04:49 -0400
+	(envelope-from <mehta.aaru20@gmail.com>) id 1hUAoO-0003KZ-4h
+	for qemu-devel@nongnu.org; Fri, 24 May 2019 10:04:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mehta.aaru20@gmail.com>) id 1hUAnf-0002Lp-Hg
-	for qemu-devel@nongnu.org; Fri, 24 May 2019 10:04:00 -0400
-Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:40251)
+	(envelope-from <mehta.aaru20@gmail.com>) id 1hUAnn-0002RN-Br
+	for qemu-devel@nongnu.org; Fri, 24 May 2019 10:04:08 -0400
+Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:37440)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <mehta.aaru20@gmail.com>)
-	id 1hUAnf-0002Kx-9K; Fri, 24 May 2019 10:03:59 -0400
-Received: by mail-pf1-x441.google.com with SMTP id u17so5396845pfn.7;
-	Fri, 24 May 2019 07:03:58 -0700 (PDT)
+	id 1hUAnn-0002Ql-5F; Fri, 24 May 2019 10:04:07 -0400
+Received: by mail-pf1-x443.google.com with SMTP id a23so5409603pff.4;
+	Fri, 24 May 2019 07:04:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=from:to:cc:subject:date:message-id;
-	bh=NAlK3IXTaFLznSZf1TdQM7YTbALj0xbQ+SmrBQupY3I=;
-	b=UngfwpklISqNSRXh5/oBvHueGyyADAgtI/HdjMgqkUFbs0/Bid71PXstOa3esjm3Cr
-	0kGegym+22I6H54SrGMNPmzaynxkJZfTJJKg70QkPxnkT4AExmEv4YcdHhpQY42dEAXy
-	nNfGB7cPB8LmuK475rJdLTvmrwkzznsM4XMb0bJuw+ymbzl5QqYCF4hqkYq42YKzR5+W
-	tWl62IsqRNMtmywpo1ae+hfYxBDejSiyd5Z+2NTJVpUsIBWlha3avVKrHycH/1znaYHn
-	2ElpYtPX32q6CiVAKq0Relf+xCE6qv7eJ1++cllOeRci3ZRH6rvdogAQzPVWLG2baf7A
-	7nPw==
+	h=from:to:cc:subject:date:message-id:in-reply-to:references;
+	bh=3FKBJA17va/jv2u1TvUxLDB1xiagIFwWCBsEV/clovc=;
+	b=a4855LGhNEYcj8uL4x3QndWURkakTYZkaqqP4d4oYiu192b2tsudRdYqWJjtJis+CR
+	aSGOvI1YVvX6dqwTqTGW29AuQf40xqhZzMW8uBfIQpfChhAJ/in/L3PdYlto6au16/G3
+	5ax5wdRu9u30VKEXCfdle3XWpyNPfA8vcnGnA/+MbmGNzlxhE5zkL2j8U5tm/FVnsquz
+	g5QOxGHjg0Y9Jgj5ogUH3+oETzqsGLFsaX2i6EsUFxEmqAzBGWm4dqbxNUg6KBJ2TuFT
+	NU9Bdvp+D2+MKrUfzrC7D7k+SPYLQkPBZdu10Eku1h+VhIO7pbyIi9R7R+Cfhamp3ae3
+	Nasg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:from:to:cc:subject:date:message-id;
-	bh=NAlK3IXTaFLznSZf1TdQM7YTbALj0xbQ+SmrBQupY3I=;
-	b=TbPj37K6iufeKbPxMkvG5PUC2fFkocLb/LZw8k2ZjEnRbuqV+dh0c0zj6CtEc0bu3S
-	FFYIhgfy5W6xZ3BNyy2SpXeXzKiJ6UjIWz6l9d0uLDp7zK9P925/NAIht6nwPBa8GQHp
-	jKZJNhUZ651yBHIy+MmC99C9ACvCWy6do3h3UuXirqz2MT6/8e9h0rkB1uuLskmzoTl4
-	50WrCmj53w6467mQin0/8hli2wrdis35pvqgvlvCFFf4gko7si1VSNMgOao+5eYIuFLH
-	kj6bQdNg39bTSZtunvyvlQEFqlrr9nHcORV5Nhhvts6Qrsy5yNskM6zL8Ot4CxTyZWqX
-	Z23Q==
-X-Gm-Message-State: APjAAAXIo8J391CaSWgLoXq11UYKYqSygGipIaVLeIaZOBRrQFqMnTeT
-	yk9Q+/NBFmN0DstyXvKGw9yOGYYoDWpi9Q==
-X-Google-Smtp-Source: APXvYqwKuiJ1k6+Ezs21ya6ATKU0heEr5lL7ltsOP7DzBFLgfC7Aq5PG9c8cP7xCPuVXSEgXK+eAEw==
-X-Received: by 2002:a65:60c7:: with SMTP id r7mr103317820pgv.22.1558706637087; 
-	Fri, 24 May 2019 07:03:57 -0700 (PDT)
+	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+	:references;
+	bh=3FKBJA17va/jv2u1TvUxLDB1xiagIFwWCBsEV/clovc=;
+	b=tqOFfloyBsYgf0IboauHwc/PnO4DF6Po/YQxmgL8ft27JZuZsmjmst9e/KqDhYeYY6
+	ohQ/CEZiOLKcCc89vQ7y9TA4E0TMEs4v2YrBwvUCR6MMUqG1Zt48il4W7piuavzTJRxN
+	KCWc8wm4o3Y6sGLoSkFNH0NcpJqPbs1/b0UBS59dLw9roAYBUtGzUJBBylEj1j+y1pdZ
+	sSDkeOiwMbJjoCStopIyUt5Dxo2oZEsve/qLpvFHXThqeRPu9+qTmsq7p0MekKyfJdgM
+	9TDiDL7VstKW8Mea4sbTfxWFdj3KwFzuFDE2cAJJjW/qZcM7XQTQQLdsXGMtE69AseNQ
+	Sn/g==
+X-Gm-Message-State: APjAAAUuF//OpYlFcMovV8twNy3grYlKavmdR3mlP3PxTkbKvDRNHk+w
+	QeXrlMqmIjfZxh4vQmdFFzl66Eu2Vxk+Hw==
+X-Google-Smtp-Source: APXvYqy4l/3ibeoF9lugxLRcZk2nFEzQ/rSSZqVuB3NnKQayxkGKq4FFbqh7sQgtkZ/6z2qw5pyqqw==
+X-Received: by 2002:a63:d00d:: with SMTP id z13mr9056359pgf.368.1558706645836; 
+	Fri, 24 May 2019 07:04:05 -0700 (PDT)
 Received: from localhost.localdomain ([120.57.120.132])
 	by smtp.gmail.com with ESMTPSA id
-	u11sm2556766pfh.130.2019.05.24.07.03.52
+	u11sm2556766pfh.130.2019.05.24.07.04.01
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Fri, 24 May 2019 07:03:56 -0700 (PDT)
+	Fri, 24 May 2019 07:04:05 -0700 (PDT)
 From: Aarushi Mehta <mehta.aaru20@gmail.com>
 To: qemu-devel@nongnu.org
-Date: Fri, 24 May 2019 19:33:28 +0530
-Message-Id: <20190524140337.13415-1-mehta.aaru20@gmail.com>
+Date: Fri, 24 May 2019 19:33:30 +0530
+Message-Id: <20190524140337.13415-3-mehta.aaru20@gmail.com>
 X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20190524140337.13415-1-mehta.aaru20@gmail.com>
+References: <20190524140337.13415-1-mehta.aaru20@gmail.com>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2607:f8b0:4864:20::441
-Subject: [Qemu-devel] [RFC PATCH v2 0/9] Add support for io_uring
+X-Received-From: 2607:f8b0:4864:20::443
+Subject: [Qemu-devel] [RFC PATCH v2 2/9] block/block: add BDRV flag for
+ io_uring
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -93,43 +98,22 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This patch series adds support for the newly developed io_uring Linux AIO interface. Linux io_uring is faster than Linux's AIO asynchronous I/O code, offers efficient buffered asynchronous I/O support, the ability to do I/O without performing a system call via polled I/O, and other efficiency enhancements. It is expected that it will replace the old AIO interface
+Signed-off-by: Aarushi Mehta <mehta.aaru20@gmail.com>
+---
+ include/block/block.h | 1 +
+ 1 file changed, 1 insertion(+)
 
-Testing it requires a host kernel 5.1 or newer and the liburing library. Use the option -drive aio=io_uring to enable it.
+diff --git a/include/block/block.h b/include/block/block.h
+index 9b083e2bca..60f7c6c01c 100644
+--- a/include/block/block.h
++++ b/include/block/block.h
+@@ -121,6 +121,7 @@ typedef struct HDGeometry {
+                                       ignoring the format layer */
+ #define BDRV_O_NO_IO       0x10000 /* don't initialize for I/O */
+ #define BDRV_O_AUTO_RDONLY 0x20000 /* degrade to read-only if opening read-write fails */
++#define BDRV_O_IO_URING    0x40000 /* use io_uring instead of the thread pool */
 
-v2:
-- Fix Patchew errors
-- Option now enumerates only for CONFIG_LINUX in qapi
-- Removed redudant and broken code in io_uring
-- io_uring now aborts on sqe leak
-
-Aarushi Mehta (9):
-  qapi/block-core: add option for io_uring
-  block/block: add BDRV flag for io_uring
-  include/block: declare interfaces for io_uring
-  stubs: add aio interface stubs for io_uring
-  util/async: add aio interfaces for io_uring
-  block/io_uring: implements interfaces for io_uring
-  blockdev: accept io_uring as option
-  block/file-posix: extends to use with io_uring
-  configure: permit use of io_uring
-
- MAINTAINERS             |  11 ++
- block/Makefile.objs     |   2 +
- block/file-posix.c      |  63 ++++++++-
- block/io_uring.c        | 306 ++++++++++++++++++++++++++++++++++++++++
- blockdev.c              |   4 +-
- configure               |  27 ++++
- include/block/aio.h     |  16 ++-
- include/block/block.h   |   1 +
- include/block/raw-aio.h |  15 ++
- qapi/block-core.json    |   6 +-
- stubs/Makefile.objs     |   1 +
- stubs/io_uring.c        |  32 +++++
- util/async.c            |  36 +++++
- 13 files changed, 511 insertions(+), 9 deletions(-)
- create mode 100644 block/io_uring.c
- create mode 100644 stubs/io_uring.c
+ #define BDRV_O_CACHE_MASK  (BDRV_O_NOCACHE | BDRV_O_NO_FLUSH)
 
 --
 2.17.1
