@@ -2,61 +2,83 @@ Return-Path: <SRS0=oHhb=TY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 16D3AC072B5
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 17:07:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D7524C072B5
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 17:32:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D533820863
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 17:07:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D533820863
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 9EF3A21848
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 17:32:56 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="VvTdzWt8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9EF3A21848
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:57684 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:57881 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hUDfX-0003cB-6c
-	for qemu-devel@archiver.kernel.org; Fri, 24 May 2019 13:07:47 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:49031)
+	id 1hUE3r-0000gB-E7
+	for qemu-devel@archiver.kernel.org; Fri, 24 May 2019 13:32:55 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:53399)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1hUDcJ-0000v2-V4
-	for qemu-devel@nongnu.org; Fri, 24 May 2019 13:04:29 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1hUE21-0007DD-Ni
+	for qemu-devel@nongnu.org; Fri, 24 May 2019 13:31:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1hUDXN-0002MH-KI
-	for qemu-devel@nongnu.org; Fri, 24 May 2019 12:59:22 -0400
-Received: from 9.mo173.mail-out.ovh.net ([46.105.72.44]:60887)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1hUDXN-0002KM-BU
-	for qemu-devel@nongnu.org; Fri, 24 May 2019 12:59:21 -0400
-Received: from player729.ha.ovh.net (unknown [10.108.42.82])
-	by mo173.mail-out.ovh.net (Postfix) with ESMTP id 75C4E1090A5
-	for <qemu-devel@nongnu.org>; Fri, 24 May 2019 18:59:18 +0200 (CEST)
-Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
-	[82.253.208.248]) (Authenticated sender: groug@kaod.org)
-	by player729.ha.ovh.net (Postfix) with ESMTPSA id 484E064D255C;
-	Fri, 24 May 2019 16:59:12 +0000 (UTC)
-Date: Fri, 24 May 2019 18:59:11 +0200
-From: Greg Kurz <groug@kaod.org>
-To: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20190524185911.22173b13@bahia.lan>
-In-Reply-To: <20190523052918.1129-4-david@gibson.dropbear.id.au>
-References: <20190523052918.1129-1-david@gibson.dropbear.id.au>
-	<20190523052918.1129-4-david@gibson.dropbear.id.au>
-X-Mailer: Claws Mail 3.16.0 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+	(envelope-from <peter.maydell@linaro.org>) id 1hUE17-0005K5-Vl
+	for qemu-devel@nongnu.org; Fri, 24 May 2019 13:30:06 -0400
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:40196)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1hUE17-0005Je-QY
+	for qemu-devel@nongnu.org; Fri, 24 May 2019 13:30:05 -0400
+Received: by mail-ot1-x344.google.com with SMTP id u11so9388289otq.7
+	for <qemu-devel@nongnu.org>; Fri, 24 May 2019 10:30:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+	:cc; bh=Vx4tTQWgEEDhUneh+utjYv491sxLZwNCyRJRcN+3dsg=;
+	b=VvTdzWt85WnsRfWdSAQykoNIASGZOc+nd8ylL/E5X6EeyC1ILTeAtUhqCha8iB6c3o
+	gzd0YJnFnUmrfxbxngnvX3TDG+qjHebRvFP92VDPKku0Yu3OT/asQVIv3AGvQ76JQA4w
+	gov/337bxrbfJ6RxDmonwO+mqDicy0TKI9AtHTl6eCR7KgLYLNpPjj0xqPgDXcypQl/b
+	AK8D6Cq+M3fNsedjFDjLKGaakTSFdvLoTQeJjLRP2YNCpVdjGcPCSfMG6fH+7110hicP
+	Zj/pcQeFe7pxTfF1mBaaTXVyt7oRQHxvjI4sAnrakimpmGqb5gfTE4+noGPH/Fz2Hn1M
+	raBA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+	:message-id:subject:to:cc;
+	bh=Vx4tTQWgEEDhUneh+utjYv491sxLZwNCyRJRcN+3dsg=;
+	b=F7JgFe1H4kgeUv4VhZNS1AOOB70qBwG3WZTJANmZSQk3KnFB9iuoubNCnHUOVTlCHe
+	QERLulLP1VlnKhNyvFdx1w87ltUZAQD3Z0c+cTcZGhqdZEN66mGzy7A5m7mdtuqU+FzY
+	ZbugCRPKggXLVRUcl9NOwfpIOcnVdDsu9ETKtyl8bKGFuN4Xg83EP8rmrcJQRR1gZ2ah
+	iY0+9h5J6w3+NkuZwDDjS3cihtO8jdzAt6TUCG/iqG60yH8e/UKqeqbUV6pRuXMvuEWr
+	5eNc5IiYnhCvcHwBRXW3WBwAlyso+nZzHerSz6CFqdDEQbFGURuEIKf+mK9SZ83NLnoS
+	x2xw==
+X-Gm-Message-State: APjAAAXl97DniAW4kU1GA5vwMQTCv0IqyvfI6gFzpfyte//6N3WAcVzW
+	zr4xiHyuciDLUVL9NVS6sYGekObc9kbkMaEyr8R0JQ==
+X-Google-Smtp-Source: APXvYqy00vTtoLjjjPTrIyedE1QJFn6oMnbtZf8B2s989K+Yf6vK9m/WYD51jbrjftHSH2XzEvKO23qwltGUXPsqh90=
+X-Received: by 2002:a9d:6b0d:: with SMTP id g13mr26214875otp.91.1558719004843; 
+	Fri, 24 May 2019 10:30:04 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Ovh-Tracer-Id: 2514415971182483942
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduuddrudduiedguddtlecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 46.105.72.44
-Subject: Re: [Qemu-devel] [PATCH 4/8] spapr: Clean up spapr_drc_populate_dt()
+References: <20190522222224.244714-1-rkir@google.com>
+	<20190523102225.GA2994@work-vm>
+	<CAOGAQerwpqaP=DKxC+WVdJcGpxnAayfMrwoPP=bBJBBG5Vn87g@mail.gmail.com>
+	<CAFEAcA9bKQukg7_HcGKWAFmoaX+DG0NhSctzwg7mpVJ_AOO09g@mail.gmail.com>
+	<CAOGAQeqEuc9T-gDWoGPmgZgOoNLA9V_h6Rwz5+PBinZe1XwfmQ@mail.gmail.com>
+In-Reply-To: <CAOGAQeqEuc9T-gDWoGPmgZgOoNLA9V_h6Rwz5+PBinZe1XwfmQ@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 24 May 2019 18:29:53 +0100
+Message-ID: <CAFEAcA8HDEXBHUkOVatfHBc4+8+EK3+yVj5Eigj3p8RJqQp6Sg@mail.gmail.com>
+To: Roman Kiryanov <rkir@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::344
+Subject: Re: [Qemu-devel] [PATCH] vmstate: Add VMSTATE_OPAQUE to save/load
+ complex data structures
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -68,143 +90,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: mdroth@linux.ibm.com, mst@redhat.com, qemu-ppc@nongnu.org, clg@kaod.org,
-	qemu-devel@nongnu.org
+Cc: QEMU Developers <qemu-devel@nongnu.org>,
+	Juan Quintela <quintela@redhat.com>,
+	"Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+	Lingfeng Yang <lfy@google.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 23 May 2019 15:29:14 +1000
-David Gibson <david@gibson.dropbear.id.au> wrote:
+On Fri, 24 May 2019 at 18:00, Roman Kiryanov <rkir@google.com> wrote:
+>
+> Hi Peter,
+>
+> > In any case, migration state on the wire needs to be
+> > architecture/endianness/
+>
+> Could you please point how the proposed change is
+> architecture/endianness/ dependent?
 
-> This makes some minor cleanups to spapr_drc_populate_dt(), renaming it to
-> the shorter and more idiomatic spapr_dt_drc() along the way.
-> 
-> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> ---
+That's really hard to say, because this patch doesn't
+come with any example of its use. So I'm basically
+guessing that when you say "load/save complex data
+structures" and call your macro OPAQUE that you mean
+"I am going to just feed the raw in-memory representation
+of this data structure into the migration stream in an
+opaque way". Perhaps my assumptions here are wrong ?
 
-Reviewed-by: Greg Kurz <groug@kaod.org>
+> > implementation-independent,
+>
+> Could you please elaborate, what "implementation"
+> you mean here?
 
->  hw/ppc/spapr.c             |  7 +++----
->  hw/ppc/spapr_drc.c         | 13 ++++++-------
->  hw/ppc/spapr_pci.c         |  3 +--
->  include/hw/ppc/spapr_drc.h |  3 +--
->  4 files changed, 11 insertions(+), 15 deletions(-)
-> 
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index 44573adce7..507fd50dd5 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -1320,13 +1320,12 @@ static void *spapr_build_fdt(SpaprMachineState *spapr)
->      spapr_populate_cpus_dt_node(fdt, spapr);
->  
->      if (smc->dr_lmb_enabled) {
-> -        _FDT(spapr_drc_populate_dt(fdt, 0, NULL, SPAPR_DR_CONNECTOR_TYPE_LMB));
-> +        _FDT(spapr_dt_drc(fdt, 0, NULL, SPAPR_DR_CONNECTOR_TYPE_LMB));
->      }
->  
->      if (mc->has_hotpluggable_cpus) {
->          int offset = fdt_path_offset(fdt, "/cpus");
-> -        ret = spapr_drc_populate_dt(fdt, offset, NULL,
-> -                                    SPAPR_DR_CONNECTOR_TYPE_CPU);
-> +        ret = spapr_dt_drc(fdt, offset, NULL, SPAPR_DR_CONNECTOR_TYPE_CPU);
->          if (ret < 0) {
->              error_report("Couldn't set up CPU DR device tree properties");
->              exit(1);
-> @@ -1363,7 +1362,7 @@ static void *spapr_build_fdt(SpaprMachineState *spapr)
->      }
->  
->      if (smc->dr_phb_enabled) {
-> -        ret = spapr_drc_populate_dt(fdt, 0, NULL, SPAPR_DR_CONNECTOR_TYPE_PHB);
-> +        ret = spapr_dt_drc(fdt, 0, NULL, SPAPR_DR_CONNECTOR_TYPE_PHB);
->          if (ret < 0) {
->              error_report("Couldn't set up PHB DR device tree properties");
->              exit(1);
-> diff --git a/hw/ppc/spapr_drc.c b/hw/ppc/spapr_drc.c
-> index 597f236b9c..bacadfcac5 100644
-> --- a/hw/ppc/spapr_drc.c
-> +++ b/hw/ppc/spapr_drc.c
-> @@ -781,7 +781,7 @@ SpaprDrc *spapr_drc_by_id(const char *type, uint32_t id)
->  }
->  
->  /**
-> - * spapr_drc_populate_dt
-> + * spapr_dt_drc
->   *
->   * @fdt: libfdt device tree
->   * @path: path in the DT to generate properties
-> @@ -794,8 +794,7 @@ SpaprDrc *spapr_drc_by_id(const char *type, uint32_t id)
->   *
->   * as documented in PAPR+ v2.1, 13.5.2
->   */
-> -int spapr_drc_populate_dt(void *fdt, int fdt_offset, Object *owner,
-> -                          uint32_t drc_type_mask)
-> +int spapr_dt_drc(void *fdt, int offset, Object *owner, uint32_t drc_type_mask)
->  {
->      Object *root_container;
->      ObjectProperty *prop;
-> @@ -873,7 +872,7 @@ int spapr_drc_populate_dt(void *fdt, int fdt_offset, Object *owner,
->      *(uint32_t *)drc_names->str = cpu_to_be32(drc_count);
->      *(uint32_t *)drc_types->str = cpu_to_be32(drc_count);
->  
-> -    ret = fdt_setprop(fdt, fdt_offset, "ibm,drc-indexes",
-> +    ret = fdt_setprop(fdt, offset, "ibm,drc-indexes",
->                        drc_indexes->data,
->                        drc_indexes->len * sizeof(uint32_t));
->      if (ret) {
-> @@ -881,7 +880,7 @@ int spapr_drc_populate_dt(void *fdt, int fdt_offset, Object *owner,
->          goto out;
->      }
->  
-> -    ret = fdt_setprop(fdt, fdt_offset, "ibm,drc-power-domains",
-> +    ret = fdt_setprop(fdt, offset, "ibm,drc-power-domains",
->                        drc_power_domains->data,
->                        drc_power_domains->len * sizeof(uint32_t));
->      if (ret) {
-> @@ -889,14 +888,14 @@ int spapr_drc_populate_dt(void *fdt, int fdt_offset, Object *owner,
->          goto out;
->      }
->  
-> -    ret = fdt_setprop(fdt, fdt_offset, "ibm,drc-names",
-> +    ret = fdt_setprop(fdt, offset, "ibm,drc-names",
->                        drc_names->str, drc_names->len);
->      if (ret) {
->          error_report("Couldn't finalize ibm,drc-names property");
->          goto out;
->      }
->  
-> -    ret = fdt_setprop(fdt, fdt_offset, "ibm,drc-types",
-> +    ret = fdt_setprop(fdt, offset, "ibm,drc-types",
->                        drc_types->str, drc_types->len);
->      if (ret) {
->          error_report("Couldn't finalize ibm,drc-types property");
-> diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
-> index c166df4145..04855d3125 100644
-> --- a/hw/ppc/spapr_pci.c
-> +++ b/hw/ppc/spapr_pci.c
-> @@ -2282,8 +2282,7 @@ int spapr_dt_phb(SpaprPhbState *phb, uint32_t intc_phandle, void *fdt,
->          return ret;
->      }
->  
-> -    ret = spapr_drc_populate_dt(fdt, bus_off, OBJECT(phb),
-> -                                SPAPR_DR_CONNECTOR_TYPE_PCI);
-> +    ret = spapr_dt_drc(fdt, bus_off, OBJECT(phb), SPAPR_DR_CONNECTOR_TYPE_PCI);
->      if (ret) {
->          return ret;
->      }
-> diff --git a/include/hw/ppc/spapr_drc.h b/include/hw/ppc/spapr_drc.h
-> index fad0a887f9..c2c543a591 100644
-> --- a/include/hw/ppc/spapr_drc.h
-> +++ b/include/hw/ppc/spapr_drc.h
-> @@ -266,8 +266,7 @@ SpaprDrc *spapr_dr_connector_new(Object *owner, const char *type,
->                                           uint32_t id);
->  SpaprDrc *spapr_drc_by_index(uint32_t index);
->  SpaprDrc *spapr_drc_by_id(const char *type, uint32_t id);
-> -int spapr_drc_populate_dt(void *fdt, int fdt_offset, Object *owner,
-> -                          uint32_t drc_type_mask);
-> +int spapr_dt_drc(void *fdt, int offset, Object *owner, uint32_t drc_type_mask);
->  
->  void spapr_drc_attach(SpaprDrc *drc, DeviceState *d, Error **errp);
->  void spapr_drc_detach(SpaprDrc *drc);
+I had in mind the C++ implementation of unordered_map<>.
 
+> > so you can't just send raw complex data structures
+>
+> Do we need to serialize (in pre_save and then release in
+> post_save) our state into a buffer and to write it as one
+> piece using the existing macro? This looks ok, but how
+> is this different from what we are doing?
+
+I guess essentially what I'm asking for here is that
+this patch comes as part of a series which makes
+use of it. It's really hard to evaluate the design
+of a utility feature without a concrete example of
+how it's being used. That then makes it easier to understand
+the abstract feature and also allows us to sometimes
+suggest better ways to achieve the underlying aim
+(and to avoid making suggestions which don't make sense!)
+
+A corollary of this is that in general we don't like to
+take patches upstream that implement facilities that don't
+have a use upstream. Is there some existing vmstate
+handling in upstream QEMU that we could refactor to
+be more cleanly implemented using this?
+
+thanks
+-- PMM
 
