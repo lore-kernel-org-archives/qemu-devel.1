@@ -2,59 +2,61 @@ Return-Path: <SRS0=oHhb=TY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 27300C072B5
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C7D7C282E3
 	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 09:35:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F1F91217F9
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 09:35:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F1F91217F9
+	by mail.kernel.org (Postfix) with ESMTPS id 676732133D
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 09:35:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 676732133D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:51632 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:51636 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hU6bp-0001Ag-5K
+	id 1hU6bp-0001BT-Kt
 	for qemu-devel@archiver.kernel.org; Fri, 24 May 2019 05:35:29 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:50413)
+Received: from eggs.gnu.org ([209.51.188.92]:50428)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hU6aD-0000C1-2D
-	for qemu-devel@nongnu.org; Fri, 24 May 2019 05:33:50 -0400
+	(envelope-from <david@redhat.com>) id 1hU6aD-0000CU-Qs
+	for qemu-devel@nongnu.org; Fri, 24 May 2019 05:33:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hU6aC-0005pu-2M
+	(envelope-from <david@redhat.com>) id 1hU6aC-0005q6-Am
 	for qemu-devel@nongnu.org; Fri, 24 May 2019 05:33:49 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39328)
+Received: from mx1.redhat.com ([209.132.183.28]:50208)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <david@redhat.com>)
-	id 1hU6aA-0005oN-0k; Fri, 24 May 2019 05:33:46 -0400
+	id 1hU6aC-0005p5-2h; Fri, 24 May 2019 05:33:48 -0400
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
 	[10.5.11.11])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D5D343003E5F;
-	Fri, 24 May 2019 09:33:39 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id A5D1D8110C;
+	Fri, 24 May 2019 09:33:41 +0000 (UTC)
 Received: from t460s.redhat.com (ovpn-116-48.ams2.redhat.com [10.36.116.48])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 429C061354;
-	Fri, 24 May 2019 09:33:36 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 29FF161354;
+	Fri, 24 May 2019 09:33:40 +0000 (UTC)
 From: David Hildenbrand <david@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Fri, 24 May 2019 11:33:30 +0200
-Message-Id: <20190524093335.22241-1-david@redhat.com>
+Date: Fri, 24 May 2019 11:33:31 +0200
+Message-Id: <20190524093335.22241-2-david@redhat.com>
+In-Reply-To: <20190524093335.22241-1-david@redhat.com>
+References: <20190524093335.22241-1-david@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.42]);
-	Fri, 24 May 2019 09:33:39 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.28]);
+	Fri, 24 May 2019 09:33:41 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v2 0/5] s390x/tcg: Vector Instruction Support
- Part 3
+Subject: [Qemu-devel] [PATCH v2 1/5] s390x/tcg: Implement VECTOR FIND ANY
+ ELEMENT EQUAL
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -73,48 +75,301 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is the third part of vector instruction support for s390x. It is bas=
-ed
-on part 2, which is will send a pull-request for to Conny soon.
+Complicated stuff. Provide two different helpers for CC an !CC handling.
+We might want to add more helpers later.
 
-Part 1: Vector Support Instructions
-Part 2: Vector Integer Instructions
-Part 3: Vector String Instructions
-Part 4: Vector Floating-Point Instructions
+zero_search() and match_index() are courtesy of Richard H.
 
-The current state can be found at (kept updated):
-    https://github.com/davidhildenbrand/qemu/tree/vx
-
-With the current state I can boot Linux kernel + user space compiled with
-SIMD support. This allows to boot distributions compiled exclusively for
-z13, requiring SIMD support. Also, it is now possible to build a complete
-kernel using rpmbuild as quite some issues have been sorted out.
-
-In this part, all Vector String Instructions introduced with the
-"Vector Facility" are added.
-
-v1 -> v2:
-- Use the fancy bit-tricks from Richard to rewrite most string instructio=
-ns
-- Create specialized variants for "VECTOR STRING RANGE COMPARE", so the
-  compiler can optimize out the rt/!rt handling code.
-
-David Hildenbrand (5):
-  s390x/tcg: Implement VECTOR FIND ANY ELEMENT EQUAL
-  s390x/tcg: Implement VECTOR FIND ELEMENT EQUAL
-  s390x/tcg: Implement VECTOR FIND ELEMENT NOT EQUAL
-  s390x/tcg: Implement VECTOR ISOLATE STRING
-  s390x/tcg: Implement VECTOR STRING RANGE COMPARE
-
+Signed-off-by: David Hildenbrand <david@redhat.com>
+---
  target/s390x/Makefile.objs       |   2 +-
- target/s390x/helper.h            |  38 +++
- target/s390x/insn-data.def       |  13 +
- target/s390x/translate_vx.inc.c  | 185 ++++++++++++
- target/s390x/vec.h               |  40 +++
- target/s390x/vec_string_helper.c | 473 +++++++++++++++++++++++++++++++
- 6 files changed, 750 insertions(+), 1 deletion(-)
+ target/s390x/helper.h            |   8 ++
+ target/s390x/insn-data.def       |   5 +
+ target/s390x/translate_vx.inc.c  |  30 ++++++
+ target/s390x/vec_string_helper.c | 154 +++++++++++++++++++++++++++++++
+ 5 files changed, 198 insertions(+), 1 deletion(-)
  create mode 100644 target/s390x/vec_string_helper.c
 
+diff --git a/target/s390x/Makefile.objs b/target/s390x/Makefile.objs
+index 993ac93ed6..0a38281a14 100644
+--- a/target/s390x/Makefile.objs
++++ b/target/s390x/Makefile.objs
+@@ -1,7 +1,7 @@
+ obj-y +=3D cpu.o cpu_models.o cpu_features.o gdbstub.o interrupt.o helpe=
+r.o
+ obj-$(CONFIG_TCG) +=3D translate.o cc_helper.o excp_helper.o fpu_helper.=
+o
+ obj-$(CONFIG_TCG) +=3D int_helper.o mem_helper.o misc_helper.o crypto_he=
+lper.o
+-obj-$(CONFIG_TCG) +=3D vec_helper.o vec_int_helper.o
++obj-$(CONFIG_TCG) +=3D vec_helper.o vec_int_helper.o vec_string_helper.o
+ obj-$(CONFIG_SOFTMMU) +=3D machine.o ioinst.o arch_dump.o mmu_helper.o d=
+iag.o
+ obj-$(CONFIG_SOFTMMU) +=3D sigp.o
+ obj-$(CONFIG_KVM) +=3D kvm.o
+diff --git a/target/s390x/helper.h b/target/s390x/helper.h
+index 7755a96c33..c45328cf73 100644
+--- a/target/s390x/helper.h
++++ b/target/s390x/helper.h
+@@ -211,6 +211,14 @@ DEF_HELPER_FLAGS_4(gvec_vscbi8, TCG_CALL_NO_RWG, voi=
+d, ptr, cptr, cptr, i32)
+ DEF_HELPER_FLAGS_4(gvec_vscbi16, TCG_CALL_NO_RWG, void, ptr, cptr, cptr,=
+ i32)
+ DEF_HELPER_4(gvec_vtm, void, ptr, cptr, env, i32)
+=20
++/* =3D=3D=3D Vector String Instructions =3D=3D=3D */
++DEF_HELPER_FLAGS_4(gvec_vfae8, TCG_CALL_NO_RWG, void, ptr, cptr, cptr, i=
+32)
++DEF_HELPER_FLAGS_4(gvec_vfae16, TCG_CALL_NO_RWG, void, ptr, cptr, cptr, =
+i32)
++DEF_HELPER_FLAGS_4(gvec_vfae32, TCG_CALL_NO_RWG, void, ptr, cptr, cptr, =
+i32)
++DEF_HELPER_5(gvec_vfae_cc8, void, ptr, cptr, cptr, env, i32)
++DEF_HELPER_5(gvec_vfae_cc16, void, ptr, cptr, cptr, env, i32)
++DEF_HELPER_5(gvec_vfae_cc32, void, ptr, cptr, cptr, env, i32)
++
+ #ifndef CONFIG_USER_ONLY
+ DEF_HELPER_3(servc, i32, env, i64, i64)
+ DEF_HELPER_4(diag, void, env, i32, i32, i32)
+diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
+index e61475bdc4..070ce2a471 100644
+--- a/target/s390x/insn-data.def
++++ b/target/s390x/insn-data.def
+@@ -1191,6 +1191,11 @@
+ /* VECTOR TEST UNDER MASK */
+     F(0xe7d8, VTM,     VRR_a, V,   0, 0, 0, 0, vtm, 0, IF_VEC)
+=20
++/* =3D=3D=3D Vector String Instructions =3D=3D=3D */
++
++/* VECTOR FIND ANY ELEMENT EQUAL */
++    F(0xe782, VFAE,    VRR_b, V,   0, 0, 0, 0, vfae, 0, IF_VEC)
++
+ #ifndef CONFIG_USER_ONLY
+ /* COMPARE AND SWAP AND PURGE */
+     E(0xb250, CSP,     RRE,   Z,   r1_32u, ra2, r1_P, 0, csp, 0, MO_TEUL=
+, IF_PRIV)
+diff --git a/target/s390x/translate_vx.inc.c b/target/s390x/translate_vx.=
+inc.c
+index 7e0bfcb190..ebd7a877f1 100644
+--- a/target/s390x/translate_vx.inc.c
++++ b/target/s390x/translate_vx.inc.c
+@@ -2353,3 +2353,33 @@ static DisasJumpType op_vtm(DisasContext *s, Disas=
+Ops *o)
+     set_cc_static(s);
+     return DISAS_NEXT;
+ }
++
++static DisasJumpType op_vfae(DisasContext *s, DisasOps *o)
++{
++    const uint8_t es =3D get_field(s->fields, m4);
++    const uint8_t m5 =3D get_field(s->fields, m5);
++    static gen_helper_gvec_3 * const g[3] =3D {
++        gen_helper_gvec_vfae8,
++        gen_helper_gvec_vfae16,
++        gen_helper_gvec_vfae32,
++    };
++    static gen_helper_gvec_3_ptr * const g_cc[3] =3D {
++        gen_helper_gvec_vfae_cc8,
++        gen_helper_gvec_vfae_cc16,
++        gen_helper_gvec_vfae_cc32,
++    };
++    if (es > ES_32) {
++        gen_program_exception(s, PGM_SPECIFICATION);
++        return DISAS_NORETURN;
++    }
++
++    if (extract32(m5, 0, 1)) {
++        gen_gvec_3_ptr(get_field(s->fields, v1), get_field(s->fields, v2=
+),
++                       get_field(s->fields, v3), cpu_env, m5, g_cc[es]);
++        set_cc_static(s);
++    } else {
++        gen_gvec_3_ool(get_field(s->fields, v1), get_field(s->fields, v2=
+),
++                       get_field(s->fields, v3), m5, g[es]);
++    }
++    return DISAS_NEXT;
++}
+diff --git a/target/s390x/vec_string_helper.c b/target/s390x/vec_string_h=
+elper.c
+new file mode 100644
+index 0000000000..56dc89c824
+--- /dev/null
++++ b/target/s390x/vec_string_helper.c
+@@ -0,0 +1,154 @@
++/*
++ * QEMU TCG support -- s390x vector string instruction support
++ *
++ * Copyright (C) 2019 Red Hat Inc
++ *
++ * Authors:
++ *   David Hildenbrand <david@redhat.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or la=
+ter.
++ * See the COPYING file in the top-level directory.
++ */
++#include "qemu/osdep.h"
++#include "qemu-common.h"
++#include "cpu.h"
++#include "internal.h"
++#include "vec.h"
++#include "tcg/tcg.h"
++#include "tcg/tcg-gvec-desc.h"
++#include "exec/helper-proto.h"
++
++/*
++ * Returns a bit set in the MSB of each element that is zero,
++ * as defined by the mask.
++ */
++static inline uint64_t zero_search(uint64_t a, uint64_t mask)
++{
++    return ~(((a & mask) + mask) | a | mask);
++}
++
++/*
++ * Returns the byte offset for the first match, or 16 for no match.
++ */
++static inline int match_index(uint64_t c0, uint64_t c1)
++{
++    return (c0 ? clz64(c0) : clz64(c1) + 64) >> 3;
++}
++
++/*
++ * Returns the number of bits composing one element.
++ */
++static uint8_t get_element_bits(uint8_t es)
++{
++    return (1 << es) * BITS_PER_BYTE;
++}
++
++/*
++ * Returns the bitmask for a single element.
++ */
++static uint64_t get_single_element_mask(uint8_t es)
++{
++    return -1ull >> (64 - get_element_bits(es));
++}
++
++/*
++ * Returns the bitmask for a single element (excluding the MSB).
++ */
++static uint64_t get_single_element_lsbs_mask(uint8_t es)
++{
++    return -1ull >> (65 - get_element_bits(es));
++}
++
++/*
++ * Returns the bitmasks for multiple elements (excluding the MSBs).
++ */
++static uint64_t get_element_lsbs_mask(uint8_t es)
++{
++    return dup_const(es, get_single_element_lsbs_mask(es));
++}
++
++static int vfae(void *v1, const void *v2, const void *v3, bool in,
++                bool rt, bool zs, uint8_t es)
++{
++    const uint64_t mask =3D get_element_lsbs_mask(es);
++    const int bits =3D get_element_bits(es);
++    uint64_t a0, a1, b0, b1, e0, e1, t0, t1, z0, z1;
++    uint64_t first_zero =3D 16;
++    uint64_t first_equal;
++    int i;
++
++    a0 =3D s390_vec_read_element64(v2, 0);
++    a1 =3D s390_vec_read_element64(v2, 1);
++    b0 =3D s390_vec_read_element64(v3, 0);
++    b1 =3D s390_vec_read_element64(v3, 1);
++    e0 =3D 0;
++    e1 =3D 0;
++    /* compare against equality with every other element */
++    for (i =3D 0; i < 64; i +=3D bits) {
++        t0 =3D rol64(b0, i);
++        t1 =3D rol64(b1, i);
++        e0 |=3D zero_search(a0 ^ t0, mask);
++        e0 |=3D zero_search(a0 ^ t1, mask);
++        e1 |=3D zero_search(a1 ^ t0, mask);
++        e1 |=3D zero_search(a1 ^ t1, mask);
++    }
++    /* invert the result if requested - invert only the MSBs */
++    if (in) {
++        e0 =3D ~e0 & ~mask;
++        e1 =3D ~e1 & ~mask;
++    }
++    first_equal =3D match_index(e0, e1);
++
++    if (zs) {
++        z0 =3D zero_search(a0, mask);
++        z1 =3D zero_search(a1, mask);
++        first_zero =3D match_index(z0, z1);
++    }
++
++    if (rt) {
++        e0 =3D (e0 >> (bits - 1)) * get_single_element_mask(es);
++        e1 =3D (e1 >> (bits - 1)) * get_single_element_mask(es);
++        s390_vec_write_element64(v1, 0, e0);
++        s390_vec_write_element64(v1, 1, e1);
++    } else {
++        s390_vec_write_element64(v1, 0, MIN(first_equal, first_zero));
++        s390_vec_write_element64(v1, 1, 0);
++    }
++
++    if (first_zero =3D=3D 16 && first_equal =3D=3D 16) {
++        return 3; /* no match */
++    } else if (first_zero =3D=3D 16) {
++        return 1; /* matching elements, no match for zero */
++    } else if (first_equal < first_zero) {
++        return 2; /* matching elements before match for zero */
++    }
++    return 0; /* match for zero */
++}
++
++#define DEF_VFAE_HELPER(BITS)                                           =
+       \
++void HELPER(gvec_vfae##BITS)(void *v1, const void *v2, const void *v3,  =
+       \
++                             uint32_t desc)                             =
+       \
++{                                                                       =
+       \
++    const bool in =3D extract32(simd_data(desc), 3, 1);                 =
+         \
++    const bool rt =3D extract32(simd_data(desc), 2, 1);                 =
+         \
++    const bool zs =3D extract32(simd_data(desc), 1, 1);                 =
+         \
++                                                                        =
+       \
++    vfae(v1, v2, v3, in, rt, zs, MO_##BITS);                            =
+       \
++}
++DEF_VFAE_HELPER(8)
++DEF_VFAE_HELPER(16)
++DEF_VFAE_HELPER(32)
++
++#define DEF_VFAE_CC_HELPER(BITS)                                        =
+       \
++void HELPER(gvec_vfae_cc##BITS)(void *v1, const void *v2, const void *v3=
+,      \
++                                CPUS390XState *env, uint32_t desc)      =
+       \
++{                                                                       =
+       \
++    const bool in =3D extract32(simd_data(desc), 3, 1);                 =
+         \
++    const bool rt =3D extract32(simd_data(desc), 2, 1);                 =
+         \
++    const bool zs =3D extract32(simd_data(desc), 1, 1);                 =
+         \
++                                                                        =
+       \
++    env->cc_op =3D vfae(v1, v2, v3, in, rt, zs, MO_##BITS);             =
+         \
++}
++DEF_VFAE_CC_HELPER(8)
++DEF_VFAE_CC_HELPER(16)
++DEF_VFAE_CC_HELPER(32)
 --=20
 2.20.1
 
