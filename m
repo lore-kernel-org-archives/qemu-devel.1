@@ -2,64 +2,85 @@ Return-Path: <SRS0=oHhb=TY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 52DE7C282DE
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 01:02:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DA238C282DD
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 02:49:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1F01C20862
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 01:02:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A44D22177E
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 02:49:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="aij2Nu4P"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1F01C20862
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="r+oazMr8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A44D22177E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:45585 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:46468 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hTybM-0007Ff-9U
-	for qemu-devel@archiver.kernel.org; Thu, 23 May 2019 21:02:28 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:50326)
+	id 1hU0GV-0008K7-OL
+	for qemu-devel@archiver.kernel.org; Thu, 23 May 2019 22:49:03 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:33959)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1hTyZy-0006F6-Oy
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 21:01:04 -0400
+	(envelope-from <programmingkidx@gmail.com>) id 1hU0Fg-0007z0-TN
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 22:48:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1hTyZx-0000dB-Ci
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 21:01:02 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:36747 helo=ozlabs.org)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
-	id 1hTyZn-0000EC-Qp; Thu, 23 May 2019 21:00:56 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
-	id 4597Mc5xNPz9sMM; Fri, 24 May 2019 11:00:28 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-	d=gibson.dropbear.id.au; s=201602; t=1558659628;
-	bh=MGKo8nRnCCiM4Jy+1IykQcQPHHpXy3uOGSDISVggz9M=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=aij2Nu4Pq0qtXbpvFg5u4ufdyTBbK4JJ29ZsplTFONBLO9SuJ5o9Zp0Gp2DdUaY7X
-	9cmCJvPMF6icUjOCN0WPpKQ6VIWw6qB1ePG5phy0ghgy4wdE9gBhkY2d1u2x8csDrW
-	ndpZJWb2b1I2PADWLzv7RNBbtYrFv0BHjM0RiaFI=
-Date: Fri, 24 May 2019 10:44:28 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
-Message-ID: <20190524004428.GA1967@umbus.fritz.box>
-References: <20190523124320.28726-1-philmd@redhat.com>
-	<20190523124320.28726-6-philmd@redhat.com>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="UugvWAfsgieZRqgk"
-Content-Disposition: inline
-In-Reply-To: <20190523124320.28726-6-philmd@redhat.com>
-User-Agent: Mutt/1.11.4 (2019-03-13)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 203.11.71.1
-Subject: Re: [Qemu-devel] [PULL 05/15] hw/ppc: Implement
- fw_cfg_arch_key_name()
+	(envelope-from <programmingkidx@gmail.com>) id 1hU0Fg-000234-1E
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 22:48:12 -0400
+Received: from mail-it1-x130.google.com ([2607:f8b0:4864:20::130]:33110)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
+	id 1hU0Ff-000222-RP; Thu, 23 May 2019 22:48:11 -0400
+Received: by mail-it1-x130.google.com with SMTP id j17so9826609itk.0;
+	Thu, 23 May 2019 19:48:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+	h=from:content-transfer-encoding:mime-version:subject:message-id:date
+	:cc:to; bh=wzPyWuEnJ4AV3dOBrZfUV4FnzdFXO8bkjuYbmFh8R2k=;
+	b=r+oazMr8n4PItDOkmrH0Ftcnk5ZEIC1tYtUHRxaa14JaPgqGUdxJnhxd13eNGxgHy3
+	2BH1PMrmNq9CanP/uHYdFH04kDZ/CimUfE1z8x3IMzn02hUIzUX8y274w1XyuCXFI49g
+	26cI7QJRqO8SzN3x17qBxx+TNNub0OcRyAY4V7rmz0XZiwrudr5CYydwqrbs9wcwnt1v
+	2u5+ZGCmpEbooxq5vjNabCGldvVMk0IvhlEvk1fC7wGJa//1A8oBicWizql8ZAu/yI8g
+	GxZKjBAULARJsVlBSD/LAHVButsl6UDlQmzRBOTSuroAgQlAq1fSMCzwOrms3vWFS+SJ
+	pgRw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:from:content-transfer-encoding:mime-version
+	:subject:message-id:date:cc:to;
+	bh=wzPyWuEnJ4AV3dOBrZfUV4FnzdFXO8bkjuYbmFh8R2k=;
+	b=obv/E4DbAESi+GCnH3K5RohrFXn2uU0JWnaFD+4Q2IA9vuORd7uJYTTuq4vll4BeBZ
+	eFOgJCdulXHr3k5qEW46evh2NQpKmEivFlbgEfZ6HMZ86tVF2KS4ZnEbLdLKar0CRlR3
+	8x00yAhbmHJNdxE3QGL0QREIRT9C4YgY/hLgjQL7tC27sX9wLehLpKANbL7TSTy4G7OC
+	cctlv2nB3dPC2uCU40SrKfdUGEVwG8/PwS6gZ6pVbzXr0fpG5COqDbOmBzE+vhrlhIud
+	/DT9AuuGCzX9CzKwIl0c2bd1ZCHItwXecOarm56nN2WnsvIkg0lPom52chzH4t0PA5SY
+	Gy7w==
+X-Gm-Message-State: APjAAAVbtov+InV2LqHPpVyHgAYWt28sXZ3zPcI+43tVe8sKa4W3lWAO
+	as7eAoI8Gd6BgXGyWKtwQjNJnKvy
+X-Google-Smtp-Source: APXvYqyleb/4isuhaVRLbymGogxkc6dFY5b3OIhaFECPFjUO6HliXHPUl6Zzlo6ktksL3zcNyN1fnQ==
+X-Received: by 2002:a24:f9c3:: with SMTP id
+	l186mr16613308ith.176.1558666090342; 
+	Thu, 23 May 2019 19:48:10 -0700 (PDT)
+Received: from [192.168.0.6] (d14-69-20-184.try.wideopenwest.com.
+	[69.14.184.20])
+	by smtp.gmail.com with ESMTPSA id t63sm646122ita.42.2019.05.23.19.48.09
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Thu, 23 May 2019 19:48:09 -0700 (PDT)
+From: Programmingkid <programmingkidx@gmail.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+Message-Id: <B954C7EE-DC27-433A-A271-D7ADF380550A@gmail.com>
+Date: Thu, 23 May 2019 22:48:07 -0400
+To: qemu Developers <qemu-devel@nongnu.org>,
+ qemu-ppc <qemu-ppc@nongnu.org>
+X-Mailer: Apple Mail (2.3273)
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::130
+Subject: [Qemu-devel] Patch causing qemu-system-ppc to crash
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -71,133 +92,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>,
-	Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
-	qemu-devel@nongnu.org, qemu-ppc@nongnu.org,
-	Gerd Hoffmann <kraxel@redhat.com>, Laszlo Ersek <lersek@redhat.com>,
-	Artyom Tarasenko <atar4qemu@gmail.com>
+Cc: David Gibson <david@gibson.dropbear.id.au>,
+	Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Recently I have noticed that qemu-system-ppc is crashing while booting =
+up my Mac OS X VM. A bit of git bisecting shows this is the patch that =
+causes this issue:
 
---UugvWAfsgieZRqgk
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+commit 1e262b49b5331441f697461e4305fe06719758a7
+Author: Richard Henderson <richard.henderson@linaro.org>
+Date:   Mon Mar 18 12:02:54 2019 -0700
 
-On Thu, May 23, 2019 at 02:43:10PM +0200, Philippe Mathieu-Daud=E9 wrote:
-> Implement fw_cfg_arch_key_name(), which returns the name of a
-> ppc-specific key.
->=20
-> The fw_cfg device is used by the machine using OpenBIOS:
-> - 40p
-> - mac99 (oldworld)
-> - g3beige (newworld)
->=20
-> Reviewed-by: Laszlo Ersek <lersek@redhat.com>
-> Message-Id: <20190422195020.1494-6-philmd@redhat.com>
-> Signed-off-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
-
-Acked-by: David Gibson <david@gibson.dropbear.id.au>
-
-> ---
->  hw/ppc/Makefile.objs |  2 +-
->  hw/ppc/fw_cfg.c      | 45 ++++++++++++++++++++++++++++++++++++++++++++
->  2 files changed, 46 insertions(+), 1 deletion(-)
->  create mode 100644 hw/ppc/fw_cfg.c
->=20
-> diff --git a/hw/ppc/Makefile.objs b/hw/ppc/Makefile.objs
-> index 636e717f20..9da93af905 100644
-> --- a/hw/ppc/Makefile.objs
-> +++ b/hw/ppc/Makefile.objs
-> @@ -1,5 +1,5 @@
->  # shared objects
-> -obj-y +=3D ppc.o ppc_booke.o fdt.o
-> +obj-y +=3D ppc.o ppc_booke.o fdt.o fw_cfg.o
->  # IBM pSeries (sPAPR)
->  obj-$(CONFIG_PSERIES) +=3D spapr.o spapr_caps.o spapr_vio.o spapr_events=
-=2Eo
->  obj-$(CONFIG_PSERIES) +=3D spapr_hcall.o spapr_iommu.o spapr_rtas.o
-> diff --git a/hw/ppc/fw_cfg.c b/hw/ppc/fw_cfg.c
-> new file mode 100644
-> index 0000000000..a88b5c4bde
-> --- /dev/null
-> +++ b/hw/ppc/fw_cfg.c
-> @@ -0,0 +1,45 @@
-> +/*
-> + * fw_cfg helpers (PPC specific)
-> + *
-> + * Copyright (c) 2019 Red Hat, Inc.
-> + *
-> + * Author:
-> + *   Philippe Mathieu-Daud=E9 <philmd@redhat.com>
-> + *
-> + * SPDX-License-Identifier: GPL-2.0-or-later
-> + *
-> + * This work is licensed under the terms of the GNU GPL, version 2 or la=
-ter.
-> + * See the COPYING file in the top-level directory.
-> + */
-> +
-> +#include "qemu/osdep.h"
-> +#include "hw/ppc/ppc.h"
-> +#include "hw/nvram/fw_cfg.h"
-> +
-> +const char *fw_cfg_arch_key_name(uint16_t key)
-> +{
-> +    static const struct {
-> +        uint16_t key;
-> +        const char *name;
-> +    } fw_cfg_arch_wellknown_keys[] =3D {
-> +        {FW_CFG_PPC_WIDTH, "width"},
-> +        {FW_CFG_PPC_HEIGHT, "height"},
-> +        {FW_CFG_PPC_DEPTH, "depth"},
-> +        {FW_CFG_PPC_TBFREQ, "tbfreq"},
-> +        {FW_CFG_PPC_CLOCKFREQ, "clockfreq"},
-> +        {FW_CFG_PPC_IS_KVM, "is_kvm"},
-> +        {FW_CFG_PPC_KVM_HC, "kvm_hc"},
-> +        {FW_CFG_PPC_KVM_PID, "pid"},
-> +        {FW_CFG_PPC_NVRAM_ADDR, "nvram_addr"},
-> +        {FW_CFG_PPC_BUSFREQ, "busfreq"},
-> +        {FW_CFG_PPC_NVRAM_FLAT, "nvram_flat"},
-> +        {FW_CFG_PPC_VIACONFIG, "viaconfig"},
-> +    };
-> +
-> +    for (size_t i =3D 0; i < ARRAY_SIZE(fw_cfg_arch_wellknown_keys); i++=
-) {
-> +        if (fw_cfg_arch_wellknown_keys[i].key =3D=3D key) {
-> +            return fw_cfg_arch_wellknown_keys[i].name;
-> +        }
-> +    }
-> +    return NULL;
-> +}
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---UugvWAfsgieZRqgk
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlznPmoACgkQbDjKyiDZ
-s5IR3w/+MwwVLLaSuUmDIefC2jgM/uvfL8XGZWGQ7qh5pRl6c7CaAmd5f58hFpt/
-A+gCh0D3j8qTk6iAZdX37lTqsLjAvOlu9nDBykIVcJ4OLvxrzwS8s0MphvZdu2mn
-HXPvcFAJofq9WdgE4FmybuWSCDpT4vgdjETWBq4zZZPTGqgBE089lsMIxRV6sQk7
-TW8WLOpm+Y6MRNwPlDXDGub6GNIbKLoQ7SqFkOv+NJP6tctnp1/cyim4s3WfBn7v
-ehwHmzOWpPbY2NG30hBsUjdogEueqmWJrD0qpUqhoRPvAePyBM+Kki0RKG9KinLY
-BHFx5XcVQZpkeMqQYKRzvxndozlzYDFiUEn7valoIAF3QL4LBaIzEHy4jO3S5iE/
-2y4M8oTj6jGG2yosq1+f7us3f9t4/jj7Tuiyl5EwGhfabMa7EXxnWtk9hhLnzD5X
-YnO4LxPXpedjAZZ+5038lCg2WeXxyyQG04k+g2CDfGfOezgOtnpPQ5ksH2/UJ7T6
-qJ0G1+EW1hRjctcLOvi4pUabrmA/eFnTOSdPw58TKHfEpQ4oZHACKB6m90KB5y+n
-gMRC+nfmpUr27eGLamub4Ge+5XddeEbD0BF8oG/agRVr9hf8TSspxf7g0ive27yl
-Vihe8uAWo8/61JNFKwvOq7TT14k/9KPg+xDk5/qkGiiXRQNR6UM=
-=xo/V
------END PGP SIGNATURE-----
-
---UugvWAfsgieZRqgk--
+    tcg/i386: Implement tcg_out_dupm_vec
+   =20
+    At the same time, improve tcg_out_dupi_vec wrt broadcast
+    from the constant pool.
+   =20
+    Signed-off-by: Richard Henderson <richard.henderson@linaro.org=
 
