@@ -2,84 +2,91 @@ Return-Path: <SRS0=oHhb=TY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D2BEC072B5
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 14:12:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 29A8DC072B5
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 14:12:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2B5F6206A3
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 14:12:35 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Evo77aYy"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B5F6206A3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id E43D5206A3
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 14:12:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E43D5206A3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:55253 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:55257 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hUAvy-0001o2-BJ
-	for qemu-devel@archiver.kernel.org; Fri, 24 May 2019 10:12:34 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:40377)
+	id 1hUAwF-00021E-2s
+	for qemu-devel@archiver.kernel.org; Fri, 24 May 2019 10:12:51 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:40414)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mehta.aaru20@gmail.com>) id 1hUAoD-0003K3-Cx
-	for qemu-devel@nongnu.org; Fri, 24 May 2019 10:04:34 -0400
+	(envelope-from <mreitz@redhat.com>) id 1hUAoc-0003KZ-5T
+	for qemu-devel@nongnu.org; Fri, 24 May 2019 10:04:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mehta.aaru20@gmail.com>) id 1hUAo0-0002cW-4d
-	for qemu-devel@nongnu.org; Fri, 24 May 2019 10:04:21 -0400
-Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:37443)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mehta.aaru20@gmail.com>)
-	id 1hUAnz-0002c2-UU; Fri, 24 May 2019 10:04:20 -0400
-Received: by mail-pf1-x444.google.com with SMTP id a23so5409939pff.4;
-	Fri, 24 May 2019 07:04:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=from:to:cc:subject:date:message-id:in-reply-to:references;
-	bh=sX7eykaQ8cZK+ytZ0RoclnVS3C7FzTjrBrMveeNkyW0=;
-	b=Evo77aYyLdCC6UeBeVsvqOqPSwLYkA7QMFLp3xjnKJei1ewqe8E1faz511cNBpd2t4
-	bNetoCn7+HmrJflvUtarj8sNiY5ZpAzC0T4JCBdEDaU4Dp2RwjPMyY8NKHnf0MsLrUR5
-	ejiL813hYUVBkGfWc4F/5g4Dl4OU9Yzy9Q29kCbIPJLSzgKxToZQYCWDTFhVxiuiFX7P
-	GpPVGxojzRrk1dvXXyAFHp2QAS4gaLIpkHiSlQMYTHFN/GTugLUGEYwX7dK1H42+HGxl
-	AyJ10GlZj+N9ytF2z+ngMwUDF1WAHh06Pwm59KfEr3OQIwsTzloHtmh05hT2DODLSUwE
-	9S/Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-	:references;
-	bh=sX7eykaQ8cZK+ytZ0RoclnVS3C7FzTjrBrMveeNkyW0=;
-	b=FiAl5+1qsajmcMH2u5V1FLrfE9Qvg8J4xUXoppla/MT9Q4RIM2ZjbfeJAPJ3S+Mw5F
-	mcsD5IUCmU63/71l8u9HWKmCiNbLyhRBS2zcpfqUVL1jyBh1kDb5bCyzIEtb4HItCGtj
-	hkQRMuL7aX9JmXuTPR1MKPtTYfeTyTFWBZlBrrmtSHf0TwRwuM7mg0pvCy+mg7U1OJes
-	ViLYXQexqxjf6NX6M4x+WZeToLmu92CkaH8AN556DFNj6/rQwVJrBDv1TjLxZS3rx7hM
-	HtPCtR9CMv5lm3U5i/4/Y8lU74hobz+OZeKu+LvaADt8PJ9U4Sm2qWyPifa4O6udG94V
-	HakQ==
-X-Gm-Message-State: APjAAAUdfdRgmKC0NvkHuAcZ/thoWoS39Rml4m60eI5WnkAvhkkS9zbG
-	LeIr56F4mNC/BQWIAyOy6WhY2WnQ0Mxdgw==
-X-Google-Smtp-Source: APXvYqwLhpJDTAMkQDahfqbOoPmf7EOgUKZcljgITJVmaQJmhrI5gTmiuNfr+kuGyHE/2e4mSBwhYg==
-X-Received: by 2002:a63:1854:: with SMTP id 20mr103061860pgy.366.1558706658608;
-	Fri, 24 May 2019 07:04:18 -0700 (PDT)
-Received: from localhost.localdomain ([120.57.120.132])
-	by smtp.gmail.com with ESMTPSA id
-	u11sm2556766pfh.130.2019.05.24.07.04.14
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Fri, 24 May 2019 07:04:18 -0700 (PDT)
-From: Aarushi Mehta <mehta.aaru20@gmail.com>
-To: qemu-devel@nongnu.org
-Date: Fri, 24 May 2019 19:33:33 +0530
-Message-Id: <20190524140337.13415-6-mehta.aaru20@gmail.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20190524140337.13415-1-mehta.aaru20@gmail.com>
-References: <20190524140337.13415-1-mehta.aaru20@gmail.com>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::444
-Subject: [Qemu-devel] [RFC PATCH v2 5/9] util/async: add aio interfaces for
- io_uring
+	(envelope-from <mreitz@redhat.com>) id 1hUAgS-0002qk-Ly
+	for qemu-devel@nongnu.org; Fri, 24 May 2019 09:56:33 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39896)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mreitz@redhat.com>)
+	id 1hUAgR-0002oj-4y; Fri, 24 May 2019 09:56:31 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 84B0A36883;
+	Fri, 24 May 2019 13:56:27 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-204-150.brq.redhat.com
+	[10.40.204.150])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 0749F5B689;
+	Fri, 24 May 2019 13:56:22 +0000 (UTC)
+To: Anton Nefedov <anton.nefedov@virtuozzo.com>, qemu-block@nongnu.org
+References: <20190516142749.81019-1-anton.nefedov@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+	mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+	/PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+	U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+	mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+	awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+	AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+	CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+	B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+	2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+	AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+	8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+	4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+	BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+	xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+	W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+	DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+	64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+	ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+	sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+	alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+	/ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+	bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+	R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <f2d129f6-b03f-aaa8-3e7d-fff48ea52233@redhat.com>
+Date: Fri, 24 May 2019 15:56:21 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
+MIME-Version: 1.0
+In-Reply-To: <20190516142749.81019-1-anton.nefedov@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="Z6BS0W6hzbhXZNtvwVVTGneEoO4FxYQnO"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.30]);
+	Fri, 24 May 2019 13:56:30 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+X-Content-Filtered-By: Mailman/MimeDel 2.1.21
+Subject: Re: [Qemu-devel] [PATCH v14 0/1] qcow2: cluster space preallocation
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -91,79 +98,161 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
-	saket.sinha89@gmail.com, Stefan Hajnoczi <stefanha@redhat.com>,
-	Julia Suvorova <jusual@mail.ru>, Aarushi Mehta <mehta.aaru20@gmail.com>
+Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, berto@igalia.com,
+	den@virtuozzo.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Aarushi Mehta <mehta.aaru20@gmail.com>
----
- util/async.c | 36 ++++++++++++++++++++++++++++++++++++
- 1 file changed, 36 insertions(+)
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--Z6BS0W6hzbhXZNtvwVVTGneEoO4FxYQnO
+From: Max Reitz <mreitz@redhat.com>
+To: Anton Nefedov <anton.nefedov@virtuozzo.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, eblake@redhat.com,
+ den@virtuozzo.com, berto@igalia.com, vsementsov@virtuozzo.com
+Message-ID: <f2d129f6-b03f-aaa8-3e7d-fff48ea52233@redhat.com>
+Subject: Re: [PATCH v14 0/1] qcow2: cluster space preallocation
+References: <20190516142749.81019-1-anton.nefedov@virtuozzo.com>
+In-Reply-To: <20190516142749.81019-1-anton.nefedov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/util/async.c b/util/async.c
-index c10642a385..2709f0edc3 100644
---- a/util/async.c
-+++ b/util/async.c
-@@ -277,6 +277,14 @@ aio_ctx_finalize(GSource     *source)
-     }
- #endif
+On 16.05.19 16:27, Anton Nefedov wrote:
+> ..apparently v13 ended up in a weird base64 that would not easily git-a=
+m.
+> Resending.
+>=20
+> ----
+>=20
+> hi,
+>=20
+> this used to be a large 10-patches series, but now thanks to Kevin's
+> BDRV_REQ_NO_FALLBACK series
+> (http://lists.nongnu.org/archive/html/qemu-devel/2019-03/msg06389.html)=
 
-+#ifdef CONFIG_LINUX_IO_URING
-+    if (ctx->linux_io_uring) {
-+        luring_detach_aio_context(ctx->linux_io_uring, ctx);
-+        luring_cleanup(ctx->linux_io_uring);
-+        ctx->linux_io_uring = NULL;
-+    }
-+#endif
-+
-     assert(QSLIST_EMPTY(&ctx->scheduled_coroutines));
-     qemu_bh_delete(ctx->co_schedule_bh);
+> the core block layer functionality is already in place: the existing fl=
+ag
+> can be reused.
+>=20
+> A few accompanying patches were also dropped from the series as those c=
+an
+> be processed separately.
+>=20
+> So,
+>=20
+> new in v13:
+>    - patch 1 (was patch 9) rebased to use s->data_file pointer
+>    - comments fixed/added
+>    - other patches dropped ;)
+>=20
+> v12: http://lists.nongnu.org/archive/html/qemu-devel/2019-01/msg02761.h=
+tml
+> v11: http://lists.nongnu.org/archive/html/qemu-devel/2018-12/msg04342.h=
+tml
+> v10: http://lists.nongnu.org/archive/html/qemu-devel/2018-12/msg00121.h=
+tml
+>=20
+> ----
+>=20
+> This pull request is to start to improve a few performance points of
+> qcow2 format:
+>=20
+>   1. non cluster-aligned write requests (to unallocated clusters) expli=
+citly
+>      pad data with zeroes if there is no backing data.
+>      Resulting increase in ops number and potential cluster fragmentati=
+on
+>      (on the host file) is already solved by:
+>        ee22a9d qcow2: Merge the writing of the COW regions with the gue=
+st data
+>      However, in case of zero COW regions, that can be avoided at all
+>      but the whole clusters are preallocated and zeroed in a single
+>      efficient write_zeroes() operation
+>=20
+>   2. moreover, efficient write_zeroes() operation can be used to preall=
+ocate
+>      space megabytes (*configurable number) ahead which gives noticeabl=
+e
+>      improvement on some storage types (e.g. distributed storage)
+>      where the space allocation operation might be expensive)
+>      (Not included in this patchset since v6).
+>=20
+>   3. this will also allow to enable simultaneous writes to the same una=
+llocated
+>      cluster after the space has been allocated & zeroed but before
+>      the first data is written and the cluster is linked to L2.
+>      (Not included in this patchset).
+>=20
+> Efficient write_zeroes usually implies that the blocks are not actually=
 
-@@ -341,6 +349,29 @@ LinuxAioState *aio_get_linux_aio(AioContext *ctx)
- }
- #endif
+> written to but only reserved and marked as zeroed by the storage.
+> Existing bdrv_write_zeroes() falls back to writing zero buffers if
+> write_zeroes is not supported by the driver, so BDRV_REQ_NO_FALLBACK is=
+ used.
+>=20
+> simple perf test:
+>=20
+>   qemu-img create -f qcow2 test.img 4G && \
+>   qemu-img bench -c $((1024*1024)) -f qcow2 -n -s 4k -t none -w test.im=
+g
+>=20
+> test results (seconds):
+>=20
+>     +-----------+-------+------+-------+------+------+
+>     |   file    |    before    |     after    | gain |
+>     +-----------+-------+------+-------+------+------+
+>     |    ssd    |      61.153  |      36.313  |  41% |
+>     |    hdd    |     112.676  |     122.056  |  -8% |
+>     +-----------+--------------+--------------+------+
 
-+#ifdef CONFIG_LINUX_IO_URING
-+LuringState *aio_setup_linux_io_uring(AioContext *ctx, Error **errp)
-+{
-+    if (ctx->linux_io_uring) {
-+        return ctx->linux_io_uring;
-+    }
-+
-+    ctx->linux_io_uring = luring_init(errp);
-+    if (!ctx->linux_io_uring) {
-+        return NULL;
-+    }
-+
-+    luring_attach_aio_context(ctx->linux_io_uring, ctx);
-+    return ctx->linux_io_uring;
-+}
-+
-+LuringState *aio_get_linux_io_uring(AioContext *ctx)
-+{
-+    assert(ctx->linux_io_uring);
-+    return ctx->linux_io_uring;
-+}
-+#endif
-+
- void aio_notify(AioContext *ctx)
- {
-     /* Write e.g. bh->scheduled before reading ctx->notify_me.  Pairs
-@@ -432,6 +463,11 @@ AioContext *aio_context_new(Error **errp)
- #ifdef CONFIG_LINUX_AIO
-     ctx->linux_aio = NULL;
- #endif
-+
-+#ifdef CONFIG_LINUX_IO_URING
-+    ctx->linux_io_uring = NULL;
-+#endif
-+
-     ctx->thread_pool = NULL;
-     qemu_rec_mutex_init(&ctx->lock);
-     timerlistgroup_init(&ctx->tlg, aio_timerlist_notify, ctx);
---
-2.17.1
+I=E2=80=99ve done a few more tests, and I=E2=80=99ve seen more slowdown o=
+n an HDD.
+(Like 30 % when doing 64 kB requests that are not aligned to clusters.)
+ On the other hand, the SSD gain is generally in the same ballpark (38 %
+when issuing the same kind of requests.)
+
+On the basis that:
+
+(1) I believe that SSD performance is more important than HDD performance=
+,
+
+(2) I can=E2=80=99t think of a simple way to automatically decide whether=
+ the
+new or the old codepath is more efficient[1], and
+
+(3) users probably would not use a switch if we introduced one.
+
+I have applied this patch to my block branch:
+
+https://git.xanclic.moe/XanClic/qemu/commits/branch/block
+
+Thanks!
+
+
+[1] Hm.  We can probably investigate whether the file is stored on a
+rotational medium or not.  Is there a fundamental reason why this patch
+seems to degrade performance on an HDD but improves it on an SSD?  If
+so, we can probably make a choice based on that.
+
+Max
+
+
+--Z6BS0W6hzbhXZNtvwVVTGneEoO4FxYQnO
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlzn+AUACgkQ9AfbAGHV
+z0C67QgAlrlN+mj82NuGoUntrryHq3vx09zByEpbaSNG3xrOdhGngC8YHKnee4Ij
+qpnyhws+6JKApREtvdbsxqDjZOUk6MRbw32YyisJ4mvg1vjJn0jy5VfAA1UCtpsV
+zmzjJYHJaA//Weor69zawHuW5JVjyT2U/JvZ0YaL3Le4D+W1bF7VFjLrvvKlIijd
+wjZ515O/2FXvFZ03U/y8YXm49gGjpTE6XjfO2ap1J/8gBD77ElczVB6IVG9apmXJ
+d8A698xUHGT/WpLWnUT/f9BJrNSmhmm72UYDASti/jcQho3oPxkrcyLhnnkkE3cR
+UyznS/UHY7Wl44aMOACRu99u3L8RgQ==
+=mJSW
+-----END PGP SIGNATURE-----
+
+--Z6BS0W6hzbhXZNtvwVVTGneEoO4FxYQnO--
 
