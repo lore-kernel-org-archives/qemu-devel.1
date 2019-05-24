@@ -2,60 +2,113 @@ Return-Path: <SRS0=oHhb=TY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C7FE9C072B5
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 18:39:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3DE6DC072B5
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 18:41:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9E326217D7
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 18:39:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9E326217D7
+	by mail.kernel.org (Postfix) with ESMTPS id 109AB217D7
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 18:41:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 109AB217D7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:58680 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:58716 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hUF6g-00033c-W0
-	for qemu-devel@archiver.kernel.org; Fri, 24 May 2019 14:39:55 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:38011)
+	id 1hUF7n-0003ja-Bn
+	for qemu-devel@archiver.kernel.org; Fri, 24 May 2019 14:41:03 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:38027)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1hUF3z-0001Hg-Pp
-	for qemu-devel@nongnu.org; Fri, 24 May 2019 14:37:08 -0400
+	(envelope-from <david@redhat.com>) id 1hUF47-0001OA-LP
+	for qemu-devel@nongnu.org; Fri, 24 May 2019 14:37:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1hUF3v-0008Uu-Bq
-	for qemu-devel@nongnu.org; Fri, 24 May 2019 14:37:05 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57030)
+	(envelope-from <david@redhat.com>) id 1hUF3z-0008WQ-DG
+	for qemu-devel@nongnu.org; Fri, 24 May 2019 14:37:10 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36364)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1hUF3u-0008Tz-Ja
-	for qemu-devel@nongnu.org; Fri, 24 May 2019 14:37:03 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
+	(Exim 4.71) (envelope-from <david@redhat.com>)
+	id 1hUF3v-0008UW-JR; Fri, 24 May 2019 14:37:04 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+	[10.5.11.23])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id A582F3092647;
-	Fri, 24 May 2019 18:36:57 +0000 (UTC)
-Received: from localhost (ovpn-117-142.ams2.redhat.com [10.36.117.142])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 7EAD984F7;
-	Fri, 24 May 2019 18:36:52 +0000 (UTC)
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: <qemu-devel@nongnu.org>
-Date: Fri, 24 May 2019 19:36:37 +0100
-Message-Id: <20190524183638.20745-3-stefanha@redhat.com>
-In-Reply-To: <20190524183638.20745-1-stefanha@redhat.com>
-References: <20190524183638.20745-1-stefanha@redhat.com>
+	by mx1.redhat.com (Postfix) with ESMTPS id 960D5C05E762;
+	Fri, 24 May 2019 18:37:02 +0000 (UTC)
+Received: from [10.36.116.21] (ovpn-116-21.ams2.redhat.com [10.36.116.21])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id B0D405B2F5;
+	Fri, 24 May 2019 18:36:58 +0000 (UTC)
+To: Christian Borntraeger <borntraeger@de.ibm.com>,
+	=?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+	Markus Armbruster <armbru@redhat.com>
+References: <51df31ee-54a1-d7be-bef4-71ae003b8811@redhat.com>
+	<3fab9e76-53ad-2de7-45df-eb69c8604709@redhat.com>
+	<016edc53-278e-cc58-0061-d2c5de80afd2@de.ibm.com>
+From: David Hildenbrand <david@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+	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
+	SE+xAvmumFBY
+Organization: Red Hat GmbH
+Message-ID: <1ddf0d83-ce0c-f1c9-065d-ff88ddb9293b@redhat.com>
+Date: Fri, 24 May 2019 20:36:57 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+In-Reply-To: <016edc53-278e-cc58-0061-d2c5de80afd2@de.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.43]);
-	Fri, 24 May 2019 18:36:57 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.31]);
+	Fri, 24 May 2019 18:37:02 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [RFC v3 2/3] scsi: add scsi_bus_dma_restart()
+Subject: Re: [Qemu-devel] hw/s390x/ipl: Dubious use of qdev_reset_all_fn
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -67,123 +120,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
-	Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>
+Cc: Halil Pasic <pasic@linux.ibm.com>, Thomas Huth <thuth@redhat.com>,
+	Cornelia Huck <cohuck@redhat.com>,
+	QEMU Developers <qemu-devel@nongnu.org>, qemu-s390x@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-By default scsi-bus.c registers vm change state handlers for SCSIDevice
-instances and restarts DMA when guest execution is resumed.
+On 24.05.19 20:28, Christian Borntraeger wrote:
+>=20
+>=20
+> On 24.05.19 20:04, David Hildenbrand wrote:
+>> On 24.05.19 19:54, Philippe Mathieu-Daud=C3=A9 wrote:
+>>> Hi Christian,
+>>>
+>>> I'm having hard time to understand why the S390_IPL object calls
+>>> qemu_register_reset(qdev_reset_all_fn) in its realize() method, while
+>>> being QOM'ified (it has a reset method).
+>>>
+>>> It doesn't seem to have a qdev children added explicitly to it.
+>>> I see it is used as a singleton, what else am I missing?
+>>>
+>>> Thanks,
+>>>
+>>> Phil.
+>>>
+>>
+>> Looks like I added it back then (~4 years ago) when converting it into=
+ a
+>> TYPE_DEVICE.
+>>
+>> I could imagine that - back then - this was needed because only
+>> TYPE_SYS_BUS_DEVICE would recursively get reset.
+>=20
+> Yes, back then singleton devices were not recursively resetted. Has tha=
+t changed?
 
-Unfortunately virtio-scsi with iothreads has a special ordering
-requirement that the core virtio code's vm change state handler runs
-before scsi-bus.c's vm change state handler.
+Hacking that call out, I don't see it getting called anymore. So it is
+still required. The question is if it can be reworked.
 
-This patch allows SCSI busses to disable the default vm change state
-handler for DMA restart.  The new scsi_bus_dma_restart() API allows them
-to manually restart DMA at a time of their choice.
-
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
----
- include/hw/scsi/scsi.h |  5 +++++
- hw/scsi/scsi-bus.c     | 37 ++++++++++++++++++++++++++++++-------
- 2 files changed, 35 insertions(+), 7 deletions(-)
-
-diff --git a/include/hw/scsi/scsi.h b/include/hw/scsi/scsi.h
-index acef25faa4..e9cc563daa 100644
---- a/include/hw/scsi/scsi.h
-+++ b/include/hw/scsi/scsi.h
-@@ -120,6 +120,10 @@ struct SCSIReqOps {
- struct SCSIBusInfo {
-     int tcq;
-     int max_channel, max_target, max_lun;
-+
-+    /* Will the bus call scsi_bus_dma_restart() itself? */
-+    bool custom_dma_restart;
-+
-     int (*parse_cdb)(SCSIDevice *dev, SCSICommand *cmd, uint8_t *buf,
-                      void *hba_private);
-     void (*transfer_data)(SCSIRequest *req, uint32_t arg);
-@@ -160,6 +164,7 @@ SCSIDevice *scsi_bus_legacy_add_drive(SCSIBus *bus, B=
-lockBackend *blk,
-                                       const char *serial, Error **errp);
- void scsi_bus_legacy_handle_cmdline(SCSIBus *bus);
- void scsi_legacy_handle_cmdline(void);
-+void scsi_bus_dma_restart(SCSIBus *bus);
-=20
- SCSIRequest *scsi_req_alloc(const SCSIReqOps *reqops, SCSIDevice *d,
-                             uint32_t tag, uint32_t lun, void *hba_privat=
-e);
-diff --git a/hw/scsi/scsi-bus.c b/hw/scsi/scsi-bus.c
-index c480553083..d2c5a1652b 100644
---- a/hw/scsi/scsi-bus.c
-+++ b/hw/scsi/scsi-bus.c
-@@ -134,6 +134,27 @@ void scsi_req_retry(SCSIRequest *req)
-     req->retry =3D true;
- }
-=20
-+static void scsi_device_dma_restart(SCSIDevice *dev)
-+{
-+    if (!dev->bh) {
-+        AioContext *ctx =3D blk_get_aio_context(dev->conf.blk);
-+        dev->bh =3D aio_bh_new(ctx, scsi_dma_restart_bh, dev);
-+        qemu_bh_schedule(dev->bh);
-+    }
-+}
-+
-+void scsi_bus_dma_restart(SCSIBus *bus)
-+{
-+    BusChild *kid;
-+
-+    QTAILQ_FOREACH(kid, &bus->qbus.children, sibling) {
-+        DeviceState *qdev =3D kid->child;
-+        SCSIDevice *dev =3D SCSI_DEVICE(qdev);
-+
-+        scsi_device_dma_restart(dev);
-+    }
-+}
-+
- static void scsi_dma_restart_cb(void *opaque, int running, RunState stat=
-e)
- {
-     SCSIDevice *s =3D opaque;
-@@ -141,11 +162,8 @@ static void scsi_dma_restart_cb(void *opaque, int ru=
-nning, RunState state)
-     if (!running) {
-         return;
-     }
--    if (!s->bh) {
--        AioContext *ctx =3D blk_get_aio_context(s->conf.blk);
--        s->bh =3D aio_bh_new(ctx, scsi_dma_restart_bh, s);
--        qemu_bh_schedule(s->bh);
--    }
-+
-+    scsi_device_dma_restart(s);
- }
-=20
- static void scsi_qdev_realize(DeviceState *qdev, Error **errp)
-@@ -206,8 +224,13 @@ static void scsi_qdev_realize(DeviceState *qdev, Err=
-or **errp)
-         error_propagate(errp, local_err);
-         return;
-     }
--    dev->vmsentry =3D qemu_add_vm_change_state_handler(scsi_dma_restart_=
-cb,
--                                                     dev);
-+
-+    if (bus->info->custom_dma_restart) {
-+        dev->vmsentry =3D NULL;
-+    } else {
-+        dev->vmsentry =3D qemu_add_vm_change_state_handler(scsi_dma_rest=
-art_cb,
-+                                                         dev);
-+    }
- }
-=20
- static void scsi_qdev_unrealize(DeviceState *qdev, Error **errp)
 --=20
-2.21.0
 
+Thanks,
+
+David / dhildenb
 
