@@ -2,82 +2,82 @@ Return-Path: <SRS0=oHhb=TY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 646AFC072B5
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 13:14:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BAF04C072B5
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 13:15:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2D84220644
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 13:14:55 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BlIZ/axH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2D84220644
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 9391320644
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 13:15:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9391320644
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:54442 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:54461 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hUA2A-0008To-30
-	for qemu-devel@archiver.kernel.org; Fri, 24 May 2019 09:14:54 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:58529)
+	id 1hUA2w-0000io-Ql
+	for qemu-devel@archiver.kernel.org; Fri, 24 May 2019 09:15:42 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:58659)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liq3ea@gmail.com>) id 1hUA0g-0007aO-4B
-	for qemu-devel@nongnu.org; Fri, 24 May 2019 09:13:23 -0400
+	(envelope-from <philmd@redhat.com>) id 1hUA0w-0007lR-8L
+	for qemu-devel@nongnu.org; Fri, 24 May 2019 09:13:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liq3ea@gmail.com>) id 1hU9zX-0002Zd-KI
-	for qemu-devel@nongnu.org; Fri, 24 May 2019 09:12:12 -0400
-Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:41454)
+	(envelope-from <philmd@redhat.com>) id 1hUA0u-0003OZ-VC
+	for qemu-devel@nongnu.org; Fri, 24 May 2019 09:13:38 -0400
+Received: from mail-wm1-f67.google.com ([209.85.128.67]:53651)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <liq3ea@gmail.com>) id 1hU9zW-0002Vw-OH
-	for qemu-devel@nongnu.org; Fri, 24 May 2019 09:12:11 -0400
-Received: by mail-oi1-x241.google.com with SMTP id y10so6975006oia.8
-	for <qemu-devel@nongnu.org>; Fri, 24 May 2019 06:12:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-	:cc; bh=cm6/LN3d3ZQ2+SycKgkiEPWzS+SUf9/nU1vzxFor2i4=;
-	b=BlIZ/axHDIzNjSSV63Tx3iNy+2eb7xbkJ1NSjWYQB53mF2ygAjTxDNqP06dwinS5Jc
-	mR5SfpFC0NsGv6c46FJzsORStSRiI4PbnrejG/Qc4RYpIC1lSTo4z+vco3kP1z6z2DWV
-	sp4BPbG+6PhltZQluoUYi5RvOf+02Blt7URKUAznGh9tq87aygTwp6uuBKsCbnoMBxDR
-	hdoIt+A0wPGAup4+QIedanv0O1PBRTTX02xaJQMwN3MmMi8V1PBaTfmS+bu336ETZBUh
-	KtIhF+GS/jVkziafq/YgOqnvVAj0v7i6/LtXwYGRsBxi0J+0CSHmkTseOU7ljxzMPSEl
-	c5pQ==
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hUA0u-0003Lu-Oz
+	for qemu-devel@nongnu.org; Fri, 24 May 2019 09:13:36 -0400
+Received: by mail-wm1-f67.google.com with SMTP id 198so9352328wme.3
+	for <qemu-devel@nongnu.org>; Fri, 24 May 2019 06:13:32 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-	:message-id:subject:to:cc;
-	bh=cm6/LN3d3ZQ2+SycKgkiEPWzS+SUf9/nU1vzxFor2i4=;
-	b=Rl9KooA5+sfTMknvMsRILSb4zbpL4+1PxkHwH8UA3Sf6duGEByRbG+49zkbpOz3wFX
-	1A54odgEUindJA2ejYNtFnb2nwYdruj/n74GjJUZkGHNw0Ku/kdodcONoBc1DAI7ZM0p
-	sRpgG7sBmYy65ETavfNirJFcf6ORPw3dQ+Ihymoxvofk3C+UhL+ZuIUSDT4uATfK13UD
-	nzWmIUBT3L2Bee2ovvrqVdE2VWaJdlXY6HSW3hxTuoG72wQkQm5TlPsozSfBBvY+evKz
-	JfyzrltZyXFsmeztK4SZbHdC4ItNq77K0vsLLX7QBIrBGxeiSJD8L8hwbmZs6hVu9jdD
-	jIEA==
-X-Gm-Message-State: APjAAAXXn3RH7htG95PJ1asuaurgtPuMfICRnCjGJo1KRn2EfC99rQ+q
-	OEu7PY45JW0ma6BfxaDJ+lC0A2UxP5ijFQa0HGA=
-X-Google-Smtp-Source: APXvYqy1RMEBkmc0kJjgf812nrcu3dKF6oCAHz41DsfF7xFnf4IlNZITjGqTSFwc0GJx685NoIxZ+EkeUHuIYXIVhhU=
-X-Received: by 2002:aca:fc43:: with SMTP id a64mr931699oii.129.1558703527235; 
-	Fri, 24 May 2019 06:12:07 -0700 (PDT)
+	h=x-gm-message-state:subject:to:references:from:openpgp:message-id
+	:date:user-agent:mime-version:in-reply-to:content-language
+	:content-transfer-encoding;
+	bh=+b5UOSAlUR+hB3EqivhPNylQiolTiEORqjkuY+QlSLo=;
+	b=k430ay5dg4qX19l1Y89OAN7+saMxPfDNYDCID2f8N1t91nCptZXO7ILs29UNT20aQz
+	p7F0ckFjIl4ThoJzr7YBWrt1uVP8AdcZ14aWmpgzAH/b2GSQ36bU08uc6P4MKhgVtIin
+	er4Uy7z3r5vndW0AE6QcF7zXLpWkwNNyvksSk2MvKawicgOtvQUqpCyHQPruztYKizjE
+	KHXnFa8JRVwLTwtH0sAgZ4GkYTd0duvix7Fbs6PMsAU3qCMP7HzjROSQkSTzsNuWaBlo
+	tHhTM+q8KlZSsKrtnYRiOaVZuUyTQY+cqMd5u/RJw1k/aar0BBY91TzdOs+iARsfLB2y
+	zTGA==
+X-Gm-Message-State: APjAAAX+A+8VNtPENapncu4x6vtq0P8a0RfdNQBvrfCy16ClEEu5wxjF
+	i17lHV6pSWoanw7Zt7GeikoPdn1supQ=
+X-Google-Smtp-Source: APXvYqyz7Gi8wSNzRJ4b9YWEIpUxMu8SllqdA0LqNq058lPvRzq1mGmwbovRba14tXhAKAGhdzb5FA==
+X-Received: by 2002:a1c:35c9:: with SMTP id
+	c192mr15305708wma.147.1558703610997; 
+	Fri, 24 May 2019 06:13:30 -0700 (PDT)
+Received: from [192.168.1.38] (228.red-83-52-173.dynamicip.rima-tde.net.
+	[83.52.173.228]) by smtp.gmail.com with ESMTPSA id
+	z74sm14412362wmc.2.2019.05.24.06.13.30
+	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+	Fri, 24 May 2019 06:13:30 -0700 (PDT)
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
+	qemu-devel@nongnu.org
+References: <20190524124248.28394-1-peter.maydell@linaro.org>
+	<20190524124248.28394-2-peter.maydell@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+	url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <d5c49edf-f864-09ff-be9d-7072cfbb355b@redhat.com>
+Date: Fri, 24 May 2019 15:13:29 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-References: <20190524063553.5339-1-philmd@redhat.com>
-	<20190524063553.5339-7-philmd@redhat.com>
-In-Reply-To: <20190524063553.5339-7-philmd@redhat.com>
-From: Li Qiang <liq3ea@gmail.com>
-Date: Fri, 24 May 2019 21:11:30 +0800
-Message-ID: <CAKXe6S+PeYbOCcDzqpHxgvrqqfgH7GVnYtpJrcLYFJbxzN5aew@mail.gmail.com>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::241
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Content-Filtered-By: Mailman/MimeDel 2.1.21
-Subject: Re: [Qemu-devel] [PATCH 06/20] hw/i386/pc: Use
- e820_get_num_entries() to access e820_entries
+In-Reply-To: <20190524124248.28394-2-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+	[fuzzy]
+X-Received-From: 209.85.128.67
+Subject: Re: [Qemu-devel] [PATCH v2 1/2] hw/intc/arm_gicv3: Fix decoding of
+ ID register range
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -89,54 +89,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Yang Zhong <yang.zhong@intel.com>, Eduardo Habkost <ehabkost@redhat.com>,
-	Rob Bradford <robert.bradford@intel.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Marcelo Tosatti <mtosatti@redhat.com>,
-	Qemu Developers <qemu-devel@nongnu.org>,
-	Samuel Ortiz <sameo@linux.intel.com>, Paolo Bonzini <pbonzini@redhat.com>,
-	Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> =E4=BA=8E2019=E5=B9=B45=E6=
-=9C=8824=E6=97=A5=E5=91=A8=E4=BA=94 =E4=B8=8B=E5=8D=882:48=E5=86=99=E9=81=
-=93=EF=BC=9A
-
-> To be able to extract the e820* code out of this file (in the next
-> patch), access e820_entries with its correct helper.
->
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
->
-
-
-Reviewed-by: Li Qiang <liq3ea@gmail.com>
-
-
-
+On 5/24/19 2:42 PM, Peter Maydell wrote:
+> The GIC ID registers cover an area 0x30 bytes in size
+> (12 registers, 4 bytes each). We were incorrectly decoding
+> only the first 0x20 bytes.
+> 
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 > ---
->  hw/i386/pc.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-> index ac8343c728..2e195049a5 100644
-> --- a/hw/i386/pc.c
-> +++ b/hw/i386/pc.c
-> @@ -1022,7 +1022,7 @@ static FWCfgState *bochs_bios_init(AddressSpace *as=
-,
-> PCMachineState *pcms)
->      fw_cfg_add_bytes(fw_cfg, FW_CFG_E820_TABLE,
->                       &e820_reserve, sizeof(e820_reserve));
->      fw_cfg_add_file(fw_cfg, "etc/e820", e820_table,
-> -                    sizeof(struct e820_entry) * e820_entries);
-> +                    sizeof(struct e820_entry) * e820_get_num_entries());
->
->      fw_cfg_add_bytes(fw_cfg, FW_CFG_HPET, &hpet_cfg, sizeof(hpet_cfg));
->      /* allocate memory for the NUMA channel: one (64bit) word for the
-> number
-> --
-> 2.20.1
->
->
->
+>  hw/intc/arm_gicv3_dist.c   | 4 ++--
+>  hw/intc/arm_gicv3_redist.c | 4 ++--
+>  2 files changed, 4 insertions(+), 4 deletions(-)
+> 
+> diff --git a/hw/intc/arm_gicv3_dist.c b/hw/intc/arm_gicv3_dist.c
+> index 53c55c57291..e6fe4905fd3 100644
+> --- a/hw/intc/arm_gicv3_dist.c
+> +++ b/hw/intc/arm_gicv3_dist.c
+> @@ -533,7 +533,7 @@ static MemTxResult gicd_readl(GICv3State *s, hwaddr offset,
+>          }
+>          return MEMTX_OK;
+>      }
+> -    case GICD_IDREGS ... GICD_IDREGS + 0x1f:
+> +    case GICD_IDREGS ... GICD_IDREGS + 0x2f:
+>          /* ID registers */
+>          *data = gicv3_idreg(offset - GICD_IDREGS);
+>          return MEMTX_OK;
+> @@ -744,7 +744,7 @@ static MemTxResult gicd_writel(GICv3State *s, hwaddr offset,
+>          gicd_write_irouter(s, attrs, irq, r);
+>          return MEMTX_OK;
+>      }
+> -    case GICD_IDREGS ... GICD_IDREGS + 0x1f:
+> +    case GICD_IDREGS ... GICD_IDREGS + 0x2f:
+>      case GICD_TYPER:
+>      case GICD_IIDR:
+>          /* RO registers, ignore the write */
+> diff --git a/hw/intc/arm_gicv3_redist.c b/hw/intc/arm_gicv3_redist.c
+> index 3b0ba6de1ab..8645220d618 100644
+> --- a/hw/intc/arm_gicv3_redist.c
+> +++ b/hw/intc/arm_gicv3_redist.c
+> @@ -233,7 +233,7 @@ static MemTxResult gicr_readl(GICv3CPUState *cs, hwaddr offset,
+>          }
+>          *data = cs->gicr_nsacr;
+>          return MEMTX_OK;
+> -    case GICR_IDREGS ... GICR_IDREGS + 0x1f:
+> +    case GICR_IDREGS ... GICR_IDREGS + 0x2f:
+>          *data = gicv3_idreg(offset - GICR_IDREGS);
+>          return MEMTX_OK;
+>      default:
+> @@ -363,7 +363,7 @@ static MemTxResult gicr_writel(GICv3CPUState *cs, hwaddr offset,
+>          return MEMTX_OK;
+>      case GICR_IIDR:
+>      case GICR_TYPER:
+> -    case GICR_IDREGS ... GICR_IDREGS + 0x1f:
+> +    case GICR_IDREGS ... GICR_IDREGS + 0x2f:
+>          /* RO registers, ignore the write */
+>          qemu_log_mask(LOG_GUEST_ERROR,
+>                        "%s: invalid guest write to RO register at offset "
+> 
+
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+
