@@ -2,80 +2,61 @@ Return-Path: <SRS0=oHhb=TY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DDEE4C072B5
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 18:34:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 78001C072B5
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 18:35:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A871F2175B
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 18:34:16 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="oKp4zpF0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A871F2175B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 0F6EE2175B
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 18:35:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0F6EE2175B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:58553 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:58567 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hUF1D-0006X8-VJ
-	for qemu-devel@archiver.kernel.org; Fri, 24 May 2019 14:34:16 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:35883)
+	id 1hUF2G-0007Ky-17
+	for qemu-devel@archiver.kernel.org; Fri, 24 May 2019 14:35:20 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:36227)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1hUExN-000485-8n
-	for qemu-devel@nongnu.org; Fri, 24 May 2019 14:30:18 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1hUExx-0004Y1-U9
+	for qemu-devel@nongnu.org; Fri, 24 May 2019 14:30:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1hUEtu-00021l-Dg
-	for qemu-devel@nongnu.org; Fri, 24 May 2019 14:26:43 -0400
-Received: from mail-wr1-x431.google.com ([2a00:1450:4864:20::431]:35490)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1hUEtt-0001zg-6F
-	for qemu-devel@nongnu.org; Fri, 24 May 2019 14:26:41 -0400
-Received: by mail-wr1-x431.google.com with SMTP id m3so10937455wrv.2
-	for <qemu-devel@nongnu.org>; Fri, 24 May 2019 11:26:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-	:cc; bh=hvXDmrw3GEQly7aZZR69fJtYhJFiM0yXn8JwBkn1fUo=;
-	b=oKp4zpF0OFbie4FIGQOgAXqch76+wF5wwTD1vGmd0oTvedjWQgmaCarkspNImEA7cg
-	njp8nCaRdhCAokKCrSwasra1RUDAbUAbBJFbOzDwHJ6HpMpyMXVDMy6FMTHGHCbnWS3v
-	eKGCrfXoIXzPhw/4QiH+0Uc8sFajw89hEpdnRw7AlzamILAXBINSwWnEBWPri6u6KBbY
-	M6LH5DW4YqV3M1vqD/azrA204h8QJ+KkxMV+GXr6fsjJuWthAHyAGuzVkSxMkH6V3Fnk
-	IEFh3ZjgK+kObAU2GUyLuK19M0tA11ImedOpYVnWLL+2opdeScHMr3QXlZ5AZVEMjW4p
-	lZcQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-	:message-id:subject:to:cc;
-	bh=hvXDmrw3GEQly7aZZR69fJtYhJFiM0yXn8JwBkn1fUo=;
-	b=itFOp3fexhl+1Y9dvRsVLST2aZfBxm71hZvqS87IFhHO6T5vCveBpgdNWxUPCY/RxF
-	vsHU34ljofIHsg9R+8gxUxxOTWV0goWcaBcmT7MBN45Vh2wAaN72KHXhiCXrxZQlZshw
-	ysG5aq67COuQJpu9RYZODt3OA2qymsNF553aeV1gkl8k02kCddC65fXP9hQl5MlRFUgm
-	o96/kiqWdJ8GebbDy1vr7SBMscwCJf2/jJy/bxoA3+R82yKGO2/B38rjCU8bh/+Um1e8
-	jqduz1QIRFUe0MW4Oq+/HtRXv2gp5wApnscULDt4L7QTAJ3JnEzLqLoPHQG/hnlFaEL0
-	le0Q==
-X-Gm-Message-State: APjAAAU883ylhgGmASj/md8mvg4DEqE4Qc0nJX7CM2mP8+rJaae4rBYI
-	sV4UONEpJM6xGriIRzzLA+lF3Pz67w4U3r/hDZ8=
-X-Google-Smtp-Source: APXvYqyu6u/Wz14PBii2wxMrLThWaoFsA/FqgX9p/UVWL5TLq/SJA3gy7TzQ7Ww4c7GS2Q1o6ZdFgOQvX13qrbI881g=
-X-Received: by 2002:adf:f988:: with SMTP id f8mr3688396wrr.254.1558722398220; 
-	Fri, 24 May 2019 11:26:38 -0700 (PDT)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1hUEi8-00041s-KS
+	for qemu-devel@nongnu.org; Fri, 24 May 2019 14:14:33 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39888)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+	id 1hUEi8-0003GG-FN
+	for qemu-devel@nongnu.org; Fri, 24 May 2019 14:14:32 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id B42B0308620F
+	for <qemu-devel@nongnu.org>; Fri, 24 May 2019 18:14:15 +0000 (UTC)
+Received: from localhost (ovpn-112-23.ams2.redhat.com [10.36.112.23])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 2B0915F7C5;
+	Fri, 24 May 2019 18:14:12 +0000 (UTC)
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+To: qemu-devel@nongnu.org
+Date: Fri, 24 May 2019 20:14:11 +0200
+Message-Id: <20190524181411.8599-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-References: <20190523134409.18673-1-stefanha@redhat.com>
-	<20190523134409.18673-2-stefanha@redhat.com>
-In-Reply-To: <20190523134409.18673-2-stefanha@redhat.com>
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Date: Fri, 24 May 2019 19:26:26 +0100
-Message-ID: <CAJSP0QU8nLHhvWUAPjDrUR8BvqGnDBvAPdi49sAH39ytp-H_-g@mail.gmail.com>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2a00:1450:4864:20::431
-Subject: Re: [Qemu-devel] [RFC v2 1/3] virtio: add vdc->vmchange_state()
- callback
+Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.42]);
+	Fri, 24 May 2019 18:14:15 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PATCH] configure: remove tpm_passthrough &
+ tpm_emulator
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -87,32 +68,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
-	Fam Zheng <fam@euphon.net>, qemu-devel <qemu-devel@nongnu.org>,
-	"Michael S. Tsirkin" <mst@redhat.com>
+Cc: pbonzini@redhat.com,
+	=?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, May 23, 2019 at 2:55 PM Stefan Hajnoczi <stefanha@redhat.com> wrote:
-> @@ -2253,10 +2254,18 @@ static void virtio_vmstate_change(void *opaque, int running, RunState state)
->          virtio_set_status(vdev, vdev->status);
->      }
->
-> +    if (!backend_run && k->vmstate_change) {
-> +        vdc->vmstate_change(vdev, backend_run);
-> +    }
-> +
->      if (k->vmstate_change) {
->          k->vmstate_change(qbus->parent, backend_run);
->      }
->
-> +    if (backend_run && k->vmstate_change) {
-> +        vdc->vmstate_change(vdev, backend_run);
-> +    }
+This is a left-over from commit 7aaa6a16373 "tpm: express dependencies
+with Kconfig".
 
-Oops, k->vmstate_change should be vdc->vmstate_change.  I'll send a
-new revision.
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+---
+ configure | 10 ----------
+ 1 file changed, 10 deletions(-)
 
-Stefan
+diff --git a/configure b/configure
+index 528b9ff705..4da99ee750 100755
+--- a/configure
++++ b/configure
+@@ -6434,8 +6434,6 @@ echo "gcov              $gcov_tool"
+ echo "gcov enabled      $gcov"
+ echo "TPM support       $tpm"
+ echo "libssh2 support   $libssh2"
+-echo "TPM passthrough   $tpm_passthrough"
+-echo "TPM emulator      $tpm_emulator"
+ echo "QOM debugging     $qom_cast_debug"
+ echo "Live block migration $live_block_migration"
+ echo "lzo support       $lzo"
+@@ -7133,14 +7131,6 @@ fi
+=20
+ if test "$tpm" =3D "yes"; then
+   echo 'CONFIG_TPM=3D$(CONFIG_SOFTMMU)' >> $config_host_mak
+-  # TPM passthrough support?
+-  if test "$tpm_passthrough" =3D "yes"; then
+-    echo "CONFIG_TPM_PASSTHROUGH=3Dy" >> $config_host_mak
+-  fi
+-  # TPM emulator support?
+-  if test "$tpm_emulator" =3D "yes"; then
+-    echo "CONFIG_TPM_EMULATOR=3Dy" >> $config_host_mak
+-  fi
+ fi
+=20
+ echo "TRACE_BACKENDS=3D$trace_backends" >> $config_host_mak
+--=20
+2.22.0.rc1.1.g079e7d2849.dirty
+
 
