@@ -6,75 +6,75 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 70FDBC072B5
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 07:46:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 472BEC072B5
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 07:47:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 45E7C21841
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 07:46:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 45E7C21841
+	by mail.kernel.org (Postfix) with ESMTPS id 1C395217F9
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 07:47:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1C395217F9
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:50549 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:50555 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hU4uW-0008PE-KY
-	for qemu-devel@archiver.kernel.org; Fri, 24 May 2019 03:46:40 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:54794)
+	id 1hU4vm-0000sX-EB
+	for qemu-devel@archiver.kernel.org; Fri, 24 May 2019 03:47:58 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:54835)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hU4tQ-0007gQ-Uq
-	for qemu-devel@nongnu.org; Fri, 24 May 2019 03:45:33 -0400
+	(envelope-from <philmd@redhat.com>) id 1hU4tX-0007l9-Ez
+	for qemu-devel@nongnu.org; Fri, 24 May 2019 03:45:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hU4tQ-00071F-0D
-	for qemu-devel@nongnu.org; Fri, 24 May 2019 03:45:32 -0400
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:45348)
+	(envelope-from <philmd@redhat.com>) id 1hU4tW-00074y-Gt
+	for qemu-devel@nongnu.org; Fri, 24 May 2019 03:45:39 -0400
+Received: from mail-wm1-f66.google.com ([209.85.128.66]:39591)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hU4tP-00070j-Qg
-	for qemu-devel@nongnu.org; Fri, 24 May 2019 03:45:31 -0400
-Received: by mail-wr1-f68.google.com with SMTP id b18so8864095wrq.12
-	for <qemu-devel@nongnu.org>; Fri, 24 May 2019 00:45:31 -0700 (PDT)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hU4tW-00074U-9x
+	for qemu-devel@nongnu.org; Fri, 24 May 2019 03:45:38 -0400
+Received: by mail-wm1-f66.google.com with SMTP id z23so4079521wma.4
+	for <qemu-devel@nongnu.org>; Fri, 24 May 2019 00:45:38 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:subject:to:references:from:openpgp:message-id
 	:date:user-agent:mime-version:in-reply-to:content-language
 	:content-transfer-encoding;
-	bh=nSphS7IkkeFCAMjUe/EacpvwgnxShfFj9l5USXkZHec=;
-	b=H+Of/iHepudT/AMTMzPy1Q5WPm252+PcSF/hULiyANNL2xMHRgZEl9BHfGQ7Xbqxsv
-	jhbFXsFjExzBK84h8qfSFA+Qw3RPPOzBQIdw3mVPRvqTqYLAznviszbJURTQQJddlfLA
-	qMXrJLt+XcMfAB3wovVBnfZkIWAmJNUlT2DTS9OAWTVCw91Rst3I6TTFacR0B11026f1
-	FiHvDXysDTjyQilXBN+4sGPKD+q3X/c0+kUNiENsJK0MhSShAv8ozYrbQPbX9RM4Tl9K
-	JTs3B643I0BPe3qdgizGY//6j0AEVwp7YNaWYpsaMOUr70xfPheyTiIEpvOQTkXiDBKT
-	79Pg==
-X-Gm-Message-State: APjAAAV3boZ4dKW+TzGfbyACjA/mnZQUBWwliy5wHUR6uQw8CcGhTdu/
-	zbOuWBvDMhnmQ8VNsPkzt2PaO1qhWaM=
-X-Google-Smtp-Source: APXvYqzP59+tjKADTzWeyVU2GsNVJsJLQT01YtHLjgoZ0WxLh8vqOZNMp98zh+nxzoE2D2pn4Nu6LA==
-X-Received: by 2002:adf:f10b:: with SMTP id r11mr531552wro.213.1558683930685; 
-	Fri, 24 May 2019 00:45:30 -0700 (PDT)
+	bh=okv70jMYe1Sw8I54iYlMZCVZS1atpW1fFCIGg3oO6dU=;
+	b=UOBiC3IKY/sqWX1WNnQsqx/2feeC+cGS4GGqplYNuj7aJPv+fV6fst8tsU1asLKRh8
+	1he4HCHU0IDh61gvPWgl/q7Upuvm7yxe3QK69oFotXXrkPRIQYVQKVN3dMaDi51jnRDV
+	07TThWdfK82hNtNNlPA/jNg55oINHiuZS4jVuTN4GnN+cbJNM2+YEWqTFU8+KcZp+z24
+	8DjpXsvvc6Q8rxSrZLVZjWYVohru3GpwY6ylgKvZMAz1pQrTiyd8Z1Dqhh2QuUoVVarc
+	CMQmvUza9lhlamEE588Q/gTk2+aGo+/tKAQ9Cber/iTAvhvJitOHroW786HgwSUnV0QB
+	e8cQ==
+X-Gm-Message-State: APjAAAVcGYRYBqDy+1HVSk8vEe5rQlQy+cBQ/nCXvbxwycmCy5I6PoFS
+	SgtDAiGpLvnU0EVAaHToq3Ch9X8pRfs=
+X-Google-Smtp-Source: APXvYqwq0+9tVWk4edSSYRn79iVqRg2lzOK4w/E7zfNGH72ehlfYY2VpaYhp6n/SZv9IMDpfVGdrww==
+X-Received: by 2002:a1c:800f:: with SMTP id b15mr15700315wmd.46.1558683937040; 
+	Fri, 24 May 2019 00:45:37 -0700 (PDT)
 Received: from [192.168.1.43] (228.red-83-52-173.dynamicip.rima-tde.net.
 	[83.52.173.228]) by smtp.gmail.com with ESMTPSA id
-	b10sm2617804wrh.59.2019.05.24.00.45.30
+	q68sm1981151wme.11.2019.05.24.00.45.36
 	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-	Fri, 24 May 2019 00:45:30 -0700 (PDT)
+	Fri, 24 May 2019 00:45:36 -0700 (PDT)
 To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
 References: <20190524070310.4952-1-kraxel@redhat.com>
-	<20190524070310.4952-2-kraxel@redhat.com>
+	<20190524070310.4952-5-kraxel@redhat.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
 	url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <2f2c6a90-a0b0-9334-6233-e10be14381bf@redhat.com>
-Date: Fri, 24 May 2019 09:45:29 +0200
+Message-ID: <193393ce-e262-4be1-2ca7-8107d634dd67@redhat.com>
+Date: Fri, 24 May 2019 09:45:35 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190524070310.4952-2-kraxel@redhat.com>
+In-Reply-To: <20190524070310.4952-5-kraxel@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 	[fuzzy]
-X-Received-From: 209.85.221.68
-Subject: Re: [Qemu-devel] [PATCH v2 1/5] usb-hub: tweak feature names
+X-Received-From: 209.85.128.66
+Subject: Re: [Qemu-devel] [PATCH v2 4/5] usb-hub: add usb_hub_port_update()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -91,34 +91,68 @@ Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 5/24/19 9:03 AM, Gerd Hoffmann wrote:
-> Add dashes, so they don't look like two separate things when printed.
+> Helper function to update port status bits which depends on the
+> connected device.  We need the same logic for device attach and
+> port reset, so factor it out.
 > 
 > Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 > ---
->  hw/usb/dev-hub.c | 10 +++++-----
->  1 file changed, 5 insertions(+), 5 deletions(-)
+>  hw/usb/dev-hub.c | 29 +++++++++++++++++------------
+>  1 file changed, 17 insertions(+), 12 deletions(-)
 > 
 > diff --git a/hw/usb/dev-hub.c b/hw/usb/dev-hub.c
-> index 7e9339b8a83d..9b04b6a6ec2d 100644
+> index 1cc92a5f9abe..29f4d6723e26 100644
 > --- a/hw/usb/dev-hub.c
 > +++ b/hw/usb/dev-hub.c
-> @@ -287,11 +287,11 @@ static const char *feature_name(int feature)
->          [PORT_POWER]         = "power",
->          [PORT_LOWSPEED]      = "lowspeed",
->          [PORT_HIGHSPEED]     = "highspeed",
-> -        [PORT_C_CONNECTION]  = "change connection",
-> -        [PORT_C_ENABLE]      = "change enable",
-> -        [PORT_C_SUSPEND]     = "change suspend",
-> -        [PORT_C_OVERCURRENT] = "change overcurrent",
-> -        [PORT_C_RESET]       = "change reset",
-> +        [PORT_C_CONNECTION]  = "change-connection",
-> +        [PORT_C_ENABLE]      = "change-enable",
-> +        [PORT_C_SUSPEND]     = "change-suspend",
-> +        [PORT_C_OVERCURRENT] = "change-overcurrent",
-> +        [PORT_C_RESET]       = "change-reset",
->          [PORT_TEST]          = "test",
->          [PORT_INDICATOR]     = "indicator",
->      };
+> @@ -188,18 +188,28 @@ static bool usb_hub_port_clear(USBHubPort *port, uint16_t status)
+>      return usb_hub_port_change(port, status);
+>  }
+>  
+> +static bool usb_hub_port_update(USBHubPort *port)
+> +{
+> +    bool notify = false;
+> +
+> +    if (port->port.dev && port->port.dev->attached) {
+> +        notify = usb_hub_port_set(port, PORT_STAT_CONNECTION);
+> +        if (port->port.dev->speed == USB_SPEED_LOW) {
+> +            usb_hub_port_set(port, PORT_STAT_LOW_SPEED);
+> +        } else {
+> +            usb_hub_port_clear(port, PORT_STAT_LOW_SPEED);
+> +        }
+> +    }
+> +    return notify;
+> +}
+> +
+>  static void usb_hub_attach(USBPort *port1)
+>  {
+>      USBHubState *s = port1->opaque;
+>      USBHubPort *port = &s->ports[port1->index];
+>  
+>      trace_usb_hub_attach(s->dev.addr, port1->index + 1);
+> -    usb_hub_port_set(port, PORT_STAT_CONNECTION);
+> -    if (port->port.dev->speed == USB_SPEED_LOW) {
+> -        usb_hub_port_set(port, PORT_STAT_LOW_SPEED);
+> -    } else {
+> -        usb_hub_port_clear(port, PORT_STAT_LOW_SPEED);
+> -    }
+> +    usb_hub_port_update(port);
+>      usb_wakeup(s->intr, 0);
+>  }
+>  
+> @@ -287,12 +297,7 @@ static void usb_hub_handle_reset(USBDevice *dev)
+>          port->wPortStatus = 0;
+>          port->wPortChange = 0;
+>          usb_hub_port_set(port, PORT_STAT_POWER);
+> -        if (port->port.dev && port->port.dev->attached) {
+> -            usb_hub_port_set(port, PORT_STAT_CONNECTION);
+> -            if (port->port.dev->speed == USB_SPEED_LOW) {
+> -                usb_hub_port_set(port, PORT_STAT_LOW_SPEED);
+> -            }
+> -        }
+> +        usb_hub_port_update(port);
+>      }
+>  }
+>  
 > 
 
 Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
