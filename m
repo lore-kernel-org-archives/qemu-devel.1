@@ -6,58 +6,57 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A24E4C072B5
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 07:08:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CFD5C072B5
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 07:10:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6D76921841
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 07:08:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6D76921841
+	by mail.kernel.org (Postfix) with ESMTPS id 2261F21841
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 07:10:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2261F21841
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:50143 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:50199 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hU4JU-0001Ex-Kk
-	for qemu-devel@archiver.kernel.org; Fri, 24 May 2019 03:08:24 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:45881)
+	id 1hU4Lc-00038t-9J
+	for qemu-devel@archiver.kernel.org; Fri, 24 May 2019 03:10:36 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:45830)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1hU4Ec-0005R1-5D
-	for qemu-devel@nongnu.org; Fri, 24 May 2019 03:03:23 -0400
+	(envelope-from <kraxel@redhat.com>) id 1hU4EY-0005PS-Tx
+	for qemu-devel@nongnu.org; Fri, 24 May 2019 03:03:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1hU4Ea-0006Mr-QG
-	for qemu-devel@nongnu.org; Fri, 24 May 2019 03:03:22 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59042)
+	(envelope-from <kraxel@redhat.com>) id 1hU4EX-0006Hq-0U
+	for qemu-devel@nongnu.org; Fri, 24 May 2019 03:03:18 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45392)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1hU4EY-0006GJ-Re
-	for qemu-devel@nongnu.org; Fri, 24 May 2019 03:03:19 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
-	[10.5.11.22])
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1hU4EV-0006GE-2F
+	for qemu-devel@nongnu.org; Fri, 24 May 2019 03:03:16 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 3B8F1307D854
+	by mx1.redhat.com (Postfix) with ESMTPS id 14D73308793A
 	for <qemu-devel@nongnu.org>; Fri, 24 May 2019 07:03:14 +0000 (UTC)
 Received: from sirius.home.kraxel.org (ovpn-116-101.ams2.redhat.com
 	[10.36.116.101])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 7D2D71001DC0;
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 85F9817D5D;
 	Fri, 24 May 2019 07:03:11 +0000 (UTC)
 Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
-	id D35AB1753A; Fri, 24 May 2019 09:03:10 +0200 (CEST)
+	id DBE311753B; Fri, 24 May 2019 09:03:10 +0200 (CEST)
 From: Gerd Hoffmann <kraxel@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Fri, 24 May 2019 09:03:08 +0200
-Message-Id: <20190524070310.4952-4-kraxel@redhat.com>
+Date: Fri, 24 May 2019 09:03:09 +0200
+Message-Id: <20190524070310.4952-5-kraxel@redhat.com>
 In-Reply-To: <20190524070310.4952-1-kraxel@redhat.com>
 References: <20190524070310.4952-1-kraxel@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.48]);
+	(mx1.redhat.com [10.5.110.45]);
 	Fri, 24 May 2019 07:03:14 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v2 3/5] usb-hub: add helpers to update port
- state
+Subject: [Qemu-devel] [PATCH v2 4/5] usb-hub: add usb_hub_port_update()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -74,50 +73,36 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add usb_hub_port_set() and usb_hub_port_clear() helpers which care about
-updating the change bits (port->wPortChange) properly, so we don't need
-to have that logic sprinkled all over the place ;)
+Helper function to update port status bits which depends on the
+connected device.  We need the same logic for device attach and
+port reset, so factor it out.
 
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- hw/usb/dev-hub.c | 84 ++++++++++++++++++++++++++----------------------
- 1 file changed, 45 insertions(+), 39 deletions(-)
+ hw/usb/dev-hub.c | 29 +++++++++++++++++------------
+ 1 file changed, 17 insertions(+), 12 deletions(-)
 
 diff --git a/hw/usb/dev-hub.c b/hw/usb/dev-hub.c
-index 4f700c8f92b5..1cc92a5f9abe 100644
+index 1cc92a5f9abe..29f4d6723e26 100644
 --- a/hw/usb/dev-hub.c
 +++ b/hw/usb/dev-hub.c
-@@ -159,18 +159,46 @@ static const uint8_t qemu_hub_hub_descriptor[] =
-         /* DeviceRemovable and PortPwrCtrlMask patched in later */
- };
+@@ -188,18 +188,28 @@ static bool usb_hub_port_clear(USBHubPort *port, uint16_t status)
+     return usb_hub_port_change(port, status);
+ }
  
-+static bool usb_hub_port_change(USBHubPort *port, uint16_t status)
++static bool usb_hub_port_update(USBHubPort *port)
 +{
 +    bool notify = false;
 +
-+    if (status & 0x1f) {
-+        port->wPortChange |= status;
-+        notify = true;
++    if (port->port.dev && port->port.dev->attached) {
++        notify = usb_hub_port_set(port, PORT_STAT_CONNECTION);
++        if (port->port.dev->speed == USB_SPEED_LOW) {
++            usb_hub_port_set(port, PORT_STAT_LOW_SPEED);
++        } else {
++            usb_hub_port_clear(port, PORT_STAT_LOW_SPEED);
++        }
 +    }
 +    return notify;
-+}
-+
-+static bool usb_hub_port_set(USBHubPort *port, uint16_t status)
-+{
-+    if (port->wPortStatus & status) {
-+        return false;
-+    }
-+    port->wPortStatus |= status;
-+    return usb_hub_port_change(port, status);
-+}
-+
-+static bool usb_hub_port_clear(USBHubPort *port, uint16_t status)
-+{
-+    if (!(port->wPortStatus & status)) {
-+        return false;
-+    }
-+    port->wPortStatus &= ~status;
-+    return usb_hub_port_change(port, status);
 +}
 +
  static void usb_hub_attach(USBPort *port1)
@@ -126,107 +111,30 @@ index 4f700c8f92b5..1cc92a5f9abe 100644
      USBHubPort *port = &s->ports[port1->index];
  
      trace_usb_hub_attach(s->dev.addr, port1->index + 1);
--    port->wPortStatus |= PORT_STAT_CONNECTION;
--    port->wPortChange |= PORT_STAT_C_CONNECTION;
-+    usb_hub_port_set(port, PORT_STAT_CONNECTION);
-     if (port->port.dev->speed == USB_SPEED_LOW) {
--        port->wPortStatus |= PORT_STAT_LOW_SPEED;
-+        usb_hub_port_set(port, PORT_STAT_LOW_SPEED);
-     } else {
--        port->wPortStatus &= ~PORT_STAT_LOW_SPEED;
-+        usb_hub_port_clear(port, PORT_STAT_LOW_SPEED);
-     }
-     usb_wakeup(s->intr, 0);
- }
-@@ -186,16 +214,9 @@ static void usb_hub_detach(USBPort *port1)
-     /* Let upstream know the device on this port is gone */
-     s->dev.port->ops->child_detach(s->dev.port, port1->dev);
- 
--    port->wPortStatus &= ~PORT_STAT_CONNECTION;
--    port->wPortChange |= PORT_STAT_C_CONNECTION;
--    if (port->wPortStatus & PORT_STAT_ENABLE) {
--        port->wPortStatus &= ~PORT_STAT_ENABLE;
--        port->wPortChange |= PORT_STAT_C_ENABLE;
+-    usb_hub_port_set(port, PORT_STAT_CONNECTION);
+-    if (port->port.dev->speed == USB_SPEED_LOW) {
+-        usb_hub_port_set(port, PORT_STAT_LOW_SPEED);
+-    } else {
+-        usb_hub_port_clear(port, PORT_STAT_LOW_SPEED);
 -    }
--    if (port->wPortStatus & PORT_STAT_SUSPEND) {
--        port->wPortStatus &= ~PORT_STAT_SUSPEND;
--        port->wPortChange |= PORT_STAT_C_SUSPEND;
--    }
-+    usb_hub_port_clear(port, PORT_STAT_CONNECTION);
-+    usb_hub_port_clear(port, PORT_STAT_ENABLE);
-+    usb_hub_port_clear(port, PORT_STAT_SUSPEND);
++    usb_hub_port_update(port);
      usb_wakeup(s->intr, 0);
  }
  
-@@ -212,9 +233,7 @@ static void usb_hub_wakeup(USBPort *port1)
-     USBHubState *s = port1->opaque;
-     USBHubPort *port = &s->ports[port1->index];
- 
--    if (port->wPortStatus & PORT_STAT_SUSPEND) {
--        port->wPortStatus &= ~PORT_STAT_SUSPEND;
--        port->wPortChange |= PORT_STAT_C_SUSPEND;
-+    if (usb_hub_port_clear(port, PORT_STAT_SUSPEND)) {
-         usb_wakeup(s->intr, 0);
-     }
- }
-@@ -265,13 +284,13 @@ static void usb_hub_handle_reset(USBDevice *dev)
-     trace_usb_hub_reset(s->dev.addr);
-     for (i = 0; i < s->num_ports; i++) {
-         port = s->ports + i;
--        port->wPortStatus = PORT_STAT_POWER;
-+        port->wPortStatus = 0;
+@@ -287,12 +297,7 @@ static void usb_hub_handle_reset(USBDevice *dev)
+         port->wPortStatus = 0;
          port->wPortChange = 0;
-+        usb_hub_port_set(port, PORT_STAT_POWER);
-         if (port->port.dev && port->port.dev->attached) {
--            port->wPortStatus |= PORT_STAT_CONNECTION;
--            port->wPortChange |= PORT_STAT_C_CONNECTION;
-+            usb_hub_port_set(port, PORT_STAT_CONNECTION);
-             if (port->port.dev->speed == USB_SPEED_LOW) {
--                port->wPortStatus |= PORT_STAT_LOW_SPEED;
-+                usb_hub_port_set(port, PORT_STAT_LOW_SPEED);
-             }
-         }
+         usb_hub_port_set(port, PORT_STAT_POWER);
+-        if (port->port.dev && port->port.dev->attached) {
+-            usb_hub_port_set(port, PORT_STAT_CONNECTION);
+-            if (port->port.dev->speed == USB_SPEED_LOW) {
+-                usb_hub_port_set(port, PORT_STAT_LOW_SPEED);
+-            }
+-        }
++        usb_hub_port_update(port);
      }
-@@ -372,13 +391,13 @@ static void usb_hub_handle_control(USBDevice *dev, USBPacket *p,
-                 port->wPortStatus |= PORT_STAT_SUSPEND;
-                 break;
-             case PORT_RESET:
-+                usb_hub_port_set(port, PORT_STAT_RESET);
-+                usb_hub_port_clear(port, PORT_STAT_RESET);
-                 if (dev && dev->attached) {
-                     usb_device_reset(dev);
--                    port->wPortChange |= PORT_STAT_C_RESET;
--                    /* set enable bit */
--                    port->wPortStatus |= PORT_STAT_ENABLE;
--                    usb_wakeup(s->intr, 0);
-+                    usb_hub_port_set(port, PORT_STAT_ENABLE);
-                 }
-+                usb_wakeup(s->intr, 0);
-                 break;
-             case PORT_POWER:
-                 break;
-@@ -407,20 +426,7 @@ static void usb_hub_handle_control(USBDevice *dev, USBPacket *p,
-                 port->wPortChange &= ~PORT_STAT_C_ENABLE;
-                 break;
-             case PORT_SUSPEND:
--                if (port->wPortStatus & PORT_STAT_SUSPEND) {
--                    port->wPortStatus &= ~PORT_STAT_SUSPEND;
--
--                    /*
--                     * USB Spec rev2.0 11.24.2.7.2.3 C_PORT_SUSPEND
--                     * "This bit is set on the following transitions:
--                     *  - On transition from the Resuming state to the
--                     *    SendEOP [sic] state"
--                     *
--                     * Note that this includes both remote wake-up and
--                     * explicit ClearPortFeature(PORT_SUSPEND).
--                     */
--                    port->wPortChange |= PORT_STAT_C_SUSPEND;
--                }
-+                usb_hub_port_clear(port, PORT_STAT_SUSPEND);
-                 break;
-             case PORT_C_SUSPEND:
-                 port->wPortChange &= ~PORT_STAT_C_SUSPEND;
+ }
+ 
 -- 
 2.18.1
 
