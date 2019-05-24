@@ -2,78 +2,64 @@ Return-Path: <SRS0=oHhb=TY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BE73C072B5
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 19:03:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 418F4C072B5
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 19:04:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D9C5E2184E
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 19:03:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D9C5E2184E
+	by mail.kernel.org (Postfix) with ESMTPS id 1747C21848
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 19:04:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1747C21848
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:59023 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:59031 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hUFTE-0004LG-79
-	for qemu-devel@archiver.kernel.org; Fri, 24 May 2019 15:03:12 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:41070)
+	id 1hUFUf-00058q-Co
+	for qemu-devel@archiver.kernel.org; Fri, 24 May 2019 15:04:41 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:42640)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1hUFDt-0000J5-Lb
-	for qemu-devel@nongnu.org; Fri, 24 May 2019 14:47:22 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1hUFKK-0005iI-2E
+	for qemu-devel@nongnu.org; Fri, 24 May 2019 14:54:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1hUFDs-0007Rm-Mj
-	for qemu-devel@nongnu.org; Fri, 24 May 2019 14:47:21 -0400
-Received: from mail-wm1-f46.google.com ([209.85.128.46]:36271)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hUFDs-0007RN-G9
-	for qemu-devel@nongnu.org; Fri, 24 May 2019 14:47:20 -0400
-Received: by mail-wm1-f46.google.com with SMTP id v22so2925944wml.1
-	for <qemu-devel@nongnu.org>; Fri, 24 May 2019 11:47:20 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-	:user-agent:mime-version:in-reply-to:content-language
-	:content-transfer-encoding;
-	bh=ppoMF4oTxBx2jS9wycnCKEgo15pl05Sn2PrdMglnwlI=;
-	b=p57ZS29gwOOcJo7eXbz4z11OXX/b0n2Hp25boAnTqQjQo3VLSa5QwLnKdersv9F3uy
-	wy6GfadW8rCGYOErjJKP53YGflwz0CdUmu4fQpwQEkXp2+LVEH/dULhb3cKHg/oqvVxF
-	++VN4nxhriy+LiXFYPwyg6cerR66OGBM+LXui0Als9eTiX+Ne3DLnTRGWoZusuxMztZe
-	zIaIKXzRIO3iIpgxNyCkZdJ7cgIV6/70sSBR3XGTD+LebJXInpa4tH3LPaq87m+c8qNr
-	kjVNmZuleG+qCx2J1SANKti7/1LuvyHY0+vyNK+eq1FxmXZVXMBF6hQXKKFJxwB2TSZ6
-	4rlA==
-X-Gm-Message-State: APjAAAVe6lUK0eVFX/+YEE67Nmf1fCJHs8oa0NenBsCWy6gO7tpUr7tx
-	h8eyDiP4Ff+OKdIilIJhvG80fQ==
-X-Google-Smtp-Source: APXvYqz5Xb3qJq59nSTjB7crFXEEyZjF1xMbL65NcTgJtt874VemqJsrHGvwFqhJeRUMIT3ujMJiZw==
-X-Received: by 2002:a7b:c8d1:: with SMTP id f17mr8778658wml.45.1558723639313; 
-	Fri, 24 May 2019 11:47:19 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:4d53:18d:3ffd:370?
-	([2001:b07:6468:f312:4d53:18d:3ffd:370])
-	by smtp.gmail.com with ESMTPSA id
-	b194sm2292692wmb.23.2019.05.24.11.47.18
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Fri, 24 May 2019 11:47:18 -0700 (PDT)
-To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
-References: <20190524183638.20745-1-stefanha@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <24b93cc5-edb1-a197-14be-e63ac356325d@redhat.com>
-Date: Fri, 24 May 2019 20:47:18 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	(envelope-from <ehabkost@redhat.com>) id 1hUFKI-0002w7-MD
+	for qemu-devel@nongnu.org; Fri, 24 May 2019 14:53:59 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56788)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hUFKG-0002th-Pl
+	for qemu-devel@nongnu.org; Fri, 24 May 2019 14:53:56 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 866F437EEA;
+	Fri, 24 May 2019 18:53:50 +0000 (UTC)
+Received: from localhost (ovpn-116-14.gru2.redhat.com [10.97.116.14])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id BF00B6092D;
+	Fri, 24 May 2019 18:53:46 +0000 (UTC)
+Date: Fri, 24 May 2019 15:53:44 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Message-ID: <20190524185344.GJ10764@habkost.net>
+References: <87woihi1wl.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <20190524183638.20745-1-stefanha@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <87woihi1wl.fsf@dusky.pond.sub.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.29]);
+	Fri, 24 May 2019 18:53:50 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-	[fuzzy]
-X-Received-From: 209.85.128.46
-Subject: Re: [Qemu-devel] [RFC v3 0/3] scsi: restart dma after vm change
- state handlers
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] qapi/misc.json is too big,
+ let's bite off a few chunks
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -85,37 +71,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>
+Cc: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>,
+	Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org,
+	Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 24/05/19 20:36, Stefan Hajnoczi wrote:
-> v3:
->  * Fix s/k->vmstate_change/vdc->vmstate_change/
->  * Still RFC, waiting for customer to confirm this fixes the issue
-> v2:
->  * Do it properly with a clean API instead of deferring to a BH!
->    Thanks for encouraging me to do this, Kevin.
-> 
-> These patches solve a deadlock when the 'cont' command is used and there are
-> failed requests on a virtio-scsi device with iothreads.  The deadlock itself is
-> actually not the thing we need to fix because we should never reach that case
-> anyway.  Instead we need to make sure DMA restart is only performed after the
-> virtio-scsi iothread is re-initialized.
+On Thu, May 23, 2019 at 06:14:18PM +0200, Markus Armbruster wrote:
+> It's nice when QAPI schema modules clearly belong to a single subsystem
+> in addition to "QAPI Schema".  misc.json doesn't, and it's grown fat:
+> 3000+ lines.  Let's move out some stuff.  Here are a few candidates:
+>=20
+> * Dump (Marc-Andr=E9)
+>=20
+>   dump-guest-memory, query-dump, DUMP_COMPLETED,
+>   query-dump-guest-memory-capability
+>=20
+>   ~200 lines.
+>=20
+> * Machine core (Eduardo, Marcel)
+>=20
+>   query-machines, query-current-machine,=20
+>=20
+>   ~60 lines.  Hardly worthwhile from a "let's shrink misc.json" point o=
+f
+>   view.  Might be worthwhile from a "let's make get_maintainers.pl
+>   work".
+>=20
+> * CPUs (Paolo, Richard)
+>=20
+>   query-cpus, query-cpus-fast
+>=20
+>   ~300 lines.  The commands are implemented in cpus.c, which MAINTAINER=
+S
+>   covers both under "Main loop" and under "Guest CPU cores (TCG) /
+>   Overall".  Neither feels right to me for these QMP commands.
 
-custom_dma_restart is a bit ugly...  Do you think it would make sense to
-order the VMStateChange handlers using some kind of enum (with the order
-unspecified within the category)?
+Should it include query-cpu-* (currently on target.json),
+and query-hotpluggable-cpus?
 
-We could start with
+>=20
+> * NUMA (Eduardo)
+>=20
+>   query-memdev, set-numa-node
+>=20
+>   ~200 lines.
+>=20
+> Opinions?
+>=20
+> Additional candidates?
 
-	VMSTATECHANGE_PRIO_UNKNOWN  = 0  (if needed?)
-	VMSTATECHANGE_PRIO_IOTHREAD = 100
-        VMSTATECHANGE_PRIO_DEVICE   = 200
+QOM: qom-list, qom-get, qom-set, qom-list-properties, object-add
+object-del.
 
-where higher priorities run first on stop and last on resume.
-
-Paolo
+--=20
+Eduardo
 
