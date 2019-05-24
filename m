@@ -2,65 +2,62 @@ Return-Path: <SRS0=oHhb=TY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_MUTT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4797DC072B5
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 15:20:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B8330C072B5
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 15:36:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1DCF720856
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 15:20:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1DCF720856
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 7753020815
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 15:36:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7753020815
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:56186 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:56354 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hUBza-0005Zh-DK
-	for qemu-devel@archiver.kernel.org; Fri, 24 May 2019 11:20:22 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:56393)
+	id 1hUCFB-0001VM-8D
+	for qemu-devel@archiver.kernel.org; Fri, 24 May 2019 11:36:29 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:59270)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1hUBvj-0003Ni-2c
-	for qemu-devel@nongnu.org; Fri, 24 May 2019 11:16:23 -0400
+	(envelope-from <groug@kaod.org>) id 1hUCDJ-0000GF-SK
+	for qemu-devel@nongnu.org; Fri, 24 May 2019 11:34:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1hUBvi-0005Uc-BF
-	for qemu-devel@nongnu.org; Fri, 24 May 2019 11:16:23 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56690)
+	(envelope-from <groug@kaod.org>) id 1hUCDH-00033s-Ti
+	for qemu-devel@nongnu.org; Fri, 24 May 2019 11:34:33 -0400
+Received: from 9.mo4.mail-out.ovh.net ([46.105.40.176]:42472)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>)
-	id 1hUBvg-0005Sl-7K; Fri, 24 May 2019 11:16:20 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 7D34630832C9;
-	Fri, 24 May 2019 15:16:17 +0000 (UTC)
-Received: from localhost (ovpn-117-142.ams2.redhat.com [10.36.117.142])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 100976871E;
-	Fri, 24 May 2019 15:16:16 +0000 (UTC)
-Date: Fri, 24 May 2019 16:16:15 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: Aarushi Mehta <mehta.aaru20@gmail.com>
-Message-ID: <20190524151615.GC31070@stefanha-x1.localdomain>
-References: <20190524140337.13415-1-mehta.aaru20@gmail.com>
-	<20190524140337.13415-4-mehta.aaru20@gmail.com>
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1hUCD9-0002wU-BI
+	for qemu-devel@nongnu.org; Fri, 24 May 2019 11:34:28 -0400
+Received: from player787.ha.ovh.net (unknown [10.109.159.222])
+	by mo4.mail-out.ovh.net (Postfix) with ESMTP id 8E9B01F315C
+	for <qemu-devel@nongnu.org>; Fri, 24 May 2019 17:34:18 +0200 (CEST)
+Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
+	[82.253.208.248]) (Authenticated sender: groug@kaod.org)
+	by player787.ha.ovh.net (Postfix) with ESMTPSA id B5C4363EB954;
+	Fri, 24 May 2019 15:34:11 +0000 (UTC)
+Date: Fri, 24 May 2019 17:34:10 +0200
+From: Greg Kurz <groug@kaod.org>
+To: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20190524173410.2d362c9a@bahia.lan>
+In-Reply-To: <20190523052918.1129-2-david@gibson.dropbear.id.au>
+References: <20190523052918.1129-1-david@gibson.dropbear.id.au>
+	<20190523052918.1129-2-david@gibson.dropbear.id.au>
+X-Mailer: Claws Mail 3.16.0 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="E/DnYTRukya0zdZ1"
-Content-Disposition: inline
-In-Reply-To: <20190524140337.13415-4-mehta.aaru20@gmail.com>
-User-Agent: Mutt/1.11.4 (2019-03-13)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.44]);
-	Fri, 24 May 2019 15:16:17 +0000 (UTC)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Ovh-Tracer-Id: 1079175062239156710
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduuddrudduiedgleduucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddm
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [RFC PATCH v2 3/9] include/block: declare
- interfaces for io_uring
+X-Received-From: 46.105.40.176
+Subject: Re: [Qemu-devel] [PATCH 2/8] spapr: Clean up device tree
+ construction for PCI devices
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -72,44 +69,229 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org,
-	saket.sinha89@gmail.com, Julia Suvorova <jusual@mail.ru>
+Cc: mdroth@linux.ibm.com, mst@redhat.com, qemu-ppc@nongnu.org, clg@kaod.org,
+	qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Thu, 23 May 2019 15:29:12 +1000
+David Gibson <david@gibson.dropbear.id.au> wrote:
 
---E/DnYTRukya0zdZ1
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-
-On Fri, May 24, 2019 at 07:33:31PM +0530, Aarushi Mehta wrote:
-> Signed-off-by: Aarushi Mehta <mehta.aaru20@gmail.com>
+> spapr_create_pci_child_dt() is a trivial wrapper around
+> spapr_populate_pci_child_dt(), but is the latter's only caller.  So fold
+> them together into spapr_dt_pci_device(), which closer matches our modern
+> naming convention.
+> 
+> While there, make a number of cleanups to the function itself.  This is
+> mostly using more temporary locals to avoid awkwardly long lines, and in
+> some cases avoiding double reads of PCI config space variables.
+> 
+> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 > ---
->  include/block/aio.h     | 16 +++++++++++++++-
->  include/block/raw-aio.h | 15 +++++++++++++++
->  2 files changed, 30 insertions(+), 1 deletion(-)
+>  hw/ppc/spapr_pci.c | 119 +++++++++++++++++++++------------------------
+>  1 file changed, 55 insertions(+), 64 deletions(-)
+> 
+> diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
+> index b2db46ef1d..4075b433fd 100644
+> --- a/hw/ppc/spapr_pci.c
+> +++ b/hw/ppc/spapr_pci.c
+> @@ -1219,57 +1219,75 @@ static const char *dt_name_from_class(uint8_t class, uint8_t subclass,
+>  static uint32_t spapr_phb_get_pci_drc_index(SpaprPhbState *phb,
+>                                              PCIDevice *pdev);
+>  
+> -static void spapr_populate_pci_child_dt(PCIDevice *dev, void *fdt, int offset,
+> -                                       SpaprPhbState *sphb)
+> +/* create OF node for pci device and required OF DT properties */
+> +static int spapr_dt_pci_device(SpaprPhbState *sphb, PCIDevice *dev,
+> +                               void *fdt, int parent_offset)
+>  {
+> +    int offset;
+> +    const gchar *basename;
+> +    char *nodename;
 
-There's not much a code reviewer can do with this patch in isolation
-since they don't know the behavior of the functions declared here.
-Please squash this patch with the patch containing the function
-definitions.  That way a full review can be done to decide "is this the
-correct function prototype?", "can the interface be simplified?", etc.
+Being curious... what's the rationale for using gchar or char, if any ?
 
---E/DnYTRukya0zdZ1
-Content-Type: application/pgp-signature; name="signature.asc"
+> +    int slot = PCI_SLOT(dev->devfn);
+> +    int func = PCI_FUNC(dev->devfn);
+>      ResourceProps rp;
+> -    bool is_bridge = false;
+> -    int pci_status;
+> -    char *buf = NULL;
+>      uint32_t drc_index = spapr_phb_get_pci_drc_index(sphb, dev);
+> +    uint32_t header_type = pci_default_read_config(dev, PCI_HEADER_TYPE, 1);
+> +    bool is_bridge = (header_type == PCI_HEADER_TYPE_BRIDGE);
+> +    uint32_t vendor_id = pci_default_read_config(dev, PCI_VENDOR_ID, 2);
+> +    uint32_t device_id = pci_default_read_config(dev, PCI_DEVICE_ID, 2);
+> +    uint32_t revision_id = pci_default_read_config(dev, PCI_REVISION_ID, 1);
+>      uint32_t ccode = pci_default_read_config(dev, PCI_CLASS_PROG, 3);
+> -    uint32_t max_msi, max_msix;
+> +    uint32_t irq_pin = pci_default_read_config(dev, PCI_INTERRUPT_PIN, 1);
+> +    uint32_t subsystem_id = pci_default_read_config(dev, PCI_SUBSYSTEM_ID, 2);
+> +    uint32_t subsystem_vendor_id =
+> +        pci_default_read_config(dev, PCI_SUBSYSTEM_VENDOR_ID, 2);
+> +    uint32_t cache_line_size =
+> +        pci_default_read_config(dev, PCI_CACHE_LINE_SIZE, 1);
+> +    uint32_t pci_status = pci_default_read_config(dev, PCI_STATUS, 2);
+> +    gchar *loc_code;
+> +    
 
------BEGIN PGP SIGNATURE-----
+trailing space ^^
 
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAlzoCr8ACgkQnKSrs4Gr
-c8j7egf/aIkYvegwyK3D2p/Le8GhDu1e8PXfquF0Q9WFTPKH+trmxKss/FM7QfxV
-JwyQuQ9RdCVgqqKZBxF8/ZJnhijUXhrz8e6quuc+pn9pn81B9Y0nsbxAKDJoP9s1
-DsDJwXFGNcU0qeDiljKUbh+aLxGD5cuZXq/bnManakSzvh+wIgNsbAagYX/Dth1T
-xhKtYjpF7dZ2OKo3tj9NYp2aVDRoibKPWP6qnk3lBI8Dm/EbaDGppqM/S8NI2FPo
-HkRC0EUfHJOorA3zTZlwRSv/nhWg/a9rSvIqvbN1gUZgWVr2pWnYXAK3rBZ0DdMN
-XYMb6ihwuquaBoF0/WwLqK8xWgxVZw==
-=obdT
------END PGP SIGNATURE-----
+Apart from that, LGTM.
 
---E/DnYTRukya0zdZ1--
+Reviewed-by: Greg Kurz <groug@kaod.org>
+
+> +    basename = dt_name_from_class((ccode >> 16) & 0xff, (ccode >> 8) & 0xff,
+> +                                  ccode & 0xff);
+>  
+> -    if (pci_default_read_config(dev, PCI_HEADER_TYPE, 1) ==
+> -        PCI_HEADER_TYPE_BRIDGE) {
+> -        is_bridge = true;
+> +    if (func != 0) {
+> +        nodename = g_strdup_printf("%s@%x,%x", basename, slot, func);
+> +    } else {
+> +        nodename = g_strdup_printf("%s@%x", basename, slot);
+>      }
+>  
+> +    _FDT(offset = fdt_add_subnode(fdt, parent_offset, nodename));
+> +
+> +    g_free(nodename);
+> +
+>      /* in accordance with PAPR+ v2.7 13.6.3, Table 181 */
+> -    _FDT(fdt_setprop_cell(fdt, offset, "vendor-id",
+> -                          pci_default_read_config(dev, PCI_VENDOR_ID, 2)));
+> -    _FDT(fdt_setprop_cell(fdt, offset, "device-id",
+> -                          pci_default_read_config(dev, PCI_DEVICE_ID, 2)));
+> -    _FDT(fdt_setprop_cell(fdt, offset, "revision-id",
+> -                          pci_default_read_config(dev, PCI_REVISION_ID, 1)));
+> +    _FDT(fdt_setprop_cell(fdt, offset, "vendor-id", vendor_id));
+> +    _FDT(fdt_setprop_cell(fdt, offset, "device-id", device_id));
+> +    _FDT(fdt_setprop_cell(fdt, offset, "revision-id", revision_id));
+> +
+>      _FDT(fdt_setprop_cell(fdt, offset, "class-code", ccode));
+> -    if (pci_default_read_config(dev, PCI_INTERRUPT_PIN, 1)) {
+> -        _FDT(fdt_setprop_cell(fdt, offset, "interrupts",
+> -                 pci_default_read_config(dev, PCI_INTERRUPT_PIN, 1)));
+> +    if (irq_pin) {
+> +        _FDT(fdt_setprop_cell(fdt, offset, "interrupts", irq_pin));
+>      }
+>  
+>      if (!is_bridge) {
+> -        _FDT(fdt_setprop_cell(fdt, offset, "min-grant",
+> -            pci_default_read_config(dev, PCI_MIN_GNT, 1)));
+> -        _FDT(fdt_setprop_cell(fdt, offset, "max-latency",
+> -            pci_default_read_config(dev, PCI_MAX_LAT, 1)));
+> +        uint32_t min_grant = pci_default_read_config(dev, PCI_MIN_GNT, 1);
+> +        uint32_t max_latency = pci_default_read_config(dev, PCI_MAX_LAT, 1);
+> +        _FDT(fdt_setprop_cell(fdt, offset, "min-grant", min_grant));
+> +        _FDT(fdt_setprop_cell(fdt, offset, "max-latency", max_latency));
+>      }
+>  
+> -    if (pci_default_read_config(dev, PCI_SUBSYSTEM_ID, 2)) {
+> -        _FDT(fdt_setprop_cell(fdt, offset, "subsystem-id",
+> -                 pci_default_read_config(dev, PCI_SUBSYSTEM_ID, 2)));
+> +    if (subsystem_id) {
+> +        _FDT(fdt_setprop_cell(fdt, offset, "subsystem-id", subsystem_id));
+>      }
+>  
+> -    if (pci_default_read_config(dev, PCI_SUBSYSTEM_VENDOR_ID, 2)) {
+> +    if (subsystem_vendor_id) {
+>          _FDT(fdt_setprop_cell(fdt, offset, "subsystem-vendor-id",
+> -                 pci_default_read_config(dev, PCI_SUBSYSTEM_VENDOR_ID, 2)));
+> +                              subsystem_vendor_id));
+>      }
+>  
+> -    _FDT(fdt_setprop_cell(fdt, offset, "cache-line-size",
+> -        pci_default_read_config(dev, PCI_CACHE_LINE_SIZE, 1)));
+> +    _FDT(fdt_setprop_cell(fdt, offset, "cache-line-size", cache_line_size));
+> +
+>  
+>      /* the following fdt cells are masked off the pci status register */
+> -    pci_status = pci_default_read_config(dev, PCI_STATUS, 2);
+>      _FDT(fdt_setprop_cell(fdt, offset, "devsel-speed",
+>                            PCI_STATUS_DEVSEL_MASK & pci_status));
+>  
+> @@ -1283,9 +1301,9 @@ static void spapr_populate_pci_child_dt(PCIDevice *dev, void *fdt, int offset,
+>          _FDT(fdt_setprop(fdt, offset, "udf-supported", NULL, 0));
+>      }
+>  
+> -    buf = spapr_phb_get_loc_code(sphb, dev);
+> -    _FDT(fdt_setprop_string(fdt, offset, "ibm,loc-code", buf));
+> -    g_free(buf);
+> +    loc_code = spapr_phb_get_loc_code(sphb, dev);
+> +    _FDT(fdt_setprop_string(fdt, offset, "ibm,loc-code", loc_code));
+> +    g_free(loc_code);
+>  
+>      if (drc_index) {
+>          _FDT(fdt_setprop_cell(fdt, offset, "ibm,my-drc-index", drc_index));
+> @@ -1297,13 +1315,13 @@ static void spapr_populate_pci_child_dt(PCIDevice *dev, void *fdt, int offset,
+>                            RESOURCE_CELLS_SIZE));
+>  
+>      if (msi_present(dev)) {
+> -        max_msi = msi_nr_vectors_allocated(dev);
+> +        uint32_t max_msi = msi_nr_vectors_allocated(dev);
+>          if (max_msi) {
+>              _FDT(fdt_setprop_cell(fdt, offset, "ibm,req#msi", max_msi));
+>          }
+>      }
+>      if (msix_present(dev)) {
+> -        max_msix = dev->msix_entries_nr;
+> +        uint32_t max_msix = dev->msix_entries_nr;
+>          if (max_msix) {
+>              _FDT(fdt_setprop_cell(fdt, offset, "ibm,req#msi-x", max_msix));
+>          }
+> @@ -1319,33 +1337,6 @@ static void spapr_populate_pci_child_dt(PCIDevice *dev, void *fdt, int offset,
+>      }
+>  
+>      spapr_phb_nvgpu_populate_pcidev_dt(dev, fdt, offset, sphb);
+> -}
+> -
+> -/* create OF node for pci device and required OF DT properties */
+> -static int spapr_create_pci_child_dt(SpaprPhbState *phb, PCIDevice *dev,
+> -                                     void *fdt, int node_offset)
+> -{
+> -    int offset;
+> -    const gchar *basename;
+> -    char *nodename;
+> -    int slot = PCI_SLOT(dev->devfn);
+> -    int func = PCI_FUNC(dev->devfn);
+> -    uint32_t ccode = pci_default_read_config(dev, PCI_CLASS_PROG, 3);
+> -
+> -    basename = dt_name_from_class((ccode >> 16) & 0xff, (ccode >> 8) & 0xff,
+> -                                  ccode & 0xff);
+> -
+> -    if (func != 0) {
+> -        nodename = g_strdup_printf("%s@%x,%x", basename, slot, func);
+> -    } else {
+> -        nodename = g_strdup_printf("%s@%x", basename, slot);
+> -    }
+> -
+> -    _FDT(offset = fdt_add_subnode(fdt, node_offset, nodename));
+> -
+> -    g_free(nodename);
+> -
+> -    spapr_populate_pci_child_dt(dev, fdt, offset, phb);
+>  
+>      return offset;
+>  }
+> @@ -1393,7 +1384,7 @@ int spapr_pci_dt_populate(SpaprDrc *drc, SpaprMachineState *spapr,
+>      SpaprPhbState *sphb = SPAPR_PCI_HOST_BRIDGE(plug_handler);
+>      PCIDevice *pdev = PCI_DEVICE(drc->dev);
+>  
+> -    *fdt_start_offset = spapr_create_pci_child_dt(sphb, pdev, fdt, 0);
+> +    *fdt_start_offset = spapr_dt_pci_device(sphb, pdev, fdt, 0);
+>      return 0;
+>  }
+>  
+> @@ -2086,7 +2077,7 @@ static void spapr_populate_pci_devices_dt(PCIBus *bus, PCIDevice *pdev,
+>      int offset;
+>      SpaprFdt s_fdt;
+>  
+> -    offset = spapr_create_pci_child_dt(p->sphb, pdev, p->fdt, p->node_off);
+> +    offset = spapr_dt_pci_device(p->sphb, pdev, p->fdt, p->node_off);
+>      if (!offset) {
+>          error_report("Failed to create pci child device tree node");
+>          return;
+
 
