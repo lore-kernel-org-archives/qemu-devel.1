@@ -2,84 +2,66 @@ Return-Path: <SRS0=oHhb=TY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 52F8EC072B5
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 14:16:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2985CC072B5
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 14:19:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1C5D020665
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 14:16:52 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OelFy3qu"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1C5D020665
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id F3F3020673
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 14:19:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F3F3020673
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:55350 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:55390 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hUB07-0005Eu-Bj
-	for qemu-devel@archiver.kernel.org; Fri, 24 May 2019 10:16:51 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:40414)
+	id 1hUB33-0006zf-2s
+	for qemu-devel@archiver.kernel.org; Fri, 24 May 2019 10:19:53 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:40481)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mehta.aaru20@gmail.com>) id 1hUAoJ-0003KZ-Vm
-	for qemu-devel@nongnu.org; Fri, 24 May 2019 10:04:40 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1hUAoY-0003SB-4R
+	for qemu-devel@nongnu.org; Fri, 24 May 2019 10:04:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mehta.aaru20@gmail.com>) id 1hUAns-0002Un-0q
-	for qemu-devel@nongnu.org; Fri, 24 May 2019 10:04:13 -0400
-Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:45822)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mehta.aaru20@gmail.com>)
-	id 1hUAnr-0002Ts-RW; Fri, 24 May 2019 10:04:11 -0400
-Received: by mail-pg1-x543.google.com with SMTP id w34so459018pga.12;
-	Fri, 24 May 2019 07:04:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=from:to:cc:subject:date:message-id:in-reply-to:references;
-	bh=IwdgR4CAZqUTgzHR3HV5kaLH/wCH1Pdav2fxuHWxNdY=;
-	b=OelFy3qun/4+OUHJQRyLVzDM+eEQL4qik9A9v8slQ9W6cEbTswGtRi82C0zmqSfCaR
-	dS6JSXll7U8ISYEfBeQVbTUn7o1A1/He+M+3XD8+BWM/4eYq665adwH95B1BSuG3cJAP
-	ShXhmYwghDh+L5lD7Bu7b0NU7BNdsmRcpnxCBkBTS5lGBB5ePBnDQW9cXq64VkdeT8Md
-	2YFbSRDcIp2d3cjL9ds0P/+mE6xeNBXkuLH8Xvv+EGhK/QmUgOl5OqHeA6YpmDdpY7eR
-	ZWwIKRdeWvFdR0UTTzR2WNCHmR4ZlT96wysHBIXIvyuHIUt9b9gktpHUXbStR46wsnIA
-	LQWQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-	:references;
-	bh=IwdgR4CAZqUTgzHR3HV5kaLH/wCH1Pdav2fxuHWxNdY=;
-	b=LFOSJmDd/Cgqtqw1UwO5jMFsK9sMPrUUengVO2+TSvOdlsXdKLF66RNgQQzGCTO4x4
-	mrvACiUmCM7R6ygGshAeikXhdv5JEffcWxeptFMD1ftGw/2oaVb/UyV5yLqVJYrZBJlP
-	IVHeoDchKc7h7Ze2kO0mfWf613Clt7PPZa4SDElE/+ya9IPaB7/2iA+5p+T6mMrUVQ2+
-	ur4ft6GXRupRAfG6qRzNCHLc1Svlyu0PBsTxS189zefE7doeRPjOHfrfUYvlmeJh0POT
-	GbE7HzWimbPvAuopytPlb0/vbj1nDIgjVHttEHzKWFjitVpLuSXj38Iw+bYFZrwOV7ir
-	U3jw==
-X-Gm-Message-State: APjAAAXEm5Jctu7WM0xspSX24gn5UTeHn18W/1TDTg4iJh44szOKKn49
-	NhQU5PqzR/Tbw+7QwDBWDuYkddpUe4nHqw==
-X-Google-Smtp-Source: APXvYqz4WYDo2X5tT4guQwyOQkqYM0FFIUm67mo71cQI3kVT2QYmZXCiMjJfENV32WGaRBE1/w/F+A==
-X-Received: by 2002:a63:4c14:: with SMTP id z20mr13272594pga.360.1558706650426;
-	Fri, 24 May 2019 07:04:10 -0700 (PDT)
-Received: from localhost.localdomain ([120.57.120.132])
-	by smtp.gmail.com with ESMTPSA id
-	u11sm2556766pfh.130.2019.05.24.07.04.06
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Fri, 24 May 2019 07:04:09 -0700 (PDT)
-From: Aarushi Mehta <mehta.aaru20@gmail.com>
-To: qemu-devel@nongnu.org
-Date: Fri, 24 May 2019 19:33:31 +0530
-Message-Id: <20190524140337.13415-4-mehta.aaru20@gmail.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20190524140337.13415-1-mehta.aaru20@gmail.com>
-References: <20190524140337.13415-1-mehta.aaru20@gmail.com>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::543
-Subject: [Qemu-devel] [RFC PATCH v2 3/9] include/block: declare interfaces
- for io_uring
+	(envelope-from <eric.auger@redhat.com>) id 1hUAje-0007HB-AP
+	for qemu-devel@nongnu.org; Fri, 24 May 2019 09:59:51 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:26279)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eric.auger@redhat.com>)
+	id 1hUAjd-0006re-6t; Fri, 24 May 2019 09:59:49 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+	[10.5.11.22])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id CF90430820E6;
+	Fri, 24 May 2019 13:59:21 +0000 (UTC)
+Received: from [10.36.116.67] (ovpn-116-67.ams2.redhat.com [10.36.116.67])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 1CE9910027C6;
+	Fri, 24 May 2019 13:59:19 +0000 (UTC)
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
+	qemu-devel@nongnu.org
+References: <20190524124829.2589-1-peter.maydell@linaro.org>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <79be2f7d-d9b6-4742-e116-078ce937a051@redhat.com>
+Date: Fri, 24 May 2019 15:59:18 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.4.0
+MIME-Version: 1.0
+In-Reply-To: <20190524124829.2589-1-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.47]);
+	Fri, 24 May 2019 13:59:21 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH] hw/arm/smmuv3: Fix decoding of ID register
+ range
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -91,90 +73,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
-	saket.sinha89@gmail.com, Stefan Hajnoczi <stefanha@redhat.com>,
-	Julia Suvorova <jusual@mail.ru>, Aarushi Mehta <mehta.aaru20@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Aarushi Mehta <mehta.aaru20@gmail.com>
----
- include/block/aio.h     | 16 +++++++++++++++-
- include/block/raw-aio.h | 15 +++++++++++++++
- 2 files changed, 30 insertions(+), 1 deletion(-)
+Hi Peter,
+On 5/24/19 2:48 PM, Peter Maydell wrote:
+> The SMMUv3 ID registers cover an area 0x30 bytes in size
+> (12 registers, 4 bytes each). We were incorrectly decoding
+> only the first 0x20 bytes.
+> 
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
 
-diff --git a/include/block/aio.h b/include/block/aio.h
-index 0ca25dfec6..9da3fd9793 100644
---- a/include/block/aio.h
-+++ b/include/block/aio.h
-@@ -50,6 +50,7 @@ typedef void IOHandler(void *opaque);
- struct Coroutine;
- struct ThreadPool;
- struct LinuxAioState;
-+struct LuringState;
+Thank you for the fix.
 
- struct AioContext {
-     GSource source;
-@@ -118,11 +119,19 @@ struct AioContext {
-     struct ThreadPool *thread_pool;
+Eric
 
- #ifdef CONFIG_LINUX_AIO
--    /* State for native Linux AIO.  Uses aio_context_acquire/release for
-+    /*
-+     * State for native Linux AIO.  Uses aio_context_acquire/release for
-      * locking.
-      */
-     struct LinuxAioState *linux_aio;
- #endif
-+#ifdef CONFIG_LINUX_IO_URING
-+    /*
-+     * State for Linux io_uring.  Uses aio_context_acquire/release for
-+     * locking.
-+     */
-+    struct LuringState *linux_io_uring;
-+#endif
-
-     /* TimerLists for calling timers - one per clock type.  Has its own
-      * locking.
-@@ -387,6 +396,11 @@ struct LinuxAioState *aio_setup_linux_aio(AioContext *ctx, Error **errp);
- /* Return the LinuxAioState bound to this AioContext */
- struct LinuxAioState *aio_get_linux_aio(AioContext *ctx);
-
-+/* Setup the LuringState bound to this AioContext */
-+struct LuringState *aio_setup_linux_io_uring(AioContext *ctx, Error **errp);
-+
-+/* Return the LuringState bound to this AioContext */
-+struct LuringState *aio_get_linux_io_uring(AioContext *ctx);
- /**
-  * aio_timer_new_with_attrs:
-  * @ctx: the aio context
-diff --git a/include/block/raw-aio.h b/include/block/raw-aio.h
-index ba223dd1f1..28a836151e 100644
---- a/include/block/raw-aio.h
-+++ b/include/block/raw-aio.h
-@@ -58,6 +58,21 @@ void laio_attach_aio_context(LinuxAioState *s, AioContext *new_context);
- void laio_io_plug(BlockDriverState *bs, LinuxAioState *s);
- void laio_io_unplug(BlockDriverState *bs, LinuxAioState *s);
- #endif
-+/* io_uring.c - Linux io_uring implementation */
-+#ifdef CONFIG_LINUX_IO_URING
-+typedef struct LuringState LuringState;
-+LuringState *luring_init(Error **errp);
-+void luring_cleanup(LuringState *s);
-+int coroutine_fn luring_co_submit(BlockDriverState *bs, LuringState *s, int fd,
-+                                uint64_t offset, QEMUIOVector *qiov, int type);
-+BlockAIOCB *luring_submit(BlockDriverState *bs, LuringState *s, int fd,
-+        int64_t sector_num, QEMUIOVector *qiov, BlockCompletionFunc *cb,
-+        void *opaque, int type);
-+void luring_detach_aio_context(LuringState *s, AioContext *old_context);
-+void luring_attach_aio_context(LuringState *s, AioContext *new_context);
-+void luring_io_plug(BlockDriverState *bs, LuringState *s);
-+void luring_io_unplug(BlockDriverState *bs, LuringState *s);
-+#endif
-
- #ifdef _WIN32
- typedef struct QEMUWin32AIOState QEMUWin32AIOState;
---
-2.17.1
+> ---
+>  hw/arm/smmuv3.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/hw/arm/smmuv3.c b/hw/arm/smmuv3.c
+> index fd8ec7860ee..e96d5beb9a8 100644
+> --- a/hw/arm/smmuv3.c
+> +++ b/hw/arm/smmuv3.c
+> @@ -1232,7 +1232,7 @@ static MemTxResult smmu_readl(SMMUv3State *s, hwaddr offset,
+>                                uint64_t *data, MemTxAttrs attrs)
+>  {
+>      switch (offset) {
+> -    case A_IDREGS ... A_IDREGS + 0x1f:
+> +    case A_IDREGS ... A_IDREGS + 0x2f:
+>          *data = smmuv3_idreg(offset - A_IDREGS);
+>          return MEMTX_OK;
+>      case A_IDR0 ... A_IDR5:
+> 
 
