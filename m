@@ -2,82 +2,70 @@ Return-Path: <SRS0=oHhb=TY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AF181C072B5
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 12:36:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BA952C072B5
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 12:37:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 795CE20868
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 12:36:19 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AzfNEgjc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 795CE20868
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 7A38F20675
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 12:37:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7A38F20675
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:53987 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:54007 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hU9Qo-00030U-Ny
-	for qemu-devel@archiver.kernel.org; Fri, 24 May 2019 08:36:18 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:50575)
+	id 1hU9S7-0004NG-PY
+	for qemu-devel@archiver.kernel.org; Fri, 24 May 2019 08:37:39 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:50508)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liq3ea@gmail.com>) id 1hU9PB-00021s-Vy
-	for qemu-devel@nongnu.org; Fri, 24 May 2019 08:34:39 -0400
+	(envelope-from <armbru@redhat.com>) id 1hU9Ot-0001tZ-Jb
+	for qemu-devel@nongnu.org; Fri, 24 May 2019 08:34:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liq3ea@gmail.com>) id 1hU9PA-0008Ge-Ls
-	for qemu-devel@nongnu.org; Fri, 24 May 2019 08:34:37 -0400
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:43393)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <liq3ea@gmail.com>) id 1hU9PA-0008Fh-FN
-	for qemu-devel@nongnu.org; Fri, 24 May 2019 08:34:36 -0400
-Received: by mail-ot1-x343.google.com with SMTP id i8so8506118oth.10
-	for <qemu-devel@nongnu.org>; Fri, 24 May 2019 05:34:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-	:cc; bh=tCn09plksA728Eo8wlZNZ8cCEFr+8E2XrlSp0TSL2Jo=;
-	b=AzfNEgjcCHLQSkmTeybbkn5yuGcNozGBzsMMhudXhV2VBWJmV1LITJnL3LgNkMCBEH
-	kYqhQDF6PvcSKxu0jptG0YkVey9sAJs382KRqmHCmGC6hKTVe2MV+ZHWCm1em5SPANhK
-	20/D/a/Vd2GXo2OH4CcUpaJBFhb1MHatU6PEufKufu5cNxR2I29ojgUYhQZMlE8P8xu6
-	vktR1UldgNb9S2J98U2EsrbUtoP9lS1cB9NWz89axAm2IsGTbjNJ8EoPX8BfOeCMR9l7
-	7hZudXLkpDxRakwZZBY0VH4u2zrURtEXDZaeOoWHB3UlmM2qtMXftXUghxJoff+03+Np
-	1A5w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-	:message-id:subject:to:cc;
-	bh=tCn09plksA728Eo8wlZNZ8cCEFr+8E2XrlSp0TSL2Jo=;
-	b=UQA3XsXIyUkh7gfLl/hy6/GJPL8jEftyJA1czHYe5lR2wA7nie/TPqiJRNgwGvkNMv
-	5qbBlfo3GjoPkA6aisT9EkmoXc+3F8WP23spEfuLh0IpXWBHvnnULOYLrAXhW6Djt8w1
-	NayqAHVnDkJNX2C09b0uYEPC7S9Dbs+q993PyHVmfEBJ1Tkeq9rGo+NEFXkL+FfuoRIe
-	Q7rd1O1ggbLO+UD/K/nU1sXHLeq9NOO/Llo4ZwZ9/uQ5ORo+4glAblbvZC5+Li2uGigx
-	tNxVgtbcUqQVhkP0JF2OV2QCweQ+PXETF35BpdYI0GigTbit4LYQHGsx4ZYVwmIiJ6YZ
-	QiSg==
-X-Gm-Message-State: APjAAAWmR4c4ci5pEeJsyuKMKdTTGzeSCxRBsuEQPMxrdFblyZsRV2kV
-	4mpehEmjsBXMwjHiLVah1e3wceALp6nx9Kr8LjU=
-X-Google-Smtp-Source: APXvYqx/zNsI/UoVypmhOuVZDbkeE/jAnwIH1gAmrnk//Aylj31VNzv2Cjhx1oLkp6vPJhK8ovbFQz+jBMqYtkvf0Bo=
-X-Received: by 2002:a9d:6c5a:: with SMTP id g26mr6833729otq.194.1558701274871; 
-	Fri, 24 May 2019 05:34:34 -0700 (PDT)
+	(envelope-from <armbru@redhat.com>) id 1hU9Os-0007y4-4h
+	for qemu-devel@nongnu.org; Fri, 24 May 2019 08:34:19 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56994)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hU9Or-0007wa-TU
+	for qemu-devel@nongnu.org; Fri, 24 May 2019 08:34:18 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 3B44B356C4;
+	Fri, 24 May 2019 12:34:12 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-117-250.ams2.redhat.com
+	[10.36.117.250])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 967F35D71B;
+	Fri, 24 May 2019 12:34:09 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+	id 259C31138648; Fri, 24 May 2019 14:34:08 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+References: <20190523081538.2291-1-armbru@redhat.com>
+	<20190523081538.2291-4-armbru@redhat.com>
+	<d70ddf0d-0eaa-406a-7427-dc1df1fac76f@redhat.com>
+Date: Fri, 24 May 2019 14:34:08 +0200
+In-Reply-To: <d70ddf0d-0eaa-406a-7427-dc1df1fac76f@redhat.com> ("Philippe
+	=?utf-8?Q?Mathieu-Daud=C3=A9=22's?= message of "Fri,
+	24 May 2019 07:28:32 +0200")
+Message-ID: <87blzs9glb.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1 (gnu/linux)
 MIME-Version: 1.0
-References: <20190524063553.5339-1-philmd@redhat.com>
-	<20190524063553.5339-5-philmd@redhat.com>
-In-Reply-To: <20190524063553.5339-5-philmd@redhat.com>
-From: Li Qiang <liq3ea@gmail.com>
-Date: Fri, 24 May 2019 20:33:58 +0800
-Message-ID: <CAKXe6SJaLz5Hmyi-0ZhZvqcZ=HhP78ad_Z5RcBysp70dXxZ4=g@mail.gmail.com>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::343
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-X-Content-Filtered-By: Mailman/MimeDel 2.1.21
-Subject: Re: [Qemu-devel] [PATCH 04/20] hw/i386/pc: Add the E820Type enum
- type
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.30]);
+	Fri, 24 May 2019 12:34:12 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [RFC v4 3/7] Makefile: Rename targets for make
+ recursion
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -89,121 +77,232 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Yang Zhong <yang.zhong@intel.com>, Eduardo Habkost <ehabkost@redhat.com>,
-	Rob Bradford <robert.bradford@intel.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Marcelo Tosatti <mtosatti@redhat.com>,
-	Qemu Developers <qemu-devel@nongnu.org>,
-	Samuel Ortiz <sameo@linux.intel.com>, Paolo Bonzini <pbonzini@redhat.com>,
-	Richard Henderson <rth@twiddle.net>
+Cc: peter.maydell@linaro.org, pbonzini@redhat.com,
+	Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> =E4=BA=8E2019=E5=B9=B45=E6=
-=9C=8824=E6=97=A5=E5=91=A8=E4=BA=94 =E4=B8=8B=E5=8D=882:45=E5=86=99=E9=81=
-=93=EF=BC=9A
+Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
 
-> This ensure we won't use an incorrect value.
+> On 5/23/19 10:15 AM, Markus Armbruster wrote:
+>> We make a few sub-directories recursively, in particular
+>> $(TARGET_DIRS).
+>>=20
+>> For goal "all", we do it the nice way: "all" has a prerequisite
+>> subdir-T for each T in $(TARGET_DIRS), and T's recipe runs make
+>> recursively.  Behaves nicely with -j and -k.
+>>=20
+>> For other goals such as "clean" and "install", the recipe runs make
+>> recursively in a for loop.  Ignores -j and -k.
+>>=20
+>> The next commit will fix that for "clean" and "install".  This commit
+>> prepares the ground by renaming the targets we use for "all" to
+>> include the goal for the sub-make.  This will permit reusing them for
+>> goals other than "all".
+>>=20
+>> Targets subdir-T for T in $(TARGET_DIRS) run "make all" in T.  Rename
+>> to T/all, and declare phony.
+>>=20
+>> Targets romsubdir-R for R in $(ROMS) run "make" in pc-bios/R.  Default
+>> goal is "all" for all R.  Rename to pc-bios/R/all, and declare phony.
+>>=20
+>> The remainder are renamed just for consistency.
+>>=20
+>> Target subdir-dtc runs "make libbft/libfdt.a" in dtc.  Rename to
+>> dtc/all, and declare phony.
+>>=20
+>> Target subdir-capstone runs make $(BUILD_DIR)/capstone/$(LIBCAPSTONE)
+>> in $(SRC_PATH)/capstone.  Rename to capstone/all, and declare phony.
+>>=20
+>> Target subdir-slirp runs "make" in $(SRC_PATH)/slirp.  Default goal is
+>> all, which builds $(BUILD_DIR)/libslirp.a.  Rename to slirp/all, and
+>> declare phony.
+>>=20
+>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>> ---
+>>  Makefile               | 30 ++++++++++++++++++------------
+>>  configure              |  6 +++---
+>>  tests/Makefile.include |  3 ++-
+>>  3 files changed, 23 insertions(+), 16 deletions(-)
+>>=20
+>> diff --git a/Makefile b/Makefile
+>> index 12e470fa03..09c726bcc2 100644
+>> --- a/Makefile
+>> +++ b/Makefile
+>> @@ -436,8 +436,8 @@ config-host.h-timestamp: config-host.mak
+>>  qemu-options.def: $(SRC_PATH)/qemu-options.hx $(SRC_PATH)/scripts/hxtool
+>>  	$(call quiet-command,sh $(SRC_PATH)/scripts/hxtool -h < $< > $@,"GEN",=
+"$@")
+>>=20=20
+>> -SUBDIR_RULES=3D$(patsubst %,subdir-%, $(TARGET_DIRS))
+>> -SOFTMMU_SUBDIR_RULES=3D$(filter %-softmmu,$(SUBDIR_RULES))
+>> +SUBDIR_RULES=3D$(addsuffix /all, $(TARGET_DIRS))
+>> +SOFTMMU_SUBDIR_RULES=3D$(filter %-softmmu/all,$(SUBDIR_RULES))
+>>=20=20
+>>  $(SOFTMMU_SUBDIR_RULES): $(authz-obj-y)
+>>  $(SOFTMMU_SUBDIR_RULES): $(block-obj-y)
+>> @@ -447,14 +447,16 @@ $(SOFTMMU_SUBDIR_RULES): $(io-obj-y)
+>>  $(SOFTMMU_SUBDIR_RULES): config-all-devices.mak
+>>  $(SOFTMMU_SUBDIR_RULES): $(edk2-decompressed)
+>>=20=20
+>> -subdir-%:
+>> -	$(call quiet-command,$(MAKE) $(SUBDIR_MAKEFLAGS) -C $* V=3D"$(V)" TARG=
+ET_DIR=3D"$*/" all,)
+>> +.PHONY: $(SUBDIR_RULES)
+>> +$(SUBDIR_RULES):
+>> +	$(call quiet-command,$(MAKE) $(SUBDIR_MAKEFLAGS) -C $(dir $@) V=3D"$(V=
+)" TARGET_DIR=3D"$(dir $@)" all,)
+>>=20=20
+>>  DTC_MAKE_ARGS=3D-I$(SRC_PATH)/dtc VPATH=3D$(SRC_PATH)/dtc -C dtc V=3D"$=
+(V)" LIBFDT_srcdir=3D$(SRC_PATH)/dtc/libfdt
+>>  DTC_CFLAGS=3D$(CFLAGS) $(QEMU_CFLAGS)
+>>  DTC_CPPFLAGS=3D-I$(BUILD_DIR)/dtc -I$(SRC_PATH)/dtc -I$(SRC_PATH)/dtc/l=
+ibfdt
+>>=20=20
+>> -subdir-dtc: .git-submodule-status dtc/libfdt dtc/tests
+>> +.PHONY: dtc/all
+>> +dtc/all: .git-submodule-status dtc/libfdt dtc/tests
+>>  	$(call quiet-command,$(MAKE) $(DTC_MAKE_ARGS) CPPFLAGS=3D"$(DTC_CPPFLA=
+GS)" CFLAGS=3D"$(DTC_CFLAGS)" LDFLAGS=3D"$(LDFLAGS)" ARFLAGS=3D"$(ARFLAGS)"=
+ CC=3D"$(CC)" AR=3D"$(AR)" LD=3D"$(LD)" $(SUBDIR_MAKEFLAGS) libfdt/libfdt.a=
+,)
 >
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> OK
+>
+>>=20=20
+>>  dtc/%: .git-submodule-status
+>> @@ -472,21 +474,25 @@ CAP_CFLAGS +=3D -DCAPSTONE_HAS_ARM64
+>>  CAP_CFLAGS +=3D -DCAPSTONE_HAS_POWERPC
+>>  CAP_CFLAGS +=3D -DCAPSTONE_HAS_X86
+>>=20=20
+>> -subdir-capstone: .git-submodule-status
+>> +.PHONY: capstone/all
+>> +capstone/all: .git-submodule-status
+>>  	$(call quiet-command,$(MAKE) -C $(SRC_PATH)/capstone CAPSTONE_SHARED=
+=3Dno BUILDDIR=3D"$(BUILD_DIR)/capstone" CC=3D"$(CC)" AR=3D"$(AR)" LD=3D"$(=
+LD)" RANLIB=3D"$(RANLIB)" CFLAGS=3D"$(CAP_CFLAGS)" $(SUBDIR_MAKEFLAGS) $(BU=
+ILD_DIR)/capstone/$(LIBCAPSTONE))
+>
+> OK
+>
+>>=20=20
+>> -subdir-slirp: .git-submodule-status
+>> +.PHONY: slirp/all
+>> +slirp/all: .git-submodule-status
+>>  	$(call quiet-command,$(MAKE) -C $(SRC_PATH)/slirp BUILD_DIR=3D"$(BUILD=
+_DIR)/slirp" CC=3D"$(CC)" AR=3D"$(AR)" LD=3D"$(LD)" RANLIB=3D"$(RANLIB)" CF=
+LAGS=3D"$(QEMU_CFLAGS) $(CFLAGS)" LDFLAGS=3D"$(LDFLAGS)")
+>
+> OK
+>
+>>=20=20
+>>  $(SUBDIR_RULES): libqemuutil.a $(common-obj-y) \
+>>  	$(qom-obj-y) $(crypto-aes-obj-$(CONFIG_USER_ONLY))
+>>=20=20
+>> -ROMSUBDIR_RULES=3D$(patsubst %,romsubdir-%, $(ROMS))
+>> +ROM_DIRS =3D $(addprefix pc-bios/, $(ROMS))
+>> +ROMSUBDIR_RULES=3D$(addsuffix /all, $(ROM_DIRS))
+>>  # Only keep -O and -g cflags
+>> -romsubdir-%:
+>> -	$(call quiet-command,$(MAKE) $(SUBDIR_MAKEFLAGS) -C pc-bios/$* V=3D"$(=
+V)" TARGET_DIR=3D"$*/" CFLAGS=3D"$(filter -O% -g%,$(CFLAGS))",)
+>> +.PHONY: $(ROMSUBDIR_RULES)
+>> +$(ROMSUBDIR_RULES):
+>> +	$(call quiet-command,$(MAKE) $(SUBDIR_MAKEFLAGS) -C $(dir $@) V=3D"$(V=
+)" TARGET_DIR=3D"$(dir $@)" CFLAGS=3D"$(filter -O% -g%,$(CFLAGS))",)
+>
+> OK
+>
+>>=20=20
+>> -ALL_SUBDIRS=3D$(TARGET_DIRS) $(patsubst %,pc-bios/%, $(ROMS))
+>> +ALL_SUBDIRS=3D$(TARGET_DIRS) $(ROM_DIRS)
+>>=20=20
+>>  recurse-all: $(SUBDIR_RULES) $(ROMSUBDIR_RULES)
+>>=20=20
+>> @@ -1087,7 +1093,7 @@ endif
+>>  	@$(if $(TARGET_DIRS), \
+>>  		echo 'Architecture specific targets:'; \
+>>  		$(foreach t, $(TARGET_DIRS), \
+>> -		printf "  %-30s - Build for %s\\n" $(patsubst %,subdir-%,$(t)) $(t);)=
+ \
+>> +		printf "  %-30s - Build for %s\\n" $(t)/all $(t);) \
+>
+> OK
+>
+>>  		echo '')
+>>  	@echo  'Cleaning targets:'
+>>  	@echo  '  clean           - Remove most generated files but keep the c=
+onfig'
+>> diff --git a/configure b/configure
+>> index d2fc346302..2897434dda 100755
+>> --- a/configure
+>> +++ b/configure
+>> @@ -6570,7 +6570,7 @@ if test "$slirp" !=3D "no"; then
+>>    echo "SLIRP_LIBS=3D$slirp_libs" >> $config_host_mak
+>>  fi
+>>  if [ "$slirp" =3D "git" -o "$slirp" =3D "internal" ]; then
+>> -    echo "config-host.h: subdir-slirp" >> $config_host_mak
+>> +    echo "config-host.h: slirp/all" >> $config_host_mak
+>>  fi
+>>  if test "$vde" =3D "yes" ; then
+>>    echo "CONFIG_VDE=3Dy" >> $config_host_mak
+>> @@ -7836,10 +7836,10 @@ if test -n "$enabled_cross_compilers"; then
+>>  fi
+>>=20=20
+>>  if [ "$fdt" =3D "git" ]; then
+>> -  echo "config-host.h: subdir-dtc" >> $config_host_mak
+>> +  echo "config-host.h: dtc/all" >> $config_host_mak
+>>  fi
+>>  if [ "$capstone" =3D "git" -o "$capstone" =3D "internal" ]; then
+>> -  echo "config-host.h: subdir-capstone" >> $config_host_mak
+>> +  echo "config-host.h: capstone/all" >> $config_host_mak
+>>  fi
+>>  if test -n "$LIBCAPSTONE"; then
+>>    echo "LIBCAPSTONE=3D$LIBCAPSTONE" >> $config_host_mak
+>> diff --git a/tests/Makefile.include b/tests/Makefile.include
+>> index 1865f6b322..2b8d34ca25 100644
+>> --- a/tests/Makefile.include
+>> +++ b/tests/Makefile.include
+>> @@ -1,3 +1,4 @@
+>> +# -*- Mode: makefile -*-
+>>=20=20
+>>  .PHONY: check-help
+>>  check-help:
+>> @@ -880,7 +881,7 @@ define do_test_tap
+>>  endef
+>>=20=20
+>>  .PHONY: $(patsubst %, check-qtest-%, $(QTEST_TARGETS))
+>> -$(patsubst %, check-qtest-%, $(QTEST_TARGETS)): check-qtest-%: subdir-%=
+-softmmu $(check-qtest-y)
+>> +$(patsubst %, check-qtest-%, $(QTEST_TARGETS)): check-qtest-%: %-softmm=
+u/all $(check-qtest-y)
+>>  	$(call do_test_human,$(check-qtest-$*-y) $(check-qtest-generic-y), \
+>>  	  QTEST_QEMU_BINARY=3D$*-softmmu/qemu-system-$* \
+>>  	  QTEST_QEMU_IMG=3Dqemu-img$(EXESUF))
+>>=20
+>
+> There is another one:
+>
+> -- >8 --
+>  # gtester tests with TAP output
+>
+> -$(patsubst %, check-report-qtest-%.tap, $(QTEST_TARGETS)): check-report-=
+qtest-%.tap: subdir-%-softmmu $(check-qtest-y)
+> +$(patsubst %, check-report-qtest-%.tap, $(QTEST_TARGETS)): check-report-=
+qtest-%.tap: %-softmmu/all $(check-qtest-y)
+>         $(call do_test_tap, $(check-qtest-$*-y) $(check-qtest-generic-y),=
+ \
+>           QTEST_QEMU_BINARY=3D$*-softmmu/qemu-system-$* \
+>           QTEST_QEMU_IMG=3Dqemu-img$(EXESUF))
+
+Good catch.
+
 > ---
->  hw/i386/pc.c         | 12 +++++++-----
->  include/hw/i386/pc.h | 16 ++++++++++------
->  2 files changed, 17 insertions(+), 11 deletions(-)
 >
-> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-> index 1245028dd6..ac8343c728 100644
-> --- a/hw/i386/pc.c
-> +++ b/hw/i386/pc.c
-> @@ -868,9 +868,10 @@ static void handle_a20_line_change(void *opaque, int
-> irq, int level)
->      x86_cpu_set_a20(cpu, level);
->  }
->
-> -ssize_t e820_add_entry(uint64_t address, uint64_t length, uint32_t type)
-> +ssize_t e820_add_entry(uint64_t address, uint64_t length, E820Type type)
->  {
->      unsigned int index =3D le32_to_cpu(e820_reserve.count);
-> +    uint32_t utype =3D (uint32_t)type;
->
+> With the fix amended:
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
-I don't have strong opinion for this, as I don't like add an explicit
-conversion.
+Thanks!
 
-
-
->      struct e820_entry *entry;
->
->      if (type !=3D E820_RAM) {
-> @@ -882,7 +883,7 @@ ssize_t e820_add_entry(uint64_t address, uint64_t
-> length, uint32_t type)
->
->          entry->address =3D cpu_to_le64(address);
->          entry->length =3D cpu_to_le64(length);
-> -        entry->type =3D cpu_to_le32(type);
-> +        entry->type =3D cpu_to_le32(utype);
->
->          e820_reserve.count =3D cpu_to_le32(index);
->      }
-> @@ -891,7 +892,7 @@ ssize_t e820_add_entry(uint64_t address, uint64_t
-> length, uint32_t type)
->      e820_table =3D g_renew(struct e820_entry, e820_table, e820_entries +=
- 1);
->      e820_table[e820_entries].address =3D cpu_to_le64(address);
->      e820_table[e820_entries].length =3D cpu_to_le64(length);
-> -    e820_table[e820_entries].type =3D cpu_to_le32(type);
-> +    e820_table[e820_entries].type =3D cpu_to_le32(utype);
->      e820_entries++;
->
->      return e820_entries;
-> @@ -902,10 +903,11 @@ size_t e820_get_num_entries(void)
->      return e820_entries;
->  }
->
-> -bool e820_get_entry(unsigned int idx, uint32_t type,
-> +bool e820_get_entry(unsigned int idx, E820Type type,
->                      uint64_t *address, uint64_t *length)
->  {
-> -    if (idx < e820_entries && e820_table[idx].type =3D=3D cpu_to_le32(ty=
-pe)) {
-> +    uint32_t utype =3D (uint32_t)type;
-> +    if (idx < e820_entries && e820_table[idx].type =3D=3D cpu_to_le32(ut=
-ype))
-> {
->          *address =3D le64_to_cpu(e820_table[idx].address);
->          *length =3D le64_to_cpu(e820_table[idx].length);
->          return true;
-> diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-> index 2bc48c03c6..10e77a40ce 100644
-> --- a/include/hw/i386/pc.h
-> +++ b/include/hw/i386/pc.h
-> @@ -282,12 +282,16 @@ void pc_system_firmware_init(PCMachineState *pcms,
-> MemoryRegion *rom_memory);
->  void pc_madt_cpu_entry(AcpiDeviceIf *adev, int uid,
->                         const CPUArchIdList *apic_ids, GArray *entry);
->
-> -/* e820 types */
-> -#define E820_RAM        1
-> -#define E820_RESERVED   2
-> -#define E820_ACPI       3
-> -#define E820_NVS        4
-> -#define E820_UNUSABLE   5
-> +/**
-> + * E820Type: Type of the e820 address range.
-> + */
-> +typedef enum {
-> +    E820_RAM        =3D 1,
-> +    E820_RESERVED   =3D 2,
-> +    E820_ACPI       =3D 3,
-> +    E820_NVS        =3D 4,
-> +    E820_UNUSABLE   =3D 5
-> +} E820Type;
->
->  ssize_t e820_add_entry(uint64_t, uint64_t, uint32_t);
->  size_t e820_get_num_entries(void);
-> --
-> 2.20.1
->
->
->
