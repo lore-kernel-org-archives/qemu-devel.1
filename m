@@ -2,70 +2,68 @@ Return-Path: <SRS0=oHhb=TY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.0 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E7D4FC072B5
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 11:34:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A439FC072B5
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 11:36:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BC33F217F9
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 11:34:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BC33F217F9
+	by mail.kernel.org (Postfix) with ESMTPS id 7D87B217F9
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 11:36:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7D87B217F9
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:52809 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:52859 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hU8Sy-00047k-2s
-	for qemu-devel@archiver.kernel.org; Fri, 24 May 2019 07:34:28 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:38973)
+	id 1hU8Uf-000513-Lb
+	for qemu-devel@archiver.kernel.org; Fri, 24 May 2019 07:36:13 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:40020)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hU8L2-00060Z-Ry
-	for qemu-devel@nongnu.org; Fri, 24 May 2019 07:26:17 -0400
+	(envelope-from <laurent@vivier.eu>) id 1hU8Px-0001vv-Ir
+	for qemu-devel@nongnu.org; Fri, 24 May 2019 07:31:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hU8L1-0001De-OB
-	for qemu-devel@nongnu.org; Fri, 24 May 2019 07:26:16 -0400
-Received: from mout.kundenserver.de ([217.72.192.73]:37779)
+	(envelope-from <laurent@vivier.eu>) id 1hU8Pw-0003Rs-Id
+	for qemu-devel@nongnu.org; Fri, 24 May 2019 07:31:21 -0400
+Received: from mout.kundenserver.de ([212.227.17.10]:39695)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1hU8L1-0001DJ-Fc
-	for qemu-devel@nongnu.org; Fri, 24 May 2019 07:26:15 -0400
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1hU8Pw-0003R9-9a
+	for qemu-devel@nongnu.org; Fri, 24 May 2019 07:31:20 -0400
 Received: from localhost.localdomain ([78.238.229.36]) by
 	mrelayeu.kundenserver.de (mreue109 [212.227.15.183]) with ESMTPSA
 	(Nemesis)
-	id 1MTAJl-1h3z1Q1cSN-00UYZc; Fri, 24 May 2019 13:25:31 +0200
+	id 1MMoXC-1hBMUE1Xz2-00Ii3v; Fri, 24 May 2019 13:25:26 +0200
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Date: Fri, 24 May 2019 13:25:17 +0200
-Message-Id: <20190524112520.17684-7-laurent@vivier.eu>
+Date: Fri, 24 May 2019 13:25:11 +0200
+Message-Id: <20190524112520.17684-1-laurent@vivier.eu>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190524112520.17684-1-laurent@vivier.eu>
-References: <20190524112520.17684-1-laurent@vivier.eu>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:yOFi+1/VS9lFfLHE3MmqVhmdwHuNz3e7O6H4CfrBLTkz8XQpfq8
-	mgoK/P8HY1atfuEt0jtDqMCHKoVLqlE0thbcyQ84yPXmGPVJZ/AlbmvikS3n3nj6m2Gj5ob
-	ddsnwUi//nfXDP90NyXttBNFy9o+my38OlI2RqgFu6wZHcyOLmVQfrMb8mwmfn3JVXgzCZ2
-	CxVS2Pd6Uimt8DIglxRmw==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:qPWGBI7w6Ww=:2UsWspFWLraJxPR9MCM7HM
-	T3ufGbRYvxsSyRpZafksnpIOjVZFcNvmwRyanUOfEP67BKnwFa8D0FoBuIFoLnVuI00qIpYMu
-	IMv5xG2iWNZon7M5VsZEQ0hJ6VqktV0GXDDz20VWuZ1tGXy1vF1p3OygtBBb++kpe0k3hYxrR
-	KgEiJxNEOYfTGMPO8sLFDjr4YsstDL1sK9wA9hyqY3PWbutRRbdtB1up0GfL8boW3yezaKNra
-	bedS3E+xzkBDr+gnnu7NKjh7eiR8d1jCypP4fuSaXWEyLtNp2wSb+Fhw5MOk+T1zciMVanExQ
-	sDYsTkcBFaMOMyWW8+Ozu7HPedt79xZuKd81R5dNi4LuEpYnvLMdOFVdmTNa3cNgSlkr1jtYd
-	xhfWNSRREGXHFSVx5gbo0w2TK5tpvpyTf9Zk0CsvL0RgCaEIBth42CYU/6MR//dkCpZne567r
-	Ft4/qQfBEqJvwpS2Er3ll6jDW5ESIoClEqbdywTLs5CaaX68ou6MLvesJOIT0m3Ejwg2yanUV
-	7mUe3+UyhQN/tY1pQlGkqvF7aYIKKCQApdm2WdLhGehpSgSGJZVWE94gAw4HRDv2ICglARSyp
-	//PJLsDSU4OyNL00zmG8J2vBlYA3RSeTnyr4Nkl5Un0ifWuuSmD0nSNEbsa2SubRIGGPOiZW6
-	i9fvAYN4e7N0JrW33whC7k65TOygGwC1cNQN/vVRONAAfAu1E/9tDbVaudWJFJ3vBOg73iLVv
-	YG1s9mthOxf7dL3xQiA/TVgXcLwci1bnazSZb2k2uqqM9h9EF4sXrZXMltU=
+X-Provags-ID: V03:K1:EWFXffn87Sj/ccFFTBy1cmwbNR4kSBEn+xKNG6eYTwnxNfg3Is/
+	+p6fF8rKPwfv964D3dfa5CxvcGXV77RRE5sFDReE+CGYMGptWHl0scgn6SF5j04ZXyJc1GK
+	+5dwFdS/HCnoissDbcwRaASDu2Gl1HsyHpcF68LUvIbHSxhiu7tXynaHUbKR/NV/dLmPfsY
+	pNvMA/B+JeAolmbgIe2MA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:N8g5UsJ7N4o=:R92f/fp4uuinxVVuWeXQ5z
+	KhSkrPJ8xME/dlE1+LiZq3UM1/aTzsD6wSGVCet/Pl/k61UZ6iTAA1dO6Hc0axQsFOekv7hfK
+	elQ/MBsvuN/7osmcpAPPskAo5bpxNV2EFZB3xBEIbyiVbNH8t2vwzlebHEceNNylIxrrdus7X
+	po3bLPhpjmaUZjorp9XRQtG8HyyvDWT0Y24ynvWFMQkMhZ8slJioRv/+AEgaBR4S5uj5i08U7
+	nLll22eBkMggGdKeDdYLz8StgtVpX86q9iA1RmTUBi8RpqtIlPLDRMHTh7KS2yStSHpbjHiiG
+	TtnVpqQrW5J0ulQtI9DvufOb8Zl31AR4C1T11lRqpl/yXAVUeOGzHUAoSBXuXwuyhVaf4Ez4b
+	92A0wGH87CKcyA2W6WJr/k5fIumK8W7Yi2pPSHAzc13JkL6ffZlmwAKX9uq3Nc+joxtEnjDth
+	tyk/JZQ4lC9Co3CrVuiWrg0zpcWqwws/QTV9+ZouVaQwAkogMs8pxnlkHHEadHURnHmlZsTxh
+	nVzREE0irnd0lJbgN1xd2lfTDQe+Qtr8/yg4e4aXcIsRCgmzXUXcBQtbNN0tFnZ8tEo8Crufk
+	8GdSgZ8/FZI0lrgzsdWVnmAJwSBjj5lUEqmT9pqQoOpiPtkSEM1rEeJaBH4aGkwnvI+ALnFYk
+	Sv8K8d/Lpnr/UaBbQ2Q/1IQ8AP6VjEx4p4xdGthAnpT2OlWRF0nhIw5T7Lxoe3r+C+ju1uHEB
+	qH7sj0JVassZSQ+ei4qpE9TVmz1l0gTX3BOhQHy1t7kkSHPdaPzGFimiEds=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 217.72.192.73
-Subject: [Qemu-devel] [PULL v2 6/9] linux-user: Sanitize interp_info and,
- for mips only, init field fp_abi
+X-Received-From: 212.227.17.10
+Subject: [Qemu-devel] [PULL v2 0/9] Linux user for 4.1 patches
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -77,59 +75,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Aleksandar Rikalo <arikalo@wavecomp.com>, Riku Voipio <riku.voipio@iki.fi>,
-	Laurent Vivier <laurent@vivier.eu>,
-	Daniel Santos <daniel.santos@pobox.com>,
+Cc: Aleksandar Rikalo <arikalo@wavecomp.com>,
 	Aleksandar Markovic <amarkovic@wavecomp.com>,
-	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+	Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>,
 	Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Daniel Santos <daniel.santos@pobox.com>
+The following changes since commit a4f667b6714916683408b983cfe0a615a725775f:
 
-Sanitize interp_info structure in load_elf_binary() and, for MIPS only,
-init its field fp_abi to MIPS_ABI_FP_UNKNOWN. This fixes appearances of
-"Unexpected FPU mode" message in some MIPS use cases. Currently, this
-bug is a complete stopper for some MIPS binaries.
+  Merge remote-tracking branch 'remotes/cohuck/tags/s390x-20190521-3' into staging (2019-05-21 16:30:13 +0100)
 
-In load_elf_binary(), struct image_info interp_info is used without
-being properly initialized. One result is that when the ELF's program
-header doesn't contain an entry for the ABI flags, then the value of
-the struct image_info's fp_abi field is set to whatever happened to
-be in stack memory at the time.
+are available in the Git repository at:
 
-Backporting to 4.0 and, if possible, to 3.1 is recommended.
+  git://github.com/vivier/qemu.git tags/linux-user-for-4.1-pull-request
 
-Fixes: https://bugs.launchpad.net/qemu/+bug/1825002
+for you to fetch changes up to 5f992db605e2c9ed0c8816c2b0f68b9bc8698f1b:
 
-Signed-off-by: Daniel Santos <daniel.santos@pobox.com>
-Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
-Message-Id: <1558282527-22183-6-git-send-email-aleksandar.markovic@rt-rk.com>
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
----
- linux-user/elfload.c | 5 +++++
- 1 file changed, 5 insertions(+)
+  linux-user: Pass through nanosecond timestamp components for stat syscalls (2019-05-24 13:16:21 +0200)
 
-diff --git a/linux-user/elfload.c b/linux-user/elfload.c
-index ef42e02d8233..02832adfbc0c 100644
---- a/linux-user/elfload.c
-+++ b/linux-user/elfload.c
-@@ -2706,6 +2706,11 @@ int load_elf_binary(struct linux_binprm *bprm, struct image_info *info)
-     char *elf_interpreter = NULL;
-     char *scratch;
- 
-+    memset(&interp_info, 0, sizeof(interp_info));
-+#ifdef TARGET_MIPS
-+    interp_info.fp_abi = MIPS_ABI_FP_UNKNOWN;
-+#endif
-+
-     info->start_mmap = (abi_ulong)ELF_START_MMAP;
- 
-     load_elf_image(bprm->filename, bprm->fd, info,
+----------------------------------------------------------------
+Add /proc/hardware and /proc/cpuinfo,
+update SIOCXXX ioctls,
+fix shmat emulation,
+add nanoseconds in stat,
+init field fp_abi on mips
+
+----------------------------------------------------------------
+
+Aleksandar Markovic (2):
+  linux-user: Fix support for SIOCATMARK and SIOCGPGRP ioctls for xtensa
+  linux-user: Add support for SIOCSPGRP ioctl for all targets
+
+Chen-Yu Tsai (1):
+  linux-user: Pass through nanosecond timestamp components for stat
+    syscalls
+
+Daniel Santos (1):
+  linux-user: Sanitize interp_info and, for mips only, init field fp_abi
+
+Laurent Vivier (2):
+  linux-user: add pseudo /proc/cpuinfo for sparc
+  linux-user: add pseudo /proc/hardware for m68k
+
+Neng Chen (1):
+  linux-user: Add support for SIOC<G|S>IFPFLAGS ioctls for all targets
+
+Richard Henderson (2):
+  linux-user: Fix shmat emulation by honoring host SHMLBA
+  linux-user: Align mmap_find_vma to host page size
+
+ linux-user/elfload.c      | 22 ++++++++----
+ linux-user/ioctls.h       |  3 ++
+ linux-user/mmap.c         | 72 +++++++++++++++++++++------------------
+ linux-user/qemu.h         |  2 +-
+ linux-user/syscall.c      | 49 ++++++++++++++++++++++++--
+ linux-user/syscall_defs.h | 57 ++++++++++++++++++++-----------
+ 6 files changed, 143 insertions(+), 62 deletions(-)
+
 -- 
 2.20.1
 
