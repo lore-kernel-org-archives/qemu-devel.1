@@ -2,150 +2,70 @@ Return-Path: <SRS0=oHhb=TY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_MUTT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 43C1FC072B5
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 19:47:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B0B8C282E3
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 19:48:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 06E3C2133D
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 19:47:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 06E3C2133D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=de.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 5402D206BA
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 19:48:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5402D206BA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:59396 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:59402 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hUG9u-0006pS-9e
-	for qemu-devel@archiver.kernel.org; Fri, 24 May 2019 15:47:18 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:50679)
+	id 1hUGBM-0007pj-KT
+	for qemu-devel@archiver.kernel.org; Fri, 24 May 2019 15:48:48 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:50983)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1hUG8n-0006Sy-WA
-	for qemu-devel@nongnu.org; Fri, 24 May 2019 15:46:11 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1hUGAW-0007W7-0t
+	for qemu-devel@nongnu.org; Fri, 24 May 2019 15:47:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1hUG8m-0006SQ-Ul
-	for qemu-devel@nongnu.org; Fri, 24 May 2019 15:46:09 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:44710
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1hUG8m-0006Rc-Ps
-	for qemu-devel@nongnu.org; Fri, 24 May 2019 15:46:08 -0400
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x4OJgDw2096496
-	for <qemu-devel@nongnu.org>; Fri, 24 May 2019 15:46:05 -0400
-Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2spm8p759b-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 24 May 2019 15:46:05 -0400
-Received: from localhost
-	by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Fri, 24 May 2019 20:46:03 +0100
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (9.149.109.198)
-	by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway:
-	Authorized Use Only! Violators will be prosecuted; 
-	(version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-	Fri, 24 May 2019 20:46:00 +0100
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com
-	(b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-	by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with
-	ESMTP id x4OJjxC848693294
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256
-	verify=OK); Fri, 24 May 2019 19:45:59 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 0EB5EA410A;
-	Fri, 24 May 2019 19:45:59 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id A2BD8A411D;
-	Fri, 24 May 2019 19:45:58 +0000 (GMT)
-Received: from oc7455500831.ibm.com (unknown [9.145.16.173])
-	by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-	Fri, 24 May 2019 19:45:58 +0000 (GMT)
-To: David Hildenbrand <david@redhat.com>,
-	=?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
-	Markus Armbruster <armbru@redhat.com>
-References: <51df31ee-54a1-d7be-bef4-71ae003b8811@redhat.com>
-	<3fab9e76-53ad-2de7-45df-eb69c8604709@redhat.com>
-	<016edc53-278e-cc58-0061-d2c5de80afd2@de.ibm.com>
-	<1ddf0d83-ce0c-f1c9-065d-ff88ddb9293b@redhat.com>
-	<60d1bf3d-659c-d199-6592-d3659702d754@redhat.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
-	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
-	syiRa+UVlsKmx1hsEg==
-Date: Fri, 24 May 2019 21:45:58 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	(envelope-from <ehabkost@redhat.com>) id 1hUGAU-0007ns-3g
+	for qemu-devel@nongnu.org; Fri, 24 May 2019 15:47:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55794)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hUGAS-0007kk-6O
+	for qemu-devel@nongnu.org; Fri, 24 May 2019 15:47:53 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+	[10.5.11.23])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id CC806C056899;
+	Fri, 24 May 2019 19:47:44 +0000 (UTC)
+Received: from localhost (ovpn-116-14.gru2.redhat.com [10.97.116.14])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id A606F19C6A;
+	Fri, 24 May 2019 19:47:38 +0000 (UTC)
+Date: Fri, 24 May 2019 16:47:34 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+To: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Message-ID: <20190524194734.GO10764@habkost.net>
+References: <20190520231910.12184-1-f4bug@amsat.org>
+	<20190522211230.GA10764@habkost.net>
+	<1711852617.24204010.1558561566547.JavaMail.zimbra@redhat.com>
+	<20190522230705.GB10764@habkost.net>
+	<7a046f76-c892-a796-e7d0-b0eda92075d9@redhat.com>
+	<1319868675.24353089.1558618080629.JavaMail.zimbra@redhat.com>
+	<20190523213031.GE10764@habkost.net>
+	<CAL1e-=jqVWxtOCoBayiYhA6D1yxZDA3a3+JrqV3wTDaGbS-eHQ@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <60d1bf3d-659c-d199-6592-d3659702d754@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-X-TM-AS-GCONF: 00
-x-cbid: 19052419-4275-0000-0000-0000033838D0
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19052419-4276-0000-0000-00003847D974
-Message-Id: <d38b05af-effc-97a1-0b4a-a0d44a13f769@de.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
-	definitions=2019-05-24_07:, , signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
-	priorityscore=1501
-	malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
-	clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
-	mlxlogscore=961 adultscore=0 classifier=spam adjust=0 reason=mlx
-	scancount=1 engine=8.0.1-1810050000 definitions=main-1905240128
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <CAL1e-=jqVWxtOCoBayiYhA6D1yxZDA3a3+JrqV3wTDaGbS-eHQ@mail.gmail.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.32]);
+	Fri, 24 May 2019 19:47:45 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
-X-MIME-Autoconverted: from 8bit to quoted-printable by
-	mx0b-001b2d01.pphosted.com id x4OJgDw2096496
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.158.5
-Subject: Re: [Qemu-devel] hw/s390x/ipl: Dubious use of qdev_reset_all_fn
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH 0/4] mips: Add more Avocado tests
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -157,98 +77,186 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Halil Pasic <pasic@linux.ibm.com>, Thomas Huth <thuth@redhat.com>,
-	Cornelia Huck <cohuck@redhat.com>,
-	QEMU Developers <qemu-devel@nongnu.org>, qemu-s390x@nongnu.org
+Cc: Aleksandar Rikalo <arikalo@wavecomp.com>, qemu-devel@nongnu.org,
+	Wainer dos Santos Moschetta <wainersm@redhat.com>,
+	Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>,
+	Aleksandar Markovic <amarkovic@wavecomp.com>,
+	Cleber Rosa <crosa@redhat.com>,
+	Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
+	Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-
-On 24.05.19 21:00, David Hildenbrand wrote:
-> On 24.05.19 20:36, David Hildenbrand wrote:
->> On 24.05.19 20:28, Christian Borntraeger wrote:
->>>
->>>
->>> On 24.05.19 20:04, David Hildenbrand wrote:
->>>> On 24.05.19 19:54, Philippe Mathieu-Daud=C3=A9 wrote:
->>>>> Hi Christian,
->>>>>
->>>>> I'm having hard time to understand why the S390_IPL object calls
->>>>> qemu_register_reset(qdev_reset_all_fn) in its realize() method, whi=
-le
->>>>> being QOM'ified (it has a reset method).
->>>>>
->>>>> It doesn't seem to have a qdev children added explicitly to it.
->>>>> I see it is used as a singleton, what else am I missing?
->>>>>
->>>>> Thanks,
->>>>>
->>>>> Phil.
->>>>>
->>>>
->>>> Looks like I added it back then (~4 years ago) when converting it in=
-to a
->>>> TYPE_DEVICE.
->>>>
->>>> I could imagine that - back then - this was needed because only
->>>> TYPE_SYS_BUS_DEVICE would recursively get reset.
->>>
->>> Yes, back then singleton devices were not recursively resetted. Has t=
-hat changed?
->>
->> Hacking that call out, I don't see it getting called anymore. So it is
->> still required. The question is if it can be reworked.
->>
+On Fri, May 24, 2019 at 03:45:56PM +0200, Aleksandar Markovic wrote:
+> On May 23, 2019 11:31 PM, "Eduardo Habkost" <ehabkost@redhat.com> wrote=
+:
+> >
+> > On Thu, May 23, 2019 at 09:28:00AM -0400, Cleber Rosa wrote:
+> > >
+> > >
+> > > ----- Original Message -----
+> > > > From: "Philippe Mathieu-Daud=E9" <philmd@redhat.com>
+> > > > To: "Eduardo Habkost" <ehabkost@redhat.com>, "Cleber Rosa" <
+> crosa@redhat.com>
+> > > > Cc: "Aleksandar Rikalo" <arikalo@wavecomp.com>, "Philippe
+> Mathieu-Daud=E9" <f4bug@amsat.org>, "Wainer dos Santos
+> > > > Moschetta" <wainersm@redhat.com>, qemu-devel@nongnu.org, "Aleksan=
+dar
+> Markovic" <aleksandar.m.mail@gmail.com>,
+> > > > "Aleksandar Markovic" <amarkovic@wavecomp.com>, "Aurelien Jarno" =
+<
+> aurelien@aurel32.net>
+> > > > Sent: Thursday, May 23, 2019 5:38:34 AM
+> > > > Subject: Re: [Qemu-devel] [PATCH 0/4] mips: Add more Avocado test=
+s
+> > > >
+> > > > On 5/23/19 1:07 AM, Eduardo Habkost wrote:
+> > > > > On Wed, May 22, 2019 at 05:46:06PM -0400, Cleber Rosa wrote:
+> > > > >> ----- Original Message -----
+> > > > >>> From: "Eduardo Habkost" <ehabkost@redhat.com>
+> > > > >>> On Tue, May 21, 2019 at 01:19:06AM +0200, Philippe Mathieu-Da=
+ud=E9
+> wrote:
+> > > > >>>> Hi,
+> > > > >>>>
+> > > > >>>> It was a rainy week-end here, so I invested it to automatize=
+ some
+> > > > >>>> of my MIPS tests.
+> > > > >>>>
+> > > > >>>> The BootLinuxSshTest is not Global warming friendly, it is n=
+ot
+> > > > >>>> meant to run on a CI system but rather on a workstation prev=
+ious
+> > > > >>>> to post a pull request.
+> > > > >>>> It can surely be improved, but it is a good starting point.
+> > > > >>>
+> > > > >>> Until we actually have a mechanism to exclude the test case o=
+n
+> > > > >>> travis-ci, I will remove patch 4/4 from the queue.  Aleksanda=
+r,
+> > > > >>> please don't merge patch 4/4 yet or it will break travis-ci.
+> > > > >>>
+> > > > >>> Cleber, Wainer, is it already possible to make "avocado run" =
+skip
+> > > > >>> tests tagged with "slow"?
+> > > > >>>
+> > > > >>
+> > > > >> The mechanism exists, but we haven't tagged any test so far as
+> slow.
+> > > > >>
+> > > > >> Should we define/document a criteria for a test to be slow?  G=
+iven
+> > > > >> that this is highly subjective, we have to think of:
+> > > > >>
+> > > > >>  * Will we consider the average or maximum run time (the timeo=
+ut
+> > > > >>    definition)?
+> > > > >>
+> > > > >>  * For a single test, what is "slow"? Some rough numbers from
+> Travis
+> > > > >>    CI[1] to help us with guidelines:
+> > > > >>    - boot_linux_console.py:BootLinuxConsole.test_x86_64_pc:  P=
+ASS
+> (6.04 s)
+> > > > >>    - boot_linux_console.py:BootLinuxConsole.test_arm_virt:  PA=
+SS
+> (2.91 s)
+> > > > >>    -
+> > > > >>
+> linux_initrd.py:LinuxInitrd.test_with_2gib_file_should_work_with_linux_=
+v4_16:
+> > > > >>    PASS (18.14 s)
+> > > > >>    - boot_linux.py:BootLinuxAarch64.test_virt:  PASS (396.88 s=
+)
+> > > > >
+> > > > > I don't think we need to overthink this.  Whatever objective
+> > > > > criteria we choose, I'm sure we'll have to adapt them later due
+> > > > > to real world problems.
+> > > > >
+> > > > > e.g.: is 396 seconds too slow?  I don't know, it depends: does =
+it
+> > > > > break Travis and other CI systems often because of timeouts?  I=
+f
+> > > > > yes, then we should probably tag it as slow.
+> > > > >
+> > > > > If having subjective criteria is really a problem (I don't thin=
+k
+> > > > > it is), then we can call the tag "skip_travis", and stop worryi=
+ng
+> > > > > about defining what exactly is "slow".
+> > > >
+> > > > I'd go with a simpler "tags:travis-ci" whitelisting any job expec=
+ting
+> to
+> > > > run smoothly there.
+> > > >
+> > >
+> > > My concern is what becomes of "make check-acceptance".  Should we
+> introduce
+> > > another target, say, "make check-acceptance-ci" or just change its
+> meaning
+> > > and reuse it?
+> >
+> > What about "make check-acceptance TAG=3Dtravis-ci"?
+> >
+> > >
+> > > > Then we can add "slow" tests without having to worry about
+> blacklisting
+> > > > for Travis CI.
+> > > > Also, Other CI can set different timeouts.
+> > > >
+> > > > I'd like maintainers to add as many tests as they want to upstrea=
+m, so
+> > > > these tests can eventually run by anyone, then each maintainer is=
+ free
+> > > > to select which particular set he wants to run as default.
+> > > >
+> > >
+> > > OK, so this matches the idea of carefully curating a set of tests f=
+or
+> > > CI.  WRT white or blacklisting, I favor the approach that requires =
+the
+> > > least effort from the developer to have its test enabled, so I'd go
+> > > with blacklisting.  I fear that simple tests will just sit on the r=
+epo
+> > > without being properly exercised if we need to whitelist them.
+> > >
+> >
+> > I agree.  I'd prefer the default case to be simple and not
+> > require extra tags.  (i.e. tests without any tags would be run in
+> > Travis by default).
+> >
 >=20
-> Yes, as it is not a sysbus device, it won't get reset.
-> The owner (machine) has to take care of this. The following works:
+> Eduardo,
 >=20
+> You are confusing me here.
 >=20
-> diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
-> index b93750c14e..91a31c2cd0 100644
-> --- a/hw/s390x/ipl.c
-> +++ b/hw/s390x/ipl.c
-> @@ -232,7 +232,6 @@ static void s390_ipl_realize(DeviceState *dev, Erro=
-r **errp)
->       */
->      ipl->compat_start_addr =3D ipl->start_addr;
->      ipl->compat_bios_start_addr =3D ipl->bios_start_addr;
-> -    qemu_register_reset(qdev_reset_all_fn, dev);
->  error:
->      error_propagate(errp, err);
->  }
-> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-> index bbc6e8fa0b..658ab529a1 100644
-> --- a/hw/s390x/s390-virtio-ccw.c
-> +++ b/hw/s390x/s390-virtio-ccw.c
-> @@ -338,6 +338,11 @@ static inline void s390_do_cpu_ipl(CPUState *cs, r=
-un_on_cpu_data arg)
->      s390_cpu_set_state(S390_CPU_STATE_OPERATING, cpu);
->  }
-> =20
-> +static void s390_ipl_reset(void)
-> +{
-> +    qdev_reset_all(DEVICE(object_resolve_path_type("", TYPE_S390_IPL, =
-NULL)));
-> +}
-> +
->  static void s390_machine_reset(void)
->  {
->      enum s390_reset reset_type;
-> @@ -353,6 +358,7 @@ static void s390_machine_reset(void)
->      case S390_RESET_EXTERNAL:
->      case S390_RESET_REIPL:
->          qemu_devices_reset();
-> +        s390_ipl_reset();
->          s390_crypto_reset();
-> =20
->          /* configure and start the ipl CPU only */
+> You first suggest:
+>=20
+> > What about "make check-acceptance TAG=3Dtravis-ci"?
 >=20
 
-While this patch is certainly ok, I find it disturbing that qdev devices =
-are being resetted,
-but qom devices not.
+I was just trying to suggest using make variables as input to
+check-acceptance, instead of creating separate makefile rules for
+each set of test cases.  But you are right:
 
+> ... and then say:
+>=20
+> > ...tests without any tags would be run in Travis by default.
+>=20
+> For casual observers like me it is contradictory, I must be missing
+> something here, no?
+
+Yes, if we use tags to exclude tests, the command line would look
+different.  Maybe something like:
+
+  make check-acceptance EXCLUDE_TAGS=3Dskip-travis
+
+The exact format of the arguments don't matter to me, as long as
+we don't require people to write new makefile rules just because
+they want to run a different set of test cases.
+
+--=20
+Eduardo
 
