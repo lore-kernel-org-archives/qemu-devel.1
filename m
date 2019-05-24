@@ -2,59 +2,111 @@ Return-Path: <SRS0=oHhb=TY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 46289C072B5
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 18:03:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E6D7C072B5
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 18:06:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1D7602133D
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 18:03:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1D7602133D
+	by mail.kernel.org (Postfix) with ESMTPS id 7509C2133D
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 18:06:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7509C2133D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:58271 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:58313 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hUEXU-0007yS-Fe
-	for qemu-devel@archiver.kernel.org; Fri, 24 May 2019 14:03:32 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:60256)
+	id 1hUEa6-0000PO-NS
+	for qemu-devel@archiver.kernel.org; Fri, 24 May 2019 14:06:14 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:60846)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1hUEWH-0007Rp-0O
-	for qemu-devel@nongnu.org; Fri, 24 May 2019 14:02:18 -0400
+	(envelope-from <david@redhat.com>) id 1hUEZA-0008Rx-RO
+	for qemu-devel@nongnu.org; Fri, 24 May 2019 14:05:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1hUEWF-0002Pn-VJ
-	for qemu-devel@nongnu.org; Fri, 24 May 2019 14:02:16 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41713)
+	(envelope-from <david@redhat.com>) id 1hUEZ8-0004EF-GY
+	for qemu-devel@nongnu.org; Fri, 24 May 2019 14:05:16 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44796)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jsnow@redhat.com>)
-	id 1hUEWD-0002NP-9v; Fri, 24 May 2019 14:02:13 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
+	(Exim 4.71) (envelope-from <david@redhat.com>)
+	id 1hUEZ4-0003vl-H9; Fri, 24 May 2019 14:05:14 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B7E4F13A82;
-	Fri, 24 May 2019 18:02:11 +0000 (UTC)
-Received: from probe.redhat.com (ovpn-123-140.rdu2.redhat.com [10.10.123.140])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id A01C368735;
-	Fri, 24 May 2019 18:02:08 +0000 (UTC)
-From: John Snow <jsnow@redhat.com>
-To: qemu-block@nongnu.org,
-	qemu-devel@nongnu.org
-Date: Fri, 24 May 2019 14:02:01 -0400
-Message-Id: <20190524180201.3302-1-jsnow@redhat.com>
+	by mx1.redhat.com (Postfix) with ESMTPS id 89F1C308FB9D;
+	Fri, 24 May 2019 18:04:47 +0000 (UTC)
+Received: from [10.36.116.21] (ovpn-116-21.ams2.redhat.com [10.36.116.21])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 9F63D60C62;
+	Fri, 24 May 2019 18:04:43 +0000 (UTC)
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+	Christian Borntraeger <borntraeger@de.ibm.com>,
+	Markus Armbruster <armbru@redhat.com>
+References: <51df31ee-54a1-d7be-bef4-71ae003b8811@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+	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
+	SE+xAvmumFBY
+Organization: Red Hat GmbH
+Message-ID: <3fab9e76-53ad-2de7-45df-eb69c8604709@redhat.com>
+Date: Fri, 24 May 2019 20:04:42 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+In-Reply-To: <51df31ee-54a1-d7be-bef4-71ae003b8811@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.29]);
-	Fri, 24 May 2019 18:02:11 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.43]);
+	Fri, 24 May 2019 18:04:47 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH] event_match: always match on None value
+Subject: Re: [Qemu-devel] hw/s390x/ipl: Dubious use of qdev_reset_all_fn
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -66,80 +118,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: John Snow <jsnow@redhat.com>, mreitz@redhat.com
+Cc: Halil Pasic <pasic@linux.ibm.com>, Thomas Huth <thuth@redhat.com>,
+	Cornelia Huck <cohuck@redhat.com>,
+	QEMU Developers <qemu-devel@nongnu.org>, qemu-s390x@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Before, event_match didn't always recurse if the event value was not a
-dictionary, and would instead check for equality immediately.
+On 24.05.19 19:54, Philippe Mathieu-Daud=C3=A9 wrote:
+> Hi Christian,
+>=20
+> I'm having hard time to understand why the S390_IPL object calls
+> qemu_register_reset(qdev_reset_all_fn) in its realize() method, while
+> being QOM'ified (it has a reset method).
+>=20
+> It doesn't seem to have a qdev children added explicitly to it.
+> I see it is used as a singleton, what else am I missing?
+>=20
+> Thanks,
+>=20
+> Phil.
+>=20
 
-By delaying equality checking to post-recursion, we can allow leaf
-values like "5" to match "None" and take advantage of the generic
-None-returns-True clause.
+Looks like I added it back then (~4 years ago) when converting it into a
+TYPE_DEVICE.
 
-This makes the matching a little more obviously consistent at the
-expense of being able to check for explicit None values, which is
-probably not that important given what this function is used for.
+I could imagine that - back then - this was needed because only
+TYPE_SYS_BUS_DEVICE would recursively get reset.
 
-Signed-off-by: John Snow <jsnow@redhat.com>
----
- python/qemu/__init__.py | 27 +++++++++++++++------------
- 1 file changed, 15 insertions(+), 12 deletions(-)
+Did you try removing it, to see if anything breaks?
 
-diff --git a/python/qemu/__init__.py b/python/qemu/__init__.py
-index 98ed8a2e28..77d45f88fe 100644
---- a/python/qemu/__init__.py
-+++ b/python/qemu/__init__.py
-@@ -409,27 +409,30 @@ class QEMUMachine(object):
-=20
-         The match criteria takes the form of a matching subdict. The eve=
-nt is
-         checked to be a superset of the subdict, recursively, with match=
-ing
--        values whenever those values are not None.
-+        values whenever the subdict values are not None.
-+
-+        This has a limitation that you cannot explicitly check for None =
-values.
-=20
-         Examples, with the subdict queries on the left:
-          - None matches any object.
-          - {"foo": None} matches {"foo": {"bar": 1}}
--         - {"foo": {"baz": None}} does not match {"foo": {"bar": 1}}
--         - {"foo": {"baz": 2}} matches {"foo": {"bar": 1, "baz": 2}}
-+         - {"foo": None} matches {"foo": 5}
-+         - {"foo": {"abc": None}} does not match {"foo": {"bar": 1}}
-+         - {"foo": {"rab": 2}} matches {"foo": {"bar": 1, "rab": 2}}
-         """
-         if match is None:
-             return True
-=20
--        for key in match:
--            if key in event:
--                if isinstance(event[key], dict):
--                    if not QEMUMachine.event_match(event[key], match[key=
-]):
--                        return False
--                elif event[key] !=3D match[key]:
-+        try:
-+            for key in match:
-+                if key in event:
-+                    return QEMUMachine.event_match(event[key], match[key=
-])
-+                else:
-                     return False
--            else:
--                return False
--        return True
-+            return True
-+        except TypeError:
-+            # either match or event wasn't iterable (not a dict)
-+            return match =3D=3D event
-=20
-     def event_wait(self, name, timeout=3D60.0, match=3DNone):
-         """
 --=20
-2.20.1
 
+Thanks,
+
+David / dhildenb
 
