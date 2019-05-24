@@ -2,51 +2,46 @@ Return-Path: <SRS0=oHhb=TY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BF820C072B5
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 06:58:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A8F6BC072B5
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 07:00:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9746A2175B
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 06:58:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9746A2175B
+	by mail.kernel.org (Postfix) with ESMTPS id 376AC2175B
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 07:00:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 376AC2175B
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:50006 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:50020 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hU49t-0002IQ-UO
-	for qemu-devel@archiver.kernel.org; Fri, 24 May 2019 02:58:29 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:44643)
+	id 1hU4BW-0003KU-Em
+	for qemu-devel@archiver.kernel.org; Fri, 24 May 2019 03:00:10 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:44983)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hU48d-0001Wv-Gu
-	for qemu-devel@nongnu.org; Fri, 24 May 2019 02:57:12 -0400
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hU4A7-0002cR-5U
+	for qemu-devel@nongnu.org; Fri, 24 May 2019 02:58:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hU48c-0002p2-E3
-	for qemu-devel@nongnu.org; Fri, 24 May 2019 02:57:11 -0400
-Received: from mail.ilande.co.uk ([46.43.2.167]:38072
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hU4A6-0003Sg-31
+	for qemu-devel@nongnu.org; Fri, 24 May 2019 02:58:43 -0400
+Received: from mail.ilande.co.uk ([46.43.2.167]:38086
 	helo=mail.default.ilande.uk0.bigv.io)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1hU48a-0002nX-3a; Fri, 24 May 2019 02:57:08 -0400
+	id 1hU4A0-0003PT-Qm; Fri, 24 May 2019 02:58:38 -0400
 Received: from host86-185-106-199.range86-185.btcentralplus.com
 	([86.185.106.199] helo=[192.168.1.65])
 	by mail.default.ilande.uk0.bigv.io with esmtpsa
 	(TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.89)
 	(envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1hU45f-0002tz-He; Fri, 24 May 2019 07:54:08 +0100
-To: David Gibson <david@gibson.dropbear.id.au>
-References: <20190507004811.29968-1-anton@ozlabs.org>
-	<20190507004811.29968-4-anton@ozlabs.org>
-	<c1d2a4cf-a9a7-4dfa-ed80-987118043f08@ilande.co.uk>
-	<20190522061112.3accdb76@kryten>
-	<20190522004924.GF30423@umbus.fritz.box>
-	<566efe93-c7a5-b821-dcb3-8577d168ea5a@ilande.co.uk>
-	<20190522061030.GG30423@umbus.fritz.box>
+	id 1hU474-0002uR-6h; Fri, 24 May 2019 07:55:34 +0100
+To: Programmingkid <programmingkidx@gmail.com>,
+	qemu Developers <qemu-devel@nongnu.org>, qemu-ppc <qemu-ppc@nongnu.org>
+References: <B954C7EE-DC27-433A-A271-D7ADF380550A@gmail.com>
 From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 Openpgp: preference=signencrypt
 Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
@@ -73,13 +68,13 @@ Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
 	Ir6VauZs5Gp25XLrL6bh/SL8aK0BX6y79m5nhfKI1/6qtzHAjtMAjqy8ChPvOqVVVqmGUzFg
 	KPsrrIoklWcYHXPyMLj9afispPVR8e0tMKvxzFBWzrWX1mzljbBlnV2n8BIwVXWNbgwpHSsj
 	imgcU9TTGC5qd9g=
-Message-ID: <a4e08b82-bec1-a5a9-60a0-8477a61040c2@ilande.co.uk>
-Date: Fri, 24 May 2019 07:54:53 +0100
+Message-ID: <632b09de-c8e2-9907-9261-47b4de779a69@ilande.co.uk>
+Date: Fri, 24 May 2019 07:56:20 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190522061030.GG30423@umbus.fritz.box>
-Content-Type: text/plain; charset=windows-1252
+In-Reply-To: <B954C7EE-DC27-433A-A271-D7ADF380550A@gmail.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-GB
 Content-Transfer-Encoding: 7bit
 X-SA-Exim-Connect-IP: 86.185.106.199
@@ -88,8 +83,7 @@ X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
 X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 46.43.2.167
-Subject: Re: [Qemu-devel] [PATCH 4/9] target/ppc: Fix lxvw4x,
- lxvh8x and lxvb16x
+Subject: Re: [Qemu-devel] Patch causing qemu-system-ppc to crash
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -101,47 +95,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: ego@linux.vnet.ibm.com, sandipandas1990@gmail.com,
-	richard.henderson@linaro.org, f4bug@amsat.org,
-	qemu-devel@nongnu.org, qemu-ppc@nongnu.org,
-	Anton Blanchard <anton@ozlabs.org>
+Cc: Richard Henderson <rth@twiddle.net>,
+	David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 22/05/2019 07:10, David Gibson wrote:
+On 24/05/2019 03:48, Programmingkid wrote:
 
-> On Wed, May 22, 2019 at 05:37:47AM +0100, Mark Cave-Ayland wrote:
->> On 22/05/2019 01:49, David Gibson wrote:
->>
->>> On Wed, May 22, 2019 at 06:11:12AM +1000, Anton Blanchard wrote:
->>>> Hi,
->>>>
->>>>> I've now had a bit of time to look through this and I believe it is
->>>>> correct, so:
->>>>>
->>>>> Reviewed-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
->>>>
->>>> Thanks Mark. David: any chance we could get this merged? I can't run a
->>>> recent Ubuntu image successfully without it. sshd hangs when I try to
->>>> ssh into it.
->>>
->>> I had a comment that was never addressed - it didn't look like the xth
->>> and xtl temporaries were initialized after the patch.
->>
->> If it helps, here was my analysis at the time (looks like you were also included on
->> the reply?): https://lists.gnu.org/archive/html/qemu-devel/2019-05/msg01515.html.
+> Recently I have noticed that qemu-system-ppc is crashing while booting up my Mac OS X VM. A bit of git bisecting shows this is the patch that causes this issue:
 > 
-> Sorry, I missed that.  Looks reasonable, I think I failed to spot the
-> generated load instructions which effectively initialize the temps.
+> commit 1e262b49b5331441f697461e4305fe06719758a7
+> Author: Richard Henderson <richard.henderson@linaro.org>
+> Date:   Mon Mar 18 12:02:54 2019 -0700
 > 
-> This is all at some remove now, can you resend the patch on top of the
-> latest tree please and I'll apply.  It's missed the pull request I
-> sent today, obviously, but I know I have some other stuff I want to
-> get in pretty soon, so I expect to send another one relatively soon.
+>     tcg/i386: Implement tcg_out_dupm_vec
+>     
+>     At the same time, improve tcg_out_dupi_vec wrt broadcast
+>     from the constant pool.
+>     
+>     Signed-off-by: Richard Henderson <richard.henderson@linaro.org
 
-All done - I've just sent a v2 rebased upon your ppc-for-4.1 branch with R-B and T-B
-tags included.
+I think this is the same issue I reported last week - does the patch at
+https://lists.gnu.org/archive/html/qemu-devel/2019-05/msg03767.html help at all?
 
 
 ATB,
