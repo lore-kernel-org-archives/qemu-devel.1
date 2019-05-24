@@ -6,56 +6,56 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 10C58C282E1
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 17:33:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E61ADC072B5
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 17:33:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D9A9921848
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 17:33:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D9A9921848
+	by mail.kernel.org (Postfix) with ESMTPS id B808721848
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 17:33:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B808721848
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:57885 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:57887 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hUE3y-0000mJ-Ur
-	for qemu-devel@archiver.kernel.org; Fri, 24 May 2019 13:33:03 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:53399)
+	id 1hUE4M-00015C-00
+	for qemu-devel@archiver.kernel.org; Fri, 24 May 2019 13:33:26 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:53416)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hUE25-0007DD-Lv
-	for qemu-devel@nongnu.org; Fri, 24 May 2019 13:31:06 -0400
+	(envelope-from <mreitz@redhat.com>) id 1hUE27-0007Ea-DV
+	for qemu-devel@nongnu.org; Fri, 24 May 2019 13:31:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hUDzb-0004Q5-Gn
-	for qemu-devel@nongnu.org; Fri, 24 May 2019 13:28:32 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56422)
+	(envelope-from <mreitz@redhat.com>) id 1hUDzW-0004NN-PV
+	for qemu-devel@nongnu.org; Fri, 24 May 2019 13:28:27 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50212)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mreitz@redhat.com>)
-	id 1hUDza-0004P8-6B; Fri, 24 May 2019 13:28:30 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
+	id 1hUDzV-0004MN-Hp; Fri, 24 May 2019 13:28:25 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 1DF463004413;
-	Fri, 24 May 2019 17:28:21 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id CD7E330001EB;
+	Fri, 24 May 2019 17:28:24 +0000 (UTC)
 Received: from localhost (ovpn-204-150.brq.redhat.com [10.40.204.150])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id AB2F760C62;
-	Fri, 24 May 2019 17:28:19 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 170545C1B4;
+	Fri, 24 May 2019 17:28:22 +0000 (UTC)
 From: Max Reitz <mreitz@redhat.com>
 To: qemu-block@nongnu.org
-Date: Fri, 24 May 2019 19:28:10 +0200
-Message-Id: <20190524172812.27308-2-mreitz@redhat.com>
+Date: Fri, 24 May 2019 19:28:11 +0200
+Message-Id: <20190524172812.27308-3-mreitz@redhat.com>
 In-Reply-To: <20190524172812.27308-1-mreitz@redhat.com>
 References: <20190524172812.27308-1-mreitz@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.44]);
+	(mx1.redhat.com [10.5.110.41]);
 	Fri, 24 May 2019 17:28:24 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [RFC 1/3] block: Add ImageRotationalInfo
+Subject: [Qemu-devel] [RFC 2/3] file-posix: Inquire rotational status
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -75,144 +75,135 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This enum indicates whether a file is stored on a rotating disk or a
-solid-state drive.  Drivers report it via the .bdrv_get_info() callback,
-and if they do not, the global bdrv_get_info() implementation
-automatically takes it from bs->file or bs->backing, if available.
-
-On the QAPI side, we report the value as part of the ImageInfo
-structure.
+On Linux, we can inquire whether the file is stored on a rotating disk
+or on a solid-state drive through the sysfs.  (The BLKROTATIONAL ioctl
+only works on device files themselves.)
 
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- qapi/block-core.json  | 19 ++++++++++++++++++-
- include/block/block.h |  7 +++++++
- block.c               | 20 +++++++++++++++++++-
- block/qapi.c          |  3 +++
- 4 files changed, 47 insertions(+), 2 deletions(-)
+ block/file-posix.c | 73 ++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 73 insertions(+)
 
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index 3e4042be7f..80b9f2a69c 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -130,6 +130,20 @@
-       'luks': 'QCryptoBlockInfoLUKS'
-   } }
+diff --git a/block/file-posix.c b/block/file-posix.c
+index d018429672..f84179c0dc 100644
+--- a/block/file-posix.c
++++ b/block/file-posix.c
+@@ -161,6 +161,9 @@ typedef struct BDRVRawState {
+     bool check_cache_dropped;
 =20
-+##
-+# @ImageRotationalInfo:
-+#
-+# Indicates whether an image is stored on a rotating disk or not.
-+#
-+# @solid-state: Image is stored on a solid-state drive
-+#
-+# @rotating:    Image is stored on a rotating disk
-+#
-+# Since: 4.1
-+##
-+{ 'enum': 'ImageRotationalInfo',
-+  'data': [ 'solid-state', 'rotating' ] }
+     PRManager *pr_mgr;
 +
- ##
- # @ImageInfo:
- #
-@@ -161,6 +175,9 @@
- #
- # @backing-image: info of the backing image (since 1.6)
- #
-+# @rotational: indicates whether the image is stored on a rotating
-+#              disk or not (since 4.1)
-+#
- # @format-specific: structure supplying additional format-specific
- # information (since 1.7)
- #
-@@ -173,7 +190,7 @@
-            '*cluster-size': 'int', '*encrypted': 'bool', '*compressed': =
-'bool',
-            '*backing-filename': 'str', '*full-backing-filename': 'str',
-            '*backing-filename-format': 'str', '*snapshots': ['SnapshotIn=
-fo'],
--           '*backing-image': 'ImageInfo',
-+           '*backing-image': 'ImageInfo', '*rotational': 'ImageRotationa=
-lInfo',
-            '*format-specific': 'ImageInfoSpecific' } }
-=20
- ##
-diff --git a/include/block/block.h b/include/block/block.h
-index 531cf595cf..dc0f8a4671 100644
---- a/include/block/block.h
-+++ b/include/block/block.h
-@@ -31,6 +31,13 @@ typedef struct BlockDriverInfo {
-      * True if this block driver only supports compressed writes
-      */
-     bool needs_compressed_writes;
-+
-+    /*
-+     * Indicates whether this image file is stored on a rotating disk
-+     * or a solid-state drive.
-+     */
 +    bool has_rotational_info;
 +    ImageRotationalInfo rotational_info;
- } BlockDriverInfo;
+ } BDRVRawState;
 =20
- typedef struct BlockFragInfo {
-diff --git a/block.c b/block.c
-index 4c3902508d..e6b2d6d23b 100644
---- a/block.c
-+++ b/block.c
-@@ -4950,6 +4950,8 @@ void bdrv_get_backing_filename(BlockDriverState *bs=
-,
- int bdrv_get_info(BlockDriverState *bs, BlockDriverInfo *bdi)
- {
-     BlockDriver *drv =3D bs->drv;
-+    int ret;
-+
-     /* if bs->drv =3D=3D NULL, bs is closed, so there's nothing to do he=
-re */
-     if (!drv) {
-         return -ENOMEDIUM;
-@@ -4960,8 +4962,24 @@ int bdrv_get_info(BlockDriverState *bs, BlockDrive=
-rInfo *bdi)
-         }
-         return -ENOTSUP;
+ typedef struct BDRVRawReopenState {
+@@ -378,6 +381,68 @@ static void raw_probe_alignment(BlockDriverState *bs=
+, int fd, Error **errp)
      }
-+
-     memset(bdi, 0, sizeof(*bdi));
--    return drv->bdrv_get_info(bs, bdi);
-+    ret =3D drv->bdrv_get_info(bs, bdi);
-+    if (ret < 0) {
-+        return ret;
-+    }
-+
-+    if (!bdi->has_rotational_info && (bs->file || bs->backing)) {
-+        BlockDriverState *child =3D bs->file ? bs->file->bs : bs->backin=
-g->bs;
-+        BlockDriverInfo child_bdi;
-+
-+        if (bdrv_get_info(child, &child_bdi) >=3D 0) {
-+            bdi->rotational_info =3D child_bdi.rotational_info;
-+            bdi->has_rotational_info =3D child_bdi.has_rotational_info;
-+        }
-+    }
-+
-+    return 0;
  }
 =20
- ImageInfoSpecific *bdrv_get_specific_info(BlockDriverState *bs,
-diff --git a/block/qapi.c b/block/qapi.c
-index 0c13c86f4e..48ebfbdcc1 100644
---- a/block/qapi.c
-+++ b/block/qapi.c
-@@ -286,6 +286,9 @@ void bdrv_query_image_info(BlockDriverState *bs,
-         }
-         info->dirty_flag =3D bdi.is_dirty;
-         info->has_dirty_flag =3D true;
++/**
++ * Tries to inquire whether the file is stored on a rotating disk or a
++ * solid-state drive.
++ */
++static void raw_update_rotational_info(BDRVRawState *s)
++{
++#ifdef CONFIG_LINUX
++    struct stat st;
++    char *part_fname, *rot_fname;
++    char rot_info[3];
++    dev_t dev;
++    int rot_fd;
++    int ret;
 +
-+        info->rotational =3D bdi.rotational_info;
-+        info->has_rotational =3D bdi.has_rotational_info;
++    s->has_rotational_info =3D false;
++
++    if (fstat(s->fd, &st) < 0) {
++        return;
++    }
++
++    if (st.st_rdev) {
++        dev =3D st.st_rdev;
++    } else {
++        dev =3D st.st_dev;
++    }
++
++    part_fname =3D g_strdup_printf("/sys/dev/block/%u:%u/partition",
++                                 major(dev), minor(dev));
++    if (access(part_fname, F_OK) =3D=3D 0) {
++        rot_fname =3D g_strdup_printf("/sys/dev/block/%u:%u/../queue/rot=
+ational",
++                                    major(dev), minor(dev));
++    } else {
++        rot_fname =3D g_strdup_printf("/sys/dev/block/%u:%u/queue/rotati=
+onal",
++                                    major(dev), minor(dev));
++    }
++    g_free(part_fname);
++
++    rot_fd =3D open(rot_fname, O_RDONLY);
++    g_free(rot_fname);
++    if (rot_fd < 0) {
++        return;
++    }
++
++    ret =3D read(rot_fd, rot_info, 2);
++    close(rot_fd);
++    if (ret < 2) {
++        return;
++    }
++
++    rot_info[2] =3D '\0';
++    if (!strcmp(rot_info, "0\n")) {
++        s->rotational_info =3D IMAGE_ROTATIONAL_INFO_SOLID_STATE;
++        s->has_rotational_info =3D true;
++    } else if (!strcmp(rot_info, "1\n")) {
++        s->rotational_info =3D IMAGE_ROTATIONAL_INFO_ROTATING;
++        s->has_rotational_info =3D true;
++    }
++#else /* CONFIG_LINUX */
++    s->has_rotational_info =3D false;
++#endif
++}
++
+ static void raw_parse_flags(int bdrv_flags, int *open_flags, bool has_wr=
+iters)
+ {
+     bool read_write =3D false;
+@@ -652,6 +717,8 @@ static int raw_open_common(BlockDriverState *bs, QDic=
+t *options,
      }
-     info->format_specific =3D bdrv_get_specific_info(bs, &err);
-     if (err) {
+ #endif
+=20
++    raw_update_rotational_info(s);
++
+     bs->supported_zero_flags =3D BDRV_REQ_MAY_UNMAP | BDRV_REQ_NO_FALLBA=
+CK;
+     ret =3D 0;
+ fail:
+@@ -1007,6 +1074,8 @@ static void raw_reopen_commit(BDRVReopenState *stat=
+e)
+     qemu_close(s->fd);
+     s->fd =3D rs->fd;
+=20
++    raw_update_rotational_info(s);
++
+     g_free(state->opaque);
+     state->opaque =3D NULL;
+=20
+@@ -2731,6 +2800,10 @@ static int raw_get_info(BlockDriverState *bs, Bloc=
+kDriverInfo *bdi)
+     BDRVRawState *s =3D bs->opaque;
+=20
+     bdi->unallocated_blocks_are_zero =3D s->discard_zeroes;
++
++    bdi->rotational_info =3D s->rotational_info;
++    bdi->has_rotational_info =3D s->has_rotational_info;
++
+     return 0;
+ }
+=20
 --=20
 2.21.0
 
