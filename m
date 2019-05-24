@@ -6,65 +6,90 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BE0E4C072B5
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 12:39:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 79CC9C072B5
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 12:40:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8416E20851
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 12:39:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8416E20851
+	by mail.kernel.org (Postfix) with ESMTPS id F25BB20851
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 12:40:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F25BB20851
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:54028 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:54078 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hU9Ty-0005aV-NQ
-	for qemu-devel@archiver.kernel.org; Fri, 24 May 2019 08:39:34 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:51187)
+	id 1hU9V5-0006RY-1M
+	for qemu-devel@archiver.kernel.org; Fri, 24 May 2019 08:40:43 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:51599)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hU9RY-0004BY-VJ
-	for qemu-devel@nongnu.org; Fri, 24 May 2019 08:37:06 -0400
+	(envelope-from <mreitz@redhat.com>) id 1hU9TW-0005PM-Hk
+	for qemu-devel@nongnu.org; Fri, 24 May 2019 08:39:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hU9RX-000139-Ln
-	for qemu-devel@nongnu.org; Fri, 24 May 2019 08:37:04 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43486)
+	(envelope-from <mreitz@redhat.com>) id 1hU9TU-0003b5-MW
+	for qemu-devel@nongnu.org; Fri, 24 May 2019 08:39:06 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57188)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hU9RX-00012m-DP
-	for qemu-devel@nongnu.org; Fri, 24 May 2019 08:37:03 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
+	(Exim 4.71) (envelope-from <mreitz@redhat.com>)
+	id 1hU9TQ-0003Vj-ER; Fri, 24 May 2019 08:39:00 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id BA836C06783D;
-	Fri, 24 May 2019 12:37:02 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-117-250.ams2.redhat.com
-	[10.36.117.250])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id E317A5B689;
-	Fri, 24 May 2019 12:36:59 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
-	id 788621138648; Fri, 24 May 2019 14:36:58 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-References: <20190523081538.2291-1-armbru@redhat.com>
-	<20190523081538.2291-6-armbru@redhat.com>
-	<b7370040-3076-5ff5-3b51-b96b0d84184f@redhat.com>
-Date: Fri, 24 May 2019 14:36:58 +0200
-In-Reply-To: <b7370040-3076-5ff5-3b51-b96b0d84184f@redhat.com> ("Philippe
-	=?utf-8?Q?Mathieu-Daud=C3=A9=22's?= message of "Fri,
-	24 May 2019 07:49:39 +0200")
-Message-ID: <877eag9ggl.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1 (gnu/linux)
+	by mx1.redhat.com (Postfix) with ESMTPS id A724330832C8;
+	Fri, 24 May 2019 12:38:58 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-204-150.brq.redhat.com
+	[10.40.204.150])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 286FA6A96A;
+	Fri, 24 May 2019 12:38:53 +0000 (UTC)
+To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+References: <20190523170643.20794-1-jsnow@redhat.com>
+	<20190523170643.20794-4-jsnow@redhat.com>
+	<8a8882b0-b752-0106-88c3-818f42852eef@redhat.com>
+	<b23e01b3-d076-0647-49ca-4554bc565336@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+	mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+	/PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+	U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+	mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+	awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+	AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+	CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+	B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+	2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+	AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+	8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+	4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+	BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+	xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+	W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+	DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+	64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+	ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+	sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+	alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+	/ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+	bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+	R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <3ae87c50-f4a6-ab80-f878-734d3ef61d2a@redhat.com>
+Date: Fri, 24 May 2019 14:38:51 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+In-Reply-To: <b23e01b3-d076-0647-49ca-4554bc565336@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="AMV3ZNIFX6JfTekoWqzf9kUI5pbZt89Bv"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.32]);
-	Fri, 24 May 2019 12:37:02 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.44]);
+	Fri, 24 May 2019 12:38:58 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [RFC v4 5/7] tests: New make target check-source
+X-Content-Filtered-By: Mailman/MimeDel 2.1.21
+Subject: Re: [Qemu-devel] [PATCH v3 3/5] QEMUMachine: add events_wait method
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -76,177 +101,135 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org, pbonzini@redhat.com
+Cc: Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+	qemu-stable@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--AMV3ZNIFX6JfTekoWqzf9kUI5pbZt89Bv
+From: Max Reitz <mreitz@redhat.com>
+To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ qemu-stable@nongnu.org
+Message-ID: <3ae87c50-f4a6-ab80-f878-734d3ef61d2a@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 3/5] QEMUMachine: add events_wait method
+References: <20190523170643.20794-1-jsnow@redhat.com>
+ <20190523170643.20794-4-jsnow@redhat.com>
+ <8a8882b0-b752-0106-88c3-818f42852eef@redhat.com>
+ <b23e01b3-d076-0647-49ca-4554bc565336@redhat.com>
+In-Reply-To: <b23e01b3-d076-0647-49ca-4554bc565336@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-> On 5/23/19 10:15 AM, Markus Armbruster wrote:
->> Make target check-source is for checking the source code itself.  For
->> now, there's just one such check, make target check-headers.  It
->> checks basic header sanity: for each header "FOO.h", test whether
->>=20
->> 	#include "qemu/osdep.h"
->> 	#include "FOO.h"
->> 	#include "FOO.h"
->>=20
->> compiles.
->>=20
->> The test works only in a git tree, with git installed.  It is skipped
->> unless $(SRC_PATH)/.git exists.
->>=20
->> Third-party headers we don't intend to clean up are excluded from this
->> test.  So are a few "funny" headers.  See make variable
->> excluded-headers.
->>=20
->> A large number of headers don't pass this test, by design or by
->> accident.  To keep things more manageable, exclude all headers outside
->> include/ for now.
->>=20
->> Headers known to fail the test are marked with
->>=20
->>     /* FIXME Does not pass make check-headers, yet! */
->>=20
->> Headers known to work only in certain configurations are marked like
->>=20
->>     /* FIXME Does not pass make check-headers without CONFIG_WIN32, yet!=
- */
->>=20
->> I tried to find and mark all of them by testing various
->> configurations.  Still, "make check" might fail for configurations I
->> didn't test.
->>=20
->> Known issue: some of these don't actually need fixing; they're *meant*
->> to work only in certain configurations.  We'll want to invent a
->> suitable marker that doesn't claim FIXME.
->>=20
->> Some headers may only be included into target-dependent code: they use
->> identifiers poisoned by exec/poison.h, or include cpu.h.  These
->> headers are marked with a comment
->>=20
->>     /* NOTE: May only be included into target-dependent code */
->>=20
->> The test treats them specially.
->>=20
->> Known issue: some of these are intended for specific targets.  The
->> test should skip them for other targets, but doesn't.  They're marked
->> FIXME instead, which is wrong.
->>=20
->> New make target check-bad-headers runs the test for headers expected
->> to fail it.  This helps with examining the failures.
->>=20
->> Signed-off-by: Markus Armbruster <armbru@redhat.com>
->> ---
-> [...]>
->> diff --git a/Makefile b/Makefile
->> index 59de8e2494..42f02c5ceb 100644
->> --- a/Makefile
->> +++ b/Makefile
->> @@ -416,6 +416,8 @@ dummy :=3D $(call unnest-vars,, \
->>                  audio-obj-m \
->>                  trace-obj-y)
->>=20=20
->> +RECURSIVE_TARGETS :=3D all clean install
->> +
->>  include $(SRC_PATH)/tests/Makefile.include
->>=20=20
->>  all: $(DOCS) $(if $(BUILD_DOCS),sphinxdocs) $(TOOLS) $(HELPERS-y) recur=
-se-all modules
->> @@ -436,7 +438,7 @@ config-host.h-timestamp: config-host.mak
->>  qemu-options.def: $(SRC_PATH)/qemu-options.hx $(SRC_PATH)/scripts/hxtool
->>  	$(call quiet-command,sh $(SRC_PATH)/scripts/hxtool -h < $< > $@,"GEN",=
-"$@")
->>=20=20
->> -TARGET_DIRS_RULES :=3D $(foreach t, all clean install, $(addsuffix /$(t=
-), $(TARGET_DIRS)))
->> +TARGET_DIRS_RULES:=3D$(foreach t, $(RECURSIVE_TARGETS), $(addsuffix /$(=
-t), $(TARGET_DIRS)))
->>=20=20
->>  SOFTMMU_ALL_RULES=3D$(filter %-softmmu/all, $(TARGET_DIRS_RULES))
->>  $(SOFTMMU_ALL_RULES): $(authz-obj-y)
->> diff --git a/Makefile.target b/Makefile.target
->> index fdbe7c89f4..a46cfda580 100644
->> --- a/Makefile.target
->> +++ b/Makefile.target
->> @@ -41,6 +41,7 @@ STPFILES=3D
->>=20=20
->>  # Makefile Tests
->>  include $(SRC_PATH)/tests/tcg/Makefile.include
->> +include $(SRC_PATH)/tests/check-headers.mak
->>=20=20
->>  config-target.h: config-target.h-timestamp
->>  config-target.h-timestamp: config-target.mak
->> @@ -216,6 +217,22 @@ hmp-commands.h: $(SRC_PATH)/hmp-commands.hx $(SRC_P=
-ATH)/scripts/hxtool
->>  hmp-commands-info.h: $(SRC_PATH)/hmp-commands-info.hx $(SRC_PATH)/scrip=
-ts/hxtool
->>  	$(call quiet-command,sh $(SRC_PATH)/scripts/hxtool -h < $< > $@,"GEN",=
-"$(TARGET_DIR)$@")
->>=20=20
->> +.PHONY: check-headers
->> +ifeq ($(wildcard $(SRC_PATH)/.git),)
->> +check-headers check-bad-headers:
->> +	@echo "  SKIP  $@ (requires a git tree)"
->> +else
->> +check-headers: $(check-target-header-tests:.c=3D.o)
->> +
->> +# Expected to fail:
->> +check-bad-headers: $(check-bad-target-header-tests:.c=3D.o)
->> +
->> +.SECONDARY: $(check-target-header-tests)
->> +$(check-target-header-tests) $(check-bad-target-header-tests): tests/he=
-ader-test-template.c
->> +	@mkdir -p $(dir $@)
->> +	@sed 's,@header@,$(subst tests/headers/,,$(@:.c=3D.h)),' <$< >$@
->> +endif
->> +
->>  clean: clean-target
->>  	rm -f *.a *~ $(PROGS)
->>  	rm -f $(shell find . -name '*.[od]')
->> @@ -238,3 +255,5 @@ endif
->>=20=20
->>  generated-files-y +=3D config-target.h
->>  Makefile: $(generated-files-y)
->> +
->> +-include $(check-target-header-tests:.c=3D.d) $(check-bad-target-header=
--tests:.c=3D.d)
->
-> $ make microblazeel-softmmu/tests/headers/include/exec/user/abitypes.o
-> ./include/exec/user/abitypes.h:6:10: fatal error: cpu.h: No such file or
-> directory
-> make: *** [./rules.mak:69:
-> microblazeel-softmmu/tests/headers/include/exec/user/abitypes.o] Error 1
->
-> ^ this one looks legit, it's arch-specific, right?
+On 23.05.19 20:03, John Snow wrote:
+>=20
+>=20
+> On 5/23/19 1:49 PM, Max Reitz wrote:
+>> On 23.05.19 19:06, John Snow wrote:
+>>> Instead of event_wait which looks for a single event, add an events_w=
+ait
+>>> which can look for any number of events simultaneously. However, it
+>>> will still only return one at a time, whichever happens first.
+>>>
+>>> Signed-off-by: John Snow <jsnow@redhat.com>
+>>> ---
+>>>  python/qemu/__init__.py | 69 +++++++++++++++++++++++++++++----------=
+--
+>>>  1 file changed, 49 insertions(+), 20 deletions(-)
+>>>
+>>> diff --git a/python/qemu/__init__.py b/python/qemu/__init__.py
+>>> index 81d9657ec0..98ed8a2e28 100644
+>>> --- a/python/qemu/__init__.py
+>>> +++ b/python/qemu/__init__.py
+>>> @@ -402,42 +402,71 @@ class QEMUMachine(object):
+>>>          self._qmp.clear_events()
+>>>          return events
+>>> =20
+>>> -    def event_wait(self, name, timeout=3D60.0, match=3DNone):
+>>> +    @staticmethod
+>>> +    def event_match(event, match=3DNone):
+>>>          """
+>>> -        Wait for specified timeout on named event in QMP; optionally=
+ filter
+>>> -        results by match.
+>>> +        Check if an event matches optional match criteria.
+>>> =20
+>>> -        The 'match' is checked to be a recursive subset of the 'even=
+t'; skips
+>>> -        branch processing on match's value None
+>>> -           {"foo": {"bar": 1}} matches {"foo": None}
+>>> -           {"foo": {"bar": 1}} does not matches {"foo": {"baz": None=
+}}
+>>> +        The match criteria takes the form of a matching subdict. The=
+ event is
+>>> +        checked to be a superset of the subdict, recursively, with m=
+atching
+>>> +        values whenever those values are not None.
+>>> +
+>>> +        Examples, with the subdict queries on the left:
+>>> +         - None matches any object.
+>>> +         - {"foo": None} matches {"foo": {"bar": 1}}
+>>> +         - {"foo": {"baz": None}} does not match {"foo": {"bar": 1}}=
 
-Yes: it includes cpu.h.
+>>
+>> Pre-existing, but the difference between =E2=80=9Cbar=E2=80=9D and =E2=
+=80=9Cbaz=E2=80=9D confused me
+>> quite a bit.
+>>
+>> Also, I wonder...  {"foo": None} would not match {"foo": 1}, right?
+>> Does that make sense?  Shouldn=E2=80=99t None be the wildcard here in =
+general?
+>> (Also pre-existing of course.)
+>>
+>> But this patch doesn=E2=80=99t make things worse, so:
+>>
+>> Reviewed-by: Max Reitz <mreitz@redhat.com>
+>>
+>> (I=E2=80=99d still like your opinion.)
+>>
+>=20
+> I knew I was inviting trouble by trying to re-document this.
+>=20
+> The intention I had when writing the docs, which I think are wrong now,=
 
-> $ make tests/headers/include/hw/net/lance.o
->   CC      tests/headers/include/hw/net/lance.o
-> In file included from tests/headers/include/hw/net/lance.c:14:
-> ./include/hw/net/lance.h:42:5: error: unknown type name =E2=80=98SysBusDe=
-vice=E2=80=99
->      SysBusDevice parent_obj;
->      ^~~~~~~~~~~~
-> make: *** [./rules.mak:69: tests/headers/include/hw/net/lance.o] Error 1
->
-> $ make tests/headers/include/hw/isa/vt82c686.o
->   CC      tests/headers/include/hw/isa/vt82c686.o
-> In file included from tests/headers/include/hw/isa/vt82c686.c:14:
-> ./include/hw/isa/vt82c686.h:13:27: error: unknown type name =E2=80=98qemu=
-_irq=E2=80=99
->                            qemu_irq sci_irq);
->                            ^~~~~~~~
-> make: *** [./rules.mak:69: tests/headers/include/hw/isa/vt82c686.o]
->
-> Nice, I like it :)
->
-> The rule pattern is not obvious (in particular with arch-specific
-> targets), but it has probably always been like that.
->
-> Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> was for {"foo": None} to match {"foo": 1}, but I think you're right tha=
+t
+> it won't because '1' isn't a dict, so it tests for equality instead.
+>=20
+> So I need to fix this one up a little bit, but I'll take the review as =
+a
+> sign that this approach seems workable.
 
-Thanks!
+I think the comment is technically completely correct.  It=E2=80=99s just=
+ that
+(1) it=E2=80=99s hard to discern =E2=80=9Cbar=E2=80=9D from =E2=80=9Cbaz=E2=
+=80=9D, and (2) if {"foo": None}
+intentionally does not match {"foo": 1}, we may want to document that,
+because it isn=E2=80=99t intuitively clear from the description.  If it=E2=
+=80=99s a bug,
+the code should be fixed (and it should still be documented).
+
+Max
+
+
+--AMV3ZNIFX6JfTekoWqzf9kUI5pbZt89Bv
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlzn5dsACgkQ9AfbAGHV
+z0A37Qf9FKTFbFXQ4ivXTF+kbmJ1XXCc2xWFz6m6XKOfqfy3QSrWEN0tB/KrHq5q
+0JuZKF3NuJ45Erf+zkRRDNGIMlDA8B80Dkfc4/rehOjx4qXveTWbi0+Zo/ixgWYE
+nbXJ+Ld3bu5xXH1QQ4nNS+r+xprbfxkr5h97RdlYFCK++LPp8Fq8EwjYkE1i1JZJ
+QIH+gHTnr/lYcsHG/54I4K0Z5tKEyIKxyETpyKLQo6wO7t30jWHKEtcZqprhDxlW
+HQEl8VWimy7IEJg7lYp2L5fNOLI7C++wLr5zRAWQ2OMVqbD1VEx0zgswtQQxDEAG
+VB5xnU8vJZ9Ihv3uHup2a1mEstvhug==
+=JZvB
+-----END PGP SIGNATURE-----
+
+--AMV3ZNIFX6JfTekoWqzf9kUI5pbZt89Bv--
 
