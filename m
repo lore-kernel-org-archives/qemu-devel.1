@@ -3,62 +3,71 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A45F4C072B5
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 17:35:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4906AC072B5
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 17:36:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6BF5C2184E
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 17:35:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6BF5C2184E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
+	by mail.kernel.org (Postfix) with ESMTPS id 1C80C2184E
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 17:36:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1C80C2184E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:57954 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:57978 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hUE6Y-0003HQ-Pp
-	for qemu-devel@archiver.kernel.org; Fri, 24 May 2019 13:35:42 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:53399)
+	id 1hUE7f-0004fw-Dp
+	for qemu-devel@archiver.kernel.org; Fri, 24 May 2019 13:36:51 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:54923)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Milos.Stojanovic@rt-rk.com>) id 1hUE23-0007DD-LA
-	for qemu-devel@nongnu.org; Fri, 24 May 2019 13:31:05 -0400
+	(envelope-from <bounces@canonical.com>) id 1hUE5h-0002rB-Jp
+	for qemu-devel@nongnu.org; Fri, 24 May 2019 13:34:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Milos.Stojanovic@rt-rk.com>) id 1hUDzn-0004WV-60
-	for qemu-devel@nongnu.org; Fri, 24 May 2019 13:28:45 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:38019 helo=mail.rt-rk.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <Milos.Stojanovic@rt-rk.com>)
-	id 1hUDzm-0003gr-S4
-	for qemu-devel@nongnu.org; Fri, 24 May 2019 13:28:43 -0400
-Received: from localhost (localhost [127.0.0.1])
-	by mail.rt-rk.com (Postfix) with ESMTP id CD3351A4172;
-	Fri, 24 May 2019 19:27:37 +0200 (CEST)
-X-Virus-Scanned: amavisd-new at rt-rk.com
-Received: by mail.rt-rk.com (Postfix, from userid 492)
-	id 02AF81A4638; Fri, 24 May 2019 19:27:35 +0200 (CEST)
-in-reply-to: <CAFEAcA_gW9PZFTB42LRXCPcD+aiWBdH3TQX7nHad_5=ioRm-ug@mail.gmail.com>
-to: "Peter Maydell" <peter.maydell@linaro.org>
-from: "Milos Stojanovic" <Milos.Stojanovic@rt-rk.com>
-message-id: <71b2-5ce82980-b-635bde80@15751148>
-X-Forward: 127.0.0.1
-date: Fri, 24 May 2019 19:27:34 +0200
+	(envelope-from <bounces@canonical.com>) id 1hUE5g-0008SE-Jq
+	for qemu-devel@nongnu.org; Fri, 24 May 2019 13:34:49 -0400
+Received: from indium.canonical.com ([91.189.90.7]:57596)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1hUE5g-0008R5-EP
+	for qemu-devel@nongnu.org; Fri, 24 May 2019 13:34:48 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1hUE5f-0004Wc-4p
+	for <qemu-devel@nongnu.org>; Fri, 24 May 2019 17:34:47 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 16EF32E8083
+	for <qemu-devel@nongnu.org>; Fri, 24 May 2019 17:34:47 +0000 (UTC)
 MIME-Version: 1.0
-User-Agent: SOGoMail 2.3.10
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 89.216.37.149
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-X-Content-Filtered-By: Mailman/MimeDel 2.1.21
-Subject: Re: [Qemu-devel] 
- =?utf-8?b?Pz09P3V0Zi04P3E/ID89PT91dGYtOD9xPyBbUEFU?=
- =?utf-8?q?CH_0/5=5D=3F=3D=3D=3Futf-8=3Fq=3F_linux-user=3A_Support_signal_?=
- =?utf-8?q?passing_for_targets_having_more_signals_than_host?=
+Date: Fri, 24 May 2019 17:21:45 -0000
+From: Thomas Huth <1586229@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=Invalid; importance=Undecided;
+	assignee=None; 
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: frazzledjazz th-huth
+X-Launchpad-Bug-Reporter: rjasmin (frazzledjazz)
+X-Launchpad-Bug-Modifier: Thomas Huth (th-huth)
+References: <20160527022808.17624.11582.malonedeb@soybean.canonical.com>
+Message-Id: <155871850699.8234.11507608342612221479.launchpad@wampee.canonical.com>
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="18968";
+	Instance="launchpad-lazr.conf"
+X-Launchpad-Hash: 58701d28c4d8e51b89968b13908b0d00a58df8f0
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 91.189.90.7
+Subject: [Qemu-devel] [Bug 1586229] Re: seabios hell
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -67,38 +76,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>,
-	Aleksandar Markovic <aleksandar.markovic@rt-rk.com>,
-	QEMU Developers <qemu-devel@nongnu.org>,
-	Aleksandar Markovic <amarkovic@wavecomp.com>
+Reply-To: Bug 1586229 <1586229@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+** Changed in: qemu
+       Status: New =3D> Invalid
 
-Hello, Peter.
-For this implemenation rt=5Fsigqueueinfo()/rt=5Ftgsigqueueinfo() were u=
-sed to multiplex signals that are out of the host range. This enabled t=
-he use of a wider signal range with rt=5Fsigqueueinfo(), rt=5Ftgsigqueu=
-einfo(), as well as kill() (for pid > 0) and tgkill(). A process can no=
-w use these system calls to send a range of signals which weren't suppo=
-reted before to itself or others threads or processes.
+-- =
 
-The tkill() system call and kill() with the argument pid <=3D 0 couldn'=
-t be implemented simply using this method because it requires acquiring=
- information about, and sending simultaneous signals to multiple thread=
-s or processes and these functionalities are out of the scope of rt=5Fs=
-igqueueinfo()/rt=5Ftgsigqueueinfo().
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1586229
 
-This patch set was primarily focused on expanding the range of real-tim=
-e signals and making them usable but some limitations still remain. For=
- example, the priority of those real-time signals, as defined by POSIX,=
- doesn't depend on the actual signal number but on the host signal nube=
-r which is used for multiplexing.
-As it now is, the functionaly is only enabled for signals that are high=
-er-numbered then the host signals but I don't see a conceptual problem =
-in expanding and testing the implenentation to include other signals (e=
-.g. the signals that NPTL uses).
+Title:
+  seabios hell
 
-Regards,
-Milo=C5=A1
+Status in QEMU:
+  Invalid
+
+Bug description:
+  getting weird annoying seabios hell and not sure how to fix it.
+
+  ok.
+
+  there IS a SEA-BIOS. There IS a way in.
+
+  -I found it by mistake.(and yall need to move the BIOS key...its in
+  the wrong place)
+
+  I was tryng to boot Yosemite to re-install. I mashed the key too early
+  and it wanted to boot the hard drive.
+
+  Apparently the bios loads AFTER the hard drive wants to boot, not
+  BEFORE it.And it will ONLY load when booting a hard disk.
+
+  ..Booting hard disk...[mash F8 here but let go and wait]
+  eventually will want to load the OS and clear the screen[mash F8 again]
+
+  --Youre in!
+
+  Its tiny, like a mini award bios but youre in! =
+
+  -Change anything HERE, though...and kiss booting a cd goodbye!
+
+  Im trying to diagnose a black screen, seems related to seabios, not
+  the vga driver.
+
+  -mayhaps wants to boot hard disk but in fact its not bootable as the
+  installer hung(and often unices install bootloader late in process)?
+
+  I cant boot the disc to reinstall to tell. But I have a few dos iso
+  lying around...hmmm.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1586229/+subscriptions
+
