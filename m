@@ -2,83 +2,92 @@ Return-Path: <SRS0=oHhb=TY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 07A3EC072B5
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 12:13:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D140C072B5
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 12:26:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C429F2081C
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 12:13:30 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qA88Qeel"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C429F2081C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id D8D0120862
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 12:26:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D8D0120862
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:53670 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:53818 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hU94k-0008Nv-2E
-	for qemu-devel@archiver.kernel.org; Fri, 24 May 2019 08:13:30 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:45331)
+	id 1hU9Gp-0003GQ-Gu
+	for qemu-devel@archiver.kernel.org; Fri, 24 May 2019 08:25:59 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:48389)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liq3ea@gmail.com>) id 1hU91H-0005QB-0R
-	for qemu-devel@nongnu.org; Fri, 24 May 2019 08:09:56 -0400
+	(envelope-from <eblake@redhat.com>) id 1hU9Fu-0002nv-NI
+	for qemu-devel@nongnu.org; Fri, 24 May 2019 08:25:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liq3ea@gmail.com>) id 1hU8pm-0001op-P2
-	for qemu-devel@nongnu.org; Fri, 24 May 2019 07:58:03 -0400
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:46889)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <liq3ea@gmail.com>) id 1hU8pm-0001oL-JV
-	for qemu-devel@nongnu.org; Fri, 24 May 2019 07:58:02 -0400
-Received: by mail-ot1-x343.google.com with SMTP id j49so8393060otc.13
-	for <qemu-devel@nongnu.org>; Fri, 24 May 2019 04:58:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-	:cc; bh=PltKjoDHQGaqX+zwe7ldhYz18ggIoDZwmZo/+n9kFWU=;
-	b=qA88Qeelf0jojBHKuMD3uTzBO/r6dni1Hsa73V7Bede1AkX3evPjLfNIZQHvqtFZEn
-	rWE817R9odfmOKAM1lzcPEj5RmDlD4R89zPxtPZN/QJ77oP5jVd67iplNX3u+1NNDy4b
-	hUZFwfcA6VGaAosWoHCfW/vxyxSeSgu37Csu1MgRwJi85/lLtqAPdpjepymkMbvZF/02
-	qumw/i4pX0Yy+xU/KjKSswgNSC/5i9besppSBgVKFCNioL/MphrChr+QLbtHHaFLgoE8
-	1Cd5MXPCMsLk5HviyMmGmDwyYK4am8uxXHcLOxcwk0eaZt7frG3ccrWkeH5xIoAg1oH+
-	CoIA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-	:message-id:subject:to:cc;
-	bh=PltKjoDHQGaqX+zwe7ldhYz18ggIoDZwmZo/+n9kFWU=;
-	b=bCYFJrXcXPsa0d60kAu419CkA3R7bjAL8evk+yQaGYnDMRuKQ1/27vvafQpZlvlOfa
-	kXuFcf9nQlYIk5Xza0SVRA8XQFKzPxSkCLtTTxKBVX2zwBPfVWnKz5210BxMfMZzhqkS
-	9Klg+hMvDl9/MIEPzuCOC+jbGQMascaWeLgu+fd2BBgUWzCgMVIrNzC83VrxZwtMh4xc
-	8ayZFtbg6XNqP/M8eI+4NVB0Vl1ftIeJJV8lXqMESYN0R6VgDdHtK5UA69/U+XiiUjXn
-	whu+fzMgT7l9CKhELXFrhH3BLaNnHiV+G5uEwx1D6Q3kYhwd2Q83jK8TNmip2c+zE8+q
-	gPzA==
-X-Gm-Message-State: APjAAAWxnM3LXXGs9pP8LMa/2Cfqjm1oxEYM/10qiepiLqpkpsN1E9bB
-	coKMxU4FyaUYfBNfuq7kQHmvaNl/KIryqHWB4mo=
-X-Google-Smtp-Source: APXvYqyjjHNzxGxDDZQdGUS9rBVOJdjQsCpvNWcZdimUdVeHPeJ7B1HuQ9zTC0VURp5ZcIQwtLYrN2wwvPOl+38m8sM=
-X-Received: by 2002:a05:6830:1386:: with SMTP id
-	d6mr1331660otq.149.1558699081190; 
-	Fri, 24 May 2019 04:58:01 -0700 (PDT)
+	(envelope-from <eblake@redhat.com>) id 1hU9Ft-0002u4-U3
+	for qemu-devel@nongnu.org; Fri, 24 May 2019 08:25:02 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:4144)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>)
+	id 1hU9Fr-0002iv-Lr; Fri, 24 May 2019 08:24:59 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 6BE5D307D863;
+	Fri, 24 May 2019 12:24:35 +0000 (UTC)
+Received: from [10.3.116.169] (ovpn-116-169.phx2.redhat.com [10.3.116.169])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id C64C05DA2E;
+	Fri, 24 May 2019 12:24:32 +0000 (UTC)
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+References: <20190523160104.21258-1-kwolf@redhat.com>
+	<20190523160104.21258-8-kwolf@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=eblake@redhat.com; keydata=
+	xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
+	xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
+	TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
+	GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
+	sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
+	AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
+	CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
+	RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
+	wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
+	Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
+	gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
+	pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
+	zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
+	pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
+	3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
+	NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
+	cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
+	SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
+	I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
+	mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
+	Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
+	2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
+Organization: Red Hat, Inc.
+Message-ID: <33434bf3-54a1-e5f2-6b7d-704de5423413@redhat.com>
+Date: Fri, 24 May 2019 07:24:31 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-References: <20190524063553.5339-1-philmd@redhat.com>
-	<20190524063553.5339-2-philmd@redhat.com>
-In-Reply-To: <20190524063553.5339-2-philmd@redhat.com>
-From: Li Qiang <liq3ea@gmail.com>
-Date: Fri, 24 May 2019 19:57:25 +0800
-Message-ID: <CAKXe6SLLtt=DnvMqGA=ztD8EWy_7X0nQoWr-W1_TUY_2tXWXVA@mail.gmail.com>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::343
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20190523160104.21258-8-kwolf@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="o5XSQUnVwlgsHx7EAPRM9zL1fIUSwoSED"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.48]);
+	Fri, 24 May 2019 12:24:37 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
 X-Content-Filtered-By: Mailman/MimeDel 2.1.21
-Subject: Re: [Qemu-devel] [PATCH 01/20] hw/i386/pc: Use unsigned type to
- index arrays
+Subject: Re: [Qemu-devel] [PATCH 07/15] test-block-iothread: Test adding
+ parent to iothread node
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -90,73 +99,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Yang Zhong <yang.zhong@intel.com>, Eduardo Habkost <ehabkost@redhat.com>,
-	Rob Bradford <robert.bradford@intel.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Marcelo Tosatti <mtosatti@redhat.com>,
-	Qemu Developers <qemu-devel@nongnu.org>,
-	Samuel Ortiz <sameo@linux.intel.com>, Paolo Bonzini <pbonzini@redhat.com>,
-	Richard Henderson <rth@twiddle.net>
+Cc: qemu-devel@nongnu.org, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> =E4=BA=8E2019=E5=B9=B45=E6=
-=9C=8824=E6=97=A5=E5=91=A8=E4=BA=94 =E4=B8=8B=E5=8D=882:40=E5=86=99=E9=81=
-=93=EF=BC=9A
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--o5XSQUnVwlgsHx7EAPRM9zL1fIUSwoSED
+From: Eric Blake <eblake@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, mreitz@redhat.com
+Message-ID: <33434bf3-54a1-e5f2-6b7d-704de5423413@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 07/15] test-block-iothread: Test adding
+ parent to iothread node
+References: <20190523160104.21258-1-kwolf@redhat.com>
+ <20190523160104.21258-8-kwolf@redhat.com>
+In-Reply-To: <20190523160104.21258-8-kwolf@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
->
+On 5/23/19 11:00 AM, Kevin Wolf wrote:
+> Opening a new parent node for a node that has already been moved into a=
 
-Reviewed-by: Li Qiang <liq3ea@gmail.com>
+> different AioContext must cause the new parent ot move into the same
 
+to
 
+> context.
+>=20
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 > ---
->  hw/i386/pc.c         | 5 +++--
->  include/hw/i386/pc.h | 2 +-
->  2 files changed, 4 insertions(+), 3 deletions(-)
->
-> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-> index 2632b73f80..fc38b59d2d 100644
-> --- a/hw/i386/pc.c
-> +++ b/hw/i386/pc.c
-> @@ -870,7 +870,7 @@ static void handle_a20_line_change(void *opaque, int
-> irq, int level)
->
->  int e820_add_entry(uint64_t address, uint64_t length, uint32_t type)
->  {
-> -    int index =3D le32_to_cpu(e820_reserve.count);
-> +    unsigned int index =3D le32_to_cpu(e820_reserve.count);
->      struct e820_entry *entry;
->
->      if (type !=3D E820_RAM) {
-> @@ -902,7 +902,8 @@ int e820_get_num_entries(void)
->      return e820_entries;
->  }
->
-> -bool e820_get_entry(int idx, uint32_t type, uint64_t *address, uint64_t
-> *length)
-> +bool e820_get_entry(unsigned int idx, uint32_t type,
-> +                    uint64_t *address, uint64_t *length)
->  {
->      if (idx < e820_entries && e820_table[idx].type =3D=3D cpu_to_le32(ty=
-pe)) {
->          *address =3D le64_to_cpu(e820_table[idx].address);
-> diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-> index 43df7230a2..ad3a75d8fa 100644
-> --- a/include/hw/i386/pc.h
-> +++ b/include/hw/i386/pc.h
-> @@ -291,7 +291,7 @@ void pc_madt_cpu_entry(AcpiDeviceIf *adev, int uid,
->
->  int e820_add_entry(uint64_t, uint64_t, uint32_t);
->  int e820_get_num_entries(void);
-> -bool e820_get_entry(int, uint32_t, uint64_t *, uint64_t *);
-> +bool e820_get_entry(unsigned int, uint32_t, uint64_t *, uint64_t *);
->
->  extern GlobalProperty pc_compat_4_0[];
->  extern const size_t pc_compat_4_0_len;
-> --
-> 2.20.1
->
->
->
+>  tests/test-block-iothread.c | 33 +++++++++++++++++++++++++++++++++
+>  1 file changed, 33 insertions(+)
+>=20
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
+
+--o5XSQUnVwlgsHx7EAPRM9zL1fIUSwoSED
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlzn4n8ACgkQp6FrSiUn
+Q2pqEwf/QYoiK320SWfZvvj2t/Ak1JAOG+lshVDk38bG/VDfIO0tlxzCbw9hS4V3
+2n5loiE6vvz6YEw5LYpARYm7R4ZqvcRBrl+kCw+wo2mToEEH4mXsI6KBYtfEQ/xO
+5CaqIe/uHaErT0GBtxyJt5zqHVj5jCMmRBxPfHa47cB+Tw1okoLi2bqHfYk/Diyu
+rabULW+nrByM+fFCR7GQqQ/qGFcU7fx3MHdu2znEaGJOMSHJnvHr9NBX7Xmbk1hQ
+1UkPSGyyV0/mYwnjtaJ0ILjDw7FxcErNqm43RPE7wHkl4Lz/P11uEzXS508j2zo3
+FeNYwGk3pCOrlY6JJKMZwFciBMtSoQ==
+=XBus
+-----END PGP SIGNATURE-----
+
+--o5XSQUnVwlgsHx7EAPRM9zL1fIUSwoSED--
+
