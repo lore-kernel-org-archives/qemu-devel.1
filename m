@@ -2,87 +2,65 @@ Return-Path: <SRS0=oHhb=TY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-12.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_MUTT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 28E9CC282DD
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 03:17:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5FF8AC072B5
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 03:41:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D1A9221773
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 03:17:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 243062175B
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 03:41:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FI32ZwNh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D1A9221773
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="B8BYFBoJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 243062175B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:46700 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:46951 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hU0iS-00057b-L4
-	for qemu-devel@archiver.kernel.org; Thu, 23 May 2019 23:17:56 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:37280)
+	id 1hU153-00024S-5t
+	for qemu-devel@archiver.kernel.org; Thu, 23 May 2019 23:41:17 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:40090)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1hU0hi-0004kq-3m
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 23:17:11 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1hU147-0001Db-59
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 23:40:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1hU0hg-0008Kf-OL
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 23:17:10 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:35962)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1hU0hg-0008Jt-DA
-	for qemu-devel@nongnu.org; Thu, 23 May 2019 23:17:08 -0400
-Received: by mail-wr1-x442.google.com with SMTP id s17so8367428wru.3
-	for <qemu-devel@nongnu.org>; Thu, 23 May 2019 20:17:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=sender:from:to:cc:subject:date:message-id:mime-version
-	:content-transfer-encoding;
-	bh=PG4FAiq5fqypNIHzKwV+MQbrRaZAlRnakvPm+gx1m6k=;
-	b=FI32ZwNhPlVPrDB/ERy/rSK+rOrEOipSXfn9H0f7c18rpWaUS996GZ37lQ1ocPVRLU
-	ClGrYsNFa943f9DeawCc8ECznQ5Kc8uijRZLCVt8BmUilz/iiSF+ohIV1e8+TjH3tKNw
-	bK4Dmi7z0GOOuYRDljvUZuwuS/nH7v5Hle8IOjTxfAR87OgDUCwdDGdXv9j0HhrZAWJr
-	GDx5oXAMk7SnI7berYsnxtNH3pqLv84cRNKhdBY+RcUJVe3gv1XSnVx9I5v2szkGB6Nk
-	AF2dC6QtrALkuWndpXEe2k8NdgYM2Y9Wb1gjrKaz4I0A1n0tWMmnMqNNtkQ/eS7qnhFu
-	ITqQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
-	:mime-version:content-transfer-encoding;
-	bh=PG4FAiq5fqypNIHzKwV+MQbrRaZAlRnakvPm+gx1m6k=;
-	b=rAtVDUpZMamUrYGUq/K1QmnDPyy8GJ5cb+aBChJ/cqEvxtOGwcyUYfoHg8qnwBDGEK
-	GG9L/EyTxYrnXY0SyFlUOPHcB55gScqq78SBRPdd8cjv1zp7QJCihVBkfPTRi+AooudT
-	JQqIDR2OHEZ0llmnLWSAEQNH5JXeF6O5zMAuH3w2L+F8K2hTqG2HWjl4svgfUi7ASGkK
-	5vLSkjnQPlv169D9WShFkR/2AeqsMmoMFPZCS6qMjw/8eWeG3Jg4KEmqJdtLLq8xddJ5
-	YjL/Sp4mm0bJSPNpMTbWQtec3RiH0URuX6YOuRUnOBnmcmGyK5hUYcYYIAKnqvjB4lGu
-	3sJA==
-X-Gm-Message-State: APjAAAVg3cgBZcaD5L8oXqeJSVkA6GGgwpNWYnXdpag7wOJkqe6oGqPf
-	b3dYAFueh8EXFOjMvDa8ez0b0EQtwXs=
-X-Google-Smtp-Source: APXvYqw9JwTOF5Tdz9j4OIoSOgXhRUfXH017K5rXBwwAPecmEotZdZFf3D076y7YTdzIHfmMM3gRBg==
-X-Received: by 2002:adf:c188:: with SMTP id x8mr4033408wre.256.1558667826711; 
-	Thu, 23 May 2019 20:17:06 -0700 (PDT)
-Received: from x1.local (228.red-83-52-173.dynamicip.rima-tde.net.
-	[83.52.173.228]) by smtp.gmail.com with ESMTPSA id
-	c207sm1141456wme.47.2019.05.23.20.17.05
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Thu, 23 May 2019 20:17:05 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-To: qemu-devel@nongnu.org
-Date: Fri, 24 May 2019 05:17:04 +0200
-Message-Id: <20190524031704.24200-1-f4bug@amsat.org>
-X-Mailer: git-send-email 2.19.1
+	(envelope-from <dgibson@ozlabs.org>) id 1hU13z-0004PM-4v
+	for qemu-devel@nongnu.org; Thu, 23 May 2019 23:40:15 -0400
+Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:52175 helo=ozlabs.org)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
+	id 1hU13w-0004Dg-Qx; Thu, 23 May 2019 23:40:11 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+	id 459Bvg6L1bz9s6w; Fri, 24 May 2019 13:39:59 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+	d=gibson.dropbear.id.au; s=201602; t=1558669199;
+	bh=rcsa597b9NrF+fDR+9PPXEIlTOv2kFQyLX6WGml/NsE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=B8BYFBoJh7mUP4dIKa7Jd2Gill0bAJfi4iJo7Os6jxLlXmy/EhUXbcKIVp96uM3t6
+	wLhQ2SnUfnRMrISq7NZLr72em0KAPRYpB6K35bvf+tzwehFNpIuTvo/hoUuBsIyKMs
+	ZRy3gqAEXaVbGjFz1zHMKVbZ/xeJ3g9SkjLSUOvw=
+Date: Fri, 24 May 2019 12:17:25 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+To: Peter Maydell <peter.maydell@linaro.org>
+Message-ID: <20190524021725.GC1967@umbus.fritz.box>
+References: <20190522044600.16534-1-david@gibson.dropbear.id.au>
+	<CAFEAcA_-O7AS-qBmj_Ba6N69WW5DBenPmxUATs3vQcdBW5Hj5w@mail.gmail.com>
+	<20190524004616.GB1967@umbus.fritz.box>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="hOcCNbCCxyk/YU74"
+Content-Disposition: inline
+In-Reply-To: <20190524004616.GB1967@umbus.fritz.box>
+User-Agent: Mutt/1.11.4 (2019-03-13)
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2a00:1450:4864:20::442
-Subject: [Qemu-devel] [PATCH] BootLinuxConsoleTest: Test the RX-Virt machine
+X-Received-From: 2401:3900:2:1::2
+Subject: Re: [Qemu-devel] [PULL 00/38] ppc-for-4.1 queue 20190522
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -94,117 +72,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
-	Richard Henderson <richard.henderson@linaro.org>,
-	Eduardo Habkost <ehabkost@redhat.com>,
-	Yoshinori Sato <ysato@users.sourceforge.jp>, Cleber Rosa <crosa@redhat.com>
+Cc: Laurent Vivier <lvivier@redhat.com>,
+	=?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>,
+	qemu-ppc <qemu-ppc@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>,
+	Greg Kurz <groug@kaod.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add two tests for the rx-virt machine, based on the recommended test
-setup from Yoshinori Sato:
-https://lists.gnu.org/archive/html/qemu-devel/2019-05/msg03586.html
 
-- U-Boot prompt
-- Linux kernel with Sash shell
+--hOcCNbCCxyk/YU74
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-These are very quick tests:
+On Fri, May 24, 2019 at 10:46:16AM +1000, David Gibson wrote:
+> On Thu, May 23, 2019 at 10:29:57AM +0100, Peter Maydell wrote:
+> > On Wed, 22 May 2019 at 05:46, David Gibson <david@gibson.dropbear.id.au=
+> wrote:
+> > >
+> > > The following changes since commit a4f667b6714916683408b983cfe0a615a7=
+25775f:
+> > >
+> > >   Merge remote-tracking branch 'remotes/cohuck/tags/s390x-20190521-3'=
+ into staging (2019-05-21 16:30:13 +0100)
+> > >
+> > > are available in the Git repository at:
+> > >
+> > >   git://github.com/dgibson/qemu.git tags/ppc-for-4.1-20190522
+> > >
+> > > for you to fetch changes up to 885659103ad9e1b0460e89c548e9fb823b007b=
+7e:
+> > >
+> > >   docs: provide documentation on the POWER9 XIVE interrupt controller=
+ (2019-05-22 10:38:22 +1000)
+> > >
+> > > ----------------------------------------------------------------
+> > > ppc patch queue 2019-05-22
+> > >
+> > > Next pull request against qemu-4.1.  Highlights:
+> > >   * KVM accelerated support for the XIVE interrupt controller in PAPR
+> > >     guests
+> > >   * A number of TCG vector fixes
+> > >   * Fixes for the PReP / 40p machine
+> > >
+> > > Other than that it's just a bunch of assorted fixes, cleanups and
+> > > minor improvements.
+> > >
+> > > This supersedes the pull request dated 2019-05-21.  I've dropped the
+> > > headers update, since it had a mistake, but is now made redundant by a
+> > > similar update in Cornelia's applied PR.  I've also added a patch with
+> > > extra documentation for the XIVE interrupt controller, and fixed a
+> > > couple of minor style errors in the previous PR.
+> > >
+> > > ----------------------------------------------------------------
+> >=20
+> > Hi -- this failed 'make check-tcg' for the linux-static build
+> > (x86-64 host):
+> >=20
+> >   TEST    linux-test on ppc64abi32
+> > qemu-ppc64abi32:
+> > /home/petmay01/linaro/qemu-for-merges/accel/tcg/cpu-exec.c:700:
+> > cpu_exec: Assertion `!have_mmap_lock()' failed.
+> > qemu-ppc64abi32:
+> > /home/petmay01/linaro/qemu-for-merges/accel/tcg/cpu-exec.c:700:
+> > cpu_exec: Assertion `!have_mmap_lock()' failed.
+> > /home/petmay01/linaro/qemu-for-merges/tests/tcg/Makefile:122: recipe
+> > for target 'run-linux-test' failed
+>=20
+> Bother.  I did run a make check-tcg on an x86_64 host, and didn't see
+> this.  Investigating...
 
-  $ avocado run -t arch:rx tests/acceptance/boot_linux_console.py
-  JOB ID     : 84a6ef01c0b87975ecbfcb31a920afd735753ace
-  JOB LOG    : /home/phil/avocado/job-results/job-2019-05-24T05.02-84a6ef0/job.log
-   (1/2) tests/acceptance/boot_linux_console.py:BootLinuxConsole.test_rx_uboot: PASS (0.11 s)
-   (2/2) tests/acceptance/boot_linux_console.py:BootLinuxConsole.test_rx_linux: PASS (0.45 s)
-  RESULTS    : PASS 2 | ERROR 0 | FAIL 0 | SKIP 0 | WARN 0 | INTERRUPT 0 | CANCEL 0
+  BUILD   TCG tests for ppc64abi32-linux-user
+  BUILD   ppc64abi32 guest-tests SKIPPED
+  RUN     TCG tests for ppc64abi32-linux-user
+  RUN     tests for ppc64abi32 SKIPPED
 
-Tests can also be run with:
+Well, that explains why I didn't see it.  I'm using the docker setup
+for check-tcg, but it's not clear to me what bits I need to run the
+ppc64abi32 tests.
 
-  $ avocado --show=console run -t arch:rx tests/acceptance/boot_linux_console.py
-  console: U-Boot 2016.05-rc3-23705-ga1ef3c71cb-dirty (Feb 05 2019 - 21:56:06 +0900)
-  console: Linux version 4.19.0+ (yo-satoh@yo-satoh-debian) (gcc version 9.0.0 20181105 (experimental) (GCC)) #137 Wed Feb 20 23:20:02 JST 2019
-  console: Built 1 zonelists, mobility grouping on.  Total pages: 8128
-  ...
-  console: SuperH (H)SCI(F) driver initialized
-  console: 88240.serial: ttySC0 at MMIO 0x88240 (irq = 215, base_baud = 0) is a sci
-  console: console [ttySC0] enabled
-  console: 88248.serial: ttySC1 at MMIO 0x88248 (irq = 219, base_baud = 0) is a sci
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
-Based-on: 20190517045136.3509-1-richard.henderson@linaro.org
-"RX architecture support"
----
- tests/acceptance/boot_linux_console.py | 51 ++++++++++++++++++++++++++
- 1 file changed, 51 insertions(+)
+--hOcCNbCCxyk/YU74
+Content-Type: application/pgp-signature; name="signature.asc"
 
-diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/boot_linux_console.py
-index d5c500ea30..f68aab1df8 100644
---- a/tests/acceptance/boot_linux_console.py
-+++ b/tests/acceptance/boot_linux_console.py
-@@ -45,6 +45,11 @@ class BootLinuxConsole(Test):
-                 fail = 'Failure message found in console: %s' % failure_message
-                 self.fail(fail)
- 
-+    def exec_command_and_wait_for_pattern(self, command, success_message):
-+        command += '\n'
-+        self.vm.console_socket.sendall(command.encode())
-+        self.wait_for_console_pattern(success_message)
-+
-     def extract_from_deb(self, deb, path):
-         """
-         Extracts a file from a deb package into the test workdir
-@@ -217,3 +222,49 @@ class BootLinuxConsole(Test):
-         self.vm.launch()
-         console_pattern = 'Kernel command line: %s' % kernel_command_line
-         self.wait_for_console_pattern(console_pattern)
-+
-+    def test_rx_uboot(self):
-+        """
-+        :avocado: tags=arch:rx
-+        :avocado: tags=machine:rx-virt
-+        :avocado: tags=endian:little
-+        """
-+        uboot_url = ('https://acc.dl.osdn.jp/users/23/23888/u-boot.bin.gz')
-+        uboot_hash = '9b78dbd43b40b2526848c0b1ce9de02c24f4dcdb'
-+        uboot_path = self.fetch_asset(uboot_url, asset_hash=uboot_hash)
-+        uboot_path = archive.uncompress(uboot_path, self.workdir)
-+
-+        self.vm.set_machine('rx-virt')
-+        self.vm.set_console()
-+        self.vm.add_args('-bios', uboot_path,
-+                         '-no-reboot')
-+        self.vm.launch()
-+        uboot_version = 'U-Boot 2016.05-rc3-23705-ga1ef3c71cb-dirty'
-+        self.wait_for_console_pattern(uboot_version)
-+        gcc_version = 'rx-unknown-linux-gcc (GCC) 9.0.0 20181105 (experimental)'
-+        # FIXME limit baudrate on chardev, else we type too fast
-+        #self.exec_command_and_wait_for_pattern('version', gcc_version)
-+
-+    def test_rx_linux(self):
-+        """
-+        :avocado: tags=arch:rx
-+        :avocado: tags=machine:rx-virt
-+        :avocado: tags=endian:little
-+        """
-+        dtb_url = ('https://acc.dl.osdn.jp/users/23/23887/rx-qemu.dtb')
-+        dtb_hash = '7b4e4e2c71905da44e86ce47adee2210b026ac18'
-+        dtb_path = self.fetch_asset(dtb_url, asset_hash=dtb_hash)
-+        kernel_url = ('http://acc.dl.osdn.jp/users/23/23845/zImage')
-+        kernel_hash = '39a81067f8d72faad90866ddfefa19165d68fc99'
-+        kernel_path = self.fetch_asset(kernel_url, asset_hash=kernel_hash)
-+
-+        self.vm.set_machine('rx-virt')
-+        self.vm.set_console()
-+        kernel_command_line = self.KERNEL_COMMON_COMMAND_LINE + 'earlycon'
-+        self.vm.add_args('-kernel', kernel_path,
-+                         '-dtb', dtb_path,
-+                         '-no-reboot')
-+        self.vm.launch()
-+        self.wait_for_console_pattern('Sash command shell (version 1.1.1)')
-+        self.exec_command_and_wait_for_pattern('printenv',
-+                                               'TERM=linux')
--- 
-2.19.1
+-----BEGIN PGP SIGNATURE-----
 
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlznVDEACgkQbDjKyiDZ
+s5LV2A//fLZETti9ATpDWLgV3RnHrYXVpLSIYTG7Gk8ummP3VMI0sWr2RnwRCxis
+l3dJ/D4/mZilwIjmL6K3qnsENxZ7t1m4nS3KSNoOZhX3jcddmy7h1hkmLXcmr3/W
+vN5kqU5RMhgmdbxLFk2q0sy73+yHI65RJSPtdD8OLWMSNE8rglFHQrT5LZ4IuCEu
+5c+oezGHo+QRQBTZk9p3xow/MFHDjYotNFUTMjC1PvA8+rNpB+s/WagyvJbVw/H1
+NwQLc9QyPnf/MgNMUCcgbxQbOJZDqcJ3DW/916NNG0ZANADdcQKH+iDPeKo4HfKW
+mJ0fVx/9ViavY1qmIBzVKyjhuz37zPSrWUAG6+NJ0/vKZgSmZhp00pKjzErZJi07
+5GAdvDIZiBpwKdBjnm/1K8aeKciewx/ygZ27SPEGcij+QEferTiPmX7wrpW90m7T
+6MKwwj3KcYjxZ+ZdlDkOtBZheJFOfLtYXo5SF1jAhbt2jvQjtmByZWPMVk3z1/ns
+8j25zvpQakfRiIyvnGNFtLzFFRDzeGD0LQ7Skd0q9vWflN57qergJdlM7LA+oao7
+Tagz7xPrln8PB5brWqFjy53Yv/ZorvRr38oLzlVPT38mCHRE7HfI9KDv4c7kgpLt
+pRz2MgACObUHByE3QrvzOwgbQhg5ucE8vzvZOxtNVQwzXRg9gIY=
+=E093
+-----END PGP SIGNATURE-----
+
+--hOcCNbCCxyk/YU74--
 
