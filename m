@@ -3,62 +3,68 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2BA05C072B5
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 12:38:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BE0E4C072B5
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 12:39:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E7FA720851
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 12:38:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E7FA720851
+	by mail.kernel.org (Postfix) with ESMTPS id 8416E20851
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 12:39:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8416E20851
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:54009 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:54028 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hU9Si-0004if-5n
-	for qemu-devel@archiver.kernel.org; Fri, 24 May 2019 08:38:16 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:50932)
+	id 1hU9Ty-0005aV-NQ
+	for qemu-devel@archiver.kernel.org; Fri, 24 May 2019 08:39:34 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:51187)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1hU9Qh-0003Js-Qq
-	for qemu-devel@nongnu.org; Fri, 24 May 2019 08:36:13 -0400
+	(envelope-from <armbru@redhat.com>) id 1hU9RY-0004BY-VJ
+	for qemu-devel@nongnu.org; Fri, 24 May 2019 08:37:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1hU9Qg-0000hf-2n
-	for qemu-devel@nongnu.org; Fri, 24 May 2019 08:36:11 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39406)
+	(envelope-from <armbru@redhat.com>) id 1hU9RX-000139-Ln
+	for qemu-devel@nongnu.org; Fri, 24 May 2019 08:37:04 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43486)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1hU9Qf-0000X8-QT
-	for qemu-devel@nongnu.org; Fri, 24 May 2019 08:36:10 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hU9RX-00012m-DP
+	for qemu-devel@nongnu.org; Fri, 24 May 2019 08:37:03 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 47B793082B5F;
-	Fri, 24 May 2019 12:35:42 +0000 (UTC)
-Received: from localhost (unknown [10.43.2.182])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 4702B6A959;
-	Fri, 24 May 2019 12:35:38 +0000 (UTC)
-Date: Fri, 24 May 2019 14:35:34 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-To: Tao Xu <tao3.xu@intel.com>
-Message-ID: <20190524143534.7dfdcd57@redhat.com>
-In-Reply-To: <20190508061726.27631-5-tao3.xu@intel.com>
-References: <20190508061726.27631-1-tao3.xu@intel.com>
-	<20190508061726.27631-5-tao3.xu@intel.com>
+	by mx1.redhat.com (Postfix) with ESMTPS id BA836C06783D;
+	Fri, 24 May 2019 12:37:02 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-117-250.ams2.redhat.com
+	[10.36.117.250])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id E317A5B689;
+	Fri, 24 May 2019 12:36:59 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+	id 788621138648; Fri, 24 May 2019 14:36:58 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+References: <20190523081538.2291-1-armbru@redhat.com>
+	<20190523081538.2291-6-armbru@redhat.com>
+	<b7370040-3076-5ff5-3b51-b96b0d84184f@redhat.com>
+Date: Fri, 24 May 2019 14:36:58 +0200
+In-Reply-To: <b7370040-3076-5ff5-3b51-b96b0d84184f@redhat.com> ("Philippe
+	=?utf-8?Q?Mathieu-Daud=C3=A9=22's?= message of "Fri,
+	24 May 2019 07:49:39 +0200")
+Message-ID: <877eag9ggl.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1 (gnu/linux)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.45]);
-	Fri, 24 May 2019 12:35:42 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.32]);
+	Fri, 24 May 2019 12:37:02 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v4 04/11] acpi: introduce
- AcpiDeviceIfClass.build_mem_ranges hook
+Subject: Re: [Qemu-devel] [RFC v4 5/7] tests: New make target check-source
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -70,316 +76,177 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: xiaoguangrong.eric@gmail.com, mst@redhat.com, jingqi.liu@intel.com,
-	qemu-devel@nongnu.org, ehabkost@redhat.com, pbonzini@redhat.com,
-	rth@twiddle.net
+Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed,  8 May 2019 14:17:19 +0800
-Tao Xu <tao3.xu@intel.com> wrote:
+Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
 
-> Add build_mem_ranges callback to AcpiDeviceIfClass and use
-> it for generating SRAT and HMAT numa memory ranges.
-> 
-> Suggested-by: Igor Mammedov <imammedo@redhat.com>
-> Co-developed-by: Liu Jingqi <jingqi.liu@intel.com>
-> Signed-off-by: Liu Jingqi <jingqi.liu@intel.com>
-> Signed-off-by: Tao Xu <tao3.xu@intel.com>
-> ---
-> 
-> Changes in v4 -> v3:
->     - spilt the 1/8 of v3 patch into two patches, 4/13 introduces
->     build_mem_ranges() and adding it to ACPI interface, 5/13 builds
->     HMAT (Igor)
-> ---
->  hw/acpi/piix4.c                      |   1 +
->  hw/i386/acpi-build.c                 | 116 ++++++++++++++++-----------
->  hw/isa/lpc_ich9.c                    |   1 +
->  include/hw/acpi/acpi_dev_interface.h |   3 +
->  include/hw/boards.h                  |  12 +++
->  include/hw/i386/pc.h                 |   1 +
->  stubs/Makefile.objs                  |   1 +
->  stubs/pc_build_mem_ranges.c          |   6 ++
->  8 files changed, 96 insertions(+), 45 deletions(-)
->  create mode 100644 stubs/pc_build_mem_ranges.c
-> 
-> diff --git a/hw/acpi/piix4.c b/hw/acpi/piix4.c
-> index 9c079d6834..7c320a49b2 100644
-> --- a/hw/acpi/piix4.c
-> +++ b/hw/acpi/piix4.c
-> @@ -723,6 +723,7 @@ static void piix4_pm_class_init(ObjectClass *klass, void *data)
->      adevc->ospm_status = piix4_ospm_status;
->      adevc->send_event = piix4_send_gpe;
->      adevc->madt_cpu = pc_madt_cpu_entry;
-> +    adevc->build_mem_ranges = pc_build_mem_ranges;
->  }
->  
->  static const TypeInfo piix4_pm_info = {
-> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-> index 43a807c483..5598e7f780 100644
-> --- a/hw/i386/acpi-build.c
-> +++ b/hw/i386/acpi-build.c
-> @@ -2271,6 +2271,65 @@ build_tpm2(GArray *table_data, BIOSLinker *linker, GArray *tcpalog)
->  #define HOLE_640K_START  (640 * KiB)
->  #define HOLE_640K_END   (1 * MiB)
->  
-> +void pc_build_mem_ranges(AcpiDeviceIf *adev, MachineState *ms)
-> +{
-> +    uint64_t mem_len, mem_base, next_base;
-> +    int i;
-> +    PCMachineState *pcms = PC_MACHINE(ms);
-> +    /*
-> +     * the memory map is a bit tricky, it contains at least one hole
-> +     * from 640k-1M and possibly another one from 3.5G-4G.
-> +     */
-> +    NumaMemRange *mem_ranges = ms->numa_state->mem_ranges;
-> +    ms->numa_state->mem_ranges_num = 0;
-> +    next_base = 0;
-> +
-> +    for (i = 0; i < pcms->numa_nodes; ++i) {
-> +        mem_base = next_base;
-> +        mem_len = pcms->node_mem[i];
-> +        next_base = mem_base + mem_len;
-> +
-> +        /* Cut out the 640K hole */
-> +        if (mem_base <= HOLE_640K_START &&
-> +            next_base > HOLE_640K_START) {
-> +            mem_len -= next_base - HOLE_640K_START;
-> +            if (mem_len > 0) {
-> +                mem_ranges[ms->numa_state->mem_ranges_num].base = mem_base;
-> +                mem_ranges[ms->numa_state->mem_ranges_num].length = mem_len;
-> +                mem_ranges[ms->numa_state->mem_ranges_num].node = i;
-> +                ms->numa_state->mem_ranges_num++;
-> +            }
-> +
-> +            /* Check for the rare case: 640K < RAM < 1M */
-> +            if (next_base <= HOLE_640K_END) {
-> +                next_base = HOLE_640K_END;
-> +                continue;
-> +            }
-> +            mem_base = HOLE_640K_END;
-> +            mem_len = next_base - HOLE_640K_END;
-> +        }
-> +
-> +        /* Cut out the ACPI_PCI hole */
-> +        if (mem_base <= pcms->below_4g_mem_size &&
-> +            next_base > pcms->below_4g_mem_size) {
-> +            mem_len -= next_base - pcms->below_4g_mem_size;
-> +            if (mem_len > 0) {
-> +                mem_ranges[ms->numa_state->mem_ranges_num].base = mem_base;
-> +                mem_ranges[ms->numa_state->mem_ranges_num].length = mem_len;
-> +                mem_ranges[ms->numa_state->mem_ranges_num].node = i;
-> +                ms->numa_state->mem_ranges_num++;
-> +            }
-> +            mem_base = 1ULL << 32;
-> +            mem_len = next_base - pcms->below_4g_mem_size;
-> +            next_base = mem_base + mem_len;
-> +        }
+> On 5/23/19 10:15 AM, Markus Armbruster wrote:
+>> Make target check-source is for checking the source code itself.  For
+>> now, there's just one such check, make target check-headers.  It
+>> checks basic header sanity: for each header "FOO.h", test whether
+>>=20
+>> 	#include "qemu/osdep.h"
+>> 	#include "FOO.h"
+>> 	#include "FOO.h"
+>>=20
+>> compiles.
+>>=20
+>> The test works only in a git tree, with git installed.  It is skipped
+>> unless $(SRC_PATH)/.git exists.
+>>=20
+>> Third-party headers we don't intend to clean up are excluded from this
+>> test.  So are a few "funny" headers.  See make variable
+>> excluded-headers.
+>>=20
+>> A large number of headers don't pass this test, by design or by
+>> accident.  To keep things more manageable, exclude all headers outside
+>> include/ for now.
+>>=20
+>> Headers known to fail the test are marked with
+>>=20
+>>     /* FIXME Does not pass make check-headers, yet! */
+>>=20
+>> Headers known to work only in certain configurations are marked like
+>>=20
+>>     /* FIXME Does not pass make check-headers without CONFIG_WIN32, yet!=
+ */
+>>=20
+>> I tried to find and mark all of them by testing various
+>> configurations.  Still, "make check" might fail for configurations I
+>> didn't test.
+>>=20
+>> Known issue: some of these don't actually need fixing; they're *meant*
+>> to work only in certain configurations.  We'll want to invent a
+>> suitable marker that doesn't claim FIXME.
+>>=20
+>> Some headers may only be included into target-dependent code: they use
+>> identifiers poisoned by exec/poison.h, or include cpu.h.  These
+>> headers are marked with a comment
+>>=20
+>>     /* NOTE: May only be included into target-dependent code */
+>>=20
+>> The test treats them specially.
+>>=20
+>> Known issue: some of these are intended for specific targets.  The
+>> test should skip them for other targets, but doesn't.  They're marked
+>> FIXME instead, which is wrong.
+>>=20
+>> New make target check-bad-headers runs the test for headers expected
+>> to fail it.  This helps with examining the failures.
+>>=20
+>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>> ---
+> [...]>
+>> diff --git a/Makefile b/Makefile
+>> index 59de8e2494..42f02c5ceb 100644
+>> --- a/Makefile
+>> +++ b/Makefile
+>> @@ -416,6 +416,8 @@ dummy :=3D $(call unnest-vars,, \
+>>                  audio-obj-m \
+>>                  trace-obj-y)
+>>=20=20
+>> +RECURSIVE_TARGETS :=3D all clean install
+>> +
+>>  include $(SRC_PATH)/tests/Makefile.include
+>>=20=20
+>>  all: $(DOCS) $(if $(BUILD_DOCS),sphinxdocs) $(TOOLS) $(HELPERS-y) recur=
+se-all modules
+>> @@ -436,7 +438,7 @@ config-host.h-timestamp: config-host.mak
+>>  qemu-options.def: $(SRC_PATH)/qemu-options.hx $(SRC_PATH)/scripts/hxtool
+>>  	$(call quiet-command,sh $(SRC_PATH)/scripts/hxtool -h < $< > $@,"GEN",=
+"$@")
+>>=20=20
+>> -TARGET_DIRS_RULES :=3D $(foreach t, all clean install, $(addsuffix /$(t=
+), $(TARGET_DIRS)))
+>> +TARGET_DIRS_RULES:=3D$(foreach t, $(RECURSIVE_TARGETS), $(addsuffix /$(=
+t), $(TARGET_DIRS)))
+>>=20=20
+>>  SOFTMMU_ALL_RULES=3D$(filter %-softmmu/all, $(TARGET_DIRS_RULES))
+>>  $(SOFTMMU_ALL_RULES): $(authz-obj-y)
+>> diff --git a/Makefile.target b/Makefile.target
+>> index fdbe7c89f4..a46cfda580 100644
+>> --- a/Makefile.target
+>> +++ b/Makefile.target
+>> @@ -41,6 +41,7 @@ STPFILES=3D
+>>=20=20
+>>  # Makefile Tests
+>>  include $(SRC_PATH)/tests/tcg/Makefile.include
+>> +include $(SRC_PATH)/tests/check-headers.mak
+>>=20=20
+>>  config-target.h: config-target.h-timestamp
+>>  config-target.h-timestamp: config-target.mak
+>> @@ -216,6 +217,22 @@ hmp-commands.h: $(SRC_PATH)/hmp-commands.hx $(SRC_P=
+ATH)/scripts/hxtool
+>>  hmp-commands-info.h: $(SRC_PATH)/hmp-commands-info.hx $(SRC_PATH)/scrip=
+ts/hxtool
+>>  	$(call quiet-command,sh $(SRC_PATH)/scripts/hxtool -h < $< > $@,"GEN",=
+"$(TARGET_DIR)$@")
+>>=20=20
+>> +.PHONY: check-headers
+>> +ifeq ($(wildcard $(SRC_PATH)/.git),)
+>> +check-headers check-bad-headers:
+>> +	@echo "  SKIP  $@ (requires a git tree)"
+>> +else
+>> +check-headers: $(check-target-header-tests:.c=3D.o)
+>> +
+>> +# Expected to fail:
+>> +check-bad-headers: $(check-bad-target-header-tests:.c=3D.o)
+>> +
+>> +.SECONDARY: $(check-target-header-tests)
+>> +$(check-target-header-tests) $(check-bad-target-header-tests): tests/he=
+ader-test-template.c
+>> +	@mkdir -p $(dir $@)
+>> +	@sed 's,@header@,$(subst tests/headers/,,$(@:.c=3D.h)),' <$< >$@
+>> +endif
+>> +
+>>  clean: clean-target
+>>  	rm -f *.a *~ $(PROGS)
+>>  	rm -f $(shell find . -name '*.[od]')
+>> @@ -238,3 +255,5 @@ endif
+>>=20=20
+>>  generated-files-y +=3D config-target.h
+>>  Makefile: $(generated-files-y)
+>> +
+>> +-include $(check-target-header-tests:.c=3D.d) $(check-bad-target-header=
+-tests:.c=3D.d)
+>
+> $ make microblazeel-softmmu/tests/headers/include/exec/user/abitypes.o
+> ./include/exec/user/abitypes.h:6:10: fatal error: cpu.h: No such file or
+> directory
+> make: *** [./rules.mak:69:
+> microblazeel-softmmu/tests/headers/include/exec/user/abitypes.o] Error 1
+>
+> ^ this one looks legit, it's arch-specific, right?
 
+Yes: it includes cpu.h.
 
-> +        mem_ranges[ms->numa_state->mem_ranges_num].base = mem_base;
-> +        mem_ranges[ms->numa_state->mem_ranges_num].length = mem_len;
-> +        mem_ranges[ms->numa_state->mem_ranges_num].node = i;
-> +        ms->numa_state->mem_ranges_num++;
+> $ make tests/headers/include/hw/net/lance.o
+>   CC      tests/headers/include/hw/net/lance.o
+> In file included from tests/headers/include/hw/net/lance.c:14:
+> ./include/hw/net/lance.h:42:5: error: unknown type name =E2=80=98SysBusDe=
+vice=E2=80=99
+>      SysBusDevice parent_obj;
+>      ^~~~~~~~~~~~
+> make: *** [./rules.mak:69: tests/headers/include/hw/net/lance.o] Error 1
+>
+> $ make tests/headers/include/hw/isa/vt82c686.o
+>   CC      tests/headers/include/hw/isa/vt82c686.o
+> In file included from tests/headers/include/hw/isa/vt82c686.c:14:
+> ./include/hw/isa/vt82c686.h:13:27: error: unknown type name =E2=80=98qemu=
+_irq=E2=80=99
+>                            qemu_irq sci_irq);
+>                            ^~~~~~~~
+> make: *** [./rules.mak:69: tests/headers/include/hw/isa/vt82c686.o]
+>
+> Nice, I like it :)
+>
+> The rule pattern is not obvious (in particular with arch-specific
+> targets), but it has probably always been like that.
+>
+> Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
-why did you drop 'if (mem_len > 0) {' as it was in original code?
-
-> +
-> +}
-> +
->  static void
->  build_srat(GArray *table_data, BIOSLinker *linker, MachineState *machine)
->  {
-> @@ -2279,10 +2338,13 @@ build_srat(GArray *table_data, BIOSLinker *linker, MachineState *machine)
->  
->      int i;
->      int srat_start, numa_start, slots;
-> -    uint64_t mem_len, mem_base, next_base;
->      MachineClass *mc = MACHINE_GET_CLASS(machine);
->      const CPUArchIdList *apic_ids = mc->possible_cpu_arch_ids(machine);
->      PCMachineState *pcms = PC_MACHINE(machine);
-> +    AcpiDeviceIfClass *adevc = ACPI_DEVICE_IF_GET_CLASS(pcms->acpi_dev);
-> +    AcpiDeviceIf *adev = ACPI_DEVICE_IF(pcms->acpi_dev);
-> +    uint32_t mem_ranges_num = machine->numa_state->mem_ranges_num;
-> +    NumaMemRange *mem_ranges = machine->numa_state->mem_ranges;
->      ram_addr_t hotplugabble_address_space_size =
->          object_property_get_int(OBJECT(pcms), PC_MACHINE_DEVMEM_REGION_SIZE,
->                                  NULL);
-> @@ -2319,57 +2381,21 @@ build_srat(GArray *table_data, BIOSLinker *linker, MachineState *machine)
->          }
->      }
->  
-> +    if (pcms->numa_nodes && !mem_ranges_num) {
-> +        adevc->build_mem_ranges(adev, machine);
-> +    }
->  
-> -    /* the memory map is a bit tricky, it contains at least one hole
-> -     * from 640k-1M and possibly another one from 3.5G-4G.
-> -     */
-> -    next_base = 0;
->      numa_start = table_data->len;
->  
-> -    for (i = 1; i < pcms->numa_nodes + 1; ++i) {
-> -        mem_base = next_base;
-> -        mem_len = pcms->node_mem[i - 1];
-> -        next_base = mem_base + mem_len;
-> -
-> -        /* Cut out the 640K hole */
-> -        if (mem_base <= HOLE_640K_START &&
-> -            next_base > HOLE_640K_START) {
-> -            mem_len -= next_base - HOLE_640K_START;
-> -            if (mem_len > 0) {
-> +    for (i = 0; i < mem_ranges_num; i++) {
-> +        if (mem_ranges[i].length > 0) {
->                  numamem = acpi_data_push(table_data, sizeof *numamem);
-> -                build_srat_memory(numamem, mem_base, mem_len, i - 1,
-> +            build_srat_memory(numamem, mem_ranges[i].base,
-> +                              mem_ranges[i].length,
-> +                              mem_ranges[i].node,
->                                    MEM_AFFINITY_ENABLED);
->              }
-> -
-> -            /* Check for the rare case: 640K < RAM < 1M */
-> -            if (next_base <= HOLE_640K_END) {
-> -                next_base = HOLE_640K_END;
-> -                continue;
->              }
-> -            mem_base = HOLE_640K_END;
-> -            mem_len = next_base - HOLE_640K_END;
-> -        }
-> -
-> -        /* Cut out the ACPI_PCI hole */
-> -        if (mem_base <= pcms->below_4g_mem_size &&
-> -            next_base > pcms->below_4g_mem_size) {
-> -            mem_len -= next_base - pcms->below_4g_mem_size;
-> -            if (mem_len > 0) {
-> -                numamem = acpi_data_push(table_data, sizeof *numamem);
-> -                build_srat_memory(numamem, mem_base, mem_len, i - 1,
-> -                                  MEM_AFFINITY_ENABLED);
-> -            }
-> -            mem_base = 1ULL << 32;
-> -            mem_len = next_base - pcms->below_4g_mem_size;
-> -            next_base = mem_base + mem_len;
-> -        }
-> -
-> -        if (mem_len > 0) {
-> -            numamem = acpi_data_push(table_data, sizeof *numamem);
-> -            build_srat_memory(numamem, mem_base, mem_len, i - 1,
-> -                              MEM_AFFINITY_ENABLED);
-> -        }
-> -    }
->      slots = (table_data->len - numa_start) / sizeof *numamem;
->      for (; slots < pcms->numa_nodes + 2; slots++) {
->          numamem = acpi_data_push(table_data, sizeof *numamem);
-> diff --git a/hw/isa/lpc_ich9.c b/hw/isa/lpc_ich9.c
-> index ac44aa53be..4ae64846ba 100644
-> --- a/hw/isa/lpc_ich9.c
-> +++ b/hw/isa/lpc_ich9.c
-> @@ -812,6 +812,7 @@ static void ich9_lpc_class_init(ObjectClass *klass, void *data)
->      adevc->ospm_status = ich9_pm_ospm_status;
->      adevc->send_event = ich9_send_gpe;
->      adevc->madt_cpu = pc_madt_cpu_entry;
-> +    adevc->build_mem_ranges = pc_build_mem_ranges;
->  }
->  
->  static const TypeInfo ich9_lpc_info = {
-> diff --git a/include/hw/acpi/acpi_dev_interface.h b/include/hw/acpi/acpi_dev_interface.h
-> index 43ff119179..d8634ac1ed 100644
-> --- a/include/hw/acpi/acpi_dev_interface.h
-> +++ b/include/hw/acpi/acpi_dev_interface.h
-> @@ -39,6 +39,7 @@ void acpi_send_event(DeviceState *dev, AcpiEventStatusBits event);
->   *           for CPU indexed by @uid in @apic_ids array,
->   *           returned structure types are:
->   *           0 - Local APIC, 9 - Local x2APIC, 0xB - GICC
-> + * build_mem_ranges: build memory ranges of ACPI SRAT and HMAT
-
-it's not exactly what it does, it does above only partially leaving out misc
-and hotplug SRAT ranges.
-
->   *
->   * Interface is designed for providing unified interface
->   * to generic ACPI functionality that could be used without
-> @@ -54,5 +55,7 @@ typedef struct AcpiDeviceIfClass {
->      void (*send_event)(AcpiDeviceIf *adev, AcpiEventStatusBits ev);
->      void (*madt_cpu)(AcpiDeviceIf *adev, int uid,
->                       const CPUArchIdList *apic_ids, GArray *entry);
-> +    void (*build_mem_ranges)(AcpiDeviceIf *adev, MachineState *ms);
-> +
->  } AcpiDeviceIfClass;
->  #endif
-> diff --git a/include/hw/boards.h b/include/hw/boards.h
-> index 777eed4dd9..9fbf921ecf 100644
-> --- a/include/hw/boards.h
-> +++ b/include/hw/boards.h
-> @@ -240,6 +240,12 @@ struct NodeInfo {
->      uint8_t distance[MAX_NODES];
->  };
->  
-> +typedef struct NumaMemRange {
-> +    uint64_t base;
-> +    uint64_t length;
-> +    uint32_t node;
-> +} NumaMemRange;
-> +
->  typedef struct NumaState {
->      /* Number of NUMA nodes */
->      int num_nodes;
-> @@ -249,6 +255,12 @@ typedef struct NumaState {
->  
->      /* NUMA nodes information */
->      NodeInfo nodes[MAX_NODES];
-> +
-> +    /* Number of NUMA memory ranges */
-> +    uint32_t mem_ranges_num;
-> +
-> +    /* NUMA memory ranges */
-> +    NumaMemRange mem_ranges[MAX_NODES + 2];
-why MAX_NODES + 2 ???
-I'd use GArray here instead of 2 above fields
-
->  } NumaState;
->  
->  /**
-> diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-> index 43df7230a2..1e4ee404ae 100644
-> --- a/include/hw/i386/pc.h
-> +++ b/include/hw/i386/pc.h
-> @@ -281,6 +281,7 @@ void pc_system_firmware_init(PCMachineState *pcms, MemoryRegion *rom_memory);
->  /* acpi-build.c */
->  void pc_madt_cpu_entry(AcpiDeviceIf *adev, int uid,
->                         const CPUArchIdList *apic_ids, GArray *entry);
-> +void pc_build_mem_ranges(AcpiDeviceIf *adev, MachineState *ms);
->  
->  /* e820 types */
->  #define E820_RAM        1
-> diff --git a/stubs/Makefile.objs b/stubs/Makefile.objs
-> index 269dfa5832..7e0a962815 100644
-> --- a/stubs/Makefile.objs
-> +++ b/stubs/Makefile.objs
-> @@ -33,6 +33,7 @@ stub-obj-y += qmp_memory_device.o
->  stub-obj-y += target-monitor-defs.o
->  stub-obj-y += target-get-monitor-def.o
->  stub-obj-y += pc_madt_cpu_entry.o
-> +stub-obj-y += pc_build_mem_ranges.o
->  stub-obj-y += vmgenid.o
->  stub-obj-y += xen-common.o
->  stub-obj-y += xen-hvm.o
-> diff --git a/stubs/pc_build_mem_ranges.c b/stubs/pc_build_mem_ranges.c
-> new file mode 100644
-> index 0000000000..0f104ba79d
-> --- /dev/null
-> +++ b/stubs/pc_build_mem_ranges.c
-> @@ -0,0 +1,6 @@
-> +#include "qemu/osdep.h"
-> +#include "hw/i386/pc.h"
-> +
-> +void pc_build_mem_ranges(AcpiDeviceIf *adev, MachineState *machine)
-> +{
-> +}
-
-why do you need stub?
-
-
+Thanks!
 
