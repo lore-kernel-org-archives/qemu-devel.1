@@ -2,79 +2,92 @@ Return-Path: <SRS0=oHhb=TY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F072C072B5
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 13:38:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 553FAC072B5
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 13:47:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DBA182175B
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 13:38:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DBA182175B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 093B020675
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 13:47:42 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Qk1of27p"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 093B020675
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:54795 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:54981 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hUAPO-0006gU-6P
-	for qemu-devel@archiver.kernel.org; Fri, 24 May 2019 09:38:54 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:35670)
+	id 1hUAXt-0001Dy-VE
+	for qemu-devel@archiver.kernel.org; Fri, 24 May 2019 09:47:41 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:37523)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hUAOH-00062u-30
-	for qemu-devel@nongnu.org; Fri, 24 May 2019 09:37:46 -0400
+	(envelope-from <aleksandar.m.mail@gmail.com>) id 1hUAWn-0000qr-Uc
+	for qemu-devel@nongnu.org; Fri, 24 May 2019 09:46:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hUAOF-0004XW-Rd
-	for qemu-devel@nongnu.org; Fri, 24 May 2019 09:37:45 -0400
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:50466)
+	(envelope-from <aleksandar.m.mail@gmail.com>) id 1hUAWh-00022K-9N
+	for qemu-devel@nongnu.org; Fri, 24 May 2019 09:46:29 -0400
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:39000)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hUAOF-0004Wy-Lv
-	for qemu-devel@nongnu.org; Fri, 24 May 2019 09:37:43 -0400
-Received: by mail-wm1-f66.google.com with SMTP id f204so9446174wme.0
-	for <qemu-devel@nongnu.org>; Fri, 24 May 2019 06:37:43 -0700 (PDT)
+	(Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
+	id 1hUAWb-0001m4-0k
+	for qemu-devel@nongnu.org; Fri, 24 May 2019 09:46:22 -0400
+Received: by mail-ot1-x344.google.com with SMTP id r7so8725845otn.6
+	for <qemu-devel@nongnu.org>; Fri, 24 May 2019 06:45:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+	h=mime-version:in-reply-to:references:from:date:message-id:subject:to
+	:cc; bh=45rQurOypCXf9RH1E3grlOKnKdSm4XQNCb+U8kPZyx4=;
+	b=Qk1of27p+7IG//8o+J4MCQJ2l04o3CCkLWVh0tQHiY3682KmhNYRK8WFGhcSOcbCah
+	ArwoEw55qXvBakJ6HWUsMtKVqm1i9pDwzDE9VUm1bPCW6us/A0gHD6Ezhv5HAlxe1y8V
+	+jJzzOGeAPrPnHVhXC3qcyRS6BykYr8104jmyj/8On+qshL5wd3ILbjVRw7dPDyDqs8E
+	lmAcQXbVB9iHG7h4t2BpuHbVSo5YPrar8anFjsJgsBFQEXrHrmEQqe87JuB4W9aO4DVa
+	5FAJ8wmcLKIzQDd/5HK0qDZnlmprC2YQ1VqsRiItDuXs3Y2BzfB7wrWM3Z7CQogZZGW8
+	1tbw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-	:date:user-agent:mime-version:in-reply-to:content-language
-	:content-transfer-encoding;
-	bh=cZOF5/nRtQUljlIvZZ1uTeg4deO4yTOhy9UP60Uqb5w=;
-	b=GJ0rI/6MqPYx0gMRHDpISUMkM0y4aBaXhgX6BfQ8m1jPrEo6fcgoDVTCLjjNtcXj6x
-	ez1hAc6dxIQ//HSgwUiRpuwNOBmASFoBOOZopN/CrKJ9AxIzKzaskzYfTwQr6ZK9r6T1
-	fmjIb+BDervAp84tZjJz05kuXhqk8/BxRJJhiZoMEhH06yS+Ku30kylXl4EDam3jU17O
-	f1IgBB51qVgGio9JSLvws2uvk+ewnniZ4SOKOBn8YNRDP1crdEtIFQFwJ66Wz+xRPWVy
-	W9tqtwiOIR43cUdlHCMOhccM+O1zGYTkJdEnlNt+RDxVd/qrevjE9xvHWbgu1szbYUby
-	XFgw==
-X-Gm-Message-State: APjAAAX/ZX0p7tfZs6SebqhXF1cazzEQITLUnLxUoE28pzb4JSzwmfqv
-	SgbsxPqrFUrFO+aeExYH4Y3eKA==
-X-Google-Smtp-Source: APXvYqxz10tD2JetETJD3Ry0VFFBsP/1d6WKslo4MYjMu6wZOMX8W36BfBgiqNdg0LB3817+QjH/XA==
-X-Received: by 2002:a1c:f102:: with SMTP id p2mr15405391wmh.126.1558705062522; 
-	Fri, 24 May 2019 06:37:42 -0700 (PDT)
-Received: from [192.168.1.38] (228.red-83-52-173.dynamicip.rima-tde.net.
-	[83.52.173.228]) by smtp.gmail.com with ESMTPSA id
-	q68sm3043507wme.11.2019.05.24.06.37.41
-	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-	Fri, 24 May 2019 06:37:42 -0700 (PDT)
-To: qemu-devel@nongnu.org
-References: <155870450828.24.7185600599110160688@549697c9ad12>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
-	url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <6d97fa23-6ff0-998e-b698-388f2313d535@redhat.com>
-Date: Fri, 24 May 2019 15:37:41 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	h=x-gm-message-state:mime-version:in-reply-to:references:from:date
+	:message-id:subject:to:cc;
+	bh=45rQurOypCXf9RH1E3grlOKnKdSm4XQNCb+U8kPZyx4=;
+	b=Qf75rMQN1OxVAGbZtJFdVGnWtJ8XxJi/T632vPDdX3f6Kl+zDiYZOkcfix35SIj98S
+	JnCnODDymOIeN4I67ZjhrPn0R+XO/sfWW67MKvM+789B++7PYWf1Q5LbmiPB8sdlR6lP
+	MdqGzIIZPuJ5qFa3nBaMIRtzRE5o5UQ/2+2mKeD5JZRNpI1zRNlnCDiG5FnTtDQFimw2
+	vwp7shThHKG5/7aGnZ1WTzbBh5Q0yQX0RhGxzJssMLRNQt2CkP3DMLUST8cgGFp3vPMF
+	ZB7cqa4IHJFpjsFFEdCSBMohh/mBkhBZegz0jwGan/E1eYjPV5sfdTnN52zOOw3Jd/f9
+	v8Qg==
+X-Gm-Message-State: APjAAAVuuHKkBaCKefBkZrNvlZxPYQj4LqLhNKlxQAhDx9/mT+aJS881
+	AM/NVGtwO9thW3KDTbJUxfis6d3YMkBq8j0IyDg=
+X-Google-Smtp-Source: APXvYqxM4AYO/+Z3+fk+vxZ75vQ1zVUxShb3mD+T2JDBuKFhBIuGaVnwMMGBKMHKv0tWKseVRVI3E/5rmQrj4Ii8MQ8=
+X-Received: by 2002:a05:6830:160a:: with SMTP id
+	g10mr143047otr.121.1558705557579; 
+	Fri, 24 May 2019 06:45:57 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <155870450828.24.7185600599110160688@549697c9ad12>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-	[fuzzy]
-X-Received-From: 209.85.128.66
-Subject: Re: [Qemu-devel] [PATCH] tests/docker: Update the Fedora image to
- Fedora 30
+Received: by 2002:a9d:410f:0:0:0:0:0 with HTTP; Fri, 24 May 2019 06:45:56
+	-0700 (PDT)
+Received: by 2002:a9d:410f:0:0:0:0:0 with HTTP; Fri, 24 May 2019 06:45:56
+	-0700 (PDT)
+In-Reply-To: <20190523213031.GE10764@habkost.net>
+References: <20190520231910.12184-1-f4bug@amsat.org>
+	<20190522211230.GA10764@habkost.net>
+	<1711852617.24204010.1558561566547.JavaMail.zimbra@redhat.com>
+	<20190522230705.GB10764@habkost.net>
+	<7a046f76-c892-a796-e7d0-b0eda92075d9@redhat.com>
+	<1319868675.24353089.1558618080629.JavaMail.zimbra@redhat.com>
+	<20190523213031.GE10764@habkost.net>
+From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Date: Fri, 24 May 2019 15:45:56 +0200
+Message-ID: <CAL1e-=jqVWxtOCoBayiYhA6D1yxZDA3a3+JrqV3wTDaGbS-eHQ@mail.gmail.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::344
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Content-Filtered-By: Mailman/MimeDel 2.1.21
+Subject: Re: [Qemu-devel] [PATCH 0/4] mips: Add more Avocado tests
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -86,60 +99,151 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, pbonzini@redhat.com, thuth@redhat.com,
-	alex.bennee@linaro.org
+Cc: Aleksandar Rikalo <arikalo@wavecomp.com>, qemu-devel@nongnu.org,
+	Wainer dos Santos Moschetta <wainersm@redhat.com>,
+	=?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>,
+	Aleksandar Markovic <amarkovic@wavecomp.com>,
+	Cleber Rosa <crosa@redhat.com>,
+	=?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+	Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Patchew,
+On May 23, 2019 11:31 PM, "Eduardo Habkost" <ehabkost@redhat.com> wrote:
+>
+> On Thu, May 23, 2019 at 09:28:00AM -0400, Cleber Rosa wrote:
+> >
+> >
+> > ----- Original Message -----
+> > > From: "Philippe Mathieu-Daud=C3=A9" <philmd@redhat.com>
+> > > To: "Eduardo Habkost" <ehabkost@redhat.com>, "Cleber Rosa" <
+crosa@redhat.com>
+> > > Cc: "Aleksandar Rikalo" <arikalo@wavecomp.com>, "Philippe
+Mathieu-Daud=C3=A9" <f4bug@amsat.org>, "Wainer dos Santos
+> > > Moschetta" <wainersm@redhat.com>, qemu-devel@nongnu.org, "Aleksandar
+Markovic" <aleksandar.m.mail@gmail.com>,
+> > > "Aleksandar Markovic" <amarkovic@wavecomp.com>, "Aurelien Jarno" <
+aurelien@aurel32.net>
+> > > Sent: Thursday, May 23, 2019 5:38:34 AM
+> > > Subject: Re: [Qemu-devel] [PATCH 0/4] mips: Add more Avocado tests
+> > >
+> > > On 5/23/19 1:07 AM, Eduardo Habkost wrote:
+> > > > On Wed, May 22, 2019 at 05:46:06PM -0400, Cleber Rosa wrote:
+> > > >> ----- Original Message -----
+> > > >>> From: "Eduardo Habkost" <ehabkost@redhat.com>
+> > > >>> On Tue, May 21, 2019 at 01:19:06AM +0200, Philippe Mathieu-Daud=
+=C3=A9
+wrote:
+> > > >>>> Hi,
+> > > >>>>
+> > > >>>> It was a rainy week-end here, so I invested it to automatize som=
+e
+> > > >>>> of my MIPS tests.
+> > > >>>>
+> > > >>>> The BootLinuxSshTest is not Global warming friendly, it is not
+> > > >>>> meant to run on a CI system but rather on a workstation previous
+> > > >>>> to post a pull request.
+> > > >>>> It can surely be improved, but it is a good starting point.
+> > > >>>
+> > > >>> Until we actually have a mechanism to exclude the test case on
+> > > >>> travis-ci, I will remove patch 4/4 from the queue.  Aleksandar,
+> > > >>> please don't merge patch 4/4 yet or it will break travis-ci.
+> > > >>>
+> > > >>> Cleber, Wainer, is it already possible to make "avocado run" skip
+> > > >>> tests tagged with "slow"?
+> > > >>>
+> > > >>
+> > > >> The mechanism exists, but we haven't tagged any test so far as
+slow.
+> > > >>
+> > > >> Should we define/document a criteria for a test to be slow?  Given
+> > > >> that this is highly subjective, we have to think of:
+> > > >>
+> > > >>  * Will we consider the average or maximum run time (the timeout
+> > > >>    definition)?
+> > > >>
+> > > >>  * For a single test, what is "slow"? Some rough numbers from
+Travis
+> > > >>    CI[1] to help us with guidelines:
+> > > >>    - boot_linux_console.py:BootLinuxConsole.test_x86_64_pc:  PASS
+(6.04 s)
+> > > >>    - boot_linux_console.py:BootLinuxConsole.test_arm_virt:  PASS
+(2.91 s)
+> > > >>    -
+> > > >>
+linux_initrd.py:LinuxInitrd.test_with_2gib_file_should_work_with_linux_v4_1=
+6:
+> > > >>    PASS (18.14 s)
+> > > >>    - boot_linux.py:BootLinuxAarch64.test_virt:  PASS (396.88 s)
+> > > >
+> > > > I don't think we need to overthink this.  Whatever objective
+> > > > criteria we choose, I'm sure we'll have to adapt them later due
+> > > > to real world problems.
+> > > >
+> > > > e.g.: is 396 seconds too slow?  I don't know, it depends: does it
+> > > > break Travis and other CI systems often because of timeouts?  If
+> > > > yes, then we should probably tag it as slow.
+> > > >
+> > > > If having subjective criteria is really a problem (I don't think
+> > > > it is), then we can call the tag "skip_travis", and stop worrying
+> > > > about defining what exactly is "slow".
+> > >
+> > > I'd go with a simpler "tags:travis-ci" whitelisting any job expecting
+to
+> > > run smoothly there.
+> > >
+> >
+> > My concern is what becomes of "make check-acceptance".  Should we
+introduce
+> > another target, say, "make check-acceptance-ci" or just change its
+meaning
+> > and reuse it?
+>
+> What about "make check-acceptance TAG=3Dtravis-ci"?
+>
+> >
+> > > Then we can add "slow" tests without having to worry about
+blacklisting
+> > > for Travis CI.
+> > > Also, Other CI can set different timeouts.
+> > >
+> > > I'd like maintainers to add as many tests as they want to upstream, s=
+o
+> > > these tests can eventually run by anyone, then each maintainer is fre=
+e
+> > > to select which particular set he wants to run as default.
+> > >
+> >
+> > OK, so this matches the idea of carefully curating a set of tests for
+> > CI.  WRT white or blacklisting, I favor the approach that requires the
+> > least effort from the developer to have its test enabled, so I'd go
+> > with blacklisting.  I fear that simple tests will just sit on the repo
+> > without being properly exercised if we need to whitelist them.
+> >
+>
+> I agree.  I'd prefer the default case to be simple and not
+> require extra tags.  (i.e. tests without any tags would be run in
+> Travis by default).
+>
 
-On 5/24/19 3:28 PM, no-reply@patchew.org wrote:
-> Patchew URL: https://patchew.org/QEMU/20190504060336.21060-1-philmd@redhat.com/
-> 
-> 
-> 
-> Hi,
-> 
-> This series failed build test on s390x host. Please find the details below.
+Eduardo,
 
-"20 days later", not yet a movie title.
+You are confusing me here.
 
->     inlined from ‘fill_psinfo’ at /var/tmp/patchew-tester-tmp-3g8u4fv2/src/linux-user/elfload.c:3208:12,
->     inlined from ‘fill_note_info’ at /var/tmp/patchew-tester-tmp-3g8u4fv2/src/linux-user/elfload.c:3390:5,
->     inlined from ‘elf_core_dump’ at /var/tmp/patchew-tester-tmp-3g8u4fv2/src/linux-user/elfload.c:3539:9:
-> /usr/include/bits/string_fortified.h:106:10: error: ‘__builtin_strncpy’ specified bound 16 equals destination size [-Werror=stringop-truncation]
->   106 |   return __builtin___strncpy_chk (__dest, __src, __len, __bos (__dest));
->       |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> cc1: all warnings being treated as errors
+You first suggest:
 
-This has been fixed by the following commit, merged earlier today:
+> What about "make check-acceptance TAG=3Dtravis-ci"?
 
-commit d7eb2b928a855a2e8038e8e75f7edf1a12226bd3
-Author: Alistair Francis <Alistair.Francis@wdc.com>
-Date:   Tue Apr 30 23:29:01 2019 +0000
+... and then say:
 
-    linux-user/elfload: Fix GCC 9 build warnings
+> ...tests without any tags would be run in Travis by default.
 
-    Fix this warning when building with GCC9 on Fedora 30:
-    In function ‘strncpy’,
-        inlined from ‘fill_psinfo’ at
-/home/alistair/qemu/linux-user/elfload.c:3208:12,
-        inlined from ‘fill_note_info’ at
-/home/alistair/qemu/linux-user/elfload.c:3390:5,
-        inlined from ‘elf_core_dump’ at
-/home/alistair/qemu/linux-user/elfload.c:3539:9:
-    /usr/include/bits/string_fortified.h:106:10: error:
-‘__builtin_strncpy’ specified bound 16 equals destination size
-[-Werror=stringop-truncation]
-      106 |   return __builtin___strncpy_chk (__dest, __src, __len,
-__bos (__dest));
-          |
-^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+For casual observers like me it is contradictory, I must be missing
+something here, no?
 
-> ---
-> Email generated automatically by Patchew [https://patchew.org/].
-> Please send your feedback to patchew-devel@redhat.com
+Regards,
+Aleksandar
 
-Done!
-
+> --
+> Eduardo
