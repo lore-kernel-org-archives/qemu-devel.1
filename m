@@ -2,88 +2,62 @@ Return-Path: <SRS0=oHhb=TY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A8F6BC072B5
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 07:00:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A1439C072B5
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 07:03:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 376AC2175B
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 07:00:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 376AC2175B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
+	by mail.kernel.org (Postfix) with ESMTPS id 731C321841
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 07:03:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 731C321841
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:50020 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:50066 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hU4BW-0003KU-Em
-	for qemu-devel@archiver.kernel.org; Fri, 24 May 2019 03:00:10 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:44983)
+	id 1hU4ER-0004u6-NI
+	for qemu-devel@archiver.kernel.org; Fri, 24 May 2019 03:03:11 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:45466)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hU4A7-0002cR-5U
-	for qemu-devel@nongnu.org; Fri, 24 May 2019 02:58:44 -0400
+	(envelope-from <kraxel@redhat.com>) id 1hU4Co-00044i-Um
+	for qemu-devel@nongnu.org; Fri, 24 May 2019 03:01:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hU4A6-0003Sg-31
-	for qemu-devel@nongnu.org; Fri, 24 May 2019 02:58:43 -0400
-Received: from mail.ilande.co.uk ([46.43.2.167]:38086
-	helo=mail.default.ilande.uk0.bigv.io)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1hU4A0-0003PT-Qm; Fri, 24 May 2019 02:58:38 -0400
-Received: from host86-185-106-199.range86-185.btcentralplus.com
-	([86.185.106.199] helo=[192.168.1.65])
-	by mail.default.ilande.uk0.bigv.io with esmtpsa
-	(TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.89)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1hU474-0002uR-6h; Fri, 24 May 2019 07:55:34 +0100
-To: Programmingkid <programmingkidx@gmail.com>,
-	qemu Developers <qemu-devel@nongnu.org>, qemu-ppc <qemu-ppc@nongnu.org>
-References: <B954C7EE-DC27-433A-A271-D7ADF380550A@gmail.com>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Openpgp: preference=signencrypt
-Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
-	mQENBFQJuzwBCADAYvxrwUh1p/PvUlNFwKosVtVHHplgWi5p29t58QlOUkceZG0DBYSNqk93
-	3JzBTbtd4JfFcSupo6MNNOrCzdCbCjZ64ik8ycaUOSzK2tKbeQLEXzXoaDL1Y7vuVO7nL9bG
-	E5Ru3wkhCFc7SkoypIoAUqz8EtiB6T89/D9TDEyjdXUacc53R5gu8wEWiMg5MQQuGwzbQy9n
-	PFI+mXC7AaEUqBVc2lBQVpAYXkN0EyqNNT12UfDLdxaxaFpUAE2pCa2LTyo5vn5hEW+i3VdN
-	PkmjyPvL6DdY03fvC01PyY8zaw+UI94QqjlrDisHpUH40IUPpC/NB0LwzL2aQOMkzT2NABEB
-	AAG0ME1hcmsgQ2F2ZS1BeWxhbmQgPG1hcmsuY2F2ZS1heWxhbmRAaWxhbmRlLmNvLnVrPokB
-	OAQTAQIAIgUCVAm7PAIbAwYLCQgHAwIGFQgCCQoLBBYCAwECHgECF4AACgkQW8LFb64PMh9f
-	NAgAuc3ObOEY8NbZko72AGrg2tWKdybcMVITxmcor4hb9155o/OWcA4IDbeATR6cfiDL/oxU
-	mcmtXVgPqOwtW3NYAKr5g/FrZZ3uluQ2mtNYAyTFeALy8YF7N3yhs7LOcpbFP7tEbkSzoXNG
-	z8iYMiYtKwttt40WaheWuRs0ZOLbs6yoczZBDhna3Nj0LA3GpeJKlaV03O4umjKJgACP1c/q
-	T2Pkg+FCBHHFP454+waqojHp4OCBo6HyK+8I4wJRa9Z0EFqXIu8lTDYoggeX0Xd6bWeCFHK3
-	DhD0/Xi/kegSW33unsp8oVcM4kcFxTkpBgj39dB4KwAUznhTJR0zUHf63LkBDQRUCbs8AQgA
-	y7kyevA4bpetM/EjtuqQX4U05MBhEz/2SFkX6IaGtTG2NNw5wbcAfhOIuNNBYbw6ExuaJ3um
-	2uLseHnudmvN4VSJ5Hfbd8rhqoMmmO71szgT/ZD9MEe2KHzBdmhmhxJdp+zQNivy215j6H27
-	14mbC2dia7ktwP1rxPIX1OOfQwPuqlkmYPuVwZP19S4EYnCELOrnJ0m56tZLn5Zj+1jZX9Co
-	YbNLMa28qsktYJ4oU4jtn6V79H+/zpERZAHmH40IRXdR3hA+Ye7iC/ZpWzT2VSDlPbGY9Yja
-	Sp7w2347L5G+LLbAfaVoejHlfy/msPeehUcuKjAdBLoEhSPYzzdvEQARAQABiQEfBBgBAgAJ
-	BQJUCbs8AhsMAAoJEFvCxW+uDzIfabYIAJXmBepHJpvCPiMNEQJNJ2ZSzSjhic84LTMWMbJ+
-	opQgr5cb8SPQyyb508fc8b4uD8ejlF/cdbbBNktp3BXsHlO5BrmcABgxSP8HYYNsX0n9kERv
-	NMToU0oiBuAaX7O/0K9+BW+3+PGMwiu5ml0cwDqljxfVN0dUBZnQ8kZpLsY+WDrIHmQWjtH+
-	Ir6VauZs5Gp25XLrL6bh/SL8aK0BX6y79m5nhfKI1/6qtzHAjtMAjqy8ChPvOqVVVqmGUzFg
-	KPsrrIoklWcYHXPyMLj9afispPVR8e0tMKvxzFBWzrWX1mzljbBlnV2n8BIwVXWNbgwpHSsj
-	imgcU9TTGC5qd9g=
-Message-ID: <632b09de-c8e2-9907-9261-47b4de779a69@ilande.co.uk>
-Date: Fri, 24 May 2019 07:56:20 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
-MIME-Version: 1.0
-In-Reply-To: <B954C7EE-DC27-433A-A271-D7ADF380550A@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 86.185.106.199
-X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
-X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
-X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
+	(envelope-from <kraxel@redhat.com>) id 1hU4Cn-0005Gp-Ik
+	for qemu-devel@nongnu.org; Fri, 24 May 2019 03:01:30 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:32794)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1hU4Cn-0005G5-60
+	for qemu-devel@nongnu.org; Fri, 24 May 2019 03:01:29 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id CE6E820260
+	for <qemu-devel@nongnu.org>; Fri, 24 May 2019 07:01:27 +0000 (UTC)
+Received: from sirius.home.kraxel.org (ovpn-116-101.ams2.redhat.com
+	[10.36.116.101])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 036AA62516;
+	Fri, 24 May 2019 07:01:22 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+	id AD1311753B; Fri, 24 May 2019 09:01:18 +0200 (CEST)
+From: Gerd Hoffmann <kraxel@redhat.com>
+To: qemu-devel@nongnu.org
+Date: Fri, 24 May 2019 09:01:18 +0200
+Message-Id: <20190524070118.30157-5-kraxel@redhat.com>
+In-Reply-To: <20190524070118.30157-1-kraxel@redhat.com>
+References: <20190524070118.30157-1-kraxel@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.29]);
+	Fri, 24 May 2019 07:01:27 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 46.43.2.167
-Subject: Re: [Qemu-devel] Patch causing qemu-system-ppc to crash
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PATCH v2 4/4] egl-helpers: add modifier support to
+ egl_dmabuf_import_texture()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -95,32 +69,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Richard Henderson <rth@twiddle.net>,
-	David Gibson <david@gibson.dropbear.id.au>
+Cc: Alex Williamson <alex.williamson@redhat.com>,
+	Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 24/05/2019 03:48, Programmingkid wrote:
+Check and use QemuDmaBuf->modifier in egl_dmabuf_import_texture()
+for dmabuf imports.
 
-> Recently I have noticed that qemu-system-ppc is crashing while booting up my Mac OS X VM. A bit of git bisecting shows this is the patch that causes this issue:
-> 
-> commit 1e262b49b5331441f697461e4305fe06719758a7
-> Author: Richard Henderson <richard.henderson@linaro.org>
-> Date:   Mon Mar 18 12:02:54 2019 -0700
-> 
->     tcg/i386: Implement tcg_out_dupm_vec
->     
->     At the same time, improve tcg_out_dupi_vec wrt broadcast
->     from the constant pool.
->     
->     Signed-off-by: Richard Henderson <richard.henderson@linaro.org
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+---
+ ui/egl-helpers.c | 32 +++++++++++++++++++++++---------
+ 1 file changed, 23 insertions(+), 9 deletions(-)
 
-I think this is the same issue I reported last week - does the patch at
-https://lists.gnu.org/archive/html/qemu-devel/2019-05/msg03767.html help at all?
+diff --git a/ui/egl-helpers.c b/ui/egl-helpers.c
+index 0c9716067cfb..87bfd32e8ddb 100644
+--- a/ui/egl-helpers.c
++++ b/ui/egl-helpers.c
+@@ -229,20 +229,34 @@ int egl_get_fd_for_texture(uint32_t tex_id, EGLint *stride, EGLint *fourcc,
+ void egl_dmabuf_import_texture(QemuDmaBuf *dmabuf)
+ {
+     EGLImageKHR image = EGL_NO_IMAGE_KHR;
+-    EGLint attrs[] = {
+-        EGL_DMA_BUF_PLANE0_FD_EXT,      dmabuf->fd,
+-        EGL_DMA_BUF_PLANE0_PITCH_EXT,   dmabuf->stride,
+-        EGL_DMA_BUF_PLANE0_OFFSET_EXT,  0,
+-        EGL_WIDTH,                      dmabuf->width,
+-        EGL_HEIGHT,                     dmabuf->height,
+-        EGL_LINUX_DRM_FOURCC_EXT,       dmabuf->fourcc,
+-        EGL_NONE, /* end of list */
+-    };
++    EGLint attrs[64];
++    int i = 0;
+ 
+     if (dmabuf->texture != 0) {
+         return;
+     }
+ 
++    attrs[i++] = EGL_WIDTH;
++    attrs[i++] = dmabuf->width;
++    attrs[i++] = EGL_HEIGHT;
++    attrs[i++] = dmabuf->height;
++    attrs[i++] = EGL_LINUX_DRM_FOURCC_EXT;
++    attrs[i++] = dmabuf->fourcc;
++
++    attrs[i++] = EGL_DMA_BUF_PLANE0_FD_EXT;
++    attrs[i++] = dmabuf->fd;
++    attrs[i++] = EGL_DMA_BUF_PLANE0_PITCH_EXT;
++    attrs[i++] = dmabuf->stride;
++    attrs[i++] = EGL_DMA_BUF_PLANE0_OFFSET_EXT;
++    attrs[i++] = 0;
++    if (dmabuf->modifier) {
++        attrs[i++] = EGL_DMA_BUF_PLANE0_MODIFIER_LO_EXT;
++        attrs[i++] = (dmabuf->modifier >>  0) & 0xffffffff;
++        attrs[i++] = EGL_DMA_BUF_PLANE0_MODIFIER_HI_EXT;
++        attrs[i++] = (dmabuf->modifier >> 32) & 0xffffffff;
++    }
++    attrs[i++] = EGL_NONE;
++
+     image = eglCreateImageKHR(qemu_egl_display,
+                               EGL_NO_CONTEXT,
+                               EGL_LINUX_DMA_BUF_EXT,
+-- 
+2.18.1
 
-
-ATB,
-
-Mark.
 
