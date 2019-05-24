@@ -2,71 +2,142 @@ Return-Path: <SRS0=oHhb=TY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_MUTT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AED01C282E1
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 21:20:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 568B0C282E1
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 23:21:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 730EA21773
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 21:20:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 730EA21773
+	by mail.kernel.org (Postfix) with ESMTPS id 1140E21848
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 23:21:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1140E21848
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:60288 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:33065 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hUHcV-0002mP-Gy
-	for qemu-devel@archiver.kernel.org; Fri, 24 May 2019 17:20:55 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:35350)
+	id 1hUJUs-0007TC-4f
+	for qemu-devel@archiver.kernel.org; Fri, 24 May 2019 19:21:10 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:52834)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1hUHbM-000264-8W
-	for qemu-devel@nongnu.org; Fri, 24 May 2019 17:19:45 -0400
+	(envelope-from <jsnow@redhat.com>) id 1hUJTm-00070V-9z
+	for qemu-devel@nongnu.org; Fri, 24 May 2019 19:20:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1hUHbK-0000ti-Cs
-	for qemu-devel@nongnu.org; Fri, 24 May 2019 17:19:44 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44381)
+	(envelope-from <jsnow@redhat.com>) id 1hUJPQ-0002hU-97
+	for qemu-devel@nongnu.org; Fri, 24 May 2019 19:15:33 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58302)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hUHbK-0000r1-3T
-	for qemu-devel@nongnu.org; Fri, 24 May 2019 17:19:42 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
+	(Exim 4.71) (envelope-from <jsnow@redhat.com>)
+	id 1hUJPO-0002dt-86; Fri, 24 May 2019 19:15:30 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 4A506308624C;
-	Fri, 24 May 2019 21:19:40 +0000 (UTC)
-Received: from localhost (ovpn-116-14.gru2.redhat.com [10.97.116.14])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 23C285C1B4;
-	Fri, 24 May 2019 21:19:36 +0000 (UTC)
-Date: Fri, 24 May 2019 18:19:35 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-To: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Message-ID: <20190524211935.GX10764@habkost.net>
-References: <20190520231910.12184-1-f4bug@amsat.org>
-	<20190522211230.GA10764@habkost.net>
-	<1711852617.24204010.1558561566547.JavaMail.zimbra@redhat.com>
-	<CAL1e-=iW2honEgNfrsFoA0tU1wMq0mw5LuoRbWVmRDBMA22ELA@mail.gmail.com>
-	<1094559891.24356881.1558619101528.JavaMail.zimbra@redhat.com>
-	<CAL1e-=ikyNrfwBR_UW8wwCNHQjLWxhcfrTdde54OP4phkdvqHA@mail.gmail.com>
-	<b4252e21-a82c-2e1b-7a3f-ed13cb3fba36@amsat.org>
-	<20190524193955.GN10764@habkost.net>
-	<CAL1e-=h-4RNGYtBPL9PEHux6qYUXAmi_2BqpgPM+j4MiWfn3iA@mail.gmail.com>
+	by mx1.redhat.com (Postfix) with ESMTPS id D8966308FC47;
+	Fri, 24 May 2019 23:15:28 +0000 (UTC)
+Received: from [10.10.123.140] (ovpn-123-140.rdu2.redhat.com [10.10.123.140])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 78364183A2;
+	Fri, 24 May 2019 23:15:27 +0000 (UTC)
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+	qemu-devel@nongnu.org, qemu-block@nongnu.org
+References: <20190523154733.54944-1-vsementsov@virtuozzo.com>
+	<20190523154733.54944-2-vsementsov@virtuozzo.com>
+From: John Snow <jsnow@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
+	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
+Message-ID: <3d8399cf-a1a1-b841-5b65-7f20201c30f4@redhat.com>
+Date: Fri, 24 May 2019 19:15:25 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
+In-Reply-To: <20190523154733.54944-2-vsementsov@virtuozzo.com>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAL1e-=h-4RNGYtBPL9PEHux6qYUXAmi_2BqpgPM+j4MiWfn3iA@mail.gmail.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.49]);
-	Fri, 24 May 2019 21:19:40 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+	(mx1.redhat.com [10.5.110.43]);
+	Fri, 24 May 2019 23:15:29 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 0/4] mips: Add more Avocado tests
+Subject: Re: [Qemu-devel] [PATCH 1/3] iotests: add test 255 to check bitmap
+ life after snapshot + commit
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -78,239 +149,196 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Aleksandar Rikalo <arikalo@wavecomp.com>, qemu-devel@nongnu.org,
-	Wainer dos Santos Moschetta <wainersm@redhat.com>,
-	Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>,
-	Aleksandar Markovic <amarkovic@wavecomp.com>,
-	Cleber Rosa <crosa@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
+Cc: fam@euphon.net, kwolf@redhat.com, den@openvz.org, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, May 24, 2019 at 10:32:36PM +0200, Aleksandar Markovic wrote:
-> On May 24, 2019 9:40 PM, "Eduardo Habkost" <ehabkost@redhat.com> wrote:
-> >
-> > On Thu, May 23, 2019 at 07:27:35PM +0200, Philippe Mathieu-Daud=C3=A9=
- wrote:
-> > > On 5/23/19 7:11 PM, Aleksandar Markovic wrote:
-> > > > On May 23, 2019 3:45 PM, "Cleber Rosa" <crosa@redhat.com> wrote:
-> > > >>> From: "Aleksandar Markovic" <aleksandar.m.mail@gmail.com>
-> > > >>> On May 22, 2019 11:46 PM, "Cleber Rosa" <crosa@redhat.com> wrot=
-e:
-> > > >>>>> From: "Eduardo Habkost" <ehabkost@redhat.com>
-> > > >>>>>
-> > > >>>>> Until we actually have a mechanism to exclude the test case o=
-n
-> > > >>>>> travis-ci, I will remove patch 4/4 from the queue.  Aleksanda=
-r,
-> > > >>>>> please don't merge patch 4/4 yet or it will break travis-ci.
-> > > >>>>>
-> > > >>>>> Cleber, Wainer, is it already possible to make "avocado run" =
-skip
-> > > >>>>> tests tagged with "slow"?
-> > > >>>>>
-> > > >>>>
-> > > >>>> The mechanism exists, but we haven't tagged any test so far as
-> slow.
-> > > >>>>
-> > > >>>
-> > > >>> Cleber,
-> > > >>>
-> > > >>> For the test from patch 4/4, there is no dilemma - it should be=
- in
-> the
-> > > >>> =E2=80=9Cslow=E2=80=9D group, as Philippe envisioned and said, =
-so that it is not
-> > > > humpered
-> > > >>> with stricter requirements for =E2=80=9Cfast=E2=80=9D (default)=
- group. Could you
-> > > > explain us
-> > > >>> how to do it, so that we can hopefully finally proceed?
-> > > >>>
-> > > >>
-> > > >> Hi Aleksandar,
-> > > >>
-> > > >> The point is that there's no "group" definition at this point.  =
-This
-> is
-> > > > the
-> > > >> core of the discussion.
-> > > >>
-> > > >> I think we're close to converging to something simple and effect=
-ive.
-> > > > Please
-> > > >> let us know what you think of the proposals given.
-> > > >>
-> > > >> Thanks!
-> > > >> - Cleber.
-> > > >>
-> > > >
-> > > > Cleber, hi.
-> > > >
-> > > > Thanks for responding.
-> > > >
-> > > > My views are very similar to Philippe's, but I will provide you w=
-ith
-> more
-> > > > details of our (mips) perspective.
-> > > >
-> > > > As far as black/whitelist issues that is a moot point for us - we
-> only want
-> > > > to be able to have a way to tag a test within the test itself (so=
-,
-> without
-> > > > updating some common files, external lists,etc.)
-> > > >
-> > > > In general, we would like to have a test environment where we wou=
-ld
-> be able
-> > > > to test what WE deem suitable for us, without feeling that we bot=
-her
-> you or
-> > > > anybody else, or that we are bothered by others.
-> > > >
-> > > > Let me give you a little extreme example: Let's say we want a com=
-plex
-> test
-> > > > that downloads components from let's say fifty internet location,
-> executes
-> > > > zillion test cases, and last two days. I wouldn't like anybody to=
- ask
-> me
-> > > > =E2=80=9CWhy would you that?=E2=80=9D or tell me =E2=80=9CYou can=
-'t do this.=E2=80=9D or say =E2=80=9CNo, we
-> did
-> > > > not anticipate such tests, patch rejected.=E2=80=9D I (we, people=
- from mips)
-> should
-> > > > be able to define what I (we) need.
-> > >
-> > > Maybe we can use subdirectory like we do for the TCG tests (Aleksan=
-dar
-> > > maintains tests/tcg/mips/). We should try to keep contribution upst=
-ream,
-> > > so good idea/pattern can be reused by others.
-> > >
-> > > What I'd like to have with those tests is, at least:
-> > >
-> > > 1/ we don't need to run all the tests (but there is a set of 'quick=
-'
-> > > tests we can run on daily basis)
-> > >
-> > > 2/ maintainers can run their default tests easily (using a combinat=
-ion
-> > > of Avocado tags)
-> > >
-> > > 3/ if a developer working on the PCI subsystem has to modify the MI=
-PS
-> > > subsystem (for example), he should be able to run the MIPS tests be=
-fore
-> > > sending his series.
-> >
-> > Keeping the test cases organized in subdirectories are a good
-> > idea, but don't think this is going to help us when we need to
-> > quickly enable/disable specific test cases on some CI systems.
-> >
->=20
-> Well, Eduardo, nobody said that directory locations should be used for
-> enabling/disabling or tagging/untagging tests in the first place. I thi=
-nk
-> it was clear for everybody from the outset that these features should h=
-ave
-> their own mechanisms, which Cleber says already exist, but can't be use=
-d
-> because the test group still can't figure out (in some hamletesque way)
-> whether to blacklist or to whitelist, or how to name the tag for travis=
-,
-> and tag for not travis, and if such tags should even exist, etc. - that=
- is
-> my layman impression from recent discussions. And now when Philippe
-> suggested (in my opinion logical and reasonable) subdirectory, an endle=
-ss
-> discussion begins: =E2=80=9CTo subdirectory or not to subdirectory? Tha=
-t is the
-> question.=E2=80=9D Meanwhile, 4.1 is inexorably getting closer and clos=
-er, and with
-> each day, the value of any potential tests is decreasing.
-
-I understand that seeing the discussions going on and the patches
-taking too long to be included might be frustrating.
-
-These discussions shouldn't get into the way of addressing other
-problems.  We don't need to wait until all discussions have
-finished before proposing new patches or before merging patches
-that are considered good.
 
 
->=20
-> Directory structure should be used in its usual and basic way: for
-> clustering files of similar nature, purpose, or origin, and I do certai=
-nly
-> support any reasonable subdirectory organization for your directory - a=
-nd
-> you should think about it, and probably while doing that consult a litt=
-le
-> bit other people from all walks of QEMU. We are ready to comply with yo=
-ur
-> final decision.
+On 5/23/19 11:47 AM, Vladimir Sementsov-Ogievskiy wrote:
+> Two testcases with persistent bitmaps are not added here, as there are
+> bugs to be fixed soon.
+> 
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>  python/qemu/__init__.py    |  4 +-
+>  tests/qemu-iotests/255     | 81 ++++++++++++++++++++++++++++++++++++++
+>  tests/qemu-iotests/255.out | 17 ++++++++
+>  tests/qemu-iotests/group   |  1 +
+>  4 files changed, 102 insertions(+), 1 deletion(-)
+>  create mode 100755 tests/qemu-iotests/255
+>  create mode 100644 tests/qemu-iotests/255.out
+> 
+> diff --git a/python/qemu/__init__.py b/python/qemu/__init__.py
+> index 81d9657ec0..4c4317a55e 100644
+> --- a/python/qemu/__init__.py
+> +++ b/python/qemu/__init__.py
+> @@ -402,7 +402,7 @@ class QEMUMachine(object):
+>          self._qmp.clear_events()
+>          return events
+>  
+> -    def event_wait(self, name, timeout=60.0, match=None):
+> +    def event_wait(self, name, timeout=60.0, match=None, fail_on=None):
+>          """
+>          Wait for specified timeout on named event in QMP; optionally filter
+>          results by match.
+> @@ -430,6 +430,7 @@ class QEMUMachine(object):
+>  
+>          # Search cached events
+>          for event in self._events:
+> +            assert event['event'] != fail_on
+>              if (event['event'] == name) and event_match(event, match):
+>                  self._events.remove(event)
+>                  return event
+> @@ -437,6 +438,7 @@ class QEMUMachine(object):
+>          # Poll for new events
+>          while True:
+>              event = self._qmp.pull_event(wait=timeout)
+> +            assert event['event'] != fail_on
+>              if (event['event'] == name) and event_match(event, match):
+>                  return event
+>              self._events.append(event)
 
-About subdirectories, specifically, note that I explicitly said
-it was a good idea.  If somebody wants to send patches, they are
-welcome.
+I'd rather not put assertions directly in the QEMUMachine code, unless
+it's actually an assertion and not a test failure, because this code is
+not necessarily meant to be used exclusively for tests.
 
-If I'm doing something else that could be blocking people from
-getting work done, I'd like to fix that.  I'm aware that
-sometimes I take too long to review patches, but I hope other
-developers can help us on the review work.
+> diff --git a/tests/qemu-iotests/255 b/tests/qemu-iotests/255
+> new file mode 100755
+> index 0000000000..36712689d3
+> --- /dev/null
+> +++ b/tests/qemu-iotests/255
+> @@ -0,0 +1,81 @@
+> +#!/usr/bin/env python
+> +#
+> +# Tests for temporary external snapshot when we have bitmaps.
+> +#
+> +# Copyright (c) 2019 Virtuozzo International GmbH. All rights reserved.
+> +#
+> +# This program is free software; you can redistribute it and/or modify
+> +# it under the terms of the GNU General Public License as published by
+> +# the Free Software Foundation; either version 2 of the License, or
+> +# (at your option) any later version.
+> +#
+> +# This program is distributed in the hope that it will be useful,
+> +# but WITHOUT ANY WARRANTY; without even the implied warranty of
+> +# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> +# GNU General Public License for more details.
+> +#
+> +# You should have received a copy of the GNU General Public License
+> +# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+> +#
+> +
+> +import iotests
+> +from iotests import qemu_img_create, file_path, log
+> +
+> +iotests.verify_image_format(supported_fmts=['qcow2'])
+> +
+> +base, top = file_path('base', 'top')
+> +size = 64 * 1024 * 3
+> +
+> +
+> +def print_bitmap(msg, vm):
+> +    result = vm.qmp('query-block')['return'][0]
+> +    if 'dirty-bitmaps' in result:
+> +        bitmap = result['dirty-bitmaps'][0]
+> +        log('{}: name={} dirty-clusters={}'.format(msg, bitmap['name'],
+> +            bitmap['count'] // 64 // 1024))
+> +    else:
+> +        log(msg + ': not found')
+> +
+> +
+> +def test(persistent, restart):
+> +    assert persistent or not restart
+> +    log("\nTestcase {}persistent {} restart\n".format(
+> +            '' if persistent else 'non-', 'with' if restart else 'without'))
+> +
+> +    qemu_img_create('-f', iotests.imgfmt, base, str(size))
+> +
+> +    vm = iotests.VM().add_drive(base)
+> +    vm.launch()
+> +
+> +    vm.qmp_log('block-dirty-bitmap-add', node='drive0', name='bitmap0',
+> +               persistent=persistent)
+> +    vm.hmp_qemu_io('drive0', 'write 0 64K')
+> +    print_bitmap('initial bitmap', vm)
+> +
+> +    vm.qmp_log('blockdev-snapshot-sync', device='drive0', snapshot_file=top,
+> +               format=iotests.imgfmt, filters=[iotests.filter_qmp_testfiles])
+> +    vm.hmp_qemu_io('drive0', 'write 64K 512')
+> +    print_bitmap('check, that no bitmaps in snapshot', vm)
 
->=20
-> The good thing is that nothing is set in stone, everything can be chang=
-ed
-> and improved, moving files is easy in git.
->=20
-> All that said, many thanks for reviewing patch 4/4.
->=20
-> Aleksandar
->=20
->=20
->=20
-> > Disabling a test case (or an entire category of test cases) known
-> > to be failing on some CI systems should require a one line patch,
-> > not moving files to a separate directory.
-> >
-> > >
-> > > > Having such test would be a big deal for me, not only that I coul=
-d
-> run it
-> > > > manually or automatically every weekend, but I could ask submitte=
-rs of
-> > > > critical changes: =E2=80=9CDid you run this test that we have in =
-Avocado
-> dir?=E2=80=9D,
-> > > > without specifying test details, procedures, etc. All this is a B=
-IG
-> deal
-> > > > for me.
-> > > >
-> > > > On the other hand, I agree that certain group of tests (envisione=
-d for
-> > > > daily or so Travis CI) should have some stricter limitations and
-> structure.
-> > > > But right now I feel humpered by it, and this is counterproductiv=
-e.
-> > > >
-> > > > So, we want freedom, responsibility and ownersheep of our tests.
-> Please
-> > > > give us the opportunity to get down on business and start writing
-> tests and
-> > > > start testing.
-> > > >
-> > > > Yours,
-> > > > Aleksandar
-> >
-> > --
-> > Eduardo
+'check that no bitmaps are in snapshot', probably.
 
---=20
-Eduardo
+> +
+> +    if restart:
+> +        log("... Restart ...")
+> +        vm.shutdown()
+> +        vm = iotests.VM().add_drive(top)
+> +        vm.launch()
+> +
+> +    vm.qmp_log('block-commit', device='drive0', top=top,
+> +               filters=[iotests.filter_qmp_testfiles])
+> +    log(vm.event_wait('BLOCK_JOB_READY', fail_on='BLOCK_JOB_COMPLETED'),
+> +        filters=[iotests.filter_qmp_event])
+
+Looks like you probably saw some interesting things during development.
+You shouldn't see COMPLETED before READY, should you? Is this necessary?
+
+> +    vm.qmp_log('block-job-complete', device='drive0')
+> +    log(vm.event_wait('BLOCK_JOB_COMPLETED'),
+> +        filters=[iotests.filter_qmp_event])
+
+(Just musing: we probably want a filtered version of event_wait for
+iotests.py so we don't have to type this so much.)
+
+> +    print_bitmap('check merged bitmap', vm)
+> +
+
+Merged? We don't /merge/ the bitmaps, do we? I guess you mean to say
+something like: "Check bitmaps on merged/converged node", right?
+
+> +    vm.hmp_qemu_io('drive0', 'write 128K 64K')
+> +    print_bitmap('check updated bitmap', vm)
+> +
+> +    vm.shutdown()
+> +
+> +
+> +test(persistent=False, restart=False)
+> diff --git a/tests/qemu-iotests/255.out b/tests/qemu-iotests/255.out
+> new file mode 100644
+> index 0000000000..2bffb486d2
+> --- /dev/null
+> +++ b/tests/qemu-iotests/255.out
+> @@ -0,0 +1,17 @@
+> +
+> +Testcase non-persistent without restart
+> +
+> +{"execute": "block-dirty-bitmap-add", "arguments": {"name": "bitmap0", "node": "drive0", "persistent": false}}
+> +{"return": {}}
+> +initial bitmap: name=bitmap0 dirty-clusters=1
+> +{"execute": "blockdev-snapshot-sync", "arguments": {"device": "drive0", "format": "qcow2", "snapshot-file": "TEST_DIR/PID-top"}}
+> +{"return": {}}
+> +check, that no bitmaps in snapshot: not found
+> +{"execute": "block-commit", "arguments": {"device": "drive0", "top": "TEST_DIR/PID-top"}}
+> +{"return": {}}
+> +{"data": {"device": "drive0", "len": 65536, "offset": 65536, "speed": 0, "type": "commit"}, "event": "BLOCK_JOB_READY", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
+> +{"execute": "block-job-complete", "arguments": {"device": "drive0"}}
+> +{"return": {}}
+> +{"data": {"device": "drive0", "len": 65536, "offset": 65536, "speed": 0, "type": "commit"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
+> +check merged bitmap: name=bitmap0 dirty-clusters=2
+> +check updated bitmap: name=bitmap0 dirty-clusters=3
+> diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
+> index 52b7c16e15..2758f48143 100644
+> --- a/tests/qemu-iotests/group
+> +++ b/tests/qemu-iotests/group
+> @@ -251,3 +251,4 @@
+>  249 rw auto quick
+>  252 rw auto backing quick
+>  253 rw auto quick
+> +255 rw auto quick
+> 
+
+Good test, I just have to dig through patch 3.
 
