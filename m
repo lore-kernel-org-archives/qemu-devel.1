@@ -2,71 +2,81 @@ Return-Path: <SRS0=oHhb=TY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_MUTT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 33C2EC072B5
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 18:32:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C716DC072B5
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 18:32:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0BB0E20673
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 18:32:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0BB0E20673
+	by mail.kernel.org (Postfix) with ESMTPS id A27C920673
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 18:32:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A27C920673
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:58521 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:58523 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hUEzi-0005Oy-97
-	for qemu-devel@archiver.kernel.org; Fri, 24 May 2019 14:32:42 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:36029)
+	id 1hUEzm-0005Sp-Qn
+	for qemu-devel@archiver.kernel.org; Fri, 24 May 2019 14:32:46 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:36135)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1hUExa-0004M3-IQ
-	for qemu-devel@nongnu.org; Fri, 24 May 2019 14:30:31 -0400
+	(envelope-from <philmd@redhat.com>) id 1hUExg-0004VS-MT
+	for qemu-devel@nongnu.org; Fri, 24 May 2019 14:30:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1hUErv-0008TP-7s
-	for qemu-devel@nongnu.org; Fri, 24 May 2019 14:24:40 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34466)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hUErv-0008Ss-0V
-	for qemu-devel@nongnu.org; Fri, 24 May 2019 14:24:39 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id EF95A308421A;
-	Fri, 24 May 2019 18:24:37 +0000 (UTC)
-Received: from localhost (ovpn-116-14.gru2.redhat.com [10.97.116.14])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 347BC68738;
-	Fri, 24 May 2019 18:24:36 +0000 (UTC)
-Date: Fri, 24 May 2019 15:24:34 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-To: Andrea Bolognani <abologna@redhat.com>
-Message-ID: <20190524182434.GH10764@habkost.net>
-References: <20190418112610.GO13773@redhat.com>
-	<877ebrmch2.fsf@dusky.pond.sub.org>
-	<20190513184237.i2ha3ixvhjqzkn5q@kamzik.brq.redhat.com>
-	<87bm05ab6c.fsf@dusky.pond.sub.org>
-	<20190514090225.vel4xm4x743o4rge@kamzik.brq.redhat.com>
-	<20190514164838.48fc7603@Igors-MacBook-Pro>
-	<20190515081854.kcpjm4zd2bzc7f6o@kamzik.brq.redhat.com>
-	<20190515125229.1784f586@redhat.com>
-	<20190515115413.cqvzjkky7xubnsuo@kamzik.brq.redhat.com>
-	<2186eb85f8541b0c9cc69cacae9321ace8addaa6.camel@redhat.com>
+	(envelope-from <philmd@redhat.com>) id 1hUEni-0006dj-CS
+	for qemu-devel@nongnu.org; Fri, 24 May 2019 14:20:22 -0400
+Received: from mail-wr1-f48.google.com ([209.85.221.48]:38747)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hUEnb-0006bU-Uk
+	for qemu-devel@nongnu.org; Fri, 24 May 2019 14:20:12 -0400
+Received: by mail-wr1-f48.google.com with SMTP id d18so10917945wrs.5
+	for <qemu-devel@nongnu.org>; Fri, 24 May 2019 11:20:10 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+	:date:user-agent:mime-version:in-reply-to:content-language
+	:content-transfer-encoding;
+	bh=Dn3/qwSfxbWLAs6qAs2Cw68jIcfGOwRniAfC44iCdYc=;
+	b=A7PAtfbZlEND7rW+bMjGzYc7hEF60WB69Txf1DAEKFjmS9P5jihusC+9qreRuyEuej
+	lLiRJFYJaFg4u07tVQ1X3TMP1mf8KAff1g0zlPLPuPAQ+8rSXQg0vcVOwf17TBjsCuRv
+	khQswI6bQkcwLqtTEYZHzW9rXhYCTemt+bh2L2cbkQZvXoYe01MnmZ4SkEoLFBdqy4Lv
+	8F91FHi3jSy0CRyWv/Vy9uaYJ2y49cChwTZK7CmCAVpTA66O1Dn58yCxI/9B9qKNmNuE
+	2dpvYDWZ0RHHVYZyOIQqAmzh2wsUxlxvqNMCYuD6oPYFWqM+9/Kp3I2AFrrLDIsqX+tj
+	jyrA==
+X-Gm-Message-State: APjAAAXGtBQDzhnmvZoeiGklYKp1sfLfAsUroSShjHX64qSVFLjE+hBh
+	lxOT/d1KIoDEWxohGliL+a1cKg==
+X-Google-Smtp-Source: APXvYqx1R0TDumj61uJeJAr7NdXbQdv51i5iAQqbISxIVa7BsO8r2H/ZJEN65tQAbWRTl87Pz4A+bA==
+X-Received: by 2002:adf:9022:: with SMTP id h31mr9048367wrh.46.1558722009868; 
+	Fri, 24 May 2019 11:20:09 -0700 (PDT)
+Received: from [192.168.1.43] (228.red-83-52-173.dynamicip.rima-tde.net.
+	[83.52.173.228])
+	by smtp.gmail.com with ESMTPSA id x2sm3736787wrs.39.2019.05.24.11.20.08
+	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+	Fri, 24 May 2019 11:20:09 -0700 (PDT)
+To: David Hildenbrand <david@redhat.com>,
+	Christian Borntraeger <borntraeger@de.ibm.com>,
+	Markus Armbruster <armbru@redhat.com>
+References: <51df31ee-54a1-d7be-bef4-71ae003b8811@redhat.com>
+	<3fab9e76-53ad-2de7-45df-eb69c8604709@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+	url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <863feca5-192e-ae14-7a57-8d839b54e603@redhat.com>
+Date: Fri, 24 May 2019 20:20:08 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <2186eb85f8541b0c9cc69cacae9321ace8addaa6.camel@redhat.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.40]);
-	Fri, 24 May 2019 18:24:38 +0000 (UTC)
+In-Reply-To: <3fab9e76-53ad-2de7-45df-eb69c8604709@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] How do we do user input bitmap properties?
+	[fuzzy]
+X-Received-From: 209.85.221.48
+Subject: Re: [Qemu-devel] hw/s390x/ipl: Dubious use of qdev_reset_all_fn
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -78,61 +88,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, Andrew Jones <drjones@redhat.com>,
-	Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
-	qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>,
-	Igor Mammedov <imammedo@redhat.com>, Dave.Martin@arm.com,
-	dgilbert@redhat.com
+Cc: Halil Pasic <pasic@linux.ibm.com>, Thomas Huth <thuth@redhat.com>,
+	Cornelia Huck <cohuck@redhat.com>,
+	QEMU Developers <qemu-devel@nongnu.org>, qemu-s390x@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, May 23, 2019 at 10:35:24AM +0200, Andrea Bolognani wrote:
-> On Wed, 2019-05-15 at 13:54 +0200, Andrew Jones wrote:
-> > On Wed, May 15, 2019 at 12:52:29PM +0200, Igor Mammedov wrote:
-> > > since using magic numbers is not very descriptive
-> > > (but if there is some spec where they come from that we could point users to
-> > > it might be acceptable too, but I'd reserve number approach for values only).
-> > 
-> > The numbers aren't magic, they're part of the name. '1' in the above
-> > 'sve1' means one quadword. It would probably have been better to use bits
-> > instead in the example, i.e.
-> > 
-> >   -cpu host,sve128=on,sve256=on,sve384=off,sve512=on
-> > 
-> > where it's now clear that "sve512" has an analogy with x86's "avx512".
-> > 
-> [...]
-> > 
-> > So I set off to convince Igor of the wide word idea (he sits next to me,
-> > so I didn't have go far), but he has convinced me of the above property
-> > idea. He used the magic phrase: "less code would be needed". If we use
-> > the properties like above then we get introspection for free (cpu property
-> > listing which libvirt already knows how to do) - so no QMP query needed.
-> > The cost is adding several properties (16 to handle the current 2048-bit
-> > limit), but I guess that's cheap enough. The command line is verbose, but
-> > also much easier for a human to construct and read. I'm pretty sold on
-> > this path, but adding Andrea and Eduardo for their input as well.
+On 5/24/19 8:04 PM, David Hildenbrand wrote:
+> On 24.05.19 19:54, Philippe Mathieu-Daudé wrote:
+>> Hi Christian,
+>>
+>> I'm having hard time to understand why the S390_IPL object calls
+>> qemu_register_reset(qdev_reset_all_fn) in its realize() method, while
+>> being QOM'ified (it has a reset method).
+>>
+>> It doesn't seem to have a qdev children added explicitly to it.
+>> I see it is used as a singleton, what else am I missing?
+>>
+>> Thanks,
+>>
+>> Phil.
+>>
 > 
-> Sorry for taking a while to respond. Anyway, the above looks good to
-> me as a general direction, but note that you'll have to implement at
-> the very least the query-cpu-model-expansion QMP command for the
-> introspection to work.
-
-Why is query-cpu-model-expansion needed?  Isn't
-device-list-properties enough?
-
+> Looks like I added it back then (~4 years ago) when converting it into a
+> TYPE_DEVICE.
 > 
-> query-cpu-model-baseline and query-cpu-model-comparison are two more
-> QMP command which, while perhaps not immediately applicabile, we will
-> want to implement at some point; more in general, what s390x is doing
-> with respect to CPU models is a good blueprint, according to the
-> libvirt developer who's the most involved with that specific area of
-> the project.
+> I could imagine that - back then - this was needed because only
+> TYPE_SYS_BUS_DEVICE would recursively get reset.
 
-Agreed.  Even if not necessary right now, query-cpu-model-* will
-probably be needed eventually.
+Thanks for the quick response :)
 
--- 
-Eduardo
+> Did you try removing it, to see if anything breaks?
+
+From build POV it is OK, but I have now idea of the effects with KVM.
+
+I don't know how to test on s390x systems, but luckily Patchew/s390x is
+back up so I'll try my luck with a RFC patch, but I'm not sure the
+default tests cover this specific device uses.
+
+Regards,
+
+Phil.
 
