@@ -3,62 +3,62 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 55A85C072B5
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 18:46:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71730C072B5
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 18:46:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2754821848
-	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 18:46:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2754821848
+	by mail.kernel.org (Postfix) with ESMTPS id 48C3021848
+	for <qemu-devel@archiver.kernel.org>; Fri, 24 May 2019 18:46:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 48C3021848
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:58796 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:58798 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hUFDC-0007YV-CY
-	for qemu-devel@archiver.kernel.org; Fri, 24 May 2019 14:46:38 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:40294)
+	id 1hUFDH-0007fn-Cs
+	for qemu-devel@archiver.kernel.org; Fri, 24 May 2019 14:46:43 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:40312)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1hUFBb-0006Vf-Qm
-	for qemu-devel@nongnu.org; Fri, 24 May 2019 14:45:00 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1hUFBe-0006Xb-Hu
+	for qemu-devel@nongnu.org; Fri, 24 May 2019 14:45:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1hUFBa-0005py-6v
-	for qemu-devel@nongnu.org; Fri, 24 May 2019 14:44:59 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55576)
+	(envelope-from <ehabkost@redhat.com>) id 1hUFBc-0005t7-1h
+	for qemu-devel@nongnu.org; Fri, 24 May 2019 14:45:02 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44480)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hUFBY-0005lC-6E
-	for qemu-devel@nongnu.org; Fri, 24 May 2019 14:44:57 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hUFBb-0005sH-Pk
+	for qemu-devel@nongnu.org; Fri, 24 May 2019 14:44:59 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+	[10.5.11.22])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 23F073086268;
-	Fri, 24 May 2019 18:44:54 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 84E0481F01;
+	Fri, 24 May 2019 18:44:58 +0000 (UTC)
 Received: from localhost (ovpn-116-14.gru2.redhat.com [10.97.116.14])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 6F2EF7D925;
-	Fri, 24 May 2019 18:44:51 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id DABD31001E65;
+	Fri, 24 May 2019 18:44:55 +0000 (UTC)
 From: Eduardo Habkost <ehabkost@redhat.com>
 To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org,
 	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Date: Fri, 24 May 2019 15:44:31 -0300
-Message-Id: <20190524184447.16678-2-ehabkost@redhat.com>
+Date: Fri, 24 May 2019 15:44:32 -0300
+Message-Id: <20190524184447.16678-3-ehabkost@redhat.com>
 In-Reply-To: <20190524184447.16678-1-ehabkost@redhat.com>
 References: <20190524184447.16678-1-ehabkost@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.49]);
-	Fri, 24 May 2019 18:44:54 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.25]);
+	Fri, 24 May 2019 18:44:58 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 01/17] qom/object: Display more helpful message
- when an object type is missing
+Subject: [Qemu-devel] [PULL 02/17] hw/ppc/pnv: Use object_initialize_child
+ for correct reference counting
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -77,93 +77,116 @@ Sender: "Qemu-devel"
 
 From: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
-When writing a new board, adding device which uses other devices
-(container) or simply refactoring, one can discover the hard way
-his machine misses some devices. In the case of containers, the
-error is not obvious:
+As explained in commit aff39be0ed97:
 
-  $ qemu-system-microblaze -M xlnx-zynqmp-pmu
-  **
-  ERROR:/source/qemu/qom/object.c:454:object_initialize_with_type: assert=
-ion failed: (type !=3D NULL)
-  Aborted (core dumped)
+  Both functions, object_initialize() and object_property_add_child()
+  increase the reference counter of the new object, so one of the
+  references has to be dropped afterwards to get the reference
+  counting right. Otherwise the child object will not be properly
+  cleaned up when the parent gets destroyed.
+  Thus let's use now object_initialize_child() instead to get the
+  reference counting here right.
 
-And we have to look at the coredump to figure the error:
+This patch was generated using the following Coccinelle script
+(with a bit of manual fix-up for overly long lines):
 
-  (gdb) bt
-  #1  0x00007f84773cf895 in abort () at /lib64/libc.so.6
-  #2  0x00007f847961fb53 in  () at /lib64/libglib-2.0.so.0
-  #3  0x00007f847967a4de in g_assertion_message_expr () at /lib64/libglib=
--2.0.so.0
-  #4  0x000055c4bcac6c11 in object_initialize_with_type (data=3Ddata@entr=
-y=3D0x55c4bdf239e0, size=3Dsize@entry=3D2464, type=3D<optimized out>) at =
-/source/qemu/qom/object.c:454
-  #5  0x000055c4bcac6e6d in object_initialize (data=3Ddata@entry=3D0x55c4=
-bdf239e0, size=3Dsize@entry=3D2464, typename=3Dtypename@entry=3D0x55c4bcc=
-7c643 "xlnx.zynqmp_ipi") at /source/qemu/qom/object.c:474
-  #6  0x000055c4bc9ea474 in xlnx_zynqmp_pmu_init (machine=3D0x55c4bdd4600=
-0) at /source/qemu/hw/microblaze/xlnx-zynqmp-pmu.c:176
-  #7  0x000055c4bca3b6cb in machine_run_board_init (machine=3D0x55c4bdd46=
-000) at /source/qemu/hw/core/machine.c:1030
-  #8  0x000055c4bc95f6d2 in main (argc=3D<optimized out>, argv=3D<optimiz=
-ed out>, envp=3D<optimized out>) at /source/qemu/vl.c:4479
+ @use_object_initialize_child@
+ expression parent_obj;
+ expression child_ptr;
+ expression child_name;
+ expression child_type;
+ expression child_size;
+ expression errp;
+ @@
+ (
+ -   object_initialize(child_ptr, child_size, child_type);
+ +   object_initialize_child(parent_obj, child_name,  child_ptr, child_si=
+ze,
+ +                           child_type, &error_abort, NULL);
+     ... when !=3D parent_obj
+ -   object_property_add_child(parent_obj, child_name, OBJECT(child_ptr),=
+ NULL);
+     ...
+?-   object_unref(OBJECT(child_ptr));
+ |
+ -   object_initialize(child_ptr, child_size, child_type);
+ +   object_initialize_child(parent_obj, child_name,  child_ptr, child_si=
+ze,
+ +                            child_type, errp, NULL);
+     ... when !=3D parent_obj
+ -   object_property_add_child(parent_obj, child_name, OBJECT(child_ptr),=
+ errp);
+     ...
+?-   object_unref(OBJECT(child_ptr));
+ )
 
-Since the caller knows the type name requested, we can simply display it
-to ease development.
+While the object_initialize() function doesn't take an
+'Error *errp' argument, the object_initialize_child() does.
+Since this code is used when a machine is created (and is not
+yet running), we deliberately choose to use the &error_abort
+argument instead of ignoring errors if an object creation failed.
 
-With this patch applied we get:
-
-  $ qemu-system-microblaze -M xlnx-zynqmp-pmu
-  qemu-system-microblaze: missing object type 'xlnx.zynqmp_ipi'
-  Aborted (core dumped)
-
-Since the assert(type) check in object_initialize_with_type() is
-now impossible, remove it.
-
+Suggested-by: Eduardo Habkost <ehabkost@redhat.com>
+Inspired-by: Thomas Huth <thuth@redhat.com>
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Message-Id: <20190427135642.16464-1-philmd@redhat.com>
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
-Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+Message-Id: <20190507163416.24647-2-philmd@redhat.com>
+Acked-by: David Gibson <david@gibson.dropbear.id.au>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- qom/object.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+ hw/ppc/pnv.c | 12 ++++--------
+ 1 file changed, 4 insertions(+), 8 deletions(-)
 
-diff --git a/qom/object.c b/qom/object.c
-index 99c4fa707e..3966a3d461 100644
---- a/qom/object.c
-+++ b/qom/object.c
-@@ -28,6 +28,7 @@
- #include "qapi/qmp/qbool.h"
- #include "qapi/qmp/qnum.h"
- #include "qapi/qmp/qstring.h"
-+#include "qemu/error-report.h"
+diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
+index dfb4ea5742..31aa20ee25 100644
+--- a/hw/ppc/pnv.c
++++ b/hw/ppc/pnv.c
+@@ -994,14 +994,12 @@ static void pnv_chip_quad_realize(Pnv9Chip *chip9, =
+Error **errp)
+         PnvCore *pnv_core =3D PNV_CORE(chip->cores + (i * 4) * typesize)=
+;
+         int core_id =3D CPU_CORE(pnv_core)->core_id;
 =20
- #define MAX_INTERFACES 32
+-        object_initialize(eq, sizeof(*eq), TYPE_PNV_QUAD);
+         snprintf(eq_name, sizeof(eq_name), "eq[%d]", core_id);
++        object_initialize_child(OBJECT(chip), eq_name, eq, sizeof(*eq),
++                                TYPE_PNV_QUAD, &error_fatal, NULL);
 =20
-@@ -448,7 +449,6 @@ static void object_initialize_with_type(void *data, s=
-ize_t size, TypeImpl *type)
- {
-     Object *obj =3D data;
+-        object_property_add_child(OBJECT(chip), eq_name, OBJECT(eq),
+-                                  &error_fatal);
+         object_property_set_int(OBJECT(eq), core_id, "id", &error_fatal)=
+;
+         object_property_set_bool(OBJECT(eq), true, "realized", &error_fa=
+tal);
+-        object_unref(OBJECT(eq));
 =20
--    g_assert(type !=3D NULL);
-     type_initialize(type);
+         pnv_xscom_add_subregion(chip, PNV9_XSCOM_EQ_BASE(eq->id),
+                                 &eq->xscom_regs);
+@@ -1165,10 +1163,9 @@ static void pnv_chip_core_realize(PnvChip *chip, E=
+rror **errp)
+             continue;
+         }
 =20
-     g_assert(type->instance_size >=3D sizeof(Object));
-@@ -468,6 +468,11 @@ void object_initialize(void *data, size_t size, cons=
-t char *typename)
- {
-     TypeImpl *type =3D type_get_by_name(typename);
+-        object_initialize(pnv_core, typesize, typename);
+         snprintf(core_name, sizeof(core_name), "core[%d]", core_hwid);
+-        object_property_add_child(OBJECT(chip), core_name, OBJECT(pnv_co=
+re),
+-                                  &error_fatal);
++        object_initialize_child(OBJECT(chip), core_name, pnv_core, types=
+ize,
++                                typename, &error_fatal, NULL);
+         object_property_set_int(OBJECT(pnv_core), smp_threads, "nr-threa=
+ds",
+                                 &error_fatal);
+         object_property_set_int(OBJECT(pnv_core), core_hwid,
+@@ -1180,7 +1177,6 @@ static void pnv_chip_core_realize(PnvChip *chip, Er=
+ror **errp)
+                                        OBJECT(chip), &error_fatal);
+         object_property_set_bool(OBJECT(pnv_core), true, "realized",
+                                  &error_fatal);
+-        object_unref(OBJECT(pnv_core));
 =20
-+    if (!type) {
-+        error_report("missing object type '%s'", typename);
-+        abort();
-+    }
-+
-     object_initialize_with_type(data, size, type);
- }
-=20
+         /* Each core has an XSCOM MMIO region */
+         if (!pnv_chip_is_power9(chip)) {
 --=20
 2.18.0.rc1.1.g3f1ff2140
 
