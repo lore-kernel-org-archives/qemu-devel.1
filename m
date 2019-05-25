@@ -6,66 +6,65 @@ X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15E5BC282CE
-	for <qemu-devel@archiver.kernel.org>; Sat, 25 May 2019 23:09:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 72806C07542
+	for <qemu-devel@archiver.kernel.org>; Sat, 25 May 2019 23:09:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C039E2075E
-	for <qemu-devel@archiver.kernel.org>; Sat, 25 May 2019 23:09:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C039E2075E
+	by mail.kernel.org (Postfix) with ESMTPS id 18C682075E
+	for <qemu-devel@archiver.kernel.org>; Sat, 25 May 2019 23:09:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 18C682075E
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:47387 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:47389 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hUfmd-0007dE-Ta
-	for qemu-devel@archiver.kernel.org; Sat, 25 May 2019 19:08:59 -0400
+	id 1hUfmt-0007ng-8G
+	for qemu-devel@archiver.kernel.org; Sat, 25 May 2019 19:09:15 -0400
 Received: from eggs.gnu.org ([209.51.188.92]:34106)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hUfku-0006Ih-0G
-	for qemu-devel@nongnu.org; Sat, 25 May 2019 19:07:13 -0400
+	(envelope-from <laurent@vivier.eu>) id 1hUfl0-0006Ih-Nh
+	for qemu-devel@nongnu.org; Sat, 25 May 2019 19:07:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hUfVM-0002py-M6
-	for qemu-devel@nongnu.org; Sat, 25 May 2019 18:51:11 -0400
-Received: from mout.kundenserver.de ([217.72.192.74]:55463)
+	(envelope-from <laurent@vivier.eu>) id 1hUfVE-0002a5-Hp
+	for qemu-devel@nongnu.org; Sat, 25 May 2019 18:51:05 -0400
+Received: from mout.kundenserver.de ([212.227.17.10]:37497)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <laurent@vivier.eu>)
-	id 1hUfVD-0002Wn-L2; Sat, 25 May 2019 18:51:00 -0400
+	id 1hUfVD-0002RI-Ie; Sat, 25 May 2019 18:51:00 -0400
 Received: from localhost.localdomain ([78.238.229.36]) by
 	mrelayeu.kundenserver.de (mreue106 [212.227.15.183]) with ESMTPSA
 	(Nemesis)
-	id 1MeC5x-1gwhag2uFL-00bOdc; Sun, 26 May 2019 00:50:34 +0200
+	id 1MTAW9-1h3PjR3laJ-00UXyS; Sun, 26 May 2019 00:50:27 +0200
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Date: Sun, 26 May 2019 00:50:12 +0200
-Message-Id: <20190525225013.13916-10-laurent@vivier.eu>
+Date: Sun, 26 May 2019 00:50:07 +0200
+Message-Id: <20190525225013.13916-5-laurent@vivier.eu>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190525225013.13916-1-laurent@vivier.eu>
 References: <20190525225013.13916-1-laurent@vivier.eu>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:tLlZfNsd0ZxDYs7xsWvCEoIOX9IiJ1kEZl15ESO+WCtFdHn+UGN
-	vTpg4qFX26qp0zpMKpPtXStpmWBBhyOaXZvWsNg3Csp8sfZGy4QsUEWNO9HQ4GbxD44h41n
-	iP2jmNnM+Qgi/UudUKdeDzPNIhf7GtmF6P6bdQa1Lsxx8JSxzHa+inL1eMm8EHRd1HFgLEt
-	5HMOEI9iYOXvMEVVPYezg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:Vfu/v7p967I=:kbtg3x0GzNeQy+t61XmS8K
-	0xv+T6CNM7YG0nTmtX7v8b6B22Nmk7TIW8Pg07qWhYIyvNbM4sLGYQOQHV0JmS5f+7kUJg84Z
-	IeobZcG9s/HZiPEAeHY73c+EmRBogjbB+Tptdsv4I0C6GR/ou5R6Q9+kMTaEsmrif3aDH72E9
-	Uow8k5EV9IU9W9mvO4g63HTx6zRJJ6y8YWkJKRd2agEEmB4XrwvcQvBtN08cPxDQrBWf6McjW
-	mXJQN7MPuO5mZg6gzfcIv3fJW9vYcKxOXj9QW5bIoXHnBmyfFU+rTFPUHVP+PqMTdGqb/6w0w
-	5zoutCi7Un/4mqRXsG+Iri1J3xoEbXC6wMwvuZG2zflW2MOq6xC07t3zB35z0vRfc0ja+NPBu
-	OR3CuwEYCh+ip9U3Ktig688hbJxXXCQqw/T+RwW0VRobFyVAZJMrdWbfdKrl2z7Eh9+x0sI95
-	029pIbn+zc2wlrRaunvxlzOJHs8y0L5MzBhrI4gmJamCQhxuIqh1nvWwwUoi/HyoaBvQSCfJA
-	+fwTsmzTpS6P1jPYeJRsOBn23NY6VTVnHJr9PVxzWZV8mr67OoA8inEUBDo9et4LEEn6DyS2j
-	qc7UmLRtndPKYqrj5ApkRH0cC216hAGOEhTFgZElSUNMEwkPf6B7HHGI9dzfP/fbOENU8AKce
-	SquOW87Q8gN5EuccmoYpAigkncgGyd2GWHP6kQTbT9nTP3UFNqc7jUJ/3rAlOhC/MZ6dn05Jt
-	CM8dK7FsJ/g4nwMq5ITZGSFJvUho7bLKy5XDvLwFKrhXnxH8nqKr49wrmBo=
+X-Provags-ID: V03:K1:+sNz4mL168o0bE842PBawOMwhFsjxx+cxt+LJZZ2Dy4GrRASCpc
+	Lu3/5H7fp/8RMq/ec9NcDDI8tMxddVGtZDJRP0grDl33367IKpCobGp+MTZNr7U645nUcFH
+	9ksK1Y4dzwM5eCHxMQhO5/zr85gAmfzxoX5hUKLs2HzW8lIfmnArEv1sRu3eJ0ZtD5fc95j
+	Kw2u3LbBxTlQich5m4cFg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:ChAsXgsST8Y=:mTJP5QKniPELzcWfLBQ2CS
+	XFkTuf0IZqTGoFiTKcKkvbHJw+AXKRINIwQOFFvek1Ib2nnsefHadyZzMJjSltt4HHFtn04rP
+	pJ5BluT1G6VcryNpz0PqE56OYkJE/U5gESlylENA7dv59P45Hsww+7mJ0D1YMI4hCUeiMwg4f
+	Iifh5RKah90Qd+pxXvsISX7Nw36g5+yJtK8WXPOIjfYOPpjLERDuBXq5LY8GNKTWNwkVxGFqJ
+	oig+shnm6whcPuFD+qgFRX6yfIJNXTTAADiNr+Kl7Sh+9oXzqxJjjtxoIc6q9PNcb0xJ5Obm9
+	3TErouS1MFe2aw4NhnwLUqyawsxAuKmZ5yJneGp1MT5YWM6SriSIqrPXM+etOdiuWVcelQqyt
+	E0XcRxy82jAafGisLZG7auNzD6N56OJKSQDPUf4GyjhLiTFiYLVNRaGm7ySfT3jjV9E/4u6pQ
+	ZvUfd43gB2W0U6OOTYW9ymY2npIsdEcfQMusVRaBSE4cAKDeIrEXE87OXdwK0JrHEEusMVOok
+	qS0etocnLZyVz6rNPqMkfriNP25GvV8YuomWTYRWOhhRXqs3x8JHnwDdX9ZbmsCi72VZq8PnC
+	WYv2k5YrHzGovRy1VeuCu2t07IflQJuFb4+Y7SrWOSGPk2mY4yq3fwiTOZh99B85A6UDKmi4u
+	qH7X6yxu0b1a6MO2MO5TAFmD2kk8nWKjxrdmtZpeu/aTxCDaZtPbAAFvxWQHn1aaFKhiBveS1
+	UwNW8qt1z5BXxTJP1RuFTU/fX/SN+LkaqloiqerKoALgh5IOlw29nFKkco8=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 217.72.192.74
-Subject: [Qemu-devel] [PATCH v7 09/10] hw/m68k: add a dummy SWIM floppy
- controller
+X-Received-From: 212.227.17.10
+Subject: [Qemu-devel] [PATCH v7 04/10] hw/m68k: add via support
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -96,539 +95,823 @@ Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 Reviewed-by: Hervé Poussineau <hpoussin@reactos.org>
 ---
- hw/block/Kconfig        |   3 +
- hw/block/Makefile.objs  |   1 +
- hw/block/swim.c         | 415 ++++++++++++++++++++++++++++++++++++++++
- include/hw/block/swim.h |  76 ++++++++
- 4 files changed, 495 insertions(+)
- create mode 100644 hw/block/swim.c
- create mode 100644 include/hw/block/swim.h
+ hw/misc/Kconfig           |   4 +
+ hw/misc/Makefile.objs     |   1 +
+ hw/misc/mac_via.c         | 666 ++++++++++++++++++++++++++++++++++++++
+ include/hw/misc/mac_via.h | 107 ++++++
+ 4 files changed, 778 insertions(+)
+ create mode 100644 hw/misc/mac_via.c
+ create mode 100644 include/hw/misc/mac_via.h
 
-diff --git a/hw/block/Kconfig b/hw/block/Kconfig
-index df96dc5dcc..2d17f481ad 100644
---- a/hw/block/Kconfig
-+++ b/hw/block/Kconfig
-@@ -37,3 +37,6 @@ config VHOST_USER_BLK
-     # Only PCI devices are provided for now
-     default y if VIRTIO_PCI
-     depends on VIRTIO && VHOST_USER && LINUX
-+
-+config SWIM
+diff --git a/hw/misc/Kconfig b/hw/misc/Kconfig
+index 385e1b0cec..87312c3abb 100644
+--- a/hw/misc/Kconfig
++++ b/hw/misc/Kconfig
+@@ -117,4 +117,8 @@ config AUX
+     bool
+     select I2C
+ 
++config MAC_VIA
 +    bool
-diff --git a/hw/block/Makefile.objs b/hw/block/Makefile.objs
-index f5f643f0cc..28c2495a00 100644
---- a/hw/block/Makefile.objs
-+++ b/hw/block/Makefile.objs
-@@ -8,6 +8,7 @@ common-obj-$(CONFIG_XEN) += xen-block.o
- common-obj-$(CONFIG_ECC) += ecc.o
- common-obj-$(CONFIG_ONENAND) += onenand.o
- common-obj-$(CONFIG_NVME_PCI) += nvme.o
-+common-obj-$(CONFIG_SWIM) += swim.o
++    select MOS6522
++
+ source macio/Kconfig
+diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
+index 77b9df9796..ef0d0d5d9b 100644
+--- a/hw/misc/Makefile.objs
++++ b/hw/misc/Makefile.objs
+@@ -75,6 +75,7 @@ obj-$(CONFIG_ARMSSE_MHU) += armsse-mhu.o
+ obj-$(CONFIG_PVPANIC) += pvpanic.o
+ obj-$(CONFIG_AUX) += auxbus.o
+ obj-$(CONFIG_ASPEED_SOC) += aspeed_scu.o aspeed_sdmc.o
++obj-$(CONFIG_MAC_VIA) += mac_via.o
+ obj-$(CONFIG_MSF2) += msf2-sysreg.o
+ obj-$(CONFIG_NRF51_SOC) += nrf51_rng.o
  
- obj-$(CONFIG_SH4) += tc58128.o
- 
-diff --git a/hw/block/swim.c b/hw/block/swim.c
+diff --git a/hw/misc/mac_via.c b/hw/misc/mac_via.c
 new file mode 100644
-index 0000000000..48ce6c7235
+index 0000000000..d6d6b86e1a
 --- /dev/null
-+++ b/hw/block/swim.c
-@@ -0,0 +1,415 @@
++++ b/hw/misc/mac_via.c
+@@ -0,0 +1,666 @@
 +/*
-+ * QEMU Macintosh floppy disk controller emulator (SWIM)
++ * QEMU m68k Macintosh VIA device support
 + *
-+ * Copyright (c) 2014-2018 Laurent Vivier <laurent@vivier.eu>
++ * Copyright (c) 2011-2018 Laurent Vivier
++ * Copyright (c) 2018 Mark Cave-Ayland
 + *
-+ * This work is licensed under the terms of the GNU GPL, version 2.  See
-+ * the COPYING file in the top-level directory.
++ * Some parts from hw/misc/macio/cuda.c
 + *
++ * Copyright (c) 2004-2007 Fabrice Bellard
++ * Copyright (c) 2007 Jocelyn Mayer
++ *
++ * some parts from linux-2.6.29, arch/m68k/include/asm/mac_via.h
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
 + */
 +
 +#include "qemu/osdep.h"
-+#include "qapi/error.h"
-+#include "sysemu/block-backend.h"
 +#include "hw/sysbus.h"
-+#include "hw/block/block.h"
-+#include "hw/block/swim.h"
++#include "qemu/timer.h"
++#include "hw/misc/mac_via.h"
++#include "hw/misc/mos6522.h"
++#include "hw/input/adb.h"
++#include "sysemu/sysemu.h"
++#include "qapi/error.h"
++#include "qemu/cutils.h"
 +
-+/* IWM registers */
 +
-+#define IWM_PH0L                0
-+#define IWM_PH0H                1
-+#define IWM_PH1L                2
-+#define IWM_PH1H                3
-+#define IWM_PH2L                4
-+#define IWM_PH2H                5
-+#define IWM_PH3L                6
-+#define IWM_PH3H                7
-+#define IWM_MTROFF              8
-+#define IWM_MTRON               9
-+#define IWM_INTDRIVE            10
-+#define IWM_EXTDRIVE            11
-+#define IWM_Q6L                 12
-+#define IWM_Q6H                 13
-+#define IWM_Q7L                 14
-+#define IWM_Q7H                 15
++/*
++ * VIAs: There are two in every machine,
++ */
 +
-+/* SWIM registers */
++#define VIA_SIZE (0x2000)
 +
-+#define SWIM_WRITE_DATA         0
-+#define SWIM_WRITE_MARK         1
-+#define SWIM_WRITE_CRC          2
-+#define SWIM_WRITE_PARAMETER    3
-+#define SWIM_WRITE_PHASE        4
-+#define SWIM_WRITE_SETUP        5
-+#define SWIM_WRITE_MODE0        6
-+#define SWIM_WRITE_MODE1        7
++/*
++ * Not all of these are true post MacII I think.
++ * CSA: probably the ones CHRP marks as 'unused' change purposes
++ * when the IWM becomes the SWIM.
++ * http://www.rs6000.ibm.com/resource/technology/chrpio/via5.mak.html
++ * ftp://ftp.austin.ibm.com/pub/technology/spec/chrp/inwork/CHRP_IORef_1.0.pdf
++ *
++ * also, http://developer.apple.com/technotes/hw/hw_09.html claims the
++ * following changes for IIfx:
++ * VIA1A_vSccWrReq not available and that VIA1A_vSync has moved to an IOP.
++ * Also, "All of the functionality of VIA2 has been moved to other chips".
++ */
 +
-+#define SWIM_READ_DATA          8
-+#define SWIM_READ_MARK          9
-+#define SWIM_READ_ERROR         10
-+#define SWIM_READ_PARAMETER     11
-+#define SWIM_READ_PHASE         12
-+#define SWIM_READ_SETUP         13
-+#define SWIM_READ_STATUS        14
-+#define SWIM_READ_HANDSHAKE     15
++#define VIA1A_vSccWrReq 0x80   /* SCC write. (input)
++                                * [CHRP] SCC WREQ: Reflects the state of the
++                                * Wait/Request pins from the SCC.
++                                * [Macintosh Family Hardware]
++                                * as CHRP on SE/30,II,IIx,IIcx,IIci.
++                                * on IIfx, "0 means an active request"
++                                */
++#define VIA1A_vRev8     0x40   /* Revision 8 board ???
++                                * [CHRP] En WaitReqB: Lets the WaitReq_L
++                                * signal from port B of the SCC appear on
++                                * the PA7 input pin. Output.
++                                * [Macintosh Family] On the SE/30, this
++                                * is the bit to flip screen buffers.
++                                * 0=alternate, 1=main.
++                                * on II,IIx,IIcx,IIci,IIfx this is a bit
++                                * for Rev ID. 0=II,IIx, 1=IIcx,IIci,IIfx
++                                */
++#define VIA1A_vHeadSel  0x20   /* Head select for IWM.
++                                * [CHRP] unused.
++                                * [Macintosh Family] "Floppy disk
++                                * state-control line SEL" on all but IIfx
++                                */
++#define VIA1A_vOverlay  0x10   /* [Macintosh Family] On SE/30,II,IIx,IIcx
++                                * this bit enables the "Overlay" address
++                                * map in the address decoders as it is on
++                                * reset for mapping the ROM over the reset
++                                * vector. 1=use overlay map.
++                                * On the IIci,IIfx it is another bit of the
++                                * CPU ID: 0=normal IIci, 1=IIci with parity
++                                * feature or IIfx.
++                                * [CHRP] En WaitReqA: Lets the WaitReq_L
++                                * signal from port A of the SCC appear
++                                * on the PA7 input pin (CHRP). Output.
++                                * [MkLinux] "Drive Select"
++                                *  (with 0x20 being 'disk head select')
++                                */
++#define VIA1A_vSync     0x08   /* [CHRP] Sync Modem: modem clock select:
++                                * 1: select the external serial clock to
++                                *    drive the SCC's /RTxCA pin.
++                                * 0: Select the 3.6864MHz clock to drive
++                                *    the SCC cell.
++                                * [Macintosh Family] Correct on all but IIfx
++                                */
 +
-+#define REG_SHIFT               9
++/* Macintosh Family Hardware sez: bits 0-2 of VIA1A are volume control
++ * on Macs which had the PWM sound hardware.  Reserved on newer models.
++ * On IIci,IIfx, bits 1-2 are the rest of the CPU ID:
++ * bit 2: 1=IIci, 0=IIfx
++ * bit 1: 1 on both IIci and IIfx.
++ * MkLinux sez bit 0 is 'burnin flag' in this case.
++ * CHRP sez: VIA1A bits 0-2 and 5 are 'unused': if programmed as
++ * inputs, these bits will read 0.
++ */
++#define VIA1A_vVolume   0x07    /* Audio volume mask for PWM */
++#define VIA1A_CPUID0    0x02    /* CPU id bit 0 on RBV, others */
++#define VIA1A_CPUID1    0x04    /* CPU id bit 0 on RBV, others */
++#define VIA1A_CPUID2    0x10    /* CPU id bit 0 on RBV, others */
++#define VIA1A_CPUID3    0x40    /* CPU id bit 0 on RBV, others */
 +
-+#define SWIM_MODE_IWM  0
-+#define SWIM_MODE_SWIM 1
++/* Info on VIA1B is from Macintosh Family Hardware & MkLinux.
++ * CHRP offers no info. */
++#define VIA1B_vSound   0x80    /* Sound enable (for compatibility with
++                                * PWM hardware) 0=enabled.
++                                * Also, on IIci w/parity, shows parity error
++                                * 0=error, 1=OK. */
++#define VIA1B_vMystery 0x40    /* On IIci, parity enable. 0=enabled,1=disabled
++                                * On SE/30, vertical sync interrupt enable.
++                                * 0=enabled. This vSync interrupt shows up
++                                * as a slot $E interrupt. */
++#define VIA1B_vADBS2   0x20    /* ADB state input bit 1 (unused on IIfx) */
++#define VIA1B_vADBS1   0x10    /* ADB state input bit 0 (unused on IIfx) */
++#define VIA1B_vADBInt  0x08    /* ADB interrupt 0=interrupt (unused on IIfx)*/
++#define VIA1B_vRTCEnb  0x04    /* Enable Real time clock. 0=enabled. */
++#define VIA1B_vRTCClk  0x02    /* Real time clock serial-clock line. */
++#define VIA1B_vRTCData 0x01    /* Real time clock serial-data line. */
 +
-+/* bits in phase register */
++/*
++ *    VIA2 A register is the interrupt lines raised off the nubus
++ *    slots.
++ *      The below info is from 'Macintosh Family Hardware.'
++ *      MkLinux calls the 'IIci internal video IRQ' below the 'RBV slot 0 irq.'
++ *      It also notes that the slot $9 IRQ is the 'Ethernet IRQ' and
++ *      defines the 'Video IRQ' as 0x40 for the 'EVR' VIA work-alike.
++ *      Perhaps OSS uses vRAM1 and vRAM2 for ADB.
++ */
 +
-+#define SWIM_SEEK_NEGATIVE   0x074
-+#define SWIM_STEP            0x071
-+#define SWIM_MOTOR_ON        0x072
-+#define SWIM_MOTOR_OFF       0x076
-+#define SWIM_INDEX           0x073
-+#define SWIM_EJECT           0x077
-+#define SWIM_SETMFM          0x171
-+#define SWIM_SETGCR          0x175
-+#define SWIM_RELAX           0x033
-+#define SWIM_LSTRB           0x008
-+#define SWIM_CA_MASK         0x077
++#define VIA2A_vRAM1    0x80    /* RAM size bit 1 (IIci: reserved) */
++#define VIA2A_vRAM0    0x40    /* RAM size bit 0 (IIci: internal video IRQ) */
++#define VIA2A_vIRQE    0x20    /* IRQ from slot $E */
++#define VIA2A_vIRQD    0x10    /* IRQ from slot $D */
++#define VIA2A_vIRQC    0x08    /* IRQ from slot $C */
++#define VIA2A_vIRQB    0x04    /* IRQ from slot $B */
++#define VIA2A_vIRQA    0x02    /* IRQ from slot $A */
++#define VIA2A_vIRQ9    0x01    /* IRQ from slot $9 */
 +
-+/* Select values for swim_select and swim_readbit */
++/* RAM size bits decoded as follows:
++ * bit1 bit0  size of ICs in bank A
++ *  0    0    256 kbit
++ *  0    1    1 Mbit
++ *  1    0    4 Mbit
++ *  1    1   16 Mbit
++ */
 +
-+#define SWIM_READ_DATA_0     0x074
-+#define SWIM_TWOMEG_DRIVE    0x075
-+#define SWIM_SINGLE_SIDED    0x076
-+#define SWIM_DRIVE_PRESENT   0x077
-+#define SWIM_DISK_IN         0x170
-+#define SWIM_WRITE_PROT      0x171
-+#define SWIM_TRACK_ZERO      0x172
-+#define SWIM_TACHO           0x173
-+#define SWIM_READ_DATA_1     0x174
-+#define SWIM_MFM_MODE        0x175
-+#define SWIM_SEEK_COMPLETE   0x176
-+#define SWIM_ONEMEG_MEDIA    0x177
++/*
++ *    Register B has the fun stuff in it
++ */
 +
-+/* Bits in handshake register */
++#define VIA2B_vVBL    0x80    /* VBL output to VIA1 (60.15Hz) driven by
++                               * timer T1.
++                               * on IIci, parity test: 0=test mode.
++                               * [MkLinux] RBV_PARODD: 1=odd,0=even. */
++#define VIA2B_vSndJck 0x40    /* External sound jack status.
++                               * 0=plug is inserted.  On SE/30, always 0 */
++#define VIA2B_vTfr0   0x20    /* Transfer mode bit 0 ack from NuBus */
++#define VIA2B_vTfr1   0x10    /* Transfer mode bit 1 ack from NuBus */
++#define VIA2B_vMode32 0x08    /* 24/32bit switch - doubles as cache flush
++                               * on II, AMU/PMMU control.
++                               *   if AMU, 0=24bit to 32bit translation
++                               *   if PMMU, 1=PMMU is accessing page table.
++                               * on SE/30 tied low.
++                               * on IIx,IIcx,IIfx, unused.
++                               * on IIci/RBV, cache control. 0=flush cache.
++                               */
++#define VIA2B_vPower  0x04   /* Power off, 0=shut off power.
++                              * on SE/30 this signal sent to PDS card.
++                              */
++#define VIA2B_vBusLk  0x02   /* Lock NuBus transactions, 0=locked.
++                              * on SE/30 sent to PDS card.
++                              */
++#define VIA2B_vCDis   0x01   /* Cache control. On IIci, 1=disable cache card
++                              * on others, 0=disable processor's instruction
++                              * and data caches.
++                              */
 +
-+#define SWIM_MARK_BYTE       0x01
-+#define SWIM_CRC_ZERO        0x02
-+#define SWIM_RDDATA          0x04
-+#define SWIM_SENSE           0x08
-+#define SWIM_MOTEN           0x10
-+#define SWIM_ERROR           0x20
-+#define SWIM_DAT2BYTE        0x40
-+#define SWIM_DAT1BYTE        0x80
++/* interrupt flags */
 +
-+/* bits in setup register */
++#define IRQ_SET         0x80
 +
-+#define SWIM_S_INV_WDATA     0x01
-+#define SWIM_S_3_5_SELECT    0x02
-+#define SWIM_S_GCR           0x04
-+#define SWIM_S_FCLK_DIV2     0x08
-+#define SWIM_S_ERROR_CORR    0x10
-+#define SWIM_S_IBM_DRIVE     0x20
-+#define SWIM_S_GCR_WRITE     0x40
-+#define SWIM_S_TIMEOUT       0x80
++/* common */
 +
-+/* bits in mode register */
++#define VIA_IRQ_TIMER1      0x40
++#define VIA_IRQ_TIMER2      0x20
 +
-+#define SWIM_CLFIFO          0x01
-+#define SWIM_ENBL1           0x02
-+#define SWIM_ENBL2           0x04
-+#define SWIM_ACTION          0x08
-+#define SWIM_WRITE_MODE      0x10
-+#define SWIM_HEDSEL          0x20
-+#define SWIM_MOTON           0x80
++/* Apple sez: http://developer.apple.com/technotes/ov/ov_04.html
++ * Another example of a valid function that has no ROM support is the use
++ * of the alternate video page for page-flipping animation. Since there
++ * is no ROM call to flip pages, it is necessary to go play with the
++ * right bit in the VIA chip (6522 Versatile Interface Adapter).
++ * [CSA: don't know which one this is, but it's one of 'em!]
++ */
 +
-+static void swim_change_cb(void *opaque, bool load, Error **errp)
++/*
++ *    6522 registers - see databook.
++ * CSA: Assignments for VIA1 confirmed from CHRP spec.
++ */
++
++/* partial address decode.  0xYYXX : XX part for RBV, YY part for VIA */
++/* Note: 15 VIA regs, 8 RBV regs */
++
++#define vBufB    0x0000  /* [VIA/RBV]  Register B */
++#define vBufAH   0x0200  /* [VIA only] Buffer A, with handshake. DON'T USE! */
++#define vDirB    0x0400  /* [VIA only] Data Direction Register B. */
++#define vDirA    0x0600  /* [VIA only] Data Direction Register A. */
++#define vT1CL    0x0800  /* [VIA only] Timer one counter low. */
++#define vT1CH    0x0a00  /* [VIA only] Timer one counter high. */
++#define vT1LL    0x0c00  /* [VIA only] Timer one latches low. */
++#define vT1LH    0x0e00  /* [VIA only] Timer one latches high. */
++#define vT2CL    0x1000  /* [VIA only] Timer two counter low. */
++#define vT2CH    0x1200  /* [VIA only] Timer two counter high. */
++#define vSR      0x1400  /* [VIA only] Shift register. */
++#define vACR     0x1600  /* [VIA only] Auxilary control register. */
++#define vPCR     0x1800  /* [VIA only] Peripheral control register. */
++                         /*            CHRP sez never ever to *write* this.
++                          *            Mac family says never to *change* this.
++                          * In fact we need to initialize it once at start.
++                          */
++#define vIFR     0x1a00  /* [VIA/RBV]  Interrupt flag register. */
++#define vIER     0x1c00  /* [VIA/RBV]  Interrupt enable register. */
++#define vBufA    0x1e00  /* [VIA/RBV] register A (no handshake) */
++
++/* from linux 2.6 drivers/macintosh/via-macii.c */
++
++/* Bits in ACR */
++
++#define VIA1ACR_vShiftCtrl         0x1c        /* Shift register control bits */
++#define VIA1ACR_vShiftExtClk       0x0c        /* Shift on external clock */
++#define VIA1ACR_vShiftOut          0x10        /* Shift out if 1 */
++
++/* Apple Macintosh Family Hardware Refenece
++ * Table 19-10 ADB transaction states
++ */
++
++#define VIA1B_vADB_StateMask    (VIA1B_vADBS1 | VIA1B_vADBS2)
++#define VIA1B_vADB_StateShift   4
++
++#define VIA_TIMER_FREQ (783360)
++
++/* VIA returns time offset from Jan 1, 1904, not 1970 */
++#define RTC_OFFSET 2082844800
++
++
++static void via1_VBL(void *opaque)
 +{
-+    FDrive *drive = opaque;
++    MacVIAState *m = opaque;
++    MOS6522Q800VIA1State *v1s = MOS6522_Q800_VIA1(&m->mos6522_via1);
++    MOS6522State *s = MOS6522(v1s);
++    MOS6522DeviceClass *mdc = MOS6522_DEVICE_GET_CLASS(s);
 +
-+    if (!load) {
-+        blk_set_perm(drive->blk, 0, BLK_PERM_ALL, &error_abort);
++    s->ifr |= VIA1_IRQ_VBLANK;
++    mdc->update_irq(s);
++
++    timer_mod(m->VBL_timer, (qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) + 16630)
++              / 16630 * 16630);
++}
++
++static void via1_one_second(void *opaque)
++{
++    MacVIAState *m = opaque;
++    MOS6522Q800VIA1State *v1s = MOS6522_Q800_VIA1(&m->mos6522_via1);
++    MOS6522State *s = MOS6522(v1s);
++    MOS6522DeviceClass *mdc = MOS6522_DEVICE_GET_CLASS(s);
++
++    s->ifr |= VIA1_IRQ_ONE_SECOND;
++    mdc->update_irq(s);
++
++    timer_mod(m->one_second_timer, (qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL)
++              + 1000) / 1000 * 1000);
++}
++
++static void via1_irq_request(void *opaque, int irq, int level)
++{
++    MOS6522Q800VIA1State *v1s = opaque;
++    MOS6522State *s = MOS6522(v1s);
++    MOS6522DeviceClass *mdc = MOS6522_DEVICE_GET_CLASS(s);
++
++    if (level) {
++        s->ifr |= 1 << irq;
 +    } else {
-+        if (!blkconf_apply_backend_options(drive->conf,
-+                                           blk_is_read_only(drive->blk), false,
-+                                           errp)) {
-+            return;
-+        }
++        s->ifr &= ~(1 << irq);
 +    }
++
++    mdc->update_irq(s);
 +}
 +
-+static const BlockDevOps swim_block_ops = {
-+    .change_media_cb = swim_change_cb,
-+};
-+
-+static Property swim_drive_properties[] = {
-+    DEFINE_PROP_INT32("unit", SWIMDrive, unit, -1),
-+    DEFINE_BLOCK_PROPERTIES(SWIMDrive, conf),
-+    DEFINE_PROP_END_OF_LIST(),
-+};
-+
-+static void swim_drive_realize(DeviceState *qdev, Error **errp)
++static void via2_irq_request(void *opaque, int irq, int level)
 +{
-+    SWIMDrive *dev = SWIM_DRIVE(qdev);
-+    SWIMBus *bus = SWIM_BUS(qdev->parent_bus);
-+    FDrive *drive;
-+    int ret;
++    MOS6522Q800VIA2State *v2s = opaque;
++    MOS6522State *s = MOS6522(v2s);
++    MOS6522DeviceClass *mdc = MOS6522_DEVICE_GET_CLASS(s);
 +
-+    if (dev->unit == -1) {
-+        for (dev->unit = 0; dev->unit < SWIM_MAX_FD; dev->unit++) {
-+            drive = &bus->ctrl->drives[dev->unit];
-+            if (!drive->blk) {
-+                break;
++    if (level) {
++        s->ifr |= 1 << irq;
++    } else {
++        s->ifr &= ~(1 << irq);
++    }
++
++    mdc->update_irq(s);
++}
++
++static void via1_rtc_update(MacVIAState *m)
++{
++    MOS6522Q800VIA1State *v1s = MOS6522_Q800_VIA1(&m->mos6522_via1);
++    MOS6522State *s = MOS6522(v1s);
++
++    if (s->b & VIA1B_vRTCEnb) {
++        return;
++    }
++
++    if (s->dirb & VIA1B_vRTCData) {
++        /* send bits to the RTC */
++        if (!(v1s->last_b & VIA1B_vRTCClk) && (s->b & VIA1B_vRTCClk)) {
++            m->data_out <<= 1;
++            m->data_out |= s->b & VIA1B_vRTCData;
++            m->data_out_cnt++;
++        }
++    } else {
++        /* receive bits from the RTC */
++        if ((v1s->last_b & VIA1B_vRTCClk) &&
++            !(s->b & VIA1B_vRTCClk) &&
++            m->data_in_cnt) {
++            s->b = (s->b & ~VIA1B_vRTCData) |
++                   ((m->data_in >> 7) & VIA1B_vRTCData);
++            m->data_in <<= 1;
++            m->data_in_cnt--;
++        }
++    }
++
++    if (m->data_out_cnt == 8) {
++        m->data_out_cnt = 0;
++
++        if (m->cmd == 0) {
++            if (m->data_out & 0x80) {
++                /* this is a read command */
++                uint32_t time = m->tick_offset +
++                               (qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) /
++                               NANOSECONDS_PER_SECOND);
++                if (m->data_out == 0x81) {        /* seconds register 0 */
++                    m->data_in = time & 0xff;
++                    m->data_in_cnt = 8;
++                } else if (m->data_out == 0x85) { /* seconds register 1 */
++                    m->data_in = (time >> 8) & 0xff;
++                    m->data_in_cnt = 8;
++                } else if (m->data_out == 0x89) { /* seconds register 2 */
++                    m->data_in = (time >> 16) & 0xff;
++                    m->data_in_cnt = 8;
++                } else if (m->data_out == 0x8d) { /* seconds register 3 */
++                    m->data_in = (time >> 24) & 0xff;
++                    m->data_in_cnt = 8;
++                } else if ((m->data_out & 0xf3) == 0xa1) {
++                    /* PRAM address 0x10 -> 0x13 */
++                    int addr = (m->data_out >> 2) & 0x03;
++                    m->data_in = v1s->PRAM[addr];
++                    m->data_in_cnt = 8;
++                } else if ((m->data_out & 0xf3) == 0xa1) {
++                    /* PRAM address 0x00 -> 0x0f */
++                    int addr = (m->data_out >> 2) & 0x0f;
++                    m->data_in = v1s->PRAM[addr];
++                    m->data_in_cnt = 8;
++                } else if ((m->data_out & 0xf8) == 0xb8) {
++                    /* extended memory designator and sector number */
++                    m->cmd = m->data_out;
++                }
++            } else {
++                /* this is a write command */
++                m->cmd = m->data_out;
 +            }
-+        }
-+    }
-+
-+    if (dev->unit >= SWIM_MAX_FD) {
-+        error_setg(errp, "Can't create floppy unit %d, bus supports "
-+                   "only %d units", dev->unit, SWIM_MAX_FD);
-+        return;
-+    }
-+
-+    drive = &bus->ctrl->drives[dev->unit];
-+    if (drive->blk) {
-+        error_setg(errp, "Floppy unit %d is in use", dev->unit);
-+        return;
-+    }
-+
-+    if (!dev->conf.blk) {
-+        /* Anonymous BlockBackend for an empty drive */
-+        dev->conf.blk = blk_new(0, BLK_PERM_ALL);
-+        ret = blk_attach_dev(dev->conf.blk, qdev);
-+        assert(ret == 0);
-+    }
-+
-+    blkconf_blocksizes(&dev->conf);
-+    if (dev->conf.logical_block_size != 512 ||
-+        dev->conf.physical_block_size != 512)
-+    {
-+        error_setg(errp, "Physical and logical block size must "
-+                   "be 512 for floppy");
-+        return;
-+    }
-+
-+    /* rerror/werror aren't supported by fdc and therefore not even registered
-+     * with qdev. So set the defaults manually before they are used in
-+     * blkconf_apply_backend_options(). */
-+    dev->conf.rerror = BLOCKDEV_ON_ERROR_AUTO;
-+    dev->conf.werror = BLOCKDEV_ON_ERROR_AUTO;
-+
-+    if (!blkconf_apply_backend_options(&dev->conf,
-+                                       blk_is_read_only(dev->conf.blk),
-+                                       false, errp)) {
-+        return;
-+    }
-+
-+    /* 'enospc' is the default for -drive, 'report' is what blk_new() gives us
-+     * for empty drives. */
-+    if (blk_get_on_error(dev->conf.blk, 0) != BLOCKDEV_ON_ERROR_ENOSPC &&
-+        blk_get_on_error(dev->conf.blk, 0) != BLOCKDEV_ON_ERROR_REPORT) {
-+        error_setg(errp, "fdc doesn't support drive option werror");
-+        return;
-+    }
-+    if (blk_get_on_error(dev->conf.blk, 1) != BLOCKDEV_ON_ERROR_REPORT) {
-+        error_setg(errp, "fdc doesn't support drive option rerror");
-+        return;
-+    }
-+
-+    drive->conf = &dev->conf;
-+    drive->blk = dev->conf.blk;
-+    drive->swimctrl = bus->ctrl;
-+
-+    blk_set_dev_ops(drive->blk, &swim_block_ops, drive);
-+}
-+
-+static void swim_drive_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *k = DEVICE_CLASS(klass);
-+    k->realize = swim_drive_realize;
-+    set_bit(DEVICE_CATEGORY_STORAGE, k->categories);
-+    k->bus_type = TYPE_SWIM_BUS;
-+    k->props = swim_drive_properties;
-+    k->desc = "virtual SWIM drive";
-+}
-+
-+static const TypeInfo swim_drive_info = {
-+    .name = TYPE_SWIM_DRIVE,
-+    .parent = TYPE_DEVICE,
-+    .instance_size = sizeof(SWIMDrive),
-+    .class_init = swim_drive_class_init,
-+};
-+
-+static const TypeInfo swim_bus_info = {
-+    .name = TYPE_SWIM_BUS,
-+    .parent = TYPE_BUS,
-+    .instance_size = sizeof(SWIMBus),
-+};
-+
-+static void iwmctrl_write(void *opaque, hwaddr reg, uint64_t value,
-+                          unsigned size)
-+{
-+    SWIMCtrl *swimctrl = opaque;
-+
-+    reg >>= REG_SHIFT;
-+
-+    swimctrl->regs[reg >> 1] = reg & 1;
-+
-+    if (swimctrl->regs[IWM_Q6] &&
-+        swimctrl->regs[IWM_Q7]) {
-+        if (swimctrl->regs[IWM_MTR]) {
-+            /* data register */
-+            swimctrl->iwm_data = value;
 +        } else {
-+            /* mode register */
-+            swimctrl->iwm_mode = value;
-+            /* detect sequence to switch from IWM mode to SWIM mode */
-+            switch (swimctrl->iwm_switch) {
-+            case 0:
-+                if (value == 0x57) {
-+                    swimctrl->iwm_switch++;
++            if (m->cmd & 0x80) {
++                if ((m->cmd & 0xf8) == 0xb8) {
++                    /* extended memory designator and sector number */
++                    int sector = m->cmd & 0x07;
++                    int addr = (m->data_out >> 2) & 0x1f;
++
++                    m->data_in = v1s->PRAM[sector * 8 + addr];
++                    m->data_in_cnt = 8;
 +                }
-+                break;
-+            case 1:
-+                if (value == 0x17) {
-+                    swimctrl->iwm_switch++;
++            } else if (!m->wprotect) {
++                /* this is a write command */
++                if (m->alt != 0) {
++                    /* extended memory designator and sector number */
++                    int sector = m->cmd & 0x07;
++                    int addr = (m->alt >> 2) & 0x1f;
++
++                    v1s->PRAM[sector * 8 + addr] = m->data_out;
++
++                    m->alt = 0;
++                } else if (m->cmd == 0x01) { /* seconds register 0 */
++                    /* FIXME */
++                } else if (m->cmd == 0x05) { /* seconds register 1 */
++                    /* FIXME */
++                } else if (m->cmd == 0x09) { /* seconds register 2 */
++                    /* FIXME */
++                } else if (m->cmd == 0x0d) { /* seconds register 3 */
++                    /* FIXME */
++                } else if (m->cmd == 0x31) {
++                    /* Test Register */
++                } else if (m->cmd == 0x35) {
++                    /* Write Protect register */
++                    m->wprotect = m->data_out & 1;
++                } else if ((m->cmd & 0xf3) == 0xa1) {
++                    /* PRAM address 0x10 -> 0x13 */
++                    int addr = (m->cmd >> 2) & 0x03;
++                    v1s->PRAM[addr] = m->data_out;
++                } else if ((m->cmd & 0xf3) == 0xa1) {
++                    /* PRAM address 0x00 -> 0x0f */
++                    int addr = (m->cmd >> 2) & 0x0f;
++                    v1s->PRAM[addr] = m->data_out;
++                } else if ((m->cmd & 0xf8) == 0xb8) {
++                    /* extended memory designator and sector number */
++                    m->alt = m->cmd;
 +                }
-+                break;
-+            case 2:
-+                if (value == 0x57) {
-+                    swimctrl->iwm_switch++;
-+                }
-+                break;
-+            case 3:
-+                if (value == 0x57) {
-+                    swimctrl->mode = SWIM_MODE_SWIM;
-+                    swimctrl->iwm_switch = 0;
-+                }
-+                break;
 +            }
 +        }
++        m->data_out = 0;
 +    }
 +}
 +
-+static uint64_t iwmctrl_read(void *opaque, hwaddr reg, unsigned size)
++static uint64_t mos6522_q800_via1_read(void *opaque, hwaddr addr, unsigned size)
 +{
-+    SWIMCtrl *swimctrl = opaque;
++    MOS6522Q800VIA1State *s = MOS6522_Q800_VIA1(opaque);
++    MOS6522State *ms = MOS6522(s);
 +
-+    reg >>= REG_SHIFT;
-+
-+    swimctrl->regs[reg >> 1] = reg & 1;
-+
-+    return 0;
++    addr = (addr >> 9) & 0xf;
++    return mos6522_read(ms, addr, size);
 +}
 +
-+static void swimctrl_write(void *opaque, hwaddr reg, uint64_t value,
-+                           unsigned size)
++static void mos6522_q800_via1_write(void *opaque, hwaddr addr, uint64_t val,
++                                    unsigned size)
 +{
-+    SWIMCtrl *swimctrl = opaque;
++    MOS6522Q800VIA1State *s = MOS6522_Q800_VIA1(opaque);
++    MOS6522State *ms = MOS6522(s);
 +
-+    if (swimctrl->mode == SWIM_MODE_IWM) {
-+        iwmctrl_write(opaque, reg, value, size);
-+        return;
-+    }
-+
-+    reg >>= REG_SHIFT;
-+
-+    switch (reg) {
-+    case SWIM_WRITE_PHASE:
-+        swimctrl->swim_phase = value;
-+        break;
-+    case SWIM_WRITE_MODE0:
-+        swimctrl->swim_mode &= ~value;
-+        break;
-+    case SWIM_WRITE_MODE1:
-+        swimctrl->swim_mode |= value;
-+        break;
-+    case SWIM_WRITE_DATA:
-+    case SWIM_WRITE_MARK:
-+    case SWIM_WRITE_CRC:
-+    case SWIM_WRITE_PARAMETER:
-+    case SWIM_WRITE_SETUP:
-+        break;
-+    }
++    addr = (addr >> 9) & 0xf;
++    mos6522_write(ms, addr, val, size);
 +}
 +
-+static uint64_t swimctrl_read(void *opaque, hwaddr reg, unsigned size)
-+{
-+    SWIMCtrl *swimctrl = opaque;
-+    uint32_t value = 0;
-+
-+    if (swimctrl->mode == SWIM_MODE_IWM) {
-+        return iwmctrl_read(opaque, reg, size);
-+    }
-+
-+    reg >>= REG_SHIFT;
-+
-+    switch (reg) {
-+    case SWIM_READ_PHASE:
-+        value = swimctrl->swim_phase;
-+        break;
-+    case SWIM_READ_HANDSHAKE:
-+        if (swimctrl->swim_phase == SWIM_DRIVE_PRESENT) {
-+            /* always answer "no drive present" */
-+            value = SWIM_SENSE;
-+        }
-+        break;
-+    case SWIM_READ_DATA:
-+    case SWIM_READ_MARK:
-+    case SWIM_READ_ERROR:
-+    case SWIM_READ_PARAMETER:
-+    case SWIM_READ_SETUP:
-+    case SWIM_READ_STATUS:
-+        break;
-+    }
-+
-+    return value;
-+}
-+
-+static const MemoryRegionOps swimctrl_mem_ops = {
-+    .write = swimctrl_write,
-+    .read = swimctrl_read,
-+    .endianness = DEVICE_NATIVE_ENDIAN,
++static const MemoryRegionOps mos6522_q800_via1_ops = {
++    .read = mos6522_q800_via1_read,
++    .write = mos6522_q800_via1_write,
++    .endianness = DEVICE_BIG_ENDIAN,
++    .valid = {
++        .min_access_size = 1,
++        .max_access_size = 1,
++    },
 +};
 +
-+static void sysbus_swim_init(Object *obj)
++static uint64_t mos6522_q800_via2_read(void *opaque, hwaddr addr, unsigned size)
++{
++    MOS6522Q800VIA2State *s = MOS6522_Q800_VIA2(opaque);
++    MOS6522State *ms = MOS6522(s);
++
++    addr = (addr >> 9) & 0xf;
++    return mos6522_read(ms, addr, size);
++}
++
++static void mos6522_q800_via2_write(void *opaque, hwaddr addr, uint64_t val,
++                                    unsigned size)
++{
++    MOS6522Q800VIA2State *s = MOS6522_Q800_VIA2(opaque);
++    MOS6522State *ms = MOS6522(s);
++
++    addr = (addr >> 9) & 0xf;
++    mos6522_write(ms, addr, val, size);
++}
++
++static const MemoryRegionOps mos6522_q800_via2_ops = {
++    .read = mos6522_q800_via2_read,
++    .write = mos6522_q800_via2_write,
++    .endianness = DEVICE_BIG_ENDIAN,
++    .valid = {
++        .min_access_size = 1,
++        .max_access_size = 1,
++    },
++};
++
++static void mac_via_reset(DeviceState *dev)
++{
++    MacVIAState *m = MAC_VIA(dev);
++
++    timer_mod(m->VBL_timer, (qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) + 16630)
++              / 16630 * 16630);
++
++    timer_mod(m->one_second_timer, (qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL)
++              + 1000) / 1000 * 1000);
++}
++
++static void mac_via_realize(DeviceState *dev, Error **errp)
++{
++    MacVIAState *m = MAC_VIA(dev);
++    MOS6522State *ms;
++    struct tm tm;
++
++    /* Init VIAs 1 and 2 */
++    sysbus_init_child_obj(OBJECT(dev), "via1", &m->mos6522_via1,
++                          sizeof(m->mos6522_via1), TYPE_MOS6522_Q800_VIA1);
++
++    sysbus_init_child_obj(OBJECT(dev), "via2", &m->mos6522_via2,
++                          sizeof(m->mos6522_via2), TYPE_MOS6522_Q800_VIA2);
++
++    /* Pass through mos6522 output IRQs */
++    ms = MOS6522(&m->mos6522_via1);
++    object_property_add_alias(OBJECT(dev), "irq[0]", OBJECT(ms),
++                              SYSBUS_DEVICE_GPIO_IRQ "[0]", &error_abort);
++    ms = MOS6522(&m->mos6522_via2);
++    object_property_add_alias(OBJECT(dev), "irq[1]", OBJECT(ms),
++                              SYSBUS_DEVICE_GPIO_IRQ "[0]", &error_abort);
++
++    /* Pass through mos6522 input IRQs */
++    qdev_pass_gpios(DEVICE(&m->mos6522_via1), dev, "via1-irq");
++    qdev_pass_gpios(DEVICE(&m->mos6522_via2), dev, "via2-irq");
++
++    /* VIA 1 */
++    m->one_second_timer = timer_new_ms(QEMU_CLOCK_VIRTUAL, via1_one_second, m);
++    m->VBL_timer = timer_new_ns(QEMU_CLOCK_VIRTUAL, via1_VBL, m);
++
++    qemu_get_timedate(&tm, 0);
++    m->tick_offset = (uint32_t)mktimegm(&tm) + RTC_OFFSET;
++}
++
++static void mac_via_init(Object *obj)
 +{
 +    SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
-+    SWIM *sbs = SWIM(obj);
-+    SWIMCtrl *swimctrl = &sbs->ctrl;
++    MacVIAState *m = MAC_VIA(obj);
 +
-+    memory_region_init_io(&swimctrl->iomem, obj, &swimctrl_mem_ops, swimctrl,
-+                          "swim", 0x2000);
-+    sysbus_init_mmio(sbd, &swimctrl->iomem);
++    /* MMIO */
++    memory_region_init(&m->mmio, obj, "mac-via", 2 * VIA_SIZE);
++    sysbus_init_mmio(sbd, &m->mmio);
++
++    memory_region_init_io(&m->via1mem, obj, &mos6522_q800_via1_ops,
++                          &m->mos6522_via1, "via1", VIA_SIZE);
++    memory_region_add_subregion(&m->mmio, 0x0, &m->via1mem);
++
++    memory_region_init_io(&m->via2mem, obj, &mos6522_q800_via2_ops,
++                          &m->mos6522_via2, "via2", VIA_SIZE);
++    memory_region_add_subregion(&m->mmio, VIA_SIZE, &m->via2mem);
++
++    /* ADB */
++    qbus_create_inplace((BusState *)&m->adb_bus, sizeof(m->adb_bus),
++                        TYPE_ADB_BUS, DEVICE(obj), "adb.0");
 +}
 +
-+static void sysbus_swim_realize(DeviceState *dev, Error **errp)
-+{
-+    SWIM *sys = SWIM(dev);
-+    SWIMCtrl *swimctrl = &sys->ctrl;
-+
-+    qbus_create_inplace(&swimctrl->bus, sizeof(SWIMBus), TYPE_SWIM_BUS, dev,
-+                        NULL);
-+    swimctrl->bus.ctrl = swimctrl;
-+}
-+
-+static void sysbus_swim_class_init(ObjectClass *oc, void *data)
++static void mac_via_class_init(ObjectClass *oc, void *data)
 +{
 +    DeviceClass *dc = DEVICE_CLASS(oc);
 +
-+    dc->realize = sysbus_swim_realize;
++    dc->realize = mac_via_realize;
++    dc->reset = mac_via_reset;
 +}
 +
-+static const TypeInfo sysbus_swim_info = {
-+    .name          = TYPE_SWIM,
-+    .parent        = TYPE_SYS_BUS_DEVICE,
-+    .instance_size = sizeof(SWIM),
-+    .instance_init = sysbus_swim_init,
-+    .class_init    = sysbus_swim_class_init,
++static TypeInfo mac_via_info = {
++    .name = TYPE_MAC_VIA,
++    .parent = TYPE_SYS_BUS_DEVICE,
++    .instance_size = sizeof(MacVIAState),
++    .instance_init = mac_via_init,
++    .class_init = mac_via_class_init,
 +};
 +
-+static void swim_register_types(void)
++/* VIA 1 */
++static void mos6522_q800_via1_portB_write(MOS6522State *s)
 +{
-+    type_register_static(&sysbus_swim_info);
-+    type_register_static(&swim_bus_info);
-+    type_register_static(&swim_drive_info);
++    MOS6522Q800VIA1State *v1s = container_of(s, MOS6522Q800VIA1State,
++                                             parent_obj);
++    MacVIAState *m = container_of(v1s, MacVIAState, mos6522_via1);
++
++    via1_rtc_update(m);
++
++    v1s->last_b = s->b;
 +}
 +
-+type_init(swim_register_types)
-diff --git a/include/hw/block/swim.h b/include/hw/block/swim.h
++static void mos6522_q800_via1_reset(DeviceState *dev)
++{
++    MOS6522State *ms = MOS6522(dev);
++    MOS6522DeviceClass *mdc = MOS6522_DEVICE_GET_CLASS(ms);
++
++    mdc->parent_reset(dev);
++
++    ms->timers[0].frequency = VIA_TIMER_FREQ;
++    ms->timers[1].frequency = VIA_TIMER_FREQ;
++
++    ms->b = VIA1B_vADB_StateMask | VIA1B_vADBInt | VIA1B_vRTCEnb;
++}
++
++static void mos6522_q800_via1_init(Object *obj)
++{
++    qdev_init_gpio_in_named(DEVICE(obj), via1_irq_request, "via1-irq",
++                            VIA1_IRQ_NB);
++}
++
++static void mos6522_q800_via1_class_init(ObjectClass *oc, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(oc);
++    MOS6522DeviceClass *mdc = MOS6522_DEVICE_CLASS(oc);
++
++    dc->reset = mos6522_q800_via1_reset;
++    mdc->portB_write = mos6522_q800_via1_portB_write;
++}
++
++static const TypeInfo mos6522_q800_via1_type_info = {
++    .name = TYPE_MOS6522_Q800_VIA1,
++    .parent = TYPE_MOS6522,
++    .instance_size = sizeof(MOS6522Q800VIA1State),
++    .instance_init = mos6522_q800_via1_init,
++    .class_init = mos6522_q800_via1_class_init,
++};
++
++/* VIA 2 */
++static void mos6522_q800_via2_portB_write(MOS6522State *s)
++{
++    if (s->dirb & VIA2B_vPower && (s->b & VIA2B_vPower) == 0) {
++        /* shutdown */
++        qemu_system_shutdown_request(SHUTDOWN_CAUSE_GUEST_SHUTDOWN);
++    }
++}
++
++static void mos6522_q800_via2_reset(DeviceState *dev)
++{
++    MOS6522State *ms = MOS6522(dev);
++    MOS6522DeviceClass *mdc = MOS6522_DEVICE_GET_CLASS(ms);
++
++    mdc->parent_reset(dev);
++
++    ms->timers[0].frequency = VIA_TIMER_FREQ;
++    ms->timers[1].frequency = VIA_TIMER_FREQ;
++
++    ms->dirb = 0;
++    ms->b = 0;
++}
++
++static void mos6522_q800_via2_init(Object *obj)
++{
++    qdev_init_gpio_in_named(DEVICE(obj), via2_irq_request, "via2-irq",
++                            VIA2_IRQ_NB);
++}
++
++static void mos6522_q800_via2_class_init(ObjectClass *oc, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(oc);
++    MOS6522DeviceClass *mdc = MOS6522_DEVICE_CLASS(oc);
++
++    dc->reset = mos6522_q800_via2_reset;
++    mdc->portB_write = mos6522_q800_via2_portB_write;
++}
++
++static const TypeInfo mos6522_q800_via2_type_info = {
++    .name = TYPE_MOS6522_Q800_VIA2,
++    .parent = TYPE_MOS6522,
++    .instance_size = sizeof(MOS6522Q800VIA2State),
++    .instance_init = mos6522_q800_via2_init,
++    .class_init = mos6522_q800_via2_class_init,
++};
++
++static void mac_via_register_types(void)
++{
++    type_register_static(&mos6522_q800_via1_type_info);
++    type_register_static(&mos6522_q800_via2_type_info);
++    type_register_static(&mac_via_info);
++}
++
++type_init(mac_via_register_types);
+diff --git a/include/hw/misc/mac_via.h b/include/hw/misc/mac_via.h
 new file mode 100644
-index 0000000000..e69c644995
+index 0000000000..69bdecabb0
 --- /dev/null
-+++ b/include/hw/block/swim.h
-@@ -0,0 +1,76 @@
++++ b/include/hw/misc/mac_via.h
+@@ -0,0 +1,107 @@
 +/*
-+ * QEMU Macintosh floppy disk controller emulator (SWIM)
 + *
-+ * Copyright (c) 2014-2018 Laurent Vivier <laurent@vivier.eu>
++ * Copyright (c) 2011-2018 Laurent Vivier
 + *
-+ * This work is licensed under the terms of the GNU GPL, version 2.  See
-+ * the COPYING file in the top-level directory.
-+ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
 + */
 +
-+#ifndef SWIM_H
-+#define SWIM_H
++#ifndef HW_MISC_MAC_VIA_H
++#define HW_MISC_MAC_VIA_H
 +
-+#include "qemu/osdep.h"
++#include "exec/memory.h"
 +#include "hw/sysbus.h"
++#include "hw/misc/mos6522.h"
 +
-+#define SWIM_MAX_FD            2
 +
-+typedef struct SWIMDrive SWIMDrive;
-+typedef struct SWIMBus SWIMBus;
-+typedef struct SWIMCtrl SWIMCtrl;
++/* VIA 1 */
++#define VIA1_IRQ_ONE_SECOND_BIT 0
++#define VIA1_IRQ_VBLANK_BIT     1
++#define VIA1_IRQ_ADB_READY_BIT  2
++#define VIA1_IRQ_ADB_DATA_BIT   3
++#define VIA1_IRQ_ADB_CLOCK_BIT  4
 +
-+#define TYPE_SWIM_DRIVE "swim-drive"
-+#define SWIM_DRIVE(obj) OBJECT_CHECK(SWIMDrive, (obj), TYPE_SWIM_DRIVE)
++#define VIA1_IRQ_NB             8
 +
-+struct SWIMDrive {
-+    DeviceState qdev;
-+    int32_t     unit;
-+    BlockConf   conf;
-+};
++#define VIA1_IRQ_ONE_SECOND (1 << VIA1_IRQ_ONE_SECOND_BIT)
++#define VIA1_IRQ_VBLANK     (1 << VIA1_IRQ_VBLANK_BIT)
++#define VIA1_IRQ_ADB_READY  (1 << VIA1_IRQ_ADB_READY_BIT)
++#define VIA1_IRQ_ADB_DATA   (1 << VIA1_IRQ_ADB_DATA_BIT)
++#define VIA1_IRQ_ADB_CLOCK  (1 << VIA1_IRQ_ADB_CLOCK_BIT)
 +
-+#define TYPE_SWIM_BUS "swim-bus"
-+#define SWIM_BUS(obj) OBJECT_CHECK(SWIMBus, (obj), TYPE_SWIM_BUS)
 +
-+struct SWIMBus {
-+    BusState bus;
-+    struct SWIMCtrl *ctrl;
-+};
++#define TYPE_MOS6522_Q800_VIA1 "mos6522-q800-via1"
++#define MOS6522_Q800_VIA1(obj)  OBJECT_CHECK(MOS6522Q800VIA1State, (obj), \
++                                    TYPE_MOS6522_Q800_VIA1)
 +
-+typedef struct FDrive {
-+    SWIMCtrl *swimctrl;
-+    BlockBackend *blk;
-+    BlockConf *conf;
-+} FDrive;
++typedef struct MOS6522Q800VIA1State {
++    /*< private >*/
++    MOS6522State parent_obj;
 +
-+struct SWIMCtrl {
-+    MemoryRegion iomem;
-+    FDrive drives[SWIM_MAX_FD];
-+    int mode;
-+    /* IWM mode */
-+    int iwm_switch;
-+    int regs[8];
-+#define IWM_PH0   0
-+#define IWM_PH1   1
-+#define IWM_PH2   2
-+#define IWM_PH3   3
-+#define IWM_MTR   4
-+#define IWM_DRIVE 5
-+#define IWM_Q6    6
-+#define IWM_Q7    7
-+    uint8_t iwm_data;
-+    uint8_t iwm_mode;
-+    /* SWIM mode */
-+    uint8_t swim_phase;
-+    uint8_t swim_mode;
-+    SWIMBus bus;
-+};
++    qemu_irq irqs[VIA1_IRQ_NB];
++    uint8_t last_b;
++    uint8_t PRAM[256];
++} MOS6522Q800VIA1State;
 +
-+#define TYPE_SWIM "swim"
-+#define SWIM(obj) OBJECT_CHECK(SWIM, (obj), TYPE_SWIM)
 +
-+typedef struct SWIM {
-+    SysBusDevice parent_obj;
-+    SWIMCtrl     ctrl;
-+} SWIM;
++/* VIA 2 */
++#define VIA2_IRQ_SCSI_DATA_BIT  0
++#define VIA2_IRQ_SLOT_BIT       1
++#define VIA2_IRQ_UNUSED_BIT     2
++#define VIA2_IRQ_SCSI_BIT       3
++#define VIA2_IRQ_ASC_BIT        4
++
++#define VIA2_IRQ_NB             8
++
++#define VIA2_IRQ_SCSI_DATA  (1 << VIA2_IRQ_SCSI_DATA_BIT)
++#define VIA2_IRQ_SLOT       (1 << VIA2_IRQ_SLOT_BIT)
++#define VIA2_IRQ_UNUSED     (1 << VIA2_IRQ_SCSI_BIT)
++#define VIA2_IRQ_SCSI       (1 << VIA2_IRQ_UNUSED_BIT)
++#define VIA2_IRQ_ASC        (1 << VIA2_IRQ_ASC_BIT)
++
++#define TYPE_MOS6522_Q800_VIA2 "mos6522-q800-via2"
++#define MOS6522_Q800_VIA2(obj)  OBJECT_CHECK(MOS6522Q800VIA2State, (obj), \
++                                    TYPE_MOS6522_Q800_VIA2)
++
++typedef struct MOS6522Q800VIA2State {
++    /*< private >*/
++    MOS6522State parent_obj;
++} MOS6522Q800VIA2State;
++
++
++#define TYPE_MAC_VIA "mac_via"
++#define MAC_VIA(obj)   OBJECT_CHECK(MacVIAState, (obj), TYPE_MAC_VIA)
++
++typedef struct MacVIAState {
++    SysBusDevice busdev;
++
++    /* MMIO */
++    MemoryRegion mmio;
++    MemoryRegion via1mem;
++    MemoryRegion via2mem;
++
++    /* VIAs */
++    MOS6522Q800VIA1State mos6522_via1;
++    MOS6522Q800VIA2State mos6522_via2;
++
++    /* RTC */
++    uint32_t tick_offset;
++
++    uint8_t data_out;
++    int data_out_cnt;
++    uint8_t data_in;
++    uint8_t data_in_cnt;
++    uint8_t cmd;
++    int wprotect;
++    int alt;
++
++    /* ADB */
++    ADBBusState adb_bus;
++
++    /* external timers */
++    QEMUTimer *one_second_timer;
++    QEMUTimer *VBL_timer;
++
++} MacVIAState;
++
 +#endif
 -- 
 2.20.1
