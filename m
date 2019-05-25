@@ -2,115 +2,85 @@ Return-Path: <SRS0=E2zY=TZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	FROM_EXCESS_BASE64,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B9F92C04AB0
-	for <qemu-devel@archiver.kernel.org>; Sat, 25 May 2019 09:17:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 38911C282E5
+	for <qemu-devel@archiver.kernel.org>; Sat, 25 May 2019 12:15:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6EE642168B
-	for <qemu-devel@archiver.kernel.org>; Sat, 25 May 2019 09:17:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EDBD42175B
+	for <qemu-devel@archiver.kernel.org>; Sat, 25 May 2019 12:15:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="Vs2hUGIw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6EE642168B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IFpT3Mrf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EDBD42175B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:38303 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:40122 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hUSoL-0006yt-L5
-	for qemu-devel@archiver.kernel.org; Sat, 25 May 2019 05:17:53 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:41048)
+	id 1hUVZw-0002Js-V8
+	for qemu-devel@archiver.kernel.org; Sat, 25 May 2019 08:15:13 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:34011)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hUSmm-0005zi-Tw
-	for qemu-devel@nongnu.org; Sat, 25 May 2019 05:16:18 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1hUVYP-0001XJ-0o
+	for qemu-devel@nongnu.org; Sat, 25 May 2019 08:13:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hUSmk-0008Pc-Ic
-	for qemu-devel@nongnu.org; Sat, 25 May 2019 05:16:16 -0400
-Received: from mail-eopbgr90139.outbound.protection.outlook.com
-	([40.107.9.139]:7250
-	helo=FRA01-MR2-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1hUSme-0008JY-Ln; Sat, 25 May 2019 05:16:10 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
-	s=selector1;
-	h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
-	bh=vdT8KTR7lu9ga4Y/T0Saqv/+/X8Ru5qWuhUjg7QPrKQ=;
-	b=Vs2hUGIwyITajSvM74EVmB1P7PIuefpBdut9uxLjJONHRg8ypi7R7x6IbrkMZnNaRgC9CwozIKEF+G4HIO4Gl8kyA4d7aL9Wc4/UanuI+UjkCBHlQz+Rd5Yj9FJOPud/MJkNOP+otVAdS9TMmgXAFwoFVko2PvNGiLnTHTyTGEc=
-Received: from PR2PR08MB4684.eurprd08.prod.outlook.com (52.133.109.209) by
-	PR2PR08MB4827.eurprd08.prod.outlook.com (52.133.109.205) with Microsoft
-	SMTP
-	Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
-	15.20.1922.15; Sat, 25 May 2019 09:16:03 +0000
-Received: from PR2PR08MB4684.eurprd08.prod.outlook.com
-	([fe80::f9ad:4124:eaee:3205]) by
-	PR2PR08MB4684.eurprd08.prod.outlook.com
-	([fe80::f9ad:4124:eaee:3205%5]) with mapi id 15.20.1922.017;
-	Sat, 25 May 2019 09:16:03 +0000
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: John Snow <jsnow@redhat.com>, "qemu-devel@nongnu.org"
-	<qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Thread-Topic: [Qemu-devel] [PATCH 1/3] iotests: add test 255 to check bitmap
-	life after snapshot + commit
-Thread-Index: AQHVEX7khpHk2Btb2UyE+Uwy+m5GW6Z66iSAgACnzQA=
-Date: Sat, 25 May 2019 09:16:02 +0000
-Message-ID: <7410deea-c26d-60ae-49a1-f6cdc7570a8c@virtuozzo.com>
-References: <20190523154733.54944-1-vsementsov@virtuozzo.com>
-	<20190523154733.54944-2-vsementsov@virtuozzo.com>
-	<3d8399cf-a1a1-b841-5b65-7f20201c30f4@redhat.com>
-In-Reply-To: <3d8399cf-a1a1-b841-5b65-7f20201c30f4@redhat.com>
-Accept-Language: ru-RU, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: HE1PR0202CA0036.eurprd02.prod.outlook.com
-	(2603:10a6:3:e4::22) To PR2PR08MB4684.eurprd08.prod.outlook.com
-	(2603:10a6:101:22::17)
-authentication-results: spf=none (sender IP is )
-	smtp.mailfrom=vsementsov@virtuozzo.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-tagtoolbar-keys: D20190525121600178
-x-originating-ip: [185.231.240.5]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 1a5dccb7-f855-47d3-48a4-08d6e0f19bd4
-x-microsoft-antispam: BCL:0; PCL:0;
-	RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(2017052603328)(7193020);
-	SRVR:PR2PR08MB4827; 
-x-ms-traffictypediagnostic: PR2PR08MB4827:
-x-ms-exchange-purlcount: 1
-x-microsoft-antispam-prvs: <PR2PR08MB482754067169F464A4E81176C1030@PR2PR08MB4827.eurprd08.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:1360;
-x-forefront-prvs: 0048BCF4DA
-x-forefront-antispam-report: SFV:NSPM;
-	SFS:(10019020)(366004)(376002)(39850400004)(346002)(136003)(396003)(189003)(199004)(7736002)(305945005)(81166006)(8936002)(81156014)(8676002)(76176011)(31686004)(52116002)(99286004)(66446008)(64756008)(66556008)(66946007)(73956011)(66476007)(446003)(11346002)(2616005)(476003)(110136005)(486006)(26005)(186003)(316002)(2501003)(386003)(36756003)(53546011)(5660300002)(102836004)(86362001)(54906003)(68736007)(478600001)(71200400001)(31696002)(71190400001)(107886003)(2201001)(6116002)(3846002)(66066001)(25786009)(14454004)(4326008)(256004)(14444005)(6512007)(53936002)(6486002)(229853002)(6306002)(6436002)(6246003)(2906002)(6506007)(2004002);
-	DIR:OUT; SFP:1102; SCL:1; SRVR:PR2PR08MB4827;
-	H:PR2PR08MB4684.eurprd08.prod.outlook.com; FPR:; SPF:None;
-	LANG:en; PTR:InfoNoRecords; MX:1; A:1; 
-received-spf: None (protection.outlook.com: virtuozzo.com does not designate
-	permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: XhuJUHzQanPckeRM83RSv1/B9Sbl2ybsHu7E5CbBgCnNcOPTm/d1CFDADfHvAMbtcgDk06MfMyhdyStTCOGvu923HHdrp2X/tY7F0SDs4aratH1OTf1fZaz5is8LWj2KTKg4NB5YycwcsElFeVM/HPv292EMMPC9jvZHAovHWzoCybERfFNrKC8n/ZKVLubgLB1ZUUO1zdlAvN9xQiReiAJdtjUgQCp5aF4isbpDU6raoy2RtqthsPXlNSvRzcZuLxQmpty/rzOtJjabGUB9+xeetxcBXynNAsKru0fLRwPBrdxcBabrKY+0PKvVyaH61KIgFukJzfBzMTN05D+1fs+WbZBNdwIMahmAkyxs3j9+2GA90oa6y0mqzGfcWPjBj+2mgDsZlsWVFYurJisPauUQ4K3vY+jorzAlw5WLX8k=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <2F9E3ADB28C8CE4EBAEA1F429F812D4D@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <marcandre.lureau@gmail.com>) id 1hUVXG-0002me-CW
+	for qemu-devel@nongnu.org; Sat, 25 May 2019 08:12:27 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:37974)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1hUVXG-0002lM-67
+	for qemu-devel@nongnu.org; Sat, 25 May 2019 08:12:26 -0400
+Received: by mail-wr1-x444.google.com with SMTP id d18so12442561wrs.5
+	for <qemu-devel@nongnu.org>; Sat, 25 May 2019 05:12:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+	:cc:content-transfer-encoding;
+	bh=eYfocmhPDINnTz5r4utBlTegy9zwuqUqzrk//YNp/hk=;
+	b=IFpT3MrfuK/Zeb5UglWd4o706+HGLuMoji5t16W0xgXn3/pX5Xu3U10LkhRDencwbk
+	AA3D7CTjfH5LvXlJp1pu6tCdJLAaVAjNjuPrX1al8dijxVx19RlKUCuXGCZzPQ8eAcmp
+	lo1h2r/HSV/bS8EaAPjbdfPz7i9Ij+q+NEjXHGDCyYx6ZBZNG9HQ1HrioGvaysmx7yz5
+	sYvQ3rw8vTGdRotyTk6HnBjZM5wjPb2APG+wT2mzKiFmuWE+VVTWUUBClIEaFvxwUd+/
+	rc9Ng+YGLuJpx2krwEp5dnh0jHs+XrXmM9alLBMKx4smcXKOuJgCgoG9axdMrhgd46xG
+	hp5g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+	:message-id:subject:to:cc:content-transfer-encoding;
+	bh=eYfocmhPDINnTz5r4utBlTegy9zwuqUqzrk//YNp/hk=;
+	b=NgYMJwviCZLN9iccmkKrGYCrdC9NV9Uosel5mn2NoNdSCY3WE9TOHVQBBbNixkdqf8
+	Q/RLBK+/9/RQiuhduwDjT0o/k21HItCFqHFIxR8/oSak644ppTsSDkgq83/+VJKP9iCb
+	htNX198XToIii6Y6aHSF07ZcAvgtcfnnSzx5u+7E6LMMifXe012dugEuZ5XACtC31pQL
+	RhCtG9AblqDfN5+GOcbwbs0Zq157mdqtz4MsVHnqvlFpXOKTIHC5+mwAwjysaRARULPl
+	WIJkYHKGFXC6myfgCSW9nvQygUtIOBnZl91lT1oDAbld8fln0EOZtwOIPELxCfYyo4kj
+	zDLg==
+X-Gm-Message-State: APjAAAX+Rn9nCCmzuqKLXmVpzwpUqI1iUNQ9hPTQu73XEFM6eqbZvYx7
+	WnicEWnqv2ml2d7ArkdkSSTggB0ShmHsF2zgqRQ=
+X-Google-Smtp-Source: APXvYqwH7vUr36wVeoPOC5nwzo5EqjfYIufUEzDe1uterpl+htXG7rS0pQssAm9kHK4eK66hEE3zdipW7VefD2eRNpo=
+X-Received: by 2002:adf:dfc4:: with SMTP id q4mr11330597wrn.201.1558786344430; 
+	Sat, 25 May 2019 05:12:24 -0700 (PDT)
 MIME-Version: 1.0
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1a5dccb7-f855-47d3-48a4-08d6e0f19bd4
-X-MS-Exchange-CrossTenant-originalarrivaltime: 25 May 2019 09:16:02.9482 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: vsementsov@virtuozzo.com
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PR2PR08MB4827
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.9.139
-Subject: Re: [Qemu-devel] [PATCH 1/3] iotests: add test 255 to check bitmap
- life after snapshot + commit
+References: <20190409161009.6322-1-marcandre.lureau@redhat.com>
+	<87sgt7sxhy.fsf@dusky.pond.sub.org>
+	<CAJ+F1CJ6hpQZf6199_-rAW98HwEssNT_kXBJF9he9NZFvWaGPA@mail.gmail.com>
+	<87tvdlhakq.fsf@dusky.pond.sub.org>
+In-Reply-To: <87tvdlhakq.fsf@dusky.pond.sub.org>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Sat, 25 May 2019 14:12:12 +0200
+Message-ID: <CAJ+F1CJLuNVu_aWPjQtFwP_tLMqn=vd_gCtW7SWZWdhYMF6H7w@mail.gmail.com>
+To: Markus Armbruster <armbru@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2a00:1450:4864:20::444
+Subject: Re: [Qemu-devel] [PATCH v4 00/20] monitor: add asynchronous command
+ type
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -122,154 +92,155 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "fam@euphon.net" <fam@euphon.net>, "kwolf@redhat.com" <kwolf@redhat.com>,
-	Denis Lunev <den@virtuozzo.com>, "mreitz@redhat.com" <mreitz@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, QEMU <qemu-devel@nongnu.org>,
+	Michael Roth <mdroth@linux.vnet.ibm.com>,
+	"Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+	Gerd Hoffmann <kraxel@redhat.com>, John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-MjUuMDUuMjAxOSAyOjE1LCBKb2huIFNub3cgd3JvdGU6DQo+IA0KPiANCj4gT24gNS8yMy8xOSAx
-MTo0NyBBTSwgVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSB3cm90ZToNCj4+IFR3byB0ZXN0
-Y2FzZXMgd2l0aCBwZXJzaXN0ZW50IGJpdG1hcHMgYXJlIG5vdCBhZGRlZCBoZXJlLCBhcyB0aGVy
-ZSBhcmUNCj4+IGJ1Z3MgdG8gYmUgZml4ZWQgc29vbi4NCj4+DQo+PiBTaWduZWQtb2ZmLWJ5OiBW
-bGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IDx2c2VtZW50c292QHZpcnR1b3p6by5jb20+DQo+
-PiAtLS0NCj4+ICAgcHl0aG9uL3FlbXUvX19pbml0X18ucHkgICAgfCAgNCArLQ0KPj4gICB0ZXN0
-cy9xZW11LWlvdGVzdHMvMjU1ICAgICB8IDgxICsrKysrKysrKysrKysrKysrKysrKysrKysrKysr
-KysrKysrKysrDQo+PiAgIHRlc3RzL3FlbXUtaW90ZXN0cy8yNTUub3V0IHwgMTcgKysrKysrKysN
-Cj4+ICAgdGVzdHMvcWVtdS1pb3Rlc3RzL2dyb3VwICAgfCAgMSArDQo+PiAgIDQgZmlsZXMgY2hh
-bmdlZCwgMTAyIGluc2VydGlvbnMoKyksIDEgZGVsZXRpb24oLSkNCj4+ICAgY3JlYXRlIG1vZGUg
-MTAwNzU1IHRlc3RzL3FlbXUtaW90ZXN0cy8yNTUNCj4+ICAgY3JlYXRlIG1vZGUgMTAwNjQ0IHRl
-c3RzL3FlbXUtaW90ZXN0cy8yNTUub3V0DQo+Pg0KPj4gZGlmZiAtLWdpdCBhL3B5dGhvbi9xZW11
-L19faW5pdF9fLnB5IGIvcHl0aG9uL3FlbXUvX19pbml0X18ucHkNCj4+IGluZGV4IDgxZDk2NTdl
-YzAuLjRjNDMxN2E1NWUgMTAwNjQ0DQo+PiAtLS0gYS9weXRob24vcWVtdS9fX2luaXRfXy5weQ0K
-Pj4gKysrIGIvcHl0aG9uL3FlbXUvX19pbml0X18ucHkNCj4+IEBAIC00MDIsNyArNDAyLDcgQEAg
-Y2xhc3MgUUVNVU1hY2hpbmUob2JqZWN0KToNCj4+ICAgICAgICAgICBzZWxmLl9xbXAuY2xlYXJf
-ZXZlbnRzKCkNCj4+ICAgICAgICAgICByZXR1cm4gZXZlbnRzDQo+PiAgIA0KPj4gLSAgICBkZWYg
-ZXZlbnRfd2FpdChzZWxmLCBuYW1lLCB0aW1lb3V0PTYwLjAsIG1hdGNoPU5vbmUpOg0KPj4gKyAg
-ICBkZWYgZXZlbnRfd2FpdChzZWxmLCBuYW1lLCB0aW1lb3V0PTYwLjAsIG1hdGNoPU5vbmUsIGZh
-aWxfb249Tm9uZSk6DQo+PiAgICAgICAgICAgIiIiDQo+PiAgICAgICAgICAgV2FpdCBmb3Igc3Bl
-Y2lmaWVkIHRpbWVvdXQgb24gbmFtZWQgZXZlbnQgaW4gUU1QOyBvcHRpb25hbGx5IGZpbHRlcg0K
-Pj4gICAgICAgICAgIHJlc3VsdHMgYnkgbWF0Y2guDQo+PiBAQCAtNDMwLDYgKzQzMCw3IEBAIGNs
-YXNzIFFFTVVNYWNoaW5lKG9iamVjdCk6DQo+PiAgIA0KPj4gICAgICAgICAgICMgU2VhcmNoIGNh
-Y2hlZCBldmVudHMNCj4+ICAgICAgICAgICBmb3IgZXZlbnQgaW4gc2VsZi5fZXZlbnRzOg0KPj4g
-KyAgICAgICAgICAgIGFzc2VydCBldmVudFsnZXZlbnQnXSAhPSBmYWlsX29uDQo+PiAgICAgICAg
-ICAgICAgIGlmIChldmVudFsnZXZlbnQnXSA9PSBuYW1lKSBhbmQgZXZlbnRfbWF0Y2goZXZlbnQs
-IG1hdGNoKToNCj4+ICAgICAgICAgICAgICAgICAgIHNlbGYuX2V2ZW50cy5yZW1vdmUoZXZlbnQp
-DQo+PiAgICAgICAgICAgICAgICAgICByZXR1cm4gZXZlbnQNCj4+IEBAIC00MzcsNiArNDM4LDcg
-QEAgY2xhc3MgUUVNVU1hY2hpbmUob2JqZWN0KToNCj4+ICAgICAgICAgICAjIFBvbGwgZm9yIG5l
-dyBldmVudHMNCj4+ICAgICAgICAgICB3aGlsZSBUcnVlOg0KPj4gICAgICAgICAgICAgICBldmVu
-dCA9IHNlbGYuX3FtcC5wdWxsX2V2ZW50KHdhaXQ9dGltZW91dCkNCj4+ICsgICAgICAgICAgICBh
-c3NlcnQgZXZlbnRbJ2V2ZW50J10gIT0gZmFpbF9vbg0KPj4gICAgICAgICAgICAgICBpZiAoZXZl
-bnRbJ2V2ZW50J10gPT0gbmFtZSkgYW5kIGV2ZW50X21hdGNoKGV2ZW50LCBtYXRjaCk6DQo+PiAg
-ICAgICAgICAgICAgICAgICByZXR1cm4gZXZlbnQNCj4+ICAgICAgICAgICAgICAgc2VsZi5fZXZl
-bnRzLmFwcGVuZChldmVudCkNCj4gDQo+IEknZCByYXRoZXIgbm90IHB1dCBhc3NlcnRpb25zIGRp
-cmVjdGx5IGluIHRoZSBRRU1VTWFjaGluZSBjb2RlLCB1bmxlc3MNCj4gaXQncyBhY3R1YWxseSBh
-biBhc3NlcnRpb24gYW5kIG5vdCBhIHRlc3QgZmFpbHVyZSwgYmVjYXVzZSB0aGlzIGNvZGUgaXMN
-Cj4gbm90IG5lY2Vzc2FyaWx5IG1lYW50IHRvIGJlIHVzZWQgZXhjbHVzaXZlbHkgZm9yIHRlc3Rz
-Lg0KDQpJdCB3YXMgbW9zdCBzaW1wbGUgdGhpbmcgdG8gZG8gdG8gc3RvcCB0ZXN0IGV4ZWN1dGlv
-biBub3QgaGFuZGxpbmcgcmV0dXJuZWQgZXZlbnQuLg0KQnV0IEkgdGhpbmsgeW91IGFyZSByaWdo
-dCwgSSdsbCByZXRoaW5rIGl0Lg0KDQo+IA0KPj4gZGlmZiAtLWdpdCBhL3Rlc3RzL3FlbXUtaW90
-ZXN0cy8yNTUgYi90ZXN0cy9xZW11LWlvdGVzdHMvMjU1DQo+PiBuZXcgZmlsZSBtb2RlIDEwMDc1
-NQ0KPj4gaW5kZXggMDAwMDAwMDAwMC4uMzY3MTI2ODlkMw0KPj4gLS0tIC9kZXYvbnVsbA0KPj4g
-KysrIGIvdGVzdHMvcWVtdS1pb3Rlc3RzLzI1NQ0KPj4gQEAgLTAsMCArMSw4MSBAQA0KPj4gKyMh
-L3Vzci9iaW4vZW52IHB5dGhvbg0KPj4gKyMNCj4+ICsjIFRlc3RzIGZvciB0ZW1wb3JhcnkgZXh0
-ZXJuYWwgc25hcHNob3Qgd2hlbiB3ZSBoYXZlIGJpdG1hcHMuDQo+PiArIw0KPj4gKyMgQ29weXJp
-Z2h0IChjKSAyMDE5IFZpcnR1b3p6byBJbnRlcm5hdGlvbmFsIEdtYkguIEFsbCByaWdodHMgcmVz
-ZXJ2ZWQuDQo+PiArIw0KPj4gKyMgVGhpcyBwcm9ncmFtIGlzIGZyZWUgc29mdHdhcmU7IHlvdSBj
-YW4gcmVkaXN0cmlidXRlIGl0IGFuZC9vciBtb2RpZnkNCj4+ICsjIGl0IHVuZGVyIHRoZSB0ZXJt
-cyBvZiB0aGUgR05VIEdlbmVyYWwgUHVibGljIExpY2Vuc2UgYXMgcHVibGlzaGVkIGJ5DQo+PiAr
-IyB0aGUgRnJlZSBTb2Z0d2FyZSBGb3VuZGF0aW9uOyBlaXRoZXIgdmVyc2lvbiAyIG9mIHRoZSBM
-aWNlbnNlLCBvcg0KPj4gKyMgKGF0IHlvdXIgb3B0aW9uKSBhbnkgbGF0ZXIgdmVyc2lvbi4NCj4+
-ICsjDQo+PiArIyBUaGlzIHByb2dyYW0gaXMgZGlzdHJpYnV0ZWQgaW4gdGhlIGhvcGUgdGhhdCBp
-dCB3aWxsIGJlIHVzZWZ1bCwNCj4+ICsjIGJ1dCBXSVRIT1VUIEFOWSBXQVJSQU5UWTsgd2l0aG91
-dCBldmVuIHRoZSBpbXBsaWVkIHdhcnJhbnR5IG9mDQo+PiArIyBNRVJDSEFOVEFCSUxJVFkgb3Ig
-RklUTkVTUyBGT1IgQSBQQVJUSUNVTEFSIFBVUlBPU0UuICBTZWUgdGhlDQo+PiArIyBHTlUgR2Vu
-ZXJhbCBQdWJsaWMgTGljZW5zZSBmb3IgbW9yZSBkZXRhaWxzLg0KPj4gKyMNCj4+ICsjIFlvdSBz
-aG91bGQgaGF2ZSByZWNlaXZlZCBhIGNvcHkgb2YgdGhlIEdOVSBHZW5lcmFsIFB1YmxpYyBMaWNl
-bnNlDQo+PiArIyBhbG9uZyB3aXRoIHRoaXMgcHJvZ3JhbS4gIElmIG5vdCwgc2VlIDxodHRwOi8v
-d3d3LmdudS5vcmcvbGljZW5zZXMvPi4NCj4+ICsjDQo+PiArDQo+PiAraW1wb3J0IGlvdGVzdHMN
-Cj4+ICtmcm9tIGlvdGVzdHMgaW1wb3J0IHFlbXVfaW1nX2NyZWF0ZSwgZmlsZV9wYXRoLCBsb2cN
-Cj4+ICsNCj4+ICtpb3Rlc3RzLnZlcmlmeV9pbWFnZV9mb3JtYXQoc3VwcG9ydGVkX2ZtdHM9Wydx
-Y293MiddKQ0KPj4gKw0KPj4gK2Jhc2UsIHRvcCA9IGZpbGVfcGF0aCgnYmFzZScsICd0b3AnKQ0K
-Pj4gK3NpemUgPSA2NCAqIDEwMjQgKiAzDQo+PiArDQo+PiArDQo+PiArZGVmIHByaW50X2JpdG1h
-cChtc2csIHZtKToNCj4+ICsgICAgcmVzdWx0ID0gdm0ucW1wKCdxdWVyeS1ibG9jaycpWydyZXR1
-cm4nXVswXQ0KPj4gKyAgICBpZiAnZGlydHktYml0bWFwcycgaW4gcmVzdWx0Og0KPj4gKyAgICAg
-ICAgYml0bWFwID0gcmVzdWx0WydkaXJ0eS1iaXRtYXBzJ11bMF0NCj4+ICsgICAgICAgIGxvZygn
-e306IG5hbWU9e30gZGlydHktY2x1c3RlcnM9e30nLmZvcm1hdChtc2csIGJpdG1hcFsnbmFtZSdd
-LA0KPj4gKyAgICAgICAgICAgIGJpdG1hcFsnY291bnQnXSAvLyA2NCAvLyAxMDI0KSkNCj4+ICsg
-ICAgZWxzZToNCj4+ICsgICAgICAgIGxvZyhtc2cgKyAnOiBub3QgZm91bmQnKQ0KPj4gKw0KPj4g
-Kw0KPj4gK2RlZiB0ZXN0KHBlcnNpc3RlbnQsIHJlc3RhcnQpOg0KPj4gKyAgICBhc3NlcnQgcGVy
-c2lzdGVudCBvciBub3QgcmVzdGFydA0KPj4gKyAgICBsb2coIlxuVGVzdGNhc2Uge31wZXJzaXN0
-ZW50IHt9IHJlc3RhcnRcbiIuZm9ybWF0KA0KPj4gKyAgICAgICAgICAgICcnIGlmIHBlcnNpc3Rl
-bnQgZWxzZSAnbm9uLScsICd3aXRoJyBpZiByZXN0YXJ0IGVsc2UgJ3dpdGhvdXQnKSkNCj4+ICsN
-Cj4+ICsgICAgcWVtdV9pbWdfY3JlYXRlKCctZicsIGlvdGVzdHMuaW1nZm10LCBiYXNlLCBzdHIo
-c2l6ZSkpDQo+PiArDQo+PiArICAgIHZtID0gaW90ZXN0cy5WTSgpLmFkZF9kcml2ZShiYXNlKQ0K
-Pj4gKyAgICB2bS5sYXVuY2goKQ0KPj4gKw0KPj4gKyAgICB2bS5xbXBfbG9nKCdibG9jay1kaXJ0
-eS1iaXRtYXAtYWRkJywgbm9kZT0nZHJpdmUwJywgbmFtZT0nYml0bWFwMCcsDQo+PiArICAgICAg
-ICAgICAgICAgcGVyc2lzdGVudD1wZXJzaXN0ZW50KQ0KPj4gKyAgICB2bS5obXBfcWVtdV9pbygn
-ZHJpdmUwJywgJ3dyaXRlIDAgNjRLJykNCj4+ICsgICAgcHJpbnRfYml0bWFwKCdpbml0aWFsIGJp
-dG1hcCcsIHZtKQ0KPj4gKw0KPj4gKyAgICB2bS5xbXBfbG9nKCdibG9ja2Rldi1zbmFwc2hvdC1z
-eW5jJywgZGV2aWNlPSdkcml2ZTAnLCBzbmFwc2hvdF9maWxlPXRvcCwNCj4+ICsgICAgICAgICAg
-ICAgICBmb3JtYXQ9aW90ZXN0cy5pbWdmbXQsIGZpbHRlcnM9W2lvdGVzdHMuZmlsdGVyX3FtcF90
-ZXN0ZmlsZXNdKQ0KPj4gKyAgICB2bS5obXBfcWVtdV9pbygnZHJpdmUwJywgJ3dyaXRlIDY0SyA1
-MTInKQ0KPj4gKyAgICBwcmludF9iaXRtYXAoJ2NoZWNrLCB0aGF0IG5vIGJpdG1hcHMgaW4gc25h
-cHNob3QnLCB2bSkNCj4gDQo+ICdjaGVjayB0aGF0IG5vIGJpdG1hcHMgYXJlIGluIHNuYXBzaG90
-JywgcHJvYmFibHkuDQo+IA0KPj4gKw0KPj4gKyAgICBpZiByZXN0YXJ0Og0KPj4gKyAgICAgICAg
-bG9nKCIuLi4gUmVzdGFydCAuLi4iKQ0KPj4gKyAgICAgICAgdm0uc2h1dGRvd24oKQ0KPj4gKyAg
-ICAgICAgdm0gPSBpb3Rlc3RzLlZNKCkuYWRkX2RyaXZlKHRvcCkNCj4+ICsgICAgICAgIHZtLmxh
-dW5jaCgpDQo+PiArDQo+PiArICAgIHZtLnFtcF9sb2coJ2Jsb2NrLWNvbW1pdCcsIGRldmljZT0n
-ZHJpdmUwJywgdG9wPXRvcCwNCj4+ICsgICAgICAgICAgICAgICBmaWx0ZXJzPVtpb3Rlc3RzLmZp
-bHRlcl9xbXBfdGVzdGZpbGVzXSkNCj4+ICsgICAgbG9nKHZtLmV2ZW50X3dhaXQoJ0JMT0NLX0pP
-Ql9SRUFEWScsIGZhaWxfb249J0JMT0NLX0pPQl9DT01QTEVURUQnKSwNCj4+ICsgICAgICAgIGZp
-bHRlcnM9W2lvdGVzdHMuZmlsdGVyX3FtcF9ldmVudF0pDQo+IA0KPiBMb29rcyBsaWtlIHlvdSBw
-cm9iYWJseSBzYXcgc29tZSBpbnRlcmVzdGluZyB0aGluZ3MgZHVyaW5nIGRldmVsb3BtZW50Lg0K
-PiBZb3Ugc2hvdWxkbid0IHNlZSBDT01QTEVURUQgYmVmb3JlIFJFQURZLCBzaG91bGQgeW91PyBJ
-cyB0aGlzIG5lY2Vzc2FyeT8NCg0KV2hlbiBqb2IgZmFpbGVkLCB3ZSBtYXkgbm90IGhhdmUgUkVB
-RFkgZXZlbnQgYnV0IG9ubHkgQ09NUExFVEVEIHdpdGggZmFpbHVyZS4NCg0KSSB0aGluaywgSSBj
-YW4gaW5zdGVhZCBpbXByb3ZlIGV2ZW50X3dhaXQgdG8gc3VwcG9ydCBsaXN0IG9mIGV2ZW50cyB0
-byB3YWl0LA0KYW5kIHRoYW4gY2hlY2sgaW4gdGVzdCwgd2hhdCBpcyBpdCwgUkVBRFkgb3IgQ09N
-UExFVEVELg0KDQo+IA0KPj4gKyAgICB2bS5xbXBfbG9nKCdibG9jay1qb2ItY29tcGxldGUnLCBk
-ZXZpY2U9J2RyaXZlMCcpDQo+PiArICAgIGxvZyh2bS5ldmVudF93YWl0KCdCTE9DS19KT0JfQ09N
-UExFVEVEJyksDQo+PiArICAgICAgICBmaWx0ZXJzPVtpb3Rlc3RzLmZpbHRlcl9xbXBfZXZlbnRd
-KQ0KPiANCj4gKEp1c3QgbXVzaW5nOiB3ZSBwcm9iYWJseSB3YW50IGEgZmlsdGVyZWQgdmVyc2lv
-biBvZiBldmVudF93YWl0IGZvcg0KPiBpb3Rlc3RzLnB5IHNvIHdlIGRvbid0IGhhdmUgdG8gdHlw
-ZSB0aGlzIHNvIG11Y2guKQ0KDQphZ3JlZQ0KDQo+IA0KPj4gKyAgICBwcmludF9iaXRtYXAoJ2No
-ZWNrIG1lcmdlZCBiaXRtYXAnLCB2bSkNCj4+ICsNCj4gDQo+IE1lcmdlZD8gV2UgZG9uJ3QgL21l
-cmdlLyB0aGUgYml0bWFwcywgZG8gd2U/IEkgZ3Vlc3MgeW91IG1lYW4gdG8gc2F5DQo+IHNvbWV0
-aGluZyBsaWtlOiAiQ2hlY2sgYml0bWFwcyBvbiBtZXJnZWQvY29udmVyZ2VkIG5vZGUiLCByaWdo
-dD8NCg0KWWVzLCBzb21ldGhpbmcgbGlrZSB0aGlzLg0KDQo+IA0KPj4gKyAgICB2bS5obXBfcWVt
-dV9pbygnZHJpdmUwJywgJ3dyaXRlIDEyOEsgNjRLJykNCj4+ICsgICAgcHJpbnRfYml0bWFwKCdj
-aGVjayB1cGRhdGVkIGJpdG1hcCcsIHZtKQ0KPj4gKw0KPj4gKyAgICB2bS5zaHV0ZG93bigpDQo+
-PiArDQo+PiArDQo+PiArdGVzdChwZXJzaXN0ZW50PUZhbHNlLCByZXN0YXJ0PUZhbHNlKQ0KPj4g
-ZGlmZiAtLWdpdCBhL3Rlc3RzL3FlbXUtaW90ZXN0cy8yNTUub3V0IGIvdGVzdHMvcWVtdS1pb3Rl
-c3RzLzI1NS5vdXQNCj4+IG5ldyBmaWxlIG1vZGUgMTAwNjQ0DQo+PiBpbmRleCAwMDAwMDAwMDAw
-Li4yYmZmYjQ4NmQyDQo+PiAtLS0gL2Rldi9udWxsDQo+PiArKysgYi90ZXN0cy9xZW11LWlvdGVz
-dHMvMjU1Lm91dA0KPj4gQEAgLTAsMCArMSwxNyBAQA0KPj4gKw0KPj4gK1Rlc3RjYXNlIG5vbi1w
-ZXJzaXN0ZW50IHdpdGhvdXQgcmVzdGFydA0KPj4gKw0KPj4gK3siZXhlY3V0ZSI6ICJibG9jay1k
-aXJ0eS1iaXRtYXAtYWRkIiwgImFyZ3VtZW50cyI6IHsibmFtZSI6ICJiaXRtYXAwIiwgIm5vZGUi
-OiAiZHJpdmUwIiwgInBlcnNpc3RlbnQiOiBmYWxzZX19DQo+PiAreyJyZXR1cm4iOiB7fX0NCj4+
-ICtpbml0aWFsIGJpdG1hcDogbmFtZT1iaXRtYXAwIGRpcnR5LWNsdXN0ZXJzPTENCj4+ICt7ImV4
-ZWN1dGUiOiAiYmxvY2tkZXYtc25hcHNob3Qtc3luYyIsICJhcmd1bWVudHMiOiB7ImRldmljZSI6
-ICJkcml2ZTAiLCAiZm9ybWF0IjogInFjb3cyIiwgInNuYXBzaG90LWZpbGUiOiAiVEVTVF9ESVIv
-UElELXRvcCJ9fQ0KPj4gK3sicmV0dXJuIjoge319DQo+PiArY2hlY2ssIHRoYXQgbm8gYml0bWFw
-cyBpbiBzbmFwc2hvdDogbm90IGZvdW5kDQo+PiAreyJleGVjdXRlIjogImJsb2NrLWNvbW1pdCIs
-ICJhcmd1bWVudHMiOiB7ImRldmljZSI6ICJkcml2ZTAiLCAidG9wIjogIlRFU1RfRElSL1BJRC10
-b3AifX0NCj4+ICt7InJldHVybiI6IHt9fQ0KPj4gK3siZGF0YSI6IHsiZGV2aWNlIjogImRyaXZl
-MCIsICJsZW4iOiA2NTUzNiwgIm9mZnNldCI6IDY1NTM2LCAic3BlZWQiOiAwLCAidHlwZSI6ICJj
-b21taXQifSwgImV2ZW50IjogIkJMT0NLX0pPQl9SRUFEWSIsICJ0aW1lc3RhbXAiOiB7Im1pY3Jv
-c2Vjb25kcyI6ICJVU0VDUyIsICJzZWNvbmRzIjogIlNFQ1MifX0NCj4+ICt7ImV4ZWN1dGUiOiAi
-YmxvY2stam9iLWNvbXBsZXRlIiwgImFyZ3VtZW50cyI6IHsiZGV2aWNlIjogImRyaXZlMCJ9fQ0K
-Pj4gK3sicmV0dXJuIjoge319DQo+PiAreyJkYXRhIjogeyJkZXZpY2UiOiAiZHJpdmUwIiwgImxl
-biI6IDY1NTM2LCAib2Zmc2V0IjogNjU1MzYsICJzcGVlZCI6IDAsICJ0eXBlIjogImNvbW1pdCJ9
-LCAiZXZlbnQiOiAiQkxPQ0tfSk9CX0NPTVBMRVRFRCIsICJ0aW1lc3RhbXAiOiB7Im1pY3Jvc2Vj
-b25kcyI6ICJVU0VDUyIsICJzZWNvbmRzIjogIlNFQ1MifX0NCj4+ICtjaGVjayBtZXJnZWQgYml0
-bWFwOiBuYW1lPWJpdG1hcDAgZGlydHktY2x1c3RlcnM9Mg0KPj4gK2NoZWNrIHVwZGF0ZWQgYml0
-bWFwOiBuYW1lPWJpdG1hcDAgZGlydHktY2x1c3RlcnM9Mw0KPj4gZGlmZiAtLWdpdCBhL3Rlc3Rz
-L3FlbXUtaW90ZXN0cy9ncm91cCBiL3Rlc3RzL3FlbXUtaW90ZXN0cy9ncm91cA0KPj4gaW5kZXgg
-NTJiN2MxNmUxNS4uMjc1OGY0ODE0MyAxMDA2NDQNCj4+IC0tLSBhL3Rlc3RzL3FlbXUtaW90ZXN0
-cy9ncm91cA0KPj4gKysrIGIvdGVzdHMvcWVtdS1pb3Rlc3RzL2dyb3VwDQo+PiBAQCAtMjUxLDMg
-KzI1MSw0IEBADQo+PiAgIDI0OSBydyBhdXRvIHF1aWNrDQo+PiAgIDI1MiBydyBhdXRvIGJhY2tp
-bmcgcXVpY2sNCj4+ICAgMjUzIHJ3IGF1dG8gcXVpY2sNCj4+ICsyNTUgcncgYXV0byBxdWljaw0K
-Pj4NCj4gDQo+IEdvb2QgdGVzdCwgSSBqdXN0IGhhdmUgdG8gZGlnIHRocm91Z2ggcGF0Y2ggMy4N
-Cj4gDQoNCg0KLS0gDQpCZXN0IHJlZ2FyZHMsDQpWbGFkaW1pcg0K
+Hi
+
+On Thu, May 23, 2019 at 9:52 AM Markus Armbruster <armbru@redhat.com> wrote=
+:
+> I'm not sure how asynchronous commands could support reconnect and
+> resume.
+
+The same way as current commands, including job commands.
+
+>
+> >> I'm ignoring "etc" unless you expand it into something specific.
+> >>
+> >> I'm also not taking the "weird" bait :)
+> >> > The following series implements an async command solution instead. B=
+y
+> >> > introducing a session context and a command return handler, it can:
+> >> > - defer the return, allowing the mainloop to reenter
+> >> > - return only to the caller (instead of broadcast events for reply)
+> >> > - optionnally allow cancellation when the client is gone
+> >> > - track on-going qapi command(s) per client/session
+> >> >
+> >> > and without introduction of new QMP APIs or client visible change.
+> >>
+> >> What do async commands provide that jobs lack?
+> >>
+> >> Why do we want both?
+> >
+> > They are different things, last we discussed it: jobs are geared
+> > toward block device operations,
+>
+> Historical accident.  We've discussed using them for non-blocky stuff,
+> such as migration.  Of course, discussions are cheap, code is what
+> counts.
+
+Using job API means providing new (& more complex) APIs to client.
+
+The screendump fix here doesn't need new API, it needs new internal
+dispatch of QMP commands: the purpose of this series.
+
+Whenever we can solve things on qemu side, I would rather not
+deprecate current API.
+
+> >                                 and do not provide simple qmp-level
+> > facilities that I listed above. What I introduce is a way for an
+> > *existing* QMP command to be splitted, so it can re-enter the main
+> > loop sanely (and not by introducing new commands or signals or making
+> > things unnecessarily more complicated).
+> >
+> > My proposal is fairly small:
+> >   27 files changed, 877 insertions(+), 260 deletions(-)
+> >
+> > Including test, and the qxl screendump fix, which account for about
+> > 1/3 of the series.
+> >
+> >> I started to write a feature-by-feature comparison, but realized I don=
+'t
+> >> have the time to figure out either jobs or async from their (rather
+> >> sparse) documentation, let alone from code.
+> >>
+> >> > Existing qemu commands can be gradually replaced by async:true
+> >> > variants when needed, while carefully reviewing the concurrency
+> >> > aspects. The async:true commands marshaller helpers are splitted in
+> >> > half, the calling and return functions. The command is called with a
+> >> > QmpReturn context, that can return immediately or later, using the
+> >> > generated return helper, which allows for a step-by-step conversion.
+> >> >
+> >> > The screendump command is converted to an async:true version to solv=
+e
+> >> > rhbz#1230527. The command shows basic cancellation (this could be
+> >> > extended if needed). It could be further improved to do asynchronous
+> >> > IO writes as well.
+> >>
+> >> What is "basic cancellation"?
+> >> What extension(s) do you have in mind?
+> >
+> > It checks for cancellation in a few places, between IO. Full
+> > cancellation would allow to cancel at any time.
+> >
+> >>
+> >> What's the impact of screendump writing synchronously?
+> >
+> > It can be pretty bad, think about 4k screens. It is 33177600 bytes,
+> > written in PPM format, blocking the main loop..
+>
+> My question was specifically about "could be further improved to do
+> asynchronous IO writes as well".  What's the impact of not having this
+> improvement?  I *guess* it means that even with the asynchronous
+> command, the synchronous writes still block "something", but I'm not
+> sure what "something" may be, and how it could impact behavior.  Hence
+> my question.
+
+It blocks many things since the BQL is taken.
+
+The goal is not to improve responsiveness at this point, but to fix
+the QXL screendump bug, by introducing a split dispatch in QMP
+commands: callback for starting, and a separate return function. This
+is not rocket science. See below.
+
+>
+> > QMP operation doing large IO (dumps), or blocking on events, could be
+> > switched to this async form without introducing user-visible change,
+>
+> Letting the next QMP command start before the current one is done is a
+> user-visible change.  We can discuss whether the change is harmless.
+
+Agree, from cover letter:
+Existing qemu commands can be gradually replaced by async:true
+variants when needed, while carefully reviewing the concurrency
+aspects.
+
+>
+> > and with minimal effort compared to jobs.
+>
+> To gauge the difference in effort, we'd need actual code to compare.
+
+It's a no-go to me, you don't want to teach all users out there with
+new job API for existing commands when you can improve or fix things
+in QEMU.
+
+The QEMU change for the command can't really be simpler than what I
+propose. You go from:
+
+qmp_foo() {
+  // do foo synchronously and
+  return something
+}
+
+to:
+
+qmp_foo_async(QmpReturn *r) {
+  // do foo asynchronously (or return synchronously)
+}
+
+foo_done() {
+  qmp_foo_async_return(r, something)
+}
+
+See "scripts: learn 'async' qapi commands" for the details.
+
+thanks
+
+--=20
+Marc-Andr=C3=A9 Lureau
 
