@@ -2,70 +2,71 @@ Return-Path: <SRS0=E2zY=TZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-6.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 90855C07542
-	for <qemu-devel@archiver.kernel.org>; Sat, 25 May 2019 23:11:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AC1F3C07542
+	for <qemu-devel@archiver.kernel.org>; Sat, 25 May 2019 23:11:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 523432075E
-	for <qemu-devel@archiver.kernel.org>; Sat, 25 May 2019 23:11:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 523432075E
+	by mail.kernel.org (Postfix) with ESMTPS id 729CE2075E
+	for <qemu-devel@archiver.kernel.org>; Sat, 25 May 2019 23:11:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 729CE2075E
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:47448 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:47450 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hUfpF-00025m-HO
-	for qemu-devel@archiver.kernel.org; Sat, 25 May 2019 19:11:41 -0400
+	id 1hUfpK-00029W-M8
+	for qemu-devel@archiver.kernel.org; Sat, 25 May 2019 19:11:46 -0400
 Received: from eggs.gnu.org ([209.51.188.92]:34106)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hUfky-0006Ih-S3
-	for qemu-devel@nongnu.org; Sat, 25 May 2019 19:07:18 -0400
+	(envelope-from <laurent@vivier.eu>) id 1hUfl7-0006Ih-H3
+	for qemu-devel@nongnu.org; Sat, 25 May 2019 19:07:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hUfVE-0002ZX-FJ
+	(envelope-from <laurent@vivier.eu>) id 1hUfVG-0002fS-1w
 	for qemu-devel@nongnu.org; Sat, 25 May 2019 18:51:05 -0400
-Received: from mout.kundenserver.de ([217.72.192.75]:48835)
+Received: from mout.kundenserver.de ([217.72.192.73]:59261)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <laurent@vivier.eu>)
-	id 1hUfVD-0002Rm-IG; Sat, 25 May 2019 18:51:00 -0400
+	id 1hUfVD-0002SJ-Jr; Sat, 25 May 2019 18:51:00 -0400
 Received: from localhost.localdomain ([78.238.229.36]) by
 	mrelayeu.kundenserver.de (mreue106 [212.227.15.183]) with ESMTPSA
 	(Nemesis)
-	id 1MdeOl-1gv3h7295t-00Zjwk; Sun, 26 May 2019 00:50:28 +0200
+	id 1MZk5x-1hA1R128xT-00WjpI; Sun, 26 May 2019 00:50:32 +0200
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Date: Sun, 26 May 2019 00:50:08 +0200
-Message-Id: <20190525225013.13916-6-laurent@vivier.eu>
+Date: Sun, 26 May 2019 00:50:11 +0200
+Message-Id: <20190525225013.13916-9-laurent@vivier.eu>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190525225013.13916-1-laurent@vivier.eu>
 References: <20190525225013.13916-1-laurent@vivier.eu>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:wbPGYITDsVPF+apyDXen+gFRQpMvd2CmslFtRmj8NTTFz204vrv
-	uy2AQ3vcrvyV+PcJF+g7VllpeJ3tGgOS/coXj7yB8sXVjqCeWNYQNMs+wYbDJgYB7Ka+SX/
-	Fyq5j+YMiHBdpYWqsVykxnHjKO1R52QxJV5h0G1NgP0E/C6y4k3VSvVYUyfAXGjRYaOvcGn
-	6K1oqGwzIzOsbVMkK6alw==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:WLbV2dytjbs=:91PxwvsU89nE+qJS2pk7Xa
-	WsTrj9NZ2W314nGRpLHRqM8JhGevpabBwpwyU9FyVWgR0Th+F72jZAqfIbM3npvLBzFHEOjLc
-	lotni7MuoS7DkslKGXD47KVcsSLj4pA6ExpLfGxAqowJ2ycCbHZzFsA/0YaMiyXm8pEsVhVC9
-	9jzlT9gYI8h7C0wNF+m3rNcJ+AFY964DY8Nx65wdPdrFfV/2ak7PCcRkjmnIVooY+nual2pfB
-	u0DuEXiNlMEdrXQ/LzFrfHRvzqhm96qx86NSYvltijwovKHs0U1fq9TFqkkkCeuUZg7it8d3T
-	r5+8bmkCtDCU2JUqfL+4VkZk75f71Oo9xH9Z04Ik9/lhCcMiCKzI28qpXiF6XevC3SAI7SmNM
-	k9UrwNKVEnNK6QgJlBpLSxI3wjtBzPeoyx4cFR2NFn88uylOkP7C/WOFDnkqnOQPMCd5MRINP
-	V5C2AEWdbSkyYfQzojGQqmjjjv5FT0Y6iJS1DHhhBTWpXraU5xz8AV4TeaVdm7iz0h8VoX2Mf
-	OPKJRRd9xamS5L0EAmhasDz4MRCsxWrqgtrF1XX9Zgah+MDzVpCoxVnNMUZiseOu4oU+w0tCe
-	cHFKW6gJonbPhPT6jlun9Z1gX81gGt/fcNZm+fgIpR0yDPqtQ3aYduiNmE4tdVeLRcMk/5/mC
-	8wH4hu9OsUPqTCG/dAnz7hOufY7j5ElZ8IsK0WaRj8FKjm58MY9TajJ/VUIIkzGITXDFSq6Ig
-	ZPxCVCytqNmt9lFTOTyoZIP4bFIYcWaaebJHF8Oskr+fjJFcrjLyd6+1oyM=
+X-Provags-ID: V03:K1:aVplGuzw0YN9cUOzdqeCZjWbVxXH1A3B2xPEQ5UO32cbHrOktPv
+	6azmhHCLFI0Apbej11hsBupx0z6OHt+pUayF2RQb+mRocoeRmif8Q/K5lXpbVcHCF7Jx8lo
+	qzJq1zeyjmGS5M5EbHkAtPW0EZ5TaWEBXBy4yeBTFXZaIY0iRPcbqDu4dCRn10/rDh5E7lT
+	ENO5vCkQ+ggK05A7w2dTg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:re9EMkvHFZE=:EOllFh1OFqT69KdYd73w2l
+	HQn9bQ67lPeZGWch6a7aM92cmX1iw6nMsYt60ycjUiujijobD3jU2V1oYdb1gfhipkuVAtx6H
+	rcH718JusG6hUNqu/L3eIckXdWq+OiTZXzbtzspnjI9i3nsi8lIqUCml0wiZo4zYG/BtaDCmV
+	3JXm22kyQ2XHgiaRxu4fT0ueOC4xRSkirBYKyMuyPqfJAXoETfjaOt91t2nmeL8q2D7Y4iGj8
+	S/hQ4/H/c+UA2WxLL6xDxHejGyT68sU0s77uV2gs94eg+ZHl+bUk54OyD5q03mu18uEPguq5l
+	ztrZ7xhEMYYFJ4ktNDqCaD6udBiHReEiXYcYbQYHY19wsDPdEj1EYAUG0CSfvBv129spRU+zc
+	xqXcqs8SwEfluY2z/5qOS9SVY04fgR9CZVTxWDF7yAiDgVcAU47pPJuJerjnw+1yPL/x1JXJH
+	ruAwSKFrz37THrlU17CuXmWuZPTL/mwiHAw4B9MXy73BZxPEPHOygAq6Kr+qgUfxDSIF2/QA9
+	TgF7A7rXZVXAIn2UoZdj8OAJ/9ZnNtefupDAtvvjm0aOah2C/w3o3amNcmmE8YLXgr0JSL1un
+	oKFh/susr0eF0LJgi3knW20zxZCpmw+Rl/ybL9zWwOMOtcnhFFhr/8FUsVGMUtuxaGv8qbAlK
+	KQK7TM9ctem7no+k14c2fEVIcKIgzD0CQ16Tp97rJ8l++7Ypt+636jKzVzxvBFWi1n0BT4/Av
+	IUal50fijdEQnycFR2jReV9uMlml0PTyTefDAKJPhgbr71PhS6gN5S/7OUs=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 217.72.192.75
-Subject: [Qemu-devel] [PATCH v7 05/10] hw/m68k: implement ADB bus support
- for via
+X-Received-From: 217.72.192.73
+Subject: [Qemu-devel] [PATCH v7 08/10] hw/m68k: add Nubus support for macfb
+ video card
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -91,267 +92,161 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+
 Co-developed-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 Reviewed-by: Hervé Poussineau <hpoussin@reactos.org>
-Reviewed-by: Thomas Huth <huth@tuxfamily.org>
 ---
- hw/misc/mac_via.c         | 190 ++++++++++++++++++++++++++++++++++++++
- include/hw/misc/mac_via.h |   7 ++
- 2 files changed, 197 insertions(+)
+ hw/display/Kconfig         |  1 +
+ hw/display/macfb.c         | 56 ++++++++++++++++++++++++++++++++++++++
+ include/hw/display/macfb.h | 21 ++++++++++++++
+ 3 files changed, 78 insertions(+)
 
-diff --git a/hw/misc/mac_via.c b/hw/misc/mac_via.c
-index d6d6b86e1a..0fc8d0a038 100644
---- a/hw/misc/mac_via.c
-+++ b/hw/misc/mac_via.c
-@@ -237,10 +237,16 @@
-  * Table 19-10 ADB transaction states
-  */
+diff --git a/hw/display/Kconfig b/hw/display/Kconfig
+index 48284269e0..f962cd8a04 100644
+--- a/hw/display/Kconfig
++++ b/hw/display/Kconfig
+@@ -123,3 +123,4 @@ config ATI_VGA
  
-+#define ADB_STATE_NEW       0
-+#define ADB_STATE_EVEN      1
-+#define ADB_STATE_ODD       2
-+#define ADB_STATE_IDLE      3
-+
- #define VIA1B_vADB_StateMask    (VIA1B_vADBS1 | VIA1B_vADBS2)
- #define VIA1B_vADB_StateShift   4
+ config MACFB
+     bool
++    depends on NUBUS
+diff --git a/hw/display/macfb.c b/hw/display/macfb.c
+index 61ba2e9e15..458e268d86 100644
+--- a/hw/display/macfb.c
++++ b/hw/display/macfb.c
+@@ -15,6 +15,7 @@
+ #include "hw/sysbus.h"
+ #include "ui/console.h"
+ #include "ui/pixel_ops.h"
++#include "hw/nubus/nubus.h"
+ #include "hw/display/macfb.h"
+ #include "qapi/error.h"
  
- #define VIA_TIMER_FREQ (783360)
-+#define VIA_ADB_POLL_FREQ 50 /* XXX: not real */
- 
- /* VIA returns time offset from Jan 1, 1904, not 1970 */
- #define RTC_OFFSET 2082844800
-@@ -422,6 +428,181 @@ static void via1_rtc_update(MacVIAState *m)
-     }
+@@ -380,12 +381,38 @@ static void macfb_sysbus_realize(DeviceState *dev, Error **errp)
+     sysbus_init_mmio(SYS_BUS_DEVICE(s), &ms->mem_vram);
  }
  
-+static int adb_via_poll(MacVIAState *s, int state, uint8_t *data)
++const uint8_t macfb_rom[] = {
++    255, 0, 0, 0,
++};
++
++static void macfb_nubus_realize(DeviceState *dev, Error **errp)
 +{
-+    if (state != ADB_STATE_IDLE) {
-+        return 0;
-+    }
++    NubusDevice *nd = NUBUS_DEVICE(dev);
++    MacfbNubusState *s = NUBUS_MACFB(dev);
++    MacfbNubusDeviceClass *ndc = MACFB_NUBUS_GET_CLASS(dev);
++    MacfbState *ms = &s->macfb;
 +
-+    if (s->adb_data_in_size < s->adb_data_in_index) {
-+        return 0;
-+    }
++    ndc->parent_realize(dev, errp);
 +
-+    if (s->adb_data_out_index != 0) {
-+        return 0;
-+    }
++    macfb_common_realize(dev, ms, errp);
++    memory_region_add_subregion(&nd->slot_mem, DAFB_BASE, &ms->mem_ctrl);
++    memory_region_add_subregion(&nd->slot_mem, VIDEO_BASE, &ms->mem_vram);
 +
-+    s->adb_data_in_index = 0;
-+    s->adb_data_out_index = 0;
-+    s->adb_data_in_size = adb_poll(&s->adb_bus, s->adb_data_in, 0xffff);
-+
-+    if (s->adb_data_in_size) {
-+        *data = s->adb_data_in[s->adb_data_in_index++];
-+        qemu_irq_raise(s->adb_data_ready);
-+    }
-+
-+    return s->adb_data_in_size;
++    nubus_register_rom(nd, macfb_rom, sizeof(macfb_rom), 1, 9, 0xf);
 +}
 +
-+static int adb_via_send(MacVIAState *s, int state, uint8_t data)
-+{
-+    switch (state) {
-+    case ADB_STATE_NEW:
-+        s->adb_data_out_index = 0;
-+        break;
-+    case ADB_STATE_EVEN:
-+        if ((s->adb_data_out_index & 1) == 0) {
-+            return 0;
-+        }
-+        break;
-+    case ADB_STATE_ODD:
-+        if (s->adb_data_out_index & 1) {
-+            return 0;
-+        }
-+        break;
-+    case ADB_STATE_IDLE:
-+        return 0;
-+    }
-+
-+    assert(s->adb_data_out_index < sizeof(s->adb_data_out) - 1);
-+
-+    s->adb_data_out[s->adb_data_out_index++] = data;
-+    qemu_irq_raise(s->adb_data_ready);
-+    return 1;
-+}
-+
-+static int adb_via_receive(MacVIAState *s, int state, uint8_t *data)
-+{
-+    switch (state) {
-+    case ADB_STATE_NEW:
-+        return 0;
-+
-+    case ADB_STATE_EVEN:
-+        if (s->adb_data_in_size <= 0) {
-+            qemu_irq_raise(s->adb_data_ready);
-+            return 0;
-+        }
-+
-+        if (s->adb_data_in_index >= s->adb_data_in_size) {
-+            *data = 0;
-+            qemu_irq_raise(s->adb_data_ready);
-+            return 1;
-+        }
-+
-+        if ((s->adb_data_in_index & 1) == 0) {
-+            return 0;
-+        }
-+
-+        break;
-+
-+    case ADB_STATE_ODD:
-+        if (s->adb_data_in_size <= 0) {
-+            qemu_irq_raise(s->adb_data_ready);
-+            return 0;
-+        }
-+
-+        if (s->adb_data_in_index >= s->adb_data_in_size) {
-+            *data = 0;
-+            qemu_irq_raise(s->adb_data_ready);
-+            return 1;
-+        }
-+
-+        if (s->adb_data_in_index & 1) {
-+            return 0;
-+        }
-+
-+        break;
-+
-+    case ADB_STATE_IDLE:
-+        if (s->adb_data_out_index == 0) {
-+            return 0;
-+        }
-+
-+        s->adb_data_in_size = adb_request(&s->adb_bus, s->adb_data_in,
-+                                          s->adb_data_out,
-+                                          s->adb_data_out_index);
-+        s->adb_data_out_index = 0;
-+        s->adb_data_in_index = 0;
-+        if (s->adb_data_in_size < 0) {
-+            *data = 0xff;
-+            qemu_irq_raise(s->adb_data_ready);
-+            return -1;
-+        }
-+
-+        if (s->adb_data_in_size == 0) {
-+            return 0;
-+        }
-+
-+        break;
-+    }
-+
-+    assert(s->adb_data_in_index < sizeof(s->adb_data_in) - 1);
-+
-+    *data = s->adb_data_in[s->adb_data_in_index++];
-+    qemu_irq_raise(s->adb_data_ready);
-+    if (*data == 0xff || *data == 0) {
-+        return 0;
-+    }
-+    return 1;
-+}
-+
-+static void via1_adb_update(MacVIAState *m)
-+{
-+    MOS6522Q800VIA1State *v1s = MOS6522_Q800_VIA1(&m->mos6522_via1);
-+    MOS6522State *s = MOS6522(v1s);
-+    int state;
-+    int ret;
-+
-+    state = (s->b & VIA1B_vADB_StateMask) >> VIA1B_vADB_StateShift;
-+
-+    if (s->acr & VIA1ACR_vShiftOut) {
-+        /* output mode */
-+        ret = adb_via_send(m, state, s->sr);
-+        if (ret > 0) {
-+            s->b &= ~VIA1B_vADBInt;
-+        } else {
-+            s->b |= VIA1B_vADBInt;
-+        }
-+    } else {
-+        /* input mode */
-+        ret = adb_via_receive(m, state, &s->sr);
-+        if (ret > 0 && s->sr != 0xff) {
-+            s->b &= ~VIA1B_vADBInt;
-+        } else {
-+            s->b |= VIA1B_vADBInt;
-+        }
-+    }
-+}
-+
-+static void via_adb_poll(void *opaque)
-+{
-+    MacVIAState *m = opaque;
-+    MOS6522Q800VIA1State *v1s = MOS6522_Q800_VIA1(&m->mos6522_via1);
-+    MOS6522State *s = MOS6522(v1s);
-+    int state;
-+
-+    if (s->b & VIA1B_vADBInt) {
-+        state = (s->b & VIA1B_vADB_StateMask) >> VIA1B_vADB_StateShift;
-+        if (adb_via_poll(m, state, &s->sr)) {
-+            s->b &= ~VIA1B_vADBInt;
-+        }
-+    }
-+
-+    timer_mod(m->adb_poll_timer,
-+              qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) +
-+              (NANOSECONDS_PER_SECOND / VIA_ADB_POLL_FREQ));
-+}
-+
- static uint64_t mos6522_q800_via1_read(void *opaque, hwaddr addr, unsigned size)
+ static void macfb_sysbus_reset(DeviceState *d)
  {
-     MOS6522Q800VIA1State *s = MOS6522_Q800_VIA1(opaque);
-@@ -484,6 +665,10 @@ static void mac_via_reset(DeviceState *dev)
+     MacfbSysBusState *s = MACFB(d);
+     macfb_reset(&s->macfb);
+ }
+ 
++static void macfb_nubus_reset(DeviceState *d)
++{
++    MacfbNubusState *s = NUBUS_MACFB(d);
++    macfb_reset(&s->macfb);
++}
++
+ static Property macfb_sysbus_properties[] = {
+     DEFINE_PROP_UINT32("width", MacfbSysBusState, macfb.width, 640),
+     DEFINE_PROP_UINT32("height", MacfbSysBusState, macfb.height, 480),
+@@ -393,6 +420,13 @@ static Property macfb_sysbus_properties[] = {
+     DEFINE_PROP_END_OF_LIST(),
+ };
+ 
++static Property macfb_nubus_properties[] = {
++    DEFINE_PROP_UINT32("width", MacfbNubusState, macfb.width, 640),
++    DEFINE_PROP_UINT32("height", MacfbNubusState, macfb.height, 480),
++    DEFINE_PROP_UINT8("depth", MacfbNubusState, macfb.depth, 8),
++    DEFINE_PROP_END_OF_LIST(),
++};
++
+ static void macfb_sysbus_class_init(ObjectClass *klass, void *data)
  {
-     MacVIAState *m = MAC_VIA(dev);
- 
-+    timer_mod(m->adb_poll_timer,
-+              qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) +
-+              (NANOSECONDS_PER_SECOND / VIA_ADB_POLL_FREQ));
-+
-     timer_mod(m->VBL_timer, (qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) + 16630)
-               / 16630 * 16630);
- 
-@@ -522,6 +707,10 @@ static void mac_via_realize(DeviceState *dev, Error **errp)
- 
-     qemu_get_timedate(&tm, 0);
-     m->tick_offset = (uint32_t)mktimegm(&tm) + RTC_OFFSET;
-+
-+    m->adb_poll_timer = timer_new_ns(QEMU_CLOCK_VIRTUAL, via_adb_poll, m);
-+    m->adb_data_ready = qdev_get_gpio_in_named(dev, "via1-irq",
-+                                               VIA1_IRQ_ADB_READY_BIT);
+     DeviceClass *dc = DEVICE_CLASS(klass);
+@@ -404,6 +438,19 @@ static void macfb_sysbus_class_init(ObjectClass *klass, void *data)
+     dc->props = macfb_sysbus_properties;
  }
  
- static void mac_via_init(Object *obj)
-@@ -570,6 +759,7 @@ static void mos6522_q800_via1_portB_write(MOS6522State *s)
-     MacVIAState *m = container_of(v1s, MacVIAState, mos6522_via1);
++static void macfb_nubus_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(klass);
++    MacfbNubusDeviceClass *ndc = MACFB_NUBUS_DEVICE_CLASS(klass);
++
++    device_class_set_parent_realize(dc, macfb_nubus_realize,
++                                    &ndc->parent_realize);
++    dc->desc = "Nubus Macintosh framebuffer";
++    dc->reset = macfb_nubus_reset;
++    dc->vmsd = &vmstate_macfb;
++    dc->props = macfb_nubus_properties;
++}
++
+ static TypeInfo macfb_sysbus_info = {
+     .name          = TYPE_MACFB,
+     .parent        = TYPE_SYS_BUS_DEVICE,
+@@ -411,9 +458,18 @@ static TypeInfo macfb_sysbus_info = {
+     .class_init    = macfb_sysbus_class_init,
+ };
  
-     via1_rtc_update(m);
-+    via1_adb_update(m);
- 
-     v1s->last_b = s->b;
++static TypeInfo macfb_nubus_info = {
++    .name          = TYPE_NUBUS_MACFB,
++    .parent        = TYPE_NUBUS_DEVICE,
++    .instance_size = sizeof(MacfbNubusState),
++    .class_init    = macfb_nubus_class_init,
++    .class_size    = sizeof(MacfbNubusDeviceClass),
++};
++
+ static void macfb_register_types(void)
+ {
+     type_register_static(&macfb_sysbus_info);
++    type_register_static(&macfb_nubus_info);
  }
-diff --git a/include/hw/misc/mac_via.h b/include/hw/misc/mac_via.h
-index 69bdecabb0..2181140293 100644
---- a/include/hw/misc/mac_via.h
-+++ b/include/hw/misc/mac_via.h
-@@ -97,6 +97,13 @@ typedef struct MacVIAState {
  
-     /* ADB */
-     ADBBusState adb_bus;
-+    QEMUTimer *adb_poll_timer;
-+    qemu_irq adb_data_ready;
-+    int adb_data_in_size;
-+    int adb_data_in_index;
-+    int adb_data_out_index;
-+    uint8_t adb_data_in[128];
-+    uint8_t adb_data_out[16];
+ type_init(macfb_register_types)
+diff --git a/include/hw/display/macfb.h b/include/hw/display/macfb.h
+index 3fe2592735..26367ae2c4 100644
+--- a/include/hw/display/macfb.h
++++ b/include/hw/display/macfb.h
+@@ -40,4 +40,25 @@ typedef struct {
+     MacfbState macfb;
+ } MacfbSysBusState;
  
-     /* external timers */
-     QEMUTimer *one_second_timer;
++#define MACFB_NUBUS_DEVICE_CLASS(class) \
++    OBJECT_CLASS_CHECK(MacfbNubusDeviceClass, (class), TYPE_NUBUS_MACFB)
++#define MACFB_NUBUS_GET_CLASS(obj) \
++    OBJECT_GET_CLASS(MacfbNubusDeviceClass, (obj), TYPE_NUBUS_MACFB)
++
++typedef struct MacfbNubusDeviceClass {
++    DeviceClass parent_class;
++
++    DeviceRealize parent_realize;
++} MacfbNubusDeviceClass;
++
++#define TYPE_NUBUS_MACFB "nubus-macfb"
++#define NUBUS_MACFB(obj) \
++    OBJECT_CHECK(MacfbNubusState, (obj), TYPE_NUBUS_MACFB)
++
++typedef struct {
++    NubusDevice busdev;
++
++    MacfbState macfb;
++} MacfbNubusState;
++
+ #endif
 -- 
 2.20.1
 
