@@ -6,64 +6,66 @@ X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D7E4C07542
-	for <qemu-devel@archiver.kernel.org>; Sat, 25 May 2019 23:08:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 15E5BC282CE
+	for <qemu-devel@archiver.kernel.org>; Sat, 25 May 2019 23:09:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1887D21707
-	for <qemu-devel@archiver.kernel.org>; Sat, 25 May 2019 23:08:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1887D21707
+	by mail.kernel.org (Postfix) with ESMTPS id C039E2075E
+	for <qemu-devel@archiver.kernel.org>; Sat, 25 May 2019 23:09:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C039E2075E
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:47385 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:47387 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hUfmc-0007ad-3i
-	for qemu-devel@archiver.kernel.org; Sat, 25 May 2019 19:08:58 -0400
+	id 1hUfmd-0007dE-Ta
+	for qemu-devel@archiver.kernel.org; Sat, 25 May 2019 19:08:59 -0400
 Received: from eggs.gnu.org ([209.51.188.92]:34106)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hUfkl-0006Ih-Tp
-	for qemu-devel@nongnu.org; Sat, 25 May 2019 19:07:06 -0400
+	(envelope-from <laurent@vivier.eu>) id 1hUfku-0006Ih-0G
+	for qemu-devel@nongnu.org; Sat, 25 May 2019 19:07:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hUfVM-0002pd-JL
+	(envelope-from <laurent@vivier.eu>) id 1hUfVM-0002py-M6
 	for qemu-devel@nongnu.org; Sat, 25 May 2019 18:51:11 -0400
-Received: from mout.kundenserver.de ([212.227.17.10]:47359)
+Received: from mout.kundenserver.de ([217.72.192.74]:55463)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <laurent@vivier.eu>)
-	id 1hUfVD-0002TG-H8; Sat, 25 May 2019 18:51:00 -0400
+	id 1hUfVD-0002Wn-L2; Sat, 25 May 2019 18:51:00 -0400
 Received: from localhost.localdomain ([78.238.229.36]) by
 	mrelayeu.kundenserver.de (mreue106 [212.227.15.183]) with ESMTPSA
 	(Nemesis)
-	id 1MZCOl-1h8NXW0JPN-00V58Q; Sun, 26 May 2019 00:50:35 +0200
+	id 1MeC5x-1gwhag2uFL-00bOdc; Sun, 26 May 2019 00:50:34 +0200
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Date: Sun, 26 May 2019 00:50:13 +0200
-Message-Id: <20190525225013.13916-11-laurent@vivier.eu>
+Date: Sun, 26 May 2019 00:50:12 +0200
+Message-Id: <20190525225013.13916-10-laurent@vivier.eu>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190525225013.13916-1-laurent@vivier.eu>
 References: <20190525225013.13916-1-laurent@vivier.eu>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:7P52Cqh2cyPuXMUzf4QqyvKjPKSRtUcVpGjzQtX4Ebej00u8npr
-	2Xy2dPm50Izxe72lJhPxs1xrRjxkMjgaLgGxrlaPkZIrjBA85MPL5U2Em6G7dkFnUXFoQ7k
-	w8TDvzVaPZxF/ZPad7ePQd2HsZe8JENdefsvXDpi0PYukezYybUOXIb1yLDYUzStOnNArgX
-	osBlOIGMxz2fRNzb8+ZWw==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:5LEpZWDbQ2U=:kR79BGu21CGIHotmRAndzY
-	5ljXwno40mCHBVcH7wExLOIJZVqd2vkTINQ5ts3EQ0mCBF25lZktHT6qK4PN8Qh2g/PU4jgJx
-	YwOmNmbnVK/zGq0dqZvyUjZ/zuTDKV+Xcy3Zdm0/9QpMVgqU1C8MPQxCEGyOSOVzIpc99DIEy
-	ieThJS/x02FFXQpbfwLyGsV8Wj6tAfYxqz5P98t8UNfIFCsxTnxCu06pXPAoy7tLzIHb+tDzi
-	LJXxy+f8gsiHAItT+6dQjVmeouIpdTsSYnaT/uIE9gjQbYJvjxVnSmY6qXYVzXPYA6Bj3PPiD
-	wxNt4mC8af6RwB6oZLLbMbksDG5KxwoPtH/p5FDjvMxGHdQYZE5wp1s62FJ+fDXFSwGzm0NDt
-	8UKU8eD1UuXTggTn38g9150QQEqwT/NUu8VdgYRdpXR5uPVVX384YUCgHfr7PHfGCQxtN4dbI
-	jqQmKURmbseGkuikywsXnve3Fluuz6o05m9ScDSk37ohTpTWrRM+sitjhGi41WW6zB19M8ytf
-	znGQG3k9QhvWVFkHLGU4tnVKfSgEesQhadZZo5OuzkL/+EUHqcBYY7e/DPslma+WEYu5EfC6L
-	vd3yCylEt20dVBIO4xl59+bpXDtLIxnWS0lCM6c42HsHv3m1pJ3mqVUzy3RFtfxBi1pK56eed
-	jTwnkasyy1cJvUutee2o9GNIDZ4WAH6ETpN1FcBW+Jj1g7rub4qgm5LkPW0n1ymnAbXTYLPXo
-	YkGPrhMQ9CufznJiwHdyG/cTIwKJJZ8/XwdWyg==
+X-Provags-ID: V03:K1:tLlZfNsd0ZxDYs7xsWvCEoIOX9IiJ1kEZl15ESO+WCtFdHn+UGN
+	vTpg4qFX26qp0zpMKpPtXStpmWBBhyOaXZvWsNg3Csp8sfZGy4QsUEWNO9HQ4GbxD44h41n
+	iP2jmNnM+Qgi/UudUKdeDzPNIhf7GtmF6P6bdQa1Lsxx8JSxzHa+inL1eMm8EHRd1HFgLEt
+	5HMOEI9iYOXvMEVVPYezg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:Vfu/v7p967I=:kbtg3x0GzNeQy+t61XmS8K
+	0xv+T6CNM7YG0nTmtX7v8b6B22Nmk7TIW8Pg07qWhYIyvNbM4sLGYQOQHV0JmS5f+7kUJg84Z
+	IeobZcG9s/HZiPEAeHY73c+EmRBogjbB+Tptdsv4I0C6GR/ou5R6Q9+kMTaEsmrif3aDH72E9
+	Uow8k5EV9IU9W9mvO4g63HTx6zRJJ6y8YWkJKRd2agEEmB4XrwvcQvBtN08cPxDQrBWf6McjW
+	mXJQN7MPuO5mZg6gzfcIv3fJW9vYcKxOXj9QW5bIoXHnBmyfFU+rTFPUHVP+PqMTdGqb/6w0w
+	5zoutCi7Un/4mqRXsG+Iri1J3xoEbXC6wMwvuZG2zflW2MOq6xC07t3zB35z0vRfc0ja+NPBu
+	OR3CuwEYCh+ip9U3Ktig688hbJxXXCQqw/T+RwW0VRobFyVAZJMrdWbfdKrl2z7Eh9+x0sI95
+	029pIbn+zc2wlrRaunvxlzOJHs8y0L5MzBhrI4gmJamCQhxuIqh1nvWwwUoi/HyoaBvQSCfJA
+	+fwTsmzTpS6P1jPYeJRsOBn23NY6VTVnHJr9PVxzWZV8mr67OoA8inEUBDo9et4LEEn6DyS2j
+	qc7UmLRtndPKYqrj5ApkRH0cC216hAGOEhTFgZElSUNMEwkPf6B7HHGI9dzfP/fbOENU8AKce
+	SquOW87Q8gN5EuccmoYpAigkncgGyd2GWHP6kQTbT9nTP3UFNqc7jUJ/3rAlOhC/MZ6dn05Jt
+	CM8dK7FsJ/g4nwMq5ITZGSFJvUho7bLKy5XDvLwFKrhXnxH8nqKr49wrmBo=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.17.10
-Subject: [Qemu-devel] [PATCH v7 10/10] hw/m68k: define Macintosh Quadra 800
+X-Received-From: 217.72.192.74
+Subject: [Qemu-devel] [PATCH v7 09/10] hw/m68k: add a dummy SWIM floppy
+ controller
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -89,583 +91,545 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-If you want to test the machine, it doesn't yet boot a MacROM, but you can
-boot a linux kernel from the command line.
-
-You can install your own disk using debian-installer with:
-
-    ./qemu-system-m68k \
-    -M q800 \
-    -serial none -serial mon:stdio \
-    -m 1000M -drive file=m68k.qcow2,format=qcow2 \
-    -net nic,model=dp83932,addr=09:00:07:12:34:57 \
-    -append "console=ttyS0 vga=off" \
-    -kernel vmlinux-4.15.0-2-m68k \
-    -initrd initrd.gz \
-    -drive file=debian-9.0-m68k-NETINST-1.iso \
-    -drive file=m68k.qcow2,format=qcow2 \
-    -nographic
-
-If you use a graphic adapter instead of "-nographic", you can use "-g" to set the
-size of the display (I use "-g 1600x800x24").
-
 Co-developed-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+Reviewed-by: Hervé Poussineau <hpoussin@reactos.org>
 ---
- MAINTAINERS                      |  14 ++
- default-configs/m68k-softmmu.mak |   1 +
- hw/m68k/Kconfig                  |  12 +
- hw/m68k/Makefile.objs            |   1 +
- hw/m68k/bootinfo.h               | 100 +++++++++
- hw/m68k/q800.c                   | 369 +++++++++++++++++++++++++++++++
- 6 files changed, 497 insertions(+)
- create mode 100644 hw/m68k/bootinfo.h
- create mode 100644 hw/m68k/q800.c
+ hw/block/Kconfig        |   3 +
+ hw/block/Makefile.objs  |   1 +
+ hw/block/swim.c         | 415 ++++++++++++++++++++++++++++++++++++++++
+ include/hw/block/swim.h |  76 ++++++++
+ 4 files changed, 495 insertions(+)
+ create mode 100644 hw/block/swim.c
+ create mode 100644 include/hw/block/swim.h
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 3cacd751bf..274dfd6e19 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -906,6 +906,20 @@ F: hw/char/mcf_uart.c
- F: hw/net/mcf_fec.c
- F: include/hw/m68k/mcf*.h
- 
-+q800
-+M: Laurent Vivier <laurent@vivier.eu>
-+S: Maintained
-+F: hw/block/swim.c
-+F: hw/m68k/bootinfo.h
-+F: hw/display/macfb.c
-+F: hw/m68k/q800.c
-+F: hw/misc/mac_via.c
-+F: hw/nubus/*
-+F: include/hw/block/swim.h
-+F: include/hw/display/macfb.h
-+F: include/hw/misc/mac_via.h
-+F: include/hw/nubus/*
+diff --git a/hw/block/Kconfig b/hw/block/Kconfig
+index df96dc5dcc..2d17f481ad 100644
+--- a/hw/block/Kconfig
++++ b/hw/block/Kconfig
+@@ -37,3 +37,6 @@ config VHOST_USER_BLK
+     # Only PCI devices are provided for now
+     default y if VIRTIO_PCI
+     depends on VIRTIO && VHOST_USER && LINUX
 +
- MicroBlaze Machines
- -------------------
- petalogix_s3adsp1800
-diff --git a/default-configs/m68k-softmmu.mak b/default-configs/m68k-softmmu.mak
-index e17495e2a0..7e3649c1b8 100644
---- a/default-configs/m68k-softmmu.mak
-+++ b/default-configs/m68k-softmmu.mak
-@@ -4,3 +4,4 @@
- #
- CONFIG_AN5206=y
- CONFIG_MCF5208=y
-+CONFIG_Q800=y
-diff --git a/hw/m68k/Kconfig b/hw/m68k/Kconfig
-index 49ef0b3f6d..ffa8e48fd8 100644
---- a/hw/m68k/Kconfig
-+++ b/hw/m68k/Kconfig
-@@ -7,3 +7,15 @@ config MCF5208
-     bool
-     select COLDFIRE
-     select PTIMER
-+
-+config Q800
++config SWIM
 +    bool
-+    select FRAMEBUFFER
-+    select ADB
-+    select MAC_VIA
-+    select ESCC
-+    select ESP
-+    select MACFB
-+    select NUBUS
-+    select DP8393X
-+    select SWIM
-diff --git a/hw/m68k/Makefile.objs b/hw/m68k/Makefile.objs
-index 482f8477b4..cfd13fae53 100644
---- a/hw/m68k/Makefile.objs
-+++ b/hw/m68k/Makefile.objs
-@@ -1,2 +1,3 @@
- obj-$(CONFIG_AN5206) += an5206.o mcf5206.o
- obj-$(CONFIG_MCF5208) += mcf5208.o mcf_intc.o
-+obj-$(CONFIG_Q800) += q800.o
-diff --git a/hw/m68k/bootinfo.h b/hw/m68k/bootinfo.h
+diff --git a/hw/block/Makefile.objs b/hw/block/Makefile.objs
+index f5f643f0cc..28c2495a00 100644
+--- a/hw/block/Makefile.objs
++++ b/hw/block/Makefile.objs
+@@ -8,6 +8,7 @@ common-obj-$(CONFIG_XEN) += xen-block.o
+ common-obj-$(CONFIG_ECC) += ecc.o
+ common-obj-$(CONFIG_ONENAND) += onenand.o
+ common-obj-$(CONFIG_NVME_PCI) += nvme.o
++common-obj-$(CONFIG_SWIM) += swim.o
+ 
+ obj-$(CONFIG_SH4) += tc58128.o
+ 
+diff --git a/hw/block/swim.c b/hw/block/swim.c
 new file mode 100644
-index 0000000000..6584775f6d
+index 0000000000..48ce6c7235
 --- /dev/null
-+++ b/hw/m68k/bootinfo.h
-@@ -0,0 +1,100 @@
-+struct bi_record {
-+    uint16_t tag;        /* tag ID */
-+    uint16_t size;       /* size of record */
-+    uint32_t data[0];    /* data */
-+};
-+
-+/* machine independent tags */
-+
-+#define BI_LAST         0x0000 /* last record */
-+#define BI_MACHTYPE     0x0001 /* machine type (u_long) */
-+#define BI_CPUTYPE      0x0002 /* cpu type (u_long) */
-+#define BI_FPUTYPE      0x0003 /* fpu type (u_long) */
-+#define BI_MMUTYPE      0x0004 /* mmu type (u_long) */
-+#define BI_MEMCHUNK     0x0005 /* memory chunk address and size */
-+                               /* (struct mem_info) */
-+#define BI_RAMDISK      0x0006 /* ramdisk address and size */
-+                               /* (struct mem_info) */
-+#define BI_COMMAND_LINE 0x0007 /* kernel command line parameters */
-+                               /* (string) */
-+
-+/*  Macintosh-specific tags (all u_long) */
-+
-+#define BI_MAC_MODEL    0x8000  /* Mac Gestalt ID (model type) */
-+#define BI_MAC_VADDR    0x8001  /* Mac video base address */
-+#define BI_MAC_VDEPTH   0x8002  /* Mac video depth */
-+#define BI_MAC_VROW     0x8003  /* Mac video rowbytes */
-+#define BI_MAC_VDIM     0x8004  /* Mac video dimensions */
-+#define BI_MAC_VLOGICAL 0x8005  /* Mac video logical base */
-+#define BI_MAC_SCCBASE  0x8006  /* Mac SCC base address */
-+#define BI_MAC_BTIME    0x8007  /* Mac boot time */
-+#define BI_MAC_GMTBIAS  0x8008  /* Mac GMT timezone offset */
-+#define BI_MAC_MEMSIZE  0x8009  /* Mac RAM size (sanity check) */
-+#define BI_MAC_CPUID    0x800a  /* Mac CPU type (sanity check) */
-+#define BI_MAC_ROMBASE  0x800b  /* Mac system ROM base address */
-+
-+/*  Macintosh hardware profile data */
-+
-+#define BI_MAC_VIA1BASE 0x8010  /* Mac VIA1 base address (always present) */
-+#define BI_MAC_VIA2BASE 0x8011  /* Mac VIA2 base address (type varies) */
-+#define BI_MAC_VIA2TYPE 0x8012  /* Mac VIA2 type (VIA, RBV, OSS) */
-+#define BI_MAC_ADBTYPE  0x8013  /* Mac ADB interface type */
-+#define BI_MAC_ASCBASE  0x8014  /* Mac Apple Sound Chip base address */
-+#define BI_MAC_SCSI5380 0x8015  /* Mac NCR 5380 SCSI (base address, multi) */
-+#define BI_MAC_SCSIDMA  0x8016  /* Mac SCSI DMA (base address) */
-+#define BI_MAC_SCSI5396 0x8017  /* Mac NCR 53C96 SCSI (base address, multi) */
-+#define BI_MAC_IDETYPE  0x8018  /* Mac IDE interface type */
-+#define BI_MAC_IDEBASE  0x8019  /* Mac IDE interface base address */
-+#define BI_MAC_NUBUS    0x801a  /* Mac Nubus type (none, regular, pseudo) */
-+#define BI_MAC_SLOTMASK 0x801b  /* Mac Nubus slots present */
-+#define BI_MAC_SCCTYPE  0x801c  /* Mac SCC serial type (normal, IOP) */
-+#define BI_MAC_ETHTYPE  0x801d  /* Mac builtin ethernet type (Sonic, MACE */
-+#define BI_MAC_ETHBASE  0x801e  /* Mac builtin ethernet base address */
-+#define BI_MAC_PMU      0x801f  /* Mac power management / poweroff hardware */
-+#define BI_MAC_IOP_SWIM 0x8020  /* Mac SWIM floppy IOP */
-+#define BI_MAC_IOP_ADB  0x8021  /* Mac ADB IOP */
-+
-+#define BOOTINFO0(as, base, id) \
-+    do { \
-+        stw_phys(as, base, id); \
-+        base += 2; \
-+        stw_phys(as, base, sizeof(struct bi_record)); \
-+        base += 2; \
-+    } while (0)
-+
-+#define BOOTINFO1(as, base, id, value) \
-+    do { \
-+        stw_phys(as, base, id); \
-+        base += 2; \
-+        stw_phys(as, base, sizeof(struct bi_record) + 4); \
-+        base += 2; \
-+        stl_phys(as, base, value); \
-+        base += 4; \
-+    } while (0)
-+
-+#define BOOTINFO2(as, base, id, value1, value2) \
-+    do { \
-+        stw_phys(as, base, id); \
-+        base += 2; \
-+        stw_phys(as, base, sizeof(struct bi_record) + 8); \
-+        base += 2; \
-+        stl_phys(as, base, value1); \
-+        base += 4; \
-+        stl_phys(as, base, value2); \
-+        base += 4; \
-+    } while (0)
-+
-+#define BOOTINFOSTR(as, base, id, string) \
-+    do { \
-+        int i; \
-+        stw_phys(as, base, id); \
-+        base += 2; \
-+        stw_phys(as, base, \
-+                 (sizeof(struct bi_record) + strlen(string) + 2) & ~1); \
-+        base += 2; \
-+        for (i = 0; string[i]; i++) { \
-+            stb_phys(as, base++, string[i]); \
-+        } \
-+        stb_phys(as, base++, 0); \
-+        base = (parameters_base + 1) & ~1; \
-+    } while (0)
-diff --git a/hw/m68k/q800.c b/hw/m68k/q800.c
-new file mode 100644
-index 0000000000..66f4fc827d
---- /dev/null
-+++ b/hw/m68k/q800.c
-@@ -0,0 +1,369 @@
++++ b/hw/block/swim.c
+@@ -0,0 +1,415 @@
 +/*
-+ * QEMU Motorla 680x0 Macintosh hardware System Emulator
++ * QEMU Macintosh floppy disk controller emulator (SWIM)
 + *
-+ * Permission is hereby granted, free of charge, to any person obtaining a copy
-+ * of this software and associated documentation files (the "Software"), to deal
-+ * in the Software without restriction, including without limitation the rights
-+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-+ * copies of the Software, and to permit persons to whom the Software is
-+ * furnished to do so, subject to the following conditions:
++ * Copyright (c) 2014-2018 Laurent Vivier <laurent@vivier.eu>
 + *
-+ * The above copyright notice and this permission notice shall be included in
-+ * all copies or substantial portions of the Software.
++ * This work is licensed under the terms of the GNU GPL, version 2.  See
++ * the COPYING file in the top-level directory.
 + *
-+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-+ * THE SOFTWARE.
 + */
 +
 +#include "qemu/osdep.h"
-+#include "sysemu/sysemu.h"
-+#include "cpu.h"
-+#include "hw/hw.h"
-+#include "hw/boards.h"
-+#include "elf.h"
-+#include "hw/loader.h"
-+#include "ui/console.h"
-+#include "exec/address-spaces.h"
-+#include "hw/char/escc.h"
-+#include "hw/sysbus.h"
-+#include "hw/scsi/esp.h"
-+#include "bootinfo.h"
-+#include "hw/misc/mac_via.h"
-+#include "hw/input/adb.h"
-+#include "hw/nubus/mac-nubus-bridge.h"
-+#include "hw/display/macfb.h"
-+#include "hw/block/swim.h"
-+#include "net/net.h"
 +#include "qapi/error.h"
-+#include "sysemu/qtest.h"
++#include "sysemu/block-backend.h"
++#include "hw/sysbus.h"
++#include "hw/block/block.h"
++#include "hw/block/swim.h"
 +
-+#define MACROM_ADDR     0x40000000
-+#define MACROM_SIZE     0x00100000
++/* IWM registers */
 +
-+#define MACROM_FILENAME "MacROM.bin"
++#define IWM_PH0L                0
++#define IWM_PH0H                1
++#define IWM_PH1L                2
++#define IWM_PH1H                3
++#define IWM_PH2L                4
++#define IWM_PH2H                5
++#define IWM_PH3L                6
++#define IWM_PH3H                7
++#define IWM_MTROFF              8
++#define IWM_MTRON               9
++#define IWM_INTDRIVE            10
++#define IWM_EXTDRIVE            11
++#define IWM_Q6L                 12
++#define IWM_Q6H                 13
++#define IWM_Q7L                 14
++#define IWM_Q7H                 15
 +
-+#define Q800_MACHINE_ID 35
-+#define Q800_CPU_ID (1 << 2)
-+#define Q800_FPU_ID (1 << 2)
-+#define Q800_MMU_ID (1 << 2)
++/* SWIM registers */
 +
-+#define MACH_MAC        3
-+#define Q800_MAC_CPU_ID 2
++#define SWIM_WRITE_DATA         0
++#define SWIM_WRITE_MARK         1
++#define SWIM_WRITE_CRC          2
++#define SWIM_WRITE_PARAMETER    3
++#define SWIM_WRITE_PHASE        4
++#define SWIM_WRITE_SETUP        5
++#define SWIM_WRITE_MODE0        6
++#define SWIM_WRITE_MODE1        7
 +
-+#define VIA_BASE              0x50f00000
-+#define SONIC_PROM_BASE       0x50f08000
-+#define SONIC_BASE            0x50f0a000
-+#define SCC_BASE              0x50f0c020
-+#define ESP_BASE              0x50f10000
-+#define ESP_PDMA              0x50f10100
-+#define ASC_BASE              0x50F14000
-+#define SWIM_BASE             0x50F1E000
-+#define NUBUS_SUPER_SLOT_BASE 0x60000000
-+#define NUBUS_SLOT_BASE       0xf0000000
++#define SWIM_READ_DATA          8
++#define SWIM_READ_MARK          9
++#define SWIM_READ_ERROR         10
++#define SWIM_READ_PARAMETER     11
++#define SWIM_READ_PHASE         12
++#define SWIM_READ_SETUP         13
++#define SWIM_READ_STATUS        14
++#define SWIM_READ_HANDSHAKE     15
 +
-+/* the video base, whereas it a Nubus address,
-+ * is needed by the kernel to have early display and
-+ * thus provided by the bootloader
-+ */
-+#define VIDEO_BASE            0xf9001000
++#define REG_SHIFT               9
 +
-+#define MAC_CLOCK  3686418
++#define SWIM_MODE_IWM  0
++#define SWIM_MODE_SWIM 1
 +
-+typedef struct {
-+    M68kCPU *cpu;
-+    uint8_t ipr;
-+} Q800IRQState;
++/* bits in phase register */
 +
-+static void q800_set_irq(void *opaque, int irq, int level)
++#define SWIM_SEEK_NEGATIVE   0x074
++#define SWIM_STEP            0x071
++#define SWIM_MOTOR_ON        0x072
++#define SWIM_MOTOR_OFF       0x076
++#define SWIM_INDEX           0x073
++#define SWIM_EJECT           0x077
++#define SWIM_SETMFM          0x171
++#define SWIM_SETGCR          0x175
++#define SWIM_RELAX           0x033
++#define SWIM_LSTRB           0x008
++#define SWIM_CA_MASK         0x077
++
++/* Select values for swim_select and swim_readbit */
++
++#define SWIM_READ_DATA_0     0x074
++#define SWIM_TWOMEG_DRIVE    0x075
++#define SWIM_SINGLE_SIDED    0x076
++#define SWIM_DRIVE_PRESENT   0x077
++#define SWIM_DISK_IN         0x170
++#define SWIM_WRITE_PROT      0x171
++#define SWIM_TRACK_ZERO      0x172
++#define SWIM_TACHO           0x173
++#define SWIM_READ_DATA_1     0x174
++#define SWIM_MFM_MODE        0x175
++#define SWIM_SEEK_COMPLETE   0x176
++#define SWIM_ONEMEG_MEDIA    0x177
++
++/* Bits in handshake register */
++
++#define SWIM_MARK_BYTE       0x01
++#define SWIM_CRC_ZERO        0x02
++#define SWIM_RDDATA          0x04
++#define SWIM_SENSE           0x08
++#define SWIM_MOTEN           0x10
++#define SWIM_ERROR           0x20
++#define SWIM_DAT2BYTE        0x40
++#define SWIM_DAT1BYTE        0x80
++
++/* bits in setup register */
++
++#define SWIM_S_INV_WDATA     0x01
++#define SWIM_S_3_5_SELECT    0x02
++#define SWIM_S_GCR           0x04
++#define SWIM_S_FCLK_DIV2     0x08
++#define SWIM_S_ERROR_CORR    0x10
++#define SWIM_S_IBM_DRIVE     0x20
++#define SWIM_S_GCR_WRITE     0x40
++#define SWIM_S_TIMEOUT       0x80
++
++/* bits in mode register */
++
++#define SWIM_CLFIFO          0x01
++#define SWIM_ENBL1           0x02
++#define SWIM_ENBL2           0x04
++#define SWIM_ACTION          0x08
++#define SWIM_WRITE_MODE      0x10
++#define SWIM_HEDSEL          0x20
++#define SWIM_MOTON           0x80
++
++static void swim_change_cb(void *opaque, bool load, Error **errp)
 +{
-+    Q800IRQState *s = opaque;
-+    int i;
++    FDrive *drive = opaque;
 +
-+    if (level) {
-+        s->ipr |= 1 << irq;
++    if (!load) {
++        blk_set_perm(drive->blk, 0, BLK_PERM_ALL, &error_abort);
 +    } else {
-+        s->ipr &= ~(1 << irq);
-+    }
-+
-+    for (i = 7; i >= 0; i--) {
-+        if ((s->ipr >> i) & 1) {
-+            m68k_set_irq_level(s->cpu, i + 1, i + 25);
++        if (!blkconf_apply_backend_options(drive->conf,
++                                           blk_is_read_only(drive->blk), false,
++                                           errp)) {
 +            return;
 +        }
 +    }
-+    m68k_set_irq_level(s->cpu, 0, 0);
 +}
 +
++static const BlockDevOps swim_block_ops = {
++    .change_media_cb = swim_change_cb,
++};
 +
-+static void main_cpu_reset(void *opaque)
++static Property swim_drive_properties[] = {
++    DEFINE_PROP_INT32("unit", SWIMDrive, unit, -1),
++    DEFINE_BLOCK_PROPERTIES(SWIMDrive, conf),
++    DEFINE_PROP_END_OF_LIST(),
++};
++
++static void swim_drive_realize(DeviceState *qdev, Error **errp)
 +{
-+    M68kCPU *cpu = opaque;
-+    CPUState *cs = CPU(cpu);
++    SWIMDrive *dev = SWIM_DRIVE(qdev);
++    SWIMBus *bus = SWIM_BUS(qdev->parent_bus);
++    FDrive *drive;
++    int ret;
 +
-+    cpu_reset(cs);
-+    cpu->env.aregs[7] = ldl_phys(cs->as, 0);
-+    cpu->env.pc = ldl_phys(cs->as, 4);
-+}
-+
-+static void q800_init(MachineState *machine)
-+{
-+    M68kCPU *cpu = NULL;
-+    int linux_boot;
-+    int32_t kernel_size;
-+    uint64_t elf_entry;
-+    char *filename;
-+    int bios_size;
-+    ram_addr_t initrd_base;
-+    int32_t initrd_size;
-+    MemoryRegion *rom;
-+    MemoryRegion *ram;
-+    ram_addr_t ram_size = machine->ram_size;
-+    const char *kernel_filename = machine->kernel_filename;
-+    const char *initrd_filename = machine->initrd_filename;
-+    const char *kernel_cmdline = machine->kernel_cmdline;
-+    hwaddr parameters_base;
-+    CPUState *cs;
-+    DeviceState *dev;
-+    DeviceState *via_dev;
-+    SysBusESPState *sysbus_esp;
-+    ESPState *esp;
-+    SysBusDevice *sysbus;
-+    BusState *adb_bus;
-+    NubusBus *nubus;
-+    Q800IRQState *irq;
-+    qemu_irq *pic;
-+
-+    linux_boot = (kernel_filename != NULL);
-+
-+    /* init CPUs */
-+    cpu = M68K_CPU(cpu_create(machine->cpu_type));
-+    qemu_register_reset(main_cpu_reset, cpu);
-+
-+    ram = g_malloc(sizeof(*ram));
-+    memory_region_init_ram(ram, NULL, "m68k_mac.ram", ram_size, &error_abort);
-+    memory_region_add_subregion(get_system_memory(), 0, ram);
-+
-+    /* IRQ Glue */
-+
-+    irq = g_new0(Q800IRQState, 1);
-+    irq->cpu = cpu;
-+    pic = qemu_allocate_irqs(q800_set_irq, irq, 8);
-+
-+    /* VIA */
-+
-+    via_dev = qdev_create(NULL, TYPE_MAC_VIA);
-+    qdev_init_nofail(via_dev);
-+    sysbus = SYS_BUS_DEVICE(via_dev);
-+    sysbus_mmio_map(sysbus, 0, VIA_BASE);
-+    qdev_connect_gpio_out_named(DEVICE(sysbus), "irq", 0, pic[0]);
-+    qdev_connect_gpio_out_named(DEVICE(sysbus), "irq", 1, pic[1]);
-+
-+
-+    adb_bus = qdev_get_child_bus(via_dev, "adb.0");
-+    dev = qdev_create(adb_bus, TYPE_ADB_KEYBOARD);
-+    qdev_init_nofail(dev);
-+    dev = qdev_create(adb_bus, TYPE_ADB_MOUSE);
-+    qdev_init_nofail(dev);
-+
-+    /* MACSONIC */
-+
-+    if (nb_nics > 1) {
-+        error_report("q800 can only have one ethernet interface");
-+        exit(1);
++    if (dev->unit == -1) {
++        for (dev->unit = 0; dev->unit < SWIM_MAX_FD; dev->unit++) {
++            drive = &bus->ctrl->drives[dev->unit];
++            if (!drive->blk) {
++                break;
++            }
++        }
 +    }
 +
-+    qemu_check_nic_model(&nd_table[0], "dp83932");
++    if (dev->unit >= SWIM_MAX_FD) {
++        error_setg(errp, "Can't create floppy unit %d, bus supports "
++                   "only %d units", dev->unit, SWIM_MAX_FD);
++        return;
++    }
 +
-+    /* MacSonic driver needs an Apple MAC address
-+     * Valid prefix are:
-+     * 00:05:02 Apple
-+     * 00:80:19 Dayna Communications, Inc.
-+     * 00:A0:40 Apple
-+     * 08:00:07 Apple
-+     * (Q800 use the last one)
-+     */
-+    nd_table[0].macaddr.a[0] = 0x08;
-+    nd_table[0].macaddr.a[1] = 0x00;
-+    nd_table[0].macaddr.a[2] = 0x07;
++    drive = &bus->ctrl->drives[dev->unit];
++    if (drive->blk) {
++        error_setg(errp, "Floppy unit %d is in use", dev->unit);
++        return;
++    }
 +
-+    dev = qdev_create(NULL, "dp8393x");
-+    qdev_set_nic_properties(dev, &nd_table[0]);
-+    qdev_prop_set_uint8(dev, "it_shift", 2);
-+    qdev_prop_set_bit(dev, "big_endian", true);
-+    qdev_prop_set_ptr(dev, "dma_mr", get_system_memory());
-+    qdev_init_nofail(dev);
-+    sysbus = SYS_BUS_DEVICE(dev);
-+    sysbus_mmio_map(sysbus, 0, SONIC_BASE);
-+    sysbus_mmio_map(sysbus, 1, SONIC_PROM_BASE);
-+    sysbus_connect_irq(sysbus, 0, pic[2]);
++    if (!dev->conf.blk) {
++        /* Anonymous BlockBackend for an empty drive */
++        dev->conf.blk = blk_new(0, BLK_PERM_ALL);
++        ret = blk_attach_dev(dev->conf.blk, qdev);
++        assert(ret == 0);
++    }
 +
-+    /* SCC */
++    blkconf_blocksizes(&dev->conf);
++    if (dev->conf.logical_block_size != 512 ||
++        dev->conf.physical_block_size != 512)
++    {
++        error_setg(errp, "Physical and logical block size must "
++                   "be 512 for floppy");
++        return;
++    }
 +
-+    dev = qdev_create(NULL, TYPE_ESCC);
-+    qdev_prop_set_uint32(dev, "disabled", 0);
-+    qdev_prop_set_uint32(dev, "frequency", MAC_CLOCK);
-+    qdev_prop_set_uint32(dev, "it_shift", 1);
-+    qdev_prop_set_bit(dev, "bit_swap", true);
-+    qdev_prop_set_chr(dev, "chrA", serial_hd(0));
-+    qdev_prop_set_chr(dev, "chrB", serial_hd(1));
-+    qdev_prop_set_uint32(dev, "chnBtype", 0);
-+    qdev_prop_set_uint32(dev, "chnAtype", 0);
-+    qdev_init_nofail(dev);
-+    sysbus = SYS_BUS_DEVICE(dev);
-+    sysbus_connect_irq(sysbus, 0, pic[3]);
-+    sysbus_connect_irq(sysbus, 1, pic[3]);
-+    sysbus_mmio_map(sysbus, 0, SCC_BASE);
++    /* rerror/werror aren't supported by fdc and therefore not even registered
++     * with qdev. So set the defaults manually before they are used in
++     * blkconf_apply_backend_options(). */
++    dev->conf.rerror = BLOCKDEV_ON_ERROR_AUTO;
++    dev->conf.werror = BLOCKDEV_ON_ERROR_AUTO;
 +
-+    /* SCSI */
++    if (!blkconf_apply_backend_options(&dev->conf,
++                                       blk_is_read_only(dev->conf.blk),
++                                       false, errp)) {
++        return;
++    }
 +
-+    dev = qdev_create(NULL, TYPE_ESP);
-+    sysbus_esp = ESP_STATE(dev);
-+    esp = &sysbus_esp->esp;
-+    esp->dma_memory_read = NULL;
-+    esp->dma_memory_write = NULL;
-+    esp->dma_opaque = NULL;
-+    sysbus_esp->it_shift = 4;
-+    esp->dma_enabled = 1;
-+    qdev_init_nofail(dev);
++    /* 'enospc' is the default for -drive, 'report' is what blk_new() gives us
++     * for empty drives. */
++    if (blk_get_on_error(dev->conf.blk, 0) != BLOCKDEV_ON_ERROR_ENOSPC &&
++        blk_get_on_error(dev->conf.blk, 0) != BLOCKDEV_ON_ERROR_REPORT) {
++        error_setg(errp, "fdc doesn't support drive option werror");
++        return;
++    }
++    if (blk_get_on_error(dev->conf.blk, 1) != BLOCKDEV_ON_ERROR_REPORT) {
++        error_setg(errp, "fdc doesn't support drive option rerror");
++        return;
++    }
 +
-+    sysbus = SYS_BUS_DEVICE(dev);
-+    sysbus_connect_irq(sysbus, 0, qdev_get_gpio_in_named(via_dev,
-+                                                         "via2-irq",
-+                                                         VIA2_IRQ_SCSI_BIT));
-+    sysbus_connect_irq(sysbus, 1,
-+                       qdev_get_gpio_in_named(via_dev, "via2-irq",
-+                                              VIA2_IRQ_SCSI_DATA_BIT));
-+    sysbus_mmio_map(sysbus, 0, ESP_BASE);
-+    sysbus_mmio_map(sysbus, 1, ESP_PDMA);
++    drive->conf = &dev->conf;
++    drive->blk = dev->conf.blk;
++    drive->swimctrl = bus->ctrl;
 +
-+    scsi_bus_legacy_handle_cmdline(&esp->bus);
++    blk_set_dev_ops(drive->blk, &swim_block_ops, drive);
++}
 +
-+    /* SWIM floppy controller */
++static void swim_drive_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *k = DEVICE_CLASS(klass);
++    k->realize = swim_drive_realize;
++    set_bit(DEVICE_CATEGORY_STORAGE, k->categories);
++    k->bus_type = TYPE_SWIM_BUS;
++    k->props = swim_drive_properties;
++    k->desc = "virtual SWIM drive";
++}
 +
-+    dev = qdev_create(NULL, TYPE_SWIM);
-+    qdev_init_nofail(dev);
-+    sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, SWIM_BASE);
++static const TypeInfo swim_drive_info = {
++    .name = TYPE_SWIM_DRIVE,
++    .parent = TYPE_DEVICE,
++    .instance_size = sizeof(SWIMDrive),
++    .class_init = swim_drive_class_init,
++};
 +
-+    /* NuBus */
++static const TypeInfo swim_bus_info = {
++    .name = TYPE_SWIM_BUS,
++    .parent = TYPE_BUS,
++    .instance_size = sizeof(SWIMBus),
++};
 +
-+    dev = qdev_create(NULL, TYPE_MAC_NUBUS_BRIDGE);
-+    qdev_init_nofail(dev);
-+    sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, NUBUS_SUPER_SLOT_BASE);
-+    sysbus_mmio_map(SYS_BUS_DEVICE(dev), 1, NUBUS_SLOT_BASE);
++static void iwmctrl_write(void *opaque, hwaddr reg, uint64_t value,
++                          unsigned size)
++{
++    SWIMCtrl *swimctrl = opaque;
 +
-+    nubus = MAC_NUBUS_BRIDGE(dev)->bus;
++    reg >>= REG_SHIFT;
 +
-+    /* framebuffer in nubus slot #9 */
++    swimctrl->regs[reg >> 1] = reg & 1;
 +
-+    dev = qdev_create(BUS(nubus), TYPE_NUBUS_MACFB);
-+    qdev_prop_set_uint32(dev, "width", graphic_width);
-+    qdev_prop_set_uint32(dev, "height", graphic_height);
-+    qdev_prop_set_uint8(dev, "depth", graphic_depth);
-+    qdev_init_nofail(dev);
-+
-+    cs = CPU(cpu);
-+    if (linux_boot) {
-+        uint64_t high;
-+        kernel_size = load_elf(kernel_filename, NULL, NULL, NULL,
-+                               &elf_entry, NULL, &high, 1,
-+                               EM_68K, 0, 0);
-+        if (kernel_size < 0) {
-+            error_report("could not load kernel '%s'", kernel_filename);
-+            exit(1);
-+        }
-+        stl_phys(cs->as, 4, elf_entry); /* reset initial PC */
-+        parameters_base = (high + 1) & ~1;
-+
-+        BOOTINFO1(cs->as, parameters_base, BI_MACHTYPE, MACH_MAC);
-+        BOOTINFO1(cs->as, parameters_base, BI_FPUTYPE, Q800_FPU_ID);
-+        BOOTINFO1(cs->as, parameters_base, BI_MMUTYPE, Q800_MMU_ID);
-+        BOOTINFO1(cs->as, parameters_base, BI_CPUTYPE, Q800_CPU_ID);
-+        BOOTINFO1(cs->as, parameters_base, BI_MAC_CPUID, Q800_MAC_CPU_ID);
-+        BOOTINFO1(cs->as, parameters_base, BI_MAC_MODEL, Q800_MACHINE_ID);
-+        BOOTINFO1(cs->as, parameters_base,
-+                  BI_MAC_MEMSIZE, ram_size >> 20); /* in MB */
-+        BOOTINFO2(cs->as, parameters_base, BI_MEMCHUNK, 0, ram_size);
-+        BOOTINFO1(cs->as, parameters_base, BI_MAC_VADDR, VIDEO_BASE);
-+        BOOTINFO1(cs->as, parameters_base, BI_MAC_VDEPTH, graphic_depth);
-+        BOOTINFO1(cs->as, parameters_base, BI_MAC_VDIM,
-+                  (graphic_height << 16) | graphic_width);
-+        BOOTINFO1(cs->as, parameters_base, BI_MAC_VROW,
-+                  (graphic_width * graphic_depth + 7) / 8);
-+        BOOTINFO1(cs->as, parameters_base, BI_MAC_SCCBASE, SCC_BASE);
-+
-+        if (kernel_cmdline) {
-+            BOOTINFOSTR(cs->as, parameters_base, BI_COMMAND_LINE,
-+                        kernel_cmdline);
-+        }
-+
-+        /* load initrd */
-+        if (initrd_filename) {
-+            initrd_size = get_image_size(initrd_filename);
-+            if (initrd_size < 0) {
-+                error_report("could not load initial ram disk '%s'",
-+                             initrd_filename);
-+                exit(1);
-+            }
-+
-+            initrd_base = (ram_size - initrd_size) & TARGET_PAGE_MASK;
-+            load_image_targphys(initrd_filename, initrd_base,
-+                                ram_size - initrd_base);
-+            BOOTINFO2(cs->as, parameters_base, BI_RAMDISK, initrd_base,
-+                      initrd_size);
++    if (swimctrl->regs[IWM_Q6] &&
++        swimctrl->regs[IWM_Q7]) {
++        if (swimctrl->regs[IWM_MTR]) {
++            /* data register */
++            swimctrl->iwm_data = value;
 +        } else {
-+            initrd_base = 0;
-+            initrd_size = 0;
-+        }
-+        BOOTINFO0(cs->as, parameters_base, BI_LAST);
-+    } else {
-+        uint8_t *ptr;
-+        /* allocate and load BIOS */
-+        rom = g_malloc(sizeof(*rom));
-+        memory_region_init_ram(rom, NULL, "m68k_mac.rom", MACROM_SIZE,
-+                               &error_abort);
-+        if (bios_name == NULL) {
-+            bios_name = MACROM_FILENAME;
-+        }
-+        filename = qemu_find_file(QEMU_FILE_TYPE_BIOS, bios_name);
-+        memory_region_set_readonly(rom, true);
-+        memory_region_add_subregion(get_system_memory(), MACROM_ADDR, rom);
-+
-+        /* Load MacROM binary */
-+        if (filename) {
-+            bios_size = load_image_targphys(filename, MACROM_ADDR, MACROM_SIZE);
-+            g_free(filename);
-+        } else {
-+            bios_size = -1;
-+        }
-+
-+        /* Remove qtest_enabled() check once firmware files are in the tree */
-+        if (!qtest_enabled()) {
-+            if (bios_size < 0 || bios_size > MACROM_SIZE) {
-+                error_report("could not load MacROM '%s'", bios_name);
-+                exit(1);
++            /* mode register */
++            swimctrl->iwm_mode = value;
++            /* detect sequence to switch from IWM mode to SWIM mode */
++            switch (swimctrl->iwm_switch) {
++            case 0:
++                if (value == 0x57) {
++                    swimctrl->iwm_switch++;
++                }
++                break;
++            case 1:
++                if (value == 0x17) {
++                    swimctrl->iwm_switch++;
++                }
++                break;
++            case 2:
++                if (value == 0x57) {
++                    swimctrl->iwm_switch++;
++                }
++                break;
++            case 3:
++                if (value == 0x57) {
++                    swimctrl->mode = SWIM_MODE_SWIM;
++                    swimctrl->iwm_switch = 0;
++                }
++                break;
 +            }
-+
-+            ptr = rom_ptr(MACROM_ADDR, MACROM_SIZE);
-+            stl_phys(cs->as, 0, ldl_p(ptr));    /* reset initial SP */
-+            stl_phys(cs->as, 4,
-+                     MACROM_ADDR + ldl_p(ptr + 4)); /* reset initial PC */
 +        }
 +    }
 +}
 +
-+static void q800_machine_init(MachineClass *mc)
++static uint64_t iwmctrl_read(void *opaque, hwaddr reg, unsigned size)
 +{
-+    mc->desc = "Macintosh Quadra 800";
-+    mc->init = q800_init;
-+    mc->default_cpu_type = M68K_CPU_TYPE_NAME("m68040");
-+    mc->max_cpus = 1;
-+    mc->is_default = 0;
-+    mc->block_default_type = IF_SCSI;
++    SWIMCtrl *swimctrl = opaque;
++
++    reg >>= REG_SHIFT;
++
++    swimctrl->regs[reg >> 1] = reg & 1;
++
++    return 0;
 +}
 +
-+DEFINE_MACHINE("q800", q800_machine_init)
++static void swimctrl_write(void *opaque, hwaddr reg, uint64_t value,
++                           unsigned size)
++{
++    SWIMCtrl *swimctrl = opaque;
++
++    if (swimctrl->mode == SWIM_MODE_IWM) {
++        iwmctrl_write(opaque, reg, value, size);
++        return;
++    }
++
++    reg >>= REG_SHIFT;
++
++    switch (reg) {
++    case SWIM_WRITE_PHASE:
++        swimctrl->swim_phase = value;
++        break;
++    case SWIM_WRITE_MODE0:
++        swimctrl->swim_mode &= ~value;
++        break;
++    case SWIM_WRITE_MODE1:
++        swimctrl->swim_mode |= value;
++        break;
++    case SWIM_WRITE_DATA:
++    case SWIM_WRITE_MARK:
++    case SWIM_WRITE_CRC:
++    case SWIM_WRITE_PARAMETER:
++    case SWIM_WRITE_SETUP:
++        break;
++    }
++}
++
++static uint64_t swimctrl_read(void *opaque, hwaddr reg, unsigned size)
++{
++    SWIMCtrl *swimctrl = opaque;
++    uint32_t value = 0;
++
++    if (swimctrl->mode == SWIM_MODE_IWM) {
++        return iwmctrl_read(opaque, reg, size);
++    }
++
++    reg >>= REG_SHIFT;
++
++    switch (reg) {
++    case SWIM_READ_PHASE:
++        value = swimctrl->swim_phase;
++        break;
++    case SWIM_READ_HANDSHAKE:
++        if (swimctrl->swim_phase == SWIM_DRIVE_PRESENT) {
++            /* always answer "no drive present" */
++            value = SWIM_SENSE;
++        }
++        break;
++    case SWIM_READ_DATA:
++    case SWIM_READ_MARK:
++    case SWIM_READ_ERROR:
++    case SWIM_READ_PARAMETER:
++    case SWIM_READ_SETUP:
++    case SWIM_READ_STATUS:
++        break;
++    }
++
++    return value;
++}
++
++static const MemoryRegionOps swimctrl_mem_ops = {
++    .write = swimctrl_write,
++    .read = swimctrl_read,
++    .endianness = DEVICE_NATIVE_ENDIAN,
++};
++
++static void sysbus_swim_init(Object *obj)
++{
++    SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
++    SWIM *sbs = SWIM(obj);
++    SWIMCtrl *swimctrl = &sbs->ctrl;
++
++    memory_region_init_io(&swimctrl->iomem, obj, &swimctrl_mem_ops, swimctrl,
++                          "swim", 0x2000);
++    sysbus_init_mmio(sbd, &swimctrl->iomem);
++}
++
++static void sysbus_swim_realize(DeviceState *dev, Error **errp)
++{
++    SWIM *sys = SWIM(dev);
++    SWIMCtrl *swimctrl = &sys->ctrl;
++
++    qbus_create_inplace(&swimctrl->bus, sizeof(SWIMBus), TYPE_SWIM_BUS, dev,
++                        NULL);
++    swimctrl->bus.ctrl = swimctrl;
++}
++
++static void sysbus_swim_class_init(ObjectClass *oc, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(oc);
++
++    dc->realize = sysbus_swim_realize;
++}
++
++static const TypeInfo sysbus_swim_info = {
++    .name          = TYPE_SWIM,
++    .parent        = TYPE_SYS_BUS_DEVICE,
++    .instance_size = sizeof(SWIM),
++    .instance_init = sysbus_swim_init,
++    .class_init    = sysbus_swim_class_init,
++};
++
++static void swim_register_types(void)
++{
++    type_register_static(&sysbus_swim_info);
++    type_register_static(&swim_bus_info);
++    type_register_static(&swim_drive_info);
++}
++
++type_init(swim_register_types)
+diff --git a/include/hw/block/swim.h b/include/hw/block/swim.h
+new file mode 100644
+index 0000000000..e69c644995
+--- /dev/null
++++ b/include/hw/block/swim.h
+@@ -0,0 +1,76 @@
++/*
++ * QEMU Macintosh floppy disk controller emulator (SWIM)
++ *
++ * Copyright (c) 2014-2018 Laurent Vivier <laurent@vivier.eu>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2.  See
++ * the COPYING file in the top-level directory.
++ *
++ */
++
++#ifndef SWIM_H
++#define SWIM_H
++
++#include "qemu/osdep.h"
++#include "hw/sysbus.h"
++
++#define SWIM_MAX_FD            2
++
++typedef struct SWIMDrive SWIMDrive;
++typedef struct SWIMBus SWIMBus;
++typedef struct SWIMCtrl SWIMCtrl;
++
++#define TYPE_SWIM_DRIVE "swim-drive"
++#define SWIM_DRIVE(obj) OBJECT_CHECK(SWIMDrive, (obj), TYPE_SWIM_DRIVE)
++
++struct SWIMDrive {
++    DeviceState qdev;
++    int32_t     unit;
++    BlockConf   conf;
++};
++
++#define TYPE_SWIM_BUS "swim-bus"
++#define SWIM_BUS(obj) OBJECT_CHECK(SWIMBus, (obj), TYPE_SWIM_BUS)
++
++struct SWIMBus {
++    BusState bus;
++    struct SWIMCtrl *ctrl;
++};
++
++typedef struct FDrive {
++    SWIMCtrl *swimctrl;
++    BlockBackend *blk;
++    BlockConf *conf;
++} FDrive;
++
++struct SWIMCtrl {
++    MemoryRegion iomem;
++    FDrive drives[SWIM_MAX_FD];
++    int mode;
++    /* IWM mode */
++    int iwm_switch;
++    int regs[8];
++#define IWM_PH0   0
++#define IWM_PH1   1
++#define IWM_PH2   2
++#define IWM_PH3   3
++#define IWM_MTR   4
++#define IWM_DRIVE 5
++#define IWM_Q6    6
++#define IWM_Q7    7
++    uint8_t iwm_data;
++    uint8_t iwm_mode;
++    /* SWIM mode */
++    uint8_t swim_phase;
++    uint8_t swim_mode;
++    SWIMBus bus;
++};
++
++#define TYPE_SWIM "swim"
++#define SWIM(obj) OBJECT_CHECK(SWIM, (obj), TYPE_SWIM)
++
++typedef struct SWIM {
++    SysBusDevice parent_obj;
++    SWIMCtrl     ctrl;
++} SWIM;
++#endif
 -- 
 2.20.1
 
