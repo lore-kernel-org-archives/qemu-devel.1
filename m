@@ -2,87 +2,65 @@ Return-Path: <SRS0=E2zY=TZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F3A68C282E1
-	for <qemu-devel@archiver.kernel.org>; Sat, 25 May 2019 02:25:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C3205C282E1
+	for <qemu-devel@archiver.kernel.org>; Sat, 25 May 2019 03:37:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BBBAD2081C
-	for <qemu-devel@archiver.kernel.org>; Sat, 25 May 2019 02:25:13 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Sh0384or"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BBBAD2081C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 81E132075C
+	for <qemu-devel@archiver.kernel.org>; Sat, 25 May 2019 03:37:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 81E132075C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:34856 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:35553 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hUMMz-0002Ya-0e
-	for qemu-devel@archiver.kernel.org; Fri, 24 May 2019 22:25:13 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:50975)
+	id 1hUNUS-00054J-K8
+	for qemu-devel@archiver.kernel.org; Fri, 24 May 2019 23:37:00 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:59510)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1hUMJs-0000UP-9N
-	for qemu-devel@nongnu.org; Fri, 24 May 2019 22:22:01 -0400
+	(envelope-from <liujunjie23@huawei.com>) id 1hUNTE-00044V-LK
+	for qemu-devel@nongnu.org; Fri, 24 May 2019 23:35:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1hUMIR-0003Yd-IK
-	for qemu-devel@nongnu.org; Fri, 24 May 2019 22:20:32 -0400
-Received: from mail-it1-x143.google.com ([2607:f8b0:4864:20::143]:56125)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
-	id 1hUMIR-0003YP-EN
-	for qemu-devel@nongnu.org; Fri, 24 May 2019 22:20:31 -0400
-Received: by mail-it1-x143.google.com with SMTP id g24so11930159iti.5
-	for <qemu-devel@nongnu.org>; Fri, 24 May 2019 19:20:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=from:to:cc:subject:date:message-id:in-reply-to:references;
-	bh=dazARfTasjbAG7BJaYUNqf7X7nG/lCTZKuXZBg0tjNk=;
-	b=Sh0384orbtEMajWgYUF/rIzC88j/9d/7yE36n5YQV2Dxlb8EOtPvlppMmA4e+AyqEG
-	+NSRRIx6k6saDNNct4RAcXX/uFjVwEtUN24cTafIPNvX6aC1QYcqSRmD/XUhJdF1E6Dy
-	6cHhJaRTZybJRWsYOu+aUAcEgfnsWTOQVLwbKT+HLtOVQaJszSYLD5z/PAOntAB+E4LE
-	+rKsJeweJxpH6ik3nrvlZhC8IHIPyUrGxz5yrtAv3rFF0Tgwo9CcYxUgeCn3VjdU+OWh
-	K7rabvFnAwoEb2fJZf5DauoCQp8R4HuxNx/qxK+POiIje3XJAAe1NdWDaiai+27R69Rq
-	PtPg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-	:references;
-	bh=dazARfTasjbAG7BJaYUNqf7X7nG/lCTZKuXZBg0tjNk=;
-	b=Tin2ydObNcvHZ3K/Yi3KAfSdEEjvAkbTa2qwuGBZH8GlX3LSkO13smdIiBC1GLccAw
-	1UBDLrL2/odlOqSlVDLuZ4V+R0yoqawgyryL28BEep9tzVdfAK/rwUz6u5tI1Wp9T8Z7
-	f909In0TLiXIA8z/W4gftgK7drHvhK2JvmLHfP4Ahl8ggmq4uFQsvcchHiUKYmVQMWcn
-	zBbG4jXzu9pBHZKLchyXgXnApf8LGFXvKtVgyYM79OBERlu7N7nnUpqlI5eOVBEZTaXx
-	cizcblP1EyemRxMtSIpWQpdll9EKtNUpbxeIx+CUkQNFHdlmJuclUVIH4rwRIiGGNNac
-	BHZQ==
-X-Gm-Message-State: APjAAAUS1P7utQE0iPPsbXCr3yO1PH+v97T3NDpgcT2nySt1OCUveUbB
-	4k+XjqRsZ9842cGqLgJwWRdHqSz5
-X-Google-Smtp-Source: APXvYqzEtP96vOP+zyv041NmFTdFxRoXJkulWVPSBAtNyhY/3suG6Oo0UlNHHqJmWl4nSn+aS1E6mw==
-X-Received: by 2002:a05:660c:105:: with SMTP id
-	w5mr11688342itj.37.1558750831006; 
-	Fri, 24 May 2019 19:20:31 -0700 (PDT)
-Received: from localhost.localdomain (d14-69-20-184.try.wideopenwest.com.
-	[69.14.184.20]) by smtp.gmail.com with ESMTPSA id
-	p20sm1575524ioj.63.2019.05.24.19.20.29
-	(version=TLS1 cipher=AES128-SHA bits=128/128);
-	Fri, 24 May 2019 19:20:30 -0700 (PDT)
-From: John Arbuckle <programmingkidx@gmail.com>
-To: richard.henderson@linaro.org, qemu-devel@nongnu.org, qemu-ppc@nongnu.orgd,
-	david@gibson.dropbear.id.au, mark.cave-ayland@ilande.co.uk
-Date: Fri, 24 May 2019 22:20:07 -0400
-Message-Id: <20190525022008.24788-2-programmingkidx@gmail.com>
-X-Mailer: git-send-email 2.14.3 (Apple Git-98)
-In-Reply-To: <20190525022008.24788-1-programmingkidx@gmail.com>
-References: <20190525022008.24788-1-programmingkidx@gmail.com>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::143
-Subject: [Qemu-devel] [PATCH 1/2] Implement Floating Point flag Fraction
- Rounded
+	(envelope-from <liujunjie23@huawei.com>) id 1hUNT9-00080u-70
+	for qemu-devel@nongnu.org; Fri, 24 May 2019 23:35:44 -0400
+Received: from szxga01-in.huawei.com ([45.249.212.187]:2420 helo=huawei.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <liujunjie23@huawei.com>)
+	id 1hUNT8-0007sk-B6
+	for qemu-devel@nongnu.org; Fri, 24 May 2019 23:35:39 -0400
+Received: from DGGEMM401-HUB.china.huawei.com (unknown [172.30.72.56])
+	by Forcepoint Email with ESMTP id EF95496ACCEF5DF31E96;
+	Sat, 25 May 2019 11:35:27 +0800 (CST)
+Received: from DGGEMM521-MBX.china.huawei.com ([169.254.4.56]) by
+	DGGEMM401-HUB.china.huawei.com ([10.3.20.209]) with mapi id
+	14.03.0439.000; Sat, 25 May 2019 11:35:21 +0800
+From: "liujunjie (A)" <liujunjie23@huawei.com>
+To: "pbonzini@redhat.com" <pbonzini@redhat.com>, "afaerber@suse.de"
+	<afaerber@suse.de>, "ehabkost@redhat.com" <ehabkost@redhat.com>,
+	"imammedo@redhat.com" <imammedo@redhat.com>, "qemu-devel@nongnu.org"
+	<qemu-devel@nongnu.org>
+Thread-Topic: Question about wrong ram-node0 reference
+Thread-Index: AdUSqrvZOubDxvGnQFyIol9vimbQhw==
+Date: Sat, 25 May 2019 03:35:20 +0000
+Message-ID: <B526101FCAB4654DB0892B650DEFC55527EECB46@dggemm521-mbx.china.huawei.com>
+Accept-Language: zh-CN, en-US
+Content-Language: zh-CN
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.177.68.90]
+MIME-Version: 1.0
+X-CFilter-Loop: Reflected
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 45.249.212.187
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+X-Content-Filtered-By: Mailman/MimeDel 2.1.21
+Subject: [Qemu-devel] Question about wrong ram-node0 reference
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -94,70 +72,127 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: John Arbuckle <programmingkidx@gmail.com>
+Cc: fangying <fangying1@huawei.com>,
+	"wangxin \(U\)" <wangxinxin.wang@huawei.com>,
+	"Huangweidong \(C\)" <weidong.huang@huawei.com>,
+	"Zhoujian \(jay\)" <jianjay.zhou@huawei.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: John Arbuckle <programmingkidx@gmail.com>
+Hi, I have met a problem:
+
+The QEMU version is 2.8.1, the virtual machine is configured with 1G huge p=
+ages, two NUMA nodes and four pass-through NVME SSDs.
+
+After we started the VM, in addition to some QMP queries nothing more has b=
+een done, the QEMU aborted after some months later.
+After that, the VM is restarted, and the problem does not reproduce yet.
+And The backtrace of the RCU thread is as follows:
+(gdb) bt
+#0  0x00007fd2695f0197 in raise () from /usr/lib64/libc.so.6
+#1  0x00007fd2695f1888 in abort () from /usr/lib64/libc.so.6
+#2  0x00007fd2695e9206 in __assert_fail_base () from /usr/lib64/libc.so.6
+#3  0x00007fd2695e92b2 in __assert_fail () from /usr/lib64/libc.so.6
+#4  0x0000000000476a84 in memory_region_finalize (obj=3D<optimized out>)
+    at /home/abuild/rpmbuild/BUILD/qemu-kvm-2.8.1/memory.c:1512
+#5  0x0000000000763105 in object_deinit (obj=3Dobj@entry=3D0x1dc1fd0,
+    type=3Dtype@entry=3D0x1d065b0) at qom/object.c:448
+#6  0x0000000000763153 in object_finalize (data=3D0x1dc1fd0) at qom/object.=
+c:462
+#7  0x00000000007627cc in object_property_del_all (obj=3Dobj@entry=3D0x1dc1=
+f70)
+    at qom/object.c:399
+#8  0x0000000000763148 in object_finalize (data=3D0x1dc1f70) at qom/object.=
+c:461
+#9  0x0000000000764426 in object_unref (obj=3D<optimized out>) at qom/objec=
+t.c:897
+#10 0x0000000000473b6b in memory_region_unref (mr=3D<optimized out>)
+    at /home/abuild/rpmbuild/BUILD/qemu-kvm-2.8.1/memory.c:1560
+#11 0x0000000000473bc7 in flatview_destroy (view=3D0x7fc188b9cb90)
+    at /home/abuild/rpmbuild/BUILD/qemu-kvm-2.8.1/memory.c:289
+#12 0x0000000000843be0 in call_rcu_thread (opaque=3D<optimized out>)
+    at util/rcu.c:279
+#13 0x00000000008325c2 in qemu_thread_start (args=3Dargs@entry=3D0x1d00810)
+    at util/qemu_thread_posix.c:496
+#14 0x00007fd269983dc5 in start_thread () from /usr/lib64/libpthread.so.0
+#15 0x00007fd2696b27bd in clone () from /usr/lib64/libc.so.6
+
+In this core, I found that the reference of "/objects/ram-node0"( the type =
+of ram-node0 is struct "HostMemoryBackendFile") equals to 0 , while the ref=
+erence of "/objects/ram-node1" equals to 129, more details can be seen at t=
+he end of this email.
+
+I searched through the community, and found a case that had the same error =
+report: https://mail.coreboot.org/pipermail/seabios/2017-September/011799.h=
+tml
+However, I did not configure pcie_pci_bridge. Besides, qemu aborted in devi=
+ce initialization phase in this case.
+
+Also, I try to find out which can reference "/objects/ram-node0" so as to l=
+ook for the one that may un reference improperly, most of them lie in the f=
+unction of "render_memory_region" or "phys_section_add" when memory topolog=
+y changes.
+Later, the temporary flatviews are destroyed by RCU thread, so un reference=
+ happened and the backtrace is similar to the one shown above.
+But I am not familiar with the detail of these process, it is hard to keep =
+trace of these memory topology changes.
+
+My question is:
+How can ram-node0's reference comes down to 0 when the virtual machine is s=
+till running?
+
+Maybe someone who is familiar with memory_region_ref or memory-backend-file=
+ can help me figure out.
+Any idea is appreciated.
+
 ---
- fpu/softfloat.c               | 15 ++++++++++++---
- include/fpu/softfloat-types.h |  1 +
- 2 files changed, 13 insertions(+), 3 deletions(-)
+(gdb) p *((HostMemoryBackendFile *) 0x1dc1f70)
+$24 =3D {parent_obj =3D {parent =3D {class =3D 0x1d70880, free =3D 0x7fd26a=
+812580 <g_free>, properties =3D 0x1db7920, ref =3D 0, parent =3D 0x1da9710}=
+, size =3D 68719476736, merge =3D true, dump =3D false, prealloc =3D true, =
+force_prealloc =3D false, is_mapped =3D true, host_nodes =3D {1, 0, 0}, pol=
+icy =3D HOST_MEM_POLICY_BIND, mr =3D {parent_obj =3D {class =3D 0x1d6d790, =
+free =3D 0x0, properties =3D 0x1db79e0, ref =3D 0, parent =3D 0x0}, romd_mo=
+de =3D true, ram =3D true, subpage =3D false, readonly =3D false, rom_devic=
+e =3D false, flush_coalesced_mmio =3D false, global_locking =3D true, dirty=
+_log_mask =3D 0 '\000', ram_block =3D 0x1dc2960, owner =3D 0x1dc1f70, iommu=
+_ops =3D 0x0, ops =3D 0xcb0fe0 <unassigned_mem_ops>, opaque =3D 0x0, contai=
+ner =3D 0x200d4c0, size =3D 0x00000000000000000000001000000000, addr =3D 0,=
+ destructor =3D 0x470800 <memory_region_destructor_ram>, align =3D 10737418=
+24, terminates =3D true, ram_device =3D false, enabled =3D true, warning_pr=
+inted =3D false, vga_logging_count =3D 0 '\000', alias =3D 0x0, alias_offse=
+t =3D 0, priority =3D 0, subregions =3D {tqh_first =3D 0x0, tqh_last =3D 0x=
+1dc2078}, subregions_link =3D {tqe_next =3D 0x0, tqe_prev =3D 0x1dc2c68}, c=
+oalesced =3D {tqh_first =3D 0x0, tqh_last =3D 0x1dc2098}, name =3D 0x1dc27a=
+0 "/objects/ram-node0", ioeventfd_nb =3D 0, ioeventfds =3D 0x0, iommu_notif=
+y =3D {lh_first =3D 0x0}, iommu_notify_flags =3D IOMMU_NOTIFIER_NONE}}, sha=
+re =3D true, mem_path =3D 0x1dc2350 "/dev/hugepages/libvirt/qemu/118-instan=
+ce-00025bf8"}
 
-diff --git a/fpu/softfloat.c b/fpu/softfloat.c
-index 2ba36ec370..ac34f6a2de 100644
---- a/fpu/softfloat.c
-+++ b/fpu/softfloat.c
-@@ -702,7 +702,7 @@ static FloatParts round_canonical(FloatParts p, float_status *s,
-     const uint64_t roundeven_mask = parm->roundeven_mask;
-     const int exp_max = parm->exp_max;
-     const int frac_shift = parm->frac_shift;
--    uint64_t frac, inc;
-+    uint64_t frac, inc, rounded;
-     int exp, flags = 0;
-     bool overflow_norm;
- 
-@@ -744,7 +744,12 @@ static FloatParts round_canonical(FloatParts p, float_status *s,
-         if (likely(exp > 0)) {
-             if (frac & round_mask) {
-                 flags |= float_flag_inexact;
--                frac += inc;
-+                rounded = frac + inc;
-+                if ((rounded ^ frac) & frac_lsb) {
-+                    flags |= float_flag_rounded;
-+                }
-+                frac = rounded;
-+
-                 if (frac & DECOMPOSED_OVERFLOW_BIT) {
-                     frac >>= 1;
-                     exp++;
-@@ -793,7 +798,11 @@ static FloatParts round_canonical(FloatParts p, float_status *s,
-                     break;
-                 }
-                 flags |= float_flag_inexact;
--                frac += inc;
-+                rounded = frac + inc;
-+                if ((rounded ^ frac) & frac_lsb) {
-+                    flags |= float_flag_rounded;
-+                }
-+                frac = rounded;
-             }
- 
-             exp = (frac & DECOMPOSED_IMPLICIT_BIT ? 1 : 0);
-diff --git a/include/fpu/softfloat-types.h b/include/fpu/softfloat-types.h
-index 2aae6a89b1..bee576e0fd 100644
---- a/include/fpu/softfloat-types.h
-+++ b/include/fpu/softfloat-types.h
-@@ -147,6 +147,7 @@ enum {
- 
- enum {
-     float_flag_invalid   =  1,
-+    float_flag_rounded   =  2,
-     float_flag_divbyzero =  4,
-     float_flag_overflow  =  8,
-     float_flag_underflow = 16,
--- 
-2.14.3 (Apple Git-98)
+(gdb) p *((HostMemoryBackendFile *) 0x1dc2b50)
+$205 =3D {parent_obj =3D {parent =3D {class =3D 0x1d70880, free =3D 0x7fd26=
+a812580 <g_free>, properties =3D 0x1db7a40, ref =3D 129, parent =3D 0x1da97=
+10}, size =3D 68719476736, merge =3D true, dump =3D false, prealloc =3D tru=
+e, force_prealloc =3D false, is_mapped =3D true, host_nodes =3D {2, 0, 0}, =
+policy =3D HOST_MEM_POLICY_BIND, mr =3D {parent_obj =3D {class =3D 0x1d6d79=
+0, free =3D 0x0, properties =3D 0x1db7aa0, ref =3D 1, parent =3D 0x1dc2b50}=
+, romd_mode =3D true, ram =3D true, subpage =3D false, readonly =3D false, =
+rom_device =3D false, flush_coalesced_mmio =3D false, global_locking =3D tr=
+ue, dirty_log_mask =3D 0 '\000', ram_block =3D 0x1dc3470, owner =3D 0x1dc2b=
+50, iommu_ops =3D 0x0, ops =3D 0xcb0fe0 <unassigned_mem_ops>, opaque =3D 0x=
+0, container =3D 0x200d4c0, size =3D 0x00000000000000000000001000000000, ad=
+dr =3D 68719476736, destructor =3D 0x470800 <memory_region_destructor_ram>,=
+ align =3D 1073741824, terminates =3D true, ram_device =3D false, enabled =
+=3D true, warning_printed =3D false, vga_logging_count =3D 0 '\000', alias =
+=3D 0x0, alias_offset =3D 0, priority =3D 0, subregions =3D {tqh_first =3D =
+0x0, tqh_last =3D 0x1dc2c58}, subregions_link =3D {tqe_next =3D 0x1dc1fd0, =
+tqe_prev =3D 0x200d568}, coalesced =3D {tqh_first =3D 0x0, tqh_last =3D 0x1=
+dc2c78}, name =3D 0x1dc32b0 "/objects/ram-node1", ioeventfd_nb =3D 0, ioeve=
+ntfds =3D 0x0, iommu_notify =3D {lh_first =3D 0x0}, iommu_notify_flags =3D =
+IOMMU_NOTIFIER_NONE}}, share =3D true, mem_path =3D 0x1da8c40 "/dev/hugepag=
+es/libvirt/qemu/118-instance-00025bf8"}
 
+Thanks,
+Junjie Liu
 
