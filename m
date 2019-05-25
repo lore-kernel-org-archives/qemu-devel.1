@@ -2,87 +2,86 @@ Return-Path: <SRS0=E2zY=TZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 19A62C282E1
-	for <qemu-devel@archiver.kernel.org>; Sat, 25 May 2019 00:19:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 08EE4C282E1
+	for <qemu-devel@archiver.kernel.org>; Sat, 25 May 2019 02:23:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D2DAE21773
-	for <qemu-devel@archiver.kernel.org>; Sat, 25 May 2019 00:19:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B80842081C
+	for <qemu-devel@archiver.kernel.org>; Sat, 25 May 2019 02:23:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="JQ6Ozg0p"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D2DAE21773
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="psw/YEIU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B80842081C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:33742 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:34822 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hUKPd-0006qm-4i
-	for qemu-devel@archiver.kernel.org; Fri, 24 May 2019 20:19:49 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:60227)
+	id 1hUMLD-0001Mq-PJ
+	for qemu-devel@archiver.kernel.org; Fri, 24 May 2019 22:23:23 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:50975)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=040baf4f1=alistair.francis@wdc.com>)
-	id 1hUK4C-0005Im-Cz
-	for qemu-devel@nongnu.org; Fri, 24 May 2019 19:57:41 -0400
+	(envelope-from <programmingkidx@gmail.com>) id 1hUMJm-0000UP-H9
+	for qemu-devel@nongnu.org; Fri, 24 May 2019 22:21:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=040baf4f1=alistair.francis@wdc.com>)
-	id 1hUJuU-00048m-B1
-	for qemu-devel@nongnu.org; Fri, 24 May 2019 19:47:39 -0400
-Received: from esa5.hgst.iphmx.com ([216.71.153.144]:51627)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <prvs=040baf4f1=alistair.francis@wdc.com>)
-	id 1hUJuU-00046f-0J; Fri, 24 May 2019 19:47:38 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-	d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-	t=1558741659; x=1590277659;
-	h=from:to:cc:subject:date:message-id:in-reply-to:
-	references:mime-version:content-transfer-encoding;
-	bh=Afx3i4e+/e/6vVqAletdTzpjrs6vkjl1vDNfsdulAjY=;
-	b=JQ6Ozg0pdlrtLcDrYdQAuH619iAtDRjuVKDrWnEIVnqChjgDZUBhhl1k
-	TxNSRyiL2eWGie8RYQjYbAdFqk+5wny04Bf77ggTDRiiYg9lILoxQVAUj
-	0q248wq+U7bOF8iqJJNWcpHPAM9K9sR4gvEKM6+XzZzhkH627GiWWICXQ
-	FWGj/6n1XDAFidxZC+4rbuQrrjhh8qCj8WO5/l2FvXW+KarQZiPs4IEz+
-	4u2PSqLLr1PX1Ww/JMOgHIhX23duFKlMXPWhjbT6+MC/PFFEx0J6GM2VV
-	TTzgfuta0CBnSsiZljhm0jpCbgtclhFrGn9QenYFe7uM5R6Zg/rU4HPt7 w==;
-X-IronPort-AV: E=Sophos;i="5.60,508,1549900800"; d="scan'208";a="110307754"
-Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com)
-	([199.255.45.14])
-	by ob1.hgst.iphmx.com with ESMTP; 25 May 2019 07:47:33 +0800
-IronPort-SDR: FkAcRe98pwH2icirvF/sqLrqcGL3aUBrt2xK4L/Mg8Itw/EfsLZPnbq4UZdJH/D5jlH9Ha+Ob8
-	Q7J3ix3tLTLNMgMvIRtGQyw85RVbES6yDGavDF4uX8IaopRDKu4cssj9mlNp3132dutXICawE8
-	4HT0si9SAYkGb12nPMk7awv+H6gbsVk8lBrsBwg81KgKYYqYpun0rcHmmV78lTBUGHpKkKyNiI
-	dwjfQ9DJpXylPBJV914cdv6T9pfmDZOPKVXu50prpk+bMBHcvZ8cmIweeNqURVF076rQhpGxsK
-	Ys1+Lxqc/2Dyh8u8HNnB/h0+
-Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-	by uls-op-cesaep01.wdc.com with ESMTP; 24 May 2019 16:22:51 -0700
-IronPort-SDR: 5TTr37oCle647gG7iHm3tJP6HuZTxzsH0P3pNdgd7kiL4NzQ5I2gMsk5ZbaA7fi4u6rU33ijul
-	jEjh5QAyChG0mMEfaTMk/S8BkqnQJluA9vihsgbxK6Kr2eecB2K5h3eoBM0myLDzHF0fDUL5lA
-	1vj+deQ5VvSRDXZZK23bleIF9gzsdkVgANa8G0CdKmk4Qa0xOp4fr+bDN2Og21oPKSnZtU7ynB
-	2h1fAmxC2e98c63b7LdoXU6u6lcqs17xjB7WhdqJMQdeInhpfwxOwBhui0eFx7QisJpVsg2JJK
-	q5c=
-Received: from risc6-mainframe.sdcorp.global.sandisk.com (HELO
-	risc6-mainframe.int.fusionio.com) ([10.196.157.140])
-	by uls-op-cesaip02.wdc.com with ESMTP; 24 May 2019 16:47:32 -0700
-From: Alistair Francis <alistair.francis@wdc.com>
-To: qemu-devel@nongnu.org,
-	qemu-riscv@nongnu.org
-Date: Fri, 24 May 2019 16:45:37 -0700
-Message-Id: <5b489a8f97b84a7c1b428b9deb2ceef2f04a8de6.1558741334.git.alistair.francis@wdc.com>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <cover.1558741334.git.alistair.francis@wdc.com>
-References: <cover.1558741334.git.alistair.francis@wdc.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+	(envelope-from <programmingkidx@gmail.com>) id 1hUMIW-0003aY-7G
+	for qemu-devel@nongnu.org; Fri, 24 May 2019 22:20:37 -0400
+Received: from mail-it1-x144.google.com ([2607:f8b0:4864:20::144]:56126)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
+	id 1hUMIW-0003aQ-32
+	for qemu-devel@nongnu.org; Fri, 24 May 2019 22:20:36 -0400
+Received: by mail-it1-x144.google.com with SMTP id g24so11930317iti.5
+	for <qemu-devel@nongnu.org>; Fri, 24 May 2019 19:20:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+	h=from:to:cc:subject:date:message-id:in-reply-to:references;
+	bh=FaLRym9qoHWfpYrSmaKpwioVaNz4Jc0X02F6oDD3AfA=;
+	b=psw/YEIUWAcY3Qy/UhpzoNBfHrB3Ni6RHbFalO5pUpIVGHEwwv5D0wj1x2ssIUZLCJ
+	wR4LoiOz3FA0S94XDgBEsByICzQUAhFEXhtIM2QZ5EArnpCo/VDZ3oZOUi61BvTp68qz
+	cKkmsyPl54BbSMDa+63PLMvJsZ1dhYZUHAwM1GnkoVciVp74Yhs+9zEmYVq40ODhYekc
+	MsO4IIyLfc/Z658wlY7O+NtEEhIHjzFd8TV33njUCmBXnc3DYGASYcOQVL7j6D1cjnQm
+	lWjWPy/mL0shVGVS647KwR+4SagS3EBltR0sc0HbIu5fVuEi6NdKgGEX6GMb41ujwsyM
+	KT5w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+	:references;
+	bh=FaLRym9qoHWfpYrSmaKpwioVaNz4Jc0X02F6oDD3AfA=;
+	b=Zr46ASW0qIz1EWrEwEsiZeJUbAIB7aGGNpOhuKGtO0jKqZH7+XVWoEc/CybuvYoY7x
+	8Ywj9P+d5jsMkWyQf9dk1FR77Bkr5YXpU4pzCAOuEiCadWTRFpJ2wClFlYafXfwZ9u5o
+	jrCk31OiLV1W2M1554F9yTAOEJDBMtsVz5fr8fNcLJ4ohipNGLb1ctg+5M8XfTiW951O
+	gPm1Fzc3KugIooQniejcsRJ4TKs+1fZMvdk7DtxOpB0S1fEzGhMhB5UJf4Onxw+t65cc
+	WgnDsYiYIcTV70AKGE/g5NT3dQChiOcQ/D8e57x1NUqWVCelmzpwhX63Rz5EV415rX52
+	qC2w==
+X-Gm-Message-State: APjAAAUae/RIS/ELknfNPqK9jutI/7k+vwQujETjYz7ms6AuOTt49sKu
+	9bZb3aFVMULtaOfxNNCZEzE=
+X-Google-Smtp-Source: APXvYqzGVJH+lgHKnKSaOTInd/lNVS06orm9e4S0R25m05B1TFrYyU6zEgb5P8cb0W7xTzahc6+/qw==
+X-Received: by 2002:a24:81d4:: with SMTP id q203mr20127283itd.55.1558750835562;
+	Fri, 24 May 2019 19:20:35 -0700 (PDT)
+Received: from localhost.localdomain (d14-69-20-184.try.wideopenwest.com.
+	[69.14.184.20]) by smtp.gmail.com with ESMTPSA id
+	p20sm1575524ioj.63.2019.05.24.19.20.34
+	(version=TLS1 cipher=AES128-SHA bits=128/128);
+	Fri, 24 May 2019 19:20:34 -0700 (PDT)
+From: John Arbuckle <programmingkidx@gmail.com>
+To: richard.henderson@linaro.org, qemu-devel@nongnu.org, qemu-ppc@nongnu.orgd,
+	david@gibson.dropbear.id.au, mark.cave-ayland@ilande.co.uk
+Date: Fri, 24 May 2019 22:20:08 -0400
+Message-Id: <20190525022008.24788-3-programmingkidx@gmail.com>
+X-Mailer: git-send-email 2.14.3 (Apple Git-98)
+In-Reply-To: <20190525022008.24788-1-programmingkidx@gmail.com>
+References: <20190525022008.24788-1-programmingkidx@gmail.com>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 216.71.153.144
-Subject: [Qemu-devel] [RFC v1 01/23] target/riscv: Don't set write
- permissions on dirty PTEs
+X-Received-From: 2607:f8b0:4864:20::144
+Subject: [Qemu-devel] [PATCH 2/2] Implement the PowerPC Floating Point
+ Status and Control Register Fraction Rounded bit
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -94,39 +93,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: alistair23@gmail.com, palmer@sifive.com, alistair.francis@wdc.com
+Cc: John Arbuckle <programmingkidx@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Setting write permission on dirty PTEs results in userspace inside a
-Hypervisor guest (VU) becoming corrupted. This appears to be becuase it
-ends up with write permission in the second stage translation in cases
-where we aren't doing a store.
-
-Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+Signed-off-by: John Arbuckle <programmingkidx@gmail.com>
 ---
- target/riscv/cpu_helper.c | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
+ target/ppc/fpu_helper.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/target/riscv/cpu_helper.c b/target/riscv/cpu_helper.c
-index b1bee3d45d..872835177a 100644
---- a/target/riscv/cpu_helper.c
-+++ b/target/riscv/cpu_helper.c
-@@ -326,10 +326,8 @@ restart:
-             if ((pte & PTE_X)) {
-                 *prot |= PAGE_EXEC;
-             }
--            /* add write permission on stores or if the page is already dirty,
--               so that we TLB miss on later writes to update the dirty bit */
--            if ((pte & PTE_W) &&
--                    (access_type == MMU_DATA_STORE || (pte & PTE_D))) {
-+            /* add write permission on stores */
-+            if ((pte & PTE_W) && (access_type == MMU_DATA_STORE)) {
-                 *prot |= PAGE_WRITE;
-             }
-             return TRANSLATE_SUCCESS;
+diff --git a/target/ppc/fpu_helper.c b/target/ppc/fpu_helper.c
+index 0b7308f539..0baf1ce8e4 100644
+--- a/target/ppc/fpu_helper.c
++++ b/target/ppc/fpu_helper.c
+@@ -630,6 +630,10 @@ static void do_float_check_status(CPUPPCState *env, uintptr_t raddr)
+         env->fpscr &= ~(1 << FPSCR_FI); /* clear the FPSCR[FI] bit */
+     }
+ 
++    /* Set or clear the Fraction Rounded bit */
++    env->fpscr = deposit32(env->fpscr, FPSCR_FR, 1,
++                           (status & float_flag_rounded) != 0);
++
+     if (cs->exception_index == POWERPC_EXCP_PROGRAM &&
+         (env->error_code & POWERPC_EXCP_FP)) {
+         /* Differred floating-point exception after target FPR update */
 -- 
-2.21.0
+2.14.3 (Apple Git-98)
 
 
