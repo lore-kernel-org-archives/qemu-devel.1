@@ -6,57 +6,56 @@ X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F2734C07542
-	for <qemu-devel@archiver.kernel.org>; Sat, 25 May 2019 15:15:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B364C07542
+	for <qemu-devel@archiver.kernel.org>; Sat, 25 May 2019 15:17:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BBB3F2075E
-	for <qemu-devel@archiver.kernel.org>; Sat, 25 May 2019 15:15:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BBB3F2075E
+	by mail.kernel.org (Postfix) with ESMTPS id 5FC962075E
+	for <qemu-devel@archiver.kernel.org>; Sat, 25 May 2019 15:17:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5FC962075E
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:43174 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:43229 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hUYO6-0006jS-Tz
-	for qemu-devel@archiver.kernel.org; Sat, 25 May 2019 11:15:11 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:32775)
+	id 1hUYQ9-0000EE-Js
+	for qemu-devel@archiver.kernel.org; Sat, 25 May 2019 11:17:17 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:32849)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1hUYM8-0005Hu-6N
-	for qemu-devel@nongnu.org; Sat, 25 May 2019 11:13:09 -0400
+	(envelope-from <clg@kaod.org>) id 1hUYMS-0005a5-DO
+	for qemu-devel@nongnu.org; Sat, 25 May 2019 11:13:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1hUYM6-0001CF-Ed
-	for qemu-devel@nongnu.org; Sat, 25 May 2019 11:13:08 -0400
-Received: from 7.mo173.mail-out.ovh.net ([46.105.44.159]:45128)
+	(envelope-from <clg@kaod.org>) id 1hUYMQ-0001Um-TO
+	for qemu-devel@nongnu.org; Sat, 25 May 2019 11:13:28 -0400
+Received: from 8.mo2.mail-out.ovh.net ([188.165.52.147]:37331)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1hUYM6-00018j-6n
-	for qemu-devel@nongnu.org; Sat, 25 May 2019 11:13:06 -0400
-Received: from player698.ha.ovh.net (unknown [10.109.146.76])
-	by mo173.mail-out.ovh.net (Postfix) with ESMTP id A456E10128E
-	for <qemu-devel@nongnu.org>; Sat, 25 May 2019 17:13:03 +0200 (CEST)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1hUYMQ-0001TV-KP
+	for qemu-devel@nongnu.org; Sat, 25 May 2019 11:13:26 -0400
+Received: from player698.ha.ovh.net (unknown [10.108.54.108])
+	by mo2.mail-out.ovh.net (Postfix) with ESMTP id C7FDB1917E1
+	for <qemu-devel@nongnu.org>; Sat, 25 May 2019 17:13:24 +0200 (CEST)
 Received: from kaod.org (lfbn-1-10649-41.w90-89.abo.wanadoo.fr [90.89.235.41])
 	(Authenticated sender: clg@kaod.org)
-	by player698.ha.ovh.net (Postfix) with ESMTPSA id 82AB6625A6FD;
-	Sat, 25 May 2019 15:12:52 +0000 (UTC)
+	by player698.ha.ovh.net (Postfix) with ESMTPSA id 80FB2625A777;
+	Sat, 25 May 2019 15:13:18 +0000 (UTC)
 From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 To: Peter Maydell <peter.maydell@linaro.org>
-Date: Sat, 25 May 2019 17:12:23 +0200
-Message-Id: <20190525151241.5017-2-clg@kaod.org>
+Date: Sat, 25 May 2019 17:12:26 +0200
+Message-Id: <20190525151241.5017-5-clg@kaod.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190525151241.5017-1-clg@kaod.org>
 References: <20190525151241.5017-1-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-X-Ovh-Tracer-Id: 6592988382810508049
+X-Ovh-Tracer-Id: 6598899356394883857
 X-VR-SPAMSTATE: OK
 X-VR-SPAMSCORE: -100
 X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduuddruddukedgkeejucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddm
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 46.105.44.159
-Subject: [Qemu-devel] [PATCH 01/19] hw/arm/aspeed: Use
- object_initialize_child for correct ref. counting
+X-Received-From: 188.165.52.147
+Subject: [Qemu-devel] [PATCH 04/19] hw: timer: Add ASPEED RTC device
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -68,237 +67,296 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
-	Andrew Jeffery <andrew@aj.id.au>, qemu-devel@nongnu.org,
-	qemu-arm@nongnu.org, Joel Stanley <joel@jms.id.au>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
-	=?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+Cc: Andrew Jeffery <andrew@aj.id.au>,
+	=?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>,
+	qemu-arm@nongnu.org, qemu-devel@nongnu.org, Joel Stanley <joel@jms.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+From: Joel Stanley <joel@jms.id.au>
 
-As explained in commit aff39be0ed97:
+The RTC is modeled to provide time and date functionality. It is
+initialised at zero to match the hardware.
 
-  Both functions, object_initialize() and object_property_add_child()
-  increase the reference counter of the new object, so one of the
-  references has to be dropped afterwards to get the reference
-  counting right. Otherwise the child object will not be properly
-  cleaned up when the parent gets destroyed.
-  Thus let's use now object_initialize_child() instead to get the
-  reference counting here right.
+There is no modelling of the alarm functionality, which includes the IRQ
+line. As there is no guest code to exercise this function that is
+acceptable for now.
 
-This patch was generated using the following Coccinelle script
-(with a bit of manual fix-up for overly long lines):
-
- @use_object_initialize_child@
- expression parent_obj;
- expression child_ptr;
- expression child_name;
- expression child_type;
- expression child_size;
- expression errp;
- @@
- (
- -   object_initialize(child_ptr, child_size, child_type);
- +   object_initialize_child(parent_obj, child_name,  child_ptr, child_si=
-ze,
- +                           child_type, &error_abort, NULL);
-     ... when !=3D parent_obj
- -   object_property_add_child(parent_obj, child_name, OBJECT(child_ptr),=
- NULL);
-     ...
- ?-  object_unref(OBJECT(child_ptr));
- |
- -   object_initialize(child_ptr, child_size, child_type);
- +   object_initialize_child(parent_obj, child_name,  child_ptr, child_si=
-ze,
- +                            child_type, errp, NULL);
-     ... when !=3D parent_obj
- -   object_property_add_child(parent_obj, child_name, OBJECT(child_ptr),=
- errp);
-     ...
- ?-  object_unref(OBJECT(child_ptr));
- )
-
- @use_sysbus_init_child_obj@
- expression parent_obj;
- expression dev;
- expression child_ptr;
- expression child_name;
- expression child_type;
- expression child_size;
- expression errp;
- @@
- (
- -   object_initialize_child(parent_obj, child_name, child_ptr, child_siz=
-e,
- -                           child_type, errp, NULL);
- +   sysbus_init_child_obj(parent_obj, child_name, child_ptr, child_size,
- +                         child_type);
-     ...
- -   qdev_set_parent_bus(DEVICE(child_ptr), sysbus_get_default());
- |
- -   object_initialize_child(parent_obj, child_name, child_ptr, child_siz=
-e,
- -                           child_type, errp, NULL);
- +   sysbus_init_child_obj(parent_obj, child_name, child_ptr, child_size,
- +                         child_type);
- -   dev =3D DEVICE(child_ptr);
- -   qdev_set_parent_bus(dev, sysbus_get_default());
- )
-
-While the object_initialize() function doesn't take an
-'Error *errp' argument, the object_initialize_child() does.
-Since this code is used when a machine is created (and is not
-yet running), we deliberately choose to use the &error_abort
-argument instead of ignoring errors if an object creation failed.
-This choice also matches when using sysbus_init_child_obj(),
-since its code is:
-
-  void sysbus_init_child_obj(Object *parent,
-                             const char *childname, void *child,
-                             size_t childsize, const char *childtype)
-  {
-      object_initialize_child(parent, childname, child, childsize,
-                              childtype, &error_abort, NULL);
-
-      qdev_set_parent_bus(DEVICE(child), sysbus_get_default());
-  }
-
-Suggested-by: Eduardo Habkost <ehabkost@redhat.com>
-Inspired-by: Thomas Huth <thuth@redhat.com>
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Signed-off-by: Joel Stanley <joel@jms.id.au>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
-Reviewed-by: Joel Stanley <joel@jms.id.au>
-Message-Id: <20190507163416.24647-8-philmd@redhat.com>
-Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- hw/arm/aspeed.c     |  6 +++---
- hw/arm/aspeed_soc.c | 50 ++++++++++++++++++---------------------------
- 2 files changed, 23 insertions(+), 33 deletions(-)
+ include/hw/timer/aspeed_rtc.h |  31 ++++++
+ hw/timer/aspeed_rtc.c         | 180 ++++++++++++++++++++++++++++++++++
+ hw/timer/Makefile.objs        |   2 +-
+ hw/timer/trace-events         |   4 +
+ 4 files changed, 216 insertions(+), 1 deletion(-)
+ create mode 100644 include/hw/timer/aspeed_rtc.h
+ create mode 100644 hw/timer/aspeed_rtc.c
 
-diff --git a/hw/arm/aspeed.c b/hw/arm/aspeed.c
-index 415cff7a015d..33070a6df843 100644
---- a/hw/arm/aspeed.c
-+++ b/hw/arm/aspeed.c
-@@ -160,9 +160,9 @@ static void aspeed_board_init(MachineState *machine,
-     ram_addr_t max_ram_size;
+diff --git a/include/hw/timer/aspeed_rtc.h b/include/hw/timer/aspeed_rtc.=
+h
+new file mode 100644
+index 000000000000..1f1155a676c1
+--- /dev/null
++++ b/include/hw/timer/aspeed_rtc.h
+@@ -0,0 +1,31 @@
++/*
++ * ASPEED Real Time Clock
++ * Joel Stanley <joel@jms.id.au>
++ *
++ * Copyright 2019 IBM Corp
++ * SPDX-License-Identifier: GPL-2.0-or-later
++ */
++#ifndef ASPEED_RTC_H
++#define ASPEED_RTC_H
++
++#include <stdint.h>
++
++#include "hw/hw.h"
++#include "hw/irq.h"
++#include "hw/sysbus.h"
++
++typedef struct AspeedRtcState {
++    SysBusDevice parent_obj;
++
++    MemoryRegion iomem;
++    qemu_irq irq;
++
++    uint32_t reg[0x18];
++    int offset;
++
++} AspeedRtcState;
++
++#define TYPE_ASPEED_RTC "aspeed.rtc"
++#define ASPEED_RTC(obj) OBJECT_CHECK(AspeedRtcState, (obj), TYPE_ASPEED_=
+RTC)
++
++#endif /* ASPEED_RTC_H */
+diff --git a/hw/timer/aspeed_rtc.c b/hw/timer/aspeed_rtc.c
+new file mode 100644
+index 000000000000..19f061c846e8
+--- /dev/null
++++ b/hw/timer/aspeed_rtc.c
+@@ -0,0 +1,180 @@
++/*
++ * ASPEED Real Time Clock
++ * Joel Stanley <joel@jms.id.au>
++ *
++ * Copyright 2019 IBM Corp
++ * SPDX-License-Identifier: GPL-2.0-or-later
++ */
++
++#include "qemu/osdep.h"
++#include "qemu-common.h"
++#include "hw/timer/aspeed_rtc.h"
++#include "qemu/log.h"
++#include "qemu/timer.h"
++
++#include "trace.h"
++
++#define COUNTER1        (0x00 / 4)
++#define COUNTER2        (0x04 / 4)
++#define ALARM           (0x08 / 4)
++#define CONTROL         (0x10 / 4)
++#define ALARM_STATUS    (0x14 / 4)
++
++#define RTC_UNLOCKED    BIT(1)
++#define RTC_ENABLED     BIT(0)
++
++static void aspeed_rtc_calc_offset(AspeedRtcState *rtc)
++{
++    struct tm tm;
++    uint32_t year, cent;
++    uint32_t reg1 =3D rtc->reg[COUNTER1];
++    uint32_t reg2 =3D rtc->reg[COUNTER2];
++
++    tm.tm_mday =3D (reg1 >> 24) & 0x1f;
++    tm.tm_hour =3D (reg1 >> 16) & 0x1f;
++    tm.tm_min =3D (reg1 >> 8) & 0x3f;
++    tm.tm_sec =3D (reg1 >> 0) & 0x3f;
++
++    cent =3D (reg2 >> 16) & 0x1f;
++    year =3D (reg2 >> 8) & 0x7f;
++    tm.tm_mon =3D ((reg2 >>  0) & 0x0f) - 1;
++    tm.tm_year =3D year + (cent * 100) - 1900;
++
++    rtc->offset =3D qemu_timedate_diff(&tm);
++}
++
++static uint32_t aspeed_rtc_get_counter(AspeedRtcState *rtc, int r)
++{
++    uint32_t year, cent;
++    struct tm now;
++
++    qemu_get_timedate(&now, rtc->offset);
++
++    switch (r) {
++    case COUNTER1:
++        return (now.tm_mday << 24) | (now.tm_hour << 16) |
++            (now.tm_min << 8) | now.tm_sec;
++    case COUNTER2:
++        cent =3D (now.tm_year + 1900) / 100;
++        year =3D now.tm_year % 100;
++        return ((cent & 0x1f) << 16) | ((year & 0x7f) << 8) |
++            ((now.tm_mon + 1) & 0xf);
++    default:
++        g_assert_not_reached();
++    }
++}
++
++static uint64_t aspeed_rtc_read(void *opaque, hwaddr addr,
++                                unsigned size)
++{
++    AspeedRtcState *rtc =3D opaque;
++    uint64_t val;
++    uint32_t r =3D addr >> 2;
++
++    switch (r) {
++    case COUNTER1:
++    case COUNTER2:
++        if (rtc->reg[CONTROL] & RTC_ENABLED) {
++            rtc->reg[r] =3D aspeed_rtc_get_counter(rtc, r);
++        }
++        /* fall through */
++    case CONTROL:
++        val =3D rtc->reg[r];
++        break;
++    case ALARM:
++    case ALARM_STATUS:
++    default:
++        qemu_log_mask(LOG_UNIMP, "%s: 0x%" HWADDR_PRIx "\n", __func__, a=
+ddr);
++        return 0;
++    }
++
++    trace_aspeed_rtc_read(addr, val);
++
++    return val;
++}
++
++static void aspeed_rtc_write(void *opaque, hwaddr addr,
++                             uint64_t val, unsigned size)
++{
++    AspeedRtcState *rtc =3D opaque;
++    uint32_t r =3D addr >> 2;
++
++    switch (r) {
++    case COUNTER1:
++    case COUNTER2:
++        if (!(rtc->reg[CONTROL] & RTC_UNLOCKED)) {
++            break;
++        }
++        /* fall through */
++    case CONTROL:
++        rtc->reg[r] =3D val;
++        aspeed_rtc_calc_offset(rtc);
++        break;
++    case ALARM:
++    case ALARM_STATUS:
++    default:
++        qemu_log_mask(LOG_UNIMP, "%s: 0x%" HWADDR_PRIx "\n", __func__, a=
+ddr);
++        break;
++    }
++    trace_aspeed_rtc_write(addr, val);
++}
++
++static void aspeed_rtc_reset(DeviceState *d)
++{
++    AspeedRtcState *rtc =3D ASPEED_RTC(d);
++
++    rtc->offset =3D 0;
++    memset(rtc->reg, 0, sizeof(rtc->reg));
++}
++
++static const MemoryRegionOps aspeed_rtc_ops =3D {
++    .read =3D aspeed_rtc_read,
++    .write =3D aspeed_rtc_write,
++    .endianness =3D DEVICE_NATIVE_ENDIAN,
++};
++
++static const VMStateDescription vmstate_aspeed_rtc =3D {
++    .name =3D TYPE_ASPEED_RTC,
++    .version_id =3D 1,
++    .fields =3D (VMStateField[]) {
++        VMSTATE_UINT32_ARRAY(reg, AspeedRtcState, 0x18),
++        VMSTATE_INT32(offset, AspeedRtcState),
++        VMSTATE_INT32(offset, AspeedRtcState),
++        VMSTATE_END_OF_LIST()
++    }
++};
++
++static void aspeed_rtc_realize(DeviceState *dev, Error **errp)
++{
++    SysBusDevice *sbd =3D SYS_BUS_DEVICE(dev);
++    AspeedRtcState *s =3D ASPEED_RTC(dev);
++
++    sysbus_init_irq(sbd, &s->irq);
++
++    memory_region_init_io(&s->iomem, OBJECT(s), &aspeed_rtc_ops, s,
++                          "aspeed-rtc", 0x18ULL);
++    sysbus_init_mmio(sbd, &s->iomem);
++}
++
++static void aspeed_rtc_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc =3D DEVICE_CLASS(klass);
++
++    dc->realize =3D aspeed_rtc_realize;
++    dc->vmsd =3D &vmstate_aspeed_rtc;
++    dc->reset =3D aspeed_rtc_reset;
++}
++
++static const TypeInfo aspeed_rtc_info =3D {
++    .name          =3D TYPE_ASPEED_RTC,
++    .parent        =3D TYPE_SYS_BUS_DEVICE,
++    .instance_size =3D sizeof(AspeedRtcState),
++    .class_init    =3D aspeed_rtc_class_init,
++};
++
++static void aspeed_rtc_register_types(void)
++{
++    type_register_static(&aspeed_rtc_info);
++}
++
++type_init(aspeed_rtc_register_types)
+diff --git a/hw/timer/Makefile.objs b/hw/timer/Makefile.objs
+index 0e9a4530f848..123d92c9692c 100644
+--- a/hw/timer/Makefile.objs
++++ b/hw/timer/Makefile.objs
+@@ -41,7 +41,7 @@ obj-$(CONFIG_MC146818RTC) +=3D mc146818rtc.o
+ obj-$(CONFIG_ALLWINNER_A10_PIT) +=3D allwinner-a10-pit.o
 =20
-     bmc =3D g_new0(AspeedBoardState, 1);
--    object_initialize(&bmc->soc, (sizeof(bmc->soc)), cfg->soc_name);
--    object_property_add_child(OBJECT(machine), "soc", OBJECT(&bmc->soc),
--                              &error_abort);
-+    object_initialize_child(OBJECT(machine), "soc", &bmc->soc,
-+                            (sizeof(bmc->soc)), cfg->soc_name, &error_ab=
-ort,
-+                            NULL);
+ common-obj-$(CONFIG_STM32F2XX_TIMER) +=3D stm32f2xx_timer.o
+-common-obj-$(CONFIG_ASPEED_SOC) +=3D aspeed_timer.o
++common-obj-$(CONFIG_ASPEED_SOC) +=3D aspeed_timer.o aspeed_rtc.o
 =20
-     sc =3D ASPEED_SOC_GET_CLASS(&bmc->soc);
+ common-obj-$(CONFIG_SUN4V_RTC) +=3D sun4v-rtc.o
+ common-obj-$(CONFIG_CMSDK_APB_TIMER) +=3D cmsdk-apb-timer.o
+diff --git a/hw/timer/trace-events b/hw/timer/trace-events
+index dcaf3d6da6c8..db02a9142cda 100644
+--- a/hw/timer/trace-events
++++ b/hw/timer/trace-events
+@@ -66,6 +66,10 @@ cmsdk_apb_dualtimer_read(uint64_t offset, uint64_t dat=
+a, unsigned size) "CMSDK A
+ cmsdk_apb_dualtimer_write(uint64_t offset, uint64_t data, unsigned size)=
+ "CMSDK APB dualtimer write: offset 0x%" PRIx64 " data 0x%" PRIx64 " size=
+ %u"
+ cmsdk_apb_dualtimer_reset(void) "CMSDK APB dualtimer: reset"
 =20
-diff --git a/hw/arm/aspeed_soc.c b/hw/arm/aspeed_soc.c
-index a27233d4876b..faff42b84ad1 100644
---- a/hw/arm/aspeed_soc.c
-+++ b/hw/arm/aspeed_soc.c
-@@ -106,12 +106,11 @@ static void aspeed_soc_init(Object *obj)
-     AspeedSoCClass *sc =3D ASPEED_SOC_GET_CLASS(s);
-     int i;
-=20
--    object_initialize(&s->cpu, sizeof(s->cpu), sc->info->cpu_type);
--    object_property_add_child(obj, "cpu", OBJECT(&s->cpu), NULL);
-+    object_initialize_child(obj, "cpu", OBJECT(&s->cpu), sizeof(s->cpu),
-+                            sc->info->cpu_type, &error_abort, NULL);
-=20
--    object_initialize(&s->scu, sizeof(s->scu), TYPE_ASPEED_SCU);
--    object_property_add_child(obj, "scu", OBJECT(&s->scu), NULL);
--    qdev_set_parent_bus(DEVICE(&s->scu), sysbus_get_default());
-+    sysbus_init_child_obj(obj, "scu", OBJECT(&s->scu), sizeof(s->scu),
-+                          TYPE_ASPEED_SCU);
-     qdev_prop_set_uint32(DEVICE(&s->scu), "silicon-rev",
-                          sc->info->silicon_rev);
-     object_property_add_alias(obj, "hw-strap1", OBJECT(&s->scu),
-@@ -121,36 +120,29 @@ static void aspeed_soc_init(Object *obj)
-     object_property_add_alias(obj, "hw-prot-key", OBJECT(&s->scu),
-                               "hw-prot-key", &error_abort);
-=20
--    object_initialize(&s->vic, sizeof(s->vic), TYPE_ASPEED_VIC);
--    object_property_add_child(obj, "vic", OBJECT(&s->vic), NULL);
--    qdev_set_parent_bus(DEVICE(&s->vic), sysbus_get_default());
-+    sysbus_init_child_obj(obj, "vic", OBJECT(&s->vic), sizeof(s->vic),
-+                          TYPE_ASPEED_VIC);
-=20
--    object_initialize(&s->timerctrl, sizeof(s->timerctrl), TYPE_ASPEED_T=
-IMER);
--    object_property_add_child(obj, "timerctrl", OBJECT(&s->timerctrl), N=
-ULL);
-+    sysbus_init_child_obj(obj, "timerctrl", OBJECT(&s->timerctrl),
-+                          sizeof(s->timerctrl), TYPE_ASPEED_TIMER);
-     object_property_add_const_link(OBJECT(&s->timerctrl), "scu",
-                                    OBJECT(&s->scu), &error_abort);
--    qdev_set_parent_bus(DEVICE(&s->timerctrl), sysbus_get_default());
-=20
--    object_initialize(&s->i2c, sizeof(s->i2c), TYPE_ASPEED_I2C);
--    object_property_add_child(obj, "i2c", OBJECT(&s->i2c), NULL);
--    qdev_set_parent_bus(DEVICE(&s->i2c), sysbus_get_default());
-+    sysbus_init_child_obj(obj, "i2c", OBJECT(&s->i2c), sizeof(s->i2c),
-+                          TYPE_ASPEED_I2C);
-=20
--    object_initialize(&s->fmc, sizeof(s->fmc), sc->info->fmc_typename);
--    object_property_add_child(obj, "fmc", OBJECT(&s->fmc), NULL);
--    qdev_set_parent_bus(DEVICE(&s->fmc), sysbus_get_default());
-+    sysbus_init_child_obj(obj, "fmc", OBJECT(&s->fmc), sizeof(s->fmc),
-+                          sc->info->fmc_typename);
-     object_property_add_alias(obj, "num-cs", OBJECT(&s->fmc), "num-cs",
-                               &error_abort);
-=20
-     for (i =3D 0; i < sc->info->spis_num; i++) {
--        object_initialize(&s->spi[i], sizeof(s->spi[i]),
--                          sc->info->spi_typename[i]);
--        object_property_add_child(obj, "spi[*]", OBJECT(&s->spi[i]), NUL=
-L);
--        qdev_set_parent_bus(DEVICE(&s->spi[i]), sysbus_get_default());
-+        sysbus_init_child_obj(obj, "spi[*]", OBJECT(&s->spi[i]),
-+                              sizeof(s->spi[i]), sc->info->spi_typename[=
-i]);
-     }
-=20
--    object_initialize(&s->sdmc, sizeof(s->sdmc), TYPE_ASPEED_SDMC);
--    object_property_add_child(obj, "sdmc", OBJECT(&s->sdmc), NULL);
--    qdev_set_parent_bus(DEVICE(&s->sdmc), sysbus_get_default());
-+    sysbus_init_child_obj(obj, "sdmc", OBJECT(&s->sdmc), sizeof(s->sdmc)=
-,
-+                          TYPE_ASPEED_SDMC);
-     qdev_prop_set_uint32(DEVICE(&s->sdmc), "silicon-rev",
-                          sc->info->silicon_rev);
-     object_property_add_alias(obj, "ram-size", OBJECT(&s->sdmc),
-@@ -159,16 +151,14 @@ static void aspeed_soc_init(Object *obj)
-                               "max-ram-size", &error_abort);
-=20
-     for (i =3D 0; i < sc->info->wdts_num; i++) {
--        object_initialize(&s->wdt[i], sizeof(s->wdt[i]), TYPE_ASPEED_WDT=
-);
--        object_property_add_child(obj, "wdt[*]", OBJECT(&s->wdt[i]), NUL=
-L);
--        qdev_set_parent_bus(DEVICE(&s->wdt[i]), sysbus_get_default());
-+        sysbus_init_child_obj(obj, "wdt[*]", OBJECT(&s->wdt[i]),
-+                              sizeof(s->wdt[i]), TYPE_ASPEED_WDT);
-         qdev_prop_set_uint32(DEVICE(&s->wdt[i]), "silicon-rev",
-                                     sc->info->silicon_rev);
-     }
-=20
--    object_initialize(&s->ftgmac100, sizeof(s->ftgmac100), TYPE_FTGMAC10=
-0);
--    object_property_add_child(obj, "ftgmac100", OBJECT(&s->ftgmac100), N=
-ULL);
--    qdev_set_parent_bus(DEVICE(&s->ftgmac100), sysbus_get_default());
-+    sysbus_init_child_obj(obj, "ftgmac100", OBJECT(&s->ftgmac100),
-+                          sizeof(s->ftgmac100), TYPE_FTGMAC100);
- }
-=20
- static void aspeed_soc_realize(DeviceState *dev, Error **errp)
++# hw/timer/aspeed-rtc.c
++aspeed_rtc_read(uint64_t addr, uint64_t value) "addr 0x%02" PRIx64 " val=
+ue 0x%08" PRIx64
++aspeed_rtc_write(uint64_t addr, uint64_t value) "addr 0x%02" PRIx64 " va=
+lue 0x%08" PRIx64
++
+ # sun4v-rtc.c
+ sun4v_rtc_read(uint64_t addr, uint64_t value) "read: addr 0x%" PRIx64 " =
+value 0x%" PRIx64
+ sun4v_rtc_write(uint64_t addr, uint64_t value) "write: addr 0x%" PRIx64 =
+" value 0x%" PRIx64
 --=20
 2.20.1
 
