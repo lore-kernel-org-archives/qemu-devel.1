@@ -2,90 +2,59 @@ Return-Path: <SRS0=E2zY=TZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C4059C04AB0
-	for <qemu-devel@archiver.kernel.org>; Sat, 25 May 2019 07:52:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 94DD6C04AB0
+	for <qemu-devel@archiver.kernel.org>; Sat, 25 May 2019 09:07:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 87AD82133D
-	for <qemu-devel@archiver.kernel.org>; Sat, 25 May 2019 07:52:54 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="m+PNkRuu"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 87AD82133D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 669402168B
+	for <qemu-devel@archiver.kernel.org>; Sat, 25 May 2019 09:07:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 669402168B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:37614 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:38212 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hURU5-0006dK-2p
-	for qemu-devel@archiver.kernel.org; Sat, 25 May 2019 03:52:53 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:59248)
+	id 1hUSej-0003nq-As
+	for qemu-devel@archiver.kernel.org; Sat, 25 May 2019 05:07:57 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:39823)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hURT6-0006FP-JG
-	for qemu-devel@nongnu.org; Sat, 25 May 2019 03:51:54 -0400
+	(envelope-from <stefanha@redhat.com>) id 1hUSdq-0003Ra-Eg
+	for qemu-devel@nongnu.org; Sat, 25 May 2019 05:07:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hURAY-0000xX-1Z
-	for qemu-devel@nongnu.org; Sat, 25 May 2019 03:32:43 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:39438)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1hURAX-0000vP-Ph
-	for qemu-devel@nongnu.org; Sat, 25 May 2019 03:32:41 -0400
-Received: by mail-wr1-x441.google.com with SMTP id e2so3240392wrv.6
-	for <qemu-devel@nongnu.org>; Sat, 25 May 2019 00:32:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=references:user-agent:from:to:cc:subject:in-reply-to:date
-	:message-id:mime-version:content-transfer-encoding;
-	bh=vVl9V4zuTn5tE2qNAT4YMa/w5EjFrpthmm04wHF3sk4=;
-	b=m+PNkRuutMe56Bbta+KYOG+E7QnLT/kbfjlUlyfyUCTRI8ZtBKz4/ZEEE6aDuOVvk2
-	Efqwh3RoM0tHqysH2jZ+HY6/Q18vadDlEQ7dICA7Eot2XXFSrKoFPdfvf9RQAr7dWVwQ
-	VbUasQNI2NQGljTnktlekvyL6GkYi0rOEGV89eWPLqSO+PJ0oensWicsHjI71XdceB5p
-	UkrpnJ/Kp1tg29KJ/+dCwblbMiMjtGSWhtY+la/YaY+wtpHJl41mizXBURA9lrGiN/ij
-	ChPsTd/8duGQSBGkvwLfZr45B5ijJc6xdh5tEKmqVk5SKlPSmvrV7c8HNKN2gF3uAMEz
-	glTQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:references:user-agent:from:to:cc:subject
-	:in-reply-to:date:message-id:mime-version:content-transfer-encoding;
-	bh=vVl9V4zuTn5tE2qNAT4YMa/w5EjFrpthmm04wHF3sk4=;
-	b=lM2sbpWchDtmK5T2zcd+5UdSRpwTM9aSc5dymfNjqItp3lYvtpqDvmPi9n7EGizHys
-	AKiHOWNjm9j4eZREH+SwHkf0kAVH+slXFV0VRB9398gD6ma9vAkoFCF1c/NaEmoh1e93
-	hIGxB+JO+uSgfeUzN3p57yU4yOc2jBHYnhy/ERORgoHm5kXUhP/QRg7Xpt8lfY/St+C2
-	3gDH7Db0PcMuSz4XXf4c06CzwkvfuKUzSSh/Yf/bsVDu8RmsWtp96x/ntU6mtB0UjrsO
-	4uM0MNIU9qt0sVODoqKsy8RKSy0SIvVQjTgMmUC3j5pOx/HV/Zcq/Q9diXvSzo/986wD
-	LDmA==
-X-Gm-Message-State: APjAAAU1qzjdkRR6XjTFdW390htrknX6vUP69eTG0KGmt+d4PmkyOoi3
-	HEPusZVVS+epZDOIBqDFJBP9aQ==
-X-Google-Smtp-Source: APXvYqyrO+97oU1HtGYQHKbCcgswX4otJOxbLNXwCVtyGfZKWHPP9vTSX7AG5Zv/7Qr5Iav1JlsjsQ==
-X-Received: by 2002:adf:fd45:: with SMTP id h5mr2790026wrs.128.1558769559906; 
-	Sat, 25 May 2019 00:32:39 -0700 (PDT)
-Received: from zen.linaroharston ([81.128.185.34])
-	by smtp.gmail.com with ESMTPSA id
-	t194sm21207234wmt.3.2019.05.25.00.32.39
-	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Sat, 25 May 2019 00:32:39 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
-	by zen.linaroharston (Postfix) with ESMTP id CF59A1FF87;
-	Sat, 25 May 2019 08:32:38 +0100 (BST)
-References: <20190525062832.18009-1-liq3ea@163.com>
-User-agent: mu4e 1.3.2; emacs 26.1
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-devel@nongnu.org
-In-reply-to: <20190525062832.18009-1-liq3ea@163.com>
-Date: Sat, 25 May 2019 08:32:38 +0100
-Message-ID: <87sgt3q99l.fsf@zen.linaroharston>
+	(envelope-from <stefanha@redhat.com>) id 1hUSdp-0002KP-Dz
+	for qemu-devel@nongnu.org; Sat, 25 May 2019 05:07:02 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38758)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>)
+	id 1hUSdn-0002IE-4K; Sat, 25 May 2019 05:06:59 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 6E1C03082AEF;
+	Sat, 25 May 2019 09:06:58 +0000 (UTC)
+Received: from localhost (ovpn-116-47.ams2.redhat.com [10.36.116.47])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 9B6E560606;
+	Sat, 25 May 2019 09:06:55 +0000 (UTC)
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: qemu-devel@nongnu.org,
+	Aarushi Mehta <mehta.aaru20@gmail.com>
+Date: Sat, 25 May 2019 10:05:59 +0100
+Message-Id: <20190525090559.31914-1-stefanha@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.45]);
+	Sat, 25 May 2019 09:06:58 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2a00:1450:4864:20::441
-Subject: Re: [Qemu-devel] [PATCH] migration: fix a typo
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PATCH] block/io_uring: use pkg-config for liburing
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -97,42 +66,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, Li Qiang <liq3ea@163.com>, dgilbert@redhat.com,
-	quintela@redhat.com
+Cc: Kevin Wolf <kwolf@redhat.com>, Julia Suvorova <jusual@mail.ru>,
+	Stefan Hajnoczi <stefanha@redhat.com>, qemu-block@nongnu.org,
+	Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Now that liburing has pkg-config support, use it instead of hardcoding
+compiler flags in QEMU's build scripts.  This way distros can customize
+the location of liburing's headers and libraries without requiring
+changes to QEMU.
 
-Li Qiang <liq3ea@163.com> writes:
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+---
+Hi Aarushi,
+This change is needed to take advantage of the pkg-config patch that
+I've just sent to liburing.  It works like this:
 
-> 'postocpy' should be 'postcopy'.
->
-> CC: qemu-trivial@nongnu.org
-> Signed-off-by: Li Qiang <liq3ea@163.com>
+  $ cd liburing
+  $ ./configure --libdir=3D/usr/lib64 # needed on Fedora x86_64
+  $ make && sudo make install
 
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+That puts liburing.pc into /usr/lib64/pkgconfig/ where QEMU's
+./configure will find it:
 
-> ---
->  migration/ram.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/migration/ram.c b/migration/ram.c
-> index 4c60869226..359dc8f1bc 100644
-> --- a/migration/ram.c
-> +++ b/migration/ram.c
-> @@ -2236,7 +2236,7 @@ static RAMBlock *unqueue_page(RAMState *rs, ram_add=
-r_t *offset)
->  }
->
->  /**
-> - * get_queued_page: unqueue a page from the postocpy requests
-> + * get_queued_page: unqueue a page from the postcopy requests
->   *
->   * Skips pages that are already sent (!dirty)
->   *
+  $ cd qemu
+  $ ./configure --target-list=3Dx86_64-softmmu # it should detect liburin=
+g
+  $ make -j$(nproc)
 
+Feel free to squash this patch into your patches, I don't mind if the
+authorship information gets lost.  It will be easier for reviewers if
+this is present from the start instead of added in a later patch.
 
---
-Alex Benn=C3=A9e
+ configure           | 12 ++++++------
+ block/Makefile.objs |  3 ++-
+ 2 files changed, 8 insertions(+), 7 deletions(-)
+
+diff --git a/configure b/configure
+index 86383dc0b3..acbdf04168 100755
+--- a/configure
++++ b/configure
+@@ -3972,15 +3972,13 @@ fi
+ # linux-io-uring probe
+=20
+ if test "$linux_io_uring" !=3D "no" ; then
+-  cat > $TMPC <<EOF
+-#include <liburing.h>
+-int main(void) { io_uring_queue_init(0, NULL, 0); io_uring_submit(NULL);=
+ return 0; }
+-EOF
+-  if compile_prog "" "-luring" ; then
++  if $pkg_config liburing; then
++    linux_io_uring_cflags=3D$($pkg_config --cflags liburing)
++    linux_io_uring_libs=3D$($pkg_config --libs liburing)
+     linux_io_uring=3Dyes
+   else
+     if test "$linux_io_uring" =3D "yes" ; then
+-      feature_not_found "linux io_uring" "Install liburing"
++      feature_not_found "linux io_uring" "Install liburing devel"
+     fi
+     linux_io_uring=3Dno
+   fi
+@@ -6884,6 +6882,8 @@ if test "$linux_aio" =3D "yes" ; then
+ fi
+ if test "$linux_io_uring" =3D "yes" ; then
+   echo "CONFIG_LINUX_IO_URING=3Dy" >> $config_host_mak
++  echo "LINUX_IO_URING_CFLAGS=3D$linux_io_uring_cflags" >> $config_host_=
+mak
++  echo "LINUX_IO_URING_LIBS=3D$linux_io_uring_libs" >> $config_host_mak
+ fi
+ if test "$attr" =3D "yes" ; then
+   echo "CONFIG_ATTR=3Dy" >> $config_host_mak
+diff --git a/block/Makefile.objs b/block/Makefile.objs
+index 262d413c6d..eed8043740 100644
+--- a/block/Makefile.objs
++++ b/block/Makefile.objs
+@@ -62,6 +62,7 @@ block-obj-$(if $(CONFIG_LZFSE),m,n) +=3D dmg-lzfse.o
+ dmg-lzfse.o-libs   :=3D $(LZFSE_LIBS)
+ qcow.o-libs        :=3D -lz
+ linux-aio.o-libs   :=3D -laio
+-io_uring.o-libs    :=3D -luring
++io_uring.o-flags   :=3D $(LINUX_IO_URING_CFLAGS)
++io_uring.o-libs    :=3D $(LINUX_IO_URING_LIBS)
+ parallels.o-cflags :=3D $(LIBXML2_CFLAGS)
+ parallels.o-libs   :=3D $(LIBXML2_LIBS)
+--=20
+2.21.0
+
 
