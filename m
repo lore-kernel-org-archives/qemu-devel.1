@@ -6,71 +6,60 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 96A33C282E3
-	for <qemu-devel@archiver.kernel.org>; Sun, 26 May 2019 17:07:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B914C282E3
+	for <qemu-devel@archiver.kernel.org>; Sun, 26 May 2019 17:11:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 60D7320657
-	for <qemu-devel@archiver.kernel.org>; Sun, 26 May 2019 17:07:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 60D7320657
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=tuxfamily.org
+	by mail.kernel.org (Postfix) with ESMTPS id 9A7D020657
+	for <qemu-devel@archiver.kernel.org>; Sun, 26 May 2019 17:11:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9A7D020657
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:57600 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:57664 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hUwcI-0002D1-EE
-	for qemu-devel@archiver.kernel.org; Sun, 26 May 2019 13:07:26 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:47956)
+	id 1hUwgc-0003ey-NW
+	for qemu-devel@archiver.kernel.org; Sun, 26 May 2019 13:11:54 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:49453)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <th.huth@gmail.com>) id 1hUwad-00010d-9T
-	for qemu-devel@nongnu.org; Sun, 26 May 2019 13:05:47 -0400
+	(envelope-from <clg@kaod.org>) id 1hUwfg-00033R-Jp
+	for qemu-devel@nongnu.org; Sun, 26 May 2019 13:10:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <th.huth@gmail.com>) id 1hUwVM-00059w-IF
-	for qemu-devel@nongnu.org; Sun, 26 May 2019 13:00:18 -0400
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:45138)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <th.huth@gmail.com>)
-	id 1hUwVM-00059E-5V; Sun, 26 May 2019 13:00:16 -0400
-Received: by mail-wr1-f66.google.com with SMTP id b18so14512444wrq.12;
-	Sun, 26 May 2019 10:00:15 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
-	:references:mime-version:content-transfer-encoding;
-	bh=7q5YvfkXAo/8pm66hs8SqX8dlCLic+UAAQlf98ognZE=;
-	b=cDzpa96TLsczsbbza9DBSG1rRsyIqen/ulvREO4MxQVSJUdwsJBLDMXasWhP8RklO4
-	+E4BkBVRbCl8HSZ2XKULz0Ku2B6g/SQoRD6ZkM2XLAppqSwEp9rfYEsWB86TPEovzDK1
-	12PTdKcNVZM0+JL1t+DBn564Ano0HtNw6T5scwVTNdUSyNbwVlf+ZMGdhsblFXQYOnC4
-	fLlHrK9QoJUoru3akIgxoA0FJ1R08aSj6pNzfvBbVZQS+qB9fAD8oCd/e4wXHzgZgKnl
-	s8LHz3418Kme2Bd/GjdlE8kd5xedstYUzq0QWmGnPbxX1Ab//ZTBP2aBUqEqINWPPpt4
-	9BXw==
-X-Gm-Message-State: APjAAAW+77b5y7jcNqgfOBP+5sHuVhzCu0BFUqVg5VNsyWJ6cPZGYivZ
-	rd3WG+2ljR5sk6q5WSR9lbs=
-X-Google-Smtp-Source: APXvYqxexwx9L9ACYh6gH+XNr/qMSmNZH3wscK27ejIhWezWlbtuLymI4J7VhJz/0NYYwQiGQDVPeA==
-X-Received: by 2002:a5d:5504:: with SMTP id b4mr54355038wrv.251.1558890014982; 
-	Sun, 26 May 2019 10:00:14 -0700 (PDT)
-Received: from thl530.multi.box (pD9E8362E.dip0.t-ipconnect.de.
-	[217.232.54.46]) by smtp.gmail.com with ESMTPSA id
-	z16sm5807180wmk.36.2019.05.26.10.00.12
-	(version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-	Sun, 26 May 2019 10:00:13 -0700 (PDT)
-Date: Sun, 26 May 2019 19:00:11 +0200
-From: Thomas Huth <huth@tuxfamily.org>
-To: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <20190526190011.361380e5@thl530.multi.box>
-In-Reply-To: <20190525225013.13916-11-laurent@vivier.eu>
-References: <20190525225013.13916-1-laurent@vivier.eu>
-	<20190525225013.13916-11-laurent@vivier.eu>
-X-Mailer: Claws Mail 3.17.3 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+	(envelope-from <clg@kaod.org>) id 1hUwfe-0001ff-G2
+	for qemu-devel@nongnu.org; Sun, 26 May 2019 13:10:56 -0400
+Received: from 5.mo69.mail-out.ovh.net ([46.105.43.105]:59944)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1hUwfe-0001Yb-A3
+	for qemu-devel@nongnu.org; Sun, 26 May 2019 13:10:54 -0400
+Received: from player711.ha.ovh.net (unknown [10.109.160.239])
+	by mo69.mail-out.ovh.net (Postfix) with ESMTP id 5306859B10
+	for <qemu-devel@nongnu.org>; Sun, 26 May 2019 19:10:42 +0200 (CEST)
+Received: from kaod.org (lfbn-1-10649-41.w90-89.abo.wanadoo.fr [90.89.235.41])
+	(Authenticated sender: clg@kaod.org)
+	by player711.ha.ovh.net (Postfix) with ESMTPSA id 42796618DEAA;
+	Sun, 26 May 2019 17:10:34 +0000 (UTC)
+To: Keno Fischer <keno@juliacomputing.com>
+References: <20190525151241.5017-1-clg@kaod.org>
+	<20190525151241.5017-8-clg@kaod.org>
+	<CABV8kRycd41XNP09C9mBvTEEReZzFHC3U8gOq0Krzyj+c4KNgA@mail.gmail.com>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <006f96c7-05fd-ee35-b6e6-1a27504e53ea@kaod.org>
+Date: Sun, 26 May 2019 19:10:33 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <CABV8kRycd41XNP09C9mBvTEEReZzFHC3U8gOq0Krzyj+c4KNgA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+X-Ovh-Tracer-Id: 14452614156711726035
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduuddruddvtddgudduvdcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-	[fuzzy]
-X-Received-From: 209.85.221.66
-Subject: Re: [Qemu-devel] [PATCH v7 10/10] hw/m68k: define Macintosh Quadra
- 800
+X-Received-From: 46.105.43.105
+Subject: Re: [Qemu-devel] [PATCH 07/19] aspeed: add support for multiple NICs
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -82,72 +71,151 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
-	"Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-	qemu-block@nongnu.org, Jason Wang <jasowang@redhat.com>,
-	Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
-	qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
-	=?UTF-8?B?SGVydsOp?= Poussineau <hpoussin@reactos.org>,
-	Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
-	=?UTF-8?B?TWFyYy1BbmRy?= =?UTF-8?B?w6k=?= Lureau
-	<marcandre.lureau@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
+Cc: Andrew Jeffery <andrew@aj.id.au>, Peter Maydell <peter.maydell@linaro.org>,
+	qemu-arm@nongnu.org, QEMU Developers <qemu-devel@nongnu.org>,
+	Joel Stanley <joel@jms.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am Sun, 26 May 2019 00:50:13 +0200
-schrieb Laurent Vivier <laurent@vivier.eu>:
+On 26/05/2019 03:01, Keno Fischer wrote:
+> Drive by comment, since I spotted this in my inbox.
+> When I tried to make this change (two years ago though),
+> I additionally needed the following. Unfortunately, I don't quite remem=
+ber
+> exactly what the issue was, but I think qemu would crash trying to crea=
+te more
+> than one nic.
 
-> If you want to test the machine, it doesn't yet boot a MacROM, but
-> you can boot a linux kernel from the command line.
-> 
-> You can install your own disk using debian-installer with:
-> 
->     ./qemu-system-m68k \
->     -M q800 \
->     -serial none -serial mon:stdio \
->     -m 1000M -drive file=m68k.qcow2,format=qcow2 \
->     -net nic,model=dp83932,addr=09:00:07:12:34:57 \
->     -append "console=ttyS0 vga=off" \
->     -kernel vmlinux-4.15.0-2-m68k \
->     -initrd initrd.gz \
->     -drive file=debian-9.0-m68k-NETINST-1.iso \
->     -drive file=m68k.qcow2,format=qcow2 \
->     -nographic
-> 
-> If you use a graphic adapter instead of "-nographic", you can use
-> "-g" to set the size of the display (I use "-g 1600x800x24").
-> 
-> Co-developed-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+Yes.=20
+
+The fix was :
+
+  http://patchwork.ozlabs.org/patch/1102295/
+
+Thanks,
+
+C.
+
 > ---
->  MAINTAINERS                      |  14 ++
->  default-configs/m68k-softmmu.mak |   1 +
->  hw/m68k/Kconfig                  |  12 +
->  hw/m68k/Makefile.objs            |   1 +
->  hw/m68k/bootinfo.h               | 100 +++++++++
->  hw/m68k/q800.c                   | 369
-> +++++++++++++++++++++++++++++++ 6 files changed, 497 insertions(+)
->  create mode 100644 hw/m68k/bootinfo.h
->  create mode 100644 hw/m68k/q800.c
-[...]
-> diff --git a/hw/m68k/bootinfo.h b/hw/m68k/bootinfo.h
-> new file mode 100644
-> index 0000000000..6584775f6d
-> --- /dev/null
-> +++ b/hw/m68k/bootinfo.h
-> @@ -0,0 +1,100 @@
-> +struct bi_record {
-> +    uint16_t tag;        /* tag ID */
-> +    uint16_t size;       /* size of record */
-> +    uint32_t data[0];    /* data */
-> +};
+>  hw/net/ftgmac100.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/hw/net/ftgmac100.c b/hw/net/ftgmac100.c
+> index 8127d0532dc..1318de85a4e 100644
+> --- a/hw/net/ftgmac100.c
+> +++ b/hw/net/ftgmac100.c
+> @@ -977,7 +977,8 @@ static void ftgmac100_realize(DeviceState *dev,
+> Error **errp)
+>      sysbus_init_irq(sbd, &s->irq);
+>      qemu_macaddr_default_if_unset(&s->conf.macaddr);
+>=20
+> -    s->conf.peers.ncs[0] =3D nd_table[0].netdev;
+> +    char *netdev_id =3D object_property_get_str(OBJECT(dev), "netdev",=
+ NULL);
+> +    s->conf.peers.ncs[0] =3D qemu_find_netdev(netdev_id);
+>=20
+>      s->nic =3D qemu_new_nic(&net_ftgmac100_info, &s->conf,
+>                            object_get_typename(OBJECT(dev)), DEVICE(dev=
+)->id,
+>=20
+>=20
+>=20
+> On Sat, May 25, 2019 at 11:22 AM C=C3=A9dric Le Goater <clg@kaod.org> w=
+rote:
+>>
+>> The Aspeed SoCs have two MACs. Extend the Aspeed model to support a
+>> second NIC.
+>>
+>> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+>> ---
+>>  include/hw/arm/aspeed_soc.h |  3 ++-
+>>  hw/arm/aspeed_soc.c         | 33 +++++++++++++++++++--------------
+>>  2 files changed, 21 insertions(+), 15 deletions(-)
+>>
+>> diff --git a/include/hw/arm/aspeed_soc.h b/include/hw/arm/aspeed_soc.h
+>> index 7247f6da2505..e8556abf4737 100644
+>> --- a/include/hw/arm/aspeed_soc.h
+>> +++ b/include/hw/arm/aspeed_soc.h
+>> @@ -25,6 +25,7 @@
+>>  #define ASPEED_SPIS_NUM  2
+>>  #define ASPEED_WDTS_NUM  3
+>>  #define ASPEED_CPUS_NUM  2
+>> +#define ASPEED_MACS_NUM  2
+>>
+>>  typedef struct AspeedSoCState {
+>>      /*< private >*/
+>> @@ -42,7 +43,7 @@ typedef struct AspeedSoCState {
+>>      AspeedSMCState spi[ASPEED_SPIS_NUM];
+>>      AspeedSDMCState sdmc;
+>>      AspeedWDTState wdt[ASPEED_WDTS_NUM];
+>> -    FTGMAC100State ftgmac100;
+>> +    FTGMAC100State ftgmac100[ASPEED_MACS_NUM];
+>>  } AspeedSoCState;
+>>
+>>  #define TYPE_ASPEED_SOC "aspeed-soc"
+>> diff --git a/hw/arm/aspeed_soc.c b/hw/arm/aspeed_soc.c
+>> index b983d5efc5d1..8cfe9e9515ed 100644
+>> --- a/hw/arm/aspeed_soc.c
+>> +++ b/hw/arm/aspeed_soc.c
+>> @@ -229,8 +229,10 @@ static void aspeed_soc_init(Object *obj)
+>>                                      sc->info->silicon_rev);
+>>      }
+>>
+>> -    sysbus_init_child_obj(obj, "ftgmac100", OBJECT(&s->ftgmac100),
+>> -                          sizeof(s->ftgmac100), TYPE_FTGMAC100);
+>> +    for (i =3D 0; i < ASPEED_MACS_NUM; i++) {
+>> +        sysbus_init_child_obj(obj, "ftgmac100[*]", OBJECT(&s->ftgmac1=
+00[i]),
+>> +                              sizeof(s->ftgmac100[i]), TYPE_FTGMAC100=
+);
+>> +    }
+>>  }
+>>
+>>  static void aspeed_soc_realize(DeviceState *dev, Error **errp)
+>> @@ -371,19 +373,22 @@ static void aspeed_soc_realize(DeviceState *dev,=
+ Error **errp)
+>>      }
+>>
+>>      /* Net */
+>> -    qdev_set_nic_properties(DEVICE(&s->ftgmac100), &nd_table[0]);
+>> -    object_property_set_bool(OBJECT(&s->ftgmac100), true, "aspeed", &=
+err);
+>> -    object_property_set_bool(OBJECT(&s->ftgmac100), true, "realized",
+>> -                             &local_err);
+>> -    error_propagate(&err, local_err);
+>> -    if (err) {
+>> -        error_propagate(errp, err);
+>> -        return;
+>> +    for (i =3D 0; i < nb_nics; i++) {
+>> +        qdev_set_nic_properties(DEVICE(&s->ftgmac100[i]), &nd_table[i=
+]);
+>> +        object_property_set_bool(OBJECT(&s->ftgmac100[i]), true, "asp=
+eed",
+>> +                                 &err);
+>> +        object_property_set_bool(OBJECT(&s->ftgmac100[i]), true, "rea=
+lized",
+>> +                                 &local_err);
+>> +        error_propagate(&err, local_err);
+>> +        if (err) {
+>> +            error_propagate(errp, err);
+>> +           return;
+>> +        }
+>> +        sysbus_mmio_map(SYS_BUS_DEVICE(&s->ftgmac100[i]), 0,
+>> +                        sc->info->memmap[ASPEED_ETH1 + i]);
+>> +        sysbus_connect_irq(SYS_BUS_DEVICE(&s->ftgmac100[i]), 0,
+>> +                           aspeed_soc_get_irq(s, ASPEED_ETH1 + i));
+>>      }
+>> -    sysbus_mmio_map(SYS_BUS_DEVICE(&s->ftgmac100), 0,
+>> -                    sc->info->memmap[ASPEED_ETH1]);
+>> -    sysbus_connect_irq(SYS_BUS_DEVICE(&s->ftgmac100), 0,
+>> -                       aspeed_soc_get_irq(s, ASPEED_ETH1));
+>>  }
+>>
+>>  static void aspeed_soc_class_init(ObjectClass *oc, void *data)
+>> --
+>> 2.20.1
+>>
+>>
 
-Maybe add a short description, license information and header guards at
-the top of the file?
-
-Apart from that, the patch looks sane to me.
-
- Thomas
 
