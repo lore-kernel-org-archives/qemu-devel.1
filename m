@@ -6,62 +6,60 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CCAF2C282E3
-	for <qemu-devel@archiver.kernel.org>; Sun, 26 May 2019 15:05:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 15E7FC282E3
+	for <qemu-devel@archiver.kernel.org>; Sun, 26 May 2019 15:08:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 932762075B
-	for <qemu-devel@archiver.kernel.org>; Sun, 26 May 2019 15:05:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CECE72075B
+	for <qemu-devel@archiver.kernel.org>; Sun, 26 May 2019 15:08:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="cbA3/Pez"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 932762075B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="YNllPSMW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CECE72075B
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:56287 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:56309 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hUuia-000528-Ph
-	for qemu-devel@archiver.kernel.org; Sun, 26 May 2019 11:05:48 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:58983)
+	id 1hUuld-00062f-W0
+	for qemu-devel@archiver.kernel.org; Sun, 26 May 2019 11:08:58 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:59996)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1hUufl-0003KL-TH
-	for qemu-devel@nongnu.org; Sun, 26 May 2019 11:02:54 -0400
+	(envelope-from <berto@igalia.com>) id 1hUuks-0005gj-6x
+	for qemu-devel@nongnu.org; Sun, 26 May 2019 11:08:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1hUufg-00066l-Ih
-	for qemu-devel@nongnu.org; Sun, 26 May 2019 11:02:50 -0400
-Received: from fanzine.igalia.com ([91.117.99.155]:55914)
+	(envelope-from <berto@igalia.com>) id 1hUukr-0002f0-58
+	for qemu-devel@nongnu.org; Sun, 26 May 2019 11:08:10 -0400
+Received: from fanzine.igalia.com ([91.117.99.155]:58437)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <berto@igalia.com>)
-	id 1hUufZ-0005Rd-Lg; Sun, 26 May 2019 11:02:42 -0400
+	id 1hUuko-0002ch-Hn; Sun, 26 May 2019 11:08:06 -0400
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
 	s=20170329; 
-	h=Content-Transfer-Encoding:Content-Type:MIME-Version:Message-ID:Date:References:In-Reply-To:Subject:Cc:To:From;
-	bh=8kmYVvRVo5948Rwdb8lzmlTbx8wzLYy5VKdsd4pcqBQ=; 
-	b=cbA3/PezWHVbHodGUroH7Lv7FIddWLYHOZtLgJkUWn89j2toUe3jI2M5Hhr6xPEpYX6wXE2TH4qvIohXLVQDuzNBpBYF49rrFYVJlPE4chMUEWqcM6R13o0+ptrUnyR/xXew+HszdrCEPZXqbCa1jr/un1j1aYIxD758FcgNq5gOwS2hXdPhUgTtOKn2FBggiGvOKgVakIaj1LsIN4cdAzhCA4XoV1uptle2Lkyq8TUNXkjLOhtzBIoZ95Nf65KhoDly8m9ZIOwTPID96MBbTgmkuzzKOfiouxA1X48zsIqBmFaxnGA92wxROm24cCib04xTVFoEQMBVcsnel8ajRw==;
+	h=Content-Type:MIME-Version:Message-ID:Date:References:In-Reply-To:Subject:Cc:To:From;
+	bh=le4ilk4IER0HAR6bx9f2Dy4yEyipr1NtichBeH9t2LU=; 
+	b=YNllPSMWE5xK3IapKHktixS+eVBnQjKAgwF5NK55DNW7wIzPg+GFlU2yts8Mrjs5jDz7an6pMpn7D6EP2CdJe9yDHTYJvIf7CQMS0EeI9AqTXwBXoFAztGvarE+6rnq5NdJxSL/jG7fOWb0PGv/+vo9P5VthmB4QoWyeYckiUkDszAY6GHGZTrQqUjzSQrlMI8cS2m9AAvrphqIxL5Yn41bTsQ4K4flKTRwyfMkAuVjKnHpKayxmQ5/J9bSNgm63cwdGUjznOyFKHvyj9Creoek6VWnjaHGKANWtdcAkfnaz+/B8zKcWOAte753jyHmkfhTAL+FpBiPwQFk11w/Rew==;
 Received: from maestria.local.igalia.com ([192.168.10.14] helo=mail.igalia.com)
 	by fanzine.igalia.com with esmtps 
 	(Cipher TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim)
-	id 1hUueu-000487-2W; Sun, 26 May 2019 17:02:00 +0200
+	id 1hUukm-00058s-AM; Sun, 26 May 2019 17:08:04 +0200
 Received: from berto by mail.igalia.com with local (Exim)
-	id 1hUuet-0003uA-Vy; Sun, 26 May 2019 17:01:59 +0200
+	id 1hUukm-0005Sf-7b; Sun, 26 May 2019 17:08:04 +0200
 From: Alberto Garcia <berto@igalia.com>
-To: Max Reitz <mreitz@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>,
-	qemu-block@nongnu.org
-In-Reply-To: <f2d129f6-b03f-aaa8-3e7d-fff48ea52233@redhat.com>
-References: <20190516142749.81019-1-anton.nefedov@virtuozzo.com>
-	<f2d129f6-b03f-aaa8-3e7d-fff48ea52233@redhat.com>
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+In-Reply-To: <20190524172812.27308-2-mreitz@redhat.com>
+References: <20190524172812.27308-1-mreitz@redhat.com>
+	<20190524172812.27308-2-mreitz@redhat.com>
 User-Agent: Notmuch/0.18.2 (http://notmuchmail.org) Emacs/24.4.1
 	(i586-pc-linux-gnu)
-Date: Sun, 26 May 2019 17:01:59 +0200
-Message-ID: <w51h89hjm3c.fsf@maestria.local.igalia.com>
+Date: Sun, 26 May 2019 17:08:04 +0200
+Message-ID: <w51ef4ljlt7.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x (no
 	timestamps) [generic] [fuzzy]
 X-Received-From: 91.117.99.155
-Subject: Re: [Qemu-devel] [PATCH v14 0/1] qcow2: cluster space preallocation
+Subject: Re: [Qemu-devel] [RFC 1/3] block: Add ImageRotationalInfo
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -73,34 +71,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, qemu-devel@nongnu.org,
-	den@virtuozzo.com
+Cc: Kevin Wolf <kwolf@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>,
+	Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+	qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri 24 May 2019 03:56:21 PM CEST, Max Reitz <mreitz@redhat.com> wrote:
->>     +-----------+-------+------+-------+------+------+
->>     |   file    |    before    |     after    | gain |
->>     +-----------+-------+------+-------+------+------+
->>     |    ssd    |      61.153  |      36.313  |  41% |
->>     |    hdd    |     112.676  |     122.056  |  -8% |
->>     +-----------+--------------+--------------+------+
->
-> I=E2=80=99ve done a few more tests, and I=E2=80=99ve seen more slowdown o=
-n an HDD.
-> (Like 30 % when doing 64 kB requests that are not aligned to
-> clusters.)  On the other hand, the SSD gain is generally in the same
-> ballpark (38 % when issuing the same kind of requests.)
-  [...]
-> [1] Hm.  We can probably investigate whether the file is stored on a
-> rotational medium or not.  Is there a fundamental reason why this
-> patch seems to degrade performance on an HDD but improves it on an
-> SSD?  If so, we can probably make a choice based on that.
+On Fri 24 May 2019 07:28:10 PM CEST, Max Reitz <mreitz@redhat.com> wrote:
+> +##
+> +# @ImageRotationalInfo:
+> +#
+> +# Indicates whether an image is stored on a rotating disk or not.
+> +#
+> +# @solid-state: Image is stored on a solid-state drive
+> +#
+> +# @rotating:    Image is stored on a rotating disk
 
-This is when writing to an unallocated cluster with no existing data on
-the backing image, right? Then it's probably because you need 2
-operations (write zeros + write data) instead of just one.
+What happens when you cannot tell? You assume it's solid-state?
 
 Berto
 
