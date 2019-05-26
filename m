@@ -7,75 +7,76 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F8C6C282E1
-	for <qemu-devel@archiver.kernel.org>; Sun, 26 May 2019 07:40:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 89907C282E1
+	for <qemu-devel@archiver.kernel.org>; Sun, 26 May 2019 08:00:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EE83E20815
-	for <qemu-devel@archiver.kernel.org>; Sun, 26 May 2019 07:40:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4E66F2085A
+	for <qemu-devel@archiver.kernel.org>; Sun, 26 May 2019 08:00:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b="hMmzi2GJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EE83E20815
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b="t7S8wtJx"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4E66F2085A
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=nongnu.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:52002 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:52122 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hUnlh-0005Ma-Qr
-	for qemu-devel@archiver.kernel.org; Sun, 26 May 2019 03:40:33 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:33370)
+	id 1hUo4x-0000Pq-84
+	for qemu-devel@archiver.kernel.org; Sun, 26 May 2019 04:00:27 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:35442)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lucienmp_antispam@yahoo.com>) id 1hUnka-0004cc-DK
-	for qemu-devel@nongnu.org; Sun, 26 May 2019 03:39:25 -0400
+	(envelope-from <lucienmp_antispam@yahoo.com>) id 1hUo3k-0008LP-9n
+	for qemu-devel@nongnu.org; Sun, 26 May 2019 03:59:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lucienmp_antispam@yahoo.com>) id 1hUncU-0004ku-CI
-	for qemu-devel@nongnu.org; Sun, 26 May 2019 03:31:04 -0400
-Received: from sonic314-48.consmr.mail.sg3.yahoo.com ([106.10.240.172]:38116)
+	(envelope-from <lucienmp_antispam@yahoo.com>) id 1hUnxp-0000MJ-Vv
+	for qemu-devel@nongnu.org; Sun, 26 May 2019 03:53:06 -0400
+Received: from sonic306-46.consmr.mail.sg3.yahoo.com ([106.10.241.166]:42840)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <lucienmp_antispam@yahoo.com>)
-	id 1hUncS-0004im-Vg
-	for qemu-devel@nongnu.org; Sun, 26 May 2019 03:31:01 -0400
+	id 1hUnxp-0000Jr-HG
+	for qemu-devel@nongnu.org; Sun, 26 May 2019 03:53:05 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048;
-	t=1558855855; bh=nJDhTYoF5BMQpZWgNBuvAWMTxFzwnMZo864YYhno/dU=;
+	t=1558857182; bh=UpAF+Bp0rIUtVnXVOisU6bkLam7XumHi/1u+zXHbgc8=;
 	h=From:To:Cc:Subject:Date:From:Subject;
-	b=hMmzi2GJAk02g0OIMGHUVmqrLJz7aEwopOJsrNNtrbxNFN09BK6kqmaGcS8lkm/v9qm8T5TTnfEZQJilziHBA8mMtHFYaBt9Xh5r+6z2WG9/zkgIGIuEN0xr2TXvSozC78MEIDvTTfiZ5vSrpz6HUbl4N3o2as/bVmTO5XOB9Zikg7/xwspyhmjfmyVqQK98Av0msoPa0mGrsr8tlsGqGmhdjuL6XBO/rNHmUNAxxwBgvuz4r98uHWdML8zPXUcDR8McbrvfaEyKb4OKqRh00K5oduAaA20sbU/uRz5ZUSbzeaIEpZnTxLazqr+GANuiBvAZlbTF0CuERQqlrqiiFw==
-X-YMail-OSG: KQuUfvEVM1le0q9SxPoQcCKzbzN3Q4AkKyzQ3eAx1yXKpae3QjXjEQB21pThW5S
-	5mNvm1eTWaaEbCD99gIFQPh83iiv_R.baLaN8sdq.AJLu1TbwXSK3IJLNI.WHn7ofEb0c5dF6VrM
-	_4Xc1Tp2EU3RucyqdeRK83sVpzYGxMwYpRCiYa4vxlMoifnUdVkbamownF6mcAxPV12gZ12MH6.r
-	ylpoPISRfYtYUXwaRL3cJuPhklDqZT6E3rp2UVo2wdBSLIi4a6t6N5mHzSke0MONA8VKSqZ8EZcu
-	IngjJIsbg.rFsVvuNHj7TNYMoOSo9xKf5Gc2_2iPDo3JGrQzhAynbP1GD7dMTiaLPtEtms0SR8XH
-	MoYC5rlNbDiXlw8vR2W1d9c2.DhfNaR0EUx8GfqGmulpb44z2_Z08xXseJEUrBMfwCZV8emWODBl
-	XalBTuAWUV25Qg6Sm9i6Xr54RSKK4G9dNLICXiZTcTR4hmqDgNid976_m0JK4qdhImrZB1JOhexg
-	ESBFr5N8uf0QorEq_Jp3uFFA.dujFnr5f7bTGkv0Y7uaX8e6lVfYOfkKIllRMXeurmDnZB2_9mtr
-	NZnuI3Nwar4o7Xj31gRBJGTgRRozbhHxhc3k3ACSNiKjPV6FsJMHpi.kq2c1pWQ.AIJisKjaDymT
-	mW5Dg.ebgoB2Q8fImENahVFG9qNBK1cQXSyKQVic3_CHuV4TI8PiUfsGy3VG32ORGjetin.qr8zO
-	g5CZ5sjPtXVRcNDNRsJizcNIVZwxcvVPDl_0NaqUaB7Y10ht6GLW9kHHFz00dTLRqrucDuaJ2sbt
-	ftW98EbHJBiCroHf5qk9Eo2DHsNMCXetkyKT788wsJ4PrN7y4HQ_kRGuX.HnKZH3FKfVpPtHl.7R
-	RdXfUhIrrIFtrb.E7sW0z9iJBKknvTTB29m3OL1nxPzPZpqa3bGfldxq1_Yg_rv2TKmIK0SET0J7
-	ofT6LH5vm6hLnBDHvsfJixtnYF5PcGR9hHVmm.d9cYc_SXPSSGEIxYam1IERIBS7oeJbkxVVV5lC
-	ehNYzLdX0Xk9hr0D7yVLHUlTR250SL5OQDr2EpmqIqTLrhkRGKVoRZ3FxMpTVWW3_I6ngv7wHkTX
-	B8WV2CkhFu4wPW5RivHIJ2_d6ErHf2R2M3bPbc79JenCpEDDyGimnRmnyY6_2MKu4FHAX8_VKKbH
-	x8FUaoP8zfX5OV4ffZesZ76Hvj.PPsdiSDeQVOS313v8IIdBKPX2bu5Aa8c5weaT8A4v5V1w3gAh
-	6uVWjyFoX31nRRAYJk4ayTDuZqGeGgBz70y_JbmGP
+	b=t7S8wtJxYsx9Mnixx5mnr5zFR50ObV6YfCZt3GM+J5NSteproudFe6IZq+i8ZQb4Ti3aiSkcN7QqWvYgM5bKwMg+Cudxnmg2QOc5AXMVfzJensLo8fIMl7NdFoT+YqY9i8U5FwCkYAUQt6606doO7qEi/PvZlR9AxhUdnAQFod3VzNw1dRUCocujY/g7w3BAaLxRnVPt51ds+n2aeJeTxp+g8zluNr9QAXcMkDMmbNIkKXSFt/a347Pj2pLYSsYg3eHj75kSBfEDKrmBwMM5kS1PKNFcpv68x6maVdf9WWlBw+07Nd5ZgjY9VIgMMblpDx+y4Uokbk0oLjC41AdZaA==
+X-YMail-OSG: 3HBsUhYVM1nIbH4P_qDpmfF8N62Ur6rbcGnwPRr6180ynbbH0KHiTdamVQiUKr4
+	AVOJY6281u4Gj03hByxF9c13VjuJEQY4pZROk3FyGyAmBk_yvX0XzecvbimRYQhzj3n0bXhcFbNv
+	oWEMS8xiZWiawlyjppxgDQaJ9fH6Ci.oNeP2enO5pexMN.45xrMVHZcu3GERB7sL1_FGLT49_ryn
+	taCdaIC8dgtBZtDUjFQMxsOaLC.WfV2kf.7xI6QbgjEhFwJcs294lTep7Eb6zIzYhthoLzNmX4lm
+	xolFZpggmfhhSOQb5A8mA9keR1LMAeeTzVVfyChHCDfyjGdodnLXIgVmBfmYsaOA5IOogaPHxt1W
+	_6_tUoUO1j.0WvpAMB1JkBPFiEzECnvmX2Pxi7yUvgHXn8vlErVLd9OFWSKz3akJ50.sqmt8PTa.
+	HFdS79F5W5CTAOU_Peu48cnnK5t3XosmnPvoodc5vJaohZMQNTvXA1nrH5er22emBz8C1x3fTxlo
+	jCD1ST1NMRa8FwE_kAv27SW7vNM7JhRQxWLzCgOC0DYC_akFj7ws2GakFnp0D7D2gPhEWGUc83Or
+	wTZqy8Pdn8eya.lvN7SO_l3AgobTqj5vClYtoCoVF_T2mIM7Sy2mU1ObIAx93owUJAo9e3od4i1a
+	sZJs8PRNE1dIiuX9h7p.0KvNR6Mx7LmcOA4EJVP1poha9jD_CLRVshI9pMIe0rOIya9ceU1xbes7
+	DQf7MZ3hZwsjgSqWwg3ICvTAO7UJmfPuUz8Q9.1NCPTdZnUZ76UEbnjd0ZE1yU8vT86xmF.m412m
+	HekECmP.T0qSFQuqGdBd_QAcJX.VxzM42Sl6rj7EBWODPC7S37wGBdA.VK5T742zaVAWwnjiM2vG
+	mkUCIyDQ3qq9G.9zPY.Rgw1wk2iZ6YL29Qrs3SthavxJHgil_aVxWpDKcwik_sHa8w_2E4dT7z9k
+	UHD159PmPA7F9koRNu44B2.pW_YuNFkj1Sbl8fT6.wKCY14DgDh3m.ByWzgY4ws95DVkB9RmptnG
+	UZsrUDR6jAg.2v8.L_Yuvwkj2TyVM_hGnlQEbpvOEL7mfzJjHPo87qeESjgnh9EIFdsTahZv47I9
+	M9loILmPYQB.ZZsELXp3cjwvG5yzpEnB4.1HlGPYf7qajO_N36ojDxVdEf4337vafiQpO7P7Oi8u
+	RauH8pzlVTf_JZRW25FG8CP4S.2ZIgXOWRZtS0DO0_tJ5m5lHB3KvnIHhM7KstuwkfxDvER71jGI
+	d3LL.taKm.yw3nw2mcKEwbhPhMNEVIX5w_tgXlg.K1nHBdjUH9KMMtQVxqHjnfG90psyJ_GfvH5I
+	-
 Received: from sonic.gate.mail.ne1.yahoo.com by
-	sonic314.consmr.mail.sg3.yahoo.com with HTTP;
-	Sun, 26 May 2019 07:30:55 +0000
+	sonic306.consmr.mail.sg3.yahoo.com with HTTP;
+	Sun, 26 May 2019 07:53:02 +0000
 Received: from pl35138.ag1212.nttpc.ne.jp (EHLO localhost.localdomain)
 	([133.232.247.66])
-	by smtp404.mail.sg3.yahoo.com (Oath Hermes SMTP Server) with ESMTPA ID
-	e0037fd4d9353a4bdc1ee07ef99d6af6; 
-	Sun, 26 May 2019 07:28:54 +0000 (UTC)
+	by smtp403.mail.sg3.yahoo.com (Oath Hermes SMTP Server) with ESMTPA ID
+	c6670c1054cd47402857e31956aff826; 
+	Sun, 26 May 2019 07:51:01 +0000 (UTC)
 To: qemu-devel@nongnu.org
-Date: Sun, 26 May 2019 16:28:26 +0900
-Message-Id: <20190526072826.32956-1-lucienmp_antispam@yahoo.com>
+Date: Sun, 26 May 2019 16:50:56 +0900
+Message-Id: <20190526075056.33865-1-lucienmp_antispam@yahoo.com>
 X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 106.10.240.172
-Subject: [Qemu-devel] [PATCH] Incorrect Stack Pointer shadow register
- support on some m68k CPUs
+X-Received-From: 106.10.241.166
+Subject: [Qemu-devel] [PATCH] Regression for m68k causing Single-Step via
+ GDB/RSP to not single step
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -99,88 +100,30 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On CPU32 and the early 68000 and 68010 the ISP doesnt exist.
-These CPUs only have SSP/USP.
+A regression that was introduced, with the refactor to TranslatorOps,
+drops two lines that update the PC when single-stepping is being performed.
+( short commit 11ab74b )
 
-The availability of this feature is determined by the
-implementation of Master mode bit in the SR register.
-
-Those with the master-mode bit have ISP.
-
-Additional comments added to the features set to claify
-exactly what differentiates each class.  (m68k_features)
-
-The movec instruction when accessing these shadow registers
-in some configurations should issue a TRAP.  This patch does not
-add this funcitonality to the helpers.
+This patch resolves that issue.
 
 Signed-off-by: Lucien Murray-Pitts <lucienmp_antispam@yahoo.com>
 ---
- target/m68k/cpu.c    |  1 +
- target/m68k/cpu.h    | 12 ++++++++++--
- target/m68k/helper.c |  3 ++-
- 3 files changed, 13 insertions(+), 3 deletions(-)
+ target/m68k/translate.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/target/m68k/cpu.c b/target/m68k/cpu.c
-index b16957934a..61368d1a9a 100644
---- a/target/m68k/cpu.c
-+++ b/target/m68k/cpu.c
-@@ -121,6 +121,7 @@ static void m68020_cpu_initfn(Object *obj)
-     CPUM68KState *env = &cpu->env;
- 
-     m68k_set_feature(env, M68K_FEATURE_M68000);
-+    m68k_set_feature(env, M68K_FEATURE_MSP);
-     m68k_set_feature(env, M68K_FEATURE_USP);
-     m68k_set_feature(env, M68K_FEATURE_WORD_INDEX);
-     m68k_set_feature(env, M68K_FEATURE_QUAD_MULDIV);
-diff --git a/target/m68k/cpu.h b/target/m68k/cpu.h
-index 9deff9e234..8be68e5e4f 100644
---- a/target/m68k/cpu.h
-+++ b/target/m68k/cpu.h
-@@ -462,12 +462,19 @@ void m68k_switch_sp(CPUM68KState *env);
- 
- void do_m68k_semihosting(CPUM68KState *env, int nr);
- 
--/* There are 4 ColdFire core ISA revisions: A, A+, B and C.
-+/* The ColdFire core ISA is a RISC-style reduction of the 68000 series
-+   Whilst the 68000 flourished by adding extended stack/instructions in
-+   five main flavors original 68000, 680010/20/30/40, and a CPU32/CPU32+
-+
-+   CPU32/32+ are basically 68000/10 compatible, with and 68020.  Mostly
-+   Supervisor state differences.
-+
-+   There are 4 ColdFire core ISA revisions: A, A+, B and C.
-    Each feature covers the subset of instructions common to the
-    ISA revisions mentioned.  */
- 
- enum m68k_features {
--    M68K_FEATURE_M68000,
-+    M68K_FEATURE_M68000,   /* Base m68k set, as opposed to ColdFire */
-     M68K_FEATURE_CF_ISA_A,
-     M68K_FEATURE_CF_ISA_B, /* (ISA B or C).  */
-     M68K_FEATURE_CF_ISA_APLUSC, /* BIT/BITREV, FF1, STRLDSR (ISA A+ or C).  */
-@@ -477,6 +484,7 @@ enum m68k_features {
-     M68K_FEATURE_CF_EMAC,
-     M68K_FEATURE_CF_EMAC_B, /* Revision B EMAC (dual accumulate).  */
-     M68K_FEATURE_USP, /* User Stack Pointer.  (ISA A+, B or C).  */
-+    M68K_FEATURE_MSP, /* Master Stack Pointer. Not 68000/10,Coldfire,CPU32 */
-     M68K_FEATURE_EXT_FULL, /* 68020+ full extension word.  */
-     M68K_FEATURE_WORD_INDEX, /* word sized address index registers.  */
-     M68K_FEATURE_SCALED_INDEX, /* scaled address index registers.  */
-diff --git a/target/m68k/helper.c b/target/m68k/helper.c
-index 6db93bdd81..64c8a82a92 100644
---- a/target/m68k/helper.c
-+++ b/target/m68k/helper.c
-@@ -337,7 +337,8 @@ void m68k_switch_sp(CPUM68KState *env)
-     env->sp[env->current_sp] = env->aregs[7];
-     if (m68k_feature(env, M68K_FEATURE_M68000)) {
-         if (env->sr & SR_S) {
--            if (env->sr & SR_M) {
-+            /* SR:Master-Mode bit unimplemented then ISP is not available */
-+            if (!m68k_feature(env, M68K_FEATURE_MSP) || env->sr & SR_M) {
-                 new_sp = M68K_SSP;
-             } else {
-                 new_sp = M68K_ISP;
+diff --git a/target/m68k/translate.c b/target/m68k/translate.c
+index f0534a4ba0..2922ea79c3 100644
+--- a/target/m68k/translate.c
++++ b/target/m68k/translate.c
+@@ -6130,6 +6130,8 @@ static void m68k_tr_tb_stop(DisasContextBase *dcbase, CPUState *cpu)
+         return;
+     }
+     if (dc->base.singlestep_enabled) {
++        update_cc_op(dc);
++        tcg_gen_movi_i32(QREG_PC, dc->pc);
+         gen_helper_raise_exception(cpu_env, tcg_const_i32(EXCP_DEBUG));
+         return;
+     }
 -- 
 2.21.0
 
