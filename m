@@ -6,56 +6,56 @@ X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4334AC07542
-	for <qemu-devel@archiver.kernel.org>; Sun, 26 May 2019 01:36:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BF274C07542
+	for <qemu-devel@archiver.kernel.org>; Sun, 26 May 2019 01:37:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 164A420644
-	for <qemu-devel@archiver.kernel.org>; Sun, 26 May 2019 01:36:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 164A420644
+	by mail.kernel.org (Postfix) with ESMTPS id 8546F20815
+	for <qemu-devel@archiver.kernel.org>; Sun, 26 May 2019 01:37:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8546F20815
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:49229 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:49241 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hUi5k-0002ec-3n
-	for qemu-devel@archiver.kernel.org; Sat, 25 May 2019 21:36:52 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:53938)
+	id 1hUi6Z-0003EH-Ka
+	for qemu-devel@archiver.kernel.org; Sat, 25 May 2019 21:37:43 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:54116)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <palmer@dabbelt.com>) id 1hUhxR-0003Hg-27
-	for qemu-devel@nongnu.org; Sat, 25 May 2019 21:28:20 -0400
+	(envelope-from <palmer@dabbelt.com>) id 1hUhxJ-0003S6-PK
+	for qemu-devel@nongnu.org; Sat, 25 May 2019 21:28:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <palmer@dabbelt.com>) id 1hUhfr-0005nT-DL
-	for qemu-devel@nongnu.org; Sat, 25 May 2019 21:10:08 -0400
-Received: from mail-pf1-f193.google.com ([209.85.210.193]:38212)
+	(envelope-from <palmer@dabbelt.com>) id 1hUhgA-0006D7-8N
+	for qemu-devel@nongnu.org; Sat, 25 May 2019 21:10:27 -0400
+Received: from mail-pf1-f193.google.com ([209.85.210.193]:42188)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <palmer@dabbelt.com>) id 1hUhfr-0005lj-69
-	for qemu-devel@nongnu.org; Sat, 25 May 2019 21:10:07 -0400
-Received: by mail-pf1-f193.google.com with SMTP id b76so7496168pfb.5
-	for <qemu-devel@nongnu.org>; Sat, 25 May 2019 18:10:07 -0700 (PDT)
+	(Exim 4.71) (envelope-from <palmer@dabbelt.com>) id 1hUhgA-00066k-19
+	for qemu-devel@nongnu.org; Sat, 25 May 2019 21:10:26 -0400
+Received: by mail-pf1-f193.google.com with SMTP id r22so4621786pfh.9
+	for <qemu-devel@nongnu.org>; Sat, 25 May 2019 18:10:25 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:subject:date:message-id:in-reply-to:references
 	:mime-version:content-transfer-encoding:cc:from:to;
-	bh=AGynrsN21pUOx1n9WYF4sVDzoqOhDbKXNfRUTxBfjrw=;
-	b=O8sDa5kVYJLu0kOQNUNewa9Zhl7pqUVzOWCUxhyRpTsvRc4DP5L0I5n72LDHALSz2I
-	C48E5TSIt5VQsSvqOAJt5JId00z4FV8RTKc7gphiNlG595gA9ew55UaGpZv+XG+4zz8S
-	GiJyeQ//5SmldHibJsw5eENTiOgsM670jU2ni7QWhEgCEb6T8oBxS8Ef70TgKrqzUzmq
-	+OumWLAvOEdN9GcNlgqJT4h9J+oPU9gEMCurdrbqW//uelYGC/dLz/ozktnIqFIeS5Dw
-	I8l3Sko47XGWvLGTc22mZuDRiQlsrI9cIHTFY7TK9rf6TSzmPbnkkVKpZY5h/NWgYrk1
-	gQsg==
-X-Gm-Message-State: APjAAAWi97+HnaWZrIV94MtC36BdGPbPyYf3+4Xjl63yCC+yvVqCC4gO
-	L3Hu9bf8Gck799rVU3EOAdRDwwkFSds=
-X-Google-Smtp-Source: APXvYqwZY92aKwMSdJQkCQ2IbMRsfUvYIvnktU69XpIv7DBfceh2O5y1c7D6P9AsqkIeKoTCD+mQLw==
-X-Received: by 2002:aa7:8dcd:: with SMTP id j13mr22711737pfr.107.1558833005679;
-	Sat, 25 May 2019 18:10:05 -0700 (PDT)
+	bh=oEPA0o9vzCE8UV54ZLVF8fcoHCuDXwBFBPwkT+i/Um8=;
+	b=rIaTH/5UtZSHr6ZjXbkI7vs4x24pj1t19yCj0k/NP5MwE/1a0L/ofyz65zQelq5Sjm
+	uGKw5iPWwvk8f90GtNTynSLR94PzEt9iBrGzKKCeu+i6N3K5dsS9LqRHIzLZQCwm+sR8
+	ZE7CRgCUb1RmDul6cheuZOLcsSUDtJoA5124EtHHE/sagpNjEXWHyoe3lyTG3pXbmB3q
+	j0bainbigU0sJcdFTjvFCXr4wk30P2NbTHzRNch8ZFfZEqsnTjx1OdPmt2HI84aICcbe
+	Hsb9/IRLozbkoj6Cyin5tpwTVFWzFPliPUajL9dnwjwyMEG/m1kF1CoAvGldsnUtOk9r
+	4aGw==
+X-Gm-Message-State: APjAAAWKq3oyOS84ux3YV1U/cUuRxaYAej32vd17W0hh4Q3mGZRtbfb4
+	U7jga2ROgj47cCWkW6dULiC98w==
+X-Google-Smtp-Source: APXvYqy3eFTJSMDonEer+W+3KTJesEVPkg+9Xs8gDaI0ugdqkayaCG34jr2c2mVhJZpJI8stxnrStQ==
+X-Received: by 2002:a62:425b:: with SMTP id p88mr73718714pfa.26.1558833024032; 
+	Sat, 25 May 2019 18:10:24 -0700 (PDT)
 Received: from localhost ([12.206.222.5]) by smtp.gmail.com with ESMTPSA id
-	e123sm6733854pgc.29.2019.05.25.18.10.04
+	127sm7141603pfc.159.2019.05.25.18.10.22
 	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Sat, 25 May 2019 18:10:05 -0700 (PDT)
-Date: Sat, 25 May 2019 18:09:23 -0700
-Message-Id: <20190526010948.3923-5-palmer@sifive.com>
+	Sat, 25 May 2019 18:10:22 -0700 (PDT)
+Date: Sat, 25 May 2019 18:09:35 -0700
+Message-Id: <20190526010948.3923-17-palmer@sifive.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190526010948.3923-1-palmer@sifive.com>
 References: <20190526010948.3923-1-palmer@sifive.com>
@@ -66,8 +66,7 @@ To: Peter Maydell <peter.maydell@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 	[fuzzy]
 X-Received-From: 209.85.210.193
-Subject: [Qemu-devel] [PULL 04/29] target/riscv: Name the argument sets for
- all of insn32 formats
+Subject: [Qemu-devel] [PULL 16/29] target/riscv: Add a base 32 and 64 bit CPU
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -79,88 +78,125 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Richard Henderson <richard.henderson@linaro.org>,
+Cc: Alistair Francis <alistair.francis@wdc.com>,
 	Palmer Dabbelt <palmer@sifive.com>, qemu-riscv@nongnu.org,
 	qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Richard Henderson <richard.henderson@linaro.org>
+From: Alistair Francis <Alistair.Francis@wdc.com>
 
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+At the same time deprecate the ISA string CPUs.
+
+It is dobtful anyone specifies the CPUs, but we are keeping them for the
+Spike machine (which is about to be depreated) so we may as well just
+mark them as deprecated.
+
+Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
 Reviewed-by: Palmer Dabbelt <palmer@sifive.com>
 Signed-off-by: Palmer Dabbelt <palmer@sifive.com>
 ---
- target/riscv/insn32.decode | 10 +++++++---
- target/riscv/translate.c   | 18 ++++++++++++++++++
- 2 files changed, 25 insertions(+), 3 deletions(-)
+ include/hw/riscv/virt.h |  4 ++--
+ qemu-deprecated.texi    |  9 +++++++++
+ target/riscv/cpu.c      | 14 ++++++++++++++
+ target/riscv/cpu.h      |  2 ++
+ 4 files changed, 27 insertions(+), 2 deletions(-)
 
-diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
-index 6f3ab7aa52d3..77f794ed703d 100644
---- a/target/riscv/insn32.decode
-+++ b/target/riscv/insn32.decode
-@@ -34,9 +34,13 @@
- %imm_u    12:s20                 !function=ex_shift_12
+diff --git a/include/hw/riscv/virt.h b/include/hw/riscv/virt.h
+index 568764b57088..d01a1a85c426 100644
+--- a/include/hw/riscv/virt.h
++++ b/include/hw/riscv/virt.h
+@@ -74,9 +74,9 @@ enum {
+                                FDT_PLIC_ADDR_CELLS + FDT_PLIC_INT_CELLS)
  
- # Argument sets:
-+&empty
- &b    imm rs2 rs1
- &i    imm rs1 rd
-+&j    imm rd
- &r    rd rs1 rs2
-+&s    imm rs1 rs2
-+&u    imm rd
- &shift     shamt rs1 rd
- &atomic    aq rl rs2 rs1 rd
+ #if defined(TARGET_RISCV32)
+-#define VIRT_CPU TYPE_RISCV_CPU_RV32GCSU_V1_10_0
++#define VIRT_CPU TYPE_RISCV_CPU_BASE32
+ #elif defined(TARGET_RISCV64)
+-#define VIRT_CPU TYPE_RISCV_CPU_RV64GCSU_V1_10_0
++#define VIRT_CPU TYPE_RISCV_CPU_BASE64
+ #endif
  
-@@ -44,9 +48,9 @@
- @r       .......   ..... ..... ... ..... ....... &r                %rs2 %rs1 %rd
- @i       ............    ..... ... ..... ....... &i      imm=%imm_i     %rs1 %rd
- @b       .......   ..... ..... ... ..... ....... &b      imm=%imm_b %rs2 %rs1
--@s       .......   ..... ..... ... ..... .......         imm=%imm_s %rs2 %rs1
--@u       ....................      ..... .......         imm=%imm_u          %rd
--@j       ....................      ..... .......         imm=%imm_j          %rd
-+@s       .......   ..... ..... ... ..... ....... &s      imm=%imm_s %rs2 %rs1
-+@u       ....................      ..... ....... &u      imm=%imm_u          %rd
-+@j       ....................      ..... ....... &j      imm=%imm_j          %rd
+ #endif
+diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
+index 90cb677849a4..fbdde3d1b4af 100644
+--- a/qemu-deprecated.texi
++++ b/qemu-deprecated.texi
+@@ -138,6 +138,15 @@ The ``acl_show'', ``acl_reset'', ``acl_policy'', ``acl_add'', and
+ ``acl_remove'' commands are deprecated with no replacement. Authorization
+ for VNC should be performed using the pluggable QAuthZ objects.
  
- @sh      ......  ...... .....  ... ..... ....... &shift  shamt=%sh10      %rs1 %rd
- @csr     ............   .....  ... ..... .......               %csr     %rs1 %rd
-diff --git a/target/riscv/translate.c b/target/riscv/translate.c
-index 840ecbef36e7..928374242e83 100644
---- a/target/riscv/translate.c
-+++ b/target/riscv/translate.c
-@@ -687,11 +687,29 @@ static bool gen_shift(DisasContext *ctx, arg_r *a,
- #include "insn_trans/trans_rvd.inc.c"
- #include "insn_trans/trans_privileged.inc.c"
- 
-+/*
-+ * Auto-generated decoder.
-+ * Note that the 16-bit decoder reuses some of the trans_* functions
-+ * initially declared by the 32-bit decoder, which results in duplicate
-+ * declaration warnings.  Suppress them.
-+ */
-+#ifdef CONFIG_PRAGMA_DIAGNOSTIC_AVAILABLE
-+# pragma GCC diagnostic push
-+# pragma GCC diagnostic ignored "-Wredundant-decls"
-+# ifdef __clang__
-+#  pragma GCC diagnostic ignored "-Wtypedef-redefinition"
-+# endif
-+#endif
++@section System emulator CPUS
 +
- bool decode_insn16(DisasContext *ctx, uint16_t insn);
- /* auto-generated decoder*/
- #include "decode_insn16.inc.c"
- #include "insn_trans/trans_rvc.inc.c"
- 
-+#ifdef CONFIG_PRAGMA_DIAGNOSTIC_AVAILABLE
-+# pragma GCC diagnostic pop
-+#endif
++@subsection RISC-V ISA CPUs (since 4.1)
 +
- static void decode_opc(DisasContext *ctx)
++The RISC-V cpus with the ISA version in the CPU name have been depcreated. The
++four CPUs are: ``rv32gcsu-v1.9.1``, ``rv32gcsu-v1.10.0``, ``rv64gcsu-v1.9.1`` and
++``rv64gcsu-v1.10.0``. Instead the version can be specified via the CPU ``priv_spec``
++option when using the ``rv32`` or ``rv64`` CPUs.
++
+ @section System emulator devices
+ 
+ @subsection bluetooth (since 3.1)
+diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
+index 0399e03e89c5..e29879915fe2 100644
+--- a/target/riscv/cpu.c
++++ b/target/riscv/cpu.c
+@@ -115,6 +115,12 @@ static void riscv_any_cpu_init(Object *obj)
+ 
+ #if defined(TARGET_RISCV32)
+ 
++static void riscv_base32_cpu_init(Object *obj)
++{
++    CPURISCVState *env = &RISCV_CPU(obj)->env;
++    set_misa(env, RV32 | RVI | RVM | RVA | RVF | RVD | RVC | RVS | RVU);
++}
++
+ static void rv32gcsu_priv1_09_1_cpu_init(Object *obj)
  {
-     /* check for compressed insn */
+     CPURISCVState *env = &RISCV_CPU(obj)->env;
+@@ -146,6 +152,12 @@ static void rv32imacu_nommu_cpu_init(Object *obj)
+ 
+ #elif defined(TARGET_RISCV64)
+ 
++static void riscv_base64_cpu_init(Object *obj)
++{
++    CPURISCVState *env = &RISCV_CPU(obj)->env;
++    set_misa(env, RV64 | RVI | RVM | RVA | RVF | RVD | RVC | RVS | RVU);
++}
++
+ static void rv64gcsu_priv1_09_1_cpu_init(Object *obj)
+ {
+     CPURISCVState *env = &RISCV_CPU(obj)->env;
+@@ -479,12 +491,14 @@ static const TypeInfo riscv_cpu_type_infos[] = {
+     },
+     DEFINE_CPU(TYPE_RISCV_CPU_ANY,              riscv_any_cpu_init),
+ #if defined(TARGET_RISCV32)
++    DEFINE_CPU(TYPE_RISCV_CPU_BASE32,           riscv_base32_cpu_init),
+     DEFINE_CPU(TYPE_RISCV_CPU_RV32GCSU_V1_09_1, rv32gcsu_priv1_09_1_cpu_init),
+     DEFINE_CPU(TYPE_RISCV_CPU_RV32GCSU_V1_10_0, rv32gcsu_priv1_10_0_cpu_init),
+     DEFINE_CPU(TYPE_RISCV_CPU_RV32IMACU_NOMMU,  rv32imacu_nommu_cpu_init),
+     DEFINE_CPU(TYPE_RISCV_CPU_SIFIVE_E31,       rv32imacu_nommu_cpu_init),
+     DEFINE_CPU(TYPE_RISCV_CPU_SIFIVE_U34,       rv32gcsu_priv1_10_0_cpu_init)
+ #elif defined(TARGET_RISCV64)
++    DEFINE_CPU(TYPE_RISCV_CPU_BASE64,           riscv_base64_cpu_init),
+     DEFINE_CPU(TYPE_RISCV_CPU_RV64GCSU_V1_09_1, rv64gcsu_priv1_09_1_cpu_init),
+     DEFINE_CPU(TYPE_RISCV_CPU_RV64GCSU_V1_10_0, rv64gcsu_priv1_10_0_cpu_init),
+     DEFINE_CPU(TYPE_RISCV_CPU_RV64IMACU_NOMMU,  rv64imacu_nommu_cpu_init),
+diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
+index 3902138639e7..74e726c1c906 100644
+--- a/target/riscv/cpu.h
++++ b/target/riscv/cpu.h
+@@ -48,6 +48,8 @@
+ #define CPU_RESOLVING_TYPE TYPE_RISCV_CPU
+ 
+ #define TYPE_RISCV_CPU_ANY              RISCV_CPU_TYPE_NAME("any")
++#define TYPE_RISCV_CPU_BASE32           RISCV_CPU_TYPE_NAME("rv32")
++#define TYPE_RISCV_CPU_BASE64           RISCV_CPU_TYPE_NAME("rv64")
+ #define TYPE_RISCV_CPU_RV32GCSU_V1_09_1 RISCV_CPU_TYPE_NAME("rv32gcsu-v1.9.1")
+ #define TYPE_RISCV_CPU_RV32GCSU_V1_10_0 RISCV_CPU_TYPE_NAME("rv32gcsu-v1.10.0")
+ #define TYPE_RISCV_CPU_RV32IMACU_NOMMU  RISCV_CPU_TYPE_NAME("rv32imacu-nommu")
 -- 
 2.21.0
 
