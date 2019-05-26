@@ -7,76 +7,75 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 89907C282E1
-	for <qemu-devel@archiver.kernel.org>; Sun, 26 May 2019 08:00:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 23E1AC282E1
+	for <qemu-devel@archiver.kernel.org>; Sun, 26 May 2019 08:01:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4E66F2085A
-	for <qemu-devel@archiver.kernel.org>; Sun, 26 May 2019 08:00:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E3D142085A
+	for <qemu-devel@archiver.kernel.org>; Sun, 26 May 2019 08:01:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b="t7S8wtJx"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4E66F2085A
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b="i8hSTve/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E3D142085A
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=nongnu.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:52122 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:52164 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hUo4x-0000Pq-84
-	for qemu-devel@archiver.kernel.org; Sun, 26 May 2019 04:00:27 -0400
+	id 1hUo62-0001QC-6J
+	for qemu-devel@archiver.kernel.org; Sun, 26 May 2019 04:01:34 -0400
 Received: from eggs.gnu.org ([209.51.188.92]:35442)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lucienmp_antispam@yahoo.com>) id 1hUo3k-0008LP-9n
-	for qemu-devel@nongnu.org; Sun, 26 May 2019 03:59:13 -0400
+	(envelope-from <lucienmp_antispam@yahoo.com>) id 1hUo4E-0008LP-MJ
+	for qemu-devel@nongnu.org; Sun, 26 May 2019 03:59:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lucienmp_antispam@yahoo.com>) id 1hUnxp-0000MJ-Vv
-	for qemu-devel@nongnu.org; Sun, 26 May 2019 03:53:06 -0400
-Received: from sonic306-46.consmr.mail.sg3.yahoo.com ([106.10.241.166]:42840)
+	(envelope-from <lucienmp_antispam@yahoo.com>) id 1hUnsZ-0005aQ-Us
+	for qemu-devel@nongnu.org; Sun, 26 May 2019 03:47:40 -0400
+Received: from sonic304-46.consmr.mail.sg3.yahoo.com ([106.10.242.236]:39779)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <lucienmp_antispam@yahoo.com>)
-	id 1hUnxp-0000Jr-HG
-	for qemu-devel@nongnu.org; Sun, 26 May 2019 03:53:05 -0400
+	id 1hUnsY-0005YX-8A
+	for qemu-devel@nongnu.org; Sun, 26 May 2019 03:47:39 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048;
-	t=1558857182; bh=UpAF+Bp0rIUtVnXVOisU6bkLam7XumHi/1u+zXHbgc8=;
+	t=1558856852; bh=h9lJAUyyyDlRjzeGFvmdpGDGbP/+clu4dXEDohXQDzI=;
 	h=From:To:Cc:Subject:Date:From:Subject;
-	b=t7S8wtJxYsx9Mnixx5mnr5zFR50ObV6YfCZt3GM+J5NSteproudFe6IZq+i8ZQb4Ti3aiSkcN7QqWvYgM5bKwMg+Cudxnmg2QOc5AXMVfzJensLo8fIMl7NdFoT+YqY9i8U5FwCkYAUQt6606doO7qEi/PvZlR9AxhUdnAQFod3VzNw1dRUCocujY/g7w3BAaLxRnVPt51ds+n2aeJeTxp+g8zluNr9QAXcMkDMmbNIkKXSFt/a347Pj2pLYSsYg3eHj75kSBfEDKrmBwMM5kS1PKNFcpv68x6maVdf9WWlBw+07Nd5ZgjY9VIgMMblpDx+y4Uokbk0oLjC41AdZaA==
-X-YMail-OSG: 3HBsUhYVM1nIbH4P_qDpmfF8N62Ur6rbcGnwPRr6180ynbbH0KHiTdamVQiUKr4
-	AVOJY6281u4Gj03hByxF9c13VjuJEQY4pZROk3FyGyAmBk_yvX0XzecvbimRYQhzj3n0bXhcFbNv
-	oWEMS8xiZWiawlyjppxgDQaJ9fH6Ci.oNeP2enO5pexMN.45xrMVHZcu3GERB7sL1_FGLT49_ryn
-	taCdaIC8dgtBZtDUjFQMxsOaLC.WfV2kf.7xI6QbgjEhFwJcs294lTep7Eb6zIzYhthoLzNmX4lm
-	xolFZpggmfhhSOQb5A8mA9keR1LMAeeTzVVfyChHCDfyjGdodnLXIgVmBfmYsaOA5IOogaPHxt1W
-	_6_tUoUO1j.0WvpAMB1JkBPFiEzECnvmX2Pxi7yUvgHXn8vlErVLd9OFWSKz3akJ50.sqmt8PTa.
-	HFdS79F5W5CTAOU_Peu48cnnK5t3XosmnPvoodc5vJaohZMQNTvXA1nrH5er22emBz8C1x3fTxlo
-	jCD1ST1NMRa8FwE_kAv27SW7vNM7JhRQxWLzCgOC0DYC_akFj7ws2GakFnp0D7D2gPhEWGUc83Or
-	wTZqy8Pdn8eya.lvN7SO_l3AgobTqj5vClYtoCoVF_T2mIM7Sy2mU1ObIAx93owUJAo9e3od4i1a
-	sZJs8PRNE1dIiuX9h7p.0KvNR6Mx7LmcOA4EJVP1poha9jD_CLRVshI9pMIe0rOIya9ceU1xbes7
-	DQf7MZ3hZwsjgSqWwg3ICvTAO7UJmfPuUz8Q9.1NCPTdZnUZ76UEbnjd0ZE1yU8vT86xmF.m412m
-	HekECmP.T0qSFQuqGdBd_QAcJX.VxzM42Sl6rj7EBWODPC7S37wGBdA.VK5T742zaVAWwnjiM2vG
-	mkUCIyDQ3qq9G.9zPY.Rgw1wk2iZ6YL29Qrs3SthavxJHgil_aVxWpDKcwik_sHa8w_2E4dT7z9k
-	UHD159PmPA7F9koRNu44B2.pW_YuNFkj1Sbl8fT6.wKCY14DgDh3m.ByWzgY4ws95DVkB9RmptnG
-	UZsrUDR6jAg.2v8.L_Yuvwkj2TyVM_hGnlQEbpvOEL7mfzJjHPo87qeESjgnh9EIFdsTahZv47I9
-	M9loILmPYQB.ZZsELXp3cjwvG5yzpEnB4.1HlGPYf7qajO_N36ojDxVdEf4337vafiQpO7P7Oi8u
-	RauH8pzlVTf_JZRW25FG8CP4S.2ZIgXOWRZtS0DO0_tJ5m5lHB3KvnIHhM7KstuwkfxDvER71jGI
-	d3LL.taKm.yw3nw2mcKEwbhPhMNEVIX5w_tgXlg.K1nHBdjUH9KMMtQVxqHjnfG90psyJ_GfvH5I
-	-
+	b=i8hSTve/gP1fqpJE+0zb7UaSICgBBNgQjZY3maRkkampOVWNxg/02GnjYcKOOT5gdcbXBo40hFsbYn/NH8Hj4t+oj3Y/cu4YTpBY3BasV5Qhl3oxyIBLnVnpOKoa4iPCBXaeSQ0mCY0NMpbg9nVRcrKBrRa+p5Dm2neFD3ik/HM+zJtXuaU8FUFqeScc/Vagc5pYM530WlQO+5SZUQ0R/BFg2AO6LjvZuVLbVrJgmI3e2tgbPlYS5fvFnm+Kq4/4j/Y1WjISNGThHLfydafRHk19FAsdC4sVjyx5uanFlgCUvtG+PzOffV1SQwuJhCe8KY+o7H/Dvad68hkphRiyiQ==
+X-YMail-OSG: sENCgDAVM1mSNY.agDYZ0MoWkVuFTosqpxCA14flrzrxWxEokHQFrqSk.hMK0SO
+	Olh2vk9SsQY406fAPvTR14hPU3.y1Dj6n8e.9GZ4fDTnIcX20hGTCr5rHLaJHRZIepr.cz0sqv7g
+	J.HQUcq0UvRlzOs59zKNST1aGd8Rx_CqL8j5pWwFEWxQgIhBJPLM6JZeiSJNy0FQaCjcUGPgqynp
+	ih6Ljo_HIIZgL5hkHR1I3JXGCK0dJNhqzmy0PlwQJzp4jtq.2N30YSdKxGLXTQ4fpfmWugEP9ZPq
+	sLKlsDCnWEyRPFbbbD6OMCMGc2Ncxv3xf4q57FnHh8TlHPNNeT6GYtOBqoCZ2GZyqQJ5u4BHIxu1
+	rAZxz8VW.vAanspdrxowUQeV3uivN.0MV_eE_5ael8sbQAzixUbj9KqBJ9LTU5_Xl.xFFz_yFoWA
+	.WfKofLLuGWaSGYaFXAHh_vk15KCXzwkkKHshoQcaVA8rHuGpxR5IyCrMN8VtRQVtk_lUF0DiKzE
+	1R.JcxH84bw.RUDt.pMp90pfUP7qiqZFLZxdDncg5VSEtJ0x7zK_c3YZIFcqHQuOkkCFm.Hde1iX
+	M7o4Apbry6lmUH6zNUZPai4Vx4au4cv5_UK.aMjoETrHIExrbrYiWcYD3dQ59c7Xqyas0aPreedU
+	S4YpPMNAXumRKhqF9klsttWLbFEbalExpqaBWYe7xkkVVrCwJkJUc80vRrgwv8qTLzumUxipoHZG
+	zAZ8ExRu5po8RCqlLswLDbIQkkskG1bmnyrWoABTkCIosIprN0kqD3U4hNsiQoFITIwrqJ3TSQr.
+	UUBqIr1Pehim8MWgo_bjoIzaPK.097Lt75HveWPqGDj5H4_KzBYlQQNxeL9UjPXeO27IuWI8RhzH
+	IIQkmrlqe7q6aCG.xAMoFUX3gntmXnt4et__xYRVADZIRwhGyk_SVi43jVf7PFxxwr9yak1Z2BiN
+	fSrwfGy1GQFgQt8pjNX8NrMobVtkLfUJq0RO6sewZmrVEniL8Zbbcx7Ex63hMoMoNDYcHfHijtxG
+	z9O0eHlltrN631oZPsrlD4WAaKkAjh9AGTWbr_gLoD_aB5IvYbmoFSrW41G6lvOfvjQzwI6eaZ.S
+	NrVeB7wDDVKmUStWOWi9O6Vn7vHVumgokell7h8OXA2_vnpzbfxW7DtG_dWFkS3P9taAh5ZtNLbx
+	IHAVz6E5Ztg_YkBpL1yfZrrQK8nyQPiAbFDfW_2KfVJRBkhWMk.y9TS50Tpt1U6VMAcIoc9uO7Th
+	XY9hchdhvi7L535gbrtTFtyhj3huICvlcyfgaK2MLUKTXD5226ovAoRRIYTbzPwFniVADGhPB
 Received: from sonic.gate.mail.ne1.yahoo.com by
-	sonic306.consmr.mail.sg3.yahoo.com with HTTP;
-	Sun, 26 May 2019 07:53:02 +0000
+	sonic304.consmr.mail.sg3.yahoo.com with HTTP;
+	Sun, 26 May 2019 07:47:32 +0000
 Received: from pl35138.ag1212.nttpc.ne.jp (EHLO localhost.localdomain)
 	([133.232.247.66])
-	by smtp403.mail.sg3.yahoo.com (Oath Hermes SMTP Server) with ESMTPA ID
-	c6670c1054cd47402857e31956aff826; 
-	Sun, 26 May 2019 07:51:01 +0000 (UTC)
+	by smtp424.mail.sg3.yahoo.com (Oath Hermes SMTP Server) with ESMTPA ID
+	3374f1a399936d92882ce880a6210ec2; 
+	Sun, 26 May 2019 07:45:31 +0000 (UTC)
 To: qemu-devel@nongnu.org
-Date: Sun, 26 May 2019 16:50:56 +0900
-Message-Id: <20190526075056.33865-1-lucienmp_antispam@yahoo.com>
+Date: Sun, 26 May 2019 16:45:27 +0900
+Message-Id: <20190526074527.33632-1-lucienmp_antispam@yahoo.com>
 X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 106.10.241.166
-Subject: [Qemu-devel] [PATCH] Regression for m68k causing Single-Step via
- GDB/RSP to not single step
+X-Received-From: 106.10.242.236
+Subject: [Qemu-devel] [PATCH] The m68k gdbstub SR reg request doesnt include
+ Condition-Codes
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -100,30 +99,35 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-A regression that was introduced, with the refactor to TranslatorOps,
-drops two lines that update the PC when single-stepping is being performed.
-( short commit 11ab74b )
+The register request via gdbstub would return the SR part
+which contains the Trace/Master/IRQ state flags, but
+would be missing the CR (Condition Register) state bits.
 
-This patch resolves that issue.
+This fix adds this support by merging them in the m68k
+specific gdbstub handler
 
 Signed-off-by: Lucien Murray-Pitts <lucienmp_antispam@yahoo.com>
 ---
- target/m68k/translate.c | 2 ++
- 1 file changed, 2 insertions(+)
+ target/m68k/gdbstub.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/target/m68k/translate.c b/target/m68k/translate.c
-index f0534a4ba0..2922ea79c3 100644
---- a/target/m68k/translate.c
-+++ b/target/m68k/translate.c
-@@ -6130,6 +6130,8 @@ static void m68k_tr_tb_stop(DisasContextBase *dcbase, CPUState *cpu)
-         return;
-     }
-     if (dc->base.singlestep_enabled) {
-+        update_cc_op(dc);
-+        tcg_gen_movi_i32(QREG_PC, dc->pc);
-         gen_helper_raise_exception(cpu_env, tcg_const_i32(EXCP_DEBUG));
-         return;
-     }
+diff --git a/target/m68k/gdbstub.c b/target/m68k/gdbstub.c
+index fd2bb46c42..f092044883 100644
+--- a/target/m68k/gdbstub.c
++++ b/target/m68k/gdbstub.c
+@@ -35,8 +35,10 @@ int m68k_cpu_gdb_read_register(CPUState *cs, uint8_t *mem_buf, int n)
+         return gdb_get_reg32(mem_buf, env->aregs[n - 8]);
+     } else {
+         switch (n) {
+-        case 16:
+-            return gdb_get_reg32(mem_buf, env->sr);
++        case 16: {
++            /* SR is made of SR+CCR, CCR is many 1bit flags so uses helper */
++            return gdb_get_reg32(mem_buf, (env->sr | cpu_m68k_get_ccr(env)));
++        }
+         case 17:
+             return gdb_get_reg32(mem_buf, env->pc);
+         }
 -- 
 2.21.0
 
