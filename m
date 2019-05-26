@@ -6,55 +6,52 @@ X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 153E9C282E5
-	for <qemu-devel@archiver.kernel.org>; Sun, 26 May 2019 16:26:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF9C3C282E3
+	for <qemu-devel@archiver.kernel.org>; Sun, 26 May 2019 16:26:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D5D6420657
-	for <qemu-devel@archiver.kernel.org>; Sun, 26 May 2019 16:26:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D5D6420657
+	by mail.kernel.org (Postfix) with ESMTPS id 8F55A20657
+	for <qemu-devel@archiver.kernel.org>; Sun, 26 May 2019 16:26:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8F55A20657
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:57199 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:57201 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hUvyp-0004Cn-2m
-	for qemu-devel@archiver.kernel.org; Sun, 26 May 2019 12:26:39 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:40909)
+	id 1hUvyv-0004JA-O9
+	for qemu-devel@archiver.kernel.org; Sun, 26 May 2019 12:26:45 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:40904)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1hUvwm-0002p3-DI
-	for qemu-devel@nongnu.org; Sun, 26 May 2019 12:24:34 -0400
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1hUvwn-0002p2-AV
+	for qemu-devel@nongnu.org; Sun, 26 May 2019 12:24:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1hUvsk-0007PK-FA
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1hUvsk-0007PV-GF
 	for qemu-devel@nongnu.org; Sun, 26 May 2019 12:20:24 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:36577 helo=mail.rt-rk.com)
+Received: from mx2.rt-rk.com ([89.216.37.149]:36576 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1hUvsk-0007OF-3O
+	id 1hUvsk-0007OE-5L
 	for qemu-devel@nongnu.org; Sun, 26 May 2019 12:20:22 -0400
 Received: from localhost (localhost [127.0.0.1])
-	by mail.rt-rk.com (Postfix) with ESMTP id D02751A4B54;
+	by mail.rt-rk.com (Postfix) with ESMTP id C05671A4BCF;
 	Sun, 26 May 2019 18:19:16 +0200 (CEST)
 X-Virus-Scanned: amavisd-new at rt-rk.com
 Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
 	[10.10.13.43])
-	by mail.rt-rk.com (Postfix) with ESMTPSA id A87CC1A4BBB;
+	by mail.rt-rk.com (Postfix) with ESMTPSA id 92AF71A4BC7;
 	Sun, 26 May 2019 18:19:16 +0200 (CEST)
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
 To: qemu-devel@nongnu.org
-Date: Sun, 26 May 2019 18:19:11 +0200
-Message-Id: <1558887551-32137-13-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Sun, 26 May 2019 18:19:09 +0200
+Message-Id: <1558887551-32137-11-git-send-email-aleksandar.markovic@rt-rk.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1558887551-32137-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1558887551-32137-1-git-send-email-aleksandar.markovic@rt-rk.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
 X-Received-From: 89.216.37.149
-Subject: [Qemu-devel] [PULL 12/12] BootLinuxSshTest: Test some userspace
- commands on Malta
+Subject: [Qemu-devel] [PULL 10/12] target/mips: add or remove space to fix
+ checkpatch errors
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -71,341 +68,274 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+From: Jules Irenge <jbi.octave@gmail.com>
 
-This tests boot a full VM and check the serial console until
-the SSH daemon is running, then start a SSH session and run
-some commands.
+Add or remove space to fix errors issued by checkpatch.pl tool
+"ERROR: spaces required around that..."
+"ERROR: space required after that..."
+"ERROR: space required before the open parenthesis"
+"ERROR: space required after that..."
+"ERROR: space prohibited between function name and open parenthesis"
+"ERROR: code indent should never use tabs"
+"ERROR: line over 90 characters"
+within "target/mips/cpu.h" file.
 
-This test can be run using:
-
-  $ avocado --show=3Dssh run -t arch:mips tests/acceptance/linux_ssh_mips=
-_malta.py
-  ssh: Entering interactive session.
-  ssh: # uname -a
-  ssh: Linux debian-mips 3.2.0-4-4kc-malta #1 Debian 3.2.51-1 mips GNU/Li=
-nux
-  ssh: # lspci -d 11ab:4620
-  ssh: 00:00.0 Host bridge: Marvell Technology Group Ltd. GT-64120/64120A=
-/64121A System Controller (rev 10)
-  ssh: # cat /sys/bus/i2c/devices/i2c-0/name
-  ssh: SMBus PIIX4 adapter at 1100
-  ssh: # cat /proc/mtd
-  ssh: dev:    size   erasesize  name
-  ssh: mtd0: 00100000 00010000 "YAMON"
-  ssh: mtd1: 002e0000 00010000 "User FS"
-  ssh: mtd2: 00020000 00010000 "Board Config"
-  ssh: # md5sum /dev/mtd2ro
-  ssh: 0dfbe8aa4c20b52e1b8bf3cb6cbdf193  /dev/mtd2ro
-  ssh: # poweroff
-
-Acked-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Signed-off-by: Jules Irenge <jbi.octave@gmail.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
-Message-Id: <20190523161832.22490-5-f4bug@amsat.org>
+Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+Message-Id: <20190413202818.13622-2-jbi.octave@gmail.com>
 ---
- MAINTAINERS                              |   1 +
- tests/acceptance/linux_ssh_mips_malta.py | 230 +++++++++++++++++++++++++=
-++++++
- tests/requirements.txt                   |   1 +
- 3 files changed, 232 insertions(+)
- create mode 100644 tests/acceptance/linux_ssh_mips_malta.py
+ target/mips/cpu.h | 175 +++++++++++++++++++++++++++++-------------------------
+ 1 file changed, 94 insertions(+), 81 deletions(-)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 3cacd75..8c34d5c 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -934,6 +934,7 @@ M: Aurelien Jarno <aurelien@aurel32.net>
- R: Aleksandar Rikalo <arikalo@wavecomp.com>
- S: Maintained
- F: hw/mips/mips_malta.c
-+F: tests/acceptance/linux_ssh_mips_malta.py
-=20
- Mipssim
- M: Aleksandar Markovic <amarkovic@wavecomp.com>
-diff --git a/tests/acceptance/linux_ssh_mips_malta.py b/tests/acceptance/=
-linux_ssh_mips_malta.py
-new file mode 100644
-index 0000000..aafb0c3
---- /dev/null
-+++ b/tests/acceptance/linux_ssh_mips_malta.py
-@@ -0,0 +1,230 @@
-+# Functional test that boots a VM and run commands via a SSH session
-+#
-+# Copyright (c) Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-+#
-+# This work is licensed under the terms of the GNU GPL, version 2 or
-+# later.  See the COPYING file in the top-level directory.
-+
-+import os
-+import re
-+import base64
-+import logging
-+import paramiko
-+import time
-+
-+from avocado import skipIf
-+from avocado_qemu import Test
-+from avocado.utils import process
-+from avocado.utils import archive
-+
-+
-+class LinuxSSH(Test):
-+
-+    timeout =3D 150 # Not for 'configure --enable-debug --enable-debug-t=
-cg'
-+
-+    KERNEL_COMMON_COMMAND_LINE =3D 'printk.time=3D0 '
-+    VM_IP =3D '127.0.0.1'
-+
-+    IMAGE_INFO =3D {
-+        'be': {
-+            'image_url': 'https://people.debian.org/~aurel32/qemu/mips/'
-+                         'debian_wheezy_mips_standard.qcow2',
-+            'image_hash': '8987a63270df67345b2135a6b7a4885a35e392d5',
-+            'rsa_hostkey': b'AAAAB3NzaC1yc2EAAAADAQABAAABAQCca1VitiyLAdQ=
-Old'
-+                           b'zT43IOEVJZ0wHD78GJi8wDAjMiYWUzNSSn0rXGQsINH=
-uH5'
-+                           b'IlF+kBZsHinb/FtKCAyS9a8uCHhQI4SuB4QhAb0+39M=
-lUw'
-+                           b'Mm0CLkctgM2eUUZ6MQMQvDlqnue6CCkxN62EZYbaxmb=
-y7j'
-+                           b'CQa1125o1HRKBvdGm2zrJWxXAfA+f1v6jHLyE8Jnu83=
-eQ+'
-+                           b'BFY25G+Vzx1PVc3zQBwJ8r0NGTRqy2//oWQP0h+bMsg=
-eFe'
-+                           b'KH/J3RJM22vg6+I4JAdBFcxnK+l781h1FuRxOn4O/Xs=
-lbg'
-+                           b'go6WtB4V4TOsw2E/KfxI5IZ/icxF+swVcnvF46Hf3uQ=
-c/0'
-+                           b'BBqb',
-+        },
-+        'le': {
-+            'image_url': 'https://people.debian.org/~aurel32/qemu/mipsel=
-/'
-+                         'debian_wheezy_mipsel_standard.qcow2',
-+            'image_hash': '7866764d9de3ef536ffca24c9fb9f04ffdb45802',
-+            'rsa_hostkey': b'AAAAB3NzaC1yc2EAAAADAQABAAABAQClXJlBT71HL5y=
-Kvv'
-+                           b'gfC7jmxSWx5zSBCzET6CLZczwAafSIs7YKfNOy/dQTx=
-huk'
-+                           b'yIGFUugZFoF3E9PzdhunuyvyTd56MPoNIqFbb5rGokw=
-U5I'
-+                           b'TOx3dBHZR0mClypL6MVrwe0bsiIb8GhF1zioNwcsaAZ=
-nAi'
-+                           b'KfXStVDtXvn/kLLq+xLABYt48CC5KYWoFaCoICskLAY=
-+qo'
-+                           b'L+LWyAnQisj4jAH8VSaSKIImFpfkHWEXPhHcC4ZBlDK=
-tnH'
-+                           b'po9vhfCHgnfW3Pzrqmk8BI4HysqPFVmJWkJGlGUL+sG=
-eg3'
-+                           b'ZZolAYuDXGuBrw8ooPJq2v2dOH+z6dyD2q/ypmAbyPq=
-j5C'
-+                           b'rc8H',
-+        },
-+    }
-+
-+    def wait_for_console_pattern(self, success_message,
-+                                 failure_message=3D'Oops'):
-+        console =3D self.vm.console_socket.makefile()
-+        console_logger =3D logging.getLogger('console')
-+        while True:
-+            msg =3D console.readline()
-+            console_logger.debug(msg.strip())
-+            if success_message in msg:
-+                break
-+            if failure_message in msg:
-+                fail =3D 'Failure message found in console: %s' % failur=
-e_message
-+                self.fail(fail)
-+
-+    def get_portfwd(self):
-+        res =3D self.vm.command('human-monitor-command',
-+                              command_line=3D'info usernet')
-+        line =3D res.split('\r\n')[2]
-+        port =3D re.split(r'.*TCP.HOST_FORWARD.*127\.0\.0\.1 (\d+)\s+10\=
-..*',
-+                        line)[1]
-+        self.log.debug("sshd listening on port:" + port)
-+        return port
-+
-+    def ssh_connect(self, username, password, rsa_hostkey_b64=3DNone):
-+        self.ssh_logger =3D logging.getLogger('ssh')
-+        self.ssh_username =3D username
-+        self.ssh_ps1 =3D '# ' if username is 'root' else '$ '
-+        self.ssh_client =3D paramiko.SSHClient()
-+        port =3D self.get_portfwd()
-+        if rsa_hostkey_b64:
-+            rsa_hostkey_bin =3D base64.b64decode(rsa_hostkey_b64)
-+            rsa_hostkey =3D paramiko.RSAKey(data =3D rsa_hostkey_bin)
-+            ipport =3D '[%s]:%s' % (self.VM_IP, port)
-+            self.ssh_logger.debug('ipport ' + ipport)
-+            self.ssh_client.get_host_keys().add(ipport, 'ssh-rsa', rsa_h=
-ostkey)
-+        for i in range(10):
-+            try:
-+                self.ssh_client.connect(self.VM_IP, int(port),
-+                                        username, password, banner_timeo=
-ut=3D90)
-+                self.ssh_logger.info("Entering interactive session.")
-+                return
-+            except:
-+                time.sleep(4)
-+                pass
-+        self.fail("sshd timeout")
-+
-+    def ssh_disconnect_vm(self):
-+        self.ssh_client.close()
-+
-+    def ssh_command(self, command, is_root=3DTrue):
-+        self.ssh_logger.info(self.ssh_ps1 + command)
-+        stdin, stdout, stderr =3D self.ssh_client.exec_command(command)
-+        stdout_lines =3D [line.strip('\n') for line in stdout]
-+        for line in stdout_lines:
-+            self.ssh_logger.info(line)
-+        stderr_lines =3D [line.strip('\n') for line in stderr]
-+        for line in stderr_lines:
-+            self.ssh_logger.warning(line)
-+        return stdout_lines, stderr_lines
-+
-+    def boot_debian_wheezy_image_and_ssh_login(self, endianess, kernel_p=
-ath):
-+        image_url =3D self.IMAGE_INFO[endianess]['image_url']
-+        image_hash =3D self.IMAGE_INFO[endianess]['image_hash']
-+        image_path =3D self.fetch_asset(image_url, asset_hash=3Dimage_ha=
-sh)
-+        rsa_hostkey_b64 =3D self.IMAGE_INFO[endianess]['rsa_hostkey']
-+
-+        self.vm.set_machine('malta')
-+        self.vm.set_console()
-+        kernel_command_line =3D (self.KERNEL_COMMON_COMMAND_LINE
-+                               + 'console=3DttyS0 root=3D/dev/sda1')
-+        self.vm.add_args('-no-reboot',
-+                         '-kernel', kernel_path,
-+                         '-append', kernel_command_line,
-+                         '-hda', image_path,
-+                         '-netdev', 'user,id=3Dvnet,hostfwd=3D:127.0.0.1=
-:0-:22',
-+                         '-device', 'pcnet,netdev=3Dvnet')
-+        self.vm.launch()
-+
-+        self.log.info('VM launched, waiting for sshd')
-+        console_pattern =3D 'Starting OpenBSD Secure Shell server: sshd'
-+        self.wait_for_console_pattern(console_pattern)
-+        self.log.info('sshd ready')
-+
-+        self.ssh_connect('root', 'root', rsa_hostkey_b64=3Drsa_hostkey_b=
-64)
-+
-+    def shutdown_via_ssh(self):
-+        self.ssh_command('poweroff')
-+        self.ssh_disconnect_vm()
-+        self.wait_for_console_pattern('Power down')
-+
-+    def run_common_commands(self):
-+        stdout, stderr =3D self.ssh_command('lspci -d 11ab:4620')
-+        self.assertIn(True, ["GT-64120" in line for line in stdout])
-+
-+        stdout, stderr =3D self.ssh_command('cat /sys/bus/i2c/devices/i2=
-c-0/name')
-+        self.assertIn(True, ["SMBus PIIX4 adapter" in line
-+                             for line in stdout])
-+
-+        stdout, stderr =3D self.ssh_command('cat /proc/mtd')
-+        self.assertIn(True, ["YAMON" in line
-+                             for line in stdout])
-+
-+        # Empty 'Board Config'
-+        stdout, stderr =3D self.ssh_command('md5sum /dev/mtd2ro')
-+        self.assertIn(True, ["0dfbe8aa4c20b52e1b8bf3cb6cbdf193" in line
-+                             for line in stdout])
-+
-+    def do_test_mips_malta(self, endianess, kernel_path, uname_m):
-+        self.boot_debian_wheezy_image_and_ssh_login(endianess, kernel_pa=
-th)
-+
-+        stdout, stderr =3D self.ssh_command('uname -a')
-+        self.assertIn(True, [uname_m + " GNU/Linux" in line for line in =
-stdout])
-+
-+        self.run_common_commands()
-+        self.shutdown_via_ssh()
-+
-+    @skipIf(os.getenv('CONTINUOUS_INTEGRATION'), 'Running on Travis-CI')
-+    def test_mips_malta32eb_kernel3_2_0(self):
-+        """
-+        :avocado: tags=3Darch:mips
-+        :avocado: tags=3Dmachine:malta
-+        :avocado: tags=3Dendian:big
-+        :avocado: tags=3Ddevice:pcnet32
-+        """
-+        kernel_url =3D ('https://people.debian.org/~aurel32/qemu/mips/'
-+                      'vmlinux-3.2.0-4-4kc-malta')
-+        kernel_hash =3D '592e384a4edc16dade52a6cd5c785c637bcbc9ad'
-+        kernel_path =3D self.fetch_asset(kernel_url, asset_hash=3Dkernel=
-_hash)
-+
-+        self.do_test_mips_malta('be', kernel_path, 'mips')
-+
-+    @skipIf(os.getenv('CONTINUOUS_INTEGRATION'), 'Running on Travis-CI')
-+    def test_mips_malta32el_kernel3_2_0(self):
-+        """
-+        :avocado: tags=3Darch:mipsel
-+        :avocado: tags=3Dmachine:malta
-+        :avocado: tags=3Dendian:little
-+        :avocado: tags=3Ddevice:pcnet32
-+        """
-+        kernel_url =3D ('https://people.debian.org/~aurel32/qemu/mipsel/=
-'
-+                      'vmlinux-3.2.0-4-4kc-malta')
-+        kernel_hash =3D 'a66bea5a8adaa2cb3d36a1d4e0ccdb01be8f6c2a'
-+        kernel_path =3D self.fetch_asset(kernel_url, asset_hash=3Dkernel=
-_hash)
-+
-+        self.do_test_mips_malta('le', kernel_path, 'mips')
-+
-+    @skipIf(os.getenv('CONTINUOUS_INTEGRATION'), 'Running on Travis-CI')
-+    def test_mips_malta64eb_kernel3_2_0(self):
-+        """
-+        :avocado: tags=3Darch:mips64
-+        :avocado: tags=3Dmachine:malta
-+        :avocado: tags=3Dendian:big
-+        :avocado: tags=3Ddevice:pcnet32
-+        """
-+        kernel_url =3D ('https://people.debian.org/~aurel32/qemu/mips/'
-+                      'vmlinux-3.2.0-4-5kc-malta')
-+        kernel_hash =3D 'db6eea7de35d36c77d8c165b6bcb222e16eb91db'
-+        kernel_path =3D self.fetch_asset(kernel_url, asset_hash=3Dkernel=
-_hash)
-+        self.do_test_mips_malta('be', kernel_path, 'mips64')
-+
-+    @skipIf(os.getenv('CONTINUOUS_INTEGRATION'), 'Running on Travis-CI')
-+    def test_mips_malta64el_kernel3_2_0(self):
-+        """
-+        :avocado: tags=3Darch:mips64el
-+        :avocado: tags=3Dmachine:malta
-+        :avocado: tags=3Dendian:little
-+        :avocado: tags=3Ddevice:pcnet32
-+        """
-+        kernel_url =3D ('https://people.debian.org/~aurel32/qemu/mipsel/=
-'
-+                      'vmlinux-3.2.0-4-5kc-malta')
-+        kernel_hash =3D '6a7f77245acf231415a0e8b725d91ed2f3487794'
-+        kernel_path =3D self.fetch_asset(kernel_url, asset_hash=3Dkernel=
-_hash)
-+        self.do_test_mips_malta('le', kernel_path, 'mips64')
-diff --git a/tests/requirements.txt b/tests/requirements.txt
-index 002ded6..3ae0e29 100644
---- a/tests/requirements.txt
-+++ b/tests/requirements.txt
-@@ -2,3 +2,4 @@
- # in the tests/venv Python virtual environment. For more info,
- # refer to: https://pip.pypa.io/en/stable/user_guide/#id1
- avocado-framework=3D=3D68.0
-+paramiko
---=20
+diff --git a/target/mips/cpu.h b/target/mips/cpu.h
+index 1f41cf6..71dd403 100644
+--- a/target/mips/cpu.h
++++ b/target/mips/cpu.h
+@@ -22,10 +22,10 @@ typedef struct CPUMIPSTLBContext CPUMIPSTLBContext;
+ 
+ typedef union wr_t wr_t;
+ union wr_t {
+-    int8_t  b[MSA_WRLEN/8];
+-    int16_t h[MSA_WRLEN/16];
+-    int32_t w[MSA_WRLEN/32];
+-    int64_t d[MSA_WRLEN/64];
++    int8_t  b[MSA_WRLEN / 8];
++    int16_t h[MSA_WRLEN / 16];
++    int32_t w[MSA_WRLEN / 32];
++    int64_t d[MSA_WRLEN / 64];
+ };
+ 
+ typedef union fpr_t fpr_t;
+@@ -71,16 +71,29 @@ struct CPUMIPSFPUContext {
+ #define FCR31_FS 24
+ #define FCR31_ABS2008 19
+ #define FCR31_NAN2008 18
+-#define SET_FP_COND(num,env)     do { ((env).fcr31) |= ((num) ? (1 << ((num) + 24)) : (1 << 23)); } while(0)
+-#define CLEAR_FP_COND(num,env)   do { ((env).fcr31) &= ~((num) ? (1 << ((num) + 24)) : (1 << 23)); } while(0)
+-#define GET_FP_COND(env)         ((((env).fcr31 >> 24) & 0xfe) | (((env).fcr31 >> 23) & 0x1))
++#define SET_FP_COND(num, env)     do { ((env).fcr31) |=                 \
++                                       ((num) ? (1 << ((num) + 24)) :   \
++                                                (1 << 23));             \
++                                     } while (0)
++#define CLEAR_FP_COND(num, env)   do { ((env).fcr31) &=                 \
++                                       ~((num) ? (1 << ((num) + 24)) :  \
++                                                 (1 << 23));            \
++                                     } while (0)
++#define GET_FP_COND(env)         ((((env).fcr31 >> 24) & 0xfe) |        \
++                                 (((env).fcr31 >> 23) & 0x1))
+ #define GET_FP_CAUSE(reg)        (((reg) >> 12) & 0x3f)
+ #define GET_FP_ENABLE(reg)       (((reg) >>  7) & 0x1f)
+ #define GET_FP_FLAGS(reg)        (((reg) >>  2) & 0x1f)
+-#define SET_FP_CAUSE(reg,v)      do { (reg) = ((reg) & ~(0x3f << 12)) | ((v & 0x3f) << 12); } while(0)
+-#define SET_FP_ENABLE(reg,v)     do { (reg) = ((reg) & ~(0x1f <<  7)) | ((v & 0x1f) << 7); } while(0)
+-#define SET_FP_FLAGS(reg,v)      do { (reg) = ((reg) & ~(0x1f <<  2)) | ((v & 0x1f) << 2); } while(0)
+-#define UPDATE_FP_FLAGS(reg,v)   do { (reg) |= ((v & 0x1f) << 2); } while(0)
++#define SET_FP_CAUSE(reg, v)      do { (reg) = ((reg) & ~(0x3f << 12)) | \
++                                               ((v & 0x3f) << 12);       \
++                                     } while (0)
++#define SET_FP_ENABLE(reg, v)     do { (reg) = ((reg) & ~(0x1f <<  7)) | \
++                                               ((v & 0x1f) << 7);        \
++                                     } while (0)
++#define SET_FP_FLAGS(reg, v)      do { (reg) = ((reg) & ~(0x1f <<  2)) | \
++                                               ((v & 0x1f) << 2);        \
++                                     } while (0)
++#define UPDATE_FP_FLAGS(reg, v)   do { (reg) |= ((v & 0x1f) << 2); } while (0)
+ #define FP_INEXACT        1
+ #define FP_UNDERFLOW      2
+ #define FP_OVERFLOW       4
+@@ -95,25 +108,25 @@ struct CPUMIPSFPUContext {
+ typedef struct CPUMIPSMVPContext CPUMIPSMVPContext;
+ struct CPUMIPSMVPContext {
+     int32_t CP0_MVPControl;
+-#define CP0MVPCo_CPA	3
+-#define CP0MVPCo_STLB	2
+-#define CP0MVPCo_VPC	1
+-#define CP0MVPCo_EVP	0
++#define CP0MVPCo_CPA    3
++#define CP0MVPCo_STLB   2
++#define CP0MVPCo_VPC    1
++#define CP0MVPCo_EVP    0
+     int32_t CP0_MVPConf0;
+-#define CP0MVPC0_M	31
+-#define CP0MVPC0_TLBS	29
+-#define CP0MVPC0_GS	28
+-#define CP0MVPC0_PCP	27
+-#define CP0MVPC0_PTLBE	16
+-#define CP0MVPC0_TCA	15
+-#define CP0MVPC0_PVPE	10
+-#define CP0MVPC0_PTC	0
++#define CP0MVPC0_M      31
++#define CP0MVPC0_TLBS   29
++#define CP0MVPC0_GS     28
++#define CP0MVPC0_PCP    27
++#define CP0MVPC0_PTLBE  16
++#define CP0MVPC0_TCA    15
++#define CP0MVPC0_PVPE   10
++#define CP0MVPC0_PTC    0
+     int32_t CP0_MVPConf1;
+-#define CP0MVPC1_CIM	31
+-#define CP0MVPC1_CIF	30
+-#define CP0MVPC1_PCX	20
+-#define CP0MVPC1_PCP2	10
+-#define CP0MVPC1_PCP1	0
++#define CP0MVPC1_CIM    31
++#define CP0MVPC1_CIF    30
++#define CP0MVPC1_PCX    20
++#define CP0MVPC1_PCP2   10
++#define CP0MVPC1_PCP1   0
+ };
+ 
+ typedef struct mips_def_t mips_def_t;
+@@ -481,44 +494,44 @@ struct CPUMIPSState {
+  */
+     int32_t CP0_Random;
+     int32_t CP0_VPEControl;
+-#define CP0VPECo_YSI	21
+-#define CP0VPECo_GSI	20
+-#define CP0VPECo_EXCPT	16
+-#define CP0VPECo_TE	15
+-#define CP0VPECo_TargTC	0
++#define CP0VPECo_YSI    21
++#define CP0VPECo_GSI    20
++#define CP0VPECo_EXCPT  16
++#define CP0VPECo_TE     15
++#define CP0VPECo_TargTC 0
+     int32_t CP0_VPEConf0;
+-#define CP0VPEC0_M	31
+-#define CP0VPEC0_XTC	21
+-#define CP0VPEC0_TCS	19
+-#define CP0VPEC0_SCS	18
+-#define CP0VPEC0_DSC	17
+-#define CP0VPEC0_ICS	16
+-#define CP0VPEC0_MVP	1
+-#define CP0VPEC0_VPA	0
++#define CP0VPEC0_M      31
++#define CP0VPEC0_XTC    21
++#define CP0VPEC0_TCS    19
++#define CP0VPEC0_SCS    18
++#define CP0VPEC0_DSC    17
++#define CP0VPEC0_ICS    16
++#define CP0VPEC0_MVP    1
++#define CP0VPEC0_VPA    0
+     int32_t CP0_VPEConf1;
+-#define CP0VPEC1_NCX	20
+-#define CP0VPEC1_NCP2	10
+-#define CP0VPEC1_NCP1	0
++#define CP0VPEC1_NCX    20
++#define CP0VPEC1_NCP2   10
++#define CP0VPEC1_NCP1   0
+     target_ulong CP0_YQMask;
+     target_ulong CP0_VPESchedule;
+     target_ulong CP0_VPEScheFBack;
+     int32_t CP0_VPEOpt;
+-#define CP0VPEOpt_IWX7	15
+-#define CP0VPEOpt_IWX6	14
+-#define CP0VPEOpt_IWX5	13
+-#define CP0VPEOpt_IWX4	12
+-#define CP0VPEOpt_IWX3	11
+-#define CP0VPEOpt_IWX2	10
+-#define CP0VPEOpt_IWX1	9
+-#define CP0VPEOpt_IWX0	8
+-#define CP0VPEOpt_DWX7	7
+-#define CP0VPEOpt_DWX6	6
+-#define CP0VPEOpt_DWX5	5
+-#define CP0VPEOpt_DWX4	4
+-#define CP0VPEOpt_DWX3	3
+-#define CP0VPEOpt_DWX2	2
+-#define CP0VPEOpt_DWX1	1
+-#define CP0VPEOpt_DWX0	0
++#define CP0VPEOpt_IWX7  15
++#define CP0VPEOpt_IWX6  14
++#define CP0VPEOpt_IWX5  13
++#define CP0VPEOpt_IWX4  12
++#define CP0VPEOpt_IWX3  11
++#define CP0VPEOpt_IWX2  10
++#define CP0VPEOpt_IWX1  9
++#define CP0VPEOpt_IWX0  8
++#define CP0VPEOpt_DWX7  7
++#define CP0VPEOpt_DWX6  6
++#define CP0VPEOpt_DWX5  5
++#define CP0VPEOpt_DWX4  4
++#define CP0VPEOpt_DWX3  3
++#define CP0VPEOpt_DWX2  2
++#define CP0VPEOpt_DWX1  1
++#define CP0VPEOpt_DWX0  0
+ /*
+  * CP0 Register 2
+  */
+@@ -625,33 +638,33 @@ struct CPUMIPSState {
+ #define CP0PC_PSN       0     /*  5..0  */
+     int32_t CP0_SRSConf0_rw_bitmask;
+     int32_t CP0_SRSConf0;
+-#define CP0SRSC0_M	31
+-#define CP0SRSC0_SRS3	20
+-#define CP0SRSC0_SRS2	10
+-#define CP0SRSC0_SRS1	0
++#define CP0SRSC0_M      31
++#define CP0SRSC0_SRS3   20
++#define CP0SRSC0_SRS2   10
++#define CP0SRSC0_SRS1   0
+     int32_t CP0_SRSConf1_rw_bitmask;
+     int32_t CP0_SRSConf1;
+-#define CP0SRSC1_M	31
+-#define CP0SRSC1_SRS6	20
+-#define CP0SRSC1_SRS5	10
+-#define CP0SRSC1_SRS4	0
++#define CP0SRSC1_M      31
++#define CP0SRSC1_SRS6   20
++#define CP0SRSC1_SRS5   10
++#define CP0SRSC1_SRS4   0
+     int32_t CP0_SRSConf2_rw_bitmask;
+     int32_t CP0_SRSConf2;
+-#define CP0SRSC2_M	31
+-#define CP0SRSC2_SRS9	20
+-#define CP0SRSC2_SRS8	10
+-#define CP0SRSC2_SRS7	0
++#define CP0SRSC2_M      31
++#define CP0SRSC2_SRS9   20
++#define CP0SRSC2_SRS8   10
++#define CP0SRSC2_SRS7   0
+     int32_t CP0_SRSConf3_rw_bitmask;
+     int32_t CP0_SRSConf3;
+-#define CP0SRSC3_M	31
+-#define CP0SRSC3_SRS12	20
+-#define CP0SRSC3_SRS11	10
+-#define CP0SRSC3_SRS10	0
++#define CP0SRSC3_M      31
++#define CP0SRSC3_SRS12  20
++#define CP0SRSC3_SRS11  10
++#define CP0SRSC3_SRS10  0
+     int32_t CP0_SRSConf4_rw_bitmask;
+     int32_t CP0_SRSConf4;
+-#define CP0SRSC4_SRS15	20
+-#define CP0SRSC4_SRS14	10
+-#define CP0SRSC4_SRS13	0
++#define CP0SRSC4_SRS15  20
++#define CP0SRSC4_SRS14  10
++#define CP0SRSC4_SRS13  0
+ /*
+  * CP0 Register 7
+  */
+@@ -1090,7 +1103,7 @@ static inline int hflags_mmu_index(uint32_t hflags)
+     }
+ }
+ 
+-static inline int cpu_mmu_index (CPUMIPSState *env, bool ifetch)
++static inline int cpu_mmu_index(CPUMIPSState *env, bool ifetch)
+ {
+     return hflags_mmu_index(env->hflags);
+ }
+@@ -1182,7 +1195,7 @@ void cpu_mips_soft_irq(CPUMIPSState *env, int irq, int level);
+ void itc_reconfigure(struct MIPSITUState *tag);
+ 
+ /* helper.c */
+-target_ulong exception_resume_pc (CPUMIPSState *env);
++target_ulong exception_resume_pc(CPUMIPSState *env);
+ 
+ static inline void restore_snan_bit_mode(CPUMIPSState *env)
+ {
+-- 
 2.7.4
 
 
