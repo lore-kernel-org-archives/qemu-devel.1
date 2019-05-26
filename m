@@ -6,52 +6,52 @@ X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B234FC282E3
-	for <qemu-devel@archiver.kernel.org>; Sun, 26 May 2019 16:29:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1EDFC282E3
+	for <qemu-devel@archiver.kernel.org>; Sun, 26 May 2019 16:29:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6C96E20657
-	for <qemu-devel@archiver.kernel.org>; Sun, 26 May 2019 16:29:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6C96E20657
+	by mail.kernel.org (Postfix) with ESMTPS id B55DD20657
+	for <qemu-devel@archiver.kernel.org>; Sun, 26 May 2019 16:29:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B55DD20657
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:57219 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:57221 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hUw1G-0006M2-CW
-	for qemu-devel@archiver.kernel.org; Sun, 26 May 2019 12:29:10 -0400
+	id 1hUw1b-0006co-1n
+	for qemu-devel@archiver.kernel.org; Sun, 26 May 2019 12:29:31 -0400
 Received: from eggs.gnu.org ([209.51.188.92]:40909)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1hUvx0-0002p3-KO
-	for qemu-devel@nongnu.org; Sun, 26 May 2019 12:24:48 -0400
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1hUvwr-0002p3-Iz
+	for qemu-devel@nongnu.org; Sun, 26 May 2019 12:24:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1hUvsj-0007Nu-2h
-	for qemu-devel@nongnu.org; Sun, 26 May 2019 12:20:22 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:35919 helo=mail.rt-rk.com)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1hUvsk-0007Pg-Gp
+	for qemu-devel@nongnu.org; Sun, 26 May 2019 12:20:23 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:36572 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1hUvsi-0006sl-Nc
-	for qemu-devel@nongnu.org; Sun, 26 May 2019 12:20:20 -0400
+	id 1hUvsk-0007O9-5y
+	for qemu-devel@nongnu.org; Sun, 26 May 2019 12:20:22 -0400
 Received: from localhost (localhost [127.0.0.1])
-	by mail.rt-rk.com (Postfix) with ESMTP id 7CC3C1A4B7C;
+	by mail.rt-rk.com (Postfix) with ESMTP id BECFC1A4BB3;
 	Sun, 26 May 2019 18:19:16 +0200 (CEST)
 X-Virus-Scanned: amavisd-new at rt-rk.com
 Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
 	[10.10.13.43])
-	by mail.rt-rk.com (Postfix) with ESMTPSA id 553581A4B7F;
+	by mail.rt-rk.com (Postfix) with ESMTPSA id 9ED011A4BA1;
 	Sun, 26 May 2019 18:19:16 +0200 (CEST)
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
 To: qemu-devel@nongnu.org
-Date: Sun, 26 May 2019 18:19:03 +0200
-Message-Id: <1558887551-32137-5-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Sun, 26 May 2019 18:19:10 +0200
+Message-Id: <1558887551-32137-12-git-send-email-aleksandar.markovic@rt-rk.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1558887551-32137-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1558887551-32137-1-git-send-email-aleksandar.markovic@rt-rk.com>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
 X-Received-From: 89.216.37.149
-Subject: [Qemu-devel] [PULL 04/12] target/mips: Fix MSA instructions
- ST.<B|H|W|D> on big endian host
+Subject: [Qemu-devel] [PULL 11/12] target/mips: realign comments to fix
+ checkpatch warnings
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -68,235 +68,100 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Mateja Marjanovic <Mateja.Marjanovic@rt-rk.com>
+From: Jules Irenge <jbi.octave@gmail.com>
 
-Fix the case when the host is a big endian machine, and change
-the approach toward ST.<B|H|W|D> instruction helpers.
+Realign comments to fix warnings issued by checkpatc.pl tool
+ "WARNING: Block comments use a leading /* on a separate line"
+within "target/mips/cpu.h" file.
 
-Signed-off-by: Mateja Marjanovic <mateja.marjanovic@rt-rk.com>
+Signed-off-by: Jules Irenge <jbi.octave@gmail.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-Message-Id: <1554212605-16457-3-git-send-email-mateja.marjanovic@rt-rk.com>
+Message-Id: <20190413202818.13622-3-jbi.octave@gmail.com>
 ---
- target/mips/op_helper.c | 200 +++++++++++++++++++++++++++++++++++++++++++-----
- 1 file changed, 180 insertions(+), 20 deletions(-)
+ target/mips/cpu.h | 34 ++++++++++++++++++++++------------
+ 1 file changed, 22 insertions(+), 12 deletions(-)
 
-diff --git a/target/mips/op_helper.c b/target/mips/op_helper.c
-index a8ae438..3918027 100644
---- a/target/mips/op_helper.c
-+++ b/target/mips/op_helper.c
-@@ -4550,31 +4550,191 @@ static inline void ensure_writable_pages(CPUMIPSState *env,
- #endif
- }
+diff --git a/target/mips/cpu.h b/target/mips/cpu.h
+index 71dd403..06a8ed4 100644
+--- a/target/mips/cpu.h
++++ b/target/mips/cpu.h
+@@ -37,7 +37,8 @@ union fpr_t {
+ /* FPU/MSA register mapping is not tested on big-endian hosts. */
+     wr_t     wr;   /* vector data */
+ };
+-/* define FP_ENDIAN_IDX to access the same location
++/*
++ *define FP_ENDIAN_IDX to access the same location
+  * in the fpr_t union regardless of the host endianness
+  */
+ #if defined(HOST_WORDS_BIGENDIAN)
+@@ -976,9 +977,11 @@ struct CPUMIPSState {
+     /* TMASK defines different execution modes */
+ #define MIPS_HFLAG_TMASK  0x1F5807FF
+ #define MIPS_HFLAG_MODE   0x00007 /* execution modes                    */
+-    /* The KSU flags must be the lowest bits in hflags. The flag order
+-       must be the same as defined for CP0 Status. This allows to use
+-       the bits as the value of mmu_idx. */
++    /*
++     * The KSU flags must be the lowest bits in hflags. The flag order
++     * must be the same as defined for CP0 Status. This allows to use
++     * the bits as the value of mmu_idx.
++     */
+ #define MIPS_HFLAG_KSU    0x00003 /* kernel/supervisor/user mode mask   */
+ #define MIPS_HFLAG_UM     0x00002 /* user mode flag                     */
+ #define MIPS_HFLAG_SM     0x00001 /* supervisor mode flag               */
+@@ -988,18 +991,22 @@ struct CPUMIPSState {
+ #define MIPS_HFLAG_CP0    0x00010 /* CP0 enabled                        */
+ #define MIPS_HFLAG_FPU    0x00020 /* FPU enabled                        */
+ #define MIPS_HFLAG_F64    0x00040 /* 64-bit FPU enabled                 */
+-    /* True if the MIPS IV COP1X instructions can be used.  This also
+-       controls the non-COP1X instructions RECIP.S, RECIP.D, RSQRT.S
+-       and RSQRT.D.  */
++    /*
++     * True if the MIPS IV COP1X instructions can be used.  This also
++     * controls the non-COP1X instructions RECIP.S, RECIP.D, RSQRT.S
++     * and RSQRT.D.
++     */
+ #define MIPS_HFLAG_COP1X  0x00080 /* COP1X instructions enabled         */
+ #define MIPS_HFLAG_RE     0x00100 /* Reversed endianness                */
+ #define MIPS_HFLAG_AWRAP  0x00200 /* 32-bit compatibility address wrapping */
+ #define MIPS_HFLAG_M16    0x00400 /* MIPS16 mode flag                   */
+ #define MIPS_HFLAG_M16_SHIFT 10
+-    /* If translation is interrupted between the branch instruction and
++    /*
++     * If translation is interrupted between the branch instruction and
+      * the delay slot, record what type of branch it is so that we can
+      * resume translation properly.  It might be possible to reduce
+-     * this from three bits to two.  */
++     * this from three bits to two.
++     */
+ #define MIPS_HFLAG_BMASK_BASE  0x803800
+ #define MIPS_HFLAG_B      0x00800 /* Unconditional branch               */
+ #define MIPS_HFLAG_BC     0x01000 /* Conditional branch                 */
+@@ -1086,8 +1093,10 @@ void mips_cpu_list(void);
+ extern void cpu_wrdsp(uint32_t rs, uint32_t mask_num, CPUMIPSState *env);
+ extern uint32_t cpu_rddsp(uint32_t mask_num, CPUMIPSState *env);
  
--#define MSA_ST_DF(DF, TYPE, ST_INSN, ...)                               \
--void helper_msa_st_ ## TYPE(CPUMIPSState *env, uint32_t wd,             \
--                            target_ulong addr)                          \
--{                                                                       \
--    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);                          \
--    int mmu_idx = cpu_mmu_index(env, false);				\
--    int i;                                                              \
--    MEMOP_IDX(DF)                                                       \
--    ensure_writable_pages(env, addr, mmu_idx, GETPC());                 \
--    for (i = 0; i < DF_ELEMENTS(DF); i++) {                             \
--        ST_INSN(env, addr + (i << DF), pwd->TYPE[i], ##__VA_ARGS__);    \
--    }                                                                   \
-+void helper_msa_st_b(CPUMIPSState *env, uint32_t wd,
-+                     target_ulong addr)
-+{
-+    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
-+    int mmu_idx = cpu_mmu_index(env, false);
-+
-+    MEMOP_IDX(DF_BYTE)
-+    ensure_writable_pages(env, addr, mmu_idx, GETPC());
-+#if !defined(CONFIG_USER_ONLY)
-+#if !defined(HOST_WORDS_BIGENDIAN)
-+    helper_ret_stb_mmu(env, addr + (0  << DF_BYTE), pwd->b[0],  oi, GETPC());
-+    helper_ret_stb_mmu(env, addr + (1  << DF_BYTE), pwd->b[1],  oi, GETPC());
-+    helper_ret_stb_mmu(env, addr + (2  << DF_BYTE), pwd->b[2],  oi, GETPC());
-+    helper_ret_stb_mmu(env, addr + (3  << DF_BYTE), pwd->b[3],  oi, GETPC());
-+    helper_ret_stb_mmu(env, addr + (4  << DF_BYTE), pwd->b[4],  oi, GETPC());
-+    helper_ret_stb_mmu(env, addr + (5  << DF_BYTE), pwd->b[5],  oi, GETPC());
-+    helper_ret_stb_mmu(env, addr + (6  << DF_BYTE), pwd->b[6],  oi, GETPC());
-+    helper_ret_stb_mmu(env, addr + (7  << DF_BYTE), pwd->b[7],  oi, GETPC());
-+    helper_ret_stb_mmu(env, addr + (8  << DF_BYTE), pwd->b[8],  oi, GETPC());
-+    helper_ret_stb_mmu(env, addr + (9  << DF_BYTE), pwd->b[9],  oi, GETPC());
-+    helper_ret_stb_mmu(env, addr + (10 << DF_BYTE), pwd->b[10], oi, GETPC());
-+    helper_ret_stb_mmu(env, addr + (11 << DF_BYTE), pwd->b[11], oi, GETPC());
-+    helper_ret_stb_mmu(env, addr + (12 << DF_BYTE), pwd->b[12], oi, GETPC());
-+    helper_ret_stb_mmu(env, addr + (13 << DF_BYTE), pwd->b[13], oi, GETPC());
-+    helper_ret_stb_mmu(env, addr + (14 << DF_BYTE), pwd->b[14], oi, GETPC());
-+    helper_ret_stb_mmu(env, addr + (15 << DF_BYTE), pwd->b[15], oi, GETPC());
-+#else
-+    helper_ret_stb_mmu(env, addr + (7  << DF_BYTE), pwd->b[0],  oi, GETPC());
-+    helper_ret_stb_mmu(env, addr + (6  << DF_BYTE), pwd->b[1],  oi, GETPC());
-+    helper_ret_stb_mmu(env, addr + (5  << DF_BYTE), pwd->b[2],  oi, GETPC());
-+    helper_ret_stb_mmu(env, addr + (4  << DF_BYTE), pwd->b[3],  oi, GETPC());
-+    helper_ret_stb_mmu(env, addr + (3  << DF_BYTE), pwd->b[4],  oi, GETPC());
-+    helper_ret_stb_mmu(env, addr + (2  << DF_BYTE), pwd->b[5],  oi, GETPC());
-+    helper_ret_stb_mmu(env, addr + (1  << DF_BYTE), pwd->b[6],  oi, GETPC());
-+    helper_ret_stb_mmu(env, addr + (0  << DF_BYTE), pwd->b[7],  oi, GETPC());
-+    helper_ret_stb_mmu(env, addr + (15 << DF_BYTE), pwd->b[8],  oi, GETPC());
-+    helper_ret_stb_mmu(env, addr + (14 << DF_BYTE), pwd->b[9],  oi, GETPC());
-+    helper_ret_stb_mmu(env, addr + (13 << DF_BYTE), pwd->b[10], oi, GETPC());
-+    helper_ret_stb_mmu(env, addr + (12 << DF_BYTE), pwd->b[11], oi, GETPC());
-+    helper_ret_stb_mmu(env, addr + (11 << DF_BYTE), pwd->b[12], oi, GETPC());
-+    helper_ret_stb_mmu(env, addr + (10 << DF_BYTE), pwd->b[13], oi, GETPC());
-+    helper_ret_stb_mmu(env, addr + (9  << DF_BYTE), pwd->b[14], oi, GETPC());
-+    helper_ret_stb_mmu(env, addr + (8  << DF_BYTE), pwd->b[15], oi, GETPC());
-+#endif
-+#else
-+#if !defined(HOST_WORDS_BIGENDIAN)
-+    cpu_stb_data(env, addr + (0  << DF_BYTE), pwd->b[0]);
-+    cpu_stb_data(env, addr + (1  << DF_BYTE), pwd->b[1]);
-+    cpu_stb_data(env, addr + (2  << DF_BYTE), pwd->b[2]);
-+    cpu_stb_data(env, addr + (3  << DF_BYTE), pwd->b[3]);
-+    cpu_stb_data(env, addr + (4  << DF_BYTE), pwd->b[4]);
-+    cpu_stb_data(env, addr + (5  << DF_BYTE), pwd->b[5]);
-+    cpu_stb_data(env, addr + (6  << DF_BYTE), pwd->b[6]);
-+    cpu_stb_data(env, addr + (7  << DF_BYTE), pwd->b[7]);
-+    cpu_stb_data(env, addr + (8  << DF_BYTE), pwd->b[8]);
-+    cpu_stb_data(env, addr + (9  << DF_BYTE), pwd->b[9]);
-+    cpu_stb_data(env, addr + (10 << DF_BYTE), pwd->b[10]);
-+    cpu_stb_data(env, addr + (11 << DF_BYTE), pwd->b[11]);
-+    cpu_stb_data(env, addr + (12 << DF_BYTE), pwd->b[12]);
-+    cpu_stb_data(env, addr + (13 << DF_BYTE), pwd->b[13]);
-+    cpu_stb_data(env, addr + (14 << DF_BYTE), pwd->b[14]);
-+    cpu_stb_data(env, addr + (15 << DF_BYTE), pwd->b[15]);
-+#else
-+    cpu_stb_data(env, addr + (7  << DF_BYTE), pwd->b[0]);
-+    cpu_stb_data(env, addr + (6  << DF_BYTE), pwd->b[1]);
-+    cpu_stb_data(env, addr + (5  << DF_BYTE), pwd->b[2]);
-+    cpu_stb_data(env, addr + (4  << DF_BYTE), pwd->b[3]);
-+    cpu_stb_data(env, addr + (3  << DF_BYTE), pwd->b[4]);
-+    cpu_stb_data(env, addr + (2  << DF_BYTE), pwd->b[5]);
-+    cpu_stb_data(env, addr + (1  << DF_BYTE), pwd->b[6]);
-+    cpu_stb_data(env, addr + (0  << DF_BYTE), pwd->b[7]);
-+    cpu_stb_data(env, addr + (15 << DF_BYTE), pwd->b[8]);
-+    cpu_stb_data(env, addr + (14 << DF_BYTE), pwd->b[9]);
-+    cpu_stb_data(env, addr + (13 << DF_BYTE), pwd->b[10]);
-+    cpu_stb_data(env, addr + (12 << DF_BYTE), pwd->b[11]);
-+    cpu_stb_data(env, addr + (11 << DF_BYTE), pwd->b[12]);
-+    cpu_stb_data(env, addr + (10 << DF_BYTE), pwd->b[13]);
-+    cpu_stb_data(env, addr + (9  << DF_BYTE), pwd->b[14]);
-+    cpu_stb_data(env, addr + (8  << DF_BYTE), pwd->b[15]);
-+#endif
-+#endif
-+}
-+
-+void helper_msa_st_h(CPUMIPSState *env, uint32_t wd,
-+                     target_ulong addr)
-+{
-+    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
-+    int mmu_idx = cpu_mmu_index(env, false);
-+
-+    MEMOP_IDX(DF_HALF)
-+    ensure_writable_pages(env, addr, mmu_idx, GETPC());
-+#if !defined(CONFIG_USER_ONLY)
-+#if !defined(HOST_WORDS_BIGENDIAN)
-+    helper_ret_stw_mmu(env, addr + (0 << DF_HALF), pwd->h[0], oi, GETPC());
-+    helper_ret_stw_mmu(env, addr + (1 << DF_HALF), pwd->h[1], oi, GETPC());
-+    helper_ret_stw_mmu(env, addr + (2 << DF_HALF), pwd->h[2], oi, GETPC());
-+    helper_ret_stw_mmu(env, addr + (3 << DF_HALF), pwd->h[3], oi, GETPC());
-+    helper_ret_stw_mmu(env, addr + (4 << DF_HALF), pwd->h[4], oi, GETPC());
-+    helper_ret_stw_mmu(env, addr + (5 << DF_HALF), pwd->h[5], oi, GETPC());
-+    helper_ret_stw_mmu(env, addr + (6 << DF_HALF), pwd->h[6], oi, GETPC());
-+    helper_ret_stw_mmu(env, addr + (7 << DF_HALF), pwd->h[7], oi, GETPC());
-+#else
-+    helper_ret_stw_mmu(env, addr + (3 << DF_HALF), pwd->h[0], oi, GETPC());
-+    helper_ret_stw_mmu(env, addr + (2 << DF_HALF), pwd->h[1], oi, GETPC());
-+    helper_ret_stw_mmu(env, addr + (1 << DF_HALF), pwd->h[2], oi, GETPC());
-+    helper_ret_stw_mmu(env, addr + (0 << DF_HALF), pwd->h[3], oi, GETPC());
-+    helper_ret_stw_mmu(env, addr + (7 << DF_HALF), pwd->h[4], oi, GETPC());
-+    helper_ret_stw_mmu(env, addr + (6 << DF_HALF), pwd->h[5], oi, GETPC());
-+    helper_ret_stw_mmu(env, addr + (5 << DF_HALF), pwd->h[6], oi, GETPC());
-+    helper_ret_stw_mmu(env, addr + (4 << DF_HALF), pwd->h[7], oi, GETPC());
-+#endif
-+#else
-+#if !defined(HOST_WORDS_BIGENDIAN)
-+    cpu_stw_data(env, addr + (0 << DF_HALF), pwd->h[0]);
-+    cpu_stw_data(env, addr + (1 << DF_HALF), pwd->h[1]);
-+    cpu_stw_data(env, addr + (2 << DF_HALF), pwd->h[2]);
-+    cpu_stw_data(env, addr + (3 << DF_HALF), pwd->h[3]);
-+    cpu_stw_data(env, addr + (4 << DF_HALF), pwd->h[4]);
-+    cpu_stw_data(env, addr + (5 << DF_HALF), pwd->h[5]);
-+    cpu_stw_data(env, addr + (6 << DF_HALF), pwd->h[6]);
-+    cpu_stw_data(env, addr + (7 << DF_HALF), pwd->h[7]);
-+#else
-+    cpu_stw_data(env, addr + (3 << DF_HALF), pwd->h[0]);
-+    cpu_stw_data(env, addr + (2 << DF_HALF), pwd->h[1]);
-+    cpu_stw_data(env, addr + (1 << DF_HALF), pwd->h[2]);
-+    cpu_stw_data(env, addr + (0 << DF_HALF), pwd->h[3]);
-+    cpu_stw_data(env, addr + (7 << DF_HALF), pwd->h[4]);
-+    cpu_stw_data(env, addr + (6 << DF_HALF), pwd->h[5]);
-+    cpu_stw_data(env, addr + (5 << DF_HALF), pwd->h[6]);
-+    cpu_stw_data(env, addr + (4 << DF_HALF), pwd->h[7]);
-+#endif
-+#endif
- }
+-/* MMU modes definitions. We carefully match the indices with our
+-   hflags layout. */
++/*
++ * MMU modes definitions. We carefully match the indices with our
++ * hflags layout.
++ */
+ #define MMU_MODE0_SUFFIX _kernel
+ #define MMU_MODE1_SUFFIX _super
+ #define MMU_MODE2_SUFFIX _user
+@@ -1110,7 +1119,8 @@ static inline int cpu_mmu_index(CPUMIPSState *env, bool ifetch)
  
-+void helper_msa_st_w(CPUMIPSState *env, uint32_t wd,
-+                     target_ulong addr)
-+{
-+    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
-+    int mmu_idx = cpu_mmu_index(env, false);
-+
-+    MEMOP_IDX(DF_WORD)
-+    ensure_writable_pages(env, addr, mmu_idx, GETPC());
- #if !defined(CONFIG_USER_ONLY)
--MSA_ST_DF(DF_BYTE,   b, helper_ret_stb_mmu, oi, GETPC())
--MSA_ST_DF(DF_HALF,   h, helper_ret_stw_mmu, oi, GETPC())
--MSA_ST_DF(DF_WORD,   w, helper_ret_stl_mmu, oi, GETPC())
--MSA_ST_DF(DF_DOUBLE, d, helper_ret_stq_mmu, oi, GETPC())
-+#if !defined(HOST_WORDS_BIGENDIAN)
-+    helper_ret_stl_mmu(env, addr + (0 << DF_WORD), oi, GETPC(), pwd->w[0]);
-+    helper_ret_stl_mmu(env, addr + (1 << DF_WORD), oi, GETPC(), pwd->w[1]);
-+    helper_ret_stl_mmu(env, addr + (2 << DF_WORD), oi, GETPC(), pwd->w[2]);
-+    helper_ret_stl_mmu(env, addr + (3 << DF_WORD), oi, GETPC(), pwd->w[3]);
- #else
--MSA_ST_DF(DF_BYTE,   b, cpu_stb_data)
--MSA_ST_DF(DF_HALF,   h, cpu_stw_data)
--MSA_ST_DF(DF_WORD,   w, cpu_stl_data)
--MSA_ST_DF(DF_DOUBLE, d, cpu_stq_data)
-+    helper_ret_stl_mmu(env, addr + (1 << DF_WORD), oi, GETPC(), pwd->w[0]);
-+    helper_ret_stl_mmu(env, addr + (0 << DF_WORD), oi, GETPC(), pwd->w[1]);
-+    helper_ret_stl_mmu(env, addr + (3 << DF_WORD), oi, GETPC(), pwd->w[2]);
-+    helper_ret_stl_mmu(env, addr + (2 << DF_WORD), oi, GETPC(), pwd->w[3]);
- #endif
-+#else
-+#if !defined(HOST_WORDS_BIGENDIAN)
-+    cpu_stl_data(env, addr + (0 << DF_WORD), pwd->w[0]);
-+    cpu_stl_data(env, addr + (1 << DF_WORD), pwd->w[1]);
-+    cpu_stl_data(env, addr + (2 << DF_WORD), pwd->w[2]);
-+    cpu_stl_data(env, addr + (3 << DF_WORD), pwd->w[3]);
-+#else
-+    cpu_stl_data(env, addr + (1 << DF_WORD), pwd->w[0]);
-+    cpu_stl_data(env, addr + (0 << DF_WORD), pwd->w[1]);
-+    cpu_stl_data(env, addr + (3 << DF_WORD), pwd->w[2]);
-+    cpu_stl_data(env, addr + (2 << DF_WORD), pwd->w[3]);
-+#endif
-+#endif
-+}
-+
-+void helper_msa_st_d(CPUMIPSState *env, uint32_t wd,
-+                     target_ulong addr)
-+{
-+    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
-+    int mmu_idx = cpu_mmu_index(env, false);
-+
-+    MEMOP_IDX(DF_DOUBLE)
-+    ensure_writable_pages(env, addr, mmu_idx, GETPC());
-+#if !defined(CONFIG_USER_ONLY)
-+    helper_ret_stq_mmu(env, addr + (0 << DF_DOUBLE), pwd->d[0], oi, GETPC());
-+    helper_ret_stq_mmu(env, addr + (1 << DF_DOUBLE), pwd->d[1], oi, GETPC());
-+#else
-+    cpu_stq_data(env, addr + (0 << DF_DOUBLE), pwd->d[0]);
-+    cpu_stq_data(env, addr + (1 << DF_DOUBLE), pwd->d[1]);
-+#endif
-+}
+ #include "exec/cpu-all.h"
  
- void helper_cache(CPUMIPSState *env, target_ulong addr, uint32_t op)
- {
+-/* Memory access type :
++/*
++ * Memory access type :
+  * may be needed for precise access rights control and precise exceptions.
+  */
+ enum {
 -- 
 2.7.4
 
