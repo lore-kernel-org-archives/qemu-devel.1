@@ -6,52 +6,52 @@ X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 862D7C282E3
-	for <qemu-devel@archiver.kernel.org>; Sun, 26 May 2019 16:32:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 99371C282E3
+	for <qemu-devel@archiver.kernel.org>; Sun, 26 May 2019 16:32:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4EB2420815
-	for <qemu-devel@archiver.kernel.org>; Sun, 26 May 2019 16:32:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4EB2420815
+	by mail.kernel.org (Postfix) with ESMTPS id 7622A20815
+	for <qemu-devel@archiver.kernel.org>; Sun, 26 May 2019 16:32:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7622A20815
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:57278 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:57280 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hUw4W-0000tP-F3
-	for qemu-devel@archiver.kernel.org; Sun, 26 May 2019 12:32:32 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:40909)
+	id 1hUw4Z-0000vx-PJ
+	for qemu-devel@archiver.kernel.org; Sun, 26 May 2019 12:32:35 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:40904)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1hUvx3-0002p3-9u
-	for qemu-devel@nongnu.org; Sun, 26 May 2019 12:24:50 -0400
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1hUvwy-0002p2-0A
+	for qemu-devel@nongnu.org; Sun, 26 May 2019 12:24:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1hUvsi-0007NU-UR
-	for qemu-devel@nongnu.org; Sun, 26 May 2019 12:20:21 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:35909 helo=mail.rt-rk.com)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1hUvsk-0007P6-BZ
+	for qemu-devel@nongnu.org; Sun, 26 May 2019 12:20:23 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:36571 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1hUvsi-0006sj-N2
-	for qemu-devel@nongnu.org; Sun, 26 May 2019 12:20:20 -0400
+	id 1hUvsk-0007O5-0t
+	for qemu-devel@nongnu.org; Sun, 26 May 2019 12:20:22 -0400
 Received: from localhost (localhost [127.0.0.1])
-	by mail.rt-rk.com (Postfix) with ESMTP id 56FA51A4800;
+	by mail.rt-rk.com (Postfix) with ESMTP id 873E11A4B7F;
 	Sun, 26 May 2019 18:19:16 +0200 (CEST)
 X-Virus-Scanned: amavisd-new at rt-rk.com
 Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
 	[10.10.13.43])
-	by mail.rt-rk.com (Postfix) with ESMTPSA id 381621A49F6;
+	by mail.rt-rk.com (Postfix) with ESMTPSA id 604DC1A4BA1;
 	Sun, 26 May 2019 18:19:16 +0200 (CEST)
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
 To: qemu-devel@nongnu.org
-Date: Sun, 26 May 2019 18:19:00 +0200
-Message-Id: <1558887551-32137-2-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Sun, 26 May 2019 18:19:04 +0200
+Message-Id: <1558887551-32137-6-git-send-email-aleksandar.markovic@rt-rk.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1558887551-32137-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1558887551-32137-1-git-send-email-aleksandar.markovic@rt-rk.com>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
 X-Received-From: 89.216.37.149
-Subject: [Qemu-devel] [PULL 01/12] target/mips: Make the results of
- DIV_<U|S>.<B|H|W|D> the same as on hardware
+Subject: [Qemu-devel] [PULL 05/12] target/mips: Refactor and fix
+ COPY_S.<B|H|W|D> instructions
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -70,46 +70,152 @@ Sender: "Qemu-devel"
 
 From: Mateja Marjanovic <Mateja.Marjanovic@rt-rk.com>
 
-MSA instructions DIV_<U|S>.<B|H|W|D> when dividing by zero,
-didn't return the same value when executed on a referent hardware
-(FPGA MIPS 64 r6, little endian) and when executed on QEMU, which
-is not a real bug, because the result when dividing by zero is
-UNPREDICTABLE [1] (page 141, 142).
-
-[1] MIPS Architecture for Programmers
-    Volume IV-j: The MIPS64 SIMD
-    Architecture Module, Revision 1.12
+The old version of the helper for the COPY_S.<B|H|W|D> MSA instructions
+has been replaced with four helpers that don't use switch, and change
+the endianness of the given index, when executed on a big endian host.
 
 Signed-off-by: Mateja Marjanovic <mateja.marjanovic@rt-rk.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-Message-Id: <1554207110-9113-2-git-send-email-mateja.marjanovic@rt-rk.com>
+Message-Id: <1554212605-16457-4-git-send-email-mateja.marjanovic@rt-rk.com>
 ---
- target/mips/msa_helper.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ target/mips/helper.h     |  7 +++++-
+ target/mips/msa_helper.c | 62 +++++++++++++++++++++++++++++++++---------------
+ target/mips/translate.c  | 19 ++++++++++++++-
+ 3 files changed, 67 insertions(+), 21 deletions(-)
 
+diff --git a/target/mips/helper.h b/target/mips/helper.h
+index a6d687e..de3a9e0 100644
+--- a/target/mips/helper.h
++++ b/target/mips/helper.h
+@@ -876,7 +876,7 @@ DEF_HELPER_5(msa_hsub_u_df, void, env, i32, i32, i32, i32)
+ 
+ DEF_HELPER_5(msa_sldi_df, void, env, i32, i32, i32, i32)
+ DEF_HELPER_5(msa_splati_df, void, env, i32, i32, i32, i32)
+-DEF_HELPER_5(msa_copy_s_df, void, env, i32, i32, i32, i32)
++
+ DEF_HELPER_5(msa_copy_u_df, void, env, i32, i32, i32, i32)
+ DEF_HELPER_5(msa_insert_df, void, env, i32, i32, i32, i32)
+ DEF_HELPER_5(msa_insve_df, void, env, i32, i32, i32, i32)
+@@ -938,6 +938,11 @@ DEF_HELPER_4(msa_pcnt_df, void, env, i32, i32, i32)
+ DEF_HELPER_4(msa_nloc_df, void, env, i32, i32, i32)
+ DEF_HELPER_4(msa_nlzc_df, void, env, i32, i32, i32)
+ 
++DEF_HELPER_4(msa_copy_s_b, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_copy_s_h, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_copy_s_w, void, env, i32, i32, i32)
++DEF_HELPER_4(msa_copy_s_d, void, env, i32, i32, i32)
++
+ DEF_HELPER_4(msa_fclass_df, void, env, i32, i32, i32)
+ DEF_HELPER_4(msa_ftrunc_s_df, void, env, i32, i32, i32)
+ DEF_HELPER_4(msa_ftrunc_u_df, void, env, i32, i32, i32)
 diff --git a/target/mips/msa_helper.c b/target/mips/msa_helper.c
-index c74e3cd..596190b 100644
+index 274c6ca..89b3be9 100644
 --- a/target/mips/msa_helper.c
 +++ b/target/mips/msa_helper.c
-@@ -641,14 +641,15 @@ static inline int64_t msa_div_s_df(uint32_t df, int64_t arg1, int64_t arg2)
-     if (arg1 == DF_MIN_INT(df) && arg2 == -1) {
-         return DF_MIN_INT(df);
-     }
--    return arg2 ? arg1 / arg2 : 0;
-+    return arg2 ? arg1 / arg2
-+                : arg1 >= 0 ? -1 : 1;
+@@ -1249,29 +1249,53 @@ void helper_msa_splati_df(CPUMIPSState *env, uint32_t df, uint32_t wd,
+     msa_splat_df(df, pwd, pws, n);
  }
  
- static inline int64_t msa_div_u_df(uint32_t df, int64_t arg1, int64_t arg2)
+-void helper_msa_copy_s_df(CPUMIPSState *env, uint32_t df, uint32_t rd,
+-                          uint32_t ws, uint32_t n)
++void helper_msa_copy_s_b(CPUMIPSState *env, uint32_t rd,
++                         uint32_t ws, uint32_t n)
  {
-     uint64_t u_arg1 = UNSIGNED(arg1, df);
-     uint64_t u_arg2 = UNSIGNED(arg2, df);
--    return u_arg2 ? u_arg1 / u_arg2 : 0;
-+    return arg2 ? u_arg1 / u_arg2 : -1;
+-    n %= DF_ELEMENTS(df);
++    n %= 16;
++#if defined(HOST_WORDS_BIGENDIAN)
++    if (n < 8) {
++        n = 8 - n - 1;
++    } else {
++        n = 24 - n - 1;
++    }
++#endif
++    env->active_tc.gpr[rd] = (int8_t)env->active_fpu.fpr[ws].wr.b[n];
++}
+ 
+-    switch (df) {
+-    case DF_BYTE:
+-        env->active_tc.gpr[rd] = (int8_t)env->active_fpu.fpr[ws].wr.b[n];
+-        break;
+-    case DF_HALF:
+-        env->active_tc.gpr[rd] = (int16_t)env->active_fpu.fpr[ws].wr.h[n];
+-        break;
+-    case DF_WORD:
+-        env->active_tc.gpr[rd] = (int32_t)env->active_fpu.fpr[ws].wr.w[n];
+-        break;
+-#ifdef TARGET_MIPS64
+-    case DF_DOUBLE:
+-        env->active_tc.gpr[rd] = (int64_t)env->active_fpu.fpr[ws].wr.d[n];
+-        break;
++void helper_msa_copy_s_h(CPUMIPSState *env, uint32_t rd,
++                         uint32_t ws, uint32_t n)
++{
++    n %= 8;
++#if defined(HOST_WORDS_BIGENDIAN)
++    if (n < 4) {
++        n = 4 - n - 1;
++    } else {
++        n = 12 - n - 1;
++    }
+ #endif
+-    default:
+-        assert(0);
++    env->active_tc.gpr[rd] = (int16_t)env->active_fpu.fpr[ws].wr.h[n];
++}
++
++void helper_msa_copy_s_w(CPUMIPSState *env, uint32_t rd,
++                         uint32_t ws, uint32_t n)
++{
++    n %= 4;
++#if defined(HOST_WORDS_BIGENDIAN)
++    if (n < 2) {
++        n = 2 - n - 1;
++    } else {
++        n = 6 - n - 1;
+     }
++#endif
++    env->active_tc.gpr[rd] = (int32_t)env->active_fpu.fpr[ws].wr.w[n];
++}
++
++void helper_msa_copy_s_d(CPUMIPSState *env, uint32_t rd,
++                         uint32_t ws, uint32_t n)
++{
++    n %= 2;
++    env->active_tc.gpr[rd] = (int64_t)env->active_fpu.fpr[ws].wr.d[n];
  }
  
- static inline int64_t msa_mod_s_df(uint32_t df, int64_t arg1, int64_t arg2)
+ void helper_msa_copy_u_df(CPUMIPSState *env, uint32_t df, uint32_t rd,
+diff --git a/target/mips/translate.c b/target/mips/translate.c
+index f96c0d0..c65d19e 100644
+--- a/target/mips/translate.c
++++ b/target/mips/translate.c
+@@ -28301,7 +28301,24 @@ static void gen_msa_elm_df(CPUMIPSState *env, DisasContext *ctx, uint32_t df,
+         switch (MASK_MSA_ELM(ctx->opcode)) {
+         case OPC_COPY_S_df:
+             if (likely(wd != 0)) {
+-                gen_helper_msa_copy_s_df(cpu_env, tdf, twd, tws, tn);
++                switch (df) {
++                case DF_BYTE:
++                    gen_helper_msa_copy_s_b(cpu_env, twd, tws, tn);
++                    break;
++                case DF_HALF:
++                    gen_helper_msa_copy_s_h(cpu_env, twd, tws, tn);
++                    break;
++                case DF_WORD:
++                    gen_helper_msa_copy_s_w(cpu_env, twd, tws, tn);
++                    break;
++#if defined(TARGET_MIPS64)
++                case DF_DOUBLE:
++                    gen_helper_msa_copy_s_d(cpu_env, twd, tws, tn);
++                    break;
++#endif
++                default:
++                    assert(0);
++                }
+             }
+             break;
+         case OPC_COPY_U_df:
 -- 
 2.7.4
 
