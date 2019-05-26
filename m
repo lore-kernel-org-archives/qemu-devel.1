@@ -2,72 +2,78 @@ Return-Path: <SRS0=5YAC=T2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 30BFFC282E3
-	for <qemu-devel@archiver.kernel.org>; Sun, 26 May 2019 16:37:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 96A33C282E3
+	for <qemu-devel@archiver.kernel.org>; Sun, 26 May 2019 17:07:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D95E72075B
-	for <qemu-devel@archiver.kernel.org>; Sun, 26 May 2019 16:37:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D95E72075B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=nongnu.org
+	by mail.kernel.org (Postfix) with ESMTPS id 60D7320657
+	for <qemu-devel@archiver.kernel.org>; Sun, 26 May 2019 17:07:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 60D7320657
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=tuxfamily.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:57349 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:57600 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hUw9i-0004jh-3E
-	for qemu-devel@archiver.kernel.org; Sun, 26 May 2019 12:37:54 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:40909)
+	id 1hUwcI-0002D1-EE
+	for qemu-devel@archiver.kernel.org; Sun, 26 May 2019 13:07:26 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:47956)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hUvxI-0002p3-Hi
-	for qemu-devel@nongnu.org; Sun, 26 May 2019 12:25:06 -0400
+	(envelope-from <th.huth@gmail.com>) id 1hUwad-00010d-9T
+	for qemu-devel@nongnu.org; Sun, 26 May 2019 13:05:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hUvjN-0002Mc-8C
-	for qemu-devel@nongnu.org; Sun, 26 May 2019 12:10:42 -0400
-Received: from indium.canonical.com ([91.189.90.7]:34652)
+	(envelope-from <th.huth@gmail.com>) id 1hUwVM-00059w-IF
+	for qemu-devel@nongnu.org; Sun, 26 May 2019 13:00:18 -0400
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:45138)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hUvjN-0002MG-32
-	for qemu-devel@nongnu.org; Sun, 26 May 2019 12:10:41 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hUvjK-0005cQ-Pq
-	for <qemu-devel@nongnu.org>; Sun, 26 May 2019 16:10:38 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id BFD022E80CB
-	for <qemu-devel@nongnu.org>; Sun, 26 May 2019 16:10:38 +0000 (UTC)
+	(Exim 4.71) (envelope-from <th.huth@gmail.com>)
+	id 1hUwVM-00059E-5V; Sun, 26 May 2019 13:00:16 -0400
+Received: by mail-wr1-f66.google.com with SMTP id b18so14512444wrq.12;
+	Sun, 26 May 2019 10:00:15 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+	:references:mime-version:content-transfer-encoding;
+	bh=7q5YvfkXAo/8pm66hs8SqX8dlCLic+UAAQlf98ognZE=;
+	b=cDzpa96TLsczsbbza9DBSG1rRsyIqen/ulvREO4MxQVSJUdwsJBLDMXasWhP8RklO4
+	+E4BkBVRbCl8HSZ2XKULz0Ku2B6g/SQoRD6ZkM2XLAppqSwEp9rfYEsWB86TPEovzDK1
+	12PTdKcNVZM0+JL1t+DBn564Ano0HtNw6T5scwVTNdUSyNbwVlf+ZMGdhsblFXQYOnC4
+	fLlHrK9QoJUoru3akIgxoA0FJ1R08aSj6pNzfvBbVZQS+qB9fAD8oCd/e4wXHzgZgKnl
+	s8LHz3418Kme2Bd/GjdlE8kd5xedstYUzq0QWmGnPbxX1Ab//ZTBP2aBUqEqINWPPpt4
+	9BXw==
+X-Gm-Message-State: APjAAAW+77b5y7jcNqgfOBP+5sHuVhzCu0BFUqVg5VNsyWJ6cPZGYivZ
+	rd3WG+2ljR5sk6q5WSR9lbs=
+X-Google-Smtp-Source: APXvYqxexwx9L9ACYh6gH+XNr/qMSmNZH3wscK27ejIhWezWlbtuLymI4J7VhJz/0NYYwQiGQDVPeA==
+X-Received: by 2002:a5d:5504:: with SMTP id b4mr54355038wrv.251.1558890014982; 
+	Sun, 26 May 2019 10:00:14 -0700 (PDT)
+Received: from thl530.multi.box (pD9E8362E.dip0.t-ipconnect.de.
+	[217.232.54.46]) by smtp.gmail.com with ESMTPSA id
+	z16sm5807180wmk.36.2019.05.26.10.00.12
+	(version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+	Sun, 26 May 2019 10:00:13 -0700 (PDT)
+Date: Sun, 26 May 2019 19:00:11 +0200
+From: Thomas Huth <huth@tuxfamily.org>
+To: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <20190526190011.361380e5@thl530.multi.box>
+In-Reply-To: <20190525225013.13916-11-laurent@vivier.eu>
+References: <20190525225013.13916-1-laurent@vivier.eu>
+	<20190525225013.13916-11-laurent@vivier.eu>
+X-Mailer: Claws Mail 3.17.3 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Sun, 26 May 2019 16:04:37 -0000
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Tags: ppc64
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: ivmn
-X-Launchpad-Bug-Reporter: Ivan Warren (ivmn)
-X-Launchpad-Bug-Modifier: Ivan Warren (ivmn)
-References: <155831074982.26912.13291059176555697592.malonedeb@soybean.canonical.com>
-Message-Id: <155888667723.16885.1254739366193961120.malone@chaenomeles.canonical.com>
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="18968";
-	Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: fec16840b5538ea12335be7926742e233e27bf13
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1829682] Re: QEMU PPC SYSTEM regression - 3.1.0
- and GIT - Fail to boot AIX
+	[fuzzy]
+X-Received-From: 209.85.221.66
+Subject: Re: [Qemu-devel] [PATCH v7 10/10] hw/m68k: define Macintosh Quadra
+ 800
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -76,246 +82,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-From: Ivan Warren via Qemu-devel <qemu-devel@nongnu.org>
-Reply-To: Bug 1829682 <1829682@bugs.launchpad.net>
-Cc: Ivan Warren <ivan@vmfacility.fr>
+Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
+	"Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+	qemu-block@nongnu.org, Jason Wang <jasowang@redhat.com>,
+	Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+	qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
+	=?UTF-8?B?SGVydsOp?= Poussineau <hpoussin@reactos.org>,
+	Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+	=?UTF-8?B?TWFyYy1BbmRy?= =?UTF-8?B?w6k=?= Lureau
+	<marcandre.lureau@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
->From qemu monitor :
-(qemu) info tlb
-info tlb
-SLB     ESID                    VSID
-0       0x0000000008000000      0x0000000004002400
-3       0xf100050008000000      0x4000005000000400
-4       0xf100100008000000      0x4000010000000400
-5       0xf100080008000000      0x4000008000000400
-6       0xf100010008000000      0x4000001000000400
-7       0xf200800008000000      0x4000810000000400
-11      0xfffff00000000000      0x0000000012001080
-(qemu) info registers
-info registers
-NIP 000000000008f418   LR 0000000000234e38 CTR 0000000000256b20 XER 0000000=
-020040010 CPU#0
-MSR 8000000000001032 HID0 0000000000000000  HF 8000000000000030 iidx 1 didx=
- 1
-TB 00000002 11869414363 DECR 1608999296
-GPR00 0000000000000000 f1000816b0036890 00000000032b5d20 0000000003380000
-GPR04 0000000002dc3838 f1000816b0036cf0 f00000002ff47600 0000000000001007
-GPR08 0000000000001000 0000000000000000 0000000000000000 00000000424d2061
-GPR12 0000000003282600 00000000025933f0 0000000002743408 0000000003380000
-GPR16 f1000816b0036d00 0000000000036000 0000000002004324 f10008008012c000
-GPR20 0000000f10008008 0000000000000000 0000000002dc3708 f10008008012bff8
-GPR24 0000000000000000 00000000000034e0 0000000000000000 0000000000000001
-GPR28 0000000000000000 0000000002743408 0000000002079498 00000000025933f0
-CR 22422280  [ E  E  G  E  E  E  L  -  ]             RES ffffffffffffffff
-FPR00 0000000000000000 0000000000000000 0000000000000000 0000000000000000
-FPR04 0000000000000000 0000000000000000 0000000000000000 0000000000000000
-FPR08 0000000000000000 0000000000000000 0000000000000000 0000000000000000
-FPR12 0000000000000000 0000000000000000 0000000000000000 0000000000000000
-FPR16 0000000000000000 0000000000000000 0000000000000000 0000000000000000
-FPR20 0000000000000000 0000000000000000 0000000000000000 0000000000000000
-FPR24 0000000000000000 0000000000000000 0000000000000000 0000000000000000
-FPR28 0000000000000000 0000000000000000 0000000000000000 0000000000000000
-FPSCR 0000000000000000
- SRR0 0000000000ad0088  SRR1 8000000000001032    PVR 00000000004e1200 VRSAV=
-E 0000000000000000
-SPRG0 0000000003380000 SPRG1 f1000816b0036d00  SPRG2 0000000002e22280  SPRG=
-3 0000000100000000
-SPRG4 0000000000000000 SPRG5 0000000000000000  SPRG6 0000000000000000  SPRG=
-7 0000000000000000
-HSRR0 0000000000000000 HSRR1 0000000000000000
- CFAR 0000000000234e34
- LPCR 000000000403f008
- PTCR 0000000000000000   DAR f10008008012c000  DSISR 0000000040000000
+Am Sun, 26 May 2019 00:50:13 +0200
+schrieb Laurent Vivier <laurent@vivier.eu>:
 
--- =
+> If you want to test the machine, it doesn't yet boot a MacROM, but
+> you can boot a linux kernel from the command line.
+> 
+> You can install your own disk using debian-installer with:
+> 
+>     ./qemu-system-m68k \
+>     -M q800 \
+>     -serial none -serial mon:stdio \
+>     -m 1000M -drive file=m68k.qcow2,format=qcow2 \
+>     -net nic,model=dp83932,addr=09:00:07:12:34:57 \
+>     -append "console=ttyS0 vga=off" \
+>     -kernel vmlinux-4.15.0-2-m68k \
+>     -initrd initrd.gz \
+>     -drive file=debian-9.0-m68k-NETINST-1.iso \
+>     -drive file=m68k.qcow2,format=qcow2 \
+>     -nographic
+> 
+> If you use a graphic adapter instead of "-nographic", you can use
+> "-g" to set the size of the display (I use "-g 1600x800x24").
+> 
+> Co-developed-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+> ---
+>  MAINTAINERS                      |  14 ++
+>  default-configs/m68k-softmmu.mak |   1 +
+>  hw/m68k/Kconfig                  |  12 +
+>  hw/m68k/Makefile.objs            |   1 +
+>  hw/m68k/bootinfo.h               | 100 +++++++++
+>  hw/m68k/q800.c                   | 369
+> +++++++++++++++++++++++++++++++ 6 files changed, 497 insertions(+)
+>  create mode 100644 hw/m68k/bootinfo.h
+>  create mode 100644 hw/m68k/q800.c
+[...]
+> diff --git a/hw/m68k/bootinfo.h b/hw/m68k/bootinfo.h
+> new file mode 100644
+> index 0000000000..6584775f6d
+> --- /dev/null
+> +++ b/hw/m68k/bootinfo.h
+> @@ -0,0 +1,100 @@
+> +struct bi_record {
+> +    uint16_t tag;        /* tag ID */
+> +    uint16_t size;       /* size of record */
+> +    uint32_t data[0];    /* data */
+> +};
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1829682
+Maybe add a short description, license information and header guards at
+the top of the file?
 
-Title:
-  QEMU PPC SYSTEM regression - 3.1.0 and GIT - Fail to boot AIX
+Apart from that, the patch looks sane to me.
 
-Status in QEMU:
-  New
-
-Bug description:
-  Built from source on a debian system
-
-  Linux db08 4.9.0-8-amd64 #1 SMP Debian 4.9.130-2 (2018-10-27) x86_64 GNU/=
-Linux
-  gcc version 6.3.0 20170516 (Debian 6.3.0-18+deb9u1)
-
-  Last git commit (from queued gdibson repository)
-
-  starting AIX 7.2 TL 2 SP 2 with the following : (the install was done
-  under qemu 3.1.0)
-
-  qemu-system-ppc64 -M pseries \
-      -cpu power7 \
-      -cdrom AIX_v7.2_Install_7200-02-02-1806_DVD_1_of_2_32018.iso \
-      -net nic \
-      -net tap,ifname=3Dtap2,script=3Dno \
-      -drive file=3DDISK1.IMG,if=3Dnone,id=3Ddrive-virtio-disk0 \
-      -device virtio-scsi-pci,id=3Dscsi -device scsi-hd,drive=3Ddrive-virti=
-o-disk0 \
-      -m 4G \
-      -serial stdio \
-      -monitor unix:ms,server,nowait \
-      -accel tcg \
-      -k fr \
-      -nographic \
-      -prom-env input-device=3D/vdevice/vty@71000000 \
-      -prom-env output-device=3D/vdevice/vty@71000000 \
-      -prom-env diag-switch?=3Dfalse \
-      -prom-env boot-command=3D"boot /pci@800000020000000/scsi@2/disk@10000=
-0000000000 -s verbose"
-
-  Yields this :
-
-  =
-
-  ^M
-  SLOF^[[0m^[[?25l ********************************************************=
-**************^M
-  ^[[1mQEMU Starting^M
-  ^[[0m Build Date =3D Jan 14 2019 18:00:39^M
-   FW Version =3D git-a5b428e1c1eae703^M
-   Press "s" to enter Open Firmware.^M^M
-  ^M^M
-  ^[[0m^[[?25hC0000^MC0100^MC0120^MC0140^MC0200^MC0240^MC0260^MC02E0^MC0300=
-^MC0320^MC0340^MC0360^MC0370^MC0380^MC0371^MC0372^MC0373^MC0374^MC03F0^MC04=
-00^MC0480^MC04C0^MC04D0^MC0500^MPopulating /vdevice methods^M
-  Populating /vdevice/vty@71000000^M
-  Populating /vdevice/nvram@71000001^M
-  Populating /vdevice/l-lan@71000002^M
-  Populating /vdevice/v-scsi@71000003^M
-         SCSI: Looking for devices^M
-            8200000000000000 CD-ROM   : "QEMU     QEMU CD-ROM      2.5+"^M
-  C05A0^MPopulating /pci@800000020000000^M
-                       00 0000 (D) : 1234 1111    qemu vga^M
-                       00 0800 (D) : 1033 0194    serial bus [ usb-xhci ]^M
-                       00 1000 (D) : 1af4 1004    virtio [ scsi ]^M
-  Populating /pci@800000020000000/scsi@2^M
-         SCSI: Looking for devices^M
-            100000000000000 DISK     : "QEMU     QEMU HARDDISK    2.5+"^M
-  C0600^MC06C0^MC0700^MC0800^MC0880^MC0890^MC08A0^MC08A8^MInstalling QEMU f=
-b^M
-  ^M
-  ^M
-  ^M
-  C08B0^MScanning USB ^M
-    XHCI: Initializing^M
-      USB Keyboard ^M
-      USB mouse ^M
-  C08C0^MC08D0^MNo console specified using screen & keyboard^M
-  User selected input-device console: /vdevice/vty@71000000^M
-  User selected output-device console: /vdevice/vty@71000000^M
-  C08E0^MC08E8^MC08FF^M     ^M
-    Welcome to Open Firmware^M
-  ^M
-    Copyright (c) 2004, 2017 IBM Corporation All rights reserved.^M
-    This program and the accompanying materials are made available^M
-    under the terms of the BSD License available at^M
-    http://www.opensource.org/licenses/bsd-license.php^M
-  ^M
-  ^M
-  Trying to load: -s verbose from: /pci@800000020000000/scsi@2/disk@1000000=
-00000000 ...   Successfully loaded^M
-  ^M
-                          ---> qemu,pseries detected <---^M
-  ^M
-  ^M
-  ^M
-  ^M
-  ^M
-  ^M
-  ^M
-  -------------------------------------------------------------------------=
-------^M
-                                  Welcome to AIX.^M
-                     boot image timestamp: 05:56:13 04/20/2019^M
-          processor count: 1;  memory size: 4096MB;  kernel size: 38426884^M
-           boot device: /pci@800000020000000/scsi@2/disk@100000000000000^M
-  ^M
-  8000FFEC bytes of free memory remain at address 7FFF0014^M
-  load address: 0x00004000   aixmon size: 0x000D2C00   boot image size: 0x0=
-1A6B430^M
-  ^LAIX vm,uuid property contains invalid data^Mload address: 0x00004000   =
-aixmon size: 0x000D2C00   boot image size: 0x01A6B430^M
-  ^LAIX vm,uuid property contains invalid data^M
-  get_ppp return code: 0xFFFFFFFE^M
-  ^M
-  AKVM: hcall-multi-tce detected but overridden, allow with "multce" boot a=
-rgument^M
-  The temporary memory region list is at 1 percent capacity.^M
-  The temporary IPLCB is at 1 percent capacity.^M
-  The IPLCB address is 0x0FFF9000^M
-  name                 offset           size^M
-  ipl_cb_and_bit_map 00000000 ......00005958^M
-  bit_map........... 00000790 ......00000006^M
-  ipl_info.......... 000001C8 ......00000024^M
-  splpar_info....... 000001EC ......00000048^M
-  system_info....... 00000234 ......000000C4^M
-  processor_info.... 000002F8 ......00000148^M
-  lpar_id_info...... 00000440 ......00000088^M
-  dr_proc_info...... 000004C8 ......00000008^M
-  dr_mem_info....... 000004D0 ......00000028^M
-  lpar_info......... 000004F8 ......00000014^M
-  segment page...... 00000518 ......00000028^M
-  processor page.... 00000540 ......00000010^M
-  res_asso_id....... 00000550 ......00000050^M
-  res_asso_group.... 000005A0 ......00000048^M
-  asso_ref_pnt...... 000005E8 ......00000010^M
-  residual.......... 00000820 ......00005138^M
-  fwad_info......... 000005F8 ......00000040^M
-  contig mem rsv.... 00000738 ......00000058^M
-      region address      region length       attr  label^M
-  0   0x0000000000000000  0x000000000FFF7000  0x01  0x01^M
-  1   0x000000000FFF7000  0x0000000000002000  0x01  0x03^M
-  2   0x000000000FFF9000  0x0000000000006000  0x01  0x02^M
-  3   0x000000000FFFF000  0x0000000000000014  0x00  0x05^M
-  4   0x000000000FFFF014  0x00000000F0000FEC  0x01  0x01^M
-  5   0x0000000100000000  0xFFFFFFFF00000000  0x00  0x07^M
-  ----------------------------^M
-  ^M
-  0000012C bytes of free memory remain at address 00004000^M
-  compressed kernel addr: D6C00;  sz: 98CE33;  uncompressed kernel addr:  1=
-DB59600^M
-           name     source       dest       size   flags^M
-   0      .data   1e6f9840    2000000    12bdd20     1^M
-   1    basecfg    1b04000    fff5000       15d9     1^M
-   2      ramfs     a63a30    efe9000    100b82a     1^M
-   3      .text   1db59840      d6c00     ba0000     1^M
-   4       .ldr   1f9b7560     c77000      a9523     1^M
-   5     symtab   1fe0aaf4     d21000     1f4410     1^M
-   6  kern. hdr   1db59600          0        240     1^M
-   7       .bss          0    32bdd20    27222e0     2^M
-  free space between BSS and RAM filesystem: 09609000^M
-  ^M
-  entry_point: 0x000D6C28^M
-                         kernel debugger setting: enabled^M
-  -------------------------------------------------------------------------=
-------^M
-  ^LStarLED{A20}^M
-  Data Storage Interrupt - PROC^M
-  .dispatch+000098              lwz    r0,1830(r6)         r0=3D0,1830(r6)=
-=3DF00000002FF48E30^M
-  KDB(0)>
-
-  (apologies for all the ^M - they are emitted by qemu or AIX - not
-  sure)
-
-  Using the same command to boot AIX from 3.1.0 works (no DSI
-  Interrupt). - Other problems occur later, but no Kernel interrupt,
-  only user space problems - and that's another problem - but one at a
-  time !
-
-  --Ivan
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1829682/+subscriptions
+ Thomas
 
