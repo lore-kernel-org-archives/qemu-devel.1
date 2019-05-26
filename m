@@ -6,67 +6,67 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 847ECC282E3
-	for <qemu-devel@archiver.kernel.org>; Sun, 26 May 2019 12:55:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2CDFDC282E3
+	for <qemu-devel@archiver.kernel.org>; Sun, 26 May 2019 13:08:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4D4FB20815
-	for <qemu-devel@archiver.kernel.org>; Sun, 26 May 2019 12:55:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4D4FB20815
+	by mail.kernel.org (Postfix) with ESMTPS id F01C92075E
+	for <qemu-devel@archiver.kernel.org>; Sun, 26 May 2019 13:08:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F01C92075E
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:55110 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:55269 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hUsgQ-00087Y-Cx
-	for qemu-devel@archiver.kernel.org; Sun, 26 May 2019 08:55:26 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:42795)
+	id 1hUssp-00024Z-J4
+	for qemu-devel@archiver.kernel.org; Sun, 26 May 2019 09:08:15 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:44933)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hUsee-0007MK-3l
-	for qemu-devel@nongnu.org; Sun, 26 May 2019 08:53:37 -0400
+	(envelope-from <laurent@vivier.eu>) id 1hUss0-0001nS-4E
+	for qemu-devel@nongnu.org; Sun, 26 May 2019 09:07:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hUsec-00030W-KK
-	for qemu-devel@nongnu.org; Sun, 26 May 2019 08:53:35 -0400
-Received: from mout.kundenserver.de ([212.227.126.131]:36837)
+	(envelope-from <laurent@vivier.eu>) id 1hUsrz-0001La-9U
+	for qemu-devel@nongnu.org; Sun, 26 May 2019 09:07:24 -0400
+Received: from mout.kundenserver.de ([212.227.126.130]:53539)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1hUsec-0002uO-8A
-	for qemu-devel@nongnu.org; Sun, 26 May 2019 08:53:34 -0400
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1hUsrz-0001GT-0a
+	for qemu-devel@nongnu.org; Sun, 26 May 2019 09:07:23 -0400
 Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
-	(mreue012 [213.165.67.103]) with ESMTPSA (Nemesis) id
-	1N5UoU-1gWuYg1kgU-016vDm; Sun, 26 May 2019 14:53:16 +0200
+	(mreue011 [213.165.67.103]) with ESMTPSA (Nemesis) id
+	1MtO4E-1gcM0D33K2-00usjZ; Sun, 26 May 2019 15:07:07 +0200
 To: Lucien Murray-Pitts <lucienmp_antispam@yahoo.com>, qemu-devel@nongnu.org
-References: <20190526074527.33632-1-lucienmp_antispam@yahoo.com>
+References: <20190526075056.33865-1-lucienmp_antispam@yahoo.com>
 From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <ebd55ffc-2405-0ad5-e914-2abf80e50530@vivier.eu>
-Date: Sun, 26 May 2019 14:53:13 +0200
+Message-ID: <76fe1f78-2d24-5d66-0271-5c7d60b637b1@vivier.eu>
+Date: Sun, 26 May 2019 15:07:04 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
 	Thunderbird/52.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190526074527.33632-1-lucienmp_antispam@yahoo.com>
+In-Reply-To: <20190526075056.33865-1-lucienmp_antispam@yahoo.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Provags-ID: V03:K1:FYEpaZbm9HekRbI1dC334lSj8nAI7bQjRbjv+W1PTymMVTQEMqe
-	mckkYrytif0ZPNPl6nRj0feicYNc9VJ6CFrnjv1kl9BkF8Gn3y4iMhiIZodM2rKYfQaV3dA
-	nkcYuLT7hkJti4bZuMWWrwZu5s2eP/ygqcUkAL0glbVx3WhAoGh5wDVPJBvjtFVWX2arVdu
-	YJz3/EBqD3+Lk3313EZig==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:ittmMV0mR4U=:HavPebZcd3VspMXNKd65y3
-	NXQLfSvbxaLxtg2aIMSckPKAi14OxIdV0qgco1jbLJPwTvl7/sO98Gb4rGStClc1pHV+SzoYE
-	bVdZsyjDnMem3HqRGZNt2QIyGZ4Jd6ceOF9aUF9fN/hIeYIYJ0lbdshFzJSBQeZUgO3jy/WoZ
-	NEUy16OOoJXmxAZX4Day1LCxymtL0mTQgvrI92YxYNatNrVV9AjiaiuBInVO1FjcGIhYXjxDy
-	3ogj4arv5dnnGbggn9ay5Q+leyf1SSKTFMTiMC0BecaHfJ5uKCFiSSYMnMgJLAlr49mppEC17
-	wFlnMJa+IvsYVDy2E/ZQEIBJWy+V8AE4DkEXCi68FigSmsJwIqYmGhXOfRAUjPl9fQ7B/kBEc
-	kU/SJLAgQCLJPJJ0ndhGHa+9YvUUIdLXoSQl9aSaW7bxwOc9S8GAu7qOPB38pxamg8fBYPHn+
-	nN6HILsell3PfclPtNewj6FAmdK37ssIqUQ8pLSlEnL7aRdFVSN+H6NFQtZzsTY0DtCmZ5kvI
-	hEgR+D8VRIkyuYI+X2DyI96LWwaJzsV0rzil8DPPsBC2ncuFaeMucLHcEImKuh4xXWowswnIB
-	6JRHNrRPJjWPyRJ+FtlZy7lncmCoSsR9kjzHiNqOrGCs8dWiXDBBhWv0E6AzrgB5hwhxXQxWu
-	wIfrW73t/P8XKmZ4kIO2NnCOmfMiiaEmdRcdIIZwvr4lBb176Z9jY4OFDsxS3MP/4r831J+Q1
-	yXcAlTll0FN8ON8gGlVUF7foLFEbJ3mFeWJLyA+8or34zY6MgtQFTO9SpJY=
+X-Provags-ID: V03:K1:lbIc+0ok/gfG1o0OA6NEbiT1TVDa6p8/r+yyFaVYJ/PP7zpcewx
+	AFRxPecq3IjyVP7eiXXYRSWevsGq1zuou640sEb4XRmI3enJ+wPBoOicmJyopy5VzfaTvv8
+	V7vVi1tyQ9xChmbspkyZngvs9E85v0WooMwyCIVWah4PGDqTW5pKSQhX/Ld6EP8V+F5lbLk
+	oqvFGL9F5zPZ94AItaTKQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:gkjqGP5Jv7k=:rFb6hPOGORZf+vwpoG2XF1
+	iUj5RaHARm9SFMR5ZU15pMk2GqLbTnGGPyMR067si5pv39tvUDRnov48RSr4oG4AcqOV+Y/17
+	CI1kIDn36pq9v91wcs7rTXGhrwKXEHSDXN2an1w1f13Td//zb3RFutrkq2oDE92+lfVmPXzRk
+	0KVg3PrIuDfuw8LRckmk2bA2QB4DL9ff7qyyjppR3I81AWYUnLjjCQxsE5cOaDhOcVOD+9D5o
+	7fLlJ/5f+BC9680qL/db78pfDKXUq0zYP25vNNODJyDGLuQredy+822ObgbW7fGbjze7yEZHE
+	su31FfI6zqSdVJav+KiQEGy8GWNF/5hyBHOFuohkKvzsvrWDiRkCrRWa3yNvYwQMkdcTbXT8E
+	qR/VJHznak/K4atjW0ynv7dtJFpbN5VRzvH7C7MVAX8U5xbsF57meQflWORku0mNJ1Oupb1gU
+	gO6/pKGup+9/uGNxhWWcRTEWhGnNF221E6BAK3qXT6q91zSH+LE6T1xZ4Et0/WysSMznzXmo+
+	zvHdvTVJRHKFt4S2cqx6XN1RnGI+DaeWxgotnvlzeLAryee3bcquKBqo9FkoedNRLNVSAt/nE
+	U9i/cUXpm8jK8CMbgodVOCQrgByOkzPvA+wVF1h5dhdDurqH6+xSJEcLaMS4oda9zIXeugMTg
+	LBMtosaTaoksF/oEWFTrV3LF1Qoz3KId5BeMIaqryH/vqxDi0YOWgw5LDqg7hPqlgu7UcPojD
+	+F6ouKqmNqdIpMnw8WC9xWsHu6PZKFXEig/KUHzN3S7zF1Ij0H+3eIL15xo=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.126.131
-Subject: Re: [Qemu-devel] [PATCH] The m68k gdbstub SR reg request doesnt
- include Condition-Codes
+X-Received-From: 212.227.126.130
+Subject: Re: [Qemu-devel] [PATCH] Regression for m68k causing Single-Step
+ via GDB/RSP to not single step
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -87,43 +87,33 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 26/05/2019 09:45, Lucien Murray-Pitts wrote:
-> The register request via gdbstub would return the SR part
-> which contains the Trace/Master/IRQ state flags, but
-> would be missing the CR (Condition Register) state bits.
+On 26/05/2019 09:50, Lucien Murray-Pitts wrote:
+> A regression that was introduced, with the refactor to TranslatorOps,
+> drops two lines that update the PC when single-stepping is being performed.
+> ( short commit 11ab74b )
 > 
-> This fix adds this support by merging them in the m68k
-> specific gdbstub handler
+> This patch resolves that issue.
 > 
 > Signed-off-by: Lucien Murray-Pitts <lucienmp_antispam@yahoo.com>
 > ---
->   target/m68k/gdbstub.c | 6 ++++--
->   1 file changed, 4 insertions(+), 2 deletions(-)
+>   target/m68k/translate.c | 2 ++
+>   1 file changed, 2 insertions(+)
 > 
-> diff --git a/target/m68k/gdbstub.c b/target/m68k/gdbstub.c
-> index fd2bb46c42..f092044883 100644
-> --- a/target/m68k/gdbstub.c
-> +++ b/target/m68k/gdbstub.c
-> @@ -35,8 +35,10 @@ int m68k_cpu_gdb_read_register(CPUState *cs, uint8_t *mem_buf, int n)
->           return gdb_get_reg32(mem_buf, env->aregs[n - 8]);
->       } else {
->           switch (n) {
-> -        case 16:
-> -            return gdb_get_reg32(mem_buf, env->sr);
-> +        case 16: {
-> +            /* SR is made of SR+CCR, CCR is many 1bit flags so uses helper */
-> +            return gdb_get_reg32(mem_buf, (env->sr | cpu_m68k_get_ccr(env)));
-
-I think parenthesis are superfluous.
-
-With that fixed:
+> diff --git a/target/m68k/translate.c b/target/m68k/translate.c
+> index f0534a4ba0..2922ea79c3 100644
+> --- a/target/m68k/translate.c
+> +++ b/target/m68k/translate.c
+> @@ -6130,6 +6130,8 @@ static void m68k_tr_tb_stop(DisasContextBase *dcbase, CPUState *cpu)
+>           return;
+>       }
+>       if (dc->base.singlestep_enabled) {
+> +        update_cc_op(dc);
+> +        tcg_gen_movi_i32(QREG_PC, dc->pc);
+>           gen_helper_raise_exception(cpu_env, tcg_const_i32(EXCP_DEBUG));
+>           return;
+>       }
+> 
 
 Reviewed-by: Laurent Vivier <laurent@vivier.eu>
-
-> +        }
->           case 17:
->               return gdb_get_reg32(mem_buf, env->pc);
->           }
-> 
 
 
