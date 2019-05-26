@@ -2,80 +2,67 @@ Return-Path: <SRS0=5YAC=T2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	FORGED_MSGID_YAHOO,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 23E1AC282E1
-	for <qemu-devel@archiver.kernel.org>; Sun, 26 May 2019 08:01:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57EE9C282E1
+	for <qemu-devel@archiver.kernel.org>; Sun, 26 May 2019 08:02:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E3D142085A
-	for <qemu-devel@archiver.kernel.org>; Sun, 26 May 2019 08:01:34 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b="i8hSTve/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E3D142085A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=nongnu.org
+	by mail.kernel.org (Postfix) with ESMTPS id 2E82D2085A
+	for <qemu-devel@archiver.kernel.org>; Sun, 26 May 2019 08:02:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2E82D2085A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:52164 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:52170 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hUo62-0001QC-6J
-	for qemu-devel@archiver.kernel.org; Sun, 26 May 2019 04:01:34 -0400
+	id 1hUo6S-0001nq-EX
+	for qemu-devel@archiver.kernel.org; Sun, 26 May 2019 04:02:00 -0400
 Received: from eggs.gnu.org ([209.51.188.92]:35442)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lucienmp_antispam@yahoo.com>) id 1hUo4E-0008LP-MJ
-	for qemu-devel@nongnu.org; Sun, 26 May 2019 03:59:43 -0400
+	(envelope-from <no-reply@patchew.org>) id 1hUo4F-0008LP-MX
+	for qemu-devel@nongnu.org; Sun, 26 May 2019 03:59:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lucienmp_antispam@yahoo.com>) id 1hUnsZ-0005aQ-Us
-	for qemu-devel@nongnu.org; Sun, 26 May 2019 03:47:40 -0400
-Received: from sonic304-46.consmr.mail.sg3.yahoo.com ([106.10.242.236]:39779)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <lucienmp_antispam@yahoo.com>)
-	id 1hUnsY-0005YX-8A
-	for qemu-devel@nongnu.org; Sun, 26 May 2019 03:47:39 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048;
-	t=1558856852; bh=h9lJAUyyyDlRjzeGFvmdpGDGbP/+clu4dXEDohXQDzI=;
-	h=From:To:Cc:Subject:Date:From:Subject;
-	b=i8hSTve/gP1fqpJE+0zb7UaSICgBBNgQjZY3maRkkampOVWNxg/02GnjYcKOOT5gdcbXBo40hFsbYn/NH8Hj4t+oj3Y/cu4YTpBY3BasV5Qhl3oxyIBLnVnpOKoa4iPCBXaeSQ0mCY0NMpbg9nVRcrKBrRa+p5Dm2neFD3ik/HM+zJtXuaU8FUFqeScc/Vagc5pYM530WlQO+5SZUQ0R/BFg2AO6LjvZuVLbVrJgmI3e2tgbPlYS5fvFnm+Kq4/4j/Y1WjISNGThHLfydafRHk19FAsdC4sVjyx5uanFlgCUvtG+PzOffV1SQwuJhCe8KY+o7H/Dvad68hkphRiyiQ==
-X-YMail-OSG: sENCgDAVM1mSNY.agDYZ0MoWkVuFTosqpxCA14flrzrxWxEokHQFrqSk.hMK0SO
-	Olh2vk9SsQY406fAPvTR14hPU3.y1Dj6n8e.9GZ4fDTnIcX20hGTCr5rHLaJHRZIepr.cz0sqv7g
-	J.HQUcq0UvRlzOs59zKNST1aGd8Rx_CqL8j5pWwFEWxQgIhBJPLM6JZeiSJNy0FQaCjcUGPgqynp
-	ih6Ljo_HIIZgL5hkHR1I3JXGCK0dJNhqzmy0PlwQJzp4jtq.2N30YSdKxGLXTQ4fpfmWugEP9ZPq
-	sLKlsDCnWEyRPFbbbD6OMCMGc2Ncxv3xf4q57FnHh8TlHPNNeT6GYtOBqoCZ2GZyqQJ5u4BHIxu1
-	rAZxz8VW.vAanspdrxowUQeV3uivN.0MV_eE_5ael8sbQAzixUbj9KqBJ9LTU5_Xl.xFFz_yFoWA
-	.WfKofLLuGWaSGYaFXAHh_vk15KCXzwkkKHshoQcaVA8rHuGpxR5IyCrMN8VtRQVtk_lUF0DiKzE
-	1R.JcxH84bw.RUDt.pMp90pfUP7qiqZFLZxdDncg5VSEtJ0x7zK_c3YZIFcqHQuOkkCFm.Hde1iX
-	M7o4Apbry6lmUH6zNUZPai4Vx4au4cv5_UK.aMjoETrHIExrbrYiWcYD3dQ59c7Xqyas0aPreedU
-	S4YpPMNAXumRKhqF9klsttWLbFEbalExpqaBWYe7xkkVVrCwJkJUc80vRrgwv8qTLzumUxipoHZG
-	zAZ8ExRu5po8RCqlLswLDbIQkkskG1bmnyrWoABTkCIosIprN0kqD3U4hNsiQoFITIwrqJ3TSQr.
-	UUBqIr1Pehim8MWgo_bjoIzaPK.097Lt75HveWPqGDj5H4_KzBYlQQNxeL9UjPXeO27IuWI8RhzH
-	IIQkmrlqe7q6aCG.xAMoFUX3gntmXnt4et__xYRVADZIRwhGyk_SVi43jVf7PFxxwr9yak1Z2BiN
-	fSrwfGy1GQFgQt8pjNX8NrMobVtkLfUJq0RO6sewZmrVEniL8Zbbcx7Ex63hMoMoNDYcHfHijtxG
-	z9O0eHlltrN631oZPsrlD4WAaKkAjh9AGTWbr_gLoD_aB5IvYbmoFSrW41G6lvOfvjQzwI6eaZ.S
-	NrVeB7wDDVKmUStWOWi9O6Vn7vHVumgokell7h8OXA2_vnpzbfxW7DtG_dWFkS3P9taAh5ZtNLbx
-	IHAVz6E5Ztg_YkBpL1yfZrrQK8nyQPiAbFDfW_2KfVJRBkhWMk.y9TS50Tpt1U6VMAcIoc9uO7Th
-	XY9hchdhvi7L535gbrtTFtyhj3huICvlcyfgaK2MLUKTXD5226ovAoRRIYTbzPwFniVADGhPB
-Received: from sonic.gate.mail.ne1.yahoo.com by
-	sonic304.consmr.mail.sg3.yahoo.com with HTTP;
-	Sun, 26 May 2019 07:47:32 +0000
-Received: from pl35138.ag1212.nttpc.ne.jp (EHLO localhost.localdomain)
-	([133.232.247.66])
-	by smtp424.mail.sg3.yahoo.com (Oath Hermes SMTP Server) with ESMTPA ID
-	3374f1a399936d92882ce880a6210ec2; 
-	Sun, 26 May 2019 07:45:31 +0000 (UTC)
-To: qemu-devel@nongnu.org
-Date: Sun, 26 May 2019 16:45:27 +0900
-Message-Id: <20190526074527.33632-1-lucienmp_antispam@yahoo.com>
-X-Mailer: git-send-email 2.21.0
+	(envelope-from <no-reply@patchew.org>) id 1hUnqn-0004ha-LX
+	for qemu-devel@nongnu.org; Sun, 26 May 2019 03:45:50 -0400
+Resent-Date: Sun, 26 May 2019 03:45:50 -0400
+Resent-Message-Id: <E1hUnqn-0004ha-LX@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21440)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1hUnqn-0004gm-Dv
+	for qemu-devel@nongnu.org; Sun, 26 May 2019 03:45:49 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1558856720; cv=none; d=zoho.com; s=zohoarc; 
+	b=iac+MbY5wuctsxE5Bgt0WjuV2l9ytsQFYA+lpQyrMmOOlrhkmw0yFhyT6L05f6oLu7MuYhxQ87N5grYrQLyPPrp7QHPU7+ssQXNvcGxmThY2Jp/rB0BaaL95pjzWAnAJH8bUQPDRcLhlkBFVlh5lG9l9vQ8SaQWZScO5JnQlm9E=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
+	s=zohoarc; t=1558856720;
+	h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
+	bh=10utG9oR1ywfBK/KLppiqq/OAcDjap8Qx6DlhPrNnsE=; 
+	b=iagNpQV0hDpoBFKJbGn7nttmo9Tdc01dqZ4xJEWB+sTkd+6yqxzR3Z+WXEfhegZxjqgcrT4r94fV+DwDg7bmQ/3DYlzAaT21I26d0Pw0uDMH+n4rSLifcUZg3hECB+wB7gRpIOxjw3neOqjKIQf9u+GDBRm0qdq1NRWsT7YQJpM=
+ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
+	spf=pass  smtp.mailfrom=no-reply@patchew.org;
+	dmarc=pass header.from=<no-reply@patchew.org>
+	header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+	mx.zohomail.com with SMTPS id 1558856719943475.2737024503376;
+	Sun, 26 May 2019 00:45:19 -0700 (PDT)
+In-Reply-To: <20190526072826.32956-1-lucienmp_antispam@yahoo.com>
+Message-ID: <155885671862.24.87494911956197849@549697c9ad12>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 106.10.242.236
-Subject: [Qemu-devel] [PATCH] The m68k gdbstub SR reg request doesnt include
- Condition-Codes
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: qemu-devel@nongnu.org
+Date: Sun, 26 May 2019 00:45:19 -0700 (PDT)
+X-ZohoMailClient: External
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 135.84.80.217
+Subject: Re: [Qemu-devel] [PATCH] Incorrect Stack Pointer shadow register
+ support on some m68k CPUs
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -87,48 +74,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-From: Lucien Murray-Pitts via Qemu-devel <qemu-devel@nongnu.org>
-Reply-To: Lucien Murray-Pitts <lucienmp_antispam@yahoo.com>
-Cc: Thomas Huth <huth@tuxfamily.org>,
-	Richard Henderson <richard.henderson@linaro.org>,
-	Laurent Vivier <laurent@vivier.eu>,
-	"Emilio G . Cota" <cota@braap.org>, lucienmp_antispam@yahoo.com,
-	=?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
-	Luc Michel <luc.michel@greensocs.com>
+Reply-To: qemu-devel@nongnu.org
+Cc: huth@tuxfamily.org, richard.henderson@linaro.org, qemu-devel@nongnu.org,
+	laurent@vivier.eu, cota@braap.org, lucienmp_antispam@yahoo.com,
+	alex.bennee@linaro.org, luc.michel@greensocs.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The register request via gdbstub would return the SR part
-which contains the Trace/Master/IRQ state flags, but
-would be missing the CR (Condition Register) state bits.
-
-This fix adds this support by merging them in the m68k
-specific gdbstub handler
-
-Signed-off-by: Lucien Murray-Pitts <lucienmp_antispam@yahoo.com>
----
- target/m68k/gdbstub.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
-
-diff --git a/target/m68k/gdbstub.c b/target/m68k/gdbstub.c
-index fd2bb46c42..f092044883 100644
---- a/target/m68k/gdbstub.c
-+++ b/target/m68k/gdbstub.c
-@@ -35,8 +35,10 @@ int m68k_cpu_gdb_read_register(CPUState *cs, uint8_t *mem_buf, int n)
-         return gdb_get_reg32(mem_buf, env->aregs[n - 8]);
-     } else {
-         switch (n) {
--        case 16:
--            return gdb_get_reg32(mem_buf, env->sr);
-+        case 16: {
-+            /* SR is made of SR+CCR, CCR is many 1bit flags so uses helper */
-+            return gdb_get_reg32(mem_buf, (env->sr | cpu_m68k_get_ccr(env)));
-+        }
-         case 17:
-             return gdb_get_reg32(mem_buf, env->pc);
-         }
--- 
-2.21.0
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDUyNjA3MjgyNi4zMjk1
+Ni0xLWx1Y2llbm1wX2FudGlzcGFtQHlhaG9vLmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVt
+cyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZv
+cgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAxOTA1MjYwNzI4MjYuMzI5NTYtMS1s
+dWNpZW5tcF9hbnRpc3BhbUB5YWhvby5jb20KVHlwZTogc2VyaWVzClN1YmplY3Q6IFtRZW11LWRl
+dmVsXSBbUEFUQ0hdIEluY29ycmVjdCBTdGFjayBQb2ludGVyIHNoYWRvdyByZWdpc3RlciBzdXBw
+b3J0IG9uIHNvbWUgbTY4ayBDUFVzCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9i
+YXNoCmdpdCByZXYtcGFyc2UgYmFzZSA+IC9kZXYvbnVsbCB8fCBleGl0IDAKZ2l0IGNvbmZpZyAt
+LWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVz
+IFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQouL3Njcmlw
+dHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09
+PQoKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKICogW25ldyB0
+YWddICAgICAgICAgICAgICAgcGF0Y2hldy8yMDE5MDUyNjA3MjgyNi4zMjk1Ni0xLWx1Y2llbm1w
+X2FudGlzcGFtQHlhaG9vLmNvbSAtPiBwYXRjaGV3LzIwMTkwNTI2MDcyODI2LjMyOTU2LTEtbHVj
+aWVubXBfYW50aXNwYW1AeWFob28uY29tClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcK
+MmZhOTJlOGQ4NiBJbmNvcnJlY3QgU3RhY2sgUG9pbnRlciBzaGFkb3cgcmVnaXN0ZXIgc3VwcG9y
+dCBvbiBzb21lIG02OGsgQ1BVcwoKPT09IE9VVFBVVCBCRUdJTiA9PT0KRVJST1I6IEF1dGhvciBl
+bWFpbCBhZGRyZXNzIGlzIG1hbmdsZWQgYnkgdGhlIG1haWxpbmcgbGlzdAojMjogCkF1dGhvcjog
+THVjaWVuIE11cnJheS1QaXR0cyB2aWEgUWVtdS1kZXZlbCA8cWVtdS1kZXZlbEBub25nbnUub3Jn
+PgoKV0FSTklORzogQmxvY2sgY29tbWVudHMgdXNlIGEgbGVhZGluZyAvKiBvbiBhIHNlcGFyYXRl
+IGxpbmUKIzQ2OiBGSUxFOiB0YXJnZXQvbTY4ay9jcHUuaDo0NjU6CisvKiBUaGUgQ29sZEZpcmUg
+Y29yZSBJU0EgaXMgYSBSSVNDLXN0eWxlIHJlZHVjdGlvbiBvZiB0aGUgNjgwMDAgc2VyaWVzCgpX
+QVJOSU5HOiBCbG9jayBjb21tZW50cyB1c2UgKiBvbiBzdWJzZXF1ZW50IGxpbmVzCiM0NzogRklM
+RTogdGFyZ2V0L202OGsvY3B1Lmg6NDY2OgorLyogVGhlIENvbGRGaXJlIGNvcmUgSVNBIGlzIGEg
+UklTQy1zdHlsZSByZWR1Y3Rpb24gb2YgdGhlIDY4MDAwIHNlcmllcworICAgV2hpbHN0IHRoZSA2
+ODAwMCBmbG91cmlzaGVkIGJ5IGFkZGluZyBleHRlbmRlZCBzdGFjay9pbnN0cnVjdGlvbnMgaW4K
+CnRvdGFsOiAxIGVycm9ycywgMiB3YXJuaW5ncywgNDQgbGluZXMgY2hlY2tlZAoKQ29tbWl0IDJm
+YTkyZThkODYyMCAoSW5jb3JyZWN0IFN0YWNrIFBvaW50ZXIgc2hhZG93IHJlZ2lzdGVyIHN1cHBv
+cnQgb24gc29tZSBtNjhrIENQVXMpIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4g
+IElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0
+byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCj09PSBPVVRQ
+VVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgpUaGUgZnVsbCBs
+b2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMTkwNTI2MDcyODI2
+LjMyOTU2LTEtbHVjaWVubXBfYW50aXNwYW1AeWFob28uY29tL3Rlc3RpbmcuY2hlY2twYXRjaC8/
+dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hl
+dyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBh
+dGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
 
 
