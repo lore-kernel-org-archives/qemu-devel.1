@@ -6,57 +6,56 @@ X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4EC3DC07542
-	for <qemu-devel@archiver.kernel.org>; Sun, 26 May 2019 01:36:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4334AC07542
+	for <qemu-devel@archiver.kernel.org>; Sun, 26 May 2019 01:36:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 28CBA20644
-	for <qemu-devel@archiver.kernel.org>; Sun, 26 May 2019 01:36:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 28CBA20644
+	by mail.kernel.org (Postfix) with ESMTPS id 164A420644
+	for <qemu-devel@archiver.kernel.org>; Sun, 26 May 2019 01:36:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 164A420644
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:49220 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:49229 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hUi4w-0001dr-B3
-	for qemu-devel@archiver.kernel.org; Sat, 25 May 2019 21:36:02 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:53897)
+	id 1hUi5k-0002ec-3n
+	for qemu-devel@archiver.kernel.org; Sat, 25 May 2019 21:36:52 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:53938)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <palmer@dabbelt.com>) id 1hUhxD-0003HK-Uu
-	for qemu-devel@nongnu.org; Sat, 25 May 2019 21:28:04 -0400
+	(envelope-from <palmer@dabbelt.com>) id 1hUhxR-0003Hg-27
+	for qemu-devel@nongnu.org; Sat, 25 May 2019 21:28:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <palmer@dabbelt.com>) id 1hUhgL-0006So-Cj
-	for qemu-devel@nongnu.org; Sat, 25 May 2019 21:10:38 -0400
-Received: from mail-pl1-f177.google.com ([209.85.214.177]:33626)
+	(envelope-from <palmer@dabbelt.com>) id 1hUhfr-0005nT-DL
+	for qemu-devel@nongnu.org; Sat, 25 May 2019 21:10:08 -0400
+Received: from mail-pf1-f193.google.com ([209.85.210.193]:38212)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <palmer@dabbelt.com>) id 1hUhgL-0006SK-7R
-	for qemu-devel@nongnu.org; Sat, 25 May 2019 21:10:37 -0400
-Received: by mail-pl1-f177.google.com with SMTP id g21so5660535plq.0
-	for <qemu-devel@nongnu.org>; Sat, 25 May 2019 18:10:37 -0700 (PDT)
+	(Exim 4.71) (envelope-from <palmer@dabbelt.com>) id 1hUhfr-0005lj-69
+	for qemu-devel@nongnu.org; Sat, 25 May 2019 21:10:07 -0400
+Received: by mail-pf1-f193.google.com with SMTP id b76so7496168pfb.5
+	for <qemu-devel@nongnu.org>; Sat, 25 May 2019 18:10:07 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:subject:date:message-id:in-reply-to:references
 	:mime-version:content-transfer-encoding:cc:from:to;
-	bh=J7lhhgtf0sOTXH1yJE/Uqjkv+hDa7WrYfOdgGU5K6D4=;
-	b=Tac60sdLGy+l3lYMhA9dbXMcWT+prMolc/h2Pw3RZ8QPR49VJK9moTHO+w5DclVNdQ
-	qGvyyRbfMYxmcYacfNHzB81WygZ2U3wbg0arGNhIzJbuXBfD0Y1b5g+FslKutEgLl6ux
-	6+ZQqAXdcz1m+5HVPsnnczK1fpIVyZ1N5rKUNLHwXO5oMAXSU0gz4RpTZbWHZThyKcZq
-	aTWgc0mYedYJO3CzH60Slg6bfFq4SQ0okamrV7CIYhTHklW7d7e3j7UBb26GV0cu43re
-	PM00YLOrBa6GCzzQTvTHiVHP7rvS6ASUh2z2foTVSSekVXCoGufV2TBovjISFSfjKZzP
-	aGRA==
-X-Gm-Message-State: APjAAAUdgRsLu4Svx7/SEGYRrMwCGsATcaazl+YSGMbN9uD6YdxE8C0K
-	jnEp0d90zs4x3OGPAzpgcudK6Q==
-X-Google-Smtp-Source: APXvYqx3aSfewtpSAEOx4sclNnBttL3hHIQSuLNFe9dadntDNBnK9LAGKDhPeKWUHYLb5vtuO1WPaQ==
-X-Received: by 2002:a17:902:2d:: with SMTP id
-	42mr118552335pla.34.1558833035950; 
-	Sat, 25 May 2019 18:10:35 -0700 (PDT)
+	bh=AGynrsN21pUOx1n9WYF4sVDzoqOhDbKXNfRUTxBfjrw=;
+	b=O8sDa5kVYJLu0kOQNUNewa9Zhl7pqUVzOWCUxhyRpTsvRc4DP5L0I5n72LDHALSz2I
+	C48E5TSIt5VQsSvqOAJt5JId00z4FV8RTKc7gphiNlG595gA9ew55UaGpZv+XG+4zz8S
+	GiJyeQ//5SmldHibJsw5eENTiOgsM670jU2ni7QWhEgCEb6T8oBxS8Ef70TgKrqzUzmq
+	+OumWLAvOEdN9GcNlgqJT4h9J+oPU9gEMCurdrbqW//uelYGC/dLz/ozktnIqFIeS5Dw
+	I8l3Sko47XGWvLGTc22mZuDRiQlsrI9cIHTFY7TK9rf6TSzmPbnkkVKpZY5h/NWgYrk1
+	gQsg==
+X-Gm-Message-State: APjAAAWi97+HnaWZrIV94MtC36BdGPbPyYf3+4Xjl63yCC+yvVqCC4gO
+	L3Hu9bf8Gck799rVU3EOAdRDwwkFSds=
+X-Google-Smtp-Source: APXvYqwZY92aKwMSdJQkCQ2IbMRsfUvYIvnktU69XpIv7DBfceh2O5y1c7D6P9AsqkIeKoTCD+mQLw==
+X-Received: by 2002:aa7:8dcd:: with SMTP id j13mr22711737pfr.107.1558833005679;
+	Sat, 25 May 2019 18:10:05 -0700 (PDT)
 Received: from localhost ([12.206.222.5]) by smtp.gmail.com with ESMTPSA id
-	g22sm6826305pfo.28.2019.05.25.18.10.35
+	e123sm6733854pgc.29.2019.05.25.18.10.04
 	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Sat, 25 May 2019 18:10:35 -0700 (PDT)
-Date: Sat, 25 May 2019 18:09:44 -0700
-Message-Id: <20190526010948.3923-26-palmer@sifive.com>
+	Sat, 25 May 2019 18:10:05 -0700 (PDT)
+Date: Sat, 25 May 2019 18:09:23 -0700
+Message-Id: <20190526010948.3923-5-palmer@sifive.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190526010948.3923-1-palmer@sifive.com>
 References: <20190526010948.3923-1-palmer@sifive.com>
@@ -66,9 +65,9 @@ From: Palmer Dabbelt <palmer@sifive.com>
 To: Peter Maydell <peter.maydell@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 	[fuzzy]
-X-Received-From: 209.85.214.177
-Subject: [Qemu-devel] [PULL 25/29] target/riscv: Add the HSTATUS register
- masks
+X-Received-From: 209.85.210.193
+Subject: [Qemu-devel] [PULL 04/29] target/riscv: Name the argument sets for
+ all of insn32 formats
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -80,51 +79,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alistair Francis <alistair.francis@wdc.com>,
+Cc: Richard Henderson <richard.henderson@linaro.org>,
 	Palmer Dabbelt <palmer@sifive.com>, qemu-riscv@nongnu.org,
 	qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Alistair Francis <Alistair.Francis@wdc.com>
+From: Richard Henderson <richard.henderson@linaro.org>
 
-Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
-Reviwed-by: Palmer Dabbelt <palmer@sifive.com>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Palmer Dabbelt <palmer@sifive.com>
 Signed-off-by: Palmer Dabbelt <palmer@sifive.com>
 ---
- target/riscv/cpu_bits.h | 18 ++++++++++++++++++
- 1 file changed, 18 insertions(+)
+ target/riscv/insn32.decode | 10 +++++++---
+ target/riscv/translate.c   | 18 ++++++++++++++++++
+ 2 files changed, 25 insertions(+), 3 deletions(-)
 
-diff --git a/target/riscv/cpu_bits.h b/target/riscv/cpu_bits.h
-index 52c21699774f..a179137bc1f2 100644
---- a/target/riscv/cpu_bits.h
-+++ b/target/riscv/cpu_bits.h
-@@ -382,6 +382,24 @@
- #define SSTATUS_SD SSTATUS64_SD
- #endif
+diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
+index 6f3ab7aa52d3..77f794ed703d 100644
+--- a/target/riscv/insn32.decode
++++ b/target/riscv/insn32.decode
+@@ -34,9 +34,13 @@
+ %imm_u    12:s20                 !function=ex_shift_12
  
-+/* hstatus CSR bits */
-+#define HSTATUS_SPRV         0x00000001
-+#define HSTATUS_STL          0x00000040
-+#define HSTATUS_SPV          0x00000080
-+#define HSTATUS_SP2P         0x00000100
-+#define HSTATUS_SP2V         0x00000200
-+#define HSTATUS_VTVM         0x00100000
-+#define HSTATUS_VTSR         0x00400000
-+
-+#define HSTATUS32_WPRI       0xFF8FF87E
-+#define HSTATUS64_WPRI       0xFFFFFFFFFF8FF87EULL
-+
-+#if defined(TARGET_RISCV32)
-+#define HSTATUS_WPRI HSTATUS32_WPRI
-+#elif defined(TARGET_RISCV64)
-+#define HSTATUS_WPRI HSTATUS64_WPRI
+ # Argument sets:
++&empty
+ &b    imm rs2 rs1
+ &i    imm rs1 rd
++&j    imm rd
+ &r    rd rs1 rs2
++&s    imm rs1 rs2
++&u    imm rd
+ &shift     shamt rs1 rd
+ &atomic    aq rl rs2 rs1 rd
+ 
+@@ -44,9 +48,9 @@
+ @r       .......   ..... ..... ... ..... ....... &r                %rs2 %rs1 %rd
+ @i       ............    ..... ... ..... ....... &i      imm=%imm_i     %rs1 %rd
+ @b       .......   ..... ..... ... ..... ....... &b      imm=%imm_b %rs2 %rs1
+-@s       .......   ..... ..... ... ..... .......         imm=%imm_s %rs2 %rs1
+-@u       ....................      ..... .......         imm=%imm_u          %rd
+-@j       ....................      ..... .......         imm=%imm_j          %rd
++@s       .......   ..... ..... ... ..... ....... &s      imm=%imm_s %rs2 %rs1
++@u       ....................      ..... ....... &u      imm=%imm_u          %rd
++@j       ....................      ..... ....... &j      imm=%imm_j          %rd
+ 
+ @sh      ......  ...... .....  ... ..... ....... &shift  shamt=%sh10      %rs1 %rd
+ @csr     ............   .....  ... ..... .......               %csr     %rs1 %rd
+diff --git a/target/riscv/translate.c b/target/riscv/translate.c
+index 840ecbef36e7..928374242e83 100644
+--- a/target/riscv/translate.c
++++ b/target/riscv/translate.c
+@@ -687,11 +687,29 @@ static bool gen_shift(DisasContext *ctx, arg_r *a,
+ #include "insn_trans/trans_rvd.inc.c"
+ #include "insn_trans/trans_privileged.inc.c"
+ 
++/*
++ * Auto-generated decoder.
++ * Note that the 16-bit decoder reuses some of the trans_* functions
++ * initially declared by the 32-bit decoder, which results in duplicate
++ * declaration warnings.  Suppress them.
++ */
++#ifdef CONFIG_PRAGMA_DIAGNOSTIC_AVAILABLE
++# pragma GCC diagnostic push
++# pragma GCC diagnostic ignored "-Wredundant-decls"
++# ifdef __clang__
++#  pragma GCC diagnostic ignored "-Wtypedef-redefinition"
++# endif
 +#endif
 +
- /* Privilege modes */
- #define PRV_U 0
- #define PRV_S 1
+ bool decode_insn16(DisasContext *ctx, uint16_t insn);
+ /* auto-generated decoder*/
+ #include "decode_insn16.inc.c"
+ #include "insn_trans/trans_rvc.inc.c"
+ 
++#ifdef CONFIG_PRAGMA_DIAGNOSTIC_AVAILABLE
++# pragma GCC diagnostic pop
++#endif
++
+ static void decode_opc(DisasContext *ctx)
+ {
+     /* check for compressed insn */
 -- 
 2.21.0
 
