@@ -6,52 +6,52 @@ X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CF9C3C282E3
-	for <qemu-devel@archiver.kernel.org>; Sun, 26 May 2019 16:26:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B234FC282E3
+	for <qemu-devel@archiver.kernel.org>; Sun, 26 May 2019 16:29:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8F55A20657
-	for <qemu-devel@archiver.kernel.org>; Sun, 26 May 2019 16:26:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8F55A20657
+	by mail.kernel.org (Postfix) with ESMTPS id 6C96E20657
+	for <qemu-devel@archiver.kernel.org>; Sun, 26 May 2019 16:29:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6C96E20657
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:57201 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:57219 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hUvyv-0004JA-O9
-	for qemu-devel@archiver.kernel.org; Sun, 26 May 2019 12:26:45 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:40904)
+	id 1hUw1G-0006M2-CW
+	for qemu-devel@archiver.kernel.org; Sun, 26 May 2019 12:29:10 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:40909)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1hUvwn-0002p2-AV
-	for qemu-devel@nongnu.org; Sun, 26 May 2019 12:24:38 -0400
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1hUvx0-0002p3-KO
+	for qemu-devel@nongnu.org; Sun, 26 May 2019 12:24:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1hUvsk-0007PV-GF
-	for qemu-devel@nongnu.org; Sun, 26 May 2019 12:20:24 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:36576 helo=mail.rt-rk.com)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1hUvsj-0007Nu-2h
+	for qemu-devel@nongnu.org; Sun, 26 May 2019 12:20:22 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:35919 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1hUvsk-0007OE-5L
-	for qemu-devel@nongnu.org; Sun, 26 May 2019 12:20:22 -0400
+	id 1hUvsi-0006sl-Nc
+	for qemu-devel@nongnu.org; Sun, 26 May 2019 12:20:20 -0400
 Received: from localhost (localhost [127.0.0.1])
-	by mail.rt-rk.com (Postfix) with ESMTP id C05671A4BCF;
+	by mail.rt-rk.com (Postfix) with ESMTP id 7CC3C1A4B7C;
 	Sun, 26 May 2019 18:19:16 +0200 (CEST)
 X-Virus-Scanned: amavisd-new at rt-rk.com
 Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
 	[10.10.13.43])
-	by mail.rt-rk.com (Postfix) with ESMTPSA id 92AF71A4BC7;
+	by mail.rt-rk.com (Postfix) with ESMTPSA id 553581A4B7F;
 	Sun, 26 May 2019 18:19:16 +0200 (CEST)
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
 To: qemu-devel@nongnu.org
-Date: Sun, 26 May 2019 18:19:09 +0200
-Message-Id: <1558887551-32137-11-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Sun, 26 May 2019 18:19:03 +0200
+Message-Id: <1558887551-32137-5-git-send-email-aleksandar.markovic@rt-rk.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1558887551-32137-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1558887551-32137-1-git-send-email-aleksandar.markovic@rt-rk.com>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
 X-Received-From: 89.216.37.149
-Subject: [Qemu-devel] [PULL 10/12] target/mips: add or remove space to fix
- checkpatch errors
+Subject: [Qemu-devel] [PULL 04/12] target/mips: Fix MSA instructions
+ ST.<B|H|W|D> on big endian host
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -68,272 +68,234 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Jules Irenge <jbi.octave@gmail.com>
+From: Mateja Marjanovic <Mateja.Marjanovic@rt-rk.com>
 
-Add or remove space to fix errors issued by checkpatch.pl tool
-"ERROR: spaces required around that..."
-"ERROR: space required after that..."
-"ERROR: space required before the open parenthesis"
-"ERROR: space required after that..."
-"ERROR: space prohibited between function name and open parenthesis"
-"ERROR: code indent should never use tabs"
-"ERROR: line over 90 characters"
-within "target/mips/cpu.h" file.
+Fix the case when the host is a big endian machine, and change
+the approach toward ST.<B|H|W|D> instruction helpers.
 
-Signed-off-by: Jules Irenge <jbi.octave@gmail.com>
+Signed-off-by: Mateja Marjanovic <mateja.marjanovic@rt-rk.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-Message-Id: <20190413202818.13622-2-jbi.octave@gmail.com>
+Message-Id: <1554212605-16457-3-git-send-email-mateja.marjanovic@rt-rk.com>
 ---
- target/mips/cpu.h | 175 +++++++++++++++++++++++++++++-------------------------
- 1 file changed, 94 insertions(+), 81 deletions(-)
+ target/mips/op_helper.c | 200 +++++++++++++++++++++++++++++++++++++++++++-----
+ 1 file changed, 180 insertions(+), 20 deletions(-)
 
-diff --git a/target/mips/cpu.h b/target/mips/cpu.h
-index 1f41cf6..71dd403 100644
---- a/target/mips/cpu.h
-+++ b/target/mips/cpu.h
-@@ -22,10 +22,10 @@ typedef struct CPUMIPSTLBContext CPUMIPSTLBContext;
- 
- typedef union wr_t wr_t;
- union wr_t {
--    int8_t  b[MSA_WRLEN/8];
--    int16_t h[MSA_WRLEN/16];
--    int32_t w[MSA_WRLEN/32];
--    int64_t d[MSA_WRLEN/64];
-+    int8_t  b[MSA_WRLEN / 8];
-+    int16_t h[MSA_WRLEN / 16];
-+    int32_t w[MSA_WRLEN / 32];
-+    int64_t d[MSA_WRLEN / 64];
- };
- 
- typedef union fpr_t fpr_t;
-@@ -71,16 +71,29 @@ struct CPUMIPSFPUContext {
- #define FCR31_FS 24
- #define FCR31_ABS2008 19
- #define FCR31_NAN2008 18
--#define SET_FP_COND(num,env)     do { ((env).fcr31) |= ((num) ? (1 << ((num) + 24)) : (1 << 23)); } while(0)
--#define CLEAR_FP_COND(num,env)   do { ((env).fcr31) &= ~((num) ? (1 << ((num) + 24)) : (1 << 23)); } while(0)
--#define GET_FP_COND(env)         ((((env).fcr31 >> 24) & 0xfe) | (((env).fcr31 >> 23) & 0x1))
-+#define SET_FP_COND(num, env)     do { ((env).fcr31) |=                 \
-+                                       ((num) ? (1 << ((num) + 24)) :   \
-+                                                (1 << 23));             \
-+                                     } while (0)
-+#define CLEAR_FP_COND(num, env)   do { ((env).fcr31) &=                 \
-+                                       ~((num) ? (1 << ((num) + 24)) :  \
-+                                                 (1 << 23));            \
-+                                     } while (0)
-+#define GET_FP_COND(env)         ((((env).fcr31 >> 24) & 0xfe) |        \
-+                                 (((env).fcr31 >> 23) & 0x1))
- #define GET_FP_CAUSE(reg)        (((reg) >> 12) & 0x3f)
- #define GET_FP_ENABLE(reg)       (((reg) >>  7) & 0x1f)
- #define GET_FP_FLAGS(reg)        (((reg) >>  2) & 0x1f)
--#define SET_FP_CAUSE(reg,v)      do { (reg) = ((reg) & ~(0x3f << 12)) | ((v & 0x3f) << 12); } while(0)
--#define SET_FP_ENABLE(reg,v)     do { (reg) = ((reg) & ~(0x1f <<  7)) | ((v & 0x1f) << 7); } while(0)
--#define SET_FP_FLAGS(reg,v)      do { (reg) = ((reg) & ~(0x1f <<  2)) | ((v & 0x1f) << 2); } while(0)
--#define UPDATE_FP_FLAGS(reg,v)   do { (reg) |= ((v & 0x1f) << 2); } while(0)
-+#define SET_FP_CAUSE(reg, v)      do { (reg) = ((reg) & ~(0x3f << 12)) | \
-+                                               ((v & 0x3f) << 12);       \
-+                                     } while (0)
-+#define SET_FP_ENABLE(reg, v)     do { (reg) = ((reg) & ~(0x1f <<  7)) | \
-+                                               ((v & 0x1f) << 7);        \
-+                                     } while (0)
-+#define SET_FP_FLAGS(reg, v)      do { (reg) = ((reg) & ~(0x1f <<  2)) | \
-+                                               ((v & 0x1f) << 2);        \
-+                                     } while (0)
-+#define UPDATE_FP_FLAGS(reg, v)   do { (reg) |= ((v & 0x1f) << 2); } while (0)
- #define FP_INEXACT        1
- #define FP_UNDERFLOW      2
- #define FP_OVERFLOW       4
-@@ -95,25 +108,25 @@ struct CPUMIPSFPUContext {
- typedef struct CPUMIPSMVPContext CPUMIPSMVPContext;
- struct CPUMIPSMVPContext {
-     int32_t CP0_MVPControl;
--#define CP0MVPCo_CPA	3
--#define CP0MVPCo_STLB	2
--#define CP0MVPCo_VPC	1
--#define CP0MVPCo_EVP	0
-+#define CP0MVPCo_CPA    3
-+#define CP0MVPCo_STLB   2
-+#define CP0MVPCo_VPC    1
-+#define CP0MVPCo_EVP    0
-     int32_t CP0_MVPConf0;
--#define CP0MVPC0_M	31
--#define CP0MVPC0_TLBS	29
--#define CP0MVPC0_GS	28
--#define CP0MVPC0_PCP	27
--#define CP0MVPC0_PTLBE	16
--#define CP0MVPC0_TCA	15
--#define CP0MVPC0_PVPE	10
--#define CP0MVPC0_PTC	0
-+#define CP0MVPC0_M      31
-+#define CP0MVPC0_TLBS   29
-+#define CP0MVPC0_GS     28
-+#define CP0MVPC0_PCP    27
-+#define CP0MVPC0_PTLBE  16
-+#define CP0MVPC0_TCA    15
-+#define CP0MVPC0_PVPE   10
-+#define CP0MVPC0_PTC    0
-     int32_t CP0_MVPConf1;
--#define CP0MVPC1_CIM	31
--#define CP0MVPC1_CIF	30
--#define CP0MVPC1_PCX	20
--#define CP0MVPC1_PCP2	10
--#define CP0MVPC1_PCP1	0
-+#define CP0MVPC1_CIM    31
-+#define CP0MVPC1_CIF    30
-+#define CP0MVPC1_PCX    20
-+#define CP0MVPC1_PCP2   10
-+#define CP0MVPC1_PCP1   0
- };
- 
- typedef struct mips_def_t mips_def_t;
-@@ -481,44 +494,44 @@ struct CPUMIPSState {
-  */
-     int32_t CP0_Random;
-     int32_t CP0_VPEControl;
--#define CP0VPECo_YSI	21
--#define CP0VPECo_GSI	20
--#define CP0VPECo_EXCPT	16
--#define CP0VPECo_TE	15
--#define CP0VPECo_TargTC	0
-+#define CP0VPECo_YSI    21
-+#define CP0VPECo_GSI    20
-+#define CP0VPECo_EXCPT  16
-+#define CP0VPECo_TE     15
-+#define CP0VPECo_TargTC 0
-     int32_t CP0_VPEConf0;
--#define CP0VPEC0_M	31
--#define CP0VPEC0_XTC	21
--#define CP0VPEC0_TCS	19
--#define CP0VPEC0_SCS	18
--#define CP0VPEC0_DSC	17
--#define CP0VPEC0_ICS	16
--#define CP0VPEC0_MVP	1
--#define CP0VPEC0_VPA	0
-+#define CP0VPEC0_M      31
-+#define CP0VPEC0_XTC    21
-+#define CP0VPEC0_TCS    19
-+#define CP0VPEC0_SCS    18
-+#define CP0VPEC0_DSC    17
-+#define CP0VPEC0_ICS    16
-+#define CP0VPEC0_MVP    1
-+#define CP0VPEC0_VPA    0
-     int32_t CP0_VPEConf1;
--#define CP0VPEC1_NCX	20
--#define CP0VPEC1_NCP2	10
--#define CP0VPEC1_NCP1	0
-+#define CP0VPEC1_NCX    20
-+#define CP0VPEC1_NCP2   10
-+#define CP0VPEC1_NCP1   0
-     target_ulong CP0_YQMask;
-     target_ulong CP0_VPESchedule;
-     target_ulong CP0_VPEScheFBack;
-     int32_t CP0_VPEOpt;
--#define CP0VPEOpt_IWX7	15
--#define CP0VPEOpt_IWX6	14
--#define CP0VPEOpt_IWX5	13
--#define CP0VPEOpt_IWX4	12
--#define CP0VPEOpt_IWX3	11
--#define CP0VPEOpt_IWX2	10
--#define CP0VPEOpt_IWX1	9
--#define CP0VPEOpt_IWX0	8
--#define CP0VPEOpt_DWX7	7
--#define CP0VPEOpt_DWX6	6
--#define CP0VPEOpt_DWX5	5
--#define CP0VPEOpt_DWX4	4
--#define CP0VPEOpt_DWX3	3
--#define CP0VPEOpt_DWX2	2
--#define CP0VPEOpt_DWX1	1
--#define CP0VPEOpt_DWX0	0
-+#define CP0VPEOpt_IWX7  15
-+#define CP0VPEOpt_IWX6  14
-+#define CP0VPEOpt_IWX5  13
-+#define CP0VPEOpt_IWX4  12
-+#define CP0VPEOpt_IWX3  11
-+#define CP0VPEOpt_IWX2  10
-+#define CP0VPEOpt_IWX1  9
-+#define CP0VPEOpt_IWX0  8
-+#define CP0VPEOpt_DWX7  7
-+#define CP0VPEOpt_DWX6  6
-+#define CP0VPEOpt_DWX5  5
-+#define CP0VPEOpt_DWX4  4
-+#define CP0VPEOpt_DWX3  3
-+#define CP0VPEOpt_DWX2  2
-+#define CP0VPEOpt_DWX1  1
-+#define CP0VPEOpt_DWX0  0
- /*
-  * CP0 Register 2
-  */
-@@ -625,33 +638,33 @@ struct CPUMIPSState {
- #define CP0PC_PSN       0     /*  5..0  */
-     int32_t CP0_SRSConf0_rw_bitmask;
-     int32_t CP0_SRSConf0;
--#define CP0SRSC0_M	31
--#define CP0SRSC0_SRS3	20
--#define CP0SRSC0_SRS2	10
--#define CP0SRSC0_SRS1	0
-+#define CP0SRSC0_M      31
-+#define CP0SRSC0_SRS3   20
-+#define CP0SRSC0_SRS2   10
-+#define CP0SRSC0_SRS1   0
-     int32_t CP0_SRSConf1_rw_bitmask;
-     int32_t CP0_SRSConf1;
--#define CP0SRSC1_M	31
--#define CP0SRSC1_SRS6	20
--#define CP0SRSC1_SRS5	10
--#define CP0SRSC1_SRS4	0
-+#define CP0SRSC1_M      31
-+#define CP0SRSC1_SRS6   20
-+#define CP0SRSC1_SRS5   10
-+#define CP0SRSC1_SRS4   0
-     int32_t CP0_SRSConf2_rw_bitmask;
-     int32_t CP0_SRSConf2;
--#define CP0SRSC2_M	31
--#define CP0SRSC2_SRS9	20
--#define CP0SRSC2_SRS8	10
--#define CP0SRSC2_SRS7	0
-+#define CP0SRSC2_M      31
-+#define CP0SRSC2_SRS9   20
-+#define CP0SRSC2_SRS8   10
-+#define CP0SRSC2_SRS7   0
-     int32_t CP0_SRSConf3_rw_bitmask;
-     int32_t CP0_SRSConf3;
--#define CP0SRSC3_M	31
--#define CP0SRSC3_SRS12	20
--#define CP0SRSC3_SRS11	10
--#define CP0SRSC3_SRS10	0
-+#define CP0SRSC3_M      31
-+#define CP0SRSC3_SRS12  20
-+#define CP0SRSC3_SRS11  10
-+#define CP0SRSC3_SRS10  0
-     int32_t CP0_SRSConf4_rw_bitmask;
-     int32_t CP0_SRSConf4;
--#define CP0SRSC4_SRS15	20
--#define CP0SRSC4_SRS14	10
--#define CP0SRSC4_SRS13	0
-+#define CP0SRSC4_SRS15  20
-+#define CP0SRSC4_SRS14  10
-+#define CP0SRSC4_SRS13  0
- /*
-  * CP0 Register 7
-  */
-@@ -1090,7 +1103,7 @@ static inline int hflags_mmu_index(uint32_t hflags)
-     }
+diff --git a/target/mips/op_helper.c b/target/mips/op_helper.c
+index a8ae438..3918027 100644
+--- a/target/mips/op_helper.c
++++ b/target/mips/op_helper.c
+@@ -4550,31 +4550,191 @@ static inline void ensure_writable_pages(CPUMIPSState *env,
+ #endif
  }
  
--static inline int cpu_mmu_index (CPUMIPSState *env, bool ifetch)
-+static inline int cpu_mmu_index(CPUMIPSState *env, bool ifetch)
- {
-     return hflags_mmu_index(env->hflags);
+-#define MSA_ST_DF(DF, TYPE, ST_INSN, ...)                               \
+-void helper_msa_st_ ## TYPE(CPUMIPSState *env, uint32_t wd,             \
+-                            target_ulong addr)                          \
+-{                                                                       \
+-    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);                          \
+-    int mmu_idx = cpu_mmu_index(env, false);				\
+-    int i;                                                              \
+-    MEMOP_IDX(DF)                                                       \
+-    ensure_writable_pages(env, addr, mmu_idx, GETPC());                 \
+-    for (i = 0; i < DF_ELEMENTS(DF); i++) {                             \
+-        ST_INSN(env, addr + (i << DF), pwd->TYPE[i], ##__VA_ARGS__);    \
+-    }                                                                   \
++void helper_msa_st_b(CPUMIPSState *env, uint32_t wd,
++                     target_ulong addr)
++{
++    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
++    int mmu_idx = cpu_mmu_index(env, false);
++
++    MEMOP_IDX(DF_BYTE)
++    ensure_writable_pages(env, addr, mmu_idx, GETPC());
++#if !defined(CONFIG_USER_ONLY)
++#if !defined(HOST_WORDS_BIGENDIAN)
++    helper_ret_stb_mmu(env, addr + (0  << DF_BYTE), pwd->b[0],  oi, GETPC());
++    helper_ret_stb_mmu(env, addr + (1  << DF_BYTE), pwd->b[1],  oi, GETPC());
++    helper_ret_stb_mmu(env, addr + (2  << DF_BYTE), pwd->b[2],  oi, GETPC());
++    helper_ret_stb_mmu(env, addr + (3  << DF_BYTE), pwd->b[3],  oi, GETPC());
++    helper_ret_stb_mmu(env, addr + (4  << DF_BYTE), pwd->b[4],  oi, GETPC());
++    helper_ret_stb_mmu(env, addr + (5  << DF_BYTE), pwd->b[5],  oi, GETPC());
++    helper_ret_stb_mmu(env, addr + (6  << DF_BYTE), pwd->b[6],  oi, GETPC());
++    helper_ret_stb_mmu(env, addr + (7  << DF_BYTE), pwd->b[7],  oi, GETPC());
++    helper_ret_stb_mmu(env, addr + (8  << DF_BYTE), pwd->b[8],  oi, GETPC());
++    helper_ret_stb_mmu(env, addr + (9  << DF_BYTE), pwd->b[9],  oi, GETPC());
++    helper_ret_stb_mmu(env, addr + (10 << DF_BYTE), pwd->b[10], oi, GETPC());
++    helper_ret_stb_mmu(env, addr + (11 << DF_BYTE), pwd->b[11], oi, GETPC());
++    helper_ret_stb_mmu(env, addr + (12 << DF_BYTE), pwd->b[12], oi, GETPC());
++    helper_ret_stb_mmu(env, addr + (13 << DF_BYTE), pwd->b[13], oi, GETPC());
++    helper_ret_stb_mmu(env, addr + (14 << DF_BYTE), pwd->b[14], oi, GETPC());
++    helper_ret_stb_mmu(env, addr + (15 << DF_BYTE), pwd->b[15], oi, GETPC());
++#else
++    helper_ret_stb_mmu(env, addr + (7  << DF_BYTE), pwd->b[0],  oi, GETPC());
++    helper_ret_stb_mmu(env, addr + (6  << DF_BYTE), pwd->b[1],  oi, GETPC());
++    helper_ret_stb_mmu(env, addr + (5  << DF_BYTE), pwd->b[2],  oi, GETPC());
++    helper_ret_stb_mmu(env, addr + (4  << DF_BYTE), pwd->b[3],  oi, GETPC());
++    helper_ret_stb_mmu(env, addr + (3  << DF_BYTE), pwd->b[4],  oi, GETPC());
++    helper_ret_stb_mmu(env, addr + (2  << DF_BYTE), pwd->b[5],  oi, GETPC());
++    helper_ret_stb_mmu(env, addr + (1  << DF_BYTE), pwd->b[6],  oi, GETPC());
++    helper_ret_stb_mmu(env, addr + (0  << DF_BYTE), pwd->b[7],  oi, GETPC());
++    helper_ret_stb_mmu(env, addr + (15 << DF_BYTE), pwd->b[8],  oi, GETPC());
++    helper_ret_stb_mmu(env, addr + (14 << DF_BYTE), pwd->b[9],  oi, GETPC());
++    helper_ret_stb_mmu(env, addr + (13 << DF_BYTE), pwd->b[10], oi, GETPC());
++    helper_ret_stb_mmu(env, addr + (12 << DF_BYTE), pwd->b[11], oi, GETPC());
++    helper_ret_stb_mmu(env, addr + (11 << DF_BYTE), pwd->b[12], oi, GETPC());
++    helper_ret_stb_mmu(env, addr + (10 << DF_BYTE), pwd->b[13], oi, GETPC());
++    helper_ret_stb_mmu(env, addr + (9  << DF_BYTE), pwd->b[14], oi, GETPC());
++    helper_ret_stb_mmu(env, addr + (8  << DF_BYTE), pwd->b[15], oi, GETPC());
++#endif
++#else
++#if !defined(HOST_WORDS_BIGENDIAN)
++    cpu_stb_data(env, addr + (0  << DF_BYTE), pwd->b[0]);
++    cpu_stb_data(env, addr + (1  << DF_BYTE), pwd->b[1]);
++    cpu_stb_data(env, addr + (2  << DF_BYTE), pwd->b[2]);
++    cpu_stb_data(env, addr + (3  << DF_BYTE), pwd->b[3]);
++    cpu_stb_data(env, addr + (4  << DF_BYTE), pwd->b[4]);
++    cpu_stb_data(env, addr + (5  << DF_BYTE), pwd->b[5]);
++    cpu_stb_data(env, addr + (6  << DF_BYTE), pwd->b[6]);
++    cpu_stb_data(env, addr + (7  << DF_BYTE), pwd->b[7]);
++    cpu_stb_data(env, addr + (8  << DF_BYTE), pwd->b[8]);
++    cpu_stb_data(env, addr + (9  << DF_BYTE), pwd->b[9]);
++    cpu_stb_data(env, addr + (10 << DF_BYTE), pwd->b[10]);
++    cpu_stb_data(env, addr + (11 << DF_BYTE), pwd->b[11]);
++    cpu_stb_data(env, addr + (12 << DF_BYTE), pwd->b[12]);
++    cpu_stb_data(env, addr + (13 << DF_BYTE), pwd->b[13]);
++    cpu_stb_data(env, addr + (14 << DF_BYTE), pwd->b[14]);
++    cpu_stb_data(env, addr + (15 << DF_BYTE), pwd->b[15]);
++#else
++    cpu_stb_data(env, addr + (7  << DF_BYTE), pwd->b[0]);
++    cpu_stb_data(env, addr + (6  << DF_BYTE), pwd->b[1]);
++    cpu_stb_data(env, addr + (5  << DF_BYTE), pwd->b[2]);
++    cpu_stb_data(env, addr + (4  << DF_BYTE), pwd->b[3]);
++    cpu_stb_data(env, addr + (3  << DF_BYTE), pwd->b[4]);
++    cpu_stb_data(env, addr + (2  << DF_BYTE), pwd->b[5]);
++    cpu_stb_data(env, addr + (1  << DF_BYTE), pwd->b[6]);
++    cpu_stb_data(env, addr + (0  << DF_BYTE), pwd->b[7]);
++    cpu_stb_data(env, addr + (15 << DF_BYTE), pwd->b[8]);
++    cpu_stb_data(env, addr + (14 << DF_BYTE), pwd->b[9]);
++    cpu_stb_data(env, addr + (13 << DF_BYTE), pwd->b[10]);
++    cpu_stb_data(env, addr + (12 << DF_BYTE), pwd->b[11]);
++    cpu_stb_data(env, addr + (11 << DF_BYTE), pwd->b[12]);
++    cpu_stb_data(env, addr + (10 << DF_BYTE), pwd->b[13]);
++    cpu_stb_data(env, addr + (9  << DF_BYTE), pwd->b[14]);
++    cpu_stb_data(env, addr + (8  << DF_BYTE), pwd->b[15]);
++#endif
++#endif
++}
++
++void helper_msa_st_h(CPUMIPSState *env, uint32_t wd,
++                     target_ulong addr)
++{
++    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
++    int mmu_idx = cpu_mmu_index(env, false);
++
++    MEMOP_IDX(DF_HALF)
++    ensure_writable_pages(env, addr, mmu_idx, GETPC());
++#if !defined(CONFIG_USER_ONLY)
++#if !defined(HOST_WORDS_BIGENDIAN)
++    helper_ret_stw_mmu(env, addr + (0 << DF_HALF), pwd->h[0], oi, GETPC());
++    helper_ret_stw_mmu(env, addr + (1 << DF_HALF), pwd->h[1], oi, GETPC());
++    helper_ret_stw_mmu(env, addr + (2 << DF_HALF), pwd->h[2], oi, GETPC());
++    helper_ret_stw_mmu(env, addr + (3 << DF_HALF), pwd->h[3], oi, GETPC());
++    helper_ret_stw_mmu(env, addr + (4 << DF_HALF), pwd->h[4], oi, GETPC());
++    helper_ret_stw_mmu(env, addr + (5 << DF_HALF), pwd->h[5], oi, GETPC());
++    helper_ret_stw_mmu(env, addr + (6 << DF_HALF), pwd->h[6], oi, GETPC());
++    helper_ret_stw_mmu(env, addr + (7 << DF_HALF), pwd->h[7], oi, GETPC());
++#else
++    helper_ret_stw_mmu(env, addr + (3 << DF_HALF), pwd->h[0], oi, GETPC());
++    helper_ret_stw_mmu(env, addr + (2 << DF_HALF), pwd->h[1], oi, GETPC());
++    helper_ret_stw_mmu(env, addr + (1 << DF_HALF), pwd->h[2], oi, GETPC());
++    helper_ret_stw_mmu(env, addr + (0 << DF_HALF), pwd->h[3], oi, GETPC());
++    helper_ret_stw_mmu(env, addr + (7 << DF_HALF), pwd->h[4], oi, GETPC());
++    helper_ret_stw_mmu(env, addr + (6 << DF_HALF), pwd->h[5], oi, GETPC());
++    helper_ret_stw_mmu(env, addr + (5 << DF_HALF), pwd->h[6], oi, GETPC());
++    helper_ret_stw_mmu(env, addr + (4 << DF_HALF), pwd->h[7], oi, GETPC());
++#endif
++#else
++#if !defined(HOST_WORDS_BIGENDIAN)
++    cpu_stw_data(env, addr + (0 << DF_HALF), pwd->h[0]);
++    cpu_stw_data(env, addr + (1 << DF_HALF), pwd->h[1]);
++    cpu_stw_data(env, addr + (2 << DF_HALF), pwd->h[2]);
++    cpu_stw_data(env, addr + (3 << DF_HALF), pwd->h[3]);
++    cpu_stw_data(env, addr + (4 << DF_HALF), pwd->h[4]);
++    cpu_stw_data(env, addr + (5 << DF_HALF), pwd->h[5]);
++    cpu_stw_data(env, addr + (6 << DF_HALF), pwd->h[6]);
++    cpu_stw_data(env, addr + (7 << DF_HALF), pwd->h[7]);
++#else
++    cpu_stw_data(env, addr + (3 << DF_HALF), pwd->h[0]);
++    cpu_stw_data(env, addr + (2 << DF_HALF), pwd->h[1]);
++    cpu_stw_data(env, addr + (1 << DF_HALF), pwd->h[2]);
++    cpu_stw_data(env, addr + (0 << DF_HALF), pwd->h[3]);
++    cpu_stw_data(env, addr + (7 << DF_HALF), pwd->h[4]);
++    cpu_stw_data(env, addr + (6 << DF_HALF), pwd->h[5]);
++    cpu_stw_data(env, addr + (5 << DF_HALF), pwd->h[6]);
++    cpu_stw_data(env, addr + (4 << DF_HALF), pwd->h[7]);
++#endif
++#endif
  }
-@@ -1182,7 +1195,7 @@ void cpu_mips_soft_irq(CPUMIPSState *env, int irq, int level);
- void itc_reconfigure(struct MIPSITUState *tag);
  
- /* helper.c */
--target_ulong exception_resume_pc (CPUMIPSState *env);
-+target_ulong exception_resume_pc(CPUMIPSState *env);
++void helper_msa_st_w(CPUMIPSState *env, uint32_t wd,
++                     target_ulong addr)
++{
++    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
++    int mmu_idx = cpu_mmu_index(env, false);
++
++    MEMOP_IDX(DF_WORD)
++    ensure_writable_pages(env, addr, mmu_idx, GETPC());
+ #if !defined(CONFIG_USER_ONLY)
+-MSA_ST_DF(DF_BYTE,   b, helper_ret_stb_mmu, oi, GETPC())
+-MSA_ST_DF(DF_HALF,   h, helper_ret_stw_mmu, oi, GETPC())
+-MSA_ST_DF(DF_WORD,   w, helper_ret_stl_mmu, oi, GETPC())
+-MSA_ST_DF(DF_DOUBLE, d, helper_ret_stq_mmu, oi, GETPC())
++#if !defined(HOST_WORDS_BIGENDIAN)
++    helper_ret_stl_mmu(env, addr + (0 << DF_WORD), oi, GETPC(), pwd->w[0]);
++    helper_ret_stl_mmu(env, addr + (1 << DF_WORD), oi, GETPC(), pwd->w[1]);
++    helper_ret_stl_mmu(env, addr + (2 << DF_WORD), oi, GETPC(), pwd->w[2]);
++    helper_ret_stl_mmu(env, addr + (3 << DF_WORD), oi, GETPC(), pwd->w[3]);
+ #else
+-MSA_ST_DF(DF_BYTE,   b, cpu_stb_data)
+-MSA_ST_DF(DF_HALF,   h, cpu_stw_data)
+-MSA_ST_DF(DF_WORD,   w, cpu_stl_data)
+-MSA_ST_DF(DF_DOUBLE, d, cpu_stq_data)
++    helper_ret_stl_mmu(env, addr + (1 << DF_WORD), oi, GETPC(), pwd->w[0]);
++    helper_ret_stl_mmu(env, addr + (0 << DF_WORD), oi, GETPC(), pwd->w[1]);
++    helper_ret_stl_mmu(env, addr + (3 << DF_WORD), oi, GETPC(), pwd->w[2]);
++    helper_ret_stl_mmu(env, addr + (2 << DF_WORD), oi, GETPC(), pwd->w[3]);
+ #endif
++#else
++#if !defined(HOST_WORDS_BIGENDIAN)
++    cpu_stl_data(env, addr + (0 << DF_WORD), pwd->w[0]);
++    cpu_stl_data(env, addr + (1 << DF_WORD), pwd->w[1]);
++    cpu_stl_data(env, addr + (2 << DF_WORD), pwd->w[2]);
++    cpu_stl_data(env, addr + (3 << DF_WORD), pwd->w[3]);
++#else
++    cpu_stl_data(env, addr + (1 << DF_WORD), pwd->w[0]);
++    cpu_stl_data(env, addr + (0 << DF_WORD), pwd->w[1]);
++    cpu_stl_data(env, addr + (3 << DF_WORD), pwd->w[2]);
++    cpu_stl_data(env, addr + (2 << DF_WORD), pwd->w[3]);
++#endif
++#endif
++}
++
++void helper_msa_st_d(CPUMIPSState *env, uint32_t wd,
++                     target_ulong addr)
++{
++    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
++    int mmu_idx = cpu_mmu_index(env, false);
++
++    MEMOP_IDX(DF_DOUBLE)
++    ensure_writable_pages(env, addr, mmu_idx, GETPC());
++#if !defined(CONFIG_USER_ONLY)
++    helper_ret_stq_mmu(env, addr + (0 << DF_DOUBLE), pwd->d[0], oi, GETPC());
++    helper_ret_stq_mmu(env, addr + (1 << DF_DOUBLE), pwd->d[1], oi, GETPC());
++#else
++    cpu_stq_data(env, addr + (0 << DF_DOUBLE), pwd->d[0]);
++    cpu_stq_data(env, addr + (1 << DF_DOUBLE), pwd->d[1]);
++#endif
++}
  
- static inline void restore_snan_bit_mode(CPUMIPSState *env)
+ void helper_cache(CPUMIPSState *env, target_ulong addr, uint32_t op)
  {
 -- 
 2.7.4
