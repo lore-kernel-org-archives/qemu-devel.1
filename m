@@ -6,44 +6,44 @@ X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B426AC282E3
-	for <qemu-devel@archiver.kernel.org>; Sun, 26 May 2019 18:46:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 65985C282E3
+	for <qemu-devel@archiver.kernel.org>; Sun, 26 May 2019 22:42:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6578420863
-	for <qemu-devel@archiver.kernel.org>; Sun, 26 May 2019 18:46:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6578420863
+	by mail.kernel.org (Postfix) with ESMTPS id 145752075B
+	for <qemu-devel@archiver.kernel.org>; Sun, 26 May 2019 22:42:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 145752075B
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=nongnu.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:60054 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:36429 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hUyAH-00033c-Gf
-	for qemu-devel@archiver.kernel.org; Sun, 26 May 2019 14:46:37 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:37751)
+	id 1hV1q5-0007ma-6G
+	for qemu-devel@archiver.kernel.org; Sun, 26 May 2019 18:42:01 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:37405)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hUy9K-0002mD-2d
-	for qemu-devel@nongnu.org; Sun, 26 May 2019 14:45:44 -0400
+	(envelope-from <bounces@canonical.com>) id 1hV1ou-0006wT-KX
+	for qemu-devel@nongnu.org; Sun, 26 May 2019 18:40:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hUy9H-0006eb-12
-	for qemu-devel@nongnu.org; Sun, 26 May 2019 14:45:38 -0400
-Received: from indium.canonical.com ([91.189.90.7]:46162)
+	(envelope-from <bounces@canonical.com>) id 1hV1or-0008Ly-J2
+	for qemu-devel@nongnu.org; Sun, 26 May 2019 18:40:48 -0400
+Received: from indium.canonical.com ([91.189.90.7]:40394)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hUy9G-0006de-Se
-	for qemu-devel@nongnu.org; Sun, 26 May 2019 14:45:34 -0400
+	id 1hV1or-0008LF-EP
+	for qemu-devel@nongnu.org; Sun, 26 May 2019 18:40:45 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hUy9F-0007Oe-EM
-	for <qemu-devel@nongnu.org>; Sun, 26 May 2019 18:45:33 +0000
+	id 1hV1oo-0006wv-Ue
+	for <qemu-devel@nongnu.org>; Sun, 26 May 2019 22:40:42 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 4DAFB2E80CC
-	for <qemu-devel@nongnu.org>; Sun, 26 May 2019 18:45:33 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id D48562E80CB
+	for <qemu-devel@nongnu.org>; Sun, 26 May 2019 22:40:42 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Sun, 26 May 2019 18:36:29 -0000
+Date: Sun, 26 May 2019 22:31:13 -0000
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
 X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
@@ -55,13 +55,13 @@ X-Launchpad-Bug-Commenters: ivmn
 X-Launchpad-Bug-Reporter: Ivan Warren (ivmn)
 X-Launchpad-Bug-Modifier: Ivan Warren (ivmn)
 References: <155831074982.26912.13291059176555697592.malonedeb@soybean.canonical.com>
-Message-Id: <155889578967.12370.16708432665286358860.malone@soybean.canonical.com>
+Message-Id: <155890987312.25075.13331137747152254091.malone@gac.canonical.com>
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com); Revision="18968";
 	Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: 297eaeabbec6a3f6d87ee69cd8ddd6fc996148bf
+X-Launchpad-Hash: eceab1d1af957e28c1cdae72bf558251539aedb1
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 91.189.90.7
 Subject: [Qemu-devel] [Bug 1829682] Re: QEMU PPC SYSTEM regression - 3.1.0
@@ -83,60 +83,27 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is the result at the same breakpoint under 3.1.0 (note the
-difference in the TLB) (notably Segment Lookaside Buffer entry #1)
+It might be a red herring...
 
-(qemu) info tlb
-info tlb
-SLB     ESID                    VSID
-0       0x0000000008000000      0x0000000004002400
-1       0xf000000028000000      0x0000000802001080
-3       0xf100050008000000      0x4000005000000400
-4       0xf100100008000000      0x4000010000000400
-5       0xf100080008000000      0x4000008000000400
-6       0xf100010008000000      0x4000001000000400
-7       0xf200800008000000      0x4000810000000400
-11      0xfffff00000000000      0x000000001a3e5080
-12      0xfffff10000000000      0x0000000824012080
-13      0xfffff20000000000      0x0000000806003080
-19      0x0ffffffff8000000      0x0000000804002c80
-20      0xf100060008000000      0x4000006000000400
-21      0xf100000008000000      0x4000000000000400
-(qemu) info registers
-info registers
-NIP 000000000008f418   LR 0000000000234e38 CTR 0000000000256b20 XER 0000000=
-020040008 CPU#0
-MSR 8000000000001032 HID0 0000000000000000  HF 8000000000000030 iidx 1 didx=
- 1
-TB 00000003 14758239312 DECR 02912440
-GPR00 0000000000000000 f1000816b0036890 00000000032b5d20 0000000003380000
-GPR04 f100100a00000000 f1000816b0036cf0 f00000002ff47600 0000000000000017
-GPR08 0000000000001000 0000000000000000 0000000000000000 0000000000000000
-GPR12 f1000117d7fad000 f1000117d7faf800 f00000002ff47600 0000000003380000
-GPR16 f1000816b0036d00 0000000002004018 000000000000003d f1000800802de000
-GPR20 0000000f10008008 0000000000000000 f100100a10000000 0000000000000800
-GPR24 0000000000000000 00000000000034e0 f1000117d7faf000 0000000000000001
-GPR28 0000000000000000 f00000002ff47600 f1000117d7fb0800 f1000117d7faf800
-CR 22022480  [ E  E  -  E  E  G  L  -  ]             RES ffffffffffffffff
-FPR00 0000000000000000 0000000000000000 0000000000000000 0000000000000000
-FPR04 0000000000000000 0000000000000000 0000000000000000 0000000000000000
-FPR08 0000000000000000 0000000000000000 0000000000000000 0000000000000000
-FPR12 0000000000000000 0000000000000000 0000000000000000 0000000000000000
-FPR16 0000000000000000 0000000000000000 0000000000000000 0000000000000000
-FPR20 0000000000000000 0000000000000000 0000000000000000 0000000000000000
-FPR24 0000000000000000 0000000000000000 0000000000000000 0000000000000000
-FPR28 0000000000000000 0000000000000000 0000000000000000 0000000000000000
-FPSCR 0000000000000000
- SRR0 000000000031dec4  SRR1 8000000000009032    PVR 00000000004e1200 VRSAV=
-E 0000000000000000
-SPRG0 0000000003380000 SPRG1 f1000816b0036d00  SPRG2 0000000003380ce8  SPRG=
-3 0000000100000000
-SPRG4 0000000000000000 SPRG5 0000000000000000  SPRG6 0000000000000000  SPRG=
-7 0000000000000000
-HSRR0 0000000000000000 HSRR1 0000000000000000
- CFAR 0000000000234e34
- LPCR 000000000001f008
- PTCR 0000000000000000   DAR f1000800802de000  DSISR 0000000042000000
+The AIX Boot procedure under 3.1.0 issues a
+
+LED{814}
+
+which it doesn't issue under 4.0.50 (so a different path is taken at
+some point by the AIX kernel)
+
+First I need to determine what AIX code 814 stands for (but it could be
+auxiliary)
+
+Before going into the ".dispatch+98" (0x8f418) - so something else must
+be different between 3.1.0 and 4.0.50...
+
+I'm probably going to have to "git bisect" this, but that's not going to
+be easy (the build in itself takes quite a while, although I could
+optimize it to just include the ppc64 TCG version).
+
+Apologies for anyone receiving notifications for this, but I'd really
+like this to work !
 
 -- =
 
