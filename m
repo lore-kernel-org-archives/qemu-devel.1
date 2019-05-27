@@ -2,59 +2,92 @@ Return-Path: <SRS0=zt/K=T3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F1B2C07542
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 May 2019 07:19:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8AB2FC07542
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 May 2019 07:50:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 16C502075E
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 May 2019 07:19:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 16C502075E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 608512075B
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 May 2019 07:50:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 608512075B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=suse.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:41188 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:41479 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hV9uq-00060V-Af
-	for qemu-devel@archiver.kernel.org; Mon, 27 May 2019 03:19:28 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:45299)
+	id 1hVAP6-00039x-EF
+	for qemu-devel@archiver.kernel.org; Mon, 27 May 2019 03:50:44 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:50363)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1hV9tS-0005Lv-QN
-	for qemu-devel@nongnu.org; Mon, 27 May 2019 03:18:06 -0400
+	(envelope-from <bwiedemann@suse.de>) id 1hVAOJ-0002mB-Am
+	for qemu-devel@nongnu.org; Mon, 27 May 2019 03:49:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1hV9tR-0002hZ-Qr
-	for qemu-devel@nongnu.org; Mon, 27 May 2019 03:18:02 -0400
-Received: from 3.mo4.mail-out.ovh.net ([46.105.57.129]:38439)
+	(envelope-from <bwiedemann@suse.de>) id 1hVAOH-0005GU-Di
+	for qemu-devel@nongnu.org; Mon, 27 May 2019 03:49:55 -0400
+Received: from mx2.suse.de ([195.135.220.15]:35152 helo=mx1.suse.de)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1hV9tR-0002gt-Lg
-	for qemu-devel@nongnu.org; Mon, 27 May 2019 03:18:01 -0400
-Received: from player730.ha.ovh.net (unknown [10.108.35.158])
-	by mo4.mail-out.ovh.net (Postfix) with ESMTP id A92CD1EF4C5
-	for <qemu-devel@nongnu.org>; Mon, 27 May 2019 09:17:59 +0200 (CEST)
-Received: from kaod.org (lfbn-1-10649-41.w90-89.abo.wanadoo.fr [90.89.235.41])
-	(Authenticated sender: clg@kaod.org)
-	by player730.ha.ovh.net (Postfix) with ESMTPSA id 05364610B40D;
-	Mon, 27 May 2019 07:17:54 +0000 (UTC)
-From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-To: David Gibson <david@gibson.dropbear.id.au>
-Date: Mon, 27 May 2019 09:17:49 +0200
-Message-Id: <20190527071749.31499-1-clg@kaod.org>
-X-Mailer: git-send-email 2.21.0
+	(Exim 4.71) (envelope-from <bwiedemann@suse.de>) id 1hVAOH-0005Dl-0M
+	for qemu-devel@nongnu.org; Mon, 27 May 2019 03:49:53 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+	by mx1.suse.de (Postfix) with ESMTP id E6743B011;
+	Mon, 27 May 2019 07:49:49 +0000 (UTC)
+To: Eduardo Habkost <ehabkost@redhat.com>,
+	"Dr. David Alan Gilbert" <dgilbert@redhat.com>
+References: <20190516125807.17025-1-bwiedemann@suse.de>
+	<20190523185737.GB2994@work-vm> <20190523212708.GD10764@habkost.net>
+From: "Bernhard M. Wiedemann" <bwiedemann@suse.de>
+Openpgp: preference=signencrypt
+Autocrypt: addr=bwiedemann@suse.de; prefer-encrypt=mutual; keydata=
+	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
+	12bW2FfpiwAGOQ==
+Message-ID: <bc805d17-f773-08d1-6b01-fcbffcd659b6@suse.de>
+Date: Mon, 27 May 2019 09:49:49 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Ovh-Tracer-Id: 10315213475625995238
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduuddruddvuddgudduiecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+In-Reply-To: <20190523212708.GD10764@habkost.net>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 46.105.57.129
-Subject: [Qemu-devel] [PATCH] ppc/pnv: introduce new skiboot platform
- properties
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x (no
+	timestamps) [generic]
+X-Received-From: 195.135.220.15
+Subject: Re: [Qemu-devel] [PATCH] i386: Fix nested SVM on older Opterons
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -66,60 +99,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org,
-	=?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+Cc: bsd@redhat.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Newer skiboots (after 6.3) support QEMU platforms that have
-characteristics closer to real OpenPOWER systems. The CPU type is used
-to define the BMC drivers: Aspeed AST2400 for POWER8 processors and
-AST2500 for POWER9s.
+On 23/05/2019 23.27, Eduardo Habkost wrote:
+> On Thu, May 23, 2019 at 07:57:38PM +0100, Dr. David Alan Gilbert wrote:
+>> * Bernhard M. Wiedemann (bwiedemann@suse.de) wrote:
+>>> Without this patch, a VM on a Opteron G3 host will have the svm flag,=
+ but
+>>> the kvm-amd module fails to load in there, complaining that it needs
+>>> cpuid 0x8000000a
+>>>
+>>> I have successfully built and tested this for 3+ years in production
+>>> on Opteron G3 servers.
+>=20
+> Have you reproduced the bug on QEMU 2.8 or newer?  The problem
+> you describe should be fixed by the following commit (from ~2.5
+> years ago).
+>=20
+> commit 0c3d7c0051576d220e6da0a8ac08f2d8482e2f0b
+>     target-i386: Enable CPUID[0x8000000A] if SVM is enabled
 
-Advertise the new platform property names, "qemu,powernv8" and
-"qemu,powernv9", using the CPU type chosen for the QEMU PowerNV
-machine. Also, advertise the original platform name "qemu,powernv" in
-case of POWER8 processors for compatibility with older skiboots.
+I was still on qemu-2.6.2 so it is good to know that this might work out
+of the box with 2.8+
 
-Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
----
- hw/ppc/pnv.c | 13 ++++++++++---
- 1 file changed, 10 insertions(+), 3 deletions(-)
-
-diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
-index dfb4ea5742c1..1f22cbf833a8 100644
---- a/hw/ppc/pnv.c
-+++ b/hw/ppc/pnv.c
-@@ -450,7 +450,8 @@ static void pnv_dt_power_mgt(void *fdt)
-=20
- static void *pnv_dt_create(MachineState *machine)
- {
--    const char plat_compat[] =3D "qemu,powernv\0ibm,powernv";
-+    const char plat_compat8[] =3D "qemu,powernv8\0qemu,powernv\0ibm,powe=
-rnv";
-+    const char plat_compat9[] =3D "qemu,powernv9\0ibm,powernv";
-     PnvMachineState *pnv =3D PNV_MACHINE(machine);
-     void *fdt;
-     char *buf;
-@@ -465,8 +466,14 @@ static void *pnv_dt_create(MachineState *machine)
-     _FDT((fdt_setprop_cell(fdt, 0, "#size-cells", 0x2)));
-     _FDT((fdt_setprop_string(fdt, 0, "model",
-                              "IBM PowerNV (emulated by qemu)")));
--    _FDT((fdt_setprop(fdt, 0, "compatible", plat_compat,
--                      sizeof(plat_compat))));
-+    if (pnv_is_power9(pnv)) {
-+        _FDT((fdt_setprop(fdt, 0, "compatible", plat_compat9,
-+                          sizeof(plat_compat9))));
-+    } else {
-+        _FDT((fdt_setprop(fdt, 0, "compatible", plat_compat8,
-+                          sizeof(plat_compat8))));
-+    }
-+
-=20
-     buf =3D  qemu_uuid_unparse_strdup(&qemu_uuid);
-     _FDT((fdt_setprop_string(fdt, 0, "vm,uuid", buf)));
---=20
-2.21.0
-
+Thanks for the pointer.
 
