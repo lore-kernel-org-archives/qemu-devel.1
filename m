@@ -2,73 +2,93 @@ Return-Path: <SRS0=zt/K=T3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42C80C04AB3
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 May 2019 13:38:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B7C4C04AB3
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 May 2019 13:44:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1710620859
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 May 2019 13:38:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1710620859
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id 043A72081C
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 May 2019 13:44:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 043A72081C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:46094 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:46144 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hVFpj-0000FT-BB
-	for qemu-devel@archiver.kernel.org; Mon, 27 May 2019 09:38:35 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:35781)
+	id 1hVFv8-0001fT-VR
+	for qemu-devel@archiver.kernel.org; Mon, 27 May 2019 09:44:10 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:36943)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hVFoq-0008KK-3p
-	for qemu-devel@nongnu.org; Mon, 27 May 2019 09:37:41 -0400
+	(envelope-from <mreitz@redhat.com>) id 1hVFuD-0001HC-9z
+	for qemu-devel@nongnu.org; Mon, 27 May 2019 09:43:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hVFop-0000KV-2W
-	for qemu-devel@nongnu.org; Mon, 27 May 2019 09:37:40 -0400
-Received: from mout.kundenserver.de ([212.227.17.10]:37473)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>)
-	id 1hVFoo-0000K1-Qk; Mon, 27 May 2019 09:37:39 -0400
-Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
-	(mreue109 [213.165.67.119]) with ESMTPSA (Nemesis) id
-	1MUokB-1h4TZt1bv7-00Qj49; Mon, 27 May 2019 15:36:52 +0200
-To: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-References: <20190525225013.13916-1-laurent@vivier.eu>
-	<20190525225013.13916-11-laurent@vivier.eu>
-	<CAL1e-=gMHkc5yj5R5gP-yBy1Lf7Q9okEPkovLfbpT0UcdC6kbQ@mail.gmail.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <998b759a-5f97-0c24-6ce5-3dcae5ecff36@vivier.eu>
-Date: Mon, 27 May 2019 15:36:49 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
-	Thunderbird/52.8.0
+	(envelope-from <mreitz@redhat.com>) id 1hVFuC-0005AI-DP
+	for qemu-devel@nongnu.org; Mon, 27 May 2019 09:43:13 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43422)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mreitz@redhat.com>)
+	id 1hVFu8-00057O-5K; Mon, 27 May 2019 09:43:08 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 68A4D81DF5;
+	Mon, 27 May 2019 13:43:07 +0000 (UTC)
+Received: from dresden.str.redhat.com (unknown [10.40.205.13])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id D91F060BE5;
+	Mon, 27 May 2019 13:43:05 +0000 (UTC)
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+	qemu-devel@nongnu.org
+References: <20190523102532.10486-1-alex.bennee@linaro.org>
+	<20190523102532.10486-28-alex.bennee@linaro.org>
+From: Max Reitz <mreitz@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+	mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+	/PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+	U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+	mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+	awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+	AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+	CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+	B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+	2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+	AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+	8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+	4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+	BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+	xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+	W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+	DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+	64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+	ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+	sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+	alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+	/ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+	bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+	R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <18f8fad1-5dac-eb5b-f531-da3b2124ec35@redhat.com>
+Date: Mon, 27 May 2019 15:43:04 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <CAL1e-=gMHkc5yj5R5gP-yBy1Lf7Q9okEPkovLfbpT0UcdC6kbQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:3FtbgILM3eqgDn1kKM6b3YPmPZjPs9V9fQYSVCmOj7VqsaQLeMX
-	+LpSN8altjjF3K2MKTO8frb1yVAiQ799M7+ofL45E3LT4lKXgcmX7TPPlYgJxkjWd4pwDMM
-	6yeVxWfCT+/Cndq31KnMtbxmiefluDXU5z/7d2ZuMru+A56bNMX/Rv4AaO2pHvPrCQyGFWj
-	QZxoXA9MDEoLmFSleaRLw==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:7J/crCkYoHk=:9SW9p7XOOnvQz67Ids7Nmm
-	+gDCgDoWudcwLRLif04sTeYokba2p82E+cVKp+QuunGkVAqVazLSpaT92Vx/a/lzMXE4Z637u
-	1pgpE21hMgQu522/aNI1BnI1u35Nxs3q6m/hWg1X+WpfkOxL+Sxa/ZLLdvy74Jzymdl7+al6W
-	cwhLam+F8YohOMfsss41SAWOwLDUyhSw3I7wFzxb7Au0Qn1CFIZ95rvLjjf7rS0cdGKXow8IV
-	B59uz+QILwMiv9gN4FeXQN7ahDU5JvDo46A9iRg5zEPQQObaQ1q9GrKn9vPQIaawicW2sZJ8l
-	FVwWNGCiCEtex7HEKMr95UH8NdNrBXxEJJDJXi8bg1F5ObAS676SGUXXMkH+GQOVMaZcktS1h
-	52oIUBRdB8l6W/rWRXJSpydHjRKwGqk0n/yN7+R/ie5FIUxOdrAVs+F/jxCuvt1lNum46Cx/d
-	uTDydDwZPWRcdpPYeuVYfUfnOGkQeC+c+Xevv74vgpM/Pb3B7sdhF+5JFyiSS7ZoD2vy+DxOa
-	zl5GyOJ9ZkbyKocczRQq4mod8Jbo4mOs51MfL/lTY2/rkFbqrgrHQ1/GP/NKq0cigxr+qhiT/
-	Hx3AJ8wqcNsllFkQlXBQK/cjkZe9tf1nvNaV7WbH/NQHTE2yPkRnlsfukn0TvlsfNAnIj8QgA
-	uPtF6xhPGxm5nDq0PwFkbr1k+0zbAnw6LLiWKfRG8l7LmkcgE405H3qd0Z78fPNw5HMQubCuA
-	SCzvNSjoD7VAKLJz3WMnffJYnpBZw30auqYCRuKFvtmXUoggmNg3nDuJCK4=
+In-Reply-To: <20190523102532.10486-28-alex.bennee@linaro.org>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="FsMxNijuSXvHMIJ1syRPjsvNpKwaVNbHy"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.25]);
+	Mon, 27 May 2019 13:43:07 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.17.10
-Subject: Re: [Qemu-devel] [PATCH v7 10/10] hw/m68k: define Macintosh Quadra
- 800
+X-Received-From: 209.132.183.28
+X-Content-Filtered-By: Mailman/MimeDel 2.1.21
+Subject: Re: [Qemu-devel] [PATCH v2 27/28] tests/qemu-iotests: re-format
+ output to for make check-block
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -80,75 +100,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
-	qemu-block@nongnu.org, Thomas Huth <huth@tuxfamily.org>,
-	Jason Wang <jasowang@redhat.com>,
-	Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org,
-	"Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-	=?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>,
-	Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
-	=?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
-	Max Reitz <mreitz@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
+Cc: Kevin Wolf <kwolf@redhat.com>, Thomas Huth <thuth@redhat.com>,
+	qemu-arm@nongnu.org, "open list:Block layer core" <qemu-block@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 27/05/2019 15:32, Aleksandar Markovic wrote:
-> 
-> On May 26, 2019 1:07 AM, "Laurent Vivier" <laurent@vivier.eu 
-> <mailto:laurent@vivier.eu>> wrote:
->  >
->  > If you want to test the machine, it doesn't yet boot a MacROM, but 
-> you can
->  > boot a linux kernel from the command line.
->  >
->  > You can install your own disk using debian-installer with:
->  >
->  >     ./qemu-system-m68k \
->  >     -M q800 \
->  >     -serial none -serial mon:stdio \
->  >     -m 1000M -drive file=m68k.qcow2,format=qcow2 \
->  >     -net nic,model=dp83932,addr=09:00:07:12:34:57 \
->  >     -append "console=ttyS0 vga=off" \
->  >     -kernel vmlinux-4.15.0-2-m68k \
->  >     -initrd initrd.gz \
->  >     -drive file=debian-9.0-m68k-NETINST-1.iso \
->  >     -drive file=m68k.qcow2,format=qcow2 \
->  >     -nographic
->  >
-> 
-> Hello Laurent,
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--FsMxNijuSXvHMIJ1syRPjsvNpKwaVNbHy
+From: Max Reitz <mreitz@redhat.com>
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ qemu-devel@nongnu.org
+Cc: qemu-arm@nongnu.org, Thomas Huth <thuth@redhat.com>,
+ Kevin Wolf <kwolf@redhat.com>,
+ "open list:Block layer core" <qemu-block@nongnu.org>
+Message-ID: <18f8fad1-5dac-eb5b-f531-da3b2124ec35@redhat.com>
+Subject: Re: [PATCH v2 27/28] tests/qemu-iotests: re-format output to for make
+ check-block
+References: <20190523102532.10486-1-alex.bennee@linaro.org>
+ <20190523102532.10486-28-alex.bennee@linaro.org>
+In-Reply-To: <20190523102532.10486-28-alex.bennee@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Hello Aleksandar,
+On 23.05.19 12:25, Alex Benn=C3=A9e wrote:
+> This attempts to clean-up the output to better match the output of the
+> rest of the QEMU check system when called with -makecheck. This include=
+s:
+>=20
+>   - formatting as "  TEST    iotest-FMT: nnn"
+>   - only dumping config on failure (when -makecheck enabled)
+>=20
+> The non-make check output has been cleaned up as well:
+>=20
+>   - line re-displayed (\r) at the end
+>   - fancy colours for pass/fail/skip
+>   - timestamps always printed (option removed)
+>=20
+> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> Message-Id: <20190503143904.31211-1-alex.bennee@linaro.org>
+> Tested-by: Thomas Huth <thuth@redhat.com>
+>=20
+> ---
+> v3
+>   - revert echo to printf
+>   - add _report_test_start
+> v4
+>   - -pretty -> -makecheck
+>   - keep all output together for makecheck
+> v5
+>   - merged in kwolf's pretty printing
+>   - timestamps always printed in non-makecheck mode
+> ---
+>  tests/qemu-iotests/check | 179 +++++++++++++++++++++++++--------------=
 
-> How does one obtain vmlinux-4.15.0-2-m68 and init.rd?
-> 
+>  1 file changed, 116 insertions(+), 63 deletions(-)
 
-you can find more details in the cover letter:
+Unless I missed something, this breaks ./check:
 
-  You can get the ISO from:
+$ ./check -T -qcow2
+000 - unknown test, ignored
+QEMU          -- "build/x86_64-softmmu/qemu-system-x86_64" -nodefaults
+-machine accel=3Dqtest
+QEMU_IMG      -- "build/qemu-img"
+QEMU_IO       -- "build/qemu-io"  --cache writeback -f qcow2
+QEMU_NBD      -- "build/qemu-nbd"
+IMGFMT        -- qcow2 (compat=3D1.1)
+IMGPROTO      -- file
+PLATFORM      -- Linux/x86_64 dresden 5.0.14-300.fc30.x86_64
+TEST_DIR      -- build/tests/qemu-iotests/scratch
+SOCKET_SCM_HELPER -- build/tests/qemu-iotests/socket_scm_helper
 
-    https://cdimage.debian.org/cdimage/ports/10.0/m68k/iso-cd/debian-10.0-m68k-NETINST-1.iso
+Passed all 0 tests
 
-  and extract the kernel and initrd.gz:
 
-    guestfish --add debian-10.0-m68k-NETINST-1.iso --ro \
-              --mount /dev/sda:/ <<_EOF_
-    copy-out /install/cdrom/initrd.gz .
-    copy-out /install/kernels/vmlinux-4.16.0-1-m68k .
-    _EOF_
+Max
 
-  The mirror to use is: http://ftp.ports.debian.org/debian-ports/
-  when it fails, continue without boot loader.
 
-  In the same way, you can extract the kernel and the initramfs from the qcow2
-  image to use it with "-kernel" and "-initrd":
+--FsMxNijuSXvHMIJ1syRPjsvNpKwaVNbHy
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-    guestfish --add m68k.qcow2 --mount /dev/sda2:/ <<_EOF_
-    copy-out /boot/vmlinux-4.16.0-1-m68k .
-    copy-out /boot/initrd.img-4.16.0-1-m68k .
-    _EOF_
+-----BEGIN PGP SIGNATURE-----
 
-Thanks,
-Laurent
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlzr6WgACgkQ9AfbAGHV
+z0DMkAf/bHal/2ocCNulJC0evjWLf7VPleqTg3TaFpGYlwH8cJ1AIUvKqQ8a8aP8
+FTFDHF/qbL8TFJ8BM6BOJGkkUnvyjFAWRBZMV+3bwNv0PT04JCyDkQIyeFLZ7lKa
+lZPIYu4B1dT7pfR67Y/5R7dPRxYq6Nsb8um+K3PCfR9CkhwQtSKX/N3TCCvOog0p
+cID3EEeFmFK3pvMd7Hc5zUun5pehcnSCsmBXfsEILu8WV7v38/BiXCv+gyRHlN89
+2SBI1xcwcCBzzZxUu2xc3fPZPADPZ3SQtyfZj5NPwenMtafZW5BLs9TaRN3OsGix
+06IlcXZ+cnpLsi3noh5nNY1qbZwAVw==
+=5xQa
+-----END PGP SIGNATURE-----
+
+--FsMxNijuSXvHMIJ1syRPjsvNpKwaVNbHy--
 
