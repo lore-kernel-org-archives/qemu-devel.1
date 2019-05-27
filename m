@@ -2,64 +2,84 @@ Return-Path: <SRS0=zt/K=T3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D8D5AC04AB3
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 May 2019 10:46:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F3735C04AB3
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 May 2019 10:47:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 979C520883
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 May 2019 10:46:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 979C520883
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id B7F26214D8
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 May 2019 10:47:48 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gnPHGGvc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B7F26214D8
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:43487 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:43493 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hVD91-0000qK-Qr
-	for qemu-devel@archiver.kernel.org; Mon, 27 May 2019 06:46:19 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:56469)
+	id 1hVDAS-0001XM-0o
+	for qemu-devel@archiver.kernel.org; Mon, 27 May 2019 06:47:48 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:56822)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1hVD7s-0000T2-GS
-	for qemu-devel@nongnu.org; Mon, 27 May 2019 06:45:09 -0400
+	(envelope-from <kernellwp@gmail.com>) id 1hVD9U-0001Cc-57
+	for qemu-devel@nongnu.org; Mon, 27 May 2019 06:46:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1hVD7r-0001BL-3g
-	for qemu-devel@nongnu.org; Mon, 27 May 2019 06:45:08 -0400
-Received: from 6.mo1.mail-out.ovh.net ([46.105.43.205]:55768)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1hVD7q-0000tT-UG
-	for qemu-devel@nongnu.org; Mon, 27 May 2019 06:45:07 -0400
-Received: from player698.ha.ovh.net (unknown [10.109.160.253])
-	by mo1.mail-out.ovh.net (Postfix) with ESMTP id 81AA817B1CE
-	for <qemu-devel@nongnu.org>; Mon, 27 May 2019 12:44:55 +0200 (CEST)
-Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
-	[82.253.208.248]) (Authenticated sender: groug@kaod.org)
-	by player698.ha.ovh.net (Postfix) with ESMTPSA id B152062F5F4E;
-	Mon, 27 May 2019 10:44:47 +0000 (UTC)
-Date: Mon, 27 May 2019 12:44:46 +0200
-From: Greg Kurz <groug@kaod.org>
-To: Yongji Xie <elohimes@gmail.com>
-Message-ID: <20190527124446.6b809c7f@bahia.lan>
-In-Reply-To: <CAONzpcbf+AcY4yEO6hBnyp1dBaV4XgUrSTdU55B3S+wcn6gOVA@mail.gmail.com>
-References: <20190520231008.20140-1-mst@redhat.com>
-	<20190320112646.3712-2-xieyongji@baidu.com>
-	<20190524121909.277ae31e@bahia.lan>
-	<CAONzpcbf+AcY4yEO6hBnyp1dBaV4XgUrSTdU55B3S+wcn6gOVA@mail.gmail.com>
-X-Mailer: Claws Mail 3.16.0 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Ovh-Tracer-Id: 13809725310402992429
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduuddruddvvddgfedvucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddm
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 46.105.43.205
-Subject: Re: [Qemu-devel] [PULL v2 04/36] virtio: Introduce started flag to
- VirtioDevice
+	(envelope-from <kernellwp@gmail.com>) id 1hVD9T-0002G7-4n
+	for qemu-devel@nongnu.org; Mon, 27 May 2019 06:46:48 -0400
+Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:35748)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <kernellwp@gmail.com>) id 1hVD9S-0002F6-TE
+	for qemu-devel@nongnu.org; Mon, 27 May 2019 06:46:47 -0400
+Received: by mail-pg1-x543.google.com with SMTP id t1so8916316pgc.2
+	for <qemu-devel@nongnu.org>; Mon, 27 May 2019 03:46:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+	h=from:to:cc:subject:date:message-id;
+	bh=YULeuaw6Jc86bWQlKIn+WYEbp/WlRteTq6uuOLuLmgE=;
+	b=gnPHGGvc3H5whBiSLcsGnQAPbOAcnvtQRKdl/vtEacTw2uoUUb55Z/1g33VtJeM8f7
+	Dny7JXEXAA4aTNuVqnZlSWTPyE2raU1rCEWDAClUzECIt2Pr1zeK+MjRTxueCrHE6N2g
+	OBivMwsMQrV/ahBijej/AkRweU/BSjVJ6KCEKALUsbFedxkrN8n7MUgKIcNh2lkmUcHH
+	xE/+M7M5uBSDGzYLMhyYYkDOxXgA8f5LDhaNsVnn7ak0ZS05zgNYQ0C9Waqiy3kOnSVp
+	XLZWxTVybRQmvLsfd5nvSleX/qTywlAKqEq6SwemuXtOujyncAUx0pf73ZS0UPoBctu7
+	u8+A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:from:to:cc:subject:date:message-id;
+	bh=YULeuaw6Jc86bWQlKIn+WYEbp/WlRteTq6uuOLuLmgE=;
+	b=My3n05r+bLj2Af0tUcskPcSLIoH3ZPf30Ynd/qbJurL53PLb0LIsF8Qa0/ejeUBSEu
+	CsvIGTY4LVHzclBNOThAG/OCm3rpta4KWZsFRWVfTa7RInFTmt2zx1B+3gCgTegkxx0D
+	FT40hAbt/Kqvew7OkI3SZhz7/P0oO8MfLgwAKOcDq4qzoSUpjJGmAEoPDoYV48w+xpx6
+	1XzwsnYxwGFUODUqEkM29EaLMERxVNk/bNBfngZqM+Op1SbKGaGVU8TFXFJGx3c1VaLG
+	XO1AzcRsWvmD5mKpWddKgOeDDaSBK6/BQFvC+nsKAPq4Gi/1bZuPb0nqfqfMzs5t6fH1
+	/x6g==
+X-Gm-Message-State: APjAAAUMxX6oLibqKZIaEHJCY73AI2iiHZ/z9HUkdDT0fBbeiSEMopRl
+	INcLUTG1CY3f0/In52xLScch8i8N
+X-Google-Smtp-Source: APXvYqyC7V1Bddt2ayGRgVkCJMHVJ9PYyLGgL/wJtpD3rLj4iNTzMOYpMH7u5Gm9y1nUaW+68DgSvA==
+X-Received: by 2002:a17:90a:9281:: with SMTP id
+	n1mr29517336pjo.25.1558954004814; 
+	Mon, 27 May 2019 03:46:44 -0700 (PDT)
+Received: from localhost.localdomain ([203.205.141.123])
+	by smtp.googlemail.com with ESMTPSA id
+	k13sm10174792pgr.90.2019.05.27.03.46.43
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
+	Mon, 27 May 2019 03:46:44 -0700 (PDT)
+From: Wanpeng Li <kernellwp@gmail.com>
+X-Google-Original-From: Wanpeng Li <wanpengli@tencent.com>
+To: qemu-devel@nongnu.org,
+	kvm@vger.kernel.org
+Date: Mon, 27 May 2019 18:46:40 +0800
+Message-Id: <1558954000-9715-1-git-send-email-wanpengli@tencent.com>
+X-Mailer: git-send-email 2.7.4
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::543
+Subject: [Qemu-devel] [PATCH] target-i386: adds PV_SCHED_YIELD CPUID feature
+ bit
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -71,172 +91,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Zhang Yu <zhangyu31@baidu.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>, qemu-devel <qemu-devel@nongnu.org>,
-	Xie Yongji <xieyongji@baidu.com>,
-	David Gibson <david@gibson.dropbear.id.au>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+	=?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 24 May 2019 19:56:06 +0800
-Yongji Xie <elohimes@gmail.com> wrote:
+From: Wanpeng Li <wanpengli@tencent.com>
 
-> On Fri, 24 May 2019 at 18:20, Greg Kurz <groug@kaod.org> wrote:
-> >
-> > On Mon, 20 May 2019 19:10:35 -0400
-> > "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> >  
-> > > From: Xie Yongji <xieyongji@baidu.com>
-> > >
-> > > The virtio 1.0 transitional devices support driver uses the device
-> > > before setting the DRIVER_OK status bit. So we introduce a started
-> > > flag to indicate whether driver has started the device or not.
-> > >
-> > > Signed-off-by: Xie Yongji <xieyongji@baidu.com>
-> > > Signed-off-by: Zhang Yu <zhangyu31@baidu.com>
-> > > Message-Id: <20190320112646.3712-2-xieyongji@baidu.com>
-> > > Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-> > > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-> > > ---
-> > >  include/hw/virtio/virtio.h |  2 ++
-> > >  hw/virtio/virtio.c         | 52 ++++++++++++++++++++++++++++++++++++--
-> > >  2 files changed, 52 insertions(+), 2 deletions(-)
-> > >
-> > > diff --git a/include/hw/virtio/virtio.h b/include/hw/virtio/virtio.h
-> > > index 7140381e3a..27c0efc3d0 100644
-> > > --- a/include/hw/virtio/virtio.h
-> > > +++ b/include/hw/virtio/virtio.h
-> > > @@ -105,6 +105,8 @@ struct VirtIODevice
-> > >      uint16_t device_id;
-> > >      bool vm_running;
-> > >      bool broken; /* device in invalid state, needs reset */
-> > > +    bool started;
-> > > +    bool start_on_kick; /* virtio 1.0 transitional devices support that */
-> > >      VMChangeStateEntry *vmstate;
-> > >      char *bus_name;
-> > >      uint8_t device_endian;
-> > > diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
-> > > index 28056a7ef7..5d533ac74e 100644
-> > > --- a/hw/virtio/virtio.c
-> > > +++ b/hw/virtio/virtio.c
-> > > @@ -1162,10 +1162,16 @@ int virtio_set_status(VirtIODevice *vdev, uint8_t val)
-> > >              }
-> > >          }
-> > >      }
-> > > +    vdev->started = val & VIRTIO_CONFIG_S_DRIVER_OK;
-> > > +    if (unlikely(vdev->start_on_kick && vdev->started)) {
-> > > +        vdev->start_on_kick = false;
-> > > +    }
-> > > +
-> > >      if (k->set_status) {
-> > >          k->set_status(vdev, val);
-> > >      }
-> > >      vdev->status = val;
-> > > +
-> > >      return 0;
-> > >  }
-> > >
-> > > @@ -1208,6 +1214,9 @@ void virtio_reset(void *opaque)
-> > >          k->reset(vdev);
-> > >      }
-> > >
-> > > +    vdev->start_on_kick = (virtio_host_has_feature(vdev, VIRTIO_F_VERSION_1) &&
-> > > +                          !virtio_vdev_has_feature(vdev, VIRTIO_F_VERSION_1));
-> > > +    vdev->started = false;
-> > >      vdev->broken = false;
-> > >      vdev->guest_features = 0;
-> > >      vdev->queue_sel = 0;
-> > > @@ -1518,14 +1527,21 @@ void virtio_queue_set_align(VirtIODevice *vdev, int n, int align)
-> > >
-> > >  static bool virtio_queue_notify_aio_vq(VirtQueue *vq)
-> > >  {
-> > > +    bool ret = false;
-> > > +
-> > >      if (vq->vring.desc && vq->handle_aio_output) {
-> > >          VirtIODevice *vdev = vq->vdev;
-> > >
-> > >          trace_virtio_queue_notify(vdev, vq - vdev->vq, vq);
-> > > -        return vq->handle_aio_output(vdev, vq);
-> > > +        ret = vq->handle_aio_output(vdev, vq);
-> > > +
-> > > +        if (unlikely(vdev->start_on_kick)) {
-> > > +            vdev->started = true;
-> > > +            vdev->start_on_kick = false;
-> > > +        }
-> > >      }
-> > >
-> > > -    return false;
-> > > +    return ret;
-> > >  }
-> > >
-> > >  static void virtio_queue_notify_vq(VirtQueue *vq)
-> > > @@ -1539,6 +1555,11 @@ static void virtio_queue_notify_vq(VirtQueue *vq)
-> > >
-> > >          trace_virtio_queue_notify(vdev, vq - vdev->vq, vq);
-> > >          vq->handle_output(vdev, vq);
-> > > +
-> > > +        if (unlikely(vdev->start_on_kick)) {
-> > > +            vdev->started = true;
-> > > +            vdev->start_on_kick = false;
-> > > +        }
-> > >      }
-> > >  }
-> > >
-> > > @@ -1556,6 +1577,11 @@ void virtio_queue_notify(VirtIODevice *vdev, int n)
-> > >      } else if (vq->handle_output) {
-> > >          vq->handle_output(vdev, vq);
-> > >      }
-> > > +
-> > > +    if (unlikely(vdev->start_on_kick)) {
-> > > +        vdev->started = true;
-> > > +        vdev->start_on_kick = false;
-> > > +    }
-> > >  }
-> > >
-> > >  uint16_t virtio_queue_vector(VirtIODevice *vdev, int n)
-> > > @@ -1770,6 +1796,13 @@ static bool virtio_broken_needed(void *opaque)
-> > >      return vdev->broken;
-> > >  }
-> > >
-> > > +static bool virtio_started_needed(void *opaque)
-> > > +{
-> > > +    VirtIODevice *vdev = opaque;
-> > > +
-> > > +    return vdev->started;  
-> >
-> > Existing machine types don't know about the "virtio/started" subsection. This
-> > breaks migration to older QEMUs if the driver has started the device, ie. most
-> > probably always when it comes to live migration.
-> >
-> > My understanding is that we do try to support backward migration though. It
-> > is a regular practice in datacenters to migrate workloads without having to
-> > take care of the QEMU version. FWIW I had to fix similar issues downstream
-> > many times in the past because customers had filed bugs.
-> >  
-> 
-> If we do need to support backward migration, for this patch, what I
-> can think of is to only migrate the flag in the case that guest kicks
-> but not set DRIVER_OK. This could fix backward migration in most case.
+Adds PV_SCHED_YIELD CPUID feature bit.
 
-You mean something like that ?
+Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
+---
+ target/i386/cpu.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-static bool virtio_started_needed(void *opaque)
-{
-    VirtIODevice *vdev = opaque;
-
-    return vdev->started && !(vdev->status & VIRTIO_CONFIG_S_DRIVER_OK);
-}
-
-> Not sure if there is a more general approach...
-> 
-
-Another approach would be to only implement the started flag for
-machine version > 4.0. This can be achieved by adding a "use-started"
-property to the base virtio device, true by default and set to
-false by hw_compat_4_0.
-
-> Thanks,
-> Yongji
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index 5f07d68..f4c4b6b 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -902,7 +902,7 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
+             "kvmclock", "kvm-nopiodelay", "kvm-mmu", "kvmclock",
+             "kvm-asyncpf", "kvm-steal-time", "kvm-pv-eoi", "kvm-pv-unhalt",
+             NULL, "kvm-pv-tlb-flush", NULL, "kvm-pv-ipi",
+-            NULL, NULL, NULL, NULL,
++            "kvm-pv-sched-yield", NULL, NULL, NULL,
+             NULL, NULL, NULL, NULL,
+             NULL, NULL, NULL, NULL,
+             "kvmclock-stable-bit", NULL, NULL, NULL,
+-- 
+2.7.4
 
 
