@@ -6,55 +6,55 @@ X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0773DC07542
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 May 2019 07:18:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F1B2C07542
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 May 2019 07:19:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D1DCC2075E
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 May 2019 07:18:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D1DCC2075E
+	by mail.kernel.org (Postfix) with ESMTPS id 16C502075E
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 May 2019 07:19:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 16C502075E
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:41186 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:41188 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hV9uL-0005iy-K8
-	for qemu-devel@archiver.kernel.org; Mon, 27 May 2019 03:18:57 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:45271)
+	id 1hV9uq-00060V-Af
+	for qemu-devel@archiver.kernel.org; Mon, 27 May 2019 03:19:28 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:45299)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1hV9t9-00059v-KA
-	for qemu-devel@nongnu.org; Mon, 27 May 2019 03:17:44 -0400
+	(envelope-from <clg@kaod.org>) id 1hV9tS-0005Lv-QN
+	for qemu-devel@nongnu.org; Mon, 27 May 2019 03:18:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1hV9t8-0002ak-Q5
-	for qemu-devel@nongnu.org; Mon, 27 May 2019 03:17:43 -0400
-Received: from 7.mo68.mail-out.ovh.net ([46.105.63.230]:54308)
+	(envelope-from <clg@kaod.org>) id 1hV9tR-0002hZ-Qr
+	for qemu-devel@nongnu.org; Mon, 27 May 2019 03:18:02 -0400
+Received: from 3.mo4.mail-out.ovh.net ([46.105.57.129]:38439)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1hV9t8-0002Zk-LS
-	for qemu-devel@nongnu.org; Mon, 27 May 2019 03:17:42 -0400
-Received: from player735.ha.ovh.net (unknown [10.109.146.173])
-	by mo68.mail-out.ovh.net (Postfix) with ESMTP id 5F85112D5B1
-	for <qemu-devel@nongnu.org>; Mon, 27 May 2019 09:17:38 +0200 (CEST)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1hV9tR-0002gt-Lg
+	for qemu-devel@nongnu.org; Mon, 27 May 2019 03:18:01 -0400
+Received: from player730.ha.ovh.net (unknown [10.108.35.158])
+	by mo4.mail-out.ovh.net (Postfix) with ESMTP id A92CD1EF4C5
+	for <qemu-devel@nongnu.org>; Mon, 27 May 2019 09:17:59 +0200 (CEST)
 Received: from kaod.org (lfbn-1-10649-41.w90-89.abo.wanadoo.fr [90.89.235.41])
 	(Authenticated sender: clg@kaod.org)
-	by player735.ha.ovh.net (Postfix) with ESMTPSA id 621EB6336185;
-	Mon, 27 May 2019 07:17:33 +0000 (UTC)
+	by player730.ha.ovh.net (Postfix) with ESMTPSA id 05364610B40D;
+	Mon, 27 May 2019 07:17:54 +0000 (UTC)
 From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 To: David Gibson <david@gibson.dropbear.id.au>
-Date: Mon, 27 May 2019 09:17:22 +0200
-Message-Id: <20190527071722.31424-1-clg@kaod.org>
+Date: Mon, 27 May 2019 09:17:49 +0200
+Message-Id: <20190527071749.31499-1-clg@kaod.org>
 X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-X-Ovh-Tracer-Id: 10309302501163437030
+X-Ovh-Tracer-Id: 10315213475625995238
 X-VR-SPAMSTATE: OK
 X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduuddruddvuddgudduhecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduuddruddvuddgudduiecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 46.105.63.230
-Subject: [Qemu-devel] [PATCH] ppc/pnv: add dummy XSCOM registers for PRD
- initialization
+X-Received-From: 46.105.57.129
+Subject: [Qemu-devel] [PATCH] ppc/pnv: introduce new skiboot platform
+ properties
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -72,61 +72,53 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-PRD (Processor recovery diagnostics) is a service available on
-OpenPower systems. The opal-prd daemon initializes the PowerPC
-Processor through the XSCOM bus and then waits for hardware diagnostic
-events.
+Newer skiboots (after 6.3) support QEMU platforms that have
+characteristics closer to real OpenPOWER systems. The CPU type is used
+to define the BMC drivers: Aspeed AST2400 for POWER8 processors and
+AST2500 for POWER9s.
+
+Advertise the new platform property names, "qemu,powernv8" and
+"qemu,powernv9", using the CPU type chosen for the QEMU PowerNV
+machine. Also, advertise the original platform name "qemu,powernv" in
+case of POWER8 processors for compatibility with older skiboots.
 
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 ---
- hw/ppc/pnv_xscom.c | 18 ++++++++++++++++++
- 1 file changed, 18 insertions(+)
+ hw/ppc/pnv.c | 13 ++++++++++---
+ 1 file changed, 10 insertions(+), 3 deletions(-)
 
-diff --git a/hw/ppc/pnv_xscom.c b/hw/ppc/pnv_xscom.c
-index c285ef514e88..f53a6d7a9457 100644
---- a/hw/ppc/pnv_xscom.c
-+++ b/hw/ppc/pnv_xscom.c
-@@ -29,6 +29,12 @@
+diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
+index dfb4ea5742c1..1f22cbf833a8 100644
+--- a/hw/ppc/pnv.c
++++ b/hw/ppc/pnv.c
+@@ -450,7 +450,8 @@ static void pnv_dt_power_mgt(void *fdt)
 =20
- #include <libfdt.h>
-=20
-+/* PRD registers */
-+#define PRD_P8_IPOLL_REG_MASK           0x01020013
-+#define PRD_P8_IPOLL_REG_STATUS         0x01020014
-+#define PRD_P9_IPOLL_REG_MASK           0x000F0033
-+#define PRD_P9_IPOLL_REG_STATUS         0x000F0034
-+
- static void xscom_complete(CPUState *cs, uint64_t hmer_bits)
+ static void *pnv_dt_create(MachineState *machine)
  {
-     /*
-@@ -70,6 +76,12 @@ static uint64_t xscom_read_default(PnvChip *chip, uint=
-32_t pcba)
-     case 0x1010c00:     /* PIBAM FIR */
-     case 0x1010c03:     /* PIBAM FIR MASK */
+-    const char plat_compat[] =3D "qemu,powernv\0ibm,powernv";
++    const char plat_compat8[] =3D "qemu,powernv8\0qemu,powernv\0ibm,powe=
+rnv";
++    const char plat_compat9[] =3D "qemu,powernv9\0ibm,powernv";
+     PnvMachineState *pnv =3D PNV_MACHINE(machine);
+     void *fdt;
+     char *buf;
+@@ -465,8 +466,14 @@ static void *pnv_dt_create(MachineState *machine)
+     _FDT((fdt_setprop_cell(fdt, 0, "#size-cells", 0x2)));
+     _FDT((fdt_setprop_string(fdt, 0, "model",
+                              "IBM PowerNV (emulated by qemu)")));
+-    _FDT((fdt_setprop(fdt, 0, "compatible", plat_compat,
+-                      sizeof(plat_compat))));
++    if (pnv_is_power9(pnv)) {
++        _FDT((fdt_setprop(fdt, 0, "compatible", plat_compat9,
++                          sizeof(plat_compat9))));
++    } else {
++        _FDT((fdt_setprop(fdt, 0, "compatible", plat_compat8,
++                          sizeof(plat_compat8))));
++    }
++
 =20
-+        /* PRD registers */
-+    case PRD_P8_IPOLL_REG_MASK:
-+    case PRD_P8_IPOLL_REG_STATUS:
-+    case PRD_P9_IPOLL_REG_MASK:
-+    case PRD_P9_IPOLL_REG_STATUS:
-+
-         /* P9 xscom reset */
-     case 0x0090018:     /* Receive status reg */
-     case 0x0090012:     /* log register */
-@@ -124,6 +136,12 @@ static bool xscom_write_default(PnvChip *chip, uint3=
-2_t pcba, uint64_t val)
-     case 0x201302a:     /* CAPP stuff */
-     case 0x2013801:     /* CAPP stuff */
-     case 0x2013802:     /* CAPP stuff */
-+
-+        /* P8 PRD registers */
-+    case PRD_P8_IPOLL_REG_MASK:
-+    case PRD_P8_IPOLL_REG_STATUS:
-+    case PRD_P9_IPOLL_REG_MASK:
-+    case PRD_P9_IPOLL_REG_STATUS:
-         return true;
-     default:
-         return false;
+     buf =3D  qemu_uuid_unparse_strdup(&qemu_uuid);
+     _FDT((fdt_setprop_string(fdt, 0, "vm,uuid", buf)));
 --=20
 2.21.0
 
