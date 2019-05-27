@@ -8,78 +8,78 @@ X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A765BC07542
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 May 2019 08:05:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C3769C07542
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 May 2019 08:05:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 72E292070D
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 May 2019 08:05:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 90F382070D
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 May 2019 08:05:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="e+XQL79t"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 72E292070D
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="klDEPBG0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 90F382070D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:41657 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:41662 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hVAdX-0008Ut-I2
-	for qemu-devel@archiver.kernel.org; Mon, 27 May 2019 04:05:39 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:52898)
+	id 1hVAdo-0000MU-OK
+	for qemu-devel@archiver.kernel.org; Mon, 27 May 2019 04:05:56 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:52977)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mehta.aaru20@gmail.com>) id 1hVAbr-0007Wt-95
-	for qemu-devel@nongnu.org; Mon, 27 May 2019 04:03:56 -0400
+	(envelope-from <mehta.aaru20@gmail.com>) id 1hVAc1-0007dF-1E
+	for qemu-devel@nongnu.org; Mon, 27 May 2019 04:04:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mehta.aaru20@gmail.com>) id 1hVAbq-0001VF-7I
-	for qemu-devel@nongnu.org; Mon, 27 May 2019 04:03:55 -0400
-Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:45156)
+	(envelope-from <mehta.aaru20@gmail.com>) id 1hVAc0-0001bD-6M
+	for qemu-devel@nongnu.org; Mon, 27 May 2019 04:04:04 -0400
+Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:44297)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <mehta.aaru20@gmail.com>)
-	id 1hVAbq-0001Ux-2Q; Mon, 27 May 2019 04:03:54 -0400
-Received: by mail-pl1-x641.google.com with SMTP id a5so6735699pls.12;
-	Mon, 27 May 2019 01:03:54 -0700 (PDT)
+	id 1hVAc0-0001ax-1d; Mon, 27 May 2019 04:04:04 -0400
+Received: by mail-pl1-x641.google.com with SMTP id c5so6743488pll.11;
+	Mon, 27 May 2019 01:04:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
 	h=from:to:cc:subject:date:message-id:in-reply-to:references;
-	bh=qVBNipnG6rsnaNkm/763xu7zNt/J2OahkNzsU67wdcA=;
-	b=e+XQL79tdrGQnheHAzlSbkIfDZzmcqSzZMPo4KDiXhsp250SY0rXYiaDYGI0x1RGt5
-	5bbJqzvBi6FbdSgl9CsXt/U/wZAamM4pZydg2LnmcFQWK5WOqbhm1tRpp214rv/MClJb
-	4RQ2RloAnzk43CSREAu541yYj+vP1o5XOQjFnAtQ82WM4kKMGc4yqOlZFyD2zggcAOTL
-	v7dzPs5Ej1DkZ5geQk27fslVqGHufoBHIp9C0ZR8kKdq75qycJuqzWngREr9cm/rMLoz
-	AAf52PVooUGKbGrYGKobnekhYJE6bJ2QdZJNcQh76I5jAzWadIZUHvVQlKfqASLCLZTr
-	eEMg==
+	bh=3FKBJA17va/jv2u1TvUxLDB1xiagIFwWCBsEV/clovc=;
+	b=klDEPBG04+RmJ4+QGwvb3hwPdCqQcsLwMiL8ftkr+KlDViv3oFmVyXwa43iRuule3G
+	zp/qIP4iNvK59xAf+553dZqa8UDjmP2cIf4fIAJrNiwFPWs5Q7SoGfXoIYX6GDmGzn/5
+	Ln/CRjSSLGuhf7g8nDnQ0xu0IbnxNjMFCbAn32EFJwz35dug1BBxyk1mTxxI+Wf+0oiL
+	s2PQiDuVaOxnu+3dtoTpN21oCs+RarkNwHiR/vXScAfnqdwT7ciZ/tQ+PwZzSipeT+zh
+	pnR2wZqunaeEwyFzSx6lK2vUCOH5NQp08J7t0Jcm+c5Je/5fq6ZtKEo7H4miWsOYRlgq
+	YZWw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
 	:references;
-	bh=qVBNipnG6rsnaNkm/763xu7zNt/J2OahkNzsU67wdcA=;
-	b=iBwKrd3U2tNMQTFI1bCILn2djOsJczSps1XU3wNiGbo2V9pLwFemH9izdWuCvJ/hgU
-	lp77Xm3D1bLK0DYxTD6OUhLHE+rJD09+Q8SIUOOKAeeh7bxPT+lBxYI5jkDCGAGjE92T
-	1HjutF+mDtc2JVcg078RrzoL5CrvV8s90YEClmdw7qAgDpXx7qTRVxaMHNW+3KQhrHWh
-	ShZPTZzq5Vx7VLJflVkFpzcan4+umgfnYZVukWCXrJsbR/QBTfT2zVWBIyZYlVAsqqhW
-	kfm7URQQCc0WrDt2ZqFrD/bMXYswXFRPqOTPnJ9IIyhhj/iOpnI2sS8P8UI39tsQD2kF
-	Glwg==
-X-Gm-Message-State: APjAAAUXnjb7/FSmQNbzHSz/+L8UFCMzspwKGXs0q5QnIzRdiKVFT1DN
-	Ji9CE9YtiQ3cviS5GxpGIIz/sBWvEB1CXA==
-X-Google-Smtp-Source: APXvYqz6S1a8Nv3ZC6oVz/kOhQF23mnvsVy9vfre3UGsKjTFhgBt5e9f1cWXjw5inlEDlos7hR/QGw==
-X-Received: by 2002:a17:902:ab90:: with SMTP id
-	f16mr16883401plr.262.1558944232751; 
-	Mon, 27 May 2019 01:03:52 -0700 (PDT)
+	bh=3FKBJA17va/jv2u1TvUxLDB1xiagIFwWCBsEV/clovc=;
+	b=rKuk9e2VBtxitrpio16GXYIdX/lmAXnZ78MYgcd6bTH60YXEKo8Lr8fjvyj+GoM3I8
+	gk33qwc506PUcuqKNSdgQNuHjwaPFhaEnkeWgkcT0dpUtKb7+CcT2qSDNxTmAKzWVbSR
+	YTX0NDHK9MyljF4DXXBNp8IfJmtUuwsrilNsCOqtA+actlBaEWuqmw7d991EMG4wkeL1
+	4KjoXQ/MESSiRv6XkLDRQeEo9UeNmRO9pVh1U6e/1FPTXw110HWbsAo64GdxMtb/7kA7
+	0gj1UGQKhOwvJ+Wp0jnzPaKWzpe4NHu+mNqGjnjWAFMQnuEr1aDHa2EdZeZb2YBIdmOT
+	bj5g==
+X-Gm-Message-State: APjAAAUeXRrpSAm8cMpBIXTq/wFVZc9HruVuRucw1qMCXBL0qkKVFFN8
+	q/QbH4Q1f+pAorPzcYpxHB0JxXWYRM0o7w==
+X-Google-Smtp-Source: APXvYqx8szK/Ee5gqOwDdJcgrOxryRKBr37ENvkZry2XacCKwJhO+9AHaJUUwOC2G//yL7wPVGg33A==
+X-Received: by 2002:a17:902:158b:: with SMTP id
+	m11mr85445017pla.268.1558944242814; 
+	Mon, 27 May 2019 01:04:02 -0700 (PDT)
 Received: from localhost.localdomain ([120.57.119.140])
 	by smtp.gmail.com with ESMTPSA id
-	j5sm10030853pfa.15.2019.05.27.01.03.48
+	j5sm10030853pfa.15.2019.05.27.01.03.58
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Mon, 27 May 2019 01:03:52 -0700 (PDT)
+	Mon, 27 May 2019 01:04:02 -0700 (PDT)
 From: Aarushi Mehta <mehta.aaru20@gmail.com>
 To: qemu-devel@nongnu.org
-Date: Mon, 27 May 2019 13:33:20 +0530
-Message-Id: <20190527080327.10780-2-mehta.aaru20@gmail.com>
+Date: Mon, 27 May 2019 13:33:22 +0530
+Message-Id: <20190527080327.10780-4-mehta.aaru20@gmail.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190527080327.10780-1-mehta.aaru20@gmail.com>
 References: <20190527080327.10780-1-mehta.aaru20@gmail.com>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
 X-Received-From: 2607:f8b0:4864:20::641
-Subject: [Qemu-devel] [PATCH v3 1/8] configure: permit use of io_uring
+Subject: [Qemu-devel] [PATCH v3 3/8] block/block: add BDRV flag for io_uring
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -100,84 +100,22 @@ Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 Signed-off-by: Aarushi Mehta <mehta.aaru20@gmail.com>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- configure | 27 +++++++++++++++++++++++++++
- 1 file changed, 27 insertions(+)
+ include/block/block.h | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/configure b/configure
-index 528b9ff705..acbdf04168 100755
---- a/configure
-+++ b/configure
-@@ -365,6 +365,7 @@ xen=""
- xen_ctrl_version=""
- xen_pci_passthrough=""
- linux_aio=""
-+linux_io_uring=""
- cap_ng=""
- attr=""
- libattr=""
-@@ -1255,6 +1256,10 @@ for opt do
-   ;;
-   --enable-linux-aio) linux_aio="yes"
-   ;;
-+  --disable-linux-io-uring) linux_io_uring="no"
-+  ;;
-+  --enable-linux-io-uring) linux_io_uring="yes"
-+  ;;
-   --disable-attr) attr="no"
-   ;;
-   --enable-attr) attr="yes"
-@@ -1773,6 +1778,7 @@ disabled with --disable-FEATURE, default is enabled if available:
-   vde             support for vde network
-   netmap          support for netmap network
-   linux-aio       Linux AIO support
-+  linux-io-uring  Linux io_uring support
-   cap-ng          libcap-ng support
-   attr            attr and xattr support
-   vhost-net       vhost-net kernel acceleration support
-@@ -3962,6 +3968,21 @@ EOF
-     linux_aio=no
-   fi
- fi
-+##########################################
-+# linux-io-uring probe
-+
-+if test "$linux_io_uring" != "no" ; then
-+  if $pkg_config liburing; then
-+    linux_io_uring_cflags=$($pkg_config --cflags liburing)
-+    linux_io_uring_libs=$($pkg_config --libs liburing)
-+    linux_io_uring=yes
-+  else
-+    if test "$linux_io_uring" = "yes" ; then
-+      feature_not_found "linux io_uring" "Install liburing devel"
-+    fi
-+    linux_io_uring=no
-+  fi
-+fi
+diff --git a/include/block/block.h b/include/block/block.h
+index 9b083e2bca..60f7c6c01c 100644
+--- a/include/block/block.h
++++ b/include/block/block.h
+@@ -121,6 +121,7 @@ typedef struct HDGeometry {
+                                       ignoring the format layer */
+ #define BDRV_O_NO_IO       0x10000 /* don't initialize for I/O */
+ #define BDRV_O_AUTO_RDONLY 0x20000 /* degrade to read-only if opening read-write fails */
++#define BDRV_O_IO_URING    0x40000 /* use io_uring instead of the thread pool */
  
- ##########################################
- # TPM emulation is only on POSIX
-@@ -6378,6 +6399,7 @@ echo "PIE               $pie"
- echo "vde support       $vde"
- echo "netmap support    $netmap"
- echo "Linux AIO support $linux_aio"
-+echo "Linux io_uring support $linux_io_uring"
- echo "ATTR/XATTR support $attr"
- echo "Install blobs     $blobs"
- echo "KVM support       $kvm"
-@@ -6858,6 +6880,11 @@ fi
- if test "$linux_aio" = "yes" ; then
-   echo "CONFIG_LINUX_AIO=y" >> $config_host_mak
- fi
-+if test "$linux_io_uring" = "yes" ; then
-+  echo "CONFIG_LINUX_IO_URING=y" >> $config_host_mak
-+  echo "LINUX_IO_URING_CFLAGS=$linux_io_uring_cflags" >> $config_host_mak
-+  echo "LINUX_IO_URING_LIBS=$linux_io_uring_libs" >> $config_host_mak
-+fi
- if test "$attr" = "yes" ; then
-   echo "CONFIG_ATTR=y" >> $config_host_mak
- fi
+ #define BDRV_O_CACHE_MASK  (BDRV_O_NOCACHE | BDRV_O_NO_FLUSH)
+ 
 -- 
 2.17.1
 
