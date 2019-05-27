@@ -2,92 +2,64 @@ Return-Path: <SRS0=zt/K=T3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F904C07542
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 May 2019 08:59:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A7AAC07542
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 May 2019 09:02:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0B93B21721
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 May 2019 08:59:17 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="TJto2Tqh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0B93B21721
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 308C22075E
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 May 2019 09:02:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 308C22075E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:42240 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:42290 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hVBTR-0003sW-AP
-	for qemu-devel@archiver.kernel.org; Mon, 27 May 2019 04:59:17 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:34646)
+	id 1hVBWr-0005Be-20
+	for qemu-devel@archiver.kernel.org; Mon, 27 May 2019 05:02:49 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:35173)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hVBSg-0003bI-2Z
-	for qemu-devel@nongnu.org; Mon, 27 May 2019 04:58:30 -0400
+	(envelope-from <stefanha@redhat.com>) id 1hVBVh-0004hA-Uy
+	for qemu-devel@nongnu.org; Mon, 27 May 2019 05:01:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hVBSd-0003Xa-Ro
-	for qemu-devel@nongnu.org; Mon, 27 May 2019 04:58:29 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:51082)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1hVBSc-0003VH-13
-	for qemu-devel@nongnu.org; Mon, 27 May 2019 04:58:27 -0400
-Received: by mail-wm1-x342.google.com with SMTP id f204so15333467wme.0
-	for <qemu-devel@nongnu.org>; Mon, 27 May 2019 01:58:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=references:user-agent:from:to:cc:subject:in-reply-to:date
-	:message-id:mime-version:content-transfer-encoding;
-	bh=mKnh+3d78vie1QJTDRdq2u0je9n7tu4k6+l8Hwhnyys=;
-	b=TJto2TqhEnZBxDNyu6tLSI3RDRXU3F/6HGgsd680N22zDK5xX51Cy6TELNs6p7XwGD
-	4kHYpHUux460JSz6u7seBKt6CCCwoU/aeL+WlMfv8BliVdzJzuGnkoDMrC90U+4DfOj2
-	7miNbhD56J/ed3szhBiB2n1Yr1PH+ThYiucdwPEyTfZ+4hJ4ReVyJAhsbmoRUobyQi81
-	uV2IszwJriHrfDp0dxJG1hxafmDGiMe1cOTQ/omHhIxfGch4hRJPzU64A+gBmWMnbX2b
-	z77vhLD0Fw07kGfkcE/CSzvJxnwlRwA9kumfq0ikrROTv6u5bLf47kDJEnk1XYJnPBQQ
-	Dd/Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:references:user-agent:from:to:cc:subject
-	:in-reply-to:date:message-id:mime-version:content-transfer-encoding;
-	bh=mKnh+3d78vie1QJTDRdq2u0je9n7tu4k6+l8Hwhnyys=;
-	b=KfMxJlRVFuogVTOUBIDA7AI27HhNayhGMJakHiUreBi62wOf0dKouZxbUid1FPh0Hj
-	zdT19jI7V/FsAc+dzbj1QJqjyoiqy/EU1MnxZo8+lhSbj38pwdxylbuMCxSBFsC3SNnZ
-	unGFWugcbwRqD5MWmVT+O1NX0397sX/GNs0Cg8Jf6tIiYenbn9iw5WFxZRdqsbK41tOE
-	EjcPkSydb6/z/GI0b8rIt4ErzuxiQPUgffQb0zWuV8d7ydup44Iqilt/0Wky2YEBD4gJ
-	FnVMR2qoU8sIoHwBlhCJFUIJXNx3+nkkrPZ+mQmGcl2dWPHw3hUZym8fty+J1YFmOrK6
-	aL5w==
-X-Gm-Message-State: APjAAAXirdudUDhL1paSTpV9NawPDY+GDdkirBw8zQ8OUC9jDpEy926O
-	YCKVWYZpC6dN9RTUiaFM7g+pHXBtC2Y=
-X-Google-Smtp-Source: APXvYqw3bEmJy4qf6ns45DnUneBOU350EGqUsdl/Fif+r9mA9hbkFPy9cXdJDo2AbtNg2o5TQpKpdg==
-X-Received: by 2002:a1c:2889:: with SMTP id o131mr9334576wmo.101.1558947504136;
-	Mon, 27 May 2019 01:58:24 -0700 (PDT)
-Received: from zen.linaroharston ([81.128.185.34])
-	by smtp.gmail.com with ESMTPSA id 16sm9232934wmx.45.2019.05.27.01.58.23
-	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Mon, 27 May 2019 01:58:23 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
-	by zen.linaroharston (Postfix) with ESMTP id 3776D1FF87;
-	Mon, 27 May 2019 09:58:23 +0100 (BST)
-References: <20190524160118.31134-1-arilou@gmail.com>
-	<20190524160118.31134-3-arilou@gmail.com>
-	<87o93oqonk.fsf@zen.linaroharston>
-	<87muj8qntz.fsf@zen.linaroharston>
-User-agent: mu4e 1.3.2; emacs 26.1
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Jon Doron <arilou@gmail.com>
-In-reply-to: <87muj8qntz.fsf@zen.linaroharston>
-Date: Mon, 27 May 2019 09:58:23 +0100
-Message-ID: <87lfysqno0.fsf@zen.linaroharston>
+	(envelope-from <stefanha@redhat.com>) id 1hVBVg-00067v-OE
+	for qemu-devel@nongnu.org; Mon, 27 May 2019 05:01:37 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53680)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>)
+	id 1hVBVd-0005sg-RB; Mon, 27 May 2019 05:01:33 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 5481F3088A65;
+	Mon, 27 May 2019 09:01:09 +0000 (UTC)
+Received: from localhost (unknown [10.36.118.63])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 93EEE5D723;
+	Mon, 27 May 2019 09:01:06 +0000 (UTC)
+Date: Mon, 27 May 2019 10:01:03 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: qemu-devel@nongnu.org
+Message-ID: <20190527090103.GA25631@stefanha-x1.localdomain>
+References: <20190527080327.10780-1-mehta.aaru20@gmail.com>
+	<155894555550.3183.17796312000148467282@d1b27de2824c>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2a00:1450:4864:20::342
-Subject: Re: [Qemu-devel] [PATCH v11 02/20] gdbstub: Implement deatch (D
- pkt) with new infra
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="SUOF0GtieIMvvwua"
+Content-Disposition: inline
+In-Reply-To: <155894555550.3183.17796312000148467282@d1b27de2824c>
+User-Agent: Mutt/1.11.4 (2019-03-13)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.47]);
+	Mon, 27 May 2019 09:01:16 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v3 0/8] Add support for io_uring
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -99,50 +71,118 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, qemu-block@nongnu.org, mreitz@redhat.com,
+	saket.sinha89@gmail.com, jusual@mail.ru, mehta.aaru20@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
-Alex Benn=C3=A9e <alex.bennee@linaro.org> writes:
+--SUOF0GtieIMvvwua
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> Alex Benn=C3=A9e <alex.bennee@linaro.org> writes:
->
->> Jon Doron <arilou@gmail.com> writes:
->>
->>> Signed-off-by: Jon Doron <arilou@gmail.com>
->>
->> Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
->
-> Hmm although I bisected to this patch which fails on:
->
-> 09:49 alex@zen/x86_64  [linux.git/master@origin] >gdb ./builds/arm64/vmli=
-nux -x ~/lsrc/qemu.git/tests/guest-debug/test-gdbstub.py
-<snip>
-> Connecting to remote
-> 0x0000000040000000 in ?? ()
-> Checking we can step the first few instructions
-> warning: Invalid remote reply:
-<snip>
->>>      }
->>> +
->>> +    if (cmd_parser) {
->>> +        /* helper will respond */
->>> +        process_string_cmd(s, NULL, line_buf, cmd_parser, 1);
->>> +    } else {
->>> +        /* unknown command, empty respone */
->>> +        put_packet(s, "");
->>> +    }
->>> +
+On Mon, May 27, 2019 at 01:25:56AM -0700, no-reply@patchew.org wrote:
+> Patchew URL: https://patchew.org/QEMU/20190527080327.10780-1-mehta.aaru20=
+@gmail.com/
+>=20
+>=20
+>=20
+> Hi,
+>=20
+> This series seems to have some coding style problems. See output below for
+> more information:
+>=20
+> Subject: [Qemu-devel] [PATCH v3 0/8] Add support for io_uring
+> Type: series
+> Message-id: 20190527080327.10780-1-mehta.aaru20@gmail.com
+>=20
+> =3D=3D=3D TEST SCRIPT BEGIN =3D=3D=3D
+> #!/bin/bash
+> git rev-parse base > /dev/null || exit 0
+> git config --local diff.renamelimit 0
+> git config --local diff.renames True
+> git config --local diff.algorithm histogram
+> ./scripts/checkpatch.pl --mailback base..
+> =3D=3D=3D TEST SCRIPT END =3D=3D=3D
+>=20
+> Updating 3c8cf5a9c21ff8782164d1def7f44bd888713384
+> Switched to a new branch 'test'
+> 75fc7f1 block/fileposix: extend to use io_uring
+> d03ae39 blockdev: accept io_uring as option
+> cae30ee util/async: add aio interfaces for io_uring
+> f3be807 stubs: add stubs for io_uring interface
+> 85c03de block/io_uring: implements interfaces for io_uring
+> 5c4a14a block/block: add BDRV flag for io_uring
+> 9a6594d qapi/block-core: add option for io_uring
+> 460c72d configure: permit use of io_uring
+>=20
+> =3D=3D=3D OUTPUT BEGIN =3D=3D=3D
+> 1/8 Checking commit 460c72d1a8df (configure: permit use of io_uring)
+> 2/8 Checking commit 9a6594daa76c (qapi/block-core: add option for io_urin=
+g)
+> 3/8 Checking commit 5c4a14a301f5 (block/block: add BDRV flag for io_uring)
+> 4/8 Checking commit 85c03de16186 (block/io_uring: implements interfaces f=
+or io_uring)
+> WARNING: added, moved or deleted file(s), does MAINTAINERS need updating?
+> #49:=20
+> new file mode 100644
+>=20
+> ERROR: space required before the open parenthesis '('
+> #196: FILE: block/io_uring.c:143:
+> +    while(!s->io_q.in_queue) {
+>=20
+> ERROR: trailing whitespace
+> #209: FILE: block/io_uring.c:156:
+> +        if (ret <=3D 0) { $
+>=20
+> total: 2 errors, 1 warnings, 387 lines checked
+>=20
+> Patch 4/8 has style problems, please review.  If any of these errors
+> are false positives report them to the maintainer, see
+> CHECKPATCH in MAINTAINERS.
+>=20
+> 5/8 Checking commit f3be80708ad1 (stubs: add stubs for io_uring interface)
+> WARNING: added, moved or deleted file(s), does MAINTAINERS need updating?
+> #35:=20
+> new file mode 100644
+>=20
+> total: 0 errors, 1 warnings, 46 lines checked
+>=20
+> Patch 5/8 has style problems, please review.  If any of these errors
+> are false positives report them to the maintainer, see
+> CHECKPATCH in MAINTAINERS.
+> 6/8 Checking commit cae30ee1388f (util/async: add aio interfaces for io_u=
+ring)
+> 7/8 Checking commit d03ae39c331c (blockdev: accept io_uring as option)
+> 8/8 Checking commit 75fc7f1d8a3e (block/fileposix: extend to use io_uring)
+> =3D=3D=3D OUTPUT END =3D=3D=3D
 
-We can't default to this empty response until we have converted the
-table otherwise we get strangeness and double responses.
+Hi Aarushi,
+I use this git hook to identify checkpatch.pl issues at git-commit(1)
+time:
+http://blog.vmsplice.net/2011/03/how-to-automatically-run-checkpatchpl.html
 
->>>      return RS_IDLE;
->>>  }
+This way I don't need to resend patch series because the issues were
+already taken care of earlier in the development process.
 
+Stefan
 
---
-Alex Benn=C3=A9e
+--SUOF0GtieIMvvwua
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAlzrp08ACgkQnKSrs4Gr
+c8iLBwgAlRjzAzGP77yetVsN8gmp9+ohj7MhdPBoInt02EbfxLzIN9GnlxXE1ovj
+gUZ2CNJNtAvE41ov0fiG4MaWENe+SixcCh7LPPzKmhUpV93iKXhshsEIEYKyjDJs
+DPAS7+oXL33z3nmfbpRV7/smJTFZdEmATHgEWEoVnfpFaehAhfaecQl/k1uYl1de
+F4150Cbwu5eifJU0YYrIeFZooabkUQun9ye9YUdHE1RrMFKp5ZALgSLppKduwW1T
+B9nBWzUvG+tagCkyrOhTX1cLrntU537a/i6tVijnjafEljAwlEHflzDBBkC5yjcE
+UFuWP7YBJJsB2EN2eRbKfzvnRFUT9g==
+=mS8p
+-----END PGP SIGNATURE-----
+
+--SUOF0GtieIMvvwua--
 
