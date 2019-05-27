@@ -2,85 +2,71 @@ Return-Path: <SRS0=zt/K=T3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_MUTT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D420C04AB3
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 May 2019 19:00:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 61830C04AB3
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 May 2019 19:00:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4C25320859
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 May 2019 19:00:10 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="gKOUUUql"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4C25320859
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 3DF1A20859
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 May 2019 19:00:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3DF1A20859
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:49584 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:49619 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hVKqv-0002Fu-Ek
-	for qemu-devel@archiver.kernel.org; Mon, 27 May 2019 15:00:09 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:40120)
+	id 1hVKrV-0002kZ-HY
+	for qemu-devel@archiver.kernel.org; Mon, 27 May 2019 15:00:45 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:40174)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hVKpy-0001qj-Ss
-	for qemu-devel@nongnu.org; Mon, 27 May 2019 14:59:11 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1hVKqK-000232-Mi
+	for qemu-devel@nongnu.org; Mon, 27 May 2019 14:59:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hVKpy-0003Zz-39
-	for qemu-devel@nongnu.org; Mon, 27 May 2019 14:59:10 -0400
-Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:46639)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hVKpx-0003ZZ-V0
-	for qemu-devel@nongnu.org; Mon, 27 May 2019 14:59:10 -0400
-Received: by mail-oi1-x241.google.com with SMTP id 203so12489889oid.13
-	for <qemu-devel@nongnu.org>; Mon, 27 May 2019 11:59:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-	:cc; bh=pNRoKcCuhIS9xIyaBQiqtrKyyTh6R7Fw5zl+s0X/dUo=;
-	b=gKOUUUqljOmFKZwwkNiJMssB7zEQx/HIPvONJgqrTqcgqm3CbWTTjUyxD+onvjwDUr
-	wYx5jDVtdmhtx35/EcLcmouG5N/2imBpmZ5HbEbJl6LcNxo5YDy9g8KNhePS2nybkb+h
-	3r06cFVLvtbG1m9IhNeMjm5Dw4FTmXaQ7iJk/7TKMvNvCiJh6Zslc1F3IdJuK7ZetiAK
-	ug8KDxoAcmvoUwZr3zYqPFhSsRArzrztTVnUNRxzdMZE+wQOfZ0PTrrJzrqbI71XAVrW
-	ZkhTSn6/lYF53MIJ16yvQ+V7XgtIFZxzjhh9PFt72VHVJF82n8gi1LR6nsKS+KjPHzex
-	aFJA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-	:message-id:subject:to:cc;
-	bh=pNRoKcCuhIS9xIyaBQiqtrKyyTh6R7Fw5zl+s0X/dUo=;
-	b=KrkNdOQImQ+3OG9mnB7HNXNgNHk8vJ+dNXBpIWykGaIB68ZStgucsGp3b5UcCPgGyw
-	CVujqB79NjmMa2eF8JKnQk7sqd+uo76ePyYFkR9TXZlXOqh8hQ/G+zKigeTinXoPzsx1
-	FOs+EoEDWHB2V8it0L/dhV7mzhvqBKaU/m3/Y1UmFItR1/OKUXsvuV/NFE+SVnIb+7Fp
-	24CDdIZGl2WcXtglwZSYn/pQodsJlDMQPvLqnP656o2v+mP8F9OOuk2FzUQlb5UwdEEi
-	W1SBwqBF+fZWy9N9+G3oVkGoASqYHq8AKK9k4HKWZr0xuwwFI1+cxbMIyWBGTbO6StXW
-	EtzA==
-X-Gm-Message-State: APjAAAWsWgEXzNOzmf4CIzCNfE6VJUOZrxIQeyhi2f0/TgcocHdG81Br
-	h2Y6J3UN0oMOMFuL46x0vIgYNWOY5ecwRJ4bFTpPOQ==
-X-Google-Smtp-Source: APXvYqyzJK4hUa2yxcAoRiPaUD9iZ3DRriWHQF2zFxo5NNhy614LaZ0av+lp+kKrLz3zxvzQ4SL4+LlLAoamnY5sKzA=
-X-Received: by 2002:aca:4e42:: with SMTP id c63mr277691oib.170.1558983549317; 
-	Mon, 27 May 2019 11:59:09 -0700 (PDT)
+	(envelope-from <ehabkost@redhat.com>) id 1hVKqI-0004Ay-Se
+	for qemu-devel@nongnu.org; Mon, 27 May 2019 14:59:32 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41222)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hVKqI-00049i-Nh
+	for qemu-devel@nongnu.org; Mon, 27 May 2019 14:59:30 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id E37F7307D926;
+	Mon, 27 May 2019 18:59:17 +0000 (UTC)
+Received: from localhost (ovpn-116-14.gru2.redhat.com [10.97.116.14])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 58B3360126;
+	Mon, 27 May 2019 18:59:15 +0000 (UTC)
+Date: Mon, 27 May 2019 15:59:12 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+To: Andrea Bolognani <abologna@redhat.com>
+Message-ID: <20190527185912.GC22103@habkost.net>
+References: <20190513184237.i2ha3ixvhjqzkn5q@kamzik.brq.redhat.com>
+	<87bm05ab6c.fsf@dusky.pond.sub.org>
+	<20190514090225.vel4xm4x743o4rge@kamzik.brq.redhat.com>
+	<20190514164838.48fc7603@Igors-MacBook-Pro>
+	<20190515081854.kcpjm4zd2bzc7f6o@kamzik.brq.redhat.com>
+	<20190515125229.1784f586@redhat.com>
+	<20190515115413.cqvzjkky7xubnsuo@kamzik.brq.redhat.com>
+	<2186eb85f8541b0c9cc69cacae9321ace8addaa6.camel@redhat.com>
+	<20190524182434.GH10764@habkost.net>
+	<2a5ef002257fe66ff6c4c88008ace24f8cffb86f.camel@redhat.com>
 MIME-Version: 1.0
-References: <20190520190533.GA28160@Red>
-	<20190521232323.GD3621@darkstar.musicnaut.iki.fi>
-	<20190522093341.GA32154@Red>
-	<20190522181904.GE3621@darkstar.musicnaut.iki.fi>
-	<8977e2bb-8d9e-f4fd-4c44-b4f67e0e7314@redhat.com>
-	<c2972889-fe60-7614-fb6e-e57ddf780a54@redhat.com>
-	<20190527063250.GI5447@atomide.com>
-	<5dbec436-4356-415e-eb1c-0f506af89744@roeck-us.net>
-In-Reply-To: <5dbec436-4356-415e-eb1c-0f506af89744@roeck-us.net>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 27 May 2019 19:58:58 +0100
-Message-ID: <CAFEAcA-n8-LV2=hQwQOvRDT+pro7iBQD8i-QBszWHuW56VQsvg@mail.gmail.com>
-To: Guenter Roeck <linux@roeck-us.net>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::241
-Subject: Re: [Qemu-devel] Running linux on qemu omap
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <2a5ef002257fe66ff6c4c88008ace24f8cffb86f.camel@redhat.com>
+User-Agent: Mutt/1.11.3 (2019-02-01)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.48]);
+	Mon, 27 May 2019 18:59:25 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] How do we do user input bitmap properties?
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -92,25 +78,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, Aaro Koskinen <aaro.koskinen@iki.fi>,
-	Tony Lindgren <tony@atomide.com>, QEMU Developers <qemu-devel@nongnu.org>,
-	lkml - Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Corentin Labbe <clabbe.montjoie@gmail.com>,
-	Linux OMAP Mailing List <linux-omap@vger.kernel.org>,
-	=?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Cc: peter.maydell@linaro.org, Andrew Jones <drjones@redhat.com>,
+	Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
+	qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>,
+	Igor Mammedov <imammedo@redhat.com>, Dave.Martin@arm.com,
+	dgilbert@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 27 May 2019 at 16:56, Guenter Roeck <linux@roeck-us.net> wrote:
-> I'd be happy to use a different (supported) branch, but the Linaro branch
-> was the only one I could find that supports those boards. Unfortunately,
-> qemu changed so much since 2.3 that it is all but impossible to merge
-> the code into mainline qemu without spending a lot of effort on it.
+On Mon, May 27, 2019 at 06:29:44PM +0200, Andrea Bolognani wrote:
+> On Fri, 2019-05-24 at 15:24 -0300, Eduardo Habkost wrote:
+> > On Thu, May 23, 2019 at 10:35:24AM +0200, Andrea Bolognani wrote:
+> > > [...] the above looks good to
+> > > me as a general direction, but note that you'll have to implement at
+> > > the very least the query-cpu-model-expansion QMP command for the
+> > > introspection to work.
+> > 
+> > Why is query-cpu-model-expansion needed?  Isn't
+> > device-list-properties enough?
+> 
+> Good question.
+> 
+> I'll have to check with Jirka, but from playing with both commands
+> it looks like the latter returns a superset of what the former does,
+> so for the purpose of figuring out which vector lengths the QEMU
+> binary recognizes it should be good enough; I suspect, however, that
+> query-cpu-model-expansion might be (made to be) smarter and for
+> example not report vector lengths that the underlying hardware
+> doesn't support, which would be valuable for the purpose of user
+> friendly error reporting and allowing applications to decide which
+> vector lengths to request when creating guests.
 
-Even back at 2.3 it wasn't possible to merge the code into mainline
-without spending a lot of effort -- that's why it was not merged :-)
+Yes, query-cpu-model-expansion returns additional information, so
+it depends on what exactly you are looking for.
 
-thanks
--- PMM
+If you want to know which properties a given QEMU binary supports
+in the command-line, `device-list-properties` is supposed to be
+enough.  If you need to know which properties can be really
+enabled in a given host (based on QEMU+KVM+hardware
+capabilities), you'll need `query-cpu-model-expansion model=max`.
+
+-- 
+Eduardo
 
