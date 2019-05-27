@@ -6,63 +6,74 @@ X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D6792C04AB3
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 May 2019 18:39:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1AB3AC072B1
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 May 2019 18:44:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B30A3208CA
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 May 2019 18:39:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B30A3208CA
+	by mail.kernel.org (Postfix) with ESMTPS id EA96520815
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 May 2019 18:44:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EA96520815
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:49372 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:49428 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hVKXN-0004pZ-S0
-	for qemu-devel@archiver.kernel.org; Mon, 27 May 2019 14:39:57 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:36839)
+	id 1hVKbf-0005xl-7w
+	for qemu-devel@archiver.kernel.org; Mon, 27 May 2019 14:44:23 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:37395)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hVKWW-0004SY-Hk
-	for qemu-devel@nongnu.org; Mon, 27 May 2019 14:39:05 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1hVKal-0005cr-SI
+	for qemu-devel@nongnu.org; Mon, 27 May 2019 14:43:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hVKWV-0005pq-Mw
-	for qemu-devel@nongnu.org; Mon, 27 May 2019 14:39:04 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53560)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hVKWV-0005pQ-Ip
-	for qemu-devel@nongnu.org; Mon, 27 May 2019 14:39:03 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id F3F5E3087930
-	for <qemu-devel@nongnu.org>; Mon, 27 May 2019 18:39:01 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-117-250.ams2.redhat.com
-	[10.36.117.250])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 9520D7940D;
-	Mon, 27 May 2019 18:38:58 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
-	id 435431138648; Mon, 27 May 2019 20:38:57 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Igor Mammedov <imammedo@redhat.com>
-References: <1558079119-320634-1-git-send-email-imammedo@redhat.com>
-	<1558079119-320634-5-git-send-email-imammedo@redhat.com>
-Date: Mon, 27 May 2019 20:38:57 +0200
-In-Reply-To: <1558079119-320634-5-git-send-email-imammedo@redhat.com> (Igor
-	Mammedov's message of "Fri, 17 May 2019 09:45:17 +0200")
-Message-ID: <87woibhhdq.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1 (gnu/linux)
+	(envelope-from <pbonzini@redhat.com>) id 1hVKal-0000MW-2Q
+	for qemu-devel@nongnu.org; Mon, 27 May 2019 14:43:27 -0400
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:54051)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hVKak-0000LW-Tf
+	for qemu-devel@nongnu.org; Mon, 27 May 2019 14:43:27 -0400
+Received: by mail-wm1-f68.google.com with SMTP id d17so344549wmb.3
+	for <qemu-devel@nongnu.org>; Mon, 27 May 2019 11:43:26 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+	:user-agent:mime-version:in-reply-to:content-language
+	:content-transfer-encoding;
+	bh=UP8WzIlgEk5m8Eo7I18QMvjlHTepqvVJMK3l9mKAlxE=;
+	b=ZdP+OoyfawaS1nXmsAQoA3JDGrD/Rcc686UVxx1PDGYRX8/u7iO7TTCpR34L83PdMy
+	G0NeKP4xPtzAbMFswoGHBOAv+7fX4SDHmfygjsXbHYhi1JOh4kFxi1tPitMHRgvSeBNW
+	ASuQ12ZOKxnexg1K55eVnWaitEy7jCBQ6kvYbfbzOAJbqmLctRQBgmkoI6TIAepXpRir
+	CtYNBvg6a7hBeCcALJslx7BL7B1OMc5RTELXUqRl0AZMr/vTwXciCADIT6UDadEReV64
+	nNBfctT2l7bYGkDwg3cUvOtnxCCC6XAD//wO88Ho3E7nUe6N5eEXnQI6DFtBo6J0kKVI
+	XnKQ==
+X-Gm-Message-State: APjAAAXeymGqMIqex6chuC90z/Bq5Z5kq3/SelG1gg1hab32S6C+HYzK
+	xynoENSpXZjhPFNGaYjkHkHZKw==
+X-Google-Smtp-Source: APXvYqyd8imGissdHN2PdZ5FBwfsWlDqnTMHMb2FwfB3joOeExc/k7MOmmKgk/A+0qMlKZU9/j/+lg==
+X-Received: by 2002:a7b:c844:: with SMTP id c4mr287182wml.108.1558982605727;
+	Mon, 27 May 2019 11:43:25 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:c92d:f9e8:f150:3553?
+	([2001:b07:6468:f312:c92d:f9e8:f150:3553])
+	by smtp.gmail.com with ESMTPSA id x22sm511301wmi.4.2019.05.27.11.43.24
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Mon, 27 May 2019 11:43:25 -0700 (PDT)
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+References: <20190427141459.19728-1-philmd@redhat.com>
+	<dadba93d-fdf3-25b8-b3e2-5b43a4618292@redhat.com>
+	<CAP+75-UKFxtHrfzAF4G=YD6XDGcDVyvTeHdzYTvOD4vecT0feA@mail.gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <08f3e1f4-8a4b-2115-d042-965a6978ea3e@redhat.com>
+Date: Mon, 27 May 2019 20:43:24 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.45]);
-	Mon, 27 May 2019 18:39:02 +0000 (UTC)
+In-Reply-To: <CAP+75-UKFxtHrfzAF4G=YD6XDGcDVyvTeHdzYTvOD4vecT0feA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v3 4/6] numa: introduce
- "numa-mem-supported" machine property
+	[fuzzy]
+X-Received-From: 209.85.128.68
+Subject: Re: [Qemu-devel] [PATCH 0/3] hw/microblaze: Kconfig cleanup
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -74,40 +85,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: libvir-list@redhat.com, pbonzini@redhat.com, berrange@redhat.com,
-	qemu-devel@nongnu.org, ehabkost@redhat.com
+Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
+	Alistair Francis <alistair@alistair23.me>,
+	QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>,
+	"Edgar E. Iglesias" <edgar.iglesias@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Igor Mammedov <imammedo@redhat.com> writes:
+On 27/05/19 18:10, Philippe Mathieu-Daudé wrote:
+>>>
+>> Queued, thanks.
+> I don't see these patches in your queue merged on "Fri 17 May", are
+> you planning to include them in your next batch?
 
-> '-numa mem' option has a number of issues and mgmt often defaults
-> to it. Unfortunately it's no possible to replace it with an alternative
-> '-numa memdev' without breaking migration compatibility.
+Yes, thanks.
 
-To be precise: -numa node,mem=... and -numa node,memdev=...  Correct?
-
->                                                          What's possible
-> though is to deprecate it, keeping option working with old machine types.
-> Once deprecation period expires, QEMU will disable '-numa mem' option,
-> usage on new machine types and when the last machine type that supported
-> it is removed we would be able to remove '-numa mem' with associated code.
->
-> In order to help mgmt to find out if being deprecated CLI option
-> '-numa mem=SZ' is still supported by particular machine type, expose
-> this information via "numa-mem-supported" machine property.
->
-> Users can use "qom-list-properties" QMP command to list machine type
-> properties including initial proprety values (when probing for supported
-> machine types with '-machine none') or at runtime at preconfig time
-> before numa mapping is configured and decide if they should used legacy
-> '-numa mem' or alternative '-numa memdev' option.
-
-This sentence is impenetrable, I'm afraid :)
-
-If we only want to convey whether a machine type supports -numa
-node,mem=..., then adding a flag to query-machines suffices.  Since I'm
-pretty sure you'd have figured that out yourself, I suspect I'm missing
-something.  Can you give me some examples of intended usage?
+Paolo
 
