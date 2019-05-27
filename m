@@ -2,67 +2,59 @@ Return-Path: <SRS0=zt/K=T3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B97AC07542
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 May 2019 14:20:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 919FCC04AB3
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 May 2019 14:26:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 38D34217F4
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 May 2019 14:20:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 38D34217F4
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 6B84F2081C
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 May 2019 14:26:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6B84F2081C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:46546 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:46633 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hVGTz-0002GS-Gm
-	for qemu-devel@archiver.kernel.org; Mon, 27 May 2019 10:20:11 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:43725)
+	id 1hVGaG-0003rJ-FH
+	for qemu-devel@archiver.kernel.org; Mon, 27 May 2019 10:26:40 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:45524)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1hVGSa-0001aW-J7
-	for qemu-devel@nongnu.org; Mon, 27 May 2019 10:18:45 -0400
+	(envelope-from <mreitz@redhat.com>) id 1hVGZV-0003Uf-61
+	for qemu-devel@nongnu.org; Mon, 27 May 2019 10:25:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1hVGSY-0007Sv-JT
-	for qemu-devel@nongnu.org; Mon, 27 May 2019 10:18:44 -0400
-Resent-Date: Mon, 27 May 2019 10:18:43 -0400
-Resent-Message-Id: <E1hVGSY-0007Sv-JT@eggs.gnu.org>
-Received: from sender-of-o53.zoho.com ([135.84.80.218]:21897)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1hVGSX-0007RJ-BO
-	for qemu-devel@nongnu.org; Mon, 27 May 2019 10:18:42 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1558960292; cv=none; d=zoho.com; s=zohoarc; 
-	b=Up3mkOkZzo5yLOrPSffioIGDEAwBBGBq1SumubItra6n53rNpFGjrg6fdmdIaheHUAmYPN3peIS1eL9wfYoGcGHHQPEMIF+5L5JpaACU/Ixg99SWrdkRPvvgKh3N1D0w9YMmUyymB6f7oD7fhVkSUanDx1jEpKWzS0ygk2nCqO0=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
-	s=zohoarc; t=1558960292;
-	h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
-	bh=+vWsj462XklaqwLz+g3S9gUdbsUbVxmkeAhbKqPrkQM=; 
-	b=nmFjI3JjU3OPHrdrH1Gir5FHwFGveoGx90iQ34vcZQEafa1X4GMeRN/c5fPzNdq6P0KpHjpbvwUsT7pLpPgZViNdfAZC/BH89FO6DrMd4msr4vRvQi55m0BkDhgKKxyisDwDfQUR543BY7GeMQ838iCBIZGq/lHQKHJ3aAGP91M=
-ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
-	spf=pass  smtp.mailfrom=no-reply@patchew.org;
-	dmarc=pass header.from=<no-reply@patchew.org>
-	header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
-	mx.zohomail.com with SMTPS id 1558960291339723.0272863463014;
-	Mon, 27 May 2019 05:31:31 -0700 (PDT)
-In-Reply-To: <20190527114203.2762-1-eric.auger@redhat.com>
-Message-ID: <155896028968.24.17330667446250277041@ce79690b2cb9>
+	(envelope-from <mreitz@redhat.com>) id 1hVGZU-0005f7-7M
+	for qemu-devel@nongnu.org; Mon, 27 May 2019 10:25:53 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33480)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1hVGZT-0005dR-Va
+	for qemu-devel@nongnu.org; Mon, 27 May 2019 10:25:52 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+	[10.5.11.22])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 412FE307D860
+	for <qemu-devel@nongnu.org>; Mon, 27 May 2019 14:25:45 +0000 (UTC)
+Received: from localhost (unknown [10.40.205.13])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 99DB010027B6;
+	Mon, 27 May 2019 14:25:42 +0000 (UTC)
+From: Max Reitz <mreitz@redhat.com>
+To: qemu-devel@nongnu.org
+Date: Mon, 27 May 2019 16:25:40 +0200
+Message-Id: <20190527142540.23255-1-mreitz@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: eric.auger@redhat.com
-Date: Mon, 27 May 2019 05:31:31 -0700 (PDT)
-X-ZohoMailClient: External
+Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.48]);
+	Mon, 27 May 2019 14:25:50 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 135.84.80.218
-Subject: Re: [Qemu-devel] [RFC v4 00/27] vSMMUv3/pSMMUv3 2 stage VFIO
- integration
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PATCH] ui/curses: Fix build with -m32
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -74,41 +66,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, drjones@redhat.com, yi.l.liu@intel.com,
-	mst@redhat.com, jean-philippe.brucker@arm.com,
-	zhangfei.gao@foxmail.com, qemu-devel@nongnu.org,
-	peterx@redhat.com, eric.auger@redhat.com,
-	alex.williamson@redhat.com, qemu-arm@nongnu.org,
-	vincent.stehle@arm.com, eric.auger.pro@gmail.com
+Cc: Gerd Hoffmann <kraxel@redhat.com>, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDUyNzExNDIwMy4yNzYy
-LTEtZXJpYy5hdWdlckByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIGZhaWxlZCBidWls
-ZCB0ZXN0IG9uIHMzOTB4IGhvc3QuIFBsZWFzZSBmaW5kIHRoZSBkZXRhaWxzIGJlbG93LgoKPT09
-IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAojIFRlc3Rpbmcgc2NyaXB0IHdpbGwg
-YmUgaW52b2tlZCB1bmRlciB0aGUgZ2l0IGNoZWNrb3V0IHdpdGgKIyBIRUFEIHBvaW50aW5nIHRv
-IGEgY29tbWl0IHRoYXQgaGFzIHRoZSBwYXRjaGVzIGFwcGxpZWQgb24gdG9wIG9mICJiYXNlIgoj
-IGJyYW5jaApzZXQgLWUKQ0M9JEhPTUUvYmluL2NjCklOU1RBTEw9JFBXRC9pbnN0YWxsCkJVSUxE
-PSRQV0QvYnVpbGQKbWtkaXIgLXAgJEJVSUxEICRJTlNUQUxMClNSQz0kUFdECmNkICRCVUlMRAok
-U1JDL2NvbmZpZ3VyZSAtLWNjPSRDQyAtLXByZWZpeD0kSU5TVEFMTAptYWtlIC1qNAojIFhYWDog
-d2UgbmVlZCByZWxpYWJsZSBjbGVhbiB1cAojIG1ha2UgY2hlY2sgLWo0IFY9MQptYWtlIGluc3Rh
-bGwKCmVjaG8KZWNobyAiPT09IEVOViA9PT0iCmVudgoKZWNobwplY2hvICI9PT0gUEFDS0FHRVMg
-PT09IgpycG0gLXFhCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgogIENDICAgICAgcHBjLXNvZnRt
-bXUvaHcvZGlzcGxheS92Z2EubwogIENDICAgICAgbWlwcy1zb2Z0bW11L2h3L21pcHMvbWlwc19y
-NGsubwovdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtb2FxZm14dTUvc3JjL2h3L3BwYy9zcGFw
-cl9pb21tdS5jOiBJbiBmdW5jdGlvbiDigJhzcGFwcl90Y2VfcmVwbGF54oCZOgovdmFyL3RtcC9w
-YXRjaGV3LXRlc3Rlci10bXAtb2FxZm14dTUvc3JjL2h3L3BwYy9zcGFwcl9pb21tdS5jOjE2MTox
-NDogZXJyb3I6IOKAmElPTU1VTm90aWZpZXLigJkge2FrYSDigJhzdHJ1Y3QgSU9NTVVOb3RpZmll
-cuKAmX0gaGFzIG5vIG1lbWJlciBuYW1lZCDigJhub3RpZnnigJkKICAxNjEgfCAgICAgICAgICAg
-ICBuLT5ub3RpZnkobiwgJmlvdGxiKTsKICAgICAgfCAgICAgICAgICAgICAgXn4KbWFrZVsxXTog
-KioqIFsvdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtb2FxZm14dTUvc3JjL3J1bGVzLm1hazo2
-OTogaHcvcHBjL3NwYXByX2lvbW11Lm9dIEVycm9yIDEKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxh
-YmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMTkwNTI3MTE0MjAzLjI3NjItMS1lcmlj
-LmF1Z2VyQHJlZGhhdC5jb20vdGVzdGluZy5zMzkweC8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwg
-Z2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9d
-LgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
+wchar_t may resolve to be an unsigned long on 32-bit architectures.
+Using the %x conversion specifier will then give a compiler warning:
+
+ui/curses.c: In function =E2=80=98get_ucs=E2=80=99:
+ui/curses.c:492:49: error: format =E2=80=98%x=E2=80=99 expects argument o=
+f type =E2=80=98unsigned int=E2=80=99, but argument 3 has type =E2=80=98w=
+char_t=E2=80=99 {aka =E2=80=98long int=E2=80=99} [-Werror=3Dformat=3D]
+  492 |         fprintf(stderr, "Could not convert 0x%04x "
+      |                                              ~~~^
+      |                                                 |
+      |                                                 unsigned int
+      |                                              %04lx
+  493 |                         "from wchar_t to a multibyte character: %=
+s\n",
+  494 |                         wch, strerror(errno));
+      |                         ~~~
+      |                         |
+      |                         wchar_t {aka long int}
+ui/curses.c:504:49: error: format =E2=80=98%x=E2=80=99 expects argument o=
+f type =E2=80=98unsigned int=E2=80=99, but argument 3 has type =E2=80=98w=
+char_t=E2=80=99 {aka =E2=80=98long int=E2=80=99} [-Werror=3Dformat=3D]
+  504 |         fprintf(stderr, "Could not convert 0x%04x "
+      |                                              ~~~^
+      |                                                 |
+      |                                                 unsigned int
+      |                                              %04lx
+  505 |                         "from a multibyte character to UCS-2 : %s=
+\n",
+  506 |                         wch, strerror(errno));
+      |                         ~~~
+      |                         |
+      |                         wchar_t {aka long int}
+
+Fix this by casting the wchar_t value to an unsigned long and using %lx
+as the conversion specifier.
+
+Fixes: b7b664a4fe9a955338f2e11a0f7433b29c8cbad0
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+---
+ ui/curses.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/ui/curses.c b/ui/curses.c
+index 1f3fcabb00..e9319eb8ae 100644
+--- a/ui/curses.c
++++ b/ui/curses.c
+@@ -489,9 +489,9 @@ static uint16_t get_ucs(wchar_t wch, iconv_t conv)
+     memset(&ps, 0, sizeof(ps));
+     ret =3D wcrtomb(mbch, wch, &ps);
+     if (ret =3D=3D -1) {
+-        fprintf(stderr, "Could not convert 0x%04x "
++        fprintf(stderr, "Could not convert 0x%04lx "
+                         "from wchar_t to a multibyte character: %s\n",
+-                        wch, strerror(errno));
++                        (unsigned long)wch, strerror(errno));
+         return 0xFFFD;
+     }
+=20
+@@ -501,9 +501,9 @@ static uint16_t get_ucs(wchar_t wch, iconv_t conv)
+     such =3D sizeof(uch);
+=20
+     if (iconv(conv, &pmbch, &smbch, &puch, &such) =3D=3D (size_t) -1) {
+-        fprintf(stderr, "Could not convert 0x%04x "
++        fprintf(stderr, "Could not convert 0x%04lx "
+                         "from a multibyte character to UCS-2 : %s\n",
+-                        wch, strerror(errno));
++                        (unsigned long)wch, strerror(errno));
+         return 0xFFFD;
+     }
+=20
+--=20
+2.21.0
 
 
