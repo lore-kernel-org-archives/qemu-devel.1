@@ -6,46 +6,45 @@ X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B79DC04AB3
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 May 2019 12:15:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A299C04AB3
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 May 2019 12:18:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D7461214D8
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 May 2019 12:15:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D7461214D8
+	by mail.kernel.org (Postfix) with ESMTPS id 313D32075C
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 May 2019 12:18:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 313D32075C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:45074 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:45082 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hVEXj-0001SO-20
-	for qemu-devel@archiver.kernel.org; Mon, 27 May 2019 08:15:55 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:46012)
+	id 1hVEZq-0002NQ-H5
+	for qemu-devel@archiver.kernel.org; Mon, 27 May 2019 08:18:06 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:46432)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hVEWr-0000xi-KI
-	for qemu-devel@nongnu.org; Mon, 27 May 2019 08:15:02 -0400
+	(envelope-from <mreitz@redhat.com>) id 1hVEYt-00022C-MN
+	for qemu-devel@nongnu.org; Mon, 27 May 2019 08:17:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hVEWq-0005eF-Qu
-	for qemu-devel@nongnu.org; Mon, 27 May 2019 08:15:01 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58206)
+	(envelope-from <mreitz@redhat.com>) id 1hVEYs-000802-Ph
+	for qemu-devel@nongnu.org; Mon, 27 May 2019 08:17:07 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49346)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mreitz@redhat.com>)
-	id 1hVEWo-0005SH-IZ; Mon, 27 May 2019 08:14:58 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
+	id 1hVEYp-0007xL-V3; Mon, 27 May 2019 08:17:04 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id BDA103082B4D;
-	Mon, 27 May 2019 12:14:56 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id EF8E03092657;
+	Mon, 27 May 2019 12:16:56 +0000 (UTC)
 Received: from dresden.str.redhat.com (unknown [10.40.205.13])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id E735C6F440;
-	Mon, 27 May 2019 12:14:52 +0000 (UTC)
-To: Alberto Garcia <berto@igalia.com>,
-	Anton Nefedov <anton.nefedov@virtuozzo.com>, qemu-block@nongnu.org
-References: <20190516142749.81019-1-anton.nefedov@virtuozzo.com>
-	<f2d129f6-b03f-aaa8-3e7d-fff48ea52233@redhat.com>
-	<w51h89hjm3c.fsf@maestria.local.igalia.com>
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 4008860BEC;
+	Mon, 27 May 2019 12:16:54 +0000 (UTC)
+To: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org
+References: <20190524172812.27308-1-mreitz@redhat.com>
+	<20190524172812.27308-2-mreitz@redhat.com>
+	<w51ef4ljlt7.fsf@maestria.local.igalia.com>
 From: Max Reitz <mreitz@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
@@ -72,23 +71,23 @@ Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
 	/ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
 	bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
 	R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <d8cb4e5b-9ba8-53d0-e269-b3cbf30e06a1@redhat.com>
-Date: Mon, 27 May 2019 14:14:50 +0200
+Message-ID: <66e86c16-c30c-5363-ef94-f01da8979872@redhat.com>
+Date: Mon, 27 May 2019 14:16:53 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <w51h89hjm3c.fsf@maestria.local.igalia.com>
+In-Reply-To: <w51ef4ljlt7.fsf@maestria.local.igalia.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="U9X08WqziKpEOAA0bCJdkGhWDsExXak2V"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+	boundary="nj27opFlFNssWMzl2GUdFsnRGYEUnwHbl"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.45]);
-	Mon, 27 May 2019 12:14:56 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.43]);
+	Mon, 27 May 2019 12:17:03 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
 X-Content-Filtered-By: Mailman/MimeDel 2.1.21
-Subject: Re: [Qemu-devel] [PATCH v14 0/1] qcow2: cluster space preallocation
+Subject: Re: [Qemu-devel] [RFC 1/3] block: Add ImageRotationalInfo
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -100,77 +99,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, qemu-devel@nongnu.org,
-	den@virtuozzo.com
+Cc: Kevin Wolf <kwolf@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>,
+	Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+	qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---U9X08WqziKpEOAA0bCJdkGhWDsExXak2V
+--nj27opFlFNssWMzl2GUdFsnRGYEUnwHbl
 From: Max Reitz <mreitz@redhat.com>
-To: Alberto Garcia <berto@igalia.com>,
- Anton Nefedov <anton.nefedov@virtuozzo.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, eblake@redhat.com,
- den@virtuozzo.com, vsementsov@virtuozzo.com
-Message-ID: <d8cb4e5b-9ba8-53d0-e269-b3cbf30e06a1@redhat.com>
-Subject: Re: [PATCH v14 0/1] qcow2: cluster space preallocation
-References: <20190516142749.81019-1-anton.nefedov@virtuozzo.com>
- <f2d129f6-b03f-aaa8-3e7d-fff48ea52233@redhat.com>
- <w51h89hjm3c.fsf@maestria.local.igalia.com>
-In-Reply-To: <w51h89hjm3c.fsf@maestria.local.igalia.com>
+To: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
+ Anton Nefedov <anton.nefedov@virtuozzo.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <66e86c16-c30c-5363-ef94-f01da8979872@redhat.com>
+Subject: Re: [RFC 1/3] block: Add ImageRotationalInfo
+References: <20190524172812.27308-1-mreitz@redhat.com>
+ <20190524172812.27308-2-mreitz@redhat.com>
+ <w51ef4ljlt7.fsf@maestria.local.igalia.com>
+In-Reply-To: <w51ef4ljlt7.fsf@maestria.local.igalia.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 26.05.19 17:01, Alberto Garcia wrote:
-> On Fri 24 May 2019 03:56:21 PM CEST, Max Reitz <mreitz@redhat.com> wrot=
+On 26.05.19 17:08, Alberto Garcia wrote:
+> On Fri 24 May 2019 07:28:10 PM CEST, Max Reitz <mreitz@redhat.com> wrot=
 e:
->>>     +-----------+-------+------+-------+------+------+
->>>     |   file    |    before    |     after    | gain |
->>>     +-----------+-------+------+-------+------+------+
->>>     |    ssd    |      61.153  |      36.313  |  41% |
->>>     |    hdd    |     112.676  |     122.056  |  -8% |
->>>     +-----------+--------------+--------------+------+
->>
->> I=E2=80=99ve done a few more tests, and I=E2=80=99ve seen more slowdow=
-n on an HDD.
->> (Like 30 % when doing 64 kB requests that are not aligned to
->> clusters.)  On the other hand, the SSD gain is generally in the same
->> ballpark (38 % when issuing the same kind of requests.)
->   [...]
->> [1] Hm.  We can probably investigate whether the file is stored on a
->> rotational medium or not.  Is there a fundamental reason why this
->> patch seems to degrade performance on an HDD but improves it on an
->> SSD?  If so, we can probably make a choice based on that.
+>> +##
+>> +# @ImageRotationalInfo:
+>> +#
+>> +# Indicates whether an image is stored on a rotating disk or not.
+>> +#
+>> +# @solid-state: Image is stored on a solid-state drive
+>> +#
+>> +# @rotating:    Image is stored on a rotating disk
 >=20
-> This is when writing to an unallocated cluster with no existing data on=
+> What happens when you cannot tell? You assume it's solid-state?
 
-> the backing image, right? Then it's probably because you need 2
-> operations (write zeros + write data) instead of just one.
+When *I* cannot tell?  This field is generally optional, so in that case
+it just will not be present.
 
-Hm, yes.  I didn=E2=80=99t test writing tail and head separately, which s=
-hould
-be even worse.
+(When Linux cannot tell?  I don=E2=80=99t know :-))
+
+Do you think there should be an explicit value for that?
 
 Max
 
 
---U9X08WqziKpEOAA0bCJdkGhWDsExXak2V
+--nj27opFlFNssWMzl2GUdFsnRGYEUnwHbl
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlzr1LoACgkQ9AfbAGHV
-z0AhAAf/S4l8hXoK5oh7x+/5sW568HKmdM3TD4OGw0XNQTsF6ZGGtWOZudSjbRg2
-6YgocB8f4uq7b/8upjTWD60xyEgYRFV81hfGaQiVOdMniIF4tqjGSK0kR0G93cQq
-4i80n2ck83qPZkOokwQCPoLsst/VJcWIU64tPpUXaxcglGn+/NCqhLXG6iyY1gxu
-MVj8rmF7vRv1euVlCqByhWFvKTjC93oQAexe2YLpP7aJA+Km43XouOi04knalNEL
-2eS9/idsYbND2/Mo+vQHAF0yJI3kZJU2xWkMBJczIvU11oYfR4eoA8g09exUFn1G
-sY2BBS5B6Utj7DBFKLhBtyHVkocQKA==
-=Re0c
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlzr1TUACgkQ9AfbAGHV
+z0BihAf/fSe3jj8ZONTQ6auFE9IoVNh/6fPue8JEHwD9yl+phkbDkSX49IDjZfPL
+ctItfBak8G1lNtjzq/3gv7A40WplLnq4awlAt/zTn39qHSoAidnB+8aA2Lib0tjy
+5ODGbxN+sKUm5rY/FipZK+yMgOZfQHPHI+6//4G2RRQAqpqJzfRiMwwDmVBuywwN
+zt77Met1OKQ8dosrYMPDHgBsYgrm8CGPCz0UYKJm0nmFY9vR2Hk4vipvdGzAdTHJ
+59lVd6TaEzc83DpeYVq95HdMoeESnfPcmC95Xzavq5IbKNB2w/Kxb+FaFggMZbH5
+HbahRbbAbi5L9Bi4g4aVwasDpKiT5A==
+=PVA5
 -----END PGP SIGNATURE-----
 
---U9X08WqziKpEOAA0bCJdkGhWDsExXak2V--
+--nj27opFlFNssWMzl2GUdFsnRGYEUnwHbl--
 
