@@ -6,77 +6,64 @@ X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F2A95C04AB3
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 May 2019 16:06:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF0E0C04AB3
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 May 2019 16:11:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C694D208CA
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 May 2019 16:06:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C694D208CA
+	by mail.kernel.org (Postfix) with ESMTPS id 906922081C
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 May 2019 16:11:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 906922081C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:47837 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:47898 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hVI8Y-0004jz-1w
-	for qemu-devel@archiver.kernel.org; Mon, 27 May 2019 12:06:10 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:60949)
+	id 1hVIDn-0005sM-Lc
+	for qemu-devel@archiver.kernel.org; Mon, 27 May 2019 12:11:35 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:33688)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hVI7g-0004Pw-Q8
-	for qemu-devel@nongnu.org; Mon, 27 May 2019 12:05:17 -0400
+	(envelope-from <pmathieu@redhat.com>) id 1hVICr-0005Sy-T7
+	for qemu-devel@nongnu.org; Mon, 27 May 2019 12:10:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hVI7f-0007oj-TM
-	for qemu-devel@nongnu.org; Mon, 27 May 2019 12:05:16 -0400
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:45234)
+	(envelope-from <pmathieu@redhat.com>) id 1hVICq-0003Vy-04
+	for qemu-devel@nongnu.org; Mon, 27 May 2019 12:10:37 -0400
+Received: from mail-ua1-f65.google.com ([209.85.222.65]:44422)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hVI7f-0007nC-N0
-	for qemu-devel@nongnu.org; Mon, 27 May 2019 12:05:15 -0400
-Received: by mail-wr1-f68.google.com with SMTP id b18so17303186wrq.12
-	for <qemu-devel@nongnu.org>; Mon, 27 May 2019 09:05:15 -0700 (PDT)
+	(Exim 4.71) (envelope-from <pmathieu@redhat.com>) id 1hVICm-0003AD-BX
+	for qemu-devel@nongnu.org; Mon, 27 May 2019 12:10:34 -0400
+Received: by mail-ua1-f65.google.com with SMTP id i48so5965444uae.11
+	for <qemu-devel@nongnu.org>; Mon, 27 May 2019 09:10:14 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:subject:from:to:cc:references:openpgp:message-id
-	:date:user-agent:mime-version:in-reply-to:content-language
-	:content-transfer-encoding;
-	bh=XJ3UGUdW1/zG6smsWMUd6Ta0pukHRlXN4ZIYUZpzSvQ=;
-	b=lctiemp+eRvHv9IZfoEeSujbrFpNdtXOMnC1b5DXlpzKDhtfBT8MJ2TT6e/tySobQw
-	o8xp4GugIJJEidfOcVsSJybKkd2hKsL7+ZQBhUxh3esHjbmDBf+wXb04bj0VC0ZXQNoI
-	S5k+OC2TmLlsGMG4ggsAJW4tQDPhBY4dbmrsR1803LLTw3aWNvLUMFIpUySuCbvYtgFn
-	Tv+poh6XXDLLfdkD+wLkcR3ppKpFComFrokgTrw022dsB/WDJPm+RnO3HwuAykL+wSn2
-	+MCox+tpthrd/eF1b2diqUZIN31LJnb8qDqHvmTCpuJO9vQplYYqDtJvj+8PEsCpEibJ
-	XXLw==
-X-Gm-Message-State: APjAAAX/RwxSKsGeF5YKxq5JOQxtcgdT5zhC6BnLm9vzYRySGUXowwgJ
-	MNhdmuVztVKSplcTGQWAOcbBWQ==
-X-Google-Smtp-Source: APXvYqxaXP6wCHvVnWv+ucFItgzO50A3oP29mswJ2F1KrzAhveQAFrZ6A7MOQpSsGX/5lue0mvPlIw==
-X-Received: by 2002:adf:c188:: with SMTP id x8mr11992474wre.256.1558973114724; 
-	Mon, 27 May 2019 09:05:14 -0700 (PDT)
-Received: from [192.168.1.43] (228.red-83-52-173.dynamicip.rima-tde.net.
-	[83.52.173.228]) by smtp.gmail.com with ESMTPSA id
-	s127sm11365705wmf.48.2019.05.27.09.05.13
-	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-	Mon, 27 May 2019 09:05:13 -0700 (PDT)
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-To: qemu-devel@nongnu.org
-References: <20190316234456.18140-1-philmd@redhat.com>
-	<97745dfa-ceaf-6572-59ba-a37e8f3c1e89@redhat.com>
-	<097f4f90-b190-93d3-5c72-756fb29f7cc3@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
-	url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <8e8abf8a-ba65-c03f-54e3-865f2919c4bd@redhat.com>
-Date: Mon, 27 May 2019 18:05:13 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+	:message-id:subject:to:cc:content-transfer-encoding;
+	bh=PteWuLIiN/BbO0o4DPcsCRTpEC8VUErV1fB0MXQtoKM=;
+	b=U7+1Dfm7vfWd/W5nVto4tsJUuYIgQX2CyC8XIRUhUupJr9c2QkytEvQN2zSc4stO6x
+	3sbBLNJHACKAKITQPtjarTG7qzvywfcngqTvfy6l7HpNPVATg9yMxDhXt0PL3Fj3CBzo
+	aGc+QYQu6XFi1J94PXX7JCv+Lcetcv8Z6fm7jJYHjbDSxoTG7n9+0W/YUaG/b5U6RTQT
+	crjYXgNVh/LDOLqKn5OrdSMAGic4sUuV38bMvpUQpGweOvUBqXvI6TCUlJL6AVkiwc8R
+	L728r6j77ZbO2+WKQcquO9VGOC/5y+Fe5q+r+QMnXr4b8ClsX5MdR7s9oXck+38fuOhB
+	CBFQ==
+X-Gm-Message-State: APjAAAVDKo+pajdZBa2qKO12GOmc14gqWlJfHHCfBV+GBfyp/NfFKZU/
+	fWtPDnToD3fowayB0ox7RGkk3Si2UK9JxvBRa3WoMw==
+X-Google-Smtp-Source: APXvYqzHtw/QIPsXNR5JOaCOuhe0S0l7f+a/yCjOT8TdKWvYQ5OBu3n3kel2LnaifJ8iqEdy+XvRK/UCdVwXogDzwBY=
+X-Received: by 2002:a9f:3241:: with SMTP id y1mr55975uad.107.1558973413782;
+	Mon, 27 May 2019 09:10:13 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <097f4f90-b190-93d3-5c72-756fb29f7cc3@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+References: <20190427141459.19728-1-philmd@redhat.com>
+	<dadba93d-fdf3-25b8-b3e2-5b43a4618292@redhat.com>
+In-Reply-To: <dadba93d-fdf3-25b8-b3e2-5b43a4618292@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Date: Mon, 27 May 2019 18:10:02 +0200
+Message-ID: <CAP+75-UKFxtHrfzAF4G=YD6XDGcDVyvTeHdzYTvOD4vecT0feA@mail.gmail.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 	[fuzzy]
-X-Received-From: 209.85.221.68
-Subject: Re: [Qemu-devel] [PATCH for-4.1 0/2] hw/alpha: Add the CY82C693UB
- southbridge in Kconfig
+X-Received-From: 209.85.222.65
+Subject: Re: [Qemu-devel] [PATCH 0/3] hw/microblaze: Kconfig cleanup
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -88,26 +75,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>,
-	Richard Henderson <rth@twiddle.net>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
+	Alistair Francis <alistair@alistair23.me>,
+	QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>,
+	"Edgar E. Iglesias" <edgar.iglesias@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/8/19 10:16 PM, Philippe Mathieu-Daudé wrote:
-> Paolo, Thomas,
-> 
-> On 4/29/19 1:29 PM, Philippe Mathieu-Daudé wrote:
->> CC'ing Thomas who is a Kconfig expert.
->>
->> On 3/17/19 12:44 AM, Philippe Mathieu-Daudé wrote:
->>> Explicit the CY82C693UB southbridge used by the 264DP.
->>>
->>> Philippe Mathieu-Daudé (2):
->>>   hw/isa/southbridge: Add the Cypress 82C693UB chipset
->>>   hw/alpha/Kconfig: The 264DP machine use a CY82C693UB southbridge
-> 
-> This series does not fix anything, but makes the kconfig graph cleaner.
+Hi Paolo,
 
-Ping?
+On Tue, Apr 30, 2019 at 9:55 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> On 27/04/19 16:14, Philippe Mathieu-Daud=C3=A9 wrote:
+> > Hi Edgar, Peter,
+> >
+> > Few fixes while cleaning Kconfig, trying to optimize builds.
+> >
+> > Regards,
+> >
+> > Phil.
+> >
+> > Philippe Mathieu-Daud=C3=A9 (3):
+> >   hw/Kconfig: Move the generic XLNX_ZYNQMP to the root hw/Kconfig
+> >   hw/intc: Only build the xlnx-iomod-intc device for the MicroBlaze PMU
+> >   hw/dma: Do not build the xlnx_dpdma device for the MicroBlaze machine=
+s
+> >
+> >  hw/Kconfig            | 3 +++
+> >  hw/dma/Makefile.objs  | 1 -
+> >  hw/intc/Makefile.objs | 2 +-
+> >  hw/timer/Kconfig      | 3 ---
+> >  4 files changed, 4 insertions(+), 5 deletions(-)
+> >
+>
+> Queued, thanks.
+
+I don't see these patches in your queue merged on "Fri 17 May", are
+you planning to include them in your next batch?
+
+Thanks,
+
+Phil.
 
