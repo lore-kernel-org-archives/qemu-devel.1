@@ -2,98 +2,70 @@ Return-Path: <SRS0=zt/K=T3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 65BC1C04AB3
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 May 2019 13:52:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 93360C04AB3
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 May 2019 13:53:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2CC7F20675
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 May 2019 13:52:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2CC7F20675
+	by mail.kernel.org (Postfix) with ESMTPS id 6059F20883
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 May 2019 13:53:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6059F20883
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:46268 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:46288 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hVG33-0004SI-60
-	for qemu-devel@archiver.kernel.org; Mon, 27 May 2019 09:52:21 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:38807)
+	id 1hVG4U-0005Mc-IT
+	for qemu-devel@archiver.kernel.org; Mon, 27 May 2019 09:53:50 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:39075)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hVG2B-00048z-KJ
-	for qemu-devel@nongnu.org; Mon, 27 May 2019 09:51:28 -0400
+	(envelope-from <lvivier@redhat.com>) id 1hVG3L-0004hv-M0
+	for qemu-devel@nongnu.org; Mon, 27 May 2019 09:52:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hVG29-0002jR-NG
-	for qemu-devel@nongnu.org; Mon, 27 May 2019 09:51:27 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46126)
+	(envelope-from <lvivier@redhat.com>) id 1hVG3K-0003T3-9Y
+	for qemu-devel@nongnu.org; Mon, 27 May 2019 09:52:39 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:29242)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mreitz@redhat.com>)
-	id 1hVG26-0002gA-Ra; Mon, 27 May 2019 09:51:23 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
+	(Exim 4.71) (envelope-from <lvivier@redhat.com>)
+	id 1hVG3G-0003Mv-Sh; Mon, 27 May 2019 09:52:35 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 1705E308FF2C;
-	Mon, 27 May 2019 13:51:18 +0000 (UTC)
-Received: from dresden.str.redhat.com (unknown [10.40.205.13])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 4AEB07BE99;
-	Mon, 27 May 2019 13:51:16 +0000 (UTC)
-To: Anton Nefedov <anton.nefedov@virtuozzo.com>,
-	Alberto Garcia <berto@igalia.com>,
-	"qemu-block@nongnu.org" <qemu-block@nongnu.org>
-References: <20190524172812.27308-1-mreitz@redhat.com>
-	<20190524172812.27308-2-mreitz@redhat.com>
-	<w51ef4ljlt7.fsf@maestria.local.igalia.com>
-	<66e86c16-c30c-5363-ef94-f01da8979872@redhat.com>
-	<w515zpwrs30.fsf@maestria.local.igalia.com>
-	<92b7c22d-06bb-f04a-0df1-7340c11be954@redhat.com>
-	<80167166-a23a-6f10-c28b-a3a905f7ca6e@virtuozzo.com>
-From: Max Reitz <mreitz@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
-	mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
-	/PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
-	U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
-	mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
-	awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
-	AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
-	CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
-	B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
-	2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
-	AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
-	8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
-	4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
-	BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
-	xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
-	W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
-	DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
-	64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
-	ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
-	sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
-	alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
-	/ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
-	bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
-	R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <6df6e5e7-2d42-2e71-b887-56c091413232@redhat.com>
-Date: Mon, 27 May 2019 15:51:14 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	by mx1.redhat.com (Postfix) with ESMTPS id E7A143087935;
+	Mon, 27 May 2019 13:52:33 +0000 (UTC)
+Received: from [10.40.204.169] (ovpn-204-169.brq.redhat.com [10.40.204.169])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id D9DE15D704;
+	Mon, 27 May 2019 13:52:31 +0000 (UTC)
+To: Igor Mammedov <imammedo@redhat.com>
+References: <20190524103521.13847-1-lvivier@redhat.com>
+	<20190524161045.314fa2de@redhat.com>
+	<c1c017f2-84ed-bddf-abb9-7154d9edb372@redhat.com>
+	<20190524201432.GP10764@habkost.net>
+	<a3f324cc-8226-57e9-2bf3-347d84cf189a@redhat.com>
+	<20190527145052.258825fb@redhat.com>
+From: Laurent Vivier <lvivier@redhat.com>
+Message-ID: <b3d08eb9-4727-ce2a-bc8e-57b7760b23f4@redhat.com>
+Date: Mon, 27 May 2019 15:52:30 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+	Thunderbird/52.8.0
 MIME-Version: 1.0
-In-Reply-To: <80167166-a23a-6f10-c28b-a3a905f7ca6e@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="zhvKhCwMelUKxxyP4fkwz5GcmAis1ME3O"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+In-Reply-To: <20190527145052.258825fb@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.49]);
-	Mon, 27 May 2019 13:51:21 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.45]);
+	Mon, 27 May 2019 13:52:34 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-X-Content-Filtered-By: Mailman/MimeDel 2.1.21
-Subject: Re: [Qemu-devel] [RFC 1/3] block: Add ImageRotationalInfo
+Subject: Re: [Qemu-devel] [PATCH v3] numa: improve cpu hotplug error message
+ with a wrong node-id
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -105,141 +77,172 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
-	Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
-	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+	Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org,
+	qemu-arm@nongnu.org, qemu-ppc@nongnu.org,
+	David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---zhvKhCwMelUKxxyP4fkwz5GcmAis1ME3O
-From: Max Reitz <mreitz@redhat.com>
-To: Anton Nefedov <anton.nefedov@virtuozzo.com>,
- Alberto Garcia <berto@igalia.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Kevin Wolf <kwolf@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <6df6e5e7-2d42-2e71-b887-56c091413232@redhat.com>
-Subject: Re: [RFC 1/3] block: Add ImageRotationalInfo
-References: <20190524172812.27308-1-mreitz@redhat.com>
- <20190524172812.27308-2-mreitz@redhat.com>
- <w51ef4ljlt7.fsf@maestria.local.igalia.com>
- <66e86c16-c30c-5363-ef94-f01da8979872@redhat.com>
- <w515zpwrs30.fsf@maestria.local.igalia.com>
- <92b7c22d-06bb-f04a-0df1-7340c11be954@redhat.com>
- <80167166-a23a-6f10-c28b-a3a905f7ca6e@virtuozzo.com>
-In-Reply-To: <80167166-a23a-6f10-c28b-a3a905f7ca6e@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 27.05.19 15:44, Anton Nefedov wrote:
-> On 27/5/2019 3:57 PM, Max Reitz wrote:
->> On 27.05.19 14:37, Alberto Garcia wrote:
->>> On Mon 27 May 2019 02:16:53 PM CEST, Max Reitz wrote:
->>>> On 26.05.19 17:08, Alberto Garcia wrote:
->>>>> On Fri 24 May 2019 07:28:10 PM CEST, Max Reitz <mreitz@redhat.com> =
-wrote:
->>>>>> +##
->>>>>> +# @ImageRotationalInfo:
->>>>>> +#
->>>>>> +# Indicates whether an image is stored on a rotating disk or not.=
-
->>>>>> +#
->>>>>> +# @solid-state: Image is stored on a solid-state drive
->>>>>> +#
->>>>>> +# @rotating:    Image is stored on a rotating disk
+On 27/05/2019 14:50, Igor Mammedov wrote:
+> On Mon, 27 May 2019 08:55:49 +0200
+> Laurent Vivier <lvivier@redhat.com> wrote:
+> 
+>> On 24/05/2019 22:14, Eduardo Habkost wrote:
+>>> On Fri, May 24, 2019 at 04:39:12PM +0200, Laurent Vivier wrote:
+>>>> On 24/05/2019 16:10, Igor Mammedov wrote:
+>>>>> On Fri, 24 May 2019 12:35:21 +0200
+>>>>> Laurent Vivier <lvivier@redhat.com> wrote:
+>>>>>   
+>>>>>> On pseries, core-ids are strongly binded to a node-id by the command
+>>>>>> line option. If an user tries to add a CPU to the wrong node, he has
+>>>>>> an error but it is not really helpful:
+>>>>>>
+>>>>>>      qemu-system-ppc64 ... -smp 1,maxcpus=64,cores=1,threads=1,sockets=1 \
+>>>>>>                            -numa node,nodeid=0 -numa node,nodeid=1 ...
+>>>>>>
+>>>>>>      (qemu) device_add power9_v2.0-spapr-cpu-core,core-id=30,node-id=1
+>>>>>>      Error: node-id=1 must match numa node specified with -numa option
+>>>>>>
+>>>>>> This patch improves this error message by giving to the user the good
+>>>>>> topology information (node-id, socket-id and thread-id if they are
+>>>>>> available) to use with the core-id he's providing:
+>>>>>>
+>>>>>>      Error: node-id=1 must match numa node specified with -numa option 'node-id 0'
+>>>>>>
+>>>>>> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
+>>>>>> ---
+>>>>>>
+>>>>>> Notes:
+>>>>>>        v3: only add the topology to the existing message
+>>>>>>            As suggested by Igor replace
+>>>>>>              Error: core-id 30 can only be plugged into node-id 0
+>>>>>>            by
+>>>>>>              Error: node-id=1 must match numa node specified with -numa option 'node-id 0'
+>>>>>>        v2: display full topology in the error message
+>>>>>>>>>     numa.c | 25 ++++++++++++++++++++++++-
+>>>>>>     1 file changed, 24 insertions(+), 1 deletion(-)
+>>>>>>
+>>>>>> diff --git a/numa.c b/numa.c
+>>>>>> index 3875e1efda3a..7882ec294be4 100644
+>>>>>> --- a/numa.c
+>>>>>> +++ b/numa.c
+>>>>>> @@ -458,6 +458,27 @@ void qmp_set_numa_node(NumaOptions *cmd, Error **errp)
+>>>>>>         set_numa_options(MACHINE(qdev_get_machine()), cmd, errp);
+>>>>>>     }
+>>>>>> +static char *cpu_topology_to_string(const CPUArchId *cpu)
+>>>>>> +{
+>>>>>> +    GString *s = g_string_new(NULL);
+>>>>>> +    if (cpu->props.has_socket_id) {
+>>>>>> +        g_string_append_printf(s, "socket-id %"PRId64, cpu->props.socket_id);
+>>>>>> +    }
+>>>>>> +    if (cpu->props.has_node_id) {
+>>>>>> +        if (s->len) {
+>>>>>> +            g_string_append_printf(s, ", ");
+>>>>>> +        }
+>>>>>> +        g_string_append_printf(s, "node-id %"PRId64, cpu->props.node_id);
+>>>>>> +    }
+>>>>>> +    if (cpu->props.has_thread_id) {
+>>>>>> +        if (s->len) {
+>>>>>> +            g_string_append_printf(s, ", ");
+>>>>>> +        }
+>>>>>> +        g_string_append_printf(s, "thread-id %"PRId64, cpu->props.thread_id);
+>>>>>> +    }
+>>>>>> +    return g_string_free(s, false);
+>>>>>> +}
 >>>>>
->>>>> What happens when you cannot tell? You assume it's solid-state?
+>>>>> turns out we already have such helper: cpu_slot_to_string()
 >>>>
->>>> When *I* cannot tell?  This field is generally optional, so in that =
-case
->>>> it just will not be present.
->>>>
->>>> (When Linux cannot tell?  I don=E2=80=99t know :-))
->>>>
->=20
-> Linux defaults to rotational =3D=3D 1 unless the driver sets
-> QUEUE_FLAG_NONROT.
->=20
-> By the way as far as I can tell, qemu does not report this flag unless
-> explicitly set in a device property.
->=20
->      DEFINE_PROP_UINT16("rotation_rate", IDEDrive, dev.rotation_rate, 0=
-),
-> and
->      DEFINE_PROP_UINT16("rotation_rate", SCSIDiskState, rotation_rate, =
-0),
->=20
->>>> Do you think there should be an explicit value for that?
+>>>> It doesn't display the node-id but the core-id. And node-id is what we need
+>>>> to know.
 >>>
->>> I'll try to rephrase:
+>>> I'm confused about what you are trying to do here.
 >>>
->>> we have a new optimization that improves performance on SSDs but redu=
-ces
->>> performance on HDDs, so this series would detect where an image is
->>> stored in order to enable the faster code path for each case.
+>>> On v1, the message looked like:
+>>>     Error: core-id 30 can only be plugged into node-id 0
 >>>
->>> What happens if QEMU cannot detect if we have a solid drive or a
->>> rotational drive? (e.g. a remote storage backend). Will it default to=
-
->>> enabling preallocation using write_zeroes()?
+>>> which is probably good for spapr.
+>>>
+>>>
+>>> Then I suggested you added the other cpu->props fields.  e.g. on
+>>> PC the message would look like:
+>>>     Error: socket-id 20, core-id 30, thread-id 40 can only be plugged into node-id 0
+>>>
+>>>
+>>> But you sent a v2 patch that would print this on PC:
+>>>     Error: core-id 30 can only be plugged into socket-id 20, node-id 0, thread-id 40
+>>>
+>>> which doesn't make sense to me.
+>>>
+>>>
+>>> Then in a reply to v2, Igor suggested:
+>>>
+>>>    error_setg(errp, "node-id=%d must match numa node specified "
+>>>                      "with -numa option '%s'", node_id, topology);
+>>>
+>>>
+>>> Igor suggest would address the problem above.  I expected it to become:
+>>>     node-id=0 must match numa node specified with -numa option core-id=30
+>>> and on PC:
+>>>     node-id=0 must match numa node specified with -numa option socket-id=20,core-id=30,thread-id=40
+>>>
+>>> Or maybe it could include the input node-id too:
+>>>     node-id=0 must match numa node specified with -numa option node-id=1,core-id=30
+>>> and on PC:
+>>>     node-id=0 must match numa node specified with -numa option node-id=1,socket-id=20,core-id=30,thread-id=40
+>>>
+>>> Both options would work.
+>>>
+>>>
+>>> But you implemented code that would print:
+>>>     Error: node-id=0 must match numa node specified with -numa option 'node-id 1'
+>>> and on PC it would print:
+>>>     Error: node-id=0 must match numa node specified with -numa option 'socket-id 20 node-id 1 thread-id=40'
+>>>
+>>> which doesn't make sense to me.
+>>>
+>>>
+>>> I was expecting something like:
+>>>     Error: CPU slot core-id=30 is bound to node-id 0, but node-id 1 was specified
+>>> and on PC:
+>>>     Error: CPU slot socket-id=20,core-id=30,thread-id=40 is bound to node-id 0, but node-id 1 was specified
+>>>
+>>>    
 >>
->> In this series, yes.  That is the default I chose.
+>> The idea is to provide the information to the user to help him to know
+>> where the cpu can be plugged when it cannot on the node-id he originally
+>> provided.
 >>
->> We have to make a separate decision for each case.  In the case of
->> filling newly allocated areas with zeroes, I think the performance gai=
-n
->> for SSDs is more important than the performance loss for HDDs.  That i=
-s
->> what I wrote in my response to Anton=E2=80=99s series.  So I took the =
-series
->> even without it being able to distinguish both cases at all.
->> Consequentially, I believe it is reasonable for that to be the default=
-
->> behavior if we cannot tell.
+>> So all the solutions you propose sounds good to me.
 >>
->> I think in general optimizing for SSDs should probably be the default.=
+>> I only need you and Igor agree on the same one.
+> 
+> We with Eduardo basically agree on contents/set of properties to print,
+> it is only different phrasing (Eduardo's suggestion is better than what we have now).
+> But lets get to what problem you are going to fix/improve. SO I've went ahead and tried
+> with following CLI:
+> 
+>     qemu-system-x86_64 -smp 1,maxcpus=4 -numa node,cpus=0-1 -numa node,cpus=2-3 -monitor stdio -device qemu64-x86_64-cpu,socket-id=1,core-id=0,thread-id=0,node-id=1
+> 
+> end it errored out with:
+> 
+>    qemu-system-x86_64: -device qemu64-x86_64-cpu,socket-id=1,core-id=0,thread-id=0,node-id=1: node-id=1 must match numa node specified with -numa option
+> 
+> As you see we already have all user provide properties for cpu (including invalid ones) reported,
+> what we are missing is suggestion for valid node-id. How about following error message:
+> 
+> qemu-system-x86_64: -device qemu64-x86_64-cpu,socket-id=1,core-id=0,thread-id=0,node-id=1: invalid node-id, must be 0
 
->> HDDs are slow anyway, so whoever uses them probably doesn=E2=80=99t ca=
-re about
->> performance too much anyway...?  Whereas people using SSDs probably do=
-=2E
->>   But as I said, we can and should always make a separate decision for=
+The case I'm worrying about is when the cpu is hotplugged: we don't have the "-device ..." information.
 
->> each case.
->>
->=20
-> Overall it looks good to me but I wonder how do we ensure both variants=
+  $ qemu-system-ppc64 -nodefaults -nographic -monitor stdio -m 1G -smp 1,maxcpus=64,cores=1,threads=1,sockets=1 -numa node,nodeid=0 -numa node,nodeid=1
+  QEMU 3.0.1 monitor - type 'help' for more information
+  (qemu) device_add power8_v2.0-spapr-cpu-core,core-id=30,node-id=1
+  node-id=1 must match numa node specified with -numa option
 
-> are test covered? Need a blockdev option to enforce the mode?
+So you can see the needed information is missing.
 
-That=E2=80=99s a good point.  Yes, file-posix should probably take an opt=
-ion to
-override the mode.  Actually, that may be a useful option in general (if
-the file is on some file system where we cannot query this information
-(like glusterfs), the user may want to manually provide it).
-
-Max
-
-
---zhvKhCwMelUKxxyP4fkwz5GcmAis1ME3O
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlzr61IACgkQ9AfbAGHV
-z0DCoAgAqMo7Df0ZNXKQZTpMbO1PeOj7+kKPmX8i/6QKZEXzPZ3uE9UKwjwLVdnI
-4Ospo/nWvLnVwW6a+4d3DanzpvsQY6j7lTW3oBd4PpwMBTLnnv2Ptoh0Pl6t/EI1
-mDpE78QxSwJw//d6XOPZWcOj4i8zDbEK1OJhxYqkyAtKbgATfXIz9zjZ/Z8avJkY
-qyu38yUNw185z18qPT1ZFajOW2XpGLn+NfxWg6HiXOt3kuNcH0l3kcEjOPKSbDJ8
-UaWTrzZOxsDHOXIYClGBwy9j9hw7EIf3FGcBD27/PIGPt/slxF9tSSSQXZUnicJA
-FGskyZoaVyklPXrtCNwcoOShwNan+A==
-=ezG2
------END PGP SIGNATURE-----
-
---zhvKhCwMelUKxxyP4fkwz5GcmAis1ME3O--
+Thanks,
+Laurent
 
