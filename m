@@ -2,73 +2,91 @@ Return-Path: <SRS0=zt/K=T3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 99FF8C07542
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 May 2019 08:35:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 02A4BC07542
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 May 2019 08:37:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5A36121734
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 May 2019 08:35:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5A36121734
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id A8A9820815
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 May 2019 08:37:58 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="oIe7W06u"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A8A9820815
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:42025 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:42064 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hVB6E-0006LM-FP
-	for qemu-devel@archiver.kernel.org; Mon, 27 May 2019 04:35:18 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:58827)
+	id 1hVB8n-0007Kj-UI
+	for qemu-devel@archiver.kernel.org; Mon, 27 May 2019 04:37:57 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:59517)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hVB4F-0005G6-DZ
-	for qemu-devel@nongnu.org; Mon, 27 May 2019 04:33:16 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1hVB80-0006yk-KY
+	for qemu-devel@nongnu.org; Mon, 27 May 2019 04:37:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hVB4D-0006o5-NZ
-	for qemu-devel@nongnu.org; Mon, 27 May 2019 04:33:15 -0400
-Received: from mout.kundenserver.de ([217.72.192.73]:44035)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1hVB4D-0006n6-Fz
-	for qemu-devel@nongnu.org; Mon, 27 May 2019 04:33:13 -0400
-Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
-	(mreue106 [213.165.67.119]) with ESMTPSA (Nemesis) id
-	1MIxmm-1hAuNm42Yc-00KPfh; Mon, 27 May 2019 10:32:41 +0200
-To: Lucien Anti-Spam <lucienmp_antispam@yahoo.com>, qemu-devel@nongnu.org
-References: <20190526072826.32956-1-lucienmp_antispam@yahoo.com>
-	<b7c64daf-5036-b492-92a5-b25524d8cbde@vivier.eu>
-	<652107096.7996190.1558928620614@mail.yahoo.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <ce0a8f20-b569-391c-6e72-25e41001876e@vivier.eu>
-Date: Mon, 27 May 2019 10:32:38 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
-	Thunderbird/52.8.0
+	(envelope-from <alex.bennee@linaro.org>) id 1hVB7z-0001LC-HS
+	for qemu-devel@nongnu.org; Mon, 27 May 2019 04:37:08 -0400
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:51309)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1hVB7z-0001KU-2u
+	for qemu-devel@nongnu.org; Mon, 27 May 2019 04:37:07 -0400
+Received: by mail-wm1-x343.google.com with SMTP id f10so7816340wmb.1
+	for <qemu-devel@nongnu.org>; Mon, 27 May 2019 01:37:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=references:user-agent:from:to:cc:subject:in-reply-to:date
+	:message-id:mime-version:content-transfer-encoding;
+	bh=fxA0mrc3dKy+GshdWHQku7yrWCCaqs0h67lnbLZuxMc=;
+	b=oIe7W06u8IuxWL0qH5JKltmcaVu0AJm0u9cQn5VEVf7WyyHA1KJAl71HxmBGqILCnT
+	+1Hxzu4MgY1laOOspPD7cLjKgOAfHjqOBfKZF/TdDp2HoX9lBMYESaVX5eBBnCvNcw+8
+	dSzm1QZiHfcFfGzp0W2Dg8Ggj7hcHhLgWkThY/8JBcgWIQ46l9sB0cmAptIlzdH0HZSu
+	kZnyWKEedCkt355KESxSgL4lElYMS/Tf5A0+5U+hMSh2vG97dVXDnUmUvFyIFbSlCGi5
+	5ZX4oJX3H1L+f9fjezqQsvnUcFwsJIcJndI/C8qkWc7xJ0tngeUSNRlN+xPPngsUqoEn
+	cQSA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:references:user-agent:from:to:cc:subject
+	:in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+	bh=fxA0mrc3dKy+GshdWHQku7yrWCCaqs0h67lnbLZuxMc=;
+	b=DRa9TI3Bf4KI/dZCttRulxRzXx0Dj5S6NmbOlSLdvPhyMRT9C7XQMVCJMwgExpmTW2
+	/+rGukcCqVf86Y7HoB4JjL+aSZrpN4H/UgOQaoI5WyRD79U6e/K+K2bJSJw6+36yZ4s6
+	l3GhJshamLVh37QhkM8LbfE5bnUjSlwAsPfLBbt1VWMRyiatlIU9K98DsGFoiiaGNgP2
+	+f7UMck2uLkG5edJulZBXgZaDc+dbor9Aa0EaqrUXr6mZmviGbGB1GXplY2mv1aYw3qB
+	GEl8zUkuSyFFIJ0pdsz7o2/ywmaQWOYg30KwDMm63BBo6wZt6ap3zoJAw0wm2NhWb/cQ
+	azmg==
+X-Gm-Message-State: APjAAAWD5Fu2aZafPiFm3CEqtuqEYNjWJ3T7gTnsw86+GPKfT2FoRu9X
+	PxOf+YGXVFmjJ+J3GlCKJqBeaQ==
+X-Google-Smtp-Source: APXvYqz4dkib/MuKemo/vruRhDhyrLxcVVqzLrzxITuzCSUwARMaPUOu/xWNaPIgvkGhDGlvQWJbPA==
+X-Received: by 2002:a1c:f111:: with SMTP id p17mr25189032wmh.62.1558946225471; 
+	Mon, 27 May 2019 01:37:05 -0700 (PDT)
+Received: from zen.linaroharston ([81.128.185.34])
+	by smtp.gmail.com with ESMTPSA id
+	o6sm29223346wrh.55.2019.05.27.01.37.04
+	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+	Mon, 27 May 2019 01:37:04 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+	by zen.linaroharston (Postfix) with ESMTP id 9CA481FF87;
+	Mon, 27 May 2019 09:37:03 +0100 (BST)
+References: <20190524160118.31134-1-arilou@gmail.com>
+	<20190524160118.31134-3-arilou@gmail.com>
+User-agent: mu4e 1.3.2; emacs 26.1
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Jon Doron <arilou@gmail.com>
+In-reply-to: <20190524160118.31134-3-arilou@gmail.com>
+Date: Mon, 27 May 2019 09:37:03 +0100
+Message-ID: <87o93oqonk.fsf@zen.linaroharston>
 MIME-Version: 1.0
-In-Reply-To: <652107096.7996190.1558928620614@mail.yahoo.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:3UsKXx0gw72KteUZhW20ffd4I1As0sAjV/+WIMdkcdsszbyTL5Q
-	nlUd+7g9oKSAeDcxhVuz5IeMuURK5l7pqEX4Yv1D4gYSOtfUKWB4m5WhADSa38klgFC4VzT
-	x48tYqGf9ZuDNM6R6rFzCbZWDp613ZL3vjBgU+OFGuyhJNP7kfgVxDznPjKKerLhTvBf21N
-	y5Ku7IYOGGJubvUW8QFzA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:Prq6WVBpOEI=:VR1UP/zs2syJUAzgksMBZX
-	rEIGOUDC5xT1G/F82BFEG/if/FJ6ssvZoYKtu5Q/V+yJjCfoXxpei5xOzbn5fouNYoB/jSA8z
-	3QDdETp94//AXrlCne+KsNh5N7UESLXs5fNukfFKpS9PbQ7wFbY0fnGJVHhQShI7DltTJ0PIn
-	wM0/d8+5dTA/4KQsIFQK9/VJ0/aAT1lE0dcilnj08jfY31ur5NPgqBslNZXPFw1qpsZAOY0Yd
-	YqaOorLSCT5ZljMVpx/pDMVHuzqe/M1n3VMDSk5l+qu6RSjbUiAkTS7iAWPwH7Yi62Y/lmsXJ
-	6GmbRlylG4m9eiootvOR1u5By7MB9yYNkuth30Ne8puvMZE77lvlpfajNAt8t33fnS0vcoTzy
-	G48qyZBbB//ookYreirUWcDnrFfrUaJjVi/BU+mtheLwWDfL63FJL9iOc51yuHhMEyqtQnG3h
-	ZkcgK0oqxTkFiE2IXroRVPQcT43LPyCSnvLSwU0+NBty/SVhUNgteqUMMk+oB4fdMDy2KELMg
-	Fyx4y153qYjPBODg0DX29a4l2Bwz/w6YN3Mk4K6dZE2WpVGlsr/DGNgUltnkRsFDo1PGyElSn
-	NjXS+CNVP7ExgkpFGI1vXtM80OJNWBfgHilD7bu8qly9vtRAs9bt5Xr9WyHqSGS68mnloindx
-	tRRi7/at1Ih8jZAiTgJuHcA/cU+d1onDP5k8X8RcduaHSLVu49TEH4rZ/Hmbg9H4b9ihFbO9u
-	fyGp95Ec79CBWdJSbtsYUsoob7gvCDsQw7/riEqluF0aGJH0IErvScbeEpY=
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 217.72.192.73
-Subject: Re: [Qemu-devel] [PATCH] Incorrect Stack Pointer shadow register
- support on some m68k CPUs
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2a00:1450:4864:20::343
+Subject: Re: [Qemu-devel] [PATCH v11 02/20] gdbstub: Implement deatch (D
+ pkt) with new infra
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -80,40 +98,162 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <huth@tuxfamily.org>,
-	Richard Henderson <richard.henderson@linaro.org>,
-	"Emilio G . Cota" <cota@braap.org>,
-	=?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
-	Luc Michel <luc.michel@greensocs.com>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 27/05/2019 05:43, Lucien Anti-Spam wrote:
-> 
->  > On Sunday, May 26, 2019, 10:10:39 PM GMT+9, Laurent Vivier 
-> <laurent@vivier.eu> wrote:
->  > On 26/05/2019 09:28, Lucien Murray-Pitts wrote:
->  >> On CPU32 and the early 68000 and 68010 the ISP doesnt exist.
->  >> These CPUs only have SSP/USP.
->  >>
-> [SNIP]
->  >> The movec instruction when accessing these shadow registers
->  >> in some configurations should issue a TRAP.  This patch does not
->  >> add this funcitonality to the helpers.
->  >>
-> 
->  >I think it's better to also update movec in the same patch.
-> [LMP] Movec should be undefined (coldfire manual) for registers it 
-> doesnt know.  The MC680X0 manual is less clear.
-> Technically this could be just leaving the operation of the instruction 
-> alone and allowing it to pass back MSP/ISP/USP as it currently does.  My 
-> thinking is this is less likely to break anything
 
-In fact, code in m68k_movec_from()/m68k_movec_to() need rework because 
-they trigger a cpu_abort() with unknown code, they need rework too. So I 
-think we can just do as you propose for the moment.
+Jon Doron <arilou@gmail.com> writes:
 
-Thanks,
-Laurent
+> Signed-off-by: Jon Doron <arilou@gmail.com>
+
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+
+> ---
+>  gdbstub.c | 93 +++++++++++++++++++++++++++++++------------------------
+>  1 file changed, 53 insertions(+), 40 deletions(-)
+>
+> diff --git a/gdbstub.c b/gdbstub.c
+> index e6d895177b..307366b250 100644
+> --- a/gdbstub.c
+> +++ b/gdbstub.c
+> @@ -1413,11 +1413,6 @@ static inline int startswith(const char *string, c=
+onst char *pattern)
+>    return !strncmp(string, pattern, strlen(pattern));
+>  }
+>
+> -static int process_string_cmd(
+> -        GDBState *s, void *user_ctx, const char *data,
+> -        const GdbCmdParseEntry *cmds, int num_cmds)
+> -        __attribute__((unused));
+> -
+>  static int process_string_cmd(GDBState *s, void *user_ctx, const char *d=
+ata,
+>                                const GdbCmdParseEntry *cmds, int num_cmds)
+>  {
+> @@ -1463,6 +1458,41 @@ static int process_string_cmd(GDBState *s, void *u=
+ser_ctx, const char *data,
+>      return -1;
+>  }
+>
+> +static void handle_detach(GdbCmdContext *gdb_ctx, void *user_ctx)
+> +{
+> +    GDBProcess *process;
+> +    GDBState *s =3D gdb_ctx->s;
+> +    uint32_t pid =3D 1;
+> +
+> +    if (s->multiprocess) {
+> +        if (!gdb_ctx->num_params) {
+> +            put_packet(s, "E22");
+> +            return;
+> +        }
+> +
+> +        pid =3D gdb_ctx->params[0].val_ul;
+> +    }
+> +
+> +    process =3D gdb_get_process(s, pid);
+> +    gdb_process_breakpoint_remove_all(s, process);
+> +    process->attached =3D false;
+> +
+> +    if (pid =3D=3D gdb_get_cpu_pid(s, s->c_cpu)) {
+> +        s->c_cpu =3D gdb_first_attached_cpu(s);
+> +    }
+> +
+> +    if (pid =3D=3D gdb_get_cpu_pid(s, s->g_cpu)) {
+> +        s->g_cpu =3D gdb_first_attached_cpu(s);
+> +    }
+> +
+> +    if (!s->c_cpu) {
+> +        /* No more process attached */
+> +        gdb_syscall_mode =3D GDB_SYS_DISABLED;
+> +        gdb_continue(s);
+> +    }
+> +    put_packet(s, "OK");
+> +}
+> +
+>  static int gdb_handle_packet(GDBState *s, const char *line_buf)
+>  {
+>      CPUState *cpu;
+> @@ -1477,6 +1507,7 @@ static int gdb_handle_packet(GDBState *s, const cha=
+r *line_buf)
+>      uint8_t *registers;
+>      target_ulong addr, len;
+>      GDBThreadIdKind thread_kind;
+> +    const GdbCmdParseEntry *cmd_parser =3D NULL;
+>
+>      trace_gdbstub_io_command(line_buf);
+>
+> @@ -1577,42 +1608,15 @@ static int gdb_handle_packet(GDBState *s, const c=
+har *line_buf)
+>          error_report("QEMU: Terminated via GDBstub");
+>          exit(0);
+>      case 'D':
+> -        /* Detach packet */
+> -        pid =3D 1;
+> -
+> -        if (s->multiprocess) {
+> -            unsigned long lpid;
+> -            if (*p !=3D ';') {
+> -                put_packet(s, "E22");
+> -                break;
+> -            }
+> -
+> -            if (qemu_strtoul(p + 1, &p, 16, &lpid)) {
+> -                put_packet(s, "E22");
+> -                break;
+> -            }
+> -
+> -            pid =3D lpid;
+> -        }
+> -
+> -        process =3D gdb_get_process(s, pid);
+> -        gdb_process_breakpoint_remove_all(s, process);
+> -        process->attached =3D false;
+> -
+> -        if (pid =3D=3D gdb_get_cpu_pid(s, s->c_cpu)) {
+> -            s->c_cpu =3D gdb_first_attached_cpu(s);
+> -        }
+> -
+> -        if (pid =3D=3D gdb_get_cpu_pid(s, s->g_cpu)) {
+> -            s->g_cpu =3D gdb_first_attached_cpu(s);
+> -        }
+> -
+> -        if (s->c_cpu =3D=3D NULL) {
+> -            /* No more process attached */
+> -            gdb_syscall_mode =3D GDB_SYS_DISABLED;
+> -            gdb_continue(s);
+> +        {
+> +            static const GdbCmdParseEntry detach_cmd_desc =3D {
+> +                .handler =3D handle_detach,
+> +                .cmd =3D "D",
+> +                .cmd_startswith =3D 1,
+> +                .schema =3D "?.l0"
+> +            };
+> +            cmd_parser =3D &detach_cmd_desc;
+>          }
+> -        put_packet(s, "OK");
+>          break;
+>      case 's':
+>          if (*p !=3D '\0') {
+> @@ -1985,6 +1989,15 @@ static int gdb_handle_packet(GDBState *s, const ch=
+ar *line_buf)
+>          put_packet(s, buf);
+>          break;
+>      }
+> +
+> +    if (cmd_parser) {
+> +        /* helper will respond */
+> +        process_string_cmd(s, NULL, line_buf, cmd_parser, 1);
+> +    } else {
+> +        /* unknown command, empty respone */
+> +        put_packet(s, "");
+> +    }
+> +
+>      return RS_IDLE;
+>  }
+
+
+--
+Alex Benn=C3=A9e
 
