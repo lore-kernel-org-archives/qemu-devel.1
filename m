@@ -2,77 +2,91 @@ Return-Path: <SRS0=zt/K=T3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 23074C04AB3
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 May 2019 16:17:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 59608C04AB3
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 May 2019 16:21:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EF45F2147A
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 May 2019 16:17:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EF45F2147A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 21C532147A
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 May 2019 16:21:15 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="u5SsYv2p"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 21C532147A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:47989 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:48042 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hVIJS-0007l8-TE
-	for qemu-devel@archiver.kernel.org; Mon, 27 May 2019 12:17:26 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:34754)
+	id 1hVIN9-0000d3-A6
+	for qemu-devel@archiver.kernel.org; Mon, 27 May 2019 12:21:15 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:37018)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1hVIIO-0007Dh-51
-	for qemu-devel@nongnu.org; Mon, 27 May 2019 12:16:21 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1hVIM9-0008Vl-LE
+	for qemu-devel@nongnu.org; Mon, 27 May 2019 12:20:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1hVIIN-0006yo-36
-	for qemu-devel@nongnu.org; Mon, 27 May 2019 12:16:20 -0400
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:39609)
+	(envelope-from <alex.bennee@linaro.org>) id 1hVIM8-0001Jc-JH
+	for qemu-devel@nongnu.org; Mon, 27 May 2019 12:20:13 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:40026)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hVIIM-0006yG-U4
-	for qemu-devel@nongnu.org; Mon, 27 May 2019 12:16:19 -0400
-Received: by mail-wr1-f67.google.com with SMTP id e2so8588286wrv.6
-	for <qemu-devel@nongnu.org>; Mon, 27 May 2019 09:16:18 -0700 (PDT)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1hVIM8-0001IC-BU
+	for qemu-devel@nongnu.org; Mon, 27 May 2019 12:20:12 -0400
+Received: by mail-wr1-x441.google.com with SMTP id t4so9088155wrx.7
+	for <qemu-devel@nongnu.org>; Mon, 27 May 2019 09:20:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=references:user-agent:from:to:cc:subject:in-reply-to:date
+	:message-id:mime-version:content-transfer-encoding;
+	bh=BFR9vdYCyDFPYeIl9x29b3ZwxBE8EOGas7qIp5yyizs=;
+	b=u5SsYv2pmajDbY3JME1SqkZV69P02Vieo541WMQfhopjW9l4enLgoJSl+/895GhGlw
+	GW1llV/Eqok0UWHUsnXJPka3MmZjVfC87C56+c2LGmTMSwlffRKTpt+VZhPNLEMXIMkm
+	FbMGB8sJyaO7WmneKqCbH6hftR5hOosjN8pvaOIC1fna4U8TjLZ4wmviPSYj8OXIPCQI
+	jpOauQrK/PO2NQoSgn+aGFmpUv6LAaVuv+tQ9nwf4KuXGF5A9SoU2oAgDtPj8TcY7HYq
+	/DfKnYPmi+qoJiTAG9wXMvyRvPdRs57YWfjeHtT2uHi7b9sUegqVOXUVAar1HNpHlmFF
+	0rBA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:subject:from:to:cc:references:message-id:date
-	:user-agent:mime-version:in-reply-to:content-language
-	:content-transfer-encoding;
-	bh=mTQh6ovPz6oeq8oighnh2RzCGDPakoPCn9Rtml4cugE=;
-	b=KD2eNoSlWWZWPBdxicE3qq9Z6pgdU3QgZhG25O6Vn9NB+M0PfqWXbLD9KhUg94tDMu
-	U+ztJXk3spSAi33ZBX933crV6ihWJfcI+C1jb2gj9/PSP8dNvcE/1bX6ao1LzWn+qKsr
-	Wwd3bhFVuP2m3zwoYV0+1eTx95plbwF5Z746p4hWvJrYV40C+hLhHEelaTSmojRWc/FW
-	+1mMdbZ3b5Od5j7HHgQR/qv/Gr/gyP1wKBtiPQ8wrTFap44hUGqTz3w1uoJFpFn72Hzr
-	iUZ7wo5Git3nMgl/zqQWDl5GcRtz8Oa9RK+r5rq0jIBl9GJpTbq3X1VjIijsmZ6c3wTi
-	QW6g==
-X-Gm-Message-State: APjAAAUMFxe9i3TRzhF06BdRHVRhtISsASKJffntrGoKzyPDGN2PBdND
-	u0UrbuNdHRO+7ZZ/Spc1RGnAHg==
-X-Google-Smtp-Source: APXvYqzFnpCZ0EtWd8mFVTdAY5a5cdU4W9b3l/E1bb/8bfRjw7GzU7d34XfkXmEXQPCEYRL42fY82g==
-X-Received: by 2002:adf:fa88:: with SMTP id h8mr24731345wrr.32.1558973777688; 
-	Mon, 27 May 2019 09:16:17 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c92d:f9e8:f150:3553?
-	([2001:b07:6468:f312:c92d:f9e8:f150:3553])
-	by smtp.gmail.com with ESMTPSA id
-	v124sm21305691wme.42.2019.05.27.09.16.16
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Mon, 27 May 2019 09:16:17 -0700 (PDT)
-From: Paolo Bonzini <pbonzini@redhat.com>
-To: qemu-devel <qemu-devel@nongnu.org>
-References: <3246431b-8d6e-f2bc-e0f0-99d80384d97b@redhat.com>
-Message-ID: <7628c6fa-5bfd-5633-69b4-811aa448dd80@redhat.com>
-Date: Mon, 27 May 2019 18:16:15 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	h=x-gm-message-state:references:user-agent:from:to:cc:subject
+	:in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+	bh=BFR9vdYCyDFPYeIl9x29b3ZwxBE8EOGas7qIp5yyizs=;
+	b=hu+1uyQEyqc2yEJuN34UJXhx7t1+cxarD32NNbJDjVXw6fkfZkdMEY/yQeOvmSjsVn
+	Tvuu3oyIjY6RIG6KONESUJFmpI3ueboG/Ic9I8vHEO7Yv94gAUl0JFSM1RM3odP/nKFi
+	BxX+CqBprqEAUqxJyffH/WtAcChUYTcoAlnZbpGB6ZHKC1WI5rgg/nVcUJYa1D9stOFx
+	6Nj7r94AtPPQHiBgAO5ZLh/AyPF08r0brT6EedYSLe1LO9nHACvZTIdtIY6KJaIavbCV
+	g3G48o//wumYmH8RE28cQ4OXah8gudkAwFqkVCplLhTa8KCkbsxlsiYh29SpNRQ+zRGA
+	70cg==
+X-Gm-Message-State: APjAAAV75JdlqpeRKSkCY7Jd7vDwsx8tJDXFz1H7LWZb4FY/X3xLnRxa
+	siPcYKfgTnjzYlbZJ4toJmpJSg==
+X-Google-Smtp-Source: APXvYqxrX1vYOf+t7kBT6gNYtJ2v/JXko7h61P4EBJhK9GVeIJ+WLy7qyUdmfczVHsCwWvzMwWXDUQ==
+X-Received: by 2002:adf:ec0f:: with SMTP id x15mr4989506wrn.165.1558974010782; 
+	Mon, 27 May 2019 09:20:10 -0700 (PDT)
+Received: from zen.linaroharston ([81.128.185.34])
+	by smtp.gmail.com with ESMTPSA id w2sm5104176wru.16.2019.05.27.09.20.09
+	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+	Mon, 27 May 2019 09:20:09 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+	by zen.linaroharston (Postfix) with ESMTP id 817871FF87;
+	Mon, 27 May 2019 17:20:09 +0100 (BST)
+References: <20190523102532.10486-1-alex.bennee@linaro.org>
+	<20190523102532.10486-28-alex.bennee@linaro.org>
+	<18f8fad1-5dac-eb5b-f531-da3b2124ec35@redhat.com>
+User-agent: mu4e 1.3.2; emacs 26.1
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Max Reitz <mreitz@redhat.com>
+In-reply-to: <18f8fad1-5dac-eb5b-f531-da3b2124ec35@redhat.com>
+Date: Mon, 27 May 2019 17:20:09 +0100
+Message-ID: <87imtvrhs6.fsf@zen.linaroharston>
 MIME-Version: 1.0
-In-Reply-To: <3246431b-8d6e-f2bc-e0f0-99d80384d97b@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-	[fuzzy]
-X-Received-From: 209.85.221.67
-Subject: [Qemu-devel] Status update on Meson features needed by QEMU
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2a00:1450:4864:20::441
+Subject: Re: [Qemu-devel] [PATCH v2 27/28] tests/qemu-iotests: re-format
+ output to for make check-block
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -84,60 +98,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
-	Richard Henderson <rth@twiddle.net>,
-	=?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Thomas Huth <thuth@redhat.com>,
+	qemu-arm@nongnu.org, qemu-devel@nongnu.org,
+	"open list:Block layer core" <qemu-block@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi all,
 
-if everything goes according to plan, Meson 0.51.0 (out in a couple of
-weeks) should have everything needed for QEMU.  I am not sure whether
-I'll have time to attempt a partial conversion to have something to
-show, but anyway this is a status update.
+Max Reitz <mreitz@redhat.com> writes:
 
-On 06/03/19 19:12, Paolo Bonzini wrote:
-> - ease of use for test logs and the ability to cut and paste test
-> invocations from the logs to the command line.  For this I have started
-> "probing" how the Meson developers feel about this kind of change[1],
-> and intend to follow up until the meson test driver is comparable in
-> usability to QEMU's "make check",
+> On 23.05.19 12:25, Alex Benn=C3=A9e wrote:
+>> This attempts to clean-up the output to better match the output of the
+>> rest of the QEMU check system when called with -makecheck. This includes:
+>>
+>>   - formatting as "  TEST    iotest-FMT: nnn"
+>>   - only dumping config on failure (when -makecheck enabled)
+>>
+>> The non-make check output has been cleaned up as well:
+>>
+>>   - line re-displayed (\r) at the end
+>>   - fancy colours for pass/fail/skip
+>>   - timestamps always printed (option removed)
+>>
+>> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+>> Message-Id: <20190503143904.31211-1-alex.bennee@linaro.org>
+>> Tested-by: Thomas Huth <thuth@redhat.com>
+>>
+>> ---
+>> v3
+>>   - revert echo to printf
+>>   - add _report_test_start
+>> v4
+>>   - -pretty -> -makecheck
+>>   - keep all output together for makecheck
+>> v5
+>>   - merged in kwolf's pretty printing
+>>   - timestamps always printed in non-makecheck mode
+>> ---
+>>  tests/qemu-iotests/check | 179 +++++++++++++++++++++++++--------------
+>>  1 file changed, 116 insertions(+), 63 deletions(-)
+>
+> Unless I missed something, this breaks ./check:
+>
+> $ ./check -T -qcow2
+> 000 - unknown test, ignored
 
-This wasn't accepted, on the other hand Meson has an introspection
-mechanism to export test definitions as JSON.  It should be easy to
-generate Make rules from it and keep using the current TAP driver.  I
-have a pending pull request to fix a bug there, which should be accepted
-in 0.51.0.
+Because -T has been dropped (timestamps are always shown). Of course
+removing from the opts passing falls through. Should I just do:
 
-> - ease of converting Makefile.objs files.  The Makefile.objs files are
-> very nice to change for simple modifications, and any replacement should
-> have the same feature.  This will require a Meson extension.
+modified   tests/qemu-iotests/check
+@@ -433,6 +433,11 @@ testlist options
+             cachemode=3Dtrue
+             xpand=3Dfalse
+             ;;
++        -T)
++            echo "-T no longer needed"
++            exit -1
++            ;;
++
+         -v)
+             verbose=3Dtrue
 
-This was accepted.  The final syntax looks like
 
-    obj.add(when: 'CONFIG_VIRTIO', if_true: files('virtio.c'),
-                                   if_false: files('virtio-stub.c'))
+> QEMU          -- "build/x86_64-softmmu/qemu-system-x86_64" -nodefaults
+> -machine accel=3Dqtest
+> QEMU_IMG      -- "build/qemu-img"
+> QEMU_IO       -- "build/qemu-io"  --cache writeback -f qcow2
+> QEMU_NBD      -- "build/qemu-nbd"
+> IMGFMT        -- qcow2 (compat=3D1.1)
+> IMGPROTO      -- file
+> PLATFORM      -- Linux/x86_64 dresden 5.0.14-300.fc30.x86_64
+> TEST_DIR      -- build/tests/qemu-iotests/scratch
+> SOCKET_SCM_HELPER -- build/tests/qemu-iotests/socket_scm_helper
+>
+> Passed all 0 tests
+>
+>
+> Max
 
-    sdl_obj.add(if_true: files('sdl.c'))
-    sdl_obj.add_all(when: 'CONFIG_OPENGL', if_true: opengl_obj)
-    common_obj.add_all(when: sdl, if_true: sdl_obj)
 
-> - ability to use the Kconfig declarations for dependencies.
-The Kconfig parser was accepted.  It should therefore be possible to
-invoke minikconf from Meson (rather than from Make) to process the
-dependencies, load the result via the parser and use it as the input to
-the source code selection rules.
-
-> - Meson generates a build.ninja file rather than a Makefile
-
-... and requires Ninja to be present when Meson runs, in order to
-generate compile_commands.json.  For this I added more functionality to
-my ninja lexer/parser so that (in addition to generating a Makefile from
-build.ninja) it can also be used to emulate the "ninja -t compdb"
-command which generates the file.  The resulting  tool can be found at
-https://gist.github.com/bonzini/fd3b69f5682f7e2eca817fb797c2db0f.
-
-Paolo
+--
+Alex Benn=C3=A9e
 
