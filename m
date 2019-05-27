@@ -6,57 +6,64 @@ X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 703A3C07542
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 May 2019 07:58:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CFB9C07542
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 May 2019 08:01:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4460F2070D
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 May 2019 07:58:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4460F2070D
+	by mail.kernel.org (Postfix) with ESMTPS id 632162070D
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 May 2019 08:01:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 632162070D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:41527 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:41583 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hVAWL-0005Nl-Im
-	for qemu-devel@archiver.kernel.org; Mon, 27 May 2019 03:58:13 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:51607)
+	id 1hVAZd-0006VX-K4
+	for qemu-devel@archiver.kernel.org; Mon, 27 May 2019 04:01:37 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:52088)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1hVAVa-00056w-V0
-	for qemu-devel@nongnu.org; Mon, 27 May 2019 03:57:28 -0400
+	(envelope-from <armbru@redhat.com>) id 1hVAYc-0005sO-Qo
+	for qemu-devel@nongnu.org; Mon, 27 May 2019 04:00:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1hVAVZ-0004Ta-D9
-	for qemu-devel@nongnu.org; Mon, 27 May 2019 03:57:26 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:4765)
+	(envelope-from <armbru@redhat.com>) id 1hVAYa-0006uT-Uy
+	for qemu-devel@nongnu.org; Mon, 27 May 2019 04:00:34 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53944)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1hVAVZ-0004KJ-6Y
-	for qemu-devel@nongnu.org; Mon, 27 May 2019 03:57:25 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hVAYZ-0006t6-7U
+	for qemu-devel@nongnu.org; Mon, 27 May 2019 04:00:32 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 9AF58307D864;
-	Mon, 27 May 2019 07:57:16 +0000 (UTC)
-Received: from localhost (unknown [10.43.2.182])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id D0D4A5D704;
-	Mon, 27 May 2019 07:57:14 +0000 (UTC)
-Date: Mon, 27 May 2019 09:57:10 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-To: "liujunjie (A)" <liujunjie23@huawei.com>
-Message-ID: <20190527095644.36b8fea8@redhat.com>
-In-Reply-To: <B526101FCAB4654DB0892B650DEFC55527EECB46@dggemm521-mbx.china.huawei.com>
-References: <B526101FCAB4654DB0892B650DEFC55527EECB46@dggemm521-mbx.china.huawei.com>
+	by mx1.redhat.com (Postfix) with ESMTPS id 3EBBB33BCD;
+	Mon, 27 May 2019 08:00:25 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-117-250.ams2.redhat.com
+	[10.36.117.250])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 957095D968;
+	Mon, 27 May 2019 08:00:22 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+	id 28C101138648; Mon, 27 May 2019 10:00:21 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+References: <87woihi1wl.fsf@dusky.pond.sub.org>
+	<20190524185344.GJ10764@habkost.net>
+Date: Mon, 27 May 2019 10:00:21 +0200
+In-Reply-To: <20190524185344.GJ10764@habkost.net> (Eduardo Habkost's message
+	of "Fri, 24 May 2019 15:53:44 -0300")
+Message-ID: <87r28k1g4q.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1 (gnu/linux)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.48]);
-	Mon, 27 May 2019 07:57:16 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.38]);
+	Mon, 27 May 2019 08:00:30 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] Question about wrong ram-node0 reference
+Subject: Re: [Qemu-devel] qapi/misc.json is too big,
+ let's bite off a few chunks
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -68,75 +75,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Huangweidong \(C\)" <weidong.huang@huawei.com>,
-	"ehabkost@redhat.com" <ehabkost@redhat.com>,
-	"wangxin \(U\)" <wangxinxin.wang@huawei.com>,
-	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-	"Zhoujian \(jay\)" <jianjay.zhou@huawei.com>,
-	fangying <fangying1@huawei.com>,
-	"pbonzini@redhat.com" <pbonzini@redhat.com>,
-	"afaerber@suse.de" <afaerber@suse.de>
+Cc: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
+	Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org,
+	Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sat, 25 May 2019 03:35:20 +0000
-"liujunjie (A)" <liujunjie23@huawei.com> wrote:
+Eduardo Habkost <ehabkost@redhat.com> writes:
 
-> Hi, I have met a problem:
-> 
-> The QEMU version is 2.8.1, the virtual machine is configured with 1G huge pages, two NUMA nodes and four pass-through NVME SSDs.
-> 
-> After we started the VM, in addition to some QMP queries nothing more has been done, the QEMU aborted after some months later.
-> After that, the VM is restarted, and the problem does not reproduce yet.
-> And The backtrace of the RCU thread is as follows:
-> (gdb) bt
-> #0  0x00007fd2695f0197 in raise () from /usr/lib64/libc.so.6
-> #1  0x00007fd2695f1888 in abort () from /usr/lib64/libc.so.6
-> #2  0x00007fd2695e9206 in __assert_fail_base () from /usr/lib64/libc.so.6
-> #3  0x00007fd2695e92b2 in __assert_fail () from /usr/lib64/libc.so.6
-> #4  0x0000000000476a84 in memory_region_finalize (obj=<optimized out>)
->     at /home/abuild/rpmbuild/BUILD/qemu-kvm-2.8.1/memory.c:1512
-> #5  0x0000000000763105 in object_deinit (obj=obj@entry=0x1dc1fd0,
->     type=type@entry=0x1d065b0) at qom/object.c:448
-> #6  0x0000000000763153 in object_finalize (data=0x1dc1fd0) at qom/object.c:462
-> #7  0x00000000007627cc in object_property_del_all (obj=obj@entry=0x1dc1f70)
->     at qom/object.c:399
-> #8  0x0000000000763148 in object_finalize (data=0x1dc1f70) at qom/object.c:461
-> #9  0x0000000000764426 in object_unref (obj=<optimized out>) at qom/object.c:897
-> #10 0x0000000000473b6b in memory_region_unref (mr=<optimized out>)
->     at /home/abuild/rpmbuild/BUILD/qemu-kvm-2.8.1/memory.c:1560
-> #11 0x0000000000473bc7 in flatview_destroy (view=0x7fc188b9cb90)
->     at /home/abuild/rpmbuild/BUILD/qemu-kvm-2.8.1/memory.c:289
-> #12 0x0000000000843be0 in call_rcu_thread (opaque=<optimized out>)
->     at util/rcu.c:279
-> #13 0x00000000008325c2 in qemu_thread_start (args=args@entry=0x1d00810)
->     at util/qemu_thread_posix.c:496
-> #14 0x00007fd269983dc5 in start_thread () from /usr/lib64/libpthread.so.0
-> #15 0x00007fd2696b27bd in clone () from /usr/lib64/libc.so.6
-> 
-> In this core, I found that the reference of "/objects/ram-node0"( the type of ram-node0 is struct "HostMemoryBackendFile") equals to 0 , while the reference of "/objects/ram-node1" equals to 129, more details can be seen at the end of this email.
-> 
-> I searched through the community, and found a case that had the same error report: https://mail.coreboot.org/pipermail/seabios/2017-September/011799.html
-> However, I did not configure pcie_pci_bridge. Besides, qemu aborted in device initialization phase in this case.
-That case doesn't seem relevant.
+> On Thu, May 23, 2019 at 06:14:18PM +0200, Markus Armbruster wrote:
+>> It's nice when QAPI schema modules clearly belong to a single subsystem
+>> in addition to "QAPI Schema".  misc.json doesn't, and it's grown fat:
+>> 3000+ lines.  Let's move out some stuff.  Here are a few candidates:
+>>=20
+>> * Dump (Marc-Andr=C3=A9)
+>>=20
+>>   dump-guest-memory, query-dump, DUMP_COMPLETED,
+>>   query-dump-guest-memory-capability
+>>=20
+>>   ~200 lines.
+>>=20
+>> * Machine core (Eduardo, Marcel)
+>>=20
+>>   query-machines, query-current-machine,=20
+>>=20
+>>   ~60 lines.  Hardly worthwhile from a "let's shrink misc.json" point of
+>>   view.  Might be worthwhile from a "let's make get_maintainers.pl
+>>   work".
+>>=20
+>> * CPUs (Paolo, Richard)
+>>=20
+>>   query-cpus, query-cpus-fast
+>>=20
+>>   ~300 lines.  The commands are implemented in cpus.c, which MAINTAINERS
+>>   covers both under "Main loop" and under "Guest CPU cores (TCG) /
+>>   Overall".  Neither feels right to me for these QMP commands.
+>
+> Should it include query-cpu-* (currently on target.json),
+> and query-hotpluggable-cpus?
 
-> 
-> Also, I try to find out which can reference "/objects/ram-node0" so as to look for the one that may un reference improperly, most of them lie in the function of "render_memory_region" or "phys_section_add" when memory topology changes.
-> Later, the temporary flatviews are destroyed by RCU thread, so un reference happened and the backtrace is similar to the one shown above.
-> But I am not familiar with the detail of these process, it is hard to keep trace of these memory topology changes.
-> 
-> My question is:
-> How can ram-node0's reference comes down to 0 when the virtual machine is still running?
-> 
-> Maybe someone who is familiar with memory_region_ref or memory-backend-file can help me figure out.
-> Any idea is appreciated.
+Interesting question.  We might need both cpu.json and cpu-target.json,
+to keep target-independent and target-dependent separated.
 
-Could you provide steps to reproduce (incl. command line)? 
+>> * NUMA (Eduardo)
+>>=20
+>>   query-memdev, set-numa-node
+>>=20
+>>   ~200 lines.
+>>=20
+>> Opinions?
+>>=20
+>> Additional candidates?
+>
+> QOM: qom-list, qom-get, qom-set, qom-list-properties, object-add
+> object-del.
 
-[...]
-> Thanks,
-> Junjie Liu
-> 
+Also qom-list-types.
 
+~230 lines.
+
+As long as we don't have an active QOM maintainer[*], the benefit is
+low.
+
+
+[*] We need one.  I'm not volunteering.
 
