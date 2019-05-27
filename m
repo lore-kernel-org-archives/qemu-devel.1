@@ -2,68 +2,59 @@ Return-Path: <SRS0=zt/K=T3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DA49C07542
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 May 2019 06:57:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0773DC07542
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 May 2019 07:18:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E1E4120717
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 May 2019 06:57:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E1E4120717
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id D1DCC2075E
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 May 2019 07:18:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D1DCC2075E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:40979 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:41186 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hV9ZN-0001Ut-28
-	for qemu-devel@archiver.kernel.org; Mon, 27 May 2019 02:57:17 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:42051)
+	id 1hV9uL-0005iy-K8
+	for qemu-devel@archiver.kernel.org; Mon, 27 May 2019 03:18:57 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:45271)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1hV9YQ-000102-Jp
-	for qemu-devel@nongnu.org; Mon, 27 May 2019 02:56:19 -0400
+	(envelope-from <clg@kaod.org>) id 1hV9t9-00059v-KA
+	for qemu-devel@nongnu.org; Mon, 27 May 2019 03:17:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1hV9YP-0003Co-F5
-	for qemu-devel@nongnu.org; Mon, 27 May 2019 02:56:18 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35076)
+	(envelope-from <clg@kaod.org>) id 1hV9t8-0002ak-Q5
+	for qemu-devel@nongnu.org; Mon, 27 May 2019 03:17:43 -0400
+Received: from 7.mo68.mail-out.ovh.net ([46.105.63.230]:54308)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lvivier@redhat.com>)
-	id 1hV9YL-00034g-H2; Mon, 27 May 2019 02:56:13 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 042FC3082E8E;
-	Mon, 27 May 2019 06:55:57 +0000 (UTC)
-Received: from [10.40.204.169] (ovpn-204-169.brq.redhat.com [10.40.204.169])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 11A7760606;
-	Mon, 27 May 2019 06:55:51 +0000 (UTC)
-To: Eduardo Habkost <ehabkost@redhat.com>
-References: <20190524103521.13847-1-lvivier@redhat.com>
-	<20190524161045.314fa2de@redhat.com>
-	<c1c017f2-84ed-bddf-abb9-7154d9edb372@redhat.com>
-	<20190524201432.GP10764@habkost.net>
-From: Laurent Vivier <lvivier@redhat.com>
-Message-ID: <a3f324cc-8226-57e9-2bf3-347d84cf189a@redhat.com>
-Date: Mon, 27 May 2019 08:55:49 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
-	Thunderbird/52.8.0
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1hV9t8-0002Zk-LS
+	for qemu-devel@nongnu.org; Mon, 27 May 2019 03:17:42 -0400
+Received: from player735.ha.ovh.net (unknown [10.109.146.173])
+	by mo68.mail-out.ovh.net (Postfix) with ESMTP id 5F85112D5B1
+	for <qemu-devel@nongnu.org>; Mon, 27 May 2019 09:17:38 +0200 (CEST)
+Received: from kaod.org (lfbn-1-10649-41.w90-89.abo.wanadoo.fr [90.89.235.41])
+	(Authenticated sender: clg@kaod.org)
+	by player735.ha.ovh.net (Postfix) with ESMTPSA id 621EB6336185;
+	Mon, 27 May 2019 07:17:33 +0000 (UTC)
+From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+To: David Gibson <david@gibson.dropbear.id.au>
+Date: Mon, 27 May 2019 09:17:22 +0200
+Message-Id: <20190527071722.31424-1-clg@kaod.org>
+X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
-In-Reply-To: <20190524201432.GP10764@habkost.net>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.46]);
-	Mon, 27 May 2019 06:56:02 +0000 (UTC)
+Content-Type: text/plain; charset=UTF-8
+X-Ovh-Tracer-Id: 10309302501163437030
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduuddruddvuddgudduhecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v3] numa: improve cpu hotplug error message
- with a wrong node-id
+X-Received-From: 46.105.63.230
+Subject: [Qemu-devel] [PATCH] ppc/pnv: add dummy XSCOM registers for PRD
+ initialization
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -75,143 +66,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org,
-	qemu-arm@nongnu.org, qemu-ppc@nongnu.org,
-	Igor Mammedov <imammedo@redhat.com>,
-	David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org,
+	=?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 24/05/2019 22:14, Eduardo Habkost wrote:
-> On Fri, May 24, 2019 at 04:39:12PM +0200, Laurent Vivier wrote:
->> On 24/05/2019 16:10, Igor Mammedov wrote:
->>> On Fri, 24 May 2019 12:35:21 +0200
->>> Laurent Vivier <lvivier@redhat.com> wrote:
->>>
->>>> On pseries, core-ids are strongly binded to a node-id by the command
->>>> line option. If an user tries to add a CPU to the wrong node, he has
->>>> an error but it is not really helpful:
->>>>
->>>>     qemu-system-ppc64 ... -smp 1,maxcpus=64,cores=1,threads=1,sockets=1 \
->>>>                           -numa node,nodeid=0 -numa node,nodeid=1 ...
->>>>
->>>>     (qemu) device_add power9_v2.0-spapr-cpu-core,core-id=30,node-id=1
->>>>     Error: node-id=1 must match numa node specified with -numa option
->>>>
->>>> This patch improves this error message by giving to the user the good
->>>> topology information (node-id, socket-id and thread-id if they are
->>>> available) to use with the core-id he's providing:
->>>>
->>>>     Error: node-id=1 must match numa node specified with -numa option 'node-id 0'
->>>>
->>>> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
->>>> ---
->>>>
->>>> Notes:
->>>>       v3: only add the topology to the existing message
->>>>           As suggested by Igor replace
->>>>             Error: core-id 30 can only be plugged into node-id 0
->>>>           by
->>>>             Error: node-id=1 must match numa node specified with -numa option 'node-id 0'
->>>>       v2: display full topology in the error message
->>>>>>>    numa.c | 25 ++++++++++++++++++++++++-
->>>>    1 file changed, 24 insertions(+), 1 deletion(-)
->>>>
->>>> diff --git a/numa.c b/numa.c
->>>> index 3875e1efda3a..7882ec294be4 100644
->>>> --- a/numa.c
->>>> +++ b/numa.c
->>>> @@ -458,6 +458,27 @@ void qmp_set_numa_node(NumaOptions *cmd, Error **errp)
->>>>        set_numa_options(MACHINE(qdev_get_machine()), cmd, errp);
->>>>    }
->>>> +static char *cpu_topology_to_string(const CPUArchId *cpu)
->>>> +{
->>>> +    GString *s = g_string_new(NULL);
->>>> +    if (cpu->props.has_socket_id) {
->>>> +        g_string_append_printf(s, "socket-id %"PRId64, cpu->props.socket_id);
->>>> +    }
->>>> +    if (cpu->props.has_node_id) {
->>>> +        if (s->len) {
->>>> +            g_string_append_printf(s, ", ");
->>>> +        }
->>>> +        g_string_append_printf(s, "node-id %"PRId64, cpu->props.node_id);
->>>> +    }
->>>> +    if (cpu->props.has_thread_id) {
->>>> +        if (s->len) {
->>>> +            g_string_append_printf(s, ", ");
->>>> +        }
->>>> +        g_string_append_printf(s, "thread-id %"PRId64, cpu->props.thread_id);
->>>> +    }
->>>> +    return g_string_free(s, false);
->>>> +}
->>>
->>> turns out we already have such helper: cpu_slot_to_string()
->>
->> It doesn't display the node-id but the core-id. And node-id is what we need
->> to know.
-> 
-> I'm confused about what you are trying to do here.
-> 
-> On v1, the message looked like:
->    Error: core-id 30 can only be plugged into node-id 0
-> 
-> which is probably good for spapr.
-> 
-> 
-> Then I suggested you added the other cpu->props fields.  e.g. on
-> PC the message would look like:
->    Error: socket-id 20, core-id 30, thread-id 40 can only be plugged into node-id 0
-> 
-> 
-> But you sent a v2 patch that would print this on PC:
->    Error: core-id 30 can only be plugged into socket-id 20, node-id 0, thread-id 40
-> 
-> which doesn't make sense to me.
-> 
-> 
-> Then in a reply to v2, Igor suggested:
-> 
->   error_setg(errp, "node-id=%d must match numa node specified "
->                     "with -numa option '%s'", node_id, topology);
-> 
-> 
-> Igor suggest would address the problem above.  I expected it to become:
->    node-id=0 must match numa node specified with -numa option core-id=30
-> and on PC:
->    node-id=0 must match numa node specified with -numa option socket-id=20,core-id=30,thread-id=40
-> 
-> Or maybe it could include the input node-id too:
->    node-id=0 must match numa node specified with -numa option node-id=1,core-id=30
-> and on PC:
->    node-id=0 must match numa node specified with -numa option node-id=1,socket-id=20,core-id=30,thread-id=40
-> 
-> Both options would work.
-> 
-> 
-> But you implemented code that would print:
->    Error: node-id=0 must match numa node specified with -numa option 'node-id 1'
-> and on PC it would print:
->    Error: node-id=0 must match numa node specified with -numa option 'socket-id 20 node-id 1 thread-id=40'
-> 
-> which doesn't make sense to me.
-> 
-> 
-> I was expecting something like:
->    Error: CPU slot core-id=30 is bound to node-id 0, but node-id 1 was specified
-> and on PC:
->    Error: CPU slot socket-id=20,core-id=30,thread-id=40 is bound to node-id 0, but node-id 1 was specified
-> 
-> 
+PRD (Processor recovery diagnostics) is a service available on
+OpenPower systems. The opal-prd daemon initializes the PowerPC
+Processor through the XSCOM bus and then waits for hardware diagnostic
+events.
 
-The idea is to provide the information to the user to help him to know 
-where the cpu can be plugged when it cannot on the node-id he originally 
-provided.
+Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+---
+ hw/ppc/pnv_xscom.c | 18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
 
-So all the solutions you propose sounds good to me.
+diff --git a/hw/ppc/pnv_xscom.c b/hw/ppc/pnv_xscom.c
+index c285ef514e88..f53a6d7a9457 100644
+--- a/hw/ppc/pnv_xscom.c
++++ b/hw/ppc/pnv_xscom.c
+@@ -29,6 +29,12 @@
+=20
+ #include <libfdt.h>
+=20
++/* PRD registers */
++#define PRD_P8_IPOLL_REG_MASK           0x01020013
++#define PRD_P8_IPOLL_REG_STATUS         0x01020014
++#define PRD_P9_IPOLL_REG_MASK           0x000F0033
++#define PRD_P9_IPOLL_REG_STATUS         0x000F0034
++
+ static void xscom_complete(CPUState *cs, uint64_t hmer_bits)
+ {
+     /*
+@@ -70,6 +76,12 @@ static uint64_t xscom_read_default(PnvChip *chip, uint=
+32_t pcba)
+     case 0x1010c00:     /* PIBAM FIR */
+     case 0x1010c03:     /* PIBAM FIR MASK */
+=20
++        /* PRD registers */
++    case PRD_P8_IPOLL_REG_MASK:
++    case PRD_P8_IPOLL_REG_STATUS:
++    case PRD_P9_IPOLL_REG_MASK:
++    case PRD_P9_IPOLL_REG_STATUS:
++
+         /* P9 xscom reset */
+     case 0x0090018:     /* Receive status reg */
+     case 0x0090012:     /* log register */
+@@ -124,6 +136,12 @@ static bool xscom_write_default(PnvChip *chip, uint3=
+2_t pcba, uint64_t val)
+     case 0x201302a:     /* CAPP stuff */
+     case 0x2013801:     /* CAPP stuff */
+     case 0x2013802:     /* CAPP stuff */
++
++        /* P8 PRD registers */
++    case PRD_P8_IPOLL_REG_MASK:
++    case PRD_P8_IPOLL_REG_STATUS:
++    case PRD_P9_IPOLL_REG_MASK:
++    case PRD_P9_IPOLL_REG_STATUS:
+         return true;
+     default:
+         return false;
+--=20
+2.21.0
 
-I only need you and Igor agree on the same one.
-
-Thanks,
-Laurent
 
