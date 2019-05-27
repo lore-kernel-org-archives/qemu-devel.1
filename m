@@ -6,46 +6,46 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 753ECC04AB3
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 May 2019 15:41:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D0D2DC04AB3
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 May 2019 15:43:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3FFBE20665
-	for <qemu-devel@archiver.kernel.org>; Mon, 27 May 2019 15:41:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3FFBE20665
+	by mail.kernel.org (Postfix) with ESMTPS id A5719208CA
+	for <qemu-devel@archiver.kernel.org>; Mon, 27 May 2019 15:43:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A5719208CA
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=users.sourceforge.jp
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:47337 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:47355 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hVHkp-00022a-DY
-	for qemu-devel@archiver.kernel.org; Mon, 27 May 2019 11:41:39 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:56092)
+	id 1hVHmq-0003lY-QX
+	for qemu-devel@archiver.kernel.org; Mon, 27 May 2019 11:43:44 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:56086)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ysato@users.sourceforge.jp>) id 1hVHin-0000ZD-55
+	(envelope-from <ysato@users.sourceforge.jp>) id 1hVHin-0000ZB-1d
 	for qemu-devel@nongnu.org; Mon, 27 May 2019 11:39:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ysato@users.sourceforge.jp>) id 1hVHil-0007NV-Ku
-	for qemu-devel@nongnu.org; Mon, 27 May 2019 11:39:33 -0400
-Received: from mail02.asahi-net.or.jp ([202.224.55.14]:58408)
+	(envelope-from <ysato@users.sourceforge.jp>) id 1hVHil-0007Nj-LE
+	for qemu-devel@nongnu.org; Mon, 27 May 2019 11:39:32 -0400
+Received: from mail02.asahi-net.or.jp ([202.224.55.14]:58411)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ysato@users.sourceforge.jp>) id 1hVHil-0007Ax-6E
+	(envelope-from <ysato@users.sourceforge.jp>) id 1hVHil-0007Do-9G
 	for qemu-devel@nongnu.org; Mon, 27 May 2019 11:39:31 -0400
 Received: from h61-195-96-97.vps.ablenet.jp (h61-195-96-97.ablenetvps.ne.jp
 	[61.195.96.97]) (Authenticated sender: PQ4Y-STU)
-	by mail02.asahi-net.or.jp (Postfix) with ESMTPA id 233F53E74D;
-	Tue, 28 May 2019 00:39:26 +0900 (JST)
+	by mail02.asahi-net.or.jp (Postfix) with ESMTPA id 3CFE23E7B8;
+	Tue, 28 May 2019 00:39:28 +0900 (JST)
 Received: from yo-satoh-debian.ysato.ml (ZM005235.ppp.dion.ne.jp [222.8.5.235])
-	by h61-195-96-97.vps.ablenet.jp (Postfix) with ESMTPSA id 62B62240085; 
-	Tue, 28 May 2019 00:39:25 +0900 (JST)
-Date: Tue, 28 May 2019 00:28:12 +0900
-Message-ID: <875zpv7w8j.wl-ysato@users.sourceforge.jp>
+	by h61-195-96-97.vps.ablenet.jp (Postfix) with ESMTPSA id 1141F240085; 
+	Tue, 28 May 2019 00:39:28 +0900 (JST)
+Date: Tue, 28 May 2019 00:31:52 +0900
+Message-ID: <87y32r6hhz.wl-ysato@users.sourceforge.jp>
 From: Yoshinori Sato <ysato@users.sourceforge.jp>
 To: Richard Henderson <richard.henderson@linaro.org>
-In-Reply-To: <20190523150803.31504-2-richard.henderson@linaro.org>
+In-Reply-To: <20190523150803.31504-6-richard.henderson@linaro.org>
 References: <20190523150803.31504-1-richard.henderson@linaro.org>
-	<20190523150803.31504-2-richard.henderson@linaro.org>
+	<20190523150803.31504-6-richard.henderson@linaro.org>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
 	FLIM/1.14.9 (=?ISO-8859-4?Q?Goj=F2?=) APEL/10.8 EasyPG/1.0.0 Emacs/25.1
 	(x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -54,8 +54,8 @@ Content-Type: text/plain; charset=US-ASCII
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
 X-Received-From: 202.224.55.14
-Subject: Re: [Qemu-devel] [PATCH 1/6] target/rx: Disassemble rx_index_addr
- into a string
+Subject: Re: [Qemu-devel] [PATCH 5/6] target/rx: Collect all bytes during
+ disassembly
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -72,268 +72,140 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 24 May 2019 00:07:58 +0900,
+On Fri, 24 May 2019 00:08:02 +0900,
 Richard Henderson wrote:
 > 
-> We were eliding all zero indexes.  It is only ld==0 that does
-> not have an index in the instruction.  This also allows us to
-> avoid breaking the final print into multiple pieces.
+> Collected, to be used in the next patch.
 > 
 > Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 Reviewed-by: Yoshinori Sato <ysato@users.sourceforge.jp>
 
 > ---
->  target/rx/disas.c | 154 +++++++++++++++++-----------------------------
->  1 file changed, 55 insertions(+), 99 deletions(-)
+>  target/rx/disas.c | 62 ++++++++++++++++++++++++++++++++---------------
+>  1 file changed, 42 insertions(+), 20 deletions(-)
 > 
 > diff --git a/target/rx/disas.c b/target/rx/disas.c
-> index 8cada4825d..64342537ee 100644
+> index ebc1a44249..5a32a87534 100644
 > --- a/target/rx/disas.c
 > +++ b/target/rx/disas.c
-> @@ -107,49 +107,42 @@ static const char psw[] = {
->      'i', 'u', 0, 0, 0, 0, 0, 0,
->  };
+> @@ -25,43 +25,59 @@ typedef struct DisasContext {
+>      disassemble_info *dis;
+>      uint32_t addr;
+>      uint32_t pc;
+> +    uint8_t len;
+> +    uint8_t bytes[8];
+>  } DisasContext;
 >  
-> -static uint32_t rx_index_addr(int ld, int size, DisasContext *ctx)
-> +static void rx_index_addr(DisasContext *ctx, char out[8], int ld, int mi)
+>  
+>  static uint32_t decode_load_bytes(DisasContext *ctx, uint32_t insn,
+> -                           int i, int n)
+> +                                  int i, int n)
 >  {
-> -    bfd_byte buf[2];
+> -    bfd_byte buf;
 > +    uint32_t addr = ctx->addr;
-> +    uint8_t buf[2];
-> +    uint16_t dsp;
 > +
->      switch (ld) {
->      case 0:
-> -        return 0;
-> +        /* No index; return empty string.  */
-> +        out[0] = '\0';
-> +        return;
+> +    g_assert(ctx->len == i);
+> +    g_assert(n <= ARRAY_SIZE(ctx->bytes));
+> +
+>      while (++i <= n) {
+> -        ctx->dis->read_memory_func(ctx->addr++, &buf, 1, ctx->dis);
+> -        insn |= buf << (32 - i * 8);
+> +        ctx->dis->read_memory_func(addr++, &ctx->bytes[i - 1], 1, ctx->dis);
+> +        insn |= ctx->bytes[i - 1] << (32 - i * 8);
+>      }
+> +    ctx->addr = addr;
+> +    ctx->len = n;
+> +
+>      return insn;
+>  }
+>  
+>  static int32_t li(DisasContext *ctx, int sz)
+>  {
+> -    int32_t addr;
+> -    bfd_byte buf[4];
+> -    addr = ctx->addr;
+> +    uint32_t addr = ctx->addr;
+> +    uintptr_t len = ctx->len;
+>  
+>      switch (sz) {
 >      case 1:
-> -        ctx->dis->read_memory_func(ctx->addr, buf, 1, ctx->dis);
+> +        g_assert(len + 1 <= ARRAY_SIZE(ctx->bytes));
 >          ctx->addr += 1;
-> -        return ((uint8_t)buf[0]) << size;
-> +        ctx->dis->read_memory_func(addr, buf, 1, ctx->dis);
-> +        dsp = buf[0];
-> +        break;
+> -        ctx->dis->read_memory_func(addr, buf, 1, ctx->dis);
+> -        return (int8_t)buf[0];
+> +        ctx->len += 1;
+> +        ctx->dis->read_memory_func(addr, ctx->bytes + len, 1, ctx->dis);
+> +        return (int8_t)ctx->bytes[len];
 >      case 2:
-> -        ctx->dis->read_memory_func(ctx->addr, buf, 2, ctx->dis);
+> +        g_assert(len + 2 <= ARRAY_SIZE(ctx->bytes));
 >          ctx->addr += 2;
-> -        return lduw_le_p(buf) << size;
-> +        ctx->dis->read_memory_func(addr, buf, 2, ctx->dis);
-> +        dsp = lduw_le_p(buf);
-> +        break;
-> +    default:
-> +        g_assert_not_reached();
+> -        ctx->dis->read_memory_func(addr, buf, 2, ctx->dis);
+> -        return ldsw_le_p(buf);
+> +        ctx->len += 2;
+> +        ctx->dis->read_memory_func(addr, ctx->bytes + len, 2, ctx->dis);
+> +        return ldsw_le_p(ctx->bytes + len);
+>      case 3:
+> +        g_assert(len + 3 <= ARRAY_SIZE(ctx->bytes));
+>          ctx->addr += 3;
+> -        ctx->dis->read_memory_func(addr, buf, 3, ctx->dis);
+> -        return (int8_t)buf[2] << 16 | lduw_le_p(buf);
+> +        ctx->len += 3;
+> +        ctx->dis->read_memory_func(addr, ctx->bytes + len, 3, ctx->dis);
+> +        return (int8_t)ctx->bytes[len + 2] << 16 | lduw_le_p(ctx->bytes + len);
+>      case 0:
+> +        g_assert(len + 4 <= ARRAY_SIZE(ctx->bytes));
+>          ctx->addr += 4;
+> -        ctx->dis->read_memory_func(addr, buf, 4, ctx->dis);
+> -        return ldl_le_p(buf);
+> +        ctx->len += 4;
+> +        ctx->dis->read_memory_func(addr, ctx->bytes + len, 4, ctx->dis);
+> +        return ldl_le_p(ctx->bytes + len);
+>      default:
+>          g_assert_not_reached();
 >      }
-> -    g_assert_not_reached();
+> @@ -110,7 +126,7 @@ static const char psw[] = {
+>  static void rx_index_addr(DisasContext *ctx, char out[8], int ld, int mi)
+>  {
+>      uint32_t addr = ctx->addr;
+> -    uint8_t buf[2];
+> +    uintptr_t len = ctx->len;
+>      uint16_t dsp;
+>  
+>      switch (ld) {
+> @@ -119,14 +135,18 @@ static void rx_index_addr(DisasContext *ctx, char out[8], int ld, int mi)
+>          out[0] = '\0';
+>          return;
+>      case 1:
+> +        g_assert(len + 1 <= ARRAY_SIZE(ctx->bytes));
+>          ctx->addr += 1;
+> -        ctx->dis->read_memory_func(addr, buf, 1, ctx->dis);
+> -        dsp = buf[0];
+> +        ctx->len += 1;
+> +        ctx->dis->read_memory_func(addr, ctx->bytes + len, 1, ctx->dis);
+> +        dsp = ctx->bytes[len];
+>          break;
+>      case 2:
+> +        g_assert(len + 2 <= ARRAY_SIZE(ctx->bytes));
+>          ctx->addr += 2;
+> -        ctx->dis->read_memory_func(addr, buf, 2, ctx->dis);
+> -        dsp = lduw_le_p(buf);
+> +        ctx->len += 2;
+> +        ctx->dis->read_memory_func(addr, ctx->bytes + len, 2, ctx->dis);
+> +        dsp = lduw_le_p(ctx->bytes + len);
+>          break;
+>      default:
+>          g_assert_not_reached();
+> @@ -1392,8 +1412,10 @@ int print_insn_rx(bfd_vma addr, disassemble_info *dis)
+>      DisasContext ctx;
+>      uint32_t insn;
+>      int i;
 > +
-> +    sprintf(out, "%u", dsp << (mi < 3 ? mi : 4 - mi));
->  }
+>      ctx.dis = dis;
+>      ctx.pc = ctx.addr = addr;
+> +    ctx.len = 0;
 >  
->  static void operand(DisasContext *ctx, int ld, int mi, int rs, int rd)
->  {
-> -    int dsp;
->      static const char sizes[][4] = {".b", ".w", ".l", ".uw", ".ub"};
-> +    char dsp[8];
-> +
->      if (ld < 3) {
-> -        switch (mi) {
-> -        case 4:
-> -            /* dsp[rs].ub */
-> -            dsp = rx_index_addr(ld, RX_MEMORY_BYTE, ctx);
-> -            break;
-> -        case 3:
-> -            /* dsp[rs].uw */
-> -            dsp = rx_index_addr(ld, RX_MEMORY_WORD, ctx);
-> -            break;
-> -        default:
-> -            /* dsp[rs].b */
-> -            /* dsp[rs].w */
-> -            /* dsp[rs].l */
-> -            dsp = rx_index_addr(ld, mi, ctx);
-> -            break;
-> -        }
-> -        if (dsp > 0) {
-> -            prt("%d", dsp);
-> -        }
-> -        prt("[r%d]%s", rs, sizes[mi]);
-> +        rx_index_addr(ctx, dsp, ld, mi);
-> +        prt("%s[r%d]%s", dsp, rs, sizes[mi]);
->      } else {
->          prt("r%d", rs);
->      }
-> @@ -235,7 +228,7 @@ static bool trans_MOV_ra(DisasContext *ctx, arg_MOV_ra *a)
->  /* mov.[bwl] rs,rd */
->  static bool trans_MOV_mm(DisasContext *ctx, arg_MOV_mm *a)
->  {
-> -    int dsp;
-> +    char dspd[8], dsps[8];
->  
->      prt("mov.%c\t", size[a->sz]);
->      if (a->lds == 3 && a->ldd == 3) {
-> @@ -244,29 +237,15 @@ static bool trans_MOV_mm(DisasContext *ctx, arg_MOV_mm *a)
->          return true;
->      }
->      if (a->lds == 3) {
-> -        prt("r%d, ", a->rd);
-> -        dsp = rx_index_addr(a->ldd, a->sz, ctx);
-> -        if (dsp > 0) {
-> -            prt("%d", dsp);
-> -        }
-> -        prt("[r%d]", a->rs);
-> +        rx_index_addr(ctx, dspd, a->ldd, a->sz);
-> +        prt("r%d, %s[r%d]", a->rs, dspd, a->rd);
->      } else if (a->ldd == 3) {
-> -        dsp = rx_index_addr(a->lds, a->sz, ctx);
-> -        if (dsp > 0) {
-> -            prt("%d", dsp);
-> -        }
-> -        prt("[r%d], r%d", a->rs, a->rd);
-> +        rx_index_addr(ctx, dsps, a->lds, a->sz);
-> +        prt("%s[r%d], r%d", dsps, a->rs, a->rd);
->      } else {
-> -        dsp = rx_index_addr(a->lds, a->sz, ctx);
-> -        if (dsp > 0) {
-> -            prt("%d", dsp);
-> -        }
-> -        prt("[r%d], ", a->rs);
-> -        dsp = rx_index_addr(a->ldd, a->sz, ctx);
-> -        if (dsp > 0) {
-> -            prt("%d", dsp);
-> -        }
-> -        prt("[r%d]", a->rd);
-> +        rx_index_addr(ctx, dsps, a->lds, a->sz);
-> +        rx_index_addr(ctx, dspd, a->ldd, a->sz);
-> +        prt("%s[r%d], %s[r%d]", dsps, a->rs, dspd, a->rd);
->      }
->      return true;
->  }
-> @@ -357,12 +336,10 @@ static bool trans_PUSH_r(DisasContext *ctx, arg_PUSH_r *a)
->  /* push dsp[rs] */
->  static bool trans_PUSH_m(DisasContext *ctx, arg_PUSH_m *a)
->  {
-> -    prt("push\t");
-> -    int dsp = rx_index_addr(a->ld, a->sz, ctx);
-> -    if (dsp > 0) {
-> -        prt("%d", dsp);
-> -    }
-> -    prt("[r%d]", a->rs);
-> +    char dsp[8];
-> +
-> +    rx_index_addr(ctx, dsp, a->ld, a->sz);
-> +    prt("push\t%s[r%d]", dsp, a->rs);
->      return true;
->  }
->  
-> @@ -389,17 +366,13 @@ static bool trans_XCHG_rr(DisasContext *ctx, arg_XCHG_rr *a)
->  /* xchg dsp[rs].<mi>,rd */
->  static bool trans_XCHG_mr(DisasContext *ctx, arg_XCHG_mr *a)
->  {
-> -    int dsp;
->      static const char msize[][4] = {
->          "b", "w", "l", "ub", "uw",
->      };
-> +    char dsp[8];
->  
-> -    prt("xchg\t");
-> -    dsp = rx_index_addr(a->ld, a->mi, ctx);
-> -    if (dsp > 0) {
-> -        prt("%d", dsp);
-> -    }
-> -    prt("[r%d].%s, r%d", a->rs, msize[a->mi], a->rd);
-> +    rx_index_addr(ctx, dsp, a->ld, a->mi);
-> +    prt("xchg\t%s[r%d].%s, r%d", dsp, a->rs, msize[a->mi], a->rd);
->      return true;
->  }
->  
-> @@ -552,13 +525,10 @@ static bool trans_ADC_rr(DisasContext *ctx, arg_ADC_rr *a)
->  /* adc dsp[rs], rd */
->  static bool trans_ADC_mr(DisasContext *ctx, arg_ADC_mr *a)
->  {
-> -    int dsp;
-> -    prt("adc\t");
-> -    dsp = rx_index_addr(a->ld, 2, ctx);
-> -    if (dsp > 0) {
-> -        prt("%d", dsp);
-> -    }
-> -    prt("[r%d], r%d", a->rs, a->rd);
-> +    char dsp[8];
-> +
-> +    rx_index_addr(ctx, dsp, a->ld, 2);
-> +    prt("adc\t%s[r%d], r%d", dsp, a->rs, a->rd);
->      return true;
->  }
->  
-> @@ -1217,25 +1187,17 @@ static bool trans_ITOF(DisasContext *ctx, arg_ITOF *a)
->  
->  #define BOP_IM(name, reg)                                       \
->      do {                                                        \
-> -        int dsp;                                                \
-> -        prt("b%s\t#%d, ", #name, a->imm);                       \
-> -        dsp = rx_index_addr(a->ld, RX_MEMORY_BYTE, ctx);        \
-> -        if (dsp > 0) {                                          \
-> -            prt("%d", dsp);                                     \
-> -        }                                                       \
-> -        prt("[r%d]", reg);                                      \
-> +        char dsp[8];                                            \
-> +        rx_index_addr(ctx, dsp, a->ld, RX_MEMORY_BYTE);         \
-> +        prt("b%s\t#%d, %s[r%d]", #name, a->imm, dsp, reg);      \
->          return true;                                            \
->      } while (0)
->  
->  #define BOP_RM(name)                                            \
->      do {                                                        \
-> -        int dsp;                                                \
-> -        prt("b%s\tr%d, ", #name, a->rd);                        \
-> -        dsp = rx_index_addr(a->ld, RX_MEMORY_BYTE, ctx);        \
-> -        if (dsp > 0) {                                          \
-> -            prt("%d", dsp);                                     \
-> -        }                                                       \
-> -        prt("[r%d]", a->rs);                                    \
-> +        char dsp[8];                                            \
-> +        rx_index_addr(ctx, dsp, a->ld, RX_MEMORY_BYTE);         \
-> +        prt("b%s\tr%d, %s[r%d]", #name, a->rd, dsp, a->rs);     \
->          return true;                                            \
->      } while (0)
->  
-> @@ -1346,12 +1308,10 @@ static bool trans_BNOT_ir(DisasContext *ctx, arg_BNOT_ir *a)
->  /* bmcond #imm, dsp[rd] */
->  static bool trans_BMCnd_im(DisasContext *ctx, arg_BMCnd_im *a)
->  {
-> -    int dsp = rx_index_addr(a->ld, RX_MEMORY_BYTE, ctx);
-> -    prt("bm%s\t#%d, ", cond[a->cd], a->imm);
-> -    if (dsp > 0) {
-> -        prt("%d", dsp);
-> -    }
-> -    prt("[%d]", a->rd);
-> +    char dsp[8];
-> +
-> +    rx_index_addr(ctx, dsp, a->ld, RX_MEMORY_BYTE);
-> +    prt("bm%s\t#%d, %s[r%d]", cond[a->cd], a->imm, dsp, a->rd);
->      return true;
->  }
->  
-> @@ -1443,16 +1403,12 @@ static bool trans_WAIT(DisasContext *ctx, arg_WAIT *a)
->  /* sccnd.[bwl] dsp:[rd] */
->  static bool trans_SCCnd(DisasContext *ctx, arg_SCCnd *a)
->  {
-> -    int dsp;
-> -    prt("sc%s.%c\t", cond[a->cd], size[a->sz]);
->      if (a->ld < 3) {
-> -        dsp = rx_index_addr(a->sz, a->ld, ctx);
-> -        if (dsp > 0) {
-> -            prt("%d", dsp);
-> -        }
-> -        prt("[r%d]", a->rd);
-> +        char dsp[8];
-> +        rx_index_addr(ctx, dsp, a->sz, a->ld);
-> +        prt("sc%s.%c\t%s[r%d]", cond[a->cd], size[a->sz], dsp, a->rd);
->      } else {
-> -        prt("r%d", a->rd);
-> +        prt("sc%s.%c\tr%d", cond[a->cd], size[a->sz], a->rd);
->      }
->      return true;
->  }
+>      insn = decode_load(&ctx);
+>      if (!decode(&ctx, insn)) {
 > -- 
 > 2.17.1
 > 
