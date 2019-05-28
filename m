@@ -2,93 +2,72 @@ Return-Path: <SRS0=2W3W=T4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7969CC04AB6
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 May 2019 17:19:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4500FC04AB6
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 May 2019 17:19:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 513292075B
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 May 2019 17:19:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 513292075B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 102CA2075B
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 May 2019 17:19:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 102CA2075B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:39934 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:39936 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hVfkv-0005XT-HS
-	for qemu-devel@archiver.kernel.org; Tue, 28 May 2019 13:19:21 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:38547)
+	id 1hVflG-0005p8-7N
+	for qemu-devel@archiver.kernel.org; Tue, 28 May 2019 13:19:42 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:38605)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hVfji-0004wg-0p
-	for qemu-devel@nongnu.org; Tue, 28 May 2019 13:18:06 -0400
+	(envelope-from <palmer@dabbelt.com>) id 1hVfjw-00053f-L0
+	for qemu-devel@nongnu.org; Tue, 28 May 2019 13:18:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hVfjY-0000vY-TN
-	for qemu-devel@nongnu.org; Tue, 28 May 2019 13:17:59 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39142)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mreitz@redhat.com>)
-	id 1hVfjS-0000q8-N8; Tue, 28 May 2019 13:17:50 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id A361F307D925;
-	Tue, 28 May 2019 17:17:43 +0000 (UTC)
-Received: from dresden.str.redhat.com (unknown [10.40.205.223])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 9082E5D71C;
-	Tue, 28 May 2019 17:17:31 +0000 (UTC)
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
-	qemu-devel@nongnu.org, qemu-block@nongnu.org
-References: <20190506153429.52737-1-vsementsov@virtuozzo.com>
-	<20190506153429.52737-3-vsementsov@virtuozzo.com>
-From: Max Reitz <mreitz@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
-	mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
-	/PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
-	U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
-	mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
-	awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
-	AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
-	CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
-	B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
-	2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
-	AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
-	8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
-	4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
-	BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
-	xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
-	W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
-	DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
-	64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
-	ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
-	sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
-	alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
-	/ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
-	bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
-	R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <3418f89f-25ef-3a8a-53d2-466278c6ed82@redhat.com>
-Date: Tue, 28 May 2019 19:17:29 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
-MIME-Version: 1.0
-In-Reply-To: <20190506153429.52737-3-vsementsov@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="6svU7IFIwnTWmXTXSBgi5RrxfWXQjSGcd"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.48]);
-	Tue, 28 May 2019 17:17:50 +0000 (UTC)
+	(envelope-from <palmer@dabbelt.com>) id 1hVfju-0001B5-5C
+	for qemu-devel@nongnu.org; Tue, 28 May 2019 13:18:19 -0400
+Received: from mail-pg1-f196.google.com ([209.85.215.196]:43833)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <palmer@dabbelt.com>) id 1hVfjr-00015W-Mq
+	for qemu-devel@nongnu.org; Tue, 28 May 2019 13:18:16 -0400
+Received: by mail-pg1-f196.google.com with SMTP id f25so11365608pgv.10
+	for <qemu-devel@nongnu.org>; Tue, 28 May 2019 10:18:10 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:date:subject:in-reply-to:cc:from:to:message-id
+	:mime-version:content-transfer-encoding;
+	bh=ynqteHpaI18mvzVpqabF5CifMGbrBuDWqWx964didfw=;
+	b=dDX9qvSfggGF9uVkymLj2L72pDjwcJ72ywzu2gJkuyhnJf78eIAkQlnBCT0M2A6/R5
+	kFAXT30mOx4bPAqVeVC920+AK3D3EzXzc4jE7BCO67ADXwGbecZGgPRkPWpzT2I78Pd0
+	LCrx8HniqCYrnMcmJdnHfB/ErQlAQCRMnIQTuFaAJRRC3E7uNgrWGvpA100OiQO3XLUd
+	RhwHqhE22x/GQ1I8XgDFqxN/1iMT+Kh0M9lwbUfacjb0/vpFbE7VT746+JAOQing3lzN
+	S88qDn9nxKm0v+8eqgO3xeYnbXB3DPQG/9gP45Yk+7uyDq0vsDYOloNxrTuLOVsXq2w8
+	tNWQ==
+X-Gm-Message-State: APjAAAWfb93gQg06nrbSquzmulE1fUSYkeSbA3bTXlO9CBr68CYwmI8Y
+	Rl//ten6MDeCapoxRUh9bWTtKGrw0XU=
+X-Google-Smtp-Source: APXvYqxrx3RdmluU8QWqv0XreCz+NTmdeff9YquhmuPtVyAQspuCIeGoSi2/4scrpqT3FpZQh8qAfQ==
+X-Received: by 2002:a63:fc61:: with SMTP id r33mr26554880pgk.294.1559063889507;
+	Tue, 28 May 2019 10:18:09 -0700 (PDT)
+Received: from localhost ([12.206.222.5]) by smtp.gmail.com with ESMTPSA id
+	f38sm11763026pgm.85.2019.05.28.10.18.07
+	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+	Tue, 28 May 2019 10:18:07 -0700 (PDT)
+Date: Tue, 28 May 2019 10:18:07 -0700 (PDT)
+X-Google-Original-Date: Tue, 28 May 2019 10:17:56 PDT (-0700)
+In-Reply-To: <a95544549f6205d1da5c9efa69fed4f9a89f5866.1557182815.git.alistair.francis@wdc.com>
+From: Palmer Dabbelt <palmer@sifive.com>
+To: Alistair Francis <Alistair.Francis@wdc.com>
+Message-ID: <mhng-4345b03b-e9cb-4dfb-8807-4245659eca20@palmer-si-x1e>
+Mime-Version: 1.0 (MHng)
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-X-Content-Filtered-By: Mailman/MimeDel 2.1.21
-Subject: Re: [Qemu-devel] [PATCH v6 2/3] block/stream: refactor stream_run:
- drop goto
+	[fuzzy]
+X-Received-From: 209.85.215.196
+Subject: Re: [Qemu-devel] [PATCH v1 1/1] target/riscv: Allow setting ISA
+ extensions via CPU props
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -100,60 +79,167 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, kwolf@redhat.com, berto@igalia.com, wencongyang2@huawei.com,
-	xiechanglong.d@gmail.com, stefanha@redhat.com, den@openvz.org,
-	andrey.shinkevich@virtuozzo.com, jsnow@redhat.com
+Cc: Alistair Francis <Alistair.Francis@wdc.com>, qemu-riscv@nongnu.org,
+	qemu-devel@nongnu.org, alistair23@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---6svU7IFIwnTWmXTXSBgi5RrxfWXQjSGcd
-From: Max Reitz <mreitz@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: xiechanglong.d@gmail.com, wencongyang2@huawei.com, fam@euphon.net,
- stefanha@redhat.com, kwolf@redhat.com, jsnow@redhat.com,
- andrey.shinkevich@virtuozzo.com, den@openvz.org, berto@igalia.com
-Message-ID: <3418f89f-25ef-3a8a-53d2-466278c6ed82@redhat.com>
-Subject: Re: [PATCH v6 2/3] block/stream: refactor stream_run: drop goto
-References: <20190506153429.52737-1-vsementsov@virtuozzo.com>
- <20190506153429.52737-3-vsementsov@virtuozzo.com>
-In-Reply-To: <20190506153429.52737-3-vsementsov@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 06.05.19 17:34, Vladimir Sementsov-Ogievskiy wrote:
-> The goto is unnecessary in the stream_run() since the common exit
-> code was removed in the commit eb23654dbe43b549ea2a9ebff9d8e:
-> "jobs: utilize job_exit shim".
->=20
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-> Reviewed-by: Alberto Garcia <berto@igalia.com>
+On Mon, 06 May 2019 15:49:53 PDT (-0700), Alistair Francis wrote:
+> This patch allows us to enable/disable the RISC-V ISA extensions from
+> the QEMU command line. This works with the rv32 and rv64 machines. The
+> idea is that in the future we can now add extensions and leave them
+> disabled by default until enabled by the user.
+>
+> Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
 > ---
->  block/stream.c | 13 ++++---------
->  1 file changed, 4 insertions(+), 9 deletions(-)
+> Based-on: <cover.1555726824.git.alistair.francis@wdc.com>
+>
+> This is based on my previous series: "RISC-V: Add properties to the
+> CPUs" which has been merged into the RISC-V tree.
+>
+>  target/riscv/cpu.c | 70 ++++++++++++++++++++++++++++++++++++++++++++--
+>  target/riscv/cpu.h | 11 ++++++++
+>  2 files changed, 79 insertions(+), 2 deletions(-)
+>
+> diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
+> index 2db173801f..41afed3140 100644
+> --- a/target/riscv/cpu.c
+> +++ b/target/riscv/cpu.c
+> @@ -23,6 +23,7 @@
+>  #include "cpu.h"
+>  #include "exec/exec-all.h"
+>  #include "qapi/error.h"
+> +#include "qemu/error-report.h"
+>  #include "hw/qdev-properties.h"
+>  #include "migration/vmstate.h"
+>
+> @@ -118,7 +119,8 @@ static void riscv_any_cpu_init(Object *obj)
+>  static void riscv_base32_cpu_init(Object *obj)
+>  {
+>      CPURISCVState *env = &RISCV_CPU(obj)->env;
+> -    set_misa(env, RV32 | RVI | RVM | RVA | RVF | RVD | RVC | RVS | RVU);
+> +    /* We set this in the realise function */
+> +    set_misa(env, 0);
+>  }
+>
+>  static void rv32gcsu_priv1_09_1_cpu_init(Object *obj)
+> @@ -155,7 +157,8 @@ static void rv32imacu_nommu_cpu_init(Object *obj)
+>  static void riscv_base64_cpu_init(Object *obj)
+>  {
+>      CPURISCVState *env = &RISCV_CPU(obj)->env;
+> -    set_misa(env, RV64 | RVI | RVM | RVA | RVF | RVD | RVC | RVS | RVU);
+> +    /* We set this in the realise function */
+> +    set_misa(env, 0);
+>  }
+>
+>  static void rv64gcsu_priv1_09_1_cpu_init(Object *obj)
+> @@ -314,6 +317,7 @@ static void riscv_cpu_realize(DeviceState *dev, Error **errp)
+>      RISCVCPUClass *mcc = RISCV_CPU_GET_CLASS(dev);
+>      int priv_version = PRIV_VERSION_1_10_0;
+>      int user_version = USER_VERSION_2_02_0;
+> +    target_ulong target_misa = 0;
+>      Error *local_err = NULL;
+>
+>      cpu_exec_realizefn(cs, &local_err);
+> @@ -357,6 +361,58 @@ static void riscv_cpu_realize(DeviceState *dev, Error **errp)
+>          set_feature(env, RISCV_FEATURE_PMP);
+>      }
+>
+> +    /* If misa isn't set (rv32 and rv64 machines) set it here */
+> +    if (!env->misa) {
+> +        /* Do some ISA extension error checking */
+> +        if (cpu->cfg.ext_i && cpu->cfg.ext_e) {
+> +            error_setg(errp,
+> +                       "I and E extensions are incompatible");
+> +                       return;
+> +       }
+> +
+> +       if (cpu->cfg.ext_g && !(cpu->cfg.ext_i & cpu->cfg.ext_m &
+> +                               cpu->cfg.ext_a & cpu->cfg.ext_f &
+> +                               cpu->cfg.ext_d)) {
+> +            warn_report("Setting G will also set IMAFD");
+> +            cpu->cfg.ext_i = true;
+> +            cpu->cfg.ext_m = true;
+> +            cpu->cfg.ext_a = true;
+> +            cpu->cfg.ext_f = true;
+> +            cpu->cfg.ext_d = true;
+> +        }
+> +
+> +        /* Set the ISA extensions, checks should have happened above */
+> +        if (cpu->cfg.ext_i) {
+> +            target_misa |= RVI;
+> +        }
+> +        if (cpu->cfg.ext_e) {
+> +            target_misa |= RVE;
+> +        }
+> +        if (cpu->cfg.ext_m) {
+> +            target_misa |= RVM;
+> +        }
+> +        if (cpu->cfg.ext_a) {
+> +            target_misa |= RVA;
+> +        }
+> +        if (cpu->cfg.ext_f) {
+> +            target_misa |= RVF;
+> +        }
+> +        if (cpu->cfg.ext_d) {
+> +            target_misa |= RVD;
+> +        }
+> +        if (cpu->cfg.ext_c) {
+> +            target_misa |= RVC;
+> +        }
+> +        if (cpu->cfg.ext_s) {
+> +            target_misa |= RVS;
+> +        }
+> +        if (cpu->cfg.ext_u) {
+> +            target_misa |= RVU;
+> +        }
+> +
+> +        set_misa(env, RVXLEN | target_misa);
+> +    }
+> +
+>      riscv_cpu_register_gdb_regs_for_features(cs);
+>
+>      qemu_init_vcpu(cs);
+> @@ -379,6 +435,16 @@ static const VMStateDescription vmstate_riscv_cpu = {
+>  };
+>
+>  static Property riscv_cpu_properties[] = {
+> +    DEFINE_PROP_BOOL("i", RISCVCPU, cfg.ext_i, true),
+> +    DEFINE_PROP_BOOL("e", RISCVCPU, cfg.ext_e, false),
+> +    DEFINE_PROP_BOOL("g", RISCVCPU, cfg.ext_g, true),
+> +    DEFINE_PROP_BOOL("m", RISCVCPU, cfg.ext_m, true),
+> +    DEFINE_PROP_BOOL("a", RISCVCPU, cfg.ext_a, true),
+> +    DEFINE_PROP_BOOL("f", RISCVCPU, cfg.ext_f, true),
+> +    DEFINE_PROP_BOOL("d", RISCVCPU, cfg.ext_d, true),
+> +    DEFINE_PROP_BOOL("c", RISCVCPU, cfg.ext_c, true),
+> +    DEFINE_PROP_BOOL("s", RISCVCPU, cfg.ext_s, true),
+> +    DEFINE_PROP_BOOL("u", RISCVCPU, cfg.ext_u, true),
+>      DEFINE_PROP_STRING("priv_spec", RISCVCPU, cfg.priv_spec),
+>      DEFINE_PROP_STRING("user_spec", RISCVCPU, cfg.user_spec),
+>      DEFINE_PROP_BOOL("mmu", RISCVCPU, cfg.mmu, true),
+> diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
+> index 67d27f45f6..9805e65065 100644
+> --- a/target/riscv/cpu.h
+> +++ b/target/riscv/cpu.h
+> @@ -229,6 +229,17 @@ typedef struct RISCVCPU {
+>
+>      /* Configuration Settings */
+>      struct {
+> +        bool ext_i;
+> +        bool ext_e;
+> +        bool ext_g;
+> +        bool ext_m;
+> +        bool ext_a;
+> +        bool ext_f;
+> +        bool ext_d;
+> +        bool ext_c;
+> +        bool ext_s;
+> +        bool ext_u;
+> +
+>          char *priv_spec;
+>          char *user_spec;
+>          bool mmu;
 
-Reviewed-by: Max Reitz <mreitz@redhat.com>
-
-
---6svU7IFIwnTWmXTXSBgi5RrxfWXQjSGcd
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlztbSkACgkQ9AfbAGHV
-z0DegQf/ZdnLWY/YkYmcWN8Uotdnl0XH407SVPC9/fqBC899zGKfo9XDRshMcUls
-kkYkA0cvnElu+eAwO7fVbv+ZU+Gi4KJA1vEujsf/ShX6LYfcdiCAatEqIquKc6zl
-QiV3nNkDZeM0aJJGy0KSU0zMbk9xhzoC6jZ7WJHjkwUDjOA2wHONFgLZd0S7HyZG
-kz2bgCASRHU5py9ntMAbMXmwbSSXhsaPA3nvUKAwVsJ48diDwd7jJe15/sAMnTGj
-F1O3QkhficKrNBln6xhFEf+VkvEniRLGOn9MGaT9Kt6UD+vA6iKGWgKKhfe+/AkW
-Z1V2YGdwoSznn+ySSu2GRDqChJA7qw==
-=Wg6r
------END PGP SIGNATURE-----
-
---6svU7IFIwnTWmXTXSBgi5RrxfWXQjSGcd--
+Reviewed-by: Palmer Dabbelt <palmer@sifive.com>
 
