@@ -7,59 +7,58 @@ X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 101B9C072B1
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71896C28CC0
 	for <qemu-devel@archiver.kernel.org>; Tue, 28 May 2019 01:15:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D67B02075E
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 May 2019 01:15:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 43CA02075E
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 May 2019 01:15:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="HTqA2RxS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D67B02075E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="LpXMZ+Cl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 43CA02075E
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:55298 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:55301 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hVQi1-0003f2-2S
+	id 1hVQi1-0003fs-Ft
 	for qemu-devel@archiver.kernel.org; Mon, 27 May 2019 21:15:21 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:46364)
+Received: from eggs.gnu.org ([209.51.188.92]:46406)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1hVQgJ-0002iz-P3
-	for qemu-devel@nongnu.org; Mon, 27 May 2019 21:13:36 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1hVQgK-0002j5-WB
+	for qemu-devel@nongnu.org; Mon, 27 May 2019 21:13:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1hVQgI-0006yE-2j
-	for qemu-devel@nongnu.org; Mon, 27 May 2019 21:13:35 -0400
-Received: from ozlabs.org ([2401:3900:2:1::2]:47345)
+	(envelope-from <dgibson@ozlabs.org>) id 1hVQgJ-0006zk-Qs
+	for qemu-devel@nongnu.org; Mon, 27 May 2019 21:13:36 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:43017 helo=ozlabs.org)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
-	id 1hVQgF-0006kj-VA; Mon, 27 May 2019 21:13:33 -0400
+	id 1hVQgI-0006kY-2R; Mon, 27 May 2019 21:13:35 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
-	id 45CbST3Pnsz9s9N; Tue, 28 May 2019 11:13:13 +1000 (AEST)
+	id 45CbST4k6hz9s9y; Tue, 28 May 2019 11:13:13 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
 	d=gibson.dropbear.id.au; s=201602; t=1559005993;
-	bh=NaqAY09AixoNrCtMM67sn2S/ijDfEydc9//tYzhzMU4=;
+	bh=AB2PI7Ip5npPxf7/mhaGao15oH8SX/OG7x1dT3Ap68g=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=HTqA2RxSN6py9lVak6HQr4oHSvAT5r9bsCgT+yBkXI8oD05+0oUxfSe2P6VQUjmW+
-	Aone7YHa6WK9lUr1Y7lciv36teXz4dbTD12Lt7xmwr5yX3HPZd43H68SG0hEO+H5Ij
-	ggYMVWth23/eczmcp9W0JgF26ASKj1CGt4/RpTXc=
-Date: Tue, 28 May 2019 11:07:03 +1000
+	b=LpXMZ+ClyM1E8IViqoZxbStCtBMGBUfXOeFXcSLupN4GR+4D7KJcMFPYiXDuzADac
+	BtSfYB26SsfL+pH4ZnTUct4hiV+p0aTsVtEU9qEBEzwtoa6RYLeFHssD/gknTij1aA
+	WdnVe2ig6cnOsZF0//n1ZXy45N4Izr98yVl8WZNg=
+Date: Tue, 28 May 2019 11:07:25 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
 To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
-Message-ID: <20190528010703.GB11618@umbus.fritz.box>
-References: <20190527071749.31499-1-clg@kaod.org>
+Message-ID: <20190528010725.GC11618@umbus.fritz.box>
+References: <20190527071722.31424-1-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="Y7xTucakfITjPcLV"
+	protocol="application/pgp-signature"; boundary="w7PDEPdKQumQfZlR"
 Content-Disposition: inline
-In-Reply-To: <20190527071749.31499-1-clg@kaod.org>
+In-Reply-To: <20190527071722.31424-1-clg@kaod.org>
 User-Agent: Mutt/1.11.4 (2019-03-13)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2401:3900:2:1::2
-Subject: Re: [Qemu-devel] [PATCH] ppc/pnv: introduce new skiboot platform
- properties
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 203.11.71.1
+Subject: Re: [Qemu-devel] [PATCH] ppc/pnv: add dummy XSCOM registers for PRD
+ initialization
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -77,62 +76,70 @@ Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---Y7xTucakfITjPcLV
+--w7PDEPdKQumQfZlR
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, May 27, 2019 at 09:17:49AM +0200, C=E9dric Le Goater wrote:
-> Newer skiboots (after 6.3) support QEMU platforms that have
-> characteristics closer to real OpenPOWER systems. The CPU type is used
-> to define the BMC drivers: Aspeed AST2400 for POWER8 processors and
-> AST2500 for POWER9s.
->=20
-> Advertise the new platform property names, "qemu,powernv8" and
-> "qemu,powernv9", using the CPU type chosen for the QEMU PowerNV
-> machine. Also, advertise the original platform name "qemu,powernv" in
-> case of POWER8 processors for compatibility with older skiboots.
+On Mon, May 27, 2019 at 09:17:22AM +0200, C=E9dric Le Goater wrote:
+> PRD (Processor recovery diagnostics) is a service available on
+> OpenPower systems. The opal-prd daemon initializes the PowerPC
+> Processor through the XSCOM bus and then waits for hardware diagnostic
+> events.
 >=20
 > Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
 
 Applied, thanks.
 
 > ---
->  hw/ppc/pnv.c | 13 ++++++++++---
->  1 file changed, 10 insertions(+), 3 deletions(-)
+>  hw/ppc/pnv_xscom.c | 18 ++++++++++++++++++
+>  1 file changed, 18 insertions(+)
 >=20
-> diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
-> index dfb4ea5742c1..1f22cbf833a8 100644
-> --- a/hw/ppc/pnv.c
-> +++ b/hw/ppc/pnv.c
-> @@ -450,7 +450,8 @@ static void pnv_dt_power_mgt(void *fdt)
+> diff --git a/hw/ppc/pnv_xscom.c b/hw/ppc/pnv_xscom.c
+> index c285ef514e88..f53a6d7a9457 100644
+> --- a/hw/ppc/pnv_xscom.c
+> +++ b/hw/ppc/pnv_xscom.c
+> @@ -29,6 +29,12 @@
 > =20
->  static void *pnv_dt_create(MachineState *machine)
->  {
-> -    const char plat_compat[] =3D "qemu,powernv\0ibm,powernv";
-> +    const char plat_compat8[] =3D "qemu,powernv8\0qemu,powernv\0ibm,powe=
-rnv";
-> +    const char plat_compat9[] =3D "qemu,powernv9\0ibm,powernv";
->      PnvMachineState *pnv =3D PNV_MACHINE(machine);
->      void *fdt;
->      char *buf;
-> @@ -465,8 +466,14 @@ static void *pnv_dt_create(MachineState *machine)
->      _FDT((fdt_setprop_cell(fdt, 0, "#size-cells", 0x2)));
->      _FDT((fdt_setprop_string(fdt, 0, "model",
->                               "IBM PowerNV (emulated by qemu)")));
-> -    _FDT((fdt_setprop(fdt, 0, "compatible", plat_compat,
-> -                      sizeof(plat_compat))));
-> +    if (pnv_is_power9(pnv)) {
-> +        _FDT((fdt_setprop(fdt, 0, "compatible", plat_compat9,
-> +                          sizeof(plat_compat9))));
-> +    } else {
-> +        _FDT((fdt_setprop(fdt, 0, "compatible", plat_compat8,
-> +                          sizeof(plat_compat8))));
-> +    }
+>  #include <libfdt.h>
+> =20
+> +/* PRD registers */
+> +#define PRD_P8_IPOLL_REG_MASK           0x01020013
+> +#define PRD_P8_IPOLL_REG_STATUS         0x01020014
+> +#define PRD_P9_IPOLL_REG_MASK           0x000F0033
+> +#define PRD_P9_IPOLL_REG_STATUS         0x000F0034
 > +
+>  static void xscom_complete(CPUState *cs, uint64_t hmer_bits)
+>  {
+>      /*
+> @@ -70,6 +76,12 @@ static uint64_t xscom_read_default(PnvChip *chip, uint=
+32_t pcba)
+>      case 0x1010c00:     /* PIBAM FIR */
+>      case 0x1010c03:     /* PIBAM FIR MASK */
 > =20
->      buf =3D  qemu_uuid_unparse_strdup(&qemu_uuid);
->      _FDT((fdt_setprop_string(fdt, 0, "vm,uuid", buf)));
+> +        /* PRD registers */
+> +    case PRD_P8_IPOLL_REG_MASK:
+> +    case PRD_P8_IPOLL_REG_STATUS:
+> +    case PRD_P9_IPOLL_REG_MASK:
+> +    case PRD_P9_IPOLL_REG_STATUS:
+> +
+>          /* P9 xscom reset */
+>      case 0x0090018:     /* Receive status reg */
+>      case 0x0090012:     /* log register */
+> @@ -124,6 +136,12 @@ static bool xscom_write_default(PnvChip *chip, uint3=
+2_t pcba, uint64_t val)
+>      case 0x201302a:     /* CAPP stuff */
+>      case 0x2013801:     /* CAPP stuff */
+>      case 0x2013802:     /* CAPP stuff */
+> +
+> +        /* P8 PRD registers */
+> +    case PRD_P8_IPOLL_REG_MASK:
+> +    case PRD_P8_IPOLL_REG_STATUS:
+> +    case PRD_P9_IPOLL_REG_MASK:
+> +    case PRD_P9_IPOLL_REG_STATUS:
+>          return true;
+>      default:
+>          return false;
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -140,25 +147,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---Y7xTucakfITjPcLV
+--w7PDEPdKQumQfZlR
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlzsibcACgkQbDjKyiDZ
-s5Ls4w//awR1QS09ov7489FmMAmTqMrKz3fJYR3ktA9Mc4ddjQQqNqBzSRask3Hr
-1WKOekxb7UES1FgqRqZ+6LRaBIdnpxN2pGpCMuuy0ivBCG3dde4nlQ+xJk5BqhcY
-Ot5F8vDi99GBilxcg7XtI5Y9ROQFWq0CnhfR6b2bRJwQbFXsY0euar4L5XlXDDDg
-AUz8GF6QOOkNDhC9dA+LCF0IqsNWXKA3SWc8U2aiW97keqQd3cbPKMO3/t0rfjDN
-r5zW3TumQTaFHkBlJkOd3vbIa0HjOGHplTbY5PyyCYF29x07zS8lKcEUbEat+jXu
-YZvjfl86SE/X24c/pWDkKr8cBIvR/+qALBMpTtTSWxi++oC0D6T8JG9eB0yD/aBY
-9bsmyMEqjh/jouhURCAKrl8dldwS4a8R86zafF7EldXL58FF1Myynx7B+Mezp8Uo
-YuA1p1vWCniwMqNexEuIWESZ/w4dI894SVc8DnXKI/vGf2H0ucTERvkX/If5IgcO
-gjndvRY3AaGGTYeVyQe1Os3AUoJzJBE97AMwRP3uvL9x/i1cXUAGHpObD6R48HFQ
-E2olS+AwmvLH3SFF7GeqiAB+BXTIQ73DKjINdQ7rGo0pHpsyQFr/zyjuBRlTzAPr
-ydEkB2nZgrV3R0UOIKy5puSMOQMkofs9k86E5bd5nAE3y8SPeu4=
-=rdbA
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlzsic0ACgkQbDjKyiDZ
+s5J3WQ/9Gu3tII+T0U98FjZzaKxmHYIpb1kqDezXLEWhK6hvvPXZNmXll/mgA/n8
+bT4UXn1Vid2N1Dn1fn2m7lpcuZcMdF3+UAscE3fnAKrxykSarJ8VVwJNnCIYWGFq
+E+uFkMCrd1tUUmqI7he8khWvvU8hM/7hALUkd6jMu04kqA5g4UNw61Y/+rkd9fFo
+KNDKDH2XKFzSAugn4TNTIs7vm9CmZC8rtZkD2aETiKYGC6AfuHI5LgdX6tZ0dhue
+iYAOcUlZrDmdcn5pvZe3G4FjuzfQi+vusby1JrtISgtUpCoy3PaltkMaFjdPU5xV
+Kb2dMluYCLizKJojwZwUm7VxMVxkfyoEnpN+8n2YLFRL4axQ+bNrQ6HBBaGL2zaJ
+cCbRiWKcOpoBZDxxx/SQ8Zn7jKo3HDf4pNHdz3W3RKh3j2NMp25C54hbvwADw7nc
+kRaZT4AqVv7XSSqCotFRrVFKW4sjkMsbIpee2Wxtc6f/ZmuRkDSvm161f6zDsNl5
+SBNWp55nYjw4dX4FRcumhtwCuphaZ1SNaNhqcLMsuhBGtIlFD1FY6/x3SfbOi88n
+oE3yUqZB1Kcgz5s0qhpx1EDR5h6yTP2kpHfKEfdeJnSPbYs0tasE9sUwf55HvB8K
+cCL/lIvHSzVKgDcJi9b+a1EMZetAm/z7535qwTt8IARCHwoBULA=
+=gh5b
 -----END PGP SIGNATURE-----
 
---Y7xTucakfITjPcLV--
+--w7PDEPdKQumQfZlR--
 
