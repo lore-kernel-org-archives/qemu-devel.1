@@ -6,68 +6,107 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4500FC04AB6
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 May 2019 17:19:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 69A1FC04AB6
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 May 2019 17:40:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 102CA2075B
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 May 2019 17:19:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 102CA2075B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
+	by mail.kernel.org (Postfix) with ESMTPS id 368562173B
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 May 2019 17:40:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 368562173B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:39936 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:40236 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hVflG-0005p8-7N
-	for qemu-devel@archiver.kernel.org; Tue, 28 May 2019 13:19:42 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:38605)
+	id 1hVg54-0002JT-5f
+	for qemu-devel@archiver.kernel.org; Tue, 28 May 2019 13:40:10 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:41155)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <palmer@dabbelt.com>) id 1hVfjw-00053f-L0
-	for qemu-devel@nongnu.org; Tue, 28 May 2019 13:18:21 -0400
+	(envelope-from <david@redhat.com>) id 1hVfuM-0002LA-Kg
+	for qemu-devel@nongnu.org; Tue, 28 May 2019 13:29:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <palmer@dabbelt.com>) id 1hVfju-0001B5-5C
-	for qemu-devel@nongnu.org; Tue, 28 May 2019 13:18:19 -0400
-Received: from mail-pg1-f196.google.com ([209.85.215.196]:43833)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <palmer@dabbelt.com>) id 1hVfjr-00015W-Mq
-	for qemu-devel@nongnu.org; Tue, 28 May 2019 13:18:16 -0400
-Received: by mail-pg1-f196.google.com with SMTP id f25so11365608pgv.10
-	for <qemu-devel@nongnu.org>; Tue, 28 May 2019 10:18:10 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:date:subject:in-reply-to:cc:from:to:message-id
-	:mime-version:content-transfer-encoding;
-	bh=ynqteHpaI18mvzVpqabF5CifMGbrBuDWqWx964didfw=;
-	b=dDX9qvSfggGF9uVkymLj2L72pDjwcJ72ywzu2gJkuyhnJf78eIAkQlnBCT0M2A6/R5
-	kFAXT30mOx4bPAqVeVC920+AK3D3EzXzc4jE7BCO67ADXwGbecZGgPRkPWpzT2I78Pd0
-	LCrx8HniqCYrnMcmJdnHfB/ErQlAQCRMnIQTuFaAJRRC3E7uNgrWGvpA100OiQO3XLUd
-	RhwHqhE22x/GQ1I8XgDFqxN/1iMT+Kh0M9lwbUfacjb0/vpFbE7VT746+JAOQing3lzN
-	S88qDn9nxKm0v+8eqgO3xeYnbXB3DPQG/9gP45Yk+7uyDq0vsDYOloNxrTuLOVsXq2w8
-	tNWQ==
-X-Gm-Message-State: APjAAAWfb93gQg06nrbSquzmulE1fUSYkeSbA3bTXlO9CBr68CYwmI8Y
-	Rl//ten6MDeCapoxRUh9bWTtKGrw0XU=
-X-Google-Smtp-Source: APXvYqxrx3RdmluU8QWqv0XreCz+NTmdeff9YquhmuPtVyAQspuCIeGoSi2/4scrpqT3FpZQh8qAfQ==
-X-Received: by 2002:a63:fc61:: with SMTP id r33mr26554880pgk.294.1559063889507;
-	Tue, 28 May 2019 10:18:09 -0700 (PDT)
-Received: from localhost ([12.206.222.5]) by smtp.gmail.com with ESMTPSA id
-	f38sm11763026pgm.85.2019.05.28.10.18.07
-	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Tue, 28 May 2019 10:18:07 -0700 (PDT)
-Date: Tue, 28 May 2019 10:18:07 -0700 (PDT)
-X-Google-Original-Date: Tue, 28 May 2019 10:17:56 PDT (-0700)
-In-Reply-To: <a95544549f6205d1da5c9efa69fed4f9a89f5866.1557182815.git.alistair.francis@wdc.com>
-From: Palmer Dabbelt <palmer@sifive.com>
-To: Alistair Francis <Alistair.Francis@wdc.com>
-Message-ID: <mhng-4345b03b-e9cb-4dfb-8807-4245659eca20@palmer-si-x1e>
-Mime-Version: 1.0 (MHng)
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
+	(envelope-from <david@redhat.com>) id 1hVfuI-0001g7-TZ
+	for qemu-devel@nongnu.org; Tue, 28 May 2019 13:29:04 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51156)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1hVfuD-0001Yc-Cq
+	for qemu-devel@nongnu.org; Tue, 28 May 2019 13:28:59 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+	[10.5.11.22])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 00094300183A;
+	Tue, 28 May 2019 17:28:52 +0000 (UTC)
+Received: from [10.36.116.177] (ovpn-116-177.ams2.redhat.com [10.36.116.177])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 0FFEF1017E3C;
+	Tue, 28 May 2019 17:28:51 +0000 (UTC)
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+References: <20190522222821.23850-1-richard.henderson@linaro.org>
+	<20190522222821.23850-17-richard.henderson@linaro.org>
+From: David Hildenbrand <david@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+	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
+	SE+xAvmumFBY
+Organization: Red Hat GmbH
+Message-ID: <a8a1fd49-c368-ed38-4d56-8743db5dd5b5@redhat.com>
+Date: Tue, 28 May 2019 19:28:51 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
+MIME-Version: 1.0
+In-Reply-To: <20190522222821.23850-17-richard.henderson@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.40]);
+	Tue, 28 May 2019 17:28:53 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-	[fuzzy]
-X-Received-From: 209.85.215.196
-Subject: Re: [Qemu-devel] [PATCH v1 1/1] target/riscv: Allow setting ISA
- extensions via CPU props
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PULL 16/16] tcg/i386: Use MOVDQA for
+ TCG_TYPE_V128 load/store
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -79,167 +118,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alistair Francis <Alistair.Francis@wdc.com>, qemu-riscv@nongnu.org,
-	qemu-devel@nongnu.org, alistair23@gmail.com
+Cc: peter.maydell@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 06 May 2019 15:49:53 PDT (-0700), Alistair Francis wrote:
-> This patch allows us to enable/disable the RISC-V ISA extensions from
-> the QEMU command line. This works with the rv32 and rv64 machines. The
-> idea is that in the future we can now add extensions and leave them
-> disabled by default until enabled by the user.
->
-> Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+On 23.05.19 00:28, Richard Henderson wrote:
+> This instruction raises #GP, aka SIGSEGV, if the effective address
+> is not aligned to 16-bytes.
+> 
+> We have assertions in tcg-op-gvec.c that the offset from ENV is
+> aligned, for vector types <= V128.  But the offset itself does not
+> validate that the final pointer is aligned -- one must also remember
+> to use the QEMU_ALIGNED() attribute on the vector member within ENV.
+> 
+> PowerPC Altivec has vector load/store instructions that silently
+> discard the low 4 bits of the address, making alignment mistakes
+> difficult to discover.  Aid that by making the most popular host
+> visibly signal the error.
+> 
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 > ---
-> Based-on: <cover.1555726824.git.alistair.francis@wdc.com>
->
-> This is based on my previous series: "RISC-V: Add properties to the
-> CPUs" which has been merged into the RISC-V tree.
->
->  target/riscv/cpu.c | 70 ++++++++++++++++++++++++++++++++++++++++++++--
->  target/riscv/cpu.h | 11 ++++++++
->  2 files changed, 79 insertions(+), 2 deletions(-)
->
-> diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
-> index 2db173801f..41afed3140 100644
-> --- a/target/riscv/cpu.c
-> +++ b/target/riscv/cpu.c
-> @@ -23,6 +23,7 @@
->  #include "cpu.h"
->  #include "exec/exec-all.h"
->  #include "qapi/error.h"
-> +#include "qemu/error-report.h"
->  #include "hw/qdev-properties.h"
->  #include "migration/vmstate.h"
->
-> @@ -118,7 +119,8 @@ static void riscv_any_cpu_init(Object *obj)
->  static void riscv_base32_cpu_init(Object *obj)
->  {
->      CPURISCVState *env = &RISCV_CPU(obj)->env;
-> -    set_misa(env, RV32 | RVI | RVM | RVA | RVF | RVD | RVC | RVS | RVU);
-> +    /* We set this in the realise function */
-> +    set_misa(env, 0);
->  }
->
->  static void rv32gcsu_priv1_09_1_cpu_init(Object *obj)
-> @@ -155,7 +157,8 @@ static void rv32imacu_nommu_cpu_init(Object *obj)
->  static void riscv_base64_cpu_init(Object *obj)
->  {
->      CPURISCVState *env = &RISCV_CPU(obj)->env;
-> -    set_misa(env, RV64 | RVI | RVM | RVA | RVF | RVD | RVC | RVS | RVU);
-> +    /* We set this in the realise function */
-> +    set_misa(env, 0);
->  }
->
->  static void rv64gcsu_priv1_09_1_cpu_init(Object *obj)
-> @@ -314,6 +317,7 @@ static void riscv_cpu_realize(DeviceState *dev, Error **errp)
->      RISCVCPUClass *mcc = RISCV_CPU_GET_CLASS(dev);
->      int priv_version = PRIV_VERSION_1_10_0;
->      int user_version = USER_VERSION_2_02_0;
-> +    target_ulong target_misa = 0;
->      Error *local_err = NULL;
->
->      cpu_exec_realizefn(cs, &local_err);
-> @@ -357,6 +361,58 @@ static void riscv_cpu_realize(DeviceState *dev, Error **errp)
->          set_feature(env, RISCV_FEATURE_PMP);
->      }
->
-> +    /* If misa isn't set (rv32 and rv64 machines) set it here */
-> +    if (!env->misa) {
-> +        /* Do some ISA extension error checking */
-> +        if (cpu->cfg.ext_i && cpu->cfg.ext_e) {
-> +            error_setg(errp,
-> +                       "I and E extensions are incompatible");
-> +                       return;
-> +       }
-> +
-> +       if (cpu->cfg.ext_g && !(cpu->cfg.ext_i & cpu->cfg.ext_m &
-> +                               cpu->cfg.ext_a & cpu->cfg.ext_f &
-> +                               cpu->cfg.ext_d)) {
-> +            warn_report("Setting G will also set IMAFD");
-> +            cpu->cfg.ext_i = true;
-> +            cpu->cfg.ext_m = true;
-> +            cpu->cfg.ext_a = true;
-> +            cpu->cfg.ext_f = true;
-> +            cpu->cfg.ext_d = true;
-> +        }
-> +
-> +        /* Set the ISA extensions, checks should have happened above */
-> +        if (cpu->cfg.ext_i) {
-> +            target_misa |= RVI;
-> +        }
-> +        if (cpu->cfg.ext_e) {
-> +            target_misa |= RVE;
-> +        }
-> +        if (cpu->cfg.ext_m) {
-> +            target_misa |= RVM;
-> +        }
-> +        if (cpu->cfg.ext_a) {
-> +            target_misa |= RVA;
-> +        }
-> +        if (cpu->cfg.ext_f) {
-> +            target_misa |= RVF;
-> +        }
-> +        if (cpu->cfg.ext_d) {
-> +            target_misa |= RVD;
-> +        }
-> +        if (cpu->cfg.ext_c) {
-> +            target_misa |= RVC;
-> +        }
-> +        if (cpu->cfg.ext_s) {
-> +            target_misa |= RVS;
-> +        }
-> +        if (cpu->cfg.ext_u) {
-> +            target_misa |= RVU;
-> +        }
-> +
-> +        set_misa(env, RVXLEN | target_misa);
-> +    }
-> +
->      riscv_cpu_register_gdb_regs_for_features(cs);
->
->      qemu_init_vcpu(cs);
-> @@ -379,6 +435,16 @@ static const VMStateDescription vmstate_riscv_cpu = {
->  };
->
->  static Property riscv_cpu_properties[] = {
-> +    DEFINE_PROP_BOOL("i", RISCVCPU, cfg.ext_i, true),
-> +    DEFINE_PROP_BOOL("e", RISCVCPU, cfg.ext_e, false),
-> +    DEFINE_PROP_BOOL("g", RISCVCPU, cfg.ext_g, true),
-> +    DEFINE_PROP_BOOL("m", RISCVCPU, cfg.ext_m, true),
-> +    DEFINE_PROP_BOOL("a", RISCVCPU, cfg.ext_a, true),
-> +    DEFINE_PROP_BOOL("f", RISCVCPU, cfg.ext_f, true),
-> +    DEFINE_PROP_BOOL("d", RISCVCPU, cfg.ext_d, true),
-> +    DEFINE_PROP_BOOL("c", RISCVCPU, cfg.ext_c, true),
-> +    DEFINE_PROP_BOOL("s", RISCVCPU, cfg.ext_s, true),
-> +    DEFINE_PROP_BOOL("u", RISCVCPU, cfg.ext_u, true),
->      DEFINE_PROP_STRING("priv_spec", RISCVCPU, cfg.priv_spec),
->      DEFINE_PROP_STRING("user_spec", RISCVCPU, cfg.user_spec),
->      DEFINE_PROP_BOOL("mmu", RISCVCPU, cfg.mmu, true),
-> diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
-> index 67d27f45f6..9805e65065 100644
-> --- a/target/riscv/cpu.h
-> +++ b/target/riscv/cpu.h
-> @@ -229,6 +229,17 @@ typedef struct RISCVCPU {
->
->      /* Configuration Settings */
->      struct {
-> +        bool ext_i;
-> +        bool ext_e;
-> +        bool ext_g;
-> +        bool ext_m;
-> +        bool ext_a;
-> +        bool ext_f;
-> +        bool ext_d;
-> +        bool ext_c;
-> +        bool ext_s;
-> +        bool ext_u;
-> +
->          char *priv_spec;
->          char *user_spec;
->          bool mmu;
+>  tcg/i386/tcg-target.inc.c | 24 ++++++++++++++++++++++--
+>  1 file changed, 22 insertions(+), 2 deletions(-)
+> 
+> diff --git a/tcg/i386/tcg-target.inc.c b/tcg/i386/tcg-target.inc.c
+> index 6ec5e60448..c0443da4af 100644
+> --- a/tcg/i386/tcg-target.inc.c
+> +++ b/tcg/i386/tcg-target.inc.c
+> @@ -1082,14 +1082,24 @@ static void tcg_out_ld(TCGContext *s, TCGType type, TCGReg ret,
+>          }
+>          /* FALLTHRU */
+>      case TCG_TYPE_V64:
+> +        /* There is no instruction that can validate 8-byte alignment.  */
+>          tcg_debug_assert(ret >= 16);
+>          tcg_out_vex_modrm_offset(s, OPC_MOVQ_VqWq, ret, 0, arg1, arg2);
+>          break;
+>      case TCG_TYPE_V128:
+> +        /*
+> +         * The gvec infrastructure is asserts that v128 vector loads
+> +         * and stores use a 16-byte aligned offset.  Validate that the
+> +         * final pointer is aligned by using an insn that will SIGSEGV.
+> +         */
+>          tcg_debug_assert(ret >= 16);
+> -        tcg_out_vex_modrm_offset(s, OPC_MOVDQU_VxWx, ret, 0, arg1, arg2);
+> +        tcg_out_vex_modrm_offset(s, OPC_MOVDQA_VxWx, ret, 0, arg1, arg2);
+>          break;
+>      case TCG_TYPE_V256:
+> +        /*
+> +         * The gvec infrastructure only requires 16-byte alignment,
+> +         * so here we must use an unaligned load.
+> +         */
+>          tcg_debug_assert(ret >= 16);
+>          tcg_out_vex_modrm_offset(s, OPC_MOVDQU_VxWx | P_VEXL,
+>                                   ret, 0, arg1, arg2);
+> @@ -1117,14 +1127,24 @@ static void tcg_out_st(TCGContext *s, TCGType type, TCGReg arg,
+>          }
+>          /* FALLTHRU */
+>      case TCG_TYPE_V64:
+> +        /* There is no instruction that can validate 8-byte alignment.  */
+>          tcg_debug_assert(arg >= 16);
+>          tcg_out_vex_modrm_offset(s, OPC_MOVQ_WqVq, arg, 0, arg1, arg2);
+>          break;
+>      case TCG_TYPE_V128:
+> +        /*
+> +         * The gvec infrastructure is asserts that v128 vector loads
+> +         * and stores use a 16-byte aligned offset.  Validate that the
+> +         * final pointer is aligned by using an insn that will SIGSEGV.
+> +         */
+>          tcg_debug_assert(arg >= 16);
+> -        tcg_out_vex_modrm_offset(s, OPC_MOVDQU_WxVx, arg, 0, arg1, arg2);
+> +        tcg_out_vex_modrm_offset(s, OPC_MOVDQA_WxVx, arg, 0, arg1, arg2);
+>          break;
+>      case TCG_TYPE_V256:
+> +        /*
+> +         * The gvec infrastructure only requires 16-byte alignment,
+> +         * so here we must use an unaligned store.
+> +         */
+>          tcg_debug_assert(arg >= 16);
+>          tcg_out_vex_modrm_offset(s, OPC_MOVDQU_WxVx | P_VEXL,
+>                                   arg, 0, arg1, arg2);
+> 
 
-Reviewed-by: Palmer Dabbelt <palmer@sifive.com>
+This is the problematic patch. Haven't looked into the details yet, so I
+can't tell what's wrong. Maybe really an alignemnt issue?
+
+-- 
+
+Thanks,
+
+David / dhildenb
 
