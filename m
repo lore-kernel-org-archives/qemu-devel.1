@@ -3,60 +3,60 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1FF5EC04AB6
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 May 2019 19:39:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C70B3C04AB6
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 May 2019 19:41:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DD9BF20B1F
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 May 2019 19:39:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DD9BF20B1F
+	by mail.kernel.org (Postfix) with ESMTPS id A11FA208CB
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 May 2019 19:41:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A11FA208CB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:41622 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:41667 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hVhwu-0008L8-4G
-	for qemu-devel@archiver.kernel.org; Tue, 28 May 2019 15:39:52 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:36876)
+	id 1hVhyH-0001bA-ON
+	for qemu-devel@archiver.kernel.org; Tue, 28 May 2019 15:41:17 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:36878)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hVhnj-0001LL-9L
+	(envelope-from <mreitz@redhat.com>) id 1hVhnj-0001LM-9R
 	for qemu-devel@nongnu.org; Tue, 28 May 2019 15:30:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hVhnY-0001Vm-2c
+	(envelope-from <mreitz@redhat.com>) id 1hVhnY-0001Vo-2S
 	for qemu-devel@nongnu.org; Tue, 28 May 2019 15:30:19 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53586)
+Received: from mx1.redhat.com ([209.132.183.28]:41084)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mreitz@redhat.com>)
-	id 1hVhnR-0000vM-Uj; Tue, 28 May 2019 15:30:06 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
+	id 1hVhnN-0000vt-5p; Tue, 28 May 2019 15:30:03 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B1F5981E1D;
-	Tue, 28 May 2019 19:29:24 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id E45A3883D7;
+	Tue, 28 May 2019 19:29:34 +0000 (UTC)
 Received: from localhost (unknown [10.40.205.223])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 4670D5C8A3;
-	Tue, 28 May 2019 19:29:24 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 7844B60565;
+	Tue, 28 May 2019 19:29:33 +0000 (UTC)
 From: Max Reitz <mreitz@redhat.com>
 To: qemu-block@nongnu.org
-Date: Tue, 28 May 2019 21:28:39 +0200
-Message-Id: <20190528192847.2730-14-mreitz@redhat.com>
+Date: Tue, 28 May 2019 21:28:42 +0200
+Message-Id: <20190528192847.2730-17-mreitz@redhat.com>
 In-Reply-To: <20190528192847.2730-1-mreitz@redhat.com>
 References: <20190528192847.2730-1-mreitz@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.25]);
-	Tue, 28 May 2019 19:29:27 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.26]);
+	Tue, 28 May 2019 19:29:34 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 13/21] block/backup: refactor: split out
- backup_calculate_cluster_size
+Subject: [Qemu-devel] [PULL 16/21] qemu-img: rebase: Reuse parent
+ BlockDriverState
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -74,165 +74,75 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+From: Sam Eiderman <shmuel.eiderman@oracle.com>
 
-Split out cluster_size calculation. Move copy-bitmap creation above
-block-job creation, as we are going to share it with upcoming
-backup-top filter, which also should be created before actual block job
-creation.
+In safe mode we open the entire chain, including the parent backing
+file of the rebased file.
+Do not open a new BlockBackend for the parent backing file, which
+saves opening the rest of the chain twice, which for long chains
+saves many "pricy" bdrv_open() calls.
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-id: 20190429090842.57910-6-vsementsov@virtuozzo.com
-[mreitz: Dropped a paragraph from the commit message that was left over
-         from a previous version]
+Permissions for blk_new() were copied from blk_new_open() when
+flags =3D 0.
+
+Reviewed-by: Karl Heubaum <karl.heubaum@oracle.com>
+Reviewed-by: Eyal Moscovici <eyal.moscovici@oracle.com>
+Signed-off-by: Sagi Amit <sagi.amit@oracle.com>
+Co-developed-by: Sagi Amit <sagi.amit@oracle.com>
+Signed-off-by: Sam Eiderman <shmuel.eiderman@oracle.com>
+Message-id: 20190523163337.4497-2-shmuel.eiderman@oracle.com
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- block/backup.c | 82 ++++++++++++++++++++++++++++++++------------------
- 1 file changed, 52 insertions(+), 30 deletions(-)
+ qemu-img.c | 29 +++++++++--------------------
+ 1 file changed, 9 insertions(+), 20 deletions(-)
 
-diff --git a/block/backup.c b/block/backup.c
-index 5b3fc9d123..00f4f8af53 100644
---- a/block/backup.c
-+++ b/block/backup.c
-@@ -497,6 +497,42 @@ static const BlockJobDriver backup_job_driver =3D {
-     .drain                  =3D backup_drain,
- };
+diff --git a/qemu-img.c b/qemu-img.c
+index 28fba1e7a7..9bd0bb1e47 100644
+--- a/qemu-img.c
++++ b/qemu-img.c
+@@ -3309,29 +3309,18 @@ static int img_rebase(int argc, char **argv)
 =20
-+static int64_t backup_calculate_cluster_size(BlockDriverState *target,
-+                                             Error **errp)
-+{
-+    int ret;
-+    BlockDriverInfo bdi;
-+
-+    /*
-+     * If there is no backing file on the target, we cannot rely on COW =
-if our
-+     * backup cluster size is smaller than the target cluster size. Even=
- for
-+     * targets with a backing file, try to avoid COW if possible.
-+     */
-+    ret =3D bdrv_get_info(target, &bdi);
-+    if (ret =3D=3D -ENOTSUP && !target->backing) {
-+        /* Cluster size is not defined */
-+        warn_report("The target block device doesn't provide "
-+                    "information about the block size and it doesn't hav=
-e a "
-+                    "backing file. The default block size of %u bytes is=
- "
-+                    "used. If the actual block size of the target exceed=
-s "
-+                    "this default, the backup may be unusable",
-+                    BACKUP_CLUSTER_SIZE_DEFAULT);
-+        return BACKUP_CLUSTER_SIZE_DEFAULT;
-+    } else if (ret < 0 && !target->backing) {
-+        error_setg_errno(errp, -ret,
-+            "Couldn't determine the cluster size of the target image, "
-+            "which has no backing file");
-+        error_append_hint(errp,
-+            "Aborting, since this may create an unusable destination ima=
-ge\n");
-+        return ret;
-+    } else if (ret < 0 && target->backing) {
-+        /* Not fatal; just trudge on ahead. */
-+        return BACKUP_CLUSTER_SIZE_DEFAULT;
-+    }
-+
-+    return MAX(BACKUP_CLUSTER_SIZE_DEFAULT, bdi.cluster_size);
-+}
-+
- BlockJob *backup_job_create(const char *job_id, BlockDriverState *bs,
-                   BlockDriverState *target, int64_t speed,
-                   MirrorSyncMode sync_mode, BdrvDirtyBitmap *sync_bitmap=
-,
-@@ -508,9 +544,10 @@ BlockJob *backup_job_create(const char *job_id, Bloc=
-kDriverState *bs,
-                   JobTxn *txn, Error **errp)
- {
-     int64_t len;
--    BlockDriverInfo bdi;
-     BackupBlockJob *job =3D NULL;
-     int ret;
-+    int64_t cluster_size;
-+    HBitmap *copy_bitmap =3D NULL;
+     /* For safe rebasing we need to compare old and new backing file */
+     if (!unsafe) {
+-        char backing_name[PATH_MAX];
+         QDict *options =3D NULL;
++        BlockDriverState *base_bs =3D backing_bs(bs);
 =20
-     assert(bs);
-     assert(target);
-@@ -572,6 +609,13 @@ BlockJob *backup_job_create(const char *job_id, Bloc=
-kDriverState *bs,
-         goto error;
-     }
-=20
-+    cluster_size =3D backup_calculate_cluster_size(target, errp);
-+    if (cluster_size < 0) {
-+        goto error;
-+    }
-+
-+    copy_bitmap =3D hbitmap_alloc(len, ctz32(cluster_size));
-+
-     /* job->len is fixed, so we can't allow resize */
-     job =3D block_job_create(job_id, &backup_job_driver, txn, bs,
-                            BLK_PERM_CONSISTENT_READ,
-@@ -600,35 +644,9 @@ BlockJob *backup_job_create(const char *job_id, Bloc=
-kDriverState *bs,
-=20
-     /* Detect image-fleecing (and similar) schemes */
-     job->serialize_target_writes =3D bdrv_chain_contains(target, bs);
+-        if (bs->backing) {
+-            if (bs->backing_format[0] !=3D '\0') {
+-                options =3D qdict_new();
+-                qdict_put_str(options, "driver", bs->backing_format);
+-            }
 -
--    /* If there is no backing file on the target, we cannot rely on COW =
-if our
--     * backup cluster size is smaller than the target cluster size. Even=
- for
--     * targets with a backing file, try to avoid COW if possible. */
--    ret =3D bdrv_get_info(target, &bdi);
--    if (ret =3D=3D -ENOTSUP && !target->backing) {
--        /* Cluster size is not defined */
--        warn_report("The target block device doesn't provide "
--                    "information about the block size and it doesn't hav=
-e a "
--                    "backing file. The default block size of %u bytes is=
- "
--                    "used. If the actual block size of the target exceed=
-s "
--                    "this default, the backup may be unusable",
--                    BACKUP_CLUSTER_SIZE_DEFAULT);
--        job->cluster_size =3D BACKUP_CLUSTER_SIZE_DEFAULT;
--    } else if (ret < 0 && !target->backing) {
--        error_setg_errno(errp, -ret,
--            "Couldn't determine the cluster size of the target image, "
--            "which has no backing file");
--        error_append_hint(errp,
--            "Aborting, since this may create an unusable destination ima=
-ge\n");
--        goto error;
--    } else if (ret < 0 && target->backing) {
--        /* Not fatal; just trudge on ahead. */
--        job->cluster_size =3D BACKUP_CLUSTER_SIZE_DEFAULT;
--    } else {
--        job->cluster_size =3D MAX(BACKUP_CLUSTER_SIZE_DEFAULT, bdi.clust=
-er_size);
--    }
--
--    job->copy_bitmap =3D hbitmap_alloc(len, ctz32(job->cluster_size));
-+    job->cluster_size =3D cluster_size;
-+    job->copy_bitmap =3D copy_bitmap;
-+    copy_bitmap =3D NULL;
-     job->use_copy_range =3D true;
-     job->copy_range_size =3D MIN_NON_ZERO(blk_get_max_transfer(job->comm=
-on.blk),
-                                         blk_get_max_transfer(job->target=
-));
-@@ -644,6 +662,10 @@ BlockJob *backup_job_create(const char *job_id, Bloc=
-kDriverState *bs,
-     return &job->common;
-=20
-  error:
-+    if (copy_bitmap) {
-+        assert(!job || !job->copy_bitmap);
-+        hbitmap_free(copy_bitmap);
-+    }
-     if (sync_bitmap) {
-         bdrv_reclaim_dirty_bitmap(bs, sync_bitmap, NULL);
-     }
+-            if (force_share) {
+-                if (!options) {
+-                    options =3D qdict_new();
+-                }
+-                qdict_put_bool(options, BDRV_OPT_FORCE_SHARE, true);
+-            }
+-            bdrv_get_backing_filename(bs, backing_name, sizeof(backing_n=
+ame));
+-            blk_old_backing =3D blk_new_open(backing_name, NULL,
+-                                           options, src_flags, &local_er=
+r);
+-            if (!blk_old_backing) {
++        if (base_bs) {
++            blk_old_backing =3D blk_new(BLK_PERM_CONSISTENT_READ,
++                                      BLK_PERM_ALL);
++            ret =3D blk_insert_bs(blk_old_backing, base_bs,
++                                &local_err);
++            if (ret < 0) {
+                 error_reportf_err(local_err,
+-                                  "Could not open old backing file '%s':=
+ ",
+-                                  backing_name);
+-                ret =3D -1;
++                                  "Could not reuse old backing file '%s'=
+: ",
++                                  base_bs->filename);
+                 goto out;
+             }
+         } else {
 --=20
 2.21.0
 
