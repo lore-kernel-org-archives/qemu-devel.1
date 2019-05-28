@@ -2,67 +2,92 @@ Return-Path: <SRS0=2W3W=T4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EEE23C04AB6
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 May 2019 12:52:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 83F4FC04AB6
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 May 2019 12:54:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BD3132081C
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 May 2019 12:52:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BD3132081C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 520FE20989
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 May 2019 12:54:03 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Ry4vvoqM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 520FE20989
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:34326 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:34336 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hVbay-00063r-Vj
-	for qemu-devel@archiver.kernel.org; Tue, 28 May 2019 08:52:48 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:56203)
+	id 1hVbcA-0006fo-Jc
+	for qemu-devel@archiver.kernel.org; Tue, 28 May 2019 08:54:02 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:56497)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1hVbZv-0005Zh-BO
-	for qemu-devel@nongnu.org; Tue, 28 May 2019 08:51:44 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hVbb3-0006AX-7n
+	for qemu-devel@nongnu.org; Tue, 28 May 2019 08:52:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1hVbZu-0006yb-9x
-	for qemu-devel@nongnu.org; Tue, 28 May 2019 08:51:43 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:20940)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eric.auger@redhat.com>)
-	id 1hVbZr-0006uf-Q8; Tue, 28 May 2019 08:51:39 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id DA402C0528CB;
-	Tue, 28 May 2019 12:51:27 +0000 (UTC)
-Received: from [10.36.116.67] (ovpn-116-67.ams2.redhat.com [10.36.116.67])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 41B53611C5;
-	Tue, 28 May 2019 12:51:23 +0000 (UTC)
-To: Peter Xu <peterx@redhat.com>
-References: <20190527114203.2762-1-eric.auger@redhat.com>
-	<20190527114203.2762-9-eric.auger@redhat.com>
-	<20190528024747.GA23180@xz-x1>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <6e747747-8069-3f85-2e29-4b95f03e0719@redhat.com>
-Date: Tue, 28 May 2019 14:51:22 +0200
+	(envelope-from <richard.henderson@linaro.org>) id 1hVbb1-0007eQ-9l
+	for qemu-devel@nongnu.org; Tue, 28 May 2019 08:52:53 -0400
+Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:46758)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1hVbaz-0007cL-F2
+	for qemu-devel@nongnu.org; Tue, 28 May 2019 08:52:50 -0400
+Received: by mail-oi1-x241.google.com with SMTP id 203so14110505oid.13
+	for <qemu-devel@nongnu.org>; Tue, 28 May 2019 05:52:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
+	:mime-version:in-reply-to:content-language:content-transfer-encoding;
+	bh=m0bOlkivdfwZCFKW4VcJ6PMPlcqCQRxaOILXwjjVmxs=;
+	b=Ry4vvoqMOJlTiwRPw0Dou73JQGFFvh1KdOII2Msq07bH7m88NBTB+/MGlWhB4cSthz
+	HSUjZ5F7JQYKooe6XV0hoRUW32gB5Dli4GnK1APEf35de48mHwoB0gYBzn6fFSVjNukT
+	SD/pi+d0dYxveUqeRw4nLE76KK8XMBAPCoFZQdsuec5NW+skQ0iO9Ypz1rSNHeZMkshY
+	Op/kcNq3XDCIlmFIzipjyq6yIWigeK88wDCObsMfakXtaAt0p+mFEAyeEUbnNm4HZzPe
+	JaM7/lNtxzDq76qE0SrE229lEEGGRkx0ZAzShD+Fqy7pqQicLe8jbtYSz+htYwmADaYi
+	oI2Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+	:date:user-agent:mime-version:in-reply-to:content-language
+	:content-transfer-encoding;
+	bh=m0bOlkivdfwZCFKW4VcJ6PMPlcqCQRxaOILXwjjVmxs=;
+	b=j4M+8B5ZLS4YfIbYKemEE7jd8y3i9LEGrbxkH6I32FrcPG69hGYAxpKc4RLfz8K0cj
+	eoMKvw02Nz319razeqeIn/F2BZvp/M9jZp5Gbxb5+Bp+PLRdxjL0CPhz5EF4ASfQLayr
+	iNmBgurCagl1dsd8k5MllcUnhSZiFe3KUnbroLdd7K298ez2iMla3yCeoszPeSwtW3Po
+	x6JDNiY0TImRjPHlksvlbnG1j+9pXPbvLieE/r/Wva3Ro+vu3DYLnA6CBMLNfpH3hZDp
+	e3VR4LT/wwBYClEKCJH1fNXIBWXi3SF/UeqPEP3Lg0m8zpY5YEpAh+IT5FO9gl3gqHb3
+	sJUw==
+X-Gm-Message-State: APjAAAV9WX7QFYknHGDmta3Gx55nVLcSdsxHoJLMvcgrUs91wpQ156dr
+	AvD81fJc2uJuZbxhVBmgUWznbw==
+X-Google-Smtp-Source: APXvYqwJng8vhrNPebbmc8TAybi0+EQBy3ChsnEiUGbx3BhVs01ztLrr0c7BEnBQmjz0ibmKED9B2w==
+X-Received: by 2002:aca:56c9:: with SMTP id k192mr2403611oib.114.1559047967814;
+	Tue, 28 May 2019 05:52:47 -0700 (PDT)
+Received: from [172.24.12.210] (168.189-204-159.bestelclientes.com.mx.
+	[189.204.159.168])
+	by smtp.gmail.com with ESMTPSA id r7sm5036935oia.22.2019.05.28.05.52.45
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Tue, 28 May 2019 05:52:47 -0700 (PDT)
+To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
+References: <20190524093335.22241-1-david@redhat.com>
+	<20190524093335.22241-3-david@redhat.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Openpgp: preference=signencrypt
+Message-ID: <b1c8a3b6-8c6e-4f4b-6811-25a14696ee85@linaro.org>
+Date: Tue, 28 May 2019 07:52:44 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.4.0
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190528024747.GA23180@xz-x1>
+In-Reply-To: <20190524093335.22241-3-david@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.31]);
-	Tue, 28 May 2019 12:51:33 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [RFC v4 08/27] hw/vfio/common: Force nested if
- iommu requires it
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::241
+Subject: Re: [Qemu-devel] [PATCH v2 2/5] s390x/tcg: Implement VECTOR FIND
+ ELEMENT EQUAL
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -74,148 +99,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, drjones@redhat.com, yi.l.liu@intel.com,
-	mst@redhat.com, jean-philippe.brucker@arm.com,
-	zhangfei.gao@foxmail.com, qemu-devel@nongnu.org,
-	alex.williamson@redhat.com, qemu-arm@nongnu.org,
-	vincent.stehle@arm.com, eric.auger.pro@gmail.com
+Cc: qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>,
+	Thomas Huth <thuth@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Peter,
+On 5/24/19 4:33 AM, David Hildenbrand wrote:
+> Core logic courtesy of Richard H.
+> 
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+> ---
+>  target/s390x/helper.h            |  6 ++++
+>  target/s390x/insn-data.def       |  2 ++
+>  target/s390x/translate_vx.inc.c  | 31 +++++++++++++++++
+>  target/s390x/vec_string_helper.c | 57 ++++++++++++++++++++++++++++++++
+>  4 files changed, 96 insertions(+)
 
-On 5/28/19 4:47 AM, Peter Xu wrote:
-> On Mon, May 27, 2019 at 01:41:44PM +0200, Eric Auger wrote:
->> In case we detect the address space is translated by
->> a virtual IOMMU which requires nested stages, let's set up
->> the container with the VFIO_TYPE1_NESTING_IOMMU iommu_type.
->>
->> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->>
->> ---
->>
->> v2 -> v3:
->> - add "nested only is selected if requested by @force_nested"
->>   comment in this patch
->> ---
->>  hw/vfio/common.c | 27 +++++++++++++++++++++++----
->>  1 file changed, 23 insertions(+), 4 deletions(-)
->>
->> diff --git a/hw/vfio/common.c b/hw/vfio/common.c
->> index 1f1deff360..99ade21056 100644
->> --- a/hw/vfio/common.c
->> +++ b/hw/vfio/common.c
->> @@ -1136,14 +1136,19 @@ static void vfio_put_address_space(VFIOAddressSpace *space)
->>   * vfio_get_iommu_type - selects the richest iommu_type (v2 first)
->>   */
->>  static int vfio_get_iommu_type(VFIOContainer *container,
->> +                               bool force_nested,
->>                                 Error **errp)
->>  {
->> -    int iommu_types[] = { VFIO_TYPE1v2_IOMMU, VFIO_TYPE1_IOMMU,
->> +    int iommu_types[] = { VFIO_TYPE1_NESTING_IOMMU,
->> +                          VFIO_TYPE1v2_IOMMU, VFIO_TYPE1_IOMMU,
->>                            VFIO_SPAPR_TCE_v2_IOMMU, VFIO_SPAPR_TCE_IOMMU };
->>      int i;
->>  
->>      for (i = 0; i < ARRAY_SIZE(iommu_types); i++) {
->>          if (ioctl(container->fd, VFIO_CHECK_EXTENSION, iommu_types[i])) {
->> +            if (iommu_types[i] == VFIO_TYPE1_NESTING_IOMMU && !force_nested) {
-> 
-> If force_nested==true and if the kernel does not support
-> VFIO_TYPE1_NESTING_IOMMU, we will still return other iommu types?
-> That seems to not match with what "force" mean here.
-> 
-> What I feel like is that we want an "iommu_nest_types[]" which only
-> contains VFIO_TYPE1_NESTING_IOMMU.  Then:
-> 
->         if (nested) {
->                 target_types = iommu_nest_types;
->         } else {
->                 target_types = iommu_types;
->         }
-> 
->         foreach (target_types)
->                 ...
-> 
->         return -EINVAL;
-> 
-> Might be clearer?  Then we can drop [2] below since we'll fail earlier
-> at [1].
-
-agreed. I can fail immediately in case the nested mode was requested and
-not supported. This will be clearer.
-
-Thanks!
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
 
-Eric
-> 
->> +                continue;
->> +            }
->>              return iommu_types[i];
->>          }
->>      }
->> @@ -1152,11 +1157,11 @@ static int vfio_get_iommu_type(VFIOContainer *container,
->>  }
->>  
->>  static int vfio_init_container(VFIOContainer *container, int group_fd,
->> -                               Error **errp)
->> +                               bool force_nested, Error **errp)
->>  {
->>      int iommu_type, ret;
->>  
->> -    iommu_type = vfio_get_iommu_type(container, errp);
->> +    iommu_type = vfio_get_iommu_type(container, force_nested, errp);
->>      if (iommu_type < 0) {
->>          return iommu_type;
-> 
-> [1]
-> 
->>      }
->> @@ -1192,6 +1197,14 @@ static int vfio_connect_container(VFIOGroup *group, AddressSpace *as,
->>      VFIOContainer *container;
->>      int ret, fd;
->>      VFIOAddressSpace *space;
->> +    IOMMUMemoryRegion *iommu_mr;
->> +    bool force_nested = false;
->> +
->> +    if (as != &address_space_memory && memory_region_is_iommu(as->root)) {
->> +        iommu_mr = IOMMU_MEMORY_REGION(as->root);
->> +        memory_region_iommu_get_attr(iommu_mr, IOMMU_ATTR_VFIO_NESTED,
->> +                                     (void *)&force_nested);
->> +    }
->>  
->>      space = vfio_get_address_space(as);
->>  
->> @@ -1252,12 +1265,18 @@ static int vfio_connect_container(VFIOGroup *group, AddressSpace *as,
->>      QLIST_INIT(&container->giommu_list);
->>      QLIST_INIT(&container->hostwin_list);
->>  
->> -    ret = vfio_init_container(container, group->fd, errp);
->> +    ret = vfio_init_container(container, group->fd, force_nested, errp);
->>      if (ret) {
->>          goto free_container_exit;
->>      }
->>  
->> +    if (force_nested && container->iommu_type != VFIO_TYPE1_NESTING_IOMMU) {
->> +            error_setg(errp, "nested mode requested by the virtual IOMMU "
->> +                       "but not supported by the vfio iommu");
->> +    }
-> 
-> [2]
-> 
->> +
->>      switch (container->iommu_type) {
->> +    case VFIO_TYPE1_NESTING_IOMMU:
->>      case VFIO_TYPE1v2_IOMMU:
->>      case VFIO_TYPE1_IOMMU:
->>      {
->> -- 
->> 2.20.1
->>
-> 
-> Regards,
-> 
+r~
+
 
