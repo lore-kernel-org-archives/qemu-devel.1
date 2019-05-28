@@ -2,50 +2,50 @@ Return-Path: <SRS0=2W3W=T4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CEDDC04AB6
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 May 2019 18:01:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 21108C04AB6
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 May 2019 18:11:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6B8B420883
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 May 2019 18:01:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6B8B420883
+	by mail.kernel.org (Postfix) with ESMTPS id DF60E20989
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 May 2019 18:11:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DF60E20989
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:40527 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:40661 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hVgPj-00075H-A0
-	for qemu-devel@archiver.kernel.org; Tue, 28 May 2019 14:01:31 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:47802)
+	id 1hVgZT-0003vD-4Q
+	for qemu-devel@archiver.kernel.org; Tue, 28 May 2019 14:11:35 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:49920)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hVgNZ-0005f9-7J
-	for qemu-devel@nongnu.org; Tue, 28 May 2019 13:59:18 -0400
+	(envelope-from <mreitz@redhat.com>) id 1hVgYK-0003Rt-Mz
+	for qemu-devel@nongnu.org; Tue, 28 May 2019 14:10:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hVgNU-0002U4-G5
-	for qemu-devel@nongnu.org; Tue, 28 May 2019 13:59:15 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35302)
+	(envelope-from <mreitz@redhat.com>) id 1hVgYI-0004Eo-N6
+	for qemu-devel@nongnu.org; Tue, 28 May 2019 14:10:23 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34800)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mreitz@redhat.com>)
-	id 1hVgNC-0002Ga-Ap; Tue, 28 May 2019 13:58:56 -0400
+	id 1hVgYB-0002ki-Oh; Tue, 28 May 2019 14:10:16 -0400
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
 	[10.5.11.22])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 0B828308A124;
-	Tue, 28 May 2019 17:58:44 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id A6CCC3019882;
+	Tue, 28 May 2019 18:09:12 +0000 (UTC)
 Received: from dresden.str.redhat.com (unknown [10.40.205.223])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id B94731017E3A;
-	Tue, 28 May 2019 17:58:41 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 5E3EC1001943;
+	Tue, 28 May 2019 18:09:11 +0000 (UTC)
 To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
 	"qemu-block@nongnu.org" <qemu-block@nongnu.org>
 References: <20190410202033.28617-1-mreitz@redhat.com>
-	<20190410202033.28617-5-mreitz@redhat.com>
-	<fc4bb38f-b13e-1e79-7e94-094f3dd984c4@virtuozzo.com>
+	<20190410202033.28617-4-mreitz@redhat.com>
+	<5fd51d1a-c9a9-f310-a3a3-369b2c1c27d0@virtuozzo.com>
 From: Max Reitz <mreitz@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
@@ -72,24 +72,24 @@ Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
 	/ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
 	bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
 	R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <259b7865-48d3-b640-71f6-6d18e65a9ee3@redhat.com>
-Date: Tue, 28 May 2019 19:58:39 +0200
+Message-ID: <283400db-a7bb-7952-d83a-c49a2936b01b@redhat.com>
+Date: Tue, 28 May 2019 20:09:09 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <fc4bb38f-b13e-1e79-7e94-094f3dd984c4@virtuozzo.com>
+In-Reply-To: <5fd51d1a-c9a9-f310-a3a3-369b2c1c27d0@virtuozzo.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="Cs52RGlUyl9AtUm4wkzkMzwArFODC9dnv"
+	boundary="dcEu0WeGa6Y6fryT7soaSROlvsnLARiTB"
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.44]);
-	Tue, 28 May 2019 17:58:44 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.47]);
+	Tue, 28 May 2019 18:09:12 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
 X-Content-Filtered-By: Mailman/MimeDel 2.1.21
-Subject: Re: [Qemu-devel] [PATCH v4 04/11] block: Inline
- bdrv_co_block_status_from_*()
+Subject: Re: [Qemu-devel] [PATCH v4 03/11] block: Storage child access
+ function
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -108,128 +108,140 @@ Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---Cs52RGlUyl9AtUm4wkzkMzwArFODC9dnv
+--dcEu0WeGa6Y6fryT7soaSROlvsnLARiTB
 From: Max Reitz <mreitz@redhat.com>
 To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
  "qemu-block@nongnu.org" <qemu-block@nongnu.org>
 Cc: Kevin Wolf <kwolf@redhat.com>,
  "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Message-ID: <259b7865-48d3-b640-71f6-6d18e65a9ee3@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v4 04/11] block: Inline
- bdrv_co_block_status_from_*()
+Message-ID: <283400db-a7bb-7952-d83a-c49a2936b01b@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v4 03/11] block: Storage child access
+ function
 References: <20190410202033.28617-1-mreitz@redhat.com>
- <20190410202033.28617-5-mreitz@redhat.com>
- <fc4bb38f-b13e-1e79-7e94-094f3dd984c4@virtuozzo.com>
-In-Reply-To: <fc4bb38f-b13e-1e79-7e94-094f3dd984c4@virtuozzo.com>
+ <20190410202033.28617-4-mreitz@redhat.com>
+ <5fd51d1a-c9a9-f310-a3a3-369b2c1c27d0@virtuozzo.com>
+In-Reply-To: <5fd51d1a-c9a9-f310-a3a3-369b2c1c27d0@virtuozzo.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 21.05.19 10:57, Vladimir Sementsov-Ogievskiy wrote:
+On 20.05.19 12:41, Vladimir Sementsov-Ogievskiy wrote:
 > 10.04.2019 23:20, Max Reitz wrote:
->> With bdrv_filtered_rw_bs(), we can easily handle this default filter
->> behavior in bdrv_co_block_status().
+>> For completeness' sake, add a function for accessing a node's storage
+>> child, too.  For filters, this is their filtered child; for non-filter=
+s,
+>> this is bs->file.
 >>
->> blkdebug wants to have an additional assertion, so it keeps its own
->> implementation, except bdrv_co_block_status_from_file() needs to be
->> inlined there.
+>> Some places are deliberately left unconverted:
+>> - BDS opening/closing functions where bs->file is handled specially
+>>    (which is basically wrong, but at least simplifies probing)
+>> - bdrv_co_block_status_from_file(), because its name implies that it
+>>    points to ->file
+>> - bdrv_snapshot_goto() in one places unrefs bs->file.  Such a
+>>    modification is not covered by this patch and is therefore just
+>>    safeguarded by an additional assert(), but otherwise kept as-is.
 >>
->> Suggested-by: Eric Blake <eblake@redhat.com>
 >> Signed-off-by: Max Reitz <mreitz@redhat.com>
->> ---
->>   include/block/block_int.h | 22 -----------------
->>   block/blkdebug.c          |  7 ++++--
->>   block/blklogwrites.c      |  1 -
->>   block/commit.c            |  1 -
->>   block/copy-on-read.c      |  2 --
->>   block/io.c                | 51 +++++++++++++------------------------=
---
->>   block/mirror.c            |  1 -
->>   block/throttle.c          |  1 -
->>   8 files changed, 22 insertions(+), 64 deletions(-)
 
 [...]
 
->> diff --git a/block/io.c b/block/io.c
->> index 5c33ecc080..8d124bae5c 100644
->> --- a/block/io.c
->> +++ b/block/io.c
-
-[...]
-
->> @@ -2088,7 +2059,8 @@ static int coroutine_fn bdrv_co_block_status(Blo=
-ckDriverState *bs,
->>  =20
->>       /* Must be non-NULL or bdrv_getlength() would have failed */
->>       assert(bs->drv);
->> -    if (!bs->drv->bdrv_co_block_status) {
->> +    has_filtered_child =3D bs->drv->is_filter && bdrv_filtered_rw_chi=
-ld(bs);
->> +    if (!bs->drv->bdrv_co_block_status && !has_filtered_child) {
->>           *pnum =3D bytes;
->>           ret =3D BDRV_BLOCK_DATA | BDRV_BLOCK_ALLOCATED;
->>           if (offset + bytes =3D=3D total_size) {
->> @@ -2109,9 +2081,20 @@ static int coroutine_fn bdrv_co_block_status(Bl=
-ockDriverState *bs,
->>       aligned_offset =3D QEMU_ALIGN_DOWN(offset, align);
->>       aligned_bytes =3D ROUND_UP(offset + bytes, align) - aligned_offs=
-et;
->>  =20
->> -    ret =3D bs->drv->bdrv_co_block_status(bs, want_zero, aligned_offs=
-et,
->> -                                        aligned_bytes, pnum, &local_m=
-ap,
->> -                                        &local_file);
->> +    if (bs->drv->bdrv_co_block_status) {
->> +        ret =3D bs->drv->bdrv_co_block_status(bs, want_zero, aligned_=
-offset,
->> +                                            aligned_bytes, pnum, &loc=
-al_map,
->> +                                            &local_file);
->> +    } else {
->> +        /* Default code for filters */
->> +
->> +        local_file =3D bdrv_filtered_rw_bs(bs);
->> +        assert(local_file);
->> +
->> +        *pnum =3D aligned_bytes;
->> +        local_map =3D aligned_offset;
->> +        ret =3D BDRV_BLOCK_RAW | BDRV_BLOCK_OFFSET_VALID;
->> +    }
+>> --- a/block/snapshot.c
+>> +++ b/block/snapshot.c
 >=20
+> [..]
 >=20
-> preexistent, but why default for filters is aligned and for other nodes=
- is not?
+>> @@ -184,6 +186,7 @@ int bdrv_snapshot_goto(BlockDriverState *bs,
+>>                          Error **errp)
+>>   {
+>>       BlockDriver *drv =3D bs->drv;
+>> +    BlockDriverState *storage_bs;
+>>       int ret, open_ret;
+>>  =20
+>>       if (!drv) {
+>> @@ -204,39 +207,40 @@ int bdrv_snapshot_goto(BlockDriverState *bs,
+>>           return ret;
+>>       }
+>>  =20
+>> -    if (bs->file) {
+>> -        BlockDriverState *file;
+>> +    storage_bs =3D bdrv_storage_bs(bs);
+>> +    if (storage_bs) {
+>>           QDict *options =3D qdict_clone_shallow(bs->options);
+>>           QDict *file_options;
+>>           Error *local_err =3D NULL;
+>>  =20
+>> -        file =3D bs->file->bs;
+>>           /* Prevent it from getting deleted when detached from bs */
+>> -        bdrv_ref(file);
+>> +        bdrv_ref(storage_bs);
+>>  =20
+>>           qdict_extract_subqdict(options, &file_options, "file.");
+>>           qobject_unref(file_options);
+>> -        qdict_put_str(options, "file", bdrv_get_node_name(file));
+>> +        qdict_put_str(options, "file", bdrv_get_node_name(storage_bs)=
+);
+>>  =20
+>>           if (drv->bdrv_close) {
+>>               drv->bdrv_close(bs);
+>>           }
+>> +
+>> +        assert(bs->file->bs =3D=3D storage_bs);
+>=20
+> Hmm, but what save us from this assertion fail for backing-filters? Bef=
+ore your
+> patch it was unreachable for them. Or what I miss?
 
-I suppose because the default code for other nodes has been written
-before the aligning code was introduced.
-
-I guess there is no good reason to enforce alignment in either case.  It
-is important to do so when issuing a request to the driver because the
-driver is not required to be able to handle unaligned requests.  If we
-completely forgo the driver and just go through to the next layer, it
-doesn=E2=80=99t really matter, I think.
-
-Well, I just kept it as it was before. O:-)
+Ha, good point.  I simply missed this point.  Yes, I need to check
+whether storage_bs is bs->file or bs->backing and then take the
+corresponding sub-QDict from bs->options.
 
 Max
 
+>>           bdrv_unref_child(bs, bs->file);
+>>           bs->file =3D NULL;
+>>  =20
+>> -        ret =3D bdrv_snapshot_goto(file, snapshot_id, errp);
+>> +        ret =3D bdrv_snapshot_goto(storage_bs, snapshot_id, errp);
+>>           open_ret =3D drv->bdrv_open(bs, options, bs->open_flags, &lo=
+cal_err);
+>>           qobject_unref(options);
+>>           if (open_ret < 0) {
+>> -            bdrv_unref(file);
+>> +            bdrv_unref(storage_bs);
+>>               bs->drv =3D NULL;
+>>               /* A bdrv_snapshot_goto() error takes precedence */
+>>               error_propagate(errp, local_err);
+>>               return ret < 0 ? ret : open_ret;
+>>           }
+>>  =20
+>> -        assert(bs->file->bs =3D=3D file);
+>> -        bdrv_unref(file);
+>> +        assert(bs->file->bs =3D=3D storage_bs);
+>> +        bdrv_unref(storage_bs);
+>>           return ret;
+>>       }
+>>  =20
+>=20
+>=20
+>=20
 
---Cs52RGlUyl9AtUm4wkzkMzwArFODC9dnv
+
+
+--dcEu0WeGa6Y6fryT7soaSROlvsnLARiTB
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlztdtAACgkQ9AfbAGHV
-z0BV0ggAsBOacCzn76Dniu5A6q+yx1kDZNSrpZqq9tKxgEUYUlhT5Y5X7ESJfAq6
-0IWPdMTzRXXyaXFX8w3cdw09LxlYXjCnth9qRPvO0JGmVOw+L+Ud6tFNrdJB1ZsG
-v6Nl/RbLy5BxoGN7HPhDImBDqJpOXEMnFWgmAlc/5CQleavIY9d1NyOueuiQFtqj
-Aetak27/rm70uoTvnf+ut+CQH3cWECr4ytNcoTsgpza94+X2DzjeoJo7lPzFqZ/q
-UIdSvAIxRJ2pqIXa8Y+7KidDMMduiN46vQVR0Kcv+IBmcq/gqKDFFnsvAx8IGF5+
-mSLreligqqLBI9+2oXtdqWx76+TYWQ==
-=0+Gd
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlzteUUACgkQ9AfbAGHV
+z0CpWwgAuq0436qWbpi4UQBbSX/Xrfx67R2Vso6SZaloE8HoW28HUo2/4Jg2xpvZ
+JThc8q+i7vfwMegkwM/Fp/PmOyR+E63hnz5kVewzYvA2gxxNBi498TAHVpJ/NbCd
+xDNcsVKQQK8sPmRU7sv39Fl8glDB3VYyB4bpWZRelzTf53jfjP8YwAOIKaIdPT/u
+8T7FKd9xbCQNNdbEjWX1Lo0uZMO24jVYbW5ak491Ns2IHIE9Vw5hOecQgue0HJKY
+fRQSYKJYusuDj54rta8W1E9v1Jvmz7OKZ8F0mZYMX3fo7hR/CUqPIViov6wMKHx+
+OVSP2GnuxNmMU4148O7M2PjdPjm9Nw==
+=hNVS
 -----END PGP SIGNATURE-----
 
---Cs52RGlUyl9AtUm4wkzkMzwArFODC9dnv--
+--dcEu0WeGa6Y6fryT7soaSROlvsnLARiTB--
 
