@@ -2,62 +2,65 @@ Return-Path: <SRS0=2W3W=T4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B5999C04AB6
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 May 2019 08:21:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C369C04AB6
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 May 2019 08:24:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8CD1B2075C
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 May 2019 08:21:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8CD1B2075C
+	by mail.kernel.org (Postfix) with ESMTPS id 23B3D208C3
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 May 2019 08:24:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 23B3D208C3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:58981 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:58997 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hVXMb-0005td-SJ
-	for qemu-devel@archiver.kernel.org; Tue, 28 May 2019 04:21:41 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:52961)
+	id 1hVXPY-0007Ay-BE
+	for qemu-devel@archiver.kernel.org; Tue, 28 May 2019 04:24:44 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:53602)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1hVXLo-0005K6-UO
-	for qemu-devel@nongnu.org; Tue, 28 May 2019 04:20:53 -0400
+	(envelope-from <armbru@redhat.com>) id 1hVXO6-0006Kw-I0
+	for qemu-devel@nongnu.org; Tue, 28 May 2019 04:23:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1hVXLf-0000gL-GB
-	for qemu-devel@nongnu.org; Tue, 28 May 2019 04:20:47 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57688)
+	(envelope-from <armbru@redhat.com>) id 1hVXO5-0002pr-J0
+	for qemu-devel@nongnu.org; Tue, 28 May 2019 04:23:14 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58288)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>)
-	id 1hVXLf-0000eU-BZ; Tue, 28 May 2019 04:20:43 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hVXO5-0002p0-ET
+	for qemu-devel@nongnu.org; Tue, 28 May 2019 04:23:13 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 745E93099FC5;
-	Tue, 28 May 2019 08:20:40 +0000 (UTC)
-Received: from redhat.com (unknown [10.36.118.21])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id DE55C6C35B;
-	Tue, 28 May 2019 08:20:39 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-To: Li Qiang <liq3ea@163.com>
-In-Reply-To: <20190525062832.18009-1-liq3ea@163.com> (Li Qiang's message of
-	"Fri, 24 May 2019 23:28:32 -0700")
-References: <20190525062832.18009-1-liq3ea@163.com>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
-Date: Tue, 28 May 2019 10:20:37 +0200
-Message-ID: <8736kz7zxm.fsf@trasno.org>
+	by mx1.redhat.com (Postfix) with ESMTPS id BF2B83179150;
+	Tue, 28 May 2019 08:23:12 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-117-250.ams2.redhat.com
+	[10.36.117.250])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 56FFE5C8B4;
+	Tue, 28 May 2019 08:23:10 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+	id DEA0911384AA; Tue, 28 May 2019 10:23:08 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: qemu-devel@nongnu.org
+Date: Tue, 28 May 2019 10:23:05 +0200
+Message-Id: <20190528082308.22032-2-armbru@redhat.com>
+In-Reply-To: <20190528082308.22032-1-armbru@redhat.com>
+References: <20190528082308.22032-1-armbru@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
 	(mx1.redhat.com [10.5.110.41]);
-	Tue, 28 May 2019 08:20:40 +0000 (UTC)
+	Tue, 28 May 2019 08:23:12 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH] migration: fix a typo
+Subject: [Qemu-devel] [PATCH 1/4] Makefile: Remove code to smooth transition
+ to config.status
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -69,20 +72,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: quintela@redhat.com
-Cc: qemu-trivial@nongnu.org, dgilbert@redhat.com, qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, richard.henderson@linaro.org, philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Li Qiang <liq3ea@163.com> wrote:
-> 'postocpy' should be 'postcopy'.
->
-> CC: qemu-trivial@nongnu.org
-> Signed-off-by: Li Qiang <liq3ea@163.com>
+When commit bdf523e6923 made configure generate config.status, it
+added a fallback to Makefile to smooth the transition, with a TODO
+"code can be removed after QEMU 1.7."  It's been more than five years.
+Remove it.
 
-Reviewed-by: Juan Quintela <quintela@redhat.com>
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+---
+ Makefile | 9 +--------
+ 1 file changed, 1 insertion(+), 8 deletions(-)
 
-Already in through trivial patches.
+diff --git a/Makefile b/Makefile
+index e02b88bcb1..940594cc7c 100644
+--- a/Makefile
++++ b/Makefile
+@@ -69,14 +69,7 @@ CONFIG_ALL=3Dy
+=20
+ config-host.mak: $(SRC_PATH)/configure $(SRC_PATH)/pc-bios $(SRC_PATH)/V=
+ERSION
+ 	@echo $@ is out-of-date, running configure
+-	@# TODO: The next lines include code which supports a smooth
+-	@# transition from old configurations without config.status.
+-	@# This code can be removed after QEMU 1.7.
+-	@if test -x config.status; then \
+-	    ./config.status; \
+-        else \
+-	    sed -n "/.*Configured with/s/[^:]*: //p" $@ | sh; \
+-	fi
++	@./config.status
+ else
+ config-host.mak:
+ ifneq ($(filter-out $(UNCHECKED_GOALS),$(MAKECMDGOALS)),$(if $(MAKECMDGO=
+ALS),,fail))
+--=20
+2.17.2
 
 
