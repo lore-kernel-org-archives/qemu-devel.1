@@ -2,93 +2,110 @@ Return-Path: <SRS0=2W3W=T4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-11.0 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B6C6BC04E84
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 May 2019 16:57:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C4A3C04AB6
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 May 2019 17:00:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7F2082070D
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 May 2019 16:57:43 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="agdoOOaN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7F2082070D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 1D6E12075B
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 May 2019 17:00:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1D6E12075B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:39665 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:39735 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hVfPy-0005Nc-Qh
-	for qemu-devel@archiver.kernel.org; Tue, 28 May 2019 12:57:42 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:60945)
+	id 1hVfT0-0007Lw-AH
+	for qemu-devel@archiver.kernel.org; Tue, 28 May 2019 13:00:50 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:34641)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel.apfelbaum@gmail.com>) id 1hVfM0-0002R0-8A
-	for qemu-devel@nongnu.org; Tue, 28 May 2019 12:53:37 -0400
+	(envelope-from <david@redhat.com>) id 1hVfRZ-0006QT-T9
+	for qemu-devel@nongnu.org; Tue, 28 May 2019 12:59:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel.apfelbaum@gmail.com>) id 1hVfLy-0001Yp-7Y
-	for qemu-devel@nongnu.org; Tue, 28 May 2019 12:53:36 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:36048)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcel.apfelbaum@gmail.com>)
-	id 1hVfLX-0001Mw-It; Tue, 28 May 2019 12:53:09 -0400
-Received: by mail-wr1-x441.google.com with SMTP id s17so21037067wru.3;
-	Tue, 28 May 2019 09:53:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=subject:to:cc:references:from:message-id:date:user-agent
-	:mime-version:in-reply-to:content-transfer-encoding:content-language;
-	bh=o1Rh6aAz7/4cgvDMz1Ecw+CCDWO53nq22FgF1mLIcWQ=;
-	b=agdoOOaNC9/nfIlJcLGjGMkNPuLNoZgT+k0cymTinZwa4gU65JwrgQQNgCzQEnvW5z
-	DVXsCjHFXTUBmMd4jh+j3XOEE8Mf44ZYZJwc6fYJUi+NRIn4dkYwmGbdgcxUg72u7VAQ
-	ZRvEcjaCGl13phXVDOC4aUY5BCJbdJWp4tqA7zzM1Z4QtAh4hcYFcWCYclwiEntoSxVk
-	ZPJ0sItXDGny33aqDC+3inNt9sb1hF8KGxOf6B4zUfH5yHRIWyX4GecUm3kzUQx7ZqeJ
-	8EJsjOFF19QkQ+hTWkAiCttYDC0xL9uygdN/U7T09ov1whw6FIBJXMMbM4cexzXj/Pui
-	OR3w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-	:user-agent:mime-version:in-reply-to:content-transfer-encoding
-	:content-language;
-	bh=o1Rh6aAz7/4cgvDMz1Ecw+CCDWO53nq22FgF1mLIcWQ=;
-	b=PqX9pUn3j8eNg+QVa2DGqA6TFK7oNJ1/lzDxg+yrB+5ut8CWuEZt/GfZJNAhccyt8A
-	iTcjScTvBR+DMmTg4Vp2cUGhp71M24kBqGHVApHEeB0gQ087YLEU/v1UK89Tl79A8M3u
-	KumCHJnke4XK6TR+IOB7ppLT6rTHc/7Y8EjR/lNziFIX0Wf9vcM7su0POxBZWKFZuP2L
-	lULLgeK7bkJ6GaWjj4dOj1o6cIlyTptxsm5Zpzx5+ERQU6+TcIWhl4jYOSX1tmAVy6Sh
-	a3qKUy0JQ+0vJzdaAWNvPuY07j0sldFoa0Jdejp+rcTzMxuxL0j4rPtU8fE2sh/H5n3G
-	bYkA==
-X-Gm-Message-State: APjAAAVgbuFht28zGTqt2oFKUKMVJWpJdp/1yPrQ53D1QkNOJxFwhlz0
-	Xfjl8zvgTgdW9DYLNrfeINc=
-X-Google-Smtp-Source: APXvYqwu/EUzjYtiB+Gpx9oMDQTXN9PK/KPhItPIr+m0N6CbU9sV0c0pJO6Ji04OhMz8IPL3kQMqPQ==
-X-Received: by 2002:a5d:6108:: with SMTP id v8mr23321286wrt.150.1559062385960; 
-	Tue, 28 May 2019 09:53:05 -0700 (PDT)
-Received: from localhost.localdomain ([37.142.144.27])
-	by smtp.gmail.com with ESMTPSA id
-	a10sm17015781wrm.94.2019.05.28.09.53.03
-	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-	Tue, 28 May 2019 09:53:05 -0700 (PDT)
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
-	qemu-devel@nongnu.org, qemu-trivial@nongnu.org
-References: <20190528164020.32250-1-philmd@redhat.com>
-	<20190528164020.32250-8-philmd@redhat.com>
-From: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Message-ID: <003b3855-8180-b808-03c6-1e3fb160a1a7@gmail.com>
-Date: Tue, 28 May 2019 19:53:01 +0300
+	(envelope-from <david@redhat.com>) id 1hVfRX-0006wY-UH
+	for qemu-devel@nongnu.org; Tue, 28 May 2019 12:59:21 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60620)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1hVfRW-0006ih-4z
+	for qemu-devel@nongnu.org; Tue, 28 May 2019 12:59:19 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 9345E301F136;
+	Tue, 28 May 2019 16:59:00 +0000 (UTC)
+Received: from [10.36.116.177] (ovpn-116-177.ams2.redhat.com [10.36.116.177])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 956FA5B0B7;
+	Tue, 28 May 2019 16:58:58 +0000 (UTC)
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+References: <20190522222821.23850-1-richard.henderson@linaro.org>
+From: David Hildenbrand <david@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+	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
+	SE+xAvmumFBY
+Organization: Red Hat GmbH
+Message-ID: <2228ffd2-f519-c08f-59f2-3b3038db83ed@redhat.com>
+Date: Tue, 28 May 2019 18:58:57 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190528164020.32250-8-philmd@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20190522222821.23850-1-richard.henderson@linaro.org>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2a00:1450:4864:20::441
-Subject: Re: [Qemu-devel] [PATCH v2 07/10] hw/isa: Use the QOM DEVICE()
- macro to access DeviceState.qdev
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.47]);
+	Tue, 28 May 2019 16:59:00 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PULL 00/16] tcg queued patches
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -100,76 +117,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
-	Dmitry Fleytman <dmitry.fleytman@gmail.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Aleksandar Rikalo <arikalo@wavecomp.com>,
-	Markus Armbruster <armbru@redhat.com>,
-	David Hildenbrand <david@redhat.com>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	qemu-s390x@nongnu.org, Halil Pasic <pasic@linux.ibm.com>,
-	Christian Borntraeger <borntraeger@de.ibm.com>,
-	Michael Walle <michael@walle.cc>, Gerd Hoffmann <kraxel@redhat.com>,
-	Aleksandar Markovic <amarkovic@wavecomp.com>,
-	Cornelia Huck <cohuck@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
-	Richard Henderson <rth@twiddle.net>
+Cc: peter.maydell@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On 23.05.19 00:28, Richard Henderson wrote:
+> The following changes since commit a4f667b6714916683408b983cfe0a615a725775f:
+> 
+>   Merge remote-tracking branch 'remotes/cohuck/tags/s390x-20190521-3' into staging (2019-05-21 16:30:13 +0100)
+> 
+> are available in the Git repository at:
+> 
+>   https://github.com/rth7680/qemu.git tags/pull-tcg-20190522
+> 
+> for you to fetch changes up to 11e2bfef799024be4a08fcf6797fe0b22fb16b58:
+> 
+>   tcg/i386: Use MOVDQA for TCG_TYPE_V128 load/store (2019-05-22 15:09:43 -0400)
+> 
+> ----------------------------------------------------------------
+> Misc gvec improvements
+> 
+> ----------------------------------------------------------------
+> Richard Henderson (16):
+>       tcg/i386: Fix dupi/dupm for avx1 and 32-bit hosts
+>       tcg: Fix missing checks and clears in tcg_gen_gvec_dup_mem
+>       tcg: Add support for vector bitwise select
+>       tcg: Add support for vector compare select
+>       tcg: Introduce do_op3_nofail for vector expansion
+>       tcg: Expand vector minmax using cmp+cmpsel
+>       tcg: Add TCG_OPF_NOT_PRESENT if TCG_TARGET_HAS_foo is negative
+>       tcg/i386: Support vector comparison select value
+>       tcg/i386: Remove expansion for missing minmax
+>       tcg/i386: Use umin/umax in expanding unsigned compare
+>       tcg/aarch64: Support vector bitwise select value
+>       tcg/aarch64: Split up is_fimm
+>       tcg/aarch64: Use MVNI in tcg_out_dupi_vec
+>       tcg/aarch64: Build vector immediates with two insns
+>       tcg/aarch64: Allow immediates for vector ORR and BIC
+>       tcg/i386: Use MOVDQA for TCG_TYPE_V128 load/store
+> 
+>  accel/tcg/tcg-runtime.h      |   2 +
+>  tcg/aarch64/tcg-target.h     |   2 +
+>  tcg/i386/tcg-target.h        |   2 +
+>  tcg/tcg-op-gvec.h            |   7 +
+>  tcg/tcg-op.h                 |   5 +
+>  tcg/tcg-opc.h                |   5 +-
+>  tcg/tcg.h                    |   2 +
+>  accel/tcg/tcg-runtime-gvec.c |  14 ++
+>  tcg/aarch64/tcg-target.inc.c | 371 ++++++++++++++++++++++++++++++++-----------
+>  tcg/i386/tcg-target.inc.c    | 169 +++++++++++++-------
+>  tcg/tcg-op-gvec.c            |  71 ++++++---
+>  tcg/tcg-op-vec.c             | 142 ++++++++++++++---
+>  tcg/tcg.c                    |   5 +
+>  tcg/README                   |  11 ++
+>  14 files changed, 620 insertions(+), 188 deletions(-)
+> 
+
+Rebasing my vx branch to latest qemu/master, I get segfaults when trying
+to boot a Linux kernel:
+
+[    2.652368] Unpacking initramfs...
+Segmentation fault (Speicherabzug geschrieben)
 
 
-On 5/28/19 7:40 PM, Philippe Mathieu-Daudé wrote:
-> Rather than looking inside the definition of a DeviceState with
-> "s->qdev", use the QOM prefered style: "DEVICE(s)".
->
-> This patch was generated using the following Coccinelle script:
->
->      // Use DEVICE() macros to access DeviceState.qdev
->      @use_device_macro_to_access_qdev@
->      expression obj;
->      identifier dev;
->      @@
->      -&obj->dev.qdev
->      +DEVICE(obj)
->
-> Suggested-by: Peter Maydell <peter.maydell@linaro.org>
-> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-> ---
->   hw/isa/lpc_ich9.c | 2 +-
->   hw/isa/vt82c686.c | 2 +-
->   2 files changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/hw/isa/lpc_ich9.c b/hw/isa/lpc_ich9.c
-> index 031ee9cd93..35d17246e9 100644
-> --- a/hw/isa/lpc_ich9.c
-> +++ b/hw/isa/lpc_ich9.c
-> @@ -412,7 +412,7 @@ void ich9_lpc_pm_init(PCIDevice *lpc_pci, bool smm_enabled)
->                                    true);
->       }
->   
-> -    ich9_lpc_reset(&lpc->d.qdev);
-> +    ich9_lpc_reset(DEVICE(lpc));
->   }
->   
->   /* APM */
-> diff --git a/hw/isa/vt82c686.c b/hw/isa/vt82c686.c
-> index 85d0532dd5..d46754f61c 100644
-> --- a/hw/isa/vt82c686.c
-> +++ b/hw/isa/vt82c686.c
-> @@ -369,7 +369,7 @@ static void vt82c686b_pm_realize(PCIDevice *dev, Error **errp)
->       pci_conf[0x90] = s->smb_io_base | 1;
->       pci_conf[0x91] = s->smb_io_base >> 8;
->       pci_conf[0xd2] = 0x90;
-> -    pm_smbus_init(&s->dev.qdev, &s->smb, false);
-> +    pm_smbus_init(DEVICE(s), &s->smb, false);
->       memory_region_add_subregion(get_system_io(), s->smb_io_base, &s->smb.io);
->   
->       apm_init(dev, &s->apm, NULL, s);
+"Auto-loading safe path" section in the GDB manual.  E.g., run from the
+shell:
+        info "(gdb)Auto-loading safe path"
+(gdb) bt
+#0  0x00007feb460409d0 in code_gen_buffer ()
+#1  0x000055679d5322d3 in cpu_tb_exec (itb=<optimized out>,
+cpu=0x7feb46040600 <code_gen_buffer+100926931>)
+    at /home/dhildenb/git/qemu/accel/tcg/cpu-exec.c:171
+#2  cpu_loop_exec_tb (tb_exit=<synthetic pointer>, last_tb=<synthetic
+pointer>, tb=<optimized out>,
+    cpu=0x7feb46040600 <code_gen_buffer+100926931>) at
+/home/dhildenb/git/qemu/accel/tcg/cpu-exec.c:618
+#3  cpu_exec (cpu=cpu@entry=0x55679fb37330) at
+/home/dhildenb/git/qemu/accel/tcg/cpu-exec.c:729
+#4  0x000055679d4f0ecf in tcg_cpu_exec (cpu=0x55679fb37330) at
+/home/dhildenb/git/qemu/cpus.c:1434
+#5  0x000055679d4f302b in qemu_tcg_cpu_thread_fn
+(arg=arg@entry=0x55679fb37330)
+    at /home/dhildenb/git/qemu/cpus.c:1743
+#6  0x000055679d79a26a in qemu_thread_start (args=<optimized out>) at
+util/qemu-thread-posix.c:502
+#7  0x00007febd07a458e in ?? ()
+#8  0x0000000000000000 in ?? ()
 
-Reviewed-by: Marcel Apfelbaum<marcel.apfelbaum@gmail.com>
+Any idea what this could be? (this series?)
+
+-- 
 
 Thanks,
-Marcel
 
+David / dhildenb
 
