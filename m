@@ -2,66 +2,61 @@ Return-Path: <SRS0=2W3W=T4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_MUTT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11F0AC04AB6
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 May 2019 19:48:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E9B7BC04AB6
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 May 2019 19:49:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E17C8208CB
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 May 2019 19:48:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E17C8208CB
+	by mail.kernel.org (Postfix) with ESMTPS id C5232208CB
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 May 2019 19:49:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C5232208CB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:41784 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:41791 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hVi5M-0007PW-7A
-	for qemu-devel@archiver.kernel.org; Tue, 28 May 2019 15:48:36 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:39251)
+	id 1hVi6J-00082B-3B
+	for qemu-devel@archiver.kernel.org; Tue, 28 May 2019 15:49:35 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:37585)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1hVhuV-0006i5-3g
-	for qemu-devel@nongnu.org; Tue, 28 May 2019 15:37:24 -0400
+	(envelope-from <mreitz@redhat.com>) id 1hVhpN-0002bR-A1
+	for qemu-devel@nongnu.org; Tue, 28 May 2019 15:32:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1hVhuU-0006Ze-8J
-	for qemu-devel@nongnu.org; Tue, 28 May 2019 15:37:23 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54446)
+	(envelope-from <mreitz@redhat.com>) id 1hVhpM-0002sv-3b
+	for qemu-devel@nongnu.org; Tue, 28 May 2019 15:32:05 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:23536)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hVhuU-0006Ng-15
-	for qemu-devel@nongnu.org; Tue, 28 May 2019 15:37:22 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
-	[10.5.11.23])
+	(Exim 4.71) (envelope-from <mreitz@redhat.com>)
+	id 1hVhpH-00018f-5d; Tue, 28 May 2019 15:31:59 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 8AD309F758;
-	Tue, 28 May 2019 19:37:09 +0000 (UTC)
-Received: from localhost (ovpn-116-11.gru2.redhat.com [10.97.116.11])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id E8E011972A;
-	Tue, 28 May 2019 19:37:06 +0000 (UTC)
-Date: Tue, 28 May 2019 16:37:04 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <20190528193704.GH22103@habkost.net>
-References: <87woihi1wl.fsf@dusky.pond.sub.org>
-	<20190524185344.GJ10764@habkost.net>
-	<87r28k1g4q.fsf@dusky.pond.sub.org>
-	<e5372760-7599-3155-44f7-dc704c9cbaa5@redhat.com>
+	by mx1.redhat.com (Postfix) with ESMTPS id A4ECB81E05;
+	Tue, 28 May 2019 19:29:48 +0000 (UTC)
+Received: from localhost (unknown [10.40.205.223])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 3BE9F5D71A;
+	Tue, 28 May 2019 19:29:48 +0000 (UTC)
+From: Max Reitz <mreitz@redhat.com>
+To: qemu-block@nongnu.org
+Date: Tue, 28 May 2019 21:28:46 +0200
+Message-Id: <20190528192847.2730-21-mreitz@redhat.com>
+In-Reply-To: <20190528192847.2730-1-mreitz@redhat.com>
+References: <20190528192847.2730-1-mreitz@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <e5372760-7599-3155-44f7-dc704c9cbaa5@redhat.com>
-User-Agent: Mutt/1.11.3 (2019-02-01)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.39]);
-	Tue, 28 May 2019 19:37:09 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.25]);
+	Tue, 28 May 2019 19:29:48 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] qapi/misc.json is too big,
- let's bite off a few chunks
+Subject: [Qemu-devel] [PULL 20/21] qcow2-bitmap: initialize bitmap directory
+ alignment
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -73,27 +68,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org,
-	=?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>,
-	Markus Armbruster <armbru@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
+	qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, May 27, 2019 at 12:03:50PM +0200, Paolo Bonzini wrote:
-> On 27/05/19 10:00, Markus Armbruster wrote:
-> > As long as we don't have an active QOM maintainer[*], the benefit is
-> > low.
-> > 
-> > 
-> > [*] We need one.  I'm not volunteering.
-> 
-> I think Daniel, Eduardo and I could count as de facto maintainer.  I
-> guess I could maintain it if I get two partners in crime as reviewers.
+From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
 
-Well, I guess this is just what we have been already doing
-becoming official.  You can count me in.
+Valgrind detects multiple issues in QEMU iotests when the memory is
+used without being initialized. Valgrind may dump lots of unnecessary
+reports what makes the memory issue analysis harder. Particularly,
+that is true for the aligned bitmap directory and can be seen while
+running the iotest #169. Padding the aligned space with zeros eases
+the pain.
 
--- 
-Eduardo
+Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+Message-id: 1558961521-131620-1-git-send-email-andrey.shinkevich@virtuozz=
+o.com
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+---
+ block/qcow2-bitmap.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
+index 640da68ce1..b2487101ed 100644
+--- a/block/qcow2-bitmap.c
++++ b/block/qcow2-bitmap.c
+@@ -753,7 +753,7 @@ static int bitmap_list_store(BlockDriverState *bs, Qc=
+ow2BitmapList *bm_list,
+         dir_offset =3D *offset;
+     }
+=20
+-    dir =3D g_try_malloc(dir_size);
++    dir =3D g_try_malloc0(dir_size);
+     if (dir =3D=3D NULL) {
+         return -ENOMEM;
+     }
+--=20
+2.21.0
+
 
