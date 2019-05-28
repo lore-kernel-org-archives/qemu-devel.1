@@ -7,74 +7,74 @@ X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D4E3FC072B1
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 May 2019 09:57:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 82068C04AB6
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 May 2019 09:57:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A6821208C3
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 May 2019 09:57:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4ED9F208CB
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 May 2019 09:57:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="vEt3BDV4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A6821208C3
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="qpePDlx7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4ED9F208CB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:60035 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:60037 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hVYrS-00040H-SP
-	for qemu-devel@archiver.kernel.org; Tue, 28 May 2019 05:57:38 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:40750)
+	id 1hVYrW-00044B-Is
+	for qemu-devel@archiver.kernel.org; Tue, 28 May 2019 05:57:42 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:40912)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hVYk4-0006EO-Qi
-	for qemu-devel@nongnu.org; Tue, 28 May 2019 05:50:03 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1hVYkC-0006KI-8d
+	for qemu-devel@nongnu.org; Tue, 28 May 2019 05:50:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hVYk3-0008V8-IS
-	for qemu-devel@nongnu.org; Tue, 28 May 2019 05:50:00 -0400
-Received: from mail-wr1-x42f.google.com ([2a00:1450:4864:20::42f]:47030)
+	(envelope-from <alex.bennee@linaro.org>) id 1hVYkB-0000D1-8C
+	for qemu-devel@nongnu.org; Tue, 28 May 2019 05:50:08 -0400
+Received: from mail-wr1-x42f.google.com ([2a00:1450:4864:20::42f]:45509)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1hVYk3-0008Ts-C7
-	for qemu-devel@nongnu.org; Tue, 28 May 2019 05:49:59 -0400
-Received: by mail-wr1-x42f.google.com with SMTP id r7so19444951wrr.13
-	for <qemu-devel@nongnu.org>; Tue, 28 May 2019 02:49:59 -0700 (PDT)
+	id 1hVYkB-0000Ah-23
+	for qemu-devel@nongnu.org; Tue, 28 May 2019 05:50:07 -0400
+Received: by mail-wr1-x42f.google.com with SMTP id b18so19436593wrq.12
+	for <qemu-devel@nongnu.org>; Tue, 28 May 2019 02:50:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
 	h=from:to:cc:subject:date:message-id:in-reply-to:references
 	:mime-version:content-transfer-encoding;
-	bh=pFgHz7Tht5qTVpx15EDKkUknXmNVbUsIScAUSfYzoag=;
-	b=vEt3BDV4pVGNjDaQXTX598ft1XJRMAqvzxi0C6qvMjpHXBDahFdDF6/NATFVedpJtx
-	Our/AVZWQmH1H5LelhWbuqAXamaKNkaMO9b5CDbbS/UEiScSp9X4+OCLm75sNgBY+ZxN
-	uaLmiOP4GWh26W298e1/RM5K201pZZBBqA65AEDXvspaJpgyNQ9UnWqJVN/cxLTY8RYT
-	I1L73NgGtlJK7MYNnkjWHDIm8SjOlNlMHQzqET/q8aIbvsTD/2sWzziY227F0sXkkKIQ
-	q/6te+MZc2VYmGKLkppx1psXOqG+/sG8L5hvG59NJkxYsbKpDszCNEy31fmBakEb3QPd
-	0E6w==
+	bh=YDNzQhJzHpYWtPYJ/WfzD9Kmonh+P1NhdBxQx7bYzps=;
+	b=qpePDlx73KMab03AZXzKxDpXvxURte1hnolFvszFU3PC+7C+35vW1YYt8Vq3j/8ru0
+	l5NDBx0ZIWznm69lLQhj1y6HnuewWOY2oyBOoogdFz23uW7Cg6AeHbOEXo4z1DXVE0nW
+	AYO42/KikUzVBJcjdVPwotwF/IgyARoAAEmD3vWiZASkolE8XMHFCClPo5i1/YG4PJMf
+	hrT4Ir5DRbvssDLmBAqOBwjR2P99WarhBim7EBrE7dsxghn1NO1fuqNQaV2qiwD0oqQV
+	JIhcdRQ+G/ZV8tECK6BDvjZLvnqR3pMTOMWPH5kIfPtl5Fxgb3bazWkzG6l1+qeNuChn
+	MULw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
 	:references:mime-version:content-transfer-encoding;
-	bh=pFgHz7Tht5qTVpx15EDKkUknXmNVbUsIScAUSfYzoag=;
-	b=F1zDQ3JwiXg1Omi4Z5MvnURUa7e4hsDMlB5EfwJaqc2ppiA07qDY0LgQbY35VkYYRF
-	abd0BjvmyltKHJ1E1J04S8CZ8wloJIz7dAePWvguwzIL38zQLctRQL8fOxJw2e9F/bgk
-	Vy/gXpx9AqaTbsZXqcNMPAUCHY98Xh9QoHjze9+bYeA3axjGwN4W+okIgHnTUTH8M3Rq
-	A/I/Rmj10CdPG42/42s8D9StT3I9HICC52R2wKq0WRxCADJcswkEwRxbuP99CWfgO9cd
-	cOSttYye51/eXGamzo8dYlDmnnMFOL8DKJfZ8HCE4jlDfZWTdMEYfuc/ssdBlxu/ERDv
-	5/fA==
-X-Gm-Message-State: APjAAAUxaD/aw8Y4a/Omij34dlFxEAFdJPvZH3BqdDr+C+sqDCEegZxi
-	3iVn5GnMnZw0xNk9Puw88czH6g==
-X-Google-Smtp-Source: APXvYqz7JHFowFTfkeWJs2ZsN9EchE/t4CT9Dd6IlfMTrddCXiPwJKhM2TBOK/SCG1QjMy0LZ0230g==
-X-Received: by 2002:adf:e742:: with SMTP id c2mr25057764wrn.249.1559036998364; 
-	Tue, 28 May 2019 02:49:58 -0700 (PDT)
+	bh=YDNzQhJzHpYWtPYJ/WfzD9Kmonh+P1NhdBxQx7bYzps=;
+	b=Kg9uE5y0l81NpKhtlMrBb7QJc1XQSAjc5sRWJaOV7C2J4esNaio0bWwCcHGVbIgJ5R
+	smXlyGJBDk94MdXX28PbwkUrrpGd/PMJIpEUCgLlsQyVdUXFSJAfB80HVDEAOG0KEoyA
+	svSuGja7hTKd9H/JQZ+IXS8KNWIw7cJiTVqlON9WGDCLV2MqXyU5N3K0v/cgq42QOHwh
+	P3gSbIY0p4P76uySbblK1rSEO7OUPMhmmL2hivxaKmNtUekpVG0mdlVX8M79BQypqE9W
+	oPewk6wrVAqNJSV5eDwetjsXv80oDzeNbFl2pJelpdKP9K9bylTCc5kA8RzfCy74adIx
+	BSQw==
+X-Gm-Message-State: APjAAAXiBd2Giz55C/FvbQaSX2G04IUn3L+jvzWwZXDa/YIstWw5nzmm
+	BnTEyXSU/AG/s2cr/M4SjZEMqA==
+X-Google-Smtp-Source: APXvYqxuMHVG433BX001IrLMFPvmW/Pw94/kFHZoUInJMVLZBiHZvlJ8LEswAOejwvs7mZqqYBEC9w==
+X-Received: by 2002:a5d:624c:: with SMTP id m12mr12625819wrv.354.1559037004886;
+	Tue, 28 May 2019 02:50:04 -0700 (PDT)
 Received: from zen.linaroharston ([81.128.185.34])
-	by smtp.gmail.com with ESMTPSA id 95sm7704397wrk.70.2019.05.28.02.49.55
+	by smtp.gmail.com with ESMTPSA id f2sm4479998wrq.48.2019.05.28.02.49.57
 	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Tue, 28 May 2019 02:49:56 -0700 (PDT)
+	Tue, 28 May 2019 02:50:02 -0700 (PDT)
 Received: from zen.linaroharston. (localhost [127.0.0.1])
-	by zen.linaroharston (Postfix) with ESMTP id 2C1C71FF98;
+	by zen.linaroharston (Postfix) with ESMTP id 94E6C1FF9C;
 	Tue, 28 May 2019 10:49:54 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: peter.maydell@linaro.org
-Date: Tue, 28 May 2019 10:49:33 +0100
-Message-Id: <20190528094953.14898-9-alex.bennee@linaro.org>
+Date: Tue, 28 May 2019 10:49:38 +0100
+Message-Id: <20190528094953.14898-14-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190528094953.14898-1-alex.bennee@linaro.org>
 References: <20190528094953.14898-1-alex.bennee@linaro.org>
@@ -84,8 +84,8 @@ Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
 X-Received-From: 2a00:1450:4864:20::42f
-Subject: [Qemu-devel] [PULL 08/28] target/arm: correct return values for
- WRITE/READ in arm-semi
+Subject: [Qemu-devel] [PULL 13/28] tests/docker: Test more components on the
+ Fedora default image
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -97,69 +97,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
-	"open list:ARM" <qemu-arm@nongnu.org>,
-	=?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
-	qemu-devel@nongnu.org
+Cc: Fam Zheng <fam@euphon.net>,
+	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+	Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
+	=?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The documentation says the write should return the number of bytes not
-written on an error (0 means everything was written). Read provides a
-buffer length and the return value should be the buffer length - bytes
-actually read. Remove the incorrect FIXME's and return the correct
-values.
+From: Philippe Mathieu-Daudé <philmd@redhat.com>
 
+Install optional dependencies of QEMU to get better coverage.
+
+The following components are now enabled:
+
+  $ ./configure
+  ...
+  Multipath support yes
+  VNC SASL support  yes
+  RDMA support      yes
+  PVRDMA support    yes
+  libiscsi support  yes
+  seccomp support   yes
+  libpmem support   yes
+  libudev           yes
+
+Note: The udev-devel package is provided by systemd-devel.
+
+Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Message-Id: <20190504055440.20406-1-philmd@redhat.com>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Acked-by: Marcel Apfelbaum<marcel.apfelbaum@gmail.com>
 
-diff --git a/target/arm/arm-semi.c b/target/arm/arm-semi.c
-index 86e6ec48c2f..53e807ab721 100644
---- a/target/arm/arm-semi.c
-+++ b/target/arm/arm-semi.c
-@@ -331,13 +331,15 @@ target_ulong do_arm_semihosting(CPUARMState *env)
-         } else {
-             s = lock_user(VERIFY_READ, arg1, len, 1);
-             if (!s) {
--                /* FIXME - should this error code be -TARGET_EFAULT ? */
--                return (uint32_t)-1;
-+                /* Return bytes not written on error */
-+                return len;
-             }
-             ret = set_swi_errno(ts, write(arg0, s, len));
-             unlock_user(s, arg1, 0);
--            if (ret == (uint32_t)-1)
--                return -1;
-+            if (ret == (uint32_t)-1) {
-+                ret = 0;
-+            }
-+            /* Return bytes not written */
-             return len - ret;
-         }
-     case TARGET_SYS_READ:
-@@ -352,15 +354,17 @@ target_ulong do_arm_semihosting(CPUARMState *env)
-         } else {
-             s = lock_user(VERIFY_WRITE, arg1, len, 0);
-             if (!s) {
--                /* FIXME - should this error code be -TARGET_EFAULT ? */
--                return (uint32_t)-1;
-+                /* return bytes not read */
-+                return len;
-             }
-             do {
-                 ret = set_swi_errno(ts, read(arg0, s, len));
-             } while (ret == -1 && errno == EINTR);
-             unlock_user(s, arg1, len);
--            if (ret == (uint32_t)-1)
--                return -1;
-+            if (ret == (uint32_t)-1) {
-+                ret = 0;
-+            }
-+            /* Return bytes not read */
-             return len - ret;
-         }
-     case TARGET_SYS_READC:
+diff --git a/tests/docker/dockerfiles/fedora.docker b/tests/docker/dockerfiles/fedora.docker
+index 69d4a7f5d75..afbba29adaa 100644
+--- a/tests/docker/dockerfiles/fedora.docker
++++ b/tests/docker/dockerfiles/fedora.docker
+@@ -8,6 +8,7 @@ ENV PACKAGES \
+     bzip2-devel \
+     ccache \
+     clang \
++    cyrus-sasl-devel \
+     device-mapper-multipath-devel \
+     findutils \
+     flex \
+@@ -23,13 +24,17 @@ ENV PACKAGES \
+     libaio-devel \
+     libasan \
+     libattr-devel \
++    libblockdev-mpath-devel \
+     libcap-devel \
+     libcap-ng-devel \
+     libcurl-devel \
+     libfdt-devel \
++    libiscsi-devel \
+     libjpeg-devel \
++    libpmem-devel \
+     libpng-devel \
+     librbd-devel \
++    libseccomp-devel \
+     libssh2-devel \
+     libubsan \
+     libusbx-devel \
+@@ -74,10 +79,12 @@ ENV PACKAGES \
+     pixman-devel \
+     python3 \
+     PyYAML \
++    rdma-core-devel \
+     SDL2-devel \
+     snappy-devel \
+     sparse \
+     spice-server-devel \
++    systemd-devel \
+     systemtap-sdt-devel \
+     tar \
+     usbredir-devel \
 -- 
 2.20.1
 
