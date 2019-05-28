@@ -6,60 +6,58 @@ X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 08206C04AB6
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 May 2019 08:20:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B5999C04AB6
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 May 2019 08:21:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D4EC22075C
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 May 2019 08:20:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D4EC22075C
+	by mail.kernel.org (Postfix) with ESMTPS id 8CD1B2075C
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 May 2019 08:21:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8CD1B2075C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:58969 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:58981 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hVXLN-0004vr-09
-	for qemu-devel@archiver.kernel.org; Tue, 28 May 2019 04:20:25 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:52660)
+	id 1hVXMb-0005td-SJ
+	for qemu-devel@archiver.kernel.org; Tue, 28 May 2019 04:21:41 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:52961)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1hVXKa-0004ev-OW
-	for qemu-devel@nongnu.org; Tue, 28 May 2019 04:19:37 -0400
+	(envelope-from <quintela@redhat.com>) id 1hVXLo-0005K6-UO
+	for qemu-devel@nongnu.org; Tue, 28 May 2019 04:20:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1hVXKZ-00083P-VC
-	for qemu-devel@nongnu.org; Tue, 28 May 2019 04:19:36 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34968)
+	(envelope-from <quintela@redhat.com>) id 1hVXLf-0000gL-GB
+	for qemu-devel@nongnu.org; Tue, 28 May 2019 04:20:47 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57688)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1hVXKZ-00081s-Qu
-	for qemu-devel@nongnu.org; Tue, 28 May 2019 04:19:35 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
+	(Exim 4.71) (envelope-from <quintela@redhat.com>)
+	id 1hVXLf-0000eU-BZ; Tue, 28 May 2019 04:20:43 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 1A3C33082B1F;
-	Tue, 28 May 2019 08:19:35 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 745E93099FC5;
+	Tue, 28 May 2019 08:20:40 +0000 (UTC)
 Received: from redhat.com (unknown [10.36.118.21])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id A73845C8B4;
-	Tue, 28 May 2019 08:19:34 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id DE55C6C35B;
+	Tue, 28 May 2019 08:20:39 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-To: Wei Yang <richardw.yang@linux.intel.com>
-In-Reply-To: <20190528014703.21030-5-richardw.yang@linux.intel.com> (Wei
-	Yang's message of "Tue, 28 May 2019 09:47:03 +0800")
-References: <20190528014703.21030-1-richardw.yang@linux.intel.com>
-	<20190528014703.21030-5-richardw.yang@linux.intel.com>
+To: Li Qiang <liq3ea@163.com>
+In-Reply-To: <20190525062832.18009-1-liq3ea@163.com> (Li Qiang's message of
+	"Fri, 24 May 2019 23:28:32 -0700")
+References: <20190525062832.18009-1-liq3ea@163.com>
 User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
-Date: Tue, 28 May 2019 10:19:32 +0200
-Message-ID: <87a7f77zzf.fsf@trasno.org>
+Date: Tue, 28 May 2019 10:20:37 +0200
+Message-ID: <8736kz7zxm.fsf@trasno.org>
 MIME-Version: 1.0
 Content-Type: text/plain
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.45]);
-	Tue, 28 May 2019 08:19:35 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.41]);
+	Tue, 28 May 2019 08:20:40 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 4/4] migration/ram.c:
- multifd_send_state->count is not really used
+Subject: Re: [Qemu-devel] [PATCH] migration: fix a typo
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -72,20 +70,19 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Reply-To: quintela@redhat.com
-Cc: qemu-devel@nongnu.org, dgilbert@redhat.com
+Cc: qemu-trivial@nongnu.org, dgilbert@redhat.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Wei Yang <richardw.yang@linux.intel.com> wrote:
-> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
-
+Li Qiang <liq3ea@163.com> wrote:
+> 'postocpy' should be 'postcopy'.
+>
+> CC: qemu-trivial@nongnu.org
+> Signed-off-by: Li Qiang <liq3ea@163.com>
 
 Reviewed-by: Juan Quintela <quintela@redhat.com>
 
-Once upon a time, we checked how many threads were created to recover
-for errors, but this was wrong because one of the "missing" threads
-could be one different from the last one.
+Already in through trivial patches.
 
-Thanks, Juan.
 
