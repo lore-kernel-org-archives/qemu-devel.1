@@ -2,78 +2,113 @@ Return-Path: <SRS0=2W3W=T4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=0.9 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	FROM_LOCAL_NOVOWEL,HEADER_FROM_DIFFERENT_DOMAINS,HK_RANDOM_FROM,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4967CC04AB6
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 May 2019 19:57:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E365C04AB6
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 May 2019 20:09:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 18FFB20B7C
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 May 2019 19:57:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E256520B7C
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 May 2019 20:09:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="boZxlBat"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 18FFB20B7C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="X2pd/Ujt"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E256520B7C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=twiddle.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:41969 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:42066 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hViEJ-0005bY-Fd
-	for qemu-devel@archiver.kernel.org; Tue, 28 May 2019 15:57:51 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:46461)
+	id 1hViPT-00083w-Uf
+	for qemu-devel@archiver.kernel.org; Tue, 28 May 2019 16:09:23 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:48717)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1hViCW-0004Vx-9w
-	for qemu-devel@nongnu.org; Tue, 28 May 2019 15:56:01 -0400
+	(envelope-from <rth7680@gmail.com>) id 1hViOf-0007n6-Rh
+	for qemu-devel@nongnu.org; Tue, 28 May 2019 16:08:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1hViCV-0005Ho-Fx
-	for qemu-devel@nongnu.org; Tue, 28 May 2019 15:56:00 -0400
-Received: from mail-yb1-xb44.google.com ([2607:f8b0:4864:20::b44]:37288)
+	(envelope-from <rth7680@gmail.com>) id 1hViOe-0006PC-T1
+	for qemu-devel@nongnu.org; Tue, 28 May 2019 16:08:33 -0400
+Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:42812)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1hViCV-0005HK-Bn
-	for qemu-devel@nongnu.org; Tue, 28 May 2019 15:55:59 -0400
-Received: by mail-yb1-xb44.google.com with SMTP id l66so4061754ybf.4
-	for <qemu-devel@nongnu.org>; Tue, 28 May 2019 12:55:59 -0700 (PDT)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1hViOe-0006O9-NT
+	for qemu-devel@nongnu.org; Tue, 28 May 2019 16:08:32 -0400
+Received: by mail-ot1-x343.google.com with SMTP id i2so18987367otr.9
+	for <qemu-devel@nongnu.org>; Tue, 28 May 2019 13:08:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-	:cc; bh=yrqKPors1uhW/6HWX5S1WZiByGeNkXhp/tOefsty0uI=;
-	b=boZxlBatYYiFC47eNGz1y4wXPzETiN14gkkQrh/aGvzkjaJ+2bCxBGL80pGe8QaC7x
-	YLuxOOleY5f+bFKgeQMgTkaj+J8W3Y1jv3Ujib/+zo12xeFwd7DTI1I7d5ySA7Bhquk9
-	2SZIrTNkszqNpbvePSDQPMajQbu/V70FBXYpsrgeEvnCbk6H78uAzofdllPSRt1aDec5
-	cdZR4WtJRLM/fJdSEfcismSUz+ecR3OBNPrH/1/guxO+TsMFHiwy3hk4Sr3NezAmD03c
-	UZ6P1SnwOYhniLbqNHnkcBHXbEi+UwKuDKnv4QOe6peXaCtD35uD48KK9qX4XnMRk88Z
-	q9WQ==
+	h=sender:subject:to:cc:references:from:openpgp:autocrypt:message-id
+	:date:user-agent:mime-version:in-reply-to:content-language
+	:content-transfer-encoding;
+	bh=7eBSVPalh23n/iA0gYQn4rdYP0Ib//7jzvyYrsHayGI=;
+	b=X2pd/UjtpvVumVjW1w1cr7jJucsFoSRoT0/fKAvLX+15VW9/kt9EK+I/ul0XqZ93r7
+	ek/t9c5omem8922f36vqJzwgTuRDtmt37azbHihAVVWM+bWdso+8K9uuBZjzWxLboVjp
+	JSN9Pnr17R3z2+geZ+CqrZBkKmT+Lm/xPp92tk0qy1PyLJ1+nf0oS9QsBi9cGRFzLZa9
+	LBamPgtkC9vffv2DNEw3laXQbh0heaPiZ1FWPKBQaliq/9HmVz7v8LSPgtC82QlMUxtb
+	3LUzD0BVW2ykr4XPt95xEOPl+EBqacCamfANRQNtkjNqIPYZUn69/D6yT+F4/T1yg8Yk
+	Xr6A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-	:message-id:subject:to:cc;
-	bh=yrqKPors1uhW/6HWX5S1WZiByGeNkXhp/tOefsty0uI=;
-	b=Hyr1j+LUwHRVBxHH9ZRfRY1ovephmBpIOdBIhZ1VYTdlMMFJC8Q8Lzr3szK0/SOKL+
-	nox+iTCVeznwglTQtg3/a9T7SV1Pe5vCp60Wma8OnmxOE2mGAel1M0NbgfC8DAGyVgi7
-	FjtuFVMl65PTqUA4//QEb9gbiLdLYEhGBmYsJ+cl2Eph+6x2emdVPrrOe9vC5S+4loYP
-	ffNDiPhKBqBSGGnzOmnBCFecW87u8ufOFBX7NzhxW3GukutlEPaZ2yhccVepPCdxaRdf
-	7eoe93tfHWHuytR8Q4sUYRZynV0REGEzVdv45RdiN5sg4StFPCBTY3D6XAJRCrNUr3of
-	JBGA==
-X-Gm-Message-State: APjAAAXUmokp7IcOVXSCbN7ZFvRdLGlePjAuSyuZ4Imr+rsmzT/K64z9
-	MOk72vD6Ug8dL+xDZ9xNTRPWVqM+8KFjbwuihXI=
-X-Google-Smtp-Source: APXvYqxax+LE0X28NxcW2Y5hh2AxKEcwppeK6jdtz2BakQVt2X5kp1LLGcdPYdfoQ+AXos3Iia+WUEVRKeUjhhTJoFo=
-X-Received: by 2002:a25:c404:: with SMTP id u4mr59113059ybf.119.1559073358227; 
-	Tue, 28 May 2019 12:55:58 -0700 (PDT)
-MIME-Version: 1.0
+	h=x-gm-message-state:sender:subject:to:cc:references:from:openpgp
+	:autocrypt:message-id:date:user-agent:mime-version:in-reply-to
+	:content-language:content-transfer-encoding;
+	bh=7eBSVPalh23n/iA0gYQn4rdYP0Ib//7jzvyYrsHayGI=;
+	b=bQLAugmf/kC0/+onbFfRLUl9ru1UCp9XKA1tBqAV1JhYLZkMjCcuAg6cMG/XlMr42Y
+	b6DwzSGr+kzv2UNiYcurjvRNaDESS2K5UvESdMNSY9gMY+oQuTgJ41RlW4OfHk9vzq8Q
+	idaE9GzbyOQT5wydMYuQrF5NyQdQMUIFavZHEJau6TUBIuIC7A64eWha9Pl9i7S6Wjh8
+	f2B8fGTT59v112ROIBEO33MlppiEwrVUCnDyhtBPELds17bD0u1ADlZlcPCoxJWOT5U1
+	CbmuhFWFD6bef0kogmpoIKnuX6hFndqEdI5DyBDxvliSG+pF6Fx/8H2Lp28GAFKVmR5c
+	mjyA==
+X-Gm-Message-State: APjAAAWdt3WkVu1RgImMXIlipAqP7thfGl5OI9fDPryf/MxAV6XE5Rmz
+	qjN7W38OuxbyDXOhdfVvurU=
+X-Google-Smtp-Source: APXvYqwPqJDUlLHk6jdWSjhbRNVX1nExPrg5/NG4vNnC9LlhNnwuWyEEbSPdbPy4R8tAlodvbCmD6A==
+X-Received: by 2002:a9d:6c89:: with SMTP id c9mr27065616otr.52.1559074111060; 
+	Tue, 28 May 2019 13:08:31 -0700 (PDT)
+Received: from [172.24.12.210] (168.189-204-159.bestelclientes.com.mx.
+	[189.204.159.168]) by smtp.googlemail.com with ESMTPSA id
+	z190sm5746865oia.21.2019.05.28.13.08.25
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Tue, 28 May 2019 13:08:30 -0700 (PDT)
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
 References: <87lfyqla7r.fsf@dusky.pond.sub.org>
+From: Richard Henderson <rth@twiddle.net>
+Openpgp: preference=signencrypt
+Autocrypt: addr=rth@twiddle.net; prefer-encrypt=mutual; keydata=
+	mQENBFGuLC8BCADcAoWcnW9lTsDMzbO3MBU+KbiGaj5JPatEUscRDkQYM2fyNjJp2tIWDK5a
+	n4yngeXB3eX61WbYR3QraRK8mlYLGxyAdHMEQfPipbqf3TmN043fssT2bc82ApJcs1zvLYgI
+	rhMht7Dck7A0wNC1jo+ZjVVFig5gDTN7gOzaAdBtV8tVNUddwkLzzaGpfihhSD6U46NdqKOG
+	Wlnn6TrkMy0QGdQ5NaXHkRlUjnnUTSW/nKfoxD+EI+A9V4sYOd8mc/TL4aJh/i/AiU57eLbo
+	n17uQI6/VTWDUWl8USiz4x9c8vmqlywLx00tAFxxoRWqk4KVJlj+Sh0up/D/sJ+vPpgBABEB
+	AAG0I1JpY2hhcmQgSGVuZGVyc29uIDxydGhAdHdpZGRsZS5uZXQ+iQFBBBMBAgArAhsDBgsJ
+	CAcDAgYVCAIJCgsEFgIDAQIeAQIXgAUJC7UHogUCWaDNVgIZAQAKCRCtEnDMTdAnm9N5CADO
+	cB8F/SudJ72IupxQf40hbJdBK176+gb3sHMsixyLtrU59lee+lIM1OZmlNjsnCYmiSnbA5ks
+	Q7p0HfO7DgdmfLzcK6xsHZukqSZy5LByw348Y913ZyjOrJZFdPP7kDg1MnqRqH4+3ZdzxV4y
+	eYBWFU9GYMIF06JbUubossOOO4ArNVZbnIPu8Vn2tDZVVqsCBqkoCSBMj519xrvyOu5z4mHS
+	LkCglXmVDOXMbqLuNAC3rfNXSnyM4hYkLUyfALJlAAy1Ro+jUqYhu7XUFV/MiwRuFMh5GbtY
+	Urkx7tqsWQXLT3GeDk/LqvpWJQwk4cHHckYjRih+70CHIenm81PVuQENBFGuLC8BCACyEx3x
+	94HIkTX0CHu2sA0w75+h9wuoA8ggJ7+S4ri0y2YsijWad5TTt6z6MMiqxk9kSA5bppaj4HXh
+	86hBF/dWCtMpNr3Rb8FNOKyeA/qkYHVD6HiAiw9c6D8Dr9hWmOk3/HSmGrNURxeUFOckDXsv
+	I+yGGKBNshj59j7QZr7ZiuIi2rWlBL8dFN/OWa/o3x7HKsE4k6K8ngwvCKP/QbDLwLLBOWH+
+	VEUtpyeyxTr3OJ47ECTxdYvXoAV2iJaKr+6doVQiiR5eVFiMYrUPUECJeolOCwqc/JlWE18L
+	+PCAFaW1H+/mpPVfSpN4wnkJ5cQiQVB41IaCM4p20iRzx7ZJABEBAAGJASUEGAECAA8CGwwF
+	AlmgzYEFCQu1CEoACgkQrRJwzE3QJ5s7rggAwABzDAGrZ6uWsMxg5PeiiAYPy6LBnCBJSpB5
+	Tfy5jH8QTmLfXW+u4Ib4sWXG7PYNR7sIrtqUHjRqXLVXrSnBX9ASGcYw/Xil45khW6LsRpO1
+	prHv9gkwQfa6fTiWXVfSfm2Nant6u02q+MaYtQpCVTiz/9ki4FfftUwUHFLU0MhIQogjd11y
+	/E08RJsqBwaHQdt14PwU1HphDOzSkhOXRXQLSd3ysyeGUXvL+gqQoXl5XYdvk8IId4PoJRo4
+	jcyJ4VbnldvXh5gdGhFA/f9JgkLk9tPW+C3wNtNWyRUq8azR9hF2fg2HJUf4IXQlIu8OOgh1
+	VcROBqvtH3ecaIL9iw==
+Message-ID: <48c042dc-39f8-9d6e-5cf7-d3e1451f78c6@twiddle.net>
+Date: Tue, 28 May 2019 15:08:23 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
+MIME-Version: 1.0
 In-Reply-To: <87lfyqla7r.fsf@dusky.pond.sub.org>
-From: Max Filippov <jcmvbkbc@gmail.com>
-Date: Tue, 28 May 2019 12:55:45 -0700
-Message-ID: <CAMo8BfKKGgLnw5DxXs=1Mh3EyenyzJxait4Ds9F7d3Y7843QnA@mail.gmail.com>
-To: Markus Armbruster <armbru@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2607:f8b0:4864:20::b44
+X-Received-From: 2607:f8b0:4864:20::343
 Subject: Re: [Qemu-devel] Headers without multiple inclusion guards
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
@@ -91,7 +126,7 @@ Cc: Peter Maydell <peter.maydell@linaro.org>, Chris Wulff <crwulff@gmail.com>,
 	David Hildenbrand <david@redhat.com>, James Hogan <jhogan@kernel.org>,
 	Anthony Green <green@moxielogic.com>, Palmer Dabbelt <palmer@sifive.com>,
 	Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
-	qemu-devel <qemu-devel@nongnu.org>,
+	Max Filippov <jcmvbkbc@gmail.com>,
 	Dmitry Fleytman <dmitry.fleytman@gmail.com>,
 	Alistair Francis <Alistair.Francis@wdc.com>,
 	Gerd Hoffmann <kraxel@redhat.com>,
@@ -103,8 +138,7 @@ Cc: Peter Maydell <peter.maydell@linaro.org>, Chris Wulff <crwulff@gmail.com>,
 	Halil Pasic <pasic@linux.ibm.com>,
 	Christian Borntraeger <borntraeger@de.ibm.com>,
 	Anthony Perard <anthony.perard@citrix.com>,
-	Richard Henderson <rth@twiddle.net>, Jason Wang <jasowang@redhat.com>,
-	Artyom Tarasenko <atar4qemu@gmail.com>,
+	Jason Wang <jasowang@redhat.com>, Artyom Tarasenko <atar4qemu@gmail.com>,
 	Laurent Vivier <lvivier@redhat.com>,
 	Thomas Huth <thuth@redhat.com>, Riku Voipio <riku.voipio@iki.fi>,
 	Eduardo Habkost <ehabkost@redhat.com>,
@@ -113,7 +147,7 @@ Cc: Peter Maydell <peter.maydell@linaro.org>, Chris Wulff <crwulff@gmail.com>,
 	Beniamino Galvani <b.galvani@gmail.com>,
 	Eric Auger <eric.auger@redhat.com>, Paul Durrant <paul.durrant@citrix.com>,
 	Stafford Horne <shorne@gmail.com>,
-	=?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
+	=?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
 	David Gibson <david@gibson.dropbear.id.au>,
 	"Daniel P. Berrange" <berrange@redhat.com>,
 	Claudio Fontana <claudio.fontana@gmail.com>,
@@ -122,26 +156,38 @@ Cc: Peter Maydell <peter.maydell@linaro.org>, Chris Wulff <crwulff@gmail.com>,
 	Claudio Fontana <claudio.fontana@huawei.com>,
 	Laurent Vivier <laurent@vivier.eu>,
 	Andrew Baumann <Andrew.Baumann@microsoft.com>,
-	=?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+	=?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
 	Michael Walle <michael@walle.cc>,
 	Aleksandar Markovic <amarkovic@wavecomp.com>,
 	Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>,
-	=?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+	=?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, May 28, 2019 at 11:12 AM Markus Armbruster <armbru@redhat.com> wrote:
-> target/xtensa/helper.h
+On 5/28/19 1:12 PM, Markus Armbruster wrote:
+> accel/tcg/atomic_template.h
+
+Intentional; could be renamed atomic_template.inc.c.
+
+> accel/tcg/tcg-runtime.h
+
 Intentional.
 
-> target/xtensa/overlay_tool.h
-Unintentional.
+> tcg/aarch64/tcg-target.opc.h
+> tcg/i386/tcg-target.opc.h
 
-> target/xtensa/xtensa-isa.h
-It's a one-liner that includes another header.
+Intentional.
 
--- 
-Thanks.
--- Max
+> tcg/tcg-gvec-desc.h
+> tcg/tcg-op-gvec.h
+
+Not intentional.
+
+> tcg/tcg-opc.h
+
+Intentional.
+
+
+r~
 
