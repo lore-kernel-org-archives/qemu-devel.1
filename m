@@ -2,83 +2,72 @@ Return-Path: <SRS0=2W3W=T4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,T_HK_NAME_DR,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 13B97C04AB6
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 May 2019 11:26:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 762BBC04AB6
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 May 2019 12:02:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D21C52081C
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 May 2019 11:26:02 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="E9qqxPK1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D21C52081C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 4DF2920883
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 May 2019 12:02:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4DF2920883
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:32865 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:33677 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hVaF0-0006M6-0L
-	for qemu-devel@archiver.kernel.org; Tue, 28 May 2019 07:26:02 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:39460)
+	id 1hVaoS-0006Wa-9i
+	for qemu-devel@archiver.kernel.org; Tue, 28 May 2019 08:02:40 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:46521)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hVaEG-0005xR-Ew
-	for qemu-devel@nongnu.org; Tue, 28 May 2019 07:25:17 -0400
+	(envelope-from <bounces@canonical.com>) id 1hVan0-0005lQ-RW
+	for qemu-devel@nongnu.org; Tue, 28 May 2019 08:01:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hVaEE-0003qU-Cr
-	for qemu-devel@nongnu.org; Tue, 28 May 2019 07:25:16 -0400
-Received: from mail-oi1-x22f.google.com ([2607:f8b0:4864:20::22f]:40424)
+	(envelope-from <bounces@canonical.com>) id 1hVamv-0000R3-1z
+	for qemu-devel@nongnu.org; Tue, 28 May 2019 08:01:10 -0400
+Received: from indium.canonical.com ([91.189.90.7]:52630)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hVaEE-0003np-77
-	for qemu-devel@nongnu.org; Tue, 28 May 2019 07:25:14 -0400
-Received: by mail-oi1-x22f.google.com with SMTP id r136so13951245oie.7
-	for <qemu-devel@nongnu.org>; Tue, 28 May 2019 04:25:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-	:cc; bh=SoBCmq6KJRDdwJy2NVFbtI5+rDtxojn1N5JjLeHUq8Q=;
-	b=E9qqxPK1KT41tmg/S8/dkIb6FmdRjHETZuVGugy5XyNTcl1k++3BgXfBn7RBgfzFD3
-	7SVwWlCHQVhhXXs4YDjzwoKGaMI4/1aw5cIkTebGjYkgEcrMHhagJhwgwVsYiMnvBecZ
-	VMGlMsup6sXxfTwmIwNAktFWLkc0M5O07qyQPedpGcEGmdkSguqvYjGHrW/gUAsranrw
-	6pn/I2xuMveVWEdIJBTt+FNLBiC5itXKnd5rRr1xv8tkCG3vPSc/b0BGPu7zvTVjWcC7
-	lx5dY0aA4KfC/sSAwBGsBYmADys6Wgbuo6mKQr/snz789vdtDSpYrO2zLH8iKE2GG+4m
-	8syg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-	:message-id:subject:to:cc;
-	bh=SoBCmq6KJRDdwJy2NVFbtI5+rDtxojn1N5JjLeHUq8Q=;
-	b=OSgZnEB0fcjmZwD2MNkAXXZ4a6I8Q9IKNjayDCAJk2iogL654HNooFYcBpYszoQCSZ
-	WQl5MNzAzjEO/T6gm7fDeJo5oPgm4OzoEn38yolsL/D2KRP0artKFFeLFtdeay6t5dyX
-	amCkrIGj3MeYFlzfOl4e/tuZMTolWUv/2zL/pgAMuGcywGPi7JofZhuQCarOJDOJ0Zrh
-	1WbB7EaqypO7QStADSG8PWUiM+s6umEKr5LCfV4Td5BK9xs1SRndyt8wfLXwpWo8AgSR
-	NASv7TmRFz+bn8DNZn4PrM3qjTJL9TmJwold6uU9q5hdCoRvESz5FVArxyx9zll2FV6p
-	HeOw==
-X-Gm-Message-State: APjAAAVQclK3ygSkJr5F6bXlEh5lpZ0ZyBo4Ood0phigZdYfzdgk2nTH
-	3/ZTvJk0z4UeRBAwUiS5LD/ly3EwS/EXb1cQVQdGYw==
-X-Google-Smtp-Source: APXvYqw2R4XN/hqLW8HXB6RxJzGaPdWf8ri8hiSm4I5S6baQA2Ii4sJZ0p1tqpYNc02fmPYg30/SDOTq/YP5fd2rrJU=
-X-Received: by 2002:aca:4e42:: with SMTP id c63mr2388915oib.170.1559042713221; 
-	Tue, 28 May 2019 04:25:13 -0700 (PDT)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1hVamu-0000N8-Te
+	for qemu-devel@nongnu.org; Tue, 28 May 2019 08:01:05 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1hVamr-0000MA-Mc
+	for <qemu-devel@nongnu.org>; Tue, 28 May 2019 12:01:01 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id A23E62E80CC
+	for <qemu-devel@nongnu.org>; Tue, 28 May 2019 12:01:01 +0000 (UTC)
 MIME-Version: 1.0
-References: <20190526010948.3923-1-palmer@sifive.com>
-In-Reply-To: <20190526010948.3923-1-palmer@sifive.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 28 May 2019 12:25:01 +0100
-Message-ID: <CAFEAcA95yeJg6qFY_ES=N-YzF=L88hAZgUhc=ashibnhAMekhA@mail.gmail.com>
-To: Palmer Dabbelt <palmer@sifive.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::22f
-Subject: Re: [Qemu-devel] [PULL] RISC-V Patches for the 4.1 Soft Freeze,
- Part 1
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 28 May 2019 11:50:29 -0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: dgilbert-h nevilad
+X-Launchpad-Bug-Reporter: Alex (nevilad)
+X-Launchpad-Bug-Modifier: Dr. David Alan Gilbert (dgilbert-h)
+References: <155792850856.14868.18260779757728395853.malonedeb@gac.canonical.com>
+Message-Id: <155904422925.16310.18215095693128819115.malone@chaenomeles.canonical.com>
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="18968";
+	Instance="launchpad-lazr.conf"
+X-Launchpad-Hash: 34972816d2a4c52601a2bb14ea3be6fb03489f7d
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 91.189.90.7
+Subject: [Qemu-devel] [Bug 1829242] Re: qemu on windows host exits after
+ savevm command
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -87,36 +76,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
-	QEMU Developers <qemu-devel@nongnu.org>
+Reply-To: Bug 1829242 <1829242@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sun, 26 May 2019 at 02:10, Palmer Dabbelt <palmer@sifive.com> wrote:
->
-> The following changes since commit a7b21f6762a2d6ec08106d8a7ccb11829914523f:
->
->   Merge remote-tracking branch 'remotes/vivier2/tags/linux-user-for-4.1-pull-request' into staging (2019-05-24 12:47:49 +0100)
->
-> are available in the Git repository at:
->
->   git://github.com/palmer-dabbelt/qemu.git tags/riscv-for-master-4.1-sf0
->
-> for you to fetch changes up to 1e0d985fa9136a563168a3da66f3d17820404ee2:
->
->   target/riscv: Only flush TLB if SATP.ASID changes (2019-05-24 12:09:25 -0700)
->
-> ----------------------------------------------------------------
-> RISC-V Patches for the 4.1 Soft Freeze, Part 1
+Hi Alex,
+   I'm not sure we've tried a savevm on a windows host; I don't have one ea=
+sily available.
+When you say 'after a few seconds qemu exits' - does it give any errors or =
+crash or anything?
 
+-- =
 
-Applied, thanks.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1829242
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/4.1
-for any user-visible changes.
+Title:
+  qemu on windows host exits after savevm command
 
-PS: softfreeze isn't for another month or so.
+Status in QEMU:
+  New
 
--- PMM
+Bug description:
+  I'm running qemu-system-i386.exe 3.1.0 with this command line:
+  "C:\Program Files\qemu\qemu-system-i386.exe"  -L C:\user\qemu\pc-bios\ -n=
+ame win7 -m 4G -uuid 564db62e-e031-b5cf-5f34-a75f8cefa98e -rtc base=3Dlocal=
+time -accel hax -hdd C:\VirtualMachines\Dev\Win10x64_VS17\swap.qcow "C:\Vir=
+tualMachines\qemu\qemu_win7.qcow"
+  Host OS Windows 10 x64, guest OS Wondows 7 x86.
+
+  Wait till the OS loads, go to compat_monitor0 tab and enter command:
+  savevm loaded_win
+  After a few seconds qemu exits, running it another time and entering comm=
+and:
+  info snapshots
+  says "There is no snapshot available". I've tried rinning it with -accel =
+tcg, with same results. I've tried less memory (1G), same results.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1829242/+subscriptions
 
