@@ -2,80 +2,79 @@ Return-Path: <SRS0=2W3W=T4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CD8DBC04AB6
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 May 2019 10:05:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E618BC04AB6
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 May 2019 10:06:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9961E208CB
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 May 2019 10:05:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B41B0208CB
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 May 2019 10:06:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ms7W1F5X"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9961E208CB
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="EkhSg1Z8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B41B0208CB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:60160 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:60197 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hVYz0-000253-SX
-	for qemu-devel@archiver.kernel.org; Tue, 28 May 2019 06:05:26 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:43527)
+	id 1hVYzY-0002Wz-Sg
+	for qemu-devel@archiver.kernel.org; Tue, 28 May 2019 06:06:00 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:43479)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hVYtg-0006Mm-Ft
-	for qemu-devel@nongnu.org; Tue, 28 May 2019 05:59:57 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hVYtf-0005Y3-2h
+	(envelope-from <alex.bennee@linaro.org>) id 1hVYtf-0006LC-22
 	for qemu-devel@nongnu.org; Tue, 28 May 2019 05:59:56 -0400
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:38499)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <alex.bennee@linaro.org>) id 1hVYtd-0005VI-7C
+	for qemu-devel@nongnu.org; Tue, 28 May 2019 05:59:54 -0400
+Received: from mail-wr1-x42a.google.com ([2a00:1450:4864:20::42a]:42128)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1hVYtd-0005Un-Ql
-	for qemu-devel@nongnu.org; Tue, 28 May 2019 05:59:54 -0400
-Received: by mail-wm1-x341.google.com with SMTP id t5so2126710wmh.3
-	for <qemu-devel@nongnu.org>; Tue, 28 May 2019 02:59:53 -0700 (PDT)
+	id 1hVYtb-0005Q1-Jz
+	for qemu-devel@nongnu.org; Tue, 28 May 2019 05:59:53 -0400
+Received: by mail-wr1-x42a.google.com with SMTP id l2so19504874wrb.9
+	for <qemu-devel@nongnu.org>; Tue, 28 May 2019 02:59:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
 	h=from:to:cc:subject:date:message-id:in-reply-to:references
 	:mime-version:content-transfer-encoding;
-	bh=ouRT/UBjHUBeDQJ4QIlqT44+hOMvQz+edWkO1B7kdOs=;
-	b=ms7W1F5XzBFG5JijFLJunNaYtYsk8F/vVqdW/xzYhD3ydGsnnEE6AN0GxkKEkCGJ/u
-	1gDnKMiLlSGY8oISRir891gZNePmpaHULIOcoXoYQKSrHBUz2+wNwLRKWEPFwK9G3TFa
-	j87xKyq1x0sZX5rlTRBhhkSY4UUFo+dNZ2FTwmSAsAKdA2V1MExuyagbq7YaNHbzuQnd
-	81U2coUsUKmvG4TlKXKx0QTw23vReUMzEC6I91NdjhICqnE5eBlUxxEhxRClNm+tNG4d
-	kTBbIvqG00wzrIY4AV1h4FE1YownzdAyeYHGhivEJAN89GXbPcmdnQm4ks6N/GwlsKaj
-	c3Gw==
+	bh=kpShySiWy3l2UEoMR7e5vE7RIjHCSmX22N18+VLA+QY=;
+	b=EkhSg1Z8xuAx+kGiEPZcYgXOnnOtCAid2TQqolLnLOCKILjMYPwdvpYYFVo6fL5zpe
+	FnZfqQKhslUz32ipb6c17ioJY912nupRK625grQ27XsbH+u50MtgSVHfMdhh9BFfMd7p
+	wwX58IcpKGv8PoEa1mZ4ViJGQYGNHNYX9Z8Z/dsM7IxxJBagv+ntNL2sDKoWeSMoK/An
+	12V54DG9LYHaHqSNMIPh9djG6VguZgLz4EN9iBF4g0vLkbx/URDSngB+hflDGbAVqhd+
+	zjQxPEsClGjtd68GNI3nyYeaZ5DmYjW07gP94LbnQbfscvAAq2ZgpWwEzGKxi3dbwLno
+	lHBQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
 	:references:mime-version:content-transfer-encoding;
-	bh=ouRT/UBjHUBeDQJ4QIlqT44+hOMvQz+edWkO1B7kdOs=;
-	b=bMtT3aNfIDEo/z9vNcHNyJjYv49YJSoPywZhNvlQ9i+G9vjoaJkgfRAHOQGC8rNi54
-	WF5KKPfV0mCYVZLjCbWknhyg3dx2XndbyDimwzrcKVH2yZiPJsk62ZI7+RpRNBVz5NUR
-	fJeqgWe9QgzQfFyv3KqNQZnZDR/3neS+XuY4xi3fps/h30DQysv91iwS7aNKzSX/IJwe
-	fDTpq3R2RL6fHjvM1lR0vfMv7qeX+qlg1U75GRA6G9+8cwu2G8Mr9WNS77rTmYRtnAej
-	d0Y/K/auPEl0R68C4aJCUXXZHw6Cw3VYVKUvb4GOQkdQZ1+ynCg2eVfyUkVITokJOJVV
-	nLUA==
-X-Gm-Message-State: APjAAAVwr/2Fa4uy/e3RwQfz7njkCRIY+eQRtNkZRg1kBwrlv6pIjl6Y
-	TjGgJu6iC8HtCAUZ6Rwx1N7wxw==
-X-Google-Smtp-Source: APXvYqzUbfXTbcjgke2A08laVAFZyJ/sL3TlVP7DtJi2yS/vBnEeBFPJ8PQFrCcI10QKz6lc0/NbPw==
-X-Received: by 2002:a1c:35c9:: with SMTP id c192mr2568076wma.147.1559037592661;
-	Tue, 28 May 2019 02:59:52 -0700 (PDT)
+	bh=kpShySiWy3l2UEoMR7e5vE7RIjHCSmX22N18+VLA+QY=;
+	b=j6yLmG7LPH7xtADi42NK03ZS++XUKFclUzARZjvzh9Nu7XGJKyFyxXC6+qWiZXdNoM
+	UWo2XhG1eKH2FsHexyaYyhcwkHWaZ1/lZkBBXToOaNFxzWqIfspHLHsGbwugQPLjuEDj
+	x23zISc24aL0rLPNlqDeDrRe1ysxe0Dd0WuVH8mv3EaTSN8oAccFH/7CoMpsVbjl67t5
+	I5nocx/FwLA8EpQUnU/zwg+IKqbIc/tacAwS3oMb9cOazDV16zyWo/sDxj4iib6jwaEb
+	a8jgT1MR8d2NAkrF+Am4KvUzvFZTwhd9Bh/Uxp11T8SObrDDWBl9nioCEhbviZiNBPwG
+	VcbA==
+X-Gm-Message-State: APjAAAXF1/kwDwipBWx9WnkHk/2SYWBYRTaXbxElx/wBW4lxx64mZn9M
+	NQrWiRPvrUtc7QTB3Q+i+iLIfg==
+X-Google-Smtp-Source: APXvYqw8Q8k2DtJ4iKmBxORbpspQXHq2qzbP/SFfe/G6hB3eHz3Yt5z/LSnjZnlUXOK0owEnKmR0YA==
+X-Received: by 2002:a5d:6a8c:: with SMTP id s12mr12674092wru.326.1559037588940;
+	Tue, 28 May 2019 02:59:48 -0700 (PDT)
 Received: from zen.linaroharston ([81.128.185.34])
-	by smtp.gmail.com with ESMTPSA id
-	c131sm2165251wma.31.2019.05.28.02.59.49
+	by smtp.gmail.com with ESMTPSA id f7sm1527452wmc.26.2019.05.28.02.59.47
 	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Tue, 28 May 2019 02:59:51 -0700 (PDT)
+	Tue, 28 May 2019 02:59:47 -0700 (PDT)
 Received: from zen.linaroharston. (localhost [127.0.0.1])
-	by zen.linaroharston (Postfix) with ESMTP id C059E1FF9E;
-	Tue, 28 May 2019 10:49:54 +0100 (BST)
+	by zen.linaroharston (Postfix) with ESMTP id 6AB661FF8F;
+	Tue, 28 May 2019 10:49:55 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: peter.maydell@linaro.org
-Date: Tue, 28 May 2019 10:49:40 +0100
-Message-Id: <20190528094953.14898-16-alex.bennee@linaro.org>
+Date: Tue, 28 May 2019 10:49:47 +0100
+Message-Id: <20190528094953.14898-23-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190528094953.14898-1-alex.bennee@linaro.org>
 References: <20190528094953.14898-1-alex.bennee@linaro.org>
@@ -84,9 +83,9 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2a00:1450:4864:20::341
-Subject: [Qemu-devel] [PULL 15/28] tests/tcg/multiarch: add hello world
- system test
+X-Received-From: 2a00:1450:4864:20::42a
+Subject: [Qemu-devel] [PULL 22/28] .travis.yml: enable aarch64-softmmu and
+ alpha-softmmu tcg tests
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -98,38 +97,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>,
+Cc: Fam Zheng <fam@euphon.net>,
 	Richard Henderson <richard.henderson@linaro.org>,
-	qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
 	=?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
-	Richard Henderson <rth@twiddle.net>
+	qemu-devel@nongnu.org,
+	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is not really i386 only, we can have the same test for all
-architectures supporting system tests.
-
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-diff --git a/tests/tcg/i386/Makefile.softmmu-target b/tests/tcg/i386/Makefile.softmmu-target
-index 53c9c5ece06..c31bbbf39a7 100644
---- a/tests/tcg/i386/Makefile.softmmu-target
-+++ b/tests/tcg/i386/Makefile.softmmu-target
-@@ -27,7 +27,7 @@ CFLAGS+=-m32
- LINK_SCRIPT=$(I386_SYSTEM_SRC)/kernel.ld
- LDFLAGS=-Wl,-T$(LINK_SCRIPT) -Wl,-melf_i386
- # FIXME: move to common once x86_64 is bootstrapped
--TESTS+=$(X86_TESTS)
-+TESTS+=$(X86_TESTS) $(MULTIARCH_TESTS)
- endif
- CFLAGS+=-nostdlib -ggdb -O0 $(MINILIB_INC)
- LDFLAGS+=-static -nostdlib $(CRT_OBJS) $(MINILIB_OBJS) -lgcc
-diff --git a/tests/tcg/i386/system/hello.c b/tests/tcg/multiarch/system/hello.c
-similarity index 100%
-rename from tests/tcg/i386/system/hello.c
-rename to tests/tcg/multiarch/system/hello.c
+diff --git a/.travis.yml b/.travis.yml
+index 6fd89b3d915..b053a836a32 100644
+--- a/.travis.yml
++++ b/.travis.yml
+@@ -284,5 +284,5 @@ matrix:
+ 
+     # Run check-tcg against softmmu targets
+     - env:
+-        - CONFIG="--target-list=xtensa-softmmu,arm-softmmu"
++        - CONFIG="--target-list=xtensa-softmmu,arm-softmmu,aarch64-softmmu,alpha-softmmu"
+         - TEST_CMD="make -j3 check-tcg V=1"
 -- 
 2.20.1
 
