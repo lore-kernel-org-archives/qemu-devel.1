@@ -6,88 +6,88 @@ X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C855C04AB6
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 May 2019 12:59:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1866EC04AB6
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 May 2019 13:02:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 38F512081C
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 May 2019 12:59:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DA802204EC
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 May 2019 13:02:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="dL7Eu2xF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 38F512081C
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="LfHcaKEQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DA802204EC
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:34388 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:34760 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hVbh9-000899-EZ
-	for qemu-devel@archiver.kernel.org; Tue, 28 May 2019 08:59:11 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:57788)
+	id 1hVbkE-0000h7-8U
+	for qemu-devel@archiver.kernel.org; Tue, 28 May 2019 09:02:22 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:58338)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hVbgP-0007pW-3O
-	for qemu-devel@nongnu.org; Tue, 28 May 2019 08:58:25 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hVbjE-0000Nl-C4
+	for qemu-devel@nongnu.org; Tue, 28 May 2019 09:01:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hVbgN-0003IT-VD
-	for qemu-devel@nongnu.org; Tue, 28 May 2019 08:58:25 -0400
-Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:41788)
+	(envelope-from <richard.henderson@linaro.org>) id 1hVbjC-0005cp-7i
+	for qemu-devel@nongnu.org; Tue, 28 May 2019 09:01:19 -0400
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:42179)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hVbgM-0003Hn-H1
-	for qemu-devel@nongnu.org; Tue, 28 May 2019 08:58:23 -0400
-Received: by mail-oi1-x242.google.com with SMTP id y10so14156668oia.8
-	for <qemu-devel@nongnu.org>; Tue, 28 May 2019 05:58:22 -0700 (PDT)
+	id 1hVbj9-0005JX-OV
+	for qemu-devel@nongnu.org; Tue, 28 May 2019 09:01:17 -0400
+Received: by mail-ot1-x344.google.com with SMTP id i2so17614485otr.9
+	for <qemu-devel@nongnu.org>; Tue, 28 May 2019 06:00:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
 	h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
 	:mime-version:in-reply-to:content-language:content-transfer-encoding;
-	bh=KCYHqGX5MknDR23eQXghnViXj1k75S2MOW76GYPTsCc=;
-	b=dL7Eu2xFGVdN/GpFsYJS363RXoj3FKMXjbsGg25cnTstl5tQIIqBrgTgXO8FGEX0V1
-	SYE+YOLrothTnYRmawJkN16YWRg4pSuem0CtEyRfvT9EW+su31gV0AM7okO2+omZWSVa
-	0n77MzglMd573zB+XzoQilLl+f/gUUuWI+WjLDffOfL/mS8tiJN4NeQyj8QlF9WYnzS0
-	5AG43KG2w9OlHRJTYH/RQLQEuvLfVI72NwyHdrSU+5YCf8hNqm4z5tJfi4gNhSnx77N4
-	Uv0L6Gh1Ye4bpdhPcAgUBy2/eRIzxXLQqcxLB2MzhEILvXlIQEGwq1VKEPylMDGDTfUl
-	UWgA==
+	bh=X98rAM9dKZpqtF4FFpaWwEi5Kr/8DBIX8PZIwIOIvHI=;
+	b=LfHcaKEQGhf5DhlcHNkhDFPCoq0vMCybE3323/Mzypa3cEk4yUuARY7oyYQIpQvYRA
+	O0Rl46z5307/mlq2AlmMXW9D1Be7dv+P2SWxBZkFHIm8U4cCdpTYzNPFZozZB6eSxW8C
+	w78BIB/boFYxkuvCT1/9IxkVrzwLK4jebDbGtZc0Q/12Qj9Ck9kGutfuvz0d/3/aJIr0
+	5GPwquV0CfkbVxeOM98gWmZWhj1wTd/JnbRmJYOQnMYpfVu56T5myzAZiH5rbNcxdl/1
+	81yaRKTYo/+fJzeYPLoR4k/Ewlt7HAtLdh2AlVTtkWs28eelA6H+XNqIJewbK/WYFcdV
+	/gWw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
 	:date:user-agent:mime-version:in-reply-to:content-language
 	:content-transfer-encoding;
-	bh=KCYHqGX5MknDR23eQXghnViXj1k75S2MOW76GYPTsCc=;
-	b=hGT/wxIkIekmEZUhH8IbulxW/L+qUxbljgv0Eu6HWcleasDxGk13wqB796Qmn7XQUW
-	C9gjG6rbX2UtdZ3+PZA7zQ0pO7fxVVuZ3Ghn5tRjbMORS/EMEw2g6yQohr1YY2NhY4+o
-	kyqOSSWNiyX7FcEGCk+xelblUbLgaicamaXY0DUxTNqbRaDzFCqO6GmAxcN6ysHZ/kVb
-	GhQSzXAZG3NvEfCbEvoa+k3vW/c0bhihzJFUqcxPEkv3+AvVexwysRR0vdaiI9PJUctx
-	anBJAJkMNVt/Zz3fkcCzV6M7Nc9DP2XTFEcbgkh2qMvdSe0yxtf1sXnrYt34YNoG993k
-	NG7g==
-X-Gm-Message-State: APjAAAUQEFd9Wxsb5/NsM8ftFJIwcRo9Ycn2aAh/2X+vO2m9sgo4AZeL
-	pJ+Roqu3XoFsNx1YXx+5Gm3wmQ==
-X-Google-Smtp-Source: APXvYqxRKOx2TkY9enAqAtPntx2ps1AVYO+HbELD3dQjZtSWihlLWxrJgZLTKMrybT0tBU+Z/vzIIw==
-X-Received: by 2002:aca:f2d7:: with SMTP id q206mr2525097oih.52.1559048301581; 
-	Tue, 28 May 2019 05:58:21 -0700 (PDT)
+	bh=X98rAM9dKZpqtF4FFpaWwEi5Kr/8DBIX8PZIwIOIvHI=;
+	b=Df2RhlBclZVpp6HCFNAHxGhnQChKQA3k5vkBMiPNL6f7fv1GkFjwBCkXP+dtYRk/gF
+	/xnoN314wYIoY1C65XLb3CmupIkBCkmg+hGcgwcUreJLA3evUQv/jV73ZXGRal0W3hbq
+	aKLNUvH24xJr4DIPWUd0dMtw9WEMt9XkoXbj8h49HvXgGLq1XQ/EH9jgZspkkgKq1qLq
+	TXZNcole71SZz6ndrl9m/b8u5UaVZFsHalU3ctk68fq06okTNgT4+9xRZB+fTsVYSDjE
+	X5LiUt+44rNJITUwGNNuMmCpNvXZwjTlv5pUcotYm12P9sI59S9ns48vh3hTx26uUzBm
+	dPzA==
+X-Gm-Message-State: APjAAAXEjkwsIetLuFWCgilMVkfI1lTnGr7OQ1fv97Xj7lpiLMumHJkq
+	/sImm+IPs8BX21o+rBfPxRAFWw==
+X-Google-Smtp-Source: APXvYqyTFJfC0g4w0vEQxOJR85Gibe0QwnNadQVGg9Lkb5b9568xpW4+VnY0iGtYratVZ2yVC/+qsQ==
+X-Received: by 2002:a9d:4d02:: with SMTP id n2mr1679460otf.332.1559048444776; 
+	Tue, 28 May 2019 06:00:44 -0700 (PDT)
 Received: from [172.24.12.210] (168.189-204-159.bestelclientes.com.mx.
-	[189.204.159.168]) by smtp.gmail.com with ESMTPSA id
-	z190sm5319343oia.21.2019.05.28.05.58.19
+	[189.204.159.168])
+	by smtp.gmail.com with ESMTPSA id q3sm4437752oig.7.2019.05.28.06.00.42
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Tue, 28 May 2019 05:58:20 -0700 (PDT)
+	Tue, 28 May 2019 06:00:43 -0700 (PDT)
 To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
 References: <20190524093335.22241-1-david@redhat.com>
-	<20190524093335.22241-5-david@redhat.com>
+	<20190524093335.22241-6-david@redhat.com>
 From: Richard Henderson <richard.henderson@linaro.org>
 Openpgp: preference=signencrypt
-Message-ID: <182e48f6-f5fb-391f-0ded-d9c08bd8565a@linaro.org>
-Date: Tue, 28 May 2019 07:58:18 -0500
+Message-ID: <8e9738ff-9ca8-7a42-5737-c2ae32883aaa@linaro.org>
+Date: Tue, 28 May 2019 08:00:40 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190524093335.22241-5-david@redhat.com>
+In-Reply-To: <20190524093335.22241-6-david@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2607:f8b0:4864:20::242
-Subject: Re: [Qemu-devel] [PATCH v2 4/5] s390x/tcg: Implement VECTOR ISOLATE
- STRING
+X-Received-From: 2607:f8b0:4864:20::344
+Subject: Re: [Qemu-devel] [PATCH v2 5/5] s390x/tcg: Implement VECTOR STRING
+ RANGE COMPARE
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -106,15 +106,21 @@ Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 5/24/19 4:33 AM, David Hildenbrand wrote:
-> Logic mostly courtesy of Richard H.
+> Unfortunately, there is no easy way to avoid looping over all elements
+> in v2. Provide specialized variants for !cc,!rt/!cc,rt/cc,!rt/cc,rt and
+> all element types. Especially for different values of rt, the compiler
+> might be able to optimize the code a lot.
+> 
+> Add s390_vec_write_element().
 > 
 > Signed-off-by: David Hildenbrand <david@redhat.com>
 > ---
->  target/s390x/helper.h            |  6 +++++
->  target/s390x/insn-data.def       |  2 ++
->  target/s390x/translate_vx.inc.c  | 34 ++++++++++++++++++++++++
->  target/s390x/vec_string_helper.c | 45 ++++++++++++++++++++++++++++++++
->  4 files changed, 87 insertions(+)
+>  target/s390x/helper.h            |  12 +++
+>  target/s390x/insn-data.def       |   2 +
+>  target/s390x/translate_vx.inc.c  |  59 +++++++++++++
+>  target/s390x/vec.h               |  21 +++++
+>  target/s390x/vec_string_helper.c | 143 +++++++++++++++++++++++++++++++
+>  5 files changed, 237 insertions(+)
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
