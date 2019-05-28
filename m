@@ -6,56 +6,57 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C6A97C04AB6
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 May 2019 19:38:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DD90BC072B1
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 May 2019 19:38:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A1C50208CB
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 May 2019 19:38:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A1C50208CB
+	by mail.kernel.org (Postfix) with ESMTPS id BC7B820B1F
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 May 2019 19:38:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BC7B820B1F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:41607 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:41613 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hVhvF-0006zI-QJ
-	for qemu-devel@archiver.kernel.org; Tue, 28 May 2019 15:38:09 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:36693)
+	id 1hVhvt-0007WD-Up
+	for qemu-devel@archiver.kernel.org; Tue, 28 May 2019 15:38:49 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:37078)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hVhn9-0000rs-Qs
-	for qemu-devel@nongnu.org; Tue, 28 May 2019 15:29:48 -0400
+	(envelope-from <mreitz@redhat.com>) id 1hVhoH-0001kx-Tr
+	for qemu-devel@nongnu.org; Tue, 28 May 2019 15:30:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hVhmy-0000u9-JX
-	for qemu-devel@nongnu.org; Tue, 28 May 2019 15:29:40 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43160)
+	(envelope-from <mreitz@redhat.com>) id 1hVhoA-000272-J6
+	for qemu-devel@nongnu.org; Tue, 28 May 2019 15:30:54 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36698)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mreitz@redhat.com>)
-	id 1hVhmR-00009I-Ai; Tue, 28 May 2019 15:29:04 -0400
+	id 1hVhny-0001Lf-OI; Tue, 28 May 2019 15:30:39 -0400
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
 	[10.5.11.11])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 0256430833AF;
-	Tue, 28 May 2019 19:28:57 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 0BBA67E426;
+	Tue, 28 May 2019 19:29:51 +0000 (UTC)
 Received: from localhost (unknown [10.40.205.223])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 8CDDA1F8;
-	Tue, 28 May 2019 19:28:56 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 94560189A2;
+	Tue, 28 May 2019 19:29:50 +0000 (UTC)
 From: Max Reitz <mreitz@redhat.com>
 To: qemu-block@nongnu.org
-Date: Tue, 28 May 2019 21:28:29 +0200
-Message-Id: <20190528192847.2730-4-mreitz@redhat.com>
+Date: Tue, 28 May 2019 21:28:47 +0200
+Message-Id: <20190528192847.2730-22-mreitz@redhat.com>
 In-Reply-To: <20190528192847.2730-1-mreitz@redhat.com>
 References: <20190528192847.2730-1-mreitz@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.44]);
-	Tue, 28 May 2019 19:28:57 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.27]);
+	Tue, 28 May 2019 19:29:57 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 03/21] qcow2-threads: use thread_pool_submit_co
+Subject: [Qemu-devel] [PULL 21/21] blockdev: loosen restrictions on
+ drive-backup source node
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -73,64 +74,73 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+From: John Snow <jsnow@redhat.com>
 
-Use thread_pool_submit_co, instead of reinventing it here. Note, that
-thread_pool_submit_aio() never returns NULL, so checking it was an
-extra thing.
+We mandate that the source node must be a root node; but there's no reaso=
+n
+I am aware of that it needs to be restricted to such. In some cases, we n=
+eed
+to make sure that there's a medium present, but in the general case we ca=
+n
+allow the backup job itself to do the graph checking.
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: Alberto Garcia <berto@igalia.com>
-Reviewed-by: Max Reitz <mreitz@redhat.com>
-Message-id: 20190506142741.41731-4-vsementsov@virtuozzo.com
+This patch helps improve the error message when you try to backup from
+the same node more than once, which is reflected in the change to test
+056.
+
+For backups with bitmaps, it will also show a better error message that
+the bitmap is in use instead of giving you something cryptic like "need
+a root node."
+
+Fixes: https://bugzilla.redhat.com/show_bug.cgi?id=3D1707303
+Signed-off-by: John Snow <jsnow@redhat.com>
+Message-id: 20190521210053.8864-1-jsnow@redhat.com
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- block/qcow2-threads.c | 17 ++---------------
- 1 file changed, 2 insertions(+), 15 deletions(-)
+ blockdev.c             | 7 ++++++-
+ tests/qemu-iotests/056 | 2 +-
+ 2 files changed, 7 insertions(+), 2 deletions(-)
 
-diff --git a/block/qcow2-threads.c b/block/qcow2-threads.c
-index 85b8034fd2..5a39fdac69 100644
---- a/block/qcow2-threads.c
-+++ b/block/qcow2-threads.c
-@@ -144,17 +144,11 @@ static int qcow2_compress_pool_func(void *opaque)
-     return 0;
- }
-=20
--static void qcow2_compress_complete(void *opaque, int ret)
--{
--    qemu_coroutine_enter(opaque);
--}
--
- static ssize_t coroutine_fn
- qcow2_co_do_compress(BlockDriverState *bs, void *dest, size_t dest_size,
-                      const void *src, size_t src_size, Qcow2CompressFunc=
- func)
- {
-     BDRVQcow2State *s =3D bs->opaque;
--    BlockAIOCB *acb;
-     ThreadPool *pool =3D aio_get_thread_pool(bdrv_get_aio_context(bs));
-     Qcow2CompressData arg =3D {
-         .dest =3D dest,
-@@ -169,16 +163,9 @@ qcow2_co_do_compress(BlockDriverState *bs, void *des=
-t, size_t dest_size,
+diff --git a/blockdev.c b/blockdev.c
+index 79fbac8450..bc339d7818 100644
+--- a/blockdev.c
++++ b/blockdev.c
+@@ -3450,11 +3450,16 @@ static BlockJob *do_drive_backup(DriveBackup *bac=
+kup, JobTxn *txn,
+         backup->compress =3D false;
      }
 =20
-     s->nb_compress_threads++;
--    acb =3D thread_pool_submit_aio(pool, qcow2_compress_pool_func, &arg,
--                                 qcow2_compress_complete,
--                                 qemu_coroutine_self());
--
--    if (!acb) {
--        s->nb_compress_threads--;
--        return -EINVAL;
--    }
--    qemu_coroutine_yield();
-+    thread_pool_submit_co(pool, qcow2_compress_pool_func, &arg);
-     s->nb_compress_threads--;
-+
-     qemu_co_queue_next(&s->compress_wait_queue);
+-    bs =3D qmp_get_root_bs(backup->device, errp);
++    bs =3D bdrv_lookup_bs(backup->device, backup->device, errp);
+     if (!bs) {
+         return NULL;
+     }
 =20
-     return arg.ret;
++    if (!bs->drv) {
++        error_setg(errp, "Device has no medium");
++        return NULL;
++    }
++
+     aio_context =3D bdrv_get_aio_context(bs);
+     aio_context_acquire(aio_context);
+=20
+diff --git a/tests/qemu-iotests/056 b/tests/qemu-iotests/056
+index 3df323984d..f40fc11a09 100755
+--- a/tests/qemu-iotests/056
++++ b/tests/qemu-iotests/056
+@@ -214,7 +214,7 @@ class BackupTest(iotests.QMPTestCase):
+         res =3D self.vm.qmp('query-block-jobs')
+         self.assert_qmp(res, 'return[0]/status', 'concluded')
+         # Leave zombie job un-dismissed, observe a failure:
+-        res =3D self.qmp_backup_and_wait(serror=3D'Need a root block nod=
+e',
++        res =3D self.qmp_backup_and_wait(serror=3D"Node 'drive0' is busy=
+: block device is in use by block job: backup",
+                                        device=3D'drive0', format=3Diotes=
+ts.imgfmt,
+                                        sync=3D'full', target=3Dself.dest=
+_img,
+                                        auto_dismiss=3DFalse)
 --=20
 2.21.0
 
