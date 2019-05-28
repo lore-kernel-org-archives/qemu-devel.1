@@ -7,75 +7,75 @@ X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ABB78C04AB6
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 May 2019 10:10:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 90F29C04AB6
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 May 2019 10:11:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6777A20883
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 May 2019 10:10:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0B29720883
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 May 2019 10:11:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="HFKoVJS6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6777A20883
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="I8cKbxKS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0B29720883
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:60232 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:60263 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hVZ3u-0005ua-Dz
-	for qemu-devel@archiver.kernel.org; Tue, 28 May 2019 06:10:30 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:43611)
+	id 1hVZ4T-0006SV-2z
+	for qemu-devel@archiver.kernel.org; Tue, 28 May 2019 06:11:05 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:43490)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hVYti-0006Q3-V8
-	for qemu-devel@nongnu.org; Tue, 28 May 2019 06:00:00 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hVYth-0005bP-8g
+	(envelope-from <alex.bennee@linaro.org>) id 1hVYtf-0006La-Cf
 	for qemu-devel@nongnu.org; Tue, 28 May 2019 05:59:58 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:39186)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <alex.bennee@linaro.org>) id 1hVYtd-0005VG-6v
+	for qemu-devel@nongnu.org; Tue, 28 May 2019 05:59:55 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:36862)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1hVYth-0005a1-06
-	for qemu-devel@nongnu.org; Tue, 28 May 2019 05:59:57 -0400
-Received: by mail-wr1-x442.google.com with SMTP id x4so392753wrt.6
-	for <qemu-devel@nongnu.org>; Tue, 28 May 2019 02:59:56 -0700 (PDT)
+	id 1hVYtc-0005Ro-NA
+	for qemu-devel@nongnu.org; Tue, 28 May 2019 05:59:53 -0400
+Received: by mail-wr1-x444.google.com with SMTP id s17so19513109wru.3
+	for <qemu-devel@nongnu.org>; Tue, 28 May 2019 02:59:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
 	h=from:to:cc:subject:date:message-id:in-reply-to:references
 	:mime-version:content-transfer-encoding;
-	bh=eb6zz8m1Vq8Xaie72PuttKF28XMFLflc0Uo0TIuBwqI=;
-	b=HFKoVJS6GFjQEAEXgWRN51wQnYFw8ZWVmae9tWd6UBakn8VB5snQZju6BBMWERK6+X
-	GPk/1JPkbLfH9sZ3n5YiGkRW2og1t4uZiBu6ceYiD7iJvWdmARQ/QxataGC+MxHhx8mG
-	NtQbAhWBirurdelMXA2/zhZeNIq91NyjFh+knXN/CVIBkG0YeAo9bHiQdRVq2/yHFrPk
-	eZae5tta8mR5b8AfkHloZhDrHLM3iN06jXTDvNDXcKOtiMOAT91PePHJvvAg72GeAeEq
-	ZoUV+5YnIgl5SKFLHSBad9zQftDGtHS1BZqMsTNMtyFd3R9HBd4JHtJerQnxOb/VfdMt
-	hsTQ==
+	bh=MjTvC0r2KoMB7KYuxEeHeBHyLDrxtEdnIoGRAS++vz4=;
+	b=I8cKbxKSQ4+Ro34juVFQLToobn8yKzCR9vcnwe8ucOoUx+G+JnIkt7dUDdkb+HJYdB
+	n0/Y+4Htpn3gEVr8AkZ9dDl3dTYIUZ3sCqRVG4n/k+qL2IPw8GqxR0Y1pDk0HC0MqhbC
+	LNmzYnOmOtDfvhBV1DRs8OubhWSJsSMe89nyDGTtfUQ6S1Nmbj9vbhXdEY9NkYxeyow4
+	XrfLgsi9T1Hr6qijh8w4HiokmLZOzWO/eAFXQntVzFPB+FEZgsf4VuhhZLk6/wL9pvCB
+	3O9N3PwZqekI54w0W0L0MtL7LhGJWY/ERV+Q2LPkxfuya1ilH+smkezRyi7i/KdpCeuZ
+	AChA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
 	:references:mime-version:content-transfer-encoding;
-	bh=eb6zz8m1Vq8Xaie72PuttKF28XMFLflc0Uo0TIuBwqI=;
-	b=RNr+xBBmOUQUiJ02g+YqLzQInpM5H87hNAHK+H8w43PEezXbRYpipnAEKwGVWAKUC9
-	LpXdnldwjoLmqzTEG0gXbknCo2VeqNFkhEEdrv4gKTfAUb88aI3s8mJ+Je5N9k0LO2Nm
-	RZq6mJmm/hYvvwp1k391HCufsf6jkHQ2wWOsWH0JqCzS276hmIaDpElO2hXABIMospVc
-	3Xtk0c6eKU3pOVJPe3rpTruHflGfVTf0AJBGEzRK6LgQ0H6uPqic0FBp8ziUm4TvWjPe
-	u2JW9iDPqqM7OE97m5VGZ3ELL6Sh/4PmRJ14he5rTLUJA+EnvIVRDn8JdoAM1Vg1saSe
-	eZ/Q==
-X-Gm-Message-State: APjAAAWYSykojylmIRL2F9YesJyFng5KMjDWdXHBwyfTEEZgT8Pk6uNp
-	mX60Q6KSjDvkSPIOgBu4mxJVKw==
-X-Google-Smtp-Source: APXvYqwQmjKfHvTg4XiLBFTrXbZubZWawf2nVFf9qdj6koqvyjz2Wt+peSBEtnPtJqP0PlEqWEdehA==
-X-Received: by 2002:a5d:4310:: with SMTP id h16mr35198624wrq.331.1559037595697;
-	Tue, 28 May 2019 02:59:55 -0700 (PDT)
+	bh=MjTvC0r2KoMB7KYuxEeHeBHyLDrxtEdnIoGRAS++vz4=;
+	b=fZ0Dph7I4nlTG/aECLCLWGY9SJ6sUHjgxrikXfuR2TyVNlpukHlzzLfELolu5ciogj
+	mk59uU+m+qIl9BSbKTPW6Q+AF7rWALwMOg9F2UDQhEd2XkbwU1LsGSSNgusAnRxgfoqu
+	JNObbJjrv5WdeyRNgt4V2cOvf7f74RqEi7tPu//wu3/9DWDK2a4XgVhfV+hjawTRf5ZX
+	tKj6MNHF1vEnSlBfabdtvbEVhlJz4C2eZ4LX0EVdC29yFfDuWmRFpJ4oQbw8aiMluAcm
+	aGA/4xrSo9nj1tHOwCPk5Y3yp4vtqqePZpkysBWRfTgi5r+dNCYGxcJHWtLHuG6lBLau
+	0gEw==
+X-Gm-Message-State: APjAAAVDVcebRlA3U0jCkpGG6rOUvN9VAs90dBmNUXhYsIA0C+DzuyTn
+	5xtrxeF633lqnPEH5kE/7tHIMQ==
+X-Google-Smtp-Source: APXvYqzCz3pewNo2A88VnOuKxKGXhKuYmX1TIfTJtiY1CJmxdJAuRIMTyjnORPUvmqPVCG8W9AEVOA==
+X-Received: by 2002:adf:e301:: with SMTP id b1mr14338034wrj.304.1559037590343; 
+	Tue, 28 May 2019 02:59:50 -0700 (PDT)
 Received: from zen.linaroharston ([81.128.185.34])
 	by smtp.gmail.com with ESMTPSA id
-	205sm2424015wmd.43.2019.05.28.02.59.49
+	t194sm3752055wmt.3.2019.05.28.02.59.47
 	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Tue, 28 May 2019 02:59:51 -0700 (PDT)
+	Tue, 28 May 2019 02:59:47 -0700 (PDT)
 Received: from zen.linaroharston. (localhost [127.0.0.1])
-	by zen.linaroharston (Postfix) with ESMTP id CDE881FFAF;
+	by zen.linaroharston (Postfix) with ESMTP id 57DF91FFA9;
 	Tue, 28 May 2019 10:49:55 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: peter.maydell@linaro.org
-Date: Tue, 28 May 2019 10:49:52 +0100
-Message-Id: <20190528094953.14898-28-alex.bennee@linaro.org>
+Date: Tue, 28 May 2019 10:49:46 +0100
+Message-Id: <20190528094953.14898-22-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190528094953.14898-1-alex.bennee@linaro.org>
 References: <20190528094953.14898-1-alex.bennee@linaro.org>
@@ -84,9 +84,8 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2a00:1450:4864:20::442
-Subject: [Qemu-devel] [PULL 27/28] tests/qemu-iotests: re-format output to
- for make check-block
+X-Received-From: 2a00:1450:4864:20::444
+Subject: [Qemu-devel] [PULL 21/28] tests/tcg/alpha: add system boot.S
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -98,338 +97,628 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Thomas Huth <thuth@redhat.com>,
-	"open list:Block layer core" <qemu-block@nongnu.org>,
-	qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
-	=?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+	Richard Henderson <richard.henderson@linaro.org>,
+	qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This attempts to clean-up the output to better match the output of the
-rest of the QEMU check system when called with -makecheck. This includes:
+From: Richard Henderson <richard.henderson@linaro.org>
 
-  - formatting as "  TEST    iotest-FMT: nnn"
-  - only dumping config on failure (when -makecheck enabled)
+This provides the bootstrap and low level helper functions for an
+alpha kernel.  We use direct access to the DP264 serial port for
+test output, and hard machine halt to exit the emulation.
 
-The non-make check output has been cleaned up as well:
-
-  - line re-displayed (\r) at the end
-  - fancy colours for pass/fail/skip
-  - timestamps always printed (option removed)
-
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Message-Id: <20190501184306.15208-1-richard.henderson@linaro.org>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Message-Id: <20190503143904.31211-1-alex.bennee@linaro.org>
-Tested-by: Thomas Huth <thuth@redhat.com>
 
-diff --git a/tests/qemu-iotests/check b/tests/qemu-iotests/check
-index 922c5d1d3d3..95162c6cf90 100755
---- a/tests/qemu-iotests/check
-+++ b/tests/qemu-iotests/check
-@@ -27,9 +27,7 @@ bad=""
- notrun=""
- casenotrun=""
- interrupt=true
--
--# by default don't output timestamps
--timestamp=${TIMESTAMP:=false}
-+makecheck=false
+diff --git a/MAINTAINERS b/MAINTAINERS
+index cc1178fe692..cf1158a434f 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -470,6 +470,7 @@ M: Richard Henderson <rth@twiddle.net>
+ S: Maintained
+ F: hw/alpha/
+ F: hw/isa/smc37c669-superio.c
++F: tests/tcg/alpha/system/
  
- _init_error()
- {
-@@ -88,6 +86,22 @@ _full_platform_details()
-     echo "$os/$platform $host $kernel"
- }
- 
-+_full_env_details()
+ ARM Machines
+ ------------
+diff --git a/tests/tcg/alpha/Makefile.softmmu-target b/tests/tcg/alpha/Makefile.softmmu-target
+new file mode 100644
+index 00000000000..3c0f34cc692
+--- /dev/null
++++ b/tests/tcg/alpha/Makefile.softmmu-target
+@@ -0,0 +1,34 @@
++#
++# Alpha system tests
++#
++
++ALPHA_SYSTEM_SRC=$(SRC_PATH)/tests/tcg/alpha/system
++VPATH+=$(ALPHA_SYSTEM_SRC)
++
++# These objects provide the basic boot code and helper functions for all tests
++CRT_OBJS=boot.o
++
++ALPHA_TEST_SRCS=$(wildcard $(ALPHA_SYSTEM_SRC)/*.c)
++ALPHA_TESTS = $(patsubst $(ALPHA_SYSTEM_SRC)/%.c, %, $(ALPHA_TEST_SRCS))
++
++CRT_PATH=$(ALPHA_SYSTEM_SRC)
++LINK_SCRIPT=$(ALPHA_SYSTEM_SRC)/kernel.ld
++LDFLAGS=-Wl,-T$(LINK_SCRIPT)
++TESTS+=$(ALPHA_TESTS) $(MULTIARCH_TESTS)
++CFLAGS+=-nostdlib -g -O1 -mcpu=ev6 $(MINILIB_INC)
++LDFLAGS+=-static -nostdlib $(CRT_OBJS) $(MINILIB_OBJS) -lgcc
++
++# building head blobs
++.PRECIOUS: $(CRT_OBJS)
++
++%.o: $(CRT_PATH)/%.S
++	$(CC) $(CFLAGS) -x assembler-with-cpp -c $< -o $@
++
++# Build and link the tests
++%: %.c $(LINK_SCRIPT) $(CRT_OBJS) $(MINILIB_OBJS)
++	$(CC) $(CFLAGS) $< -o $@ $(LDFLAGS)
++
++memory: CFLAGS+=-DCHECK_UNALIGNED=0
++
++# Running
++QEMU_OPTS+=-serial chardev:output -kernel
+diff --git a/tests/tcg/alpha/system/boot.S b/tests/tcg/alpha/system/boot.S
+new file mode 100644
+index 00000000000..9791b1ef7c8
+--- /dev/null
++++ b/tests/tcg/alpha/system/boot.S
+@@ -0,0 +1,511 @@
++/*
++ * Minimal Alpha system boot code.
++ *
++ * Copyright Linaro Ltd 2019
++ */
++
++	.set	noat
++	.set	nomacro
++	.arch	ev6
++	.text
++
++.macro load_pci_io reg
++	/* For typhoon, this is
++	 *   0xfffffc0000000000  -- kseg identity map
++	 * +      0x10000000000  -- typhoon pio base
++	 * +        0x1fc000000  -- typhoon pchip0 pci base
++	 * = 0xfffffd01fc000000
++	 */
++	ldah	\reg, -3		/* ff..fd0000 */
++	lda	\reg, 0x1fc(\reg)	/* ff..fd01fc */
++	sll	\reg, 24, \reg
++.endm
++
++#define com1Rbr 0x3f8
++#define com1Thr 0x3f8
++#define com1Ier 0x3f9
++#define com1Iir 0x3fa
++#define com1Lcr 0x3fb
++#define com1Mcr 0x3fc
++#define com1Lsr 0x3fd
++#define com1Msr 0x3fe
++#define com1Scr 0x3ff
++#define com1Dll 0x3f8
++#define com1Dlm 0x3f9
++
++#define PAL_halt    0
++#define PAL_wrent  52
++#define PAL_wrkgp  55
++
++	.text
++	.p2align 4
++	.globl	_start
++	.ent	_start
++_start:
++	br	$gp, .+4
++	ldah	$gp, 0($gp)		!gpdisp!1
++	lda	$gp, 0($gp)		!gpdisp!1
++
++	ldah	$sp, $stack_end($gp)	!gprelhigh
++	lda	$sp, $stack_end($sp)	!gprellow
++
++	/* Install kernel gp for exception handlers.  */
++	mov	$gp, $16
++	call_pal PAL_wrkgp
++
++	/* Install exception handlers.  */
++	ldah	$16, entInt($gp)	!gprelhigh
++	lda	$16, entInt($16)	!gprellow
++	lda	$17, 0
++	call_pal PAL_wrent
++
++	ldah	$16, entArith($gp)	!gprelhigh
++	lda	$16, entArith($16)	!gprellow
++	lda	$17, 1
++	call_pal PAL_wrent
++
++	ldah	$16, entMM($gp)		!gprelhigh
++	lda	$16, entMM($16)		!gprellow
++	lda	$17, 2
++	call_pal PAL_wrent
++
++	ldah	$16, entIF($gp)		!gprelhigh
++	lda	$16, entIF($16)		!gprellow
++	lda	$17, 3
++	call_pal PAL_wrent
++
++	ldah	$16, entUna($gp)	!gprelhigh
++	lda	$16, entUna($16)	!gprellow
++	lda	$17, 4
++	call_pal PAL_wrent
++
++	ldah	$16, entSys($gp)	!gprelhigh
++	lda	$16, entSys($16)	!gprellow
++	lda	$17, 5
++	call_pal PAL_wrent
++
++	/*
++	 * Initialize COM1.
++	 */
++	load_pci_io $1
++	lda	$2, 0x87		/* outb(0x87, com1Lcr); */
++	stb	$2, com1Lcr($1)
++	stb	$31, com1Dlm($1)	/* outb(0, com1Dlm); */
++	lda	$2, 3			/* baudconst 3 => 56000 */
++	stb	$2, com1Dll($1)		/* outb(baudconst, com1Dll); */
++	lda	$2, 0x07
++	stb	$2, com1Lcr($1)		/* outb(0x07, com1Lcr) */
++	lda	$2, 0x0f
++	stb	$2, com1Mcr($1)		/* outb(0x0f, com1Mcr) */
++
++	bsr	$26, main		!samegp
++
++	/* fall through to _exit */
++	.end	_start
++
++	.globl	_exit
++	.ent	_exit
++_exit:
++	.frame	$sp, 0, $26, 0
++	.prologue 0
++
++	/* We cannot return an error code.  */
++	call_pal PAL_halt
++	.end	_exit
++
++/*
++ * We have received an exception that we don't handle.  Log and exit.
++ */
++	.ent	log_exit
++log_exit:
++entInt:
++entArith:
++entMM:
++entIF:
++entUna:
++entSys:
++	ldah	$16, $errormsg($gp)	!gprelhigh
++	lda	$16, $errormsg($16)	!gprellow
++	bsr	$26, __sys_outs		!samegp
++	bsr	$26, _exit		!samegp
++	.end	log_exit
++
++	.section .rodata
++$errormsg:
++	.string "Terminated by exception.\n"
++	.previous
++
++	/*
++	 * Helper Functions
++	 */
++
++	/* Output a single character to serial port */
++	.global __sys_outc
++	.ent	__sys_outc
++__sys_outc:
++	.frame	$sp, 0, $26, 0
++	.prologue 0
++
++	load_pci_io $1
++
++	/* 
++	 * while ((inb(com1Lsr) & 0x20) == 0)
++	 *       continue;
++	 */
++1:	ldbu	$0, com1Lsr($1)
++	and	$0, 0x20, $0
++	beq	$0, 1b
++
++	/* outb(c, com1Thr); */
++	stb	$16, com1Thr($1)
++	ret
++	.end	__sys_outc
++
++	/* Output a nul-terminated string to serial port */
++	.global	__sys_outs
++	.ent	__sys_outs
++__sys_outs:
++	.frame	$sp, 0, $26, 0
++	.prologue 0
++
++	load_pci_io $1
++
++	ldbu	$2, 0($16)
++	beq	$2, 9f
++
++	/* 
++	 * while ((inb(com1Lsr) & 0x20) == 0)
++	 *       continue;
++	 */
++1:	ldbu	$0, com1Lsr($1)
++	and	$0, 0x20, $0
++	beq	$0, 1b
++
++	/* outb(c, com1Thr); */
++	stb	$2, com1Thr($1)
++
++	addq	$16, 1, $16
++	ldbu	$2, 0($16)
++	bne	$2, 1b
++
++9:	ret
++	.end	__sys_outs
++
++/*
++ * Division routines that are normally in libc.
++ *
++ * These do not follow the C calling convention.  Arguments are in $24+$25,
++ * the result is in $27.  Register $28 may be clobbered; everything else
++ * must be saved.
++ *
++ * We store the remainder in $28, so that we can share code.
++ *
++ * We do not signal divide by zero.
++ */
++
++/*
++ * Unsigned 64-bit division.
++ */
++
++	.globl	__divqu
++	.ent	__divqu
++__divqu:
++	.frame	$sp, 48, $23
++	subq	$sp, 48, $sp
++	stq	$0, 0($sp)
++	stq	$1, 8($sp)
++	stq	$2, 16($sp)
++	stq	$3, 24($sp)
++	stq	$4, 32($sp)
++	.prologue 0
++
++#define mask     $0
++#define divisor  $1
++#define compare  $2
++#define tmp1     $3
++#define tmp2     $4
++#define quotient $27
++#define modulus  $28
++
++	mov	$24, modulus
++	mov	$25, divisor
++	mov	$31, quotient
++	mov	1, mask
++	beq	$25, 9f
++
++	/* Shift left until divisor >= modulus.  */
++1:	cmpult	divisor, modulus, compare
++	blt	divisor, 2f
++	addq	divisor, divisor, divisor
++	addq	mask, mask, mask
++	bne	compare, 1b
++
++2:	addq	quotient, mask, tmp2
++	srl	mask, 1, mask
++	cmpule	divisor, modulus, compare
++	subq	modulus, divisor, tmp1
++	cmovne	compare, tmp2, quotient
++	srl	divisor, 1, divisor
++	cmovne	compare, tmp1, modulus
++	bne	mask, 2b
++
++9:	ldq	$0, 0($sp)
++	ldq	$1, 8($sp)
++	ldq	$2, 16($sp)
++	ldq	$3, 24($sp)
++	ldq	$4, 32($sp)
++	addq	$sp, 48, $sp
++	ret	$31, ($23), 1
++
++#undef mask
++#undef divisor
++#undef compare
++#undef tmp1
++#undef tmp2
++#undef quotient
++#undef modulus
++
++	.end	__divqu
++
++/*
++ * Unsigned 64-bit remainder.
++ * Note that __divqu above leaves the result in $28.
++ */
++
++	.globl	__remqu
++	.ent	__remqu
++__remqu:
++	.frame	$sp, 16, $23
++	subq	$sp, 16, $sp
++	stq	$23, 0($sp)
++	.prologue 0
++
++	bsr	$23, __divqu
++
++	ldq	$23, 0($sp)
++	mov	$28, $27
++	addq	$sp, 16, $sp
++	ret	$31, ($23), 1
++	.end	__remqu
++
++/*
++ * Signed 64-bit division.
++ */
++
++	.globl	__divqs
++	.ent	__divqs
++__divqs:
++	.prologue 0
++
++	/* Common case: both arguments are positive.  */
++	bis	$24, $25, $28
++	bge	$28, __divqu
++
++	/* At least one argument is negative.  */
++	subq	$sp, 32, $sp
++	stq	$23, 0($sp)
++	stq	$24, 8($sp)
++	stq	$25, 16($sp)
++
++	/* Compute absolute values.  */
++	subq	$31, $24, $28
++	cmovlt	$24, $28, $24
++	subq	$31, $25, $28
++	cmovlt	$25, $28, $25
++
++	bsr	$23, __divqu
++
++	ldq	$24, 8($sp)
++	ldq	$25, 16($sp)
++
++	/* -a / b = a / -b = -(a / b) */
++	subq	$31, $27, $23
++	xor	$24, $25, $28
++	cmovlt	$28, $23, $27
++
++	ldq	$23, 0($sp)
++	addq	$sp, 32, $sp
++	ret	$31, ($23), 1
++	.end	__divqs
++
++/*
++ * Signed 64-bit remainder.
++ */
++
++	.globl	__remqs
++	.ent	__remqs
++__remqs:
++	.prologue 0
++
++	/* Common case: both arguments are positive.  */
++	bis	$24, $25, $28
++	bge	$28, __remqu
++
++	/* At least one argument is negative.  */
++	subq	$sp, 32, $sp
++	stq	$23, 0($sp)
++	stq	$24, 8($sp)
++	stq	$25, 16($sp)
++
++	/* Compute absolute values.  */
++	subq	$31, $24, $28
++	cmovlt	$24, $28, $24
++	subq	$31, $25, $28
++	cmovlt	$25, $28, $25
++
++	bsr	$23, __divqu
++
++	ldq	$23, 0($sp)
++	ldq	$24, 8($sp)
++	ldq	$25, 16($sp)
++
++	/* -a % b = -(a % b); a % -b = a % b.  */
++	subq	$31, $28, $27
++	cmovge	$24, $28, $27
++
++	addq	$sp, 32, $sp
++	ret	$31, ($23), 1
++	.end	__remqs
++
++/*
++ * Unsigned 32-bit division.
++ */
++
++	.globl	__divlu
++	.ent	__divlu
++__divlu:
++	.frame	$sp, 32, $23
++	subq	$sp, 32, $sp
++	stq	$23, 0($sp)
++	stq	$24, 8($sp)
++	stq	$25, 16($sp)
++	.prologue 0
++
++	/* Zero extend and use the 64-bit routine.  */
++	zap	$24, 0xf0, $24
++	zap	$25, 0xf0, $25
++	bsr	$23, __divqu
++
++	addl	$27, 0, $27
++	ldq	$23, 0($sp)
++	ldq	$24, 8($sp)
++	ldq	$25, 16($sp)
++	addq	$sp, 32, $sp
++	ret	$31, ($23), 1
++	.end	__divlu
++
++/*
++ * Unsigned 32-bit remainder.
++ */
++
++	.globl	__remlu
++	.ent	__remlu
++__remlu:
++	.frame	$sp, 32, $23
++	subq	$sp, 32, $sp
++	stq	$23, 0($sp)
++	stq	$24, 8($sp)
++	stq	$25, 16($sp)
++	.prologue 0
++
++	/* Zero extend and use the 64-bit routine.  */
++	zap	$24, 0xf0, $24
++	zap	$25, 0xf0, $25
++	bsr	$23, __divqu
++
++	/* Recall that the remainder is returned in $28.  */
++	addl	$28, 0, $27
++	ldq	$23, 0($sp)
++	ldq	$24, 8($sp)
++	ldq	$25, 16($sp)
++	addq	$sp, 32, $sp
++	ret	$31, ($23), 1
++	.end	__remlu
++
++/*
++ * Signed 32-bit division.
++ */
++
++	.globl	__divls
++	.ent	__divls
++__divls:
++	.frame	$sp, 32, $23
++	subq	$sp, 32, $sp
++	stq	$23, 0($sp)
++	stq	$24, 8($sp)
++	stq	$25, 16($sp)
++	.prologue 0
++
++	/* Sign extend.  */
++	addl	$24, 0, $24
++	addl	$25, 0, $25
++
++	/* Compute absolute values.  */
++	subq	$31, $24, $28
++	cmovlt	$24, $28, $24
++	subq	$31, $25, $28
++	cmovlt	$25, $28, $25
++
++	bsr	$23, __divqu
++
++	ldq	$24, 8($sp)
++	ldq	$25, 16($sp)
++
++	/* Negate the unsigned result, if necessary.  */
++	xor	$24, $25, $28
++	subl	$31, $27, $23
++	addl	$27, 0, $27
++	addl	$28, 0, $28
++	cmovlt	$28, $23, $27
++
++	ldq	$23, 0($sp)
++	addq	$sp, 32, $sp
++	ret	$31, ($23), 1
++	.end	__divls
++
++/*
++ * Signed 32-bit remainder.
++ */
++
++	.globl	__remls
++	.ent	__remls
++__remls:
++	.frame	$sp, 32, $23
++	subq	$sp, 32, $sp
++	stq	$23, 0($sp)
++	stq	$24, 8($sp)
++	stq	$25, 16($sp)
++	.prologue 0
++
++	/* Sign extend.  */
++	addl	$24, 0, $24
++	addl	$25, 0, $25
++
++	/* Compute absolute values.  */
++	subq	$31, $24, $28
++	cmovlt	$24, $28, $24
++	subq	$31, $25, $28
++	cmovlt	$25, $28, $25
++
++	bsr	$23, __divqu
++
++	ldq	$23, 0($sp)
++	ldq	$24, 8($sp)
++	ldq	$25, 16($sp)
++
++	/* Negate the unsigned result, if necessary.  */
++	subl	$31, $28, $27
++	addl	$28, 0, $28
++	cmovge	$24, $28, $27
++
++	addq	$sp, 32, $sp
++	ret	$31, ($23), 1
++	.end	__remls
++
++	.data
++	.p2align 4
++stack:
++	.skip	65536
++$stack_end:
++	.type	stack,@object
++	.size	stack, . - stack
+diff --git a/tests/tcg/alpha/system/kernel.ld b/tests/tcg/alpha/system/kernel.ld
+new file mode 100644
+index 00000000000..d2ac6ecfeb8
+--- /dev/null
++++ b/tests/tcg/alpha/system/kernel.ld
+@@ -0,0 +1,30 @@
++ENTRY(_start)
++
++SECTIONS
 +{
-+    cat <<EOF
-+QEMU          -- "$QEMU_PROG" $QEMU_OPTIONS
-+QEMU_IMG      -- "$QEMU_IMG_PROG" $QEMU_IMG_OPTIONS
-+QEMU_IO       -- "$QEMU_IO_PROG" $QEMU_IO_OPTIONS
-+QEMU_NBD      -- "$QEMU_NBD_PROG" $QEMU_NBD_OPTIONS
-+IMGFMT        -- $FULL_IMGFMT_DETAILS
-+IMGPROTO      -- $IMGPROTO
-+PLATFORM      -- $FULL_HOST_DETAILS
-+TEST_DIR      -- $TEST_DIR
-+SOCKET_SCM_HELPER -- $SOCKET_SCM_HELPER
++    /* Linux kernel legacy start address.  */
++    . = 0xfffffc0000310000;
++    _text = .;
++    .text : {
++        *(.text)
++    }
++    .rodata : {
++        *(.rodata)
++    }
++    _etext = .;
 +
-+EOF
++    . = ALIGN(8192);
++    _data = .;
++    .got : {
++        *(.got)
++    }
++    .data : {
++	*(.sdata)
++        *(.data)
++    }
++    _edata = .;
++    .bss : {
++        *(.bss)
++    }
++    _end = .;
 +}
-+
- # $1 = prog to look for
- set_prog_path()
- {
-@@ -254,8 +268,8 @@ other options
-     -misalign           misalign memory allocations
-     -n                  show me, do not run tests
-     -o options          -o options to pass to qemu-img create/convert
--    -T                  output timestamps
-     -c mode             cache mode
-+    -makecheck          pretty print output for make check
- 
- testlist options
-     -g group[,group...]        include tests from these groups
-@@ -403,7 +417,10 @@ testlist options
-                 command -v xxdiff >/dev/null 2>&1 && diff=xxdiff
-             fi
-             ;;
--
-+        -makecheck)   # makecheck friendly output
-+            makecheck=true
-+            xpand=false
-+            ;;
-         -n)        # show me, don't do it
-             showme=true
-             xpand=false
-@@ -416,8 +433,7 @@ testlist options
-             cachemode=true
-             xpand=false
-             ;;
--        -T)        # turn on timestamp output
--            timestamp=true
-+        -T)        # deprecated timestamp option
-             xpand=false
-             ;;
- 
-@@ -633,12 +649,6 @@ _wallclock()
-     date "+%H %M %S" | awk '{ print $1*3600 + $2*60 + $3 }'
- }
- 
--_timestamp()
--{
--    now=$(date "+%T")
--    printf %s " [$now]"
--}
--
- _wrapup()
- {
-     if $showme
-@@ -704,23 +714,54 @@ END        { if (NR > 0) {
- 
- trap "_wrapup; exit \$status" 0 1 2 3 15
- 
-+# Report the test start and results. For makecheck we want to pretty
-+# print the whole report at the end of the execution.
-+# args: $seq, $starttime, $lasttime
-+_report_test_start()
-+{
-+    if ! $makecheck; then
-+        if [ -n "$3" ]; then
-+            local lasttime=" (last: $3s)"
-+        fi
-+        printf "%-8s %-10s [%s]            %4s%-14s\r" "$1" "..." "$2" "..." "$lasttime"
-+    fi
-+}
-+# args:$seq $status $starttime $lasttime $thistime $details
-+_report_test_result()
-+{
-+    local status lasttime thistime
-+    if $makecheck; then
-+        if [ -n "$2" ] && [ "$2" != "pass" ]; then
-+            status=" [$2]"
-+        fi
-+        printf "  TEST    iotest-$IMGFMT: %s%s\n" "$1" "$status"
-+        return
-+    fi
-+
-+    if [ -n "$4" ]; then
-+        lasttime=" (last: $4s)"
-+    fi
-+    if [ -n "$5" ]; then
-+        thistime=" $5s"
-+    fi
-+    case "$2" in
-+        "pass")     status=$(printf "\e[32m%-10s\e[0m" "$2") ;;
-+        "fail")     status=$(printf "\e[1m\e[31m%-10s\e[0m" "$2") ;;
-+        "not run")  status=$(printf "\e[33m%-10s\e[0m" "$2") ;;
-+        *)          status=$(printf "%-10s" "$2") ;;
-+    esac
-+
-+    printf "%-8s %s [%s] [%s] %4s%-14s %s\n" "$1" "$status" "$3" "$(date '+%T')" "$thistime" "$lasttime" "$6"
-+}
-+
- [ -f $TIMESTAMP_FILE ] || touch $TIMESTAMP_FILE
- 
- FULL_IMGFMT_DETAILS=$(_full_imgfmt_details)
- FULL_HOST_DETAILS=$(_full_platform_details)
- 
--cat <<EOF
--QEMU          -- "$QEMU_PROG" $QEMU_OPTIONS
--QEMU_IMG      -- "$QEMU_IMG_PROG" $QEMU_IMG_OPTIONS
--QEMU_IO       -- "$QEMU_IO_PROG" $QEMU_IO_OPTIONS
--QEMU_NBD      -- "$QEMU_NBD_PROG" $QEMU_NBD_OPTIONS
--IMGFMT        -- $FULL_IMGFMT_DETAILS
--IMGPROTO      -- $IMGPROTO
--PLATFORM      -- $FULL_HOST_DETAILS
--TEST_DIR      -- $TEST_DIR
--SOCKET_SCM_HELPER -- $SOCKET_SCM_HELPER
--
--EOF
-+if ! $makecheck; then
-+    _full_env_details
-+fi
- 
- seq="check"
- 
-@@ -728,42 +769,43 @@ seq="check"
- 
- for seq in $list
- do
--    err=false
--    printf %s "$seq"
-+    err=false       # error flag
-+    printdiff=false # show diff to reference output?
-+    status=""       # test result summary
-+    results=""      # test result details
-+
-     if [ -n "$TESTS_REMAINING_LOG" ] ; then
-         sed -e "s/$seq//" -e 's/  / /' -e 's/^ *//' $TESTS_REMAINING_LOG > $TESTS_REMAINING_LOG.tmp
-         mv $TESTS_REMAINING_LOG.tmp $TESTS_REMAINING_LOG
-         sync
-     fi
- 
-+    lasttime=$(sed -n -e "/^$seq /s/.* //p" <$TIMESTAMP_FILE)
-+    starttime=$(date "+%T")
-+    _report_test_start $seq $starttime $lasttime
-+
-     if $showme
-     then
--        echo
--        continue
-+        status="not run"
-     elif [ -f expunged ] && $expunge && egrep "^$seq([         ]|\$)" expunged >/dev/null
-     then
--        echo " - expunged"
-+        status="not run"
-+        results="expunged"
-         rm -f $seq.out.bad
-         echo "/^$seq\$/d" >>$tmp.expunged
-     elif [ ! -f "$source_iotests/$seq" ]
-     then
--        echo " - no such test?"
-+        status="not run"
-+        results="no such test?"
-         echo "/^$seq\$/d" >>$tmp.expunged
-     else
-         # really going to try and run this one
-         #
-         rm -f $seq.out.bad
--        lasttime=$(sed -n -e "/^$seq /s/.* //p" <$TIMESTAMP_FILE)
--        if [ "X$lasttime" != X ]; then
--                printf %s " ${lasttime}s ..."
--        else
--                printf "        "        # prettier output with timestamps.
--        fi
-         rm -f core $seq.notrun
-         rm -f $seq.casenotrun
- 
-         start=$(_wallclock)
--        $timestamp && printf %s "        [$(date "+%T")]"
- 
-         if [ "$(head -n 1 "$source_iotests/$seq")" == "#!/usr/bin/env python" ]; then
-             run_command="$PYTHON $seq"
-@@ -781,26 +823,26 @@ do
-                     $run_command >$tmp.out 2>&1)
-         fi
-         sts=$?
--        $timestamp && _timestamp
-         stop=$(_wallclock)
- 
-         if [ -f core ]
-         then
--            printf " [dumped core]"
-             mv core $seq.core
-+            status="fail"
-+            results="[dumped core] $seq.core"
-             err=true
-         fi
- 
-         if [ -f $seq.notrun ]
-         then
--            $timestamp || printf " [not run] "
--            $timestamp && echo " [not run]" && printf %s "        $seq -- "
--            cat $seq.notrun
--            notrun="$notrun $seq"
-+            # overwrites timestamp output
-+            status="not run"
-+            results="$(cat $seq.notrun)"
-         else
-             if [ $sts -ne 0 ]
-             then
--                printf %s " [failed, exit status $sts]"
-+                status="fail"
-+                results=$(printf %s "[failed, exit status $sts]")
-                 err=true
-             fi
- 
-@@ -821,22 +863,23 @@ do
- 
-             if [ ! -f "$reference" ]
-             then
--                echo " - no qualified output"
-+                status="fail"
-+                reason="no qualified output"
-                 err=true
-             else
-                 if diff -w "$reference" $tmp.out >/dev/null 2>&1
-                 then
--                    echo ""
--                    if $err
--                    then
--                        :
--                    else
--                        echo "$seq $(expr $stop - $start)" >>$tmp.time
-+                    if ! $err; then
-+                        status="pass"
-+                        thistime=$(expr $stop - $start)
-+                        echo "$seq $thistime" >>$tmp.time
-                     fi
-                 else
--                    echo " - output mismatch (see $seq.out.bad)"
-                     mv $tmp.out $seq.out.bad
-                     $diff -w "$reference" "$PWD"/$seq.out.bad
-+                    status="fail"
-+                    results="output mismatch (see $seq.out.bad)"
-+                    printdiff=true
-                     err=true
-                 fi
-             fi
-@@ -850,13 +893,27 @@ do
- 
-     # come here for each test, except when $showme is true
-     #
--    if $err
--    then
--        bad="$bad $seq"
--        n_bad=$(expr $n_bad + 1)
--        quick=false
--    fi
--    [ -f $seq.notrun ] || try=$(expr $try + 1)
-+    _report_test_result $seq "$status" "$starttime" "$lasttime" "$thistime" "$results"
-+    case "$status" in
-+        "pass")
-+            try=$(expr $try + 1)
-+            ;;
-+        "fail")
-+            try=$(expr $try + 1)
-+            if $makecheck; then
-+                _full_env_details
-+            fi
-+            if $printdiff; then
-+                $diff -w "$reference" "$PWD"/$seq.out.bad
-+            fi
-+            bad="$bad $seq"
-+            n_bad=$(expr $n_bad + 1)
-+            quick=false
-+            ;;
-+        "not run")
-+            notrun="$notrun $seq"
-+            ;;
-+    esac
- 
-     seq="after_$seq"
- done
 -- 
 2.20.1
 
