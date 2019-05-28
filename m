@@ -2,71 +2,80 @@ Return-Path: <SRS0=2W3W=T4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A3F4C04AB6
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 May 2019 18:33:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C297C04AB6
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 May 2019 18:35:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5E743208CB
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 May 2019 18:33:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 559BB208CB
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 May 2019 18:35:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=fintelia.io header.i=@fintelia.io header.b="7U4ulSj3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5E743208CB
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=fintelia.io
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="u44uJ5m+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 559BB208CB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:40865 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:40879 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hVguR-0002C2-7L
-	for qemu-devel@archiver.kernel.org; Tue, 28 May 2019 14:33:15 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:53784)
-	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from
-	<bounce+cf442f.9b4e76-qemu-devel=nongnu.org@fintelia.io>)
-	id 1hVgt2-0001S2-2w
-	for qemu-devel@nongnu.org; Tue, 28 May 2019 14:31:49 -0400
+	id 1hVgwY-0003il-G6
+	for qemu-devel@archiver.kernel.org; Tue, 28 May 2019 14:35:26 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:54049)
+	by lists.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <peter.maydell@linaro.org>) id 1hVguX-0002KB-U6
+	for qemu-devel@nongnu.org; Tue, 28 May 2019 14:33:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from
-	<bounce+cf442f.9b4e76-qemu-devel=nongnu.org@fintelia.io>)
-	id 1hVgsz-0006IU-0s
-	for qemu-devel@nongnu.org; Tue, 28 May 2019 14:31:47 -0400
-Received: from rs224.mailgun.us ([209.61.151.224]:23312)
+	(envelope-from <peter.maydell@linaro.org>) id 1hVguS-0007KN-B6
+	for qemu-devel@nongnu.org; Tue, 28 May 2019 14:33:18 -0400
+Received: from mail-oi1-x22d.google.com ([2607:f8b0:4864:20::22d]:32838)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from
-	<bounce+cf442f.9b4e76-qemu-devel=nongnu.org@fintelia.io>)
-	id 1hVgsp-000666-K5
-	for qemu-devel@nongnu.org; Tue, 28 May 2019 14:31:40 -0400
-DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=fintelia.io; q=dns/txt;
-	s=pic; 
-	t=1559068285; h=Content-Transfer-Encoding: MIME-Version: Message-Id:
-	Date: Subject: Cc: To: From: Sender;
-	bh=nEcuwIlVHsRxXcVicnYj6GVZmMZCKRdLrLrqRXh7teE=;
-	b=7U4ulSj3Hsb9P9um5dNOfi8y9gm9OcyXJlNFb/5ygAdB1SfgU2zuLh8NFnhD0L1VvFvEmLpX
-	qzKKByBJ0tKr73Q8kxojaiNysQno8DH5W0hMv5nlHYGgEOqFH6XvxgG5ZvYYUHpXfdrj2nKe
-	BioXsayM/m797PZgBPWvWvStQaMZWDrKKY2X6lkmLARC9nm64059kgZlWEfohV9LJMY54xWa
-	/+n6ubdKN1cFvAE+HEqfAY1JQGfWRqpdF2T2c74r8hBJ5IsIOq7ovzSbFtxhwgRE9/AZZawp
-	WBQr2cro7nTn5/dYF0p9tJhxbBnSyKfzgHbpRp3NES+5WMOhJgDjyA==
-X-Mailgun-Sending-Ip: 209.61.151.224
-X-Mailgun-Sid: WyJlMGM5NSIsICJxZW11LWRldmVsQG5vbmdudS5vcmciLCAiOWI0ZTc2Il0=
-Received: from localhost.localdomain (cpe-174-100-208-63.neo.res.rr.com
-	[174.100.208.63])
-	by mxa.mailgun.org with ESMTP id 5ced7e7a.7f4b0c0727f0-smtp-out-n03;
-	Tue, 28 May 2019 18:31:22 -0000 (UTC)
-From: Jonathan Behrens <jonathan@fintelia.io>
-To: qemu-devel@nongnu.org
-Date: Tue, 28 May 2019 14:30:20 -0400
-Message-Id: <20190528183020.17915-1-jonathan@fintelia.io>
-X-Mailer: git-send-email 2.20.1
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1hVguO-0007B6-Nb
+	for qemu-devel@nongnu.org; Tue, 28 May 2019 14:33:14 -0400
+Received: by mail-oi1-x22d.google.com with SMTP id q186so15102174oia.0
+	for <qemu-devel@nongnu.org>; Tue, 28 May 2019 11:33:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+	:cc:content-transfer-encoding;
+	bh=hflmveIUT9776d/4hJf9/0kiwLAc22FOLJGzIuxs74I=;
+	b=u44uJ5m+xsmEkQAtFUp2+zT7BDF7ym0b9660XLb3qaP2812VvZUUG02y8QXxqpIUx/
+	7AZpy2/faEWmXaEiFXA6K2q8kCE3vLZ7VQV/0DiadFOMEvevN9p0Qi3lyMLFB8pN1wv/
+	Sbnnvw7+IiS8hpyr3VurmzH+r127/0azHwoz0fwLEAHY9qSc1hdblHbtI5KndAQcC1no
+	bwpfmfkA5kDRYc6k49Fnol0v6RNrtIKXCrMJFf6RLg7TsCs1hasuCkyXqcygprNV63H0
+	EdyKWMYF4yo4s48ACIyprzykFVBcVUac/i2LmfsSQByeJ2Masf3fA/MhLKlymLrgOcSu
+	8NtQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+	:message-id:subject:to:cc:content-transfer-encoding;
+	bh=hflmveIUT9776d/4hJf9/0kiwLAc22FOLJGzIuxs74I=;
+	b=LxE0XMaC2fWJluxt83JPJjMlh9xRNL8pIV3pexW98rUoMqQcpb5C4qpvMUEhufAo10
+	gjQIQXHXsvO5QeLvbEIu3qbNpjyj/Vp5u24HATmQFWbOfviHpcmCFDSM2Ovk4Rl8mG5p
+	s36bcILfANAkRs2lqYBuvCwe5YE48s3b02oKUHBid9GLg1ITuRJmM2PGT5oMR6vr0yFH
+	aO5lyxCXs455GdK+9OHeTzQzFmbb7x84CwZ6AA4X+z0HmrxyPF9QJ/4D+Xw0nCiPvR6o
+	q5/n8nAsOVV014mPseTUTlXXsgfKlhjnDjrhykVWb0Zh0ULYRBhxv+oFnQaflLFea5Kf
+	N9bw==
+X-Gm-Message-State: APjAAAWuw7+eVuBrr4AfMVJJsIfvjoxY3EB83rzPFjNNVARiwmorhyM6
+	79YPqwrL+kkrQvETMkJTRhu53H0CZ6VHT+A9rQdhNw==
+X-Google-Smtp-Source: APXvYqy5k/2a92r+bhbTL4lJxiqLsbW6v6K0zcj55PYGm/0OVqi3U1BFW0JTnlC4pruDf39SwtUlbd1y60h/O2HIf7c=
+X-Received: by 2002:aca:cd12:: with SMTP id d18mr3399573oig.146.1559068382420; 
+	Tue, 28 May 2019 11:33:02 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.61.151.224
-Subject: [Qemu-devel] [PATCH for 4.1 v3] target/riscv: Expose time CSRs when
- allowed by [m|s]counteren
+References: <87lfyqla7r.fsf@dusky.pond.sub.org>
+In-Reply-To: <87lfyqla7r.fsf@dusky.pond.sub.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 28 May 2019 19:32:51 +0100
+Message-ID: <CAFEAcA_DdosM2mSo0FWMLjv2eBHscQGXw-_J6AefiwURZGCCrg@mail.gmail.com>
+To: Markus Armbruster <armbru@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::22d
+Subject: Re: [Qemu-devel] Headers without multiple inclusion guards
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -78,363 +87,157 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
+Cc: Chris Wulff <crwulff@gmail.com>,
 	Sagar Karandikar <sagark@eecs.berkeley.edu>,
-	Jonathan Behrens <jonathan@fintelia.io>,
-	Palmer Dabbelt <palmer@sifive.com>,
+	David Hildenbrand <david@redhat.com>, James Hogan <jhogan@kernel.org>,
+	Anthony Green <green@moxielogic.com>, Palmer Dabbelt <palmer@sifive.com>,
+	Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+	QEMU Developers <qemu-devel@nongnu.org>, Max Filippov <jcmvbkbc@gmail.com>,
+	Dmitry Fleytman <dmitry.fleytman@gmail.com>,
 	Alistair Francis <Alistair.Francis@wdc.com>,
-	Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+	Gerd Hoffmann <kraxel@redhat.com>,
+	"Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+	Guan Xuetao <gxt@mprc.pku.edu.cn>, Marek Vasut <marex@denx.de>,
+	Stefano Stabellini <sstabellini@kernel.org>,
+	Aleksandar Rikalo <arikalo@wavecomp.com>, Helge Deller <deller@gmx.de>,
+	"Michael S. Tsirkin" <mst@redhat.com>, Laszlo Ersek <lersek@redhat.com>,
+	Halil Pasic <pasic@linux.ibm.com>,
+	Christian Borntraeger <borntraeger@de.ibm.com>,
+	Anthony Perard <anthony.perard@citrix.com>,
+	Richard Henderson <rth@twiddle.net>, Jason Wang <jasowang@redhat.com>,
+	Artyom Tarasenko <atar4qemu@gmail.com>,
+	Laurent Vivier <lvivier@redhat.com>,
+	Thomas Huth <thuth@redhat.com>, Riku Voipio <riku.voipio@iki.fi>,
+	Eduardo Habkost <ehabkost@redhat.com>,
+	Alistair Francis <alistair@alistair23.me>, Greg Kurz <groug@kaod.org>,
+	Marcelo Tosatti <mtosatti@redhat.com>,
+	Beniamino Galvani <b.galvani@gmail.com>,
+	Eric Auger <eric.auger@redhat.com>, Paul Durrant <paul.durrant@citrix.com>,
+	Stafford Horne <shorne@gmail.com>,
+	=?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
+	David Gibson <david@gibson.dropbear.id.au>,
+	"Daniel P. Berrange" <berrange@redhat.com>,
+	Claudio Fontana <claudio.fontana@gmail.com>,
+	Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+	Cornelia Huck <cohuck@redhat.com>,
+	Claudio Fontana <claudio.fontana@huawei.com>,
+	Laurent Vivier <laurent@vivier.eu>,
+	Andrew Baumann <Andrew.Baumann@microsoft.com>,
+	=?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+	Michael Walle <michael@walle.cc>,
+	Aleksandar Markovic <amarkovic@wavecomp.com>,
+	Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>,
+	=?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Currently mcounteren.TM acts as though it is hardwired to zero, even though QEMU allows it to be set. This change resolves the issue by allowing reads to the time and timeh control registers when running in a privileged mode where such accesses are allowed.
+On Tue, 28 May 2019 at 19:12, Markus Armbruster <armbru@redhat.com> wrote:
+> I append the alphabetical list of headers without multiple inclusion
+> guards (as reported by scripts/clean-header-guards -nv), followed by the
+> same list sorted into maintainer buckets.  If you're cc'ed, please find
+> your bucket(s), and tell me which headers intentionally lack guards.
 
-The frequency of the time register is stored in the time_freq field of each hart so that it is accessible during CSR reads, but must be the same across all harts. Each board can initialize it to a custom value, although all currently use a 10 MHz frequency.
+> FPU emulation
+> M: Aurelien Jarno <aurelien@aurel32.net>
+> M: Peter Maydell <peter.maydell@linaro.org>
+> M: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> fpu/softfloat-specialize.h
+> include/fpu/softfloat-macros.h
 
-Signed-off-by: Jonathan Behrens <jonathan@fintelia.io>
----
- hw/riscv/riscv_hart.c           |  4 ++++
- hw/riscv/sifive_clint.c         | 30 ++++++++++++++++++++++--------
- hw/riscv/sifive_e.c             |  2 ++
- hw/riscv/sifive_u.c             |  4 +++-
- hw/riscv/spike.c                |  6 +++++-
- hw/riscv/virt.c                 |  4 +++-
- include/hw/riscv/riscv_hart.h   |  1 +
- include/hw/riscv/sifive_clint.h |  4 ----
- include/hw/riscv/sifive_e.h     |  4 ++++
- include/hw/riscv/sifive_u.h     |  1 +
- include/hw/riscv/spike.h        |  1 +
- include/hw/riscv/virt.h         |  1 +
- target/riscv/cpu.h              |  2 ++
- target/riscv/csr.c              | 17 +++++++++++------
- 14 files changed, 60 insertions(+), 21 deletions(-)
+I think that include/fpu/softfloat-macros.h should ideally
+have header guards.
 
-diff --git a/hw/riscv/riscv_hart.c b/hw/riscv/riscv_hart.c
-index e34a26a0ef..c39cd55330 100644
---- a/hw/riscv/riscv_hart.c
-+++ b/hw/riscv/riscv_hart.c
-@@ -19,6 +19,7 @@
-  */
- 
- #include "qemu/osdep.h"
-+#include "qemu/timer.h"
- #include "qapi/error.h"
- #include "hw/sysbus.h"
- #include "target/riscv/cpu.h"
-@@ -27,6 +28,8 @@
- static Property riscv_harts_props[] = {
-     DEFINE_PROP_UINT32("num-harts", RISCVHartArrayState, num_harts, 1),
-     DEFINE_PROP_STRING("cpu-type", RISCVHartArrayState, cpu_type),
-+    DEFINE_PROP_UINT64("timebase-frequency", RISCVHartArrayState, time_freq,
-+                       NANOSECONDS_PER_SECOND),
-     DEFINE_PROP_END_OF_LIST(),
- };
- 
-@@ -49,6 +52,7 @@ static void riscv_harts_realize(DeviceState *dev, Error **errp)
-                                 sizeof(RISCVCPU), s->cpu_type,
-                                 &error_abort, NULL);
-         s->harts[n].env.mhartid = n;
-+        s->harts[n].env.time_freq = s->time_freq;
-         qemu_register_reset(riscv_harts_cpu_reset, &s->harts[n]);
-         object_property_set_bool(OBJECT(&s->harts[n]), true,
-                                  "realized", &err);
-diff --git a/hw/riscv/sifive_clint.c b/hw/riscv/sifive_clint.c
-index d4c159e937..71edf4dcc6 100644
---- a/hw/riscv/sifive_clint.c
-+++ b/hw/riscv/sifive_clint.c
-@@ -26,10 +26,10 @@
- #include "hw/riscv/sifive_clint.h"
- #include "qemu/timer.h"
- 
--static uint64_t cpu_riscv_read_rtc(void)
-+static uint64_t cpu_riscv_read_rtc(CPURISCVState *env)
- {
-     return muldiv64(qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL),
--        SIFIVE_CLINT_TIMEBASE_FREQ, NANOSECONDS_PER_SECOND);
-+        env->time_freq, NANOSECONDS_PER_SECOND);
- }
- 
- /*
-@@ -41,7 +41,7 @@ static void sifive_clint_write_timecmp(RISCVCPU *cpu, uint64_t value)
-     uint64_t next;
-     uint64_t diff;
- 
--    uint64_t rtc_r = cpu_riscv_read_rtc();
-+    uint64_t rtc_r = cpu_riscv_read_rtc(&cpu->env);
- 
-     cpu->env.timecmp = value;
-     if (cpu->env.timecmp <= rtc_r) {
-@@ -56,7 +56,7 @@ static void sifive_clint_write_timecmp(RISCVCPU *cpu, uint64_t value)
-     diff = cpu->env.timecmp - rtc_r;
-     /* back to ns (note args switched in muldiv64) */
-     next = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) +
--        muldiv64(diff, NANOSECONDS_PER_SECOND, SIFIVE_CLINT_TIMEBASE_FREQ);
-+        muldiv64(diff, NANOSECONDS_PER_SECOND, cpu->env.time_freq);
-     timer_mod(cpu->env.timer, next);
- }
- 
-@@ -107,11 +107,25 @@ static uint64_t sifive_clint_read(void *opaque, hwaddr addr, unsigned size)
-             return 0;
-         }
-     } else if (addr == clint->time_base) {
--        /* time_lo */
--        return cpu_riscv_read_rtc() & 0xFFFFFFFF;
-+        /* All harts must have the same time frequency, so just use hart 0 */
-+        CPUState *cpu = qemu_get_cpu(0);
-+        CPURISCVState *env = cpu ? cpu->env_ptr : NULL;
-+        if (!env) {
-+            error_report("clint: hart 0 not valid?!");
-+        } else {
-+            /* time_lo */
-+            return cpu_riscv_read_rtc(env) & 0xFFFFFFFF;
-+        }
-     } else if (addr == clint->time_base + 4) {
--        /* time_hi */
--        return (cpu_riscv_read_rtc() >> 32) & 0xFFFFFFFF;
-+        /* All harts must have the same time frequency, so just use hart 0 */
-+        CPUState *cpu = qemu_get_cpu(0);
-+        CPURISCVState *env = cpu ? cpu->env_ptr : NULL;
-+        if (!env) {
-+            error_report("clint: hart 0 not valid?!");
-+        } else {
-+            /* time_hi */
-+            return (cpu_riscv_read_rtc(env) >> 32) & 0xFFFFFFFF;
-+        }
-     }
- 
-     error_report("clint: invalid read: %08x", (uint32_t)addr);
-diff --git a/hw/riscv/sifive_e.c b/hw/riscv/sifive_e.c
-index 80ac56fa7d..2d6f768ff1 100644
---- a/hw/riscv/sifive_e.c
-+++ b/hw/riscv/sifive_e.c
-@@ -146,6 +146,8 @@ static void riscv_sifive_e_soc_init(Object *obj)
-                             &error_abort);
-     object_property_set_int(OBJECT(&s->cpus), smp_cpus, "num-harts",
-                             &error_abort);
-+    object_property_set_int(OBJECT(&s->cpus), SIFIVE_E_TIMEBASE_FREQ,
-+                            "timebase-frequency", &error_abort);
-     sysbus_init_child_obj(obj, "riscv.sifive.e.gpio0",
-                           &s->gpio, sizeof(s->gpio),
-                           TYPE_SIFIVE_GPIO);
-diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
-index 5ecc47cea3..ab2b00106b 100644
---- a/hw/riscv/sifive_u.c
-+++ b/hw/riscv/sifive_u.c
-@@ -116,7 +116,7 @@ static void create_fdt(SiFiveUState *s, const struct MemmapEntry *memmap,
- 
-     qemu_fdt_add_subnode(fdt, "/cpus");
-     qemu_fdt_setprop_cell(fdt, "/cpus", "timebase-frequency",
--        SIFIVE_CLINT_TIMEBASE_FREQ);
-+        SIFIVE_U_TIMEBASE_FREQ);
-     qemu_fdt_setprop_cell(fdt, "/cpus", "#size-cells", 0x0);
-     qemu_fdt_setprop_cell(fdt, "/cpus", "#address-cells", 0x1);
- 
-@@ -329,6 +329,8 @@ static void riscv_sifive_u_soc_init(Object *obj)
-                             &error_abort);
-     object_property_set_int(OBJECT(&s->cpus), smp_cpus, "num-harts",
-                             &error_abort);
-+    object_property_set_int(OBJECT(&s->cpus), SIFIVE_U_TIMEBASE_FREQ,
-+                            "timebase-frequency", &error_abort);
- 
-     sysbus_init_child_obj(obj, "gem", &s->gem, sizeof(s->gem),
-                           TYPE_CADENCE_GEM);
-diff --git a/hw/riscv/spike.c b/hw/riscv/spike.c
-index 5b33d4be3b..7c1872aad0 100644
---- a/hw/riscv/spike.c
-+++ b/hw/riscv/spike.c
-@@ -106,7 +106,7 @@ static void create_fdt(SpikeState *s, const struct MemmapEntry *memmap,
- 
-     qemu_fdt_add_subnode(fdt, "/cpus");
-     qemu_fdt_setprop_cell(fdt, "/cpus", "timebase-frequency",
--        SIFIVE_CLINT_TIMEBASE_FREQ);
-+        SPIKE_TIMEBASE_FREQ);
-     qemu_fdt_setprop_cell(fdt, "/cpus", "#size-cells", 0x0);
-     qemu_fdt_setprop_cell(fdt, "/cpus", "#address-cells", 0x1);
- 
-@@ -180,6 +180,8 @@ static void spike_board_init(MachineState *machine)
-                             &error_abort);
-     object_property_set_int(OBJECT(&s->soc), smp_cpus, "num-harts",
-                             &error_abort);
-+    object_property_set_int(OBJECT(&s->soc), SPIKE_TIMEBASE_FREQ,
-+                            "timebase-frequency", &error_abort);
-     object_property_set_bool(OBJECT(&s->soc), true, "realized",
-                             &error_abort);
- 
-@@ -268,6 +270,8 @@ static void spike_v1_10_0_board_init(MachineState *machine)
-                             &error_abort);
-     object_property_set_int(OBJECT(&s->soc), smp_cpus, "num-harts",
-                             &error_abort);
-+    object_property_set_int(OBJECT(&s->soc), SPIKE_TIMEBASE_FREQ,
-+                            "timebase-frequency", &error_abort);
-     object_property_set_bool(OBJECT(&s->soc), true, "realized",
-                             &error_abort);
- 
-diff --git a/hw/riscv/virt.c b/hw/riscv/virt.c
-index 84d94d0c42..e3a2474cea 100644
---- a/hw/riscv/virt.c
-+++ b/hw/riscv/virt.c
-@@ -185,7 +185,7 @@ static void *create_fdt(RISCVVirtState *s, const struct MemmapEntry *memmap,
- 
-     qemu_fdt_add_subnode(fdt, "/cpus");
-     qemu_fdt_setprop_cell(fdt, "/cpus", "timebase-frequency",
--                          SIFIVE_CLINT_TIMEBASE_FREQ);
-+                          VIRT_TIMEBASE_FREQ);
-     qemu_fdt_setprop_cell(fdt, "/cpus", "#size-cells", 0x0);
-     qemu_fdt_setprop_cell(fdt, "/cpus", "#address-cells", 0x1);
- 
-@@ -403,6 +403,8 @@ static void riscv_virt_board_init(MachineState *machine)
-                             &error_abort);
-     object_property_set_int(OBJECT(&s->soc), smp_cpus, "num-harts",
-                             &error_abort);
-+    object_property_set_int(OBJECT(&s->soc), VIRT_TIMEBASE_FREQ,
-+                            "timebase-frequency", &error_abort);
-     object_property_set_bool(OBJECT(&s->soc), true, "realized",
-                             &error_abort);
- 
-diff --git a/include/hw/riscv/riscv_hart.h b/include/hw/riscv/riscv_hart.h
-index 0671d88a44..2e82e85b2b 100644
---- a/include/hw/riscv/riscv_hart.h
-+++ b/include/hw/riscv/riscv_hart.h
-@@ -33,6 +33,7 @@ typedef struct RISCVHartArrayState {
-     /*< public >*/
-     uint32_t num_harts;
-     char *cpu_type;
-+    uint64_t time_freq;
-     RISCVCPU *harts;
- } RISCVHartArrayState;
- 
-diff --git a/include/hw/riscv/sifive_clint.h b/include/hw/riscv/sifive_clint.h
-index e2865be1d1..aaa2a58c6e 100644
---- a/include/hw/riscv/sifive_clint.h
-+++ b/include/hw/riscv/sifive_clint.h
-@@ -47,8 +47,4 @@ enum {
-     SIFIVE_TIME_BASE    = 0xBFF8
- };
- 
--enum {
--    SIFIVE_CLINT_TIMEBASE_FREQ = 10000000
--};
--
- #endif
-diff --git a/include/hw/riscv/sifive_e.h b/include/hw/riscv/sifive_e.h
-index 3b14eb7462..95bd33d872 100644
---- a/include/hw/riscv/sifive_e.h
-+++ b/include/hw/riscv/sifive_e.h
-@@ -71,6 +71,10 @@ enum {
-     SIFIVE_E_GPIO0_IRQ0 = 8
- };
- 
-+enum {
-+    SIFIVE_E_TIMEBASE_FREQ = 10000000,
-+};
-+
- #define SIFIVE_E_PLIC_HART_CONFIG "M"
- #define SIFIVE_E_PLIC_NUM_SOURCES 127
- #define SIFIVE_E_PLIC_NUM_PRIORITIES 7
-diff --git a/include/hw/riscv/sifive_u.h b/include/hw/riscv/sifive_u.h
-index 892f0eee21..85ee1eca78 100644
---- a/include/hw/riscv/sifive_u.h
-+++ b/include/hw/riscv/sifive_u.h
-@@ -63,6 +63,7 @@ enum {
- };
- 
- enum {
-+    SIFIVE_U_TIMEBASE_FREQ = 10000000,
-     SIFIVE_U_CLOCK_FREQ = 1000000000,
-     SIFIVE_U_GEM_CLOCK_FREQ = 125000000
- };
-diff --git a/include/hw/riscv/spike.h b/include/hw/riscv/spike.h
-index 641b70da67..2d391d1559 100644
---- a/include/hw/riscv/spike.h
-+++ b/include/hw/riscv/spike.h
-@@ -36,6 +36,7 @@ enum {
- };
- 
- enum {
-+    SPIKE_TIMEBASE_FREQ = 10000000,
-     SPIKE_CLOCK_FREQ = 1000000000
- };
- 
-diff --git a/include/hw/riscv/virt.h b/include/hw/riscv/virt.h
-index d01a1a85c4..53d4318f76 100644
---- a/include/hw/riscv/virt.h
-+++ b/include/hw/riscv/virt.h
-@@ -53,6 +53,7 @@ enum {
- };
- 
- enum {
-+    VIRT_TIMEBASE_FREQ = 10000000,
-     VIRT_CLOCK_FREQ = 1000000000
- };
- 
-diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
-index 74e726c1c9..9c09bbbffd 100644
---- a/target/riscv/cpu.h
-+++ b/target/riscv/cpu.h
-@@ -175,7 +175,9 @@ struct CPURISCVState {
-     /* temporary htif regs */
-     uint64_t mfromhost;
-     uint64_t mtohost;
-+
-     uint64_t timecmp;
-+    uint64_t time_freq;
- 
-     /* physical memory protection */
-     pmp_table_t pmp_state;
-diff --git a/target/riscv/csr.c b/target/riscv/csr.c
-index f9e2910643..303c362782 100644
---- a/target/riscv/csr.c
-+++ b/target/riscv/csr.c
-@@ -191,22 +191,31 @@ static int read_instreth(CPURISCVState *env, int csrno, target_ulong *val)
- }
- #endif /* TARGET_RISCV32 */
- 
--#if defined(CONFIG_USER_ONLY)
- static int read_time(CPURISCVState *env, int csrno, target_ulong *val)
- {
-+#if !defined(CONFIG_USER_ONLY)
-+    *val = muldiv64(qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL),
-+                    env->time_freq, NANOSECONDS_PER_SECOND);
-+#else
-     *val = cpu_get_host_ticks();
-+#endif
-     return 0;
- }
- 
- #if defined(TARGET_RISCV32)
- static int read_timeh(CPURISCVState *env, int csrno, target_ulong *val)
- {
-+#if !defined(CONFIG_USER_ONLY)
-+    *val = muldiv64(qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL),
-+                    env->time_freq, NANOSECONDS_PER_SECOND) >> 32;
-+#else
-     *val = cpu_get_host_ticks() >> 32;
-+#endif
-     return 0;
- }
- #endif
- 
--#else /* CONFIG_USER_ONLY */
-+#if !defined(CONFIG_USER_ONLY)
- 
- /* Machine constants */
- 
-@@ -856,14 +865,10 @@ static riscv_csr_operations csr_ops[CSR_TABLE_SIZE] = {
-     [CSR_INSTRETH] =            { ctr,  read_instreth                       },
- #endif
- 
--    /* User-level time CSRs are only available in linux-user
--     * In privileged mode, the monitor emulates these CSRs */
--#if defined(CONFIG_USER_ONLY)
-     [CSR_TIME] =                { ctr,  read_time                           },
- #if defined(TARGET_RISCV32)
-     [CSR_TIMEH] =               { ctr,  read_timeh                          },
- #endif
--#endif
- 
- #if !defined(CONFIG_USER_ONLY)
-     /* Machine Timers and Counters */
--- 
-2.20.1
+fpu/softfloat-specialize.h is a bit odd as it's intended to be included
+exactly once, by fpu/softfloat.c. Guards wouldn't hurt, I think, but it
+might be cleanest to rename it to fpu/softfloat-specialize.inc.c
+to match our convention for "lump of C which is textually
+included but isn't a header".
+
+> ARM
+> M: Peter Maydell <peter.maydell@linaro.org>
+> target/arm/helper-a64.h
+> target/arm/helper-sve.h
+> target/arm/helper.h
+> target/arm/op_addsub.h
+
+All intentional -- target/*/helper.h and anything it includes
+is intended to be included multiple times for different
+purposes (the includer #defines various macros appropriately
+to produce different effects).
+
+> Allwinner-a10
+> M: Beniamino Galvani <b.galvani@gmail.com>
+> M: Peter Maydell <peter.maydell@linaro.org>
+> include/hw/arm/allwinner-a10.h
+
+This appears to me to have an include guard:
+perhaps your check doesn't recognize the variant
+where the #define appears just before the #endif rather
+than just after the #ifndef ?
+
+> ARM PrimeCell and CMSDK devices
+> M: Peter Maydell <peter.maydell@linaro.org>
+> hw/display/pl110_template.h
+
+Intentional, like all the hw/display/*_template.h headers:
+they're included multiple times with various definitions
+of BITS to generate different functions. (Note that there's
+an item on the BiteSizedTasks page which suggests that
+we could clean up all of these because only the 32-bit
+case is used now that our display surfaces are always
+32-bits-per-pixel.)
+
+> Raspberry Pi
+> M: Peter Maydell <peter.maydell@linaro.org>
+> R: Andrew Baumann <Andrew.Baumann@microsoft.com>
+> R: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> include/hw/arm/raspi_platform.h
+
+Mistake, should have a guard.
+
+> PXA2XX
+> M: Andrzej Zaborowski <balrogg@gmail.com>
+> M: Peter Maydell <peter.maydell@linaro.org>
+> hw/display/pxa2xx_template.h
+
+Intentional, see above.
+
+> Xilinx ZynqMP
+> M: Alistair Francis <alistair@alistair23.me>
+> M: Edgar E. Iglesias <edgar.iglesias@gmail.com>
+> M: Peter Maydell <peter.maydell@linaro.org>
+> include/hw/arm/xlnx-zynqmp.h
+> include/hw/display/xlnx_dp.h
+> include/hw/dma/xlnx-zynq-devcfg.h
+
+These all have guards in non-standard formats.
+
+> include/hw/timer/xlnx-zynqmp-rtc.h
+
+Mistake, should have a guard.
+
+> OMAP
+> M: Peter Maydell <peter.maydell@linaro.org>
+> hw/display/omap_lcd_template.h
+
+Intentional, see above.
+
+> include/hw/arm/omap.h
+
+Has a guard in a non-standard form.
+
+> UNMAINTAINED
+> ------------
+> hw/display/tc6393xb_template.h
+
+Intentional (see above)
+
+> include/hw/char/cadence_uart.h
+
+Another with a guard which isn't of a style your check
+detects.
+
+thanks
+-- PMM
 
