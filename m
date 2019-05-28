@@ -2,66 +2,64 @@ Return-Path: <SRS0=2W3W=T4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F263DC04AB6
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 May 2019 08:28:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C149C04AB6
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 May 2019 08:30:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C934D208C3
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 May 2019 08:28:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C934D208C3
+	by mail.kernel.org (Postfix) with ESMTPS id 6F478208C3
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 May 2019 08:30:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6F478208C3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:59056 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:59068 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hVXTJ-0001Te-3C
-	for qemu-devel@archiver.kernel.org; Tue, 28 May 2019 04:28:37 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:54371)
+	id 1hVXUf-0002DM-MB
+	for qemu-devel@archiver.kernel.org; Tue, 28 May 2019 04:30:01 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:54503)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1hVXQs-0000HL-Ob
-	for qemu-devel@nongnu.org; Tue, 28 May 2019 04:26:07 -0400
+	(envelope-from <quintela@redhat.com>) id 1hVXRJ-0000Wv-Az
+	for qemu-devel@nongnu.org; Tue, 28 May 2019 04:26:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1hVXQn-0005ik-HX
-	for qemu-devel@nongnu.org; Tue, 28 May 2019 04:26:05 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47622)
+	(envelope-from <quintela@redhat.com>) id 1hVXRH-0006DO-6g
+	for qemu-devel@nongnu.org; Tue, 28 May 2019 04:26:32 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48480)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1hVXQn-0005Zm-B5
-	for qemu-devel@nongnu.org; Tue, 28 May 2019 04:26:01 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
-	[10.5.11.22])
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1hVXRG-0006Ci-S9
+	for qemu-devel@nongnu.org; Tue, 28 May 2019 04:26:31 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 2394164394;
-	Tue, 28 May 2019 08:25:49 +0000 (UTC)
-Received: from [10.40.204.169] (ovpn-204-169.brq.redhat.com [10.40.204.169])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 917B010021B6;
-	Tue, 28 May 2019 08:25:42 +0000 (UTC)
-To: qemu-devel@nongnu.org
-References: <20190514162744.30398-1-lvivier@redhat.com>
-	<20190514162744.30398-3-lvivier@redhat.com>
-From: Laurent Vivier <lvivier@redhat.com>
-Message-ID: <c9b025e7-0825-03e3-79ab-2224d6198a35@redhat.com>
-Date: Tue, 28 May 2019 10:25:41 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
-	Thunderbird/52.8.0
+	by mx1.redhat.com (Postfix) with ESMTPS id 7980EC058CA4;
+	Tue, 28 May 2019 08:26:23 +0000 (UTC)
+Received: from redhat.com (unknown [10.36.118.21])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 528E65D9C4;
+	Tue, 28 May 2019 08:26:14 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+To: Yury Kotov <yury-kotov@yandex-team.ru>
+In-Reply-To: <20190527093350.28567-2-yury-kotov@yandex-team.ru> (Yury Kotov's
+	message of "Mon, 27 May 2019 12:33:49 +0300")
+References: <20190527093350.28567-1-yury-kotov@yandex-team.ru>
+	<20190527093350.28567-2-yury-kotov@yandex-team.ru>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
+Date: Tue, 28 May 2019 10:26:12 +0200
+Message-ID: <87y32r6l3v.fsf@trasno.org>
 MIME-Version: 1.0
-In-Reply-To: <20190514162744.30398-3-lvivier@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.39]);
-	Tue, 28 May 2019 08:25:49 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.32]);
+	Tue, 28 May 2019 08:26:30 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v5 2/4] rng-builtin: add an RNG backend
- that uses qemu_guest_getrandom()
+Subject: Re: [Qemu-devel] [PATCH 1/2] migration: Fix fd protocol for
+ incoming defer
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -73,90 +71,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "=?UTF-8?Q?Daniel_P_._Berrang=c3=a9?=" <berrange@redhat.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Kashyap Chamarthy <kchamart@redhat.com>,
-	Richard Henderson <richard.henderson@linaro.org>,
-	"Richard W . M . Jones" <rjones@redhat.com>, Amit Shah <amit@kernel.org>,
-	Markus Armbruster <armbru@redhat.com>
+Reply-To: quintela@redhat.com
+Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
+	"Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+	qemu-devel@nongnu.org, yc-core@yandex-team.ru,
+	Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 14/05/2019 18:27, Laurent Vivier wrote:
-> Add a new RNG backend using QEMU builtin getrandom function.
-> 
-> It can be created and used with something like:
-> 
->      ... -object rng-builtin,id=rng0 -device virtio-rng,rng=rng0 ...
-> 
-> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-> Reviewed-by: Markus Armbruster <armbru@redhat.com>
-> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
-> ---
->   backends/Makefile.objs |  2 +-
->   backends/rng-builtin.c | 54 ++++++++++++++++++++++++++++++++++++++++++
->   qemu-options.hx        |  7 ++++++
->   3 files changed, 62 insertions(+), 1 deletion(-)
->   create mode 100644 backends/rng-builtin.c
-> 
-> diff --git a/backends/Makefile.objs b/backends/Makefile.objs
-> index 981e8e122f2c..f0691116e86e 100644
-> --- a/backends/Makefile.objs
-> +++ b/backends/Makefile.objs
-> @@ -1,4 +1,4 @@
-> -common-obj-y += rng.o rng-egd.o
-> +common-obj-y += rng.o rng-egd.o rng-builtin.o
->   common-obj-$(CONFIG_POSIX) += rng-random.o
->   
->   common-obj-$(CONFIG_TPM) += tpm.o
-> diff --git a/backends/rng-builtin.c b/backends/rng-builtin.c
-> new file mode 100644
-> index 000000000000..6b9543a7de87
-> --- /dev/null
-> +++ b/backends/rng-builtin.c
-> @@ -0,0 +1,54 @@
-> +/*
-> + * QEMU Builtin Random Number Generator Backend
-> + *
-> + * This work is licensed under the terms of the GNU GPL, version 2 or later.
-> + * See the COPYING file in the top-level directory.
-> + */
-> +
-> +#include "qemu/osdep.h"
-> +#include "sysemu/rng.h"
-> +#include "qemu/main-loop.h"
-> +#include "qemu/guest-random.h"
-> +
-> +#define TYPE_RNG_BUILTIN "rng-builtin"
-> +#define RNG_BUILTIN(obj) OBJECT_CHECK(RngBuiltin, (obj), TYPE_RNG_BUILTIN)
-> +
-> +typedef struct RngBuiltin {
-> +    RngBackend parent;
-> +} RngBuiltin;
-> +
-> +static void rng_builtin_request_entropy(RngBackend *b, RngRequest *req)
-> +{
-> +    RngBuiltin *s = RNG_BUILTIN(b);
-> +
-> +    while (!QSIMPLEQ_EMPTY(&s->parent.requests)) {
-> +        RngRequest *req = QSIMPLEQ_FIRST(&s->parent.requests);
-> +
-> +        qemu_guest_getrandom_nofail(req->data, req->size);
-> +
-> +        req->receive_entropy(req->opaque, req->data, req->size);
-> +
-> +        rng_backend_finalize_request(&s->parent, req);
+Yury Kotov <yury-kotov@yandex-team.ru> wrote:
+> Currently, incoming migration through fd supports only command-line case:
+> E.g.
+>     fork();
+>     fd = open();
+>     exec("qemu ... -incoming fd:%d", fd);
 >
+> It's possible to use add-fd commands to pass fd for migration, but it's
+> invalid case. add-fd works with fdset but not with particular fds.
+>
+> To work with getfd in incoming defer it's enough to use monitor_fd_param
+> instead of strtol. monitor_fd_param supports both cases:
+> * fd:123
+> * fd:fd_name (added by getfd).
+>
+> Signed-off-by: Yury Kotov <yury-kotov@yandex-team.ru>
 
-There is a problem here:
+Reviewed-by: Juan Quintela <quintela@redhat.com>
 
-rng_backend_request_entropy() calls rng_builtin_request_entropy() and 
-then add the request to the queue parent.requests, so receive_entropy() 
-is called only on the next call of rng_backend_request_entropy() (and 
-parameter req is unused).
-
-Thanks,
-Laurent
-
+Not only that, it also improves error messages.
 
