@@ -2,92 +2,61 @@ Return-Path: <SRS0=2W3W=T4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1866EC04AB6
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 May 2019 13:02:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 404A8C04AB6
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 May 2019 13:03:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DA802204EC
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 May 2019 13:02:22 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="LfHcaKEQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DA802204EC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 192D6208CB
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 May 2019 13:03:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 192D6208CB
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=users.sourceforge.jp
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:34760 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:34772 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hVbkE-0000h7-8U
-	for qemu-devel@archiver.kernel.org; Tue, 28 May 2019 09:02:22 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:58338)
+	id 1hVblf-0001Yp-9d
+	for qemu-devel@archiver.kernel.org; Tue, 28 May 2019 09:03:51 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:58604)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hVbjE-0000Nl-C4
-	for qemu-devel@nongnu.org; Tue, 28 May 2019 09:01:21 -0400
+	(envelope-from <ysato@users.sourceforge.jp>) id 1hVbkF-0000nC-8t
+	for qemu-devel@nongnu.org; Tue, 28 May 2019 09:02:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hVbjC-0005cp-7i
-	for qemu-devel@nongnu.org; Tue, 28 May 2019 09:01:19 -0400
-Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:42179)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hVbj9-0005JX-OV
-	for qemu-devel@nongnu.org; Tue, 28 May 2019 09:01:17 -0400
-Received: by mail-ot1-x344.google.com with SMTP id i2so17614485otr.9
-	for <qemu-devel@nongnu.org>; Tue, 28 May 2019 06:00:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
-	:mime-version:in-reply-to:content-language:content-transfer-encoding;
-	bh=X98rAM9dKZpqtF4FFpaWwEi5Kr/8DBIX8PZIwIOIvHI=;
-	b=LfHcaKEQGhf5DhlcHNkhDFPCoq0vMCybE3323/Mzypa3cEk4yUuARY7oyYQIpQvYRA
-	O0Rl46z5307/mlq2AlmMXW9D1Be7dv+P2SWxBZkFHIm8U4cCdpTYzNPFZozZB6eSxW8C
-	w78BIB/boFYxkuvCT1/9IxkVrzwLK4jebDbGtZc0Q/12Qj9Ck9kGutfuvz0d/3/aJIr0
-	5GPwquV0CfkbVxeOM98gWmZWhj1wTd/JnbRmJYOQnMYpfVu56T5myzAZiH5rbNcxdl/1
-	81yaRKTYo/+fJzeYPLoR4k/Ewlt7HAtLdh2AlVTtkWs28eelA6H+XNqIJewbK/WYFcdV
-	/gWw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-	:date:user-agent:mime-version:in-reply-to:content-language
-	:content-transfer-encoding;
-	bh=X98rAM9dKZpqtF4FFpaWwEi5Kr/8DBIX8PZIwIOIvHI=;
-	b=Df2RhlBclZVpp6HCFNAHxGhnQChKQA3k5vkBMiPNL6f7fv1GkFjwBCkXP+dtYRk/gF
-	/xnoN314wYIoY1C65XLb3CmupIkBCkmg+hGcgwcUreJLA3evUQv/jV73ZXGRal0W3hbq
-	aKLNUvH24xJr4DIPWUd0dMtw9WEMt9XkoXbj8h49HvXgGLq1XQ/EH9jgZspkkgKq1qLq
-	TXZNcole71SZz6ndrl9m/b8u5UaVZFsHalU3ctk68fq06okTNgT4+9xRZB+fTsVYSDjE
-	X5LiUt+44rNJITUwGNNuMmCpNvXZwjTlv5pUcotYm12P9sI59S9ns48vh3hTx26uUzBm
-	dPzA==
-X-Gm-Message-State: APjAAAXEjkwsIetLuFWCgilMVkfI1lTnGr7OQ1fv97Xj7lpiLMumHJkq
-	/sImm+IPs8BX21o+rBfPxRAFWw==
-X-Google-Smtp-Source: APXvYqyTFJfC0g4w0vEQxOJR85Gibe0QwnNadQVGg9Lkb5b9568xpW4+VnY0iGtYratVZ2yVC/+qsQ==
-X-Received: by 2002:a9d:4d02:: with SMTP id n2mr1679460otf.332.1559048444776; 
-	Tue, 28 May 2019 06:00:44 -0700 (PDT)
-Received: from [172.24.12.210] (168.189-204-159.bestelclientes.com.mx.
-	[189.204.159.168])
-	by smtp.gmail.com with ESMTPSA id q3sm4437752oig.7.2019.05.28.06.00.42
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Tue, 28 May 2019 06:00:43 -0700 (PDT)
-To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
-References: <20190524093335.22241-1-david@redhat.com>
-	<20190524093335.22241-6-david@redhat.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <8e9738ff-9ca8-7a42-5737-c2ae32883aaa@linaro.org>
-Date: Tue, 28 May 2019 08:00:40 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
-MIME-Version: 1.0
-In-Reply-To: <20190524093335.22241-6-david@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+	(envelope-from <ysato@users.sourceforge.jp>) id 1hVbkA-0006Fo-BO
+	for qemu-devel@nongnu.org; Tue, 28 May 2019 09:02:23 -0400
+Received: from mail01.asahi-net.or.jp ([202.224.55.13]:47334)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <ysato@users.sourceforge.jp>) id 1hVbkA-0006EU-3x
+	for qemu-devel@nongnu.org; Tue, 28 May 2019 09:02:18 -0400
+Received: from h61-195-96-97.vps.ablenet.jp (h61-195-96-97.ablenetvps.ne.jp
+	[61.195.96.97]) (Authenticated sender: PQ4Y-STU)
+	by mail01.asahi-net.or.jp (Postfix) with ESMTPA id 940BA120E8F;
+	Tue, 28 May 2019 22:02:15 +0900 (JST)
+Received: from yo-satoh-debian.ysato.ml (v098235.dynamic.ppp.asahi-net.or.jp
+	[124.155.98.235])
+	by h61-195-96-97.vps.ablenet.jp (Postfix) with ESMTPSA id E4692240085; 
+	Tue, 28 May 2019 22:02:14 +0900 (JST)
+Date: Tue, 28 May 2019 22:02:10 +0900
+Message-ID: <8736kyraul.wl-ysato@users.sourceforge.jp>
+From: Yoshinori Sato <ysato@users.sourceforge.jp>
+To: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+In-Reply-To: <CAL1e-=htcqmvHF_sHbW+-xgfqT6FCeVE0eCr8TOfapov5VVQWA@mail.gmail.com>
+References: <20190523150803.31504-1-richard.henderson@linaro.org>
+	<87woib6h5z.wl-ysato@users.sourceforge.jp>
+	<CAL1e-=htcqmvHF_sHbW+-xgfqT6FCeVE0eCr8TOfapov5VVQWA@mail.gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+	FLIM/1.14.9 (=?ISO-8859-4?Q?Goj=F2?=) APEL/10.8 EasyPG/1.0.0 Emacs/25.1
+	(x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2607:f8b0:4864:20::344
-Subject: Re: [Qemu-devel] [PATCH v2 5/5] s390x/tcg: Implement VECTOR STRING
- RANGE COMPARE
+X-Received-From: 202.224.55.13
+Subject: Re: [Qemu-devel] [PATCH 0/6] target/rx: Improvements to disassembly
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -99,32 +68,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>,
-	Thomas Huth <thuth@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/24/19 4:33 AM, David Hildenbrand wrote:
-> Unfortunately, there is no easy way to avoid looping over all elements
-> in v2. Provide specialized variants for !cc,!rt/!cc,rt/cc,!rt/cc,rt and
-> all element types. Especially for different values of rt, the compiler
-> might be able to optimize the code a lot.
+On Tue, 28 May 2019 02:47:40 +0900,
+Aleksandar Markovic wrote:
 > 
-> Add s390_vec_write_element().
+> On May 27, 2019 5:44 PM, "Yoshinori Sato" <ysato@users.sourceforge.jp>
+> wrote:
+> >
+> > On Fri, 24 May 2019 00:07:57 +0900,
+> > Richard Henderson wrote:
+> > >
+> > > Here's a sample of the new output, taken from u-boot.bin:
+> > >
+> > > IN:
+> > > 0xfff8000a:  fb 12 00 01 00 00          mov.l   #0x00000100, r1
+> > > 0xfff80010:  fb 32 f0 13 00 00          mov.l   #0x000013f0, r3
+> > > 0xfff80016:  43 13                      sub     r1, r3
+> > > 0xfff80018:  fb 22 00 ea f9 ff          mov.l   #-398848, r2
+> > > 0xfff8001e:  7f 8f                      smovf
+> > > 0xfff80020:  ef 01                      mov.l   r0, r1
+> > > 0xfff80022:  05 1e 32 00                bsr.a   fff83240
+> > >
+> > > IN:
+> > > 0xfff83240:  72 11 5c fb                add     #-1188, r1
+> > > 0xfff83244:  75 21 f0                   and     #-16, r1
+> > > 0xfff83247:  02                         rts
+> > >
+> > > Obviously there are still a few inconsistencies in the
+> > > format strings used for the immediates, but the format
+> > > is readable and it is easy to look at the opcode to see
+> > > how our decode compares to the manual.
+> > >
+> >
+> > Hmm.
+> > The output of the immediate value should be the same as the output of
+> objdump.
+> > I do not think that it is the proper format, but I did that because
+> > it was useful for comparing the results.
+> >
 > 
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-> ---
->  target/s390x/helper.h            |  12 +++
->  target/s390x/insn-data.def       |   2 +
->  target/s390x/translate_vx.inc.c  |  59 +++++++++++++
->  target/s390x/vec.h               |  21 +++++
->  target/s390x/vec_string_helper.c | 143 +++++++++++++++++++++++++++++++
->  5 files changed, 237 insertions(+)
+> We in MIPS also use objdump output as the reference and desired output for
+> QEMU disassembler (not that we are always succeeding in doing that)
+> 
+> Inventing propriatery QEMU output for some instructions is in my view
+> counterproductive and confusing.
+> 
+> Sincerely,
+> Aleksandar
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+I also considered it. Although the opcodes of RX were licensed as GPLv3,
+they were not usable as they were.
 
+> 
+> > >
+> > > r~
+> > >
+> > >
+> > > Richard Henderson (6):
+> > >   target/rx: Disassemble rx_index_addr into a string
+> > >   target/rx: Replace operand with prt_ldmi in disassembler
+> > >   target/rx: Use prt_ldmi for XCHG_mr disassembly
+> > >   target/rx: Emit all disassembly in one prt()
+> > >   target/rx: Collect all bytes during disassembly
+> > >   target/rx: Dump bytes for each insn during disassembly
+> > >
+> > >  target/rx/disas.c | 366 +++++++++++++++++++++-------------------------
+> > >  1 file changed, 166 insertions(+), 200 deletions(-)
+> > >
+> > > --
+> > > 2.17.1
+> > >
+> >
+> > --
+> > Yosinori Sato
+> >
 
-r~
-
+-- 
+Yosinori Sato
 
