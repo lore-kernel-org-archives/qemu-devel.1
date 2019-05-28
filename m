@@ -3,63 +3,65 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AC6FAC04AB6
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 May 2019 08:27:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F263DC04AB6
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 May 2019 08:28:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 70A42208C3
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 May 2019 08:27:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 70A42208C3
+	by mail.kernel.org (Postfix) with ESMTPS id C934D208C3
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 May 2019 08:28:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C934D208C3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:59048 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:59056 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hVXSB-0000qv-NI
-	for qemu-devel@archiver.kernel.org; Tue, 28 May 2019 04:27:27 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:53633)
+	id 1hVXTJ-0001Te-3C
+	for qemu-devel@archiver.kernel.org; Tue, 28 May 2019 04:28:37 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:54371)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hVXO7-0006LB-Mi
-	for qemu-devel@nongnu.org; Tue, 28 May 2019 04:23:17 -0400
+	(envelope-from <lvivier@redhat.com>) id 1hVXQs-0000HL-Ob
+	for qemu-devel@nongnu.org; Tue, 28 May 2019 04:26:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hVXO6-0002qN-2U
-	for qemu-devel@nongnu.org; Tue, 28 May 2019 04:23:15 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58456)
+	(envelope-from <lvivier@redhat.com>) id 1hVXQn-0005ik-HX
+	for qemu-devel@nongnu.org; Tue, 28 May 2019 04:26:05 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47622)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hVXO5-0002pK-SN
-	for qemu-devel@nongnu.org; Tue, 28 May 2019 04:23:14 -0400
+	(Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1hVXQn-0005Zm-B5
+	for qemu-devel@nongnu.org; Tue, 28 May 2019 04:26:01 -0400
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
 	[10.5.11.22])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 35EA630833C0;
-	Tue, 28 May 2019 08:23:13 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-117-250.ams2.redhat.com
-	[10.36.117.250])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 611FA1001E80;
-	Tue, 28 May 2019 08:23:10 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
-	id EA4B61132BD3; Tue, 28 May 2019 10:23:08 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
+	by mx1.redhat.com (Postfix) with ESMTPS id 2394164394;
+	Tue, 28 May 2019 08:25:49 +0000 (UTC)
+Received: from [10.40.204.169] (ovpn-204-169.brq.redhat.com [10.40.204.169])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 917B010021B6;
+	Tue, 28 May 2019 08:25:42 +0000 (UTC)
 To: qemu-devel@nongnu.org
-Date: Tue, 28 May 2019 10:23:07 +0200
-Message-Id: <20190528082308.22032-4-armbru@redhat.com>
-In-Reply-To: <20190528082308.22032-1-armbru@redhat.com>
-References: <20190528082308.22032-1-armbru@redhat.com>
+References: <20190514162744.30398-1-lvivier@redhat.com>
+	<20190514162744.30398-3-lvivier@redhat.com>
+From: Laurent Vivier <lvivier@redhat.com>
+Message-ID: <c9b025e7-0825-03e3-79ab-2224d6198a35@redhat.com>
+Date: Tue, 28 May 2019 10:25:41 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+	Thunderbird/52.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <20190514162744.30398-3-lvivier@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.44]);
-	Tue, 28 May 2019 08:23:13 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+	(mx1.redhat.com [10.5.110.39]);
+	Tue, 28 May 2019 08:25:49 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH 3/4] Makefile: Rename targets for make recursion
+Subject: Re: [Qemu-devel] [PATCH v5 2/4] rng-builtin: add an RNG backend
+ that uses qemu_guest_getrandom()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -71,205 +73,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pbonzini@redhat.com, richard.henderson@linaro.org, philmd@redhat.com
+Cc: "=?UTF-8?Q?Daniel_P_._Berrang=c3=a9?=" <berrange@redhat.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Kashyap Chamarthy <kchamart@redhat.com>,
+	Richard Henderson <richard.henderson@linaro.org>,
+	"Richard W . M . Jones" <rjones@redhat.com>, Amit Shah <amit@kernel.org>,
+	Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We make a few sub-directories recursively, in particular
-$(TARGET_DIRS).
+On 14/05/2019 18:27, Laurent Vivier wrote:
+> Add a new RNG backend using QEMU builtin getrandom function.
+> 
+> It can be created and used with something like:
+> 
+>      ... -object rng-builtin,id=rng0 -device virtio-rng,rng=rng0 ...
+> 
+> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+> Reviewed-by: Markus Armbruster <armbru@redhat.com>
+> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
+> ---
+>   backends/Makefile.objs |  2 +-
+>   backends/rng-builtin.c | 54 ++++++++++++++++++++++++++++++++++++++++++
+>   qemu-options.hx        |  7 ++++++
+>   3 files changed, 62 insertions(+), 1 deletion(-)
+>   create mode 100644 backends/rng-builtin.c
+> 
+> diff --git a/backends/Makefile.objs b/backends/Makefile.objs
+> index 981e8e122f2c..f0691116e86e 100644
+> --- a/backends/Makefile.objs
+> +++ b/backends/Makefile.objs
+> @@ -1,4 +1,4 @@
+> -common-obj-y += rng.o rng-egd.o
+> +common-obj-y += rng.o rng-egd.o rng-builtin.o
+>   common-obj-$(CONFIG_POSIX) += rng-random.o
+>   
+>   common-obj-$(CONFIG_TPM) += tpm.o
+> diff --git a/backends/rng-builtin.c b/backends/rng-builtin.c
+> new file mode 100644
+> index 000000000000..6b9543a7de87
+> --- /dev/null
+> +++ b/backends/rng-builtin.c
+> @@ -0,0 +1,54 @@
+> +/*
+> + * QEMU Builtin Random Number Generator Backend
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2 or later.
+> + * See the COPYING file in the top-level directory.
+> + */
+> +
+> +#include "qemu/osdep.h"
+> +#include "sysemu/rng.h"
+> +#include "qemu/main-loop.h"
+> +#include "qemu/guest-random.h"
+> +
+> +#define TYPE_RNG_BUILTIN "rng-builtin"
+> +#define RNG_BUILTIN(obj) OBJECT_CHECK(RngBuiltin, (obj), TYPE_RNG_BUILTIN)
+> +
+> +typedef struct RngBuiltin {
+> +    RngBackend parent;
+> +} RngBuiltin;
+> +
+> +static void rng_builtin_request_entropy(RngBackend *b, RngRequest *req)
+> +{
+> +    RngBuiltin *s = RNG_BUILTIN(b);
+> +
+> +    while (!QSIMPLEQ_EMPTY(&s->parent.requests)) {
+> +        RngRequest *req = QSIMPLEQ_FIRST(&s->parent.requests);
+> +
+> +        qemu_guest_getrandom_nofail(req->data, req->size);
+> +
+> +        req->receive_entropy(req->opaque, req->data, req->size);
+> +
+> +        rng_backend_finalize_request(&s->parent, req);
+>
 
-For goal "all", we do it the nice way: "all" has a prerequisite
-subdir-T for each T in $(TARGET_DIRS), and T's recipe runs make
-recursively.  Behaves nicely with -j and -k.
+There is a problem here:
 
-For other goals such as "clean" and "install", the recipe runs make
-recursively in a for loop.  Ignores -j and -k.
+rng_backend_request_entropy() calls rng_builtin_request_entropy() and 
+then add the request to the queue parent.requests, so receive_entropy() 
+is called only on the next call of rng_backend_request_entropy() (and 
+parameter req is unused).
 
-The next commit will fix that for "clean" and "install".  This commit
-prepares the ground by renaming the targets we use for "all" to
-include the goal for the sub-make.  This will permit reusing them for
-goals other than "all".
-
-Targets subdir-T for T in $(TARGET_DIRS) run "make all" in T.  Rename
-to T/all, and declare phony.
-
-Targets romsubdir-R for R in $(ROMS) run "make" in pc-bios/R.  Default
-goal is "all" for all R.  Rename to pc-bios/R/all, and declare phony.
-
-The remainder are renamed just for consistency.
-
-Target subdir-dtc runs "make libbft/libfdt.a" in dtc.  Rename to
-dtc/all, and declare phony.
-
-Target subdir-capstone runs make $(BUILD_DIR)/capstone/$(LIBCAPSTONE)
-in $(SRC_PATH)/capstone.  Rename to capstone/all, and declare phony.
-
-Target subdir-slirp runs "make" in $(SRC_PATH)/slirp.  Default goal is
-all, which builds $(BUILD_DIR)/libslirp.a.  Rename to slirp/all, and
-declare phony.
-
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
----
- Makefile               | 30 ++++++++++++++++++------------
- configure              |  6 +++---
- tests/Makefile.include |  5 +++--
- 3 files changed, 24 insertions(+), 17 deletions(-)
-
-diff --git a/Makefile b/Makefile
-index 80c9c6416f..42930b7749 100644
---- a/Makefile
-+++ b/Makefile
-@@ -437,8 +437,8 @@ config-host.h-timestamp: config-host.mak
- qemu-options.def: $(SRC_PATH)/qemu-options.hx $(SRC_PATH)/scripts/hxtool
- 	$(call quiet-command,sh $(SRC_PATH)/scripts/hxtool -h < $< > $@,"GEN","=
-$@")
-=20
--SUBDIR_RULES=3D$(patsubst %,subdir-%, $(TARGET_DIRS))
--SOFTMMU_SUBDIR_RULES=3D$(filter %-softmmu,$(SUBDIR_RULES))
-+SUBDIR_RULES=3D$(addsuffix /all, $(TARGET_DIRS))
-+SOFTMMU_SUBDIR_RULES=3D$(filter %-softmmu/all,$(SUBDIR_RULES))
-=20
- $(SOFTMMU_SUBDIR_RULES): $(authz-obj-y)
- $(SOFTMMU_SUBDIR_RULES): $(block-obj-y)
-@@ -448,14 +448,16 @@ $(SOFTMMU_SUBDIR_RULES): $(io-obj-y)
- $(SOFTMMU_SUBDIR_RULES): config-all-devices.mak
- $(SOFTMMU_SUBDIR_RULES): $(edk2-decompressed)
-=20
--subdir-%:
--	$(call quiet-command,$(MAKE) $(SUBDIR_MAKEFLAGS) -C $* V=3D"$(V)" TARGE=
-T_DIR=3D"$*/" all,)
-+.PHONY: $(SUBDIR_RULES)
-+$(SUBDIR_RULES):
-+	$(call quiet-command,$(MAKE) $(SUBDIR_MAKEFLAGS) -C $(dir $@) V=3D"$(V)=
-" TARGET_DIR=3D"$(dir $@)" all,)
-=20
- DTC_MAKE_ARGS=3D-I$(SRC_PATH)/dtc VPATH=3D$(SRC_PATH)/dtc -C dtc V=3D"$(=
-V)" LIBFDT_srcdir=3D$(SRC_PATH)/dtc/libfdt
- DTC_CFLAGS=3D$(CFLAGS) $(QEMU_CFLAGS)
- DTC_CPPFLAGS=3D-I$(BUILD_DIR)/dtc -I$(SRC_PATH)/dtc -I$(SRC_PATH)/dtc/li=
-bfdt
-=20
--subdir-dtc: .git-submodule-status dtc/libfdt dtc/tests
-+.PHONY: dtc/all
-+dtc/all: .git-submodule-status dtc/libfdt dtc/tests
- 	$(call quiet-command,$(MAKE) $(DTC_MAKE_ARGS) CPPFLAGS=3D"$(DTC_CPPFLAG=
-S)" CFLAGS=3D"$(DTC_CFLAGS)" LDFLAGS=3D"$(LDFLAGS)" ARFLAGS=3D"$(ARFLAGS)=
-" CC=3D"$(CC)" AR=3D"$(AR)" LD=3D"$(LD)" $(SUBDIR_MAKEFLAGS) libfdt/libfd=
-t.a,)
-=20
- dtc/%: .git-submodule-status
-@@ -473,21 +475,25 @@ CAP_CFLAGS +=3D -DCAPSTONE_HAS_ARM64
- CAP_CFLAGS +=3D -DCAPSTONE_HAS_POWERPC
- CAP_CFLAGS +=3D -DCAPSTONE_HAS_X86
-=20
--subdir-capstone: .git-submodule-status
-+.PHONY: capstone/all
-+capstone/all: .git-submodule-status
- 	$(call quiet-command,$(MAKE) -C $(SRC_PATH)/capstone CAPSTONE_SHARED=3D=
-no BUILDDIR=3D"$(BUILD_DIR)/capstone" CC=3D"$(CC)" AR=3D"$(AR)" LD=3D"$(L=
-D)" RANLIB=3D"$(RANLIB)" CFLAGS=3D"$(CAP_CFLAGS)" $(SUBDIR_MAKEFLAGS) $(B=
-UILD_DIR)/capstone/$(LIBCAPSTONE))
-=20
--subdir-slirp: .git-submodule-status
-+.PHONY: slirp/all
-+slirp/all: .git-submodule-status
- 	$(call quiet-command,$(MAKE) -C $(SRC_PATH)/slirp BUILD_DIR=3D"$(BUILD_=
-DIR)/slirp" CC=3D"$(CC)" AR=3D"$(AR)" LD=3D"$(LD)" RANLIB=3D"$(RANLIB)" C=
-FLAGS=3D"$(QEMU_CFLAGS) $(CFLAGS)" LDFLAGS=3D"$(LDFLAGS)")
-=20
- $(SUBDIR_RULES): libqemuutil.a $(common-obj-y) \
- 	$(qom-obj-y) $(crypto-user-obj-$(CONFIG_USER_ONLY))
-=20
--ROMSUBDIR_RULES=3D$(patsubst %,romsubdir-%, $(ROMS))
-+ROM_DIRS =3D $(addprefix pc-bios/, $(ROMS))
-+ROMSUBDIR_RULES=3D$(addsuffix /all, $(ROM_DIRS))
- # Only keep -O and -g cflags
--romsubdir-%:
--	$(call quiet-command,$(MAKE) $(SUBDIR_MAKEFLAGS) -C pc-bios/$* V=3D"$(V=
-)" TARGET_DIR=3D"$*/" CFLAGS=3D"$(filter -O% -g%,$(CFLAGS))",)
-+.PHONY: $(ROMSUBDIR_RULES)
-+$(ROMSUBDIR_RULES):
-+	$(call quiet-command,$(MAKE) $(SUBDIR_MAKEFLAGS) -C $(dir $@) V=3D"$(V)=
-" TARGET_DIR=3D"$(dir $@)" CFLAGS=3D"$(filter -O% -g%,$(CFLAGS))",)
-=20
--ALL_SUBDIRS=3D$(TARGET_DIRS) $(patsubst %,pc-bios/%, $(ROMS))
-+ALL_SUBDIRS=3D$(TARGET_DIRS) $(ROM_DIRS)
-=20
- recurse-all: $(SUBDIR_RULES) $(ROMSUBDIR_RULES)
-=20
-@@ -1098,7 +1104,7 @@ endif
- 	@$(if $(TARGET_DIRS), \
- 		echo 'Architecture specific targets:'; \
- 		$(foreach t, $(TARGET_DIRS), \
--		printf "  %-30s - Build for %s\\n" $(patsubst %,subdir-%,$(t)) $(t);) =
-\
-+		printf "  %-30s - Build for %s\\n" $(t)/all $(t);) \
- 		echo '')
- 	@echo  'Cleaning targets:'
- 	@echo  '  clean           - Remove most generated files but keep the co=
-nfig'
-diff --git a/configure b/configure
-index 528b9ff705..effd943a05 100755
---- a/configure
-+++ b/configure
-@@ -6597,7 +6597,7 @@ if test "$slirp" !=3D "no"; then
-   echo "SLIRP_LIBS=3D$slirp_libs" >> $config_host_mak
- fi
- if [ "$slirp" =3D "git" -o "$slirp" =3D "internal" ]; then
--    echo "config-host.h: subdir-slirp" >> $config_host_mak
-+    echo "config-host.h: slirp/all" >> $config_host_mak
- fi
- if test "$vde" =3D "yes" ; then
-   echo "CONFIG_VDE=3Dy" >> $config_host_mak
-@@ -7865,10 +7865,10 @@ if test -n "$enabled_cross_compilers"; then
- fi
-=20
- if [ "$fdt" =3D "git" ]; then
--  echo "config-host.h: subdir-dtc" >> $config_host_mak
-+  echo "config-host.h: dtc/all" >> $config_host_mak
- fi
- if [ "$capstone" =3D "git" -o "$capstone" =3D "internal" ]; then
--  echo "config-host.h: subdir-capstone" >> $config_host_mak
-+  echo "config-host.h: capstone/all" >> $config_host_mak
- fi
- if test -n "$LIBCAPSTONE"; then
-   echo "LIBCAPSTONE=3D$LIBCAPSTONE" >> $config_host_mak
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 1865f6b322..1a3f17faa9 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -1,3 +1,4 @@
-+# -*- Mode: makefile -*-
-=20
- .PHONY: check-help
- check-help:
-@@ -880,7 +881,7 @@ define do_test_tap
- endef
-=20
- .PHONY: $(patsubst %, check-qtest-%, $(QTEST_TARGETS))
--$(patsubst %, check-qtest-%, $(QTEST_TARGETS)): check-qtest-%: subdir-%-=
-softmmu $(check-qtest-y)
-+$(patsubst %, check-qtest-%, $(QTEST_TARGETS)): check-qtest-%: %-softmmu=
-/all $(check-qtest-y)
- 	$(call do_test_human,$(check-qtest-$*-y) $(check-qtest-generic-y), \
- 	  QTEST_QEMU_BINARY=3D$*-softmmu/qemu-system-$* \
- 	  QTEST_QEMU_IMG=3Dqemu-img$(EXESUF))
-@@ -893,7 +894,7 @@ check-speed: $(check-speed-y)
-=20
- # gtester tests with TAP output
-=20
--$(patsubst %, check-report-qtest-%.tap, $(QTEST_TARGETS)): check-report-=
-qtest-%.tap: subdir-%-softmmu $(check-qtest-y)
-+$(patsubst %, check-report-qtest-%.tap, $(QTEST_TARGETS)): check-report-=
-qtest-%.tap: %-softmmu/all $(check-qtest-y)
- 	$(call do_test_tap, $(check-qtest-$*-y) $(check-qtest-generic-y), \
- 	  QTEST_QEMU_BINARY=3D$*-softmmu/qemu-system-$* \
- 	  QTEST_QEMU_IMG=3Dqemu-img$(EXESUF))
---=20
-2.17.2
+Thanks,
+Laurent
 
 
