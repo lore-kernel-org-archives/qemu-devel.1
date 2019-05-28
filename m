@@ -6,107 +6,89 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 69A1FC04AB6
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 May 2019 17:40:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AAECAC04AB6
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 May 2019 17:40:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 368562173B
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 May 2019 17:40:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 368562173B
+	by mail.kernel.org (Postfix) with ESMTPS id 79CFD2173B
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 May 2019 17:40:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 79CFD2173B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:40236 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:40271 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hVg54-0002JT-5f
-	for qemu-devel@archiver.kernel.org; Tue, 28 May 2019 13:40:10 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:41155)
+	id 1hVg5T-0002bU-P8
+	for qemu-devel@archiver.kernel.org; Tue, 28 May 2019 13:40:35 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:42898)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hVfuM-0002LA-Kg
-	for qemu-devel@nongnu.org; Tue, 28 May 2019 13:29:07 -0400
+	(envelope-from <mreitz@redhat.com>) id 1hVfzV-0006TP-FG
+	for qemu-devel@nongnu.org; Tue, 28 May 2019 13:34:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hVfuI-0001g7-TZ
-	for qemu-devel@nongnu.org; Tue, 28 May 2019 13:29:04 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51156)
+	(envelope-from <mreitz@redhat.com>) id 1hVfzU-0007cJ-BQ
+	for qemu-devel@nongnu.org; Tue, 28 May 2019 13:34:25 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51856)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1hVfuD-0001Yc-Cq
-	for qemu-devel@nongnu.org; Tue, 28 May 2019 13:28:59 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
-	[10.5.11.22])
+	(Exim 4.71) (envelope-from <mreitz@redhat.com>)
+	id 1hVfzP-0007RD-J9; Tue, 28 May 2019 13:34:19 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 00094300183A;
-	Tue, 28 May 2019 17:28:52 +0000 (UTC)
-Received: from [10.36.116.177] (ovpn-116-177.ams2.redhat.com [10.36.116.177])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 0FFEF1017E3C;
-	Tue, 28 May 2019 17:28:51 +0000 (UTC)
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-References: <20190522222821.23850-1-richard.henderson@linaro.org>
-	<20190522222821.23850-17-richard.henderson@linaro.org>
-From: David Hildenbrand <david@redhat.com>
+	by mx1.redhat.com (Postfix) with ESMTPS id A41C8C06C9DA;
+	Tue, 28 May 2019 17:34:04 +0000 (UTC)
+Received: from dresden.str.redhat.com (unknown [10.40.205.223])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 658C25D6A9;
+	Tue, 28 May 2019 17:33:53 +0000 (UTC)
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+	qemu-devel@nongnu.org, qemu-block@nongnu.org
+References: <20190506153429.52737-1-vsementsov@virtuozzo.com>
+	<20190506153429.52737-4-vsementsov@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
 Openpgp: preference=signencrypt
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
-	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
-	SE+xAvmumFBY
-Organization: Red Hat GmbH
-Message-ID: <a8a1fd49-c368-ed38-4d56-8743db5dd5b5@redhat.com>
-Date: Tue, 28 May 2019 19:28:51 +0200
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+	mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+	/PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+	U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+	mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+	awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+	AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+	CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+	B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+	2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+	AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+	8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+	4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+	BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+	xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+	W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+	DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+	64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+	ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+	sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+	alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+	/ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+	bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+	R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <ee950bac-f0d8-3bc9-f5ed-deaf4d36777b@redhat.com>
+Date: Tue, 28 May 2019 19:33:51 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190522222821.23850-17-richard.henderson@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+In-Reply-To: <20190506153429.52737-4-vsementsov@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="GjOZfBmOnO3EY9jB8Wf8vbzapoT7Ccq3K"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.40]);
-	Tue, 28 May 2019 17:28:53 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.32]);
+	Tue, 28 May 2019 17:34:15 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PULL 16/16] tcg/i386: Use MOVDQA for
- TCG_TYPE_V128 load/store
+X-Content-Filtered-By: Mailman/MimeDel 2.1.21
+Subject: Re: [Qemu-devel] [PATCH v6 3/3] block/stream: introduce a bottom
+ node
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -118,94 +100,146 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org
+Cc: fam@euphon.net, kwolf@redhat.com, berto@igalia.com, wencongyang2@huawei.com,
+	xiechanglong.d@gmail.com, stefanha@redhat.com, den@openvz.org,
+	andrey.shinkevich@virtuozzo.com, jsnow@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 23.05.19 00:28, Richard Henderson wrote:
-> This instruction raises #GP, aka SIGSEGV, if the effective address
-> is not aligned to 16-bytes.
-> 
-> We have assertions in tcg-op-gvec.c that the offset from ENV is
-> aligned, for vector types <= V128.  But the offset itself does not
-> validate that the final pointer is aligned -- one must also remember
-> to use the QEMU_ALIGNED() attribute on the vector member within ENV.
-> 
-> PowerPC Altivec has vector load/store instructions that silently
-> discard the low 4 bits of the address, making alignment mistakes
-> difficult to discover.  Aid that by making the most popular host
-> visibly signal the error.
-> 
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--GjOZfBmOnO3EY9jB8Wf8vbzapoT7Ccq3K
+From: Max Reitz <mreitz@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: xiechanglong.d@gmail.com, wencongyang2@huawei.com, fam@euphon.net,
+ stefanha@redhat.com, kwolf@redhat.com, jsnow@redhat.com,
+ andrey.shinkevich@virtuozzo.com, den@openvz.org, berto@igalia.com
+Message-ID: <ee950bac-f0d8-3bc9-f5ed-deaf4d36777b@redhat.com>
+Subject: Re: [PATCH v6 3/3] block/stream: introduce a bottom node
+References: <20190506153429.52737-1-vsementsov@virtuozzo.com>
+ <20190506153429.52737-4-vsementsov@virtuozzo.com>
+In-Reply-To: <20190506153429.52737-4-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 06.05.19 17:34, Vladimir Sementsov-Ogievskiy wrote:
+> From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+>=20
+> The bottom node is the intermediate block device that has the base as i=
+ts
+> backing image. It is used instead of the base node while a block stream=
+
+> job is running to avoid dependency on the base that may change due to t=
+he
+> parallel jobs. The change may take place due to a filter node as well t=
+hat
+> is inserted between the base and the intermediate bottom node. It occur=
+s
+> when the base node is the top one for another commit or stream job.
+> After the introduction of the bottom node, don't freeze its backing chi=
+ld,
+> that's the base, anymore.
+>=20
+> Suggested-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> Reviewed-by: Alberto Garcia <berto@igalia.com>
 > ---
->  tcg/i386/tcg-target.inc.c | 24 ++++++++++++++++++++++--
->  1 file changed, 22 insertions(+), 2 deletions(-)
-> 
-> diff --git a/tcg/i386/tcg-target.inc.c b/tcg/i386/tcg-target.inc.c
-> index 6ec5e60448..c0443da4af 100644
-> --- a/tcg/i386/tcg-target.inc.c
-> +++ b/tcg/i386/tcg-target.inc.c
-> @@ -1082,14 +1082,24 @@ static void tcg_out_ld(TCGContext *s, TCGType type, TCGReg ret,
->          }
->          /* FALLTHRU */
->      case TCG_TYPE_V64:
-> +        /* There is no instruction that can validate 8-byte alignment.  */
->          tcg_debug_assert(ret >= 16);
->          tcg_out_vex_modrm_offset(s, OPC_MOVQ_VqWq, ret, 0, arg1, arg2);
->          break;
->      case TCG_TYPE_V128:
-> +        /*
-> +         * The gvec infrastructure is asserts that v128 vector loads
-> +         * and stores use a 16-byte aligned offset.  Validate that the
-> +         * final pointer is aligned by using an insn that will SIGSEGV.
-> +         */
->          tcg_debug_assert(ret >= 16);
-> -        tcg_out_vex_modrm_offset(s, OPC_MOVDQU_VxWx, ret, 0, arg1, arg2);
-> +        tcg_out_vex_modrm_offset(s, OPC_MOVDQA_VxWx, ret, 0, arg1, arg2);
->          break;
->      case TCG_TYPE_V256:
-> +        /*
-> +         * The gvec infrastructure only requires 16-byte alignment,
-> +         * so here we must use an unaligned load.
-> +         */
->          tcg_debug_assert(ret >= 16);
->          tcg_out_vex_modrm_offset(s, OPC_MOVDQU_VxWx | P_VEXL,
->                                   ret, 0, arg1, arg2);
-> @@ -1117,14 +1127,24 @@ static void tcg_out_st(TCGContext *s, TCGType type, TCGReg arg,
->          }
->          /* FALLTHRU */
->      case TCG_TYPE_V64:
-> +        /* There is no instruction that can validate 8-byte alignment.  */
->          tcg_debug_assert(arg >= 16);
->          tcg_out_vex_modrm_offset(s, OPC_MOVQ_WqVq, arg, 0, arg1, arg2);
->          break;
->      case TCG_TYPE_V128:
-> +        /*
-> +         * The gvec infrastructure is asserts that v128 vector loads
-> +         * and stores use a 16-byte aligned offset.  Validate that the
-> +         * final pointer is aligned by using an insn that will SIGSEGV.
-> +         */
->          tcg_debug_assert(arg >= 16);
-> -        tcg_out_vex_modrm_offset(s, OPC_MOVDQU_WxVx, arg, 0, arg1, arg2);
-> +        tcg_out_vex_modrm_offset(s, OPC_MOVDQA_WxVx, arg, 0, arg1, arg2);
->          break;
->      case TCG_TYPE_V256:
-> +        /*
-> +         * The gvec infrastructure only requires 16-byte alignment,
-> +         * so here we must use an unaligned store.
-> +         */
->          tcg_debug_assert(arg >= 16);
->          tcg_out_vex_modrm_offset(s, OPC_MOVDQU_WxVx | P_VEXL,
->                                   arg, 0, arg1, arg2);
-> 
+>  block/stream.c         | 49 +++++++++++++++++++++---------------------=
 
-This is the problematic patch. Haven't looked into the details yet, so I
-can't tell what's wrong. Maybe really an alignemnt issue?
+>  tests/qemu-iotests/245 |  4 ++--
+>  2 files changed, 27 insertions(+), 26 deletions(-)
+>=20
+> diff --git a/block/stream.c b/block/stream.c
+> index 65b13b27e0..fc97c89f81 100644
+> --- a/block/stream.c
+> +++ b/block/stream.c
 
--- 
+[...]
 
-Thanks,
+> @@ -248,26 +250,25 @@ void stream_start(const char *job_id, BlockDriver=
+State *bs,
+>       * already have our own plans. Also don't allow resize as the imag=
+e size is
+>       * queried only at the job start and then cached. */
+>      s =3D block_job_create(job_id, &stream_job_driver, NULL, bs,
+> -                         BLK_PERM_CONSISTENT_READ | BLK_PERM_WRITE_UNC=
+HANGED |
+> -                         BLK_PERM_GRAPH_MOD,
+> -                         BLK_PERM_CONSISTENT_READ | BLK_PERM_WRITE_UNC=
+HANGED |
+> -                         BLK_PERM_WRITE,
+> +                         basic_flags | BLK_PERM_GRAPH_MOD,
+> +                         basic_flags | BLK_PERM_WRITE,
+>                           speed, creation_flags, NULL, NULL, errp);
+>      if (!s) {
+>          goto fail;
+>      }
+> =20
+> -    /* Block all intermediate nodes between bs and base, because they =
+will
+> -     * disappear from the chain after this operation. The streaming jo=
+b reads
+> -     * every block only once, assuming that it doesn't change, so bloc=
+k writes
+> -     * and resizes. */
+> -    for (iter =3D backing_bs(bs); iter && iter !=3D base; iter =3D bac=
+king_bs(iter)) {
+> -        block_job_add_bdrv(&s->common, "intermediate node", iter, 0,
+> -                           BLK_PERM_CONSISTENT_READ | BLK_PERM_WRITE_U=
+NCHANGED,
+> -                           &error_abort);
+> +    /*
+> +     * Block all intermediate nodes between bs and bottom (inclusive),=
+ because
+> +     * they will disappear from the chain after this operation. The st=
+reaming
+> +     * job reads every block only once, assuming that it doesn't chang=
+e, so
+> +     * forbid writes and resizes.
+> +     */
+> +    for (iter =3D bs; iter !=3D bottom; iter =3D backing_bs(iter)) {
+> +        block_job_add_bdrv(&s->common, "intermediate node", backing_bs=
+(iter),
+> +                           0, basic_flags, &error_abort);
 
-David / dhildenb
+I don=E2=80=99t understand this change.  Isn=E2=80=99t it doing exactly t=
+he same as before?
+
+(If so, I just find it harder to read because every iteration isn=E2=80=99=
+t
+about @iter but backing_bs(iter).)
+
+The rest looks good to me.
+
+Max
+
+>      }
+> =20
+> -    s->base =3D base;
+> +    s->bottom =3D bottom;
+>      s->backing_file_str =3D g_strdup(backing_file_str);
+>      s->bs_read_only =3D bs_read_only;
+>      s->chain_frozen =3D true;
+
+
+--GjOZfBmOnO3EY9jB8Wf8vbzapoT7Ccq3K
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlztcP8ACgkQ9AfbAGHV
+z0Cc5Qf/UeKAL+BPL+3InGQJWi7B1w9th1IdND1pgmmekuM21XMh+5YtE+av3sW3
+ovN/S2y718bXcJKCs20e/vSe7bPw20dHodsHIfNnB7JFRC8qU5l2gbbrff2l4V6e
+QSiMFKBrImb0YEfuDK3gLp57WFLfVPxxQKOsfk19IFgwiCkXbGu4nfGrd3bv6CGp
+Dxtk/X0V/panAXqlp1DTbV8CoQnw5ckCOGgrzoQzsI24dQ8cLKZt3dGJ9PyJJ2Ho
++npSn00m9Vaw4SGuMdadjMoDytleSfgvx9oGHBJuC+arnarvdOonmUubnIhozsOn
+9tfQfznQ6z5spbOYZswTEyTocsTAIA==
+=zRMW
+-----END PGP SIGNATURE-----
+
+--GjOZfBmOnO3EY9jB8Wf8vbzapoT7Ccq3K--
 
