@@ -6,61 +6,61 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C369C04AB6
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 May 2019 08:24:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EFBE0C04E84
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 May 2019 08:24:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 23B3D208C3
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 May 2019 08:24:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 23B3D208C3
+	by mail.kernel.org (Postfix) with ESMTPS id CB5E9208C3
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 May 2019 08:24:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CB5E9208C3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:58997 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:59000 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hVXPY-0007Ay-BE
-	for qemu-devel@archiver.kernel.org; Tue, 28 May 2019 04:24:44 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:53602)
+	id 1hVXPZ-0007B1-UV
+	for qemu-devel@archiver.kernel.org; Tue, 28 May 2019 04:24:45 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:53597)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hVXO6-0006Kw-I0
+	(envelope-from <armbru@redhat.com>) id 1hVXO6-0006Ku-Eh
 	for qemu-devel@nongnu.org; Tue, 28 May 2019 04:23:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hVXO5-0002pr-J0
+	(envelope-from <armbru@redhat.com>) id 1hVXO5-0002pd-Hx
 	for qemu-devel@nongnu.org; Tue, 28 May 2019 04:23:14 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58288)
+Received: from mx1.redhat.com ([209.132.183.28]:58448)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hVXO5-0002p0-ET
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hVXO5-0002ou-Cq
 	for qemu-devel@nongnu.org; Tue, 28 May 2019 04:23:13 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id BF2B83179150;
+	by mx1.redhat.com (Postfix) with ESMTPS id AED1930833C1;
 	Tue, 28 May 2019 08:23:12 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-117-250.ams2.redhat.com
 	[10.36.117.250])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 56FFE5C8B4;
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 5A24E6C35B;
 	Tue, 28 May 2019 08:23:10 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
-	id DEA0911384AA; Tue, 28 May 2019 10:23:08 +0200 (CEST)
+	id E288D1132BB6; Tue, 28 May 2019 10:23:08 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Tue, 28 May 2019 10:23:05 +0200
-Message-Id: <20190528082308.22032-2-armbru@redhat.com>
+Date: Tue, 28 May 2019 10:23:06 +0200
+Message-Id: <20190528082308.22032-3-armbru@redhat.com>
 In-Reply-To: <20190528082308.22032-1-armbru@redhat.com>
 References: <20190528082308.22032-1-armbru@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.41]);
+	(mx1.redhat.com [10.5.110.44]);
 	Tue, 28 May 2019 08:23:12 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH 1/4] Makefile: Remove code to smooth transition
- to config.status
+Subject: [Qemu-devel] [PATCH 2/4] Makefile: Drop bogus cleaning of
+ $(ALL_SUBDIRS)/qemu-options.def
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -77,41 +77,31 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-When commit bdf523e6923 made configure generate config.status, it
-added a fallback to Makefile to smooth the transition, with a TODO
-"code can be removed after QEMU 1.7."  It's been more than five years.
-Remove it.
+When commit df2943ba3c7 moved "rm -f qemu-options.def" from distclean
+to clean, it also added "rm -f $$d/qemu-options.def" to the for d in
+$(ALL_SUBDIRS) loop.  That file doesn't exist.  Remove the mistaken
+rm.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- Makefile | 9 +--------
- 1 file changed, 1 insertion(+), 8 deletions(-)
+ Makefile | 1 -
+ 1 file changed, 1 deletion(-)
 
 diff --git a/Makefile b/Makefile
-index e02b88bcb1..940594cc7c 100644
+index 940594cc7c..80c9c6416f 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -69,14 +69,7 @@ CONFIG_ALL=3Dy
+@@ -658,7 +658,6 @@ clean:
+ 	rm -rf qga/qapi-generated
+ 	for d in $(ALL_SUBDIRS); do \
+ 	if test -d $$d; then $(MAKE) -C $$d $@ || exit 1; fi; \
+-	rm -f $$d/qemu-options.def; \
+         done
+ 	rm -f config-all-devices.mak
 =20
- config-host.mak: $(SRC_PATH)/configure $(SRC_PATH)/pc-bios $(SRC_PATH)/V=
-ERSION
- 	@echo $@ is out-of-date, running configure
--	@# TODO: The next lines include code which supports a smooth
--	@# transition from old configurations without config.status.
--	@# This code can be removed after QEMU 1.7.
--	@if test -x config.status; then \
--	    ./config.status; \
--        else \
--	    sed -n "/.*Configured with/s/[^:]*: //p" $@ | sh; \
--	fi
-+	@./config.status
- else
- config-host.mak:
- ifneq ($(filter-out $(UNCHECKED_GOALS),$(MAKECMDGOALS)),$(if $(MAKECMDGO=
-ALS),,fail))
 --=20
 2.17.2
 
