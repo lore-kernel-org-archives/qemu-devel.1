@@ -2,57 +2,65 @@ Return-Path: <SRS0=2W3W=T4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E1AEDC04AB6
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 May 2019 06:19:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B72C9C04AB6
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 May 2019 06:40:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A2FDF206C1
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 May 2019 06:19:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A2FDF206C1
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=birkelund.eu
+	by mail.kernel.org (Postfix) with ESMTPS id 6EC6A2070D
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 May 2019 06:40:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6EC6A2070D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:57835 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:58146 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hVVSc-0006GM-Vo
-	for qemu-devel@archiver.kernel.org; Tue, 28 May 2019 02:19:47 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:59321)
+	id 1hVVmp-0002co-9N
+	for qemu-devel@archiver.kernel.org; Tue, 28 May 2019 02:40:39 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:34663)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <klaus@birkelund.eu>) id 1hVVRf-0005uB-DY
-	for qemu-devel@nongnu.org; Tue, 28 May 2019 02:18:48 -0400
+	(envelope-from <groug@kaod.org>) id 1hVVlb-0001wU-M1
+	for qemu-devel@nongnu.org; Tue, 28 May 2019 02:39:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <klaus@birkelund.eu>) id 1hVVRd-0000Iw-Ts
-	for qemu-devel@nongnu.org; Tue, 28 May 2019 02:18:47 -0400
-Received: from charlie.dont.surf ([128.199.63.193]:44018)
+	(envelope-from <groug@kaod.org>) id 1hVVla-0000Nz-D8
+	for qemu-devel@nongnu.org; Tue, 28 May 2019 02:39:23 -0400
+Received: from 5.mo5.mail-out.ovh.net ([87.98.173.103]:35228)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <klaus@birkelund.eu>)
-	id 1hVVRZ-0000GL-FE; Tue, 28 May 2019 02:18:42 -0400
-Received: from apples.localdomain (soho-cph.cust-cnex.dsd101.net
-	[194.62.216.132])
-	by charlie.dont.surf (Postfix) with ESMTPSA id C06CBBFD16;
-	Tue, 28 May 2019 06:18:37 +0000 (UTC)
-Date: Tue, 28 May 2019 08:18:36 +0200
-From: Klaus Birkelund <klaus@birkelund.eu>
-To: Kenneth Heitke <kenneth.heitke@intel.com>
-Message-ID: <20190528061836.GB32236@apples.localdomain>
-Mail-Followup-To: Kenneth Heitke <kenneth.heitke@intel.com>,
-	kwolf@redhat.com, mreitz@redhat.com, keith.busch@intel.com,
-	qemu-block@nongnu.org, philmd@redhat.com, qemu-devel@nongnu.org
-References: <20190520174030.1647-1-kenneth.heitke@intel.com>
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1hVVla-0000JQ-5v
+	for qemu-devel@nongnu.org; Tue, 28 May 2019 02:39:22 -0400
+Received: from player759.ha.ovh.net (unknown [10.108.42.215])
+	by mo5.mail-out.ovh.net (Postfix) with ESMTP id 0827623A9F6
+	for <qemu-devel@nongnu.org>; Tue, 28 May 2019 08:39:18 +0200 (CEST)
+Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
+	[82.253.208.248]) (Authenticated sender: groug@kaod.org)
+	by player759.ha.ovh.net (Postfix) with ESMTPSA id 30D106432C2F;
+	Tue, 28 May 2019 06:39:10 +0000 (UTC)
+Date: Tue, 28 May 2019 08:39:09 +0200
+From: Greg Kurz <groug@kaod.org>
+To: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20190528083909.65ba8be4@bahia.lan>
+In-Reply-To: <20190528000854.GA11618@umbus.fritz.box>
+References: <20190520231008.20140-1-mst@redhat.com>
+	<20190320112646.3712-2-xieyongji@baidu.com>
+	<20190524121909.277ae31e@bahia.lan>
+	<20190528000854.GA11618@umbus.fritz.box>
+X-Mailer: Claws Mail 3.16.0 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190520174030.1647-1-kenneth.heitke@intel.com>
-User-Agent: Mutt/1.11.4 (2019-03-13)
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	boundary="Sig_/fjJc22yaohZP.VbC0INouSQ";
+	protocol="application/pgp-signature"
+X-Ovh-Tracer-Id: 15534322489956342246
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduuddruddvgedguddufecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 128.199.63.193
-Subject: Re: [Qemu-devel] [PATCH v2] nvme: add Get/Set Feature Timestamp
- support
+X-Received-From: 87.98.173.103
+Subject: Re: [Qemu-devel] [PULL v2 04/36] virtio: Introduce started flag to
+ VirtioDevice
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -64,248 +72,205 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org,
-	mreitz@redhat.com, keith.busch@intel.com, philmd@redhat.com
+Cc: Peter Maydell <peter.maydell@linaro.org>, Zhang Yu <zhangyu31@baidu.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
+	"Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+	Xie Yongji <xieyongji@baidu.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, May 20, 2019 at 11:40:30AM -0600, Kenneth Heitke wrote:
-> Signed-off-by: Kenneth Heitke <kenneth.heitke@intel.com>
-> ---
->  hw/block/nvme.c       | 106 +++++++++++++++++++++++++++++++++++++++++-
->  hw/block/nvme.h       |   3 ++
->  hw/block/trace-events |   2 +
->  include/block/nvme.h  |   2 +
->  4 files changed, 111 insertions(+), 2 deletions(-)
-> 
-> diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-> index 7caf92532a..67372e0cd1 100644
-> --- a/hw/block/nvme.c
-> +++ b/hw/block/nvme.c
-> @@ -219,6 +219,30 @@ static uint16_t nvme_map_prp(QEMUSGList *qsg, QEMUIOVector *iov, uint64_t prp1,
->      return NVME_INVALID_FIELD | NVME_DNR;
->  }
->  
-> +static uint16_t nvme_dma_write_prp(NvmeCtrl *n, uint8_t *ptr, uint32_t len,
-> +                                   uint64_t prp1, uint64_t prp2)
-> +{
-> +    QEMUSGList qsg;
-> +    QEMUIOVector iov;
-> +    uint16_t status = NVME_SUCCESS;
-> +
-> +    if (nvme_map_prp(&qsg, &iov, prp1, prp2, len, n)) {
-> +        return NVME_INVALID_FIELD | NVME_DNR;
-> +    }
-> +    if (qsg.nsg > 0) {
-> +        if (dma_buf_write(ptr, len, &qsg)) {
-> +            status = NVME_INVALID_FIELD | NVME_DNR;
-> +        }
-> +        qemu_sglist_destroy(&qsg);
-> +    } else {
-> +        if (qemu_iovec_to_buf(&iov, 0, ptr, len) != len) {
-> +            status = NVME_INVALID_FIELD | NVME_DNR;
-> +        }
-> +        qemu_iovec_destroy(&iov);
-> +    }
-> +    return status;
-> +}
-> +
->  static uint16_t nvme_dma_read_prp(NvmeCtrl *n, uint8_t *ptr, uint32_t len,
->      uint64_t prp1, uint64_t prp2)
->  {
-> @@ -678,7 +702,6 @@ static uint16_t nvme_identify_nslist(NvmeCtrl *n, NvmeIdentify *c)
->      return ret;
->  }
->  
-> -
->  static uint16_t nvme_identify(NvmeCtrl *n, NvmeCmd *cmd)
->  {
->      NvmeIdentify *c = (NvmeIdentify *)cmd;
-> @@ -696,6 +719,57 @@ static uint16_t nvme_identify(NvmeCtrl *n, NvmeCmd *cmd)
->      }
->  }
->  
-> +static inline void nvme_set_timestamp(NvmeCtrl *n, uint64_t ts)
-> +{
-> +    trace_nvme_setfeat_timestamp(ts);
-> +
-> +    n->host_timestamp = le64_to_cpu(ts);
-> +    n->timestamp_set_qemu_clock_ms = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
-> +}
-> +
-> +static inline uint64_t nvme_get_timestamp(const NvmeCtrl *n)
-> +{
-> +    uint64_t current_time = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
-> +    uint64_t elapsed_time = current_time - n->timestamp_set_qemu_clock_ms;
-> +
-> +    union nvme_timestamp {
-> +        struct {
-> +            uint64_t timestamp:48;
-> +            uint64_t sync:1;
-> +            uint64_t origin:3;
-> +            uint64_t rsvd1:12;
-> +        };
-> +        uint64_t all;
-> +    };
-> +
-> +    union nvme_timestamp ts;
-> +    ts.all = 0;
-> +
-> +    /*
-> +     * If the sum of the Timestamp value set by the host and the elapsed
-> +     * time exceeds 2^48, the value returned should be reduced modulo 2^48.
-> +     */
-> +    ts.timestamp = (n->host_timestamp + elapsed_time) & 0xffffffffffff;
-> +
-> +    /* If the host timestamp is non-zero, set the timestamp origin */
-> +    ts.origin = n->host_timestamp ? 0x01 : 0x00;
-> +
-> +    trace_nvme_getfeat_timestamp(ts.all);
-> +
-> +    return cpu_to_le64(ts.all);
-> +}
-> +
-> +static uint16_t nvme_get_feature_timestamp(NvmeCtrl *n, NvmeCmd *cmd)
-> +{
-> +    uint64_t prp1 = le64_to_cpu(cmd->prp1);
-> +    uint64_t prp2 = le64_to_cpu(cmd->prp2);
-> +
-> +    uint64_t timestamp = nvme_get_timestamp(n);
-> +
-> +    return nvme_dma_read_prp(n, (uint8_t *)&timestamp,
-> +                                 sizeof(timestamp), prp1, prp2);
-> +}
-> +
->  static uint16_t nvme_get_feature(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
->  {
->      uint32_t dw10 = le32_to_cpu(cmd->cdw10);
-> @@ -710,6 +784,9 @@ static uint16_t nvme_get_feature(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
->          result = cpu_to_le32((n->num_queues - 2) | ((n->num_queues - 2) << 16));
->          trace_nvme_getfeat_numq(result);
->          break;
-> +    case NVME_TIMESTAMP:
-> +        return nvme_get_feature_timestamp(n, cmd);
-> +        break;
->      default:
->          trace_nvme_err_invalid_getfeat(dw10);
->          return NVME_INVALID_FIELD | NVME_DNR;
-> @@ -719,6 +796,24 @@ static uint16_t nvme_get_feature(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
->      return NVME_SUCCESS;
->  }
->  
-> +static uint16_t nvme_set_feature_timestamp(NvmeCtrl *n, NvmeCmd *cmd)
-> +{
-> +    uint16_t ret;
-> +    uint64_t timestamp;
-> +    uint64_t prp1 = le64_to_cpu(cmd->prp1);
-> +    uint64_t prp2 = le64_to_cpu(cmd->prp2);
-> +
-> +    ret = nvme_dma_write_prp(n, (uint8_t *)&timestamp,
-> +                                sizeof(timestamp), prp1, prp2);
-> +    if (ret != NVME_SUCCESS) {
-> +        return ret;
-> +    }
-> +
-> +    nvme_set_timestamp(n, timestamp);
-> +
-> +    return NVME_SUCCESS;
-> +}
-> +
->  static uint16_t nvme_set_feature(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
->  {
->      uint32_t dw10 = le32_to_cpu(cmd->cdw10);
-> @@ -735,6 +830,11 @@ static uint16_t nvme_set_feature(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
->          req->cqe.result =
->              cpu_to_le32((n->num_queues - 2) | ((n->num_queues - 2) << 16));
->          break;
-> +
-> +    case NVME_TIMESTAMP:
-> +        return nvme_set_feature_timestamp(n, cmd);
-> +        break;
-> +
->      default:
->          trace_nvme_err_invalid_setfeat(dw10);
->          return NVME_INVALID_FIELD | NVME_DNR;
-> @@ -907,6 +1007,8 @@ static int nvme_start_ctrl(NvmeCtrl *n)
->      nvme_init_sq(&n->admin_sq, n, n->bar.asq, 0, 0,
->          NVME_AQA_ASQS(n->bar.aqa) + 1);
->  
-> +    nvme_set_timestamp(n, 0ULL);
-> +
->      return 0;
->  }
->  
-> @@ -1270,7 +1372,7 @@ static void nvme_realize(PCIDevice *pci_dev, Error **errp)
->      id->sqes = (0x6 << 4) | 0x6;
->      id->cqes = (0x4 << 4) | 0x4;
->      id->nn = cpu_to_le32(n->num_namespaces);
-> -    id->oncs = cpu_to_le16(NVME_ONCS_WRITE_ZEROS);
-> +    id->oncs = cpu_to_le16(NVME_ONCS_WRITE_ZEROS | NVME_ONCS_TIMESTAMP);
->      id->psd[0].mp = cpu_to_le16(0x9c4);
->      id->psd[0].enlat = cpu_to_le32(0x10);
->      id->psd[0].exlat = cpu_to_le32(0x4);
-> diff --git a/hw/block/nvme.h b/hw/block/nvme.h
-> index 56c9d4b4b1..d7277e72b7 100644
-> --- a/hw/block/nvme.h
-> +++ b/hw/block/nvme.h
-> @@ -69,6 +69,7 @@ typedef struct NvmeCtrl {
->      uint16_t    max_prp_ents;
->      uint16_t    cqe_size;
->      uint16_t    sqe_size;
-> +    uint16_t    oncs;
+--Sig_/fjJc22yaohZP.VbC0INouSQ
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-Looks like this unused member snuck its way into the patch. But I see no
-harm in it being there.
+On Tue, 28 May 2019 10:08:54 +1000
+David Gibson <david@gibson.dropbear.id.au> wrote:
 
->      uint32_t    reg_size;
->      uint32_t    num_namespaces;
->      uint32_t    num_queues;
-> @@ -79,6 +80,8 @@ typedef struct NvmeCtrl {
->      uint32_t    cmbloc;
->      uint8_t     *cmbuf;
->      uint64_t    irq_status;
-> +    uint64_t    host_timestamp;                 /* Timestamp sent by the host */
-> +    uint64_t    timestamp_set_qemu_clock_ms;    /* QEMU clock time */
->  
->      char            *serial;
->      NvmeNamespace   *namespaces;
-> diff --git a/hw/block/trace-events b/hw/block/trace-events
-> index b92039a573..97a17838ed 100644
-> --- a/hw/block/trace-events
-> +++ b/hw/block/trace-events
-> @@ -46,6 +46,8 @@ nvme_identify_nslist(uint16_t ns) "identify namespace list, nsid=%"PRIu16""
->  nvme_getfeat_vwcache(const char* result) "get feature volatile write cache, result=%s"
->  nvme_getfeat_numq(int result) "get feature number of queues, result=%d"
->  nvme_setfeat_numq(int reqcq, int reqsq, int gotcq, int gotsq) "requested cq_count=%d sq_count=%d, responding with cq_count=%d sq_count=%d"
-> +nvme_setfeat_timestamp(uint64_t ts) "set feature timestamp = 0x%"PRIx64""
-> +nvme_getfeat_timestamp(uint64_t ts) "get feature timestamp = 0x%"PRIx64""
->  nvme_mmio_intm_set(uint64_t data, uint64_t new_mask) "wrote MMIO, interrupt mask set, data=0x%"PRIx64", new_mask=0x%"PRIx64""
->  nvme_mmio_intm_clr(uint64_t data, uint64_t new_mask) "wrote MMIO, interrupt mask clr, data=0x%"PRIx64", new_mask=0x%"PRIx64""
->  nvme_mmio_cfg(uint64_t data) "wrote MMIO, config controller config=0x%"PRIx64""
-> diff --git a/include/block/nvme.h b/include/block/nvme.h
-> index 849a6f3fa3..3ec8efcc43 100644
-> --- a/include/block/nvme.h
-> +++ b/include/block/nvme.h
-> @@ -581,6 +581,7 @@ enum NvmeIdCtrlOncs {
->      NVME_ONCS_WRITE_ZEROS   = 1 << 3,
->      NVME_ONCS_FEATURES      = 1 << 4,
->      NVME_ONCS_RESRVATIONS   = 1 << 5,
-> +    NVME_ONCS_TIMESTAMP     = 1 << 6,
->  };
->  
->  #define NVME_CTRL_SQES_MIN(sqes) ((sqes) & 0xf)
-> @@ -622,6 +623,7 @@ enum NvmeFeatureIds {
->      NVME_INTERRUPT_VECTOR_CONF      = 0x9,
->      NVME_WRITE_ATOMICITY            = 0xa,
->      NVME_ASYNCHRONOUS_EVENT_CONF    = 0xb,
-> +    NVME_TIMESTAMP                  = 0xe,
->      NVME_SOFTWARE_PROGRESS_MARKER   = 0x80
->  };
->  
-> -- 
-> 2.17.1
-> 
+> On Fri, May 24, 2019 at 12:19:09PM +0200, Greg Kurz wrote:
+> > On Mon, 20 May 2019 19:10:35 -0400
+> > "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> >  =20
+> > > From: Xie Yongji <xieyongji@baidu.com>
+> > >=20
+> > > The virtio 1.0 transitional devices support driver uses the device
+> > > before setting the DRIVER_OK status bit. So we introduce a started
+> > > flag to indicate whether driver has started the device or not.
+> > >=20
+> > > Signed-off-by: Xie Yongji <xieyongji@baidu.com>
+> > > Signed-off-by: Zhang Yu <zhangyu31@baidu.com>
+> > > Message-Id: <20190320112646.3712-2-xieyongji@baidu.com>
+> > > Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+> > > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> > > ---
+> > >  include/hw/virtio/virtio.h |  2 ++
+> > >  hw/virtio/virtio.c         | 52 ++++++++++++++++++++++++++++++++++++=
+--
+> > >  2 files changed, 52 insertions(+), 2 deletions(-)
+> > >=20
+> > > diff --git a/include/hw/virtio/virtio.h b/include/hw/virtio/virtio.h
+> > > index 7140381e3a..27c0efc3d0 100644
+> > > --- a/include/hw/virtio/virtio.h
+> > > +++ b/include/hw/virtio/virtio.h
+> > > @@ -105,6 +105,8 @@ struct VirtIODevice
+> > >      uint16_t device_id;
+> > >      bool vm_running;
+> > >      bool broken; /* device in invalid state, needs reset */
+> > > +    bool started;
+> > > +    bool start_on_kick; /* virtio 1.0 transitional devices support t=
+hat */
+> > >      VMChangeStateEntry *vmstate;
+> > >      char *bus_name;
+> > >      uint8_t device_endian;
+> > > diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
+> > > index 28056a7ef7..5d533ac74e 100644
+> > > --- a/hw/virtio/virtio.c
+> > > +++ b/hw/virtio/virtio.c
+> > > @@ -1162,10 +1162,16 @@ int virtio_set_status(VirtIODevice *vdev, uin=
+t8_t val)
+> > >              }
+> > >          }
+> > >      }
+> > > +    vdev->started =3D val & VIRTIO_CONFIG_S_DRIVER_OK;
+> > > +    if (unlikely(vdev->start_on_kick && vdev->started)) {
+> > > +        vdev->start_on_kick =3D false;
+> > > +    }
+> > > +
+> > >      if (k->set_status) {
+> > >          k->set_status(vdev, val);
+> > >      }
+> > >      vdev->status =3D val;
+> > > +
+> > >      return 0;
+> > >  }
+> > > =20
+> > > @@ -1208,6 +1214,9 @@ void virtio_reset(void *opaque)
+> > >          k->reset(vdev);
+> > >      }
+> > > =20
+> > > +    vdev->start_on_kick =3D (virtio_host_has_feature(vdev, VIRTIO_F_=
+VERSION_1) &&
+> > > +                          !virtio_vdev_has_feature(vdev, VIRTIO_F_VE=
+RSION_1));
+> > > +    vdev->started =3D false;
+> > >      vdev->broken =3D false;
+> > >      vdev->guest_features =3D 0;
+> > >      vdev->queue_sel =3D 0;
+> > > @@ -1518,14 +1527,21 @@ void virtio_queue_set_align(VirtIODevice *vde=
+v, int n, int align)
+> > > =20
+> > >  static bool virtio_queue_notify_aio_vq(VirtQueue *vq)
+> > >  {
+> > > +    bool ret =3D false;
+> > > +
+> > >      if (vq->vring.desc && vq->handle_aio_output) {
+> > >          VirtIODevice *vdev =3D vq->vdev;
+> > > =20
+> > >          trace_virtio_queue_notify(vdev, vq - vdev->vq, vq);
+> > > -        return vq->handle_aio_output(vdev, vq);
+> > > +        ret =3D vq->handle_aio_output(vdev, vq);
+> > > +
+> > > +        if (unlikely(vdev->start_on_kick)) {
+> > > +            vdev->started =3D true;
+> > > +            vdev->start_on_kick =3D false;
+> > > +        }
+> > >      }
+> > > =20
+> > > -    return false;
+> > > +    return ret;
+> > >  }
+> > > =20
+> > >  static void virtio_queue_notify_vq(VirtQueue *vq)
+> > > @@ -1539,6 +1555,11 @@ static void virtio_queue_notify_vq(VirtQueue *=
+vq)
+> > > =20
+> > >          trace_virtio_queue_notify(vdev, vq - vdev->vq, vq);
+> > >          vq->handle_output(vdev, vq);
+> > > +
+> > > +        if (unlikely(vdev->start_on_kick)) {
+> > > +            vdev->started =3D true;
+> > > +            vdev->start_on_kick =3D false;
+> > > +        }
+> > >      }
+> > >  }
+> > > =20
+> > > @@ -1556,6 +1577,11 @@ void virtio_queue_notify(VirtIODevice *vdev, i=
+nt n)
+> > >      } else if (vq->handle_output) {
+> > >          vq->handle_output(vdev, vq);
+> > >      }
+> > > +
+> > > +    if (unlikely(vdev->start_on_kick)) {
+> > > +        vdev->started =3D true;
+> > > +        vdev->start_on_kick =3D false;
+> > > +    }
+> > >  }
+> > > =20
+> > >  uint16_t virtio_queue_vector(VirtIODevice *vdev, int n)
+> > > @@ -1770,6 +1796,13 @@ static bool virtio_broken_needed(void *opaque)
+> > >      return vdev->broken;
+> > >  }
+> > > =20
+> > > +static bool virtio_started_needed(void *opaque)
+> > > +{
+> > > +    VirtIODevice *vdev =3D opaque;
+> > > +
+> > > +    return vdev->started; =20
+> >=20
+> > Existing machine types don't know about the "virtio/started" subsection=
+. This
+> > breaks migration to older QEMUs if the driver has started the device, i=
+e. most
+> > probably always when it comes to live migration.
+> >=20
+> > My understanding is that we do try to support backward migration though=
+. It
+> > is a regular practice in datacenters to migrate workloads without havin=
+g to
+> > take care of the QEMU version. FWIW I had to fix similar issues downstr=
+eam
+> > many times in the past because customers had filed bugs.
+> >=20
+> > Cc'ing David for his opinion. =20
+>=20
+> Uh.. did you mean to CC me, or Dave Gilbert?
+>=20
 
-Reviewed-by: Klaus Birkelund Jensen <klaus.jensen@cnexlabs.com>
+Oops... Dave Gilbert indeed, but you're thoughts on that matter are valuable
+as well. I remember being involved in backward migration fixes for spapr
+several times.
+
+> I mean, I think you're right that we should try to maintain backwards
+> migration, but this isn't really my area of authority.
+>=20
+
+Cc'ing Dave Gilbert :)
+
+Cheers,
+
+--
+Greg
+
+--Sig_/fjJc22yaohZP.VbC0INouSQ
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEtIKLr5QxQM7yo0kQcdTV5YIvc9YFAlzs140ACgkQcdTV5YIv
+c9b3PxAAhYZx8UCH9d0j1ScnlqsgE621yapQToWNW9xQ8S5FICLF4NvAoZ+jiAZk
+oXB4Ee1I5I8mepqV4orrqkucqvWxbK3qiObaT3WDlGlgi2dgtHQA5u7SZei6BOwb
+DfyY6295J3T/JGGpTNvjdYOMcdWa8s/Su89i1ELVXqZ8WN+3VJkFXf7qHv6H3/AG
+hI4+fdZUtoh44nsdaEAGEck4YG9kms7ORlAT2tCipe22rPvjPvhi9+WbtOV0jI67
+ehvArGKnlwdVd5xEYGdqt2MPKvSlEE9ayDxBB6Ff4DuwPPym4iIT3VtiBWt8NOUY
+n1kYxZyGB5c062QEeNOU56TQnlV+vG4cfu62YiByBuTxdNlat9AtgpiP6D+YaM82
+ONrCef093NPn/fxfFCF8lBoSbwQzVLMLAtpOk9+Z7l+CmqbBBlzDi8UnCkxhUAKi
+MXE1UqtgKl7z1ydOvF3HaMgA8IIZFBJfAeMo3U2ASnU2jfsn14mlOjY/XJHulwcw
+oCn6XYGUp7KuoG1QD/1oDk32t4waJMsXGeOIrfDxKaIjAnauS2j5Dw+2nomIa0Zf
+IyfBIz8048kyrs4dEQoGyCcvjlXRXB7WeWLbwZqZwepPNEZmR7JYFwZuTRtkHRRm
+tA255o3QkK2mk053rCnuvq3Df4t+Op/VK4Q994vahBR8zvd0Zks=
+=FCfv
+-----END PGP SIGNATURE-----
+
+--Sig_/fjJc22yaohZP.VbC0INouSQ--
 
