@@ -2,95 +2,79 @@ Return-Path: <SRS0=2W3W=T4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A66B3C04AB6
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 May 2019 21:35:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 41122C04AB6
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 May 2019 22:08:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6E49A2075B
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 May 2019 21:35:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F00FD2075B
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 May 2019 22:08:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="rKiIEUNf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6E49A2075B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="mzFVMdby"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F00FD2075B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:43032 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:43296 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hVjki-0003ZA-6t
-	for qemu-devel@archiver.kernel.org; Tue, 28 May 2019 17:35:24 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:37634)
+	id 1hVkH5-0000FP-6M
+	for qemu-devel@archiver.kernel.org; Tue, 28 May 2019 18:08:51 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:43976)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hVjjv-0003DC-P0
-	for qemu-devel@nongnu.org; Tue, 28 May 2019 17:34:36 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1hVkGE-0008LF-8l
+	for qemu-devel@nongnu.org; Tue, 28 May 2019 18:07:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hVjju-0008Pd-TS
-	for qemu-devel@nongnu.org; Tue, 28 May 2019 17:34:35 -0400
-Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:45222)
+	(envelope-from <peter.maydell@linaro.org>) id 1hVkGC-0002hF-S5
+	for qemu-devel@nongnu.org; Tue, 28 May 2019 18:07:58 -0400
+Received: from mail-ot1-x32f.google.com ([2607:f8b0:4864:20::32f]:40559)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hVjju-0008NY-MN
-	for qemu-devel@nongnu.org; Tue, 28 May 2019 17:34:34 -0400
-Received: by mail-oi1-x242.google.com with SMTP id w144so281215oie.12
-	for <qemu-devel@nongnu.org>; Tue, 28 May 2019 14:34:34 -0700 (PDT)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1hVkGC-0002b6-JY
+	for qemu-devel@nongnu.org; Tue, 28 May 2019 18:07:56 -0400
+Received: by mail-ot1-x32f.google.com with SMTP id u11so19327801otq.7
+	for <qemu-devel@nongnu.org>; Tue, 28 May 2019 15:07:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
-	:mime-version:in-reply-to:content-language:content-transfer-encoding;
-	bh=mbCa80eI2fD0zcMHDnr9VPez84wtN+Cgrkhyv6gWRiY=;
-	b=rKiIEUNfcSgDoFwa169GYJ6CEvbqOrziekR3POa4nnNGKuO2T/tmqjOc2YIGPAW7ob
-	fWCxjz5nU/XFIqYTg84g3afoMULDlxqCcuQU8KLW3Dpe6aG1EKG7KSvzceiQj8WHkOtM
-	VtHYRzSVJ44GptAFjqJ8yXN7P022sLtcO9VtV7p2EcrXkrXf9ZuVHEe9CzdoULlpgJrz
-	NlWaVsnKISWQXd6GlyLNsu8o6HOdY8rj5NOr1EA/+lhs7QG/HMB1IaxC3ikpOKROpb8o
-	aol8yFXD5BtFPls71U+mlz/URT9qMSer5iybZCFMPpQ/AZh5avW1j+2qUlZutGRBmfjk
-	VcdA==
+	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+	:cc; bh=oSw5BcdoPWZKnz+zMnJHC+UCf889Dak4GzEiw6PiBBs=;
+	b=mzFVMdby3N8s0uKc32eYZBMkmwtw6QTdw7E2W37M030PIytQpZnqSVlOHioqzOtCIk
+	Q/5Qkbw9XA1tZ2Yr3eoWqMvbss9ameJrgP7ihB8WxoGWgLtbPf49vJj08oCay0ln9QHS
+	69QK4Nfw2Qg78SIaikgOeq8oZm1DyMLvBRvHPpkaSY9lg5OPTf1vIKQTrRONTxLFpJYP
+	spqd5d3lxIu7rebX1CBr2WSmfZL/BNgMqiND2fa2OGuPqs2r8hUL+gZphSCrRzcB6mAK
+	z3FqVLZSLZVEAJip65UzCYyphLvHg1SmWq9YTQi+FRTELpZlDKFOVNezqPhDxAe7wdaj
+	Z3iQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-	:date:user-agent:mime-version:in-reply-to:content-language
-	:content-transfer-encoding;
-	bh=mbCa80eI2fD0zcMHDnr9VPez84wtN+Cgrkhyv6gWRiY=;
-	b=KST3KswWu02bsfGSjxJA+neni3W7SkAwPpIWFMmOq4A+HZ/q7w0UrQwdsbo9RewA1V
-	2Unib7me6RZuZZnZwa2AEbZ+TsYdzXOAbuIIr0fufpHHyosXt/5YDUpFpjgbyAHywSlE
-	Lui7KEbyvo49nsYq2E/lMI05MEreA/Tc18HQCiYd9Ds4/8lD3gcthvYtWLYookU00imx
-	ch6EzWSXettrleFipqzYeAP0TgQF3Bxzq9OT5gr+2HqaDz32bulsd9AbjXKWX6hKfdGy
-	kis49ki7JUVOJgc1kLsxw5DIzWqhPkLJo/uJX/CzeDyule8WXHScJsIqCsNP9xTlgvHV
-	nqeg==
-X-Gm-Message-State: APjAAAVHMyyujDIKTGB24Ocp4rU84vSOYmyZua9aqnc2dqUrd5xIZw1h
-	9P+btwTOUd/6AF0qfMVp0o+Ctg==
-X-Google-Smtp-Source: APXvYqzCvFEao0D5GvD2SlMXAQzVeeNN3fnvlOjFxk3bjOLD/c8w+E41KdEpAtxX4W7zWQlUyyI18g==
-X-Received: by 2002:aca:dec4:: with SMTP id v187mr4194082oig.19.1559079273430; 
-	Tue, 28 May 2019 14:34:33 -0700 (PDT)
-Received: from [172.24.12.210] (168.189-204-159.bestelclientes.com.mx.
-	[189.204.159.168]) by smtp.gmail.com with ESMTPSA id
-	w130sm5819738oib.44.2019.05.28.14.34.31
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Tue, 28 May 2019 14:34:32 -0700 (PDT)
-To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
-References: <20190522222821.23850-1-richard.henderson@linaro.org>
-	<20190522222821.23850-17-richard.henderson@linaro.org>
-	<a8a1fd49-c368-ed38-4d56-8743db5dd5b5@redhat.com>
-	<7d00bc45-fbc5-9096-af44-253779063319@redhat.com>
-	<09cb162c-594c-4863-2dfd-ae30b218bc9c@redhat.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <d0a8b16f-e0f8-64b9-3ca6-3ef044c18af7@linaro.org>
-Date: Tue, 28 May 2019 16:34:29 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+	:message-id:subject:to:cc;
+	bh=oSw5BcdoPWZKnz+zMnJHC+UCf889Dak4GzEiw6PiBBs=;
+	b=a8PPlo2bg3UI5K7/gxWbzhqHMudwB3UjZf+n2FhlaoZl1uhf9C1/8IZWkg2uwSPKjA
+	DbavjhK+CDc+4Ir9ZOko9M4Np1icRYcWDSzh3KU8CxU6MW3+GHrtJ25rHubFoXi6jhzk
+	IhLbqY3qX9CG9RfCaUGuv0QYgCjIX3SJyBHb6oGEn7xy/1ShJ0KrLEwUGIyg7OP7kYIz
+	/mkYIoWR3HlSgcHvKptBSVSFQrMEK915pS6HG8R+js0ECVsc8LeVnDX3eY2fEolR9Vfs
+	d3qKsutoMsNbS6R7wNPTlPmgQfqILa9JsR/Zk9PiZgG8UkXHwU+o99R3tTQiBGV9wmvX
+	kNYw==
+X-Gm-Message-State: APjAAAUKVIgZt2DE7K9XO4GUUXiguOqKv02YFtMeP6FogS/FqckqPFYB
+	wLbrUtGMig88mxNh5oLnPEV10TaMgxxPFLvNX9vXvQ==
+X-Google-Smtp-Source: APXvYqw3DhuMpAVZWUuwtuslGveOMSbyBVxsB6ENjucXoKaVPsyCjl6dSwTrS5mRpgkaFNJ7zcZRhHk+by95BiVVqNI=
+X-Received: by 2002:a9d:6b0d:: with SMTP id g13mr41326439otp.91.1559081274472; 
+	Tue, 28 May 2019 15:07:54 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <09cb162c-594c-4863-2dfd-ae30b218bc9c@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <CAFEAcA_-DptTwe7dkbZ171HJ+DtXCAOKt08pja=4-QbQKJSEvQ@mail.gmail.com>
+	<6382a25f-6af4-5ceb-5750-b23c5f053a48@redhat.com>
+In-Reply-To: <6382a25f-6af4-5ceb-5750-b23c5f053a48@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 28 May 2019 23:07:43 +0100
+Message-ID: <CAFEAcA_Y39Zw72LEcpNdPirKY7o4sNBQVgX4i4dRf6R_9NM1xw@mail.gmail.com>
+To: John Snow <jsnow@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2607:f8b0:4864:20::242
-Subject: Re: [Qemu-devel] [PULL 16/16] tcg/i386: Use MOVDQA for
- TCG_TYPE_V128 load/store
+X-Received-From: 2607:f8b0:4864:20::32f
+Subject: Re: [Qemu-devel] Sketch of a transition of QEMU docs to Sphinx
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -102,34 +86,151 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+	"Daniel P. Berrange" <berrange@redhat.com>,
+	QEMU Developers <qemu-devel@nongnu.org>,
+	Eduardo Habkost <ehabkost@redhat.com>,
+	Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/28/19 1:46 PM, David Hildenbrand wrote:
-> FWIW, this seems to be the easiest way:
-> 
-> diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
-> index f0d9a6a36d..d363ae0fb3 100644
-> --- a/target/s390x/cpu.h
-> +++ b/target/s390x/cpu.h
-> @@ -66,7 +66,7 @@ struct CPUS390XState {
->       * The floating point registers are part of the vector registers.
->       * vregs[0][0] -> vregs[15][0] are 16 floating point registers
->       */
-> -    CPU_DoubleU vregs[32][2];  /* vector registers */
-> +    CPU_DoubleU vregs[32][2] QEMU_ALIGNED(16);  /* vector registers */
->      uint32_t aregs[16];    /* access registers */
->      uint8_t riccb[64];     /* runtime instrumentation control */
->      uint64_t gscb[4];      /* guarded storage control */
-> 
-> 
-> Makes it work for me again.
+On Tue, 28 May 2019 at 20:09, John Snow <jsnow@redhat.com> wrote:
+>
+>
+>
+> On 5/21/19 2:56 PM, Peter Maydell wrote:
+> > Currently we have a vague plan that we should migrate our
+> > documentation away from Texinfo to using Sphinx, plus some isolated
+> > bits of documentation already in .rst format. This email is an attempt
+> > to sketch out a transition plan for getting us from where we are today
+> > to where (I think) we want to be.
+> >
+> >
+> > WHERE WE ARE TODAY
+> > ------------------
+> >
+> > I'm going to concentrate on the documentation that's installed by
+> > 'make install', because anything else is for developers only, making
+> > it lower priority to clean up and more amenable to messing around with
+> > anyway.
+> >
+>
+> To an extent, I'd like to emphasize that our "users" are increasingly
+> developers from other projects and these internal docs are primarily
+> useful for this crowd.
+>
+> > Currently we install:
+> >
+> > - in $DESTDIR/usr/local/share/doc/qemu:
+> >  qemu-doc.html
+> >  qemu-ga-ref.html
+> >  qemu-qmp-ref.html
+> >  qemu-doc.txt
+> >  qemu-ga-ref.txt
+> >  qemu-qmp-ref.txt
+> >  interop/  (the only Sphinx manual we currently ship)
+> >
+>
+> Oh, but this is exactly what I was referencing above, so nevermind.
 
-That's the right fix, and exactly the bug that I was hoping to find with
-11e2bfef7990 ("tcg/i386: Use MOVDQA for TCG_TYPE_V128 load/store").
+Right. The devel/ manual is for things which are purely
+QEMU internals -- autogenerated internal API docs,
+how TCG works, that kind of thing. (What we have so far
+is in docs/devel/.) The interop/ manual is the one for
+QEMU's interfaces to other projects.
+
+> > Sphinx supports a "plain text" output format, which will create a
+> > one-big-text-file for each of the four installed manuals. It might
+> > also be possible to generate some kind of "one .txt file per input
+> > .rst file" format, but that would require a greater amount of messing
+> > about.  (The sphinx text builder doesn't do this and so you'd need to
+> > get make to invoke sphinx once per rst file in each manual, which will
+> > be awkward.) Or we could just say "it's 2019, the HTML documentation
+> > is the official format, that (and manpages) is what we ship". Opinions?
+> >
+>
+> I am not sure what the value in plaintext Sphinx docs are, since they
+> lose the hyperlinks ... unless you keep it in ReST or Markdown format,
+> and then you could just install the source documents, no?
+>
+> I just seem to think that most of the text-only purists are also the
+> type to already have the source tree checked out somewhere.
+>
+> As long as we've got HTML + manpages, I think we're doing OK.
+
+That tends to be my opinion (especially since we don't for instance
+check the text output to make sure it hasn't rendered in some
+way that introduces problems). I just wanted to give people
+an opportunity to say "I like the way we currently ship plain text".
+
+> > (1) qemu-ga-ref and qemu-qmp-ref will become part of the interop/
+> > manual. This requires:
+> >  * adding rst-generation support to qapi-gen.py
+> >  * converting the hand-written texinfo parts to rst
+> >  * listing those new .rst files in docs/interop/index.rst
+> >  * makefile runes to create manpages via the 'man' sphinx builder
+> >    from docs/interop/qemu-ga-ref.rst and qemu-qmp-ref.rst
+> >  * there is a tests/qapi-schema/doc-good.test.texi which I think
+> >    is acting as a test of the texi doc generation; this should
+> >    be converted to test the rst doc generation instead
+> >  * delete all the old texinfo build machinery, install runes, etc
+> >
+>
+> Good riddance. I assume this also means we need to rewrite the QAPI
+> comments to use Sphinx-ese instead of Texi-ese.
+
+Yes, if we auto-inline comment text we would need to update
+the markup (as with the .hx file stuff I mention later).
+(I guess in theory if there's only a very limited set of
+markups used we could make the rst generation translate from
+the current format to rst, but I think we'd be better off
+having the format really match our current documentation.)
+
+> I think that'd be good, though, because it means we get proper lexing
+> and parsing on our examples. Especially in places where we
+> cross-reference; for example -- QMP has this trick where our commands
+> don't take any arguments themselves but rather define a data type it
+> expects as input.
+>
+> In the output manual, this means that we don't document the arguments
+> near the function, which is awful.
+>
+> Sphinx can help us cross-reference these things better.
+
+Yes, at least in theory. I haven't looked into how difficult
+it is to get Sphinx to actually make things refer to each other,
+but it really ought to be doable.
 
 
-r~
+> > Comments on this whole proposal (whether I've forgotten anything
+> > about our current setup, whether we really do want to go to the
+> > place I've suggested we go, etc) welcome.
+
+> It looks good to me overall -- any progress towards a unified manual
+> with automatic checking of any sort is an improvement.
+>
+> I'll try to keep an eye on it over the summer and see if I can't help
+> nudge the block layer documents along the path to something unified.
+> I've written one custom extension now, so what's a few more?
+>
+> I also wrote a hasty script that tried to unify the qemu-img.texi and
+> qemu-img help outputs and removed one more usage of the hxtool, but it's
+> only a stopgap and wasn't something like proper sphinx integration, but
+> maybe I could keep working in that area soon.
+
+Thanks.
+
+> I would also like to say that it would be useful to host our HTML docs
+> online such that we can point to the different versions, like you can
+> with the official python docs. They often have a little dropdown where
+> you can switch between 3.5/3.6/3.7 or so on and see the difference on
+> that exact page. It'd just simply be nice to be able to do the same for
+> QMP docs.
+
+Yes, definitely, although this is I think somewhat orthogonal to
+the format we use to create them.
+
+thanks
+-- PMM
 
