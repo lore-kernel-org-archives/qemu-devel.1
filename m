@@ -2,74 +2,63 @@ Return-Path: <SRS0=2W3W=T4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+X-Spam-Status: No, score=-2.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,RCVD_ILLEGAL_IP,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A768CC04AB6
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 May 2019 07:06:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 23F9DC04AB6
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 May 2019 07:46:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7B3992075B
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 May 2019 07:06:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7B3992075B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id E63C62075B
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 May 2019 07:46:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E63C62075B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:58350 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:58661 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hVWBt-00082O-Nx
-	for qemu-devel@archiver.kernel.org; Tue, 28 May 2019 03:06:33 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:39428)
+	id 1hVWoe-0005MC-IV
+	for qemu-devel@archiver.kernel.org; Tue, 28 May 2019 03:46:36 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:46405)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hVWB5-0007dr-2b
-	for qemu-devel@nongnu.org; Tue, 28 May 2019 03:05:43 -0400
+	(envelope-from <tao3.xu@intel.com>) id 1hVWno-0004pI-Tf
+	for qemu-devel@nongnu.org; Tue, 28 May 2019 03:45:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hVWB4-0003Gq-6R
-	for qemu-devel@nongnu.org; Tue, 28 May 2019 03:05:43 -0400
-Received: from mout.kundenserver.de ([217.72.192.74]:53967)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1hVWB3-0003GU-UY
-	for qemu-devel@nongnu.org; Tue, 28 May 2019 03:05:42 -0400
-Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
-	(mreue109 [213.165.67.119]) with ESMTPSA (Nemesis) id
-	1M26j1-1hTaHa2usb-002ZLY; Tue, 28 May 2019 09:00:03 +0200
-To: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-	Markus Armbruster <armbru@redhat.com>, Yuval Shaia <yuval.shaia@oracle.com>
-References: <20190505105112.22691-1-yuval.shaia@oracle.com>
-	<871s0pjisd.fsf@dusky.pond.sub.org>
-	<89805e43-4bbe-1a4b-1fd4-2c042aa979bf@gmail.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <4508df6d-cb54-26e9-1603-09ef9ff87a0b@vivier.eu>
-Date: Tue, 28 May 2019 09:00:00 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
-	Thunderbird/52.8.0
+	(envelope-from <tao3.xu@intel.com>) id 1hVWnn-0003Fy-RK
+	for qemu-devel@nongnu.org; Tue, 28 May 2019 03:45:44 -0400
+Received: from mga06.intel.com ([134.134.136.31]:23318)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <tao3.xu@intel.com>)
+	id 1hVWnj-00032B-Jx; Tue, 28 May 2019 03:45:39 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+	by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+	28 May 2019 00:45:24 -0700
+X-ExtLoop1: 1
+Received: from shzintpr02.sh.intel.com (HELO [0.0.0.0]) ([10.239.4.160])
+	by orsmga001.jf.intel.com with ESMTP; 28 May 2019 00:45:22 -0700
+To: Igor Mammedov <imammedo@redhat.com>
+References: <20190508061726.27631-1-tao3.xu@intel.com>
+	<20190508061726.27631-4-tao3.xu@intel.com>
+	<20190523154743.5fdd4b81@redhat.com>
+From: Tao Xu <tao3.xu@intel.com>
+Message-ID: <663c8744-78e4-842c-d9e7-91b36ba30d91@intel.com>
+Date: Tue, 28 May 2019 15:43:03 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <89805e43-4bbe-1a4b-1fd4-2c042aa979bf@gmail.com>
+In-Reply-To: <20190523154743.5fdd4b81@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:vuuUMc/2cWgLfw03eeHBxTXVx/Y41ECip2Z5iVVZYXnQrN94UHt
-	1X3n+lstJovlyJf2jbHd9XGf/RcXgck0kw87c+ASarzHc8MAFomXXsQoUiFspE0VvfXUQYO
-	W69igIzKiCkhdVtGFqkkFVfmETR8UxNSkGW9XMha+R/+nAFM6tlhHx85AJn35Oqj13qZ/J3
-	CCC1X69/AqYQIKTjo0xAw==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:fmqABoXC+Qs=:SWc46e3cUSoVBgFxVmM5yK
-	ze5YNsQna7gRk+jCLOLydlpUI00wIUSgb/FWSyrkvQ1iNqS2/Tb1Y9BLuhabNwg5E93j/qKws
-	ziQymUhLYshb9GwAGMDWM7E8oS9OFG8IU3OGyGI+nq4ZQ3q+AI6tyUs4BG1zwQbmSS94QNdHS
-	l+a0nAk/O5JEawhzfP+OLLQmXBqEdoGBQOUFRVO2g8eou41UJe8p5LhI7YDItzxdtbnHgtcsH
-	f/tBS2GCVS3iL+r+Vqkl+KpiQjfor4E0QSFCnK6xJz6/uvdWVLUTDKngjBB5Cb+KqUhfyhaq2
-	DvWilfvHCzeFub2KZcQIYzXYkfWWshiWxDHGhrZZzMq6m9qsmyZqYNS0d7rh3YKyrTA9j8y/s
-	XyZ8FZkjLdw9gmSbEHy56SuOkvFV/4g7eBHyXHcFpXbTAtt2eCmqkNkk8lsJFb5UbXOJS8QOW
-	XU0HTgCGLt6bUSlX786DJJt3Fcc+nsocNXx9m8fNosHx+1RzcLyb6VpbzTlkopZcmrQwIRo/+
-	wus7aFcPjRTo41Kf9zMQTLxdmUoEh4hQbbIiY4eiDMvbQIbUQuMcD/JqyZJ6+VoJHHeNPjkpU
-	//BQIQ25cs3AgbsUkcWf5h7+XngMAtx5C7sHSvmAdIk3/gjUtdUhh2PK2z8zmTijjTOOE0d3g
-	mmh1nAj/lGuqtkyIruo/X9eIE2O82beCqCMiU6VibFN7Co8AIXW51KtlyBLtQLZNCX31t9HNB
-	7pPCcIeJxVqCZelsJRx7UWA3HvgaLJq4RnbQU90a38ISm5M7zlplk8+qIU8=
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 217.72.192.74
-Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH] hw/rdma: Delete unused
- headers inclusion
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 134.134.136.31
+Subject: Re: [Qemu-devel] [PATCH v4 03/11] numa: move numa global variable
+ numa_info into MachineState
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -81,60 +70,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, qemu-devel@nongnu.org
+Cc: xiaoguangrong.eric@gmail.com, mst@redhat.com, jingqi.liu@intel.com,
+	qemu-devel@nongnu.org, ehabkost@redhat.com, qemu-ppc@nongnu.org,
+	pbonzini@redhat.com, david@gibson.dropbear.id.au, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 24/05/2019 07:29, Marcel Apfelbaum wrote:
-> Hi Markus,
-> 
-> On 5/23/19 6:24 PM, Markus Armbruster wrote:
->> Looks stuck.  Let's try qemu-trivial.
-> 
-> Thanks, that is a great idea.
-> 
-> I didn't want to send a single-patch pull request,
-> especially while another is waiting for reviews.
-> Anyway, trivial queue can be used indeed.
 
-Applied to my trivial-patches branch.
-
-Thanks,
-Laurent
-
-> Thanks,
-> Marcel
+On 23/05/2019 21:47, Igor Mammedov wrote:
+> On Wed,  8 May 2019 14:17:18 +0800
+> Tao Xu <tao3.xu@intel.com> wrote:
 > 
->>
->> Yuval Shaia <yuval.shaia@oracle.com> writes:
->>
->>> This is a trivial cleanup patch.
->>>
->>> Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
->>> ---
->>>   hw/rdma/rdma_backend.c | 7 -------
->>>   1 file changed, 7 deletions(-)
->>>
->>> diff --git a/hw/rdma/rdma_backend.c b/hw/rdma/rdma_backend.c
->>> index d1660b6474..05f6b03221 100644
->>> --- a/hw/rdma/rdma_backend.c
->>> +++ b/hw/rdma/rdma_backend.c
->>> @@ -14,16 +14,9 @@
->>>    */
->>>   #include "qemu/osdep.h"
->>> -#include "sysemu/sysemu.h"
->>> -#include "qapi/error.h"
->>> -#include "qapi/qmp/qlist.h"
->>> -#include "qapi/qmp/qnum.h"
->>>   #include "qapi/qapi-events-rdma.h"
->>>   #include <infiniband/verbs.h>
->>> -#include <infiniband/umad_types.h>
->>> -#include <infiniband/umad.h>
->>> -#include <rdma/rdma_user_cm.h>
->>>   #include "contrib/rdmacm-mux/rdmacm-mux.h"
->>>   #include "trace.h"
-> 
+...
+>> diff --git a/hw/arm/boot.c b/hw/arm/boot.c
+>> index 8ff08814fd..845b737ab9 100644
+>> --- a/hw/arm/boot.c
+>> +++ b/hw/arm/boot.c
+>> @@ -602,7 +602,7 @@ int arm_load_dtb(hwaddr addr, const struct arm_boot_info *binfo,
+>>       if (nb_numa_nodes > 0) {
+>>           mem_base = binfo->loader_start;
+>>           for (i = 0; i < nb_numa_nodes; i++) {
+>> -            mem_len = numa_info[i].node_mem;
+>> +            mem_len = ms->numa_state->nodes[i].node_mem;
+> in 1/11 I've suggested to add nb_numa_nodes, but it might be to add
+> a pointer to MachineState there.
+> It would also help to simplify arm_load_dtb later as there are other
+> bits that we copy to arm_boot_info from MachineState.
 > 
 
+Hi Igor,
+
+Thank you for your review. I will simplify arm_load_dtb() in the next 
+version of patch and improve the other issues.
+
+Tao
 
