@@ -2,110 +2,64 @@ Return-Path: <SRS0=2W3W=T4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.0 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C4A3C04AB6
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 May 2019 17:00:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9ACE8C04AB6
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 May 2019 17:02:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1D6E12075B
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 May 2019 17:00:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1D6E12075B
+	by mail.kernel.org (Postfix) with ESMTPS id 74FFD2166E
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 May 2019 17:02:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 74FFD2166E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:39735 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:39752 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hVfT0-0007Lw-AH
-	for qemu-devel@archiver.kernel.org; Tue, 28 May 2019 13:00:50 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:34641)
+	id 1hVfUh-00007q-6m
+	for qemu-devel@archiver.kernel.org; Tue, 28 May 2019 13:02:35 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:34895)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hVfRZ-0006QT-T9
-	for qemu-devel@nongnu.org; Tue, 28 May 2019 12:59:24 -0400
+	(envelope-from <cohuck@redhat.com>) id 1hVfT0-0007RS-6r
+	for qemu-devel@nongnu.org; Tue, 28 May 2019 13:00:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hVfRX-0006wY-UH
-	for qemu-devel@nongnu.org; Tue, 28 May 2019 12:59:21 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60620)
+	(envelope-from <cohuck@redhat.com>) id 1hVfSw-0008Is-Bb
+	for qemu-devel@nongnu.org; Tue, 28 May 2019 13:00:49 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59204)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1hVfRW-0006ih-4z
-	for qemu-devel@nongnu.org; Tue, 28 May 2019 12:59:19 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>)
+	id 1hVfSn-0007ve-Sn; Tue, 28 May 2019 13:00:40 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+	[10.5.11.23])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 9345E301F136;
-	Tue, 28 May 2019 16:59:00 +0000 (UTC)
-Received: from [10.36.116.177] (ovpn-116-177.ams2.redhat.com [10.36.116.177])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 956FA5B0B7;
-	Tue, 28 May 2019 16:58:58 +0000 (UTC)
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-References: <20190522222821.23850-1-richard.henderson@linaro.org>
-From: David Hildenbrand <david@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
-	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
-	SE+xAvmumFBY
+	by mx1.redhat.com (Postfix) with ESMTPS id 50EB76147C;
+	Tue, 28 May 2019 17:00:26 +0000 (UTC)
+Received: from gondolin (dhcp-192-222.str.redhat.com [10.33.192.222])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id B873F8082;
+	Tue, 28 May 2019 17:00:03 +0000 (UTC)
+Date: Tue, 28 May 2019 19:00:01 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+To: Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>
+Message-ID: <20190528190001.17d7cdf0.cohuck@redhat.com>
+In-Reply-To: <20190528164020.32250-5-philmd@redhat.com>
+References: <20190528164020.32250-1-philmd@redhat.com>
+	<20190528164020.32250-5-philmd@redhat.com>
 Organization: Red Hat GmbH
-Message-ID: <2228ffd2-f519-c08f-59f2-3b3038db83ed@redhat.com>
-Date: Tue, 28 May 2019 18:58:57 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190522222821.23850-1-richard.henderson@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.47]);
-	Tue, 28 May 2019 16:59:00 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.39]);
+	Tue, 28 May 2019 17:00:26 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PULL 00/16] tcg queued patches
+Subject: Re: [Qemu-devel] [PATCH v2 04/10] hw/s390x/event-facility: Use the
+ QOM BUS() macro to access BusState.qbus
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -117,99 +71,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org
+Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
+	Dmitry Fleytman <dmitry.fleytman@gmail.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	Aleksandar Markovic <amarkovic@wavecomp.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>, qemu-trivial@nongnu.org,
+	David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org,
+	Markus Armbruster <armbru@redhat.com>, Halil Pasic <pasic@linux.ibm.com>,
+	Aleksandar Rikalo <arikalo@wavecomp.com>, Michael Walle <michael@walle.cc>,
+	Gerd Hoffmann <kraxel@redhat.com>, qemu-s390x@nongnu.org,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Christian Borntraeger <borntraeger@de.ibm.com>,
+	Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 23.05.19 00:28, Richard Henderson wrote:
-> The following changes since commit a4f667b6714916683408b983cfe0a615a725775f:
-> 
->   Merge remote-tracking branch 'remotes/cohuck/tags/s390x-20190521-3' into staging (2019-05-21 16:30:13 +0100)
-> 
-> are available in the Git repository at:
-> 
->   https://github.com/rth7680/qemu.git tags/pull-tcg-20190522
-> 
-> for you to fetch changes up to 11e2bfef799024be4a08fcf6797fe0b22fb16b58:
-> 
->   tcg/i386: Use MOVDQA for TCG_TYPE_V128 load/store (2019-05-22 15:09:43 -0400)
-> 
-> ----------------------------------------------------------------
-> Misc gvec improvements
-> 
-> ----------------------------------------------------------------
-> Richard Henderson (16):
->       tcg/i386: Fix dupi/dupm for avx1 and 32-bit hosts
->       tcg: Fix missing checks and clears in tcg_gen_gvec_dup_mem
->       tcg: Add support for vector bitwise select
->       tcg: Add support for vector compare select
->       tcg: Introduce do_op3_nofail for vector expansion
->       tcg: Expand vector minmax using cmp+cmpsel
->       tcg: Add TCG_OPF_NOT_PRESENT if TCG_TARGET_HAS_foo is negative
->       tcg/i386: Support vector comparison select value
->       tcg/i386: Remove expansion for missing minmax
->       tcg/i386: Use umin/umax in expanding unsigned compare
->       tcg/aarch64: Support vector bitwise select value
->       tcg/aarch64: Split up is_fimm
->       tcg/aarch64: Use MVNI in tcg_out_dupi_vec
->       tcg/aarch64: Build vector immediates with two insns
->       tcg/aarch64: Allow immediates for vector ORR and BIC
->       tcg/i386: Use MOVDQA for TCG_TYPE_V128 load/store
-> 
->  accel/tcg/tcg-runtime.h      |   2 +
->  tcg/aarch64/tcg-target.h     |   2 +
->  tcg/i386/tcg-target.h        |   2 +
->  tcg/tcg-op-gvec.h            |   7 +
->  tcg/tcg-op.h                 |   5 +
->  tcg/tcg-opc.h                |   5 +-
->  tcg/tcg.h                    |   2 +
->  accel/tcg/tcg-runtime-gvec.c |  14 ++
->  tcg/aarch64/tcg-target.inc.c | 371 ++++++++++++++++++++++++++++++++-----------
->  tcg/i386/tcg-target.inc.c    | 169 +++++++++++++-------
->  tcg/tcg-op-gvec.c            |  71 ++++++---
->  tcg/tcg-op-vec.c             | 142 ++++++++++++++---
->  tcg/tcg.c                    |   5 +
->  tcg/README                   |  11 ++
->  14 files changed, 620 insertions(+), 188 deletions(-)
-> 
+On Tue, 28 May 2019 18:40:14 +0200
+Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> wrote:
 
-Rebasing my vx branch to latest qemu/master, I get segfaults when trying
-to boot a Linux kernel:
+> Rather than looking inside the definition of a BusState with "s->bus.qbus=
+",
+> use the QOM prefered style: "BUS(&s->bus)".
+>=20
+> This patch was generated using the following Coccinelle script:
+>=20
+>     // Use BUS() macros to access BusState.qbus
+>     @use_bus_macro_to_access_qbus@
+>     expression obj;
+>     identifier bus;
+>     @@
+>     -&obj->bus.qbus
+>     +BUS(&obj->bus)
+>=20
+> Suggested-by: Peter Maydell <peter.maydell@linaro.org>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> ---
+>  hw/s390x/event-facility.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 
-[    2.652368] Unpacking initramfs...
-Segmentation fault (Speicherabzug geschrieben)
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 
-
-"Auto-loading safe path" section in the GDB manual.  E.g., run from the
-shell:
-        info "(gdb)Auto-loading safe path"
-(gdb) bt
-#0  0x00007feb460409d0 in code_gen_buffer ()
-#1  0x000055679d5322d3 in cpu_tb_exec (itb=<optimized out>,
-cpu=0x7feb46040600 <code_gen_buffer+100926931>)
-    at /home/dhildenb/git/qemu/accel/tcg/cpu-exec.c:171
-#2  cpu_loop_exec_tb (tb_exit=<synthetic pointer>, last_tb=<synthetic
-pointer>, tb=<optimized out>,
-    cpu=0x7feb46040600 <code_gen_buffer+100926931>) at
-/home/dhildenb/git/qemu/accel/tcg/cpu-exec.c:618
-#3  cpu_exec (cpu=cpu@entry=0x55679fb37330) at
-/home/dhildenb/git/qemu/accel/tcg/cpu-exec.c:729
-#4  0x000055679d4f0ecf in tcg_cpu_exec (cpu=0x55679fb37330) at
-/home/dhildenb/git/qemu/cpus.c:1434
-#5  0x000055679d4f302b in qemu_tcg_cpu_thread_fn
-(arg=arg@entry=0x55679fb37330)
-    at /home/dhildenb/git/qemu/cpus.c:1743
-#6  0x000055679d79a26a in qemu_thread_start (args=<optimized out>) at
-util/qemu-thread-posix.c:502
-#7  0x00007febd07a458e in ?? ()
-#8  0x0000000000000000 in ?? ()
-
-Any idea what this could be? (this series?)
-
--- 
-
-Thanks,
-
-David / dhildenb
+(I assume this will go through the trivial tree?)
 
