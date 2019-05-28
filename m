@@ -6,58 +6,57 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 57721C04AB6
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 00:02:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 80D61C04AB6
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 00:03:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2924721670
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 00:02:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2924721670
+	by mail.kernel.org (Postfix) with ESMTPS id 548F221670
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 00:03:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 548F221670
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:44416 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:44418 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hVm39-0000LZ-9o
-	for qemu-devel@archiver.kernel.org; Tue, 28 May 2019 20:02:35 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:32917)
+	id 1hVm3X-0000dF-Kt
+	for qemu-devel@archiver.kernel.org; Tue, 28 May 2019 20:02:59 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:33019)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1hVlzi-0006Q6-90
-	for qemu-devel@nongnu.org; Tue, 28 May 2019 19:59:03 -0400
+	(envelope-from <jsnow@redhat.com>) id 1hVlzp-0006Wh-IY
+	for qemu-devel@nongnu.org; Tue, 28 May 2019 19:59:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1hVlzg-0001Ip-DB
-	for qemu-devel@nongnu.org; Tue, 28 May 2019 19:59:02 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54562)
+	(envelope-from <jsnow@redhat.com>) id 1hVlzo-0001Uw-AA
+	for qemu-devel@nongnu.org; Tue, 28 May 2019 19:59:09 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54582)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <jsnow@redhat.com>)
-	id 1hVlzc-0001GP-F2; Tue, 28 May 2019 19:58:56 -0400
+	id 1hVlzg-0001IM-Eo; Tue, 28 May 2019 19:59:01 -0400
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
 	[10.5.11.16])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 35D6F305B418;
-	Tue, 28 May 2019 23:58:54 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 0E109301988B;
+	Tue, 28 May 2019 23:58:59 +0000 (UTC)
 Received: from probe.bos.redhat.com (dhcp-17-187.bos.redhat.com [10.18.17.187])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 0FDA05F9D5;
-	Tue, 28 May 2019 23:58:45 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id F07201715C;
+	Tue, 28 May 2019 23:58:56 +0000 (UTC)
 From: John Snow <jsnow@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Tue, 28 May 2019 19:58:40 -0400
-Message-Id: <20190528235842.29453-2-jsnow@redhat.com>
+Date: Tue, 28 May 2019 19:58:42 -0400
+Message-Id: <20190528235842.29453-4-jsnow@redhat.com>
 In-Reply-To: <20190528235842.29453-1-jsnow@redhat.com>
 References: <20190528235842.29453-1-jsnow@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
 	(mx1.redhat.com [10.5.110.47]);
-	Tue, 28 May 2019 23:58:54 +0000 (UTC)
+	Tue, 28 May 2019 23:58:59 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 1/3] migration/dirty-bitmaps: change bitmap
- enumeration method
+Subject: [Qemu-devel] [PULL 3/3] iotests: test external snapshot with bitmap
+ copying
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -71,87 +70,155 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: peter.maydell@linaro.org,
 	Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
-	aihua liang <aliang@redhat.com>, qemu-block@nongnu.org,
-	qemu-stable@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>,
-	jsnow@redhat.com
+	jsnow@redhat.com, qemu-stable@nongnu.org, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Shift from looking at every root BDS to *every* BDS. This will migrate
-bitmaps that are attached to blockdev created nodes instead of just ones
-attached to emulated storage devices.
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-Note that this will not migrate anonymous or internal-use bitmaps, as
-those are defined as having no name.
+This test shows that external snapshots and incremental backups are
+friends.
 
-This will also fix the Coverity issues Peter Maydell has been asking
-about for the past several releases, as well as fixing a real bug.
-
-Reported-by: Peter Maydell <peter.maydell@linaro.org>
-Reported-by: Coverity =F0=9F=98=85
-Reported-by: aihua liang <aliang@redhat.com>
-Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Signed-off-by: John Snow <jsnow@redhat.com>
-Message-id: 20190514201926.10407-1-jsnow@redhat.com
-Fixes: https://bugzilla.redhat.com/show_bug.cgi?id=3D1652490
-Fixes: Coverity CID 1390625
-CC: Stefan Hajnoczi <stefanha@redhat.com>
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Reviewed-by: John Snow <jsnow@redhat.com>
+Message-id: 20190517152111.206494-3-vsementsov@virtuozzo.com
 Signed-off-by: John Snow <jsnow@redhat.com>
 ---
- migration/block-dirty-bitmap.c | 14 ++++----------
- 1 file changed, 4 insertions(+), 10 deletions(-)
+ tests/qemu-iotests/254     | 52 ++++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/254.out | 52 ++++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/group   |  1 +
+ 3 files changed, 105 insertions(+)
+ create mode 100755 tests/qemu-iotests/254
+ create mode 100644 tests/qemu-iotests/254.out
 
-diff --git a/migration/block-dirty-bitmap.c b/migration/block-dirty-bitma=
-p.c
-index d1bb863cb6..4a896a09eb 100644
---- a/migration/block-dirty-bitmap.c
-+++ b/migration/block-dirty-bitmap.c
-@@ -273,7 +273,6 @@ static int init_dirty_bitmap_migration(void)
-     BlockDriverState *bs;
-     BdrvDirtyBitmap *bitmap;
-     DirtyBitmapMigBitmapState *dbms;
--    BdrvNextIterator it;
-     Error *local_err =3D NULL;
-=20
-     dirty_bitmap_mig_state.bulk_completed =3D false;
-@@ -281,13 +280,8 @@ static int init_dirty_bitmap_migration(void)
-     dirty_bitmap_mig_state.prev_bitmap =3D NULL;
-     dirty_bitmap_mig_state.no_bitmaps =3D false;
-=20
--    for (bs =3D bdrv_first(&it); bs; bs =3D bdrv_next(&it)) {
--        const char *drive_name =3D bdrv_get_device_or_node_name(bs);
--
--        /* skip automatically inserted nodes */
--        while (bs && bs->drv && bs->implicit) {
--            bs =3D backing_bs(bs);
--        }
-+    for (bs =3D bdrv_next_all_states(NULL); bs; bs =3D bdrv_next_all_sta=
-tes(bs)) {
-+        const char *name =3D bdrv_get_device_or_node_name(bs);
-=20
-         for (bitmap =3D bdrv_dirty_bitmap_next(bs, NULL); bitmap;
-              bitmap =3D bdrv_dirty_bitmap_next(bs, bitmap))
-@@ -296,7 +290,7 @@ static int init_dirty_bitmap_migration(void)
-                 continue;
-             }
-=20
--            if (drive_name =3D=3D NULL) {
-+            if (!name || strcmp(name, "") =3D=3D 0) {
-                 error_report("Found bitmap '%s' in unnamed node %p. It c=
-an't "
-                              "be migrated", bdrv_dirty_bitmap_name(bitma=
-p), bs);
-                 goto fail;
-@@ -313,7 +307,7 @@ static int init_dirty_bitmap_migration(void)
-=20
-             dbms =3D g_new0(DirtyBitmapMigBitmapState, 1);
-             dbms->bs =3D bs;
--            dbms->node_name =3D drive_name;
-+            dbms->node_name =3D name;
-             dbms->bitmap =3D bitmap;
-             dbms->total_sectors =3D bdrv_nb_sectors(bs);
-             dbms->sectors_per_chunk =3D CHUNK_SIZE * 8 *
+diff --git a/tests/qemu-iotests/254 b/tests/qemu-iotests/254
+new file mode 100755
+index 0000000000..33cb80a512
+--- /dev/null
++++ b/tests/qemu-iotests/254
+@@ -0,0 +1,52 @@
++#!/usr/bin/env python
++#
++# Test external snapshot with bitmap copying.
++#
++# Copyright (c) 2019 Virtuozzo International GmbH. All rights reserved.
++#
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
++#
++
++import iotests
++from iotests import qemu_img_create, file_path, log
++
++disk, top =3D file_path('disk', 'top')
++size =3D 1024 * 1024
++
++qemu_img_create('-f', iotests.imgfmt, disk, str(size))
++
++vm =3D iotests.VM().add_drive(disk, opts=3D'node-name=3Dbase')
++vm.launch()
++
++vm.qmp_log('block-dirty-bitmap-add', node=3D'drive0', name=3D'bitmap0')
++
++vm.hmp_qemu_io('drive0', 'write 0 512K')
++
++vm.qmp_log('transaction', indent=3D2, actions=3D[
++    {'type': 'blockdev-snapshot-sync',
++     'data': {'device': 'drive0', 'snapshot-file': top,
++              'snapshot-node-name': 'snap'}},
++    {'type': 'block-dirty-bitmap-add',
++     'data': {'node': 'snap', 'name': 'bitmap0'}},
++    {'type': 'block-dirty-bitmap-merge',
++     'data': {'node': 'snap', 'target': 'bitmap0',
++              'bitmaps': [{'node': 'base', 'name': 'bitmap0'}]}}
++], filters=3D[iotests.filter_qmp_testfiles])
++
++result =3D vm.qmp('query-block')['return'][0]
++log("query-block: device =3D {}, node-name =3D {}, dirty-bitmaps:".forma=
+t(
++    result['device'], result['inserted']['node-name']))
++log(result['dirty-bitmaps'], indent=3D2)
++
++vm.shutdown()
+diff --git a/tests/qemu-iotests/254.out b/tests/qemu-iotests/254.out
+new file mode 100644
+index 0000000000..d7394cf002
+--- /dev/null
++++ b/tests/qemu-iotests/254.out
+@@ -0,0 +1,52 @@
++{"execute": "block-dirty-bitmap-add", "arguments": {"name": "bitmap0", "=
+node": "drive0"}}
++{"return": {}}
++{
++  "execute": "transaction",
++  "arguments": {
++    "actions": [
++      {
++        "data": {
++          "device": "drive0",
++          "snapshot-file": "TEST_DIR/PID-top",
++          "snapshot-node-name": "snap"
++        },
++        "type": "blockdev-snapshot-sync"
++      },
++      {
++        "data": {
++          "name": "bitmap0",
++          "node": "snap"
++        },
++        "type": "block-dirty-bitmap-add"
++      },
++      {
++        "data": {
++          "bitmaps": [
++            {
++              "name": "bitmap0",
++              "node": "base"
++            }
++          ],
++          "node": "snap",
++          "target": "bitmap0"
++        },
++        "type": "block-dirty-bitmap-merge"
++      }
++    ]
++  }
++}
++{
++  "return": {}
++}
++query-block: device =3D drive0, node-name =3D snap, dirty-bitmaps:
++[
++  {
++    "busy": false,
++    "count": 524288,
++    "granularity": 65536,
++    "name": "bitmap0",
++    "persistent": false,
++    "recording": true,
++    "status": "active"
++  }
++]
+diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
+index 2c74deec00..859c4b5e9f 100644
+--- a/tests/qemu-iotests/group
++++ b/tests/qemu-iotests/group
+@@ -264,3 +264,4 @@
+ 249 rw auto quick
+ 252 rw auto backing quick
+ 253 rw auto quick
++254 rw auto backing quick
 --=20
 2.20.1
 
