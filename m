@@ -6,89 +6,75 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AAECAC04AB6
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 May 2019 17:40:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BF1CC04AB6
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 May 2019 17:46:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 79CFD2173B
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 May 2019 17:40:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 79CFD2173B
+	by mail.kernel.org (Postfix) with ESMTPS id 70B202173B
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 May 2019 17:46:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 70B202173B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:40271 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:40377 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hVg5T-0002bU-P8
-	for qemu-devel@archiver.kernel.org; Tue, 28 May 2019 13:40:35 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:42898)
+	id 1hVgAv-00064t-NB
+	for qemu-devel@archiver.kernel.org; Tue, 28 May 2019 13:46:13 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:45326)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hVfzV-0006TP-FG
-	for qemu-devel@nongnu.org; Tue, 28 May 2019 13:34:26 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1hVgA5-0005iI-6H
+	for qemu-devel@nongnu.org; Tue, 28 May 2019 13:45:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hVfzU-0007cJ-BQ
-	for qemu-devel@nongnu.org; Tue, 28 May 2019 13:34:25 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51856)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mreitz@redhat.com>)
-	id 1hVfzP-0007RD-J9; Tue, 28 May 2019 13:34:19 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id A41C8C06C9DA;
-	Tue, 28 May 2019 17:34:04 +0000 (UTC)
-Received: from dresden.str.redhat.com (unknown [10.40.205.223])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 658C25D6A9;
-	Tue, 28 May 2019 17:33:53 +0000 (UTC)
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
-	qemu-devel@nongnu.org, qemu-block@nongnu.org
-References: <20190506153429.52737-1-vsementsov@virtuozzo.com>
-	<20190506153429.52737-4-vsementsov@virtuozzo.com>
-From: Max Reitz <mreitz@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
-	mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
-	/PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
-	U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
-	mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
-	awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
-	AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
-	CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
-	B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
-	2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
-	AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
-	8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
-	4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
-	BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
-	xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
-	W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
-	DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
-	64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
-	ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
-	sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
-	alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
-	/ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
-	bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
-	R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <ee950bac-f0d8-3bc9-f5ed-deaf4d36777b@redhat.com>
-Date: Tue, 28 May 2019 19:33:51 +0200
+	(envelope-from <pbonzini@redhat.com>) id 1hVgA4-0001ED-6K
+	for qemu-devel@nongnu.org; Tue, 28 May 2019 13:45:21 -0400
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:38454)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hVgA3-0001By-Vq
+	for qemu-devel@nongnu.org; Tue, 28 May 2019 13:45:20 -0400
+Received: by mail-wr1-f68.google.com with SMTP id d18so21206570wrs.5
+	for <qemu-devel@nongnu.org>; Tue, 28 May 2019 10:45:17 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+	:user-agent:mime-version:in-reply-to:content-language
+	:content-transfer-encoding;
+	bh=kUoWpY6D/8N4tWxUgAqdicDiMlZGJsyNeAPTC//UWos=;
+	b=pBfSdrXVX17QWgS35hj8kd/FXzSZMJ0k3vYExCAG8yiwkvoh7Abbw46x76prC4TNW+
+	W8gcy3oiH82U4eXroB3XtA72qdOi2RVStJtt+tuxTXhIS9Vy3p5EEQBDicjGcP333pn8
+	eHM6FseHz7q04NX/cTbZlGiSn+UY+h4msJHWmXlGy5QeAPM3kZTtPePgMzV9ri6HL31H
+	YXq2rM2uV0eqULBjvHOwtm8CbV/7Ua1n4AdG+evBb39iPdgBUR6tftv+/WmQWDsTkRyN
+	/I4ERHbl92TGkispmdGXSaTv1w7srERp/x9/qAasZWaLsjkvVeY+/jOLS07f2oENwziB
+	emrw==
+X-Gm-Message-State: APjAAAW9OzzprnyBtSvqvwOgTgK1BqO6C567Nd0Bwl7m/Ks9fvcP6cSu
+	C18VeSs7/uS9z8Rz7lCsF2wtXg==
+X-Google-Smtp-Source: APXvYqyhRnRv0iT0ZqXnv0s5nfr/2ljfGmTFEM/fldnDJSIVW1YkLybtzCu//G9xyamU4U2qyXW0jQ==
+X-Received: by 2002:a5d:6a90:: with SMTP id s16mr10116381wru.288.1559065516150;
+	Tue, 28 May 2019 10:45:16 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:c92d:f9e8:f150:3553?
+	([2001:b07:6468:f312:c92d:f9e8:f150:3553])
+	by smtp.gmail.com with ESMTPSA id
+	a124sm4842096wmh.3.2019.05.28.10.45.15
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Tue, 28 May 2019 10:45:15 -0700 (PDT)
+To: Jie Wang <wangjie88@huawei.com>, qemu-devel@nongnu.org,
+	qemu-block@nongnu.org
+References: <1559048796-57016-1-git-send-email-wangjie88@huawei.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <cac8ed16-7846-ca22-2463-c3c738066d61@redhat.com>
+Date: Tue, 28 May 2019 19:45:14 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190506153429.52737-4-vsementsov@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="GjOZfBmOnO3EY9jB8Wf8vbzapoT7Ccq3K"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.32]);
-	Tue, 28 May 2019 17:34:15 +0000 (UTC)
+In-Reply-To: <1559048796-57016-1-git-send-email-wangjie88@huawei.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-X-Content-Filtered-By: Mailman/MimeDel 2.1.21
-Subject: Re: [Qemu-devel] [PATCH v6 3/3] block/stream: introduce a bottom
- node
+	[fuzzy]
+X-Received-From: 209.85.221.68
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] pr-manager-helper: fix pr
+ process been killed when reconectting
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -100,146 +86,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, kwolf@redhat.com, berto@igalia.com, wencongyang2@huawei.com,
-	xiechanglong.d@gmail.com, stefanha@redhat.com, den@openvz.org,
-	andrey.shinkevich@virtuozzo.com, jsnow@redhat.com
+Cc: Michal Privoznik <mprivozn@redhat.com>, eric.fangyi@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---GjOZfBmOnO3EY9jB8Wf8vbzapoT7Ccq3K
-From: Max Reitz <mreitz@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: xiechanglong.d@gmail.com, wencongyang2@huawei.com, fam@euphon.net,
- stefanha@redhat.com, kwolf@redhat.com, jsnow@redhat.com,
- andrey.shinkevich@virtuozzo.com, den@openvz.org, berto@igalia.com
-Message-ID: <ee950bac-f0d8-3bc9-f5ed-deaf4d36777b@redhat.com>
-Subject: Re: [PATCH v6 3/3] block/stream: introduce a bottom node
-References: <20190506153429.52737-1-vsementsov@virtuozzo.com>
- <20190506153429.52737-4-vsementsov@virtuozzo.com>
-In-Reply-To: <20190506153429.52737-4-vsementsov@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 28/05/19 15:06, Jie Wang wrote:
+> if pr-helper been killed and qemu send disconnect event to libvirt
+> and libvirt started a new pr-helper process, the new pr-heleper
+> been killed again when qemu is connectting to the new pr-helper,
+> qemu will never send disconnect to libvirt, and libvirt will never
+> receive connected event.
 
-On 06.05.19 17:34, Vladimir Sementsov-Ogievskiy wrote:
-> From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
->=20
-> The bottom node is the intermediate block device that has the base as i=
-ts
-> backing image. It is used instead of the base node while a block stream=
+I think this would let a guest "spam" events just by sending a lot PR
+commands.  Also, as you said, in this case QEMU has never sent a
+"connected" event, so I'm not sure why it should send a disconnection event.
 
-> job is running to avoid dependency on the base that may change due to t=
-he
-> parallel jobs. The change may take place due to a filter node as well t=
-hat
-> is inserted between the base and the intermediate bottom node. It occur=
-s
-> when the base node is the top one for another commit or stream job.
-> After the introduction of the bottom node, don't freeze its backing chi=
-ld,
-> that's the base, anymore.
->=20
-> Suggested-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> Reviewed-by: Alberto Garcia <berto@igalia.com>
+Does libvirt monitor at all the pr-helper to check if it dies?  Or does
+it rely exclusively on QEMU's events?
+
+Paolo
+
+
+> Signed-off-by: Jie Wang <wangjie88@huawei.com>
 > ---
->  block/stream.c         | 49 +++++++++++++++++++++---------------------=
-
->  tests/qemu-iotests/245 |  4 ++--
->  2 files changed, 27 insertions(+), 26 deletions(-)
->=20
-> diff --git a/block/stream.c b/block/stream.c
-> index 65b13b27e0..fc97c89f81 100644
-> --- a/block/stream.c
-> +++ b/block/stream.c
-
-[...]
-
-> @@ -248,26 +250,25 @@ void stream_start(const char *job_id, BlockDriver=
-State *bs,
->       * already have our own plans. Also don't allow resize as the imag=
-e size is
->       * queried only at the job start and then cached. */
->      s =3D block_job_create(job_id, &stream_job_driver, NULL, bs,
-> -                         BLK_PERM_CONSISTENT_READ | BLK_PERM_WRITE_UNC=
-HANGED |
-> -                         BLK_PERM_GRAPH_MOD,
-> -                         BLK_PERM_CONSISTENT_READ | BLK_PERM_WRITE_UNC=
-HANGED |
-> -                         BLK_PERM_WRITE,
-> +                         basic_flags | BLK_PERM_GRAPH_MOD,
-> +                         basic_flags | BLK_PERM_WRITE,
->                           speed, creation_flags, NULL, NULL, errp);
->      if (!s) {
->          goto fail;
+>  scsi/pr-manager-helper.c | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/scsi/pr-manager-helper.c b/scsi/pr-manager-helper.c
+> index 438380fced..b7341b8f47 100644
+> --- a/scsi/pr-manager-helper.c
+> +++ b/scsi/pr-manager-helper.c
+> @@ -120,6 +120,7 @@ static int pr_manager_helper_initialize(PRManagerHelper *pr_mgr,
+>      if (local_err) {
+>          object_unref(OBJECT(sioc));
+>          error_propagate(errp, local_err);
+> +        pr_manager_send_status_changed_event(pr_mgr);
+>          return -ENOTCONN;
 >      }
-> =20
-> -    /* Block all intermediate nodes between bs and base, because they =
-will
-> -     * disappear from the chain after this operation. The streaming jo=
-b reads
-> -     * every block only once, assuming that it doesn't change, so bloc=
-k writes
-> -     * and resizes. */
-> -    for (iter =3D backing_bs(bs); iter && iter !=3D base; iter =3D bac=
-king_bs(iter)) {
-> -        block_job_add_bdrv(&s->common, "intermediate node", iter, 0,
-> -                           BLK_PERM_CONSISTENT_READ | BLK_PERM_WRITE_U=
-NCHANGED,
-> -                           &error_abort);
-> +    /*
-> +     * Block all intermediate nodes between bs and bottom (inclusive),=
- because
-> +     * they will disappear from the chain after this operation. The st=
-reaming
-> +     * job reads every block only once, assuming that it doesn't chang=
-e, so
-> +     * forbid writes and resizes.
-> +     */
-> +    for (iter =3D bs; iter !=3D bottom; iter =3D backing_bs(iter)) {
-> +        block_job_add_bdrv(&s->common, "intermediate node", backing_bs=
-(iter),
-> +                           0, basic_flags, &error_abort);
+>  
+> 
 
-I don=E2=80=99t understand this change.  Isn=E2=80=99t it doing exactly t=
-he same as before?
-
-(If so, I just find it harder to read because every iteration isn=E2=80=99=
-t
-about @iter but backing_bs(iter).)
-
-The rest looks good to me.
-
-Max
-
->      }
-> =20
-> -    s->base =3D base;
-> +    s->bottom =3D bottom;
->      s->backing_file_str =3D g_strdup(backing_file_str);
->      s->bs_read_only =3D bs_read_only;
->      s->chain_frozen =3D true;
-
-
---GjOZfBmOnO3EY9jB8Wf8vbzapoT7Ccq3K
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlztcP8ACgkQ9AfbAGHV
-z0Cc5Qf/UeKAL+BPL+3InGQJWi7B1w9th1IdND1pgmmekuM21XMh+5YtE+av3sW3
-ovN/S2y718bXcJKCs20e/vSe7bPw20dHodsHIfNnB7JFRC8qU5l2gbbrff2l4V6e
-QSiMFKBrImb0YEfuDK3gLp57WFLfVPxxQKOsfk19IFgwiCkXbGu4nfGrd3bv6CGp
-Dxtk/X0V/panAXqlp1DTbV8CoQnw5ckCOGgrzoQzsI24dQ8cLKZt3dGJ9PyJJ2Ho
-+npSn00m9Vaw4SGuMdadjMoDytleSfgvx9oGHBJuC+arnarvdOonmUubnIhozsOn
-9tfQfznQ6z5spbOYZswTEyTocsTAIA==
-=zRMW
------END PGP SIGNATURE-----
-
---GjOZfBmOnO3EY9jB8Wf8vbzapoT7Ccq3K--
 
