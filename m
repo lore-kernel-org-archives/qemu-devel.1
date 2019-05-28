@@ -3,68 +3,71 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,T_HK_NAME_DR autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 25AEFC04AB6
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 May 2019 14:51:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E3E1C04E84
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 May 2019 15:02:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F1B532081C
-	for <qemu-devel@archiver.kernel.org>; Tue, 28 May 2019 14:51:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F1B532081C
+	by mail.kernel.org (Postfix) with ESMTPS id 5A869206C1
+	for <qemu-devel@archiver.kernel.org>; Tue, 28 May 2019 15:02:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5A869206C1
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:36279 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:36428 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hVdRy-0001Vz-0q
-	for qemu-devel@archiver.kernel.org; Tue, 28 May 2019 10:51:38 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:52588)
+	id 1hVdcq-0007Rm-GN
+	for qemu-devel@archiver.kernel.org; Tue, 28 May 2019 11:02:52 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:56119)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1hVdPC-0008SY-8R
-	for qemu-devel@nongnu.org; Tue, 28 May 2019 10:48:47 -0400
+	(envelope-from <bounces@canonical.com>) id 1hVdbs-00076N-6M
+	for qemu-devel@nongnu.org; Tue, 28 May 2019 11:01:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1hVdP6-0006Eh-Ig
-	for qemu-devel@nongnu.org; Tue, 28 May 2019 10:48:42 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59476)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1hVdP4-00059k-Vo
-	for qemu-devel@nongnu.org; Tue, 28 May 2019 10:48:40 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 4C63330A6973;
-	Tue, 28 May 2019 14:46:58 +0000 (UTC)
-Received: from [10.40.204.169] (ovpn-204-169.brq.redhat.com [10.40.204.169])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 8B6B460852;
-	Tue, 28 May 2019 14:46:53 +0000 (UTC)
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-References: <20190528135144.24028-1-philmd@redhat.com>
-	<20190528144204.GF2724@work-vm>
-From: Laurent Vivier <lvivier@redhat.com>
-Message-ID: <7d55f0b0-c2ad-d2b4-f75b-708627a75d84@redhat.com>
-Date: Tue, 28 May 2019 16:46:52 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
-	Thunderbird/52.8.0
+	(envelope-from <bounces@canonical.com>) id 1hVdbV-0001Wl-7N
+	for qemu-devel@nongnu.org; Tue, 28 May 2019 11:01:37 -0400
+Received: from indium.canonical.com ([91.189.90.7]:59380)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1hVdbT-0001Og-22
+	for qemu-devel@nongnu.org; Tue, 28 May 2019 11:01:27 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1hVdbH-0003L7-1b
+	for <qemu-devel@nongnu.org>; Tue, 28 May 2019 15:01:15 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 8C4792E80D5
+	for <qemu-devel@nongnu.org>; Tue, 28 May 2019 15:01:12 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20190528144204.GF2724@work-vm>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.47]);
-	Tue, 28 May 2019 14:46:58 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
+Date: Tue, 28 May 2019 14:50:36 -0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: dgilbert-h nevilad
+X-Launchpad-Bug-Reporter: Alex (nevilad)
+X-Launchpad-Bug-Modifier: Dr. David Alan Gilbert (dgilbert-h)
+References: <155792850856.14868.18260779757728395853.malonedeb@gac.canonical.com>
+Message-Id: <155905503622.17083.14120450024765241821.malone@chaenomeles.canonical.com>
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="18968";
+	Instance="launchpad-lazr.conf"
+X-Launchpad-Hash: fe1ca30be3988485b5f501c23ac1fdbc52dd72ec
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH] tests/migration: Disable
- /migration/postcopy/unix qtest on Travis-CI
+X-Received-From: 91.189.90.7
+Subject: [Qemu-devel] [Bug 1829242] Re: qemu on windows host exits after
+ savevm command
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -73,41 +76,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
-	Thomas Huth <thuth@redhat.com>, Juan Quintela <quintela@redhat.com>,
-	"Dr. David Alan Gilbert" <dgilbert@redhat.com>,
-	qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
-	=?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Reply-To: Bug 1829242 <1829242@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 28/05/2019 16:42, Dr. David Alan Gilbert wrote:
-> * Philippe Mathieu-Daud=C3=A9 (philmd@redhat.com) wrote:
->> This started to fail 6 months ago [1] and lately occurs too
->> often on the main Travis CI.
->>
->> Travis CI set the CONTINUOUS_INTEGRATION variable in the process
->> environment [2]. Let's use it to disable it when running this test
->> there.
->>
->> [1] https://travis-ci.org/philmd/qemu/jobs/466594203#L4430
->> [2] https://docs.travis-ci.com/user/environment-variables/#default-env=
-ironment-variables
->=20
-> I think the right solution here is to disable it under TCG.
->=20
+I think you'll have to break out a debugger on it to see why it's
+exiting; if you can break on any exit paths and get a backtrace we can
+have some more guesswork.
 
-For example, it's already done for  ppc64 and s390x:
+-- =
 
-d254b392cb10 tests/migration-test: Disable s390x test when running with T=
-CG
-5fd4a9c97397 tests/migration: Skip tests for ppc tcg
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1829242
 
-You need the same for aarch64 since:
-c02b37814cf6 tests: Add migration test for aarch64
+Title:
+  qemu on windows host exits after savevm command
 
+Status in QEMU:
+  New
 
-Thanks,
-Laurent
+Bug description:
+  I'm running qemu-system-i386.exe 3.1.0 with this command line:
+  "C:\Program Files\qemu\qemu-system-i386.exe"  -L C:\user\qemu\pc-bios\ -n=
+ame win7 -m 4G -uuid 564db62e-e031-b5cf-5f34-a75f8cefa98e -rtc base=3Dlocal=
+time -accel hax -hdd C:\VirtualMachines\Dev\Win10x64_VS17\swap.qcow "C:\Vir=
+tualMachines\qemu\qemu_win7.qcow"
+  Host OS Windows 10 x64, guest OS Wondows 7 x86.
+
+  Wait till the OS loads, go to compat_monitor0 tab and enter command:
+  savevm loaded_win
+  After a few seconds qemu exits, running it another time and entering comm=
+and:
+  info snapshots
+  says "There is no snapshot available". I've tried rinning it with -accel =
+tcg, with same results. I've tried less memory (1G), same results.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1829242/+subscriptions
 
