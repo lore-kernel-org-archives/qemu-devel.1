@@ -2,92 +2,100 @@ Return-Path: <SRS0=DspQ=T5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8982EC04AB3
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 05:38:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B4518C04AB3
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 05:42:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 38962217D9
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 05:38:00 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="C4C0DC66"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 38962217D9
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 445B0205F4
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 05:42:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 445B0205F4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:47548 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:47601 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hVrHj-0005Qa-7q
-	for qemu-devel@archiver.kernel.org; Wed, 29 May 2019 01:37:59 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:60618)
+	id 1hVrM5-0007N9-8p
+	for qemu-devel@archiver.kernel.org; Wed, 29 May 2019 01:42:29 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:33268)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel.apfelbaum@gmail.com>) id 1hVrGq-0004zt-8e
-	for qemu-devel@nongnu.org; Wed, 29 May 2019 01:37:05 -0400
+	(envelope-from <aravinda@linux.vnet.ibm.com>) id 1hVrK9-0005t3-Ar
+	for qemu-devel@nongnu.org; Wed, 29 May 2019 01:40:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel.apfelbaum@gmail.com>) id 1hVrGp-0001Ur-Cb
-	for qemu-devel@nongnu.org; Wed, 29 May 2019 01:37:04 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:41697)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcel.apfelbaum@gmail.com>)
-	id 1hVqsR-0001yg-In
-	for qemu-devel@nongnu.org; Wed, 29 May 2019 01:11:51 -0400
-Received: by mail-wr1-x442.google.com with SMTP id c2so640039wrm.8
-	for <qemu-devel@nongnu.org>; Tue, 28 May 2019 22:11:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=subject:to:cc:references:from:message-id:date:user-agent
-	:mime-version:in-reply-to:content-transfer-encoding:content-language;
-	bh=YQ1xqtLZLWliwP7boBDEU6TpsqPaCpy6byNYhOdb2C4=;
-	b=C4C0DC66zbqFpcUQlBc5YjPXXPtAnIyTQdNY6+aiN7kIBLhH6z5EbTV7iRVf5zWH1g
-	xwL2/e+QLn7AOZkDhP9PC/GM10F04W/7kPQ8twB5G9YJ4d7NlQXy3AahDh1dNPK8KpXp
-	u2+Fb4P2WhSQOzcNFu2SA3vH0VVK2zUvfZyu/+Mx+gQSS1f3HjdXQlc0bt7nrAvqyB3+
-	fupLb+puKY0tylSVjtGQGrrNPL2QAnpe3AKaDV3T9vX+HPr5T3QI0361pK1O8vP4I04w
-	sHZC2Wc9Y5kdaSuv+OL7BwCj1qo2fQz24Z2bOAyvMtbusZoCEo/F2pcgb7sM15zPHcd9
-	wDxw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-	:user-agent:mime-version:in-reply-to:content-transfer-encoding
-	:content-language;
-	bh=YQ1xqtLZLWliwP7boBDEU6TpsqPaCpy6byNYhOdb2C4=;
-	b=myBsbYXpVG1kMR0HXZCXVnjNiRxYr1PQnnOnrAoFEJ61DsOaWeP3fUSFHW/wwRUE2t
-	EIQb1wR5fmYBajk6O2oYWUnsIVP4OZP0uDwmfglUbebkhjlzukwwIg+bevo/9hBr7kyZ
-	HyS+U2Epcvane2kAtCLh5QkRQNMYxQtlycriSdl3S/JpG86/AGUxPHGKfUpB8ukm21Zr
-	bNsrFXnuwIC5zLBtmXqGEtxnCr63vfx07H55tWtAlGW9lZbiy6bpudtem2X962VaqkaW
-	HtWBhq9qzhVT6DG2F6NNaoSCvg94sqTRI6jyvYMRhXcflv/sgTw+8d9+mlf8SpT8G/cs
-	s/7g==
-X-Gm-Message-State: APjAAAW5K3scKbir9yi3m98o9RrCOFFPCjLRN+FcFdoc5QFsMIsfHWxR
-	gHa1EXiQjybhrxokqa+x0y0=
-X-Google-Smtp-Source: APXvYqwmeC85rd4jOv7WEsQPzP2f3P7214UFSu7k/fHLdKjn5jbnPLsd3cle4G+PyO5/qZ8O8Jt8Yw==
-X-Received: by 2002:a5d:6207:: with SMTP id y7mr58368955wru.265.1559106698898; 
-	Tue, 28 May 2019 22:11:38 -0700 (PDT)
-Received: from localhost.localdomain ([37.142.144.27])
-	by smtp.gmail.com with ESMTPSA id
-	u19sm12434321wmu.41.2019.05.28.22.11.37
-	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-	Tue, 28 May 2019 22:11:38 -0700 (PDT)
-To: Gerd Hoffmann <kraxel@redhat.com>
-References: <20190528204331.5280-1-kraxel@redhat.com>
-	<016bde36-9476-91c3-0a06-5cd13d317083@gmail.com>
-	<20190529050123.dblwhfffwa5emhjf@sirius.home.kraxel.org>
-From: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Message-ID: <f82b1632-083b-8520-4f46-b9d89de9583c@gmail.com>
-Date: Wed, 29 May 2019 08:11:36 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	(envelope-from <aravinda@linux.vnet.ibm.com>) id 1hVrK8-0004yy-9D
+	for qemu-devel@nongnu.org; Wed, 29 May 2019 01:40:29 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:47988)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <aravinda@linux.vnet.ibm.com>)
+	id 1hVrK7-0004qP-PU
+	for qemu-devel@nongnu.org; Wed, 29 May 2019 01:40:28 -0400
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+	x4T5XNXj007432
+	for <qemu-devel@nongnu.org>; Wed, 29 May 2019 01:40:13 -0400
+Received: from e34.co.us.ibm.com (e34.co.us.ibm.com [32.97.110.152])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2sshjfmmpr-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 29 May 2019 01:40:13 -0400
+Received: from localhost
+	by e34.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <aravinda@linux.vnet.ibm.com>;
+	Wed, 29 May 2019 06:40:12 +0100
+Received: from b03cxnp08028.gho.boulder.ibm.com (9.17.130.20)
+	by e34.co.us.ibm.com (192.168.1.134) with IBM ESMTP SMTP Gateway:
+	Authorized Use Only! Violators will be prosecuted; 
+	(version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+	Wed, 29 May 2019 06:40:10 +0100
+Received: from b03ledav003.gho.boulder.ibm.com
+	(b03ledav003.gho.boulder.ibm.com [9.17.130.234])
+	by b03cxnp08028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with
+	ESMTP id x4T5e9C821103056
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256
+	verify=OK); Wed, 29 May 2019 05:40:09 GMT
+Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 764576A05A;
+	Wed, 29 May 2019 05:40:09 +0000 (GMT)
+Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 465066A047;
+	Wed, 29 May 2019 05:40:07 +0000 (GMT)
+Received: from [127.0.1.1] (unknown [9.124.31.56])
+	by b03ledav003.gho.boulder.ibm.com (Postfix) with ESMTP;
+	Wed, 29 May 2019 05:40:06 +0000 (GMT)
+From: Aravinda Prasad <aravinda@linux.vnet.ibm.com>
+To: aik@au1.ibm.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org,
+	david@gibson.dropbear.id.au
+Date: Wed, 29 May 2019 11:10:06 +0530
+User-Agent: StGit/0.17.1-dirty
 MIME-Version: 1.0
-In-Reply-To: <20190529050123.dblwhfffwa5emhjf@sirius.home.kraxel.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
-	That's all we know.
-X-Received-From: 2a00:1450:4864:20::442
-Subject: Re: [Qemu-devel] [PATCH] q35: fix mmconfig and PCI0._CRS
+X-TM-AS-GCONF: 00
+x-cbid: 19052905-0016-0000-0000-000009BB5883
+X-IBM-SpamModules-Scores: 
+X-IBM-SpamModules-Versions: BY=3.00011177; HX=3.00000242; KW=3.00000007;
+	PH=3.00000004; SC=3.00000286; SDB=6.01210122; UDB=6.00635758;
+	IPR=6.00991155; 
+	MB=3.00027096; MTD=3.00000008; XFM=3.00000015; UTC=2019-05-29 05:40:12
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19052905-0017-0000-0000-000043683D83
+Message-Id: <155910829070.13149.5215948335633966328.stgit@aravinda>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
+	definitions=2019-05-29_03:, , signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+	priorityscore=1501
+	malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+	clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+	mlxlogscore=557 adultscore=0 classifier=spam adjust=0 reason=mlx
+	scancount=1 engine=8.0.1-1810050000 definitions=main-1905290037
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 148.163.156.1
+Subject: [Qemu-devel] [PATCH v9 0/6] target-ppc/spapr: Add FWNMI support in
+ QEMU for PowerKVM guests
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -99,65 +107,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
-	Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
-	=?UTF-8?B?TMOhc3psw7Mgw4lyc2Vr?= <lersek@redhat.com>,
-	Richard Henderson <rth@twiddle.net>
+Cc: paulus@ozlabs.org, aravinda@linux.vnet.ibm.com, groug@kaod.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Gerd,
+This patch set adds support for FWNMI in PowerKVM guests.
 
-On 5/29/19 8:01 AM, Gerd Hoffmann wrote:
-> On Wed, May 29, 2019 at 07:48:03AM +0300, Marcel Apfelbaum wrote:
->> Hi Gerd,
->>
->> On 5/28/19 11:43 PM, Gerd Hoffmann wrote:
->>> This patch changes the handling of the mmconfig area.  Thanks to the
->>> pci(e) expander devices we already have the logic to exclude address
->>> ranges from PCI0._CRS.  We can simply add the mmconfig address range
->>> to the list get it excluded as well.
->>>
->>> With that in place we can go with a fixed pci hole which covers the
->>> whole area from the end of (low) ram to the ioapic.
->>>
->>> This will make the whole logic alot less fragile.  No matter where the
->>> firmware places the mmconfig xbar, things should work correctly.  The
->>> guest also gets a bit more PCI address space (seabios boot):
->>>
->>>       # cat /proc/iomem
->>>       [ ... ]
->>>       7ffdd000-7fffffff : reserved
->>>       80000000-afffffff : PCI Bus 0000:00            <<-- this is new
->>>       b0000000-bfffffff : PCI MMCONFIG 0000 [bus 00-ff]
->>>         b0000000-bfffffff : reserved
->>>       c0000000-febfffff : PCI Bus 0000:00
->>>         f8000000-fbffffff : 0000:00:01.0
->>>       [ ... ]
->>>
->>> So this is a guest visible change.
->> Looks good to me, but shouldn't we use some compat
->> property to not affect previous machine versions?
-> acpi table changes are typically not versioned, and IIRC the acpi tables
-> are part of the live migration data stream so the tables will not change
-> under the feet of the running guest even when it is migrated to another
-> qemu version.
+System errors such as SLB multihit and memory errors
+that cannot be corrected by hardware is passed on to
+the kernel for handling by raising machine check
+exception (an NMI). Upon such machine check exceptions,
+if the address in error belongs to guest then KVM
+invokes guests' 0x200 interrupt vector if the guest
+is not FWNMI capable. For FWNMI capable guest
+KVM passes the control to QEMU by exiting the guest.
 
-I wasn't "worried" only about migration, but also about the visible 
-change in
-the guests keeping the same machine type and upgrading QEMU.
+This patch series adds functionality to QEMU to pass
+on such machine check exceptions to the FWNMI capable
+guest kernel by building an error log and invoking
+the guest registered machine check handling routine.
 
-I am not saying is a "big" issue since it will probably not affect the 
-guests at all.
-Upgrading QEMU will look like a firmware update or something.
+The KVM changes are now part of the upstream kernel
+(commit e20bbd3d). This series contain QEMU changes.
 
-Thanks,
-Marcel
+Change Log v9:
+  - Fixed kvm cap and spapr cap issues
 
-> cheers,
->    Gerd
->
+Change Log v8:
+  - Added functionality to check FWNMI capability during
+    VM migration
+
+Change Log v7:
+  - Rebased to 4.1
+
+Change Log v6:
+  - Fetches rtas_addr from fdt
+  - Handles all error conditions (earlier it was only UEs)
+
+Change Log v5:
+  - Handled VM migrations by including rtas_addr in VMSTATE.
+  - Migration is blocked while a machine check is in progress.
+
+---
+
+Aravinda Prasad (6):
+      ppc: spapr: Handle "ibm,nmi-register" and "ibm,nmi-interlock" RTAS calls
+      Wrapper function to wait on condition for the main loop mutex
+      target/ppc: Handle NMI guest exit
+      target/ppc: Build rtas error log upon an MCE
+      ppc: spapr: Enable FWNMI capability
+      migration: Include migration support for machine check handling
+
+
+ cpus.c                   |    5 +
+ hw/ppc/spapr.c           |   34 ++++++
+ hw/ppc/spapr_caps.c      |   24 ++++
+ hw/ppc/spapr_events.c    |  276 ++++++++++++++++++++++++++++++++++++++++++++++
+ hw/ppc/spapr_rtas.c      |   92 +++++++++++++++
+ include/hw/ppc/spapr.h   |   25 ++++
+ include/qemu/main-loop.h |    8 +
+ target/ppc/kvm.c         |   35 ++++++
+ target/ppc/kvm_ppc.h     |   14 ++
+ target/ppc/trace-events  |    1 
+ 10 files changed, 512 insertions(+), 2 deletions(-)
+
+--
+Aravinda
 
 
