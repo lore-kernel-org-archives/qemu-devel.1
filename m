@@ -2,63 +2,64 @@ Return-Path: <SRS0=DspQ=T5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.0 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 94E6BC28CC1
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 04:42:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 31B89C28CC0
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 04:42:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6A8EB21734
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 04:42:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6A8EB21734
+	by mail.kernel.org (Postfix) with ESMTPS id EE34121734
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 04:42:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EE34121734
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:47000 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:47002 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hVqPu-0006T0-I5
-	for qemu-devel@archiver.kernel.org; Wed, 29 May 2019 00:42:22 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:47703)
+	id 1hVqQ3-0006Y6-89
+	for qemu-devel@archiver.kernel.org; Wed, 29 May 2019 00:42:31 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:47727)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1hVqOA-0005DE-Q4
-	for qemu-devel@nongnu.org; Wed, 29 May 2019 00:40:36 -0400
+	(envelope-from <kraxel@redhat.com>) id 1hVqOB-0005DL-TI
+	for qemu-devel@nongnu.org; Wed, 29 May 2019 00:40:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1hVqO9-00068Q-Jm
-	for qemu-devel@nongnu.org; Wed, 29 May 2019 00:40:34 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51522)
+	(envelope-from <kraxel@redhat.com>) id 1hVqO9-00068k-SR
+	for qemu-devel@nongnu.org; Wed, 29 May 2019 00:40:35 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40830)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1hVqO9-00064w-Ax
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1hVqO9-000655-Fa
 	for qemu-devel@nongnu.org; Wed, 29 May 2019 00:40:33 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+	[10.5.11.23])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B3EF83087926
-	for <qemu-devel@nongnu.org>; Wed, 29 May 2019 04:40:27 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 0CA4488305
+	for <qemu-devel@nongnu.org>; Wed, 29 May 2019 04:40:28 +0000 (UTC)
 Received: from sirius.home.kraxel.org (ovpn-116-59.ams2.redhat.com
 	[10.36.116.59])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 4D798798A9;
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 587E91972A;
 	Wed, 29 May 2019 04:40:21 +0000 (UTC)
 Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
-	id 8F0EF16E36; Wed, 29 May 2019 06:40:20 +0200 (CEST)
+	id A088217446; Wed, 29 May 2019 06:40:20 +0200 (CEST)
 From: Gerd Hoffmann <kraxel@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Wed, 29 May 2019 06:40:11 +0200
-Message-Id: <20190529044020.27003-1-kraxel@redhat.com>
+Date: Wed, 29 May 2019 06:40:12 +0200
+Message-Id: <20190529044020.27003-2-kraxel@redhat.com>
+In-Reply-To: <20190529044020.27003-1-kraxel@redhat.com>
+References: <20190529044020.27003-1-kraxel@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.45]);
-	Wed, 29 May 2019 04:40:27 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.28]);
+	Wed, 29 May 2019 04:40:28 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 0/9] Vga 20190529 patches
+Subject: [Qemu-devel] [PULL 1/9] vhost-user: add vhost_user_gpu_set_socket()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -77,92 +78,403 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The following changes since commit da35f7f1eeff9f249a9597400fc514c83fd3a0=
-f8:
+From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-  virtio-gpu: add sanity check (2019-05-28 08:14:44 +0200)
+Add a new vhost-user message to give a unix socket to a vhost-user
+backend for GPU display updates.
 
-are available in the Git repository at:
+Back when I started that work, I added a new GPU channel because the
+vhost-user protocol wasn't bidirectional. Since then, there is a
+vhost-user-slave channel for the slave to send requests to the master.
+We could extend it with GPU messages. However, the GPU protocol is
+quite orthogonal to vhost-user, thus I chose to have a new dedicated
+channel.
 
-  git://git.kraxel.org/qemu tags/vga-20190529-pull-request
+See vhost-user-gpu.rst for the protocol details.
 
-for you to fetch changes up to 267f664658fee4138f80013fa25354191e8091cb:
-
-  hw/display: add vhost-user-vga & gpu-pci (2019-05-29 06:30:45 +0200)
-
-----------------------------------------------------------------
-vga: add vhost-user-gpu.
-
-----------------------------------------------------------------
-
-Marc-Andr=C3=A9 Lureau (9):
-  vhost-user: add vhost_user_gpu_set_socket()
-  virtio-gpu: add bswap helpers header
-  virtio-gpu: add a pixman helper header
-  util: compile drm.o on posix
-  contrib: add vhost-user-gpu
-  spice-app: fix running when !CONFIG_OPENGL
-  virtio-gpu: split virtio-gpu, introduce virtio-gpu-base
-  virtio-gpu: split virtio-gpu-pci & virtio-vga
-  hw/display: add vhost-user-vga & gpu-pci
-
- configure                                  |   17 +
- Makefile                                   |   24 +-
- Makefile.objs                              |    1 +
- contrib/libvhost-user/libvhost-user.h      |    1 +
- contrib/vhost-user-gpu/virgl.h             |   25 +
- contrib/vhost-user-gpu/vugbm.h             |   67 ++
- contrib/vhost-user-gpu/vugpu.h             |  177 +++
- hw/display/virtio-vga.h                    |   32 +
- include/hw/virtio/vhost-backend.h          |    2 +
- include/hw/virtio/virtio-gpu-bswap.h       |   61 +
- include/hw/virtio/virtio-gpu-pci.h         |   40 +
- include/hw/virtio/virtio-gpu-pixman.h      |   45 +
- include/hw/virtio/virtio-gpu.h             |   92 +-
- contrib/libvhost-user/libvhost-user.c      |    1 +
- contrib/vhost-user-gpu/main.c              | 1185 ++++++++++++++++++++
- contrib/vhost-user-gpu/virgl.c             |  579 ++++++++++
- contrib/vhost-user-gpu/vugbm.c             |  328 ++++++
- hw/display/vhost-user-gpu-pci.c            |   51 +
- hw/display/vhost-user-gpu.c                |  607 ++++++++++
- hw/display/vhost-user-vga.c                |   52 +
- hw/display/virtio-gpu-3d.c                 |   49 +-
- hw/display/virtio-gpu-base.c               |  268 +++++
- hw/display/virtio-gpu-pci.c                |   55 +-
- hw/display/virtio-gpu.c                    |  448 ++------
- hw/display/virtio-vga.c                    |  138 +--
- hw/virtio/vhost-user.c                     |   11 +
- ui/spice-app.c                             |    3 +-
- vl.c                                       |    1 +
- MAINTAINERS                                |   10 +-
- contrib/vhost-user-gpu/50-qemu-gpu.json.in |    5 +
- contrib/vhost-user-gpu/Makefile.objs       |   10 +
- docs/interop/index.rst                     |    1 +
- docs/interop/vhost-user-gpu.rst            |  242 ++++
- docs/interop/vhost-user.rst                |    9 +
- hw/display/Kconfig                         |   10 +
- hw/display/Makefile.objs                   |    5 +-
- rules.mak                                  |    9 +-
- util/Makefile.objs                         |    2 +-
- 38 files changed, 4176 insertions(+), 487 deletions(-)
- create mode 100644 contrib/vhost-user-gpu/virgl.h
- create mode 100644 contrib/vhost-user-gpu/vugbm.h
- create mode 100644 contrib/vhost-user-gpu/vugpu.h
- create mode 100644 hw/display/virtio-vga.h
- create mode 100644 include/hw/virtio/virtio-gpu-bswap.h
- create mode 100644 include/hw/virtio/virtio-gpu-pci.h
- create mode 100644 include/hw/virtio/virtio-gpu-pixman.h
- create mode 100644 contrib/vhost-user-gpu/main.c
- create mode 100644 contrib/vhost-user-gpu/virgl.c
- create mode 100644 contrib/vhost-user-gpu/vugbm.c
- create mode 100644 hw/display/vhost-user-gpu-pci.c
- create mode 100644 hw/display/vhost-user-gpu.c
- create mode 100644 hw/display/vhost-user-vga.c
- create mode 100644 hw/display/virtio-gpu-base.c
- create mode 100644 contrib/vhost-user-gpu/50-qemu-gpu.json.in
- create mode 100644 contrib/vhost-user-gpu/Makefile.objs
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Message-id: 20190524130946.31736-2-marcandre.lureau@redhat.com
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+---
+ contrib/libvhost-user/libvhost-user.h |   1 +
+ include/hw/virtio/vhost-backend.h     |   2 +
+ contrib/libvhost-user/libvhost-user.c |   1 +
+ hw/virtio/vhost-user.c                |  11 ++
+ MAINTAINERS                           |   6 +
+ docs/interop/index.rst                |   1 +
+ docs/interop/vhost-user-gpu.rst       | 242 ++++++++++++++++++++++++++
+ docs/interop/vhost-user.rst           |   9 +
+ 8 files changed, 273 insertions(+)
  create mode 100644 docs/interop/vhost-user-gpu.rst
 
+diff --git a/contrib/libvhost-user/libvhost-user.h b/contrib/libvhost-use=
+r/libvhost-user.h
+index 78b33306e813..3b888ff0a513 100644
+--- a/contrib/libvhost-user/libvhost-user.h
++++ b/contrib/libvhost-user/libvhost-user.h
+@@ -94,6 +94,7 @@ typedef enum VhostUserRequest {
+     VHOST_USER_POSTCOPY_END     =3D 30,
+     VHOST_USER_GET_INFLIGHT_FD =3D 31,
+     VHOST_USER_SET_INFLIGHT_FD =3D 32,
++    VHOST_USER_GPU_SET_SOCKET =3D 33,
+     VHOST_USER_MAX
+ } VhostUserRequest;
+=20
+diff --git a/include/hw/virtio/vhost-backend.h b/include/hw/virtio/vhost-=
+backend.h
+index d6632a18e689..6f6670783f7a 100644
+--- a/include/hw/virtio/vhost-backend.h
++++ b/include/hw/virtio/vhost-backend.h
+@@ -170,4 +170,6 @@ int vhost_backend_invalidate_device_iotlb(struct vhos=
+t_dev *dev,
+ int vhost_backend_handle_iotlb_msg(struct vhost_dev *dev,
+                                           struct vhost_iotlb_msg *imsg);
+=20
++int vhost_user_gpu_set_socket(struct vhost_dev *dev, int fd);
++
+ #endif /* VHOST_BACKEND_H */
+diff --git a/contrib/libvhost-user/libvhost-user.c b/contrib/libvhost-use=
+r/libvhost-user.c
+index c56f2dfe44a4..443b7e08c3b2 100644
+--- a/contrib/libvhost-user/libvhost-user.c
++++ b/contrib/libvhost-user/libvhost-user.c
+@@ -130,6 +130,7 @@ vu_request_to_string(unsigned int req)
+         REQ(VHOST_USER_POSTCOPY_END),
+         REQ(VHOST_USER_GET_INFLIGHT_FD),
+         REQ(VHOST_USER_SET_INFLIGHT_FD),
++        REQ(VHOST_USER_GPU_SET_SOCKET),
+         REQ(VHOST_USER_MAX),
+     };
+ #undef REQ
+diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
+index 553319c7ac78..4ca5b2551e12 100644
+--- a/hw/virtio/vhost-user.c
++++ b/hw/virtio/vhost-user.c
+@@ -96,6 +96,7 @@ typedef enum VhostUserRequest {
+     VHOST_USER_POSTCOPY_END     =3D 30,
+     VHOST_USER_GET_INFLIGHT_FD =3D 31,
+     VHOST_USER_SET_INFLIGHT_FD =3D 32,
++    VHOST_USER_GPU_SET_SOCKET =3D 33,
+     VHOST_USER_MAX
+ } VhostUserRequest;
+=20
+@@ -353,6 +354,16 @@ static int vhost_user_write(struct vhost_dev *dev, V=
+hostUserMsg *msg,
+     return 0;
+ }
+=20
++int vhost_user_gpu_set_socket(struct vhost_dev *dev, int fd)
++{
++    VhostUserMsg msg =3D {
++        .hdr.request =3D VHOST_USER_GPU_SET_SOCKET,
++        .hdr.flags =3D VHOST_USER_VERSION,
++    };
++
++    return vhost_user_write(dev, &msg, &fd, 1);
++}
++
+ static int vhost_user_set_log_base(struct vhost_dev *dev, uint64_t base,
+                                    struct vhost_log *log)
+ {
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 3cacd751bf39..e04ae7817c00 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -1676,6 +1676,12 @@ F: hw/display/virtio-gpu*
+ F: hw/display/virtio-vga.c
+ F: include/hw/virtio/virtio-gpu.h
+=20
++vhost-user-gpu
++M: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
++M: Gerd Hoffmann <kraxel@redhat.com>
++S: Maintained
++F: docs/interop/vhost-user-gpu.rst
++
+ Cirrus VGA
+ M: Gerd Hoffmann <kraxel@redhat.com>
+ S: Odd Fixes
+diff --git a/docs/interop/index.rst b/docs/interop/index.rst
+index a037bd67ecca..b4bfcab4171c 100644
+--- a/docs/interop/index.rst
++++ b/docs/interop/index.rst
+@@ -16,3 +16,4 @@ Contents:
+    live-block-operations
+    pr-helper
+    vhost-user
++   vhost-user-gpu
+diff --git a/docs/interop/vhost-user-gpu.rst b/docs/interop/vhost-user-gp=
+u.rst
+new file mode 100644
+index 000000000000..688f8b425999
+--- /dev/null
++++ b/docs/interop/vhost-user-gpu.rst
+@@ -0,0 +1,242 @@
++=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
++Vhost-user-gpu Protocol
++=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
++
++:Licence: This work is licensed under the terms of the GNU GPL,
++          version 2 or later. See the COPYING file in the top-level
++          directory.
++
++.. contents:: Table of Contents
++
++Introduction
++=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
++
++The vhost-user-gpu protocol is aiming at sharing the rendering result
++of a virtio-gpu, done from a vhost-user slave process to a vhost-user
++master process (such as QEMU). It bears a resemblance to a display
++server protocol, if you consider QEMU as the display server and the
++slave as the client, but in a very limited way. Typically, it will
++work by setting a scanout/display configuration, before sending flush
++events for the display updates. It will also update the cursor shape
++and position.
++
++The protocol is sent over a UNIX domain stream socket, since it uses
++socket ancillary data to share opened file descriptors (DMABUF fds or
++shared memory). The socket is usually obtained via
++``VHOST_USER_GPU_SET_SOCKET``.
++
++Requests are sent by the *slave*, and the optional replies by the
++*master*.
++
++Wire format
++=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
++
++Unless specified differently, numbers are in the machine native byte
++order.
++
++A vhost-user-gpu message (request and reply) consists of 3 header
++fields and a payload.
++
+++---------+-------+------+---------+
++| request | flags | size | payload |
+++---------+-------+------+---------+
++
++Header
++------
++
++:request: ``u32``, type of the request
++
++:flags: ``u32``, 32-bit bit field:
++
++ - Bit 2 is the reply flag - needs to be set on each reply
++
++:size: ``u32``, size of the payload
++
++Payload types
++-------------
++
++Depending on the request type, **payload** can be:
++
++VhostUserGpuCursorPos
++^^^^^^^^^^^^^^^^^^^^^
++
+++------------+---+---+
++| scanout-id | x | y |
+++------------+---+---+
++
++:scanout-id: ``u32``, the scanout where the cursor is located
++
++:x/y: ``u32``, the cursor postion
++
++VhostUserGpuCursorUpdate
++^^^^^^^^^^^^^^^^^^^^^^^^
++
+++-----+-------+-------+--------+
++| pos | hot_x | hot_y | cursor |
+++-----+-------+-------+--------+
++
++:pos: a ``VhostUserGpuCursorPos``, the cursor location
++
++:hot_x/hot_y: ``u32``, the cursor hot location
++
++:cursor: ``[u32; 64 * 64]``, 64x64 RGBA cursor data (PIXMAN_a8r8g8b8 for=
+mat)
++
++VhostUserGpuScanout
++^^^^^^^^^^^^^^^^^^^
++
+++------------+---+---+
++| scanout-id | w | h |
+++------------+---+---+
++
++:scanout-id: ``u32``, the scanout configuration to set
++
++:w/h: ``u32``, the scanout width/height size
++
++VhostUserGpuUpdate
++^^^^^^^^^^^^^^^^^^
++
+++------------+---+---+---+---+------+
++| scanout-id | x | y | w | h | data |
+++------------+---+---+---+---+------+
++
++:scanout-id: ``u32``, the scanout content to update
++
++:x/y/w/h: ``u32``, region of the update
++
++:data: RGB data (PIXMAN_x8r8g8b8 format)
++
++VhostUserGpuDMABUFScanout
++^^^^^^^^^^^^^^^^^^^^^^^^^
++
+++------------+---+---+---+---+-----+-----+--------+-------+--------+
++| scanout-id | x | y | w | h | fdw | fwh | stride | flags | fourcc |
+++------------+---+---+---+---+-----+-----+--------+-------+--------+
++
++:scanout-id: ``u32``, the scanout configuration to set
++
++:x/y: ``u32``, the location of the scanout within the DMABUF
++
++:w/h: ``u32``, the scanout width/height size
++
++:fdw/fdh/stride/flags: ``u32``, the DMABUF width/height/stride/flags
++
++:fourcc: ``i32``, the DMABUF fourcc
++
++
++C structure
++-----------
++
++In QEMU the vhost-user-gpu message is implemented with the following str=
+uct:
++
++.. code:: c
++
++  typedef struct VhostUserGpuMsg {
++      uint32_t request; /* VhostUserGpuRequest */
++      uint32_t flags;
++      uint32_t size; /* the following payload size */
++      union {
++          VhostUserGpuCursorPos cursor_pos;
++          VhostUserGpuCursorUpdate cursor_update;
++          VhostUserGpuScanout scanout;
++          VhostUserGpuUpdate update;
++          VhostUserGpuDMABUFScanout dmabuf_scanout;
++          struct virtio_gpu_resp_display_info display_info;
++          uint64_t u64;
++      } payload;
++  } QEMU_PACKED VhostUserGpuMsg;
++
++Protocol features
++-----------------
++
++None yet.
++
++As the protocol may need to evolve, new messages and communication
++changes are negotiated thanks to preliminary
++``VHOST_USER_GPU_GET_PROTOCOL_FEATURES`` and
++``VHOST_USER_GPU_SET_PROTOCOL_FEATURES`` requests.
++
++Communication
++=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
++
++Message types
++-------------
++
++``VHOST_USER_GPU_GET_PROTOCOL_FEATURES``
++  :id: 1
++  :request payload: N/A
++  :reply payload: ``u64``
++
++  Get the supported protocol features bitmask.
++
++``VHOST_USER_GPU_SET_PROTOCOL_FEATURES``
++  :id: 2
++  :request payload: ``u64``
++  :reply payload: N/A
++
++  Enable protocol features using a bitmask.
++
++``VHOST_USER_GPU_GET_DISPLAY_INFO``
++  :id: 3
++  :request payload: N/A
++  :reply payload: ``struct virtio_gpu_resp_display_info`` (from virtio s=
+pecification)
++
++  Get the preferred display configuration.
++
++``VHOST_USER_GPU_CURSOR_POS``
++  :id: 4
++  :request payload: ``VhostUserGpuCursorPos``
++  :reply payload: N/A
++
++  Set/show the cursor position.
++
++``VHOST_USER_GPU_CURSOR_POS_HIDE``
++  :id: 5
++  :request payload: ``VhostUserGpuCursorPos``
++  :reply payload: N/A
++
++  Set/hide the cursor.
++
++``VHOST_USER_GPU_CURSOR_UPDATE``
++  :id: 6
++  :request payload: ``VhostUserGpuCursorUpdate``
++  :reply payload: N/A
++
++  Update the cursor shape and location.
++
++``VHOST_USER_GPU_SCANOUT``
++  :id: 7
++  :request payload: ``VhostUserGpuScanout``
++  :reply payload: N/A
++
++  Set the scanout resolution. To disable a scanout, the dimensions
++  width/height are set to 0.
++
++``VHOST_USER_GPU_UPDATE``
++  :id: 8
++  :request payload: ``VhostUserGpuUpdate``
++  :reply payload: N/A
++
++  Update the scanout content. The data payload contains the graphical bi=
+ts.
++  The display should be flushed and presented.
++
++``VHOST_USER_GPU_DMABUF_SCANOUT``
++  :id: 9
++  :request payload: ``VhostUserGpuDMABUFScanout``
++  :reply payload: N/A
++
++  Set the scanout resolution/configuration, and share a DMABUF file
++  descriptor for the scanout content, which is passed as ancillary
++  data. To disable a scanout, the dimensions width/height are set
++  to 0, there is no file descriptor passed.
++
++``VHOST_USER_GPU_DMABUF_UPDATE``
++  :id: 10
++  :request payload: ``VhostUserGpuUpdate``
++  :reply payload: empty payload
++
++  The display should be flushed and presented according to updated
++  region from ``VhostUserGpuUpdate``.
++
++  Note: there is no data payload, since the scanout is shared thanks
++  to DMABUF, that must have been set previously with
++  ``VHOST_USER_GPU_DMABUF_SCANOUT``.
+diff --git a/docs/interop/vhost-user.rst b/docs/interop/vhost-user.rst
+index 7f3232c79836..dc0ff9211ff5 100644
+--- a/docs/interop/vhost-user.rst
++++ b/docs/interop/vhost-user.rst
+@@ -1163,6 +1163,15 @@ Master message types
+   send the shared inflight buffer back to slave so that slave could
+   get inflight I/O after a crash or restart.
+=20
++``VHOST_USER_GPU_SET_SOCKET``
++  :id: 33
++  :equivalent ioctl: N/A
++  :master payload: N/A
++
++  Sets the GPU protocol socket file descriptor, which is passed as
++  ancillary data. The GPU protocol is used to inform the master of
++  rendering state and updates. See vhost-user-gpu.rst for details.
++
+ Slave message types
+ -------------------
+=20
 --=20
 2.18.1
 
