@@ -2,62 +2,87 @@ Return-Path: <SRS0=DspQ=T5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C81FC07542
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 07:22:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FEBCC07542
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 07:22:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EFC652075C
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 07:22:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0301121670
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 07:22:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="HSDK8oG0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EFC652075C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fqa8ii6B"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0301121670
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:48862 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:48869 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hVsuU-0000nv-3x
-	for qemu-devel@archiver.kernel.org; Wed, 29 May 2019 03:22:06 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:48395)
+	id 1hVsux-0001E5-4Y
+	for qemu-devel@archiver.kernel.org; Wed, 29 May 2019 03:22:35 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:53267)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1hVsQq-0000qE-Fo
-	for qemu-devel@nongnu.org; Wed, 29 May 2019 02:51:29 -0400
+	(envelope-from <elohimes@gmail.com>) id 1hVsjl-0000ae-JK
+	for qemu-devel@nongnu.org; Wed, 29 May 2019 03:11:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1hVsQp-00033J-9F
-	for qemu-devel@nongnu.org; Wed, 29 May 2019 02:51:28 -0400
-Received: from ozlabs.org ([203.11.71.1]:44563)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
-	id 1hVsQo-0002uH-VF; Wed, 29 May 2019 02:51:27 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
-	id 45DLv73CQHz9sPl; Wed, 29 May 2019 16:50:25 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-	d=gibson.dropbear.id.au; s=201602; t=1559112627;
-	bh=GUZhhj9ktzjORPqE5ENQeBsjM9/HbMGBpQ2Ql0E1fAc=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=HSDK8oG0rVn65VE7t0dR5F3YjZorrG2xVIFSeaognR0hCLt69u5wu/oEsx3aQTmsh
-	8j9VlmWqE/mtEAj8l4I1+1XB1p9nfuyYQwctSOAm80Xaym8RRyK9CYzh0l04OxNcoo
-	kqHS6PUfkm5zigQYUbn0wFi7anhT4wOwFKn0s9WQ=
-From: David Gibson <david@gibson.dropbear.id.au>
-To: peter.maydell@linaro.org
-Date: Wed, 29 May 2019 16:50:09 +1000
-Message-Id: <20190529065017.15149-37-david@gibson.dropbear.id.au>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20190529065017.15149-1-david@gibson.dropbear.id.au>
-References: <20190529065017.15149-1-david@gibson.dropbear.id.au>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 203.11.71.1
-Subject: [Qemu-devel] [PULL 36/44] spapr/irq: initialize the IRQ device only
- once
+	(envelope-from <elohimes@gmail.com>) id 1hVsjj-0006R3-Ke
+	for qemu-devel@nongnu.org; Wed, 29 May 2019 03:11:01 -0400
+Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:46977)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <elohimes@gmail.com>) id 1hVsjh-0006PA-KD
+	for qemu-devel@nongnu.org; Wed, 29 May 2019 03:10:59 -0400
+Received: by mail-pg1-x544.google.com with SMTP id v9so782472pgr.13
+	for <qemu-devel@nongnu.org>; Wed, 29 May 2019 00:10:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+	h=from:to:cc:subject:date:message-id:in-reply-to:references;
+	bh=GjcX2eS1qWnd/pfqLo8M97WyTdrvK7+rz7aAhVuI32E=;
+	b=fqa8ii6B3pDGwtNzmAtAtIZ+g03DBeYwNeakYkbtOh4SavsZuY8XV8yVgsaggskbTJ
+	2GF7SfAeUPJbl8xqUKBrlmwVSTfyqPuCouZi4QN2v3ZseDEzTk2drpHAGfOFi7t7z08X
+	7IJSdGAE43tOzDHRoXPoyvsiPQMIa7cP4Eviy4NZoVaCfjomfIOIz+E0ILiUEi4OV6RV
+	nOqW4PuG2UxWWQzSjz+fS0OBxnkGDLvKZaKW031YmIfvcYbIrX1BXAa689BoJi07uuiZ
+	lpQDbBVtcfZl3qXQUV0tWQiPyTVj3wPj6UFKSuHyOUOEMPQYMW9pcv1lcv32vL2n7gem
+	CxFQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+	:references;
+	bh=GjcX2eS1qWnd/pfqLo8M97WyTdrvK7+rz7aAhVuI32E=;
+	b=OB34nfl/Y6Z3XXR7hDCkJq40S/X4bFpWEY6x/UO+RgJXqclLQQxi34QOJd+d5gSf9G
+	8aNYAGP6APMPEBRFjQ1w76nbkTvaz6gHI1YFC9jDPCBnkj8RYNAtmufqst80dx1cQ9d2
+	H1cA3vQM3VvHKowD8Z7qGVBRrI2DJuleut/Tm7HnLGv70Qt8WqOCTPgVP0TrR9ID8UWN
+	/ysKiAOsBkOIo31CRtTWhDMEIWjmSqYH1DhRCILktQFfZMu/5XOZ5VHBFTGnDE6Eoenb
+	0kwShsLH4RPiCbTAK1enmL8+LnlX6PLM4AmYzNOuBHRLBqQvnpL7EhiIuFRlPm0us4Ew
+	nXig==
+X-Gm-Message-State: APjAAAXjglZLD3vP9Yj5jHgdmjDM56t7qSd2p51Rr56v+R1sCBz53LvV
+	/YNv7C92hxea8NkCMRGfOVc=
+X-Google-Smtp-Source: APXvYqzMQrN7WpQ4HgD5jGm7YyQEsSHQpyTnP7/o8i5oQ+8l8N902SqK6EDKwHcwgROqeZMlJ+vnfw==
+X-Received: by 2002:a17:90a:ac03:: with SMTP id
+	o3mr10472629pjq.114.1559113855429; 
+	Wed, 29 May 2019 00:10:55 -0700 (PDT)
+Received: from localhost ([116.247.112.152])
+	by smtp.gmail.com with ESMTPSA id r4sm4619471pjd.28.2019.05.29.00.10.54
+	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+	Wed, 29 May 2019 00:10:55 -0700 (PDT)
+From: elohimes@gmail.com
+X-Google-Original-From: xieyongji@baidu.com
+To: mst@redhat.com,
+	groug@kaod.org,
+	dgilbert@redhat.com
+Date: Wed, 29 May 2019 15:09:51 +0800
+Message-Id: <20190529070955.25565-2-xieyongji@baidu.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20190529070955.25565-1-xieyongji@baidu.com>
+References: <20190529070955.25565-1-xieyongji@baidu.com>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::544
+Subject: [Qemu-devel] [PATCH 1/5] virtio: Set "start_on_kick" on
+ virtio_set_features()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -69,83 +94,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: lvivier@redhat.com, qemu-devel@nongnu.org, groug@kaod.org,
-	qemu-ppc@nongnu.org, clg@kaod.org,
-	David Gibson <david@gibson.dropbear.id.au>, rth@twiddle.net
+Cc: Xie Yongji <xieyongji@baidu.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: C=C3=A9dric Le Goater <clg@kaod.org>
+From: Xie Yongji <xieyongji@baidu.com>
 
-Add a check to make sure that the routine initializing the emulated
-IRQ device is called once. We don't have much to test on the XICS
-side, so we introduce a 'init' boolean under ICSState.
+The guest feature is not set correctly on virtio_reset() and
+virtio_init(). So we should not use it to set "start_on_kick" at that
+point. This patch set "start_on_kick" on virtio_set_features() instead.
 
-Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
-Message-Id: <20190513084245.25755-13-clg@kaod.org>
-Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+Signed-off-by: Xie Yongji <xieyongji@baidu.com>
 ---
- hw/intc/spapr_xive.c  | 9 +++++++++
- hw/intc/xics_spapr.c  | 7 +++++++
- include/hw/ppc/xics.h | 1 +
- 3 files changed, 17 insertions(+)
+ hw/virtio/virtio.c | 25 +++++++++++++++----------
+ 1 file changed, 15 insertions(+), 10 deletions(-)
 
-diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
-index a79574b23c..f6f6c29d6a 100644
---- a/hw/intc/spapr_xive.c
-+++ b/hw/intc/spapr_xive.c
-@@ -338,6 +338,15 @@ void spapr_xive_init(SpaprXive *xive, Error **errp)
-     XiveSource *xsrc =3D &xive->source;
-     XiveENDSource *end_xsrc =3D &xive->end_source;
-=20
-+    /*
-+     * The emulated XIVE device can only be initialized once. If the
-+     * ESB memory region has been already mapped, it means we have been
-+     * through there.
-+     */
-+    if (memory_region_is_mapped(&xsrc->esb_mmio)) {
-+        return;
-+    }
+diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
+index 4805727b53..fc8fca81ad 100644
+--- a/hw/virtio/virtio.c
++++ b/hw/virtio/virtio.c
+@@ -1214,8 +1214,7 @@ void virtio_reset(void *opaque)
+         k->reset(vdev);
+     }
+ 
+-    vdev->start_on_kick = (virtio_host_has_feature(vdev, VIRTIO_F_VERSION_1) &&
+-                          !virtio_vdev_has_feature(vdev, VIRTIO_F_VERSION_1));
++    vdev->start_on_kick = false;
+     vdev->started = false;
+     vdev->broken = false;
+     vdev->guest_features = 0;
+@@ -2069,14 +2068,21 @@ int virtio_set_features(VirtIODevice *vdev, uint64_t val)
+         return -EINVAL;
+     }
+     ret = virtio_set_features_nocheck(vdev, val);
+-    if (!ret && virtio_vdev_has_feature(vdev, VIRTIO_RING_F_EVENT_IDX)) {
+-        /* VIRTIO_RING_F_EVENT_IDX changes the size of the caches.  */
+-        int i;
+-        for (i = 0; i < VIRTIO_QUEUE_MAX; i++) {
+-            if (vdev->vq[i].vring.num != 0) {
+-                virtio_init_region_cache(vdev, i);
++    if (!ret) {
++        if (virtio_vdev_has_feature(vdev, VIRTIO_RING_F_EVENT_IDX)) {
++            /* VIRTIO_RING_F_EVENT_IDX changes the size of the caches.  */
++            int i;
++            for (i = 0; i < VIRTIO_QUEUE_MAX; i++) {
++                if (vdev->vq[i].vring.num != 0) {
++                    virtio_init_region_cache(vdev, i);
++                }
+             }
+         }
 +
-     /* TIMA initialization */
-     memory_region_init_io(&xive->tm_mmio, OBJECT(xive), &xive_tm_ops, xi=
-ve,
-                           "xive.tima", 4ull << TM_SHIFT);
-diff --git a/hw/intc/xics_spapr.c b/hw/intc/xics_spapr.c
-index 9d2b8adef7..5a1835e8b1 100644
---- a/hw/intc/xics_spapr.c
-+++ b/hw/intc/xics_spapr.c
-@@ -239,6 +239,13 @@ static void rtas_int_on(PowerPCCPU *cpu, SpaprMachin=
-eState *spapr,
-=20
- void xics_spapr_init(SpaprMachineState *spapr)
- {
-+    /* Emulated mode can only be initialized once. */
-+    if (spapr->ics->init) {
-+        return;
-+    }
-+
-+    spapr->ics->init =3D true;
-+
-     /* Registration of global state belongs into realize */
-     spapr_rtas_register(RTAS_IBM_SET_XIVE, "ibm,set-xive", rtas_set_xive=
-);
-     spapr_rtas_register(RTAS_IBM_GET_XIVE, "ibm,get-xive", rtas_get_xive=
-);
-diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
-index eb65ad7e43..d6f8e4c4c2 100644
---- a/include/hw/ppc/xics.h
-+++ b/include/hw/ppc/xics.h
-@@ -119,6 +119,7 @@ struct ICSState {
-     uint32_t offset;
-     ICSIRQState *irqs;
-     XICSFabric *xics;
-+    bool init; /* sPAPR ICS device initialized */
- };
-=20
- #define ICS_PROP_XICS "xics"
---=20
-2.21.0
++        if (virtio_host_has_feature(vdev, VIRTIO_F_VERSION_1) &&
++            !virtio_vdev_has_feature(vdev, VIRTIO_F_VERSION_1)) {
++            vdev->start_on_kick = true;
++        }
+     }
+     return ret;
+ }
+@@ -2331,8 +2337,7 @@ void virtio_init(VirtIODevice *vdev, const char *name,
+             g_malloc0(sizeof(*vdev->vector_queues) * nvectors);
+     }
+ 
+-    vdev->start_on_kick = (virtio_host_has_feature(vdev, VIRTIO_F_VERSION_1) &&
+-                          !virtio_vdev_has_feature(vdev, VIRTIO_F_VERSION_1));
++    vdev->start_on_kick = false;
+     vdev->started = false;
+     vdev->device_id = device_id;
+     vdev->status = 0;
+-- 
+2.17.1
 
 
