@@ -2,74 +2,62 @@ Return-Path: <SRS0=DspQ=T5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EDAA1C04AB3
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 03:41:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B488C04AB3
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 04:04:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C3A1821721
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 03:41:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C3A1821721
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 5162621734
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 04:04:50 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="eGksVjai"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5162621734
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:46491 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:46657 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hVpT8-0001y6-0I
-	for qemu-devel@archiver.kernel.org; Tue, 28 May 2019 23:41:38 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:38505)
+	id 1hVppZ-0004vJ-GM
+	for qemu-devel@archiver.kernel.org; Wed, 29 May 2019 00:04:49 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:42579)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1hVpSF-0001c2-Hb
-	for qemu-devel@nongnu.org; Tue, 28 May 2019 23:40:44 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1hVpom-0004cT-27
+	for qemu-devel@nongnu.org; Wed, 29 May 2019 00:04:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1hVpSE-0008WC-AO
-	for qemu-devel@nongnu.org; Tue, 28 May 2019 23:40:43 -0400
-Received: from mail-qt1-f195.google.com ([209.85.160.195]:41517)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1hVpSE-0007KI-5r
-	for qemu-devel@nongnu.org; Tue, 28 May 2019 23:40:42 -0400
-Received: by mail-qt1-f195.google.com with SMTP id s57so884171qte.8
-	for <qemu-devel@nongnu.org>; Tue, 28 May 2019 20:40:22 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-	:mime-version:content-disposition:in-reply-to;
-	bh=CA/4dQuaDckNy4AUShkfB3sMJYFzdlrvMh+cMSh6ymk=;
-	b=f8Drda/0/seq3TZbwrPxg6IuO7Ad2i0wN3Zxf0qAmITEccJxoQDJOGKAfQIhY/ywww
-	sGlOOXD6pFMBEVWmRamD/A+ybzDIFUeNxwvi6sQFNIJZr8TI1sUzzbyicaLzAi55SFRj
-	PUUfilbtiJnktNHTuuIAnKcGjWPZ6zndG+y4adjsHbui0ZGMv/XMrUPn+Ne05APLoYmZ
-	5V9RTiQsY43rAWSqQIg/BvkO/oJDll0EreIUKzAeb4tKc40e3LJHtJAn5R+WqpKX6AsN
-	Canzcf9FzeIEawTB+OGTHtQfvPhuqLdm4Jom5QNIyt0fDhO2PVU2gPJWYjH1RRrN7Bk5
-	RGbQ==
-X-Gm-Message-State: APjAAAUvjxQ8HO78ffFW2LZDnZByxzsJZSBDS7bdjhfetdIBFHzLwIC1
-	jybtVnNiEjShjBuoW7zpocjGjg==
-X-Google-Smtp-Source: APXvYqxZCW8sl4NzynuNYSnfMxxMzOniFC/UrECQYsUqP/bQUypqcvtbOQPs3tn5egFKxY8JGWz0FQ==
-X-Received: by 2002:ac8:96d:: with SMTP id z42mr90521227qth.24.1559101221644; 
-	Tue, 28 May 2019 20:40:21 -0700 (PDT)
-Received: from redhat.com (pool-100-0-197-103.bstnma.fios.verizon.net.
-	[100.0.197.103])
-	by smtp.gmail.com with ESMTPSA id w5sm6288911qtc.50.2019.05.28.20.40.20
-	(version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-	Tue, 28 May 2019 20:40:20 -0700 (PDT)
-Date: Tue, 28 May 2019 23:40:18 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Dongjiu Geng <gengdongjiu@huawei.com>
-Message-ID: <20190528233859-mutt-send-email-mst@kernel.org>
-References: <1557832703-42620-1-git-send-email-gengdongjiu@huawei.com>
-	<1557832703-42620-3-git-send-email-gengdongjiu@huawei.com>
+	(envelope-from <dgibson@ozlabs.org>) id 1hVpok-0006xh-EV
+	for qemu-devel@nongnu.org; Wed, 29 May 2019 00:03:59 -0400
+Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:50847 helo=ozlabs.org)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1hVpoi-0006lo-R1
+	for qemu-devel@nongnu.org; Wed, 29 May 2019 00:03:58 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+	id 45DHBg1vMSz9sB8; Wed, 29 May 2019 14:03:39 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+	d=gibson.dropbear.id.au; s=201602; t=1559102619;
+	bh=/luALfeC8x0Y7FPALvUo4G9a2dSAY/XJEm5Z3sU6+iI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=eGksVjaic0ycB2ECzUGKIxoLvvWTfXlmi4ycotOhMslOnCqATIF8g61G9WXaVoQBx
+	9OdEt2zxcgRguV8Qad/lmNPWlxqA1romo7BUpLqHyst9hvRmvpcJyoxo2YynbekeD2
+	etK/MHxIIiFTknXeI7Yf1FwBKAjiVK8axwhQK5hU=
+Date: Wed, 29 May 2019 11:47:34 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+To: Markus Armbruster <armbru@redhat.com>
+Message-ID: <20190529014733.GA32028@umbus.fritz.box>
+References: <87lfyqla7r.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="DocE+STaALJfprDB"
 Content-Disposition: inline
-In-Reply-To: <1557832703-42620-3-git-send-email-gengdongjiu@huawei.com>
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-	[fuzzy]
-X-Received-From: 209.85.160.195
-Subject: Re: [Qemu-devel] [PATCH v17 02/10] ACPI: add some GHES structures
- and macros definition
+In-Reply-To: <87lfyqla7r.fsf@dusky.pond.sub.org>
+User-Agent: Mutt/1.11.4 (2019-03-13)
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2401:3900:2:1::2
+Subject: Re: [Qemu-devel] Headers without multiple inclusion guards
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -81,108 +69,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, ehabkost@redhat.com, kvm@vger.kernel.org,
-	mtosatti@redhat.com, qemu-devel@nongnu.org, linuxarm@huawei.com,
-	shannon.zhaosl@gmail.com, zhengxiang9@huawei.com,
-	qemu-arm@nongnu.org, james.morse@arm.com,
-	jonathan.cameron@huawei.com, imammedo@redhat.com,
-	pbonzini@redhat.com, xuwei5@huawei.com, lersek@redhat.com, rth@twiddle.net
+Cc: Peter Maydell <peter.maydell@linaro.org>, Chris Wulff <crwulff@gmail.com>,
+	Sagar Karandikar <sagark@eecs.berkeley.edu>,
+	David Hildenbrand <david@redhat.com>, James Hogan <jhogan@kernel.org>,
+	Anthony Green <green@moxielogic.com>, Palmer Dabbelt <palmer@sifive.com>,
+	Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+	qemu-devel@nongnu.org, Max Filippov <jcmvbkbc@gmail.com>,
+	Dmitry Fleytman <dmitry.fleytman@gmail.com>,
+	Alistair Francis <Alistair.Francis@wdc.com>,
+	Gerd Hoffmann <kraxel@redhat.com>,
+	"Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+	Guan Xuetao <gxt@mprc.pku.edu.cn>, Marek Vasut <marex@denx.de>,
+	Stefano Stabellini <sstabellini@kernel.org>,
+	Aleksandar Rikalo <arikalo@wavecomp.com>, Helge Deller <deller@gmx.de>,
+	"Michael S. Tsirkin" <mst@redhat.com>, Laszlo Ersek <lersek@redhat.com>,
+	Halil Pasic <pasic@linux.ibm.com>,
+	Christian Borntraeger <borntraeger@de.ibm.com>,
+	Anthony Perard <anthony.perard@citrix.com>,
+	Jason Wang <jasowang@redhat.com>, Artyom Tarasenko <atar4qemu@gmail.com>,
+	Laurent Vivier <lvivier@redhat.com>,
+	Thomas Huth <thuth@redhat.com>, Riku Voipio <riku.voipio@iki.fi>,
+	Eduardo Habkost <ehabkost@redhat.com>,
+	Alistair Francis <alistair@alistair23.me>, Greg Kurz <groug@kaod.org>,
+	Marcelo Tosatti <mtosatti@redhat.com>,
+	Beniamino Galvani <b.galvani@gmail.com>,
+	Eric Auger <eric.auger@redhat.com>, Paul Durrant <paul.durrant@citrix.com>,
+	Stafford Horne <shorne@gmail.com>,
+	Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>,
+	Richard Henderson <rth@twiddle.net>,
+	"Daniel P. Berrange" <berrange@redhat.com>,
+	Claudio Fontana <claudio.fontana@gmail.com>,
+	Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+	Cornelia Huck <cohuck@redhat.com>,
+	Claudio Fontana <claudio.fontana@huawei.com>,
+	Laurent Vivier <laurent@vivier.eu>,
+	Andrew Baumann <Andrew.Baumann@microsoft.com>,
+	Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
+	Michael Walle <michael@walle.cc>,
+	Aleksandar Markovic <amarkovic@wavecomp.com>,
+	Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>,
+	Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, May 14, 2019 at 04:18:15AM -0700, Dongjiu Geng wrote:
-> Add Generic Error Status Block structures and some macros
-> definitions, which is referred to the ACPI 4.0 or ACPI 6.2. The
-> HEST table generation and CPER record will use them.
-> 
-> Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
 
-Are these all still used? I'd rather you moved stuff to
-where it's used.
+--DocE+STaALJfprDB
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
+On Tue, May 28, 2019 at 08:12:24PM +0200, Markus Armbruster wrote:
+> We have a bunch of headers without multiple inclusion guards.  Some are
+> clearly intentional, some look accidental.  Too many for me to find out
+> by examining each of them, so I'm asking their maintainers.
+>=20
+> Why do I ask?  I'd like to mark the intentional ones and fix the
+> accidental ones, so they don't flunk "make check-headers" from "[RFC v4
+> 0/7] Baby steps towards saner headers" just because they lack multiple
+> inclusion guards.
+>=20
+> Just in case: what's a multiple inclusion guard?  It's
+>=20
+>     #ifndef UNIQUE_GUARD_SYMBOL_H
+>     #define UNIQUE_GUARD_SYMBOL_H
+>     ...
+>     #endif
+>=20
+> with nothing but comments outside the conditional, so that the header
+> can safely be included more than once.
+>=20
+> I append the alphabetical list of headers without multiple inclusion
+> guards (as reported by scripts/clean-header-guards -nv), followed by the
+> same list sorted into maintainer buckets.  If you're cc'ed, please find
+> your bucket(s), and tell me which headers intentionally lack guards.
 
+[snip]
+> PowerPC
+> M: David Gibson <david@gibson.dropbear.id.au>
+> target/ppc/helper.h
 
-> ---
->  include/hw/acpi/acpi-defs.h | 52 +++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 52 insertions(+)
-> 
-> diff --git a/include/hw/acpi/acpi-defs.h b/include/hw/acpi/acpi-defs.h
-> index f9aa4bd..d1996fb 100644
-> --- a/include/hw/acpi/acpi-defs.h
-> +++ b/include/hw/acpi/acpi-defs.h
-> @@ -224,6 +224,25 @@ typedef struct AcpiMultipleApicTable AcpiMultipleApicTable;
->  #define ACPI_APIC_RESERVED              16   /* 16 and greater are reserved */
->  
->  /*
-> + * Values for Hardware Error Notification Type field
-> + */
-> +enum AcpiHestNotifyType {
-> +    ACPI_HEST_NOTIFY_POLLED = 0,
-> +    ACPI_HEST_NOTIFY_EXTERNAL = 1,
-> +    ACPI_HEST_NOTIFY_LOCAL = 2,
-> +    ACPI_HEST_NOTIFY_SCI = 3,
-> +    ACPI_HEST_NOTIFY_NMI = 4,
-> +    ACPI_HEST_NOTIFY_CMCI = 5,  /* ACPI 5.0: 18.3.2.7, Table 18-290 */
-> +    ACPI_HEST_NOTIFY_MCE = 6,   /* ACPI 5.0: 18.3.2.7, Table 18-290 */
-> +    ACPI_HEST_NOTIFY_GPIO = 7,  /* ACPI 6.0: 18.3.2.7, Table 18-332 */
-> +    ACPI_HEST_NOTIFY_SEA = 8,   /* ACPI 6.1: 18.3.2.9, Table 18-345 */
-> +    ACPI_HEST_NOTIFY_SEI = 9,   /* ACPI 6.1: 18.3.2.9, Table 18-345 */
-> +    ACPI_HEST_NOTIFY_GSIV = 10, /* ACPI 6.1: 18.3.2.9, Table 18-345 */
-> +    ACPI_HEST_NOTIFY_SDEI = 11, /* ACPI 6.2: 18.3.2.9, Table 18-383 */
-> +    ACPI_HEST_NOTIFY_RESERVED = 12 /* 12 and greater are reserved */
-> +};
-> +
+Like the equivalent ARM variants, intentional.
 
-If there's a single user, the best thing to do
-is just to open-code with a comment that matches
-spec names. It's hard to find stuff like ACPI_HEST_NOTIFY_GSIV
-in a spec.
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
-> +/*
->   * MADT sub-structures (Follow MULTIPLE_APIC_DESCRIPTION_TABLE)
->   */
->  #define ACPI_SUB_HEADER_DEF   /* Common ACPI sub-structure header */\
-> @@ -400,6 +419,39 @@ struct AcpiSystemResourceAffinityTable {
->  } QEMU_PACKED;
->  typedef struct AcpiSystemResourceAffinityTable AcpiSystemResourceAffinityTable;
->  
-> +/*
-> + * Generic Error Status Block
-> + */
-> +struct AcpiGenericErrorStatus {
-> +    /* It is a bitmask composed of ACPI_GEBS_xxx macros */
-> +    uint32_t block_status;
-> +    uint32_t raw_data_offset;
-> +    uint32_t raw_data_length;
-> +    uint32_t data_length;
-> +    uint32_t error_severity;
-> +} QEMU_PACKED;
-> +typedef struct AcpiGenericErrorStatus AcpiGenericErrorStatus;
-> +
-> +/*
-> + * Masks for block_status flags above
-> + */
-> +#define ACPI_GEBS_UNCORRECTABLE         1
-> +
-> +/*
-> + * Values for error_severity field above
-> + */
-> +enum AcpiGenericErrorSeverity {
-> +    ACPI_CPER_SEV_RECOVERABLE,
-> +    ACPI_CPER_SEV_FATAL,
-> +    ACPI_CPER_SEV_CORRECTED,
-> +    ACPI_CPER_SEV_NONE,
-> +};
-> +
-> +/*
-> + * Generic Hardware Error Source version 2
-> + */
-> +#define ACPI_HEST_SOURCE_GENERIC_ERROR_V2    10
-> +
->  #define ACPI_SRAT_PROCESSOR_APIC     0
->  #define ACPI_SRAT_MEMORY             1
->  #define ACPI_SRAT_PROCESSOR_x2APIC   2
-> -- 
-> 1.8.3.1
+--DocE+STaALJfprDB
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlzt5LUACgkQbDjKyiDZ
+s5KRHg/9EXoNGPwr+4nyw+b7H62dguDoiHNRG5msf4WewG/wlPrCft6eqcO8+/Kd
+PJtlqi6CNprLRoTrPLagGOC8R/GpZ7aWEFhshtqVheIlKS+80VCqAFdIejB/vr9a
+/f47qeNmKqMhEfEnJA332nqCOYY1niS+CnOV0+bd7psOQ6TlCnNvdPYYYdX3PXnS
+9NTyacoPsWaR1/epuUBXck9WW1JeiNNLHuYN30arvjrcWifmVy5uWUeh2KRJwo5q
+8eHzG00B5zQoJswbylAUYacesh+aGgFWVw6LU9Z1qu+gnXphXFfsRzguPcl4WUS9
+F/oSKAweNcdAyAr7SzNFyYjsXJPC1SThspD6xN8qMgYyIFBpWmrciBJuD2EjsNzM
+OTgFGBnCmGazJ93j8J4mI5OwaZ1eqDkARhUmkT9H+wI1D8ac1lP6l+U7vFsC1xwc
+hLRdjR/JfCGfFcqD9e3k1J2bIgOJvaAWaISomBSx7cPeBYG+FJDOsWP+EurMhaaK
+7La6D+8WH2GkX0w4HAgXIjgbXRbNK4jUCCd+3+BpUYQWdUrfODoTOixcuv3RaRo+
+FiNuPbVSbA6rHw0jMo/oh0glvVjESUnfPNeoAj7e/Sqi0w7MOlop8lLrcl2JGdeO
+UoRC9vfijWBLkQw4jkhkwmo8jtGCjqJ3B4LTujjcZuBj3Th7Wx4=
+=u5pr
+-----END PGP SIGNATURE-----
+
+--DocE+STaALJfprDB--
 
