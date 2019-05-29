@@ -2,62 +2,86 @@ Return-Path: <SRS0=DspQ=T5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 226BBC04AB3
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 07:09:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C48AC04AB3
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 07:10:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E57CB21019
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 07:09:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0B3DC21019
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 07:10:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="IQBOubMJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E57CB21019
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="px0LcRNr"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0B3DC21019
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:48636 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:48638 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hVsiP-0007Ko-UO
-	for qemu-devel@archiver.kernel.org; Wed, 29 May 2019 03:09:38 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:48074)
+	id 1hVsjC-0007zD-7M
+	for qemu-devel@archiver.kernel.org; Wed, 29 May 2019 03:10:26 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:45256)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1hVsQQ-0000L6-V9
-	for qemu-devel@nongnu.org; Wed, 29 May 2019 02:51:03 -0400
+	(envelope-from <arilou@gmail.com>) id 1hVsHy-00019y-LO
+	for qemu-devel@nongnu.org; Wed, 29 May 2019 02:42:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1hVsQQ-0002qT-1s
-	for qemu-devel@nongnu.org; Wed, 29 May 2019 02:51:02 -0400
-Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:56907 helo=ozlabs.org)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
-	id 1hVsQP-0002e0-M5; Wed, 29 May 2019 02:51:01 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
-	id 45DLv62HCLz9sPJ; Wed, 29 May 2019 16:50:23 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-	d=gibson.dropbear.id.au; s=201602; t=1559112626;
-	bh=siwZger9wRnZvOxEZY9u/KjVe/b0SGHKQBk2SghV9nE=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=IQBOubMJHzYeVJzElLwr+8g7hR6yqC++i67lrYv1i847pmy7tRScY7w+JsUBvarpe
-	NqDtPTVZ/PFTJBwYdoDaluGUX8EjGYVEH4nhc4HmBb9k32nD2oUfq/0IShNBAT7ZVI
-	YwgiPEUR6FTizcsTJR7hAH4eJxe07pHLCK3sn9E8=
-From: David Gibson <david@gibson.dropbear.id.au>
-To: peter.maydell@linaro.org
-Date: Wed, 29 May 2019 16:49:58 +1000
-Message-Id: <20190529065017.15149-26-david@gibson.dropbear.id.au>
+	(envelope-from <arilou@gmail.com>) id 1hVsHx-0002T5-9j
+	for qemu-devel@nongnu.org; Wed, 29 May 2019 02:42:18 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:55393)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <arilou@gmail.com>) id 1hVsHx-0002Jq-48
+	for qemu-devel@nongnu.org; Wed, 29 May 2019 02:42:17 -0400
+Received: by mail-wm1-x341.google.com with SMTP id u78so714973wmu.5
+	for <qemu-devel@nongnu.org>; Tue, 28 May 2019 23:42:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+	h=from:to:cc:subject:date:message-id:in-reply-to:references
+	:mime-version:content-transfer-encoding;
+	bh=WJhaKk0Bv9gRHhRS5uztzL7FE5AQMtFAVizIuMhmaP4=;
+	b=px0LcRNrPB7184dsi9bPUkbTrp6T1HnCkcUH8cYGUDYK3SrU+Q66JPUV/nd9p8oEi+
+	CIQ7/aTXxJOwIAiwQOAzrlGCFcaxfmD4M79OA/YYn0E8sxclLc1KwpFj/ENrbIs50tdQ
+	3LrtGh4INJTfYeP4cKDwHxM7w+92cwQ85fr51s0xuYEKkwvetA4Mp0j7fYYa2dznIat4
+	jGrKT1X2UmjRnMscksfhVt9clxHQGPixVJrZMCA0LstyzQIv92UqbjPzO3sTGzsDJnfX
+	P5qHRug+DDQsYvv5rnDKYLuT42VLsAk7YZrYAgxJiOmVA93Kqq67xCeqMEM8g9Yx7Yiw
+	pHrg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+	:references:mime-version:content-transfer-encoding;
+	bh=WJhaKk0Bv9gRHhRS5uztzL7FE5AQMtFAVizIuMhmaP4=;
+	b=RKUgUUDQ/qt3qT/aKEPh6Z06hxwAvHuMtT9qL+7g2jnu3knTE1hPkC3d/feF4sr/D/
+	ofAbh9wvjBGlbPVOa6fsnXKBViDRrTlUbNfT0hiRknZfFFjIPuAWnaFkSTmpI9jKEExh
+	wunI4NciOGRHKLH9VYWqlD06j5mzTzFysRxUVCHVk2M4v8Z8yYxu4jpkWpQVfvCJsD4l
+	JBeruyAb8i9uqlDDoFy5hnmKB/aEe9/kBvRoaDk38WbOkkhsXlD2A51FpUcpD0WL+yD0
+	YeOqT3HsaokB4glPqvEvGq3n/CcfYyncVrZw1OpnJ+dRK6R6G7eWC83dz7EIcfXnNMal
+	1IfA==
+X-Gm-Message-State: APjAAAUVaK0l9ypVOC+x5accB2F9orRgdZ4S3cFec8yLVlGc8LF22Bx1
+	4vSsJNqUHHD8StLavYBRmU+HeBfF
+X-Google-Smtp-Source: APXvYqzyh65MPSvEbgK/SqHKtBapmD5ltw/UATkC6ZwWpHAq+VoBxjfVjJvSBN21WJhixZcn5TO06w==
+X-Received: by 2002:a1c:f610:: with SMTP id w16mr5337031wmc.37.1559112136097; 
+	Tue, 28 May 2019 23:42:16 -0700 (PDT)
+Received: from linux.local ([31.154.166.148])
+	by smtp.gmail.com with ESMTPSA id f2sm6831168wme.12.2019.05.28.23.42.15
+	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+	Tue, 28 May 2019 23:42:15 -0700 (PDT)
+From: Jon Doron <arilou@gmail.com>
+To: qemu-devel@nongnu.org
+Date: Wed, 29 May 2019 09:41:44 +0300
+Message-Id: <20190529064148.19856-17-arilou@gmail.com>
 X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20190529065017.15149-1-david@gibson.dropbear.id.au>
-References: <20190529065017.15149-1-david@gibson.dropbear.id.au>
+In-Reply-To: <20190529064148.19856-1-arilou@gmail.com>
+References: <20190529064148.19856-1-arilou@gmail.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2401:3900:2:1::2
-Subject: [Qemu-devel] [PULL 25/44] spapr: Print out extra hints when CAS
- negotiation of interrupt mode fails
+X-Received-From: 2a00:1450:4864:20::341
+Subject: [Qemu-devel] [PATCH v12 16/20] gdbstub: Implement v commands with
+ new infra
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -69,57 +93,213 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: lvivier@redhat.com, qemu-devel@nongnu.org, groug@kaod.org,
-	qemu-ppc@nongnu.org, clg@kaod.org,
-	Satheesh Rajendran <sathnaga@linux.vnet.ibm.com>,
-	David Gibson <david@gibson.dropbear.id.au>, rth@twiddle.net
+Cc: alex.bennee@linaro.org, Jon Doron <arilou@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Greg Kurz <groug@kaod.org>
-
-Let's suggest to the user how the machine should be configured to allow
-the guest to boot successfully.
-
-Suggested-by: Satheesh Rajendran <sathnaga@linux.vnet.ibm.com>
-Signed-off-by: Greg Kurz <groug@kaod.org>
-Message-Id: <155799221739.527449.14907564571096243745.stgit@bahia.lan>
-Reviewed-by: Satheesh Rajendran <sathnaga@linux.vnet.ibm.com>
-Tested-by: Satheesh Rajendran <sathnaga@linux.vnet.ibm.com>
-[dwg: Adjusted for style error]
-Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+Signed-off-by: Jon Doron <arilou@gmail.com>
 ---
- hw/ppc/spapr_hcall.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+ gdbstub.c | 170 +++++++++++++++++++++++++++++++++++-------------------
+ 1 file changed, 110 insertions(+), 60 deletions(-)
 
-diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
-index 63a55614b8..0a050ad3d8 100644
---- a/hw/ppc/spapr_hcall.c
-+++ b/hw/ppc/spapr_hcall.c
-@@ -1646,12 +1646,14 @@ static target_ulong h_client_architecture_support=
-(PowerPCCPU *cpu,
-      */
-     if (guest_xive) {
-         if (spapr->irq->ov5 =3D=3D SPAPR_OV5_XIVE_LEGACY) {
--            error_report("Guest requested unavailable interrupt mode (XI=
-VE)");
-+            error_report(
-+"Guest requested unavailable interrupt mode (XIVE), try the ic-mode=3Dxi=
-ve or ic-mode=3Ddual machine property");
-             exit(EXIT_FAILURE);
+diff --git a/gdbstub.c b/gdbstub.c
+index 3fd1a1cddb..648191a3b0 100644
+--- a/gdbstub.c
++++ b/gdbstub.c
+@@ -1818,6 +1818,106 @@ static void handle_step(GdbCmdContext *gdb_ctx, void *user_ctx)
+     gdb_continue(gdb_ctx->s);
+ }
+ 
++static void handle_v_cont_query(GdbCmdContext *gdb_ctx, void *user_ctx)
++{
++    put_packet(gdb_ctx->s, "vCont;c;C;s;S");
++}
++
++static void handle_v_cont(GdbCmdContext *gdb_ctx, void *user_ctx)
++{
++    int res;
++
++    if (!gdb_ctx->num_params) {
++        return;
++    }
++
++    res = gdb_handle_vcont(gdb_ctx->s, gdb_ctx->params[0].data);
++    if ((res == -EINVAL) || (res == -ERANGE)) {
++        put_packet(gdb_ctx->s, "E22");
++    } else if (res) {
++        put_packet(gdb_ctx->s, "");
++    }
++}
++
++static void handle_v_attach(GdbCmdContext *gdb_ctx, void *user_ctx)
++{
++    GDBProcess *process;
++    CPUState *cpu;
++    char thread_id[16];
++
++    pstrcpy(gdb_ctx->str_buf, sizeof(gdb_ctx->str_buf), "E22");
++    if (!gdb_ctx->num_params) {
++        goto cleanup;
++    }
++
++    process = gdb_get_process(gdb_ctx->s, gdb_ctx->params[0].val_ul);
++    if (!process) {
++        goto cleanup;
++    }
++
++    cpu = get_first_cpu_in_process(gdb_ctx->s, process);
++    if (!cpu) {
++        goto cleanup;
++    }
++
++    process->attached = true;
++    gdb_ctx->s->g_cpu = cpu;
++    gdb_ctx->s->c_cpu = cpu;
++
++    gdb_fmt_thread_id(gdb_ctx->s, cpu, thread_id, sizeof(thread_id));
++    snprintf(gdb_ctx->str_buf, sizeof(gdb_ctx->str_buf), "T%02xthread:%s;",
++             GDB_SIGNAL_TRAP, thread_id);
++cleanup:
++    put_packet(gdb_ctx->s, gdb_ctx->str_buf);
++}
++
++static void handle_v_kill(GdbCmdContext *gdb_ctx, void *user_ctx)
++{
++    /* Kill the target */
++    put_packet(gdb_ctx->s, "OK");
++    error_report("QEMU: Terminated via GDBstub");
++    exit(0);
++}
++
++static GdbCmdParseEntry gdb_v_commands_table[] = {
++    /* Order is important if has same prefix */
++    {
++        .handler = handle_v_cont_query,
++        .cmd = "Cont?",
++        .cmd_startswith = 1
++    },
++    {
++        .handler = handle_v_cont,
++        .cmd = "Cont",
++        .cmd_startswith = 1,
++        .schema = "s0"
++    },
++    {
++        .handler = handle_v_attach,
++        .cmd = "Attach;",
++        .cmd_startswith = 1,
++        .schema = "l0"
++    },
++    {
++        .handler = handle_v_kill,
++        .cmd = "Kill;",
++        .cmd_startswith = 1
++    },
++};
++
++static void handle_v_commands(GdbCmdContext *gdb_ctx, void *user_ctx)
++{
++    if (!gdb_ctx->num_params) {
++        return;
++    }
++
++    if (process_string_cmd(gdb_ctx->s, NULL, gdb_ctx->params[0].data,
++                           gdb_v_commands_table,
++                           ARRAY_SIZE(gdb_v_commands_table))) {
++        put_packet(gdb_ctx->s, "");
++    }
++}
++
+ static int gdb_handle_packet(GDBState *s, const char *line_buf)
+ {
+     CPUState *cpu;
+@@ -1825,7 +1925,7 @@ static int gdb_handle_packet(GDBState *s, const char *line_buf)
+     CPUClass *cc;
+     const char *p;
+     uint32_t pid, tid;
+-    int ch, type, res;
++    int ch, type;
+     uint8_t mem_buf[MAX_PACKET_LENGTH];
+     char buf[sizeof(mem_buf) + 1 /* trailing NUL */];
+     char thread_id[16];
+@@ -1874,66 +1974,16 @@ static int gdb_handle_packet(GDBState *s, const char *line_buf)
          }
-     } else {
-         if (spapr->irq->ov5 =3D=3D SPAPR_OV5_XIVE_EXPLOIT) {
--            error_report("Guest requested unavailable interrupt mode (XI=
-CS)");
-+            error_report(
-+"Guest requested unavailable interrupt mode (XICS), either don't set the=
- ic-mode machine property or try ic-mode=3Dxics or ic-mode=3Ddual");
-             exit(EXIT_FAILURE);
+         break;
+     case 'v':
+-        if (strncmp(p, "Cont", 4) == 0) {
+-            p += 4;
+-            if (*p == '?') {
+-                put_packet(s, "vCont;c;C;s;S");
+-                break;
+-            }
+-
+-            res = gdb_handle_vcont(s, p);
+-
+-            if (res) {
+-                if ((res == -EINVAL) || (res == -ERANGE)) {
+-                    put_packet(s, "E22");
+-                    break;
+-                }
+-                goto unknown_command;
+-            }
+-            break;
+-        } else if (strncmp(p, "Attach;", 7) == 0) {
+-            unsigned long pid;
+-
+-            p += 7;
+-
+-            if (qemu_strtoul(p, &p, 16, &pid)) {
+-                put_packet(s, "E22");
+-                break;
+-            }
+-
+-            process = gdb_get_process(s, pid);
+-
+-            if (process == NULL) {
+-                put_packet(s, "E22");
+-                break;
+-            }
+-
+-            cpu = get_first_cpu_in_process(s, process);
+-
+-            if (cpu == NULL) {
+-                /* Refuse to attach an empty process */
+-                put_packet(s, "E22");
+-                break;
+-            }
+-
+-            process->attached = true;
+-
+-            s->g_cpu = cpu;
+-            s->c_cpu = cpu;
+-
+-            snprintf(buf, sizeof(buf), "T%02xthread:%s;", GDB_SIGNAL_TRAP,
+-                     gdb_fmt_thread_id(s, cpu, thread_id, sizeof(thread_id)));
+-
+-            put_packet(s, buf);
+-            break;
+-        } else if (strncmp(p, "Kill;", 5) == 0) {
+-            /* Kill the target */
+-            put_packet(s, "OK");
+-            error_report("QEMU: Terminated via GDBstub");
+-            exit(0);
+-        } else {
+-            goto unknown_command;
++        {
++            static const GdbCmdParseEntry v_cmd_desc = {
++                .handler = handle_v_commands,
++                .cmd = "v",
++                .cmd_startswith = 1,
++                .schema = "s0"
++            };
++            cmd_parser = &v_cmd_desc;
          }
-     }
---=20
++        break;
+     case 'k':
+         /* Kill the target */
+         error_report("QEMU: Terminated via GDBstub");
+-- 
 2.21.0
 
 
