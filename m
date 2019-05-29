@@ -2,66 +2,92 @@ Return-Path: <SRS0=DspQ=T5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D00BEC04AB3
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 05:19:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8982EC04AB3
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 05:38:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AC31820883
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 05:19:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AC31820883
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 38962217D9
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 05:38:00 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="C4C0DC66"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 38962217D9
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:47364 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:47548 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hVqzs-0002qa-VD
-	for qemu-devel@archiver.kernel.org; Wed, 29 May 2019 01:19:32 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:55817)
+	id 1hVrHj-0005Qa-7q
+	for qemu-devel@archiver.kernel.org; Wed, 29 May 2019 01:37:59 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:60618)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hVqz6-0002ZZ-TB
-	for qemu-devel@nongnu.org; Wed, 29 May 2019 01:18:46 -0400
+	(envelope-from <marcel.apfelbaum@gmail.com>) id 1hVrGq-0004zt-8e
+	for qemu-devel@nongnu.org; Wed, 29 May 2019 01:37:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hVqz5-0005R3-I1
-	for qemu-devel@nongnu.org; Wed, 29 May 2019 01:18:44 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35614)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hVqz5-0005QT-BE
-	for qemu-devel@nongnu.org; Wed, 29 May 2019 01:18:43 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 511903001835
-	for <qemu-devel@nongnu.org>; Wed, 29 May 2019 05:18:42 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-117-250.ams2.redhat.com
-	[10.36.117.250])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id CB6757D910;
-	Wed, 29 May 2019 05:18:39 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
-	id 4A66C1138648; Wed, 29 May 2019 07:18:38 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: John Snow <jsnow@redhat.com>
-References: <20190528204220.9615-1-jsnow@redhat.com>
-	<20190528204220.9615-3-jsnow@redhat.com>
-Date: Wed, 29 May 2019 07:18:38 +0200
-In-Reply-To: <20190528204220.9615-3-jsnow@redhat.com> (John Snow's message of
-	"Tue, 28 May 2019 16:42:20 -0400")
-Message-ID: <87d0k1j0sx.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1 (gnu/linux)
+	(envelope-from <marcel.apfelbaum@gmail.com>) id 1hVrGp-0001Ur-Cb
+	for qemu-devel@nongnu.org; Wed, 29 May 2019 01:37:04 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:41697)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcel.apfelbaum@gmail.com>)
+	id 1hVqsR-0001yg-In
+	for qemu-devel@nongnu.org; Wed, 29 May 2019 01:11:51 -0400
+Received: by mail-wr1-x442.google.com with SMTP id c2so640039wrm.8
+	for <qemu-devel@nongnu.org>; Tue, 28 May 2019 22:11:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+	h=subject:to:cc:references:from:message-id:date:user-agent
+	:mime-version:in-reply-to:content-transfer-encoding:content-language;
+	bh=YQ1xqtLZLWliwP7boBDEU6TpsqPaCpy6byNYhOdb2C4=;
+	b=C4C0DC66zbqFpcUQlBc5YjPXXPtAnIyTQdNY6+aiN7kIBLhH6z5EbTV7iRVf5zWH1g
+	xwL2/e+QLn7AOZkDhP9PC/GM10F04W/7kPQ8twB5G9YJ4d7NlQXy3AahDh1dNPK8KpXp
+	u2+Fb4P2WhSQOzcNFu2SA3vH0VVK2zUvfZyu/+Mx+gQSS1f3HjdXQlc0bt7nrAvqyB3+
+	fupLb+puKY0tylSVjtGQGrrNPL2QAnpe3AKaDV3T9vX+HPr5T3QI0361pK1O8vP4I04w
+	sHZC2Wc9Y5kdaSuv+OL7BwCj1qo2fQz24Z2bOAyvMtbusZoCEo/F2pcgb7sM15zPHcd9
+	wDxw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+	:user-agent:mime-version:in-reply-to:content-transfer-encoding
+	:content-language;
+	bh=YQ1xqtLZLWliwP7boBDEU6TpsqPaCpy6byNYhOdb2C4=;
+	b=myBsbYXpVG1kMR0HXZCXVnjNiRxYr1PQnnOnrAoFEJ61DsOaWeP3fUSFHW/wwRUE2t
+	EIQb1wR5fmYBajk6O2oYWUnsIVP4OZP0uDwmfglUbebkhjlzukwwIg+bevo/9hBr7kyZ
+	HyS+U2Epcvane2kAtCLh5QkRQNMYxQtlycriSdl3S/JpG86/AGUxPHGKfUpB8ukm21Zr
+	bNsrFXnuwIC5zLBtmXqGEtxnCr63vfx07H55tWtAlGW9lZbiy6bpudtem2X962VaqkaW
+	HtWBhq9qzhVT6DG2F6NNaoSCvg94sqTRI6jyvYMRhXcflv/sgTw+8d9+mlf8SpT8G/cs
+	s/7g==
+X-Gm-Message-State: APjAAAW5K3scKbir9yi3m98o9RrCOFFPCjLRN+FcFdoc5QFsMIsfHWxR
+	gHa1EXiQjybhrxokqa+x0y0=
+X-Google-Smtp-Source: APXvYqwmeC85rd4jOv7WEsQPzP2f3P7214UFSu7k/fHLdKjn5jbnPLsd3cle4G+PyO5/qZ8O8Jt8Yw==
+X-Received: by 2002:a5d:6207:: with SMTP id y7mr58368955wru.265.1559106698898; 
+	Tue, 28 May 2019 22:11:38 -0700 (PDT)
+Received: from localhost.localdomain ([37.142.144.27])
+	by smtp.gmail.com with ESMTPSA id
+	u19sm12434321wmu.41.2019.05.28.22.11.37
+	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+	Tue, 28 May 2019 22:11:38 -0700 (PDT)
+To: Gerd Hoffmann <kraxel@redhat.com>
+References: <20190528204331.5280-1-kraxel@redhat.com>
+	<016bde36-9476-91c3-0a06-5cd13d317083@gmail.com>
+	<20190529050123.dblwhfffwa5emhjf@sirius.home.kraxel.org>
+From: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Message-ID: <f82b1632-083b-8520-4f46-b9d89de9583c@gmail.com>
+Date: Wed, 29 May 2019 08:11:36 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.40]);
-	Wed, 29 May 2019 05:18:42 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [RFC PATCH 2/2] machine.py: minor delinting
+In-Reply-To: <20190529050123.dblwhfffwa5emhjf@sirius.home.kraxel.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+	That's all we know.
+X-Received-From: 2a00:1450:4864:20::442
+Subject: Re: [Qemu-devel] [PATCH] q35: fix mmconfig and PCI0._CRS
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -73,113 +99,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, ehabkost@redhat.com
+Cc: Eduardo Habkost <ehabkost@redhat.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
+	Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
+	=?UTF-8?B?TMOhc3psw7Mgw4lyc2Vr?= <lersek@redhat.com>,
+	Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-John Snow <jsnow@redhat.com> writes:
+Hi Gerd,
 
-> Since we're out in a new module, do a quick cursory pass of some of the
-> more obvious style issues.
+On 5/29/19 8:01 AM, Gerd Hoffmann wrote:
+> On Wed, May 29, 2019 at 07:48:03AM +0300, Marcel Apfelbaum wrote:
+>> Hi Gerd,
+>>
+>> On 5/28/19 11:43 PM, Gerd Hoffmann wrote:
+>>> This patch changes the handling of the mmconfig area.  Thanks to the
+>>> pci(e) expander devices we already have the logic to exclude address
+>>> ranges from PCI0._CRS.  We can simply add the mmconfig address range
+>>> to the list get it excluded as well.
+>>>
+>>> With that in place we can go with a fixed pci hole which covers the
+>>> whole area from the end of (low) ram to the ioapic.
+>>>
+>>> This will make the whole logic alot less fragile.  No matter where the
+>>> firmware places the mmconfig xbar, things should work correctly.  The
+>>> guest also gets a bit more PCI address space (seabios boot):
+>>>
+>>>       # cat /proc/iomem
+>>>       [ ... ]
+>>>       7ffdd000-7fffffff : reserved
+>>>       80000000-afffffff : PCI Bus 0000:00            <<-- this is new
+>>>       b0000000-bfffffff : PCI MMCONFIG 0000 [bus 00-ff]
+>>>         b0000000-bfffffff : reserved
+>>>       c0000000-febfffff : PCI Bus 0000:00
+>>>         f8000000-fbffffff : 0000:00:01.0
+>>>       [ ... ]
+>>>
+>>> So this is a guest visible change.
+>> Looks good to me, but shouldn't we use some compat
+>> property to not affect previous machine versions?
+> acpi table changes are typically not versioned, and IIRC the acpi tables
+> are part of the live migration data stream so the tables will not change
+> under the feet of the running guest even when it is migrated to another
+> qemu version.
+
+I wasn't "worried" only about migration, but also about the visible 
+change in
+the guests keeping the same machine type and upgrading QEMU.
+
+I am not saying is a "big" issue since it will probably not affect the 
+guests at all.
+Upgrading QEMU will look like a firmware update or something.
+
+Thanks,
+Marcel
+
+> cheers,
+>    Gerd
 >
-> Signed-off-by: John Snow <jsnow@redhat.com>
-> ---
->  python/qemu/machine.py | 23 +++++++++++++++--------
->  1 file changed, 15 insertions(+), 8 deletions(-)
->
-> diff --git a/python/qemu/machine.py b/python/qemu/machine.py
-> index a8a311b035..925046fc20 100644
-> --- a/python/qemu/machine.py
-> +++ b/python/qemu/machine.py
-> @@ -16,7 +16,6 @@ import errno
->  import logging
->  import os
->  import subprocess
-> -import re
->  import shutil
->  import socket
->  import tempfile
-> @@ -54,7 +53,7 @@ class MonitorResponseError(qmp.QMPError):
->          self.reply = reply
->  
->  
-> -class QEMUMachine(object):
-> +class QEMUMachine:
 
-Premature.  Makes it a "classic class" in Python 2.  See
-
-https://docs.python.org/2.7/reference/datamodel.html#new-style-and-classic-classes
-https://pythonclock.org/
-
->      """
->      A QEMU VM
->  
-> @@ -119,8 +118,10 @@ class QEMUMachine(object):
->          self.shutdown()
->          return False
->  
-> -    # This can be used to add an unused monitor instance.
->      def add_monitor_null(self):
-> +        """
-> +        This can be used to add an unused monitor instance.
-> +        """
->          self._args.append('-monitor')
->          self._args.append('null')
->  
-> @@ -143,10 +144,13 @@ class QEMUMachine(object):
->          self._args.append(','.join(options))
->          return self
->  
-> -    # Exactly one of fd and file_path must be given.
-> -    # (If it is file_path, the helper will open that file and pass its
-> -    # own fd)
->      def send_fd_scm(self, fd=None, file_path=None):
-> +        """
-> +        Send an fd or file_path to socket_scm_helper.
-> +
-> +        Exactly one of fd and file_path must be given.
-> +        If it is file_path, the helper will open that file and pass its own fd.
-> +        """
->          # In iotest.py, the qmp should always use unix socket.
->          assert self._qmp.is_scm_available()
->          if self._socket_scm_helper is None:
-> @@ -194,14 +198,17 @@ class QEMUMachine(object):
->              raise
->  
->      def is_running(self):
-> +        """Returns true if the VM is running."""
->          return self._popen is not None and self._popen.poll() is None
->  
->      def exitcode(self):
-> +        """Returns the exit code if possible, or None."""
->          if self._popen is None:
->              return None
->          return self._popen.poll()
->  
->      def get_pid(self):
-> +        """Returns the PID of the running process, or None."""
->          if not self.is_running():
->              return None
->          return self._popen.pid
-> @@ -339,7 +346,7 @@ class QEMUMachine(object):
->                  command = ' '.join(self._qemu_full_args)
->              else:
->                  command = ''
-> -            LOG.warn(msg, -exitcode, command)
-> +            LOG.warning(msg, -exitcode, command)
-
-Is this a bug fix?
-
->  
->          self._launched = False
->  
-> @@ -373,7 +380,7 @@ class QEMUMachine(object):
->          """
->          Poll for one queued QMP events and return it
->          """
-> -        if len(self._events) > 0:
-> +        if self._events:
->              return self._events.pop(0)
->          return self._qmp.pull_event(wait=wait)
 
