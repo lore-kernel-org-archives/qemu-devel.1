@@ -2,75 +2,73 @@ Return-Path: <SRS0=DspQ=T5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E1A76C04AB3
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 03:22:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8940FC04AB3
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 03:25:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BACB8205F4
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 03:22:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BACB8205F4
+	by mail.kernel.org (Postfix) with ESMTPS id 63C0E20657
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 03:25:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 63C0E20657
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:46310 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:46323 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hVpAj-00050e-Ui
-	for qemu-devel@archiver.kernel.org; Tue, 28 May 2019 23:22:37 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:35580)
+	id 1hVpDA-0005yt-JJ
+	for qemu-devel@archiver.kernel.org; Tue, 28 May 2019 23:25:08 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:35904)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1hVp9t-0004jf-H3
-	for qemu-devel@nongnu.org; Tue, 28 May 2019 23:21:46 -0400
+	(envelope-from <mst@redhat.com>) id 1hVpC3-0005NH-Ji
+	for qemu-devel@nongnu.org; Tue, 28 May 2019 23:24:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1hVp9s-0007s8-CJ
-	for qemu-devel@nongnu.org; Tue, 28 May 2019 23:21:45 -0400
-Received: from mail-qt1-f195.google.com ([209.85.160.195]:35762)
+	(envelope-from <mst@redhat.com>) id 1hVpC2-0003ZY-F3
+	for qemu-devel@nongnu.org; Tue, 28 May 2019 23:23:59 -0400
+Received: from mail-qt1-f195.google.com ([209.85.160.195]:44504)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1hVp9s-0007rE-89
-	for qemu-devel@nongnu.org; Tue, 28 May 2019 23:21:44 -0400
-Received: by mail-qt1-f195.google.com with SMTP id w1so880247qts.2
-	for <qemu-devel@nongnu.org>; Tue, 28 May 2019 20:21:44 -0700 (PDT)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1hVpC2-0003YZ-8i
+	for qemu-devel@nongnu.org; Tue, 28 May 2019 23:23:58 -0400
+Received: by mail-qt1-f195.google.com with SMTP id m2so830433qtp.11
+	for <qemu-devel@nongnu.org>; Tue, 28 May 2019 20:23:58 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-	:mime-version:content-disposition:content-transfer-encoding
-	:in-reply-to;
-	bh=+BLIyxyePTn2kZOn6YwF3uZjrbaiq6FJ5d3R61/OJaQ=;
-	b=Cm7WcYLm/R/pQXPSHQzUNgmPfffZQDigepuRwk7/dAmh42DXgKFTZIzfXG3/3aO2qn
-	Ib026S1MHDYNZUG7Yq1vChC5FMY7SaUDPrvMJmpehiiXDveF9eTyN67Cd2iQqV1ahIMI
-	h1+picKlTebp2mfu7FfLX6DCxEVg/1DMCwG6kQFdJZVaocVBVSNLGm/mSePC3CUEbXtC
-	9JTq/JJR3kv2J/VXSXHtLyIwlVKjn2sTTiIjVu4SyJ29eS9+n3k9QfMLeBZVikz9JNOh
-	ptTlL/ZofPjLh0bfB9kvCbWf+Q38PTY91lCVI0b6N1IB7jzImzbsEMWldxR9RzR1xPhY
-	Lqhg==
-X-Gm-Message-State: APjAAAV1sMnDfhcpEbaP8nlI99Z6VmctL23dQhiKmA67FzQZrRqzE+no
-	I3JWeMJPux4kyQreGrQoGP627A==
-X-Google-Smtp-Source: APXvYqyMy/EH+S/Sutv4ILkIXpiq9K1NYpDaXBY82mLvAR61nXOYxQQUfOCOT1wcoTO3rvmM6gZSNg==
-X-Received: by 2002:a0c:d13a:: with SMTP id a55mr55859802qvh.111.1559100103651;
-	Tue, 28 May 2019 20:21:43 -0700 (PDT)
+	:mime-version:content-disposition:in-reply-to;
+	bh=XDiVx4dNcGN10uwsUhaP3aSGBwRGZYzs7Ur5X5fPj90=;
+	b=ZsQ7v+szLpwiyRZ9MZFWJhZMhhB1DieJeMv7oH1cZZitNilY+2rbhEP7vJPRMx5ban
+	Gy4EOPVmSdLFDes8b/oOpCBw/4TNp/X+ggvyGQDo2LD8cv8EYdQ1nzjYShB71ZAodPB2
+	+2jHXmFFyjrswArirxej/B+jsLf2boT2QVuoV4w19Fb+3Kd9Z6VZaooSd39bYIjPVsbG
+	wrpsqlcsOK/G3EEGR4LSluAluDs9bN/49tCsSeaG9dJrhIzHE225LUdbIBeiEfRW8Kv2
+	SSUjx6FTDUqCtfIWFoshgT42u6/8MEs2TVJfN1fVOXe6YhlKM4HdPxvYbeVw/5eAl79E
+	XsSw==
+X-Gm-Message-State: APjAAAWjM4XxrZ7zYd42Q+MqRid3cNY4dIpSGaMCGzjdp/BgDVBEDcJt
+	Dd/9IyV0A5PbkPlF/tSw5XxOpw==
+X-Google-Smtp-Source: APXvYqzJ6an2liucV/n2EiLtEAvhaE8QYoNSar6nxs36mNIzluHxsbUjV78rlNklStHkUZKpfim4cQ==
+X-Received: by 2002:ad4:45a8:: with SMTP id y8mr205030qvu.101.1559100237823;
+	Tue, 28 May 2019 20:23:57 -0700 (PDT)
 Received: from redhat.com (pool-100-0-197-103.bstnma.fios.verizon.net.
 	[100.0.197.103]) by smtp.gmail.com with ESMTPSA id
-	t17sm6533709qte.66.2019.05.28.20.21.41
+	x22sm1552446qtm.97.2019.05.28.20.23.56
 	(version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-	Tue, 28 May 2019 20:21:42 -0700 (PDT)
-Date: Tue, 28 May 2019 23:21:40 -0400
+	Tue, 28 May 2019 20:23:56 -0700 (PDT)
+Date: Tue, 28 May 2019 23:23:54 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
-Message-ID: <20190528231739-mutt-send-email-mst@kernel.org>
-References: <20190524063553.5339-1-philmd@redhat.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20190528232250-mutt-send-email-mst@kernel.org>
+References: <20190523052918.1129-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20190524063553.5339-1-philmd@redhat.com>
+In-Reply-To: <20190523052918.1129-1-david@gibson.dropbear.id.au>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 	[fuzzy]
 X-Received-From: 209.85.160.195
-Subject: Re: [Qemu-devel] [PATCH 00/20] hw/i386/pc: Do not restrict the
- fw_cfg functions to the PC machine
+Subject: Re: [Qemu-devel] [PATCH 1/8] spapr: Clean up device node name
+ generation for PCI devices
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -82,82 +80,118 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Yang Zhong <yang.zhong@intel.com>, Samuel Ortiz <sameo@linux.intel.com>,
-	Rob Bradford <robert.bradford@intel.com>,
-	Marcelo Tosatti <mtosatti@redhat.com>, qemu-devel@nongnu.org,
-	Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
+Cc: qemu-devel@nongnu.org, mdroth@linux.ibm.com, qemu-ppc@nongnu.org,
+	groug@kaod.org, clg@kaod.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, May 24, 2019 at 08:35:33AM +0200, Philippe Mathieu-Daudé wrote:
-> Hi,
+On Thu, May 23, 2019 at 03:29:11PM +1000, David Gibson wrote:
+> spapr_populate_pci_child_dt() adds a 'name' property to the device tree
+> node for PCI devices.  This is never necessary for a flattened device tree,
+> it is implicit in the name added when the node is constructed.  In fact
+> anything we do add to a 'name' property will be overwritten with something
+> derived from the structural name in the guest firmware (but in fact it is
+> exactly the same bytes).
 > 
-> This is my take at salvaging some NEMU good work.
-> Samuel worked in adding the fw_cfg device to the x86-virt NEMU machine.
-> This series is inspired by NEMU's commit 3cb92d080835 [*] and adapted
-> to upstream style. The result makes the upstream codebase more
-> modularizable.
-> There are very little logical changes, this is mostly a cleanup
-> refactor.
+> So, remove that.  In addition, pci_get_node_name() is very simple, so fold
+> it into its (also simple) sole caller spapr_create_pci_child_dt().
 > 
-> Regards,
+> While we're there rename pci_find_device_name() to the shorter and more
+> accurate dt_name_from_class().
 > 
-> Phil.
+> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 
-So I take issue with some of the renames.  When I see fw_cfg_XXXX I
-expect the definition be in fw_cfg.c not in pc.c
+The threading is broken here btw.
 
-Please use prefixes that match the file name -
-avoids namespace conflicts and makes it easy to
-find files.
+I was CC'd but it's mostly PPC stuff.
+I like how pci_XX functions that are not in pci.c are
+going away :)
 
-This is not to say that the current system is perfect:
-we have bochs_bios_init which isn't in bochs.c, should
-be pc_bochs_bios_init or whatever.
-
-Thanks!
+Acked-by: Michael S. Tsirkin <mst@redhat.com>
 
 
-> [*] https://github.com/intel/nemu/commit/3cb92d080835ac8d47c8b713156338afa33cff5c
+> ---
+>  hw/ppc/spapr_pci.c | 43 +++++++++++++++++--------------------------
+>  1 file changed, 17 insertions(+), 26 deletions(-)
 > 
-> Philippe Mathieu-Daudé (20):
->   hw/i386/pc: Use unsigned type to index arrays
->   hw/i386/pc: Use size_t type to hold/return a size of array
->   hw/i386/pc: Let e820_add_entry() return a ssize_t type
->   hw/i386/pc: Add the E820Type enum type
->   hw/i386/pc: Add documentation to the e820_*() functions
->   hw/i386/pc: Use e820_get_num_entries() to access e820_entries
->   hw/i386/pc: Extract e820 memory layout code
->   hw/i386/pc: Use address_space_memory in place
->   hw/i386/pc: Rename bochs_bios_init() more generic as
->     x86_create_fw_cfg()
->   hw/i386/pc: Pass the boot_cpus value by argument
->   hw/i386/pc: Pass the apic_id_limit value by argument
->   hw/i386/pc: Pass the CPUArchIdList array by argument
->   hw/i386/pc: Let fw_cfg_init() use the generic MachineState
->   hw/i386/pc: Let pc_build_smbios() take a FWCfgState argument
->   hw/i386/pc: Let pc_build_smbios() take a generic MachineState argument
->   hw/i386/pc: Rename pc_build_smbios() as generic fw_cfg_build_smbios()
->   hw/i386/pc: Let pc_build_feature_control() take a FWCfgState argument
->   hw/i386/pc: Let pc_build_feature_control() take a MachineState
->     argument
->   hw/i386/pc: Rename pc_build_feature_control() as generic
->     fw_cfg_build_*
->   hw/i386/pc: Extract the x86 generic fw_cfg code
-> 
->  hw/i386/Makefile.objs        |   2 +-
->  hw/i386/e820_memory_layout.c |  62 +++++++++++
->  hw/i386/e820_memory_layout.h |  76 +++++++++++++
->  hw/i386/fw_cfg.c             | 135 +++++++++++++++++++++++
->  hw/i386/fw_cfg.h             |   6 ++
->  hw/i386/pc.c                 | 201 ++---------------------------------
->  include/hw/i386/pc.h         |  11 --
->  target/i386/kvm.c            |   1 +
->  8 files changed, 289 insertions(+), 205 deletions(-)
->  create mode 100644 hw/i386/e820_memory_layout.c
->  create mode 100644 hw/i386/e820_memory_layout.h
-> 
+> diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
+> index 97961b0128..b2db46ef1d 100644
+> --- a/hw/ppc/spapr_pci.c
+> +++ b/hw/ppc/spapr_pci.c
+> @@ -1173,8 +1173,8 @@ static const PCIClass pci_classes[] = {
+>      { "data-processing-controller", spc_subclass },
+>  };
+>  
+> -static const char *pci_find_device_name(uint8_t class, uint8_t subclass,
+> -                                        uint8_t iface)
+> +static const char *dt_name_from_class(uint8_t class, uint8_t subclass,
+> +                                      uint8_t iface)
+>  {
+>      const PCIClass *pclass;
+>      const PCISubClass *psubclass;
+> @@ -1216,23 +1216,6 @@ static const char *pci_find_device_name(uint8_t class, uint8_t subclass,
+>      return name;
+>  }
+>  
+> -static gchar *pci_get_node_name(PCIDevice *dev)
+> -{
+> -    int slot = PCI_SLOT(dev->devfn);
+> -    int func = PCI_FUNC(dev->devfn);
+> -    uint32_t ccode = pci_default_read_config(dev, PCI_CLASS_PROG, 3);
+> -    const char *name;
+> -
+> -    name = pci_find_device_name((ccode >> 16) & 0xff, (ccode >> 8) & 0xff,
+> -                                ccode & 0xff);
+> -
+> -    if (func != 0) {
+> -        return g_strdup_printf("%s@%x,%x", name, slot, func);
+> -    } else {
+> -        return g_strdup_printf("%s@%x", name, slot);
+> -    }
+> -}
+> -
+>  static uint32_t spapr_phb_get_pci_drc_index(SpaprPhbState *phb,
+>                                              PCIDevice *pdev);
+>  
+> @@ -1300,11 +1283,6 @@ static void spapr_populate_pci_child_dt(PCIDevice *dev, void *fdt, int offset,
+>          _FDT(fdt_setprop(fdt, offset, "udf-supported", NULL, 0));
+>      }
+>  
+> -    _FDT(fdt_setprop_string(fdt, offset, "name",
+> -                            pci_find_device_name((ccode >> 16) & 0xff,
+> -                                                 (ccode >> 8) & 0xff,
+> -                                                 ccode & 0xff)));
+> -
+>      buf = spapr_phb_get_loc_code(sphb, dev);
+>      _FDT(fdt_setprop_string(fdt, offset, "ibm,loc-code", buf));
+>      g_free(buf);
+> @@ -1348,10 +1326,23 @@ static int spapr_create_pci_child_dt(SpaprPhbState *phb, PCIDevice *dev,
+>                                       void *fdt, int node_offset)
+>  {
+>      int offset;
+> -    gchar *nodename;
+> +    const gchar *basename;
+> +    char *nodename;
+> +    int slot = PCI_SLOT(dev->devfn);
+> +    int func = PCI_FUNC(dev->devfn);
+> +    uint32_t ccode = pci_default_read_config(dev, PCI_CLASS_PROG, 3);
+> +
+> +    basename = dt_name_from_class((ccode >> 16) & 0xff, (ccode >> 8) & 0xff,
+> +                                  ccode & 0xff);
+> +
+> +    if (func != 0) {
+> +        nodename = g_strdup_printf("%s@%x,%x", basename, slot, func);
+> +    } else {
+> +        nodename = g_strdup_printf("%s@%x", basename, slot);
+> +    }
+>  
+> -    nodename = pci_get_node_name(dev);
+>      _FDT(offset = fdt_add_subnode(fdt, node_offset, nodename));
+> +
+>      g_free(nodename);
+>  
+>      spapr_populate_pci_child_dt(dev, fdt, offset, phb);
 > -- 
-> 2.20.1
+> 2.21.0
 
