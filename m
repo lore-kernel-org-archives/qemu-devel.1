@@ -2,55 +2,62 @@ Return-Path: <SRS0=DspQ=T5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,T_HK_NAME_DR,URIBL_BLOCKED,
+	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 33431C28CC0
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 11:27:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 21062C28CC0
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 11:31:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 06DE520B1F
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 11:27:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 06DE520B1F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=ispras.ru
+	by mail.kernel.org (Postfix) with ESMTPS id ECE2D20B1F
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 11:31:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ECE2D20B1F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:52063 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:52101 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hVwjv-0006Kh-Bd
-	for qemu-devel@archiver.kernel.org; Wed, 29 May 2019 07:27:27 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:46068)
+	id 1hVwoH-0007Fg-4T
+	for qemu-devel@archiver.kernel.org; Wed, 29 May 2019 07:31:57 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:46730)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1hVwjB-00063V-DM
-	for qemu-devel@nongnu.org; Wed, 29 May 2019 07:26:42 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1hVwnJ-0006uW-IE
+	for qemu-devel@nongnu.org; Wed, 29 May 2019 07:30:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1hVwj9-0007OF-VY
-	for qemu-devel@nongnu.org; Wed, 29 May 2019 07:26:41 -0400
-Received: from mail.ispras.ru ([83.149.199.45]:47878)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1hVwj9-0007CX-KE
-	for qemu-devel@nongnu.org; Wed, 29 May 2019 07:26:39 -0400
-Received: from PASHAISP (unknown [85.142.117.226])
-	by mail.ispras.ru (Postfix) with ESMTPSA id 1CEB5540089;
-	Wed, 29 May 2019 14:26:36 +0300 (MSK)
-From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
-To: <qemu-devel@nongnu.org>, <pbonzini@redhat.com>, <rth@twiddle.net>,
-	<ehabkost@redhat.com>, <quintela@redhat.com>, <dgilbert@redhat.com>
-Date: Wed, 29 May 2019 14:26:39 +0300
-Message-ID: <003a01d51611$6251a2b0$26f4e810$@ru>
+	(envelope-from <dgilbert@redhat.com>) id 1hVwnI-0002xr-LS
+	for qemu-devel@nongnu.org; Wed, 29 May 2019 07:30:57 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35810)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hVwnI-0002xe-Gk
+	for qemu-devel@nongnu.org; Wed, 29 May 2019 07:30:56 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id BDBC330C543E;
+	Wed, 29 May 2019 11:30:50 +0000 (UTC)
+Received: from work-vm (unknown [10.36.118.28])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 6BCFA5D9E1;
+	Wed, 29 May 2019 11:30:48 +0000 (UTC)
+Date: Wed, 29 May 2019 12:30:46 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Pavel Dovgalyuk <dovgaluk@ispras.ru>
+Message-ID: <20190529113045.GE2882@work-vm>
+References: <003a01d51611$6251a2b0$26f4e810$@ru>
 MIME-Version: 1.0
-X-Mailer: Microsoft Office Outlook 12.0
-Thread-Index: AdUWEWIIHtVTtE6DS5KeQtA2/pLkfw==
-Content-Language: ru
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 83.149.199.45
-Content-Type: text/plain;
-	charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-X-Content-Filtered-By: Mailman/MimeDel 2.1.21
-Subject: [Qemu-devel] i386: EFER vs 32-bit CPU
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <003a01d51611$6251a2b0$26f4e810$@ru>
+User-Agent: Mutt/1.11.4 (2019-03-13)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.46]);
+	Wed, 29 May 2019 11:30:50 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] i386: EFER vs 32-bit CPU
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -62,33 +69,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: pbonzini@redhat.com, quintela@redhat.com, qemu-devel@nongnu.org,
+	ehabkost@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hello!
+* Pavel Dovgalyuk (dovgaluk@ispras.ru) wrote:
+> Hello!
+> 
+>  
+> 
+> I found this while debugging the inconsistent saved/restored state of the virtual machine.
+> 
+>  
+> 
+> i386 (32 bit) emulation uses this register (in wrmsr and in MMU fault processing).
+> 
+> But it does not included in VMState, because "efer" field is disabled with #ifdef TARGET_X86_64
+> 
+>  
+> 
+> I think that efer should be saved for i386 too, but how it should be made to preserve the backward
+> compatibility?
+> 
+> Should we add a section for i386, which duplicates efer, or just version_id of the main VMSD should
+> be updated?
 
- 
+You could do:
 
-I found this while debugging the inconsistent saved/restored state of the virtual machine.
+#ifdef TARGET_X86_64
+        VMSTATE_UINT64(env.efer, X86CPU),
+        VMSTATE_UINT64(env.star, X86CPU),
+...
 
- 
+to become:
 
-i386 (32 bit) emulation uses this register (in wrmsr and in MMU fault processing).
+        VMSTATE_UINT64_TEST(env.efer, X86CPU, efer_needed)
+#ifdef TARGET_X86_64
+        VMSTATE_UINT64(env.star, X86CPU),
 
-But it does not included in VMState, because "efer" field is disabled with #ifdef TARGET_X86_64
 
- 
+and then make efer_needed a function that returns true if
+TARGET_X86_64 or it's a new machine type that knows about whatever
+you're going to do with it.
 
-I think that efer should be saved for i386 too, but how it should be made to preserve the backward
-compatibility?
+Dave
 
-Should we add a section for i386, which duplicates efer, or just version_id of the main VMSD should
-be updated?
-
- 
-
-Pavel Dovgalyuk
-
- 
+>  
+> 
+> Pavel Dovgalyuk
+> 
+>  
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
