@@ -2,64 +2,71 @@ Return-Path: <SRS0=DspQ=T5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_MUTT autolearn=unavailable autolearn_force=no version=3.4.0
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 28E41C04AB3
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 08:10:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 32FE3C46470
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 08:12:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E488420B7C
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 08:10:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E488420B7C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 0E17B21670
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 08:12:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0E17B21670
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:49655 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:49663 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hVtfk-0005zr-5B
-	for qemu-devel@archiver.kernel.org; Wed, 29 May 2019 04:10:56 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:38304)
+	id 1hVth1-0006zB-BP
+	for qemu-devel@archiver.kernel.org; Wed, 29 May 2019 04:12:15 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:38339)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yan.y.zhao@intel.com>) id 1hVteq-0005XK-1n
-	for qemu-devel@nongnu.org; Wed, 29 May 2019 04:10:02 -0400
+	(envelope-from <laurent@vivier.eu>) id 1hVtfL-0005oi-GW
+	for qemu-devel@nongnu.org; Wed, 29 May 2019 04:10:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yan.y.zhao@intel.com>) id 1hVten-0001BR-Uo
-	for qemu-devel@nongnu.org; Wed, 29 May 2019 04:10:00 -0400
-Received: from mga14.intel.com ([192.55.52.115]:24074)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yan.y.zhao@intel.com>)
-	id 1hVten-00018l-G3
-	for qemu-devel@nongnu.org; Wed, 29 May 2019 04:09:57 -0400
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-	by fmsmga103.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
-	29 May 2019 01:09:53 -0700
-X-ExtLoop1: 1
-Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040)
-	([10.239.13.9])
-	by orsmga003.jf.intel.com with ESMTP; 29 May 2019 01:09:47 -0700
-Date: Wed, 29 May 2019 04:04:03 -0400
-From: Yan Zhao <yan.y.zhao@intel.com>
-To: Zhenyu Wang <zhenyuw@linux.intel.com>
-Message-ID: <20190529080403.GI27438@joy-OptiPlex-7040>
-References: <20190527034155.31473-1-yan.y.zhao@intel.com>
-	<20190527034437.31594-1-yan.y.zhao@intel.com>
-	<20190529030750.GN29553@zhen-hp.sh.intel.com>
+	(envelope-from <laurent@vivier.eu>) id 1hVtfJ-0001XS-Kg
+	for qemu-devel@nongnu.org; Wed, 29 May 2019 04:10:31 -0400
+Received: from mout.kundenserver.de ([212.227.17.10]:48033)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1hVtfH-0001Ol-OT
+	for qemu-devel@nongnu.org; Wed, 29 May 2019 04:10:29 -0400
+Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
+	(mreue108 [213.165.67.119]) with ESMTPSA (Nemesis) id
+	1MYeZB-1h9dlh2sJH-00Vfx6; Wed, 29 May 2019 10:04:18 +0200
+To: qemu-devel@nongnu.org
+References: <20190528195355.26793-1-laurent@vivier.eu>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <82cede0f-6149-cda0-987d-8eb4c943c9ca@vivier.eu>
+Date: Wed, 29 May 2019 10:04:15 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+	Thunderbird/52.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190529030750.GN29553@zhen-hp.sh.intel.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 192.55.52.115
-Subject: Re: [Qemu-devel] [PATCH v3 2/2] drm/i915/gvt: export
- migration_version to mdev sysfs for Intel vGPU
+In-Reply-To: <20190528195355.26793-1-laurent@vivier.eu>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Provags-ID: V03:K1:BJ2VvPrhfN2wC0CXj9z4t1m8T54elMcHCbLfc9ULhMrp9Z/KDqN
+	p3RZH1wx0tCNlAYVNNwjf2TyWcSh9h3wvsd9097vpJqLo/xf2lCcWRTdOh5huf8H0PKPbDw
+	4z6tih2PJHNwjmbmru9Uy+2yTLY0T04j1CQ8vJCW5rsEw6jx3Ieyfs/M+RPiMmFcPS4GxTW
+	GFWjW4qS7cVm1Sw1KyeTA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:e0xrdYgDCaY=:CY7y20J1OQOjR3WvTCYmsI
+	3J9hO474OUSZxyOQRouujdAXKttztUsZtee0W5C9OHEhCi/vWhzfjd2l4yjinTVvuqft8k4Av
+	1p0DZySGgJLsah1xyQFAyMuJzY8GclL3oSbQcx3I5r4lAV3OGGe7CX91G60YySQL4QPHyTOhx
+	LbyOfEAPvx0EGkJ0P2HRvPVEyK2x8IOW+aRwv8yAnGMcFKizlQqOfacH0MNJJn1Yaeden2E0e
+	oFNaBefX0tc4ddn6h7YyEzwe86+Zhv13tFnbJ+0SOmiE1HzkfQV7RPhUUPdFKn1HvbbxA5mmb
+	TYh8Kfkfba7MzgZPnay09HE1CzE2pFst/mjFNu0edJHKU4Ig32nSomo2gtC8n8srfRiu/OPIB
+	BO2sfWaz14Nu1qFrbSH1NopTRBO0sBEyKFlERIeBPNn259vaEYA4FiMIL/5RM0tDJZcM77PQQ
+	YlsqZcjmK7IOI0gWtZGRcOiRBLEdomgmIuQKNSwjo46pXL0War03Q3PiOcMWIwgijltbDrn/u
+	pCsefBaHu8UvgbJ4WdRRLNilb4ZQj5ERojKr7lFG+coKXSSDKesDqSOblVCbdEZVLemQgdmV1
+	Ol0l2BYuruFkbuLWmsLgoUhwFjJj+TtMV12bbflAKLalKHX3lVwHztSB1YDNpRdUxv2heONhq
+	O2qLyFsYGfaLT1glqEvoOm7RG33/pbz6rb2YMr7XvDZbxRCp7COKSWlgMvIlCB4UhgrQbcym3
+	tBSLIRg7UIN0TDnMnfouS+0ipK4YZ9uxvu8tISgsmBX7lpaKiv8TfS9HLys=
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 212.227.17.10
+Subject: Re: [Qemu-devel] [PATCH] linux-user: emulate msgsnd(),
+ msgrcv() and semtimedop()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -71,432 +78,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Yan Zhao <yan.y.zhao@intel.com>
-Cc: "cjia@nvidia.com" <cjia@nvidia.com>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"aik@ozlabs.ru" <aik@ozlabs.ru>,
-	"Zhengxiao.zx@alibaba-inc.com" <Zhengxiao.zx@alibaba-inc.com>,
-	"shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
-	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-	"kwankhede@nvidia.com" <kwankhede@nvidia.com>,
-	"eauger@redhat.com" <eauger@redhat.com>, "Liu, Yi L" <yi.l.liu@intel.com>,
-	"eskultet@redhat.com" <eskultet@redhat.com>, "Yang,
-	Ziye" <ziye.yang@intel.com>, "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
-	"pasic@linux.ibm.com" <pasic@linux.ibm.com>,
-	"libvir-list@redhat.com" <libvir-list@redhat.com>,
-	"felipe@nutanix.com" <felipe@nutanix.com>,
-	"Ken.Xue@amd.com" <Ken.Xue@amd.com>, "Tian, Kevin" <kevin.tian@intel.com>,
-	"dgilbert@redhat.com" <dgilbert@redhat.com>,
-	"dinechin@redhat.com" <dinechin@redhat.com>,
-	"alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-	"intel-gvt-dev@lists.freedesktop.org"
-	<intel-gvt-dev@lists.freedesktop.org>, "Liu,
-	Changpeng" <changpeng.liu@intel.com>,
-	"berrange@redhat.com" <berrange@redhat.com>,
-	"cohuck@redhat.com" <cohuck@redhat.com>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"Wang, Zhi A" <zhi.a.wang@intel.com>,
-	"jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>, "He,
-	Shaopeng" <shaopeng.he@intel.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Cornelia Huck <cohuck@redhat.com>,
+	=?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+	Riku Voipio <riku.voipio@iki.fi>,
+	=?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+	Aleksandar Markovic <aleksandar.m.mail@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, May 29, 2019 at 11:07:50AM +0800, Zhenyu Wang wrote:
-> On 2019.05.26 23:44:37 -0400, Yan Zhao wrote:
-> > This feature implements the migration_version attribute for Intel's vGPU
-> > mdev devices.
-> > 
-> > migration_version attribute is rw.
-> > It's used to check migration compatibility for two mdev devices of the
-> > same mdev type.
-> > migration_version string is defined by vendor driver and opaque to
-> > userspace.
-> > 
-> > For Intel vGPU of gen8 and gen9, the format of migration_version string
-> > is:
-> >   <vendor id>-<device id>-<vgpu type>-<software version>.
-> > 
-> > For future platforms, the format of migration_version string is to be
-> > expanded to include more meta data to identify Intel vGPUs for live
-> > migration compatibility check
-> > 
-> > For old platforms, and for GVT not supporting vGPU live migration
-> > feature, -ENODEV is returned on read(2)/write(2) of migration_version
-> > attribute.
-> > For vGPUs running old GVT who do not expose migration_version
-> > attribute, live migration is regarded as not supported for those vGPUs.
-> > 
-> > Cc: Alex Williamson <alex.williamson@redhat.com>
-> > Cc: Erik Skultety <eskultet@redhat.com>
-> > Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> > Cc: Cornelia Huck <cohuck@redhat.com>
-> > Cc: "Tian, Kevin" <kevin.tian@intel.com>
-> > Cc: Zhenyu Wang <zhenyuw@linux.intel.com>
-> > Cc: "Wang, Zhi A" <zhi.a.wang@intel.com>
-> > c: Neo Jia <cjia@nvidia.com>
-> > Cc: Kirti Wankhede <kwankhede@nvidia.com>
-> > 
-> > Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
-> > 
-> > ---
-> > v3:
-> > 1. renamed version to migration_version
-> > (Christophe de Dinechin, Cornelia Huck, Alex Williamson)
-> > 2. instead of generating migration version strings each time, storing
-> > them in vgpu types generated during initialization.
-> > (Zhenyu Wang, Cornelia Huck)
-> > 3. replaced multiple snprintf to one big snprintf in
-> > intel_gvt_get_vfio_migration_version()
-> > (Dr. David Alan Gilbert)
-> > 4. printed detailed error log
-> > (Alex Williamson, Erik Skultety, Cornelia Huck, Dr. David Alan Gilbert)
-> > 5. incorporated <software version> into migration_version string
-> > (Alex Williamson)
-> > 6. do not use ifndef macro to switch off migration_version attribute
-> > (Zhenyu Wang)
-> > 
-> > v2:
-> > 1. removed 32 common part of version string
-> > (Alex Williamson)
-> > 2. do not register version attribute for GVT not supporting live
-> > migration.(Cornelia Huck)
-> > 3. for platforms out of gen8, gen9, return -EINVAL --> -ENODEV for
-> > incompatible. (Cornelia Huck)
-> > ---
-> >  drivers/gpu/drm/i915/gvt/Makefile            |   2 +-
-> >  drivers/gpu/drm/i915/gvt/gvt.c               |  39 +++++
-> >  drivers/gpu/drm/i915/gvt/gvt.h               |   5 +
-> >  drivers/gpu/drm/i915/gvt/migration_version.c | 167 +++++++++++++++++++
-> >  drivers/gpu/drm/i915/gvt/vgpu.c              |  13 +-
-> >  5 files changed, 223 insertions(+), 3 deletions(-)
-> >  create mode 100644 drivers/gpu/drm/i915/gvt/migration_version.c
-> > 
-> > diff --git a/drivers/gpu/drm/i915/gvt/Makefile b/drivers/gpu/drm/i915/gvt/Makefile
-> > index 271fb46d4dd0..a9d561c93ab8 100644
-> > --- a/drivers/gpu/drm/i915/gvt/Makefile
-> > +++ b/drivers/gpu/drm/i915/gvt/Makefile
-> > @@ -3,7 +3,7 @@ GVT_DIR := gvt
-> >  GVT_SOURCE := gvt.o aperture_gm.o handlers.o vgpu.o trace_points.o firmware.o \
-> >  	interrupt.o gtt.o cfg_space.o opregion.o mmio.o display.o edid.o \
-> >  	execlist.o scheduler.o sched_policy.o mmio_context.o cmd_parser.o debugfs.o \
-> > -	fb_decoder.o dmabuf.o page_track.o
-> > +	fb_decoder.o dmabuf.o page_track.o migration_version.o
-> >  
-> >  ccflags-y				+= -I$(src) -I$(src)/$(GVT_DIR)
-> >  i915-y					+= $(addprefix $(GVT_DIR)/, $(GVT_SOURCE))
-> > diff --git a/drivers/gpu/drm/i915/gvt/gvt.c b/drivers/gpu/drm/i915/gvt/gvt.c
-> > index 43f4242062dd..be2980e8ac75 100644
-> > --- a/drivers/gpu/drm/i915/gvt/gvt.c
-> > +++ b/drivers/gpu/drm/i915/gvt/gvt.c
-> > @@ -105,14 +105,53 @@ static ssize_t description_show(struct kobject *kobj, struct device *dev,
-> >  		       type->weight);
-> >  }
-> >  
-> > +static ssize_t migration_version_show(struct kobject *kobj, struct device *dev,
-> > +		char *buf)
-> > +{
-> > +	struct intel_vgpu_type *type;
-> > +	void *gvt = kdev_to_i915(dev)->gvt;
-> > +
-> > +	type = intel_gvt_find_vgpu_type(gvt, kobject_name(kobj));
-> > +	if (!type || !type->migration_version) {
-> > +		gvt_err("Does not support migraion on type %s. Please search previous detailed log\n",
-> > +				kobject_name(kobj));
-> > +		return -ENODEV;
-> > +	}
-> > +
-> > +	return snprintf(buf, strlen(type->migration_version) + 2,
-> > +			"%s\n", type->migration_version);
-> > +}
-> > +
-> > +static ssize_t migration_version_store(struct kobject *kobj, struct device *dev,
-> > +		const char *buf, size_t count)
-> > +{
-> > +	int ret = 0;
-> > +	struct intel_vgpu_type *type;
-> > +	void *gvt = kdev_to_i915(dev)->gvt;
-> > +
-> > +	type = intel_gvt_find_vgpu_type(gvt, kobject_name(kobj));
-> > +	if (!type || !type->migration_version) {
-> > +		gvt_err("Does not support migraion on type %s. Please search previous detailed log\n",
-> > +				kobject_name(kobj));
-> > +		return -ENODEV;
-> > +	}
-> > +
-> > +	ret = intel_gvt_check_vfio_migration_version(gvt,
-> > +			type->migration_version, buf);
-> > +
-> > +	return (ret < 0 ? ret : count);
-> > +}
-> > +
-> >  static MDEV_TYPE_ATTR_RO(available_instances);
-> >  static MDEV_TYPE_ATTR_RO(device_api);
-> >  static MDEV_TYPE_ATTR_RO(description);
-> > +static MDEV_TYPE_ATTR_RW(migration_version);
-> >  
-> >  static struct attribute *gvt_type_attrs[] = {
-> >  	&mdev_type_attr_available_instances.attr,
-> >  	&mdev_type_attr_device_api.attr,
-> >  	&mdev_type_attr_description.attr,
-> > +	&mdev_type_attr_migration_version.attr,
-> >  	NULL,
-> >  };
-> >  
-> > diff --git a/drivers/gpu/drm/i915/gvt/gvt.h b/drivers/gpu/drm/i915/gvt/gvt.h
-> > index f5a328b5290a..265319d35c25 100644
-> > --- a/drivers/gpu/drm/i915/gvt/gvt.h
-> > +++ b/drivers/gpu/drm/i915/gvt/gvt.h
-> > @@ -296,6 +296,7 @@ struct intel_vgpu_type {
-> >  	unsigned int fence;
-> >  	unsigned int weight;
-> >  	enum intel_vgpu_edid resolution;
-> > +	char *migration_version;
-> >  };
-> >  
-> >  struct intel_gvt {
-> > @@ -687,6 +688,10 @@ void intel_gvt_debugfs_remove_vgpu(struct intel_vgpu *vgpu);
-> >  int intel_gvt_debugfs_init(struct intel_gvt *gvt);
-> >  void intel_gvt_debugfs_clean(struct intel_gvt *gvt);
-> >  
-> > +ssize_t intel_gvt_check_vfio_migration_version(struct intel_gvt *gvt,
-> > +		const char *self, const char *remote);
-> > +char *intel_gvt_get_vfio_migration_version(struct intel_gvt *gvt,
-> > +		const char *vgpu_type);
-> >  
-> >  #include "trace.h"
-> >  #include "mpt.h"
-> > diff --git a/drivers/gpu/drm/i915/gvt/migration_version.c b/drivers/gpu/drm/i915/gvt/migration_version.c
-> > new file mode 100644
-> > index 000000000000..e6acf188b29a
-> > --- /dev/null
-> > +++ b/drivers/gpu/drm/i915/gvt/migration_version.c
-> > @@ -0,0 +1,167 @@
-> > +/*
-> > + * Copyright(c) 2011-2017 Intel Corporation. All rights reserved.
-> > + *
-> > + * Permission is hereby granted, free of charge, to any person obtaining a
-> > + * copy of this software and associated documentation files (the "Software"),
-> > + * to deal in the Software without restriction, including without limitation
-> > + * the rights to use, copy, modify, merge, publish, distribute, sublicense,
-> > + * and/or sell copies of the Software, and to permit persons to whom the
-> > + * Software is furnished to do so, subject to the following conditions:
-> > + *
-> > + * The above copyright notice and this permission notice (including the next
-> > + * paragraph) shall be included in all copies or substantial portions of the
-> > + * Software.
-> > + *
-> > + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-> > + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-> > + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
-> > + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-> > + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-> > + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-> > + * SOFTWARE.
-> > + *
-> > + * Authors:
-> > + *    Yan Zhao <yan.y.zhao@intel.com>
-> > + */
-> > +#include <linux/vfio.h>
-> > +#include "i915_drv.h"
-> > +#include "gvt.h"
-> > +
-> > +#define INV_SOFTWARE_VERSION (-1U)
-> > +#define VENDOR_ID_LEN (4)
-> > +#define DEVICE_ID_LEN (4)
-> > +#define VGPU_TYPE_LEN (16)
-> > +#define SOFTWARE_VER_LEN (8)
-> > +
-> > +/* total length of vfio migration version string.
-> > + * never exceed limit of PATH_MAX (4096)
-> > + */
-> > +#define MIGRATION_VERSION_TOTAL_LEN (VENDOR_ID_LEN + DEVICE_ID_LEN + \
-> > +					VGPU_TYPE_LEN + SOFTWARE_VER_LEN + 4)
-> > +
-> > +#define GVT_VFIO_MIGRATION_SOFTWARE_VERSION INV_SOFTWARE_VERSION
-> > +
-> > +
-> > +#define PRINTF_FORMAT "%04x-%04x-%s-%08x"
-> > +#define SCANF_FORMAT "%x-%x-%16[^-]-%x"
-> > +
-> > +enum incompatible_reason {
-> > +	IREASON_WRONG_REMOTE_FORMAT = 0,
-> > +	IREASON_HARDWARE_MISMATCH,
-> > +	IREASON_SOFTWARE_VERSION_MISMATCH,
-> > +	IREASON_VGPU_TYPE_MISMATCH,
-> > +};
-> > +
-> > +static const char *const incompatible_reason_str[] = {
-> > +	[IREASON_WRONG_REMOTE_FORMAT] =
-> > +		"wrong string format. probably wrong GVT version",
-> > +	[IREASON_HARDWARE_MISMATCH] =
-> > +		"physical device not matched",
-> > +	[IREASON_SOFTWARE_VERSION_MISMATCH] =
-> > +		"migration software version not matched",
-> > +	[IREASON_VGPU_TYPE_MISMATCH] =
-> > +		"vgpu type not matched"
-> > +};
-> > +
-> > +static bool is_compatible(const char *local, const char *remote)
-> > +{
-> > +	bool ret;
-> > +
-> > +	ret = sysfs_streq(local, remote);
-> > +
-> > +	if (!ret) {
-> > +		int vid_l = 0, did_l = 0, vid_r = 0, did_r = 0;
-> > +		char type_l[VGPU_TYPE_LEN], type_r[VGPU_TYPE_LEN];
-> > +		u32 sv_l = 0, sv_r = 0;
-> > +		int rl = 0, rr = 0;
-> > +		enum incompatible_reason reason = IREASON_WRONG_REMOTE_FORMAT;
-> > +
-> > +		memset(type_l, 0, sizeof(type_l));
-> > +		memset(type_r, 0, sizeof(type_r));
-> > +
-> > +		rl = sscanf(local, SCANF_FORMAT,
-> > +				&vid_l, &did_l, type_l, &sv_l);
-> > +		rr = sscanf(remote, SCANF_FORMAT,
-> > +				&vid_r, &did_r, type_r, &sv_r);
-> > +
-> > +		if (rl == rr) {
-> > +			if (vid_l != vid_r || did_l != did_r)
-> > +				reason = IREASON_HARDWARE_MISMATCH;
-> > +			else if (sv_l != sv_r)
-> > +				reason = IREASON_SOFTWARE_VERSION_MISMATCH;
-> > +			else if (strncmp(type_l, type_r, VGPU_TYPE_LEN))
-> > +				reason = IREASON_VGPU_TYPE_MISMATCH;
-> > +		}
-> > +
-> > +		gvt_err("Migration version mismatched. Possible reason: %s. Local migration version:%s, Remote migration version:%s\n",
-> > +				incompatible_reason_str[reason], local,	remote);
-> > +
-> > +	}
-> > +	return ret;
-> > +
-> > +}
-> > +
-> > +
-> > +char *
-> > +intel_gvt_get_vfio_migration_version(struct intel_gvt *gvt,
-> > +		const char *vgpu_type)
-> > +{
-> > +	int cnt = 0;
-> > +	struct drm_i915_private *dev_priv = gvt->dev_priv;
-> > +	char *version = NULL;
-> > +
-> > +	/* currently only gen8 & gen9 are supported */
-> > +	if (!IS_GEN(dev_priv, 8) && !IS_GEN(dev_priv, 9)) {
-> > +		gvt_err("Local hardware does not support migration on %d\n",
-> > +				INTEL_INFO(dev_priv)->gen);
-> > +		return NULL;
-> > +	}
-> > +
-> > +	if (GVT_VFIO_MIGRATION_SOFTWARE_VERSION == INV_SOFTWARE_VERSION) {
-> > +		gvt_err("Local GVT does not support migration\n");
-> > +		return NULL;
-> > +	}
-> > +
-> > +	version = kzalloc(MIGRATION_VERSION_TOTAL_LEN, GFP_KERNEL);
-> > +
-> > +	if (unlikely(!version)) {
-> > +		gvt_err("memory allocation failed when get local migraiton version\n");
-> > +		return NULL;
-> > +	}
-> > +
-> > +	/* vendor id + device id + vgpu type + software version */
-> > +	cnt = snprintf(version, MIGRATION_VERSION_TOTAL_LEN, PRINTF_FORMAT,
-> > +			PCI_VENDOR_ID_INTEL,
-> > +			INTEL_DEVID(dev_priv),
-> > +			vgpu_type,
-> > +			GVT_VFIO_MIGRATION_SOFTWARE_VERSION);
-> > +
-> > +	if (cnt)
-> > +		return version;
-> > +
-> > +	gvt_err("string generation failed when get local migration version\n");
-> > +	return NULL;
+On 28/05/2019 21:53, Laurent Vivier wrote:
+> When we have updated kernel headers to 5.2-rc1 we have introduced
+> new syscall numbers that can be not supported by older kernels
+> and fail with ENOSYS while the guest emulation succeeded before
+> because the syscalls were emulated with ipc().
 > 
-> Handle version kfree for possible error here. The approach looks fine to me.
-> I think some of those messages might be too chatty or maybe debug message instead.
-> Others are good to me.
+> This patch fixes the problem by using ipc() if the new syscall
+> returns ENOSYS.
 > 
-> Acked-by: Zhenyu Wang <zhenyuw@linux.intel.com>
+> Fixes: 86e636951ddc ("linux-user: fix __NR_semtimedop undeclared error")
+> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+> ---
+>   linux-user/syscall.c      | 61 +++++++++++++++++++--------------------
+>   linux-user/syscall_defs.h |  1 +
+>   2 files changed, 31 insertions(+), 31 deletions(-)
 > 
-Got it. will add the kfree in next revision.
-But debug message is only available for debug version of driver? If that's true,
-maybe keep it printed also for non-debug version is better? as it is intended to
-be checked by userspace software to see what's going wrong on migration
-compatibility test.
-Thank you:)
+> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+> index 5e29e675e9cf..bbd185bbff74 100644
+> --- a/linux-user/syscall.c
+> +++ b/linux-user/syscall.c
+> @@ -763,50 +763,21 @@ safe_syscall2(int, nanosleep, const struct timespec *, req,
+>   safe_syscall4(int, clock_nanosleep, const clockid_t, clock, int, flags,
+>                 const struct timespec *, req, struct timespec *, rem)
+>   #endif
+> -#if !defined(__NR_msgsnd) || !defined(__NR_msgrcv) || !defined(__NR_semtimedop)
+> -/* This host kernel architecture uses a single ipc syscall; fake up
+> - * wrappers for the sub-operations to hide this implementation detail.
+> - * Annoyingly we can't include linux/ipc.h to get the constant definitions
+> - * for the call parameter because some structs in there conflict with the
+> - * sys/ipc.h ones. So we just define them here, and rely on them being
+> - * the same for all host architectures.
+> - */
+> -#define Q_SEMTIMEDOP 4
+> -#define Q_MSGSND 11
+> -#define Q_MSGRCV 12
+> -#define Q_IPCCALL(VERSION, OP) ((VERSION) << 16 | (OP))
+> -
+> +#ifdef __NR_ipc
+>   safe_syscall6(int, ipc, int, call, long, first, long, second, long, third,
+>                 void *, ptr, long, fifth)
+>   #endif
+>   #ifdef __NR_msgsnd
+>   safe_syscall4(int, msgsnd, int, msgid, const void *, msgp, size_t, sz,
+>                 int, flags)
+> -#else
+> -static int safe_msgsnd(int msgid, const void *msgp, size_t sz, int flags)
+> -{
+> -    return safe_ipc(Q_IPCCALL(0, Q_MSGSND), msgid, sz, flags, (void *)msgp, 0);
+> -}
+>   #endif
+>   #ifdef __NR_msgrcv
+>   safe_syscall5(int, msgrcv, int, msgid, void *, msgp, size_t, sz,
+>                 long, msgtype, int, flags)
+> -#else
+> -static int safe_msgrcv(int msgid, void *msgp, size_t sz, long type, int flags)
+> -{
+> -    return safe_ipc(Q_IPCCALL(1, Q_MSGRCV), msgid, sz, flags, msgp, type);
+> -}
+>   #endif
+>   #ifdef __NR_semtimedop
+>   safe_syscall4(int, semtimedop, int, semid, struct sembuf *, tsops,
+>                 unsigned, nsops, const struct timespec *, timeout)
+> -#else
+> -static int safe_semtimedop(int semid, struct sembuf *tsops, unsigned nsops,
+> -                           const struct timespec *timeout)
+> -{
+> -    return safe_ipc(Q_IPCCALL(0, Q_SEMTIMEDOP), semid, nsops, 0, tsops,
+> -                    (long)timeout);
+> -}
+>   #endif
+>   #if defined(TARGET_NR_mq_open) && defined(__NR_mq_open)
+>   safe_syscall5(int, mq_timedsend, int, mqdes, const char *, msg_ptr,
+> @@ -3530,11 +3501,21 @@ static inline abi_long target_to_host_sembuf(struct sembuf *host_sembuf,
+>   static inline abi_long do_semop(int semid, abi_long ptr, unsigned nsops)
+>   {
+>       struct sembuf sops[nsops];
+> +    abi_long ret;
+>   
+>       if (target_to_host_sembuf(sops, ptr, nsops))
+>           return -TARGET_EFAULT;
+>   
+> -    return get_errno(safe_semtimedop(semid, sops, nsops, NULL));
+> +    ret = -ENOSYS;
 
-> > +}
-> > +
-> > +ssize_t intel_gvt_check_vfio_migration_version(struct intel_gvt *gvt,
-> > +		const char *self, const char *remote)
-> > +{
-> > +	struct drm_i915_private *dev_priv = gvt->dev_priv;
-> > +
-> > +	/* currently only gen8 & gen9 are supported */
-> > +	if (!IS_GEN(dev_priv, 8) && !IS_GEN(dev_priv, 9)) {
-> > +		gvt_err("Local hardware does not support migration on %d\n",
-> > +				INTEL_INFO(dev_priv)->gen);
-> > +		return -ENODEV;
-> > +	}
-> > +
-> > +	if (GVT_VFIO_MIGRATION_SOFTWARE_VERSION == INV_SOFTWARE_VERSION) {
-> > +		gvt_err("Local GVT does not support migration\n");
-> > +		return -ENODEV;
-> > +	}
-> > +
-> > +	if (!is_compatible(self, remote))
-> > +		return -EINVAL;
-> > +
-> > +	return 0;
-> > +}
-> > diff --git a/drivers/gpu/drm/i915/gvt/vgpu.c b/drivers/gpu/drm/i915/gvt/vgpu.c
-> > index 44ce3c2b9ac1..7642b21641bd 100644
-> > --- a/drivers/gpu/drm/i915/gvt/vgpu.c
-> > +++ b/drivers/gpu/drm/i915/gvt/vgpu.c
-> > @@ -155,13 +155,18 @@ int intel_gvt_init_vgpu_types(struct intel_gvt *gvt)
-> >  			sprintf(gvt->types[i].name, "GVTg_V5_%s",
-> >  						vgpu_types[i].name);
-> >  
-> > -		gvt_dbg_core("type[%d]: %s avail %u low %u high %u fence %u weight %u res %s\n",
-> > +		gvt->types[i].migration_version =
-> > +			intel_gvt_get_vfio_migration_version(gvt,
-> > +					gvt->types[i].name);
-> > +		gvt_dbg_core("type[%d]: %s avail %u low %u high %u fence %u weight %u res %s, migratio_version:%s\n",
-> >  			     i, gvt->types[i].name,
-> >  			     gvt->types[i].avail_instance,
-> >  			     gvt->types[i].low_gm_size,
-> >  			     gvt->types[i].high_gm_size, gvt->types[i].fence,
-> >  			     gvt->types[i].weight,
-> > -			     vgpu_edid_str(gvt->types[i].resolution));
-> > +			     vgpu_edid_str(gvt->types[i].resolution),
-> > +			     (gvt->types[i].migration_version ?
-> > +			     gvt->types[i].migration_version : "null"));
-> >  	}
-> >  
-> >  	gvt->num_types = i;
-> > @@ -170,6 +175,10 @@ int intel_gvt_init_vgpu_types(struct intel_gvt *gvt)
-> >  
-> >  void intel_gvt_clean_vgpu_types(struct intel_gvt *gvt)
-> >  {
-> > +	int i;
-> > +
-> > +	for (i = 0; i < gvt->num_types; i++)
-> > +		kfree(gvt->types[i].migration_version);
-> >  	kfree(gvt->types);
-> >  }
-> >  
-> > -- 
-> > 2.17.1
-> > 
-> 
-> -- 
-> Open Source Technology Center, Intel ltd.
-> 
-> $gpg --keyserver wwwkeys.pgp.net --recv-keys 4D781827
+this and following ones must be TARGET_ENOSYS.
 
+I send a v2.
 
+Thanks,
+Laurent
 
