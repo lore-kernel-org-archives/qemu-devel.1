@@ -2,77 +2,74 @@ Return-Path: <SRS0=DspQ=T5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2352AC04AB6
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 02:49:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 53BB0C04AB6
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 02:50:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DBB9621019
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 02:49:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DBB9621019
+	by mail.kernel.org (Postfix) with ESMTPS id 2379621019
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 02:50:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2379621019
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:45984 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:46032 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hVoeD-0005cL-Rc
-	for qemu-devel@archiver.kernel.org; Tue, 28 May 2019 22:49:01 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:58756)
+	id 1hVofu-0006Kl-G7
+	for qemu-devel@archiver.kernel.org; Tue, 28 May 2019 22:50:46 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:59002)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1hVodK-0005JG-Tf
-	for qemu-devel@nongnu.org; Tue, 28 May 2019 22:48:08 -0400
+	(envelope-from <mst@redhat.com>) id 1hVofA-0005xM-GA
+	for qemu-devel@nongnu.org; Tue, 28 May 2019 22:50:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1hVodH-0008CK-RE
-	for qemu-devel@nongnu.org; Tue, 28 May 2019 22:48:06 -0400
-Received: from mail-qt1-f193.google.com ([209.85.160.193]:32873)
+	(envelope-from <mst@redhat.com>) id 1hVof9-0006ed-FM
+	for qemu-devel@nongnu.org; Tue, 28 May 2019 22:50:00 -0400
+Received: from mail-qk1-f194.google.com ([209.85.222.194]:45000)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1hVodG-00085y-FA
-	for qemu-devel@nongnu.org; Tue, 28 May 2019 22:48:03 -0400
-Received: by mail-qt1-f193.google.com with SMTP id 14so826337qtf.0
-	for <qemu-devel@nongnu.org>; Tue, 28 May 2019 19:48:02 -0700 (PDT)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1hVof9-0006d5-B8
+	for qemu-devel@nongnu.org; Tue, 28 May 2019 22:49:59 -0400
+Received: by mail-qk1-f194.google.com with SMTP id w187so466437qkb.11
+	for <qemu-devel@nongnu.org>; Tue, 28 May 2019 19:49:59 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:date:from:to:cc:subject:message-id:references
 	:mime-version:content-disposition:in-reply-to;
-	bh=Gx6s3toXdO2Z0dlyfVbQbgjO/9OCSFv/a1EOUnN1SeU=;
-	b=J7zQhevIC/HeVau4sElt2uL+sMRfLhrwbFwmTy9yZmhp8k768GscmpwTJqpmiaoENX
-	/6g7PsQxRSG34GNUNRARYG5I3QMnwnjKzTFVWAEBTgtCPOcJPlE0YslJjspcCuQ5Bc1n
-	hyUDI16CJSEAkewYP+A02A0/6yW5pLf5FmG739KkurhjwmR0isGnWwCUKpxW16vmlRy8
-	JB6Km7fTklLQ8CuCtXyOJWE18uoe+0auCxxZb+fzthaabZZ158DWGKUEZo/wxB7cB6KS
-	FiGXSCemNkULJnDnA7zBdgnkKOgKxmiDWgTBxGHUp3s5g40UI3RGlIY7EHrJcCxG4Ctd
-	V2FQ==
-X-Gm-Message-State: APjAAAW7q7kkPM5hPzsrroJMi6K3vNn6fRGJbn88Jy4BWukD1SJFYxfr
-	ppOPdceX8o2Ut2JE+ctI7J31Jg==
-X-Google-Smtp-Source: APXvYqwZlX5pecraFPTE/ARcqnmLwkaT7UdicK31sgBl7z0jzaT4ulmXz3IGdZoCh3SdNGLjebXKuQ==
-X-Received: by 2002:ac8:4701:: with SMTP id f1mr11093811qtp.126.1559098081765; 
-	Tue, 28 May 2019 19:48:01 -0700 (PDT)
+	bh=ZYxO6jmBnDiy2fZj9QCDDSWGxuQzRFN+HTvQWdss/vw=;
+	b=Ho6i18CUlSULdUhxs5HoTn9gfuisAXkUT2LayCRmjJ6zlOv8gXDpKSl8MWmo7ESgE+
+	e+mMU62P01RSl77/WwuFWaJ10EZs6tuFhSZYNa9TryM6h+Gr9i2kd047QZ8xAfiqSaS6
+	U8YfuvOHK8Br81AFnGjj4x4PwccjjS9nxAG4pWmqHZMQkoeKo6MMBw7/LSf7SRVbpvw1
+	arUuFK3oY9J44BSgn32L6OTRnzCj2IY+U9QryGgnTP7odF5OKjigOUZ167PIecCzHzgp
+	4Xe4Av/ZKl/Qo9DwwCSXTRt0IdHrdNe9hGGzqB5jJ1WBzJtOFpNPHdQrFwBkhpHy/rTP
+	pC7A==
+X-Gm-Message-State: APjAAAU7tbIyU6rLnSakdgE3hPTjF7SUA/iVG/4UUXCIhHGIx8MtlN4i
+	LbfuLq2ns37FgNkTwzpU+SVaJQ==
+X-Google-Smtp-Source: APXvYqzVZLwseXUpNPezYMmz1nVYdtthhBY1otxc13MEIGEYCR85hGEnZCNQZ3vkbRPGHL4YvjjYwg==
+X-Received: by 2002:a05:620a:1084:: with SMTP id
+	g4mr93323729qkk.228.1559098198747; 
+	Tue, 28 May 2019 19:49:58 -0700 (PDT)
 Received: from redhat.com (pool-100-0-197-103.bstnma.fios.verizon.net.
 	[100.0.197.103]) by smtp.gmail.com with ESMTPSA id
-	n124sm6189642qkf.31.2019.05.28.19.48.00
+	n67sm6125649qte.42.2019.05.28.19.49.57
 	(version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-	Tue, 28 May 2019 19:48:00 -0700 (PDT)
-Date: Tue, 28 May 2019 22:47:58 -0400
+	Tue, 28 May 2019 19:49:57 -0700 (PDT)
+Date: Tue, 28 May 2019 22:49:55 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
-To: si-wei liu <si-wei.liu@oracle.com>
-Message-ID: <20190528224639-mutt-send-email-mst@kernel.org>
-References: <20190322134447.14831-1-jfreimann@redhat.com>
-	<20190404082933.ke7tvryocpdd2h54@jenstp.localdomain>
-	<20190405085628.GA2819@work-vm>
-	<20190405191850-mutt-send-email-mst@kernel.org>
-	<0dd75e65-6cf3-893f-a907-d9dc13f10ff5@oracle.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <20190528224810-mutt-send-email-mst@kernel.org>
+References: <20190528204838.21568-1-kraxel@redhat.com>
+	<bf45adf2-1594-89b4-6a4d-9af6d9e8ac6e@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <0dd75e65-6cf3-893f-a907-d9dc13f10ff5@oracle.com>
+In-Reply-To: <bf45adf2-1594-89b4-6a4d-9af6d9e8ac6e@redhat.com>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 	[fuzzy]
-X-Received-From: 209.85.160.193
-Subject: Re: [Qemu-devel] [RFC PATCH 0/2] implement the failover feature for
- assigned network devices
+X-Received-From: 209.85.222.194
+Subject: Re: [Qemu-devel] [PATCH] q35: split memory at 2G
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -84,180 +81,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pkrempa@redhat.com, ehabkost@redhat.com, armbru@redhat.com,
-	qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com,
-	liran.alon@oracle.com, laine@redhat.com, ogerlitz@mellanox.com,
-	Jens Freimann <jfreimann@redhat.com>, ailan@redhat.com,
-	"Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org,
+	Gerd Hoffmann <kraxel@redhat.com>,
+	=?iso-8859-1?B?TOFzemzzIMlyc2Vr?= <lersek@redhat.com>,
+	Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, May 28, 2019 at 05:35:26PM -0700, si-wei liu wrote:
-> 
-> 
-> On 4/5/2019 4:22 PM, Michael S. Tsirkin wrote:
-> > On Fri, Apr 05, 2019 at 09:56:29AM +0100, Dr. David Alan Gilbert wrote:
-> > > * Jens Freimann (jfreimann@redhat.com) wrote:
-> > > > ping
-> > > > 
-> > > > FYI: I'm also working on a few related tools to detect driver behaviour when
-> > > > assigning a MAC to the vf device. Code is at https://github.com/jensfr/netfailover_driver_detect
-> > > Hi Jens,
-> > >    I've not been following this too uch, but:
-> > > 
-> > > > regards,
-> > > > Jens
-> > > > 
-> > > > On Fri, Mar 22, 2019 at 02:44:45PM +0100, Jens Freimann wrote:
-> > > > > This is another attempt at implementing the host side of the
-> > > > > net_failover concept
-> > > > > (https://www.kernel.org/doc/html/latest/networking/net_failover.html)
-> > > > > 
-> > > > > The general idea is that we have a pair of devices, a vfio-pci and a
-> > > > > emulated device. Before migration the vfio device is unplugged and data
-> > > > > flows to the emulated device, on the target side another vfio-pci device
-> > > > > is plugged in to take over the data-path. In the guest the net_failover
-> > > > > module will pair net devices with the same MAC address.
-> > > > > 
-> > > > > * In the first patch the infrastructure for hiding the device is added
-> > > > >   for the qbus and qdev APIs. A "hidden" boolean is added to the device
-> > > > >   state and it is set based on a callback to the standby device which
-> > > > >   registers itself for handling the assessment: "should the primary device
-> > > > >   be hidden?" by cross validating the ids of the devices.
-> > > > > 
-> > > > > * In the second patch the virtio-net uses the API to hide the vfio
-> > > > >   device and unhides it when the feature is acked.
-> > > > > 
-> > > > > Previous discussion: https://patchwork.ozlabs.org/cover/989098/
-> > > > > 
-> > > > > To summarize concerns/feedback from previous discussion:
-> > > > > 1.- guest OS can reject or worse _delay_ unplug by any amount of time.
-> > > > >   Migration might get stuck for unpredictable time with unclear reason.
-> > > > >   This approach combines two tricky things, hot/unplug and migration.
-> > > > >   -> We can surprise-remove the PCI device and in QEMU we can do all
-> > > > >      necessary rollbacks transparent to management software. Will it be
-> > > > >      easy, probably not.
-> > > This sounds 'fun' - bonus cases are things like what happens if the
-> > > guest gets rebooted somewhere during the process or if it's currently
-> > > sitting in the bios/grub/etc
-> > Um, during which process? Guests are gradually fixed to support
-> > surprise removal well. Part of it is thunderbolt which makes
-> > it incredibly easy. Yes - bios/grub will need to learn to
-> > handle this well.
-> I shared the same concern. As device emulator (QEMU), you know where guest
-> would reject or delay - it's even agnostic bios/grub should respond to hot
-> plug or not. You don't even know whether guest has the support for ACPI
-> hotplug, surprise removal, do you? How QEMU infer what is the right
-> disposition by telling apart these guest states?
-> 
-> -Siwei
-
-We can always add a feature bit for that :)
-No feature bit -> primary stays hidden.
-
-
+On Wed, May 29, 2019 at 03:21:16AM +0200, Paolo Bonzini wrote:
+> On 28/05/19 22:48, Gerd Hoffmann wrote:
+> > Original q35 behavior was to split memory 2.75 GB, leaving space for the
+> > mmconfig bar at 0xb000000 and pci I/O window starting at 0xc0000000.
 > > 
-> > > > > 2. PCI devices are a precious ressource. The primary device should never
-> > > > >   be added to QEMU if it won't be used by guest instead of hiding it in
-> > > > >   QEMU.
-> > > > >   -> We only hotplug the device when the standby feature bit was
-> > > > >      negotiated. We save the device cmdline options until we need it for
-> > > > >      qdev_device_add()
-> > > > >      Hiding a device can be a useful concept to model. For example a
-> > > > >      pci device in a powered-off slot could be marked as hidden until the slot is
-> > > > >      powered on (mst).
-> > > Are they really that precious? Personally it's not something I'd worry
-> > > about.
-> > > 
-> > > > > 3. Management layer software should handle this. Open Stack already has
-> > > > >   components/code to handle unplug/replug VFIO devices and metadata to
-> > > > >   provide to the guest for detecting which devices should be paired.
-> > > > >   -> An approach that includes all software from firmware to
-> > > > >      higher-level management software wasn't tried in the last years. This is
-> > > > >      an attempt to keep it simple and contained in QEMU as much as possible.
-> > > > > 4. Hotplugging a device and then making it part of a failover setup is
-> > > > >    not possible
-> > > > >   -> addressed by extending qdev hotplug functions to check for hidden
-> > > > >      attribute, so e.g. device_add can be used to plug a device.
-> > > > > 
-> > > > > There are still some open issues:
-> > > > > 
-> > > > > Migration: I'm looking for something like a pre-migration hook that I
-> > > > > could use to unplug the vfio-pci device. I tried with a migration
-> > > > > notifier but it is called to late, i.e. after migration is aborted due
-> > > > > to vfio-pci marked unmigrateable. I worked around this by setting it
-> > > > > to migrateable and used a migration notifier on the virtio-net device.
-> > > Why not just let this happen at the libvirt level; then you do the
-> > > hotunplug etc before you actually tell qemu anything about starting a
-> > > migration?
-> > If qemu frees up resources (as it does on unplug) then libvirt
-> > is not guaranteed it can roll the change back on e.g.
-> > migration failure.
+> > Note: Those machine types have been removed from the qemu codebase
+> > meanwhile because they could not be live-migrated so there was little
+> > value in keeping them around.
 > > 
-> > But really another issue is simply that it's a mechanism,
-> > there's no policy that management needs to decide on.
-> > Doing it at lowest possible level ensures all
-> > upper layers benefit with minimal pain.
+> > With the effort to allow for gigabyte-alignment of guest memory that
+> > behavior was changed:  The split was moved to 2G, but only in case the
+> > memory didn't fit below 2.75 GB.
 > > 
-> > > > > Commandline: There is a dependency between vfio-pci and virtio-net
-> > > > > devices. One points to the other via new parameters
-> > > > > primar=<primary qdev id> and standby='<standby qdev id>'. This means
-> > > > > that the primary device needs to be specified after standby device on
-> > > > > the qemu command line. Not sure how to solve this.
-> > > > > 
-> > > > > Error handling: Patches don't cover all possible error scenarios yet.
-> > > > > 
-> > > > > I have tested this with a mlx5 NIC and was able to migrate the VM with
-> > > > > above mentioned workarounds for open problems.
-> > > > > 
-> > > > > Command line example:
-> > > > > 
-> > > > > qemu-system-x86_64 -enable-kvm -m 3072 -smp 3 \
-> > > > >         -machine q35,kernel-irqchip=split -cpu host   \
-> > > > >         -k fr   \
-> > > > >         -serial stdio   \
-> > > > >         -net none \
-> > > > >         -qmp unix:/tmp/qmp.socket,server,nowait \
-> > > > >         -monitor telnet:127.0.0.1:5555,server,nowait \
-> > > > >         -device pcie-root-port,id=root0,multifunction=on,chassis=0,addr=0xa \
-> > > > >         -device pcie-root-port,id=root1,bus=pcie.0,chassis=1 \
-> > > > >         -device pcie-root-port,id=root2,bus=pcie.0,chassis=2 \
-> > > > >         -netdev tap,script=/root/bin/bridge.sh,downscript=no,id=hostnet1,vhost=on \
-> > > > >         -device virtio-net-pci,netdev=hostnet1,id=net1,mac=52:54:00:6f:55:cc,bus=root2,primary=hostdev0 \
-> > > > >         -device vfio-pci,host=5e:00.2,id=hostdev0,bus=root1,standby=net1 \
-> > > Yes, that's a bit grim; it's circular dependency on the 'hostdev0' and
-> > > 'net1' id's.  cc'ing in Markus.
-> > > 
-> > > Dave
-> > > 
-> > > > >         /root/rhel-guest-image-8.0-1781.x86_64.qcow2
-> > > > > 
-> > > > > I'm grateful for any remarks or ideas!
-> > > > > 
-> > > > > Thanks!
-> > > > > 
-> > > > > regards,
-> > > > > Jens
-> > > > > 
-> > > > > Sameeh Jubran (2):
-> > > > >   qdev/qbus: Add hidden device support
-> > > > >   net/virtio: add failover support
-> > > > > 
-> > > > > hw/core/qdev.c                 | 27 ++++++++++
-> > > > > hw/net/virtio-net.c            | 95 ++++++++++++++++++++++++++++++++++
-> > > > > hw/pci/pci.c                   |  1 +
-> > > > > include/hw/pci/pci.h           |  2 +
-> > > > > include/hw/qdev-core.h         |  8 +++
-> > > > > include/hw/virtio/virtio-net.h |  7 +++
-> > > > > qdev-monitor.c                 | 48 +++++++++++++++--
-> > > > > vl.c                           |  7 ++-
-> > > > > 8 files changed, 189 insertions(+), 6 deletions(-)
-> > > > > 
-> > > > > -- 
-> > > > > 2.20.1
-> > > > > 
-> > > > > 
-> > > --
-> > > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> > So today the address space between 2G and 2,75G is not used for guest
+> > memory in typical use cases, where the guest memory sized at a power of
+> > two or a gigabyte number.  But if you configure your guest with some odd
+> > amout of memory (such as 2.5G) the address space is used.
+> 
+> Wasn't it done to ensure pre-PAE OSes could use as much memory as
+> possible?  (If you run pre-PAE OSes with more RAM than can fit below 4G,
+> you can just reduce the amount of memory and get all the 2.75G).
+> 
+> Paolo
+
+Absolutely. Gerd is just saying the configuration is rare enough that
+it's not worth worrying about. I don't know myself - why do
+we bother making this change? What's the advantage?
+
+-- 
+MST
 
