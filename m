@@ -2,60 +2,83 @@ Return-Path: <SRS0=DspQ=T5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 46519C04AB3
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 07:19:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D2779C04AB3
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 07:19:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 152012075C
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 07:19:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A43D6208C3
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 07:19:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="XYa5vXvB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 152012075C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YGffU8sp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A43D6208C3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:48802 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:48804 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hVss7-0007CF-54
-	for qemu-devel@archiver.kernel.org; Wed, 29 May 2019 03:19:39 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:47502)
+	id 1hVss9-0007EP-P6
+	for qemu-devel@archiver.kernel.org; Wed, 29 May 2019 03:19:41 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:53215)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1hVsPy-0008D0-PX
-	for qemu-devel@nongnu.org; Wed, 29 May 2019 02:50:35 -0400
+	(envelope-from <elohimes@gmail.com>) id 1hVsjf-0000OB-Iq
+	for qemu-devel@nongnu.org; Wed, 29 May 2019 03:10:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1hVsPx-0002W5-53
-	for qemu-devel@nongnu.org; Wed, 29 May 2019 02:50:34 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:54683 helo=ozlabs.org)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
-	id 1hVsPw-0002RJ-BD; Wed, 29 May 2019 02:50:33 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
-	id 45DLv20prmz9sBr; Wed, 29 May 2019 16:50:21 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-	d=gibson.dropbear.id.au; s=201602; t=1559112622;
-	bh=Vfl8iaj2UXBKYIR6axFGslC1xVyEFFzzrybLIkgJ0p4=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=XYa5vXvBIkzfF7H/zCwhpXY3W/jwA1dRi65qIQ2N4Vh+HLmCE4uK9WsQNbs4nGVrl
-	r4gffyeueM7vNCXgUdWQOlKbw5s+VyfCQu0UD8TchXPF8r7sK78suD5bz3s6KJe/Db
-	kinrPg10NLIpzz4kZQg+1SmGDvhkGAShHcExg7x0=
-From: David Gibson <david@gibson.dropbear.id.au>
-To: peter.maydell@linaro.org
-Date: Wed, 29 May 2019 16:49:37 +1000
-Message-Id: <20190529065017.15149-5-david@gibson.dropbear.id.au>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20190529065017.15149-1-david@gibson.dropbear.id.au>
-References: <20190529065017.15149-1-david@gibson.dropbear.id.au>
-MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 203.11.71.1
-Subject: [Qemu-devel] [PULL 04/44] target/ppc/kvm: Fix trace typo
+	(envelope-from <elohimes@gmail.com>) id 1hVsjd-0006O8-Kv
+	for qemu-devel@nongnu.org; Wed, 29 May 2019 03:10:55 -0400
+Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:39332)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <elohimes@gmail.com>) id 1hVsjb-0006My-SK
+	for qemu-devel@nongnu.org; Wed, 29 May 2019 03:10:53 -0400
+Received: by mail-pl1-x644.google.com with SMTP id g9so658058plm.6
+	for <qemu-devel@nongnu.org>; Wed, 29 May 2019 00:10:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+	h=from:to:cc:subject:date:message-id;
+	bh=JUZGbiiSfwtgG6+C+pk4U0bdDVaD9HvtYKCMbozyaBc=;
+	b=YGffU8spWs/c0/20Bxf0xYPMFODHpYE4XZ+M3rF62ZYbQ5bXxi8MUI1Hwn1OsBQAJG
+	JtjBONn92czWOes14brkx9iexrRHv/Ui9gvUL4ROrKgUIyI36Ad8FNUHowhg2/OI8zlB
+	R0gMzUmwakIEaumOvi63OqAKm+7KEXoO9Q+xvkywA+7NbeqBt+vaoulGAJvpDyvrc8dZ
+	dqqzTy5mDdQgj8N3NwUmlQFOQlYVyU7PNEs0CQS3MQTRjjuhzZaEmkfR96zzQP3pjbMD
+	Olkncp9utC64N4QViKkmWxwvSOfYdYzeYISs2WWAE2NkLtLi3rGxScj7MWWgvZq02RHf
+	oHPA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:from:to:cc:subject:date:message-id;
+	bh=JUZGbiiSfwtgG6+C+pk4U0bdDVaD9HvtYKCMbozyaBc=;
+	b=IIsDadp6k5WOiPXBhaPyOjXpT/WPtYevW5Wt50/bxwfsKV6yZjKJ1+fNCFQ70Oiu+z
+	13/AY80/mPmEaiFvrz1Ompg+IhpltAIqfCqQCME0rHiDjhlCJUZtxrwjPX25eMMjLJnv
+	jkFEc15Vi8vK14dRNFNEEUnzaNtM1qub+BtMYuB+32yWGgCj5d/6eyIlRVPvR9Fdi3uV
+	flNxzR2F7UpusBZZM6lJgy5v0ohmuu4guRMcVNPhWqMC0YiM+xRWq6fZftiWLk/FBs6a
+	0b753dQmQaQw00hJ9QJT5o3KT+MfBKjQLU7hYD1k8cVmDc1bIMfmqOe8gu5G2DwwsU4P
+	vBLg==
+X-Gm-Message-State: APjAAAVjFkNl4ZMMLwHmX8jfZC0DLSiJk3zImN0/fYmoOAUqd08O3vIA
+	MdoeLSa7jR6VaIwU4qCGuyQ=
+X-Google-Smtp-Source: APXvYqwg1nKuJgYbKwH8oTF1LIjtQX6dSCMFlz/hfAIbZg/4vkTnQJeEzCrLoFgy+zTKs7z6mnidXw==
+X-Received: by 2002:a17:902:e40a:: with SMTP id
+	ci10mr92503927plb.195.1559113850254; 
+	Wed, 29 May 2019 00:10:50 -0700 (PDT)
+Received: from localhost ([116.247.112.152]) by smtp.gmail.com with ESMTPSA id
+	g17sm24212474pfk.55.2019.05.29.00.10.49
+	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+	Wed, 29 May 2019 00:10:49 -0700 (PDT)
+From: elohimes@gmail.com
+X-Google-Original-From: xieyongji@baidu.com
+To: mst@redhat.com,
+	groug@kaod.org,
+	dgilbert@redhat.com
+Date: Wed, 29 May 2019 15:09:50 +0800
+Message-Id: <20190529070955.25565-1-xieyongji@baidu.com>
+X-Mailer: git-send-email 2.17.1
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::644
+Subject: [Qemu-devel] [PATCH 0/5] virtio: fix some issues of "started" and
+ "start_on_kick" flag
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -67,55 +90,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: lvivier@redhat.com, qemu-devel@nongnu.org, groug@kaod.org,
-	Boxuan Li <liboxuan@connect.hku.hk>, qemu-ppc@nongnu.org,
-	clg@kaod.org, David Gibson <david@gibson.dropbear.id.au>, rth@twiddle.net
+Cc: Xie Yongji <xieyongji@baidu.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Boxuan Li <liboxuan@connect.hku.hk>
+From: Xie Yongji <xieyongji@baidu.com>
 
-Signed-off-by: Boxuan Li <liboxuan@connect.hku.hk>
-Message-Id: <20190430172842.27369-1-liboxuan@connect.hku.hk>
-Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
----
- target/ppc/kvm.c        | 2 +-
- target/ppc/trace-events | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+We introduced two flags "started" and "start_on_kick" to indicate virtio
+device's state before. But there still are some problems with them. So
+we try to fixup them in this patchset.
 
-diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
-index 02e22e2017..1a9caf8f40 100644
---- a/target/ppc/kvm.c
-+++ b/target/ppc/kvm.c
-@@ -1721,7 +1721,7 @@ int kvm_arch_handle_exit(CPUState *cs, struct kvm_r=
-un *run)
-             trace_kvm_handle_dcr_write();
-             ret =3D kvmppc_handle_dcr_write(env, run->dcr.dcrn, run->dcr=
-.data);
-         } else {
--            trace_kvm_handle_drc_read();
-+            trace_kvm_handle_dcr_read();
-             ret =3D kvmppc_handle_dcr_read(env, run->dcr.dcrn, &run->dcr=
-.data);
-         }
-         break;
-diff --git a/target/ppc/trace-events b/target/ppc/trace-events
-index 7b3cfe11fd..3dc6740706 100644
---- a/target/ppc/trace-events
-+++ b/target/ppc/trace-events
-@@ -22,7 +22,7 @@ kvm_failed_put_vpa(void) "Warning: Unable to set VPA in=
-formation to KVM"
- kvm_failed_get_vpa(void) "Warning: Unable to get VPA information from KV=
-M"
- kvm_injected_interrupt(int irq) "injected interrupt %d"
- kvm_handle_dcr_write(void) "handle dcr write"
--kvm_handle_drc_read(void) "handle dcr read"
-+kvm_handle_dcr_read(void) "handle dcr read"
- kvm_handle_halt(void) "handle halt"
- kvm_handle_papr_hcall(void) "handle PAPR hypercall"
- kvm_handle_epr(void) "handle epr"
---=20
-2.21.0
+The patch 1 fixes a regression bug that old guest is not able to boot with
+vhost-user-blk device.
+
+The patch 2,3,4 fix some problems with "started" and "start_on_kick" flag.
+
+The patch 5 introduces a "use-started" property to avoid a migration
+issue under Greg Kurz's suggestion [1].
+
+[1] https://lists.gnu.org/archive/html/qemu-devel/2019-05/msg06247.html
+
+Xie Yongji (5):
+  virtio: Set "start_on_kick" on virtio_set_features()
+  virtio: Migrate the "start_on_kick" flag
+  virtio: Make sure we get correct state of device on
+    handle_aio_output()
+  virtio: Don't change "started" flag on virtio_vmstate_change()
+  virtio: add "use-started" property
+
+ hw/block/vhost-user-blk.c  |  8 +++--
+ hw/core/machine.c          |  4 ++-
+ hw/virtio/virtio.c         | 67 +++++++++++++++++++++++++++-----------
+ include/hw/virtio/virtio.h | 10 ++++++
+ 4 files changed, 67 insertions(+), 22 deletions(-)
+
+-- 
+2.17.1
 
 
