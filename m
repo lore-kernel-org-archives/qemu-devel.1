@@ -2,90 +2,71 @@ Return-Path: <SRS0=DspQ=T5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6AD7FC28CC1
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 14:09:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F7A8C28CC0
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 14:10:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 471D1238C5
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 14:09:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 471D1238C5
+	by mail.kernel.org (Postfix) with ESMTPS id 2E66A238CE
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 14:10:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2E66A238CE
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:55147 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:55177 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hVzGL-0004QM-G0
-	for qemu-devel@archiver.kernel.org; Wed, 29 May 2019 10:09:05 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:52237)
+	id 1hVzHd-0005GL-Bh
+	for qemu-devel@archiver.kernel.org; Wed, 29 May 2019 10:10:25 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:53963)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hVzAo-0000fj-4s
-	for qemu-devel@nongnu.org; Wed, 29 May 2019 10:03:23 -0400
+	(envelope-from <alex.williamson@redhat.com>) id 1hVzGK-0004Ve-JS
+	for qemu-devel@nongnu.org; Wed, 29 May 2019 10:09:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hVzAn-00044T-2s
-	for qemu-devel@nongnu.org; Wed, 29 May 2019 10:03:22 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36398)
+	(envelope-from <alex.williamson@redhat.com>) id 1hVzGI-0000op-KR
+	for qemu-devel@nongnu.org; Wed, 29 May 2019 10:09:04 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38676)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mreitz@redhat.com>)
-	id 1hVzAk-0003za-P3; Wed, 29 May 2019 10:03:18 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
+	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+	id 1hVzGG-0000mj-KC
+	for qemu-devel@nongnu.org; Wed, 29 May 2019 10:09:02 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 0B493B2DF5;
-	Wed, 29 May 2019 14:03:18 +0000 (UTC)
-Received: from dresden.str.redhat.com (unknown [10.40.205.150])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 3999D643DA;
-	Wed, 29 May 2019 14:03:17 +0000 (UTC)
-To: qemu-block@nongnu.org
-References: <20190516161114.27596-1-mreitz@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
-	mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
-	/PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
-	U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
-	mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
-	awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
-	AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
-	CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
-	B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
-	2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
-	AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
-	8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
-	4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
-	BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
-	xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
-	W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
-	DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
-	64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
-	ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
-	sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
-	alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
-	/ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
-	bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
-	R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <28e6a9e5-0504-f07a-c177-b81bd2f20066@redhat.com>
-Date: Wed, 29 May 2019 16:03:15 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	by mx1.redhat.com (Postfix) with ESMTPS id C629130044C9;
+	Wed, 29 May 2019 14:08:47 +0000 (UTC)
+Received: from x1.home (ovpn-116-22.phx2.redhat.com [10.3.116.22])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 0B9C560FAF;
+	Wed, 29 May 2019 14:08:36 +0000 (UTC)
+Date: Wed, 29 May 2019 08:08:36 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Boris Fiuczynski <fiuczy@linux.ibm.com>
+Message-ID: <20190529080836.007b8755@x1.home>
+In-Reply-To: <0c1f5f03-1895-b9a2-999f-f611dd295732@linux.ibm.com>
+References: <20190506014514.3555-1-yan.y.zhao@intel.com>
+	<20190506014904.3621-1-yan.y.zhao@intel.com>
+	<20190507151826.502be009@x1.home>
+	<20190508112740.GA24397@joy-OptiPlex-7040>
+	<20190508152242.4b54a5e7@x1.home>
+	<5eac912c-e753-b5f6-83a4-b646f991d858@linux.ibm.com>
+	<20190514093140.68cc6f7a@x1.home>
+	<0c1f5f03-1895-b9a2-999f-f611dd295732@linux.ibm.com>
+Organization: Red Hat
 MIME-Version: 1.0
-In-Reply-To: <20190516161114.27596-1-mreitz@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="SCzPv8krMOQMbKPoEFVQ4PDpuYEIKgNx2"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.26]);
-	Wed, 29 May 2019 14:03:18 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.46]);
+	Wed, 29 May 2019 14:08:58 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-X-Content-Filtered-By: Mailman/MimeDel 2.1.21
-Subject: Re: [Qemu-devel] [PATCH] iotests: Fix intermittent failure in 219
+Subject: Re: [Qemu-devel] [libvirt] [PATCH v2 1/2] vfio/mdev: add version
+ attribute for mdev device
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -97,71 +78,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
+Cc: "cjia@nvidia.com" <cjia@nvidia.com>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	"aik@ozlabs.ru" <aik@ozlabs.ru>,
+	"Zhengxiao.zx@alibaba-inc.com" <Zhengxiao.zx@alibaba-inc.com>,
+	"shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
+	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+	"kwankhede@nvidia.com" <kwankhede@nvidia.com>,
+	"eauger@redhat.com" <eauger@redhat.com>, "Liu, Yi
+	L" <yi.l.liu@intel.com>, "eskultet@redhat.com" <eskultet@redhat.com>,
+	"Yang, Ziye" <ziye.yang@intel.com>,
+	"mlevitsk@redhat.com" <mlevitsk@redhat.com>,
+	Halil Pasic <pasic@linux.ibm.com>,
+	"libvir-list@redhat.com" <libvir-list@redhat.com>,
+	"arei.gonglei@huawei.com" <arei.gonglei@huawei.com>,
+	"felipe@nutanix.com" <felipe@nutanix.com>,
+	"Ken.Xue@amd.com" <Ken.Xue@amd.com>, "Tian,
+	Kevin" <kevin.tian@intel.com>, Yan Zhao <yan.y.zhao@intel.com>,
+	"dgilbert@redhat.com" <dgilbert@redhat.com>,
+	"zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>,
+	"dinechin@redhat.com" <dinechin@redhat.com>,
+	"intel-gvt-dev@lists.freedesktop.org"
+	<intel-gvt-dev@lists.freedesktop.org>, "Liu,
+	Changpeng" <changpeng.liu@intel.com>, Krowiak <akrowiak@linux.ibm.com>,
+	Pierre Morel <pmorel@linux.ibm.com>,
+	"cohuck@redhat.com" <cohuck@redhat.com>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "Wang, Zhi
+	A" <zhi.a.wang@intel.com>,
+	"jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>, "He,
+	Shaopeng" <shaopeng.he@intel.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---SCzPv8krMOQMbKPoEFVQ4PDpuYEIKgNx2
-From: Max Reitz <mreitz@redhat.com>
-To: qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>
-Message-ID: <28e6a9e5-0504-f07a-c177-b81bd2f20066@redhat.com>
-Subject: Re: [PATCH] iotests: Fix intermittent failure in 219
-References: <20190516161114.27596-1-mreitz@redhat.com>
-In-Reply-To: <20190516161114.27596-1-mreitz@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Tue, 28 May 2019 22:57:15 +0200
+Boris Fiuczynski <fiuczy@linux.ibm.com> wrote:
 
-On 16.05.19 18:11, Max Reitz wrote:
-> In 219, we wait for the job to make progress before we emit its status.=
+> On 5/14/19 5:31 PM, Alex Williamson wrote:
+> > On Wed, 8 May 2019 17:27:47 +0200
+> > Boris Fiuczynski <fiuczy@linux.ibm.com> wrote:
+> >   
+> >> On 5/8/19 11:22 PM, Alex Williamson wrote:  
+> >>>>> I thought there was a request to make this more specific to migration
+> >>>>> by renaming it to something like migration_version.  Also, as an
+> >>>>>        
+> >>>> so this attribute may not only include a mdev device's parent device info and
+> >>>> mdev type, but also include numeric software version of vendor specific
+> >>>> migration code, right?  
+> >>> It's a vendor defined string, it should be considered opaque to the
+> >>> user, the vendor can include whatever they feel is relevant.
+> >>>      
+> >> Would a vendor also be allowed to provide a string expressing required
+> >> features as well as containing backend resource requirements which need
+> >> to be compatible for a successful migration? Somehow a bit like a cpu
+> >> model... maybe even as json or xml...
+> >> I am asking this with vfio-ap in mind. In that context checking
+> >> compatibility of two vfio-ap mdev devices is not as simple as checking
+> >> if version A is smaller or equal to version B.  
+> > 
+> > Two pieces to this, the first is that the string is opaque exactly so
+> > that the vendor driver can express whatever they need in it.  The user
+> > should never infer that two devices are compatible.  The second is that  
+> I agree.
+> 
+> > this is not a resource availability or reservation interface.  The fact  
+> I also agree. The migration_version (version in this case is not really 
+> a good fit) is a summary of requirements the source mdev has which a 
+> target mdev needs to be able to fulfill in order to allow migration.
+> The target mdev already exists and was already configured by other means 
+> not involved in the migration check process.
 
-> This makes the output reliable.
->=20
-> Unfortunately, there is a bug: We do not wait for any more progress if
-> the job has already reached its total-progress.  Right after the job ha=
-s
-> been started, it is possible that total-progress is still 0, though.  I=
-n
-> that case, we may skip the first progress-making step and keep ending u=
-p
-> 64 kB short.
->=20
-> To fix that bug, we cab simply wait for total-progress to reach 4 MB
-> (the image size) after starting the job.
->=20
-> Reported-by: Karen Mezick <kmezick@redhat.com>
-> Buglink: https://bugzilla.redhat.com/show_bug.cgi?id=3D1686651
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
-> ---
->  tests/qemu-iotests/219 | 13 ++++++++++---
->  1 file changed, 10 insertions(+), 3 deletions(-)
+Just a nit here (I hope), the target mdev does not necessarily exist at
+the time we're testing migration version compatibility.  The intention
+is that this feature can be used to select a target host system which
+can possibly generate a compatible target mdev device before committing
+to create that device.  For instance a management tool might test for
+migration compatibility across a data center, narrowing the set of
+potential target hosts, then proceed to select a best choice based on
+factors including the ability to actually instantiate such a device on
+the host.
 
-Adjusted the commit message to what I understood John to mean, and
-applied to my block(-on-kevin) branch.
+> Using the migrations_version as some kind of configuration transport 
+> and/or reservation mechanism wasn't my intention and IMHO would both be 
+> wrong.
 
-(Thanks for the review!)
+Sounds good.  Thanks,
 
-Max
+Alex
 
+> > that a target device would be compatible for migration should not take
+> > into account whether the target has the resources to actually create
+> > such a device.  Doing so would imply some sort of resource reservation
+> > support that does not exist.  Matrix devices are clearly a bit
+> > complicated here since maybe the source is expressing a component of
+> > the device that doesn't exist on the target.  In such a "resource not
+> > available at all" case, it might be fair to nak the compatibility test,
+> > but a "ok, but resource not currently available" case should pass,
+> > imo.  Thanks,
+> > 
+> > Alex
+> > 
+> > --
+> > libvir-list mailing list
+> > libvir-list@redhat.com
+> > https://www.redhat.com/mailman/listinfo/libvir-list
+> >   
+> 
+> 
 
---SCzPv8krMOQMbKPoEFVQ4PDpuYEIKgNx2
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlzukSMACgkQ9AfbAGHV
-z0BbbwgAtSsAZvEP09GbuHlCZzDmfZjgl052Y44Hd/d15r0kRIntI8DlXJWkMcHo
-Z3H/x57Tsz6LuP2Py64zfOfz0Z7cxaZd7BWAwiMC58fp+39m/w06VNvGfr1JMqbQ
-Z1Yky36W6LcSvcz0gwMlBXtqJkwrZ2fpwtYII3QLPW2oh5JcVfqRPizQJOpAzzQX
-NrP1dOs2SlihUe2wNq/JJsIuMJ8ZMYjMBJ3gSI11QKzfzGjWHvKoVhNhTp4KROwt
-SDS6M1L2tpVTDNG9IAN1C7CoZECIhYE8uL6L8pClwgnCVLlUwdmbP9LMMqUBEDFJ
-KuCtNbeSVEK/V3wiGJIGmkPrfgiPfQ==
-=hFxK
------END PGP SIGNATURE-----
-
---SCzPv8krMOQMbKPoEFVQ4PDpuYEIKgNx2--
 
