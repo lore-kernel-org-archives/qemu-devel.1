@@ -6,70 +6,69 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 81A06C04AB3
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 03:25:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 83786C04AB3
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 03:31:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 496A720657
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 03:25:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 496A720657
+	by mail.kernel.org (Postfix) with ESMTPS id 3FE502067C
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 03:31:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3FE502067C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:46355 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:46401 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hVpDc-0006Kk-Im
-	for qemu-devel@archiver.kernel.org; Tue, 28 May 2019 23:25:36 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:36007)
+	id 1hVpJh-00082m-DR
+	for qemu-devel@archiver.kernel.org; Tue, 28 May 2019 23:31:53 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:36854)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1hVpCQ-0005ZA-33
-	for qemu-devel@nongnu.org; Tue, 28 May 2019 23:24:23 -0400
+	(envelope-from <mst@redhat.com>) id 1hVpIQ-0007Go-AV
+	for qemu-devel@nongnu.org; Tue, 28 May 2019 23:30:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1hVpCO-0004UP-NZ
-	for qemu-devel@nongnu.org; Tue, 28 May 2019 23:24:22 -0400
-Received: from mail-qt1-f196.google.com ([209.85.160.196]:33092)
+	(envelope-from <mst@redhat.com>) id 1hVpIO-0006B1-OF
+	for qemu-devel@nongnu.org; Tue, 28 May 2019 23:30:34 -0400
+Received: from mail-qk1-f195.google.com ([209.85.222.195]:40130)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1hVpCO-0004Sr-Iu
-	for qemu-devel@nongnu.org; Tue, 28 May 2019 23:24:20 -0400
-Received: by mail-qt1-f196.google.com with SMTP id 14so904722qtf.0
-	for <qemu-devel@nongnu.org>; Tue, 28 May 2019 20:24:20 -0700 (PDT)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1hVpIL-0005ik-Uw
+	for qemu-devel@nongnu.org; Tue, 28 May 2019 23:30:30 -0400
+Received: by mail-qk1-f195.google.com with SMTP id c70so524061qkg.7
+	for <qemu-devel@nongnu.org>; Tue, 28 May 2019 20:30:24 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:date:from:to:cc:subject:message-id:references
 	:mime-version:content-disposition:in-reply-to;
-	bh=vHtHXlb2UxU1f5Qt+FyLuYxrO8fV3Dn+f67W9eBDx4s=;
-	b=kQ1Jjn3xCQxzrrT5TxfXb9Cq0pCTgAfj/dbm4f0GLnu4vuC9GuXhTLh9P58ra1MRfy
-	kGaDuXMui5ld5CHqRglsTCOD9FLlweI8mVlWDRkZqnIsVt+EZIE/oufk99AqpkLTwY9c
-	L/JReYIz0WVoD48HACoWF5J04hzo7V/ffGaFtuY2V4pvW1k6XCacRSkwM5P96E4/Q9kl
-	Z6kPWvzl7QYsp5x1V07hOwH/Ahcr9P9dU8FZCSIYmXDrGTlISMnYk24fwEcAxI/c5Ieb
-	dxky7q8DaJLE7m6HuWE7QmtlIxPP6wCyJ6q2B6W2QIuxY0R7HRZY0NFHagaCcs2q02wi
-	+pqA==
-X-Gm-Message-State: APjAAAVCFlCjoFCT7Iw+IAiy5jG9PTJS88Oo22C4EALJLo8B55GczFWQ
-	B+jwFnC0E4TlEA0e29AqN8iRWg==
-X-Google-Smtp-Source: APXvYqyWGIsPMBvTT4N76v5lzOsyEfB3ZGcwOTE9zFDBPtSEGfcKvdtR+n6dy5XsLqX8tbcBh2sfkw==
-X-Received: by 2002:aed:3bd7:: with SMTP id s23mr17778362qte.139.1559100259928;
-	Tue, 28 May 2019 20:24:19 -0700 (PDT)
+	bh=KZJ17QHEHD9j7pz8pF2IW2nzXk6cjxLnIqD5cdlyR/I=;
+	b=cJgA4RXKeNAkRfPfFdk46Q3UrhZb//NXDw08JCYZ2J5TpZROnF6Gc/d+S+RsScBjkW
+	PvZIDm84sRfmF/o9rtXik8dVDeEiMbN2xRn+XfPyXxiws6Qt3b0S1+yLFppJvFPPG6uM
+	kO9HkZRZTXMMObPoNpVkBC1kPf/aBZOAERSZYicYWGthEdIggt4CTfQxsbSIODPcMH32
+	5+P3MyX2CD3qzjrssJlSW+AgNFMBGtR5GSmgv9wGcBJf5n/91HtsVQEbojVNvaqaLRTM
+	uU8kSYXDVXiNnZPnQxuJuxSf+P6WmcVMzRmQ2VGNzm1h+7GlCMKJZCt9qv7cuZGpkyf5
+	lUbQ==
+X-Gm-Message-State: APjAAAUYOMOh2kwJTxwrRgOko9/KrGs2sQrK5R2EgBEboZJbpoDeY1Ep
+	ozAejBelsY/QBwckYE8b9Lg2Lw==
+X-Google-Smtp-Source: APXvYqxvYgv+SxglD+mkY7+S0APn7qxKiGsbWotcAlgAR6VTBewrTg7BNw18eAqCQr8tBHUOJOm0QQ==
+X-Received: by 2002:a05:620a:16cf:: with SMTP id
+	a15mr79789507qkn.332.1559100623513; 
+	Tue, 28 May 2019 20:30:23 -0700 (PDT)
 Received: from redhat.com (pool-100-0-197-103.bstnma.fios.verizon.net.
 	[100.0.197.103]) by smtp.gmail.com with ESMTPSA id
-	z18sm2174466qtf.28.2019.05.28.20.24.18
+	z26sm2054041qti.74.2019.05.28.20.30.22
 	(version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-	Tue, 28 May 2019 20:24:19 -0700 (PDT)
-Date: Tue, 28 May 2019 23:24:17 -0400
+	Tue, 28 May 2019 20:30:22 -0700 (PDT)
+Date: Tue, 28 May 2019 23:30:20 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
-To: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20190528232406-mutt-send-email-mst@kernel.org>
-References: <20190523052918.1129-1-david@gibson.dropbear.id.au>
-	<20190528232250-mutt-send-email-mst@kernel.org>
+To: Alex Williamson <alex.williamson@redhat.com>
+Message-ID: <20190528232626-mutt-send-email-mst@kernel.org>
+References: <155786484688.13873.6037015630912983760.stgit@gimli.home>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190528232250-mutt-send-email-mst@kernel.org>
+In-Reply-To: <155786484688.13873.6037015630912983760.stgit@gimli.home>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 	[fuzzy]
-X-Received-From: 209.85.160.196
-Subject: Re: [Qemu-devel] [PATCH 1/8] spapr: Clean up device node name
- generation for PCI devices
+X-Received-From: 209.85.222.195
+Subject: Re: [Qemu-devel] [PATCH for-4.1 v2] q35: Revert to kernel irqchip
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -81,121 +80,138 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, mdroth@linux.ibm.com, qemu-ppc@nongnu.org,
-	groug@kaod.org, clg@kaod.org
+Cc: berrange@redhat.com, ehabkost@redhat.com, qemu-devel@nongnu.org,
+	peterx@redhat.com, pbonzini@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, May 28, 2019 at 11:23:54PM -0400, Michael S. Tsirkin wrote:
-> On Thu, May 23, 2019 at 03:29:11PM +1000, David Gibson wrote:
-> > spapr_populate_pci_child_dt() adds a 'name' property to the device tree
-> > node for PCI devices.  This is never necessary for a flattened device tree,
-> > it is implicit in the name added when the node is constructed.  In fact
-> > anything we do add to a 'name' property will be overwritten with something
-> > derived from the structural name in the guest firmware (but in fact it is
-> > exactly the same bytes).
-> > 
-> > So, remove that.  In addition, pci_get_node_name() is very simple, so fold
-> > it into its (also simple) sole caller spapr_create_pci_child_dt().
-> > 
-> > While we're there rename pci_find_device_name() to the shorter and more
-> > accurate dt_name_from_class().
-> > 
-> > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+On Tue, May 14, 2019 at 02:14:41PM -0600, Alex Williamson wrote:
+> Commit b2fc91db8447 ("q35: set split kernel irqchip as default") changed
+> the default for the pc-q35-4.0 machine type to use split irqchip, which
+> turned out to have disasterous effects on vfio-pci INTx support.  KVM
+> resampling irqfds are registered for handling these interrupts, but
+> these are non-functional in split irqchip mode.  We can't simply test
+> for split irqchip in QEMU as userspace handling of this interrupt is a
+> significant performance regression versus KVM handling (GeForce GPUs
+> assigned to Windows VMs are non-functional without forcing MSI mode or
+> re-enabling kernel irqchip).
 > 
-> The threading is broken here btw.
+> The resolution is to revert the change in default irqchip mode in the
+> pc-q35-4.1 machine and create a pc-q35-4.0.1 machine for the 4.0-stable
+> branch.  The qemu-q35-4.0 machine type should not be used in vfio-pci
+> configurations for devices requiring legacy INTx support without
+> explicitly modifying the VM configuration to use kernel irqchip.
 > 
-> I was CC'd but it's mostly PPC stuff.
-> I like how pci_XX functions that are not in pci.c are
-> going away :)
-> 
-> Acked-by: Michael S. Tsirkin <mst@redhat.com>
+> Link: https://bugs.launchpad.net/qemu/+bug/1826422
+> Fixes: b2fc91db8447 ("q35: set split kernel irqchip as default")
+> Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
 
-and that's for the whole patchset.
+OK I guess but it's really a kvm patch.
+So I'd like Paolo to review and merge if appropriate.
 
+Can't say this makes me too happy. split irqchip
+has a bunch of advantages.
+
+> ---
+>  hw/core/machine.c    |    3 +++
+>  hw/i386/pc.c         |    3 +++
+>  hw/i386/pc_q35.c     |   16 ++++++++++++++--
+>  include/hw/boards.h  |    3 +++
+>  include/hw/i386/pc.h |    3 +++
+>  5 files changed, 26 insertions(+), 2 deletions(-)
 > 
-> > ---
-> >  hw/ppc/spapr_pci.c | 43 +++++++++++++++++--------------------------
-> >  1 file changed, 17 insertions(+), 26 deletions(-)
-> > 
-> > diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
-> > index 97961b0128..b2db46ef1d 100644
-> > --- a/hw/ppc/spapr_pci.c
-> > +++ b/hw/ppc/spapr_pci.c
-> > @@ -1173,8 +1173,8 @@ static const PCIClass pci_classes[] = {
-> >      { "data-processing-controller", spc_subclass },
-> >  };
-> >  
-> > -static const char *pci_find_device_name(uint8_t class, uint8_t subclass,
-> > -                                        uint8_t iface)
-> > +static const char *dt_name_from_class(uint8_t class, uint8_t subclass,
-> > +                                      uint8_t iface)
-> >  {
-> >      const PCIClass *pclass;
-> >      const PCISubClass *psubclass;
-> > @@ -1216,23 +1216,6 @@ static const char *pci_find_device_name(uint8_t class, uint8_t subclass,
-> >      return name;
-> >  }
-> >  
-> > -static gchar *pci_get_node_name(PCIDevice *dev)
-> > -{
-> > -    int slot = PCI_SLOT(dev->devfn);
-> > -    int func = PCI_FUNC(dev->devfn);
-> > -    uint32_t ccode = pci_default_read_config(dev, PCI_CLASS_PROG, 3);
-> > -    const char *name;
-> > -
-> > -    name = pci_find_device_name((ccode >> 16) & 0xff, (ccode >> 8) & 0xff,
-> > -                                ccode & 0xff);
-> > -
-> > -    if (func != 0) {
-> > -        return g_strdup_printf("%s@%x,%x", name, slot, func);
-> > -    } else {
-> > -        return g_strdup_printf("%s@%x", name, slot);
-> > -    }
-> > -}
-> > -
-> >  static uint32_t spapr_phb_get_pci_drc_index(SpaprPhbState *phb,
-> >                                              PCIDevice *pdev);
-> >  
-> > @@ -1300,11 +1283,6 @@ static void spapr_populate_pci_child_dt(PCIDevice *dev, void *fdt, int offset,
-> >          _FDT(fdt_setprop(fdt, offset, "udf-supported", NULL, 0));
-> >      }
-> >  
-> > -    _FDT(fdt_setprop_string(fdt, offset, "name",
-> > -                            pci_find_device_name((ccode >> 16) & 0xff,
-> > -                                                 (ccode >> 8) & 0xff,
-> > -                                                 ccode & 0xff)));
-> > -
-> >      buf = spapr_phb_get_loc_code(sphb, dev);
-> >      _FDT(fdt_setprop_string(fdt, offset, "ibm,loc-code", buf));
-> >      g_free(buf);
-> > @@ -1348,10 +1326,23 @@ static int spapr_create_pci_child_dt(SpaprPhbState *phb, PCIDevice *dev,
-> >                                       void *fdt, int node_offset)
-> >  {
-> >      int offset;
-> > -    gchar *nodename;
-> > +    const gchar *basename;
-> > +    char *nodename;
-> > +    int slot = PCI_SLOT(dev->devfn);
-> > +    int func = PCI_FUNC(dev->devfn);
-> > +    uint32_t ccode = pci_default_read_config(dev, PCI_CLASS_PROG, 3);
-> > +
-> > +    basename = dt_name_from_class((ccode >> 16) & 0xff, (ccode >> 8) & 0xff,
-> > +                                  ccode & 0xff);
-> > +
-> > +    if (func != 0) {
-> > +        nodename = g_strdup_printf("%s@%x,%x", basename, slot, func);
-> > +    } else {
-> > +        nodename = g_strdup_printf("%s@%x", basename, slot);
-> > +    }
-> >  
-> > -    nodename = pci_get_node_name(dev);
-> >      _FDT(offset = fdt_add_subnode(fdt, node_offset, nodename));
-> > +
-> >      g_free(nodename);
-> >  
-> >      spapr_populate_pci_child_dt(dev, fdt, offset, phb);
-> > -- 
-> > 2.21.0
+> diff --git a/hw/core/machine.c b/hw/core/machine.c
+> index 5d046a43e3d2..e41e6698ac9f 100644
+> --- a/hw/core/machine.c
+> +++ b/hw/core/machine.c
+> @@ -24,6 +24,9 @@
+>  #include "hw/pci/pci.h"
+>  #include "hw/mem/nvdimm.h"
+>  
+> +GlobalProperty hw_compat_4_0_1[] = {};
+> +const size_t hw_compat_4_0_1_len = G_N_ELEMENTS(hw_compat_4_0_1);
+> +
+>  GlobalProperty hw_compat_4_0[] = {};
+>  const size_t hw_compat_4_0_len = G_N_ELEMENTS(hw_compat_4_0);
+>  
+> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+> index d98b737b8f3b..b5311e7e2bd5 100644
+> --- a/hw/i386/pc.c
+> +++ b/hw/i386/pc.c
+> @@ -115,6 +115,9 @@ struct hpet_fw_config hpet_cfg = {.count = UINT8_MAX};
+>  /* Physical Address of PVH entry point read from kernel ELF NOTE */
+>  static size_t pvh_start_addr;
+>  
+> +GlobalProperty pc_compat_4_0_1[] = {};
+> +const size_t pc_compat_4_0_1_len = G_N_ELEMENTS(pc_compat_4_0_1);
+> +
+>  GlobalProperty pc_compat_4_0[] = {};
+>  const size_t pc_compat_4_0_len = G_N_ELEMENTS(pc_compat_4_0);
+>  
+> diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
+> index 37dd350511a9..dcddc6466200 100644
+> --- a/hw/i386/pc_q35.c
+> +++ b/hw/i386/pc_q35.c
+> @@ -357,7 +357,7 @@ static void pc_q35_machine_options(MachineClass *m)
+>      m->units_per_default_bus = 1;
+>      m->default_machine_opts = "firmware=bios-256k.bin";
+>      m->default_display = "std";
+> -    m->default_kernel_irqchip_split = true;
+> +    m->default_kernel_irqchip_split = false;
+>      m->no_floppy = 1;
+>      machine_class_allow_dynamic_sysbus_dev(m, TYPE_AMD_IOMMU_DEVICE);
+>      machine_class_allow_dynamic_sysbus_dev(m, TYPE_INTEL_IOMMU_DEVICE);
+> @@ -374,10 +374,22 @@ static void pc_q35_4_1_machine_options(MachineClass *m)
+>  DEFINE_Q35_MACHINE(v4_1, "pc-q35-4.1", NULL,
+>                     pc_q35_4_1_machine_options);
+>  
+> -static void pc_q35_4_0_machine_options(MachineClass *m)
+> +static void pc_q35_4_0_1_machine_options(MachineClass *m)
+>  {
+>      pc_q35_4_1_machine_options(m);
+>      m->alias = NULL;
+> +    compat_props_add(m->compat_props, hw_compat_4_0_1, hw_compat_4_0_1_len);
+> +    compat_props_add(m->compat_props, pc_compat_4_0_1, pc_compat_4_0_1_len);
+> +}
+> +
+> +DEFINE_Q35_MACHINE(v4_0_1, "pc-q35-4.0.1", NULL,
+> +                   pc_q35_4_0_1_machine_options);
+> +
+> +static void pc_q35_4_0_machine_options(MachineClass *m)
+> +{
+> +    pc_q35_4_0_1_machine_options(m);
+> +    m->default_kernel_irqchip_split = true;
+> +    m->alias = NULL;
+>      compat_props_add(m->compat_props, hw_compat_4_0, hw_compat_4_0_len);
+>      compat_props_add(m->compat_props, pc_compat_4_0, pc_compat_4_0_len);
+>  }
+> diff --git a/include/hw/boards.h b/include/hw/boards.h
+> index 6f7916f88f02..6ff02bf3e472 100644
+> --- a/include/hw/boards.h
+> +++ b/include/hw/boards.h
+> @@ -292,6 +292,9 @@ struct MachineState {
+>      } \
+>      type_init(machine_initfn##_register_types)
+>  
+> +extern GlobalProperty hw_compat_4_0_1[];
+> +extern const size_t hw_compat_4_0_1_len;
+> +
+>  extern GlobalProperty hw_compat_4_0[];
+>  extern const size_t hw_compat_4_0_len;
+>  
+> diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+> index 43df7230a22b..5d5636241e34 100644
+> --- a/include/hw/i386/pc.h
+> +++ b/include/hw/i386/pc.h
+> @@ -293,6 +293,9 @@ int e820_add_entry(uint64_t, uint64_t, uint32_t);
+>  int e820_get_num_entries(void);
+>  bool e820_get_entry(int, uint32_t, uint64_t *, uint64_t *);
+>  
+> +extern GlobalProperty pc_compat_4_0_1[];
+> +extern const size_t pc_compat_4_0_1_len;
+> +
+>  extern GlobalProperty pc_compat_4_0[];
+>  extern const size_t pc_compat_4_0_len;
+>  
 
