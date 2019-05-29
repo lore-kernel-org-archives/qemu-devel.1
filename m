@@ -2,112 +2,62 @@ Return-Path: <SRS0=DspQ=T5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9621CC04AB3
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 07:37:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C5BCC04AB3
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 07:38:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 53E11204FD
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 07:37:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C3232208C3
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 07:38:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="JzQxdMPR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 53E11204FD
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="p+f90RFr"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C3232208C3
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:49129 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:49133 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hVt9F-0005hF-Ci
-	for qemu-devel@archiver.kernel.org; Wed, 29 May 2019 03:37:21 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:59410)
+	id 1hVtAH-0006XH-PI
+	for qemu-devel@archiver.kernel.org; Wed, 29 May 2019 03:38:25 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:47877)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hVt78-0004Ki-6w
-	for qemu-devel@nongnu.org; Wed, 29 May 2019 03:35:11 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1hVsQ7-0008NR-Ln
+	for qemu-devel@nongnu.org; Wed, 29 May 2019 02:50:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hVt76-00033m-Gz
-	for qemu-devel@nongnu.org; Wed, 29 May 2019 03:35:10 -0400
-Received: from mail-eopbgr00105.outbound.protection.outlook.com
-	([40.107.0.105]:35237
-	helo=EUR02-AM5-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1hVt71-0002z5-5e; Wed, 29 May 2019 03:35:03 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
-	s=selector1;
-	h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
-	bh=bn/3nidQ0S5Mm8LhPY+KvJYiExIPa26epZtO9oUzALs=;
-	b=JzQxdMPR3HCnb9Q1Mt4EyUJKSAkXrMgs1rer65PgDDbPB6AfSwVzexUeROCPGFo+ey+1AAxQP/K19zctwmO8+QumQJLraW8AxBITH/lAN5hAPX7sYYQodU35dK6TV9wV0esKW1SrVeY6neYW6P+41VQ5R+7GfPmAGFoyHypVTPI=
-Received: from AM0PR08MB2961.eurprd08.prod.outlook.com (52.134.126.11) by
-	AM0PR08MB5252.eurprd08.prod.outlook.com (20.179.39.153) with Microsoft
-	SMTP
-	Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
-	15.20.1922.16; Wed, 29 May 2019 07:34:59 +0000
-Received: from AM0PR08MB2961.eurprd08.prod.outlook.com
-	([fe80::9499:ef6a:95e:a3c6]) by AM0PR08MB2961.eurprd08.prod.outlook.com
-	([fe80::9499:ef6a:95e:a3c6%4]) with mapi id 15.20.1922.021;
-	Wed, 29 May 2019 07:34:59 +0000
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: Max Reitz <mreitz@redhat.com>, "qemu-devel@nongnu.org"
-	<qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Thread-Topic: [PATCH v6 3/3] block/stream: introduce a bottom node
-Thread-Index: AQHVBCE9xsQwL5Xm6Ui8YJ6AfY9Z7qaA7sSAgADq/wA=
-Date: Wed, 29 May 2019 07:34:59 +0000
-Message-ID: <5a18f815-ed81-fd58-5f48-9ffe944f0ea4@virtuozzo.com>
-References: <20190506153429.52737-1-vsementsov@virtuozzo.com>
-	<20190506153429.52737-4-vsementsov@virtuozzo.com>
-	<ee950bac-f0d8-3bc9-f5ed-deaf4d36777b@redhat.com>
-In-Reply-To: <ee950bac-f0d8-3bc9-f5ed-deaf4d36777b@redhat.com>
-Accept-Language: ru-RU, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: HE1PR0102CA0001.eurprd01.prod.exchangelabs.com
-	(2603:10a6:7:14::14) To AM0PR08MB2961.eurprd08.prod.outlook.com
-	(2603:10a6:208:66::11)
-authentication-results: spf=none (sender IP is )
-	smtp.mailfrom=vsementsov@virtuozzo.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-tagtoolbar-keys: D20190529103456590
-x-originating-ip: [185.231.240.5]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 9c8e28ab-253d-4608-f32b-08d6e4082749
-x-microsoft-antispam: BCL:0; PCL:0;
-	RULEID:(2390118)(7020095)(4652040)(8989299)(5600148)(711020)(4605104)(1401327)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(2017052603328)(7193020);
-	SRVR:AM0PR08MB5252; 
-x-ms-traffictypediagnostic: AM0PR08MB5252:
-x-microsoft-antispam-prvs: <AM0PR08MB52529B2F712A156716C6E851C11F0@AM0PR08MB5252.eurprd08.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:175;
-x-forefront-prvs: 0052308DC6
-x-forefront-antispam-report: SFV:NSPM;
-	SFS:(10019020)(376002)(39850400004)(396003)(346002)(366004)(136003)(199004)(189003)(25786009)(31686004)(99286004)(2501003)(6512007)(386003)(486006)(66476007)(186003)(86362001)(2906002)(110136005)(71190400001)(71200400001)(26005)(53936002)(54906003)(446003)(66556008)(2616005)(11346002)(66946007)(6246003)(53546011)(73956011)(4326008)(76176011)(66446008)(64756008)(52116002)(6506007)(476003)(5660300002)(7736002)(2201001)(305945005)(316002)(31696002)(256004)(66066001)(8936002)(229853002)(68736007)(6486002)(3846002)(7416002)(102836004)(6436002)(36756003)(478600001)(14454004)(8676002)(81156014)(81166006)(6116002);
-	DIR:OUT; SFP:1102; SCL:1; SRVR:AM0PR08MB5252;
-	H:AM0PR08MB2961.eurprd08.prod.outlook.com; FPR:; SPF:None;
-	LANG:en; PTR:InfoNoRecords; A:1; MX:1; 
-received-spf: None (protection.outlook.com: virtuozzo.com does not designate
-	permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: t7Cez0vi39o3Ua8mtAKwH8Tj7qhTi9fpF3SlwNvSg4KYZtzSB9a9TVtzbhgFCMIEBxxE23B+a+1THEr836EQT1u9I0oE0BiOUvV/mN7cvi4sq1SpisFHNLFUAXU7dZ7VWA4468mGCICqAz9/+sgmUVva+/iDcCjDnbfZ3Gs8oj6bAKKWQraM3/7sXiujWe4yenNPwXbqiKYdNbVTxHCHOwNv0vmsC9v4McMz45q1f+d+EHIPdrOrCEj3KNAQe6CR7Zmn1+myZQw5dRzIF6d+2/Z23bRvGik5YKpX5BeM/gU3O4GX1XsTvhBdqt9ZqOc8UaN3RDw9whmkMbabycDAAx7qz/Eqjm4dRRO6bk3xa9ZvQYjRSF4HYO6PNgijBvxOnUBIV6kc3RYoQIV7GMDeqYWN57X1l0hX/qUGthqwFZ4=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <462818B46960C24C8F44BC5DD3BB563A@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <dgibson@ozlabs.org>) id 1hVsQ5-0002g4-Cy
+	for qemu-devel@nongnu.org; Wed, 29 May 2019 02:50:43 -0400
+Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:54189 helo=ozlabs.org)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
+	id 1hVsQ4-0002c6-JL; Wed, 29 May 2019 02:50:41 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+	id 45DLv53tKwz9sPV; Wed, 29 May 2019 16:50:22 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+	d=gibson.dropbear.id.au; s=201602; t=1559112625;
+	bh=BjiFSb1b89t8ZsTeXhXZ6WzYs2aJf3rKsJujYhnowoo=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=p+f90RFrVaycNWvl2ZJGJxFZnM+aRqFKxWdOG57udOVj5/vxqsg2FAArs4tlEkXpO
+	ngix4EOj6O5yO51k3DuJEgAfGIjqOQpXCQD2+DX4CX2ePBru/GWeMzfubWJ7OSS0Kf
+	F5dazwXVbh8Q+TjnX6CH7hXJMeR32aqohQA5NZ2o=
+From: David Gibson <david@gibson.dropbear.id.au>
+To: peter.maydell@linaro.org
+Date: Wed, 29 May 2019 16:49:53 +1000
+Message-Id: <20190529065017.15149-21-david@gibson.dropbear.id.au>
+X-Mailer: git-send-email 2.21.0
+In-Reply-To: <20190529065017.15149-1-david@gibson.dropbear.id.au>
+References: <20190529065017.15149-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9c8e28ab-253d-4608-f32b-08d6e4082749
-X-MS-Exchange-CrossTenant-originalarrivaltime: 29 May 2019 07:34:59.4050 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: vsementsov@virtuozzo.com
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR08MB5252
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.0.105
-Subject: Re: [Qemu-devel] [PATCH v6 3/3] block/stream: introduce a bottom
- node
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2401:3900:2:1::2
+Subject: [Qemu-devel] [PULL 20/44] spapr/xive: Sanity checks of OV5 during
+ CAS
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -119,84 +69,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "fam@euphon.net" <fam@euphon.net>, "kwolf@redhat.com" <kwolf@redhat.com>,
-	"berto@igalia.com" <berto@igalia.com>, Denis Lunev <den@virtuozzo.com>,
-	"wencongyang2@huawei.com" <wencongyang2@huawei.com>,
-	"xiechanglong.d@gmail.com" <xiechanglong.d@gmail.com>,
-	"stefanha@redhat.com" <stefanha@redhat.com>,
-	Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>,
-	"jsnow@redhat.com" <jsnow@redhat.com>
+Cc: lvivier@redhat.com, qemu-devel@nongnu.org, groug@kaod.org,
+	qemu-ppc@nongnu.org, clg@kaod.org,
+	Satheesh Rajendran <sathnaga@linux.vnet.ibm.com>,
+	David Gibson <david@gibson.dropbear.id.au>, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-MjguMDUuMjAxOSAyMDozMywgTWF4IFJlaXR6IHdyb3RlOg0KPiBPbiAwNi4wNS4xOSAxNzozNCwg
-VmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSB3cm90ZToNCj4+IEZyb206IEFuZHJleSBTaGlu
-a2V2aWNoIDxhbmRyZXkuc2hpbmtldmljaEB2aXJ0dW96em8uY29tPg0KPj4NCj4+IFRoZSBib3R0
-b20gbm9kZSBpcyB0aGUgaW50ZXJtZWRpYXRlIGJsb2NrIGRldmljZSB0aGF0IGhhcyB0aGUgYmFz
-ZSBhcyBpdHMNCj4+IGJhY2tpbmcgaW1hZ2UuIEl0IGlzIHVzZWQgaW5zdGVhZCBvZiB0aGUgYmFz
-ZSBub2RlIHdoaWxlIGEgYmxvY2sgc3RyZWFtDQo+PiBqb2IgaXMgcnVubmluZyB0byBhdm9pZCBk
-ZXBlbmRlbmN5IG9uIHRoZSBiYXNlIHRoYXQgbWF5IGNoYW5nZSBkdWUgdG8gdGhlDQo+PiBwYXJh
-bGxlbCBqb2JzLiBUaGUgY2hhbmdlIG1heSB0YWtlIHBsYWNlIGR1ZSB0byBhIGZpbHRlciBub2Rl
-IGFzIHdlbGwgdGhhdA0KPj4gaXMgaW5zZXJ0ZWQgYmV0d2VlbiB0aGUgYmFzZSBhbmQgdGhlIGlu
-dGVybWVkaWF0ZSBib3R0b20gbm9kZS4gSXQgb2NjdXJzDQo+PiB3aGVuIHRoZSBiYXNlIG5vZGUg
-aXMgdGhlIHRvcCBvbmUgZm9yIGFub3RoZXIgY29tbWl0IG9yIHN0cmVhbSBqb2IuDQo+PiBBZnRl
-ciB0aGUgaW50cm9kdWN0aW9uIG9mIHRoZSBib3R0b20gbm9kZSwgZG9uJ3QgZnJlZXplIGl0cyBi
-YWNraW5nIGNoaWxkLA0KPj4gdGhhdCdzIHRoZSBiYXNlLCBhbnltb3JlLg0KPj4NCj4+IFN1Z2dl
-c3RlZC1ieTogVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSA8dnNlbWVudHNvdkB2aXJ0dW96
-em8uY29tPg0KPj4gU2lnbmVkLW9mZi1ieTogQW5kcmV5IFNoaW5rZXZpY2ggPGFuZHJleS5zaGlu
-a2V2aWNoQHZpcnR1b3p6by5jb20+DQo+PiBSZXZpZXdlZC1ieTogVmxhZGltaXIgU2VtZW50c292
-LU9naWV2c2tpeSA8dnNlbWVudHNvdkB2aXJ0dW96em8uY29tPg0KPj4gUmV2aWV3ZWQtYnk6IEFs
-YmVydG8gR2FyY2lhIDxiZXJ0b0BpZ2FsaWEuY29tPg0KPj4gLS0tDQo+PiAgIGJsb2NrL3N0cmVh
-bS5jICAgICAgICAgfCA0OSArKysrKysrKysrKysrKysrKysrKystLS0tLS0tLS0tLS0tLS0tLS0t
-LS0NCj4+ICAgdGVzdHMvcWVtdS1pb3Rlc3RzLzI0NSB8ICA0ICsrLS0NCj4+ICAgMiBmaWxlcyBj
-aGFuZ2VkLCAyNyBpbnNlcnRpb25zKCspLCAyNiBkZWxldGlvbnMoLSkNCj4+DQo+PiBkaWZmIC0t
-Z2l0IGEvYmxvY2svc3RyZWFtLmMgYi9ibG9jay9zdHJlYW0uYw0KPj4gaW5kZXggNjViMTNiMjdl
-MC4uZmM5N2M4OWY4MSAxMDA2NDQNCj4+IC0tLSBhL2Jsb2NrL3N0cmVhbS5jDQo+PiArKysgYi9i
-bG9jay9zdHJlYW0uYw0KPiANCj4gWy4uLl0NCj4gDQo+PiBAQCAtMjQ4LDI2ICsyNTAsMjUgQEAg
-dm9pZCBzdHJlYW1fc3RhcnQoY29uc3QgY2hhciAqam9iX2lkLCBCbG9ja0RyaXZlclN0YXRlICpi
-cywNCj4+ICAgICAgICAqIGFscmVhZHkgaGF2ZSBvdXIgb3duIHBsYW5zLiBBbHNvIGRvbid0IGFs
-bG93IHJlc2l6ZSBhcyB0aGUgaW1hZ2Ugc2l6ZSBpcw0KPj4gICAgICAgICogcXVlcmllZCBvbmx5
-IGF0IHRoZSBqb2Igc3RhcnQgYW5kIHRoZW4gY2FjaGVkLiAqLw0KPj4gICAgICAgcyA9IGJsb2Nr
-X2pvYl9jcmVhdGUoam9iX2lkLCAmc3RyZWFtX2pvYl9kcml2ZXIsIE5VTEwsIGJzLA0KPj4gLSAg
-ICAgICAgICAgICAgICAgICAgICAgICBCTEtfUEVSTV9DT05TSVNURU5UX1JFQUQgfCBCTEtfUEVS
-TV9XUklURV9VTkNIQU5HRUQgfA0KPj4gLSAgICAgICAgICAgICAgICAgICAgICAgICBCTEtfUEVS
-TV9HUkFQSF9NT0QsDQo+PiAtICAgICAgICAgICAgICAgICAgICAgICAgIEJMS19QRVJNX0NPTlNJ
-U1RFTlRfUkVBRCB8IEJMS19QRVJNX1dSSVRFX1VOQ0hBTkdFRCB8DQo+PiAtICAgICAgICAgICAg
-ICAgICAgICAgICAgIEJMS19QRVJNX1dSSVRFLA0KPj4gKyAgICAgICAgICAgICAgICAgICAgICAg
-ICBiYXNpY19mbGFncyB8IEJMS19QRVJNX0dSQVBIX01PRCwNCj4+ICsgICAgICAgICAgICAgICAg
-ICAgICAgICAgYmFzaWNfZmxhZ3MgfCBCTEtfUEVSTV9XUklURSwNCj4+ICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgIHNwZWVkLCBjcmVhdGlvbl9mbGFncywgTlVMTCwgTlVMTCwgZXJycCk7DQo+
-PiAgICAgICBpZiAoIXMpIHsNCj4+ICAgICAgICAgICBnb3RvIGZhaWw7DQo+PiAgICAgICB9DQo+
-PiAgIA0KPj4gLSAgICAvKiBCbG9jayBhbGwgaW50ZXJtZWRpYXRlIG5vZGVzIGJldHdlZW4gYnMg
-YW5kIGJhc2UsIGJlY2F1c2UgdGhleSB3aWxsDQo+PiAtICAgICAqIGRpc2FwcGVhciBmcm9tIHRo
-ZSBjaGFpbiBhZnRlciB0aGlzIG9wZXJhdGlvbi4gVGhlIHN0cmVhbWluZyBqb2IgcmVhZHMNCj4+
-IC0gICAgICogZXZlcnkgYmxvY2sgb25seSBvbmNlLCBhc3N1bWluZyB0aGF0IGl0IGRvZXNuJ3Qg
-Y2hhbmdlLCBzbyBibG9jayB3cml0ZXMNCj4+IC0gICAgICogYW5kIHJlc2l6ZXMuICovDQo+PiAt
-ICAgIGZvciAoaXRlciA9IGJhY2tpbmdfYnMoYnMpOyBpdGVyICYmIGl0ZXIgIT0gYmFzZTsgaXRl
-ciA9IGJhY2tpbmdfYnMoaXRlcikpIHsNCj4+IC0gICAgICAgIGJsb2NrX2pvYl9hZGRfYmRydigm
-cy0+Y29tbW9uLCAiaW50ZXJtZWRpYXRlIG5vZGUiLCBpdGVyLCAwLA0KPj4gLSAgICAgICAgICAg
-ICAgICAgICAgICAgICAgIEJMS19QRVJNX0NPTlNJU1RFTlRfUkVBRCB8IEJMS19QRVJNX1dSSVRF
-X1VOQ0hBTkdFRCwNCj4+IC0gICAgICAgICAgICAgICAgICAgICAgICAgICAmZXJyb3JfYWJvcnQp
-Ow0KPj4gKyAgICAvKg0KPj4gKyAgICAgKiBCbG9jayBhbGwgaW50ZXJtZWRpYXRlIG5vZGVzIGJl
-dHdlZW4gYnMgYW5kIGJvdHRvbSAoaW5jbHVzaXZlKSwgYmVjYXVzZQ0KPj4gKyAgICAgKiB0aGV5
-IHdpbGwgZGlzYXBwZWFyIGZyb20gdGhlIGNoYWluIGFmdGVyIHRoaXMgb3BlcmF0aW9uLiBUaGUg
-c3RyZWFtaW5nDQo+PiArICAgICAqIGpvYiByZWFkcyBldmVyeSBibG9jayBvbmx5IG9uY2UsIGFz
-c3VtaW5nIHRoYXQgaXQgZG9lc24ndCBjaGFuZ2UsIHNvDQo+PiArICAgICAqIGZvcmJpZCB3cml0
-ZXMgYW5kIHJlc2l6ZXMuDQo+PiArICAgICAqLw0KPj4gKyAgICBmb3IgKGl0ZXIgPSBiczsgaXRl
-ciAhPSBib3R0b207IGl0ZXIgPSBiYWNraW5nX2JzKGl0ZXIpKSB7DQo+PiArICAgICAgICBibG9j
-a19qb2JfYWRkX2JkcnYoJnMtPmNvbW1vbiwgImludGVybWVkaWF0ZSBub2RlIiwgYmFja2luZ19i
-cyhpdGVyKSwNCj4+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAwLCBiYXNpY19mbGFncywg
-JmVycm9yX2Fib3J0KTsNCj4gDQo+IEkgZG9u4oCZdCB1bmRlcnN0YW5kIHRoaXMgY2hhbmdlLiAg
-SXNu4oCZdCBpdCBkb2luZyBleGFjdGx5IHRoZSBzYW1lIGFzIGJlZm9yZT8NCj4gDQo+IChJZiBz
-bywgSSBqdXN0IGZpbmQgaXQgaGFyZGVyIHRvIHJlYWQgYmVjYXVzZSBldmVyeSBpdGVyYXRpb24g
-aXNu4oCZdA0KPiBhYm91dCBAaXRlciBidXQgYmFja2luZ19icyhpdGVyKS4pDQoNCkhtLCBpdCdz
-IHRoZSBzYW1lLCBidXQgbm90IHVzaW5nIGJhc2UuIFdlIG1heSBzYXZlIG9sZCBsb29wIGlmIGNh
-bGN1bGF0ZSBiYXNlIGV4YWN0bHkgYmVmb3JlDQp0aGUgbG9vcCAob3IgYXQgbGVhc3Qgbm90IHNl
-cGFyYXRlZCBmcm9tIGl0IGJ5IGFueSB5aWVsZC1wb2ludCkNCg0KPiANCj4gVGhlIHJlc3QgbG9v
-a3MgZ29vZCB0byBtZS4NCj4gDQo+IE1heA0KPiANCj4+ICAgICAgIH0NCj4+ICAgDQo+PiAtICAg
-IHMtPmJhc2UgPSBiYXNlOw0KPj4gKyAgICBzLT5ib3R0b20gPSBib3R0b207DQo+PiAgICAgICBz
-LT5iYWNraW5nX2ZpbGVfc3RyID0gZ19zdHJkdXAoYmFja2luZ19maWxlX3N0cik7DQo+PiAgICAg
-ICBzLT5ic19yZWFkX29ubHkgPSBic19yZWFkX29ubHk7DQo+PiAgICAgICBzLT5jaGFpbl9mcm96
-ZW4gPSB0cnVlOw0KPiANCg0KDQotLSANCkJlc3QgcmVnYXJkcywNClZsYWRpbWlyDQo=
+From: Greg Kurz <groug@kaod.org>
+
+If a machine is started with ic-mode=3Dxive but the guest only knows
+about XICS, eg. an RHEL 7.6 guest, the kernel panics. This is
+expected but a bit unfortunate since the crash doesn't provide
+much information for the end user to guess what's happening.
+
+Detect that during CAS and exit QEMU with a proper error message
+instead, like it is already done for the MMU.
+
+Even if this is less likely to happen, the opposite case of a guest
+that only knows about XIVE would certainly fail all the same if the
+machine is started with ic-mode=3Dxics.
+
+Also, the only valid values a guest can pass in byte 23 of OV5 during
+CAS are 0b00 (XIVE legacy mode) and 0b01 (XIVE exploitation mode). Any
+other value is a bug, at least with the current spec. Again, it does
+not seem right to let the guest go on without a precise idea of the
+interrupt mode it asked for.
+
+Handle these cases as well.
+
+Reported-by: Satheesh Rajendran <sathnaga@linux.vnet.ibm.com>
+Signed-off-by: Greg Kurz <groug@kaod.org>
+Message-Id: <155793986451.464434.12887933000007255549.stgit@bahia.lan>
+Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+---
+ hw/ppc/spapr_hcall.c | 24 ++++++++++++++++++++++++
+ 1 file changed, 24 insertions(+)
+
+diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
+index 6c16d2b120..63a55614b8 100644
+--- a/hw/ppc/spapr_hcall.c
++++ b/hw/ppc/spapr_hcall.c
+@@ -1513,6 +1513,7 @@ static target_ulong h_client_architecture_support(P=
+owerPCCPU *cpu,
+     bool guest_radix;
+     Error *local_err =3D NULL;
+     bool raw_mode_supported =3D false;
++    bool guest_xive;
+=20
+     cas_pvr =3D cas_check_pvr(spapr, cpu, &addr, &raw_mode_supported, &l=
+ocal_err);
+     if (local_err) {
+@@ -1545,10 +1546,17 @@ static target_ulong h_client_architecture_support=
+(PowerPCCPU *cpu,
+         error_report("guest requested hash and radix MMU, which is inval=
+id.");
+         exit(EXIT_FAILURE);
+     }
++    if (spapr_ovec_test(ov5_guest, OV5_XIVE_BOTH)) {
++        error_report("guest requested an invalid interrupt mode");
++        exit(EXIT_FAILURE);
++    }
++
+     /* The radix/hash bit in byte 24 requires special handling: */
+     guest_radix =3D spapr_ovec_test(ov5_guest, OV5_MMU_RADIX_300);
+     spapr_ovec_clear(ov5_guest, OV5_MMU_RADIX_300);
+=20
++    guest_xive =3D spapr_ovec_test(ov5_guest, OV5_XIVE_EXPLOIT);
++
+     /*
+      * HPT resizing is a bit of a special case, because when enabled
+      * we assume an HPT guest will support it until it says it
+@@ -1632,6 +1640,22 @@ static target_ulong h_client_architecture_support(=
+PowerPCCPU *cpu,
+                                           ov5_updates) !=3D 0);
+     }
+=20
++    /*
++     * Ensure the guest asks for an interrupt mode we support; otherwise
++     * terminate the boot.
++     */
++    if (guest_xive) {
++        if (spapr->irq->ov5 =3D=3D SPAPR_OV5_XIVE_LEGACY) {
++            error_report("Guest requested unavailable interrupt mode (XI=
+VE)");
++            exit(EXIT_FAILURE);
++        }
++    } else {
++        if (spapr->irq->ov5 =3D=3D SPAPR_OV5_XIVE_EXPLOIT) {
++            error_report("Guest requested unavailable interrupt mode (XI=
+CS)");
++            exit(EXIT_FAILURE);
++        }
++    }
++
+     /*
+      * Generate a machine reset when we have an update of the
+      * interrupt mode. Only required when the machine supports both
+--=20
+2.21.0
+
 
