@@ -2,83 +2,50 @@ Return-Path: <SRS0=DspQ=T5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D708C04AB3
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 08:53:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1386BC04AB3
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 08:54:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CF33020B7C
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 08:53:36 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LEhTsuy7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CF33020B7C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id DC23120B7C
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 08:54:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DC23120B7C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:50080 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:50088 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hVuL2-0003at-3V
-	for qemu-devel@archiver.kernel.org; Wed, 29 May 2019 04:53:36 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:45208)
+	id 1hVuMC-0004WR-1A
+	for qemu-devel@archiver.kernel.org; Wed, 29 May 2019 04:54:48 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:45354)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bmeng.cn@gmail.com>) id 1hVuJe-0002t0-US
-	for qemu-devel@nongnu.org; Wed, 29 May 2019 04:52:12 -0400
+	(envelope-from <dplotnikov@virtuozzo.com>) id 1hVuKU-0003SJ-AU
+	for qemu-devel@nongnu.org; Wed, 29 May 2019 04:53:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bmeng.cn@gmail.com>) id 1hVuJe-0002Gk-2p
-	for qemu-devel@nongnu.org; Wed, 29 May 2019 04:52:10 -0400
-Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:32768)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bmeng.cn@gmail.com>)
-	id 1hVuJc-0002Fp-0x; Wed, 29 May 2019 04:52:08 -0400
-Received: by mail-pg1-x543.google.com with SMTP id h17so982916pgv.0;
-	Wed, 29 May 2019 01:52:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=from:to:subject:date:message-id;
-	bh=kS9RwfTWm7yJJiKansvU2AvQ0hnlJBsSRKgE5jXjYTI=;
-	b=LEhTsuy7OuQN3yJeX8u96tFxbMduV5X4UGXTxM6OGEcfjS9OJK24Ec+0FORgchb8wu
-	rSIj/WjoCCE1V2BfM/uwpKpr+i+3z5uhRhvEG2+ko1y7gHWSyoEOpsAYxI3e7KOTkUnY
-	5W6Bm1iTVanPQ9hiUV4F+JQ0TIDMI3vt0q7p98S1iAgA+lpwDMsqJG5uap8jEviokCQ2
-	D3b+3EVXMS/jmbBJb6ka9Q9+mBvbmrUvJVeiHDdWhn5fZYZs2b7PF2DCbzQv2jfFetEQ
-	KhBPE8H7/yreuEk59HqKR0nJv9jokOp8W/Wg3DfXzMy911rj4A+x8pC6P9Wya95BMlZy
-	nJ0Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:from:to:subject:date:message-id;
-	bh=kS9RwfTWm7yJJiKansvU2AvQ0hnlJBsSRKgE5jXjYTI=;
-	b=nQfqDu5e1Hk/Mlm4z2XOOrgynLpGtUDDqi3oQXe+KjeucGYQXbJYNoT0En0gtjbler
-	Ww3jo5peLvMqxb+6eHM08ckax0emMSHCZttKl789PFynsnvrK3jHNg1cQfkR8d07zJ3k
-	lGArq0d5kmpB5hNKQVerLqldIrSvaUR4cpxKaMKge2fZXy+g2nMoIus6kRuji1v1zo5C
-	xrmoctIwoHlK66KuA+Qk/DNfLvjiEVFko9MWixUPJ6zCVIXyp8Eh7Bd3nwcNPq/DcvL6
-	HOw3OnkiOX3xy6RSZDtdd8oNzd9zQMzkP8NMnvJEbXqKFYHnfI4DJgO+NQ3eNPrnXRQv
-	6pgQ==
-X-Gm-Message-State: APjAAAWdrqcKKhAWqzloTEvpuHV2+fMKODwZxT5Fe1JYvPMhEGx8uCz0
-	GieSqtuyJdtGiVwcjVr1CyIZe3mJ
-X-Google-Smtp-Source: APXvYqz8bmnpoQpg410Xq1RIALZdOTrKcVxM63F9hjaug5EBQk5GGssoXPEldQZ7A5WSDPRctlbjpw==
-X-Received: by 2002:a17:90a:240c:: with SMTP id
-	h12mr10916017pje.12.1559119926436; 
-	Wed, 29 May 2019 01:52:06 -0700 (PDT)
-Received: from localhost.localdomain (unknown-224-80.windriver.com.
-	[147.11.224.80]) by smtp.gmail.com with ESMTPSA id
-	k3sm16310838pgo.81.2019.05.29.01.52.05
-	(version=TLS1 cipher=AES128-SHA bits=128/128);
-	Wed, 29 May 2019 01:52:05 -0700 (PDT)
-From: Bin Meng <bmeng.cn@gmail.com>
-To: qemu-riscv@nongnu.org, qemu-devel@nongnu.org,
-	Alistair Francis <Alistair.Francis@wdc.com>,
-	Palmer Dabbelt <palmer@sifive.com>
-Date: Wed, 29 May 2019 01:52:01 -0700
-Message-Id: <1559119921-6098-1-git-send-email-bmeng.cn@gmail.com>
-X-Mailer: git-send-email 1.7.1
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::543
-Subject: [Qemu-devel] [PATCH] riscv: virt: Correct pci "bus-range" encoding
+	(envelope-from <dplotnikov@virtuozzo.com>) id 1hVuKT-0002aL-4w
+	for qemu-devel@nongnu.org; Wed, 29 May 2019 04:53:02 -0400
+Received: from relay.sw.ru ([185.231.240.75]:55156)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dplotnikov@virtuozzo.com>)
+	id 1hVuKQ-0002YV-9B; Wed, 29 May 2019 04:52:58 -0400
+Received: from [10.94.4.71] (helo=dptest2.qa.sw.ru)
+	by relay.sw.ru with esmtp (Exim 4.91)
+	(envelope-from <dplotnikov@virtuozzo.com>)
+	id 1hVuKM-00027p-4G; Wed, 29 May 2019 11:52:54 +0300
+From: Denis Plotnikov <dplotnikov@virtuozzo.com>
+To: kwolf@redhat.com,
+	mreitz@redhat.com,
+	qemu-block@nongnu.org
+Date: Wed, 29 May 2019 11:52:48 +0300
+Message-Id: <20190529085248.7857-1-dplotnikov@virtuozzo.com>
+X-Mailer: git-send-email 2.17.0
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
+X-Received-From: 185.231.240.75
+Subject: [Qemu-devel] [PATCH v1] qemu-io: add pattern file for write command
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -90,33 +57,139 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: vsementsov@virtuozzo.com, qemu-devel@nongnu.org, den@virtuozzo.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The largest pci bus number should be calculated from ECAM size,
-instead of its base address.
+The patch allows to provide a pattern file for write
+command. There was no similar ability before.
 
-Signed-off-by: Bin Meng <bmeng.cn@gmail.com>
+Signed-off-by: Denis Plotnikov <dplotnikov@virtuozzo.com>
 ---
+ qemu-io-cmds.c | 58 ++++++++++++++++++++++++++++++++++++++++++++++----
+ 1 file changed, 54 insertions(+), 4 deletions(-)
 
- hw/riscv/virt.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/hw/riscv/virt.c b/hw/riscv/virt.c
-index fc4c6b3..d6132d9 100644
---- a/hw/riscv/virt.c
-+++ b/hw/riscv/virt.c
-@@ -299,7 +299,7 @@ static void *create_fdt(RISCVVirtState *s, const struct MemmapEntry *memmap,
-     qemu_fdt_setprop_string(fdt, nodename, "device_type", "pci");
-     qemu_fdt_setprop_cell(fdt, nodename, "linux,pci-domain", 0);
-     qemu_fdt_setprop_cells(fdt, nodename, "bus-range", 0,
--                           memmap[VIRT_PCIE_ECAM].base /
-+                           memmap[VIRT_PCIE_ECAM].size /
-                                PCIE_MMCFG_SIZE_MIN - 1);
-     qemu_fdt_setprop(fdt, nodename, "dma-coherent", NULL, 0);
-     qemu_fdt_setprop_cells(fdt, nodename, "reg", 0, memmap[VIRT_PCIE_ECAM].base,
+diff --git a/qemu-io-cmds.c b/qemu-io-cmds.c
+index 09750a23ce..6786536be7 100644
+--- a/qemu-io-cmds.c
++++ b/qemu-io-cmds.c
+@@ -21,6 +21,7 @@
+ #include "qemu/option.h"
+ #include "qemu/timer.h"
+ #include "qemu/cutils.h"
++#include "string.h"
+ 
+ #define CMD_NOFILE_OK   0x01
+ 
+@@ -343,6 +344,35 @@ static void *qemu_io_alloc(BlockBackend *blk, size_t len, int pattern)
+     return buf;
+ }
+ 
++static void *qemu_io_alloc_from_file(BlockBackend *blk, size_t len,
++                                     char *file_name)
++{
++    void *buf;
++    FILE *f = fopen(file_name, "r");
++
++    if (!f) {
++        printf("cannot open file '%s'\n", file_name);
++        return NULL;
++    }
++
++    if (qemuio_misalign) {
++        len += MISALIGN_OFFSET;
++    }
++    buf = blk_blockalign(blk, len);
++    memset(buf, 0, len);
++
++    if (!fread(buf, sizeof(char), len, f)) {
++        printf("file '%s' is empty\n", file_name);
++        g_free(buf);
++        return NULL;
++    }
++
++    if (qemuio_misalign) {
++        buf += MISALIGN_OFFSET;
++    }
++    return buf;
++}
++
+ static void qemu_io_free(void *p)
+ {
+     if (qemuio_misalign) {
+@@ -965,7 +995,7 @@ static const cmdinfo_t write_cmd = {
+     .perm       = BLK_PERM_WRITE,
+     .argmin     = 2,
+     .argmax     = -1,
+-    .args       = "[-bcCfnquz] [-P pattern] off len",
++    .args       = "[-bcCfnquz] [-P pattern | -s source_file] off len",
+     .oneline    = "writes a number of bytes at a specified offset",
+     .help       = write_help,
+ };
+@@ -974,7 +1004,7 @@ static int write_f(BlockBackend *blk, int argc, char **argv)
+ {
+     struct timeval t1, t2;
+     bool Cflag = false, qflag = false, bflag = false;
+-    bool Pflag = false, zflag = false, cflag = false;
++    bool Pflag = false, zflag = false, cflag = false, sflag = false;
+     int flags = 0;
+     int c, cnt, ret;
+     char *buf = NULL;
+@@ -983,8 +1013,9 @@ static int write_f(BlockBackend *blk, int argc, char **argv)
+     /* Some compilers get confused and warn if this is not initialized.  */
+     int64_t total = 0;
+     int pattern = 0xcd;
++    char *file_name;
+ 
+-    while ((c = getopt(argc, argv, "bcCfnpP:quz")) != -1) {
++    while ((c = getopt(argc, argv, "bcCfnpP:quzs:")) != -1) {
+         switch (c) {
+         case 'b':
+             bflag = true;
+@@ -1020,6 +1051,10 @@ static int write_f(BlockBackend *blk, int argc, char **argv)
+         case 'z':
+             zflag = true;
+             break;
++        case 's':
++            sflag = true;
++            file_name = g_strdup(optarg);
++            break;
+         default:
+             qemuio_command_usage(&write_cmd);
+             return -EINVAL;
+@@ -1056,6 +1091,14 @@ static int write_f(BlockBackend *blk, int argc, char **argv)
+         return -EINVAL;
+     }
+ 
++    if (sflag && Pflag) {
++        printf("-s and -P cannot be specified at the same time\n");
++    }
++
++    if (sflag && zflag) {
++        printf("-s and -z cannot be specified at the same time\n");
++    }
++
+     offset = cvtnum(argv[optind]);
+     if (offset < 0) {
+         print_cvtnum_err(offset, argv[optind]);
+@@ -1088,7 +1131,14 @@ static int write_f(BlockBackend *blk, int argc, char **argv)
+     }
+ 
+     if (!zflag) {
+-        buf = qemu_io_alloc(blk, count, pattern);
++        if (sflag) {
++            buf = qemu_io_alloc_from_file(blk, count, file_name);
++            if (!buf) {
++                return -EINVAL;
++            }
++        } else {
++            buf = qemu_io_alloc(blk, count, pattern);
++        }
+     }
+ 
+     gettimeofday(&t1, NULL);
 -- 
-2.7.4
+2.17.0
 
 
