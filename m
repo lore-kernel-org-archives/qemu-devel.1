@@ -7,57 +7,55 @@ X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 62E99C04AB3
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 07:18:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 46519C04AB3
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 07:19:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 30D782075C
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 07:18:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 152012075C
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 07:19:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="khfoUfrA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 30D782075C
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="XYa5vXvB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 152012075C
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:48796 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:48802 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hVsqw-0006H4-C2
-	for qemu-devel@archiver.kernel.org; Wed, 29 May 2019 03:18:26 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:48175)
+	id 1hVss7-0007CF-54
+	for qemu-devel@archiver.kernel.org; Wed, 29 May 2019 03:19:39 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:47502)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1hVsQT-0000Nm-RQ
-	for qemu-devel@nongnu.org; Wed, 29 May 2019 02:51:06 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1hVsPy-0008D0-PX
+	for qemu-devel@nongnu.org; Wed, 29 May 2019 02:50:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1hVsQS-0002tX-Oy
-	for qemu-devel@nongnu.org; Wed, 29 May 2019 02:51:05 -0400
-Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:45491 helo=ozlabs.org)
+	(envelope-from <dgibson@ozlabs.org>) id 1hVsPx-0002W5-53
+	for qemu-devel@nongnu.org; Wed, 29 May 2019 02:50:34 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:54683 helo=ozlabs.org)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
-	id 1hVsQS-0002r2-DV; Wed, 29 May 2019 02:51:04 -0400
+	id 1hVsPw-0002RJ-BD; Wed, 29 May 2019 02:50:33 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
-	id 45DLv651rHz9sPM; Wed, 29 May 2019 16:50:25 +1000 (AEST)
+	id 45DLv20prmz9sBr; Wed, 29 May 2019 16:50:21 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-	d=gibson.dropbear.id.au; s=201602; t=1559112626;
-	bh=9vdpppTxGBDsHN3Z7tJDxzrT9kU/xLpjp2jGJfkC4qk=;
+	d=gibson.dropbear.id.au; s=201602; t=1559112622;
+	bh=Vfl8iaj2UXBKYIR6axFGslC1xVyEFFzzrybLIkgJ0p4=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=khfoUfrAPaf8XfX8MXkwoAeOPgC9G0zmoVIpAsM8mmD95JE+m5Zz+HhVqwHvprQi0
-	sQre0yY0s72Hy4cVpSPxWUcZqWSMB3vyL6E71rT1Ep3JOom74Tgg7wPhYZjGgjRCg7
-	M/W7tsQ/7WI6uEpKYP9FCortS0jz6gkhnP0EAhy4=
+	b=XYa5vXvBIkzfF7H/zCwhpXY3W/jwA1dRi65qIQ2N4Vh+HLmCE4uK9WsQNbs4nGVrl
+	r4gffyeueM7vNCXgUdWQOlKbw5s+VyfCQu0UD8TchXPF8r7sK78suD5bz3s6KJe/Db
+	kinrPg10NLIpzz4kZQg+1SmGDvhkGAShHcExg7x0=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: peter.maydell@linaro.org
-Date: Wed, 29 May 2019 16:50:04 +1000
-Message-Id: <20190529065017.15149-32-david@gibson.dropbear.id.au>
+Date: Wed, 29 May 2019 16:49:37 +1000
+Message-Id: <20190529065017.15149-5-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190529065017.15149-1-david@gibson.dropbear.id.au>
 References: <20190529065017.15149-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2401:3900:2:1::2
-Subject: [Qemu-devel] [PULL 31/44] spapr/xive: activate KVM support
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 203.11.71.1
+Subject: [Qemu-devel] [PULL 04/44] target/ppc/kvm: Fix trace typo
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -70,50 +68,53 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: lvivier@redhat.com, qemu-devel@nongnu.org, groug@kaod.org,
-	qemu-ppc@nongnu.org, clg@kaod.org,
-	David Gibson <david@gibson.dropbear.id.au>, rth@twiddle.net
+	Boxuan Li <liboxuan@connect.hku.hk>, qemu-ppc@nongnu.org,
+	clg@kaod.org, David Gibson <david@gibson.dropbear.id.au>, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: C=C3=A9dric Le Goater <clg@kaod.org>
+From: Boxuan Li <liboxuan@connect.hku.hk>
 
-All is in place for KVM now. State synchronization and migration will
-come next.
-
-Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
-Message-Id: <20190513084245.25755-8-clg@kaod.org>
+Signed-off-by: Boxuan Li <liboxuan@connect.hku.hk>
+Message-Id: <20190430172842.27369-1-liboxuan@connect.hku.hk>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/spapr_irq.c | 9 ---------
- 1 file changed, 9 deletions(-)
+ target/ppc/kvm.c        | 2 +-
+ target/ppc/trace-events | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
-index 8d371523e6..e969683f5c 100644
---- a/hw/ppc/spapr_irq.c
-+++ b/hw/ppc/spapr_irq.c
-@@ -248,19 +248,10 @@ SpaprIrq spapr_irq_xics =3D {
- static void spapr_irq_init_xive(SpaprMachineState *spapr, int nr_irqs,
-                                 Error **errp)
- {
--    MachineState *machine =3D MACHINE(spapr);
-     uint32_t nr_servers =3D spapr_max_server_number(spapr);
-     DeviceState *dev;
-     int i;
-=20
--    /* KVM XIVE device not yet available */
--    if (kvm_enabled()) {
--        if (machine_kernel_irqchip_required(machine)) {
--            error_setg(errp, "kernel_irqchip requested. no KVM XIVE supp=
-ort");
--            return;
--        }
--    }
--
-     dev =3D qdev_create(NULL, TYPE_SPAPR_XIVE);
-     qdev_prop_set_uint32(dev, "nr-irqs", nr_irqs);
-     /*
+diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+index 02e22e2017..1a9caf8f40 100644
+--- a/target/ppc/kvm.c
++++ b/target/ppc/kvm.c
+@@ -1721,7 +1721,7 @@ int kvm_arch_handle_exit(CPUState *cs, struct kvm_r=
+un *run)
+             trace_kvm_handle_dcr_write();
+             ret =3D kvmppc_handle_dcr_write(env, run->dcr.dcrn, run->dcr=
+.data);
+         } else {
+-            trace_kvm_handle_drc_read();
++            trace_kvm_handle_dcr_read();
+             ret =3D kvmppc_handle_dcr_read(env, run->dcr.dcrn, &run->dcr=
+.data);
+         }
+         break;
+diff --git a/target/ppc/trace-events b/target/ppc/trace-events
+index 7b3cfe11fd..3dc6740706 100644
+--- a/target/ppc/trace-events
++++ b/target/ppc/trace-events
+@@ -22,7 +22,7 @@ kvm_failed_put_vpa(void) "Warning: Unable to set VPA in=
+formation to KVM"
+ kvm_failed_get_vpa(void) "Warning: Unable to get VPA information from KV=
+M"
+ kvm_injected_interrupt(int irq) "injected interrupt %d"
+ kvm_handle_dcr_write(void) "handle dcr write"
+-kvm_handle_drc_read(void) "handle dcr read"
++kvm_handle_dcr_read(void) "handle dcr read"
+ kvm_handle_halt(void) "handle halt"
+ kvm_handle_papr_hcall(void) "handle PAPR hypercall"
+ kvm_handle_epr(void) "handle epr"
 --=20
 2.21.0
 
