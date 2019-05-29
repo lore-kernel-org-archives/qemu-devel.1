@@ -2,86 +2,63 @@ Return-Path: <SRS0=DspQ=T5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FCDDC28CC1
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 14:20:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AE89DC28CC0
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 14:33:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 51453239C8
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 14:20:22 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GMR21/AI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 51453239C8
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 5F71423A57
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 14:33:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5F71423A57
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:55355 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:55448 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hVzRF-0000X7-Fj
-	for qemu-devel@archiver.kernel.org; Wed, 29 May 2019 10:20:21 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:56348)
+	id 1hVzde-0003QD-8E
+	for qemu-devel@archiver.kernel.org; Wed, 29 May 2019 10:33:10 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:60966)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.m.mail@gmail.com>) id 1hVzQP-0000Ao-MN
-	for qemu-devel@nongnu.org; Wed, 29 May 2019 10:19:30 -0400
+	(envelope-from <lvivier@redhat.com>) id 1hVzcC-0002bZ-Kg
+	for qemu-devel@nongnu.org; Wed, 29 May 2019 10:31:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.m.mail@gmail.com>) id 1hVzQO-0000qg-Hq
-	for qemu-devel@nongnu.org; Wed, 29 May 2019 10:19:29 -0400
-Received: from mail-ot1-x335.google.com ([2607:f8b0:4864:20::335]:41967)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
-	id 1hVzQO-0000pg-6E
-	for qemu-devel@nongnu.org; Wed, 29 May 2019 10:19:28 -0400
-Received: by mail-ot1-x335.google.com with SMTP id l25so2167513otp.8
-	for <qemu-devel@nongnu.org>; Wed, 29 May 2019 07:19:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=mime-version:in-reply-to:references:from:date:message-id:subject:to
-	:cc; bh=no+30y3AssIZl36aiBayhMqNMYAO7PModrCfojkCUog=;
-	b=GMR21/AIT8CtE49idUHvgl8Mwn7Isw6RrZbx71fR/o4NMFKyILoL+tTAi7SPrrzF7y
-	nK43J4FxBaKTSMqFJh3/gb8OK1ari5r3Vfl7TMcgRlKTDxVkK3JJJyr54GESpRguRj8x
-	7Wg3vrPgwxmEub/E70wiKjCn7ZhdWeljkAFr8fFWXrxAcFwrzghAwFht90tfVgvRczN9
-	LWXcD21LkbtP2ZStM7/uywR7YZ1ZyfnhLZ0pSw4etqE4+cmDt72sZRMhRH0/hHgDTZgb
-	EfXkgZBtxp0xgQtbgWQR8CYrIzedSCNcsDBp2NtzVw45o7RnKML4Oe54uVCXDkx5S0bG
-	P6Qg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:in-reply-to:references:from:date
-	:message-id:subject:to:cc;
-	bh=no+30y3AssIZl36aiBayhMqNMYAO7PModrCfojkCUog=;
-	b=S6bWN24Qk7f/E2j1Fu0hSQJWwH5PRCceZJPi/QUAFOzspW2XZ2BB/vbGTvGQycruU7
-	6vOw4i9AYD+dX/V9LicF0mAb4h4vWFGZIH2dNBFZGDnvgj4BWBGD3R8AdADZbqq3hqAz
-	92ex6ei+jyNZzpk3LSLj/C+06wrX3zB+pHNDhHzajMFazO82W16PTnhq7HBabrhjTgX2
-	J6BlZgelgvrRAHi3w5YfGskZt5mLJ53pRyQGOTxWZ53F4ojl9q9TTIC0+KgB8PNMa1t1
-	KLgx2jphAhSjTeD1r4puEFMthSnVPg+jSy0zkQmLMHX9oMga/+XuX+Sd+ZKc0o8NCmvq
-	hvEA==
-X-Gm-Message-State: APjAAAWlErzywB6lAw5rKNJJ8me9WddXTzYBbEgIO4b/HUuwKpT96Wir
-	BbAtIgPaTBoRbIsqokv1Rthk/QJn6Y3u/ZCXr7w=
-X-Google-Smtp-Source: APXvYqzvLvYMVMh7GiZAh+4yxXq/i7YM4wNZWf79q9gdaTku7RQF0cTqtmvMC0rIOE/LNSW/aRitQhExv4lv9wPKT18=
-X-Received: by 2002:a9d:63c1:: with SMTP id e1mr48709218otl.341.1559139566994; 
-	Wed, 29 May 2019 07:19:26 -0700 (PDT)
+	(envelope-from <lvivier@redhat.com>) id 1hVzcA-0004VS-Cp
+	for qemu-devel@nongnu.org; Wed, 29 May 2019 10:31:40 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34368)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1hVzc8-0004Kq-EZ
+	for qemu-devel@nongnu.org; Wed, 29 May 2019 10:31:36 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id BBE0B3179B44;
+	Wed, 29 May 2019 14:31:22 +0000 (UTC)
+Received: from thinkpad.redhat.com (ovpn-204-181.brq.redhat.com
+	[10.40.204.181])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 1C2E817A8F;
+	Wed, 29 May 2019 14:31:15 +0000 (UTC)
+From: Laurent Vivier <lvivier@redhat.com>
+To: qemu-devel@nongnu.org
+Date: Wed, 29 May 2019 16:31:03 +0200
+Message-Id: <20190529143106.11789-2-lvivier@redhat.com>
+In-Reply-To: <20190529143106.11789-1-lvivier@redhat.com>
+References: <20190529143106.11789-1-lvivier@redhat.com>
 MIME-Version: 1.0
-Received: by 2002:a9d:410f:0:0:0:0:0 with HTTP; Wed, 29 May 2019 07:19:25
-	-0700 (PDT)
-Received: by 2002:a9d:410f:0:0:0:0:0 with HTTP; Wed, 29 May 2019 07:19:25
-	-0700 (PDT)
-In-Reply-To: <2b3a7c62-81d1-0d91-e7d5-03c9fcd4a012@redhat.com>
-References: <BN6PR2201MB1251C914F948CFB53757492DC61F0@BN6PR2201MB1251.namprd22.prod.outlook.com>
-	<2b3a7c62-81d1-0d91-e7d5-03c9fcd4a012@redhat.com>
-From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Wed, 29 May 2019 16:19:25 +0200
-Message-ID: <CAL1e-=ix3BeKM3ct25imB1AWXvN620Cpud0apWrOga1cAn7OMQ@mail.gmail.com>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::335
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.41]);
+	Wed, 29 May 2019 14:31:27 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
-X-Content-Filtered-By: Mailman/MimeDel 2.1.21
-Subject: Re: [Qemu-devel] Malta-related files in MAINTAINERS
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PATCH v7 1/4] VirtIO-RNG: Update default entropy
+ source to `/dev/urandom`
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -93,60 +70,126 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Aurelien Jarno <aurelien@aurel32.net>,
-	Aleksandar Markovic <amarkovic@wavecomp.com>,
-	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: Laurent Vivier <lvivier@redhat.com>,
+	=?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+	Kashyap Chamarthy <kchamart@redhat.com>, Amit Shah <amit@kernel.org>,
+	Richard Henderson <richard.henderson@linaro.org>,
+	"Richard W . M . Jones" <rjones@redhat.com>,
+	Markus Armbruster <armbru@redhat.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On May 29, 2019 3:45 PM, "Philippe Mathieu-Daud=C3=A9" <philmd@redhat.com> =
-wrote:
->
-> Hi Aleksandar,
->
-> On 5/29/19 10:22 AM, Aleksandar Markovic wrote:
-> > Hello, Philippe.
-> >
-> > Currently, we have these two files in Malta MAINTAINERS section:
-> > F: hw/mips/mips_malta.c
-> > F: tests/acceptance/linux_ssh_mips_malta.py
-> >
-> > Do we need to add more files, or other Malta-related files naturally
-belong to some other sections, or are shared by many boards?
->
-> Not related to your question:
->
-> The Malta model is an old one in QEMU, as such it uses the condensed
-> format where all the Malta specific devices are self-contained in the
-> same file. This organization has Pro/Cons.
->
-> New MIPS boards where added and instead of reuse components, they were
-> duplicated few times, so now it is harder to maintain.
->
-> Back to your question:
->
-> All the South Bridge and 'below' devices are shared with the x86 PC
-> machine, except:
->
-> - FDC37M81X Super I/O: maintained by 'PC Chipset'
-> - PIIX4 South Bridge: maintained by 'PC' but this might change
->   as Michael S. Tsirkin is mostly interested in the PIIX3.
->   I have a WIP painful series related to PIIX cleanup.
->
-> The North Bridge differs and is Malta specific, so you can add it in
-> this section:
->
-> - hw/mips/gt64xxx_pci.c
->
-> I'll sort the PIIX some day ;)
->
+From: Kashyap Chamarthy <kchamart@redhat.com>
 
-I honestly appreciate your detailed response.
+When QEMU exposes a VirtIO-RNG device to the guest, that device needs a
+source of entropy, and that source needs to be "non-blocking", like
+`/dev/urandom`.  However, currently QEMU defaults to the problematic
+`/dev/random`, which on Linux is "blocking" (as in, it waits until
+sufficient entropy is available).
 
-Aleksandar
+Why prefer `/dev/urandom` over `/dev/random`?
+---------------------------------------------
 
-> Regards,
->
-> Phil.
->
+The man pages of urandom(4) and random(4) state:
+
+    "The /dev/random device is a legacy interface which dates back to a
+    time where the cryptographic primitives used in the implementation
+    of /dev/urandom were not widely trusted.  It will return random
+    bytes only within the estimated number of bits of fresh noise in the
+    entropy pool, blocking if necessary.  /dev/random is suitable for
+    applications that need high quality randomness, and can afford
+    indeterminate delays."
+
+Further, the "Usage" section of the said man pages state:
+
+    "The /dev/random interface is considered a legacy interface, and
+    /dev/urandom is preferred and sufficient in all use cases, with the
+    exception of applications which require randomness during early boot
+    time; for these applications, getrandom(2) must be used instead,
+    because it will block until the entropy pool is initialized.
+
+    "If a seed file is saved across reboots as recommended below (all
+    major Linux distributions have done this since 2000 at least), the
+    output is cryptographically secure against attackers without local
+    root access as soon as it is reloaded in the boot sequence, and
+    perfectly adequate for network encryption session keys.  Since reads
+    from /dev/random may block, users will usually want to open it in
+    nonblocking mode (or perform a read with timeout), and provide some
+    sort of user notification if the desired entropy is not immediately
+    available."
+
+And refer to random(7) for a comparison of `/dev/random` and
+`/dev/urandom`.
+
+What about other OSes?
+----------------------
+
+`/dev/urandom` exists and works on OS-X, FreeBSD, DragonFlyBSD, NetBSD
+and OpenBSD, which cover all the non-Linux platforms we explicitly
+support, aside from Windows.
+
+On Windows `/dev/random` doesn't work either so we don't regress.
+This is actually another argument in favour of using the newly
+proposed 'rng-builtin' backend by default, as that will work on
+Windows.
+
+    - - -
+
+Given the above, change the entropy source for VirtIO-RNG device to
+`/dev/urandom`.
+
+Related discussion in these[1][2] past threads.
+
+[1] https://lists.nongnu.org/archive/html/qemu-devel/2018-06/msg08335.htm=
+l
+    -- "RNG: Any reason QEMU doesn't default to `/dev/urandom`?"
+[2] https://lists.nongnu.org/archive/html/qemu-devel/2018-09/msg02724.htm=
+l
+    -- "[RFC] Virtio RNG: Consider changing the default entropy source to
+       /dev/urandom"
+
+Signed-off-by: Kashyap Chamarthy <kchamart@redhat.com>
+Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
+Signed-off-by: Laurent Vivier <lvivier@redhat.com>
+---
+ backends/rng-random.c | 2 +-
+ qemu-options.hx       | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/backends/rng-random.c b/backends/rng-random.c
+index e2a49b0571d7..eff36ef14084 100644
+--- a/backends/rng-random.c
++++ b/backends/rng-random.c
+@@ -112,7 +112,7 @@ static void rng_random_init(Object *obj)
+                             rng_random_set_filename,
+                             NULL);
+=20
+-    s->filename =3D g_strdup("/dev/random");
++    s->filename =3D g_strdup("/dev/urandom");
+     s->fd =3D -1;
+ }
+=20
+diff --git a/qemu-options.hx b/qemu-options.hx
+index 39dc17042967..f6e9bd1d9c42 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -4328,7 +4328,7 @@ Creates a random number generator backend which obt=
+ains entropy from
+ a device on the host. The @option{id} parameter is a unique ID that
+ will be used to reference this entropy backend from the @option{virtio-r=
+ng}
+ device. The @option{filename} parameter specifies which file to obtain
+-entropy from and if omitted defaults to @option{/dev/random}.
++entropy from and if omitted defaults to @option{/dev/urandom}.
+=20
+ @item -object rng-egd,id=3D@var{id},chardev=3D@var{chardevid}
+=20
+--=20
+2.20.1
+
+
