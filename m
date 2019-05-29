@@ -2,61 +2,87 @@ Return-Path: <SRS0=DspQ=T5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8117CC04AB3
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 07:02:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AA2C9C04AB3
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 07:04:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4FD89208CB
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 07:02:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 643E0208CB
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 07:04:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="fS8xcg4n"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4FD89208CB
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="W8DVy6X3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 643E0208CB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:48529 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:48551 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hVsba-0001g3-G3
-	for qemu-devel@archiver.kernel.org; Wed, 29 May 2019 03:02:34 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:47710)
+	id 1hVsdV-000350-LZ
+	for qemu-devel@archiver.kernel.org; Wed, 29 May 2019 03:04:33 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:45220)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1hVsQ3-0008HQ-G6
-	for qemu-devel@nongnu.org; Wed, 29 May 2019 02:50:40 -0400
+	(envelope-from <arilou@gmail.com>) id 1hVsHv-00016L-Fv
+	for qemu-devel@nongnu.org; Wed, 29 May 2019 02:42:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1hVsQ2-0002c2-BY
-	for qemu-devel@nongnu.org; Wed, 29 May 2019 02:50:39 -0400
-Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:55855 helo=ozlabs.org)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
-	id 1hVsQ1-0002Ya-VJ; Wed, 29 May 2019 02:50:38 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
-	id 45DLv32rgyz9sNk; Wed, 29 May 2019 16:50:22 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-	d=gibson.dropbear.id.au; s=201602; t=1559112623;
-	bh=Pt2V6H9UxjB0VJr6x7Imcec9CnShuswntyMOw5mqCy0=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=fS8xcg4nRf1Q3oCD7DbnMmuJvImGT49muIYI1Yth0ladTmkygJy90By//RU4pG2BQ
-	SFF/8Xb/yIoo6N/9pqKfqS9+KWK0G+EA4bl/kpmSklNUyyQwWXIGBkgf5h6FpIhbQG
-	EVtKvRwkeaB9AfCvLHHxrGlmp7g4qvDRsz4TQPlA=
-From: David Gibson <david@gibson.dropbear.id.au>
-To: peter.maydell@linaro.org
-Date: Wed, 29 May 2019 16:49:45 +1000
-Message-Id: <20190529065017.15149-13-david@gibson.dropbear.id.au>
+	(envelope-from <arilou@gmail.com>) id 1hVsHu-000224-GU
+	for qemu-devel@nongnu.org; Wed, 29 May 2019 02:42:15 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:37981)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <arilou@gmail.com>) id 1hVsHu-0001uT-Af
+	for qemu-devel@nongnu.org; Wed, 29 May 2019 02:42:14 -0400
+Received: by mail-wr1-x443.google.com with SMTP id d18so793679wrs.5
+	for <qemu-devel@nongnu.org>; Tue, 28 May 2019 23:42:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+	h=from:to:cc:subject:date:message-id:in-reply-to:references
+	:mime-version:content-transfer-encoding;
+	bh=znSiOGTnV63Iw4NoeCVkFq+8TJBRoFVxm4iUWeh4XxE=;
+	b=W8DVy6X34OB183ztL9J5Uorl/nmQURkpqPMerzieAUEpyAIxzBwalKwG29Iwtvl3h8
+	vh4ItqgaKPfgYOyahzoHLNhyXg5vzM8Bae2NEoyqXoyeK48GBZbw9Tczl8jAUcsf2KBO
+	vDdFnu/cUHpQCGlc318qTTTyzX9GAOojWfZ3djD8XNxirmnATRMQSWnf7vDbw3WLDAhZ
+	4kH2zB1nLOE/HBinDU+FML5VRNwWJJ0bAHTw4uyuVdC0/oRgQaaAztvFPp1R+FKvabJH
+	rx8J55SWlH639Xw6NlUAfnHychKphrHr55ntcvWnWtFdkXqawpWj622wVEtDLTsYNgbE
+	JAhw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+	:references:mime-version:content-transfer-encoding;
+	bh=znSiOGTnV63Iw4NoeCVkFq+8TJBRoFVxm4iUWeh4XxE=;
+	b=fL6c1XRr0Sh3ofxKi/MZgeJaMjnb8CiHOk8Qld/UjR4njJG2KnYedy0dpQUl7iSVZQ
+	igiXPLJmN2B9FC+Z8bwPiRXjUqEC9ckuufw+5wbdnnZ+2T+FYbgMpNNth0rZyIF5Ls3Z
+	S81g7GsVuSw4XMWz35s3B9lQF7ffCHp/2/2UzPVhyZwHaapGEWNLXNfZD+H0sFA/nn++
+	ueU+4ViUPe2KG6rjNHn4USX0KcZ/w6JKKoRVSYKO9UmPSzHJsfiPqxfY/j5yT3OaZotr
+	woIp4/ssAJjK9y/IAK8g82JyXzI7YXnhM9Gb4bPZCcJqM7sTDWWHmULNQt4/fbXlyQcP
+	YU3g==
+X-Gm-Message-State: APjAAAWQXFUaRsCBWHFRWAsCJJeEGRv4WCTP3A/G7iPIxxuiVUK/DIto
+	aA97D9Cla7mjQj+SBGRkA+E8xQ0A
+X-Google-Smtp-Source: APXvYqxmIeA/W36rmi9TZKfKoRqq6hFsEZysWbqlu7eHpXQ3JJg1yamkcvf11V9ffVVQqjGcTsxanA==
+X-Received: by 2002:a5d:6189:: with SMTP id j9mr16791438wru.151.1559112133229; 
+	Tue, 28 May 2019 23:42:13 -0700 (PDT)
+Received: from linux.local ([31.154.166.148])
+	by smtp.gmail.com with ESMTPSA id f2sm6831168wme.12.2019.05.28.23.42.12
+	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+	Tue, 28 May 2019 23:42:12 -0700 (PDT)
+From: Jon Doron <arilou@gmail.com>
+To: qemu-devel@nongnu.org
+Date: Wed, 29 May 2019 09:41:41 +0300
+Message-Id: <20190529064148.19856-14-arilou@gmail.com>
 X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20190529065017.15149-1-david@gibson.dropbear.id.au>
-References: <20190529065017.15149-1-david@gibson.dropbear.id.au>
+In-Reply-To: <20190529064148.19856-1-arilou@gmail.com>
+References: <20190529064148.19856-1-arilou@gmail.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2401:3900:2:1::2
-Subject: [Qemu-devel] [PULL 12/44] target/ppc: Fix vsum2sws
+X-Received-From: 2a00:1450:4864:20::443
+Subject: [Qemu-devel] [PATCH v12 13/20] gdbstub: Implement read all
+ registers (g pkt) with new infra
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -68,48 +94,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: lvivier@redhat.com, qemu-devel@nongnu.org, groug@kaod.org,
-	qemu-ppc@nongnu.org, clg@kaod.org,
-	David Gibson <david@gibson.dropbear.id.au>,
-	Anton Blanchard <anton@ozlabs.org>, rth@twiddle.net
+Cc: alex.bennee@linaro.org, Jon Doron <arilou@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Anton Blanchard <anton@ozlabs.org>
-
-A recent cleanup changed the pre zeroing of the result from 64 bit
-to 32 bit operations:
-
--        result.u64[i] =3D 0;
-+        result.VsrW(i) =3D 0;
-
-This corrupts the result.
-
-Fixes: 60594fea298d ("target/ppc: remove various HOST_WORDS_BIGENDIAN hac=
-ks in int_helper.c")
-Signed-off-by: Anton Blanchard <anton@ozlabs.org>
-Message-Id: <20190507004811.29968-9-anton@ozlabs.org>
-Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+Signed-off-by: Jon Doron <arilou@gmail.com>
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- target/ppc/int_helper.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ gdbstub.c | 31 +++++++++++++++++++++++--------
+ 1 file changed, 23 insertions(+), 8 deletions(-)
 
-diff --git a/target/ppc/int_helper.c b/target/ppc/int_helper.c
-index 2bad2d5620..093ef74b59 100644
---- a/target/ppc/int_helper.c
-+++ b/target/ppc/int_helper.c
-@@ -2053,7 +2053,7 @@ void helper_vsum2sws(CPUPPCState *env, ppc_avr_t *r=
-, ppc_avr_t *a, ppc_avr_t *b)
-     for (i =3D 0; i < ARRAY_SIZE(r->u64); i++) {
-         int64_t t =3D (int64_t)b->VsrSW(upper + i * 2);
-=20
--        result.VsrW(i) =3D 0;
-+        result.VsrD(i) =3D 0;
-         for (j =3D 0; j < ARRAY_SIZE(r->u64); j++) {
-             t +=3D a->VsrSW(2 * i + j);
+diff --git a/gdbstub.c b/gdbstub.c
+index a487e549d1..8a401e6527 100644
+--- a/gdbstub.c
++++ b/gdbstub.c
+@@ -1774,6 +1774,21 @@ static void handle_write_all_regs(GdbCmdContext *gdb_ctx, void *user_ctx)
+     put_packet(gdb_ctx->s, "OK");
+ }
+ 
++static void handle_read_all_regs(GdbCmdContext *gdb_ctx, void *user_ctx)
++{
++    target_ulong addr, len;
++
++    cpu_synchronize_state(gdb_ctx->s->g_cpu);
++    len = 0;
++    for (addr = 0; addr < gdb_ctx->s->g_cpu->gdb_num_g_regs; addr++) {
++        len += gdb_read_register(gdb_ctx->s->g_cpu, gdb_ctx->mem_buf + len,
++                                 addr);
++    }
++
++    memtohex(gdb_ctx->str_buf, gdb_ctx->mem_buf, len);
++    put_packet(gdb_ctx->s, gdb_ctx->str_buf);
++}
++
+ static int gdb_handle_packet(GDBState *s, const char *line_buf)
+ {
+     CPUState *cpu;
+@@ -1781,7 +1796,7 @@ static int gdb_handle_packet(GDBState *s, const char *line_buf)
+     CPUClass *cc;
+     const char *p;
+     uint32_t pid, tid;
+-    int ch, reg_size, type, res;
++    int ch, type, res;
+     uint8_t mem_buf[MAX_PACKET_LENGTH];
+     char buf[sizeof(mem_buf) + 1 /* trailing NUL */];
+     char thread_id[16];
+@@ -1940,14 +1955,14 @@ static int gdb_handle_packet(GDBState *s, const char *line_buf)
          }
---=20
+         break;
+     case 'g':
+-        cpu_synchronize_state(s->g_cpu);
+-        len = 0;
+-        for (addr = 0; addr < s->g_cpu->gdb_num_g_regs; addr++) {
+-            reg_size = gdb_read_register(s->g_cpu, mem_buf + len, addr);
+-            len += reg_size;
++        {
++            static const GdbCmdParseEntry read_all_regs_cmd_desc = {
++                .handler = handle_read_all_regs,
++                .cmd = "g",
++                .cmd_startswith = 1
++            };
++            cmd_parser = &read_all_regs_cmd_desc;
+         }
+-        memtohex(buf, mem_buf, len);
+-        put_packet(s, buf);
+         break;
+     case 'G':
+         {
+-- 
 2.21.0
 
 
