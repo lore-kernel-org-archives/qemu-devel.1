@@ -3,66 +3,91 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 111FAC28CC0
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 12:50:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6EFC2C28CC0
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 12:51:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CD7D9205ED
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 12:50:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CD7D9205ED
+	by mail.kernel.org (Postfix) with ESMTPS id 46D99205ED
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 12:51:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 46D99205ED
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:53845 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:53847 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hVy2O-0005BM-Nx
-	for qemu-devel@archiver.kernel.org; Wed, 29 May 2019 08:50:36 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:35009)
+	id 1hVy3E-0005oZ-Do
+	for qemu-devel@archiver.kernel.org; Wed, 29 May 2019 08:51:28 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:35239)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hVy0r-0004SQ-6T
-	for qemu-devel@nongnu.org; Wed, 29 May 2019 08:49:02 -0400
+	(envelope-from <mreitz@redhat.com>) id 1hVy1e-0004rC-4B
+	for qemu-devel@nongnu.org; Wed, 29 May 2019 08:49:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hVy0p-0001Dv-Vu
-	for qemu-devel@nongnu.org; Wed, 29 May 2019 08:49:01 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:32856)
+	(envelope-from <mreitz@redhat.com>) id 1hVy1d-0002B9-97
+	for qemu-devel@nongnu.org; Wed, 29 May 2019 08:49:50 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:1659)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hVy0p-00010d-Nb
-	for qemu-devel@nongnu.org; Wed, 29 May 2019 08:48:59 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
+	(Exim 4.71) (envelope-from <mreitz@redhat.com>)
+	id 1hVy1b-00025l-2l; Wed, 29 May 2019 08:49:47 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+	[10.5.11.23])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 0A3B53086225;
-	Wed, 29 May 2019 12:48:09 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-117-250.ams2.redhat.com
-	[10.36.117.250])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id C1B5D7E306;
-	Wed, 29 May 2019 12:47:51 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
-	id 411091138648; Wed, 29 May 2019 14:47:50 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-References: <87lfyqla7r.fsf@dusky.pond.sub.org>
-	<CAFEAcA_DdosM2mSo0FWMLjv2eBHscQGXw-_J6AefiwURZGCCrg@mail.gmail.com>
-Date: Wed, 29 May 2019 14:47:50 +0200
-In-Reply-To: <CAFEAcA_DdosM2mSo0FWMLjv2eBHscQGXw-_J6AefiwURZGCCrg@mail.gmail.com>
-	(Peter Maydell's message of "Tue, 28 May 2019 19:32:51 +0100")
-Message-ID: <87o93lfmvd.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1 (gnu/linux)
+	by mx1.redhat.com (Postfix) with ESMTPS id 6380A30C1FE4;
+	Wed, 29 May 2019 12:49:41 +0000 (UTC)
+Received: from dresden.str.redhat.com (unknown [10.40.205.150])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 050DA80BB;
+	Wed, 29 May 2019 12:49:39 +0000 (UTC)
+To: Markus Armbruster <armbru@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+References: <20190524075848.23781-1-sgarzare@redhat.com>
+	<87ftozds0e.fsf@dusky.pond.sub.org>
+From: Max Reitz <mreitz@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+	mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+	/PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+	U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+	mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+	awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+	AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+	CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+	B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+	2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+	AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+	8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+	4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+	BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+	xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+	W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+	DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+	64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+	ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+	sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+	alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+	/ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+	bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+	R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <fe94cf9c-4a41-481f-7d2a-cbf879215790@redhat.com>
+Date: Wed, 29 May 2019 14:49:38 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+In-Reply-To: <87ftozds0e.fsf@dusky.pond.sub.org>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="9qOzLYIxcqRHI7iVAm0OMxIid7RJXzcUx"
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.42]);
-	Wed, 29 May 2019 12:48:39 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.43]);
+	Wed, 29 May 2019 12:49:41 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] Headers without multiple inclusion guards
+X-Content-Filtered-By: Mailman/MimeDel 2.1.21
+Subject: Re: [Qemu-devel] [PATCH v2 0/3] Update documentation and help
+ related to the preallocation parameter
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -74,193 +99,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Dmitry Fleytman <dmitry.fleytman@gmail.com>,
-	Sagar Karandikar <sagark@eecs.berkeley.edu>,
-	"Michael S. Tsirkin" <mst@redhat.com>, James Hogan <jhogan@kernel.org>,
-	Anthony Green <green@moxielogic.com>, Palmer Dabbelt <palmer@sifive.com>,
-	Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
-	QEMU Developers <qemu-devel@nongnu.org>,
-	Philippe =?utf-8?Q?Mathieu-Daud?= =?utf-8?Q?=C3=A9?= <f4bug@amsat.org>,
-	Max Filippov <jcmvbkbc@gmail.com>,
-	Alistair Francis <Alistair.Francis@wdc.com>,
-	Gerd Hoffmann <kraxel@redhat.com>, "Edgar E.
-	Iglesias" <edgar.iglesias@gmail.com>, Guan Xuetao <gxt@mprc.pku.edu.cn>,
-	Marek Vasut <marex@denx.de>, Stefano Stabellini <sstabellini@kernel.org>,
-	Aleksandar Rikalo <arikalo@wavecomp.com>, Helge Deller <deller@gmx.de>,
-	David Hildenbrand <david@redhat.com>,
-	Markus Armbruster <armbru@redhat.com>, Halil Pasic <pasic@linux.ibm.com>,
-	Christian Borntraeger <borntraeger@de.ibm.com>,
-	Anthony Perard <anthony.perard@citrix.com>,
-	David Gibson <david@gibson.dropbear.id.au>,
-	Laszlo Ersek <lersek@redhat.com>, Jason Wang <jasowang@redhat.com>,
-	Artyom Tarasenko <atar4qemu@gmail.com>,
-	Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
-	Alistair Francis <alistair@alistair23.me>,
-	Eduardo Habkost <ehabkost@redhat.com>,
-	Riku Voipio <riku.voipio@iki.fi>, Greg Kurz <groug@kaod.org>,
-	Marcelo Tosatti <mtosatti@redhat.com>,
-	Beniamino Galvani <b.galvani@gmail.com>,
-	Eric Auger <eric.auger@redhat.com>, Paul Durrant <paul.durrant@citrix.com>,
-	Stafford Horne <shorne@gmail.com>,
-	Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>,
-	Richard Henderson <rth@twiddle.net>,
-	"Daniel P. Berrange" <berrange@redhat.com>,
-	Claudio Fontana <claudio.fontana@gmail.com>,
-	Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
-	Chris Wulff <crwulff@gmail.com>,
-	Claudio Fontana <claudio.fontana@huawei.com>,
-	Laurent Vivier <laurent@vivier.eu>,
-	Andrew Baumann <Andrew.Baumann@microsoft.com>,
-	Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
-	Michael Walle <michael@walle.cc>,
-	Aleksandar Markovic <amarkovic@wavecomp.com>,
-	Cornelia Huck <cohuck@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
-	Aurelien Jarno <aurelien@aurel32.net>
+Cc: integration@gluster.org, qemu-devel@nongnu.org, qemu-block@nongnu.org,
+	Stefano Garzarella <sgarzare@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Peter Maydell <peter.maydell@linaro.org> writes:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--9qOzLYIxcqRHI7iVAm0OMxIid7RJXzcUx
+From: Max Reitz <mreitz@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+Cc: Stefano Garzarella <sgarzare@redhat.com>, qemu-devel@nongnu.org,
+ integration@gluster.org, qemu-block@nongnu.org
+Message-ID: <fe94cf9c-4a41-481f-7d2a-cbf879215790@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 0/3] Update documentation and help related
+ to the preallocation parameter
+References: <20190524075848.23781-1-sgarzare@redhat.com>
+ <87ftozds0e.fsf@dusky.pond.sub.org>
+In-Reply-To: <87ftozds0e.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-> On Tue, 28 May 2019 at 19:12, Markus Armbruster <armbru@redhat.com> wrote:
->> I append the alphabetical list of headers without multiple inclusion
->> guards (as reported by scripts/clean-header-guards -nv), followed by the
->> same list sorted into maintainer buckets.  If you're cc'ed, please find
->> your bucket(s), and tell me which headers intentionally lack guards.
->
->> FPU emulation
->> M: Aurelien Jarno <aurelien@aurel32.net>
->> M: Peter Maydell <peter.maydell@linaro.org>
->> M: Alex Benn=C3=A9e <alex.bennee@linaro.org>
->> fpu/softfloat-specialize.h
->> include/fpu/softfloat-macros.h
->
-> I think that include/fpu/softfloat-macros.h should ideally
-> have header guards.
+On 28.05.19 08:15, Markus Armbruster wrote:
+> Kevin, Max, this series looks ready to me.  Feel free to ask me to take=
 
-I'll add one.
+> it through my tree.
 
-> fpu/softfloat-specialize.h is a bit odd as it's intended to be included
-> exactly once, by fpu/softfloat.c. Guards wouldn't hurt, I think, but it
-> might be cleanest to rename it to fpu/softfloat-specialize.inc.c
-> to match our convention for "lump of C which is textually
-> included but isn't a header".
+*ask*
 
-Makes me wonder why we bother with a separate file.
+:-)
 
-Renaming it to .inc.c gets it out of check-headers' way.
 
->> ARM
->> M: Peter Maydell <peter.maydell@linaro.org>
->> target/arm/helper-a64.h
->> target/arm/helper-sve.h
->> target/arm/helper.h
->> target/arm/op_addsub.h
->
-> All intentional -- target/*/helper.h and anything it includes
-> is intended to be included multiple times for different
-> purposes (the includer #defines various macros appropriately
-> to produce different effects).
+--9qOzLYIxcqRHI7iVAm0OMxIid7RJXzcUx
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-We have quite a few special headers of this kind.  The ones that require
-macros to be defined should be excluded from check-headers.  The ones
-that don't could instead skip the "#include a second time works" part of
-the test.  We'll see.
+-----BEGIN PGP SIGNATURE-----
 
->> Allwinner-a10
->> M: Beniamino Galvani <b.galvani@gmail.com>
->> M: Peter Maydell <peter.maydell@linaro.org>
->> include/hw/arm/allwinner-a10.h
->
-> This appears to me to have an include guard:
-> perhaps your check doesn't recognize the variant
-> where the #define appears just before the #endif rather
-> than just after the #ifndef ?
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlzuf+IACgkQ9AfbAGHV
+z0CoqQgAmPE5cKUFzJC3wTfhjkiqjZw3zD8lej0ZthEjMeIvq+X6BD4lYOYbJVIj
+Dn5Jsv3txkVmw6Uw3qp+V7dJXq/i5y2CTrzqphVR7d9iCnvWxsr2oK23rvxP9/NC
+KTd08yqDdH5kqKUcq6knDwHutKr7/3ElDwayMvnm9vv7mrQyXxBrsF30728kTyxP
+5lvHztEjx1nBjH3/eTDI/HTpTTW4FEoLkSIccE8z59FZ7QKXX6c0+jh19WYQ7SsO
+4G9/oYuTjoMPAM5R/bb4qUajtQJB/1CeNG+AxT7gnJdRP1EWZxpLfjYczI/RJhfk
+U8OGcRs6ALOlETC4oDnTlwqFzVPfxQ==
+=397q
+-----END PGP SIGNATURE-----
 
-You're right, it doesn't.
-
-We got a dozen headers with the #define in unusual places.  I'll
-normalize them.
-
->> ARM PrimeCell and CMSDK devices
->> M: Peter Maydell <peter.maydell@linaro.org>
->> hw/display/pl110_template.h
->
-> Intentional, like all the hw/display/*_template.h headers:
-> they're included multiple times with various definitions
-> of BITS to generate different functions. (Note that there's
-> an item on the BiteSizedTasks page which suggests that
-> we could clean up all of these because only the 32-bit
-> case is used now that our display surfaces are always
-> 32-bits-per-pixel.)
-
-Another one for the "special headers" bucket.
-
->> Raspberry Pi
->> M: Peter Maydell <peter.maydell@linaro.org>
->> R: Andrew Baumann <Andrew.Baumann@microsoft.com>
->> R: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
->> include/hw/arm/raspi_platform.h
->
-> Mistake, should have a guard.
-
-I'll add one.
-
->> PXA2XX
->> M: Andrzej Zaborowski <balrogg@gmail.com>
->> M: Peter Maydell <peter.maydell@linaro.org>
->> hw/display/pxa2xx_template.h
->
-> Intentional, see above.
-
-Another one for the "special headers" bucket.
-
->> Xilinx ZynqMP
->> M: Alistair Francis <alistair@alistair23.me>
->> M: Edgar E. Iglesias <edgar.iglesias@gmail.com>
->> M: Peter Maydell <peter.maydell@linaro.org>
->> include/hw/arm/xlnx-zynqmp.h
->> include/hw/display/xlnx_dp.h
->> include/hw/dma/xlnx-zynq-devcfg.h
->
-> These all have guards in non-standard formats.
-
-I'll normalize.
-
->> include/hw/timer/xlnx-zynqmp-rtc.h
->
-> Mistake, should have a guard.
-
-I'll add one.
-
->> OMAP
->> M: Peter Maydell <peter.maydell@linaro.org>
->> hw/display/omap_lcd_template.h
->
-> Intentional, see above.
-
-Another one for the "special headers" bucket.
-
->> include/hw/arm/omap.h
->
-> Has a guard in a non-standard form.
-
-I'll normalize.
-
->> UNMAINTAINED
->> ------------
->> hw/display/tc6393xb_template.h
->
-> Intentional (see above)
-
-Another one for the "special headers" bucket.
-
->> include/hw/char/cadence_uart.h
->
-> Another with a guard which isn't of a style your check
-> detects.
-
-I'll normalize.
-
-Thanks!
+--9qOzLYIxcqRHI7iVAm0OMxIid7RJXzcUx--
 
