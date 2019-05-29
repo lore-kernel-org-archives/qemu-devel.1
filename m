@@ -2,86 +2,80 @@ Return-Path: <SRS0=DspQ=T5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	FROM_EXCESS_BASE64,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9300DC28CC1
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 11:49:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A2A48C28CC0
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 11:51:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 624252081C
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 11:49:18 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FXpuXDOM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 624252081C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 6F6D32081C
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 11:51:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6F6D32081C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:52309 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:52345 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hVx53-0007qE-Ne
-	for qemu-devel@archiver.kernel.org; Wed, 29 May 2019 07:49:17 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:49940)
+	id 1hVx73-00006z-Hc
+	for qemu-devel@archiver.kernel.org; Wed, 29 May 2019 07:51:21 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:50581)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1hVx3E-00070d-Md
-	for qemu-devel@nongnu.org; Wed, 29 May 2019 07:47:25 -0400
+	(envelope-from <philmd@redhat.com>) id 1hVx6E-0008FQ-Rh
+	for qemu-devel@nongnu.org; Wed, 29 May 2019 07:50:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1hVx3D-0007aj-Si
-	for qemu-devel@nongnu.org; Wed, 29 May 2019 07:47:24 -0400
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:35501)
+	(envelope-from <philmd@redhat.com>) id 1hVx6D-0001pj-9V
+	for qemu-devel@nongnu.org; Wed, 29 May 2019 07:50:30 -0400
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:52757)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1hVx3D-0007Zq-Oq
-	for qemu-devel@nongnu.org; Wed, 29 May 2019 07:47:23 -0400
-Received: by mail-ot1-x342.google.com with SMTP id n14so1704778otk.2
-	for <qemu-devel@nongnu.org>; Wed, 29 May 2019 04:47:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-	:cc:content-transfer-encoding;
-	bh=aExuaKYTnOHihruRIq+XtADu9811UKNFck5LVpS5Xg8=;
-	b=FXpuXDOMbAC5gZcAqQ87hBvWUt395wQTfM8xbvgjdWVIiFzNNSo6ifiw7wL9VegQP3
-	R0Yf6YQh7fvs5b4UIDc+20bL6m33zP1VzsHnuqIUqChiukfQMs1KY3QM3tHGmJvP7bZ4
-	lrSULf4pW08wESEl8IqVsitlHDv1myIKyxMCwoueVTnN1ycrDLFtakA2WMHReitgjCdT
-	g8AIEK7EJD9j44ynUKDfXX5EKW/rmWG20mCjBvruFjuQ17gE2GXCU4pNxDkRPa2Yu8Ql
-	6RsafUnM9azyu/MEP+DqUzsx5L6d+NKKPR8k24l5IvcmaKI5hgkFZtVKb6joe9wwKlf+
-	eXSw==
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hVx6D-0001ot-47
+	for qemu-devel@nongnu.org; Wed, 29 May 2019 07:50:29 -0400
+Received: by mail-wm1-f68.google.com with SMTP id y3so1469729wmm.2
+	for <qemu-devel@nongnu.org>; Wed, 29 May 2019 04:50:29 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-	:message-id:subject:to:cc:content-transfer-encoding;
-	bh=aExuaKYTnOHihruRIq+XtADu9811UKNFck5LVpS5Xg8=;
-	b=XErsjkfm0nlAYOliJLUVcQ4UZdz3oMCAhfXtyeLjEK8YPU0k8rECU4Zfub24eM5FyZ
-	DXlyvuFBqB/lpXoB++FgRGsd2oIt6CSGjJ6/SJOOIdKRvjUj7q9evmKhMCpXHlouomkr
-	AxQ5vZROqtVELuedwp2nC9DJCtGMMFtOvEnqBXzuHaxo/kkl9nanfvoE5xilT5Gwveqa
-	MvSJhC5ZkUDedsQcEjNHu8Igu4UJtLXZfIiLaGC1OAjfcdQJpGb+2HOFCPl0X4aa1ubo
-	lohnwhObh0H1z8yJrdnCvI0Ng9fv/BVMW6uttrZJ9hyRF8nWg+Q8+bd0WnivcKz3lkDO
-	Gkig==
-X-Gm-Message-State: APjAAAV4jzGCkjhW4UVAniIPRaoRCsDTxDKCEaPSwrtITZI74TiYrSpi
-	MYpxhc460LydQwf1/XR09CAwwX9ZITxPyuTRBxg=
-X-Google-Smtp-Source: APXvYqwwVwDHWBkzjHI+zuly9b5Kid5wcJH5IbEWuT8hehOzrcF87n7D0EONPYPeJInr9jJ1Ku0PiywchamZjUsGHXU=
-X-Received: by 2002:a9d:74c5:: with SMTP id a5mr4878725otl.322.1559130442610; 
-	Wed, 29 May 2019 04:47:22 -0700 (PDT)
+	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+	:date:user-agent:mime-version:in-reply-to:content-language
+	:content-transfer-encoding;
+	bh=33ZmxqWT9ywRyy+z2NlogBGAH8NxzDpHx3qU5TDATes=;
+	b=KsdZiFzjupnHoUIIPphe/hd/Vpd8plnPuwjhZEvJAs9RqqRrUOA56oWe2sLT3PYGXx
+	m2GSNXGntdnF+O+gzN0OYtAZbrG+mqkMcWMwnIA0QLojw+8f6LmSIgfHzht0J73lQkWj
+	ajwG6KQitK/LFrUaIh3zW3xXdCgdXecXwHKSifuT8iZZhbY6iZQWkK1V2WoZDwmI737l
+	P6JV2ppJWGJ61o2STV4srjdquE6M2AtxWuWhg8gQpxCdkUw3aSn06AGs7AX5noxY1hlA
+	LRXenzcyNZ+6ld2r/HZ6ZtlR+2v9+6p5hf56t7tNGBklKnLQumIqRe64zQGdBT8Z4J+i
+	lEYQ==
+X-Gm-Message-State: APjAAAUp6bfjNAxy9FNRWb8a8s8qJh+a+Pezz49o/3RyX5I6j9t6oRXn
+	GC3JnVVT34f+Ait8zzSWPnU3Rw==
+X-Google-Smtp-Source: APXvYqxOIrOi/uS+rXEAUheXoSTjPGsjkdMSgPeYzTiEEHxcUGhHiolL/L6Fdsr4PD+ge5yqKhJC6Q==
+X-Received: by 2002:a1c:7001:: with SMTP id l1mr6894703wmc.40.1559130628028;
+	Wed, 29 May 2019 04:50:28 -0700 (PDT)
+Received: from [10.32.224.40] (red-hat-inc.vlan560.asr1.mad1.gblx.net.
+	[159.63.51.90])
+	by smtp.gmail.com with ESMTPSA id n7sm6053671wrw.64.2019.05.29.04.50.26
+	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+	Wed, 29 May 2019 04:50:27 -0700 (PDT)
+To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
+References: <20190520124716.30472-1-kraxel@redhat.com>
+	<20190520124716.30472-11-kraxel@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+	url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <c293af5d-08a1-4890-5584-c7693dcd48a7@redhat.com>
+Date: Wed, 29 May 2019 13:50:26 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-References: <20190519084815.7410-1-ppandit@redhat.com>
-	<CAJ+F1CLXdw4gE45vVEpStKrKsu-OYy1+5caC9wUduEtQRhjrpA@mail.gmail.com>
-	<nycvar.YSQ.7.76.1905231257400.23354@xnncv>
-	<CAJ+F1CLH1qN-jVVaMacMB41PWfZ5Xd9A8ycowaNxwgvQhPEvMQ@mail.gmail.com>
-	<nycvar.YSQ.7.76.1905291448250.16122@xnncv>
-In-Reply-To: <nycvar.YSQ.7.76.1905291448250.16122@xnncv>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Wed, 29 May 2019 13:47:11 +0200
-Message-ID: <CAJ+F1C+xhBeoVqoE4aPgLqquq7rNKbZTtNSHe73FFgMyDCUzyw@mail.gmail.com>
-To: P J P <ppandit@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::342
-Subject: Re: [Qemu-devel] [PATCH v2] qga: check length of command-line &
- environment variables
+In-Reply-To: <20190520124716.30472-11-kraxel@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+	[fuzzy]
+X-Received-From: 209.85.128.68
+Subject: Re: [Qemu-devel] [PATCH v3 10/14] tests/vm: openbsd autoinstall,
+ using serial console
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -93,51 +87,224 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?Q?Ferm=C3=ADn_J=2E_Serna?= <fjserna@gmail.com>,
-	"Daniel P . Berrange" <berrange@redhat.com>,
-	QEMU Developers <qemu-devel@nongnu.org>,
-	Michael Roth <mdroth@linux.vnet.ibm.com>
+Cc: Fam Zheng <fam@euphon.net>, Ed Maste <emaste@freebsd.org>,
+	Kamil Rytarowski <kamil@netbsd.org>,
+	=?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+	Li-Wen Hsu <lwhsu@freebsd.org>, Brad Smith <brad@comstyle.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi
+On 5/20/19 2:47 PM, Gerd Hoffmann wrote:
+> Instead of fetching the prebuilt image from patchew download the install
+> iso and prepare the image locally.  Install to disk, using the serial
+> console.  Create qemu user, configure ssh login.  Install packages
+> needed for qemu builds.
+> 
+> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+> ---
+>  tests/vm/openbsd | 158 +++++++++++++++++++++++++++++++++++++++++++----
+>  1 file changed, 145 insertions(+), 13 deletions(-)
+> 
+> diff --git a/tests/vm/openbsd b/tests/vm/openbsd
+> index 2105c01a267a..c5f0a1521833 100755
+> --- a/tests/vm/openbsd
+> +++ b/tests/vm/openbsd
+> @@ -2,10 +2,11 @@
+>  #
+>  # OpenBSD VM image
+>  #
+> -# Copyright 2017 Red Hat Inc.
+> +# Copyright 2017-2019 Red Hat Inc.
+>  #
+>  # Authors:
+>  #  Fam Zheng <famz@redhat.com>
+> +#  Gerd Hoffmann <kraxel@redhat.com>
+>  #
+>  # This code is licensed under the GPL version 2 or later.  See
+>  # the COPYING file in the top-level directory.
+> @@ -13,34 +14,165 @@
+>  
+>  import os
+>  import sys
+> +import socket
+>  import subprocess
+>  import basevm
+>  
+>  class OpenBSDVM(basevm.BaseVM):
+>      name = "openbsd"
+>      arch = "x86_64"
+> +
+> +    link = "https://cdn.openbsd.org/pub/OpenBSD/6.5/amd64/install65.iso"
+> +    csum = "38d1f8cadd502f1c27bf05c5abde6cc505dd28f3f34f8a941048ff9a54f9f608"
+> +    size = "20G"
+> +    pkgs = [
+> +        # tools
+> +        "git",
+> +        "pkgconf",
+> +        "bzip2", "xz",
+> +
+> +        # gnu tools
+> +        "bash",
+> +        "gmake",
+> +        "gsed",
+> +        "bison",
+> +
+> +        # libs: usb
+> +        "libusb1",
+> +
+> +        # libs: crypto
+> +        "gnutls",
+> +
+> +        # libs: images
+> +        "jpeg",
+> +        "png",
+> +
+> +	# libs: ui
+> +        "sdl2",
+> +        "gtk+3",
+> +        "libxkbcommon",
+> +    ]
+> +
+>      BUILD_SCRIPT = """
+>          set -e;
+> -        rm -rf /var/tmp/qemu-test.*
+> -        cd $(mktemp -d /var/tmp/qemu-test.XXXXXX);
+> +        rm -rf /home/qemu/qemu-test.*
+> +        cd $(mktemp -d /home/qemu/qemu-test.XXXXXX);
+> +        mkdir src build; cd src;
+>          tar -xf /dev/rsd1c;
+> -        ./configure --cc=x86_64-unknown-openbsd6.1-gcc-4.9.4 --python=python2.7 {configure_opts};
+> -        gmake --output-sync -j{jobs} {verbose};
+> -        # XXX: "gmake check" seems to always hang or fail
+> -        #gmake --output-sync -j{jobs} check {verbose};
+> +        cd ../build
+> +        ../src/configure --cc=cc --python=python3 {configure_opts};
+> +        gmake --output-sync -j{jobs} {target} {verbose};
+>      """
+> +    poweroff = "halt -p"
+>  
+>      def build_image(self, img):
+> -        cimg = self._download_with_cache("http://download.patchew.org/openbsd-6.1-amd64.img.xz",
+> -                sha256sum='8c6cedc483e602cfee5e04f0406c64eb99138495e8ca580bc0293bcf0640c1bf')
+> -        img_tmp_xz = img + ".tmp.xz"
+> +        self.print_step("Downloading install iso")
+> +        cimg = self._download_with_cache(self.link, sha256sum=self.csum)
+>          img_tmp = img + ".tmp"
+> -        sys.stderr.write("Extracting the image...\n")
+> -        subprocess.check_call(["cp", "-f", cimg, img_tmp_xz])
+> -        subprocess.check_call(["xz", "-dvf", img_tmp_xz])
+> +        iso = img + ".install.iso"
+> +
+> +        self.print_step("Preparing iso and disk image")
+> +        subprocess.check_call(["cp", "-f", cimg, iso])
+> +        subprocess.check_call(["qemu-img", "create", "-f", "qcow2",
+> +                               img_tmp, self.size])
+> +
+> +        self.print_step("Booting installer")
+> +        self.boot(img_tmp, extra_args = [
+> +            "-machine", "graphics=off",
+> +            "-cdrom", iso
+> +        ])
+> +        self.console_init()
+> +        self.console_wait_send("boot>", "set tty com0\n")
+> +        self.console_wait_send("boot>", "\n")
+> +
+> +        # pre-install configuration
+> +        self.console_wait_send("(I)nstall",               "i\n")
+> +        self.console_wait_send("Terminal type",           "xterm\n")
+> +        self.console_wait_send("System hostname",         "openbsd\n")
+> +        self.console_wait_send("Which network interface", "vio0\n")
+> +        self.console_wait_send("IPv4 address",            "dhcp\n")
+> +        self.console_wait_send("IPv6 address",            "none\n")
+> +        self.console_wait_send("Which network interface", "done\n")
+> +        self.console_wait_send("DNS domain name",         "localnet\n")
+> +        self.console_wait("Password for root account")
+> +        self.console_send("%s\n" % self.ROOT_PASS)
+> +        self.console_wait("Password for root account")
+> +        self.console_send("%s\n" % self.ROOT_PASS)
+> +        self.console_wait_send("Start sshd(8)",           "yes\n")
+> +        self.console_wait_send("X Window System",         "\n")
+> +        self.console_wait_send("xenodm",                  "\n")
+> +        self.console_wait_send("console to com0",         "\n")
+> +        self.console_wait_send("Which speed",             "\n")
+> +
+> +        self.console_wait("Setup a user")
+> +        self.console_send("%s\n" % self.GUEST_USER)
+> +        self.console_wait("Full name")
+> +        self.console_send("%s\n" % self.GUEST_USER)
+> +        self.console_wait("Password")
+> +        self.console_send("%s\n" % self.GUEST_PASS)
+> +        self.console_wait("Password")
+> +        self.console_send("%s\n" % self.GUEST_PASS)
+> +
+> +        self.console_wait_send("Allow root ssh login",    "yes\n")
+> +        self.console_wait_send("timezone",                "UTC\n")
+> +        self.console_wait_send("root disk",               "\n")
+> +        self.console_wait_send("(W)hole disk",            "\n")
+> +        self.console_wait_send("(A)uto layout",           "\n")
+> +        self.console_wait_send("Location of sets",        "cd0\n")
+> +        self.console_wait_send("Pathname to the sets",    "\n")
+> +        self.console_wait_send("Set name(s)",             "\n")
+> +        self.console_wait_send("without verification",    "yes\n")
+> +
+> +        self.print_step("Installation started now, this will take a while")
+> +        self.console_wait_send("Location of sets",        "done\n")
+> +
+> +        self.console_wait("successfully completed")
+> +        self.print_step("Installation finished, rebooting")
+> +        self.console_wait_send("(R)eboot",                "reboot\n")
+> +
+> +        # setup qemu user
+> +        prompt = "$"
+> +        self.console_ssh_init(prompt, self.GUEST_USER, self.GUEST_PASS)
+> +        self.console_wait_send(prompt, "exit\n")
+> +
+> +        # setup root user
+> +        prompt = "openbsd#"
+> +        self.console_ssh_init(prompt, "root", self.ROOT_PASS)
+> +        self.console_sshd_config(prompt)
+> +
+> +        # setup virtio-blk #1 (tarfile)
+> +        self.console_wait(prompt)
+> +        self.console_send("echo 'chmod 666 /dev/rsd1c' >> /etc/rc.local\n")
+> +
+> +        # enable w+x for /home
+> +        self.console_wait(prompt)
+> +        self.console_send("sed -i -e '/home/s/rw,/rw,wxallowed,/' /etc/fstab\n")
+> +
+> +        # tweak datasize limit
+> +        self.console_wait(prompt)
+> +        self.console_send("sed -i -e 's/\\(datasize[^=]*\\)=[^:]*/\\1=infinity/' /etc/login.conf\n")
+> +
+> +        # use http (be proxy cache friendly)
+> +        self.console_wait(prompt)
+> +        self.console_send("sed -i -e 's/https/http/' /etc/installurl\n")
+> +
+> +        self.print_step("Configuration finished, rebooting")
+> +        self.console_wait_send(prompt, "reboot\n")
+> +        self.console_wait("login:")
+> +        self.wait_ssh()
+> +
+> +        self.print_step("Installing packages")
+> +        self.ssh_root_check("pkg_add %s\n" % " ".join(self.pkgs))
+> +
+> +        # shutdown
+> +        self.ssh_root(self.poweroff)
+> +        self.wait()
+> +
+>          if os.path.exists(img):
+>              os.remove(img)
+>          os.rename(img_tmp, img)
+> +        os.remove(iso)
+> +        self.print_step("All done")
+>  
+>  if __name__ == "__main__":
+>      sys.exit(basevm.main(OpenBSDVM))
+> 
 
-On Wed, May 29, 2019 at 11:38 AM P J P <ppandit@redhat.com> wrote:
->
->   Hello Marc,
->
-> +-- On Thu, 23 May 2019, Marc-Andr=C3=A9 Lureau wrote --+
-> | I don't see how you could exploit this today.
-> |
-> | QMP parser has MAX_TOKEN_COUNT (2ULL << 20).
->
-> I see, didn't realise that. I tried to reproduce it and
->
->    {"error": {"class": "GenericError", "desc": "JSON token count limit ex=
-ceeded"}}
->
-> got above error around ~1048570 tokens; Much earlier than 0x200000(=3D209=
-7152)
-> as defined by MAX_TOKEN_COUNT. I guess multiple packets are being merged =
-to
-> form the incoming command and there is a glitch in there.
->
-> | We could have "assert(count < MAX_TOKEN_COUNT)" in the loop, if it help=
-s.
->
-> No, assert() doesn't seem good.
+This works like charm.
 
-assert() is good if it's a programming error: that is if it should
-never happen at run-time.
-It's a decent way to document the code.
-
->
-> I think same limit will apply to commands coming via QAPIs as well?
-
-What do you mean? If the generated API is used internally by QEMU?
-(it's not, but in this case there would be no limit)
-
---=20
-Marc-Andr=C3=A9 Lureau
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
