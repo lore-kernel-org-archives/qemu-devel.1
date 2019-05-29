@@ -2,69 +2,62 @@ Return-Path: <SRS0=DspQ=T5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_NEOMUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 33A7AC04AB3
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 07:49:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C7F96C04AB3
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 07:51:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 101A920665
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 07:49:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 101A920665
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 751B520665
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 07:51:49 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="cMlWuh/+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 751B520665
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:49315 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:49369 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hVtLF-0006TF-Bs
-	for qemu-devel@archiver.kernel.org; Wed, 29 May 2019 03:49:45 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:34572)
+	id 1hVtNE-0007rw-QP
+	for qemu-devel@archiver.kernel.org; Wed, 29 May 2019 03:51:48 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:48570)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jfreimann@redhat.com>) id 1hVtJq-0005nR-Iz
-	for qemu-devel@nongnu.org; Wed, 29 May 2019 03:48:20 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1hVsRC-0001HW-93
+	for qemu-devel@nongnu.org; Wed, 29 May 2019 02:51:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jfreimann@redhat.com>) id 1hVtJp-0003uZ-6l
-	for qemu-devel@nongnu.org; Wed, 29 May 2019 03:48:18 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33368)
+	(envelope-from <dgibson@ozlabs.org>) id 1hVsRA-0003DG-A6
+	for qemu-devel@nongnu.org; Wed, 29 May 2019 02:51:50 -0400
+Received: from ozlabs.org ([203.11.71.1]:52401)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jfreimann@redhat.com>)
-	id 1hVtJp-0003r2-2A
-	for qemu-devel@nongnu.org; Wed, 29 May 2019 03:48:17 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
-	[10.5.11.23])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 705B89FFC5
-	for <qemu-devel@nongnu.org>; Wed, 29 May 2019 07:48:10 +0000 (UTC)
-Received: from localhost (dhcp-192-193.str.redhat.com [10.33.192.193])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 2AC481A7CA;
-	Wed, 29 May 2019 07:48:04 +0000 (UTC)
-Date: Wed, 29 May 2019 09:48:02 +0200
-From: Jens Freimann <jfreimann@redhat.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20190529074802.2cofzjkudfuilbej@jenstp.localdomain>
-References: <20190517125820.2885-1-jfreimann@redhat.com>
-	<20190520165657.2293c5d7@x1.home>
-	<20190521072157.wpb77wlc5mhfcdes@jenstp.localdomain>
-	<20190521073511-mutt-send-email-mst@kernel.org>
-	<20190521184918.n4nnk6ack3ssp6jv@jenstp.localdomain>
-	<20190528223900-mutt-send-email-mst@kernel.org>
+	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
+	id 1hVsR9-00031j-5L; Wed, 29 May 2019 02:51:48 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+	id 45DLv81Vx9z9sPn; Wed, 29 May 2019 16:50:26 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+	d=gibson.dropbear.id.au; s=201602; t=1559112628;
+	bh=N4Msu5vC5ToRCfQzQVywNNY77GKEdiRxWk6vPULpnQw=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=cMlWuh/+x/9K20YM6e6Jsb418/6kpUa1dwxXB+b50N2F+zaA0vLFZOffNovH7LSEY
+	K2zw7RcZkHfLyUv2o2FmizuyldUasM8cpTdKbLhSUm7JF8AIqdDnOHL9yiLANaQnzQ
+	NcnzJ1OmyoX65YiM/B2KVVGoH5h3lhL/wnBHrKew=
+From: David Gibson <david@gibson.dropbear.id.au>
+To: peter.maydell@linaro.org
+Date: Wed, 29 May 2019 16:50:10 +1000
+Message-Id: <20190529065017.15149-38-david@gibson.dropbear.id.au>
+X-Mailer: git-send-email 2.21.0
+In-Reply-To: <20190529065017.15149-1-david@gibson.dropbear.id.au>
+References: <20190529065017.15149-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20190528223900-mutt-send-email-mst@kernel.org>
-User-Agent: NeoMutt/20180716-1376-5d6ed1
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.39]);
-	Wed, 29 May 2019 07:48:10 +0000 (UTC)
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 0/4] add failover feature for assigned
- network devices
+X-Received-From: 203.11.71.1
+Subject: [Qemu-devel] [PULL 37/44] ppc/xics: fix irq priority in
+ ics_set_irq_type()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -76,36 +69,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pkrempa@redhat.com, berrange@redhat.com, ehabkost@redhat.com,
-	aadam@redhat.com, qemu-devel@nongnu.org,
-	Alex Williamson <alex.williamson@redhat.com>, laine@redhat.com,
-	ailan@redhat.com
+Cc: lvivier@redhat.com, qemu-devel@nongnu.org, groug@kaod.org,
+	qemu-ppc@nongnu.org, clg@kaod.org,
+	David Gibson <david@gibson.dropbear.id.au>, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, May 28, 2019 at 10:40:42PM -0400, Michael S. Tsirkin wrote:
->On Tue, May 21, 2019 at 08:49:18PM +0200, Jens Freimann wrote:
->> On Tue, May 21, 2019 at 07:37:19AM -0400, Michael S. Tsirkin wrote:
->> > On Tue, May 21, 2019 at 09:21:57AM +0200, Jens Freimann wrote:
->> > Actually is there a list of devices for which this has been tested
->> > besides mlx5? I think someone said some old intel cards
->> > don't support this well, we might need to blacklist these ...
->>
->> So far I've tested mlx5 and XL710 which both worked, but I'm
->> working on testing with more devices. But of course help with testing
->> is greatly appreciated.
->
->A testing tool that people can run to get a pass/fail
->result would be needed for that.
->Do you have something like this?
+From: C=C3=A9dric Le Goater <clg@kaod.org>
 
-I have two simple tools. One that sends packets and another one that
-sniffs for packets to see which device the packet goes to. Find it at
-https://github.com/jensfr/netfailover_driver_detect
+Recent commits changed the behavior of ics_set_irq_type() to
+initialize correctly LSIs at the KVM level. ics_set_irq_type() is also
+called by the realize routine of the different devices of the machine
+when initial interrupts are claimed, before the ICSState device is
+reseted.
 
-Feedback and/or patches welcome.
+In the case, the ICSIRQState priority is 0x0 and the call to
+ics_set_irq_type() results in configuring the target of the
+interrupt. On P9, when using the KVM XICS-on-XIVE device, the target
+is configured to be server 0, priority 0 and the event queue 0 is
+created automatically by KVM.
 
-regards,
-Jens 
+With the dual interrupt mode creating the KVM device at reset, it
+leads to unexpected effects on the guest, mostly blocking IPIs. This
+is wrong, fix it by reseting the ICSIRQState structure when
+ics_set_irq_type() is called.
+
+Fixes: commit 6cead90c5c9c ("xics: Write source state to KVM at claim tim=
+e")
+Signed-off-by: Greg Kurz <groug@kaod.org>
+Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+Message-Id: <20190513084245.25755-14-clg@kaod.org>
+Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+---
+ hw/intc/xics.c | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
+
+diff --git a/hw/intc/xics.c b/hw/intc/xics.c
+index af7dc709ab..79f5a8a916 100644
+--- a/hw/intc/xics.c
++++ b/hw/intc/xics.c
+@@ -610,6 +610,12 @@ static const TypeInfo ics_simple_info =3D {
+     .class_size =3D sizeof(ICSStateClass),
+ };
+=20
++static void ics_reset_irq(ICSIRQState *irq)
++{
++    irq->priority =3D 0xff;
++    irq->saved_priority =3D 0xff;
++}
++
+ static void ics_base_reset(DeviceState *dev)
+ {
+     ICSState *ics =3D ICS_BASE(dev);
+@@ -623,8 +629,7 @@ static void ics_base_reset(DeviceState *dev)
+     memset(ics->irqs, 0, sizeof(ICSIRQState) * ics->nr_irqs);
+=20
+     for (i =3D 0; i < ics->nr_irqs; i++) {
+-        ics->irqs[i].priority =3D 0xff;
+-        ics->irqs[i].saved_priority =3D 0xff;
++        ics_reset_irq(ics->irqs + i);
+         ics->irqs[i].flags =3D flags[i];
+     }
+ }
+@@ -760,6 +765,7 @@ void ics_set_irq_type(ICSState *ics, int srcno, bool =
+lsi)
+         lsi ? XICS_FLAGS_IRQ_LSI : XICS_FLAGS_IRQ_MSI;
+=20
+     if (kvm_irqchip_in_kernel()) {
++        ics_reset_irq(ics->irqs + srcno);
+         ics_set_kvm_state_one(ics, srcno);
+     }
+ }
+--=20
+2.21.0
+
 
