@@ -6,60 +6,101 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 52714C28CC0
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 13:47:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CAC7C28CC0
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 13:49:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 18C6622CB8
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 13:47:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 18C6622CB8
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 13A0E22CBD
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 13:49:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 13A0E22CBD
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:54595 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:54730 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hVyv3-0002LL-Az
-	for qemu-devel@archiver.kernel.org; Wed, 29 May 2019 09:47:05 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:47198)
+	id 1hVyxO-0003mN-CN
+	for qemu-devel@archiver.kernel.org; Wed, 29 May 2019 09:49:30 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:48541)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1hVysH-0000Uc-0H
-	for qemu-devel@nongnu.org; Wed, 29 May 2019 09:44:14 -0400
+	(envelope-from <farman@linux.ibm.com>) id 1hVywE-0003Io-Sn
+	for qemu-devel@nongnu.org; Wed, 29 May 2019 09:48:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1hVysF-0008WI-8W
-	for qemu-devel@nongnu.org; Wed, 29 May 2019 09:44:12 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37286)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1hVysF-0008Se-1l
-	for qemu-devel@nongnu.org; Wed, 29 May 2019 09:44:11 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C7F5E3082B71;
-	Wed, 29 May 2019 13:44:01 +0000 (UTC)
-Received: from x1.home (ovpn-116-22.phx2.redhat.com [10.3.116.22])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 2623C600C4;
-	Wed, 29 May 2019 13:43:57 +0000 (UTC)
-Date: Wed, 29 May 2019 07:43:56 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20190529074356.29ab0f7a@x1.home>
-In-Reply-To: <20190528232626-mutt-send-email-mst@kernel.org>
-References: <155786484688.13873.6037015630912983760.stgit@gimli.home>
-	<20190528232626-mutt-send-email-mst@kernel.org>
-Organization: Red Hat
+	(envelope-from <farman@linux.ibm.com>) id 1hVywD-0002dB-Am
+	for qemu-devel@nongnu.org; Wed, 29 May 2019 09:48:18 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:55430)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <farman@linux.ibm.com>)
+	id 1hVywB-0002Zo-Rn
+	for qemu-devel@nongnu.org; Wed, 29 May 2019 09:48:17 -0400
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+	x4TDll6q005325
+	for <qemu-devel@nongnu.org>; Wed, 29 May 2019 09:48:09 -0400
+Received: from e32.co.us.ibm.com (e32.co.us.ibm.com [32.97.110.150])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2sst1vus4w-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 29 May 2019 09:48:08 -0400
+Received: from localhost
+	by e32.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <farman@linux.ibm.com>;
+	Wed, 29 May 2019 14:48:08 +0100
+Received: from b03cxnp08028.gho.boulder.ibm.com (9.17.130.20)
+	by e32.co.us.ibm.com (192.168.1.132) with IBM ESMTP SMTP Gateway:
+	Authorized Use Only! Violators will be prosecuted; 
+	(version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+	Wed, 29 May 2019 14:48:05 +0100
+Received: from b03ledav001.gho.boulder.ibm.com
+	(b03ledav001.gho.boulder.ibm.com [9.17.130.232])
+	by b03cxnp08028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with
+	ESMTP id x4TDm4Yd30736894
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256
+	verify=OK); Wed, 29 May 2019 13:48:04 GMT
+Received: from b03ledav001.gho.boulder.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id EB9B16E04C;
+	Wed, 29 May 2019 13:48:03 +0000 (GMT)
+Received: from b03ledav001.gho.boulder.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 4696D6E056;
+	Wed, 29 May 2019 13:48:00 +0000 (GMT)
+Received: from [9.80.235.171] (unknown [9.80.235.171])
+	by b03ledav001.gho.boulder.ibm.com (Postfix) with ESMTP;
+	Wed, 29 May 2019 13:47:59 +0000 (GMT)
+To: Cornelia Huck <cohuck@redhat.com>, Halil Pasic <pasic@linux.ibm.com>,
+	Farhan Ali <alifm@linux.ibm.com>, Pierre Morel <pmorel@linux.ibm.com>
+References: <20190507154733.28604-1-cohuck@redhat.com>
+	<20190507154733.28604-3-cohuck@redhat.com>
+From: Eric Farman <farman@linux.ibm.com>
+Date: Wed, 29 May 2019 09:47:57 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20190507154733.28604-3-cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.45]);
-	Wed, 29 May 2019 13:44:01 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH for-4.1 v2] q35: Revert to kernel irqchip
+X-TM-AS-GCONF: 00
+x-cbid: 19052913-0004-0000-0000-00001515A10A
+X-IBM-SpamModules-Scores: 
+X-IBM-SpamModules-Versions: BY=3.00011179; HX=3.00000242; KW=3.00000007;
+	PH=3.00000004; SC=3.00000286; SDB=6.01210285; UDB=6.00635855;
+	IPR=6.00991318; 
+	MB=3.00027101; MTD=3.00000008; XFM=3.00000015; UTC=2019-05-29 13:48:07
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19052913-0005-0000-0000-00008BD9A6BB
+Message-Id: <5cee6204-3106-9a99-3620-aa8f4df491aa@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
+	definitions=2019-05-29_07:, , signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+	priorityscore=1501
+	malwarescore=0 suspectscore=2 phishscore=0 bulkscore=0 spamscore=0
+	clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+	mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+	scancount=1 engine=8.0.1-1810050000 definitions=main-1905290091
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 148.163.156.1
+Subject: Re: [Qemu-devel] [PATCH v4 2/2] vfio-ccw: support async command
+ subregion
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -71,156 +112,255 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: berrange@redhat.com, ehabkost@redhat.com, qemu-devel@nongnu.org,
-	peterx@redhat.com, pbonzini@redhat.com, rth@twiddle.net
+Cc: qemu-s390x@nongnu.org, Alex Williamson <alex.williamson@redhat.com>,
+	qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 28 May 2019 23:30:20 -0400
-"Michael S. Tsirkin" <mst@redhat.com> wrote:
 
-> On Tue, May 14, 2019 at 02:14:41PM -0600, Alex Williamson wrote:
-> > Commit b2fc91db8447 ("q35: set split kernel irqchip as default") changed
-> > the default for the pc-q35-4.0 machine type to use split irqchip, which
-> > turned out to have disasterous effects on vfio-pci INTx support.  KVM
-> > resampling irqfds are registered for handling these interrupts, but
-> > these are non-functional in split irqchip mode.  We can't simply test
-> > for split irqchip in QEMU as userspace handling of this interrupt is a
-> > significant performance regression versus KVM handling (GeForce GPUs
-> > assigned to Windows VMs are non-functional without forcing MSI mode or
-> > re-enabling kernel irqchip).
-> > 
-> > The resolution is to revert the change in default irqchip mode in the
-> > pc-q35-4.1 machine and create a pc-q35-4.0.1 machine for the 4.0-stable
-> > branch.  The qemu-q35-4.0 machine type should not be used in vfio-pci
-> > configurations for devices requiring legacy INTx support without
-> > explicitly modifying the VM configuration to use kernel irqchip.
-> > 
-> > Link: https://bugs.launchpad.net/qemu/+bug/1826422
-> > Fixes: b2fc91db8447 ("q35: set split kernel irqchip as default")
-> > Signed-off-by: Alex Williamson <alex.williamson@redhat.com>  
+
+On 5/7/19 11:47 AM, Cornelia Huck wrote:
+> A vfio-ccw device may provide an async command subregion for
+> issuing halt/clear subchannel requests. If it is present, use
+> it for sending halt/clear request to the device; if not, fall
+> back to emulation (as done today).
 > 
-> OK I guess but it's really a kvm patch.
-> So I'd like Paolo to review and merge if appropriate.
+> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+
+This looks fine to me; thanks for the explanations!
+
+Reviewed-by: Eric Farman <farman@linux.ibm.com>
+
+> ---
+>  hw/s390x/css.c              |  27 +++++++--
+>  hw/vfio/ccw.c               | 110 +++++++++++++++++++++++++++++++++++-
+>  include/hw/s390x/s390-ccw.h |   3 +
+>  3 files changed, 134 insertions(+), 6 deletions(-)
 > 
-> Can't say this makes me too happy. split irqchip
-> has a bunch of advantages.
-
-What exactly are those advantages relative to a our default QEMU
-users?  I see lots of users assigning consumer class hardware and
-seeing regressions.  They don't care about a theoretically improved
-security attack surface at the cost of performance for legacy devices,
-or especially functionality.  Should these users be our focus for the
-default machine type?  I think we could make these sorts of compromises
-in a legacy-free or virt/cloud/enterprise machine type, but for a
-general purpose PC emulator, it doesn't seem a good match given the
-issues we have currently.  Obviously users can continue to tune the q35
-machine type on their own and enable split irqchip if it's important to
-them.  Thanks,
-
-Alex
-
-> > ---
-> >  hw/core/machine.c    |    3 +++
-> >  hw/i386/pc.c         |    3 +++
-> >  hw/i386/pc_q35.c     |   16 ++++++++++++++--
-> >  include/hw/boards.h  |    3 +++
-> >  include/hw/i386/pc.h |    3 +++
-> >  5 files changed, 26 insertions(+), 2 deletions(-)
-> > 
-> > diff --git a/hw/core/machine.c b/hw/core/machine.c
-> > index 5d046a43e3d2..e41e6698ac9f 100644
-> > --- a/hw/core/machine.c
-> > +++ b/hw/core/machine.c
-> > @@ -24,6 +24,9 @@
-> >  #include "hw/pci/pci.h"
-> >  #include "hw/mem/nvdimm.h"
-> >  
-> > +GlobalProperty hw_compat_4_0_1[] = {};
-> > +const size_t hw_compat_4_0_1_len = G_N_ELEMENTS(hw_compat_4_0_1);
-> > +
-> >  GlobalProperty hw_compat_4_0[] = {};
-> >  const size_t hw_compat_4_0_len = G_N_ELEMENTS(hw_compat_4_0);
-> >  
-> > diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-> > index d98b737b8f3b..b5311e7e2bd5 100644
-> > --- a/hw/i386/pc.c
-> > +++ b/hw/i386/pc.c
-> > @@ -115,6 +115,9 @@ struct hpet_fw_config hpet_cfg = {.count = UINT8_MAX};
-> >  /* Physical Address of PVH entry point read from kernel ELF NOTE */
-> >  static size_t pvh_start_addr;
-> >  
-> > +GlobalProperty pc_compat_4_0_1[] = {};
-> > +const size_t pc_compat_4_0_1_len = G_N_ELEMENTS(pc_compat_4_0_1);
-> > +
-> >  GlobalProperty pc_compat_4_0[] = {};
-> >  const size_t pc_compat_4_0_len = G_N_ELEMENTS(pc_compat_4_0);
-> >  
-> > diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
-> > index 37dd350511a9..dcddc6466200 100644
-> > --- a/hw/i386/pc_q35.c
-> > +++ b/hw/i386/pc_q35.c
-> > @@ -357,7 +357,7 @@ static void pc_q35_machine_options(MachineClass *m)
-> >      m->units_per_default_bus = 1;
-> >      m->default_machine_opts = "firmware=bios-256k.bin";
-> >      m->default_display = "std";
-> > -    m->default_kernel_irqchip_split = true;
-> > +    m->default_kernel_irqchip_split = false;
-> >      m->no_floppy = 1;
-> >      machine_class_allow_dynamic_sysbus_dev(m, TYPE_AMD_IOMMU_DEVICE);
-> >      machine_class_allow_dynamic_sysbus_dev(m, TYPE_INTEL_IOMMU_DEVICE);
-> > @@ -374,10 +374,22 @@ static void pc_q35_4_1_machine_options(MachineClass *m)
-> >  DEFINE_Q35_MACHINE(v4_1, "pc-q35-4.1", NULL,
-> >                     pc_q35_4_1_machine_options);
-> >  
-> > -static void pc_q35_4_0_machine_options(MachineClass *m)
-> > +static void pc_q35_4_0_1_machine_options(MachineClass *m)
-> >  {
-> >      pc_q35_4_1_machine_options(m);
-> >      m->alias = NULL;
-> > +    compat_props_add(m->compat_props, hw_compat_4_0_1, hw_compat_4_0_1_len);
-> > +    compat_props_add(m->compat_props, pc_compat_4_0_1, pc_compat_4_0_1_len);
-> > +}
-> > +
-> > +DEFINE_Q35_MACHINE(v4_0_1, "pc-q35-4.0.1", NULL,
-> > +                   pc_q35_4_0_1_machine_options);
-> > +
-> > +static void pc_q35_4_0_machine_options(MachineClass *m)
-> > +{
-> > +    pc_q35_4_0_1_machine_options(m);
-> > +    m->default_kernel_irqchip_split = true;
-> > +    m->alias = NULL;
-> >      compat_props_add(m->compat_props, hw_compat_4_0, hw_compat_4_0_len);
-> >      compat_props_add(m->compat_props, pc_compat_4_0, pc_compat_4_0_len);
-> >  }
-> > diff --git a/include/hw/boards.h b/include/hw/boards.h
-> > index 6f7916f88f02..6ff02bf3e472 100644
-> > --- a/include/hw/boards.h
-> > +++ b/include/hw/boards.h
-> > @@ -292,6 +292,9 @@ struct MachineState {
-> >      } \
-> >      type_init(machine_initfn##_register_types)
-> >  
-> > +extern GlobalProperty hw_compat_4_0_1[];
-> > +extern const size_t hw_compat_4_0_1_len;
-> > +
-> >  extern GlobalProperty hw_compat_4_0[];
-> >  extern const size_t hw_compat_4_0_len;
-> >  
-> > diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-> > index 43df7230a22b..5d5636241e34 100644
-> > --- a/include/hw/i386/pc.h
-> > +++ b/include/hw/i386/pc.h
-> > @@ -293,6 +293,9 @@ int e820_add_entry(uint64_t, uint64_t, uint32_t);
-> >  int e820_get_num_entries(void);
-> >  bool e820_get_entry(int, uint32_t, uint64_t *, uint64_t *);
-> >  
-> > +extern GlobalProperty pc_compat_4_0_1[];
-> > +extern const size_t pc_compat_4_0_1_len;
-> > +
-> >  extern GlobalProperty pc_compat_4_0[];
-> >  extern const size_t pc_compat_4_0_len;
-> >    
+> diff --git a/hw/s390x/css.c b/hw/s390x/css.c
+> index 8fc9e35ba5d3..5b21a74b5c29 100644
+> --- a/hw/s390x/css.c
+> +++ b/hw/s390x/css.c
+> @@ -22,6 +22,7 @@
+>  #include "trace.h"
+>  #include "hw/s390x/s390_flic.h"
+>  #include "hw/s390x/s390-virtio-ccw.h"
+> +#include "hw/s390x/s390-ccw.h"
+>  
+>  typedef struct CrwContainer {
+>      CRW crw;
+> @@ -1191,6 +1192,26 @@ static void sch_handle_start_func_virtual(SubchDev *sch)
+>  
+>  }
+>  
+> +static void sch_handle_halt_func_passthrough(SubchDev *sch)
+> +{
+> +    int ret;
+> +
+> +    ret = vfio_ccw_handle_halt(sch);
+> +    if (ret == -ENOSYS) {
+> +        sch_handle_halt_func(sch);
+> +    }
+> +}
+> +
+> +static void sch_handle_clear_func_passthrough(SubchDev *sch)
+> +{
+> +    int ret;
+> +
+> +    ret = vfio_ccw_handle_clear(sch);
+> +    if (ret == -ENOSYS) {
+> +        sch_handle_clear_func(sch);
+> +    }
+> +}
+> +
+>  static IOInstEnding sch_handle_start_func_passthrough(SubchDev *sch)
+>  {
+>      SCHIB *schib = &sch->curr_status;
+> @@ -1230,11 +1251,9 @@ IOInstEnding do_subchannel_work_passthrough(SubchDev *sch)
+>      SCHIB *schib = &sch->curr_status;
+>  
+>      if (schib->scsw.ctrl & SCSW_FCTL_CLEAR_FUNC) {
+> -        /* TODO: Clear handling */
+> -        sch_handle_clear_func(sch);
+> +        sch_handle_clear_func_passthrough(sch);
+>      } else if (schib->scsw.ctrl & SCSW_FCTL_HALT_FUNC) {
+> -        /* TODO: Halt handling */
+> -        sch_handle_halt_func(sch);
+> +        sch_handle_halt_func_passthrough(sch);
+>      } else if (schib->scsw.ctrl & SCSW_FCTL_START_FUNC) {
+>          return sch_handle_start_func_passthrough(sch);
+>      }
+> diff --git a/hw/vfio/ccw.c b/hw/vfio/ccw.c
+> index 31dd3a2a87b6..175a17b1772a 100644
+> --- a/hw/vfio/ccw.c
+> +++ b/hw/vfio/ccw.c
+> @@ -2,9 +2,12 @@
+>   * vfio based subchannel assignment support
+>   *
+>   * Copyright 2017 IBM Corp.
+> + * Copyright 2019 Red Hat, Inc.
+> + *
+>   * Author(s): Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+>   *            Xiao Feng Ren <renxiaof@linux.vnet.ibm.com>
+>   *            Pierre Morel <pmorel@linux.vnet.ibm.com>
+> + *            Cornelia Huck <cohuck@redhat.com>
+>   *
+>   * This work is licensed under the terms of the GNU GPL, version 2 or (at
+>   * your option) any later version. See the COPYING file in the top-level
+> @@ -32,6 +35,9 @@ struct VFIOCCWDevice {
+>      uint64_t io_region_size;
+>      uint64_t io_region_offset;
+>      struct ccw_io_region *io_region;
+> +    uint64_t async_cmd_region_size;
+> +    uint64_t async_cmd_region_offset;
+> +    struct ccw_cmd_region *async_cmd_region;
+>      EventNotifier io_notifier;
+>      bool force_orb_pfch;
+>      bool warned_orb_pfch;
+> @@ -114,6 +120,87 @@ again:
+>      }
+>  }
+>  
+> +int vfio_ccw_handle_clear(SubchDev *sch)
+> +{
+> +    S390CCWDevice *cdev = sch->driver_data;
+> +    VFIOCCWDevice *vcdev = DO_UPCAST(VFIOCCWDevice, cdev, cdev);
+> +    struct ccw_cmd_region *region = vcdev->async_cmd_region;
+> +    int ret;
+> +
+> +    if (!vcdev->async_cmd_region) {
+> +        /* Async command region not available, fall back to emulation */
+> +        return -ENOSYS;
+> +    }
+> +
+> +    memset(region, 0, sizeof(*region));
+> +    region->command = VFIO_CCW_ASYNC_CMD_CSCH;
+> +
+> +again:
+> +    ret = pwrite(vcdev->vdev.fd, region,
+> +                 vcdev->async_cmd_region_size, vcdev->async_cmd_region_offset);
+> +    if (ret != vcdev->async_cmd_region_size) {
+> +        if (errno == EAGAIN) {
+> +            goto again;
+> +        }
+> +        error_report("vfio-ccw: write cmd region failed with errno=%d", errno);
+> +        ret = -errno;
+> +    } else {
+> +        ret = region->ret_code;
+> +    }
+> +    switch (ret) {
+> +    case 0:
+> +    case -ENODEV:
+> +    case -EACCES:
+> +        return 0;
+> +    case -EFAULT:
+> +    default:
+> +        sch_gen_unit_exception(sch);
+> +        css_inject_io_interrupt(sch);
+> +        return 0;
+> +    }
+> +}
+> +
+> +int vfio_ccw_handle_halt(SubchDev *sch)
+> +{
+> +    S390CCWDevice *cdev = sch->driver_data;
+> +    VFIOCCWDevice *vcdev = DO_UPCAST(VFIOCCWDevice, cdev, cdev);
+> +    struct ccw_cmd_region *region = vcdev->async_cmd_region;
+> +    int ret;
+> +
+> +    if (!vcdev->async_cmd_region) {
+> +        /* Async command region not available, fall back to emulation */
+> +        return -ENOSYS;
+> +    }
+> +
+> +    memset(region, 0, sizeof(*region));
+> +    region->command = VFIO_CCW_ASYNC_CMD_HSCH;
+> +
+> +again:
+> +    ret = pwrite(vcdev->vdev.fd, region,
+> +                 vcdev->async_cmd_region_size, vcdev->async_cmd_region_offset);
+> +    if (ret != vcdev->async_cmd_region_size) {
+> +        if (errno == EAGAIN) {
+> +            goto again;
+> +        }
+> +        error_report("vfio-ccw: write cmd region failed with errno=%d", errno);
+> +        ret = -errno;
+> +    } else {
+> +        ret = region->ret_code;
+> +    }
+> +    switch (ret) {
+> +    case 0:
+> +    case -EBUSY:
+> +    case -ENODEV:
+> +    case -EACCES:
+> +        return 0;
+> +    case -EFAULT:
+> +    default:
+> +        sch_gen_unit_exception(sch);
+> +        css_inject_io_interrupt(sch);
+> +        return 0;
+> +    }
+> +}
+> +
+>  static void vfio_ccw_reset(DeviceState *dev)
+>  {
+>      CcwDevice *ccw_dev = DO_UPCAST(CcwDevice, parent_obj, dev);
+> @@ -287,9 +374,13 @@ static void vfio_ccw_get_region(VFIOCCWDevice *vcdev, Error **errp)
+>          return;
+>      }
+>  
+> +    /*
+> +     * We always expect at least the I/O region to be present. We also
+> +     * may have a variable number of regions governed by capabilities.
+> +     */
+>      if (vdev->num_regions < VFIO_CCW_CONFIG_REGION_INDEX + 1) {
+> -        error_setg(errp, "vfio: Unexpected number of the I/O region %u",
+> -                   vdev->num_regions);
+> +        error_setg(errp, "vfio: too few regions (%u), expected at least %u",
+> +                   vdev->num_regions, VFIO_CCW_CONFIG_REGION_INDEX + 1);
+>          return;
+>      }
+>  
+> @@ -309,11 +400,26 @@ static void vfio_ccw_get_region(VFIOCCWDevice *vcdev, Error **errp)
+>      vcdev->io_region_offset = info->offset;
+>      vcdev->io_region = g_malloc0(info->size);
+>  
+> +    /* check for the optional async command region */
+> +    ret = vfio_get_dev_region_info(vdev, VFIO_REGION_TYPE_CCW,
+> +                                   VFIO_REGION_SUBTYPE_CCW_ASYNC_CMD, &info);
+> +    if (!ret) {
+> +        vcdev->async_cmd_region_size = info->size;
+> +        if (sizeof(*vcdev->async_cmd_region) != vcdev->async_cmd_region_size) {
+> +            error_setg(errp, "vfio: Unexpected size of the async cmd region");
+> +            g_free(info);
+> +            return;
+> +        }
+> +        vcdev->async_cmd_region_offset = info->offset;
+> +        vcdev->async_cmd_region = g_malloc0(info->size);
+> +    }
+> +
+>      g_free(info);
+>  }
+>  
+>  static void vfio_ccw_put_region(VFIOCCWDevice *vcdev)
+>  {
+> +    g_free(vcdev->async_cmd_region);
+>      g_free(vcdev->io_region);
+>  }
+>  
+> diff --git a/include/hw/s390x/s390-ccw.h b/include/hw/s390x/s390-ccw.h
+> index 901d805d79a3..e9c7e1db5761 100644
+> --- a/include/hw/s390x/s390-ccw.h
+> +++ b/include/hw/s390x/s390-ccw.h
+> @@ -37,4 +37,7 @@ typedef struct S390CCWDeviceClass {
+>      IOInstEnding (*handle_request) (SubchDev *sch);
+>  } S390CCWDeviceClass;
+>  
+> +int vfio_ccw_handle_clear(SubchDev *sch);
+> +int vfio_ccw_handle_halt(SubchDev *sch);
+> +
+>  #endif
+> 
 
 
