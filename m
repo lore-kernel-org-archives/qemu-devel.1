@@ -2,62 +2,95 @@ Return-Path: <SRS0=DspQ=T5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	T_HK_NAME_DR autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.0 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9EE2CC28CC2
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 10:20:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 348A3C28CC3
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 10:25:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6962E21721
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 10:20:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6962E21721
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 0E26A20B1F
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 10:25:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0E26A20B1F
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:51106 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:51204 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hVvgl-00076k-Mv
-	for qemu-devel@archiver.kernel.org; Wed, 29 May 2019 06:20:07 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:33395)
+	id 1hVvmG-0000ns-9c
+	for qemu-devel@archiver.kernel.org; Wed, 29 May 2019 06:25:48 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:34661)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1hVvf6-00060W-Pd
-	for qemu-devel@nongnu.org; Wed, 29 May 2019 06:18:25 -0400
+	(envelope-from <groug@kaod.org>) id 1hVvlR-0000Ow-1k
+	for qemu-devel@nongnu.org; Wed, 29 May 2019 06:24:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1hVvf4-0001fB-QD
-	for qemu-devel@nongnu.org; Wed, 29 May 2019 06:18:24 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52788)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hVvf2-0001e0-Ua
-	for qemu-devel@nongnu.org; Wed, 29 May 2019 06:18:21 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 6FDFFC0AD2AD
-	for <qemu-devel@nongnu.org>; Wed, 29 May 2019 10:18:11 +0000 (UTC)
-Received: from dgilbert-t580.localhost (unknown [10.36.118.28])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 45EE66A96F;
-	Wed, 29 May 2019 10:18:10 +0000 (UTC)
-From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-To: qemu-devel@nongnu.org, jasowang@redhat.com, eblake@redhat.com,
-	armbru@redhat.com, laine@redhat.com
-Date: Wed, 29 May 2019 11:17:56 +0100
-Message-Id: <20190529101756.22557-3-dgilbert@redhat.com>
-In-Reply-To: <20190529101756.22557-1-dgilbert@redhat.com>
-References: <20190529101756.22557-1-dgilbert@redhat.com>
+	(envelope-from <groug@kaod.org>) id 1hVvlQ-0005gw-0M
+	for qemu-devel@nongnu.org; Wed, 29 May 2019 06:24:57 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:55392
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1hVvlP-0005gS-Sd
+	for qemu-devel@nongnu.org; Wed, 29 May 2019 06:24:55 -0400
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+	x4TAHaOI058618
+	for <qemu-devel@nongnu.org>; Wed, 29 May 2019 06:24:51 -0400
+Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2ssq4uu1ak-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 29 May 2019 06:24:51 -0400
+Received: from localhost
+	by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <groug@kaod.org>;
+	Wed, 29 May 2019 11:24:49 +0100
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (9.149.109.195)
+	by e06smtp05.uk.ibm.com (192.168.101.135) with IBM ESMTP SMTP Gateway:
+	Authorized Use Only! Violators will be prosecuted; 
+	(version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+	Wed, 29 May 2019 11:24:46 +0100
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com
+	(b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+	by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with
+	ESMTP id x4TAOjuf48824524
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256
+	verify=OK); Wed, 29 May 2019 10:24:45 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 36F57A4054;
+	Wed, 29 May 2019 10:24:45 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 00798A405C;
+	Wed, 29 May 2019 10:24:45 +0000 (GMT)
+Received: from bahia.lan (unknown [9.145.189.170])
+	by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+	Wed, 29 May 2019 10:24:44 +0000 (GMT)
+From: Greg Kurz <groug@kaod.org>
+To: qemu-devel@nongnu.org
+Date: Wed, 29 May 2019 12:24:44 +0200
+User-Agent: StGit/unknown-version
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.32]);
-	Wed, 29 May 2019 10:18:16 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v2 2/2] net/announce: Add HMP optional
- interface list
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+x-cbid: 19052910-0020-0000-0000-000003418EC5
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19052910-0021-0000-0000-000021948F12
+Message-Id: <155912548463.2019004.3515830305299809902.stgit@bahia.lan>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
+	definitions=2019-05-29_06:, , signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+	priorityscore=1501
+	malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+	clxscore=1034 lowpriorityscore=0 mlxscore=0 impostorscore=0
+	mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+	scancount=1 engine=8.0.1-1810050000 definitions=main-1905290069
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 148.163.158.5
+Subject: [Qemu-devel] [PATCH] MAINTAINERS: Change maintership of Xen code
+ under hw/9pfs
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -69,129 +102,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Anthony Perard <anthony.perard@citrix.com>,
+	Stefano Stabellini <sstabellini@kernel.org>, Greg Kurz <groug@kaod.org>,
+	Paul Durrant <paul.durrant@citrix.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Xen folks are the actual maintainers for this.
 
-Add the optional interface list to the HMP command.
-
-i.e.
-
-   All interfaces
-        announce_self
-
-   Just the named interfaces:
-        announce_self vn1,vn2
-
-Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Signed-off-by: Greg Kurz <groug@kaod.org>
 ---
- hmp-commands.hx |  6 ++++--
- hmp.c           | 38 +++++++++++++++++++++++++++++++++++++-
- 2 files changed, 41 insertions(+), 3 deletions(-)
+ MAINTAINERS |    3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/hmp-commands.hx b/hmp-commands.hx
-index 3dc421cb6a..1b63372713 100644
---- a/hmp-commands.hx
-+++ b/hmp-commands.hx
-@@ -955,8 +955,8 @@ ETEXI
-=20
-     {
-         .name       =3D "announce_self",
--        .args_type  =3D "",
--        .params     =3D "",
-+        .args_type  =3D "interfaces:s?",
-+        .params     =3D "[interfaces]",
-         .help       =3D "Trigger GARP/RARP announcements",
-         .cmd        =3D hmp_announce_self,
-     },
-@@ -967,6 +967,8 @@ STEXI
- Trigger a round of GARP/RARP broadcasts; this is useful for explicitly u=
-pdating the
- network infrastructure after a reconfiguration or some forms of migratio=
-n.
- The timings of the round are set by the migration announce parameters.
-+An optional comma separated @var{interfaces} list restricts the announce=
- to the
-+named set of interfaces.
- ETEXI
-=20
-     {
-diff --git a/hmp.c b/hmp.c
-index a9665da6ec..f42b47f130 100644
---- a/hmp.c
-+++ b/hmp.c
-@@ -27,6 +27,7 @@
- #include "monitor/monitor.h"
- #include "monitor/qdev.h"
- #include "qapi/error.h"
-+#include "qapi/clone-visitor.h"
- #include "qapi/opts-visitor.h"
- #include "qapi/qapi-builtin-visit.h"
- #include "qapi/qapi-commands-block.h"
-@@ -38,6 +39,7 @@
- #include "qapi/qapi-commands-run-state.h"
- #include "qapi/qapi-commands-tpm.h"
- #include "qapi/qapi-commands-ui.h"
-+#include "qapi/qapi-visit-net.h"
- #include "qapi/qmp/qdict.h"
- #include "qapi/qmp/qerror.h"
- #include "qapi/string-input-visitor.h"
-@@ -67,6 +69,32 @@ static void hmp_handle_error(Monitor *mon, Error **err=
-p)
-     }
- }
-=20
-+/*
-+ * Produce a strList from a comma separated list.
-+ * A NULL or empty input string return NULL.
-+ */
-+static strList *strList_from_comma_list(const char *in)
-+{
-+    strList *res =3D NULL;
-+    strList **hook =3D &res;
-+
-+    while (in && in[0]) {
-+        char *comma =3D strchr(in, ',');
-+        *hook =3D g_new0(strList, 1);
-+
-+        if (comma) {
-+            (*hook)->value =3D g_strndup(in, comma - in);
-+            in =3D comma + 1; /* skip the , */
-+        } else {
-+            (*hook)->value =3D g_strdup(in);
-+            in =3D NULL;
-+        }
-+        hook =3D &(*hook)->next;
-+    }
-+
-+    return res;
-+}
-+
- void hmp_info_name(Monitor *mon, const QDict *qdict)
- {
-     NameInfo *info;
-@@ -1640,7 +1668,15 @@ void hmp_info_snapshots(Monitor *mon, const QDict =
-*qdict)
-=20
- void hmp_announce_self(Monitor *mon, const QDict *qdict)
- {
--    qmp_announce_self(migrate_announce_params(), NULL);
-+    const char *interfaces_str =3D qdict_get_try_str(qdict, "interfaces"=
-);
-+    AnnounceParameters *params =3D QAPI_CLONE(AnnounceParameters,
-+                                            migrate_announce_params());
-+
-+    qapi_free_strList(params->interfaces);
-+    params->interfaces =3D strList_from_comma_list(interfaces_str);
-+    params->has_interfaces =3D params->interfaces !=3D NULL;
-+    qmp_announce_self(params, NULL);
-+    qapi_free_AnnounceParameters(params);
- }
-=20
- void hmp_migrate_cancel(Monitor *mon, const QDict *qdict)
---=20
-2.21.0
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 1f5f8b7a2c37..d00380641796 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -411,7 +411,7 @@ M: Paul Durrant <paul.durrant@citrix.com>
+ L: xen-devel@lists.xenproject.org
+ S: Supported
+ F: */xen*
+-F: hw/9pfs/xen-9p-backend.c
++F: hw/9pfs/xen-9p*
+ F: hw/char/xen_console.c
+ F: hw/display/xenfb.c
+ F: hw/net/xen_nic.c
+@@ -1505,6 +1505,7 @@ virtio-9p
+ M: Greg Kurz <groug@kaod.org>
+ S: Supported
+ F: hw/9pfs/
++X: hw/9pfs/xen-9p*
+ F: fsdev/
+ F: tests/virtio-9p-test.c
+ T: git https://github.com/gkurz/qemu.git 9p-next
 
 
