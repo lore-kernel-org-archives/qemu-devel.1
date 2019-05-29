@@ -2,80 +2,66 @@ Return-Path: <SRS0=DspQ=T5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_NEOMUTT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4606EC28CC0
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 13:21:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 00002C28CC0
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 13:22:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1CE87205F4
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 13:21:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1CE87205F4
+	by mail.kernel.org (Postfix) with ESMTPS id C8FB821721
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 13:22:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C8FB821721
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:54264 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:54268 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hVyWY-0000Db-4W
-	for qemu-devel@archiver.kernel.org; Wed, 29 May 2019 09:21:46 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:42096)
+	id 1hVyX0-0000a0-2y
+	for qemu-devel@archiver.kernel.org; Wed, 29 May 2019 09:22:14 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:42150)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hVyV8-0007v3-OU
-	for qemu-devel@nongnu.org; Wed, 29 May 2019 09:20:19 -0400
+	(envelope-from <kraxel@redhat.com>) id 1hVyVZ-0008Cf-Ih
+	for qemu-devel@nongnu.org; Wed, 29 May 2019 09:20:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hVyV7-00074g-UP
-	for qemu-devel@nongnu.org; Wed, 29 May 2019 09:20:18 -0400
-Received: from mail-wm1-f41.google.com ([209.85.128.41]:38222)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hVyV7-000744-PI
-	for qemu-devel@nongnu.org; Wed, 29 May 2019 09:20:17 -0400
-Received: by mail-wm1-f41.google.com with SMTP id t5so1602868wmh.3
-	for <qemu-devel@nongnu.org>; Wed, 29 May 2019 06:20:17 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-	:date:user-agent:mime-version:in-reply-to:content-language
-	:content-transfer-encoding;
-	bh=YnIcyWSlxmwHrQOxn7L+/vGM87xN2qYHeBQs7WFqtHg=;
-	b=M+6mYH4w8ECvOf6+z8kAqCUCSQNbxEJ/s/vCe6JslfUnSgock3qUKJoz6cjkQuYLXY
-	aVYjXBn6LJtgkjiva4lQ/kFqMiE4vqFerAkRER/o1z5JiBtvEVV4PJg69cDZJwpmJEpo
-	Cs2S+oHBWJZA2kmxccMPZgRPLvRv3jj7oOJFXOq+Jpsu1aJ75T/j8PohpoTEpOGnJmpH
-	VKuHauaEw2d8uP6uK1aHeDj0JkxaHlNTeJ5F0LEz7vNeCwxTkdM/8Z8f94QmdJ/Uuw9t
-	++3fFesM5WdomgP1VhozUmIXi5Ju0en4b9a8ToAmDrZSR046upuoG7PBMdi/IDRTXMAT
-	h/pQ==
-X-Gm-Message-State: APjAAAUaiJKGNnMidDn3bHpJosim2YpW3Re0FUViBThyjJUsLrX2Ge+m
-	qHOXmTAYy2V39XmlKEj7JkNi3w==
-X-Google-Smtp-Source: APXvYqz4kNYSqSZlAdO5JDYpDqVpd6Go61fFpe15p8jtMoAW5LGz/l7z3wqwxfGQXWOEeKjNltdAow==
-X-Received: by 2002:a7b:cbd8:: with SMTP id n24mr6806538wmi.2.1559136015521;
-	Wed, 29 May 2019 06:20:15 -0700 (PDT)
-Received: from [10.32.224.40] (red-hat-inc.vlan560.asr1.mad1.gblx.net.
-	[159.63.51.90]) by smtp.gmail.com with ESMTPSA id
-	205sm6973253wmd.43.2019.05.29.06.20.11
-	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-	Wed, 29 May 2019 06:20:14 -0700 (PDT)
-To: Markus Armbruster <armbru@redhat.com>, Max Filippov <jcmvbkbc@gmail.com>
-References: <87lfyqla7r.fsf@dusky.pond.sub.org>
-	<CAMo8BfKKGgLnw5DxXs=1Mh3EyenyzJxait4Ds9F7d3Y7843QnA@mail.gmail.com>
-	<87ftoxfmpz.fsf@dusky.pond.sub.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
-	url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <e6c16333-ae32-a30c-ec99-a4145a3f30b2@redhat.com>
-Date: Wed, 29 May 2019 15:20:10 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	(envelope-from <kraxel@redhat.com>) id 1hVyVY-0007OC-JD
+	for qemu-devel@nongnu.org; Wed, 29 May 2019 09:20:45 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45980)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1hVyVW-0007K8-IE
+	for qemu-devel@nongnu.org; Wed, 29 May 2019 09:20:44 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+	[10.5.11.22])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 750C681E19;
+	Wed, 29 May 2019 13:20:35 +0000 (UTC)
+Received: from sirius.home.kraxel.org (ovpn-117-131.ams2.redhat.com
+	[10.36.117.131])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 282DC1001E80;
+	Wed, 29 May 2019 13:20:34 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+	id 6611116E08; Wed, 29 May 2019 15:20:33 +0200 (CEST)
+Date: Wed, 29 May 2019 15:20:33 +0200
+From: Gerd Hoffmann <kraxel@redhat.com>
+To: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20190529132033.cdjuguiwn2tg22lp@sirius.home.kraxel.org>
+References: <20190528204331.5280-1-kraxel@redhat.com>
+	<20190529131652.7ae89190@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <87ftoxfmpz.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190529131652.7ae89190@redhat.com>
+User-Agent: NeoMutt/20180716
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.25]);
+	Wed, 29 May 2019 13:20:35 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-	[fuzzy]
-X-Received-From: 209.85.128.41
-Subject: Re: [Qemu-devel] Headers without multiple inclusion guards
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH] q35: fix mmconfig and PCI0._CRS
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -87,67 +73,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
-	Dmitry Fleytman <dmitry.fleytman@gmail.com>,
-	Sagar Karandikar <sagark@eecs.berkeley.edu>,
-	"Michael S. Tsirkin" <mst@redhat.com>, James Hogan <jhogan@kernel.org>,
-	Anthony Green <green@moxielogic.com>, Palmer Dabbelt <palmer@sifive.com>,
-	Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
-	qemu-devel <qemu-devel@nongnu.org>,
-	=?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
-	Alistair Francis <Alistair.Francis@wdc.com>,
-	Gerd Hoffmann <kraxel@redhat.com>,
-	"Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
-	Guan Xuetao <gxt@mprc.pku.edu.cn>, Marek Vasut <marex@denx.de>,
-	Stefano Stabellini <sstabellini@kernel.org>,
-	Aleksandar Rikalo <arikalo@wavecomp.com>, Helge Deller <deller@gmx.de>,
-	David Hildenbrand <david@redhat.com>, Halil Pasic <pasic@linux.ibm.com>,
-	Christian Borntraeger <borntraeger@de.ibm.com>,
-	Anthony Perard <anthony.perard@citrix.com>,
-	David Gibson <david@gibson.dropbear.id.au>,
-	Laszlo Ersek <lersek@redhat.com>, Jason Wang <jasowang@redhat.com>,
-	Artyom Tarasenko <atar4qemu@gmail.com>,
-	Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
-	Alistair Francis <alistair@alistair23.me>,
-	Eduardo Habkost <ehabkost@redhat.com>,
-	Riku Voipio <riku.voipio@iki.fi>, Greg Kurz <groug@kaod.org>,
-	Marcelo Tosatti <mtosatti@redhat.com>,
-	Beniamino Galvani <b.galvani@gmail.com>,
-	Eric Auger <eric.auger@redhat.com>, Paul Durrant <paul.durrant@citrix.com>,
-	Stafford Horne <shorne@gmail.com>,
-	=?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
-	Richard Henderson <rth@twiddle.net>,
-	"Daniel P. Berrange" <berrange@redhat.com>,
-	Claudio Fontana <claudio.fontana@gmail.com>,
-	Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
-	Chris Wulff <crwulff@gmail.com>,
-	Claudio Fontana <claudio.fontana@huawei.com>,
-	Laurent Vivier <laurent@vivier.eu>,
-	Andrew Baumann <Andrew.Baumann@microsoft.com>,
-	Michael Walle <michael@walle.cc>,
-	Aleksandar Markovic <amarkovic@wavecomp.com>,
-	Cornelia Huck <cohuck@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
-	Aurelien Jarno <aurelien@aurel32.net>
+Cc: Eduardo Habkost <ehabkost@redhat.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	=?utf-8?B?TMOhc3psw7Mgw4lyc2Vr?= <lersek@redhat.com>,
+	Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/29/19 2:51 PM, Markus Armbruster wrote:
-> Max Filippov <jcmvbkbc@gmail.com> writes:
+On Wed, May 29, 2019 at 01:16:52PM +0200, Igor Mammedov wrote:
+> On Tue, 28 May 2019 22:43:31 +0200
+> Gerd Hoffmann <kraxel@redhat.com> wrote:
 > 
->> On Tue, May 28, 2019 at 11:12 AM Markus Armbruster <armbru@redhat.com> wrote:
->>> target/xtensa/helper.h
->> Intentional.
->>
->>> target/xtensa/overlay_tool.h
->> Unintentional.
->>
->>> target/xtensa/xtensa-isa.h
->> It's a one-liner that includes another header.
+> > This patch changes the handling of the mmconfig area.  Thanks to the
+> > pci(e) expander devices we already have the logic to exclude address
+> > ranges from PCI0._CRS.  We can simply add the mmconfig address range
+> > to the list get it excluded as well.
+> > 
+> > With that in place we can go with a fixed pci hole which covers the
+> > whole area from the end of (low) ram to the ioapic.
+> > 
+> > This will make the whole logic alot less fragile.  No matter where the
+> > firmware places the mmconfig xbar, things should work correctly.  The
+> > guest also gets a bit more PCI address space (seabios boot):
+> > 
+> >     # cat /proc/iomem
+> >     [ ... ]
+> >     7ffdd000-7fffffff : reserved
+> >     80000000-afffffff : PCI Bus 0000:00            <<-- this is new
+> >     b0000000-bfffffff : PCI MMCONFIG 0000 [bus 00-ff]
+> >       b0000000-bfffffff : reserved
+> >     c0000000-febfffff : PCI Bus 0000:00
+> >       f8000000-fbffffff : 0000:00:01.0
+> >     [ ... ]
+> > 
+> > So this is a guest visible change.
 > 
-> Feels like a bad idea, but it doesn't bother me right now.
+> My impression was that QEMU would/should add into CRS whatever bars
+> firmware programmed (and it looks like QEMU doesn't do it right).
 
-I think include/hw/xtensa/xtensa-isa.h is misplaced, it should be in
-target/xtensa/xtensa-isa.h, but since disas/xtensa.c includes it, it
-ended in include/.
+Well, that works reasonable well.  It looks at all pci bars.  The ones
+which do not belong to PCI0 are added to their pci(e) expander.  All
+remaining address space of the pci hole is added to PCI0.  At times
+things look a bit odd as all unused ranges go to PCI0 even in cases like
+this one:
+
+[ ... ]
+84a00000-85203fff : PCI Bus 0000:40
+  84a00000-84bfffff : PCI Bus 0000:44
+  84c00000-84dfffff : PCI Bus 0000:43
+  84e00000-84ffffff : PCI Bus 0000:42
+  85000000-851fffff : PCI Bus 0000:41
+  85200000-85200fff : 0000:40:02.3
+  85201000-85201fff : 0000:40:02.2
+  85202000-85202fff : 0000:40:02.1
+  85203000-85203fff : 0000:40:02.0
+85204000-853fffff : PCI Bus 0000:00   <<-- this could be given to PCI Bus 0000:40
+85400000-85c03fff : PCI Bus 0000:80
+  85400000-855fffff : PCI Bus 0000:84
+[ ... ]
+
+but that is more or less cosmetical.
+
+> So I'm not really fond of adding bigger hole just to paper over
+> existing bug (still might be the way to go). Let me ponder a bit
+> on it and look into what's isn't working on QEMU side properly.
+
+Basically qemu assumes the (32bit) pci hole starts above the mmconfig
+bar.  The pci hole should start above low memory though, like it does
+on 'pc'.  And the mmconfig bar should be excluded.
+
+cheers,
+  Gerd
+
 
