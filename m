@@ -2,67 +2,66 @@ Return-Path: <SRS0=DspQ=T5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 58A13C04AB3
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 08:55:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E4C78C28CC0
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 08:58:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 228CE21019
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 08:55:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 228CE21019
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id BC7FE20B7C
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 08:58:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BC7FE20B7C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:50101 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:50172 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hVuMq-00057Q-DU
-	for qemu-devel@archiver.kernel.org; Wed, 29 May 2019 04:55:28 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:45469)
+	id 1hVuQ9-0006ty-37
+	for qemu-devel@archiver.kernel.org; Wed, 29 May 2019 04:58:53 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:46566)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hVuKy-0003tQ-Nb
-	for qemu-devel@nongnu.org; Wed, 29 May 2019 04:53:33 -0400
+	(envelope-from <imammedo@redhat.com>) id 1hVuPN-0006Z5-N8
+	for qemu-devel@nongnu.org; Wed, 29 May 2019 04:58:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hVuKx-0002m4-Fe
-	for qemu-devel@nongnu.org; Wed, 29 May 2019 04:53:32 -0400
-Received: from mout.kundenserver.de ([212.227.126.131]:49327)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1hVuKx-0002lD-7M
-	for qemu-devel@nongnu.org; Wed, 29 May 2019 04:53:31 -0400
-Received: from localhost.localdomain ([78.238.229.36]) by
-	mrelayeu.kundenserver.de (mreue012 [212.227.15.167]) with ESMTPSA
-	(Nemesis)
-	id 1MiMIY-1gzbiB2sWE-00fVo0; Wed, 29 May 2019 10:48:09 +0200
-From: Laurent Vivier <laurent@vivier.eu>
-To: qemu-devel@nongnu.org
-Date: Wed, 29 May 2019 10:48:04 +0200
-Message-Id: <20190529084804.25950-1-laurent@vivier.eu>
-X-Mailer: git-send-email 2.20.1
+	(envelope-from <imammedo@redhat.com>) id 1hVuPM-0005AJ-Hl
+	for qemu-devel@nongnu.org; Wed, 29 May 2019 04:58:05 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49298)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1hVuPM-0005A0-9P
+	for qemu-devel@nongnu.org; Wed, 29 May 2019 04:58:04 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+	[10.5.11.23])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 3078B308795E;
+	Wed, 29 May 2019 08:58:03 +0000 (UTC)
+Received: from localhost (unknown [10.43.2.182])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 6CEC01A4D9;
+	Wed, 29 May 2019 08:57:54 +0000 (UTC)
+Date: Wed, 29 May 2019 10:57:50 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+To: Wei Yang <richardw.yang@linux.intel.com>
+Message-ID: <20190529105750.696fe6d2@redhat.com>
+In-Reply-To: <20190529003214.GA24428@richard>
+References: <20190411071739.22889-1-richardw.yang@linux.intel.com>
+	<20190527142114.521ab953@redhat.com>
+	<20190528013548.GA8813@richard>
+	<20190528142627.6841e91a@redhat.com>
+	<20190529003214.GA24428@richard>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:qNNE4MHroailQjdAGeAkz+vvhAr7BxeOWnGs00bVrILyPvufVFW
-	mlTzwcWDdYZlj9sVwNBMdRXN+9YuczBVHFZRPi4Y3vIVFqi3ZUx0Ne/IEsuSpgk09DaGpXn
-	pGfmZ4+ZVklIklvyIReBv+hg3TuC5u5HAz00QPkrvNBr51IiayFRLvgqvQ3Ad+BoZbsakVQ
-	xDM2d6Jon047WnLW725lw==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:cGUg4oRVVM4=:iN6xlREUjcKqb7aqNjYv7h
-	axhiq50sz9NnEKzY8VgUnxbNRjAnhPbcs6qTAfrE5VWnaRqA9HNdEbGEjv8kVHP5GB/waFfuO
-	+2zJoN/5MZ/m/YOu3kQQPx4xYS7VJKaSTQ4Bxd2Bpkp6Y4RJiDNjlQQg5qo0vxvlpOTTueAGD
-	uhGwI8rv+cTG3QpEWHsqp3Wc75xWBH8JVaw3hom6LrXwTh8HywuDSRwYa9HLQvfEbSSP/aTgr
-	96LgEkFqWTFhMJqPhf1GAKs8TFSmO1Rb8UCkra1Sj0uT2z+vI3xvQmEghxs5wk4ag7d/Sntgs
-	eOMZRiWn1VxSZ/8/0c75K5S5y3gL5740OnXT6U7VXsDEG4w8lyZ+ymlfcQe/k0y2eDrBVOf7k
-	imPFTDAc3g8TpolauNhP4LeaCOtalQPNgHIZ0vo8bvm6HTR8yp0TlMWbLPhnwt6blXzM/ZwEy
-	JPECOeFJD8mr1DHm7TcAjzEGceSHyE6YG5sXtg8MvpPXrjLNynsiQA6NunHeEdyJDWJn7K6Sx
-	YFYRA2+yZgCpGbHZ/7YJefq6+mhIGpSAIYczNJz49jUN99v/LWWRpXmhwa97Ys/gD31DH+BZG
-	iQhrTx6ORyMrqf70KMLAWpbosjJmeHqH2QEMG7TtSz8ZMRYDzXY+2FT/ykMo/monkzMmN+ykX
-	T0hGYNB1Eu8e364WaY0d+HTneVV3sPRogTErfyicDrvkbn0AHjS/XNxT5T68Jj5UKs5Bj3blR
-	RINIc+fQOe5HakEsJSzj3IW2P5GfeVJ/hblQUA==
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.45]);
+	Wed, 29 May 2019 08:58:03 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.126.131
-Subject: [Qemu-devel] [PATCH v2] linux-user: emulate msgsnd(),
- msgrcv() and semtimedop()
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH] hw/i386/pc: check apci hotplug capability
+ before nvdimm's
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -74,160 +73,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Cornelia Huck <cohuck@redhat.com>,
-	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
-	Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>,
-	=?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
-	Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Cc: pbonzini@redhat.com, thuth@redhat.com, rth@twiddle.net,
+	qemu-devel@nongnu.org, ehabkost@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-When we have updated kernel headers to 5.2-rc1 we have introduced
-new syscall numbers that can be not supported by older kernels
-and fail with ENOSYS while the guest emulation succeeded before
-because the syscalls were emulated with ipc().
+On Wed, 29 May 2019 08:32:14 +0800
+Wei Yang <richardw.yang@linux.intel.com> wrote:
 
-This patch fixes the problem by using ipc() if the new syscall
-returns ENOSYS.
+> On Tue, May 28, 2019 at 02:26:27PM +0200, Igor Mammedov wrote:
+> >On Tue, 28 May 2019 09:35:48 +0800
+> >Wei Yang <richardw.yang@linux.intel.com> wrote:
+> >  
+> >> On Mon, May 27, 2019 at 02:21:14PM +0200, Igor Mammedov wrote:  
+> >> >On Thu, 11 Apr 2019 15:17:39 +0800
+> >> >Wei Yang <richardw.yang@linux.intel.com> wrote:
+> >> >    
+> >> >> pc_memory_pre_plug() is called during hotplug for both pc-dimm and
+> >> >> nvdimm. This is more proper to check apci hotplug capability before
+> >> >> check nvdimm specific capability.    
+> >> >not sure what this about.
+> >> >Currently we are checking if ACPI is enabled
+> >> >  if (!pcms->acpi_dev || !acpi_enabled) { ...
+> >> >before nvdimm check and it looks better to me that we cancel
+> >> >nvdimm hotplug earlier than passing it to
+> >> >    hotplug_handler_pre_plug(pcms->acpi_dev, dev, &local_err)
+> >> >with this patch ACPI device handler will be called before
+> >> >nvdimm check happens, so it's +1 unnecessary call chain in
+> >> >the case of nvdimm, which I'd rather not have.
+> >> >
+> >> >Are there any issues with current call flow?
+> >> >(commit message doesn't really explaining why we need this patch)
+> >> >    
+> >> 
+> >> My idea is to check more generic requirement and then specific one.
+> >> 
+> >> For example, the call flow looks like this:
+> >> 
+> >> pc_memory_pre_plug
+> >> 
+> >>     piix4_device_pre_plug_cb | ich9_pm_device_pre_plug_cb
+> >>         if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM) &&
+> >>             !lpc->pm.acpi_memory_hotplug.is_enabled)
+> >> 
+> >>     if (is_nvdimm && !ms->nvdimms_state->is_enabled)
+> >>     
+> >> 
+> >> In hotplug_handler_pre_plug(), it checks the acpi hotplug capability. And then
+> >> if it has memory hotplug capability and is nvdimm, we check whether nvdimm is
+> >> enabled.  
+> >
+> >I don't think pc_memory_pre_plug() should rely on what hotplug_handler_pre_plug()
+> >checks or does. Similarly the later is taking care of whatever piix4 needs to care
+> >and shouldn't care about what machine code does.
+> >  
+> 
+> Agree. It is not proper to let hotplug_handler_pre_plug() take care about
+> machine code.
+> 
+> >Moreover when hotplug_handler_pre_plug() starts to reserve resources, then
+> >if you move check as suggested you'd need to rollback all that
+> >hotplug_handler_pre_plug() done to gracefully abort hotplug.
+> >  
+> 
+> Confused.
+> 
+> hotplug_handler_pre_plug() doesn't reserve resources.
 
-Fixes: 86e636951ddc ("linux-user: fix __NR_semtimedop undeclared error")
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
----
 
-Notes:
-    v2: replace ENOSYS by TARGET_ENOSYS
+it's not currently, but if it would it would not work with your patch properly
+or break unexpectedly since whoever would change hotplug_handler_pre_plug()
+might not notice that machine code need to be taken care of.
 
- linux-user/syscall.c      | 61 +++++++++++++++++++--------------------
- linux-user/syscall_defs.h |  1 +
- 2 files changed, 31 insertions(+), 31 deletions(-)
+Try to consider devices and machine as separate libraries. Which should
+in reasonable limits be independent and work through documented interfaces.
+In that case likehood of breaking something would be less than relying on
+current code impl./call order with implicit inter-dependencies. 
 
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index 5e29e675e9cf..9ecbac463385 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -763,50 +763,21 @@ safe_syscall2(int, nanosleep, const struct timespec *, req,
- safe_syscall4(int, clock_nanosleep, const clockid_t, clock, int, flags,
-               const struct timespec *, req, struct timespec *, rem)
- #endif
--#if !defined(__NR_msgsnd) || !defined(__NR_msgrcv) || !defined(__NR_semtimedop)
--/* This host kernel architecture uses a single ipc syscall; fake up
-- * wrappers for the sub-operations to hide this implementation detail.
-- * Annoyingly we can't include linux/ipc.h to get the constant definitions
-- * for the call parameter because some structs in there conflict with the
-- * sys/ipc.h ones. So we just define them here, and rely on them being
-- * the same for all host architectures.
-- */
--#define Q_SEMTIMEDOP 4
--#define Q_MSGSND 11
--#define Q_MSGRCV 12
--#define Q_IPCCALL(VERSION, OP) ((VERSION) << 16 | (OP))
--
-+#ifdef __NR_ipc
- safe_syscall6(int, ipc, int, call, long, first, long, second, long, third,
-               void *, ptr, long, fifth)
- #endif
- #ifdef __NR_msgsnd
- safe_syscall4(int, msgsnd, int, msgid, const void *, msgp, size_t, sz,
-               int, flags)
--#else
--static int safe_msgsnd(int msgid, const void *msgp, size_t sz, int flags)
--{
--    return safe_ipc(Q_IPCCALL(0, Q_MSGSND), msgid, sz, flags, (void *)msgp, 0);
--}
- #endif
- #ifdef __NR_msgrcv
- safe_syscall5(int, msgrcv, int, msgid, void *, msgp, size_t, sz,
-               long, msgtype, int, flags)
--#else
--static int safe_msgrcv(int msgid, void *msgp, size_t sz, long type, int flags)
--{
--    return safe_ipc(Q_IPCCALL(1, Q_MSGRCV), msgid, sz, flags, msgp, type);
--}
- #endif
- #ifdef __NR_semtimedop
- safe_syscall4(int, semtimedop, int, semid, struct sembuf *, tsops,
-               unsigned, nsops, const struct timespec *, timeout)
--#else
--static int safe_semtimedop(int semid, struct sembuf *tsops, unsigned nsops,
--                           const struct timespec *timeout)
--{
--    return safe_ipc(Q_IPCCALL(0, Q_SEMTIMEDOP), semid, nsops, 0, tsops,
--                    (long)timeout);
--}
- #endif
- #if defined(TARGET_NR_mq_open) && defined(__NR_mq_open)
- safe_syscall5(int, mq_timedsend, int, mqdes, const char *, msg_ptr,
-@@ -3530,11 +3501,21 @@ static inline abi_long target_to_host_sembuf(struct sembuf *host_sembuf,
- static inline abi_long do_semop(int semid, abi_long ptr, unsigned nsops)
- {
-     struct sembuf sops[nsops];
-+    abi_long ret;
- 
-     if (target_to_host_sembuf(sops, ptr, nsops))
-         return -TARGET_EFAULT;
- 
--    return get_errno(safe_semtimedop(semid, sops, nsops, NULL));
-+    ret = -TARGET_ENOSYS;
-+#ifdef __NR_semtimedop
-+    ret = get_errno(safe_semtimedop(semid, sops, nsops, NULL));
-+#endif
-+#ifdef __NR_ipc
-+    if (ret == -TARGET_ENOSYS) {
-+        ret = get_errno(safe_ipc(IPCOP_semtimedop, semid, nsops, 0, sops, 0));
-+    }
-+#endif
-+    return ret;
- }
- 
- struct target_msqid_ds
-@@ -3689,7 +3670,16 @@ static inline abi_long do_msgsnd(int msqid, abi_long msgp,
-     }
-     host_mb->mtype = (abi_long) tswapal(target_mb->mtype);
-     memcpy(host_mb->mtext, target_mb->mtext, msgsz);
-+    ret = -TARGET_ENOSYS;
-+#ifdef __NR_msgsnd
-     ret = get_errno(safe_msgsnd(msqid, host_mb, msgsz, msgflg));
-+#endif
-+#ifdef __NR_ipc
-+    if (ret == -TARGET_ENOSYS) {
-+        ret = get_errno(safe_ipc(IPCOP_msgsnd, msqid, msgsz, msgflg,
-+                                 host_mb, 0));
-+    }
-+#endif
-     g_free(host_mb);
-     unlock_user_struct(target_mb, msgp, 0);
- 
-@@ -3717,7 +3707,16 @@ static inline abi_long do_msgrcv(int msqid, abi_long msgp,
-         ret = -TARGET_ENOMEM;
-         goto end;
-     }
-+    ret = -TARGET_ENOSYS;
-+#ifdef __NR_msgrcv
-     ret = get_errno(safe_msgrcv(msqid, host_mb, msgsz, msgtyp, msgflg));
-+#endif
-+#ifdef __NR_ipc
-+    if (ret == -TARGET_ENOSYS) {
-+        ret = get_errno(safe_ipc(IPCOP_CALL(1, IPCOP_msgrcv), msqid, msgsz,
-+                        msgflg, host_mb, msgtyp));
-+    }
-+#endif
- 
-     if (ret > 0) {
-         abi_ulong target_mtext_addr = msgp + sizeof(abi_ulong);
-diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
-index 7f141f699c1a..3175440e9dd9 100644
---- a/linux-user/syscall_defs.h
-+++ b/linux-user/syscall_defs.h
-@@ -32,6 +32,7 @@
- #define TARGET_SYS_RECVMMSG     19        /* recvmmsg()            */
- #define TARGET_SYS_SENDMMSG     20        /* sendmmsg()            */
- 
-+#define IPCOP_CALL(VERSION, OP) ((VERSION) << 16 | (OP))
- #define IPCOP_semop		1
- #define IPCOP_semget		2
- #define IPCOP_semctl		3
--- 
-2.20.1
+> pc_dimm_pre_plug() does.
+> 
+> I didn't plan to move the code after pc_dimm_pre_plug().
+> 
+> >So I'd leave the code as it is now, since it doesn't depend on concrete
+> >hotplug_handler_pre_plug() implementation and won't break if
+> >hotplug_handler_pre_plug() will start consuming resources (which could
+> >happen and you won't even notice it since changed code is in piix4/q35
+> >files when reviewing patches).  
+> >> This is why I suggest to change the order here. No functional issue for
+> >> current code.
+> >>   
+> 
 
 
