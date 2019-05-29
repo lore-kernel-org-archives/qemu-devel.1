@@ -2,63 +2,87 @@ Return-Path: <SRS0=DspQ=T5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 57851C04AB3
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 07:25:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4AAA2C04AB3
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 07:25:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 21374208CB
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 07:25:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 18BFA21019
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 07:25:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="T2LjsQCL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 21374208CB
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Yh8u7qAa"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 18BFA21019
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:48938 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:48943 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hVsxt-0003tH-BW
-	for qemu-devel@archiver.kernel.org; Wed, 29 May 2019 03:25:37 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:47621)
+	id 1hVsyA-0004F3-8F
+	for qemu-devel@archiver.kernel.org; Wed, 29 May 2019 03:25:54 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:53307)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1hVsQ1-0008FF-SZ
-	for qemu-devel@nongnu.org; Wed, 29 May 2019 02:50:39 -0400
+	(envelope-from <elohimes@gmail.com>) id 1hVsjn-0000c8-A5
+	for qemu-devel@nongnu.org; Wed, 29 May 2019 03:11:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1hVsQ0-0002ZZ-Gn
-	for qemu-devel@nongnu.org; Wed, 29 May 2019 02:50:37 -0400
-Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:52713 helo=ozlabs.org)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
-	id 1hVsQ0-0002WZ-3f; Wed, 29 May 2019 02:50:36 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
-	id 45DLv22kJJz9sND; Wed, 29 May 2019 16:50:21 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-	d=gibson.dropbear.id.au; s=201602; t=1559112622;
-	bh=4StR73JNWFQ1/thi09NsdrDUvCBxTXO3YWUSa+PeIXs=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=T2LjsQCLgdOXCkgcvuyxyQehkf/CJJ/gfvPGgl20eLeK+3j95QLRjDtpi0hnjwtre
-	bvXfNt3LV2gVHlRoYoWjy7cuLlhJJedzKurPWyHyvGCTTzLT1G6aqM3RsHSLFHJ6h0
-	K4ZPmeDrcAltw+3C72YgPgstGnrLi6fWQHjkx0BM=
-From: David Gibson <david@gibson.dropbear.id.au>
-To: peter.maydell@linaro.org
-Date: Wed, 29 May 2019 16:49:38 +1000
-Message-Id: <20190529065017.15149-6-david@gibson.dropbear.id.au>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20190529065017.15149-1-david@gibson.dropbear.id.au>
-References: <20190529065017.15149-1-david@gibson.dropbear.id.au>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <elohimes@gmail.com>) id 1hVsjm-0006SS-9J
+	for qemu-devel@nongnu.org; Wed, 29 May 2019 03:11:03 -0400
+Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:33772)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <elohimes@gmail.com>) id 1hVsjm-0006Rm-4Z
+	for qemu-devel@nongnu.org; Wed, 29 May 2019 03:11:02 -0400
+Received: by mail-pl1-x643.google.com with SMTP id g21so673082plq.0
+	for <qemu-devel@nongnu.org>; Wed, 29 May 2019 00:11:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+	h=from:to:cc:subject:date:message-id:in-reply-to:references;
+	bh=U0Mx+YreHQRLB91RmN0bCzlScT5GPJ9gYEH0yygk22I=;
+	b=Yh8u7qAa+gm1IgAdJvgF+dQVqowHj+EIH/1ZcE6ssV/lKulMZ0mWCuoGD1iX/3F1OQ
+	w1uxWPtvrPIC1HRk6yidkJyJk+xK3NPVQGar2qqQ8GqYOPDnm+Xuvo/OO/ESmwObCwqB
+	ksLvdUD5bx213A2uy0NSJ1R0EMB223Dultb2IKtks97LNPsOVp/aGFEZl/zb0rWcHqC+
+	ybIpuVpbxmODClIGSBVjXTX+nvdVEjg8Q//EVlPVwmnccdkBGCDbw+6yKPgcK9riuYG1
+	RdjM9J9axFDqEmM6sJXuz15FNU5ZSewlWvqrthABshy0x01lvlKOS/usC3ayveg2m5ni
+	Ir3Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+	:references;
+	bh=U0Mx+YreHQRLB91RmN0bCzlScT5GPJ9gYEH0yygk22I=;
+	b=HKUNHvlHOWfg1C8N6eRcK/h5uSRISTRyCzHHJxZwNHtPpfMnsQ+7ZqZrXWhJI6b0o0
+	B0+HZhsK9SDsU2mcYHxcBy0YJnztujzjsMoeURtcPL4BBPeEZhDwkPEPe9bODkf4O7VZ
+	Dqf3cmtP9HS0oB3F5qIK6YfErKr9DpT1laSE5YDSWZ9QQLn9EM7v5Yyq/dZ261AVVrOA
+	oBkskwGuBvXvHLp2kwqVN8eUdu/I1NycNAGZZEzWTG5xrejsapa5tgovcu1OOI9pdftB
+	khhUo3AddxVc+/B7iF2sEoncHudGqQJbTYwxOdJMLsHU3rlQTjZB1Zgdycw+qoknzxYm
+	Nz3g==
+X-Gm-Message-State: APjAAAXI7nG/4d4MetR9zDwojSmAiQcBwSYkUAbyrC+Q23VqEW09CpdY
+	WGtuIkADA5dKCnANLWABG9G6DQQW
+X-Google-Smtp-Source: APXvYqzKOGBL90ccywgTotQmecQj/JHDq3LGi8Lm9hVJuY0jvjyQhbz1wxtW1n5kCc41CQHHLcto2g==
+X-Received: by 2002:a17:902:2947:: with SMTP id
+	g65mr118403751plb.115.1559113861345; 
+	Wed, 29 May 2019 00:11:01 -0700 (PDT)
+Received: from localhost ([116.247.112.152]) by smtp.gmail.com with ESMTPSA id
+	n12sm15493682pgq.54.2019.05.29.00.11.00
+	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+	Wed, 29 May 2019 00:11:00 -0700 (PDT)
+From: elohimes@gmail.com
+X-Google-Original-From: xieyongji@baidu.com
+To: mst@redhat.com,
+	groug@kaod.org,
+	dgilbert@redhat.com
+Date: Wed, 29 May 2019 15:09:53 +0800
+Message-Id: <20190529070955.25565-4-xieyongji@baidu.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20190529070955.25565-1-xieyongji@baidu.com>
+References: <20190529070955.25565-1-xieyongji@baidu.com>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2401:3900:2:1::2
-Subject: [Qemu-devel] [PULL 05/44] hw/ppc/prep: use TYPE_MC146818_RTC
- instead of a hardcoded string
+X-Received-From: 2607:f8b0:4864:20::643
+Subject: [Qemu-devel] [PATCH 3/5] virtio: Make sure we get correct state of
+ device on handle_aio_output()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -70,39 +94,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: lvivier@redhat.com, qemu-devel@nongnu.org, groug@kaod.org,
-	qemu-ppc@nongnu.org, clg@kaod.org,
-	David Gibson <david@gibson.dropbear.id.au>,
-	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
-	rth@twiddle.net
+Cc: Xie Yongji <xieyongji@baidu.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+From: Xie Yongji <xieyongji@baidu.com>
 
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Message-Id: <20190505152839.18650-2-philmd@redhat.com>
-Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+We should set the flags: "start_on_kick" and "started" after we call
+the kick functions (handle_aio_output() and handle_output()).
+
+Signed-off-by: Xie Yongji <xieyongji@baidu.com>
 ---
- hw/ppc/prep.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ hw/virtio/virtio.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/hw/ppc/prep.c b/hw/ppc/prep.c
-index b7f459d475..ebee321148 100644
---- a/hw/ppc/prep.c
-+++ b/hw/ppc/prep.c
-@@ -601,7 +601,7 @@ static int prep_set_cmos_checksum(DeviceState *dev, v=
-oid *opaque)
-     uint16_t checksum =3D *(uint16_t *)opaque;
-     ISADevice *rtc;
-=20
--    if (object_dynamic_cast(OBJECT(dev), "mc146818rtc")) {
-+    if (object_dynamic_cast(OBJECT(dev), TYPE_MC146818_RTC)) {
-         rtc =3D ISA_DEVICE(dev);
-         rtc_set_memory(rtc, 0x2e, checksum & 0xff);
-         rtc_set_memory(rtc, 0x3e, checksum & 0xff);
---=20
-2.21.0
+diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
+index 4d4ff67791..8a81374492 100644
+--- a/hw/virtio/virtio.c
++++ b/hw/virtio/virtio.c
+@@ -1575,11 +1575,11 @@ void virtio_queue_notify(VirtIODevice *vdev, int n)
+         event_notifier_set(&vq->host_notifier);
+     } else if (vq->handle_output) {
+         vq->handle_output(vdev, vq);
+-    }
+ 
+-    if (unlikely(vdev->start_on_kick)) {
+-        vdev->started = true;
+-        vdev->start_on_kick = false;
++        if (unlikely(vdev->start_on_kick)) {
++            vdev->started = true;
++            vdev->start_on_kick = false;
++        }
+     }
+ }
+ 
+-- 
+2.17.1
 
 
