@@ -7,57 +7,57 @@ X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A382C04AB3
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 07:17:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 62E99C04AB3
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 07:18:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9AEDB2075C
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 07:17:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 30D782075C
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 07:18:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="Jgas2urf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9AEDB2075C
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="khfoUfrA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 30D782075C
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:48781 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:48796 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hVsqT-0005vC-HL
-	for qemu-devel@archiver.kernel.org; Wed, 29 May 2019 03:17:57 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:48096)
+	id 1hVsqw-0006H4-C2
+	for qemu-devel@archiver.kernel.org; Wed, 29 May 2019 03:18:26 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:48175)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1hVsQR-0000Ld-FX
-	for qemu-devel@nongnu.org; Wed, 29 May 2019 02:51:04 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1hVsQT-0000Nm-RQ
+	for qemu-devel@nongnu.org; Wed, 29 May 2019 02:51:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1hVsQQ-0002qo-9z
-	for qemu-devel@nongnu.org; Wed, 29 May 2019 02:51:03 -0400
-Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:60617 helo=ozlabs.org)
+	(envelope-from <dgibson@ozlabs.org>) id 1hVsQS-0002tX-Oy
+	for qemu-devel@nongnu.org; Wed, 29 May 2019 02:51:05 -0400
+Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:45491 helo=ozlabs.org)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
-	id 1hVsQP-0002cV-Lq; Wed, 29 May 2019 02:51:02 -0400
+	id 1hVsQS-0002r2-DV; Wed, 29 May 2019 02:51:04 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
-	id 45DLv55CHMz9sPG; Wed, 29 May 2019 16:50:22 +1000 (AEST)
+	id 45DLv651rHz9sPM; Wed, 29 May 2019 16:50:25 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-	d=gibson.dropbear.id.au; s=201602; t=1559112625;
-	bh=uN6drKYKwxES9bskyqe9lxIMQqaWXGheRiRszvbh5qo=;
+	d=gibson.dropbear.id.au; s=201602; t=1559112626;
+	bh=9vdpppTxGBDsHN3Z7tJDxzrT9kU/xLpjp2jGJfkC4qk=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Jgas2urfJuwkjhYdBPVxJtm+upb7wfvE42t+BJyOqmdFTLxBDkYI/dwuMoYuSYnFP
-	ZXQ+XCWXZqwtjIlyRJpAPa+EDV92DtyTK8w/G6tKQym09jAhfWhc5RuvzWZ6uXNKzA
-	KnjVFXBW1YKeq33FdZIcwkKHRGeEEJ1sSQ4w/Xkg=
+	b=khfoUfrAPaf8XfX8MXkwoAeOPgC9G0zmoVIpAsM8mmD95JE+m5Zz+HhVqwHvprQi0
+	sQre0yY0s72Hy4cVpSPxWUcZqWSMB3vyL6E71rT1Ep3JOom74Tgg7wPhYZjGgjRCg7
+	M/W7tsQ/7WI6uEpKYP9FCortS0jz6gkhnP0EAhy4=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: peter.maydell@linaro.org
-Date: Wed, 29 May 2019 16:49:56 +1000
-Message-Id: <20190529065017.15149-24-david@gibson.dropbear.id.au>
+Date: Wed, 29 May 2019 16:50:04 +1000
+Message-Id: <20190529065017.15149-32-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190529065017.15149-1-david@gibson.dropbear.id.au>
 References: <20190529065017.15149-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
 X-Received-From: 2401:3900:2:1::2
-Subject: [Qemu-devel] [PULL 23/44] target/ppc: Use vector variable shifts
- for VSL, VSR, VSRA
+Subject: [Qemu-devel] [PULL 31/44] spapr/xive: activate KVM support
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -69,163 +69,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: lvivier@redhat.com, Richard Henderson <richard.henderson@linaro.org>,
-	qemu-devel@nongnu.org, groug@kaod.org, qemu-ppc@nongnu.org,
-	clg@kaod.org, David Gibson <david@gibson.dropbear.id.au>, rth@twiddle.net
+Cc: lvivier@redhat.com, qemu-devel@nongnu.org, groug@kaod.org,
+	qemu-ppc@nongnu.org, clg@kaod.org,
+	David Gibson <david@gibson.dropbear.id.au>, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Richard Henderson <richard.henderson@linaro.org>
+From: C=C3=A9dric Le Goater <clg@kaod.org>
 
-The gvec expanders take care of masking the shift amount
-against the element width.
+All is in place for KVM now. State synchronization and migration will
+come next.
 
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-Message-Id: <20190518191430.21686-2-richard.henderson@linaro.org>
+Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+Message-Id: <20190513084245.25755-8-clg@kaod.org>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- target/ppc/helper.h                 | 12 ----------
- target/ppc/int_helper.c             | 37 -----------------------------
- target/ppc/translate/vmx-impl.inc.c | 24 +++++++++----------
- 3 files changed, 12 insertions(+), 61 deletions(-)
+ hw/ppc/spapr_irq.c | 9 ---------
+ 1 file changed, 9 deletions(-)
 
-diff --git a/target/ppc/helper.h b/target/ppc/helper.h
-index 638a6e99c4..02b67a333e 100644
---- a/target/ppc/helper.h
-+++ b/target/ppc/helper.h
-@@ -180,18 +180,6 @@ DEF_HELPER_3(vmuloub, void, avr, avr, avr)
- DEF_HELPER_3(vmulouh, void, avr, avr, avr)
- DEF_HELPER_3(vmulouw, void, avr, avr, avr)
- DEF_HELPER_3(vmuluwm, void, avr, avr, avr)
--DEF_HELPER_3(vsrab, void, avr, avr, avr)
--DEF_HELPER_3(vsrah, void, avr, avr, avr)
--DEF_HELPER_3(vsraw, void, avr, avr, avr)
--DEF_HELPER_3(vsrad, void, avr, avr, avr)
--DEF_HELPER_3(vsrb, void, avr, avr, avr)
--DEF_HELPER_3(vsrh, void, avr, avr, avr)
--DEF_HELPER_3(vsrw, void, avr, avr, avr)
--DEF_HELPER_3(vsrd, void, avr, avr, avr)
--DEF_HELPER_3(vslb, void, avr, avr, avr)
--DEF_HELPER_3(vslh, void, avr, avr, avr)
--DEF_HELPER_3(vslw, void, avr, avr, avr)
--DEF_HELPER_3(vsld, void, avr, avr, avr)
- DEF_HELPER_3(vslo, void, avr, avr, avr)
- DEF_HELPER_3(vsro, void, avr, avr, avr)
- DEF_HELPER_3(vsrv, void, avr, avr, avr)
-diff --git a/target/ppc/int_helper.c b/target/ppc/int_helper.c
-index 093ef74b59..8ce89f2ad9 100644
---- a/target/ppc/int_helper.c
-+++ b/target/ppc/int_helper.c
-@@ -1791,23 +1791,6 @@ VSHIFT(l, 1)
- VSHIFT(r, 0)
- #undef VSHIFT
-=20
--#define VSL(suffix, element, mask)                                      =
-\
--    void helper_vsl##suffix(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b)   =
-\
--    {                                                                   =
-\
--        int i;                                                          =
-\
--                                                                        =
-\
--        for (i =3D 0; i < ARRAY_SIZE(r->element); i++) {                =
-  \
--            unsigned int shift =3D b->element[i] & mask;                =
-  \
--                                                                        =
-\
--            r->element[i] =3D a->element[i] << shift;                   =
-  \
--        }                                                               =
-\
--    }
--VSL(b, u8, 0x7)
--VSL(h, u16, 0x0F)
--VSL(w, u32, 0x1F)
--VSL(d, u64, 0x3F)
--#undef VSL
--
- void helper_vslv(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b)
+diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
+index 8d371523e6..e969683f5c 100644
+--- a/hw/ppc/spapr_irq.c
++++ b/hw/ppc/spapr_irq.c
+@@ -248,19 +248,10 @@ SpaprIrq spapr_irq_xics =3D {
+ static void spapr_irq_init_xive(SpaprMachineState *spapr, int nr_irqs,
+                                 Error **errp)
  {
+-    MachineState *machine =3D MACHINE(spapr);
+     uint32_t nr_servers =3D spapr_max_server_number(spapr);
+     DeviceState *dev;
      int i;
-@@ -1980,26 +1963,6 @@ VNEG(vnegw, s32)
- VNEG(vnegd, s64)
- #undef VNEG
 =20
--#define VSR(suffix, element, mask)                                      =
-\
--    void helper_vsr##suffix(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b)   =
-\
--    {                                                                   =
-\
--        int i;                                                          =
-\
--                                                                        =
-\
--        for (i =3D 0; i < ARRAY_SIZE(r->element); i++) {                =
-  \
--            unsigned int shift =3D b->element[i] & mask;                =
-  \
--            r->element[i] =3D a->element[i] >> shift;                   =
-  \
--        }                                                               =
-\
+-    /* KVM XIVE device not yet available */
+-    if (kvm_enabled()) {
+-        if (machine_kernel_irqchip_required(machine)) {
+-            error_setg(errp, "kernel_irqchip requested. no KVM XIVE supp=
+ort");
+-            return;
+-        }
 -    }
--VSR(ab, s8, 0x7)
--VSR(ah, s16, 0xF)
--VSR(aw, s32, 0x1F)
--VSR(ad, s64, 0x3F)
--VSR(b, u8, 0x7)
--VSR(h, u16, 0xF)
--VSR(w, u32, 0x1F)
--VSR(d, u64, 0x3F)
--#undef VSR
 -
- void helper_vsro(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b)
- {
-     int sh =3D (b->VsrB(0xf) >> 3) & 0xf;
-diff --git a/target/ppc/translate/vmx-impl.inc.c b/target/ppc/translate/v=
-mx-impl.inc.c
-index 6861f4c5b9..663275b729 100644
---- a/target/ppc/translate/vmx-impl.inc.c
-+++ b/target/ppc/translate/vmx-impl.inc.c
-@@ -530,21 +530,21 @@ GEN_VXFORM(vmuleuw, 4, 10);
- GEN_VXFORM(vmulesb, 4, 12);
- GEN_VXFORM(vmulesh, 4, 13);
- GEN_VXFORM(vmulesw, 4, 14);
--GEN_VXFORM(vslb, 2, 4);
--GEN_VXFORM(vslh, 2, 5);
--GEN_VXFORM(vslw, 2, 6);
-+GEN_VXFORM_V(vslb, MO_8, tcg_gen_gvec_shlv, 2, 4);
-+GEN_VXFORM_V(vslh, MO_16, tcg_gen_gvec_shlv, 2, 5);
-+GEN_VXFORM_V(vslw, MO_32, tcg_gen_gvec_shlv, 2, 6);
- GEN_VXFORM(vrlwnm, 2, 6);
- GEN_VXFORM_DUAL(vslw, PPC_ALTIVEC, PPC_NONE, \
-                 vrlwnm, PPC_NONE, PPC2_ISA300)
--GEN_VXFORM(vsld, 2, 23);
--GEN_VXFORM(vsrb, 2, 8);
--GEN_VXFORM(vsrh, 2, 9);
--GEN_VXFORM(vsrw, 2, 10);
--GEN_VXFORM(vsrd, 2, 27);
--GEN_VXFORM(vsrab, 2, 12);
--GEN_VXFORM(vsrah, 2, 13);
--GEN_VXFORM(vsraw, 2, 14);
--GEN_VXFORM(vsrad, 2, 15);
-+GEN_VXFORM_V(vsld, MO_64, tcg_gen_gvec_shlv, 2, 23);
-+GEN_VXFORM_V(vsrb, MO_8, tcg_gen_gvec_shrv, 2, 8);
-+GEN_VXFORM_V(vsrh, MO_16, tcg_gen_gvec_shrv, 2, 9);
-+GEN_VXFORM_V(vsrw, MO_32, tcg_gen_gvec_shrv, 2, 10);
-+GEN_VXFORM_V(vsrd, MO_64, tcg_gen_gvec_shrv, 2, 27);
-+GEN_VXFORM_V(vsrab, MO_8, tcg_gen_gvec_sarv, 2, 12);
-+GEN_VXFORM_V(vsrah, MO_16, tcg_gen_gvec_sarv, 2, 13);
-+GEN_VXFORM_V(vsraw, MO_32, tcg_gen_gvec_sarv, 2, 14);
-+GEN_VXFORM_V(vsrad, MO_64, tcg_gen_gvec_sarv, 2, 15);
- GEN_VXFORM(vsrv, 2, 28);
- GEN_VXFORM(vslv, 2, 29);
- GEN_VXFORM(vslo, 6, 16);
+     dev =3D qdev_create(NULL, TYPE_SPAPR_XIVE);
+     qdev_prop_set_uint32(dev, "nr-irqs", nr_irqs);
+     /*
 --=20
 2.21.0
 
