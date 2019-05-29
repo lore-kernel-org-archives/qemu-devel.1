@@ -2,80 +2,140 @@ Return-Path: <SRS0=DspQ=T5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 53AC4C28CC0
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 18:27:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 43A01C28CC1
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 18:35:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 249BF2406E
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 18:27:40 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=cam.ac.uk header.i=@cam.ac.uk header.b="h55OvHhO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 249BF2406E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=cl.cam.ac.uk
+	by mail.kernel.org (Postfix) with ESMTPS id 121AA2407A
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 18:35:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 121AA2407A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:59018 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:59100 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hW3Ia-0006oa-8e
-	for qemu-devel@archiver.kernel.org; Wed, 29 May 2019 14:27:40 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:60923)
+	id 1hW3Qc-0008Tw-0v
+	for qemu-devel@archiver.kernel.org; Wed, 29 May 2019 14:35:58 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:33875)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <hmka2@hermes.cam.ac.uk>) id 1hW3Ha-0006Jq-Q3
-	for qemu-devel@nongnu.org; Wed, 29 May 2019 14:26:39 -0400
+	(envelope-from <jsnow@redhat.com>) id 1hW3PV-00081c-S7
+	for qemu-devel@nongnu.org; Wed, 29 May 2019 14:34:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <hmka2@hermes.cam.ac.uk>) id 1hW3HX-0001e2-KC
-	for qemu-devel@nongnu.org; Wed, 29 May 2019 14:26:37 -0400
-Received: from ppsw-30.csi.cam.ac.uk ([131.111.8.130]:40882)
+	(envelope-from <jsnow@redhat.com>) id 1hW3PU-000611-TO
+	for qemu-devel@nongnu.org; Wed, 29 May 2019 14:34:49 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53668)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <hmka2@hermes.cam.ac.uk>)
-	id 1hW3HN-0001V3-5W; Wed, 29 May 2019 14:26:27 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=cam.ac.uk; 
-	s=20180806.ppsw;
-	h=Sender:Content-Type:Cc:To:Subject:Message-ID:Date:From:
-	In-Reply-To:References:MIME-Version:Reply-To:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
-	Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
-	List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=WMyOssXvw2r/eBAuwxd1V1u0p/Jnx0wbisZ0nP5sgMw=;
-	b=h55OvHhOICZFmUpWlDogFWpigl
-	2bO69lX7bmbMJJN72ngbWhFgBjQWxZWl/ZLII6zh0sBdeXTC42XfD20g0MVVUo6eO0sIZyx3OjBGo
-	4t8uzc9l401oUPg3f45niqiMikq/DEdMl2YQTjuH1pO7u6aghF4d15sIGifPEmqtSXH4=; 
-X-Cam-AntiVirus: no malware found
-X-Cam-ScannerInfo: http://help.uis.cam.ac.uk/email-scanner-virus
-Received: from mail-lj1-f180.google.com ([209.85.208.180]:46617)
-	by ppsw-30.csi.cam.ac.uk (smtp.hermes.cam.ac.uk [131.111.8.156]:587)
-	with esmtpsa (PLAIN:hmka2) (TLSv1.2:ECDHE-RSA-AES128-GCM-SHA256:128)
-	id 1hW3HH-000NaS-dC (Exim 4.91)
-	(return-path <hmka2@hermes.cam.ac.uk>); Wed, 29 May 2019 19:26:19 +0100
-Received: by mail-lj1-f180.google.com with SMTP id m15so3440573ljg.13;
-	Wed, 29 May 2019 11:26:19 -0700 (PDT)
-X-Gm-Message-State: APjAAAXtwwWsdQvoDBBqukXga23ZjixmwvzKDyFV1GG4Z3FejOfjWExn
-	zpLjRKa93fiMzOFY3N7XVGoL4IMey8dnQ4Y+0D0=
-X-Google-Smtp-Source: APXvYqwPV7NMcJjgCiffZgPKTervynRghqz+CmIJ42LzFWQxVsQvRqE9ySchTy2q8Vxi9W4/fflKInQpkh2QsukcSZo=
-X-Received: by 2002:a2e:964a:: with SMTP id z10mr9138516ljh.22.1559154378648; 
-	Wed, 29 May 2019 11:26:18 -0700 (PDT)
+	(Exim 4.71) (envelope-from <jsnow@redhat.com>)
+	id 1hW3PS-0005zJ-OM; Wed, 29 May 2019 14:34:46 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+	[10.5.11.23])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id BAA12308A951;
+	Wed, 29 May 2019 18:34:37 +0000 (UTC)
+Received: from [10.18.17.164] (dhcp-17-164.bos.redhat.com [10.18.17.164])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id BD7D3272BB;
+	Wed, 29 May 2019 18:34:35 +0000 (UTC)
+To: kwolf@redhat.com, mreitz@redhat.com
+References: <1559154027-282547-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+From: John Snow <jsnow@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
+	mQINBFTKefwBEAChvwqYC6saTzawbih87LqBYq0d5A8jXYXaiFMV/EvMSDqqY4EY6whXliNO
+	IYzhgrPEe7ZmPxbCSe4iMykjhwMh5byIHDoPGDU+FsQty2KXuoxto+ZdrP9gymAgmyqdk3aV
+	vzzmCa3cOppcqKvA0Kqr10UeX/z4OMVV390V+DVWUvzXpda45/Sxup57pk+hyY52wxxjIqef
+	rj8u5BN93s5uCVTus0oiVA6W+iXYzTvVDStMFVqnTxSxlpZoH5RGKvmoWV3uutByQyBPHW2U
+	1Y6n6iEZ9MlP3hcDqlo0S8jeP03HaD4gOqCuqLceWF5+2WyHzNfylpNMFVi+Hp0H/nSDtCvQ
+	ua7j+6Pt7q5rvqgHvRipkDDVsjqwasuNc3wyoHexrBeLU/iJBuDld5iLy+dHXoYMB3HmjMxj
+	3K5/8XhGrDx6BDFeO3HIpi3u2z1jniB7RtyVEtdupED6lqsDj0oSz9NxaOFZrS3Jf6z/kHIf
+	h42mM9Sx7+s4c07N2LieUxcfqhFTaa/voRibF4cmkBVUhOD1AKXNfhEsTvmcz9NbUchCkcvA
+	T9119CrsxfVsE7bXiGvdXnzyGLXdsoosjzwacKdOrVaDmN3Uy+SHiQXo6TlkSdV0XH2PUxTM
+	LsBFIO9qXO43Ai6J6iPAP/01l8fuZfpJE0/L/c25yyaND7xA3wARAQABtCpKb2huIFNub3cg
+	KEpvaG4gSHVzdG9uKSA8anNub3dAcmVkaGF0LmNvbT6JAlQEEwECAD4CGwMCHgECF4AFCwkI
+	BwMFFQoJCAsFFgIDAQAWIQT665cRoSz0dYEvGPKIqQZNGDVh6wUCXF392gUJC1Xq3gAKCRCI
+	qQZNGDVh6558D/9pM4pu4njX5aT6uUW3vAmbWLF1jfPxiTQgSHAnm9EBMZED/fsvkzj97clo
+	LN7JKmbYZNgJmR01A7flG45V4iOR/249qAfaVuD+ZzZi1R4jFzr13WS+IEdn0hYp9ITndb7R
+	ezW+HGu6/rP2PnfmDnNowgJu6Dp6IUEabq8SXXwGHXZPuMIrsXJxUdKJdGnh1o2u7271yNO7
+	J9PEMuMDsgjsdnaGtv7aQ9CECtXvBleAc06pLW2HU10r5wQyBMZGITemJdBhhdzGmbHAL0M6
+	vKi/bafHRWqfMqOAdDkv3Jg4arl2NCG/uNateR1z5e529+UlB4XVAQT+f5T/YyI65DFTY940
+	il3aZhA8u788jZEPMXmt94u7uPZbEYp7V0jt68SrTaOgO7NaXsboXFjwEa42Ug5lB5d5/Qdp
+	1AITUv0NJ51kKwhHL1dEagGeloIsGVQILmpS0MLdtitBHqZLsnJkRvtMaxo47giyBlv2ewmq
+	tIGTlVLxHx9xkc9aVepOuiGlZaZB72c9AvZs9rKaAjgU2UfJHlB/Hr4uSk/1EY0IgMv4vnsG
+	1sA5gvS7A4T4euu0PqHtn2sZEWDrk5RDbw0yIb53JYdXboLFmFXKzVASfKh2ZVeXRBlQQSJi
+	3PBR1GzzqORlfryby7mkY857xzCI2NkIkD2eq+HhzFTfFOTdGrkCDQRUynn8ARAAwbhP45BE
+	d/zAMBPV2dk2WwIwKRSKULElP3kXpcuiDWYQob3UODUUqClO+3aXVRndaNmZX9WbzGYexVo3
+	5j+CVBCGr3DlU8AL9pp3KQ3SJihWcDed1LSmUf8tS+10d6mdGxDqgnd/OWU214isvhgWZtZG
+	MM/Xj7cx5pERIiP+jqu7PT1cibcfcEKhPjYdyV1QnLtKNGrTg/UMKaL+qkWBUI/8uBoa0HLs
+	NH63bXsRtNAG8w6qG7iiueYZUIXKc4IHINUguqYQJVdSe+u8b2N5XNhDSEUhdlqFYraJvX6d
+	TjxMTW5lzVG2KjztfErRNSUmu2gezbw1/CV0ztniOKDA7mkQi6UIUDRh4LxRm5mflfKiCyDQ
+	L6P/jxHBxFv+sIgjuLrfNhIC1p3z9rvCh+idAVJgtHtYl8p6GAVrF+4xQV2zZH45tgmHo2+S
+	JsLPjXZtWVsWANpepXnesyabWtNAV4qQB7/SfC77zZwsVX0OOY2Qc+iohmXo8U7DgXVDgl/R
+	/5Qgfnlv0/3rOdMt6ZPy5LJr8D9LJmcP0RvX98jyoBOf06Q9QtEwJsNLCOCo2LKNL71DNjZr
+	nXEwjUH66CXiRXDbDKprt71BiSTitkFhGGU88XCtrp8R9yArXPf4MN+wNYBjfT7K29gWTzxt
+	9DYQIvEf69oZD5Z5qHYGp031E90AEQEAAYkCPAQYAQIAJgIbDBYhBPrrlxGhLPR1gS8Y8oip
+	Bk0YNWHrBQJcXf3JBQkLVerNAAoJEIipBk0YNWHrU1AP/1FOK2SBGbyhHa5vDHuf47fgLipC
+	e0/h1E0vdSonzlhPxuZoQ47FjzG9uOhqqQG6/PqtWs/FJIyz8aGG4aV+pSA/9Ko3/2ND8MSY
+	ZflWs7Y8Peg08Ro01GTHFITjEUgHpTpHiT6TNcZB5aZNJ8jqCtW5UlqvXXbVeSTmO70ZiVtc
+	vUJbpvSxYmzhFfZWaXIPcNcKWL1rnmnzs67lDhMLdkYVf91aml/XtyMUlfB8Iaejzud9Ht3r
+	C0pA9MG57pLblX7okEshxAC0+tUdY2vANWFeX0mgqRt1GSuG9XM9H/cKP1czfUV/FgaWo/Ya
+	fM4eMhUAlL/y+/AJxxumPhBXftM4yuiktp2JMezoIMJI9fmhjfWDw7+2jVrx9ze1joLakFD1
+	rVAoHxVJ7ORfQ4Ni/qWbQm3T6qQkSMt4N/scNsMczibdTPxU7qtwQwIeFOOc3wEwmJ9Qe3ox
+	TODQ0agXiWVj0OXYCHJ6MxTDswtyTGQW+nUHpKBgHGwUaR6d1kr/LK9+5LpOfRlK9VRfEu7D
+	PGNiRkr8Abp8jHsrBqQWfUS1bAf62bq6XUel0kUCtb7qCq024aOczXYWPFpJFX+nhp4d7NeH
+	Edq+wlC13sBSiSHC7T5yssJ+7JPa2ATLlSKhEvBsLe2TsSTTtFlA0nBclqhfJXzimiuge9qU
+	E40lvMWBuQINBFTKimUBEADDbJ+pQ5M4QBMWkaWImRj7c598xIZ37oKM6rGaSnuB1SVb7YCr
+	Ci2MTwQcrQscA2jm80O8VFqWk+/XsEp62dty47GVwSfdGje/3zv3VTH2KhOCKOq3oPP5ZXWY
+	rz2d2WnTvx++o6lU7HLHDEC3NGLYNLkL1lyVxLhnhvcMxkf1EGA1DboEcMgnJrNB1pGP27ww
+	cSfvdyPGseV+qZZa8kuViDga1oxmnYDxFKMGLxrClqHrRt8geQL1Wj5KFM5hFtGTK4da5lPn
+	wGNd6/CINMeCT2AWZY5ySz7/tSZe5F22vPvVZGoPgQicYWdNc3ap7+7IKP86JNjmec/9RJcz
+	jvrYjJdiqBVldXou72CtDydKVLVSKv8c2wBDJghYZitfYIaL8cTvQfUHRYTfo0n5KKSec8Vo
+	vjDuxmdbOUBA+SkRxqmneP5OxGoZ92VusrwWCjry8HRsNdR+2T+ClDCO6Wpihu4V3CPkQwTy
+	eCuMHPAT0ka5paTwLrnZIxsdfnjUa96T10vzmQgAxpbbiaLvgKJ8+76OPdDnhddyxd2ldYfw
+	RkF5PEGg3mqZnYKNNBtwjvX49SAvgETQvLzQ8IKVgZS0m4z9qHHvtc1BsQnFfe+LJOFjzZr7
+	CrDNJMqk1JTHYsSi2JcN3vY32WMezXSQ0TzeMK4kdnclSQyp/h23GWod5QARAQABiQRbBBgB
+	AgAmAhsCFiEE+uuXEaEs9HWBLxjyiKkGTRg1YesFAlxd/coFCQtV2mQCKcFdIAQZAQIABgUC
+	VMqKZQAKCRB974EGqvw5DiJoEACLmuiRq9ifvOh5DyBFwRS7gvA14DsGQngmC57EzV0EFcfM
+	XVi1jX5OtwUyUe0Az5r6lHyyHDsDsIpLKBlWrYCeLpUhRR3oy181T7UNxvujGFeTkzvLAOo6
+	Hs3b8Wv9ARg+7acRYkQRNY7k0GIJ6YZz149tRyRKAy/vSjsaB9Lt0NOd1wf2EQMKwRVELwJD
+	y0AazGn+0PRP7Bua2YbtxaBmhBBDb2tPpwn8U9xdckB4Vlft9lcWNsC/18Gi9bpjd9FSbdH/
+	sOUI+3ToWYENeoT4IP09wn6EkgWaJS3nAUN/MOycNej2i4Yhy2wDDSKyTAnVkSSSoXk+tK91
+	HfqtokbDanB8daP+K5LgoiWHzjfWzsxA2jKisI4YCGjrYQzTyGOT6P6u6SEeoEx10865B/zc
+	8/vN50kncdjYz2naacIDEKQNZlnGLsGkpCbfmfdi3Zg4vuWKNdWr0wGUzDUcpqW0y/lUXna+
+	6uyQShX5e4JD2UPuf9WAQ9HtgSAkaDd4O1I2J41sleePzZOVB3DmYgy+ECRJJ5nw3ihdxpgc
+	y/v3lfcJaqiyCv0PF+K/gSOvwhH7CbVqARmptT7yhhxqFdaYWo2Z2ksuKyoKSRMFCXQY5oac
+	uTmyPIT4STFyUQFeqSCWDum/NFNoSKhmItw2Td+4VSJHShRVbg39KNFPZ7mXYAkQiKkGTRg1
+	YesWJA/+PV3qDUtPNEGwjVvjQqHSbrBy94tu6gJvPHgGPtRDYvxnCaJsmgiC0pGB2KFRsnfl
+	2zBNBEWF/XwsI081jQE5UO60GKmHTputChLXpVobyuc+lroG2YhknXRBAV969SLnZR4BS/1s
+	Gi046gOXfaKYatve8BiZr5it5Foq3FMPDNgZMit1H9Dk8rkKFfDMRf8EGS/Z+TmyEsIf99H7
+	TH3n7lco8qO81fSFwkh4pvo2kWRFYTC5vsIVQ+GqVUp+W1DZJHxX8LwWuF1AzUt4MUTtNAvy
+	TXl5EgsmoY9mpNNL7ZnW65oG63nEP5KNiybvuQJzXVxR8eqzOh2Mod4nHg3PE7UCd3DvLNsn
+	GXFRo44WyT/G2lArBtjpkut7bDm0i1nENABy2UgS+1QvdmgNu6aEZxdNthwRjUhuuvCCDMA4
+	rCDQYyakH2tJNQgkXkeLodBKF4bHiBbuwj0E39S9wmGgg+q4OTnAO/yhQGknle7a7G5xHBwE
+	i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
+	RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
+	glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
+Message-ID: <35a23383-dbbb-6ad5-f8f9-9c7e3c1e9694@redhat.com>
+Date: Wed, 29 May 2019 14:34:35 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-References: <20190521104324.12835-1-Hesham.Almatary@cl.cam.ac.uk>
-	<20190521104324.12835-3-Hesham.Almatary@cl.cam.ac.uk>
-	<CAKmqyKOT_15kFNjHkUgk+bs6GwGrDrAOPoe+t0u3T6hg6TqiPQ@mail.gmail.com>
-	<CA+wsVCDgogUXBDNiWm7R19fAyNw-3ybPiW4O8yA=Wt8oqyShFg@mail.gmail.com>
-In-Reply-To: <CA+wsVCDgogUXBDNiWm7R19fAyNw-3ybPiW4O8yA=Wt8oqyShFg@mail.gmail.com>
-From: Hesham Almatary <hesham.almatary@cl.cam.ac.uk>
-Date: Wed, 29 May 2019 20:25:42 +0200
-X-Gmail-Original-Message-ID: <CA+wsVCD==3g=jH8_0AZyrycz=C-7dw4CNAzYqou6wjXA+qqcZQ@mail.gmail.com>
-Message-ID: <CA+wsVCD==3g=jH8_0AZyrycz=C-7dw4CNAzYqou6wjXA+qqcZQ@mail.gmail.com>
-To: Alistair Francis <alistair23@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <1559154027-282547-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.41]);
+	Wed, 29 May 2019 18:34:46 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 131.111.8.130
-Subject: Re: [Qemu-devel] [PATCHv3 3/5] RISC-V: Check PMP during Page Table
- Walks
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v2] hw/block/fdc: floppy command FIFO
+ memory initialization
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -87,94 +147,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
-	Sagar Karandikar <sagark@eecs.berkeley.edu>,
-	Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
-	Palmer Dabbelt <palmer@sifive.com>,
-	"qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
-	Alistair Francis <Alistair.Francis@wdc.com>
+Cc: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>,
+	vsementsov@virtuozzo.com, qemu-devel@nongnu.org,
+	qemu-block@nongnu.org, den@openvz.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-ping
 
-On Wed, 22 May 2019 at 11:26, Hesham Almatary
-<hesham.almatary@cl.cam.ac.uk> wrote:
->
-> On Tue, 21 May 2019 at 23:40, Alistair Francis <alistair23@gmail.com> wrote:
-> >
-> > On Tue, May 21, 2019 at 3:44 AM Hesham Almatary
-> > <Hesham.Almatary@cl.cam.ac.uk> wrote:
-> > >
-> > > The PMP should be checked when doing a page table walk, and report access
-> > > fault exception if the to-be-read PTE failed the PMP check.
-> > >
-> > > Suggested-by: Jonathan Behrens <fintelia@gmail.com>
-> > > Signed-off-by: Hesham Almatary <Hesham.Almatary@cl.cam.ac.uk>
-> > > ---
-> > >  target/riscv/cpu.h        |  1 +
-> > >  target/riscv/cpu_helper.c | 10 +++++++++-
-> > >  2 files changed, 10 insertions(+), 1 deletion(-)
-> > >
-> > > diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
-> > > index c17184f4e4..ab3ba3f15a 100644
-> > > --- a/target/riscv/cpu.h
-> > > +++ b/target/riscv/cpu.h
-> > > @@ -94,6 +94,7 @@ enum {
-> > >  #define PRIV_VERSION_1_09_1 0x00010901
-> > >  #define PRIV_VERSION_1_10_0 0x00011000
-> > >
-> > > +#define TRANSLATE_PMP_FAIL 2
-> > >  #define TRANSLATE_FAIL 1
-> > >  #define TRANSLATE_SUCCESS 0
-> > >  #define NB_MMU_MODES 4
-> > > diff --git a/target/riscv/cpu_helper.c b/target/riscv/cpu_helper.c
-> > > index 7c7282c680..d0b0f9cf88 100644
-> > > --- a/target/riscv/cpu_helper.c
-> > > +++ b/target/riscv/cpu_helper.c
-> > > @@ -211,6 +211,12 @@ restart:
-> > >
-> > >          /* check that physical address of PTE is legal */
-> > >          target_ulong pte_addr = base + idx * ptesize;
-> > > +
-> > > +        if (riscv_feature(env, RISCV_FEATURE_PMP) &&
-> > > +            !pmp_hart_has_privs(env, pte_addr, sizeof(target_ulong),
-> > > +            1 << MMU_DATA_LOAD)) {
-> >
-> > I see a problem here.
-> >
-> > pmp_hart_has_privs() checks permissions based on the current value of
-> > env->priv. This might not always be the correct permissions to check,
-> > we should instead use the current mode to check permissions.
-> >
-> That is not clear to me. Isn't env->priv the current privildge mode?
-> Could you please elaborate on what other cases this might not be the case?
->
-> > The best way to do this to me is to probably provide a privileged mode
-> > override to the function, can you add that?
-> >
-> > Alistair
-> >
-> > > +            return TRANSLATE_PMP_FAIL;
-> > > +        }
-> > >  #if defined(TARGET_RISCV32)
-> > >          target_ulong pte = ldl_phys(cs->as, pte_addr);
-> > >  #elif defined(TARGET_RISCV64)
-> > > @@ -405,8 +411,10 @@ bool riscv_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
-> > >      if (riscv_feature(env, RISCV_FEATURE_PMP) &&
-> > >          (ret == TRANSLATE_SUCCESS) &&
-> > >          !pmp_hart_has_privs(env, pa, TARGET_PAGE_SIZE, 1 << access_type)) {
-> > > +        ret = TRANSLATE_PMP_FAIL;
-> > > +    }
-> > > +    if (ret == TRANSLATE_PMP_FAIL) {
-> > >          pmp_violation = true;
-> > > -        ret = TRANSLATE_FAIL;
-> > >      }
-> > >      if (ret == TRANSLATE_SUCCESS) {
-> > >          tlb_set_page(cs, address & TARGET_PAGE_MASK, pa & TARGET_PAGE_MASK,
-> > > --
-> > > 2.17.1
-> > >
-> > >
+
+On 5/29/19 2:20 PM, Andrey Shinkevich wrote:
+> The uninitialized memory allocated for the command FIFO of the
+> floppy controller during the VM hardware initialization incurs
+> many unwanted reports by Valgrind when VM state is being saved.
+> That verbosity hardens a search for the real memory issues when
+> the iotests run. Particularly, the patch eliminates 20 unnecessary
+> reports of the Valgrind tool in the iotest #169.
+> 
+> Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+> ---
+> v2:
+>   01: The pointer unnecessary check 'if (fdctrl->fifo)' was removed
+>       as suggested by John.
+> 
+>  hw/block/fdc.c | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/hw/block/fdc.c b/hw/block/fdc.c
+> index 6f19f12..9af762b 100644
+> --- a/hw/block/fdc.c
+> +++ b/hw/block/fdc.c
+> @@ -2647,6 +2647,7 @@ static void fdctrl_realize_common(DeviceState *dev, FDCtrl *fdctrl,
+>  
+>      FLOPPY_DPRINTF("init controller\n");
+>      fdctrl->fifo = qemu_memalign(512, FD_SECTOR_LEN);
+> +    memset(fdctrl->fifo, 0, FD_SECTOR_LEN);
+>      fdctrl->fifo_size = 512;
+>      fdctrl->result_timer = timer_new_ns(QEMU_CLOCK_VIRTUAL,
+>                                               fdctrl_result_timer, fdctrl);
+> 
+
+I guess technically I would send a PR for this but it's just a single
+patch, so it'd be nice if it can just get staged in the next block
+roundup by whomever.
+
+Max/Kevin, if you would be so kind?
+
+--js
 
