@@ -2,61 +2,86 @@ Return-Path: <SRS0=DspQ=T5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 422EBC04AB3
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 06:55:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DB3F3C07542
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 06:58:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0F471208CB
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 06:55:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A7A17216FD
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 06:58:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="MMLvW8FR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0F471208CB
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="c7g0XgVF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A7A17216FD
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:48425 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:48457 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hVsUt-00043f-7M
-	for qemu-devel@archiver.kernel.org; Wed, 29 May 2019 02:55:39 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:47479)
+	id 1hVsXM-0006Ui-Va
+	for qemu-devel@archiver.kernel.org; Wed, 29 May 2019 02:58:13 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:45155)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1hVsPx-0008Cw-VL
-	for qemu-devel@nongnu.org; Wed, 29 May 2019 02:50:35 -0400
+	(envelope-from <arilou@gmail.com>) id 1hVsHq-00011p-Ri
+	for qemu-devel@nongnu.org; Wed, 29 May 2019 02:42:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1hVsPw-0002Vk-V0
-	for qemu-devel@nongnu.org; Wed, 29 May 2019 02:50:33 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:43353 helo=ozlabs.org)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
-	id 1hVsPw-0002R7-BC; Wed, 29 May 2019 02:50:32 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
-	id 45DLv15rXYz9sCJ; Wed, 29 May 2019 16:50:21 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-	d=gibson.dropbear.id.au; s=201602; t=1559112621;
-	bh=BkQijpXj/KCURZ/rN6s0iYa5Zt/xqM674NRmoCOpbX8=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=MMLvW8FRZqE5WD3IwaJE6Xb56IxHPKswr34PqNWau7FtY1SyoQ02kEKXwXY7t3jUC
-	a4ssuzw/ExVvcoZ9iznQDjFe4UMihI++/QnP6mfb4D6z7/u4LxNf23TmcocGgdF44o
-	BwldK2gSXCvw8ZCMGF8tkwbXa1wNpOyE6YzABT/k=
-From: David Gibson <david@gibson.dropbear.id.au>
-To: peter.maydell@linaro.org
-Date: Wed, 29 May 2019 16:49:34 +1000
-Message-Id: <20190529065017.15149-2-david@gibson.dropbear.id.au>
+	(envelope-from <arilou@gmail.com>) id 1hVsHp-00016r-T1
+	for qemu-devel@nongnu.org; Wed, 29 May 2019 02:42:10 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:35107)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <arilou@gmail.com>) id 1hVsHp-0000zc-NF
+	for qemu-devel@nongnu.org; Wed, 29 May 2019 02:42:09 -0400
+Received: by mail-wr1-x444.google.com with SMTP id m3so810809wrv.2
+	for <qemu-devel@nongnu.org>; Tue, 28 May 2019 23:42:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+	h=from:to:cc:subject:date:message-id:in-reply-to:references
+	:mime-version:content-transfer-encoding;
+	bh=6BpSj4VncrNQLULTrP7ZGJ4fogVHX3e/cU14TJAFSE4=;
+	b=c7g0XgVF7T8Uz5xGPd9s9zd+evaxonHXiJ7gZGCnXlMeqOvciRdITgydXIlxjxnEMH
+	0hqcgejs3WlnAoUA566B4zYdwsIcc4TuilnBDMJu9hmlVzDeDx6ImFNGatBeT9JZg4J4
+	9XebHEmzOj2ZM5LKJwyKLLh8ZOnFbeF1XwIEwkRobbkqJHKw6aYbXkcnKOgQsZFugRyB
+	+IU+U4vYfNKZdSwlzTIJYrhs5/w66ZDzQ3l+nv2CejoAYfqoN6l2l6tka5SxPjGLbO9H
+	N2oSTcM/v0lQ4d2sUuJWWpXlt/X/fbkxf0jw6LH8sP+jpefCkGx87KJ7+g5j9r+c6QAp
+	l4oA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+	:references:mime-version:content-transfer-encoding;
+	bh=6BpSj4VncrNQLULTrP7ZGJ4fogVHX3e/cU14TJAFSE4=;
+	b=oQFd2zrV85bIpe6wkHrJqpeLT5qHLaf620mK25B3nN3LcRo0DMubDIEmnjBFbOWaf5
+	tjX6XuvAtpP+1WTyHQ6rw+RGFXU3OIsiz9ep0bs30wNosD8QNwHHn70lrEUvq7TyWz2c
+	r6tX1qqElUJY25H3sr+ivcjye9WMAS2i9CTQQDEqp/9ygHMjk+lU9n8b9sVpfYNJbeTm
+	QN0nkGQF+sVzyMzyPutYsKbvICLTvnmIfPitJabDKfceOs+bu10xgK0aXoG47wH2UGPr
+	0X6MRcBrNAR/vKf/Yc0+SjILYpOAqSMUFdc+VMSKF1BVTzGt4Q4RDfg7VYJVdObx8ApY
+	/Fuw==
+X-Gm-Message-State: APjAAAWirEUHEuXVBI6qmRelaCZhdfCubvVTPUnnkMjHKPUppgoJFAb8
+	RKkDORLkLtv84YODmVE1sy7aHBaA
+X-Google-Smtp-Source: APXvYqzHvmi3Rdjp+2e69VaVHMji2I/ThMvnV5qppVrkQQVz4MtRoTMCbgWAXxSystkZ3vZD80eAUQ==
+X-Received: by 2002:a5d:6709:: with SMTP id o9mr13310735wru.301.1559112128686; 
+	Tue, 28 May 2019 23:42:08 -0700 (PDT)
+Received: from linux.local ([31.154.166.148])
+	by smtp.gmail.com with ESMTPSA id f2sm6831168wme.12.2019.05.28.23.42.07
+	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+	Tue, 28 May 2019 23:42:08 -0700 (PDT)
+From: Jon Doron <arilou@gmail.com>
+To: qemu-devel@nongnu.org
+Date: Wed, 29 May 2019 09:41:36 +0300
+Message-Id: <20190529064148.19856-9-arilou@gmail.com>
 X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20190529065017.15149-1-david@gibson.dropbear.id.au>
-References: <20190529065017.15149-1-david@gibson.dropbear.id.au>
+In-Reply-To: <20190529064148.19856-1-arilou@gmail.com>
+References: <20190529064148.19856-1-arilou@gmail.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 203.11.71.1
-Subject: [Qemu-devel] [PULL 01/44] tests: Fix up docker cross builds for
- ppc64 (BE) targets
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2a00:1450:4864:20::444
+Subject: [Qemu-devel] [PATCH v12 08/20] gdbstub: Implement set register (P
+ pkt) with new infra
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -68,74 +93,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: lvivier@redhat.com, qemu-devel@nongnu.org, groug@kaod.org,
-	qemu-ppc@nongnu.org, clg@kaod.org,
-	David Gibson <david@gibson.dropbear.id.au>, rth@twiddle.net
+Cc: alex.bennee@linaro.org, Jon Doron <arilou@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We currently have docker cross building targets for powerpc (32-bit, BE)
-and ppc64el (64-bit, LE), but not for pcp64 (64-bit, BE).  This is an
-irritating gap in make check-tcg coverage so correct it.
-
-Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+Signed-off-by: Jon Doron <arilou@gmail.com>
 ---
- tests/docker/Makefile.include                      |  1 +
- tests/docker/dockerfiles/debian-ppc64-cross.docker | 11 +++++++++++
- tests/tcg/ppc/Makefile.include                     |  3 +++
- 3 files changed, 15 insertions(+)
- create mode 100644 tests/docker/dockerfiles/debian-ppc64-cross.docker
+ gdbstub.c | 39 ++++++++++++++++++++++++++++++---------
+ 1 file changed, 30 insertions(+), 9 deletions(-)
 
-diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.includ=
-e
-index c0e1bf57a3..aaf5396b85 100644
---- a/tests/docker/Makefile.include
-+++ b/tests/docker/Makefile.include
-@@ -107,6 +107,7 @@ docker-image-debian-sparc64-cross: docker-image-debia=
-n-sid
- docker-image-debian-mips64-cross: docker-image-debian-sid
- docker-image-debian-riscv64-cross: docker-image-debian-sid
- docker-image-debian-powerpc-cross: docker-image-debian-sid
-+docker-image-debian-ppc64-cross: docker-image-debian-sid
- docker-image-travis: NOUSER=3D1
-=20
- # Specialist build images, sometimes very limited tools
-diff --git a/tests/docker/dockerfiles/debian-ppc64-cross.docker b/tests/d=
-ocker/dockerfiles/debian-ppc64-cross.docker
-new file mode 100644
-index 0000000000..7f239c322d
---- /dev/null
-+++ b/tests/docker/dockerfiles/debian-ppc64-cross.docker
-@@ -0,0 +1,11 @@
-+#
-+# Docker ppc64 cross-compiler target
-+#
-+# This docker target builds on the debian sid base image which
-+# contains cross compilers for Debian "ports" targets.
-+FROM qemu:debian-sid
+diff --git a/gdbstub.c b/gdbstub.c
+index 572222bfa4..fc9526b3f5 100644
+--- a/gdbstub.c
++++ b/gdbstub.c
+@@ -1651,6 +1651,27 @@ static void handle_remove_bp(GdbCmdContext *gdb_ctx, void *user_ctx)
+     put_packet(gdb_ctx->s, "E22");
+ }
+ 
++static void handle_set_reg(GdbCmdContext *gdb_ctx, void *user_ctx)
++{
++    int reg_size;
 +
-+RUN DEBIAN_FRONTEND=3Dnoninteractive eatmydata \
-+    apt-get install -y --no-install-recommends \
-+       gcc-powerpc64-linux-gnu \
-+       libc6-dev-ppc64-cross || { echo "Failed to build - see debian-sid=
-.docker notes"; exit 1; }
-diff --git a/tests/tcg/ppc/Makefile.include b/tests/tcg/ppc/Makefile.incl=
-ude
-index b062c30dd3..ae01fb8fad 100644
---- a/tests/tcg/ppc/Makefile.include
-+++ b/tests/tcg/ppc/Makefile.include
-@@ -1,6 +1,9 @@
- ifeq ($(TARGET_NAME),ppc)
- DOCKER_IMAGE=3Ddebian-powerpc-cross
- DOCKER_CROSS_COMPILER=3Dpowerpc-linux-gnu-gcc
-+else ifeq ($(TARGET_NAME),ppc64)
-+DOCKER_IMAGE=3Ddebian-ppc64-cross
-+DOCKER_CROSS_COMPILER=3Dpowerpc64-linux-gnu-gcc
- else ifeq ($(TARGET_NAME),ppc64le)
- DOCKER_IMAGE=3Ddebian-ppc64el-cross
- DOCKER_CROSS_COMPILER=3Dpowerpc64le-linux-gnu-gcc
---=20
++    if (!gdb_has_xml) {
++        put_packet(gdb_ctx->s, "E00");
++        return;
++    }
++
++    if (gdb_ctx->num_params != 2) {
++        put_packet(gdb_ctx->s, "E22");
++        return;
++    }
++
++    reg_size = strlen(gdb_ctx->params[1].data) / 2;
++    hextomem(gdb_ctx->mem_buf, gdb_ctx->params[1].data, reg_size);
++    gdb_write_register(gdb_ctx->s->g_cpu, gdb_ctx->mem_buf,
++                       gdb_ctx->params[0].val_ull);
++    put_packet(gdb_ctx->s, "OK");
++}
++
+ static int gdb_handle_packet(GDBState *s, const char *line_buf)
+ {
+     CPUState *cpu;
+@@ -1895,15 +1916,15 @@ static int gdb_handle_packet(GDBState *s, const char *line_buf)
+         }
+         break;
+     case 'P':
+-        if (!gdb_has_xml)
+-            goto unknown_command;
+-        addr = strtoull(p, (char **)&p, 16);
+-        if (*p == '=')
+-            p++;
+-        reg_size = strlen(p) / 2;
+-        hextomem(mem_buf, p, reg_size);
+-        gdb_write_register(s->g_cpu, mem_buf, addr);
+-        put_packet(s, "OK");
++        {
++            static const GdbCmdParseEntry set_reg_cmd_desc = {
++                .handler = handle_set_reg,
++                .cmd = "P",
++                .cmd_startswith = 1,
++                .schema = "L?s0"
++            };
++            cmd_parser = &set_reg_cmd_desc;
++        }
+         break;
+     case 'Z':
+         {
+-- 
 2.21.0
 
 
