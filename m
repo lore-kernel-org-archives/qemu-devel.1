@@ -3,70 +3,73 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A7F57C04AB3
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 05:44:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D4717C04AB3
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 05:46:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7058820B1F
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 05:44:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7058820B1F
+	by mail.kernel.org (Postfix) with ESMTPS id A7F6F205F4
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 05:46:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A7F6F205F4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:47631 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:47678 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hVrOS-0000nn-I9
-	for qemu-devel@archiver.kernel.org; Wed, 29 May 2019 01:44:56 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:33472)
+	id 1hVrQ8-00020I-Uh
+	for qemu-devel@archiver.kernel.org; Wed, 29 May 2019 01:46:40 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:33351)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aravinda@linux.vnet.ibm.com>) id 1hVrKr-0006W5-PC
-	for qemu-devel@nongnu.org; Wed, 29 May 2019 01:41:14 -0400
+	(envelope-from <aravinda@linux.vnet.ibm.com>) id 1hVrKD-00060f-H0
+	for qemu-devel@nongnu.org; Wed, 29 May 2019 01:40:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aravinda@linux.vnet.ibm.com>) id 1hVrKq-0005VC-Fz
-	for qemu-devel@nongnu.org; Wed, 29 May 2019 01:41:13 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:44770)
+	(envelope-from <aravinda@linux.vnet.ibm.com>) id 1hVrKC-00057y-HO
+	for qemu-devel@nongnu.org; Wed, 29 May 2019 01:40:33 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:41852)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aravinda@linux.vnet.ibm.com>)
-	id 1hVrKm-0005SA-H7; Wed, 29 May 2019 01:41:09 -0400
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+	id 1hVrKC-00055Q-6b
+	for qemu-devel@nongnu.org; Wed, 29 May 2019 01:40:32 -0400
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x4T5XlHj079877; Wed, 29 May 2019 01:41:02 -0400
-Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com
-	[169.63.214.131])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2sskw8gg5e-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256
-	verify=NOT); Wed, 29 May 2019 01:41:02 -0400
-Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
-	by ppma01dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id
-	x4SNceDf022435; Tue, 28 May 2019 23:45:52 GMT
-Received: from b01cxnp22033.gho.pok.ibm.com (b01cxnp22033.gho.pok.ibm.com
-	[9.57.198.23]) by ppma01dal.us.ibm.com with ESMTP id 2spwb8w5bv-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256
-	verify=NOT); Tue, 28 May 2019 23:45:52 +0000
-Received: from b01ledav003.gho.pok.ibm.com (b01ledav003.gho.pok.ibm.com
-	[9.57.199.108])
-	by b01cxnp22033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
-	x4T5f07I30867618
+	x4T5XOKJ042559
+	for <qemu-devel@nongnu.org>; Wed, 29 May 2019 01:40:31 -0400
+Received: from e31.co.us.ibm.com (e31.co.us.ibm.com [32.97.110.149])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2ssk4s9w5r-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 29 May 2019 01:40:30 -0400
+Received: from localhost
+	by e31.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <aravinda@linux.vnet.ibm.com>;
+	Wed, 29 May 2019 06:40:30 +0100
+Received: from b03cxnp08025.gho.boulder.ibm.com (9.17.130.17)
+	by e31.co.us.ibm.com (192.168.1.131) with IBM ESMTP SMTP Gateway:
+	Authorized Use Only! Violators will be prosecuted; 
+	(version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+	Wed, 29 May 2019 06:40:27 +0100
+Received: from b03ledav005.gho.boulder.ibm.com
+	(b03ledav005.gho.boulder.ibm.com [9.17.130.236])
+	by b03cxnp08025.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with
+	ESMTP id x4T5eQiC12648894
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256
-	verify=OK); Wed, 29 May 2019 05:41:00 GMT
-Received: from b01ledav003.gho.pok.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 94EF2B2066;
-	Wed, 29 May 2019 05:41:00 +0000 (GMT)
-Received: from b01ledav003.gho.pok.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id B241DB2065;
-	Wed, 29 May 2019 05:40:58 +0000 (GMT)
+	verify=OK); Wed, 29 May 2019 05:40:26 GMT
+Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id B185DBE051;
+	Wed, 29 May 2019 05:40:26 +0000 (GMT)
+Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 8FD0DBE04F;
+	Wed, 29 May 2019 05:40:24 +0000 (GMT)
 Received: from [127.0.1.1] (unknown [9.124.31.56])
-	by b01ledav003.gho.pok.ibm.com (Postfix) with ESMTP;
-	Wed, 29 May 2019 05:40:58 +0000 (GMT)
+	by b03ledav005.gho.boulder.ibm.com (Postfix) with ESMTP;
+	Wed, 29 May 2019 05:40:24 +0000 (GMT)
 From: Aravinda Prasad <aravinda@linux.vnet.ibm.com>
 To: aik@au1.ibm.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org,
 	david@gibson.dropbear.id.au
-Date: Wed, 29 May 2019 11:10:57 +0530
-Message-ID: <155910845769.13149.8097972239187020170.stgit@aravinda>
+Date: Wed, 29 May 2019 11:10:23 +0530
 In-Reply-To: <155910829070.13149.5215948335633966328.stgit@aravinda>
 References: <155910829070.13149.5215948335633966328.stgit@aravinda>
 User-Agent: StGit/0.17.1-dirty
@@ -74,18 +77,27 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
 X-TM-AS-GCONF: 00
+x-cbid: 19052905-8235-0000-0000-00000E9FBB27
+X-IBM-SpamModules-Scores: 
+X-IBM-SpamModules-Versions: BY=3.00011177; HX=3.00000242; KW=3.00000007;
+	PH=3.00000004; SC=3.00000286; SDB=6.01210123; UDB=6.00635758;
+	IPR=6.00991155; 
+	MB=3.00027096; MTD=3.00000008; XFM=3.00000015; UTC=2019-05-29 05:40:29
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19052905-8236-0000-0000-000045C34D72
+Message-Id: <155910842340.13149.1753970249353896871.stgit@aravinda>
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
 	definitions=2019-05-29_03:, , signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
 	priorityscore=1501
-	malwarescore=0 suspectscore=2 phishscore=0 bulkscore=0 spamscore=0
+	malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
 	clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
-	mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+	mlxlogscore=908 adultscore=0 classifier=spam adjust=0 reason=mlx
 	scancount=1 engine=8.0.1-1810050000 definitions=main-1905290037
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
 X-Received-From: 148.163.156.1
-Subject: [Qemu-devel] [PATCH v9 6/6] migration: Include migration support
- for machine check handling
+Subject: [Qemu-devel] [PATCH v9 2/6] Wrapper function to wait on condition
+ for the main loop mutex
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -102,129 +114,54 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This patch includes migration support for machine check
-handling. Especially this patch blocks VM migration
-requests until the machine check error handling is
-complete as (i) these errors are specific to the source
-hardware and is irrelevant on the target hardware,
-(ii) these errors cause data corruption and should
-be handled before migration.
+Introduce a wrapper function to wait on condition for
+the main loop mutex. This function atomically releases
+the main loop mutex and causes the calling thread to
+block on the condition. This wrapper is required because
+qemu_global_mutex is a static variable.
 
 Signed-off-by: Aravinda Prasad <aravinda@linux.vnet.ibm.com>
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+Reviewed-by: Greg Kurz <groug@kaod.org>
 ---
- hw/ppc/spapr.c         |   20 ++++++++++++++++++++
- hw/ppc/spapr_events.c  |   17 +++++++++++++++++
- hw/ppc/spapr_rtas.c    |    4 ++++
- include/hw/ppc/spapr.h |    2 ++
- 4 files changed, 43 insertions(+)
+ cpus.c                   |    5 +++++
+ include/qemu/main-loop.h |    8 ++++++++
+ 2 files changed, 13 insertions(+)
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index e8a77636..31c4850 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -2104,6 +2104,25 @@ static const VMStateDescription vmstate_spapr_dtb = {
-     },
- };
- 
-+static bool spapr_fwnmi_needed(void *opaque)
-+{
-+    SpaprMachineState *spapr = (SpaprMachineState *)opaque;
-+
-+    return (spapr->guest_machine_check_addr == -1) ? 0 : 1;
-+}
-+
-+static const VMStateDescription vmstate_spapr_machine_check = {
-+    .name = "spapr_machine_check",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .needed = spapr_fwnmi_needed,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT64(guest_machine_check_addr, SpaprMachineState),
-+        VMSTATE_INT32(mc_status, SpaprMachineState),
-+        VMSTATE_END_OF_LIST()
-+    },
-+};
-+
- static const VMStateDescription vmstate_spapr = {
-     .name = "spapr",
-     .version_id = 3,
-@@ -2137,6 +2156,7 @@ static const VMStateDescription vmstate_spapr = {
-         &vmstate_spapr_dtb,
-         &vmstate_spapr_cap_large_decr,
-         &vmstate_spapr_cap_ccf_assist,
-+        &vmstate_spapr_machine_check,
-         NULL
-     }
- };
-diff --git a/hw/ppc/spapr_events.c b/hw/ppc/spapr_events.c
-index 573c0b7..35e21e4 100644
---- a/hw/ppc/spapr_events.c
-+++ b/hw/ppc/spapr_events.c
-@@ -41,6 +41,7 @@
- #include "qemu/bcd.h"
- #include "hw/ppc/spapr_ovec.h"
- #include <libfdt.h>
-+#include "migration/blocker.h"
- 
- #define RTAS_LOG_VERSION_MASK                   0xff000000
- #define   RTAS_LOG_VERSION_6                    0x06000000
-@@ -855,6 +856,22 @@ static void spapr_mce_dispatch_elog(PowerPCCPU *cpu, bool recovered)
- void spapr_mce_req_event(PowerPCCPU *cpu, bool recovered)
- {
-     SpaprMachineState *spapr = SPAPR_MACHINE(qdev_get_machine());
-+    int ret;
-+    Error *local_err = NULL;
-+
-+    error_setg(&spapr->fwnmi_migration_blocker,
-+            "Live migration not supported during machine check handling");
-+    ret = migrate_add_blocker(spapr->fwnmi_migration_blocker, &local_err);
-+    if (ret < 0) {
-+        /*
-+         * We don't want to abort and let the migration to continue. In a
-+         * rare case, the machine check handler will run on the target
-+         * hardware. Though this is not preferable, it is better than aborting
-+         * the migration or killing the VM.
-+         */
-+        error_free(spapr->fwnmi_migration_blocker);
-+        warn_report_err(local_err);
-+    }
- 
-     while (spapr->mc_status != -1) {
-         /*
-diff --git a/hw/ppc/spapr_rtas.c b/hw/ppc/spapr_rtas.c
-index 91a7ab9..c849223 100644
---- a/hw/ppc/spapr_rtas.c
-+++ b/hw/ppc/spapr_rtas.c
-@@ -50,6 +50,7 @@
- #include "target/ppc/mmu-hash64.h"
- #include "target/ppc/mmu-book3s-v3.h"
- #include "kvm_ppc.h"
-+#include "migration/blocker.h"
- 
- static void rtas_display_character(PowerPCCPU *cpu, SpaprMachineState *spapr,
-                                    uint32_t token, uint32_t nargs,
-@@ -404,6 +405,9 @@ static void rtas_ibm_nmi_interlock(PowerPCCPU *cpu,
-         spapr->mc_status = -1;
-         qemu_cond_signal(&spapr->mc_delivery_cond);
-         rtas_st(rets, 0, RTAS_OUT_SUCCESS);
-+        migrate_del_blocker(spapr->fwnmi_migration_blocker);
-+        error_free(spapr->fwnmi_migration_blocker);
-+        spapr->fwnmi_migration_blocker = NULL;
-     }
+diff --git a/cpus.c b/cpus.c
+index ffc5711..14cb24b 100644
+--- a/cpus.c
++++ b/cpus.c
+@@ -1867,6 +1867,11 @@ void qemu_mutex_unlock_iothread(void)
+     qemu_mutex_unlock(&qemu_global_mutex);
  }
  
-diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-index bd75d4b..6c0cfd8 100644
---- a/include/hw/ppc/spapr.h
-+++ b/include/hw/ppc/spapr.h
-@@ -214,6 +214,8 @@ struct SpaprMachineState {
-     SpaprCapabilities def, eff, mig;
- 
-     unsigned gpu_numa_id;
++void qemu_cond_wait_iothread(QemuCond *cond)
++{
++    qemu_cond_wait(cond, &qemu_global_mutex);
++}
 +
-+    Error *fwnmi_migration_blocker;
- };
+ static bool all_vcpus_paused(void)
+ {
+     CPUState *cpu;
+diff --git a/include/qemu/main-loop.h b/include/qemu/main-loop.h
+index f6ba78e..a6d20b0 100644
+--- a/include/qemu/main-loop.h
++++ b/include/qemu/main-loop.h
+@@ -295,6 +295,14 @@ void qemu_mutex_lock_iothread_impl(const char *file, int line);
+  */
+ void qemu_mutex_unlock_iothread(void);
  
- #define H_SUCCESS         0
++/*
++ * qemu_cond_wait_iothread: Wait on condition for the main loop mutex
++ *
++ * This function atomically releases the main loop mutex and causes
++ * the calling thread to block on the condition.
++ */
++void qemu_cond_wait_iothread(QemuCond *cond);
++
+ /* internal interfaces */
+ 
+ void qemu_fd_register(int fd);
 
 
