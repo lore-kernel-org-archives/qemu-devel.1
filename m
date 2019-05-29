@@ -6,71 +6,74 @@ X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D032C04AB6
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 01:22:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 22850C04AB6
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 02:41:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 40D9C2070D
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 01:22:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 40D9C2070D
+	by mail.kernel.org (Postfix) with ESMTPS id EC50821019
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 02:41:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EC50821019
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:45251 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:45936 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hVnIH-0001Ob-B6
-	for qemu-devel@archiver.kernel.org; Tue, 28 May 2019 21:22:17 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:47686)
+	id 1hVoXF-0003hM-0V
+	for qemu-devel@archiver.kernel.org; Tue, 28 May 2019 22:41:49 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:57680)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1hVnHY-00016p-Rk
-	for qemu-devel@nongnu.org; Tue, 28 May 2019 21:21:33 -0400
+	(envelope-from <mst@redhat.com>) id 1hVoWW-0003O4-4w
+	for qemu-devel@nongnu.org; Tue, 28 May 2019 22:41:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1hVnHX-0001Xe-1H
-	for qemu-devel@nongnu.org; Tue, 28 May 2019 21:21:32 -0400
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:40167)
+	(envelope-from <mst@redhat.com>) id 1hVoWT-0007hW-Mt
+	for qemu-devel@nongnu.org; Tue, 28 May 2019 22:41:04 -0400
+Received: from mail-qk1-f196.google.com ([209.85.222.196]:35649)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hVnHS-0001S1-5J
-	for qemu-devel@nongnu.org; Tue, 28 May 2019 21:21:28 -0400
-Received: by mail-wm1-f65.google.com with SMTP id 15so359312wmg.5
-	for <qemu-devel@nongnu.org>; Tue, 28 May 2019 18:21:19 -0700 (PDT)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1hVoWR-0007TB-QU
+	for qemu-devel@nongnu.org; Tue, 28 May 2019 22:41:00 -0400
+Received: by mail-qk1-f196.google.com with SMTP id l128so516079qke.2
+	for <qemu-devel@nongnu.org>; Tue, 28 May 2019 19:40:47 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-	:user-agent:mime-version:in-reply-to:content-language
-	:content-transfer-encoding;
-	bh=ycYOtGiWthinXl/Acj8a7yeW0iGtvdSx5stpHQ0pLsk=;
-	b=g2urJD0uiBBLxtfj97r3VOZTkvy5yHdF8hByvnQQe996F0DXJBg3fsJI68Er+pIkIM
-	dEIEQpp+UfnUWhEF4BjsREjmluEVboCiMtMD89Oh9u77GDwOld32F6+3oHXvK6R/bGJE
-	DWVGyvy5cBlMaxeSAvtjZE7lUFXkaoZ3DT3GHiqTcze+Gy3E/V45lyENnEDc8CUsGXfg
-	rsxh+s4jr9N90g9vAtx6tbknK9IthjlY9WVknDWo/GMLslMJnZBIj8EZnhrIb+oHl/OL
-	Gu8Z63t5g/HKRlyE8vlwtdYptnKGSX+4F7VdCvXoIcSheNv+ToVDmsFRW+ULLm/FwUGG
-	pFKw==
-X-Gm-Message-State: APjAAAWmgW7MXOZY7EAIo+EA65h4a3hMwOTXLZdbFu3OdqwMJV61CImc
-	ChFR5fJYRmNPXdErsFHlQ/QRYw==
-X-Google-Smtp-Source: APXvYqwzL8tm/m5Os0a/FasPn2DjbMILphwdxDuTsMvVG3iX5GScFGcVa/5u90NmQuX0n2aicBUsPg==
-X-Received: by 2002:a1c:7c07:: with SMTP id x7mr4595427wmc.60.1559092878354;
-	Tue, 28 May 2019 18:21:18 -0700 (PDT)
-Received: from [192.168.10.150] ([93.56.166.5])
-	by smtp.gmail.com with ESMTPSA id z5sm4216771wma.36.2019.05.28.18.21.17
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Tue, 28 May 2019 18:21:17 -0700 (PDT)
-To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
-References: <20190528204838.21568-1-kraxel@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <bf45adf2-1594-89b4-6a4d-9af6d9e8ac6e@redhat.com>
-Date: Wed, 29 May 2019 03:21:16 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+	:mime-version:content-disposition:in-reply-to;
+	bh=IdflxEZdyI2LNkeIyhEC2MlHd8bbffi7s8wHFZHpbB0=;
+	b=RWZ46f5Jb63/eyOSR+aTQKVsdm+vZ+RxJp2yjgk2ZtT3cC82Da9meZ3+Rk5CsSJjqE
+	nyRqXowSDe7Xh4zIvABSCdFQbN0A2yw1XcCS7qOf5qjN+rALLm6nqwK/57yyUQdKbL7U
+	o7+emR6zjwfnuUkXv95W76VTA9yswmlsX1mVIdA007sCfsjNSPoUKr2WeIEqMA907Vqc
+	9EjZTmDNgpWgpvN18SWTa4O+SP/7PHOiHbmE9ZNmB8c/yEbm7vfHj2Od0J83VF1mnk/d
+	Cn+FKIsSofW6fA+StYwoabazqn7SyYb75R1QQ/VSvpDwLDB0qQbVgT9Oe0iS01n4ery4
+	3bvA==
+X-Gm-Message-State: APjAAAXqGzHXoCn1+V2GmRVxF5bFJyzyOh3EzGUpuk6m7H5H3j9DWyUH
+	2JS6EOx4RnmsjAkTXynY9kmrEw==
+X-Google-Smtp-Source: APXvYqzKphDX8EIfgIa43ve69qrEF5DmbCRqeMKpYOTriH8DVdfI98bKT/nLKi3TDSI35mSUp8Qc0g==
+X-Received: by 2002:a05:620a:34d:: with SMTP id
+	t13mr16454337qkm.201.1559097646586; 
+	Tue, 28 May 2019 19:40:46 -0700 (PDT)
+Received: from redhat.com (pool-100-0-197-103.bstnma.fios.verizon.net.
+	[100.0.197.103])
+	by smtp.gmail.com with ESMTPSA id k5sm2038329qtj.40.2019.05.28.19.40.44
+	(version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+	Tue, 28 May 2019 19:40:45 -0700 (PDT)
+Date: Tue, 28 May 2019 22:40:42 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Jens Freimann <jfreimann@redhat.com>
+Message-ID: <20190528223900-mutt-send-email-mst@kernel.org>
+References: <20190517125820.2885-1-jfreimann@redhat.com>
+	<20190520165657.2293c5d7@x1.home>
+	<20190521072157.wpb77wlc5mhfcdes@jenstp.localdomain>
+	<20190521073511-mutt-send-email-mst@kernel.org>
+	<20190521184918.n4nnk6ack3ssp6jv@jenstp.localdomain>
 MIME-Version: 1.0
-In-Reply-To: <20190528204838.21568-1-kraxel@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190521184918.n4nnk6ack3ssp6jv@jenstp.localdomain>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 	[fuzzy]
-X-Received-From: 209.85.128.65
-Subject: Re: [Qemu-devel] [PATCH] q35: split memory at 2G
+X-Received-From: 209.85.222.196
+Subject: Re: [Qemu-devel] [PATCH 0/4] add failover feature for assigned
+ network devices
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -82,34 +85,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Richard Henderson <rth@twiddle.net>,
-	=?UTF-8?B?TMOhc3psw7Mgw4lyc2Vr?= <lersek@redhat.com>,
-	Eduardo Habkost <ehabkost@redhat.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>
+Cc: pkrempa@redhat.com, berrange@redhat.com, ehabkost@redhat.com,
+	aadam@redhat.com, qemu-devel@nongnu.org,
+	Alex Williamson <alex.williamson@redhat.com>, laine@redhat.com,
+	ailan@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 28/05/19 22:48, Gerd Hoffmann wrote:
-> Original q35 behavior was to split memory 2.75 GB, leaving space for the
-> mmconfig bar at 0xb000000 and pci I/O window starting at 0xc0000000.
+On Tue, May 21, 2019 at 08:49:18PM +0200, Jens Freimann wrote:
+> On Tue, May 21, 2019 at 07:37:19AM -0400, Michael S. Tsirkin wrote:
+> > On Tue, May 21, 2019 at 09:21:57AM +0200, Jens Freimann wrote:
+> > > On Mon, May 20, 2019 at 04:56:57PM -0600, Alex Williamson wrote:
+> > > > On Fri, 17 May 2019 14:58:16 +0200
+> > > > Jens Freimann <jfreimann@redhat.com> wrote:
+> > > > > Command line example:
+> > > > >
+> > > > > qemu-system-x86_64 -enable-kvm -m 3072 -smp 3 \
+> > > > >         -machine q35,kernel-irqchip=split -cpu host   \
+> > > > >         -k fr   \
+> > > > >         -serial stdio   \
+> > > > >         -net none \
+> > > > >         -qmp unix:/tmp/qmp.socket,server,nowait \
+> > > > >         -monitor telnet:127.0.0.1:5555,server,nowait \
+> > > > >         -device pcie-root-port,id=root0,multifunction=on,chassis=0,addr=0xa \
+> > > > >         -device pcie-root-port,id=root1,bus=pcie.0,chassis=1 \
+> > > > >         -device pcie-root-port,id=root2,bus=pcie.0,chassis=2 \
+> > > > >         -netdev tap,script=/root/bin/bridge.sh,downscript=no,id=hostnet1,vhost=on \
+> > > > >         -device virtio-net-pci,netdev=hostnet1,id=net1,mac=52:54:00:6f:55:cc,bus=root2,failover=on \
+> > > > >         /root/rhel-guest-image-8.0-1781.x86_64.qcow2
+> > > > >
+> > > > > Then the primary device can be hotplugged via
+> > > > >  (qemu) device_add vfio-pci,host=5e:00.2,id=hostdev0,bus=root1,standby=net1
+> > > >
+> > > > Is this standby= option only valid for Network/Ethernet class code
+> > > > devices?  If so, perhaps vfio-pci code should reject the option on any
+> > > > non-ethernet devices.  The option is also non-intuitive for users, only
+> > > > through examples like above can we see it relates to the id of the
+> > > > secondary device.  Could we instead name it something like
+> > > > "standby_net_failover_pair_id="?
+> > > 
+> > > It is only for ethernet (VFs), I will add code to reject non-ethernet VF devices.
+> > > I agree the name is not descriptive and the one you suggest seems good to
+> > > me.
+> > > >
+> > > > Also, this feature requires matching MAC addresses per the description,
+> > > > where is that done?  Is it the user's responsibility to set the MAC on
+> > > > the host device prior to the device_add?  If so, is this actually not
+> > > > only specific to ethernet devices, but ethernet VFs?
+> > > 
+> > > Yes, it's the users responsibility and the MACs are then matched by
+> > > the net_failover driver in the guest. It makes sense for ethernet VFs only,
+> > > I'll add a check for that.
+> > 
+> > Actually is there a list of devices for which this has been tested
+> > besides mlx5? I think someone said some old intel cards
+> > don't support this well, we might need to blacklist these ...
 > 
-> Note: Those machine types have been removed from the qemu codebase
-> meanwhile because they could not be live-migrated so there was little
-> value in keeping them around.
+> So far I've tested mlx5 and XL710 which both worked, but I'm
+> working on testing with more devices. But of course help with testing
+> is greatly appreciated.
 > 
-> With the effort to allow for gigabyte-alignment of guest memory that
-> behavior was changed:  The split was moved to 2G, but only in case the
-> memory didn't fit below 2.75 GB.
-> 
-> So today the address space between 2G and 2,75G is not used for guest
-> memory in typical use cases, where the guest memory sized at a power of
-> two or a gigabyte number.  But if you configure your guest with some odd
-> amout of memory (such as 2.5G) the address space is used.
+> regards,
+> Jens
 
-Wasn't it done to ensure pre-PAE OSes could use as much memory as
-possible?  (If you run pre-PAE OSes with more RAM than can fit below 4G,
-you can just reduce the amount of memory and get all the 2.75G).
+A testing tool that people can run to get a pass/fail
+result would be needed for that.
+Do you have something like this?
 
-Paolo
+-- 
+MST
 
