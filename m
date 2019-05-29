@@ -2,62 +2,65 @@ Return-Path: <SRS0=DspQ=T5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_NEOMUTT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 77328C04AB3
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 06:38:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D0D1C04AB3
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 06:42:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3B2A521670
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 06:38:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3B2A521670
+	by mail.kernel.org (Postfix) with ESMTPS id D77DC21670
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 06:42:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D77DC21670
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:48150 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:48212 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hVsEY-0007Tx-JM
-	for qemu-devel@archiver.kernel.org; Wed, 29 May 2019 02:38:46 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:42075)
+	id 1hVsIB-0000yt-PO
+	for qemu-devel@archiver.kernel.org; Wed, 29 May 2019 02:42:31 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:44885)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1hVs4q-0000cg-HU
-	for qemu-devel@nongnu.org; Wed, 29 May 2019 02:28:45 -0400
+	(envelope-from <kraxel@redhat.com>) id 1hVsGz-0000OU-RC
+	for qemu-devel@nongnu.org; Wed, 29 May 2019 02:41:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1hVs4o-0004gm-H9
-	for qemu-devel@nongnu.org; Wed, 29 May 2019 02:28:44 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60338)
+	(envelope-from <kraxel@redhat.com>) id 1hVsGy-0007qH-Vm
+	for qemu-devel@nongnu.org; Wed, 29 May 2019 02:41:17 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42634)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1hVs4o-0004ft-AS
-	for qemu-devel@nongnu.org; Wed, 29 May 2019 02:28:42 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1hVsGy-00050k-1n
+	for qemu-devel@nongnu.org; Wed, 29 May 2019 02:41:16 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 09D425857F;
-	Wed, 29 May 2019 06:28:41 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 513F185528
+	for <qemu-devel@nongnu.org>; Wed, 29 May 2019 06:41:05 +0000 (UTC)
 Received: from sirius.home.kraxel.org (ovpn-116-59.ams2.redhat.com
 	[10.36.116.59])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id D8DB561B65;
-	Wed, 29 May 2019 06:28:37 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 23304646CC;
+	Wed, 29 May 2019 06:41:04 +0000 (UTC)
 Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
-	id 294591752B; Wed, 29 May 2019 08:28:33 +0200 (CEST)
+	id 61E5111AAB; Wed, 29 May 2019 08:41:03 +0200 (CEST)
+Date: Wed, 29 May 2019 08:41:03 +0200
 From: Gerd Hoffmann <kraxel@redhat.com>
-To: qemu-devel@nongnu.org
-Date: Wed, 29 May 2019 08:28:28 +0200
-Message-Id: <20190529062832.26483-6-kraxel@redhat.com>
-In-Reply-To: <20190529062832.26483-1-kraxel@redhat.com>
-References: <20190529062832.26483-1-kraxel@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+To: Max Reitz <mreitz@redhat.com>
+Message-ID: <20190529064103.2con6v4kevqx2t76@sirius.home.kraxel.org>
+References: <20190527142540.23255-1-mreitz@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190527142540.23255-1-mreitz@redhat.com>
+User-Agent: NeoMutt/20180716
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.39]);
-	Wed, 29 May 2019 06:28:41 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.28]);
+	Wed, 29 May 2019 06:41:05 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 5/9] usb-hub: make number of ports
- runtime-configurable
+Subject: Re: [Qemu-devel] [PATCH] ui/curses: Fix build with -m32
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -69,195 +72,18 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add num_ports property which allows configure the number of downstream
-ports.  Valid range is 1-8, default is 8.
+On Mon, May 27, 2019 at 04:25:40PM +0200, Max Reitz wrote:
+> wchar_t may resolve to be an unsigned long on 32-bit architectures.
+> Using the %x conversion specifier will then give a compiler warning:
 
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-Message-id: 20190524070310.4952-3-kraxel@redhat.com
----
- hw/usb/dev-hub.c | 45 +++++++++++++++++++++++++++++----------------
- 1 file changed, 29 insertions(+), 16 deletions(-)
+Added to ui queue.
 
-diff --git a/hw/usb/dev-hub.c b/hw/usb/dev-hub.c
-index 9b04b6a6ec2d..4f700c8f92b5 100644
---- a/hw/usb/dev-hub.c
-+++ b/hw/usb/dev-hub.c
-@@ -29,7 +29,7 @@
- #include "desc.h"
- #include "qemu/error-report.h"
- 
--#define NUM_PORTS 8
-+#define MAX_PORTS 8
- 
- typedef struct USBHubPort {
-     USBPort port;
-@@ -40,7 +40,8 @@ typedef struct USBHubPort {
- typedef struct USBHubState {
-     USBDevice dev;
-     USBEndpoint *intr;
--    USBHubPort ports[NUM_PORTS];
-+    uint32_t num_ports;
-+    USBHubPort ports[MAX_PORTS];
- } USBHubState;
- 
- #define TYPE_USB_HUB "usb-hub"
-@@ -109,7 +110,7 @@ static const USBDescIface desc_iface_hub = {
-         {
-             .bEndpointAddress      = USB_DIR_IN | 0x01,
-             .bmAttributes          = USB_ENDPOINT_XFER_INT,
--            .wMaxPacketSize        = 1 + DIV_ROUND_UP(NUM_PORTS, 8),
-+            .wMaxPacketSize        = 1 + DIV_ROUND_UP(MAX_PORTS, 8),
-             .bInterval             = 0xff,
-         },
-     }
-@@ -242,7 +243,7 @@ static USBDevice *usb_hub_find_device(USBDevice *dev, uint8_t addr)
-     USBDevice *downstream;
-     int i;
- 
--    for (i = 0; i < NUM_PORTS; i++) {
-+    for (i = 0; i < s->num_ports; i++) {
-         port = &s->ports[i];
-         if (!(port->wPortStatus & PORT_STAT_ENABLE)) {
-             continue;
-@@ -262,7 +263,7 @@ static void usb_hub_handle_reset(USBDevice *dev)
-     int i;
- 
-     trace_usb_hub_reset(s->dev.addr);
--    for (i = 0; i < NUM_PORTS; i++) {
-+    for (i = 0; i < s->num_ports; i++) {
-         port = s->ports + i;
-         port->wPortStatus = PORT_STAT_POWER;
-         port->wPortChange = 0;
-@@ -332,7 +333,7 @@ static void usb_hub_handle_control(USBDevice *dev, USBPacket *p,
-         {
-             unsigned int n = index - 1;
-             USBHubPort *port;
--            if (n >= NUM_PORTS) {
-+            if (n >= s->num_ports) {
-                 goto fail;
-             }
-             port = &s->ports[n];
-@@ -361,7 +362,7 @@ static void usb_hub_handle_control(USBDevice *dev, USBPacket *p,
-             trace_usb_hub_set_port_feature(s->dev.addr, index,
-                                            feature_name(value));
- 
--            if (n >= NUM_PORTS) {
-+            if (n >= s->num_ports) {
-                 goto fail;
-             }
-             port = &s->ports[n];
-@@ -394,7 +395,7 @@ static void usb_hub_handle_control(USBDevice *dev, USBPacket *p,
-             trace_usb_hub_clear_port_feature(s->dev.addr, index,
-                                              feature_name(value));
- 
--            if (n >= NUM_PORTS) {
-+            if (n >= s->num_ports) {
-                 goto fail;
-             }
-             port = &s->ports[n];
-@@ -443,17 +444,17 @@ static void usb_hub_handle_control(USBDevice *dev, USBPacket *p,
-             unsigned int n, limit, var_hub_size = 0;
-             memcpy(data, qemu_hub_hub_descriptor,
-                    sizeof(qemu_hub_hub_descriptor));
--            data[2] = NUM_PORTS;
-+            data[2] = s->num_ports;
- 
-             /* fill DeviceRemovable bits */
--            limit = DIV_ROUND_UP(NUM_PORTS + 1, 8) + 7;
-+            limit = DIV_ROUND_UP(s->num_ports + 1, 8) + 7;
-             for (n = 7; n < limit; n++) {
-                 data[n] = 0x00;
-                 var_hub_size++;
-             }
- 
-             /* fill PortPwrCtrlMask bits */
--            limit = limit + DIV_ROUND_UP(NUM_PORTS, 8);
-+            limit = limit + DIV_ROUND_UP(s->num_ports, 8);
-             for (;n < limit; n++) {
-                 data[n] = 0xff;
-                 var_hub_size++;
-@@ -481,7 +482,7 @@ static void usb_hub_handle_data(USBDevice *dev, USBPacket *p)
-             unsigned int status;
-             uint8_t buf[4];
-             int i, n;
--            n = DIV_ROUND_UP(NUM_PORTS + 1, 8);
-+            n = DIV_ROUND_UP(s->num_ports + 1, 8);
-             if (p->iov.size == 1) { /* FreeBSD workaround */
-                 n = 1;
-             } else if (n > p->iov.size) {
-@@ -489,7 +490,7 @@ static void usb_hub_handle_data(USBDevice *dev, USBPacket *p)
-                 return;
-             }
-             status = 0;
--            for(i = 0; i < NUM_PORTS; i++) {
-+            for (i = 0; i < s->num_ports; i++) {
-                 port = &s->ports[i];
-                 if (port->wPortChange)
-                     status |= (1 << (i + 1));
-@@ -520,7 +521,7 @@ static void usb_hub_unrealize(USBDevice *dev, Error **errp)
-     USBHubState *s = (USBHubState *)dev;
-     int i;
- 
--    for (i = 0; i < NUM_PORTS; i++) {
-+    for (i = 0; i < s->num_ports; i++) {
-         usb_unregister_port(usb_bus_from_device(dev),
-                             &s->ports[i].port);
-     }
-@@ -540,6 +541,12 @@ static void usb_hub_realize(USBDevice *dev, Error **errp)
-     USBHubPort *port;
-     int i;
- 
-+    if (s->num_ports < 1 || s->num_ports > MAX_PORTS) {
-+        error_setg(errp, "num_ports (%d) out of range (1..%d)",
-+                   s->num_ports, MAX_PORTS);
-+        return;
-+    }
-+
-     if (dev->port->hubcount == 5) {
-         error_setg(errp, "usb hub chain too deep");
-         return;
-@@ -548,7 +555,7 @@ static void usb_hub_realize(USBDevice *dev, Error **errp)
-     usb_desc_create_serial(dev);
-     usb_desc_init(dev);
-     s->intr = usb_ep_get(dev, USB_TOKEN_IN, 1);
--    for (i = 0; i < NUM_PORTS; i++) {
-+    for (i = 0; i < s->num_ports; i++) {
-         port = &s->ports[i];
-         usb_register_port(usb_bus_from_device(dev),
-                           &port->port, s, i, &usb_hub_port_ops,
-@@ -575,12 +582,17 @@ static const VMStateDescription vmstate_usb_hub = {
-     .minimum_version_id = 1,
-     .fields = (VMStateField[]) {
-         VMSTATE_USB_DEVICE(dev, USBHubState),
--        VMSTATE_STRUCT_ARRAY(ports, USBHubState, NUM_PORTS, 0,
-+        VMSTATE_STRUCT_ARRAY(ports, USBHubState, MAX_PORTS, 0,
-                              vmstate_usb_hub_port, USBHubPort),
-         VMSTATE_END_OF_LIST()
-     }
- };
- 
-+static Property usb_hub_properties[] = {
-+    DEFINE_PROP_UINT32("ports", USBHubState, num_ports, 8),
-+    DEFINE_PROP_END_OF_LIST(),
-+};
-+
- static void usb_hub_class_initfn(ObjectClass *klass, void *data)
- {
-     DeviceClass *dc = DEVICE_CLASS(klass);
-@@ -597,6 +609,7 @@ static void usb_hub_class_initfn(ObjectClass *klass, void *data)
-     set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
-     dc->fw_name = "hub";
-     dc->vmsd = &vmstate_usb_hub;
-+    dc->props = usb_hub_properties;
- }
- 
- static const TypeInfo hub_info = {
--- 
-2.18.1
+thanks,
+  Gerd
 
 
