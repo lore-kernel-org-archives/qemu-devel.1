@@ -2,53 +2,76 @@ Return-Path: <SRS0=DspQ=T5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 344E5C28CC0
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 18:22:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BDD48C28CC0
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 18:23:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0DCA42405D
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 18:22:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0DCA42405D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id 8E60724061
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 18:23:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8E60724061
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ubuntu.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:58951 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:58957 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hW3D6-0003vZ-7L
-	for qemu-devel@archiver.kernel.org; Wed, 29 May 2019 14:22:00 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:59682)
+	id 1hW3E8-0004kw-QQ
+	for qemu-devel@archiver.kernel.org; Wed, 29 May 2019 14:23:04 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:48716)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1hW3Bi-00031D-MJ
-	for qemu-devel@nongnu.org; Wed, 29 May 2019 14:20:35 -0400
+	(envelope-from <bounces@canonical.com>) id 1hW2Fv-0007K2-7b
+	for qemu-devel@nongnu.org; Wed, 29 May 2019 13:20:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <andrey.shinkevich@virtuozzo.com>) id 1hW3Bh-0006Fa-Iy
-	for qemu-devel@nongnu.org; Wed, 29 May 2019 14:20:34 -0400
-Received: from relay.sw.ru ([185.231.240.75]:48886)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <andrey.shinkevich@virtuozzo.com>)
-	id 1hW3Bg-0006Cw-T3; Wed, 29 May 2019 14:20:33 -0400
-Received: from [172.16.25.136] (helo=localhost.sw.ru)
-	by relay.sw.ru with esmtp (Exim 4.91)
-	(envelope-from <andrey.shinkevich@virtuozzo.com>)
-	id 1hW3Bd-0006Yr-D5; Wed, 29 May 2019 21:20:29 +0300
-From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-To: qemu-devel@nongnu.org,
-	qemu-block@nongnu.org
-Date: Wed, 29 May 2019 21:20:27 +0300
-Message-Id: <1559154027-282547-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-X-Mailer: git-send-email 1.8.3.1
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 185.231.240.75
-Subject: [Qemu-devel] [PATCH v2] hw/block/fdc: floppy command FIFO memory
- initialization
+	(envelope-from <bounces@canonical.com>) id 1hW2Fu-0003TV-9B
+	for qemu-devel@nongnu.org; Wed, 29 May 2019 13:20:51 -0400
+Received: from indium.canonical.com ([91.189.90.7]:54274)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1hW2Fu-0003SE-3t
+	for qemu-devel@nongnu.org; Wed, 29 May 2019 13:20:50 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1hW2Fr-0005fl-Lp
+	for <qemu-devel@nongnu.org>; Wed, 29 May 2019 17:20:47 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 694062E80D0
+	for <qemu-devel@nongnu.org>; Wed, 29 May 2019 17:20:47 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 29 May 2019 17:14:23 -0000
+From: Steve Beattie <sbeattie@ubuntu.com>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=intel; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug: distribution=ubuntu; sourcepackage=qemu; component=main;
+	status=New; importance=Undecided; assignee=None; 
+X-Launchpad-Bug-Tags: intel-virt-19.10 qemu-19.10
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: quanxian-wang sbeattie
+X-Launchpad-Bug-Reporter: quanxian (quanxian-wang)
+X-Launchpad-Bug-Modifier: Steve Beattie (sbeattie)
+References: <155909595152.12810.1489513977238974514.malonedeb@soybean.canonical.com>
+Message-Id: <155915006372.16310.9543487162464035752.malone@chaenomeles.canonical.com>
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="18968";
+	Instance="launchpad-lazr.conf"
+X-Launchpad-Hash: 7681295f79fb2ad7dd105fcd6c2756e63ba63e4c
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 91.189.90.7
+X-Mailman-Approved-At: Wed, 29 May 2019 14:21:39 -0400
+Subject: [Qemu-devel] [Bug 1830821] Re: Expose ARCH_CAP_MDS_NO in guest
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -57,41 +80,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, mreitz@redhat.com,
-	andrey.shinkevich@virtuozzo.com, den@openvz.org, jsnow@redhat.com
+Reply-To: Bug 1830821 <1830821@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The uninitialized memory allocated for the command FIFO of the
-floppy controller during the VM hardware initialization incurs
-many unwanted reports by Valgrind when VM state is being saved.
-That verbosity hardens a search for the real memory issues when
-the iotests run. Particularly, the patch eliminates 20 unnecessary
-reports of the Valgrind tool in the iotest #169.
+The specific upstream commit is 20140a82c67467f53814ca197403d5e1b561a5e5
+and is incorporated into qemu 1:3.1+dfsg-2ubuntu3.1 in disco-security
+(19.04) and 1:3.1+dfsg-2ubuntu4 in eoan-proposed. For backporting to
+cosmic and older, I believe it requires the infrastructure to support
+IA32_ARCH_CAPABILITIES in place.
 
-Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
----
-v2:
-  01: The pointer unnecessary check 'if (fdctrl->fifo)' was removed
-      as suggested by John.
+-- =
 
- hw/block/fdc.c | 1 +
- 1 file changed, 1 insertion(+)
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1830821
 
-diff --git a/hw/block/fdc.c b/hw/block/fdc.c
-index 6f19f12..9af762b 100644
---- a/hw/block/fdc.c
-+++ b/hw/block/fdc.c
-@@ -2647,6 +2647,7 @@ static void fdctrl_realize_common(DeviceState *dev, FDCtrl *fdctrl,
- 
-     FLOPPY_DPRINTF("init controller\n");
-     fdctrl->fifo = qemu_memalign(512, FD_SECTOR_LEN);
-+    memset(fdctrl->fifo, 0, FD_SECTOR_LEN);
-     fdctrl->fifo_size = 512;
-     fdctrl->result_timer = timer_new_ns(QEMU_CLOCK_VIRTUAL,
-                                              fdctrl_result_timer, fdctrl);
--- 
-1.8.3.1
+Title:
+  Expose ARCH_CAP_MDS_NO in guest
 
+Status in intel:
+  New
+Status in QEMU:
+  New
+Status in qemu package in Ubuntu:
+  New
+
+Bug description:
+  Description:
+
+  MDS_NO is bit 5 of ARCH_CAPABILITIES. Expose this bit to guest.
+
+  Target Qemu: 4.1
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/intel/+bug/1830821/+subscriptions
 
