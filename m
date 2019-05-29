@@ -6,60 +6,59 @@ X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 63313C28CC0
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 16:39:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BFABC28CC0
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 16:39:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3C9AF23DE8
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 16:39:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3C9AF23DE8
+	by mail.kernel.org (Postfix) with ESMTPS id 1693523DF2
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 16:39:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1693523DF2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:57763 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:57765 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hW1c0-0001bQ-AE
-	for qemu-devel@archiver.kernel.org; Wed, 29 May 2019 12:39:36 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:39654)
+	id 1hW1c3-0001dI-8g
+	for qemu-devel@archiver.kernel.org; Wed, 29 May 2019 12:39:39 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:39562)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1hW1a2-00007I-Ls
-	for qemu-devel@nongnu.org; Wed, 29 May 2019 12:37:35 -0400
+	(envelope-from <mst@redhat.com>) id 1hW1Zr-0008Pb-U1
+	for qemu-devel@nongnu.org; Wed, 29 May 2019 12:37:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1hW1a1-0002qa-KZ
-	for qemu-devel@nongnu.org; Wed, 29 May 2019 12:37:34 -0400
-Received: from mail-qk1-f181.google.com ([209.85.222.181]:42727)
+	(envelope-from <mst@redhat.com>) id 1hW1Zq-0002gm-S4
+	for qemu-devel@nongnu.org; Wed, 29 May 2019 12:37:23 -0400
+Received: from mail-qt1-f193.google.com ([209.85.160.193]:33672)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1hW1a1-0002qJ-Gq
-	for qemu-devel@nongnu.org; Wed, 29 May 2019 12:37:33 -0400
-Received: by mail-qk1-f181.google.com with SMTP id b18so1872983qkc.9
-	for <qemu-devel@nongnu.org>; Wed, 29 May 2019 09:37:33 -0700 (PDT)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1hW1Zq-0002gU-Nf
+	for qemu-devel@nongnu.org; Wed, 29 May 2019 12:37:22 -0400
+Received: by mail-qt1-f193.google.com with SMTP id 14so3436038qtf.0
+	for <qemu-devel@nongnu.org>; Wed, 29 May 2019 09:37:22 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:date:from:to:cc:subject:message-id:references
 	:mime-version:content-disposition:in-reply-to;
-	bh=v+ECkpJzkDVdVI5rLDwJXguPVOQxaO4yQjX4+F++UwY=;
-	b=Cl4w+eoRrGxT0FWaWxlksY5OfSdylcmJR/HldB748t0rrSdzWW/sVA/KuaKjg9oD9K
-	FeGoDt2A6MAOhvYAfVpK8KMlHt/yYXkyykbGas78a5q2JQCvlmOFQwno2moYbLUSE1Y3
-	uWQv9dRzNZNiYNakGpHwWYGSUn9Hbw8N0IKAtxvxnNxT0h/744pJ3byoCq57nhqjrBea
-	SCtV/0ler/F15WXaw3yxnXOPaFzZTazQdUhA3SGZFEfla1jTBGGB6jmf0UM+S6NGtX4y
-	kR96dD/iqrYbYmF2jzTSl1jNFe1cA7H8M6gEvByhBJtTtscefVU16AQB+h8xbPd5Y7Bf
-	88Jg==
-X-Gm-Message-State: APjAAAWRDPJWx82FZsUwFHeIToIFLwIPK7hPqoeQC0hxuUK64Ry7UxWz
-	53YPNs9ZgkUyykGdovG25ZE7FwYSn00=
-X-Google-Smtp-Source: APXvYqzr7GKQPzCNRTyXhAYTQxpJtAV2CCQhPH2dG1eJXUclLYJZ6LLSQc+OAM/efHVkbc0w+EQb7Q==
-X-Received: by 2002:a37:8183:: with SMTP id
-	c125mr46236364qkd.306.1559147852711; 
-	Wed, 29 May 2019 09:37:32 -0700 (PDT)
+	bh=BMjQYyCdvFzPEzLYug8aCJTeB4WwbCrsrkhqi7chWAs=;
+	b=lqHiPURMx5VTMoS+R+WXeE8hXs91xmis1H0+I6eh/SaBe8HoAaHEbqIIg+a0SdtbtC
+	3n4XZUrrgaFlKsI/N0Eowv64EQUIZku24obAFfe0Sx+aZxKutjlx5ZM1cylZesMiDBz6
+	d4nIJwDAyuvC7onpEkrqIWP7G41tO3GMUpsgKPlKcyLtIYa52mdN0B8aso3Jn4fWmvqF
+	i57Dioom9IaEvlrRMXyNI6J5dwaK81ZcjAP/LtPgwy66mNecYenlZTrfXXq50FFRKFsY
+	cSWql9L886+j+1m9B0keuynscBFL64IVvLy3k0hxExmON4i4wvGSjCFe/Yn1gSWfkkjb
+	WwxQ==
+X-Gm-Message-State: APjAAAXPkqpggneZSem3unBS5odxV0X5YIQt7Eq73jFlt4VdDgj6wyRj
+	QpEARnJgx4popqdVOYm9O7dIWoZnzjU=
+X-Google-Smtp-Source: APXvYqynzQ7AWgjz+iM/7RL9nrkeSLN0LHI0OXR3ZnQ+j4I7DsuEIKP8PE9N4wWBpI+44Ks3BU0J5w==
+X-Received: by 2002:aed:3764:: with SMTP id i91mr6656671qtb.203.1559147841201; 
+	Wed, 29 May 2019 09:37:21 -0700 (PDT)
 Received: from redhat.com (pool-100-0-197-103.bstnma.fios.verizon.net.
-	[100.0.197.103])
-	by smtp.gmail.com with ESMTPSA id h6sm2774374qti.21.2019.05.29.09.37.31
+	[100.0.197.103]) by smtp.gmail.com with ESMTPSA id
+	f129sm6128947qkj.47.2019.05.29.09.37.19
 	(version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-	Wed, 29 May 2019 09:37:31 -0700 (PDT)
-Date: Wed, 29 May 2019 12:37:31 -0400
+	Wed, 29 May 2019 09:37:20 -0700 (PDT)
+Date: Wed, 29 May 2019 12:37:19 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: qemu-devel@nongnu.org
-Message-ID: <1556604614-32081-1-git-send-email-wangjie88@huawei.com>
+Message-ID: <20190521062836.6541-3-richardw.yang@linux.intel.com>
 References: <20190529163604.18560-1-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
@@ -69,8 +68,9 @@ X-Mailer: git-send-email 2.17.1.1206.gb667731e2e.dirty
 X-Mutt-Fcc: =sent
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 	[fuzzy]
-X-Received-From: 209.85.222.181
-Subject: [Qemu-devel] [PULL 08/10] vhost: remove the dead code
+X-Received-From: 209.85.160.193
+Subject: [Qemu-devel] [PULL 03/10] acpi: pci: use build_append_foo() API to
+ construct MCFG
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -83,37 +83,113 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Peter Maydell <peter.maydell@linaro.org>,
-	Stefan Hajnoczi <stefanha@redhat.com>, Jie Wang <wangjie88@huawei.com>
+	Wei Yang <richardw.yang@linux.intel.com>,
+	Igor Mammedov <imammedo@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190529163731.gg8PzFaIoQ5xjxqjIC4_Sd3NPQK9KRvE4NLP7ouRKy0@z>
+Message-ID: <20190529163719.zxExtyWxWql65UKkDzg94AoWP8SO0YeTaNIzMkVUbDQ@z>
 
-From: Jie Wang <wangjie88@huawei.com>
+From: Wei Yang <richardw.yang@linux.intel.com>
 
-remove the dead code
+build_append_foo() API doesn't need explicit endianness conversions
+which eliminates a source of errors and it makes build_mcfg() look like
+declarative definition of MCFG table in ACPI spec, which makes it easy
+to review.
 
-Signed-off-by: Jie Wang <wangjie88@huawei.com>
-Message-Id: <1556604614-32081-1-git-send-email-wangjie88@huawei.com>
+Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
+Suggested-by: Igor Mammedov <imammedo@redhat.com>
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+
+v3:
+   * add some comment on the Configuration Space base address allocation
+     structure
+v2:
+   * miss the reserved[8] of MCFG in last version, add it back
+   * drop SOBs and make sure bios-tables-test all OK
+Message-Id: <20190521062836.6541-3-richardw.yang@linux.intel.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- hw/virtio/vhost.c | 1 -
- 1 file changed, 1 deletion(-)
+ include/hw/acpi/acpi-defs.h | 18 ------------------
+ hw/acpi/pci.c               | 33 ++++++++++++++++++++++++---------
+ 2 files changed, 24 insertions(+), 27 deletions(-)
 
-diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
-index 7f61018f2a..2303a8c206 100644
---- a/hw/virtio/vhost.c
-+++ b/hw/virtio/vhost.c
-@@ -1650,7 +1650,6 @@ fail_vq:
-                              hdev->vqs + i,
-                              hdev->vq_index + i);
-     }
--    i = hdev->nvqs;
+diff --git a/include/hw/acpi/acpi-defs.h b/include/hw/acpi/acpi-defs.h
+index f9aa4bd398..57a3f58b0c 100644
+--- a/include/hw/acpi/acpi-defs.h
++++ b/include/hw/acpi/acpi-defs.h
+@@ -449,24 +449,6 @@ struct AcpiSratProcessorGiccAffinity {
  
- fail_mem:
- fail_features:
+ typedef struct AcpiSratProcessorGiccAffinity AcpiSratProcessorGiccAffinity;
+ 
+-/* PCI fw r3.0 MCFG table. */
+-/* Subtable */
+-struct AcpiMcfgAllocation {
+-    uint64_t address;                /* Base address, processor-relative */
+-    uint16_t pci_segment;            /* PCI segment group number */
+-    uint8_t start_bus_number;       /* Starting PCI Bus number */
+-    uint8_t end_bus_number;         /* Final PCI Bus number */
+-    uint32_t reserved;
+-} QEMU_PACKED;
+-typedef struct AcpiMcfgAllocation AcpiMcfgAllocation;
+-
+-struct AcpiTableMcfg {
+-    ACPI_TABLE_HEADER_DEF;
+-    uint8_t reserved[8];
+-    AcpiMcfgAllocation allocation[0];
+-} QEMU_PACKED;
+-typedef struct AcpiTableMcfg AcpiTableMcfg;
+-
+ /*
+  * TCPA Description Table
+  *
+diff --git a/hw/acpi/pci.c b/hw/acpi/pci.c
+index fa0fa30bb9..9510597a19 100644
+--- a/hw/acpi/pci.c
++++ b/hw/acpi/pci.c
+@@ -30,17 +30,32 @@
+ 
+ void build_mcfg(GArray *table_data, BIOSLinker *linker, AcpiMcfgInfo *info)
+ {
+-    AcpiTableMcfg *mcfg;
+-    int len = sizeof(*mcfg) + sizeof(mcfg->allocation[0]);
++    int mcfg_start = table_data->len;
+ 
+-    mcfg = acpi_data_push(table_data, len);
+-    mcfg->allocation[0].address = cpu_to_le64(info->base);
++    /*
++     * PCI Firmware Specification, Revision 3.0
++     * 4.1.2 MCFG Table Description.
++     */
++    acpi_data_push(table_data, sizeof(AcpiTableHeader));
++    /* Reserved */
++    build_append_int_noprefix(table_data, 0, 8);
+ 
+-    /* Only a single allocation so no need to play with segments */
+-    mcfg->allocation[0].pci_segment = cpu_to_le16(0);
+-    mcfg->allocation[0].start_bus_number = 0;
+-    mcfg->allocation[0].end_bus_number = PCIE_MMCFG_BUS(info->size - 1);
++    /*
++     * Memory Mapped Enhanced Configuration Space Base Address Allocation
++     * Structure
++     */
++    /* Base address, processor-relative */
++    build_append_int_noprefix(table_data, info->base, 8);
++    /* PCI segment group number */
++    build_append_int_noprefix(table_data, 0, 2);
++    /* Starting PCI Bus number */
++    build_append_int_noprefix(table_data, 0, 1);
++    /* Final PCI Bus number */
++    build_append_int_noprefix(table_data, PCIE_MMCFG_BUS(info->size - 1), 1);
++    /* Reserved */
++    build_append_int_noprefix(table_data, 0, 4);
+ 
+-    build_header(linker, table_data, (void *)mcfg, "MCFG", len, 1, NULL, NULL);
++    build_header(linker, table_data, (void *)(table_data->data + mcfg_start),
++                 "MCFG", table_data->len - mcfg_start, 1, NULL, NULL);
+ }
+ 
 -- 
 MST
 
