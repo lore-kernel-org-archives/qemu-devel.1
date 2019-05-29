@@ -2,86 +2,62 @@ Return-Path: <SRS0=DspQ=T5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 580D9C04AB3
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 07:16:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A382C04AB3
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 07:17:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2390C21019
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 07:16:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9AEDB2075C
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 07:17:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Xm04gVdb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2390C21019
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="Jgas2urf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9AEDB2075C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:48763 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:48781 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hVsot-0004iM-9i
-	for qemu-devel@archiver.kernel.org; Wed, 29 May 2019 03:16:19 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:45320)
+	id 1hVsqT-0005vC-HL
+	for qemu-devel@archiver.kernel.org; Wed, 29 May 2019 03:17:57 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:48096)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <arilou@gmail.com>) id 1hVsI2-0001EL-J3
-	for qemu-devel@nongnu.org; Wed, 29 May 2019 02:42:23 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1hVsQR-0000Ld-FX
+	for qemu-devel@nongnu.org; Wed, 29 May 2019 02:51:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <arilou@gmail.com>) id 1hVsI1-00037l-GJ
-	for qemu-devel@nongnu.org; Wed, 29 May 2019 02:42:22 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:39793)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <arilou@gmail.com>) id 1hVsI1-0002zc-9H
-	for qemu-devel@nongnu.org; Wed, 29 May 2019 02:42:21 -0400
-Received: by mail-wm1-x342.google.com with SMTP id z23so682539wma.4
-	for <qemu-devel@nongnu.org>; Tue, 28 May 2019 23:42:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=from:to:cc:subject:date:message-id:in-reply-to:references
-	:mime-version:content-transfer-encoding;
-	bh=KoGMDinYQHodOIbKXwJ/At0fSWyzS9xNAHk1qWOol/Y=;
-	b=Xm04gVdb6d47qroLNMeVkNI3fzQAhUYv3GAleOVr//GuhCF7RwVNwpfHzJtLo7+9op
-	iNbqp+bdOLyinH/twZOq1A8Alv951lX0B2ROv0tWwKQ7I8Lsg5uK4e+X+1eZJC879Hi6
-	SWrSvEmuZN31YAlA4PiLKT4M3AGZWxsxeg5PsYxjMhpZ05HMQDbUNl35RBCAwUPihmad
-	MGpGsdwds1EwXVMECwIs8v9rG0wXbFxDA9AXvX8dHT6zIHQTP4c/c7WdXCewlV3ASqnq
-	IEN097XZK3usrdDgBCLFWMzx7HXPfJJpS+PJh2WjKuiwh0Byclk6EZ7b2YIEFewJCyhi
-	rO0g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-	:references:mime-version:content-transfer-encoding;
-	bh=KoGMDinYQHodOIbKXwJ/At0fSWyzS9xNAHk1qWOol/Y=;
-	b=cIdeL68JLbGoAt3VTgALe+nXlzPcbuObAlPfBdX2CODGwovlR1nqNDsCUF00KjRy0u
-	bsMxW9YQb+NNlwlm0Nwcf2kOnfqf307ojwZwZ34yziAmIaQDafT7Fx1DbJQh1Pp1XxiZ
-	xSLJ2Xhx189WN0R7/OECz8fZl64sdhIShCy2aDQdsk5BctuHVq3QVeDoy3hyQgx3Ogom
-	w5wrt74Ele32KTfe+0TrQqOOjIctbU6QcVNjBLmLOAWCo4IY3qKHOM96at+UmdwVp7qW
-	fo8tbkg6QCuOBeCjNPkXHSESF8aDRxsv581pbf64C6PfsDXlBUGOqeRV/irLkzeCDk5o
-	xvJw==
-X-Gm-Message-State: APjAAAXupC4DvyeGuYOst3k5tPf7b7BTD/gOybsB88xKdG/zPQmY/awb
-	PFHT7ySGQoiBaJU+gFrM87+CJG5P
-X-Google-Smtp-Source: APXvYqwZvV0+sTiIKaaghXnlHiQ4iINiV5otlgQKdKCj6+lrmCvyeiJps+nRnEPSifXSBVCgmYJPPw==
-X-Received: by 2002:a1c:4484:: with SMTP id r126mr5794829wma.27.1559112140264; 
-	Tue, 28 May 2019 23:42:20 -0700 (PDT)
-Received: from linux.local ([31.154.166.148])
-	by smtp.gmail.com with ESMTPSA id f2sm6831168wme.12.2019.05.28.23.42.19
-	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Tue, 28 May 2019 23:42:19 -0700 (PDT)
-From: Jon Doron <arilou@gmail.com>
-To: qemu-devel@nongnu.org
-Date: Wed, 29 May 2019 09:41:48 +0300
-Message-Id: <20190529064148.19856-21-arilou@gmail.com>
+	(envelope-from <dgibson@ozlabs.org>) id 1hVsQQ-0002qo-9z
+	for qemu-devel@nongnu.org; Wed, 29 May 2019 02:51:03 -0400
+Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:60617 helo=ozlabs.org)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
+	id 1hVsQP-0002cV-Lq; Wed, 29 May 2019 02:51:02 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+	id 45DLv55CHMz9sPG; Wed, 29 May 2019 16:50:22 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+	d=gibson.dropbear.id.au; s=201602; t=1559112625;
+	bh=uN6drKYKwxES9bskyqe9lxIMQqaWXGheRiRszvbh5qo=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=Jgas2urfJuwkjhYdBPVxJtm+upb7wfvE42t+BJyOqmdFTLxBDkYI/dwuMoYuSYnFP
+	ZXQ+XCWXZqwtjIlyRJpAPa+EDV92DtyTK8w/G6tKQym09jAhfWhc5RuvzWZ6uXNKzA
+	KnjVFXBW1YKeq33FdZIcwkKHRGeEEJ1sSQ4w/Xkg=
+From: David Gibson <david@gibson.dropbear.id.au>
+To: peter.maydell@linaro.org
+Date: Wed, 29 May 2019 16:49:56 +1000
+Message-Id: <20190529065017.15149-24-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20190529064148.19856-1-arilou@gmail.com>
-References: <20190529064148.19856-1-arilou@gmail.com>
+In-Reply-To: <20190529065017.15149-1-david@gibson.dropbear.id.au>
+References: <20190529065017.15149-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2a00:1450:4864:20::342
-Subject: [Qemu-devel] [PATCH v12 20/20] gdbstub: Implement qemu physical
- memory mode
+X-Received-From: 2401:3900:2:1::2
+Subject: [Qemu-devel] [PULL 23/44] target/ppc: Use vector variable shifts
+ for VSL, VSR, VSRA
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -93,124 +69,164 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: alex.bennee@linaro.org, Jon Doron <arilou@gmail.com>
+Cc: lvivier@redhat.com, Richard Henderson <richard.henderson@linaro.org>,
+	qemu-devel@nongnu.org, groug@kaod.org, qemu-ppc@nongnu.org,
+	clg@kaod.org, David Gibson <david@gibson.dropbear.id.au>, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add a new query/set which changes the memory GDB sees to physical memory
-only.
+From: Richard Henderson <richard.henderson@linaro.org>
 
-gdb> maint packet qqemu.PhyMemMode
-will reply the current phy_mem_mode state (1 for enabled, 0 for disabled)
-gdb> maint packet Qqemu.PhyMemMode:1
-Will make GDB read/write only to physical memory, set to 0 to disable
+The gvec expanders take care of masking the shift amount
+against the element width.
 
-Signed-off-by: Jon Doron <arilou@gmail.com>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Message-Id: <20190518191430.21686-2-richard.henderson@linaro.org>
+Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- gdbstub.c | 62 +++++++++++++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 60 insertions(+), 2 deletions(-)
+ target/ppc/helper.h                 | 12 ----------
+ target/ppc/int_helper.c             | 37 -----------------------------
+ target/ppc/translate/vmx-impl.inc.c | 24 +++++++++----------
+ 3 files changed, 12 insertions(+), 61 deletions(-)
 
-diff --git a/gdbstub.c b/gdbstub.c
-index a0ff0017f6..d46e21bf70 100644
---- a/gdbstub.c
-+++ b/gdbstub.c
-@@ -46,11 +46,27 @@
- #define GDB_ATTACHED "1"
- #endif
- 
-+#ifndef CONFIG_USER_ONLY
-+static int phy_memory_mode;
-+#endif
-+
- static inline int target_memory_rw_debug(CPUState *cpu, target_ulong addr,
-                                          uint8_t *buf, int len, bool is_write)
+diff --git a/target/ppc/helper.h b/target/ppc/helper.h
+index 638a6e99c4..02b67a333e 100644
+--- a/target/ppc/helper.h
++++ b/target/ppc/helper.h
+@@ -180,18 +180,6 @@ DEF_HELPER_3(vmuloub, void, avr, avr, avr)
+ DEF_HELPER_3(vmulouh, void, avr, avr, avr)
+ DEF_HELPER_3(vmulouw, void, avr, avr, avr)
+ DEF_HELPER_3(vmuluwm, void, avr, avr, avr)
+-DEF_HELPER_3(vsrab, void, avr, avr, avr)
+-DEF_HELPER_3(vsrah, void, avr, avr, avr)
+-DEF_HELPER_3(vsraw, void, avr, avr, avr)
+-DEF_HELPER_3(vsrad, void, avr, avr, avr)
+-DEF_HELPER_3(vsrb, void, avr, avr, avr)
+-DEF_HELPER_3(vsrh, void, avr, avr, avr)
+-DEF_HELPER_3(vsrw, void, avr, avr, avr)
+-DEF_HELPER_3(vsrd, void, avr, avr, avr)
+-DEF_HELPER_3(vslb, void, avr, avr, avr)
+-DEF_HELPER_3(vslh, void, avr, avr, avr)
+-DEF_HELPER_3(vslw, void, avr, avr, avr)
+-DEF_HELPER_3(vsld, void, avr, avr, avr)
+ DEF_HELPER_3(vslo, void, avr, avr, avr)
+ DEF_HELPER_3(vsro, void, avr, avr, avr)
+ DEF_HELPER_3(vsrv, void, avr, avr, avr)
+diff --git a/target/ppc/int_helper.c b/target/ppc/int_helper.c
+index 093ef74b59..8ce89f2ad9 100644
+--- a/target/ppc/int_helper.c
++++ b/target/ppc/int_helper.c
+@@ -1791,23 +1791,6 @@ VSHIFT(l, 1)
+ VSHIFT(r, 0)
+ #undef VSHIFT
+=20
+-#define VSL(suffix, element, mask)                                      =
+\
+-    void helper_vsl##suffix(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b)   =
+\
+-    {                                                                   =
+\
+-        int i;                                                          =
+\
+-                                                                        =
+\
+-        for (i =3D 0; i < ARRAY_SIZE(r->element); i++) {                =
+  \
+-            unsigned int shift =3D b->element[i] & mask;                =
+  \
+-                                                                        =
+\
+-            r->element[i] =3D a->element[i] << shift;                   =
+  \
+-        }                                                               =
+\
+-    }
+-VSL(b, u8, 0x7)
+-VSL(h, u16, 0x0F)
+-VSL(w, u32, 0x1F)
+-VSL(d, u64, 0x3F)
+-#undef VSL
+-
+ void helper_vslv(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b)
  {
--    CPUClass *cc = CPU_GET_CLASS(cpu);
-+    CPUClass *cc;
- 
-+#ifndef CONFIG_USER_ONLY
-+    if (phy_memory_mode) {
-+        if (is_write) {
-+            cpu_physical_memory_write(addr, buf, len);
-+        } else {
-+            cpu_physical_memory_read(addr, buf, len);
-+        }
-+        return 0;
-+    }
-+#endif
-+
-+    cc = CPU_GET_CLASS(cpu);
-     if (cc->memory_rw_debug) {
-         return cc->memory_rw_debug(cpu, addr, buf, len, is_write);
-     }
-@@ -2132,8 +2148,36 @@ static void handle_query_attached(GdbCmdContext *gdb_ctx, void *user_ctx)
- 
- static void handle_query_qemu_supported(GdbCmdContext *gdb_ctx, void *user_ctx)
+     int i;
+@@ -1980,26 +1963,6 @@ VNEG(vnegw, s32)
+ VNEG(vnegd, s64)
+ #undef VNEG
+=20
+-#define VSR(suffix, element, mask)                                      =
+\
+-    void helper_vsr##suffix(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b)   =
+\
+-    {                                                                   =
+\
+-        int i;                                                          =
+\
+-                                                                        =
+\
+-        for (i =3D 0; i < ARRAY_SIZE(r->element); i++) {                =
+  \
+-            unsigned int shift =3D b->element[i] & mask;                =
+  \
+-            r->element[i] =3D a->element[i] >> shift;                   =
+  \
+-        }                                                               =
+\
+-    }
+-VSR(ab, s8, 0x7)
+-VSR(ah, s16, 0xF)
+-VSR(aw, s32, 0x1F)
+-VSR(ad, s64, 0x3F)
+-VSR(b, u8, 0x7)
+-VSR(h, u16, 0xF)
+-VSR(w, u32, 0x1F)
+-VSR(d, u64, 0x3F)
+-#undef VSR
+-
+ void helper_vsro(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b)
  {
--    put_packet(gdb_ctx->s, "sstepbits;sstep");
-+    snprintf(gdb_ctx->str_buf, sizeof(gdb_ctx->str_buf), "sstepbits;sstep");
-+#ifndef CONFIG_USER_ONLY
-+    pstrcat(gdb_ctx->str_buf, sizeof(gdb_ctx->str_buf), ";PhyMemMode");
-+#endif
-+    put_packet(gdb_ctx->s, gdb_ctx->str_buf);
-+}
-+
-+#ifndef CONFIG_USER_ONLY
-+static void handle_query_qemu_phy_mem_mode(GdbCmdContext *gdb_ctx,
-+                                           void *user_ctx)
-+{
-+    snprintf(gdb_ctx->str_buf, sizeof(gdb_ctx->str_buf), "%d", phy_memory_mode);
-+    put_packet(gdb_ctx->s, gdb_ctx->str_buf);
-+}
-+
-+static void handle_set_qemu_phy_mem_mode(GdbCmdContext *gdb_ctx, void *user_ctx)
-+{
-+    if (!gdb_ctx->num_params) {
-+        put_packet(gdb_ctx->s, "E22");
-+        return;
-+    }
-+
-+    if (!gdb_ctx->params[0].val_ul) {
-+        phy_memory_mode = 0;
-+    } else {
-+        phy_memory_mode = 1;
-+    }
-+    put_packet(gdb_ctx->s, "OK");
- }
-+#endif
- 
- static GdbCmdParseEntry gdb_gen_query_set_common_table[] = {
-     /* Order is important if has same prefix */
-@@ -2215,6 +2259,12 @@ static GdbCmdParseEntry gdb_gen_query_table[] = {
-         .handler = handle_query_qemu_supported,
-         .cmd = "qemu.Supported",
-     },
-+#ifndef CONFIG_USER_ONLY
-+    {
-+        .handler = handle_query_qemu_phy_mem_mode,
-+        .cmd = "qemu.PhyMemMode",
-+    },
-+#endif
- };
- 
- static GdbCmdParseEntry gdb_gen_set_table[] = {
-@@ -2225,6 +2275,14 @@ static GdbCmdParseEntry gdb_gen_set_table[] = {
-         .cmd_startswith = 1,
-         .schema = "l0"
-     },
-+#ifndef CONFIG_USER_ONLY
-+    {
-+        .handler = handle_set_qemu_phy_mem_mode,
-+        .cmd = "qemu.PhyMemMode:",
-+        .cmd_startswith = 1,
-+        .schema = "l0"
-+    },
-+#endif
- };
- 
- static void handle_gen_query(GdbCmdContext *gdb_ctx, void *user_ctx)
--- 
+     int sh =3D (b->VsrB(0xf) >> 3) & 0xf;
+diff --git a/target/ppc/translate/vmx-impl.inc.c b/target/ppc/translate/v=
+mx-impl.inc.c
+index 6861f4c5b9..663275b729 100644
+--- a/target/ppc/translate/vmx-impl.inc.c
++++ b/target/ppc/translate/vmx-impl.inc.c
+@@ -530,21 +530,21 @@ GEN_VXFORM(vmuleuw, 4, 10);
+ GEN_VXFORM(vmulesb, 4, 12);
+ GEN_VXFORM(vmulesh, 4, 13);
+ GEN_VXFORM(vmulesw, 4, 14);
+-GEN_VXFORM(vslb, 2, 4);
+-GEN_VXFORM(vslh, 2, 5);
+-GEN_VXFORM(vslw, 2, 6);
++GEN_VXFORM_V(vslb, MO_8, tcg_gen_gvec_shlv, 2, 4);
++GEN_VXFORM_V(vslh, MO_16, tcg_gen_gvec_shlv, 2, 5);
++GEN_VXFORM_V(vslw, MO_32, tcg_gen_gvec_shlv, 2, 6);
+ GEN_VXFORM(vrlwnm, 2, 6);
+ GEN_VXFORM_DUAL(vslw, PPC_ALTIVEC, PPC_NONE, \
+                 vrlwnm, PPC_NONE, PPC2_ISA300)
+-GEN_VXFORM(vsld, 2, 23);
+-GEN_VXFORM(vsrb, 2, 8);
+-GEN_VXFORM(vsrh, 2, 9);
+-GEN_VXFORM(vsrw, 2, 10);
+-GEN_VXFORM(vsrd, 2, 27);
+-GEN_VXFORM(vsrab, 2, 12);
+-GEN_VXFORM(vsrah, 2, 13);
+-GEN_VXFORM(vsraw, 2, 14);
+-GEN_VXFORM(vsrad, 2, 15);
++GEN_VXFORM_V(vsld, MO_64, tcg_gen_gvec_shlv, 2, 23);
++GEN_VXFORM_V(vsrb, MO_8, tcg_gen_gvec_shrv, 2, 8);
++GEN_VXFORM_V(vsrh, MO_16, tcg_gen_gvec_shrv, 2, 9);
++GEN_VXFORM_V(vsrw, MO_32, tcg_gen_gvec_shrv, 2, 10);
++GEN_VXFORM_V(vsrd, MO_64, tcg_gen_gvec_shrv, 2, 27);
++GEN_VXFORM_V(vsrab, MO_8, tcg_gen_gvec_sarv, 2, 12);
++GEN_VXFORM_V(vsrah, MO_16, tcg_gen_gvec_sarv, 2, 13);
++GEN_VXFORM_V(vsraw, MO_32, tcg_gen_gvec_sarv, 2, 14);
++GEN_VXFORM_V(vsrad, MO_64, tcg_gen_gvec_sarv, 2, 15);
+ GEN_VXFORM(vsrv, 2, 28);
+ GEN_VXFORM(vslv, 2, 29);
+ GEN_VXFORM(vslo, 6, 16);
+--=20
 2.21.0
 
 
