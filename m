@@ -6,58 +6,58 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	T_HK_NAME_DR autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3F58C28CC0
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 10:20:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9EE2CC28CC2
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 10:20:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AD36B21721
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 10:20:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AD36B21721
+	by mail.kernel.org (Postfix) with ESMTPS id 6962E21721
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 10:20:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6962E21721
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:51108 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:51106 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hVvgm-00078Q-Bm
-	for qemu-devel@archiver.kernel.org; Wed, 29 May 2019 06:20:08 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:33396)
+	id 1hVvgl-00076k-Mv
+	for qemu-devel@archiver.kernel.org; Wed, 29 May 2019 06:20:07 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:33395)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1hVvf6-00060X-Pf
+	(envelope-from <dgilbert@redhat.com>) id 1hVvf6-00060W-Pd
 	for qemu-devel@nongnu.org; Wed, 29 May 2019 06:18:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1hVvf4-0001fH-Qj
+	(envelope-from <dgilbert@redhat.com>) id 1hVvf4-0001fB-QD
 	for qemu-devel@nongnu.org; Wed, 29 May 2019 06:18:24 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54266)
+Received: from mx1.redhat.com ([209.132.183.28]:52788)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hVvf2-0001e2-VJ
-	for qemu-devel@nongnu.org; Wed, 29 May 2019 06:18:22 -0400
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hVvf2-0001e0-Ua
+	for qemu-devel@nongnu.org; Wed, 29 May 2019 06:18:21 -0400
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
 	[10.5.11.13])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id EFC86A3B65
-	for <qemu-devel@nongnu.org>; Wed, 29 May 2019 10:18:09 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 6FDFFC0AD2AD
+	for <qemu-devel@nongnu.org>; Wed, 29 May 2019 10:18:11 +0000 (UTC)
 Received: from dgilbert-t580.localhost (unknown [10.36.118.28])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id C6DF4611CD;
-	Wed, 29 May 2019 10:18:07 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 45EE66A96F;
+	Wed, 29 May 2019 10:18:10 +0000 (UTC)
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
 To: qemu-devel@nongnu.org, jasowang@redhat.com, eblake@redhat.com,
 	armbru@redhat.com, laine@redhat.com
-Date: Wed, 29 May 2019 11:17:55 +0100
-Message-Id: <20190529101756.22557-2-dgilbert@redhat.com>
+Date: Wed, 29 May 2019 11:17:56 +0100
+Message-Id: <20190529101756.22557-3-dgilbert@redhat.com>
 In-Reply-To: <20190529101756.22557-1-dgilbert@redhat.com>
 References: <20190529101756.22557-1-dgilbert@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.30]);
-	Wed, 29 May 2019 10:18:10 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.32]);
+	Wed, 29 May 2019 10:18:16 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v2 1/2] net/announce: Allow optional list of
- interfaces
+Subject: [Qemu-devel] [PATCH v2 2/2] net/announce: Add HMP optional
+ interface list
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -75,164 +75,122 @@ Sender: "Qemu-devel"
 
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-Allow the caller to restrict the set of interfaces that announces are
-sent on.  The default is still to send on all interfaces.
+Add the optional interface list to the HMP command.
 
-e.g.
+i.e.
 
-  { "execute": "announce-self", "arguments": { "initial": 50, "max": 550,=
- "rounds": 5, "step": 50, "interfaces": ["vn2","vn1"] } }
+   All interfaces
+        announce_self
 
-This doesn't affect the behaviour of migration announcments.
-
-Note: There's still only one timer for the qmp command, so that
-performing an 'announce-self' on one list of interfaces followed
-by another 'announce-self' on another list will stop the announces
-on the existing set.
+   Just the named interfaces:
+        announce_self vn1,vn2
 
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- include/net/announce.h |  2 +-
- net/announce.c         | 39 ++++++++++++++++++++++++++++++++-------
- net/trace-events       |  2 +-
- qapi/net.json          | 11 ++++++++---
- 4 files changed, 42 insertions(+), 12 deletions(-)
+ hmp-commands.hx |  6 ++++--
+ hmp.c           | 38 +++++++++++++++++++++++++++++++++++++-
+ 2 files changed, 41 insertions(+), 3 deletions(-)
 
-diff --git a/include/net/announce.h b/include/net/announce.h
-index 892d302b65..3ebffe517e 100644
---- a/include/net/announce.h
-+++ b/include/net/announce.h
-@@ -23,7 +23,7 @@ struct AnnounceTimer {
- /* Returns: update the timer to the next time point */
- int64_t qemu_announce_timer_step(AnnounceTimer *timer);
+diff --git a/hmp-commands.hx b/hmp-commands.hx
+index 3dc421cb6a..1b63372713 100644
+--- a/hmp-commands.hx
++++ b/hmp-commands.hx
+@@ -955,8 +955,8 @@ ETEXI
 =20
--/* Delete the underlying timer */
-+/* Delete the underlying timer and other data */
- void qemu_announce_timer_del(AnnounceTimer *timer);
+     {
+         .name       =3D "announce_self",
+-        .args_type  =3D "",
+-        .params     =3D "",
++        .args_type  =3D "interfaces:s?",
++        .params     =3D "[interfaces]",
+         .help       =3D "Trigger GARP/RARP announcements",
+         .cmd        =3D hmp_announce_self,
+     },
+@@ -967,6 +967,8 @@ STEXI
+ Trigger a round of GARP/RARP broadcasts; this is useful for explicitly u=
+pdating the
+ network infrastructure after a reconfiguration or some forms of migratio=
+n.
+ The timings of the round are set by the migration announce parameters.
++An optional comma separated @var{interfaces} list restricts the announce=
+ to the
++named set of interfaces.
+ ETEXI
 =20
- /*
-diff --git a/net/announce.c b/net/announce.c
-index 91e9a6e267..1ce42b571d 100644
---- a/net/announce.c
-+++ b/net/announce.c
-@@ -38,6 +38,8 @@ void qemu_announce_timer_del(AnnounceTimer *timer)
-         timer_free(timer->tm);
-         timer->tm =3D NULL;
+     {
+diff --git a/hmp.c b/hmp.c
+index a9665da6ec..f42b47f130 100644
+--- a/hmp.c
++++ b/hmp.c
+@@ -27,6 +27,7 @@
+ #include "monitor/monitor.h"
+ #include "monitor/qdev.h"
+ #include "qapi/error.h"
++#include "qapi/clone-visitor.h"
+ #include "qapi/opts-visitor.h"
+ #include "qapi/qapi-builtin-visit.h"
+ #include "qapi/qapi-commands-block.h"
+@@ -38,6 +39,7 @@
+ #include "qapi/qapi-commands-run-state.h"
+ #include "qapi/qapi-commands-tpm.h"
+ #include "qapi/qapi-commands-ui.h"
++#include "qapi/qapi-visit-net.h"
+ #include "qapi/qmp/qdict.h"
+ #include "qapi/qmp/qerror.h"
+ #include "qapi/string-input-visitor.h"
+@@ -67,6 +69,32 @@ static void hmp_handle_error(Monitor *mon, Error **err=
+p)
      }
-+    qapi_free_strList(timer->params.interfaces);
-+    timer->params.interfaces =3D NULL;
  }
 =20
- /*
-@@ -96,24 +98,47 @@ static int announce_self_create(uint8_t *buf,
-=20
- static void qemu_announce_self_iter(NICState *nic, void *opaque)
- {
-+    AnnounceTimer *timer =3D opaque;
-     uint8_t buf[60];
-     int len;
-+    bool skip;
++/*
++ * Produce a strList from a comma separated list.
++ * A NULL or empty input string return NULL.
++ */
++static strList *strList_from_comma_list(const char *in)
++{
++    strList *res =3D NULL;
++    strList **hook =3D &res;
 +
-+    if (timer->params.has_interfaces) {
-+        strList *entry =3D timer->params.interfaces;
-+        /* Skip unless we find our name in the requested list */
-+        skip =3D true;
++    while (in && in[0]) {
++        char *comma =3D strchr(in, ',');
++        *hook =3D g_new0(strList, 1);
 +
-+        while (entry) {
-+            if (!strcmp(entry->value, nic->ncs->name)) {
-+                /* Found us */
-+                skip =3D false;
-+                break;
-+            }
-+            entry =3D entry->next;
++        if (comma) {
++            (*hook)->value =3D g_strndup(in, comma - in);
++            in =3D comma + 1; /* skip the , */
++        } else {
++            (*hook)->value =3D g_strdup(in);
++            in =3D NULL;
 +        }
-+    } else {
-+        skip =3D false;
++        hook =3D &(*hook)->next;
 +    }
 +
-+    trace_qemu_announce_self_iter(nic->ncs->name,
-+                                  qemu_ether_ntoa(&nic->conf->macaddr), =
-skip);
-=20
--    trace_qemu_announce_self_iter(qemu_ether_ntoa(&nic->conf->macaddr));
--    len =3D announce_self_create(buf, nic->conf->macaddr.a);
-+    if (!skip) {
-+        len =3D announce_self_create(buf, nic->conf->macaddr.a);
-=20
--    qemu_send_packet_raw(qemu_get_queue(nic), buf, len);
-+        qemu_send_packet_raw(qemu_get_queue(nic), buf, len);
-=20
--    /* if the NIC provides it's own announcement support, use it as well=
- */
--    if (nic->ncs->info->announce) {
--        nic->ncs->info->announce(nic->ncs);
-+        /* if the NIC provides it's own announcement support, use it as =
-well */
-+        if (nic->ncs->info->announce) {
-+            nic->ncs->info->announce(nic->ncs);
-+        }
-     }
- }
- static void qemu_announce_self_once(void *opaque)
++    return res;
++}
++
+ void hmp_info_name(Monitor *mon, const QDict *qdict)
  {
-     AnnounceTimer *timer =3D (AnnounceTimer *)opaque;
+     NameInfo *info;
+@@ -1640,7 +1668,15 @@ void hmp_info_snapshots(Monitor *mon, const QDict =
+*qdict)
 =20
--    qemu_foreach_nic(qemu_announce_self_iter, NULL);
-+    qemu_foreach_nic(qemu_announce_self_iter, timer);
+ void hmp_announce_self(Monitor *mon, const QDict *qdict)
+ {
+-    qmp_announce_self(migrate_announce_params(), NULL);
++    const char *interfaces_str =3D qdict_get_try_str(qdict, "interfaces"=
+);
++    AnnounceParameters *params =3D QAPI_CLONE(AnnounceParameters,
++                                            migrate_announce_params());
++
++    qapi_free_strList(params->interfaces);
++    params->interfaces =3D strList_from_comma_list(interfaces_str);
++    params->has_interfaces =3D params->interfaces !=3D NULL;
++    qmp_announce_self(params, NULL);
++    qapi_free_AnnounceParameters(params);
+ }
 =20
-     if (--timer->round) {
-         qemu_announce_timer_step(timer);
-diff --git a/net/trace-events b/net/trace-events
-index a7937f3f3a..875ef2a0f3 100644
---- a/net/trace-events
-+++ b/net/trace-events
-@@ -1,7 +1,7 @@
- # See docs/devel/tracing.txt for syntax documentation.
-=20
- # announce.c
--qemu_announce_self_iter(const char *mac) "%s"
-+qemu_announce_self_iter(const char *name, const char *mac, int skip) "%s=
-:%s skip: %d"
-=20
- # vhost-user.c
- vhost_user_event(const char *chr, int event) "chr: %s got event: %d"
-diff --git a/qapi/net.json b/qapi/net.json
-index 5f7bff1637..ee9bf2c5f5 100644
---- a/qapi/net.json
-+++ b/qapi/net.json
-@@ -699,6 +699,9 @@
- #
- # @step: Delay increase (in ms) after each self-announcement attempt
- #
-+# @interfaces: An optional list of interface names, which restrict the
-+#        announcment to the listed interfaces. (Since 4.1)
-+#
- # Since: 4.0
- ##
-=20
-@@ -706,7 +709,8 @@
-   'data': { 'initial': 'int',
-             'max': 'int',
-             'rounds': 'int',
--            'step': 'int' } }
-+            'step': 'int',
-+            '*interfaces': ['str'] } }
-=20
- ##
- # @announce-self:
-@@ -718,9 +722,10 @@
- #
- # Example:
- #
--# -> { "execute": "announce-self"
-+# -> { "execute": "announce-self",
- #      "arguments": {
--#          "initial": 50, "max": 550, "rounds": 10, "step": 50 } }
-+#          "initial": 50, "max": 550, "rounds": 10, "step": 50,
-+#          "interfaces": ["vn2","vn3"] } }
- # <- { "return": {} }
- #
- # Since: 4.0
+ void hmp_migrate_cancel(Monitor *mon, const QDict *qdict)
 --=20
 2.21.0
 
