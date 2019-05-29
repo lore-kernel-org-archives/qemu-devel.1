@@ -2,90 +2,93 @@ Return-Path: <SRS0=DspQ=T5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DEE4DC28CC0
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 16:51:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68584C28CC0
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 17:16:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ACC9A23E47
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 16:51:39 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="iILTnX4/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ACC9A23E47
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 4377B23F0E
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 17:16:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4377B23F0E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:58085 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:58281 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hW1ne-0000Tn-Th
-	for qemu-devel@archiver.kernel.org; Wed, 29 May 2019 12:51:38 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:43617)
+	id 1hW2Bp-0005ZG-B3
+	for qemu-devel@archiver.kernel.org; Wed, 29 May 2019 13:16:37 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:47648)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hW1mt-0000BI-9N
-	for qemu-devel@nongnu.org; Wed, 29 May 2019 12:50:52 -0400
+	(envelope-from <groug@kaod.org>) id 1hW2AZ-0004tq-Mi
+	for qemu-devel@nongnu.org; Wed, 29 May 2019 13:15:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hW1ms-000838-84
-	for qemu-devel@nongnu.org; Wed, 29 May 2019 12:50:51 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:53014)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1hW1mr-000821-UK
-	for qemu-devel@nongnu.org; Wed, 29 May 2019 12:50:50 -0400
-Received: by mail-wm1-x343.google.com with SMTP id y3so2152723wmm.2
-	for <qemu-devel@nongnu.org>; Wed, 29 May 2019 09:50:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=references:user-agent:from:to:cc:subject:in-reply-to:date
-	:message-id:mime-version:content-transfer-encoding;
-	bh=Bcj+PZz6w7A7e+eSJkgxIOPffRR8inMczDju2EmRKGw=;
-	b=iILTnX4/B62Aysc6tGUPKOH5LySJflbuVVVgsBHW/T1B1pS7RTOLyCHRwDKuL3GZwk
-	LVX/UF5vjAtd0Mg5I++FXjExVpRJRx3KuNW9BkfF3NFAPTfPXAST6N+ByQXM2KsdYJ86
-	+xCuPnl97HAr//lhQTvWcbhnqEposf7EiU55GaJeCmZeDg0b5uq4JN+7P7Se0JYcYSMf
-	PpB9eGEqK6p85cG8ihS9pugeYBEyo/EX0VWzglrMPTYpUNADAOCWbQef7Mco0GKk2TEN
-	wBlhKaX2fWNQ7yMs3RTcivGNDxxoxXimaEBaV19lD8kJvPiZRiODuB3Uru9AntQ5ALb4
-	U3vA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:references:user-agent:from:to:cc:subject
-	:in-reply-to:date:message-id:mime-version:content-transfer-encoding;
-	bh=Bcj+PZz6w7A7e+eSJkgxIOPffRR8inMczDju2EmRKGw=;
-	b=B2NF+jIT4qO+WXHuOa6FH1w4fPZGrd8cneMQLoD8PKY0wT0GdYbEK0gwoMhL9egCN+
-	Jywj6KEfGa/2T35I/X6+xVrCm2r3z0GEoXOHSoMrG5lFwMgqBIMrfxdqGjSOK9/3O75j
-	2Oqcbb+kSO7DGC5V3teJzBc7JzerVr5pm5s0MUigT9brMFqTg2dgrpoNYyA4E2YkOmg8
-	lWwPxDZgk3d+qT/gaVvByf3jUIgRHqFFRch3aS5dMfYILZTkFgZUK8zoe6fBxXVlmc0N
-	ToFUvaLeUXiKBqRe7WXA9G5TC5b5/Lzuy1dgMIIlQ2hlwF51HT8ZEAw/ihW061lD8sf+
-	L5AA==
-X-Gm-Message-State: APjAAAWn8T6hg9n0DX+SqiIyLDAIpZqfvZRVXkyJXw0HCcsrjCJB+AHe
-	kUSO3J1E5csjwxWx9yrjYRm8+w==
-X-Google-Smtp-Source: APXvYqxWsMzJBeZD2EmJJZJiSpiyG/K+xO0PANG/NYVaNXBRmLgxtd6FtBY4F4mcMRLGiV1nAD4XQg==
-X-Received: by 2002:a1c:2947:: with SMTP id p68mr7229986wmp.71.1559148647957; 
-	Wed, 29 May 2019 09:50:47 -0700 (PDT)
-Received: from zen.linaroharston ([81.128.185.34])
-	by smtp.gmail.com with ESMTPSA id d17sm31966wrx.9.2019.05.29.09.50.46
-	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Wed, 29 May 2019 09:50:46 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
-	by zen.linaroharston (Postfix) with ESMTP id 2F4EA1FF87;
-	Wed, 29 May 2019 17:50:46 +0100 (BST)
-References: <20190329210804.22121-1-wainersm@redhat.com>
-	<5005fcec-42af-427c-4f68-8415490e9598@redhat.com>
-User-agent: mu4e 1.3.2; emacs 26.1
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Wainer dos Santos Moschetta <wainersm@redhat.com>
-In-reply-to: <5005fcec-42af-427c-4f68-8415490e9598@redhat.com>
-Date: Wed, 29 May 2019 17:50:46 +0100
-Message-ID: <87blzl5hnd.fsf@zen.linaroharston>
+	(envelope-from <groug@kaod.org>) id 1hW2AY-0000US-QM
+	for qemu-devel@nongnu.org; Wed, 29 May 2019 13:15:19 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:44428
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1hW2AY-0000Tt-I1
+	for qemu-devel@nongnu.org; Wed, 29 May 2019 13:15:18 -0400
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+	x4THD4K7057556
+	for <qemu-devel@nongnu.org>; Wed, 29 May 2019 13:15:14 -0400
+Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2ssvmxve4p-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 29 May 2019 13:15:13 -0400
+Received: from localhost
+	by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <groug@kaod.org>;
+	Wed, 29 May 2019 18:15:12 +0100
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
+	by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway:
+	Authorized Use Only! Violators will be prosecuted; 
+	(version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+	Wed, 29 May 2019 18:15:10 +0100
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com
+	[9.149.105.62])
+	by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with
+	ESMTP id x4THF9VK35520526
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256
+	verify=OK); Wed, 29 May 2019 17:15:09 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 6F9FFAE055;
+	Wed, 29 May 2019 17:15:09 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 47FD5AE057;
+	Wed, 29 May 2019 17:15:09 +0000 (GMT)
+Received: from bahia.lan (unknown [9.145.189.170])
+	by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+	Wed, 29 May 2019 17:15:09 +0000 (GMT)
+From: Greg Kurz <groug@kaod.org>
+To: David Gibson <david@gibson.dropbear.id.au>
+Date: Wed, 29 May 2019 19:15:09 +0200
+User-Agent: StGit/unknown-version
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2a00:1450:4864:20::343
-Subject: Re: [Qemu-devel] [PATCH 0/5] tests/vm: Python 3,
- improve image caching, and misc
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+x-cbid: 19052917-0008-0000-0000-000002EBAA10
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19052917-0009-0000-0000-000022587BED
+Message-Id: <155915010892.2061314.10485622810149098411.stgit@bahia.lan>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
+	definitions=2019-05-29_08:, , signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+	priorityscore=1501
+	malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+	clxscore=1034 lowpriorityscore=0 mlxscore=0 impostorscore=0
+	mlxlogscore=602 adultscore=0 classifier=spam adjust=0 reason=mlx
+	scancount=1 engine=8.0.1-1810050000 definitions=main-1905290112
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 148.163.158.5
+Subject: [Qemu-devel] [PATCH] spapr_pci: Improve error message
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -97,26 +100,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, peter.maydell@linaro.org, lersek@redhat.com,
-	qemu-devel@nongnu.org, pbonzini@redhat.com, philmd@redhat.com
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Every PHB must have a unique index. This is checked at realize but when
+a duplicate index is detected, an error message mentioning BUIDs is
+printed. This doesn't help much, especially since BUID is an internal
+concept that is no longer exposed to the user.
 
-Wainer dos Santos Moschetta <wainersm@redhat.com> writes:
+Fix the message to mention the index property instead of BUID. As a bonus
+print a list of indexes already in use.
 
-> Ping. More reviews needed.
->
-> I've already got Philippe's reviewed-by, thanks!
+Signed-off-by: Greg Kurz <groug@kaod.org>
+---
+ hw/ppc/spapr_pci.c |    9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
 
-I've queued patches 1,2,4,5 to testing/next, thanks.
+diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
+index 97961b012859..fb8c54f4d90f 100644
+--- a/hw/ppc/spapr_pci.c
++++ b/hw/ppc/spapr_pci.c
+@@ -1699,7 +1699,14 @@ static void spapr_phb_realize(DeviceState *dev, Error **errp)
+     }
+ 
+     if (spapr_pci_find_phb(spapr, sphb->buid)) {
+-        error_setg(errp, "PCI host bridges must have unique BUIDs");
++        SpaprPhbState *s;
++
++        error_setg(errp, "PCI host bridges must have unique indexes");
++        error_append_hint(errp, "The following indexes are already in use:");
++        QLIST_FOREACH(s, &spapr->phbs, list) {
++            error_append_hint(errp, " %d", s->index);
++        }
++        error_append_hint(errp, "\nTry another value for the index property\n");
+         return;
+     }
+ 
 
-I'm going to see is 3 is obviated by Gerd's VM rebuild work but I've
-added it for now.
-
-Sorry about the delay.
-
---
-Alex Benn=C3=A9e
 
