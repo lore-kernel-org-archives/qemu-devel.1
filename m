@@ -2,86 +2,61 @@ Return-Path: <SRS0=DspQ=T5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DB3F3C07542
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 06:58:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D4E0C04AB3
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 06:58:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A7A17216FD
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 06:58:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6BC19216FD
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 06:58:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="c7g0XgVF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A7A17216FD
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="Vz6F4jI5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6BC19216FD
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:48457 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:48459 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hVsXM-0006Ui-Va
-	for qemu-devel@archiver.kernel.org; Wed, 29 May 2019 02:58:13 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:45155)
+	id 1hVsXW-0006cn-KU
+	for qemu-devel@archiver.kernel.org; Wed, 29 May 2019 02:58:22 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:47486)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <arilou@gmail.com>) id 1hVsHq-00011p-Ri
-	for qemu-devel@nongnu.org; Wed, 29 May 2019 02:42:11 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1hVsPy-0008Cx-Au
+	for qemu-devel@nongnu.org; Wed, 29 May 2019 02:50:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <arilou@gmail.com>) id 1hVsHp-00016r-T1
-	for qemu-devel@nongnu.org; Wed, 29 May 2019 02:42:10 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:35107)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <arilou@gmail.com>) id 1hVsHp-0000zc-NF
-	for qemu-devel@nongnu.org; Wed, 29 May 2019 02:42:09 -0400
-Received: by mail-wr1-x444.google.com with SMTP id m3so810809wrv.2
-	for <qemu-devel@nongnu.org>; Tue, 28 May 2019 23:42:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=from:to:cc:subject:date:message-id:in-reply-to:references
-	:mime-version:content-transfer-encoding;
-	bh=6BpSj4VncrNQLULTrP7ZGJ4fogVHX3e/cU14TJAFSE4=;
-	b=c7g0XgVF7T8Uz5xGPd9s9zd+evaxonHXiJ7gZGCnXlMeqOvciRdITgydXIlxjxnEMH
-	0hqcgejs3WlnAoUA566B4zYdwsIcc4TuilnBDMJu9hmlVzDeDx6ImFNGatBeT9JZg4J4
-	9XebHEmzOj2ZM5LKJwyKLLh8ZOnFbeF1XwIEwkRobbkqJHKw6aYbXkcnKOgQsZFugRyB
-	+IU+U4vYfNKZdSwlzTIJYrhs5/w66ZDzQ3l+nv2CejoAYfqoN6l2l6tka5SxPjGLbO9H
-	N2oSTcM/v0lQ4d2sUuJWWpXlt/X/fbkxf0jw6LH8sP+jpefCkGx87KJ7+g5j9r+c6QAp
-	l4oA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-	:references:mime-version:content-transfer-encoding;
-	bh=6BpSj4VncrNQLULTrP7ZGJ4fogVHX3e/cU14TJAFSE4=;
-	b=oQFd2zrV85bIpe6wkHrJqpeLT5qHLaf620mK25B3nN3LcRo0DMubDIEmnjBFbOWaf5
-	tjX6XuvAtpP+1WTyHQ6rw+RGFXU3OIsiz9ep0bs30wNosD8QNwHHn70lrEUvq7TyWz2c
-	r6tX1qqElUJY25H3sr+ivcjye9WMAS2i9CTQQDEqp/9ygHMjk+lU9n8b9sVpfYNJbeTm
-	QN0nkGQF+sVzyMzyPutYsKbvICLTvnmIfPitJabDKfceOs+bu10xgK0aXoG47wH2UGPr
-	0X6MRcBrNAR/vKf/Yc0+SjILYpOAqSMUFdc+VMSKF1BVTzGt4Q4RDfg7VYJVdObx8ApY
-	/Fuw==
-X-Gm-Message-State: APjAAAWirEUHEuXVBI6qmRelaCZhdfCubvVTPUnnkMjHKPUppgoJFAb8
-	RKkDORLkLtv84YODmVE1sy7aHBaA
-X-Google-Smtp-Source: APXvYqzHvmi3Rdjp+2e69VaVHMji2I/ThMvnV5qppVrkQQVz4MtRoTMCbgWAXxSystkZ3vZD80eAUQ==
-X-Received: by 2002:a5d:6709:: with SMTP id o9mr13310735wru.301.1559112128686; 
-	Tue, 28 May 2019 23:42:08 -0700 (PDT)
-Received: from linux.local ([31.154.166.148])
-	by smtp.gmail.com with ESMTPSA id f2sm6831168wme.12.2019.05.28.23.42.07
-	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Tue, 28 May 2019 23:42:08 -0700 (PDT)
-From: Jon Doron <arilou@gmail.com>
-To: qemu-devel@nongnu.org
-Date: Wed, 29 May 2019 09:41:36 +0300
-Message-Id: <20190529064148.19856-9-arilou@gmail.com>
+	(envelope-from <dgibson@ozlabs.org>) id 1hVsPw-0002Vp-VY
+	for qemu-devel@nongnu.org; Wed, 29 May 2019 02:50:34 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:60433 helo=ozlabs.org)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
+	id 1hVsPw-0002RC-Dh; Wed, 29 May 2019 02:50:32 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+	id 45DLv202WYz9sBb; Wed, 29 May 2019 16:50:21 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+	d=gibson.dropbear.id.au; s=201602; t=1559112622;
+	bh=LwgeqNNd+ZrGocsW9YkV/sNtHFn1cTUistNEVdfncKs=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=Vz6F4jI5xZxurPa0LSXyqCKCq+Byvqdu66rpJTzdeYb1ah9tQdKxb19jqOa1F9wVq
+	0F4JWa1mCjIOnAs/id+DqpPo30SbHGzY8s2ANtAAeQ4phm8uGfzZS9Y+4RYoI4Tll9
+	wfkCet87TzUjshie84+jIFk1VI2WUseKPvN55F8E=
+From: David Gibson <david@gibson.dropbear.id.au>
+To: peter.maydell@linaro.org
+Date: Wed, 29 May 2019 16:49:35 +1000
+Message-Id: <20190529065017.15149-3-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20190529064148.19856-1-arilou@gmail.com>
-References: <20190529064148.19856-1-arilou@gmail.com>
+In-Reply-To: <20190529065017.15149-1-david@gibson.dropbear.id.au>
+References: <20190529065017.15149-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2a00:1450:4864:20::444
-Subject: [Qemu-devel] [PATCH v12 08/20] gdbstub: Implement set register (P
- pkt) with new infra
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 203.11.71.1
+Subject: [Qemu-devel] [PULL 02/44] configure: Distinguish ppc64 and ppc64le
+ hosts
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -93,74 +68,135 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: alex.bennee@linaro.org, Jon Doron <arilou@gmail.com>
+Cc: lvivier@redhat.com, Richard Henderson <richard.henderson@linaro.org>,
+	qemu-devel@nongnu.org, groug@kaod.org, qemu-ppc@nongnu.org,
+	clg@kaod.org, David Gibson <david@gibson.dropbear.id.au>, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Jon Doron <arilou@gmail.com>
----
- gdbstub.c | 39 ++++++++++++++++++++++++++++++---------
- 1 file changed, 30 insertions(+), 9 deletions(-)
+From: Richard Henderson <richard.henderson@linaro.org>
 
-diff --git a/gdbstub.c b/gdbstub.c
-index 572222bfa4..fc9526b3f5 100644
---- a/gdbstub.c
-+++ b/gdbstub.c
-@@ -1651,6 +1651,27 @@ static void handle_remove_bp(GdbCmdContext *gdb_ctx, void *user_ctx)
-     put_packet(gdb_ctx->s, "E22");
- }
- 
-+static void handle_set_reg(GdbCmdContext *gdb_ctx, void *user_ctx)
-+{
-+    int reg_size;
-+
-+    if (!gdb_has_xml) {
-+        put_packet(gdb_ctx->s, "E00");
-+        return;
-+    }
-+
-+    if (gdb_ctx->num_params != 2) {
-+        put_packet(gdb_ctx->s, "E22");
-+        return;
-+    }
-+
-+    reg_size = strlen(gdb_ctx->params[1].data) / 2;
-+    hextomem(gdb_ctx->mem_buf, gdb_ctx->params[1].data, reg_size);
-+    gdb_write_register(gdb_ctx->s->g_cpu, gdb_ctx->mem_buf,
-+                       gdb_ctx->params[0].val_ull);
-+    put_packet(gdb_ctx->s, "OK");
-+}
-+
- static int gdb_handle_packet(GDBState *s, const char *line_buf)
- {
-     CPUState *cpu;
-@@ -1895,15 +1916,15 @@ static int gdb_handle_packet(GDBState *s, const char *line_buf)
-         }
-         break;
-     case 'P':
--        if (!gdb_has_xml)
--            goto unknown_command;
--        addr = strtoull(p, (char **)&p, 16);
--        if (*p == '=')
--            p++;
--        reg_size = strlen(p) / 2;
--        hextomem(mem_buf, p, reg_size);
--        gdb_write_register(s->g_cpu, mem_buf, addr);
--        put_packet(s, "OK");
-+        {
-+            static const GdbCmdParseEntry set_reg_cmd_desc = {
-+                .handler = handle_set_reg,
-+                .cmd = "P",
-+                .cmd_startswith = 1,
-+                .schema = "L?s0"
-+            };
-+            cmd_parser = &set_reg_cmd_desc;
-+        }
-         break;
-     case 'Z':
-         {
--- 
+We cannot use the ppc64le host compiler to build ppc64(be) guest code.
+Clean up confusion between cross_cc_powerpc and cross_cc_ppc; make use
+of the cflags variable as well.
+
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Message-Id: <20190501223819.8584-2-richard.henderson@linaro.org>
+[dwg: Dropped hunk relating to ppc64abi32, it doesn't test properly]
+Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+---
+ configure | 33 +++++++++++++++++++++++----------
+ 1 file changed, 23 insertions(+), 10 deletions(-)
+
+diff --git a/configure b/configure
+index 528b9ff705..07eb2b3942 100755
+--- a/configure
++++ b/configure
+@@ -198,7 +198,7 @@ supported_kvm_target() {
+         i386:i386 | i386:x86_64 | i386:x32 | \
+         x86_64:i386 | x86_64:x86_64 | x86_64:x32 | \
+         mips:mips | mipsel:mips | \
+-        ppc:ppc | ppc64:ppc | ppc:ppc64 | ppc64:ppc64 | \
++        ppc:ppc | ppc64:ppc | ppc:ppc64 | ppc64:ppc64 | ppc64:ppc64le | =
+\
+         s390x:s390x)
+             return 0
+         ;;
+@@ -502,8 +502,11 @@ cross_cc_arm=3D"arm-linux-gnueabihf-gcc"
+ cross_cc_cflags_armeb=3D"-mbig-endian"
+ cross_cc_i386=3D"i386-pc-linux-gnu-gcc"
+ cross_cc_cflags_i386=3D""
+-cross_cc_powerpc=3D"powerpc-linux-gnu-gcc"
+-cross_cc_powerpc=3D"powerpc-linux-gnu-gcc"
++cross_cc_ppc=3D"powerpc-linux-gnu-gcc"
++cross_cc_cflags_ppc=3D"-m32"
++cross_cc_ppc64=3D"powerpc-linux-gnu-gcc"
++cross_cc_cflags_ppc64=3D"-m64"
++cross_cc_ppc64le=3D"powerpc64le-linux-gnu-gcc"
+=20
+ enabled_cross_compilers=3D""
+=20
+@@ -700,7 +703,11 @@ elif check_define __sparc__ ; then
+   fi
+ elif check_define _ARCH_PPC ; then
+   if check_define _ARCH_PPC64 ; then
+-    cpu=3D"ppc64"
++    if check_define _LITTLE_ENDIAN ; then
++      cpu=3D"ppc64le"
++    else
++      cpu=3D"ppc64"
++    fi
+   else
+     cpu=3D"ppc"
+   fi
+@@ -731,10 +738,14 @@ ARCH=3D
+ # Note that this case should only have supported host CPUs, not guests.
+ case "$cpu" in
+   ppc|ppc64|s390|s390x|sparc64|x32|riscv32|riscv64)
+-    cpu=3D"$cpu"
+     supported_cpu=3D"yes"
+     eval "cross_cc_${cpu}=3D\$host_cc"
+   ;;
++  ppc64le)
++    ARCH=3D"ppc64"
++    supported_cpu=3D"yes"
++    cross_cc_ppc64le=3D$host_cc
++  ;;
+   i386|i486|i586|i686|i86pc|BePC)
+     cpu=3D"i386"
+     supported_cpu=3D"yes"
+@@ -1538,8 +1549,8 @@ case "$cpu" in
+     ppc)
+            CPU_CFLAGS=3D"-m32"
+            LDFLAGS=3D"-m32 $LDFLAGS"
+-           cross_cc_powerpc=3D$cc
+-           cross_cc_cflags_powerpc=3D$CPU_CFLAGS
++           cross_cc_ppc=3D$cc
++           cross_cc_cflags_ppc=3D"$CPU_CFLAGS"
+            ;;
+     ppc64)
+            CPU_CFLAGS=3D"-m64"
+@@ -6191,7 +6202,7 @@ if { test "$cpu" =3D "i386" || test "$cpu" =3D "x86=
+_64"; } && \
+         fi
+     done
+ fi
+-if test "$cpu" =3D "ppc64" && test "$targetos" !=3D "Darwin" ; then
++if test "$ARCH" =3D "ppc64" && test "$targetos" !=3D "Darwin" ; then
+   roms=3D"$roms spapr-rtas"
+ fi
+=20
+@@ -7378,7 +7389,7 @@ if test "$linux" =3D "yes" ; then
+   i386|x86_64|x32)
+     linux_arch=3Dx86
+     ;;
+-  ppc|ppc64)
++  ppc|ppc64|ppc64le)
+     linux_arch=3Dpowerpc
+     ;;
+   s390x)
+@@ -7539,7 +7550,8 @@ case "$target_name" in
+   ;;
+   ppc)
+     gdb_xml_files=3D"power-core.xml power-fpu.xml power-altivec.xml powe=
+r-spe.xml"
+-    target_compiler=3D$cross_cc_powerpc
++    target_compiler=3D$cross_cc_ppc
++    target_compiler_cflags=3D"$cross_cc_cflags_ppc"
+   ;;
+   ppc64)
+     TARGET_BASE_ARCH=3Dppc
+@@ -7547,6 +7559,7 @@ case "$target_name" in
+     mttcg=3Dyes
+     gdb_xml_files=3D"power64-core.xml power-fpu.xml power-altivec.xml po=
+wer-spe.xml power-vsx.xml"
+     target_compiler=3D$cross_cc_ppc64
++    target_compiler_cflags=3D"$cross_cc_cflags_ppc64"
+   ;;
+   ppc64le)
+     TARGET_ARCH=3Dppc64
+--=20
 2.21.0
 
 
