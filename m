@@ -2,99 +2,101 @@ Return-Path: <SRS0=DspQ=T5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E6A7CC04AB3
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 08:23:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D08FC04AB3
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 08:23:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C2AE820665
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 08:23:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C2AE820665
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=citrix.com
+	by mail.kernel.org (Postfix) with ESMTPS id 0C4D820665
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 08:23:58 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=wavesemi.onmicrosoft.com header.i=@wavesemi.onmicrosoft.com header.b="fiQ9wlwe"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0C4D820665
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=wavecomp.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:49765 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:49768 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hVtri-0001tV-Lm
-	for qemu-devel@archiver.kernel.org; Wed, 29 May 2019 04:23:18 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:40183)
+	id 1hVtsL-0002WM-6d
+	for qemu-devel@archiver.kernel.org; Wed, 29 May 2019 04:23:57 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:40240)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Paul.Durrant@citrix.com>) id 1hVtqM-000154-Si
-	for qemu-devel@nongnu.org; Wed, 29 May 2019 04:21:55 -0400
+	(envelope-from <amarkovic@wavecomp.com>) id 1hVtqp-0001O6-4S
+	for qemu-devel@nongnu.org; Wed, 29 May 2019 04:22:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Paul.Durrant@citrix.com>) id 1hVtqL-0000Ks-Oy
-	for qemu-devel@nongnu.org; Wed, 29 May 2019 04:21:54 -0400
-Received: from esa3.hc3370-68.iphmx.com ([216.71.145.155]:10524)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <Paul.Durrant@citrix.com>)
-	id 1hVtqL-0000Ic-ES
-	for qemu-devel@nongnu.org; Wed, 29 May 2019 04:21:53 -0400
-Authentication-Results: esa3.hc3370-68.iphmx.com;
-	dkim=none (message not signed) header.i=none;
-	spf=None smtp.pra=Paul.Durrant@citrix.com;
-	spf=Pass smtp.mailfrom=Paul.Durrant@citrix.com;
-	spf=None smtp.helo=postmaster@MIAPEX02MSOL01.citrite.net
-Received-SPF: None (esa3.hc3370-68.iphmx.com: no sender
-	authenticity information available from domain of
-	Paul.Durrant@citrix.com) identity=pra;
-	client-ip=23.29.105.83; receiver=esa3.hc3370-68.iphmx.com;
-	envelope-from="Paul.Durrant@citrix.com";
-	x-sender="Paul.Durrant@citrix.com"; x-conformance=sidf_compatible
-Received-SPF: Pass (esa3.hc3370-68.iphmx.com: domain of
-	Paul.Durrant@citrix.com designates 23.29.105.83 as permitted
-	sender) identity=mailfrom; client-ip=23.29.105.83;
-	receiver=esa3.hc3370-68.iphmx.com;
-	envelope-from="Paul.Durrant@citrix.com";
-	x-sender="Paul.Durrant@citrix.com";
-	x-conformance=sidf_compatible; x-record-type="v=spf1";
-	x-record-text="v=spf1 ip4:209.167.231.154 ip4:178.63.86.133
-	ip4:195.66.111.40/30 ip4:85.115.9.32/28 ip4:199.102.83.4
-	ip4:192.28.146.160 ip4:192.28.146.107 ip4:216.52.6.88
-	ip4:216.52.6.188 ip4:23.29.105.83 ip4:162.221.156.50 ~all"
-Received-SPF: None (esa3.hc3370-68.iphmx.com: no sender
-	authenticity information available from domain of
-	postmaster@MIAPEX02MSOL01.citrite.net) identity=helo;
-	client-ip=23.29.105.83; receiver=esa3.hc3370-68.iphmx.com;
-	envelope-from="Paul.Durrant@citrix.com";
-	x-sender="postmaster@MIAPEX02MSOL01.citrite.net";
-	x-conformance=sidf_compatible
-IronPort-SDR: QgjiMWa/I70xxpyNkEeXlCg41APGsSuR3uHXLKb5xzzzaBejbFOJqsiyJEJQoil0BEbZ6H83ay
-	XZLeh0IBQAmuvA97zdfTt8upGUmi4n0+pj4BMknFlr+GvpLoWVhMCu0NYg4Rs4/hJSe7wBESG7
-	joedtFkFjRTxfLmc8jtKntJtLshLh+UGy6FN0g/SfSe6Am3LCvumvWBYD54IB5xyZ4UPv5nhEx
-	npTcCRWHnKJpXElMJtH2NdYeKLX9lwv1AP/twXi2KkIksNxz/9zlytWkW5NdiBSzG6PReye1wO
-	RAU=
-X-SBRS: 2.7
-X-MesageID: 1035703
-X-Ironport-Server: esa3.hc3370-68.iphmx.com
-X-Remote-IP: 23.29.105.83
-X-Policy: $RELAYED
-X-IronPort-AV: E=Sophos;i="5.60,526,1549947600"; 
-   d="scan'208";a="1035703"
-From: Paul Durrant <Paul.Durrant@citrix.com>
-To: 'Eduardo Habkost' <ehabkost@redhat.com>, Markus Armbruster
-	<armbru@redhat.com>
-Thread-Topic: Headers without multiple inclusion guards
-Thread-Index: AQHVFYEBg2PnLBQnXE6+nzp55xu0haaAyRGAgAD6mIA=
-Date: Wed, 29 May 2019 08:21:33 +0000
-Message-ID: <3038b5ea224c4f2b84eb7c1f5fa36134@AMSPEX02CL03.citrite.net>
-References: <87lfyqla7r.fsf@dusky.pond.sub.org>
-	<20190528192317.GG22103@habkost.net>
-In-Reply-To: <20190528192317.GG22103@habkost.net>
-Accept-Language: en-GB, en-US
+	(envelope-from <amarkovic@wavecomp.com>) id 1hVtqo-0000iz-7r
+	for qemu-devel@nongnu.org; Wed, 29 May 2019 04:22:23 -0400
+Received: from mail-eopbgr740090.outbound.protection.outlook.com
+	([40.107.74.90]:61520
+	helo=NAM01-BN3-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
+	id 1hVtqn-0000iF-Vu
+	for qemu-devel@nongnu.org; Wed, 29 May 2019 04:22:22 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=wavesemi.onmicrosoft.com; s=selector1-wavesemi-onmicrosoft-com;
+	h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+	bh=xuDupgo3l7tMk0mg9zmmye4mOxqET2Ji6aMQj2BAV58=;
+	b=fiQ9wlwePJIDjz35rfePvzy345hbsPne3uOYUbDEGjdzaEza6piftbGoi6r6mBXdopcLXZuugBGddHbEQmVlw2l8Eq1RfRPxGd+kk+GYB+1Ckx7z/CwytctecHtficx3z+Q6up0izvv6l7wt8ixe4rCBcPDd3GpSUXFwOYv5EsY=
+Received: from BN6PR2201MB1251.namprd22.prod.outlook.com (10.174.81.139) by
+	BN6PR2201MB1315.namprd22.prod.outlook.com (10.174.80.9) with Microsoft
+	SMTP
+	Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+	15.20.1922.16; Wed, 29 May 2019 08:22:18 +0000
+Received: from BN6PR2201MB1251.namprd22.prod.outlook.com
+	([fe80::854a:15e2:b5f:e2c8]) by
+	BN6PR2201MB1251.namprd22.prod.outlook.com
+	([fe80::854a:15e2:b5f:e2c8%8]) with mapi id 15.20.1922.021;
+	Wed, 29 May 2019 08:22:18 +0000
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
+To: =?iso-8859-1?Q?Philippe_Mathieu-Daud=E9?= <philmd@redhat.com>
+Thread-Topic: Malta-related files in MAINTAINERS
+Thread-Index: AQHVFfeR5EFnlOiftEqy3oXDxtUD/g==
+Date: Wed, 29 May 2019 08:22:18 +0000
+Message-ID: <BN6PR2201MB1251C914F948CFB53757492DC61F0@BN6PR2201MB1251.namprd22.prod.outlook.com>
+Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: 
 X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
+authentication-results: spf=none (sender IP is )
+	smtp.mailfrom=amarkovic@wavecomp.com; 
+x-originating-ip: [109.245.225.115]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 6204a8f0-67a2-4823-fc1a-08d6e40ec3f5
+x-microsoft-antispam: BCL:0; PCL:0;
+	RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(2017052603328)(7193020);
+	SRVR:BN6PR2201MB1315; 
+x-ms-traffictypediagnostic: BN6PR2201MB1315:
+x-microsoft-antispam-prvs: <BN6PR2201MB1315DFD0AED8F8A83DA231D0C61F0@BN6PR2201MB1315.namprd22.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:2449;
+x-forefront-prvs: 0052308DC6
+x-forefront-antispam-report: SFV:NSPM;
+	SFS:(10019020)(136003)(366004)(346002)(396003)(39850400004)(376002)(199004)(189003)(86362001)(486006)(476003)(3846002)(6116002)(66476007)(66556008)(66946007)(91956017)(6506007)(5660300002)(64756008)(9686003)(76116006)(53936002)(7696005)(102836004)(66446008)(2906002)(6436002)(73956011)(55016002)(3480700005)(186003)(26005)(8676002)(8936002)(316002)(81156014)(52536014)(66066001)(81166006)(7736002)(305945005)(74316002)(99286004)(71200400001)(256004)(68736007)(71190400001)(558084003)(33656002)(4326008)(478600001)(25786009)(14454004)(6916009);
+	DIR:OUT; SFP:1102; SCL:1; SRVR:BN6PR2201MB1315;
+	H:BN6PR2201MB1251.namprd22.prod.outlook.com; FPR:; SPF:None;
+	LANG:en; PTR:InfoNoRecords; A:1; MX:1; 
+received-spf: None (protection.outlook.com: wavecomp.com does not designate
+	permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: 9PIl7L2GoCxkLqOnNhLpN2ATt9jfpE79hHG/EabY0oNrN1qRUXVaBq6j+3BFou3lGRrNAj3gP8pXsAHERXMmLlbJHtyLlcdR1bRTDK4kpBYGbm1qciXeeB1F+uihSlh3V0XEAGkeAheG3ObGcc8IxZ1PUWcs4wJdyoR2hPvezx0dH70hqwysH6yA2bWBAM8aSf0r059W+voALAXwFssr0cwWuahaD/Tqoyt961XHfPcf9waPQ5VtxbG3tq3IYbj8zcUl9/MLIv0dBKuglMomrUcVMivvdBvY5V1DTzxyhmOtbABeezsFIBrvHnEIfwhgf76MpEXaowL67kqE+vIgoMyRdXqhRkek1KsjfG2AH/KlEfzho3/E+5Zix9QXCLgQBWreUtGx2X81maBH01yw+vb2x1g0HoKZNu9usP1RsAA=
 Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x
-X-Received-From: 216.71.145.155
-Subject: Re: [Qemu-devel] Headers without multiple inclusion guards
+X-OriginatorOrg: wavecomp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6204a8f0-67a2-4823-fc1a-08d6e40ec3f5
+X-MS-Exchange-CrossTenant-originalarrivaltime: 29 May 2019 08:22:18.5264 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 463607d3-1db3-40a0-8a29-970c56230104
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: amarkovic@wavecomp.com
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN6PR2201MB1315
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.74.90
+Subject: [Qemu-devel] Malta-related files in MAINTAINERS
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -106,73 +108,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Chris Wulff <crwulff@gmail.com>,
-	Sagar Karandikar <sagark@eecs.berkeley.edu>,
-	David Hildenbrand <david@redhat.com>, James Hogan <jhogan@kernel.org>,
-	Anthony Green <green@moxielogic.com>, Palmer Dabbelt <palmer@sifive.com>,
-	Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
-	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-	Max Filippov <jcmvbkbc@gmail.com>, Dmitry
-	Fleytman <dmitry.fleytman@gmail.com>,
-	Alistair Francis <Alistair.Francis@wdc.com>,
-	Gerd Hoffmann <kraxel@redhat.com>,
-	"Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
-	Guan Xuetao <gxt@mprc.pku.edu.cn>, Marek
-	Vasut <marex@denx.de>, Stefano Stabellini <sstabellini@kernel.org>,
-	Aleksandar Rikalo <arikalo@wavecomp.com>, Helge Deller <deller@gmx.de>,
-	"Michael S. Tsirkin" <mst@redhat.com>, Laszlo Ersek <lersek@redhat.com>,
-	Halil Pasic <pasic@linux.ibm.com>,
-	Christian Borntraeger <borntraeger@de.ibm.com>,
-	Anthony Perard <anthony.perard@citrix.com>, Richard
-	Henderson <rth@twiddle.net>, Jason Wang <jasowang@redhat.com>,
-	Artyom Tarasenko <atar4qemu@gmail.com>,
-	Laurent Vivier <lvivier@redhat.com>,
-	Thomas Huth <thuth@redhat.com>, Riku Voipio <riku.voipio@iki.fi>,
-	Alistair Francis <alistair@alistair23.me>, Greg Kurz <groug@kaod.org>,
-	Marcelo Tosatti <mtosatti@redhat.com>,
-	Beniamino Galvani <b.galvani@gmail.com>,
-	Eric Auger <eric.auger@redhat.com>, Stafford Horne <shorne@gmail.com>,
-	=?iso-8859-1?Q?Alex_Benn=E9e?= <alex.bennee@linaro.org>,
-	David Gibson <david@gibson.dropbear.id.au>,
-	"Daniel P. Berrange" <berrange@redhat.com>,
-	Claudio Fontana <claudio.fontana@gmail.com>,
-	Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
-	Cornelia Huck <cohuck@redhat.com>,
-	Claudio Fontana <claudio.fontana@huawei.com>,
-	Laurent Vivier <laurent@vivier.eu>,
-	Andrew Baumann <Andrew.Baumann@microsoft.com>,
-	=?iso-8859-1?Q?Philippe_Mathieu-Daud=E9?= <philmd@redhat.com>,
-	Michael Walle <michael@walle.cc>,
-	Aleksandar Markovic <amarkovic@wavecomp.com>,
-	Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>,
-	=?iso-8859-1?Q?Philippe_Mathieu-Daud=E9?= <f4bug@amsat.org>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-=20
-> [...]
-> > Guest CPU Cores (Xen):
-> > ----------------------
-> >
-> > X86
-> > M: Stefano Stabellini <sstabellini@kernel.org>
-> > M: Anthony Perard <anthony.perard@citrix.com>
-> > M: Paul Durrant <paul.durrant@citrix.com>
-> > include/hw/xen/io/ring.h
->=20
-> I see a __XEN_PUBLIC_IO_RING_H__ guard there.  Probably
-> clean-header-guards.pl is confused by the comments at the end of
-> the file?
->=20
+Hello, Philippe.
 
-Yes, I see no problem there. The emacs boilerplate is common in Xen headers=
- and persisted when this was imported.
+Currently, we have these two files in Malta MAINTAINERS section:
+F: hw/mips/mips_malta.c
+F: tests/acceptance/linux_ssh_mips_malta.py
 
-  Paul
+Do we need to add more files, or other Malta-related files naturally belong=
+ to some other sections, or are shared by many boards?
 
-> > [...]
->=20
-> --
-> Eduardo
+Yours, Aleksandae
 
