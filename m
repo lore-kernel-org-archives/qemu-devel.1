@@ -2,86 +2,63 @@ Return-Path: <SRS0=DspQ=T5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C48AC04AB3
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 07:10:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9EB2FC04AB3
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 07:10:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0B3DC21019
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 07:10:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6D0B521019
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 07:10:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="px0LcRNr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0B3DC21019
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="HNZ+Rb7a"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6D0B521019
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:48638 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:48654 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hVsjC-0007zD-7M
-	for qemu-devel@archiver.kernel.org; Wed, 29 May 2019 03:10:26 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:45256)
+	id 1hVsjH-00084R-IA
+	for qemu-devel@archiver.kernel.org; Wed, 29 May 2019 03:10:31 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:47649)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <arilou@gmail.com>) id 1hVsHy-00019y-LO
-	for qemu-devel@nongnu.org; Wed, 29 May 2019 02:42:19 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1hVsQ2-0008Fx-E6
+	for qemu-devel@nongnu.org; Wed, 29 May 2019 02:50:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <arilou@gmail.com>) id 1hVsHx-0002T5-9j
-	for qemu-devel@nongnu.org; Wed, 29 May 2019 02:42:18 -0400
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:55393)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <arilou@gmail.com>) id 1hVsHx-0002Jq-48
-	for qemu-devel@nongnu.org; Wed, 29 May 2019 02:42:17 -0400
-Received: by mail-wm1-x341.google.com with SMTP id u78so714973wmu.5
-	for <qemu-devel@nongnu.org>; Tue, 28 May 2019 23:42:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=from:to:cc:subject:date:message-id:in-reply-to:references
-	:mime-version:content-transfer-encoding;
-	bh=WJhaKk0Bv9gRHhRS5uztzL7FE5AQMtFAVizIuMhmaP4=;
-	b=px0LcRNrPB7184dsi9bPUkbTrp6T1HnCkcUH8cYGUDYK3SrU+Q66JPUV/nd9p8oEi+
-	CIQ7/aTXxJOwIAiwQOAzrlGCFcaxfmD4M79OA/YYn0E8sxclLc1KwpFj/ENrbIs50tdQ
-	3LrtGh4INJTfYeP4cKDwHxM7w+92cwQ85fr51s0xuYEKkwvetA4Mp0j7fYYa2dznIat4
-	jGrKT1X2UmjRnMscksfhVt9clxHQGPixVJrZMCA0LstyzQIv92UqbjPzO3sTGzsDJnfX
-	P5qHRug+DDQsYvv5rnDKYLuT42VLsAk7YZrYAgxJiOmVA93Kqq67xCeqMEM8g9Yx7Yiw
-	pHrg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-	:references:mime-version:content-transfer-encoding;
-	bh=WJhaKk0Bv9gRHhRS5uztzL7FE5AQMtFAVizIuMhmaP4=;
-	b=RKUgUUDQ/qt3qT/aKEPh6Z06hxwAvHuMtT9qL+7g2jnu3knTE1hPkC3d/feF4sr/D/
-	ofAbh9wvjBGlbPVOa6fsnXKBViDRrTlUbNfT0hiRknZfFFjIPuAWnaFkSTmpI9jKEExh
-	wunI4NciOGRHKLH9VYWqlD06j5mzTzFysRxUVCHVk2M4v8Z8yYxu4jpkWpQVfvCJsD4l
-	JBeruyAb8i9uqlDDoFy5hnmKB/aEe9/kBvRoaDk38WbOkkhsXlD2A51FpUcpD0WL+yD0
-	YeOqT3HsaokB4glPqvEvGq3n/CcfYyncVrZw1OpnJ+dRK6R6G7eWC83dz7EIcfXnNMal
-	1IfA==
-X-Gm-Message-State: APjAAAUVaK0l9ypVOC+x5accB2F9orRgdZ4S3cFec8yLVlGc8LF22Bx1
-	4vSsJNqUHHD8StLavYBRmU+HeBfF
-X-Google-Smtp-Source: APXvYqzyh65MPSvEbgK/SqHKtBapmD5ltw/UATkC6ZwWpHAq+VoBxjfVjJvSBN21WJhixZcn5TO06w==
-X-Received: by 2002:a1c:f610:: with SMTP id w16mr5337031wmc.37.1559112136097; 
-	Tue, 28 May 2019 23:42:16 -0700 (PDT)
-Received: from linux.local ([31.154.166.148])
-	by smtp.gmail.com with ESMTPSA id f2sm6831168wme.12.2019.05.28.23.42.15
-	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Tue, 28 May 2019 23:42:15 -0700 (PDT)
-From: Jon Doron <arilou@gmail.com>
-To: qemu-devel@nongnu.org
-Date: Wed, 29 May 2019 09:41:44 +0300
-Message-Id: <20190529064148.19856-17-arilou@gmail.com>
+	(envelope-from <dgibson@ozlabs.org>) id 1hVsQ0-0002Za-Ga
+	for qemu-devel@nongnu.org; Wed, 29 May 2019 02:50:38 -0400
+Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:57579 helo=ozlabs.org)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
+	id 1hVsPz-0002Wc-O6; Wed, 29 May 2019 02:50:36 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+	id 45DLv23zSDz9sNK; Wed, 29 May 2019 16:50:22 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+	d=gibson.dropbear.id.au; s=201602; t=1559112622;
+	bh=BDmxZb8/fuq570SYItgaSbQcITu2aaOYY38yS/5ivek=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=HNZ+Rb7ax7EwdmEnHRbIVdAsxLePKquZ/8TcKRK8u6NPvtolC8WrWgFWOS9sAgPYG
+	J5QhJGZz+50+o3b89lvS84qss+g8H+d6Ue53ZLD7Z72yntztErO5gmwBe4whnFmLrk
+	FeNFDNBjuNl9c+11LQ920xPYIM3uz0x8QLt83LDg=
+From: David Gibson <david@gibson.dropbear.id.au>
+To: peter.maydell@linaro.org
+Date: Wed, 29 May 2019 16:49:48 +1000
+Message-Id: <20190529065017.15149-16-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20190529064148.19856-1-arilou@gmail.com>
-References: <20190529064148.19856-1-arilou@gmail.com>
+In-Reply-To: <20190529065017.15149-1-david@gibson.dropbear.id.au>
+References: <20190529065017.15149-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2a00:1450:4864:20::341
-Subject: [Qemu-devel] [PATCH v12 16/20] gdbstub: Implement v commands with
- new infra
+X-Received-From: 2401:3900:2:1::2
+Subject: [Qemu-devel] [PULL 15/44] spapr/xive: fix EQ page addresses above
+ 64GB
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -93,213 +70,118 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: alex.bennee@linaro.org, Jon Doron <arilou@gmail.com>
+Cc: lvivier@redhat.com, qemu-devel@nongnu.org, groug@kaod.org,
+	qemu-ppc@nongnu.org, clg@kaod.org,
+	David Gibson <david@gibson.dropbear.id.au>, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Jon Doron <arilou@gmail.com>
----
- gdbstub.c | 170 +++++++++++++++++++++++++++++++++++-------------------
- 1 file changed, 110 insertions(+), 60 deletions(-)
+From: C=C3=A9dric Le Goater <clg@kaod.org>
 
-diff --git a/gdbstub.c b/gdbstub.c
-index 3fd1a1cddb..648191a3b0 100644
---- a/gdbstub.c
-+++ b/gdbstub.c
-@@ -1818,6 +1818,106 @@ static void handle_step(GdbCmdContext *gdb_ctx, void *user_ctx)
-     gdb_continue(gdb_ctx->s);
- }
- 
-+static void handle_v_cont_query(GdbCmdContext *gdb_ctx, void *user_ctx)
-+{
-+    put_packet(gdb_ctx->s, "vCont;c;C;s;S");
-+}
-+
-+static void handle_v_cont(GdbCmdContext *gdb_ctx, void *user_ctx)
-+{
-+    int res;
-+
-+    if (!gdb_ctx->num_params) {
-+        return;
-+    }
-+
-+    res = gdb_handle_vcont(gdb_ctx->s, gdb_ctx->params[0].data);
-+    if ((res == -EINVAL) || (res == -ERANGE)) {
-+        put_packet(gdb_ctx->s, "E22");
-+    } else if (res) {
-+        put_packet(gdb_ctx->s, "");
-+    }
-+}
-+
-+static void handle_v_attach(GdbCmdContext *gdb_ctx, void *user_ctx)
-+{
-+    GDBProcess *process;
-+    CPUState *cpu;
-+    char thread_id[16];
-+
-+    pstrcpy(gdb_ctx->str_buf, sizeof(gdb_ctx->str_buf), "E22");
-+    if (!gdb_ctx->num_params) {
-+        goto cleanup;
-+    }
-+
-+    process = gdb_get_process(gdb_ctx->s, gdb_ctx->params[0].val_ul);
-+    if (!process) {
-+        goto cleanup;
-+    }
-+
-+    cpu = get_first_cpu_in_process(gdb_ctx->s, process);
-+    if (!cpu) {
-+        goto cleanup;
-+    }
-+
-+    process->attached = true;
-+    gdb_ctx->s->g_cpu = cpu;
-+    gdb_ctx->s->c_cpu = cpu;
-+
-+    gdb_fmt_thread_id(gdb_ctx->s, cpu, thread_id, sizeof(thread_id));
-+    snprintf(gdb_ctx->str_buf, sizeof(gdb_ctx->str_buf), "T%02xthread:%s;",
-+             GDB_SIGNAL_TRAP, thread_id);
-+cleanup:
-+    put_packet(gdb_ctx->s, gdb_ctx->str_buf);
-+}
-+
-+static void handle_v_kill(GdbCmdContext *gdb_ctx, void *user_ctx)
-+{
-+    /* Kill the target */
-+    put_packet(gdb_ctx->s, "OK");
-+    error_report("QEMU: Terminated via GDBstub");
-+    exit(0);
-+}
-+
-+static GdbCmdParseEntry gdb_v_commands_table[] = {
-+    /* Order is important if has same prefix */
-+    {
-+        .handler = handle_v_cont_query,
-+        .cmd = "Cont?",
-+        .cmd_startswith = 1
-+    },
-+    {
-+        .handler = handle_v_cont,
-+        .cmd = "Cont",
-+        .cmd_startswith = 1,
-+        .schema = "s0"
-+    },
-+    {
-+        .handler = handle_v_attach,
-+        .cmd = "Attach;",
-+        .cmd_startswith = 1,
-+        .schema = "l0"
-+    },
-+    {
-+        .handler = handle_v_kill,
-+        .cmd = "Kill;",
-+        .cmd_startswith = 1
-+    },
-+};
-+
-+static void handle_v_commands(GdbCmdContext *gdb_ctx, void *user_ctx)
-+{
-+    if (!gdb_ctx->num_params) {
-+        return;
-+    }
-+
-+    if (process_string_cmd(gdb_ctx->s, NULL, gdb_ctx->params[0].data,
-+                           gdb_v_commands_table,
-+                           ARRAY_SIZE(gdb_v_commands_table))) {
-+        put_packet(gdb_ctx->s, "");
-+    }
-+}
-+
- static int gdb_handle_packet(GDBState *s, const char *line_buf)
+The high order bits of the address of the OS event queue is stored in
+bits [4-31] of word2 of the XIVE END internal structures and the low
+order bits in word3. This structure is using Big Endian ordering and
+computing the value requires some simple arithmetic which happens to
+be wrong. The mask removing bits [0-3] of word2 is applied to the
+wrong value and the resulting address is bogus when above 64GB.
+
+Guests with more than 64GB of RAM will allocate pages for the OS event
+queues which will reside above the 64GB limit. In this case, the XIVE
+device model will wake up the CPUs in case of a notification, such as
+IPIs, but the update of the event queue will be written at the wrong
+place in memory. The result is uncertain as the guest memory is
+trashed and IPI are not delivered.
+
+Introduce a helper xive_end_qaddr() to compute this value correctly in
+all places where it is used.
+
+Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+Message-Id: <20190508171946.657-3-clg@kaod.org>
+Reviewed-by: Greg Kurz <groug@kaod.org>
+Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+---
+ hw/intc/spapr_xive.c       | 3 +--
+ hw/intc/xive.c             | 9 +++------
+ include/hw/ppc/xive_regs.h | 6 ++++++
+ 3 files changed, 10 insertions(+), 8 deletions(-)
+
+diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
+index 33da1a52c6..a19e998093 100644
+--- a/hw/intc/spapr_xive.c
++++ b/hw/intc/spapr_xive.c
+@@ -1150,8 +1150,7 @@ static target_ulong h_int_get_queue_config(PowerPCC=
+PU *cpu,
+     }
+=20
+     if (xive_end_is_enqueue(end)) {
+-        args[1] =3D (uint64_t) be32_to_cpu(end->w2 & 0x0fffffff) << 32
+-            | be32_to_cpu(end->w3);
++        args[1] =3D xive_end_qaddr(end);
+         args[2] =3D xive_get_field32(END_W0_QSIZE, end->w0) + 12;
+     } else {
+         args[1] =3D 0;
+diff --git a/hw/intc/xive.c b/hw/intc/xive.c
+index a0b87001da..dcf2fcd108 100644
+--- a/hw/intc/xive.c
++++ b/hw/intc/xive.c
+@@ -1042,8 +1042,7 @@ static const TypeInfo xive_source_info =3D {
+=20
+ void xive_end_queue_pic_print_info(XiveEND *end, uint32_t width, Monitor=
+ *mon)
  {
-     CPUState *cpu;
-@@ -1825,7 +1925,7 @@ static int gdb_handle_packet(GDBState *s, const char *line_buf)
-     CPUClass *cc;
-     const char *p;
-     uint32_t pid, tid;
--    int ch, type, res;
-+    int ch, type;
-     uint8_t mem_buf[MAX_PACKET_LENGTH];
-     char buf[sizeof(mem_buf) + 1 /* trailing NUL */];
-     char thread_id[16];
-@@ -1874,66 +1974,16 @@ static int gdb_handle_packet(GDBState *s, const char *line_buf)
-         }
-         break;
-     case 'v':
--        if (strncmp(p, "Cont", 4) == 0) {
--            p += 4;
--            if (*p == '?') {
--                put_packet(s, "vCont;c;C;s;S");
--                break;
--            }
--
--            res = gdb_handle_vcont(s, p);
--
--            if (res) {
--                if ((res == -EINVAL) || (res == -ERANGE)) {
--                    put_packet(s, "E22");
--                    break;
--                }
--                goto unknown_command;
--            }
--            break;
--        } else if (strncmp(p, "Attach;", 7) == 0) {
--            unsigned long pid;
--
--            p += 7;
--
--            if (qemu_strtoul(p, &p, 16, &pid)) {
--                put_packet(s, "E22");
--                break;
--            }
--
--            process = gdb_get_process(s, pid);
--
--            if (process == NULL) {
--                put_packet(s, "E22");
--                break;
--            }
--
--            cpu = get_first_cpu_in_process(s, process);
--
--            if (cpu == NULL) {
--                /* Refuse to attach an empty process */
--                put_packet(s, "E22");
--                break;
--            }
--
--            process->attached = true;
--
--            s->g_cpu = cpu;
--            s->c_cpu = cpu;
--
--            snprintf(buf, sizeof(buf), "T%02xthread:%s;", GDB_SIGNAL_TRAP,
--                     gdb_fmt_thread_id(s, cpu, thread_id, sizeof(thread_id)));
--
--            put_packet(s, buf);
--            break;
--        } else if (strncmp(p, "Kill;", 5) == 0) {
--            /* Kill the target */
--            put_packet(s, "OK");
--            error_report("QEMU: Terminated via GDBstub");
--            exit(0);
--        } else {
--            goto unknown_command;
-+        {
-+            static const GdbCmdParseEntry v_cmd_desc = {
-+                .handler = handle_v_commands,
-+                .cmd = "v",
-+                .cmd_startswith = 1,
-+                .schema = "s0"
-+            };
-+            cmd_parser = &v_cmd_desc;
-         }
-+        break;
-     case 'k':
-         /* Kill the target */
-         error_report("QEMU: Terminated via GDBstub");
--- 
+-    uint64_t qaddr_base =3D (uint64_t) be32_to_cpu(end->w2 & 0x0fffffff)=
+ << 32
+-        | be32_to_cpu(end->w3);
++    uint64_t qaddr_base =3D xive_end_qaddr(end);
+     uint32_t qsize =3D xive_get_field32(END_W0_QSIZE, end->w0);
+     uint32_t qindex =3D xive_get_field32(END_W1_PAGE_OFF, end->w1);
+     uint32_t qentries =3D 1 << (qsize + 10);
+@@ -1072,8 +1071,7 @@ void xive_end_queue_pic_print_info(XiveEND *end, ui=
+nt32_t width, Monitor *mon)
+=20
+ void xive_end_pic_print_info(XiveEND *end, uint32_t end_idx, Monitor *mo=
+n)
+ {
+-    uint64_t qaddr_base =3D (uint64_t) be32_to_cpu(end->w2 & 0x0fffffff)=
+ << 32
+-        | be32_to_cpu(end->w3);
++    uint64_t qaddr_base =3D xive_end_qaddr(end);
+     uint32_t qindex =3D xive_get_field32(END_W1_PAGE_OFF, end->w1);
+     uint32_t qgen =3D xive_get_field32(END_W1_GENERATION, end->w1);
+     uint32_t qsize =3D xive_get_field32(END_W0_QSIZE, end->w0);
+@@ -1101,8 +1099,7 @@ void xive_end_pic_print_info(XiveEND *end, uint32_t=
+ end_idx, Monitor *mon)
+=20
+ static void xive_end_enqueue(XiveEND *end, uint32_t data)
+ {
+-    uint64_t qaddr_base =3D (uint64_t) be32_to_cpu(end->w2 & 0x0fffffff)=
+ << 32
+-        | be32_to_cpu(end->w3);
++    uint64_t qaddr_base =3D xive_end_qaddr(end);
+     uint32_t qsize =3D xive_get_field32(END_W0_QSIZE, end->w0);
+     uint32_t qindex =3D xive_get_field32(END_W1_PAGE_OFF, end->w1);
+     uint32_t qgen =3D xive_get_field32(END_W1_GENERATION, end->w1);
+diff --git a/include/hw/ppc/xive_regs.h b/include/hw/ppc/xive_regs.h
+index bf36678a24..1a8c5b5e64 100644
+--- a/include/hw/ppc/xive_regs.h
++++ b/include/hw/ppc/xive_regs.h
+@@ -208,6 +208,12 @@ typedef struct XiveEND {
+ #define xive_end_is_backlog(end)  (be32_to_cpu((end)->w0) & END_W0_BACKL=
+OG)
+ #define xive_end_is_escalate(end) (be32_to_cpu((end)->w0) & END_W0_ESCAL=
+ATE_CTL)
+=20
++static inline uint64_t xive_end_qaddr(XiveEND *end)
++{
++    return ((uint64_t) be32_to_cpu(end->w2) & 0x0fffffff) << 32 |
++        be32_to_cpu(end->w3);
++}
++
+ /* Notification Virtual Target (NVT) */
+ typedef struct XiveNVT {
+         uint32_t        w0;
+--=20
 2.21.0
 
 
