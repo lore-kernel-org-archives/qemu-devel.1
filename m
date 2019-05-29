@@ -2,50 +2,86 @@ Return-Path: <SRS0=DspQ=T5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	FROM_EXCESS_BASE64,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CA9FC28CC2
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 11:48:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9300DC28CC1
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 11:49:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 18B282081C
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 11:48:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 18B282081C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id 624252081C
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 11:49:18 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FXpuXDOM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 624252081C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:52301 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:52309 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hVx3n-0007EC-BW
-	for qemu-devel@archiver.kernel.org; Wed, 29 May 2019 07:47:59 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:49781)
+	id 1hVx53-0007qE-Ne
+	for qemu-devel@archiver.kernel.org; Wed, 29 May 2019 07:49:17 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:49940)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dplotnikov@virtuozzo.com>) id 1hVx2b-0006kF-40
-	for qemu-devel@nongnu.org; Wed, 29 May 2019 07:46:47 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1hVx3E-00070d-Md
+	for qemu-devel@nongnu.org; Wed, 29 May 2019 07:47:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dplotnikov@virtuozzo.com>) id 1hVx2X-0006sN-5x
-	for qemu-devel@nongnu.org; Wed, 29 May 2019 07:46:42 -0400
-Received: from relay.sw.ru ([185.231.240.75]:33758)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dplotnikov@virtuozzo.com>)
-	id 1hVx2R-0006ms-Mi; Wed, 29 May 2019 07:46:36 -0400
-Received: from [10.94.4.71] (helo=dptest2.qa.sw.ru)
-	by relay.sw.ru with esmtp (Exim 4.91)
-	(envelope-from <dplotnikov@virtuozzo.com>)
-	id 1hVx2M-0003Dw-CH; Wed, 29 May 2019 14:46:30 +0300
-From: Denis Plotnikov <dplotnikov@virtuozzo.com>
-To: eblake@redhat.com,
-	kwolf@redhat.com,
-	mreitz@redhat.com
-Date: Wed, 29 May 2019 14:46:24 +0300
-Message-Id: <20190529114624.23107-1-dplotnikov@virtuozzo.com>
-X-Mailer: git-send-email 2.17.0
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 185.231.240.75
-Subject: [Qemu-devel] [PATCH v2] qemu-io: add pattern file for write command
+	(envelope-from <marcandre.lureau@gmail.com>) id 1hVx3D-0007aj-Si
+	for qemu-devel@nongnu.org; Wed, 29 May 2019 07:47:24 -0400
+Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:35501)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1hVx3D-0007Zq-Oq
+	for qemu-devel@nongnu.org; Wed, 29 May 2019 07:47:23 -0400
+Received: by mail-ot1-x342.google.com with SMTP id n14so1704778otk.2
+	for <qemu-devel@nongnu.org>; Wed, 29 May 2019 04:47:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+	:cc:content-transfer-encoding;
+	bh=aExuaKYTnOHihruRIq+XtADu9811UKNFck5LVpS5Xg8=;
+	b=FXpuXDOMbAC5gZcAqQ87hBvWUt395wQTfM8xbvgjdWVIiFzNNSo6ifiw7wL9VegQP3
+	R0Yf6YQh7fvs5b4UIDc+20bL6m33zP1VzsHnuqIUqChiukfQMs1KY3QM3tHGmJvP7bZ4
+	lrSULf4pW08wESEl8IqVsitlHDv1myIKyxMCwoueVTnN1ycrDLFtakA2WMHReitgjCdT
+	g8AIEK7EJD9j44ynUKDfXX5EKW/rmWG20mCjBvruFjuQ17gE2GXCU4pNxDkRPa2Yu8Ql
+	6RsafUnM9azyu/MEP+DqUzsx5L6d+NKKPR8k24l5IvcmaKI5hgkFZtVKb6joe9wwKlf+
+	eXSw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+	:message-id:subject:to:cc:content-transfer-encoding;
+	bh=aExuaKYTnOHihruRIq+XtADu9811UKNFck5LVpS5Xg8=;
+	b=XErsjkfm0nlAYOliJLUVcQ4UZdz3oMCAhfXtyeLjEK8YPU0k8rECU4Zfub24eM5FyZ
+	DXlyvuFBqB/lpXoB++FgRGsd2oIt6CSGjJ6/SJOOIdKRvjUj7q9evmKhMCpXHlouomkr
+	AxQ5vZROqtVELuedwp2nC9DJCtGMMFtOvEnqBXzuHaxo/kkl9nanfvoE5xilT5Gwveqa
+	MvSJhC5ZkUDedsQcEjNHu8Igu4UJtLXZfIiLaGC1OAjfcdQJpGb+2HOFCPl0X4aa1ubo
+	lohnwhObh0H1z8yJrdnCvI0Ng9fv/BVMW6uttrZJ9hyRF8nWg+Q8+bd0WnivcKz3lkDO
+	Gkig==
+X-Gm-Message-State: APjAAAV4jzGCkjhW4UVAniIPRaoRCsDTxDKCEaPSwrtITZI74TiYrSpi
+	MYpxhc460LydQwf1/XR09CAwwX9ZITxPyuTRBxg=
+X-Google-Smtp-Source: APXvYqwwVwDHWBkzjHI+zuly9b5Kid5wcJH5IbEWuT8hehOzrcF87n7D0EONPYPeJInr9jJ1Ku0PiywchamZjUsGHXU=
+X-Received: by 2002:a9d:74c5:: with SMTP id a5mr4878725otl.322.1559130442610; 
+	Wed, 29 May 2019 04:47:22 -0700 (PDT)
+MIME-Version: 1.0
+References: <20190519084815.7410-1-ppandit@redhat.com>
+	<CAJ+F1CLXdw4gE45vVEpStKrKsu-OYy1+5caC9wUduEtQRhjrpA@mail.gmail.com>
+	<nycvar.YSQ.7.76.1905231257400.23354@xnncv>
+	<CAJ+F1CLH1qN-jVVaMacMB41PWfZ5Xd9A8ycowaNxwgvQhPEvMQ@mail.gmail.com>
+	<nycvar.YSQ.7.76.1905291448250.16122@xnncv>
+In-Reply-To: <nycvar.YSQ.7.76.1905291448250.16122@xnncv>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Wed, 29 May 2019 13:47:11 +0200
+Message-ID: <CAJ+F1C+xhBeoVqoE4aPgLqquq7rNKbZTtNSHe73FFgMyDCUzyw@mail.gmail.com>
+To: P J P <ppandit@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::342
+Subject: Re: [Qemu-devel] [PATCH v2] qga: check length of command-line &
+ environment variables
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -57,137 +93,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, den@virtuozzo.com
+Cc: =?UTF-8?Q?Ferm=C3=ADn_J=2E_Serna?= <fjserna@gmail.com>,
+	"Daniel P . Berrange" <berrange@redhat.com>,
+	QEMU Developers <qemu-devel@nongnu.org>,
+	Michael Roth <mdroth@linux.vnet.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The patch allows to provide a pattern file for write
-command. There was no similar ability before.
----
- qemu-io-cmds.c | 58 ++++++++++++++++++++++++++++++++++++++++++++++----
- 1 file changed, 54 insertions(+), 4 deletions(-)
+Hi
 
-diff --git a/qemu-io-cmds.c b/qemu-io-cmds.c
-index 09750a23ce..148f2ff92a 100644
---- a/qemu-io-cmds.c
-+++ b/qemu-io-cmds.c
-@@ -21,6 +21,7 @@
- #include "qemu/option.h"
- #include "qemu/timer.h"
- #include "qemu/cutils.h"
-+#include "string.h"
- 
- #define CMD_NOFILE_OK   0x01
- 
-@@ -343,6 +344,35 @@ static void *qemu_io_alloc(BlockBackend *blk, size_t len, int pattern)
-     return buf;
- }
- 
-+static void *qemu_io_alloc_from_file(BlockBackend *blk, size_t len,
-+                                     char *file_name)
-+{
-+    void *buf;
-+    FILE *f = fopen(file_name, "r");
-+
-+    if (!f) {
-+        printf("cannot open file '%s'\n", file_name);
-+        return NULL;
-+    }
-+
-+    if (qemuio_misalign) {
-+        len += MISALIGN_OFFSET;
-+    }
-+    buf = blk_blockalign(blk, len);
-+    memset(buf, 0, len);
-+
-+    if (!fread(buf, sizeof(char), len, f)) {
-+        printf("file '%s' is empty\n", file_name);
-+        qemu_vfree(buf);
-+        return NULL;
-+    }
-+
-+    if (qemuio_misalign) {
-+        buf += MISALIGN_OFFSET;
-+    }
-+    return buf;
-+}
-+
- static void qemu_io_free(void *p)
- {
-     if (qemuio_misalign) {
-@@ -965,7 +995,7 @@ static const cmdinfo_t write_cmd = {
-     .perm       = BLK_PERM_WRITE,
-     .argmin     = 2,
-     .argmax     = -1,
--    .args       = "[-bcCfnquz] [-P pattern] off len",
-+    .args       = "[-bcCfnquz] [-P pattern | -s source_file] off len",
-     .oneline    = "writes a number of bytes at a specified offset",
-     .help       = write_help,
- };
-@@ -974,7 +1004,7 @@ static int write_f(BlockBackend *blk, int argc, char **argv)
- {
-     struct timeval t1, t2;
-     bool Cflag = false, qflag = false, bflag = false;
--    bool Pflag = false, zflag = false, cflag = false;
-+    bool Pflag = false, zflag = false, cflag = false, sflag = false;
-     int flags = 0;
-     int c, cnt, ret;
-     char *buf = NULL;
-@@ -983,8 +1013,9 @@ static int write_f(BlockBackend *blk, int argc, char **argv)
-     /* Some compilers get confused and warn if this is not initialized.  */
-     int64_t total = 0;
-     int pattern = 0xcd;
-+    char *file_name;
- 
--    while ((c = getopt(argc, argv, "bcCfnpP:quz")) != -1) {
-+    while ((c = getopt(argc, argv, "bcCfnpP:quzs:")) != -1) {
-         switch (c) {
-         case 'b':
-             bflag = true;
-@@ -1020,6 +1051,10 @@ static int write_f(BlockBackend *blk, int argc, char **argv)
-         case 'z':
-             zflag = true;
-             break;
-+        case 's':
-+            sflag = true;
-+            file_name = g_strdup(optarg);
-+            break;
-         default:
-             qemuio_command_usage(&write_cmd);
-             return -EINVAL;
-@@ -1056,6 +1091,14 @@ static int write_f(BlockBackend *blk, int argc, char **argv)
-         return -EINVAL;
-     }
- 
-+    if (sflag && Pflag) {
-+        printf("-s and -P cannot be specified at the same time\n");
-+    }
-+
-+    if (sflag && zflag) {
-+        printf("-s and -z cannot be specified at the same time\n");
-+    }
-+
-     offset = cvtnum(argv[optind]);
-     if (offset < 0) {
-         print_cvtnum_err(offset, argv[optind]);
-@@ -1088,7 +1131,14 @@ static int write_f(BlockBackend *blk, int argc, char **argv)
-     }
- 
-     if (!zflag) {
--        buf = qemu_io_alloc(blk, count, pattern);
-+        if (sflag) {
-+            buf = qemu_io_alloc_from_file(blk, count, file_name);
-+            if (!buf) {
-+                return -EINVAL;
-+            }
-+        } else {
-+            buf = qemu_io_alloc(blk, count, pattern);
-+        }
-     }
- 
-     gettimeofday(&t1, NULL);
--- 
-2.17.0
+On Wed, May 29, 2019 at 11:38 AM P J P <ppandit@redhat.com> wrote:
+>
+>   Hello Marc,
+>
+> +-- On Thu, 23 May 2019, Marc-Andr=C3=A9 Lureau wrote --+
+> | I don't see how you could exploit this today.
+> |
+> | QMP parser has MAX_TOKEN_COUNT (2ULL << 20).
+>
+> I see, didn't realise that. I tried to reproduce it and
+>
+>    {"error": {"class": "GenericError", "desc": "JSON token count limit ex=
+ceeded"}}
+>
+> got above error around ~1048570 tokens; Much earlier than 0x200000(=3D209=
+7152)
+> as defined by MAX_TOKEN_COUNT. I guess multiple packets are being merged =
+to
+> form the incoming command and there is a glitch in there.
+>
+> | We could have "assert(count < MAX_TOKEN_COUNT)" in the loop, if it help=
+s.
+>
+> No, assert() doesn't seem good.
 
+assert() is good if it's a programming error: that is if it should
+never happen at run-time.
+It's a decent way to document the code.
+
+>
+> I think same limit will apply to commands coming via QAPIs as well?
+
+What do you mean? If the generated API is used internally by QEMU?
+(it's not, but in this case there would be no limit)
+
+--=20
+Marc-Andr=C3=A9 Lureau
 
