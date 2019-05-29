@@ -6,58 +6,60 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D5248C04AB3
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 06:30:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5685CC04AB3
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 06:33:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B162C21019
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 06:30:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B162C21019
+	by mail.kernel.org (Postfix) with ESMTPS id 1BD2221019
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 06:33:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1BD2221019
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:48022 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:48070 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hVs6P-0001UO-0I
-	for qemu-devel@archiver.kernel.org; Wed, 29 May 2019 02:30:21 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:42005)
+	id 1hVs9N-0003Nl-B4
+	for qemu-devel@archiver.kernel.org; Wed, 29 May 2019 02:33:25 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:42039)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1hVs4m-0000aK-EH
-	for qemu-devel@nongnu.org; Wed, 29 May 2019 02:28:41 -0400
+	(envelope-from <kraxel@redhat.com>) id 1hVs4o-0000ao-Az
+	for qemu-devel@nongnu.org; Wed, 29 May 2019 02:28:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1hVs4l-0004eR-EW
-	for qemu-devel@nongnu.org; Wed, 29 May 2019 02:28:40 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48360)
+	(envelope-from <kraxel@redhat.com>) id 1hVs4m-0004eu-0H
+	for qemu-devel@nongnu.org; Wed, 29 May 2019 02:28:42 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60314)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1hVs4k-0004dg-S5
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1hVs4l-0004dt-G8
 	for qemu-devel@nongnu.org; Wed, 29 May 2019 02:28:39 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+	[10.5.11.22])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id DD9963082B5A;
-	Wed, 29 May 2019 06:28:37 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 74F6F59450;
+	Wed, 29 May 2019 06:28:38 +0000 (UTC)
 Received: from sirius.home.kraxel.org (ovpn-116-59.ams2.redhat.com
 	[10.36.116.59])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id B8D4064028;
-	Wed, 29 May 2019 06:28:33 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 2A7181001DDD;
+	Wed, 29 May 2019 06:28:38 +0000 (UTC)
 Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
-	id 18A8417512; Wed, 29 May 2019 08:28:33 +0200 (CEST)
+	id 398A317534; Wed, 29 May 2019 08:28:33 +0200 (CEST)
 From: Gerd Hoffmann <kraxel@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Wed, 29 May 2019 08:28:26 +0200
-Message-Id: <20190529062832.26483-4-kraxel@redhat.com>
+Date: Wed, 29 May 2019 08:28:30 +0200
+Message-Id: <20190529062832.26483-8-kraxel@redhat.com>
 In-Reply-To: <20190529062832.26483-1-kraxel@redhat.com>
 References: <20190529062832.26483-1-kraxel@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.45]);
-	Wed, 29 May 2019 06:28:37 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.39]);
+	Wed, 29 May 2019 06:28:38 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 3/9] usb-host: avoid libusb_set_configuration
- calls
+Subject: [Qemu-devel] [PULL 7/9] usb-hub: add usb_hub_port_update()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -74,53 +76,73 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Seems some devices become confused when we call
-libusb_set_configuration().  So before calling the function check
-whenever the device has multiple configurations in the first place, and
-in case it hasn't (which is the case for the majority of devices) simply
-skip the call as it will have no effect anyway.
+Helper function to update port status bits which depends on the
+connected device.  We need the same logic for device attach and
+port reset, so factor it out.
 
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-Message-id: 20190522094702.17619-4-kraxel@redhat.com
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Message-id: 20190524070310.4952-5-kraxel@redhat.com
 ---
- hw/usb/host-libusb.c | 18 ++++++++++--------
- 1 file changed, 10 insertions(+), 8 deletions(-)
+ hw/usb/dev-hub.c | 29 +++++++++++++++++------------
+ 1 file changed, 17 insertions(+), 12 deletions(-)
 
-diff --git a/hw/usb/host-libusb.c b/hw/usb/host-libusb.c
-index 4e9a45a5d26f..4f765d7f9a2f 100644
---- a/hw/usb/host-libusb.c
-+++ b/hw/usb/host-libusb.c
-@@ -1225,19 +1225,21 @@ static void usb_host_set_address(USBHostDevice *s, int addr)
- 
- static void usb_host_set_config(USBHostDevice *s, int config, USBPacket *p)
+diff --git a/hw/usb/dev-hub.c b/hw/usb/dev-hub.c
+index 1cc92a5f9abe..29f4d6723e26 100644
+--- a/hw/usb/dev-hub.c
++++ b/hw/usb/dev-hub.c
+@@ -188,18 +188,28 @@ static bool usb_hub_port_clear(USBHubPort *port, ui=
+nt16_t status)
+     return usb_hub_port_change(port, status);
+ }
+=20
++static bool usb_hub_port_update(USBHubPort *port)
++{
++    bool notify =3D false;
++
++    if (port->port.dev && port->port.dev->attached) {
++        notify =3D usb_hub_port_set(port, PORT_STAT_CONNECTION);
++        if (port->port.dev->speed =3D=3D USB_SPEED_LOW) {
++            usb_hub_port_set(port, PORT_STAT_LOW_SPEED);
++        } else {
++            usb_hub_port_clear(port, PORT_STAT_LOW_SPEED);
++        }
++    }
++    return notify;
++}
++
+ static void usb_hub_attach(USBPort *port1)
  {
--    int rc;
-+    int rc = 0;
- 
-     trace_usb_host_set_config(s->bus_num, s->addr, config);
- 
-     usb_host_release_interfaces(s);
--    rc = libusb_set_configuration(s->dh, config);
--    if (rc != 0) {
--        usb_host_libusb_error("libusb_set_configuration", rc);
--        p->status = USB_RET_STALL;
--        if (rc == LIBUSB_ERROR_NO_DEVICE) {
--            usb_host_nodev(s);
-+    if (s->ddesc.bNumConfigurations != 1) {
-+        rc = libusb_set_configuration(s->dh, config);
-+        if (rc != 0) {
-+            usb_host_libusb_error("libusb_set_configuration", rc);
-+            p->status = USB_RET_STALL;
-+            if (rc == LIBUSB_ERROR_NO_DEVICE) {
-+                usb_host_nodev(s);
-+            }
-+            return;
-         }
--        return;
+     USBHubState *s =3D port1->opaque;
+     USBHubPort *port =3D &s->ports[port1->index];
+=20
+     trace_usb_hub_attach(s->dev.addr, port1->index + 1);
+-    usb_hub_port_set(port, PORT_STAT_CONNECTION);
+-    if (port->port.dev->speed =3D=3D USB_SPEED_LOW) {
+-        usb_hub_port_set(port, PORT_STAT_LOW_SPEED);
+-    } else {
+-        usb_hub_port_clear(port, PORT_STAT_LOW_SPEED);
+-    }
++    usb_hub_port_update(port);
+     usb_wakeup(s->intr, 0);
+ }
+=20
+@@ -287,12 +297,7 @@ static void usb_hub_handle_reset(USBDevice *dev)
+         port->wPortStatus =3D 0;
+         port->wPortChange =3D 0;
+         usb_hub_port_set(port, PORT_STAT_POWER);
+-        if (port->port.dev && port->port.dev->attached) {
+-            usb_hub_port_set(port, PORT_STAT_CONNECTION);
+-            if (port->port.dev->speed =3D=3D USB_SPEED_LOW) {
+-                usb_hub_port_set(port, PORT_STAT_LOW_SPEED);
+-            }
+-        }
++        usb_hub_port_update(port);
      }
-     p->status = usb_host_claim_interfaces(s, config);
-     if (p->status != USB_RET_SUCCESS) {
--- 
+ }
+=20
+--=20
 2.18.1
 
 
