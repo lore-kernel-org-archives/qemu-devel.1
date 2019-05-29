@@ -6,59 +6,59 @@ X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AC2A4C28CC0
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 16:44:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C796C28CC0
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 16:44:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7322623E28
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 16:44:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7322623E28
+	by mail.kernel.org (Postfix) with ESMTPS id 3995623E2A
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 16:44:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3995623E2A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:57901 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:57903 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hW1gH-0005Tj-OU
-	for qemu-devel@archiver.kernel.org; Wed, 29 May 2019 12:44:01 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:39547)
+	id 1hW1gl-0005ir-DX
+	for qemu-devel@archiver.kernel.org; Wed, 29 May 2019 12:44:31 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:39634)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1hW1Zq-0008OY-9U
-	for qemu-devel@nongnu.org; Wed, 29 May 2019 12:37:23 -0400
+	(envelope-from <mst@redhat.com>) id 1hW1a1-00006Q-RB
+	for qemu-devel@nongnu.org; Wed, 29 May 2019 12:37:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1hW1Zo-0002fM-Kd
-	for qemu-devel@nongnu.org; Wed, 29 May 2019 12:37:22 -0400
-Received: from mail-qt1-f196.google.com ([209.85.160.196]:41985)
+	(envelope-from <mst@redhat.com>) id 1hW1a0-0002pa-Hy
+	for qemu-devel@nongnu.org; Wed, 29 May 2019 12:37:33 -0400
+Received: from mail-qt1-f170.google.com ([209.85.160.170]:40577)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1hW1Zo-0002b4-Gk
-	for qemu-devel@nongnu.org; Wed, 29 May 2019 12:37:20 -0400
-Received: by mail-qt1-f196.google.com with SMTP id s15so3355680qtk.9
-	for <qemu-devel@nongnu.org>; Wed, 29 May 2019 09:37:15 -0700 (PDT)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1hW1a0-0002ol-DP
+	for qemu-devel@nongnu.org; Wed, 29 May 2019 12:37:32 -0400
+Received: by mail-qt1-f170.google.com with SMTP id a15so1278547qtn.7
+	for <qemu-devel@nongnu.org>; Wed, 29 May 2019 09:37:32 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:date:from:to:cc:subject:message-id:references
 	:mime-version:content-disposition:in-reply-to;
-	bh=CSBnVJWUl++AOk+6oKojcpAmnlxqCg6oScq3C9+WfQI=;
-	b=PHIiA0fNjb2EDa4AkjV4bKqzqOYmeHRZc2vYjR9LBJ+JZdk6HUDO28rYNjc7XtrnSI
-	0YYyZIIjxN00vMsjYq/mAVONwOTynSgQQHtZFvm6sP2L4Y/dRb0AbMxqgz8KeCkocf9H
-	GLbd3+bB4+FPMhAcbZjABMzc7YNmgpQNhWKx0HJjbIfr7PGj4T8+gN4fmkZwoSZxn6nl
-	vmoWlhZ65ohxhMyCWP4Kw5LhDLnrR3SOWCqlyfxXeKDxhapIT0lCwBUYVKs5qgMbSMbE
-	KgGeUnDGWzFb4R9viSzIU3VUUOGkxIRUhJOCThUFa+VMhB75aILasu4naf+23vdUxrlZ
-	3+Sw==
-X-Gm-Message-State: APjAAAVN5RKkNBhdnUcm5LPiDUpvQvAkat7Xstg6L6uMDdg1DhlmCLnQ
-	PjyhZOksCaJudS9Ym6Oh2muxcRb9uDI=
-X-Google-Smtp-Source: APXvYqzpaIp5wAZlYFNs1Y1wuBOgP3MFsacPtcSDN/Evl18nfm07iQyTisVlMl3meoCkVarmqOzyjQ==
-X-Received: by 2002:a0c:e6c7:: with SMTP id l7mr38160005qvn.237.1559147834182; 
-	Wed, 29 May 2019 09:37:14 -0700 (PDT)
+	bh=10gtUgNWokHnuKVb5ifGU0dmysJTncLIbTvLdgrqOEs=;
+	b=mUnlKIrelKBKZ0y1jy0Zh7roWSlbCTrCmVTyNFwVRvdhN/cxvBvQrIBjc8pcoNrbOv
+	pSNmGeY9yHmNbCbw6L0JYkDIxI93V3ezsvSi5IesfYOzqmkU4/LmCbvVubpYqG64LPMo
+	lp3Y74aYjHj0cmnHjpdLe2xzu29FeRqvA3sgvx8DFPQqKyJjrqJd/j2r3TK1owyF+c8s
+	wWn5L5iHxJ3YQYoCKFJRZOFR0pjU8IN3LPRvq2feUtDrl46d/tk0RkV2SRLgP2EygiXj
+	DJ3uh5EpQvB6Alr+frGnWi4Rrg03GAEjbAWkh3X1aWYNs13hZgAI+IsaK58fH6L9tK4b
+	Op6g==
+X-Gm-Message-State: APjAAAUt6I7YNSjw2EzAd/s5eAgbC+yeHcOlf9JF9T8worSCYAg2LrXl
+	QoMWfdK0uAA5p74gWs2RyU61jJmt+Cg=
+X-Google-Smtp-Source: APXvYqwP+tliDdhuSQfIxwc1f8g7nzSSPDJ4YQhSdbFQp/7qgz+gnwcHoGHVPZwkZll+LkCuqB1xvg==
+X-Received: by 2002:a0c:98c7:: with SMTP id g7mr4160017qvd.13.1559147846696;
+	Wed, 29 May 2019 09:37:26 -0700 (PDT)
 Received: from redhat.com (pool-100-0-197-103.bstnma.fios.verizon.net.
-	[100.0.197.103])
-	by smtp.gmail.com with ESMTPSA id m40sm210843qtm.2.2019.05.29.09.37.12
+	[100.0.197.103]) by smtp.gmail.com with ESMTPSA id
+	k54sm8392355qtk.54.2019.05.29.09.37.25
 	(version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-	Wed, 29 May 2019 09:37:13 -0700 (PDT)
-Date: Wed, 29 May 2019 12:37:11 -0400
+	Wed, 29 May 2019 09:37:25 -0700 (PDT)
+Date: Wed, 29 May 2019 12:37:24 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: qemu-devel@nongnu.org
-Message-ID: <20190521062836.6541-2-richardw.yang@linux.intel.com>
+Message-ID: <20190513061939.3464-5-david@gibson.dropbear.id.au>
 References: <20190529163604.18560-1-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
@@ -68,8 +68,8 @@ X-Mailer: git-send-email 2.17.1.1206.gb667731e2e.dirty
 X-Mutt-Fcc: =sent
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 	[fuzzy]
-X-Received-From: 209.85.160.196
-Subject: [Qemu-devel] [PULL 02/10] hw/acpi: Consolidate build_mcfg to pci.c
+X-Received-From: 209.85.160.170
+Subject: [Qemu-devel] [PULL 05/10] pci: Make is_bridge a bool
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -82,219 +82,163 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Peter Maydell <peter.maydell@linaro.org>,
-	Eduardo Habkost <ehabkost@redhat.com>,
-	Shannon Zhao <shannon.zhaosl@gmail.com>, qemu-arm@nongnu.org,
-	Wei Yang <richardw.yang@linux.intel.com>,
-	Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
-	Richard Henderson <rth@twiddle.net>
+	Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+	Greg Kurz <groug@kaod.org>, qemu-ppc@nongnu.org,
+	David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190529163711.4KNzSQvqjuX5L8zuXUXftjuiqzrKbTwvh2JZTVID14w@z>
+Message-ID: <20190529163724.znnYVfnYaXLpPNr-XyY9VHyDS-f85EkRT9E0qWENh_w@z>
 
-From: Wei Yang <richardw.yang@linux.intel.com>
+From: David Gibson <david@gibson.dropbear.id.au>
 
-Now we have two identical build_mcfg functions.
+The is_bridge field in PCIDevice acts as a bool, but is declared as an int.
+Declare it as a bool for clarity, and change everything that writes it to
+use true/false instead of 0/1 to match.
 
-Consolidate them in acpi/pci.c.
-
-Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
-
-v4:
-  * ACPI_PCI depends on both ACPI and PCI
-  * rebase on latest master, adjust arm Kconfig
-v3:
-  * adjust changelog based on Igor's suggestion
-Message-Id: <20190521062836.6541-2-richardw.yang@linux.intel.com>
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+Reviewed-by: Greg Kurz <groug@kaod.org>
+Message-Id: <20190513061939.3464-5-david@gibson.dropbear.id.au>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- default-configs/i386-softmmu.mak |  1 +
- include/hw/acpi/pci.h            |  1 +
- hw/acpi/pci.c                    | 46 ++++++++++++++++++++++++++++++++
- hw/arm/virt-acpi-build.c         | 17 ------------
- hw/i386/acpi-build.c             | 18 +------------
- hw/acpi/Kconfig                  |  4 +++
- hw/acpi/Makefile.objs            |  1 +
- hw/arm/Kconfig                   |  1 +
- 8 files changed, 55 insertions(+), 34 deletions(-)
- create mode 100644 hw/acpi/pci.c
+ include/hw/pci/pci.h               | 2 +-
+ hw/pci-bridge/dec.c                | 4 ++--
+ hw/pci-bridge/i82801b11.c          | 2 +-
+ hw/pci-bridge/pci_bridge_dev.c     | 2 +-
+ hw/pci-bridge/pcie_pci_bridge.c    | 2 +-
+ hw/pci-bridge/pcie_root_port.c     | 2 +-
+ hw/pci-bridge/simba.c              | 2 +-
+ hw/pci-bridge/xio3130_downstream.c | 2 +-
+ hw/pci-bridge/xio3130_upstream.c   | 2 +-
+ 9 files changed, 10 insertions(+), 10 deletions(-)
 
-diff --git a/default-configs/i386-softmmu.mak b/default-configs/i386-softmmu.mak
-index ba3fb3ff50..cd5ea391e8 100644
---- a/default-configs/i386-softmmu.mak
-+++ b/default-configs/i386-softmmu.mak
-@@ -25,3 +25,4 @@
- CONFIG_ISAPC=y
- CONFIG_I440FX=y
- CONFIG_Q35=y
-+CONFIG_ACPI_PCI=y
-diff --git a/include/hw/acpi/pci.h b/include/hw/acpi/pci.h
-index 124af7d32a..8bbd32cf45 100644
---- a/include/hw/acpi/pci.h
-+++ b/include/hw/acpi/pci.h
-@@ -30,4 +30,5 @@ typedef struct AcpiMcfgInfo {
-     uint32_t size;
- } AcpiMcfgInfo;
+diff --git a/include/hw/pci/pci.h b/include/hw/pci/pci.h
+index da20c915ef..d082707dfa 100644
+--- a/include/hw/pci/pci.h
++++ b/include/hw/pci/pci.h
+@@ -234,7 +234,7 @@ typedef struct PCIDeviceClass {
+      * This doesn't mean pci host switch.
+      * When card bus bridge is supported, this would be enhanced.
+      */
+-    int is_bridge;
++    bool is_bridge;
  
-+void build_mcfg(GArray *table_data, BIOSLinker *linker, AcpiMcfgInfo *info);
- #endif
-diff --git a/hw/acpi/pci.c b/hw/acpi/pci.c
-new file mode 100644
-index 0000000000..fa0fa30bb9
---- /dev/null
-+++ b/hw/acpi/pci.c
-@@ -0,0 +1,46 @@
-+/*
-+ * Support for generating PCI related ACPI tables and passing them to Guests
-+ *
-+ * Copyright (C) 2006 Fabrice Bellard
-+ * Copyright (C) 2008-2010  Kevin O'Connor <kevin@koconnor.net>
-+ * Copyright (C) 2013-2019 Red Hat Inc
-+ * Copyright (C) 2019 Intel Corporation
-+ *
-+ * Author: Wei Yang <richardw.yang@linux.intel.com>
-+ * Author: Michael S. Tsirkin <mst@redhat.com>
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License as published by
-+ * the Free Software Foundation; either version 2 of the License, or
-+ * (at your option) any later version.
-+
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+
-+ * You should have received a copy of the GNU General Public License along
-+ * with this program; if not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "hw/acpi/aml-build.h"
-+#include "hw/acpi/pci.h"
-+#include "hw/pci/pcie_host.h"
-+
-+void build_mcfg(GArray *table_data, BIOSLinker *linker, AcpiMcfgInfo *info)
-+{
-+    AcpiTableMcfg *mcfg;
-+    int len = sizeof(*mcfg) + sizeof(mcfg->allocation[0]);
-+
-+    mcfg = acpi_data_push(table_data, len);
-+    mcfg->allocation[0].address = cpu_to_le64(info->base);
-+
-+    /* Only a single allocation so no need to play with segments */
-+    mcfg->allocation[0].pci_segment = cpu_to_le16(0);
-+    mcfg->allocation[0].start_bus_number = 0;
-+    mcfg->allocation[0].end_bus_number = PCIE_MMCFG_BUS(info->size - 1);
-+
-+    build_header(linker, table_data, (void *)mcfg, "MCFG", len, 1, NULL, NULL);
-+}
-+
-diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-index e7c96d658e..4a64f9985c 100644
---- a/hw/arm/virt-acpi-build.c
-+++ b/hw/arm/virt-acpi-build.c
-@@ -546,23 +546,6 @@ build_srat(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
-                  "SRAT", table_data->len - srat_start, 3, NULL, NULL);
- }
+     /* rom bar */
+     const char *romfile;
+diff --git a/hw/pci-bridge/dec.c b/hw/pci-bridge/dec.c
+index 8484bfd434..ca40253730 100644
+--- a/hw/pci-bridge/dec.c
++++ b/hw/pci-bridge/dec.c
+@@ -68,7 +68,7 @@ static void dec_21154_pci_bridge_class_init(ObjectClass *klass, void *data)
+     k->vendor_id = PCI_VENDOR_ID_DEC;
+     k->device_id = PCI_DEVICE_ID_DEC_21154;
+     k->config_write = pci_bridge_write_config;
+-    k->is_bridge = 1;
++    k->is_bridge = true;
+     dc->desc = "DEC 21154 PCI-PCI bridge";
+     dc->reset = pci_bridge_reset;
+     dc->vmsd = &vmstate_pci_device;
+@@ -129,7 +129,7 @@ static void dec_21154_pci_host_class_init(ObjectClass *klass, void *data)
+     k->device_id = PCI_DEVICE_ID_DEC_21154;
+     k->revision = 0x02;
+     k->class_id = PCI_CLASS_BRIDGE_PCI;
+-    k->is_bridge = 1;
++    k->is_bridge = true;
+     /*
+      * PCI-facing part of the host bridge, not usable without the
+      * host-facing part, which can't be device_add'ed, yet.
+diff --git a/hw/pci-bridge/i82801b11.c b/hw/pci-bridge/i82801b11.c
+index 10e590e5c6..6d8b0f54a7 100644
+--- a/hw/pci-bridge/i82801b11.c
++++ b/hw/pci-bridge/i82801b11.c
+@@ -90,7 +90,7 @@ static void i82801b11_bridge_class_init(ObjectClass *klass, void *data)
+     PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
+     DeviceClass *dc = DEVICE_CLASS(klass);
  
--static void
--build_mcfg(GArray *table_data, BIOSLinker *linker, AcpiMcfgInfo *info)
--{
--    AcpiTableMcfg *mcfg;
--    int len = sizeof(*mcfg) + sizeof(mcfg->allocation[0]);
--
--    mcfg = acpi_data_push(table_data, len);
--    mcfg->allocation[0].address = cpu_to_le64(info->base);
--
--    /* Only a single allocation so no need to play with segments */
--    mcfg->allocation[0].pci_segment = cpu_to_le16(0);
--    mcfg->allocation[0].start_bus_number = 0;
--    mcfg->allocation[0].end_bus_number = PCIE_MMCFG_BUS(info->size - 1);
--
--    build_header(linker, table_data, (void *)mcfg, "MCFG", len, 1, NULL, NULL);
--}
--
- /* GTDT */
- static void
- build_gtdt(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
-diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-index 0d78d73894..85dc1640bc 100644
---- a/hw/i386/acpi-build.c
-+++ b/hw/i386/acpi-build.c
-@@ -2405,22 +2405,6 @@ build_srat(GArray *table_data, BIOSLinker *linker, MachineState *machine)
-                  table_data->len - srat_start, 1, NULL, NULL);
- }
+-    k->is_bridge = 1;
++    k->is_bridge = true;
+     k->vendor_id = PCI_VENDOR_ID_INTEL;
+     k->device_id = PCI_DEVICE_ID_INTEL_82801BA_11;
+     k->revision = ICH9_D2P_A2_REVISION;
+diff --git a/hw/pci-bridge/pci_bridge_dev.c b/hw/pci-bridge/pci_bridge_dev.c
+index ff6b8323da..c56ed1f52f 100644
+--- a/hw/pci-bridge/pci_bridge_dev.c
++++ b/hw/pci-bridge/pci_bridge_dev.c
+@@ -253,7 +253,7 @@ static void pci_bridge_dev_class_init(ObjectClass *klass, void *data)
+     k->vendor_id = PCI_VENDOR_ID_REDHAT;
+     k->device_id = PCI_DEVICE_ID_REDHAT_BRIDGE;
+     k->class_id = PCI_CLASS_BRIDGE_PCI;
+-    k->is_bridge = 1,
++    k->is_bridge = true;
+     dc->desc = "Standard PCI Bridge";
+     dc->reset = qdev_pci_bridge_dev_reset;
+     dc->props = pci_bridge_dev_properties;
+diff --git a/hw/pci-bridge/pcie_pci_bridge.c b/hw/pci-bridge/pcie_pci_bridge.c
+index d491b40d04..9a4fba413a 100644
+--- a/hw/pci-bridge/pcie_pci_bridge.c
++++ b/hw/pci-bridge/pcie_pci_bridge.c
+@@ -143,7 +143,7 @@ static void pcie_pci_bridge_class_init(ObjectClass *klass, void *data)
+     DeviceClass *dc = DEVICE_CLASS(klass);
+     HotplugHandlerClass *hc = HOTPLUG_HANDLER_CLASS(klass);
  
--static void
--build_mcfg_q35(GArray *table_data, BIOSLinker *linker, AcpiMcfgInfo *info)
--{
--    AcpiTableMcfg *mcfg;
--    int len = sizeof(*mcfg) + 1 * sizeof(mcfg->allocation[0]);
--
--    mcfg = acpi_data_push(table_data, len);
--    mcfg->allocation[0].address = cpu_to_le64(info->base);
--    /* Only a single allocation so no need to play with segments */
--    mcfg->allocation[0].pci_segment = cpu_to_le16(0);
--    mcfg->allocation[0].start_bus_number = 0;
--    mcfg->allocation[0].end_bus_number = PCIE_MMCFG_BUS(info->size - 1);
--
--    build_header(linker, table_data, (void *)mcfg, "MCFG", len, 1, NULL, NULL);
--}
--
- /*
-  * VT-d spec 8.1 DMA Remapping Reporting Structure
-  * (version Oct. 2014 or later)
-@@ -2690,7 +2674,7 @@ void acpi_build(AcpiBuildTables *tables, MachineState *machine)
-     }
-     if (acpi_get_mcfg(&mcfg)) {
-         acpi_add_table(table_offsets, tables_blob);
--        build_mcfg_q35(tables_blob, tables->linker, &mcfg);
-+        build_mcfg(tables_blob, tables->linker, &mcfg);
-     }
-     if (x86_iommu_get_default()) {
-         IommuType IOMMUType = x86_iommu_get_type();
-diff --git a/hw/acpi/Kconfig b/hw/acpi/Kconfig
-index eca3beed75..7c59cf900b 100644
---- a/hw/acpi/Kconfig
-+++ b/hw/acpi/Kconfig
-@@ -23,6 +23,10 @@ config ACPI_NVDIMM
-     bool
-     depends on ACPI
+-    k->is_bridge = 1;
++    k->is_bridge = true;
+     k->vendor_id = PCI_VENDOR_ID_REDHAT;
+     k->device_id = PCI_DEVICE_ID_REDHAT_PCIE_BRIDGE;
+     k->realize = pcie_pci_bridge_realize;
+diff --git a/hw/pci-bridge/pcie_root_port.c b/hw/pci-bridge/pcie_root_port.c
+index e94d918b6d..be3f4d5e03 100644
+--- a/hw/pci-bridge/pcie_root_port.c
++++ b/hw/pci-bridge/pcie_root_port.c
+@@ -162,7 +162,7 @@ static void rp_class_init(ObjectClass *klass, void *data)
+     DeviceClass *dc = DEVICE_CLASS(klass);
+     PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
  
-+config ACPI_PCI
-+    bool
-+    depends on ACPI && PCI
-+
- config ACPI_VMGENID
-     bool
-     default y
-diff --git a/hw/acpi/Makefile.objs b/hw/acpi/Makefile.objs
-index 2d46e3789a..661a9b8c2f 100644
---- a/hw/acpi/Makefile.objs
-+++ b/hw/acpi/Makefile.objs
-@@ -11,6 +11,7 @@ common-obj-$(call lnot,$(CONFIG_ACPI_X86)) += acpi-stub.o
- common-obj-y += acpi_interface.o
- common-obj-y += bios-linker-loader.o
- common-obj-y += aml-build.o
-+common-obj-$(CONFIG_ACPI_PCI) += pci.o
- common-obj-$(CONFIG_TPM) += tpm.o
+-    k->is_bridge = 1;
++    k->is_bridge = true;
+     k->config_write = rp_write_config;
+     k->realize = rp_realize;
+     k->exit = rp_exit;
+diff --git a/hw/pci-bridge/simba.c b/hw/pci-bridge/simba.c
+index dea4c8c5e7..7cf0d6e047 100644
+--- a/hw/pci-bridge/simba.c
++++ b/hw/pci-bridge/simba.c
+@@ -76,7 +76,7 @@ static void simba_pci_bridge_class_init(ObjectClass *klass, void *data)
+     k->device_id = PCI_DEVICE_ID_SUN_SIMBA;
+     k->revision = 0x11;
+     k->config_write = pci_bridge_write_config;
+-    k->is_bridge = 1;
++    k->is_bridge = true;
+     set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
+     dc->reset = pci_bridge_reset;
+     dc->vmsd = &vmstate_pci_device;
+diff --git a/hw/pci-bridge/xio3130_downstream.c b/hw/pci-bridge/xio3130_downstream.c
+index 467bbabe4c..ab2a51e15d 100644
+--- a/hw/pci-bridge/xio3130_downstream.c
++++ b/hw/pci-bridge/xio3130_downstream.c
+@@ -152,7 +152,7 @@ static void xio3130_downstream_class_init(ObjectClass *klass, void *data)
+     DeviceClass *dc = DEVICE_CLASS(klass);
+     PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
  
- common-obj-$(CONFIG_IPMI) += ipmi.o
-diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
-index af8cffde9c..9aced9d54d 100644
---- a/hw/arm/Kconfig
-+++ b/hw/arm/Kconfig
-@@ -19,6 +19,7 @@ config ARM_VIRT
-     select PLATFORM_BUS
-     select SMBIOS
-     select VIRTIO_MMIO
-+    select ACPI_PCI
+-    k->is_bridge = 1;
++    k->is_bridge = true;
+     k->config_write = xio3130_downstream_write_config;
+     k->realize = xio3130_downstream_realize;
+     k->exit = xio3130_downstream_exitfn;
+diff --git a/hw/pci-bridge/xio3130_upstream.c b/hw/pci-bridge/xio3130_upstream.c
+index b524908cf1..1d41a49ab0 100644
+--- a/hw/pci-bridge/xio3130_upstream.c
++++ b/hw/pci-bridge/xio3130_upstream.c
+@@ -126,7 +126,7 @@ static void xio3130_upstream_class_init(ObjectClass *klass, void *data)
+     DeviceClass *dc = DEVICE_CLASS(klass);
+     PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
  
- config CHEETAH
-     bool
+-    k->is_bridge = 1;
++    k->is_bridge = true;
+     k->config_write = xio3130_upstream_write_config;
+     k->realize = xio3130_upstream_realize;
+     k->exit = xio3130_upstream_exitfn;
 -- 
 MST
 
