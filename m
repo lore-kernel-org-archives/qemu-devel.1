@@ -4,61 +4,61 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 287B3C04AB6
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 00:36:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D593C04AB6
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 00:36:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E333C20B1F
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 00:35:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E333C20B1F
+	by mail.kernel.org (Postfix) with ESMTPS id 4491F20B1F
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 00:36:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4491F20B1F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:44778 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:44784 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hVmZT-0007k1-7B
-	for qemu-devel@archiver.kernel.org; Tue, 28 May 2019 20:35:59 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:40284)
+	id 1hVmaG-00007T-II
+	for qemu-devel@archiver.kernel.org; Tue, 28 May 2019 20:36:48 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:40458)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richardw.yang@linux.intel.com>) id 1hVmYS-0007Df-9f
-	for qemu-devel@nongnu.org; Tue, 28 May 2019 20:34:57 -0400
+	(envelope-from <richardw.yang@linux.intel.com>) id 1hVmZ8-0007j2-OO
+	for qemu-devel@nongnu.org; Tue, 28 May 2019 20:35:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richardw.yang@linux.intel.com>) id 1hVmYR-0000LX-8q
-	for qemu-devel@nongnu.org; Tue, 28 May 2019 20:34:56 -0400
-Received: from mga14.intel.com ([192.55.52.115]:42176)
+	(envelope-from <richardw.yang@linux.intel.com>) id 1hVmZ7-0000t8-0u
+	for qemu-devel@nongnu.org; Tue, 28 May 2019 20:35:38 -0400
+Received: from mga05.intel.com ([192.55.52.43]:40561)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <richardw.yang@linux.intel.com>)
-	id 1hVmYR-0000KJ-0O
-	for qemu-devel@nongnu.org; Tue, 28 May 2019 20:34:55 -0400
+	id 1hVmZ4-0000jW-VL
+	for qemu-devel@nongnu.org; Tue, 28 May 2019 20:35:35 -0400
 X-Amp-Result: UNKNOWN
 X-Amp-Original-Verdict: FILE UNKNOWN
 X-Amp-File-Uploaded: False
 Received: from orsmga006.jf.intel.com ([10.7.209.51])
-	by fmsmga103.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
-	28 May 2019 17:34:53 -0700
+	by fmsmga105.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+	28 May 2019 17:35:21 -0700
 X-ExtLoop1: 1
 Received: from richard.sh.intel.com (HELO localhost) ([10.239.159.54])
-	by orsmga006.jf.intel.com with ESMTP; 28 May 2019 17:34:51 -0700
-Date: Wed, 29 May 2019 08:34:22 +0800
+	by orsmga006.jf.intel.com with ESMTP; 28 May 2019 17:35:20 -0700
+Date: Wed, 29 May 2019 08:34:51 +0800
 From: Wei Yang <richardw.yang@linux.intel.com>
 To: Juan Quintela <quintela@redhat.com>
-Message-ID: <20190529003422.GB24428@richard>
+Message-ID: <20190529003450.GC24428@richard>
 References: <20190528014703.21030-1-richardw.yang@linux.intel.com>
-	<20190528014703.21030-2-richardw.yang@linux.intel.com>
-	<87muj780dc.fsf@trasno.org>
+	<20190528014703.21030-3-richardw.yang@linux.intel.com>
+	<87imtv80aw.fsf@trasno.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <87muj780dc.fsf@trasno.org>
+In-Reply-To: <87imtv80aw.fsf@trasno.org>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 192.55.52.115
-Subject: Re: [Qemu-devel] [PATCH 1/4] migration: multifd_save_setup always
- return 0
+X-Received-From: 192.55.52.43
+Subject: Re: [Qemu-devel] [PATCH 2/4] migration/ram.c: use same type in
+ MultiFDPages_t to define offsest
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -77,38 +77,40 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, May 28, 2019 at 10:11:11AM +0200, Juan Quintela wrote:
+On Tue, May 28, 2019 at 10:12:39AM +0200, Juan Quintela wrote:
 >Wei Yang <richardw.yang@linux.intel.com> wrote:
+>> MultiFDPacket_t.offset is allocated to store MultiFDPages_t.offset.
+>>
+>> It would be better to use the same type.
+>>
 >> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
 >> ---
->>  migration/migration.c | 7 +------
->>  1 file changed, 1 insertion(+), 6 deletions(-)
+>>  migration/ram.c | 2 +-
+>>  1 file changed, 1 insertion(+), 1 deletion(-)
 >>
->> diff --git a/migration/migration.c b/migration/migration.c
->> index d0a0f68f11..3aae4f2734 100644
->> --- a/migration/migration.c
->> +++ b/migration/migration.c
->> @@ -3336,12 +3336,7 @@ void migrate_fd_connect(MigrationState *s, Error *error_in)
->>          return;
->>      }
+>> diff --git a/migration/ram.c b/migration/ram.c
+>> index 4c60869226..dcf4c54eb5 100644
+>> --- a/migration/ram.c
+>> +++ b/migration/ram.c
+>> @@ -607,7 +607,7 @@ typedef struct {
+>>      uint64_t packet_num;
+>>      uint64_t unused[4];    /* Reserved for future use */
+>>      char ramblock[256];
+>> -    uint64_t offset[];
+>> +    ram_addr_t offset[];
+>>  } __attribute__((packed)) MultiFDPacket_t;
 >>  
->> -    if (multifd_save_setup() != 0) {
->> -        migrate_set_state(&s->state, MIGRATION_STATUS_SETUP,
->> -                          MIGRATION_STATUS_FAILED);
->> -        migrate_fd_cleanup(s);
->> -        return;
->> -    }
->> +    multifd_save_setup();
->>      qemu_thread_create(&s->thread, "live_migration", migration_thread, s,
->>                         QEMU_THREAD_JOINABLE);
->>      s->migration_thread_running = true;
+>>  typedef struct {
 >
->Nack.
+>This needs a comment, but it is on purpose.  We want that the value on
+>the wire to be the same for any architecture.  (Migration stream is
+>supposed to be architecture independent).  ram_addr_t is architecture
+>dependent.
 >
->On the compression patches that are on list, multifd_save_setup()
->returns -1 if there is a problem when we allocate a zbuff.
 
-You mean there are some patches in mail list?
+Sounds reasonable.
+
+>Later, Juan.
 
 -- 
 Wei Yang
