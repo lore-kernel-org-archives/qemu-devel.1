@@ -2,50 +2,60 @@ Return-Path: <SRS0=DspQ=T5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1386BC04AB3
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 08:54:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A7ADC04AB3
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 08:55:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DC23120B7C
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 08:54:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DC23120B7C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id D678F21019
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 08:55:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D678F21019
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:50088 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:50094 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hVuMC-0004WR-1A
-	for qemu-devel@archiver.kernel.org; Wed, 29 May 2019 04:54:48 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:45354)
+	id 1hVuMi-00050x-61
+	for qemu-devel@archiver.kernel.org; Wed, 29 May 2019 04:55:21 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:45400)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dplotnikov@virtuozzo.com>) id 1hVuKU-0003SJ-AU
-	for qemu-devel@nongnu.org; Wed, 29 May 2019 04:53:03 -0400
+	(envelope-from <richardw.yang@linux.intel.com>) id 1hVuKs-0003ll-MX
+	for qemu-devel@nongnu.org; Wed, 29 May 2019 04:53:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dplotnikov@virtuozzo.com>) id 1hVuKT-0002aL-4w
-	for qemu-devel@nongnu.org; Wed, 29 May 2019 04:53:02 -0400
-Received: from relay.sw.ru ([185.231.240.75]:55156)
+	(envelope-from <richardw.yang@linux.intel.com>) id 1hVuKq-0002hD-Kx
+	for qemu-devel@nongnu.org; Wed, 29 May 2019 04:53:26 -0400
+Received: from mga12.intel.com ([192.55.52.136]:26053)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dplotnikov@virtuozzo.com>)
-	id 1hVuKQ-0002YV-9B; Wed, 29 May 2019 04:52:58 -0400
-Received: from [10.94.4.71] (helo=dptest2.qa.sw.ru)
-	by relay.sw.ru with esmtp (Exim 4.91)
-	(envelope-from <dplotnikov@virtuozzo.com>)
-	id 1hVuKM-00027p-4G; Wed, 29 May 2019 11:52:54 +0300
-From: Denis Plotnikov <dplotnikov@virtuozzo.com>
-To: kwolf@redhat.com,
-	mreitz@redhat.com,
-	qemu-block@nongnu.org
-Date: Wed, 29 May 2019 11:52:48 +0300
-Message-Id: <20190529085248.7857-1-dplotnikov@virtuozzo.com>
-X-Mailer: git-send-email 2.17.0
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 185.231.240.75
-Subject: [Qemu-devel] [PATCH v1] qemu-io: add pattern file for write command
+	(Exim 4.71) (envelope-from <richardw.yang@linux.intel.com>)
+	id 1hVuKZ-0002bt-0d; Wed, 29 May 2019 04:53:10 -0400
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+	by fmsmga106.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+	29 May 2019 01:53:04 -0700
+X-ExtLoop1: 1
+Received: from richard.sh.intel.com (HELO localhost) ([10.239.159.54])
+	by fmsmga006.fm.intel.com with ESMTP; 29 May 2019 01:53:03 -0700
+Date: Wed, 29 May 2019 16:52:34 +0800
+From: Wei Yang <richardw.yang@linux.intel.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20190529085234.GA13368@richard>
+References: <20190326024320.27895-1-richardw.yang@linux.intel.com>
+	<20190528230111-mutt-send-email-mst@kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190528230111-mutt-send-email-mst@kernel.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 192.55.52.136
+Subject: Re: [Qemu-devel] [PATCH v6] hw/acpi: extract acpi_add_rom_blob()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -57,139 +67,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: vsementsov@virtuozzo.com, qemu-devel@nongnu.org, den@virtuozzo.com
+Reply-To: Wei Yang <richardw.yang@linux.intel.com>
+Cc: yang.zhong@intel.com, peter.maydell@linaro.org, qemu-devel@nongnu.org,
+	shannon.zhaosl@gmail.com, qemu-arm@nongnu.org,
+	Wei Yang <richardw.yang@linux.intel.com>, imammedo@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The patch allows to provide a pattern file for write
-command. There was no similar ability before.
+On Tue, May 28, 2019 at 11:01:32PM -0400, Michael S. Tsirkin wrote:
+>On Tue, Mar 26, 2019 at 10:43:20AM +0800, Wei Yang wrote:
+>> arm and i386 has almost the same function acpi_add_rom_blob(), except
+>> giving different FWCfgCallback function.
+>> 
+>> This patch moves acpi_add_rom_blob() to utils.c by passing
+>> FWCfgCallback to it.
+>> 
+>> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
+>> Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+>
+>Conflicts with your other patches. Pls rebase on top.
+>
 
-Signed-off-by: Denis Plotnikov <dplotnikov@virtuozzo.com>
----
- qemu-io-cmds.c | 58 ++++++++++++++++++++++++++++++++++++++++++++++----
- 1 file changed, 54 insertions(+), 4 deletions(-)
+Ah, would you mind letting me know which tree I need to rebase on?
 
-diff --git a/qemu-io-cmds.c b/qemu-io-cmds.c
-index 09750a23ce..6786536be7 100644
---- a/qemu-io-cmds.c
-+++ b/qemu-io-cmds.c
-@@ -21,6 +21,7 @@
- #include "qemu/option.h"
- #include "qemu/timer.h"
- #include "qemu/cutils.h"
-+#include "string.h"
- 
- #define CMD_NOFILE_OK   0x01
- 
-@@ -343,6 +344,35 @@ static void *qemu_io_alloc(BlockBackend *blk, size_t len, int pattern)
-     return buf;
- }
- 
-+static void *qemu_io_alloc_from_file(BlockBackend *blk, size_t len,
-+                                     char *file_name)
-+{
-+    void *buf;
-+    FILE *f = fopen(file_name, "r");
-+
-+    if (!f) {
-+        printf("cannot open file '%s'\n", file_name);
-+        return NULL;
-+    }
-+
-+    if (qemuio_misalign) {
-+        len += MISALIGN_OFFSET;
-+    }
-+    buf = blk_blockalign(blk, len);
-+    memset(buf, 0, len);
-+
-+    if (!fread(buf, sizeof(char), len, f)) {
-+        printf("file '%s' is empty\n", file_name);
-+        g_free(buf);
-+        return NULL;
-+    }
-+
-+    if (qemuio_misalign) {
-+        buf += MISALIGN_OFFSET;
-+    }
-+    return buf;
-+}
-+
- static void qemu_io_free(void *p)
- {
-     if (qemuio_misalign) {
-@@ -965,7 +995,7 @@ static const cmdinfo_t write_cmd = {
-     .perm       = BLK_PERM_WRITE,
-     .argmin     = 2,
-     .argmax     = -1,
--    .args       = "[-bcCfnquz] [-P pattern] off len",
-+    .args       = "[-bcCfnquz] [-P pattern | -s source_file] off len",
-     .oneline    = "writes a number of bytes at a specified offset",
-     .help       = write_help,
- };
-@@ -974,7 +1004,7 @@ static int write_f(BlockBackend *blk, int argc, char **argv)
- {
-     struct timeval t1, t2;
-     bool Cflag = false, qflag = false, bflag = false;
--    bool Pflag = false, zflag = false, cflag = false;
-+    bool Pflag = false, zflag = false, cflag = false, sflag = false;
-     int flags = 0;
-     int c, cnt, ret;
-     char *buf = NULL;
-@@ -983,8 +1013,9 @@ static int write_f(BlockBackend *blk, int argc, char **argv)
-     /* Some compilers get confused and warn if this is not initialized.  */
-     int64_t total = 0;
-     int pattern = 0xcd;
-+    char *file_name;
- 
--    while ((c = getopt(argc, argv, "bcCfnpP:quz")) != -1) {
-+    while ((c = getopt(argc, argv, "bcCfnpP:quzs:")) != -1) {
-         switch (c) {
-         case 'b':
-             bflag = true;
-@@ -1020,6 +1051,10 @@ static int write_f(BlockBackend *blk, int argc, char **argv)
-         case 'z':
-             zflag = true;
-             break;
-+        case 's':
-+            sflag = true;
-+            file_name = g_strdup(optarg);
-+            break;
-         default:
-             qemuio_command_usage(&write_cmd);
-             return -EINVAL;
-@@ -1056,6 +1091,14 @@ static int write_f(BlockBackend *blk, int argc, char **argv)
-         return -EINVAL;
-     }
- 
-+    if (sflag && Pflag) {
-+        printf("-s and -P cannot be specified at the same time\n");
-+    }
-+
-+    if (sflag && zflag) {
-+        printf("-s and -z cannot be specified at the same time\n");
-+    }
-+
-     offset = cvtnum(argv[optind]);
-     if (offset < 0) {
-         print_cvtnum_err(offset, argv[optind]);
-@@ -1088,7 +1131,14 @@ static int write_f(BlockBackend *blk, int argc, char **argv)
-     }
- 
-     if (!zflag) {
--        buf = qemu_io_alloc(blk, count, pattern);
-+        if (sflag) {
-+            buf = qemu_io_alloc_from_file(blk, count, file_name);
-+            if (!buf) {
-+                return -EINVAL;
-+            }
-+        } else {
-+            buf = qemu_io_alloc(blk, count, pattern);
-+        }
-     }
- 
-     gettimeofday(&t1, NULL);
+
 -- 
-2.17.0
-
+Wei Yang
+Help you, Help me
 
