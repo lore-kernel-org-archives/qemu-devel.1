@@ -2,72 +2,63 @@ Return-Path: <SRS0=DspQ=T5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_MUTT autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D803C04AB6
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 03:02:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EAFB2C04AB6
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 03:10:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 199612075B
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 03:02:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 199612075B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id AD2F0216FD
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 03:10:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AD2F0216FD
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:46142 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:46211 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hVorU-0000EE-Eo
-	for qemu-devel@archiver.kernel.org; Tue, 28 May 2019 23:02:44 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:60550)
+	id 1hVoyt-0002Wv-Id
+	for qemu-devel@archiver.kernel.org; Tue, 28 May 2019 23:10:23 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:33312)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1hVoqY-0008In-UA
-	for qemu-devel@nongnu.org; Tue, 28 May 2019 23:01:48 -0400
+	(envelope-from <zhenyuw@linux.intel.com>) id 1hVoxt-00026L-Gx
+	for qemu-devel@nongnu.org; Tue, 28 May 2019 23:09:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1hVoqX-0006Hs-12
-	for qemu-devel@nongnu.org; Tue, 28 May 2019 23:01:46 -0400
-Received: from mail-qt1-f196.google.com ([209.85.160.196]:43369)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1hVoqV-0005tY-7x
-	for qemu-devel@nongnu.org; Tue, 28 May 2019 23:01:44 -0400
-Received: by mail-qt1-f196.google.com with SMTP id z24so786051qtj.10
-	for <qemu-devel@nongnu.org>; Tue, 28 May 2019 20:01:36 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-	:mime-version:content-disposition:in-reply-to;
-	bh=rZy9c5E3YHRqXyJGCQb3EJDo/mMMwv33o7p41CKnsJ4=;
-	b=q2LqfbjSfCBfyry6JvuQqXqVDiULAKYIy5Dy5TCarxS8P6azmHgim+2mDp3d9ucL/8
-	uEJfvGgbovLM0dFU8D8dRMqf1zD7isiuOErpwUIGOyQHbPYEsIszj63dFzaHeLGmdpdE
-	8W+9RSfAfpmvUFbHEFJSI5VyrjVlaahqEyR84qyT1R94sONauLrfgL/yZK00f7ZT7DKZ
-	kBM2kvv55JUP/S3Q8FHDHbJLXgz8BCkFFkRQXVYvcqOtZj/jzDI1taBLLAfzMVI6aats
-	pTkdST7Ip5OsW/Md4w7ExYgi+ZiDC3+6tuVrMhtAuJaVWxUIijwWk6Y7ya/BxbxU8TL8
-	VWYQ==
-X-Gm-Message-State: APjAAAVidFlalPms7QDEFMBoCCabEf+gnjvFXyUlVy9/JJrXN6f74jmq
-	NDKU+vDlnllqjFPtdO84c0azAA==
-X-Google-Smtp-Source: APXvYqzf46F70HkWwWsY8DmPtIzFCnMda1j+6ioefuIgpeO+Ia9sHfKPcE7f+vmIywDGrpr8eTlNig==
-X-Received: by 2002:ad4:53c2:: with SMTP id k2mr15220988qvv.15.1559098895542; 
-	Tue, 28 May 2019 20:01:35 -0700 (PDT)
-Received: from redhat.com (pool-100-0-197-103.bstnma.fios.verizon.net.
-	[100.0.197.103]) by smtp.gmail.com with ESMTPSA id
-	e133sm7176106qkb.76.2019.05.28.20.01.33
-	(version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-	Tue, 28 May 2019 20:01:34 -0700 (PDT)
-Date: Tue, 28 May 2019 23:01:32 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Wei Yang <richardw.yang@linux.intel.com>
-Message-ID: <20190528230111-mutt-send-email-mst@kernel.org>
-References: <20190326024320.27895-1-richardw.yang@linux.intel.com>
+	(envelope-from <zhenyuw@linux.intel.com>) id 1hVoxr-0002RA-8I
+	for qemu-devel@nongnu.org; Tue, 28 May 2019 23:09:21 -0400
+Received: from mga03.intel.com ([134.134.136.65]:9419)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <zhenyuw@linux.intel.com>)
+	id 1hVoxq-0002L8-Rw
+	for qemu-devel@nongnu.org; Tue, 28 May 2019 23:09:19 -0400
+X-Amp-Result: UNSCANNABLE
+X-Amp-File-Uploaded: False
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+	by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+	28 May 2019 20:09:14 -0700
+X-ExtLoop1: 1
+Received: from zhen-hp.sh.intel.com (HELO zhen-hp) ([10.239.13.116])
+	by orsmga008.jf.intel.com with ESMTP; 28 May 2019 20:09:08 -0700
+Date: Wed, 29 May 2019 11:07:50 +0800
+From: Zhenyu Wang <zhenyuw@linux.intel.com>
+To: Yan Zhao <yan.y.zhao@intel.com>
+Message-ID: <20190529030750.GN29553@zhen-hp.sh.intel.com>
+References: <20190527034155.31473-1-yan.y.zhao@intel.com>
+	<20190527034437.31594-1-yan.y.zhao@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="qDymnuGqqhW10CwH"
 Content-Disposition: inline
-In-Reply-To: <20190326024320.27895-1-richardw.yang@linux.intel.com>
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-	[fuzzy]
-X-Received-From: 209.85.160.196
-Subject: Re: [Qemu-devel] [PATCH v6] hw/acpi: extract acpi_add_rom_blob()
+In-Reply-To: <20190527034437.31594-1-yan.y.zhao@intel.com>
+User-Agent: Mutt/1.10.0 (2018-05-17)
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 134.134.136.65
+Subject: Re: [Qemu-devel] [PATCH v3 2/2] drm/i915/gvt: export
+ migration_version to mdev sysfs for Intel vGPU
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -79,247 +70,455 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: yang.zhong@intel.com, peter.maydell@linaro.org, qemu-devel@nongnu.org,
-	shannon.zhaosl@gmail.com, qemu-arm@nongnu.org, imammedo@redhat.com
+Reply-To: Zhenyu Wang <zhenyuw@linux.intel.com>
+Cc: cjia@nvidia.com, kvm@vger.kernel.org, aik@ozlabs.ru,
+	Zhengxiao.zx@alibaba-inc.com, shuangtai.tst@alibaba-inc.com,
+	qemu-devel@nongnu.org, kwankhede@nvidia.com, eauger@redhat.com,
+	yi.l.liu@intel.com, eskultet@redhat.com, ziye.yang@intel.com,
+	mlevitsk@redhat.com, pasic@linux.ibm.com, libvir-list@redhat.com,
+	felipe@nutanix.com, Ken.Xue@amd.com, kevin.tian@intel.com,
+	dgilbert@redhat.com, zhenyuw@linux.intel.com,
+	dinechin@redhat.com, alex.williamson@redhat.com,
+	intel-gvt-dev@lists.freedesktop.org, changpeng.liu@intel.com,
+	berrange@redhat.com, cohuck@redhat.com,
+	linux-kernel@vger.kernel.org, zhi.a.wang@intel.com,
+	jonathan.davies@nutanix.com, shaopeng.he@intel.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Mar 26, 2019 at 10:43:20AM +0800, Wei Yang wrote:
-> arm and i386 has almost the same function acpi_add_rom_blob(), except
-> giving different FWCfgCallback function.
-> 
-> This patch moves acpi_add_rom_blob() to utils.c by passing
-> FWCfgCallback to it.
-> 
-> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
-> Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 
-Conflicts with your other patches. Pls rebase on top.
+--qDymnuGqqhW10CwH
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
+On 2019.05.26 23:44:37 -0400, Yan Zhao wrote:
+> This feature implements the migration_version attribute for Intel's vGPU
+> mdev devices.
+>=20
+> migration_version attribute is rw.
+> It's used to check migration compatibility for two mdev devices of the
+> same mdev type.
+> migration_version string is defined by vendor driver and opaque to
+> userspace.
+>=20
+> For Intel vGPU of gen8 and gen9, the format of migration_version string
+> is:
+>   <vendor id>-<device id>-<vgpu type>-<software version>.
+>=20
+> For future platforms, the format of migration_version string is to be
+> expanded to include more meta data to identify Intel vGPUs for live
+> migration compatibility check
+>=20
+> For old platforms, and for GVT not supporting vGPU live migration
+> feature, -ENODEV is returned on read(2)/write(2) of migration_version
+> attribute.
+> For vGPUs running old GVT who do not expose migration_version
+> attribute, live migration is regarded as not supported for those vGPUs.
+>=20
+> Cc: Alex Williamson <alex.williamson@redhat.com>
+> Cc: Erik Skultety <eskultet@redhat.com>
+> Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> Cc: Cornelia Huck <cohuck@redhat.com>
+> Cc: "Tian, Kevin" <kevin.tian@intel.com>
+> Cc: Zhenyu Wang <zhenyuw@linux.intel.com>
+> Cc: "Wang, Zhi A" <zhi.a.wang@intel.com>
+> c: Neo Jia <cjia@nvidia.com>
+> Cc: Kirti Wankhede <kwankhede@nvidia.com>
+>=20
+> Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
+>=20
 > ---
-> v6:
->   * change author from Igor to Michael
-> v5:
->   * remove unnecessary header glib/gprintf.h
->   * rearrange include header to make it more suitable
-> v4:
->   * extract -> moves
->   * adjust comment in source to make checkpatch happy
 > v3:
->   * put acpi_add_rom_blob() to hw/acpi/utils.c
+> 1. renamed version to migration_version
+> (Christophe de Dinechin, Cornelia Huck, Alex Williamson)
+> 2. instead of generating migration version strings each time, storing
+> them in vgpu types generated during initialization.
+> (Zhenyu Wang, Cornelia Huck)
+> 3. replaced multiple snprintf to one big snprintf in
+> intel_gvt_get_vfio_migration_version()
+> (Dr. David Alan Gilbert)
+> 4. printed detailed error log
+> (Alex Williamson, Erik Skultety, Cornelia Huck, Dr. David Alan Gilbert)
+> 5. incorporated <software version> into migration_version string
+> (Alex Williamson)
+> 6. do not use ifndef macro to switch off migration_version attribute
+> (Zhenyu Wang)
+>=20
 > v2:
->   * remove unused header in original source file
-> 
-> author
+> 1. removed 32 common part of version string
+> (Alex Williamson)
+> 2. do not register version attribute for GVT not supporting live
+> migration.(Cornelia Huck)
+> 3. for platforms out of gen8, gen9, return -EINVAL --> -ENODEV for
+> incompatible. (Cornelia Huck)
 > ---
->  hw/acpi/Makefile.objs    |  2 +-
->  hw/acpi/utils.c          | 36 ++++++++++++++++++++++++++++++++++++
->  hw/arm/virt-acpi-build.c | 26 ++++++++++----------------
->  hw/i386/acpi-build.c     | 26 ++++++++++----------------
->  include/hw/acpi/utils.h  |  9 +++++++++
->  5 files changed, 66 insertions(+), 33 deletions(-)
->  create mode 100644 hw/acpi/utils.c
->  create mode 100644 include/hw/acpi/utils.h
-> 
-> diff --git a/hw/acpi/Makefile.objs b/hw/acpi/Makefile.objs
-> index 2d46e3789a..ba93c5b64a 100644
-> --- a/hw/acpi/Makefile.objs
-> +++ b/hw/acpi/Makefile.objs
-> @@ -10,7 +10,7 @@ common-obj-$(call lnot,$(CONFIG_ACPI_X86)) += acpi-stub.o
->  
->  common-obj-y += acpi_interface.o
->  common-obj-y += bios-linker-loader.o
-> -common-obj-y += aml-build.o
-> +common-obj-y += aml-build.o utils.o
->  common-obj-$(CONFIG_TPM) += tpm.o
->  
->  common-obj-$(CONFIG_IPMI) += ipmi.o
-> diff --git a/hw/acpi/utils.c b/hw/acpi/utils.c
-> new file mode 100644
-> index 0000000000..77b9e8148f
-> --- /dev/null
-> +++ b/hw/acpi/utils.c
-> @@ -0,0 +1,36 @@
-> +/*
-> + * Utilities for generating ACPI tables and passing them to Guests
-> + *
-> + * Copyright (C) 2019 Intel Corporation
-> + * Copyright (C) 2019 Red Hat Inc
-> + *
-> + * Author: Wei Yang <richardw.yang@linux.intel.com>
-> + * Author: Michael S. Tsirkin <mst@redhat.com>
-> + *
-> + * This program is free software; you can redistribute it and/or modify
-> + * it under the terms of the GNU General Public License as published by
-> + * the Free Software Foundation; either version 2 of the License, or
-> + * (at your option) any later version.
-> +
-> + * This program is distributed in the hope that it will be useful,
-> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-> + * GNU General Public License for more details.
-> +
-> + * You should have received a copy of the GNU General Public License along
-> + * with this program; if not, see <http://www.gnu.org/licenses/>.
-> + */
-> +
-> +#include "qemu/osdep.h"
-> +#include "hw/acpi/aml-build.h"
-> +#include "hw/acpi/utils.h"
-> +#include "hw/loader.h"
-> +
-> +MemoryRegion *acpi_add_rom_blob(FWCfgCallback update, void *opaque,
-> +                                GArray *blob, const char *name,
-> +                                uint64_t max_size)
+>  drivers/gpu/drm/i915/gvt/Makefile            |   2 +-
+>  drivers/gpu/drm/i915/gvt/gvt.c               |  39 +++++
+>  drivers/gpu/drm/i915/gvt/gvt.h               |   5 +
+>  drivers/gpu/drm/i915/gvt/migration_version.c | 167 +++++++++++++++++++
+>  drivers/gpu/drm/i915/gvt/vgpu.c              |  13 +-
+>  5 files changed, 223 insertions(+), 3 deletions(-)
+>  create mode 100644 drivers/gpu/drm/i915/gvt/migration_version.c
+>=20
+> diff --git a/drivers/gpu/drm/i915/gvt/Makefile b/drivers/gpu/drm/i915/gvt=
+/Makefile
+> index 271fb46d4dd0..a9d561c93ab8 100644
+> --- a/drivers/gpu/drm/i915/gvt/Makefile
+> +++ b/drivers/gpu/drm/i915/gvt/Makefile
+> @@ -3,7 +3,7 @@ GVT_DIR :=3D gvt
+>  GVT_SOURCE :=3D gvt.o aperture_gm.o handlers.o vgpu.o trace_points.o fir=
+mware.o \
+>  	interrupt.o gtt.o cfg_space.o opregion.o mmio.o display.o edid.o \
+>  	execlist.o scheduler.o sched_policy.o mmio_context.o cmd_parser.o debug=
+fs.o \
+> -	fb_decoder.o dmabuf.o page_track.o
+> +	fb_decoder.o dmabuf.o page_track.o migration_version.o
+> =20
+>  ccflags-y				+=3D -I$(src) -I$(src)/$(GVT_DIR)
+>  i915-y					+=3D $(addprefix $(GVT_DIR)/, $(GVT_SOURCE))
+> diff --git a/drivers/gpu/drm/i915/gvt/gvt.c b/drivers/gpu/drm/i915/gvt/gv=
+t.c
+> index 43f4242062dd..be2980e8ac75 100644
+> --- a/drivers/gpu/drm/i915/gvt/gvt.c
+> +++ b/drivers/gpu/drm/i915/gvt/gvt.c
+> @@ -105,14 +105,53 @@ static ssize_t description_show(struct kobject *kob=
+j, struct device *dev,
+>  		       type->weight);
+>  }
+> =20
+> +static ssize_t migration_version_show(struct kobject *kobj, struct devic=
+e *dev,
+> +		char *buf)
 > +{
-> +    return rom_add_blob(name, blob->data, acpi_data_len(blob), max_size, -1,
-> +                        name, update, opaque, NULL, true);
+> +	struct intel_vgpu_type *type;
+> +	void *gvt =3D kdev_to_i915(dev)->gvt;
+> +
+> +	type =3D intel_gvt_find_vgpu_type(gvt, kobject_name(kobj));
+> +	if (!type || !type->migration_version) {
+> +		gvt_err("Does not support migraion on type %s. Please search previous =
+detailed log\n",
+> +				kobject_name(kobj));
+> +		return -ENODEV;
+> +	}
+> +
+> +	return snprintf(buf, strlen(type->migration_version) + 2,
+> +			"%s\n", type->migration_version);
 > +}
 > +
-> diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-> index 57679a89bf..a846f74a14 100644
-> --- a/hw/arm/virt-acpi-build.c
-> +++ b/hw/arm/virt-acpi-build.c
-> @@ -37,9 +37,9 @@
->  #include "hw/acpi/acpi.h"
->  #include "hw/nvram/fw_cfg.h"
->  #include "hw/acpi/bios-linker-loader.h"
-> -#include "hw/loader.h"
->  #include "hw/hw.h"
->  #include "hw/acpi/aml-build.h"
-> +#include "hw/acpi/utils.h"
->  #include "hw/pci/pcie_host.h"
->  #include "hw/pci/pci.h"
->  #include "hw/arm/virt.h"
-> @@ -881,14 +881,6 @@ static void virt_acpi_build_reset(void *build_opaque)
->      build_state->patched = false;
->  }
->  
-> -static MemoryRegion *acpi_add_rom_blob(AcpiBuildState *build_state,
-> -                                       GArray *blob, const char *name,
-> -                                       uint64_t max_size)
-> -{
-> -    return rom_add_blob(name, blob->data, acpi_data_len(blob), max_size, -1,
-> -                        name, virt_acpi_build_update, build_state, NULL, true);
-> -}
-> -
->  static const VMStateDescription vmstate_virt_acpi_build = {
->      .name = "virt_acpi_build",
->      .version_id = 1,
-> @@ -920,20 +912,22 @@ void virt_acpi_setup(VirtMachineState *vms)
->      virt_acpi_build(vms, &tables);
->  
->      /* Now expose it all to Guest */
-> -    build_state->table_mr = acpi_add_rom_blob(build_state, tables.table_data,
-> -                                               ACPI_BUILD_TABLE_FILE,
-> -                                               ACPI_BUILD_TABLE_MAX_SIZE);
-> +    build_state->table_mr = acpi_add_rom_blob(virt_acpi_build_update,
-> +                                              build_state, tables.table_data,
-> +                                              ACPI_BUILD_TABLE_FILE,
-> +                                              ACPI_BUILD_TABLE_MAX_SIZE);
->      assert(build_state->table_mr != NULL);
->  
->      build_state->linker_mr =
-> -        acpi_add_rom_blob(build_state, tables.linker->cmd_blob,
-> -                          "etc/table-loader", 0);
-> +        acpi_add_rom_blob(virt_acpi_build_update, build_state,
-> +                          tables.linker->cmd_blob, "etc/table-loader", 0);
->  
->      fw_cfg_add_file(vms->fw_cfg, ACPI_BUILD_TPMLOG_FILE, tables.tcpalog->data,
->                      acpi_data_len(tables.tcpalog));
->  
-> -    build_state->rsdp_mr = acpi_add_rom_blob(build_state, tables.rsdp,
-> -                                              ACPI_BUILD_RSDP_FILE, 0);
-> +    build_state->rsdp_mr = acpi_add_rom_blob(virt_acpi_build_update,
-> +                                             build_state, tables.rsdp,
-> +                                             ACPI_BUILD_RSDP_FILE, 0);
->  
->      qemu_register_reset(virt_acpi_build_reset, build_state);
->      virt_acpi_build_reset(build_state);
-> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-> index 416da318ae..b17d4a711d 100644
-> --- a/hw/i386/acpi-build.c
-> +++ b/hw/i386/acpi-build.c
-> @@ -37,7 +37,6 @@
->  #include "hw/acpi/cpu.h"
->  #include "hw/nvram/fw_cfg.h"
->  #include "hw/acpi/bios-linker-loader.h"
-> -#include "hw/loader.h"
->  #include "hw/isa/isa.h"
->  #include "hw/block/fdc.h"
->  #include "hw/acpi/memory_hotplug.h"
-> @@ -58,6 +57,7 @@
->  #include "hw/i386/x86-iommu.h"
->  
->  #include "hw/acpi/aml-build.h"
-> +#include "hw/acpi/utils.h"
->  
->  #include "qom/qom-qobject.h"
->  #include "hw/i386/amd_iommu.h"
-> @@ -2842,14 +2842,6 @@ static void acpi_build_reset(void *build_opaque)
->      build_state->patched = 0;
->  }
->  
-> -static MemoryRegion *acpi_add_rom_blob(AcpiBuildState *build_state,
-> -                                       GArray *blob, const char *name,
-> -                                       uint64_t max_size)
-> -{
-> -    return rom_add_blob(name, blob->data, acpi_data_len(blob), max_size, -1,
-> -                        name, acpi_build_update, build_state, NULL, true);
-> -}
-> -
->  static const VMStateDescription vmstate_acpi_build = {
->      .name = "acpi_build",
->      .version_id = 1,
-> @@ -2891,14 +2883,15 @@ void acpi_setup(void)
->      acpi_build(&tables, MACHINE(pcms));
->  
->      /* Now expose it all to Guest */
-> -    build_state->table_mr = acpi_add_rom_blob(build_state, tables.table_data,
-> -                                               ACPI_BUILD_TABLE_FILE,
-> -                                               ACPI_BUILD_TABLE_MAX_SIZE);
-> +    build_state->table_mr = acpi_add_rom_blob(acpi_build_update,
-> +                                              build_state, tables.table_data,
-> +                                              ACPI_BUILD_TABLE_FILE,
-> +                                              ACPI_BUILD_TABLE_MAX_SIZE);
->      assert(build_state->table_mr != NULL);
->  
->      build_state->linker_mr =
-> -        acpi_add_rom_blob(build_state, tables.linker->cmd_blob,
-> -                          "etc/table-loader", 0);
-> +        acpi_add_rom_blob(acpi_build_update, build_state,
-> +                          tables.linker->cmd_blob, "etc/table-loader", 0);
->  
->      fw_cfg_add_file(pcms->fw_cfg, ACPI_BUILD_TPMLOG_FILE,
->                      tables.tcpalog->data, acpi_data_len(tables.tcpalog));
-> @@ -2935,8 +2928,9 @@ void acpi_setup(void)
->          build_state->rsdp_mr = NULL;
->      } else {
->          build_state->rsdp = NULL;
-> -        build_state->rsdp_mr = acpi_add_rom_blob(build_state, tables.rsdp,
-> -                                                  ACPI_BUILD_RSDP_FILE, 0);
-> +        build_state->rsdp_mr = acpi_add_rom_blob(acpi_build_update,
-> +                                                 build_state, tables.rsdp,
-> +                                                 ACPI_BUILD_RSDP_FILE, 0);
->      }
->  
->      qemu_register_reset(acpi_build_reset, build_state);
-> diff --git a/include/hw/acpi/utils.h b/include/hw/acpi/utils.h
+> +static ssize_t migration_version_store(struct kobject *kobj, struct devi=
+ce *dev,
+> +		const char *buf, size_t count)
+> +{
+> +	int ret =3D 0;
+> +	struct intel_vgpu_type *type;
+> +	void *gvt =3D kdev_to_i915(dev)->gvt;
+> +
+> +	type =3D intel_gvt_find_vgpu_type(gvt, kobject_name(kobj));
+> +	if (!type || !type->migration_version) {
+> +		gvt_err("Does not support migraion on type %s. Please search previous =
+detailed log\n",
+> +				kobject_name(kobj));
+> +		return -ENODEV;
+> +	}
+> +
+> +	ret =3D intel_gvt_check_vfio_migration_version(gvt,
+> +			type->migration_version, buf);
+> +
+> +	return (ret < 0 ? ret : count);
+> +}
+> +
+>  static MDEV_TYPE_ATTR_RO(available_instances);
+>  static MDEV_TYPE_ATTR_RO(device_api);
+>  static MDEV_TYPE_ATTR_RO(description);
+> +static MDEV_TYPE_ATTR_RW(migration_version);
+> =20
+>  static struct attribute *gvt_type_attrs[] =3D {
+>  	&mdev_type_attr_available_instances.attr,
+>  	&mdev_type_attr_device_api.attr,
+>  	&mdev_type_attr_description.attr,
+> +	&mdev_type_attr_migration_version.attr,
+>  	NULL,
+>  };
+> =20
+> diff --git a/drivers/gpu/drm/i915/gvt/gvt.h b/drivers/gpu/drm/i915/gvt/gv=
+t.h
+> index f5a328b5290a..265319d35c25 100644
+> --- a/drivers/gpu/drm/i915/gvt/gvt.h
+> +++ b/drivers/gpu/drm/i915/gvt/gvt.h
+> @@ -296,6 +296,7 @@ struct intel_vgpu_type {
+>  	unsigned int fence;
+>  	unsigned int weight;
+>  	enum intel_vgpu_edid resolution;
+> +	char *migration_version;
+>  };
+> =20
+>  struct intel_gvt {
+> @@ -687,6 +688,10 @@ void intel_gvt_debugfs_remove_vgpu(struct intel_vgpu=
+ *vgpu);
+>  int intel_gvt_debugfs_init(struct intel_gvt *gvt);
+>  void intel_gvt_debugfs_clean(struct intel_gvt *gvt);
+> =20
+> +ssize_t intel_gvt_check_vfio_migration_version(struct intel_gvt *gvt,
+> +		const char *self, const char *remote);
+> +char *intel_gvt_get_vfio_migration_version(struct intel_gvt *gvt,
+> +		const char *vgpu_type);
+> =20
+>  #include "trace.h"
+>  #include "mpt.h"
+> diff --git a/drivers/gpu/drm/i915/gvt/migration_version.c b/drivers/gpu/d=
+rm/i915/gvt/migration_version.c
 > new file mode 100644
-> index 0000000000..140b4de603
+> index 000000000000..e6acf188b29a
 > --- /dev/null
-> +++ b/include/hw/acpi/utils.h
-> @@ -0,0 +1,9 @@
-> +#ifndef HW_ACPI_UTILS_H
-> +#define HW_ACPI_UTILS_H
+> +++ b/drivers/gpu/drm/i915/gvt/migration_version.c
+> @@ -0,0 +1,167 @@
+> +/*
+> + * Copyright(c) 2011-2017 Intel Corporation. All rights reserved.
+> + *
+> + * Permission is hereby granted, free of charge, to any person obtaining=
+ a
+> + * copy of this software and associated documentation files (the "Softwa=
+re"),
+> + * to deal in the Software without restriction, including without limita=
+tion
+> + * the rights to use, copy, modify, merge, publish, distribute, sublicen=
+se,
+> + * and/or sell copies of the Software, and to permit persons to whom the
+> + * Software is furnished to do so, subject to the following conditions:
+> + *
+> + * The above copyright notice and this permission notice (including the =
+next
+> + * paragraph) shall be included in all copies or substantial portions of=
+ the
+> + * Software.
+> + *
+> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRE=
+SS OR
+> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILI=
+TY,
+> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SH=
+ALL
+> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR =
+OTHER
+> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISI=
+NG FROM,
+> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALING=
+S IN THE
+> + * SOFTWARE.
+> + *
+> + * Authors:
+> + *    Yan Zhao <yan.y.zhao@intel.com>
+> + */
+> +#include <linux/vfio.h>
+> +#include "i915_drv.h"
+> +#include "gvt.h"
 > +
-> +#include "hw/nvram/fw_cfg.h"
+> +#define INV_SOFTWARE_VERSION (-1U)
+> +#define VENDOR_ID_LEN (4)
+> +#define DEVICE_ID_LEN (4)
+> +#define VGPU_TYPE_LEN (16)
+> +#define SOFTWARE_VER_LEN (8)
 > +
-> +MemoryRegion *acpi_add_rom_blob(FWCfgCallback update, void *opaque,
-> +                                GArray *blob, const char *name,
-> +                                uint64_t max_size);
-> +#endif
-> -- 
-> 2.19.1
+> +/* total length of vfio migration version string.
+> + * never exceed limit of PATH_MAX (4096)
+> + */
+> +#define MIGRATION_VERSION_TOTAL_LEN (VENDOR_ID_LEN + DEVICE_ID_LEN + \
+> +					VGPU_TYPE_LEN + SOFTWARE_VER_LEN + 4)
+> +
+> +#define GVT_VFIO_MIGRATION_SOFTWARE_VERSION INV_SOFTWARE_VERSION
+> +
+> +
+> +#define PRINTF_FORMAT "%04x-%04x-%s-%08x"
+> +#define SCANF_FORMAT "%x-%x-%16[^-]-%x"
+> +
+> +enum incompatible_reason {
+> +	IREASON_WRONG_REMOTE_FORMAT =3D 0,
+> +	IREASON_HARDWARE_MISMATCH,
+> +	IREASON_SOFTWARE_VERSION_MISMATCH,
+> +	IREASON_VGPU_TYPE_MISMATCH,
+> +};
+> +
+> +static const char *const incompatible_reason_str[] =3D {
+> +	[IREASON_WRONG_REMOTE_FORMAT] =3D
+> +		"wrong string format. probably wrong GVT version",
+> +	[IREASON_HARDWARE_MISMATCH] =3D
+> +		"physical device not matched",
+> +	[IREASON_SOFTWARE_VERSION_MISMATCH] =3D
+> +		"migration software version not matched",
+> +	[IREASON_VGPU_TYPE_MISMATCH] =3D
+> +		"vgpu type not matched"
+> +};
+> +
+> +static bool is_compatible(const char *local, const char *remote)
+> +{
+> +	bool ret;
+> +
+> +	ret =3D sysfs_streq(local, remote);
+> +
+> +	if (!ret) {
+> +		int vid_l =3D 0, did_l =3D 0, vid_r =3D 0, did_r =3D 0;
+> +		char type_l[VGPU_TYPE_LEN], type_r[VGPU_TYPE_LEN];
+> +		u32 sv_l =3D 0, sv_r =3D 0;
+> +		int rl =3D 0, rr =3D 0;
+> +		enum incompatible_reason reason =3D IREASON_WRONG_REMOTE_FORMAT;
+> +
+> +		memset(type_l, 0, sizeof(type_l));
+> +		memset(type_r, 0, sizeof(type_r));
+> +
+> +		rl =3D sscanf(local, SCANF_FORMAT,
+> +				&vid_l, &did_l, type_l, &sv_l);
+> +		rr =3D sscanf(remote, SCANF_FORMAT,
+> +				&vid_r, &did_r, type_r, &sv_r);
+> +
+> +		if (rl =3D=3D rr) {
+> +			if (vid_l !=3D vid_r || did_l !=3D did_r)
+> +				reason =3D IREASON_HARDWARE_MISMATCH;
+> +			else if (sv_l !=3D sv_r)
+> +				reason =3D IREASON_SOFTWARE_VERSION_MISMATCH;
+> +			else if (strncmp(type_l, type_r, VGPU_TYPE_LEN))
+> +				reason =3D IREASON_VGPU_TYPE_MISMATCH;
+> +		}
+> +
+> +		gvt_err("Migration version mismatched. Possible reason: %s. Local migr=
+ation version:%s, Remote migration version:%s\n",
+> +				incompatible_reason_str[reason], local,	remote);
+> +
+> +	}
+> +	return ret;
+> +
+> +}
+> +
+> +
+> +char *
+> +intel_gvt_get_vfio_migration_version(struct intel_gvt *gvt,
+> +		const char *vgpu_type)
+> +{
+> +	int cnt =3D 0;
+> +	struct drm_i915_private *dev_priv =3D gvt->dev_priv;
+> +	char *version =3D NULL;
+> +
+> +	/* currently only gen8 & gen9 are supported */
+> +	if (!IS_GEN(dev_priv, 8) && !IS_GEN(dev_priv, 9)) {
+> +		gvt_err("Local hardware does not support migration on %d\n",
+> +				INTEL_INFO(dev_priv)->gen);
+> +		return NULL;
+> +	}
+> +
+> +	if (GVT_VFIO_MIGRATION_SOFTWARE_VERSION =3D=3D INV_SOFTWARE_VERSION) {
+> +		gvt_err("Local GVT does not support migration\n");
+> +		return NULL;
+> +	}
+> +
+> +	version =3D kzalloc(MIGRATION_VERSION_TOTAL_LEN, GFP_KERNEL);
+> +
+> +	if (unlikely(!version)) {
+> +		gvt_err("memory allocation failed when get local migraiton version\n");
+> +		return NULL;
+> +	}
+> +
+> +	/* vendor id + device id + vgpu type + software version */
+> +	cnt =3D snprintf(version, MIGRATION_VERSION_TOTAL_LEN, PRINTF_FORMAT,
+> +			PCI_VENDOR_ID_INTEL,
+> +			INTEL_DEVID(dev_priv),
+> +			vgpu_type,
+> +			GVT_VFIO_MIGRATION_SOFTWARE_VERSION);
+> +
+> +	if (cnt)
+> +		return version;
+> +
+> +	gvt_err("string generation failed when get local migration version\n");
+> +	return NULL;
+
+Handle version kfree for possible error here. The approach looks fine to me.
+I think some of those messages might be too chatty or maybe debug message i=
+nstead.
+Others are good to me.
+
+Acked-by: Zhenyu Wang <zhenyuw@linux.intel.com>
+
+> +}
+> +
+> +ssize_t intel_gvt_check_vfio_migration_version(struct intel_gvt *gvt,
+> +		const char *self, const char *remote)
+> +{
+> +	struct drm_i915_private *dev_priv =3D gvt->dev_priv;
+> +
+> +	/* currently only gen8 & gen9 are supported */
+> +	if (!IS_GEN(dev_priv, 8) && !IS_GEN(dev_priv, 9)) {
+> +		gvt_err("Local hardware does not support migration on %d\n",
+> +				INTEL_INFO(dev_priv)->gen);
+> +		return -ENODEV;
+> +	}
+> +
+> +	if (GVT_VFIO_MIGRATION_SOFTWARE_VERSION =3D=3D INV_SOFTWARE_VERSION) {
+> +		gvt_err("Local GVT does not support migration\n");
+> +		return -ENODEV;
+> +	}
+> +
+> +	if (!is_compatible(self, remote))
+> +		return -EINVAL;
+> +
+> +	return 0;
+> +}
+> diff --git a/drivers/gpu/drm/i915/gvt/vgpu.c b/drivers/gpu/drm/i915/gvt/v=
+gpu.c
+> index 44ce3c2b9ac1..7642b21641bd 100644
+> --- a/drivers/gpu/drm/i915/gvt/vgpu.c
+> +++ b/drivers/gpu/drm/i915/gvt/vgpu.c
+> @@ -155,13 +155,18 @@ int intel_gvt_init_vgpu_types(struct intel_gvt *gvt)
+>  			sprintf(gvt->types[i].name, "GVTg_V5_%s",
+>  						vgpu_types[i].name);
+> =20
+> -		gvt_dbg_core("type[%d]: %s avail %u low %u high %u fence %u weight %u =
+res %s\n",
+> +		gvt->types[i].migration_version =3D
+> +			intel_gvt_get_vfio_migration_version(gvt,
+> +					gvt->types[i].name);
+> +		gvt_dbg_core("type[%d]: %s avail %u low %u high %u fence %u weight %u =
+res %s, migratio_version:%s\n",
+>  			     i, gvt->types[i].name,
+>  			     gvt->types[i].avail_instance,
+>  			     gvt->types[i].low_gm_size,
+>  			     gvt->types[i].high_gm_size, gvt->types[i].fence,
+>  			     gvt->types[i].weight,
+> -			     vgpu_edid_str(gvt->types[i].resolution));
+> +			     vgpu_edid_str(gvt->types[i].resolution),
+> +			     (gvt->types[i].migration_version ?
+> +			     gvt->types[i].migration_version : "null"));
+>  	}
+> =20
+>  	gvt->num_types =3D i;
+> @@ -170,6 +175,10 @@ int intel_gvt_init_vgpu_types(struct intel_gvt *gvt)
+> =20
+>  void intel_gvt_clean_vgpu_types(struct intel_gvt *gvt)
+>  {
+> +	int i;
+> +
+> +	for (i =3D 0; i < gvt->num_types; i++)
+> +		kfree(gvt->types[i].migration_version);
+>  	kfree(gvt->types);
+>  }
+> =20
+> --=20
+> 2.17.1
+>=20
+
+--=20
+Open Source Technology Center, Intel ltd.
+
+$gpg --keyserver wwwkeys.pgp.net --recv-keys 4D781827
+
+--qDymnuGqqhW10CwH
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iF0EARECAB0WIQTXuabgHDW6LPt9CICxBBozTXgYJwUCXO33hgAKCRCxBBozTXgY
+J1nkAKCZtc3iswsrf9qHQxaC2UOMoSXHTgCfQrcnRcG3WOGT+LqMefdZ4cruirA=
+=0Ra5
+-----END PGP SIGNATURE-----
+
+--qDymnuGqqhW10CwH--
 
