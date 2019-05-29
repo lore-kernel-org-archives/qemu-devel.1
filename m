@@ -2,70 +2,93 @@ Return-Path: <SRS0=DspQ=T5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CC197C28CC0
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 20:42:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6279AC28CC0
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 21:40:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A076924189
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 20:42:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A076924189
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
+	by mail.kernel.org (Postfix) with ESMTPS id 2DA2D2422A
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 21:40:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2DA2D2422A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:38744 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:55072 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hW5PD-0007M7-FA
-	for qemu-devel@archiver.kernel.org; Wed, 29 May 2019 16:42:39 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:55020)
+	id 1hW6Is-0006vF-7h
+	for qemu-devel@archiver.kernel.org; Wed, 29 May 2019 17:40:10 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:36618)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <palmer@dabbelt.com>) id 1hW5OK-00073A-Va
-	for qemu-devel@nongnu.org; Wed, 29 May 2019 16:41:46 -0400
+	(envelope-from <mreitz@redhat.com>) id 1hW6Hr-0006ZP-KK
+	for qemu-devel@nongnu.org; Wed, 29 May 2019 17:39:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <palmer@dabbelt.com>) id 1hW5OJ-0006Da-RA
-	for qemu-devel@nongnu.org; Wed, 29 May 2019 16:41:44 -0400
-Received: from mail-pf1-f196.google.com ([209.85.210.196]:35370)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <palmer@dabbelt.com>) id 1hW5OJ-00069q-3M
-	for qemu-devel@nongnu.org; Wed, 29 May 2019 16:41:43 -0400
-Received: by mail-pf1-f196.google.com with SMTP id d126so2403660pfd.2
-	for <qemu-devel@nongnu.org>; Wed, 29 May 2019 13:41:40 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:subject:date:message-id:mime-version
-	:content-transfer-encoding:cc:from:to;
-	bh=80RE6I//gD2gYR0rctF2qVLsvsYc9yppzUaiacmJdRE=;
-	b=kg2TO/mMaNsL/q24stpBkdztuLxhjPNvYudzwyZvVQMxqd2xS64wRTtEg+x3NlibLh
-	UmH1TDCT7ayCg4X1PfZR4MTWFTIEX/k76LuzQrHYP26BYVZ4fWGp1aYLPrj/Frvaqt85
-	FMpIEfl9r1E23Aoh0TgLvl7GSywwAcNud/Xf3VrJAan68xusY9/2wLhdxiNSNlzJsCgv
-	LqA6IU+WWhP6pJqvOzOTA6d4HMyWpW2IQiIbn+xhwaqCLdlGPcKZoLv0D8WmJYYbVx+s
-	iutee4tVC0n5J9f2qXJavZqvYWQXumyNh+XRTjFaERaICjPKWoib5YERTMWEY8s2RMRy
-	Lfuw==
-X-Gm-Message-State: APjAAAVJraduJyRIuOl0fC6KDQDC13er4ySdD5kuq7x0D7nCinfdXvFy
-	1VMHXZjmeoewXenOGqPeM8fAqqAEbUA=
-X-Google-Smtp-Source: APXvYqx3G0/l4zgBQZQ4CYLRplw/Yk2QiR3I7o6HhqzVyOywxPqIwPRZdqALxF3YBn2SdhxIqwC8Ig==
-X-Received: by 2002:a17:90a:65c2:: with SMTP id
-	i2mr14222559pjs.54.1559162499192; 
-	Wed, 29 May 2019 13:41:39 -0700 (PDT)
-Received: from localhost ([12.206.222.5])
-	by smtp.gmail.com with ESMTPSA id x18sm600635pfo.8.2019.05.29.13.41.38
-	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Wed, 29 May 2019 13:41:38 -0700 (PDT)
-Date: Wed, 29 May 2019 13:41:02 -0700
-Message-Id: <20190529204101.26907-1-palmer@sifive.com>
-X-Mailer: git-send-email 2.21.0
+	(envelope-from <mreitz@redhat.com>) id 1hW6Hq-00028Z-KN
+	for qemu-devel@nongnu.org; Wed, 29 May 2019 17:39:07 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45466)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mreitz@redhat.com>)
+	id 1hW6Ho-00022F-61; Wed, 29 May 2019 17:39:04 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+	[10.5.11.22])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id D458E85538;
+	Wed, 29 May 2019 21:38:54 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-116-183.ams2.redhat.com
+	[10.36.116.183])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id C81B71001DFA;
+	Wed, 29 May 2019 21:38:47 +0000 (UTC)
+To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>,
+	qemu-devel@nongnu.org, qemu-block@nongnu.org
+References: <1559154027-282547-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+	mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+	/PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+	U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+	mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+	awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+	AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+	CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+	B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+	2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+	AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+	8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+	4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+	BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+	xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+	W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+	DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+	64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+	ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+	sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+	alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+	/ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+	bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+	R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <fd085c62-35fb-a054-7a75-cad24eda07a1@redhat.com>
+Date: Wed, 29 May 2019 23:38:44 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-From: Palmer Dabbelt <palmer@sifive.com>
-To: qemu-riscv@nongnu.org
+In-Reply-To: <1559154027-282547-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="7DQGwr02cYbk8roa3QaTK5SMN3pZd7ng0"
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.28]);
+	Wed, 29 May 2019 21:39:03 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-	[fuzzy]
-X-Received-From: 209.85.210.196
-Subject: [Qemu-devel] [PATCH] sifive_prci: Read and write PRCI registers
+X-Received-From: 209.132.183.28
+X-Content-Filtered-By: Mailman/MimeDel 2.1.21
+Subject: Re: [Qemu-devel] [PATCH v2] hw/block/fdc: floppy command FIFO
+ memory initialization
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -77,153 +100,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Nathaniel Graff <nathaniel.graff@sifive.com>,
-	Palmer Dabbelt <palmer@sifive.com>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, den@openvz.org, vsementsov@virtuozzo.com,
+	jsnow@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Nathaniel Graff <nathaniel.graff@sifive.com>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--7DQGwr02cYbk8roa3QaTK5SMN3pZd7ng0
+From: Max Reitz <mreitz@redhat.com>
+To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>,
+ qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, jsnow@redhat.com, den@openvz.org,
+ vsementsov@virtuozzo.com
+Message-ID: <fd085c62-35fb-a054-7a75-cad24eda07a1@redhat.com>
+Subject: Re: [PATCH v2] hw/block/fdc: floppy command FIFO memory
+ initialization
+References: <1559154027-282547-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+In-Reply-To: <1559154027-282547-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Writes to the SiFive PRCI registers are preserved while leaving the
-ready bits set for the HFX/HFR oscillators and the lock bit set for the
-PLL.
+On 29.05.19 20:20, Andrey Shinkevich wrote:
+> The uninitialized memory allocated for the command FIFO of the
+> floppy controller during the VM hardware initialization incurs
+> many unwanted reports by Valgrind when VM state is being saved.
+> That verbosity hardens a search for the real memory issues when
+> the iotests run. Particularly, the patch eliminates 20 unnecessary
+> reports of the Valgrind tool in the iotest #169.
+>=20
+> Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+> ---
+> v2:
+>   01: The pointer unnecessary check 'if (fdctrl->fifo)' was removed
+>       as suggested by John.
+>=20
+>  hw/block/fdc.c | 1 +
+>  1 file changed, 1 insertion(+)
 
-Signed-off-by: Nathaniel Graff <nathaniel.graff@sifive.com>
-Reviewed-by: Michael Clark <mjc@sifive.com>
-Signed-off-by: Palmer Dabbelt <palmer@sifive.com>
----
- hw/riscv/sifive_prci.c         | 49 ++++++++++++++++++++++++++++------
- include/hw/riscv/sifive_prci.h | 32 ++++++++++++++++++++++
- 2 files changed, 73 insertions(+), 8 deletions(-)
+Thanks, applied to my block-on-kevin branch:
 
-diff --git a/hw/riscv/sifive_prci.c b/hw/riscv/sifive_prci.c
-index 0910ea32c1a5..d3716a928568 100644
---- a/hw/riscv/sifive_prci.c
-+++ b/hw/riscv/sifive_prci.c
-@@ -23,15 +23,18 @@
- #include "target/riscv/cpu.h"
- #include "hw/riscv/sifive_prci.h"
- 
--/* currently implements enough to mock freedom-e-sdk BSP clock programming */
--
- static uint64_t sifive_prci_read(void *opaque, hwaddr addr, unsigned int size)
- {
--    if (addr == 0 /* PRCI_HFROSCCFG */) {
--        return 1 << 31; /* ROSC_RDY */
--    }
--    if (addr == 8 /* PRCI_PLLCFG    */) {
--        return 1 << 31; /* PLL_LOCK */
-+    SiFivePRCIState *s = opaque;
-+    switch (addr) {
-+    case SIFIVE_PRCI_HFROSCCFG:
-+        return s->hfrosccfg;
-+    case SIFIVE_PRCI_HFXOSCCFG:
-+        return s->hfxosccfg;
-+    case SIFIVE_PRCI_PLLCFG:
-+        return s->pllcfg;
-+    case SIFIVE_PRCI_PLLOUTDIV:
-+        return s->plloutdiv;
-     }
-     hw_error("%s: read: addr=0x%x\n", __func__, (int)addr);
-     return 0;
-@@ -40,7 +43,30 @@ static uint64_t sifive_prci_read(void *opaque, hwaddr addr, unsigned int size)
- static void sifive_prci_write(void *opaque, hwaddr addr,
-            uint64_t val64, unsigned int size)
- {
--    /* discard writes */
-+    SiFivePRCIState *s = opaque;
-+    switch (addr) {
-+    case SIFIVE_PRCI_HFROSCCFG:
-+        s->hfrosccfg = (uint32_t) val64;
-+        /* OSC stays ready */
-+        s->hfrosccfg |= SIFIVE_PRCI_HFROSCCFG_RDY;
-+        break;
-+    case SIFIVE_PRCI_HFXOSCCFG:
-+        s->hfxosccfg = (uint32_t) val64;
-+        /* OSC stays ready */
-+        s->hfxosccfg |= SIFIVE_PRCI_HFXOSCCFG_RDY;
-+        break;
-+    case SIFIVE_PRCI_PLLCFG:
-+        s->pllcfg = (uint32_t) val64;
-+        /* PLL stays locked */
-+        s->pllcfg |= SIFIVE_PRCI_PLLCFG_LOCK;
-+        break;
-+    case SIFIVE_PRCI_PLLOUTDIV:
-+        s->plloutdiv = (uint32_t) val64;
-+        break;
-+    default:
-+        hw_error("%s: bad write: addr=0x%x v=0x%x\n",
-+                 __func__, (int)addr, (int)val64);
-+    }
- }
- 
- static const MemoryRegionOps sifive_prci_ops = {
-@@ -60,6 +86,13 @@ static void sifive_prci_init(Object *obj)
-     memory_region_init_io(&s->mmio, obj, &sifive_prci_ops, s,
-                           TYPE_SIFIVE_PRCI, 0x8000);
-     sysbus_init_mmio(SYS_BUS_DEVICE(obj), &s->mmio);
-+
-+    s->hfrosccfg = (SIFIVE_PRCI_HFROSCCFG_RDY | SIFIVE_PRCI_HFROSCCFG_EN);
-+    s->hfxosccfg = (SIFIVE_PRCI_HFROSCCFG_RDY | SIFIVE_PRCI_HFROSCCFG_EN);
-+    s->pllcfg = (SIFIVE_PRCI_PLLCFG_REFSEL | SIFIVE_PRCI_PLLCFG_BYPASS |
-+                SIFIVE_PRCI_PLLCFG_LOCK);
-+    s->plloutdiv = SIFIVE_PRCI_PLLOUTDIV_DIV1;
-+
- }
- 
- static const TypeInfo sifive_prci_info = {
-diff --git a/include/hw/riscv/sifive_prci.h b/include/hw/riscv/sifive_prci.h
-index b6f4c486cc1e..bd51c4af3c1c 100644
---- a/include/hw/riscv/sifive_prci.h
-+++ b/include/hw/riscv/sifive_prci.h
-@@ -19,6 +19,34 @@
- #ifndef HW_SIFIVE_PRCI_H
- #define HW_SIFIVE_PRCI_H
- 
-+enum {
-+    SIFIVE_PRCI_HFROSCCFG   = 0x0,
-+    SIFIVE_PRCI_HFXOSCCFG   = 0x4,
-+    SIFIVE_PRCI_PLLCFG      = 0x8,
-+    SIFIVE_PRCI_PLLOUTDIV   = 0xC
-+};
-+
-+enum {
-+    SIFIVE_PRCI_HFROSCCFG_RDY   = (1 << 31),
-+    SIFIVE_PRCI_HFROSCCFG_EN    = (1 << 30)
-+};
-+
-+enum {
-+    SIFIVE_PRCI_HFXOSCCFG_RDY   = (1 << 31),
-+    SIFIVE_PRCI_HFXOSCCFG_EN    = (1 << 30)
-+};
-+
-+enum {
-+    SIFIVE_PRCI_PLLCFG_PLLSEL   = (1 << 16),
-+    SIFIVE_PRCI_PLLCFG_REFSEL   = (1 << 17),
-+    SIFIVE_PRCI_PLLCFG_BYPASS   = (1 << 18),
-+    SIFIVE_PRCI_PLLCFG_LOCK     = (1 << 31)
-+};
-+
-+enum {
-+    SIFIVE_PRCI_PLLOUTDIV_DIV1  = (1 << 8)
-+};
-+
- #define TYPE_SIFIVE_PRCI "riscv.sifive.prci"
- 
- #define SIFIVE_PRCI(obj) \
-@@ -30,6 +58,10 @@ typedef struct SiFivePRCIState {
- 
-     /*< public >*/
-     MemoryRegion mmio;
-+    uint32_t hfrosccfg;
-+    uint32_t hfxosccfg;
-+    uint32_t pllcfg;
-+    uint32_t plloutdiv;
- } SiFivePRCIState;
- 
- DeviceState *sifive_prci_create(hwaddr addr);
--- 
-2.21.0
+https://git.xanclic.moe/XanClic/qemu/commits/branch/block-on-kevin
 
+(To become my block branch when my current pull request is done.)
+
+Max
+
+
+--7DQGwr02cYbk8roa3QaTK5SMN3pZd7ng0
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlzu++QACgkQ9AfbAGHV
+z0Dj2Qf/feeQKNhV7lpPMrXql3DXjvbCgtt7iT5BjLHusGDHxcT3Pvv+XfEWLl/i
+DFLyFUCTAD0jVgTMzoNaJLRmvyGDV4baBIZJetEN9DcWhiIlVPaFcyJ0gp7HY91n
+DJz1j2d4uqr+IeW7LA1ClRpANmC4V/qzfkE++VXk81p9PzsKEbFFGN2u8bLuxygl
+LbB5/kHOOSWeRt/VdLDYLu43zdcuZgdRrqYpvkCu05909xymTGkeOIc33W72U2zm
+XcLdFbALZJH46YqPf1OOBfvbPrWMcy1K4Nb/eDiwiXimblW19uxe2fSPCxvx6rY5
+Dsfy61+a3sbjCiITuaHheMY2cIdlgw==
+=Qm6M
+-----END PGP SIGNATURE-----
+
+--7DQGwr02cYbk8roa3QaTK5SMN3pZd7ng0--
 
