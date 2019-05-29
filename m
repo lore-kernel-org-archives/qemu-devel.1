@@ -6,77 +6,63 @@ X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 96E88C28CC0
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 09:40:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D3E31C28CC0
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 09:42:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 700F32070D
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 09:40:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 700F32070D
+	by mail.kernel.org (Postfix) with ESMTPS id ACBCC2070D
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 09:42:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ACBCC2070D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:50705 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:50715 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hVv4l-0003o2-Ot
-	for qemu-devel@archiver.kernel.org; Wed, 29 May 2019 05:40:51 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:54462)
+	id 1hVv64-0004rT-09
+	for qemu-devel@archiver.kernel.org; Wed, 29 May 2019 05:42:12 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:54499)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1hVv2d-0002hX-AZ
-	for qemu-devel@nongnu.org; Wed, 29 May 2019 05:38:40 -0400
+	(envelope-from <ppandit@redhat.com>) id 1hVv2p-0002mH-8B
+	for qemu-devel@nongnu.org; Wed, 29 May 2019 05:38:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1hVv2c-0002jO-IS
-	for qemu-devel@nongnu.org; Wed, 29 May 2019 05:38:39 -0400
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:37363)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hVv2c-0002j9-DR
-	for qemu-devel@nongnu.org; Wed, 29 May 2019 05:38:38 -0400
-Received: by mail-wr1-f68.google.com with SMTP id h1so1235836wro.4
-	for <qemu-devel@nongnu.org>; Wed, 29 May 2019 02:38:38 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-	:user-agent:mime-version:in-reply-to:content-language
-	:content-transfer-encoding;
-	bh=GyeF7UAIV8Fy3xtoQTt3vNm4DRuLD7XSRn9yg2iKkDQ=;
-	b=QZFxb1goU+pXJ7Fr9KtqRj796eXs8Up+g+Nzy7TJk3NPyO+njbrHkcyR8/58YV6yNM
-	ZESkbQzt4KOxgt+qO/Jh1yKsgxUFirVEFde34u+Kbe1WoP8H/cRGGBqvzpKzBx++LUZ9
-	Fu6rKy9vHSuaHksr/I4M/56Z9miW14tDoKgQmbV9/XPBoYRLJeNDBtm5vdGF1P3UlzpK
-	5Bo0Wn7ezbEnTxF+wwOKzxzRlnb2jPoNao//mmnA1C1cHKzs1909O+bVsFvG9r+HuTCj
-	uLwaNkAQii3a2d1BtQ7yt0YXPiqKdF12EZ07tGMiNUZn5Tzs3rd71mX3L6DeBlOc2ZOv
-	kDxQ==
-X-Gm-Message-State: APjAAAWP3AcHxpS4Luu7/UwY2ZdkMA0abHV69CzRltcJrRQEABvl4A39
-	GwpjBhK4cUSdd4H/YLCwDPuwhA==
-X-Google-Smtp-Source: APXvYqzOfpNRHg0GAMlkzvncMdgm9o1Y6o4xGic/wQkmFEAkRb1/0xYflBg9jbeOt6iUTv0vBALi/A==
-X-Received: by 2002:adf:f909:: with SMTP id b9mr39460948wrr.119.1559122712631; 
-	Wed, 29 May 2019 02:38:32 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c92d:f9e8:f150:3553?
-	([2001:b07:6468:f312:c92d:f9e8:f150:3553])
-	by smtp.gmail.com with ESMTPSA id
-	o20sm23057503wro.2.2019.05.29.02.38.31
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Wed, 29 May 2019 02:38:31 -0700 (PDT)
-To: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-	Gerd Hoffmann <kraxel@redhat.com>
-References: <20190528204331.5280-1-kraxel@redhat.com>
-	<016bde36-9476-91c3-0a06-5cd13d317083@gmail.com>
-	<20190529050123.dblwhfffwa5emhjf@sirius.home.kraxel.org>
-	<f82b1632-083b-8520-4f46-b9d89de9583c@gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <b5c121b2-87ed-0d3b-8602-7ccf74f8dc42@redhat.com>
-Date: Wed, 29 May 2019 11:38:31 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	(envelope-from <ppandit@redhat.com>) id 1hVv2o-0002od-Ec
+	for qemu-devel@nongnu.org; Wed, 29 May 2019 05:38:51 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38236)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ppandit@redhat.com>) id 1hVv2o-0002js-91
+	for qemu-devel@nongnu.org; Wed, 29 May 2019 05:38:50 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 28ADAA3B60;
+	Wed, 29 May 2019 09:38:34 +0000 (UTC)
+Received: from kaapi (unknown [10.35.206.19])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 899FA600C4;
+	Wed, 29 May 2019 09:38:22 +0000 (UTC)
+Date: Wed, 29 May 2019 15:08:16 +0530 (IST)
+From: P J P <ppandit@redhat.com>
+X-X-Sender: pjp@kaapi
+To: =?ISO-8859-15?Q?Marc-Andr=E9_Lureau?= <marcandre.lureau@gmail.com>
+In-Reply-To: <CAJ+F1CLH1qN-jVVaMacMB41PWfZ5Xd9A8ycowaNxwgvQhPEvMQ@mail.gmail.com>
+Message-ID: <nycvar.YSQ.7.76.1905291448250.16122@xnncv>
+References: <20190519084815.7410-1-ppandit@redhat.com>
+	<CAJ+F1CLXdw4gE45vVEpStKrKsu-OYy1+5caC9wUduEtQRhjrpA@mail.gmail.com>
+	<nycvar.YSQ.7.76.1905231257400.23354@xnncv>
+	<CAJ+F1CLH1qN-jVVaMacMB41PWfZ5Xd9A8ycowaNxwgvQhPEvMQ@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <f82b1632-083b-8520-4f46-b9d89de9583c@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.30]);
+	Wed, 29 May 2019 09:38:34 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-	[fuzzy]
-X-Received-From: 209.85.221.68
-Subject: Re: [Qemu-devel] [PATCH] q35: fix mmconfig and PCI0._CRS
+X-Received-From: 209.132.183.28
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Content-Filtered-By: Mailman/MimeDel 2.1.21
+Subject: Re: [Qemu-devel] [PATCH v2] qga: check length of command-line &
+ environment variables
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -88,22 +74,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
-	Igor Mammedov <imammedo@redhat.com>,
-	=?UTF-8?B?TMOhc3psw7Mgw4lyc2Vr?= <lersek@redhat.com>,
-	Richard Henderson <rth@twiddle.net>
+Cc: =?ISO-8859-15?Q?Ferm=EDn_J=2E_Serna?= <fjserna@gmail.com>,
+	"Daniel P . Berrange" <berrange@redhat.com>,
+	QEMU Developers <qemu-devel@nongnu.org>,
+	Michael Roth <mdroth@linux.vnet.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 29/05/19 07:11, Marcel Apfelbaum wrote:
-> I am not saying is a "big" issue since it will probably not affect the
-> guests at all.
-> Upgrading QEMU will look like a firmware update or something.
+  Hello Marc,
 
-Yeah, this happens all the time.  This kind of bugfix is generally not
-versioned.
++-- On Thu, 23 May 2019, Marc-Andr=C3=A9 Lureau wrote --+
+| I don't see how you could exploit this today.
+|=20
+| QMP parser has MAX_TOKEN_COUNT (2ULL << 20).
 
-Paolo
+I see, didn't realise that. I tried to reproduce it and
 
+   {"error": {"class": "GenericError", "desc": "JSON token count limit ex=
+ceeded"}}
+
+got above error around ~1048570 tokens; Much earlier than 0x200000(=3D209=
+7152) =20
+as defined by MAX_TOKEN_COUNT. I guess multiple packets are being merged =
+to=20
+form the incoming command and there is a glitch in there.
+
+| We could have "assert(count < MAX_TOKEN_COUNT)" in the loop, if it help=
+s.
+
+No, assert() doesn't seem good.
+
+I think same limit will apply to commands coming via QAPIs as well?
+
+
+Thank you.
+--
+Prasad J Pandit / Red Hat Product Security Team
+47AF CE69 3A90 54AA 9045 1053 DD13 3D32 FE5B 041F
