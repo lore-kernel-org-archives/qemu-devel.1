@@ -2,70 +2,64 @@ Return-Path: <SRS0=DspQ=T5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BC76DC07542
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 08:27:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5203AC04E84
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 08:39:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4F8BF20B7C
-	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 08:27:30 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=mail.uni-paderborn.de header.i=@mail.uni-paderborn.de header.b="qaEIBIMw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4F8BF20B7C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=mail.uni-paderborn.de
+	by mail.kernel.org (Postfix) with ESMTPS id 2EFEA21670
+	for <qemu-devel@archiver.kernel.org>; Wed, 29 May 2019 08:39:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2EFEA21670
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:49825 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:49928 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hVtvl-00055U-CP
-	for qemu-devel@archiver.kernel.org; Wed, 29 May 2019 04:27:29 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:41077)
+	id 1hVu7G-0007SN-MO
+	for qemu-devel@archiver.kernel.org; Wed, 29 May 2019 04:39:22 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:42659)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1hVtuc-0004Mn-JO
-	for qemu-devel@nongnu.org; Wed, 29 May 2019 04:26:19 -0400
+	(envelope-from <wangjie88@huawei.com>) id 1hVu6Q-00078S-D8
+	for qemu-devel@nongnu.org; Wed, 29 May 2019 04:38:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1hVtub-0004Hc-Mm
-	for qemu-devel@nongnu.org; Wed, 29 May 2019 04:26:18 -0400
-Received: from zuban.uni-paderborn.de ([131.234.189.17]:55362)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kbastian@mail.uni-paderborn.de>)
-	id 1hVtua-0004Em-RX
-	for qemu-devel@nongnu.org; Wed, 29 May 2019 04:26:17 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=mail.uni-paderborn.de; s=20170601;
-	h=Content-Transfer-Encoding:Content-Type
-	:In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:
-	Sender:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=pnYBzeN3MZ4q3Ivw3OERXwXUhO5uVyGz1CXmPsElfPg=;
-	b=qaEIBIMwh61mG1adzfUD6K2Y8L
-	E0AbznCE73jawsYf17OKTiiLL8cR4P4Uy5N0glA68AxTzgt9o3e2d+LeMZk6l967BDYRnn+U9zxsb
-	3U/ZBDOjOUqoyQJ8ItWsPkSpU2mLE5nrTGS4nfxMH1CaD2tOxXNyF0Z8lgyIVjd7M2Oo=; 
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-References: <87lfyqla7r.fsf@dusky.pond.sub.org>
-From: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-Message-ID: <cba64bd3-f6f0-f3cd-897c-10838cbebaf4@mail.uni-paderborn.de>
-Date: Wed, 29 May 2019 10:25:09 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.7.0
+	(envelope-from <wangjie88@huawei.com>) id 1hVu6P-0003oN-3p
+	for qemu-devel@nongnu.org; Wed, 29 May 2019 04:38:30 -0400
+Received: from szxga05-in.huawei.com ([45.249.212.191]:2238 helo=huawei.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <wangjie88@huawei.com>)
+	id 1hVu6L-0003mP-LA; Wed, 29 May 2019 04:38:26 -0400
+Received: from DGGEMS413-HUB.china.huawei.com (unknown [172.30.72.58])
+	by Forcepoint Email with ESMTP id E7EF8FCB05CEEA205CF5;
+	Wed, 29 May 2019 16:38:20 +0800 (CST)
+Received: from [127.0.0.1] (10.177.25.93) by DGGEMS413-HUB.china.huawei.com
+	(10.3.19.213) with Microsoft SMTP Server id 14.3.439.0; Wed, 29 May 2019
+	16:37:57 +0800
+To: Michal Privoznik <mprivozn@redhat.com>, Paolo Bonzini
+	<pbonzini@redhat.com>, <qemu-devel@nongnu.org>, <qemu-block@nongnu.org>
+References: <1559048796-57016-1-git-send-email-wangjie88@huawei.com>
+	<cac8ed16-7846-ca22-2463-c3c738066d61@redhat.com>
+	<f165741a-2ffd-62fd-b121-49bf1a3597f1@redhat.com>
+From: Jie Wang <wangjie88@huawei.com>
+Message-ID: <8600e1e3-fd24-6e07-6951-f70b7a23f703@huawei.com>
+Date: Wed, 29 May 2019 16:37:55 +0800
+User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:60.0) Gecko/20100101
+	Thunderbird/60.5.0
 MIME-Version: 1.0
-In-Reply-To: <87lfyqla7r.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US-large
-X-IMT-Spam-Score: 0.0 ()
-X-PMX-Version: 6.4.6.2792898, Antispam-Engine: 2.7.2.2107409,
-	Antispam-Data: 2019.5.29.81516, AntiVirus-Engine: 5.63.0,
-	AntiVirus-Data: 2019.5.29.5630000
-X-IMT-Authenticated-Sender: kbastian@UNI-PADERBORN.DE
+In-Reply-To: <f165741a-2ffd-62fd-b121-49bf1a3597f1@redhat.com>
+Content-Language: en-US
+X-Originating-IP: [10.177.25.93]
+X-CFilter-Loop: Reflected
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 131.234.189.17
-Subject: Re: [Qemu-devel] Headers without multiple inclusion guards
+X-Received-From: 45.249.212.191
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+X-Content-Filtered-By: Mailman/MimeDel 2.1.21
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] pr-manager-helper: fix pr
+ process been killed when reconectting
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -77,59 +71,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
-	Dmitry Fleytman <dmitry.fleytman@gmail.com>,
-	Sagar Karandikar <sagark@eecs.berkeley.edu>,
-	"Michael S. Tsirkin" <mst@redhat.com>, James Hogan <jhogan@kernel.org>,
-	Anthony Green <green@moxielogic.com>, Palmer Dabbelt <palmer@sifive.com>,
-	Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
-	=?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
-	Max Filippov <jcmvbkbc@gmail.com>,
-	Alistair Francis <Alistair.Francis@wdc.com>,
-	Gerd Hoffmann <kraxel@redhat.com>,
-	"Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
-	Guan Xuetao <gxt@mprc.pku.edu.cn>, Marek Vasut <marex@denx.de>,
-	Stefano Stabellini <sstabellini@kernel.org>,
-	Aleksandar Rikalo <arikalo@wavecomp.com>, Helge Deller <deller@gmx.de>,
-	David Hildenbrand <david@redhat.com>, Halil Pasic <pasic@linux.ibm.com>,
-	Christian Borntraeger <borntraeger@de.ibm.com>,
-	Anthony Perard <anthony.perard@citrix.com>,
-	David Gibson <david@gibson.dropbear.id.au>,
-	Laszlo Ersek <lersek@redhat.com>, Jason Wang <jasowang@redhat.com>,
-	Artyom Tarasenko <atar4qemu@gmail.com>,
-	Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
-	Alistair Francis <alistair@alistair23.me>,
-	Eduardo Habkost <ehabkost@redhat.com>,
-	Riku Voipio <riku.voipio@iki.fi>, Greg Kurz <groug@kaod.org>,
-	Marcelo Tosatti <mtosatti@redhat.com>,
-	Beniamino Galvani <b.galvani@gmail.com>,
-	Eric Auger <eric.auger@redhat.com>, Paul Durrant <paul.durrant@citrix.com>,
-	Stafford Horne <shorne@gmail.com>,
-	=?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
-	Richard Henderson <rth@twiddle.net>,
-	"Daniel P. Berrange" <berrange@redhat.com>,
-	Claudio Fontana <claudio.fontana@gmail.com>,
-	=?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
-	Chris Wulff <crwulff@gmail.com>,
-	Claudio Fontana <claudio.fontana@huawei.com>,
-	Laurent Vivier <laurent@vivier.eu>,
-	Andrew Baumann <Andrew.Baumann@microsoft.com>,
-	Michael Walle <michael@walle.cc>,
-	Aleksandar Markovic <amarkovic@wavecomp.com>,
-	Cornelia Huck <cohuck@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
-	Aurelien Jarno <aurelien@aurel32.net>
+Cc: eric.fangyi@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Hi, Paolo and Michal:
 
-On 5/28/19 8:12 PM, Markus Armbruster wrote:
-> target/tricore/tricore-opcodes.h
-unintentional.
-
-
-Cheers,
-
-Bastian
+Let me add some details about this problem.
 
 
+reappear steps:
+
+1. in Host, execute the following command many times quickly:
+
+"ps aux|grep helper|grep -v grep|grep -v qemu-kvm|awk '{print $2}';ps aux=
+|grep helper|grep -v grep|grep -v qemu-kvm|awk '{print $2}'|xargs -n1 kil=
+l -9"
+
+2. at the same time , execute PR command continuously in Guest
+
+just execute step 1 and 2 for a moment, the problem will appear.
+
+
+when the problem appeared:
+
+1. qemu will initialize pr-helper and connect to it cyclically, but alway=
+s failed because no running pr-helper process to connect.
+
+2. libvirt will always waiting for connected event, but will never to sta=
+rt new pr-helper process because not receive disconnect event.
+
+
+I'm not found the best way to solve this problem, can you give me some su=
+ggestion?
+
+
+On 2019/5/29 15:33, Michal Privoznik wrote:
+> On 5/28/19 7:45 PM, Paolo Bonzini wrote:
+>> On 28/05/19 15:06, Jie Wang wrote:
+>>> if pr-helper been killed and qemu send disconnect event to libvirt
+>>> and libvirt started a new pr-helper process, the new pr-heleper
+>>> been killed again when qemu is connectting to the new pr-helper,
+>>> qemu will never send disconnect to libvirt, and libvirt will never
+>>> receive connected event.
+>>
+>> I think this would let a guest "spam" events just by sending a lot PR
+>> commands.=C2=A0 Also, as you said, in this case QEMU has never sent a
+>> "connected" event, so I'm not sure why it should send a disconnection =
+event.
+>
+> So pr manager is initialized on the first PR command and not when qemu =
+is starting?
+>
+> If a user inside the guest could somehow kill pr-helper process in the =
+host then yes, they could spam libvirt/qemu. But if a user from inside a =
+guest can kill a process in the host that is much bigger problem than spa=
+ming libvirt.
+>
+>>
+>> Does libvirt monitor at all the pr-helper to check if it dies?=C2=A0 O=
+r does
+>> it rely exclusively on QEMU's events?
+>
+> Libvirt relies solely on QEMU's events. Just like with qemu process its=
+elf, libvirt can't rely on SIGCHILD because the daemon might be restarted=
+ which would reparent all qemu and pr-helper processes rendering libvirt =
+wait for SIGCHILD useless.
+>
+> But there is an exception to this: when libvirt is spawning pr-helper i=
+t does so by following these steps:
+>
+> 1) Try to acquire (lock) pidfile
+> 2) unlink(socket)
+> 3) spawn pr-helper process (this yields child's PID)
+> 4) wait some time until socket is created
+> 5) some follow up work (move child's PID into same cgroup as qemu's mai=
+n thread, relabel the socket so that qemu can access it)
+>
+> If any of these steps fails then child is killed. However, the PID is n=
+ot recorded anywhere and thus is forgotten once control jumps out of the =
+function.
+>
+> Michal
+>
+> .
+>
