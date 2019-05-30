@@ -2,81 +2,85 @@ Return-Path: <SRS0=r6E1=T6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D2C8C28CC0
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 15:21:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BD9B3C28CC0
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 15:26:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 647B325CC3
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 15:21:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 647B325CC3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 7107525CF3
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 15:26:41 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Iw+mFOoT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7107525CF3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:55499 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:55551 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hWMrU-0001pB-Nj
-	for qemu-devel@archiver.kernel.org; Thu, 30 May 2019 11:21:00 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:34211)
+	id 1hWMwy-0003dT-FH
+	for qemu-devel@archiver.kernel.org; Thu, 30 May 2019 11:26:40 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:35414)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hWMqc-0001Ro-Ns
-	for qemu-devel@nongnu.org; Thu, 30 May 2019 11:20:07 -0400
+	(envelope-from <thatlemon@gmail.com>) id 1hWMw9-00035J-Cu
+	for qemu-devel@nongnu.org; Thu, 30 May 2019 11:25:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hWMqX-0001Lz-7r
-	for qemu-devel@nongnu.org; Thu, 30 May 2019 11:20:04 -0400
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:38257)
+	(envelope-from <thatlemon@gmail.com>) id 1hWMw8-0006ep-Iu
+	for qemu-devel@nongnu.org; Thu, 30 May 2019 11:25:49 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:43636)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hWMqV-000108-8e
-	for qemu-devel@nongnu.org; Thu, 30 May 2019 11:20:01 -0400
-Received: by mail-wr1-f65.google.com with SMTP id d18so4479289wrs.5
-	for <qemu-devel@nongnu.org>; Thu, 30 May 2019 08:19:32 -0700 (PDT)
+	(Exim 4.71) (envelope-from <thatlemon@gmail.com>) id 1hWMw8-0006dm-Cl
+	for qemu-devel@nongnu.org; Thu, 30 May 2019 11:25:48 -0400
+Received: by mail-wr1-x441.google.com with SMTP id l17so4470777wrm.10
+	for <qemu-devel@nongnu.org>; Thu, 30 May 2019 08:25:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+	h=to:from:subject:cc:message-id:date:user-agent:mime-version
+	:content-language:content-transfer-encoding;
+	bh=PJtLEoH5vpdQyQyomfFW/fhuefsDO+DnL8daoj0GhF0=;
+	b=Iw+mFOoTezzmbp7HA3pWT1CoV56b0HP8T6uo2ylKVlc9Kkn2ed8ok3napmVv9qqsjO
+	RbYZqo+aABhDltKR+EM7bYrIjtUhPCwIsMw2g8c3EXe20r517k60bC11VEEkWVDGaLs9
+	HWX1i8w4YM+6fvFwvMv01YEKPRKY0eHrhvlALlzDE7bQCWzJ/zyRRAFnJQ38nxteLT43
+	fZNfBIjGjcEHURtq8z7+w3696UEkAetY5U/f7F+wThT8snmfEKq+jQNvQ+xSB9gCDL4J
+	kN5p+ZEZKmVnJQAyhj857c6UW7wggW07ajMnqdiHZ3n8Sh3H9fMAFKvCY1py8UOnwUwX
+	8lrw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-	:date:user-agent:mime-version:in-reply-to:content-language
-	:content-transfer-encoding;
-	bh=fDl7Up76bQvJLfU8dD9TX43UFJ7OBQx7Oz2y/M4uMy8=;
-	b=AMK5TWEgDJSyyZ2Hu8t4ETaaiBDoLkHhjyQLgUBR6BKZ9Ewse+hJGY1Q3Aiqifx7ab
-	4reEqfcSeZkiCsX9iF7V6FlNKO5+/64VGp0BBP0Xjia14CfvaI3avWBADYyMRsYklMV5
-	DlSnXeB3xYnsQ8TFDSwj18nbkszOJYEXEEGHPX7z2zwfVBNGbnuIVH1qHdFv4QQcFh0f
-	0zk6iRfbv5da/Argy5ByiUallbQySs8/NLGyNAU2gAFg4A11CX/9QJU/UBZnlzk9TNaG
-	QutUBhzlE8leiA75busWOxPNTWOh77kKxTHe1/eoor30Bnwoh8JJcIAAfqdxu+pmpExS
-	06cg==
-X-Gm-Message-State: APjAAAWbb/5K6Dtb0zwcR3XF7ie5xTstZ8fJvqPC53H8te5bJZCS+Ah7
-	S8yoKg6DVAFw9Bzmn9iEaXQAbg==
-X-Google-Smtp-Source: APXvYqx1gsIviiNn/OcE3Esle/WR34K4TF+tMiUbhyQ8cXdCdSxeuTmlaR1HKj6KoqqDHap6j0kuZA==
-X-Received: by 2002:a5d:684c:: with SMTP id o12mr3057707wrw.305.1559229571680; 
-	Thu, 30 May 2019 08:19:31 -0700 (PDT)
-Received: from [192.168.1.38] (228.red-83-52-173.dynamicip.rima-tde.net.
-	[83.52.173.228]) by smtp.gmail.com with ESMTPSA id
-	d11sm3747581wrv.72.2019.05.30.08.19.30
+	h=x-gm-message-state:to:from:subject:cc:message-id:date:user-agent
+	:mime-version:content-language:content-transfer-encoding;
+	bh=PJtLEoH5vpdQyQyomfFW/fhuefsDO+DnL8daoj0GhF0=;
+	b=IyGy9iUDY/3aU7GpSb+LvHmyxen8TjP/u87JXMm8imi+3191JNY6GqA5fnm8LyCgKi
+	5Azw8ssr3l8N07uXGO1SJgftqLpIS5HErgYHAhfxBzluhxDozKbkDYgnpcVhRkNykqKj
+	9PVTZM9/PQtqa2lUWYtof1ppHG3cvPW2gdIABWZQdw3hJFTwL1x4ju0aqeuZY57g+Df/
+	yKs4NenFGeig1/558lby+1dmmm2iibGUbuU9ImvDhXDj3XVW2A3f5hPFERqmrnByYr7M
+	XP+kZ19iNKOvGvDx3bmV/iHHhhpNE1aWRmiq9Nv5VyCBEmWQu7oup720u0U3TVn6qnKb
+	uVPA==
+X-Gm-Message-State: APjAAAXOuYWsY6xiZS1B+Cjsvwx8M8IL3rlaklKdhhOgGjVh65xBBLt5
+	HG3GQb8+O24orLTwM3shBjo=
+X-Google-Smtp-Source: APXvYqxnldVEpDhfMCQBotcGhxSOedWlHmi9GiaVKUlY1xubjghmLLzS9Jzuyw8rZr3W9zYw+v4PdA==
+X-Received: by 2002:a5d:6406:: with SMTP id z6mr3174297wru.87.1559229946955;
+	Thu, 30 May 2019 08:25:46 -0700 (PDT)
+Received: from [192.168.1.103] ([151.60.67.168])
+	by smtp.gmail.com with ESMTPSA id c12sm4036204wmb.1.2019.05.30.08.25.45
 	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-	Thu, 30 May 2019 08:19:31 -0700 (PDT)
-To: Li Qiang <liq3ea@gmail.com>
-References: <20190524063553.5339-1-philmd@redhat.com>
-	<20190524063553.5339-11-philmd@redhat.com>
-	<CAKXe6SLrVkLhe3bG-_LsJd0qKBM8NQ-jDJjat80xLkqp8cg_ug@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
-	url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <2d4d64cb-7177-df14-25ee-3eeecbbaf48d@redhat.com>
-Date: Thu, 30 May 2019 17:19:29 +0200
+	Thu, 30 May 2019 08:25:46 -0700 (PDT)
+To: qemu-devel@nongnu.org
+From: Giuseppe Musacchio <thatlemon@gmail.com>
+Message-ID: <9028dc83-82a2-fc51-b559-0020b2c0a892@gmail.com>
+Date: Thu, 30 May 2019 17:25:45 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <CAKXe6SLrVkLhe3bG-_LsJd0qKBM8NQ-jDJjat80xLkqp8cg_ug@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-	[fuzzy]
-X-Received-From: 209.85.221.65
-Subject: Re: [Qemu-devel] [PATCH 10/20] hw/i386/pc: Pass the boot_cpus value
- by argument
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2a00:1450:4864:20::441
+Subject: [Qemu-devel] [PATCH] Avoid crash in epoll_ctl with EPOLL_CTL_DEL
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -88,78 +92,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Yang Zhong <yang.zhong@intel.com>, Eduardo Habkost <ehabkost@redhat.com>,
-	Rob Bradford <robert.bradford@intel.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Marcelo Tosatti <mtosatti@redhat.com>,
-	Qemu Developers <qemu-devel@nongnu.org>,
-	Samuel Ortiz <sameo@linux.intel.com>, Paolo Bonzini <pbonzini@redhat.com>,
-	Richard Henderson <rth@twiddle.net>
+Cc: Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/24/19 5:30 PM, Li Qiang wrote:
-> Philippe Mathieu-Daudé <philmd@redhat.com <mailto:philmd@redhat.com>> 于
-> 2019年5月24日周五 下午2:50写道：
-> 
->     The boot_cpus is used once. Pass it by argument, this will
->     allow us to remove the PCMachineState argument later.
-> 
->     Suggested-by: Samuel Ortiz <sameo@linux.intel.com
->     <mailto:sameo@linux.intel.com>>
->     Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com
->     <mailto:philmd@redhat.com>>
->     ---
->      hw/i386/pc.c | 6 +++---
->      1 file changed, 3 insertions(+), 3 deletions(-)
-> 
->     diff --git a/hw/i386/pc.c b/hw/i386/pc.c
->     index 264074489b..01894b9875 100644
->     --- a/hw/i386/pc.c
->     +++ b/hw/i386/pc.c
->     @@ -928,7 +928,7 @@ static void pc_build_smbios(PCMachineState *pcms)
->          }
->      }
-> 
->     -static FWCfgState *x86_create_fw_cfg(PCMachineState *pcms)
->     +static FWCfgState *x86_create_fw_cfg(PCMachineState *pcms, uint16_t
->     boot_cpus)
-> 
-> 
-> For the patches 10/11/12, I don't think this is an elegant solution.
-> When we add more data like 'boot_cpus'
-> we need add more arguments?
+The `event` parameter is ignored by the kernel if `op` is EPOLL_CTL_DEL,
+do the same and avoid returning EFAULT if garbage is passed instead of a
+valid pointer.
 
-This fonction is called once at machine creation, so there is no
-performance penalty. To keep the code modularizable (reusable) it is an
-acceptable tradeoff :)
+Signed-off-by: Giuseppe Musacchio <thatlemon@gmail.com>
+---
+  linux-user/syscall.c | 2 +-
+  1 file changed, 1 insertion(+), 1 deletion(-)
 
-> 
->      {
->          FWCfgState *fw_cfg;
->          uint64_t *numa_fw_cfg;
->     @@ -938,7 +938,7 @@ static FWCfgState
->     *x86_create_fw_cfg(PCMachineState *pcms)
-> 
->          fw_cfg = fw_cfg_init_io_dma(FW_CFG_IO_BASE, FW_CFG_IO_BASE + 4,
->                                      &address_space_memory);
->     -    fw_cfg_add_i16(fw_cfg, FW_CFG_NB_CPUS, pcms->boot_cpus);
->     +    fw_cfg_add_i16(fw_cfg, FW_CFG_NB_CPUS, boot_cpus);
-> 
->          /* FW_CFG_MAX_CPUS is a bit confusing/problematic on x86:
->           *
->     @@ -1762,7 +1762,7 @@ void pc_memory_init(PCMachineState *pcms,
->                                              option_rom_mr,
->                                              1);
-> 
->     -    fw_cfg = x86_create_fw_cfg(pcms);
->     +    fw_cfg = x86_create_fw_cfg(pcms, pcms->boot_cpus);
-> 
->          rom_set_fw(fw_cfg);
-> 
->     -- 
->     2.20.1
-> 
-> 
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index 5e29e675e9..32d463d58d 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -11329,7 +11329,7 @@ static abi_long do_syscall1(void *cpu_env, int 
+num, abi_long arg1,
+      {
+          struct epoll_event ep;
+          struct epoll_event *epp = 0;
+-        if (arg4) {
++        if (arg2 != EPOLL_CTL_DEL && arg4) {
+              struct target_epoll_event *target_ep;
+              if (!lock_user_struct(VERIFY_READ, target_ep, arg4, 1)) {
+                  return -TARGET_EFAULT;
+-- 
+2.20.1
+
 
