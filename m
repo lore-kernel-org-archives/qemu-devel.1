@@ -2,78 +2,62 @@ Return-Path: <SRS0=r6E1=T6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F6C4C28CC0
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 11:01:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A404BC28CC0
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 11:05:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DF124257AC
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 11:01:30 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="si1MAE/9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DF124257AC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 6CF11257B7
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 11:05:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6CF11257B7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:52006 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:52038 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hWIoM-00013S-4Q
-	for qemu-devel@archiver.kernel.org; Thu, 30 May 2019 07:01:30 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:39800)
+	id 1hWIrk-0002kj-ME
+	for qemu-devel@archiver.kernel.org; Thu, 30 May 2019 07:05:00 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:40265)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <geleman@gmail.com>) id 1hWInS-0000i1-RE
-	for qemu-devel@nongnu.org; Thu, 30 May 2019 07:00:35 -0400
+	(envelope-from <kwolf@redhat.com>) id 1hWIq4-0001hk-BZ
+	for qemu-devel@nongnu.org; Thu, 30 May 2019 07:03:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <geleman@gmail.com>) id 1hWInR-0003iK-P5
-	for qemu-devel@nongnu.org; Thu, 30 May 2019 07:00:34 -0400
-Received: from mail-vs1-xe42.google.com ([2607:f8b0:4864:20::e42]:41659)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <geleman@gmail.com>) id 1hWInR-0003aQ-IP
-	for qemu-devel@nongnu.org; Thu, 30 May 2019 07:00:33 -0400
-Received: by mail-vs1-xe42.google.com with SMTP id g24so2042408vso.8
-	for <qemu-devel@nongnu.org>; Thu, 30 May 2019 04:00:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-	:cc; bh=lW5xxki/o6CsCWfxBGqWQ/PA8jgHGun1vZIu7u0tq98=;
-	b=si1MAE/9rmkLK/HQJ2z/jjQM7qkzflpQMybvfZqDqeJVsiPLlMDqSHD8/ygFq6DjC+
-	1Ptl7uAAqSojk7c1LY5c7hza5kgf823UMaP3MTAo4zW2tE0LBmEaeloqWyp9cqv8GFxq
-	RR0UFj665d0XW0oFwuv1+TnB2WQwR+cDtuuAIpz9jij52WFNoh4BAkSRs1L3y7RKWIAD
-	IbCj3lzdHoHOcqgysiioJS+a0M9dD3MDXuTed95/x4Py0cBcB2SONPHeo1Qce7mHB71o
-	qfgD7f/npYaOQXHUT7/x+fVdCgE3ev0Qu8A0dFNmZLLinrhLiw4FJbDJFA/tfiSYdeut
-	P2AA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-	:message-id:subject:to:cc;
-	bh=lW5xxki/o6CsCWfxBGqWQ/PA8jgHGun1vZIu7u0tq98=;
-	b=l5aSP0TLdpmNcwUaVxhJ9q4zDmW1zZSHCIwuroGlt8zir4gIJSnrWVPuTiKZn0dndD
-	EjVBQliIg229Zt42nDWeal/ODObPeQuFwl3cOP+UBEXw2gyGHANGCvtLfBqvdpwHXcLY
-	pqZj2lqMU1XQkR1MHXdDZ9aZqBFju3Niud1oHfpyXrNW+N8iL0SijLNy5w/jysIm5wvv
-	u3+VlSZ8nAwgKfIGAAsZQRw6bZsrYwpHQ4W5gPTJclmdbOeZbLPgMKyXlMRm4RxIlmZA
-	tWcBz92Luiy4cKmBtacLqzCm5kcpx/Q3FUym0MB5f91tsMCOBy4y8fxo3dJWcbYk1fbc
-	aQug==
-X-Gm-Message-State: APjAAAVVmjvCGdSU7jyIiBYHTaIwXyyZPDkWpqrDF0sSQQ85YFwlmvXl
-	+NnO7gF54CLHbXNn8qhgQ1PTFx3MRVjAU31havE=
-X-Google-Smtp-Source: APXvYqxVDmGPBK7D19Y3zTojrWnqX7qXfOz+j8HkVpV2q7fvDQBCR1w1vnmVD9VLtmKyXN7pBFpHU4VZxFio+YC8M0o=
-X-Received: by 2002:a67:f4c6:: with SMTP id s6mr1484754vsn.193.1559214031364; 
-	Thu, 30 May 2019 04:00:31 -0700 (PDT)
+	(envelope-from <kwolf@redhat.com>) id 1hWIq3-0003We-4f
+	for qemu-devel@nongnu.org; Thu, 30 May 2019 07:03:16 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42857)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kwolf@redhat.com>)
+	id 1hWIq0-0003Nj-4p; Thu, 30 May 2019 07:03:12 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 9EB1330C1AFE;
+	Thu, 30 May 2019 11:03:08 +0000 (UTC)
+Received: from linux.fritz.box.com (ovpn-116-119.ams2.redhat.com
+	[10.36.116.119])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 342B36FC0E;
+	Thu, 30 May 2019 11:03:05 +0000 (UTC)
+From: Kevin Wolf <kwolf@redhat.com>
+To: qemu-block@nongnu.org
+Date: Thu, 30 May 2019 13:02:51 +0200
+Message-Id: <20190530110255.16225-3-kwolf@redhat.com>
+In-Reply-To: <20190530110255.16225-1-kwolf@redhat.com>
+References: <20190530110255.16225-1-kwolf@redhat.com>
 MIME-Version: 1.0
-References: <003a01d51611$6251a2b0$26f4e810$@ru>
-In-Reply-To: <003a01d51611$6251a2b0$26f4e810$@ru>
-From: TeLeMan <geleman@gmail.com>
-Date: Thu, 30 May 2019 19:00:17 +0800
-Message-ID: <CAETRQWkhH-ZPkbLcCWE7xiY6eTeTS0Ow=wHwo=iFGp0uy5OwQA@mail.gmail.com>
-To: Pavel Dovgalyuk <dovgaluk@ispras.ru>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::e42
-Subject: Re: [Qemu-devel] i386: EFER vs 32-bit CPU
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.40]);
+	Thu, 30 May 2019 11:03:11 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PATCH v4 2/6] tests/qapi-schema: Test for good
+ feature lists in structs
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -85,43 +69,163 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: ehabkost@redhat.com, Juan Quintela <quintela@redhat.com>,
-	dgilbert@redhat.com, qemu-devel <qemu-devel@nongnu.org>,
-	Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: kwolf@redhat.com, pkrempa@redhat.com, armbru@redhat.com,
+	qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, May 29, 2019 at 7:27 PM Pavel Dovgalyuk <dovgaluk@ispras.ru> wrote:
->
-> Hello!
->
->
->
-> I found this while debugging the inconsistent saved/restored state of the virtual machine.
->
->
->
-> i386 (32 bit) emulation uses this register (in wrmsr and in MMU fault processing).
->
-> But it does not included in VMState, because "efer" field is disabled with #ifdef TARGET_X86_64
->
->
->
-> I think that efer should be saved for i386 too, but how it should be made to preserve the backward
-> compatibility?
->
-> Should we add a section for i386, which duplicates efer, or just version_id of the main VMSD should
-> be updated?
->
->
->
-> Pavel Dovgalyuk
->
->
->
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+---
+ tests/qapi-schema/qapi-schema-test.json | 39 ++++++++++++++++++++++
+ tests/test-qmp-cmds.c                   |  8 +++++
+ tests/qapi-schema/qapi-schema-test.out  | 43 +++++++++++++++++++++++++
+ tests/qapi-schema/test-qapi.py          |  4 +++
+ 4 files changed, 94 insertions(+)
 
-Nobody followed this issue 10 years ago:
+diff --git a/tests/qapi-schema/qapi-schema-test.json b/tests/qapi-schema/=
+qapi-schema-test.json
+index 0952c68734..c6d59acc3e 100644
+--- a/tests/qapi-schema/qapi-schema-test.json
++++ b/tests/qapi-schema/qapi-schema-test.json
+@@ -242,3 +242,42 @@
+   { 'foo': 'TestIfStruct',
+     'bar': { 'type': ['TestIfEnum'], 'if': 'defined(TEST_IF_EVT_BAR)' } =
+},
+   'if': 'defined(TEST_IF_EVT) && defined(TEST_IF_STRUCT)' }
++
++# test 'features' for structs
++
++{ 'struct': 'FeatureStruct0',
++  'data': { 'foo': 'int' },
++  'features': [] }
++{ 'struct': 'FeatureStruct1',
++  'data': { 'foo': 'int' },
++  'features': [ 'feature1' ] }
++{ 'struct': 'FeatureStruct2',
++  'data': { 'foo': 'int' },
++  'features': [ { 'name': 'feature1' } ] }
++{ 'struct': 'FeatureStruct3',
++  'data': { 'foo': 'int' },
++  'features': [ 'feature1', 'feature2' ] }
++{ 'struct': 'FeatureStruct4',
++  'data': { 'namespace-test': 'int' },
++  'features': [ 'namespace-test', 'int', 'name', 'if' ] }
++
++{ 'struct': 'CondFeatureStruct1',
++  'data': { 'foo': 'int' },
++  'features': [ { 'name': 'feature1', 'if': 'defined(TEST_IF_FEATURE_1)'=
+} ] }
++{ 'struct': 'CondFeatureStruct2',
++  'data': { 'foo': 'int' },
++  'features': [ { 'name': 'feature1', 'if': 'defined(TEST_IF_FEATURE_1)'=
+},
++                { 'name': 'feature2', 'if': 'defined(TEST_IF_FEATURE_2)'=
+} ] }
++{ 'struct': 'CondFeatureStruct3',
++  'data': { 'foo': 'int' },
++  'features': [ { 'name': 'feature1', 'if': [ 'defined(TEST_IF_COND_1)',
++                                              'defined(TEST_IF_COND_2)']=
+ } ] }
++{ 'command': 'test-features',
++  'data': { 'fs0': 'FeatureStruct0',
++            'fs1': 'FeatureStruct1',
++            'fs2': 'FeatureStruct2',
++            'fs3': 'FeatureStruct3',
++            'fs4': 'FeatureStruct4',
++            'cfs1': 'CondFeatureStruct1',
++            'cfs2': 'CondFeatureStruct2',
++            'cfs3': 'CondFeatureStruct3' } }
+diff --git a/tests/test-qmp-cmds.c b/tests/test-qmp-cmds.c
+index 630b1b9bac..1f738f12e2 100644
+--- a/tests/test-qmp-cmds.c
++++ b/tests/test-qmp-cmds.c
+@@ -45,6 +45,14 @@ void qmp_user_def_cmd1(UserDefOne * ud1, Error **errp)
+ {
+ }
+=20
++void qmp_test_features(FeatureStruct0 *fs0, FeatureStruct1 *fs1,
++                       FeatureStruct2 *fs2, FeatureStruct3 *fs3,
++                       FeatureStruct4 *fs4, CondFeatureStruct1 *cfs1,
++                       CondFeatureStruct2 *cfs2, CondFeatureStruct3 *cfs=
+3,
++                       Error **errp)
++{
++}
++
+ UserDefTwo *qmp_user_def_cmd2(UserDefOne *ud1a,
+                               bool has_udb1, UserDefOne *ud1b,
+                               Error **errp)
+diff --git a/tests/qapi-schema/qapi-schema-test.out b/tests/qapi-schema/q=
+api-schema-test.out
+index 77fb1e1aa9..85d510bc00 100644
+--- a/tests/qapi-schema/qapi-schema-test.out
++++ b/tests/qapi-schema/qapi-schema-test.out
+@@ -354,3 +354,46 @@ object q_obj_TestIfEvent-arg
+ event TestIfEvent q_obj_TestIfEvent-arg
+    boxed=3DFalse
+     if ['defined(TEST_IF_EVT) && defined(TEST_IF_STRUCT)']
++object FeatureStruct0
++    member foo: int optional=3DFalse
++object FeatureStruct1
++    member foo: int optional=3DFalse
++    feature feature1
++object FeatureStruct2
++    member foo: int optional=3DFalse
++    feature feature1
++object FeatureStruct3
++    member foo: int optional=3DFalse
++    feature feature1
++    feature feature2
++object FeatureStruct4
++    member namespace-test: int optional=3DFalse
++    feature namespace-test
++    feature int
++    feature name
++    feature if
++object CondFeatureStruct1
++    member foo: int optional=3DFalse
++    feature feature1
++        if ['defined(TEST_IF_FEATURE_1)']
++object CondFeatureStruct2
++    member foo: int optional=3DFalse
++    feature feature1
++        if ['defined(TEST_IF_FEATURE_1)']
++    feature feature2
++        if ['defined(TEST_IF_FEATURE_2)']
++object CondFeatureStruct3
++    member foo: int optional=3DFalse
++    feature feature1
++        if ['defined(TEST_IF_COND_1)', 'defined(TEST_IF_COND_2)']
++object q_obj_test-features-arg
++    member fs0: FeatureStruct0 optional=3DFalse
++    member fs1: FeatureStruct1 optional=3DFalse
++    member fs2: FeatureStruct2 optional=3DFalse
++    member fs3: FeatureStruct3 optional=3DFalse
++    member fs4: FeatureStruct4 optional=3DFalse
++    member cfs1: CondFeatureStruct1 optional=3DFalse
++    member cfs2: CondFeatureStruct2 optional=3DFalse
++    member cfs3: CondFeatureStruct3 optional=3DFalse
++command test-features q_obj_test-features-arg -> None
++   gen=3DTrue success_response=3DTrue boxed=3DFalse oob=3DFalse preconfi=
+g=3DFalse
+diff --git a/tests/qapi-schema/test-qapi.py b/tests/qapi-schema/test-qapi=
+.py
+index f2d6815c86..b0f770b9bd 100644
+--- a/tests/qapi-schema/test-qapi.py
++++ b/tests/qapi-schema/test-qapi.py
+@@ -49,6 +49,10 @@ class QAPISchemaTestVisitor(QAPISchemaVisitor):
+             self._print_if(m.ifcond, 8)
+         self._print_variants(variants)
+         self._print_if(ifcond)
++        if features:
++            for f in features:
++                print('    feature %s' % f.name)
++                self._print_if(f.ifcond, 8)
+=20
+     def visit_alternate_type(self, name, info, ifcond, variants):
+         print('alternate %s' % name)
+--=20
+2.20.1
 
-https://lists.gnu.org/archive/html/qemu-devel/2009-10/msg01765.html
 
