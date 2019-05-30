@@ -2,60 +2,58 @@ Return-Path: <SRS0=r6E1=T6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 05D41C28CC0
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 08:34:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D83FC28CC0
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 08:35:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CFC3C25118
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 08:34:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CFC3C25118
+	by mail.kernel.org (Postfix) with ESMTPS id 063B225118
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 08:35:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 063B225118
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:49212 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:49214 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hWGWT-0003iA-Kk
-	for qemu-devel@archiver.kernel.org; Thu, 30 May 2019 04:34:53 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:34320)
+	id 1hWGWe-0003qV-7O
+	for qemu-devel@archiver.kernel.org; Thu, 30 May 2019 04:35:04 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:34389)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1hWGUm-0002sf-AN
-	for qemu-devel@nongnu.org; Thu, 30 May 2019 04:33:10 -0400
+	(envelope-from <imammedo@redhat.com>) id 1hWGUw-0002wv-FA
+	for qemu-devel@nongnu.org; Thu, 30 May 2019 04:33:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1hWGUl-0006Sq-54
-	for qemu-devel@nongnu.org; Thu, 30 May 2019 04:33:08 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39796)
+	(envelope-from <imammedo@redhat.com>) id 1hWGUv-0006gk-7z
+	for qemu-devel@nongnu.org; Thu, 30 May 2019 04:33:18 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:20660)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1hWGUk-0006Ar-TW
-	for qemu-devel@nongnu.org; Thu, 30 May 2019 04:33:07 -0400
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1hWGUu-00066J-WF
+	for qemu-devel@nongnu.org; Thu, 30 May 2019 04:33:17 -0400
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
 	[10.5.11.22])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 1625A30B46F1
-	for <qemu-devel@nongnu.org>; Thu, 30 May 2019 08:32:50 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id D5602309703F
+	for <qemu-devel@nongnu.org>; Thu, 30 May 2019 08:32:44 +0000 (UTC)
 Received: from dell-r430-03.lab.eng.brq.redhat.com
 	(dell-r430-03.lab.eng.brq.redhat.com [10.37.153.18])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id B5D991001E86;
-	Thu, 30 May 2019 08:32:47 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 63FA410027B6;
+	Thu, 30 May 2019 08:32:40 +0000 (UTC)
 From: Igor Mammedov <imammedo@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Thu, 30 May 2019 10:33:18 +0200
-Message-Id: <1559205199-233510-3-git-send-email-imammedo@redhat.com>
-In-Reply-To: <1559205199-233510-1-git-send-email-imammedo@redhat.com>
-References: <1559205199-233510-1-git-send-email-imammedo@redhat.com>
+Date: Thu, 30 May 2019 10:33:16 +0200
+Message-Id: <1559205199-233510-1-git-send-email-imammedo@redhat.com>
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.46]);
-	Thu, 30 May 2019 08:32:50 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.43]);
+	Thu, 30 May 2019 08:32:49 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v4 2/3] numa: deprecate 'mem' parameter of
- '-numa node' option
+Subject: [Qemu-devel] [PATCH v4 0/3] numa: deprecate '-numa node,
+ mem' and default memory distribution
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -73,88 +71,68 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The parameter allows to configure fake NUMA topology where guest
-VM simulates NUMA topology but not actually getting performance
-benefits from it. The same or better results could be achieved
-using 'memdev' parameter.
-Beside of unpredictable performance, '-numa node.mem' option has
-other issues when it's used with combination of -mem-path +
-+ -mem-prealloc + memdev backends (pc-dimm), breaking binding of
-memdev backends since mem-path/mem-prealloc are global and affect
-the most of RAM allocations.
+Changes since v3:
+  - simplify series by dropping idea of showing property values in "qom-list-properties"
+    and use MachineInfo in QAPI schema instead
 
-It's possible to make memdevs and global -mem-path/mem-prealloc
-to play nicely together but that will just complicate already
-complicated code and add unobious ways it could break on 2
-different memmory allocation pathes and their combinations.
+Changes since v2:
+  - taking in account previous review, implement a way for mgmt to intospect if
+    '-numa node,mem' is supported by machine type as suggested by Daniel at
+             https://www.mail-archive.com/qemu-devel@nongnu.org/msg601220.html
+      * ammend "qom-list-properties" to show property values
+      * add "numa-mem-supported" machine property to reflect if '-numa node,mem=SZ'
+        is supported. It culd be used with '-machine none' or at runtime with
+        --preconfig before numa memory mapping are configured
+  * minor fixes to deprecation documentation mentioning "numa-mem-supported" property
 
-Instead of it, consolidate all guest RAM allocation over memdev
-which still allows to create fake NUMA configurations if desired
-and leaves one simplifyed code path to consider when it comes
-to guest RAM allocation.
+ 1) "I'm considering to deprecating -mem-path/prealloc CLI options and replacing
+them with a single memdev Machine property to allow interested users to pick
+used backend for initial RAM (fixes mixed -mem-path+hostmem backends issues)
+and as a transition step to modeling initial RAM as a Device instead of
+(ab)using MemoryRegion APIs."
+(for more details see: https://www.mail-archive.com/qemu-devel@nongnu.org/msg596314.html)
 
-To achieve desired simplification deprecate 'mem' parameter as its
-ad-hoc partitioning of initial RAM MemoryRegion can't be translated
-to memdev based backend transparently to users and in compatible
-manner (migration wise).
+However there is a couple of roadblocks on the way (s390x and numa memory handling).
+I think I finally thought out a way to hack s390x in migration compatible manner,
+but I don't see any way to do it for -numa node,mem and default RAM assignement
+to nodes. Considering both numa usecases aren't meaningfully using NUMA (aside
+guest side testing) and could be replaced with explicitly used memdev parameter,
+I'd like to propose removing these fake NUMA friends on new machine types,
+hence this deprecation. And once the last machie type that supported the option
+is removed we would be able to remove option altogether.
 
-Later down the road that will allow to consolidate means of how
-guest RAM is allocated and would permit us to clean up quite
-a bit memory allocations and numa code, leaving only 'memdev'
-implementation in place.
+As result of removing deprecated options and replacing initial RAM allocation
+with 'memdev's (1), QEMU will allocate guest RAM in consistent way, fixing mixed
+use-case and allowing boards to move towards modelling initial RAM as Device(s).
+Which in its own turn should allow to cleanup NUMA/HMP/memory accounting code
+more by dropping ad-hoc node_mem tracking and reusing memory device enumeration
+instead.
 
-Signed-off-by: Igor Mammedov <imammedo@redhat.com>
----
+Reference to previous versions:
+ * https://www.mail-archive.com/qemu-devel@nongnu.org/msg617694.html
 
-Notes:
-    v4:
-      * fix up documentation to mention where users should look
-        to check if -numa node.mem is supported
+CC: libvir-list@redhat.com
+CC: ehabkost@redhat.com
+CC: pbonzini@redhat.com
+CC: berrange@redhat.com
+CC: armbru@redhat.com
 
- numa.c               |  2 ++
- qemu-deprecated.texi | 16 ++++++++++++++++
- 2 files changed, 18 insertions(+)
+Igor Mammedov (3):
+  machine: show if CLI option '-numa node,mem' is supported in QAPI
+    schema
+  numa: deprecate 'mem' parameter of '-numa node' option
+  numa: deprecate implict memory distribution between nodes
 
-diff --git a/numa.c b/numa.c
-index 3875e1e..2205773 100644
---- a/numa.c
-+++ b/numa.c
-@@ -121,6 +121,8 @@ static void parse_numa_node(MachineState *ms, NumaNodeOptions *node,
- 
-     if (node->has_mem) {
-         numa_info[nodenr].node_mem = node->mem;
-+        warn_report("Parameter -numa node,mem is deprecated,"
-+                    " use -numa node,memdev instead");
-     }
-     if (node->has_memdev) {
-         Object *o;
-diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
-index 50292d8..eb347f5 100644
---- a/qemu-deprecated.texi
-+++ b/qemu-deprecated.texi
-@@ -82,6 +82,22 @@ The @code{-realtime mlock=on|off} argument has been replaced by the
- The ``-virtfs_synth'' argument is now deprecated. Please use ``-fsdev synth''
- and ``-device virtio-9p-...'' instead.
- 
-+@subsection -numa node,mem=@var{size} (since 4.1)
-+
-+The parameter @option{mem} of @option{-numa node} is used to assign a part of
-+guest RAM to a NUMA node. But when using it, it's impossible to manage specified
-+RAM chunk on the host side (like bind it to a host node, setting bind policy, ...),
-+so guest end-ups with the fake NUMA configuration with suboptiomal performance.
-+However since 2014 there is an alternative way to assign RAM to a NUMA node
-+using parameter @option{memdev}, which does the same as @option{mem} and adds
-+means to actualy manage node RAM on the host side. Use parameter @option{memdev}
-+with @var{memory-backend-ram} backend as an replacement for parameter @option{mem}
-+to achieve the same fake NUMA effect or a properly configured
-+@var{memory-backend-file} backend to actually benefit from NUMA configuration.
-+In future new machine versions will not accept the option but it will still
-+work with old machine types. User can check QAPI schema to see if the legacy
-+option is supported by looking at MachineInfo::numa-mem-supported property.
-+
- @section QEMU Machine Protocol (QMP) commands
- 
- @subsection block-dirty-bitmap-add "autoload" parameter (since 2.12.0)
+ include/hw/boards.h  |  3 +++
+ hw/arm/virt.c        |  1 +
+ hw/i386/pc.c         |  1 +
+ hw/ppc/spapr.c       |  1 +
+ numa.c               |  5 +++++
+ qapi/misc.json       |  5 ++++-
+ qemu-deprecated.texi | 24 ++++++++++++++++++++++++
+ vl.c                 |  1 +
+ 8 files changed, 40 insertions(+), 1 deletion(-)
+
 -- 
 2.7.4
 
