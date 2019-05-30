@@ -6,55 +6,55 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E9EEC28CC0
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 09:31:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 114D6C28CC0
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 09:32:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7BA75255AF
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 09:31:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7BA75255AF
+	by mail.kernel.org (Postfix) with ESMTPS id A0167255AF
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 09:32:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A0167255AF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:49949 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:49951 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hWHPZ-00029p-Mr
-	for qemu-devel@archiver.kernel.org; Thu, 30 May 2019 05:31:49 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:44477)
+	id 1hWHPk-0002HF-OI
+	for qemu-devel@archiver.kernel.org; Thu, 30 May 2019 05:32:00 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:44522)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1hWHNR-0000i3-20
-	for qemu-devel@nongnu.org; Thu, 30 May 2019 05:29:37 -0400
+	(envelope-from <peterx@redhat.com>) id 1hWHNb-0000o7-7b
+	for qemu-devel@nongnu.org; Thu, 30 May 2019 05:29:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1hWHNQ-0001Kd-5m
-	for qemu-devel@nongnu.org; Thu, 30 May 2019 05:29:37 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45584)
+	(envelope-from <peterx@redhat.com>) id 1hWHNa-0001Y7-6A
+	for qemu-devel@nongnu.org; Thu, 30 May 2019 05:29:47 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43230)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1hWHNQ-0001Jh-0E
-	for qemu-devel@nongnu.org; Thu, 30 May 2019 05:29:36 -0400
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1hWHNa-0001WL-1A
+	for qemu-devel@nongnu.org; Thu, 30 May 2019 05:29:46 -0400
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
 	[10.5.11.22])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 5EFA7C13070F
-	for <qemu-devel@nongnu.org>; Thu, 30 May 2019 09:29:35 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 657183680B
+	for <qemu-devel@nongnu.org>; Thu, 30 May 2019 09:29:45 +0000 (UTC)
 Received: from xz-x1.redhat.com (ovpn-12-221.pek2.redhat.com [10.72.12.221])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id E4EC51001DF6;
-	Thu, 30 May 2019 09:29:31 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 3EDBB1001DF6;
+	Thu, 30 May 2019 09:29:39 +0000 (UTC)
 From: Peter Xu <peterx@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Thu, 30 May 2019 17:29:09 +0800
-Message-Id: <20190530092919.26059-3-peterx@redhat.com>
+Date: Thu, 30 May 2019 17:29:11 +0800
+Message-Id: <20190530092919.26059-5-peterx@redhat.com>
 In-Reply-To: <20190530092919.26059-1-peterx@redhat.com>
 References: <20190530092919.26059-1-peterx@redhat.com>
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.31]);
-	Thu, 30 May 2019 09:29:35 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.30]);
+	Thu, 30 May 2019 09:29:45 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v3 02/12] migration: No need to take rcu during
- sync_dirty_bitmap
+Subject: [Qemu-devel] [PATCH v3 04/12] memory: Don't set migration bitmap
+ when without migration
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -73,60 +73,75 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-cpu_physical_memory_sync_dirty_bitmap() has one RAMBlock* as
-parameter, which means that it must be with RCU read lock held
-already.  Taking it again inside seems redundant.  Removing it.
-Instead comment on the functions about the RCU read lock.
+Similar to 9460dee4b2 ("memory: do not touch code dirty bitmap unless
+TCG is enabled", 2015-06-05) but for the migration bitmap - we can
+skip the MIGRATION bitmap update if migration not enabled.
 
 Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
 Signed-off-by: Peter Xu <peterx@redhat.com>
 ---
- include/exec/ram_addr.h | 5 +----
- migration/ram.c         | 1 +
- 2 files changed, 2 insertions(+), 4 deletions(-)
+ include/exec/memory.h   |  2 ++
+ include/exec/ram_addr.h | 12 +++++++++++-
+ memory.c                |  2 +-
+ 3 files changed, 14 insertions(+), 2 deletions(-)
 
+diff --git a/include/exec/memory.h b/include/exec/memory.h
+index e6140e8a04..f29300c54d 100644
+--- a/include/exec/memory.h
++++ b/include/exec/memory.h
+@@ -46,6 +46,8 @@
+         OBJECT_GET_CLASS(IOMMUMemoryRegionClass, (obj), \
+                          TYPE_IOMMU_MEMORY_REGION)
+ 
++extern bool global_dirty_log;
++
+ typedef struct MemoryRegionOps MemoryRegionOps;
+ typedef struct MemoryRegionMmio MemoryRegionMmio;
+ 
 diff --git a/include/exec/ram_addr.h b/include/exec/ram_addr.h
-index 139ad79390..6fc49e5db5 100644
+index 6fc49e5db5..79e70a96ee 100644
 --- a/include/exec/ram_addr.h
 +++ b/include/exec/ram_addr.h
-@@ -408,6 +408,7 @@ static inline void cpu_physical_memory_clear_dirty_range(ram_addr_t start,
- }
+@@ -348,8 +348,13 @@ static inline void cpu_physical_memory_set_dirty_lebitmap(unsigned long *bitmap,
+             if (bitmap[k]) {
+                 unsigned long temp = leul_to_cpu(bitmap[k]);
  
- 
-+/* Called with RCU critical section */
- static inline
- uint64_t cpu_physical_memory_sync_dirty_bitmap(RAMBlock *rb,
-                                                ram_addr_t start,
-@@ -431,8 +432,6 @@ uint64_t cpu_physical_memory_sync_dirty_bitmap(RAMBlock *rb,
-                                         DIRTY_MEMORY_BLOCK_SIZE);
-         unsigned long page = BIT_WORD(start >> TARGET_PAGE_BITS);
- 
--        rcu_read_lock();
--
-         src = atomic_rcu_read(
-                 &ram_list.dirty_memory[DIRTY_MEMORY_MIGRATION])->blocks;
- 
-@@ -452,8 +451,6 @@ uint64_t cpu_physical_memory_sync_dirty_bitmap(RAMBlock *rb,
-                 idx++;
-             }
-         }
--
--        rcu_read_unlock();
+-                atomic_or(&blocks[DIRTY_MEMORY_MIGRATION][idx][offset], temp);
+                 atomic_or(&blocks[DIRTY_MEMORY_VGA][idx][offset], temp);
++
++                if (global_dirty_log) {
++                    atomic_or(&blocks[DIRTY_MEMORY_MIGRATION][idx][offset],
++                              temp);
++                }
++
+                 if (tcg_enabled()) {
+                     atomic_or(&blocks[DIRTY_MEMORY_CODE][idx][offset], temp);
+                 }
+@@ -366,6 +371,11 @@ static inline void cpu_physical_memory_set_dirty_lebitmap(unsigned long *bitmap,
+         xen_hvm_modified_memory(start, pages << TARGET_PAGE_BITS);
      } else {
-         ram_addr_t offset = rb->offset;
+         uint8_t clients = tcg_enabled() ? DIRTY_CLIENTS_ALL : DIRTY_CLIENTS_NOCODE;
++
++        if (!global_dirty_log) {
++            clients &= ~(1 << DIRTY_MEMORY_MIGRATION);
++        }
++
+         /*
+          * bitmap-traveling is faster than memory-traveling (for addr...)
+          * especially when most of the memory is not dirty.
+diff --git a/memory.c b/memory.c
+index 0920c105aa..cff0ea8f40 100644
+--- a/memory.c
++++ b/memory.c
+@@ -38,7 +38,7 @@
+ static unsigned memory_region_transaction_depth;
+ static bool memory_region_update_pending;
+ static bool ioeventfd_update_pending;
+-static bool global_dirty_log = false;
++bool global_dirty_log;
  
-diff --git a/migration/ram.c b/migration/ram.c
-index 4c60869226..dc916042fb 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -1678,6 +1678,7 @@ static inline bool migration_bitmap_clear_dirty(RAMState *rs,
-     return ret;
- }
- 
-+/* Called with RCU critical section */
- static void migration_bitmap_sync_range(RAMState *rs, RAMBlock *rb,
-                                         ram_addr_t length)
- {
+ static QTAILQ_HEAD(, MemoryListener) memory_listeners
+     = QTAILQ_HEAD_INITIALIZER(memory_listeners);
 -- 
 2.17.1
 
