@@ -2,79 +2,84 @@ Return-Path: <SRS0=r6E1=T6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A93BCC28CC0
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 19:09:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 45227C28CC3
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 19:09:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6508726077
+	by mail.kernel.org (Postfix) with ESMTPS id 13D9526077
 	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 19:09:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RGnQfi8a"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6508726077
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qQuqFSp6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 13D9526077
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:58017 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:58019 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hWQQt-0007Ud-57
-	for qemu-devel@archiver.kernel.org; Thu, 30 May 2019 15:09:47 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:58858)
+	id 1hWQQu-0007Wb-4B
+	for qemu-devel@archiver.kernel.org; Thu, 30 May 2019 15:09:48 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:58884)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mrolnik@gmail.com>) id 1hWQOz-0006NN-Nl
-	for qemu-devel@nongnu.org; Thu, 30 May 2019 15:07:51 -0400
+	(envelope-from <mrolnik@gmail.com>) id 1hWQP2-0006NT-Gh
+	for qemu-devel@nongnu.org; Thu, 30 May 2019 15:07:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mrolnik@gmail.com>) id 1hWQOy-00074K-7T
-	for qemu-devel@nongnu.org; Thu, 30 May 2019 15:07:49 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:38676)
+	(envelope-from <mrolnik@gmail.com>) id 1hWQP1-00077O-Mu
+	for qemu-devel@nongnu.org; Thu, 30 May 2019 15:07:52 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:37003)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mrolnik@gmail.com>) id 1hWQOx-000732-VG
-	for qemu-devel@nongnu.org; Thu, 30 May 2019 15:07:48 -0400
-Received: by mail-wr1-x444.google.com with SMTP id d18so4897557wrs.5
-	for <qemu-devel@nongnu.org>; Thu, 30 May 2019 12:07:47 -0700 (PDT)
+	(Exim 4.71) (envelope-from <mrolnik@gmail.com>) id 1hWQP1-00076c-H6
+	for qemu-devel@nongnu.org; Thu, 30 May 2019 15:07:51 -0400
+Received: by mail-wr1-x443.google.com with SMTP id h1so4906953wro.4
+	for <qemu-devel@nongnu.org>; Thu, 30 May 2019 12:07:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=from:to:cc:subject:date:message-id;
-	bh=JkWILbyjQUBjfe8Bnjfcos2cTjqOqy1LxMC/99vfhlA=;
-	b=RGnQfi8avGTeT5onUOgPjIeyqWRCybMOVa4xCl07pu0LzCrX6DFXKtx1DCv7QNfL4l
-	xCmm1yBqexYXq6BbHUPYi3hxYiv/e+q2LyARR07B4ZUvtBwCmoSgiSUV/ZKQVZHloqIE
-	yQ1UihvBr8tk0Osi31HibWKEakoPV+8CppSBqg9t60mckxzeBH4LKTdQlQIXIE2t6vkn
-	3a7dAykWX8vic+fVirSWaS8iRDA0YorGAc3iY3Q8Prj11OApVIHzDrK4dUA7qwEuxfKW
-	yS8GVXFH2B/oUcyHjzAFLXaGQZvxEi/00ku+FO3ZpCJasQgmJonWB1fbxDKR2oQg0lLR
-	fEeg==
+	h=from:to:cc:subject:date:message-id:in-reply-to:references;
+	bh=1+7WmdBrHGx6Ha+xOFMNUexdsePyk4/I42eILCOPpxA=;
+	b=qQuqFSp6KWGHIdmdRNp9ox93m7Ya67HGS4c8/PuJNCGkTkZTHHBDyi62aRI4vZxHCg
+	MmvYqo337hUhse7279KSq3MSUTxjhlcMOnQlC0yJDwxUsd+P/xyxxSuL/X4OTGtwCROA
+	VjIjEFaSNPeQOg22/xTA+PcdvJINUlb2nhYyyOfc1XaKT2ZcoabCwSZxpEp0UhguSxZP
+	jlvRZPh5S8nEE/MrLQ1gHIiSArJEuy6omamWV9iZU/h4X9PKtPx0Mwbw3weTr/iEFRTj
+	YFFx5gwaY3F+OvObGlFKOR7VieoSYafqrkcBW8a5v8rk3MCmyELuLI6mfRrXE2aS3bFB
+	KLjA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:from:to:cc:subject:date:message-id;
-	bh=JkWILbyjQUBjfe8Bnjfcos2cTjqOqy1LxMC/99vfhlA=;
-	b=XMlGsx25aLdiRemxE8UFXLLzRxLE72eZvMvWa5Bm/i+PBItwdjrWB4KVBsvz5yl4gV
-	pjwE0HHON/OC/s3exs152/wTCBYYvZ/G61VQ8CDUIQSm6+NXJz0hLUacvzZuz5ShQ+Sv
-	wOzUGp95k4mAQ5G7aVYqzCAaNSdmn4QJjxSPpeHD4jlGebHr+4pV16AJCt5d23MWA3sF
-	TnQeY3JraWkP8tbGv0U7ttSgOXv3jy6Gp+o240jdDPX6bZgi63dTK89m5Sf9cy0exIDm
-	0murgb8Yilt/gIvtPINkZXqFX3oJAiA4cZacjzrdzgsrwbkn1cwDr0nHzqbscoWtz9qL
-	xb1A==
-X-Gm-Message-State: APjAAAWzhFGlfNrUV0hyvg0GmH2hXARB6q1V+UONUCPPsBdHgF7/SffU
-	vGkoH6l1mUFyk1wi2zybbFk0bX2kM2A=
-X-Google-Smtp-Source: APXvYqx6dY/JEfKM7wHdY3LfA5x5pf5fQAuL2hhgfyGyiblrvcNB84rXoXmugtQlrlhXXV9OmylhZw==
-X-Received: by 2002:a5d:4f0a:: with SMTP id c10mr3627057wru.180.1559243265458; 
-	Thu, 30 May 2019 12:07:45 -0700 (PDT)
+	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+	:references;
+	bh=1+7WmdBrHGx6Ha+xOFMNUexdsePyk4/I42eILCOPpxA=;
+	b=nZIUTkhiuWCEZ6ckuZGxNgrFMABSHSeRkm4JUgoiI7w6F7x0FM/Romy4PSYs7iGnxy
+	do4PBP8/J1lbeC/AjY4/I2ZFUdCfA0280x+N8IAjJNAtWlgO/N/E+jPakxej911bNiaf
+	n+TfJUPHprxzz7XrMJn86Lu18l+zVoawPEheA8SsxQ+DVVdwoUIHZdYuH80cFA5VCUvY
+	ndoJaHEgneG3xt6Tzia9WuXcLWhZHNz2++Ub/Ly2oL7qqG8EflHppk+RYxM7NCFEHrkn
+	WKwKEWH0ZMXGILS0Nx012+70p4Q6k0vwge7d1MHeKQaWD22p1PibTedUndkZrXHZsEm7
+	xSkg==
+X-Gm-Message-State: APjAAAVjk4K6ibiHwMwHrNyJRViNWG5W35t4EohVOv9mk5cWylK5xWAo
+	hHSruMWIifA/3WGZRomg1XBFKvzktAQ=
+X-Google-Smtp-Source: APXvYqzS+sHm7HG474ygEuREFQiAkVrGaeUrJaMHOCJVUqEyLlBM4SkmrHdM57qZlPWAoo8yHZqpqg==
+X-Received: by 2002:adf:ebc6:: with SMTP id v6mr3762317wrn.258.1559243270127; 
+	Thu, 30 May 2019 12:07:50 -0700 (PDT)
 Received: from localhost.localdomain (bzq-109-65-68-81.red.bezeqint.net.
 	[109.65.68.81])
-	by smtp.gmail.com with ESMTPSA id u9sm8711230wme.48.2019.05.30.12.07.44
+	by smtp.gmail.com with ESMTPSA id u9sm8711230wme.48.2019.05.30.12.07.48
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Thu, 30 May 2019 12:07:44 -0700 (PDT)
+	Thu, 30 May 2019 12:07:49 -0700 (PDT)
 From: Michael Rolnik <mrolnik@gmail.com>
 To: qemu-devel@nongnu.org
-Date: Thu, 30 May 2019 22:07:30 +0300
-Message-Id: <20190530190738.22713-1-mrolnik@gmail.com>
+Date: Thu, 30 May 2019 22:07:33 +0300
+Message-Id: <20190530190738.22713-4-mrolnik@gmail.com>
 X-Mailer: git-send-email 2.18.0
+In-Reply-To: <20190530190738.22713-1-mrolnik@gmail.com>
+References: <20190530190738.22713-1-mrolnik@gmail.com>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2a00:1450:4864:20::444
-Subject: [Qemu-devel] [PATCH RFC v20 0/8] QEMU AVR 8 bit cores
+X-Received-From: 2a00:1450:4864:20::443
+Subject: [Qemu-devel] [PATCH RFC v20 3/8] target/avr: Add mechanism to check
+ for active debugger connection
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -86,246 +91,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Michael Rolnik <mrolnik@gmail.com>, rth@twiddle.net
+Cc: Sarah Harris <S.E.Harris@kent.ac.uk>, Michael Rolnik <mrolnik@gmail.com>,
+	rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This series of patches adds 8bit AVR cores to QEMU.
-All instruction, except BREAK/DES/SPM/SPMX, are implemented. Not fully tested yet.
-However I was able to execute simple code with functions. e.g fibonacci calculation.
-This series of patches include a non real, sample board.
-No fuses support yet. PC is set to 0 at reset.
+From: Sarah Harris <S.E.Harris@kent.ac.uk>
 
-the patches include the following
-1. just a basic 8bit AVR CPU, without instruction decoding or translation
-2. CPU features which allow define the following 8bit AVR cores
-     avr1
-     avr2 avr25
-     avr3 avr31 avr35
-     avr4
-     avr5 avr51
-     avr6
-     xmega2 xmega4 xmega5 xmega6 xmega7
-3. a definition of sample machine with SRAM, FLASH and CPU which allows to execute simple code
-4. encoding for all AVR instructions
-5. interrupt handling
-6. helpers for IN, OUT, SLEEP, WBR & unsupported instructions
-7. a decoder which given an opcode decides what istruction it is
-8. translation of AVR instruction into TCG
-9. all features together
+AVR CPUs have a BREAK instruction which behaves differently depending on whether debugging is enabled.
+Since the hardware fuses that normally control this are difficult to emulate, and the BREAK instruction is useful for testing, the BREAK instruction is instead enabled/disabled depending on whether a GDB session is attached.
 
-changes since v3
-1. rampD/X/Y/Z registers are encoded as 0x00ff0000 (instead of 0x000000ff) for faster address manipulaton
-2. ffs changed to ctz32
-3. duplicate code removed at avr_cpu_do_interrupt
-4. using andc instead of not + and
-5. fixing V flag calculation in varios instructions
-6. freeing local variables in PUSH
-7. tcg_const_local_i32 -> tcg_const_i32
-8. using sextract32 instead of my implementation
-9. fixing BLD instruction
-10.xor(r) instead of 0xff - r at COM
-11.fixing MULS/MULSU not to modify inputs' content
-12.using SUB for NEG
-13.fixing tcg_gen_qemu_ld/st call in XCH
+Signed-off-by: Sarah Harris <S.E.Harris@kent.ac.uk>
+Signed-off-by: Michael Rolnik <mrolnik@gmail.com>
+---
+ gdbstub.c              | 5 +++++
+ include/exec/gdbstub.h | 4 ++++
+ 2 files changed, 9 insertions(+)
 
-changes since v4
-1. target is now defined as big endian in order to optimize push_ret/pop_ret
-2. all style warnings are fixed
-3. adding cpu_set/get_sreg functions
-4. simplifying gen_goto_tb as there is no real paging
-5. env->pc -> env->pc_w
-6. making flag dump more compact
-7. more spacing
-8. renaming CODE/DATA_INDEX -> MMU_CODE/DATA_IDX
-9. removing avr_set_feature
-10. SPL/SPH set bug fix
-11. switching stb_phys to cpu_stb_data
-12. cleaning up avr_decode
-13. saving sreg, rampD/X/Y/Z, eind in HW format (savevm)
-14. saving CPU features (savevm)
-
-changes since v5
-1. BLD bug fix
-2. decoder generator is added
-
-chages since v6
-1. using cpu_get_sreg/cpu_set_sreg in avr_cpu_gdb_read_register/avr_cpu_gdb_write_register
-2. configure the target as little endian because otherwise GDB does not work
-3. fixing and testing gen_push_ret/gen_pop_ret
-
-changes since v7
-1. folding back v6 
-2. logging at helper_outb and helper_inb are done for non supported yet registers only
-3. MAINTAINERS updated
-
-changes since v8
-1. removing hw/avr from hw/Makefile.obj as it should not be built for all
-2. making linux compilable
-3. testing on
-    a. Mac, Apple LLVM version 7.0.0
-    b. Ubuntu 12.04, gcc 4.9.2
-    c. Fedora 23, gcc 5.3.1
-4. folding back some patches
-5. translation bug fixes for ORI, CPI, XOR instructions
-6. propper handling of cpu register writes though memory
-
-changes since v9
-1. removing forward declarations of static functions
-2. disabling debug prints
-3. switching to case range instead of if else if ...
-4. LD/ST IN/OUT accessing CPU maintainder registers are not routed to any device
-5. commenst about sample board and sample IO device added
-6. sample board description is more descriptive now
-7. memory_region_allocate_system_memory is used to create RAM
-8. now there are helper_fullrd & helper_fullwr when LD/ST try to access registers
-
-changes since v10
-1. movig back fullwr & fullrd into the commit where outb and inb were introduced
-2. changing tlb_fill function signature
-3. adding empty line between functions
-4. adding newline on the last line of the file
-5. using tb->flags to generae full access ST/LD instructions
-6. fixing SBRC bug
-7. folding back 10th commit
-8. whenever a new file is introduced it's added to Makefile.objs
-
-changes since v11
-1. updating to v2.7.0-rc
-2. removing assignment to env->fullacc from gen_intermediate_code
-
-changes since v12
-1. fixing spacing
-2. fixing get/put_segment functions
-3. removing target-avr/machine.h file
-4. VMSTATE_SINGLE_TEST -> VMSTATE_SINGLE
-5. comment spelling
-6. removing hw/avr/sample_io.c
-7. char const* -> const char*
-8. proper ram allocation
-9. fixing breakpoint functionality.
-10.env1 -> env
-11.fixing avr_cpu_gdb_write_register & avr_cpu_gdb_read_register functions
-12.any cpu is removed
-12.feature bits are not saved into vm state
-
-changes since v13
-1. rebasing to v2.7.0-rc1
-
-changes since v14
-1. I made self review with git gui tool. (I did not know such a thing exists)
-2. removing all double/tripple spaces
-3. removing comment reference to SampleIO
-4. folding back some changes, so there is not deleted lines in my code
-5. moving avr configuration, within configure file, before chris
-
-changes since v15
-1. removing IO registers cache from CPU
-2. implementing CBI/SBI as read(helper_inb), modify, write(helper_outb)
-3. implementing CBIC/SBIC as read(helper_inb), check, branch
-4. adding missing tcg_temp_free_i32 for tcg_const_i32
-
-changes since v16
-1. removing EXT IO registers knoledge from CPU. These registers are accessible 
-   by LD/ST only. CPU has no interest in them
-
-changes since v17 (by Richard Henderson)
-This is Michael's v17, with some adjustments of my own:
-
-1. Fix the whitespace errors reported by "git am",
-2. Replace the utf-8 characters with normal ascii,
-3. Ditch the separate compilation of translate.c.
-
-I retained the two separate files that could be regenerated
-from the included cpugen program, but merged in translate-insn.c.
-Not that it matters, but the code generated is about 3k smaller.
-
-changes since v18
-1.  moving target-avr into target/avr
-2.  do not call cpu_exec_initfn function from avr_cpu_initfn
-3.  call cpu_exec_realizefn avr_cpu_realizefn
-4.  do not fail sample machine creation if no rom is suplied
-5.  add tcg_gen_exit_tb(0) for BS_BRANCH in gen_intermediate_code
-6.  fix a register getters/setters in machine.c
-7.  changing QEMU_ARCH_AVR from 1<<17 to 1<<18
-
-changes since v19
-1.  use decodetree.py tool to decode instructions
-2.  adding USART
-3.  adding 16 bit timer peripherals
-4.  changing QEMU_ARCH_AVR from 1<<18 to 1<<20
-5.  renaming tlb_fill to avr_cpu_tlb_fill
-
-*** BLURB HERE ***
-
-Michael Rolnik (1):
-  target-avr: Add instruction decoding
-
-Sarah Harris (7):
-  target/avr: Add outward facing interfaces and core CPU logic
-  target/avr: Add instruction helpers
-  target/avr: Add mechanism to check for active debugger connection
-  target/avr: Add instruction translation
-  target/avr: Add limited support for USART and 16 bit timer peripherals
-  target/avr: Add example board configuration
-  target/avr: Register AVR support with the rest of QEMU, the build
-    system, and the MAINTAINERS file
-
- MAINTAINERS                     |    6 +
- arch_init.c                     |    2 +
- configure                       |    6 +
- default-configs/avr-softmmu.mak |    5 +
- gdbstub.c                       |    5 +
- hw/Kconfig                      |    1 +
- hw/avr/Kconfig                  |    4 +
- hw/avr/Makefile.objs            |    1 +
- hw/avr/sample.c                 |  177 ++
- hw/char/Kconfig                 |    3 +
- hw/char/Makefile.objs           |    1 +
- hw/char/avr_usart.c             |  316 ++++
- hw/timer/Kconfig                |    3 +
- hw/timer/Makefile.objs          |    1 +
- hw/timer/avr_timer16.c          |  587 ++++++
- include/disas/dis-asm.h         |    6 +
- include/exec/gdbstub.h          |    4 +
- include/hw/char/avr_usart.h     |   99 +
- include/hw/timer/avr_timer16.h  |   99 +
- include/sysemu/arch_init.h      |    1 +
- qapi/common.json                |    2 +-
- target/avr/Makefile.objs        |   40 +
- target/avr/cpu-qom.h            |   83 +
- target/avr/cpu.c                |  571 ++++++
- target/avr/cpu.h                |  242 +++
- target/avr/gdbstub.c            |   85 +
- target/avr/helper.c             |  346 ++++
- target/avr/helper.h             |   28 +
- target/avr/insn16.decode        |  160 ++
- target/avr/insn32.decode        |   10 +
- target/avr/machine.c            |  122 ++
- target/avr/translate.c          | 2981 +++++++++++++++++++++++++++++++
- tests/machine-none-test.c       |    1 +
- 33 files changed, 5997 insertions(+), 1 deletion(-)
- create mode 100644 default-configs/avr-softmmu.mak
- create mode 100644 hw/avr/Kconfig
- create mode 100644 hw/avr/Makefile.objs
- create mode 100644 hw/avr/sample.c
- create mode 100644 hw/char/avr_usart.c
- create mode 100644 hw/timer/avr_timer16.c
- create mode 100644 include/hw/char/avr_usart.h
- create mode 100644 include/hw/timer/avr_timer16.h
- create mode 100644 target/avr/Makefile.objs
- create mode 100644 target/avr/cpu-qom.h
- create mode 100644 target/avr/cpu.c
- create mode 100644 target/avr/cpu.h
- create mode 100644 target/avr/gdbstub.c
- create mode 100644 target/avr/helper.c
- create mode 100644 target/avr/helper.h
- create mode 100644 target/avr/insn16.decode
- create mode 100644 target/avr/insn32.decode
- create mode 100644 target/avr/machine.c
- create mode 100644 target/avr/translate.c
-
+diff --git a/gdbstub.c b/gdbstub.c
+index 462f89edfe..94ee45798b 100644
+--- a/gdbstub.c
++++ b/gdbstub.c
+@@ -1793,6 +1793,11 @@ static int gdb_handle_packet(GDBState *s, const char *line_buf)
+     return RS_IDLE;
+ }
+ 
++bool gdb_is_active(void)
++{
++    return gdbserver_state != NULL;
++}
++
+ void gdb_set_stop_cpu(CPUState *cpu)
+ {
+     GDBProcess *p = gdb_get_cpu_process(gdbserver_state, cpu);
+diff --git a/include/exec/gdbstub.h b/include/exec/gdbstub.h
+index 08363969c1..d059bf5339 100644
+--- a/include/exec/gdbstub.h
++++ b/include/exec/gdbstub.h
+@@ -45,6 +45,10 @@ void gdb_do_syscall(gdb_syscall_complete_cb cb, const char *fmt, ...);
+  */
+ void gdb_do_syscallv(gdb_syscall_complete_cb cb, const char *fmt, va_list va);
+ int use_gdb_syscalls(void);
++/**
++ * gdb_is_active: return true if debugging in progress
++ */
++bool gdb_is_active(void);
+ void gdb_set_stop_cpu(CPUState *cpu);
+ void gdb_exit(CPUArchState *, int);
+ #ifdef CONFIG_USER_ONLY
 -- 
 2.18.0
 
