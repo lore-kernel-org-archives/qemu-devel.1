@@ -7,75 +7,74 @@ X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D18AC28CC0
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CC294C28CC3
 	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 10:27:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 49C41218DA
+	by mail.kernel.org (Postfix) with ESMTPS id 9E21421911
 	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 10:27:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="O56u2QoN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 49C41218DA
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="aGjwsyhp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9E21421911
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:50695 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:50697 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hWIHL-0002zt-GS
+	id 1hWIHL-000301-Py
 	for qemu-devel@archiver.kernel.org; Thu, 30 May 2019 06:27:23 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:57046)
+Received: from eggs.gnu.org ([209.51.188.92]:54389)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hWIFE-0001EL-Ez
-	for qemu-devel@nongnu.org; Thu, 30 May 2019 06:25:14 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1hWI6c-0002f6-EX
+	for qemu-devel@nongnu.org; Thu, 30 May 2019 06:16:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hWIFC-0000Gq-VK
-	for qemu-devel@nongnu.org; Thu, 30 May 2019 06:25:12 -0400
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:35939)
+	(envelope-from <alex.bennee@linaro.org>) id 1hWI6b-0006aX-Ju
+	for qemu-devel@nongnu.org; Thu, 30 May 2019 06:16:18 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:39185)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1hWIFC-00004y-NL
-	for qemu-devel@nongnu.org; Thu, 30 May 2019 06:25:10 -0400
-Received: by mail-wm1-x344.google.com with SMTP id v22so3489000wml.1
-	for <qemu-devel@nongnu.org>; Thu, 30 May 2019 03:25:03 -0700 (PDT)
+	id 1hWI6b-0006Zh-Al
+	for qemu-devel@nongnu.org; Thu, 30 May 2019 06:16:17 -0400
+Received: by mail-wr1-x442.google.com with SMTP id x4so3823154wrt.6
+	for <qemu-devel@nongnu.org>; Thu, 30 May 2019 03:16:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
 	h=from:to:cc:subject:date:message-id:in-reply-to:references
 	:mime-version:content-transfer-encoding;
-	bh=cCiZUh4L2IhfBkOcPLSzMZiMaGor1Q+neTC7jHeJYrM=;
-	b=O56u2QoNY9oNO8vrbzs8wgl/wHsOmo9d5QufBecCQecm5KrjpChZR3S2U7kgXObvfR
-	rMGKqnjBJDmXRpIpAAHwYH2npDiBOs+ww7v6n/xpA/w+k/2zHoNaVlAxe4r+vkPCpbZT
-	egN9fcGcBhC6WYjYAho8ZG25WTGl+0tDYvpAPuKlLy1WoRSKbKVWLTMgneANYbWeJaZ+
-	yEyocS1D8ySUvO9vg3e3Mr7yYZTA56aIbP++3TJxDfxW5HzAhfITUHt9PF03YUxRCh49
-	6Yum5wjefv8ofdDmhH8eU91vKlO/NpuAJ6OtN16fB3nS036HoI5C2APU4XBgsbSbF4J0
-	eyPw==
+	bh=xFNo43YFBlGXQTu9u+IzwiFY7MRIcliAhPyrexXbSw4=;
+	b=aGjwsyhpJaISYkAKaegqef18bmnET9MGNJhLPvwin5OYecXdS5j8OilhPw2iOzIN5Z
+	l6z3sNIxNC4428P1VhbmVEnBu70f5bB/ciSX8L4Y6wz+ICKS0L7wlKJfc5OrQJQteQ2R
+	pezeixNxxn4Ddorw2qlh/wm5Ua+MWZeb56xtNq4Omj+7PQC7NDzPuUpQjRxRfGLOKYPH
+	qoV4JeKcqok3eQp6JUbOMGVJdvlkW3RzUPF6IUS3CBReFtstDKmbTHYN8d6DCVutoV4e
+	FriSvQmJFWux1UiDDtBjrM3ZMB4r+Zw32f8cHmruK2UT53LhMnZIiBMZ1q21N6bYbzhm
+	I2oA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
 	:references:mime-version:content-transfer-encoding;
-	bh=cCiZUh4L2IhfBkOcPLSzMZiMaGor1Q+neTC7jHeJYrM=;
-	b=eOtnPpI4G2qVVXcF1pkmq8V2jrXskSeDDm6E/vvwSpc1Umhh2oQXqQ3BPJt07CuDKf
-	6+ih07BEiHtGz4dS9HW0vLxHkvlqMyVK6t1alU6UMiv0Ta9S+sAfvdlJ42D3zeqcp73y
-	EmEcwBuss4d+RxaYJ8O07ZXOlJ4yNVviiKjUhkKwkrff/KZu6ggW2S2qUnZ9tdK4H0YM
-	If1/dLSdmgeBDVOKXGxUzBwRp/KDblvn8JO7hus0ji99PaqM1k+6hdA3lme4hiC4vIM1
-	fzcYrQe5Bb9WNDJuBCzm1lYTtlLiqxmImmEePacxpWl6OE9cojZBVg2bEwYK6kVM+vFB
-	yPQw==
-X-Gm-Message-State: APjAAAUPppNzAiJLiIZZIP+W2zOR1RTm7jJOipj4wHFmBdTdFeiY1EkI
-	5fMyOqqxq23WuymbMisK8sGQ+Q==
-X-Google-Smtp-Source: APXvYqzqGGBcw7DFlPv+otwQ0w3RiZKgcp8+SLyvczVN3qOKx/Avebiidsp25pQR1it9FVAZvTuIWg==
-X-Received: by 2002:a05:600c:c4:: with SMTP id u4mr1809023wmm.96.1559211902477;
-	Thu, 30 May 2019 03:25:02 -0700 (PDT)
+	bh=xFNo43YFBlGXQTu9u+IzwiFY7MRIcliAhPyrexXbSw4=;
+	b=h7u91pY74T8omO6V4HSt7ZPr+dIPlxJqZ3qffRA3ew61FvlEnSGBur/mk2earbyDzM
+	QawGoqwZX57MAvAa8spmvADzCyQb51kSrP58ZA4hYyPMT495GIgmw7+SUCVCPCH3QBSj
+	KM5bbQ4g5TrFqcaGQBfb56E1qpVpuyHoayHiWCOKfA6IbOHE3xuw25dZD7j4JSsu4McX
+	/WIVEcJyd6CiZMQskN4ffO9Lm+XkQpMRVBwHJtjuoYzTmJ+PAIdPaiquq1BqXTbiVuNQ
+	rQfKp63H/rt/P6y6qbTuQPK55+4mJn+YQcAdr0ctB5Mh+XxQRU8jhNQl77WmH2KmBNO7
+	2UJw==
+X-Gm-Message-State: APjAAAUlhq9QBW7d4cHRVqfsU6sxNhhAheDQ+aCiZ4/w7brKYDjRYf5p
+	1hGiV1EGStaD9eEJ2gkx9ZhMD/eDK/U=
+X-Google-Smtp-Source: APXvYqxWfR5ka4YxVTg7uJO60eRpfrpaBivarGhzWUZ0TJGb5+N4KuC+QC3y+EXmq3pTqSIFAltonQ==
+X-Received: by 2002:a5d:504f:: with SMTP id h15mr2043355wrt.208.1559211376335; 
+	Thu, 30 May 2019 03:16:16 -0700 (PDT)
 Received: from zen.linaroharston ([81.128.185.34])
-	by smtp.gmail.com with ESMTPSA id
-	h90sm7115328wrh.15.2019.05.30.03.25.00
+	by smtp.gmail.com with ESMTPSA id j2sm2338652wrx.65.2019.05.30.03.16.07
 	(version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-	Thu, 30 May 2019 03:25:00 -0700 (PDT)
+	Thu, 30 May 2019 03:16:09 -0700 (PDT)
 Received: from zen.linaroharston. (localhost [127.0.0.1])
-	by zen.linaroharston (Postfix) with ESMTP id 351D61FF9E;
-	Thu, 30 May 2019 11:16:05 +0100 (BST)
+	by zen.linaroharston (Postfix) with ESMTP id C32581FF99;
+	Thu, 30 May 2019 11:16:04 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Thu, 30 May 2019 11:15:51 +0100
-Message-Id: <20190530101603.22254-15-alex.bennee@linaro.org>
+Date: Thu, 30 May 2019 11:15:46 +0100
+Message-Id: <20190530101603.22254-10-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190530101603.22254-1-alex.bennee@linaro.org>
 References: <20190530101603.22254-1-alex.bennee@linaro.org>
@@ -84,8 +83,9 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2a00:1450:4864:20::344
-Subject: [Qemu-devel] [PATCH  v1 14/26] tests/vm: python3 fixes
+X-Received-From: 2a00:1450:4864:20::442
+Subject: [Qemu-devel] [PATCH v1 09/26] tests/vm: Use python configured on
+ build
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -98,75 +98,49 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Fam Zheng <fam@euphon.net>,
-	=?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
 	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
-	Gerd Hoffmann <kraxel@redhat.com>
+	=?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+	Wainer dos Santos Moschetta <wainersm@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Gerd Hoffmann <kraxel@redhat.com>
+From: Wainer dos Santos Moschetta <wainersm@redhat.com>
 
-Add proper unicode handling when processing strings.
-Also need to explicitly say we want int not float.
+Changed the vm-test makefile to execute python scripts
+with the interpreter configured on build. This allows to
+run vm-test targets properly in Linux distros with Python 3
+only support.
 
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-Id: <20190520124716.30472-3-kraxel@redhat.com>
-[AJB: fix conflicts with tests/vm: Port basevm to Python 3]
+Signed-off-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
+Message-Id: <20190329210804.22121-2-wainersm@redhat.com>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- tests/vm/basevm.py | 11 ++++++-----
- 1 file changed, 6 insertions(+), 5 deletions(-)
+ tests/vm/Makefile.include | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/tests/vm/basevm.py b/tests/vm/basevm.py
-index 083befce9f5..4847549592d 100755
---- a/tests/vm/basevm.py
-+++ b/tests/vm/basevm.py
-@@ -73,7 +73,7 @@ class BaseVM(object):
-             "-vnc", "127.0.0.1:0,to=20",
-             "-serial", "file:%s" % os.path.join(self._tmpdir, "serial.out")]
-         if vcpus and vcpus > 1:
--            self._args += ["-smp", str(vcpus)]
-+            self._args += ["-smp", "%d" % vcpus]
-         if kvm_available(self.arch):
-             self._args += ["-enable-kvm"]
-         else:
-@@ -85,12 +85,13 @@ class BaseVM(object):
-             if not sha256sum:
-                 return True
-             checksum = subprocess.check_output(["sha256sum", fname]).split()[0]
--            return sha256sum == checksum.decode()
-+            return sha256sum == checksum.decode("utf-8")
- 
-         cache_dir = os.path.expanduser("~/.cache/qemu-vm/download")
-         if not os.path.exists(cache_dir):
-             os.makedirs(cache_dir)
--        fname = os.path.join(cache_dir, hashlib.sha1(url.encode()).hexdigest())
-+        fname = os.path.join(cache_dir,
-+                             hashlib.sha1(url.encode("utf-8")).hexdigest())
-         if os.path.exists(fname) and check_sha256sum(fname):
-             return fname
-         logging.debug("Downloading %s to %s...", url, fname)
-@@ -134,7 +135,7 @@ class BaseVM(object):
-         raise NotImplementedError
- 
-     def add_source_dir(self, src_dir):
--        name = "data-" + hashlib.sha1(src_dir.encode()).hexdigest()[:5]
-+        name = "data-" + hashlib.sha1(src_dir.encode("utf-8")).hexdigest()[:5]
-         tarfile = os.path.join(self._tmpdir, name + ".tar")
-         logging.debug("Creating archive %s for src_dir dir: %s", tarfile, src_dir)
-         subprocess.check_call(["./scripts/archive-source.sh", tarfile],
-@@ -256,7 +257,7 @@ def main(vmcls):
-             vm.add_source_dir(args.build_qemu)
-             cmd = [vm.BUILD_SCRIPT.format(
-                    configure_opts = " ".join(argv),
--                   jobs=args.jobs,
-+                   jobs=int(args.jobs),
-                    target=args.build_target,
-                    verbose = "V=1" if args.verbose else "")]
-         else:
+diff --git a/tests/vm/Makefile.include b/tests/vm/Makefile.include
+index 992d823f6bd..6f82676306d 100644
+--- a/tests/vm/Makefile.include
++++ b/tests/vm/Makefile.include
+@@ -35,7 +35,7 @@ $(IMAGES_DIR)/%.img:	$(SRC_PATH)/tests/vm/% \
+ 			$(SRC_PATH)/tests/vm/Makefile.include
+ 	@mkdir -p $(IMAGES_DIR)
+ 	$(call quiet-command, \
+-		$< \
++		$(PYTHON) $< \
+ 		$(if $(V)$(DEBUG), --debug) \
+ 		--image "$@" \
+ 		--force \
+@@ -46,7 +46,7 @@ $(IMAGES_DIR)/%.img:	$(SRC_PATH)/tests/vm/% \
+ # Build in VM $(IMAGE)
+ vm-build-%: $(IMAGES_DIR)/%.img
+ 	$(call quiet-command, \
+-		$(SRC_PATH)/tests/vm/$* \
++		$(PYTHON) $(SRC_PATH)/tests/vm/$* \
+ 		$(if $(V)$(DEBUG), --debug) \
+ 		$(if $(DEBUG), --interactive) \
+ 		$(if $(J),--jobs $(J)) \
 -- 
 2.20.1
 
