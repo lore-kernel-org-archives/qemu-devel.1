@@ -2,62 +2,60 @@ Return-Path: <SRS0=r6E1=T6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E09CC28CC0
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 07:34:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D028AC28CC0
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 07:34:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CE40724600
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 07:34:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CE40724600
+	by mail.kernel.org (Postfix) with ESMTPS id A94CB24600
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 07:34:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A94CB24600
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:48525 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:48527 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hWFa4-00041O-Im
-	for qemu-devel@archiver.kernel.org; Thu, 30 May 2019 03:34:32 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:51952)
+	id 1hWFaD-00046W-O9
+	for qemu-devel@archiver.kernel.org; Thu, 30 May 2019 03:34:41 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:51914)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1hWFY9-0002fh-NW
-	for qemu-devel@nongnu.org; Thu, 30 May 2019 03:32:34 -0400
+	(envelope-from <kwolf@redhat.com>) id 1hWFY6-0002bB-Ny
+	for qemu-devel@nongnu.org; Thu, 30 May 2019 03:32:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1hWFY8-0001Pi-EP
-	for qemu-devel@nongnu.org; Thu, 30 May 2019 03:32:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50670)
+	(envelope-from <kwolf@redhat.com>) id 1hWFY5-0001LJ-HW
+	for qemu-devel@nongnu.org; Thu, 30 May 2019 03:32:30 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35718)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <kwolf@redhat.com>)
-	id 1hWFY5-0001Ky-CA; Thu, 30 May 2019 03:32:29 -0400
+	id 1hWFY2-0001JD-QE; Thu, 30 May 2019 03:32:26 -0400
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
 	[10.5.11.15])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 9AD2B30821AE;
-	Thu, 30 May 2019 07:32:28 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 23F5F83F44;
+	Thu, 30 May 2019 07:32:25 +0000 (UTC)
 Received: from linux.fritz.box.com (ovpn-116-119.ams2.redhat.com
 	[10.36.116.119])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 38A08983A;
-	Thu, 30 May 2019 07:32:27 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 66CBE5D704;
+	Thu, 30 May 2019 07:32:21 +0000 (UTC)
 From: Kevin Wolf <kwolf@redhat.com>
 To: qemu-block@nongnu.org
-Date: Thu, 30 May 2019 09:32:01 +0200
-Message-Id: <20190530073205.5293-3-kwolf@redhat.com>
-In-Reply-To: <20190530073205.5293-1-kwolf@redhat.com>
-References: <20190530073205.5293-1-kwolf@redhat.com>
+Date: Thu, 30 May 2019 09:31:59 +0200
+Message-Id: <20190530073205.5293-1-kwolf@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.47]);
-	Thu, 30 May 2019 07:32:28 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.27]);
+	Thu, 30 May 2019 07:32:25 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v3 2/6] tests/qapi-schema: Test for good
- feature lists in structs
+Subject: [Qemu-devel] [PATCH v3 0/6] file-posix: Add dynamic-auto-read-only
+ QAPI feature
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -75,135 +73,101 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
----
- tests/qapi-schema/qapi-schema-test.json | 39 ++++++++++++++++++++++
- tests/qapi-schema/qapi-schema-test.out  | 43 +++++++++++++++++++++++++
- tests/qapi-schema/test-qapi.py          |  4 +++
- 3 files changed, 86 insertions(+)
+This series adds optional feature lists to struct definitions in the
+QAPI schema and makes use of them to advertise the new behaviour of
+auto-read-only=3Don in file-posix.
 
-diff --git a/tests/qapi-schema/qapi-schema-test.json b/tests/qapi-schema/=
-qapi-schema-test.json
-index 0952c68734..c6d59acc3e 100644
---- a/tests/qapi-schema/qapi-schema-test.json
-+++ b/tests/qapi-schema/qapi-schema-test.json
-@@ -242,3 +242,42 @@
-   { 'foo': 'TestIfStruct',
-     'bar': { 'type': ['TestIfEnum'], 'if': 'defined(TEST_IF_EVT_BAR)' } =
-},
-   'if': 'defined(TEST_IF_EVT) && defined(TEST_IF_STRUCT)' }
-+
-+# test 'features' for structs
-+
-+{ 'struct': 'FeatureStruct0',
-+  'data': { 'foo': 'int' },
-+  'features': [] }
-+{ 'struct': 'FeatureStruct1',
-+  'data': { 'foo': 'int' },
-+  'features': [ 'feature1' ] }
-+{ 'struct': 'FeatureStruct2',
-+  'data': { 'foo': 'int' },
-+  'features': [ { 'name': 'feature1' } ] }
-+{ 'struct': 'FeatureStruct3',
-+  'data': { 'foo': 'int' },
-+  'features': [ 'feature1', 'feature2' ] }
-+{ 'struct': 'FeatureStruct4',
-+  'data': { 'namespace-test': 'int' },
-+  'features': [ 'namespace-test', 'int', 'name', 'if' ] }
-+
-+{ 'struct': 'CondFeatureStruct1',
-+  'data': { 'foo': 'int' },
-+  'features': [ { 'name': 'feature1', 'if': 'defined(TEST_IF_FEATURE_1)'=
-} ] }
-+{ 'struct': 'CondFeatureStruct2',
-+  'data': { 'foo': 'int' },
-+  'features': [ { 'name': 'feature1', 'if': 'defined(TEST_IF_FEATURE_1)'=
-},
-+                { 'name': 'feature2', 'if': 'defined(TEST_IF_FEATURE_2)'=
-} ] }
-+{ 'struct': 'CondFeatureStruct3',
-+  'data': { 'foo': 'int' },
-+  'features': [ { 'name': 'feature1', 'if': [ 'defined(TEST_IF_COND_1)',
-+                                              'defined(TEST_IF_COND_2)']=
- } ] }
-+{ 'command': 'test-features',
-+  'data': { 'fs0': 'FeatureStruct0',
-+            'fs1': 'FeatureStruct1',
-+            'fs2': 'FeatureStruct2',
-+            'fs3': 'FeatureStruct3',
-+            'fs4': 'FeatureStruct4',
-+            'cfs1': 'CondFeatureStruct1',
-+            'cfs2': 'CondFeatureStruct2',
-+            'cfs3': 'CondFeatureStruct3' } }
-diff --git a/tests/qapi-schema/qapi-schema-test.out b/tests/qapi-schema/q=
-api-schema-test.out
-index 77fb1e1aa9..85d510bc00 100644
---- a/tests/qapi-schema/qapi-schema-test.out
-+++ b/tests/qapi-schema/qapi-schema-test.out
-@@ -354,3 +354,46 @@ object q_obj_TestIfEvent-arg
- event TestIfEvent q_obj_TestIfEvent-arg
-    boxed=3DFalse
-     if ['defined(TEST_IF_EVT) && defined(TEST_IF_STRUCT)']
-+object FeatureStruct0
-+    member foo: int optional=3DFalse
-+object FeatureStruct1
-+    member foo: int optional=3DFalse
-+    feature feature1
-+object FeatureStruct2
-+    member foo: int optional=3DFalse
-+    feature feature1
-+object FeatureStruct3
-+    member foo: int optional=3DFalse
-+    feature feature1
-+    feature feature2
-+object FeatureStruct4
-+    member namespace-test: int optional=3DFalse
-+    feature namespace-test
-+    feature int
-+    feature name
-+    feature if
-+object CondFeatureStruct1
-+    member foo: int optional=3DFalse
-+    feature feature1
-+        if ['defined(TEST_IF_FEATURE_1)']
-+object CondFeatureStruct2
-+    member foo: int optional=3DFalse
-+    feature feature1
-+        if ['defined(TEST_IF_FEATURE_1)']
-+    feature feature2
-+        if ['defined(TEST_IF_FEATURE_2)']
-+object CondFeatureStruct3
-+    member foo: int optional=3DFalse
-+    feature feature1
-+        if ['defined(TEST_IF_COND_1)', 'defined(TEST_IF_COND_2)']
-+object q_obj_test-features-arg
-+    member fs0: FeatureStruct0 optional=3DFalse
-+    member fs1: FeatureStruct1 optional=3DFalse
-+    member fs2: FeatureStruct2 optional=3DFalse
-+    member fs3: FeatureStruct3 optional=3DFalse
-+    member fs4: FeatureStruct4 optional=3DFalse
-+    member cfs1: CondFeatureStruct1 optional=3DFalse
-+    member cfs2: CondFeatureStruct2 optional=3DFalse
-+    member cfs3: CondFeatureStruct3 optional=3DFalse
-+command test-features q_obj_test-features-arg -> None
-+   gen=3DTrue success_response=3DTrue boxed=3DFalse oob=3DFalse preconfi=
-g=3DFalse
-diff --git a/tests/qapi-schema/test-qapi.py b/tests/qapi-schema/test-qapi=
-.py
-index f2d6815c86..b0f770b9bd 100644
---- a/tests/qapi-schema/test-qapi.py
-+++ b/tests/qapi-schema/test-qapi.py
-@@ -49,6 +49,10 @@ class QAPISchemaTestVisitor(QAPISchemaVisitor):
-             self._print_if(m.ifcond, 8)
-         self._print_variants(variants)
-         self._print_if(ifcond)
-+        if features:
-+            for f in features:
-+                print('    feature %s' % f.name)
-+                self._print_if(f.ifcond, 8)
-=20
-     def visit_alternate_type(self, name, info, ifcond, variants):
-         print('alternate %s' % name)
+v3:
+- Added a command using the structs types to the positive test case
+- Renamed QAPIDoc.SymbolPart to QAPIDoc.DocPart
+- Applied requested comment changes
+- Style fixes to avoid adding pycodestyle-3 complaints
+- More stylistic changes to match Markus' taste better
+
+v2:
+- Check that features have well-formed names instead of just checking
+  that they are strings
+- Use QAPISchemaFeature objects instead of dicts
+- Catch duplicate feature names (and test that a feature name doesn't
+  conflict with an object member)
+- Added patch 4 and 5 to add rudimentary support for features to
+  QAPIDoc so it doesn't complain about the documentation format
+  suggested by Markus. Used that format in the documentation of
+  dynamic-auto-read-only.
+
+
+Kevin Wolf (6):
+  qapi: Add feature flags to struct types
+  tests/qapi-schema: Test for good feature lists in structs
+  tests/qapi-schema: Error case tests for features in structs
+  qapi: Disentangle QAPIDoc code
+  qapi: Allow documentation for features
+  file-posix: Add dynamic-auto-read-only QAPI feature
+
+ qapi/block-core.json                          |  13 +-
+ qapi/introspect.json                          |   6 +-
+ tests/qapi-schema/features-bad-type.json      |   3 +
+ .../qapi-schema/features-duplicate-name.json  |   3 +
+ tests/qapi-schema/features-missing-name.json  |   3 +
+ tests/qapi-schema/features-name-bad-type.json |   3 +
+ tests/qapi-schema/features-no-list.json       |   3 +
+ tests/qapi-schema/features-unknown-key.json   |   3 +
+ tests/qapi-schema/qapi-schema-test.json       |  39 +++
+ docs/devel/qapi-code-gen.txt                  |  38 +++
+ scripts/qapi/common.py                        | 228 +++++++++++++++---
+ scripts/qapi/doc.py                           |  15 +-
+ scripts/qapi/introspect.py                    |   6 +-
+ scripts/qapi/types.py                         |   3 +-
+ scripts/qapi/visit.py                         |   3 +-
+ tests/Makefile.include                        |   6 +
+ tests/qapi-schema/double-type.err             |   2 +-
+ tests/qapi-schema/features-bad-type.err       |   1 +
+ tests/qapi-schema/features-bad-type.exit      |   1 +
+ tests/qapi-schema/features-bad-type.out       |   0
+ tests/qapi-schema/features-duplicate-name.err |   1 +
+ .../qapi-schema/features-duplicate-name.exit  |   1 +
+ tests/qapi-schema/features-duplicate-name.out |   0
+ tests/qapi-schema/features-missing-name.err   |   1 +
+ tests/qapi-schema/features-missing-name.exit  |   1 +
+ tests/qapi-schema/features-missing-name.out   |   0
+ tests/qapi-schema/features-name-bad-type.err  |   1 +
+ tests/qapi-schema/features-name-bad-type.exit |   1 +
+ tests/qapi-schema/features-name-bad-type.out  |   0
+ tests/qapi-schema/features-no-list.err        |   1 +
+ tests/qapi-schema/features-no-list.exit       |   1 +
+ tests/qapi-schema/features-no-list.out        |   0
+ tests/qapi-schema/features-unknown-key.err    |   2 +
+ tests/qapi-schema/features-unknown-key.exit   |   1 +
+ tests/qapi-schema/features-unknown-key.out    |   0
+ tests/qapi-schema/qapi-schema-test.out        |  43 ++++
+ tests/qapi-schema/test-qapi.py                |   7 +-
+ tests/qapi-schema/unknown-expr-key.err        |   2 +-
+ 38 files changed, 395 insertions(+), 47 deletions(-)
+ create mode 100644 tests/qapi-schema/features-bad-type.json
+ create mode 100644 tests/qapi-schema/features-duplicate-name.json
+ create mode 100644 tests/qapi-schema/features-missing-name.json
+ create mode 100644 tests/qapi-schema/features-name-bad-type.json
+ create mode 100644 tests/qapi-schema/features-no-list.json
+ create mode 100644 tests/qapi-schema/features-unknown-key.json
+ create mode 100644 tests/qapi-schema/features-bad-type.err
+ create mode 100644 tests/qapi-schema/features-bad-type.exit
+ create mode 100644 tests/qapi-schema/features-bad-type.out
+ create mode 100644 tests/qapi-schema/features-duplicate-name.err
+ create mode 100644 tests/qapi-schema/features-duplicate-name.exit
+ create mode 100644 tests/qapi-schema/features-duplicate-name.out
+ create mode 100644 tests/qapi-schema/features-missing-name.err
+ create mode 100644 tests/qapi-schema/features-missing-name.exit
+ create mode 100644 tests/qapi-schema/features-missing-name.out
+ create mode 100644 tests/qapi-schema/features-name-bad-type.err
+ create mode 100644 tests/qapi-schema/features-name-bad-type.exit
+ create mode 100644 tests/qapi-schema/features-name-bad-type.out
+ create mode 100644 tests/qapi-schema/features-no-list.err
+ create mode 100644 tests/qapi-schema/features-no-list.exit
+ create mode 100644 tests/qapi-schema/features-no-list.out
+ create mode 100644 tests/qapi-schema/features-unknown-key.err
+ create mode 100644 tests/qapi-schema/features-unknown-key.exit
+ create mode 100644 tests/qapi-schema/features-unknown-key.out
+
 --=20
 2.20.1
 
