@@ -2,64 +2,77 @@ Return-Path: <SRS0=r6E1=T6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	T_HK_NAME_DR,USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 16AC0C28CC0
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 13:57:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9AE5BC28CC2
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 14:08:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8FFD125A00
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 13:57:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8FFD125A00
+	by mail.kernel.org (Postfix) with ESMTPS id 776A225A17
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 14:08:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 776A225A17
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:54445 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:54589 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hWLYy-0005UR-OT
-	for qemu-devel@archiver.kernel.org; Thu, 30 May 2019 09:57:48 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:44040)
+	id 1hWLjT-0008A4-FL
+	for qemu-devel@archiver.kernel.org; Thu, 30 May 2019 10:08:39 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:46799)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1hWLV4-0002Sp-GT
-	for qemu-devel@nongnu.org; Thu, 30 May 2019 09:53:47 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1hWLiI-0007aU-AH
+	for qemu-devel@nongnu.org; Thu, 30 May 2019 10:07:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1hWLV0-0007pb-Lv
-	for qemu-devel@nongnu.org; Thu, 30 May 2019 09:53:43 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43486)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hWLUz-0007nl-Of
-	for qemu-devel@nongnu.org; Thu, 30 May 2019 09:53:41 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
-	[10.5.11.22])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C85ED9FFC0
-	for <qemu-devel@nongnu.org>; Thu, 30 May 2019 13:53:37 +0000 (UTC)
-Received: from work-vm (ovpn-117-91.ams2.redhat.com [10.36.117.91])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 9DE041009976;
-	Thu, 30 May 2019 13:53:34 +0000 (UTC)
-Date: Thu, 30 May 2019 14:53:30 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Peter Xu <peterx@redhat.com>
-Message-ID: <20190530135329.GG2823@work-vm>
-References: <20190530092919.26059-1-peterx@redhat.com>
-	<20190530092919.26059-10-peterx@redhat.com>
+	(envelope-from <pbonzini@redhat.com>) id 1hWLiH-0008QJ-Bm
+	for qemu-devel@nongnu.org; Thu, 30 May 2019 10:07:26 -0400
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:44158)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hWLiH-0008PU-5E
+	for qemu-devel@nongnu.org; Thu, 30 May 2019 10:07:25 -0400
+Received: by mail-wr1-f67.google.com with SMTP id w13so4287459wru.11
+	for <qemu-devel@nongnu.org>; Thu, 30 May 2019 07:07:25 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+	:user-agent:mime-version:in-reply-to:content-language
+	:content-transfer-encoding;
+	bh=ZpMjqyCqZkPrjQeVY3cuelwz++9CMifqrFZNCVg+YCY=;
+	b=o8y3NGcrAyL2qBnHXUqGWO2wano6bEW36AivHIHC+2vJ4R2yXMheulgHWnhHm7kUXy
+	w3UCRIpe6PSR3D/QyX5kxS8FPstIFuOEOqYtyYg4bYmiPJaBUMVp4JrP4tv79t6z0S0m
+	0gzZ/CnmJOe1Gc7qfWbKAQD4Iqqg1+AyIJZyjU6ugCAz46240BiG72UlauLUap66E1xa
+	HfxSfYP1wKA5JzECVOW8T0fZvou92ml8VEj4NOcXfgB1FauXeDbp192wbA6VFpHGgqCF
+	V3pp0ZefhKGtJs4p2DRHUxoAv4jEB87e1+FvnPZ9fRJokbtx3uuT4tb7NLA1Xt3SncNi
+	Hybg==
+X-Gm-Message-State: APjAAAUVRunzUlnWyKtiInhf/zIua8AFdWYnatiMsNqNAAbqSl9fGkXL
+	38RKWaCPKvnKWK5dE4QVmfad7A==
+X-Google-Smtp-Source: APXvYqzIFu3RaJZALmkL2Je9ENDd3zTdhqTpv2516ZzbGqs92GqLfFW4khEGKM8pnZgOD/GZivImuA==
+X-Received: by 2002:adf:ce11:: with SMTP id p17mr2758900wrn.58.1559225243958; 
+	Thu, 30 May 2019 07:07:23 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:f91e:ffe0:9205:3b26?
+	([2001:b07:6468:f312:f91e:ffe0:9205:3b26])
+	by smtp.gmail.com with ESMTPSA id n5sm3394558wrj.27.2019.05.30.07.07.22
+	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+	Thu, 30 May 2019 07:07:23 -0700 (PDT)
+To: Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+References: <20190527092319.15844-1-stefanha@redhat.com>
+	<20190530084214.GA4890@linux.fritz.box>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <2cbb60cd-beba-52bf-71d0-bc3cfe756a59@redhat.com>
+Date: Thu, 30 May 2019 16:07:21 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190530092919.26059-10-peterx@redhat.com>
-User-Agent: Mutt/1.11.4 (2019-03-13)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.39]);
-	Thu, 30 May 2019 13:53:37 +0000 (UTC)
+In-Reply-To: <20190530084214.GA4890@linux.fritz.box>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v3 09/12] kvm: Persistent per kvmslot dirty
- bitmap
+	[fuzzy]
+X-Received-From: 209.85.221.67
+Subject: Re: [Qemu-devel] [PATCH] block/linux-aio: explictly clear laiocb->co
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -71,137 +84,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
-	qemu-devel@nongnu.org, Juan Quintela <quintela@redhat.com>
+Cc: Max Reitz <mreitz@redhat.com>, Julia Suvorova <jusual@mail.ru>,
+	qemu-devel@nongnu.org, qemu-block@nongnu.org,
+	Aarushi Mehta <mehta.aaru20@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Peter Xu (peterx@redhat.com) wrote:
-> When synchronizing dirty bitmap from kernel KVM we do it in a
-> per-kvmslot fashion and we allocate the userspace bitmap for each of
-> the ioctl.  This patch instead make the bitmap cache be persistent
-> then we don't need to g_malloc0() every time.
+On 30/05/19 10:42, Kevin Wolf wrote:
+> Am 27.05.2019 um 11:23 hat Stefan Hajnoczi geschrieben:
+>> qemu_aio_get() does not zero allocated memory.  Explicitly initialize
+>> laiocb->co to prevent an uninitialized memory access in
+>> qemu_laio_process_completion().
+>>
+>> Note that this bug has never manifested itself.  I guess we're lucky!
+>>
+>> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 > 
-> More importantly, the cached per-kvmslot dirty bitmap will be further
-> used when we want to add support for the KVM_CLEAR_DIRTY_LOG and this
-> cached bitmap will be used to guarantee we won't clear any unknown
-> dirty bits otherwise that can be a severe data loss issue for
-> migration code.
+> That the bug never manifested itself might be because it's in an unused
+> function. How about we finally just remove the unused callback-based
+> laio_submit() from the code?
 > 
-> Signed-off-by: Peter Xu <peterx@redhat.com>
+> At the time when I converted linux-aio to coroutines, someone (maybe
+> Paolo?) insisted that we keep the old interface because we might add a
+> new user sometime with possible shortcuts that bypass the whole coroutine
+> path, but it hasn't happened and I think we've moved even further in the
+> opposite direction since then.
 
-Is there no way to make this get allocated the first time it's needed?
-I'm thinking here of the VM most of the time not being migrated so we're
-allocating this structure for no benefit.
+Yes, I suppose it's time.  Spending time fixing bugs in dead code is
+always a sign that it's time. :)
 
-Dave
-
-> ---
->  accel/kvm/kvm-all.c      | 39 +++++++++++++++++++++------------------
->  include/sysemu/kvm_int.h |  2 ++
->  2 files changed, 23 insertions(+), 18 deletions(-)
-> 
-> diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-> index b686531586..334c610918 100644
-> --- a/accel/kvm/kvm-all.c
-> +++ b/accel/kvm/kvm-all.c
-> @@ -497,31 +497,14 @@ static int kvm_physical_sync_dirty_bitmap(KVMMemoryListener *kml,
->              return 0;
->          }
->  
-> -        /* XXX bad kernel interface alert
-> -         * For dirty bitmap, kernel allocates array of size aligned to
-> -         * bits-per-long.  But for case when the kernel is 64bits and
-> -         * the userspace is 32bits, userspace can't align to the same
-> -         * bits-per-long, since sizeof(long) is different between kernel
-> -         * and user space.  This way, userspace will provide buffer which
-> -         * may be 4 bytes less than the kernel will use, resulting in
-> -         * userspace memory corruption (which is not detectable by valgrind
-> -         * too, in most cases).
-> -         * So for now, let's align to 64 instead of HOST_LONG_BITS here, in
-> -         * a hope that sizeof(long) won't become >8 any time soon.
-> -         */
-> -        size = ALIGN(((mem->memory_size) >> TARGET_PAGE_BITS),
-> -                     /*HOST_LONG_BITS*/ 64) / 8;
-> -        d.dirty_bitmap = g_malloc0(size);
-> -
-> +        d.dirty_bitmap = mem->dirty_bmap;
->          d.slot = mem->slot | (kml->as_id << 16);
->          if (kvm_vm_ioctl(s, KVM_GET_DIRTY_LOG, &d) == -1) {
->              DPRINTF("ioctl failed %d\n", errno);
-> -            g_free(d.dirty_bitmap);
->              return -1;
->          }
->  
->          kvm_get_dirty_pages_log_range(section, d.dirty_bitmap);
-> -        g_free(d.dirty_bitmap);
->      }
->  
->      return 0;
-> @@ -765,6 +748,7 @@ static void kvm_set_phys_mem(KVMMemoryListener *kml,
->      MemoryRegion *mr = section->mr;
->      bool writeable = !mr->readonly && !mr->rom_device;
->      hwaddr start_addr, size;
-> +    unsigned long bmap_size;
->      void *ram;
->  
->      if (!memory_region_is_ram(mr)) {
-> @@ -796,6 +780,8 @@ static void kvm_set_phys_mem(KVMMemoryListener *kml,
->          }
->  
->          /* unregister the slot */
-> +        g_free(mem->dirty_bmap);
-> +        mem->dirty_bmap = NULL;
->          mem->memory_size = 0;
->          mem->flags = 0;
->          err = kvm_set_user_memory_region(kml, mem, false);
-> @@ -807,12 +793,29 @@ static void kvm_set_phys_mem(KVMMemoryListener *kml,
->          return;
->      }
->  
-> +    /*
-> +     * XXX bad kernel interface alert For dirty bitmap, kernel
-> +     * allocates array of size aligned to bits-per-long.  But for case
-> +     * when the kernel is 64bits and the userspace is 32bits,
-> +     * userspace can't align to the same bits-per-long, since
-> +     * sizeof(long) is different between kernel and user space.  This
-> +     * way, userspace will provide buffer which may be 4 bytes less
-> +     * than the kernel will use, resulting in userspace memory
-> +     * corruption (which is not detectable by valgrind too, in most
-> +     * cases).  So for now, let's align to 64 instead of
-> +     * HOST_LONG_BITS here, in a hope that sizeof(long) won't become
-> +     * >8 any time soon.
-> +     */
-> +    bmap_size = ALIGN((size >> TARGET_PAGE_BITS),
-> +                      /*HOST_LONG_BITS*/ 64) / 8;
-> +
->      /* register the new slot */
->      mem = kvm_alloc_slot(kml);
->      mem->memory_size = size;
->      mem->start_addr = start_addr;
->      mem->ram = ram;
->      mem->flags = kvm_mem_flags(mr);
-> +    mem->dirty_bmap = g_malloc0(bmap_size);
->  
->      err = kvm_set_user_memory_region(kml, mem, true);
->      if (err) {
-> diff --git a/include/sysemu/kvm_int.h b/include/sysemu/kvm_int.h
-> index f838412491..687a2ee423 100644
-> --- a/include/sysemu/kvm_int.h
-> +++ b/include/sysemu/kvm_int.h
-> @@ -21,6 +21,8 @@ typedef struct KVMSlot
->      int slot;
->      int flags;
->      int old_flags;
-> +    /* Dirty bitmap cache for the slot */
-> +    unsigned long *dirty_bmap;
->  } KVMSlot;
->  
->  typedef struct KVMMemoryListener {
-> -- 
-> 2.17.1
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Paolo
 
