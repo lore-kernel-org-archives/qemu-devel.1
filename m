@@ -2,65 +2,89 @@ Return-Path: <SRS0=r6E1=T6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CE2FC28CC0
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 00:29:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 37436C28CC0
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 00:40:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F0CB4243A5
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 00:29:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F0CB4243A5
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id D2332243AD
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 00:40:21 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GMSsqNdg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D2332243AD
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:47231 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:50192 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hW8we-0002t3-U7
-	for qemu-devel@archiver.kernel.org; Wed, 29 May 2019 20:29:24 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:41018)
+	id 1hW97E-0004fR-88
+	for qemu-devel@archiver.kernel.org; Wed, 29 May 2019 20:40:20 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:42168)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richardw.yang@linux.intel.com>) id 1hW8vl-0002aT-Fe
-	for qemu-devel@nongnu.org; Wed, 29 May 2019 20:28:30 -0400
+	(envelope-from <elohimes@gmail.com>) id 1hW96N-0004Mv-RS
+	for qemu-devel@nongnu.org; Wed, 29 May 2019 20:39:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richardw.yang@linux.intel.com>) id 1hW8vk-00024y-6X
-	for qemu-devel@nongnu.org; Wed, 29 May 2019 20:28:29 -0400
-Received: from mga03.intel.com ([134.134.136.65]:65534)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <richardw.yang@linux.intel.com>)
-	id 1hW8vj-00023g-UV
-	for qemu-devel@nongnu.org; Wed, 29 May 2019 20:28:28 -0400
-X-Amp-Result: UNSCANNABLE
-X-Amp-File-Uploaded: False
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-	by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
-	29 May 2019 17:28:25 -0700
-X-ExtLoop1: 1
-Received: from richard.sh.intel.com (HELO localhost) ([10.239.159.54])
-	by fmsmga006.fm.intel.com with ESMTP; 29 May 2019 17:28:23 -0700
-Date: Thu, 30 May 2019 08:27:54 +0800
-From: Wei Yang <richardw.yang@linux.intel.com>
-To: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20190530002754.GA24526@richard>
-References: <20190411071739.22889-1-richardw.yang@linux.intel.com>
-	<20190527142114.521ab953@redhat.com>
-	<20190528013548.GA8813@richard>
-	<20190528142627.6841e91a@redhat.com>
-	<20190529003214.GA24428@richard>
-	<20190529105750.696fe6d2@redhat.com>
+	(envelope-from <elohimes@gmail.com>) id 1hW96M-0002gd-7y
+	for qemu-devel@nongnu.org; Wed, 29 May 2019 20:39:27 -0400
+Received: from mail-qt1-x843.google.com ([2607:f8b0:4864:20::843]:38347)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <elohimes@gmail.com>) id 1hW96M-0002g9-1A
+	for qemu-devel@nongnu.org; Wed, 29 May 2019 20:39:26 -0400
+Received: by mail-qt1-x843.google.com with SMTP id l3so4959124qtj.5
+	for <qemu-devel@nongnu.org>; Wed, 29 May 2019 17:39:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+	:cc; bh=IK5U2zVuICdGjLfTWSZbO09U2WHvmmACWp4g51PE96U=;
+	b=GMSsqNdg8HKaWHTb6flmYD7pjc/FmkP8IqUo8K1FNDCu3MGVkltshlNjaaEeKwNVos
+	8nb2chMy/+3aJGR8LZXBd+eyfulJ5I7MJu1LS6UsBUIzmDvkp4WWyA/QFTmlrgYpTQKe
+	X0ZNXTgGp+pkQh3af+PSISunFVeNjCJujwEC9c2oIQ7iA8x+xunxrY9id26VP/Lt+Bhb
+	dPhk1losfwD/SSyKGACI+4a6Lonu27nG+Qy8Ef7WSyEUJzk+EXYl18smDpXx3KGwaiBZ
+	lcxbH7f4Kul4yWTe5AnRmhmxut0qnfGaenm+/mpRT9+Wqe+Pq7tV7CVMk0THfjVRFfs5
+	0s0Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+	:message-id:subject:to:cc;
+	bh=IK5U2zVuICdGjLfTWSZbO09U2WHvmmACWp4g51PE96U=;
+	b=fi8T/zZOxp1tP1tmyuYCwJ+EpGSKrEHKo/darnVLHa3b+DyI417EwlRsmRgjgU1yUF
+	7PSRR8nwC17d473LB3yFyhALkf5lKXuOusaeCQeYaPh9HhN1TlHOugB4q1PuPEp5ri1Z
+	aS8Y0EpDhikfBLkIq766HufMZzXWWC8qOF5YGcF+Lp/tGUIz/WFNY3YAWp9B5kC1pQcz
+	7/a1lsc3RUVku3hVNpQ7bRSYZsyzvNOoNwDcLQ/ywPlwmhl5/nolhyBUtNmlGh5B7w+W
+	DKoU8/Tfg1hkAYkPrLjbxyvomoZx+4kviqo4jCg9oNHjAD6VsNFWOFM4XLsVjW/lRm2W
+	MDkg==
+X-Gm-Message-State: APjAAAVCVE+Ruk+H6ohpEvtAhFWQUriTYS6ycgU07+Un6mVSGxDJyd4J
+	6rDYjcRJJaXJgS1aBdRw/GNAtzi8FQVZuRp+BfA=
+X-Google-Smtp-Source: APXvYqwC0BQwbpahl6xrdsLNu5f8r5fMeURtioEeRhZYwDnNquvufem7gEhhul+kdIqrP4YysEIPly7KWSuv3pDxDxA=
+X-Received: by 2002:ac8:3971:: with SMTP id t46mr901507qtb.164.1559176765312; 
+	Wed, 29 May 2019 17:39:25 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190529105750.696fe6d2@redhat.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+References: <20190320112646.3712-2-xieyongji@baidu.com>
+	<20190524121909.277ae31e@bahia.lan>
+	<20190528000854.GA11618@umbus.fritz.box>
+	<20190528083909.65ba8be4@bahia.lan> <20190529111849.GD2882@work-vm>
+	<20190529135434.34c46b39@bahia.lab.toulouse-stg.fr.ibm.com>
+	<20190529123818.GG2882@work-vm>
+	<20190529150213.51143f1c@bahia.lab.toulouse-stg.fr.ibm.com>
+	<20190529134058.GI2882@work-vm>
+	<CAONzpcYRK5ydTLuNh4cz3753odky9imAHc8+Lxt3gFa5qdH4kg@mail.gmail.com>
+	<20190529144219.GJ2882@work-vm>
+In-Reply-To: <20190529144219.GJ2882@work-vm>
+From: Yongji Xie <elohimes@gmail.com>
+Date: Thu, 30 May 2019 08:39:13 +0800
+Message-ID: <CAONzpcZQZjT8+JZ7Mw2R1mUhieh2gyz+Aha9CCRHoQhB6KL88g@mail.gmail.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 134.134.136.65
-Subject: Re: [Qemu-devel] [PATCH] hw/i386/pc: check apci hotplug capability
- before nvdimm's
+X-Received-From: 2607:f8b0:4864:20::843
+Subject: Re: [Qemu-devel] [PULL v2 04/36] virtio: Introduce started flag to
+ VirtioDevice
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -72,94 +96,226 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Wei Yang <richardw.yang@linux.intel.com>
-Cc: thuth@redhat.com, ehabkost@redhat.com, qemu-devel@nongnu.org,
-	Wei Yang <richardw.yang@linux.intel.com>, pbonzini@redhat.com,
-	rth@twiddle.net
+Cc: Peter Maydell <peter.maydell@linaro.org>, Zhang Yu <zhangyu31@baidu.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	qemu-devel <qemu-devel@nongnu.org>, Greg Kurz <groug@kaod.org>,
+	Xie Yongji <xieyongji@baidu.com>,
+	David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, May 29, 2019 at 10:57:50AM +0200, Igor Mammedov wrote:
->On Wed, 29 May 2019 08:32:14 +0800
->Wei Yang <richardw.yang@linux.intel.com> wrote:
+On Wed, 29 May 2019 at 22:42, Dr. David Alan Gilbert
+<dgilbert@redhat.com> wrote:
 >
->> On Tue, May 28, 2019 at 02:26:27PM +0200, Igor Mammedov wrote:
->> >On Tue, 28 May 2019 09:35:48 +0800
->> >Wei Yang <richardw.yang@linux.intel.com> wrote:
->> >  
->> >> On Mon, May 27, 2019 at 02:21:14PM +0200, Igor Mammedov wrote:  
->> >> >On Thu, 11 Apr 2019 15:17:39 +0800
->> >> >Wei Yang <richardw.yang@linux.intel.com> wrote:
->> >> >    
->> >> >> pc_memory_pre_plug() is called during hotplug for both pc-dimm and
->> >> >> nvdimm. This is more proper to check apci hotplug capability before
->> >> >> check nvdimm specific capability.    
->> >> >not sure what this about.
->> >> >Currently we are checking if ACPI is enabled
->> >> >  if (!pcms->acpi_dev || !acpi_enabled) { ...
->> >> >before nvdimm check and it looks better to me that we cancel
->> >> >nvdimm hotplug earlier than passing it to
->> >> >    hotplug_handler_pre_plug(pcms->acpi_dev, dev, &local_err)
->> >> >with this patch ACPI device handler will be called before
->> >> >nvdimm check happens, so it's +1 unnecessary call chain in
->> >> >the case of nvdimm, which I'd rather not have.
->> >> >
->> >> >Are there any issues with current call flow?
->> >> >(commit message doesn't really explaining why we need this patch)
->> >> >    
->> >> 
->> >> My idea is to check more generic requirement and then specific one.
->> >> 
->> >> For example, the call flow looks like this:
->> >> 
->> >> pc_memory_pre_plug
->> >> 
->> >>     piix4_device_pre_plug_cb | ich9_pm_device_pre_plug_cb
->> >>         if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM) &&
->> >>             !lpc->pm.acpi_memory_hotplug.is_enabled)
->> >> 
->> >>     if (is_nvdimm && !ms->nvdimms_state->is_enabled)
->> >>     
->> >> 
->> >> In hotplug_handler_pre_plug(), it checks the acpi hotplug capability. And then
->> >> if it has memory hotplug capability and is nvdimm, we check whether nvdimm is
->> >> enabled.  
->> >
->> >I don't think pc_memory_pre_plug() should rely on what hotplug_handler_pre_plug()
->> >checks or does. Similarly the later is taking care of whatever piix4 needs to care
->> >and shouldn't care about what machine code does.
->> >  
->> 
->> Agree. It is not proper to let hotplug_handler_pre_plug() take care about
->> machine code.
->> 
->> >Moreover when hotplug_handler_pre_plug() starts to reserve resources, then
->> >if you move check as suggested you'd need to rollback all that
->> >hotplug_handler_pre_plug() done to gracefully abort hotplug.
->> >  
->> 
->> Confused.
->> 
->> hotplug_handler_pre_plug() doesn't reserve resources.
+> * Yongji Xie (elohimes@gmail.com) wrote:
+> > On Wed, 29 May 2019 at 21:43, Dr. David Alan Gilbert
+> > <dgilbert@redhat.com> wrote:
+> > >
+> > > * Greg Kurz (groug@kaod.org) wrote:
+> > > > On Wed, 29 May 2019 13:38:19 +0100
+> > > > "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
+> > > >
+> > > > > * Greg Kurz (groug@kaod.org) wrote:
+> > > > > > On Wed, 29 May 2019 12:18:50 +0100
+> > > > > > "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
+> > > > > >
+> > > > > > > * Greg Kurz (groug@kaod.org) wrote:
+> > > > > > > > On Tue, 28 May 2019 10:08:54 +1000
+> > > > > > > > David Gibson <david@gibson.dropbear.id.au> wrote:
+> > > > > > > >
+> > > > > > > > > On Fri, May 24, 2019 at 12:19:09PM +0200, Greg Kurz wrote:
+> > > > > > > > > > On Mon, 20 May 2019 19:10:35 -0400
+> > > > > > > > > > "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> > > > > > > > > >
+> > > > > > > > > > > From: Xie Yongji <xieyongji@baidu.com>
+> > > > > > > > > > >
+> > > > > > > > > > > The virtio 1.0 transitional devices support driver uses the device
+> > > > > > > > > > > before setting the DRIVER_OK status bit. So we introduce a started
+> > > > > > > > > > > flag to indicate whether driver has started the device or not.
+> > > > > > > > > > >
+> > > > > > > > > > > Signed-off-by: Xie Yongji <xieyongji@baidu.com>
+> > > > > > > > > > > Signed-off-by: Zhang Yu <zhangyu31@baidu.com>
+> > > > > > > > > > > Message-Id: <20190320112646.3712-2-xieyongji@baidu.com>
+> > > > > > > > > > > Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+> > > > > > > > > > > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> > > > > > > > > > > ---
+> > > > > > > > > > >  include/hw/virtio/virtio.h |  2 ++
+> > > > > > > > > > >  hw/virtio/virtio.c         | 52 ++++++++++++++++++++++++++++++++++++--
+> > > > > > > > > > >  2 files changed, 52 insertions(+), 2 deletions(-)
+> > > > > > > > > > >
+> > > > > > > > > > > diff --git a/include/hw/virtio/virtio.h b/include/hw/virtio/virtio.h
+> > > > > > > > > > > index 7140381e3a..27c0efc3d0 100644
+> > > > > > > > > > > --- a/include/hw/virtio/virtio.h
+> > > > > > > > > > > +++ b/include/hw/virtio/virtio.h
+> > > > > > > > > > > @@ -105,6 +105,8 @@ struct VirtIODevice
+> > > > > > > > > > >      uint16_t device_id;
+> > > > > > > > > > >      bool vm_running;
+> > > > > > > > > > >      bool broken; /* device in invalid state, needs reset */
+> > > > > > > > > > > +    bool started;
+> > > > > > > > > > > +    bool start_on_kick; /* virtio 1.0 transitional devices support that */
+> > > > > > > > > > >      VMChangeStateEntry *vmstate;
+> > > > > > > > > > >      char *bus_name;
+> > > > > > > > > > >      uint8_t device_endian;
+> > > > > > > > > > > diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
+> > > > > > > > > > > index 28056a7ef7..5d533ac74e 100644
+> > > > > > > > > > > --- a/hw/virtio/virtio.c
+> > > > > > > > > > > +++ b/hw/virtio/virtio.c
+> > > > > > > > > > > @@ -1162,10 +1162,16 @@ int virtio_set_status(VirtIODevice *vdev, uint8_t val)
+> > > > > > > > > > >              }
+> > > > > > > > > > >          }
+> > > > > > > > > > >      }
+> > > > > > > > > > > +    vdev->started = val & VIRTIO_CONFIG_S_DRIVER_OK;
+> > > > > > > > > > > +    if (unlikely(vdev->start_on_kick && vdev->started)) {
+> > > > > > > > > > > +        vdev->start_on_kick = false;
+> > > > > > > > > > > +    }
+> > > > > > > > > > > +
+> > > > > > > > > > >      if (k->set_status) {
+> > > > > > > > > > >          k->set_status(vdev, val);
+> > > > > > > > > > >      }
+> > > > > > > > > > >      vdev->status = val;
+> > > > > > > > > > > +
+> > > > > > > > > > >      return 0;
+> > > > > > > > > > >  }
+> > > > > > > > > > >
+> > > > > > > > > > > @@ -1208,6 +1214,9 @@ void virtio_reset(void *opaque)
+> > > > > > > > > > >          k->reset(vdev);
+> > > > > > > > > > >      }
+> > > > > > > > > > >
+> > > > > > > > > > > +    vdev->start_on_kick = (virtio_host_has_feature(vdev, VIRTIO_F_VERSION_1) &&
+> > > > > > > > > > > +                          !virtio_vdev_has_feature(vdev, VIRTIO_F_VERSION_1));
+> > > > > > > > > > > +    vdev->started = false;
+> > > > > > > > > > >      vdev->broken = false;
+> > > > > > > > > > >      vdev->guest_features = 0;
+> > > > > > > > > > >      vdev->queue_sel = 0;
+> > > > > > > > > > > @@ -1518,14 +1527,21 @@ void virtio_queue_set_align(VirtIODevice *vdev, int n, int align)
+> > > > > > > > > > >
+> > > > > > > > > > >  static bool virtio_queue_notify_aio_vq(VirtQueue *vq)
+> > > > > > > > > > >  {
+> > > > > > > > > > > +    bool ret = false;
+> > > > > > > > > > > +
+> > > > > > > > > > >      if (vq->vring.desc && vq->handle_aio_output) {
+> > > > > > > > > > >          VirtIODevice *vdev = vq->vdev;
+> > > > > > > > > > >
+> > > > > > > > > > >          trace_virtio_queue_notify(vdev, vq - vdev->vq, vq);
+> > > > > > > > > > > -        return vq->handle_aio_output(vdev, vq);
+> > > > > > > > > > > +        ret = vq->handle_aio_output(vdev, vq);
+> > > > > > > > > > > +
+> > > > > > > > > > > +        if (unlikely(vdev->start_on_kick)) {
+> > > > > > > > > > > +            vdev->started = true;
+> > > > > > > > > > > +            vdev->start_on_kick = false;
+> > > > > > > > > > > +        }
+> > > > > > > > > > >      }
+> > > > > > > > > > >
+> > > > > > > > > > > -    return false;
+> > > > > > > > > > > +    return ret;
+> > > > > > > > > > >  }
+> > > > > > > > > > >
+> > > > > > > > > > >  static void virtio_queue_notify_vq(VirtQueue *vq)
+> > > > > > > > > > > @@ -1539,6 +1555,11 @@ static void virtio_queue_notify_vq(VirtQueue *vq)
+> > > > > > > > > > >
+> > > > > > > > > > >          trace_virtio_queue_notify(vdev, vq - vdev->vq, vq);
+> > > > > > > > > > >          vq->handle_output(vdev, vq);
+> > > > > > > > > > > +
+> > > > > > > > > > > +        if (unlikely(vdev->start_on_kick)) {
+> > > > > > > > > > > +            vdev->started = true;
+> > > > > > > > > > > +            vdev->start_on_kick = false;
+> > > > > > > > > > > +        }
+> > > > > > > > > > >      }
+> > > > > > > > > > >  }
+> > > > > > > > > > >
+> > > > > > > > > > > @@ -1556,6 +1577,11 @@ void virtio_queue_notify(VirtIODevice *vdev, int n)
+> > > > > > > > > > >      } else if (vq->handle_output) {
+> > > > > > > > > > >          vq->handle_output(vdev, vq);
+> > > > > > > > > > >      }
+> > > > > > > > > > > +
+> > > > > > > > > > > +    if (unlikely(vdev->start_on_kick)) {
+> > > > > > > > > > > +        vdev->started = true;
+> > > > > > > > > > > +        vdev->start_on_kick = false;
+> > > > > > > > > > > +    }
+> > > > > > > > > > >  }
+> > > > > > > > > > >
+> > > > > > > > > > >  uint16_t virtio_queue_vector(VirtIODevice *vdev, int n)
+> > > > > > > > > > > @@ -1770,6 +1796,13 @@ static bool virtio_broken_needed(void *opaque)
+> > > > > > > > > > >      return vdev->broken;
+> > > > > > > > > > >  }
+> > > > > > > > > > >
+> > > > > > > > > > > +static bool virtio_started_needed(void *opaque)
+> > > > > > > > > > > +{
+> > > > > > > > > > > +    VirtIODevice *vdev = opaque;
+> > > > > > > > > > > +
+> > > > > > > > > > > +    return vdev->started;
+> > > > > > > > > >
+> > > > > > > > > > Existing machine types don't know about the "virtio/started" subsection. This
+> > > > > > > > > > breaks migration to older QEMUs if the driver has started the device, ie. most
+> > > > > > > > > > probably always when it comes to live migration.
+> > > > > > > > > >
+> > > > > > > > > > My understanding is that we do try to support backward migration though. It
+> > > > > > > > > > is a regular practice in datacenters to migrate workloads without having to
+> > > > > > > > > > take care of the QEMU version. FWIW I had to fix similar issues downstream
+> > > > > > > > > > many times in the past because customers had filed bugs.
+> > > > > > > > > >
+> > > > > > > > > > Cc'ing David for his opinion.
+> > > > > > > > >
+> > > > > > > > > Uh.. did you mean to CC me, or Dave Gilbert?
+> > > > > > > > >
+> > > > > > > >
+> > > > > > > > Oops... Dave Gilbert indeed, but you're thoughts on that matter are valuable
+> > > > > > > > as well. I remember being involved in backward migration fixes for spapr
+> > > > > > > > several times.
+> > > > > > > >
+> > > > > > > > > I mean, I think you're right that we should try to maintain backwards
+> > > > > > > > > migration, but this isn't really my area of authority.
+> > > > > > > > >
+> > > > > > > >
+> > > > > > > > Cc'ing Dave Gilbert :)
+> > > > > > >
+> > > > > > > Right, I need to maintain backwards migration compatibility; tie the
+> > > > > > > feature to a machine type so it's only used on newer machine types and
+> > > > > > > then we'll be safe.
+> > > > > > >
+> > > > > > > Having said that, what's the symptom when this goes wrong?
+> > > > > > >
+> > > > > >
+> > > > > > Since the started flag is set as soon as the guest driver begins to use
+> > > > > > the device and remains so until next reset, the associated subsection is
+> > > > > > basically always emitted when migrating a booted guest. This causes
+> > > > > > migration to always fail on the target in this case:
+> > > > >
+> > > > > I meant what's the symptom without this patch series at all?
+> > > > >
+> > > >
+> > > > Oh sorry... if I got it right, migrating when the guest first kicked the
+> > > > device but not set the DRIVE_OK bit yet would result in a guest hang on
+> > > > the destination. Yongji might elaborate a bit more on that.
+> > >
+> > > Hmm - the only thing worse than a migration failing with an error is a
+> > > migration that fails with a hung guest.
+> > >
+> > > If you were sending a new subsection in *only* the case where the guest
+> > > would definitely hang, then I think it would be worth sending the
+> > > subsection and allowing the backwards migration to fail with the error
+> > > because it's a bit better than a hung VM.
+> > >
+> >
+> > I considered this approach before. But it needs to add some complex
+> > logic in virtio code to make sure migration works well between
+> > different qemu versions. Since it's hardly to trigger the hung VM bug.
+> > So I still try to use the general way (tie the feature to a machine
+> > type) to fix this migration issue. It's easily to ensure the
+> > compatibility
 >
->
->it's not currently, but if it would it would not work with your patch properly
->or break unexpectedly since whoever would change hotplug_handler_pre_plug()
->might not notice that machine code need to be taken care of.
->
->Try to consider devices and machine as separate libraries. Which should
->in reasonable limits be independent and work through documented interfaces.
->In that case likehood of breaking something would be less than relying on
->current code impl./call order with implicit inter-dependencies. 
+> OK, great.  For reference could you give me a bit more info on how
+> exactly the failure happens, how you spot it and what the symptoms are;
+> so that when someone comes to me with a hung VM I know what to look for?
 >
 
-So the logic here is check machine then device, right? I think this is
-reasonable. To be honest, this rule is not that obvious.
+Oh, sure. This failure would only happen on an old guest (e.g. centos
+6u5, centos 6u3) with virtio-blk/vhost-user-blk device. This kind of
+guest might be hung when migration completes at the point that guest
+is booting (loading virtio-blk driver) because its first I/O would be
+hung.
 
-Anyway, I think what you mentioned make sense. Thanks
-
--- 
-Wei Yang
-Help you, Help me
+Thanks,
+Yongji
 
