@@ -2,59 +2,73 @@ Return-Path: <SRS0=r6E1=T6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	T_HK_NAME_DR,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 67264C28CC0
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 09:42:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C4A0C28CC0
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 09:44:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1EC7B25671
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 09:42:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1EC7B25671
+	by mail.kernel.org (Postfix) with ESMTPS id DA4192567F
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 09:44:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DA4192567F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:50111 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:50123 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hWHaK-0002dp-Hg
-	for qemu-devel@archiver.kernel.org; Thu, 30 May 2019 05:42:56 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:44742)
+	id 1hWHbw-0003dS-6v
+	for qemu-devel@archiver.kernel.org; Thu, 30 May 2019 05:44:36 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:45886)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1hWHOA-0001Lj-5O
-	for qemu-devel@nongnu.org; Thu, 30 May 2019 05:30:23 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1hWHSd-0004iv-In
+	for qemu-devel@nongnu.org; Thu, 30 May 2019 05:35:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1hWHO6-0002IR-SK
-	for qemu-devel@nongnu.org; Thu, 30 May 2019 05:30:22 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33930)
+	(envelope-from <dgilbert@redhat.com>) id 1hWHSb-0000lX-Hs
+	for qemu-devel@nongnu.org; Thu, 30 May 2019 05:34:59 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46374)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1hWHO6-0002HH-KX
-	for qemu-devel@nongnu.org; Thu, 30 May 2019 05:30:18 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
-	[10.5.11.22])
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hWHSW-0000Ya-Kn
+	for qemu-devel@nongnu.org; Thu, 30 May 2019 05:34:52 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id F015130821AE
-	for <qemu-devel@nongnu.org>; Thu, 30 May 2019 09:30:17 +0000 (UTC)
-Received: from xz-x1.redhat.com (ovpn-12-221.pek2.redhat.com [10.72.12.221])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id A16591001E77;
-	Thu, 30 May 2019 09:30:14 +0000 (UTC)
-From: Peter Xu <peterx@redhat.com>
-To: qemu-devel@nongnu.org
-Date: Thu, 30 May 2019 17:29:19 +0800
-Message-Id: <20190530092919.26059-13-peterx@redhat.com>
-In-Reply-To: <20190530092919.26059-1-peterx@redhat.com>
-References: <20190530092919.26059-1-peterx@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+	by mx1.redhat.com (Postfix) with ESMTPS id CD4D5F9E97;
+	Thu, 30 May 2019 09:34:32 +0000 (UTC)
+Received: from work-vm (ovpn-117-91.ams2.redhat.com [10.36.117.91])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id A14455D704;
+	Thu, 30 May 2019 09:34:26 +0000 (UTC)
+Date: Thu, 30 May 2019 10:34:24 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Yongji Xie <elohimes@gmail.com>
+Message-ID: <20190530093423.GC2823@work-vm>
+References: <20190529111849.GD2882@work-vm>
+	<20190529135434.34c46b39@bahia.lab.toulouse-stg.fr.ibm.com>
+	<20190529123818.GG2882@work-vm>
+	<20190529150213.51143f1c@bahia.lab.toulouse-stg.fr.ibm.com>
+	<20190529134058.GI2882@work-vm>
+	<CAONzpcYRK5ydTLuNh4cz3753odky9imAHc8+Lxt3gFa5qdH4kg@mail.gmail.com>
+	<20190529144219.GJ2882@work-vm>
+	<CAONzpcZQZjT8+JZ7Mw2R1mUhieh2gyz+Aha9CCRHoQhB6KL88g@mail.gmail.com>
+	<20190530090559.GB2823@work-vm>
+	<CAONzpcbdh7XNigSQP6f5+E4gNDUxn4WGe5fVnE0fFaurW5XCSQ@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAONzpcbdh7XNigSQP6f5+E4gNDUxn4WGe5fVnE0fFaurW5XCSQ@mail.gmail.com>
+User-Agent: Mutt/1.11.4 (2019-03-13)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.47]);
-	Thu, 30 May 2019 09:30:17 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.38]);
+	Thu, 30 May 2019 09:34:41 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v3 12/12] migration: Split log_clear() into
- smaller chunks
+Subject: Re: [Qemu-devel] [PULL v2 04/36] virtio: Introduce started flag to
+ VirtioDevice
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -66,299 +80,245 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
-	"Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-	peterx@redhat.com, Juan Quintela <quintela@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Zhang Yu <zhangyu31@baidu.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	qemu-devel <qemu-devel@nongnu.org>, Greg Kurz <groug@kaod.org>,
+	Xie Yongji <xieyongji@baidu.com>,
+	David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Currently we are doing log_clear() right after log_sync() which mostly
-keeps the old behavior when log_clear() was still part of log_sync().
+* Yongji Xie (elohimes@gmail.com) wrote:
+> On Thu, 30 May 2019 at 17:06, Dr. David Alan Gilbert
+> <dgilbert@redhat.com> wrote:
+> >
+> > * Yongji Xie (elohimes@gmail.com) wrote:
+> > > On Wed, 29 May 2019 at 22:42, Dr. David Alan Gilbert
+> > > <dgilbert@redhat.com> wrote:
+> > > >
+> > > > * Yongji Xie (elohimes@gmail.com) wrote:
+> > > > > On Wed, 29 May 2019 at 21:43, Dr. David Alan Gilbert
+> > > > > <dgilbert@redhat.com> wrote:
+> > > > > >
+> > > > > > * Greg Kurz (groug@kaod.org) wrote:
+> > > > > > > On Wed, 29 May 2019 13:38:19 +0100
+> > > > > > > "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
+> > > > > > >
+> > > > > > > > * Greg Kurz (groug@kaod.org) wrote:
+> > > > > > > > > On Wed, 29 May 2019 12:18:50 +0100
+> > > > > > > > > "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
+> > > > > > > > >
+> > > > > > > > > > * Greg Kurz (groug@kaod.org) wrote:
+> > > > > > > > > > > On Tue, 28 May 2019 10:08:54 +1000
+> > > > > > > > > > > David Gibson <david@gibson.dropbear.id.au> wrote:
+> > > > > > > > > > >
+> > > > > > > > > > > > On Fri, May 24, 2019 at 12:19:09PM +0200, Greg Kurz wrote:
+> > > > > > > > > > > > > On Mon, 20 May 2019 19:10:35 -0400
+> > > > > > > > > > > > > "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> > > > > > > > > > > > >
+> > > > > > > > > > > > > > From: Xie Yongji <xieyongji@baidu.com>
+> > > > > > > > > > > > > >
+> > > > > > > > > > > > > > The virtio 1.0 transitional devices support driver uses the device
+> > > > > > > > > > > > > > before setting the DRIVER_OK status bit. So we introduce a started
+> > > > > > > > > > > > > > flag to indicate whether driver has started the device or not.
+> > > > > > > > > > > > > >
+> > > > > > > > > > > > > > Signed-off-by: Xie Yongji <xieyongji@baidu.com>
+> > > > > > > > > > > > > > Signed-off-by: Zhang Yu <zhangyu31@baidu.com>
+> > > > > > > > > > > > > > Message-Id: <20190320112646.3712-2-xieyongji@baidu.com>
+> > > > > > > > > > > > > > Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+> > > > > > > > > > > > > > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> > > > > > > > > > > > > > ---
+> > > > > > > > > > > > > >  include/hw/virtio/virtio.h |  2 ++
+> > > > > > > > > > > > > >  hw/virtio/virtio.c         | 52 ++++++++++++++++++++++++++++++++++++--
+> > > > > > > > > > > > > >  2 files changed, 52 insertions(+), 2 deletions(-)
+> > > > > > > > > > > > > >
+> > > > > > > > > > > > > > diff --git a/include/hw/virtio/virtio.h b/include/hw/virtio/virtio.h
+> > > > > > > > > > > > > > index 7140381e3a..27c0efc3d0 100644
+> > > > > > > > > > > > > > --- a/include/hw/virtio/virtio.h
+> > > > > > > > > > > > > > +++ b/include/hw/virtio/virtio.h
+> > > > > > > > > > > > > > @@ -105,6 +105,8 @@ struct VirtIODevice
+> > > > > > > > > > > > > >      uint16_t device_id;
+> > > > > > > > > > > > > >      bool vm_running;
+> > > > > > > > > > > > > >      bool broken; /* device in invalid state, needs reset */
+> > > > > > > > > > > > > > +    bool started;
+> > > > > > > > > > > > > > +    bool start_on_kick; /* virtio 1.0 transitional devices support that */
+> > > > > > > > > > > > > >      VMChangeStateEntry *vmstate;
+> > > > > > > > > > > > > >      char *bus_name;
+> > > > > > > > > > > > > >      uint8_t device_endian;
+> > > > > > > > > > > > > > diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
+> > > > > > > > > > > > > > index 28056a7ef7..5d533ac74e 100644
+> > > > > > > > > > > > > > --- a/hw/virtio/virtio.c
+> > > > > > > > > > > > > > +++ b/hw/virtio/virtio.c
+> > > > > > > > > > > > > > @@ -1162,10 +1162,16 @@ int virtio_set_status(VirtIODevice *vdev, uint8_t val)
+> > > > > > > > > > > > > >              }
+> > > > > > > > > > > > > >          }
+> > > > > > > > > > > > > >      }
+> > > > > > > > > > > > > > +    vdev->started = val & VIRTIO_CONFIG_S_DRIVER_OK;
+> > > > > > > > > > > > > > +    if (unlikely(vdev->start_on_kick && vdev->started)) {
+> > > > > > > > > > > > > > +        vdev->start_on_kick = false;
+> > > > > > > > > > > > > > +    }
+> > > > > > > > > > > > > > +
+> > > > > > > > > > > > > >      if (k->set_status) {
+> > > > > > > > > > > > > >          k->set_status(vdev, val);
+> > > > > > > > > > > > > >      }
+> > > > > > > > > > > > > >      vdev->status = val;
+> > > > > > > > > > > > > > +
+> > > > > > > > > > > > > >      return 0;
+> > > > > > > > > > > > > >  }
+> > > > > > > > > > > > > >
+> > > > > > > > > > > > > > @@ -1208,6 +1214,9 @@ void virtio_reset(void *opaque)
+> > > > > > > > > > > > > >          k->reset(vdev);
+> > > > > > > > > > > > > >      }
+> > > > > > > > > > > > > >
+> > > > > > > > > > > > > > +    vdev->start_on_kick = (virtio_host_has_feature(vdev, VIRTIO_F_VERSION_1) &&
+> > > > > > > > > > > > > > +                          !virtio_vdev_has_feature(vdev, VIRTIO_F_VERSION_1));
+> > > > > > > > > > > > > > +    vdev->started = false;
+> > > > > > > > > > > > > >      vdev->broken = false;
+> > > > > > > > > > > > > >      vdev->guest_features = 0;
+> > > > > > > > > > > > > >      vdev->queue_sel = 0;
+> > > > > > > > > > > > > > @@ -1518,14 +1527,21 @@ void virtio_queue_set_align(VirtIODevice *vdev, int n, int align)
+> > > > > > > > > > > > > >
+> > > > > > > > > > > > > >  static bool virtio_queue_notify_aio_vq(VirtQueue *vq)
+> > > > > > > > > > > > > >  {
+> > > > > > > > > > > > > > +    bool ret = false;
+> > > > > > > > > > > > > > +
+> > > > > > > > > > > > > >      if (vq->vring.desc && vq->handle_aio_output) {
+> > > > > > > > > > > > > >          VirtIODevice *vdev = vq->vdev;
+> > > > > > > > > > > > > >
+> > > > > > > > > > > > > >          trace_virtio_queue_notify(vdev, vq - vdev->vq, vq);
+> > > > > > > > > > > > > > -        return vq->handle_aio_output(vdev, vq);
+> > > > > > > > > > > > > > +        ret = vq->handle_aio_output(vdev, vq);
+> > > > > > > > > > > > > > +
+> > > > > > > > > > > > > > +        if (unlikely(vdev->start_on_kick)) {
+> > > > > > > > > > > > > > +            vdev->started = true;
+> > > > > > > > > > > > > > +            vdev->start_on_kick = false;
+> > > > > > > > > > > > > > +        }
+> > > > > > > > > > > > > >      }
+> > > > > > > > > > > > > >
+> > > > > > > > > > > > > > -    return false;
+> > > > > > > > > > > > > > +    return ret;
+> > > > > > > > > > > > > >  }
+> > > > > > > > > > > > > >
+> > > > > > > > > > > > > >  static void virtio_queue_notify_vq(VirtQueue *vq)
+> > > > > > > > > > > > > > @@ -1539,6 +1555,11 @@ static void virtio_queue_notify_vq(VirtQueue *vq)
+> > > > > > > > > > > > > >
+> > > > > > > > > > > > > >          trace_virtio_queue_notify(vdev, vq - vdev->vq, vq);
+> > > > > > > > > > > > > >          vq->handle_output(vdev, vq);
+> > > > > > > > > > > > > > +
+> > > > > > > > > > > > > > +        if (unlikely(vdev->start_on_kick)) {
+> > > > > > > > > > > > > > +            vdev->started = true;
+> > > > > > > > > > > > > > +            vdev->start_on_kick = false;
+> > > > > > > > > > > > > > +        }
+> > > > > > > > > > > > > >      }
+> > > > > > > > > > > > > >  }
+> > > > > > > > > > > > > >
+> > > > > > > > > > > > > > @@ -1556,6 +1577,11 @@ void virtio_queue_notify(VirtIODevice *vdev, int n)
+> > > > > > > > > > > > > >      } else if (vq->handle_output) {
+> > > > > > > > > > > > > >          vq->handle_output(vdev, vq);
+> > > > > > > > > > > > > >      }
+> > > > > > > > > > > > > > +
+> > > > > > > > > > > > > > +    if (unlikely(vdev->start_on_kick)) {
+> > > > > > > > > > > > > > +        vdev->started = true;
+> > > > > > > > > > > > > > +        vdev->start_on_kick = false;
+> > > > > > > > > > > > > > +    }
+> > > > > > > > > > > > > >  }
+> > > > > > > > > > > > > >
+> > > > > > > > > > > > > >  uint16_t virtio_queue_vector(VirtIODevice *vdev, int n)
+> > > > > > > > > > > > > > @@ -1770,6 +1796,13 @@ static bool virtio_broken_needed(void *opaque)
+> > > > > > > > > > > > > >      return vdev->broken;
+> > > > > > > > > > > > > >  }
+> > > > > > > > > > > > > >
+> > > > > > > > > > > > > > +static bool virtio_started_needed(void *opaque)
+> > > > > > > > > > > > > > +{
+> > > > > > > > > > > > > > +    VirtIODevice *vdev = opaque;
+> > > > > > > > > > > > > > +
+> > > > > > > > > > > > > > +    return vdev->started;
+> > > > > > > > > > > > >
+> > > > > > > > > > > > > Existing machine types don't know about the "virtio/started" subsection. This
+> > > > > > > > > > > > > breaks migration to older QEMUs if the driver has started the device, ie. most
+> > > > > > > > > > > > > probably always when it comes to live migration.
+> > > > > > > > > > > > >
+> > > > > > > > > > > > > My understanding is that we do try to support backward migration though. It
+> > > > > > > > > > > > > is a regular practice in datacenters to migrate workloads without having to
+> > > > > > > > > > > > > take care of the QEMU version. FWIW I had to fix similar issues downstream
+> > > > > > > > > > > > > many times in the past because customers had filed bugs.
+> > > > > > > > > > > > >
+> > > > > > > > > > > > > Cc'ing David for his opinion.
+> > > > > > > > > > > >
+> > > > > > > > > > > > Uh.. did you mean to CC me, or Dave Gilbert?
+> > > > > > > > > > > >
+> > > > > > > > > > >
+> > > > > > > > > > > Oops... Dave Gilbert indeed, but you're thoughts on that matter are valuable
+> > > > > > > > > > > as well. I remember being involved in backward migration fixes for spapr
+> > > > > > > > > > > several times.
+> > > > > > > > > > >
+> > > > > > > > > > > > I mean, I think you're right that we should try to maintain backwards
+> > > > > > > > > > > > migration, but this isn't really my area of authority.
+> > > > > > > > > > > >
+> > > > > > > > > > >
+> > > > > > > > > > > Cc'ing Dave Gilbert :)
+> > > > > > > > > >
+> > > > > > > > > > Right, I need to maintain backwards migration compatibility; tie the
+> > > > > > > > > > feature to a machine type so it's only used on newer machine types and
+> > > > > > > > > > then we'll be safe.
+> > > > > > > > > >
+> > > > > > > > > > Having said that, what's the symptom when this goes wrong?
+> > > > > > > > > >
+> > > > > > > > >
+> > > > > > > > > Since the started flag is set as soon as the guest driver begins to use
+> > > > > > > > > the device and remains so until next reset, the associated subsection is
+> > > > > > > > > basically always emitted when migrating a booted guest. This causes
+> > > > > > > > > migration to always fail on the target in this case:
+> > > > > > > >
+> > > > > > > > I meant what's the symptom without this patch series at all?
+> > > > > > > >
+> > > > > > >
+> > > > > > > Oh sorry... if I got it right, migrating when the guest first kicked the
+> > > > > > > device but not set the DRIVE_OK bit yet would result in a guest hang on
+> > > > > > > the destination. Yongji might elaborate a bit more on that.
+> > > > > >
+> > > > > > Hmm - the only thing worse than a migration failing with an error is a
+> > > > > > migration that fails with a hung guest.
+> > > > > >
+> > > > > > If you were sending a new subsection in *only* the case where the guest
+> > > > > > would definitely hang, then I think it would be worth sending the
+> > > > > > subsection and allowing the backwards migration to fail with the error
+> > > > > > because it's a bit better than a hung VM.
+> > > > > >
+> > > > >
+> > > > > I considered this approach before. But it needs to add some complex
+> > > > > logic in virtio code to make sure migration works well between
+> > > > > different qemu versions. Since it's hardly to trigger the hung VM bug.
+> > > > > So I still try to use the general way (tie the feature to a machine
+> > > > > type) to fix this migration issue. It's easily to ensure the
+> > > > > compatibility
+> > > >
+> > > > OK, great.  For reference could you give me a bit more info on how
+> > > > exactly the failure happens, how you spot it and what the symptoms are;
+> > > > so that when someone comes to me with a hung VM I know what to look for?
+> > > >
+> > >
+> > > Oh, sure. This failure would only happen on an old guest (e.g. centos
+> > > 6u5, centos 6u3) with virtio-blk/vhost-user-blk device. This kind of
+> > > guest might be hung when migration completes at the point that guest
+> > > is booting (loading virtio-blk driver) because its first I/O would be
+> > > hung.
+> >
+> > OK, thanks.
+> > But a migration when the VM is running is fine? - it's only a problem
+> > if it happens during bootup, before the driver starts?
+> >
+> 
+> Yes. Running VM would be fine unless we reload the driver manually at
+> that point...
 
-This patch tries to further optimize the migration log_clear() code
-path to split huge log_clear()s into smaller chunks.
+OK, thanks.
 
-We do this by spliting the whole guest memory region into memory
-chunks, whose size is decided by MigrationState.clear_bitmap_shift (an
-example will be given below).  With that, we don't do the dirty bitmap
-clear operation on the remote node (e.g., KVM) when we fetch the dirty
-bitmap, instead we explicitly clear the dirty bitmap for the memory
-chunk for each of the first time we send a page in that chunk.
+Dave
 
-Here comes an example.
-
-Assuming the guest has 64G memory, then before this patch the KVM
-ioctl KVM_CLEAR_DIRTY_LOG will be a single one covering 64G memory.
-If after the patch, let's assume when the clear bitmap shift is 18,
-then the memory chunk size on x86_64 will be 1UL<<18 * 4K = 1GB.  Then
-instead of sending a big 64G ioctl, we'll send 64 small ioctls, each
-of the ioctl will cover 1G of the guest memory.  For each of the 64
-small ioctls, we'll only send if any of the page in that small chunk
-was going to be sent right away.
-
-Signed-off-by: Peter Xu <peterx@redhat.com>
----
- include/exec/ram_addr.h | 75 +++++++++++++++++++++++++++++++++++++++--
- migration/migration.c   |  4 +++
- migration/migration.h   | 27 +++++++++++++++
- migration/ram.c         | 44 ++++++++++++++++++++++++
- migration/trace-events  |  1 +
- 5 files changed, 149 insertions(+), 2 deletions(-)
-
-diff --git a/include/exec/ram_addr.h b/include/exec/ram_addr.h
-index f8930914cd..c85896f4d5 100644
---- a/include/exec/ram_addr.h
-+++ b/include/exec/ram_addr.h
-@@ -50,8 +50,69 @@ struct RAMBlock {
-     unsigned long *unsentmap;
-     /* bitmap of already received pages in postcopy */
-     unsigned long *receivedmap;
-+
-+    /*
-+     * bitmap of already cleared dirty bitmap.  Set this up to
-+     * non-NULL to enable the capability to postpone and split
-+     * clearing of dirty bitmap on the remote node (e.g., KVM).  The
-+     * bitmap will be set only when doing global sync.
-+     *
-+     * NOTE: this bitmap is different comparing to the other bitmaps
-+     * in that one bit can represent multiple guest pages (which is
-+     * decided by the `clear_bmap_shift' variable below).  On
-+     * destination side, this should always be NULL, and the variable
-+     * `clear_bmap_shift' is meaningless.
-+     */
-+    unsigned long *clear_bmap;
-+    uint8_t clear_bmap_shift;
- };
- 
-+/**
-+ * clear_bmap_size: calculate clear bitmap size
-+ *
-+ * @pages: number of guest pages
-+ * @shift: guest page number shift
-+ *
-+ * Returns: number of bits for the clear bitmap
-+ */
-+static inline long clear_bmap_size(uint64_t pages, uint8_t shift)
-+{
-+    return DIV_ROUND_UP(pages, 1UL << shift);
-+}
-+
-+/**
-+ * clear_bmap_set: set clear bitmap for the page range
-+ *
-+ * @rb: the ramblock to operate on
-+ * @start: the start page number
-+ * @size: number of pages to set in the bitmap
-+ *
-+ * Returns: None
-+ */
-+static inline void clear_bmap_set(RAMBlock *rb, uint64_t start,
-+                                  uint64_t npages)
-+{
-+    uint8_t shift = rb->clear_bmap_shift;
-+
-+    bitmap_set_atomic(rb->clear_bmap, start >> shift,
-+                      clear_bmap_size(npages, shift));
-+}
-+
-+/**
-+ * clear_bmap_test_and_clear: test clear bitmap for the page, clear if set
-+ *
-+ * @rb: the ramblock to operate on
-+ * @page: the page number to check
-+ *
-+ * Returns: true if the bit was set, false otherwise
-+ */
-+static inline bool clear_bmap_test_and_clear(RAMBlock *rb, uint64_t page)
-+{
-+    uint8_t shift = rb->clear_bmap_shift;
-+
-+    return bitmap_test_and_clear_atomic(rb->clear_bmap, page >> shift, 1);
-+}
-+
- static inline bool offset_in_ramblock(RAMBlock *b, ram_addr_t offset)
- {
-     return (b && b->host && offset < b->used_length) ? true : false;
-@@ -462,8 +523,18 @@ uint64_t cpu_physical_memory_sync_dirty_bitmap(RAMBlock *rb,
-             }
-         }
- 
--        /* TODO: split the huge bitmap into smaller chunks */
--        memory_region_clear_dirty_bitmap(rb->mr, start, length);
-+        if (rb->clear_bmap) {
-+            /*
-+             * Postpone the dirty bitmap clear to the point before we
-+             * really send the pages, also we will split the clear
-+             * dirty procedure into smaller chunks.
-+             */
-+            clear_bmap_set(rb, start >> TARGET_PAGE_BITS,
-+                           length >> TARGET_PAGE_BITS);
-+        } else {
-+            /* Slow path - still do that in a huge chunk */
-+            memory_region_clear_dirty_bitmap(rb->mr, start, length);
-+        }
-     } else {
-         ram_addr_t offset = rb->offset;
- 
-diff --git a/migration/migration.c b/migration/migration.c
-index 2865ae3fa9..8a607fe1e2 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -3362,6 +3362,8 @@ void migration_global_dump(Monitor *mon)
-                    ms->send_section_footer ? "on" : "off");
-     monitor_printf(mon, "decompress-error-check: %s\n",
-                    ms->decompress_error_check ? "on" : "off");
-+    monitor_printf(mon, "clear-bitmap-shift: %u\n",
-+                   ms->clear_bitmap_shift);
- }
- 
- #define DEFINE_PROP_MIG_CAP(name, x)             \
-@@ -3376,6 +3378,8 @@ static Property migration_properties[] = {
-                      send_section_footer, true),
-     DEFINE_PROP_BOOL("decompress-error-check", MigrationState,
-                       decompress_error_check, true),
-+    DEFINE_PROP_UINT8("x-clear-bitmap-shift", MigrationState,
-+                      clear_bitmap_shift, CLEAR_BITMAP_SHIFT_DEFAULT),
- 
-     /* Migration parameters */
-     DEFINE_PROP_UINT8("x-compress-level", MigrationState,
-diff --git a/migration/migration.h b/migration/migration.h
-index 780a096857..6e3178d8b2 100644
---- a/migration/migration.h
-+++ b/migration/migration.h
-@@ -27,6 +27,23 @@ struct PostcopyBlocktimeContext;
- 
- #define  MIGRATION_RESUME_ACK_VALUE  (1)
- 
-+/*
-+ * 1<<6=64 pages -> 256K chunk when page size is 4K.  This gives us
-+ * the benefit that all the chunks are 64 pages aligned then the
-+ * bitmaps are always aligned to LONG.
-+ */
-+#define CLEAR_BITMAP_SHIFT_MIN             6
-+/*
-+ * 1<<18=256K pages -> 1G chunk when page size is 4K.  This is the
-+ * default value to use if no one specified.
-+ */
-+#define CLEAR_BITMAP_SHIFT_DEFAULT        18
-+/*
-+ * 1<<31=2G pages -> 8T chunk when page size is 4K.  This should be
-+ * big enough and make sure we won't overflow easily.
-+ */
-+#define CLEAR_BITMAP_SHIFT_MAX            31
-+
- /* State for the incoming migration */
- struct MigrationIncomingState {
-     QEMUFile *from_src_file;
-@@ -233,6 +250,16 @@ struct MigrationState
-      * do not trigger spurious decompression errors.
-      */
-     bool decompress_error_check;
-+
-+    /*
-+     * This decides the size of guest memory chunk that will be used
-+     * to track dirty bitmap clearing.  The size of memory chunk will
-+     * be GUEST_PAGE_SIZE << N.  Say, N=0 means we will clear dirty
-+     * bitmap for each page to send (1<<0=1); N=10 means we will clear
-+     * dirty bitmap only once for 1<<10=1K continuous guest pages
-+     * (which is in 4M chunk).
-+     */
-+    uint8_t clear_bitmap_shift;
- };
- 
- void migrate_set_state(int *state, int old_state, int new_state);
-diff --git a/migration/ram.c b/migration/ram.c
-index dc916042fb..632bf02575 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -1668,6 +1668,33 @@ static inline bool migration_bitmap_clear_dirty(RAMState *rs,
-     bool ret;
- 
-     qemu_mutex_lock(&rs->bitmap_mutex);
-+
-+    /*
-+     * Clear dirty bitmap if needed.  This _must_ be called before we
-+     * send any of the page in the chunk because we need to make sure
-+     * we can capture further page content changes when we sync dirty
-+     * log the next time.  So as long as we are going to send any of
-+     * the page in the chunk we clear the remote dirty bitmap for all.
-+     * Clearing it earlier won't be a problem, but too late will.
-+     */
-+    if (rb->clear_bmap && clear_bmap_test_and_clear(rb, page)) {
-+        uint8_t shift = rb->clear_bmap_shift;
-+        hwaddr size = 1ULL << (TARGET_PAGE_BITS + shift);
-+        hwaddr start = (page << TARGET_PAGE_BITS) & (-size);
-+
-+        /*
-+         * CLEAR_BITMAP_SHIFT_MIN should always guarantee this... this
-+         * can make things easier sometimes since then start address
-+         * of the small chunk will always be 64 pages aligned so the
-+         * bitmap will always be aligned to unsigned long.  We should
-+         * even be able to remove this restriction but I'm simply
-+         * keeping it.
-+         */
-+        assert(shift >= 6);
-+        trace_migration_bitmap_clear_dirty(rb->idstr, start, size, page);
-+        memory_region_clear_dirty_bitmap(rb->mr, start, size);
-+    }
-+
-     ret = test_and_clear_bit(page, rb->bmap);
- 
-     if (ret) {
-@@ -2685,6 +2712,8 @@ static void ram_save_cleanup(void *opaque)
-     memory_global_dirty_log_stop();
- 
-     RAMBLOCK_FOREACH_NOT_IGNORED(block) {
-+        g_free(block->clear_bmap);
-+        block->clear_bmap = NULL;
-         g_free(block->bmap);
-         block->bmap = NULL;
-         g_free(block->unsentmap);
-@@ -3195,15 +3224,30 @@ static int ram_state_init(RAMState **rsp)
- 
- static void ram_list_init_bitmaps(void)
- {
-+    MigrationState *ms = migrate_get_current();
-     RAMBlock *block;
-     unsigned long pages;
-+    uint8_t shift;
- 
-     /* Skip setting bitmap if there is no RAM */
-     if (ram_bytes_total()) {
-+        shift = ms->clear_bitmap_shift;
-+        if (shift > CLEAR_BITMAP_SHIFT_MAX) {
-+            error_report("clear_bitmap_shift (%u) too big, using "
-+                         "max value (%u)", shift, CLEAR_BITMAP_SHIFT_MAX);
-+            shift = CLEAR_BITMAP_SHIFT_MAX;
-+        } else if (shift < CLEAR_BITMAP_SHIFT_MIN) {
-+            error_report("clear_bitmap_shift (%u) too small, using "
-+                         "min value (%u)", shift, CLEAR_BITMAP_SHIFT_MIN);
-+            shift = CLEAR_BITMAP_SHIFT_MIN;
-+        }
-+
-         RAMBLOCK_FOREACH_NOT_IGNORED(block) {
-             pages = block->max_length >> TARGET_PAGE_BITS;
-             block->bmap = bitmap_new(pages);
-             bitmap_set(block->bmap, 0, pages);
-+            block->clear_bmap_shift = shift;
-+            block->clear_bmap = bitmap_new(clear_bmap_size(pages, shift));
-             if (migrate_postcopy_ram()) {
-                 block->unsentmap = bitmap_new(pages);
-                 bitmap_set(block->unsentmap, 0, pages);
-diff --git a/migration/trace-events b/migration/trace-events
-index de2e136e57..2c45974330 100644
---- a/migration/trace-events
-+++ b/migration/trace-events
-@@ -79,6 +79,7 @@ get_queued_page(const char *block_name, uint64_t tmp_offset, unsigned long page_
- get_queued_page_not_dirty(const char *block_name, uint64_t tmp_offset, unsigned long page_abs, int sent) "%s/0x%" PRIx64 " page_abs=0x%lx (sent=%d)"
- migration_bitmap_sync_start(void) ""
- migration_bitmap_sync_end(uint64_t dirty_pages) "dirty_pages %" PRIu64
-+migration_bitmap_clear_dirty(char *str, uint64_t start, uint64_t size, unsigned long page) "rb %s start 0x%"PRIx64" size 0x%"PRIx64" page 0x%lx"
- migration_throttle(void) ""
- multifd_recv(uint8_t id, uint64_t packet_num, uint32_t used, uint32_t flags, uint32_t next_packet_size) "channel %d packet number %" PRIu64 " pages %d flags 0x%x next packet size %d"
- multifd_recv_sync_main(long packet_num) "packet num %ld"
--- 
-2.17.1
-
+> Thanks,
+> Yongji
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
