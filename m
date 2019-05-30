@@ -2,81 +2,64 @@ Return-Path: <SRS0=r6E1=T6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	T_HK_NAME_DR,USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 14087C28CC0
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 13:11:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E3D2C28CC0
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 13:21:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D3EB025952
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 13:11:21 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=cam.ac.uk header.i=@cam.ac.uk header.b="MINGF1A8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D3EB025952
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=cl.cam.ac.uk
+	by mail.kernel.org (Postfix) with ESMTPS id 668A325982
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 13:21:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 668A325982
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:53921 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:54029 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hWKq0-0008AP-Pt
-	for qemu-devel@archiver.kernel.org; Thu, 30 May 2019 09:11:20 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:36026)
+	id 1hWL0A-0001fp-1o
+	for qemu-devel@archiver.kernel.org; Thu, 30 May 2019 09:21:50 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:37821)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <hmka2@hermes.cam.ac.uk>) id 1hWKpE-0007kX-8i
-	for qemu-devel@nongnu.org; Thu, 30 May 2019 09:10:33 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1hWKzF-00016C-VN
+	for qemu-devel@nongnu.org; Thu, 30 May 2019 09:20:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <hmka2@hermes.cam.ac.uk>) id 1hWKpC-0003Te-DH
-	for qemu-devel@nongnu.org; Thu, 30 May 2019 09:10:32 -0400
-Received: from ppsw-41.csi.cam.ac.uk ([131.111.8.141]:37046)
+	(envelope-from <dgilbert@redhat.com>) id 1hWKzE-0003Nk-Cf
+	for qemu-devel@nongnu.org; Thu, 30 May 2019 09:20:53 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53656)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <hmka2@hermes.cam.ac.uk>)
-	id 1hWKp3-0003M7-Ad; Thu, 30 May 2019 09:10:23 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=cam.ac.uk; 
-	s=20180806.ppsw;
-	h=Sender:Content-Type:Cc:To:Subject:Message-ID:Date:From:
-	In-Reply-To:References:MIME-Version:Reply-To:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
-	Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
-	List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=qUpRepGQOt/XAQs+elq3yyHkbiLJfY8ZvXaWCQVA4t0=;
-	b=MINGF1A8ONF8BOCYmJqjvbsMP9
-	jEsXyYo70KR8bF06IKMtJL3sK8QWTT20SqxERJwdGR7AQUG4C/MkMpkt6OshaVvsrt/vhLEDLI9yh
-	Y2HjeFK9pz5tDx2YuufXUlThjNuXy9CO0AskvB6iSNVQhilcwAMJjApjBGMwdn5bu9Z0=; 
-X-Cam-AntiVirus: no malware found
-X-Cam-ScannerInfo: http://help.uis.cam.ac.uk/email-scanner-virus
-Received: from mail-lf1-f43.google.com ([209.85.167.43]:41406)
-	by ppsw-41.csi.cam.ac.uk (smtp.hermes.cam.ac.uk [131.111.8.159]:587)
-	with esmtpsa (PLAIN:hmka2) (TLSv1.2:ECDHE-RSA-AES128-GCM-SHA256:128)
-	id 1hWKp0-0013gu-Re (Exim 4.91)
-	(return-path <hmka2@hermes.cam.ac.uk>); Thu, 30 May 2019 14:10:18 +0100
-Received: by mail-lf1-f43.google.com with SMTP id 136so4973471lfa.8;
-	Thu, 30 May 2019 06:10:15 -0700 (PDT)
-X-Gm-Message-State: APjAAAVH5beLq3pu7j5w/Rn/6bDOyA1y1BFagdV1YBI84HQvOyOm0kB7
-	0a4DLPGgnUAZrQRMTPrvWwhnnnwbLxgbeJ5GZJY=
-X-Google-Smtp-Source: APXvYqwaPsVJx1kMtWL8CMB8ZJxgjHxb3ij6MH8SOVOuGYszQ3HIpdHZi5/AG5ad4BsXmkoiPxYyzUGo8GFFrJ8p7h0=
-X-Received: by 2002:a19:488e:: with SMTP id v136mr2031057lfa.192.1559221814232;
-	Thu, 30 May 2019 06:10:14 -0700 (PDT)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hWKzE-0003I1-2v
+	for qemu-devel@nongnu.org; Thu, 30 May 2019 09:20:52 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+	[10.5.11.23])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id D8839308A946
+	for <qemu-devel@nongnu.org>; Thu, 30 May 2019 13:20:38 +0000 (UTC)
+Received: from work-vm (ovpn-117-91.ams2.redhat.com [10.36.117.91])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 65DFD34912;
+	Thu, 30 May 2019 13:20:36 +0000 (UTC)
+Date: Thu, 30 May 2019 14:20:33 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Peter Xu <peterx@redhat.com>
+Message-ID: <20190530132033.GF2823@work-vm>
+References: <20190530092919.26059-1-peterx@redhat.com>
+	<20190530092919.26059-8-peterx@redhat.com>
 MIME-Version: 1.0
-References: <20190521104324.12835-1-Hesham.Almatary@cl.cam.ac.uk>
-	<20190521104324.12835-3-Hesham.Almatary@cl.cam.ac.uk>
-	<CAKmqyKOT_15kFNjHkUgk+bs6GwGrDrAOPoe+t0u3T6hg6TqiPQ@mail.gmail.com>
-	<CA+wsVCDgogUXBDNiWm7R19fAyNw-3ybPiW4O8yA=Wt8oqyShFg@mail.gmail.com>
-	<CAKmqyKNN-R1jJB3DXQqvPQsu+8W3jH+mrCD+iBbdH+J_JwRbgg@mail.gmail.com>
-In-Reply-To: <CAKmqyKNN-R1jJB3DXQqvPQsu+8W3jH+mrCD+iBbdH+J_JwRbgg@mail.gmail.com>
-From: Hesham Almatary <hesham.almatary@cl.cam.ac.uk>
-Date: Thu, 30 May 2019 15:09:37 +0200
-X-Gmail-Original-Message-ID: <CA+wsVCBgEQUCHeBAe84ZkCeRb9bNw3xQ6gbSORQ9Oc0_YPM66A@mail.gmail.com>
-Message-ID: <CA+wsVCBgEQUCHeBAe84ZkCeRb9bNw3xQ6gbSORQ9Oc0_YPM66A@mail.gmail.com>
-To: Alistair Francis <alistair23@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190530092919.26059-8-peterx@redhat.com>
+User-Agent: Mutt/1.11.4 (2019-03-13)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.41]);
+	Thu, 30 May 2019 13:20:38 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 131.111.8.141
-Subject: Re: [Qemu-devel] [PATCHv3 3/5] RISC-V: Check PMP during Page Table
- Walks
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v3 07/12] memory: Introduce memory listener
+ hook log_clear()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -88,100 +71,224 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
-	"qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+Cc: Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+	qemu-devel@nongnu.org, Juan Quintela <quintela@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 30 May 2019 at 05:07, Alistair Francis <alistair23@gmail.com> wrote:
->
-> On Wed, May 22, 2019 at 2:27 AM Hesham Almatary
-> <hesham.almatary@cl.cam.ac.uk> wrote:
-> >
-> > On Tue, 21 May 2019 at 23:40, Alistair Francis <alistair23@gmail.com> wrote:
-> > >
-> > > On Tue, May 21, 2019 at 3:44 AM Hesham Almatary
-> > > <Hesham.Almatary@cl.cam.ac.uk> wrote:
-> > > >
-> > > > The PMP should be checked when doing a page table walk, and report access
-> > > > fault exception if the to-be-read PTE failed the PMP check.
-> > > >
-> > > > Suggested-by: Jonathan Behrens <fintelia@gmail.com>
-> > > > Signed-off-by: Hesham Almatary <Hesham.Almatary@cl.cam.ac.uk>
-> > > > ---
-> > > >  target/riscv/cpu.h        |  1 +
-> > > >  target/riscv/cpu_helper.c | 10 +++++++++-
-> > > >  2 files changed, 10 insertions(+), 1 deletion(-)
-> > > >
-> > > > diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
-> > > > index c17184f4e4..ab3ba3f15a 100644
-> > > > --- a/target/riscv/cpu.h
-> > > > +++ b/target/riscv/cpu.h
-> > > > @@ -94,6 +94,7 @@ enum {
-> > > >  #define PRIV_VERSION_1_09_1 0x00010901
-> > > >  #define PRIV_VERSION_1_10_0 0x00011000
-> > > >
-> > > > +#define TRANSLATE_PMP_FAIL 2
-> > > >  #define TRANSLATE_FAIL 1
-> > > >  #define TRANSLATE_SUCCESS 0
-> > > >  #define NB_MMU_MODES 4
-> > > > diff --git a/target/riscv/cpu_helper.c b/target/riscv/cpu_helper.c
-> > > > index 7c7282c680..d0b0f9cf88 100644
-> > > > --- a/target/riscv/cpu_helper.c
-> > > > +++ b/target/riscv/cpu_helper.c
-> > > > @@ -211,6 +211,12 @@ restart:
-> > > >
-> > > >          /* check that physical address of PTE is legal */
-> > > >          target_ulong pte_addr = base + idx * ptesize;
-> > > > +
-> > > > +        if (riscv_feature(env, RISCV_FEATURE_PMP) &&
-> > > > +            !pmp_hart_has_privs(env, pte_addr, sizeof(target_ulong),
-> > > > +            1 << MMU_DATA_LOAD)) {
-> > >
-> > > I see a problem here.
-> > >
-> > > pmp_hart_has_privs() checks permissions based on the current value of
-> > > env->priv. This might not always be the correct permissions to check,
-> > > we should instead use the current mode to check permissions.
-> > >
-> > That is not clear to me. Isn't env->priv the current privildge mode?
-> > Could you please elaborate on what other cases this might not be the case?
->
-> Sorry for the delay. The RISC-V Hypervisor Extension allows load/store
-> operations to be carried out as a previous privilege. The mstatus.MPRV
-> and hstatus.SPRV allow this.
->
-No problem, thanks for the clarification.
-You are right, I haven't considered MPRV. I fixed that in a separate
-commit in a v4 series of patches.
-> Alistair
->
-> >
-> > > The best way to do this to me is to probably provide a privileged mode
-> > > override to the function, can you add that?
-> > >
-> > > Alistair
-> > >
-> > > > +            return TRANSLATE_PMP_FAIL;
-> > > > +        }
-> > > >  #if defined(TARGET_RISCV32)
-> > > >          target_ulong pte = ldl_phys(cs->as, pte_addr);
-> > > >  #elif defined(TARGET_RISCV64)
-> > > > @@ -405,8 +411,10 @@ bool riscv_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
-> > > >      if (riscv_feature(env, RISCV_FEATURE_PMP) &&
-> > > >          (ret == TRANSLATE_SUCCESS) &&
-> > > >          !pmp_hart_has_privs(env, pa, TARGET_PAGE_SIZE, 1 << access_type)) {
-> > > > +        ret = TRANSLATE_PMP_FAIL;
-> > > > +    }
-> > > > +    if (ret == TRANSLATE_PMP_FAIL) {
-> > > >          pmp_violation = true;
-> > > > -        ret = TRANSLATE_FAIL;
-> > > >      }
-> > > >      if (ret == TRANSLATE_SUCCESS) {
-> > > >          tlb_set_page(cs, address & TARGET_PAGE_MASK, pa & TARGET_PAGE_MASK,
-> > > > --
-> > > > 2.17.1
-> > > >
-> > > >
+* Peter Xu (peterx@redhat.com) wrote:
+> Introduce a new memory region listener hook log_clear() to allow the
+> listeners to hook onto the points where the dirty bitmap is cleared by
+> the bitmap users.
+> 
+> Previously log_sync() contains two operations:
+> 
+>   - dirty bitmap collection, and,
+>   - dirty bitmap clear on remote site.
+> 
+> Let's take KVM as example - log_sync() for KVM will first copy the
+> kernel dirty bitmap to userspace, and at the same time we'll clear the
+> dirty bitmap there along with re-protecting all the guest pages again.
+> 
+> We add this new log_clear() interface only to split the old log_sync()
+> into two separated procedures:
+> 
+>   - use log_sync() to collect the collection only, and,
+>   - use log_clear() to clear the remote dirty bitmap.
+> 
+> With the new interface, the memory listener users will still be able
+> to decide how to implement the log synchronization procedure, e.g.,
+> they can still only provide log_sync() method only and put all the two
+> procedures within log_sync() (that's how the old KVM works before
+> KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2 is introduced).  However with this
+> new interface the memory listener users will start to have a chance to
+> postpone the log clear operation explicitly if the module supports.
+> That can really benefit users like KVM at least for host kernels that
+> support KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2.
+> 
+> There are three places that can clear dirty bits in any one of the
+> dirty bitmap in the ram_list.dirty_memory[3] array:
+> 
+>         cpu_physical_memory_snapshot_and_clear_dirty
+>         cpu_physical_memory_test_and_clear_dirty
+>         cpu_physical_memory_sync_dirty_bitmap
+> 
+> Currently we hook directly into each of the functions to notify about
+> the log_clear().
+> 
+> Signed-off-by: Peter Xu <peterx@redhat.com>
+> ---
+>  exec.c                  | 12 ++++++++++
+>  include/exec/memory.h   | 17 ++++++++++++++
+>  include/exec/ram_addr.h |  3 +++
+>  memory.c                | 51 +++++++++++++++++++++++++++++++++++++++++
+>  4 files changed, 83 insertions(+)
+> 
+> diff --git a/exec.c b/exec.c
+> index 2615b4cfed..ab595e1e4b 100644
+> --- a/exec.c
+> +++ b/exec.c
+> @@ -1355,6 +1355,8 @@ bool cpu_physical_memory_test_and_clear_dirty(ram_addr_t start,
+>      DirtyMemoryBlocks *blocks;
+>      unsigned long end, page;
+>      bool dirty = false;
+> +    RAMBlock *ramblock;
+> +    uint64_t mr_offset, mr_size;
+>  
+>      if (length == 0) {
+>          return false;
+> @@ -1366,6 +1368,10 @@ bool cpu_physical_memory_test_and_clear_dirty(ram_addr_t start,
+>      rcu_read_lock();
+>  
+>      blocks = atomic_rcu_read(&ram_list.dirty_memory[client]);
+> +    ramblock = qemu_get_ram_block(start);
+> +    /* Range sanity check on the ramblock */
+> +    assert(start >= ramblock->offset &&
+> +           start + length <= ramblock->offset + ramblock->used_length);
+>  
+>      while (page < end) {
+>          unsigned long idx = page / DIRTY_MEMORY_BLOCK_SIZE;
+> @@ -1377,6 +1383,10 @@ bool cpu_physical_memory_test_and_clear_dirty(ram_addr_t start,
+>          page += num;
+>      }
+>  
+> +    mr_offset = (ram_addr_t)(page << TARGET_PAGE_BITS) - ramblock->offset;
+> +    mr_size = (end - page) << TARGET_PAGE_BITS;
+> +    memory_region_clear_dirty_bitmap(ramblock->mr, mr_offset, mr_size);
+> +
+>      rcu_read_unlock();
+>  
+>      if (dirty && tcg_enabled()) {
+> @@ -1432,6 +1442,8 @@ DirtyBitmapSnapshot *cpu_physical_memory_snapshot_and_clear_dirty
+>          tlb_reset_dirty_range_all(start, length);
+>      }
+>  
+> +    memory_region_clear_dirty_bitmap(mr, addr, length);
+> +
+>      return snap;
+>  }
+>  
+> diff --git a/include/exec/memory.h b/include/exec/memory.h
+> index f29300c54d..d752b2a758 100644
+> --- a/include/exec/memory.h
+> +++ b/include/exec/memory.h
+> @@ -416,6 +416,7 @@ struct MemoryListener {
+>      void (*log_stop)(MemoryListener *listener, MemoryRegionSection *section,
+>                       int old, int new);
+>      void (*log_sync)(MemoryListener *listener, MemoryRegionSection *section);
+> +    void (*log_clear)(MemoryListener *listener, MemoryRegionSection *section);
+>      void (*log_global_start)(MemoryListener *listener);
+>      void (*log_global_stop)(MemoryListener *listener);
+>      void (*eventfd_add)(MemoryListener *listener, MemoryRegionSection *section,
+> @@ -1269,6 +1270,22 @@ void memory_region_set_log(MemoryRegion *mr, bool log, unsigned client);
+>  void memory_region_set_dirty(MemoryRegion *mr, hwaddr addr,
+>                               hwaddr size);
+>  
+> +/**
+> + * memory_region_clear_dirty_bitmap - clear dirty bitmap for memory range
+> + *
+> + * This function is called when the caller wants to clear the remote
+> + * dirty bitmap of a memory range within the memory region.  This can
+> + * be used by e.g. KVM to manually clear dirty log when
+> + * KVM_CAP_MANUAL_DIRTY_LOG_PROTECT is declared support by the host
+> + * kernel.
+> + *
+> + * @mr:     the memory region to clear the dirty log upon
+> + * @start:  start address offset within the memory region
+> + * @len:    length of the memory region to clear dirty bitmap
+> + */
+> +void memory_region_clear_dirty_bitmap(MemoryRegion *mr, hwaddr start,
+> +                                      hwaddr len);
+> +
+>  /**
+>   * memory_region_snapshot_and_clear_dirty: Get a snapshot of the dirty
+>   *                                         bitmap and clear it.
+> diff --git a/include/exec/ram_addr.h b/include/exec/ram_addr.h
+> index f8ee011d3c..f8930914cd 100644
+> --- a/include/exec/ram_addr.h
+> +++ b/include/exec/ram_addr.h
+> @@ -461,6 +461,9 @@ uint64_t cpu_physical_memory_sync_dirty_bitmap(RAMBlock *rb,
+>                  idx++;
+>              }
+>          }
+> +
+> +        /* TODO: split the huge bitmap into smaller chunks */
+> +        memory_region_clear_dirty_bitmap(rb->mr, start, length);
+>      } else {
+>          ram_addr_t offset = rb->offset;
+>  
+> diff --git a/memory.c b/memory.c
+> index 84bba7b65c..a051025dd1 100644
+> --- a/memory.c
+> +++ b/memory.c
+> @@ -2064,6 +2064,57 @@ static void memory_region_sync_dirty_bitmap(MemoryRegion *mr)
+>      }
+>  }
+>  
+> +void memory_region_clear_dirty_bitmap(MemoryRegion *mr, hwaddr start,
+> +                                      hwaddr len)
+> +{
+> +    MemoryRegionSection mrs;
+> +    MemoryListener *listener;
+> +    AddressSpace *as;
+> +    FlatView *view;
+> +    FlatRange *fr;
+> +    hwaddr sec_start, sec_end, sec_size;
+> +
+> +    QTAILQ_FOREACH(listener, &memory_listeners, link) {
+> +        if (!listener->log_clear) {
+> +            continue;
+> +        }
+> +        as = listener->address_space;
+> +        view = address_space_get_flatview(as);
+> +        FOR_EACH_FLAT_RANGE(fr, view) {
+> +            if (!fr->dirty_log_mask || fr->mr != mr) {
+> +                /*
+> +                 * Clear dirty bitmap operation only applies to those
+> +                 * regions whose dirty logging is at least enabled
+> +                 */
+> +                continue;
+> +            }
+> +
+> +            mrs = section_from_flat_range(fr, view);
+> +
+> +            sec_start = MAX(mrs.offset_within_region, start);
+> +            sec_end = mrs.offset_within_region + int128_get64(mrs.size);
+> +            sec_end = MIN(sec_end, start + len);
+> +
+> +            if (sec_start >= sec_end) {
+> +                /*
+> +                 * If this memory region section has no intersection
+> +                 * with the requested range, skip.
+> +                 */
+> +                continue;
+> +            }
+> +
+> +            /* Valid case; shrink the section if needed */
+> +            mrs.offset_within_address_space +=
+> +                sec_start - mrs.offset_within_region;
+> +            mrs.offset_within_region = sec_start;
+> +            sec_size = sec_end - sec_start;
+> +            mrs.size = int128_make64(sec_size);
+> +            listener->log_clear(listener, &mrs);
+> +        }
+> +        flatview_unref(view);
+> +    }
+> +}
+> +
+>  DirtyBitmapSnapshot *memory_region_snapshot_and_clear_dirty(MemoryRegion *mr,
+>                                                              hwaddr addr,
+>                                                              hwaddr size,
+
+I think that's ok (although some of the size juggling I only think I've
+got).
+
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+
+> -- 
+> 2.17.1
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
