@@ -2,64 +2,110 @@ Return-Path: <SRS0=r6E1=T6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	T_HK_NAME_DR,USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E3D2C28CC0
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 13:21:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AD93EC28CC0
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 13:27:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 668A325982
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 13:21:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 668A325982
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 58D4725992
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 13:27:01 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="fUcqENWf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 58D4725992
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:54029 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:54098 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hWL0A-0001fp-1o
-	for qemu-devel@archiver.kernel.org; Thu, 30 May 2019 09:21:50 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:37821)
+	id 1hWL5A-0003xL-Hf
+	for qemu-devel@archiver.kernel.org; Thu, 30 May 2019 09:27:00 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:39198)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1hWKzF-00016C-VN
-	for qemu-devel@nongnu.org; Thu, 30 May 2019 09:20:55 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1hWL4I-0003VH-P1
+	for qemu-devel@nongnu.org; Thu, 30 May 2019 09:26:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1hWKzE-0003Nk-Cf
-	for qemu-devel@nongnu.org; Thu, 30 May 2019 09:20:53 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53656)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hWKzE-0003I1-2v
-	for qemu-devel@nongnu.org; Thu, 30 May 2019 09:20:52 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
-	[10.5.11.23])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D8839308A946
-	for <qemu-devel@nongnu.org>; Thu, 30 May 2019 13:20:38 +0000 (UTC)
-Received: from work-vm (ovpn-117-91.ams2.redhat.com [10.36.117.91])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 65DFD34912;
-	Thu, 30 May 2019 13:20:36 +0000 (UTC)
-Date: Thu, 30 May 2019 14:20:33 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Peter Xu <peterx@redhat.com>
-Message-ID: <20190530132033.GF2823@work-vm>
-References: <20190530092919.26059-1-peterx@redhat.com>
-	<20190530092919.26059-8-peterx@redhat.com>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1hWL4H-0006to-JC
+	for qemu-devel@nongnu.org; Thu, 30 May 2019 09:26:06 -0400
+Received: from mail-eopbgr140137.outbound.protection.outlook.com
+	([40.107.14.137]:52839
+	helo=EUR01-VE1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+	id 1hWL4D-0006pW-8G; Thu, 30 May 2019 09:26:03 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+	s=selector1;
+	h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+	bh=L24bEcgNxoNhfXWTkiCK0TLEo4SXkdY39scZGSc5i+0=;
+	b=fUcqENWf91JKjmKOXkf9+ja3BraFvzTao5mIUMuFhfrFPpGN3uylnCf5nsV+DFa3185Hsez9r0NGwa7K3ltl1rBiu7kkOM1hvloBMRd1X2f3tPBK7Ln6W+2Bi+uY90vkGspzvuCecFYaZUS6MAbiotye8LucO606Vjju7h7fm2g=
+Received: from DB7PR08MB2972.eurprd08.prod.outlook.com (52.134.109.150) by
+	DB7PR08MB3083.eurprd08.prod.outlook.com (52.134.110.25) with Microsoft
+	SMTP
+	Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+	15.20.1922.16; Thu, 30 May 2019 13:25:55 +0000
+Received: from DB7PR08MB2972.eurprd08.prod.outlook.com
+	([fe80::e5eb:4576:5a22:7f82]) by
+	DB7PR08MB2972.eurprd08.prod.outlook.com
+	([fe80::e5eb:4576:5a22:7f82%7]) with mapi id 15.20.1943.016;
+	Thu, 30 May 2019 13:25:55 +0000
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org"
+	<qemu-block@nongnu.org>
+Thread-Topic: [PATCH v8 0/7] backup-top filter driver for backup
+Thread-Index: AQHVFjXG5C3ar/FgH0iQpyr20x551aaDqfwA
+Date: Thu, 30 May 2019 13:25:55 +0000
+Message-ID: <5a71a794-f01f-59d6-e140-334c20db31d2@virtuozzo.com>
+References: <20190529154654.95870-1-vsementsov@virtuozzo.com>
+In-Reply-To: <20190529154654.95870-1-vsementsov@virtuozzo.com>
+Accept-Language: ru-RU, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-clientproxiedby: HE1PR0101CA0022.eurprd01.prod.exchangelabs.com
+	(2603:10a6:3:77::32) To DB7PR08MB2972.eurprd08.prod.outlook.com
+	(2603:10a6:5:1c::22)
+authentication-results: spf=none (sender IP is )
+	smtp.mailfrom=vsementsov@virtuozzo.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-tagtoolbar-keys: D20190530162552683
+x-originating-ip: [185.231.240.5]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 5cc2a7b3-5e88-4ae1-6e79-08d6e5025831
+x-microsoft-antispam: BCL:0; PCL:0;
+	RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(2017052603328)(7193020);
+	SRVR:DB7PR08MB3083; 
+x-ms-traffictypediagnostic: DB7PR08MB3083:
+x-ms-exchange-purlcount: 1
+x-microsoft-antispam-prvs: <DB7PR08MB3083665F707C69E39F49CC6FC1180@DB7PR08MB3083.eurprd08.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:7219;
+x-forefront-prvs: 00531FAC2C
+x-forefront-antispam-report: SFV:NSPM;
+	SFS:(10019020)(39850400004)(346002)(376002)(366004)(396003)(136003)(199004)(189003)(53754006)(26005)(66066001)(305945005)(386003)(6506007)(53936002)(6246003)(54906003)(7736002)(102836004)(11346002)(2501003)(446003)(81166006)(2616005)(110136005)(3846002)(6512007)(81156014)(8676002)(186003)(8936002)(86362001)(31696002)(4326008)(14444005)(2906002)(6116002)(5660300002)(256004)(6306002)(476003)(14454004)(66476007)(229853002)(66556008)(31686004)(6436002)(25786009)(966005)(68736007)(486006)(66946007)(66446008)(99286004)(76176011)(52116002)(6486002)(71190400001)(478600001)(64756008)(316002)(36756003)(71200400001)(73956011);
+	DIR:OUT; SFP:1102; SCL:1; SRVR:DB7PR08MB3083;
+	H:DB7PR08MB2972.eurprd08.prod.outlook.com; FPR:; SPF:None;
+	LANG:en; PTR:InfoNoRecords; A:1; MX:1; 
+received-spf: None (protection.outlook.com: virtuozzo.com does not designate
+	permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: Mx9ntihTHHCAK2d/o63fZcHnyzH5IvO8p9TyOwVZEaPUis4U+xFgDXXIViibKPern3DpkeD7YhsPZ48gct3odU2QXheHsHEJinTEtTfOw78o0Enc1wayc+8Ow+XbLmEB5t0jCV+8FpfumBp4DAxnVQezX0BuwWSV/JKc7DZAjMUhuYV3XDDcL86cLChgkluy/5jsk9uRadP+NMU+fVMA/itlDaES8fH2kAXi2I4PxbBnucwdtgMJB0YzTS93dE2fDAFrkBzlb8PinpvQhfJYju7uwde1Vd4Gi4g4LQ20F89bVSQZHBSOGyKkvaDVo+x5D0wZZaU1OFWZVodeeZtcvfPsnpXsoEoOu8vv6MpJwnRjf7N0UkcgWeNid7mic6TxqjLSvKfzfUo/qf1td3bBHH/33Z3lQUsOKjJ8HK3fnI0=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <A31BC8717B80904386D98DC0D1122FC5@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190530092919.26059-8-peterx@redhat.com>
-User-Agent: Mutt/1.11.4 (2019-03-13)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.41]);
-	Thu, 30 May 2019 13:20:38 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v3 07/12] memory: Introduce memory listener
- hook log_clear()
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5cc2a7b3-5e88-4ae1-6e79-08d6e5025831
+X-MS-Exchange-CrossTenant-originalarrivaltime: 30 May 2019 13:25:55.5901 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: vsementsov@virtuozzo.com
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB7PR08MB3083
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.14.137
+Subject: Re: [Qemu-devel] [PATCH v8 0/7] backup-top filter driver for backup
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -71,224 +117,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
-	qemu-devel@nongnu.org, Juan Quintela <quintela@redhat.com>
+Cc: "fam@euphon.net" <fam@euphon.net>, "kwolf@redhat.com" <kwolf@redhat.com>,
+	Denis Lunev <den@virtuozzo.com>, "mreitz@redhat.com" <mreitz@redhat.com>,
+	"stefanha@redhat.com" <stefanha@redhat.com>,
+	"jsnow@redhat.com" <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Peter Xu (peterx@redhat.com) wrote:
-> Introduce a new memory region listener hook log_clear() to allow the
-> listeners to hook onto the points where the dirty bitmap is cleared by
-> the bitmap users.
-> 
-> Previously log_sync() contains two operations:
-> 
->   - dirty bitmap collection, and,
->   - dirty bitmap clear on remote site.
-> 
-> Let's take KVM as example - log_sync() for KVM will first copy the
-> kernel dirty bitmap to userspace, and at the same time we'll clear the
-> dirty bitmap there along with re-protecting all the guest pages again.
-> 
-> We add this new log_clear() interface only to split the old log_sync()
-> into two separated procedures:
-> 
->   - use log_sync() to collect the collection only, and,
->   - use log_clear() to clear the remote dirty bitmap.
-> 
-> With the new interface, the memory listener users will still be able
-> to decide how to implement the log synchronization procedure, e.g.,
-> they can still only provide log_sync() method only and put all the two
-> procedures within log_sync() (that's how the old KVM works before
-> KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2 is introduced).  However with this
-> new interface the memory listener users will start to have a chance to
-> postpone the log clear operation explicitly if the module supports.
-> That can really benefit users like KVM at least for host kernels that
-> support KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2.
-> 
-> There are three places that can clear dirty bits in any one of the
-> dirty bitmap in the ram_list.dirty_memory[3] array:
-> 
->         cpu_physical_memory_snapshot_and_clear_dirty
->         cpu_physical_memory_test_and_clear_dirty
->         cpu_physical_memory_sync_dirty_bitmap
-> 
-> Currently we hook directly into each of the functions to notify about
-> the log_clear().
-> 
-> Signed-off-by: Peter Xu <peterx@redhat.com>
-> ---
->  exec.c                  | 12 ++++++++++
->  include/exec/memory.h   | 17 ++++++++++++++
->  include/exec/ram_addr.h |  3 +++
->  memory.c                | 51 +++++++++++++++++++++++++++++++++++++++++
->  4 files changed, 83 insertions(+)
-> 
-> diff --git a/exec.c b/exec.c
-> index 2615b4cfed..ab595e1e4b 100644
-> --- a/exec.c
-> +++ b/exec.c
-> @@ -1355,6 +1355,8 @@ bool cpu_physical_memory_test_and_clear_dirty(ram_addr_t start,
->      DirtyMemoryBlocks *blocks;
->      unsigned long end, page;
->      bool dirty = false;
-> +    RAMBlock *ramblock;
-> +    uint64_t mr_offset, mr_size;
->  
->      if (length == 0) {
->          return false;
-> @@ -1366,6 +1368,10 @@ bool cpu_physical_memory_test_and_clear_dirty(ram_addr_t start,
->      rcu_read_lock();
->  
->      blocks = atomic_rcu_read(&ram_list.dirty_memory[client]);
-> +    ramblock = qemu_get_ram_block(start);
-> +    /* Range sanity check on the ramblock */
-> +    assert(start >= ramblock->offset &&
-> +           start + length <= ramblock->offset + ramblock->used_length);
->  
->      while (page < end) {
->          unsigned long idx = page / DIRTY_MEMORY_BLOCK_SIZE;
-> @@ -1377,6 +1383,10 @@ bool cpu_physical_memory_test_and_clear_dirty(ram_addr_t start,
->          page += num;
->      }
->  
-> +    mr_offset = (ram_addr_t)(page << TARGET_PAGE_BITS) - ramblock->offset;
-> +    mr_size = (end - page) << TARGET_PAGE_BITS;
-> +    memory_region_clear_dirty_bitmap(ramblock->mr, mr_offset, mr_size);
-> +
->      rcu_read_unlock();
->  
->      if (dirty && tcg_enabled()) {
-> @@ -1432,6 +1442,8 @@ DirtyBitmapSnapshot *cpu_physical_memory_snapshot_and_clear_dirty
->          tlb_reset_dirty_range_all(start, length);
->      }
->  
-> +    memory_region_clear_dirty_bitmap(mr, addr, length);
-> +
->      return snap;
->  }
->  
-> diff --git a/include/exec/memory.h b/include/exec/memory.h
-> index f29300c54d..d752b2a758 100644
-> --- a/include/exec/memory.h
-> +++ b/include/exec/memory.h
-> @@ -416,6 +416,7 @@ struct MemoryListener {
->      void (*log_stop)(MemoryListener *listener, MemoryRegionSection *section,
->                       int old, int new);
->      void (*log_sync)(MemoryListener *listener, MemoryRegionSection *section);
-> +    void (*log_clear)(MemoryListener *listener, MemoryRegionSection *section);
->      void (*log_global_start)(MemoryListener *listener);
->      void (*log_global_stop)(MemoryListener *listener);
->      void (*eventfd_add)(MemoryListener *listener, MemoryRegionSection *section,
-> @@ -1269,6 +1270,22 @@ void memory_region_set_log(MemoryRegion *mr, bool log, unsigned client);
->  void memory_region_set_dirty(MemoryRegion *mr, hwaddr addr,
->                               hwaddr size);
->  
-> +/**
-> + * memory_region_clear_dirty_bitmap - clear dirty bitmap for memory range
-> + *
-> + * This function is called when the caller wants to clear the remote
-> + * dirty bitmap of a memory range within the memory region.  This can
-> + * be used by e.g. KVM to manually clear dirty log when
-> + * KVM_CAP_MANUAL_DIRTY_LOG_PROTECT is declared support by the host
-> + * kernel.
-> + *
-> + * @mr:     the memory region to clear the dirty log upon
-> + * @start:  start address offset within the memory region
-> + * @len:    length of the memory region to clear dirty bitmap
-> + */
-> +void memory_region_clear_dirty_bitmap(MemoryRegion *mr, hwaddr start,
-> +                                      hwaddr len);
-> +
->  /**
->   * memory_region_snapshot_and_clear_dirty: Get a snapshot of the dirty
->   *                                         bitmap and clear it.
-> diff --git a/include/exec/ram_addr.h b/include/exec/ram_addr.h
-> index f8ee011d3c..f8930914cd 100644
-> --- a/include/exec/ram_addr.h
-> +++ b/include/exec/ram_addr.h
-> @@ -461,6 +461,9 @@ uint64_t cpu_physical_memory_sync_dirty_bitmap(RAMBlock *rb,
->                  idx++;
->              }
->          }
-> +
-> +        /* TODO: split the huge bitmap into smaller chunks */
-> +        memory_region_clear_dirty_bitmap(rb->mr, start, length);
->      } else {
->          ram_addr_t offset = rb->offset;
->  
-> diff --git a/memory.c b/memory.c
-> index 84bba7b65c..a051025dd1 100644
-> --- a/memory.c
-> +++ b/memory.c
-> @@ -2064,6 +2064,57 @@ static void memory_region_sync_dirty_bitmap(MemoryRegion *mr)
->      }
->  }
->  
-> +void memory_region_clear_dirty_bitmap(MemoryRegion *mr, hwaddr start,
-> +                                      hwaddr len)
-> +{
-> +    MemoryRegionSection mrs;
-> +    MemoryListener *listener;
-> +    AddressSpace *as;
-> +    FlatView *view;
-> +    FlatRange *fr;
-> +    hwaddr sec_start, sec_end, sec_size;
-> +
-> +    QTAILQ_FOREACH(listener, &memory_listeners, link) {
-> +        if (!listener->log_clear) {
-> +            continue;
-> +        }
-> +        as = listener->address_space;
-> +        view = address_space_get_flatview(as);
-> +        FOR_EACH_FLAT_RANGE(fr, view) {
-> +            if (!fr->dirty_log_mask || fr->mr != mr) {
-> +                /*
-> +                 * Clear dirty bitmap operation only applies to those
-> +                 * regions whose dirty logging is at least enabled
-> +                 */
-> +                continue;
-> +            }
-> +
-> +            mrs = section_from_flat_range(fr, view);
-> +
-> +            sec_start = MAX(mrs.offset_within_region, start);
-> +            sec_end = mrs.offset_within_region + int128_get64(mrs.size);
-> +            sec_end = MIN(sec_end, start + len);
-> +
-> +            if (sec_start >= sec_end) {
-> +                /*
-> +                 * If this memory region section has no intersection
-> +                 * with the requested range, skip.
-> +                 */
-> +                continue;
-> +            }
-> +
-> +            /* Valid case; shrink the section if needed */
-> +            mrs.offset_within_address_space +=
-> +                sec_start - mrs.offset_within_region;
-> +            mrs.offset_within_region = sec_start;
-> +            sec_size = sec_end - sec_start;
-> +            mrs.size = int128_make64(sec_size);
-> +            listener->log_clear(listener, &mrs);
-> +        }
-> +        flatview_unref(view);
-> +    }
-> +}
-> +
->  DirtyBitmapSnapshot *memory_region_snapshot_and_clear_dirty(MemoryRegion *mr,
->                                                              hwaddr addr,
->                                                              hwaddr size,
-
-I think that's ok (although some of the size juggling I only think I've
-got).
-
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-
-> -- 
-> 2.17.1
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+MjkuMDUuMjAxOSAxODo0NiwgVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSB3cm90ZToNCj4g
+SGkgYWxsIQ0KPiANCj4gVGhlc2Ugc2VyaWVzIGludHJvZHVjZSBiYWNrdXAtdG9wIGRyaXZlci4g
+SXQncyBhIGZpbHRlci1ub2RlLCB3aGljaA0KPiBkbyBjb3B5LWJlZm9yZS13cml0ZSBvcGVyYXRp
+b24uIE1pcnJvciB1c2VzIGZpbHRlci1ub2RlIGZvciBoYW5kbGluZw0KPiBndWVzdCB3cml0ZXMs
+IGxldCdzIG1vdmUgdG8gZmlsdGVyLW5vZGUgKGZyb20gd3JpdGUtbm90aWZpZXJzKSBmb3INCj4g
+YmFja3VwIHRvbw0KPiANCj4gdjg6DQo+IDAxLTAzOiBuZXcNCj4gMDU6IGFkZCBNYXgncyByLWIN
+Cj4gb3RoZXJzIGNoYW5nZWQsIGNoYW5nZSBkZXNjcmlwdGlvbiBpbiBlYWNoIHBhdGNoIG1haWwg
+aW4gTm90ZXMgc2VjdGlvbi4NCj4gDQo+IHY2LXY3IHdhcyBwcmVwYXJpbmcgcmVmYWN0b3Jpbmcs
+IHdoaWNoIG5vdyBpcyBpbiBNYXgncyBwdWxsIHJlcXVlc3QsIGFuZA0KPiB0aGVzZSBzZXJpZXMg
+YmFzZWQgb24gaXQ6DQo+IEJhc2VkLW9uOiBodHRwczovL2xpc3RzLmdudS5vcmcvYXJjaGl2ZS9o
+dG1sL3FlbXUtZGV2ZWwvMjAxOS0wNS9tc2cwNjUyNi5odG1sDQoNCkl0IG1lcmdlZCwgc28sIG5v
+dyB0aGUgc2VyaWVzIGJhc2VkIG9uIG1hc3Rlci4NCg0KPiANCj4gVmxhZGltaXIgU2VtZW50c292
+LU9naWV2c2tpeSAoNyk6DQo+ICAgIGJsb2NrOiB0ZWFjaCBiZHJ2X2RlYnVnX2JyZWFrcG9pbnQg
+c2tpcCBmaWx0ZXJzIHdpdGggYmFja2luZw0KPiAgICBibG9jazogc3dhcCBvcGVyYXRpb24gb3Jk
+ZXIgaW4gYmRydl9hcHBlbmQNCj4gICAgYmxvY2s6IGFsbG93IG5vdCBvbmUgY2hpbGQgZm9yIGlt
+cGxpY2l0IG5vZGUNCj4gICAgYmxvY2s6IGludHJvZHVjZSBiYWNrdXAtdG9wIGZpbHRlciBkcml2
+ZXINCj4gICAgYmxvY2svaW86IHJlZmFjdG9yIHdhaXRfc2VyaWFsaXNpbmdfcmVxdWVzdHMNCj4g
+ICAgYmxvY2s6IGFkZCBsb2NrL3VubG9jayByYW5nZSBmdW5jdGlvbnMNCj4gICAgYmxvY2svYmFj
+a3VwOiB1c2UgYmFja3VwLXRvcCBpbnN0ZWFkIG9mIHdyaXRlIG5vdGlmaWVycw0KPiANCj4gICBi
+bG9jay9iYWNrdXAtdG9wLmggICAgICAgICB8ICA2NCArKysrKysrKw0KPiAgIGluY2x1ZGUvYmxv
+Y2svYmxvY2tfaW50LmggIHwgICA0ICsNCj4gICBibG9jay5jICAgICAgICAgICAgICAgICAgICB8
+ICA2MCArKysrKy0tDQo+ICAgYmxvY2svYmFja3VwLXRvcC5jICAgICAgICAgfCAzMjIgKysrKysr
+KysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKw0KPiAgIGJsb2NrL2JhY2t1cC5jICAgICAg
+ICAgICAgIHwgMTcxICsrKysrKysrLS0tLS0tLS0tLS0tDQo+ICAgYmxvY2svaW8uYyAgICAgICAg
+ICAgICAgICAgfCAgNjggKysrKysrLS0NCj4gICBibG9jay9NYWtlZmlsZS5vYmpzICAgICAgICB8
+ICAgMiArDQo+ICAgdGVzdHMvcWVtdS1pb3Rlc3RzLzA1NiAgICAgfCAgIDIgKy0NCj4gICB0ZXN0
+cy9xZW11LWlvdGVzdHMvMDg1Lm91dCB8ICAgMiArLQ0KPiAgIHRlc3RzL3FlbXUtaW90ZXN0cy8x
+MjkgICAgIHwgICAxIC0NCj4gICB0ZXN0cy9xZW11LWlvdGVzdHMvMTQxLm91dCB8ICAgMiArLQ0K
+PiAgIDExIGZpbGVzIGNoYW5nZWQsIDU2NyBpbnNlcnRpb25zKCspLCAxMzEgZGVsZXRpb25zKC0p
+DQo+ICAgY3JlYXRlIG1vZGUgMTAwNjQ0IGJsb2NrL2JhY2t1cC10b3AuaA0KPiAgIGNyZWF0ZSBt
+b2RlIDEwMDY0NCBibG9jay9iYWNrdXAtdG9wLmMNCj4gDQoNCg0KLS0gDQpCZXN0IHJlZ2FyZHMs
+DQpWbGFkaW1pcg0K
 
