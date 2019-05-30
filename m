@@ -2,67 +2,50 @@ Return-Path: <SRS0=r6E1=T6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 66F46C28CC0
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 07:56:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 37FCBC28CC0
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 08:12:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3CBC32576C
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 07:56:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3CBC32576C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 10A2B257D5
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 08:12:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 10A2B257D5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:48800 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:48931 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hWFv8-0002rl-Gj
-	for qemu-devel@archiver.kernel.org; Thu, 30 May 2019 03:56:18 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:55819)
+	id 1hWGAZ-0005Mj-VN
+	for qemu-devel@archiver.kernel.org; Thu, 30 May 2019 04:12:15 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:58308)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1hWFtv-0002Ai-Ez
-	for qemu-devel@nongnu.org; Thu, 30 May 2019 03:55:04 -0400
+	(envelope-from <dplotnikov@virtuozzo.com>) id 1hWG9a-00050p-OT
+	for qemu-devel@nongnu.org; Thu, 30 May 2019 04:11:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1hWFtu-0006Ym-59
-	for qemu-devel@nongnu.org; Thu, 30 May 2019 03:55:03 -0400
-Resent-Date: Thu, 30 May 2019 03:55:03 -0400
-Resent-Message-Id: <E1hWFtu-0006Ym-59@eggs.gnu.org>
-Received: from sender4-of-o55.zoho.com ([136.143.188.55]:21577)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1hWFtt-0006YM-TX
-	for qemu-devel@nongnu.org; Thu, 30 May 2019 03:55:02 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1559202847; cv=none; d=zoho.com; s=zohoarc; 
-	b=V/fXQgiG0LMCiDXzh3JapdhG6iQYNYz2QeMXmL5tjb5At0dQILQA9OsjXXmTdJI8Oby4EfsdXKuM+tPsHBh7kuRn0VBOdYkRQLiFSQl6eOnl2ZtD6dBOl6TowFhgZjBo/ly9OsTlu0znuFAHfXFPXXki6SHRc7QcFPM+zOh6XgU=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
-	s=zohoarc; t=1559202847;
-	h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
-	bh=ZMdpE4yv1cpGFJjk29UCUUrRq2XME/Gj4+ytZ72LlzE=; 
-	b=Xe3zaN58kFxhSVmikVpG4/zwjLsrUqKJyWjLPhV49hlSaLHtvaKY598swCqEvfvPhjUKLUfduQjXtW5S46re0a8kSzI70dBIwSlf99+XBM0G8Dy9CtkgmARy7JgrYjPeiWm2t7bWeYeyhxo4DQu2HXnjje2DHHQ5kV7IrFR2J+U=
-ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
-	spf=pass  smtp.mailfrom=no-reply@patchew.org;
-	dmarc=pass header.from=<no-reply@patchew.org>
-	header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
-	mx.zohomail.com with SMTPS id 1559202846496192.148363570387;
-	Thu, 30 May 2019 00:54:06 -0700 (PDT)
-In-Reply-To: <20190530073205.5293-1-kwolf@redhat.com>
-Message-ID: <155920284527.9187.14210063698054538086@ce79690b2cb9>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: kwolf@redhat.com
-Date: Thu, 30 May 2019 00:54:06 -0700 (PDT)
-X-ZohoMailClient: External
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 136.143.188.55
-Subject: Re: [Qemu-devel] [PATCH v3 0/6] file-posix: Add
- dynamic-auto-read-only QAPI feature
+	(envelope-from <dplotnikov@virtuozzo.com>) id 1hWG9Y-0007xO-Ty
+	for qemu-devel@nongnu.org; Thu, 30 May 2019 04:11:14 -0400
+Received: from relay.sw.ru ([185.231.240.75]:46408)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dplotnikov@virtuozzo.com>)
+	id 1hWG9U-0007s2-Gj; Thu, 30 May 2019 04:11:08 -0400
+Received: from [10.94.4.71] (helo=dptest2.qa.sw.ru)
+	by relay.sw.ru with esmtp (Exim 4.91)
+	(envelope-from <dplotnikov@virtuozzo.com>)
+	id 1hWG9O-00058p-Fr; Thu, 30 May 2019 11:11:02 +0300
+From: Denis Plotnikov <dplotnikov@virtuozzo.com>
+To: eblake@redhat.com,
+	kwolf@redhat.com,
+	mreitz@redhat.com
+Date: Thu, 30 May 2019 11:10:55 +0300
+Message-Id: <20190530081055.9560-1-dplotnikov@virtuozzo.com>
+X-Mailer: git-send-email 2.17.0
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
+X-Received-From: 185.231.240.75
+Subject: [Qemu-devel] [PATCH v4] qemu-io: add pattern file for write command
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -74,60 +57,162 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, pkrempa@redhat.com, armbru@redhat.com,
-	qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, den@virtuozzo.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDUzMDA3MzIwNS41Mjkz
-LTEta3dvbGZAcmVkaGF0LmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBmYWlsZWQgdGhlIGFzYW4g
-YnVpbGQgdGVzdC4gUGxlYXNlIGZpbmQgdGhlIHRlc3RpbmcgY29tbWFuZHMgYW5kCnRoZWlyIG91
-dHB1dCBiZWxvdy4gSWYgeW91IGhhdmUgRG9ja2VyIGluc3RhbGxlZCwgeW91IGNhbiBwcm9iYWJs
-eSByZXByb2R1Y2UgaXQKbG9jYWxseS4KCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmlu
-L2Jhc2gKdGltZSBtYWtlIGRvY2tlci10ZXN0LWRlYnVnQGZlZG9yYSBUQVJHRVRfTElTVD14ODZf
-NjQtc29mdG1tdSBKPTE0IE5FVFdPUks9MQo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKY2xhbmcr
-KyAtTC90bXAvcWVtdS10ZXN0L2J1aWxkL2R0Yy9saWJmZHQgIC1JL3Vzci9pbmNsdWRlL3BpeG1h
-bi0xICAtSS90bXAvcWVtdS10ZXN0L3NyYy9kdGMvbGliZmR0IC1XZXJyb3IgLURIQVNfTElCU1NI
-Ml9TRlRQX0ZTWU5DICAtcHRocmVhZCAtSS91c3IvaW5jbHVkZS9nbGliLTIuMCAtSS91c3IvbGli
-NjQvZ2xpYi0yLjAvaW5jbHVkZSAgLWZQSUUgLURQSUUgLW02NCAtbWN4MTYgLURfR05VX1NPVVJD
-RSAtRF9GSUxFX09GRlNFVF9CSVRTPTY0IC1EX0xBUkdFRklMRV9TT1VSQ0UgLVdzdHJpY3QtcHJv
-dG90eXBlcyAtV3JlZHVuZGFudC1kZWNscyAtV2FsbCAtV3VuZGVmIC1Xd3JpdGUtc3RyaW5ncyAt
-V21pc3NpbmctcHJvdG90eXBlcyAtZm5vLXN0cmljdC1hbGlhc2luZyAtZm5vLWNvbW1vbiAtZndy
-YXB2IC1zdGQ9Z251OTkgIC1Xbm8tc3RyaW5nLXBsdXMtaW50IC1Xbm8tdHlwZWRlZi1yZWRlZmlu
-aXRpb24gLVduby1pbml0aWFsaXplci1vdmVycmlkZXMgLVdleHBhbnNpb24tdG8tZGVmaW5lZCAt
-V2VuZGlmLWxhYmVscyAtV25vLXNoaWZ0LW5lZ2F0aXZlLXZhbHVlIC1Xbm8tbWlzc2luZy1pbmNs
-dWRlLWRpcnMgLVdlbXB0eS1ib2R5IC1XbmVzdGVkLWV4dGVybnMgLVdmb3JtYXQtc2VjdXJpdHkg
-LVdmb3JtYXQteTJrIC1XaW5pdC1zZWxmIC1XaWdub3JlZC1xdWFsaWZpZXJzIC1Xb2xkLXN0eWxl
-LWRlZmluaXRpb24gLVd0eXBlLWxpbWl0cyAtZnN0YWNrLXByb3RlY3Rvci1zdHJvbmcgIC1JL3Vz
-ci9pbmNsdWRlL3AxMS1raXQtMSAgICAgLUkvdXNyL2luY2x1ZGUvbGlicG5nMTYgIC1JL3Vzci9p
-bmNsdWRlL3NwaWNlLTEgLUkvdXNyL2luY2x1ZGUvc3BpY2Utc2VydmVyIC1JL3Vzci9pbmNsdWRl
-L2NhY2FyZCAtSS91c3IvaW5jbHVkZS9nbGliLTIuMCAtSS91c3IvbGliNjQvZ2xpYi0yLjAvaW5j
-bHVkZSAtSS91c3IvaW5jbHVkZS9uc3MzIC1JL3Vzci9pbmNsdWRlL25zcHI0IC1wdGhyZWFkIC1J
-L3Vzci9pbmNsdWRlL2xpYm1vdW50IC1JL3Vzci9pbmNsdWRlL2Jsa2lkIC1JL3Vzci9pbmNsdWRl
-L3V1aWQgLUkvdXNyL2luY2x1ZGUvcGl4bWFuLTEgICAtSS90bXAvcWVtdS10ZXN0L3NyYy90ZXN0
-cyAtZnNhbml0aXplPXVuZGVmaW5lZCAtZnNhbml0aXplPWFkZHJlc3MgLWcgIC1XbCwtLXdhcm4t
-Y29tbW9uIC1XbCwteixyZWxybyAtV2wsLXosbm93IC1waWUgLW02NCAtZyAgLW8gdGVzdHMvdGVz
-dC1vcHRzLXZpc2l0b3IgdGVzdHMvdGVzdC1vcHRzLXZpc2l0b3IubyB0ZXN0cy90ZXN0LXFhcGkt
-dHlwZXMubyB0ZXN0cy9pbmNsdWRlL3Rlc3QtcWFwaS10eXBlcy1zdWItbW9kdWxlLm8gdGVzdHMv
-dGVzdC1xYXBpLXR5cGVzLXN1Yi1zdWItbW9kdWxlLm8gdGVzdHMvdGVzdC1xYXBpLXZpc2l0Lm8g
-dGVzdHMvaW5jbHVkZS90ZXN0LXFhcGktdmlzaXQtc3ViLW1vZHVsZS5vIHRlc3RzL3Rlc3QtcWFw
-aS12aXNpdC1zdWItc3ViLW1vZHVsZS5vIHRlc3RzL3Rlc3QtcWFwaS1pbnRyb3NwZWN0Lm8gcW9t
-L29iamVjdC5vIHFvbS9jb250YWluZXIubyBxb20vcW9tLXFvYmplY3QubyBxb20vb2JqZWN0X2lu
-dGVyZmFjZXMubyAgbGlicWVtdXV0aWwuYSAgIC1sbSAtbHogIC1sZ3RocmVhZC0yLjAgLXB0aHJl
-YWQgLWxnbGliLTIuMCAgLWxuZXR0bGUgIC1sZ251dGxzICAgLWxydCAtbHogLWx1dGlsIC1sY2Fw
-LW5nIAovdXNyL2Jpbi9sZDogdGVzdHMvdGVzdC1xYXBpLWNvbW1hbmRzLm86IGluIGZ1bmN0aW9u
-IGBxbXBfbWFyc2hhbF90ZXN0X2ZlYXR1cmVzJzoKL3RtcC9xZW11LXRlc3QvYnVpbGQvdGVzdHMv
-dGVzdC1xYXBpLWNvbW1hbmRzLmM6NjkzOiB1bmRlZmluZWQgcmVmZXJlbmNlIHRvIGBxbXBfdGVz
-dF9mZWF0dXJlcycKY2xhbmctNzogZXJyb3I6IGxpbmtlciBjb21tYW5kIGZhaWxlZCB3aXRoIGV4
-aXQgY29kZSAxICh1c2UgLXYgdG8gc2VlIGludm9jYXRpb24pCm1ha2U6ICoqKiBbL3RtcC9xZW11
-LXRlc3Qvc3JjL3J1bGVzLm1hazoxMjQ6IHRlc3RzL3Rlc3QtcW1wLWNtZHNdIEVycm9yIDEKbWFr
-ZTogKioqIFdhaXRpbmcgZm9yIHVuZmluaXNoZWQgam9icy4uLi4KbWFrZVsxXTogTGVhdmluZyBk
-aXJlY3RvcnkgJy90bXAvcWVtdS10ZXN0L2J1aWxkL3Rlc3RzL2ZwJwoKClRoZSBmdWxsIGxvZyBp
-cyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAxOTA1MzAwNzMyMDUuNTI5
-My0xLWt3b2xmQHJlZGhhdC5jb20vdGVzdGluZy5hc2FuLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFp
-bCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwczovL3BhdGNoZXcub3Jn
-L10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+The patch allows to provide a pattern file for write
+command. There was no similar ability before.
+
+Signed-off-by: Denis Plotnikov <dplotnikov@virtuozzo.com>
+---
+ qemu-io-cmds.c | 81 ++++++++++++++++++++++++++++++++++++++++++++++----
+ 1 file changed, 75 insertions(+), 6 deletions(-)
+
+diff --git a/qemu-io-cmds.c b/qemu-io-cmds.c
+index 09750a23ce..1c6a5e4faf 100644
+--- a/qemu-io-cmds.c
++++ b/qemu-io-cmds.c
+@@ -21,6 +21,7 @@
+ #include "qemu/option.h"
+ #include "qemu/timer.h"
+ #include "qemu/cutils.h"
++#include "string.h"
+ 
+ #define CMD_NOFILE_OK   0x01
+ 
+@@ -343,6 +344,61 @@ static void *qemu_io_alloc(BlockBackend *blk, size_t len, int pattern)
+     return buf;
+ }
+ 
++static void *qemu_io_alloc_from_file(BlockBackend *blk, size_t len,
++                                     char *file_name)
++{
++    char *buf, *buf_pos;
++    FILE *f = fopen(file_name, "r");
++    int l;
++
++    if (!f) {
++        printf("'%s': %s\n", file_name, strerror(errno));
++        return NULL;
++    }
++
++    if (qemuio_misalign) {
++        len += MISALIGN_OFFSET;
++    }
++    buf = blk_blockalign(blk, len);
++    memset(buf, 0, len);
++
++    buf_pos = buf;
++
++    while (len > 0) {
++        l = fread(buf_pos, sizeof(char), len, f);
++
++        if (feof(f)) {
++            rewind(f);
++        }
++
++        if (ferror(f)) {
++            printf("'%s': %s\n", file_name, strerror(errno));
++            goto error;
++        }
++
++        if (l == 0) {
++            printf("'%s' is empty\n", file_name);
++            goto error;
++        }
++
++        len -= l;
++        buf_pos += l;
++    }
++
++    if (qemuio_misalign) {
++        buf += MISALIGN_OFFSET;
++    }
++
++    goto out;
++
++error:
++    qemu_vfree(buf);
++    buf = NULL;
++out:
++    fclose(f);
++    return buf;
++}
++
+ static void qemu_io_free(void *p)
+ {
+     if (qemuio_misalign) {
+@@ -965,7 +1021,7 @@ static const cmdinfo_t write_cmd = {
+     .perm       = BLK_PERM_WRITE,
+     .argmin     = 2,
+     .argmax     = -1,
+-    .args       = "[-bcCfnquz] [-P pattern] off len",
++    .args       = "[-bcCfnquz] [-P pattern | -s source_file] off len",
+     .oneline    = "writes a number of bytes at a specified offset",
+     .help       = write_help,
+ };
+@@ -974,7 +1030,7 @@ static int write_f(BlockBackend *blk, int argc, char **argv)
+ {
+     struct timeval t1, t2;
+     bool Cflag = false, qflag = false, bflag = false;
+-    bool Pflag = false, zflag = false, cflag = false;
++    bool Pflag = false, zflag = false, cflag = false, sflag = false;
+     int flags = 0;
+     int c, cnt, ret;
+     char *buf = NULL;
+@@ -983,8 +1039,9 @@ static int write_f(BlockBackend *blk, int argc, char **argv)
+     /* Some compilers get confused and warn if this is not initialized.  */
+     int64_t total = 0;
+     int pattern = 0xcd;
++    char *file_name;
+ 
+-    while ((c = getopt(argc, argv, "bcCfnpP:quz")) != -1) {
++    while ((c = getopt(argc, argv, "bcCfnpP:quzs:")) != -1) {
+         switch (c) {
+         case 'b':
+             bflag = true;
+@@ -1020,6 +1077,10 @@ static int write_f(BlockBackend *blk, int argc, char **argv)
+         case 'z':
+             zflag = true;
+             break;
++        case 's':
++            sflag = true;
++            file_name = g_strdup(optarg);
++            break;
+         default:
+             qemuio_command_usage(&write_cmd);
+             return -EINVAL;
+@@ -1051,8 +1112,9 @@ static int write_f(BlockBackend *blk, int argc, char **argv)
+         return -EINVAL;
+     }
+ 
+-    if (zflag && Pflag) {
+-        printf("-z and -P cannot be specified at the same time\n");
++    if ((int)zflag + (int)Pflag + (int)sflag > 1) {
++        printf("Only one of -z, -P, and -s"
++               "can be specified at the same time\n");
+         return -EINVAL;
+     }
+ 
+@@ -1088,7 +1150,14 @@ static int write_f(BlockBackend *blk, int argc, char **argv)
+     }
+ 
+     if (!zflag) {
+-        buf = qemu_io_alloc(blk, count, pattern);
++        if (sflag) {
++            buf = qemu_io_alloc_from_file(blk, count, file_name);
++            if (!buf) {
++                return -EINVAL;
++            }
++        } else {
++            buf = qemu_io_alloc(blk, count, pattern);
++        }
+     }
+ 
+     gettimeofday(&t1, NULL);
+-- 
+2.17.0
 
 
