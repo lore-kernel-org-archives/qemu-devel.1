@@ -6,51 +6,52 @@ X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 05E36C28CC2
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 13:54:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A1E7C28CC0
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 13:54:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D2CB625982
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 13:54:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D2CB625982
+	by mail.kernel.org (Postfix) with ESMTPS id 169E725982
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 13:54:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 169E725982
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=cl.cam.ac.uk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:54371 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:54373 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hWLVH-0002JQ-WC
-	for qemu-devel@archiver.kernel.org; Thu, 30 May 2019 09:54:00 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:43701)
+	id 1hWLVK-0002LI-7Z
+	for qemu-devel@archiver.kernel.org; Thu, 30 May 2019 09:54:02 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:43675)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <hmka2@cl.cam.ac.uk>) id 1hWLTR-00016m-5z
-	for qemu-devel@nongnu.org; Thu, 30 May 2019 09:52:06 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <hmka2@cl.cam.ac.uk>) id 1hWLTQ-0005v0-4g
+	(envelope-from <hmka2@cl.cam.ac.uk>) id 1hWLTQ-00015o-5u
 	for qemu-devel@nongnu.org; Thu, 30 May 2019 09:52:05 -0400
-Received: from mta2.cl.cam.ac.uk ([2001:630:212:200::25:2]:42845)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <hmka2@cl.cam.ac.uk>) id 1hWLTP-0005t7-1N
+	for qemu-devel@nongnu.org; Thu, 30 May 2019 09:52:04 -0400
+Received: from mta2.cl.cam.ac.uk ([2001:630:212:200::25:2]:32905)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <hmka2@cl.cam.ac.uk>)
-	id 1hWLTN-0005r9-WF; Thu, 30 May 2019 09:52:02 -0400
+	id 1hWLTM-0005ox-F2; Thu, 30 May 2019 09:52:00 -0400
 Received: from cassia.cl.cam.ac.uk ([2001:630:212:238:b26e:bfff:fe2f:c7d9])
 	by mta2.cl.cam.ac.uk with esmtps
 	(TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.86_2)
 	(envelope-from <hmka2@cl.cam.ac.uk>)
-	id 1hWLTN-000Gct-9f; Thu, 30 May 2019 14:52:01 +0100
+	id 1hWLTL-000Gck-O5; Thu, 30 May 2019 14:51:59 +0100
 Received: from hmka2 by cassia.cl.cam.ac.uk with local (Exim 4.90_1)
 	(envelope-from <hmka2@cl.cam.ac.uk>)
-	id 1hWLTN-0005bt-7y; Thu, 30 May 2019 14:52:01 +0100
+	id 1hWLTL-0005Zy-Md; Thu, 30 May 2019 14:51:59 +0100
 From: Hesham Almatary <Hesham.Almatary@cl.cam.ac.uk>
 To: qemu-riscv@nongnu.org
-Date: Thu, 30 May 2019 14:51:33 +0100
-Message-Id: <20190530135135.19715-4-Hesham.Almatary@cl.cam.ac.uk>
+Date: Thu, 30 May 2019 14:51:32 +0100
+Message-Id: <20190530135135.19715-3-Hesham.Almatary@cl.cam.ac.uk>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190530135135.19715-1-Hesham.Almatary@cl.cam.ac.uk>
 References: <20190530135135.19715-1-Hesham.Almatary@cl.cam.ac.uk>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
 X-Received-From: 2001:630:212:200::25:2
-Subject: [Qemu-devel] [PATCHv4 4/6] RISC-V: Check PMP during Page Table Walks
+Subject: [Qemu-devel] [PATCHv4 3/6] RISC-V: Check for the effective memory
+ privilege mode during PMP checks
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -71,57 +72,101 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The PMP should be checked when doing a page table walk, and report access
-fault exception if the to-be-read PTE failed the PMP check.
+The current PMP check function checks for env->priv which is not the effective
+memory privilege mode.
 
-Suggested-by: Jonathan Behrens <fintelia@gmail.com>
+For example, mstatus.MPRV could be set while executing in M-Mode, and in that
+case the privilege mode for the PMP check should be S-Mode rather than M-Mode
+(in env->priv) if mstatus.MPP == PRV_S.
+
+This patch passes the effective memory privilege mode to the PMP check.
+Functions that call the PMP check should pass the correct memory privilege mode
+after reading mstatus' MPRV/MPP or hstatus.SPRV (if Hypervisor mode exists).
+
+Suggested-by: Alistair Francis <alistair.francis@wdc.com>
 Signed-off-by: Hesham Almatary <Hesham.Almatary@cl.cam.ac.uk>
 ---
- target/riscv/cpu.h        |  1 +
  target/riscv/cpu_helper.c | 10 +++++++++-
- 2 files changed, 10 insertions(+), 1 deletion(-)
+ target/riscv/pmp.c        |  6 +++---
+ target/riscv/pmp.h        |  2 +-
+ 3 files changed, 13 insertions(+), 5 deletions(-)
 
-diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
-index c17184f4e4..ab3ba3f15a 100644
---- a/target/riscv/cpu.h
-+++ b/target/riscv/cpu.h
-@@ -94,6 +94,7 @@ enum {
- #define PRIV_VERSION_1_09_1 0x00010901
- #define PRIV_VERSION_1_10_0 0x00011000
-
-+#define TRANSLATE_PMP_FAIL 2
- #define TRANSLATE_FAIL 1
- #define TRANSLATE_SUCCESS 0
- #define NB_MMU_MODES 4
 diff --git a/target/riscv/cpu_helper.c b/target/riscv/cpu_helper.c
-index 5a1cd7cf96..00bc4f1712 100644
+index 7c7282c680..5a1cd7cf96 100644
 --- a/target/riscv/cpu_helper.c
 +++ b/target/riscv/cpu_helper.c
-@@ -211,6 +211,12 @@ restart:
+@@ -392,19 +392,27 @@ bool riscv_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
+     int prot;
+     bool pmp_violation = false;
+     int ret = TRANSLATE_FAIL;
++    int mode = mmu_idx;
 
-         /* check that physical address of PTE is legal */
-         target_ulong pte_addr = base + idx * ptesize;
-+
-+        if (riscv_feature(env, RISCV_FEATURE_PMP) &&
-+            !pmp_hart_has_privs(env, pte_addr, sizeof(target_ulong),
-+            1 << MMU_DATA_LOAD, PRV_S)) {
-+            return TRANSLATE_PMP_FAIL;
+     qemu_log_mask(CPU_LOG_MMU, "%s ad %" VADDR_PRIx " rw %d mmu_idx %d\n",
+                   __func__, address, access_type, mmu_idx);
+
+     ret = get_physical_address(env, &pa, &prot, address, access_type, mmu_idx);
+
++    if (mode == PRV_M && access_type != MMU_INST_FETCH) {
++        if (get_field(env->mstatus, MSTATUS_MPRV)) {
++            mode = get_field(env->mstatus, MSTATUS_MPP);
 +        }
- #if defined(TARGET_RISCV32)
-         target_ulong pte = ldl_phys(cs->as, pte_addr);
- #elif defined(TARGET_RISCV64)
-@@ -413,8 +419,10 @@ bool riscv_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
-         (ret == TRANSLATE_SUCCESS) &&
-         !pmp_hart_has_privs(env, pa, TARGET_PAGE_SIZE, 1 << access_type,
-         mode)) {
-+        ret = TRANSLATE_PMP_FAIL;
 +    }
-+    if (ret == TRANSLATE_PMP_FAIL) {
++
+     qemu_log_mask(CPU_LOG_MMU,
+                   "%s address=%" VADDR_PRIx " ret %d physical " TARGET_FMT_plx
+                   " prot %d\n", __func__, address, ret, pa, prot);
+
+     if (riscv_feature(env, RISCV_FEATURE_PMP) &&
+         (ret == TRANSLATE_SUCCESS) &&
+-        !pmp_hart_has_privs(env, pa, TARGET_PAGE_SIZE, 1 << access_type)) {
++        !pmp_hart_has_privs(env, pa, TARGET_PAGE_SIZE, 1 << access_type,
++        mode)) {
          pmp_violation = true;
--        ret = TRANSLATE_FAIL;
+         ret = TRANSLATE_FAIL;
      }
-     if (ret == TRANSLATE_SUCCESS) {
-         tlb_set_page(cs, address & TARGET_PAGE_MASK, pa & TARGET_PAGE_MASK,
+diff --git a/target/riscv/pmp.c b/target/riscv/pmp.c
+index b11c4ae22f..89170bc11d 100644
+--- a/target/riscv/pmp.c
++++ b/target/riscv/pmp.c
+@@ -229,7 +229,7 @@ static int pmp_is_in_range(CPURISCVState *env, int pmp_index, target_ulong addr)
+  * Check if the address has required RWX privs to complete desired operation
+  */
+ bool pmp_hart_has_privs(CPURISCVState *env, target_ulong addr,
+-    target_ulong size, pmp_priv_t privs)
++    target_ulong size, pmp_priv_t privs, target_ulong mode)
+ {
+     int i = 0;
+     int ret = -1;
+@@ -265,7 +265,7 @@ bool pmp_hart_has_privs(CPURISCVState *env, target_ulong addr,
+             }
+
+             allowed_privs = PMP_READ | PMP_WRITE | PMP_EXEC;
+-            if ((env->priv != PRV_M) || pmp_is_locked(env, i)) {
++            if ((mode != PRV_M) || pmp_is_locked(env, i)) {
+                 allowed_privs &= env->pmp_state.pmp[i].cfg_reg;
+             }
+
+@@ -281,7 +281,7 @@ bool pmp_hart_has_privs(CPURISCVState *env, target_ulong addr,
+
+     /* No rule matched */
+     if (ret == -1) {
+-        if (env->priv == PRV_M) {
++        if (mode == PRV_M) {
+             ret = 1; /* Privileged spec v1.10 states if no PMP entry matches an
+                       * M-Mode access, the access succeeds */
+         } else {
+diff --git a/target/riscv/pmp.h b/target/riscv/pmp.h
+index 66790950eb..8e19793132 100644
+--- a/target/riscv/pmp.h
++++ b/target/riscv/pmp.h
+@@ -59,6 +59,6 @@ void pmpaddr_csr_write(CPURISCVState *env, uint32_t addr_index,
+     target_ulong val);
+ target_ulong pmpaddr_csr_read(CPURISCVState *env, uint32_t addr_index);
+ bool pmp_hart_has_privs(CPURISCVState *env, target_ulong addr,
+-    target_ulong size, pmp_priv_t priv);
++    target_ulong size, pmp_priv_t priv, target_ulong mode);
+
+ #endif
 --
 2.17.1
 
