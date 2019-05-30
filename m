@@ -2,62 +2,92 @@ Return-Path: <SRS0=r6E1=T6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E66A9C28CC0
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 15:00:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A0113C28CC0
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 15:03:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7EEDF25C08
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 15:00:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7EEDF25C08
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id 7857B2343A
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 15:03:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7857B2343A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:55260 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:55303 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hWMXP-0004uj-IV
-	for qemu-devel@archiver.kernel.org; Thu, 30 May 2019 11:00:15 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:56889)
+	id 1hWMaQ-0006Cm-QU
+	for qemu-devel@archiver.kernel.org; Thu, 30 May 2019 11:03:22 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:57701)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <gengdongjiu@huawei.com>) id 1hWMWb-0004PH-Of
-	for qemu-devel@nongnu.org; Thu, 30 May 2019 10:59:26 -0400
+	(envelope-from <eblake@redhat.com>) id 1hWMZR-0005ss-5Z
+	for qemu-devel@nongnu.org; Thu, 30 May 2019 11:02:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <gengdongjiu@huawei.com>) id 1hWMWa-0002UJ-Ly
-	for qemu-devel@nongnu.org; Thu, 30 May 2019 10:59:25 -0400
-Received: from szxga07-in.huawei.com ([45.249.212.35]:36264 helo=huawei.com)
+	(envelope-from <eblake@redhat.com>) id 1hWMZQ-000456-1S
+	for qemu-devel@nongnu.org; Thu, 30 May 2019 11:02:20 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58788)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <gengdongjiu@huawei.com>)
-	id 1hWMWW-00025F-1D; Thu, 30 May 2019 10:59:22 -0400
-Received: from DGGEMS405-HUB.china.huawei.com (unknown [172.30.72.59])
-	by Forcepoint Email with ESMTP id 3418FA158468C0152440;
-	Thu, 30 May 2019 22:58:33 +0800 (CST)
-Received: from [127.0.0.1] (10.142.68.147) by DGGEMS405-HUB.china.huawei.com
-	(10.3.19.205) with Microsoft SMTP Server id 14.3.439.0; Thu, 30 May 2019
-	22:58:26 +0800
-To: "Michael S. Tsirkin" <mst@redhat.com>
-References: <1557832703-42620-1-git-send-email-gengdongjiu@huawei.com>
-	<1557832703-42620-3-git-send-email-gengdongjiu@huawei.com>
-	<20190528233859-mutt-send-email-mst@kernel.org>
-From: gengdongjiu <gengdongjiu@huawei.com>
-Message-ID: <a0cad169-0dae-8525-f36f-2b88e418791e@huawei.com>
-Date: Thu, 30 May 2019 22:58:23 +0800
-User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:52.0) Gecko/20100101
-	Thunderbird/52.3.0
+	(Exim 4.71) (envelope-from <eblake@redhat.com>)
+	id 1hWMZ4-0003uA-9a; Thu, 30 May 2019 11:01:59 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 41669A00F9;
+	Thu, 30 May 2019 15:01:57 +0000 (UTC)
+Received: from [10.3.116.169] (ovpn-116-169.phx2.redhat.com [10.3.116.169])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 0CB6C7FD28;
+	Thu, 30 May 2019 15:01:52 +0000 (UTC)
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+	qemu-devel@nongnu.org, qemu-block@nongnu.org
+References: <20190530143941.241963-1-vsementsov@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=eblake@redhat.com; keydata=
+	xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
+	xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
+	TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
+	GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
+	sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
+	AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
+	CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
+	RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
+	wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
+	Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
+	gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
+	pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
+	zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
+	pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
+	3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
+	NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
+	cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
+	SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
+	I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
+	mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
+	Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
+	2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
+Organization: Red Hat, Inc.
+Message-ID: <dd1f2ea6-9e4c-1486-7d10-da3b0a84bbc4@redhat.com>
+Date: Thu, 30 May 2019 10:01:52 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190528233859-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.142.68.147]
-X-CFilter-Loop: Reflected
+In-Reply-To: <20190530143941.241963-1-vsementsov@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="8U7c4u7rNJ3pk7Ma7nUKvkNhLCFwj6nKc"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.26]);
+	Thu, 30 May 2019 15:01:57 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 45.249.212.35
-Subject: Re: [Qemu-devel] [PATCH v17 02/10] ACPI: add some GHES structures
- and macros definition
+X-Received-From: 209.132.183.28
+X-Content-Filtered-By: Mailman/MimeDel 2.1.21
+Subject: Re: [Qemu-devel] [PATCH] qapi: add dirty-bitmaps to
+ query-named-block-nodes result
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -69,117 +99,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, ehabkost@redhat.com, kvm@vger.kernel.org,
-	mtosatti@redhat.com, qemu-devel@nongnu.org, linuxarm@huawei.com,
-	shannon.zhaosl@gmail.com, zhengxiang9@huawei.com,
-	qemu-arm@nongnu.org, james.morse@arm.com,
-	jonathan.cameron@huawei.com, imammedo@redhat.com,
-	pbonzini@redhat.com, xuwei5@huawei.com, lersek@redhat.com, rth@twiddle.net
+Cc: kwolf@redhat.com, armbru@redhat.com, mreitz@redhat.com,
+	nshirokovskiy@virtuozzo.com, den@openvz.org, jsnow@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--8U7c4u7rNJ3pk7Ma7nUKvkNhLCFwj6nKc
+From: Eric Blake <eblake@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: mreitz@redhat.com, kwolf@redhat.com, armbru@redhat.com, jsnow@redhat.com,
+ den@openvz.org, nshirokovskiy@virtuozzo.com
+Message-ID: <dd1f2ea6-9e4c-1486-7d10-da3b0a84bbc4@redhat.com>
+Subject: Re: [PATCH] qapi: add dirty-bitmaps to query-named-block-nodes result
+References: <20190530143941.241963-1-vsementsov@virtuozzo.com>
+In-Reply-To: <20190530143941.241963-1-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On 2019/5/29 11:40, Michael S. Tsirkin wrote:
-> On Tue, May 14, 2019 at 04:18:15AM -0700, Dongjiu Geng wrote:
->> Add Generic Error Status Block structures and some macros
->> definitions, which is referred to the ACPI 4.0 or ACPI 6.2. The
->> HEST table generation and CPER record will use them.
->>
->> Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
-> 
-> Are these all still used? I'd rather you moved stuff to
-> where it's used.
-Ok, I will move them, thanks
+On 5/30/19 9:39 AM, Vladimir Sementsov-Ogievskiy wrote:
+> Let's add a possibility to query dirty-bitmaps not only on root nodes.
+> It is useful when dealing both with snapshots and incremental backups.
+>=20
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>  qapi/block-core.json | 5 ++++-
+>  block/qapi.c         | 5 +++++
+>  2 files changed, 9 insertions(+), 1 deletion(-)
 
-> 
-> 
-> 
->> ---
->>  include/hw/acpi/acpi-defs.h | 52 +++++++++++++++++++++++++++++++++++++++++++++
->>  1 file changed, 52 insertions(+)
->>
->> diff --git a/include/hw/acpi/acpi-defs.h b/include/hw/acpi/acpi-defs.h
->> index f9aa4bd..d1996fb 100644
->> --- a/include/hw/acpi/acpi-defs.h
->> +++ b/include/hw/acpi/acpi-defs.h
->> @@ -224,6 +224,25 @@ typedef struct AcpiMultipleApicTable AcpiMultipleApicTable;
->>  #define ACPI_APIC_RESERVED              16   /* 16 and greater are reserved */
->>  
->>  /*
->> + * Values for Hardware Error Notification Type field
->> + */
->> +enum AcpiHestNotifyType {
->> +    ACPI_HEST_NOTIFY_POLLED = 0,
->> +    ACPI_HEST_NOTIFY_EXTERNAL = 1,
->> +    ACPI_HEST_NOTIFY_LOCAL = 2,
->> +    ACPI_HEST_NOTIFY_SCI = 3,
->> +    ACPI_HEST_NOTIFY_NMI = 4,
->> +    ACPI_HEST_NOTIFY_CMCI = 5,  /* ACPI 5.0: 18.3.2.7, Table 18-290 */
->> +    ACPI_HEST_NOTIFY_MCE = 6,   /* ACPI 5.0: 18.3.2.7, Table 18-290 */
->> +    ACPI_HEST_NOTIFY_GPIO = 7,  /* ACPI 6.0: 18.3.2.7, Table 18-332 */
->> +    ACPI_HEST_NOTIFY_SEA = 8,   /* ACPI 6.1: 18.3.2.9, Table 18-345 */
->> +    ACPI_HEST_NOTIFY_SEI = 9,   /* ACPI 6.1: 18.3.2.9, Table 18-345 */
->> +    ACPI_HEST_NOTIFY_GSIV = 10, /* ACPI 6.1: 18.3.2.9, Table 18-345 */
->> +    ACPI_HEST_NOTIFY_SDEI = 11, /* ACPI 6.2: 18.3.2.9, Table 18-383 */
->> +    ACPI_HEST_NOTIFY_RESERVED = 12 /* 12 and greater are reserved */
->> +};
->> +
-> 
-> If there's a single user, the best thing to do
-> is just to open-code with a comment that matches
-> spec names. It's hard to find stuff like ACPI_HEST_NOTIFY_GSIV
-> in a spec.
-ok, I will do it, thanks
+Indeed useful.
 
-> 
->> +/*
->>   * MADT sub-structures (Follow MULTIPLE_APIC_DESCRIPTION_TABLE)
->>   */
->>  #define ACPI_SUB_HEADER_DEF   /* Common ACPI sub-structure header */\
->> @@ -400,6 +419,39 @@ struct AcpiSystemResourceAffinityTable {
->>  } QEMU_PACKED;
->>  typedef struct AcpiSystemResourceAffinityTable AcpiSystemResourceAffinityTable;
->>  
->> +/*
->> + * Generic Error Status Block
->> + */
->> +struct AcpiGenericErrorStatus {
->> +    /* It is a bitmask composed of ACPI_GEBS_xxx macros */
->> +    uint32_t block_status;
->> +    uint32_t raw_data_offset;
->> +    uint32_t raw_data_length;
->> +    uint32_t data_length;
->> +    uint32_t error_severity;
->> +} QEMU_PACKED;
->> +typedef struct AcpiGenericErrorStatus AcpiGenericErrorStatus;
->> +
->> +/*
->> + * Masks for block_status flags above
->> + */
->> +#define ACPI_GEBS_UNCORRECTABLE         1
->> +
->> +/*
->> + * Values for error_severity field above
->> + */
->> +enum AcpiGenericErrorSeverity {
->> +    ACPI_CPER_SEV_RECOVERABLE,
->> +    ACPI_CPER_SEV_FATAL,
->> +    ACPI_CPER_SEV_CORRECTED,
->> +    ACPI_CPER_SEV_NONE,
->> +};
->> +
->> +/*
->> + * Generic Hardware Error Source version 2
->> + */
->> +#define ACPI_HEST_SOURCE_GENERIC_ERROR_V2    10
->> +
->>  #define ACPI_SRAT_PROCESSOR_APIC     0
->>  #define ACPI_SRAT_MEMORY             1
->>  #define ACPI_SRAT_PROCESSOR_x2APIC   2
->> -- 
->> 1.8.3.1
-> .
-> 
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
+
+--8U7c4u7rNJ3pk7Ma7nUKvkNhLCFwj6nKc
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlzv8GAACgkQp6FrSiUn
+Q2o5oAgApT/hOL4XNeaJyX6ceGshZOfd4DL97HHn3foWLRWvQjc6817aChHXJeg4
+jTHzXfvg3IMDnIthvs5BFW8t0w8tf2QjOYKBxiRMPhpmXtF++o6Q1wMLbPE3MqIN
+L0jxl7ZJ0ujPSepC6SSwRHzWk3Fp6oVeLzjbkZ05DjQybOZ1vLdZ2xeCTdriLy6I
+lv1HC2vlqn7Bj3hojguyMws0aqkhj6NdbGl1CNCHcaUYWrahsZI6sgFW5TTXmZRt
+k4EVl3nfu+Dfz6xB10gc1YDgsGAGJh9rtWHlyYaKWlz5DDeu56AiHrId2Vr7A0w8
+iF2j+k76S1L0qadRfNmf+xfs3ai6Aw==
+=PECP
+-----END PGP SIGNATURE-----
+
+--8U7c4u7rNJ3pk7Ma7nUKvkNhLCFwj6nKc--
 
