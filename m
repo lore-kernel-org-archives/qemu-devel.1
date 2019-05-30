@@ -2,64 +2,79 @@ Return-Path: <SRS0=r6E1=T6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	T_HK_NAME_DR,USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DC1DC28CC0
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 18:59:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A93BCC28CC0
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 19:09:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C82F026057
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 18:59:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C82F026057
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 6508726077
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 19:09:48 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RGnQfi8a"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6508726077
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:57921 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:58017 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hWQHJ-0004zR-Tw
-	for qemu-devel@archiver.kernel.org; Thu, 30 May 2019 14:59:53 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:57635)
+	id 1hWQQt-0007Ud-57
+	for qemu-devel@archiver.kernel.org; Thu, 30 May 2019 15:09:47 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:58858)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1hWQGW-0004gf-Ai
-	for qemu-devel@nongnu.org; Thu, 30 May 2019 14:59:06 -0400
+	(envelope-from <mrolnik@gmail.com>) id 1hWQOz-0006NN-Nl
+	for qemu-devel@nongnu.org; Thu, 30 May 2019 15:07:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1hWQGU-0006Ly-Eu
-	for qemu-devel@nongnu.org; Thu, 30 May 2019 14:59:04 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44438)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hWQGU-0006L9-5q
-	for qemu-devel@nongnu.org; Thu, 30 May 2019 14:59:02 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 53A3B4E90E
-	for <qemu-devel@nongnu.org>; Thu, 30 May 2019 18:59:01 +0000 (UTC)
-Received: from work-vm (ovpn-117-91.ams2.redhat.com [10.36.117.91])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id D83E860C89;
-	Thu, 30 May 2019 18:58:57 +0000 (UTC)
-Date: Thu, 30 May 2019 19:58:55 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Peter Xu <peterx@redhat.com>
-Message-ID: <20190530185854.GJ2823@work-vm>
-References: <20190530092919.26059-1-peterx@redhat.com>
-	<20190530092919.26059-13-peterx@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190530092919.26059-13-peterx@redhat.com>
-User-Agent: Mutt/1.11.4 (2019-03-13)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.38]);
-	Thu, 30 May 2019 18:59:01 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v3 12/12] migration: Split log_clear() into
- smaller chunks
+	(envelope-from <mrolnik@gmail.com>) id 1hWQOy-00074K-7T
+	for qemu-devel@nongnu.org; Thu, 30 May 2019 15:07:49 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:38676)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <mrolnik@gmail.com>) id 1hWQOx-000732-VG
+	for qemu-devel@nongnu.org; Thu, 30 May 2019 15:07:48 -0400
+Received: by mail-wr1-x444.google.com with SMTP id d18so4897557wrs.5
+	for <qemu-devel@nongnu.org>; Thu, 30 May 2019 12:07:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+	h=from:to:cc:subject:date:message-id;
+	bh=JkWILbyjQUBjfe8Bnjfcos2cTjqOqy1LxMC/99vfhlA=;
+	b=RGnQfi8avGTeT5onUOgPjIeyqWRCybMOVa4xCl07pu0LzCrX6DFXKtx1DCv7QNfL4l
+	xCmm1yBqexYXq6BbHUPYi3hxYiv/e+q2LyARR07B4ZUvtBwCmoSgiSUV/ZKQVZHloqIE
+	yQ1UihvBr8tk0Osi31HibWKEakoPV+8CppSBqg9t60mckxzeBH4LKTdQlQIXIE2t6vkn
+	3a7dAykWX8vic+fVirSWaS8iRDA0YorGAc3iY3Q8Prj11OApVIHzDrK4dUA7qwEuxfKW
+	yS8GVXFH2B/oUcyHjzAFLXaGQZvxEi/00ku+FO3ZpCJasQgmJonWB1fbxDKR2oQg0lLR
+	fEeg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:from:to:cc:subject:date:message-id;
+	bh=JkWILbyjQUBjfe8Bnjfcos2cTjqOqy1LxMC/99vfhlA=;
+	b=XMlGsx25aLdiRemxE8UFXLLzRxLE72eZvMvWa5Bm/i+PBItwdjrWB4KVBsvz5yl4gV
+	pjwE0HHON/OC/s3exs152/wTCBYYvZ/G61VQ8CDUIQSm6+NXJz0hLUacvzZuz5ShQ+Sv
+	wOzUGp95k4mAQ5G7aVYqzCAaNSdmn4QJjxSPpeHD4jlGebHr+4pV16AJCt5d23MWA3sF
+	TnQeY3JraWkP8tbGv0U7ttSgOXv3jy6Gp+o240jdDPX6bZgi63dTK89m5Sf9cy0exIDm
+	0murgb8Yilt/gIvtPINkZXqFX3oJAiA4cZacjzrdzgsrwbkn1cwDr0nHzqbscoWtz9qL
+	xb1A==
+X-Gm-Message-State: APjAAAWzhFGlfNrUV0hyvg0GmH2hXARB6q1V+UONUCPPsBdHgF7/SffU
+	vGkoH6l1mUFyk1wi2zybbFk0bX2kM2A=
+X-Google-Smtp-Source: APXvYqx6dY/JEfKM7wHdY3LfA5x5pf5fQAuL2hhgfyGyiblrvcNB84rXoXmugtQlrlhXXV9OmylhZw==
+X-Received: by 2002:a5d:4f0a:: with SMTP id c10mr3627057wru.180.1559243265458; 
+	Thu, 30 May 2019 12:07:45 -0700 (PDT)
+Received: from localhost.localdomain (bzq-109-65-68-81.red.bezeqint.net.
+	[109.65.68.81])
+	by smtp.gmail.com with ESMTPSA id u9sm8711230wme.48.2019.05.30.12.07.44
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Thu, 30 May 2019 12:07:44 -0700 (PDT)
+From: Michael Rolnik <mrolnik@gmail.com>
+To: qemu-devel@nongnu.org
+Date: Thu, 30 May 2019 22:07:30 +0300
+Message-Id: <20190530190738.22713-1-mrolnik@gmail.com>
+X-Mailer: git-send-email 2.18.0
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2a00:1450:4864:20::444
+Subject: [Qemu-devel] [PATCH RFC v20 0/8] QEMU AVR 8 bit cores
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -71,313 +86,247 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
-	qemu-devel@nongnu.org, Juan Quintela <quintela@redhat.com>
+Cc: Michael Rolnik <mrolnik@gmail.com>, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Peter Xu (peterx@redhat.com) wrote:
-> Currently we are doing log_clear() right after log_sync() which mostly
-> keeps the old behavior when log_clear() was still part of log_sync().
-> 
-> This patch tries to further optimize the migration log_clear() code
-> path to split huge log_clear()s into smaller chunks.
-> 
-> We do this by spliting the whole guest memory region into memory
-> chunks, whose size is decided by MigrationState.clear_bitmap_shift (an
-> example will be given below).  With that, we don't do the dirty bitmap
-> clear operation on the remote node (e.g., KVM) when we fetch the dirty
-> bitmap, instead we explicitly clear the dirty bitmap for the memory
-> chunk for each of the first time we send a page in that chunk.
-> 
-> Here comes an example.
-> 
-> Assuming the guest has 64G memory, then before this patch the KVM
-> ioctl KVM_CLEAR_DIRTY_LOG will be a single one covering 64G memory.
-> If after the patch, let's assume when the clear bitmap shift is 18,
-> then the memory chunk size on x86_64 will be 1UL<<18 * 4K = 1GB.  Then
-> instead of sending a big 64G ioctl, we'll send 64 small ioctls, each
-> of the ioctl will cover 1G of the guest memory.  For each of the 64
-> small ioctls, we'll only send if any of the page in that small chunk
-> was going to be sent right away.
-> 
-> Signed-off-by: Peter Xu <peterx@redhat.com>
+This series of patches adds 8bit AVR cores to QEMU.
+All instruction, except BREAK/DES/SPM/SPMX, are implemented. Not fully tested yet.
+However I was able to execute simple code with functions. e.g fibonacci calculation.
+This series of patches include a non real, sample board.
+No fuses support yet. PC is set to 0 at reset.
 
-> ---
->  include/exec/ram_addr.h | 75 +++++++++++++++++++++++++++++++++++++++--
->  migration/migration.c   |  4 +++
->  migration/migration.h   | 27 +++++++++++++++
->  migration/ram.c         | 44 ++++++++++++++++++++++++
->  migration/trace-events  |  1 +
->  5 files changed, 149 insertions(+), 2 deletions(-)
-> 
-> diff --git a/include/exec/ram_addr.h b/include/exec/ram_addr.h
-> index f8930914cd..c85896f4d5 100644
-> --- a/include/exec/ram_addr.h
-> +++ b/include/exec/ram_addr.h
-> @@ -50,8 +50,69 @@ struct RAMBlock {
->      unsigned long *unsentmap;
->      /* bitmap of already received pages in postcopy */
->      unsigned long *receivedmap;
-> +
-> +    /*
-> +     * bitmap of already cleared dirty bitmap.  Set this up to
+the patches include the following
+1. just a basic 8bit AVR CPU, without instruction decoding or translation
+2. CPU features which allow define the following 8bit AVR cores
+     avr1
+     avr2 avr25
+     avr3 avr31 avr35
+     avr4
+     avr5 avr51
+     avr6
+     xmega2 xmega4 xmega5 xmega6 xmega7
+3. a definition of sample machine with SRAM, FLASH and CPU which allows to execute simple code
+4. encoding for all AVR instructions
+5. interrupt handling
+6. helpers for IN, OUT, SLEEP, WBR & unsupported instructions
+7. a decoder which given an opcode decides what istruction it is
+8. translation of AVR instruction into TCG
+9. all features together
 
-Is that description the right way around?  Isn't it set when
-we receive dirty info from the kernel and hence it needs clearing
-in the future?
+changes since v3
+1. rampD/X/Y/Z registers are encoded as 0x00ff0000 (instead of 0x000000ff) for faster address manipulaton
+2. ffs changed to ctz32
+3. duplicate code removed at avr_cpu_do_interrupt
+4. using andc instead of not + and
+5. fixing V flag calculation in varios instructions
+6. freeing local variables in PUSH
+7. tcg_const_local_i32 -> tcg_const_i32
+8. using sextract32 instead of my implementation
+9. fixing BLD instruction
+10.xor(r) instead of 0xff - r at COM
+11.fixing MULS/MULSU not to modify inputs' content
+12.using SUB for NEG
+13.fixing tcg_gen_qemu_ld/st call in XCH
 
-> +     * non-NULL to enable the capability to postpone and split
-> +     * clearing of dirty bitmap on the remote node (e.g., KVM).  The
-> +     * bitmap will be set only when doing global sync.
-> +     *
-> +     * NOTE: this bitmap is different comparing to the other bitmaps
-> +     * in that one bit can represent multiple guest pages (which is
-> +     * decided by the `clear_bmap_shift' variable below).  On
-> +     * destination side, this should always be NULL, and the variable
-> +     * `clear_bmap_shift' is meaningless.
-> +     */
-> +    unsigned long *clear_bmap;
-> +    uint8_t clear_bmap_shift;
+changes since v4
+1. target is now defined as big endian in order to optimize push_ret/pop_ret
+2. all style warnings are fixed
+3. adding cpu_set/get_sreg functions
+4. simplifying gen_goto_tb as there is no real paging
+5. env->pc -> env->pc_w
+6. making flag dump more compact
+7. more spacing
+8. renaming CODE/DATA_INDEX -> MMU_CODE/DATA_IDX
+9. removing avr_set_feature
+10. SPL/SPH set bug fix
+11. switching stb_phys to cpu_stb_data
+12. cleaning up avr_decode
+13. saving sreg, rampD/X/Y/Z, eind in HW format (savevm)
+14. saving CPU features (savevm)
 
-Is this just here as a convenience rather than using the copy in
-the property?
+changes since v5
+1. BLD bug fix
+2. decoder generator is added
 
-Dave
+chages since v6
+1. using cpu_get_sreg/cpu_set_sreg in avr_cpu_gdb_read_register/avr_cpu_gdb_write_register
+2. configure the target as little endian because otherwise GDB does not work
+3. fixing and testing gen_push_ret/gen_pop_ret
 
->  };
->  
-> +/**
-> + * clear_bmap_size: calculate clear bitmap size
-> + *
-> + * @pages: number of guest pages
-> + * @shift: guest page number shift
-> + *
-> + * Returns: number of bits for the clear bitmap
-> + */
-> +static inline long clear_bmap_size(uint64_t pages, uint8_t shift)
-> +{
-> +    return DIV_ROUND_UP(pages, 1UL << shift);
-> +}
-> +
-> +/**
-> + * clear_bmap_set: set clear bitmap for the page range
-> + *
-> + * @rb: the ramblock to operate on
-> + * @start: the start page number
-> + * @size: number of pages to set in the bitmap
-> + *
-> + * Returns: None
-> + */
-> +static inline void clear_bmap_set(RAMBlock *rb, uint64_t start,
-> +                                  uint64_t npages)
-> +{
-> +    uint8_t shift = rb->clear_bmap_shift;
-> +
-> +    bitmap_set_atomic(rb->clear_bmap, start >> shift,
-> +                      clear_bmap_size(npages, shift));
-> +}
-> +
-> +/**
-> + * clear_bmap_test_and_clear: test clear bitmap for the page, clear if set
-> + *
-> + * @rb: the ramblock to operate on
-> + * @page: the page number to check
-> + *
-> + * Returns: true if the bit was set, false otherwise
-> + */
-> +static inline bool clear_bmap_test_and_clear(RAMBlock *rb, uint64_t page)
-> +{
-> +    uint8_t shift = rb->clear_bmap_shift;
-> +
-> +    return bitmap_test_and_clear_atomic(rb->clear_bmap, page >> shift, 1);
-> +}
-> +
->  static inline bool offset_in_ramblock(RAMBlock *b, ram_addr_t offset)
->  {
->      return (b && b->host && offset < b->used_length) ? true : false;
-> @@ -462,8 +523,18 @@ uint64_t cpu_physical_memory_sync_dirty_bitmap(RAMBlock *rb,
->              }
->          }
->  
-> -        /* TODO: split the huge bitmap into smaller chunks */
-> -        memory_region_clear_dirty_bitmap(rb->mr, start, length);
-> +        if (rb->clear_bmap) {
-> +            /*
-> +             * Postpone the dirty bitmap clear to the point before we
-> +             * really send the pages, also we will split the clear
-> +             * dirty procedure into smaller chunks.
-> +             */
-> +            clear_bmap_set(rb, start >> TARGET_PAGE_BITS,
-> +                           length >> TARGET_PAGE_BITS);
-> +        } else {
-> +            /* Slow path - still do that in a huge chunk */
-> +            memory_region_clear_dirty_bitmap(rb->mr, start, length);
-> +        }
->      } else {
->          ram_addr_t offset = rb->offset;
->  
-> diff --git a/migration/migration.c b/migration/migration.c
-> index 2865ae3fa9..8a607fe1e2 100644
-> --- a/migration/migration.c
-> +++ b/migration/migration.c
-> @@ -3362,6 +3362,8 @@ void migration_global_dump(Monitor *mon)
->                     ms->send_section_footer ? "on" : "off");
->      monitor_printf(mon, "decompress-error-check: %s\n",
->                     ms->decompress_error_check ? "on" : "off");
-> +    monitor_printf(mon, "clear-bitmap-shift: %u\n",
-> +                   ms->clear_bitmap_shift);
->  }
->  
->  #define DEFINE_PROP_MIG_CAP(name, x)             \
-> @@ -3376,6 +3378,8 @@ static Property migration_properties[] = {
->                       send_section_footer, true),
->      DEFINE_PROP_BOOL("decompress-error-check", MigrationState,
->                        decompress_error_check, true),
-> +    DEFINE_PROP_UINT8("x-clear-bitmap-shift", MigrationState,
-> +                      clear_bitmap_shift, CLEAR_BITMAP_SHIFT_DEFAULT),
->  
->      /* Migration parameters */
->      DEFINE_PROP_UINT8("x-compress-level", MigrationState,
-> diff --git a/migration/migration.h b/migration/migration.h
-> index 780a096857..6e3178d8b2 100644
-> --- a/migration/migration.h
-> +++ b/migration/migration.h
-> @@ -27,6 +27,23 @@ struct PostcopyBlocktimeContext;
->  
->  #define  MIGRATION_RESUME_ACK_VALUE  (1)
->  
-> +/*
-> + * 1<<6=64 pages -> 256K chunk when page size is 4K.  This gives us
-> + * the benefit that all the chunks are 64 pages aligned then the
-> + * bitmaps are always aligned to LONG.
-> + */
-> +#define CLEAR_BITMAP_SHIFT_MIN             6
-> +/*
-> + * 1<<18=256K pages -> 1G chunk when page size is 4K.  This is the
-> + * default value to use if no one specified.
-> + */
-> +#define CLEAR_BITMAP_SHIFT_DEFAULT        18
-> +/*
-> + * 1<<31=2G pages -> 8T chunk when page size is 4K.  This should be
-> + * big enough and make sure we won't overflow easily.
-> + */
-> +#define CLEAR_BITMAP_SHIFT_MAX            31
-> +
->  /* State for the incoming migration */
->  struct MigrationIncomingState {
->      QEMUFile *from_src_file;
-> @@ -233,6 +250,16 @@ struct MigrationState
->       * do not trigger spurious decompression errors.
->       */
->      bool decompress_error_check;
-> +
-> +    /*
-> +     * This decides the size of guest memory chunk that will be used
-> +     * to track dirty bitmap clearing.  The size of memory chunk will
-> +     * be GUEST_PAGE_SIZE << N.  Say, N=0 means we will clear dirty
-> +     * bitmap for each page to send (1<<0=1); N=10 means we will clear
-> +     * dirty bitmap only once for 1<<10=1K continuous guest pages
-> +     * (which is in 4M chunk).
-> +     */
-> +    uint8_t clear_bitmap_shift;
->  };
->  
->  void migrate_set_state(int *state, int old_state, int new_state);
-> diff --git a/migration/ram.c b/migration/ram.c
-> index dc916042fb..632bf02575 100644
-> --- a/migration/ram.c
-> +++ b/migration/ram.c
-> @@ -1668,6 +1668,33 @@ static inline bool migration_bitmap_clear_dirty(RAMState *rs,
->      bool ret;
->  
->      qemu_mutex_lock(&rs->bitmap_mutex);
-> +
-> +    /*
-> +     * Clear dirty bitmap if needed.  This _must_ be called before we
-> +     * send any of the page in the chunk because we need to make sure
-> +     * we can capture further page content changes when we sync dirty
-> +     * log the next time.  So as long as we are going to send any of
-> +     * the page in the chunk we clear the remote dirty bitmap for all.
-> +     * Clearing it earlier won't be a problem, but too late will.
-> +     */
-> +    if (rb->clear_bmap && clear_bmap_test_and_clear(rb, page)) {
-> +        uint8_t shift = rb->clear_bmap_shift;
-> +        hwaddr size = 1ULL << (TARGET_PAGE_BITS + shift);
-> +        hwaddr start = (page << TARGET_PAGE_BITS) & (-size);
-> +
-> +        /*
-> +         * CLEAR_BITMAP_SHIFT_MIN should always guarantee this... this
-> +         * can make things easier sometimes since then start address
-> +         * of the small chunk will always be 64 pages aligned so the
-> +         * bitmap will always be aligned to unsigned long.  We should
-> +         * even be able to remove this restriction but I'm simply
-> +         * keeping it.
-> +         */
-> +        assert(shift >= 6);
-> +        trace_migration_bitmap_clear_dirty(rb->idstr, start, size, page);
-> +        memory_region_clear_dirty_bitmap(rb->mr, start, size);
-> +    }
-> +
->      ret = test_and_clear_bit(page, rb->bmap);
->  
->      if (ret) {
-> @@ -2685,6 +2712,8 @@ static void ram_save_cleanup(void *opaque)
->      memory_global_dirty_log_stop();
->  
->      RAMBLOCK_FOREACH_NOT_IGNORED(block) {
-> +        g_free(block->clear_bmap);
-> +        block->clear_bmap = NULL;
->          g_free(block->bmap);
->          block->bmap = NULL;
->          g_free(block->unsentmap);
-> @@ -3195,15 +3224,30 @@ static int ram_state_init(RAMState **rsp)
->  
->  static void ram_list_init_bitmaps(void)
->  {
-> +    MigrationState *ms = migrate_get_current();
->      RAMBlock *block;
->      unsigned long pages;
-> +    uint8_t shift;
->  
->      /* Skip setting bitmap if there is no RAM */
->      if (ram_bytes_total()) {
-> +        shift = ms->clear_bitmap_shift;
-> +        if (shift > CLEAR_BITMAP_SHIFT_MAX) {
-> +            error_report("clear_bitmap_shift (%u) too big, using "
-> +                         "max value (%u)", shift, CLEAR_BITMAP_SHIFT_MAX);
-> +            shift = CLEAR_BITMAP_SHIFT_MAX;
-> +        } else if (shift < CLEAR_BITMAP_SHIFT_MIN) {
-> +            error_report("clear_bitmap_shift (%u) too small, using "
-> +                         "min value (%u)", shift, CLEAR_BITMAP_SHIFT_MIN);
-> +            shift = CLEAR_BITMAP_SHIFT_MIN;
-> +        }
-> +
->          RAMBLOCK_FOREACH_NOT_IGNORED(block) {
->              pages = block->max_length >> TARGET_PAGE_BITS;
->              block->bmap = bitmap_new(pages);
->              bitmap_set(block->bmap, 0, pages);
-> +            block->clear_bmap_shift = shift;
-> +            block->clear_bmap = bitmap_new(clear_bmap_size(pages, shift));
->              if (migrate_postcopy_ram()) {
->                  block->unsentmap = bitmap_new(pages);
->                  bitmap_set(block->unsentmap, 0, pages);
-> diff --git a/migration/trace-events b/migration/trace-events
-> index de2e136e57..2c45974330 100644
-> --- a/migration/trace-events
-> +++ b/migration/trace-events
-> @@ -79,6 +79,7 @@ get_queued_page(const char *block_name, uint64_t tmp_offset, unsigned long page_
->  get_queued_page_not_dirty(const char *block_name, uint64_t tmp_offset, unsigned long page_abs, int sent) "%s/0x%" PRIx64 " page_abs=0x%lx (sent=%d)"
->  migration_bitmap_sync_start(void) ""
->  migration_bitmap_sync_end(uint64_t dirty_pages) "dirty_pages %" PRIu64
-> +migration_bitmap_clear_dirty(char *str, uint64_t start, uint64_t size, unsigned long page) "rb %s start 0x%"PRIx64" size 0x%"PRIx64" page 0x%lx"
->  migration_throttle(void) ""
->  multifd_recv(uint8_t id, uint64_t packet_num, uint32_t used, uint32_t flags, uint32_t next_packet_size) "channel %d packet number %" PRIu64 " pages %d flags 0x%x next packet size %d"
->  multifd_recv_sync_main(long packet_num) "packet num %ld"
-> -- 
-> 2.17.1
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+changes since v7
+1. folding back v6 
+2. logging at helper_outb and helper_inb are done for non supported yet registers only
+3. MAINTAINERS updated
+
+changes since v8
+1. removing hw/avr from hw/Makefile.obj as it should not be built for all
+2. making linux compilable
+3. testing on
+    a. Mac, Apple LLVM version 7.0.0
+    b. Ubuntu 12.04, gcc 4.9.2
+    c. Fedora 23, gcc 5.3.1
+4. folding back some patches
+5. translation bug fixes for ORI, CPI, XOR instructions
+6. propper handling of cpu register writes though memory
+
+changes since v9
+1. removing forward declarations of static functions
+2. disabling debug prints
+3. switching to case range instead of if else if ...
+4. LD/ST IN/OUT accessing CPU maintainder registers are not routed to any device
+5. commenst about sample board and sample IO device added
+6. sample board description is more descriptive now
+7. memory_region_allocate_system_memory is used to create RAM
+8. now there are helper_fullrd & helper_fullwr when LD/ST try to access registers
+
+changes since v10
+1. movig back fullwr & fullrd into the commit where outb and inb were introduced
+2. changing tlb_fill function signature
+3. adding empty line between functions
+4. adding newline on the last line of the file
+5. using tb->flags to generae full access ST/LD instructions
+6. fixing SBRC bug
+7. folding back 10th commit
+8. whenever a new file is introduced it's added to Makefile.objs
+
+changes since v11
+1. updating to v2.7.0-rc
+2. removing assignment to env->fullacc from gen_intermediate_code
+
+changes since v12
+1. fixing spacing
+2. fixing get/put_segment functions
+3. removing target-avr/machine.h file
+4. VMSTATE_SINGLE_TEST -> VMSTATE_SINGLE
+5. comment spelling
+6. removing hw/avr/sample_io.c
+7. char const* -> const char*
+8. proper ram allocation
+9. fixing breakpoint functionality.
+10.env1 -> env
+11.fixing avr_cpu_gdb_write_register & avr_cpu_gdb_read_register functions
+12.any cpu is removed
+12.feature bits are not saved into vm state
+
+changes since v13
+1. rebasing to v2.7.0-rc1
+
+changes since v14
+1. I made self review with git gui tool. (I did not know such a thing exists)
+2. removing all double/tripple spaces
+3. removing comment reference to SampleIO
+4. folding back some changes, so there is not deleted lines in my code
+5. moving avr configuration, within configure file, before chris
+
+changes since v15
+1. removing IO registers cache from CPU
+2. implementing CBI/SBI as read(helper_inb), modify, write(helper_outb)
+3. implementing CBIC/SBIC as read(helper_inb), check, branch
+4. adding missing tcg_temp_free_i32 for tcg_const_i32
+
+changes since v16
+1. removing EXT IO registers knoledge from CPU. These registers are accessible 
+   by LD/ST only. CPU has no interest in them
+
+changes since v17 (by Richard Henderson)
+This is Michael's v17, with some adjustments of my own:
+
+1. Fix the whitespace errors reported by "git am",
+2. Replace the utf-8 characters with normal ascii,
+3. Ditch the separate compilation of translate.c.
+
+I retained the two separate files that could be regenerated
+from the included cpugen program, but merged in translate-insn.c.
+Not that it matters, but the code generated is about 3k smaller.
+
+changes since v18
+1.  moving target-avr into target/avr
+2.  do not call cpu_exec_initfn function from avr_cpu_initfn
+3.  call cpu_exec_realizefn avr_cpu_realizefn
+4.  do not fail sample machine creation if no rom is suplied
+5.  add tcg_gen_exit_tb(0) for BS_BRANCH in gen_intermediate_code
+6.  fix a register getters/setters in machine.c
+7.  changing QEMU_ARCH_AVR from 1<<17 to 1<<18
+
+changes since v19
+1.  use decodetree.py tool to decode instructions
+2.  adding USART
+3.  adding 16 bit timer peripherals
+4.  changing QEMU_ARCH_AVR from 1<<18 to 1<<20
+5.  renaming tlb_fill to avr_cpu_tlb_fill
+
+*** BLURB HERE ***
+
+Michael Rolnik (1):
+  target-avr: Add instruction decoding
+
+Sarah Harris (7):
+  target/avr: Add outward facing interfaces and core CPU logic
+  target/avr: Add instruction helpers
+  target/avr: Add mechanism to check for active debugger connection
+  target/avr: Add instruction translation
+  target/avr: Add limited support for USART and 16 bit timer peripherals
+  target/avr: Add example board configuration
+  target/avr: Register AVR support with the rest of QEMU, the build
+    system, and the MAINTAINERS file
+
+ MAINTAINERS                     |    6 +
+ arch_init.c                     |    2 +
+ configure                       |    6 +
+ default-configs/avr-softmmu.mak |    5 +
+ gdbstub.c                       |    5 +
+ hw/Kconfig                      |    1 +
+ hw/avr/Kconfig                  |    4 +
+ hw/avr/Makefile.objs            |    1 +
+ hw/avr/sample.c                 |  177 ++
+ hw/char/Kconfig                 |    3 +
+ hw/char/Makefile.objs           |    1 +
+ hw/char/avr_usart.c             |  316 ++++
+ hw/timer/Kconfig                |    3 +
+ hw/timer/Makefile.objs          |    1 +
+ hw/timer/avr_timer16.c          |  587 ++++++
+ include/disas/dis-asm.h         |    6 +
+ include/exec/gdbstub.h          |    4 +
+ include/hw/char/avr_usart.h     |   99 +
+ include/hw/timer/avr_timer16.h  |   99 +
+ include/sysemu/arch_init.h      |    1 +
+ qapi/common.json                |    2 +-
+ target/avr/Makefile.objs        |   40 +
+ target/avr/cpu-qom.h            |   83 +
+ target/avr/cpu.c                |  571 ++++++
+ target/avr/cpu.h                |  242 +++
+ target/avr/gdbstub.c            |   85 +
+ target/avr/helper.c             |  346 ++++
+ target/avr/helper.h             |   28 +
+ target/avr/insn16.decode        |  160 ++
+ target/avr/insn32.decode        |   10 +
+ target/avr/machine.c            |  122 ++
+ target/avr/translate.c          | 2981 +++++++++++++++++++++++++++++++
+ tests/machine-none-test.c       |    1 +
+ 33 files changed, 5997 insertions(+), 1 deletion(-)
+ create mode 100644 default-configs/avr-softmmu.mak
+ create mode 100644 hw/avr/Kconfig
+ create mode 100644 hw/avr/Makefile.objs
+ create mode 100644 hw/avr/sample.c
+ create mode 100644 hw/char/avr_usart.c
+ create mode 100644 hw/timer/avr_timer16.c
+ create mode 100644 include/hw/char/avr_usart.h
+ create mode 100644 include/hw/timer/avr_timer16.h
+ create mode 100644 target/avr/Makefile.objs
+ create mode 100644 target/avr/cpu-qom.h
+ create mode 100644 target/avr/cpu.c
+ create mode 100644 target/avr/cpu.h
+ create mode 100644 target/avr/gdbstub.c
+ create mode 100644 target/avr/helper.c
+ create mode 100644 target/avr/helper.h
+ create mode 100644 target/avr/insn16.decode
+ create mode 100644 target/avr/insn32.decode
+ create mode 100644 target/avr/machine.c
+ create mode 100644 target/avr/translate.c
+
+-- 
+2.18.0
+
 
