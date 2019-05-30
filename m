@@ -2,64 +2,81 @@ Return-Path: <SRS0=r6E1=T6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	T_HK_NAME_DR,USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C0F3BC28CC0
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 16:42:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 76BF3C28CC0
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 17:39:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8038B25DD0
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 16:42:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8038B25DD0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 47C5525E93
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 17:39:32 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="SgD79Cyq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 47C5525E93
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:56661 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:57208 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hWO8C-0007GZ-Gl
-	for qemu-devel@archiver.kernel.org; Thu, 30 May 2019 12:42:20 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:33290)
+	id 1hWP1X-0000od-7e
+	for qemu-devel@archiver.kernel.org; Thu, 30 May 2019 13:39:31 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:44079)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1hWO7G-0006j5-NK
-	for qemu-devel@nongnu.org; Thu, 30 May 2019 12:41:24 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hWP0h-0000Qz-8j
+	for qemu-devel@nongnu.org; Thu, 30 May 2019 13:38:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1hWO7F-000786-5y
-	for qemu-devel@nongnu.org; Thu, 30 May 2019 12:41:22 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47106)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hWO78-0006ZS-NH
-	for qemu-devel@nongnu.org; Thu, 30 May 2019 12:41:15 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 69ADC81112
-	for <qemu-devel@nongnu.org>; Thu, 30 May 2019 16:40:48 +0000 (UTC)
-Received: from work-vm (ovpn-117-91.ams2.redhat.com [10.36.117.91])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 895F17A547;
-	Thu, 30 May 2019 16:40:40 +0000 (UTC)
-Date: Thu, 30 May 2019 17:40:38 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Peter Xu <peterx@redhat.com>
-Message-ID: <20190530164037.GH2823@work-vm>
-References: <20190530092919.26059-1-peterx@redhat.com>
-	<20190530092919.26059-11-peterx@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190530092919.26059-11-peterx@redhat.com>
-User-Agent: Mutt/1.11.4 (2019-03-13)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.28]);
-	Thu, 30 May 2019 16:40:53 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v3 10/12] kvm: Introduce slots lock for
- memory listener
+	(envelope-from <richard.henderson@linaro.org>) id 1hWP0Z-0000ge-NA
+	for qemu-devel@nongnu.org; Thu, 30 May 2019 13:38:35 -0400
+Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:40714)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1hWP0X-0000dJ-JA
+	for qemu-devel@nongnu.org; Thu, 30 May 2019 13:38:29 -0400
+Received: by mail-ot1-x343.google.com with SMTP id u11so6431095otq.7
+	for <qemu-devel@nongnu.org>; Thu, 30 May 2019 10:38:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=from:to:cc:subject:date:message-id;
+	bh=NlfGiAAlPDQtelzDRN9s5s54Y74DMuOJ6VJbYlSv7zo=;
+	b=SgD79CyqD8o2D+fOKp0hfXAazxGXFauY/FcGUCiFJ4Xr3IA6yKF5cuPKncSk19Yz8A
+	DOKjJ8ijd2/cVBtMMRR+HjMKjJbVdpsanlh5GQ0TXuedE1gitY9r9ERlCGrOjv+mh3bl
+	YW8rkHJQs0wZl1ynTUb5uSqpLVyMQF9q6uDweM/ktNCtiY0H9BjWKb3ViKrzQ4Nna3Gw
+	wsMvVxAmriZFGLweM65amhcOWDLh9OQrqKeRyO96Va2D1v7rd3RV5TJAifwg1sFjhGyS
+	5efmvy3XTIG/LWDvpE8AY2DQrVm8Ng9mK5Fj4r43bbPBv7nXgWQiUKJYgSFTwlG3xJQd
+	Nong==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:from:to:cc:subject:date:message-id;
+	bh=NlfGiAAlPDQtelzDRN9s5s54Y74DMuOJ6VJbYlSv7zo=;
+	b=RHsoQhbfwEYBG67nGz4KcPNatyKyYjzLqyLvJGaqGLkqfEsDA3W6phz9rn+GEfIBzi
+	4X5nD+eFfSyJRpuNEC0SR4Uj6iQ7aWfjd9/6Isq+O7kEbQMbZul/6vhfPYxOGZXNipi7
+	ttlv4gukcNIbkFg8uvjWCzKCU12Xsb9tBrE9RyfWYmUV+p49E2/PAnHUm+neV/HALTA6
+	H4heWMdPFyBQbcSX/vGPCMm7xMV//tT0lr70qXKWKsRiU+lei/xw2dDfiTxJsIKswXWA
+	bYYYGi9MEwbzqIWe/9NKn4GjZ3TDnp0mdlpVZMoZD92gcl6hshicxca4AJwf0yq/X3jO
+	8aLw==
+X-Gm-Message-State: APjAAAUi3IGG95WyCsY2tFoMdTz6jMgID7IHWcNmIpzjGCz95zxu6YCi
+	/VDW1ECYwKDCX991G355zJIaMGV+umdltw==
+X-Google-Smtp-Source: APXvYqzgjBZv+L3ZfNk9vTxuurkKGvmM/EYYknR2zNcbu19ghGWkZVIyewk/Jawj8P9DdaP6BU2lag==
+X-Received: by 2002:a9d:694a:: with SMTP id p10mr3649933oto.61.1559237908397; 
+	Thu, 30 May 2019 10:38:28 -0700 (PDT)
+Received: from localhost.localdomain (168.189-204-159.bestelclientes.com.mx.
+	[189.204.159.168])
+	by smtp.gmail.com with ESMTPSA id i12sm1124466otk.2.2019.05.30.10.38.26
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Thu, 30 May 2019 10:38:27 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
+To: qemu-devel@nongnu.org
+Date: Thu, 30 May 2019 12:38:24 -0500
+Message-Id: <20190530173824.30699-1-richard.henderson@linaro.org>
+X-Mailer: git-send-email 2.17.1
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::343
+Subject: [Qemu-devel] [PATCH] util: Adjust qemu_guest_getrandom_nofail for
+ Coverity
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -71,250 +88,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
-	qemu-devel@nongnu.org, Juan Quintela <quintela@redhat.com>
+Cc: qemu-trivial@nongnu.org, peter.maydell@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Peter Xu (peterx@redhat.com) wrote:
-> Introduce KVMMemoryListener.slots_lock to protect the slots inside the
-> kvm memory listener.  Currently it is close to useless because all the
-> KVM code path now is always protected by the BQL.  But it'll start to
-> make sense in follow up patches where we might do remote dirty bitmap
-> clear and also we'll update the per-slot cached dirty bitmap even
-> without the BQL.  So let's prepare for it.
-> 
-> We can also use per-slot lock for above reason but it seems to be an
-> overkill.  Let's just use this bigger one (which covers all the slots
-> of a single address space) but anyway this lock is still much smaller
-> than the BQL.
-> 
-> Signed-off-by: Peter Xu <peterx@redhat.com>
+Explicitly ignore the return value of qemu_guest_getrandom.
+Because we use error_fatal, all errors are already caught.
 
-No one ever frees it? Huh OK, in that case if no one ever frees the
-listener then I guess you don't need to cleanup the lock.
+Fixes: CID 1401701
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ util/guest-random.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
+diff --git a/util/guest-random.c b/util/guest-random.c
+index e8124a3cad..00a08fd981 100644
+--- a/util/guest-random.c
++++ b/util/guest-random.c
+@@ -56,7 +56,7 @@ int qemu_guest_getrandom(void *buf, size_t len, Error **errp)
+ 
+ void qemu_guest_getrandom_nofail(void *buf, size_t len)
+ {
+-    qemu_guest_getrandom(buf, len, &error_fatal);
++    (void)qemu_guest_getrandom(buf, len, &error_fatal);
+ }
+ 
+ uint64_t qemu_guest_random_seed_thread_part1(void)
+-- 
+2.17.1
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-
-> ---
->  accel/kvm/kvm-all.c      | 58 +++++++++++++++++++++++++++++++---------
->  include/sysemu/kvm_int.h |  2 ++
->  2 files changed, 48 insertions(+), 12 deletions(-)
-> 
-> diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-> index 334c610918..e687060296 100644
-> --- a/accel/kvm/kvm-all.c
-> +++ b/accel/kvm/kvm-all.c
-> @@ -138,6 +138,9 @@ static const KVMCapabilityInfo kvm_required_capabilites[] = {
->      KVM_CAP_LAST_INFO
->  };
->  
-> +#define kvm_slots_lock(kml)      qemu_mutex_lock(&(kml)->slots_lock)
-> +#define kvm_slots_unlock(kml)    qemu_mutex_unlock(&(kml)->slots_lock)
-> +
->  int kvm_get_max_memslots(void)
->  {
->      KVMState *s = KVM_STATE(current_machine->accelerator);
-> @@ -165,6 +168,7 @@ int kvm_memcrypt_encrypt_data(uint8_t *ptr, uint64_t len)
->      return 1;
->  }
->  
-> +/* Called with KVMMemoryListener.slots_lock held */
->  static KVMSlot *kvm_get_free_slot(KVMMemoryListener *kml)
->  {
->      KVMState *s = kvm_state;
-> @@ -182,10 +186,17 @@ static KVMSlot *kvm_get_free_slot(KVMMemoryListener *kml)
->  bool kvm_has_free_slot(MachineState *ms)
->  {
->      KVMState *s = KVM_STATE(ms->accelerator);
-> +    bool result;
-> +    KVMMemoryListener *kml = &s->memory_listener;
-> +
-> +    kvm_slots_lock(kml);
-> +    result = !!kvm_get_free_slot(kml);
-> +    kvm_slots_unlock(kml);
->  
-> -    return kvm_get_free_slot(&s->memory_listener);
-> +    return result;
->  }
->  
-> +/* Called with KVMMemoryListener.slots_lock held */
->  static KVMSlot *kvm_alloc_slot(KVMMemoryListener *kml)
->  {
->      KVMSlot *slot = kvm_get_free_slot(kml);
-> @@ -244,18 +255,21 @@ int kvm_physical_memory_addr_from_host(KVMState *s, void *ram,
->                                         hwaddr *phys_addr)
->  {
->      KVMMemoryListener *kml = &s->memory_listener;
-> -    int i;
-> +    int i, ret = 0;
->  
-> +    kvm_slots_lock(kml);
->      for (i = 0; i < s->nr_slots; i++) {
->          KVMSlot *mem = &kml->slots[i];
->  
->          if (ram >= mem->ram && ram < mem->ram + mem->memory_size) {
->              *phys_addr = mem->start_addr + (ram - mem->ram);
-> -            return 1;
-> +            ret = 1;
-> +            break;
->          }
->      }
-> +    kvm_slots_unlock(kml);
->  
-> -    return 0;
-> +    return ret;
->  }
->  
->  static int kvm_set_user_memory_region(KVMMemoryListener *kml, KVMSlot *slot, bool new)
-> @@ -391,6 +405,7 @@ static int kvm_mem_flags(MemoryRegion *mr)
->      return flags;
->  }
->  
-> +/* Called with KVMMemoryListener.slots_lock held */
->  static int kvm_slot_update_flags(KVMMemoryListener *kml, KVMSlot *mem,
->                                   MemoryRegion *mr)
->  {
-> @@ -409,19 +424,26 @@ static int kvm_section_update_flags(KVMMemoryListener *kml,
->  {
->      hwaddr start_addr, size;
->      KVMSlot *mem;
-> +    int ret = 0;
->  
->      size = kvm_align_section(section, &start_addr);
->      if (!size) {
->          return 0;
->      }
->  
-> +    kvm_slots_lock(kml);
-> +
->      mem = kvm_lookup_matching_slot(kml, start_addr, size);
->      if (!mem) {
->          /* We don't have a slot if we want to trap every access. */
-> -        return 0;
-> +        goto out;
->      }
->  
-> -    return kvm_slot_update_flags(kml, mem, section->mr);
-> +    ret = kvm_slot_update_flags(kml, mem, section->mr);
-> +
-> +out:
-> +    kvm_slots_unlock(kml);
-> +    return ret;
->  }
->  
->  static void kvm_log_start(MemoryListener *listener,
-> @@ -478,6 +500,8 @@ static int kvm_get_dirty_pages_log_range(MemoryRegionSection *section,
->   * This function will first try to fetch dirty bitmap from the kernel,
->   * and then updates qemu's dirty bitmap.
->   *
-> + * NOTE: caller must be with kml->slots_lock held.
-> + *
->   * @kml: the KVM memory listener object
->   * @section: the memory section to sync the dirty bitmap with
->   */
-> @@ -488,26 +512,28 @@ static int kvm_physical_sync_dirty_bitmap(KVMMemoryListener *kml,
->      struct kvm_dirty_log d = {};
->      KVMSlot *mem;
->      hwaddr start_addr, size;
-> +    int ret = 0;
->  
->      size = kvm_align_section(section, &start_addr);
->      if (size) {
->          mem = kvm_lookup_matching_slot(kml, start_addr, size);
->          if (!mem) {
->              /* We don't have a slot if we want to trap every access. */
-> -            return 0;
-> +            goto out;
->          }
->  
->          d.dirty_bitmap = mem->dirty_bmap;
->          d.slot = mem->slot | (kml->as_id << 16);
->          if (kvm_vm_ioctl(s, KVM_GET_DIRTY_LOG, &d) == -1) {
->              DPRINTF("ioctl failed %d\n", errno);
-> -            return -1;
-> +            ret = -1;
-> +            goto out;
->          }
->  
->          kvm_get_dirty_pages_log_range(section, d.dirty_bitmap);
->      }
-> -
-> -    return 0;
-> +out:
-> +    return ret;
->  }
->  
->  static void kvm_coalesce_mmio_region(MemoryListener *listener,
-> @@ -770,10 +796,12 @@ static void kvm_set_phys_mem(KVMMemoryListener *kml,
->      ram = memory_region_get_ram_ptr(mr) + section->offset_within_region +
->            (start_addr - section->offset_within_address_space);
->  
-> +    kvm_slots_lock(kml);
-> +
->      if (!add) {
->          mem = kvm_lookup_matching_slot(kml, start_addr, size);
->          if (!mem) {
-> -            return;
-> +            goto out;
->          }
->          if (mem->flags & KVM_MEM_LOG_DIRTY_PAGES) {
->              kvm_physical_sync_dirty_bitmap(kml, section);
-> @@ -790,7 +818,7 @@ static void kvm_set_phys_mem(KVMMemoryListener *kml,
->                      __func__, strerror(-err));
->              abort();
->          }
-> -        return;
-> +        goto out;
->      }
->  
->      /*
-> @@ -823,6 +851,9 @@ static void kvm_set_phys_mem(KVMMemoryListener *kml,
->                  strerror(-err));
->          abort();
->      }
-> +
-> +out:
-> +    kvm_slots_unlock(kml);
->  }
->  
->  static void kvm_region_add(MemoryListener *listener,
-> @@ -849,7 +880,9 @@ static void kvm_log_sync(MemoryListener *listener,
->      KVMMemoryListener *kml = container_of(listener, KVMMemoryListener, listener);
->      int r;
->  
-> +    kvm_slots_lock(kml);
->      r = kvm_physical_sync_dirty_bitmap(kml, section);
-> +    kvm_slots_unlock(kml);
->      if (r < 0) {
->          abort();
->      }
-> @@ -929,6 +962,7 @@ void kvm_memory_listener_register(KVMState *s, KVMMemoryListener *kml,
->  {
->      int i;
->  
-> +    qemu_mutex_init(&kml->slots_lock);
->      kml->slots = g_malloc0(s->nr_slots * sizeof(KVMSlot));
->      kml->as_id = as_id;
->  
-> diff --git a/include/sysemu/kvm_int.h b/include/sysemu/kvm_int.h
-> index 687a2ee423..31df465fdc 100644
-> --- a/include/sysemu/kvm_int.h
-> +++ b/include/sysemu/kvm_int.h
-> @@ -27,6 +27,8 @@ typedef struct KVMSlot
->  
->  typedef struct KVMMemoryListener {
->      MemoryListener listener;
-> +    /* Protects the slots and all inside them */
-> +    QemuMutex slots_lock;
->      KVMSlot *slots;
->      int as_id;
->  } KVMMemoryListener;
-> -- 
-> 2.17.1
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
