@@ -2,66 +2,61 @@ Return-Path: <SRS0=r6E1=T6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_MUTT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7ADC0C28CC0
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 08:53:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 34B77C28CC0
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 09:00:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 444E8254D5
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 08:53:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 444E8254D5
+	by mail.kernel.org (Postfix) with ESMTPS id EF31825571
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 09:00:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EF31825571
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:49388 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:49428 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hWGon-0000NS-Tb
-	for qemu-devel@archiver.kernel.org; Thu, 30 May 2019 04:53:49 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:37789)
+	id 1hWGun-0001Lr-4U
+	for qemu-devel@archiver.kernel.org; Thu, 30 May 2019 05:00:01 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:38556)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1hWGnz-0008VQ-R8
-	for qemu-devel@nongnu.org; Thu, 30 May 2019 04:53:00 -0400
+	(envelope-from <imammedo@redhat.com>) id 1hWGty-00012f-SX
+	for qemu-devel@nongnu.org; Thu, 30 May 2019 04:59:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1hWGny-0007lP-Sa
-	for qemu-devel@nongnu.org; Thu, 30 May 2019 04:52:59 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:28576)
+	(envelope-from <imammedo@redhat.com>) id 1hWGtt-0003jn-Ot
+	for qemu-devel@nongnu.org; Thu, 30 May 2019 04:59:10 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49324)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1hWGny-0007kL-Mp
-	for qemu-devel@nongnu.org; Thu, 30 May 2019 04:52:58 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1hWGtt-0003jI-GN
+	for qemu-devel@nongnu.org; Thu, 30 May 2019 04:59:05 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C4B9559451;
-	Thu, 30 May 2019 08:52:56 +0000 (UTC)
-Received: from linux.fritz.box (ovpn-116-119.ams2.redhat.com [10.36.116.119])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 0C7973AC8;
-	Thu, 30 May 2019 08:52:50 +0000 (UTC)
-Date: Thu, 30 May 2019 10:52:49 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <20190530085249.GB4890@linux.fritz.box>
-References: <20190524183638.20745-1-stefanha@redhat.com>
-	<24b93cc5-edb1-a197-14be-e63ac356325d@redhat.com>
-	<20190529221030.GD3471@localhost.localdomain>
-	<2666245b-7873-dc66-4af0-6b9c1eaa445d@redhat.com>
+	by mx1.redhat.com (Postfix) with ESMTPS id C05873092667;
+	Thu, 30 May 2019 08:58:59 +0000 (UTC)
+Received: from localhost (unknown [10.43.2.182])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 1F5A477D45;
+	Thu, 30 May 2019 08:58:52 +0000 (UTC)
+Date: Thu, 30 May 2019 10:58:52 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Message-ID: <20190530105852.18fa0c7b@redhat.com>
+In-Reply-To: <20190528204331.5280-1-kraxel@redhat.com>
+References: <20190528204331.5280-1-kraxel@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <2666245b-7873-dc66-4af0-6b9c1eaa445d@redhat.com>
-User-Agent: Mutt/1.11.3 (2019-02-01)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.39]);
-	Thu, 30 May 2019 08:52:56 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.43]);
+	Thu, 30 May 2019 08:59:04 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [RFC v3 0/3] scsi: restart dma after vm change
- state handlers
+Subject: Re: [Qemu-devel] [PATCH] q35: fix mmconfig and PCI0._CRS
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -73,35 +68,152 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, qemu-devel@nongnu.org,
-	Stefan Hajnoczi <stefanha@redhat.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, "Michael
+	S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	=?UTF-8?B?TMOhc3psw7Mgw4lyc2Vr?= <lersek@redhat.com>,
+	Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 30.05.2019 um 10:27 hat Paolo Bonzini geschrieben:
-> On 30/05/19 00:10, Kevin Wolf wrote:
-> > I don't think this is as nice because stopping or resuming a device
-> > could involve some async operation (e.g. be delegated to a BH). In this
-> > case, a device on a child bus must still wait for the BH (or other async
-> > part) to be completed before it can resume its own operation.
-> > 
-> > Basically, a single flat list of global VM state handlers wasn't a good
-> > design, because what we actually need in such cases is something
-> > hierarchical.
-> 
-> So add an AioContext state change handler?
+On Tue, 28 May 2019 22:43:31 +0200
+Gerd Hoffmann <kraxel@redhat.com> wrote:
 
-Does anything really change for the AioContext that could cause a
-callback? As I read the code, only the virtio-scsi device state really
-changes and it doesn't do more with the AioContext than just taking the
-lock for a while.
+> This patch changes the handling of the mmconfig area.  Thanks to the
+> pci(e) expander devices we already have the logic to exclude address
+> ranges from PCI0._CRS.  We can simply add the mmconfig address range
+> to the list get it excluded as well.
+>=20
+> With that in place we can go with a fixed pci hole which covers the
+> whole area from the end of (low) ram to the ioapic.
+>=20
+> This will make the whole logic alot less fragile.  No matter where the
+> firmware places the mmconfig xbar, things should work correctly.  The
+> guest also gets a bit more PCI address space (seabios boot):
+>=20
+>     # cat /proc/iomem
+>     [ ... ]
+>     7ffdd000-7fffffff : reserved
+>     80000000-afffffff : PCI Bus 0000:00            <<-- this is new
+>     b0000000-bfffffff : PCI MMCONFIG 0000 [bus 00-ff]
+>       b0000000-bfffffff : reserved
+>     c0000000-febfffff : PCI Bus 0000:00
+>       f8000000-fbffffff : 0000:00:01.0
+>     [ ... ]
+>=20
+> So this is a guest visible change.
+>=20
+> Cc: L=C3=A1szl=C3=B3 =C3=89rsek <lersek@redhat.com>
+> Cc: Igor Mammedov <imammedo@redhat.com>
+> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 
-But in any case, inferring whether the HBA is ready from some AioContext
-state change, even if it were technically possible, is rather indirect
-and more a hack than a proper solution in my book. So a callback from
-the HBA to its bus feels like the correct approach.
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 
-Kevin
+> ---
+>  hw/i386/acpi-build.c | 14 ++++++++++++++
+>  hw/pci-host/q35.c    | 31 ++++++++-----------------------
+>  2 files changed, 22 insertions(+), 23 deletions(-)
+>=20
+> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+> index 0d78d738948c..abb0e0ce9f27 100644
+> --- a/hw/i386/acpi-build.c
+> +++ b/hw/i386/acpi-build.c
+> @@ -122,6 +122,8 @@ typedef struct FwCfgTPMConfig {
+>      uint8_t tpmppi_version;
+>  } QEMU_PACKED FwCfgTPMConfig;
+> =20
+> +static bool acpi_get_mcfg(AcpiMcfgInfo *mcfg);
+> +
+>  static void init_common_fadt_data(Object *o, AcpiFadtData *data)
+>  {
+>      uint32_t io =3D object_property_get_uint(o, ACPI_PM_PROP_PM_IO_BASE,=
+ NULL);
+> @@ -1807,6 +1809,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
+>      CrsRangeSet crs_range_set;
+>      PCMachineState *pcms =3D PC_MACHINE(machine);
+>      PCMachineClass *pcmc =3D PC_MACHINE_GET_CLASS(machine);
+> +    AcpiMcfgInfo mcfg;
+>      uint32_t nr_mem =3D machine->ram_slots;
+>      int root_bus_limit =3D 0xFF;
+>      PCIBus *bus =3D NULL;
+> @@ -1921,6 +1924,17 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
+>          }
+>      }
+> =20
+> +    /*
+> +     * At this point crs_range_set has all the ranges used by pci
+> +     * busses *other* than PCI0.  These ranges will be excluded from
+> +     * the PCI0._CRS.  Add mmconfig to the set so it will be excluded
+> +     * too.
+> +     */
+> +    if (acpi_get_mcfg(&mcfg)) {
+> +        crs_range_insert(crs_range_set.mem_ranges,
+> +                         mcfg.base, mcfg.base + mcfg.size - 1);
+> +    }
+> +
+>      scope =3D aml_scope("\\_SB.PCI0");
+>      /* build PCI0._CRS */
+>      crs =3D aml_resource_template();
+> diff --git a/hw/pci-host/q35.c b/hw/pci-host/q35.c
+> index 960939f5ed3e..72093320befe 100644
+> --- a/hw/pci-host/q35.c
+> +++ b/hw/pci-host/q35.c
+> @@ -258,15 +258,6 @@ static void q35_host_initfn(Object *obj)
+>      object_property_add_link(obj, MCH_HOST_PROP_IO_MEM, TYPE_MEMORY_REGI=
+ON,
+>                               (Object **) &s->mch.address_space_io,
+>                               qdev_prop_allow_set_link_before_realize, 0,=
+ NULL);
+> -
+> -    /* Leave enough space for the biggest MCFG BAR */
+> -    /* TODO: this matches current bios behaviour, but
+> -     * it's not a power of two, which means an MTRR
+> -     * can't cover it exactly.
+> -     */
+> -    range_set_bounds(&s->mch.pci_hole,
+> -            MCH_HOST_BRIDGE_PCIEXBAR_DEFAULT + MCH_HOST_BRIDGE_PCIEXBAR_=
+MAX,
+> -            IO_APIC_DEFAULT_ADDRESS - 1);
+>  }
+> =20
+>  static const TypeInfo q35_host_info =3D {
+> @@ -338,20 +329,6 @@ static void mch_update_pciexbar(MCHPCIState *mch)
+>      }
+>      addr =3D pciexbar & addr_mask;
+>      pcie_host_mmcfg_update(pehb, enable, addr, length);
+> -    /* Leave enough space for the MCFG BAR */
+> -    /*
+> -     * TODO: this matches current bios behaviour, but it's not a power o=
+f two,
+> -     * which means an MTRR can't cover it exactly.
+> -     */
+> -    if (enable) {
+> -        range_set_bounds(&mch->pci_hole,
+> -                         addr + length,
+> -                         IO_APIC_DEFAULT_ADDRESS - 1);
+> -    } else {
+> -        range_set_bounds(&mch->pci_hole,
+> -                         MCH_HOST_BRIDGE_PCIEXBAR_DEFAULT,
+> -                         IO_APIC_DEFAULT_ADDRESS - 1);
+> -    }
+>  }
+> =20
+>  /* PAM */
+> @@ -484,6 +461,14 @@ static void mch_update(MCHPCIState *mch)
+>      mch_update_pam(mch);
+>      mch_update_smram(mch);
+>      mch_update_ext_tseg_mbytes(mch);
+> +
+> +    /*
+> +     * pci hole goes from end-of-low-ram to io-apic.
+> +     * mmconfig will be excluded by the dsdt builder.
+> +     */
+> +    range_set_bounds(&mch->pci_hole,
+> +                     mch->below_4g_mem_size,
+> +                     IO_APIC_DEFAULT_ADDRESS - 1);
+>  }
+> =20
+>  static int mch_post_load(void *opaque, int version_id)
+
 
