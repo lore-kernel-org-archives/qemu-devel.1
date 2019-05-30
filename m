@@ -7,75 +7,74 @@ X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 85799C28CC0
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 10:33:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CB650C28CC0
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 10:33:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3FA5025750
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 10:33:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8659C25750
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 10:33:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="GhP6pyvg"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3FA5025750
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="f0wR+s4P"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8659C25750
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:50831 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:50859 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hWIMv-0007t4-Hd
-	for qemu-devel@archiver.kernel.org; Thu, 30 May 2019 06:33:09 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:57076)
+	id 1hWIN6-00081m-Ne
+	for qemu-devel@archiver.kernel.org; Thu, 30 May 2019 06:33:20 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:54434)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hWIFF-0001Ed-Pi
-	for qemu-devel@nongnu.org; Thu, 30 May 2019 06:25:15 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1hWI6f-0002iD-7u
+	for qemu-devel@nongnu.org; Thu, 30 May 2019 06:16:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hWIFD-0000Ha-C9
-	for qemu-devel@nongnu.org; Thu, 30 May 2019 06:25:13 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:51755)
+	(envelope-from <alex.bennee@linaro.org>) id 1hWI6e-0006cZ-2r
+	for qemu-devel@nongnu.org; Thu, 30 May 2019 06:16:21 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:39187)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1hWIFC-0000Af-TB
-	for qemu-devel@nongnu.org; Thu, 30 May 2019 06:25:11 -0400
-Received: by mail-wm1-x343.google.com with SMTP id f10so3617872wmb.1
-	for <qemu-devel@nongnu.org>; Thu, 30 May 2019 03:25:09 -0700 (PDT)
+	id 1hWI6d-0006bp-Qi
+	for qemu-devel@nongnu.org; Thu, 30 May 2019 06:16:20 -0400
+Received: by mail-wr1-x444.google.com with SMTP id x4so3823233wrt.6
+	for <qemu-devel@nongnu.org>; Thu, 30 May 2019 03:16:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
 	h=from:to:cc:subject:date:message-id:in-reply-to:references
 	:mime-version:content-transfer-encoding;
-	bh=2471IffjmNwT1ZIHN+LiHQt5WCW20wr0QmjXYo3CRl8=;
-	b=GhP6pyvgxpZHNbcmuwIEZapIcPwTGrWK0KZLjWSykCKgyPcPg2c1rfpruDvYzZsjt6
-	MMzu1U5NZa7LdAGOfNQm5KJDcjnzTbl+hFh7iHD+eNMY4yboMipXfdtjtMTRYtoEX/Uh
-	bZYiSPwFsYtuFGSVQHMAJdiKdAhTowkASDpUA8uFlqTUsKeq1UNMnfZZt9sKD1XAYamM
-	q79zSr5dkeLTSPI0b7H6Td1KqyX5TdHLXbpoHPGLaPIlSQp0UMUSAUhUA7dJdykWM9vU
-	xxj+Wp4WmedLwGahsLBEu9vQ4VEP6F66xvC0fiKsBvXGNzTGB1W9JK214ORoHdSUnkWi
-	q8fQ==
+	bh=y2B2y1XQyJxhlxlLqIvvLBXxQCmx4xrmH/BIjlRjWcs=;
+	b=f0wR+s4PFVjNDk4AMOB+0UFj5XJN5P3DQ+suNvlR1vlOZFnL/ZdlFwTdxwMLARF6Tr
+	gpbCJkbLz95o0AgRFTltIfiu1vdPzisBn+wo6PNUqvmmm2IDVlZ6u4plFy3sxSzDDcRz
+	Us7bfyFayZm58+kC7y40nKaa9aZ+wvtZe9cn53GsyUpLVMmcq0Dwa4kwI0SViCPy8fNy
+	PwDRUw/YygeIiMlUo4GX13xiafwhWPlS6LljgFWIZNgVGArq5naOngOSj/5qyyRabV2X
+	HGn3Y/+4XzA91bHjENRe9euUc9hHhVvM44ddQX9Jo8ZWJMkMkJz+CA+Q4UPo2cIB4vhm
+	mA7g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
 	:references:mime-version:content-transfer-encoding;
-	bh=2471IffjmNwT1ZIHN+LiHQt5WCW20wr0QmjXYo3CRl8=;
-	b=GjjV/JBiFVLYKaUGDxIgM6J+2DT8peDzDzDVvyOlm5E5PNLvWwCSlj1drtfRbHKGMy
-	gEkVda7RX3t1rNdsNjeeGC64FEWLjyiNImAoQvNnVd5uWoZy9UP6FqH9ETN7EPKgV2Ls
-	mPxrCDWir/v2tnecQeGaBzgFOHOnfMoe2Ns5H7dkJp8Qj2bYLewiDTahgZr2Pwl9410Z
-	c/9EQaj0YRirDovy2TjtyznlijRFrCBjl+yXgxb/+ueS2L5tedmDcIUzEw9D+sOrc8h+
-	LpqumTf6Ji232szEdEh4zZcrEo5j6El96nUy7sveH0S1b6GLCalGdHetgIGakUfJP43u
-	m/RA==
-X-Gm-Message-State: APjAAAWwV5nMlnu94cqZUbwBO05aGZbPA781E+GMIhm/r+hDjVnv5YUb
-	ZT4PDWlRlCXUrk2DBqpN5sJNNJUfy2k=
-X-Google-Smtp-Source: APXvYqyW9Iqbs65U6v8JWEmqsWuxobq7L/pVtQOWf2xVlngb/kvOEdicMkKa5lrXYcSjWE8k45uxOw==
-X-Received: by 2002:a05:600c:1101:: with SMTP id
-	b1mr1855856wma.154.1559211907916; 
-	Thu, 30 May 2019 03:25:07 -0700 (PDT)
+	bh=y2B2y1XQyJxhlxlLqIvvLBXxQCmx4xrmH/BIjlRjWcs=;
+	b=sVtUe1WaUcxvxrXyujWC57rj/tfdpyM2J4iR0EJUn8c3gM6WYs3YfJ7pfLfhg6AxXo
+	Gg2zU96/j2HBGTbeVdwmXmhz84PHXE8DizuvrjrtRFEmBor4L9JJ4LU5s6fNTYGvhW+a
+	uVjeDKNWGecYDsRiCvQk/xY1UQ7cWwnnE86aDxybE8wQgaCcsrdaffiyyNjybT40KBjW
+	LFNeTR2W5rL3qXVm+WLIXoZlDwtpFyfyI1PqCBRGSkcS73gKtfADMtAZLk6KuTgPNK+I
+	zH5NkGlXaV9SorGQU+l6xAopXAKD3rIzgg95dhvyoG1yADwX3Ofoqn2B6W6kCwr0QF5r
+	bIDw==
+X-Gm-Message-State: APjAAAXtMJRgb+A51GJUB6R7YLimQdUY3W1qej7nUN5ag+eDA3gXJcZ+
+	NYtll63b243Wf7+wlVn+4Cz7y49DxHA=
+X-Google-Smtp-Source: APXvYqz1kHYFpJlkWKPIPHy8MV5oBerdGUwyhZy8vFS5nefHZMDqwx7gUHGry4D8qbXDHwbJ7ioe/w==
+X-Received: by 2002:a5d:51cf:: with SMTP id n15mr958810wrv.216.1559211378693; 
+	Thu, 30 May 2019 03:16:18 -0700 (PDT)
 Received: from zen.linaroharston ([81.128.185.34])
-	by smtp.gmail.com with ESMTPSA id w2sm1744827wru.16.2019.05.30.03.25.02
+	by smtp.gmail.com with ESMTPSA id o4sm2355995wmo.20.2019.05.30.03.16.09
 	(version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-	Thu, 30 May 2019 03:25:04 -0700 (PDT)
+	Thu, 30 May 2019 03:16:17 -0700 (PDT)
 Received: from zen.linaroharston. (localhost [127.0.0.1])
-	by zen.linaroharston (Postfix) with ESMTP id C4FBF1FFAA;
+	by zen.linaroharston (Postfix) with ESMTP id 20DA71FF9D;
 	Thu, 30 May 2019 11:16:05 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Thu, 30 May 2019 11:15:58 +0100
-Message-Id: <20190530101603.22254-22-alex.bennee@linaro.org>
+Date: Thu, 30 May 2019 11:15:50 +0100
+Message-Id: <20190530101603.22254-14-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190530101603.22254-1-alex.bennee@linaro.org>
 References: <20190530101603.22254-1-alex.bennee@linaro.org>
@@ -84,9 +83,9 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2a00:1450:4864:20::343
-Subject: [Qemu-devel] [PATCH v1 21/26] tests/vm: serial console support
- helpers
+X-Received-From: 2a00:1450:4864:20::444
+Subject: [Qemu-devel] [PATCH v1 13/26] scripts: use git archive in
+ archive-source
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -109,150 +108,119 @@ Sender: "Qemu-devel"
 
 From: Gerd Hoffmann <kraxel@redhat.com>
 
-Add a bunch of helpers to talk to the guest using the
-serial console.
-
-Also drop the hard-coded -serial parameter for the vm
-so QEMUMachine.set_console() actually works.
+Use git archive to create tarballs of qemu and submodules instead of
+cloning the repository and the submodules.  This is a order of magnitude
+faster because it doesn't fetch the submodules from the internet each
+time the script runs.
 
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 Tested-by: Thomas Huth <thuth@redhat.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-Id: <20190520124716.30472-10-kraxel@redhat.com>
+Message-Id: <20190520124716.30472-2-kraxel@redhat.com>
+[AJB: fixed up tabs]
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- tests/vm/basevm.py | 85 ++++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 82 insertions(+), 3 deletions(-)
+ scripts/archive-source.sh | 72 +++++++++++++++++----------------------
+ 1 file changed, 31 insertions(+), 41 deletions(-)
 
-diff --git a/tests/vm/basevm.py b/tests/vm/basevm.py
-index f27178f3c7c..8894267f078 100755
---- a/tests/vm/basevm.py
-+++ b/tests/vm/basevm.py
-@@ -2,10 +2,11 @@
- #
- # VM testing base class
- #
--# Copyright 2017 Red Hat Inc.
-+# Copyright 2017-2019 Red Hat Inc.
- #
- # Authors:
- #  Fam Zheng <famz@redhat.com>
-+#  Gerd Hoffmann <kraxel@redhat.com>
- #
- # This code is licensed under the GPL version 2 or later.  See
- # the COPYING file in the top-level directory.
-@@ -13,7 +14,9 @@
+diff --git a/scripts/archive-source.sh b/scripts/archive-source.sh
+index 8b899482600..ca94e49978f 100755
+--- a/scripts/archive-source.sh
++++ b/scripts/archive-source.sh
+@@ -19,16 +19,25 @@ if test $# -lt 1; then
+ fi
  
- from __future__ import print_function
- import os
-+import re
- import sys
-+import socket
- import logging
- import time
- import datetime
-@@ -79,8 +82,7 @@ class BaseVM(object):
-             "-cpu", "max",
-             "-netdev", "user,id=vnet,hostfwd=:127.0.0.1:0-:22",
-             "-device", "virtio-net-pci,netdev=vnet",
--            "-vnc", "127.0.0.1:0,to=20",
--            "-serial", "file:%s" % os.path.join(self._tmpdir, "serial.out")]
-+            "-vnc", "127.0.0.1:0,to=20"]
-         if vcpus and vcpus > 1:
-             self._args += ["-smp", "%d" % vcpus]
-         if kvm_available(self.arch):
-@@ -162,6 +164,8 @@ class BaseVM(object):
-         logging.debug("QEMU args: %s", " ".join(args))
-         qemu_bin = os.environ.get("QEMU", "qemu-system-" + self.arch)
-         guest = QEMUMachine(binary=qemu_bin, args=args)
-+        guest.set_machine('pc')
-+        guest.set_console()
-         try:
-             guest.launch()
-         except:
-@@ -184,6 +188,81 @@ class BaseVM(object):
-             raise Exception("Cannot find ssh port from 'info usernet':\n%s" % \
-                             usernet_info)
+ tar_file=$(realpath "$1")
+-list_file="${tar_file}.list"
+-vroot_dir="${tar_file}.vroot"
++sub_tdir=$(mktemp -d "${tar_file%.tar}.sub.XXXXXXXX")
++sub_file="${sub_tdir}/submodule.tar"
  
-+    def console_init(self, timeout = 120):
-+        vm = self._guest
-+        vm.console_socket.settimeout(timeout)
-+
-+    def console_log(self, text):
-+        for line in re.split("[\r\n]", text):
-+            # filter out terminal escape sequences
-+            line = re.sub("\x1b\[[0-9;?]*[a-zA-Z]", "", line)
-+            line = re.sub("\x1b\([0-9;?]*[a-zA-Z]", "", line)
-+            # replace unprintable chars
-+            line = re.sub("\x1b", "<esc>", line)
-+            line = re.sub("[\x00-\x1f]", ".", line)
-+            if line == "":
-+                continue
-+            # log console line
-+            sys.stderr.write("con recv: %s\n" % line)
-+
-+    def console_wait(self, expect):
-+        vm = self._guest
-+        output = ""
-+        while True:
-+            try:
-+                chars = vm.console_socket.recv(1024)
-+            except socket.timeout:
-+                sys.stderr.write("console: *** read timeout ***\n")
-+                sys.stderr.write("console: waiting for: '%s'\n" % expect)
-+                sys.stderr.write("console: line buffer:\n")
-+                sys.stderr.write("\n")
-+                self.console_log(output.rstrip())
-+                sys.stderr.write("\n")
-+                raise
-+            output += chars.decode("latin1")
-+            if expect in output:
-+                break
-+            if "\r" in output or "\n" in output:
-+                lines = re.split("[\r\n]", output)
-+                output = lines.pop()
-+                if self.debug:
-+                    self.console_log("\n".join(lines))
-+        if self.debug:
-+            self.console_log(output)
-+
-+    def console_send(self, command):
-+        vm = self._guest
-+        if self.debug:
-+            logline = re.sub("\n", "<enter>", command)
-+            logline = re.sub("[\x00-\x1f]", ".", logline)
-+            sys.stderr.write("con send: %s\n" % logline)
-+        for char in list(command):
-+            vm.console_socket.send(char.encode("utf-8"))
-+            time.sleep(0.01)
-+
-+    def console_wait_send(self, wait, command):
-+        self.console_wait(wait)
-+        self.console_send(command)
-+
-+    def console_ssh_init(self, prompt, user, pw):
-+        sshkey_cmd = "echo '%s' > .ssh/authorized_keys\n" % SSH_PUB_KEY.rstrip()
-+        self.console_wait_send("login:",    "%s\n" % user)
-+        self.console_wait_send("Password:", "%s\n" % pw)
-+        self.console_wait_send(prompt,      "mkdir .ssh\n")
-+        self.console_wait_send(prompt,      sshkey_cmd)
-+        self.console_wait_send(prompt,      "chmod 755 .ssh\n")
-+        self.console_wait_send(prompt,      "chmod 644 .ssh/authorized_keys\n")
-+
-+    def console_sshd_config(self, prompt):
-+        self.console_wait(prompt)
-+        self.console_send("echo 'PermitRootLogin yes' >> /etc/ssh/sshd_config\n")
-+        for var in self.envvars:
-+            self.console_wait(prompt)
-+            self.console_send("echo 'AcceptEnv %s' >> /etc/ssh/sshd_config\n" % var)
-+
-+    def print_step(self, text):
-+        sys.stderr.write("### %s ...\n" % text)
-+
-     def wait_ssh(self, seconds=300):
-         starttime = datetime.datetime.now()
-         endtime = starttime + datetime.timedelta(seconds=seconds)
+ # We want a predictable list of submodules for builds, that is
+ # independent of what the developer currently has initialized
+ # in their checkout, because the build environment is completely
+ # different to the host OS.
+ submodules="dtc slirp ui/keycodemapdb tests/fp/berkeley-softfloat-3 tests/fp/berkeley-testfloat-3"
++sub_deinit=""
+ 
+-trap "status=$?; rm -rf \"$list_file\" \"$vroot_dir\"; exit \$status" 0 1 2 3 15
++function cleanup() {
++    local status=$?
++    rm -rf "$sub_tdir"
++    if test "$sub_deinit" != ""; then
++        git submodule deinit $sub_deinit
++    fi
++    exit $status
++}
++trap "cleanup" 0 1 2 3 15
+ 
+ if git diff-index --quiet HEAD -- &>/dev/null
+ then
+@@ -36,45 +45,26 @@ then
+ else
+     HEAD=$(git stash create)
+ fi
+-git clone --shared . "$vroot_dir"
+-test $? -ne 0 && error "failed to clone into '$vroot_dir'"
+-for sm in $submodules; do
+-    if test -d "$sm/.git"
+-    then
+-       git clone --shared "$sm" "$vroot_dir/$sm"
+-       test $? -ne 0 && error "failed to clone submodule $sm"
+-    fi
+-done
+-
+-cd "$vroot_dir"
+-test $? -ne 0 && error "failed to change into '$vroot_dir'"
+-
+-git checkout $HEAD
+-test $? -ne 0 && error "failed to checkout $HEAD revision"
+ 
++git archive --format tar $HEAD > "$tar_file"
++test $? -ne 0 && error "failed to archive qemu"
+ for sm in $submodules; do
+-    git submodule update --init $sm
+-    test $? -ne 0 && error "failed to init submodule $sm"
++    status="$(git submodule status "$sm")"
++    smhash="${status#[ +-]}"
++    smhash="${smhash%% *}"
++    case "$status" in
++        -*)
++            sub_deinit="$sub_deinit $sm"
++            git submodule update --init "$sm"
++            test $? -ne 0 && error "failed to update submodule $sm"
++            ;;
++        +*)
++            echo "WARNING: submodule $sm is out of sync"
++            ;;
++    esac
++    (cd $sm; git archive --format tar --prefix "$sm/" $smhash) > "$sub_file"
++    test $? -ne 0 && error "failed to archive submodule $sm ($smhash)"
++    tar --concatenate --file "$tar_file" "$sub_file"
++    test $? -ne 0 && error "failed append submodule $sm to $tar_file"
+ done
+-
+-if test -n "$submodules"; then
+-    {
+-        git ls-files || error "git ls-files failed"
+-        for sm in $submodules; do
+-            (cd $sm; git ls-files) | sed "s:^:$sm/:"
+-            if test "${PIPESTATUS[*]}" != "0 0"; then
+-                error "git ls-files in submodule $sm failed"
+-            fi
+-        done
+-    } | grep -x -v $(for sm in $submodules; do echo "-e $sm"; done) > "$list_file"
+-else
+-    git ls-files > "$list_file"
+-fi
+-
+-if test $? -ne 0; then
+-    error "failed to generate list file"
+-fi
+-
+-tar -cf "$tar_file" -T "$list_file" || error "failed to create tar file"
+-
+ exit 0
 -- 
 2.20.1
 
