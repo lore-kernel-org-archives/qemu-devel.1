@@ -6,87 +6,76 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 07465C28CC0
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 13:42:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A8FBC28CC0
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 13:46:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C97C52490E
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 13:42:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E222F259D7
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 13:46:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="KCj/sUyW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C97C52490E
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="tMJq2yf7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E222F259D7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:54232 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:54289 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hWLK5-00073C-II
-	for qemu-devel@archiver.kernel.org; Thu, 30 May 2019 09:42:25 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:41645)
+	id 1hWLOG-0008K1-3m
+	for qemu-devel@archiver.kernel.org; Thu, 30 May 2019 09:46:44 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:42542)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hWLJ8-0006ao-Cm
-	for qemu-devel@nongnu.org; Thu, 30 May 2019 09:41:27 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1hWLNL-0007me-3j
+	for qemu-devel@nongnu.org; Thu, 30 May 2019 09:45:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hWLJ7-00035x-E9
-	for qemu-devel@nongnu.org; Thu, 30 May 2019 09:41:26 -0400
-Received: from mail-ot1-x330.google.com ([2607:f8b0:4864:20::330]:35357)
+	(envelope-from <peter.maydell@linaro.org>) id 1hWLNJ-0007ci-UB
+	for qemu-devel@nongnu.org; Thu, 30 May 2019 09:45:46 -0400
+Received: from mail-ot1-x32f.google.com ([2607:f8b0:4864:20::32f]:36125)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hWLJ7-00035T-7Z
-	for qemu-devel@nongnu.org; Thu, 30 May 2019 09:41:25 -0400
-Received: by mail-ot1-x330.google.com with SMTP id n14so5644629otk.2
-	for <qemu-devel@nongnu.org>; Thu, 30 May 2019 06:41:25 -0700 (PDT)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1hWLNJ-0007bi-II
+	for qemu-devel@nongnu.org; Thu, 30 May 2019 09:45:45 -0400
+Received: by mail-ot1-x32f.google.com with SMTP id c3so5649361otr.3
+	for <qemu-devel@nongnu.org>; Thu, 30 May 2019 06:45:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
-	:mime-version:in-reply-to:content-language:content-transfer-encoding;
-	bh=yfy8gaQudA6qBkT8aOQQAh77J1AxSthIJuskrJUwyu0=;
-	b=KCj/sUyW0FQ86uzlgGc9fzdh1K307UcyLTZpceRaQux+jPRJzLWVgvFegZqVaSW2mf
-	10wMz0Fz2DK+FxvrYFtyuV7IusbEMwJXqRkSkS7fDm4XXbqQCtnl4u55xdJ3FO9z8p3T
-	HOMSSpzGk0UwqGU/iwCybldNxRC4xsuN9/neyzvzxnUhsoPwL2fJ6gztOljJoFqtJhaC
-	Z0d1LjL1KF4NzIDzmWjjq8OqOTK1WtlR39OOkwFFm57hqtKcMZ3hgjTQgKq/tj6nN8PW
-	J0kmop6M/I5U5TGMNWyP+qh7hNCex5gMqVMSRO8CGApbgWwQHnT8h1kALQKXrmkH6jyh
-	gZlw==
+	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+	:cc; bh=ErMyDkZZzVjh4LSNyQ0aew4RuCiUfbCr2v7Eeqf58VQ=;
+	b=tMJq2yf7LOfP9MJJf37Go4Y/u5Rvpu4389zNiqMA4lgBvIBaRrSI+7c+UFQcbmiLFz
+	j3qHUX86m/sGEzmMDRiegJ6bcjaCHaA5xUGqjtlRqc+aVVWjG8cUDPka04wA+3mTj5Z3
+	NwAXnjqAM7lDsFOY0Ut4oNEmxjabgSU397Ty4EmZD1DyvMSEhbTGdz7ZmNWE6oy3Ph8F
+	NxtRIhluV40zrs5q88+zHtIgSmFXqlGYMRkNayto5ZcwHCZYBbvxiDF6S1LlIxVXK/Y+
+	ZSKbzf6RRXfXtlvKSrGwmZoAqfx9qh0q+9f98QFlfzIC1s9ZCLwQXEv+p5X72GAwiLQE
+	dFjw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-	:date:user-agent:mime-version:in-reply-to:content-language
-	:content-transfer-encoding;
-	bh=yfy8gaQudA6qBkT8aOQQAh77J1AxSthIJuskrJUwyu0=;
-	b=j35We0w8TOrTgUtoJfyChMKmRkLzf5/9a6fLy8F5p2Vx/FJ3NbwoPoSfsOyxlfgISM
-	KYBzLJ8MdSXfodygo0jbdDqzNNXTVoqth58cjCcm2uH4HDtGS5glBQ1cfnWly2HudxpZ
-	uGOc9hyyEFNeE4I7g2lh/XotWkfZkYyj4ih26lKWtWQDx2SMi1dWDmoSe8sndstXG1B/
-	vUNWK4nzsqJeDNXdkksjjFGqdAl2icDfz52og0dm8C/QQHk6PfXhXFAawjvGNI8N4TCp
-	m3mXOqsElSjLtvGEoZqGTyKK+9+lJUcN7OIVBrPkZDaVCyAEjxjNeEdLUfMrEW02fkAX
-	Lk8g==
-X-Gm-Message-State: APjAAAVYw4T9AqYlW2Gmba84CL77fAeoJoZ4oJ4I+ljlJRilL9xGWFHm
-	jOeHQINXb1RIhfLJsLEhmASzpLO6lGV5fA==
-X-Google-Smtp-Source: APXvYqwzX/zdpWzqguc3+tK+HP+GoIDxV3sTVAjMeixhXECRp8mmr/bYrpQFEU/wwBt/ymJRbEd5Zg==
-X-Received: by 2002:a9d:ea6:: with SMTP id 35mr2433446otj.257.1559223683968;
-	Thu, 30 May 2019 06:41:23 -0700 (PDT)
-Received: from [172.24.12.210] (168.189-204-159.bestelclientes.com.mx.
-	[189.204.159.168])
-	by smtp.gmail.com with ESMTPSA id i10sm948545oto.17.2019.05.30.06.41.20
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Thu, 30 May 2019 06:41:22 -0700 (PDT)
-To: Peter Maydell <peter.maydell@linaro.org>
+	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+	:message-id:subject:to:cc;
+	bh=ErMyDkZZzVjh4LSNyQ0aew4RuCiUfbCr2v7Eeqf58VQ=;
+	b=Lfc7elbsRd+jzHy6FO091NC7w4KeRdPKI9nHyx5vOzmkgfD/TTQKCDhfNjwNs93v/p
+	bbyKPAcWnr2YNDsokGqmAVrR1hupVsZcNZN1TmWw2d3yTDghQI/y0yjPhRrfDTd9bvTC
+	v9Gy6SZoyhnmodaxgjTw72lbR8NXnrtPjyP8jX5lWPaxjvnes0iFhHF/S6vWvLFr4Jk8
+	q1zDdUeILetokRvL1BA/PQfGMUy34d4ISE5ee27GIXadjvQ4XA+fDlgsNFRmV8xA4zQ9
+	o8SDRgBuBsw60idUme9oeCya2gOB2/Yi23uo2TvyIuuK2he4JV3KXqSO8IAPCgFeD6Mm
+	md1g==
+X-Gm-Message-State: APjAAAXktOmbVojrnawbkBRihZ13auNMkRZCfyyyhRVJtMbnIEAAhJiB
+	f6z5T6vGpri5c49mXh6/wf1tVbaPKq7j1VehFtfCzQ==
+X-Google-Smtp-Source: APXvYqzMwv/QyPWa+AFFPVU13x9mfpaUM19WJVlFteP5DaGSUkdiJwQl1A6fPgzGCyZ7l3UCtIpgro/LWt35QQU4uy0=
+X-Received: by 2002:a9d:6b0d:: with SMTP id g13mr2705110otp.91.1559223944585; 
+	Thu, 30 May 2019 06:45:44 -0700 (PDT)
+MIME-Version: 1.0
 References: <20190522184226.17871-1-richard.henderson@linaro.org>
 	<20190522184226.17871-11-richard.henderson@linaro.org>
 	<CAFEAcA-=D+812uru4ZWfS5B0V-ot-RUvdWm0wV4mO8RUsETgbw@mail.gmail.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <4c6a0080-85db-e81d-10f1-50acab162d8c@linaro.org>
-Date: Thu, 30 May 2019 08:41:15 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.7.0
-MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-=D+812uru4ZWfS5B0V-ot-RUvdWm0wV4mO8RUsETgbw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+	<4c6a0080-85db-e81d-10f1-50acab162d8c@linaro.org>
+In-Reply-To: <4c6a0080-85db-e81d-10f1-50acab162d8c@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 30 May 2019 14:45:33 +0100
+Message-ID: <CAFEAcA-ULkvtVmmgQBPZA8MHkFc-OHFmDtBn4z5XKDU9y93CDw@mail.gmail.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2607:f8b0:4864:20::330
+X-Received-From: 2607:f8b0:4864:20::32f
 Subject: Re: [Qemu-devel] [PULL 10/25] util: Add qemu_guest_getrandom and
  associated routines
 X-BeenThere: qemu-devel@nongnu.org
@@ -105,39 +94,40 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/30/19 6:29 AM, Peter Maydell wrote:
-> On Wed, 22 May 2019 at 19:42, Richard Henderson
-> <richard.henderson@linaro.org> wrote:
->>
->> This routine is intended to produce high-quality random numbers to the
->> guest.  Normally, such numbers are crypto quality from the host, but a
->> command-line option can force the use of a fully deterministic sequence
->> for use while debugging.
-> 
->> +void qemu_guest_getrandom_nofail(void *buf, size_t len)
->> +{
->> +    qemu_guest_getrandom(buf, len, &error_fatal);
->> +}
->>
-> 
-> Hi; Coverity complains about this because in the other 4 places
-> where we call qemu_guest_getrandom() we check its return
-> value, but here we ignore it. If qemu_guest_getrandom() can't
-> fail ever then we don't need the separate _nofail() version.
-> If it can fail sometimes but not here then we should assert()
-> so with a comment explaining why it can't fail, or we should
-> do an error-exit check like qdev_init_nofail().
-> (This is CID 1401701.)
+On Thu, 30 May 2019 at 14:41, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+>
+> On 5/30/19 6:29 AM, Peter Maydell wrote:
+> > On Wed, 22 May 2019 at 19:42, Richard Henderson
+> > <richard.henderson@linaro.org> wrote:
+> >>
+> >> This routine is intended to produce high-quality random numbers to the
+> >> guest.  Normally, such numbers are crypto quality from the host, but a
+> >> command-line option can force the use of a fully deterministic sequence
+> >> for use while debugging.
+> >
+> >> +void qemu_guest_getrandom_nofail(void *buf, size_t len)
+> >> +{
+> >> +    qemu_guest_getrandom(buf, len, &error_fatal);
+> >> +}
+> >>
+> >
+> > Hi; Coverity complains about this because in the other 4 places
+> > where we call qemu_guest_getrandom() we check its return
+> > value, but here we ignore it. If qemu_guest_getrandom() can't
+> > fail ever then we don't need the separate _nofail() version.
+> > If it can fail sometimes but not here then we should assert()
+> > so with a comment explaining why it can't fail, or we should
+> > do an error-exit check like qdev_init_nofail().
+> > (This is CID 1401701.)
+>
+> Because of &error_fatal, we will have already exited on error.  As a qapi
+> programming pattern, that seems clear in this context.
 
-Because of &error_fatal, we will have already exited on error.  As a qapi
-programming pattern, that seems clear in this context.
+Whoops, I didn't see the error_fatal. I think that a cast to void
+will indeed silence the Coverity error (at least a quick google
+search suggests it will).
 
-I don't see how the qdev_init_nofail pattern is an improvement (although in
-that specific case we certainly produce a better error message).  If we insist
-on that pattern, then we should remove error_fatal and error_abort entirely.
-
-Would coverity be happy with casting the return value to void?
-
-
-r~
+thanks
+-- PMM
 
