@@ -2,93 +2,81 @@ Return-Path: <SRS0=r6E1=T6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C6AEC28CC0
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 09:52:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A1240C28CC0
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 10:03:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 14727256AB
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 09:52:42 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="LWC1laJm"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 14727256AB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 798E0256CF
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 10:03:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 798E0256CF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:50282 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:50378 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hWHjm-0005fP-9y
-	for qemu-devel@archiver.kernel.org; Thu, 30 May 2019 05:52:42 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:50222)
+	id 1hWHtu-0007tG-DW
+	for qemu-devel@archiver.kernel.org; Thu, 30 May 2019 06:03:10 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:51870)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hWHiz-0005Oi-2c
-	for qemu-devel@nongnu.org; Thu, 30 May 2019 05:51:54 -0400
+	(envelope-from <philmd@redhat.com>) id 1hWHsq-0007T4-9f
+	for qemu-devel@nongnu.org; Thu, 30 May 2019 06:02:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hWHiy-0002We-0e
-	for qemu-devel@nongnu.org; Thu, 30 May 2019 05:51:53 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:45222)
+	(envelope-from <philmd@redhat.com>) id 1hWHsp-0002ji-3t
+	for qemu-devel@nongnu.org; Thu, 30 May 2019 06:02:04 -0400
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:38830)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1hWHix-0002Vn-Mj
-	for qemu-devel@nongnu.org; Thu, 30 May 2019 05:51:51 -0400
-Received: by mail-wr1-x444.google.com with SMTP id b18so3722814wrq.12
-	for <qemu-devel@nongnu.org>; Thu, 30 May 2019 02:51:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=references:user-agent:from:to:cc:subject:in-reply-to:date
-	:message-id:mime-version:content-transfer-encoding;
-	bh=Z3biaN7oZCkzlCSjB3tHHfF6NrBBgvnm+opDI+3kb0k=;
-	b=LWC1laJmdIQovzZgTBdiJEi/RDsDppW3Q+FptHDY/0ocu7afAKMgbjWFmCB8BOPDVg
-	AWl0+PUdoE1wtE87EYG3Pw3cOF6iBnNcylR7LvlvB1hWAYphSsRlDEmiwJpP1H+pu0jg
-	JoBTtZXUn+9BZUt7gp0MIxJxaHhhTkHhq49Qw737g1intylyxUvYOmZNbyMy88tqYsNe
-	NJDp6e56crIP+JFlqVuBb0zvaG2Stv2okLTC63jx5tdVgb0/T4QPOGepzBSZ4utj1RQ6
-	ZoRgdO9Qxha8MEUJLxTYFzO8/i03IxnayT+tOiR/UEqV0idByriYXe7gI0RzZLnAo3Pe
-	tZJw==
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hWHso-0002ia-U2
+	for qemu-devel@nongnu.org; Thu, 30 May 2019 06:02:03 -0400
+Received: by mail-wm1-f68.google.com with SMTP id t5so3437321wmh.3
+	for <qemu-devel@nongnu.org>; Thu, 30 May 2019 03:02:02 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:references:user-agent:from:to:cc:subject
-	:in-reply-to:date:message-id:mime-version:content-transfer-encoding;
-	bh=Z3biaN7oZCkzlCSjB3tHHfF6NrBBgvnm+opDI+3kb0k=;
-	b=AJpgVn6ZmQkpI0TWJwkghgEaPwVghAvnsL9u6/hLuIR8XSuWMEAFOX2K/YX4Z/D8lQ
-	1NgcoSUt3R/iAtvBjxNbGmzb6Mf8UIjOvOw1pU6IoAotcKIgVGoVHTR2t5lFpTqcNT9y
-	gtsJfsPaKu+iDNx4mD3tgSE96Cl3i1iVMwMHCPtKJxDSzCpC152Mi7fQ2jc67ixERsXl
-	9xvV1rhKuJg7rjZMBv9cMCF8PZKiITlPRQ/JPRNaEqUwAt1qOczQsWISEig6Mx4HuAWp
-	h31AT3WTnJGjmA/M4YjU5J1OJ/Ykrf+1mfxLkORyrDD0zyo8y5eyFSjMXMTdYjdka2sq
-	OBGg==
-X-Gm-Message-State: APjAAAXGW0PDqGvKAokk3oPsN0KuyMgykbe51te//9uhvXbfRot/DuS6
-	AnAU2kFAery1Zvdaec+LOLvumw==
-X-Google-Smtp-Source: APXvYqwlPLuDeOsjMlbNKOTk79KPFMIaD1f0E52i/cAdToXAPIcmDhjslSFfDSxMgQO/lp8sF+Lvag==
-X-Received: by 2002:a5d:6189:: with SMTP id j9mr2026358wru.151.1559209910311; 
-	Thu, 30 May 2019 02:51:50 -0700 (PDT)
-Received: from zen.linaroharston ([81.128.185.34])
-	by smtp.gmail.com with ESMTPSA id
-	205sm2474190wmd.43.2019.05.30.02.51.49
-	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Thu, 30 May 2019 02:51:49 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
-	by zen.linaroharston (Postfix) with ESMTP id ACF691FF87;
-	Thu, 30 May 2019 10:51:48 +0100 (BST)
-References: <20190523234011.583-1-marcandre.lureau@redhat.com>
-	<20190523234011.583-4-marcandre.lureau@redhat.com>
-	<e0cf3112-62f6-aaff-0821-f472297dbb93@redhat.com>
-	<CAMxuvay+ZrdjhJg-juU0aTOtcy=cLshC+WGyPBQ6VysXZksa5w@mail.gmail.com>
-User-agent: mu4e 1.3.2; emacs 26.1
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-In-reply-to: <CAMxuvay+ZrdjhJg-juU0aTOtcy=cLshC+WGyPBQ6VysXZksa5w@mail.gmail.com>
-Date: Thu, 30 May 2019 10:51:48 +0100
-Message-ID: <875zps5ky3.fsf@zen.linaroharston>
+	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+	:date:user-agent:mime-version:in-reply-to:content-language
+	:content-transfer-encoding;
+	bh=T6oG6/hElIryF7pWU2YE+/IyH+aJutyQpyU+obE3XqA=;
+	b=OGDzXb3EW8ZYxOkhtl9TEuKKOD/VmI0DQThr0MeKhSnMLD5BLKbyHcsj0gouQyhL4R
+	4bwBPbT7JLxeugnDAKX2R/qpfyFYYx9ryThKKNRHhoKJeC1lkSRv5IWD3X8oBMiBnLJY
+	HACSks42yy3X8NaHHxFafw5QLI1D+VhhuoWVBurNKl2NAVClGjSPKULUct+s1Wvdp4Jc
+	3lIm2SjOPpxlf3TLQgYAT8fZRlGMgPGTDjx23RZtt2KvceHxy/UkSgDtde3Q7dTJt8XM
+	/sGLro+ySh79iqLxaex/hyxqpCyTu/L8y1C7RwLRnyn8pTcJ+fpO7hxx8fD8/9Nsyeie
+	7d6g==
+X-Gm-Message-State: APjAAAX5zUN5yDnsCkOJQpNQe8+4A11vFfC61KjOC1++d0FP9aqsHg5c
+	v+vwrnubA2EbMBsQJFH/MX0Geg==
+X-Google-Smtp-Source: APXvYqxqjdtX31+6G5c8UPrNATV2o9IrNrsdRi84peViOYlIRndaOEO2uWUpNW0cGw4ETF2ktNIrig==
+X-Received: by 2002:a1c:f111:: with SMTP id p17mr1786591wmh.62.1559210521832; 
+	Thu, 30 May 2019 03:02:01 -0700 (PDT)
+Received: from [192.168.1.43] (228.red-83-52-173.dynamicip.rima-tde.net.
+	[83.52.173.228]) by smtp.gmail.com with ESMTPSA id
+	l190sm2951931wml.16.2019.05.30.03.02.00
+	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+	Thu, 30 May 2019 03:02:01 -0700 (PDT)
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+	Gerd Hoffmann <kraxel@redhat.com>
+References: <20190520124716.30472-1-kraxel@redhat.com>
+	<878suo5ls0.fsf@zen.linaroharston>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+	url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <f77a0c5b-c36e-4c44-5c3b-580e977682d5@redhat.com>
+Date: Thu, 30 May 2019 12:02:00 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
+In-Reply-To: <878suo5ls0.fsf@zen.linaroharston>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2a00:1450:4864:20::444
-Subject: Re: [Qemu-devel] [PATCH 3/4] docker: update fedora to f30
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+	[fuzzy]
+X-Received-From: 209.85.128.68
+Subject: Re: [Qemu-devel] [PATCH v3 00/14] tests/vm: serial console
+ autoinstall, misc fixes.
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -100,82 +88,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>,
-	=?utf-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
-	Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
-	qemu-devel <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>
+Cc: Fam Zheng <fam@euphon.net>, Ed Maste <emaste@freebsd.org>,
+	qemu-devel@nongnu.org, Kamil Rytarowski <kamil@netbsd.org>,
+	Li-Wen Hsu <lwhsu@freebsd.org>, Brad Smith <brad@comstyle.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
-
-> Hi
->
-> On Fri, May 24, 2019 at 9:41 AM Philippe Mathieu-Daud=C3=A9
-> <philmd@redhat.com> wrote:
+On 5/30/19 11:33 AM, Alex Bennée wrote:
+> 
+> Gerd Hoffmann <kraxel@redhat.com> writes:
+> 
+>> This patch series changes the way virtual machines for test builds are
+>> managed.  They are created locally on the developer machine now.  The
+>> installer is booted on the serial console and the scripts walks through
+>> the dialogs to install and configure the guest.
 >>
->> On 5/24/19 1:40 AM, Marc-Andr=C3=A9 Lureau wrote:
->> > Released last month.
->> >
->> > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
->> > ---
->> >  tests/docker/dockerfiles/fedora.docker | 2 +-
->> >  1 file changed, 1 insertion(+), 1 deletion(-)
->> >
->> > diff --git a/tests/docker/dockerfiles/fedora.docker b/tests/docker/doc=
-kerfiles/fedora.docker
->> > index 69d4a7f5d7..1496b68ba1 100644
->> > --- a/tests/docker/dockerfiles/fedora.docker
->> > +++ b/tests/docker/dockerfiles/fedora.docker
->> > @@ -1,4 +1,4 @@
->> > -FROM fedora:29
->> > +FROM fedora:30
+>> That takes the download.patchew.org server out of the loop and makes it
+>> alot easier to tweak the guest images (adding build dependencies for
+>> example).
 >>
->> Hmm this patch is pending for review:
->> https://lists.gnu.org/archive/html/qemu-devel/2019-05/msg00819.html
->
-> Oh I missed that. Maybe we should use "latest" to avoid bumping the
-> version every 6 months.
->
-> fwiw we have different versions:
->
-> tests/docker/dockerfiles/fedora-cris-cross.docker:FROM fedora:latest
-
-I'll fix that
-
-> tests/docker/dockerfiles/fedora-i386-cross.docker:FROM fedora:29
-
-The cross compilers images are different as they generally don't want to
-include the "native" libraries. For Debian based ones we do have a base
-image that everything builds up from but we haven't bothered for fedora
-as we only have a few so far.
-
-> tests/docker/dockerfiles/fedora.docker:FROM fedora:29
->
-> In 62559b916 "tests: update Fedora i386 cross image to Fedora 29", Daniel=
- said:
->
->     Using the "latest" tag is not a good idea because this changes what
->     release it points to every 6 months. Together with caching of docker
->     builds this can cause confusion where CI has cached & built with Fedo=
-ra
->     N, while a developer tries to reproduce a CI problem with Fedora N + =
-1,
->     or vica-verca.
->
-> But at the same time, Daniel bumped f28 to f29 in commit 19a9978db1.
->
-> It's confusing, do we need some stability or follow the latest?
->
+>> The install scripts take care to apply host proxy settings (from *_proxy
+>> environment variables) to the guest, so any package downloads will be
+>> routed through the proxy and can be cached that way.  This also makes
+>> them work behind strict firewalls.
 >>
->> >  ENV PACKAGES \
->> >      bc \
->> >      bison \
->> >
+>> There are also a bunch of smaller tweaks for tests/vm to fix issues I
+>> was struggling with.  See commit messages of individual patches for
+>> details.
+> 
+> Queued to testing/next, thanks.
+> 
+> One of the machines I'm testing on seems to have problems with getting
+> the installer working over the serial link but it works on my main dev
+> box and others have it working as well so I suspect it might be a local
+> problem.
 
-
---
-Alex Benn=C3=A9e
+Is this the same issue I described there?
+https://lists.gnu.org/archive/html/qemu-devel/2019-05/msg06784.html
 
