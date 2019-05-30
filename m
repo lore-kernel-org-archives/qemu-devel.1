@@ -7,75 +7,75 @@ X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 52484C28CC0
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 10:18:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C943C28CC0
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 10:18:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1542E256ED
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 10:18:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1B8F3256ED
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 10:18:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="oWYG3OsZ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1542E256ED
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="XZupICCA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1B8F3256ED
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:50555 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:50557 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hWI8p-0003sk-6W
-	for qemu-devel@archiver.kernel.org; Thu, 30 May 2019 06:18:35 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:54254)
+	id 1hWI96-00043M-AR
+	for qemu-devel@archiver.kernel.org; Thu, 30 May 2019 06:18:52 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:54262)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hWI6U-0002ZH-7F
+	(envelope-from <alex.bennee@linaro.org>) id 1hWI6U-0002ZK-Np
 	for qemu-devel@nongnu.org; Thu, 30 May 2019 06:16:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hWI6S-0006Rx-Ml
+	(envelope-from <alex.bennee@linaro.org>) id 1hWI6T-0006Sm-BU
 	for qemu-devel@nongnu.org; Thu, 30 May 2019 06:16:10 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:54260)
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:43743)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1hWI6S-0006R7-FR
-	for qemu-devel@nongnu.org; Thu, 30 May 2019 06:16:08 -0400
-Received: by mail-wm1-x342.google.com with SMTP id d17so3593610wmb.3
-	for <qemu-devel@nongnu.org>; Thu, 30 May 2019 03:16:08 -0700 (PDT)
+	id 1hWI6T-0006RX-2u
+	for qemu-devel@nongnu.org; Thu, 30 May 2019 06:16:09 -0400
+Received: by mail-wr1-x442.google.com with SMTP id l17so3799857wrm.10
+	for <qemu-devel@nongnu.org>; Thu, 30 May 2019 03:16:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
 	h=from:to:cc:subject:date:message-id:in-reply-to:references
 	:mime-version:content-transfer-encoding;
-	bh=BFjisebq0hiOO8nTLU3fa+Dkmd/UUHwPkWgZnwgthE0=;
-	b=oWYG3OsZHSvMDtOSOcqGd358S7FY6Qy7aFfdfAXFGpkWzeTJyPHN5EcqeLWu/2995E
-	eYL9nAaDcAfdl3Zp50yUa4ArvHxS8zek5XoB6fS7RyeXmByX8HBwBGbWhVyttf5+ks99
-	jueFlGH8XasYjgJN3WSMP5oWG0IxHzBGZWgHFXTjbjGzOnjiWkTqfGKDPZMj8A5kBNz0
-	k/RwgaL8UiU77pkiM7lW3TDHYVq9s50x22sn+DGwV2GUEZgBFOlDm93nIWrp8Sj919Ou
-	N+gTklJvg7OTyiqni61wauYxGklPccK1AU9Q2xYbgGa8FY8ourmuZv9l4NnUQU7W/GPt
-	Bbrw==
+	bh=PPLFa9NHnZbGHQDGEn1CiaHDLKyObQdBVLbTqFMD65I=;
+	b=XZupICCADA9sZPbFCDZJlSNr9kqu2xsEr+tj1nHOnTeTYPzkB480cWgVdleix5zmas
+	JvIk5yWG41IWcMH/K5H+Z5c45S6byrH4FHF+8CSnq1b8AzO0VQ9e2W31i7qOwNxc2NnS
+	wCPDuXtIU1X33cUaXT5ZTkUZrrHBptHCx3fmSeCLhpP6GTgaVctqMczHqSxiE/U3zEqD
+	j/Y//Qb2mpJAO1zaOh1odCA3T8c+4GR9tWv5OOYdLt4qeEpZOiT8d2L9gdmOnZlTnSFK
+	MiwnQWNOP97g9OTG8idvD3rAs1A7sthtVktWQZjPBU0OYX2FRI1hOnkL8Hvn1wv3SG0K
+	AfjQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
 	:references:mime-version:content-transfer-encoding;
-	bh=BFjisebq0hiOO8nTLU3fa+Dkmd/UUHwPkWgZnwgthE0=;
-	b=BT1KFrD5qkHPhInFCF+Y6bsJBpTN0/gTlhByyRIE3h2Cd80IBNNE+GQ5C6TPnD5Ckp
-	Kgt3sqY5swSr/8sPXOqACZkn5J0l2rtWTR2IBGzIc8BDvnOXUFWFzQvO4S8KONwHofiz
-	WzqW/BT67zgE5Y2b2dfaiq8+tWM2FNgxNZ1nFskSe4PVFaa+VYe0xl9zBPu9ogoWXMpl
-	yNv6tD8tUdCzbvn++v4XP/gLIWN7XZQgyw3qm1/PJb9IS+SsuT/5BrhQ1AxeYlVtzp87
-	yJY0Gjvt4ePXMgV3mvRhQy7cCau1BxxfLGdLNV776urOsgYm5tasQQF4dnmZSEt0Virp
-	0ZXg==
-X-Gm-Message-State: APjAAAUAV869yoWjBa6LCc5V0TMliL+pVhgXNrP3R0EQSeQafuzaOC5r
-	wVy464BRpKuMdJn6zQM0akw0rQ==
-X-Google-Smtp-Source: APXvYqyZBlYGdwJiueywb0PiVnPzW7eEvT6GTvBWQ1WqZcrEV3v2U2ebgxIjc4FUyROC89NTiKQLrw==
-X-Received: by 2002:a1c:407:: with SMTP id 7mr1852691wme.113.1559211367301;
+	bh=PPLFa9NHnZbGHQDGEn1CiaHDLKyObQdBVLbTqFMD65I=;
+	b=oDpgCtsQ0jeiMswVddCeIWdAlBD0tXQmy9a8eSzNSu4pFp/9eiifqvBUi/8AM0PJ84
+	wb/Oz3KL7wtq72Wte4KC7ctxn/rdP/vZ59Ksc/kp/39eKBrjhOIQSn0NsE3eL62+Mt9e
+	A5u7YRDPDjEOfE47I/58xw0Px9bktICP4E27gwy396/5qZ7OQqd8mRpQ4Xj1SKXnZT6+
+	/K9/XfsFrFIbdG0KhbFZ/yCS9KviIgj6+Qdtw+zIt0YtTRlFnQSMSkTFzd53t6twkR53
+	zMjs3z/uugbj/e9ZVl+cGOrGBww3xQHMLBH7Cpp/fRMHBLT5iVZu8m0nZ9DRkrHTjw1w
+	g1Ig==
+X-Gm-Message-State: APjAAAXVdy7SNx48mEhE5jOg4jzKG1W0s/NtQ5I23h+ypJxbnHw3YL3f
+	jL8LKJn3UrOvfBQW2YmAzU6SMA==
+X-Google-Smtp-Source: APXvYqxHRtR09B5lWkb0xxaM07QHWeATVvSEuoLJ9UEw0Dx6P+9cwcsksNAYMYad7/C7IpGdsuooiw==
+X-Received: by 2002:adf:e7c5:: with SMTP id e5mr2018623wrn.107.1559211367918; 
 	Thu, 30 May 2019 03:16:07 -0700 (PDT)
 Received: from zen.linaroharston ([81.128.185.34])
 	by smtp.gmail.com with ESMTPSA id
-	h12sm1917464wre.14.2019.05.30.03.16.04
+	y17sm4609255wrg.18.2019.05.30.03.16.04
 	(version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
 	Thu, 30 May 2019 03:16:04 -0700 (PDT)
 Received: from zen.linaroharston. (localhost [127.0.0.1])
-	by zen.linaroharston (Postfix) with ESMTP id 31D7F1FF8F;
+	by zen.linaroharston (Postfix) with ESMTP id 49ADE1FF90;
 	Thu, 30 May 2019 11:16:04 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Thu, 30 May 2019 11:15:39 +0100
-Message-Id: <20190530101603.22254-3-alex.bennee@linaro.org>
+Date: Thu, 30 May 2019 11:15:40 +0100
+Message-Id: <20190530101603.22254-4-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190530101603.22254-1-alex.bennee@linaro.org>
 References: <20190530101603.22254-1-alex.bennee@linaro.org>
@@ -84,9 +84,9 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2a00:1450:4864:20::342
-Subject: [Qemu-devel] [PATCH v1 02/26] qemu-io-cmds: use clock_gettime for
- benchmarking
+X-Received-From: 2a00:1450:4864:20::442
+Subject: [Qemu-devel] [PATCH v1 03/26] tests: Run the iotests during "make
+ check" again
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -98,266 +98,153 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
-	=?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
-	"open list:Block layer core" <qemu-block@nongnu.org>,
-	Max Reitz <mreitz@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>,
+	=?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The previous use of gettimeofday() ran into undefined behaviour when
-we ended up doing a div 0 for a very short operation. This is because
-gettimeofday only works at the microsecond level as well as being
-prone to discontinuous jumps in system time. Using clock_gettime with
-CLOCK_MONOTONIC gives greater precision and alleviates some of the
-potential problems with time jumping around.
+From: Thomas Huth <thuth@redhat.com>
 
-We could use CLOCK_MONOTONIC_RAW to avoid being tripped up by NTP and
-adjtime but that is Linux specific so I decided it would do for now.
+People often forget to run the iotests before submitting patches or
+pull requests - this is likely due to the fact that we do not run the
+tests during our mandatory "make check" tests yet. Now that we've got
+a proper "auto" group of iotests that should be fine to run in every
+environment, we can enable the iotests during "make check" again by
+running the "auto" tests by default from the check-block.sh script.
 
+Some cases still need to be checked first, though: iotests need bash
+and GNU sed (otherwise they fail), and if gprof is enabled, it spoils
+the output of some test cases causing them to fail. So if we detect
+that one of the required programs is missing or that gprof is enabled,
+we still have to skip the iotests to avoid failures.
+
+And finally, since we are using check-block.sh now again, this patch also
+removes the qemu-iotests-quick.sh script since we do not need that anymore
+(and having two shell wrapper scripts around the block tests seem
+rather confusing than helpful).
+
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+Message-Id: <20190502084506.8009-8-thuth@redhat.com>
+[AJB: -makecheck to check-block.sh, move check-block to start&gate it]
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- qemu-io-cmds.c | 69 +++++++++++++++++++++++++-------------------------
- 1 file changed, 35 insertions(+), 34 deletions(-)
+ tests/Makefile.include      |  8 +++----
+ tests/check-block.sh        | 44 ++++++++++++++++++++++++++++---------
+ tests/qemu-iotests-quick.sh |  8 -------
+ 3 files changed, 38 insertions(+), 22 deletions(-)
+ delete mode 100755 tests/qemu-iotests-quick.sh
 
-diff --git a/qemu-io-cmds.c b/qemu-io-cmds.c
-index 30a7d9a13bf..f6701e3b8a8 100644
---- a/qemu-io-cmds.c
-+++ b/qemu-io-cmds.c
-@@ -248,20 +248,21 @@ static void cvtstr(double value, char *str, size_t size)
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index 1865f6b3222..0c6d8c75941 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -140,7 +140,7 @@ check-unit-y += tests/test-uuid$(EXESUF)
+ check-unit-y += tests/ptimer-test$(EXESUF)
+ check-unit-y += tests/test-qapi-util$(EXESUF)
  
+-check-block-$(CONFIG_POSIX) += tests/qemu-iotests-quick.sh
++check-block-$(call land,$(CONFIG_POSIX),$(CONFIG_SOFTMMU)) += tests/check-block.sh
  
+ # All QTests for now are POSIX-only, but the dependencies are
+ # really in libqtest, not in the testcases themselves.
+@@ -1077,8 +1077,8 @@ clean-tcg: $(CLEAN_TCG_TARGET_RULES)
  
--static struct timeval tsub(struct timeval t1, struct timeval t2)
-+static struct timespec tsub(struct timespec t1, struct timespec t2)
- {
--    t1.tv_usec -= t2.tv_usec;
--    if (t1.tv_usec < 0) {
--        t1.tv_usec += 1000000;
-+    t1.tv_nsec -= t2.tv_nsec;
-+    if (t1.tv_nsec < 0) {
-+        t1.tv_nsec += 1000000000;
-         t1.tv_sec--;
-     }
-     t1.tv_sec -= t2.tv_sec;
-     return t1;
- }
+ QEMU_IOTESTS_HELPERS-$(call land,$(CONFIG_SOFTMMU),$(CONFIG_LINUX)) = tests/qemu-iotests/socket_scm_helper$(EXESUF)
  
--static double tdiv(double value, struct timeval tv)
-+static double tdiv(double value, struct timespec tv)
- {
--    return value / ((double)tv.tv_sec + ((double)tv.tv_usec / 1000000.0));
-+    double time = (double)tv.tv_sec + ((double)tv.tv_nsec / 1000000000.0);
-+    return value / time;
- }
+-.PHONY: check-tests/qemu-iotests-quick.sh
+-check-tests/qemu-iotests-quick.sh: tests/qemu-iotests-quick.sh qemu-img$(EXESUF) qemu-io$(EXESUF) qemu-nbd$(EXESUF) $(QEMU_IOTESTS_HELPERS-y)
++.PHONY: check-tests/check-block.sh
++check-tests/check-block.sh: tests/check-block.sh qemu-img$(EXESUF) qemu-io$(EXESUF) qemu-nbd$(EXESUF) $(QEMU_IOTESTS_HELPERS-y)
+ 	$<
  
- #define HOURS(sec)      ((sec) / (60 * 60))
-@@ -274,16 +275,16 @@ enum {
-     VERBOSE_FIXED_TIME  = 0x2,
- };
+ .PHONY: $(patsubst %, check-%, $(check-qapi-schema-y))
+@@ -1152,7 +1152,7 @@ check-acceptance: check-venv $(TESTS_RESULTS_DIR)
+ check-qapi-schema: $(patsubst %,check-%, $(check-qapi-schema-y)) check-tests/qapi-schema/doc-good.texi
+ check-qtest: $(patsubst %,check-qtest-%, $(QTEST_TARGETS))
+ check-block: $(patsubst %,check-%, $(check-block-y))
+-check: check-qapi-schema check-unit check-softfloat check-qtest check-decodetree
++check: check-block check-qapi-schema check-unit check-softfloat check-qtest check-decodetree
+ check-clean:
+ 	rm -rf $(check-unit-y) tests/*.o $(QEMU_IOTESTS_HELPERS-y)
+ 	rm -rf $(sort $(foreach target,$(SYSEMU_TARGET_LIST), $(check-qtest-$(target)-y)) $(check-qtest-generic-y))
+diff --git a/tests/check-block.sh b/tests/check-block.sh
+index f3d12fd602d..c8b6cec3f68 100755
+--- a/tests/check-block.sh
++++ b/tests/check-block.sh
+@@ -1,24 +1,48 @@
+ #!/bin/sh
  
--static void timestr(struct timeval *tv, char *ts, size_t size, int format)
-+static void timestr(struct timespec *tv, char *ts, size_t size, int format)
- {
--    double usec = (double)tv->tv_usec / 1000000.0;
-+    double nsec = (double)tv->tv_nsec / 1000000000.0;
+-FORMAT_LIST="raw qcow2 qed vmdk vpc"
++# Honor the SPEED environment variable, just like we do it for the qtests.
++if [ "$SPEED" = "slow" ]; then
++    format_list="raw qcow2"
++    group=
++elif [ "$SPEED" = "thorough" ]; then
++    format_list="raw qcow2 qed vmdk vpc"
++    group=
++else
++    format_list=qcow2
++    group="-g auto"
++fi
++
+ if [ "$#" -ne 0 ]; then
+-    FORMAT_LIST="$@"
++    format_list="$@"
++fi
++
++if grep -q "TARGET_GPROF=y" *-softmmu/config-target.mak 2>/dev/null ; then
++    echo "GPROF is enabled ==> Not running the qemu-iotests."
++    exit 0
+ fi
  
-     if (format & TERSE_FIXED_TIME) {
-         if (!HOURS(tv->tv_sec)) {
-             snprintf(ts, size, "%u:%02u.%02u",
-                     (unsigned int) MINUTES(tv->tv_sec),
-                     (unsigned int) SECONDS(tv->tv_sec),
--                    (unsigned int) (usec * 100));
-+                    (unsigned int) (nsec * 100000));
-             return;
-         }
-         format |= VERBOSE_FIXED_TIME; /* fallback if hours needed */
-@@ -294,9 +295,9 @@ static void timestr(struct timeval *tv, char *ts, size_t size, int format)
-                 (unsigned int) HOURS(tv->tv_sec),
-                 (unsigned int) MINUTES(tv->tv_sec),
-                 (unsigned int) SECONDS(tv->tv_sec),
--                (unsigned int) (usec * 100));
-+                (unsigned int) (nsec * 100000));
-     } else {
--        snprintf(ts, size, "0.%04u sec", (unsigned int) (usec * 10000));
-+        snprintf(ts, size, "0.%04u sec", (unsigned int) (nsec * 10000000));
-     }
- }
+-export QEMU_PROG="$PWD/x86_64-softmmu/qemu-system-x86_64"
+-export QEMU_IMG_PROG="$PWD/qemu-img"
+-export QEMU_IO_PROG="$PWD/qemu-io"
++if [ -z "$(find . -name 'qemu-system-*' -print)" ]; then
++    echo "No qemu-system binary available ==> Not running the qemu-iotests."
++    exit 0
++fi
++
++if ! command -v bash >/dev/null 2>&1 ; then
++    echo "bash not available ==> Not running the qemu-iotests."
++    exit 0
++fi
  
-@@ -376,7 +377,7 @@ static void dump_buffer(const void *buffer, int64_t offset, int64_t len)
-     }
- }
+-if [ ! -x $QEMU_PROG ]; then
+-    echo "'make check-block' requires qemu-system-x86_64"
+-    exit 1
++if ! (sed --version | grep 'GNU sed') > /dev/null 2>&1 ; then
++    if ! command -v gsed >/dev/null 2>&1; then
++        echo "GNU sed not available ==> Not running the qemu-iotests."
++        exit 0
++    fi
+ fi
  
--static void print_report(const char *op, struct timeval *t, int64_t offset,
-+static void print_report(const char *op, struct timespec *t, int64_t offset,
-                          int64_t count, int64_t total, int cnt, bool Cflag)
- {
-     char s1[64], s2[64], ts[64];
-@@ -649,7 +650,7 @@ static const cmdinfo_t read_cmd = {
+ cd tests/qemu-iotests
  
- static int read_f(BlockBackend *blk, int argc, char **argv)
- {
--    struct timeval t1, t2;
-+    struct timespec t1, t2;
-     bool Cflag = false, qflag = false, vflag = false;
-     bool Pflag = false, sflag = false, lflag = false, bflag = false;
-     int c, cnt, ret;
-@@ -758,13 +759,13 @@ static int read_f(BlockBackend *blk, int argc, char **argv)
+ ret=0
+-for FMT in $FORMAT_LIST ; do
+-    ./check -T -nocache -$FMT || ret=1
++for fmt in $format_list ; do
++    ./check -makecheck -$fmt $group || ret=1
+ done
  
-     buf = qemu_io_alloc(blk, count, 0xab);
- 
--    gettimeofday(&t1, NULL);
-+    clock_gettime(CLOCK_MONOTONIC, &t1);
-     if (bflag) {
-         ret = do_load_vmstate(blk, buf, offset, count, &total);
-     } else {
-         ret = do_pread(blk, buf, offset, count, &total);
-     }
--    gettimeofday(&t2, NULL);
-+    clock_gettime(CLOCK_MONOTONIC, &t2);
- 
-     if (ret < 0) {
-         printf("read failed: %s\n", strerror(-ret));
-@@ -836,7 +837,7 @@ static const cmdinfo_t readv_cmd = {
- 
- static int readv_f(BlockBackend *blk, int argc, char **argv)
- {
--    struct timeval t1, t2;
-+    struct timespec t1, t2;
-     bool Cflag = false, qflag = false, vflag = false;
-     int c, cnt, ret;
-     char *buf;
-@@ -891,9 +892,9 @@ static int readv_f(BlockBackend *blk, int argc, char **argv)
-         return -EINVAL;
-     }
- 
--    gettimeofday(&t1, NULL);
-+    clock_gettime(CLOCK_MONOTONIC, &t1);
-     ret = do_aio_readv(blk, &qiov, offset, &total);
--    gettimeofday(&t2, NULL);
-+    clock_gettime(CLOCK_MONOTONIC, &t2);
- 
-     if (ret < 0) {
-         printf("readv failed: %s\n", strerror(-ret));
-@@ -972,7 +973,7 @@ static const cmdinfo_t write_cmd = {
- 
- static int write_f(BlockBackend *blk, int argc, char **argv)
- {
--    struct timeval t1, t2;
-+    struct timespec t1, t2;
-     bool Cflag = false, qflag = false, bflag = false;
-     bool Pflag = false, zflag = false, cflag = false;
-     int flags = 0;
-@@ -1091,7 +1092,7 @@ static int write_f(BlockBackend *blk, int argc, char **argv)
-         buf = qemu_io_alloc(blk, count, pattern);
-     }
- 
--    gettimeofday(&t1, NULL);
-+    clock_gettime(CLOCK_MONOTONIC, &t1);
-     if (bflag) {
-         ret = do_save_vmstate(blk, buf, offset, count, &total);
-     } else if (zflag) {
-@@ -1101,7 +1102,7 @@ static int write_f(BlockBackend *blk, int argc, char **argv)
-     } else {
-         ret = do_pwrite(blk, buf, offset, count, flags, &total);
-     }
--    gettimeofday(&t2, NULL);
-+    clock_gettime(CLOCK_MONOTONIC, &t2);
- 
-     if (ret < 0) {
-         printf("write failed: %s\n", strerror(-ret));
-@@ -1160,7 +1161,7 @@ static const cmdinfo_t writev_cmd = {
- 
- static int writev_f(BlockBackend *blk, int argc, char **argv)
- {
--    struct timeval t1, t2;
-+    struct timespec t1, t2;
-     bool Cflag = false, qflag = false;
-     int flags = 0;
-     int c, cnt, ret;
-@@ -1213,9 +1214,9 @@ static int writev_f(BlockBackend *blk, int argc, char **argv)
-         return -EINVAL;
-     }
- 
--    gettimeofday(&t1, NULL);
-+    clock_gettime(CLOCK_MONOTONIC, &t1);
-     ret = do_aio_writev(blk, &qiov, offset, flags, &total);
--    gettimeofday(&t2, NULL);
-+    clock_gettime(CLOCK_MONOTONIC, &t2);
- 
-     if (ret < 0) {
-         printf("writev failed: %s\n", strerror(-ret));
-@@ -1250,15 +1251,15 @@ struct aio_ctx {
-     bool zflag;
-     BlockAcctCookie acct;
-     int pattern;
--    struct timeval t1;
-+    struct timespec t1;
- };
- 
- static void aio_write_done(void *opaque, int ret)
- {
-     struct aio_ctx *ctx = opaque;
--    struct timeval t2;
-+    struct timespec t2;
- 
--    gettimeofday(&t2, NULL);
-+    clock_gettime(CLOCK_MONOTONIC, &t2);
- 
- 
-     if (ret < 0) {
-@@ -1288,9 +1289,9 @@ out:
- static void aio_read_done(void *opaque, int ret)
- {
-     struct aio_ctx *ctx = opaque;
--    struct timeval t2;
-+    struct timespec t2;
- 
--    gettimeofday(&t2, NULL);
-+    clock_gettime(CLOCK_MONOTONIC, &t2);
- 
-     if (ret < 0) {
-         printf("readv failed: %s\n", strerror(-ret));
-@@ -1425,7 +1426,7 @@ static int aio_read_f(BlockBackend *blk, int argc, char **argv)
-         return -EINVAL;
-     }
- 
--    gettimeofday(&ctx->t1, NULL);
-+    clock_gettime(CLOCK_MONOTONIC, &ctx->t1);
-     block_acct_start(blk_get_stats(blk), &ctx->acct, ctx->qiov.size,
-                      BLOCK_ACCT_READ);
-     blk_aio_preadv(blk, ctx->offset, &ctx->qiov, 0, aio_read_done, ctx);
-@@ -1570,7 +1571,7 @@ static int aio_write_f(BlockBackend *blk, int argc, char **argv)
-             return -EINVAL;
-         }
- 
--        gettimeofday(&ctx->t1, NULL);
-+        clock_gettime(CLOCK_MONOTONIC, &ctx->t1);
-         block_acct_start(blk_get_stats(blk), &ctx->acct, ctx->qiov.size,
-                          BLOCK_ACCT_WRITE);
- 
-@@ -1746,7 +1747,7 @@ static const cmdinfo_t discard_cmd = {
- 
- static int discard_f(BlockBackend *blk, int argc, char **argv)
- {
--    struct timeval t1, t2;
-+    struct timespec t1, t2;
-     bool Cflag = false, qflag = false;
-     int c, ret;
-     int64_t offset, bytes;
-@@ -1787,9 +1788,9 @@ static int discard_f(BlockBackend *blk, int argc, char **argv)
-         return -EINVAL;
-     }
- 
--    gettimeofday(&t1, NULL);
-+    clock_gettime(CLOCK_MONOTONIC, &t1);
-     ret = blk_pdiscard(blk, offset, bytes);
--    gettimeofday(&t2, NULL);
-+    clock_gettime(CLOCK_MONOTONIC, &t2);
- 
-     if (ret < 0) {
-         printf("discard failed: %s\n", strerror(-ret));
+ exit $ret
+diff --git a/tests/qemu-iotests-quick.sh b/tests/qemu-iotests-quick.sh
+deleted file mode 100755
+index 0e554bb9724..00000000000
+--- a/tests/qemu-iotests-quick.sh
++++ /dev/null
+@@ -1,8 +0,0 @@
+-#!/bin/sh
+-
+-cd tests/qemu-iotests
+-
+-ret=0
+-TEST_DIR=${TEST_DIR:-/tmp/qemu-iotests-quick-$$} ./check -T -qcow2 -g quick || ret=1
+-
+-exit $ret
 -- 
 2.20.1
 
