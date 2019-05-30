@@ -7,75 +7,74 @@ X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F0705C28CC3
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 10:21:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 87429C28CC0
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 10:21:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BF50725715
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 10:21:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 52ED025715
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 10:21:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="is+/WRib"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BF50725715
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="aCUSwaMJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 52ED025715
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:50609 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:50613 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hWIBl-0006En-TQ
-	for qemu-devel@archiver.kernel.org; Thu, 30 May 2019 06:21:37 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:54347)
+	id 1hWIBn-0006Gg-EK
+	for qemu-devel@archiver.kernel.org; Thu, 30 May 2019 06:21:39 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:54401)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hWI6Y-0002cF-R4
-	for qemu-devel@nongnu.org; Thu, 30 May 2019 06:16:15 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1hWI6d-0002ff-3j
+	for qemu-devel@nongnu.org; Thu, 30 May 2019 06:16:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hWI6Y-0006XT-2T
-	for qemu-devel@nongnu.org; Thu, 30 May 2019 06:16:14 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:39973)
+	(envelope-from <alex.bennee@linaro.org>) id 1hWI6c-0006ao-2t
+	for qemu-devel@nongnu.org; Thu, 30 May 2019 06:16:19 -0400
+Received: from mail-wm1-x32a.google.com ([2a00:1450:4864:20::32a]:39175)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1hWI6X-0006Wx-SR
-	for qemu-devel@nongnu.org; Thu, 30 May 2019 06:16:14 -0400
-Received: by mail-wr1-x443.google.com with SMTP id t4so3810371wrx.7
-	for <qemu-devel@nongnu.org>; Thu, 30 May 2019 03:16:13 -0700 (PDT)
+	id 1hWI6b-0006aH-Se
+	for qemu-devel@nongnu.org; Thu, 30 May 2019 06:16:18 -0400
+Received: by mail-wm1-x32a.google.com with SMTP id z23so3459874wma.4
+	for <qemu-devel@nongnu.org>; Thu, 30 May 2019 03:16:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
 	h=from:to:cc:subject:date:message-id:in-reply-to:references
 	:mime-version:content-transfer-encoding;
-	bh=W0YwnQ7RyXinYmA/R3gRUT7SUlaDY+T48f3CddOaKS4=;
-	b=is+/WRibWmlDXeyKsRs5GmyS7UPJbnfWF923ZV7AYXKcxqn5PpLdrzy26ni0gIi6te
-	obLr59UrIPwgbrj1WUYrmqmDYgT9z2RJRifLE1LVC+5KFZaaAV8qVB3m48p2XLihW5vF
-	GTv5JBkZTqLkUFLmT0ufgMNnvMrHKIxytuujuoK5ULCsCihdY11xsTf4Cwp1UJObfIAL
-	lj9dfaHBOFZZYPhziXvbA8DYDG7ljIn/9bBPfWqpZfEE4YXNBGjRrG4k2/d6a8OJyf5l
-	lxcnnkh7ePCN4XJrPkR4xjnnapE+5JxKJFcuWQcCOmOqGw7KADNhcxGptghbeWnrqzsA
-	a6vQ==
+	bh=zHc+QewZiPLzAKrh7Ap5biSxTst0S3+b8dtoVpxzoyo=;
+	b=aCUSwaMJHXE+rRG3Ku2QceQq/98HeRQvRONO/R1BIQnVG1jeFIsenqNU2jnpL0T2ZR
+	dJgxHo72vXx71eNWJL6906Jhbtz7kCkBlK5hAr/8OGWlMA8fNT70v3V5LBMjUujpICOt
+	J4Slyk4z+Nss4WmEAqhnOs2e/vGKirgumAUVWCi0rcjG9UUrzD3AKZtGFm3b6qExo9eD
+	T+qWDkaR+ygFV7IjU0Dm0cF0gNRFkPlAXIg43+UfGpGFp5yFBlDf0xtfXKEW+1O8z043
+	YT06593rCtvOeKfwp9wS1LfhB1wA0oX6wlct4ZPcIN+0uHll2F8LpG+bnbkRmaBtnAZ8
+	flTw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
 	:references:mime-version:content-transfer-encoding;
-	bh=W0YwnQ7RyXinYmA/R3gRUT7SUlaDY+T48f3CddOaKS4=;
-	b=K6vdjrwlLxle/vb/utQ4b9TX3/SdosrsetBtUCJMN99/oZCjE1Bc5HKzie1jdKWfW1
-	ZcpOGP0JpyOhzYIQdNEObsomDdy4D667Wf8+pEGyKDyRCGznxKN9JCU0avPb9E4fKnCk
-	RPBBHJWEkh0hXjcCIK3FI9Il/jQWFGWv9zLZjIkVIKk+vPTxZDRE8htEmZXfRzqZ5p6m
-	lr2VTqf5n77W0TvT3PegbT9OgDQFEb+Cgr/Q/cz2dmZnu241yYfDbmCahEhiLcfsLAFJ
-	TFVVC4TJDUr/WvWj9qUGK4+l9+qxv5Lr74XJUef4Ab3aqGUSF6GnGx8cEMpOGFHhNF3U
-	KM1Q==
-X-Gm-Message-State: APjAAAXN2PwNAGjdMbPHdhOc4fyKov8sar5ijODcVZ4DXDI+pINQzx9s
-	5HFxpXMhao0QM6aPaHcxYAdW3g==
-X-Google-Smtp-Source: APXvYqzX+8tBQ8C9W8CsItE4gtgPKPdb+9LiJIwHNszJUh3weKMVkbKy4WFGd1IHEy4z78c+dmmH8A==
-X-Received: by 2002:adf:dc8e:: with SMTP id r14mr2067766wrj.121.1559211372802; 
-	Thu, 30 May 2019 03:16:12 -0700 (PDT)
+	bh=zHc+QewZiPLzAKrh7Ap5biSxTst0S3+b8dtoVpxzoyo=;
+	b=iU+wpEwofmiGF6KZMcju4eTgyhrPnL1OKKSVkH7lMUrtm20yWE0JWgWTfj75hopztT
+	KCLE1h3eVaacUbl2rXyJjreaiZZnsfnySJ/9ORnDQv2XISWvQXRvURVrcZr+tWIfMGm8
+	ubjG9RmET8uA+xri7rqgRKgheyGItKPQbj+xyWRQkP44D+43ShH5+9bO/fR/IEo83hFN
+	nlnSsCyWsYxiNRh1+caGKnlf0LfoSCUU9QRtDzGimhs0ADf6xC0Pn6DITctUPAhoD9Sz
+	d0WMMp0kaqxbC48+7SwPtbASHsv3bQgG+Rv4gU2ZTY/zqzeZDTNxO4BEYEBjhICv4cqL
+	YM9Q==
+X-Gm-Message-State: APjAAAWfI49mGGixaRG7Ut7PSC9TVE/Uaa3ZJdspkH/tzZZMFoHKzkVL
+	CgopxEt8QyffvzgJxE0qH1J98Q==
+X-Google-Smtp-Source: APXvYqxXVomBiQw3TuXtOTLMLtFFcwzUhA1wgp8lcEVVqIUI4bAYpGBzQjTgJ6/fW0Hb8TOLmkSO/g==
+X-Received: by 2002:a1c:e109:: with SMTP id y9mr1689806wmg.35.1559211376798;
+	Thu, 30 May 2019 03:16:16 -0700 (PDT)
 Received: from zen.linaroharston ([81.128.185.34])
-	by smtp.gmail.com with ESMTPSA id
-	h12sm1917633wre.14.2019.05.30.03.16.06
+	by smtp.gmail.com with ESMTPSA id h8sm5024657wmf.5.2019.05.30.03.16.08
 	(version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-	Thu, 30 May 2019 03:16:09 -0700 (PDT)
+	Thu, 30 May 2019 03:16:10 -0700 (PDT)
 Received: from zen.linaroharston. (localhost [127.0.0.1])
-	by zen.linaroharston (Postfix) with ESMTP id 9B72E1FF96;
-	Thu, 30 May 2019 11:16:04 +0100 (BST)
+	by zen.linaroharston (Postfix) with ESMTP id 0B85E1FF9C;
+	Thu, 30 May 2019 11:16:05 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Thu, 30 May 2019 11:15:44 +0100
-Message-Id: <20190530101603.22254-8-alex.bennee@linaro.org>
+Date: Thu, 30 May 2019 11:15:49 +0100
+Message-Id: <20190530101603.22254-13-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190530101603.22254-1-alex.bennee@linaro.org>
 References: <20190530101603.22254-1-alex.bennee@linaro.org>
@@ -84,9 +83,9 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2a00:1450:4864:20::443
-Subject: [Qemu-devel] [PATCH v1 07/26] .travis.yml: bump gcc sanitiser job
- to gcc-9
+X-Received-From: 2a00:1450:4864:20::32a
+Subject: [Qemu-devel] [PATCH v1 12/26] tests/vm: Add missing variables on
+ help
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -100,48 +99,43 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Fam Zheng <fam@euphon.net>,
 	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
-	=?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+	=?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+	Wainer dos Santos Moschetta <wainersm@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The toolchain PPA has it so we might as well use it.
+From: Wainer dos Santos Moschetta <wainersm@redhat.com>
 
+Added description of variables missing on vm-test help.
+
+Signed-off-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
+Message-Id: <20190329210804.22121-6-wainersm@redhat.com>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- .travis.yml | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+ tests/vm/Makefile.include | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
 
-diff --git a/.travis.yml b/.travis.yml
-index b053a836a32..f0aa37f2d12 100644
---- a/.travis.yml
-+++ b/.travis.yml
-@@ -240,8 +240,8 @@ matrix:
-             - ubuntu-toolchain-r-test
-           packages:
-             # Extra toolchains
--            - gcc-7
--            - g++-7
-+            - gcc-9
-+            - g++-9
-             # Build dependencies
-             - libaio-dev
-             - libattr1-dev
-@@ -270,11 +270,11 @@ matrix:
-       language: generic
-       compiler: none
-       env:
--        - COMPILER_NAME=gcc CXX=g++-7 CC=gcc-7
--        - CONFIG="--cc=gcc-7 --cxx=g++-7 --disable-pie --disable-linux-user"
-+        - COMPILER_NAME=gcc CXX=g++-9 CC=gcc-9
-+        - CONFIG="--cc=gcc-9 --cxx=g++-9 --disable-pie --disable-linux-user"
-         - TEST_CMD=""
-       before_script:
--        - ./configure ${CONFIG} --extra-cflags="-g3 -O0 -fsanitize=thread -fuse-ld=gold" || { cat config.log && exit 1; }
-+        - ./configure ${CONFIG} --extra-cflags="-g3 -O0 -Wno-error=stringop-truncation -fsanitize=thread -fuse-ld=gold" || { cat config.log && exit 1; }
+diff --git a/tests/vm/Makefile.include b/tests/vm/Makefile.include
+index 6f82676306d..c59411bee01 100644
+--- a/tests/vm/Makefile.include
++++ b/tests/vm/Makefile.include
+@@ -21,9 +21,13 @@ vm-test:
+ 	@echo "  vm-clean-all                    - Clean up VM images"
+ 	@echo
+ 	@echo "Special variables:"
+-	@echo "    BUILD_TARGET=foo		 - override the build target"
+-	@echo "    TARGET_LIST=a,b,c    	 - Override target list in builds."
++	@echo "    BUILD_TARGET=foo		 - Override the build target"
++	@echo "    TARGET_LIST=a,b,c    	 - Override target list in builds"
+ 	@echo '    EXTRA_CONFIGURE_OPTS="..."'
++	@echo "    J=[0..9]*            	 - Override the -jN parameter for make commands"
++	@echo "    DEBUG=1              	 - Enable verbose output on host and interactive debugging"
++	@echo "    V=1				 - Enable verbose ouput on host and guest commands"
++	@echo "    QEMU=/path/to/qemu		 - Change path to QEMU binary"
  
+ vm-build-all: $(addprefix vm-build-, $(IMAGES))
  
-     # Run check-tcg against linux-user
 -- 
 2.20.1
 
