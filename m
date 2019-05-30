@@ -2,59 +2,61 @@ Return-Path: <SRS0=r6E1=T6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F41D6C46470
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DC99CC072B1
 	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 05:40:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C6EBD26076
+	by mail.kernel.org (Postfix) with ESMTPS id 9B74C26050
 	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 05:40:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="NngbI4Kn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C6EBD26076
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="JawBejaS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9B74C26050
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:52059 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:52067 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hWDnx-0007jB-HW
+	id 1hWDnx-0007kQ-Q1
 	for qemu-devel@archiver.kernel.org; Thu, 30 May 2019 01:40:45 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:34938)
+Received: from eggs.gnu.org ([209.51.188.92]:34942)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1hWDm0-0006Xr-EX
+	(envelope-from <dgibson@ozlabs.org>) id 1hWDm0-0006Xs-ID
 	for qemu-devel@nongnu.org; Thu, 30 May 2019 01:38:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1hWDlz-000495-FP
+	(envelope-from <dgibson@ozlabs.org>) id 1hWDlz-00048O-7U
 	for qemu-devel@nongnu.org; Thu, 30 May 2019 01:38:44 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:56369 helo=ozlabs.org)
+Received: from bilbo.ozlabs.org ([203.11.71.1]:51071 helo=ozlabs.org)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
-	id 1hWDlz-00046j-2y; Thu, 30 May 2019 01:38:43 -0400
+	id 1hWDlx-00045a-Ty; Thu, 30 May 2019 01:38:43 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
-	id 45DxFl07DQz9s4V; Thu, 30 May 2019 15:38:34 +1000 (AEST)
+	id 45DxFl0yCcz9s3l; Thu, 30 May 2019 15:38:35 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
 	d=gibson.dropbear.id.au; s=201602; t=1559194715;
-	bh=PX7L6psk9bxpQ3H09igMIsL59XmwW7RGiPJ/e6qp8EQ=;
-	h=From:To:Cc:Subject:Date:From;
-	b=NngbI4Kn12EJFzjHBxoaOEU1ZbCjgDV7wf44+hoXsrk+XlSX0Q3HtH9ZscMKBE071
-	8ILqFl2golqOq55aZJ0S+2e0hUT2oVLHo2rzli81XTBuo9DknjVY35R5IWfOY+dPUz
-	aPGSH7Rwfrtr/7UktVqTyiYX17Kw/uI2nHiIPbhc=
+	bh=+lxQTtJygEMrOo4K8QMnuAxyUk7C/17tEDaXNevlNmI=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=JawBejaSCsRiqVyIWPwPsuTB3/QGgxkY1dVN/P2SsFNpLwyZL1iOnQ6miGRJHnZ/g
+	9gmE5wN8EK6Ebhk9vHNMcM6976R5UoboUOIN6lr++0+uCzkFsYDslFvreJHK9fwTM6
+	xOqz8U/8NccuuOg2PwTHwgsNlJacpc1YcoK9KDAk=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: qemu-devel@nongnu.org,
 	qemu-ppc@nongnu.org
-Date: Thu, 30 May 2019 15:38:23 +1000
-Message-Id: <20190530053831.22115-1-david@gibson.dropbear.id.au>
+Date: Thu, 30 May 2019 15:38:27 +1000
+Message-Id: <20190530053831.22115-5-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.21.0
+In-Reply-To: <20190530053831.22115-1-david@gibson.dropbear.id.au>
+References: <20190530053831.22115-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 203.11.71.1
-Subject: [Qemu-devel] [PATCH v2 0/8] pseries: Allow hotplug of P2P bridges
- and devices under P2P bridges
+Subject: [Qemu-devel] [PATCH v2 4/8] spapr: Clean up spapr_drc_populate_dt()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -72,44 +74,151 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-PAPR has its own PCI hotplug mechanism which we implemented quite a
-while ago.  However, we weren't able to hotplug devices under PCI
-bridges, because the pci-bridge code would try to handle the hotplug
-using SHPC which won't work with PAPR.
+This makes some minor cleanups to spapr_drc_populate_dt(), renaming it to
+the shorter and more idiomatic spapr_dt_drc() along the way.
 
-We now have the infrastructure in the hotplug core to have the machine
-take control of the hotplug before the bus tries to claim it, which
-lets us address this.  While we're about it, make a bunch of cleanups
-and also allow hot plug of P2P bridges themselves (this turns out to
-be quite straightforward once the rest is in place).
+Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+Reviewed-by: Greg Kurz <groug@kaod.org>
+Acked-by: Michael S. Tsirkin <mst@redhat.com>
+---
+ hw/ppc/spapr.c             |  7 +++----
+ hw/ppc/spapr_drc.c         | 13 ++++++-------
+ hw/ppc/spapr_pci.c         |  3 +--
+ include/hw/ppc/spapr_drc.h |  3 +--
+ 4 files changed, 11 insertions(+), 15 deletions(-)
 
-For now, we don't support hot unplug of bridges - this seems to cause
-problems, at least for a Linux guest.  I suspect the problem is on the
-guest side, but for now just prohibit until we have time to
-investigate properly.
-
-Changes since v1:
- * Added proper cover letter
- * Addressed some minor comments
-
-David Gibson (8):
-  spapr: Clean up device node name generation for PCI devices
-  spapr: Clean up device tree construction for PCI devices
-  spapr: Clean up dt creation for PCI buses
-  spapr: Clean up spapr_drc_populate_dt()
-  spapr: Clean up DRC index construction
-  spapr: Don't use bus number for building DRC ids
-  spapr: Direct all PCI hotplug to host bridge, rather than P2P bridge
-  spapr: Allow hot plug/unplug of PCI bridges and devices under PCI
-    bridges
-
- hw/ppc/spapr.c              |  25 +-
- hw/ppc/spapr_drc.c          |  13 +-
- hw/ppc/spapr_pci.c          | 486 ++++++++++++++++++++++--------------
- include/hw/pci-host/spapr.h |   4 +-
- include/hw/ppc/spapr_drc.h  |   3 +-
- 5 files changed, 327 insertions(+), 204 deletions(-)
-
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index 44573adce7..507fd50dd5 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -1320,13 +1320,12 @@ static void *spapr_build_fdt(SpaprMachineState *s=
+papr)
+     spapr_populate_cpus_dt_node(fdt, spapr);
+=20
+     if (smc->dr_lmb_enabled) {
+-        _FDT(spapr_drc_populate_dt(fdt, 0, NULL, SPAPR_DR_CONNECTOR_TYPE=
+_LMB));
++        _FDT(spapr_dt_drc(fdt, 0, NULL, SPAPR_DR_CONNECTOR_TYPE_LMB));
+     }
+=20
+     if (mc->has_hotpluggable_cpus) {
+         int offset =3D fdt_path_offset(fdt, "/cpus");
+-        ret =3D spapr_drc_populate_dt(fdt, offset, NULL,
+-                                    SPAPR_DR_CONNECTOR_TYPE_CPU);
++        ret =3D spapr_dt_drc(fdt, offset, NULL, SPAPR_DR_CONNECTOR_TYPE_=
+CPU);
+         if (ret < 0) {
+             error_report("Couldn't set up CPU DR device tree properties"=
+);
+             exit(1);
+@@ -1363,7 +1362,7 @@ static void *spapr_build_fdt(SpaprMachineState *spa=
+pr)
+     }
+=20
+     if (smc->dr_phb_enabled) {
+-        ret =3D spapr_drc_populate_dt(fdt, 0, NULL, SPAPR_DR_CONNECTOR_T=
+YPE_PHB);
++        ret =3D spapr_dt_drc(fdt, 0, NULL, SPAPR_DR_CONNECTOR_TYPE_PHB);
+         if (ret < 0) {
+             error_report("Couldn't set up PHB DR device tree properties"=
+);
+             exit(1);
+diff --git a/hw/ppc/spapr_drc.c b/hw/ppc/spapr_drc.c
+index 597f236b9c..bacadfcac5 100644
+--- a/hw/ppc/spapr_drc.c
++++ b/hw/ppc/spapr_drc.c
+@@ -781,7 +781,7 @@ SpaprDrc *spapr_drc_by_id(const char *type, uint32_t =
+id)
+ }
+=20
+ /**
+- * spapr_drc_populate_dt
++ * spapr_dt_drc
+  *
+  * @fdt: libfdt device tree
+  * @path: path in the DT to generate properties
+@@ -794,8 +794,7 @@ SpaprDrc *spapr_drc_by_id(const char *type, uint32_t =
+id)
+  *
+  * as documented in PAPR+ v2.1, 13.5.2
+  */
+-int spapr_drc_populate_dt(void *fdt, int fdt_offset, Object *owner,
+-                          uint32_t drc_type_mask)
++int spapr_dt_drc(void *fdt, int offset, Object *owner, uint32_t drc_type=
+_mask)
+ {
+     Object *root_container;
+     ObjectProperty *prop;
+@@ -873,7 +872,7 @@ int spapr_drc_populate_dt(void *fdt, int fdt_offset, =
+Object *owner,
+     *(uint32_t *)drc_names->str =3D cpu_to_be32(drc_count);
+     *(uint32_t *)drc_types->str =3D cpu_to_be32(drc_count);
+=20
+-    ret =3D fdt_setprop(fdt, fdt_offset, "ibm,drc-indexes",
++    ret =3D fdt_setprop(fdt, offset, "ibm,drc-indexes",
+                       drc_indexes->data,
+                       drc_indexes->len * sizeof(uint32_t));
+     if (ret) {
+@@ -881,7 +880,7 @@ int spapr_drc_populate_dt(void *fdt, int fdt_offset, =
+Object *owner,
+         goto out;
+     }
+=20
+-    ret =3D fdt_setprop(fdt, fdt_offset, "ibm,drc-power-domains",
++    ret =3D fdt_setprop(fdt, offset, "ibm,drc-power-domains",
+                       drc_power_domains->data,
+                       drc_power_domains->len * sizeof(uint32_t));
+     if (ret) {
+@@ -889,14 +888,14 @@ int spapr_drc_populate_dt(void *fdt, int fdt_offset=
+, Object *owner,
+         goto out;
+     }
+=20
+-    ret =3D fdt_setprop(fdt, fdt_offset, "ibm,drc-names",
++    ret =3D fdt_setprop(fdt, offset, "ibm,drc-names",
+                       drc_names->str, drc_names->len);
+     if (ret) {
+         error_report("Couldn't finalize ibm,drc-names property");
+         goto out;
+     }
+=20
+-    ret =3D fdt_setprop(fdt, fdt_offset, "ibm,drc-types",
++    ret =3D fdt_setprop(fdt, offset, "ibm,drc-types",
+                       drc_types->str, drc_types->len);
+     if (ret) {
+         error_report("Couldn't finalize ibm,drc-types property");
+diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
+index 08537c8c85..efbbe705c7 100644
+--- a/hw/ppc/spapr_pci.c
++++ b/hw/ppc/spapr_pci.c
+@@ -2282,8 +2282,7 @@ int spapr_dt_phb(SpaprPhbState *phb, uint32_t intc_=
+phandle, void *fdt,
+         return ret;
+     }
+=20
+-    ret =3D spapr_drc_populate_dt(fdt, bus_off, OBJECT(phb),
+-                                SPAPR_DR_CONNECTOR_TYPE_PCI);
++    ret =3D spapr_dt_drc(fdt, bus_off, OBJECT(phb), SPAPR_DR_CONNECTOR_T=
+YPE_PCI);
+     if (ret) {
+         return ret;
+     }
+diff --git a/include/hw/ppc/spapr_drc.h b/include/hw/ppc/spapr_drc.h
+index fad0a887f9..c2c543a591 100644
+--- a/include/hw/ppc/spapr_drc.h
++++ b/include/hw/ppc/spapr_drc.h
+@@ -266,8 +266,7 @@ SpaprDrc *spapr_dr_connector_new(Object *owner, const=
+ char *type,
+                                          uint32_t id);
+ SpaprDrc *spapr_drc_by_index(uint32_t index);
+ SpaprDrc *spapr_drc_by_id(const char *type, uint32_t id);
+-int spapr_drc_populate_dt(void *fdt, int fdt_offset, Object *owner,
+-                          uint32_t drc_type_mask);
++int spapr_dt_drc(void *fdt, int offset, Object *owner, uint32_t drc_type=
+_mask);
+=20
+ void spapr_drc_attach(SpaprDrc *drc, DeviceState *d, Error **errp);
+ void spapr_drc_detach(SpaprDrc *drc);
 --=20
 2.21.0
 
