@@ -2,60 +2,62 @@ Return-Path: <SRS0=r6E1=T6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 328C2C28CC0
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 08:37:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DF04C28CC0
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 08:43:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 085EE25125
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 08:37:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 085EE25125
+	by mail.kernel.org (Postfix) with ESMTPS id 5050C2531E
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 08:43:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5050C2531E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:49266 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:49311 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hWGYg-0005NK-BN
-	for qemu-devel@archiver.kernel.org; Thu, 30 May 2019 04:37:10 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:34414)
+	id 1hWGee-0006wu-If
+	for qemu-devel@archiver.kernel.org; Thu, 30 May 2019 04:43:20 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:36058)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1hWGV3-00031J-Fq
-	for qemu-devel@nongnu.org; Thu, 30 May 2019 04:33:26 -0400
+	(envelope-from <kwolf@redhat.com>) id 1hWGdl-0006bd-41
+	for qemu-devel@nongnu.org; Thu, 30 May 2019 04:42:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1hWGV2-0006kj-AA
-	for qemu-devel@nongnu.org; Thu, 30 May 2019 04:33:25 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57555)
+	(envelope-from <kwolf@redhat.com>) id 1hWGdk-0002Be-6r
+	for qemu-devel@nongnu.org; Thu, 30 May 2019 04:42:25 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60392)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1hWGV2-0006FO-2r
-	for qemu-devel@nongnu.org; Thu, 30 May 2019 04:33:24 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
-	[10.5.11.22])
+	(Exim 4.71) (envelope-from <kwolf@redhat.com>)
+	id 1hWGdi-0002As-48; Thu, 30 May 2019 04:42:22 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+	[10.5.11.23])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 6FDA281E04
-	for <qemu-devel@nongnu.org>; Thu, 30 May 2019 08:32:47 +0000 (UTC)
-Received: from dell-r430-03.lab.eng.brq.redhat.com
-	(dell-r430-03.lab.eng.brq.redhat.com [10.37.153.18])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 270091017E2E;
-	Thu, 30 May 2019 08:32:45 +0000 (UTC)
-From: Igor Mammedov <imammedo@redhat.com>
-To: qemu-devel@nongnu.org
-Date: Thu, 30 May 2019 10:33:17 +0200
-Message-Id: <1559205199-233510-2-git-send-email-imammedo@redhat.com>
-In-Reply-To: <1559205199-233510-1-git-send-email-imammedo@redhat.com>
-References: <1559205199-233510-1-git-send-email-imammedo@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+	by mx1.redhat.com (Postfix) with ESMTPS id 2D08FA0B47;
+	Thu, 30 May 2019 08:42:21 +0000 (UTC)
+Received: from linux.fritz.box (ovpn-116-119.ams2.redhat.com [10.36.116.119])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 649248195;
+	Thu, 30 May 2019 08:42:16 +0000 (UTC)
+Date: Thu, 30 May 2019 10:42:14 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20190530084214.GA4890@linux.fritz.box>
+References: <20190527092319.15844-1-stefanha@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190527092319.15844-1-stefanha@redhat.com>
+User-Agent: Mutt/1.11.3 (2019-02-01)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.25]);
-	Thu, 30 May 2019 08:32:50 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.26]);
+	Thu, 30 May 2019 08:42:21 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v4 1/3] machine: show if CLI option '-numa node,
- mem' is supported in QAPI schema
+Subject: Re: [Qemu-devel] [PATCH] block/linux-aio: explictly clear laiocb->co
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -67,135 +69,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: libvir-list@redhat.com, pbonzini@redhat.com, berrange@redhat.com,
-	ehabkost@redhat.com, armbru@redhat.com
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
+	pbonzini@redhat.com, Julia Suvorova <jusual@mail.ru>,
+	Aarushi Mehta <mehta.aaru20@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Legacy '-numa node,mem' option has a number of issues and mgmt often
-defaults to it. Unfortunately it's no possible to replace it with
-an alternative '-numa memdev' without breaking migration compatibility.
-What's possible though is to deprecate it, keeping option working with
-old machine types only.
+Am 27.05.2019 um 11:23 hat Stefan Hajnoczi geschrieben:
+> qemu_aio_get() does not zero allocated memory.  Explicitly initialize
+> laiocb->co to prevent an uninitialized memory access in
+> qemu_laio_process_completion().
+> 
+> Note that this bug has never manifested itself.  I guess we're lucky!
+> 
+> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 
-In order to help users to find out if being deprecated CLI option
-'-numa node,mem' is still supported by particular machine type, add new
-"numa-mem-supported" property to MachineInfo description in QAPI schema.
+That the bug never manifested itself might be because it's in an unused
+function. How about we finally just remove the unused callback-based
+laio_submit() from the code?
 
-"numa-mem-supported" is set to 'true' for machines that currently support
-NUMA, but it will be flipped to 'false' later on, once deprecation period
-expires and kept 'true' only for old machine types that used to support
-the legacy option so it won't break existing configuration that are using
-it.
+At the time when I converted linux-aio to coroutines, someone (maybe
+Paolo?) insisted that we keep the old interface because we might add a
+new user sometime with possible shortcuts that bypass the whole coroutine
+path, but it hasn't happened and I think we've moved even further in the
+opposite direction since then.
 
-Signed-off-by: Igor Mammedov <imammedo@redhat.com>
----
+Kevin
 
-Notes:
-    v4:
-      * drop idea to use "qom-list-properties" and use MachineInfo instead
-        which could be inspected with 'query-machines'
-
- include/hw/boards.h | 3 +++
- hw/arm/virt.c       | 1 +
- hw/i386/pc.c        | 1 +
- hw/ppc/spapr.c      | 1 +
- qapi/misc.json      | 5 ++++-
- vl.c                | 1 +
- 6 files changed, 11 insertions(+), 1 deletion(-)
-
-diff --git a/include/hw/boards.h b/include/hw/boards.h
-index 6f7916f..86894b6 100644
---- a/include/hw/boards.h
-+++ b/include/hw/boards.h
-@@ -158,6 +158,8 @@ typedef struct {
-  * @kvm_type:
-  *    Return the type of KVM corresponding to the kvm-type string option or
-  *    computed based on other criteria such as the host kernel capabilities.
-+ * @numa_mem_supported:
-+ *    true if '--numa node.mem' option is supported and false otherwise
-  */
- struct MachineClass {
-     /*< private >*/
-@@ -210,6 +212,7 @@ struct MachineClass {
-     bool ignore_boot_device_suffixes;
-     bool smbus_no_migration_support;
-     bool nvdimm_supported;
-+    bool numa_mem_supported;
- 
-     HotplugHandler *(*get_hotplug_handler)(MachineState *machine,
-                                            DeviceState *dev);
-diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index bf54f10..481a603 100644
---- a/hw/arm/virt.c
-+++ b/hw/arm/virt.c
-@@ -1943,6 +1943,7 @@ static void virt_machine_class_init(ObjectClass *oc, void *data)
-     assert(!mc->get_hotplug_handler);
-     mc->get_hotplug_handler = virt_machine_get_hotplug_handler;
-     hc->plug = virt_machine_device_plug_cb;
-+    mc->numa_mem_supported = true;
- }
- 
- static void virt_instance_init(Object *obj)
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index 2632b73..05b8368 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -2747,6 +2747,7 @@ static void pc_machine_class_init(ObjectClass *oc, void *data)
-     nc->nmi_monitor_handler = x86_nmi;
-     mc->default_cpu_type = TARGET_DEFAULT_CPU_TYPE;
-     mc->nvdimm_supported = true;
-+    mc->numa_mem_supported = true;
- 
-     object_class_property_add(oc, PC_MACHINE_DEVMEM_REGION_SIZE, "int",
-         pc_machine_get_device_memory_region_size, NULL,
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 2ef3ce4..265ecfb 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -4336,6 +4336,7 @@ static void spapr_machine_class_init(ObjectClass *oc, void *data)
-      * in which LMBs are represented and hot-added
-      */
-     mc->numa_mem_align_shift = 28;
-+    mc->numa_mem_supported = true;
- 
-     smc->default_caps.caps[SPAPR_CAP_HTM] = SPAPR_CAP_OFF;
-     smc->default_caps.caps[SPAPR_CAP_VSX] = SPAPR_CAP_ON;
-diff --git a/qapi/misc.json b/qapi/misc.json
-index 8b3ca4f..d0bdccb 100644
---- a/qapi/misc.json
-+++ b/qapi/misc.json
-@@ -2018,12 +2018,15 @@
- #
- # @hotpluggable-cpus: cpu hotplug via -device is supported (since 2.7.0)
- #
-+# @numa-mem-supported: true if '-numa node,mem' option is supported by machine
-+#                      type and false otherwise (since 4.1)
-+#
- # Since: 1.2.0
- ##
- { 'struct': 'MachineInfo',
-   'data': { 'name': 'str', '*alias': 'str',
-             '*is-default': 'bool', 'cpu-max': 'int',
--            'hotpluggable-cpus': 'bool'} }
-+            'hotpluggable-cpus': 'bool', 'numa-mem-supported': 'bool'} }
- 
- ##
- # @query-machines:
-diff --git a/vl.c b/vl.c
-index 5550bd7..5bf17f5 100644
---- a/vl.c
-+++ b/vl.c
-@@ -1520,6 +1520,7 @@ MachineInfoList *qmp_query_machines(Error **errp)
-         info->name = g_strdup(mc->name);
-         info->cpu_max = !mc->max_cpus ? 1 : mc->max_cpus;
-         info->hotpluggable_cpus = mc->has_hotpluggable_cpus;
-+        info->numa_mem_supported = mc->numa_mem_supported;
- 
-         entry = g_malloc0(sizeof(*entry));
-         entry->value = info;
--- 
-2.7.4
-
+> I challenge you to find a place where laiocb->co is initialized and then
+> we can drop this patch.  I've double-checked and cannot find it...
+> 
+>  block/linux-aio.c | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/block/linux-aio.c b/block/linux-aio.c
+> index d4b61fb251..a097653be6 100644
+> --- a/block/linux-aio.c
+> +++ b/block/linux-aio.c
+> @@ -440,6 +440,7 @@ BlockAIOCB *laio_submit(BlockDriverState *bs, LinuxAioState *s, int fd,
+>      int ret;
+>  
+>      laiocb = qemu_aio_get(&laio_aiocb_info, bs, cb, opaque);
+> +    laiocb->co = NULL;
+>      laiocb->nbytes = nb_sectors * BDRV_SECTOR_SIZE;
+>      laiocb->ctx = s;
+>      laiocb->ret = -EINPROGRESS;
+> -- 
+> 2.21.0
+> 
 
