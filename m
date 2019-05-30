@@ -2,79 +2,60 @@ Return-Path: <SRS0=r6E1=T6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 26C7CC28CC0
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 08:29:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 05D41C28CC0
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 08:34:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F3D2624F53
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 08:29:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F3D2624F53
+	by mail.kernel.org (Postfix) with ESMTPS id CFC3C25118
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 08:34:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CFC3C25118
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:49153 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:49212 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hWGQr-0001RR-9z
-	for qemu-devel@archiver.kernel.org; Thu, 30 May 2019 04:29:05 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:33355)
+	id 1hWGWT-0003iA-Kk
+	for qemu-devel@archiver.kernel.org; Thu, 30 May 2019 04:34:53 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:34320)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1hWGQ2-00010E-Qf
-	for qemu-devel@nongnu.org; Thu, 30 May 2019 04:28:15 -0400
+	(envelope-from <imammedo@redhat.com>) id 1hWGUm-0002sf-AN
+	for qemu-devel@nongnu.org; Thu, 30 May 2019 04:33:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1hWGQ2-0002vd-16
-	for qemu-devel@nongnu.org; Thu, 30 May 2019 04:28:14 -0400
-Received: from mail-wm1-f53.google.com ([209.85.128.53]:39852)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hWGQ1-0002lH-Qy
-	for qemu-devel@nongnu.org; Thu, 30 May 2019 04:28:13 -0400
-Received: by mail-wm1-f53.google.com with SMTP id z23so3229501wma.4
-	for <qemu-devel@nongnu.org>; Thu, 30 May 2019 01:27:57 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-	:user-agent:mime-version:in-reply-to:content-language
-	:content-transfer-encoding;
-	bh=Ym8zAV4HuOVtBjpiNLxVUk0ikr3v6QLlxKO837em+FQ=;
-	b=bPjRoUf1Cxq1p8hnDMirKOToUOPQ0GG4BorFtOpUUG8NqVP4owprger1gmHbCDEHQ7
-	nK0R0CCjASdeqARfmdjzIxsTGyP3WjJCN4ByMkFydMLOSh6pW2qOMeXfGIGlRokBKDeU
-	+OqLat961HloxBs+oXll5AlWPxZyo7abMe0wCGZHUhROgPp5oVmZn8txNFduDfdXA4nS
-	x3bMddRH8MPbyOxPwrAy/Z5DmaHw71LrzPeTZaAuZnJmFZg6SCLjSoHE+fzvp/FohuCe
-	I7WVitHX1vjidTHuWwIYRq6cU+fNVIQ0feQd9BcxBm/dZwmCs3ieng1b8o8jZ45kSjnl
-	W82Q==
-X-Gm-Message-State: APjAAAWTgafX+zUOB4hsux16b3xOXNkNIF9895TgbJ9PAr2VjpVh6542
-	YKPOLbaZACNxdxe74doqogzsLsnEsPoTpw==
-X-Google-Smtp-Source: APXvYqx6CznjikUK/mOZp0hWYjcY0af+eg6+nEAlIOjfPrvFJyz5EFjBsKpNDnYkrhIG4K5VJ1UEjQ==
-X-Received: by 2002:a1c:c8:: with SMTP id 191mr1496667wma.6.1559204876666;
-	Thu, 30 May 2019 01:27:56 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:3da1:318a:275c:408?
-	([2001:b07:6468:f312:3da1:318a:275c:408])
-	by smtp.gmail.com with ESMTPSA id m17sm1475406wmc.6.2019.05.30.01.27.55
-	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-	Thu, 30 May 2019 01:27:55 -0700 (PDT)
-To: Kevin Wolf <kwolf@redhat.com>
-References: <20190524183638.20745-1-stefanha@redhat.com>
-	<24b93cc5-edb1-a197-14be-e63ac356325d@redhat.com>
-	<20190529221030.GD3471@localhost.localdomain>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <2666245b-7873-dc66-4af0-6b9c1eaa445d@redhat.com>
-Date: Thu, 30 May 2019 10:27:55 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
-MIME-Version: 1.0
-In-Reply-To: <20190529221030.GD3471@localhost.localdomain>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+	(envelope-from <imammedo@redhat.com>) id 1hWGUl-0006Sq-54
+	for qemu-devel@nongnu.org; Thu, 30 May 2019 04:33:08 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39796)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1hWGUk-0006Ar-TW
+	for qemu-devel@nongnu.org; Thu, 30 May 2019 04:33:07 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+	[10.5.11.22])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 1625A30B46F1
+	for <qemu-devel@nongnu.org>; Thu, 30 May 2019 08:32:50 +0000 (UTC)
+Received: from dell-r430-03.lab.eng.brq.redhat.com
+	(dell-r430-03.lab.eng.brq.redhat.com [10.37.153.18])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id B5D991001E86;
+	Thu, 30 May 2019 08:32:47 +0000 (UTC)
+From: Igor Mammedov <imammedo@redhat.com>
+To: qemu-devel@nongnu.org
+Date: Thu, 30 May 2019 10:33:18 +0200
+Message-Id: <1559205199-233510-3-git-send-email-imammedo@redhat.com>
+In-Reply-To: <1559205199-233510-1-git-send-email-imammedo@redhat.com>
+References: <1559205199-233510-1-git-send-email-imammedo@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.46]);
+	Thu, 30 May 2019 08:32:50 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-	[fuzzy]
-X-Received-From: 209.85.128.53
-Subject: Re: [Qemu-devel] [RFC v3 0/3] scsi: restart dma after vm change
- state handlers
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PATCH v4 2/3] numa: deprecate 'mem' parameter of
+ '-numa node' option
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -86,22 +67,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, qemu-devel@nongnu.org,
-	Stefan Hajnoczi <stefanha@redhat.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>
+Cc: libvir-list@redhat.com, pbonzini@redhat.com, berrange@redhat.com,
+	ehabkost@redhat.com, armbru@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 30/05/19 00:10, Kevin Wolf wrote:
-> I don't think this is as nice because stopping or resuming a device
-> could involve some async operation (e.g. be delegated to a BH). In this
-> case, a device on a child bus must still wait for the BH (or other async
-> part) to be completed before it can resume its own operation.
-> 
-> Basically, a single flat list of global VM state handlers wasn't a good
-> design, because what we actually need in such cases is something
-> hierarchical.
+The parameter allows to configure fake NUMA topology where guest
+VM simulates NUMA topology but not actually getting performance
+benefits from it. The same or better results could be achieved
+using 'memdev' parameter.
+Beside of unpredictable performance, '-numa node.mem' option has
+other issues when it's used with combination of -mem-path +
++ -mem-prealloc + memdev backends (pc-dimm), breaking binding of
+memdev backends since mem-path/mem-prealloc are global and affect
+the most of RAM allocations.
 
-So add an AioContext state change handler?
+It's possible to make memdevs and global -mem-path/mem-prealloc
+to play nicely together but that will just complicate already
+complicated code and add unobious ways it could break on 2
+different memmory allocation pathes and their combinations.
+
+Instead of it, consolidate all guest RAM allocation over memdev
+which still allows to create fake NUMA configurations if desired
+and leaves one simplifyed code path to consider when it comes
+to guest RAM allocation.
+
+To achieve desired simplification deprecate 'mem' parameter as its
+ad-hoc partitioning of initial RAM MemoryRegion can't be translated
+to memdev based backend transparently to users and in compatible
+manner (migration wise).
+
+Later down the road that will allow to consolidate means of how
+guest RAM is allocated and would permit us to clean up quite
+a bit memory allocations and numa code, leaving only 'memdev'
+implementation in place.
+
+Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+---
+
+Notes:
+    v4:
+      * fix up documentation to mention where users should look
+        to check if -numa node.mem is supported
+
+ numa.c               |  2 ++
+ qemu-deprecated.texi | 16 ++++++++++++++++
+ 2 files changed, 18 insertions(+)
+
+diff --git a/numa.c b/numa.c
+index 3875e1e..2205773 100644
+--- a/numa.c
++++ b/numa.c
+@@ -121,6 +121,8 @@ static void parse_numa_node(MachineState *ms, NumaNodeOptions *node,
+ 
+     if (node->has_mem) {
+         numa_info[nodenr].node_mem = node->mem;
++        warn_report("Parameter -numa node,mem is deprecated,"
++                    " use -numa node,memdev instead");
+     }
+     if (node->has_memdev) {
+         Object *o;
+diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
+index 50292d8..eb347f5 100644
+--- a/qemu-deprecated.texi
++++ b/qemu-deprecated.texi
+@@ -82,6 +82,22 @@ The @code{-realtime mlock=on|off} argument has been replaced by the
+ The ``-virtfs_synth'' argument is now deprecated. Please use ``-fsdev synth''
+ and ``-device virtio-9p-...'' instead.
+ 
++@subsection -numa node,mem=@var{size} (since 4.1)
++
++The parameter @option{mem} of @option{-numa node} is used to assign a part of
++guest RAM to a NUMA node. But when using it, it's impossible to manage specified
++RAM chunk on the host side (like bind it to a host node, setting bind policy, ...),
++so guest end-ups with the fake NUMA configuration with suboptiomal performance.
++However since 2014 there is an alternative way to assign RAM to a NUMA node
++using parameter @option{memdev}, which does the same as @option{mem} and adds
++means to actualy manage node RAM on the host side. Use parameter @option{memdev}
++with @var{memory-backend-ram} backend as an replacement for parameter @option{mem}
++to achieve the same fake NUMA effect or a properly configured
++@var{memory-backend-file} backend to actually benefit from NUMA configuration.
++In future new machine versions will not accept the option but it will still
++work with old machine types. User can check QAPI schema to see if the legacy
++option is supported by looking at MachineInfo::numa-mem-supported property.
++
+ @section QEMU Machine Protocol (QMP) commands
+ 
+ @subsection block-dirty-bitmap-add "autoload" parameter (since 2.12.0)
+-- 
+2.7.4
+
 
