@@ -3,114 +3,80 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A1B0EC28CC0
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 16:31:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 06340C28CC0
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 16:35:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 66CA625DA0
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 16:31:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 66CA625DA0
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id BDD1825DBB
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 16:35:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BDD1825DBB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:56527 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:56546 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hWNxo-00042p-NJ
-	for qemu-devel@archiver.kernel.org; Thu, 30 May 2019 12:31:36 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:57143)
+	id 1hWO1F-00050H-W9
+	for qemu-devel@archiver.kernel.org; Thu, 30 May 2019 12:35:10 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:58934)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hWNwn-0003Og-2k
-	for qemu-devel@nongnu.org; Thu, 30 May 2019 12:30:34 -0400
+	(envelope-from <philmd@redhat.com>) id 1hWO0K-0004gh-56
+	for qemu-devel@nongnu.org; Thu, 30 May 2019 12:34:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hWNwl-0006nP-No
-	for qemu-devel@nongnu.org; Thu, 30 May 2019 12:30:33 -0400
-Received: from mout.kundenserver.de ([212.227.17.24]:51879)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>)
-	id 1hWNwl-0006n3-Ey; Thu, 30 May 2019 12:30:31 -0400
-Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
-	(mreue107 [213.165.67.119]) with ESMTPSA (Nemesis) id
-	1MA88C-1hQNfg1jxq-00BgWD; Thu, 30 May 2019 18:30:22 +0200
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
-	qemu-devel@nongnu.org
-References: <20190530143916.20255-1-alex.bennee@linaro.org>
-From: Laurent Vivier <laurent@vivier.eu>
-Openpgp: preference=signencrypt
-Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
-	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
-Message-ID: <ced800af-8f00-cc27-358d-57cb0e715e45@vivier.eu>
-Date: Thu, 30 May 2019 18:30:21 +0200
+	(envelope-from <philmd@redhat.com>) id 1hWO0I-0000m1-VT
+	for qemu-devel@nongnu.org; Thu, 30 May 2019 12:34:12 -0400
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:41026)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hWO0I-0000lD-OW
+	for qemu-devel@nongnu.org; Thu, 30 May 2019 12:34:10 -0400
+Received: by mail-wr1-f66.google.com with SMTP id c2so4622482wrm.8
+	for <qemu-devel@nongnu.org>; Thu, 30 May 2019 09:34:10 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+	:date:user-agent:mime-version:in-reply-to:content-language
+	:content-transfer-encoding;
+	bh=1AgZoy454L+s0PduOvRU73bcQAh4Zk736l+VO1SADmI=;
+	b=YPCx1mbWWBQNZxeTnWfp5Lk0J0XjnxPs8LK6mT2fJHpQ0PidF2k2LPK4Fo2VDk9RyB
+	qvqkh9h1wczlEv/4zS77uGYMeB47X/R78NgRcKZt7Sms9N+bHJQwHQD8K1Djqhwp9IdC
+	3uMSSowzChuM6JNOn2/5oNY+5cspWZninJzR71N1eqacz/nrkzCo5E3viRfLTzJEGL4h
+	aXdrqINkBjKGEj04BbcHYdU3eiA+iYFjeaeTrHKLKmyixfZHtiTvncD7bB0nY5pz9P0S
+	DmUaXIS109aVCXyXjE4/m+lpZY6hPuZuxuW1H6o7+Rgm2eYNcI7gJFus6UM69ZIC2VjX
+	ioNg==
+X-Gm-Message-State: APjAAAVsmRFqF/Jcy1pbn+5WkjNFPE6DaE0/XB5IWYCbHOlpPbpgHBKS
+	CpHlkK653qCEL3yA7RnYjJluzQ==
+X-Google-Smtp-Source: APXvYqwO/QY1kHCI3URCGJOxJxkPGj/e19HoGEuKAZbJadezxZqf1G0tPinz6VVXBOpjS1t08+bk9A==
+X-Received: by 2002:a5d:4886:: with SMTP id g6mr3132151wrq.108.1559234049348; 
+	Thu, 30 May 2019 09:34:09 -0700 (PDT)
+Received: from [192.168.1.38] (228.red-83-52-173.dynamicip.rima-tde.net.
+	[83.52.173.228]) by smtp.gmail.com with ESMTPSA id
+	b10sm8476912wrh.59.2019.05.30.09.34.07
+	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+	Thu, 30 May 2019 09:34:07 -0700 (PDT)
+To: Li Qiang <liq3ea@gmail.com>
+References: <20190524063553.5339-1-philmd@redhat.com>
+	<20190524063553.5339-5-philmd@redhat.com>
+	<CAKXe6SJaLz5Hmyi-0ZhZvqcZ=HhP78ad_Z5RcBysp70dXxZ4=g@mail.gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+	url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <f1c033b6-780e-0849-41cf-e8c776bacefd@redhat.com>
+Date: Thu, 30 May 2019 18:34:06 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190530143916.20255-1-alex.bennee@linaro.org>
+In-Reply-To: <CAKXe6SJaLz5Hmyi-0ZhZvqcZ=HhP78ad_Z5RcBysp70dXxZ4=g@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:OXBBRV1jbcaTvxs09wiB5t6LAnDsLlH8toXVQZoCrdkjUnwj1mx
-	YWWwi1H4YcZA7COE8r8fB4AY+RJ8qtGBWcmj4FhJGbizGsZgGTzrJhSDICxXMB2PVLIhIsA
-	P1dmqumSbrnA+ta3IKyVPwn7Z0k6ZlYR7d0dz08k+wW+kG4XkY1feOa9c81RNhbJb6FLvGM
-	pu9D2lbCmXPpI1W2Q2fPQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:56/LrKOKgy4=:Ivz+5Func4aFpbRBIOHS7r
-	zSrZYkd5wM1zqdfVBg+76Mqu4DuneGZbDCtG8CbsSMrCAD7Y/jTE7wlE1XueATZE5mPnp0sqO
-	7QaDXRl9xKNpKQiRr8FLhzyw8eZCtF7XPG7n6NXHiC+IvDCGJb83FiMNMsgkQd6rfSsY5CBkx
-	TM2PiSxsrKggMWHUyMZeqrBvVhNiQQTLUYAk8VHXq9u48uzDJCR8Zr22KapjLJDJBzxpgBE3+
-	kOtmK828rJE5X2sKG1p39d4mXI6dg1HVJyFKhNkt9rCUU7GHSK8VvDwxyL8L5wj6XTneHZucp
-	KBfL/34j/kLEeJseYRoa7PFqcuwTEgq0taONjAhe/3twQYV7eNt4bAGCefWcwRa4jnMVa/AC6
-	9NtQs9l3If85QwEnM27Il6VCRXmn6gch6fR6+7uLMhHTZXsNgCvXSsG0apukplhl/cUhmX5zN
-	9A1RA3pwfyHSFuE/birfv9a400qiveNO4bbA9zmXmykZulmL5Qn1qBJq8g+toueAqYM7DgIp1
-	GcNA1utoCnHUMrN7R4ANTTDqz54R5YVCRcEEMO+HwOLmmbxnxMbIebir9TmQli3n6JaEbh3YL
-	zZ5hh6OQKeOnMfBa3SuuBuLnF5+hKqiMBJQg0XNQ/A0eJ2QptXdQUQj2otJepdzN6WcFsEtR3
-	4prTRVuxZ/JrHL9KxZU16u5i6JMOQWwpTOht4V0nySwZKzdIcwfxZwNoKq93XesY4StBDRrI/
-	W7LIUR4FY97JsKqkbwYO88isUhQJG2tfYzNN2/VA+fT36phWA+z7SEbcLgM=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.17.24
-Subject: Re: [Qemu-devel] [RFC PATCH] semihosting: split console_out intro
- string and char versions
+	[fuzzy]
+X-Received-From: 209.85.221.66
+Subject: Re: [Qemu-devel] [PATCH 04/20] hw/i386/pc: Add the E820Type enum
+ type
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -122,177 +88,133 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Riku Voipio <riku.voipio@iki.fi>,
-	qemu-arm@nongnu.org
+Cc: Yang Zhong <yang.zhong@intel.com>, Eduardo Habkost <ehabkost@redhat.com>,
+	Rob Bradford <robert.bradford@intel.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Marcelo Tosatti <mtosatti@redhat.com>,
+	Qemu Developers <qemu-devel@nongnu.org>,
+	Samuel Ortiz <sameo@linux.intel.com>, Paolo Bonzini <pbonzini@redhat.com>,
+	Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 30/05/2019 à 16:39, Alex Bennée a écrit :
-> This is ostensibly to avoid the weirdness of len looking like it might
-> come from a guest and sometimes being used. While we are at it fix up
-> the error checking for the arm-linux-user implementation of the API
-> which got flagged up by Coverity (CID 1401700).
+Hi Li,
+
+On 5/24/19 2:33 PM, Li Qiang wrote:
+> Philippe Mathieu-Daudé <philmd@redhat.com <mailto:philmd@redhat.com>> 于
+> 2019年5月24日周五 下午2:45写道：
 > 
-> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-> ---
->  hw/semihosting/console.c         | 34 +++++++++++++++++++++++---------
->  include/hw/semihosting/console.h | 25 +++++++++++++++++------
->  linux-user/arm/semihost.c        | 28 ++++++++++++++++++++++++--
->  target/arm/arm-semi.c            |  4 ++--
->  4 files changed, 72 insertions(+), 19 deletions(-)
+>     This ensure we won't use an incorrect value.
 > 
-> diff --git a/hw/semihosting/console.c b/hw/semihosting/console.c
-> index 466ea6dade7..4a5758972db 100644
-> --- a/hw/semihosting/console.c
-> +++ b/hw/semihosting/console.c
-> @@ -36,26 +36,24 @@ int qemu_semihosting_log_out(const char *s, int len)
->  /*
->   * A re-implementation of lock_user_string that we can use locally
->   * instead of relying on softmmu-semi. Hopefully we can deprecate that
-> - * in time. We either copy len bytes if specified or until we find a NULL.
-> + * in time. Copy string until we find a 0 or address error.
->   */
-> -static GString *copy_user_string(CPUArchState *env, target_ulong addr, int len)
-> +static GString *copy_user_string(CPUArchState *env, target_ulong addr)
->  {
->      CPUState *cpu = ENV_GET_CPU(env);
-> -    GString *s = g_string_sized_new(len ? len : 128);
-> +    GString *s = g_string_sized_new(128);
->      uint8_t c;
-> -    bool done;
->  
->      do {
->          if (cpu_memory_rw_debug(cpu, addr++, &c, 1, 0) == 0) {
->              s = g_string_append_c(s, c);
-> -            done = len ? s->len == len : c == 0;
->          } else {
->              qemu_log_mask(LOG_GUEST_ERROR,
->                            "%s: passed inaccessible address " TARGET_FMT_lx,
->                            __func__, addr);
-> -            done = true;
-> +            break;
->          }
-> -    } while (!done);
-> +    } while (c!=0);
->  
->      return s;
->  }
-> @@ -68,9 +66,9 @@ static void semihosting_cb(CPUState *cs, target_ulong ret, target_ulong err)
->      }
->  }
->  
-> -int qemu_semihosting_console_out(CPUArchState *env, target_ulong addr, int len)
-> +int qemu_semihosting_console_outs(CPUArchState *env, target_ulong addr)
->  {
-> -    GString *s = copy_user_string(env, addr, len);
-> +    GString *s = copy_user_string(env, addr);
->      int out = s->len;
->  
->      if (use_gdb_syscalls()) {
-> @@ -82,3 +80,21 @@ int qemu_semihosting_console_out(CPUArchState *env, target_ulong addr, int len)
->      g_string_free(s, true);
->      return out;
->  }
-> +
-> +void qemu_semihosting_console_outc(CPUArchState *env, target_ulong addr)
-> +{
-> +    CPUState *cpu = ENV_GET_CPU(env);
-> +    uint8_t c;
-> +
-> +    if (cpu_memory_rw_debug(cpu, addr, &c, 1, 0) == 0) {
-> +        if (use_gdb_syscalls()) {
-> +            gdb_do_syscall(semihosting_cb, "write,2,%x,%x", addr, 1);
-> +        } else {
-> +            qemu_semihosting_log_out((const char *) &c, 1);
-> +        }
-> +    } else {
-> +        qemu_log_mask(LOG_GUEST_ERROR,
-> +                      "%s: passed inaccessible address " TARGET_FMT_lx,
-> +                      __func__, addr);
-> +    }
-> +}
-> diff --git a/include/hw/semihosting/console.h b/include/hw/semihosting/console.h
-> index 30e66ae20aa..3a4fba75905 100644
-> --- a/include/hw/semihosting/console.h
-> +++ b/include/hw/semihosting/console.h
-> @@ -10,17 +10,30 @@
->  #define _SEMIHOST_CONSOLE_H_
->  
->  /**
-> - * qemu_semihosting_console_out:
-> + * qemu_semihosting_console_outs:
->   * @env: CPUArchState
-> - * @s: host address of guest string
-> - * @len: length of string or 0 (string is null terminated)
-> + * @s: host address of null terminated guest string
->   *
-> - * Send a guest string to the debug console. This may be the remote
-> - * gdb session if a softmmu guest is currently being debugged.
-> + * Send a null terminated guest string to the debug console. This may
-> + * be the remote gdb session if a softmmu guest is currently being
-> + * debugged.
->   *
->   * Returns: number of bytes written.
->   */
-> -int qemu_semihosting_console_out(CPUArchState *env, target_ulong s, int len);
-> +int qemu_semihosting_console_outs(CPUArchState *env, target_ulong s);
-> +
-> +/**
-> + * qemu_semihosting_console_outc:
-> + * @env: CPUArchState
-> + * @s: host address of null terminated guest string
-> + *
-> + * Send single character from guest memory to the debug console. This
-> + * may be the remote gdb session if a softmmu guest is currently being
-> + * debugged.
-> + *
-> + * Returns: nothing
-> + */
-> +void qemu_semihosting_console_outc(CPUArchState *env, target_ulong c);
->  
->  /**
->   * qemu_semihosting_log_out:
-> diff --git a/linux-user/arm/semihost.c b/linux-user/arm/semihost.c
-> index 9554102a855..b7cdc21f832 100644
-> --- a/linux-user/arm/semihost.c
-> +++ b/linux-user/arm/semihost.c
-> @@ -15,10 +15,34 @@
->  #include "hw/semihosting/console.h"
->  #include "qemu.h"
->  
-> -int qemu_semihosting_console_out(CPUArchState *env, target_ulong addr, int len)
-> +int qemu_semihosting_console_outs(CPUArchState *env, target_ulong addr)
->  {
-> +    int len;
->      void *s = lock_user_string(addr);
-> -    len = write(STDERR_FILENO, s, len ? len : strlen(s));
-> +    if (!s) {
-> +        qemu_log_mask(LOG_GUEST_ERROR,
-> +                      "%s: passed inaccessible address " TARGET_FMT_lx,
-> +                      __func__, addr);
-> +        return 0;
-> +    }
-> +
-> +    len = write(STDERR_FILENO, s, strlen(s));
+>     Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com
+>     <mailto:philmd@redhat.com>>
+>     ---
+>      hw/i386/pc.c         | 12 +++++++-----
+>      include/hw/i386/pc.h | 16 ++++++++++------
+>      2 files changed, 17 insertions(+), 11 deletions(-)
+> 
+>     diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+>     index 1245028dd6..ac8343c728 100644
+>     --- a/hw/i386/pc.c
+>     +++ b/hw/i386/pc.c
+>     @@ -868,9 +868,10 @@ static void handle_a20_line_change(void
+>     *opaque, int irq, int level)
+>          x86_cpu_set_a20(cpu, level);
+>      }
+> 
+>     -ssize_t e820_add_entry(uint64_t address, uint64_t length, uint32_t
+>     type)
+>     +ssize_t e820_add_entry(uint64_t address, uint64_t length, E820Type
+>     type)
+>      {
+>          unsigned int index = le32_to_cpu(e820_reserve.count);
+>     +    uint32_t utype = (uint32_t)type;
+> 
+> 
+> I don't have strong opinion for this, as I don't like add an explicit
+> conversion.
 
-You could avoid 2 calls to strlen() if you inline directly
-lock_user_string() content:
+Usually I try to not over-cast, but I guess remember I added that
+because some Clang build was failing, but I started a build on Travis-CI
+and all passed, so I might have been trying in a local build directory
+with stricter CPPFLAGS.
+I'll clean that out.
 
-    len = target_strlen(addr);
-    if (len < 0){
-       qemu_log_mask(LOG_GUEST_ERROR,
-                     "%s: passed inaccessible address " TARGET_FMT_lx,
-                     __func__, addr);
-       return 0;
-    }
-    s = lock_user(VERIFY_READ, addr, (long)(len + 1), 1);
-    len = write(STDERR_FILENO, s, len);
+Thanks for your review of this series!
 
->      unlock_user(s, addr, 0);
->      return len;
->  }
+Phil.
 
-Thanks,
-Laurent
+>          struct e820_entry *entry;
+> 
+>          if (type != E820_RAM) {
+>     @@ -882,7 +883,7 @@ ssize_t e820_add_entry(uint64_t address,
+>     uint64_t length, uint32_t type)
+> 
+>              entry->address = cpu_to_le64(address);
+>              entry->length = cpu_to_le64(length);
+>     -        entry->type = cpu_to_le32(type);
+>     +        entry->type = cpu_to_le32(utype);
+> 
+>              e820_reserve.count = cpu_to_le32(index);
+>          }
+>     @@ -891,7 +892,7 @@ ssize_t e820_add_entry(uint64_t address,
+>     uint64_t length, uint32_t type)
+>          e820_table = g_renew(struct e820_entry, e820_table,
+>     e820_entries + 1);
+>          e820_table[e820_entries].address = cpu_to_le64(address);
+>          e820_table[e820_entries].length = cpu_to_le64(length);
+>     -    e820_table[e820_entries].type = cpu_to_le32(type);
+>     +    e820_table[e820_entries].type = cpu_to_le32(utype);
+>          e820_entries++;
+> 
+>          return e820_entries;
+>     @@ -902,10 +903,11 @@ size_t e820_get_num_entries(void)
+>          return e820_entries;
+>      }
+> 
+>     -bool e820_get_entry(unsigned int idx, uint32_t type,
+>     +bool e820_get_entry(unsigned int idx, E820Type type,
+>                          uint64_t *address, uint64_t *length)
+>      {
+>     -    if (idx < e820_entries && e820_table[idx].type ==
+>     cpu_to_le32(type)) {
+>     +    uint32_t utype = (uint32_t)type;
+>     +    if (idx < e820_entries && e820_table[idx].type ==
+>     cpu_to_le32(utype)) {
+>              *address = le64_to_cpu(e820_table[idx].address);
+>              *length = le64_to_cpu(e820_table[idx].length);
+>              return true;
+>     diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+>     index 2bc48c03c6..10e77a40ce 100644
+>     --- a/include/hw/i386/pc.h
+>     +++ b/include/hw/i386/pc.h
+>     @@ -282,12 +282,16 @@ void pc_system_firmware_init(PCMachineState
+>     *pcms, MemoryRegion *rom_memory);
+>      void pc_madt_cpu_entry(AcpiDeviceIf *adev, int uid,
+>                             const CPUArchIdList *apic_ids, GArray *entry);
+> 
+>     -/* e820 types */
+>     -#define E820_RAM        1
+>     -#define E820_RESERVED   2
+>     -#define E820_ACPI       3
+>     -#define E820_NVS        4
+>     -#define E820_UNUSABLE   5
+>     +/**
+>     + * E820Type: Type of the e820 address range.
+>     + */
+>     +typedef enum {
+>     +    E820_RAM        = 1,
+>     +    E820_RESERVED   = 2,
+>     +    E820_ACPI       = 3,
+>     +    E820_NVS        = 4,
+>     +    E820_UNUSABLE   = 5
+>     +} E820Type;
+> 
+>      ssize_t e820_add_entry(uint64_t, uint64_t, uint32_t);
+>      size_t e820_get_num_entries(void);
+>     -- 
+>     2.20.1
+> 
+> 
 
