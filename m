@@ -6,38 +6,39 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84B23C28CC0
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 16:04:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 959D0C28CC0
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 16:13:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5379625D44
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 16:04:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5379625D44
+	by mail.kernel.org (Postfix) with ESMTPS id 5D96123A85
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 16:13:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5D96123A85
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:56135 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:56278 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hWNXo-0003OH-Bj
-	for qemu-devel@archiver.kernel.org; Thu, 30 May 2019 12:04:44 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:42519)
+	id 1hWNg3-0006m3-99
+	for qemu-devel@archiver.kernel.org; Thu, 30 May 2019 12:13:15 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:49627)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hWNTn-0000jY-Dr
-	for qemu-devel@nongnu.org; Thu, 30 May 2019 12:00:37 -0400
+	(envelope-from <laurent@vivier.eu>) id 1hWNfE-0006S6-Rj
+	for qemu-devel@nongnu.org; Thu, 30 May 2019 12:12:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hWNTl-0008Rx-40
-	for qemu-devel@nongnu.org; Thu, 30 May 2019 12:00:35 -0400
-Received: from mout.kundenserver.de ([212.227.126.135]:44413)
+	(envelope-from <laurent@vivier.eu>) id 1hWNfC-0005nc-Vo
+	for qemu-devel@nongnu.org; Thu, 30 May 2019 12:12:24 -0400
+Received: from mout.kundenserver.de ([212.227.17.24]:42317)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1hWNTk-0008FP-NB
-	for qemu-devel@nongnu.org; Thu, 30 May 2019 12:00:32 -0400
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1hWNfB-0005k9-7H
+	for qemu-devel@nongnu.org; Thu, 30 May 2019 12:12:22 -0400
 Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
-	(mreue010 [213.165.67.103]) with ESMTPSA (Nemesis) id
-	1My2pz-1gfcT635ah-00zWrN; Thu, 30 May 2019 18:00:03 +0200
+	(mreue106 [213.165.67.119]) with ESMTPSA (Nemesis) id
+	1M2fQ9-1haWOM0Gid-004Fch; Thu, 30 May 2019 18:12:09 +0200
+From: Laurent Vivier <laurent@vivier.eu>
 To: Giuseppe Musacchio <thatlemon@gmail.com>, qemu-devel@nongnu.org
 References: <9028dc83-82a2-fc51-b559-0020b2c0a892@gmail.com>
-From: Laurent Vivier <laurent@vivier.eu>
+	<64eb15b1-ed5c-d12e-5f56-8a2b40df8041@vivier.eu>
 Openpgp: preference=signencrypt
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
 	mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
@@ -81,33 +82,33 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
 	OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
 	JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
 	ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <64eb15b1-ed5c-d12e-5f56-8a2b40df8041@vivier.eu>
-Date: Thu, 30 May 2019 18:00:00 +0200
+Message-ID: <f1184a82-29e4-ba41-2f44-dd4b3e0f15a9@vivier.eu>
+Date: Thu, 30 May 2019 18:12:06 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <9028dc83-82a2-fc51-b559-0020b2c0a892@gmail.com>
+In-Reply-To: <64eb15b1-ed5c-d12e-5f56-8a2b40df8041@vivier.eu>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:+gck8kEmmqFroRru1vKIYyOoImJUwUzkuiACxH4S5oL/MzJBhvu
-	uu0MOlDBCv+HJSQM4rGTq/6UMGtHhZBxrwR0PYoAg1Vx/wWzO7jrXq69EKGEyWK+BDcOG/d
-	hbI/j+I5SuSc3THZ2XlzU25WaCDIPnwrkwLJUKnG5rBdSZFYR5AABYCdWta9iUGCmOCQPO9
-	bzXqA+2WGP3EpgxCWwMkQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:0fvyQrUGpW8=:Rm58y8oWU4CPQIRTVLEMO7
-	s6/Tq+LLxJA9OV0FWDeCu/UQlwRuxL4AbvB4YXKg7mo3nUh5/IHnOwF4LYChf6xAVBg9SSdkK
-	CwAFAx1993p+E8Yk0AWrwaYiG9quSgHu6BDMJ2dAYZCmQyk9K1t4/CqOYMrFwbCmc8PrXj6pj
-	DvwXtsRTCOcU5nsFmihZ/Zt3zCtzoHLSUdeoGSC7D3vza9CcNJ8FL8DliwJDNiS7QiFFY9b13
-	DxINylOncWh+GNPpHsBpFMS84dVv6lsIhntXIa0FonlgB+9wTcWcFN94P41M7mS+n8DAqnetX
-	2pTm8hwmMxK5XszahqsuGtragOtLZ64mmAsFSP304R36a3AEQMYVgyhIu1TBGD85Nj4prdInk
-	Lcec4HykbUBRtiCouaMkiiRn+/DyptUhnXHY5BNL+1QesVsoop1t2ehsI9z9sTXJeiNDgHVsX
-	ohm/1Xin+GEyv4qO0Oiw/TlwnpkG98lJwC68aN3PG0dByzTo7QZ+xbA4t+gPn3+LGDB3IVHze
-	dmCREY21nYhTuL46WQoH1q1qyhJFLTKmjVPZFA3fT4CDb+E8/fmaP1METo4WxrgxRgALDqQMB
-	z3a+WSpgRqDZc92flFXziQ0hZEfSZ7/ZkiTnzaunV/S0dCpzDYfKztY+eag+SL0+CSlXywCL1
-	LR+aQT4tyCbweWO7T4JWJafMqZHAYrtyumyn7BVkCBkZ0KAZyKpBV9/aiX7APYVUG3YiMQua5
-	KgFbTggYAjWUJyiY0qHLQRGrOpdFPmaPYpBcx5fdn1P02sum+OiNKEsbgYo=
+X-Provags-ID: V03:K1:lSP0ZcFn+veChgP7UAH+BCHhBZtHphc1jaXmmBerD2pLRd7aqbT
+	BJe1cEZFoeoA0tFho0ff4XHBYWQgxf7ajMyixXQQu/habzX5vH/wPwCSh9m+IwU+KgI7t6q
+	seqgSiCaiI7adw2P/kdccXUo9DBZkw29kpImCXJHDvRPhYn7OxF0V7E/YHlbhuENjfT1woc
+	6nzpHq8jqmsWxK2roW2ow==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:u1DEV0/yI2g=:nYgRJp5YU6sjjazbStDUkZ
+	kdQuhzsMIoFijdk6jpEt6dkZTmf6rkyoydj/KeK0Lc9TJqQOsp3ZYO6IWCLZFCzTvW6al0/sJ
+	BhsaJOkzXx5Dzn8lOPpNrK4sL4CKJi4RY4GpZNFqfz0MfBpv1X893/6nYx/YdB1joSxlVBVkV
+	dSuNEUbFpKa9yD1wAp/ZEk9yO1p6FjbZ0YOpPYBdecWqo2+VGAEd4rOT3xBnj3BMkw/WpovZv
+	9vaSGfBkXTFKqgnn3y5Rp/L0Isfgxk44Mb5oUD5JE7Dj0JVtnnPDn5HapbblNVJCzUqE4DriR
+	uutOHMwO0HkEezfL3YrJT555LlhjjSDz4/nLEYKQUI2cPlAPv+j6yzye4g5MZSoRdSziDfgD8
+	nFxmT+nQJeqiHQzcVbAm2HlKTt8SVzpolmZybmxH8KKbaT9f5fJ0P9Yd1EwgQPmlh+ywWgJXM
+	ceSz2h9iI22x3eS2juhVKSCwk3lti3Fb3QuWAoxHIRvkikmQkWLqzKU7tzKn2FP5Xea/aoAZh
+	1PZcs9f/auEuzBcfxhnPxVvYcxHjYnO16nICuIxubJRLeSPaoP5L8MClr7GIMBc2k95o7ShNo
+	uvNMKl7C2YmtbHJVfb3C4OLPj4VjKLGoYl2IkcH/1VozACVRjc81HTIOTqXmvbTWVJ1ZDEP51
+	CEBDQ1ZCk+vfr6yg3QT93GPxQqfkuZ7gzQXl+RzEX+xgS84J7TVdonxJKNimNw2bZ0bZ0bbfF
+	EYc4Ibm5l4qBn4iUleJd8k5MuEwyhDQXXtQQ+iW6QzN8n8LtbJDStHD+fVc=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.126.135
+X-Received-From: 212.227.17.24
 Subject: Re: [Qemu-devel] [PATCH] Avoid crash in epoll_ctl with EPOLL_CTL_DEL
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
@@ -125,30 +126,67 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 30/05/2019 à 17:25, Giuseppe Musacchio a écrit :
-> The `event` parameter is ignored by the kernel if `op` is EPOLL_CTL_DEL,
-> do the same and avoid returning EFAULT if garbage is passed instead of a
-> valid pointer.
+Le 30/05/2019 à 18:00, Laurent Vivier a écrit :
+> Le 30/05/2019 à 17:25, Giuseppe Musacchio a écrit :
+>> The `event` parameter is ignored by the kernel if `op` is EPOLL_CTL_DEL,
+>> do the same and avoid returning EFAULT if garbage is passed instead of a
+>> valid pointer.
+>>
+>> Signed-off-by: Giuseppe Musacchio <thatlemon@gmail.com>
+>> ---
+>>  linux-user/syscall.c | 2 +-
+>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+>> index 5e29e675e9..32d463d58d 100644
+>> --- a/linux-user/syscall.c
+>> +++ b/linux-user/syscall.c
+>> @@ -11329,7 +11329,7 @@ static abi_long do_syscall1(void *cpu_env, int
+>> num, abi_long arg1,
+>>      {
+>>          struct epoll_event ep;
+>>          struct epoll_event *epp = 0;
+>> -        if (arg4) {
+>> +        if (arg2 != EPOLL_CTL_DEL && arg4) {
+>>              struct target_epoll_event *target_ep;
+>>              if (!lock_user_struct(VERIFY_READ, target_ep, arg4, 1)) {
+>>                  return -TARGET_EFAULT;
 > 
-> Signed-off-by: Giuseppe Musacchio <thatlemon@gmail.com>
-> ---
->  linux-user/syscall.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> Reviewed-by: Laurent Vivier <laurent@vivier.eu>
 > 
-> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-> index 5e29e675e9..32d463d58d 100644
-> --- a/linux-user/syscall.c
-> +++ b/linux-user/syscall.c
-> @@ -11329,7 +11329,7 @@ static abi_long do_syscall1(void *cpu_env, int
-> num, abi_long arg1,
->      {
->          struct epoll_event ep;
->          struct epoll_event *epp = 0;
-> -        if (arg4) {
-> +        if (arg2 != EPOLL_CTL_DEL && arg4) {
->              struct target_epoll_event *target_ep;
->              if (!lock_user_struct(VERIFY_READ, target_ep, arg4, 1)) {
->                  return -TARGET_EFAULT;
 
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+in fact, the BUGS section of epoll_ctl(2) says:
+
+"In kernel versions before 2.6.9, the EPOLL_CTL_DEL operation required a
+ non-null pointer in event, even though this argument is ignored.  Since
+ Linux 2.6.9, event can be specified as NULL when  using  EPOLL_CTL_DEL.
+ Applications  that  need  to be portable to kernels before 2.6.9 should
+ specify a non-null pointer in event."
+
+So something like this would be more portable:
+
+@@ -11329,6 +11329,7 @@ static abi_long do_syscall1(void *cpu_env, int
+num, abi_long arg1,
+         struct epoll_event ep;
+         struct epoll_event *epp = 0;
+         if (arg4) {
++            if (arg2 != EPOLL_CTL_DEL) {
+                 struct target_epoll_event *target_ep;
+                 if (!lock_user_struct(VERIFY_READ, target_ep, arg4, 1)) {
+                     return -TARGET_EFAULT;
+@@ -11340,6 +11341,11 @@ static abi_long do_syscall1(void *cpu_env, int
+num, abi_long arg1,
+                  */
+                 ep.data.u64 = tswap64(target_ep->data.u64);
+                 unlock_user_struct(target_ep, arg4, 0);
++            }
++            /*
++             * before kernel 2.6.9, EPOLL_CTL_DEL operation required a
++             * non-null pointer, even though this argument is ignored.
++             * */
+             epp = &ep;
+         }
+
+Thanks,
+Laurent
 
