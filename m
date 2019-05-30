@@ -6,137 +6,111 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5767CC28CC0
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 16:29:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A1B0EC28CC0
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 16:31:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 18B4C25D91
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 16:29:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 18B4C25D91
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 66CA625DA0
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 16:31:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 66CA625DA0
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:56481 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:56527 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hWNvV-0002sN-Rt
-	for qemu-devel@archiver.kernel.org; Thu, 30 May 2019 12:29:13 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:56122)
+	id 1hWNxo-00042p-NJ
+	for qemu-devel@archiver.kernel.org; Thu, 30 May 2019 12:31:36 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:57143)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1hWNt8-0001f9-2I
-	for qemu-devel@nongnu.org; Thu, 30 May 2019 12:26:47 -0400
+	(envelope-from <laurent@vivier.eu>) id 1hWNwn-0003Og-2k
+	for qemu-devel@nongnu.org; Thu, 30 May 2019 12:30:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1hWNt7-0004qN-2Q
-	for qemu-devel@nongnu.org; Thu, 30 May 2019 12:26:46 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:28108)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jsnow@redhat.com>)
-	id 1hWNsz-0004lX-Nh; Thu, 30 May 2019 12:26:37 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
-	[10.5.11.23])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id A32673082A9C;
-	Thu, 30 May 2019 16:26:29 +0000 (UTC)
-Received: from [10.18.17.164] (dhcp-17-164.bos.redhat.com [10.18.17.164])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 9A9C734913;
-	Thu, 30 May 2019 16:26:26 +0000 (UTC)
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
-	qemu-devel@nongnu.org, qemu-block@nongnu.org
-References: <20190530143941.241963-1-vsementsov@virtuozzo.com>
-From: John Snow <jsnow@redhat.com>
+	(envelope-from <laurent@vivier.eu>) id 1hWNwl-0006nP-No
+	for qemu-devel@nongnu.org; Thu, 30 May 2019 12:30:33 -0400
+Received: from mout.kundenserver.de ([212.227.17.24]:51879)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>)
+	id 1hWNwl-0006n3-Ey; Thu, 30 May 2019 12:30:31 -0400
+Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
+	(mreue107 [213.165.67.119]) with ESMTPSA (Nemesis) id
+	1MA88C-1hQNfg1jxq-00BgWD; Thu, 30 May 2019 18:30:22 +0200
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+	qemu-devel@nongnu.org
+References: <20190530143916.20255-1-alex.bennee@linaro.org>
+From: Laurent Vivier <laurent@vivier.eu>
 Openpgp: preference=signencrypt
-Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
-	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
-Message-ID: <c7ef8501-0c9f-f21b-1b60-dcd7dba03557@redhat.com>
-Date: Thu, 30 May 2019 12:26:26 -0400
+Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
+	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
+Message-ID: <ced800af-8f00-cc27-358d-57cb0e715e45@vivier.eu>
+Date: Thu, 30 May 2019 18:30:21 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190530143941.241963-1-vsementsov@virtuozzo.com>
+In-Reply-To: <20190530143916.20255-1-alex.bennee@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.45]);
-	Thu, 30 May 2019 16:26:34 +0000 (UTC)
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:OXBBRV1jbcaTvxs09wiB5t6LAnDsLlH8toXVQZoCrdkjUnwj1mx
+	YWWwi1H4YcZA7COE8r8fB4AY+RJ8qtGBWcmj4FhJGbizGsZgGTzrJhSDICxXMB2PVLIhIsA
+	P1dmqumSbrnA+ta3IKyVPwn7Z0k6ZlYR7d0dz08k+wW+kG4XkY1feOa9c81RNhbJb6FLvGM
+	pu9D2lbCmXPpI1W2Q2fPQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:56/LrKOKgy4=:Ivz+5Func4aFpbRBIOHS7r
+	zSrZYkd5wM1zqdfVBg+76Mqu4DuneGZbDCtG8CbsSMrCAD7Y/jTE7wlE1XueATZE5mPnp0sqO
+	7QaDXRl9xKNpKQiRr8FLhzyw8eZCtF7XPG7n6NXHiC+IvDCGJb83FiMNMsgkQd6rfSsY5CBkx
+	TM2PiSxsrKggMWHUyMZeqrBvVhNiQQTLUYAk8VHXq9u48uzDJCR8Zr22KapjLJDJBzxpgBE3+
+	kOtmK828rJE5X2sKG1p39d4mXI6dg1HVJyFKhNkt9rCUU7GHSK8VvDwxyL8L5wj6XTneHZucp
+	KBfL/34j/kLEeJseYRoa7PFqcuwTEgq0taONjAhe/3twQYV7eNt4bAGCefWcwRa4jnMVa/AC6
+	9NtQs9l3If85QwEnM27Il6VCRXmn6gch6fR6+7uLMhHTZXsNgCvXSsG0apukplhl/cUhmX5zN
+	9A1RA3pwfyHSFuE/birfv9a400qiveNO4bbA9zmXmykZulmL5Qn1qBJq8g+toueAqYM7DgIp1
+	GcNA1utoCnHUMrN7R4ANTTDqz54R5YVCRcEEMO+HwOLmmbxnxMbIebir9TmQli3n6JaEbh3YL
+	zZ5hh6OQKeOnMfBa3SuuBuLnF5+hKqiMBJQg0XNQ/A0eJ2QptXdQUQj2otJepdzN6WcFsEtR3
+	4prTRVuxZ/JrHL9KxZU16u5i6JMOQWwpTOht4V0nySwZKzdIcwfxZwNoKq93XesY4StBDRrI/
+	W7LIUR4FY97JsKqkbwYO88isUhQJG2tfYzNN2/VA+fT36phWA+z7SEbcLgM=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH] qapi: add dirty-bitmaps to
- query-named-block-nodes result
+X-Received-From: 212.227.17.24
+Subject: Re: [Qemu-devel] [RFC PATCH] semihosting: split console_out intro
+ string and char versions
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -148,74 +122,177 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, nshirokovskiy@virtuozzo.com, den@openvz.org,
-	armbru@redhat.com, mreitz@redhat.com
+Cc: Peter Maydell <peter.maydell@linaro.org>, Riku Voipio <riku.voipio@iki.fi>,
+	qemu-arm@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-
-On 5/30/19 10:39 AM, Vladimir Sementsov-Ogievskiy wrote:
-> Let's add a possibility to query dirty-bitmaps not only on root nodes.
-> It is useful when dealing both with snapshots and incremental backups.
+Le 30/05/2019 à 16:39, Alex Bennée a écrit :
+> This is ostensibly to avoid the weirdness of len looking like it might
+> come from a guest and sometimes being used. While we are at it fix up
+> the error checking for the arm-linux-user implementation of the API
+> which got flagged up by Coverity (CID 1401700).
 > 
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 > ---
->  qapi/block-core.json | 5 ++++-
->  block/qapi.c         | 5 +++++
->  2 files changed, 9 insertions(+), 1 deletion(-)
+>  hw/semihosting/console.c         | 34 +++++++++++++++++++++++---------
+>  include/hw/semihosting/console.h | 25 +++++++++++++++++------
+>  linux-user/arm/semihost.c        | 28 ++++++++++++++++++++++++--
+>  target/arm/arm-semi.c            |  4 ++--
+>  4 files changed, 72 insertions(+), 19 deletions(-)
 > 
-> diff --git a/qapi/block-core.json b/qapi/block-core.json
-> index 1defcde048..64ae1ab812 100644
-> --- a/qapi/block-core.json
-> +++ b/qapi/block-core.json
-> @@ -360,6 +360,9 @@
->  # @write_threshold: configured write threshold for the device.
->  #                   0 if disabled. (Since 2.3)
->  #
-> +# @dirty-bitmaps: dirty bitmaps information (only present if node
-> +#                 has one or more dirty bitmaps) (Since 4.1)
-> +#
->  # Since: 0.14.0
->  #
->  ##
-> @@ -378,7 +381,7 @@
->              '*bps_wr_max_length': 'int', '*iops_max_length': 'int',
->              '*iops_rd_max_length': 'int', '*iops_wr_max_length': 'int',
->              '*iops_size': 'int', '*group': 'str', 'cache': 'BlockdevCacheInfo',
-> -            'write_threshold': 'int' } }
-> +            'write_threshold': 'int', '*dirty-bitmaps': ['BlockDirtyInfo'] } }
+> diff --git a/hw/semihosting/console.c b/hw/semihosting/console.c
+> index 466ea6dade7..4a5758972db 100644
+> --- a/hw/semihosting/console.c
+> +++ b/hw/semihosting/console.c
+> @@ -36,26 +36,24 @@ int qemu_semihosting_log_out(const char *s, int len)
+>  /*
+>   * A re-implementation of lock_user_string that we can use locally
+>   * instead of relying on softmmu-semi. Hopefully we can deprecate that
+> - * in time. We either copy len bytes if specified or until we find a NULL.
+> + * in time. Copy string until we find a 0 or address error.
+>   */
+> -static GString *copy_user_string(CPUArchState *env, target_ulong addr, int len)
+> +static GString *copy_user_string(CPUArchState *env, target_ulong addr)
+>  {
+>      CPUState *cpu = ENV_GET_CPU(env);
+> -    GString *s = g_string_sized_new(len ? len : 128);
+> +    GString *s = g_string_sized_new(128);
+>      uint8_t c;
+> -    bool done;
 >  
->  ##
->  # @BlockDeviceIoStatus:
-> diff --git a/block/qapi.c b/block/qapi.c
-> index 0c13c86f4e..7eefdecb29 100644
-> --- a/block/qapi.c
-> +++ b/block/qapi.c
-> @@ -78,6 +78,11 @@ BlockDeviceInfo *bdrv_block_device_info(BlockBackend *blk,
->          info->backing_file = g_strdup(bs->backing_file);
+>      do {
+>          if (cpu_memory_rw_debug(cpu, addr++, &c, 1, 0) == 0) {
+>              s = g_string_append_c(s, c);
+> -            done = len ? s->len == len : c == 0;
+>          } else {
+>              qemu_log_mask(LOG_GUEST_ERROR,
+>                            "%s: passed inaccessible address " TARGET_FMT_lx,
+>                            __func__, addr);
+> -            done = true;
+> +            break;
+>          }
+> -    } while (!done);
+> +    } while (c!=0);
+>  
+>      return s;
+>  }
+> @@ -68,9 +66,9 @@ static void semihosting_cb(CPUState *cs, target_ulong ret, target_ulong err)
 >      }
+>  }
 >  
-> +    if (!QLIST_EMPTY(&bs->dirty_bitmaps)) {
-> +        info->has_dirty_bitmaps = true;
-> +        info->dirty_bitmaps = bdrv_query_dirty_bitmaps(bs);
+> -int qemu_semihosting_console_out(CPUArchState *env, target_ulong addr, int len)
+> +int qemu_semihosting_console_outs(CPUArchState *env, target_ulong addr)
+>  {
+> -    GString *s = copy_user_string(env, addr, len);
+> +    GString *s = copy_user_string(env, addr);
+>      int out = s->len;
+>  
+>      if (use_gdb_syscalls()) {
+> @@ -82,3 +80,21 @@ int qemu_semihosting_console_out(CPUArchState *env, target_ulong addr, int len)
+>      g_string_free(s, true);
+>      return out;
+>  }
+> +
+> +void qemu_semihosting_console_outc(CPUArchState *env, target_ulong addr)
+> +{
+> +    CPUState *cpu = ENV_GET_CPU(env);
+> +    uint8_t c;
+> +
+> +    if (cpu_memory_rw_debug(cpu, addr, &c, 1, 0) == 0) {
+> +        if (use_gdb_syscalls()) {
+> +            gdb_do_syscall(semihosting_cb, "write,2,%x,%x", addr, 1);
+> +        } else {
+> +            qemu_semihosting_log_out((const char *) &c, 1);
+> +        }
+> +    } else {
+> +        qemu_log_mask(LOG_GUEST_ERROR,
+> +                      "%s: passed inaccessible address " TARGET_FMT_lx,
+> +                      __func__, addr);
+> +    }
+> +}
+> diff --git a/include/hw/semihosting/console.h b/include/hw/semihosting/console.h
+> index 30e66ae20aa..3a4fba75905 100644
+> --- a/include/hw/semihosting/console.h
+> +++ b/include/hw/semihosting/console.h
+> @@ -10,17 +10,30 @@
+>  #define _SEMIHOST_CONSOLE_H_
+>  
+>  /**
+> - * qemu_semihosting_console_out:
+> + * qemu_semihosting_console_outs:
+>   * @env: CPUArchState
+> - * @s: host address of guest string
+> - * @len: length of string or 0 (string is null terminated)
+> + * @s: host address of null terminated guest string
+>   *
+> - * Send a guest string to the debug console. This may be the remote
+> - * gdb session if a softmmu guest is currently being debugged.
+> + * Send a null terminated guest string to the debug console. This may
+> + * be the remote gdb session if a softmmu guest is currently being
+> + * debugged.
+>   *
+>   * Returns: number of bytes written.
+>   */
+> -int qemu_semihosting_console_out(CPUArchState *env, target_ulong s, int len);
+> +int qemu_semihosting_console_outs(CPUArchState *env, target_ulong s);
+> +
+> +/**
+> + * qemu_semihosting_console_outc:
+> + * @env: CPUArchState
+> + * @s: host address of null terminated guest string
+> + *
+> + * Send single character from guest memory to the debug console. This
+> + * may be the remote gdb session if a softmmu guest is currently being
+> + * debugged.
+> + *
+> + * Returns: nothing
+> + */
+> +void qemu_semihosting_console_outc(CPUArchState *env, target_ulong c);
+>  
+>  /**
+>   * qemu_semihosting_log_out:
+> diff --git a/linux-user/arm/semihost.c b/linux-user/arm/semihost.c
+> index 9554102a855..b7cdc21f832 100644
+> --- a/linux-user/arm/semihost.c
+> +++ b/linux-user/arm/semihost.c
+> @@ -15,10 +15,34 @@
+>  #include "hw/semihosting/console.h"
+>  #include "qemu.h"
+>  
+> -int qemu_semihosting_console_out(CPUArchState *env, target_ulong addr, int len)
+> +int qemu_semihosting_console_outs(CPUArchState *env, target_ulong addr)
+>  {
+> +    int len;
+>      void *s = lock_user_string(addr);
+> -    len = write(STDERR_FILENO, s, len ? len : strlen(s));
+> +    if (!s) {
+> +        qemu_log_mask(LOG_GUEST_ERROR,
+> +                      "%s: passed inaccessible address " TARGET_FMT_lx,
+> +                      __func__, addr);
+> +        return 0;
 > +    }
 > +
->      info->detect_zeroes = bs->detect_zeroes;
->  
->      if (blk && blk_get_public(blk)->throttle_group_member.throttle_state) {
-> 
+> +    len = write(STDERR_FILENO, s, strlen(s));
 
-So query-block uses bdrv_query_info, which calls bdrv_block_device_info,
-so we'll duplicate the bitmap output when doing the old-fashioned block
-query, but that's probably harmless overall.
+You could avoid 2 calls to strlen() if you inline directly
+lock_user_string() content:
 
-We can continue to support the output in both places, or we could opt to
-deprecate the older interface; I think this is one of the last chances
-we'd get to do so before libvirt and wider adoption.
+    len = target_strlen(addr);
+    if (len < 0){
+       qemu_log_mask(LOG_GUEST_ERROR,
+                     "%s: passed inaccessible address " TARGET_FMT_lx,
+                     __func__, addr);
+       return 0;
+    }
+    s = lock_user(VERIFY_READ, addr, (long)(len + 1), 1);
+    len = write(STDERR_FILENO, s, len);
 
-I think that's probably Eric's choice.
+>      unlock_user(s, addr, 0);
+>      return len;
+>  }
 
-Reviewed-by: John Snow <jsnow@redhat.com>
+Thanks,
+Laurent
 
