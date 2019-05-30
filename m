@@ -7,74 +7,74 @@ X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CB650C28CC0
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 10:33:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 58AB6C28CC0
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 10:35:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8659C25750
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 10:33:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1AB9125758
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 10:35:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="f0wR+s4P"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8659C25750
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="TNcxgGyp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1AB9125758
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:50859 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:50919 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hWIN6-00081m-Ne
-	for qemu-devel@archiver.kernel.org; Thu, 30 May 2019 06:33:20 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:54434)
+	id 1hWIOu-0000jC-9O
+	for qemu-devel@archiver.kernel.org; Thu, 30 May 2019 06:35:12 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:57158)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hWI6f-0002iD-7u
-	for qemu-devel@nongnu.org; Thu, 30 May 2019 06:16:22 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1hWIFH-0001Fy-EM
+	for qemu-devel@nongnu.org; Thu, 30 May 2019 06:25:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hWI6e-0006cZ-2r
-	for qemu-devel@nongnu.org; Thu, 30 May 2019 06:16:21 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:39187)
+	(envelope-from <alex.bennee@linaro.org>) id 1hWIFD-0000IU-MC
+	for qemu-devel@nongnu.org; Thu, 30 May 2019 06:25:15 -0400
+Received: from mail-wm1-x332.google.com ([2a00:1450:4864:20::332]:37404)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1hWI6d-0006bp-Qi
-	for qemu-devel@nongnu.org; Thu, 30 May 2019 06:16:20 -0400
-Received: by mail-wr1-x444.google.com with SMTP id x4so3823233wrt.6
-	for <qemu-devel@nongnu.org>; Thu, 30 May 2019 03:16:19 -0700 (PDT)
+	id 1hWIFD-000063-93
+	for qemu-devel@nongnu.org; Thu, 30 May 2019 06:25:11 -0400
+Received: by mail-wm1-x332.google.com with SMTP id 7so3479010wmo.2
+	for <qemu-devel@nongnu.org>; Thu, 30 May 2019 03:25:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
 	h=from:to:cc:subject:date:message-id:in-reply-to:references
 	:mime-version:content-transfer-encoding;
-	bh=y2B2y1XQyJxhlxlLqIvvLBXxQCmx4xrmH/BIjlRjWcs=;
-	b=f0wR+s4PFVjNDk4AMOB+0UFj5XJN5P3DQ+suNvlR1vlOZFnL/ZdlFwTdxwMLARF6Tr
-	gpbCJkbLz95o0AgRFTltIfiu1vdPzisBn+wo6PNUqvmmm2IDVlZ6u4plFy3sxSzDDcRz
-	Us7bfyFayZm58+kC7y40nKaa9aZ+wvtZe9cn53GsyUpLVMmcq0Dwa4kwI0SViCPy8fNy
-	PwDRUw/YygeIiMlUo4GX13xiafwhWPlS6LljgFWIZNgVGArq5naOngOSj/5qyyRabV2X
-	HGn3Y/+4XzA91bHjENRe9euUc9hHhVvM44ddQX9Jo8ZWJMkMkJz+CA+Q4UPo2cIB4vhm
-	mA7g==
+	bh=i/i2ywuXLTtPSClMKCvPqBuSnYnrMH6w3mkxq4w23A4=;
+	b=TNcxgGyp5olZtcGwMrsQZz9b1DiB1Qg6J72RCiIIFI8KfjP50Hm7kLdE+BNF43CVL0
+	yQUCUg8lALISTJOPr03WIWH5vSMeBu+HaD8kUyMIVZmggwzKa410X3+GhAmB6oMXHYXO
+	O96P7XMjKxxwoLlbnf1IsmDL48z/CUWzwDgAxcIIoEPTczWCgG+AiRRkrCgKF3fkfkbZ
+	78jcOLi7uYQpiy1FGjXsa7cstlFAJENKKlLm/gmJph3ivyfbJAwxbFIu5PAFz61PPSz5
+	kJl4kG5Wov8hbWd75Wj+7wpxaaxRC/GKreNAALgVB+0vaA5QKRi6Q/F36ubLqZkfgiCH
+	RIRQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
 	:references:mime-version:content-transfer-encoding;
-	bh=y2B2y1XQyJxhlxlLqIvvLBXxQCmx4xrmH/BIjlRjWcs=;
-	b=sVtUe1WaUcxvxrXyujWC57rj/tfdpyM2J4iR0EJUn8c3gM6WYs3YfJ7pfLfhg6AxXo
-	Gg2zU96/j2HBGTbeVdwmXmhz84PHXE8DizuvrjrtRFEmBor4L9JJ4LU5s6fNTYGvhW+a
-	uVjeDKNWGecYDsRiCvQk/xY1UQ7cWwnnE86aDxybE8wQgaCcsrdaffiyyNjybT40KBjW
-	LFNeTR2W5rL3qXVm+WLIXoZlDwtpFyfyI1PqCBRGSkcS73gKtfADMtAZLk6KuTgPNK+I
-	zH5NkGlXaV9SorGQU+l6xAopXAKD3rIzgg95dhvyoG1yADwX3Ofoqn2B6W6kCwr0QF5r
-	bIDw==
-X-Gm-Message-State: APjAAAXtMJRgb+A51GJUB6R7YLimQdUY3W1qej7nUN5ag+eDA3gXJcZ+
-	NYtll63b243Wf7+wlVn+4Cz7y49DxHA=
-X-Google-Smtp-Source: APXvYqz1kHYFpJlkWKPIPHy8MV5oBerdGUwyhZy8vFS5nefHZMDqwx7gUHGry4D8qbXDHwbJ7ioe/w==
-X-Received: by 2002:a5d:51cf:: with SMTP id n15mr958810wrv.216.1559211378693; 
-	Thu, 30 May 2019 03:16:18 -0700 (PDT)
+	bh=i/i2ywuXLTtPSClMKCvPqBuSnYnrMH6w3mkxq4w23A4=;
+	b=ByCCSwD04DhP9av0+TNW5TstqeZy1Vc0jtQvifZCPHvJ5vFL7JlH3aCsnYSLZKgoA+
+	74JNzuUAjTjgB/OL7/RyDwg4bbGAhqT+Ez6qb7dVUJfufGy8ugxk5mjbhz1DDYoZbqV0
+	1KhSGRdTlviCWCt+bc25v3e0rAsPgmv3/97N7B6k6dw04fkUT93QxoGt6Tg6h5mbHZxm
+	sU443O5NHWDApkrJ38sjMIj92zWdc6ojfuNHfzJlFYky3ejLVY3vdKttrEuXzSvpn5+K
+	0HLC3qDEBoTiy+32r1NifRBqBGOpe7Zy6Wirh+YJ9oZ7trvu8DvmJtZS0jdKukDTDwZ0
+	HTSw==
+X-Gm-Message-State: APjAAAW4D/nGPxfYMFAHxVNW1jFVvEBdInOePQJsoKBg9dpTn/gAyecu
+	f/p7WY3hTrzDiPmjnEgkrvECFQ==
+X-Google-Smtp-Source: APXvYqyc0UG19jjbB87M/dlL+IjWMEbEtaIEdM70TUl48hejadU+sWYm/OzDuMGpwwipkH7sHsOdmw==
+X-Received: by 2002:a1c:9a16:: with SMTP id c22mr1852538wme.39.1559211903728; 
+	Thu, 30 May 2019 03:25:03 -0700 (PDT)
 Received: from zen.linaroharston ([81.128.185.34])
-	by smtp.gmail.com with ESMTPSA id o4sm2355995wmo.20.2019.05.30.03.16.09
+	by smtp.gmail.com with ESMTPSA id n4sm2145728wrp.61.2019.05.30.03.25.00
 	(version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-	Thu, 30 May 2019 03:16:17 -0700 (PDT)
+	Thu, 30 May 2019 03:25:02 -0700 (PDT)
 Received: from zen.linaroharston. (localhost [127.0.0.1])
-	by zen.linaroharston (Postfix) with ESMTP id 20DA71FF9D;
+	by zen.linaroharston (Postfix) with ESMTP id DABD61FFAB;
 	Thu, 30 May 2019 11:16:05 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Thu, 30 May 2019 11:15:50 +0100
-Message-Id: <20190530101603.22254-14-alex.bennee@linaro.org>
+Date: Thu, 30 May 2019 11:15:59 +0100
+Message-Id: <20190530101603.22254-23-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190530101603.22254-1-alex.bennee@linaro.org>
 References: <20190530101603.22254-1-alex.bennee@linaro.org>
@@ -83,9 +83,9 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2a00:1450:4864:20::444
-Subject: [Qemu-devel] [PATCH v1 13/26] scripts: use git archive in
- archive-source
+X-Received-From: 2a00:1450:4864:20::332
+Subject: [Qemu-devel] [PATCH  v1 22/26] tests/vm: openbsd autoinstall,
+ using serial console
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -99,128 +99,223 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Fam Zheng <fam@euphon.net>,
 	=?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
-	Thomas Huth <thuth@redhat.com>,
 	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
-	Gerd Hoffmann <kraxel@redhat.com>
+	Gerd Hoffmann <kraxel@redhat.com>, Brad Smith <brad@comstyle.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 From: Gerd Hoffmann <kraxel@redhat.com>
 
-Use git archive to create tarballs of qemu and submodules instead of
-cloning the repository and the submodules.  This is a order of magnitude
-faster because it doesn't fetch the submodules from the internet each
-time the script runs.
+Instead of fetching the prebuilt image from patchew download the install
+iso and prepare the image locally.  Install to disk, using the serial
+console.  Create qemu user, configure ssh login.  Install packages
+needed for qemu builds.
 
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-Tested-by: Thomas Huth <thuth@redhat.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-Id: <20190520124716.30472-2-kraxel@redhat.com>
-[AJB: fixed up tabs]
+Message-Id: <20190520124716.30472-11-kraxel@redhat.com>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- scripts/archive-source.sh | 72 +++++++++++++++++----------------------
- 1 file changed, 31 insertions(+), 41 deletions(-)
+ tests/vm/openbsd | 158 +++++++++++++++++++++++++++++++++++++++++++----
+ 1 file changed, 145 insertions(+), 13 deletions(-)
 
-diff --git a/scripts/archive-source.sh b/scripts/archive-source.sh
-index 8b899482600..ca94e49978f 100755
---- a/scripts/archive-source.sh
-+++ b/scripts/archive-source.sh
-@@ -19,16 +19,25 @@ if test $# -lt 1; then
- fi
+diff --git a/tests/vm/openbsd b/tests/vm/openbsd
+index 2105c01a267..c5f0a152183 100755
+--- a/tests/vm/openbsd
++++ b/tests/vm/openbsd
+@@ -2,10 +2,11 @@
+ #
+ # OpenBSD VM image
+ #
+-# Copyright 2017 Red Hat Inc.
++# Copyright 2017-2019 Red Hat Inc.
+ #
+ # Authors:
+ #  Fam Zheng <famz@redhat.com>
++#  Gerd Hoffmann <kraxel@redhat.com>
+ #
+ # This code is licensed under the GPL version 2 or later.  See
+ # the COPYING file in the top-level directory.
+@@ -13,34 +14,165 @@
  
- tar_file=$(realpath "$1")
--list_file="${tar_file}.list"
--vroot_dir="${tar_file}.vroot"
-+sub_tdir=$(mktemp -d "${tar_file%.tar}.sub.XXXXXXXX")
-+sub_file="${sub_tdir}/submodule.tar"
+ import os
+ import sys
++import socket
+ import subprocess
+ import basevm
  
- # We want a predictable list of submodules for builds, that is
- # independent of what the developer currently has initialized
- # in their checkout, because the build environment is completely
- # different to the host OS.
- submodules="dtc slirp ui/keycodemapdb tests/fp/berkeley-softfloat-3 tests/fp/berkeley-testfloat-3"
-+sub_deinit=""
+ class OpenBSDVM(basevm.BaseVM):
+     name = "openbsd"
+     arch = "x86_64"
++
++    link = "https://cdn.openbsd.org/pub/OpenBSD/6.5/amd64/install65.iso"
++    csum = "38d1f8cadd502f1c27bf05c5abde6cc505dd28f3f34f8a941048ff9a54f9f608"
++    size = "20G"
++    pkgs = [
++        # tools
++        "git",
++        "pkgconf",
++        "bzip2", "xz",
++
++        # gnu tools
++        "bash",
++        "gmake",
++        "gsed",
++        "bison",
++
++        # libs: usb
++        "libusb1",
++
++        # libs: crypto
++        "gnutls",
++
++        # libs: images
++        "jpeg",
++        "png",
++
++	# libs: ui
++        "sdl2",
++        "gtk+3",
++        "libxkbcommon",
++    ]
++
+     BUILD_SCRIPT = """
+         set -e;
+-        rm -rf /var/tmp/qemu-test.*
+-        cd $(mktemp -d /var/tmp/qemu-test.XXXXXX);
++        rm -rf /home/qemu/qemu-test.*
++        cd $(mktemp -d /home/qemu/qemu-test.XXXXXX);
++        mkdir src build; cd src;
+         tar -xf /dev/rsd1c;
+-        ./configure --cc=x86_64-unknown-openbsd6.1-gcc-4.9.4 --python=python2.7 {configure_opts};
+-        gmake --output-sync -j{jobs} {verbose};
+-        # XXX: "gmake check" seems to always hang or fail
+-        #gmake --output-sync -j{jobs} check {verbose};
++        cd ../build
++        ../src/configure --cc=cc --python=python3 {configure_opts};
++        gmake --output-sync -j{jobs} {target} {verbose};
+     """
++    poweroff = "halt -p"
  
--trap "status=$?; rm -rf \"$list_file\" \"$vroot_dir\"; exit \$status" 0 1 2 3 15
-+function cleanup() {
-+    local status=$?
-+    rm -rf "$sub_tdir"
-+    if test "$sub_deinit" != ""; then
-+        git submodule deinit $sub_deinit
-+    fi
-+    exit $status
-+}
-+trap "cleanup" 0 1 2 3 15
+     def build_image(self, img):
+-        cimg = self._download_with_cache("http://download.patchew.org/openbsd-6.1-amd64.img.xz",
+-                sha256sum='8c6cedc483e602cfee5e04f0406c64eb99138495e8ca580bc0293bcf0640c1bf')
+-        img_tmp_xz = img + ".tmp.xz"
++        self.print_step("Downloading install iso")
++        cimg = self._download_with_cache(self.link, sha256sum=self.csum)
+         img_tmp = img + ".tmp"
+-        sys.stderr.write("Extracting the image...\n")
+-        subprocess.check_call(["cp", "-f", cimg, img_tmp_xz])
+-        subprocess.check_call(["xz", "-dvf", img_tmp_xz])
++        iso = img + ".install.iso"
++
++        self.print_step("Preparing iso and disk image")
++        subprocess.check_call(["cp", "-f", cimg, iso])
++        subprocess.check_call(["qemu-img", "create", "-f", "qcow2",
++                               img_tmp, self.size])
++
++        self.print_step("Booting installer")
++        self.boot(img_tmp, extra_args = [
++            "-machine", "graphics=off",
++            "-cdrom", iso
++        ])
++        self.console_init()
++        self.console_wait_send("boot>", "set tty com0\n")
++        self.console_wait_send("boot>", "\n")
++
++        # pre-install configuration
++        self.console_wait_send("(I)nstall",               "i\n")
++        self.console_wait_send("Terminal type",           "xterm\n")
++        self.console_wait_send("System hostname",         "openbsd\n")
++        self.console_wait_send("Which network interface", "vio0\n")
++        self.console_wait_send("IPv4 address",            "dhcp\n")
++        self.console_wait_send("IPv6 address",            "none\n")
++        self.console_wait_send("Which network interface", "done\n")
++        self.console_wait_send("DNS domain name",         "localnet\n")
++        self.console_wait("Password for root account")
++        self.console_send("%s\n" % self.ROOT_PASS)
++        self.console_wait("Password for root account")
++        self.console_send("%s\n" % self.ROOT_PASS)
++        self.console_wait_send("Start sshd(8)",           "yes\n")
++        self.console_wait_send("X Window System",         "\n")
++        self.console_wait_send("xenodm",                  "\n")
++        self.console_wait_send("console to com0",         "\n")
++        self.console_wait_send("Which speed",             "\n")
++
++        self.console_wait("Setup a user")
++        self.console_send("%s\n" % self.GUEST_USER)
++        self.console_wait("Full name")
++        self.console_send("%s\n" % self.GUEST_USER)
++        self.console_wait("Password")
++        self.console_send("%s\n" % self.GUEST_PASS)
++        self.console_wait("Password")
++        self.console_send("%s\n" % self.GUEST_PASS)
++
++        self.console_wait_send("Allow root ssh login",    "yes\n")
++        self.console_wait_send("timezone",                "UTC\n")
++        self.console_wait_send("root disk",               "\n")
++        self.console_wait_send("(W)hole disk",            "\n")
++        self.console_wait_send("(A)uto layout",           "\n")
++        self.console_wait_send("Location of sets",        "cd0\n")
++        self.console_wait_send("Pathname to the sets",    "\n")
++        self.console_wait_send("Set name(s)",             "\n")
++        self.console_wait_send("without verification",    "yes\n")
++
++        self.print_step("Installation started now, this will take a while")
++        self.console_wait_send("Location of sets",        "done\n")
++
++        self.console_wait("successfully completed")
++        self.print_step("Installation finished, rebooting")
++        self.console_wait_send("(R)eboot",                "reboot\n")
++
++        # setup qemu user
++        prompt = "$"
++        self.console_ssh_init(prompt, self.GUEST_USER, self.GUEST_PASS)
++        self.console_wait_send(prompt, "exit\n")
++
++        # setup root user
++        prompt = "openbsd#"
++        self.console_ssh_init(prompt, "root", self.ROOT_PASS)
++        self.console_sshd_config(prompt)
++
++        # setup virtio-blk #1 (tarfile)
++        self.console_wait(prompt)
++        self.console_send("echo 'chmod 666 /dev/rsd1c' >> /etc/rc.local\n")
++
++        # enable w+x for /home
++        self.console_wait(prompt)
++        self.console_send("sed -i -e '/home/s/rw,/rw,wxallowed,/' /etc/fstab\n")
++
++        # tweak datasize limit
++        self.console_wait(prompt)
++        self.console_send("sed -i -e 's/\\(datasize[^=]*\\)=[^:]*/\\1=infinity/' /etc/login.conf\n")
++
++        # use http (be proxy cache friendly)
++        self.console_wait(prompt)
++        self.console_send("sed -i -e 's/https/http/' /etc/installurl\n")
++
++        self.print_step("Configuration finished, rebooting")
++        self.console_wait_send(prompt, "reboot\n")
++        self.console_wait("login:")
++        self.wait_ssh()
++
++        self.print_step("Installing packages")
++        self.ssh_root_check("pkg_add %s\n" % " ".join(self.pkgs))
++
++        # shutdown
++        self.ssh_root(self.poweroff)
++        self.wait()
++
+         if os.path.exists(img):
+             os.remove(img)
+         os.rename(img_tmp, img)
++        os.remove(iso)
++        self.print_step("All done")
  
- if git diff-index --quiet HEAD -- &>/dev/null
- then
-@@ -36,45 +45,26 @@ then
- else
-     HEAD=$(git stash create)
- fi
--git clone --shared . "$vroot_dir"
--test $? -ne 0 && error "failed to clone into '$vroot_dir'"
--for sm in $submodules; do
--    if test -d "$sm/.git"
--    then
--       git clone --shared "$sm" "$vroot_dir/$sm"
--       test $? -ne 0 && error "failed to clone submodule $sm"
--    fi
--done
--
--cd "$vroot_dir"
--test $? -ne 0 && error "failed to change into '$vroot_dir'"
--
--git checkout $HEAD
--test $? -ne 0 && error "failed to checkout $HEAD revision"
- 
-+git archive --format tar $HEAD > "$tar_file"
-+test $? -ne 0 && error "failed to archive qemu"
- for sm in $submodules; do
--    git submodule update --init $sm
--    test $? -ne 0 && error "failed to init submodule $sm"
-+    status="$(git submodule status "$sm")"
-+    smhash="${status#[ +-]}"
-+    smhash="${smhash%% *}"
-+    case "$status" in
-+        -*)
-+            sub_deinit="$sub_deinit $sm"
-+            git submodule update --init "$sm"
-+            test $? -ne 0 && error "failed to update submodule $sm"
-+            ;;
-+        +*)
-+            echo "WARNING: submodule $sm is out of sync"
-+            ;;
-+    esac
-+    (cd $sm; git archive --format tar --prefix "$sm/" $smhash) > "$sub_file"
-+    test $? -ne 0 && error "failed to archive submodule $sm ($smhash)"
-+    tar --concatenate --file "$tar_file" "$sub_file"
-+    test $? -ne 0 && error "failed append submodule $sm to $tar_file"
- done
--
--if test -n "$submodules"; then
--    {
--        git ls-files || error "git ls-files failed"
--        for sm in $submodules; do
--            (cd $sm; git ls-files) | sed "s:^:$sm/:"
--            if test "${PIPESTATUS[*]}" != "0 0"; then
--                error "git ls-files in submodule $sm failed"
--            fi
--        done
--    } | grep -x -v $(for sm in $submodules; do echo "-e $sm"; done) > "$list_file"
--else
--    git ls-files > "$list_file"
--fi
--
--if test $? -ne 0; then
--    error "failed to generate list file"
--fi
--
--tar -cf "$tar_file" -T "$list_file" || error "failed to create tar file"
--
- exit 0
+ if __name__ == "__main__":
+     sys.exit(basevm.main(OpenBSDVM))
 -- 
 2.20.1
 
