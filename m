@@ -2,73 +2,91 @@ Return-Path: <SRS0=r6E1=T6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	T_HK_NAME_DR,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C4A0C28CC0
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 09:44:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6934FC28CC0
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 09:44:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DA4192567F
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 09:44:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DA4192567F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 34D2C2567F
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 09:44:54 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="tM3QDgYE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 34D2C2567F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:50123 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:50132 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hWHbw-0003dS-6v
-	for qemu-devel@archiver.kernel.org; Thu, 30 May 2019 05:44:36 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:45886)
+	id 1hWHcD-0003sD-Gs
+	for qemu-devel@archiver.kernel.org; Thu, 30 May 2019 05:44:53 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:48480)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1hWHSd-0004iv-In
-	for qemu-devel@nongnu.org; Thu, 30 May 2019 05:35:01 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1hWHb3-0003GE-R1
+	for qemu-devel@nongnu.org; Thu, 30 May 2019 05:43:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1hWHSb-0000lX-Hs
-	for qemu-devel@nongnu.org; Thu, 30 May 2019 05:34:59 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46374)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hWHSW-0000Ya-Kn
-	for qemu-devel@nongnu.org; Thu, 30 May 2019 05:34:52 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id CD4D5F9E97;
-	Thu, 30 May 2019 09:34:32 +0000 (UTC)
-Received: from work-vm (ovpn-117-91.ams2.redhat.com [10.36.117.91])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id A14455D704;
-	Thu, 30 May 2019 09:34:26 +0000 (UTC)
-Date: Thu, 30 May 2019 10:34:24 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Yongji Xie <elohimes@gmail.com>
-Message-ID: <20190530093423.GC2823@work-vm>
-References: <20190529111849.GD2882@work-vm>
-	<20190529135434.34c46b39@bahia.lab.toulouse-stg.fr.ibm.com>
-	<20190529123818.GG2882@work-vm>
-	<20190529150213.51143f1c@bahia.lab.toulouse-stg.fr.ibm.com>
-	<20190529134058.GI2882@work-vm>
-	<CAONzpcYRK5ydTLuNh4cz3753odky9imAHc8+Lxt3gFa5qdH4kg@mail.gmail.com>
-	<20190529144219.GJ2882@work-vm>
-	<CAONzpcZQZjT8+JZ7Mw2R1mUhieh2gyz+Aha9CCRHoQhB6KL88g@mail.gmail.com>
-	<20190530090559.GB2823@work-vm>
-	<CAONzpcbdh7XNigSQP6f5+E4gNDUxn4WGe5fVnE0fFaurW5XCSQ@mail.gmail.com>
+	(envelope-from <alex.bennee@linaro.org>) id 1hWHb2-0002QQ-Dd
+	for qemu-devel@nongnu.org; Thu, 30 May 2019 05:43:41 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:38393)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1hWHb2-0002Ot-7K
+	for qemu-devel@nongnu.org; Thu, 30 May 2019 05:43:40 -0400
+Received: by mail-wr1-x443.google.com with SMTP id d18so3742883wrs.5
+	for <qemu-devel@nongnu.org>; Thu, 30 May 2019 02:43:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=references:user-agent:from:to:cc:subject:in-reply-to:date
+	:message-id:mime-version:content-transfer-encoding;
+	bh=p6q3T5Fo6eW67L07uFEmWtEWZRxiJK3l5INPTyrpzec=;
+	b=tM3QDgYETXnF2a/KOocWGtjvkjquxki+ST24ty+Rt7/tYX8qwMH/HKCpK0xlPHMbeW
+	bUG5tq70bCJBlUr3WwHG6O0YNLX6Xp9NjMjUscNm1pVV1MNZqOS2BuHp9+wo9Y1aqEBx
+	yXfrXGtWiaaXyo3oATfc2VvCbmcgUmNupoEiWMI9Pz+5BD62YNUxtoqZrfh2whuyFcE9
+	m0lmIzhZAUYiZF2AXarv6/Rzw1Ubcn+OjKRZ3ZShgniX/KD0dI4wmte17oqdbds2FDNE
+	4C1H+JX3I88VetB1Avmx3MfI6yw9j/nw754U8Q0wAJ20dTneVs98ts/2+dnNliDRkL63
+	k+4g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:references:user-agent:from:to:cc:subject
+	:in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+	bh=p6q3T5Fo6eW67L07uFEmWtEWZRxiJK3l5INPTyrpzec=;
+	b=ShuN/dXlAUE0GTx/maszo91aGcHP2kKux6rDvhGWB1it7mNMMU5dza5ENjsD6/mvrP
+	eRV2PDloi8YlIDunOTHHAtwxD6trqPd4zQbYTYAxhK+gxvqw4ZoQ8pToilnriCUHfM3M
+	jfh5TrdT9Otgcnt9RgDjLNMDdqN31VRcFSDXT5jmlEhcAba+/CC+yDBuptFoORkdshtJ
+	52VWctD7ujR8TCRtWAQaohtQ2u0iTqLv7HPHRi7bofoq6oh57lfYACrJI4RvTi1XrBOX
+	kkvw92wv3Z4+sgdYe2G/upniT3ZJPWxbMMkZOkZ5KfoaFDEEJzvLD2hTuS8GPauJ8+M7
+	szCQ==
+X-Gm-Message-State: APjAAAVqRS5v59n4d/tKNwufTpFvJY84EDEx1YXCTMYXO9gyJOgiwgBG
+	rSmhILljP5EAHgN49YZJ+sEjwt8X88Q=
+X-Google-Smtp-Source: APXvYqy6+fmTfvAsZiz3WQAehaHLXyiZ0LoM2ozc8UqCmdiVgZ/G2vgxZE7ERo8xiEQAwc6SzDvWRQ==
+X-Received: by 2002:adf:ab45:: with SMTP id r5mr1942196wrc.100.1559209418077; 
+	Thu, 30 May 2019 02:43:38 -0700 (PDT)
+Received: from zen.linaroharston ([81.128.185.34])
+	by smtp.gmail.com with ESMTPSA id s8sm2192713wra.55.2019.05.30.02.43.37
+	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+	Thu, 30 May 2019 02:43:37 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+	by zen.linaroharston (Postfix) with ESMTP id BD7AE1FF87;
+	Thu, 30 May 2019 10:43:36 +0100 (BST)
+References: <20190520124716.30472-1-kraxel@redhat.com>
+	<155835775478.22.12860360999794172452@5d2e01a8a801>
+User-agent: mu4e 1.3.2; emacs 26.1
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+In-reply-to: <155835775478.22.12860360999794172452@5d2e01a8a801>
+Date: Thu, 30 May 2019 10:43:36 +0100
+Message-ID: <877ea85lbr.fsf@zen.linaroharston>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAONzpcbdh7XNigSQP6f5+E4gNDUxn4WGe5fVnE0fFaurW5XCSQ@mail.gmail.com>
-User-Agent: Mutt/1.11.4 (2019-03-13)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.38]);
-	Thu, 30 May 2019 09:34:41 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PULL v2 04/36] virtio: Introduce started flag to
- VirtioDevice
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2a00:1450:4864:20::443
+Subject: Re: [Qemu-devel] [PATCH v3 00/14] tests/vm: serial console
+ autoinstall, misc fixes.
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -80,245 +98,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Zhang Yu <zhangyu31@baidu.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	qemu-devel <qemu-devel@nongnu.org>, Greg Kurz <groug@kaod.org>,
-	Xie Yongji <xieyongji@baidu.com>,
-	David Gibson <david@gibson.dropbear.id.au>
+Cc: kraxel@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Yongji Xie (elohimes@gmail.com) wrote:
-> On Thu, 30 May 2019 at 17:06, Dr. David Alan Gilbert
-> <dgilbert@redhat.com> wrote:
-> >
-> > * Yongji Xie (elohimes@gmail.com) wrote:
-> > > On Wed, 29 May 2019 at 22:42, Dr. David Alan Gilbert
-> > > <dgilbert@redhat.com> wrote:
-> > > >
-> > > > * Yongji Xie (elohimes@gmail.com) wrote:
-> > > > > On Wed, 29 May 2019 at 21:43, Dr. David Alan Gilbert
-> > > > > <dgilbert@redhat.com> wrote:
-> > > > > >
-> > > > > > * Greg Kurz (groug@kaod.org) wrote:
-> > > > > > > On Wed, 29 May 2019 13:38:19 +0100
-> > > > > > > "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
-> > > > > > >
-> > > > > > > > * Greg Kurz (groug@kaod.org) wrote:
-> > > > > > > > > On Wed, 29 May 2019 12:18:50 +0100
-> > > > > > > > > "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
-> > > > > > > > >
-> > > > > > > > > > * Greg Kurz (groug@kaod.org) wrote:
-> > > > > > > > > > > On Tue, 28 May 2019 10:08:54 +1000
-> > > > > > > > > > > David Gibson <david@gibson.dropbear.id.au> wrote:
-> > > > > > > > > > >
-> > > > > > > > > > > > On Fri, May 24, 2019 at 12:19:09PM +0200, Greg Kurz wrote:
-> > > > > > > > > > > > > On Mon, 20 May 2019 19:10:35 -0400
-> > > > > > > > > > > > > "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> > > > > > > > > > > > >
-> > > > > > > > > > > > > > From: Xie Yongji <xieyongji@baidu.com>
-> > > > > > > > > > > > > >
-> > > > > > > > > > > > > > The virtio 1.0 transitional devices support driver uses the device
-> > > > > > > > > > > > > > before setting the DRIVER_OK status bit. So we introduce a started
-> > > > > > > > > > > > > > flag to indicate whether driver has started the device or not.
-> > > > > > > > > > > > > >
-> > > > > > > > > > > > > > Signed-off-by: Xie Yongji <xieyongji@baidu.com>
-> > > > > > > > > > > > > > Signed-off-by: Zhang Yu <zhangyu31@baidu.com>
-> > > > > > > > > > > > > > Message-Id: <20190320112646.3712-2-xieyongji@baidu.com>
-> > > > > > > > > > > > > > Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-> > > > > > > > > > > > > > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-> > > > > > > > > > > > > > ---
-> > > > > > > > > > > > > >  include/hw/virtio/virtio.h |  2 ++
-> > > > > > > > > > > > > >  hw/virtio/virtio.c         | 52 ++++++++++++++++++++++++++++++++++++--
-> > > > > > > > > > > > > >  2 files changed, 52 insertions(+), 2 deletions(-)
-> > > > > > > > > > > > > >
-> > > > > > > > > > > > > > diff --git a/include/hw/virtio/virtio.h b/include/hw/virtio/virtio.h
-> > > > > > > > > > > > > > index 7140381e3a..27c0efc3d0 100644
-> > > > > > > > > > > > > > --- a/include/hw/virtio/virtio.h
-> > > > > > > > > > > > > > +++ b/include/hw/virtio/virtio.h
-> > > > > > > > > > > > > > @@ -105,6 +105,8 @@ struct VirtIODevice
-> > > > > > > > > > > > > >      uint16_t device_id;
-> > > > > > > > > > > > > >      bool vm_running;
-> > > > > > > > > > > > > >      bool broken; /* device in invalid state, needs reset */
-> > > > > > > > > > > > > > +    bool started;
-> > > > > > > > > > > > > > +    bool start_on_kick; /* virtio 1.0 transitional devices support that */
-> > > > > > > > > > > > > >      VMChangeStateEntry *vmstate;
-> > > > > > > > > > > > > >      char *bus_name;
-> > > > > > > > > > > > > >      uint8_t device_endian;
-> > > > > > > > > > > > > > diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
-> > > > > > > > > > > > > > index 28056a7ef7..5d533ac74e 100644
-> > > > > > > > > > > > > > --- a/hw/virtio/virtio.c
-> > > > > > > > > > > > > > +++ b/hw/virtio/virtio.c
-> > > > > > > > > > > > > > @@ -1162,10 +1162,16 @@ int virtio_set_status(VirtIODevice *vdev, uint8_t val)
-> > > > > > > > > > > > > >              }
-> > > > > > > > > > > > > >          }
-> > > > > > > > > > > > > >      }
-> > > > > > > > > > > > > > +    vdev->started = val & VIRTIO_CONFIG_S_DRIVER_OK;
-> > > > > > > > > > > > > > +    if (unlikely(vdev->start_on_kick && vdev->started)) {
-> > > > > > > > > > > > > > +        vdev->start_on_kick = false;
-> > > > > > > > > > > > > > +    }
-> > > > > > > > > > > > > > +
-> > > > > > > > > > > > > >      if (k->set_status) {
-> > > > > > > > > > > > > >          k->set_status(vdev, val);
-> > > > > > > > > > > > > >      }
-> > > > > > > > > > > > > >      vdev->status = val;
-> > > > > > > > > > > > > > +
-> > > > > > > > > > > > > >      return 0;
-> > > > > > > > > > > > > >  }
-> > > > > > > > > > > > > >
-> > > > > > > > > > > > > > @@ -1208,6 +1214,9 @@ void virtio_reset(void *opaque)
-> > > > > > > > > > > > > >          k->reset(vdev);
-> > > > > > > > > > > > > >      }
-> > > > > > > > > > > > > >
-> > > > > > > > > > > > > > +    vdev->start_on_kick = (virtio_host_has_feature(vdev, VIRTIO_F_VERSION_1) &&
-> > > > > > > > > > > > > > +                          !virtio_vdev_has_feature(vdev, VIRTIO_F_VERSION_1));
-> > > > > > > > > > > > > > +    vdev->started = false;
-> > > > > > > > > > > > > >      vdev->broken = false;
-> > > > > > > > > > > > > >      vdev->guest_features = 0;
-> > > > > > > > > > > > > >      vdev->queue_sel = 0;
-> > > > > > > > > > > > > > @@ -1518,14 +1527,21 @@ void virtio_queue_set_align(VirtIODevice *vdev, int n, int align)
-> > > > > > > > > > > > > >
-> > > > > > > > > > > > > >  static bool virtio_queue_notify_aio_vq(VirtQueue *vq)
-> > > > > > > > > > > > > >  {
-> > > > > > > > > > > > > > +    bool ret = false;
-> > > > > > > > > > > > > > +
-> > > > > > > > > > > > > >      if (vq->vring.desc && vq->handle_aio_output) {
-> > > > > > > > > > > > > >          VirtIODevice *vdev = vq->vdev;
-> > > > > > > > > > > > > >
-> > > > > > > > > > > > > >          trace_virtio_queue_notify(vdev, vq - vdev->vq, vq);
-> > > > > > > > > > > > > > -        return vq->handle_aio_output(vdev, vq);
-> > > > > > > > > > > > > > +        ret = vq->handle_aio_output(vdev, vq);
-> > > > > > > > > > > > > > +
-> > > > > > > > > > > > > > +        if (unlikely(vdev->start_on_kick)) {
-> > > > > > > > > > > > > > +            vdev->started = true;
-> > > > > > > > > > > > > > +            vdev->start_on_kick = false;
-> > > > > > > > > > > > > > +        }
-> > > > > > > > > > > > > >      }
-> > > > > > > > > > > > > >
-> > > > > > > > > > > > > > -    return false;
-> > > > > > > > > > > > > > +    return ret;
-> > > > > > > > > > > > > >  }
-> > > > > > > > > > > > > >
-> > > > > > > > > > > > > >  static void virtio_queue_notify_vq(VirtQueue *vq)
-> > > > > > > > > > > > > > @@ -1539,6 +1555,11 @@ static void virtio_queue_notify_vq(VirtQueue *vq)
-> > > > > > > > > > > > > >
-> > > > > > > > > > > > > >          trace_virtio_queue_notify(vdev, vq - vdev->vq, vq);
-> > > > > > > > > > > > > >          vq->handle_output(vdev, vq);
-> > > > > > > > > > > > > > +
-> > > > > > > > > > > > > > +        if (unlikely(vdev->start_on_kick)) {
-> > > > > > > > > > > > > > +            vdev->started = true;
-> > > > > > > > > > > > > > +            vdev->start_on_kick = false;
-> > > > > > > > > > > > > > +        }
-> > > > > > > > > > > > > >      }
-> > > > > > > > > > > > > >  }
-> > > > > > > > > > > > > >
-> > > > > > > > > > > > > > @@ -1556,6 +1577,11 @@ void virtio_queue_notify(VirtIODevice *vdev, int n)
-> > > > > > > > > > > > > >      } else if (vq->handle_output) {
-> > > > > > > > > > > > > >          vq->handle_output(vdev, vq);
-> > > > > > > > > > > > > >      }
-> > > > > > > > > > > > > > +
-> > > > > > > > > > > > > > +    if (unlikely(vdev->start_on_kick)) {
-> > > > > > > > > > > > > > +        vdev->started = true;
-> > > > > > > > > > > > > > +        vdev->start_on_kick = false;
-> > > > > > > > > > > > > > +    }
-> > > > > > > > > > > > > >  }
-> > > > > > > > > > > > > >
-> > > > > > > > > > > > > >  uint16_t virtio_queue_vector(VirtIODevice *vdev, int n)
-> > > > > > > > > > > > > > @@ -1770,6 +1796,13 @@ static bool virtio_broken_needed(void *opaque)
-> > > > > > > > > > > > > >      return vdev->broken;
-> > > > > > > > > > > > > >  }
-> > > > > > > > > > > > > >
-> > > > > > > > > > > > > > +static bool virtio_started_needed(void *opaque)
-> > > > > > > > > > > > > > +{
-> > > > > > > > > > > > > > +    VirtIODevice *vdev = opaque;
-> > > > > > > > > > > > > > +
-> > > > > > > > > > > > > > +    return vdev->started;
-> > > > > > > > > > > > >
-> > > > > > > > > > > > > Existing machine types don't know about the "virtio/started" subsection. This
-> > > > > > > > > > > > > breaks migration to older QEMUs if the driver has started the device, ie. most
-> > > > > > > > > > > > > probably always when it comes to live migration.
-> > > > > > > > > > > > >
-> > > > > > > > > > > > > My understanding is that we do try to support backward migration though. It
-> > > > > > > > > > > > > is a regular practice in datacenters to migrate workloads without having to
-> > > > > > > > > > > > > take care of the QEMU version. FWIW I had to fix similar issues downstream
-> > > > > > > > > > > > > many times in the past because customers had filed bugs.
-> > > > > > > > > > > > >
-> > > > > > > > > > > > > Cc'ing David for his opinion.
-> > > > > > > > > > > >
-> > > > > > > > > > > > Uh.. did you mean to CC me, or Dave Gilbert?
-> > > > > > > > > > > >
-> > > > > > > > > > >
-> > > > > > > > > > > Oops... Dave Gilbert indeed, but you're thoughts on that matter are valuable
-> > > > > > > > > > > as well. I remember being involved in backward migration fixes for spapr
-> > > > > > > > > > > several times.
-> > > > > > > > > > >
-> > > > > > > > > > > > I mean, I think you're right that we should try to maintain backwards
-> > > > > > > > > > > > migration, but this isn't really my area of authority.
-> > > > > > > > > > > >
-> > > > > > > > > > >
-> > > > > > > > > > > Cc'ing Dave Gilbert :)
-> > > > > > > > > >
-> > > > > > > > > > Right, I need to maintain backwards migration compatibility; tie the
-> > > > > > > > > > feature to a machine type so it's only used on newer machine types and
-> > > > > > > > > > then we'll be safe.
-> > > > > > > > > >
-> > > > > > > > > > Having said that, what's the symptom when this goes wrong?
-> > > > > > > > > >
-> > > > > > > > >
-> > > > > > > > > Since the started flag is set as soon as the guest driver begins to use
-> > > > > > > > > the device and remains so until next reset, the associated subsection is
-> > > > > > > > > basically always emitted when migrating a booted guest. This causes
-> > > > > > > > > migration to always fail on the target in this case:
-> > > > > > > >
-> > > > > > > > I meant what's the symptom without this patch series at all?
-> > > > > > > >
-> > > > > > >
-> > > > > > > Oh sorry... if I got it right, migrating when the guest first kicked the
-> > > > > > > device but not set the DRIVE_OK bit yet would result in a guest hang on
-> > > > > > > the destination. Yongji might elaborate a bit more on that.
-> > > > > >
-> > > > > > Hmm - the only thing worse than a migration failing with an error is a
-> > > > > > migration that fails with a hung guest.
-> > > > > >
-> > > > > > If you were sending a new subsection in *only* the case where the guest
-> > > > > > would definitely hang, then I think it would be worth sending the
-> > > > > > subsection and allowing the backwards migration to fail with the error
-> > > > > > because it's a bit better than a hung VM.
-> > > > > >
-> > > > >
-> > > > > I considered this approach before. But it needs to add some complex
-> > > > > logic in virtio code to make sure migration works well between
-> > > > > different qemu versions. Since it's hardly to trigger the hung VM bug.
-> > > > > So I still try to use the general way (tie the feature to a machine
-> > > > > type) to fix this migration issue. It's easily to ensure the
-> > > > > compatibility
-> > > >
-> > > > OK, great.  For reference could you give me a bit more info on how
-> > > > exactly the failure happens, how you spot it and what the symptoms are;
-> > > > so that when someone comes to me with a hung VM I know what to look for?
-> > > >
-> > >
-> > > Oh, sure. This failure would only happen on an old guest (e.g. centos
-> > > 6u5, centos 6u3) with virtio-blk/vhost-user-blk device. This kind of
-> > > guest might be hung when migration completes at the point that guest
-> > > is booting (loading virtio-blk driver) because its first I/O would be
-> > > hung.
-> >
-> > OK, thanks.
-> > But a migration when the VM is running is fine? - it's only a problem
-> > if it happens during bootup, before the driver starts?
-> >
-> 
-> Yes. Running VM would be fine unless we reload the driver manually at
-> that point...
 
-OK, thanks.
+no-reply@patchew.org writes:
 
-Dave
+> Patchew URL: https://patchew.org/QEMU/20190520124716.30472-1-kraxel@redha=
+t.com/
+>
+>
+>
+> Hi,
+>
+> This series seems to have some coding style problems. See output below for
+> more information:
+>
+> Subject: [Qemu-devel] [PATCH v3 00/14] tests/vm: serial console autoinsta=
+ll, misc fixes.
+> Message-id: 20190520124716.30472-1-kraxel@redhat.com
+> Type: series
+>
+> =3D=3D=3D TEST SCRIPT BEGIN =3D=3D=3D
+> #!/bin/bash
+> git rev-parse base > /dev/null || exit 0
+> git config --local diff.renamelimit 0
+> git config --local diff.renames True
+> git config --local diff.algorithm histogram
+> ./scripts/checkpatch.pl --mailback base..
+> =3D=3D=3D TEST SCRIPT END =3D=3D=3D
+>
+> From https://github.com/patchew-project/qemu
+>    1b46b4daa6..6d8e75d41c  master     -> master
+> From https://github.com/patchew-project/qemu
+>  * [new tag]               patchew/20190520124716.30472-1-kraxel@redhat.c=
+om -> patchew/20190520124716.30472-1-kraxel@redhat.com
+> Switched to a new branch 'test'
+> 6f7f5d5a99 tests/vm: ubuntu.i386: apt proxy setup
+> ef70a753bb tests/vm: fedora autoinstall, using serial console
+> 0debc608fb tests/vm: netbsd autoinstall, using serial console
+> 5e005a2c07 tests/vm: freebsd autoinstall, using serial console
+> bff0400f4e tests/vm: openbsd autoinstall, using serial console
+> 59085882aa tests/vm: serial console support helpers
+> 27ef52c336 tests/vm: add DEBUG=3D1 to help text
+> 128b742fc5 tests/vm: add vm-boot-{ssh, serial}-<guest> targets
+> 2eb095b079 tests/vm: proper guest shutdown
+> 4f3a1fed99 tests/vm: run test builds on snapshot
+> d3850e7e8e tests/vm: use ssh with pty unconditionally
+> 9d18c76436 tests/vm: send proxy environment variables over ssh
+> 9bb50d9be2 tests/vm: python3 fixes
+> 76e6f4270e scripts: use git archive in archive-source
+>
+> =3D=3D=3D OUTPUT BEGIN =3D=3D=3D
+> 1/14 Checking commit 76e6f4270ef3 (scripts: use git archive in archive-so=
+urce)
+> ERROR: code indent should never use tabs
+> #41: FILE: scripts/archive-source.sh:36:
+> +^Igit submodule deinit $sub_deinit$
+>
+> ERROR: code indent should never use tabs
+> #68: FILE: scripts/archive-source.sh:56:
+> +^I-*)$
+>
+> ERROR: code indent should never use tabs
+> #69: FILE: scripts/archive-source.sh:57:
+> +^I    sub_deinit=3D"$sub_deinit $sm"$
+>
+> ERROR: code indent should never use tabs
+> #70: FILE: scripts/archive-source.sh:58:
+> +^I    git submodule update --init "$sm"$
+>
+> ERROR: code indent should never use tabs
+> #71: FILE: scripts/archive-source.sh:59:
+> +^I    test $? -ne 0 && error "failed to update submodule $sm"$
+>
+> ERROR: code indent should never use tabs
+> #72: FILE: scripts/archive-source.sh:60:
+> +^I    ;;$
+>
+> ERROR: code indent should never use tabs
+> #73: FILE: scripts/archive-source.sh:61:
+> +^I+*)$
+>
+> ERROR: code indent should never use tabs
+> #74: FILE: scripts/archive-source.sh:62:
+> +^I    echo "WARNING: submodule $sm is out of sync"$
+>
+> ERROR: code indent should never use tabs
+> #75: FILE: scripts/archive-source.sh:63:
+> +^I    ;;$
+>
+> total: 9 errors, 0 warnings, 93 lines checked
 
-> Thanks,
-> Yongji
+I'll fix these up but it might be worth seeing how that crept into your
+editor? I'll include an update to editorconfig while I'm at it.
+
 --
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Alex Benn=C3=A9e
 
