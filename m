@@ -2,63 +2,66 @@ Return-Path: <SRS0=r6E1=T6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	T_HK_NAME_DR,USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,T_HK_NAME_DR,USER_AGENT_MUTT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 44785C28CC0
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 17:58:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 23A27C28CC0
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 18:02:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0D9E425EE5
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 17:58:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0D9E425EE5
+	by mail.kernel.org (Postfix) with ESMTPS id E3F0B25EEA
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 18:01:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E3F0B25EEA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:57413 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:57461 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hWPJi-0007D8-BC
-	for qemu-devel@archiver.kernel.org; Thu, 30 May 2019 13:58:18 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:47087)
+	id 1hWPNG-0000Lz-Jy
+	for qemu-devel@archiver.kernel.org; Thu, 30 May 2019 14:01:58 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:47702)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1hWPIM-0006S6-Rk
-	for qemu-devel@nongnu.org; Thu, 30 May 2019 13:56:57 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1hWPM0-0007xA-5s
+	for qemu-devel@nongnu.org; Thu, 30 May 2019 14:00:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1hWPIL-00007K-66
-	for qemu-devel@nongnu.org; Thu, 30 May 2019 13:56:54 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57942)
+	(envelope-from <dgilbert@redhat.com>) id 1hWPLx-0002iK-Am
+	for qemu-devel@nongnu.org; Thu, 30 May 2019 14:00:40 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35162)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hWPIK-00006t-U2
-	for qemu-devel@nongnu.org; Thu, 30 May 2019 13:56:53 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
-	[10.5.11.22])
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hWPLv-0002gB-LV
+	for qemu-devel@nongnu.org; Thu, 30 May 2019 14:00:35 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+	[10.5.11.23])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 37D153091FA6
-	for <qemu-devel@nongnu.org>; Thu, 30 May 2019 17:56:52 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id BB426301988B
+	for <qemu-devel@nongnu.org>; Thu, 30 May 2019 18:00:33 +0000 (UTC)
 Received: from work-vm (ovpn-117-91.ams2.redhat.com [10.36.117.91])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id D80901010F63;
-	Thu, 30 May 2019 17:56:48 +0000 (UTC)
-Date: Thu, 30 May 2019 18:56:46 +0100
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id B1C5719736;
+	Thu, 30 May 2019 18:00:25 +0000 (UTC)
+Date: Thu, 30 May 2019 19:00:23 +0100
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Peter Xu <peterx@redhat.com>
-Message-ID: <20190530175645.GI2823@work-vm>
-References: <20190530092919.26059-1-peterx@redhat.com>
-	<20190530092919.26059-12-peterx@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20190530180022.GB2864@work-vm>
+References: <20190517125820.2885-1-jfreimann@redhat.com>
+	<20190517125820.2885-4-jfreimann@redhat.com>
+	<20190521094504.GB2915@work-vm>
+	<20190530145645.tjwkgi4hae5yblsi@jenstp.localdomain>
+	<20190530134631-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190530092919.26059-12-peterx@redhat.com>
+In-Reply-To: <20190530134631-mutt-send-email-mst@kernel.org>
 User-Agent: Mutt/1.11.4 (2019-03-13)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.42]);
-	Thu, 30 May 2019 17:56:52 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.47]);
+	Thu, 30 May 2019 18:00:33 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v3 11/12] kvm: Support KVM_CLEAR_DIRTY_LOG
+Subject: Re: [Qemu-devel] [PATCH 3/4] net/virtio: add failover support
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -70,264 +73,132 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
-	qemu-devel@nongnu.org, Juan Quintela <quintela@redhat.com>
+Cc: pkrempa@redhat.com, berrange@redhat.com, ehabkost@redhat.com,
+	aadam@redhat.com, qemu-devel@nongnu.org, laine@redhat.com,
+	Jens Freimann <jfreimann@redhat.com>, ailan@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Peter Xu (peterx@redhat.com) wrote:
-> Firstly detect the interface using KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2
-> and mark it.  When failed to enable the new feature we'll fall back to
-> the old sync.
+* Michael S. Tsirkin (mst@redhat.com) wrote:
+> On Thu, May 30, 2019 at 04:56:45PM +0200, Jens Freimann wrote:
+> > Hi David,
+> > 
+> > sorry for the  delayed reply.
+> > 
+> > On Tue, May 28, 2019 at 11:04:15AM -0400, Michael S. Tsirkin wrote:
+> > > On Tue, May 21, 2019 at 10:45:05AM +0100, Dr. David Alan Gilbert wrote:
+> > > > * Jens Freimann (jfreimann@redhat.com) wrote:
+> > > > > +static void virtio_net_primary_plug_timer(void *opaque);
+> > > > > +
+> > > > >  static void virtio_net_set_link_status(NetClientState *nc)
+> > > > >  {
+> > > > >      VirtIONet *n = qemu_get_nic_opaque(nc);
+> > > > > @@ -786,6 +796,14 @@ static void virtio_net_set_features(VirtIODevice *vdev, uint64_t features)
+> > > > >      } else {
+> > > > >          memset(n->vlans, 0xff, MAX_VLAN >> 3);
+> > > > >      }
+> > > > > +
+> > > > > +    if (virtio_has_feature(features, VIRTIO_NET_F_STANDBY)) {
+> > > > > +        atomic_set(&n->primary_should_be_hidden, false);
+> > > > > +        if (n->primary_device_timer)
+> > > > > +            timer_mod(n->primary_device_timer,
+> > > > > +                qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL) +
+> > > > > +                4000);
+> > > > > +    }
+> > > > 
+> > > > What's this magic timer constant and why?
+> > 
+> > To be honest it's a leftover from previous versions (before I took
+> > over) of the patches and I'm not sure why the timer is there.
+> > I removed it and so far see no reason to keep it.
+> > 
+> > > > 
+> > > > >  }
+> > > > >
+> > > > >  static int virtio_net_handle_rx_mode(VirtIONet *n, uint8_t cmd,
+> > > > > @@ -2626,6 +2644,87 @@ void virtio_net_set_netclient_name(VirtIONet *n, const char *name,
+> > > > >      n->netclient_type = g_strdup(type);
+> > > > >  }
+> > > > >
+> > > > > +static void virtio_net_primary_plug_timer(void *opaque)
+> > > > > +{
+> > > > > +    VirtIONet *n = opaque;
+> > > > > +    Error *err = NULL;
+> > > > > +
+> > > > > +    if (n->primary_device_dict)
+> > > > > +        n->primary_device_opts = qemu_opts_from_qdict(qemu_find_opts("device"),
+> > > > > +            n->primary_device_dict, &err);
+> > > > > +    if (n->primary_device_opts) {
+> > > > > +        n->primary_dev = qdev_device_add(n->primary_device_opts, &err);
+> > > > > +        error_setg(&err, "virtio_net: couldn't plug in primary device");
+> > > > > +        return;
+> > > > > +    }
+> > > > > +    if (!n->primary_device_dict && err) {
+> > > > > +        if (n->primary_device_timer) {
+> > > > > +            timer_mod(n->primary_device_timer,
+> > > > > +                qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL) +
+> > > > > +                100);
+> > > > 
+> > > > same here.
+> > 
+> > see above
+> > 
+> > > > 
+> > > > 
+> > > > > +        }
+> > > > > +    }
+> > > > > +}
+> > > > > +
+> > > > > +static void virtio_net_handle_migration_primary(VirtIONet *n,
+> > > > > +                                                MigrationState *s)
+> > > > > +{
+> > > > > +    Error *err = NULL;
+> > > > > +    bool should_be_hidden = atomic_read(&n->primary_should_be_hidden);
+> > > > > +
+> > > > > +    n->primary_dev = qdev_find_recursive(sysbus_get_default(),
+> > > > > +            n->primary_device_id);
+> > > > > +    if (!n->primary_dev) {
+> > > > > +        error_setg(&err, "virtio_net: couldn't find primary device");
+> > > > 
+> > > > There's something broken with the error handling in this function - the
+> > > > 'err' never goes anywhere - I don't think it ever gets printed or
+> > > > reported or stops the migration.
+> > 
+> > yes, I'll fix it.
+> > 
+> > > > > +    }
+> > > > > +    if (migration_in_setup(s) && !should_be_hidden && n->primary_dev) {
+> > > > > +        qdev_unplug(n->primary_dev, &err);
+> > > > 
+> > > > Not knowing unplug well; can you just explain - is that device hard
+> > > > unplugged and it's gone by the time this function returns or is it still
+> > > > hanging around for some indeterminate time?
+> > 
+> > Qemu will trigger an unplug request via pcie attention button in which case
+> > there could be a delay by the guest operating system. We could give it some
+> > amount of time and if nothing happens try surpise removal or handle the
+> > error otherwise.
+> > 
+> > 
+> > regards,
+> > Jens
 > 
-> Provide the log_clear() hook for the memory listeners for both address
-> spaces of KVM (normal system memory, and SMM) and deliever the clear
-> message to kernel.
-> 
-> Signed-off-by: Peter Xu <peterx@redhat.com>
-> ---
->  accel/kvm/kvm-all.c    | 180 +++++++++++++++++++++++++++++++++++++++++
->  accel/kvm/trace-events |   1 +
->  2 files changed, 181 insertions(+)
-> 
-> diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-> index e687060296..23895a95a2 100644
-> --- a/accel/kvm/kvm-all.c
-> +++ b/accel/kvm/kvm-all.c
-> @@ -91,6 +91,7 @@ struct KVMState
->      int many_ioeventfds;
->      int intx_set_mask;
->      bool sync_mmu;
-> +    bool manual_dirty_log_protect;
->      /* The man page (and posix) say ioctl numbers are signed int, but
->       * they're not.  Linux, glibc and *BSD all treat ioctl numbers as
->       * unsigned, and treating them as signed here can break things */
-> @@ -536,6 +537,157 @@ out:
->      return ret;
->  }
->  
-> +/* Alignment requirement for KVM_CLEAR_DIRTY_LOG - 64 pages */
-> +#define KVM_CLEAR_LOG_SHIFT  6
-> +#define KVM_CLEAR_LOG_ALIGN  (qemu_real_host_page_size << KVM_CLEAR_LOG_SHIFT)
-> +#define KVM_CLEAR_LOG_MASK   (-KVM_CLEAR_LOG_ALIGN)
-> +
-> +/**
-> + * kvm_physical_log_clear - Clear the kernel's dirty bitmap for range
-> + *
-> + * NOTE: this will be a no-op if we haven't enabled manual dirty log
-> + * protection in the host kernel because in that case this operation
-> + * will be done within log_sync().
-> + *
-> + * @kml:     the kvm memory listener
-> + * @section: the memory range to clear dirty bitmap
-> + */
-> +static int kvm_physical_log_clear(KVMMemoryListener *kml,
-> +                                  MemoryRegionSection *section)
-> +{
-> +    KVMState *s = kvm_state;
-> +    struct kvm_clear_dirty_log d;
-> +    uint64_t start, end, bmap_start, start_delta, bmap_npages, size;
-> +    unsigned long *bmap_clear = NULL, psize = qemu_real_host_page_size;
-> +    KVMSlot *mem = NULL;
-> +    int ret, i;
-> +
-> +    if (!s->manual_dirty_log_protect) {
-> +        /* No need to do explicit clear */
-> +        return 0;
-> +    }
-> +
-> +    start = section->offset_within_address_space;
-> +    size = int128_get64(section->size);
-> +
-> +    if (!size) {
-> +        /* Nothing more we can do... */
-> +        return 0;
-> +    }
-> +
-> +    kvm_slots_lock(kml);
-> +
-> +    /* Find any possible slot that covers the section */
-> +    for (i = 0; i < s->nr_slots; i++) {
-> +        mem = &kml->slots[i];
-> +        if (mem->start_addr <= start &&
-> +            start + size <= mem->start_addr + mem->memory_size) {
-> +            break;
-> +        }
-> +    }
-> +
-> +    /*
-> +     * We should always find one memslot until this point, otherwise
-> +     * there could be something wrong from the upper layer
-> +     */
-> +    assert(mem && i != s->nr_slots);
-> +
-> +    /*
-> +     * We need to extend either the start or the size or both to
-> +     * satisfy the KVM interface requirement.  Firstly, do the start
-> +     * page alignment on 64 host pages
-> +     */
-> +    bmap_start = (start - mem->start_addr) & KVM_CLEAR_LOG_MASK;
-> +    start_delta = start - mem->start_addr - bmap_start;
-> +    bmap_start /= psize;
-> +
-> +    /*
-> +     * The kernel interface has restriction on the size too, that either:
-> +     *
-> +     * (1) the size is 64 host pages aligned (just like the start), or
-> +     * (2) the size fills up until the end of the KVM memslot.
-> +     */
-> +    bmap_npages = DIV_ROUND_UP(size + start_delta, KVM_CLEAR_LOG_ALIGN)
-> +        << KVM_CLEAR_LOG_SHIFT;
-> +    end = mem->memory_size / psize;
-> +    if (bmap_npages > end - bmap_start) {
-> +        bmap_npages = end - bmap_start;
-> +    }
-> +    start_delta /= psize;
-> +
-> +    /*
-> +     * Prepare the bitmap to clear dirty bits.  Here we must guarantee
-> +     * that we won't clear any unknown dirty bits otherwise we might
-> +     * accidentally clear some set bits which are not yet synced from
-> +     * the kernel into QEMU's bitmap, then we'll lose track of the
-> +     * guest modifications upon those pages (which can directly lead
-> +     * to guest data loss or panic after migration).
-> +     *
-> +     * Layout of the KVMSlot.dirty_bmap:
-> +     *
-> +     *                   |<-------- bmap_npages -----------..>|
-> +     *                                                     [1]
-> +     *                     start_delta         size
-> +     *  |----------------|-------------|------------------|------------|
-> +     *  ^                ^             ^                               ^
-> +     *  |                |             |                               |
-> +     * start          bmap_start     (start)                         end
-> +     * of memslot                                             of memslot
-> +     *
-> +     * [1] bmap_npages can be aligned to either 64 pages or the end of slot
-> +     */
-> +
-> +    assert(bmap_start % BITS_PER_LONG == 0);
-> +    if (start_delta) {
-> +        /* Slow path - we need to manipulate a temp bitmap */
-> +        bmap_clear = bitmap_new(bmap_npages);
-> +        bitmap_copy_with_src_offset(bmap_clear, mem->dirty_bmap,
-> +                                    bmap_start, start_delta + size / psize);
-> +        /*
-> +         * We need to fill the holes at start because that was not
-> +         * specified by the caller and we extended the bitmap only for
-> +         * 64 pages alignment
-> +         */
-> +        bitmap_clear(bmap_clear, 0, start_delta);
-> +        d.dirty_bitmap = bmap_clear;
+> That's a subject for another day. Let's get the basic thing
+> working.
 
-This is painful, but I guess it's the only way.
+Well no, we need to know this thing isn't going to hang in the migration
+setup phase, or if it does how we recover.  This patch series is very
+odd precisely because it's trying to do the unplug itself in the
+migration phase rather than let the management layer do it - so unless
+it's nailed down how to make sure that's really really bullet proof
+then we've got to go back and ask the question about whether we should
+really fix it so it can be done by the management layer.
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Dave
 
-> +    } else {
-> +        /* Fast path - start address aligns well with BITS_PER_LONG */
-> +        d.dirty_bitmap = mem->dirty_bmap + BIT_WORD(bmap_start);
-> +    }
-> +
-> +    d.first_page = bmap_start;
-> +    /* It should never overflow.  If it happens, say something */
-> +    assert(bmap_npages <= UINT32_MAX);
-> +    d.num_pages = bmap_npages;
-> +    d.slot = mem->slot | (kml->as_id << 16);
-> +
-> +    if (kvm_vm_ioctl(s, KVM_CLEAR_DIRTY_LOG, &d) == -1) {
-> +        ret = -errno;
-> +        error_report("%s: KVM_CLEAR_DIRTY_LOG failed, slot=%d, "
-> +                     "start=0x%"PRIx64", size=0x%"PRIx32", errno=%d",
-> +                     __func__, d.slot, (uint64_t)d.first_page,
-> +                     (uint32_t)d.num_pages, ret);
-> +    } else {
-> +        ret = 0;
-> +        trace_kvm_clear_dirty_log(d.slot, d.first_page, d.num_pages);
-> +    }
-> +
-> +    /*
-> +     * After we have updated the remote dirty bitmap, we update the
-> +     * cached bitmap as well for the memslot, then if another user
-> +     * clears the same region we know we shouldn't clear it again on
-> +     * the remote otherwise it's data loss as well.
-> +     */
-> +    bitmap_clear(mem->dirty_bmap, bmap_start + start_delta,
-> +                 size / psize);
-> +    /* This handles the NULL case well */
-> +    g_free(bmap_clear);
-> +
-> +    kvm_slots_unlock(kml);
-> +
-> +    return ret;
-> +}
-> +
->  static void kvm_coalesce_mmio_region(MemoryListener *listener,
->                                       MemoryRegionSection *secion,
->                                       hwaddr start, hwaddr size)
-> @@ -888,6 +1040,22 @@ static void kvm_log_sync(MemoryListener *listener,
->      }
->  }
->  
-> +static void kvm_log_clear(MemoryListener *listener,
-> +                          MemoryRegionSection *section)
-> +{
-> +    KVMMemoryListener *kml = container_of(listener, KVMMemoryListener, listener);
-> +    int r;
-> +
-> +    r = kvm_physical_log_clear(kml, section);
-> +    if (r < 0) {
-> +        error_report_once("%s: kvm log clear failed: mr=%s "
-> +                          "offset=%"HWADDR_PRIx" size=%"PRIx64, __func__,
-> +                          section->mr->name, section->offset_within_region,
-> +                          int128_get64(section->size));
-> +        abort();
-> +    }
-> +}
-> +
->  static void kvm_mem_ioeventfd_add(MemoryListener *listener,
->                                    MemoryRegionSection *section,
->                                    bool match_data, uint64_t data,
-> @@ -975,6 +1143,7 @@ void kvm_memory_listener_register(KVMState *s, KVMMemoryListener *kml,
->      kml->listener.log_start = kvm_log_start;
->      kml->listener.log_stop = kvm_log_stop;
->      kml->listener.log_sync = kvm_log_sync;
-> +    kml->listener.log_clear = kvm_log_clear;
->      kml->listener.priority = 10;
->  
->      memory_listener_register(&kml->listener, as);
-> @@ -1699,6 +1868,17 @@ static int kvm_init(MachineState *ms)
->      s->coalesced_pio = s->coalesced_mmio &&
->                         kvm_check_extension(s, KVM_CAP_COALESCED_PIO);
->  
-> +    s->manual_dirty_log_protect =
-> +        kvm_check_extension(s, KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2);
-> +    if (s->manual_dirty_log_protect) {
-> +        ret = kvm_vm_enable_cap(s, KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2, 0, 1);
-> +        if (ret) {
-> +            warn_report("Trying to enable KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2 "
-> +                        "but failed.  Falling back to the legacy mode. ");
-> +            s->manual_dirty_log_protect = false;
-> +        }
-> +    }
-> +
->  #ifdef KVM_CAP_VCPU_EVENTS
->      s->vcpu_events = kvm_check_extension(s, KVM_CAP_VCPU_EVENTS);
->  #endif
-> diff --git a/accel/kvm/trace-events b/accel/kvm/trace-events
-> index 33c5b1b3af..4fb6e59d19 100644
-> --- a/accel/kvm/trace-events
-> +++ b/accel/kvm/trace-events
-> @@ -15,4 +15,5 @@ kvm_irqchip_release_virq(int virq) "virq %d"
->  kvm_set_ioeventfd_mmio(int fd, uint64_t addr, uint32_t val, bool assign, uint32_t size, bool datamatch) "fd: %d @0x%" PRIx64 " val=0x%x assign: %d size: %d match: %d"
->  kvm_set_ioeventfd_pio(int fd, uint16_t addr, uint32_t val, bool assign, uint32_t size, bool datamatch) "fd: %d @0x%x val=0x%x assign: %d size: %d match: %d"
->  kvm_set_user_memory(uint32_t slot, uint32_t flags, uint64_t guest_phys_addr, uint64_t memory_size, uint64_t userspace_addr, int ret) "Slot#%d flags=0x%x gpa=0x%"PRIx64 " size=0x%"PRIx64 " ua=0x%"PRIx64 " ret=%d"
-> +kvm_clear_dirty_log(uint32_t slot, uint64_t start, uint32_t size) "slot#%"PRId32" start 0x%"PRIx64" size 0x%"PRIx32
->  
 > -- 
-> 2.17.1
-> 
+> MST
 --
 Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
