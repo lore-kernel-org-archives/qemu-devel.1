@@ -2,114 +2,67 @@ Return-Path: <SRS0=r6E1=T6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 959D0C28CC0
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 16:13:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F421DC28CC0
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 16:14:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5D96123A85
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 16:13:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5D96123A85
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id C699025D7F
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 16:14:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C699025D7F
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:56278 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:56321 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hWNg3-0006m3-99
-	for qemu-devel@archiver.kernel.org; Thu, 30 May 2019 12:13:15 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:49627)
+	id 1hWNhS-0007az-UO
+	for qemu-devel@archiver.kernel.org; Thu, 30 May 2019 12:14:42 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:50127)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hWNfE-0006S6-Rj
-	for qemu-devel@nongnu.org; Thu, 30 May 2019 12:12:25 -0400
+	(envelope-from <no-reply@patchew.org>) id 1hWNgD-0006vz-JQ
+	for qemu-devel@nongnu.org; Thu, 30 May 2019 12:13:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hWNfC-0005nc-Vo
-	for qemu-devel@nongnu.org; Thu, 30 May 2019 12:12:24 -0400
-Received: from mout.kundenserver.de ([212.227.17.24]:42317)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1hWNfB-0005k9-7H
-	for qemu-devel@nongnu.org; Thu, 30 May 2019 12:12:22 -0400
-Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
-	(mreue106 [213.165.67.119]) with ESMTPSA (Nemesis) id
-	1M2fQ9-1haWOM0Gid-004Fch; Thu, 30 May 2019 18:12:09 +0200
-From: Laurent Vivier <laurent@vivier.eu>
-To: Giuseppe Musacchio <thatlemon@gmail.com>, qemu-devel@nongnu.org
-References: <9028dc83-82a2-fc51-b559-0020b2c0a892@gmail.com>
-	<64eb15b1-ed5c-d12e-5f56-8a2b40df8041@vivier.eu>
-Openpgp: preference=signencrypt
-Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
-	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
-Message-ID: <f1184a82-29e4-ba41-2f44-dd4b3e0f15a9@vivier.eu>
-Date: Thu, 30 May 2019 18:12:06 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	(envelope-from <no-reply@patchew.org>) id 1hWNgC-0007QH-GV
+	for qemu-devel@nongnu.org; Thu, 30 May 2019 12:13:25 -0400
+Resent-Date: Thu, 30 May 2019 12:13:25 -0400
+Resent-Message-Id: <E1hWNgC-0007QH-GV@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21453)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1hWNgC-0006uU-8r
+	for qemu-devel@nongnu.org; Thu, 30 May 2019 12:13:24 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1559232746; cv=none; d=zoho.com; s=zohoarc; 
+	b=k2z2KPrqmp1Srq50mesPhiTJq4yKfwImeLHWgBDeSV2eneeEWje1DQ5h0NhX+zzrZgbDlcUZw2TO0UXXuCHJ70nulBYIRAt51eowwrenYK/AMl2pHm8TxDgcCW3q2594v9CAUeBS623Z0R7F7JgTG3yXgKqCwmXzlPhbZtpVPjQ=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
+	s=zohoarc; t=1559232746;
+	h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
+	bh=Is/Pk0UOYSbTZ52qMrZyfTmWrJCiCZntRlIOIMqRi0o=; 
+	b=SBkK6LizNQdOw2HnEZqpfiF1cGKxWPlE4H+1iJphsmfEbiGBNEoemWJdhmPByMwAkhf819wk+LpFQE0GYmFxE0ilG1BTea6idlHWX3Hf+AjtzsKSXInDtjBToLMIb4YadWTMfXoupsce5R0sMCXfh8wAWEwPfql6YHjdojYMOlM=
+ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
+	spf=pass  smtp.mailfrom=no-reply@patchew.org;
+	dmarc=pass header.from=<no-reply@patchew.org>
+	header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+	mx.zohomail.com with SMTPS id 15592327443171022.8248793888841;
+	Thu, 30 May 2019 09:12:24 -0700 (PDT)
+In-Reply-To: <20190530143916.20255-1-alex.bennee@linaro.org>
+Message-ID: <155923274262.9187.6714348083557874693@ce79690b2cb9>
 MIME-Version: 1.0
-In-Reply-To: <64eb15b1-ed5c-d12e-5f56-8a2b40df8041@vivier.eu>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:lSP0ZcFn+veChgP7UAH+BCHhBZtHphc1jaXmmBerD2pLRd7aqbT
-	BJe1cEZFoeoA0tFho0ff4XHBYWQgxf7ajMyixXQQu/habzX5vH/wPwCSh9m+IwU+KgI7t6q
-	seqgSiCaiI7adw2P/kdccXUo9DBZkw29kpImCXJHDvRPhYn7OxF0V7E/YHlbhuENjfT1woc
-	6nzpHq8jqmsWxK2roW2ow==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:u1DEV0/yI2g=:nYgRJp5YU6sjjazbStDUkZ
-	kdQuhzsMIoFijdk6jpEt6dkZTmf6rkyoydj/KeK0Lc9TJqQOsp3ZYO6IWCLZFCzTvW6al0/sJ
-	BhsaJOkzXx5Dzn8lOPpNrK4sL4CKJi4RY4GpZNFqfz0MfBpv1X893/6nYx/YdB1joSxlVBVkV
-	dSuNEUbFpKa9yD1wAp/ZEk9yO1p6FjbZ0YOpPYBdecWqo2+VGAEd4rOT3xBnj3BMkw/WpovZv
-	9vaSGfBkXTFKqgnn3y5Rp/L0Isfgxk44Mb5oUD5JE7Dj0JVtnnPDn5HapbblNVJCzUqE4DriR
-	uutOHMwO0HkEezfL3YrJT555LlhjjSDz4/nLEYKQUI2cPlAPv+j6yzye4g5MZSoRdSziDfgD8
-	nFxmT+nQJeqiHQzcVbAm2HlKTt8SVzpolmZybmxH8KKbaT9f5fJ0P9Yd1EwgQPmlh+ywWgJXM
-	ceSz2h9iI22x3eS2juhVKSCwk3lti3Fb3QuWAoxHIRvkikmQkWLqzKU7tzKn2FP5Xea/aoAZh
-	1PZcs9f/auEuzBcfxhnPxVvYcxHjYnO16nICuIxubJRLeSPaoP5L8MClr7GIMBc2k95o7ShNo
-	uvNMKl7C2YmtbHJVfb3C4OLPj4VjKLGoYl2IkcH/1VozACVRjc81HTIOTqXmvbTWVJ1ZDEP51
-	CEBDQ1ZCk+vfr6yg3QT93GPxQqfkuZ7gzQXl+RzEX+xgS84J7TVdonxJKNimNw2bZ0bZ0bbfF
-	EYc4Ibm5l4qBn4iUleJd8k5MuEwyhDQXXtQQ+iW6QzN8n8LtbJDStHD+fVc=
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: alex.bennee@linaro.org
+Date: Thu, 30 May 2019 09:12:24 -0700 (PDT)
+X-ZohoMailClient: External
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.17.24
-Subject: Re: [Qemu-devel] [PATCH] Avoid crash in epoll_ctl with EPOLL_CTL_DEL
+X-Received-From: 135.84.80.217
+Subject: Re: [Qemu-devel] [RFC PATCH] semihosting: split console_out intro
+ string and char versions
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -121,72 +74,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Riku Voipio <riku.voipio@iki.fi>
+Reply-To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, riku.voipio@iki.fi, qemu-devel@nongnu.org,
+	laurent@vivier.eu, qemu-arm@nongnu.org, alex.bennee@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 30/05/2019 à 18:00, Laurent Vivier a écrit :
-> Le 30/05/2019 à 17:25, Giuseppe Musacchio a écrit :
->> The `event` parameter is ignored by the kernel if `op` is EPOLL_CTL_DEL,
->> do the same and avoid returning EFAULT if garbage is passed instead of a
->> valid pointer.
->>
->> Signed-off-by: Giuseppe Musacchio <thatlemon@gmail.com>
->> ---
->>  linux-user/syscall.c | 2 +-
->>  1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
->> index 5e29e675e9..32d463d58d 100644
->> --- a/linux-user/syscall.c
->> +++ b/linux-user/syscall.c
->> @@ -11329,7 +11329,7 @@ static abi_long do_syscall1(void *cpu_env, int
->> num, abi_long arg1,
->>      {
->>          struct epoll_event ep;
->>          struct epoll_event *epp = 0;
->> -        if (arg4) {
->> +        if (arg2 != EPOLL_CTL_DEL && arg4) {
->>              struct target_epoll_event *target_ep;
->>              if (!lock_user_struct(VERIFY_READ, target_ep, arg4, 1)) {
->>                  return -TARGET_EFAULT;
-> 
-> Reviewed-by: Laurent Vivier <laurent@vivier.eu>
-> 
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDUzMDE0MzkxNi4yMDI1
+NS0xLWFsZXguYmVubmVlQGxpbmFyby5vcmcvCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2VlbXMgdG8g
+aGF2ZSBzb21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBmb3IKbW9y
+ZSBpbmZvcm1hdGlvbjoKClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUkZDIFBBVENIXSBzZW1paG9z
+dGluZzogc3BsaXQgY29uc29sZV9vdXQgaW50cm8gc3RyaW5nIGFuZCBjaGFyIHZlcnNpb25zClR5
+cGU6IHNlcmllcwpNZXNzYWdlLWlkOiAyMDE5MDUzMDE0MzkxNi4yMDI1NS0xLWFsZXguYmVubmVl
+QGxpbmFyby5vcmcKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0IHJl
+di1wYXJzZSBiYXNlID4gL2Rldi9udWxsIHx8IGV4aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlm
+Zi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQg
+Y29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3Bh
+dGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4uCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpGcm9tIGh0
+dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogKiBbbmV3IHRhZ10gICAgICAg
+ICAgICAgICBwYXRjaGV3LzIwMTkwNTMwMTQzOTE2LjIwMjU1LTEtYWxleC5iZW5uZWVAbGluYXJv
+Lm9yZyAtPiBwYXRjaGV3LzIwMTkwNTMwMTQzOTE2LjIwMjU1LTEtYWxleC5iZW5uZWVAbGluYXJv
+Lm9yZwpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjk4YzU1N2IzNTcgc2VtaWhvc3Rp
+bmc6IHNwbGl0IGNvbnNvbGVfb3V0IGludHJvIHN0cmluZyBhbmQgY2hhciB2ZXJzaW9ucwoKPT09
+IE9VVFBVVCBCRUdJTiA9PT0KRVJST1I6IHNwYWNlcyByZXF1aXJlZCBhcm91bmQgdGhhdCAnIT0n
+IChjdHg6VnhWKQojNDc6IEZJTEU6IGh3L3NlbWlob3N0aW5nL2NvbnNvbGUuYzo1NjoKKyAgICB9
+IHdoaWxlIChjIT0wKTsKICAgICAgICAgICAgICAgXgoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5p
+bmdzLCAxNDcgbGluZXMgY2hlY2tlZAoKQ29tbWl0IDk4YzU1N2IzNTcwOCAoc2VtaWhvc3Rpbmc6
+IHNwbGl0IGNvbnNvbGVfb3V0IGludHJvIHN0cmluZyBhbmQgY2hhciB2ZXJzaW9ucykgaGFzIHN0
+eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUg
+ZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQ
+QVRDSCBpbiBNQUlOVEFJTkVSUy4KPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhp
+dGVkIHdpdGggY29kZTogMQoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3Bh
+dGNoZXcub3JnL2xvZ3MvMjAxOTA1MzAxNDM5MTYuMjAyNTUtMS1hbGV4LmJlbm5lZUBsaW5hcm8u
+b3JnL3Rlc3RpbmcuY2hlY2twYXRjaC8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVk
+IGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ug
+c2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
 
-in fact, the BUGS section of epoll_ctl(2) says:
-
-"In kernel versions before 2.6.9, the EPOLL_CTL_DEL operation required a
- non-null pointer in event, even though this argument is ignored.  Since
- Linux 2.6.9, event can be specified as NULL when  using  EPOLL_CTL_DEL.
- Applications  that  need  to be portable to kernels before 2.6.9 should
- specify a non-null pointer in event."
-
-So something like this would be more portable:
-
-@@ -11329,6 +11329,7 @@ static abi_long do_syscall1(void *cpu_env, int
-num, abi_long arg1,
-         struct epoll_event ep;
-         struct epoll_event *epp = 0;
-         if (arg4) {
-+            if (arg2 != EPOLL_CTL_DEL) {
-                 struct target_epoll_event *target_ep;
-                 if (!lock_user_struct(VERIFY_READ, target_ep, arg4, 1)) {
-                     return -TARGET_EFAULT;
-@@ -11340,6 +11341,11 @@ static abi_long do_syscall1(void *cpu_env, int
-num, abi_long arg1,
-                  */
-                 ep.data.u64 = tswap64(target_ep->data.u64);
-                 unlock_user_struct(target_ep, arg4, 0);
-+            }
-+            /*
-+             * before kernel 2.6.9, EPOLL_CTL_DEL operation required a
-+             * non-null pointer, even though this argument is ignored.
-+             * */
-             epp = &ep;
-         }
-
-Thanks,
-Laurent
 
