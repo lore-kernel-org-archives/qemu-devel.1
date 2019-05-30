@@ -7,74 +7,74 @@ X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 58AB6C28CC0
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 10:35:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D49D8C28CC0
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 10:35:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1AB9125758
-	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 10:35:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A15FB25758
+	for <qemu-devel@archiver.kernel.org>; Thu, 30 May 2019 10:35:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="TNcxgGyp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1AB9125758
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="tMhGNvsX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A15FB25758
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:50919 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:50949 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hWIOu-0000jC-9O
-	for qemu-devel@archiver.kernel.org; Thu, 30 May 2019 06:35:12 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:57158)
+	id 1hWIPA-0000rj-QX
+	for qemu-devel@archiver.kernel.org; Thu, 30 May 2019 06:35:28 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:54454)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hWIFH-0001Fy-EM
-	for qemu-devel@nongnu.org; Thu, 30 May 2019 06:25:16 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1hWI6g-0002jI-5c
+	for qemu-devel@nongnu.org; Thu, 30 May 2019 06:16:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hWIFD-0000IU-MC
-	for qemu-devel@nongnu.org; Thu, 30 May 2019 06:25:15 -0400
-Received: from mail-wm1-x332.google.com ([2a00:1450:4864:20::332]:37404)
+	(envelope-from <alex.bennee@linaro.org>) id 1hWI6f-0006dY-6O
+	for qemu-devel@nongnu.org; Thu, 30 May 2019 06:16:22 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:44681)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1hWIFD-000063-93
-	for qemu-devel@nongnu.org; Thu, 30 May 2019 06:25:11 -0400
-Received: by mail-wm1-x332.google.com with SMTP id 7so3479010wmo.2
-	for <qemu-devel@nongnu.org>; Thu, 30 May 2019 03:25:04 -0700 (PDT)
+	id 1hWI6e-0006ct-VY
+	for qemu-devel@nongnu.org; Thu, 30 May 2019 06:16:21 -0400
+Received: by mail-wr1-x442.google.com with SMTP id w13so3790631wru.11
+	for <qemu-devel@nongnu.org>; Thu, 30 May 2019 03:16:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
 	h=from:to:cc:subject:date:message-id:in-reply-to:references
 	:mime-version:content-transfer-encoding;
-	bh=i/i2ywuXLTtPSClMKCvPqBuSnYnrMH6w3mkxq4w23A4=;
-	b=TNcxgGyp5olZtcGwMrsQZz9b1DiB1Qg6J72RCiIIFI8KfjP50Hm7kLdE+BNF43CVL0
-	yQUCUg8lALISTJOPr03WIWH5vSMeBu+HaD8kUyMIVZmggwzKa410X3+GhAmB6oMXHYXO
-	O96P7XMjKxxwoLlbnf1IsmDL48z/CUWzwDgAxcIIoEPTczWCgG+AiRRkrCgKF3fkfkbZ
-	78jcOLi7uYQpiy1FGjXsa7cstlFAJENKKlLm/gmJph3ivyfbJAwxbFIu5PAFz61PPSz5
-	kJl4kG5Wov8hbWd75Wj+7wpxaaxRC/GKreNAALgVB+0vaA5QKRi6Q/F36ubLqZkfgiCH
-	RIRQ==
+	bh=9J8E5pdedqRlrr8v2PQK1sYVyobiXRzGN2v10P6ZPKk=;
+	b=tMhGNvsXWK1d8mDUvvdqV7C9zC2/n+/THau0y1371lKEvNRNUKDZUQ9Cy6q6uSZWKj
+	FVByZuJI+k8nOrf4FKdJNo/EyKYe6cEq2n3IxVL+an7Xm2/XiL1P1crZWLRi00Y5ALyT
+	YGV7zudJQnKsGm1UTeY/vTNo4vS6yjdvtaEhU3miGYxqjF591oU/ZJOsxOsglfUgsAT2
+	zD86++d3933l0kQQbth+3eJu2ciEiK0DOXZSkUwiP9gF0b6YITdfb5LDbL9cNxefD3B1
+	LeDt2h6ZKgafBJR7oinzDcEhX9cejKyWtlnnpYVFNh8+zKwJhMgOigVK+6UMvMNpyqs2
+	7oHA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
 	:references:mime-version:content-transfer-encoding;
-	bh=i/i2ywuXLTtPSClMKCvPqBuSnYnrMH6w3mkxq4w23A4=;
-	b=ByCCSwD04DhP9av0+TNW5TstqeZy1Vc0jtQvifZCPHvJ5vFL7JlH3aCsnYSLZKgoA+
-	74JNzuUAjTjgB/OL7/RyDwg4bbGAhqT+Ez6qb7dVUJfufGy8ugxk5mjbhz1DDYoZbqV0
-	1KhSGRdTlviCWCt+bc25v3e0rAsPgmv3/97N7B6k6dw04fkUT93QxoGt6Tg6h5mbHZxm
-	sU443O5NHWDApkrJ38sjMIj92zWdc6ojfuNHfzJlFYky3ejLVY3vdKttrEuXzSvpn5+K
-	0HLC3qDEBoTiy+32r1NifRBqBGOpe7Zy6Wirh+YJ9oZ7trvu8DvmJtZS0jdKukDTDwZ0
-	HTSw==
-X-Gm-Message-State: APjAAAW4D/nGPxfYMFAHxVNW1jFVvEBdInOePQJsoKBg9dpTn/gAyecu
-	f/p7WY3hTrzDiPmjnEgkrvECFQ==
-X-Google-Smtp-Source: APXvYqyc0UG19jjbB87M/dlL+IjWMEbEtaIEdM70TUl48hejadU+sWYm/OzDuMGpwwipkH7sHsOdmw==
-X-Received: by 2002:a1c:9a16:: with SMTP id c22mr1852538wme.39.1559211903728; 
-	Thu, 30 May 2019 03:25:03 -0700 (PDT)
+	bh=9J8E5pdedqRlrr8v2PQK1sYVyobiXRzGN2v10P6ZPKk=;
+	b=tqHgcfXcWrDZf2I1MWMkuqMlyfvzfT3Qqsfoks+jswxS665ljsLM6ZKuyxxbRZLy2H
+	Q6uOMT9IMzlVR9aWYfeSxMQCQPLMmqcsiLnSVR+B/Rtd1Vie4/KKoqNDPxqVPncA0UWH
+	RohbBrMQ9bLMHksI+PKKL5k/7VepWq+Sa1MnhLH5AhNSOcMGwjQIt3OTTp+7Ce1pZtty
+	E/4ExAzyiPiEWUqo3QiabTIC12gQk5k/B5AZB897FEuKyHjrbhKzhDY9E96vtBF+jLMb
+	oLA2fgYXg3UopHYd++n6uOt1fxyjagU5UQutHycPnxCVBwap+cvox5iL/kme1kfA37Ix
+	XBtg==
+X-Gm-Message-State: APjAAAXPaIZCJVLHuWrg5uA0W0oMqYbIzsVoEQY09WY40A+cV1zTEI7G
+	bx/bwECL7wsPSMCfsFy2NYZLJDeqAGM=
+X-Google-Smtp-Source: APXvYqzjUiVGwtR65OWMLZfXyQsukgAjM//aQXBTnaXw6SiRdYXtnASARs3JV9AaNGQpL+I3sVxmiQ==
+X-Received: by 2002:a5d:638a:: with SMTP id p10mr2048522wru.273.1559211379486; 
+	Thu, 30 May 2019 03:16:19 -0700 (PDT)
 Received: from zen.linaroharston ([81.128.185.34])
-	by smtp.gmail.com with ESMTPSA id n4sm2145728wrp.61.2019.05.30.03.25.00
+	by smtp.gmail.com with ESMTPSA id 32sm5445495wra.35.2019.05.30.03.16.10
 	(version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-	Thu, 30 May 2019 03:25:02 -0700 (PDT)
+	Thu, 30 May 2019 03:16:17 -0700 (PDT)
 Received: from zen.linaroharston. (localhost [127.0.0.1])
-	by zen.linaroharston (Postfix) with ESMTP id DABD61FFAB;
+	by zen.linaroharston (Postfix) with ESMTP id 5FEA81FFA3;
 	Thu, 30 May 2019 11:16:05 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Thu, 30 May 2019 11:15:59 +0100
-Message-Id: <20190530101603.22254-23-alex.bennee@linaro.org>
+Date: Thu, 30 May 2019 11:15:53 +0100
+Message-Id: <20190530101603.22254-17-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190530101603.22254-1-alex.bennee@linaro.org>
 References: <20190530101603.22254-1-alex.bennee@linaro.org>
@@ -83,9 +83,9 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2a00:1450:4864:20::332
-Subject: [Qemu-devel] [PATCH  v1 22/26] tests/vm: openbsd autoinstall,
- using serial console
+X-Received-From: 2a00:1450:4864:20::442
+Subject: [Qemu-devel] [PATCH v1 16/26] tests/vm: use ssh with pty
+ unconditionally
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -99,223 +99,73 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Fam Zheng <fam@euphon.net>,
 	=?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+	Thomas Huth <thuth@redhat.com>,
 	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
-	Gerd Hoffmann <kraxel@redhat.com>, Brad Smith <brad@comstyle.com>
+	Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 From: Gerd Hoffmann <kraxel@redhat.com>
 
-Instead of fetching the prebuilt image from patchew download the install
-iso and prepare the image locally.  Install to disk, using the serial
-console.  Create qemu user, configure ssh login.  Install packages
-needed for qemu builds.
+Allways ask ssh to run with a pseudo terminal.
+Not having a terminal causes problems now and then.
 
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+Tested-by: Thomas Huth <thuth@redhat.com>
 Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-Id: <20190520124716.30472-11-kraxel@redhat.com>
+Message-Id: <20190520124716.30472-5-kraxel@redhat.com>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- tests/vm/openbsd | 158 +++++++++++++++++++++++++++++++++++++++++++----
- 1 file changed, 145 insertions(+), 13 deletions(-)
+ tests/vm/basevm.py | 13 ++++---------
+ 1 file changed, 4 insertions(+), 9 deletions(-)
 
-diff --git a/tests/vm/openbsd b/tests/vm/openbsd
-index 2105c01a267..c5f0a152183 100755
---- a/tests/vm/openbsd
-+++ b/tests/vm/openbsd
-@@ -2,10 +2,11 @@
- #
- # OpenBSD VM image
- #
--# Copyright 2017 Red Hat Inc.
-+# Copyright 2017-2019 Red Hat Inc.
- #
- # Authors:
- #  Fam Zheng <famz@redhat.com>
-+#  Gerd Hoffmann <kraxel@redhat.com>
- #
- # This code is licensed under the GPL version 2 or later.  See
- # the COPYING file in the top-level directory.
-@@ -13,34 +14,165 @@
+diff --git a/tests/vm/basevm.py b/tests/vm/basevm.py
+index 5e30bac6615..395eefaec94 100755
+--- a/tests/vm/basevm.py
++++ b/tests/vm/basevm.py
+@@ -107,16 +107,14 @@ class BaseVM(object):
+         os.rename(fname + ".download", fname)
+         return fname
  
- import os
- import sys
-+import socket
- import subprocess
- import basevm
+-    def _ssh_do(self, user, cmd, check, interactive=False):
+-        ssh_cmd = ["ssh", "-q",
++    def _ssh_do(self, user, cmd, check):
++        ssh_cmd = ["ssh", "-q", "-t",
+                    "-o", "StrictHostKeyChecking=no",
+                    "-o", "UserKnownHostsFile=" + os.devnull,
+                    "-o", "ConnectTimeout=1",
+                    "-p", self.ssh_port, "-i", self._ssh_key_file]
+         for var in self.envvars:
+             ssh_cmd += ['-o', "SendEnv=%s" % var ]
+-        if interactive:
+-            ssh_cmd += ['-t']
+         assert not isinstance(cmd, str)
+         ssh_cmd += ["%s@127.0.0.1" % user] + list(cmd)
+         logging.debug("ssh_cmd: %s", " ".join(ssh_cmd))
+@@ -128,9 +126,6 @@ class BaseVM(object):
+     def ssh(self, *cmd):
+         return self._ssh_do(self.GUEST_USER, cmd, False)
  
- class OpenBSDVM(basevm.BaseVM):
-     name = "openbsd"
-     arch = "x86_64"
-+
-+    link = "https://cdn.openbsd.org/pub/OpenBSD/6.5/amd64/install65.iso"
-+    csum = "38d1f8cadd502f1c27bf05c5abde6cc505dd28f3f34f8a941048ff9a54f9f608"
-+    size = "20G"
-+    pkgs = [
-+        # tools
-+        "git",
-+        "pkgconf",
-+        "bzip2", "xz",
-+
-+        # gnu tools
-+        "bash",
-+        "gmake",
-+        "gsed",
-+        "bison",
-+
-+        # libs: usb
-+        "libusb1",
-+
-+        # libs: crypto
-+        "gnutls",
-+
-+        # libs: images
-+        "jpeg",
-+        "png",
-+
-+	# libs: ui
-+        "sdl2",
-+        "gtk+3",
-+        "libxkbcommon",
-+    ]
-+
-     BUILD_SCRIPT = """
-         set -e;
--        rm -rf /var/tmp/qemu-test.*
--        cd $(mktemp -d /var/tmp/qemu-test.XXXXXX);
-+        rm -rf /home/qemu/qemu-test.*
-+        cd $(mktemp -d /home/qemu/qemu-test.XXXXXX);
-+        mkdir src build; cd src;
-         tar -xf /dev/rsd1c;
--        ./configure --cc=x86_64-unknown-openbsd6.1-gcc-4.9.4 --python=python2.7 {configure_opts};
--        gmake --output-sync -j{jobs} {verbose};
--        # XXX: "gmake check" seems to always hang or fail
--        #gmake --output-sync -j{jobs} check {verbose};
-+        cd ../build
-+        ../src/configure --cc=cc --python=python3 {configure_opts};
-+        gmake --output-sync -j{jobs} {target} {verbose};
-     """
-+    poweroff = "halt -p"
+-    def ssh_interactive(self, *cmd):
+-        return self._ssh_do(self.GUEST_USER, cmd, False, True)
+-
+     def ssh_root(self, *cmd):
+         return self._ssh_do("root", cmd, False)
  
-     def build_image(self, img):
--        cimg = self._download_with_cache("http://download.patchew.org/openbsd-6.1-amd64.img.xz",
--                sha256sum='8c6cedc483e602cfee5e04f0406c64eb99138495e8ca580bc0293bcf0640c1bf')
--        img_tmp_xz = img + ".tmp.xz"
-+        self.print_step("Downloading install iso")
-+        cimg = self._download_with_cache(self.link, sha256sum=self.csum)
-         img_tmp = img + ".tmp"
--        sys.stderr.write("Extracting the image...\n")
--        subprocess.check_call(["cp", "-f", cimg, img_tmp_xz])
--        subprocess.check_call(["xz", "-dvf", img_tmp_xz])
-+        iso = img + ".install.iso"
-+
-+        self.print_step("Preparing iso and disk image")
-+        subprocess.check_call(["cp", "-f", cimg, iso])
-+        subprocess.check_call(["qemu-img", "create", "-f", "qcow2",
-+                               img_tmp, self.size])
-+
-+        self.print_step("Booting installer")
-+        self.boot(img_tmp, extra_args = [
-+            "-machine", "graphics=off",
-+            "-cdrom", iso
-+        ])
-+        self.console_init()
-+        self.console_wait_send("boot>", "set tty com0\n")
-+        self.console_wait_send("boot>", "\n")
-+
-+        # pre-install configuration
-+        self.console_wait_send("(I)nstall",               "i\n")
-+        self.console_wait_send("Terminal type",           "xterm\n")
-+        self.console_wait_send("System hostname",         "openbsd\n")
-+        self.console_wait_send("Which network interface", "vio0\n")
-+        self.console_wait_send("IPv4 address",            "dhcp\n")
-+        self.console_wait_send("IPv6 address",            "none\n")
-+        self.console_wait_send("Which network interface", "done\n")
-+        self.console_wait_send("DNS domain name",         "localnet\n")
-+        self.console_wait("Password for root account")
-+        self.console_send("%s\n" % self.ROOT_PASS)
-+        self.console_wait("Password for root account")
-+        self.console_send("%s\n" % self.ROOT_PASS)
-+        self.console_wait_send("Start sshd(8)",           "yes\n")
-+        self.console_wait_send("X Window System",         "\n")
-+        self.console_wait_send("xenodm",                  "\n")
-+        self.console_wait_send("console to com0",         "\n")
-+        self.console_wait_send("Which speed",             "\n")
-+
-+        self.console_wait("Setup a user")
-+        self.console_send("%s\n" % self.GUEST_USER)
-+        self.console_wait("Full name")
-+        self.console_send("%s\n" % self.GUEST_USER)
-+        self.console_wait("Password")
-+        self.console_send("%s\n" % self.GUEST_PASS)
-+        self.console_wait("Password")
-+        self.console_send("%s\n" % self.GUEST_PASS)
-+
-+        self.console_wait_send("Allow root ssh login",    "yes\n")
-+        self.console_wait_send("timezone",                "UTC\n")
-+        self.console_wait_send("root disk",               "\n")
-+        self.console_wait_send("(W)hole disk",            "\n")
-+        self.console_wait_send("(A)uto layout",           "\n")
-+        self.console_wait_send("Location of sets",        "cd0\n")
-+        self.console_wait_send("Pathname to the sets",    "\n")
-+        self.console_wait_send("Set name(s)",             "\n")
-+        self.console_wait_send("without verification",    "yes\n")
-+
-+        self.print_step("Installation started now, this will take a while")
-+        self.console_wait_send("Location of sets",        "done\n")
-+
-+        self.console_wait("successfully completed")
-+        self.print_step("Installation finished, rebooting")
-+        self.console_wait_send("(R)eboot",                "reboot\n")
-+
-+        # setup qemu user
-+        prompt = "$"
-+        self.console_ssh_init(prompt, self.GUEST_USER, self.GUEST_PASS)
-+        self.console_wait_send(prompt, "exit\n")
-+
-+        # setup root user
-+        prompt = "openbsd#"
-+        self.console_ssh_init(prompt, "root", self.ROOT_PASS)
-+        self.console_sshd_config(prompt)
-+
-+        # setup virtio-blk #1 (tarfile)
-+        self.console_wait(prompt)
-+        self.console_send("echo 'chmod 666 /dev/rsd1c' >> /etc/rc.local\n")
-+
-+        # enable w+x for /home
-+        self.console_wait(prompt)
-+        self.console_send("sed -i -e '/home/s/rw,/rw,wxallowed,/' /etc/fstab\n")
-+
-+        # tweak datasize limit
-+        self.console_wait(prompt)
-+        self.console_send("sed -i -e 's/\\(datasize[^=]*\\)=[^:]*/\\1=infinity/' /etc/login.conf\n")
-+
-+        # use http (be proxy cache friendly)
-+        self.console_wait(prompt)
-+        self.console_send("sed -i -e 's/https/http/' /etc/installurl\n")
-+
-+        self.print_step("Configuration finished, rebooting")
-+        self.console_wait_send(prompt, "reboot\n")
-+        self.console_wait("login:")
-+        self.wait_ssh()
-+
-+        self.print_step("Installing packages")
-+        self.ssh_root_check("pkg_add %s\n" % " ".join(self.pkgs))
-+
-+        # shutdown
-+        self.ssh_root(self.poweroff)
-+        self.wait()
-+
-         if os.path.exists(img):
-             os.remove(img)
-         os.rename(img_tmp, img)
-+        os.remove(iso)
-+        self.print_step("All done")
+@@ -284,9 +279,9 @@ def main(vmcls):
+         return 2
  
- if __name__ == "__main__":
-     sys.exit(basevm.main(OpenBSDVM))
+     if args.interactive:
+-        if vm.ssh_interactive(*cmd) == 0:
++        if vm.ssh(*cmd) == 0:
+             return 0
+-        vm.ssh_interactive()
++        vm.ssh()
+         return 3
+     else:
+         if vm.ssh(*cmd) != 0:
 -- 
 2.20.1
 
