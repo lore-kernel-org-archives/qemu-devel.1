@@ -2,76 +2,92 @@ Return-Path: <SRS0=hY9S=T7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 01832C28CC3
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 May 2019 14:09:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF7ECC04AB6
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 May 2019 14:12:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C21DB269F8
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 May 2019 14:09:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C21DB269F8
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 9109626A1B
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 May 2019 14:12:11 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="v2lSyYWt"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9109626A1B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:44169 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:44232 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hWiE8-0001qP-2Z
-	for qemu-devel@archiver.kernel.org; Fri, 31 May 2019 10:09:48 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:38523)
+	id 1hWiGQ-0003mZ-NV
+	for qemu-devel@archiver.kernel.org; Fri, 31 May 2019 10:12:10 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:37257)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mrezanin@redhat.com>) id 1hWi4K-0003Z6-6O
-	for qemu-devel@nongnu.org; Fri, 31 May 2019 09:59:41 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hWhzS-0007W6-Kl
+	for qemu-devel@nongnu.org; Fri, 31 May 2019 09:54:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mrezanin@redhat.com>) id 1hWi4I-00063f-Aw
-	for qemu-devel@nongnu.org; Fri, 31 May 2019 09:59:40 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:18386)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mrezanin@redhat.com>)
-	id 1hWi4E-00060X-6k; Fri, 31 May 2019 09:59:34 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
-	[10.5.11.22])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id DCF3BC130719;
-	Fri, 31 May 2019 13:59:32 +0000 (UTC)
-Received: from colo-mx.corp.redhat.com
-	(colo-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.21])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id CCB7F1001E86;
-	Fri, 31 May 2019 13:59:32 +0000 (UTC)
-Received: from zmail17.collab.prod.int.phx2.redhat.com
-	(zmail17.collab.prod.int.phx2.redhat.com [10.5.83.19])
-	by colo-mx.corp.redhat.com (Postfix) with ESMTP id B3A95206D2;
-	Fri, 31 May 2019 13:59:32 +0000 (UTC)
-Date: Fri, 31 May 2019 09:59:29 -0400 (EDT)
-From: Miroslav Rezanina <mrezanin@redhat.com>
-To: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-Message-ID: <627031963.25549126.1559311169316.JavaMail.zimbra@redhat.com>
-In-Reply-To: <874l5aahmx.fsf@zen.linaroharston>
-References: <20190514155301.16123-1-alex.bennee@linaro.org>
-	<20190514155301.16123-7-alex.bennee@linaro.org>
-	<20190531091204.tjmq622gw457xbdr@lws.brq.redhat.com>
-	<87sgsu51bd.fsf@zen.linaroharston>
-	<833530119.25503992.1559302089822.JavaMail.zimbra@redhat.com>
-	<874l5aahmx.fsf@zen.linaroharston>
+	(envelope-from <richard.henderson@linaro.org>) id 1hWhzR-0001hr-Kq
+	for qemu-devel@nongnu.org; Fri, 31 May 2019 09:54:38 -0400
+Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:41680)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1hWhzR-0001hQ-Fi
+	for qemu-devel@nongnu.org; Fri, 31 May 2019 09:54:37 -0400
+Received: by mail-ot1-x343.google.com with SMTP id 107so3425680otj.8
+	for <qemu-devel@nongnu.org>; Fri, 31 May 2019 06:54:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
+	:mime-version:in-reply-to:content-language:content-transfer-encoding;
+	bh=v38BXfjeXHYqYshs0HEFalSzmSNh0qCSLUr0pE7J2K4=;
+	b=v2lSyYWtkecniPHlpZUVs+ipokpZneH8AOlAwwKtGNOMRBTx1Id6jeKuXXm1k6EMkc
+	Ci1E+PvAbC4suq+Rfgc71sP/HvETEMkJfBTOAr91CaYPyd7jbPyhyactG0ZGYYpVkc+e
+	3FeAN7MpRYnVYcqU4Dozo75IpDxDH34whzmPhBrE2AXH5GjlyBy7PcAUKJ5Sf+zDMFQM
+	zLfRtHC2vac1rxIy8f2XGhMa2KLUqQL1qxXsSYI9P+FyrbvQyU1lN4+RsR3o1OzqcfBU
+	VdJuoJERVe6Jv9nutklrDqtrzaD2pDDM7ZqHsPcf3tM76raF6y1gNYC33V/CCHQkeNLU
+	S8zg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+	:date:user-agent:mime-version:in-reply-to:content-language
+	:content-transfer-encoding;
+	bh=v38BXfjeXHYqYshs0HEFalSzmSNh0qCSLUr0pE7J2K4=;
+	b=NdF2bRyhWRubHN3XgW0u8cXZKbuFchmEfZd1kJ5m5fVfzmuTkrCPPvP2SPgaLm8fTe
+	3Jf158nIz15PXbaDnPt2ahmhrjMpxIYb8RUwGCphq85bqUgbWS4B+D4bsIrQh+voz0Os
+	NQsqOXdocdpMKwTSnIJ52EleID9A5d78yPK5hCEDQk7PQhhyNM05sxQelb3/qxHVREdD
+	Qqz/X2GGRWbNYhEAbDKuYxPORy+YM/OPfX6m4RZ6uOhNBCjaNUKLUJIaa6htyugZ5tej
+	Fa7ROxD1gKbGjpGkre08RSeOM8aipSyl047IFi/1Ep/0pdm0WOd8YCvwASPXN2YI6akD
+	uHhg==
+X-Gm-Message-State: APjAAAVFl8EF3GRqys6/FJ40ZS0kwuVtkyYooXt7e9yVQIcX7X6UhaPp
+	vZzOfzLPve01Xcb98JAWcCdwTs2y/zmoVw==
+X-Google-Smtp-Source: APXvYqzZtMFX3ECzGgt2z9dQUmE8E21xu9w7KgyPWfqak/DZUzluBuBfQVcKWOGPcTZtOWdR7vQJsA==
+X-Received: by 2002:a9d:6d91:: with SMTP id x17mr1952755otp.14.1559310876782; 
+	Fri, 31 May 2019 06:54:36 -0700 (PDT)
+Received: from [172.24.12.210] (168.189-204-159.bestelclientes.com.mx.
+	[189.204.159.168]) by smtp.gmail.com with ESMTPSA id
+	r205sm2157557oig.0.2019.05.31.06.54.35
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Fri, 31 May 2019 06:54:36 -0700 (PDT)
+To: Michael Rolnik <mrolnik@gmail.com>, qemu-devel@nongnu.org
+References: <20190530190738.22713-1-mrolnik@gmail.com>
+	<20190530190738.22713-4-mrolnik@gmail.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Openpgp: preference=signencrypt
+Message-ID: <402ba0b2-e2e0-6b7a-1862-4588e5f83357@linaro.org>
+Date: Fri, 31 May 2019 08:54:33 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.7.0
 MIME-Version: 1.0
+In-Reply-To: <20190530190738.22713-4-mrolnik@gmail.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Originating-IP: [10.40.204.19, 10.4.195.20]
-Thread-Topic: target/arm: use the common interface for WRITE0/WRITEC in
-	arm-semi
-Thread-Index: PHKtkS65/Rg51CAuNZ8JNu6imuD3rQ==
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.31]);
-	Fri, 31 May 2019 13:59:32 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [RFC PATCH 06/11] target/arm: use the common
- interface for WRITE0/WRITEC in arm-semi
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::343
+Subject: Re: [Qemu-devel] [PATCH RFC v20 3/8] target/avr: Add mechanism to
+ check for active debugger connection
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -83,228 +99,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Riku Voipio <riku.voipio@iki.fi>,
-	qemu-devel@nongnu.org, qemu-arm@nongnu.org,
-	Laurent Vivier <laurent@vivier.eu>
+Cc: Sarah Harris <S.E.Harris@kent.ac.uk>, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On 5/30/19 2:07 PM, Michael Rolnik wrote:
+> From: Sarah Harris <S.E.Harris@kent.ac.uk>
+> 
+> AVR CPUs have a BREAK instruction which behaves differently depending on whether debugging is enabled.
+> Since the hardware fuses that normally control this are difficult to emulate, and the BREAK instruction is useful for testing, the BREAK instruction is instead enabled/disabled depending on whether a GDB session is attached.
+
+I don't think that this is the right way to model this.
+
+I think that BREAK should always raise an exception and return to the main
+loop.  If there we find that the debugger is not attached, the main loop will
+simply continue.  Which becomes a nop, as documented.
 
 
------ Original Message -----
-> From: "Alex Benn=C3=A9e" <alex.bennee@linaro.org>
-> To: "Miroslav Rezanina" <mrezanin@redhat.com>
-> Cc: qemu-devel@nongnu.org, "Peter Maydell" <peter.maydell@linaro.org>, "R=
-iku Voipio" <riku.voipio@iki.fi>,
-> qemu-arm@nongnu.org, "Laurent Vivier" <laurent@vivier.eu>
-> Sent: Friday, May 31, 2019 3:16:38 PM
-> Subject: Re: [Qemu-devel] [RFC PATCH 06/11] target/arm: use the common in=
-terface for WRITE0/WRITEC in arm-semi
->=20
->=20
-> Miroslav Rezanina <mrezanin@redhat.com> writes:
->=20
-> > ----- Original Message -----
-> >> From: "Alex Benn=C3=A9e" <alex.bennee@linaro.org>
-> >> To: "Miroslav Rezanina" <mrezanin@redhat.com>
-> >> Cc: qemu-devel@nongnu.org, "Peter Maydell" <peter.maydell@linaro.org>,
-> >> "Riku Voipio" <riku.voipio@iki.fi>,
-> >> qemu-arm@nongnu.org, "Laurent Vivier" <laurent@vivier.eu>
-> >> Sent: Friday, May 31, 2019 1:08:06 PM
-> >> Subject: Re: [Qemu-devel] [RFC PATCH 06/11] target/arm: use the common
-> >> interface for WRITE0/WRITEC in arm-semi
-> >>
-> >>
-> >> Miroslav Rezanina <mrezanin@redhat.com> writes:
-> >>
-> >> > On Tue, May 14, 2019 at 04:52:56PM +0100, Alex Benn=C3=A9e wrote:
-> >> >> Now we have a common semihosting console interface use that for our
-> >> >> string output. However ARM is currently unique in also supporting
-> >> >> semihosting for linux-user so we need to replicate the API in
-> >> >> linux-user. If other architectures gain this support we can move th=
-e
-> >> >> file later.
-> >> >>
-> >> >> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-> >> >> ---
-> >> >>  linux-user/Makefile.objs  |  2 ++
-> >> >>  linux-user/arm/semihost.c | 24 ++++++++++++++++++++++++
-> >> >>  target/arm/arm-semi.c     | 31 ++++++-------------------------
-> >> >>  3 files changed, 32 insertions(+), 25 deletions(-)
-> >> >>  create mode 100644 linux-user/arm/semihost.c
-> >> >>
-> >> >> diff --git a/linux-user/Makefile.objs b/linux-user/Makefile.objs
-> >> >> index 769b8d83362..285c5dfa17a 100644
-> >> >> --- a/linux-user/Makefile.objs
-> >> >> +++ b/linux-user/Makefile.objs
-> >> >> @@ -6,4 +6,6 @@ obj-y =3D main.o syscall.o strace.o mmap.o signal.o=
- \
-> >> >>  obj-$(TARGET_HAS_BFLT) +=3D flatload.o
-> >> >>  obj-$(TARGET_I386) +=3D vm86.o
-> >> >>  obj-$(TARGET_ARM) +=3D arm/nwfpe/
-> >> >> +obj-$(TARGET_ARM) +=3D arm/semihost.o
-> >> >> +obj-$(TARGET_AARCH64) +=3D arm/semihost.o
-> >> >>  obj-$(TARGET_M68K) +=3D m68k-sim.o
-> >> >> diff --git a/linux-user/arm/semihost.c b/linux-user/arm/semihost.c
-> >> >> new file mode 100644
-> >> >> index 00000000000..9554102a855
-> >> >> --- /dev/null
-> >> >> +++ b/linux-user/arm/semihost.c
-> >> >> @@ -0,0 +1,24 @@
-> >> >> +/*
-> >> >> + * ARM Semihosting Console Support
-> >> >> + *
-> >> >> + * Copyright (c) 2019 Linaro Ltd
-> >> >> + *
-> >> >> + * Currently ARM is unique in having support for semihosting suppo=
-rt
-> >> >> + * in linux-user. So for now we implement the common console API b=
-ut
-> >> >> + * just for arm linux-user.
-> >> >> + *
-> >> >> + * SPDX-License-Identifier: GPL-2.0-or-later
-> >> >> + */
-> >> >> +
-> >> >> +#include "qemu/osdep.h"
-> >> >> +#include "cpu.h"
-> >> >> +#include "hw/semihosting/console.h"
-> >> >> +#include "qemu.h"
-> >> >> +
-> >> >> +int qemu_semihosting_console_out(CPUArchState *env, target_ulong a=
-ddr,
-> >> >> int len)
-> >> >> +{
-> >> >> +    void *s =3D lock_user_string(addr);
-> >> >> +    len =3D write(STDERR_FILENO, s, len ? len : strlen(s));
-> >> >> +    unlock_user(s, addr, 0);
-> >> >> +    return len;
-> >> >> +}
-> >> >> diff --git a/target/arm/arm-semi.c b/target/arm/arm-semi.c
-> >> >> index 9e5a414dd89..253c66b172a 100644
-> >> >> --- a/target/arm/arm-semi.c
-> >> >> +++ b/target/arm/arm-semi.c
-> >> >> @@ -27,6 +27,7 @@
-> >> >>
-> >> >>  #include "cpu.h"
-> >> >>  #include "hw/semihosting/semihost.h"
-> >> >> +#include "hw/semihosting/console.h"
-> >> >>  #ifdef CONFIG_USER_ONLY
-> >> >>  #include "qemu.h"
-> >> >>
-> >> >> @@ -314,32 +315,12 @@ target_ulong do_arm_semihosting(CPUARMState *=
-env)
-> >> >>              return set_swi_errno(ts, close(arg0));
-> >> >>          }
-> >> >>      case TARGET_SYS_WRITEC:
-> >> >> -        {
-> >> >> -          char c;
-> >> >> -
-> >> >> -          if (get_user_u8(c, args))
-> >> >> -              /* FIXME - should this error code be -TARGET_EFAULT =
-? */
-> >> >> -              return (uint32_t)-1;
-> >> >> -          /* Write to debug console.  stderr is near enough.  */
-> >> >> -          if (use_gdb_syscalls()) {
-> >> >> -                return arm_gdb_syscall(cpu, arm_semi_cb,
-> >> >> "write,2,%x,1",
-> >> >> args);
-> >> >> -          } else {
-> >> >> -                return write(STDERR_FILENO, &c, 1);
-> >> >> -          }
-> >> >> -        }
-> >> >> +    {
-> >> >> +        qemu_semihosting_console_out(env, args, 1);
-> >> >> +        return 0xdeadbeef;
-> >> >> +    }
-> >> >>      case TARGET_SYS_WRITE0:
-> >> >> -        if (!(s =3D lock_user_string(args)))
-> >> >> -            /* FIXME - should this error code be -TARGET_EFAULT ? =
-*/
-> >> >> -            return (uint32_t)-1;
-> >> >> -        len =3D strlen(s);
-> >> >> -        if (use_gdb_syscalls()) {
-> >> >> -            return arm_gdb_syscall(cpu, arm_semi_cb, "write,2,%x,%=
-x",
-> >> >> -                                   args, len);
-> >> >> -        } else {
-> >> >> -            ret =3D write(STDERR_FILENO, s, len);
-> >> >> -        }
-> >> >> -        unlock_user(s, args, 0);
-> >> >> -        return ret;
-> >> >> +        return qemu_semihosting_console_out(env, args, 0);
-> >> >>      case TARGET_SYS_WRITE:
-> >> >>          GET_ARG(0);
-> >> >>          GET_ARG(1);
-> >> >> --
-> >> >> 2.20.1
-> >> >>
-> >> >>
-> >> >
-> >> > Hi Alex,
-> >> >
-> >> > this patch breaks build for softmmu target when CONFIG_SEMIHOSTING i=
-s
-> >> > not
-> >> > enabled as qemu_semihosting_console_out
-> >> > is not defined in such case - neither linux-user/arm/semihost.c nor
-> >> > hw/semihosting/console.c compiled and function
-> >> > is not in stubs/semihost.c
-> >>
-> >> How do you do that? I tried ../../configure --without-default-devices
-> >> and that still builds for me.
-> >
-> > It's usual RHEL way - use --without-default-devices and use specific
-> > list of enabled devices (this mean disable CONFIG_SEMIHOSTING in
-> > default_config/* file).
->=20
-> OK - so from the upstream source tree CONFIG_SEMIHOSTING is still =3Dy
-> (but I can see most of them are now =3Dn). Isn't the simplest solution to
-> fix-up your version of the default_config file to include SEMIHOSTING?
->=20
-
-It's fix but it goes against our policy of handling CONFIG options so we
-would prefer to have this fixed - otherwise there's no meaning in having
-config option if you can't disable it.
-
-> Is this an out-of-tree RHEL addition?
->
-
-No, it's RHEL device config handling.
-
-Mirek
-=20
-> >>
-> >> But I suspect what's needed is to change:
-> >>
-> >> #ifndef CONFIG_USER_ONLY
-> >>
-> >> to
-> >>
-> >> #ifdef CONFIG_SEMIHOSTING
-> >>
-> >> to the relevant headers and helper bits.
-> >
-> > Yeah, have to find out what are relevant pieces.
-> >
-> > Mirek
-> >
-> >>
-> >> >
-> >> > Mirek
-> >>
-> >>
-> >> --
-> >> Alex Benn=C3=A9e
-> >>
->=20
->=20
-> --
-> Alex Benn=C3=A9e
->=20
-
---=20
-Miroslav Rezanina
-Software Engineer - Virtualization Team Maintainer
-
+r~
 
