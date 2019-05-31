@@ -2,65 +2,74 @@ Return-Path: <SRS0=hY9S=T7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B05DC04AB6
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 May 2019 16:57:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C596C04AB6
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 May 2019 16:58:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 336DF258BB
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 May 2019 16:57:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 336DF258BB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 344E224F9F
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 May 2019 16:58:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 344E224F9F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:46482 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:46514 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hWkqS-0004Jj-EU
-	for qemu-devel@archiver.kernel.org; Fri, 31 May 2019 12:57:32 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:44695)
+	id 1hWkrU-0005N7-IM
+	for qemu-devel@archiver.kernel.org; Fri, 31 May 2019 12:58:36 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:43535)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wainersm@redhat.com>) id 1hWkmf-0001Wg-DC
-	for qemu-devel@nongnu.org; Fri, 31 May 2019 12:53:38 -0400
+	(envelope-from <bounces@canonical.com>) id 1hWkkT-0006bo-1u
+	for qemu-devel@nongnu.org; Fri, 31 May 2019 12:51:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wainersm@redhat.com>) id 1hWkme-0000wy-Ey
-	for qemu-devel@nongnu.org; Fri, 31 May 2019 12:53:37 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35370)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wainersm@redhat.com>) id 1hWkme-0000wD-9o
-	for qemu-devel@nongnu.org; Fri, 31 May 2019 12:53:36 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
-	[10.5.11.23])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id A3A0E30842A9
-	for <qemu-devel@nongnu.org>; Fri, 31 May 2019 16:53:35 +0000 (UTC)
-Received: from virtlab501.virt.lab.eng.bos.redhat.com
-	(virtlab501.virt.lab.eng.bos.redhat.com [10.19.152.162])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 3BB034129;
-	Fri, 31 May 2019 16:53:35 +0000 (UTC)
-From: Wainer dos Santos Moschetta <wainersm@redhat.com>
-To: qemu-devel@nongnu.org
-Date: Fri, 31 May 2019 12:53:34 -0400
-Message-Id: <20190531165334.20403-2-wainersm@redhat.com>
-In-Reply-To: <20190531165334.20403-1-wainersm@redhat.com>
-References: <20190531165334.20403-1-wainersm@redhat.com>
+	(envelope-from <bounces@canonical.com>) id 1hWkV8-0003j1-Ti
+	for qemu-devel@nongnu.org; Fri, 31 May 2019 12:35:33 -0400
+Received: from indium.canonical.com ([91.189.90.7]:40204)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1hWkV8-0003gb-CC
+	for qemu-devel@nongnu.org; Fri, 31 May 2019 12:35:30 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1hWkV6-0005tJ-Lq
+	for <qemu-devel@nongnu.org>; Fri, 31 May 2019 16:35:28 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 95AF02E80CB
+	for <qemu-devel@nongnu.org>; Fri, 31 May 2019 16:35:28 +0000 (UTC)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.40]);
-	Fri, 31 May 2019 16:53:35 +0000 (UTC)
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
+Date: Fri, 31 May 2019 16:28:50 -0000
+From: =?utf-8?q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Tags: aarch64 uefi
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: ajbennee jerryxiao lersek
+X-Launchpad-Bug-Reporter: Jerry (jerryxiao)
+X-Launchpad-Bug-Modifier: =?utf-8?q?Alex_Benn=C3=A9e_=28ajbennee=29?=
+References: <155923186868.25498.16417785082829115907.malonedeb@gac.canonical.com>
+	<155931574363.8426.10336516680800433530.malone@wampee.canonical.com>
+Message-Id: <87muj28u65.fsf@zen.linaroharston>
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="18968";
+	Instance="launchpad-lazr.conf"
+X-Launchpad-Hash: a0dca6dee6426dd88dd489deec96a3653c5b7351
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH 1/1] accel: Remove unused AccelClass::opt_name
- attribute
+X-Received-From: 91.189.90.7
+Subject: Re: [Qemu-devel] [Bug 1831115] Re: qemu 4.0.0 on aarch64: uefi
+ firmware oversize
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -69,39 +78,179 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: thuth@redhat.com, ehabkost@redhat.com
+Reply-To: Bug 1831115 <1831115@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
+Message-ID: <20190531162850.5c6AdnsYVtK428UonsSftzUQc9Q3qC26Lcn5eY-LyEk@z>
 
-The AccelType type was converted to AccelClass QOM
-object on b14a0b7469f, and the original data type had
-a field to store the option name which in turn was
-used to search an accelerator. The lookup method
-(accel_find) changed too, making the option field
-unnecessary but it became AccelClass::opt_name despite
-that. Therefore, and given that none accelerator
-implementation sets AccelClass::opt_name, let's
-remove this attribute.
+Jerry <ubuntu@mail.jerryxiao.cc> writes:
 
-Signed-off-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
----
- include/sysemu/accel.h | 1 -
- 1 file changed, 1 deletion(-)
+> [jerry@jerry-n1 aarch64]$ du -b *
+> 67108864        AAVMF_CODE.fd
+> 67108864        AAVMF_VARS.fd
+> 67108864        QEMU_EFI.fd
+> 67108864        QEMU_VARS.fd
+>
+> 2097152 QEMU_EFI.fd.orig
+> 786432  QEMU_VARS.fd.orig
+>
+>
+> Both files have been padded to 64MB. (if padding means filling it with
+> /dev/zero)
 
-diff --git a/include/sysemu/accel.h b/include/sysemu/accel.h
-index 70e9e2f2a1..81293cdb08 100644
---- a/include/sysemu/accel.h
-+++ b/include/sysemu/accel.h
-@@ -36,7 +36,6 @@ typedef struct AccelClass {
-     ObjectClass parent_class;
-     /*< public >*/
-=20
--    const char *opt_name;
-     const char *name;
-     int (*init_machine)(MachineState *ms);
-     void (*setup_post)(MachineState *ms, AccelState *accel);
---=20
-2.21.0
+You can use:
 
+   truncate -s 64m /path/to/blob
+
+>
+> QEMU_EFI.fd and QEMU_VARS.fd are built by myself according to
+> https://wiki.linaro.org/LEG/UEFIforQEMU. With the self-built formware,
+> I'm getting almost the same error: qemu-system-aarch64: Initialization
+> of device cfi.pflash01 failed: device requires 67108864 bytes, block
+> backend provides 786432 bytes
+
+Are you sure your libvirt invocation is properly pointing at your new
+re-sized blobs? WFM here on master:
+
+  ./aarch64-softmmu/qemu-system-aarch64 -cpu max -machine
+type=3Dvirt,virtualization=3Don -display none -m 4096 -serial mon:stdio
+-netdev user,id=3Dunet,hostfwd=3Dtcp::2222-:22 -device virtio-net-
+pci,netdev=3Dunet -device virtio-scsi-pci -blockdev driver=3Draw,node-
+name=3Dhd,discard=3Dunmap,file.driver=3Dhost_device,file.filename=3D/dev/ze=
+n-
+disk/debian-buster-arm64 -device scsi-hd,drive=3Dhd -bios
+/usr/share/AAVMF/AAVMF_CODE.fd
+
+Where:
+
+ls -l /usr/share/AAVMF/*
+-rw-r--r-- 1 root root 67108864 Mar 16 00:37 /usr/share/AAVMF/AAVMF32_CODE.=
+fd
+-rw-r--r-- 1 root root 67108864 Mar 16 00:37 /usr/share/AAVMF/AAVMF32_VARS.=
+fd
+-rw-r--r-- 1 root root 67108864 Mar 16 00:37 /usr/share/AAVMF/AAVMF_CODE.fd
+-rw-r--r-- 1 root root 67108864 Mar 16 00:37 /usr/share/AAVMF/AAVMF_VARS.fd
+
+--
+Alex Benn=C3=A9e
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1831115
+
+Title:
+  qemu 4.0.0 on aarch64: uefi firmware oversize
+
+Status in QEMU:
+  New
+
+Bug description:
+  I'd like to enable uefi in my virtual machine, however qemu is always sho=
+wing the same error:   qemu-system-aarch64: Initialization of device cfi.pf=
+lash01 failed: device requires 67108864 bytes, block backend provides 78643=
+2 bytes  =
+
+  It's clearly impossible to fit a uefi firmware into 786432 bytes.  =
+
+
+  Environment: qemu-system-aarch64 with kvm on an amlogic s905d aarch64
+  dev board, running archlinuxarm, qemu in the repository is compiled
+  with https://download.qemu.org/qemu-4.0.0.tar.xz
+
+  (My AAVMF_CODE.fd and AAVMF_VARS.fd are extracted from debian package
+  qemu-efi-aarch64 0~20181115.85588389-3)
+
+  Below is my libvirt log.
+
+  2019-05-30 15:07:44.216+0000: starting up libvirt version: 5.3.0, qemu ve=
+rsion: 4.0.0, kernel: 4.19.46-1-ARCH, hostname: jerry-n1.localdomain
+  LC_ALL=3DC \
+  PATH=3D/usr/local/sbin:/usr/local/bin:/usr/bin \
+  HOME=3D/var/lib/libvirt/qemu/domain-2-debiantesting \
+  XDG_DATA_HOME=3D/var/lib/libvirt/qemu/domain-2-debiantesting/.local/share=
+ \
+  XDG_CACHE_HOME=3D/var/lib/libvirt/qemu/domain-2-debiantesting/.cache \
+  XDG_CONFIG_HOME=3D/var/lib/libvirt/qemu/domain-2-debiantesting/.config \
+  QEMU_AUDIO_DRV=3Dnone \
+  /usr/bin/qemu-system-aarch64 \
+  -name guest=3Ddebiantesting,debug-threads=3Don \
+  -S \
+  -object secret,id=3DmasterKey0,format=3Draw,file=3D/var/lib/libvirt/qemu/=
+domain-2-debiantesting/master-key.aes \
+  -machine virt-4.0,accel=3Dkvm,usb=3Doff,dump-guest-core=3Doff,gic-version=
+=3D2 \
+  -cpu host \
+  -drive file=3D/opt/ovmf/aarch64/AAVMF_CODE.fd,if=3Dpflash,format=3Draw,un=
+it=3D0,readonly=3Don \
+  -drive file=3D/var/lib/libvirt/qemu/nvram/debiantesting_VARS.fd,if=3Dpfla=
+sh,format=3Draw,unit=3D1 \
+  -m 1024 \
+  -overcommit mem-lock=3Doff \
+  -smp 4,sockets=3D4,cores=3D1,threads=3D1 \
+  -uuid 508d100a-b4e5-4199-9ff9-ac6d40fe2896 \
+  -display none \
+  -no-user-config \
+  -nodefaults \
+  -chardev socket,id=3Dcharmonitor,fd=3D25,server,nowait \
+  -mon chardev=3Dcharmonitor,id=3Dmonitor,mode=3Dcontrol \
+  -rtc base=3Dutc \
+  -no-reboot \
+  -boot strict=3Don \
+  -device pcie-root-port,port=3D0x8,chassis=3D1,id=3Dpci.1,bus=3Dpcie.0,mul=
+tifunction=3Don,addr=3D0x1 \
+  -device pcie-root-port,port=3D0x9,chassis=3D2,id=3Dpci.2,bus=3Dpcie.0,add=
+r=3D0x1.0x1 \
+  -device pcie-root-port,port=3D0xa,chassis=3D3,id=3Dpci.3,bus=3Dpcie.0,add=
+r=3D0x1.0x2 \
+  -device pcie-root-port,port=3D0xb,chassis=3D4,id=3Dpci.4,bus=3Dpcie.0,add=
+r=3D0x1.0x3 \
+  -device pcie-root-port,port=3D0xc,chassis=3D5,id=3Dpci.5,bus=3Dpcie.0,add=
+r=3D0x1.0x4 \
+  -device pcie-root-port,port=3D0xd,chassis=3D6,id=3Dpci.6,bus=3Dpcie.0,add=
+r=3D0x1.0x5 \
+  -device qemu-xhci,p2=3D15,p3=3D15,id=3Dusb,bus=3Dpci.2,addr=3D0x0 \
+  -device virtio-scsi-pci,id=3Dscsi0,bus=3Dpci.3,addr=3D0x0 \
+  -device virtio-serial-pci,id=3Dvirtio-serial0,bus=3Dpci.4,addr=3D0x0 \
+  -drive file=3D/mnt/hddp1/jerry/libvirt/aarch64-images/debiantesting.qcow2=
+,format=3Dqcow2,if=3Dnone,id=3Ddrive-scsi0-0-0-0 \
+  -device scsi-hd,bus=3Dscsi0.0,channel=3D0,scsi-id=3D0,lun=3D0,device_id=
+=3Ddrive-scsi0-0-0-0,drive=3Ddrive-scsi0-0-0-0,id=3Dscsi0-0-0-0,bootindex=
+=3D2 \
+  -drive file=3D/mnt/hddp1/jerry/libvirt/aarch64-iso/debian-testing-arm64-n=
+etinst.iso,format=3Draw,if=3Dnone,id=3Ddrive-scsi0-0-0-1,readonly=3Don \
+  -device scsi-cd,bus=3Dscsi0.0,channel=3D0,scsi-id=3D0,lun=3D1,device_id=
+=3Ddrive-scsi0-0-0-1,drive=3Ddrive-scsi0-0-0-1,id=3Dscsi0-0-0-1,bootindex=
+=3D1 \
+  -netdev tap,fd=3D27,id=3Dhostnet0 \
+  -device virtio-net-pci,netdev=3Dhostnet0,id=3Dnet0,mac=3D52:54:00:d5:28:6=
+d,bus=3Dpci.1,addr=3D0x0 \
+  -chardev pty,id=3Dcharserial0 \
+  -serial chardev:charserial0 \
+  -chardev socket,id=3Dcharchannel0,fd=3D28,server,nowait \
+  -device virtserialport,bus=3Dvirtio-serial0.0,nr=3D1,chardev=3Dcharchanne=
+l0,id=3Dchannel0,name=3Dorg.qemu.guest_agent.0 \
+  -object rng-random,id=3Dobjrng0,filename=3D/dev/urandom \
+  -device virtio-rng-pci,rng=3Dobjrng0,id=3Drng0,bus=3Dpci.5,addr=3D0x0 \
+  -sandbox on,obsolete=3Ddeny,elevateprivileges=3Ddeny,spawn=3Ddeny,resourc=
+econtrol=3Ddeny \
+  -msg timestamp=3Don
+  2019-05-30 15:07:44.216+0000: Domain id=3D2 is tainted: host-cpu
+  char device redirected to /dev/pts/2 (label charserial0)
+  2019-05-30T15:07:46.701125Z qemu-system-aarch64: Initialization of device=
+ cfi.pflash01 failed: device requires 67108864 bytes, block backend provide=
+s 786432 bytes
+  2019-05-30 15:07:46.779+0000: shutting down, reason=3Dfailed
+  (END)
+
+  # /etc/libvirt/qemu.conf  =
+
+  nvram =3D [
+          "/opt/ovmf/aarch64/AAVMF_CODE.fd:/opt/ovmf/aarch64/AAVMF_VARS.fd"
+  ]
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1831115/+subscriptions
 
