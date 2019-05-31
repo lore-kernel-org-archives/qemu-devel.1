@@ -2,91 +2,110 @@ Return-Path: <SRS0=hY9S=T7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 60C70C04AB6
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 May 2019 17:58:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68AD5C04AB6
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 May 2019 18:00:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 33E0D218DA
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 May 2019 17:58:58 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="MuCHmoPp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 33E0D218DA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 1F38326D93
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 May 2019 18:00:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1F38326D93
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:47239 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:47247 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hWlnt-0002Bv-HQ
-	for qemu-devel@archiver.kernel.org; Fri, 31 May 2019 13:58:57 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:57853)
+	id 1hWlp0-0002q8-94
+	for qemu-devel@archiver.kernel.org; Fri, 31 May 2019 14:00:06 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:58020)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hWln9-0001tE-1l
-	for qemu-devel@nongnu.org; Fri, 31 May 2019 13:58:12 -0400
+	(envelope-from <david@redhat.com>) id 1hWlny-0002Jz-5b
+	for qemu-devel@nongnu.org; Fri, 31 May 2019 13:59:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hWln0-00084D-FM
-	for qemu-devel@nongnu.org; Fri, 31 May 2019 13:58:04 -0400
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:39380)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hWln0-0007ek-6q
-	for qemu-devel@nongnu.org; Fri, 31 May 2019 13:58:02 -0400
-Received: by mail-ot1-x341.google.com with SMTP id k24so4929484otn.6
-	for <qemu-devel@nongnu.org>; Fri, 31 May 2019 10:57:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
-	:mime-version:in-reply-to:content-language:content-transfer-encoding;
-	bh=pfFDW6nDCaHvEe9R2InzlAHFQJKyxceko0mAGRagKI4=;
-	b=MuCHmoPpe3POhnpCaR8W0Ey22VoaJgOCCaiJqP+9hJiJ+RzeWXLS1aJedNkwjG1hRH
-	ROdN4UhbKNjbthPOiCR8C3LbKYaH6sEqapyyJNxjDbokLhLflpytBTGDoGsdJYYa8jbZ
-	05o5BK2GWN5l23cZoUzYkQkal3mK1mjWkiP7V+MdhGg9aIAwhb/jrB+R09e5F+8Ebi8a
-	tvdFY4G8kCkQlHT61dyP4fqHM16IC+TK7QtTbmGP0dfG1wLwj9QFAa43QeAdLoif9412
-	FJKj6XXVlggC8QwnI85egVd1CWBVK3Rys5sLMGRum2vjCqCMU+x+ghmIqDbBVj3myO33
-	LagQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-	:date:user-agent:mime-version:in-reply-to:content-language
-	:content-transfer-encoding;
-	bh=pfFDW6nDCaHvEe9R2InzlAHFQJKyxceko0mAGRagKI4=;
-	b=b1Wr9T4ICaEDZq74Fr/7vyFVibSa6+fH8d4lOliAdKQSY66ZwygAwCLiL6YMpWe5rv
-	56o8/FQ7wVKLz7wCa4lLOCNGbwnB9P7h4yRB+8B4oDWKQpsGIQaCQbnmP2v7KXYBtzIQ
-	PIOJRPvvNp2pwQiXqFR0T/9v2xcz6A4Tlfg5I0bZBi321boVEt3uPF6G04hujxhgJWTJ
-	98z88oRQ4Dcp1m0wicgCImjdDXiREF135hITng1z7f3x0ytd77bbt8qPWV5nM4wLQq0s
-	3uLrw6zDA5PR0ZID3gCF4Elq+/Ji8ppvAs0ENxnkSn30sPyLoDgL+GDJmmRwfzmJLa9h
-	IH4Q==
-X-Gm-Message-State: APjAAAWE9LIUD5g0VaG6RbAeGJzKRnYq3h1GdldgK9NqkT51Qe/AgL57
-	0/4gq6DsBAXm6JOJIVNNeZGQk/f8PCriqA==
-X-Google-Smtp-Source: APXvYqyfdtpyG9RToygNGgb7TEg0ltpftzxKkmgBbsvvDhtROuUb7g4tzgxAQzO5Y3at9JDr3JGx/A==
-X-Received: by 2002:a9d:7b4d:: with SMTP id f13mr2798117oto.82.1559325472712; 
-	Fri, 31 May 2019 10:57:52 -0700 (PDT)
-Received: from [172.24.12.210] (168.189-204-159.bestelclientes.com.mx.
-	[189.204.159.168])
-	by smtp.gmail.com with ESMTPSA id 37sm2620541oti.45.2019.05.31.10.57.51
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Fri, 31 May 2019 10:57:52 -0700 (PDT)
-To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
+	(envelope-from <david@redhat.com>) id 1hWlnx-0001Tm-55
+	for qemu-devel@nongnu.org; Fri, 31 May 2019 13:59:02 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35872)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1hWlnw-0001TG-Ty
+	for qemu-devel@nongnu.org; Fri, 31 May 2019 13:59:01 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id DADC080467;
+	Fri, 31 May 2019 17:58:59 +0000 (UTC)
+Received: from [10.36.116.233] (ovpn-116-233.ams2.redhat.com [10.36.116.233])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id D28F25DD7B;
+	Fri, 31 May 2019 17:58:58 +0000 (UTC)
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
 References: <20190531104432.29379-1-david@redhat.com>
 	<20190531104432.29379-24-david@redhat.com>
-From: Richard Henderson <richard.henderson@linaro.org>
+	<a65ae6d5-e9cd-a3ab-c770-5d8f3fcaa6e9@linaro.org>
+From: David Hildenbrand <david@redhat.com>
 Openpgp: preference=signencrypt
-Message-ID: <a65ae6d5-e9cd-a3ab-c770-5d8f3fcaa6e9@linaro.org>
-Date: Fri, 31 May 2019 12:57:49 -0500
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+	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
+	SE+xAvmumFBY
+Organization: Red Hat GmbH
+Message-ID: <eea6986f-5da4-ff22-385e-ba8bc419a7ac@redhat.com>
+Date: Fri, 31 May 2019 19:58:58 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.7.0
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190531104432.29379-24-david@redhat.com>
+In-Reply-To: <a65ae6d5-e9cd-a3ab-c770-5d8f3fcaa6e9@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::341
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.28]);
+	Fri, 31 May 2019 17:58:59 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
 Subject: Re: [Qemu-devel] [PATCH v1 23/23] s390x: Bump the "qemu" CPU model
  up to a stripped-down z13
 X-BeenThere: qemu-devel@nongnu.org
@@ -106,23 +125,38 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/31/19 5:44 AM, David Hildenbrand wrote:
-> We don't care about the other two missing base features:
-> - S390_FEAT_DFP_PACKED_CONVERSION
-> - S390_FEAT_GROUP_GEN13_PTFF
+On 31.05.19 19:57, Richard Henderson wrote:
+> On 5/31/19 5:44 AM, David Hildenbrand wrote:
+>> We don't care about the other two missing base features:
+>> - S390_FEAT_DFP_PACKED_CONVERSION
+>> - S390_FEAT_GROUP_GEN13_PTFF
+>>
+>> Signed-off-by: David Hildenbrand <david@redhat.com>
+>> ---
+>>  hw/s390x/s390-virtio-ccw.c  |  2 ++
+>>  target/s390x/cpu_models.c   |  4 ++--
+>>  target/s390x/gen-features.c | 11 +++++++----
+>>  3 files changed, 11 insertions(+), 6 deletions(-)
 > 
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-> ---
->  hw/s390x/s390-virtio-ccw.c  |  2 ++
->  target/s390x/cpu_models.c   |  4 ++--
->  target/s390x/gen-features.c | 11 +++++++----
->  3 files changed, 11 insertions(+), 6 deletions(-)
+> We should get around to supporting DFP at some point.
+> The code is all there, used by target/ppc/.
 
-We should get around to supporting DFP at some point.
-The code is all there, used by target/ppc/.
+Cool, didn't know about that - will take a look once I have sme spare
+time. Are you aware of a HFP library?
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Thanks!
+
+> 
+> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+> 
+> 
+> r~
+> 
 
 
-r~
+-- 
+
+Thanks,
+
+David / dhildenb
 
