@@ -3,48 +3,48 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_MUTT autolearn=ham
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,T_HK_NAME_DR,USER_AGENT_MUTT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DD073C04AB6
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 May 2019 18:43:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D8BDEC04AB6
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 May 2019 18:46:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ACE6D26E0B
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 May 2019 18:43:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ACE6D26E0B
+	by mail.kernel.org (Postfix) with ESMTPS id A9DF326E15
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 May 2019 18:46:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A9DF326E15
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:47701 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:47740 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hWmUk-0005BN-Np
-	for qemu-devel@archiver.kernel.org; Fri, 31 May 2019 14:43:14 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:37219)
+	id 1hWmY9-0006Fn-V1
+	for qemu-devel@archiver.kernel.org; Fri, 31 May 2019 14:46:45 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:37809)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1hWmTw-0004uE-5c
-	for qemu-devel@nongnu.org; Fri, 31 May 2019 14:42:25 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1hWmWu-0005g2-LC
+	for qemu-devel@nongnu.org; Fri, 31 May 2019 14:45:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1hWmTv-0008TF-2v
-	for qemu-devel@nongnu.org; Fri, 31 May 2019 14:42:24 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60226)
+	(envelope-from <dgilbert@redhat.com>) id 1hWmWt-0007wM-G6
+	for qemu-devel@nongnu.org; Fri, 31 May 2019 14:45:28 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56514)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hWmTu-0008MN-Tl
-	for qemu-devel@nongnu.org; Fri, 31 May 2019 14:42:23 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hWmWt-0007qh-7V
+	for qemu-devel@nongnu.org; Fri, 31 May 2019 14:45:27 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id DBC873006372
-	for <qemu-devel@nongnu.org>; Fri, 31 May 2019 18:42:20 +0000 (UTC)
-Received: from localhost (ovpn-120-246.rdu2.redhat.com [10.10.120.246])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 45110600D1;
-	Fri, 31 May 2019 18:42:14 +0000 (UTC)
-Date: Fri, 31 May 2019 15:42:12 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
+	by mx1.redhat.com (Postfix) with ESMTPS id 0642880B49
+	for <qemu-devel@nongnu.org>; Fri, 31 May 2019 18:45:26 +0000 (UTC)
+Received: from work-vm (ovpn-117-254.ams2.redhat.com [10.36.117.254])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 3A1B35DE81;
+	Fri, 31 May 2019 18:45:15 +0000 (UTC)
+Date: Fri, 31 May 2019 19:45:13 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 To: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20190531184212.GE22103@habkost.net>
+Message-ID: <20190531184512.GN3169@work-vm>
 References: <20190517125820.2885-4-jfreimann@redhat.com>
 	<20190521094504.GB2915@work-vm>
 	<20190530145645.tjwkgi4hae5yblsi@jenstp.localdomain>
@@ -59,11 +59,11 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <20190531135059-mutt-send-email-mst@kernel.org>
-User-Agent: Mutt/1.11.3 (2019-02-01)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+User-Agent: Mutt/1.11.4 (2019-03-13)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.43]);
-	Fri, 31 May 2019 18:42:20 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.28]);
+	Fri, 31 May 2019 18:45:26 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
 Subject: Re: [Qemu-devel] [PATCH 3/4] net/virtio: add failover support
@@ -78,15 +78,15 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pkrempa@redhat.com, berrange@redhat.com, aadam@redhat.com,
-	"Dr. David Alan Gilbert" <dgilbert@redhat.com>,
-	qemu-devel@nongnu.org, laine@redhat.com,
+Cc: pkrempa@redhat.com, berrange@redhat.com,
+	Eduardo Habkost <ehabkost@redhat.com>, aadam@redhat.com,
+	qemu-devel@nongnu.org, laine@redhat.com, jdenemar@redhat.com,
 	Jens Freimann <jfreimann@redhat.com>, ailan@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, May 31, 2019 at 02:04:49PM -0400, Michael S. Tsirkin wrote:
+* Michael S. Tsirkin (mst@redhat.com) wrote:
 > On Fri, May 31, 2019 at 02:01:54PM -0300, Eduardo Habkost wrote:
 > > > Yes. It's just lots of extremely low level interfaces
 > > > and all rather pointless.
@@ -103,11 +103,25 @@ On Fri, May 31, 2019 at 02:04:49PM -0400, Michael S. Tsirkin wrote:
 > Exposing such a level of detail to management is imho pointless.
 > We are better off with a high level API, see below.
 
-I don't disagree it's low level.  I just disagree it's pointless.
-The goal here is to provide an API that management software can
-use.
+so I don't know much about vfio; but to me it strikes me that
+you wouldn't need that low level detail if we just reworked vfio
+to look more like all our other devices; something like:
 
-> 
+  -vfiodev  host=02:00.0,id=gpu
+  -device vfio-pci,dev=gpu
+
+The 'vfiodev' would own the resources; so to do this trick, the
+management layer would:
+   hotunplug the vfio-pci
+   migrate
+
+if anything went wrong it would
+   hotplug the vfio-pci backin
+
+you wouldn't have free'd up any resources because they belonged
+to the vfiodev.
+
+
 > > If we want this to work before
 > > surprise removal is implemented, we need to provide an API that
 > > works for management software.
@@ -127,14 +141,17 @@ use.
 > The API in question would be a high level one, something
 > along the lines of a single "guest allowed migration" event.
 
-If you want to hide the low level details behind a higher level
-API, that's OK.  I just want to be sure we have really listened
-to management software developers to confirm the API we're
-providing will work for them.
+This is all fairly normal problems with hot unplugging - that's
+already dealt with at higher levels for normal hot unplugging.
 
-This will probably require documenting the new interface in more
-detail (as you have already mentioned in this thread).
+The question here is to try to avoid duplicating that fairly
+painful process in qemu.
 
--- 
-Eduardo
+Dave
+
+> 
+> -- 
+> MST
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
