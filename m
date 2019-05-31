@@ -7,78 +7,82 @@ X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B855C04AB6
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 May 2019 14:03:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 45888C04AB6
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 May 2019 14:03:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DDA092446F
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 May 2019 14:03:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 187EB2446F
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 May 2019 14:03:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="W5o53EZB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DDA092446F
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="QUeGozTv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 187EB2446F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:44079 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:44085 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hWi7e-0005wZ-1d
-	for qemu-devel@archiver.kernel.org; Fri, 31 May 2019 10:03:06 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:34553)
+	id 1hWi88-0006B2-Do
+	for qemu-devel@archiver.kernel.org; Fri, 31 May 2019 10:03:36 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:34575)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hWhos-0007XO-PJ
-	for qemu-devel@nongnu.org; Fri, 31 May 2019 09:43:43 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hWhov-0007Zy-BU
+	for qemu-devel@nongnu.org; Fri, 31 May 2019 09:43:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hWhor-0000Tj-Pe
-	for qemu-devel@nongnu.org; Fri, 31 May 2019 09:43:42 -0400
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:33115)
+	(envelope-from <richard.henderson@linaro.org>) id 1hWhou-0000XZ-8M
+	for qemu-devel@nongnu.org; Fri, 31 May 2019 09:43:45 -0400
+Received: from mail-oi1-x229.google.com ([2607:f8b0:4864:20::229]:42241)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hWhor-0000Sq-Kt
-	for qemu-devel@nongnu.org; Fri, 31 May 2019 09:43:41 -0400
-Received: by mail-ot1-x341.google.com with SMTP id n18so9230387otq.0
-	for <qemu-devel@nongnu.org>; Fri, 31 May 2019 06:43:41 -0700 (PDT)
+	id 1hWhou-0000Vh-3b
+	for qemu-devel@nongnu.org; Fri, 31 May 2019 09:43:44 -0400
+Received: by mail-oi1-x229.google.com with SMTP id v25so7162809oic.9
+	for <qemu-devel@nongnu.org>; Fri, 31 May 2019 06:43:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=from:to:cc:subject:date:message-id:in-reply-to:references;
-	bh=rNgSWAbxlywlQ4KxHC7oNVwolWTAQUxbjiBFeCf/M3w=;
-	b=W5o53EZBCXmYPS30t0zcWJXRsn1SgcwCAZqNHFiwmu/wst3HCvKHp2/pzgCBEgagBr
-	NnuaJBPK9EuzOH/2yL9beFP5dzXvxuRq5a7BwDbQSNPyzrI/HaIedQFoWqNVtq4nItkO
-	lWZ4bd2gCnUA4r2phqnCV99sUA/osZX3Xh14V4ShbIfAyGvETsRAqWnqG+v1xpt14p6o
-	Q7eUGqUZ4m25bCT/zRsar8Xf3yHGLqf8Ey0zh2hYZ7XFTyhfKUFdjtBqCHIYtPK+KsOp
-	uLxD59JOj+giHXkz5sBVkZiKp7XRVVCZsJgIh1S5BBvAD0o1BrQ23U+UG1eWVJE4Lciz
-	WX2A==
+	h=from:to:cc:subject:date:message-id:in-reply-to:references
+	:mime-version:content-transfer-encoding;
+	bh=R+n1RejJW342bFslDn26nW3Vb7JdpGcpR0skOavPjDM=;
+	b=QUeGozTvP+Oq+3+odyNfjZ+5J2OqvvitucYu7bh1hQ0rU4w7IRic1hG5E8+8qI/AYc
+	vWb9x6sAQU0r2GvGWIwJbW8s1o0cpIFRHzFLHoGP5afp8qVjVVEejKeSq1YYsXdgq2kq
+	x7ey9y2HclzrP6ociLTCOH35mTsQPPP6oHe4jYyOHPwBrb879HQC7gZehlnaiD3xaiIl
+	EGY45hxvAhiGnkERtpnH6HmQmxkZ4M9p2g8BAMeSgmGAwrACVO3DdpcTF8If5sZbX9mH
+	/hGpqbr5dSlr6m10BSOtF93BMmSTtlXPvZIYZ79vWLBUDz2RNx+N1QHvBWzLHUWgoWXp
+	T5Bg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-	:references;
-	bh=rNgSWAbxlywlQ4KxHC7oNVwolWTAQUxbjiBFeCf/M3w=;
-	b=G0xSsJPU/jNsHhj2wufTBSHwIY05b0IFcG7syN3A0yYGoAe7djgPRu/F7pzmaTqxM1
-	AGjQjDZqlgZrP6iF8nU0qr+Outdo55kDZnuECGXRHUEw/5pf+YoiKxO4nI1QX9Rv5JaL
-	uKJwEJotczMXXs/gMwzIQEQl8Kx5j6apqtn9AmZAvnGydRc4OMrHXDkLqWaAbq2jPd+e
-	+F3Oq2KWXAZ0sCewS5VX2sntYM68ruy22i1c8fl0sq+NMWyLg0Q8lVAfXt9az3eLfgBU
-	NSLiEO1oTVQDLiKrpELVZE11SPVZivAsrJy5iXPLaxwJeN12Yka+7G/ZC24Va2KqR9+D
-	IsYg==
-X-Gm-Message-State: APjAAAUa6r5zn3yw8YEtK1TiPvw7YtIzeFmGKvoPTOTDBRNbc7ZXdG6q
-	5SXk3oii6jLFsJBy+296P2SRp9fAQK733w==
-X-Google-Smtp-Source: APXvYqxWFc55Kayj13+jVqy1DGF9lXmUzccT7x7LoEmEH7q9iUjOSRfAgWw/rOVNAE2mNxnLFALshQ==
-X-Received: by 2002:a9d:6296:: with SMTP id x22mr1892564otk.94.1559310220869; 
-	Fri, 31 May 2019 06:43:40 -0700 (PDT)
+	:references:mime-version:content-transfer-encoding;
+	bh=R+n1RejJW342bFslDn26nW3Vb7JdpGcpR0skOavPjDM=;
+	b=JBPf9ygxJUEEL2Gq+6qnHivMTsM0o+qs0k90JuzPz2L399JcpVjUEa/rFjx/lzaAt+
+	r2e2FhcNjY8sfzHYmMyUHrh28SneLsKYVhyB7kcgGYNGsmlQfInXZ9ofo+tobLP9NaZc
+	DkhedyiC0z7siRw4ALrnhzJm/fWyRC9dT/Ik2M6+QGfbv2/KuEMf0cXNRf+5RereXtYI
+	e5JhFSmMdGVMxziMAAwSodMgngTvOfyYTLUYG1gcoG5cQOzxFe73NfZzAteNuJA4xff5
+	Fi6TD5rQVRvCrjcLQA0Qsb3fpJusEjO2nFsC/CA1QLGtjLrt2Zf3e96vsCUsZiXITmdO
+	sRAw==
+X-Gm-Message-State: APjAAAVkFAIYGGeLbuKdh7gzAOIWd3B7HHeT8c9orhmtkNNCb7N/gQTD
+	VrghJo0gOFF2UBzrTBYumkyomfXCA6g2eQ==
+X-Google-Smtp-Source: APXvYqzpUEOob2bJXPuMmBgoYmFZR4T3cBlq75dZTolnZgGVi+4ijO2JVCmY6P3gQnj9AsEIHfxt2g==
+X-Received: by 2002:a54:4f8d:: with SMTP id g13mr4398504oiy.3.1559310222759;
+	Fri, 31 May 2019 06:43:42 -0700 (PDT)
 Received: from localhost.localdomain (168.189-204-159.bestelclientes.com.mx.
 	[189.204.159.168]) by smtp.gmail.com with ESMTPSA id
-	r23sm2391176otg.49.2019.05.31.06.43.39
+	r23sm2391176otg.49.2019.05.31.06.43.40
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Fri, 31 May 2019 06:43:40 -0700 (PDT)
+	Fri, 31 May 2019 06:43:41 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Fri, 31 May 2019 08:43:07 -0500
-Message-Id: <20190531134315.4109-16-richard.henderson@linaro.org>
+Date: Fri, 31 May 2019 08:43:08 -0500
+Message-Id: <20190531134315.4109-17-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190531134315.4109-1-richard.henderson@linaro.org>
 References: <20190531134315.4109-1-richard.henderson@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2607:f8b0:4864:20::341
-Subject: [Qemu-devel] [PATCH v16 15/23] hw/rx: Honor -accel qtest
+X-Received-From: 2607:f8b0:4864:20::229
+Subject: [Qemu-devel] [PATCH v16 16/23] Add rx-softmmu
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -95,48 +99,94 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Issue an error if no kernel, no bios, and not qtest'ing.
-Fixes make check-qtest-rx: test/qom-test.
+From: Yoshinori Sato <ysato@users.sourceforge.jp>
 
+Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
+Message-Id: <20190516055244.95559-10-ysato@users.sourceforge.jp>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- hw/rx/rx62n.c | 10 +++++++++-
- 1 file changed, 9 insertions(+), 1 deletion(-)
+ include/sysemu/arch_init.h     | 1 +
+ arch_init.c                    | 2 ++
+ configure                      | 8 ++++++++
+ default-configs/rx-softmmu.mak | 3 +++
+ hw/Kconfig                     | 1 +
+ 5 files changed, 15 insertions(+)
+ create mode 100644 default-configs/rx-softmmu.mak
 
-diff --git a/hw/rx/rx62n.c b/hw/rx/rx62n.c
-index 3a8fe7b0bf..e55257c622 100644
---- a/hw/rx/rx62n.c
-+++ b/hw/rx/rx62n.c
-@@ -21,11 +21,13 @@
+diff --git a/include/sysemu/arch_init.h b/include/sysemu/arch_init.h
+index 10cbafe970..3f4f844f7b 100644
+--- a/include/sysemu/arch_init.h
++++ b/include/sysemu/arch_init.h
+@@ -25,6 +25,7 @@ enum {
+     QEMU_ARCH_NIOS2 = (1 << 17),
+     QEMU_ARCH_HPPA = (1 << 18),
+     QEMU_ARCH_RISCV = (1 << 19),
++    QEMU_ARCH_RX = (1 << 20),
+ };
  
- #include "qemu/osdep.h"
- #include "qapi/error.h"
-+#include "qemu/error-report.h"
- #include "hw/hw.h"
- #include "hw/rx/rx62n.h"
- #include "hw/loader.h"
- #include "hw/sysbus.h"
- #include "sysemu/sysemu.h"
-+#include "sysemu/qtest.h"
- #include "cpu.h"
- 
- /*
-@@ -190,8 +192,14 @@ static void rx62n_realize(DeviceState *dev, Error **errp)
-     memory_region_init_rom(&s->c_flash, NULL, "codeflash",
-                            RX62N_CFLASH_SIZE, errp);
-     memory_region_add_subregion(s->sysmem, RX62N_CFLASH_BASE, &s->c_flash);
+ extern const uint32_t arch_type;
+diff --git a/arch_init.c b/arch_init.c
+index f4f3f610c8..cc25ddd7ca 100644
+--- a/arch_init.c
++++ b/arch_init.c
+@@ -74,6 +74,8 @@ int graphic_depth = 32;
+ #define QEMU_ARCH QEMU_ARCH_PPC
+ #elif defined(TARGET_RISCV)
+ #define QEMU_ARCH QEMU_ARCH_RISCV
++#elif defined(TARGET_RX)
++#define QEMU_ARCH QEMU_ARCH_RX
+ #elif defined(TARGET_S390X)
+ #define QEMU_ARCH QEMU_ARCH_S390X
+ #elif defined(TARGET_SH4)
+diff --git a/configure b/configure
+index 6cdcfb2dc3..7e5477e487 100755
+--- a/configure
++++ b/configure
+@@ -7605,6 +7605,11 @@ case "$target_name" in
+     gdb_xml_files="riscv-64bit-cpu.xml riscv-64bit-fpu.xml riscv-64bit-csr.xml"
+     target_compiler=$cross_cc_riscv64
+   ;;
++  rx)
++    TARGET_ARCH=rx
++    bflt="yes"
++    target_compiler=$cross_cc_rx
++  ;;
+   sh4|sh4eb)
+     TARGET_ARCH=sh4
+     bflt="yes"
+@@ -7825,6 +7830,9 @@ for i in $ARCH $TARGET_BASE_ARCH ; do
+   riscv*)
+     disas_config "RISCV"
+   ;;
++  rx)
++    disas_config "RX"
++  ;;
+   s390*)
+     disas_config "S390"
+   ;;
+diff --git a/default-configs/rx-softmmu.mak b/default-configs/rx-softmmu.mak
+new file mode 100644
+index 0000000000..a3eecefb11
+--- /dev/null
++++ b/default-configs/rx-softmmu.mak
+@@ -0,0 +1,3 @@
++# Default configuration for rx-softmmu
 +
-     if (!s->kernel) {
--        rom_add_file_fixed(bios_name, RX62N_CFLASH_BASE, 0);
-+        if (bios_name) {
-+            rom_add_file_fixed(bios_name, RX62N_CFLASH_BASE, 0);
-+        }  else if (!qtest_enabled()) {
-+            error_report("No bios or kernel specified");
-+            exit(1);
-+        }
-     }
- 
-     object_initialize_child(OBJECT(s), "cpu", &s->cpu,
++CONFIG_RX_VIRT=y
+diff --git a/hw/Kconfig b/hw/Kconfig
+index 195f541e50..b0c7221240 100644
+--- a/hw/Kconfig
++++ b/hw/Kconfig
+@@ -54,6 +54,7 @@ source nios2/Kconfig
+ source openrisc/Kconfig
+ source ppc/Kconfig
+ source riscv/Kconfig
++source rx/Kconfig
+ source s390x/Kconfig
+ source sh4/Kconfig
+ source sparc/Kconfig
 -- 
 2.17.1
 
