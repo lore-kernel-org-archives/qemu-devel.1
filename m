@@ -2,76 +2,79 @@ Return-Path: <SRS0=hY9S=T7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D6DEDC04AB6
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 May 2019 09:24:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D87D7C04AB6
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 May 2019 09:39:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AE70E266BA
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 May 2019 09:24:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AE70E266BA
+	by mail.kernel.org (Postfix) with ESMTPS id B0595266FF
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 May 2019 09:39:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B0595266FF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:39076 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:39205 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hWdlv-0006Lk-Ua
-	for qemu-devel@archiver.kernel.org; Fri, 31 May 2019 05:24:23 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:38278)
+	id 1hWe0f-0001Fx-RR
+	for qemu-devel@archiver.kernel.org; Fri, 31 May 2019 05:39:37 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:40666)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vkuznets@redhat.com>) id 1hWdkc-0005Ta-Mh
-	for qemu-devel@nongnu.org; Fri, 31 May 2019 05:23:04 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1hWdzx-0000ww-1C
+	for qemu-devel@nongnu.org; Fri, 31 May 2019 05:38:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vkuznets@redhat.com>) id 1hWdkb-0005bE-HB
-	for qemu-devel@nongnu.org; Fri, 31 May 2019 05:23:02 -0400
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:44541)
+	(envelope-from <pbonzini@redhat.com>) id 1hWdzw-0002Ql-4j
+	for qemu-devel@nongnu.org; Fri, 31 May 2019 05:38:52 -0400
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:37502)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <vkuznets@redhat.com>) id 1hWdkb-0005a3-Ai
-	for qemu-devel@nongnu.org; Fri, 31 May 2019 05:23:01 -0400
-Received: by mail-wr1-f68.google.com with SMTP id w13so5982521wru.11
-	for <qemu-devel@nongnu.org>; Fri, 31 May 2019 02:23:00 -0700 (PDT)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hWdzv-000297-UR
+	for qemu-devel@nongnu.org; Fri, 31 May 2019 05:38:52 -0400
+Received: by mail-wm1-f65.google.com with SMTP id 7so5483689wmo.2
+	for <qemu-devel@nongnu.org>; Fri, 31 May 2019 02:38:40 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-	:message-id:mime-version;
-	bh=YPgJ7SvnBgZ2L6ZOs2ea8PQjIIaX51OxPiUdgc9Y+F8=;
-	b=EWrgjkayQVpTXC7S7VlQHpsrFaC9uCzzZFEKlL1+9wD/lIBavhe53U25PFg8feNMlR
-	WGmQAbmlzvajfKqZFuG4fHoxrM9wkq4av3gb/nP+gmVGXQG6fOoJoqJ6RE1A6XZO2cAO
-	7SKaeFz06zbcHotcjbzBUPlypF4nw2vEzCwee06vrMenCm0gmfU8luyBC0mUnKHnTjFv
-	g876yaddnI7Zi6NXQnXd8OypOiA7OTqMecdX66XOGhHuV4JiyZKsz+FCT7ETJcici9Tq
-	qne9Ua1ax9C2e0HujMjORVS3mDxeIlKvI7NiiIT57wmOEXB0USkQiFt7ECVSdT/Yc2bu
-	SpjA==
-X-Gm-Message-State: APjAAAVoHHAF3Md7cEWVIs/Txl+a2j9w5IWZ39GIuNQx3367Z48m6m0M
-	mjgb8xhJiwZP6FSaO3NLhE/odQ==
-X-Google-Smtp-Source: APXvYqzTc3NleWfF2pbXBKChqqY3QfFFRZhjpmylJS9JJPy+8b++2r95SSLevPj9jGaF95vJ7N7N9Q==
-X-Received: by 2002:adf:f743:: with SMTP id z3mr5692121wrp.129.1559294579401; 
-	Fri, 31 May 2019 02:22:59 -0700 (PDT)
-Received: from vitty.brq.redhat.com (nat-pool-brq-t.redhat.com.
-	[213.175.37.10])
-	by smtp.gmail.com with ESMTPSA id 6sm9654615wrd.51.2019.05.31.02.22.58
-	(version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-	Fri, 31 May 2019 02:22:58 -0700 (PDT)
-From: Vitaly Kuznetsov <vkuznets@redhat.com>
-To: Roman Kagan <rkagan@virtuozzo.com>
-In-Reply-To: <20190530175511.GA13965@rkaganb.sw.ru>
-References: <20190517141924.19024-1-vkuznets@redhat.com>
-	<20190517141924.19024-3-vkuznets@redhat.com>
-	<20190527155231.GB2362@rkaganb.sw.ru>
-	<87h89fn95y.fsf@vitty.brq.redhat.com>
-	<20190530175511.GA13965@rkaganb.sw.ru>
-Date: Fri, 31 May 2019 11:22:57 +0200
-Message-ID: <87a7f3kmfi.fsf@vitty.brq.redhat.com>
+	h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+	:user-agent:mime-version:in-reply-to:content-language
+	:content-transfer-encoding;
+	bh=YbvwlkzNR1i7UC74xckLQ4uyepqQeuSEWCNfYj50iuU=;
+	b=ie6SwnfGMVYWAPJNRZZZMHGoTPeOLLjQgn8k53VtGiqNUVMrHx0dzTkV2Kc53OwX3L
+	quie/c5ri+UMjH7mZkqQ42t7zp7OZjS+CDVeIKAFu5T7I1x5UCrFq8BAzc95mUz5AguM
+	njuOlWwgGI5uB1y0+HSZrXGV64F7l7Fd+OxNqRfFD4gdIaBG3b3qqihbadjQcJcZpkS3
+	ShN9bfXpzz1vQQypbJsrEnGjXa4Yap1C++Xit65h6qgcjAdX1cx6wsICR08bplF2EhX9
+	zFHzK/wtprfqxyRAAbBZJXVMjlDLp++o8q9bJzMWoEZQye1tQDHwSQKo1UOFAg/bI2eB
+	Y/eQ==
+X-Gm-Message-State: APjAAAX3f6zHrrIRldOv5nC4lTs8BIcFQH8RnUS5KWryih+uCxktf00o
+	uB9lDcoHkNCLWZjcNit95saqYw==
+X-Google-Smtp-Source: APXvYqyYXFAqRTktKComYqxAlSd9RGfP3WxxxBe1C3tFo55dCxbxuvaAtN2KDuKooflF80qx/LhSxw==
+X-Received: by 2002:a1c:dc45:: with SMTP id t66mr5251011wmg.63.1559295519351; 
+	Fri, 31 May 2019 02:38:39 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:3da1:318a:275c:408?
+	([2001:b07:6468:f312:3da1:318a:275c:408])
+	by smtp.gmail.com with ESMTPSA id
+	y132sm8075754wmd.35.2019.05.31.02.38.38
+	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+	Fri, 31 May 2019 02:38:38 -0700 (PDT)
+To: Wainer dos Santos Moschetta <wainersm@redhat.com>, qemu-devel@nongnu.org
+References: <20190530215755.328-1-wainersm@redhat.com>
+	<20190530215755.328-2-wainersm@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <5ed9a908-bfde-255a-f0de-b977c5f71db6@redhat.com>
+Date: Fri, 31 May 2019 11:38:38 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <20190530215755.328-2-wainersm@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 	[fuzzy]
-X-Received-From: 209.85.221.68
-Subject: Re: [Qemu-devel] [PATCH v2 2/9] i386/kvm: add support for
- KVM_GET_SUPPORTED_HV_CPUID
+X-Received-From: 209.85.128.65
+Subject: Re: [Qemu-devel] [PATCH 1/1] vl: make -accel help to list enabled
+ accelerators only
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -83,97 +86,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?utf-8?Q?Daniel_P_=2E_Berrang=C3=A9?= <berrange@redhat.com>,
-	Eduardo Habkost <ehabkost@redhat.com>,
-	Marcelo Tosatti <mtosatti@redhat.com>, "Dr . David
-	Alan Gilbert" <dgilbert@redhat.com>,
-	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-	Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: philmd@redhat.com, ehabkost@redhat.com, crosa@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Roman Kagan <rkagan@virtuozzo.com> writes:
+On 30/05/19 23:57, Wainer dos Santos Moschetta wrote:
+> Currently, -accel help shows all possible accelerators regardless
+> if they are enabled in the binary or not. That is a different
+> semantic from -cpu and -machine helps, for example. So this change
+> makes it to list only the accelerators which support is compiled
+> in the binary target.
+> 
+> Note that it does not check if the accelerator is enabled in the
+> host, so the help message's header was rewritten to emphasize
+> that. Also qtest is not displayed given that it is used for
+> internal testing purpose only.
+> 
+> Signed-off-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
+> ---
+>  vl.c | 18 +++++++++++++++++-
+>  1 file changed, 17 insertions(+), 1 deletion(-)
+> 
+> diff --git a/vl.c b/vl.c
+> index 2e69c9fef2..e5d40c01f8 100644
+> --- a/vl.c
+> +++ b/vl.c
+> @@ -3575,7 +3575,23 @@ int main(int argc, char **argv, char **envp)
+>                                                       optarg, true);
+>                  optarg = qemu_opt_get(accel_opts, "accel");
+>                  if (!optarg || is_help_option(optarg)) {
+> -                    printf("Possible accelerators: kvm, xen, hax, tcg\n");
+> +                    printf("Accelerators supported in QEMU binary:\n");
+> +                    GSList *el, *accel_list = object_class_get_list(TYPE_ACCEL,
+> +                                                                    false);
+> +                    for (el = accel_list; el; el = el->next) {
+> +                        gchar *typename = g_strdup(object_class_get_name(
+> +                                                   OBJECT_CLASS(el->data)));
+> +                        /* omit qtest which is used for tests only */
+> +                        if (g_strcmp0(typename, ACCEL_CLASS_NAME("qtest")) &&
+> +                            g_str_has_suffix(typename, ACCEL_CLASS_SUFFIX)) {
+> +                            gchar **optname = g_strsplit(typename,
+> +                                                         ACCEL_CLASS_SUFFIX, 0);
+> +                            printf("%s\n", optname[0]);
+> +                            g_free(optname);
+> +                        }
+> +                        g_free(typename);
+> +                    }
+> +                    g_slist_free(accel_list);
+>                      exit(0);
+>                  }
+>                  opts = qemu_opts_create(qemu_find_opts("machine"), NULL,
+> 
 
-> On Mon, May 27, 2019 at 06:39:53PM +0200, Vitaly Kuznetsov wrote:
->> Roman Kagan <rkagan@virtuozzo.com> writes:
->> > On Fri, May 17, 2019 at 04:19:17PM +0200, Vitaly Kuznetsov wrote:
->> >> +static struct kvm_cpuid2 *try_get_hv_cpuid(CPUState *cs, int max)
->> >> +{
->> >> +    struct kvm_cpuid2 *cpuid;
->> >> +    int r, size;
->> >> +
->> >> +    size = sizeof(*cpuid) + max * sizeof(*cpuid->entries);
->> >> +    cpuid = g_malloc0(size);
->> >> +    cpuid->nent = max;
->> >> +
->> >> +    r = kvm_vcpu_ioctl(cs, KVM_GET_SUPPORTED_HV_CPUID, cpuid);
->> >> +    if (r == 0 && cpuid->nent >= max) {
->> >> +        r = -E2BIG;
->> >> +    }
->> >> +    if (r < 0) {
->> >> +        if (r == -E2BIG) {
->> >> +            g_free(cpuid);
->> >> +            return NULL;
->> >> +        } else {
->> >> +            fprintf(stderr, "KVM_GET_SUPPORTED_HV_CPUID failed: %s\n",
->> >> +                    strerror(-r));
->> >> +            exit(1);
->> >> +        }
->> >> +    }
->> >> +    return cpuid;
->> >> +}
->> >> +
->> >> +/*
->> >> + * Run KVM_GET_SUPPORTED_HV_CPUID ioctl(), allocating a buffer large enough
->> >> + * for all entries.
->> >> + */
->> >> +static struct kvm_cpuid2 *get_supported_hv_cpuid(CPUState *cs)
->> >> +{
->> >> +    struct kvm_cpuid2 *cpuid;
->> >> +    int max = 7; /* 0x40000000..0x40000005, 0x4000000A */
->> >> +
->> >> +    /*
->> >> +     * When the buffer is too small, KVM_GET_SUPPORTED_HV_CPUID fails with
->> >> +     * -E2BIG, however, it doesn't report back the right size. Keep increasing
->> >> +     * it and re-trying until we succeed.
->> >> +     */
->> >
->> > I'm still missing the idea of reiterating more than once: the ioctl
->> > returns the actual size of the array.
->> 
->> Hm, I think I checked that and it doesn't seem to be the case.
->> 
->> The code in kvm_vcpu_ioctl_get_hv_cpuid():
->> 
->> 	if (cpuid->nent < nent)
->> 		return -E2BIG;
->> 
->> 	if (cpuid->nent > nent)
->> 		cpuid->nent = nent;
->> 
->> (I think I even ran a test after your comment on v1 and it it
->> confirmed nent is not set on E2BIG). Am I missing something obvious?
->
-> Indeed, I saw kvm_vcpu_ioctl_get_cpuid2() always setting ->nent on
-> return and assumed so did kvm_vcpu_ioctl_get_hv_cpuid().  I stand
-> corrected, please disregard this comment.
+Queued, thanks!
 
-No problem at all!
-
-> (What was the reason for not following this pattern in
-> kvm_vcpu_ioctl_get_hv_cpuid BTW?)
-
-The opportunity to set nent in E2BIG case was probabbly overlooked. I
-was looking at QEMU's get_supported_cpuid() implementation which
-iterates trying to find the right number and used this as a pattern.
-
-While setting nent in E2BIG case seems to be very convenient, this is an
-unobvious side-effect: usually, where the return value indicates an
-error we don't inspect the payload. I'm, however, not at all against
-changing kvm_vcpu_ioctl_get_hv_cpuid(). Unfortunately, this won't help
-QEMU and we'll still have to iterate to support legacy kernels.
-
--- 
-Vitaly
+Paolo
 
