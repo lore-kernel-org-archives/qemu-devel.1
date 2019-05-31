@@ -2,72 +2,55 @@ Return-Path: <SRS0=hY9S=T7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_MUTT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_NEOMUTT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 99CCFC04AB6
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 May 2019 09:16:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B2B7AC04AB6
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 May 2019 09:20:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6E0D426691
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 May 2019 09:16:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6E0D426691
+	by mail.kernel.org (Postfix) with ESMTPS id 773D62669E
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 May 2019 09:20:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 773D62669E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:39002 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:39057 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hWdeU-0003HO-Nq
-	for qemu-devel@archiver.kernel.org; Fri, 31 May 2019 05:16:42 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:37170)
+	id 1hWdiN-0004iV-EG
+	for qemu-devel@archiver.kernel.org; Fri, 31 May 2019 05:20:43 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:37886)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1hWddU-0002gu-85
-	for qemu-devel@nongnu.org; Fri, 31 May 2019 05:15:41 -0400
+	(envelope-from <mrezanin@redhat.com>) id 1hWdhP-0004FX-8P
+	for qemu-devel@nongnu.org; Fri, 31 May 2019 05:19:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1hWddS-0000fD-4J
-	for qemu-devel@nongnu.org; Fri, 31 May 2019 05:15:40 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:32962)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1hWddM-0000aI-OR
-	for qemu-devel@nongnu.org; Fri, 31 May 2019 05:15:34 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D43C5C002965;
-	Fri, 31 May 2019 09:15:26 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-117-126.ams2.redhat.com
-	[10.36.117.126])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id C4545608CA;
-	Fri, 31 May 2019 09:15:20 +0000 (UTC)
-Date: Fri, 31 May 2019 11:15:14 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>
-Message-ID: <20190531091514.GA9842@localhost.localdomain>
-References: <20190409161009.6322-1-marcandre.lureau@redhat.com>
-	<87sgt7sxhy.fsf@dusky.pond.sub.org>
-	<CAJ+F1CJ6hpQZf6199_-rAW98HwEssNT_kXBJF9he9NZFvWaGPA@mail.gmail.com>
-	<87tvdlhakq.fsf@dusky.pond.sub.org>
-	<CAJ+F1CJLuNVu_aWPjQtFwP_tLMqn=vd_gCtW7SWZWdhYMF6H7w@mail.gmail.com>
-	<87blzo1fa5.fsf@dusky.pond.sub.org>
-	<20190527090731.uohmamahlg53bu77@sirius.home.kraxel.org>
-	<87pno46ngf.fsf@dusky.pond.sub.org>
+	(envelope-from <mrezanin@redhat.com>) id 1hWdhO-0003Fq-3p
+	for qemu-devel@nongnu.org; Fri, 31 May 2019 05:19:43 -0400
+Received: from 212-4-128-36.cust.selfnet.cz ([212.4.128.36]:60036
+	helo=workimage.localdomain) by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <mrezanin@redhat.com>)
+	id 1hWdhL-0003CD-1C; Fri, 31 May 2019 05:19:39 -0400
+Received: by workimage.localdomain (Postfix, from userid 1000)
+	id 12A541C3399; Fri, 31 May 2019 11:12:05 +0200 (CEST)
+Date: Fri, 31 May 2019 11:12:04 +0200
+From: Miroslav Rezanina <mrezanin@redhat.com>
+To: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+Message-ID: <20190531091204.tjmq622gw457xbdr@lws.brq.redhat.com>
+References: <20190514155301.16123-1-alex.bennee@linaro.org>
+	<20190514155301.16123-7-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <87pno46ngf.fsf@dusky.pond.sub.org>
-User-Agent: Mutt/1.11.3 (2019-02-01)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.31]);
-	Fri, 31 May 2019 09:15:27 +0000 (UTC)
+In-Reply-To: <20190514155301.16123-7-alex.bennee@linaro.org>
+User-Agent: NeoMutt/20180716
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v4 00/20] monitor: add asynchronous command
- type
+X-Received-From: 212.4.128.36
+Subject: Re: [Qemu-devel] [RFC PATCH 06/11] target/arm: use the common
+ interface for WRITE0/WRITEC in arm-semi
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -79,77 +62,133 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Michael Roth <mdroth@linux.vnet.ibm.com>, QEMU <qemu-devel@nongnu.org>,
-	"Dr. David Alan Gilbert" <dgilbert@redhat.com>,
-	=?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@gmail.com>,
-	Gerd Hoffmann <kraxel@redhat.com>, John Snow <jsnow@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Riku Voipio <riku.voipio@iki.fi>,
+	qemu-devel@nongnu.org, qemu-arm@nongnu.org,
+	Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 27.05.2019 um 15:23 hat Markus Armbruster geschrieben:
-> Gerd Hoffmann <kraxel@redhat.com> writes:
+On Tue, May 14, 2019 at 04:52:56PM +0100, Alex Benn=E9e wrote:
+> Now we have a common semihosting console interface use that for our
+> string output. However ARM is currently unique in also supporting
+> semihosting for linux-user so we need to replicate the API in
+> linux-user. If other architectures gain this support we can move the
+> file later.
 >=20
-> > On Mon, May 27, 2019 at 10:18:42AM +0200, Markus Armbruster wrote:
-> >> Marc-Andr=E9 Lureau <marcandre.lureau@gmail.com> writes:
-> >>=20
-> >> > Hi
-> >> >
-> >> > On Thu, May 23, 2019 at 9:52 AM Markus Armbruster <armbru@redhat.c=
-om> wrote:
-> >> >> I'm not sure how asynchronous commands could support reconnect an=
-d
-> >> >> resume.
-> >> >
-> >> > The same way as current commands, including job commands.
-> >>=20
-> >> Consider the following scenario: a management application such as
-> >> libvirt starts a long-running task with the intent to monitor it unt=
-il
-> >> it finishes.  Half-way through, the management application needs to
-> >> disconnect and reconnect for some reason (systemctl restart, or cras=
-h &
-> >> recover, or whatever).
-> >>=20
-> >> If the long-running task is a job, the management application can re=
-sume
-> >> after reconnect: the job's ID is as valid as it was before, and the
-> >> commands to query and control the job work as before.
-> >>=20
-> >> What if it's and asynchronous command?
-> >
-> > This is not meant for some long-running job which you have to manage.
-> >
-> > Allowing commands being asynchronous makes sense for things which (a)
-> > typically don't take long, and (b) don't need any management.
-> >
-> > So, if the connection goes down the job is simply canceled, and after
-> > reconnecting the management can simply send the same command again.
+> Signed-off-by: Alex Benn=E9e <alex.bennee@linaro.org>
+> ---
+>  linux-user/Makefile.objs  |  2 ++
+>  linux-user/arm/semihost.c | 24 ++++++++++++++++++++++++
+>  target/arm/arm-semi.c     | 31 ++++++-------------------------
+>  3 files changed, 32 insertions(+), 25 deletions(-)
+>  create mode 100644 linux-user/arm/semihost.c
 >=20
-> Is this worth its own infrastructure?
+> diff --git a/linux-user/Makefile.objs b/linux-user/Makefile.objs
+> index 769b8d83362..285c5dfa17a 100644
+> --- a/linux-user/Makefile.objs
+> +++ b/linux-user/Makefile.objs
+> @@ -6,4 +6,6 @@ obj-y =3D main.o syscall.o strace.o mmap.o signal.o \
+>  obj-$(TARGET_HAS_BFLT) +=3D flatload.o
+>  obj-$(TARGET_I386) +=3D vm86.o
+>  obj-$(TARGET_ARM) +=3D arm/nwfpe/
+> +obj-$(TARGET_ARM) +=3D arm/semihost.o
+> +obj-$(TARGET_AARCH64) +=3D arm/semihost.o
+>  obj-$(TARGET_M68K) +=3D m68k-sim.o
+> diff --git a/linux-user/arm/semihost.c b/linux-user/arm/semihost.c
+> new file mode 100644
+> index 00000000000..9554102a855
+> --- /dev/null
+> +++ b/linux-user/arm/semihost.c
+> @@ -0,0 +1,24 @@
+> +/*
+> + * ARM Semihosting Console Support
+> + *
+> + * Copyright (c) 2019 Linaro Ltd
+> + *
+> + * Currently ARM is unique in having support for semihosting support
+> + * in linux-user. So for now we implement the common console API but
+> + * just for arm linux-user.
+> + *
+> + * SPDX-License-Identifier: GPL-2.0-or-later
+> + */
+> +
+> +#include "qemu/osdep.h"
+> +#include "cpu.h"
+> +#include "hw/semihosting/console.h"
+> +#include "qemu.h"
+> +
+> +int qemu_semihosting_console_out(CPUArchState *env, target_ulong addr,=
+ int len)
+> +{
+> +    void *s =3D lock_user_string(addr);
+> +    len =3D write(STDERR_FILENO, s, len ? len : strlen(s));
+> +    unlock_user(s, addr, 0);
+> +    return len;
+> +}
+> diff --git a/target/arm/arm-semi.c b/target/arm/arm-semi.c
+> index 9e5a414dd89..253c66b172a 100644
+> --- a/target/arm/arm-semi.c
+> +++ b/target/arm/arm-semi.c
+> @@ -27,6 +27,7 @@
+> =20
+>  #include "cpu.h"
+>  #include "hw/semihosting/semihost.h"
+> +#include "hw/semihosting/console.h"
+>  #ifdef CONFIG_USER_ONLY
+>  #include "qemu.h"
+> =20
+> @@ -314,32 +315,12 @@ target_ulong do_arm_semihosting(CPUARMState *env)
+>              return set_swi_errno(ts, close(arg0));
+>          }
+>      case TARGET_SYS_WRITEC:
+> -        {
+> -          char c;
+> -
+> -          if (get_user_u8(c, args))
+> -              /* FIXME - should this error code be -TARGET_EFAULT ? */
+> -              return (uint32_t)-1;
+> -          /* Write to debug console.  stderr is near enough.  */
+> -          if (use_gdb_syscalls()) {
+> -                return arm_gdb_syscall(cpu, arm_semi_cb, "write,2,%x,1=
+", args);
+> -          } else {
+> -                return write(STDERR_FILENO, &c, 1);
+> -          }
+> -        }
+> +    {
+> +        qemu_semihosting_console_out(env, args, 1);
+> +        return 0xdeadbeef;
+> +    }
+>      case TARGET_SYS_WRITE0:
+> -        if (!(s =3D lock_user_string(args)))
+> -            /* FIXME - should this error code be -TARGET_EFAULT ? */
+> -            return (uint32_t)-1;
+> -        len =3D strlen(s);
+> -        if (use_gdb_syscalls()) {
+> -            return arm_gdb_syscall(cpu, arm_semi_cb, "write,2,%x,%x",
+> -                                   args, len);
+> -        } else {
+> -            ret =3D write(STDERR_FILENO, s, len);
+> -        }
+> -        unlock_user(s, args, 0);
+> -        return ret;
+> +        return qemu_semihosting_console_out(env, args, 0);
+>      case TARGET_SYS_WRITE:
+>          GET_ARG(0);
+>          GET_ARG(1);
+> --=20
+> 2.20.1
 >=20
-> Would you hazard a guess on how many commands can take long enough to
-> demand a conversion to asynchronous, yet not need any management?
-
-Candidates are any commands that perform I/O. You don't want to hold the
-BQL while doing I/O. Probably most block layer commands fall into this
-category.
-
-In fact, even the commands to start a block job could probably make use
-of this infrastructure because they typically do some I/O before
-returning success for starting the job.
-
-> >> > Whenever we can solve things on qemu side, I would rather not
-> >> > deprecate current API.
-> >>=20
-> >> Making a synchronous command asynchronous definitely changes API.
-> >
-> > Inside qemu yes, sure.  But for the QMP client nothing changes.
 >=20
-> Command replies can arrive out of order, can't they?
 
-My understanding is that this is just an internal change and commands
-still aren't processed in parallel.
+Hi Alex,
 
-Kevin
+this patch breaks build for softmmu target when CONFIG_SEMIHOSTING is not=
+ enabled as qemu_semihosting_console_out
+is not defined in such case - neither linux-user/arm/semihost.c nor hw/se=
+mihosting/console.c compiled and function
+is not in stubs/semihost.c=20
+
+Mirek
 
