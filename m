@@ -2,93 +2,79 @@ Return-Path: <SRS0=hY9S=T7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
 	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D85B9C04AB6
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 May 2019 08:47:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BA80BC04AB6
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 May 2019 09:02:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A9AC7206C1
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 May 2019 08:47:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7D7CA2553B
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 May 2019 09:02:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Mc18kiPC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A9AC7206C1
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="oNKh0T0J"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7D7CA2553B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:38745 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:38884 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hWdCg-0006C4-UU
-	for qemu-devel@archiver.kernel.org; Fri, 31 May 2019 04:47:58 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:59817)
+	id 1hWdQP-0000DH-Ky
+	for qemu-devel@archiver.kernel.org; Fri, 31 May 2019 05:02:09 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:34168)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hWdBb-0005tJ-Ew
-	for qemu-devel@nongnu.org; Fri, 31 May 2019 04:46:52 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1hWdPJ-0008CZ-09
+	for qemu-devel@nongnu.org; Fri, 31 May 2019 05:01:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hWdBa-0007cY-9C
-	for qemu-devel@nongnu.org; Fri, 31 May 2019 04:46:51 -0400
-Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:40018)
+	(envelope-from <peter.maydell@linaro.org>) id 1hWdPI-00076G-0g
+	for qemu-devel@nongnu.org; Fri, 31 May 2019 05:01:00 -0400
+Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:41199)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hWdBZ-0007Yu-V8
-	for qemu-devel@nongnu.org; Fri, 31 May 2019 04:46:50 -0400
-Received: by mail-oi1-x244.google.com with SMTP id r136so7132918oie.7
-	for <qemu-devel@nongnu.org>; Fri, 31 May 2019 01:46:49 -0700 (PDT)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1hWdPH-00074U-Ob
+	for qemu-devel@nongnu.org; Fri, 31 May 2019 05:00:59 -0400
+Received: by mail-ot1-x342.google.com with SMTP id 107so2645703otj.8
+	for <qemu-devel@nongnu.org>; Fri, 31 May 2019 02:00:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
-	:mime-version:in-reply-to:content-language:content-transfer-encoding;
-	bh=AwRUex3oIHEgUoEGXrADY2L4vksNM7iAbuQigSiYYZE=;
-	b=Mc18kiPCsBg8SUP0D6uS5VPTgaueic8EzFqBemR5mSwoIq0bDmuQt5Ik9H1iXgqQnH
-	rdbAXPrmpWdN/bXE0k/Vti7JwUeRy6jp1xIPkAIkKZzhrdnjzWI8OA+GO6OV4zOv7FPR
-	oOJ++v/RyElCkBX3H59rVaaheodsar0UlSaNf+37FQ9PtJB8SZEb8WPXXL1enjjJaJ3l
-	Ji169Zg7w+wZAmH6z45EO5PF2jWI0EeIjUORBLziWmmctDx87sJ+p5yw/RSEkyN17rS8
-	4xDaq2FGkyotAYIx4zPVBTxdO0V05YIoUYKsty4FsBQjsmRZ82jgj6bzOQ/TXJJ77Yld
-	Fe1A==
+	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+	:cc; bh=q6pv/FQFsCWJI7vYgX4n9cwOf3W3UOWrJeFAt5iBe6A=;
+	b=oNKh0T0J8j2rqelCFaprkANrXdREw0B+sEM08h4k7ZRC7o0EzRjKsMGu/2ywiWsp2V
+	acJryvisC1D+0ND4orOVoaYtv6X1+zGt9k3KWM+cu6cSa/yGddJQ3xuvkZK+yQzZIvC7
+	a9r6JjjhEEc52/9FF8a+MxATf0dFDHNQUH+QPH7+IpFCyUT66o2JbfqqnT9BT4MBvEjt
+	IyLPFMqAOeNTPPogD9R+GMT23Cvcrfek84+Kn9bs2Yxs1sblxJbIVWayp1eThgsGIztw
+	OIMdCauxJKkilgdIKQX5UVcnHy8fCeXTtik7rvPKBETku4b33b0Q9FCfipw/hVIbZBpZ
+	HF8Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-	:date:user-agent:mime-version:in-reply-to:content-language
-	:content-transfer-encoding;
-	bh=AwRUex3oIHEgUoEGXrADY2L4vksNM7iAbuQigSiYYZE=;
-	b=WhsJ/NARRLT7NZgK16F0wBtjAPcAcViPQG1cNozUoMTYPfhcbBE1g/aR7icFtg5rrH
-	LhV3HHZztd5irjMABbFiN3DqjlbSxzL2Ymfo5tAsmD4EIjSMHpUhO/PcbaC3Gy5KtCmf
-	i7BLjDu4H1s8sJXQOpZHK46appH9Zq2fIC8JasoipWg6nSo8VSNBoo6lpEKzRAuek/1p
-	m/1U6iZ5UJRUnB2b868B/5SO3hGtNiHtRdC2t5ANvmBKeH1hUmjipy8NHKMARPbbKLDi
-	ARiiYnARzkFQs4YFV+Q9Gfzu16OK9CU9d2C4clZ666dWrPYgUb6i6ASi2C9Scs8zZw3M
-	h+AQ==
-X-Gm-Message-State: APjAAAXgcBk9W4Y+taiwWpbbVvAIgs/NV7B98zfURfINYRZaJWzezxnQ
-	wsTAP4eZ/KYAXoKdFzVvMG+KuQ==
-X-Google-Smtp-Source: APXvYqxZ6c8+I0VblfKALVRmPBcpV6PEQNGkMW46VQfp6u0qc/TGeU30Gw49TWE6MNl/dlXkOhI5gw==
-X-Received: by 2002:aca:4b41:: with SMTP id y62mr5337774oia.131.1559292408686; 
-	Fri, 31 May 2019 01:46:48 -0700 (PDT)
-Received: from [172.24.12.210] (168.189-204-159.bestelclientes.com.mx.
-	[189.204.159.168])
-	by smtp.gmail.com with ESMTPSA id 38sm1951730otv.3.2019.05.31.01.46.47
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Fri, 31 May 2019 01:46:47 -0700 (PDT)
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
-	qemu-devel@nongnu.org
-References: <20190523204954.13122-1-richard.henderson@linaro.org>
-	<155865586800.24.17673050455759130330@549697c9ad12>
-	<87v9xr3ui8.fsf@zen.linaroharston>
-From: Richard Henderson <richard.henderson@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <f42dfb1b-ad03-0bd6-efb3-100253b5201f@linaro.org>
-Date: Fri, 31 May 2019 03:46:45 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.7.0
+	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+	:message-id:subject:to:cc;
+	bh=q6pv/FQFsCWJI7vYgX4n9cwOf3W3UOWrJeFAt5iBe6A=;
+	b=Joq0K6FFuy4EvRYUFmGY9PmxHLyPDRHAjREEcmuFqIYVc2jAuFxtp7LUTTNY6ZQ8bT
+	nKnlRHbf8AiybwiXjDuxiEdRUa+mWUYbSHG0PezZuoRTX5COr4p/H0FLtH/OFxtYWbAs
+	k3GyBCcBU4rDz0uEPFbD+8q/YkhKsYLpkxdJnVW0M78UcVJJt0w3N01U6+NFo05mRfwx
+	ftB+6apV6a+LuwwfOHQV9WoPSnSjcJlRp8vJCfXvE5AhcHIKqM6gP/jygu+0hS4hDbve
+	QNJlO7i00gu/Ru6MZr9Q3hhTOD//FHGQkhhFZcikvOIAKr2LzipJTIdImlHf+j+1/6U0
+	YrYw==
+X-Gm-Message-State: APjAAAVZjqSyLFHhKVh58C7UMPO45X2RSXN1MQ/dFMKu5Ye318fH1N5l
+	6pQouyfCe3ADY1C2KRMQ5OpUuZ9H8KrsJYpKeBNORg==
+X-Google-Smtp-Source: APXvYqw0mXSocs1klp9c9f6dPwH9I94qOzoz8P3RxBIXhgLWVXwjesxYhFBqLS8FAfSq7xcHH3tW2e5i1rQI+qJ89vs=
+X-Received: by 2002:a9d:2c29:: with SMTP id f38mr879996otb.97.1559293258702;
+	Fri, 31 May 2019 02:00:58 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <87v9xr3ui8.fsf@zen.linaroharston>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+References: <20190530173824.30699-1-richard.henderson@linaro.org>
+In-Reply-To: <20190530173824.30699-1-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 31 May 2019 10:00:47 +0100
+Message-ID: <CAFEAcA8QoncdF-rQt7LDHx3B09xSgzrOjZGxb7L71Jh4h3vM1g@mail.gmail.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2607:f8b0:4864:20::244
-Subject: Re: [Qemu-devel] [PATCH v2 0/2] Update capstone module
+X-Received-From: 2607:f8b0:4864:20::342
+Subject: Re: [Qemu-devel] [PATCH] util: Adjust qemu_guest_getrandom_nofail
+ for Coverity
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -100,83 +86,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: david@redhat.com
+Cc: QEMU Trivial <qemu-trivial@nongnu.org>,
+	QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/31/19 3:20 AM, Alex Bennée wrote:
-> 
-> no-reply@patchew.org writes:
-> 
->> Patchew URL: https://patchew.org/QEMU/20190523204954.13122-1-richard.henderson@linaro.org/
->>
->>
->>
->> Hi,
->>
->> This series failed build test on s390x host. Please find the details below.
->>
->> === TEST SCRIPT BEGIN ===
->> #!/bin/bash
->> # Testing script will be invoked under the git checkout with
->> # HEAD pointing to a commit that has the patches applied on top of "base"
->> # branch
->> set -e
->> CC=$HOME/bin/cc
->> INSTALL=$PWD/install
->> BUILD=$PWD/build
->> mkdir -p $BUILD $INSTALL
->> SRC=$PWD
->> cd $BUILD
->> $SRC/configure --cc=$CC --prefix=$INSTALL
->> make -j4
->> # XXX: we need reliable clean up
->> # make check -j4 V=1
->> make install
->>
->> echo
->> echo "=== ENV ==="
->> env
->>
->> echo
->> echo "=== PACKAGES ==="
->> rpm -qa
->> === TEST SCRIPT END ===
->>
->>   GEN     ui/input-keymap-qcode-to-atset1.c
->>   CC      cs.o
->>   CC      utils.o
->> cs.c:17:10: fatal error: capstone/capstone.h: No such file or directory
->>    17 | #include <capstone/capstone.h>
->>       |          ^~~~~~~~~~~~~~~~~~~~~
->> compilation terminated.
->> ---
->>   CC      /var/tmp/patchew-tester-tmp-c6t41dq_/src/build/slirp/src/socket.o
->> In file included from utils.h:13,
->>                  from utils.c:12:
->> cs_priv.h:7:10: fatal error: capstone/capstone.h: No such file or directory
->>     7 | #include <capstone/capstone.h>
->>       |          ^~~~~~~~~~~~~~~~~~~~~
->> compilation terminated.
->>
->>
->> The full log is available at
->> http://patchew.org/logs/20190523204954.13122-1-richard.henderson@linaro.org/testing.s390x/?type=message.
-> 
-> I saw this on my laptop (which doesn't have system capstone installed)
-> as well. Did I imagine there was a patch floating around to deal with
-> the captone/capstone inconsistency?
+On Thu, 30 May 2019 at 18:38, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+>
+> Explicitly ignore the return value of qemu_guest_getrandom.
+> Because we use error_fatal, all errors are already caught.
+>
+> Fixes: CID 1401701
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  util/guest-random.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-You did see one, but that was for users of capstone.
-This is while building capstone itself.
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
-This means that something changed in capstone's own build system that I failed
-to replicate while pulling it into ours, and I failed to notice because the
-build here found the system header instead.
-
-Ho hum.
-
-
-r~
+thanks
+-- PMM
 
