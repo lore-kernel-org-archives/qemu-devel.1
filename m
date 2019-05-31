@@ -3,59 +3,80 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CD5ABC04AB6
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 May 2019 06:44:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F23CDC04AB6
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 May 2019 06:46:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A29B2264AD
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 May 2019 06:44:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A29B2264AD
+	by mail.kernel.org (Postfix) with ESMTPS id C6E7F264B1
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 May 2019 06:46:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C6E7F264B1
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:37544 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:37582 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hWbHU-0006dy-U4
-	for qemu-devel@archiver.kernel.org; Fri, 31 May 2019 02:44:48 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:33992)
+	id 1hWbIo-0007Kx-W3
+	for qemu-devel@archiver.kernel.org; Fri, 31 May 2019 02:46:11 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:34169)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hWbGf-0006D6-TN
-	for qemu-devel@nongnu.org; Fri, 31 May 2019 02:43:58 -0400
+	(envelope-from <philmd@redhat.com>) id 1hWbHs-0006xH-Kj
+	for qemu-devel@nongnu.org; Fri, 31 May 2019 02:45:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hWbGe-0006c7-Rb
-	for qemu-devel@nongnu.org; Fri, 31 May 2019 02:43:57 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43384)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hWbGe-0006ZR-M8
-	for qemu-devel@nongnu.org; Fri, 31 May 2019 02:43:56 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 3898AC04FFF6;
-	Fri, 31 May 2019 06:43:50 +0000 (UTC)
-Received: from x1w.redhat.com (ovpn-204-242.brq.redhat.com [10.40.204.242])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 2F1432B5A6;
-	Fri, 31 May 2019 06:43:45 +0000 (UTC)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-To: qemu-devel@nongnu.org
-Date: Fri, 31 May 2019 08:43:41 +0200
-Message-Id: <20190531064341.29730-1-philmd@redhat.com>
+	(envelope-from <philmd@redhat.com>) id 1hWbHr-0000rs-K4
+	for qemu-devel@nongnu.org; Fri, 31 May 2019 02:45:12 -0400
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:34071)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hWbHr-0000oj-DO
+	for qemu-devel@nongnu.org; Fri, 31 May 2019 02:45:11 -0400
+Received: by mail-wr1-f66.google.com with SMTP id f8so5708217wrt.1
+	for <qemu-devel@nongnu.org>; Thu, 30 May 2019 23:45:11 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+	:date:user-agent:mime-version:in-reply-to:content-language
+	:content-transfer-encoding;
+	bh=Elkz7JbyyVOqgRr93mxVz0FuJGQLZ6ES/70s5IOKKLQ=;
+	b=Sh5YTbLfpCHwNhKEud/1y6/92A15AoxnKY8Io/Q0vKWPCGDF91S70a/1vJ6U28EY9L
+	P/oar1tC1w6qmgim8qWAIqcUHlHmW4Xl/ONwqf+A4GzVXfNzndCNuJH2CG+GXvDz24UA
+	PFBs0LMG9QbkKwxWPup2xiX3JwTqEpfa/CtUT+v3IL9iHeKNoYEIq2Yu7d7xllAxuVVu
+	tN9I/ZvO3gq1U7MH89MLKid2g5KTP2ydN49FCme3/tOQPHGepVnmF+bVt+pjVM5PeKi7
+	l7EMK3NCOh3R//062ugZQoMl0QjZiVuPzyeU8SnLhLwB2Pz4COvW7xXpvnGyXdfU5wDc
+	E42g==
+X-Gm-Message-State: APjAAAVwgxqVUjniG9D4LBSb/BLxQY+e7FPtbl/xz18Opa8nVK5ojoNu
+	+tCjGhrBp49kBBKk8P8aX+HLTQ==
+X-Google-Smtp-Source: APXvYqwyIEI+9H9zfcMBbnUOTb/JkM3VOHNjutptW6QPWqSR3Sfh72QxnShoms5XghauRYd6X/zGJQ==
+X-Received: by 2002:adf:fc8f:: with SMTP id g15mr5142508wrr.122.1559285110244; 
+	Thu, 30 May 2019 23:45:10 -0700 (PDT)
+Received: from [192.168.1.43] (183.red-88-21-202.staticip.rima-tde.net.
+	[88.21.202.183]) by smtp.gmail.com with ESMTPSA id
+	y132sm7328966wmd.35.2019.05.30.23.45.09
+	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+	Thu, 30 May 2019 23:45:09 -0700 (PDT)
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+	qemu-devel@nongnu.org
+References: <20190530101603.22254-1-alex.bennee@linaro.org>
+	<20190530101603.22254-13-alex.bennee@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+	url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <ff7756d2-6a38-1477-ad38-4f4686094c0b@redhat.com>
+Date: Fri, 31 May 2019 08:45:08 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.31]);
-	Fri, 31 May 2019 06:43:50 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20190530101603.22254-13-alex.bennee@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH] Makefile: Rename the 'vm-test' target as
- 'vm-help'
+	[fuzzy]
+X-Received-From: 209.85.221.66
+Subject: Re: [Qemu-devel] [PATCH v1 12/26] tests/vm: Add missing variables
+ on help
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -68,94 +89,45 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Fam Zheng <fam@euphon.net>,
-	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
-	=?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+	Wainer dos Santos Moschetta <wainersm@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We already have 'make check-help', use the 'make vm-help' form
-to display helps about VM testing. Keep the old target to not
-bother old customs.
+On 5/30/19 12:15 PM, Alex Bennée wrote:
+> From: Wainer dos Santos Moschetta <wainersm@redhat.com>
+> 
+> Added description of variables missing on vm-test help.
+> 
+> Signed-off-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
+> Message-Id: <20190329210804.22121-6-wainersm@redhat.com>
+> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+> ---
+>  tests/vm/Makefile.include | 8 ++++++--
+>  1 file changed, 6 insertions(+), 2 deletions(-)
+> 
+> diff --git a/tests/vm/Makefile.include b/tests/vm/Makefile.include
+> index 6f82676306d..c59411bee01 100644
+> --- a/tests/vm/Makefile.include
+> +++ b/tests/vm/Makefile.include
+> @@ -21,9 +21,13 @@ vm-test:
+>  	@echo "  vm-clean-all                    - Clean up VM images"
+>  	@echo
+>  	@echo "Special variables:"
+> -	@echo "    BUILD_TARGET=foo		 - override the build target"
+> -	@echo "    TARGET_LIST=a,b,c    	 - Override target list in builds."
+> +	@echo "    BUILD_TARGET=foo		 - Override the build target"
+> +	@echo "    TARGET_LIST=a,b,c    	 - Override target list in builds"
+>  	@echo '    EXTRA_CONFIGURE_OPTS="..."'
+> +	@echo "    J=[0..9]*            	 - Override the -jN parameter for make commands"
+> +	@echo "    DEBUG=1              	 - Enable verbose output on host and interactive debugging"
+> +	@echo "    V=1				 - Enable verbose ouput on host and guest commands"
+> +	@echo "    QEMU=/path/to/qemu		 - Change path to QEMU binary"
+>  
+>  vm-build-all: $(addprefix vm-build-, $(IMAGES))
+>  
+> 
 
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
----
-Based-on: <20190530101603.22254-1-alex.bennee@linaro.org>
-          "testing/next queue"
----
- Makefile                  | 4 ++--
- docs/devel/testing.rst    | 4 ++--
- tests/vm/Makefile.include | 5 +++--
- 3 files changed, 7 insertions(+), 6 deletions(-)
-
-diff --git a/Makefile b/Makefile
-index f0be624f47..f67739df7c 100644
---- a/Makefile
-+++ b/Makefile
-@@ -9,7 +9,7 @@ SRC_PATH=3D.
- UNCHECKED_GOALS :=3D %clean TAGS cscope ctags dist \
-     html info pdf txt \
-     help check-help print-% \
--    docker docker-% vm-test vm-build-%
-+    docker docker-% vm-help vm-test vm-build-%
-=20
- print-%:
- 	@echo '$*=3D$($*)'
-@@ -1121,7 +1121,7 @@ endif
- 	@echo  'Test targets:'
- 	@echo  '  check           - Run all tests (check-help for details)'
- 	@echo  '  docker          - Help about targets running tests inside Doc=
-ker containers'
--	@echo  '  vm-test         - Help about targets running tests inside VM'
-+	@echo  '  vm-help         - Help about targets running tests inside VM'
- 	@echo  ''
- 	@echo  'Documentation targets:'
- 	@echo  '  html info pdf txt'
-diff --git a/docs/devel/testing.rst b/docs/devel/testing.rst
-index da2d0fc964..68aba3926e 100644
---- a/docs/devel/testing.rst
-+++ b/docs/devel/testing.rst
-@@ -399,12 +399,12 @@ VM testing
-=20
- This test suite contains scripts that bootstrap various guest images tha=
-t have
- necessary packages to build QEMU. The basic usage is documented in ``Mak=
-efile``
--help which is displayed with ``make vm-test``.
-+help which is displayed with ``make vm-help``.
-=20
- Quickstart
- ----------
-=20
--Run ``make vm-test`` to list available make targets. Invoke a specific m=
-ake
-+Run ``make vm-help`` to list available make targets. Invoke a specific m=
-ake
- command to run build test in an image. For example, ``make vm-build-free=
-bsd``
- will build the source tree in the FreeBSD image. The command can be exec=
-uted
- from either the source tree or the build dir; if the former, ``./configu=
-re`` is
-diff --git a/tests/vm/Makefile.include b/tests/vm/Makefile.include
-index 5e37063d32..b7311d7bd9 100644
---- a/tests/vm/Makefile.include
-+++ b/tests/vm/Makefile.include
-@@ -8,8 +8,9 @@ IMAGE_FILES :=3D $(patsubst %, $(IMAGES_DIR)/%.img, $(IMA=
-GES))
-=20
- .PRECIOUS: $(IMAGE_FILES)
-=20
--vm-test:
--	@echo "vm-test: Test QEMU in preconfigured virtual machines"
-+# 'vm-help' target was historically named 'vm-test'
-+vm-help vm-test:
-+	@echo "vm-help: Test QEMU in preconfigured virtual machines"
- 	@echo
- 	@echo "  vm-build-ubuntu.i386            - Build QEMU in ubuntu i386 VM=
-"
- 	@echo "  vm-build-freebsd                - Build QEMU in FreeBSD VM"
---=20
-2.20.1
-
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
