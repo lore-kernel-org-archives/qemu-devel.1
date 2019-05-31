@@ -2,94 +2,93 @@ Return-Path: <SRS0=hY9S=T7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DBCBDC04AB6
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 May 2019 15:01:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B81C1C04AB6
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 May 2019 15:03:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A72B526B3F
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 May 2019 15:01:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8681D23A6B
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 May 2019 15:03:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="nC3GKnZM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A72B526B3F
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="t0wvVA+D"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8681D23A6B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:44952 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:44970 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hWj2O-0006kw-Uk
-	for qemu-devel@archiver.kernel.org; Fri, 31 May 2019 11:01:44 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:51586)
+	id 1hWj4G-00087O-T7
+	for qemu-devel@archiver.kernel.org; Fri, 31 May 2019 11:03:40 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:52342)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hWj04-0005AJ-BY
-	for qemu-devel@nongnu.org; Fri, 31 May 2019 10:59:21 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hWj2s-0007MY-Ud
+	for qemu-devel@nongnu.org; Fri, 31 May 2019 11:02:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hWj03-0006tV-8M
-	for qemu-devel@nongnu.org; Fri, 31 May 2019 10:59:20 -0400
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:35505)
+	(envelope-from <richard.henderson@linaro.org>) id 1hWj2r-0000pf-Tz
+	for qemu-devel@nongnu.org; Fri, 31 May 2019 11:02:14 -0400
+Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:43851)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hWj03-0006s5-0T
-	for qemu-devel@nongnu.org; Fri, 31 May 2019 10:59:19 -0400
-Received: by mail-ot1-x343.google.com with SMTP id n14so9471829otk.2
-	for <qemu-devel@nongnu.org>; Fri, 31 May 2019 07:59:18 -0700 (PDT)
+	id 1hWj2r-0000oP-PC
+	for qemu-devel@nongnu.org; Fri, 31 May 2019 11:02:13 -0400
+Received: by mail-ot1-x343.google.com with SMTP id i8so9442541oth.10
+	for <qemu-devel@nongnu.org>; Fri, 31 May 2019 08:02:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
 	h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
 	:mime-version:in-reply-to:content-language:content-transfer-encoding;
-	bh=j1ZHhwe+yzamYZOOliGnDRxB/h8lFwkpybiuXwA5Gf4=;
-	b=nC3GKnZMdGhVv/936AhSJJB6ZW/LUZX166DETf5HUUWlcxsScx4psQpdQs1/Hc2qZq
-	l+2dg95MLHHjL29U6OgIFWj41TRAVw8M1btvlgxcNXvpoFtzkLLAt/ZTilTLJ+1+V3uy
-	BCG9yvDF77ZBQPzjahOiyN+cz+WmzoM09LXgsXIyxcDOM54WuPxs0G5KaBr2kiu6gfyX
-	33LiBQxinsSHVio6h3iRTaWeFa3CzArshqB7C53izwP2UsHMs2oFm5maWs89wvZRY7Lk
-	HCHNW0JB/GvJRSibeVeQUIE19O8+wMmWYs7qknTedv2PvYxLSN99gRk187vTJl9p+Ytf
-	W8+g==
+	bh=97DXUicvkb6RxW1FypmtfqFRG5RHcy/75INNLeM9Izk=;
+	b=t0wvVA+DwDN9AfGCSJPplnMu+JUDWjzJbFzPMJ4YxUWRWqJvyitXGjWf9kJ0+0yCWG
+	7P6j/9b4gAo2R6uJI7GAwadeMCskbgZpGYJdmA05FDFcUUqLQJQiDxJ6N2Xq7tMxuYLh
+	K/LwbKVlr8CHajetjGPgBRJgEy4i1PiiiqTr9XEvPzThqjYkJ5OoOImRxhk4SlUpmCUO
+	/rKAfMxoRPvSDpCpk4YyEZoVFUy9CKhoUgECpZaWAGTpIKl9wdu5VZIeT0n9Gooba9TW
+	PdHppPYZTSxE/oaYNRJMfvtJPkN+HFW/gDh9gBGpZO0kSc+mqcCtf4v7GOn5dL5DVYhJ
+	TNrg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
 	:date:user-agent:mime-version:in-reply-to:content-language
 	:content-transfer-encoding;
-	bh=j1ZHhwe+yzamYZOOliGnDRxB/h8lFwkpybiuXwA5Gf4=;
-	b=CQ5H0p+Yj+aEgrmIHWGY94bXMNQVuYpnIMUi5eXIjbeSUcu6HeL9YrQztfz1SvNq2C
-	TiuLwAYrLIjuyaHbfm9QMSiS8/FdTx+ML4PPwJW3Rz24fZObew5gAvVx0+wvS6ooiWCc
-	khhh6RQZsAVi4wmNDiTMhObVeNA10BYJ1fYRZph9AL3dHzHv6cEJ3glZs43jv8J2oC5w
-	h0Iat3hOK4BU+8ui1nX/0pSXLayHk6NDQxRoQXgcbyRZQwmwlI6cUQAoyw7Le84bOcE1
-	k9xT+b9/OiIS12GSWajlcUvDF3Pgcxgo2DvlWuzRUgCDMZoFXd7UCxerb79V0iIwi/9t
-	lu6Q==
-X-Gm-Message-State: APjAAAW+Wp1xSobShdrbbguPuxxm8xiIBOIubUrUsXlRHFjxFzGHqFWH
-	cGdBm22vR7croBX9dYscyFDb6A==
-X-Google-Smtp-Source: APXvYqzm+cu0o4V+Y+n3s7LvIU2zG4T3yxHgvSZxQPF0CJPzrL6nAf8O96PEemhI87tiqXcJ9fI4tw==
-X-Received: by 2002:a05:6830:118:: with SMTP id
-	i24mr2136027otp.307.1559314757493; 
-	Fri, 31 May 2019 07:59:17 -0700 (PDT)
+	bh=97DXUicvkb6RxW1FypmtfqFRG5RHcy/75INNLeM9Izk=;
+	b=OrAHM3l7M7NwN9tQf7joYdSx4kYtOCmehmlXOFutBOWak6zLgVLefQtTbDU0VOxlH4
+	t5B45B0fuEGGKXxrMcQTHL5boAMvK1hFtidrJQO6RHg17rOyMmsTSMOOUrWuwECVlyST
+	KNSLsH70NsRP5NoLCll8gY1u/Erd1+IjaRi6n/3nLomkYNi3JSXTA8SOB6Wglg5tZ8UY
+	/ci3aBJ3UC28vjQiOH+R/8u4q2luvGe1kyL65uhWfhk/jFQ7PW1j8wNNunVH24neEqd8
+	uRocralJRG993qK2ZC8Hl/i1bUEUfjO0Kn3EErtumoxU4ZnoNJea4KV/V23KWlmN1xQ1
+	26Gg==
+X-Gm-Message-State: APjAAAVz1E7X7lp6gzsk3W6HDujPxIrvh5x7qzFCJ6SIJuiYZ8QceMi2
+	Naeqv5Td8LEL0tw8i0SU096GMQ==
+X-Google-Smtp-Source: APXvYqyS2Psg/xqHJiCeFeG6BZ9JswJ23M7LBfOhM2JXUF3HrjatWXxJScGNOoAccCzjRqSwTRZfPQ==
+X-Received: by 2002:a9d:6b99:: with SMTP id b25mr2075271otq.242.1559314932022; 
+	Fri, 31 May 2019 08:02:12 -0700 (PDT)
 Received: from [172.24.12.210] (168.189-204-159.bestelclientes.com.mx.
-	[189.204.159.168]) by smtp.gmail.com with ESMTPSA id
-	f186sm2114205oia.52.2019.05.31.07.59.16
+	[189.204.159.168])
+	by smtp.gmail.com with ESMTPSA id 37sm2431929oti.45.2019.05.31.08.02.10
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Fri, 31 May 2019 07:59:16 -0700 (PDT)
-To: Igor Mammedov <imammedo@redhat.com>
-References: <20190531134315.4109-1-richard.henderson@linaro.org>
-	<20190531134315.4109-14-richard.henderson@linaro.org>
-	<20190531162341.3743eb45@redhat.com>
+	Fri, 31 May 2019 08:02:11 -0700 (PDT)
+To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
+References: <20190531145608.28183-1-david@redhat.com>
+	<20190531145608.28183-2-david@redhat.com>
 From: Richard Henderson <richard.henderson@linaro.org>
 Openpgp: preference=signencrypt
-Message-ID: <6e7ec64f-43e2-fb66-3e47-ea7ff0f86eb4@linaro.org>
-Date: Fri, 31 May 2019 09:59:14 -0500
+Message-ID: <399e11f9-7af7-778c-698c-6036e87f0f2b@linaro.org>
+Date: Fri, 31 May 2019 10:02:08 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <20190531162341.3743eb45@redhat.com>
+In-Reply-To: <20190531145608.28183-2-david@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
 X-Received-From: 2607:f8b0:4864:20::343
-Subject: Re: [Qemu-devel] [PATCH v16 13/23] target/rx: Fix cpu types and
- names
+Subject: Re: [Qemu-devel] [PATCH v1 1/2] s390x/tcg: Fix max_byte detection
+ for stfle
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -101,57 +100,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: philmd@redhat.com, qemu-devel@nongnu.org, ysato@users.sourceforge.jp
+Cc: qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>,
+	Thomas Huth <thuth@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/31/19 9:23 AM, Igor Mammedov wrote:
-> On Fri, 31 May 2019 08:43:05 -0500
-> Richard Henderson <richard.henderson@linaro.org> wrote:
+On 5/31/19 9:56 AM, David Hildenbrand wrote:
+> used_stfl_bytes() is 0, before initialized via prepare_stfl() on the
+> first invocation. We have to move the calculation of max_bytes after
+> prepare_stfl().
 > 
->> There was confusion here about abstract classes and naming cpus.
->> We had registered a concrete class named "-rxcpu".  This was put
->> into the default cpu fields, and matched, so basic tests worked.
->> However, no value for -cpu could ever match in rx_cpu_class_by_name.
->>
->> Rename the base class to "rx-cpu" and make it abstract.  This
->> matches what we do for most other targets.  Create a new concrete
->> cpu with the name "rx62n-rx-cpu".
-> 
-> since it hasn't been merged yet, it would be better to squash this
-> fixup into 3/23
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+> ---
+>  target/s390x/misc_helper.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
 
-Except that it's not just 3/23 but also 8/23.  Which is why it was so much
-easier to leave it separate for review.
-
-I suppose this could be split and squashed, it you insist.  I don't see any
-particular value in that though.
-
->> -    typename = g_strdup_printf(RX_CPU_TYPE_NAME(""));
->> +    typename = g_strdup_printf(RX_CPU_TYPE_NAME("%s"), cpu_model);
->>      oc = object_class_by_name(typename);
-> 
-> in case of new cpu, I'd allow only typename as cpu_model
-> 
-> s/typename/cpu_model/
->   
-> which is compatible with '-device' naming and QMP/monitor interfaces
-> that we support.
-> 
-> and I would not add other naming schemes /like adding suffix to cpu_model or .../
-> that  are existing in QEMU for legacy reasons.
-
-I don't understand what you're looking for.
-
-Do you want a type called "rx62n" for the concrete cpu instance?
-That seems to be contrary to every other device in our system.
-
-I hope you're not suggesting that the command-line be "-cpu rx62n-rx-cpu".
-That seems pointlessly verbose.
-
-If we're going to change the way we do things, we should do that everywhere,
-and not make things different for only one target.
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
 
 r~
