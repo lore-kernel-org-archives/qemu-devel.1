@@ -2,114 +2,143 @@ Return-Path: <SRS0=hY9S=T7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CCDFC04AB6
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 May 2019 19:03:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 69352C04AB6
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 May 2019 19:04:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1AEF526E24
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 May 2019 19:03:20 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="WeybCj7G"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1AEF526E24
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id 339E726E2B
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 May 2019 19:04:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 339E726E2B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:47875 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:47890 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hWmoA-0000lU-Nk
-	for qemu-devel@archiver.kernel.org; Fri, 31 May 2019 15:03:18 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:39948)
+	id 1hWmpl-0001uP-E5
+	for qemu-devel@archiver.kernel.org; Fri, 31 May 2019 15:04:57 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:40227)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hWmmt-0000BM-94
-	for qemu-devel@nongnu.org; Fri, 31 May 2019 15:02:01 -0400
+	(envelope-from <jsnow@redhat.com>) id 1hWmoZ-0001CU-3T
+	for qemu-devel@nongnu.org; Fri, 31 May 2019 15:03:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hWmmr-0001oC-LN
-	for qemu-devel@nongnu.org; Fri, 31 May 2019 15:01:59 -0400
-Received: from mail-eopbgr80139.outbound.protection.outlook.com
-	([40.107.8.139]:64576
-	helo=EUR04-VI1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1hWmmq-0001iV-9r
-	for qemu-devel@nongnu.org; Fri, 31 May 2019 15:01:57 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
-	s=selector1;
-	h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
-	bh=ZXGZbCASboNZFrItFs+lyLH0r9ai1X5M9pg03IX29OE=;
-	b=WeybCj7GEpAR9uO5RbSE7NjiraSdMciNjD3uC2FI4hKkvqynyYjtmjGdlwebolxuCeNXt1yHOJLAvsp5nHSrq01Nhki8jXgWWXuJ+luDInIzgg+2/GTKB8yx6gOP+Xz9khInkTSuvZVdipPF8phT7FGVNylkpn4c4EqKHd4uyis=
-Received: from AM0PR08MB2961.eurprd08.prod.outlook.com (52.134.126.11) by
-	AM0PR08MB5251.eurprd08.prod.outlook.com (20.179.39.152) with Microsoft
-	SMTP
-	Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
-	15.20.1943.16; Fri, 31 May 2019 19:01:49 +0000
-Received: from AM0PR08MB2961.eurprd08.prod.outlook.com
-	([fe80::8d90:32ae:bdd6:48e8]) by
-	AM0PR08MB2961.eurprd08.prod.outlook.com
-	([fe80::8d90:32ae:bdd6:48e8%7]) with mapi id 15.20.1943.018;
-	Fri, 31 May 2019 19:01:49 +0000
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: John Snow <jsnow@redhat.com>, "qemu-devel@nongnu.org"
-	<qemu-devel@nongnu.org>
-Thread-Topic: [Qemu-devel] [PULL v2 3/3] blockdev: acquire aio_context for
-	bitmap add/remove
-Thread-Index: AQHUyUcV8RSjifrUx0ySegZzcJVcPaaGGpmAgAAM0ACAAAyfgA==
-Date: Fri, 31 May 2019 19:01:49 +0000
-Message-ID: <5f47e6a1-f353-d23f-5cbe-5a3628fc1a70@virtuozzo.com>
+	(envelope-from <jsnow@redhat.com>) id 1hWmoX-0003id-Ni
+	for qemu-devel@nongnu.org; Fri, 31 May 2019 15:03:43 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35024)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1hWmoX-0003hy-Ff
+	for qemu-devel@nongnu.org; Fri, 31 May 2019 15:03:41 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id C755280B3F;
+	Fri, 31 May 2019 19:03:40 +0000 (UTC)
+Received: from [10.18.17.164] (dhcp-17-164.bos.redhat.com [10.18.17.164])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 5A2777A419;
+	Fri, 31 May 2019 19:03:40 +0000 (UTC)
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 References: <20190220180112.28250-1-jsnow@redhat.com>
 	<20190220180112.28250-4-jsnow@redhat.com>
 	<c4cfb4f0-cc7b-3952-3c70-b498b2ec9847@virtuozzo.com>
 	<44d131fa-9cb8-95ba-eab6-0b7cdda374ab@redhat.com>
-In-Reply-To: <44d131fa-9cb8-95ba-eab6-0b7cdda374ab@redhat.com>
-Accept-Language: ru-RU, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: HE1PR0502CA0012.eurprd05.prod.outlook.com
-	(2603:10a6:3:e3::22) To AM0PR08MB2961.eurprd08.prod.outlook.com
-	(2603:10a6:208:66::11)
-authentication-results: spf=none (sender IP is )
-	smtp.mailfrom=vsementsov@virtuozzo.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-tagtoolbar-keys: D20190531220147375
-x-originating-ip: [185.231.240.5]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 75b6ca0e-1e04-43a2-f31a-08d6e5fa6f14
-x-microsoft-antispam: BCL:0; PCL:0;
-	RULEID:(2390118)(7020095)(4652040)(8989299)(5600148)(711020)(4605104)(1401327)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(2017052603328)(7193020);
-	SRVR:AM0PR08MB5251; 
-x-ms-traffictypediagnostic: AM0PR08MB5251:
-x-ms-exchange-purlcount: 1
-x-microsoft-antispam-prvs: <AM0PR08MB5251884175457D146580F81CC1190@AM0PR08MB5251.eurprd08.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:1388;
-x-forefront-prvs: 00540983E2
-x-forefront-antispam-report: SFV:NSPM;
-	SFS:(10019020)(376002)(346002)(366004)(39850400004)(396003)(136003)(189003)(199004)(52314003)(66066001)(66446008)(316002)(71190400001)(71200400001)(6486002)(256004)(229853002)(73956011)(66946007)(2501003)(478600001)(68736007)(6436002)(25786009)(76176011)(14444005)(14454004)(66556008)(64756008)(305945005)(36756003)(966005)(102836004)(66476007)(3846002)(53546011)(7736002)(6116002)(5660300002)(486006)(2616005)(86362001)(11346002)(6506007)(2906002)(31696002)(26005)(446003)(8936002)(476003)(110136005)(52116002)(186003)(386003)(99286004)(6246003)(53936002)(6512007)(4326008)(31686004)(6306002)(8676002)(81166006)(81156014);
-	DIR:OUT; SFP:1102; SCL:1; SRVR:AM0PR08MB5251;
-	H:AM0PR08MB2961.eurprd08.prod.outlook.com; FPR:; SPF:None;
-	LANG:en; PTR:InfoNoRecords; MX:1; A:1; 
-received-spf: None (protection.outlook.com: virtuozzo.com does not designate
-	permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: tflhW42k8vD4YRwcdyd8ELaBEJkHQXm2RYEWQpy0bfi8hSQVyFLaC3QjvN1uMsGEt1DvanF3VKLB9EgV2FalwttIDkoEO3TjDteeH4wGEEuazFgypJxdFYEalS5uOCn9PwLR+lKzS9Ub2LFBR8PZdzrAQK4DgD0SryT+wMMsIYBHDYkbIzfW3Lz8hFmDnI6YQFU+oKbI+flukZqz2txxbQXgcLVllPQha6g9SNJeRSXbfwo5T7YOl4yjpLnwZsUXI6hNkktG6BGiwOwcJhtJGnWsL9Nuyx4/cj/MPmiwpKcMQEB6u9k06zLQ5n/XXKT/kDJrU3cFVZyCoK69Dg6O95GD5a/M3h+AUgZQrb0OPY9XAGD8it04W20J10AZEYcyKRRs4789AVDZEh9ewvAR13SsyZ6FNfRWecqy719hBjg=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <46D598C1D40E11418707C1B922D2656A@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	<5f47e6a1-f353-d23f-5cbe-5a3628fc1a70@virtuozzo.com>
+From: John Snow <jsnow@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
+	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
+Message-ID: <dad32fcf-9154-f016-4e3d-07dddcf19329@redhat.com>
+Date: Fri, 31 May 2019 15:03:39 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 75b6ca0e-1e04-43a2-f31a-08d6e5fa6f14
-X-MS-Exchange-CrossTenant-originalarrivaltime: 31 May 2019 19:01:49.2379 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: vsementsov@virtuozzo.com
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR08MB5251
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.8.139
+In-Reply-To: <5f47e6a1-f353-d23f-5cbe-5a3628fc1a70@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.28]);
+	Fri, 31 May 2019 19:03:40 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
 Subject: Re: [Qemu-devel] [PULL v2 3/3] blockdev: acquire aio_context for
  bitmap add/remove
 X-BeenThere: qemu-devel@nongnu.org
@@ -128,56 +157,90 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-MzEuMDUuMjAxOSAyMToxNiwgSm9obiBTbm93IHdyb3RlOg0KPiANCj4gDQo+IE9uIDUvMzEvMTkg
-MTozMCBQTSwgVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSB3cm90ZToNCj4+IEhpIQ0KPj4N
-Cj4+IDIwLjAyLjIwMTkgMjE6MDEsIEpvaG4gU25vdyB3cm90ZToNCj4+PiBXaGVuIGJpdG1hcHMg
-YXJlIHBlcnNpc3RlbnQsIHRoZXkgbWF5IGluY3VyIGEgZGlzayByZWFkIG9yIHdyaXRlIHdoZW4g
-Yml0bWFwcw0KPj4+IGFyZSBhZGRlZCBvciByZW1vdmVkLiBGb3IgY29uZmlndXJhdGlvbnMgbGlr
-ZSB2aXJ0aW8tZGF0YXBsYW5lLCBmYWlsaW5nIHRvDQo+Pj4gYWNxdWlyZSB0aGlzIGxvY2sgd2ls
-bCBhYm9ydCBRRU1VIHdoZW4gZGlzayBJTyBvY2N1cnMuDQo+Pj4NCj4+PiBXZSB1c2VkIHRvIGFj
-cXVpcmUgYWlvX2NvbnRleHQgYXMgcGFydCBvZiB0aGUgYml0bWFwIGxvb2t1cCwgc28gcmUtaW50
-cm9kdWNlDQo+Pj4gdGhlIGxvY2sgZm9yIGp1c3QgdGhlIGNhc2VzIHRoYXQgaGF2ZSBhbiBJTyBw
-ZW5hbHR5LiBDb21taXQgMjExOTg4MmMgcmVtb3ZlZA0KPj4+IHRoZXNlIGxvY2tzLCBhbmQgSSBm
-YWlsZWQgdG8gbm90aWNlIHRoaXMgd2hlbiB3ZSBjb21taXR0ZWQgZmQ1YWU0Y2MsIHNvIHRoaXMN
-Cj4+PiBoYXMgYmVlbiBicm9rZW4gc2luY2UgcGVyc2lzdGVudCBiaXRtYXBzIHdlcmUgaW50cm9k
-dWNlZC4NCj4+Pg0KPj4+IEZpeGVzOiBodHRwczovL2J1Z3ppbGxhLnJlZGhhdC5jb20vc2hvd19i
-dWcuY2dpP2lkPTE2NzIwMTANCj4+PiBSZXBvcnRlZC1CeTogQWlodWEgTGlhbmcgPGFsaWFuZ0By
-ZWRoYXQuY29tPg0KPj4+IFNpZ25lZC1vZmYtYnk6IEpvaG4gU25vdyA8anNub3dAcmVkaGF0LmNv
-bT4NCj4+PiBSZXZpZXdlZC1ieTogRXJpYyBCbGFrZSA8ZWJsYWtlQHJlZGhhdC5jb20+DQo+Pj4g
-TWVzc2FnZS1pZDogMjAxOTAyMTgyMzMxNTQuMTkzMDMtMS1qc25vd0ByZWRoYXQuY29tDQo+Pj4g
-U2lnbmVkLW9mZi1ieTogSm9obiBTbm93IDxqc25vd0ByZWRoYXQuY29tPg0KPj4+IC0tLQ0KPj4N
-Cj4+IFsuLl0NCj4+DQo+Pj4gICAgdm9pZCBxbXBfYmxvY2tfZGlydHlfYml0bWFwX3JlbW92ZShj
-b25zdCBjaGFyICpub2RlLCBjb25zdCBjaGFyICpuYW1lLA0KPj4+IEBAIC0yODc4LDYgKzI4ODUs
-NyBAQCB2b2lkIHFtcF9ibG9ja19kaXJ0eV9iaXRtYXBfcmVtb3ZlKGNvbnN0IGNoYXIgKm5vZGUs
-IGNvbnN0IGNoYXIgKm5hbWUsDQo+Pj4gICAgICAgIEJsb2NrRHJpdmVyU3RhdGUgKmJzOw0KPj4+
-ICAgICAgICBCZHJ2RGlydHlCaXRtYXAgKmJpdG1hcDsNCj4+PiAgICAgICAgRXJyb3IgKmxvY2Fs
-X2VyciA9IE5VTEw7DQo+Pj4gKyAgICBBaW9Db250ZXh0ICphaW9fY29udGV4dCA9IE5VTEw7DQo+
-Pj4gICAgDQo+Pj4gICAgICAgIGJpdG1hcCA9IGJsb2NrX2RpcnR5X2JpdG1hcF9sb29rdXAobm9k
-ZSwgbmFtZSwgJmJzLCBlcnJwKTsNCj4+PiAgICAgICAgaWYgKCFiaXRtYXAgfHwgIWJzKSB7DQo+
-Pj4gQEAgLTI4OTIsMTQgKzI5MDAsMjAgQEAgdm9pZCBxbXBfYmxvY2tfZGlydHlfYml0bWFwX3Jl
-bW92ZShjb25zdCBjaGFyICpub2RlLCBjb25zdCBjaGFyICpuYW1lLA0KPj4+ICAgICAgICB9DQo+
-Pj4gICAgDQo+Pj4gICAgICAgIGlmIChiZHJ2X2RpcnR5X2JpdG1hcF9nZXRfcGVyc2lzdGFuY2Uo
-Yml0bWFwKSkgew0KPj4+ICsgICAgICAgIGFpb19jb250ZXh0ID0gYmRydl9nZXRfYWlvX2NvbnRl
-eHQoYnMpOw0KPj4+ICsgICAgICAgIGFpb19jb250ZXh0X2FjcXVpcmUoYWlvX2NvbnRleHQpOw0K
-Pj4+ICAgICAgICAgICAgYmRydl9yZW1vdmVfcGVyc2lzdGVudF9kaXJ0eV9iaXRtYXAoYnMsIG5h
-bWUsICZsb2NhbF9lcnIpOw0KPj4+ICAgICAgICAgICAgaWYgKGxvY2FsX2VyciAhPSBOVUxMKSB7
-DQo+Pj4gICAgICAgICAgICAgICAgZXJyb3JfcHJvcGFnYXRlKGVycnAsIGxvY2FsX2Vycik7DQo+
-Pj4gLSAgICAgICAgICAgIHJldHVybjsNCj4+PiArICAgICAgICAgICAgZ290byBvdXQ7DQo+Pj4g
-ICAgICAgICAgICB9DQo+Pj4gICAgICAgIH0NCj4+PiAgICANCj4+PiAgICAgICAgYmRydl9yZWxl
-YXNlX2RpcnR5X2JpdG1hcChicywgYml0bWFwKTsNCj4+PiArIG91dDoNCj4+PiArICAgIGlmIChh
-aW9fY29udGV4dCkgew0KPj4+ICsgICAgICAgIGFpb19jb250ZXh0X3JlbGVhc2UoYWlvX2NvbnRl
-eHQpOw0KPj4+ICsgICAgfQ0KPj4+ICAgIH0NCj4+PiAgICANCj4+PiAgICAvKioNCj4+Pg0KPj4N
-Cj4+IEEgYml0IGxhdGUsIGJ1dCBJIGhhdmUgYSBxdWVzdGlvbjoNCj4+DQo+PiBXaHkgZGlkIHlv
-dSBpbmNsdWRlIGJkcnZfcmVsZWFzZV9kaXJ0eV9iaXRtYXAgY2FsbCBpbnRvIGNvbnRleHQtYWNx
-dWlyZWQgc2VjdGlvbj8gQXMgSSBjYW4NCj4+IHVuZGVyc3RhbmQgZnJvbSBjb21taXQgbWVzc2Fn
-ZSwgaXQncyBub3QgYWN0dWFsbHkgbmVlZGVkPw0KPj4NCj4gDQo+IE5vIHJlYXNvbiBiZXlvbmQg
-aGFiaXQuDQo+IA0KDQpPayB0aGFua3MuIEknbSBub3cgd29ya2luZyAob2sgd29ya2VkLCBJJ2Qg
-YmV0dGVyIGdvIGhvbWUgbm93KSBvbiB0cmFuc2FjdGlvbiBhY3Rpb24gZm9yIGJpdG1hcC1yZW1v
-dmUuDQpJdCBvY2N1cnMsIHRoYXQgd2UgbmVlZCBpdCB0byBoYXZlIGFuIGFiaWxpdHkgdG8gX21v
-dmVfLCBub3QgX2NvcHlfIGJpdG1hcHMgaW4gdHJhbnNhY3Rpb24gKHdlIG9mIGNvdXJzZQ0KY2Fu
-IGNvcHkgaW4gdHJhbnNhY3Rpb24gYW5kIHRoZW4gcmVtb3ZlIGFmdGVyIHRyYW5zYWN0aW9uLCBi
-dXQgaXQgZG9lc24ndCB3b3JrIGlmIGJpdG1hcCBpcyBwZXJzaXN0ZW50IGFuZA0KYWZ0ZXIgdHJh
-bnNhY3Rpb24gbm9kZSBpcyBSTykuIFNvLCBJIGhhdmUgdG8gcmVmYWN0b3IgdGhpcyBjb2RlIGFu
-eXdheSwgYW5kIHRoZXJlZm9yZSBJJ3ZlIGFza2VkIGZvciB0aGlzDQp0aGluZyB3aGljaCBJIHdh
-bnQgdG8gcmVmYWN0b3IgdG9vLg0KDQotLSANCkJlc3QgcmVnYXJkcywNClZsYWRpbWlyDQo=
+
+
+On 5/31/19 3:01 PM, Vladimir Sementsov-Ogievskiy wrote:
+> 31.05.2019 21:16, John Snow wrote:
+>>
+>>
+>> On 5/31/19 1:30 PM, Vladimir Sementsov-Ogievskiy wrote:
+>>> Hi!
+>>>
+>>> 20.02.2019 21:01, John Snow wrote:
+>>>> When bitmaps are persistent, they may incur a disk read or write when bitmaps
+>>>> are added or removed. For configurations like virtio-dataplane, failing to
+>>>> acquire this lock will abort QEMU when disk IO occurs.
+>>>>
+>>>> We used to acquire aio_context as part of the bitmap lookup, so re-introduce
+>>>> the lock for just the cases that have an IO penalty. Commit 2119882c removed
+>>>> these locks, and I failed to notice this when we committed fd5ae4cc, so this
+>>>> has been broken since persistent bitmaps were introduced.
+>>>>
+>>>> Fixes: https://bugzilla.redhat.com/show_bug.cgi?id=1672010
+>>>> Reported-By: Aihua Liang <aliang@redhat.com>
+>>>> Signed-off-by: John Snow <jsnow@redhat.com>
+>>>> Reviewed-by: Eric Blake <eblake@redhat.com>
+>>>> Message-id: 20190218233154.19303-1-jsnow@redhat.com
+>>>> Signed-off-by: John Snow <jsnow@redhat.com>
+>>>> ---
+>>>
+>>> [..]
+>>>
+>>>>    void qmp_block_dirty_bitmap_remove(const char *node, const char *name,
+>>>> @@ -2878,6 +2885,7 @@ void qmp_block_dirty_bitmap_remove(const char *node, const char *name,
+>>>>        BlockDriverState *bs;
+>>>>        BdrvDirtyBitmap *bitmap;
+>>>>        Error *local_err = NULL;
+>>>> +    AioContext *aio_context = NULL;
+>>>>    
+>>>>        bitmap = block_dirty_bitmap_lookup(node, name, &bs, errp);
+>>>>        if (!bitmap || !bs) {
+>>>> @@ -2892,14 +2900,20 @@ void qmp_block_dirty_bitmap_remove(const char *node, const char *name,
+>>>>        }
+>>>>    
+>>>>        if (bdrv_dirty_bitmap_get_persistance(bitmap)) {
+>>>> +        aio_context = bdrv_get_aio_context(bs);
+>>>> +        aio_context_acquire(aio_context);
+>>>>            bdrv_remove_persistent_dirty_bitmap(bs, name, &local_err);
+>>>>            if (local_err != NULL) {
+>>>>                error_propagate(errp, local_err);
+>>>> -            return;
+>>>> +            goto out;
+>>>>            }
+>>>>        }
+>>>>    
+>>>>        bdrv_release_dirty_bitmap(bs, bitmap);
+>>>> + out:
+>>>> +    if (aio_context) {
+>>>> +        aio_context_release(aio_context);
+>>>> +    }
+>>>>    }
+>>>>    
+>>>>    /**
+>>>>
+>>>
+>>> A bit late, but I have a question:
+>>>
+>>> Why did you include bdrv_release_dirty_bitmap call into context-acquired section? As I can
+>>> understand from commit message, it's not actually needed?
+>>>
+>>
+>> No reason beyond habit.
+>>
+> 
+> Ok thanks. I'm now working (ok worked, I'd better go home now) on transaction action for bitmap-remove.
+> It occurs, that we need it to have an ability to _move_, not _copy_ bitmaps in transaction (we of course
+> can copy in transaction and then remove after transaction, but it doesn't work if bitmap is persistent and
+> after transaction node is RO). So, I have to refactor this code anyway, and therefore I've asked for this
+> thing which I want to refactor too.
+> 
+
+Safe travels home!
+
+(Why transactions for remove? Just convenience for batching actions?
+I'll find out on Monday.)
+
+Have a good weekend!
+
+--js
 
