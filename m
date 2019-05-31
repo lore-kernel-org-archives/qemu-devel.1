@@ -2,74 +2,73 @@ Return-Path: <SRS0=hY9S=T7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_MUTT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 43412C04AB6
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 May 2019 17:02:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF055C04AB6
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 May 2019 17:03:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0D65226CAC
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 May 2019 17:02:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0D65226CAC
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=mail.jerryxiao.cc
+	by mail.kernel.org (Postfix) with ESMTPS id 9C52126CC0
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 May 2019 17:03:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9C52126CC0
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:46582 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:46603 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hWkuz-0007Gr-CH
-	for qemu-devel@archiver.kernel.org; Fri, 31 May 2019 13:02:13 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:46434)
+	id 1hWkwY-0008KJ-UL
+	for qemu-devel@archiver.kernel.org; Fri, 31 May 2019 13:03:50 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:46708)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hWktc-0006cy-JX
-	for qemu-devel@nongnu.org; Fri, 31 May 2019 13:00:50 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1hWkut-0007OO-NI
+	for qemu-devel@nongnu.org; Fri, 31 May 2019 13:02:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hWkta-0000eP-Ft
-	for qemu-devel@nongnu.org; Fri, 31 May 2019 13:00:48 -0400
-Received: from indium.canonical.com ([91.189.90.7]:43370)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hWkta-0000d5-2V
-	for qemu-devel@nongnu.org; Fri, 31 May 2019 13:00:46 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hWktY-0007uO-P4
-	for <qemu-devel@nongnu.org>; Fri, 31 May 2019 17:00:44 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id B7B552E80C9
-	for <qemu-devel@nongnu.org>; Fri, 31 May 2019 17:00:44 +0000 (UTC)
+	(envelope-from <ehabkost@redhat.com>) id 1hWkus-00025I-69
+	for qemu-devel@nongnu.org; Fri, 31 May 2019 13:02:07 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:5917)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hWkur-00024T-U5
+	for qemu-devel@nongnu.org; Fri, 31 May 2019 13:02:06 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 0489930C62BB
+	for <qemu-devel@nongnu.org>; Fri, 31 May 2019 17:02:05 +0000 (UTC)
+Received: from localhost (ovpn-116-11.gru2.redhat.com [10.97.116.11])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id E8A4B601A0;
+	Fri, 31 May 2019 17:01:57 +0000 (UTC)
+Date: Fri, 31 May 2019 14:01:54 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20190531170154.GB22103@habkost.net>
+References: <20190517125820.2885-1-jfreimann@redhat.com>
+	<20190517125820.2885-4-jfreimann@redhat.com>
+	<20190521094504.GB2915@work-vm>
+	<20190530145645.tjwkgi4hae5yblsi@jenstp.localdomain>
+	<20190530134631-mutt-send-email-mst@kernel.org>
+	<20190530180022.GB2864@work-vm>
+	<20190530140419-mutt-send-email-mst@kernel.org>
+	<20190530182210.GA22103@habkost.net>
+	<20190530190322-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 31 May 2019 16:50:27 -0000
-From: Jerry <ubuntu@mail.jerryxiao.cc>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Invalid; importance=Undecided;
-	assignee=None; 
-X-Launchpad-Bug-Tags: aarch64 uefi
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: ajbennee jerryxiao lersek
-X-Launchpad-Bug-Reporter: Jerry (jerryxiao)
-X-Launchpad-Bug-Modifier: Jerry (jerryxiao)
-References: <155923186868.25498.16417785082829115907.malonedeb@gac.canonical.com>
-Message-Id: <155932142803.24846.8987381570456503017.malone@gac.canonical.com>
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="18968";
-	Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: 822faa9e982bb285ffe5d1fc0657909033a65830
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190530190322-mutt-send-email-mst@kernel.org>
+User-Agent: Mutt/1.11.3 (2019-02-01)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.43]);
+	Fri, 31 May 2019 17:02:05 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1831115] Re: qemu 4.0.0 on aarch64: uefi firmware
- oversize
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH 3/4] net/virtio: add failover support
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -78,143 +77,178 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1831115 <1831115@bugs.launchpad.net>
+Cc: pkrempa@redhat.com, berrange@redhat.com, aadam@redhat.com,
+	"Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+	qemu-devel@nongnu.org, laine@redhat.com,
+	Jens Freimann <jfreimann@redhat.com>, ailan@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-I just noticed that it was a libvirt bug that caused the error.
+On Thu, May 30, 2019 at 07:06:29PM -0400, Michael S. Tsirkin wrote:
+> On Thu, May 30, 2019 at 03:22:10PM -0300, Eduardo Habkost wrote:
+> > On Thu, May 30, 2019 at 02:09:42PM -0400, Michael S. Tsirkin wrote:
+> > > On Thu, May 30, 2019 at 07:00:23PM +0100, Dr. David Alan Gilbert wrote:
+> > > > * Michael S. Tsirkin (mst@redhat.com) wrote:
+> > > > > On Thu, May 30, 2019 at 04:56:45PM +0200, Jens Freimann wrote:
+> > > > > > Hi David,
+> > > > > > 
+> > > > > > sorry for the  delayed reply.
+> > > > > > 
+> > > > > > On Tue, May 28, 2019 at 11:04:15AM -0400, Michael S. Tsirkin wrote:
+> > > > > > > On Tue, May 21, 2019 at 10:45:05AM +0100, Dr. David Alan Gilbert wrote:
+> > > > > > > > * Jens Freimann (jfreimann@redhat.com) wrote:
+> > > > > > > > > +static void virtio_net_primary_plug_timer(void *opaque);
+> > > > > > > > > +
+> > > > > > > > >  static void virtio_net_set_link_status(NetClientState *nc)
+> > > > > > > > >  {
+> > > > > > > > >      VirtIONet *n = qemu_get_nic_opaque(nc);
+> > > > > > > > > @@ -786,6 +796,14 @@ static void virtio_net_set_features(VirtIODevice *vdev, uint64_t features)
+> > > > > > > > >      } else {
+> > > > > > > > >          memset(n->vlans, 0xff, MAX_VLAN >> 3);
+> > > > > > > > >      }
+> > > > > > > > > +
+> > > > > > > > > +    if (virtio_has_feature(features, VIRTIO_NET_F_STANDBY)) {
+> > > > > > > > > +        atomic_set(&n->primary_should_be_hidden, false);
+> > > > > > > > > +        if (n->primary_device_timer)
+> > > > > > > > > +            timer_mod(n->primary_device_timer,
+> > > > > > > > > +                qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL) +
+> > > > > > > > > +                4000);
+> > > > > > > > > +    }
+> > > > > > > > 
+> > > > > > > > What's this magic timer constant and why?
+> > > > > > 
+> > > > > > To be honest it's a leftover from previous versions (before I took
+> > > > > > over) of the patches and I'm not sure why the timer is there.
+> > > > > > I removed it and so far see no reason to keep it.
+> > > > > > 
+> > > > > > > > 
+> > > > > > > > >  }
+> > > > > > > > >
+> > > > > > > > >  static int virtio_net_handle_rx_mode(VirtIONet *n, uint8_t cmd,
+> > > > > > > > > @@ -2626,6 +2644,87 @@ void virtio_net_set_netclient_name(VirtIONet *n, const char *name,
+> > > > > > > > >      n->netclient_type = g_strdup(type);
+> > > > > > > > >  }
+> > > > > > > > >
+> > > > > > > > > +static void virtio_net_primary_plug_timer(void *opaque)
+> > > > > > > > > +{
+> > > > > > > > > +    VirtIONet *n = opaque;
+> > > > > > > > > +    Error *err = NULL;
+> > > > > > > > > +
+> > > > > > > > > +    if (n->primary_device_dict)
+> > > > > > > > > +        n->primary_device_opts = qemu_opts_from_qdict(qemu_find_opts("device"),
+> > > > > > > > > +            n->primary_device_dict, &err);
+> > > > > > > > > +    if (n->primary_device_opts) {
+> > > > > > > > > +        n->primary_dev = qdev_device_add(n->primary_device_opts, &err);
+> > > > > > > > > +        error_setg(&err, "virtio_net: couldn't plug in primary device");
+> > > > > > > > > +        return;
+> > > > > > > > > +    }
+> > > > > > > > > +    if (!n->primary_device_dict && err) {
+> > > > > > > > > +        if (n->primary_device_timer) {
+> > > > > > > > > +            timer_mod(n->primary_device_timer,
+> > > > > > > > > +                qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL) +
+> > > > > > > > > +                100);
+> > > > > > > > 
+> > > > > > > > same here.
+> > > > > > 
+> > > > > > see above
+> > > > > > 
+> > > > > > > > 
+> > > > > > > > 
+> > > > > > > > > +        }
+> > > > > > > > > +    }
+> > > > > > > > > +}
+> > > > > > > > > +
+> > > > > > > > > +static void virtio_net_handle_migration_primary(VirtIONet *n,
+> > > > > > > > > +                                                MigrationState *s)
+> > > > > > > > > +{
+> > > > > > > > > +    Error *err = NULL;
+> > > > > > > > > +    bool should_be_hidden = atomic_read(&n->primary_should_be_hidden);
+> > > > > > > > > +
+> > > > > > > > > +    n->primary_dev = qdev_find_recursive(sysbus_get_default(),
+> > > > > > > > > +            n->primary_device_id);
+> > > > > > > > > +    if (!n->primary_dev) {
+> > > > > > > > > +        error_setg(&err, "virtio_net: couldn't find primary device");
+> > > > > > > > 
+> > > > > > > > There's something broken with the error handling in this function - the
+> > > > > > > > 'err' never goes anywhere - I don't think it ever gets printed or
+> > > > > > > > reported or stops the migration.
+> > > > > > 
+> > > > > > yes, I'll fix it.
+> > > > > > 
+> > > > > > > > > +    }
+> > > > > > > > > +    if (migration_in_setup(s) && !should_be_hidden && n->primary_dev) {
+> > > > > > > > > +        qdev_unplug(n->primary_dev, &err);
+> > > > > > > > 
+> > > > > > > > Not knowing unplug well; can you just explain - is that device hard
+> > > > > > > > unplugged and it's gone by the time this function returns or is it still
+> > > > > > > > hanging around for some indeterminate time?
+> > > > > > 
+> > > > > > Qemu will trigger an unplug request via pcie attention button in which case
+> > > > > > there could be a delay by the guest operating system. We could give it some
+> > > > > > amount of time and if nothing happens try surpise removal or handle the
+> > > > > > error otherwise.
+> > > > > > 
+> > > > > > 
+> > > > > > regards,
+> > > > > > Jens
+> > > > > 
+> > > > > That's a subject for another day. Let's get the basic thing
+> > > > > working.
+> > > > 
+> > > > Well no, we need to know this thing isn't going to hang in the migration
+> > > > setup phase, or if it does how we recover.
+> > > 
+> > > 
+> > > This thing is *supposed* to be stuck in migration startup phase
+> > > if guest is malicious.
+> > > 
+> > > If migration does not progress management needs
+> > > a way to detect this and cancel.
+> > > 
+> > > Some more documentation about how this is supposed to happen
+> > > would be helpful.
+> > 
+> > Do we have confirmation from libvirt developers that this would
+> > be a reasonable API for them?
+> > 
+> > 
+> > > >  This patch series is very
+> > > > odd precisely because it's trying to do the unplug itself in the
+> > > > migration phase rather than let the management layer do it - so unless
+> > > > it's nailed down how to make sure that's really really bullet proof
+> > > > then we've got to go back and ask the question about whether we should
+> > > > really fix it so it can be done by the management layer.
+> > > > 
+> > > > Dave
+> > > 
+> > > management already said they can't because files get closed and
+> > > resources freed on unplug and so they might not be able to re-add device
+> > > on migration failure. We do it in migration because that is
+> > > where failures can happen and we can recover.
+> > 
+> > We are capable of providing an API to libvirt where files won't
+> > get closed when a device is unplugged, if necessary.
+> > 
+> > This might become necessary if libvirt or management software
+> > developers tell us the interface we are providing is not going to
+> > work for them.
+> > 
+> > -- 
+> > Eduardo
+> 
+> Yes. It's just lots of extremely low level interfaces
+> and all rather pointless.
+> 
+> And down the road extensions like surprise removal support will make it
+> all cleaner and more transparent. Floating things up to libvirt means
+> all these low level details will require more and more hacks.
 
--drive file=3D/opt/ovmf/aarch64/AAVMF_CODE.fd,if=3Dpflash,format=3Draw,unit=
-=3D0,readonly=3Don \
--drive file=3D/var/lib/libvirt/qemu/nvram/debiantesting_VARS.fd,if=3Dpflash=
-,format=3Draw,unit=3D1 \
+Why do you call it pointless?  If we want this to work before
+surprise removal is implemented, we need to provide an API that
+works for management software.  Don't we want to make this work
+without surprise removal too?
 
-debiantesting_VARS.fd was never removed or replaced after its first
-creation since the installation errored out. I deleted this file
-manually and everything is fine now.
-
-Sorry for your inconvenience.
-
-** Changed in: qemu
-       Status: New =3D> Invalid
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1831115
-
-Title:
-  qemu 4.0.0 on aarch64: uefi firmware oversize
-
-Status in QEMU:
-  Invalid
-
-Bug description:
-  I'd like to enable uefi in my virtual machine, however qemu is always sho=
-wing the same error:   qemu-system-aarch64: Initialization of device cfi.pf=
-lash01 failed: device requires 67108864 bytes, block backend provides 78643=
-2 bytes  =
-
-  It's clearly impossible to fit a uefi firmware into 786432 bytes.  =
-
-
-  Environment: qemu-system-aarch64 with kvm on an amlogic s905d aarch64
-  dev board, running archlinuxarm, qemu in the repository is compiled
-  with https://download.qemu.org/qemu-4.0.0.tar.xz
-
-  (My AAVMF_CODE.fd and AAVMF_VARS.fd are extracted from debian package
-  qemu-efi-aarch64 0~20181115.85588389-3)
-
-  Below is my libvirt log.
-
-  2019-05-30 15:07:44.216+0000: starting up libvirt version: 5.3.0, qemu ve=
-rsion: 4.0.0, kernel: 4.19.46-1-ARCH, hostname: jerry-n1.localdomain
-  LC_ALL=3DC \
-  PATH=3D/usr/local/sbin:/usr/local/bin:/usr/bin \
-  HOME=3D/var/lib/libvirt/qemu/domain-2-debiantesting \
-  XDG_DATA_HOME=3D/var/lib/libvirt/qemu/domain-2-debiantesting/.local/share=
- \
-  XDG_CACHE_HOME=3D/var/lib/libvirt/qemu/domain-2-debiantesting/.cache \
-  XDG_CONFIG_HOME=3D/var/lib/libvirt/qemu/domain-2-debiantesting/.config \
-  QEMU_AUDIO_DRV=3Dnone \
-  /usr/bin/qemu-system-aarch64 \
-  -name guest=3Ddebiantesting,debug-threads=3Don \
-  -S \
-  -object secret,id=3DmasterKey0,format=3Draw,file=3D/var/lib/libvirt/qemu/=
-domain-2-debiantesting/master-key.aes \
-  -machine virt-4.0,accel=3Dkvm,usb=3Doff,dump-guest-core=3Doff,gic-version=
-=3D2 \
-  -cpu host \
-  -drive file=3D/opt/ovmf/aarch64/AAVMF_CODE.fd,if=3Dpflash,format=3Draw,un=
-it=3D0,readonly=3Don \
-  -drive file=3D/var/lib/libvirt/qemu/nvram/debiantesting_VARS.fd,if=3Dpfla=
-sh,format=3Draw,unit=3D1 \
-  -m 1024 \
-  -overcommit mem-lock=3Doff \
-  -smp 4,sockets=3D4,cores=3D1,threads=3D1 \
-  -uuid 508d100a-b4e5-4199-9ff9-ac6d40fe2896 \
-  -display none \
-  -no-user-config \
-  -nodefaults \
-  -chardev socket,id=3Dcharmonitor,fd=3D25,server,nowait \
-  -mon chardev=3Dcharmonitor,id=3Dmonitor,mode=3Dcontrol \
-  -rtc base=3Dutc \
-  -no-reboot \
-  -boot strict=3Don \
-  -device pcie-root-port,port=3D0x8,chassis=3D1,id=3Dpci.1,bus=3Dpcie.0,mul=
-tifunction=3Don,addr=3D0x1 \
-  -device pcie-root-port,port=3D0x9,chassis=3D2,id=3Dpci.2,bus=3Dpcie.0,add=
-r=3D0x1.0x1 \
-  -device pcie-root-port,port=3D0xa,chassis=3D3,id=3Dpci.3,bus=3Dpcie.0,add=
-r=3D0x1.0x2 \
-  -device pcie-root-port,port=3D0xb,chassis=3D4,id=3Dpci.4,bus=3Dpcie.0,add=
-r=3D0x1.0x3 \
-  -device pcie-root-port,port=3D0xc,chassis=3D5,id=3Dpci.5,bus=3Dpcie.0,add=
-r=3D0x1.0x4 \
-  -device pcie-root-port,port=3D0xd,chassis=3D6,id=3Dpci.6,bus=3Dpcie.0,add=
-r=3D0x1.0x5 \
-  -device qemu-xhci,p2=3D15,p3=3D15,id=3Dusb,bus=3Dpci.2,addr=3D0x0 \
-  -device virtio-scsi-pci,id=3Dscsi0,bus=3Dpci.3,addr=3D0x0 \
-  -device virtio-serial-pci,id=3Dvirtio-serial0,bus=3Dpci.4,addr=3D0x0 \
-  -drive file=3D/mnt/hddp1/jerry/libvirt/aarch64-images/debiantesting.qcow2=
-,format=3Dqcow2,if=3Dnone,id=3Ddrive-scsi0-0-0-0 \
-  -device scsi-hd,bus=3Dscsi0.0,channel=3D0,scsi-id=3D0,lun=3D0,device_id=
-=3Ddrive-scsi0-0-0-0,drive=3Ddrive-scsi0-0-0-0,id=3Dscsi0-0-0-0,bootindex=
-=3D2 \
-  -drive file=3D/mnt/hddp1/jerry/libvirt/aarch64-iso/debian-testing-arm64-n=
-etinst.iso,format=3Draw,if=3Dnone,id=3Ddrive-scsi0-0-0-1,readonly=3Don \
-  -device scsi-cd,bus=3Dscsi0.0,channel=3D0,scsi-id=3D0,lun=3D1,device_id=
-=3Ddrive-scsi0-0-0-1,drive=3Ddrive-scsi0-0-0-1,id=3Dscsi0-0-0-1,bootindex=
-=3D1 \
-  -netdev tap,fd=3D27,id=3Dhostnet0 \
-  -device virtio-net-pci,netdev=3Dhostnet0,id=3Dnet0,mac=3D52:54:00:d5:28:6=
-d,bus=3Dpci.1,addr=3D0x0 \
-  -chardev pty,id=3Dcharserial0 \
-  -serial chardev:charserial0 \
-  -chardev socket,id=3Dcharchannel0,fd=3D28,server,nowait \
-  -device virtserialport,bus=3Dvirtio-serial0.0,nr=3D1,chardev=3Dcharchanne=
-l0,id=3Dchannel0,name=3Dorg.qemu.guest_agent.0 \
-  -object rng-random,id=3Dobjrng0,filename=3D/dev/urandom \
-  -device virtio-rng-pci,rng=3Dobjrng0,id=3Drng0,bus=3Dpci.5,addr=3D0x0 \
-  -sandbox on,obsolete=3Ddeny,elevateprivileges=3Ddeny,spawn=3Ddeny,resourc=
-econtrol=3Ddeny \
-  -msg timestamp=3Don
-  2019-05-30 15:07:44.216+0000: Domain id=3D2 is tainted: host-cpu
-  char device redirected to /dev/pts/2 (label charserial0)
-  2019-05-30T15:07:46.701125Z qemu-system-aarch64: Initialization of device=
- cfi.pflash01 failed: device requires 67108864 bytes, block backend provide=
-s 786432 bytes
-  2019-05-30 15:07:46.779+0000: shutting down, reason=3Dfailed
-  (END)
-
-  # /etc/libvirt/qemu.conf  =
-
-  nvram =3D [
-          "/opt/ovmf/aarch64/AAVMF_CODE.fd:/opt/ovmf/aarch64/AAVMF_VARS.fd"
-  ]
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1831115/+subscriptions
+-- 
+Eduardo
 
