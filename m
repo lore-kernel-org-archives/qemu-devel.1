@@ -2,94 +2,91 @@ Return-Path: <SRS0=hY9S=T7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 93D49C04AB6
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 May 2019 16:28:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 928ACC04AB6
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 May 2019 16:29:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5B13726C15
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 May 2019 16:28:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5B13726C15
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 5E64026C1C
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 May 2019 16:29:48 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="qiavmvGa"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5E64026C1C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:46086 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:46096 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hWkNv-0003y6-Jx
-	for qemu-devel@archiver.kernel.org; Fri, 31 May 2019 12:28:03 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:38921)
+	id 1hWkPb-0004zx-NY
+	for qemu-devel@archiver.kernel.org; Fri, 31 May 2019 12:29:47 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:39511)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hWkMh-0003N5-P5
-	for qemu-devel@nongnu.org; Fri, 31 May 2019 12:26:49 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1hWkOp-0004gV-Q6
+	for qemu-devel@nongnu.org; Fri, 31 May 2019 12:29:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hWkMg-0001PE-BW
-	for qemu-devel@nongnu.org; Fri, 31 May 2019 12:26:47 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43924)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mreitz@redhat.com>)
-	id 1hWkMd-0001Lv-5o; Fri, 31 May 2019 12:26:43 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
-	[10.5.11.23])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 4F5207F7C6;
-	Fri, 31 May 2019 16:26:42 +0000 (UTC)
-Received: from dresden.str.redhat.com (unknown [10.40.205.32])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 0DBA119C69;
-	Fri, 31 May 2019 16:26:40 +0000 (UTC)
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
-	"qemu-block@nongnu.org" <qemu-block@nongnu.org>
-References: <20190410202033.28617-1-mreitz@redhat.com>
-	<20190410202033.28617-3-mreitz@redhat.com>
-	<5a335159-8a98-5c60-657d-920e1eb81065@virtuozzo.com>
-From: Max Reitz <mreitz@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
-	mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
-	/PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
-	U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
-	mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
-	awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
-	AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
-	CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
-	B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
-	2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
-	AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
-	8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
-	4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
-	BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
-	xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
-	W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
-	DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
-	64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
-	ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
-	sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
-	alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
-	/ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
-	bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
-	R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <47fb9429-eb34-ab15-e370-0a38070303be@redhat.com>
-Date: Fri, 31 May 2019 18:26:39 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.7.0
+	(envelope-from <alex.bennee@linaro.org>) id 1hWkOn-0004q5-UT
+	for qemu-devel@nongnu.org; Fri, 31 May 2019 12:28:59 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:43824)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1hWkOl-0004mF-UN
+	for qemu-devel@nongnu.org; Fri, 31 May 2019 12:28:57 -0400
+Received: by mail-wr1-x442.google.com with SMTP id m6so1221435wrj.10
+	for <qemu-devel@nongnu.org>; Fri, 31 May 2019 09:28:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=references:user-agent:from:to:cc:subject:in-reply-to:date
+	:message-id:mime-version:content-transfer-encoding;
+	bh=VfK96mQbwbTPMECSvLcjRvExGPmA/7+SDYsox9nXIKA=;
+	b=qiavmvGaFXnGsZwgXtuiPraieYOvSVd3YdhzcBL+/DiySGI8Plxwi/QtEIo2MZi01L
+	FHnvrpAYXUlFzj5y4ZNZo5BPLGURz0XXOA+a7xP7LCQDbjnX+hTTdVPT7A88W195JxtC
+	OO69P646C+LL0oSLQU8zPdwAvXxs1gCvVPhByX6fIamRHsuHU5jlTLR0qhvtT+JUx/MP
+	qRwvErysXShmgNLO6JTfoKELhtZzt6fIsBrGl82aW6Hfh4v8Iiead97Jgig8bQBSE4Ld
+	aIxCCqyq7O4FDMLKljFR0CfpRbg+Hxxh424cQuq8+r7jGNApH2tmgzLYzVMj7jCWUpAG
+	KnSQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:references:user-agent:from:to:cc:subject
+	:in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+	bh=VfK96mQbwbTPMECSvLcjRvExGPmA/7+SDYsox9nXIKA=;
+	b=G5UVTZRGSP4GNqCKln5iU44hXWKbjlcMU9BMctHcD6AbmicB3VKS2CJOsZtSEzibRi
+	vSU+69DWqG/6TfCVm+QJcGmRtb4AJwdzI6lA6FSppOfnZJPpTQ22Y/lnScYGaf3zixML
+	gNJSriNxBl1ZJSlCTXavMSePRxBcrmFUPv9q5Ibe4ZqmCLWupACVYB6XTyHrXN/VtsJD
+	LfBOY7yBpqIp2tZ/8gBygG7rYLo1RYiqQMZIFAafxrccbvVminpRhd9Z+ysSK73yQVth
+	s6+1mIckWi3RjWmEoT0d2dTxVXLsWi/beK2dLfUK7SzwsiqximCxhqRcvivXYfFeoOJz
+	oD/A==
+X-Gm-Message-State: APjAAAXDkibd4Q3tF430r73BY1sABwEcvQ1JTBV1G/29CnNVQt/AYr4A
+	f9B4JyUyvFaVZ+Ef5V/Grk9d6pdebhM=
+X-Google-Smtp-Source: APXvYqyDA576KTXI/lIlCzPnn4exb4qSP4s2JNX6ETrO/Oo62ijsJyBB4YVKT53VIGlFTAtn2vZ5Xw==
+X-Received: by 2002:adf:ebc6:: with SMTP id v6mr7537980wrn.258.1559320132558; 
+	Fri, 31 May 2019 09:28:52 -0700 (PDT)
+Received: from zen.linaroharston ([81.128.185.34])
+	by smtp.gmail.com with ESMTPSA id
+	j82sm6245811wmj.40.2019.05.31.09.28.51
+	(version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+	Fri, 31 May 2019 09:28:51 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+	by zen.linaroharston (Postfix) with ESMTP id 07F4F1FF87;
+	Fri, 31 May 2019 17:28:51 +0100 (BST)
+References: <155923186868.25498.16417785082829115907.malonedeb@gac.canonical.com>
+	<155931574363.8426.10336516680800433530.malone@wampee.canonical.com>
+User-agent: mu4e 1.3.2; emacs 26.1
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Bug 1831115 <1831115@bugs.launchpad.net>
+In-reply-to: <155931574363.8426.10336516680800433530.malone@wampee.canonical.com>
+Date: Fri, 31 May 2019 17:28:50 +0100
+Message-ID: <87muj28u65.fsf@zen.linaroharston>
 MIME-Version: 1.0
-In-Reply-To: <5a335159-8a98-5c60-657d-920e1eb81065@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="bLtIMsn1GN1YUyweUWWsyeLyMiNL5v3Ly"
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.28]);
-	Fri, 31 May 2019 16:26:42 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-X-Content-Filtered-By: Mailman/MimeDel 2.1.21
-Subject: Re: [Qemu-devel] [PATCH v4 02/11] block: Filtered children access
- functions
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2a00:1450:4864:20::442
+Subject: Re: [Qemu-devel] [Bug 1831115] Re: qemu 4.0.0 on aarch64: uefi
+ firmware oversize
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -101,206 +98,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
-	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---bLtIMsn1GN1YUyweUWWsyeLyMiNL5v3Ly
-From: Max Reitz <mreitz@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Message-ID: <47fb9429-eb34-ab15-e370-0a38070303be@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v4 02/11] block: Filtered children access
- functions
-References: <20190410202033.28617-1-mreitz@redhat.com>
- <20190410202033.28617-3-mreitz@redhat.com>
- <5a335159-8a98-5c60-657d-920e1eb81065@virtuozzo.com>
-In-Reply-To: <5a335159-8a98-5c60-657d-920e1eb81065@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
 
-On 16.04.19 12:02, Vladimir Sementsov-Ogievskiy wrote:
-> 10.04.2019 23:20, Max Reitz wrote:
->> What bs->file and bs->backing mean depends on the node.  For filter
->> nodes, both signify a node that will eventually receive all R/W
->> accesses.  For format nodes, bs->file contains metadata and data, and
->> bs->backing will not receive writes -- instead, writes are COWed to
->> bs->file.  Usually.
->>
->> In any case, it is not trivial to guess what a child means exactly wit=
-h
->> our currently limited form of expression.  It is better to introduce
->> some functions that actually guarantee a meaning:
->>
->> - bdrv_filtered_cow_child() will return the child that receives reques=
-ts
->>    filtered through COW.  That is, reads may or may not be forwarded
->>    (depending on the overlay's allocation status), but writes never go=
- to
->>    this child.
->>
->> - bdrv_filtered_rw_child() will return the child that receives request=
-s
->>    filtered through some very plain process.  Reads and writes issued =
-to
->>    the parent will go to the child as well (although timing, etc. may =
-be
->>    modified).
->>
->> - All drivers but quorum (but quorum is pretty opaque to the general
->>    block layer anyway) always only have one of these children: All rea=
-d
->>    requests must be served from the filtered_rw_child (if it exists), =
-so
->>    if there was a filtered_cow_child in addition, it would not receive=
+Jerry <ubuntu@mail.jerryxiao.cc> writes:
 
->>    any requests at all.
->>    (The closest here is mirror, where all requests are passed on to th=
-e
->>    source, but with write-blocking, write requests are "COWed" to the
->>    target.  But that just means that the target is a special child tha=
-t
->>    cannot be introspected by the generic block layer functions, and th=
-at
->>    source is a filtered_rw_child.)
->>    Therefore, we can also add bdrv_filtered_child() which returns that=
+> [jerry@jerry-n1 aarch64]$ du -b *
+> 67108864        AAVMF_CODE.fd
+> 67108864        AAVMF_VARS.fd
+> 67108864        QEMU_EFI.fd
+> 67108864        QEMU_VARS.fd
+>
+> 2097152 QEMU_EFI.fd.orig
+> 786432  QEMU_VARS.fd.orig
+>
+>
+> Both files have been padded to 64MB. (if padding means filling it with
+> /dev/zero)
 
->>    one child (or NULL, if there is no filtered child).
->>
->> Also, many places in the current block layer should be skipping filter=
-s
->> (all filters or just the ones added implicitly, it depends) when going=
+You can use:
 
->> through a block node chain.  They do not do that currently, but this
->> patch makes them.
->>
->> One example for this is qemu-img map, which should skip filters and on=
-ly
->> look at the COW elements in the graph.  The change to iotest 204's
->> reference output shows how using blkdebug on top of a COW node used to=
+   truncate -s 64m /path/to/blob
 
->> make qemu-img map disregard the rest of the backing chain, but with th=
-is
->> patch, the allocation in the base image is reported correctly.
->>
->> Furthermore, a note should be made that sometimes we do want to access=
+>
+> QEMU_EFI.fd and QEMU_VARS.fd are built by myself according to
+> https://wiki.linaro.org/LEG/UEFIforQEMU. With the self-built formware,
+> I'm getting almost the same error: qemu-system-aarch64: Initialization
+> of device cfi.pflash01 failed: device requires 67108864 bytes, block
+> backend provides 786432 bytes
 
->> bs->backing directly.  This is whenever the operation in question is n=
-ot
->> about accessing the COW child, but the "backing" child, be it COW or
->> not.  This is the case in functions such as bdrv_open_backing_file() o=
-r
->> whenever we have to deal with the special behavior of @backing as a
->> blockdev option, which is that it does not default to null like all
->> other child references do.
->>
->> Finally, the query functions (query-block and query-named-block-nodes)=
+Are you sure your libvirt invocation is properly pointing at your new
+re-sized blobs? WFM here on master:
 
->> are modified to return any filtered child under "backing", not just
->> bs->backing or COW children.  This is so that filters do not interrupt=
+  ./aarch64-softmmu/qemu-system-aarch64 -cpu max -machine type=3Dvirt,virtu=
+alization=3Don -display none -m 4096 -serial mon:stdio -netdev user,id=3Dun=
+et,hostfwd=3Dtcp::2222-:22 -device virtio-net-pci,netdev=3Dunet -device vir=
+tio-scsi-pci -blockdev driver=3Draw,node-name=3Dhd,discard=3Dunmap,file.dri=
+ver=3Dhost_device,file.filename=3D/dev/zen-disk/debian-buster-arm64 -device=
+ scsi-hd,drive=3Dhd -bios /usr/share/AAVMF/AAVMF_CODE.fd
 
->> the reported backing chain.  This changes the output of iotest 184, as=
+Where:
 
->> the throttled node now appears as a backing child.
->>
->> Signed-off-by: Max Reitz <mreitz@redhat.com>
->> ---
->>   qapi/block-core.json           |   4 +
->>   include/block/block.h          |   1 +
->>   include/block/block_int.h      |  40 +++++--
->>   block.c                        | 210 +++++++++++++++++++++++++++----=
+ls -l /usr/share/AAVMF/*
+-rw-r--r-- 1 root root 67108864 Mar 16 00:37 /usr/share/AAVMF/AAVMF32_CODE.=
+fd
+-rw-r--r-- 1 root root 67108864 Mar 16 00:37 /usr/share/AAVMF/AAVMF32_VARS.=
+fd
+-rw-r--r-- 1 root root 67108864 Mar 16 00:37 /usr/share/AAVMF/AAVMF_CODE.fd
+-rw-r--r-- 1 root root 67108864 Mar 16 00:37 /usr/share/AAVMF/AAVMF_VARS.fd
+
 --
->>   block/backup.c                 |   8 +-
->>   block/block-backend.c          |  16 ++-
->>   block/commit.c                 |  33 +++---
->>   block/io.c                     |  45 ++++---
->>   block/mirror.c                 |  21 ++--
->>   block/qapi.c                   |  30 +++--
->>   block/stream.c                 |  13 +-
->>   blockdev.c                     |  88 +++++++++++---
->>   migration/block-dirty-bitmap.c |   4 +-
->>   nbd/server.c                   |   6 +-
->>   qemu-img.c                     |  29 ++---
->>   tests/qemu-iotests/184.out     |   7 +-
->>   tests/qemu-iotests/204.out     |   1 +
->>   17 files changed, 411 insertions(+), 145 deletions(-)
->=20
-> really huge... didn't you consider conversion file-by-file?
->=20
-> [..]
->=20
->> diff --git a/block.c b/block.c
->> index 16615bc876..e8f6febda0 100644
->> --- a/block.c
->> +++ b/block.c
->=20
-> [..]
->=20
->>  =20
->> @@ -3467,14 +3469,17 @@ static int bdrv_reopen_parse_backing(BDRVReope=
-nState *reopen_state,
->>       /*
->>        * Find the "actual" backing file by skipping all links that poi=
-nt
->>        * to an implicit node, if any (e.g. a commit filter node).
->> +     * We cannot use any of the bdrv_skip_*() functions here because
->> +     * those return the first explicit node, while we are looking for=
-
->> +     * its overlay here.
->>        */
->>       overlay_bs =3D bs;
->> -    while (backing_bs(overlay_bs) && backing_bs(overlay_bs)->implicit=
-) {
->> -        overlay_bs =3D backing_bs(overlay_bs);
->> +    while (overlay_bs->backing && bdrv_filtered_bs(overlay_bs)->impli=
-cit) {
->=20
-> So, you don't want to skip implicit filters with 'file' child? Then, wh=
-y not to use
-> child_bs(overlay_bs->backing), like in following if condition?
-
-On second thought, I actually think this version is wrong in the other wa=
-y.
-
-There needs to be a bs with bs->backing !=3D NULL and !bs->implicit
-somewhere in the chain.  We try to find that node.  It doesn=E2=80=99t ma=
-tter
-what=E2=80=99s on top of it, though,  If there are implicit node (which w=
-e try
-to skip here), the user isn=E2=80=99t aware of them.  Consequentially, it=
-
-doesn=E2=80=99t matter whether these implicit nodes use bs->backing or bs=
-->file,
-we just need to skip them.
-
-What is wrong is the =E2=80=9Cwhile (overlay_bs->backing ...)=E2=80=9D.  =
-That needs to
-be =E2=80=9Cwhile (bdrv_filtered_bs(overlay_bs) ...)=E2=80=9D.
-
-Max
-
-
---bLtIMsn1GN1YUyweUWWsyeLyMiNL5v3Ly
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlzxVb8ACgkQ9AfbAGHV
-z0CPUgf+IhnrZ/ZFM3NZ2A7LUG3RHsF4L0P4lBuexJz+jM/yB0Sl9biEpGCad9M0
-DJc+IslVRSgFRc84ueNWs6wxDzkahcz/wY0VLhLDb4XkA+svcCKQnM++uHEilTMD
-z486hthUtyFXjUigNoFnDXKEe4sxHeSo6mNyoKQ+k3y8KnhT7yKRV+D+Scqm2sHe
-QyOkqO6H8FCgyFcwK3kq68GVkmm6M5ESrXBcyEK40aPu8DwUZZ8lp+WoXEe2GwI9
-YH08HgFG9CGIK14XDTW/KkcJUCh/OTldIEjNlrEUNiZ3kD2ncWTC0NIzurHUykBa
-O1AHCKSPdB1yDLpwAen4OlGewhDIBA==
-=EmpS
------END PGP SIGNATURE-----
-
---bLtIMsn1GN1YUyweUWWsyeLyMiNL5v3Ly--
+Alex Benn=C3=A9e
 
