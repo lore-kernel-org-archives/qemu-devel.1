@@ -2,92 +2,65 @@ Return-Path: <SRS0=hY9S=T7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ABBB2C04AB6
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 May 2019 15:16:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 28CE1C04AB6
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 May 2019 15:16:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8401C26B6F
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 May 2019 15:16:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8401C26B6F
+	by mail.kernel.org (Postfix) with ESMTPS id EECD026B79
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 May 2019 15:16:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EECD026B79
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:45114 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:45116 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hWjGK-0003nG-RG
-	for qemu-devel@archiver.kernel.org; Fri, 31 May 2019 11:16:08 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:54373)
+	id 1hWjGp-0004H8-7k
+	for qemu-devel@archiver.kernel.org; Fri, 31 May 2019 11:16:39 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:54618)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1hWjEQ-0002k1-V3
-	for qemu-devel@nongnu.org; Fri, 31 May 2019 11:14:12 -0400
+	(envelope-from <imammedo@redhat.com>) id 1hWjFV-0003V3-4C
+	for qemu-devel@nongnu.org; Fri, 31 May 2019 11:15:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1hWjEP-000127-Vb
-	for qemu-devel@nongnu.org; Fri, 31 May 2019 11:14:10 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50810)
+	(envelope-from <imammedo@redhat.com>) id 1hWjFU-0002X7-1F
+	for qemu-devel@nongnu.org; Fri, 31 May 2019 11:15:17 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:18631)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>)
-	id 1hWjEM-0000uA-AI; Fri, 31 May 2019 11:14:06 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1hWjFT-0002WN-SM
+	for qemu-devel@nongnu.org; Fri, 31 May 2019 11:15:15 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 1613820276;
-	Fri, 31 May 2019 15:13:54 +0000 (UTC)
-Received: from [10.3.116.169] (ovpn-116-169.phx2.redhat.com [10.3.116.169])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 39B13643D6;
-	Fri, 31 May 2019 15:13:52 +0000 (UTC)
-To: Denis Plotnikov <dplotnikov@virtuozzo.com>, sgarzare@redhat.com,
-	kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org
-References: <20190531074620.24934-1-dplotnikov@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=eblake@redhat.com; keydata=
-	xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
-	xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
-	TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
-	GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
-	sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
-	AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
-	CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
-	RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
-	wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
-	Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
-	gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
-	pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
-	zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
-	pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
-	3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
-	NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
-	cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
-	SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
-	I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
-	mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
-	Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
-	2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
-Organization: Red Hat, Inc.
-Message-ID: <d2498589-e866-475c-13dd-fe9ce35b914b@redhat.com>
-Date: Fri, 31 May 2019 10:13:52 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	by mx1.redhat.com (Postfix) with ESMTPS id 33EDF30C1B9C;
+	Fri, 31 May 2019 15:15:15 +0000 (UTC)
+Received: from localhost (unknown [10.43.2.182])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 11FB55DE86;
+	Fri, 31 May 2019 15:15:11 +0000 (UTC)
+Date: Fri, 31 May 2019 17:15:07 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <20190531171507.7666961e@redhat.com>
+In-Reply-To: <6e7ec64f-43e2-fb66-3e47-ea7ff0f86eb4@linaro.org>
+References: <20190531134315.4109-1-richard.henderson@linaro.org>
+	<20190531134315.4109-14-richard.henderson@linaro.org>
+	<20190531162341.3743eb45@redhat.com>
+	<6e7ec64f-43e2-fb66-3e47-ea7ff0f86eb4@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20190531074620.24934-1-dplotnikov@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="WgyPkxeuzGgaEKQWlINMRAhA8OBl21fvl"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.29]);
-	Fri, 31 May 2019 15:13:59 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.43]);
+	Fri, 31 May 2019 15:15:15 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-X-Content-Filtered-By: Mailman/MimeDel 2.1.21
-Subject: Re: [Qemu-devel] [PATCH v5] qemu-io: add pattern file for write
- command
+Subject: Re: [Qemu-devel] [PATCH v16 13/23] target/rx: Fix cpu types and
+ names
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -99,88 +72,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: vsementsov@virtuozzo.com, qemu-devel@nongnu.org, den@virtuozzo.com
+Cc: philmd@redhat.com, qemu-devel@nongnu.org, ysato@users.sourceforge.jp
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---WgyPkxeuzGgaEKQWlINMRAhA8OBl21fvl
-From: Eric Blake <eblake@redhat.com>
-To: Denis Plotnikov <dplotnikov@virtuozzo.com>, sgarzare@redhat.com,
- kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org
-Cc: vsementsov@virtuozzo.com, qemu-devel@nongnu.org, den@virtuozzo.com
-Message-ID: <d2498589-e866-475c-13dd-fe9ce35b914b@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v5] qemu-io: add pattern file for write
- command
-References: <20190531074620.24934-1-dplotnikov@virtuozzo.com>
-In-Reply-To: <20190531074620.24934-1-dplotnikov@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Fri, 31 May 2019 09:59:14 -0500
+Richard Henderson <richard.henderson@linaro.org> wrote:
 
-On 5/31/19 2:46 AM, Denis Plotnikov wrote:
-> The patch allows to provide a pattern file for write
-> command. There was no similar ability before.
->=20
-> Signed-off-by: Denis Plotnikov <dplotnikov@virtuozzo.com>
-> ---
-> v5:
->   * file name initiated with null to make compilers happy
->=20
+> On 5/31/19 9:23 AM, Igor Mammedov wrote:
+> > On Fri, 31 May 2019 08:43:05 -0500
+> > Richard Henderson <richard.henderson@linaro.org> wrote:
+> >   
+> >> There was confusion here about abstract classes and naming cpus.
+> >> We had registered a concrete class named "-rxcpu".  This was put
+> >> into the default cpu fields, and matched, so basic tests worked.
+> >> However, no value for -cpu could ever match in rx_cpu_class_by_name.
+> >>
+> >> Rename the base class to "rx-cpu" and make it abstract.  This
+> >> matches what we do for most other targets.  Create a new concrete
+> >> cpu with the name "rx62n-rx-cpu".  
+> > 
+> > since it hasn't been merged yet, it would be better to squash this
+> > fixup into 3/23  
+> 
+> Except that it's not just 3/23 but also 8/23.  Which is why it was so much
+> easier to leave it separate for review.
+> 
+> I suppose this could be split and squashed, it you insist.  I don't see any
+> particular value in that though.
 
-> +static void *qemu_io_alloc_from_file(BlockBackend *blk, size_t len,
-> +                                     char *file_name)
-> +{
-> +    char *buf, *buf_pos;
-> +    FILE *f =3D fopen(file_name, "r");
-> +    int l;
-> +
-> +    if (!f) {
-> +        printf("'%s': %s\n", file_name, strerror(errno));
-> +        return NULL;
-> +    }
-> +
-> +    if (qemuio_misalign) {
-> +        len +=3D MISALIGN_OFFSET;
-> +    }
-> +    buf =3D blk_blockalign(blk, len);
-> +    memset(buf, 0, len);
-> +
-> +    buf_pos =3D buf;
-> +
-> +    while (len > 0) {
-> +        l =3D fread(buf_pos, sizeof(char), len, f);
-> +
-> +        if (feof(f)) {
-> +            rewind(f);
-> +        }
+well,
+one has to wonder why previous patches looked strange before they stumble
+on this one. So it's awkward fro reviewer and I'd guess for whomever would
+dig through the history later.
 
-Why are we reading the file more than once? Once we've read it once,
-it's more efficient to switch to a loop that memcpy()s the prefix into
-the rest of the buffer, rather than to perform repeated I/O.
+> 
+> >> -    typename = g_strdup_printf(RX_CPU_TYPE_NAME(""));
+> >> +    typename = g_strdup_printf(RX_CPU_TYPE_NAME("%s"), cpu_model);
+> >>      oc = object_class_by_name(typename);  
+> > 
+> > in case of new cpu, I'd allow only typename as cpu_model
+> > 
+> > s/typename/cpu_model/
+> >   
+> > which is compatible with '-device' naming and QMP/monitor interfaces
+> > that we support.
+> > 
+> > and I would not add other naming schemes /like adding suffix to cpu_model or .../
+> > that  are existing in QEMU for legacy reasons.  
+> 
+> I don't understand what you're looking for.
+> 
+> Do you want a type called "rx62n" for the concrete cpu instance?
+> That seems to be contrary to every other device in our system.
+> 
+> I hope you're not suggesting that the command-line be "-cpu rx62n-rx-cpu".
+> That seems pointlessly verbose.
+the other interfaces (qmp/monitor/-device) are using verbose form only,
+so it would be better to just be consistent with them.
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+> 
+> If we're going to change the way we do things, we should do that everywhere,
+> and not make things different for only one target.
+We can't do the same for already existing cpus since it might break existing
+configurations out-there. But at least the new code won't get in the way
+when we get to deprecating multiple ways one could name cpu with -cpu.
 
+> 
+> 
+> r~
 
---WgyPkxeuzGgaEKQWlINMRAhA8OBl21fvl
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlzxRLAACgkQp6FrSiUn
-Q2qhcwf/VoYX4JjGmIdTcHzGvFefpbRFxJmQ6oJhQtDUF1agc95KQuqMt+C+/Sry
-yg+SztVmhXtEQcZPR+fc38Yrb4IaqvzfdXlNDzjpXoynYMUL2vgAuYN1d9ksKmjZ
-uJFg9r03UJYkRoO0k79GhqzvpBW87cxgKXFp8+HLCoItwh1IZO7KBNo5C7rLq2sz
-vlUGjXUV3i2bw5nZywk46SimMY8OAbVWELdE+KOaFglOTOEJPJl6S9FTGO/g1NaQ
-AnMkUQS3gmozN2/zpEFkRFuzJc77Dp03gK7HB5Y83cWaiRhs0nwvDhPvmkcAJWt8
-ZAHxaZCbP6ozcglfyrxnvUJ2CzRnNw==
-=4DLl
------END PGP SIGNATURE-----
-
---WgyPkxeuzGgaEKQWlINMRAhA8OBl21fvl--
 
