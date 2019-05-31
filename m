@@ -2,112 +2,92 @@ Return-Path: <SRS0=hY9S=T7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 48DEEC04AB6
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 May 2019 17:45:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF2C8C04AB6
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 May 2019 17:49:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1F22F26D50
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 May 2019 17:45:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1F22F26D50
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 79CD126D5E
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 May 2019 17:49:30 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="flDRSxmu"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 79CD126D5E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:47085 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:47125 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hWlaQ-0004LY-ET
-	for qemu-devel@archiver.kernel.org; Fri, 31 May 2019 13:45:02 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:54996)
+	id 1hWlej-0005al-Ro
+	for qemu-devel@archiver.kernel.org; Fri, 31 May 2019 13:49:29 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:55591)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hWlZg-00042e-8H
-	for qemu-devel@nongnu.org; Fri, 31 May 2019 13:44:17 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hWldm-0005Jp-MT
+	for qemu-devel@nongnu.org; Fri, 31 May 2019 13:48:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hWlZc-0001BU-Os
-	for qemu-devel@nongnu.org; Fri, 31 May 2019 13:44:15 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41530)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1hWlZc-0001AM-Gu
-	for qemu-devel@nongnu.org; Fri, 31 May 2019 13:44:12 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
-	[10.5.11.23])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 338BDF9E7B;
-	Fri, 31 May 2019 17:44:11 +0000 (UTC)
-Received: from [10.36.116.233] (ovpn-116-233.ams2.redhat.com [10.36.116.233])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 2B89819C69;
-	Fri, 31 May 2019 17:44:10 +0000 (UTC)
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+	(envelope-from <richard.henderson@linaro.org>) id 1hWldl-0004y0-K4
+	for qemu-devel@nongnu.org; Fri, 31 May 2019 13:48:30 -0400
+Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:35056)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1hWldl-0004x6-9F
+	for qemu-devel@nongnu.org; Fri, 31 May 2019 13:48:29 -0400
+Received: by mail-oi1-x241.google.com with SMTP id y6so4736465oix.2
+	for <qemu-devel@nongnu.org>; Fri, 31 May 2019 10:48:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
+	:mime-version:in-reply-to:content-language:content-transfer-encoding;
+	bh=CDc/JVw+52I/alb2lQU/Zyy98nAkyaGg8+py/RsfLpk=;
+	b=flDRSxmupn6aUIMM8cymKmQs6BiSXRHQ1Pt7Vb+xDFKliMtL9Xv5s6FnY/YrpxZ+aZ
+	3cBZCv3tVr0EGT09X4RCJ1Ew133NyPdklaRUiDnAanz5f0C731QQ/N8AtGfq58SAZ+po
+	hnrMb4HDvLmqi4kQf2Z97xdDHc7aBx2LNXYuBqeMRAhNrIXeCpSFKv/99lrBIsaKKA+E
+	0lXS0TZQzntGTRBA6rcUnQ3Y+dITTJpnJ9vEYsifCdDQcmj6Ale6ijNQvbusGO1mNkOf
+	7OGwmGM6CEzlVvraxoIGRKvAoaZ2UwZ62UjEacUVZcNqWFBEVCOriwPFQWs/IxmtXFli
+	Sl1Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+	:date:user-agent:mime-version:in-reply-to:content-language
+	:content-transfer-encoding;
+	bh=CDc/JVw+52I/alb2lQU/Zyy98nAkyaGg8+py/RsfLpk=;
+	b=MV3d4HGVxGtrSP/nWYRXCXeGuGFpvkx3/PBQBwZrgAFwUIG9cG7FWRlzJAKOizLMZ/
+	VN0msNc+hVpcI/WUdISo3Mw8/63w3R9DEcGlbIaoeTGMQVJbB/umxFCCdHQxc3L1DMM3
+	8D/3LO+GJHxWyHb/NIUC25jfFJpx+4eQdDICOTVKnsXnloqRsYhG4WIVScefpsCjOoF+
+	pb/j7/ByzPZ3f7c/nFeq9J1ORmEEeXRTPQ6w2Xme9LBrn+cvUCe7aMLeYoNl8xhGrmIV
+	3772hZOWTy0zt09848qmnMTtpAw8rCbRP5FlVeXrnj6oDFKI6Rdj3DCRAtcEEwpEPS9c
+	DIDQ==
+X-Gm-Message-State: APjAAAXEZifuLzJ+YbkrIiOQQrceYz9W3MdObLn0ydxuoAVIxYBu3Zu6
+	diFNjTurTsQ13IS0p5O35ZQu/Q==
+X-Google-Smtp-Source: APXvYqwMYQpedxHp9Hm2G5BwhfvpsXSdb+7oD4a7yUhcKkpFjxjbbzXoTlHOhcMnqszCUoN7GLZKVQ==
+X-Received: by 2002:aca:5209:: with SMTP id g9mr16271oib.35.1559324908120;
+	Fri, 31 May 2019 10:48:28 -0700 (PDT)
+Received: from [172.24.12.210] (168.189-204-159.bestelclientes.com.mx.
+	[189.204.159.168]) by smtp.gmail.com with ESMTPSA id
+	l31sm2267626otc.30.2019.05.31.10.48.26
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Fri, 31 May 2019 10:48:27 -0700 (PDT)
+To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
 References: <20190531104432.29379-1-david@redhat.com>
-	<20190531104432.29379-17-david@redhat.com>
-	<91a1c09a-63b4-8d57-3065-b8cad49b89c7@linaro.org>
-From: David Hildenbrand <david@redhat.com>
+	<20190531104432.29379-18-david@redhat.com>
+From: Richard Henderson <richard.henderson@linaro.org>
 Openpgp: preference=signencrypt
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
-	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
-	SE+xAvmumFBY
-Organization: Red Hat GmbH
-Message-ID: <fcfdee74-1d97-76c3-bf3a-fca8887bdb42@redhat.com>
-Date: Fri, 31 May 2019 19:44:09 +0200
+Message-ID: <3b28ed7b-cbde-c7a3-c072-df8eeb55a288@linaro.org>
+Date: Fri, 31 May 2019 12:48:24 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <91a1c09a-63b4-8d57-3065-b8cad49b89c7@linaro.org>
+In-Reply-To: <20190531104432.29379-18-david@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.38]);
-	Fri, 31 May 2019 17:44:11 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v1 16/23] s390x/tcg: Implement VECTOR FP
- MULTIPLY AND (ADD|SUBTRACT)
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::241
+Subject: Re: [Qemu-devel] [PATCH v1 17/23] s390x/tcg: Implement VECTOR FP
+ PERFORM SIGN OPERATION
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -125,33 +105,53 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 31.05.19 19:42, Richard Henderson wrote:
-> On 5/31/19 5:44 AM, David Hildenbrand wrote:
->> +typedef uint64_t (*vop64_4_fn)(uint64_t a, uint64_t b, uint64_t c,
->> +                               float_status *s);
->> +static void vop64_4(S390Vector *v1, const S390Vector *v2, const S390Vector *v3,
->> +                    const S390Vector *v4, CPUS390XState *env, bool s,
->> +                    vop64_4_fn fn, uintptr_t retaddr)
->> +{
-> 
-> Surely this is only going to be used for FMA/FMS.
-> Why not just pass in the float_muladd_* constant
-> to pass on to float64_muladd?
+On 5/31/19 5:44 AM, David Hildenbrand wrote:
+> +static DisasJumpType op_vfpso(DisasContext *s, DisasOps *o)
+> +{
+> +    const uint8_t fpf = get_field(s->fields, m3);
+> +    const uint8_t m4 = get_field(s->fields, m4);
+> +    const uint8_t m5 = get_field(s->fields, m5);
+> +    const bool se = extract32(m4, 3, 1);
+> +    TCGv_i64 tmp;
+> +    int i;
+> +
+> +    if (fpf != FPF_LONG || extract32(m4, 0, 3) || m5 > 2) {
+> +        gen_program_exception(s, PGM_SPECIFICATION);
+> +        return DISAS_NORETURN;
+> +    }
+> +
+> +    tmp = tcg_temp_new_i64();
+> +    for (i = 0; i < 2; i++) {
+> +        read_vec_element_i64(tmp, get_field(s->fields, v2), i, ES_64);
+> +
+> +        switch (m5) {
+> +        case 0:
+> +            /* sign bit is inverted (complement) */
+> +            tcg_gen_xori_i64(tmp, tmp, 1ull << 63);
+> +            break;
+> +        case 1:
+> +            /* sign bit is set to one (negative) */
+> +            tcg_gen_ori_i64(tmp, tmp, 1ull << 63);
+> +            break;
+> +        case 2:
+> +            /* sign bit is set to zero (positive) */
+> +            tcg_gen_andi_i64(tmp, tmp, (1ull << 63) - 1);
+> +            break;
+> +        }
+> +
+> +        write_vec_element_i64(tmp, get_field(s->fields, v1), i, ES_64);
+> +        if (se) {
+> +            break;
+> +        }
+> +    }
+> +    tcg_temp_free_i64(tmp);
+> +    return DISAS_NEXT;
+> +}
 
-I actually had something similar before, but makes sense, as this will
-really only be used for these functions.
-
-Thanks!
-
-> 
-> 
-> r~
-> 
+Better to use tcg_gen_gvec_{and,xor,or}i to do all of the elements at once.
+Won't work for FPF_EXTENDED, but much better for FPF_SINGLE, once they're
+supported.
 
 
--- 
-
-Thanks,
-
-David / dhildenb
+r~
 
