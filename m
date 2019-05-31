@@ -2,70 +2,92 @@ Return-Path: <SRS0=hY9S=T7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,T_HK_NAME_DR,USER_AGENT_MUTT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DDEE4C04AB6
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 May 2019 08:24:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 183CBC04AB6
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 May 2019 08:31:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A5ADA265B7
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 May 2019 08:24:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A5ADA265B7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id D7FC7265C6
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 May 2019 08:31:38 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="GS2twhP4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D7FC7265C6
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:38500 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:38572 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hWcqP-0008H3-VW
-	for qemu-devel@archiver.kernel.org; Fri, 31 May 2019 04:24:57 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:56563)
+	id 1hWcws-0001KG-1Q
+	for qemu-devel@archiver.kernel.org; Fri, 31 May 2019 04:31:38 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:57338)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1hWcpZ-0007tk-P7
-	for qemu-devel@nongnu.org; Fri, 31 May 2019 04:24:07 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1hWcvl-0000ot-JH
+	for qemu-devel@nongnu.org; Fri, 31 May 2019 04:30:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1hWcpY-0005g8-08
-	for qemu-devel@nongnu.org; Fri, 31 May 2019 04:24:05 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57800)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hWcpX-0005Ys-MG
-	for qemu-devel@nongnu.org; Fri, 31 May 2019 04:24:03 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 0E7D251145
-	for <qemu-devel@nongnu.org>; Fri, 31 May 2019 08:23:59 +0000 (UTC)
-Received: from work-vm (ovpn-117-254.ams2.redhat.com [10.36.117.254])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id F0A935C231;
-	Fri, 31 May 2019 08:23:46 +0000 (UTC)
-Date: Fri, 31 May 2019 09:23:44 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20190531082343.GA3169@work-vm>
-References: <20190517125820.2885-1-jfreimann@redhat.com>
-	<20190517125820.2885-4-jfreimann@redhat.com>
-	<20190521094504.GB2915@work-vm>
-	<20190530145645.tjwkgi4hae5yblsi@jenstp.localdomain>
-	<20190530134631-mutt-send-email-mst@kernel.org>
-	<20190530180022.GB2864@work-vm>
-	<20190530140419-mutt-send-email-mst@kernel.org>
-	<20190530190822.GL2823@work-vm>
-	<20190530152104-mutt-send-email-mst@kernel.org>
+	(envelope-from <alex.bennee@linaro.org>) id 1hWcvj-0003yO-Mr
+	for qemu-devel@nongnu.org; Fri, 31 May 2019 04:30:29 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:50465)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1hWcvi-0003s0-CN
+	for qemu-devel@nongnu.org; Fri, 31 May 2019 04:30:26 -0400
+Received: by mail-wm1-x341.google.com with SMTP id f204so1479418wme.0
+	for <qemu-devel@nongnu.org>; Fri, 31 May 2019 01:30:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=references:user-agent:from:to:cc:subject:in-reply-to:date
+	:message-id:mime-version:content-transfer-encoding;
+	bh=nTKHyf+Tg6V3JFjX7S3qTj0yReqy9kAieC8xt0L9DKk=;
+	b=GS2twhP4rLj0UkrfecbSwyUTvNdou77AEK7zcnlHC49+qOko46TQWv7RvZ7Hc/98md
+	4hnata0pTncaLwrsyHWcbc0ceh0KDXcP4Erru8k+mQxRQrvBtCdNAKw+hrR7hEYhthtD
+	UhQqDZOL05i52vry6dQCTbW9rnks7FnjRtvyvasqs8FHB3aMoxwo2VszDtHGq71AdIqr
+	fK+2jy6x0LlMZeLIffYrwuECrLBdsr8wYaBh/eMA044Pkc5hpiv/t+/tjyFopMe7Diyh
+	yPiTwiyBOOv11cf/Fj4nl80kcxdRkCOWZ40SuSn5jLMXyufKWk2STfDX0IdMoM6JBJrq
+	xTVQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:references:user-agent:from:to:cc:subject
+	:in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+	bh=nTKHyf+Tg6V3JFjX7S3qTj0yReqy9kAieC8xt0L9DKk=;
+	b=PlmmrrDEu0bps7wHCPouliYwLnaAEkmnFUpoxBHxRcDJZDMm2E1e4rl5BJMxdHQtya
+	H1DGfSa5U953OVvWmdFzWnwOLuZ2vYMMD7BY0bWyZpRjKagQfHaDcZlBFwrdC6cg2m79
+	mqJfzjKHm8hteqoIgP0NM1L003tKaABkeq6mpW9a2+nTnIuufjBmTGRct49/EkJahHkO
+	5QdRNhqZmvTV7Jeq+Z/LIvfJW2QAc+hMHwuWuGxIuOBgJNL0LWVulYdyMs1cMokvUaNZ
+	JHXCaA9ES0HsqaXIwBS429DnZ/RTYkGaDlfXqXf6NCIo8sKrV/pGkRXssoOHd/OeRFnm
+	vEyQ==
+X-Gm-Message-State: APjAAAVs+JHTH5+ud2XmcSNfGWCcA1f014Rm0FDTrS4yks7J8s12vf4J
+	hMM0f9y7BC8Sey8HAa8N7Mf7VQ==
+X-Google-Smtp-Source: APXvYqxI/TbLgNs1dtmpe/AFDzb/7jgL3nHjj+XcV7Uvv+XrZnXvLj9ZNet9Ei5nFgB3V69jZvsQGw==
+X-Received: by 2002:a1c:7d4e:: with SMTP id y75mr4861676wmc.169.1559291425173; 
+	Fri, 31 May 2019 01:30:25 -0700 (PDT)
+Received: from zen.linaroharston ([81.128.185.34])
+	by smtp.gmail.com with ESMTPSA id
+	z20sm5325997wmf.14.2019.05.31.01.30.23
+	(version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+	Fri, 31 May 2019 01:30:24 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+	by zen.linaroharston (Postfix) with ESMTP id 7C05C1FF87;
+	Fri, 31 May 2019 09:30:23 +0100 (BST)
+References: <20190530143916.20255-1-alex.bennee@linaro.org>
+	<ced800af-8f00-cc27-358d-57cb0e715e45@vivier.eu>
+User-agent: mu4e 1.3.2; emacs 26.1
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Laurent Vivier <laurent@vivier.eu>
+In-reply-to: <ced800af-8f00-cc27-358d-57cb0e715e45@vivier.eu>
+Date: Fri, 31 May 2019 09:30:23 +0100
+Message-ID: <87tvdb3u1s.fsf@zen.linaroharston>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190530152104-mutt-send-email-mst@kernel.org>
-User-Agent: Mutt/1.11.4 (2019-03-13)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.39]);
-	Fri, 31 May 2019 08:23:59 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 3/4] net/virtio: add failover support
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2a00:1450:4864:20::341
+Subject: Re: [Qemu-devel] [RFC PATCH] semihosting: split console_out intro
+ string and char versions
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -77,179 +99,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pkrempa@redhat.com, berrange@redhat.com, ehabkost@redhat.com,
-	aadam@redhat.com, qemu-devel@nongnu.org, laine@redhat.com,
-	Jens Freimann <jfreimann@redhat.com>, ailan@redhat.com
+Cc: Peter Maydell <peter.maydell@linaro.org>, Riku Voipio <riku.voipio@iki.fi>,
+	qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Michael S. Tsirkin (mst@redhat.com) wrote:
-> On Thu, May 30, 2019 at 08:08:23PM +0100, Dr. David Alan Gilbert wrote:
-> > * Michael S. Tsirkin (mst@redhat.com) wrote:
-> > > On Thu, May 30, 2019 at 07:00:23PM +0100, Dr. David Alan Gilbert wrote:
-> > > > * Michael S. Tsirkin (mst@redhat.com) wrote:
-> > > > > On Thu, May 30, 2019 at 04:56:45PM +0200, Jens Freimann wrote:
-> > > > > > Hi David,
-> > > > > > 
-> > > > > > sorry for the  delayed reply.
-> > > > > > 
-> > > > > > On Tue, May 28, 2019 at 11:04:15AM -0400, Michael S. Tsirkin wrote:
-> > > > > > > On Tue, May 21, 2019 at 10:45:05AM +0100, Dr. David Alan Gilbert wrote:
-> > > > > > > > * Jens Freimann (jfreimann@redhat.com) wrote:
-> > > > > > > > > +static void virtio_net_primary_plug_timer(void *opaque);
-> > > > > > > > > +
-> > > > > > > > >  static void virtio_net_set_link_status(NetClientState *nc)
-> > > > > > > > >  {
-> > > > > > > > >      VirtIONet *n = qemu_get_nic_opaque(nc);
-> > > > > > > > > @@ -786,6 +796,14 @@ static void virtio_net_set_features(VirtIODevice *vdev, uint64_t features)
-> > > > > > > > >      } else {
-> > > > > > > > >          memset(n->vlans, 0xff, MAX_VLAN >> 3);
-> > > > > > > > >      }
-> > > > > > > > > +
-> > > > > > > > > +    if (virtio_has_feature(features, VIRTIO_NET_F_STANDBY)) {
-> > > > > > > > > +        atomic_set(&n->primary_should_be_hidden, false);
-> > > > > > > > > +        if (n->primary_device_timer)
-> > > > > > > > > +            timer_mod(n->primary_device_timer,
-> > > > > > > > > +                qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL) +
-> > > > > > > > > +                4000);
-> > > > > > > > > +    }
-> > > > > > > > 
-> > > > > > > > What's this magic timer constant and why?
-> > > > > > 
-> > > > > > To be honest it's a leftover from previous versions (before I took
-> > > > > > over) of the patches and I'm not sure why the timer is there.
-> > > > > > I removed it and so far see no reason to keep it.
-> > > > > > 
-> > > > > > > > 
-> > > > > > > > >  }
-> > > > > > > > >
-> > > > > > > > >  static int virtio_net_handle_rx_mode(VirtIONet *n, uint8_t cmd,
-> > > > > > > > > @@ -2626,6 +2644,87 @@ void virtio_net_set_netclient_name(VirtIONet *n, const char *name,
-> > > > > > > > >      n->netclient_type = g_strdup(type);
-> > > > > > > > >  }
-> > > > > > > > >
-> > > > > > > > > +static void virtio_net_primary_plug_timer(void *opaque)
-> > > > > > > > > +{
-> > > > > > > > > +    VirtIONet *n = opaque;
-> > > > > > > > > +    Error *err = NULL;
-> > > > > > > > > +
-> > > > > > > > > +    if (n->primary_device_dict)
-> > > > > > > > > +        n->primary_device_opts = qemu_opts_from_qdict(qemu_find_opts("device"),
-> > > > > > > > > +            n->primary_device_dict, &err);
-> > > > > > > > > +    if (n->primary_device_opts) {
-> > > > > > > > > +        n->primary_dev = qdev_device_add(n->primary_device_opts, &err);
-> > > > > > > > > +        error_setg(&err, "virtio_net: couldn't plug in primary device");
-> > > > > > > > > +        return;
-> > > > > > > > > +    }
-> > > > > > > > > +    if (!n->primary_device_dict && err) {
-> > > > > > > > > +        if (n->primary_device_timer) {
-> > > > > > > > > +            timer_mod(n->primary_device_timer,
-> > > > > > > > > +                qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL) +
-> > > > > > > > > +                100);
-> > > > > > > > 
-> > > > > > > > same here.
-> > > > > > 
-> > > > > > see above
-> > > > > > 
-> > > > > > > > 
-> > > > > > > > 
-> > > > > > > > > +        }
-> > > > > > > > > +    }
-> > > > > > > > > +}
-> > > > > > > > > +
-> > > > > > > > > +static void virtio_net_handle_migration_primary(VirtIONet *n,
-> > > > > > > > > +                                                MigrationState *s)
-> > > > > > > > > +{
-> > > > > > > > > +    Error *err = NULL;
-> > > > > > > > > +    bool should_be_hidden = atomic_read(&n->primary_should_be_hidden);
-> > > > > > > > > +
-> > > > > > > > > +    n->primary_dev = qdev_find_recursive(sysbus_get_default(),
-> > > > > > > > > +            n->primary_device_id);
-> > > > > > > > > +    if (!n->primary_dev) {
-> > > > > > > > > +        error_setg(&err, "virtio_net: couldn't find primary device");
-> > > > > > > > 
-> > > > > > > > There's something broken with the error handling in this function - the
-> > > > > > > > 'err' never goes anywhere - I don't think it ever gets printed or
-> > > > > > > > reported or stops the migration.
-> > > > > > 
-> > > > > > yes, I'll fix it.
-> > > > > > 
-> > > > > > > > > +    }
-> > > > > > > > > +    if (migration_in_setup(s) && !should_be_hidden && n->primary_dev) {
-> > > > > > > > > +        qdev_unplug(n->primary_dev, &err);
-> > > > > > > > 
-> > > > > > > > Not knowing unplug well; can you just explain - is that device hard
-> > > > > > > > unplugged and it's gone by the time this function returns or is it still
-> > > > > > > > hanging around for some indeterminate time?
-> > > > > > 
-> > > > > > Qemu will trigger an unplug request via pcie attention button in which case
-> > > > > > there could be a delay by the guest operating system. We could give it some
-> > > > > > amount of time and if nothing happens try surpise removal or handle the
-> > > > > > error otherwise.
-> > > > > > 
-> > > > > > 
-> > > > > > regards,
-> > > > > > Jens
-> > > > > 
-> > > > > That's a subject for another day. Let's get the basic thing
-> > > > > working.
-> > > > 
-> > > > Well no, we need to know this thing isn't going to hang in the migration
-> > > > setup phase, or if it does how we recover.
-> > > 
-> > > 
-> > > This thing is *supposed* to be stuck in migration startup phase
-> > > if guest is malicious.
-> > > 
-> > > If migration does not progress management needs
-> > > a way to detect this and cancel.
-> > > 
-> > > Some more documentation about how this is supposed to happen
-> > > would be helpful.
-> > 
-> > I want to see that first; because I want to convinced it's just a
-> > documentation problem and that we actually really have a method of
-> > recovering.
-> > 
-> > > >  This patch series is very
-> > > > odd precisely because it's trying to do the unplug itself in the
-> > > > migration phase rather than let the management layer do it - so unless
-> > > > it's nailed down how to make sure that's really really bullet proof
-> > > > then we've got to go back and ask the question about whether we should
-> > > > really fix it so it can be done by the management layer.
-> > > > 
-> > > > Dave
-> > > 
-> > > management already said they can't because files get closed and
-> > > resources freed on unplug and so they might not be able to re-add device
-> > > on migration failure. We do it in migration because that is
-> > > where failures can happen and we can recover.
-> > 
-> > I find this explanation confusing - I can kind of see where it's coming
-> > from, but we've got a pretty clear separation between a NIC and the
-> > netdev that backs it; those files and resources should be associated
-> > with the netdev and not the NIC.  So does hot-removing the NIC really
-> > clean up the netdev?  (I guess maybe this is a different in vfio
-> > which is the problem)
-> > 
-> > Dave
-> 
-> what we are removing is the VFIO device.
-> Nothing to do with nic or netdev.
 
-OK, but at the same time why can't we hold open the VFIOs devices
-resources in a comparable way - i.e. don't really let qemu let go of
-it even when the guest has unplugged it?
+Laurent Vivier <laurent@vivier.eu> writes:
 
-Dave
+> Le 30/05/2019 =C3=A0 16:39, Alex Benn=C3=A9e a =C3=A9crit :
+>> This is ostensibly to avoid the weirdness of len looking like it might
+>> come from a guest and sometimes being used. While we are at it fix up
+>> the error checking for the arm-linux-user implementation of the API
+>> which got flagged up by Coverity (CID 1401700).
+>>
+>> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+>> ---
+<snip>
+>>  /**
+>>   * qemu_semihosting_log_out:
+>> diff --git a/linux-user/arm/semihost.c b/linux-user/arm/semihost.c
+>> index 9554102a855..b7cdc21f832 100644
+>> --- a/linux-user/arm/semihost.c
+>> +++ b/linux-user/arm/semihost.c
+>> @@ -15,10 +15,34 @@
+>>  #include "hw/semihosting/console.h"
+>>  #include "qemu.h"
+>>
+>> -int qemu_semihosting_console_out(CPUArchState *env, target_ulong addr, =
+int len)
+>> +int qemu_semihosting_console_outs(CPUArchState *env, target_ulong addr)
+>>  {
+>> +    int len;
+>>      void *s =3D lock_user_string(addr);
+>> -    len =3D write(STDERR_FILENO, s, len ? len : strlen(s));
+>> +    if (!s) {
+>> +        qemu_log_mask(LOG_GUEST_ERROR,
+>> +                      "%s: passed inaccessible address " TARGET_FMT_lx,
+>> +                      __func__, addr);
+>> +        return 0;
+>> +    }
+>> +
+>> +    len =3D write(STDERR_FILENO, s, strlen(s));
+>
+> You could avoid 2 calls to strlen() if you inline directly
+> lock_user_string() content:
+>
+>     len =3D target_strlen(addr);
+>     if (len < 0){
+>        qemu_log_mask(LOG_GUEST_ERROR,
+>                      "%s: passed inaccessible address " TARGET_FMT_lx,
+>                      __func__, addr);
+>        return 0;
+>     }
+>     s =3D lock_user(VERIFY_READ, addr, (long)(len + 1), 1);
+>     len =3D write(STDERR_FILENO, s, len);
+>
+>>      unlock_user(s, addr, 0);
+>>      return len;
+>>  }
 
-> > > > > -- 
-> > > > > MST
-> > > > --
-> > > > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> > --
-> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+It's a nice clean-up but I've just looked at what was going on inside
+with lock_user. I guess g_assert(s) on the lock user would be fair as we
+can't fail at this point?
+
 --
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Alex Benn=C3=A9e
 
