@@ -2,92 +2,63 @@ Return-Path: <SRS0=hY9S=T7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 94584C28CC2
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 May 2019 14:14:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1AA7CC04AB6
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 May 2019 14:25:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 655EA26A2D
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 May 2019 14:14:37 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="tifwS1tj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 655EA26A2D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id E669426A87
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 May 2019 14:25:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E669426A87
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:44304 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:44461 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hWiIm-0005WW-H8
-	for qemu-devel@archiver.kernel.org; Fri, 31 May 2019 10:14:36 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:41794)
+	id 1hWiSv-0007yo-2B
+	for qemu-devel@archiver.kernel.org; Fri, 31 May 2019 10:25:05 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:44822)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hWiFR-00034V-LY
-	for qemu-devel@nongnu.org; Fri, 31 May 2019 10:11:10 -0400
+	(envelope-from <imammedo@redhat.com>) id 1hWiRu-0007Ya-JU
+	for qemu-devel@nongnu.org; Fri, 31 May 2019 10:24:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hWiFQ-000235-KG
-	for qemu-devel@nongnu.org; Fri, 31 May 2019 10:11:09 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:33093)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1hWiFQ-00020G-CT
-	for qemu-devel@nongnu.org; Fri, 31 May 2019 10:11:08 -0400
-Received: by mail-wr1-x441.google.com with SMTP id d9so6670705wrx.0
-	for <qemu-devel@nongnu.org>; Fri, 31 May 2019 07:11:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=references:user-agent:from:to:cc:subject:in-reply-to:date
-	:message-id:mime-version:content-transfer-encoding;
-	bh=nR0Fsd5lcFxshF9x99tgdF4xX215jpME3sQAn3FOKWk=;
-	b=tifwS1tj410hVtbRKDDw+g3AFbinEgEbHOKebH2dZH4Qss08Vub4fQK4fn3Gqn68w/
-	JWZXoXMDPIDbVe9mhoKTdlaIT84soHUHb9nuyrtGWTOq2exGPWCuI+o2ac5chx4H9YOD
-	G/WQYzXXKzX1USNDUN3bXeMVSbwmjKE9eMn6xFcxxJuHbQukJ6jv5Ol8YO5ZETLNAspX
-	kcI4oHvV6dFjntLXTtBJcEtU7YmPbY7dQ3cpXf0HmEHV99lPDqDXEWOEf/0a+q/giuVz
-	hxLFNxIjG5AgTeVim4kKxPvUkpAdoP238JUQCF1Oppj9ZJJSvKb8AtKh1shU+NkkkUOd
-	TnKg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:references:user-agent:from:to:cc:subject
-	:in-reply-to:date:message-id:mime-version:content-transfer-encoding;
-	bh=nR0Fsd5lcFxshF9x99tgdF4xX215jpME3sQAn3FOKWk=;
-	b=Xd9zxkuNwho0Wihb7HbavEwQyPyFFiU4DhDOvClJhMthliE7ilyyL/5+R8lN56t/rM
-	v912a1Q8QQaC4COvWkP+d+khoVm9h2hTVMQIjYd3DSJYKuiP0rXq3x5COM0JwbVnYZto
-	xY0XfySv3PKRMkCm+hvMWZTRzMRvKzStnmB2UGrtTlN/qd9tAVN/wstNvg1PqPb+PBa2
-	p0sruPX9Cygprd/Axoo396E/xF7JzSzeSOToKPiJmd69BplIuLOTyeVySY39BEsWO3q0
-	ikPXVJlimnm8bIqJrHDQleGWEcZ9ZlWAUAVghfjCk3Uz42YR9aQzDxnIaVfe/rO5xTAY
-	pbGA==
-X-Gm-Message-State: APjAAAUIAWHM6l5SWeNoGdE1137WnorUuSd9IzjbiRmdF2Ajqo2TQTtd
-	/+f12DfF8GA8ijRkqDC+bW04w+152WY=
-X-Google-Smtp-Source: APXvYqzASJe3k6Uey0+kvDnBSUszN1dxqOmgD9hiCPByBnwR4IJzEmBCokq2hmOaf8s+1GLcGicIwQ==
-X-Received: by 2002:adf:cd8c:: with SMTP id q12mr7010523wrj.103.1559311867318; 
-	Fri, 31 May 2019 07:11:07 -0700 (PDT)
-Received: from zen.linaroharston ([81.128.185.34])
-	by smtp.gmail.com with ESMTPSA id
-	c14sm6145770wrt.45.2019.05.31.07.11.06
-	(version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-	Fri, 31 May 2019 07:11:06 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
-	by zen.linaroharston (Postfix) with ESMTP id EEABA1FF87;
-	Fri, 31 May 2019 15:11:05 +0100 (BST)
-References: <20190529064148.19856-1-arilou@gmail.com>
-	<20190529064148.19856-19-arilou@gmail.com>
-User-agent: mu4e 1.3.2; emacs 26.1
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Jon Doron <arilou@gmail.com>
-In-reply-to: <20190529064148.19856-19-arilou@gmail.com>
-Date: Fri, 31 May 2019 15:11:05 +0100
-Message-ID: <87r28e90jq.fsf@zen.linaroharston>
+	(envelope-from <imammedo@redhat.com>) id 1hWiRr-0007jl-F8
+	for qemu-devel@nongnu.org; Fri, 31 May 2019 10:24:01 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57038)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1hWiRr-0007aM-5p
+	for qemu-devel@nongnu.org; Fri, 31 May 2019 10:23:59 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+	[10.5.11.22])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 78A6CA3EB1;
+	Fri, 31 May 2019 14:23:51 +0000 (UTC)
+Received: from localhost (unknown [10.43.2.182])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 25A1D1009976;
+	Fri, 31 May 2019 14:23:46 +0000 (UTC)
+Date: Fri, 31 May 2019 16:23:41 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <20190531162341.3743eb45@redhat.com>
+In-Reply-To: <20190531134315.4109-14-richard.henderson@linaro.org>
+References: <20190531134315.4109-1-richard.henderson@linaro.org>
+	<20190531134315.4109-14-richard.henderson@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2a00:1450:4864:20::441
-Subject: Re: [Qemu-devel] [PATCH v12 18/20] gdbstub: Implement target halted
- (? pkt) with new infra
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.30]);
+	Fri, 31 May 2019 14:23:56 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v16 13/23] target/rx: Fix cpu types and
+ names
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -99,89 +70,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: philmd@redhat.com, qemu-devel@nongnu.org, ysato@users.sourceforge.jp
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Fri, 31 May 2019 08:43:05 -0500
+Richard Henderson <richard.henderson@linaro.org> wrote:
 
-Jon Doron <arilou@gmail.com> writes:
+> There was confusion here about abstract classes and naming cpus.
+> We had registered a concrete class named "-rxcpu".  This was put
+> into the default cpu fields, and matched, so basic tests worked.
+> However, no value for -cpu could ever match in rx_cpu_class_by_name.
+> 
+> Rename the base class to "rx-cpu" and make it abstract.  This
+> matches what we do for most other targets.  Create a new concrete
+> cpu with the name "rx62n-rx-cpu".
 
-> Note: The user-mode thread-id has been correctly reported since bd88c780e6
->
-> Signed-off-by: Jon Doron <arilou@gmail.com>
+since it hasn't been merged yet, it would be better to squash this
+fixup into 3/23
 
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+[...]
 
-> ---
->  gdbstub.c | 35 +++++++++++++++++++++++++----------
->  1 file changed, 25 insertions(+), 10 deletions(-)
->
-> diff --git a/gdbstub.c b/gdbstub.c
-> index 80fe5b2d0c..a474f2c755 100644
-> --- a/gdbstub.c
-> +++ b/gdbstub.c
-> @@ -2265,13 +2265,29 @@ static void handle_gen_set(GdbCmdContext *gdb_ctx=
-, void *user_ctx)
->      }
+> diff --git a/target/rx/cpu.c b/target/rx/cpu.c
+> index 3268077d08..41fe1de4bb 100644
+> --- a/target/rx/cpu.c
+> +++ b/target/rx/cpu.c
+> @@ -74,13 +74,14 @@ static void rx_cpu_list_entry(gpointer data, gpointer user_data)
+>      const char *typename = object_class_get_name(OBJECT_CLASS(data));
+>      int len = strlen(typename) - strlen(RX_CPU_TYPE_SUFFIX);
+>  
+> -    qemu_printf("%.*s\n", len, typename);
+> +    qemu_printf("  %.*s\n", len, typename);
 >  }
->
-> +static void handle_target_halt(GdbCmdContext *gdb_ctx, void *user_ctx)
-> +{
-> +    char thread_id[16];
-> +
-> +    gdb_fmt_thread_id(gdb_ctx->s, gdb_ctx->s->c_cpu, thread_id,
-> +                      sizeof(thread_id));
-> +    snprintf(gdb_ctx->str_buf, sizeof(gdb_ctx->str_buf), "T%02xthread:%s=
-;",
-> +             GDB_SIGNAL_TRAP, thread_id);
-> +    put_packet(gdb_ctx->s, gdb_ctx->str_buf);
-> +    /*
-> +     * Remove all the breakpoints when this query is issued,
-> +     * because gdb is doing an initial connect and the state
-> +     * should be cleaned up.
-> +     */
-> +    gdb_breakpoint_remove_all();
-> +}
-> +
->  static int gdb_handle_packet(GDBState *s, const char *line_buf)
+>  
+>  void rx_cpu_list(void)
 >  {
->      const char *p;
->      int ch;
->      uint8_t mem_buf[MAX_PACKET_LENGTH];
->      char buf[sizeof(mem_buf) + 1 /* trailing NUL */];
-> -    char thread_id[16];
->      const GdbCmdParseEntry *cmd_parser =3D NULL;
->
->      trace_gdbstub_io_command(line_buf);
-> @@ -2283,15 +2299,14 @@ static int gdb_handle_packet(GDBState *s, const c=
-har *line_buf)
->          put_packet(s, "OK");
->          break;
->      case '?':
-> -        /* TODO: Make this return the correct value for user-mode.  */
-> -        snprintf(buf, sizeof(buf), "T%02xthread:%s;", GDB_SIGNAL_TRAP,
-> -                 gdb_fmt_thread_id(s, s->c_cpu, thread_id, sizeof(thread=
-_id)));
-> -        put_packet(s, buf);
-> -        /* Remove all the breakpoints when this query is issued,
-> -         * because gdb is doing and initial connect and the state
-> -         * should be cleaned up.
-> -         */
-> -        gdb_breakpoint_remove_all();
-> +        {
-> +            static const GdbCmdParseEntry target_halted_cmd_desc =3D {
-> +                .handler =3D handle_target_halt,
-> +                .cmd =3D "?",
-> +                .cmd_startswith =3D 1
-> +            };
-> +            cmd_parser =3D &target_halted_cmd_desc;
-> +        }
->          break;
->      case 'c':
->          {
+> -    GSList *list;
+> -    list = object_class_get_list_sorted(TYPE_RXCPU, false);
+> +    GSList *list = object_class_get_list_sorted(TYPE_RX_CPU, false);
+> +
+> +    qemu_printf("Available CPUs:\n");
+>      g_slist_foreach(list, rx_cpu_list_entry, NULL);
+>      g_slist_free(list);
+>  }
+> @@ -88,15 +89,17 @@ void rx_cpu_list(void)
+>  static ObjectClass *rx_cpu_class_by_name(const char cpu_model)
+>  {
+>      ObjectClass *oc;
+> -    char *typename = NULL;
+> +    char *typename;
+>  
+> -    typename = g_strdup_printf(RX_CPU_TYPE_NAME(""));
+> +    typename = g_strdup_printf(RX_CPU_TYPE_NAME("%s"), cpu_model);
+>      oc = object_class_by_name(typename);
+
+in case of new cpu, I'd allow only typename as cpu_model
+
+s/typename/cpu_model/
+  
+which is compatible with '-device' naming and QMP/monitor interfaces
+that we support.
+
+and I would not add other naming schemes /like adding suffix to cpu_model or .../
+that  are existing in QEMU for legacy reasons.
 
 
---
-Alex Benn=C3=A9e
+> -    if (oc != NULL && object_class_is_abstract(oc)) {
+> -        oc = NULL;
+> -    }
+> -
+>      g_free(typename);
+> +
+> +    if (oc == NULL ||
+> +        object_class_is_abstract(oc) ||
+> +        !object_class_dynamic_cast(oc, TYPE_RX_CPU)) {
+> +        return NULL;
+> +    }
+>      return oc;
+>  }
+>  
+[...]
+
+
 
