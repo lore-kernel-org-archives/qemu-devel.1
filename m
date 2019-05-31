@@ -2,63 +2,91 @@ Return-Path: <SRS0=hY9S=T7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 06134C04AB6
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 May 2019 08:06:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DE72C04AB6
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 May 2019 08:17:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BEFF92655D
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 May 2019 08:06:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BEFF92655D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id DF56224B9C
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 May 2019 08:17:26 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="d2XDU7mp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DF56224B9C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:38298 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:38408 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hWcYy-0002BF-Ur
-	for qemu-devel@archiver.kernel.org; Fri, 31 May 2019 04:06:56 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:53081)
+	id 1hWcj7-0005GC-UZ
+	for qemu-devel@archiver.kernel.org; Fri, 31 May 2019 04:17:26 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:54784)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1hWcYE-0001rK-Gf
-	for qemu-devel@nongnu.org; Fri, 31 May 2019 04:06:12 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1hWcgr-0003dU-Pe
+	for qemu-devel@nongnu.org; Fri, 31 May 2019 04:15:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1hWcYC-0001fB-Gw
-	for qemu-devel@nongnu.org; Fri, 31 May 2019 04:06:10 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51734)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1hWcYA-0001ZE-KB
-	for qemu-devel@nongnu.org; Fri, 31 May 2019 04:06:07 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 9845D9FFEB;
-	Fri, 31 May 2019 08:06:05 +0000 (UTC)
-Received: from localhost (unknown [10.43.2.182])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 9FE727E5B9;
-	Fri, 31 May 2019 08:06:04 +0000 (UTC)
-Date: Fri, 31 May 2019 10:06:00 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-To: Michael Rolnik <mrolnik@gmail.com>
-Message-ID: <20190531100600.289d1738@redhat.com>
-In-Reply-To: <20190530190738.22713-8-mrolnik@gmail.com>
-References: <20190530190738.22713-1-mrolnik@gmail.com>
-	<20190530190738.22713-8-mrolnik@gmail.com>
+	(envelope-from <alex.bennee@linaro.org>) id 1hWcgq-0006MY-Pf
+	for qemu-devel@nongnu.org; Fri, 31 May 2019 04:15:05 -0400
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:34414)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1hWcgq-0006LJ-HH
+	for qemu-devel@nongnu.org; Fri, 31 May 2019 04:15:04 -0400
+Received: by mail-wm1-x344.google.com with SMTP id e19so7132175wme.1
+	for <qemu-devel@nongnu.org>; Fri, 31 May 2019 01:15:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=references:user-agent:from:to:cc:subject:in-reply-to:date
+	:message-id:mime-version:content-transfer-encoding;
+	bh=yqiRe5OgaB/dmM0M59VMBOOk9ZeiW/PQd52uRaMYFjc=;
+	b=d2XDU7mphXAOY5t/VNoSLNy6MbV6V+A5h4IdOqt43bv1LIGuE/fCdnsdLiu5OwGpsc
+	q1Mr59Hc12u49Umig8REpz+zChzs3lt7/9WASPTnkzmWPVP+MnwK81RonfID5DLLmkta
+	O/1UVOoZBHvb5sa9q63TAuWYIiPwhS7+Mlv4aIzbccyceoyDNlu1hbZzmIIUsWmb0Nrq
+	xWUcKh6cH6joPU2BwrXtwTWe1ARjVDWUdO55qvBWxYyDm0rqIs0Uwa7XlBgTT4sPvL+X
+	bCc9gUWphHfx7SjfTqYebJftD/kchUQC7ApnMayPYKYS2AD+neKBJJ9+N0iJouhkC0YQ
+	9XEQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:references:user-agent:from:to:cc:subject
+	:in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+	bh=yqiRe5OgaB/dmM0M59VMBOOk9ZeiW/PQd52uRaMYFjc=;
+	b=HQEKfpNODOGdUo9kgi4T7ahg4H+LWxX7VhzrcqFWmA1uiKwPOanNJh80EyWX5xSvsO
+	08mOSA/6H2PycHQC9PI7HdNnM5ScGmpJwZ2oQqtSM8WAXvSBZ9dcMxp1oWvvcrHRP1sj
+	IshwjYk+qtyvxuo7rRqzDIogdHhI5BWiYt+iH9MXIWNqoU3trOco7vvAPz/SqqGsnGj7
+	jJggVISKWdMKf4cEMTsu3L9ecM3x+sbjUtUWkXwh/Bz1gQ4eJUxj9bmjSNOp21vzEVkz
+	AosBW8HqfBw+7I1y9kjmorCRLwqHddoofwPOld5hFlghlQ7HM1X2eVdRRhzVy/y4xhd2
+	i6Sw==
+X-Gm-Message-State: APjAAAUxZSAwvSsdg8q6Gw64OZjVzjAtO4NqNP3fazoJbgx+A/dSsoBW
+	qz66aH1WepTG/JVJ3S5LB18COQ==
+X-Google-Smtp-Source: APXvYqywEwzOMpG4Ik/D4OzH+32fh7r3BHFQBxNL62Qx+J7X4FTC5LI+/B5z9HKQSbxmVB9I2pRFqQ==
+X-Received: by 2002:a1c:228b:: with SMTP id i133mr4856652wmi.140.1559290502684;
+	Fri, 31 May 2019 01:15:02 -0700 (PDT)
+Received: from zen.linaroharston ([81.128.185.34])
+	by smtp.gmail.com with ESMTPSA id
+	h12sm4225202wre.14.2019.05.31.01.15.01
+	(version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+	Fri, 31 May 2019 01:15:01 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+	by zen.linaroharston (Postfix) with ESMTP id 3D3271FF87;
+	Fri, 31 May 2019 09:15:01 +0100 (BST)
+References: <20190530101603.22254-1-alex.bennee@linaro.org>
+	<20190530101603.22254-21-alex.bennee@linaro.org>
+	<6c2efee2-31bb-68f2-12d0-684ca5959ad4@redhat.com>
+User-agent: mu4e 1.3.2; emacs 26.1
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+In-reply-to: <6c2efee2-31bb-68f2-12d0-684ca5959ad4@redhat.com>
+Date: Fri, 31 May 2019 09:15:01 +0100
+Message-ID: <87y32n3ure.fsf@zen.linaroharston>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.39]);
-	Fri, 31 May 2019 08:06:05 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH RFC v20 7/8] target/avr: Add example board
- configuration
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2a00:1450:4864:20::344
+Subject: Re: [Qemu-devel] [PATCH v1 20/26] tests/vm: add DEBUG=1 to help text
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -70,245 +98,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Sarah Harris <S.E.Harris@kent.ac.uk>, qemu-devel@nongnu.org,
-	rth@twiddle.net
+Cc: Fam Zheng <fam@euphon.net>, Thomas Huth <thuth@redhat.com>,
+	qemu-devel@nongnu.org, Wainer dos Santos Moschetta <wainersm@redhat.com>,
+	Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 30 May 2019 22:07:37 +0300
-Michael Rolnik <mrolnik@gmail.com> wrote:
 
-> From: Sarah Harris <S.E.Harris@kent.ac.uk>
-> 
-> A simple board setup that configures an AVR CPU to run a given firmware image.
-> This is all that's useful to implement without peripheral emulation as AVR CPUs include a lot of on-board peripherals.
-> 
-> Signed-off-by: Sarah Harris <S.E.Harris@kent.ac.uk>
-> Signed-off-by: Michael Rolnik <mrolnik@gmail.com>
-> ---
->  hw/Kconfig           |   1 +
->  hw/avr/Kconfig       |   4 +
->  hw/avr/Makefile.objs |   1 +
->  hw/avr/sample.c      | 177 +++++++++++++++++++++++++++++++++++++++++++
->  4 files changed, 183 insertions(+)
->  create mode 100644 hw/avr/Kconfig
->  create mode 100644 hw/avr/Makefile.objs
->  create mode 100644 hw/avr/sample.c
-> 
-> diff --git a/hw/Kconfig b/hw/Kconfig
-> index 195f541e50..1f25636855 100644
-> --- a/hw/Kconfig
-> +++ b/hw/Kconfig
-> @@ -42,6 +42,7 @@ source watchdog/Kconfig
->  # arch Kconfig
->  source arm/Kconfig
->  source alpha/Kconfig
-> +source avr/Kconfig
->  source cris/Kconfig
->  source hppa/Kconfig
->  source i386/Kconfig
-> diff --git a/hw/avr/Kconfig b/hw/avr/Kconfig
-> new file mode 100644
-> index 0000000000..c6ca8fe775
-> --- /dev/null
-> +++ b/hw/avr/Kconfig
-> @@ -0,0 +1,4 @@
-> +config AVR_SAMPLE
-> +    bool
-> +    select AVR_TIMER16
-> +    select AVR_USART
-> diff --git a/hw/avr/Makefile.objs b/hw/avr/Makefile.objs
-> new file mode 100644
-> index 0000000000..626b7064b3
-> --- /dev/null
-> +++ b/hw/avr/Makefile.objs
-> @@ -0,0 +1 @@
-> +obj-y += sample.o
-> diff --git a/hw/avr/sample.c b/hw/avr/sample.c
-> new file mode 100644
-> index 0000000000..21b384b3b3
-> --- /dev/null
-> +++ b/hw/avr/sample.c
-> @@ -0,0 +1,177 @@
-> +/*
-> + * QEMU AVR CPU
-> + *
-> + * Copyright (c) 2016 Michael Rolnik
-> + *
-> + * This library is free software; you can redistribute it and/or
-> + * modify it under the terms of the GNU Lesser General Public
-> + * License as published by the Free Software Foundation; either
-> + * version 2.1 of the License, or (at your option) any later version.
-> + *
-> + * This library is distributed in the hope that it will be useful,
-> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-> + * Lesser General Public License for more details.
-> + *
-> + * You should have received a copy of the GNU Lesser General Public
-> + * License along with this library; if not, see
-> + * <http://www.gnu.org/licenses/lgpl-2.1.html>
-> + */
-> +
-> +/*
-> + *  NOTE:
-> + *      This is not a real AVR board, this is an example!
-> + *      The CPU is an approximation of an ATmega2560, but is missing various
-> + *      built-in peripherals.
-> + *
-> + *      This example board loads provided binary file into flash memory and
-> + *      executes it from 0x00000000 address in the code memory space.
-> + *
-> + *      Currently used for AVR CPU validation
-> + *
-> + */
-> +
-> +#include "qemu/osdep.h"
-> +#include "qapi/error.h"
-> +#include "qemu-common.h"
-> +#include "cpu.h"
-> +#include "hw/hw.h"
-> +#include "sysemu/sysemu.h"
-> +#include "sysemu/qtest.h"
-> +#include "ui/console.h"
-> +#include "hw/boards.h"
-> +#include "hw/loader.h"
-> +#include "qemu/error-report.h"
-> +#include "exec/address-spaces.h"
-> +#include "include/hw/sysbus.h"
-> +#include "include/hw/char/avr_usart.h"
-> +#include "include/hw/timer/avr_timer16.h"
-> +#include "elf.h"
-> +
-> +#define SIZE_FLASH 0x00040000
-> +#define SIZE_SRAM 0x00002200
-> +/*
-> + * Size of additional "external" memory, as if the AVR were configured to use
-> + * an external RAM chip.
-> + * Note that the configuration registers that normally enable this feature are
-> + * unimplemented.
-> + */
-> +#define SIZE_EXMEM 0x00000000
-> +
-> +/* Offsets of periphals in emulated memory space (i.e. not host addresses)  */
-> +#define PRR0 0x64
-> +#define PRR1 0x65
-> +#define USART_BASE 0xc0
-> +#define USART_PRR PRR0
-> +#define USART_PRR_MASK 0b00000010
-> +#define TIMER1_BASE 0x80
-> +#define TIMER1_IMSK_BASE 0x6f
-> +#define TIMER1_IFR_BASE 0x36
-> +#define TIMER1_PRR PRR0
-> +#define TIMER1_PRR_MASK 0b01000000
-> +
-> +/* Interrupt numbers used by peripherals */
-> +#define TIMER1_CAPT_IRQ 15
-> +#define TIMER1_COMPA_IRQ 16
-> +#define TIMER1_COMPB_IRQ 17
-> +#define TIMER1_COMPC_IRQ 18
-> +#define TIMER1_OVF_IRQ 19
-> +
-> +static void sample_init(MachineState *machine)
-> +{
-> +    MemoryRegion *address_space_mem;
-> +    MemoryRegion *ram;
-> +    MemoryRegion *flash;
-> +    AVRCPU *cpu_avr;
-> +    const char *firmware = NULL;
-> +    const char *filename;
-> +    int bytes_loaded;
-> +    AVRUsartState *usart0;
-> +    AVRTimer16State *timer1;
-> +    SysBusDevice *busdev;
-> +
-> +    address_space_mem = get_system_memory();
-> +    ram = g_new(MemoryRegion, 1);
-> +    flash = g_new(MemoryRegion, 1);
-> +
-> +    /* ATmega2560. */
-> +    cpu_avr = AVR_CPU(cpu_create("avr6-avr"));
-pls, look at how default_cpu_type and try to use that approach
+Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
 
-> +
-> +    memory_region_allocate_system_memory(
-> +        ram, NULL, "avr.ram", SIZE_SRAM + SIZE_EXMEM);
-> +    memory_region_add_subregion(address_space_mem, OFFSET_DATA, ram);
-> +
-> +    memory_region_init_rom(flash, NULL, "avr.flash", SIZE_FLASH, &error_fatal);
-> +    memory_region_add_subregion(address_space_mem, OFFSET_CODE, flash);
-> +
-> +    /* USART 0 built-in peripheral */
-> +    usart0 = AVR_USART(object_new(TYPE_AVR_USART));
-> +    busdev = SYS_BUS_DEVICE(usart0);
-> +    sysbus_mmio_map(busdev, 0, OFFSET_DATA + USART_BASE);
-> +    /*
-> +     * These IRQ numbers don't match the datasheet because we're counting from
-> +     * zero and not including reset.
-> +     */
-> +    sysbus_connect_irq(busdev, 0, qdev_get_gpio_in(DEVICE(cpu_avr), 24));
-> +    sysbus_connect_irq(busdev, 1, qdev_get_gpio_in(DEVICE(cpu_avr), 25));
-> +    sysbus_connect_irq(busdev, 2, qdev_get_gpio_in(DEVICE(cpu_avr), 26));
-> +    usart0->prr_address = OFFSET_DATA + PRR0;
-> +    usart0->prr_mask = USART_PRR_MASK;
-> +    qdev_prop_set_chr(DEVICE(usart0), "chardev", serial_hd(0));
-> +    object_property_set_bool(OBJECT(usart0), true, "realized", &error_fatal);
-> +
-> +    /* Timer 1 built-in periphal */
-> +    timer1 = AVR_TIMER16(object_new(TYPE_AVR_TIMER16));
-> +    busdev = SYS_BUS_DEVICE(timer1);
-> +    sysbus_mmio_map(busdev, 0, OFFSET_DATA + TIMER1_BASE);
-> +    sysbus_mmio_map(busdev, 1, OFFSET_DATA + TIMER1_IMSK_BASE);
-> +    sysbus_mmio_map(busdev, 2, OFFSET_DATA + TIMER1_IFR_BASE);
-> +    sysbus_connect_irq(busdev, 0, qdev_get_gpio_in(
-> +        DEVICE(cpu_avr), TIMER1_CAPT_IRQ));
-> +    sysbus_connect_irq(busdev, 1, qdev_get_gpio_in(
-> +        DEVICE(cpu_avr), TIMER1_COMPA_IRQ));
-> +    sysbus_connect_irq(busdev, 2, qdev_get_gpio_in(
-> +        DEVICE(cpu_avr), TIMER1_COMPB_IRQ));
-> +    sysbus_connect_irq(busdev, 3, qdev_get_gpio_in(
-> +        DEVICE(cpu_avr), TIMER1_COMPC_IRQ));
-> +    sysbus_connect_irq(busdev, 4, qdev_get_gpio_in(
-> +        DEVICE(cpu_avr), TIMER1_OVF_IRQ));
-> +    timer1->prr_address = OFFSET_DATA + TIMER1_PRR;
-> +    timer1->prr_mask = TIMER1_PRR_MASK;
-> +    object_property_set_bool(OBJECT(timer1), true, "realized", &error_fatal);
-> +
-> +    /* Load firmware (contents of flash) trying to auto-detect format */
-> +    firmware = machine->firmware;
-> +    if (firmware != NULL) {
-> +        filename = qemu_find_file(QEMU_FILE_TYPE_BIOS, firmware);
-> +        if (filename == NULL) {
-> +            error_report("Unable to find %s", firmware);
-> +            exit(1);
-> +        }
-> +
-> +        bytes_loaded = load_elf(
-> +            filename, NULL, NULL, NULL, NULL, NULL, NULL, 0, EM_NONE, 0, 0);
-> +        if (bytes_loaded < 0) {
-> +            error_report(
-> +                "Unable to load %s as ELF, trying again as raw binary",
-> +                firmware);
-> +            bytes_loaded = load_image_targphys(
-> +                filename, OFFSET_CODE, SIZE_FLASH);
-> +        }
-> +        if (bytes_loaded < 0) {
-> +            error_report(
-> +                "Unable to load firmware image %s as ELF or raw binary",
-> +                firmware);
-> +            exit(1);
-> +        }
-> +    }
-> +}
-> +
-> +static void sample_machine_init(MachineClass *mc)
-> +{
-> +    mc->desc = "AVR sample/example board";
-> +    mc->init = sample_init;
-> +    mc->is_default = 1;
-> +}
-> +
-> +DEFINE_MACHINE("sample", sample_machine_init)
+> Hi  Alex,
+>
+> On 5/30/19 12:15 PM, Alex Benn=C3=A9e wrote:
+>> From: Gerd Hoffmann <kraxel@redhat.com>
+>>
+>> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+>> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+>> Tested-by: Thomas Huth <thuth@redhat.com>
+>> Message-Id: <20190520124716.30472-9-kraxel@redhat.com>
+>> [AJB: fix minor conflict]
+>> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+>> ---
+>>  tests/vm/Makefile.include | 2 ++
+>>  1 file changed, 2 insertions(+)
+>>
+>> diff --git a/tests/vm/Makefile.include b/tests/vm/Makefile.include
+>> index e329129bd65..628eecade78 100644
+>> --- a/tests/vm/Makefile.include
+>> +++ b/tests/vm/Makefile.include
+>> @@ -25,6 +25,8 @@ vm-test:
+>>  	@echo "  vm-boot-ssh-<guest>             - Boot guest and login via ss=
+h"
+>>  	@echo
+>>  	@echo "Special variables:"
+>> +	@echo "    DEBUG=3D1                       - be verbose, also start in=
+teractive"
+>> +	@echo "	                                   shell on build failures"
+>
+> Patch 12 of this series (tests/vm: Add missing variables on help)
+> already added this, it now appears 2 times:
+>
+> Special variables:
+>     DEBUG=3D1                       - be verbose, also start interactive
+>                                            shell on build failures
+>     DEBUG=3D1                      - Enable verbose output on host and
+> interactive debugging
+>
+> This one is more precise although...
 
+Oops merge failure - will fix that.
+
+>
+>>  	@echo "    BUILD_TARGET=3Dfoo		 - Override the build target"
+>>  	@echo "    TARGET_LIST=3Da,b,c    	 - Override target list in builds"
+>>  	@echo '    EXTRA_CONFIGURE_OPTS=3D"..."'
+>>
+
+
+--
+Alex Benn=C3=A9e
 
