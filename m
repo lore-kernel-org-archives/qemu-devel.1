@@ -2,106 +2,92 @@ Return-Path: <SRS0=hY9S=T7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 28958C04AB6
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 May 2019 14:47:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C9D7C04AB6
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 May 2019 14:47:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EAE6A26AE3
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 May 2019 14:47:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1360426AE3
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 May 2019 14:47:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=wavesemi.onmicrosoft.com header.i=@wavesemi.onmicrosoft.com header.b="gI5nY+zQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EAE6A26AE3
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=wavecomp.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="skMiZDtV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1360426AE3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:44701 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:44707 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hWio9-0007we-1a
-	for qemu-devel@archiver.kernel.org; Fri, 31 May 2019 10:47:01 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:48657)
+	id 1hWioP-0008DC-BS
+	for qemu-devel@archiver.kernel.org; Fri, 31 May 2019 10:47:17 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:48682)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <arikalo@wavecomp.com>) id 1hWimW-0006xa-0z
-	for qemu-devel@nongnu.org; Fri, 31 May 2019 10:45:21 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hWimi-00079o-EX
+	for qemu-devel@nongnu.org; Fri, 31 May 2019 10:45:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <arikalo@wavecomp.com>) id 1hWimU-0002Ir-VB
-	for qemu-devel@nongnu.org; Fri, 31 May 2019 10:45:19 -0400
-Received: from mail-eopbgr680124.outbound.protection.outlook.com
-	([40.107.68.124]:14976
-	helo=NAM04-BN3-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <arikalo@wavecomp.com>)
-	id 1hWimU-0002IF-QL
-	for qemu-devel@nongnu.org; Fri, 31 May 2019 10:45:18 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=wavesemi.onmicrosoft.com; s=selector1-wavesemi-onmicrosoft-com;
-	h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
-	bh=KwGF/hLc2CAYRwMPrFg2LuKsqo2xYAAxa3Ozu5AdvR4=;
-	b=gI5nY+zQ0saxYpbpYcAJUUaPAfiUmMR3WUFbkZ2JY+ZREXzkbHtz3Cb7egZTTUkSh32RhSv4V/AcsqMmdhz3v8qbtVY1PHuarVqnl9JEvtNwcBnldzWpLgOI2QpXQS4AcGspY/KMKfx78PvcoXOxbEKqnkhCSxiBA64+7gO6SR4=
-Received: from DM5PR22MB1658.namprd22.prod.outlook.com (10.164.152.163) by
-	DM5PR22MB0858.namprd22.prod.outlook.com (10.171.161.10) with Microsoft
-	SMTP
-	Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
-	15.20.1943.18; Fri, 31 May 2019 14:45:15 +0000
-Received: from DM5PR22MB1658.namprd22.prod.outlook.com
-	([fe80::1037:fb85:b06:6dba]) by DM5PR22MB1658.namprd22.prod.outlook.com
-	([fe80::1037:fb85:b06:6dba%7]) with mapi id 15.20.1922.021;
-	Fri, 31 May 2019 14:45:15 +0000
-From: Aleksandar Rikalo <arikalo@wavecomp.com>
-To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>,
-	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Thread-Topic: [PATCH 5/5] tests/tcg: target/mips: Add README for MSA tests
-Thread-Index: AQHU9t8PfxQ8WVsxGUiRbghXzOdj/KaFkQY2
-Date: Fri, 31 May 2019 14:45:15 +0000
-Message-ID: <DM5PR22MB16585CA0B53656270F8E37ADD2190@DM5PR22MB1658.namprd22.prod.outlook.com>
-References: <1555699081-24577-1-git-send-email-aleksandar.markovic@rt-rk.com>,
-	<1555699081-24577-6-git-send-email-aleksandar.markovic@rt-rk.com>
-In-Reply-To: <1555699081-24577-6-git-send-email-aleksandar.markovic@rt-rk.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
-	smtp.mailfrom=arikalo@wavecomp.com; 
-x-originating-ip: [82.117.201.26]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: b9513a2b-208a-4a0a-3241-08d6e5d69820
-x-microsoft-antispam: BCL:0; PCL:0;
-	RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(7168020)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(2017052603328)(7193020);
-	SRVR:DM5PR22MB0858; 
-x-ms-traffictypediagnostic: DM5PR22MB0858:
-x-microsoft-antispam-prvs: <DM5PR22MB08582D111AF5C84CB17D62A6D2190@DM5PR22MB0858.namprd22.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:7691;
-x-forefront-prvs: 00540983E2
-x-forefront-antispam-report: SFV:NSPM;
-	SFS:(10019020)(376002)(346002)(39840400004)(136003)(366004)(396003)(189003)(199004)(8676002)(81166006)(2906002)(81156014)(66066001)(9686003)(99286004)(6506007)(53546011)(7696005)(74316002)(7736002)(55236004)(102836004)(76176011)(71200400001)(5660300002)(229853002)(76116006)(52536014)(86362001)(6436002)(6606003)(55016002)(71190400001)(91956017)(4744005)(54896002)(53936002)(256004)(66446008)(66476007)(66946007)(64756008)(66556008)(73956011)(6246003)(4326008)(107886003)(25786009)(316002)(19627405001)(26005)(68736007)(33656002)(186003)(486006)(2501003)(14454004)(478600001)(110136005)(54906003)(446003)(8936002)(11346002)(3846002)(6116002)(476003);
-	DIR:OUT; SFP:1102; SCL:1; SRVR:DM5PR22MB0858;
-	H:DM5PR22MB1658.namprd22.prod.outlook.com; FPR:; SPF:None;
-	LANG:en; PTR:InfoNoRecords; MX:1; A:1; 
-received-spf: None (protection.outlook.com: wavecomp.com does not designate
-	permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: NG4XadDYnj5aPK1XGRSTLcyYBkBn4EpK0CEY5H8JYHUqJYF1YNPo5l5UW+zsxRa1vpZ//y2CHvK5qszK5Qk2h7EeEZ4HN+EXRtqH8M3pbhCkOGl3Fy6zB5sIe3CVOjCsdL/pbvE1Ib4sSM8x7SRyTCCcDtCQAfoVgO4QNsveIj3yWiXiBfb40KcbvdMxpzbB8ZA7GBBz9EtjZabDBd+JKWDOBmYvij5btftFQbAF+LDgEg6+EMtGFXnkvKAtbF4Bj9P7SehZ/HyoFoIdmSov/o8gpOZWz/nwV0FUFYthvPH7SmFYrn+fbQXLF3IJnNustlUDVtQcZK86DvdD/JReBlJw8iHsKMXoiuJWV9lV4RyixVcbyJRal8BvQkwCCLn2A9vlEx9jmPyPE39SOZgGLKbSuKGlwgAe1NzsF0qXg6I=
+	(envelope-from <richard.henderson@linaro.org>) id 1hWimg-0002Xi-I2
+	for qemu-devel@nongnu.org; Fri, 31 May 2019 10:45:32 -0400
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:34547)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1hWime-0002Pz-LY
+	for qemu-devel@nongnu.org; Fri, 31 May 2019 10:45:29 -0400
+Received: by mail-ot1-x341.google.com with SMTP id l17so9444364otq.1
+	for <qemu-devel@nongnu.org>; Fri, 31 May 2019 07:45:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
+	:mime-version:in-reply-to:content-language:content-transfer-encoding;
+	bh=etBdTWUHv40hMWae9M0RUsJbcAdpS/y4cGWcIuI0osw=;
+	b=skMiZDtVEAISwKRooVlx5y5l2c756MiHzArbwrKObLrwtjWC3E9Tmscq6cE0qQlQIg
+	J1/vtLI6g5MVsZKmsvQ8VsVZO1wYKAlNRp3iYjoYomTcYCEuMDnVdVJr5UhjabUd6NKZ
+	EjugBocdh1TOpOc0ApDFjIIQP1MQ9W4Q28kulW4zX02dKRSX8wdJjeunBVdhlXhc3TIl
+	5g0hjskJf+vgNh68SxQQ45Qtba4J6mdSoBGVumCJ2AI3R3z7t90LJz0st8QxcCvf/g7O
+	/as8jbFvqhxxU3rAL1KoKtJ6EW8/uooIrBPAEO1cfMa85Gqg3oMxSQstrtkEiKj97O+5
+	AkAg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+	:date:user-agent:mime-version:in-reply-to:content-language
+	:content-transfer-encoding;
+	bh=etBdTWUHv40hMWae9M0RUsJbcAdpS/y4cGWcIuI0osw=;
+	b=aW6ks1yy6M7AO5+xkZTpuhiDFx7+sZ5VedeCC4uI/ZZbWOHd4AsQWHd1ZwdAg6jfAX
+	3cdNGUkNp4cDb1a5gL2DgVnp/aipWqDT41DYPsw8k1EwVFVus1kiDUtz5mYKswdoWOTJ
+	ZlH7m8a6P1ZCjpnToKuId8DA/ZMRxas+eaJMt9dO8jACY+zOtsKmOlquASBMzCXI+Ox8
+	FeMHVgVmGWYl5ge1bPWac6iShq+C1KRfJUmMg4QAIINu0o0VdSLCMtAeWvcDlb3X0PoA
+	CRFnkmfCzCi43cAhqCMsR+YyGdGsU1on3rzwDsHzFwj2e5tvVg722E6QVxrk8KsZMpWX
+	Ossw==
+X-Gm-Message-State: APjAAAWeLFFLHPNBr7P4j03Jo3Fkvt5qHbrSPN7RZKhTr6M1abcPzuzd
+	/Q+0ndWGMdibZq7/sLPsBM9x2Q==
+X-Google-Smtp-Source: APXvYqxfseVbR5cxLP8PFuOmcg1HsHPK0Ab7MuytV9XG8K0H/dz8/ccEldsi1gl0BVjQ3LfCN8755Q==
+X-Received: by 2002:a9d:6210:: with SMTP id g16mr2084445otj.225.1559313926171; 
+	Fri, 31 May 2019 07:45:26 -0700 (PDT)
+Received: from [172.24.12.210] (168.189-204-159.bestelclientes.com.mx.
+	[189.204.159.168])
+	by smtp.gmail.com with ESMTPSA id o3sm1948020otl.76.2019.05.31.07.45.23
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Fri, 31 May 2019 07:45:23 -0700 (PDT)
+To: Michael Rolnik <mrolnik@gmail.com>, qemu-devel@nongnu.org
+References: <20190530190738.22713-1-mrolnik@gmail.com>
+	<20190530190738.22713-5-mrolnik@gmail.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Openpgp: preference=signencrypt
+Message-ID: <17b55a6e-af48-861d-6c2c-20bab1e45155@linaro.org>
+Date: Fri, 31 May 2019 09:45:21 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.7.0
 MIME-Version: 1.0
-X-OriginatorOrg: wavecomp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b9513a2b-208a-4a0a-3241-08d6e5d69820
-X-MS-Exchange-CrossTenant-originalarrivaltime: 31 May 2019 14:45:15.5593 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 463607d3-1db3-40a0-8a29-970c56230104
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: arikalo@wavecomp.com
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR22MB0858
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.68.124
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
-X-Content-Filtered-By: Mailman/MimeDel 2.1.21
-Subject: Re: [Qemu-devel] [PATCH 5/5] tests/tcg: target/mips: Add README for
- MSA tests
+In-Reply-To: <20190530190738.22713-5-mrolnik@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::341
+Subject: Re: [Qemu-devel] [PATCH RFC v20 4/8] target-avr: Add instruction
+ decoding
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -113,34 +99,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Aleksandar Markovic <amarkovic@wavecomp.com>,
-	"aurelien@aurel32.net" <aurelien@aurel32.net>
+Cc: rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-> From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-> Sent: Friday, April 19, 2019 8:38 PM
-> To: qemu-devel@nongnu.org
-> Cc: aurelien@aurel32.net; Aleksandar Markovic; Aleksandar Rikalo
-> Subject: [PATCH 5/5] tests/tcg: target/mips: Add README for MSA tests
->
-> From: Aleksandar Markovic <amarkovic@wavecomp.com>
->
-> Add README for MSA tests. This is just to explain how to run tests even
-> without Makefile. Makefile will be provided later on.
->
-> Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+On 5/30/19 2:07 PM, Michael Rolnik wrote:
+> This includes:
+> - encoding of all 16 bit instructions
+> - encoding of all 32 bit instructions
+> 
+> Signed-off-by: Michael Rolnik <mrolnik@gmail.com>
 > ---
+>  target/avr/insn16.decode | 160 +++++++++++++++++++++++++++++++++++++++
+>  target/avr/insn32.decode |  10 +++
+>  2 files changed, 170 insertions(+)
+>  create mode 100644 target/avr/insn16.decode
+>  create mode 100644 target/avr/insn32.decode
 
-Besides README, until MSA TCG tests are integrated via Makefiles,
-we should at least have a shell script that would enable developers
-ro run the tests for the time being. Otherwise,
+Two things:
 
-Reviewed-by: Aleksandar Rikalo <arikalo@wavecomp.com>
+(1) decodetree can handle variable-width ISA now.
 
->  tests/tcg/mips/user/ase/msa/README | 639 +++++++++++++++++++++++++++++++=
-++++++
->  1 file changed, 639 insertions(+)
->  create mode 100644 tests/tcg/mips/user/ase/msa/README
->
+It's slightly ugly in that the %field numbering is little-endian and thus
+varies for each insn size.  But the in-flight patch set for target/rx shows
+that it works.
+
+That said, I don't think you need that because,
+
+(2) The four instructions that are 32-bits do not have
+    any opcode bits in the second 16-bits.
+
+E.g.
+
+# The 22-bit immediate is partially in the opcode word,
+# and partially in the next.  Use append_16 to build the
+# complete 22-bit value.
+%imm_call	4:5 0:1			!function=append_16
+CALL		1001 010. .... 111.	imm=%imm_call
+JMP		1001 010. .... 110.	imm=%imm_call
+
+# The 16-bit immediate is completely in the next word.
+# Fields cannot be defined with no bits, so we cannot play
+# the same trick and append to a zero-bit value.
+# Defer reading the immediate until trans_{LDS,STS}.
+@ldst_s		.... ... rd:5 ....	imm=0
+LDS		1001 000 ..... 0000	@ldst_s
+STS		1001 001 ..... 0000	@ldst_s
+
+
+static uint16_t next_word(DisasContext *ctx)
+{
+    return cpu_lduw_code(ctx->env, ctx->npc++ * 2);
+}
+
+static int append_16(DisasContext *ctx, int x)
+{
+    return x << 16 | next_word(ctx);
+}
+
+static bool trans_LDS(DisasContext *ctx, arg_ldst_s *a)
+{
+    a->imm = next_word(ctx);
+    // other stuff
+}
+
+I realize that next_word as written does not fit in to how you currently
+process instructions in the loop, but I also think that's a mistake.  I'll
+respond to that in its place in the next patch.
+
+That said, next_word *could* be written to use ctx->inst[0].opcode.
+
+
+r~
+
