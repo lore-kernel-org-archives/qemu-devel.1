@@ -2,70 +2,95 @@ Return-Path: <SRS0=hY9S=T7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_MUTT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CF055C04AB6
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 May 2019 17:03:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AC1CAC28CC3
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 May 2019 17:05:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9C52126CC0
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 May 2019 17:03:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9C52126CC0
+	by mail.kernel.org (Postfix) with ESMTPS id 79A5D26CC6
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 May 2019 17:05:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 79A5D26CC6
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:46603 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:46613 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hWkwY-0008KJ-UL
-	for qemu-devel@archiver.kernel.org; Fri, 31 May 2019 13:03:50 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:46708)
+	id 1hWkxs-0000XZ-Pj
+	for qemu-devel@archiver.kernel.org; Fri, 31 May 2019 13:05:12 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:46921)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1hWkut-0007OO-NI
-	for qemu-devel@nongnu.org; Fri, 31 May 2019 13:02:09 -0400
+	(envelope-from <mreitz@redhat.com>) id 1hWkvp-0007zv-6C
+	for qemu-devel@nongnu.org; Fri, 31 May 2019 13:03:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1hWkus-00025I-69
-	for qemu-devel@nongnu.org; Fri, 31 May 2019 13:02:07 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:5917)
+	(envelope-from <mreitz@redhat.com>) id 1hWkvn-0003Un-OP
+	for qemu-devel@nongnu.org; Fri, 31 May 2019 13:03:05 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40476)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hWkur-00024T-U5
-	for qemu-devel@nongnu.org; Fri, 31 May 2019 13:02:06 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
+	(Exim 4.71) (envelope-from <mreitz@redhat.com>)
+	id 1hWkvk-0003KD-Ds; Fri, 31 May 2019 13:03:00 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+	[10.5.11.23])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 0489930C62BB
-	for <qemu-devel@nongnu.org>; Fri, 31 May 2019 17:02:05 +0000 (UTC)
-Received: from localhost (ovpn-116-11.gru2.redhat.com [10.97.116.11])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id E8A4B601A0;
-	Fri, 31 May 2019 17:01:57 +0000 (UTC)
-Date: Fri, 31 May 2019 14:01:54 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20190531170154.GB22103@habkost.net>
-References: <20190517125820.2885-1-jfreimann@redhat.com>
-	<20190517125820.2885-4-jfreimann@redhat.com>
-	<20190521094504.GB2915@work-vm>
-	<20190530145645.tjwkgi4hae5yblsi@jenstp.localdomain>
-	<20190530134631-mutt-send-email-mst@kernel.org>
-	<20190530180022.GB2864@work-vm>
-	<20190530140419-mutt-send-email-mst@kernel.org>
-	<20190530182210.GA22103@habkost.net>
-	<20190530190322-mutt-send-email-mst@kernel.org>
+	by mx1.redhat.com (Postfix) with ESMTPS id 886EFC05001F;
+	Fri, 31 May 2019 17:02:54 +0000 (UTC)
+Received: from dresden.str.redhat.com (unknown [10.40.205.32])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 5BECA19C69;
+	Fri, 31 May 2019 17:02:53 +0000 (UTC)
+From: Max Reitz <mreitz@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+	"qemu-block@nongnu.org" <qemu-block@nongnu.org>
+References: <20190410202033.28617-1-mreitz@redhat.com>
+	<20190410202033.28617-3-mreitz@redhat.com>
+	<5a335159-8a98-5c60-657d-920e1eb81065@virtuozzo.com>
+	<47fb9429-eb34-ab15-e370-0a38070303be@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+	mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+	/PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+	U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+	mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+	awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+	AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+	CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+	B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+	2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+	AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+	8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+	4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+	BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+	xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+	W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+	DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+	64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+	ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+	sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+	alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+	/ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+	bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+	R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <80e51147-2575-5fd5-2b82-46f7ce7ddcce@redhat.com>
+Date: Fri, 31 May 2019 19:02:51 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190530190322-mutt-send-email-mst@kernel.org>
-User-Agent: Mutt/1.11.3 (2019-02-01)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+In-Reply-To: <47fb9429-eb34-ab15-e370-0a38070303be@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="yUjkVT49kWvPRzJjTKHFo0WO3oipwsrv9"
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.43]);
-	Fri, 31 May 2019 17:02:05 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.31]);
+	Fri, 31 May 2019 17:02:54 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 3/4] net/virtio: add failover support
+X-Content-Filtered-By: Mailman/MimeDel 2.1.21
+Subject: Re: [Qemu-devel] [PATCH v4 02/11] block: Filtered children access
+ functions
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -77,178 +102,217 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pkrempa@redhat.com, berrange@redhat.com, aadam@redhat.com,
-	"Dr. David Alan Gilbert" <dgilbert@redhat.com>,
-	qemu-devel@nongnu.org, laine@redhat.com,
-	Jens Freimann <jfreimann@redhat.com>, ailan@redhat.com
+Cc: Kevin Wolf <kwolf@redhat.com>,
+	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, May 30, 2019 at 07:06:29PM -0400, Michael S. Tsirkin wrote:
-> On Thu, May 30, 2019 at 03:22:10PM -0300, Eduardo Habkost wrote:
-> > On Thu, May 30, 2019 at 02:09:42PM -0400, Michael S. Tsirkin wrote:
-> > > On Thu, May 30, 2019 at 07:00:23PM +0100, Dr. David Alan Gilbert wrote:
-> > > > * Michael S. Tsirkin (mst@redhat.com) wrote:
-> > > > > On Thu, May 30, 2019 at 04:56:45PM +0200, Jens Freimann wrote:
-> > > > > > Hi David,
-> > > > > > 
-> > > > > > sorry for the  delayed reply.
-> > > > > > 
-> > > > > > On Tue, May 28, 2019 at 11:04:15AM -0400, Michael S. Tsirkin wrote:
-> > > > > > > On Tue, May 21, 2019 at 10:45:05AM +0100, Dr. David Alan Gilbert wrote:
-> > > > > > > > * Jens Freimann (jfreimann@redhat.com) wrote:
-> > > > > > > > > +static void virtio_net_primary_plug_timer(void *opaque);
-> > > > > > > > > +
-> > > > > > > > >  static void virtio_net_set_link_status(NetClientState *nc)
-> > > > > > > > >  {
-> > > > > > > > >      VirtIONet *n = qemu_get_nic_opaque(nc);
-> > > > > > > > > @@ -786,6 +796,14 @@ static void virtio_net_set_features(VirtIODevice *vdev, uint64_t features)
-> > > > > > > > >      } else {
-> > > > > > > > >          memset(n->vlans, 0xff, MAX_VLAN >> 3);
-> > > > > > > > >      }
-> > > > > > > > > +
-> > > > > > > > > +    if (virtio_has_feature(features, VIRTIO_NET_F_STANDBY)) {
-> > > > > > > > > +        atomic_set(&n->primary_should_be_hidden, false);
-> > > > > > > > > +        if (n->primary_device_timer)
-> > > > > > > > > +            timer_mod(n->primary_device_timer,
-> > > > > > > > > +                qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL) +
-> > > > > > > > > +                4000);
-> > > > > > > > > +    }
-> > > > > > > > 
-> > > > > > > > What's this magic timer constant and why?
-> > > > > > 
-> > > > > > To be honest it's a leftover from previous versions (before I took
-> > > > > > over) of the patches and I'm not sure why the timer is there.
-> > > > > > I removed it and so far see no reason to keep it.
-> > > > > > 
-> > > > > > > > 
-> > > > > > > > >  }
-> > > > > > > > >
-> > > > > > > > >  static int virtio_net_handle_rx_mode(VirtIONet *n, uint8_t cmd,
-> > > > > > > > > @@ -2626,6 +2644,87 @@ void virtio_net_set_netclient_name(VirtIONet *n, const char *name,
-> > > > > > > > >      n->netclient_type = g_strdup(type);
-> > > > > > > > >  }
-> > > > > > > > >
-> > > > > > > > > +static void virtio_net_primary_plug_timer(void *opaque)
-> > > > > > > > > +{
-> > > > > > > > > +    VirtIONet *n = opaque;
-> > > > > > > > > +    Error *err = NULL;
-> > > > > > > > > +
-> > > > > > > > > +    if (n->primary_device_dict)
-> > > > > > > > > +        n->primary_device_opts = qemu_opts_from_qdict(qemu_find_opts("device"),
-> > > > > > > > > +            n->primary_device_dict, &err);
-> > > > > > > > > +    if (n->primary_device_opts) {
-> > > > > > > > > +        n->primary_dev = qdev_device_add(n->primary_device_opts, &err);
-> > > > > > > > > +        error_setg(&err, "virtio_net: couldn't plug in primary device");
-> > > > > > > > > +        return;
-> > > > > > > > > +    }
-> > > > > > > > > +    if (!n->primary_device_dict && err) {
-> > > > > > > > > +        if (n->primary_device_timer) {
-> > > > > > > > > +            timer_mod(n->primary_device_timer,
-> > > > > > > > > +                qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL) +
-> > > > > > > > > +                100);
-> > > > > > > > 
-> > > > > > > > same here.
-> > > > > > 
-> > > > > > see above
-> > > > > > 
-> > > > > > > > 
-> > > > > > > > 
-> > > > > > > > > +        }
-> > > > > > > > > +    }
-> > > > > > > > > +}
-> > > > > > > > > +
-> > > > > > > > > +static void virtio_net_handle_migration_primary(VirtIONet *n,
-> > > > > > > > > +                                                MigrationState *s)
-> > > > > > > > > +{
-> > > > > > > > > +    Error *err = NULL;
-> > > > > > > > > +    bool should_be_hidden = atomic_read(&n->primary_should_be_hidden);
-> > > > > > > > > +
-> > > > > > > > > +    n->primary_dev = qdev_find_recursive(sysbus_get_default(),
-> > > > > > > > > +            n->primary_device_id);
-> > > > > > > > > +    if (!n->primary_dev) {
-> > > > > > > > > +        error_setg(&err, "virtio_net: couldn't find primary device");
-> > > > > > > > 
-> > > > > > > > There's something broken with the error handling in this function - the
-> > > > > > > > 'err' never goes anywhere - I don't think it ever gets printed or
-> > > > > > > > reported or stops the migration.
-> > > > > > 
-> > > > > > yes, I'll fix it.
-> > > > > > 
-> > > > > > > > > +    }
-> > > > > > > > > +    if (migration_in_setup(s) && !should_be_hidden && n->primary_dev) {
-> > > > > > > > > +        qdev_unplug(n->primary_dev, &err);
-> > > > > > > > 
-> > > > > > > > Not knowing unplug well; can you just explain - is that device hard
-> > > > > > > > unplugged and it's gone by the time this function returns or is it still
-> > > > > > > > hanging around for some indeterminate time?
-> > > > > > 
-> > > > > > Qemu will trigger an unplug request via pcie attention button in which case
-> > > > > > there could be a delay by the guest operating system. We could give it some
-> > > > > > amount of time and if nothing happens try surpise removal or handle the
-> > > > > > error otherwise.
-> > > > > > 
-> > > > > > 
-> > > > > > regards,
-> > > > > > Jens
-> > > > > 
-> > > > > That's a subject for another day. Let's get the basic thing
-> > > > > working.
-> > > > 
-> > > > Well no, we need to know this thing isn't going to hang in the migration
-> > > > setup phase, or if it does how we recover.
-> > > 
-> > > 
-> > > This thing is *supposed* to be stuck in migration startup phase
-> > > if guest is malicious.
-> > > 
-> > > If migration does not progress management needs
-> > > a way to detect this and cancel.
-> > > 
-> > > Some more documentation about how this is supposed to happen
-> > > would be helpful.
-> > 
-> > Do we have confirmation from libvirt developers that this would
-> > be a reasonable API for them?
-> > 
-> > 
-> > > >  This patch series is very
-> > > > odd precisely because it's trying to do the unplug itself in the
-> > > > migration phase rather than let the management layer do it - so unless
-> > > > it's nailed down how to make sure that's really really bullet proof
-> > > > then we've got to go back and ask the question about whether we should
-> > > > really fix it so it can be done by the management layer.
-> > > > 
-> > > > Dave
-> > > 
-> > > management already said they can't because files get closed and
-> > > resources freed on unplug and so they might not be able to re-add device
-> > > on migration failure. We do it in migration because that is
-> > > where failures can happen and we can recover.
-> > 
-> > We are capable of providing an API to libvirt where files won't
-> > get closed when a device is unplugged, if necessary.
-> > 
-> > This might become necessary if libvirt or management software
-> > developers tell us the interface we are providing is not going to
-> > work for them.
-> > 
-> > -- 
-> > Eduardo
-> 
-> Yes. It's just lots of extremely low level interfaces
-> and all rather pointless.
-> 
-> And down the road extensions like surprise removal support will make it
-> all cleaner and more transparent. Floating things up to libvirt means
-> all these low level details will require more and more hacks.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--yUjkVT49kWvPRzJjTKHFo0WO3oipwsrv9
+From: Max Reitz <mreitz@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Message-ID: <80e51147-2575-5fd5-2b82-46f7ce7ddcce@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v4 02/11] block: Filtered children access
+ functions
+References: <20190410202033.28617-1-mreitz@redhat.com>
+ <20190410202033.28617-3-mreitz@redhat.com>
+ <5a335159-8a98-5c60-657d-920e1eb81065@virtuozzo.com>
+ <47fb9429-eb34-ab15-e370-0a38070303be@redhat.com>
+In-Reply-To: <47fb9429-eb34-ab15-e370-0a38070303be@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Why do you call it pointless?  If we want this to work before
-surprise removal is implemented, we need to provide an API that
-works for management software.  Don't we want to make this work
-without surprise removal too?
+On 31.05.19 18:26, Max Reitz wrote:
+> On 16.04.19 12:02, Vladimir Sementsov-Ogievskiy wrote:
+>> 10.04.2019 23:20, Max Reitz wrote:
+>>> What bs->file and bs->backing mean depends on the node.  For filter
+>>> nodes, both signify a node that will eventually receive all R/W
+>>> accesses.  For format nodes, bs->file contains metadata and data, and=
 
--- 
-Eduardo
+>>> bs->backing will not receive writes -- instead, writes are COWed to
+>>> bs->file.  Usually.
+>>>
+>>> In any case, it is not trivial to guess what a child means exactly wi=
+th
+>>> our currently limited form of expression.  It is better to introduce
+>>> some functions that actually guarantee a meaning:
+>>>
+>>> - bdrv_filtered_cow_child() will return the child that receives reque=
+sts
+>>>    filtered through COW.  That is, reads may or may not be forwarded
+>>>    (depending on the overlay's allocation status), but writes never g=
+o to
+>>>    this child.
+>>>
+>>> - bdrv_filtered_rw_child() will return the child that receives reques=
+ts
+>>>    filtered through some very plain process.  Reads and writes issued=
+ to
+>>>    the parent will go to the child as well (although timing, etc. may=
+ be
+>>>    modified).
+>>>
+>>> - All drivers but quorum (but quorum is pretty opaque to the general
+>>>    block layer anyway) always only have one of these children: All re=
+ad
+>>>    requests must be served from the filtered_rw_child (if it exists),=
+ so
+>>>    if there was a filtered_cow_child in addition, it would not receiv=
+e
+>>>    any requests at all.
+>>>    (The closest here is mirror, where all requests are passed on to t=
+he
+>>>    source, but with write-blocking, write requests are "COWed" to the=
+
+>>>    target.  But that just means that the target is a special child th=
+at
+>>>    cannot be introspected by the generic block layer functions, and t=
+hat
+>>>    source is a filtered_rw_child.)
+>>>    Therefore, we can also add bdrv_filtered_child() which returns tha=
+t
+>>>    one child (or NULL, if there is no filtered child).
+>>>
+>>> Also, many places in the current block layer should be skipping filte=
+rs
+>>> (all filters or just the ones added implicitly, it depends) when goin=
+g
+>>> through a block node chain.  They do not do that currently, but this
+>>> patch makes them.
+>>>
+>>> One example for this is qemu-img map, which should skip filters and o=
+nly
+>>> look at the COW elements in the graph.  The change to iotest 204's
+>>> reference output shows how using blkdebug on top of a COW node used t=
+o
+>>> make qemu-img map disregard the rest of the backing chain, but with t=
+his
+>>> patch, the allocation in the base image is reported correctly.
+>>>
+>>> Furthermore, a note should be made that sometimes we do want to acces=
+s
+>>> bs->backing directly.  This is whenever the operation in question is =
+not
+>>> about accessing the COW child, but the "backing" child, be it COW or
+>>> not.  This is the case in functions such as bdrv_open_backing_file() =
+or
+>>> whenever we have to deal with the special behavior of @backing as a
+>>> blockdev option, which is that it does not default to null like all
+>>> other child references do.
+>>>
+>>> Finally, the query functions (query-block and query-named-block-nodes=
+)
+>>> are modified to return any filtered child under "backing", not just
+>>> bs->backing or COW children.  This is so that filters do not interrup=
+t
+>>> the reported backing chain.  This changes the output of iotest 184, a=
+s
+>>> the throttled node now appears as a backing child.
+>>>
+>>> Signed-off-by: Max Reitz <mreitz@redhat.com>
+>>> ---
+>>>   qapi/block-core.json           |   4 +
+>>>   include/block/block.h          |   1 +
+>>>   include/block/block_int.h      |  40 +++++--
+>>>   block.c                        | 210 +++++++++++++++++++++++++++---=
+---
+>>>   block/backup.c                 |   8 +-
+>>>   block/block-backend.c          |  16 ++-
+>>>   block/commit.c                 |  33 +++---
+>>>   block/io.c                     |  45 ++++---
+>>>   block/mirror.c                 |  21 ++--
+>>>   block/qapi.c                   |  30 +++--
+>>>   block/stream.c                 |  13 +-
+>>>   blockdev.c                     |  88 +++++++++++---
+>>>   migration/block-dirty-bitmap.c |   4 +-
+>>>   nbd/server.c                   |   6 +-
+>>>   qemu-img.c                     |  29 ++---
+>>>   tests/qemu-iotests/184.out     |   7 +-
+>>>   tests/qemu-iotests/204.out     |   1 +
+>>>   17 files changed, 411 insertions(+), 145 deletions(-)
+>>
+>> really huge... didn't you consider conversion file-by-file?
+>>
+>> [..]
+>>
+>>> diff --git a/block.c b/block.c
+>>> index 16615bc876..e8f6febda0 100644
+>>> --- a/block.c
+>>> +++ b/block.c
+>>
+>> [..]
+>>
+>>>  =20
+>>> @@ -3467,14 +3469,17 @@ static int bdrv_reopen_parse_backing(BDRVReop=
+enState *reopen_state,
+>>>       /*
+>>>        * Find the "actual" backing file by skipping all links that po=
+int
+>>>        * to an implicit node, if any (e.g. a commit filter node).
+>>> +     * We cannot use any of the bdrv_skip_*() functions here because=
+
+>>> +     * those return the first explicit node, while we are looking fo=
+r
+>>> +     * its overlay here.
+>>>        */
+>>>       overlay_bs =3D bs;
+>>> -    while (backing_bs(overlay_bs) && backing_bs(overlay_bs)->implici=
+t) {
+>>> -        overlay_bs =3D backing_bs(overlay_bs);
+>>> +    while (overlay_bs->backing && bdrv_filtered_bs(overlay_bs)->impl=
+icit) {
+>>
+>> So, you don't want to skip implicit filters with 'file' child? Then, w=
+hy not to use
+>> child_bs(overlay_bs->backing), like in following if condition?
+>=20
+> On second thought, I actually think this version is wrong in the other =
+way.
+>=20
+> There needs to be a bs with bs->backing !=3D NULL and !bs->implicit
+> somewhere in the chain.
+
+(Actually, no, the bs->backing node is @bs)
+
+> We try to find that node.  It doesn=E2=80=99t matter
+> what=E2=80=99s on top of it, though,  If there are implicit node (which=
+ we try
+> to skip here), the user isn=E2=80=99t aware of them.  Consequentially, =
+it
+> doesn=E2=80=99t matter whether these implicit nodes use bs->backing or =
+bs->file,
+> we just need to skip them.
+>=20
+> What is wrong is the =E2=80=9Cwhile (overlay_bs->backing ...)=E2=80=9D.=
+  That needs to
+> be =E2=80=9Cwhile (bdrv_filtered_bs(overlay_bs) ...)=E2=80=9D.
+
+I just saw my reply where I noticed this before...  So nothing too new th=
+en.
+
+Max
+
+
+--yUjkVT49kWvPRzJjTKHFo0WO3oipwsrv9
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlzxXjsACgkQ9AfbAGHV
+z0BwZQgAw9sg78aph7oKAr+0EVbfrBZlYuErRoeABLxS0OFyqVzefcsFZlK6e2KH
+F2HlW5eplDsBqcMlzoP+9PYwVRodPOMX691FBt8x3Js5Y4Kj9goqwRKAN+lLlMJn
+YcusivcEPx0HrBo4Xc4mwIyjJIbo8S40JfyVrRYrLpX+dNwcsn1eupNJbMohNUsc
+YRF4vxzxWWQJhoj9MxZOCFnCqD25naWFWxXCxKTLTNsREb9D6084v2k+zhSImYew
+cCCRlq7beGgzGpezsINdfz2Y8i69pMre0e6bJFhzpiREU0x7tYrIWyCfSWGsKXly
+EnoemhHG5Kx1NiLrJ2celCAweHgLyQ==
+=5q5r
+-----END PGP SIGNATURE-----
+
+--yUjkVT49kWvPRzJjTKHFo0WO3oipwsrv9--
 
