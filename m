@@ -6,57 +6,57 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B21CC04AB6
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 May 2019 11:00:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4AFA7C04AB6
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 May 2019 11:02:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 21699267EA
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 May 2019 11:00:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 21699267EA
+	by mail.kernel.org (Postfix) with ESMTPS id 2000C24378
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 May 2019 11:02:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2000C24378
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:41022 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:41055 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hWfH5-0002sy-4n
-	for qemu-devel@archiver.kernel.org; Fri, 31 May 2019 07:00:39 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:56254)
+	id 1hWfJE-0004rF-8V
+	for qemu-devel@archiver.kernel.org; Fri, 31 May 2019 07:02:52 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:56352)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hWf27-0007ET-CU
-	for qemu-devel@nongnu.org; Fri, 31 May 2019 06:45:12 -0400
+	(envelope-from <david@redhat.com>) id 1hWf2a-0007k9-1n
+	for qemu-devel@nongnu.org; Fri, 31 May 2019 06:45:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hWf26-0001oB-2i
-	for qemu-devel@nongnu.org; Fri, 31 May 2019 06:45:11 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42800)
+	(envelope-from <david@redhat.com>) id 1hWf2Y-0002UP-5G
+	for qemu-devel@nongnu.org; Fri, 31 May 2019 06:45:39 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42856)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1hWf25-0001nO-Rj
-	for qemu-devel@nongnu.org; Fri, 31 May 2019 06:45:10 -0400
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1hWf2X-000236-WA
+	for qemu-devel@nongnu.org; Fri, 31 May 2019 06:45:38 -0400
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
 	[10.5.11.23])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 344E830821C0;
-	Fri, 31 May 2019 10:45:09 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 383DD30821C0;
+	Fri, 31 May 2019 10:45:21 +0000 (UTC)
 Received: from t460s.redhat.com (ovpn-116-233.ams2.redhat.com [10.36.116.233])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id E7870271AE;
-	Fri, 31 May 2019 10:45:05 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 27403473BC;
+	Fri, 31 May 2019 10:45:19 +0000 (UTC)
 From: David Hildenbrand <david@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Fri, 31 May 2019 12:44:25 +0200
-Message-Id: <20190531104432.29379-17-david@redhat.com>
+Date: Fri, 31 May 2019 12:44:32 +0200
+Message-Id: <20190531104432.29379-24-david@redhat.com>
 In-Reply-To: <20190531104432.29379-1-david@redhat.com>
 References: <20190531104432.29379-1-david@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
 	(mx1.redhat.com [10.5.110.47]);
-	Fri, 31 May 2019 10:45:09 +0000 (UTC)
+	Fri, 31 May 2019 10:45:21 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v1 16/23] s390x/tcg: Implement VECTOR FP
- MULTIPLY AND (ADD|SUBTRACT)
+Subject: [Qemu-devel] [PATCH v1 23/23] s390x: Bump the "qemu" CPU model up
+ to a stripped-down z13
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -74,174 +74,88 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+We don't care about the other two missing base features:
+- S390_FEAT_DFP_PACKED_CONVERSION
+- S390_FEAT_GROUP_GEN13_PTFF
+
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- target/s390x/helper.h           |  4 +++
- target/s390x/insn-data.def      |  4 +++
- target/s390x/translate_vx.inc.c | 23 +++++++++++++
- target/s390x/vec_fpu_helper.c   | 61 +++++++++++++++++++++++++++++++++
- 4 files changed, 92 insertions(+)
+ hw/s390x/s390-virtio-ccw.c  |  2 ++
+ target/s390x/cpu_models.c   |  4 ++--
+ target/s390x/gen-features.c | 11 +++++++----
+ 3 files changed, 11 insertions(+), 6 deletions(-)
 
-diff --git a/target/s390x/helper.h b/target/s390x/helper.h
-index 22e02a0178..bcaabb91a5 100644
---- a/target/s390x/helper.h
-+++ b/target/s390x/helper.h
-@@ -284,6 +284,10 @@ DEF_HELPER_FLAGS_4(gvec_vflr64, TCG_CALL_NO_WG, void=
-, ptr, cptr, env, i32)
- DEF_HELPER_FLAGS_4(gvec_vflr64s, TCG_CALL_NO_WG, void, ptr, cptr, env, i=
-32)
- DEF_HELPER_FLAGS_5(gvec_vfm64, TCG_CALL_NO_WG, void, ptr, cptr, cptr, en=
-v, i32)
- DEF_HELPER_FLAGS_5(gvec_vfm64s, TCG_CALL_NO_WG, void, ptr, cptr, cptr, e=
-nv, i32)
-+DEF_HELPER_FLAGS_6(gvec_vfma64, TCG_CALL_NO_WG, void, ptr, cptr, cptr, c=
-ptr, env, i32)
-+DEF_HELPER_FLAGS_6(gvec_vfma64s, TCG_CALL_NO_WG, void, ptr, cptr, cptr, =
-cptr, env, i32)
-+DEF_HELPER_FLAGS_6(gvec_vfms64, TCG_CALL_NO_WG, void, ptr, cptr, cptr, c=
-ptr, env, i32)
-+DEF_HELPER_FLAGS_6(gvec_vfms64s, TCG_CALL_NO_WG, void, ptr, cptr, cptr, =
-cptr, env, i32)
+diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+index bbc6e8fa0b..4d643686cb 100644
+--- a/hw/s390x/s390-virtio-ccw.c
++++ b/hw/s390x/s390-virtio-ccw.c
+@@ -669,7 +669,9 @@ DEFINE_CCW_MACHINE(4_1, "4.1", true);
 =20
- #ifndef CONFIG_USER_ONLY
- DEF_HELPER_3(servc, i32, env, i64, i64)
-diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
-index e56059ac34..e86ade9e44 100644
---- a/target/s390x/insn-data.def
-+++ b/target/s390x/insn-data.def
-@@ -1236,6 +1236,10 @@
-     F(0xe7c5, VFLR,    VRR_a, V,   0, 0, 0, 0, vcdg, 0, IF_VEC)
- /* VECTOR FP MULTIPLY */
-     F(0xe7e7, VFM,     VRR_c, V,   0, 0, 0, 0, vfa, 0, IF_VEC)
-+/* VECTOR FP MULTIPLY AND ADD */
-+    F(0xe78f, VFMA,    VRR_e, V,   0, 0, 0, 0, vfma, 0, IF_VEC)
-+/* VECTOR FP MULTIPLY AND SUBTRACT */
-+    F(0xe78e, VFMS,    VRR_e, V,   0, 0, 0, 0, vfma, 0, IF_VEC)
-=20
- #ifndef CONFIG_USER_ONLY
- /* COMPARE AND SWAP AND PURGE */
-diff --git a/target/s390x/translate_vx.inc.c b/target/s390x/translate_vx.=
-inc.c
-index ae31a327cf..b624c7a8aa 100644
---- a/target/s390x/translate_vx.inc.c
-+++ b/target/s390x/translate_vx.inc.c
-@@ -2704,3 +2704,26 @@ static DisasJumpType op_vfll(DisasContext *s, Disa=
-sOps *o)
-                    0, fn);
-     return DISAS_NEXT;
- }
-+
-+static DisasJumpType op_vfma(DisasContext *s, DisasOps *o)
-+{
-+    const uint8_t m5 =3D get_field(s->fields, m5);
-+    const uint8_t fpf =3D get_field(s->fields, m6);
-+    const bool se =3D extract32(m5, 3, 1);
-+    gen_helper_gvec_4_ptr *fn;
-+
-+    if (fpf !=3D FPF_LONG || extract32(m5, 0, 3)) {
-+        gen_program_exception(s, PGM_SPECIFICATION);
-+        return DISAS_NORETURN;
-+    }
-+
-+    if (s->fields->op2 =3D=3D 0x8f) {
-+        fn =3D se ? gen_helper_gvec_vfma64s : gen_helper_gvec_vfma64;
-+    } else {
-+        fn =3D se ? gen_helper_gvec_vfms64s : gen_helper_gvec_vfms64;
-+    }
-+    gen_gvec_4_ptr(get_field(s->fields, v1), get_field(s->fields, v2),
-+                   get_field(s->fields, v3), get_field(s->fields, v4), c=
-pu_env,
-+                   0, fn);
-+    return DISAS_NEXT;
-+}
-diff --git a/target/s390x/vec_fpu_helper.c b/target/s390x/vec_fpu_helper.=
-c
-index fd147cc055..a27b354214 100644
---- a/target/s390x/vec_fpu_helper.c
-+++ b/target/s390x/vec_fpu_helper.c
-@@ -125,6 +125,31 @@ static void vop64_3(S390Vector *v1, const S390Vector=
- *v2, const S390Vector *v3,
-     *v1 =3D tmp;
- }
-=20
-+typedef uint64_t (*vop64_4_fn)(uint64_t a, uint64_t b, uint64_t c,
-+                               float_status *s);
-+static void vop64_4(S390Vector *v1, const S390Vector *v2, const S390Vect=
-or *v3,
-+                    const S390Vector *v4, CPUS390XState *env, bool s,
-+                    vop64_4_fn fn, uintptr_t retaddr)
-+{
-+    uint8_t vxc, vec_exc =3D 0;
-+    S390Vector tmp =3D {};
-+    int i;
-+
-+    for (i =3D 0; i < 2; i++) {
-+        const uint64_t a =3D s390_vec_read_element64(v2, i);
-+        const uint64_t b =3D s390_vec_read_element64(v3, i);
-+        const uint64_t c =3D s390_vec_read_element64(v4, i);
-+
-+        s390_vec_write_element64(&tmp, i, fn(a, b, c, &env->fpu_status))=
-;
-+        vxc =3D check_ieee_exc(env, i, false, &vec_exc);
-+        if (s || vxc) {
-+            break;
-+        }
-+    }
-+    handle_ieee_exc(env, vxc, vec_exc, retaddr);
-+    *v1 =3D tmp;
-+}
-+
- static uint64_t vfa64(uint64_t a, uint64_t b, float_status *s)
+ static void ccw_machine_4_0_instance_options(MachineState *machine)
  {
-     return float64_val(float64_add(make_float64(a), make_float64(b), s))=
-;
-@@ -508,3 +533,39 @@ void HELPER(gvec_vfm64s)(void *v1, const void *v2, c=
-onst void *v3,
- {
-     vop64_3(v1, v2, v3, env, true, vfm64, GETPC());
++    static const S390FeatInit qemu_cpu_feat =3D { S390_FEAT_LIST_QEMU_V4=
+_0 };
+     ccw_machine_4_1_instance_options(machine);
++    s390_set_qemu_cpu_model(0x2827, 12, 2, qemu_cpu_feat);
  }
+=20
+ static void ccw_machine_4_0_class_options(MachineClass *mc)
+diff --git a/target/s390x/cpu_models.c b/target/s390x/cpu_models.c
+index 21ea819483..b5d16e4c89 100644
+--- a/target/s390x/cpu_models.c
++++ b/target/s390x/cpu_models.c
+@@ -86,8 +86,8 @@ static S390CPUDef s390_cpu_defs[] =3D {
+     CPUDEF_INIT(0x8562, 15, 1, 47, 0x08000000U, "gen15b", "IBM 8562 GA1"=
+),
+ };
+=20
+-#define QEMU_MAX_CPU_TYPE 0x2827
+-#define QEMU_MAX_CPU_GEN 12
++#define QEMU_MAX_CPU_TYPE 0x2964
++#define QEMU_MAX_CPU_GEN 13
+ #define QEMU_MAX_CPU_EC_GA 2
+ static const S390FeatInit qemu_max_cpu_feat_init =3D { S390_FEAT_LIST_QE=
+MU_MAX };
+ static S390FeatBitmap qemu_max_cpu_feat;
+diff --git a/target/s390x/gen-features.c b/target/s390x/gen-features.c
+index a818c80332..dc320a06c2 100644
+--- a/target/s390x/gen-features.c
++++ b/target/s390x/gen-features.c
+@@ -689,7 +689,7 @@ static uint16_t qemu_V3_1[] =3D {
+     S390_FEAT_MSA_EXT_4,
+ };
+=20
+-static uint16_t qemu_LATEST[] =3D {
++static uint16_t qemu_V4_0[] =3D {
+     /*
+      * Only BFP bits are implemented (HFP, DFP, PFPO and DIVIDE TO INTEG=
+ER not
+      * implemented yet).
+@@ -698,11 +698,13 @@ static uint16_t qemu_LATEST[] =3D {
+     S390_FEAT_ZPCI,
+ };
+=20
+-/* add all new definitions before this point */
+-static uint16_t qemu_MAX[] =3D {
+-    /* z13+ features */
++static uint16_t qemu_LATEST[] =3D {
+     S390_FEAT_STFLE_53,
+     S390_FEAT_VECTOR,
++};
 +
-+static uint64_t vfma64(uint64_t a, uint64_t b, uint64_t c, float_status =
-*s)
-+{
-+    return float64_val(float64_muladd(make_float64(a), make_float64(b),
-+                       make_float64(c), 0, s));
-+}
-+
-+void HELPER(gvec_vfma64)(void *v1, const void *v2, const void *v3,
-+                         const void *v4, CPUS390XState *env, uint32_t de=
-sc)
-+{
-+    vop64_4(v1, v2, v3, v4, env, false, vfma64, GETPC());
-+}
-+
-+void HELPER(gvec_vfma64s)(void *v1, const void *v2, const void *v3,
-+                         const void *v4, CPUS390XState *env, uint32_t de=
-sc)
-+{
-+    vop64_4(v1, v2, v3, v4, env, true, vfma64, GETPC());
-+}
-+
-+static uint64_t vfms64(uint64_t a, uint64_t b, uint64_t c, float_status =
-*s)
-+{
-+    return float64_val(float64_muladd(make_float64(a), make_float64(b),
-+                       make_float64(c), float_muladd_negate_c, s));
-+}
-+
-+void HELPER(gvec_vfms64)(void *v1, const void *v2, const void *v3,
-+                         const void *v4, CPUS390XState *env, uint32_t de=
-sc)
-+{
-+    vop64_4(v1, v2, v3, v4, env, false, vfms64, GETPC());
-+}
-+
-+void HELPER(gvec_vfms64s)(void *v1, const void *v2, const void *v3,
-+                         const void *v4, CPUS390XState *env, uint32_t de=
-sc)
-+{
-+    vop64_4(v1, v2, v3, v4, env, true, vfms64, GETPC());
-+}
++/* add all new definitions before this point */
++static uint16_t qemu_MAX[] =3D {
+     /* generates a dependency warning, leave it out for now */
+     S390_FEAT_MSA_EXT_5,
+ };
+@@ -821,6 +823,7 @@ static FeatGroupDefSpec FeatGroupDef[] =3D {
+ static FeatGroupDefSpec QemuFeatDef[] =3D {
+     QEMU_FEAT_INITIALIZER(V2_11),
+     QEMU_FEAT_INITIALIZER(V3_1),
++    QEMU_FEAT_INITIALIZER(V4_0),
+     QEMU_FEAT_INITIALIZER(LATEST),
+     QEMU_FEAT_INITIALIZER(MAX),
+ };
 --=20
 2.20.1
 
