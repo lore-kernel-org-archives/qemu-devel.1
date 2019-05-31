@@ -7,86 +7,86 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 764A3C04AB6
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 May 2019 13:41:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF509C04AB6
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 May 2019 13:42:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 32A852698E
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 May 2019 13:41:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A04CA2454D
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 May 2019 13:42:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="EIAZs6KX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 32A852698E
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="i9GXTnOo"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A04CA2454D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:43722 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:43746 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hWhmH-00056e-H4
-	for qemu-devel@archiver.kernel.org; Fri, 31 May 2019 09:41:01 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:60751)
+	id 1hWhnf-0006Ji-Ql
+	for qemu-devel@archiver.kernel.org; Fri, 31 May 2019 09:42:27 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:33071)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hWhit-0002Ps-Kt
-	for qemu-devel@nongnu.org; Fri, 31 May 2019 09:37:32 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1hWhkB-0003gR-D6
+	for qemu-devel@nongnu.org; Fri, 31 May 2019 09:38:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hWhfF-0004yP-5Z
-	for qemu-devel@nongnu.org; Fri, 31 May 2019 09:33:46 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:42763)
+	(envelope-from <alex.bennee@linaro.org>) id 1hWhk9-0003Mx-Ma
+	for qemu-devel@nongnu.org; Fri, 31 May 2019 09:38:50 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:51951)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1hWhfE-0004wn-TM
-	for qemu-devel@nongnu.org; Fri, 31 May 2019 09:33:45 -0400
-Received: by mail-wr1-x444.google.com with SMTP id l2so6543651wrb.9
-	for <qemu-devel@nongnu.org>; Fri, 31 May 2019 06:33:44 -0700 (PDT)
+	id 1hWhk9-0003Jz-GH
+	for qemu-devel@nongnu.org; Fri, 31 May 2019 09:38:49 -0400
+Received: by mail-wm1-x342.google.com with SMTP id f10so6103705wmb.1
+	for <qemu-devel@nongnu.org>; Fri, 31 May 2019 06:38:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
 	h=references:user-agent:from:to:cc:subject:in-reply-to:date
 	:message-id:mime-version:content-transfer-encoding;
-	bh=XR0dSMHDtnjqbjfje9BMpv23BYYDBeaqPe+YuFryDww=;
-	b=EIAZs6KXlvQZr5aWOaMwmcUA5cU8WXlf8KZMtYWTSn2+WanSMOg8eOXAgHu8qnIKeJ
-	Rbt9OwxZro+3LKKsCoc+sQvgRcqbsLMIrsn4Vk3wDii+YGBCqMnHUwH2eVZmqFegCWUA
-	ZhM1abunUWkpCBR+seobVzb28+X2m8hY7lPEooPH2RsQdPVFCSRJ+6Ur92xHBlzrZDGK
-	s2/SfJ9ZKepdSC/9OcogQXHeIAgmKUaoVMwXpyec4ygCR2RAstp1X3Jb3YmsSudGbauI
-	gSN+KXt3BuluMp6LNSe9cygkx/SIs2fJy3ENOJzFqPUr06PkQifos9TfjjxomoOWt3ko
-	jkOg==
+	bh=VfNoAd2cBbExF85Rqe49EkPI1f+Cpem8QpiDm1cqEo4=;
+	b=i9GXTnOoGOIiAxffiTxQ2V4Yhdk2DWXRhe0IllobIqVsHvaenfoFkiMobZO4mU0NJR
+	uQesFax2N/hg90IZ3ZhTh/2D9HaLbT09CnE7Nd+DLrHwYH/+U8KFE/0ndpEu34FF2ZIk
+	lFzAfIdwFr4iwdsewm8cwvFcvQUxafg+e9eziv4xJ9WReZJ622MFprwrtjQBpTM0lSrZ
+	BvkqE+wgLG3lmfcpA4yZpfQcvan2LQgkiBRD9jqAiwvGhwydqvknPdtDT5ZqVsxD+5mS
+	91kAhDWa+hags3UAGuXcyTvNO9QdzGpPaXFBipbdlICW3f084o7eEEp4ETFuXM38r0Id
+	rWlQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:references:user-agent:from:to:cc:subject
 	:in-reply-to:date:message-id:mime-version:content-transfer-encoding;
-	bh=XR0dSMHDtnjqbjfje9BMpv23BYYDBeaqPe+YuFryDww=;
-	b=YN5HSOKN1LhhqRjpgc+nDqwE5cl8/u0Wf+nvw78JyipD3rdUGdXW3BREs+683fSJZa
-	7D7UOfD7sFgOF79qHqHIl7iY1HX2yAVtBfhNn3ByRHndyWQQhHrSnOCEUkfO+XHm7p7g
-	tcTHGBkJ5xyki95Q11WFGU6xvfuimVRmE4z6xP03A3DkJJNExo7Qm1BahdFvPvPkxsrz
-	LM9z+eRyqGneV8S7FQy80TgQ8tas/0LUhqosn3novfpd0x8gV1lD8Hy3F4DoEf1N20Nv
-	BAEF9lXrZGQvySxF3W0rZKYS2qZUOT1ZoPmyfYPrmzLaq2cli0TzGlU9qbp0BfFopYxy
-	b8bQ==
-X-Gm-Message-State: APjAAAUr2UWXNUsPuS2aAePwdUW2V7msFHNb5K3Ngh7FRjmAdjddMP8J
-	wY5R+jOQSAbbzmOc8dt/IqV2+g==
-X-Google-Smtp-Source: APXvYqxuBkLSfMaVspgxaUdf4P+Dld2LmojYYdNQYgKCK0BmcilcpQHgrLE8ECLgE/VlAqO5qnVq6Q==
-X-Received: by 2002:a5d:5391:: with SMTP id d17mr5914619wrv.340.1559309623114; 
-	Fri, 31 May 2019 06:33:43 -0700 (PDT)
+	bh=VfNoAd2cBbExF85Rqe49EkPI1f+Cpem8QpiDm1cqEo4=;
+	b=ufdJA3yKa5vUL7pTAAnaDNpS5uCkjO8fFhp/l44tztk9pdHancZPyWXxqQPcKnjm5G
+	QyVoWawGTeaAHW+QmvLaSWFYSm/tqRhgomDfyTqIr7XhuJEaCQdfdrSmr7B2mSoSbcxt
+	rVjT0Gdzk1/BSNVqg0iZD1aUXH71RMFzVELoBzbFgGciJJGx19q373Hn5Wf8C9V/ozNS
+	l6sIRitavMPqehIPe/i9wDpxQhMZjteFTvGs/GhgCg6maIg2KQraEqu/+yT+lskWCC6p
+	ZP/gV3EPzvc+Vj8pU/WEm6CWfWbfrjjPCpxlugQ9sl9QWn1lAM9GfSc8e7r3t8trDQv3
+	klYA==
+X-Gm-Message-State: APjAAAU91IgSg7bdYrOSytEeGHKVY/UPykrI7cITq1lesCq/O4Hw3dAR
+	rjt8Nqpb0NvGaOhlhWKUQaaizw==
+X-Google-Smtp-Source: APXvYqyQiD8jCvT8iv1l4VSJBLf2tBnopQ6ahUFPgoS/1T+2hMA8Su8uVl9ruV2+JgJ2PzAlgFOfgg==
+X-Received: by 2002:a1c:d182:: with SMTP id i124mr5926481wmg.102.1559309926456;
+	Fri, 31 May 2019 06:38:46 -0700 (PDT)
 Received: from zen.linaroharston ([81.128.185.34])
-	by smtp.gmail.com with ESMTPSA id e6sm1089643wrw.83.2019.05.31.06.33.40
+	by smtp.gmail.com with ESMTPSA id z17sm748674wru.21.2019.05.31.06.38.44
 	(version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-	Fri, 31 May 2019 06:33:40 -0700 (PDT)
+	Fri, 31 May 2019 06:38:44 -0700 (PDT)
 Received: from zen (localhost [127.0.0.1])
-	by zen.linaroharston (Postfix) with ESMTP id 40E0D1FF87;
-	Fri, 31 May 2019 14:33:40 +0100 (BST)
+	by zen.linaroharston (Postfix) with ESMTP id DC7431FF87;
+	Fri, 31 May 2019 14:38:43 +0100 (BST)
 References: <20190529064148.19856-1-arilou@gmail.com>
-	<20190529064148.19856-3-arilou@gmail.com>
+	<20190529064148.19856-10-arilou@gmail.com>
 User-agent: mu4e 1.3.2; emacs 26.1
 From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: Jon Doron <arilou@gmail.com>
-In-reply-to: <20190529064148.19856-3-arilou@gmail.com>
-Date: Fri, 31 May 2019 14:33:40 +0100
-Message-ID: <8736kuaguj.fsf@zen.linaroharston>
+In-reply-to: <20190529064148.19856-10-arilou@gmail.com>
+Date: Fri, 31 May 2019 14:38:43 +0100
+Message-ID: <87y32m921o.fsf@zen.linaroharston>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2a00:1450:4864:20::444
-Subject: Re: [Qemu-devel] [PATCH v12 02/20] gdbstub: Implement deatch (D
- pkt) with new infra
+X-Received-From: 2a00:1450:4864:20::342
+Subject: Re: [Qemu-devel] [PATCH v12 09/20] gdbstub: Implement get register
+ (p pkt) with new infra
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -111,155 +111,80 @@ Jon Doron <arilou@gmail.com> writes:
 Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 
 > ---
->  gdbstub.c | 101 +++++++++++++++++++++++++++++++++---------------------
->  1 file changed, 61 insertions(+), 40 deletions(-)
+>  gdbstub.c | 50 ++++++++++++++++++++++++++++++++++++++------------
+>  1 file changed, 38 insertions(+), 12 deletions(-)
 >
 > diff --git a/gdbstub.c b/gdbstub.c
-> index e6d895177b..1db322c15a 100644
+> index fc9526b3f5..07740ec0af 100644
 > --- a/gdbstub.c
 > +++ b/gdbstub.c
-> @@ -1413,11 +1413,6 @@ static inline int startswith(const char *string, c=
-onst char *pattern)
->    return !strncmp(string, pattern, strlen(pattern));
+> @@ -1672,6 +1672,36 @@ static void handle_set_reg(GdbCmdContext *gdb_ctx,=
+ void *user_ctx)
+>      put_packet(gdb_ctx->s, "OK");
 >  }
 >
-> -static int process_string_cmd(
-> -        GDBState *s, void *user_ctx, const char *data,
-> -        const GdbCmdParseEntry *cmds, int num_cmds)
-> -        __attribute__((unused));
-> -
->  static int process_string_cmd(GDBState *s, void *user_ctx, const char *d=
-ata,
->                                const GdbCmdParseEntry *cmds, int num_cmds)
->  {
-> @@ -1463,6 +1458,55 @@ static int process_string_cmd(GDBState *s, void *u=
-ser_ctx, const char *data,
->      return -1;
->  }
->
-> +static void run_cmd_parser(GDBState *s, const char *data,
-> +                           const GdbCmdParseEntry *cmd)
+> +static void handle_get_reg(GdbCmdContext *gdb_ctx, void *user_ctx)
 > +{
-> +    if (!data) {
+> +    int reg_size;
+> +
+> +    /*
+> +     * Older gdb are really dumb, and don't use 'g' if 'p' is avaialable.
+> +     * This works, but can be very slow.  Anything new enough to
+> +     * understand XML also knows how to use this properly.
+> +     */
+> +    if (!gdb_has_xml) {
+> +        put_packet(gdb_ctx->s, "");
 > +        return;
 > +    }
 > +
-> +    /* In case there was an error during the command parsing we must
-> +    * send a NULL packet to indicate the command is not supported */
-> +    if (process_string_cmd(s, NULL, data, cmd, 1)) {
-> +        put_packet(s, "");
-> +    }
-> +}
-> +
-> +static void handle_detach(GdbCmdContext *gdb_ctx, void *user_ctx)
-> +{
-> +    GDBProcess *process;
-> +    GDBState *s =3D gdb_ctx->s;
-> +    uint32_t pid =3D 1;
-> +
-> +    if (s->multiprocess) {
-> +        if (!gdb_ctx->num_params) {
-> +            put_packet(s, "E22");
-> +            return;
-> +        }
-> +
-> +        pid =3D gdb_ctx->params[0].val_ul;
+> +    if (!gdb_ctx->num_params) {
+> +        put_packet(gdb_ctx->s, "E14");
+> +        return;
 > +    }
 > +
-> +    process =3D gdb_get_process(s, pid);
-> +    gdb_process_breakpoint_remove_all(s, process);
-> +    process->attached =3D false;
-> +
-> +    if (pid =3D=3D gdb_get_cpu_pid(s, s->c_cpu)) {
-> +        s->c_cpu =3D gdb_first_attached_cpu(s);
+> +    reg_size =3D gdb_read_register(gdb_ctx->s->g_cpu, gdb_ctx->mem_buf,
+> +                                 gdb_ctx->params[0].val_ull);
+> +    if (!reg_size) {
+> +        put_packet(gdb_ctx->s, "E14");
+> +        return;
 > +    }
 > +
-> +    if (pid =3D=3D gdb_get_cpu_pid(s, s->g_cpu)) {
-> +        s->g_cpu =3D gdb_first_attached_cpu(s);
-> +    }
-> +
-> +    if (!s->c_cpu) {
-> +        /* No more process attached */
-> +        gdb_syscall_mode =3D GDB_SYS_DISABLED;
-> +        gdb_continue(s);
-> +    }
-> +    put_packet(s, "OK");
+> +    memtohex(gdb_ctx->str_buf, gdb_ctx->mem_buf, reg_size);
+> +    put_packet(gdb_ctx->s, gdb_ctx->str_buf);
 > +}
 > +
 >  static int gdb_handle_packet(GDBState *s, const char *line_buf)
 >  {
 >      CPUState *cpu;
-> @@ -1477,6 +1521,7 @@ static int gdb_handle_packet(GDBState *s, const cha=
-r *line_buf)
->      uint8_t *registers;
->      target_ulong addr, len;
->      GDBThreadIdKind thread_kind;
-> +    const GdbCmdParseEntry *cmd_parser =3D NULL;
->
->      trace_gdbstub_io_command(line_buf);
->
-> @@ -1577,42 +1622,15 @@ static int gdb_handle_packet(GDBState *s, const c=
+> @@ -1901,18 +1931,14 @@ static int gdb_handle_packet(GDBState *s, const c=
 har *line_buf)
->          error_report("QEMU: Terminated via GDBstub");
->          exit(0);
->      case 'D':
-> -        /* Detach packet */
-> -        pid =3D 1;
-> -
-> -        if (s->multiprocess) {
-> -            unsigned long lpid;
-> -            if (*p !=3D ';') {
-> -                put_packet(s, "E22");
-> -                break;
-> -            }
-> -
-> -            if (qemu_strtoul(p + 1, &p, 16, &lpid)) {
-> -                put_packet(s, "E22");
-> -                break;
-> -            }
-> -
-> -            pid =3D lpid;
-> -        }
-> -
-> -        process =3D gdb_get_process(s, pid);
-> -        gdb_process_breakpoint_remove_all(s, process);
-> -        process->attached =3D false;
-> -
-> -        if (pid =3D=3D gdb_get_cpu_pid(s, s->c_cpu)) {
-> -            s->c_cpu =3D gdb_first_attached_cpu(s);
-> -        }
-> -
-> -        if (pid =3D=3D gdb_get_cpu_pid(s, s->g_cpu)) {
-> -            s->g_cpu =3D gdb_first_attached_cpu(s);
-> -        }
-> -
-> -        if (s->c_cpu =3D=3D NULL) {
-> -            /* No more process attached */
-> -            gdb_syscall_mode =3D GDB_SYS_DISABLED;
-> -            gdb_continue(s);
-> +        {
-> +            static const GdbCmdParseEntry detach_cmd_desc =3D {
-> +                .handler =3D handle_detach,
-> +                .cmd =3D "D",
-> +                .cmd_startswith =3D 1,
-> +                .schema =3D "?.l0"
-> +            };
-> +            cmd_parser =3D &detach_cmd_desc;
 >          }
-> -        put_packet(s, "OK");
 >          break;
->      case 's':
->          if (*p !=3D '\0') {
-> @@ -1985,6 +2003,9 @@ static int gdb_handle_packet(GDBState *s, const cha=
-r *line_buf)
->          put_packet(s, buf);
+>      case 'p':
+> -        /* Older gdb are really dumb, and don't use 'g' if 'p' is avaial=
+able.
+> -           This works, but can be very slow.  Anything new enough to
+> -           understand XML also knows how to use this properly.  */
+> -        if (!gdb_has_xml)
+> -            goto unknown_command;
+> -        addr =3D strtoull(p, (char **)&p, 16);
+> -        reg_size =3D gdb_read_register(s->g_cpu, mem_buf, addr);
+> -        if (reg_size) {
+> -            memtohex(buf, mem_buf, reg_size);
+> -            put_packet(s, buf);
+> -        } else {
+> -            put_packet(s, "E14");
+> +        {
+> +            static const GdbCmdParseEntry get_reg_cmd_desc =3D {
+> +                .handler =3D handle_get_reg,
+> +                .cmd =3D "p",
+> +                .cmd_startswith =3D 1,
+> +                .schema =3D "L0"
+> +            };
+> +            cmd_parser =3D &get_reg_cmd_desc;
+>          }
 >          break;
->      }
-> +
-> +    run_cmd_parser(s, line_buf, cmd_parser);
-> +
->      return RS_IDLE;
->  }
+>      case 'P':
 
 
 --
