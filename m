@@ -2,74 +2,123 @@ Return-Path: <SRS0=hY9S=T7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DC2BC04AB6
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 May 2019 15:26:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 67236C04AB6
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 May 2019 15:29:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CA87B26BA8
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 May 2019 15:26:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CA87B26BA8
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=mail.jerryxiao.cc
+	by mail.kernel.org (Postfix) with ESMTPS id 24E9E26B91
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 May 2019 15:29:03 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b="pY+h/9/H"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 24E9E26B91
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nutanix.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:45231 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:45239 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hWjQG-0008Qn-OK
-	for qemu-devel@archiver.kernel.org; Fri, 31 May 2019 11:26:24 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:56591)
+	id 1hWjSo-0000nn-FT
+	for qemu-devel@archiver.kernel.org; Fri, 31 May 2019 11:29:02 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:57170)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hWjPT-00087c-TF
-	for qemu-devel@nongnu.org; Fri, 31 May 2019 11:25:37 -0400
+	(envelope-from <thanos.makatos@nutanix.com>) id 1hWjS2-0000V9-7H
+	for qemu-devel@nongnu.org; Fri, 31 May 2019 11:28:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hWjPS-0007LA-9f
-	for qemu-devel@nongnu.org; Fri, 31 May 2019 11:25:35 -0400
-Received: from indium.canonical.com ([91.189.90.7]:43670)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hWjPR-0007J0-Id
-	for qemu-devel@nongnu.org; Fri, 31 May 2019 11:25:34 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hWjPP-0001AB-OL
-	for <qemu-devel@nongnu.org>; Fri, 31 May 2019 15:25:31 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id B5D6F2E80C9
-	for <qemu-devel@nongnu.org>; Fri, 31 May 2019 15:25:31 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+	(envelope-from <thanos.makatos@nutanix.com>) id 1hWjS1-0001Sh-3R
+	for qemu-devel@nongnu.org; Fri, 31 May 2019 11:28:14 -0400
+Received: from mx0a-002c1b01.pphosted.com ([148.163.151.68]:41424)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thanos.makatos@nutanix.com>)
+	id 1hWjS0-0001QI-Ms
+	for qemu-devel@nongnu.org; Fri, 31 May 2019 11:28:13 -0400
+Received: from pps.filterd (m0127839.ppops.net [127.0.0.1])
+	by mx0a-002c1b01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+	x4VFN4to018173; Fri, 31 May 2019 08:28:09 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nutanix.com;
+	h=from : to : cc :
+	subject : date : message-id : references : in-reply-to : content-type :
+	content-transfer-encoding : mime-version; s=proofpoint20171006;
+	bh=3cIGREHCXGjIe4zDXshovQ8m/tDGYim1WcqlPVqEtdY=;
+	b=pY+h/9/Hq6HuwQ0jpvEjdq2awdrURJc3xt/FKtZ1CHUKFfCQXYu9HCMF7QuRAx0eqksr
+	b74VZL/LeiG0XnFKa/W3Gz3AORWDvdaaJVsZ/Qwy7T6WKCXOMFH+4SzsPD0om8lC3cxj
+	VanNcs46Dv40uBRCyntW/F7dZxUXVINDBwQwZQrxD1V1OcrWrn+j8vTzT8zJ7jgmkkXs
+	sVg6Bbtc93rQEEaJbd4egEewEEM+MgorE7yu2FkoRrNUFwUfikMv03Vm8LwlPBia8viN
+	ttNZJyO8Xx+XNYi/ippTF7Eyp7a3/28C8yMLJ+evb9+oaAdGxCeMjTzCsEmwFjWWw5vh
+	pQ== 
+Received: from nam01-sn1-obe.outbound.protection.outlook.com
+	(mail-sn1nam01lp2058.outbound.protection.outlook.com [104.47.32.58])
+	by mx0a-002c1b01.pphosted.com with ESMTP id 2styhxrn9e-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256
+	verify=NOT); Fri, 31 May 2019 08:28:09 -0700
+Received: from MN2PR02MB6205.namprd02.prod.outlook.com (52.132.174.26) by
+	MN2PR02MB6399.namprd02.prod.outlook.com (52.132.175.208) with Microsoft
+	SMTP
+	Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+	15.20.1922.18; Fri, 31 May 2019 15:28:08 +0000
+Received: from MN2PR02MB6205.namprd02.prod.outlook.com
+	([fe80::25d5:60b3:a680:7ebd]) by
+	MN2PR02MB6205.namprd02.prod.outlook.com
+	([fe80::25d5:60b3:a680:7ebd%3]) with mapi id 15.20.1922.021;
+	Fri, 31 May 2019 15:28:08 +0000
+From: Thanos Makatos <thanos.makatos@nutanix.com>
+To: Alex Williamson <alex.williamson@redhat.com>
+Thread-Topic: [Qemu-devel] QEMU tries to register to VFIO memory that is not
+	RAM
+Thread-Index: AdUXtUBrTZM56mQoR86m4RxpHSXlmQACSDQAAAGm+pA=
+Date: Fri, 31 May 2019 15:28:07 +0000
+Message-ID: <MN2PR02MB620549D68EB53487C6FCF51F8B190@MN2PR02MB6205.namprd02.prod.outlook.com>
+References: <MN2PR02MB62053CE40CA6B4A97B32FA048B190@MN2PR02MB6205.namprd02.prod.outlook.com>
+	<20190531083732.37ecbb1e@x1.home>
+In-Reply-To: <20190531083732.37ecbb1e@x1.home>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [62.254.189.133]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: eb1ae5e8-fc46-45b6-3a21-08d6e5dc955d
+x-microsoft-antispam: BCL:0; PCL:0;
+	RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(2017052603328)(7193020);
+	SRVR:MN2PR02MB6399; 
+x-ms-traffictypediagnostic: MN2PR02MB6399:
+x-proofpoint-crosstenant: true
+x-microsoft-antispam-prvs: <MN2PR02MB6399A4CE3CFDFB3BBC5760A08B190@MN2PR02MB6399.namprd02.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:9508;
+x-forefront-prvs: 00540983E2
+x-forefront-antispam-report: SFV:NSPM;
+	SFS:(10019020)(39860400002)(396003)(376002)(346002)(136003)(366004)(199004)(189003)(14444005)(8936002)(81166006)(8676002)(81156014)(7736002)(99286004)(76176011)(55016002)(53936002)(9686003)(305945005)(68736007)(26005)(256004)(52536014)(71200400001)(74316002)(86362001)(229853002)(7696005)(6436002)(71190400001)(5660300002)(66066001)(6246003)(486006)(446003)(73956011)(2906002)(102836004)(6916009)(6506007)(476003)(76116006)(107886003)(33656002)(186003)(66946007)(4326008)(66446008)(54906003)(44832011)(66556008)(3846002)(14454004)(6116002)(25786009)(478600001)(64756008)(316002)(11346002)(66476007)(64030200001);
+	DIR:OUT; SFP:1102; SCL:1; SRVR:MN2PR02MB6399;
+	H:MN2PR02MB6205.namprd02.prod.outlook.com; FPR:; SPF:None;
+	LANG:en; PTR:InfoNoRecords; A:1; MX:1; 
+received-spf: None (protection.outlook.com: nutanix.com does not designate
+	permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: fEr+kH5cG0lVN/DE0/0dn30dVeUYUdM5XtklZYdeuunURl6pKB8jLwow6WbWmuQ+fLS3AQfl7WxDhYfzzX+w29tfqL6Bo4sYX8kY8Y1VhdmVXt3pNpXjCevAxogRj4yi2RkOpd6m+pe6KhTHQ8QIPx7htjVkX9tyuQvTYmBqGSGGLp/MACf2hT5NfQSwzPE/2TZ5NQMtpY/rkJTQPLuFDTmJwp4avQc+/Yhw/8B8wi3EkEBS3MmR4skR3nNNyoRtRsJi/rX+CGZ8cBSVLfhq5e/I9SDgGOHCdljHBgZ8cLChUpKKkeUUEj1bP76F5+JvFuNrp6edItCetmSUjB/lzccfBA+ZPO1aRk6H+I1zRH4F6TZgGRAU23ft6T3oI9xd7HZg8H+RutMPfDUyd/kNf+74/IRMPVcajp3GXvfyqus=
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 31 May 2019 15:15:43 -0000
-From: Jerry <ubuntu@mail.jerryxiao.cc>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Invalid; importance=Undecided;
-	assignee=None; 
-X-Launchpad-Bug-Tags: aarch64 uefi
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: jerryxiao lersek
-X-Launchpad-Bug-Reporter: Jerry (jerryxiao)
-X-Launchpad-Bug-Modifier: Jerry (jerryxiao)
-References: <155923186868.25498.16417785082829115907.malonedeb@gac.canonical.com>
-Message-Id: <155931574363.8426.10336516680800433530.malone@wampee.canonical.com>
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="18968";
-	Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: 601710e73cce7e9d814d3f4958537fd8eb41b834
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1831115] Re: qemu 4.0.0 on aarch64: uefi firmware
- oversize
+MIME-Version: 1.0
+X-OriginatorOrg: nutanix.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: eb1ae5e8-fc46-45b6-3a21-08d6e5dc955d
+X-MS-Exchange-CrossTenant-originalarrivaltime: 31 May 2019 15:28:07.9825 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: bb047546-786f-4de1-bd75-24e5b6f79043
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: thanos.makatos@nutanix.com
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR02MB6399
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
+	definitions=2019-05-31_10:, , signatures=0
+X-Proofpoint-Spam-Reason: safe
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 148.163.151.68
+Subject: Re: [Qemu-devel] QEMU tries to register to VFIO memory that is not
+ RAM
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -78,146 +127,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1831115 <1831115@bugs.launchpad.net>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+	Swapnil Ingle <swapnil.ingle@nutanix.com>,
+	Felipe Franciosi <felipe@nutanix.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-[jerry@jerry-n1 aarch64]$ du -b *
-67108864        AAVMF_CODE.fd
-67108864        AAVMF_VARS.fd
-67108864        QEMU_EFI.fd
-67108864        QEMU_VARS.fd
+> > When configuring device pass-through via VFIO to a VM, I noticed that
+> > QEMU tries to register (DMA_MAP) all memory regions of a guest (not
+                > > only RAM). That includes firmware regions like "pc.rom"=
+. Would a
+> > physical device ever need access to those?
+>
+> Probably not, but are those things not in the address space of the
+> device on a physical system?
 
-2097152 QEMU_EFI.fd.orig
-786432  QEMU_VARS.fd.orig
+They are. I'm wondering whether it makes sense in a virtualized environment=
+.
 
+>
+> > Am I missing something?
+>
+> Does this cause a problem?
 
-Both files have been padded to 64MB. (if padding means filling it with /dev=
-/zero)
+It does in my use case. We're experimenting with devices backed by another
+userspace application. We can configure QEMU to allocate shared memory
+(MAP_SHARED) for guest RAM (which we can register in the other process) but=
+ not
+for anything else.
 
-QEMU_EFI.fd and QEMU_VARS.fd are built by myself according to
-https://wiki.linaro.org/LEG/UEFIforQEMU. With the self-built formware,
-I'm getting almost the same error: qemu-system-aarch64: Initialization
-of device cfi.pflash01 failed: device requires 67108864 bytes, block
-backend provides 786432 bytes
+>  It's not always easy to identify regions
+> that should not be mapped to a device, clearly we're not going to
+> create a whitelist based on the name of the region.  Thanks,
 
--- =
+Indeed. Could we decide whether or not to register an address space with
+VFIO in a more intelligent manner? E.g. the following simplistic patch solv=
+es
+our problem:
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1831115
+diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+index 4374cc6176..d9d3b1277a 100644
+--- a/hw/vfio/common.c
++++ b/hw/vfio/common.c
+@@ -430,6 +430,9 @@ static void vfio_listener_region_add(MemoryListener *li=
+stener,
+     VFIOHostDMAWindow *hostwin;
+     bool hostwin_found;
 
-Title:
-  qemu 4.0.0 on aarch64: uefi firmware oversize
-
-Status in QEMU:
-  Invalid
-
-Bug description:
-  I'd like to enable uefi in my virtual machine, however qemu is always sho=
-wing the same error:   qemu-system-aarch64: Initialization of device cfi.pf=
-lash01 failed: device requires 67108864 bytes, block backend provides 78643=
-2 bytes  =
-
-  It's clearly impossible to fit a uefi firmware into 786432 bytes.  =
-
-
-  Environment: qemu-system-aarch64 with kvm on an amlogic s905d aarch64
-  dev board, running archlinuxarm, qemu in the repository is compiled
-  with https://download.qemu.org/qemu-4.0.0.tar.xz
-
-  (My AAVMF_CODE.fd and AAVMF_VARS.fd are extracted from debian package
-  qemu-efi-aarch64 0~20181115.85588389-3)
-
-  Below is my libvirt log.
-
-  2019-05-30 15:07:44.216+0000: starting up libvirt version: 5.3.0, qemu ve=
-rsion: 4.0.0, kernel: 4.19.46-1-ARCH, hostname: jerry-n1.localdomain
-  LC_ALL=3DC \
-  PATH=3D/usr/local/sbin:/usr/local/bin:/usr/bin \
-  HOME=3D/var/lib/libvirt/qemu/domain-2-debiantesting \
-  XDG_DATA_HOME=3D/var/lib/libvirt/qemu/domain-2-debiantesting/.local/share=
- \
-  XDG_CACHE_HOME=3D/var/lib/libvirt/qemu/domain-2-debiantesting/.cache \
-  XDG_CONFIG_HOME=3D/var/lib/libvirt/qemu/domain-2-debiantesting/.config \
-  QEMU_AUDIO_DRV=3Dnone \
-  /usr/bin/qemu-system-aarch64 \
-  -name guest=3Ddebiantesting,debug-threads=3Don \
-  -S \
-  -object secret,id=3DmasterKey0,format=3Draw,file=3D/var/lib/libvirt/qemu/=
-domain-2-debiantesting/master-key.aes \
-  -machine virt-4.0,accel=3Dkvm,usb=3Doff,dump-guest-core=3Doff,gic-version=
-=3D2 \
-  -cpu host \
-  -drive file=3D/opt/ovmf/aarch64/AAVMF_CODE.fd,if=3Dpflash,format=3Draw,un=
-it=3D0,readonly=3Don \
-  -drive file=3D/var/lib/libvirt/qemu/nvram/debiantesting_VARS.fd,if=3Dpfla=
-sh,format=3Draw,unit=3D1 \
-  -m 1024 \
-  -overcommit mem-lock=3Doff \
-  -smp 4,sockets=3D4,cores=3D1,threads=3D1 \
-  -uuid 508d100a-b4e5-4199-9ff9-ac6d40fe2896 \
-  -display none \
-  -no-user-config \
-  -nodefaults \
-  -chardev socket,id=3Dcharmonitor,fd=3D25,server,nowait \
-  -mon chardev=3Dcharmonitor,id=3Dmonitor,mode=3Dcontrol \
-  -rtc base=3Dutc \
-  -no-reboot \
-  -boot strict=3Don \
-  -device pcie-root-port,port=3D0x8,chassis=3D1,id=3Dpci.1,bus=3Dpcie.0,mul=
-tifunction=3Don,addr=3D0x1 \
-  -device pcie-root-port,port=3D0x9,chassis=3D2,id=3Dpci.2,bus=3Dpcie.0,add=
-r=3D0x1.0x1 \
-  -device pcie-root-port,port=3D0xa,chassis=3D3,id=3Dpci.3,bus=3Dpcie.0,add=
-r=3D0x1.0x2 \
-  -device pcie-root-port,port=3D0xb,chassis=3D4,id=3Dpci.4,bus=3Dpcie.0,add=
-r=3D0x1.0x3 \
-  -device pcie-root-port,port=3D0xc,chassis=3D5,id=3Dpci.5,bus=3Dpcie.0,add=
-r=3D0x1.0x4 \
-  -device pcie-root-port,port=3D0xd,chassis=3D6,id=3Dpci.6,bus=3Dpcie.0,add=
-r=3D0x1.0x5 \
-  -device qemu-xhci,p2=3D15,p3=3D15,id=3Dusb,bus=3Dpci.2,addr=3D0x0 \
-  -device virtio-scsi-pci,id=3Dscsi0,bus=3Dpci.3,addr=3D0x0 \
-  -device virtio-serial-pci,id=3Dvirtio-serial0,bus=3Dpci.4,addr=3D0x0 \
-  -drive file=3D/mnt/hddp1/jerry/libvirt/aarch64-images/debiantesting.qcow2=
-,format=3Dqcow2,if=3Dnone,id=3Ddrive-scsi0-0-0-0 \
-  -device scsi-hd,bus=3Dscsi0.0,channel=3D0,scsi-id=3D0,lun=3D0,device_id=
-=3Ddrive-scsi0-0-0-0,drive=3Ddrive-scsi0-0-0-0,id=3Dscsi0-0-0-0,bootindex=
-=3D2 \
-  -drive file=3D/mnt/hddp1/jerry/libvirt/aarch64-iso/debian-testing-arm64-n=
-etinst.iso,format=3Draw,if=3Dnone,id=3Ddrive-scsi0-0-0-1,readonly=3Don \
-  -device scsi-cd,bus=3Dscsi0.0,channel=3D0,scsi-id=3D0,lun=3D1,device_id=
-=3Ddrive-scsi0-0-0-1,drive=3Ddrive-scsi0-0-0-1,id=3Dscsi0-0-0-1,bootindex=
-=3D1 \
-  -netdev tap,fd=3D27,id=3Dhostnet0 \
-  -device virtio-net-pci,netdev=3Dhostnet0,id=3Dnet0,mac=3D52:54:00:d5:28:6=
-d,bus=3Dpci.1,addr=3D0x0 \
-  -chardev pty,id=3Dcharserial0 \
-  -serial chardev:charserial0 \
-  -chardev socket,id=3Dcharchannel0,fd=3D28,server,nowait \
-  -device virtserialport,bus=3Dvirtio-serial0.0,nr=3D1,chardev=3Dcharchanne=
-l0,id=3Dchannel0,name=3Dorg.qemu.guest_agent.0 \
-  -object rng-random,id=3Dobjrng0,filename=3D/dev/urandom \
-  -device virtio-rng-pci,rng=3Dobjrng0,id=3Drng0,bus=3Dpci.5,addr=3D0x0 \
-  -sandbox on,obsolete=3Ddeny,elevateprivileges=3Ddeny,spawn=3Ddeny,resourc=
-econtrol=3Ddeny \
-  -msg timestamp=3Don
-  2019-05-30 15:07:44.216+0000: Domain id=3D2 is tainted: host-cpu
-  char device redirected to /dev/pts/2 (label charserial0)
-  2019-05-30T15:07:46.701125Z qemu-system-aarch64: Initialization of device=
- cfi.pflash01 failed: device requires 67108864 bytes, block backend provide=
-s 786432 bytes
-  2019-05-30 15:07:46.779+0000: shutting down, reason=3Dfailed
-  (END)
-
-  # /etc/libvirt/qemu.conf  =
-
-  nvram =3D [
-          "/opt/ovmf/aarch64/AAVMF_CODE.fd:/opt/ovmf/aarch64/AAVMF_VARS.fd"
-  ]
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1831115/+subscriptions
++    if (!section->mr->ram_device)
++        return;
++
+     if (vfio_listener_skipped_section(section)) {
+         trace_vfio_listener_region_add_skip(
+                 section->offset_within_address_space,
 
