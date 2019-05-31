@@ -2,112 +2,65 @@ Return-Path: <SRS0=hY9S=T7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0CBC4C04AB6
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 May 2019 09:48:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91720C04AB6
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 May 2019 09:58:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D83DD26719
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 May 2019 09:48:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D83DD26719
+	by mail.kernel.org (Postfix) with ESMTPS id 65B5126748
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 May 2019 09:58:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 65B5126748
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:39308 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:39392 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hWe9b-00050b-0B
-	for qemu-devel@archiver.kernel.org; Fri, 31 May 2019 05:48:51 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:41953)
+	id 1hWeIV-0007M7-Gv
+	for qemu-devel@archiver.kernel.org; Fri, 31 May 2019 05:58:03 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:43939)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hWe6r-0003cP-RA
-	for qemu-devel@nongnu.org; Fri, 31 May 2019 05:46:02 -0400
+	(envelope-from <imammedo@redhat.com>) id 1hWeHj-00073M-Td
+	for qemu-devel@nongnu.org; Fri, 31 May 2019 05:57:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hWe6p-0000S8-HD
-	for qemu-devel@nongnu.org; Fri, 31 May 2019 05:46:01 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40720)
+	(envelope-from <imammedo@redhat.com>) id 1hWeHi-0001WC-Uq
+	for qemu-devel@nongnu.org; Fri, 31 May 2019 05:57:15 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45350)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>)
-	id 1hWe6n-0000QI-OA; Fri, 31 May 2019 05:45:57 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1hWeHi-0001SJ-P1
+	for qemu-devel@nongnu.org; Fri, 31 May 2019 05:57:14 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 9E7E33082135;
-	Fri, 31 May 2019 09:45:55 +0000 (UTC)
-Received: from [10.36.116.233] (ovpn-116-233.ams2.redhat.com [10.36.116.233])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 3C8275DAA4;
-	Fri, 31 May 2019 09:45:54 +0000 (UTC)
-To: Peter Maydell <peter.maydell@linaro.org>, Cornelia Huck <cohuck@redhat.com>
-References: <20190520170302.13643-1-cohuck@redhat.com>
-	<20190520170302.13643-20-cohuck@redhat.com>
-	<CAFEAcA-NBnfATjAcCdvMBtzuPcEArz4Z_TJnZdnfjdPhKFcaDQ@mail.gmail.com>
-From: David Hildenbrand <david@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
-	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
-	SE+xAvmumFBY
-Organization: Red Hat GmbH
-Message-ID: <2a233c74-dec0-d8b0-6a5d-41e35a380040@redhat.com>
-Date: Fri, 31 May 2019 11:45:53 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	by mx1.redhat.com (Postfix) with ESMTPS id 8CE2AC130719;
+	Fri, 31 May 2019 09:57:01 +0000 (UTC)
+Received: from localhost (unknown [10.43.2.182])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 8BB8B60C9F;
+	Fri, 31 May 2019 09:56:59 +0000 (UTC)
+Date: Fri, 31 May 2019 11:56:55 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+To: Michael Rolnik <mrolnik@gmail.com>
+Message-ID: <20190531115655.0c0c85ef@redhat.com>
+In-Reply-To: <CAK4993h5ddy0jA6_Yp-vHgDpg8nwcoqg2W+uTn45mAcHEPXSqA@mail.gmail.com>
+References: <20190530190738.22713-1-mrolnik@gmail.com>
+	<20190530190738.22713-2-mrolnik@gmail.com>
+	<20190531100237.138a9113@redhat.com>
+	<CAK4993h5ddy0jA6_Yp-vHgDpg8nwcoqg2W+uTn45mAcHEPXSqA@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-NBnfATjAcCdvMBtzuPcEArz4Z_TJnZdnfjdPhKFcaDQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.42]);
-	Fri, 31 May 2019 09:45:55 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.31]);
+	Fri, 31 May 2019 09:57:06 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PULL 19/54] s390x/tcg: Implement VECTOR GALOIS
- FIELD MULTIPLY SUM (AND ACCUMULATE)
+Subject: Re: [Qemu-devel] [PATCH RFC v20 1/8] target/avr: Add outward facing
+ interfaces and core CPU logic
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -119,68 +72,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-s390x <qemu-s390x@nongnu.org>,
-	Richard Henderson <richard.henderson@linaro.org>,
-	QEMU Developers <qemu-devel@nongnu.org>
+Cc: Sarah Harris <S.E.Harris@kent.ac.uk>,
+	QEMU Developers <qemu-devel@nongnu.org>,
+	Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 30.05.19 13:22, Peter Maydell wrote:
-> On Mon, 20 May 2019 at 18:06, Cornelia Huck <cohuck@redhat.com> wrote:
->>
->> From: David Hildenbrand <david@redhat.com>
->>
->> A galois field multiplication in field 2 is like binary multiplication,
->> however instead of doing ordinary binary additions, xor's are performed.
->> So no carries are considered.
->>
->> Implement all variants via helpers. s390_vec_sar() and s390_vec_shr()
->> will be reused later on.
->>
->> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
->> Signed-off-by: David Hildenbrand <david@redhat.com>
+On Fri, 31 May 2019 11:15:01 +0300
+Michael Rolnik <mrolnik@gmail.com> wrote:
+
+> Hi Igor.
 > 
-> Hi -- Coverity (CID 1401703) complains that a lot of this
-> function is dead code:
+> Please explain what I should do.
+Maybe look at inline comments which are somewhere in the body of reply.
+
+> thank you,
+> Michael
 > 
->> +static S390Vector galois_multiply64(uint64_t a, uint64_t b)
->> +{
->> +    S390Vector res = {};
->> +    S390Vector va = {
->> +        .doubleword[1] = a,
->> +    };
->> +    S390Vector vb = {
->> +        .doubleword[1] = b,
->> +    };
->> +
->> +    while (!s390_vec_is_zero(&vb)) {
->> +        if (vb.doubleword[1] & 0x1) {
->> +            s390_vec_xor(&res, &res, &va);
->> +        }
->> +        s390_vec_shl(&va, &va, 1);
->> +        s390_vec_shr(&vb, &vb, 1);
->> +    }
->> +    return res;
->> +}
+> On Fri, May 31, 2019 at 11:02 AM Igor Mammedov <imammedo@redhat.com> wrote:
 > 
-> but I can't make any sense of its annotations or why it
-> thinks this is true. Would somebody like to have a look at the
-> issue? If it's just Coverity getting confused we can mark it
-> as a false positive.
+> > On Thu, 30 May 2019 22:07:31 +0300
+> > Michael Rolnik <mrolnik@gmail.com> wrote:
+[...]
 
-I am pretty sure it is a false positive. I'll have to request access to
-coverity first to have a look at the details. Thanks!
+> > > +static ObjectClass *avr_cpu_class_by_name(const char *cpu_model)
+> > > +{
+> > > +    ObjectClass *oc;
+> > > +    char *name;
+> > > +
+> > > +    if (!cpu_model) {
+> > > +        return NULL;
+> > > +    }
+> > > +
+> > > +    oc = object_class_by_name(cpu_model);
+> > > +    if (oc != NULL && object_class_dynamic_cast(oc, TYPE_AVR_CPU) !=  
+> > NULL &&  
+> > > +        !object_class_is_abstract(oc)) {
+> > > +        return oc;
+> > > +    }  
+> >
+> > In other targets QEMU has 1-2 or more naming variants but that were
+> > influenced
+> > by legacy code and we have to keep compatibility not to break existing
+> > configurations.
+> >
+> > In case of new cpu, I'd keep only above hunk and drop the rest so that
+> > only one naming scheme would be available, which is compatible with
+> > '-device' naming and QMP/monitor interfaces that we support.
+> >
 
-> 
-> thanks
-> -- PMM
-> 
+I've suggested to leave only above hunk and drop following hunk.
+this way only full cpu type name will be accepted by '-cpu'
 
+> > > +    name = g_strdup_printf(AVR_CPU_TYPE_NAME("%s"), cpu_model);
+> > > +    oc = object_class_by_name(name);
+> > > +    g_free(name);
+> > > +    if (oc != NULL && object_class_dynamic_cast(oc, TYPE_AVR_CPU) !=  
+> > NULL &&  
+> > > +        !object_class_is_abstract(oc)) {
+> > > +        return oc;
+> > > +    }
 
--- 
+since suffix trick will be removed, you'll probably need to
+amend/simplify avr_cpu_list_entry() as well.
 
-Thanks,
+> > > +    return NULL;
+> > > +}
+> > > +
+[...]
 
-David / dhildenb
 
