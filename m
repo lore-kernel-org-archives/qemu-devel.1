@@ -2,69 +2,74 @@ Return-Path: <SRS0=hY9S=T7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A836FC04AB6
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 May 2019 15:23:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DC2BC04AB6
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 May 2019 15:26:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6B7D726B87
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 May 2019 15:23:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6B7D726B87
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id CA87B26BA8
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 May 2019 15:26:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CA87B26BA8
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=mail.jerryxiao.cc
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:45179 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:45231 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hWjND-0006hN-9w
-	for qemu-devel@archiver.kernel.org; Fri, 31 May 2019 11:23:15 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:56002)
+	id 1hWjQG-0008Qn-OK
+	for qemu-devel@archiver.kernel.org; Fri, 31 May 2019 11:26:24 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:56591)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1hWjMH-0006E6-QB
-	for qemu-devel@nongnu.org; Fri, 31 May 2019 11:22:19 -0400
+	(envelope-from <bounces@canonical.com>) id 1hWjPT-00087c-TF
+	for qemu-devel@nongnu.org; Fri, 31 May 2019 11:25:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1hWjMG-0003mR-73
-	for qemu-devel@nongnu.org; Fri, 31 May 2019 11:22:17 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38452)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1hWjMF-0003kh-VT
-	for qemu-devel@nongnu.org; Fri, 31 May 2019 11:22:16 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 2376830842A8;
-	Fri, 31 May 2019 15:22:15 +0000 (UTC)
-Received: from x1.home (ovpn-116-22.phx2.redhat.com [10.3.116.22])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id E9E02601AC;
-	Fri, 31 May 2019 15:22:09 +0000 (UTC)
-Date: Fri, 31 May 2019 09:22:07 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-To: pbonzini@redhat.com
-Message-ID: <20190531092207.0e341dbf@x1.home>
-In-Reply-To: <20190529120043-mutt-send-email-mst@kernel.org>
-References: <155786484688.13873.6037015630912983760.stgit@gimli.home>
-	<20190528232626-mutt-send-email-mst@kernel.org>
-	<20190529074356.29ab0f7a@x1.home>
-	<20190529120043-mutt-send-email-mst@kernel.org>
-Organization: Red Hat
+	(envelope-from <bounces@canonical.com>) id 1hWjPS-0007LA-9f
+	for qemu-devel@nongnu.org; Fri, 31 May 2019 11:25:35 -0400
+Received: from indium.canonical.com ([91.189.90.7]:43670)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1hWjPR-0007J0-Id
+	for qemu-devel@nongnu.org; Fri, 31 May 2019 11:25:34 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1hWjPP-0001AB-OL
+	for <qemu-devel@nongnu.org>; Fri, 31 May 2019 15:25:31 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id B5D6F2E80C9
+	for <qemu-devel@nongnu.org>; Fri, 31 May 2019 15:25:31 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.40]);
-	Fri, 31 May 2019 15:22:15 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 31 May 2019 15:15:43 -0000
+From: Jerry <ubuntu@mail.jerryxiao.cc>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=Invalid; importance=Undecided;
+	assignee=None; 
+X-Launchpad-Bug-Tags: aarch64 uefi
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: jerryxiao lersek
+X-Launchpad-Bug-Reporter: Jerry (jerryxiao)
+X-Launchpad-Bug-Modifier: Jerry (jerryxiao)
+References: <155923186868.25498.16417785082829115907.malonedeb@gac.canonical.com>
+Message-Id: <155931574363.8426.10336516680800433530.malone@wampee.canonical.com>
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="18968";
+	Instance="launchpad-lazr.conf"
+X-Launchpad-Hash: 601710e73cce7e9d814d3f4958537fd8eb41b834
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH for-4.1 v2] q35: Revert to kernel irqchip
+X-Received-From: 91.189.90.7
+Subject: [Qemu-devel] [Bug 1831115] Re: qemu 4.0.0 on aarch64: uefi firmware
+ oversize
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -73,168 +78,146 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: berrange@redhat.com, ehabkost@redhat.com,
-	"Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
-	peterx@redhat.com, rth@twiddle.net
+Reply-To: Bug 1831115 <1831115@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+[jerry@jerry-n1 aarch64]$ du -b *
+67108864        AAVMF_CODE.fd
+67108864        AAVMF_VARS.fd
+67108864        QEMU_EFI.fd
+67108864        QEMU_VARS.fd
 
-Paolo?  Please see MST's request below.  Thanks,
+2097152 QEMU_EFI.fd.orig
+786432  QEMU_VARS.fd.orig
 
-Alex
 
-On Wed, 29 May 2019 12:01:14 -0400
-"Michael S. Tsirkin" <mst@redhat.com> wrote:
+Both files have been padded to 64MB. (if padding means filling it with /dev=
+/zero)
 
-> On Wed, May 29, 2019 at 07:43:56AM -0600, Alex Williamson wrote:
-> > On Tue, 28 May 2019 23:30:20 -0400
-> > "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> >   
-> > > On Tue, May 14, 2019 at 02:14:41PM -0600, Alex Williamson wrote:  
-> > > > Commit b2fc91db8447 ("q35: set split kernel irqchip as default") changed
-> > > > the default for the pc-q35-4.0 machine type to use split irqchip, which
-> > > > turned out to have disasterous effects on vfio-pci INTx support.  KVM
-> > > > resampling irqfds are registered for handling these interrupts, but
-> > > > these are non-functional in split irqchip mode.  We can't simply test
-> > > > for split irqchip in QEMU as userspace handling of this interrupt is a
-> > > > significant performance regression versus KVM handling (GeForce GPUs
-> > > > assigned to Windows VMs are non-functional without forcing MSI mode or
-> > > > re-enabling kernel irqchip).
-> > > > 
-> > > > The resolution is to revert the change in default irqchip mode in the
-> > > > pc-q35-4.1 machine and create a pc-q35-4.0.1 machine for the 4.0-stable
-> > > > branch.  The qemu-q35-4.0 machine type should not be used in vfio-pci
-> > > > configurations for devices requiring legacy INTx support without
-> > > > explicitly modifying the VM configuration to use kernel irqchip.
-> > > > 
-> > > > Link: https://bugs.launchpad.net/qemu/+bug/1826422
-> > > > Fixes: b2fc91db8447 ("q35: set split kernel irqchip as default")
-> > > > Signed-off-by: Alex Williamson <alex.williamson@redhat.com>    
-> > > 
-> > > OK I guess but it's really a kvm patch.
-> > > So I'd like Paolo to review and merge if appropriate.
-> > > 
-> > > Can't say this makes me too happy. split irqchip
-> > > has a bunch of advantages.  
-> > 
-> > What exactly are those advantages relative to a our default QEMU
-> > users?  I see lots of users assigning consumer class hardware and
-> > seeing regressions.  They don't care about a theoretically improved
-> > security attack surface at the cost of performance for legacy devices,
-> > or especially functionality.  Should these users be our focus for the
-> > default machine type?  I think we could make these sorts of compromises
-> > in a legacy-free or virt/cloud/enterprise machine type, but for a
-> > general purpose PC emulator, it doesn't seem a good match given the
-> > issues we have currently.  Obviously users can continue to tune the q35
-> > machine type on their own and enable split irqchip if it's important to
-> > them.  Thanks,
-> > 
-> > Alex  
-> 
-> It's a reasonable argument. Again I think Paolo should make the call.
-> 
-> > > > ---
-> > > >  hw/core/machine.c    |    3 +++
-> > > >  hw/i386/pc.c         |    3 +++
-> > > >  hw/i386/pc_q35.c     |   16 ++++++++++++++--
-> > > >  include/hw/boards.h  |    3 +++
-> > > >  include/hw/i386/pc.h |    3 +++
-> > > >  5 files changed, 26 insertions(+), 2 deletions(-)
-> > > > 
-> > > > diff --git a/hw/core/machine.c b/hw/core/machine.c
-> > > > index 5d046a43e3d2..e41e6698ac9f 100644
-> > > > --- a/hw/core/machine.c
-> > > > +++ b/hw/core/machine.c
-> > > > @@ -24,6 +24,9 @@
-> > > >  #include "hw/pci/pci.h"
-> > > >  #include "hw/mem/nvdimm.h"
-> > > >  
-> > > > +GlobalProperty hw_compat_4_0_1[] = {};
-> > > > +const size_t hw_compat_4_0_1_len = G_N_ELEMENTS(hw_compat_4_0_1);
-> > > > +
-> > > >  GlobalProperty hw_compat_4_0[] = {};
-> > > >  const size_t hw_compat_4_0_len = G_N_ELEMENTS(hw_compat_4_0);
-> > > >  
-> > > > diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-> > > > index d98b737b8f3b..b5311e7e2bd5 100644
-> > > > --- a/hw/i386/pc.c
-> > > > +++ b/hw/i386/pc.c
-> > > > @@ -115,6 +115,9 @@ struct hpet_fw_config hpet_cfg = {.count = UINT8_MAX};
-> > > >  /* Physical Address of PVH entry point read from kernel ELF NOTE */
-> > > >  static size_t pvh_start_addr;
-> > > >  
-> > > > +GlobalProperty pc_compat_4_0_1[] = {};
-> > > > +const size_t pc_compat_4_0_1_len = G_N_ELEMENTS(pc_compat_4_0_1);
-> > > > +
-> > > >  GlobalProperty pc_compat_4_0[] = {};
-> > > >  const size_t pc_compat_4_0_len = G_N_ELEMENTS(pc_compat_4_0);
-> > > >  
-> > > > diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
-> > > > index 37dd350511a9..dcddc6466200 100644
-> > > > --- a/hw/i386/pc_q35.c
-> > > > +++ b/hw/i386/pc_q35.c
-> > > > @@ -357,7 +357,7 @@ static void pc_q35_machine_options(MachineClass *m)
-> > > >      m->units_per_default_bus = 1;
-> > > >      m->default_machine_opts = "firmware=bios-256k.bin";
-> > > >      m->default_display = "std";
-> > > > -    m->default_kernel_irqchip_split = true;
-> > > > +    m->default_kernel_irqchip_split = false;
-> > > >      m->no_floppy = 1;
-> > > >      machine_class_allow_dynamic_sysbus_dev(m, TYPE_AMD_IOMMU_DEVICE);
-> > > >      machine_class_allow_dynamic_sysbus_dev(m, TYPE_INTEL_IOMMU_DEVICE);
-> > > > @@ -374,10 +374,22 @@ static void pc_q35_4_1_machine_options(MachineClass *m)
-> > > >  DEFINE_Q35_MACHINE(v4_1, "pc-q35-4.1", NULL,
-> > > >                     pc_q35_4_1_machine_options);
-> > > >  
-> > > > -static void pc_q35_4_0_machine_options(MachineClass *m)
-> > > > +static void pc_q35_4_0_1_machine_options(MachineClass *m)
-> > > >  {
-> > > >      pc_q35_4_1_machine_options(m);
-> > > >      m->alias = NULL;
-> > > > +    compat_props_add(m->compat_props, hw_compat_4_0_1, hw_compat_4_0_1_len);
-> > > > +    compat_props_add(m->compat_props, pc_compat_4_0_1, pc_compat_4_0_1_len);
-> > > > +}
-> > > > +
-> > > > +DEFINE_Q35_MACHINE(v4_0_1, "pc-q35-4.0.1", NULL,
-> > > > +                   pc_q35_4_0_1_machine_options);
-> > > > +
-> > > > +static void pc_q35_4_0_machine_options(MachineClass *m)
-> > > > +{
-> > > > +    pc_q35_4_0_1_machine_options(m);
-> > > > +    m->default_kernel_irqchip_split = true;
-> > > > +    m->alias = NULL;
-> > > >      compat_props_add(m->compat_props, hw_compat_4_0, hw_compat_4_0_len);
-> > > >      compat_props_add(m->compat_props, pc_compat_4_0, pc_compat_4_0_len);
-> > > >  }
-> > > > diff --git a/include/hw/boards.h b/include/hw/boards.h
-> > > > index 6f7916f88f02..6ff02bf3e472 100644
-> > > > --- a/include/hw/boards.h
-> > > > +++ b/include/hw/boards.h
-> > > > @@ -292,6 +292,9 @@ struct MachineState {
-> > > >      } \
-> > > >      type_init(machine_initfn##_register_types)
-> > > >  
-> > > > +extern GlobalProperty hw_compat_4_0_1[];
-> > > > +extern const size_t hw_compat_4_0_1_len;
-> > > > +
-> > > >  extern GlobalProperty hw_compat_4_0[];
-> > > >  extern const size_t hw_compat_4_0_len;
-> > > >  
-> > > > diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-> > > > index 43df7230a22b..5d5636241e34 100644
-> > > > --- a/include/hw/i386/pc.h
-> > > > +++ b/include/hw/i386/pc.h
-> > > > @@ -293,6 +293,9 @@ int e820_add_entry(uint64_t, uint64_t, uint32_t);
-> > > >  int e820_get_num_entries(void);
-> > > >  bool e820_get_entry(int, uint32_t, uint64_t *, uint64_t *);
-> > > >  
-> > > > +extern GlobalProperty pc_compat_4_0_1[];
-> > > > +extern const size_t pc_compat_4_0_1_len;
-> > > > +
-> > > >  extern GlobalProperty pc_compat_4_0[];
-> > > >  extern const size_t pc_compat_4_0_len;
-> > > >      
+QEMU_EFI.fd and QEMU_VARS.fd are built by myself according to
+https://wiki.linaro.org/LEG/UEFIforQEMU. With the self-built formware,
+I'm getting almost the same error: qemu-system-aarch64: Initialization
+of device cfi.pflash01 failed: device requires 67108864 bytes, block
+backend provides 786432 bytes
 
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1831115
+
+Title:
+  qemu 4.0.0 on aarch64: uefi firmware oversize
+
+Status in QEMU:
+  Invalid
+
+Bug description:
+  I'd like to enable uefi in my virtual machine, however qemu is always sho=
+wing the same error:   qemu-system-aarch64: Initialization of device cfi.pf=
+lash01 failed: device requires 67108864 bytes, block backend provides 78643=
+2 bytes  =
+
+  It's clearly impossible to fit a uefi firmware into 786432 bytes.  =
+
+
+  Environment: qemu-system-aarch64 with kvm on an amlogic s905d aarch64
+  dev board, running archlinuxarm, qemu in the repository is compiled
+  with https://download.qemu.org/qemu-4.0.0.tar.xz
+
+  (My AAVMF_CODE.fd and AAVMF_VARS.fd are extracted from debian package
+  qemu-efi-aarch64 0~20181115.85588389-3)
+
+  Below is my libvirt log.
+
+  2019-05-30 15:07:44.216+0000: starting up libvirt version: 5.3.0, qemu ve=
+rsion: 4.0.0, kernel: 4.19.46-1-ARCH, hostname: jerry-n1.localdomain
+  LC_ALL=3DC \
+  PATH=3D/usr/local/sbin:/usr/local/bin:/usr/bin \
+  HOME=3D/var/lib/libvirt/qemu/domain-2-debiantesting \
+  XDG_DATA_HOME=3D/var/lib/libvirt/qemu/domain-2-debiantesting/.local/share=
+ \
+  XDG_CACHE_HOME=3D/var/lib/libvirt/qemu/domain-2-debiantesting/.cache \
+  XDG_CONFIG_HOME=3D/var/lib/libvirt/qemu/domain-2-debiantesting/.config \
+  QEMU_AUDIO_DRV=3Dnone \
+  /usr/bin/qemu-system-aarch64 \
+  -name guest=3Ddebiantesting,debug-threads=3Don \
+  -S \
+  -object secret,id=3DmasterKey0,format=3Draw,file=3D/var/lib/libvirt/qemu/=
+domain-2-debiantesting/master-key.aes \
+  -machine virt-4.0,accel=3Dkvm,usb=3Doff,dump-guest-core=3Doff,gic-version=
+=3D2 \
+  -cpu host \
+  -drive file=3D/opt/ovmf/aarch64/AAVMF_CODE.fd,if=3Dpflash,format=3Draw,un=
+it=3D0,readonly=3Don \
+  -drive file=3D/var/lib/libvirt/qemu/nvram/debiantesting_VARS.fd,if=3Dpfla=
+sh,format=3Draw,unit=3D1 \
+  -m 1024 \
+  -overcommit mem-lock=3Doff \
+  -smp 4,sockets=3D4,cores=3D1,threads=3D1 \
+  -uuid 508d100a-b4e5-4199-9ff9-ac6d40fe2896 \
+  -display none \
+  -no-user-config \
+  -nodefaults \
+  -chardev socket,id=3Dcharmonitor,fd=3D25,server,nowait \
+  -mon chardev=3Dcharmonitor,id=3Dmonitor,mode=3Dcontrol \
+  -rtc base=3Dutc \
+  -no-reboot \
+  -boot strict=3Don \
+  -device pcie-root-port,port=3D0x8,chassis=3D1,id=3Dpci.1,bus=3Dpcie.0,mul=
+tifunction=3Don,addr=3D0x1 \
+  -device pcie-root-port,port=3D0x9,chassis=3D2,id=3Dpci.2,bus=3Dpcie.0,add=
+r=3D0x1.0x1 \
+  -device pcie-root-port,port=3D0xa,chassis=3D3,id=3Dpci.3,bus=3Dpcie.0,add=
+r=3D0x1.0x2 \
+  -device pcie-root-port,port=3D0xb,chassis=3D4,id=3Dpci.4,bus=3Dpcie.0,add=
+r=3D0x1.0x3 \
+  -device pcie-root-port,port=3D0xc,chassis=3D5,id=3Dpci.5,bus=3Dpcie.0,add=
+r=3D0x1.0x4 \
+  -device pcie-root-port,port=3D0xd,chassis=3D6,id=3Dpci.6,bus=3Dpcie.0,add=
+r=3D0x1.0x5 \
+  -device qemu-xhci,p2=3D15,p3=3D15,id=3Dusb,bus=3Dpci.2,addr=3D0x0 \
+  -device virtio-scsi-pci,id=3Dscsi0,bus=3Dpci.3,addr=3D0x0 \
+  -device virtio-serial-pci,id=3Dvirtio-serial0,bus=3Dpci.4,addr=3D0x0 \
+  -drive file=3D/mnt/hddp1/jerry/libvirt/aarch64-images/debiantesting.qcow2=
+,format=3Dqcow2,if=3Dnone,id=3Ddrive-scsi0-0-0-0 \
+  -device scsi-hd,bus=3Dscsi0.0,channel=3D0,scsi-id=3D0,lun=3D0,device_id=
+=3Ddrive-scsi0-0-0-0,drive=3Ddrive-scsi0-0-0-0,id=3Dscsi0-0-0-0,bootindex=
+=3D2 \
+  -drive file=3D/mnt/hddp1/jerry/libvirt/aarch64-iso/debian-testing-arm64-n=
+etinst.iso,format=3Draw,if=3Dnone,id=3Ddrive-scsi0-0-0-1,readonly=3Don \
+  -device scsi-cd,bus=3Dscsi0.0,channel=3D0,scsi-id=3D0,lun=3D1,device_id=
+=3Ddrive-scsi0-0-0-1,drive=3Ddrive-scsi0-0-0-1,id=3Dscsi0-0-0-1,bootindex=
+=3D1 \
+  -netdev tap,fd=3D27,id=3Dhostnet0 \
+  -device virtio-net-pci,netdev=3Dhostnet0,id=3Dnet0,mac=3D52:54:00:d5:28:6=
+d,bus=3Dpci.1,addr=3D0x0 \
+  -chardev pty,id=3Dcharserial0 \
+  -serial chardev:charserial0 \
+  -chardev socket,id=3Dcharchannel0,fd=3D28,server,nowait \
+  -device virtserialport,bus=3Dvirtio-serial0.0,nr=3D1,chardev=3Dcharchanne=
+l0,id=3Dchannel0,name=3Dorg.qemu.guest_agent.0 \
+  -object rng-random,id=3Dobjrng0,filename=3D/dev/urandom \
+  -device virtio-rng-pci,rng=3Dobjrng0,id=3Drng0,bus=3Dpci.5,addr=3D0x0 \
+  -sandbox on,obsolete=3Ddeny,elevateprivileges=3Ddeny,spawn=3Ddeny,resourc=
+econtrol=3Ddeny \
+  -msg timestamp=3Don
+  2019-05-30 15:07:44.216+0000: Domain id=3D2 is tainted: host-cpu
+  char device redirected to /dev/pts/2 (label charserial0)
+  2019-05-30T15:07:46.701125Z qemu-system-aarch64: Initialization of device=
+ cfi.pflash01 failed: device requires 67108864 bytes, block backend provide=
+s 786432 bytes
+  2019-05-30 15:07:46.779+0000: shutting down, reason=3Dfailed
+  (END)
+
+  # /etc/libvirt/qemu.conf  =
+
+  nvram =3D [
+          "/opt/ovmf/aarch64/AAVMF_CODE.fd:/opt/ovmf/aarch64/AAVMF_VARS.fd"
+  ]
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1831115/+subscriptions
 
