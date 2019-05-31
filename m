@@ -2,56 +2,112 @@ Return-Path: <SRS0=hY9S=T7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C674C04AB6
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 May 2019 11:47:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B2A0C04AB6
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 May 2019 11:49:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 35A4C2684B
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 May 2019 11:47:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 35A4C2684B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
+	by mail.kernel.org (Postfix) with ESMTPS id 116ED26860
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 May 2019 11:49:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 116ED26860
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:41537 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:41573 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hWfzv-0002CJ-EY
-	for qemu-devel@archiver.kernel.org; Fri, 31 May 2019 07:46:59 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:40530)
+	id 1hWg2G-0003mk-ED
+	for qemu-devel@archiver.kernel.org; Fri, 31 May 2019 07:49:24 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:40690)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1hWfxs-0000xE-6v
-	for qemu-devel@nongnu.org; Fri, 31 May 2019 07:44:54 -0400
+	(envelope-from <david@redhat.com>) id 1hWfyc-0001Gy-7f
+	for qemu-devel@nongnu.org; Fri, 31 May 2019 07:45:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1hWfwO-0000Na-UL
-	for qemu-devel@nongnu.org; Fri, 31 May 2019 07:43:21 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:40809 helo=mail.rt-rk.com)
+	(envelope-from <david@redhat.com>) id 1hWfli-0007wU-Ke
+	for qemu-devel@nongnu.org; Fri, 31 May 2019 07:32:19 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:61769)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1hWfwO-0007y8-NL
-	for qemu-devel@nongnu.org; Fri, 31 May 2019 07:43:20 -0400
-Received: from localhost (localhost [127.0.0.1])
-	by mail.rt-rk.com (Postfix) with ESMTP id B367B1A2025;
-	Fri, 31 May 2019 13:42:17 +0200 (CEST)
-X-Virus-Scanned: amavisd-new at rt-rk.com
-Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
-	[10.10.13.43])
-	by mail.rt-rk.com (Postfix) with ESMTPSA id 911D41A1E2E;
-	Fri, 31 May 2019 13:42:17 +0200 (CEST)
-From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-To: qemu-devel@nongnu.org
-Date: Fri, 31 May 2019 13:41:30 +0200
-Message-Id: <1559302891-29002-2-git-send-email-aleksandar.markovic@rt-rk.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1559302891-29002-1-git-send-email-aleksandar.markovic@rt-rk.com>
-References: <1559302891-29002-1-git-send-email-aleksandar.markovic@rt-rk.com>
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 89.216.37.149
-Subject: [Qemu-devel] [PATCH v7 1/2] linux-user: Add support for
- setsockopt() options IPV6_<ADD|DROP>_MEMBERSHIP
+	(Exim 4.71) (envelope-from <david@redhat.com>)
+	id 1hWfli-0007vc-CT; Fri, 31 May 2019 07:32:18 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id AA830307ACE6;
+	Fri, 31 May 2019 11:32:17 +0000 (UTC)
+Received: from [10.36.116.233] (ovpn-116-233.ams2.redhat.com [10.36.116.233])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 73DB360610;
+	Fri, 31 May 2019 11:32:16 +0000 (UTC)
+To: Peter Maydell <peter.maydell@linaro.org>, Cornelia Huck <cohuck@redhat.com>
+References: <20190520170302.13643-1-cohuck@redhat.com>
+	<20190520170302.13643-20-cohuck@redhat.com>
+	<CAFEAcA-NBnfATjAcCdvMBtzuPcEArz4Z_TJnZdnfjdPhKFcaDQ@mail.gmail.com>
+From: David Hildenbrand <david@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+	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
+	SE+xAvmumFBY
+Organization: Red Hat GmbH
+Message-ID: <00219505-bdb0-628b-9aed-f3211eb10b61@redhat.com>
+Date: Fri, 31 May 2019 13:32:15 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
+MIME-Version: 1.0
+In-Reply-To: <CAFEAcA-NBnfATjAcCdvMBtzuPcEArz4Z_TJnZdnfjdPhKFcaDQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.46]);
+	Fri, 31 May 2019 11:32:17 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PULL 19/54] s390x/tcg: Implement VECTOR GALOIS
+ FIELD MULTIPLY SUM (AND ACCUMULATE)
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -63,95 +119,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: arikalo@wavecomp.com, lvivier@redhat.com, Neng Chen <nchen@wavecomp.com>,
-	amarkovic@wavecomp.com
+Cc: qemu-s390x <qemu-s390x@nongnu.org>,
+	Richard Henderson <richard.henderson@linaro.org>,
+	QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Neng Chen <nchen@wavecomp.com>
+On 30.05.19 13:22, Peter Maydell wrote:
+> On Mon, 20 May 2019 at 18:06, Cornelia Huck <cohuck@redhat.com> wrote:
+>>
+>> From: David Hildenbrand <david@redhat.com>
+>>
+>> A galois field multiplication in field 2 is like binary multiplication,
+>> however instead of doing ordinary binary additions, xor's are performed.
+>> So no carries are considered.
+>>
+>> Implement all variants via helpers. s390_vec_sar() and s390_vec_shr()
+>> will be reused later on.
+>>
+>> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+>> Signed-off-by: David Hildenbrand <david@redhat.com>
+> 
+> Hi -- Coverity (CID 1401703) complains that a lot of this
+> function is dead code:
+> 
+>> +static S390Vector galois_multiply64(uint64_t a, uint64_t b)
+>> +{
+>> +    S390Vector res = {};
+>> +    S390Vector va = {
+>> +        .doubleword[1] = a,
+>> +    };
+>> +    S390Vector vb = {
+>> +        .doubleword[1] = b,
+>> +    };
+>> +
+>> +    while (!s390_vec_is_zero(&vb)) {
+>> +        if (vb.doubleword[1] & 0x1) {
+>> +            s390_vec_xor(&res, &res, &va);
+>> +        }
+>> +        s390_vec_shl(&va, &va, 1);
+>> +        s390_vec_shr(&vb, &vb, 1);
+>> +    }
+>> +    return res;
+>> +}
+> 
+> but I can't make any sense of its annotations or why it
+> thinks this is true. Would somebody like to have a look at the
+> issue? If it's just Coverity getting confused we can mark it
+> as a false positive.
 
-Add support for options IPV6_ADD_MEMBERSHIP and IPV6_DROP_MEMPEMBERSHIP
-of the syscall setsockopt(). These options control membership in
-multicast groups. Their argument is a pointer to a struct ipv6_mreq,
-which is in turn defined in IP v6 header netinet/in.h as:
+I can't make absolutely any sense of the coverity gibberish as well.
 
- struct ipv6_mreq {
-     /* IPv6 multicast address of group */
-     struct  in6_addr  ipv6mr_multiaddr;
-     /* local IPv6 address of interface */
-     int     ipv6mr_interface;
- };
+The only think is that "vb->doubleword[0]" will always be 0, but that's
+not what coverity is complaining about.
 
-...whereas its definition in kernel's include/uapi/linux/in6.h is:
+Marking it as false positive, thanks!
 
- #if __UAPI_DEF_IPV6_MREQ
- struct ipv6_mreq {
-     /* IPv6 multicast address of group */
-         struct  in6_addr ipv6mr_multiaddr;
-     /* local IPv6 address of interface */
-     int     ipv6mr_ifindex;
- };
- #endif
+> 
+> thanks
+> -- PMM
+> 
 
-The first field of ipv6_mreq has the same name ("ipv6mr_multiaddr")
-and type ("in6_addr") in both cases. Moreover, the in6_addr structure
-consists of fields that are always big-endian (on host of any endian),
-therefore the ipv6_mreq's field ipv6mr_multiaddr doesn't need any
-endian conversion.
 
-The second field of ipv6_mreq may, however, depending on the build
-environment, have different names. This is the reason why the lines
-"#if __UAPI_DEF_IPV6_MREQ" and "#if defined(__UAPI_DEF_IPV6_MREQ)"
-are used in this patch - to establish the right choice for the field
-name. Also, endian conversion is needed for this field, since it is
-of type "int".
-
-Signed-off-by: Neng Chen <nchen@wavecomp.com>
-Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
----
- linux-user/syscall.c | 27 +++++++++++++++++++++++++++
- 1 file changed, 27 insertions(+)
-
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index 96cd4bf..b690404 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -1892,6 +1892,33 @@ static abi_long do_setsockopt(int sockfd, int level, int optname,
-                                        &pki, sizeof(pki)));
-             break;
-         }
-+        case IPV6_ADD_MEMBERSHIP:
-+        case IPV6_DROP_MEMBERSHIP:
-+        {
-+            struct ipv6_mreq ipv6mreq;
-+
-+            if (optlen < sizeof(ipv6mreq)) {
-+                return -TARGET_EINVAL;
-+            }
-+
-+            if (copy_from_user(&ipv6mreq, optval_addr, sizeof(ipv6mreq))) {
-+                return -TARGET_EFAULT;
-+            }
-+
-+#if defined(__UAPI_DEF_IPV6_MREQ)
-+#if __UAPI_DEF_IPV6_MREQ
-+            ipv6mreq.ipv6mr_ifindex = tswap32(ipv6mreq.ipv6mr_ifindex);
-+#else
-+            ipv6mreq.ipv6mr_interface = tswap32(ipv6mreq.ipv6mr_interface);
-+#endif /* __UAPI_DEF_IVP6_MREQ */
-+#else
-+            ipv6mreq.ipv6mr_interface = tswap32(ipv6mreq.ipv6mr_interface);
-+#endif /* defined (__UAPI_DEF_IPV6_MREQ) */
-+
-+            ret = get_errno(setsockopt(sockfd, level, optname,
-+                                       &ipv6mreq, sizeof(ipv6mreq)));
-+            break;
-+        }
-         default:
-             goto unimplemented;
-         }
 -- 
-2.7.4
 
+Thanks,
+
+David / dhildenb
 
