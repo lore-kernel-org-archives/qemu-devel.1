@@ -6,47 +6,45 @@ X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 49FEBC04AB6
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 May 2019 18:21:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E18D9C04AB6
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 May 2019 18:21:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 27ADB212F5
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 May 2019 18:21:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 27ADB212F5
+	by mail.kernel.org (Postfix) with ESMTPS id AD5FD212F5
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 May 2019 18:21:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AD5FD212F5
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:47464 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:47466 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hWm9V-0007D4-Bx
-	for qemu-devel@archiver.kernel.org; Fri, 31 May 2019 14:21:17 -0400
+	id 1hWm9Y-0007GP-Tf
+	for qemu-devel@archiver.kernel.org; Fri, 31 May 2019 14:21:20 -0400
 Received: from eggs.gnu.org ([209.51.188.92]:33130)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hWm7q-00062V-Pz
-	for qemu-devel@nongnu.org; Fri, 31 May 2019 14:19:35 -0400
+	(envelope-from <david@redhat.com>) id 1hWm7x-00062V-9u
+	for qemu-devel@nongnu.org; Fri, 31 May 2019 14:19:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hWlwd-0000Cv-Tr
-	for qemu-devel@nongnu.org; Fri, 31 May 2019 14:08:00 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40232)
+	(envelope-from <david@redhat.com>) id 1hWlun-0007Lz-RS
+	for qemu-devel@nongnu.org; Fri, 31 May 2019 14:06:07 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56032)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1hWlwd-0000C7-Lv
-	for qemu-devel@nongnu.org; Fri, 31 May 2019 14:07:59 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1hWlul-0007Jm-Vn
+	for qemu-devel@nongnu.org; Fri, 31 May 2019 14:06:04 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B58AE85545;
-	Fri, 31 May 2019 18:07:58 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id EBBD83179B6E;
+	Fri, 31 May 2019 18:05:52 +0000 (UTC)
 Received: from [10.36.116.233] (ovpn-116-233.ams2.redhat.com [10.36.116.233])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id B244E5D71B;
-	Fri, 31 May 2019 18:07:57 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id D0E155DE81;
+	Fri, 31 May 2019 18:05:51 +0000 (UTC)
 To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
 References: <20190531104432.29379-1-david@redhat.com>
-	<20190531104432.29379-24-david@redhat.com>
-	<a65ae6d5-e9cd-a3ab-c770-5d8f3fcaa6e9@linaro.org>
-	<eea6986f-5da4-ff22-385e-ba8bc419a7ac@redhat.com>
-	<89db4302-dc14-23f6-bf17-c783f187acab@linaro.org>
+	<20190531104432.29379-18-david@redhat.com>
+	<3b28ed7b-cbde-c7a3-c072-df8eeb55a288@linaro.org>
 From: David Hildenbrand <david@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
@@ -93,23 +91,23 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
 	+8Umfre0Xt4713VxMygW0PnQt5aSQdMD58jHFxTk092mU+yIHj5LeYgvwSgZN4airXk5yRXl
 	SE+xAvmumFBY
 Organization: Red Hat GmbH
-Message-ID: <15900a55-63a1-1576-3805-11534d67f060@redhat.com>
-Date: Fri, 31 May 2019 20:07:56 +0200
+Message-ID: <37a260b6-8e46-5b47-0402-2ba10c25ee38@redhat.com>
+Date: Fri, 31 May 2019 20:05:51 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <89db4302-dc14-23f6-bf17-c783f187acab@linaro.org>
+In-Reply-To: <3b28ed7b-cbde-c7a3-c072-df8eeb55a288@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.28]);
-	Fri, 31 May 2019 18:07:58 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.41]);
+	Fri, 31 May 2019 18:05:58 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v1 23/23] s390x: Bump the "qemu" CPU model
- up to a stripped-down z13
+Subject: Re: [Qemu-devel] [PATCH v1 17/23] s390x/tcg: Implement VECTOR FP
+ PERFORM SIGN OPERATION
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -127,21 +125,65 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 31.05.19 20:06, Richard Henderson wrote:
-> On 5/31/19 12:58 PM, David Hildenbrand wrote:
->> Are you aware of a HFP library?
-> 
-> No.  It might be possible to shoehorn into softfloat, because I *think* to can
-> treat HFP as BFP with weird rounding.  At least that's what I remember from my
-> old college daze on the esa/390.
-> 
-> Otherwise we could maybe steal some code from Hercules.  I see "OSI certified"
-> and "Q public license" on the web page, which iirc is compatible.
-> 
+On 31.05.19 19:48, Richard Henderson wrote:
+> On 5/31/19 5:44 AM, David Hildenbrand wrote:
+>> +static DisasJumpType op_vfpso(DisasContext *s, DisasOps *o)
+>> +{
+>> +    const uint8_t fpf =3D get_field(s->fields, m3);
+>> +    const uint8_t m4 =3D get_field(s->fields, m4);
+>> +    const uint8_t m5 =3D get_field(s->fields, m5);
+>> +    const bool se =3D extract32(m4, 3, 1);
+>> +    TCGv_i64 tmp;
+>> +    int i;
+>> +
+>> +    if (fpf !=3D FPF_LONG || extract32(m4, 0, 3) || m5 > 2) {
+>> +        gen_program_exception(s, PGM_SPECIFICATION);
+>> +        return DISAS_NORETURN;
+>> +    }
+>> +
+>> +    tmp =3D tcg_temp_new_i64();
+>> +    for (i =3D 0; i < 2; i++) {
+>> +        read_vec_element_i64(tmp, get_field(s->fields, v2), i, ES_64)=
+;
+>> +
+>> +        switch (m5) {
+>> +        case 0:
+>> +            /* sign bit is inverted (complement) */
+>> +            tcg_gen_xori_i64(tmp, tmp, 1ull << 63);
+>> +            break;
+>> +        case 1:
+>> +            /* sign bit is set to one (negative) */
+>> +            tcg_gen_ori_i64(tmp, tmp, 1ull << 63);
+>> +            break;
+>> +        case 2:
+>> +            /* sign bit is set to zero (positive) */
+>> +            tcg_gen_andi_i64(tmp, tmp, (1ull << 63) - 1);
+>> +            break;
+>> +        }
+>> +
+>> +        write_vec_element_i64(tmp, get_field(s->fields, v1), i, ES_64=
+);
+>> +        if (se) {
+>> +            break;
+>> +        }
+>> +    }
+>> +    tcg_temp_free_i64(tmp);
+>> +    return DISAS_NEXT;
+>> +}
+>=20
+> Better to use tcg_gen_gvec_{and,xor,or}i to do all of the elements at o=
+nce.
+> Won't work for FPF_EXTENDED, but much better for FPF_SINGLE, once they'=
+re
+> supported.
+>=20
 
-Right, they support it. Maybe a project for a cold winter evening ;)
+How could I miss that :)
 
--- 
+Thanks!
+
+
+--=20
 
 Thanks,
 
