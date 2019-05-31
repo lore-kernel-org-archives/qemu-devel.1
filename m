@@ -2,66 +2,62 @@ Return-Path: <SRS0=hY9S=T7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B7619C04AB6
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 May 2019 15:41:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ACD42C04AB6
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 May 2019 15:49:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8FD0B218D1
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 May 2019 15:41:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8FD0B218D1
+	by mail.kernel.org (Postfix) with ESMTPS id 84C0F2680B
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 May 2019 15:49:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 84C0F2680B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:45366 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:45421 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hWjet-0003zn-QI
-	for qemu-devel@archiver.kernel.org; Fri, 31 May 2019 11:41:31 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:59181)
+	id 1hWjme-0006T4-RU
+	for qemu-devel@archiver.kernel.org; Fri, 31 May 2019 11:49:32 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:60391)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1hWjeB-0003aH-2u
-	for qemu-devel@nongnu.org; Fri, 31 May 2019 11:40:48 -0400
+	(envelope-from <philmd@redhat.com>) id 1hWjlX-0005tF-Li
+	for qemu-devel@nongnu.org; Fri, 31 May 2019 11:48:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1hWje4-0003Pk-9C
-	for qemu-devel@nongnu.org; Fri, 31 May 2019 11:40:41 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55594)
+	(envelope-from <philmd@redhat.com>) id 1hWjlW-0003Ki-If
+	for qemu-devel@nongnu.org; Fri, 31 May 2019 11:48:23 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46544)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1hWjdt-0003Cm-8j
-	for qemu-devel@nongnu.org; Fri, 31 May 2019 11:40:33 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
+	(Exim 4.71) (envelope-from <philmd@redhat.com>)
+	id 1hWjlU-0002Vf-2b; Fri, 31 May 2019 11:48:20 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+	[10.5.11.22])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 2497E30BBE9F;
-	Fri, 31 May 2019 15:40:11 +0000 (UTC)
-Received: from x1.home (ovpn-116-22.phx2.redhat.com [10.3.116.22])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 59FC67C582;
-	Fri, 31 May 2019 15:40:05 +0000 (UTC)
-Date: Fri, 31 May 2019 09:40:02 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-To: Thanos Makatos <thanos.makatos@nutanix.com>
-Message-ID: <20190531094002.29030716@x1.home>
-In-Reply-To: <MN2PR02MB620549D68EB53487C6FCF51F8B190@MN2PR02MB6205.namprd02.prod.outlook.com>
-References: <MN2PR02MB62053CE40CA6B4A97B32FA048B190@MN2PR02MB6205.namprd02.prod.outlook.com>
-	<20190531083732.37ecbb1e@x1.home>
-	<MN2PR02MB620549D68EB53487C6FCF51F8B190@MN2PR02MB6205.namprd02.prod.outlook.com>
-Organization: Red Hat
+	by mx1.redhat.com (Postfix) with ESMTPS id 0619B80B3F;
+	Fri, 31 May 2019 15:47:58 +0000 (UTC)
+Received: from x1w.redhat.com (ovpn-204-73.brq.redhat.com [10.40.204.73])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id B5DC310027B8;
+	Fri, 31 May 2019 15:47:49 +0000 (UTC)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: qemu-devel@nongnu.org
+Date: Fri, 31 May 2019 17:47:34 +0200
+Message-Id: <20190531154735.20809-2-philmd@redhat.com>
+In-Reply-To: <20190531154735.20809-1-philmd@redhat.com>
+References: <20190531154735.20809-1-philmd@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.49]);
-	Fri, 31 May 2019 15:40:20 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.28]);
+	Fri, 31 May 2019 15:47:59 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] QEMU tries to register to VFIO memory that is not
- RAM
+Subject: [Qemu-devel] [RFC PATCH 1/2] target/arm: Add stubs to build with
+ CONFIG_SEMIHOSTING disabled
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -73,58 +69,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-	Swapnil Ingle <swapnil.ingle@nutanix.com>,
-	Felipe Franciosi <felipe@nutanix.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+	Aleksandar Rikalo <arikalo@wavecomp.com>,
+	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+	Richard Henderson <richard.henderson@linaro.org>, qemu-arm@nongnu.org,
+	Aleksandar Markovic <amarkovic@wavecomp.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Miroslav Rezanina <mrezanin@redhat.com>,
+	=?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+	Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 31 May 2019 15:28:07 +0000
-Thanos Makatos <thanos.makatos@nutanix.com> wrote:
+If a distribution wants to build QEMU without semihosting support,
+it currently gets this build failure:
 
-> > > When configuring device pass-through via VFIO to a VM, I noticed that
-> > > QEMU tries to register (DMA_MAP) all memory regions of a guest (not
->                 > > only RAM). That includes firmware regions like "pc.rom". Would a
-> > > physical device ever need access to those?  
-> >
-> > Probably not, but are those things not in the address space of the
-> > device on a physical system?  
-> 
-> They are. I'm wondering whether it makes sense in a virtualized environment.
-> 
-> >  
-> > > Am I missing something?  
-> >
-> > Does this cause a problem?  
-> 
-> It does in my use case. We're experimenting with devices backed by another
-> userspace application. We can configure QEMU to allocate shared memory
-> (MAP_SHARED) for guest RAM (which we can register in the other process) but not
-> for anything else.
-> 
-> >  It's not always easy to identify regions
-> > that should not be mapped to a device, clearly we're not going to
-> > create a whitelist based on the name of the region.  Thanks,  
-> 
-> Indeed. Could we decide whether or not to register an address space with
-> VFIO in a more intelligent manner? E.g. the following simplistic patch solves
-> our problem:
-> 
-> diff --git a/hw/vfio/common.c b/hw/vfio/common.c
-> index 4374cc6176..d9d3b1277a 100644
-> --- a/hw/vfio/common.c
-> +++ b/hw/vfio/common.c
-> @@ -430,6 +430,9 @@ static void vfio_listener_region_add(MemoryListener *listener,
->      VFIOHostDMAWindow *hostwin;
->      bool hostwin_found;
-> 
-> +    if (!section->mr->ram_device)
-> +        return;
-> +
+  $ ./configure --target-list=3Daarch64-softmmu --without-default-devices
+  $ sed -i s/CONFIG_SEMIHOSTING=3Dy/CONFIG_SEMIHOSTING=3Dn/ default-confi=
+gs/arm-softmmu.mak
+  $ make subdir-aarch64-softmmu
+  [...]
+    LINK    aarch64-softmmu/qemu-system-aarch64
+  /usr/bin/ld: target/arm/arm-semi.o: in function `do_arm_semihosting':
+  ./target/arm/arm-semi.c:321: undefined reference to `qemu_semihosting_c=
+onsole_out'
+  /usr/bin/ld: ./target/arm/arm-semi.c:318: undefined reference to `qemu_=
+semihosting_console_out'
+  collect2: error: ld returned 1 exit status
+  make[1]: *** [Makefile:204: qemu-system-aarch64] Error 1
+  make: *** [Makefile:472: subdir-aarch64-softmmu] Error 2
 
-Nope, this would prevent IOMMU mapping of assigned device MMIO regions
-which would prevent peer-to-peer DMA between assigned devices.  Thanks,
+Fix it by providing a stub when semihosting is disabled.
 
-Alex
+Reported-by: Miroslav Rezanina <mrezanin@redhat.com>
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+---
+ target/arm/Makefile.objs    |  3 ++-
+ target/arm/arm-semi-stubs.c | 21 +++++++++++++++++++++
+ 2 files changed, 23 insertions(+), 1 deletion(-)
+ create mode 100644 target/arm/arm-semi-stubs.c
+
+diff --git a/target/arm/Makefile.objs b/target/arm/Makefile.objs
+index 6bdcc65c2c..39b02b1fa4 100644
+--- a/target/arm/Makefile.objs
++++ b/target/arm/Makefile.objs
+@@ -1,4 +1,5 @@
+-obj-y +=3D arm-semi.o
++obj-$(CONFIG_SEMIHOSTING) +=3D arm-semi.o
++obj-$(call lnot,$(CONFIG_SEMIHOSTING)) +=3D arm-semi-stubs.o
+ obj-$(CONFIG_SOFTMMU) +=3D machine.o psci.o arch_dump.o monitor.o
+ obj-$(CONFIG_KVM) +=3D kvm.o
+ obj-$(call land,$(CONFIG_KVM),$(call lnot,$(TARGET_AARCH64))) +=3D kvm32=
+.o
+diff --git a/target/arm/arm-semi-stubs.c b/target/arm/arm-semi-stubs.c
+new file mode 100644
+index 0000000000..a91ecbd9d5
+--- /dev/null
++++ b/target/arm/arm-semi-stubs.c
+@@ -0,0 +1,21 @@
++/*
++ *  Arm "Angel" semihosting stubs
++ *
++ * Copyright (c) 2019 Red Hat, Inc.
++ *
++ * Author:
++ *   Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
++ *
++ * SPDX-License-Identifier: GPL-2.0-or-later
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or la=
+ter.
++ * See the COPYING file in the top-level directory.
++ */
++
++#include "qemu/osdep.h"
++#include "cpu.h"
++
++target_ulong do_arm_semihosting(CPUARMState *env)
++{
++    g_assert_not_reached();
++}
+--=20
+2.20.1
+
 
