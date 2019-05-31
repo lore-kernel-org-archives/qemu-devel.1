@@ -2,65 +2,93 @@ Return-Path: <SRS0=hY9S=T7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_MUTT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A989C04AB6
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 May 2019 08:34:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D85B9C04AB6
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 May 2019 08:47:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 31B0B24353
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 May 2019 08:34:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 31B0B24353
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id A9AC7206C1
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 May 2019 08:47:59 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Mc18kiPC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A9AC7206C1
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:38612 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:38745 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hWczx-0003Dh-3w
-	for qemu-devel@archiver.kernel.org; Fri, 31 May 2019 04:34:49 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:57971)
+	id 1hWdCg-0006C4-UU
+	for qemu-devel@archiver.kernel.org; Fri, 31 May 2019 04:47:58 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:59817)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1hWcyr-0002eR-OS
-	for qemu-devel@nongnu.org; Fri, 31 May 2019 04:33:42 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hWdBb-0005tJ-Ew
+	for qemu-devel@nongnu.org; Fri, 31 May 2019 04:46:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1hWcyq-0000SR-HB
-	for qemu-devel@nongnu.org; Fri, 31 May 2019 04:33:41 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59496)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>)
-	id 1hWcyo-0000Lz-00; Fri, 31 May 2019 04:33:38 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 1AC043007148;
-	Fri, 31 May 2019 08:33:36 +0000 (UTC)
-Received: from localhost (ovpn-117-228.ams2.redhat.com [10.36.117.228])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 745C96FC1F;
-	Fri, 31 May 2019 08:33:35 +0000 (UTC)
-Date: Fri, 31 May 2019 09:33:34 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <20190531083334.GA29868@stefanha-x1.localdomain>
-References: <20190528084544.183558-1-vsementsov@virtuozzo.com>
-	<20190528084544.183558-2-vsementsov@virtuozzo.com>
+	(envelope-from <richard.henderson@linaro.org>) id 1hWdBa-0007cY-9C
+	for qemu-devel@nongnu.org; Fri, 31 May 2019 04:46:51 -0400
+Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:40018)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1hWdBZ-0007Yu-V8
+	for qemu-devel@nongnu.org; Fri, 31 May 2019 04:46:50 -0400
+Received: by mail-oi1-x244.google.com with SMTP id r136so7132918oie.7
+	for <qemu-devel@nongnu.org>; Fri, 31 May 2019 01:46:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
+	:mime-version:in-reply-to:content-language:content-transfer-encoding;
+	bh=AwRUex3oIHEgUoEGXrADY2L4vksNM7iAbuQigSiYYZE=;
+	b=Mc18kiPCsBg8SUP0D6uS5VPTgaueic8EzFqBemR5mSwoIq0bDmuQt5Ik9H1iXgqQnH
+	rdbAXPrmpWdN/bXE0k/Vti7JwUeRy6jp1xIPkAIkKZzhrdnjzWI8OA+GO6OV4zOv7FPR
+	oOJ++v/RyElCkBX3H59rVaaheodsar0UlSaNf+37FQ9PtJB8SZEb8WPXXL1enjjJaJ3l
+	Ji169Zg7w+wZAmH6z45EO5PF2jWI0EeIjUORBLziWmmctDx87sJ+p5yw/RSEkyN17rS8
+	4xDaq2FGkyotAYIx4zPVBTxdO0V05YIoUYKsty4FsBQjsmRZ82jgj6bzOQ/TXJJ77Yld
+	Fe1A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+	:date:user-agent:mime-version:in-reply-to:content-language
+	:content-transfer-encoding;
+	bh=AwRUex3oIHEgUoEGXrADY2L4vksNM7iAbuQigSiYYZE=;
+	b=WhsJ/NARRLT7NZgK16F0wBtjAPcAcViPQG1cNozUoMTYPfhcbBE1g/aR7icFtg5rrH
+	LhV3HHZztd5irjMABbFiN3DqjlbSxzL2Ymfo5tAsmD4EIjSMHpUhO/PcbaC3Gy5KtCmf
+	i7BLjDu4H1s8sJXQOpZHK46appH9Zq2fIC8JasoipWg6nSo8VSNBoo6lpEKzRAuek/1p
+	m/1U6iZ5UJRUnB2b868B/5SO3hGtNiHtRdC2t5ANvmBKeH1hUmjipy8NHKMARPbbKLDi
+	ARiiYnARzkFQs4YFV+Q9Gfzu16OK9CU9d2C4clZ666dWrPYgUb6i6ASi2C9Scs8zZw3M
+	h+AQ==
+X-Gm-Message-State: APjAAAXgcBk9W4Y+taiwWpbbVvAIgs/NV7B98zfURfINYRZaJWzezxnQ
+	wsTAP4eZ/KYAXoKdFzVvMG+KuQ==
+X-Google-Smtp-Source: APXvYqxZ6c8+I0VblfKALVRmPBcpV6PEQNGkMW46VQfp6u0qc/TGeU30Gw49TWE6MNl/dlXkOhI5gw==
+X-Received: by 2002:aca:4b41:: with SMTP id y62mr5337774oia.131.1559292408686; 
+	Fri, 31 May 2019 01:46:48 -0700 (PDT)
+Received: from [172.24.12.210] (168.189-204-159.bestelclientes.com.mx.
+	[189.204.159.168])
+	by smtp.gmail.com with ESMTPSA id 38sm1951730otv.3.2019.05.31.01.46.47
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Fri, 31 May 2019 01:46:47 -0700 (PDT)
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+	qemu-devel@nongnu.org
+References: <20190523204954.13122-1-richard.henderson@linaro.org>
+	<155865586800.24.17673050455759130330@549697c9ad12>
+	<87v9xr3ui8.fsf@zen.linaroharston>
+From: Richard Henderson <richard.henderson@linaro.org>
+Openpgp: preference=signencrypt
+Message-ID: <f42dfb1b-ad03-0bd6-efb3-100253b5201f@linaro.org>
+Date: Fri, 31 May 2019 03:46:45 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.7.0
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="Dxnq1zWXvFF0Q93v"
-Content-Disposition: inline
-In-Reply-To: <20190528084544.183558-2-vsementsov@virtuozzo.com>
-User-Agent: Mutt/1.11.4 (2019-03-13)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.41]);
-	Fri, 31 May 2019 08:33:36 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 1/2] util/iov: introduce
- qemu_iovec_init_extended
+In-Reply-To: <87v9xr3ui8.fsf@zen.linaroharston>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::244
+Subject: Re: [Qemu-devel] [PATCH v2 0/2] Update capstone module
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -72,116 +100,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, fam@euphon.net, qemu-devel@nongnu.org,
-	qemu-block@nongnu.org, mreitz@redhat.com
+Cc: david@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On 5/31/19 3:20 AM, Alex Bennée wrote:
+> 
+> no-reply@patchew.org writes:
+> 
+>> Patchew URL: https://patchew.org/QEMU/20190523204954.13122-1-richard.henderson@linaro.org/
+>>
+>>
+>>
+>> Hi,
+>>
+>> This series failed build test on s390x host. Please find the details below.
+>>
+>> === TEST SCRIPT BEGIN ===
+>> #!/bin/bash
+>> # Testing script will be invoked under the git checkout with
+>> # HEAD pointing to a commit that has the patches applied on top of "base"
+>> # branch
+>> set -e
+>> CC=$HOME/bin/cc
+>> INSTALL=$PWD/install
+>> BUILD=$PWD/build
+>> mkdir -p $BUILD $INSTALL
+>> SRC=$PWD
+>> cd $BUILD
+>> $SRC/configure --cc=$CC --prefix=$INSTALL
+>> make -j4
+>> # XXX: we need reliable clean up
+>> # make check -j4 V=1
+>> make install
+>>
+>> echo
+>> echo "=== ENV ==="
+>> env
+>>
+>> echo
+>> echo "=== PACKAGES ==="
+>> rpm -qa
+>> === TEST SCRIPT END ===
+>>
+>>   GEN     ui/input-keymap-qcode-to-atset1.c
+>>   CC      cs.o
+>>   CC      utils.o
+>> cs.c:17:10: fatal error: capstone/capstone.h: No such file or directory
+>>    17 | #include <capstone/capstone.h>
+>>       |          ^~~~~~~~~~~~~~~~~~~~~
+>> compilation terminated.
+>> ---
+>>   CC      /var/tmp/patchew-tester-tmp-c6t41dq_/src/build/slirp/src/socket.o
+>> In file included from utils.h:13,
+>>                  from utils.c:12:
+>> cs_priv.h:7:10: fatal error: capstone/capstone.h: No such file or directory
+>>     7 | #include <capstone/capstone.h>
+>>       |          ^~~~~~~~~~~~~~~~~~~~~
+>> compilation terminated.
+>>
+>>
+>> The full log is available at
+>> http://patchew.org/logs/20190523204954.13122-1-richard.henderson@linaro.org/testing.s390x/?type=message.
+> 
+> I saw this on my laptop (which doesn't have system capstone installed)
+> as well. Did I imagine there was a patch floating around to deal with
+> the captone/capstone inconsistency?
 
---Dxnq1zWXvFF0Q93v
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+You did see one, but that was for users of capstone.
+This is while building capstone itself.
 
-On Tue, May 28, 2019 at 11:45:43AM +0300, Vladimir Sementsov-Ogievskiy wrot=
-e:
-> diff --git a/util/iov.c b/util/iov.c
-> index 74e6ca8ed7..6bfd609998 100644
-> --- a/util/iov.c
-> +++ b/util/iov.c
-> @@ -353,6 +353,95 @@ void qemu_iovec_concat(QEMUIOVector *dst,
->      qemu_iovec_concat_iov(dst, src->iov, src->niov, soffset, sbytes);
->  }
-> =20
-> +/*
-> + * qiov_find_iov
-> + *
-> + * Return iov, where byte at @offset (in @qiov) is.
-> + * Update @offset to be offset inside that iov to the smae byte.
+This means that something changed in capstone's own build system that I failed
+to replicate while pulling it into ours, and I failed to notice because the
+build here found the system header instead.
 
-s/smae/same/
+Ho hum.
 
-> + */
-> +static struct iovec *qiov_find_iov(QEMUIOVector *qiov, size_t *offset)
-> +{
-> +    struct iovec *iov =3D qiov->iov;
-> +
-> +    assert(*offset < qiov->size);
-> +
-> +    while (*offset >=3D iov->iov_len) {
-> +        *offset -=3D iov->iov_len;
-> +        iov++;
-> +    }
-> +
-> +    return iov;
-> +}
-> +
-> +/*
-> + * qiov_slice
-> + *
-> + * Fund subarray of iovec's, containing requested range. @head would
 
-s/Fund/Find/
-
-> + * be offset in first iov (retruned by the function), @tail would be
-
-s/retruned/returned/
-
-> + * count of extra bytes in last iov (returned iov + @niov - 1).
-> + */
-> +static struct iovec *qiov_slice(QEMUIOVector *qiov,
-> +                                size_t offset, size_t len,
-> +                                size_t *head, size_t *tail, int *niov)
-> +{
-> +    struct iovec *iov =3D qiov_find_iov(qiov, &offset), *end_iov;
-> +    size_t end_offset;
-> +
-> +    assert(offset + len <=3D qiov->size);
-
-offset has already been modified by qiov_find_iov() in iov's
-initializer so this comparison is meaningless.  Fix:
-
-  struct iovec *iov;
-  struct iovec *end_iov;
-  size_t end_offset;
-
-  assert(offset + len <=3D qiov->size);
-
-  iov =3D qiov_find_iov(qiov, &offset);
-
-Perhaps qiov_find_iov() shouldn't reuse the offset argument for two
-different things (the offset from the beginning of qiov and the offset
-=66rom the beginning of the returned iovec).  This would eliminate this
-class of bugs.
-
-> +
-> +    end_offset =3D iov->iov_len;
-> +    end_iov =3D iov + 1;
-> +
-> +    while (end_offset - offset < len) {
-> +        end_offset +=3D end_iov->iov_len;
-> +        end_iov++;
-> +    }
-
-Hmm...this looks like qiov_find_iov().  Can this function be implemented
-in less code using two calls to qiov_find_iov() to find the first and
-last iovecs?
-
---Dxnq1zWXvFF0Q93v
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAlzw5t4ACgkQnKSrs4Gr
-c8iUvggApvor9mAqXU+kXo6qk5M0+azv71i+M/J84MdWUJAJMlcCpHYOIzxZjf+S
-cJduNY6ACc4W2aYUMU9zT77jG05pfoRwrv959XoL06oZpm0g7XQwIWEzEu9moyI5
-Y0Y0A7PSqvekrX6PLytxWf7ZJqQqsZZE0OT5XOC+433hQGEenNkAM61cGjZAdqSc
-GIl2h4cfI7berGLBMw8ZGedfwMX0ljzvip8NZEN9FMyZlxb1ZKmYCqzCDPwnbnTv
-VY6vwpfWd3qWqkv8p6uIAgN5qHq+KtAGYs8ccp9O+o6ojgbilU6G2pwJBicFoHbS
-lJGf1n4HpMFSO+6sPop9zbwZ2ZNofw==
-=ka0H
------END PGP SIGNATURE-----
-
---Dxnq1zWXvFF0Q93v--
+r~
 
