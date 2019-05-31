@@ -2,117 +2,91 @@ Return-Path: <SRS0=hY9S=T7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ED81AC04AB6
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 May 2019 13:39:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 764A3C04AB6
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 May 2019 13:41:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BB91C26979
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 May 2019 13:39:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 32A852698E
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 May 2019 13:41:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b="cbnu9o1S"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BB91C26979
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nutanix.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="EIAZs6KX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 32A852698E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:43659 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:43722 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hWhkm-0003q8-0i
-	for qemu-devel@archiver.kernel.org; Fri, 31 May 2019 09:39:28 -0400
+	id 1hWhmH-00056e-H4
+	for qemu-devel@archiver.kernel.org; Fri, 31 May 2019 09:41:01 -0400
 Received: from eggs.gnu.org ([209.51.188.92]:60751)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thanos.makatos@nutanix.com>) id 1hWhj9-0002Ps-DE
-	for qemu-devel@nongnu.org; Fri, 31 May 2019 09:37:48 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1hWhit-0002Ps-Kt
+	for qemu-devel@nongnu.org; Fri, 31 May 2019 09:37:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thanos.makatos@nutanix.com>) id 1hWheG-0003aL-A3
-	for qemu-devel@nongnu.org; Fri, 31 May 2019 09:32:46 -0400
-Received: from mx0b-002c1b01.pphosted.com ([148.163.155.12]:40022)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thanos.makatos@nutanix.com>)
-	id 1hWheF-0003Rk-AC
-	for qemu-devel@nongnu.org; Fri, 31 May 2019 09:32:44 -0400
-Received: from pps.filterd (m0127841.ppops.net [127.0.0.1])
-	by mx0b-002c1b01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x4VDOo0V012959
-	for <qemu-devel@nongnu.org>; Fri, 31 May 2019 06:32:31 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nutanix.com;
-	h=from : to : cc :
-	subject : date : message-id : content-type : content-transfer-encoding
-	: mime-version; s=proofpoint20171006;
-	bh=sAkoea4q13g3EzEOpxJY/TRD7JgIcH+BkWYIVcjd8DI=;
-	b=cbnu9o1SR6NQSCeLhVSkDI44VrpvQvtLhwcSPdGsHZkXGxaUVQZJWBQXvlpSShnp3e6F
-	5zM0u/bl6PR0mI0h6A1yrHwWdVxQy2jYGOWYMfTX4AlIZCRfJ+ZoAhIFd3DbzdnNPbx/
-	XTIVDkrNTjAcLUgUzhXfi8FoXa3q64Ss0o0mMncwbtgt40O7QxXVuUXk/xEhcBXDtP4A
-	eUzSOffmZ1GFMN1CFCb/WivJfNRKf5ul1vTlzf8pxeLVERlBXgY64vFXVaAcgFSw8tp4
-	uZrxaRjv9WsLRY4LTt0M2+IcGc+3W+GlycTwaKWnCQAw/eA5NY0XHTiv91/2dN/GkPuP
-	ug== 
-Received: from nam02-bl2-obe.outbound.protection.outlook.com
-	(mail-bl2nam02lp2056.outbound.protection.outlook.com [104.47.38.56])
-	by mx0b-002c1b01.pphosted.com with ESMTP id 2ssd3twbt5-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256
-	verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 31 May 2019 06:32:31 -0700
-Received: from MN2PR02MB6205.namprd02.prod.outlook.com (52.132.174.26) by
-	MN2PR02MB6464.namprd02.prod.outlook.com (52.132.175.221) with Microsoft
-	SMTP
-	Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
-	15.20.1943.18; Fri, 31 May 2019 13:32:29 +0000
-Received: from MN2PR02MB6205.namprd02.prod.outlook.com
-	([fe80::25d5:60b3:a680:7ebd]) by
-	MN2PR02MB6205.namprd02.prod.outlook.com
-	([fe80::25d5:60b3:a680:7ebd%3]) with mapi id 15.20.1922.021;
-	Fri, 31 May 2019 13:32:29 +0000
-From: Thanos Makatos <thanos.makatos@nutanix.com>
-To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Thread-Topic: QEMU tries to register to VFIO memory that is not RAM
-Thread-Index: AdUXtUBrTZM56mQoR86m4RxpHSXlmQ==
-Date: Fri, 31 May 2019 13:32:29 +0000
-Message-ID: <MN2PR02MB62053CE40CA6B4A97B32FA048B190@MN2PR02MB6205.namprd02.prod.outlook.com>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [62.254.189.133]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: e2fa6641-b41d-452f-ae1d-08d6e5cc6dde
-x-microsoft-antispam: BCL:0; PCL:0;
-	RULEID:(2390118)(7020095)(4652040)(8989299)(5600148)(711020)(4605104)(1401327)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(2017052603328)(7193020);
-	SRVR:MN2PR02MB6464; 
-x-ms-traffictypediagnostic: MN2PR02MB6464:
-x-proofpoint-crosstenant: true
-x-microsoft-antispam-prvs: <MN2PR02MB6464F64D40AA1F8CA9A6D5458B190@MN2PR02MB6464.namprd02.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:4303;
-x-forefront-prvs: 00540983E2
-x-forefront-antispam-report: SFV:NSPM;
-	SFS:(10019020)(366004)(39860400002)(396003)(346002)(376002)(136003)(189003)(199004)(33656002)(8676002)(486006)(5660300002)(3846002)(6116002)(68736007)(81156014)(81166006)(186003)(66066001)(107886003)(316002)(99286004)(2501003)(54906003)(476003)(6436002)(8936002)(6916009)(305945005)(14444005)(74316002)(6506007)(256004)(7696005)(53936002)(55016002)(558084003)(9686003)(5640700003)(7736002)(76116006)(52536014)(64756008)(71200400001)(66446008)(71190400001)(26005)(44832011)(25786009)(86362001)(4326008)(2906002)(14454004)(66476007)(73956011)(478600001)(66556008)(66946007)(2351001)(102836004)(64030200001);
-	DIR:OUT; SFP:1102; SCL:1; SRVR:MN2PR02MB6464;
-	H:MN2PR02MB6205.namprd02.prod.outlook.com; FPR:; SPF:None;
-	LANG:en; PTR:InfoNoRecords; MX:1; A:1; 
-received-spf: None (protection.outlook.com: nutanix.com does not designate
-	permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: z8oMsqKaidcEIJKXjGZ/5pEQlIMp6SLVUd6eVkfhMTPnTavQ9AI/+1gFM3YdVPK9ncguljKb1dXW5wNm4A3KTUYPVIISUjMuWRnplBcG4yLegIEBfQ0nCOinCFhScoao0u8/FZAeodNp9zEGPsbjcPyEXI0bJOJO4sriHMSTUxM3DNlIyXiwCHaeX1IiBGD576w3Z4QdCBKusDoO19Sy9Ok2l/eUyhApuzAHyObIBeg2qztgOz1YU9His77RPeufqMMBgV7Anp0xM4FzjRty79GZioAh5j0D7Nia2RqWqyb0v6I0+7qSsM/dh3Dm7n1XroPGibQ7JYge98Uy73GDJFbEanAiFHFAxk9IAJYedJPOSYD7lG/4u88BtzAx7WuFMJrRM23XI/7ZrH2sCxTZsHGm+qLNtv0rFX/dL+fLCgs=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <alex.bennee@linaro.org>) id 1hWhfF-0004yP-5Z
+	for qemu-devel@nongnu.org; Fri, 31 May 2019 09:33:46 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:42763)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1hWhfE-0004wn-TM
+	for qemu-devel@nongnu.org; Fri, 31 May 2019 09:33:45 -0400
+Received: by mail-wr1-x444.google.com with SMTP id l2so6543651wrb.9
+	for <qemu-devel@nongnu.org>; Fri, 31 May 2019 06:33:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=references:user-agent:from:to:cc:subject:in-reply-to:date
+	:message-id:mime-version:content-transfer-encoding;
+	bh=XR0dSMHDtnjqbjfje9BMpv23BYYDBeaqPe+YuFryDww=;
+	b=EIAZs6KXlvQZr5aWOaMwmcUA5cU8WXlf8KZMtYWTSn2+WanSMOg8eOXAgHu8qnIKeJ
+	Rbt9OwxZro+3LKKsCoc+sQvgRcqbsLMIrsn4Vk3wDii+YGBCqMnHUwH2eVZmqFegCWUA
+	ZhM1abunUWkpCBR+seobVzb28+X2m8hY7lPEooPH2RsQdPVFCSRJ+6Ur92xHBlzrZDGK
+	s2/SfJ9ZKepdSC/9OcogQXHeIAgmKUaoVMwXpyec4ygCR2RAstp1X3Jb3YmsSudGbauI
+	gSN+KXt3BuluMp6LNSe9cygkx/SIs2fJy3ENOJzFqPUr06PkQifos9TfjjxomoOWt3ko
+	jkOg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:references:user-agent:from:to:cc:subject
+	:in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+	bh=XR0dSMHDtnjqbjfje9BMpv23BYYDBeaqPe+YuFryDww=;
+	b=YN5HSOKN1LhhqRjpgc+nDqwE5cl8/u0Wf+nvw78JyipD3rdUGdXW3BREs+683fSJZa
+	7D7UOfD7sFgOF79qHqHIl7iY1HX2yAVtBfhNn3ByRHndyWQQhHrSnOCEUkfO+XHm7p7g
+	tcTHGBkJ5xyki95Q11WFGU6xvfuimVRmE4z6xP03A3DkJJNExo7Qm1BahdFvPvPkxsrz
+	LM9z+eRyqGneV8S7FQy80TgQ8tas/0LUhqosn3novfpd0x8gV1lD8Hy3F4DoEf1N20Nv
+	BAEF9lXrZGQvySxF3W0rZKYS2qZUOT1ZoPmyfYPrmzLaq2cli0TzGlU9qbp0BfFopYxy
+	b8bQ==
+X-Gm-Message-State: APjAAAUr2UWXNUsPuS2aAePwdUW2V7msFHNb5K3Ngh7FRjmAdjddMP8J
+	wY5R+jOQSAbbzmOc8dt/IqV2+g==
+X-Google-Smtp-Source: APXvYqxuBkLSfMaVspgxaUdf4P+Dld2LmojYYdNQYgKCK0BmcilcpQHgrLE8ECLgE/VlAqO5qnVq6Q==
+X-Received: by 2002:a5d:5391:: with SMTP id d17mr5914619wrv.340.1559309623114; 
+	Fri, 31 May 2019 06:33:43 -0700 (PDT)
+Received: from zen.linaroharston ([81.128.185.34])
+	by smtp.gmail.com with ESMTPSA id e6sm1089643wrw.83.2019.05.31.06.33.40
+	(version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+	Fri, 31 May 2019 06:33:40 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+	by zen.linaroharston (Postfix) with ESMTP id 40E0D1FF87;
+	Fri, 31 May 2019 14:33:40 +0100 (BST)
+References: <20190529064148.19856-1-arilou@gmail.com>
+	<20190529064148.19856-3-arilou@gmail.com>
+User-agent: mu4e 1.3.2; emacs 26.1
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Jon Doron <arilou@gmail.com>
+In-reply-to: <20190529064148.19856-3-arilou@gmail.com>
+Date: Fri, 31 May 2019 14:33:40 +0100
+Message-ID: <8736kuaguj.fsf@zen.linaroharston>
 MIME-Version: 1.0
-X-OriginatorOrg: nutanix.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e2fa6641-b41d-452f-ae1d-08d6e5cc6dde
-X-MS-Exchange-CrossTenant-originalarrivaltime: 31 May 2019 13:32:29.7843 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: bb047546-786f-4de1-bd75-24e5b6f79043
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: thanos.makatos@nutanix.com
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR02MB6464
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
-	definitions=2019-05-31_08:, , signatures=0
-X-Proofpoint-Spam-Reason: safe
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.155.12
-Subject: [Qemu-devel] QEMU tries to register to VFIO memory that is not RAM
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2a00:1450:4864:20::444
+Subject: Re: [Qemu-devel] [PATCH v12 02/20] gdbstub: Implement deatch (D
+ pkt) with new infra
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -124,14 +98,170 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Swapnil Ingle <swapnil.ingle@nutanix.com>,
-	Felipe Franciosi <felipe@nutanix.com>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-When configuring device pass-through via VFIO to a VM, I noticed that QEMU =
-tries to register (DMA_MAP) all memory regions of a guest (not only RAM). T=
-hat includes firmware regions like "pc.rom". Would a physical device ever n=
-eed access to those? Am I missing something?
+
+Jon Doron <arilou@gmail.com> writes:
+
+> Signed-off-by: Jon Doron <arilou@gmail.com>
+
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+
+> ---
+>  gdbstub.c | 101 +++++++++++++++++++++++++++++++++---------------------
+>  1 file changed, 61 insertions(+), 40 deletions(-)
+>
+> diff --git a/gdbstub.c b/gdbstub.c
+> index e6d895177b..1db322c15a 100644
+> --- a/gdbstub.c
+> +++ b/gdbstub.c
+> @@ -1413,11 +1413,6 @@ static inline int startswith(const char *string, c=
+onst char *pattern)
+>    return !strncmp(string, pattern, strlen(pattern));
+>  }
+>
+> -static int process_string_cmd(
+> -        GDBState *s, void *user_ctx, const char *data,
+> -        const GdbCmdParseEntry *cmds, int num_cmds)
+> -        __attribute__((unused));
+> -
+>  static int process_string_cmd(GDBState *s, void *user_ctx, const char *d=
+ata,
+>                                const GdbCmdParseEntry *cmds, int num_cmds)
+>  {
+> @@ -1463,6 +1458,55 @@ static int process_string_cmd(GDBState *s, void *u=
+ser_ctx, const char *data,
+>      return -1;
+>  }
+>
+> +static void run_cmd_parser(GDBState *s, const char *data,
+> +                           const GdbCmdParseEntry *cmd)
+> +{
+> +    if (!data) {
+> +        return;
+> +    }
+> +
+> +    /* In case there was an error during the command parsing we must
+> +    * send a NULL packet to indicate the command is not supported */
+> +    if (process_string_cmd(s, NULL, data, cmd, 1)) {
+> +        put_packet(s, "");
+> +    }
+> +}
+> +
+> +static void handle_detach(GdbCmdContext *gdb_ctx, void *user_ctx)
+> +{
+> +    GDBProcess *process;
+> +    GDBState *s =3D gdb_ctx->s;
+> +    uint32_t pid =3D 1;
+> +
+> +    if (s->multiprocess) {
+> +        if (!gdb_ctx->num_params) {
+> +            put_packet(s, "E22");
+> +            return;
+> +        }
+> +
+> +        pid =3D gdb_ctx->params[0].val_ul;
+> +    }
+> +
+> +    process =3D gdb_get_process(s, pid);
+> +    gdb_process_breakpoint_remove_all(s, process);
+> +    process->attached =3D false;
+> +
+> +    if (pid =3D=3D gdb_get_cpu_pid(s, s->c_cpu)) {
+> +        s->c_cpu =3D gdb_first_attached_cpu(s);
+> +    }
+> +
+> +    if (pid =3D=3D gdb_get_cpu_pid(s, s->g_cpu)) {
+> +        s->g_cpu =3D gdb_first_attached_cpu(s);
+> +    }
+> +
+> +    if (!s->c_cpu) {
+> +        /* No more process attached */
+> +        gdb_syscall_mode =3D GDB_SYS_DISABLED;
+> +        gdb_continue(s);
+> +    }
+> +    put_packet(s, "OK");
+> +}
+> +
+>  static int gdb_handle_packet(GDBState *s, const char *line_buf)
+>  {
+>      CPUState *cpu;
+> @@ -1477,6 +1521,7 @@ static int gdb_handle_packet(GDBState *s, const cha=
+r *line_buf)
+>      uint8_t *registers;
+>      target_ulong addr, len;
+>      GDBThreadIdKind thread_kind;
+> +    const GdbCmdParseEntry *cmd_parser =3D NULL;
+>
+>      trace_gdbstub_io_command(line_buf);
+>
+> @@ -1577,42 +1622,15 @@ static int gdb_handle_packet(GDBState *s, const c=
+har *line_buf)
+>          error_report("QEMU: Terminated via GDBstub");
+>          exit(0);
+>      case 'D':
+> -        /* Detach packet */
+> -        pid =3D 1;
+> -
+> -        if (s->multiprocess) {
+> -            unsigned long lpid;
+> -            if (*p !=3D ';') {
+> -                put_packet(s, "E22");
+> -                break;
+> -            }
+> -
+> -            if (qemu_strtoul(p + 1, &p, 16, &lpid)) {
+> -                put_packet(s, "E22");
+> -                break;
+> -            }
+> -
+> -            pid =3D lpid;
+> -        }
+> -
+> -        process =3D gdb_get_process(s, pid);
+> -        gdb_process_breakpoint_remove_all(s, process);
+> -        process->attached =3D false;
+> -
+> -        if (pid =3D=3D gdb_get_cpu_pid(s, s->c_cpu)) {
+> -            s->c_cpu =3D gdb_first_attached_cpu(s);
+> -        }
+> -
+> -        if (pid =3D=3D gdb_get_cpu_pid(s, s->g_cpu)) {
+> -            s->g_cpu =3D gdb_first_attached_cpu(s);
+> -        }
+> -
+> -        if (s->c_cpu =3D=3D NULL) {
+> -            /* No more process attached */
+> -            gdb_syscall_mode =3D GDB_SYS_DISABLED;
+> -            gdb_continue(s);
+> +        {
+> +            static const GdbCmdParseEntry detach_cmd_desc =3D {
+> +                .handler =3D handle_detach,
+> +                .cmd =3D "D",
+> +                .cmd_startswith =3D 1,
+> +                .schema =3D "?.l0"
+> +            };
+> +            cmd_parser =3D &detach_cmd_desc;
+>          }
+> -        put_packet(s, "OK");
+>          break;
+>      case 's':
+>          if (*p !=3D '\0') {
+> @@ -1985,6 +2003,9 @@ static int gdb_handle_packet(GDBState *s, const cha=
+r *line_buf)
+>          put_packet(s, buf);
+>          break;
+>      }
+> +
+> +    run_cmd_parser(s, line_buf, cmd_parser);
+> +
+>      return RS_IDLE;
+>  }
+
+
+--
+Alex Benn=C3=A9e
 
