@@ -3,49 +3,48 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 16C35C04AB6
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 May 2019 17:18:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 97CDDC04AB6
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 May 2019 17:20:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E079226B03
-	for <qemu-devel@archiver.kernel.org>; Fri, 31 May 2019 17:18:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E079226B03
+	by mail.kernel.org (Postfix) with ESMTPS id 5E8AF26CD1
+	for <qemu-devel@archiver.kernel.org>; Fri, 31 May 2019 17:20:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5E8AF26CD1
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:46802 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:46810 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hWlAj-0007Fv-6o
-	for qemu-devel@archiver.kernel.org; Fri, 31 May 2019 13:18:29 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:49678)
+	id 1hWlCQ-0008Dl-IG
+	for qemu-devel@archiver.kernel.org; Fri, 31 May 2019 13:20:14 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:50156)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hWl9D-0006ZI-Io
-	for qemu-devel@nongnu.org; Fri, 31 May 2019 13:16:56 -0400
+	(envelope-from <david@redhat.com>) id 1hWlAy-0007bA-Lv
+	for qemu-devel@nongnu.org; Fri, 31 May 2019 13:18:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hWl98-0001OK-1u
-	for qemu-devel@nongnu.org; Fri, 31 May 2019 13:16:51 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58126)
+	(envelope-from <david@redhat.com>) id 1hWlAx-000308-LG
+	for qemu-devel@nongnu.org; Fri, 31 May 2019 13:18:44 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51292)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1hWl97-0001Mv-AT
-	for qemu-devel@nongnu.org; Fri, 31 May 2019 13:16:49 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1hWlAx-0002zZ-DP
+	for qemu-devel@nongnu.org; Fri, 31 May 2019 13:18:43 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 30C0E3082E64;
-	Fri, 31 May 2019 17:16:48 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id B5F5E81F1B;
+	Fri, 31 May 2019 17:18:37 +0000 (UTC)
 Received: from [10.36.116.233] (ovpn-116-233.ams2.redhat.com [10.36.116.233])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 25A525D9D1;
-	Fri, 31 May 2019 17:16:46 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 8E3844647D;
+	Fri, 31 May 2019 17:18:35 +0000 (UTC)
 To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
 References: <20190531104432.29379-1-david@redhat.com>
-	<20190531104432.29379-8-david@redhat.com>
-	<f984c5d3-2a30-2bb9-468c-5c8bb94b6ebf@linaro.org>
-	<1225a07f-4997-76ad-e9d4-d476980f6c52@linaro.org>
+	<20190531104432.29379-7-david@redhat.com>
+	<974e874b-bc19-d27d-ea8c-e64470da19cc@linaro.org>
 From: David Hildenbrand <david@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
@@ -92,23 +91,23 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
 	+8Umfre0Xt4713VxMygW0PnQt5aSQdMD58jHFxTk092mU+yIHj5LeYgvwSgZN4airXk5yRXl
 	SE+xAvmumFBY
 Organization: Red Hat GmbH
-Message-ID: <2738a209-52ca-3049-43ba-3cd390328376@redhat.com>
-Date: Fri, 31 May 2019 19:16:46 +0200
+Message-ID: <92387aef-4624-cc91-fac9-cf0a6db5f8da@redhat.com>
+Date: Fri, 31 May 2019 19:18:34 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <1225a07f-4997-76ad-e9d4-d476980f6c52@linaro.org>
+In-Reply-To: <974e874b-bc19-d27d-ea8c-e64470da19cc@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.46]);
-	Fri, 31 May 2019 17:16:48 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.25]);
+	Fri, 31 May 2019 17:18:42 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v1 07/23] s390x/tcg: Implement VECTOR FP
- CONVERT FROM FIXED 64-BIT
+Subject: Re: [Qemu-devel] [PATCH v1 06/23] s390x/tcg: Implement VECTOR FP
+ COMPARE (EQUAL|HIGH|HIGH OR EQUAL)
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -126,38 +125,71 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 31.05.19 19:15, Richard Henderson wrote:
-> On 5/31/19 12:10 PM, Richard Henderson wrote:
->> On 5/31/19 5:44 AM, David Hildenbrand wrote:
->>> +static DisasJumpType op_vcdg(DisasContext *s, DisasOps *o)
->>> +{
->>> +    const uint8_t fpf = get_field(s->fields, m3);
->>> +    const uint8_t m4 = get_field(s->fields, m4);
->>> +    const uint8_t erm = get_field(s->fields, m5);
->>> +    const bool se = extract32(m4, 3, 1);
->>> +    gen_helper_gvec_2_ptr *fn;
->>> +
->>> +    if (fpf != FPF_LONG || extract32(m4, 0, 2) || erm > 7 || erm == 2) {
->>
->> Please split out the erm validity check.
->> We have fpinst_extract_m34 doing some of this now;
->> it would be a shame to replicate it more.
-> 
-> Hmm.  Or perhaps you aren't replicating it because it's only used by these
-> conversions, and both signed and unsigned go through this same function?
+On 31.05.19 18:53, Richard Henderson wrote:
+> On 5/31/19 5:44 AM, David Hildenbrand wrote:
+>> +static int vfc64(S390Vector *v1, const S390Vector *v2, const S390Vect=
+or *v3,
+>> +                 CPUS390XState *env, bool s, bool test_equal, bool te=
+st_high,
+>> +                 uintptr_t retaddr)
+>> +{
+>> +    uint8_t vxc, vec_exc =3D 0;
+>> +    S390Vector tmp =3D {};
+>> +    int match =3D 0;
+>> +    int i;
+>> +
+>> +    for (i =3D 0; i < 2; i++) {
+>> +        const float64 a =3D make_float64(s390_vec_read_element64(v2, =
+i));
+>> +        const float64 b =3D make_float64(s390_vec_read_element64(v3, =
+i));
+>> +        const int cmp =3D float64_compare_quiet(a, b, &env->fpu_statu=
+s);
+>> +
+>> +        if ((cmp =3D=3D float_relation_equal && test_equal) ||
+>> +            (cmp =3D=3D float_relation_greater && test_high)) {
+>=20
+> It might be easier to pass in the comparison function instead of test_e=
+qual and
+> test_high (float64_eq_quiet, float64_lt_quiet) and swap the arguments t=
+o turn
+> lt into gt (not affecting eq).
+>=20
+> This will let you pass float64_eq and float64_lt when it comes time to =
+support
+> the SQ bit for the vector-enhancment-1 facility.
+>=20
+> Otherwise you'll have 3 bools passed in and a bit of a mess here.
 
-Right, the check is only at one place in this file. Thanks!
+Very good idea!
 
-> 
-> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-> 
-> 
+>=20
+>=20
+>> +    if (match =3D=3D i + 1) {
+>> +        return 0;
+>=20
+> This doesn't look right.  How can match =3D=3D 3,
+> with i =3D=3D 2 when not exiting the loop early.
+>=20
+> The vxc case is handled via longjmp, I think,
+> which leaves the S case to handle here.
+>=20
+> Perhaps better as
+>=20
+> 	if (match) {
+> 	    return s || match =3D=3D 2 ? 0 : 1;
+> 	}
+> 	return 3;
+
+Yes indeed, thanks for catching this.
+
+>=20
+>=20
 > r~
-> 
-> 
+>=20
 
 
--- 
+--=20
 
 Thanks,
 
