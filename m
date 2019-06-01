@@ -3,91 +3,83 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F32FC28CC1
-	for <qemu-devel@archiver.kernel.org>; Sat,  1 Jun 2019 09:35:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 81ACCC28CC1
+	for <qemu-devel@archiver.kernel.org>; Sat,  1 Jun 2019 09:54:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 537F4271B4
-	for <qemu-devel@archiver.kernel.org>; Sat,  1 Jun 2019 09:35:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4E2CA271CE
+	for <qemu-devel@archiver.kernel.org>; Sat,  1 Jun 2019 09:54:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="NJGYSPLy"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 537F4271B4
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="QyDonpZL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4E2CA271CE
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:34763 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:34904 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hX0Qa-0003tE-AW
-	for qemu-devel@archiver.kernel.org; Sat, 01 Jun 2019 05:35:52 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:45723)
+	id 1hX0ii-0006sD-Vz
+	for qemu-devel@archiver.kernel.org; Sat, 01 Jun 2019 05:54:37 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:47490)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hX0Pl-0003Vo-Tn
-	for qemu-devel@nongnu.org; Sat, 01 Jun 2019 05:35:02 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1hX0hl-0006Jo-Qq
+	for qemu-devel@nongnu.org; Sat, 01 Jun 2019 05:53:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hX0Pk-0007h2-VA
-	for qemu-devel@nongnu.org; Sat, 01 Jun 2019 05:35:01 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:34588)
+	(envelope-from <peter.maydell@linaro.org>) id 1hX0Vl-0003gZ-Ju
+	for qemu-devel@nongnu.org; Sat, 01 Jun 2019 05:41:14 -0400
+Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:45231)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1hX0Pk-0007eW-O6
-	for qemu-devel@nongnu.org; Sat, 01 Jun 2019 05:35:00 -0400
-Received: by mail-wr1-x441.google.com with SMTP id f8so8048580wrt.1
-	for <qemu-devel@nongnu.org>; Sat, 01 Jun 2019 02:35:00 -0700 (PDT)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1hX0Vl-0003f3-8M
+	for qemu-devel@nongnu.org; Sat, 01 Jun 2019 05:41:13 -0400
+Received: by mail-oi1-x243.google.com with SMTP id b20so5984131oie.12
+	for <qemu-devel@nongnu.org>; Sat, 01 Jun 2019 02:41:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=references:user-agent:from:to:cc:subject:in-reply-to:date
-	:message-id:mime-version:content-transfer-encoding;
-	bh=eer2gU7Njkk/2flakzZQaQX21JoLyyIwVLLnnGnhZ+I=;
-	b=NJGYSPLyxEWXp0UeTY+Ag7wnZ1IfhqV/EHAE47ndYBG+oEYAQ3c9SiH7nBGkS/Lp/c
-	ln5rgxUoRst/YSfYjOrVmP4/gLllaIXMEwTcqEOgdzItCTHyCrT+WllH8vYVW/1JJ/zX
-	R8FVTAeVK5qqPDRbmCTBSydnVdGbTaCRAeh/axsqOeWpKA3IAcWu9sTDiLY0LcBF5qx2
-	Q0t+cUP1hp1BlfE7NDwwUOb8Okj3P6POd7zzV2g/+4iaLZNgocEmOGcjcnhU9SWp3Usj
-	bk+Fftnfm4egPTUj9J4vy32JAijYFl9i3Kfd/ZJFY2vzgD9iV82ocnwPpI9OsEZKUZOh
-	pkTA==
+	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+	:cc:content-transfer-encoding;
+	bh=OyUncQWuC08e2sp/rFTLIQ/A4TeV+nXqHCw5HdY5vb8=;
+	b=QyDonpZLae3Wi9OBqK3+qYu+BFdGsro9wUOt1sj4o/EtO4M5bnVPofUs3rUK4OpZ3R
+	AJTGQW3ySU3F7w+bWzpeja47O+f7Nokdoc5gp68lKDQyZWd3maOihtcPmn2dPttXse0g
+	BZJ4A5LUw6H0CPYVrmPTCiPYn24U3k3QjeiWe/TDsE6o4ghPxlkvW2uVc879K2aU8ci5
+	pndCY1RCRGi/ux8BWH9YUcYR+/hYqv845J5vyct12LpoUazelGS4bjYrxIrd6Ddrp1sA
+	9d7baKytIFARbVbDpcqiYExR1ZPc8c4ATUMsde08Ga2dW68OrpNcdjvORDYfwLmZqvm8
+	zU8Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:references:user-agent:from:to:cc:subject
-	:in-reply-to:date:message-id:mime-version:content-transfer-encoding;
-	bh=eer2gU7Njkk/2flakzZQaQX21JoLyyIwVLLnnGnhZ+I=;
-	b=Wf/TCLZ7gvLx3hIFZsB1S9kil30q3lsJWZhiwN/ka/CyEg0Bm26J66+I9nBlIBAsS4
-	2kOYQ42pjmIGExPlSDhpMWF0evq9IwIXZw8K9XDI0jcYw4qFU46d97B92F5aQvsLi8BF
-	pA4zb3wNhcSFhLEFdS+/zCW2uQbcsdL4shMY7ZoDc0AQFO/Aq6yBKE50b5fSjXV5+yzt
-	Ovejfxywy1L8eReBzry39zgVaRDIQUV4dybIYxC6hk+zzY8eUtmm/naiqgLnbTj3dkjf
-	HPzX2ciejkdyTk9p+J+E4lWwycnMG20K7fbQVnvQz7s5WB4zGBwpYJVeB/5+c0mDGift
-	Za0A==
-X-Gm-Message-State: APjAAAVV4X3Cna0Gjn4KM12uIaB5tDw9NMK6VKzM3wXbYCmjVrK2mBk4
-	l0ok4Py+wWpzLYmEkaooo6j8IA==
-X-Google-Smtp-Source: APXvYqzg66DkTEqbYLbWC+eYOIwnSIa7izfxeCqTqsmBXD+Yix9o4uoYUkhnNsUhfzApapMToQ9MaQ==
-X-Received: by 2002:a5d:5189:: with SMTP id k9mr1662054wrv.329.1559381699162; 
-	Sat, 01 Jun 2019 02:34:59 -0700 (PDT)
-Received: from zen.linaroharston ([81.128.185.34])
-	by smtp.gmail.com with ESMTPSA id
-	197sm8797252wma.36.2019.06.01.02.34.57
-	(version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-	Sat, 01 Jun 2019 02:34:58 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
-	by zen.linaroharston (Postfix) with ESMTP id 5877D1FF87;
-	Sat,  1 Jun 2019 10:34:57 +0100 (BST)
+	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+	:message-id:subject:to:cc:content-transfer-encoding;
+	bh=OyUncQWuC08e2sp/rFTLIQ/A4TeV+nXqHCw5HdY5vb8=;
+	b=fCqWE8otfuqWkkhcp+AGHvf9hNsrSW3QQ/CRNtxNPZXbSs5j148e+peuienm4SlJYF
+	d80Y7rOm4px8GzBpD94pMYvJxnUVrqZ9uBJvjbrMEWzu7nvX8enIRGhdaSKJc5z6YOTX
+	4P1i0fjRMnuDia144PhBkOit1VOglv6A7zLWRWcs7pzFWrJNYxkd5s/wqOPfBSg0CYyR
+	MmVf8IP+YPm2Z28qhlKWpWteSMSiwAjPjaVV4Xa4WI6YuNFrhaJZ/BVrvB806ob+JYZc
+	zxOcp84Q8qRVD+dLQLIItGmT54Fqg8FiPqzdrWiMeKJCy6s1LmV1eNz5EsYuvoiigar5
+	AuOQ==
+X-Gm-Message-State: APjAAAUljBtyQWDP7rxSSbVTaxe3zRWDiECIagjD1MEV2hPkKBB74DL/
+	dXaHV/jZdLUvv36fKuza2sWPoHf1Q/1SGmDWb/dukQ==
+X-Google-Smtp-Source: APXvYqwR0YYSNGuYMUwi4bf4oidZ/wpUgurceVuHhW7+R4GNzSCV4ikULZoJ1fLHluUwarAJZbCWhrqstj13uuNZF3k=
+X-Received: by 2002:aca:6cc1:: with SMTP id h184mr1748680oic.170.1559382071628;
+	Sat, 01 Jun 2019 02:41:11 -0700 (PDT)
+MIME-Version: 1.0
 References: <20190531154735.20809-1-philmd@redhat.com>
 	<CAFEAcA9TJGq-8fMv2amQEEGz9QKCNWYwJxCXrjqSh=Yc87yTww@mail.gmail.com>
 	<947e851b-4b95-3126-2eaf-d5d16f8b831b@redhat.com>
 	<431872249.25606899.1559321648368.JavaMail.zimbra@redhat.com>
 	<CAFEAcA_KKH62rK2pbR8dWXOCJWe1X8wif5whc+y0_e-hTpmoRQ@mail.gmail.com>
-User-agent: mu4e 1.3.2; emacs 26.1
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Peter Maydell <peter.maydell@linaro.org>
-In-reply-to: <CAFEAcA_KKH62rK2pbR8dWXOCJWe1X8wif5whc+y0_e-hTpmoRQ@mail.gmail.com>
-Date: Sat, 01 Jun 2019 10:34:57 +0100
-Message-ID: <87lfyl8x8e.fsf@zen.linaroharston>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+	<87lfyl8x8e.fsf@zen.linaroharston>
+In-Reply-To: <87lfyl8x8e.fsf@zen.linaroharston>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Sat, 1 Jun 2019 10:41:00 +0100
+Message-ID: <CAFEAcA9W315__M3rGxarUOKkGo9PyqrDPa6bG7MWOv1jC0sFhw@mail.gmail.com>
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2a00:1450:4864:20::441
+X-Received-From: 2607:f8b0:4864:20::243
 Subject: Re: [Qemu-devel] [RFC PATCH 0/2] target: Build with
  CONFIG_SEMIHOSTING disabled
 X-BeenThere: qemu-devel@nongnu.org
@@ -109,35 +101,29 @@ Cc: Samuel Ortiz <sameo@linux.intel.com>,
 	Aleksandar Markovic <amarkovic@wavecomp.com>,
 	Paolo Bonzini <pbonzini@redhat.com>,
 	Miroslav Rezanina <mrezanin@redhat.com>,
-	Philippe =?utf-8?Q?Mathieu-Da?= =?utf-8?Q?ud=C3=A9?=
-	<philmd@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
+	=?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+	Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-Peter Maydell <peter.maydell@linaro.org> writes:
-
-> On Fri, 31 May 2019 at 17:54, Miroslav Rezanina <mrezanin@redhat.com> wro=
-te:
->> What about CONFIG_ARM_VIRT - can we use it to introduce dependency on
->> CONFIG_SEMIHOSTING or is there valid scenario of qemu build with CONFIG_=
-ARM_VIRT
->> enabled and CONFIG_SEMIHOSTING disabled?
+On Sat, 1 Jun 2019 at 10:34, Alex Benn=C3=A9e <alex.bennee@linaro.org> wrot=
+e:
 >
-> Semihosting is a feature that works on all Arm CPUs
-> regardless of which machine model you're using (or whether
-> you're using softmmu or linux-user), so I think
-> the machine's Kconfig fragment is the wrong place to try
-> to pull it in.
-
-Although amusingly it doesn't work in kvm but perhaps it should?
-
 >
-> thanks
-> -- PMM
+> Peter Maydell <peter.maydell@linaro.org> writes:
+> > Semihosting is a feature that works on all Arm CPUs
+> > regardless of which machine model you're using (or whether
+> > you're using softmmu or linux-user), so I think
+> > the machine's Kconfig fragment is the wrong place to try
+> > to pull it in.
+>
+> Although amusingly it doesn't work in kvm but perhaps it should?
 
+It would be nice if it did, but the problem IIRC is that semihosting
+hooks either SVC or HLT instructions, and inside KVM both of
+those go to EL1, ie to the guest, and can't be trapped to KVM.
 
---
-Alex Benn=C3=A9e
+thanks
+-- PMM
 
