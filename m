@@ -2,142 +2,65 @@ Return-Path: <SRS0=gcBw=UA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_MUTT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F4CAC04AB6
-	for <qemu-devel@archiver.kernel.org>; Sat,  1 Jun 2019 00:07:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 33956C04AB6
+	for <qemu-devel@archiver.kernel.org>; Sat,  1 Jun 2019 02:50:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D8E0A27041
-	for <qemu-devel@archiver.kernel.org>; Sat,  1 Jun 2019 00:07:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D8E0A27041
+	by mail.kernel.org (Postfix) with ESMTPS id F37C1270C2
+	for <qemu-devel@archiver.kernel.org>; Sat,  1 Jun 2019 02:50:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F37C1270C2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:50725 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:51871 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hWrYp-0002wg-30
-	for qemu-devel@archiver.kernel.org; Fri, 31 May 2019 20:07:47 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:57569)
+	id 1hWu63-00055Y-U3
+	for qemu-devel@archiver.kernel.org; Fri, 31 May 2019 22:50:15 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:46103)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1hWrXz-0002bE-FV
-	for qemu-devel@nongnu.org; Fri, 31 May 2019 20:06:56 -0400
+	(envelope-from <peterx@redhat.com>) id 1hWu5G-0004lb-NC
+	for qemu-devel@nongnu.org; Fri, 31 May 2019 22:49:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1hWrXy-00079m-1o
-	for qemu-devel@nongnu.org; Fri, 31 May 2019 20:06:55 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41344)
+	(envelope-from <peterx@redhat.com>) id 1hWtxY-0004N5-25
+	for qemu-devel@nongnu.org; Fri, 31 May 2019 22:41:28 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37414)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jsnow@redhat.com>)
-	id 1hWrXu-00077Z-Om; Fri, 31 May 2019 20:06:50 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1hWtxX-0004MC-TN
+	for qemu-devel@nongnu.org; Fri, 31 May 2019 22:41:28 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+	[10.5.11.23])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id BC05E368FF;
-	Sat,  1 Jun 2019 00:06:49 +0000 (UTC)
-Received: from [10.18.17.164] (dhcp-17-164.bos.redhat.com [10.18.17.164])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 6F9F588B28;
-	Sat,  1 Jun 2019 00:06:47 +0000 (UTC)
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
-	qemu-devel@nongnu.org, qemu-block@nongnu.org
-References: <20190531163202.162543-1-vsementsov@virtuozzo.com>
-	<20190531163202.162543-7-vsementsov@virtuozzo.com>
-From: John Snow <jsnow@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
-	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
-Message-ID: <38975505-c3ed-982e-1875-5f6d650f01da@redhat.com>
-Date: Fri, 31 May 2019 20:06:47 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	by mx1.redhat.com (Postfix) with ESMTPS id A4FC43179B49
+	for <qemu-devel@nongnu.org>; Sat,  1 Jun 2019 02:41:25 +0000 (UTC)
+Received: from xz-x1 (ovpn-12-71.pek2.redhat.com [10.72.12.71])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 47BBC19C69;
+	Sat,  1 Jun 2019 02:41:21 +0000 (UTC)
+Date: Sat, 1 Jun 2019 10:41:15 +0800
+From: Peter Xu <peterx@redhat.com>
+To: Juan Quintela <quintela@redhat.com>
+Message-ID: <20190601024115.GA4958@xz-x1>
+References: <20190530092919.26059-1-peterx@redhat.com>
+	<20190530092919.26059-5-peterx@redhat.com>
+	<87a7f2ok0m.fsf@trasno.org>
 MIME-Version: 1.0
-In-Reply-To: <20190531163202.162543-7-vsementsov@virtuozzo.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Content-Disposition: inline
+In-Reply-To: <87a7f2ok0m.fsf@trasno.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.30]);
-	Sat, 01 Jun 2019 00:06:49 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.41]);
+	Sat, 01 Jun 2019 02:41:25 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2 6/9] block/qcow2-bitmap: do not remove
- bitmaps on reopen-ro
+Subject: Re: [Qemu-devel] [PATCH v3 04/12] memory: Don't set migration
+ bitmap when without migration
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -149,164 +72,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, kwolf@redhat.com, den@openvz.org, mreitz@redhat.com
+Cc: Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+	qemu-devel@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-
-On 5/31/19 12:31 PM, Vladimir Sementsov-Ogievskiy wrote:
-> qcow2_reopen_bitmaps_ro wants to store bitmaps and then mark them all
-> readonly. But the latter don't work, as
-> qcow2_store_persistent_dirty_bitmaps removes bitmaps after storing.
-> It's OK for inactivation but bad idea for reopen-ro. And this leads to
-> the following bug:
+On Fri, May 31, 2019 at 03:01:29PM +0200, Juan Quintela wrote:
+> Peter Xu <peterx@redhat.com> wrote:
+> > Similar to 9460dee4b2 ("memory: do not touch code dirty bitmap unless
+> > TCG is enabled", 2015-06-05) but for the migration bitmap - we can
+> > skip the MIGRATION bitmap update if migration not enabled.
+> >
+> > Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+> > Signed-off-by: Peter Xu <peterx@redhat.com>
 > 
-> Assume we have persistent bitmap 'bitmap0'.
-> Create external snapshot
->   bitmap0 is stored and therefore removed
-> Commit snapshot
->   now we have no bitmaps
-> Do some writes from guest (*)
->   they are not marked in bitmap
-> Shutdown
-> Start
->   bitmap0 is loaded as valid, but it is actually broken! It misses
->   writes (*)
-> Incremental backup
->   it will be inconsistent
+> Reviewed-by: Juan Quintela <quintela@redhat.com>
 > 
-> So, let's stop removing bitmaps on reopen-ro. But don't rejoice:
-> reopening bitmaps to rw is broken too, so the whole scenario will not
-> work after this patch and we can't enable corresponding test cases in
-> 255 iotests still. Reopening bitmaps rw will be fixed in the following
-> patches.
-> 
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->  block/qcow2.h        |  3 ++-
->  block/qcow2-bitmap.c | 46 +++++++++++++++++++++++++++++---------------
->  block/qcow2.c        |  2 +-
->  3 files changed, 34 insertions(+), 17 deletions(-)
-> 
-> diff --git a/block/qcow2.h b/block/qcow2.h
-> index 88a2030f54..4c8435141b 100644
-> --- a/block/qcow2.h
-> +++ b/block/qcow2.h
-> @@ -734,7 +734,8 @@ Qcow2BitmapInfoList *qcow2_get_bitmap_info_list(BlockDriverState *bs,
->                                                  Error **errp);
->  int qcow2_reopen_bitmaps_rw(BlockDriverState *bs, Error **errp);
->  int qcow2_truncate_bitmaps_check(BlockDriverState *bs, Error **errp);
-> -void qcow2_store_persistent_dirty_bitmaps(BlockDriverState *bs, Error **errp);
-> +void qcow2_store_persistent_dirty_bitmaps(BlockDriverState *bs,
-> +                                          bool release_stored, Error **errp);
->  int qcow2_reopen_bitmaps_ro(BlockDriverState *bs, Error **errp);
->  bool qcow2_can_store_new_dirty_bitmap(BlockDriverState *bs,
->                                        const char *name,
-> diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
-> index fbeee37243..25b1e069a7 100644
-> --- a/block/qcow2-bitmap.c
-> +++ b/block/qcow2-bitmap.c
-> @@ -1432,7 +1432,29 @@ fail:
->      bitmap_list_free(bm_list);
->  }
->  
-> -void qcow2_store_persistent_dirty_bitmaps(BlockDriverState *bs, Error **errp)
-> +/*
-> + * qcow2_store_persistent_dirty_bitmaps
-> + *
-> + * Stores persistent BdrvDirtyBitmap's.
-> + *
+> But if we ever decide to _not_ dirty all the bitmap at start (only used
+> pages) we need to fix this.
 
-No apostrophe for plural's
+Right, but IMHO we can never avoid doing it, because kvm (and also the
+per-ramblock dirty bitmaps) will only capture "dirtied pages" after
+log sync has started.  One example is what if one page P is never been
+touched after log_sync?  Then in kvm dirty log it'll never be set, and
+the only way to make sure we will still migrate that page P (that
+could be touched before log_sync so it might still contain valid data
+rather than a zero page) is to dirty all the pages at the start of
+migration (for now, it's ram_list_init_bitmaps).
 
-> + * @release_stored: if true, release BdrvDirtyBitmap's after storing to the
-> + * image. This is used in two cases, both via qcow2_inactivate:
-> + * 1. bdrv_close: It's correct to remove bitmaps on close.
-> + * 2. migration: If bitmaps are migrated through migration channel via
-> + *    'dirty-bitmaps' migration capability they are not handled by this code.
-> + *    Otherwise, it's OK to drop BdrvDirtyBitmap's and reload them on
-> + *    invalidation.
-> + *
-> + * Anyway, it's correct to remove BdrvDirtyBitmap's on inactivation, as
-> + * inactivation means that we lose control on disk, and therefore on bitmaps,
-> + * we should sync them and do not touch more.
-> + *
-> + * Contrariwise, we don't want to release any bitmaps on just reopen-to-ro,
-> + * when we need to store them, as image is still under our control, and it's
-> + * good to keep all the bitmaps in read-only mode.
-> + */
+Thanks for the review!
 
-I have to admit that 'Contrariwise' is not an everyday term for me. You
-should keep it in here just for fun, in my opinion.
-
-Regarding "it's good to keep all the bitmaps in read-only mode":
-More directly, keeping them read-only is correct because this is what
-would happen if we opened the node readonly to begin with, and whether
-we opened directly or reopened to that state shouldn't matter for the
-state we get afterward.
-
-> +void qcow2_store_persistent_dirty_bitmaps(BlockDriverState *bs,
-> +                                          bool release_stored, Error **errp)
->  {
->      BdrvDirtyBitmap *bitmap;
->      BDRVQcow2State *s = bs->opaque;
-> @@ -1545,20 +1567,14 @@ void qcow2_store_persistent_dirty_bitmaps(BlockDriverState *bs, Error **errp)
->          g_free(tb);
->      }
->  
-> -    QSIMPLEQ_FOREACH(bm, bm_list, entry) {
-> -        /* For safety, we remove bitmap after storing.
-> -         * We may be here in two cases:
-> -         * 1. bdrv_close. It's ok to drop bitmap.
-> -         * 2. inactivation. It means migration without 'dirty-bitmaps'
-> -         *    capability, so bitmaps are not marked with
-> -         *    BdrvDirtyBitmap.migration flags. It's not bad to drop them too,
-> -         *    and reload on invalidation.
-> -         */
-> -        if (bm->dirty_bitmap == NULL) {
-> -            continue;
-> -        }
-> +    if (release_stored) {
-> +        QSIMPLEQ_FOREACH(bm, bm_list, entry) {
-> +            if (bm->dirty_bitmap == NULL) {
-> +                continue;
-> +            }
->  
-> -        bdrv_release_dirty_bitmap(bs, bm->dirty_bitmap);
-> +            bdrv_release_dirty_bitmap(bs, bm->dirty_bitmap);
-> +        }
->      }
->  
->  success:
-> @@ -1586,7 +1602,7 @@ int qcow2_reopen_bitmaps_ro(BlockDriverState *bs, Error **errp)
->      BdrvDirtyBitmap *bitmap;
->      Error *local_err = NULL;
->  
-> -    qcow2_store_persistent_dirty_bitmaps(bs, &local_err);
-> +    qcow2_store_persistent_dirty_bitmaps(bs, false, &local_err);
->      if (local_err != NULL) {
->          error_propagate(errp, local_err);
->          return -EINVAL;
-> diff --git a/block/qcow2.c b/block/qcow2.c
-> index f2cb131048..02d8ce7534 100644
-> --- a/block/qcow2.c
-> +++ b/block/qcow2.c
-> @@ -2344,7 +2344,7 @@ static int qcow2_inactivate(BlockDriverState *bs)
->      int ret, result = 0;
->      Error *local_err = NULL;
->  
-> -    qcow2_store_persistent_dirty_bitmaps(bs, &local_err);
-> +    qcow2_store_persistent_dirty_bitmaps(bs, true, &local_err);
->      if (local_err != NULL) {
->          result = -EINVAL;
->          error_reportf_err(local_err, "Lost persistent bitmaps during "
-> 
-
-code:
-Reviewed-by: John Snow <jsnow@redhat.com>
-
-(You can adjust the docs as you need to on further review, if any, and
-keep that RB. --js)
+-- 
+Peter Xu
 
