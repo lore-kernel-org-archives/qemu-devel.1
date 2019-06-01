@@ -2,68 +2,56 @@ Return-Path: <SRS0=gcBw=UA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C1547C28CC1
-	for <qemu-devel@archiver.kernel.org>; Sat,  1 Jun 2019 15:50:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8473AC28CC1
+	for <qemu-devel@archiver.kernel.org>; Sat,  1 Jun 2019 18:33:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 66D8D276E4
-	for <qemu-devel@archiver.kernel.org>; Sat,  1 Jun 2019 15:50:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 66D8D276E4
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 591ED25840
+	for <qemu-devel@archiver.kernel.org>; Sat,  1 Jun 2019 18:33:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 591ED25840
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:38424 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:39946 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hX6HT-0000sa-9g
-	for qemu-devel@archiver.kernel.org; Sat, 01 Jun 2019 11:50:51 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:57800)
+	id 1hX8pK-000427-9N
+	for qemu-devel@archiver.kernel.org; Sat, 01 Jun 2019 14:33:58 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:48206)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1hX6Gi-0000Ur-8k
-	for qemu-devel@nongnu.org; Sat, 01 Jun 2019 11:50:05 -0400
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1hX8nR-0002sL-Lc
+	for qemu-devel@nongnu.org; Sat, 01 Jun 2019 14:32:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1hX6Gh-0004nu-3V
-	for qemu-devel@nongnu.org; Sat, 01 Jun 2019 11:50:04 -0400
-Received: from 3.mo68.mail-out.ovh.net ([46.105.58.60]:48513)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1hX8nQ-0005t4-EG
+	for qemu-devel@nongnu.org; Sat, 01 Jun 2019 14:32:01 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:59824 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1hX6Gg-0004kP-U0
-	for qemu-devel@nongnu.org; Sat, 01 Jun 2019 11:50:03 -0400
-Received: from player762.ha.ovh.net (unknown [10.109.146.50])
-	by mo68.mail-out.ovh.net (Postfix) with ESMTP id A530112F3B4
-	for <qemu-devel@nongnu.org>; Sat,  1 Jun 2019 17:49:51 +0200 (CEST)
-Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
-	[82.253.208.248]) (Authenticated sender: groug@kaod.org)
-	by player762.ha.ovh.net (Postfix) with ESMTPSA id 12BEA66264F2;
-	Sat,  1 Jun 2019 15:49:42 +0000 (UTC)
-Date: Sat, 1 Jun 2019 17:49:41 +0200
-From: Greg Kurz <groug@kaod.org>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20190601174941.00bf108f@bahia.lab.toulouse-stg.fr.ibm.com>
-In-Reply-To: <20190531193633.GI22103@habkost.net>
-References: <20190520231008.20140-1-mst@redhat.com>
-	<20190320112646.3712-2-xieyongji@baidu.com>
-	<20190524121909.277ae31e@bahia.lan>
-	<CAONzpcbf+AcY4yEO6hBnyp1dBaV4XgUrSTdU55B3S+wcn6gOVA@mail.gmail.com>
-	<20190527124446.6b809c7f@bahia.lan>
-	<20190527145329-mutt-send-email-mst@kernel.org>
-	<CAONzpcb6dtsnYhVW+yy0FijXtHoLavXX_bwStVEZC1hqJr9wSQ@mail.gmail.com>
-	<20190531193633.GI22103@habkost.net>
-X-Mailer: Claws Mail 3.16.0 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Ovh-Tracer-Id: 11429572907931965782
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduuddrudeffedgleeiucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddm
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 46.105.58.60
-Subject: Re: [Qemu-devel] [PULL v2 04/36] virtio: Introduce started flag to
- VirtioDevice
+	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
+	id 1hX8nQ-0005Pw-7e
+	for qemu-devel@nongnu.org; Sat, 01 Jun 2019 14:32:00 -0400
+Received: from localhost (localhost [127.0.0.1])
+	by mail.rt-rk.com (Postfix) with ESMTP id 6A0011A1D83;
+	Sat,  1 Jun 2019 20:30:55 +0200 (CEST)
+X-Virus-Scanned: amavisd-new at rt-rk.com
+Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
+	[10.10.13.43])
+	by mail.rt-rk.com (Postfix) with ESMTPSA id 402261A1D39;
+	Sat,  1 Jun 2019 20:30:55 +0200 (CEST)
+From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
+To: qemu-devel@nongnu.org
+Date: Sat,  1 Jun 2019 20:30:40 +0200
+Message-Id: <1559413846-4402-3-git-send-email-aleksandar.markovic@rt-rk.com>
+X-Mailer: git-send-email 2.7.4
+In-Reply-To: <1559413846-4402-1-git-send-email-aleksandar.markovic@rt-rk.com>
+References: <1559413846-4402-1-git-send-email-aleksandar.markovic@rt-rk.com>
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
+X-Received-From: 89.216.37.149
+Subject: [Qemu-devel] [PULL 2/8] target/mips: Add emulation of MMI
+ instruction PCPYLD
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -75,82 +63,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Zhang Yu <zhangyu31@baidu.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>, qemu-devel <qemu-devel@nongnu.org>,
-	Yongji Xie <elohimes@gmail.com>, Xie Yongji <xieyongji@baidu.com>,
-	David Gibson <david@gibson.dropbear.id.au>
+Cc: peter.maydell@linaro.org, amarkovic@wavecomp.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 31 May 2019 16:36:33 -0300
-Eduardo Habkost <ehabkost@redhat.com> wrote:
+From: Mateja Marjanovic <mateja.marjanovic@rt-rk.com>
 
-> On Tue, May 28, 2019 at 10:48:09AM +0800, Yongji Xie wrote:
-> > On Tue, 28 May 2019 at 02:54, Michael S. Tsirkin <mst@redhat.com> wrote:  
-> > >
-> > > On Mon, May 27, 2019 at 12:44:46PM +0200, Greg Kurz wrote:  
-> > > > On Fri, 24 May 2019 19:56:06 +0800
-> > > > Yongji Xie <elohimes@gmail.com> wrote:
-> > > >  
-> > > > > On Fri, 24 May 2019 at 18:20, Greg Kurz <groug@kaod.org> wrote:  
-> > > > > >
-> > > > > > On Mon, 20 May 2019 19:10:35 -0400
-> > > > > > "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> > > > > >  
-> > > > > > > From: Xie Yongji <xieyongji@baidu.com>  
-> [...]
-> > > > > > > @@ -1770,6 +1796,13 @@ static bool virtio_broken_needed(void *opaque)
-> > > > > > >      return vdev->broken;
-> > > > > > >  }
-> > > > > > >
-> > > > > > > +static bool virtio_started_needed(void *opaque)
-> > > > > > > +{
-> > > > > > > +    VirtIODevice *vdev = opaque;
-> > > > > > > +
-> > > > > > > +    return vdev->started;  
-> > > > > >
-> > > > > > Existing machine types don't know about the "virtio/started" subsection. This
-> > > > > > breaks migration to older QEMUs if the driver has started the device, ie. most
-> > > > > > probably always when it comes to live migration.
-> > > > > >
-> > > > > > My understanding is that we do try to support backward migration though. It
-> > > > > > is a regular practice in datacenters to migrate workloads without having to
-> > > > > > take care of the QEMU version. FWIW I had to fix similar issues downstream
-> > > > > > many times in the past because customers had filed bugs.
-> > > > > >  
-> > > > >
-> > > > > If we do need to support backward migration, for this patch, what I
-> > > > > can think of is to only migrate the flag in the case that guest kicks
-> > > > > but not set DRIVER_OK. This could fix backward migration in most case.  
-> > > >
-> > > > You mean something like that ?
-> > > >
-> > > > static bool virtio_started_needed(void *opaque)
-> > > > {
-> > > >     VirtIODevice *vdev = opaque;
-> > > >
-> > > >     return vdev->started && !(vdev->status & VIRTIO_CONFIG_S_DRIVER_OK);
-> > > > }
-> > > >  
-> > > > > Not sure if there is a more general approach...
-> > > > >  
-> > > >
-> > > > Another approach would be to only implement the started flag for
-> > > > machine version > 4.0. This can be achieved by adding a "use-started"
-> > > > property to the base virtio device, true by default and set to
-> > > > false by hw_compat_4_0.  
-> > >
-> > > I think this is best frankly.
-> > >  
-> > 
-> > Only implement the started flag for machine version > 4.0 might not be
-> > good because vhost-user-blk now need to use this flag. How about only
-> > migrating this flag for machine version > 4.0 instead?  
-> 
-> Was this implemented?  Is migration from QEMU 4.1 to QEMU 4.0
-> currently broken?
-> 
+Add emulation of MMI instruction PCPYLD. The emulation is implemented
+using TCG front end operations directly to achieve better performance.
 
-Answer is yes for both questions.
+Signed-off-by: Mateja Marjanovic <mateja.marjanovic@rt-rk.com>
+Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+Reviewed-by: Aleksandar Rikalo <arikalo@wavecomp.com>
+Message-Id: <1551712405-2530-3-git-send-email-mateja.marjanovic@rt-rk.com>
+---
+ target/mips/translate.c | 43 ++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 42 insertions(+), 1 deletion(-)
+
+diff --git a/target/mips/translate.c b/target/mips/translate.c
+index 704eb2b..b4fcbb1 100644
+--- a/target/mips/translate.c
++++ b/target/mips/translate.c
+@@ -24419,6 +24419,45 @@ static void gen_mmi_pcpyh(DisasContext *ctx)
+     }
+ }
+ 
++/*
++ *  PCPYLD rd, rs, rt
++ *
++ *    Parallel Copy Lower Doubleword
++ *
++ *   1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0
++ *  +-----------+---------+---------+---------+---------+-----------+
++ *  |    MMI    |   rs    |   rt    |   rd    | PCPYLD  |    MMI2   |
++ *  +-----------+---------+---------+---------+---------+-----------+
++ */
++static void gen_mmi_pcpyld(DisasContext *ctx)
++{
++    uint32_t rs, rt, rd;
++    uint32_t opcode;
++
++    opcode = ctx->opcode;
++
++    rs = extract32(opcode, 21, 5);
++    rt = extract32(opcode, 16, 5);
++    rd = extract32(opcode, 11, 5);
++
++    if (rd == 0) {
++        /* nop */
++    } else {
++        if (rs == 0) {
++            tcg_gen_movi_i64(cpu_mmr[rd], 0);
++        } else {
++            tcg_gen_mov_i64(cpu_mmr[rd], cpu_gpr[rs]);
++        }
++        if (rt == 0) {
++            tcg_gen_movi_i64(cpu_gpr[rd], 0);
++        } else {
++            if (rd != rt) {
++                tcg_gen_mov_i64(cpu_gpr[rd], cpu_gpr[rt]);
++            }
++        }
++    }
++}
++
+ #endif
+ 
+ 
+@@ -27433,7 +27472,6 @@ static void decode_mmi2(CPUMIPSState *env, DisasContext *ctx)
+     case MMI_OPC_2_PINTH:     /* TODO: MMI_OPC_2_PINTH */
+     case MMI_OPC_2_PMULTW:    /* TODO: MMI_OPC_2_PMULTW */
+     case MMI_OPC_2_PDIVW:     /* TODO: MMI_OPC_2_PDIVW */
+-    case MMI_OPC_2_PCPYLD:    /* TODO: MMI_OPC_2_PCPYLD */
+     case MMI_OPC_2_PMADDH:    /* TODO: MMI_OPC_2_PMADDH */
+     case MMI_OPC_2_PHMADH:    /* TODO: MMI_OPC_2_PHMADH */
+     case MMI_OPC_2_PAND:      /* TODO: MMI_OPC_2_PAND */
+@@ -27448,6 +27486,9 @@ static void decode_mmi2(CPUMIPSState *env, DisasContext *ctx)
+     case MMI_OPC_2_PROT3W:    /* TODO: MMI_OPC_2_PROT3W */
+         generate_exception_end(ctx, EXCP_RI); /* TODO: MMI_OPC_CLASS_MMI2 */
+         break;
++    case MMI_OPC_2_PCPYLD:
++        gen_mmi_pcpyld(ctx);
++        break;
+     default:
+         MIPS_INVAL("TX79 MMI class MMI2");
+         generate_exception_end(ctx, EXCP_RI);
+-- 
+2.7.4
+
 
