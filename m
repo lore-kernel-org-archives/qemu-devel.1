@@ -6,45 +6,45 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 64D79C04AB6
-	for <qemu-devel@archiver.kernel.org>; Sat,  1 Jun 2019 00:04:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F4CAC04AB6
+	for <qemu-devel@archiver.kernel.org>; Sat,  1 Jun 2019 00:07:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2FF3D26F1C
-	for <qemu-devel@archiver.kernel.org>; Sat,  1 Jun 2019 00:04:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2FF3D26F1C
+	by mail.kernel.org (Postfix) with ESMTPS id D8E0A27041
+	for <qemu-devel@archiver.kernel.org>; Sat,  1 Jun 2019 00:07:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D8E0A27041
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:50676 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:50725 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hWrVX-0001sT-CC
-	for qemu-devel@archiver.kernel.org; Fri, 31 May 2019 20:04:23 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:56852)
+	id 1hWrYp-0002wg-30
+	for qemu-devel@archiver.kernel.org; Fri, 31 May 2019 20:07:47 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:57569)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1hWrUX-0001Tr-UL
-	for qemu-devel@nongnu.org; Fri, 31 May 2019 20:03:22 -0400
+	(envelope-from <jsnow@redhat.com>) id 1hWrXz-0002bE-FV
+	for qemu-devel@nongnu.org; Fri, 31 May 2019 20:06:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1hWrLz-0006Qq-Jf
-	for qemu-devel@nongnu.org; Fri, 31 May 2019 19:54:32 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58924)
+	(envelope-from <jsnow@redhat.com>) id 1hWrXy-00079m-1o
+	for qemu-devel@nongnu.org; Fri, 31 May 2019 20:06:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41344)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <jsnow@redhat.com>)
-	id 1hWrLy-0006OP-9r; Fri, 31 May 2019 19:54:30 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
+	id 1hWrXu-00077Z-Om; Fri, 31 May 2019 20:06:50 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 41292307D840;
-	Fri, 31 May 2019 23:54:29 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id BC05E368FF;
+	Sat,  1 Jun 2019 00:06:49 +0000 (UTC)
 Received: from [10.18.17.164] (dhcp-17-164.bos.redhat.com [10.18.17.164])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 5780C601A0;
-	Fri, 31 May 2019 23:54:28 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 6F9F588B28;
+	Sat,  1 Jun 2019 00:06:47 +0000 (UTC)
 To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
 	qemu-devel@nongnu.org, qemu-block@nongnu.org
 References: <20190531163202.162543-1-vsementsov@virtuozzo.com>
-	<20190531163202.162543-6-vsementsov@virtuozzo.com>
+	<20190531163202.162543-7-vsementsov@virtuozzo.com>
 From: John Snow <jsnow@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
@@ -121,23 +121,23 @@ Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
 	i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
 	RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
 	glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
-Message-ID: <506d9259-f911-0fce-67b7-1a6e4e3066a5@redhat.com>
-Date: Fri, 31 May 2019 19:54:27 -0400
+Message-ID: <38975505-c3ed-982e-1875-5f6d650f01da@redhat.com>
+Date: Fri, 31 May 2019 20:06:47 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190531163202.162543-6-vsementsov@virtuozzo.com>
+In-Reply-To: <20190531163202.162543-7-vsementsov@virtuozzo.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.48]);
-	Fri, 31 May 2019 23:54:29 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.30]);
+	Sat, 01 Jun 2019 00:06:49 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2 5/9] block/qcow2-bitmap: drop
- qcow2_reopen_bitmaps_rw_hint()
+Subject: Re: [Qemu-devel] [PATCH v2 6/9] block/qcow2-bitmap: do not remove
+ bitmaps on reopen-ro
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -157,40 +157,156 @@ Sender: "Qemu-devel"
 
 
 On 5/31/19 12:31 PM, Vladimir Sementsov-Ogievskiy wrote:
-> The function is unused, drop it.
+> qcow2_reopen_bitmaps_ro wants to store bitmaps and then mark them all
+> readonly. But the latter don't work, as
+> qcow2_store_persistent_dirty_bitmaps removes bitmaps after storing.
+> It's OK for inactivation but bad idea for reopen-ro. And this leads to
+> the following bug:
+> 
+> Assume we have persistent bitmap 'bitmap0'.
+> Create external snapshot
+>   bitmap0 is stored and therefore removed
+> Commit snapshot
+>   now we have no bitmaps
+> Do some writes from guest (*)
+>   they are not marked in bitmap
+> Shutdown
+> Start
+>   bitmap0 is loaded as valid, but it is actually broken! It misses
+>   writes (*)
+> Incremental backup
+>   it will be inconsistent
+> 
+> So, let's stop removing bitmaps on reopen-ro. But don't rejoice:
+> reopening bitmaps to rw is broken too, so the whole scenario will not
+> work after this patch and we can't enable corresponding test cases in
+> 255 iotests still. Reopening bitmaps rw will be fixed in the following
+> patches.
 > 
 > Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 > ---
->  block/qcow2.h        |  2 --
->  block/qcow2-bitmap.c | 15 +--------------
->  2 files changed, 1 insertion(+), 16 deletions(-)
+>  block/qcow2.h        |  3 ++-
+>  block/qcow2-bitmap.c | 46 +++++++++++++++++++++++++++++---------------
+>  block/qcow2.c        |  2 +-
+>  3 files changed, 34 insertions(+), 17 deletions(-)
 > 
 > diff --git a/block/qcow2.h b/block/qcow2.h
-> index 567375e56c..88a2030f54 100644
+> index 88a2030f54..4c8435141b 100644
 > --- a/block/qcow2.h
 > +++ b/block/qcow2.h
-> @@ -732,8 +732,6 @@ int qcow2_check_bitmaps_refcounts(BlockDriverState *bs, BdrvCheckResult *res,
->  bool qcow2_load_dirty_bitmaps(BlockDriverState *bs, Error **errp);
->  Qcow2BitmapInfoList *qcow2_get_bitmap_info_list(BlockDriverState *bs,
+> @@ -734,7 +734,8 @@ Qcow2BitmapInfoList *qcow2_get_bitmap_info_list(BlockDriverState *bs,
 >                                                  Error **errp);
-> -int qcow2_reopen_bitmaps_rw_hint(BlockDriverState *bs, bool *header_updated,
-> -                                 Error **errp);
 >  int qcow2_reopen_bitmaps_rw(BlockDriverState *bs, Error **errp);
 >  int qcow2_truncate_bitmaps_check(BlockDriverState *bs, Error **errp);
->  void qcow2_store_persistent_dirty_bitmaps(BlockDriverState *bs, Error **errp);
+> -void qcow2_store_persistent_dirty_bitmaps(BlockDriverState *bs, Error **errp);
+> +void qcow2_store_persistent_dirty_bitmaps(BlockDriverState *bs,
+> +                                          bool release_stored, Error **errp);
+>  int qcow2_reopen_bitmaps_ro(BlockDriverState *bs, Error **errp);
+>  bool qcow2_can_store_new_dirty_bitmap(BlockDriverState *bs,
+>                                        const char *name,
 > diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
-> index 60b79f1dac..fbeee37243 100644
+> index fbeee37243..25b1e069a7 100644
 > --- a/block/qcow2-bitmap.c
 > +++ b/block/qcow2-bitmap.c
-> @@ -1102,8 +1102,7 @@ Qcow2BitmapInfoList *qcow2_get_bitmap_info_list(BlockDriverState *bs,
->      return list;
+> @@ -1432,7 +1432,29 @@ fail:
+>      bitmap_list_free(bm_list);
 >  }
 >  
-> -int qcow2_reopen_bitmaps_rw_hint(BlockDriverState *bs, bool *header_updated,
-> -                                 Error **errp)
-> +int qcow2_reopen_bitmaps_rw(BlockDriverState *bs, Error **errp)
+> -void qcow2_store_persistent_dirty_bitmaps(BlockDriverState *bs, Error **errp)
+> +/*
+> + * qcow2_store_persistent_dirty_bitmaps
+> + *
+> + * Stores persistent BdrvDirtyBitmap's.
+> + *
 
-Well, not used outside of this file. :)
+No apostrophe for plural's
 
+> + * @release_stored: if true, release BdrvDirtyBitmap's after storing to the
+> + * image. This is used in two cases, both via qcow2_inactivate:
+> + * 1. bdrv_close: It's correct to remove bitmaps on close.
+> + * 2. migration: If bitmaps are migrated through migration channel via
+> + *    'dirty-bitmaps' migration capability they are not handled by this code.
+> + *    Otherwise, it's OK to drop BdrvDirtyBitmap's and reload them on
+> + *    invalidation.
+> + *
+> + * Anyway, it's correct to remove BdrvDirtyBitmap's on inactivation, as
+> + * inactivation means that we lose control on disk, and therefore on bitmaps,
+> + * we should sync them and do not touch more.
+> + *
+> + * Contrariwise, we don't want to release any bitmaps on just reopen-to-ro,
+> + * when we need to store them, as image is still under our control, and it's
+> + * good to keep all the bitmaps in read-only mode.
+> + */
+
+I have to admit that 'Contrariwise' is not an everyday term for me. You
+should keep it in here just for fun, in my opinion.
+
+Regarding "it's good to keep all the bitmaps in read-only mode":
+More directly, keeping them read-only is correct because this is what
+would happen if we opened the node readonly to begin with, and whether
+we opened directly or reopened to that state shouldn't matter for the
+state we get afterward.
+
+> +void qcow2_store_persistent_dirty_bitmaps(BlockDriverState *bs,
+> +                                          bool release_stored, Error **errp)
+>  {
+>      BdrvDirtyBitmap *bitmap;
+>      BDRVQcow2State *s = bs->opaque;
+> @@ -1545,20 +1567,14 @@ void qcow2_store_persistent_dirty_bitmaps(BlockDriverState *bs, Error **errp)
+>          g_free(tb);
+>      }
+>  
+> -    QSIMPLEQ_FOREACH(bm, bm_list, entry) {
+> -        /* For safety, we remove bitmap after storing.
+> -         * We may be here in two cases:
+> -         * 1. bdrv_close. It's ok to drop bitmap.
+> -         * 2. inactivation. It means migration without 'dirty-bitmaps'
+> -         *    capability, so bitmaps are not marked with
+> -         *    BdrvDirtyBitmap.migration flags. It's not bad to drop them too,
+> -         *    and reload on invalidation.
+> -         */
+> -        if (bm->dirty_bitmap == NULL) {
+> -            continue;
+> -        }
+> +    if (release_stored) {
+> +        QSIMPLEQ_FOREACH(bm, bm_list, entry) {
+> +            if (bm->dirty_bitmap == NULL) {
+> +                continue;
+> +            }
+>  
+> -        bdrv_release_dirty_bitmap(bs, bm->dirty_bitmap);
+> +            bdrv_release_dirty_bitmap(bs, bm->dirty_bitmap);
+> +        }
+>      }
+>  
+>  success:
+> @@ -1586,7 +1602,7 @@ int qcow2_reopen_bitmaps_ro(BlockDriverState *bs, Error **errp)
+>      BdrvDirtyBitmap *bitmap;
+>      Error *local_err = NULL;
+>  
+> -    qcow2_store_persistent_dirty_bitmaps(bs, &local_err);
+> +    qcow2_store_persistent_dirty_bitmaps(bs, false, &local_err);
+>      if (local_err != NULL) {
+>          error_propagate(errp, local_err);
+>          return -EINVAL;
+> diff --git a/block/qcow2.c b/block/qcow2.c
+> index f2cb131048..02d8ce7534 100644
+> --- a/block/qcow2.c
+> +++ b/block/qcow2.c
+> @@ -2344,7 +2344,7 @@ static int qcow2_inactivate(BlockDriverState *bs)
+>      int ret, result = 0;
+>      Error *local_err = NULL;
+>  
+> -    qcow2_store_persistent_dirty_bitmaps(bs, &local_err);
+> +    qcow2_store_persistent_dirty_bitmaps(bs, true, &local_err);
+>      if (local_err != NULL) {
+>          result = -EINVAL;
+>          error_reportf_err(local_err, "Lost persistent bitmaps during "
+> 
+
+code:
 Reviewed-by: John Snow <jsnow@redhat.com>
+
+(You can adjust the docs as you need to on further review, if any, and
+keep that RB. --js)
 
