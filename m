@@ -2,65 +2,88 @@ Return-Path: <SRS0=gcBw=UA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_MUTT
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 33956C04AB6
-	for <qemu-devel@archiver.kernel.org>; Sat,  1 Jun 2019 02:50:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6CA14C04AB6
+	for <qemu-devel@archiver.kernel.org>; Sat,  1 Jun 2019 03:16:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F37C1270C2
-	for <qemu-devel@archiver.kernel.org>; Sat,  1 Jun 2019 02:50:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F37C1270C2
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 38763270DA
+	for <qemu-devel@archiver.kernel.org>; Sat,  1 Jun 2019 03:16:18 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ds+P6CDA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 38763270DA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:51871 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:52095 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hWu63-00055Y-U3
-	for qemu-devel@archiver.kernel.org; Fri, 31 May 2019 22:50:15 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:46103)
+	id 1hWuVF-0000Io-DN
+	for qemu-devel@archiver.kernel.org; Fri, 31 May 2019 23:16:17 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:48716)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1hWu5G-0004lb-NC
-	for qemu-devel@nongnu.org; Fri, 31 May 2019 22:49:27 -0400
+	(envelope-from <randrianasulu@gmail.com>) id 1hWuUO-00086m-2L
+	for qemu-devel@nongnu.org; Fri, 31 May 2019 23:15:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1hWtxY-0004N5-25
-	for qemu-devel@nongnu.org; Fri, 31 May 2019 22:41:28 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37414)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1hWtxX-0004MC-TN
-	for qemu-devel@nongnu.org; Fri, 31 May 2019 22:41:28 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
-	[10.5.11.23])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id A4FC43179B49
-	for <qemu-devel@nongnu.org>; Sat,  1 Jun 2019 02:41:25 +0000 (UTC)
-Received: from xz-x1 (ovpn-12-71.pek2.redhat.com [10.72.12.71])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 47BBC19C69;
-	Sat,  1 Jun 2019 02:41:21 +0000 (UTC)
-Date: Sat, 1 Jun 2019 10:41:15 +0800
-From: Peter Xu <peterx@redhat.com>
-To: Juan Quintela <quintela@redhat.com>
-Message-ID: <20190601024115.GA4958@xz-x1>
-References: <20190530092919.26059-1-peterx@redhat.com>
-	<20190530092919.26059-5-peterx@redhat.com>
-	<87a7f2ok0m.fsf@trasno.org>
+	(envelope-from <randrianasulu@gmail.com>) id 1hWuQd-0002yA-7m
+	for qemu-devel@nongnu.org; Fri, 31 May 2019 23:11:32 -0400
+Received: from mail-pg1-x530.google.com ([2607:f8b0:4864:20::530]:35650)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <randrianasulu@gmail.com>)
+	id 1hWuQc-0002xa-Ow
+	for qemu-devel@nongnu.org; Fri, 31 May 2019 23:11:31 -0400
+Received: by mail-pg1-x530.google.com with SMTP id t1so1537188pgc.2
+	for <qemu-devel@nongnu.org>; Fri, 31 May 2019 20:11:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+	h=from:to:subject:date:user-agent:mime-version
+	:content-transfer-encoding:content-disposition:message-id;
+	bh=E35KT0VHdn7bbdZnWSlo+v31/fAe02WDJACKXfWg6qY=;
+	b=Ds+P6CDAPh/HAzKRjwUKPF1rgMc7j8H51VQ3G0hzG02KM8hLXkSBmeAfBTvf4MSu2h
+	d3O+BgIEPCSirR8hEuBtn4fYXNmlnP6wTqbKofbT+73Zq+tQBOflqF7KhNvGQyZYL8nL
+	kuSHUQkNpDUKkTk7v8p/ZQnE0+UvCb4mstWgygj0gyyzDUFFij2q0dIVJM4e/MYiywcb
+	RCPo3AzrFGcFKpcjkGQUewGOoh+2XjxFo5oft8vXW817VI1EObl1nF3bYILPFDDR8GO3
+	SfSz0qNxuHPcnfQ66n1AczFAhosaojJHF4yTRD3mAGFH4KaLTNfeY/NSuHLNWkov34Ps
+	u66A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:from:to:subject:date:user-agent:mime-version
+	:content-transfer-encoding:content-disposition:message-id;
+	bh=E35KT0VHdn7bbdZnWSlo+v31/fAe02WDJACKXfWg6qY=;
+	b=ga/ucxJCrqcY82CvKB1LKcJEiSeHrLN/hJ6ud5H/MeApQeeyJ236Xq0rXQ4s5L4E8I
+	reJhPpfZrLTkfgVBlVSNrrJMN1goY/e8p614r8aPp2lzIWpe0VzOVBfJm9l1QB5IBNrc
+	OKa8ugUQyCJIVfMGAYBjNGvQHB0pahJkTgmDRGWBEk0rIoUM5ExjrWd8KFPrYYUwe9IY
+	ojOxTgbBh1a5uzyvFiuasomUWZc5BL2koXA8ylA/4QddVZKHvFFiTOK8J4+DxL2TmT0i
+	HOCXJqBrEhuba9zc5wgW32AvW+kYGJ9O17tafHsf2zNOovx7oEqFBL3UhsEPN9261KiF
+	aP2A==
+X-Gm-Message-State: APjAAAV+G+QtorCxA/XSq4KBZzYmVrqotdFT4BvxCBxrspuhPwHDdV1P
+	Z8F7Z3wJ9aPPtfY9cYL7NbNf/67G
+X-Google-Smtp-Source: APXvYqx9L3Lq/m1CEdfhvzOtgRVgImEOSE5aP40kF05A06IRUc09qfBlps0NOE28TF8BE0RYGoZdFQ==
+X-Received: by 2002:a63:24c1:: with SMTP id
+	k184mr10821179pgk.120.1559358688860; 
+	Fri, 31 May 2019 20:11:28 -0700 (PDT)
+Received: from [192.168.1.100] ([176.116.252.109])
+	by smtp.gmail.com with ESMTPSA id 2sm8499385pgl.40.2019.05.31.20.11.27
+	for <qemu-devel@nongnu.org>
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Fri, 31 May 2019 20:11:28 -0700 (PDT)
+From: Andrew Randrianasulu <randrianasulu@gmail.com>
+To: qemu-devel@nongnu.org
+Date: Sat, 1 Jun 2019 06:03:23 +0300
+User-Agent: KMail/1.9.10
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain;
+  charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Content-Disposition: inline
-In-Reply-To: <87a7f2ok0m.fsf@trasno.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.41]);
-	Sat, 01 Jun 2019 02:41:25 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v3 04/12] memory: Don't set migration
- bitmap when without migration
+Message-Id: <201906010603.23645.randrianasulu@gmail.com>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::530
+Subject: [Qemu-devel] "accel/tcg: demacro cputlb" break qemu-system-x86_64
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -72,37 +95,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
-	qemu-devel@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, May 31, 2019 at 03:01:29PM +0200, Juan Quintela wrote:
-> Peter Xu <peterx@redhat.com> wrote:
-> > Similar to 9460dee4b2 ("memory: do not touch code dirty bitmap unless
-> > TCG is enabled", 2015-06-05) but for the migration bitmap - we can
-> > skip the MIGRATION bitmap update if migration not enabled.
-> >
-> > Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
-> > Signed-off-by: Peter Xu <peterx@redhat.com>
-> 
-> Reviewed-by: Juan Quintela <quintela@redhat.com>
-> 
-> But if we ever decide to _not_ dirty all the bitmap at start (only used
-> pages) we need to fix this.
+Hello!
 
-Right, but IMHO we can never avoid doing it, because kvm (and also the
-per-ramblock dirty bitmaps) will only capture "dirtied pages" after
-log sync has started.  One example is what if one page P is never been
-touched after log_sync?  Then in kvm dirty log it'll never be set, and
-the only way to make sure we will still migrate that page P (that
-could be touched before log_sync so it might still contain valid data
-rather than a zero page) is to dirty all the pages at the start of
-migration (for now, it's ram_list_init_bitmaps).
+I was compiling latest qemu git, and was surprized to find qemu-system-x86_64
+(compiled for 32-bit x86 machine) can't boot any 64-bit kernel anymore.
 
-Thanks for the review!
+32-bit kernels and kvm were fine.
+So, I run git bisect
 
--- 
-Peter Xu
+./configure --target-list=x86_64-softmmu --disable-werror 
+
+make -j 5
+
+x86_64-softmmu/qemu-system-x86_64 -kernel /boot/bzImage-4.12.0-x64 -accel tcg
+
+git bisect log
+git bisect start
+# bad: [60905286cb5150de854e08279bca7dfc4b549e91] Merge remote-tracking branch 'remotes/dgibson/tags/ppc-for-4.1-20190529' into staging
+git bisect bad 60905286cb5150de854e08279bca7dfc4b549e91
+# good: [32a1a94dd324d33578dca1dc96d7896a0244d768] Update version for v3.1.0 release
+git bisect good 32a1a94dd324d33578dca1dc96d7896a0244d768
+# good: [32a1a94dd324d33578dca1dc96d7896a0244d768] Update version for v3.1.0 release
+git bisect good 32a1a94dd324d33578dca1dc96d7896a0244d768
+# good: [9403bccfe3e271f04e12c8c64d306e0cff589009] Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-20190228-1' into staging
+git bisect good 9403bccfe3e271f04e12c8c64d306e0cff589009
+# good: [9403bccfe3e271f04e12c8c64d306e0cff589009] Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-20190228-1' into staging
+git bisect good 9403bccfe3e271f04e12c8c64d306e0cff589009
+# good: [a39286dd61e455014694cb6aa44cfa9e5c86d101] nbd: Tolerate some server non-compliance in NBD_CMD_BLOCK_STATUS
+git bisect good a39286dd61e455014694cb6aa44cfa9e5c86d101
+# bad: [bab1671f0fa928fd678a22f934739f06fd5fd035] tcg: Manually expand INDEX_op_dup_vec
+git bisect bad bab1671f0fa928fd678a22f934739f06fd5fd035
+# bad: [bab1671f0fa928fd678a22f934739f06fd5fd035] tcg: Manually expand INDEX_op_dup_vec
+git bisect bad bab1671f0fa928fd678a22f934739f06fd5fd035
+# good: [956fe143b4f254356496a0a1c479fa632376dfec] target/arm: Implement VLLDM for v7M CPUs with an FPU
+git bisect good 956fe143b4f254356496a0a1c479fa632376dfec
+# good: [df06df4f412a67341de0fbb075e74c4dde3c8972] Merge remote-tracking branch 'remotes/ericb/tags/pull-nbd-2019-05-07' into staging
+git bisect good df06df4f412a67341de0fbb075e74c4dde3c8972
+# good: [e5a0a6784a63a15d5b1221326fe5c258be6b5561] vvfat: Replace bdrv_{read,write}() with bdrv_{pread,pwrite}()
+git bisect good e5a0a6784a63a15d5b1221326fe5c258be6b5561
+# bad: [01807c8b0e9f5da6981c2e62a3c1d8f661fb178e] Merge remote-tracking branch 'remotes/armbru/tags/pull-misc-2019-05-13' into staging
+git bisect bad 01807c8b0e9f5da6981c2e62a3c1d8f661fb178e
+# bad: [04d6556c5c91d6b00c70df7b85e1715a7c7870df] Merge remote-tracking branch 'remotes/stsquad/tags/pull-demacro-softmmu-100519-1' into staging
+git bisect bad 04d6556c5c91d6b00c70df7b85e1715a7c7870df
+# good: [c9ba36ff2f56a95dec0ee47f4dab0b22a0a01f86] Merge remote-tracking branch 'remotes/kevin/tags/for-upstream' into staging
+git bisect good c9ba36ff2f56a95dec0ee47f4dab0b22a0a01f86
+# bad: [fc1bc777910dc14a3db4e2ad66f3e536effc297d] cputlb: Drop attribute flatten
+git bisect bad fc1bc777910dc14a3db4e2ad66f3e536effc297d
+# bad: [f1be36969de2fb9b6b64397db1098f115210fcd9] cputlb: Move TLB_RECHECK handling into load/store_helper
+git bisect bad f1be36969de2fb9b6b64397db1098f115210fcd9
+# bad: [eed5664238ea5317689cf32426d9318686b2b75c] accel/tcg: demacro cputlb
+git bisect bad eed5664238ea5317689cf32426d9318686b2b75c
+# first bad commit: [eed5664238ea5317689cf32426d9318686b2b75c] accel/tcg: demacro cputlb
+
+Not sure how many people test qemu-system-x86_64 on 32-bit x86 hosts....
+
+ gcc --version
+gcc (GCC) 5.5.0
+
+commit log says
+
+-------------
+accel/tcg: demacro cputlb
+
+    Instead of expanding a series of macros to generate the load/store
+    helpers we move stuff into common functions and rely on the compiler
+    to eliminate the dead code for each variant.
+--------------
+
+May be gcc 5.5.0 was not really good in this case ...
 
