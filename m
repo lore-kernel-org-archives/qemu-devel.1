@@ -2,90 +2,60 @@ Return-Path: <SRS0=s7fR=UB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7269BC282DC
-	for <qemu-devel@archiver.kernel.org>; Sun,  2 Jun 2019 16:30:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BDBAC282DC
+	for <qemu-devel@archiver.kernel.org>; Sun,  2 Jun 2019 20:18:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2D9A827970
-	for <qemu-devel@archiver.kernel.org>; Sun,  2 Jun 2019 16:30:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0E4AD2793B
+	for <qemu-devel@archiver.kernel.org>; Sun,  2 Jun 2019 20:18:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="zrPbwX2F"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2D9A827970
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=mail.ru header.i=@mail.ru header.b="mSd9TL1M"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0E4AD2793B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=nongnu.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:50801 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:52542 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hXTNe-0007YN-56
-	for qemu-devel@archiver.kernel.org; Sun, 02 Jun 2019 12:30:46 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:40780)
+	id 1hXWvz-0002Fe-RC
+	for qemu-devel@archiver.kernel.org; Sun, 02 Jun 2019 16:18:27 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:42863)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hXTML-0006Zx-2i
-	for qemu-devel@nongnu.org; Sun, 02 Jun 2019 12:29:26 -0400
+	(envelope-from <jusual@mail.ru>) id 1hXWvB-0001iS-5J
+	for qemu-devel@nongnu.org; Sun, 02 Jun 2019 16:17:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hXTBn-0004Yo-LX
-	for qemu-devel@nongnu.org; Sun, 02 Jun 2019 12:18:33 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:36313)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1hXTBn-0004XD-DI
-	for qemu-devel@nongnu.org; Sun, 02 Jun 2019 12:18:31 -0400
-Received: by mail-wr1-x443.google.com with SMTP id n4so6627381wrs.3
-	for <qemu-devel@nongnu.org>; Sun, 02 Jun 2019 09:18:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=references:user-agent:from:to:subject:in-reply-to:date:message-id
-	:mime-version:content-transfer-encoding;
-	bh=2IQsbSJJ3IQtK+oBZmdCIiSTODGaRMJ9p/tJJcmn3qQ=;
-	b=zrPbwX2FzMoDxwK3yHtNXBglqJvQsVILo7So/Fxouv8jZLY8yAfqxmHNE63sAiNnZQ
-	sbY1NjmK67P85PmUtsilVsAvHsfcJA/yTEfohGeNjyNWgXfoOlh4sor43TmwFbUAynek
-	gycDnBP6pcDb4JhRRVFo4OMKpR/kQdZFfGnjF6aGTrGi6P4VXtk92C6TyDQD6baqaf+y
-	iD+Tefx0vQTGQJTwFiSemjxBSYTuXRqDWPg498w0zL9XRSK7dujrm/+rVMjKekli2fjK
-	6RO556FCAm8gTMd1h/WsYAqQS8VJdWQbylUMYuKJ7mCZlwZzWzsWyH7eN1ocSkOL1T7w
-	r1hw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:references:user-agent:from:to:subject
-	:in-reply-to:date:message-id:mime-version:content-transfer-encoding;
-	bh=2IQsbSJJ3IQtK+oBZmdCIiSTODGaRMJ9p/tJJcmn3qQ=;
-	b=BOALRr0Jyq0lRi4G0Pi/Xe4TyPHuMxjqeKyKJ3L7HrHHxvmntoxRJa2RXi4LIKdQUQ
-	GWYykSqjZLC2fJTQrNSWwaQXHiatkD2azc88usuT/0As2JdluaDKvFriVL+OCjYHsTfp
-	yIqQXrGfZGF2I8/yd3KlmGNlZh36h+1yjn2Bqc1JhwE4Ykr+iABsnMUGPHwPIXx/kkCM
-	VXJRXcgfyIiNSubLkN5QZwM5QUFm+kXIk1fRBFBb5uMed21hZhn8FE2Emm81ZcLyP2a2
-	0OG/oVy90XzYOCmt9f4QrRVH9ID/jGddJHKbi5DqC9X+eaRk2rqLygo0uFaUerpWq9Kt
-	2BhA==
-X-Gm-Message-State: APjAAAX/4OnAmbz2ArbMwaRpk42xAjaD2kjpfcc0r5BXa0UBYBByuyRM
-	4f2+ZQarNby6IW4h21Bbj/XDaII5wZI=
-X-Google-Smtp-Source: APXvYqwhXyZHEgPz/OFrAinNj6k8WFO4pvABeMCPGxEvBP6ps4yHAwxv9CYgKfHIxQvCw1XrbkmaOQ==
-X-Received: by 2002:adf:e711:: with SMTP id c17mr13648084wrm.227.1559492308942;
-	Sun, 02 Jun 2019 09:18:28 -0700 (PDT)
-Received: from zen.linaroharston ([81.128.185.34])
-	by smtp.gmail.com with ESMTPSA id
-	f65sm15561976wmg.45.2019.06.02.09.18.27 for <qemu-devel@nongnu.org>
-	(version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-	Sun, 02 Jun 2019 09:18:28 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
-	by zen.linaroharston (Postfix) with ESMTP id 71E211FF87
-	for <qemu-devel@nongnu.org>; Sun,  2 Jun 2019 17:18:27 +0100 (BST)
-References: <201906010603.23645.randrianasulu@gmail.com>
-User-agent: mu4e 1.3.2; emacs 26.1
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+	(envelope-from <jusual@mail.ru>) id 1hXWv9-00068u-Tn
+	for qemu-devel@nongnu.org; Sun, 02 Jun 2019 16:17:37 -0400
+Received: from smtp48.i.mail.ru ([94.100.177.108]:56354)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jusual@mail.ru>) id 1hXWv9-00067a-Aq
+	for qemu-devel@nongnu.org; Sun, 02 Jun 2019 16:17:35 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mail.ru;
+	s=mail2; h=Message-Id:Date:Subject:Cc:To:From;
+	bh=JJC3y5FgvvbzIXcCDu3j94Y1erdK3NlWW/tiF8L6Oi4=; 
+	b=mSd9TL1M6A38vVBi6nGczgUPdD/PGSyzTgg7SvX7OeefhCJCDWVM9XUrKY81jxCyqfVbfVJnVO4Icla4pBKJtZHy+NAnITdykgNjalzBcSdEZg19Vg9uwTZDPjk/INTb8UgCBYSYf2OmuRV6V9kHvMX55+ge3rkdMT5fwUv5zAA=;
+Received: by smtp48.i.mail.ru with esmtpa (envelope-from <jusual@mail.ru>)
+	id 1hXWv4-0001PM-Jx; Sun, 02 Jun 2019 23:17:31 +0300
 To: qemu-devel@nongnu.org
-In-reply-to: <201906010603.23645.randrianasulu@gmail.com>
-Date: Sun, 02 Jun 2019 17:18:27 +0100
-Message-ID: <874l58dkq4.fsf@zen.linaroharston>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Date: Sun,  2 Jun 2019 23:17:09 +0300
+Message-Id: <20190602201709.11901-1-jusual@mail.ru>
+X-Mailer: git-send-email 2.17.1
+Authentication-Results: smtp48.i.mail.ru; auth=pass smtp.auth=jusual@mail.ru
+	smtp.mailfrom=jusual@mail.ru
+X-77F55803: 257C4F86AB09C89C5A78504BD2AC2941988784FC6C4AE31F9672AF9B3B928BC0910B9CD103F8184182AE88D8AAE8D318A3B75102AD07AABE
+X-7FA49CB5: 0D63561A33F958A5DF53127363732015EA709D4FA80CC134FCB00143F2C94C828941B15DA834481FA18204E546F3947C25D43C09D2508269F6B57BC7E64490618DEB871D839B7333395957E7521B51C2545D4CF71C94A83E9FA2833FD35BB23D27C277FBC8AE2E8B6D77D8F98F67F34EA471835C12D1D977C4224003CC8364767815B9869FA544D8D32BA5DBAC0009BE9E8FC8737B5C22497C48477FF724415E3AA81AA40904B5D9CF19DD082D7633A093541453170D46FCD81D268191BDAD3D78DA827A17800CE7436E4CC186B5AB2DB3661434B16C20AC93541453170D46FCAAAE862A0553A39223F8577A6DFFEA7C29113EBC45E7010B072AAC739A9836F6EFF80C71ABB335746BA297DBC24807EA27F269C8F02392CD9B131C21E5171FED3C9F3DD0FB1AF5EB4E70A05D1297E1BBCB5012B2E24CD356
+X-Mailru-Sender: 42ECD68FB001EF95CFF07A00C0DCB66EA366D5AA146F84BACBA5A4425A1ADE1CAED14ECBD12AF47CBCD5BA2C93075E1EC77752E0C033A69E882C431543FD75E20226C39053983FF03453F38A29522196
+X-Mras: OK
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2a00:1450:4864:20::443
-Subject: Re: [Qemu-devel] "accel/tcg: demacro cputlb" break
- qemu-system-x86_64
+X-Received-From: 94.100.177.108
+Subject: [Qemu-devel] [PATCH] block/linux-aio: Drop unused BlockAIOCB
+ submission method
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -97,111 +67,152 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+From: Julia Suvorova via Qemu-devel <qemu-devel@nongnu.org>
+Reply-To: Julia Suvorova <jusual@mail.ru>
+Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>,
+	Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+	Julia Suvorova <jusual@mail.ru>, Aarushi Mehta <mehta.aaru20@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Callback-based laio_submit() and laio_cancel() were left after
+rewriting Linux AIO backend to coroutines in hope that they would be
+used in other code that could bypass coroutines. They can be safely
+removed because they have not been used since that time.
 
-Andrew Randrianasulu <randrianasulu@gmail.com> writes:
+Signed-off-by: Julia Suvorova <jusual@mail.ru>
+---
+ block/linux-aio.c       | 72 ++++++-----------------------------------
+ include/block/raw-aio.h |  3 --
+ 2 files changed, 10 insertions(+), 65 deletions(-)
 
-> Hello!
->
-> I was compiling latest qemu git, and was surprized to find qemu-system-x8=
-6_64
-> (compiled for 32-bit x86 machine) can't boot any 64-bit kernel anymore.
->
-> 32-bit kernels and kvm were fine.
-> So, I run git bisect
->
-> ./configure --target-list=3Dx86_64-softmmu --disable-werror
->
-> make -j 5
->
-> x86_64-softmmu/qemu-system-x86_64 -kernel /boot/bzImage-4.12.0-x64
-> -accel tcg
+diff --git a/block/linux-aio.c b/block/linux-aio.c
+index d4b61fb251..27100c2fd1 100644
+--- a/block/linux-aio.c
++++ b/block/linux-aio.c
+@@ -30,7 +30,6 @@
+ #define MAX_EVENTS 128
+ 
+ struct qemu_laiocb {
+-    BlockAIOCB common;
+     Coroutine *co;
+     LinuxAioState *ctx;
+     struct iocb iocb;
+@@ -72,7 +71,7 @@ static inline ssize_t io_event_ret(struct io_event *ev)
+ }
+ 
+ /*
+- * Completes an AIO request (calls the callback and frees the ACB).
++ * Completes an AIO request.
+  */
+ static void qemu_laio_process_completion(struct qemu_laiocb *laiocb)
+ {
+@@ -94,18 +93,15 @@ static void qemu_laio_process_completion(struct qemu_laiocb *laiocb)
+     }
+ 
+     laiocb->ret = ret;
+-    if (laiocb->co) {
+-        /* If the coroutine is already entered it must be in ioq_submit() and
+-         * will notice laio->ret has been filled in when it eventually runs
+-         * later.  Coroutines cannot be entered recursively so avoid doing
+-         * that!
+-         */
+-        if (!qemu_coroutine_entered(laiocb->co)) {
+-            aio_co_wake(laiocb->co);
+-        }
+-    } else {
+-        laiocb->common.cb(laiocb->common.opaque, ret);
+-        qemu_aio_unref(laiocb);
++
++    /*
++     * If the coroutine is already entered it must be in ioq_submit() and
++     * will notice laio->ret has been filled in when it eventually runs
++     * later.  Coroutines cannot be entered recursively so avoid doing
++     * that!
++     */
++    if (!qemu_coroutine_entered(laiocb->co)) {
++        aio_co_wake(laiocb->co);
+     }
+ }
+ 
+@@ -273,30 +269,6 @@ static bool qemu_laio_poll_cb(void *opaque)
+     return true;
+ }
+ 
+-static void laio_cancel(BlockAIOCB *blockacb)
+-{
+-    struct qemu_laiocb *laiocb = (struct qemu_laiocb *)blockacb;
+-    struct io_event event;
+-    int ret;
+-
+-    if (laiocb->ret != -EINPROGRESS) {
+-        return;
+-    }
+-    ret = io_cancel(laiocb->ctx->ctx, &laiocb->iocb, &event);
+-    laiocb->ret = -ECANCELED;
+-    if (ret != 0) {
+-        /* iocb is not cancelled, cb will be called by the event loop later */
+-        return;
+-    }
+-
+-    laiocb->common.cb(laiocb->common.opaque, laiocb->ret);
+-}
+-
+-static const AIOCBInfo laio_aiocb_info = {
+-    .aiocb_size         = sizeof(struct qemu_laiocb),
+-    .cancel_async       = laio_cancel,
+-};
+-
+ static void ioq_init(LaioQueue *io_q)
+ {
+     QSIMPLEQ_INIT(&io_q->pending);
+@@ -431,30 +403,6 @@ int coroutine_fn laio_co_submit(BlockDriverState *bs, LinuxAioState *s, int fd,
+     return laiocb.ret;
+ }
+ 
+-BlockAIOCB *laio_submit(BlockDriverState *bs, LinuxAioState *s, int fd,
+-        int64_t sector_num, QEMUIOVector *qiov, int nb_sectors,
+-        BlockCompletionFunc *cb, void *opaque, int type)
+-{
+-    struct qemu_laiocb *laiocb;
+-    off_t offset = sector_num * BDRV_SECTOR_SIZE;
+-    int ret;
+-
+-    laiocb = qemu_aio_get(&laio_aiocb_info, bs, cb, opaque);
+-    laiocb->nbytes = nb_sectors * BDRV_SECTOR_SIZE;
+-    laiocb->ctx = s;
+-    laiocb->ret = -EINPROGRESS;
+-    laiocb->is_read = (type == QEMU_AIO_READ);
+-    laiocb->qiov = qiov;
+-
+-    ret = laio_do_submit(fd, laiocb, offset, type);
+-    if (ret < 0) {
+-        qemu_aio_unref(laiocb);
+-        return NULL;
+-    }
+-
+-    return &laiocb->common;
+-}
+-
+ void laio_detach_aio_context(LinuxAioState *s, AioContext *old_context)
+ {
+     aio_set_event_notifier(old_context, &s->e, false, NULL, NULL);
+diff --git a/include/block/raw-aio.h b/include/block/raw-aio.h
+index ba223dd1f1..0cb7cc74a2 100644
+--- a/include/block/raw-aio.h
++++ b/include/block/raw-aio.h
+@@ -50,9 +50,6 @@ LinuxAioState *laio_init(Error **errp);
+ void laio_cleanup(LinuxAioState *s);
+ int coroutine_fn laio_co_submit(BlockDriverState *bs, LinuxAioState *s, int fd,
+                                 uint64_t offset, QEMUIOVector *qiov, int type);
+-BlockAIOCB *laio_submit(BlockDriverState *bs, LinuxAioState *s, int fd,
+-        int64_t sector_num, QEMUIOVector *qiov, int nb_sectors,
+-        BlockCompletionFunc *cb, void *opaque, int type);
+ void laio_detach_aio_context(LinuxAioState *s, AioContext *old_context);
+ void laio_attach_aio_context(LinuxAioState *s, AioContext *new_context);
+ void laio_io_plug(BlockDriverState *bs, LinuxAioState *s);
+-- 
+2.17.1
 
-Could you run:
-
-  make check-tcg
-
-And report which tests (if any) fail?
-
-
->
-> git bisect log
-> git bisect start
-> # bad: [60905286cb5150de854e08279bca7dfc4b549e91] Merge remote-tracking b=
-ranch 'remotes/dgibson/tags/ppc-for-4.1-20190529' into staging
-> git bisect bad 60905286cb5150de854e08279bca7dfc4b549e91
-> # good: [32a1a94dd324d33578dca1dc96d7896a0244d768] Update version for v3.=
-1.0 release
-> git bisect good 32a1a94dd324d33578dca1dc96d7896a0244d768
-> # good: [32a1a94dd324d33578dca1dc96d7896a0244d768] Update version for v3.=
-1.0 release
-> git bisect good 32a1a94dd324d33578dca1dc96d7896a0244d768
-> # good: [9403bccfe3e271f04e12c8c64d306e0cff589009] Merge remote-tracking =
-branch 'remotes/pmaydell/tags/pull-target-arm-20190228-1' into staging
-> git bisect good 9403bccfe3e271f04e12c8c64d306e0cff589009
-> # good: [9403bccfe3e271f04e12c8c64d306e0cff589009] Merge remote-tracking =
-branch 'remotes/pmaydell/tags/pull-target-arm-20190228-1' into staging
-> git bisect good 9403bccfe3e271f04e12c8c64d306e0cff589009
-> # good: [a39286dd61e455014694cb6aa44cfa9e5c86d101] nbd: Tolerate some ser=
-ver non-compliance in NBD_CMD_BLOCK_STATUS
-> git bisect good a39286dd61e455014694cb6aa44cfa9e5c86d101
-> # bad: [bab1671f0fa928fd678a22f934739f06fd5fd035] tcg: Manually expand IN=
-DEX_op_dup_vec
-> git bisect bad bab1671f0fa928fd678a22f934739f06fd5fd035
-> # bad: [bab1671f0fa928fd678a22f934739f06fd5fd035] tcg: Manually expand IN=
-DEX_op_dup_vec
-> git bisect bad bab1671f0fa928fd678a22f934739f06fd5fd035
-> # good: [956fe143b4f254356496a0a1c479fa632376dfec] target/arm: Implement =
-VLLDM for v7M CPUs with an FPU
-> git bisect good 956fe143b4f254356496a0a1c479fa632376dfec
-> # good: [df06df4f412a67341de0fbb075e74c4dde3c8972] Merge remote-tracking =
-branch 'remotes/ericb/tags/pull-nbd-2019-05-07' into staging
-> git bisect good df06df4f412a67341de0fbb075e74c4dde3c8972
-> # good: [e5a0a6784a63a15d5b1221326fe5c258be6b5561] vvfat: Replace bdrv_{r=
-ead,write}() with bdrv_{pread,pwrite}()
-> git bisect good e5a0a6784a63a15d5b1221326fe5c258be6b5561
-> # bad: [01807c8b0e9f5da6981c2e62a3c1d8f661fb178e] Merge remote-tracking b=
-ranch 'remotes/armbru/tags/pull-misc-2019-05-13' into staging
-> git bisect bad 01807c8b0e9f5da6981c2e62a3c1d8f661fb178e
-> # bad: [04d6556c5c91d6b00c70df7b85e1715a7c7870df] Merge remote-tracking b=
-ranch 'remotes/stsquad/tags/pull-demacro-softmmu-100519-1' into staging
-> git bisect bad 04d6556c5c91d6b00c70df7b85e1715a7c7870df
-> # good: [c9ba36ff2f56a95dec0ee47f4dab0b22a0a01f86] Merge remote-tracking =
-branch 'remotes/kevin/tags/for-upstream' into staging
-> git bisect good c9ba36ff2f56a95dec0ee47f4dab0b22a0a01f86
-> # bad: [fc1bc777910dc14a3db4e2ad66f3e536effc297d] cputlb: Drop attribute =
-flatten
-> git bisect bad fc1bc777910dc14a3db4e2ad66f3e536effc297d
-> # bad: [f1be36969de2fb9b6b64397db1098f115210fcd9] cputlb: Move TLB_RECHEC=
-K handling into load/store_helper
-> git bisect bad f1be36969de2fb9b6b64397db1098f115210fcd9
-> # bad: [eed5664238ea5317689cf32426d9318686b2b75c] accel/tcg: demacro cput=
-lb
-> git bisect bad eed5664238ea5317689cf32426d9318686b2b75c
-> # first bad commit: [eed5664238ea5317689cf32426d9318686b2b75c] accel/tcg:=
- demacro cputlb
->
-> Not sure how many people test qemu-system-x86_64 on 32-bit x86 hosts....
->
->  gcc --version
-> gcc (GCC) 5.5.0
->
-> commit log says
->
-> -------------
-> accel/tcg: demacro cputlb
->
->     Instead of expanding a series of macros to generate the load/store
->     helpers we move stuff into common functions and rely on the compiler
->     to eliminate the dead code for each variant.
-> --------------
->
-> May be gcc 5.5.0 was not really good in this case ...
-
-
---
-Alex Benn=C3=A9e
 
