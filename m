@@ -2,65 +2,72 @@ Return-Path: <SRS0=s7fR=UB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.0 required=3.0 tests=FROM_WSP_TRAIL,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D018C28CC2
-	for <qemu-devel@archiver.kernel.org>; Sun,  2 Jun 2019 03:53:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 87BF3C28CC2
+	for <qemu-devel@archiver.kernel.org>; Sun,  2 Jun 2019 04:31:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D5270260EB
-	for <qemu-devel@archiver.kernel.org>; Sun,  2 Jun 2019 03:53:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D5270260EB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 51FB127845
+	for <qemu-devel@archiver.kernel.org>; Sun,  2 Jun 2019 04:31:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 51FB127845
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:44515 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:44786 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hXHYm-0002vh-7X
-	for qemu-devel@archiver.kernel.org; Sat, 01 Jun 2019 23:53:28 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:47056)
+	id 1hXI9b-0007hG-5w
+	for qemu-devel@archiver.kernel.org; Sun, 02 Jun 2019 00:31:31 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:51122)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <chen.zhang@intel.com>) id 1hXHSp-0007Dy-MC
-	for qemu-devel@nongnu.org; Sat, 01 Jun 2019 23:47:21 -0400
+	(envelope-from <bounces@canonical.com>) id 1hXI8i-0007JI-9g
+	for qemu-devel@nongnu.org; Sun, 02 Jun 2019 00:30:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <chen.zhang@intel.com>) id 1hXHSn-00039n-W2
-	for qemu-devel@nongnu.org; Sat, 01 Jun 2019 23:47:19 -0400
-Received: from mga12.intel.com ([192.55.52.136]:51834)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <chen.zhang@intel.com>)
-	id 1hXHSn-00032p-Mo
-	for qemu-devel@nongnu.org; Sat, 01 Jun 2019 23:47:17 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-	by fmsmga106.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
-	01 Jun 2019 20:47:11 -0700
-X-ExtLoop1: 1
-Received: from unknown (HELO localhost.localdomain) ([10.239.13.19])
-	by orsmga005.jf.intel.com with ESMTP; 01 Jun 2019 20:47:09 -0700
-From: Zhang Chen <chen.zhang@intel.com >
-To: Li Zhijian <lizhijian@cn.fujitsu.com>,
-	"Dr. David Alan Gilbert" <dgilbert@redhat.com>,
-	Juan Quintela <quintela@redhat.com>,
-	zhanghailiang <zhang.zhanghailiang@huawei.com>,
-	Jason Wang <jasowang@redhat.com>, qemu-dev <qemu-devel@nongnu.org>
-Date: Sun,  2 Jun 2019 11:42:34 +0800
-Message-Id: <20190602034239.23225-2-chen.zhang@intel.com>
-X-Mailer: git-send-email 2.17.GIT
-In-Reply-To: <20190602034239.23225-1-chen.zhang@intel.com>
-References: <20190602034239.23225-1-chen.zhang@intel.com>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 192.55.52.136
-Subject: [Qemu-devel] [PATCH 1/6] COLO-compare: Add new parameter to
- communicate with remote colo-frame
+	(envelope-from <bounces@canonical.com>) id 1hXI84-0001rK-Cf
+	for qemu-devel@nongnu.org; Sun, 02 Jun 2019 00:29:58 -0400
+Received: from indium.canonical.com ([91.189.90.7]:41128)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1hXI84-0001qd-2o
+	for qemu-devel@nongnu.org; Sun, 02 Jun 2019 00:29:56 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1hXI82-0005k1-MN
+	for <qemu-devel@nongnu.org>; Sun, 02 Jun 2019 04:29:54 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 936162E8076
+	for <qemu-devel@nongnu.org>; Sun,  2 Jun 2019 04:29:54 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Sun, 02 Jun 2019 04:17:29 -0000
+From: Launchpad Bug Tracker <1567254@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=Expired; importance=Undecided;
+	assignee=None; 
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: janitor john-frankish th-huth
+X-Launchpad-Bug-Reporter: John Frankish (john-frankish)
+X-Launchpad-Bug-Modifier: Launchpad Janitor (janitor)
+References: <20160407073359.3051.6082.malonedeb@chaenomeles.canonical.com>
+Message-Id: <155944904966.14260.11870120270500548086.malone@loganberry.canonical.com>
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="18968";
+	Instance="launchpad-lazr.conf"
+X-Launchpad-Hash: 0fe125523c794776dd0f4099f39604f9afcfce51
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 91.189.90.7
+Subject: [Qemu-devel] [Bug 1567254] Re: qemu-2.5.1 will not run with gtk3/vte
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -69,140 +76,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Zhang Chen <chen.zhang@intel.com>, Zhang Chen <zhangckid@gmail.com>
+Reply-To: Bug 1567254 <1567254@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Zhang Chen <chen.zhang@intel.com>
+[Expired for QEMU because there has been no activity for 60 days.]
 
-We add the "notify_dev=chardevID" parameter. After that colo-compare can connect with
-remote(currently just for Xen, KVM-COLO didn't need it.) colo-frame through chardev socket,
-it can notify remote(Xen) colo-frame to handle checkpoint event.
+** Changed in: qemu
+       Status: Incomplete =3D> Expired
 
-Signed-off-by: Zhang Chen <chen.zhang@intel.com>
----
- net/colo-compare.c | 21 +++++++++++++++++++++
- qemu-options.hx    | 33 ++++++++++++++++++++++++++++++++-
- 2 files changed, 53 insertions(+), 1 deletion(-)
+-- =
 
-diff --git a/net/colo-compare.c b/net/colo-compare.c
-index fcb491121b..21849748b6 100644
---- a/net/colo-compare.c
-+++ b/net/colo-compare.c
-@@ -83,6 +83,7 @@ typedef struct CompareState {
-     char *pri_indev;
-     char *sec_indev;
-     char *outdev;
-+    char *notify_dev;
-     CharBackend chr_pri_in;
-     CharBackend chr_sec_in;
-     CharBackend chr_out;
-@@ -897,6 +898,21 @@ static void compare_set_vnet_hdr(Object *obj,
-     s->vnet_hdr = value;
- }
- 
-+static char *compare_get_notify_dev(Object *obj, Error **errp)
-+{
-+    CompareState *s = COLO_COMPARE(obj);
-+
-+    return g_strdup(s->notify_dev);
-+}
-+
-+static void compare_set_notify_dev(Object *obj, const char *value, Error **errp)
-+{
-+    CompareState *s = COLO_COMPARE(obj);
-+
-+    g_free(s->notify_dev);
-+    s->notify_dev = g_strdup(value);
-+}
-+
- static void compare_pri_rs_finalize(SocketReadState *pri_rs)
- {
-     CompareState *s = container_of(pri_rs, CompareState, pri_rs);
-@@ -1057,6 +1073,10 @@ static void colo_compare_init(Object *obj)
-                             (Object **)&s->iothread,
-                             object_property_allow_set_link,
-                             OBJ_PROP_LINK_STRONG, NULL);
-+    /* This parameter just for Xen COLO */
-+    object_property_add_str(obj, "notify_dev",
-+                            compare_get_notify_dev, compare_set_notify_dev,
-+                            NULL);
- 
-     s->vnet_hdr = false;
-     object_property_add_bool(obj, "vnet_hdr_support", compare_get_vnet_hdr,
-@@ -1103,6 +1123,7 @@ static void colo_compare_finalize(Object *obj)
-     g_free(s->pri_indev);
-     g_free(s->sec_indev);
-     g_free(s->outdev);
-+    g_free(s->notify_dev);
- }
- 
- static const TypeInfo colo_compare_info = {
-diff --git a/qemu-options.hx b/qemu-options.hx
-index 7ae3373a00..30e1ca754f 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -4475,7 +4475,7 @@ Dump the network traffic on netdev @var{dev} to the file specified by
- The file format is libpcap, so it can be analyzed with tools such as tcpdump
- or Wireshark.
- 
--@item -object colo-compare,id=@var{id},primary_in=@var{chardevid},secondary_in=@var{chardevid},outdev=@var{chardevid},iothread=@var{id}[,vnet_hdr_support]
-+@item -object colo-compare,id=@var{id},primary_in=@var{chardevid},secondary_in=@var{chardevid},outdev=@var{chardevid},iothread=@var{id}[,vnet_hdr_support][,notify_dev=@var{id}]
- 
- Colo-compare gets packet from primary_in@var{chardevid} and secondary_in@var{chardevid}, than compare primary packet with
- secondary packet. If the packets are same, we will output primary
-@@ -4484,11 +4484,15 @@ do checkpoint and send primary packet to outdev@var{chardevid}.
- In order to improve efficiency, we need to put the task of comparison
- in another thread. If it has the vnet_hdr_support flag, colo compare
- will send/recv packet with vnet_hdr_len.
-+If you want to use Xen COLO, will need the notify_dev to notify Xen
-+colo-frame to do checkpoint.
- 
- we must use it with the help of filter-mirror and filter-redirector.
- 
- @example
- 
-+KVM COLO
-+
- primary:
- -netdev tap,id=hn0,vhost=off,script=/etc/qemu-ifup,downscript=/etc/qemu-ifdown
- -device e1000,id=e0,netdev=hn0,mac=52:a4:00:12:78:66
-@@ -4512,6 +4516,33 @@ secondary:
- -object filter-redirector,id=f1,netdev=hn0,queue=tx,indev=red0
- -object filter-redirector,id=f2,netdev=hn0,queue=rx,outdev=red1
- 
-+
-+Xen COLO
-+
-+primary:
-+-netdev tap,id=hn0,vhost=off,script=/etc/qemu-ifup,downscript=/etc/qemu-ifdown
-+-device e1000,id=e0,netdev=hn0,mac=52:a4:00:12:78:66
-+-chardev socket,id=mirror0,host=3.3.3.3,port=9003,server,nowait
-+-chardev socket,id=compare1,host=3.3.3.3,port=9004,server,nowait
-+-chardev socket,id=compare0,host=3.3.3.3,port=9001,server,nowait
-+-chardev socket,id=compare0-0,host=3.3.3.3,port=9001
-+-chardev socket,id=compare_out,host=3.3.3.3,port=9005,server,nowait
-+-chardev socket,id=compare_out0,host=3.3.3.3,port=9005
-+-chardev socket,id=notify_way,host=3.3.3.3,port=9009,server,nowait
-+-object filter-mirror,id=m0,netdev=hn0,queue=tx,outdev=mirror0
-+-object filter-redirector,netdev=hn0,id=redire0,queue=rx,indev=compare_out
-+-object filter-redirector,netdev=hn0,id=redire1,queue=rx,outdev=compare0
-+-object iothread,id=iothread1
-+-object colo-compare,id=comp0,primary_in=compare0-0,secondary_in=compare1,outdev=compare_out0,notify_dev=nofity_way,iothread=iothread1
-+
-+secondary:
-+-netdev tap,id=hn0,vhost=off,script=/etc/qemu-ifup,down script=/etc/qemu-ifdown
-+-device e1000,netdev=hn0,mac=52:a4:00:12:78:66
-+-chardev socket,id=red0,host=3.3.3.3,port=9003
-+-chardev socket,id=red1,host=3.3.3.3,port=9004
-+-object filter-redirector,id=f1,netdev=hn0,queue=tx,indev=red0
-+-object filter-redirector,id=f2,netdev=hn0,queue=rx,outdev=red1
-+
- @end example
- 
- If you want to know the detail of above command line, you can read
--- 
-2.17.GIT
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1567254
 
+Title:
+  qemu-2.5.1 will not run with gtk3/vte
+
+Status in QEMU:
+  Expired
+
+Bug description:
+  Using qemu-2.5.1 and compiling without gtk3 and vte-2.90.
+
+  This works:
+
+  CC=3D"gcc -mtune=3Dgeneric -Os -pipe" CXX=3D"g++ -mtune=3Dgeneric -Os -pi=
+pe
+  -fno-exceptions -fno-rtti" ./configure --prefix=3D/usr/local
+  --localstatedir=3D/var --libexecdir=3D/usr/local/lib/qemu --interp-
+  prefix=3D/usr/local/share/qemu --audio-drv-list=3D"oss alsa sdl" --target-
+  list=3D"i386-softmmu i386-linux-user x86_64-softmmu x86_64-linux-user"
+  --smbd=3D/usr/local/sbin/smbd --disable-curses
+
+  find . -name config-host.mak -type f -exec sed -i 's/-O2//g' {} \;
+
+  make
+  sudo make install
+
+  If I then add gtk3 and vte-2.90 development files and compile again,
+  this fails with or without --disable-docs:
+
+   sudo make install
+  ...
+  make -C po install
+  make[1]: Entering directory '/usr/src/qemu-2.5.1/po'
+    GEN   tr.mo
+  /bin/sh: msgfmt: not found
+  Makefile:13: recipe for target 'tr.mo' failed
+  make[1]: *** [tr.mo] Error 127
+  make[1]: Leaving directory '/usr/src/qemu-2.5.1/po'
+  Makefile:443: recipe for target 'install' failed
+  make: *** [install] Error 2
+
+  If I then add gettext and re-compile, "qemu-system-x86_64 -blah-blah"
+  opens a window, displays the bios message and stops.
+
+  * configure script should check for gettext
+  * if "--disable-docs" is passed, "make install" should not try to install=
+ docs
+  * qemu should work when compiled with gtk3 and vte
+  * why does qemu insist on vte-2.90, when vte-2.91 has been out +/- 2 year=
+s?
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1567254/+subscriptions
 
