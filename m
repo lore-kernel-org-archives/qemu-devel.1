@@ -2,59 +2,58 @@ Return-Path: <SRS0=s7fR=UB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 71BDCC282DC
-	for <qemu-devel@archiver.kernel.org>; Sun,  2 Jun 2019 11:22:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A78EC282DC
+	for <qemu-devel@archiver.kernel.org>; Sun,  2 Jun 2019 11:44:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 480E1278F8
-	for <qemu-devel@archiver.kernel.org>; Sun,  2 Jun 2019 11:22:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 480E1278F8
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
+	by mail.kernel.org (Postfix) with ESMTPS id 619B9278D5
+	for <qemu-devel@archiver.kernel.org>; Sun,  2 Jun 2019 11:44:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 619B9278D5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=siemens.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:47803 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:47967 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hXOYz-00025M-Jj
-	for qemu-devel@archiver.kernel.org; Sun, 02 Jun 2019 07:22:09 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:34112)
+	id 1hXOux-0006AD-A7
+	for qemu-devel@archiver.kernel.org; Sun, 02 Jun 2019 07:44:51 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:38098)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hXOPf-0003Ld-Gz
-	for qemu-devel@nongnu.org; Sun, 02 Jun 2019 07:12:33 -0400
+	(envelope-from <jan.kiszka@siemens.com>) id 1hXOt6-0004pJ-Ox
+	for qemu-devel@nongnu.org; Sun, 02 Jun 2019 07:42:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hXOPe-0003ZS-2K
-	for qemu-devel@nongnu.org; Sun, 02 Jun 2019 07:12:31 -0400
-Received: from mail.ilande.co.uk ([46.43.2.167]:51406
-	helo=mail.default.ilande.uk0.bigv.io)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1hXOPd-0002kX-RA; Sun, 02 Jun 2019 07:12:29 -0400
-Received: from host81-158-188-206.range81-158.btcentralplus.com
-	([81.158.188.206] helo=kentang.home)
-	by mail.default.ilande.uk0.bigv.io with esmtpsa
-	(TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.89)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1hXOLd-0008A4-0L; Sun, 02 Jun 2019 12:08:21 +0100
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-To: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au,
-	rth@twiddle.net, gkurz@kaod.org
-Date: Sun,  2 Jun 2019 12:08:51 +0100
-Message-Id: <20190602110903.3431-4-mark.cave-ayland@ilande.co.uk>
-X-Mailer: git-send-email 2.11.0
-In-Reply-To: <20190602110903.3431-1-mark.cave-ayland@ilande.co.uk>
-References: <20190602110903.3431-1-mark.cave-ayland@ilande.co.uk>
-X-SA-Exim-Connect-IP: 81.158.188.206
-X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
-X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
-X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 46.43.2.167
-Subject: [Qemu-devel] [PATCH v2 03/15] target/ppc: remove getVSR()/putVSR()
- from int_helper.c
+	(envelope-from <jan.kiszka@siemens.com>) id 1hXOsW-00067M-9y
+	for qemu-devel@nongnu.org; Sun, 02 Jun 2019 07:42:21 -0400
+Received: from thoth.sbs.de ([192.35.17.2]:33127)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jan.kiszka@siemens.com>)
+	id 1hXOsW-00063m-0X
+	for qemu-devel@nongnu.org; Sun, 02 Jun 2019 07:42:20 -0400
+Received: from mail2.sbs.de (mail2.sbs.de [192.129.41.66])
+	by thoth.sbs.de (8.15.2/8.15.2) with ESMTPS id x52BgFlF027537
+	(version=TLSv1.2 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK); 
+	Sun, 2 Jun 2019 13:42:16 +0200
+Received: from [139.22.33.164] ([139.22.33.164])
+	by mail2.sbs.de (8.15.2/8.15.2) with ESMTP id x52BgD2t017469;
+	Sun, 2 Jun 2019 13:42:13 +0200
+X-Mozilla-News-Host: news://news.gmane.org:119
+To: qemu-devel <qemu-devel@nongnu.org>
+From: Jan Kiszka <jan.kiszka@siemens.com>
+Message-ID: <a84b7e03-f9a8-b577-be27-4d93d1caa1c9@siemens.com>
+Date: Sun, 2 Jun 2019 13:42:13 +0200
+User-Agent: Mozilla/5.0 (X11; U; Linux i686 (x86_64); de; rv:1.8.1.12)
+	Gecko/20080226 SUSE/2.0.0.12-1.1 Thunderbird/2.0.0.12 Mnenhy/0.7.5.666
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
+X-Received-From: 192.35.17.2
+Subject: [Qemu-devel] [PATCH] ioapic: kvm: Skip route updates for masked pins
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -66,100 +65,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Peter Xu <peterx@redhat.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Since commit 8a14d31b00 "target/ppc: switch fpr/vsrl registers so all VSX
-registers are in host endian order" functions getVSR() and putVSR() which used
-to convert the VSR registers into host endian order are no longer required.
+From: Jan Kiszka <jan.kiszka@siemens.com>
 
-Now that there are now no more users of getVSR()/putVSR() these functions can
-be completely removed.
+Masked entries will not generate interrupt messages, thus do no need to
+be routed by KVM. This is a cosmetic cleanup, just avoiding warnings of
+the kind
 
-Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+qemu-system-x86_64: vtd_irte_get: detected non-present IRTE (index=0, high=0xff00, low=0x100)
+
+if the masked entry happens to reference a non-present IRTE.
+
+Signed-off-by: Jan Kiszka <jan.kiszka@siemens.com>
 ---
- target/ppc/int_helper.c | 22 ++++++++++------------
- target/ppc/internal.h   | 12 ------------
- 2 files changed, 10 insertions(+), 24 deletions(-)
+ hw/intc/ioapic.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
 
-diff --git a/target/ppc/int_helper.c b/target/ppc/int_helper.c
-index 8ce89f2ad9..3b8939edcc 100644
---- a/target/ppc/int_helper.c
-+++ b/target/ppc/int_helper.c
-@@ -1902,38 +1902,36 @@ VEXTRACT(d, u64)
- void helper_xxextractuw(CPUPPCState *env, target_ulong xtn,
-                         target_ulong xbn, uint32_t index)
- {
--    ppc_vsr_t xt, xb;
-+    ppc_vsr_t *xt = &env->vsr[xtn];
-+    ppc_vsr_t *xb = &env->vsr[xbn];
-+    ppc_vsr_t t = { };
-     size_t es = sizeof(uint32_t);
-     uint32_t ext_index;
-     int i;
- 
--    getVSR(xbn, &xb, env);
--    memset(&xt, 0, sizeof(xt));
--
-     ext_index = index;
-     for (i = 0; i < es; i++, ext_index++) {
--        xt.VsrB(8 - es + i) = xb.VsrB(ext_index % 16);
-+        t.VsrB(8 - es + i) = xb->VsrB(ext_index % 16);
+diff --git a/hw/intc/ioapic.c b/hw/intc/ioapic.c
+index 7074489fdf..2fb288a22d 100644
+--- a/hw/intc/ioapic.c
++++ b/hw/intc/ioapic.c
+@@ -197,9 +197,11 @@ static void ioapic_update_kvm_routes(IOAPICCommonState *s)
+             MSIMessage msg;
+             struct ioapic_entry_info info;
+             ioapic_entry_parse(s->ioredtbl[i], &info);
+-            msg.address = info.addr;
+-            msg.data = info.data;
+-            kvm_irqchip_update_msi_route(kvm_state, i, msg, NULL);
++            if (!info.masked) {
++                msg.address = info.addr;
++                msg.data = info.data;
++                kvm_irqchip_update_msi_route(kvm_state, i, msg, NULL);
++            }
+         }
+         kvm_irqchip_commit_routes(kvm_state);
      }
- 
--    putVSR(xtn, &xt, env);
-+    *xt = t;
- }
- 
- void helper_xxinsertw(CPUPPCState *env, target_ulong xtn,
-                       target_ulong xbn, uint32_t index)
- {
--    ppc_vsr_t xt, xb;
-+    ppc_vsr_t *xt = &env->vsr[xtn];
-+    ppc_vsr_t *xb = &env->vsr[xbn];
-+    ppc_vsr_t t = *xt;
-     size_t es = sizeof(uint32_t);
-     int ins_index, i = 0;
- 
--    getVSR(xbn, &xb, env);
--    getVSR(xtn, &xt, env);
--
-     ins_index = index;
-     for (i = 0; i < es && ins_index < 16; i++, ins_index++) {
--        xt.VsrB(ins_index) = xb.VsrB(8 - es + i);
-+        t.VsrB(ins_index) = xb->VsrB(8 - es + i);
-     }
- 
--    putVSR(xtn, &xt, env);
-+    *xt = t;
- }
- 
- #define VEXT_SIGNED(name, element, cast)                            \
-diff --git a/target/ppc/internal.h b/target/ppc/internal.h
-index fb6f64ed1e..d3d327e548 100644
---- a/target/ppc/internal.h
-+++ b/target/ppc/internal.h
-@@ -204,18 +204,6 @@ EXTRACT_HELPER(IMM8, 11, 8);
- EXTRACT_HELPER(DCMX, 16, 7);
- EXTRACT_HELPER_SPLIT_3(DCMX_XV, 5, 16, 0, 1, 2, 5, 1, 6, 6);
- 
--static inline void getVSR(int n, ppc_vsr_t *vsr, CPUPPCState *env)
--{
--    vsr->VsrD(0) = env->vsr[n].VsrD(0);
--    vsr->VsrD(1) = env->vsr[n].VsrD(1);
--}
--
--static inline void putVSR(int n, ppc_vsr_t *vsr, CPUPPCState *env)
--{
--    env->vsr[n].VsrD(0) = vsr->VsrD(0);
--    env->vsr[n].VsrD(1) = vsr->VsrD(1);
--}
--
- void helper_compute_fprf_float16(CPUPPCState *env, float16 arg);
- void helper_compute_fprf_float32(CPUPPCState *env, float32 arg);
- void helper_compute_fprf_float128(CPUPPCState *env, float128 arg);
 -- 
-2.11.0
-
+2.16.4
 
