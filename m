@@ -6,49 +6,49 @@ X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 36CDCC282DC
-	for <qemu-devel@archiver.kernel.org>; Sun,  2 Jun 2019 13:41:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D749C46470
+	for <qemu-devel@archiver.kernel.org>; Sun,  2 Jun 2019 15:01:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E6D332792A
-	for <qemu-devel@archiver.kernel.org>; Sun,  2 Jun 2019 13:41:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E6D332792A
+	by mail.kernel.org (Postfix) with ESMTPS id 59EE327955
+	for <qemu-devel@archiver.kernel.org>; Sun,  2 Jun 2019 15:01:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 59EE327955
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:49314 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:49908 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hXQjx-00036n-F1
-	for qemu-devel@archiver.kernel.org; Sun, 02 Jun 2019 09:41:37 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:51264)
+	id 1hXRzR-00070U-5m
+	for qemu-devel@archiver.kernel.org; Sun, 02 Jun 2019 11:01:41 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:59814)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hXQjA-0002lX-Ho
-	for qemu-devel@nongnu.org; Sun, 02 Jun 2019 09:40:49 -0400
+	(envelope-from <bounces@canonical.com>) id 1hXRya-0006cV-0g
+	for qemu-devel@nongnu.org; Sun, 02 Jun 2019 11:00:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hXQj9-00032M-2f
-	for qemu-devel@nongnu.org; Sun, 02 Jun 2019 09:40:48 -0400
-Received: from indium.canonical.com ([91.189.90.7]:46662)
+	(envelope-from <bounces@canonical.com>) id 1hXRyY-0007zG-5W
+	for qemu-devel@nongnu.org; Sun, 02 Jun 2019 11:00:47 -0400
+Received: from indium.canonical.com ([91.189.90.7]:51066)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hXQj8-00031d-RP
-	for qemu-devel@nongnu.org; Sun, 02 Jun 2019 09:40:46 -0400
+	id 1hXRyX-0007yH-Ve
+	for qemu-devel@nongnu.org; Sun, 02 Jun 2019 11:00:46 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hXQj7-0006nf-FI
-	for <qemu-devel@nongnu.org>; Sun, 02 Jun 2019 13:40:45 +0000
+	id 1hXRyV-0002AX-Vt
+	for <qemu-devel@nongnu.org>; Sun, 02 Jun 2019 15:00:43 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 69DF22E8055
-	for <qemu-devel@nongnu.org>; Sun,  2 Jun 2019 13:40:45 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id C13372E80CC
+	for <qemu-devel@nongnu.org>; Sun,  2 Jun 2019 15:00:43 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Sun, 02 Jun 2019 13:30:29 -0000
+Date: Sun, 02 Jun 2019 14:54:47 -0000
 From: =?utf-8?q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
 X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Tags: arm
+X-Launchpad-Bug-Tags: arm testcase
 X-Launchpad-Bug-Information-Type: Public
 X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
@@ -56,18 +56,17 @@ X-Launchpad-Bug-Commenters: ajbennee lersek
 X-Launchpad-Bug-Reporter: Laszlo Ersek (Red Hat) (lersek)
 X-Launchpad-Bug-Modifier: =?utf-8?q?Alex_Benn=C3=A9e_=28ajbennee=29?=
 References: <155912118291.12579.8926874795813611531.malonedeb@soybean.canonical.com>
-	<155947076950.12691.8450256339566609756.malone@soybean.canonical.com>
-Message-Id: <875zpodsi2.fsf@zen.linaroharston>
+Message-Id: <155948728802.12615.124317424840214330.launchpad@soybean.canonical.com>
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com); Revision="18968";
 	Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: 831c101525966702506c2e86104620c25ef7e455
+X-Launchpad-Hash: e6d494548106efab9f7c5992bb825ac55bcfbc8e
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 91.189.90.7
-Subject: Re: [Qemu-devel] [Bug 1830872] Re: AARCH64 to ARMv7 mistranslation
- in TCG
+Subject: [Qemu-devel] [Bug 1830872] Re: AARCH64 to ARMv7 mistranslation in
+ TCG
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 List-Id: <qemu-devel.nongnu.org>
@@ -82,27 +81,8 @@ Reply-To: Bug 1830872 <1830872@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190602133029.uMDzLXNMkQFko5i0A54rJMEqk0o01IK8yhCOmYFg-O4@z>
 
-Laszlo Ersek (Red Hat) <lersek@redhat.com> writes:
-
-> Possibly related:
-> [Qemu-devel] "accel/tcg: demacro cputlb" break qemu-system-x86_64
-> https://lists.gnu.org/archive/html/qemu-devel/2019-05/msg07362.html
->
-> (qemu-system-x86_64 fails to boot 64-bit kernel under TCG accel when
-> QEMU is built for i686)
->
-> Note to self: try to reprodouce the present issue with QEMU built at
-> eed5664238ea^ -- this LP has originally been filed about the tree at
-> a4f667b67149, and that commit contains eed5664238ea. So checking at
-> eed5664238ea^ might reveal a difference.
-
-Oops. Looks like tests/tcg/multiarch/system/memory.c didn't cover enough
-cases.
-
---
-Alex Benn=C3=A9e
+** Tags added: testcase
 
 -- =
 
