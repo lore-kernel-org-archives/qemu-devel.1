@@ -2,63 +2,89 @@ Return-Path: <SRS0=s7fR=UB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_MUTT
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F3380C282DC
-	for <qemu-devel@archiver.kernel.org>; Sun,  2 Jun 2019 12:11:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BDE9EC282DC
+	for <qemu-devel@archiver.kernel.org>; Sun,  2 Jun 2019 12:14:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C25F127907
-	for <qemu-devel@archiver.kernel.org>; Sun,  2 Jun 2019 12:11:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C25F127907
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 8D22C27908
+	for <qemu-devel@archiver.kernel.org>; Sun,  2 Jun 2019 12:14:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8D22C27908
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:48565 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:48577 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hXPKU-0004pL-PY
-	for qemu-devel@archiver.kernel.org; Sun, 02 Jun 2019 08:11:14 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:41349)
+	id 1hXPO0-0005z6-Op
+	for qemu-devel@archiver.kernel.org; Sun, 02 Jun 2019 08:14:52 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:41704)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1hXPJl-0004XE-B6
-	for qemu-devel@nongnu.org; Sun, 02 Jun 2019 08:10:30 -0400
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hXPN7-0005XW-9G
+	for qemu-devel@nongnu.org; Sun, 02 Jun 2019 08:13:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1hXPJk-0004eP-B7
-	for qemu-devel@nongnu.org; Sun, 02 Jun 2019 08:10:29 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36758)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1hXPJj-0004a3-Fh
-	for qemu-devel@nongnu.org; Sun, 02 Jun 2019 08:10:28 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 7268E8665A;
-	Sun,  2 Jun 2019 12:10:25 +0000 (UTC)
-Received: from xz-x1 (ovpn-12-71.pek2.redhat.com [10.72.12.71])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 3B28F6266B;
-	Sun,  2 Jun 2019 12:10:20 +0000 (UTC)
-Date: Sun, 2 Jun 2019 20:10:14 +0800
-From: Peter Xu <peterx@redhat.com>
-To: Jan Kiszka <jan.kiszka@siemens.com>
-Message-ID: <20190602121014.GC4958@xz-x1>
-References: <a84b7e03-f9a8-b577-be27-4d93d1caa1c9@siemens.com>
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hXPN6-0006nj-4T
+	for qemu-devel@nongnu.org; Sun, 02 Jun 2019 08:13:57 -0400
+Received: from mail.ilande.co.uk ([46.43.2.167]:51600
+	helo=mail.default.ilande.uk0.bigv.io)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+	id 1hXPN5-0006mw-Ut; Sun, 02 Jun 2019 08:13:56 -0400
+Received: from host81-158-188-206.range81-158.btcentralplus.com
+	([81.158.188.206] helo=[192.168.1.65])
+	by mail.default.ilande.uk0.bigv.io with esmtpsa
+	(TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.89)
+	(envelope-from <mark.cave-ayland@ilande.co.uk>)
+	id 1hXPMA-0008NL-BH; Sun, 02 Jun 2019 13:12:59 +0100
+To: David Gibson <david@gibson.dropbear.id.au>
+References: <20190524065345.25591-1-mark.cave-ayland@ilande.co.uk>
+	<20190528010937.GD11618@umbus.fritz.box>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Openpgp: preference=signencrypt
+Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
+	mQENBFQJuzwBCADAYvxrwUh1p/PvUlNFwKosVtVHHplgWi5p29t58QlOUkceZG0DBYSNqk93
+	3JzBTbtd4JfFcSupo6MNNOrCzdCbCjZ64ik8ycaUOSzK2tKbeQLEXzXoaDL1Y7vuVO7nL9bG
+	E5Ru3wkhCFc7SkoypIoAUqz8EtiB6T89/D9TDEyjdXUacc53R5gu8wEWiMg5MQQuGwzbQy9n
+	PFI+mXC7AaEUqBVc2lBQVpAYXkN0EyqNNT12UfDLdxaxaFpUAE2pCa2LTyo5vn5hEW+i3VdN
+	PkmjyPvL6DdY03fvC01PyY8zaw+UI94QqjlrDisHpUH40IUPpC/NB0LwzL2aQOMkzT2NABEB
+	AAG0ME1hcmsgQ2F2ZS1BeWxhbmQgPG1hcmsuY2F2ZS1heWxhbmRAaWxhbmRlLmNvLnVrPokB
+	OAQTAQIAIgUCVAm7PAIbAwYLCQgHAwIGFQgCCQoLBBYCAwECHgECF4AACgkQW8LFb64PMh9f
+	NAgAuc3ObOEY8NbZko72AGrg2tWKdybcMVITxmcor4hb9155o/OWcA4IDbeATR6cfiDL/oxU
+	mcmtXVgPqOwtW3NYAKr5g/FrZZ3uluQ2mtNYAyTFeALy8YF7N3yhs7LOcpbFP7tEbkSzoXNG
+	z8iYMiYtKwttt40WaheWuRs0ZOLbs6yoczZBDhna3Nj0LA3GpeJKlaV03O4umjKJgACP1c/q
+	T2Pkg+FCBHHFP454+waqojHp4OCBo6HyK+8I4wJRa9Z0EFqXIu8lTDYoggeX0Xd6bWeCFHK3
+	DhD0/Xi/kegSW33unsp8oVcM4kcFxTkpBgj39dB4KwAUznhTJR0zUHf63LkBDQRUCbs8AQgA
+	y7kyevA4bpetM/EjtuqQX4U05MBhEz/2SFkX6IaGtTG2NNw5wbcAfhOIuNNBYbw6ExuaJ3um
+	2uLseHnudmvN4VSJ5Hfbd8rhqoMmmO71szgT/ZD9MEe2KHzBdmhmhxJdp+zQNivy215j6H27
+	14mbC2dia7ktwP1rxPIX1OOfQwPuqlkmYPuVwZP19S4EYnCELOrnJ0m56tZLn5Zj+1jZX9Co
+	YbNLMa28qsktYJ4oU4jtn6V79H+/zpERZAHmH40IRXdR3hA+Ye7iC/ZpWzT2VSDlPbGY9Yja
+	Sp7w2347L5G+LLbAfaVoejHlfy/msPeehUcuKjAdBLoEhSPYzzdvEQARAQABiQEfBBgBAgAJ
+	BQJUCbs8AhsMAAoJEFvCxW+uDzIfabYIAJXmBepHJpvCPiMNEQJNJ2ZSzSjhic84LTMWMbJ+
+	opQgr5cb8SPQyyb508fc8b4uD8ejlF/cdbbBNktp3BXsHlO5BrmcABgxSP8HYYNsX0n9kERv
+	NMToU0oiBuAaX7O/0K9+BW+3+PGMwiu5ml0cwDqljxfVN0dUBZnQ8kZpLsY+WDrIHmQWjtH+
+	Ir6VauZs5Gp25XLrL6bh/SL8aK0BX6y79m5nhfKI1/6qtzHAjtMAjqy8ChPvOqVVVqmGUzFg
+	KPsrrIoklWcYHXPyMLj9afispPVR8e0tMKvxzFBWzrWX1mzljbBlnV2n8BIwVXWNbgwpHSsj
+	imgcU9TTGC5qd9g=
+Message-ID: <9146443d-c5cd-e255-6a18-6bba23b30ec3@ilande.co.uk>
+Date: Sun, 2 Jun 2019 13:13:44 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <a84b7e03-f9a8-b577-be27-4d93d1caa1c9@siemens.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.26]);
-	Sun, 02 Jun 2019 12:10:25 +0000 (UTC)
+In-Reply-To: <20190528010937.GD11618@umbus.fritz.box>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
+X-SA-Exim-Connect-IP: 81.158.188.206
+X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
+X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
+X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH] ioapic: kvm: Skip route updates for masked
- pins
+X-Received-From: 46.43.2.167
+Subject: Re: [Qemu-devel] [PATCH v2] target/ppc: Fix lxvw4x,
+ lxvh8x and lxvb16x
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -70,38 +96,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel <qemu-devel@nongnu.org>,
-	"Michael S. Tsirkin" <mst@redhat.com>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sun, Jun 02, 2019 at 01:42:13PM +0200, Jan Kiszka wrote:
-> From: Jan Kiszka <jan.kiszka@siemens.com>
+On 28/05/2019 02:09, David Gibson wrote:
+
+> On Fri, May 24, 2019 at 07:53:45AM +0100, Mark Cave-Ayland wrote:
+>> From: Anton Blanchard <anton@ozlabs.org>
+>>
+>> During the conversion these instructions were incorrectly treated as
+>> stores. We need to use set_cpu_vsr* and not get_cpu_vsr*.
+>>
+>> Fixes: 8b3b2d75c7c0 ("introduce get_cpu_vsr{l,h}() and set_cpu_vsr{l,h}() helpers for VSR register access")
+>> Signed-off-by: Anton Blanchard <anton@ozlabs.org>
+>> Reviewed-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+>> Tested-by: Greg Kurz <groug@kaod.org>
+>> Reviewed-by: Greg Kurz <groug@kaod.org>
 > 
-> Masked entries will not generate interrupt messages, thus do no need to
-> be routed by KVM. This is a cosmetic cleanup, just avoiding warnings of
-> the kind
+> Applied, thanks.
+
+I'm in the process of preparing a VSX fixes branch to send over to qemu-stable@ so
+that Anton's patches make the next 4.0 stable release, however I can't find this
+patch in your ppc-for-4.1 branch? Did it get missed somehow?
+
+
+ATB,
+
+Mark.
+
+>> ---
+>>  target/ppc/translate/vsx-impl.inc.c | 13 +++++++------
+>>  1 file changed, 7 insertions(+), 6 deletions(-)
+>>
+>> diff --git a/target/ppc/translate/vsx-impl.inc.c b/target/ppc/translate/vsx-impl.inc.c
+>> index 199d22da97..cdb44b8b70 100644
+>> --- a/target/ppc/translate/vsx-impl.inc.c
+>> +++ b/target/ppc/translate/vsx-impl.inc.c
+>> @@ -102,8 +102,7 @@ static void gen_lxvw4x(DisasContext *ctx)
+>>      }
+>>      xth = tcg_temp_new_i64();
+>>      xtl = tcg_temp_new_i64();
+>> -    get_cpu_vsrh(xth, xT(ctx->opcode));
+>> -    get_cpu_vsrl(xtl, xT(ctx->opcode));
+>> +
+>>      gen_set_access_type(ctx, ACCESS_INT);
+>>      EA = tcg_temp_new();
+>>  
+>> @@ -126,6 +125,8 @@ static void gen_lxvw4x(DisasContext *ctx)
+>>          tcg_gen_addi_tl(EA, EA, 8);
+>>          tcg_gen_qemu_ld_i64(xtl, EA, ctx->mem_idx, MO_BEQ);
+>>      }
+>> +    set_cpu_vsrh(xT(ctx->opcode), xth);
+>> +    set_cpu_vsrl(xT(ctx->opcode), xtl);
+>>      tcg_temp_free(EA);
+>>      tcg_temp_free_i64(xth);
+>>      tcg_temp_free_i64(xtl);
+>> @@ -185,8 +186,6 @@ static void gen_lxvh8x(DisasContext *ctx)
+>>      }
+>>      xth = tcg_temp_new_i64();
+>>      xtl = tcg_temp_new_i64();
+>> -    get_cpu_vsrh(xth, xT(ctx->opcode));
+>> -    get_cpu_vsrl(xtl, xT(ctx->opcode));
+>>      gen_set_access_type(ctx, ACCESS_INT);
+>>  
+>>      EA = tcg_temp_new();
+>> @@ -197,6 +196,8 @@ static void gen_lxvh8x(DisasContext *ctx)
+>>      if (ctx->le_mode) {
+>>          gen_bswap16x8(xth, xtl, xth, xtl);
+>>      }
+>> +    set_cpu_vsrh(xT(ctx->opcode), xth);
+>> +    set_cpu_vsrl(xT(ctx->opcode), xtl);
+>>      tcg_temp_free(EA);
+>>      tcg_temp_free_i64(xth);
+>>      tcg_temp_free_i64(xtl);
+>> @@ -214,14 +215,14 @@ static void gen_lxvb16x(DisasContext *ctx)
+>>      }
+>>      xth = tcg_temp_new_i64();
+>>      xtl = tcg_temp_new_i64();
+>> -    get_cpu_vsrh(xth, xT(ctx->opcode));
+>> -    get_cpu_vsrl(xtl, xT(ctx->opcode));
+>>      gen_set_access_type(ctx, ACCESS_INT);
+>>      EA = tcg_temp_new();
+>>      gen_addr_reg_index(ctx, EA);
+>>      tcg_gen_qemu_ld_i64(xth, EA, ctx->mem_idx, MO_BEQ);
+>>      tcg_gen_addi_tl(EA, EA, 8);
+>>      tcg_gen_qemu_ld_i64(xtl, EA, ctx->mem_idx, MO_BEQ);
+>> +    set_cpu_vsrh(xT(ctx->opcode), xth);
+>> +    set_cpu_vsrl(xT(ctx->opcode), xtl);
+>>      tcg_temp_free(EA);
+>>      tcg_temp_free_i64(xth);
+>>      tcg_temp_free_i64(xtl);
 > 
-> qemu-system-x86_64: vtd_irte_get: detected non-present IRTE (index=0, high=0xff00, low=0x100)
-> 
-> if the masked entry happens to reference a non-present IRTE.
-> 
-> Signed-off-by: Jan Kiszka <jan.kiszka@siemens.com>
 
-Reviewed-by: Peter Xu <peterx@redhat.com>
-
-Thanks, Jan.
-
-The "non-cosmetic" part of clearing of those entries (e.g. including
-when the entries were not setup correctly rather than masked) was
-never really implemented and that task has been on my todo list for
-quite a while but with a very low priority (low enough to sink...).  I
-hope I didn't overlook its importance since AFAICT general OSs should
-hardly trigger those paths and so far I don't see it a very big issue.
-
-Regards,
-
--- 
-Peter Xu
 
