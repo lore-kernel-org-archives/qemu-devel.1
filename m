@@ -2,64 +2,73 @@ Return-Path: <SRS0=s7fR=UB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 151BCC282DC
-	for <qemu-devel@archiver.kernel.org>; Sun,  2 Jun 2019 09:13:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D3A60C282DC
+	for <qemu-devel@archiver.kernel.org>; Sun,  2 Jun 2019 10:27:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E1C74278A6
-	for <qemu-devel@archiver.kernel.org>; Sun,  2 Jun 2019 09:13:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E1C74278A6
+	by mail.kernel.org (Postfix) with ESMTPS id AF4F8278D3
+	for <qemu-devel@archiver.kernel.org>; Sun,  2 Jun 2019 10:27:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AF4F8278D3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:46741 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:47313 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hXMYP-00049l-PP
-	for qemu-devel@archiver.kernel.org; Sun, 02 Jun 2019 05:13:25 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:49803)
+	id 1hXNhd-00063C-8F
+	for qemu-devel@archiver.kernel.org; Sun, 02 Jun 2019 06:27:01 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:57040)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mlevitsk@redhat.com>) id 1hXMXM-0003g2-AK
-	for qemu-devel@nongnu.org; Sun, 02 Jun 2019 05:12:21 -0400
+	(envelope-from <bounces@canonical.com>) id 1hXNgJ-0004uF-Ng
+	for qemu-devel@nongnu.org; Sun, 02 Jun 2019 06:25:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mlevitsk@redhat.com>) id 1hXMXL-0007fb-DP
-	for qemu-devel@nongnu.org; Sun, 02 Jun 2019 05:12:20 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52164)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mlevitsk@redhat.com>)
-	id 1hXMXI-0007cm-WA; Sun, 02 Jun 2019 05:12:17 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C3B93307D85B;
-	Sun,  2 Jun 2019 09:12:14 +0000 (UTC)
-Received: from dhcp-4-67.tlv.redhat.com (dhcp-4-67.tlv.redhat.com [10.35.4.67])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 10E71608A7;
-	Sun,  2 Jun 2019 09:12:12 +0000 (UTC)
-Message-ID: <b87f080563bb4b8c16d1371f298c94c5b6865c49.camel@redhat.com>
-From: Maxim Levitsky <mlevitsk@redhat.com>
-To: qemu-block@nongnu.org
-Date: Sun, 02 Jun 2019 12:12:11 +0300
-In-Reply-To: <20190415135746.7571-1-mlevitsk@redhat.com>
-References: <20190415135746.7571-1-mlevitsk@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.48]);
-	Sun, 02 Jun 2019 09:12:14 +0000 (UTC)
+	(envelope-from <bounces@canonical.com>) id 1hXNgH-0001oC-5J
+	for qemu-devel@nongnu.org; Sun, 02 Jun 2019 06:25:39 -0400
+Received: from indium.canonical.com ([91.189.90.7]:34944)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1hXNgG-0001my-Uq
+	for qemu-devel@nongnu.org; Sun, 02 Jun 2019 06:25:37 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1hXNgF-0005K4-Iy
+	for <qemu-devel@nongnu.org>; Sun, 02 Jun 2019 10:25:35 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 846732E80CB
+	for <qemu-devel@nongnu.org>; Sun,  2 Jun 2019 10:25:35 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Sun, 02 Jun 2019 10:19:29 -0000
+From: "Laszlo Ersek \(Red Hat\)" <lersek@redhat.com>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Tags: arm
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: lersek
+X-Launchpad-Bug-Reporter: Laszlo Ersek (Red Hat) (lersek)
+X-Launchpad-Bug-Modifier: Laszlo Ersek (Red Hat) (lersek)
+References: <155912118291.12579.8926874795813611531.malonedeb@soybean.canonical.com>
+Message-Id: <155947076950.12691.8450256339566609756.malone@soybean.canonical.com>
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="18968";
+	Instance="launchpad-lazr.conf"
+X-Launchpad-Hash: 63c4f60e4fd3346d1cf06f1c05c07ca04de3a8a0
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 0/5] Few fixes for userspace NVME driver
+X-Received-From: 91.189.90.7
+Subject: [Qemu-devel] [Bug 1830872] Re: AARCH64 to ARMv7 mistranslation in
+ TCG
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -68,49 +77,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
-	qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>
+Reply-To: Bug 1830872 <1830872@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 2019-04-15 at 16:57 +0300, Maxim Levitsky wrote:
-> CC: Fam Zheng <fam@euphon.net>
-> CC: Kevin Wolf <kwolf@redhat.com>
-> CC: Max Reitz <mreitz@redhat.com>
-> CC: qemu-devel@nongnu.org
-> 
-> 
-> Hi!
-> These are few assorted fixes and features for the userspace
-> nvme driver.
-> 
-> Tested that on my laptop with my Samsung X5 thunderbolt drive, which
-> happens to have 4K sectors, support for discard and write zeros.
-> 
-> Also bunch of fixes sitting in my queue from the period when I developed
-> the nvme-mdev driver.
-> 
-> Best regards,
-> 	Maxim Levitsky
-> 
-> Maxim Levitsky (5):
->   block/nvme: don't flip CQ phase bits
->   block/nvme: fix doorbell stride
->   block/nvme: support larger that 512 bytes sector devices
->   block/nvme: add support for write zeros
->   block/nvme: add support for discard
-> 
->  block/nvme.c         | 194 +++++++++++++++++++++++++++++++++++++++++--
->  block/trace-events   |   3 +
->  include/block/nvme.h |  17 +++-
->  3 files changed, 204 insertions(+), 10 deletions(-)
-> 
+Possibly related:
+[Qemu-devel] "accel/tcg: demacro cputlb" break qemu-system-x86_64
+https://lists.gnu.org/archive/html/qemu-devel/2019-05/msg07362.html
 
-Ping.
+(qemu-system-x86_64 fails to boot 64-bit kernel under TCG accel when
+QEMU is built for i686)
 
-Best regards,
-	Maxim Levitsky
+Note to self: try to reprodouce the present issue with QEMU built at
+eed5664238ea^ -- this LP has originally been filed about the tree at
+a4f667b67149, and that commit contains eed5664238ea. So checking at
+eed5664238ea^ might reveal a difference.
 
+-- =
 
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1830872
+
+Title:
+  AARCH64 to ARMv7 mistranslation in TCG
+
+Status in QEMU:
+  New
+
+Bug description:
+  The following guest code:
+
+  https://github.com/tianocore/edk2/blob/3604174718e2afc950c3cc64c64ba5165c=
+8692bd/MdePkg/Library/BaseMemoryLibOptDxe/AArch64/CopyMem.S
+
+  implements, in hand-optimized aarch64 assembly, the CopyMem() edk2 (EFI
+  Development Kit II) library function. (CopyMem() basically has memmove()
+  semantics, to provide a standard C analog here.) The relevant functions
+  are InternalMemCopyMem() and __memcpy().
+
+  When TCG translates this aarch64 code to x86_64, everything works
+  fine.
+
+  When TCG translates this aarch64 code to ARMv7, the destination area of
+  the translated CopyMem() function becomes corrupted -- it differs from
+  the intended source contents. Namely, in every 4096 byte block, the
+  8-byte word at offset 4032 (0xFC0) is zeroed out in the destination,
+  instead of receiving the intended source value.
+
+  I'm attaching two hexdumps of the same destination area:
+
+  - "good.txt" is a hexdump of the destination area when CopyMem() was
+    translated to x86_64,
+
+  - "bad.txt" is a hexdump of the destination area when CopyMem() was
+    translated to ARMv7.
+
+  In order to assist with the analysis of this issue, I disassembled the
+  aarch64 binary with "objdump". Please find the listing in
+  "DxeCore.objdump", attached. The InternalMemCopyMem() function starts at
+  hex offset 2b2ec. The __memcpy() function starts at hex offset 2b180.
+
+  And, I ran the guest on the ARMv7 host with "-d
+  in_asm,op,op_opt,op_ind,out_asm". Please find the log in
+  "tcg.in_asm.op.op_opt.op_ind.out_asm.log", attached.
+
+  The TBs that correspond to (parts of) the InternalMemCopyMem() and
+  __memcpy() functions are scattered over the TCG log file, but the offset
+  between the "nice" disassembly from "DxeCore.objdump", and the in-RAM
+  TBs in the TCG log, can be determined from the fact that there is a
+  single prfm instruction in the entire binary. The instruction's offset
+  is 0x2b180 in "DxeCore.objdump" -- at the beginning of the __memcpy()
+  function --, and its RAM address is 0x472d2180 in the TCG log. Thus the
+  difference (=3D the load address of DxeCore.efi) is 0x472a7000.
+
+  QEMU was built at commit a4f667b67149 ("Merge remote-tracking branch
+  'remotes/cohuck/tags/s390x-20190521-3' into staging", 2019-05-21).
+
+  The reproducer command line is (on an ARMv7 host):
+
+    qemu-system-aarch64 \
+      -display none \
+      -machine virt,accel=3Dtcg \
+      -nodefaults \
+      -nographic \
+      -drive if=3Dpflash,format=3Draw,file=3D$prefix/share/qemu/edk2-aarch6=
+4-code.fd,readonly \
+      -drive if=3Dpflash,format=3Draw,file=3D$prefix/share/qemu/edk2-arm-va=
+rs.fd,snapshot=3Don \
+      -cpu cortex-a57 \
+      -chardev stdio,signal=3Doff,mux=3Don,id=3Dchar0 \
+      -mon chardev=3Dchar0,mode=3Dreadline \
+      -serial chardev:char0
+
+  The apparent symptom is an assertion failure *in the guest*, such as
+
+  > ASSERT [DxeCore]
+  > /home/lacos/src/upstream/qemu/roms/edk2/MdePkg/Library/BaseLib/String.c=
+(1090):
+  > Length < _gPcd_FixedAtBuild_PcdMaximumAsciiStringLength
+
+  but that is only a (distant) consequence of the CopyMem()
+  mistranslation, and resultant destination area corruption.
+
+  Originally reported in the following two mailing list messages:
+  - http://mid.mail-archive.com/9d2e260c-c491-03d2-9b8b-b57b72083f77@redhat=
+.com
+  - http://mid.mail-archive.com/f1cec8c0-1a9b-f5bb-f951-ea0ba9d276ee@redhat=
+.com
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1830872/+subscriptions
 
