@@ -7,57 +7,57 @@ X-Spam-Status: No, score=-6.0 required=3.0 tests=FROM_WSP_TRAIL,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2714CC28CC2
-	for <qemu-devel@archiver.kernel.org>; Sun,  2 Jun 2019 03:50:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ACF3EC28CC2
+	for <qemu-devel@archiver.kernel.org>; Sun,  2 Jun 2019 03:52:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D501427838
-	for <qemu-devel@archiver.kernel.org>; Sun,  2 Jun 2019 03:50:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D501427838
+	by mail.kernel.org (Postfix) with ESMTPS id 7FE6620848
+	for <qemu-devel@archiver.kernel.org>; Sun,  2 Jun 2019 03:52:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7FE6620848
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:44501 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:44509 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hXHWH-0001DO-5y
-	for qemu-devel@archiver.kernel.org; Sat, 01 Jun 2019 23:50:53 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:47085)
+	id 1hXHXc-0002LH-Qp
+	for qemu-devel@archiver.kernel.org; Sat, 01 Jun 2019 23:52:16 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:47060)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <chen.zhang@intel.com>) id 1hXHSr-0007EC-1I
-	for qemu-devel@nongnu.org; Sat, 01 Jun 2019 23:47:22 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <chen.zhang@intel.com>) id 1hXHSq-0003Cu-0F
+	(envelope-from <chen.zhang@intel.com>) id 1hXHSp-0007Dz-OL
 	for qemu-devel@nongnu.org; Sat, 01 Jun 2019 23:47:20 -0400
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <chen.zhang@intel.com>) id 1hXHSo-0003AG-Bi
+	for qemu-devel@nongnu.org; Sat, 01 Jun 2019 23:47:19 -0400
 Received: from mga12.intel.com ([192.55.52.136]:51833)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <chen.zhang@intel.com>)
-	id 1hXHSp-00030z-Ns
-	for qemu-devel@nongnu.org; Sat, 01 Jun 2019 23:47:19 -0400
+	id 1hXHSo-00030z-1H
+	for qemu-devel@nongnu.org; Sat, 01 Jun 2019 23:47:18 -0400
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga005.jf.intel.com ([10.7.209.41])
 	by fmsmga106.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
-	01 Jun 2019 20:47:19 -0700
+	01 Jun 2019 20:47:15 -0700
 X-ExtLoop1: 1
 Received: from unknown (HELO localhost.localdomain) ([10.239.13.19])
-	by orsmga005.jf.intel.com with ESMTP; 01 Jun 2019 20:47:17 -0700
+	by orsmga005.jf.intel.com with ESMTP; 01 Jun 2019 20:47:13 -0700
 From: Zhang Chen <chen.zhang@intel.com >
 To: Li Zhijian <lizhijian@cn.fujitsu.com>,
 	"Dr. David Alan Gilbert" <dgilbert@redhat.com>,
 	Juan Quintela <quintela@redhat.com>,
 	zhanghailiang <zhang.zhanghailiang@huawei.com>,
 	Jason Wang <jasowang@redhat.com>, qemu-dev <qemu-devel@nongnu.org>
-Date: Sun,  2 Jun 2019 11:42:38 +0800
-Message-Id: <20190602034239.23225-6-chen.zhang@intel.com>
+Date: Sun,  2 Jun 2019 11:42:36 +0800
+Message-Id: <20190602034239.23225-4-chen.zhang@intel.com>
 X-Mailer: git-send-email 2.17.GIT
 In-Reply-To: <20190602034239.23225-1-chen.zhang@intel.com>
 References: <20190602034239.23225-1-chen.zhang@intel.com>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
 X-Received-From: 192.55.52.136
-Subject: [Qemu-devel] [PATCH 5/6] COLO-compare: Rename the
- colo_compare_inconsistency_notify
+Subject: [Qemu-devel] [PATCH 3/6] COLO-compare: Make the compare_chr_send()
+ can send notification message.
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -76,55 +76,113 @@ Sender: "Qemu-devel"
 
 From: Zhang Chen <chen.zhang@intel.com>
 
-We have add the notify_remote_frame function for Xen,
-so we rename the colo_compare_inconsistency_notify to
-notify_native_frame(KVM-qemu COLO frame) looks better.
+We need use this function to send notification message for remote colo-frame(Xen).
+So we add new parameter for this job.
 
 Signed-off-by: Zhang Chen <chen.zhang@intel.com>
 ---
- net/colo-compare.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ net/colo-compare.c | 41 +++++++++++++++++++++++++++++++++--------
+ 1 file changed, 33 insertions(+), 8 deletions(-)
 
 diff --git a/net/colo-compare.c b/net/colo-compare.c
-index 19075c7a66..101c1f477e 100644
+index 8b7bd9f0c7..16285f4a96 100644
 --- a/net/colo-compare.c
 +++ b/net/colo-compare.c
-@@ -120,7 +120,7 @@ enum {
-     SECONDARY_IN,
- };
+@@ -129,7 +129,8 @@ static void colo_compare_inconsistency_notify(void)
+ static int compare_chr_send(CompareState *s,
+                             const uint8_t *buf,
+                             uint32_t size,
+-                            uint32_t vnet_hdr_len);
++                            uint32_t vnet_hdr_len,
++                            bool notify_remote_frame);
  
--static void colo_compare_inconsistency_notify(void)
-+static void notify_native_frame(void)
+ static gint seq_sorter(Packet *a, Packet *b, gpointer data)
  {
-     notifier_list_notify(&colo_compare_notifiers,
-                 migrate_get_current());
-@@ -449,7 +449,7 @@ sec:
-         if (s->notify_dev) {
-             notify_remote_frame(s);
-         } else {
--            colo_compare_inconsistency_notify();
-+            notify_native_frame();
-         }
+@@ -241,7 +242,8 @@ static void colo_release_primary_pkt(CompareState *s, Packet *pkt)
+     ret = compare_chr_send(s,
+                            pkt->data,
+                            pkt->size,
+-                           pkt->vnet_hdr_len);
++                           pkt->vnet_hdr_len,
++                           false);
+     if (ret < 0) {
+         error_report("colo send primary packet failed");
      }
- }
-@@ -606,7 +606,7 @@ static int colo_old_packet_check_one_conn(Connection *conn,
-         if (s->notify_dev) {
-             notify_remote_frame(s);
-         } else {
--            colo_compare_inconsistency_notify();
-+            notify_native_frame();
-         }
+@@ -671,7 +673,8 @@ static void colo_compare_connection(void *opaque, void *user_data)
+ static int compare_chr_send(CompareState *s,
+                             const uint8_t *buf,
+                             uint32_t size,
+-                            uint32_t vnet_hdr_len)
++                            uint32_t vnet_hdr_len,
++                            bool notify_remote_frame)
+ {
+     int ret = 0;
+     uint32_t len = htonl(size);
+@@ -680,7 +683,14 @@ static int compare_chr_send(CompareState *s,
          return 0;
      }
-@@ -660,7 +660,7 @@ static void colo_compare_packet(CompareState *s, Connection *conn,
-             if (s->notify_dev) {
-                 notify_remote_frame(s);
-             } else {
--                colo_compare_inconsistency_notify();
-+                notify_native_frame();
-             }
-             break;
+ 
+-    ret = qemu_chr_fe_write_all(&s->chr_out, (uint8_t *)&len, sizeof(len));
++    if (notify_remote_frame) {
++        ret = qemu_chr_fe_write_all(&s->chr_notify_dev,
++                                    (uint8_t *)&len,
++                                    sizeof(len));
++    } else {
++        ret = qemu_chr_fe_write_all(&s->chr_out, (uint8_t *)&len, sizeof(len));
++    }
++
+     if (ret != sizeof(len)) {
+         goto err;
+     }
+@@ -691,13 +701,26 @@ static int compare_chr_send(CompareState *s,
+          * know how to parse net packet correctly.
+          */
+         len = htonl(vnet_hdr_len);
+-        ret = qemu_chr_fe_write_all(&s->chr_out, (uint8_t *)&len, sizeof(len));
++
++        if (!notify_remote_frame) {
++            ret = qemu_chr_fe_write_all(&s->chr_out,
++                                        (uint8_t *)&len,
++                                        sizeof(len));
++        }
++
+         if (ret != sizeof(len)) {
+             goto err;
          }
+     }
+ 
+-    ret = qemu_chr_fe_write_all(&s->chr_out, (uint8_t *)buf, size);
++    if (notify_remote_frame) {
++        ret = qemu_chr_fe_write_all(&s->chr_notify_dev,
++                                    (uint8_t *)buf,
++                                    size);
++    } else {
++        ret = qemu_chr_fe_write_all(&s->chr_out, (uint8_t *)buf, size);
++    }
++
+     if (ret != size) {
+         goto err;
+     }
+@@ -943,7 +966,8 @@ static void compare_pri_rs_finalize(SocketReadState *pri_rs)
+         compare_chr_send(s,
+                          pri_rs->buf,
+                          pri_rs->packet_len,
+-                         pri_rs->vnet_hdr_len);
++                         pri_rs->vnet_hdr_len,
++                         false);
+     } else {
+         /* compare packet in the specified connection */
+         colo_compare_connection(conn, s);
+@@ -1075,7 +1099,8 @@ static void colo_flush_packets(void *opaque, void *user_data)
+         compare_chr_send(s,
+                          pkt->data,
+                          pkt->size,
+-                         pkt->vnet_hdr_len);
++                         pkt->vnet_hdr_len,
++                         false);
+         packet_destroy(pkt, NULL);
+     }
+     while (!g_queue_is_empty(&conn->secondary_list)) {
 -- 
 2.17.GIT
 
