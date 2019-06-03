@@ -2,111 +2,70 @@ Return-Path: <SRS0=e5mL=UC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F2131C28CC6
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 09:28:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84B2DC28CC6
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 09:29:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BBACC260CC
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 09:28:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BBACC260CC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 4F2B0260CC
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 09:29:07 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (4096-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="Y26A+Eq0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4F2B0260CC
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=nongnu.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:60369 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:60373 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hXjGR-0005HA-Tf
-	for qemu-devel@archiver.kernel.org; Mon, 03 Jun 2019 05:28:23 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:47427)
+	id 1hXjH8-0005wk-Dp
+	for qemu-devel@archiver.kernel.org; Mon, 03 Jun 2019 05:29:06 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:50562)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hXiwV-00058f-1I
-	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 05:07:48 -0400
+	(envelope-from <qemu_oss@crudebyte.com>) id 1hXj5x-0005XG-5Y
+	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 05:17:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hXiwT-0003Xx-Mt
-	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 05:07:47 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39290)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>)
-	id 1hXiwS-0003Rz-6X; Mon, 03 Jun 2019 05:07:45 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id ADC622F8BF4;
-	Mon,  3 Jun 2019 09:07:41 +0000 (UTC)
-Received: from [10.36.117.0] (unknown [10.36.117.0])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 88ABA648BC;
-	Mon,  3 Jun 2019 09:07:39 +0000 (UTC)
+	(envelope-from <qemu_oss@crudebyte.com>) id 1hXj5v-0000en-Gz
+	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 05:17:33 -0400
+Received: from kylie.crudebyte.com ([5.189.157.229]:54157)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <qemu_oss@crudebyte.com>)
+	id 1hXj5t-0000Xr-Dm
+	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 05:17:30 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=crudebyte.com; s=kylie; h=Content-Type:Content-Transfer-Encoding:
+	MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=v/pCLjJLLbOV3hDeIlmz8c7aRMzQnaCIFZjKj7uOQRA=;
+	b=Y26A+Eq0bH+Rd+0KtrfVSLQ0zp
+	JbB2iAFo/rZABq5MwlaJlzYAuSZwixEGgLGAJNc1z/Dw4Nv0hqAc75cL3v5HU0UheTw+jxwm0/P2+
+	/2LoYXudvdbIcdMgs7x1T8LKCxCQDeHROQRCmABEQEDmoqgRSq/VYAukcf8Bpmzn6//GfVnrZQxag
+	4gh5KtD0vXLRhdMKGPfOuv0/uA/CkOSk5Ig6XnBEZfhXOSQWdet8HtPBhK5Rhw0UrTTmUXYynbAeO
+	vzjquEVEfhbksHVU1jRKtSe1f119h/7VM/BV40Worx+zsAIBULqch3fl2Lw0TY7te0BHNqejuHmGf
+	4Jn8TIuq0dXmT0/Gc930rrZBmgZI/Wyw7uZlWnT3ynBfAyHNokpLaxqzg+gl6JityVHpCNx0IIpBj
+	KCgAu/KWAgVLWcYfAtkxwwkRSFWJ/atWg01CZQv34xeHjMcV1aR2DNU7m/rbuWHqFWXVCRghgvW8H
+	SeCbQucEpC+sIFjR+QZek4bFRri7cRsEE/MQGsY7qV4TXpybbQpBj+ftnOXtVCLxT9DzJqjkj0Hgk
+	9vRVMliw0cpCta46X0MveQW6LMzV7xxYSIX4O15Bykm5snDTH7DCCwYupi0L4AHeS8fF18Gt9TZ7+
+	EAj+H2RQ5gq1yXQftlR9p15yNSBtFI366LMgkl/W4=;
 To: qemu-devel@nongnu.org
-References: <20190603090635.10631-1-david@redhat.com>
-	<20190603090635.10631-2-david@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
-	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
-	SE+xAvmumFBY
-Organization: Red Hat GmbH
-Message-ID: <11d11210-0b4e-a019-71ed-2cc8bdff04ec@redhat.com>
-Date: Mon, 3 Jun 2019 11:07:38 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.7.0
+Date: Mon, 03 Jun 2019 11:17:22 +0200
+Message-ID: <1575139.mHQbk1htSj@silver>
+In-Reply-To: <20190603085715.6e737b0e@bahia.lab.toulouse-stg.fr.ibm.com>
+References: <590216e2666653bac21d950aaba98f87d0a53324.1557093245.git.qemu_oss@crudebyte.com>
+	<3878644.JKHuFhRL4E@silver>
+	<20190603085715.6e737b0e@bahia.lab.toulouse-stg.fr.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <20190603090635.10631-2-david@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.38]);
-	Mon, 03 Jun 2019 09:07:41 +0000 (UTC)
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2 01/22] s390x/tcg: Store only the
- necessary amount of doublewords for STFLE
+X-Received-From: 5.189.157.229
+Subject: Re: [Qemu-devel] [libvirt patch] qemu: adds support for virtfs 9p
+ argument 'vii'
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -118,87 +77,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Stefan Liebler <stli@linux.ibm.com>, Thomas Huth <thuth@redhat.com>,
-	Denys Vlasenko <dvlasenk@redhat.com>,
-	Andreas Krebbel <Andreas.Krebbel@de.ibm.com>,
-	Cornelia Huck <cohuck@redhat.com>,
-	Richard Henderson <richard.henderson@linaro.org>,
-	Pino Toscano <ptoscano@redhat.com>,
-	Christian Borntraeger <borntraeger@de.ibm.com>,
-	qemu-s390x@nongnu.org, Richard Henderson <rth@twiddle.net>
+From: Christian Schoenebeck via Qemu-devel <qemu-devel@nongnu.org>
+Reply-To: Christian Schoenebeck <qemu_oss@crudebyte.com>
+Cc: Daniel =?ISO-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
+	Christian Schoenebeck <qemu_oss@crudebyte.com>, Greg Kurz <groug@kaod.org>,
+	Antonios Motakis <antonios.motakis@huawei.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 03.06.19 11:06, David Hildenbrand wrote:
-> The PoP (z14, 7-382) says:
->     Doublewords to the right of the doubleword in which the
->     highest-numbered facility bit is assigned for a model
->     may or may not be stored.
+On Montag, 3. Juni 2019 08:57:15 CEST Greg Kurz wrote:
+> > Ok, I will extend Antonios' patch to log that error on host. I thought
+> > about limiting that error message to once per session (for not flooding
+> > the logs), but it is probably not worth it, so if you don't veto then I
+> > will just log that error simply on every file access.
 > 
-> However, stack protection in certain binaries can't deal with that.
-> "gzip" example code:
-> 
-> f1b4:       a7 08 00 03             lhi     %r0,3
-> f1b8:       b2 b0 f0 a0             stfle   160(%r15)
-> f1bc:       e3 20 f0 b2 00 90       llgc    %r2,178(%r15)
-> f1c2:       c0 2b 00 00 00 01       nilf    %r2,1
-> f1c8:       b2 4f 00 10             ear     %r1,%a0
-> f1cc:       b9 14 00 22             lgfr    %r2,%r2
-> f1d0:       eb 11 00 20 00 0d       sllg    %r1,%r1,32
-> f1d6:       b2 4f 00 11             ear     %r1,%a1
-> f1da:       d5 07 f0 b8 10 28       clc     184(8,%r15),40(%r1)
-> f1e0:       a7 74 00 06             jne     f1ec <file_read@@Base+0x1bc>
-> f1e4:       eb ef f1 30 00 04       lmg     %r14,%r15,304(%r15)
-> f1ea:       07 fe                   br      %r14
-> f1ec:       c0 e5 ff ff 9d 6e       brasl   %r14,2cc8 <__stack_chk_fail@plt>
-> 
-> In QEMU, we currently have:
->     max_bytes = 24
-> the code asks for (3 + 1) doublewords == 32 bytes.
-> 
-> If we write 32 bytes instead of only 24, and return "2 + 1" doublewords
-> ("one less than the number of doulewords needed to contain all of the
->  facility bits"), the example code detects a stack corruption.
-> 
-> In my opinion, the code is wrong. However, it seems to work fine on
-> real machines. So let's limit storing to the minimum of the requested
-> and the maximum doublewords.
-> 
-> Cc: Stefan Liebler <stli@linux.ibm.com>
-> Cc: Andreas Krebbel <Andreas.Krebbel@de.ibm.com>
-> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-> ---
->  target/s390x/misc_helper.c | 8 +++++++-
->  1 file changed, 7 insertions(+), 1 deletion(-)
-> 
-> diff --git a/target/s390x/misc_helper.c b/target/s390x/misc_helper.c
-> index 34476134a4..10aa617cf9 100644
-> --- a/target/s390x/misc_helper.c
-> +++ b/target/s390x/misc_helper.c
-> @@ -678,7 +678,13 @@ uint32_t HELPER(stfle)(CPUS390XState *env, uint64_t addr)
->  
->      prepare_stfl();
->      max_bytes = ROUND_UP(used_stfl_bytes, 8);
-> -    for (i = 0; i < count_bytes; ++i) {
-> +
-> +    /*
-> +     * The PoP says that doublewords beyond the highest-numbered facility
-> +     * bit may or may not be stored.  However, existing hardware appears to
-> +     * not store the words, and existing software depend on that.
-> +     */
-> +    for (i = 0; i < MIN(count_bytes, max_bytes); ++i) {
->          cpu_stb_data_ra(env, addr + i, stfl_bytes[i], ra);
->      }
->  
-> 
+> Please use error_report_once().
 
-Not intended to be included in this series, please ignore :)
+I will.
 
--- 
+> > > Please repost a series, possibly based on some of Antonios's patches
+> > > that
+> > > allows to avoid the QID collision, returns an error to the client
+> > > instead
+> > > and possibly printing out some useful messages in the QEMU log. Then, on
+> > > top of that, you can start introducing hashing and variable prefix
+> > > length.
+> > 
+> > So you want that as its own patch series first, or can I continue with my
+> > suggestion to deliver the hash patch and variable suffix length patch as
+> > last patches within the same series?
+> 
+> Same series is okay.
 
-Thanks,
+Ok.
 
-David / dhildenb
+I'm currently busy with other work; I will probably send a new patch set 
+approximately next week.
+
+Best regards,
+Christian Schoenebeck
 
