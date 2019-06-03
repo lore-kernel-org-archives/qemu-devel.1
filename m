@@ -2,90 +2,67 @@ Return-Path: <SRS0=GUf1=UD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DF337C282CE
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 18:35:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CD907C282CE
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 18:38:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AB93220848
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 18:35:08 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="uizvNHHy"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AB93220848
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 90C0D2075B
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 18:38:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 90C0D2075B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:56325 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:56370 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hYEH5-00052s-Ul
-	for qemu-devel@archiver.kernel.org; Tue, 04 Jun 2019 14:35:07 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:39209)
+	id 1hYEKL-0006FE-Oa
+	for qemu-devel@archiver.kernel.org; Tue, 04 Jun 2019 14:38:29 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:39752)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hYEGD-0004k4-Pw
-	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 14:34:14 -0400
+	(envelope-from <no-reply@patchew.org>) id 1hYEJQ-0005uc-I1
+	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 14:37:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hYEGC-0006aD-L6
-	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 14:34:13 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:45855)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1hYEGC-0006Ti-F6
-	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 14:34:12 -0400
-Received: by mail-wr1-x444.google.com with SMTP id f9so2166710wre.12
-	for <qemu-devel@nongnu.org>; Tue, 04 Jun 2019 11:34:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=references:user-agent:from:to:cc:subject:in-reply-to:date
-	:message-id:mime-version:content-transfer-encoding;
-	bh=xWZmk+BD6U/Ihkq553JF8vJyhLol2/PBy+yfXTaDGsg=;
-	b=uizvNHHyRN66XerfatJRqMTYwoLHhfQzTu+DRDCy+c5gOiBFtRW+5/BJfzhrDZbqR1
-	McUxEU0DUlP+kdHO6q+v6IshL1kuyREQklV3h21Ac1MzBckJ4cE4WlJ4DiEFlFU3a0wx
-	iijvRaRud80KzFHv2+269cSwuQ+5QoEmqZgl3+ZHsE/5C5KoVwDyzuJIuAXhTN2u26eB
-	Oh4yNpvdT1nu+iSxQMHId3WnxY1d8I6e7JCyBYIawK11bf6nulww6z85M+WobVsjC935
-	0lFdtSjXgz1GsDOTMSZkS6MgkyGkyIOzUM0WkzMphjiTPwy8QMYtJOGTSuun3lCJ0jkR
-	ENTQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:references:user-agent:from:to:cc:subject
-	:in-reply-to:date:message-id:mime-version:content-transfer-encoding;
-	bh=xWZmk+BD6U/Ihkq553JF8vJyhLol2/PBy+yfXTaDGsg=;
-	b=FK8dyqW7GVP3O5A2GVpkiUc+Lmgosz5VgDAbN0E9w/KP6hao8yTC0gmVZf6RnP6eDT
-	9OvDrOr4cx8oL1blkKgnydwmAZErob3vePYENC71+cW62IJf7muhvmvwX74aAvmr/VW4
-	pnp9uHk0F/E0z2zl9TcWgNh73uCCoqnszEQtn9It5UzGaXr8u9kiQkUzXuk6Y17mc4Q9
-	Iqjlmyqi5PU2QKNsTRw2M+x24IUAramhbDiyMK+M+HVFEprIpPXGAB88rTbxcov50jLf
-	Hvo4PcI9lsXySxU3OKRrUE11q4rBXh8w2ujwQzeOOcAa4RQIpddVkTyljsOsTSGRq1SR
-	Wbng==
-X-Gm-Message-State: APjAAAV0KkhxVHj74QylZb44HDSS7tPyfkyAzVIUPCPdshCscv+7m2nO
-	eQPe71/u1Mn9eNkW16bFRHchWQ==
-X-Google-Smtp-Source: APXvYqy5r9TDDKRYSbALhMz+9FbNWPMZj//HswMnZ/o/r6iNvWMZYFY0AQTro5XgAk+bdReQi/plXA==
-X-Received: by 2002:adf:f00d:: with SMTP id j13mr22299698wro.178.1559673250202;
-	Tue, 04 Jun 2019 11:34:10 -0700 (PDT)
-Received: from zen.linaroharston ([81.128.185.34])
-	by smtp.gmail.com with ESMTPSA id
-	65sm35143517wro.85.2019.06.04.11.34.09
-	(version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-	Tue, 04 Jun 2019 11:34:09 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
-	by zen.linaroharston (Postfix) with ESMTP id 2EEC01FF87;
-	Tue,  4 Jun 2019 19:34:09 +0100 (BST)
-References: <87va0vgad2.fsf@zen.linaroharston>
-	<20190311092956.woo6mfecw3qyxxet@steredhat>
-User-agent: mu4e 1.3.2; emacs 26.1
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Stefano Garzarella <sgarzare@redhat.com>
-In-reply-to: <20190311092956.woo6mfecw3qyxxet@steredhat>
-Date: Tue, 04 Jun 2019 19:34:09 +0100
-Message-ID: <87y32hryhq.fsf@zen.linaroharston>
+	(envelope-from <no-reply@patchew.org>) id 1hYEJO-0002XF-Ve
+	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 14:37:32 -0400
+Resent-Date: Tue, 04 Jun 2019 14:37:32 -0400
+Resent-Message-Id: <E1hYEJO-0002XF-Ve@eggs.gnu.org>
+Received: from sender4-of-o55.zoho.com ([136.143.188.55]:21545)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1hYEJO-0002Tz-Ow
+	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 14:37:30 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1559558913; cv=none; d=zoho.com; s=zohoarc; 
+	b=auYM/as2WMyu5WPUeQ0bNPBKkXkTy6LgnZBKbE2UQUZwtubG125+xLXwNA1MS36hJO0W7dsXpqrorXtYz5PAhpA67S4cv5r0GZNB0QRRiRImrMh95u1awJX0ZGbD3RKUsq0oVdxyGDjMXEWGvyB9y4Y0ZB+lVndIH+cPRaJcPH0=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
+	s=zohoarc; t=1559558913;
+	h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
+	bh=OdGSMS/H7RqU+SVATIxOxCJvklc+vcm++wjllBWFJR8=; 
+	b=eT5x6+qbc8wJhKA0twoqP7fI6Nz5AzzEVfvoG6nyCKfL9z7GPrO1mhMuSX6J7SN2fwjMx3ab9z6rk0PaCIMoPix3rMqILiju098dw6s8xmd+SxGsXTCxJfUHeeQ6CSViD3xZYr1bzCEHqWXSbMXXj11nlxHXpgZElWzNpnrjiHU=
+ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
+	spf=pass  smtp.mailfrom=no-reply@patchew.org;
+	dmarc=pass header.from=<no-reply@patchew.org>
+	header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+	mx.zohomail.com with SMTPS id 1559558911192967.5167011686991;
+	Mon, 3 Jun 2019 03:48:31 -0700 (PDT)
+In-Reply-To: <20190602110903.3431-1-mark.cave-ayland@ilande.co.uk>
+Message-ID: <155955891012.32260.9064081470614985823@ce79690b2cb9>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2a00:1450:4864:20::444
-Subject: Re: [Qemu-devel] Booting kernels with PVHVM documentation?
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: mark.cave-ayland@ilande.co.uk
+Date: Mon, 3 Jun 2019 03:48:31 -0700 (PDT)
+X-ZohoMailClient: External
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 136.143.188.55
+Subject: Re: [Qemu-devel] [PATCH v2 00/15] target/ppc: remove
+ getVSR()/putVSR() and further tidy-up
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -97,72 +74,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <bonzini@gnu.org>,
-	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Reply-To: qemu-devel@nongnu.org
+Cc: gkurz@kaod.org, rth@twiddle.net, qemu-ppc@nongnu.org, qemu-devel@nongnu.org,
+	david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDYwMjExMDkwMy4zNDMx
+LTEtbWFyay5jYXZlLWF5bGFuZEBpbGFuZGUuY28udWsvCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2Vl
+bXMgdG8gaGF2ZSBzb21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBm
+b3IKbW9yZSBpbmZvcm1hdGlvbjoKClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjIgMDAv
+MTVdIHRhcmdldC9wcGM6IHJlbW92ZSBnZXRWU1IoKS9wdXRWU1IoKSBhbmQgZnVydGhlciB0aWR5
+LXVwClR5cGU6IHNlcmllcwpNZXNzYWdlLWlkOiAyMDE5MDYwMjExMDkwMy4zNDMxLTEtbWFyay5j
+YXZlLWF5bGFuZEBpbGFuZGUuY28udWsKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmlu
+L2Jhc2gKZ2l0IHJldi1wYXJzZSBiYXNlID4gL2Rldi9udWxsIHx8IGV4aXQgMApnaXQgY29uZmln
+IC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFt
+ZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCi4vc2Ny
+aXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4uCj09PSBURVNUIFNDUklQVCBFTkQg
+PT09CgpGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogICA2MDkw
+NTI4NmNiLi5hZDg4ZTQyNTJmICBtYXN0ZXIgICAgIC0+IG1hc3RlcgpGcm9tIGh0dHBzOi8vZ2l0
+aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogKiBbbmV3IHRhZ10gICAgICAgICAgICAgICBw
+YXRjaGV3LzIwMTkwNjAyMTEwOTAzLjM0MzEtMS1tYXJrLmNhdmUtYXlsYW5kQGlsYW5kZS5jby51
+ayAtPiBwYXRjaGV3LzIwMTkwNjAyMTEwOTAzLjM0MzEtMS1tYXJrLmNhdmUtYXlsYW5kQGlsYW5k
+ZS5jby51awpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjg2OGY2NDA1MDEgdGFyZ2V0
+L3BwYzogaW1wcm92ZSBWU1hfRk1BREQgd2l0aCBuZXcgR0VOX1ZTWF9IRUxQRVJfVlNYX01BREQg
+bWFjcm8KMTE2NTg0MzVmOSB0YXJnZXQvcHBjOiBkZWNvZGUgdGFyZ2V0IHJlZ2lzdGVyIGluIFZT
+WF9FWFRSQUNUX0lOU0VSVCBhdCB0cmFuc2xhdGlvbiB0aW1lCmU5ZTUyZTNmMGEgdGFyZ2V0L3Bw
+YzogZGVjb2RlIHRhcmdldCByZWdpc3RlciBpbiBWU1hfVkVDVE9SX0xPQURfU1RPUkVfTEVOR1RI
+IGF0IHRyYW5zbGF0aW9uIHRpbWUKMjM5ZTA3YTBjZiB0YXJnZXQvcHBjOiBpbnRyb2R1Y2UgR0VO
+X1ZTWF9IRUxQRVJfUjJfQUIgbWFjcm8gdG8gZnB1X2hlbHBlci5jCjZhZWI4YTJlMzYgdGFyZ2V0
+L3BwYzogaW50cm9kdWNlIEdFTl9WU1hfSEVMUEVSX1IyIG1hY3JvIHRvIGZwdV9oZWxwZXIuYwpi
+NDM4MzZkNGU4IHRhcmdldC9wcGM6IGludHJvZHVjZSBHRU5fVlNYX0hFTFBFUl9SMyBtYWNybyB0
+byBmcHVfaGVscGVyLmMKMjQxOTIwMDU2YSB0YXJnZXQvcHBjOiBpbnRyb2R1Y2UgR0VOX1ZTWF9I
+RUxQRVJfWDEgbWFjcm8gdG8gZnB1X2hlbHBlci5jCjk1OTI2MWEwNzQgdGFyZ2V0L3BwYzogaW50
+cm9kdWNlIEdFTl9WU1hfSEVMUEVSX1gyX0FCIG1hY3JvIHRvIGZwdV9oZWxwZXIuYwplY2Q1MTli
+ODZlIHRhcmdldC9wcGM6IGludHJvZHVjZSBHRU5fVlNYX0hFTFBFUl9YMiBtYWNybyB0byBmcHVf
+aGVscGVyLmMKNjJiNDY2NzcwYiB0YXJnZXQvcHBjOiBpbnRyb2R1Y2Ugc2VwYXJhdGUgZ2VuZXJh
+dG9yIGFuZCBoZWxwZXIgZm9yIHhzY3ZxcGRwCmQ4YTViZWVjMzMgdGFyZ2V0L3BwYzogaW50cm9k
+dWNlIEdFTl9WU1hfSEVMUEVSX1gzIG1hY3JvIHRvIGZwdV9oZWxwZXIuYwpiMmRlMTc2MWU1IHRh
+cmdldC9wcGM6IGludHJvZHVjZSBzZXBhcmF0ZSBWU1hfQ01QIG1hY3JvIGZvciB4dmNtcCogaW5z
+dHJ1Y3Rpb25zCjg5NWI5NTNmODEgdGFyZ2V0L3BwYzogcmVtb3ZlIGdldFZTUigpL3B1dFZTUigp
+IGZyb20gaW50X2hlbHBlci5jCmNhOTQxZmZlOWUgdGFyZ2V0L3BwYzogcmVtb3ZlIGdldFZTUigp
+L3B1dFZTUigpIGZyb20gbWVtX2hlbHBlci5jCmVhZTU5Yzc5YzUgdGFyZ2V0L3BwYzogcmVtb3Zl
+IGdldFZTUigpL3B1dFZTUigpIGZyb20gZnB1X2hlbHBlci5jCgo9PT0gT1VUUFVUIEJFR0lOID09
+PQoxLzE1IENoZWNraW5nIGNvbW1pdCBlYWU1OWM3OWM1ZWEgKHRhcmdldC9wcGM6IHJlbW92ZSBn
+ZXRWU1IoKS9wdXRWU1IoKSBmcm9tIGZwdV9oZWxwZXIuYykKMi8xNSBDaGVja2luZyBjb21taXQg
+Y2E5NDFmZmU5ZWFmICh0YXJnZXQvcHBjOiByZW1vdmUgZ2V0VlNSKCkvcHV0VlNSKCkgZnJvbSBt
+ZW1faGVscGVyLmMpCjMvMTUgQ2hlY2tpbmcgY29tbWl0IDg5NWI5NTNmODE3NSAodGFyZ2V0L3Bw
+YzogcmVtb3ZlIGdldFZTUigpL3B1dFZTUigpIGZyb20gaW50X2hlbHBlci5jKQo0LzE1IENoZWNr
+aW5nIGNvbW1pdCBiMmRlMTc2MWU1ODEgKHRhcmdldC9wcGM6IGludHJvZHVjZSBzZXBhcmF0ZSBW
+U1hfQ01QIG1hY3JvIGZvciB4dmNtcCogaW5zdHJ1Y3Rpb25zKQo1LzE1IENoZWNraW5nIGNvbW1p
+dCBkOGE1YmVlYzMzYmQgKHRhcmdldC9wcGM6IGludHJvZHVjZSBHRU5fVlNYX0hFTFBFUl9YMyBt
+YWNybyB0byBmcHVfaGVscGVyLmMpCjYvMTUgQ2hlY2tpbmcgY29tbWl0IDYyYjQ2Njc3MGJhYSAo
+dGFyZ2V0L3BwYzogaW50cm9kdWNlIHNlcGFyYXRlIGdlbmVyYXRvciBhbmQgaGVscGVyIGZvciB4
+c2N2cXBkcCkKNy8xNSBDaGVja2luZyBjb21taXQgZWNkNTE5Yjg2ZWVjICh0YXJnZXQvcHBjOiBp
+bnRyb2R1Y2UgR0VOX1ZTWF9IRUxQRVJfWDIgbWFjcm8gdG8gZnB1X2hlbHBlci5jKQo4LzE1IENo
+ZWNraW5nIGNvbW1pdCA5NTkyNjFhMDc0ODAgKHRhcmdldC9wcGM6IGludHJvZHVjZSBHRU5fVlNY
+X0hFTFBFUl9YMl9BQiBtYWNybyB0byBmcHVfaGVscGVyLmMpCjkvMTUgQ2hlY2tpbmcgY29tbWl0
+IDI0MTkyMDA1NmFiMCAodGFyZ2V0L3BwYzogaW50cm9kdWNlIEdFTl9WU1hfSEVMUEVSX1gxIG1h
+Y3JvIHRvIGZwdV9oZWxwZXIuYykKMTAvMTUgQ2hlY2tpbmcgY29tbWl0IGI0MzgzNmQ0ZThiYiAo
+dGFyZ2V0L3BwYzogaW50cm9kdWNlIEdFTl9WU1hfSEVMUEVSX1IzIG1hY3JvIHRvIGZwdV9oZWxw
+ZXIuYykKMTEvMTUgQ2hlY2tpbmcgY29tbWl0IDZhZWI4YTJlMzZjNyAodGFyZ2V0L3BwYzogaW50
+cm9kdWNlIEdFTl9WU1hfSEVMUEVSX1IyIG1hY3JvIHRvIGZwdV9oZWxwZXIuYykKMTIvMTUgQ2hl
+Y2tpbmcgY29tbWl0IDIzOWUwN2EwY2ZmYSAodGFyZ2V0L3BwYzogaW50cm9kdWNlIEdFTl9WU1hf
+SEVMUEVSX1IyX0FCIG1hY3JvIHRvIGZwdV9oZWxwZXIuYykKMTMvMTUgQ2hlY2tpbmcgY29tbWl0
+IGU5ZTUyZTNmMGEzOSAodGFyZ2V0L3BwYzogZGVjb2RlIHRhcmdldCByZWdpc3RlciBpbiBWU1hf
+VkVDVE9SX0xPQURfU1RPUkVfTEVOR1RIIGF0IHRyYW5zbGF0aW9uIHRpbWUpCjE0LzE1IENoZWNr
+aW5nIGNvbW1pdCAxMTY1ODQzNWY5ZmYgKHRhcmdldC9wcGM6IGRlY29kZSB0YXJnZXQgcmVnaXN0
+ZXIgaW4gVlNYX0VYVFJBQ1RfSU5TRVJUIGF0IHRyYW5zbGF0aW9uIHRpbWUpCjE1LzE1IENoZWNr
+aW5nIGNvbW1pdCA4NjhmNjQwNTAxNWMgKHRhcmdldC9wcGM6IGltcHJvdmUgVlNYX0ZNQUREIHdp
+dGggbmV3IEdFTl9WU1hfSEVMUEVSX1ZTWF9NQUREIG1hY3JvKQpXQVJOSU5HOiBCbG9jayBjb21t
+ZW50cyB1c2UgYSBsZWFkaW5nIC8qIG9uIGEgc2VwYXJhdGUgbGluZQojMjc4OiBGSUxFOiB0YXJn
+ZXQvcHBjL3RyYW5zbGF0ZS92c3gtaW1wbC5pbmMuYzoxMzExOgorICAgICAgICAvKiAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgXAoKV0FSTklORzogQmxvY2sgY29tbWVudHMgdXNlIGEgbGVhZGluZyAvKiBvbiBhIHNlcGFy
+YXRlIGxpbmUKIzI4NDogRklMRTogdGFyZ2V0L3BwYy90cmFuc2xhdGUvdnN4LWltcGwuaW5jLmM6
+MTMxNzoKKyAgICAgICAgLyogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgIFwKCkVSUk9SOiBNYWNyb3Mgd2l0aCBjb21wbGV4
+IHZhbHVlcyBzaG91bGQgYmUgZW5jbG9zZWQgaW4gcGFyZW50aGVzaXMKIzMyNTogRklMRTogdGFy
+Z2V0L3BwYy90cmFuc2xhdGUvdnN4LW9wcy5pbmMuYzo2NjoKKyNkZWZpbmUgR0VOX1hYM0ZPUk1f
+TkFNRShuYW1lLCBvcGNuYW1lLCBvcGMyLCBvcGMzLCBmbDIpICAgICAgICAgICAgICAgXAorR0VO
+X0hBTkRMRVIyX0UobmFtZSwgb3BjbmFtZSwgMHgzQywgb3BjMiB8IDAsIG9wYzMsIDAsIFBQQ19O
+T05FLCBmbDIpLCBcCitHRU5fSEFORExFUjJfRShuYW1lLCBvcGNuYW1lLCAweDNDLCBvcGMyIHwg
+MSwgb3BjMywgMCwgUFBDX05PTkUsIGZsMiksIFwKK0dFTl9IQU5ETEVSMl9FKG5hbWUsIG9wY25h
+bWUsIDB4M0MsIG9wYzIgfCAyLCBvcGMzLCAwLCBQUENfTk9ORSwgZmwyKSwgXAorR0VOX0hBTkRM
+RVIyX0UobmFtZSwgb3BjbmFtZSwgMHgzQywgb3BjMiB8IDMsIG9wYzMsIDAsIFBQQ19OT05FLCBm
+bDIpCgp0b3RhbDogMSBlcnJvcnMsIDIgd2FybmluZ3MsIDM3NyBsaW5lcyBjaGVja2VkCgpQYXRj
+aCAxNS8xNSBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhl
+c2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWlu
+ZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKPT09IE9VVFBVVCBFTkQgPT09CgpU
+ZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFi
+bGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAxOTA2MDIxMTA5MDMuMzQzMS0xLW1hcmsu
+Y2F2ZS1heWxhbmRAaWxhbmRlLmNvLnVrL3Rlc3RpbmcuY2hlY2twYXRjaC8/dHlwZT1tZXNzYWdl
+LgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6Ly9w
+YXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxA
+cmVkaGF0LmNvbQ==
 
-Stefano Garzarella <sgarzare@redhat.com> writes:
-
-> Hi Alex,
-> sorry for the big delay, but I was traveling without my PC.
->
-> On Wed, Mar 06, 2019 at 05:51:05PM +0000, Alex Benn=C3=A9e wrote:
->>
->> Hi,
->>
->> I've been looking at using PVH as an alternative to a long bios boot
->> sequence to boot some x86_64 test kernels for tests/tcg. I'm finding it
->> hard to piece together all the bits but I naively thought it would just
->> be a case of adding a few ELF NOTES to my boot.S with something like:
->>
->>           ELFNOTE(Xen, XEN_ELFNOTE_VIRT_BASE,      _ASM_PTR 0x100000)
->>           ELFNOTE(Xen, XEN_ELFNOTE_ENTRY,          _ASM_PTR _start)
->>           ELFNOTE(Xen, XEN_ELFNOTE_PHYS32_ENTRY,   _ASM_PTR 0)    /* ent=
-ry =3D=3D virtbase */
->>           ELFNOTE(Xen, XEN_ELFNOTE_PADDR_OFFSET,   _ASM_PTR 0)
->>
->>           .code64
->
-> Can you try to use .code32?
-> The pvh.bin optionrom will jump to the image in 32-bit mode.
-> I don't have a lot of experience, but looking at arch/x86/platform/pvh/he=
-ad.S
-> (Linux), I saw that entry point is under .code32, than it will switch to
-> 64-bit mode.
-
-That doesn't seem to make any difference:
-
-./qemu-system-x86_64 -monitor none -display none -chardev stdio,id=3Dout -d=
-evice isa-debugcon,chardev=3Dout -device isa-debug-exit,iobase=3D0xf4,iosiz=
-e=3D0x4 -kernel ./tests/hello -vga none
-qemu-system-x86_64: Error loading uncompressed kernel without PVH ELF Note
-
-
-<snip>
->
->>   * are they any special linker rules required for the Xen.notes?
->
-> I don't know, but I'll investigate on it.
->
->>
->> And finally:
->>
->>   * is this idea of mine a weird abuse of the PVHVM boot protocol or
->>     does it make sense?
->
-> IMHO it isn't an abuse and make sense to boot a bare-metal application
-> directly in 32-bit mode using the PVH loader.
->
-> If you want to share with me a part of your code, I'll try to play with
-> it.
-
-My current hacking branch is:
-
-  https://github.com/stsquad/qemu/tree/testing/next-with-x86-64-tests
-
---
-Alex Benn=C3=A9e
 
