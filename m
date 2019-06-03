@@ -4,85 +4,80 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 578E9C04AB5
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 17:23:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BF5DCC04AB5
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 17:23:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 258C42737D
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 17:23:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8555327396
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 17:23:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PzzzAgx5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 258C42737D
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZIJWHYfB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8555327396
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:38411 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:38414 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hXqfl-0007wI-93
-	for qemu-devel@archiver.kernel.org; Mon, 03 Jun 2019 13:23:01 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:43316)
+	id 1hXqgc-00006y-L2
+	for qemu-devel@archiver.kernel.org; Mon, 03 Jun 2019 13:23:54 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:43485)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1hXqUL-0007GC-Nq
-	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 13:11:14 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1hXqUU-0007TW-DZ
+	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 13:11:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1hXqUK-0004MD-4c
-	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 13:11:13 -0400
-Received: from mail-wr1-x432.google.com ([2a00:1450:4864:20::432]:39501)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1hXqUT-0004c6-AU
+	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 13:11:22 -0400
+Received: from mail-wr1-x435.google.com ([2a00:1450:4864:20::435]:34893)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1hXqUJ-0003qB-Qm
-	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 13:11:12 -0400
-Received: by mail-wr1-x432.google.com with SMTP id x4so12920847wrt.6
-	for <qemu-devel@nongnu.org>; Mon, 03 Jun 2019 10:10:53 -0700 (PDT)
+	id 1hXqUQ-0003wn-3B
+	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 13:11:18 -0400
+Received: by mail-wr1-x435.google.com with SMTP id m3so12922809wrv.2
+	for <qemu-devel@nongnu.org>; Mon, 03 Jun 2019 10:10:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
-	:mime-version:content-transfer-encoding;
-	bh=vc64i+V8AvVjruMmRgyWsqB0XBi6fzlLO4mu9/lTb9I=;
-	b=PzzzAgx5geEqL8awZmMUpoTyTtKnnFqtCOGU4l1QQb+4HTbjdSK8AYJLMd76aMmrL5
-	aTR3Xi3drLb5mLi2+49YFPd8ejGnxTumeOUZjRnfo6wUp3QNZGSKu5ujg80ACHRvS4+c
-	DkaK0lBdP0tN5gr1m3S8yB22ZBEG91U8/VpsdCYTmMdPIFbRW6CAv9NiNhg2BsoTbXXB
-	AUfekDCoB50Q5DHjDQH59mDPaOjYMWqj7Mhnqw7+V8zOY5rwrK3RP1lYuo6uq9MzuELI
-	wvsF1RXW3f5BU/dhNyaatqWn2b2GBe2mUZO+DPcH1kjVfbw/y/i0GO4nzfWTOQGrbGRS
-	IrJw==
+	h=sender:from:to:subject:date:message-id:in-reply-to:references;
+	bh=24E6ZqLnqNyFbdN4STnHa0w5tRYTyGrJT58JpATqj/Q=;
+	b=ZIJWHYfB5JDi1cw/7BIxAxai/lsUauuk3KCy4a695HtVfh/5qm3dRxO1ipHCTqRPW8
+	/Do33tXSHArmS3rxDjP9ykk6slDHZJiEI8DCX4mhb8//9DhiqjxyOUFNFOGp9pWtwMIV
+	32zUaxPSn2aCyZl1MTD6a7v/nMQQPbIm3SBEkh/pN2+MesWKRWNMkaw22X85D8+y6fx0
+	ugP+os07uDAOWy95qH8MtmVigjssi9TKDpD0gb6qeww+MJSxzLxTS2V3Rrnfxhr8gEbm
+	sOXLn4RzOlq/QDesyDsxYM5vFoCjqJLUTyL/10cHSipndBAVYSpEAaiMaOc5co2hWElX
+	HjLg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
-	:in-reply-to:references:mime-version:content-transfer-encoding;
-	bh=vc64i+V8AvVjruMmRgyWsqB0XBi6fzlLO4mu9/lTb9I=;
-	b=Ki2SFdThwXgOqrdFuMHFhLpobeNgY/RqfVbkXZ2slYMynl0/ifbOqQL1fvHYXmRVJO
-	FQkCd39k99RqOtPBo63WzzSXK93cqsQwPWec83HKoDyImWHg5Xm2UE6w8BBelrBqWEqw
-	5ot9NkPxo2FnvhHEQEZVqMTilSNMHo56QPi5JADQ4A+t6CbugCYmYVp3UjaAEI5a/dCg
-	n3kgu/72ZNRJVf1QnWPWu3HbjF4L8HViSskDEp7aWf+9QWVPJxA5CjBEHB53NX5RxvPU
-	9kVJk5bWpo84hzn7+pyEWDsmQk188GUcUtSpzgnaq8dBF5e5AHgZgLMZUqHRyNTKo+Lt
-	mJNw==
-X-Gm-Message-State: APjAAAXhX3MHkZOOU6pFf/ZLgTs7erXDelL+PsYElupHdAqts4F2ggzl
-	cH3G9T/A50KSThigsaKKatASu3h/
-X-Google-Smtp-Source: APXvYqw/2lE4qoWpI5XfDU6oOZbt0ePSUIxB0xAcZah1hZ/7siNaj1Y4YEtnQ10190L9UhtOVS3fYQ==
-X-Received: by 2002:adf:e311:: with SMTP id b17mr17283846wrj.11.1559581851740; 
-	Mon, 03 Jun 2019 10:10:51 -0700 (PDT)
+	h=x-gm-message-state:sender:from:to:subject:date:message-id
+	:in-reply-to:references;
+	bh=24E6ZqLnqNyFbdN4STnHa0w5tRYTyGrJT58JpATqj/Q=;
+	b=H5YmINDLc6q0E1ECi5BZ3EF+vkDIElgpV0tAYfHEy9yKiu31m01Yvh7LKc9roC+mHg
+	7+CySiMYKK2rT4Ci7SY7pcNq5INFxnbiv7xAJcMw43kxiRYkXot+WRhtnuc1ztR8InfH
+	K/iIZ8wj/F5rNo28BdtT0NOXQgiPhJrs5QXd+OLV5ftyePCLNDUbplFJOrY+PbkT4Cbs
+	Q+9x4/+mfyje+1rHjFeLY6/2kPRNv2uVrCzfwOZKl+PrhgXyhKNS3mqBKypgs3qGo+ws
+	XWkIm2PsowmnN9pu6dvK4Dn2SAV4EakqRjU4Zr88d68TeTjhvF6qxlPfqiaBk/i3wHWB
+	bYTw==
+X-Gm-Message-State: APjAAAWhqHv+pKbrvBS8smwBtWsOb+BhbHKIy/1adFpYjAlKSSJjldgv
+	1RKZ52pQbsnU/TXoTLcOH4tzJTMT
+X-Google-Smtp-Source: APXvYqzUR22i7jPDd+2pZxwtSV7aDyYaSnwiCLNNeum1e0fylxBJC671UgObR5MxxrFsxnLvvebndA==
+X-Received: by 2002:adf:ba47:: with SMTP id t7mr16704771wrg.175.1559581855824; 
+	Mon, 03 Jun 2019 10:10:55 -0700 (PDT)
 Received: from 640k.lan ([93.56.166.5]) by smtp.gmail.com with ESMTPSA id
-	r131sm3325045wmf.4.2019.06.03.10.10.50
+	r131sm3325045wmf.4.2019.06.03.10.10.55 for <qemu-devel@nongnu.org>
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Mon, 03 Jun 2019 10:10:51 -0700 (PDT)
+	Mon, 03 Jun 2019 10:10:55 -0700 (PDT)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Mon,  3 Jun 2019 19:10:24 +0200
-Message-Id: <1559581843-3968-6-git-send-email-pbonzini@redhat.com>
+Date: Mon,  3 Jun 2019 19:10:29 +0200
+Message-Id: <1559581843-3968-11-git-send-email-pbonzini@redhat.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1559581843-3968-1-git-send-email-pbonzini@redhat.com>
 References: <1559581843-3968-1-git-send-email-pbonzini@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2a00:1450:4864:20::432
-Subject: [Qemu-devel] [PULL 05/24] i386: Enable IA32_MISC_ENABLE MWAIT bit
- when exposing mwait/monitor
+X-Received-From: 2a00:1450:4864:20::435
+Subject: [Qemu-devel] [PULL 10/24] qgraph: fix qos_node_contains with options
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -94,56 +89,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Wanpeng Li <wanpengli@tencent.com>, Eduardo Habkost <ehabkost@redhat.com>,
-	=?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Wanpeng Li <wanpengli@tencent.com>
+Currently, if qos_node_contains was passed options, it would still
+create an edge without any options.  Instead, in that case
+NULL acts as a terminator.
 
-The CPUID.01H:ECX[bit 3] ought to mirror the value of the MSR
-IA32_MISC_ENABLE MWAIT bit and as userspace has control of them
-both, it is userspace's job to configure both bits to match on
-the initial setup.
-
-Cc: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Radim Krčmář <rkrcmar@redhat.com>
-Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
-Message-Id: <1557813999-9175-1-git-send-email-wanpengli@tencent.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- target/i386/cpu.c | 3 +++
- target/i386/cpu.h | 1 +
- 2 files changed, 4 insertions(+)
+ tests/libqos/qgraph.c | 12 ++++++++----
+ tests/libqos/qgraph.h | 15 +++++++++------
+ 2 files changed, 17 insertions(+), 10 deletions(-)
 
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index 536d7d1..c1ab86d 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -4730,6 +4730,9 @@ static void x86_cpu_reset(CPUState *s)
+diff --git a/tests/libqos/qgraph.c b/tests/libqos/qgraph.c
+index b149caa..7a7ae2a 100644
+--- a/tests/libqos/qgraph.c
++++ b/tests/libqos/qgraph.c
+@@ -632,15 +632,19 @@ void qos_node_create_driver(const char *name, QOSCreateDriverFunc function)
+ }
  
-     env->pat = 0x0007040600070406ULL;
-     env->msr_ia32_misc_enable = MSR_IA32_MISC_ENABLE_DEFAULT;
-+    if (env->features[FEAT_1_ECX] & CPUID_EXT_MONITOR) {
-+        env->msr_ia32_misc_enable |= MSR_IA32_MISC_ENABLE_MWAIT;
+ void qos_node_contains(const char *container, const char *contained,
+-                       ...)
++                       QOSGraphEdgeOptions *opts, ...)
+ {
+     va_list va;
+-    va_start(va, contained);
+-    QOSGraphEdgeOptions *opts;
+ 
++    if (opts == NULL) {
++        add_edge(container, contained, QEDGE_CONTAINS, NULL);
++        return;
 +    }
++
++    va_start(va, opts);
+     do {
+-        opts = va_arg(va, QOSGraphEdgeOptions *);
+         add_edge(container, contained, QEDGE_CONTAINS, opts);
++        opts = va_arg(va, QOSGraphEdgeOptions *);
+     } while (opts != NULL);
  
-     memset(env->dr, 0, sizeof(env->dr));
-     env->dr[6] = DR6_FIXED_1;
-diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index fce6660..bd06523 100644
---- a/target/i386/cpu.h
-+++ b/target/i386/cpu.h
-@@ -387,6 +387,7 @@ typedef enum X86Seg {
- #define MSR_IA32_MISC_ENABLE            0x1a0
- /* Indicates good rep/movs microcode on some processors: */
- #define MSR_IA32_MISC_ENABLE_DEFAULT    1
-+#define MSR_IA32_MISC_ENABLE_MWAIT      (1ULL << 18)
+     va_end(va);
+diff --git a/tests/libqos/qgraph.h b/tests/libqos/qgraph.h
+index e799095..3a25dda 100644
+--- a/tests/libqos/qgraph.h
++++ b/tests/libqos/qgraph.h
+@@ -453,14 +453,16 @@ void qos_node_create_machine_args(const char *name,
+ void qos_node_create_driver(const char *name, QOSCreateDriverFunc function);
  
- #define MSR_MTRRphysBase(reg)           (0x200 + 2 * (reg))
- #define MSR_MTRRphysMask(reg)           (0x200 + 2 * (reg) + 1)
+ /**
+- * qos_node_contains(): creates an edge of type QEDGE_CONTAINS and
+- * adds it to the edge list mapped to @container in the
++ * qos_node_contains(): creates one or more edges of type QEDGE_CONTAINS
++ * and adds them to the edge list mapped to @container in the
+  * edge hash table.
+  *
+- * This edge will have @container as source and @contained as destination.
++ * The edges will have @container as source and @contained as destination.
+  *
+- * It also has the possibility to add optional NULL-terminated
+- * @opts parameters (see %QOSGraphEdgeOptions)
++ * If @opts is NULL, a single edge will be added with no options.
++ * If @opts is non-NULL, the arguments after @contained represent a
++ * NULL-terminated list of %QOSGraphEdgeOptions structs, and an
++ * edge will be added for each of them.
+  *
+  * This function can be useful when there are multiple devices
+  * with the same node name contained in a machine/other node
+@@ -480,7 +482,8 @@ void qos_node_create_driver(const char *name, QOSCreateDriverFunc function);
+  * For contains, op1.arg and op1.size_arg represent the arg to pass
+  * to @contained constructor to properly initialize it.
+  */
+-void qos_node_contains(const char *container, const char *contained, ...);
++void qos_node_contains(const char *container, const char *contained,
++                       QOSGraphEdgeOptions *opts, ...);
+ 
+ /**
+  * qos_node_produces(): creates an edge of type QEDGE_PRODUCES and
 -- 
 1.8.3.1
 
