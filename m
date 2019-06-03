@@ -7,78 +7,78 @@ X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9AA1EC04AB5
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 17:17:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 61C3EC04AB5
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 17:19:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6629720673
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 17:17:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 33B9D24AB5
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 17:19:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aXYOJaeD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6629720673
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="X3VgkKfK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 33B9D24AB5
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:38334 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:38352 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hXqaJ-0003XV-H3
-	for qemu-devel@archiver.kernel.org; Mon, 03 Jun 2019 13:17:23 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:43267)
+	id 1hXqcQ-0004yT-8Z
+	for qemu-devel@archiver.kernel.org; Mon, 03 Jun 2019 13:19:34 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:43387)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1hXqUE-00078s-RI
-	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 13:11:07 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1hXqUQ-0007LM-2Y
+	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 13:11:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1hXqU8-00043c-BK
-	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 13:11:03 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:39814)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1hXqUO-0004Sl-0I
+	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 13:11:17 -0400
+Received: from mail-wr1-x431.google.com ([2a00:1450:4864:20::431]:39501)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1hXqU5-0003sy-9n
-	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 13:10:59 -0400
-Received: by mail-wr1-x443.google.com with SMTP id x4so12920924wrt.6
-	for <qemu-devel@nongnu.org>; Mon, 03 Jun 2019 10:10:54 -0700 (PDT)
+	id 1hXqUN-00044T-PS
+	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 13:11:15 -0400
+Received: by mail-wr1-x431.google.com with SMTP id x4so12921292wrt.6
+	for <qemu-devel@nongnu.org>; Mon, 03 Jun 2019 10:11:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
-	bh=i8cdpTQpJJWnX9/W8Ct8bcoN/ZoC8uS3+XE2cylOq34=;
-	b=aXYOJaeDS/kqo3T/r/8s0CEmQXyST/ysfepjBYfJD8DDwWg8fdZoOQwRQfeIeLulJR
-	oXJ2QlFaIKuFi/os+o75zTEHmKaFRX7mTOJXsTutbVtPFwIpH0cajFqTXzxK8siFlCYO
-	me3ZH3uZoxhT/mn1fu088Y2pnFie6ky3N4Vnfeg49aJ0Ir/FhabvUov94zeesEXOOLG3
-	90Mp74ciBtH/H4RMPSBEvVr0FSRjIAT5fYkKs1ZNMYPnDNZDB5fZEFGYY0mAM447ueph
-	LS9ljnYY0YiQHs74igG+Tt/OP+DOPW4n7zWHVqZbrfH22QR9cyagzIzEkCYo3VdNCbft
-	38Nw==
+	h=sender:from:to:subject:date:message-id:in-reply-to:references;
+	bh=7SaMpOvODHuGBK9ZU2E8tUIRm7zqRrLcE07dgiBjSQ4=;
+	b=X3VgkKfKpIY7JtX5dplho2vAfvmcPqMqeSSRWWVQCtQMGuv13o6cRhx8htUBqfMR+L
+	f5nzNpJz/1ogHF80AArhnEACKfmxggKT0A80Er6qkgIbb9n4P759/9KSa0tnPC/GSQWF
+	xaF/kSDaJcZ5HT/MeAesJbkJxJ4bheJaDFlOEG3uEYfRK7CF4OKyV5VfbvlnbjndWcj0
+	qNB9DDnXE1Bd0JwKaJylPkkDkOH3wa1t/tBMqdPsfKIqnLDSfps0BgDgMSfIGnaRfYoV
+	+NaBpwiFaFilB+nRKbnO0+6Er1uy6kAwOG7UHCxZ1SICLQmHQQ8ePeZIvUdXuynABlII
+	zx0w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+	h=x-gm-message-state:sender:from:to:subject:date:message-id
 	:in-reply-to:references;
-	bh=i8cdpTQpJJWnX9/W8Ct8bcoN/ZoC8uS3+XE2cylOq34=;
-	b=S50pDz6ZJA907u4AJz8twG7EHsjycYRB7IhXKFfwPY2rR4/bL1TrFMzoKakkGkDf/I
-	RN0KFgwK7Q14uFZqSJGxuSGIYgE41y6tf/1zqaBSG2tM9Y1nNyNqVJdOXXQ1plUNKdns
-	tcTWFO8LCRa7T0eEzaxp/TkVUwL1ojIazDc8Ak0TK/1SJcEOrirCnpwjjurt7Qf9CMXi
-	cCyN/V+og9mWOP05PpvvtATXYQwnw2+aLIFyBxjZ6W+LxweEsUc4fb2XaHBLv0Opz2nc
-	MGyFy9lju113k+k4xoSvilq0EFzMgbgD7xI8yd5sWBvSklmHhF+u3D6y2G//VQ6ufhT9
-	Jadw==
-X-Gm-Message-State: APjAAAUC57w/wvL/QeuSGjphyWd+kBfNoTChagRcEEcZ3N09fvW3U8AO
-	qcdfnDPGWPgUebkudN5ZWt6SIkFp
-X-Google-Smtp-Source: APXvYqwd2RnC5QqL+gMa37Y6W0/XKcflPJTH2ABE/44nLizBwo3I5oyeRzCKCWNUyHLYln94YAZuHA==
-X-Received: by 2002:adf:f951:: with SMTP id q17mr16842462wrr.173.1559581853400;
-	Mon, 03 Jun 2019 10:10:53 -0700 (PDT)
+	bh=7SaMpOvODHuGBK9ZU2E8tUIRm7zqRrLcE07dgiBjSQ4=;
+	b=tYQInRg/1uY5KEzH8IGHJeVf13i+balmwkz21mATPVphMxKXFJj42kz0sWszIoRcz7
+	5V4DqXGYgBH7gmXX8pWooOGcC9DO5ouk5n19x60OzPbyiOozqVG1hAi6XXQizb6dG8ko
+	8LAv4Rr2sVQj2F0zTeyD0QC8Ugyo2oeZLzvpG9Fx9dKzHAAm97f+GMGIZObjXQyuXYAh
+	i9hizPgcZOYWch8x1YmVTsd9eUWoXLmnNN//lrJihPn1q6zhO1fgIUaLI8vmPBx8ibWx
+	7jmhoRXMsvQt94gqIyUU05hESdMgno/kjkudZWvXZjUmOjIMrXh5ux2cZMkv8JowBQLD
+	2qmA==
+X-Gm-Message-State: APjAAAXBO7CmSGO1mq+0EVt+J009/o5Ee/KzoXFHOUe/q7kS9l1AtNTe
+	qKeLwQF3sOfZhr8VMDa+I4YfwFGB
+X-Google-Smtp-Source: APXvYqxcc7WzNISrJDypuJ0688/t3ZzQb8jJFepfE134h9m/JhNvCeAkg3CNS1skIXq6QbQosU/jKA==
+X-Received: by 2002:adf:f542:: with SMTP id j2mr3498147wrp.16.1559581860404;
+	Mon, 03 Jun 2019 10:11:00 -0700 (PDT)
 Received: from 640k.lan ([93.56.166.5]) by smtp.gmail.com with ESMTPSA id
-	r131sm3325045wmf.4.2019.06.03.10.10.52
+	r131sm3325045wmf.4.2019.06.03.10.10.59 for <qemu-devel@nongnu.org>
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Mon, 03 Jun 2019 10:10:52 -0700 (PDT)
+	Mon, 03 Jun 2019 10:10:59 -0700 (PDT)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Mon,  3 Jun 2019 19:10:26 +0200
-Message-Id: <1559581843-3968-8-git-send-email-pbonzini@redhat.com>
+Date: Mon,  3 Jun 2019 19:10:33 +0200
+Message-Id: <1559581843-3968-15-git-send-email-pbonzini@redhat.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1559581843-3968-1-git-send-email-pbonzini@redhat.com>
 References: <1559581843-3968-1-git-send-email-pbonzini@redhat.com>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2a00:1450:4864:20::443
-Subject: [Qemu-devel] [PULL 07/24] edu: mmio: allow 64-bit access in read
- dispatch
+X-Received-From: 2a00:1450:4864:20::431
+Subject: [Qemu-devel] [PULL 14/24] imx25-pdk: create ds1338 for qtest inside
+ the test
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -90,40 +90,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Li Qiang <liq3ea@163.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Li Qiang <liq3ea@163.com>
+There is no need to have a test device created by the board.
+Instead, create it in the qtest so that we will be able to run
+it on other boards too.
 
-The edu spec says when address >= 0x80, the MMIO area can
-be accessed by 64-bit.
-
-Signed-off-by: Li Qiang <liq3ea@163.com>
-Reviewed-by: Philippe Mathieu-Daude <philmd@redhat.com>
-Message-Id: <20190510164349.81507-3-liq3ea@163.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/misc/edu.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+ hw/arm/imx25_pdk.c  | 9 ---------
+ tests/ds1338-test.c | 2 +-
+ 2 files changed, 1 insertion(+), 10 deletions(-)
 
-diff --git a/hw/misc/edu.c b/hw/misc/edu.c
-index 65fc32b..33de051 100644
---- a/hw/misc/edu.c
-+++ b/hw/misc/edu.c
-@@ -185,7 +185,11 @@ static uint64_t edu_mmio_read(void *opaque, hwaddr addr, unsigned size)
-     EduState *edu = opaque;
-     uint64_t val = ~0ULL;
- 
--    if (size != 4) {
-+    if (addr < 0x80 && size != 4) {
-+        return val;
-+    }
-+
-+    if (addr >= 0x80 && size != 4 && size != 8) {
-         return val;
+diff --git a/hw/arm/imx25_pdk.c b/hw/arm/imx25_pdk.c
+index eef1b18..a0423ff 100644
+--- a/hw/arm/imx25_pdk.c
++++ b/hw/arm/imx25_pdk.c
+@@ -131,15 +131,6 @@ static void imx25_pdk_init(MachineState *machine)
+      */
+     if (!qtest_enabled()) {
+         arm_load_kernel(&s->soc.cpu, &imx25_pdk_binfo);
+-    } else {
+-        /*
+-         * This I2C device doesn't exist on the real board.
+-         * We add it here (only on qtest usage) to be able to do a bit
+-         * of simple qtest. See "make check" for details.
+-         */
+-        i2c_create_slave((I2CBus *)qdev_get_child_bus(DEVICE(&s->soc.i2c[0]),
+-                                                      "i2c-bus.0"),
+-                         "ds1338", 0x68);
      }
+ }
+ 
+diff --git a/tests/ds1338-test.c b/tests/ds1338-test.c
+index 88f829f..bd72a15 100644
+--- a/tests/ds1338-test.c
++++ b/tests/ds1338-test.c
+@@ -54,7 +54,7 @@ int main(int argc, char **argv)
+ 
+     g_test_init(&argc, &argv, NULL);
+ 
+-    s = qtest_start("-display none -machine imx25-pdk");
++    s = qtest_start("-display none -machine imx25-pdk -device ds1338,address=0x68");
+     i2c = imx_i2c_create(s, IMX25_I2C_0_BASE);
+     addr = DS1338_ADDR;
  
 -- 
 1.8.3.1
