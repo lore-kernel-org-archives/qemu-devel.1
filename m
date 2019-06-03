@@ -6,57 +6,57 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7428BC28CC7
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B27B9C28CC6
 	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 09:14:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5175A27ED9
+	by mail.kernel.org (Postfix) with ESMTPS id 8FB1F27ED9
 	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 09:14:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5175A27ED9
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8FB1F27ED9
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:60122 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:60124 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hXj30-0002b4-FE
+	id 1hXj30-0002bd-MV
 	for qemu-devel@archiver.kernel.org; Mon, 03 Jun 2019 05:14:30 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:47140)
+Received: from eggs.gnu.org ([209.51.188.92]:46986)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hXiw5-0004hs-7X
-	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 05:07:22 -0400
+	(envelope-from <david@redhat.com>) id 1hXivt-0004TY-VQ
+	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 05:07:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hXiw4-0002y7-3I
-	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 05:07:21 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56244)
+	(envelope-from <david@redhat.com>) id 1hXivs-0002i7-RY
+	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 05:07:09 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46392)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <david@redhat.com>)
-	id 1hXiw3-0002x3-S5; Mon, 03 Jun 2019 05:07:20 -0400
+	id 1hXivs-0002gm-Jm; Mon, 03 Jun 2019 05:07:08 -0400
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
 	[10.5.11.12])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 2702FC058CA2;
-	Mon,  3 Jun 2019 09:07:19 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id BFFD930833C4;
+	Mon,  3 Jun 2019 09:07:07 +0000 (UTC)
 Received: from t460s.redhat.com (unknown [10.36.117.0])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id EB45261981;
-	Mon,  3 Jun 2019 09:07:14 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id C1FEF61981;
+	Mon,  3 Jun 2019 09:07:05 +0000 (UTC)
 From: David Hildenbrand <david@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Mon,  3 Jun 2019 11:06:26 +0200
-Message-Id: <20190603090635.10631-14-david@redhat.com>
+Date: Mon,  3 Jun 2019 11:06:22 +0200
+Message-Id: <20190603090635.10631-10-david@redhat.com>
 In-Reply-To: <20190603090635.10631-1-david@redhat.com>
 References: <20190603090635.10631-1-david@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.32]);
-	Mon, 03 Jun 2019 09:07:19 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.44]);
+	Mon, 03 Jun 2019 09:07:07 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v2 13/22] s390x/tcg: Implement VECTOR LOAD
- LENGTHENED
+Subject: [Qemu-devel] [PATCH v2 09/22] s390x/tcg: Implement VECTOR FP
+ CONVERT TO FIXED 64-BIT
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -78,124 +78,95 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Take care of reading/indicating the 32-bit elements.
-
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
  target/s390x/helper.h           |  2 ++
  target/s390x/insn-data.def      |  2 ++
- target/s390x/translate_vx.inc.c | 19 ++++++++++++++++++
- target/s390x/vec_fpu_helper.c   | 35 +++++++++++++++++++++++++++++++++
- 4 files changed, 58 insertions(+)
+ target/s390x/translate_vx.inc.c |  3 +++
+ target/s390x/vec_fpu_helper.c   | 23 +++++++++++++++++++++++
+ 4 files changed, 30 insertions(+)
 
 diff --git a/target/s390x/helper.h b/target/s390x/helper.h
-index 10a9cb39b6..cb25141ffe 100644
+index 6fd996e924..9893c677da 100644
 --- a/target/s390x/helper.h
 +++ b/target/s390x/helper.h
-@@ -278,6 +278,8 @@ DEF_HELPER_FLAGS_5(gvec_vfd64, TCG_CALL_NO_WG, void, =
-ptr, cptr, cptr, env, i32)
- DEF_HELPER_FLAGS_5(gvec_vfd64s, TCG_CALL_NO_WG, void, ptr, cptr, cptr, e=
-nv, i32)
- DEF_HELPER_FLAGS_4(gvec_vfi64, TCG_CALL_NO_WG, void, ptr, cptr, env, i32=
-)
- DEF_HELPER_FLAGS_4(gvec_vfi64s, TCG_CALL_NO_WG, void, ptr, cptr, env, i3=
+@@ -270,6 +270,8 @@ DEF_HELPER_FLAGS_4(gvec_vcdg64, TCG_CALL_NO_WG, void,=
+ ptr, cptr, env, i32)
+ DEF_HELPER_FLAGS_4(gvec_vcdg64s, TCG_CALL_NO_WG, void, ptr, cptr, env, i=
+32)
+ DEF_HELPER_FLAGS_4(gvec_vcdlg64, TCG_CALL_NO_WG, void, ptr, cptr, env, i=
+32)
+ DEF_HELPER_FLAGS_4(gvec_vcdlg64s, TCG_CALL_NO_WG, void, ptr, cptr, env, =
+i32)
++DEF_HELPER_FLAGS_4(gvec_vcgd64, TCG_CALL_NO_WG, void, ptr, cptr, env, i3=
 2)
-+DEF_HELPER_FLAGS_4(gvec_vfll32, TCG_CALL_NO_WG, void, ptr, cptr, env, i3=
-2)
-+DEF_HELPER_FLAGS_4(gvec_vfll32s, TCG_CALL_NO_WG, void, ptr, cptr, env, i=
++DEF_HELPER_FLAGS_4(gvec_vcgd64s, TCG_CALL_NO_WG, void, ptr, cptr, env, i=
 32)
 =20
  #ifndef CONFIG_USER_ONLY
  DEF_HELPER_3(servc, i32, env, i64, i64)
 diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
-index f77aa41253..5afdb36aec 100644
+index 465b36dd70..97c62a8af5 100644
 --- a/target/s390x/insn-data.def
 +++ b/target/s390x/insn-data.def
-@@ -1230,6 +1230,8 @@
-     F(0xe7e5, VFD,     VRR_c, V,   0, 0, 0, 0, vfa, 0, IF_VEC)
- /* VECTOR LOAD FP INTEGER */
-     F(0xe7c7, VFI,     VRR_a, V,   0, 0, 0, 0, vcdg, 0, IF_VEC)
-+/* VECTOR LOAD LENGTHENED */
-+    F(0xe7c4, VFLL,    VRR_a, V,   0, 0, 0, 0, vfll, 0, IF_VEC)
+@@ -1222,6 +1222,8 @@
+     F(0xe7c3, VCDG,    VRR_a, V,   0, 0, 0, 0, vcdg, 0, IF_VEC)
+ /* VECTOR FP CONVERT FROM LOGICAL 64-BIT */
+     F(0xe7c1, VCDLG,   VRR_a, V,   0, 0, 0, 0, vcdg, 0, IF_VEC)
++/* VECTOR FP CONVERT TO FIXED 64-BIT */
++    F(0xe7c2, VCGD,    VRR_a, V,   0, 0, 0, 0, vcdg, 0, IF_VEC)
 =20
  #ifndef CONFIG_USER_ONLY
  /* COMPARE AND SWAP AND PURGE */
 diff --git a/target/s390x/translate_vx.inc.c b/target/s390x/translate_vx.=
 inc.c
-index 59d8b971c0..a25985e5c9 100644
+index fa755cd1d6..a42de2ff01 100644
 --- a/target/s390x/translate_vx.inc.c
 +++ b/target/s390x/translate_vx.inc.c
-@@ -2679,3 +2679,22 @@ static DisasJumpType op_vcdg(DisasContext *s, Disa=
-sOps *o)
-                    deposit32(m4, 4, 4, erm), fn);
-     return DISAS_NEXT;
- }
-+
-+static DisasJumpType op_vfll(DisasContext *s, DisasOps *o)
-+{
-+    const uint8_t fpf =3D get_field(s->fields, m3);
-+    const uint8_t m4 =3D get_field(s->fields, m4);
-+    gen_helper_gvec_2_ptr *fn =3D gen_helper_gvec_vfll32;
-+
-+    if (fpf !=3D FPF_SHORT || extract32(m4, 0, 3)) {
-+        gen_program_exception(s, PGM_SPECIFICATION);
-+        return DISAS_NORETURN;
-+    }
-+
-+    if (extract32(m4, 3, 1)) {
-+        fn =3D gen_helper_gvec_vfll32s;
-+    }
-+    gen_gvec_2_ptr(get_field(s->fields, v1), get_field(s->fields, v2), c=
-pu_env,
-+                   0, fn);
-+    return DISAS_NEXT;
-+}
+@@ -2660,6 +2660,9 @@ static DisasJumpType op_vcdg(DisasContext *s, Disas=
+Ops *o)
+     case 0xc1:
+         fn =3D se ? gen_helper_gvec_vcdlg64s : gen_helper_gvec_vcdlg64;
+         break;
++    case 0xc2:
++        fn =3D se ? gen_helper_gvec_vcgd64s : gen_helper_gvec_vcgd64;
++        break;
+     default:
+         g_assert_not_reached();
+     }
 diff --git a/target/s390x/vec_fpu_helper.c b/target/s390x/vec_fpu_helper.=
 c
-index bdcafc6738..f5b7fdf871 100644
+index 181378e167..e7251aca04 100644
 --- a/target/s390x/vec_fpu_helper.c
 +++ b/target/s390x/vec_fpu_helper.c
-@@ -409,3 +409,38 @@ void HELPER(gvec_vfi64s)(void *v1, const void *v2, C=
-PUS390XState *env,
+@@ -323,3 +323,26 @@ void HELPER(gvec_vcdlg64s)(void *v1, const void *v2,=
+ CPUS390XState *env,
 =20
-     vop64_2(v1, v2, env, true, XxC, erm, vfi64, GETPC());
+     vop64_2(v1, v2, env, true, XxC, erm, vcdlg64, GETPC());
  }
 +
-+static void vfll32(S390Vector *v1, const S390Vector *v2, CPUS390XState *=
-env,
-+                   bool s, uintptr_t retaddr)
++static uint64_t vcgd64(uint64_t a, float_status *s)
 +{
-+    uint8_t vxc, vec_exc =3D 0;
-+    S390Vector tmp =3D {};
-+    int i;
-+
-+    for (i =3D 0; i < 2; i++) {
-+        /* load from even element */
-+        const float32 a =3D s390_vec_read_element32(v2, i * 2);
-+        const uint64_t ret =3D float32_to_float64(a, &env->fpu_status);
-+
-+        s390_vec_write_element64(&tmp, i, ret);
-+        /* indicate the source element */
-+        vxc =3D check_ieee_exc(env, i * 2, false, &vec_exc);
-+        if (s || vxc) {
-+            break;
-+        }
-+    }
-+    handle_ieee_exc(env, vxc, vec_exc, retaddr);
-+    *v1 =3D tmp;
++    return float64_to_int64(a, s);
 +}
 +
-+void HELPER(gvec_vfll32)(void *v1, const void *v2, CPUS390XState *env,
++void HELPER(gvec_vcgd64)(void *v1, const void *v2, CPUS390XState *env,
 +                         uint32_t desc)
 +{
-+    vfll32(v1, v2, env, false, GETPC());
++    const uint8_t erm =3D extract32(simd_data(desc), 4, 4);
++    const bool XxC =3D extract32(simd_data(desc), 2, 1);
++
++    vop64_2(v1, v2, env, false, XxC, erm, vcgd64, GETPC());
 +}
 +
-+void HELPER(gvec_vfll32s)(void *v1, const void *v2, CPUS390XState *env,
++void HELPER(gvec_vcgd64s)(void *v1, const void *v2, CPUS390XState *env,
 +                          uint32_t desc)
 +{
-+    vfll32(v1, v2, env, true, GETPC());
++    const uint8_t erm =3D extract32(simd_data(desc), 4, 4);
++    const bool XxC =3D extract32(simd_data(desc), 2, 1);
++
++    vop64_2(v1, v2, env, true, XxC, erm, vcgd64, GETPC());
 +}
 --=20
 2.21.0
