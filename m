@@ -6,55 +6,55 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B2CCC04AB6
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 06:56:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C775C04AB6
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 06:56:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 621AD27C56
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 06:56:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 621AD27C56
+	by mail.kernel.org (Postfix) with ESMTPS id 55E8027C56
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 06:56:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 55E8027C56
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:58743 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:58745 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hXgt4-0002dl-JF
-	for qemu-devel@archiver.kernel.org; Mon, 03 Jun 2019 02:56:06 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:49489)
+	id 1hXgt9-0002hE-DG
+	for qemu-devel@archiver.kernel.org; Mon, 03 Jun 2019 02:56:11 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:49572)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1hXgoO-0007Vt-U9
-	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 02:51:18 -0400
+	(envelope-from <peterx@redhat.com>) id 1hXgoa-0007nf-2J
+	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 02:51:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1hXgoN-00025J-DG
-	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 02:51:16 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57788)
+	(envelope-from <peterx@redhat.com>) id 1hXgoZ-0002L1-2p
+	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 02:51:28 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:32788)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1hXgoN-00024D-5V
-	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 02:51:15 -0400
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1hXgoY-0002KQ-Tr
+	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 02:51:27 -0400
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
 	[10.5.11.13])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 835FE356DB
-	for <qemu-devel@nongnu.org>; Mon,  3 Jun 2019 06:51:14 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 3F7B8330259
+	for <qemu-devel@nongnu.org>; Mon,  3 Jun 2019 06:51:26 +0000 (UTC)
 Received: from xz-x1.nay.redhat.com (dhcp-15-205.nay.redhat.com [10.66.15.205])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 78E64648B0;
-	Mon,  3 Jun 2019 06:51:12 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 599A64E6AA;
+	Mon,  3 Jun 2019 06:51:22 +0000 (UTC)
 From: Peter Xu <peterx@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Mon,  3 Jun 2019 14:50:49 +0800
-Message-Id: <20190603065056.25211-5-peterx@redhat.com>
+Date: Mon,  3 Jun 2019 14:50:52 +0800
+Message-Id: <20190603065056.25211-8-peterx@redhat.com>
 In-Reply-To: <20190603065056.25211-1-peterx@redhat.com>
 References: <20190603065056.25211-1-peterx@redhat.com>
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.30]);
-	Mon, 03 Jun 2019 06:51:14 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.29]);
+	Mon, 03 Jun 2019 06:51:26 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v4 04/11] bitmap: Add
- bitmap_copy_with_{src|dst}_offset()
+Subject: [Qemu-devel] [PATCH v4 07/11] kvm: Update comments for
+ sync_dirty_bitmap
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -73,239 +73,37 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-These helpers copy the source bitmap to destination bitmap with a
-shift either on the src or dst bitmap.
-
-Meanwhile, we never have bitmap tests but we should.
-
-This patch also introduces the initial test cases for utils/bitmap.c
-but it only tests the newly introduced functions.
+It's obviously obsolete.  Do some update.
 
 Signed-off-by: Peter Xu <peterx@redhat.com>
 ---
- include/qemu/bitmap.h  |  9 +++++
- tests/Makefile.include |  2 +
- tests/test-bitmap.c    | 72 +++++++++++++++++++++++++++++++++++
- util/bitmap.c          | 85 ++++++++++++++++++++++++++++++++++++++++++
- 4 files changed, 168 insertions(+)
- create mode 100644 tests/test-bitmap.c
+ accel/kvm/kvm-all.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
-diff --git a/include/qemu/bitmap.h b/include/qemu/bitmap.h
-index 5c313346b9..82a1d2f41f 100644
---- a/include/qemu/bitmap.h
-+++ b/include/qemu/bitmap.h
-@@ -41,6 +41,10 @@
-  * bitmap_find_next_zero_area(buf, len, pos, n, mask)	Find bit free area
-  * bitmap_to_le(dst, src, nbits)      Convert bitmap to little endian
-  * bitmap_from_le(dst, src, nbits)    Convert bitmap from little endian
-+ * bitmap_copy_with_src_offset(dst, src, offset, nbits)
-+ *                                    *dst = *src (with an offset into src)
-+ * bitmap_copy_with_dst_offset(dst, src, offset, nbits)
-+ *                                    *dst = *src (with an offset into dst)
+diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+index 524c4ddfbd..b686531586 100644
+--- a/accel/kvm/kvm-all.c
++++ b/accel/kvm/kvm-all.c
+@@ -473,13 +473,13 @@ static int kvm_get_dirty_pages_log_range(MemoryRegionSection *section,
+ #define ALIGN(x, y)  (((x)+(y)-1) & ~((y)-1))
+ 
+ /**
+- * kvm_physical_sync_dirty_bitmap - Grab dirty bitmap from kernel space
+- * This function updates qemu's dirty bitmap using
+- * memory_region_set_dirty().  This means all bits are set
+- * to dirty.
++ * kvm_physical_sync_dirty_bitmap - Sync dirty bitmap from kernel space
+  *
+- * @start_add: start of logged region.
+- * @end_addr: end of logged region.
++ * This function will first try to fetch dirty bitmap from the kernel,
++ * and then updates qemu's dirty bitmap.
++ *
++ * @kml: the KVM memory listener object
++ * @section: the memory section to sync the dirty bitmap with
   */
- 
- /*
-@@ -271,4 +275,9 @@ void bitmap_to_le(unsigned long *dst, const unsigned long *src,
- void bitmap_from_le(unsigned long *dst, const unsigned long *src,
-                     long nbits);
- 
-+void bitmap_copy_with_src_offset(unsigned long *dst, const unsigned long *src,
-+                                 unsigned long offset, unsigned long nbits);
-+void bitmap_copy_with_dst_offset(unsigned long *dst, const unsigned long *src,
-+                                 unsigned long shift, unsigned long nbits);
-+
- #endif /* BITMAP_H */
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 1865f6b322..5e2d7dddff 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -64,6 +64,7 @@ check-unit-y += tests/test-opts-visitor$(EXESUF)
- check-unit-$(CONFIG_BLOCK) += tests/test-coroutine$(EXESUF)
- check-unit-y += tests/test-visitor-serialization$(EXESUF)
- check-unit-y += tests/test-iov$(EXESUF)
-+check-unit-y += tests/test-bitmap$(EXESUF)
- check-unit-$(CONFIG_BLOCK) += tests/test-aio$(EXESUF)
- check-unit-$(CONFIG_BLOCK) += tests/test-aio-multithread$(EXESUF)
- check-unit-$(CONFIG_BLOCK) += tests/test-throttle$(EXESUF)
-@@ -529,6 +530,7 @@ tests/test-image-locking$(EXESUF): tests/test-image-locking.o $(test-block-obj-y
- tests/test-thread-pool$(EXESUF): tests/test-thread-pool.o $(test-block-obj-y)
- tests/test-iov$(EXESUF): tests/test-iov.o $(test-util-obj-y)
- tests/test-hbitmap$(EXESUF): tests/test-hbitmap.o $(test-util-obj-y) $(test-crypto-obj-y)
-+tests/test-bitmap$(EXESUF): tests/test-bitmap.o $(test-util-obj-y)
- tests/test-x86-cpuid$(EXESUF): tests/test-x86-cpuid.o
- tests/test-xbzrle$(EXESUF): tests/test-xbzrle.o migration/xbzrle.o migration/page_cache.o $(test-util-obj-y)
- tests/test-cutils$(EXESUF): tests/test-cutils.o util/cutils.o $(test-util-obj-y)
-diff --git a/tests/test-bitmap.c b/tests/test-bitmap.c
-new file mode 100644
-index 0000000000..43f7ba26c5
---- /dev/null
-+++ b/tests/test-bitmap.c
-@@ -0,0 +1,72 @@
-+/*
-+ * SPDX-License-Identifier: GPL-2.0-or-later
-+ *
-+ * Bitmap.c unit-tests.
-+ *
-+ * Copyright (C) 2019, Red Hat, Inc.
-+ *
-+ * Author: Peter Xu <peterx@redhat.com>
-+ */
-+
-+#include <stdlib.h>
-+#include "qemu/osdep.h"
-+#include "qemu/bitmap.h"
-+
-+#define BMAP_SIZE  1024
-+
-+static void check_bitmap_copy_with_offset(void)
-+{
-+    unsigned long *bmap1, *bmap2, *bmap3, total;
-+
-+    bmap1 = bitmap_new(BMAP_SIZE);
-+    bmap2 = bitmap_new(BMAP_SIZE);
-+    bmap3 = bitmap_new(BMAP_SIZE);
-+
-+    bmap1[0] = random();
-+    bmap1[1] = random();
-+    bmap1[2] = random();
-+    bmap1[3] = random();
-+    total = BITS_PER_LONG * 4;
-+
-+    /* Shift 115 bits into bmap2 */
-+    bitmap_copy_with_dst_offset(bmap2, bmap1, 115, total);
-+    /* Shift another 85 bits into bmap3 */
-+    bitmap_copy_with_dst_offset(bmap3, bmap2, 85, total + 115);
-+    /* Shift back 200 bits back */
-+    bitmap_copy_with_src_offset(bmap2, bmap3, 200, total);
-+
-+    g_assert_cmpmem(bmap1, total / sizeof(unsigned long),
-+                    bmap2, total / sizeof(unsigned long));
-+
-+    bitmap_clear(bmap1, 0, BMAP_SIZE);
-+    /* Set bits in bmap1 are 100-245 */
-+    bitmap_set(bmap1, 100, 145);
-+
-+    /* Set bits in bmap2 are 60-205 */
-+    bitmap_copy_with_src_offset(bmap2, bmap1, 40, 250);
-+    g_assert_cmpint(find_first_bit(bmap2, 60), ==, 60);
-+    g_assert_cmpint(find_next_zero_bit(bmap2, 205, 60), ==, 205);
-+    g_assert(test_bit(205, bmap2) == 0);
-+
-+    /* Set bits in bmap3 are 135-280 */
-+    bitmap_copy_with_dst_offset(bmap3, bmap1, 35, 250);
-+    g_assert_cmpint(find_first_bit(bmap3, 135), ==, 135);
-+    g_assert_cmpint(find_next_zero_bit(bmap3, 280, 135), ==, 280);
-+    g_assert(test_bit(280, bmap3) == 0);
-+
-+    g_free(bmap1);
-+    g_free(bmap2);
-+    g_free(bmap3);
-+}
-+
-+int main(int argc, char **argv)
-+{
-+    g_test_init(&argc, &argv, NULL);
-+
-+    g_test_add_func("/bitmap/bitmap_copy_with_offset",
-+                    check_bitmap_copy_with_offset);
-+
-+    g_test_run();
-+
-+    return 0;
-+}
-diff --git a/util/bitmap.c b/util/bitmap.c
-index cb618c65a5..1753ff7f5b 100644
---- a/util/bitmap.c
-+++ b/util/bitmap.c
-@@ -402,3 +402,88 @@ void bitmap_to_le(unsigned long *dst, const unsigned long *src,
- {
-     bitmap_to_from_le(dst, src, nbits);
- }
-+
-+/*
-+ * Copy "src" bitmap with a positive offset and put it into the "dst"
-+ * bitmap.  The caller needs to make sure the bitmap size of "src"
-+ * is bigger than (shift + nbits).
-+ */
-+void bitmap_copy_with_src_offset(unsigned long *dst, const unsigned long *src,
-+                                 unsigned long shift, unsigned long nbits)
-+{
-+    unsigned long left_mask, right_mask, last_mask;
-+
-+    /* Proper shift src pointer to the first word to copy from */
-+    src += BIT_WORD(shift);
-+    shift %= BITS_PER_LONG;
-+
-+    if (!shift) {
-+        /* Fast path */
-+        bitmap_copy(dst, src, nbits);
-+        return;
-+    }
-+
-+    right_mask = (1ul << shift) - 1;
-+    left_mask = ~right_mask;
-+
-+    while (nbits >= BITS_PER_LONG) {
-+        *dst = (*src & left_mask) >> shift;
-+        *dst |= (src[1] & right_mask) << (BITS_PER_LONG - shift);
-+        dst++;
-+        src++;
-+        nbits -= BITS_PER_LONG;
-+    }
-+
-+    if (nbits > BITS_PER_LONG - shift) {
-+        *dst = (*src & left_mask) >> shift;
-+        nbits -= BITS_PER_LONG - shift;
-+        last_mask = (1ul << nbits) - 1;
-+        *dst |= (src[1] & last_mask) << (BITS_PER_LONG - shift);
-+    } else if (nbits) {
-+        last_mask = (1ul << nbits) - 1;
-+        *dst = (*src >> shift) & last_mask;
-+    }
-+}
-+
-+/*
-+ * Copy "src" bitmap into the "dst" bitmap with an offset in the
-+ * "dst".  The caller needs to make sure the bitmap size of "dst" is
-+ * bigger than (shift + nbits).
-+ */
-+void bitmap_copy_with_dst_offset(unsigned long *dst, const unsigned long *src,
-+                                 unsigned long shift, unsigned long nbits)
-+{
-+    unsigned long left_mask, right_mask, last_mask;
-+
-+    /* Proper shift dst pointer to the first word to copy from */
-+    dst += BIT_WORD(shift);
-+    shift %= BITS_PER_LONG;
-+
-+    if (!shift) {
-+        /* Fast path */
-+        bitmap_copy(dst, src, nbits);
-+        return;
-+    }
-+
-+    right_mask = (1ul << (BITS_PER_LONG - shift)) - 1;
-+    left_mask = ~right_mask;
-+
-+    *dst &= (1ul << shift) - 1;
-+    while (nbits >= BITS_PER_LONG) {
-+        *dst |= (*src & right_mask) << shift;
-+        dst[1] = (*src & left_mask) >> (BITS_PER_LONG - shift);
-+        dst++;
-+        src++;
-+        nbits -= BITS_PER_LONG;
-+    }
-+
-+    if (nbits > BITS_PER_LONG - shift) {
-+        *dst |= (*src & right_mask) << shift;
-+        nbits -= BITS_PER_LONG - shift;
-+        last_mask = ((1ul << nbits) - 1) << (BITS_PER_LONG - shift);
-+        dst[1] = (*src & last_mask) >> (BITS_PER_LONG - shift);
-+    } else if (nbits) {
-+        last_mask = (1ul << nbits) - 1;
-+        *dst |= (*src & last_mask) << shift;
-+    }
-+}
+ static int kvm_physical_sync_dirty_bitmap(KVMMemoryListener *kml,
+                                           MemoryRegionSection *section)
 -- 
 2.17.1
 
