@@ -2,84 +2,100 @@ Return-Path: <SRS0=e5mL=UC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4097BC04AB5
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 12:53:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 245FEC04AB5
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 12:54:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0F7FD24A6E
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 12:53:58 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NyAZuyzT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0F7FD24A6E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 0084524E8A
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 12:54:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0084524E8A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:34736 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:34746 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hXmTN-0005ZY-7H
-	for qemu-devel@archiver.kernel.org; Mon, 03 Jun 2019 08:53:57 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:37968)
+	id 1hXmUB-00068y-6m
+	for qemu-devel@archiver.kernel.org; Mon, 03 Jun 2019 08:54:47 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:41567)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mehta.aaru20@gmail.com>) id 1hXmKw-0007F5-9U
-	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 08:45:17 -0400
+	(envelope-from <stli@linux.ibm.com>) id 1hXkMu-0002s9-VS
+	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 06:39:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mehta.aaru20@gmail.com>) id 1hXmEp-0006zQ-2e
-	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 08:38:55 -0400
-Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:43245)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mehta.aaru20@gmail.com>)
-	id 1hXmEo-0006xT-Su; Mon, 03 Jun 2019 08:38:55 -0400
-Received: by mail-pl1-x642.google.com with SMTP id cl9so1840391plb.10;
-	Mon, 03 Jun 2019 05:38:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=from:to:cc:subject:date:message-id:in-reply-to:references;
-	bh=LtyXP6pU3wLcU44kzIV+V39Txu8qaO7ubJvSXbC66PQ=;
-	b=NyAZuyzTenzksxLOolD3RsBvaYcx7jzYHKUUP4R2rT2R8NpjAZinT34jHYbkhky/Jf
-	YyOk+M/dy1qt5sXpCjoPa1IbVDj3y7pqnN+lesckl+jdIlYBCd025kM9aJceRjfKpcBL
-	EFDP7738cKvid4BT0kES+xRBSKLuMNbEKNYSwiNut7aRyPbE+YehnjfmAZ5dVAZL8wK4
-	VTIJNpsvU8BKKf34l5NZ6cwNIYXeR9yeUYFbQPZTlB5i5hC7im487OA1DIXDIDtpBoBy
-	yKLbU5FprvNPJd/uZNvtGHWoGxyPi4DaAAgGmNSCBU5/SHl3n32U90jiZLe9s6nhmkoK
-	qm9w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-	:references;
-	bh=LtyXP6pU3wLcU44kzIV+V39Txu8qaO7ubJvSXbC66PQ=;
-	b=eNNj8oGPkAJ47tmaPbDA5wBMJfzMF9Fst1031tFumrtJxsVl0RVqQu39wPGG2T6cUS
-	UaER9lYW+BU0dIpHmMFGpySH1mZqrQDjgoc0vXHdMKjxe3RTb2jXW6wHOHEBnqMe5qCK
-	jYIFP3FpBIgL+NhJaoksZ/1hd9snqYdQP/wxkvVYwsRHK823BeqKte1QIffas1HangNY
-	jUDGdIMH8z+x+tuxhN3QY2obub5Ekr0lzQbbGhhC6M4m3ZauoDRmgtT8v5ak/PUw36/7
-	FrJu1z48Cbcld/EIHRUui+8uFDujWuhqJL+2zEKWZoCC3BwkEhjwmFjMKa3expcEY5Yp
-	A6gw==
-X-Gm-Message-State: APjAAAXDp0aEBj+ov7RpC8izygkobaZfDXG1GtU3yzLC9N7UbjgXOnzs
-	7p9gvXuH8WLi9Y2ucaz0KGuyz4a8fCDvvg==
-X-Google-Smtp-Source: APXvYqwa/HzZA0B2BEH39pEgNt2LZ5ZMmI/6BjfqKXy38aLL4ob/Sv18Emfis3KytOb4+XiEhxhK0w==
-X-Received: by 2002:a17:902:7043:: with SMTP id
-	h3mr29080981plt.292.1559565533487; 
-	Mon, 03 Jun 2019 05:38:53 -0700 (PDT)
-Received: from localhost.localdomain ([136.233.9.100])
-	by smtp.gmail.com with ESMTPSA id
-	k14sm34860257pga.5.2019.06.03.05.38.46
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Mon, 03 Jun 2019 05:38:52 -0700 (PDT)
-From: Aarushi Mehta <mehta.aaru20@gmail.com>
-To: qemu-devel@nongnu.org
-Date: Mon,  3 Jun 2019 18:08:16 +0530
-Message-Id: <20190603123823.32661-3-mehta.aaru20@gmail.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20190603123823.32661-1-mehta.aaru20@gmail.com>
-References: <20190603123823.32661-1-mehta.aaru20@gmail.com>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::642
-Subject: [Qemu-devel] [PATCH v4 2/9] qapi/block-core: add option for io_uring
+	(envelope-from <stli@linux.ibm.com>) id 1hXkMt-0007dJ-D3
+	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 06:39:08 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:46580
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stli@linux.ibm.com>) id 1hXkMt-0007a6-5L
+	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 06:39:07 -0400
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+	x53AVko1142957
+	for <qemu-devel@nongnu.org>; Mon, 3 Jun 2019 06:39:01 -0400
+Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2sw0tab98g-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 03 Jun 2019 06:39:01 -0400
+Received: from localhost
+	by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <stli@linux.ibm.com>;
+	Mon, 3 Jun 2019 11:38:59 +0100
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
+	by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway:
+	Authorized Use Only! Violators will be prosecuted; 
+	(version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+	Mon, 3 Jun 2019 11:38:57 +0100
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com
+	[9.149.105.62])
+	by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with
+	ESMTP id x53AcsaI46858312
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256
+	verify=OK); Mon, 3 Jun 2019 10:38:54 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 1698CAE055;
+	Mon,  3 Jun 2019 10:38:54 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id CC254AE051;
+	Mon,  3 Jun 2019 10:38:53 +0000 (GMT)
+Received: from oc4452167425.ibm.com (unknown [9.152.222.74])
+	by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+	Mon,  3 Jun 2019 10:38:53 +0000 (GMT)
+To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
+References: <20190531145608.28183-1-david@redhat.com>
+	<20190531145608.28183-3-david@redhat.com>
+From: Stefan Liebler <stli@linux.ibm.com>
+Date: Mon, 3 Jun 2019 12:38:53 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
+MIME-Version: 1.0
+In-Reply-To: <20190531145608.28183-3-david@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-IE
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+x-cbid: 19060310-0008-0000-0000-000002ED46AF
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19060310-0009-0000-0000-0000225A2549
+Message-Id: <b16f8afd-3458-591c-5b47-e1672e53e64a@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
+	definitions=2019-06-03_08:, , signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+	priorityscore=1501
+	malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+	clxscore=1011 lowpriorityscore=0 mlxscore=0 impostorscore=0
+	mlxlogscore=724 adultscore=0 classifier=spam adjust=0 reason=mlx
+	scancount=1 engine=8.0.1-1810050000 definitions=main-1906030078
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 148.163.158.5
+X-Mailman-Approved-At: Mon, 03 Jun 2019 08:50:25 -0400
+Subject: Re: [Qemu-devel] [PATCH v1 2/2] s390x/tcg: Store only the necessary
+ amount of doublewords for STFLE
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -91,41 +107,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
-	qemu-block@nongnu.org, Markus Armbruster <armbru@redhat.com>,
-	Max Reitz <mreitz@redhat.com>, saket.sinha89@gmail.com,
-	Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
-	Julia Suvorova <jusual@mail.ru>, Aarushi Mehta <mehta.aaru20@gmail.com>
+Cc: Thomas Huth <thuth@redhat.com>, Ilya Leoshkevich <iii@de.ibm.com>,
+	Andreas Krebbel <Andreas.Krebbel@de.ibm.com>,
+	Cornelia Huck <cohuck@redhat.com>, qemu-s390x@nongnu.org,
+	Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Option only enumerates for hosts that support it.
-Signed-off-by: Aarushi Mehta <mehta.aaru20@gmail.com>
----
- qapi/block-core.json | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+On 5/31/19 4:56 PM, David Hildenbrand wrote:
+> The PoP (z14, 7-382) says:
+>      Doublewords to the right of the doubleword in which the
+>      highest-numbered facility bit is assigned for a model
+>      may or may not be stored.
+> 
+> However, stack protection in certain binaries can't deal with that.
+> "gzip" example code:
+> 
+> f1b4:       a7 08 00 03             lhi     %r0,3
+> f1b8:       b2 b0 f0 a0             stfle   160(%r15)
+> f1bc:       e3 20 f0 b2 00 90       llgc    %r2,178(%r15)
+> f1c2:       c0 2b 00 00 00 01       nilf    %r2,1
+> f1c8:       b2 4f 00 10             ear     %r1,%a0
+> f1cc:       b9 14 00 22             lgfr    %r2,%r2
+> f1d0:       eb 11 00 20 00 0d       sllg    %r1,%r1,32
+> f1d6:       b2 4f 00 11             ear     %r1,%a1
+> f1da:       d5 07 f0 b8 10 28       clc     184(8,%r15),40(%r1)
+> f1e0:       a7 74 00 06             jne     f1ec <file_read@@Base+0x1bc>
+> f1e4:       eb ef f1 30 00 04       lmg     %r14,%r15,304(%r15)
+> f1ea:       07 fe                   br      %r14
+> f1ec:       c0 e5 ff ff 9d 6e       brasl   %r14,2cc8 <__stack_chk_fail@plt>
+> 
+> In QEMU, we currently have:
+>      max_bytes = 24
+> the code asks for (3 + 1) doublewords == 32 bytes.
+> 
+> If we write 32 bytes instead of only 24, and return "2 + 1" doublewords
+> ("one less than the number of doulewords needed to contain all of the
+>   facility bits"), the example code detects a stack corruption.
+> 
+> In my opinion, the code is wrong. However, it seems to work fine on
+> real machines. So let's limit storing to the minimum of the requested
+> and the maximum doublewords.
+Hi David,
 
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index 1defcde048..db7eedd058 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -2792,11 +2792,13 @@
- #
- # @threads:     Use qemu's thread pool
- # @native:      Use native AIO backend (only Linux and Windows)
-+# @io_uring:    Use linux io_uring (since 4.1)
- #
- # Since: 2.9
- ##
- { 'enum': 'BlockdevAioOptions',
--  'data': [ 'threads', 'native' ] }
-+  'data': [ 'threads', 'native',
-+            { 'name': 'io_uring', 'if': 'defined(CONFIG_LINUX_IO_URING)' } ] }
- 
- ##
- # @BlockdevCacheOptions:
--- 
-2.17.1
+Thanks for catching this. I've reported the "gzip" example to Ilya and 
+indeed, r0 is setup too large. He will fix it in gzip.
+
+You've mentioned, that this is detected in certain binaries.
+Can you please share those occurrences.
+Perhaps on future machines with further facility bits, stfle will write 
+beyond the provided doubleword-array on a real machine or in qemu.
+
+Bye
+Stefan
+
+> 
+> Cc: Stefan Liebler <stli@linux.ibm.com>
+> Cc: Andreas Krebbel <Andreas.Krebbel@de.ibm.com>
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+> ---
+>   target/s390x/misc_helper.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/target/s390x/misc_helper.c b/target/s390x/misc_helper.c
+> index 34476134a4..b561c5781b 100644
+> --- a/target/s390x/misc_helper.c
+> +++ b/target/s390x/misc_helper.c
+> @@ -678,7 +678,7 @@ uint32_t HELPER(stfle)(CPUS390XState *env, uint64_t addr)
+>   
+>       prepare_stfl();
+>       max_bytes = ROUND_UP(used_stfl_bytes, 8);
+> -    for (i = 0; i < count_bytes; ++i) {
+> +    for (i = 0; i < MIN(count_bytes, max_bytes); ++i) {
+>           cpu_stb_data_ra(env, addr + i, stfl_bytes[i], ra);
+>       }
+>   
+> 
 
 
