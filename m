@@ -3,61 +3,60 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2209CC04AB5
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 15:14:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0CF77C04AB5
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 15:15:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DE8A42407D
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 15:14:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DE8A42407D
+	by mail.kernel.org (Postfix) with ESMTPS id C918E24CF1
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 15:15:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C918E24CF1
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:36430 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:36442 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hXofS-0000bi-3V
-	for qemu-devel@archiver.kernel.org; Mon, 03 Jun 2019 11:14:34 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:39659)
+	id 1hXogO-0001Tw-1Y
+	for qemu-devel@archiver.kernel.org; Mon, 03 Jun 2019 11:15:32 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:39897)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1hXoUn-0000Z5-8Z
-	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 11:03:35 -0400
+	(envelope-from <kwolf@redhat.com>) id 1hXoV9-0000sM-Ow
+	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 11:04:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1hXoUi-0007UJ-65
-	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 11:03:30 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58884)
+	(envelope-from <kwolf@redhat.com>) id 1hXoV7-0008Hf-OM
+	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 11:03:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56930)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <kwolf@redhat.com>)
-	id 1hXoUe-0007Mn-1i; Mon, 03 Jun 2019 11:03:24 -0400
+	id 1hXoV3-00088o-Bo; Mon, 03 Jun 2019 11:03:49 -0400
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
 	[10.5.11.16])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 63804307D942;
-	Mon,  3 Jun 2019 15:03:10 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 96547C05678B;
+	Mon,  3 Jun 2019 15:03:43 +0000 (UTC)
 Received: from linux.fritz.box.com (ovpn-116-129.ams2.redhat.com
 	[10.36.116.129])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 785D06726F;
-	Mon,  3 Jun 2019 15:03:09 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 7FAB06727B;
+	Mon,  3 Jun 2019 15:03:41 +0000 (UTC)
 From: Kevin Wolf <kwolf@redhat.com>
 To: qemu-block@nongnu.org
-Date: Mon,  3 Jun 2019 17:02:10 +0200
-Message-Id: <20190603150233.6614-6-kwolf@redhat.com>
+Date: Mon,  3 Jun 2019 17:02:17 +0200
+Message-Id: <20190603150233.6614-13-kwolf@redhat.com>
 In-Reply-To: <20190603150233.6614-1-kwolf@redhat.com>
 References: <20190603150233.6614-1-kwolf@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.48]);
-	Mon, 03 Jun 2019 15:03:18 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.32]);
+	Mon, 03 Jun 2019 15:03:43 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 05/28] block: avoid recursive block_status call
- if possible
+Subject: [Qemu-devel] [PULL 12/28] block: Add Error to blk_set_aio_context()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -74,291 +73,360 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Add an Error parameter to blk_set_aio_context() and use
+bdrv_child_try_set_aio_context() internally to check whether all
+involved nodes can actually support the AioContext switch.
 
-drv_co_block_status digs bs->file for additional, more accurate search
-for hole inside region, reported as DATA by bs since 5daa74a6ebc.
-
-This accuracy is not free: assume we have qcow2 disk. Actually, qcow2
-knows, where are holes and where is data. But every block_status
-request calls lseek additionally. Assume a big disk, full of
-data, in any iterative copying block job (or img convert) we'll call
-lseek(HOLE) on every iteration, and each of these lseeks will have to
-iterate through all metadata up to the end of file. It's obviously
-ineffective behavior. And for many scenarios we don't need this lseek
-at all.
-
-However, lseek is needed when we have metadata-preallocated image.
-
-So, let's detect metadata-preallocation case and don't dig qcow2's
-protocol file in other cases.
-
-The idea is to compare allocation size in POV of filesystem with
-allocations size in POV of Qcow2 (by refcounts). If allocation in fs is
-significantly lower, consider it as metadata-preallocation case.
-
-102 iotest changed, as our detector can't detect shrinked file as
-metadata-preallocation, which don't seem to be wrong, as with metadata
-preallocation we always have valid file length.
-
-Two other iotests have a slight change in their QMP output sequence:
-Active 'block-commit' returns earlier because the job coroutine yields
-earlier on a blocking operation. This operation is loading the refcount
-blocks in qcow2_detect_metadata_preallocation().
-
-Suggested-by: Denis V. Lunev <den@openvz.org>
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- block/qcow2.h              |  4 ++++
- include/block/block.h      |  8 +++++++-
- block/io.c                 |  9 ++++++++-
- block/qcow2-refcount.c     | 32 ++++++++++++++++++++++++++++++++
- block/qcow2.c              | 11 +++++++++++
- tests/qemu-iotests/102     |  2 +-
- tests/qemu-iotests/102.out |  3 ++-
- tests/qemu-iotests/141.out |  2 +-
- tests/qemu-iotests/144.out |  2 +-
- 9 files changed, 67 insertions(+), 6 deletions(-)
+ include/sysemu/block-backend.h  |  3 ++-
+ block/block-backend.c           | 26 ++++++++++++++++----------
+ hw/block/dataplane/virtio-blk.c | 12 +++++++++---
+ hw/block/dataplane/xen-block.c  |  6 ++++--
+ hw/scsi/virtio-scsi.c           | 10 +++++++---
+ tests/test-bdrv-drain.c         |  8 ++++----
+ tests/test-block-iothread.c     | 22 +++++++++++-----------
+ 7 files changed, 53 insertions(+), 34 deletions(-)
 
-diff --git a/block/qcow2.h b/block/qcow2.h
-index 567375e56c..fc1b0d3c1e 100644
---- a/block/qcow2.h
-+++ b/block/qcow2.h
-@@ -356,6 +356,9 @@ typedef struct BDRVQcow2State {
-     int nb_threads;
-=20
-     BdrvChild *data_file;
-+
-+    bool metadata_preallocation_checked;
-+    bool metadata_preallocation;
- } BDRVQcow2State;
-=20
- typedef struct Qcow2COWRegion {
-@@ -655,6 +658,7 @@ int qcow2_change_refcount_order(BlockDriverState *bs,=
- int refcount_order,
-                                 void *cb_opaque, Error **errp);
- int qcow2_shrink_reftable(BlockDriverState *bs);
- int64_t qcow2_get_last_cluster(BlockDriverState *bs, int64_t size);
-+int qcow2_detect_metadata_preallocation(BlockDriverState *bs);
-=20
- /* qcow2-cluster.c functions */
- int qcow2_grow_l1_table(BlockDriverState *bs, uint64_t min_size,
-diff --git a/include/block/block.h b/include/block/block.h
-index 9b083e2bca..531cf595cf 100644
---- a/include/block/block.h
-+++ b/include/block/block.h
-@@ -156,10 +156,15 @@ typedef struct HDGeometry {
-  * BDRV_BLOCK_EOF: the returned pnum covers through end of file for this
-  *                 layer, set by block layer
-  *
-- * Internal flag:
-+ * Internal flags:
-  * BDRV_BLOCK_RAW: for use by passthrough drivers, such as raw, to reque=
-st
-  *                 that the block layer recompute the answer from the re=
-turned
-  *                 BDS; must be accompanied by just BDRV_BLOCK_OFFSET_VA=
-LID.
-+ * BDRV_BLOCK_RECURSE: request that the block layer will recursively sea=
-rch for
-+ *                     zeroes in file child of current block node inside
-+ *                     returned region. Only valid together with both
-+ *                     BDRV_BLOCK_DATA and BDRV_BLOCK_OFFSET_VALID. Shou=
-ld not
-+ *                     appear with BDRV_BLOCK_ZERO.
-  *
-  * If BDRV_BLOCK_OFFSET_VALID is set, the map parameter represents the
-  * host offset within the returned BDS that is allocated for the
-@@ -184,6 +189,7 @@ typedef struct HDGeometry {
- #define BDRV_BLOCK_RAW          0x08
- #define BDRV_BLOCK_ALLOCATED    0x10
- #define BDRV_BLOCK_EOF          0x20
-+#define BDRV_BLOCK_RECURSE      0x40
- #define BDRV_BLOCK_OFFSET_MASK  BDRV_SECTOR_MASK
-=20
- typedef QSIMPLEQ_HEAD(BlockReopenQueue, BlockReopenQueueEntry) BlockReop=
-enQueue;
-diff --git a/block/io.c b/block/io.c
-index 3134a60a48..150358c3b1 100644
---- a/block/io.c
-+++ b/block/io.c
-@@ -2092,6 +2092,12 @@ static int coroutine_fn bdrv_co_block_status(Block=
-DriverState *bs,
-      */
-     assert(*pnum && QEMU_IS_ALIGNED(*pnum, align) &&
-            align > offset - aligned_offset);
-+    if (ret & BDRV_BLOCK_RECURSE) {
-+        assert(ret & BDRV_BLOCK_DATA);
-+        assert(ret & BDRV_BLOCK_OFFSET_VALID);
-+        assert(!(ret & BDRV_BLOCK_ZERO));
-+    }
-+
-     *pnum -=3D offset - aligned_offset;
-     if (*pnum > bytes) {
-         *pnum =3D bytes;
-@@ -2122,7 +2128,8 @@ static int coroutine_fn bdrv_co_block_status(BlockD=
-riverState *bs,
-         }
-     }
-=20
--    if (want_zero && local_file && local_file !=3D bs &&
-+    if (want_zero && ret & BDRV_BLOCK_RECURSE &&
-+        local_file && local_file !=3D bs &&
-         (ret & BDRV_BLOCK_DATA) && !(ret & BDRV_BLOCK_ZERO) &&
-         (ret & BDRV_BLOCK_OFFSET_VALID)) {
-         int64_t file_pnum;
-diff --git a/block/qcow2-refcount.c b/block/qcow2-refcount.c
-index 4c1794f9af..3a2c673a5e 100644
---- a/block/qcow2-refcount.c
-+++ b/block/qcow2-refcount.c
-@@ -3444,3 +3444,35 @@ int64_t qcow2_get_last_cluster(BlockDriverState *b=
-s, int64_t size)
-                             "There are no references in the refcount tab=
-le.");
-     return -EIO;
+diff --git a/include/sysemu/block-backend.h b/include/sysemu/block-backen=
+d.h
+index 938de34fe9..228fb3fb83 100644
+--- a/include/sysemu/block-backend.h
++++ b/include/sysemu/block-backend.h
+@@ -208,7 +208,8 @@ void blk_op_unblock(BlockBackend *blk, BlockOpType op=
+, Error *reason);
+ void blk_op_block_all(BlockBackend *blk, Error *reason);
+ void blk_op_unblock_all(BlockBackend *blk, Error *reason);
+ AioContext *blk_get_aio_context(BlockBackend *blk);
+-void blk_set_aio_context(BlockBackend *blk, AioContext *new_context);
++int blk_set_aio_context(BlockBackend *blk, AioContext *new_context,
++                        Error **errp);
+ void blk_add_aio_context_notifier(BlockBackend *blk,
+         void (*attached_aio_context)(AioContext *new_context, void *opaq=
+ue),
+         void (*detach_aio_context)(void *opaque), void *opaque);
+diff --git a/block/block-backend.c b/block/block-backend.c
+index ad3e1c882d..390fde6f71 100644
+--- a/block/block-backend.c
++++ b/block/block-backend.c
+@@ -1865,30 +1865,36 @@ static AioContext *blk_aiocb_get_aio_context(Bloc=
+kAIOCB *acb)
+     return blk_get_aio_context(blk_acb->blk);
  }
-+
-+int qcow2_detect_metadata_preallocation(BlockDriverState *bs)
-+{
-+    BDRVQcow2State *s =3D bs->opaque;
-+    int64_t i, end_cluster, cluster_count =3D 0, threshold;
-+    int64_t file_length, real_allocation, real_clusters;
-+
-+    file_length =3D bdrv_getlength(bs->file->bs);
-+    if (file_length < 0) {
-+        return file_length;
-+    }
-+
-+    real_allocation =3D bdrv_get_allocated_file_size(bs->file->bs);
-+    if (real_allocation < 0) {
-+        return real_allocation;
-+    }
-+
-+    real_clusters =3D real_allocation / s->cluster_size;
-+    threshold =3D MAX(real_clusters * 10 / 9, real_clusters + 2);
-+
-+    end_cluster =3D size_to_clusters(s, file_length);
-+    for (i =3D 0; i < end_cluster && cluster_count < threshold; i++) {
-+        uint64_t refcount;
-+        int ret =3D qcow2_get_refcount(bs, i, &refcount);
-+        if (ret < 0) {
-+            return ret;
+=20
+-static void blk_do_set_aio_context(BlockBackend *blk, AioContext *new_co=
+ntext,
+-                                   bool update_root_node)
++static int blk_do_set_aio_context(BlockBackend *blk, AioContext *new_con=
+text,
++                                  bool update_root_node, Error **errp)
+ {
+     BlockDriverState *bs =3D blk_bs(blk);
+     ThrottleGroupMember *tgm =3D &blk->public.throttle_group_member;
++    int ret;
+=20
+     if (bs) {
++        if (update_root_node) {
++            ret =3D bdrv_child_try_set_aio_context(bs, new_context, blk-=
+>root,
++                                                 errp);
++            if (ret < 0) {
++                return ret;
++            }
 +        }
-+        cluster_count +=3D !!refcount;
-+    }
-+
-+    return cluster_count >=3D threshold;
-+}
-diff --git a/block/qcow2.c b/block/qcow2.c
-index f2cb131048..14f914117f 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -1895,6 +1895,12 @@ static int coroutine_fn qcow2_co_block_status(Bloc=
-kDriverState *bs,
-     unsigned int bytes;
-     int status =3D 0;
-=20
-+    if (!s->metadata_preallocation_checked) {
-+        ret =3D qcow2_detect_metadata_preallocation(bs);
-+        s->metadata_preallocation =3D (ret =3D=3D 1);
-+        s->metadata_preallocation_checked =3D true;
-+    }
-+
-     bytes =3D MIN(INT_MAX, count);
-     qemu_co_mutex_lock(&s->lock);
-     ret =3D qcow2_get_cluster_offset(bs, offset, &bytes, &cluster_offset=
-);
-@@ -1917,6 +1923,11 @@ static int coroutine_fn qcow2_co_block_status(Bloc=
-kDriverState *bs,
-     } else if (ret !=3D QCOW2_CLUSTER_UNALLOCATED) {
-         status |=3D BDRV_BLOCK_DATA;
+         if (tgm->throttle_state) {
+             bdrv_drained_begin(bs);
+             throttle_group_detach_aio_context(tgm);
+             throttle_group_attach_aio_context(tgm, new_context);
+             bdrv_drained_end(bs);
+         }
+-        if (update_root_node) {
+-            GSList *ignore =3D g_slist_prepend(NULL, blk->root);
+-            bdrv_set_aio_context_ignore(bs, new_context, &ignore);
+-            g_slist_free(ignore);
+-        }
      }
-+    if (s->metadata_preallocation && (status & BDRV_BLOCK_DATA) &&
-+        (status & BDRV_BLOCK_OFFSET_VALID))
-+    {
-+        status |=3D BDRV_BLOCK_RECURSE;
-+    }
-     return status;
++
++    return 0;
  }
 =20
-diff --git a/tests/qemu-iotests/102 b/tests/qemu-iotests/102
-index 749ff66b8a..b898df436f 100755
---- a/tests/qemu-iotests/102
-+++ b/tests/qemu-iotests/102
-@@ -55,7 +55,7 @@ $QEMU_IO -c 'write 0 64k' "$TEST_IMG" | _filter_qemu_io
- $QEMU_IMG resize -f raw --shrink "$TEST_IMG" $((5 * 64 * 1024))
+-void blk_set_aio_context(BlockBackend *blk, AioContext *new_context)
++int blk_set_aio_context(BlockBackend *blk, AioContext *new_context,
++                        Error **errp)
+ {
+-    blk_do_set_aio_context(blk, new_context, true);
++    return blk_do_set_aio_context(blk, new_context, true, errp);
+ }
 =20
- $QEMU_IO -c map "$TEST_IMG"
--$QEMU_IMG map "$TEST_IMG"
-+$QEMU_IMG map "$TEST_IMG" | _filter_qemu_img_map
+ static bool blk_root_can_set_aio_ctx(BdrvChild *child, AioContext *ctx,
+@@ -1915,7 +1921,7 @@ static void blk_root_set_aio_ctx(BdrvChild *child, =
+AioContext *ctx,
+                                  GSList **ignore)
+ {
+     BlockBackend *blk =3D child->opaque;
+-    blk_do_set_aio_context(blk, ctx, false);
++    blk_do_set_aio_context(blk, ctx, false, &error_abort);
+ }
 =20
- echo
- echo '=3D=3D=3D Testing map on an image file truncated outside of qemu =3D=
-=3D=3D'
-diff --git a/tests/qemu-iotests/102.out b/tests/qemu-iotests/102.out
-index 4401b08fee..cd2fdc7f96 100644
---- a/tests/qemu-iotests/102.out
-+++ b/tests/qemu-iotests/102.out
-@@ -7,7 +7,8 @@ wrote 65536/65536 bytes at offset 0
- 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- Image resized.
- 64 KiB (0x10000) bytes     allocated at offset 0 bytes (0x0)
--Offset          Length          Mapped to       File
-+Offset          Length          File
-+0               0x10000         TEST_DIR/t.IMGFMT
+ void blk_add_aio_context_notifier(BlockBackend *blk,
+diff --git a/hw/block/dataplane/virtio-blk.c b/hw/block/dataplane/virtio-=
+blk.c
+index 8c37bd314a..158c78f852 100644
+--- a/hw/block/dataplane/virtio-blk.c
++++ b/hw/block/dataplane/virtio-blk.c
+@@ -173,6 +173,7 @@ int virtio_blk_data_plane_start(VirtIODevice *vdev)
+     VirtioBusClass *k =3D VIRTIO_BUS_GET_CLASS(qbus);
+     unsigned i;
+     unsigned nvqs =3D s->conf->num_queues;
++    Error *local_err =3D NULL;
+     int r;
 =20
- =3D=3D=3D Testing map on an image file truncated outside of qemu =3D=3D=3D
+     if (vblk->dataplane_started || s->starting) {
+@@ -212,7 +213,11 @@ int virtio_blk_data_plane_start(VirtIODevice *vdev)
+     vblk->dataplane_started =3D true;
+     trace_virtio_blk_data_plane_start(s);
 =20
-diff --git a/tests/qemu-iotests/141.out b/tests/qemu-iotests/141.out
-index 41c7291258..4d71d9dcae 100644
---- a/tests/qemu-iotests/141.out
-+++ b/tests/qemu-iotests/141.out
-@@ -42,9 +42,9 @@ Formatting 'TEST_DIR/o.IMGFMT', fmt=3DIMGFMT size=3D104=
-8576 backing_file=3DTEST_DIR/t.
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "even=
-t": "JOB_STATUS_CHANGE", "data": {"status": "created", "id": "job0"}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "even=
-t": "JOB_STATUS_CHANGE", "data": {"status": "running", "id": "job0"}}
-+{"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "even=
-t": "JOB_STATUS_CHANGE", "data": {"status": "ready", "id": "job0"}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "even=
-t": "BLOCK_JOB_READY", "data": {"device": "job0", "len": 0, "offset": 0, =
-"speed": 0, "type": "commit"}}
--{"return": {}}
- {"error": {"class": "GenericError", "desc": "Node 'drv0' is busy: block =
-device is in use by block job: commit"}}
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "even=
-t": "JOB_STATUS_CHANGE", "data": {"status": "waiting", "id": "job0"}}
-diff --git a/tests/qemu-iotests/144.out b/tests/qemu-iotests/144.out
-index 55299201e4..a9a8216bea 100644
---- a/tests/qemu-iotests/144.out
-+++ b/tests/qemu-iotests/144.out
-@@ -14,10 +14,10 @@ Formatting 'TEST_DIR/tmp.qcow2', fmt=3Dqcow2 size=3D5=
-36870912 backing_file=3DTEST_DIR/
+-    blk_set_aio_context(s->conf->conf.blk, s->ctx);
++    r =3D blk_set_aio_context(s->conf->conf.blk, s->ctx, &local_err);
++    if (r < 0) {
++        error_report_err(local_err);
++        goto fail_guest_notifiers;
++    }
 =20
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "even=
-t": "JOB_STATUS_CHANGE", "data": {"status": "created", "id": "virtio0"}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "even=
-t": "JOB_STATUS_CHANGE", "data": {"status": "running", "id": "virtio0"}}
-+{"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "even=
-t": "JOB_STATUS_CHANGE", "data": {"status": "ready", "id": "virtio0"}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "even=
-t": "BLOCK_JOB_READY", "data": {"device": "virtio0", "len": 0, "offset": =
-0, "speed": 0, "type": "commit"}}
- {"return": {}}
--{"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "even=
-t": "JOB_STATUS_CHANGE", "data": {"status": "waiting", "id": "virtio0"}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "even=
-t": "JOB_STATUS_CHANGE", "data": {"status": "pending", "id": "virtio0"}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "even=
-t": "BLOCK_JOB_COMPLETED", "data": {"device": "virtio0", "len": 0, "offse=
-t": 0, "speed": 0, "type": "commit"}}
+     /* Kick right away to begin processing requests already in vring */
+     for (i =3D 0; i < nvqs; i++) {
+@@ -281,8 +286,9 @@ void virtio_blk_data_plane_stop(VirtIODevice *vdev)
+     aio_context_acquire(s->ctx);
+     aio_wait_bh_oneshot(s->ctx, virtio_blk_data_plane_stop_bh, s);
+=20
+-    /* Drain and switch bs back to the QEMU main loop */
+-    blk_set_aio_context(s->conf->conf.blk, qemu_get_aio_context());
++    /* Drain and try to switch bs back to the QEMU main loop. If other u=
+sers
++     * keep the BlockBackend in the iothread, that's ok */
++    blk_set_aio_context(s->conf->conf.blk, qemu_get_aio_context(), NULL)=
+;
+=20
+     aio_context_release(s->ctx);
+=20
+diff --git a/hw/block/dataplane/xen-block.c b/hw/block/dataplane/xen-bloc=
+k.c
+index bb8f1186e4..f7ad452bbd 100644
+--- a/hw/block/dataplane/xen-block.c
++++ b/hw/block/dataplane/xen-block.c
+@@ -682,7 +682,8 @@ void xen_block_dataplane_stop(XenBlockDataPlane *data=
+plane)
+     }
+=20
+     aio_context_acquire(dataplane->ctx);
+-    blk_set_aio_context(dataplane->blk, qemu_get_aio_context());
++    /* Xen doesn't have multiple users for nodes, so this can't fail */
++    blk_set_aio_context(dataplane->blk, qemu_get_aio_context(), &error_a=
+bort);
+     aio_context_release(dataplane->ctx);
+=20
+     xendev =3D dataplane->xendev;
+@@ -811,7 +812,8 @@ void xen_block_dataplane_start(XenBlockDataPlane *dat=
+aplane,
+     }
+=20
+     aio_context_acquire(dataplane->ctx);
+-    blk_set_aio_context(dataplane->blk, dataplane->ctx);
++    /* If other users keep the BlockBackend in the iothread, that's ok *=
+/
++    blk_set_aio_context(dataplane->blk, dataplane->ctx, NULL);
+     aio_context_release(dataplane->ctx);
+     return;
+=20
+diff --git a/hw/scsi/virtio-scsi.c b/hw/scsi/virtio-scsi.c
+index 839f120256..01c2b85f90 100644
+--- a/hw/scsi/virtio-scsi.c
++++ b/hw/scsi/virtio-scsi.c
+@@ -795,6 +795,7 @@ static void virtio_scsi_hotplug(HotplugHandler *hotpl=
+ug_dev, DeviceState *dev,
+     VirtIODevice *vdev =3D VIRTIO_DEVICE(hotplug_dev);
+     VirtIOSCSI *s =3D VIRTIO_SCSI(vdev);
+     SCSIDevice *sd =3D SCSI_DEVICE(dev);
++    int ret;
+=20
+     if (s->ctx && !s->dataplane_fenced) {
+         AioContext *ctx;
+@@ -808,9 +809,11 @@ static void virtio_scsi_hotplug(HotplugHandler *hotp=
+lug_dev, DeviceState *dev,
+             return;
+         }
+         virtio_scsi_acquire(s);
+-        blk_set_aio_context(sd->conf.blk, s->ctx);
++        ret =3D blk_set_aio_context(sd->conf.blk, s->ctx, errp);
+         virtio_scsi_release(s);
+-
++        if (ret < 0) {
++            return;
++        }
+     }
+=20
+     if (virtio_vdev_has_feature(vdev, VIRTIO_SCSI_F_HOTPLUG)) {
+@@ -839,7 +842,8 @@ static void virtio_scsi_hotunplug(HotplugHandler *hot=
+plug_dev, DeviceState *dev,
+=20
+     if (s->ctx) {
+         virtio_scsi_acquire(s);
+-        blk_set_aio_context(sd->conf.blk, qemu_get_aio_context());
++        /* If other users keep the BlockBackend in the iothread, that's =
+ok */
++        blk_set_aio_context(sd->conf.blk, qemu_get_aio_context(), NULL);
+         virtio_scsi_release(s);
+     }
+=20
+diff --git a/tests/test-bdrv-drain.c b/tests/test-bdrv-drain.c
+index 5534c2adf9..e86798923f 100644
+--- a/tests/test-bdrv-drain.c
++++ b/tests/test-bdrv-drain.c
+@@ -678,7 +678,7 @@ static void test_iothread_common(enum drain_type drai=
+n_type, int drain_thread)
+     s =3D bs->opaque;
+     blk_insert_bs(blk, bs, &error_abort);
+=20
+-    blk_set_aio_context(blk, ctx_a);
++    blk_set_aio_context(blk, ctx_a, &error_abort);
+     aio_context_acquire(ctx_a);
+=20
+     s->bh_indirection_ctx =3D ctx_b;
+@@ -742,7 +742,7 @@ static void test_iothread_common(enum drain_type drai=
+n_type, int drain_thread)
+     }
+=20
+     aio_context_acquire(ctx_a);
+-    blk_set_aio_context(blk, qemu_get_aio_context());
++    blk_set_aio_context(blk, qemu_get_aio_context(), &error_abort);
+     aio_context_release(ctx_a);
+=20
+     bdrv_unref(bs);
+@@ -903,7 +903,7 @@ static void test_blockjob_common_drain_node(enum drai=
+n_type drain_type,
+     if (use_iothread) {
+         iothread =3D iothread_new();
+         ctx =3D iothread_get_aio_context(iothread);
+-        blk_set_aio_context(blk_src, ctx);
++        blk_set_aio_context(blk_src, ctx, &error_abort);
+     } else {
+         ctx =3D qemu_get_aio_context();
+     }
+@@ -1001,7 +1001,7 @@ static void test_blockjob_common_drain_node(enum dr=
+ain_type drain_type,
+     g_assert_cmpint(ret, =3D=3D, (result =3D=3D TEST_JOB_SUCCESS ? 0 : -=
+EIO));
+=20
+     if (use_iothread) {
+-        blk_set_aio_context(blk_src, qemu_get_aio_context());
++        blk_set_aio_context(blk_src, qemu_get_aio_context(), &error_abor=
+t);
+     }
+     aio_context_release(ctx);
+=20
+diff --git a/tests/test-block-iothread.c b/tests/test-block-iothread.c
+index e424d360c8..1d47ea9895 100644
+--- a/tests/test-block-iothread.c
++++ b/tests/test-block-iothread.c
+@@ -342,14 +342,14 @@ static void test_sync_op(const void *opaque)
+     blk_insert_bs(blk, bs, &error_abort);
+     c =3D QLIST_FIRST(&bs->parents);
+=20
+-    blk_set_aio_context(blk, ctx);
++    blk_set_aio_context(blk, ctx, &error_abort);
+     aio_context_acquire(ctx);
+     t->fn(c);
+     if (t->blkfn) {
+         t->blkfn(blk);
+     }
+     aio_context_release(ctx);
+-    blk_set_aio_context(blk, qemu_get_aio_context());
++    blk_set_aio_context(blk, qemu_get_aio_context(), &error_abort);
+=20
+     bdrv_unref(bs);
+     blk_unref(blk);
+@@ -428,7 +428,7 @@ static void test_attach_blockjob(void)
+         aio_poll(qemu_get_aio_context(), false);
+     }
+=20
+-    blk_set_aio_context(blk, ctx);
++    blk_set_aio_context(blk, ctx, &error_abort);
+=20
+     tjob->n =3D 0;
+     while (tjob->n =3D=3D 0) {
+@@ -436,7 +436,7 @@ static void test_attach_blockjob(void)
+     }
+=20
+     aio_context_acquire(ctx);
+-    blk_set_aio_context(blk, qemu_get_aio_context());
++    blk_set_aio_context(blk, qemu_get_aio_context(), &error_abort);
+     aio_context_release(ctx);
+=20
+     tjob->n =3D 0;
+@@ -444,7 +444,7 @@ static void test_attach_blockjob(void)
+         aio_poll(qemu_get_aio_context(), false);
+     }
+=20
+-    blk_set_aio_context(blk, ctx);
++    blk_set_aio_context(blk, ctx, &error_abort);
+=20
+     tjob->n =3D 0;
+     while (tjob->n =3D=3D 0) {
+@@ -453,7 +453,7 @@ static void test_attach_blockjob(void)
+=20
+     aio_context_acquire(ctx);
+     job_complete_sync(&tjob->common.job, &error_abort);
+-    blk_set_aio_context(blk, qemu_get_aio_context());
++    blk_set_aio_context(blk, qemu_get_aio_context(), &error_abort);
+     aio_context_release(ctx);
+=20
+     bdrv_unref(bs);
+@@ -497,7 +497,7 @@ static void test_propagate_basic(void)
+     bs_verify =3D bdrv_open(NULL, NULL, options, BDRV_O_RDWR, &error_abo=
+rt);
+=20
+     /* Switch the AioContext */
+-    blk_set_aio_context(blk, ctx);
++    blk_set_aio_context(blk, ctx, &error_abort);
+     g_assert(blk_get_aio_context(blk) =3D=3D ctx);
+     g_assert(bdrv_get_aio_context(bs_a) =3D=3D ctx);
+     g_assert(bdrv_get_aio_context(bs_verify) =3D=3D ctx);
+@@ -505,7 +505,7 @@ static void test_propagate_basic(void)
+=20
+     /* Switch the AioContext back */
+     ctx =3D qemu_get_aio_context();
+-    blk_set_aio_context(blk, ctx);
++    blk_set_aio_context(blk, ctx, &error_abort);
+     g_assert(blk_get_aio_context(blk) =3D=3D ctx);
+     g_assert(bdrv_get_aio_context(bs_a) =3D=3D ctx);
+     g_assert(bdrv_get_aio_context(bs_verify) =3D=3D ctx);
+@@ -565,7 +565,7 @@ static void test_propagate_diamond(void)
+     blk_insert_bs(blk, bs_verify, &error_abort);
+=20
+     /* Switch the AioContext */
+-    blk_set_aio_context(blk, ctx);
++    blk_set_aio_context(blk, ctx, &error_abort);
+     g_assert(blk_get_aio_context(blk) =3D=3D ctx);
+     g_assert(bdrv_get_aio_context(bs_verify) =3D=3D ctx);
+     g_assert(bdrv_get_aio_context(bs_a) =3D=3D ctx);
+@@ -574,7 +574,7 @@ static void test_propagate_diamond(void)
+=20
+     /* Switch the AioContext back */
+     ctx =3D qemu_get_aio_context();
+-    blk_set_aio_context(blk, ctx);
++    blk_set_aio_context(blk, ctx, &error_abort);
+     g_assert(blk_get_aio_context(blk) =3D=3D ctx);
+     g_assert(bdrv_get_aio_context(bs_verify) =3D=3D ctx);
+     g_assert(bdrv_get_aio_context(bs_a) =3D=3D ctx);
+@@ -654,7 +654,7 @@ static void test_propagate_mirror(void)
+     job_cancel_sync_all();
+=20
+     aio_context_acquire(ctx);
+-    blk_set_aio_context(blk, main_ctx);
++    blk_set_aio_context(blk, main_ctx, &error_abort);
+     bdrv_try_set_aio_context(target, main_ctx, &error_abort);
+     aio_context_release(ctx);
+=20
 --=20
 2.20.1
 
