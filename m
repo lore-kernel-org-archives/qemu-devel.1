@@ -2,73 +2,65 @@ Return-Path: <SRS0=e5mL=UC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D98FC04AB5
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 15:37:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 287C3C04AB5
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 15:41:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 138EB2147A
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 15:37:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 138EB2147A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 0157627930
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 15:41:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0157627930
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:36869 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:36940 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hXp1p-0001dz-A2
-	for qemu-devel@archiver.kernel.org; Mon, 03 Jun 2019 11:37:41 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:49491)
+	id 1hXp5J-0003Jl-7S
+	for qemu-devel@archiver.kernel.org; Mon, 03 Jun 2019 11:41:17 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:50582)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hXp07-0000fh-6K
-	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 11:35:56 -0400
+	(envelope-from <groug@kaod.org>) id 1hXp4J-0002l8-8a
+	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 11:40:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hXp05-0000B8-Pl
-	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 11:35:55 -0400
-Received: from indium.canonical.com ([91.189.90.7]:54692)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hXp05-00009X-KB
-	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 11:35:53 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hXp04-0006TS-1F
-	for <qemu-devel@nongnu.org>; Mon, 03 Jun 2019 15:35:52 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id E200A2E80CB
-	for <qemu-devel@nongnu.org>; Mon,  3 Jun 2019 15:35:51 +0000 (UTC)
+	(envelope-from <groug@kaod.org>) id 1hXp4H-0007cE-Qn
+	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 11:40:15 -0400
+Received: from 20.mo3.mail-out.ovh.net ([178.33.47.94]:54202)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1hXp4H-0007W0-LD
+	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 11:40:13 -0400
+Received: from player728.ha.ovh.net (unknown [10.108.57.43])
+	by mo3.mail-out.ovh.net (Postfix) with ESMTP id 6CBA8216E1F
+	for <qemu-devel@nongnu.org>; Mon,  3 Jun 2019 17:40:10 +0200 (CEST)
+Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
+	[82.253.208.248]) (Authenticated sender: groug@kaod.org)
+	by player728.ha.ovh.net (Postfix) with ESMTPSA id 244DA65AC7CD;
+	Mon,  3 Jun 2019 15:40:01 +0000 (UTC)
+Date: Mon, 3 Jun 2019 17:40:00 +0200
+From: Greg Kurz <groug@kaod.org>
+To: Aravinda Prasad <aravinda@linux.vnet.ibm.com>
+Message-ID: <20190603174000.5875d724@bahia.lab.toulouse-stg.fr.ibm.com>
+In-Reply-To: <155910845769.13149.8097972239187020170.stgit@aravinda>
+References: <155910829070.13149.5215948335633966328.stgit@aravinda>
+	<155910845769.13149.8097972239187020170.stgit@aravinda>
+X-Mailer: Claws Mail 3.16.0 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 03 Jun 2019 15:27:59 -0000
-From: "Laszlo Ersek \(Red Hat\)" <lersek@redhat.com>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Tags: arm testcase
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: ajbennee lersek
-X-Launchpad-Bug-Reporter: Laszlo Ersek (Red Hat) (lersek)
-X-Launchpad-Bug-Modifier: Laszlo Ersek (Red Hat) (lersek)
-References: <155912118291.12579.8926874795813611531.malonedeb@soybean.canonical.com>
-Message-Id: <155957567997.7808.14001979407214352306.malone@wampee.canonical.com>
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="18968";
-	Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: 41af21e97d0e02f0962cd1f723cda8ba8f0951c7
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Ovh-Tracer-Id: 4564679699672766868
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduuddrudefjedgkeekucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddm
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1830872] Re: AARCH64 to ARMv7 mistranslation in
- TCG
+X-Received-From: 178.33.47.94
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v9 6/6] migration: Include
+ migration support for machine check handling
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -77,108 +69,144 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1830872 <1830872@bugs.launchpad.net>
+Cc: aik@au1.ibm.com, qemu-devel@nongnu.org, paulus@ozlabs.org,
+	qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-I confirm that QEMU works fine (for the use case originally reported in
-this LP ticket) when built at commit a6ae23831b, i.e. at the parent of
-eed5664238ea.
+On Wed, 29 May 2019 11:10:57 +0530
+Aravinda Prasad <aravinda@linux.vnet.ibm.com> wrote:
 
--- =
+> This patch includes migration support for machine check
+> handling. Especially this patch blocks VM migration
+> requests until the machine check error handling is
+> complete as (i) these errors are specific to the source
+> hardware and is irrelevant on the target hardware,
+> (ii) these errors cause data corruption and should
+> be handled before migration.
+> 
+> Signed-off-by: Aravinda Prasad <aravinda@linux.vnet.ibm.com>
+> ---
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1830872
+LGTM, just one issue: machine reset should del and free the blocker as well,
+otherwise QEMU would crash if spapr_mce_req_event() is called again.
 
-Title:
-  AARCH64 to ARMv7 mistranslation in TCG
+>  hw/ppc/spapr.c         |   20 ++++++++++++++++++++
+>  hw/ppc/spapr_events.c  |   17 +++++++++++++++++
+>  hw/ppc/spapr_rtas.c    |    4 ++++
+>  include/hw/ppc/spapr.h |    2 ++
+>  4 files changed, 43 insertions(+)
+> 
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index e8a77636..31c4850 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -2104,6 +2104,25 @@ static const VMStateDescription vmstate_spapr_dtb = {
+>      },
+>  };
+>  
+> +static bool spapr_fwnmi_needed(void *opaque)
+> +{
+> +    SpaprMachineState *spapr = (SpaprMachineState *)opaque;
+> +
+> +    return (spapr->guest_machine_check_addr == -1) ? 0 : 1;
+> +}
+> +
+> +static const VMStateDescription vmstate_spapr_machine_check = {
+> +    .name = "spapr_machine_check",
+> +    .version_id = 1,
+> +    .minimum_version_id = 1,
+> +    .needed = spapr_fwnmi_needed,
+> +    .fields = (VMStateField[]) {
+> +        VMSTATE_UINT64(guest_machine_check_addr, SpaprMachineState),
+> +        VMSTATE_INT32(mc_status, SpaprMachineState),
+> +        VMSTATE_END_OF_LIST()
+> +    },
+> +};
+> +
+>  static const VMStateDescription vmstate_spapr = {
+>      .name = "spapr",
+>      .version_id = 3,
+> @@ -2137,6 +2156,7 @@ static const VMStateDescription vmstate_spapr = {
+>          &vmstate_spapr_dtb,
+>          &vmstate_spapr_cap_large_decr,
+>          &vmstate_spapr_cap_ccf_assist,
+> +        &vmstate_spapr_machine_check,
+>          NULL
+>      }
+>  };
+> diff --git a/hw/ppc/spapr_events.c b/hw/ppc/spapr_events.c
+> index 573c0b7..35e21e4 100644
+> --- a/hw/ppc/spapr_events.c
+> +++ b/hw/ppc/spapr_events.c
+> @@ -41,6 +41,7 @@
+>  #include "qemu/bcd.h"
+>  #include "hw/ppc/spapr_ovec.h"
+>  #include <libfdt.h>
+> +#include "migration/blocker.h"
+>  
+>  #define RTAS_LOG_VERSION_MASK                   0xff000000
+>  #define   RTAS_LOG_VERSION_6                    0x06000000
+> @@ -855,6 +856,22 @@ static void spapr_mce_dispatch_elog(PowerPCCPU *cpu, bool recovered)
+>  void spapr_mce_req_event(PowerPCCPU *cpu, bool recovered)
+>  {
+>      SpaprMachineState *spapr = SPAPR_MACHINE(qdev_get_machine());
+> +    int ret;
+> +    Error *local_err = NULL;
+> +
+> +    error_setg(&spapr->fwnmi_migration_blocker,
+> +            "Live migration not supported during machine check handling");
+> +    ret = migrate_add_blocker(spapr->fwnmi_migration_blocker, &local_err);
+> +    if (ret < 0) {
+> +        /*
+> +         * We don't want to abort and let the migration to continue. In a
+> +         * rare case, the machine check handler will run on the target
+> +         * hardware. Though this is not preferable, it is better than aborting
+> +         * the migration or killing the VM.
+> +         */
+> +        error_free(spapr->fwnmi_migration_blocker);
+> +        warn_report_err(local_err);
+> +    }
+>  
+>      while (spapr->mc_status != -1) {
+>          /*
+> diff --git a/hw/ppc/spapr_rtas.c b/hw/ppc/spapr_rtas.c
+> index 91a7ab9..c849223 100644
+> --- a/hw/ppc/spapr_rtas.c
+> +++ b/hw/ppc/spapr_rtas.c
+> @@ -50,6 +50,7 @@
+>  #include "target/ppc/mmu-hash64.h"
+>  #include "target/ppc/mmu-book3s-v3.h"
+>  #include "kvm_ppc.h"
+> +#include "migration/blocker.h"
+>  
+>  static void rtas_display_character(PowerPCCPU *cpu, SpaprMachineState *spapr,
+>                                     uint32_t token, uint32_t nargs,
+> @@ -404,6 +405,9 @@ static void rtas_ibm_nmi_interlock(PowerPCCPU *cpu,
+>          spapr->mc_status = -1;
+>          qemu_cond_signal(&spapr->mc_delivery_cond);
+>          rtas_st(rets, 0, RTAS_OUT_SUCCESS);
+> +        migrate_del_blocker(spapr->fwnmi_migration_blocker);
+> +        error_free(spapr->fwnmi_migration_blocker);
+> +        spapr->fwnmi_migration_blocker = NULL;
+>      }
+>  }
+>  
+> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+> index bd75d4b..6c0cfd8 100644
+> --- a/include/hw/ppc/spapr.h
+> +++ b/include/hw/ppc/spapr.h
+> @@ -214,6 +214,8 @@ struct SpaprMachineState {
+>      SpaprCapabilities def, eff, mig;
+>  
+>      unsigned gpu_numa_id;
+> +
+> +    Error *fwnmi_migration_blocker;
+>  };
+>  
+>  #define H_SUCCESS         0
+> 
+> 
 
-Status in QEMU:
-  New
-
-Bug description:
-  The following guest code:
-
-  https://github.com/tianocore/edk2/blob/3604174718e2afc950c3cc64c64ba5165c=
-8692bd/MdePkg/Library/BaseMemoryLibOptDxe/AArch64/CopyMem.S
-
-  implements, in hand-optimized aarch64 assembly, the CopyMem() edk2 (EFI
-  Development Kit II) library function. (CopyMem() basically has memmove()
-  semantics, to provide a standard C analog here.) The relevant functions
-  are InternalMemCopyMem() and __memcpy().
-
-  When TCG translates this aarch64 code to x86_64, everything works
-  fine.
-
-  When TCG translates this aarch64 code to ARMv7, the destination area of
-  the translated CopyMem() function becomes corrupted -- it differs from
-  the intended source contents. Namely, in every 4096 byte block, the
-  8-byte word at offset 4032 (0xFC0) is zeroed out in the destination,
-  instead of receiving the intended source value.
-
-  I'm attaching two hexdumps of the same destination area:
-
-  - "good.txt" is a hexdump of the destination area when CopyMem() was
-    translated to x86_64,
-
-  - "bad.txt" is a hexdump of the destination area when CopyMem() was
-    translated to ARMv7.
-
-  In order to assist with the analysis of this issue, I disassembled the
-  aarch64 binary with "objdump". Please find the listing in
-  "DxeCore.objdump", attached. The InternalMemCopyMem() function starts at
-  hex offset 2b2ec. The __memcpy() function starts at hex offset 2b180.
-
-  And, I ran the guest on the ARMv7 host with "-d
-  in_asm,op,op_opt,op_ind,out_asm". Please find the log in
-  "tcg.in_asm.op.op_opt.op_ind.out_asm.log", attached.
-
-  The TBs that correspond to (parts of) the InternalMemCopyMem() and
-  __memcpy() functions are scattered over the TCG log file, but the offset
-  between the "nice" disassembly from "DxeCore.objdump", and the in-RAM
-  TBs in the TCG log, can be determined from the fact that there is a
-  single prfm instruction in the entire binary. The instruction's offset
-  is 0x2b180 in "DxeCore.objdump" -- at the beginning of the __memcpy()
-  function --, and its RAM address is 0x472d2180 in the TCG log. Thus the
-  difference (=3D the load address of DxeCore.efi) is 0x472a7000.
-
-  QEMU was built at commit a4f667b67149 ("Merge remote-tracking branch
-  'remotes/cohuck/tags/s390x-20190521-3' into staging", 2019-05-21).
-
-  The reproducer command line is (on an ARMv7 host):
-
-    qemu-system-aarch64 \
-      -display none \
-      -machine virt,accel=3Dtcg \
-      -nodefaults \
-      -nographic \
-      -drive if=3Dpflash,format=3Draw,file=3D$prefix/share/qemu/edk2-aarch6=
-4-code.fd,readonly \
-      -drive if=3Dpflash,format=3Draw,file=3D$prefix/share/qemu/edk2-arm-va=
-rs.fd,snapshot=3Don \
-      -cpu cortex-a57 \
-      -chardev stdio,signal=3Doff,mux=3Don,id=3Dchar0 \
-      -mon chardev=3Dchar0,mode=3Dreadline \
-      -serial chardev:char0
-
-  The apparent symptom is an assertion failure *in the guest*, such as
-
-  > ASSERT [DxeCore]
-  > /home/lacos/src/upstream/qemu/roms/edk2/MdePkg/Library/BaseLib/String.c=
-(1090):
-  > Length < _gPcd_FixedAtBuild_PcdMaximumAsciiStringLength
-
-  but that is only a (distant) consequence of the CopyMem()
-  mistranslation, and resultant destination area corruption.
-
-  Originally reported in the following two mailing list messages:
-  - http://mid.mail-archive.com/9d2e260c-c491-03d2-9b8b-b57b72083f77@redhat=
-.com
-  - http://mid.mail-archive.com/f1cec8c0-1a9b-f5bb-f951-ea0ba9d276ee@redhat=
-.com
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1830872/+subscriptions
 
