@@ -6,82 +6,61 @@ X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E718CC04AB6
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 07:04:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5AD6BC04AB6
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 07:04:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BCFCD27C7B
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 07:04:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BCFCD27C7B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 3345327C7B
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 07:04:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3345327C7B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:58844 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:58846 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hXh11-0000yU-2t
-	for qemu-devel@archiver.kernel.org; Mon, 03 Jun 2019 03:04:19 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:50621)
+	id 1hXh1L-0001E1-ET
+	for qemu-devel@archiver.kernel.org; Mon, 03 Jun 2019 03:04:39 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:52744)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hXgsg-0002gf-QK
-	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 02:55:43 -0400
+	(envelope-from <cohuck@redhat.com>) id 1hXgzn-0000Ll-9K
+	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 03:03:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hXgsf-00071i-BX
-	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 02:55:42 -0400
-Received: from indium.canonical.com ([91.189.90.7]:47772)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hXgsf-00070L-1B
-	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 02:55:41 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hXgsc-0003v7-PU
-	for <qemu-devel@nongnu.org>; Mon, 03 Jun 2019 06:55:38 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id BED432E80CB
-	for <qemu-devel@nongnu.org>; Mon,  3 Jun 2019 06:55:38 +0000 (UTC)
+	(envelope-from <cohuck@redhat.com>) id 1hXgzm-000871-9X
+	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 03:03:03 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33218)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>)
+	id 1hXgzm-0007PW-4K; Mon, 03 Jun 2019 03:03:02 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id EB764A3B5D;
+	Mon,  3 Jun 2019 07:02:33 +0000 (UTC)
+Received: from gondolin (ovpn-204-96.brq.redhat.com [10.40.204.96])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 4A2F166D51;
+	Mon,  3 Jun 2019 07:02:29 +0000 (UTC)
+Date: Mon, 3 Jun 2019 09:02:25 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+To: David Hildenbrand <david@redhat.com>
+Message-ID: <20190603090225.15da7022.cohuck@redhat.com>
+In-Reply-To: <20190531145608.28183-1-david@redhat.com>
+References: <20190531145608.28183-1-david@redhat.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 03 Jun 2019 06:45:23 -0000
-From: =?utf-8?q?Christian_Ehrhardt_=EE=83=BF?= <1830821@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=intel; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug: product=qemu; status=Fix Released; importance=Undecided;
-	assignee=None; 
-X-Launchpad-Bug: distribution=ubuntu; sourcepackage=qemu; component=main;
-	status=Fix Released; importance=Undecided; assignee=None; 
-X-Launchpad-Bug: distribution=ubuntu; distroseries=bionic; sourcepackage=qemu; 
-	component=main; status=Confirmed; importance=Wishlist;
-	assignee=None; 
-X-Launchpad-Bug: distribution=ubuntu; distroseries=cosmic; sourcepackage=qemu; 
-	component=main; status=Confirmed; importance=Wishlist;
-	assignee=None; 
-X-Launchpad-Bug: distribution=ubuntu; distroseries=disco; sourcepackage=qemu; 
-	component=main; status=Fix Released; importance=Undecided;
-	assignee=None; 
-X-Launchpad-Bug-Tags: intel-virt-19.10 qemu-19.10
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: paelzer quanxian-wang sbeattie
-X-Launchpad-Bug-Reporter: quanxian (quanxian-wang)
-X-Launchpad-Bug-Modifier: =?utf-8?q?Christian_Ehrhardt_=EE=83=BF_=28paelzer?=
-	=?utf-8?q?=29?=
-References: <155909595152.12810.1489513977238974514.malonedeb@soybean.canonical.com>
-Message-Id: <155954432307.24515.10059972768129249740.malone@gac.canonical.com>
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="18968";
-	Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: bd68244785db41f7fad8ef940f01055721235083
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.30]);
+	Mon, 03 Jun 2019 07:02:33 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1830821] Re: Expose ARCH_CAP_MDS_NO in guest
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v1 0/2] s390x/tcg: STFLE fixes
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -90,78 +69,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1830821 <1830821@bugs.launchpad.net>
+Cc: Thomas Huth <thuth@redhat.com>, qemu-s390x@nongnu.org,
+	qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is done upstream, no need for the upstream bug task.
-For Ubuntu I'll update the tasks to match the statement of sbeattie.
-There are discussions to reconsider some of the backports, but unfortunatel=
-y the IA32_ARCH_CAPABILITIES infrastructure is a rather big set of changes.
+On Fri, 31 May 2019 16:56:06 +0200
+David Hildenbrand <david@redhat.com> wrote:
 
-** Changed in: qemu
-       Status: New =3D> Fix Released
+> While testing vector instructions, I ran into various issues with
+> user space binaries compiled with more recent compiler versions like
+> 
+> # gunzip /usr/share/man/man1/hexdump.1.gz
+> <dhildenb> *** stack smashing detected ***: <unknown> terminated
+> 
+> Turns out:
+> a) the STFLE instruction in semi-broken on the first invocation
+> b) the code expects a different STFLE behavior than documented in the PoP
+> 
+> Fix a) and make sure the code works by adjusting b).
+> 
 
-** Also affects: qemu (Ubuntu Cosmic)
-   Importance: Undecided
-       Status: New
+So your problems actually did not have anything to do with vector
+instructions and were simply exposed by running binaries compiled with a
+more recent compiler version, right? Interesting :)
 
-** Also affects: qemu (Ubuntu Disco)
-   Importance: Undecided
-       Status: New
+> David Hildenbrand (2):
+>   s390x/tcg: Fix max_byte detection for stfle
+>   s390x/tcg: Store only the necessary amount of doublewords for STFLE
+> 
+>  target/s390x/misc_helper.c | 5 +++--
+>  1 file changed, 3 insertions(+), 2 deletions(-)
+> 
 
-** Also affects: qemu (Ubuntu Bionic)
-   Importance: Undecided
-       Status: New
-
-** Changed in: qemu (Ubuntu Disco)
-       Status: New =3D> Fix Released
-
-** Changed in: qemu (Ubuntu)
-       Status: New =3D> Fix Released
-
-** Changed in: qemu (Ubuntu Bionic)
-   Importance: Undecided =3D> Wishlist
-
-** Changed in: qemu (Ubuntu Cosmic)
-   Importance: Undecided =3D> Wishlist
-
-** Changed in: qemu (Ubuntu Bionic)
-       Status: New =3D> Confirmed
-
-** Changed in: qemu (Ubuntu Cosmic)
-       Status: New =3D> Confirmed
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1830821
-
-Title:
-  Expose ARCH_CAP_MDS_NO in guest
-
-Status in intel:
-  New
-Status in QEMU:
-  Fix Released
-Status in qemu package in Ubuntu:
-  Fix Released
-Status in qemu source package in Bionic:
-  Confirmed
-Status in qemu source package in Cosmic:
-  Confirmed
-Status in qemu source package in Disco:
-  Fix Released
-
-Bug description:
-  Description:
-
-  MDS_NO is bit 5 of ARCH_CAPABILITIES. Expose this bit to guest.
-
-  Target Qemu: 4.1
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/intel/+bug/1830821/+subscriptions
+Do you want to include these in a pull request, or should I pick them
+up myself?
 
