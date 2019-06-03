@@ -3,59 +3,60 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 12CA8C04AB5
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 20:35:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 05E9DC04AB5
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 20:50:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DF87425687
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 20:35:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DF87425687
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id B81952654C
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 20:50:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B81952654C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:40633 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:40768 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hXtgU-0001y2-3w
-	for qemu-devel@archiver.kernel.org; Mon, 03 Jun 2019 16:35:58 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:58529)
+	id 1hXtuy-0005iX-1Y
+	for qemu-devel@archiver.kernel.org; Mon, 03 Jun 2019 16:50:56 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:34957)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hXteg-0000Tc-A8
-	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 16:34:07 -0400
+	(envelope-from <groug@kaod.org>) id 1hXttx-0005KD-Uf
+	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 16:49:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hXtTl-0004Z5-J5
-	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 16:22:50 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47376)
+	(envelope-from <groug@kaod.org>) id 1hXttt-000121-Sz
+	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 16:49:52 -0400
+Received: from 6.mo173.mail-out.ovh.net ([46.105.43.93]:56400)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mreitz@redhat.com>)
-	id 1hXtTk-0004VW-76; Mon, 03 Jun 2019 16:22:48 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 888AF550CF;
-	Mon,  3 Jun 2019 20:22:47 +0000 (UTC)
-Received: from localhost (unknown [10.40.205.221])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 1CE2C5D71A;
-	Mon,  3 Jun 2019 20:22:44 +0000 (UTC)
-From: Max Reitz <mreitz@redhat.com>
-To: qemu-block@nongnu.org
-Date: Mon,  3 Jun 2019 22:22:36 +0200
-Message-Id: <20190603202236.1342-3-mreitz@redhat.com>
-In-Reply-To: <20190603202236.1342-1-mreitz@redhat.com>
-References: <20190603202236.1342-1-mreitz@redhat.com>
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1hXtto-0000f5-Ld
+	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 16:49:47 -0400
+Received: from player787.ha.ovh.net (unknown [10.108.35.210])
+	by mo173.mail-out.ovh.net (Postfix) with ESMTP id 667C710BFDD
+	for <qemu-devel@nongnu.org>; Mon,  3 Jun 2019 22:49:37 +0200 (CEST)
+Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
+	[82.253.208.248]) (Authenticated sender: groug@kaod.org)
+	by player787.ha.ovh.net (Postfix) with ESMTPSA id 7238468AE89E;
+	Mon,  3 Jun 2019 20:49:31 +0000 (UTC)
+Date: Mon, 3 Jun 2019 22:49:30 +0200
+From: Greg Kurz <groug@kaod.org>
+To: elohimes@gmail.com
+Message-ID: <20190603224930.4f3c14fe@bahia.lab.toulouse-stg.fr.ibm.com>
+In-Reply-To: <20190529070955.25565-6-xieyongji@baidu.com>
+References: <20190529070955.25565-1-xieyongji@baidu.com>
+	<20190529070955.25565-6-xieyongji@baidu.com>
+X-Mailer: Claws Mail 3.16.0 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.29]);
-	Mon, 03 Jun 2019 20:22:47 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Ovh-Tracer-Id: 9790825592104261933
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduuddrudefjedgudehvdcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v2 2/2] blockdev: Overlays are not snapshots
+X-Received-From: 46.105.43.93
+Subject: Re: [Qemu-devel] [PATCH 5/5] virtio: add "use-started" property
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -67,117 +68,157 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>,
-	qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>
+Cc: qemu-devel@nongnu.org, Xie Yongji <xieyongji@baidu.com>,
+	dgilbert@redhat.com, mst@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-There are error messages which refer to an overlay node as the snapshot.
-That is wrong, those are two different things.
+On Wed, 29 May 2019 15:09:55 +0800
+elohimes@gmail.com wrote:
 
-Signed-off-by: Max Reitz <mreitz@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
----
- blockdev.c                 | 10 +++++-----
- tests/qemu-iotests/085.out | 10 +++++-----
- 2 files changed, 10 insertions(+), 10 deletions(-)
+> From: Xie Yongji <xieyongji@baidu.com>
+> 
+> In order to avoid migration issues, we introduce a "use-started"
+> property to the base virtio device to indicate whether "started"
+> and "start_on_kick" flag could be used. This property will be
+> true by default and set to false when machine type <= 4.0.
+> 
+> Suggested-by: Greg Kurz <groug@kaod.org>
+> Signed-off-by: Xie Yongji <xieyongji@baidu.com>
+> ---
+>  hw/block/vhost-user-blk.c  |  8 ++++++--
+>  hw/core/machine.c          |  4 +++-
+>  hw/virtio/virtio.c         |  7 ++++---
+>  include/hw/virtio/virtio.h | 10 ++++++++++
+>  4 files changed, 23 insertions(+), 6 deletions(-)
+> 
+> diff --git a/hw/block/vhost-user-blk.c b/hw/block/vhost-user-blk.c
+> index 9cb61336a6..520c5d3d4b 100644
+> --- a/hw/block/vhost-user-blk.c
+> +++ b/hw/block/vhost-user-blk.c
+> @@ -191,9 +191,13 @@ static void vhost_user_blk_stop(VirtIODevice *vdev)
+>  static void vhost_user_blk_set_status(VirtIODevice *vdev, uint8_t status)
+>  {
+>      VHostUserBlk *s = VHOST_USER_BLK(vdev);
+> -    bool should_start = vdev->started;
+> +    bool should_start = status & VIRTIO_CONFIG_S_DRIVER_OK;
 
-diff --git a/blockdev.c b/blockdev.c
-index 6963270108..7de0b04fe7 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -1608,13 +1608,13 @@ static void external_snapshot_prepare(BlkActionSt=
-ate *common,
-             s->has_snapshot_node_name ? s->snapshot_node_name : NULL;
-=20
-         if (node_name && !snapshot_node_name) {
--            error_setg(errp, "New snapshot node name missing");
-+            error_setg(errp, "New overlay node name missing");
-             goto out;
-         }
-=20
-         if (snapshot_node_name &&
-             bdrv_lookup_bs(snapshot_node_name, snapshot_node_name, NULL)=
-) {
--            error_setg(errp, "New snapshot node name already in use");
-+            error_setg(errp, "New overlay node name already in use");
-             goto out;
-         }
-=20
-@@ -1656,7 +1656,7 @@ static void external_snapshot_prepare(BlkActionStat=
-e *common,
-     }
-=20
-     if (bdrv_has_blk(state->new_bs)) {
--        error_setg(errp, "The snapshot is already in use");
-+        error_setg(errp, "The overlay is already in use");
-         goto out;
-     }
-=20
-@@ -1666,12 +1666,12 @@ static void external_snapshot_prepare(BlkActionSt=
-ate *common,
-     }
-=20
-     if (state->new_bs->backing !=3D NULL) {
--        error_setg(errp, "The snapshot already has a backing image");
-+        error_setg(errp, "The overlay already has a backing image");
-         goto out;
-     }
-=20
-     if (!state->new_bs->drv->supports_backing) {
--        error_setg(errp, "The snapshot does not support backing images")=
-;
-+        error_setg(errp, "The overlay does not support backing images");
-         goto out;
-     }
-=20
-diff --git a/tests/qemu-iotests/085.out b/tests/qemu-iotests/085.out
-index 6edf107f55..2a5f256cd3 100644
---- a/tests/qemu-iotests/085.out
-+++ b/tests/qemu-iotests/085.out
-@@ -64,13 +64,13 @@ Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D1=
-34217728 backing_file=3DTEST_DIR/
-=20
- =3D=3D=3D Invalid command - cannot create a snapshot using a file BDS =3D=
-=3D=3D
-=20
--{"error": {"class": "GenericError", "desc": "The snapshot does not suppo=
-rt backing images"}}
-+{"error": {"class": "GenericError", "desc": "The overlay does not suppor=
-t backing images"}}
-=20
- =3D=3D=3D Invalid command - snapshot node used as active layer =3D=3D=3D
-=20
--{"error": {"class": "GenericError", "desc": "The snapshot is already in =
-use"}}
--{"error": {"class": "GenericError", "desc": "The snapshot is already in =
-use"}}
--{"error": {"class": "GenericError", "desc": "The snapshot is already in =
-use"}}
-+{"error": {"class": "GenericError", "desc": "The overlay is already in u=
-se"}}
-+{"error": {"class": "GenericError", "desc": "The overlay is already in u=
-se"}}
-+{"error": {"class": "GenericError", "desc": "The overlay is already in u=
-se"}}
-=20
- =3D=3D=3D Invalid command - snapshot node used as backing hd =3D=3D=3D
-=20
-@@ -81,7 +81,7 @@ Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D134=
-217728 backing_file=3DTEST_DIR/
- Formatting 'TEST_DIR/t.IMGFMT.base', fmt=3DIMGFMT size=3D134217728
- Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D134217728 backing_fi=
-le=3DTEST_DIR/t.IMGFMT.base
- {"return": {}}
--{"error": {"class": "GenericError", "desc": "The snapshot already has a =
-backing image"}}
-+{"error": {"class": "GenericError", "desc": "The overlay already has a b=
-acking image"}}
-=20
- =3D=3D=3D Invalid command - The node does not exist =3D=3D=3D
-=20
---=20
-2.21.0
+I guess you need the above because the set_status callback is called
+before setting vdev->status, and virtio_device_started() thus doesn't
+return the expected result for older machine types ?
+
+What about adding a status argument to virtio_device_started() ?
+
+    bool should_start = virtio_device_started(vdev, status);
+
+>      int ret;
+>  
+> +    if (virtio_device_started(vdev)) {
+> +        should_start = true;
+> +    }
+> +
+>      if (!vdev->vm_running) {
+>          should_start = false;
+>      }
+> @@ -317,7 +321,7 @@ static int vhost_user_blk_connect(DeviceState *dev)
+>      }
+>  
+>      /* restore vhost state */
+> -    if (vdev->started) {
+> +    if (virtio_device_started(vdev)) {
+
+    if (virtio_device_started(vdev, vdev->status)) {
+
+and so on...
+
+>          ret = vhost_user_blk_start(vdev);
+>          if (ret < 0) {
+>              error_report("vhost-user-blk: vhost start failed: %s",
+> diff --git a/hw/core/machine.c b/hw/core/machine.c
+> index 934c1bcceb..1730d28c1b 100644
+> --- a/hw/core/machine.c
+> +++ b/hw/core/machine.c
+> @@ -24,7 +24,9 @@
+>  #include "hw/pci/pci.h"
+>  #include "hw/mem/nvdimm.h"
+>  
+> -GlobalProperty hw_compat_4_0[] = {};
+> +GlobalProperty hw_compat_4_0[] = {
+> +    { "virtio-device", "use-started", "false" },
+> +};
+>  const size_t hw_compat_4_0_len = G_N_ELEMENTS(hw_compat_4_0);
+>  
+>  GlobalProperty hw_compat_3_1[] = {
+> diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
+> index 9e17293d46..4c05a9efe3 100644
+> --- a/hw/virtio/virtio.c
+> +++ b/hw/virtio/virtio.c
+> @@ -1803,14 +1803,14 @@ static bool virtio_started_needed(void *opaque)
+>  {
+>      VirtIODevice *vdev = opaque;
+>  
+> -    return vdev->started;
+> +    return vdev->started && vdev->use_started;
+
+Hmm... the idea is that vdev->started should never be set when
+"use-started" is "off". Instead of checking vdev->use_started
+here, you should rather assign it to vdev->started everywhere
+you currently assign true.
+
+>  }
+>  
+>  static bool virtio_start_on_kick_needed(void *opaque)
+>  {
+>      VirtIODevice *vdev = opaque;
+>  
+> -    return vdev->start_on_kick;
+> +    return vdev->start_on_kick && vdev->use_started;
+>  }
+>  
+>  static const VMStateDescription vmstate_virtqueue = {
+> @@ -2320,7 +2320,7 @@ static void virtio_vmstate_change(void *opaque, int running, RunState state)
+>      VirtIODevice *vdev = opaque;
+>      BusState *qbus = qdev_get_parent_bus(DEVICE(vdev));
+>      VirtioBusClass *k = VIRTIO_BUS_GET_CLASS(qbus);
+> -    bool backend_run = running && vdev->started;
+> +    bool backend_run = running && virtio_device_started(vdev);
+>      vdev->vm_running = running;
+>  
+>      if (backend_run) {
+> @@ -2698,6 +2698,7 @@ static void virtio_device_instance_finalize(Object *obj)
+>  
+>  static Property virtio_properties[] = {
+>      DEFINE_VIRTIO_COMMON_FEATURES(VirtIODevice, host_features),
+> +    DEFINE_PROP_BOOL("use-started", VirtIODevice, use_started, true),
+>      DEFINE_PROP_END_OF_LIST(),
+>  };
+>  
+> diff --git a/include/hw/virtio/virtio.h b/include/hw/virtio/virtio.h
+> index 27c0efc3d0..ba4dbd7480 100644
+> --- a/include/hw/virtio/virtio.h
+> +++ b/include/hw/virtio/virtio.h
+> @@ -105,6 +105,7 @@ struct VirtIODevice
+>      uint16_t device_id;
+>      bool vm_running;
+>      bool broken; /* device in invalid state, needs reset */
+> +    bool use_started;
+>      bool started;
+>      bool start_on_kick; /* virtio 1.0 transitional devices support that */
+>      VMChangeStateEntry *vmstate;
+> @@ -351,4 +352,13 @@ static inline bool virtio_is_big_endian(VirtIODevice *vdev)
+>      /* Devices conforming to VIRTIO 1.0 or later are always LE. */
+>      return false;
+>  }
+> +
+> +static inline bool virtio_device_started(VirtIODevice *vdev)
+> +{
+> +    if (vdev->use_started) {
+> +        return vdev->started;
+> +    }
+> +
+> +    return vdev->status & VIRTIO_CONFIG_S_DRIVER_OK;
+> +}
+>  #endif
 
 
