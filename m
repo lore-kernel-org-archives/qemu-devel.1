@@ -2,66 +2,91 @@ Return-Path: <SRS0=e5mL=UC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_MUTT autolearn=ham
+X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 10453C04AB5
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 19:52:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 61EE5C04AB5
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 19:55:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DC358268EC
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 19:52:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DC358268EC
+	by mail.kernel.org (Postfix) with ESMTPS id 38C4A26B24
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 19:55:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 38C4A26B24
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:40067 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:40093 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hXt05-0003dS-6R
-	for qemu-devel@archiver.kernel.org; Mon, 03 Jun 2019 15:52:09 -0400
+	id 1hXt2s-0005fW-Ek
+	for qemu-devel@archiver.kernel.org; Mon, 03 Jun 2019 15:55:02 -0400
 Received: from eggs.gnu.org ([209.51.188.92]:49437)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1hXsyd-0002Mz-Vi
-	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 15:50:41 -0400
+	(envelope-from <eblake@redhat.com>) id 1hXsyo-0002Mz-0m
+	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 15:50:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1hXst8-0003KJ-9G
-	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 15:44:59 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37290)
+	(envelope-from <eblake@redhat.com>) id 1hXsqv-0006tB-Dr
+	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 15:42:42 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41196)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hXst8-0003IW-0m
-	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 15:44:58 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
+	(Exim 4.71) (envelope-from <eblake@redhat.com>)
+	id 1hXsqu-0006q2-7m; Mon, 03 Jun 2019 15:42:40 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 55B5F85543;
-	Mon,  3 Jun 2019 19:44:57 +0000 (UTC)
-Received: from localhost (ovpn-120-246.rdu2.redhat.com [10.10.120.246])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id BFD4A5D9C6;
-	Mon,  3 Jun 2019 19:44:49 +0000 (UTC)
-Date: Mon, 3 Jun 2019 16:44:48 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-To: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20190603194448.GR22103@habkost.net>
-References: <20190531192429.GH22103@habkost.net>
-	<93e5101f-67f1-a416-5e80-f16371a35e6a@redhat.com>
-	<871s0asvli.fsf@dusky.pond.sub.org>
-	<236db86d-52df-5537-4f33-f3c09bbb6289@redhat.com>
-	<20190603201629.0880a337.cohuck@redhat.com>
+	by mx1.redhat.com (Postfix) with ESMTPS id 8263C300144E;
+	Mon,  3 Jun 2019 19:42:34 +0000 (UTC)
+Received: from [10.3.116.85] (ovpn-116-85.phx2.redhat.com [10.3.116.85])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 0605B17DD4;
+	Mon,  3 Jun 2019 19:42:33 +0000 (UTC)
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+References: <20190603162512.30422-1-mreitz@redhat.com>
+	<20190603162512.30422-3-mreitz@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=eblake@redhat.com; keydata=
+	xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
+	xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
+	TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
+	GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
+	sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
+	AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
+	CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
+	RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
+	wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
+	Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
+	gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
+	pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
+	zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
+	pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
+	3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
+	NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
+	cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
+	SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
+	I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
+	mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
+	Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
+	2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
+Organization: Red Hat, Inc.
+Message-ID: <c3a8e513-c659-641f-d9d8-ccd068978df5@redhat.com>
+Date: Mon, 3 Jun 2019 14:42:33 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190603201629.0880a337.cohuck@redhat.com>
-User-Agent: Mutt/1.11.3 (2019-02-01)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+In-Reply-To: <20190603162512.30422-3-mreitz@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="WFObeyZWlUEldoi2AttoLHBgmDYcaOmcM"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.28]);
-	Mon, 03 Jun 2019 19:44:57 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.43]);
+	Mon, 03 Jun 2019 19:42:34 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] Deprecation policy and build dependencies
+X-Content-Filtered-By: Mailman/MimeDel 2.1.21
+Subject: Re: [Qemu-devel] [PATCH 2/2] blockdev: Overlays are not snapshots
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -73,97 +98,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
-	"Daniel P. Berrange" <berrange@redhat.com>,
-	Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
-	Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org,
-	Cleber Rosa <crosa@redhat.com>, John Snow <jsnow@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org,
+	Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Jun 03, 2019 at 08:16:29PM +0200, Cornelia Huck wrote:
-> On Mon, 3 Jun 2019 14:02:16 -0400
-> John Snow <jsnow@redhat.com> wrote:
-> 
-> > On 6/3/19 8:26 AM, Markus Armbruster wrote:
-> > > John Snow <jsnow@redhat.com> writes:
-> > >   
-> > >> On 5/31/19 3:24 PM, Eduardo Habkost wrote:  
-> > >>> Long story short: I would really like to drop support for Python
-> > >>> 2 in QEMU 4.1.  
-> > > 
-> > > The sooner, the better, as far as I'm concerned.
-> > >   
-> > >>> What exactly prevents us from doing this?  Does our deprecation
-> > >>> policy really apply to build dependencies?
-> > >>>  
-> > >>
-> > >> Normally I'd say it's only nice to also follow the depreciation policy
-> > >> for tooling as well to give people a chance to switch away, but with
-> > >> regards to Python2, I feel like we're in the clear to drop it for the
-> > >> first release that will happen after the Python2 doomsday clock.
-> > >>
-> > >> (So, probably 4.2.)  
-> > > 
-> > > In addition to our feature deprecation policity, we have a "Supported
-> > > build platforms" policy (commit 45b47130f4b).  The most common holdback
-> > > is this one:
-> > > 
-> > >     For distributions with long-lifetime releases, the project will aim
-> > >     to support the most recent major version at all times. Support for
-> > >     the previous major version will be dropped 2 years after the new
-> > >     major version is released. For the purposes of identifying supported
-> > >     software versions, the project will look at RHEL, Debian, Ubuntu
-> > >     LTS, and SLES distros. Other long-lifetime distros will be assumed
-> > >     to ship similar software versions.
-> > > 
-> > > RHEL-7 has Python 3 only in EPEL.  RHEL-8 came out last month.  Unless
-> > > we interpret our policy to include EPEL, this means supporting Python 2
-> > > for some 16 months after upstream Python retires it.  My personal
-> > > opinion: nuts.
-> > >   
-> > 
-> > I would rather not support Python2 a day after the clock expires.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--WFObeyZWlUEldoi2AttoLHBgmDYcaOmcM
+From: Eric Blake <eblake@redhat.com>
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>
+Message-ID: <c3a8e513-c659-641f-d9d8-ccd068978df5@redhat.com>
+Subject: Re: [PATCH 2/2] blockdev: Overlays are not snapshots
+References: <20190603162512.30422-1-mreitz@redhat.com>
+ <20190603162512.30422-3-mreitz@redhat.com>
+In-Reply-To: <20190603162512.30422-3-mreitz@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Me neither.
+On 6/3/19 11:25 AM, Max Reitz wrote:
+> There are error messages which refer to an overlay node as the snapshot=
+=2E
+> That is wrong, those are two different things.
+>=20
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> ---
+>  blockdev.c | 10 +++++-----
+>  1 file changed, 5 insertions(+), 5 deletions(-)
+>=20
 
-> > 
-> > > I didn't bother checking Debian, Ubuntu LTS and SLES.
-> > > 
-> > > For hosts other than Linux, we're less ambitious.
-> > >   
-> > 
-> > That policy strikes me as weird, because RHEL7 is not going to be, in
-> > general, using the latest and greatest QEMU. Usually stable versions of
-> > distros stick with the versions of the programs that came out at the time.
-> 
-> I think the idea was that folks might actually develop on a 'stable'
-> distro (in a previous life, I used to complain quite often that
-> building QEMU on a stable distro broke... it was one of my main
-> development machines, but not controlled by me).
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-Good point.
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
-> 
-> > 
-> > What's the benefit of making sure that stable platforms can continue to
-> > run the *newest* QEMU? Is this even a reasonable restriction? If you are
-> > running RHEL7, how many projects do you expect to be able to git clone
-> > and build and have that work with the rest of your legacy/stable
-> > dependencies?
-> > 
-> > RHEL7 uses a 1.5.3 based version. I don't think it matters if we update
-> > 4.2 to be Python3 only, really.
-> 
-> It depends on how old the distro is and what update policy it
-> uses... if parts of it are regularly updated, it might actually be
-> usable. In this case, I think we really need to interpret our policy
-> to include EPEL, or it is completely nuts.
 
-Let's do that, please.  If we simply include EPEL in our policy
-we don't need to treat Python as special.
+--WFObeyZWlUEldoi2AttoLHBgmDYcaOmcM
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
--- 
-Eduardo
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlz1eCkACgkQp6FrSiUn
+Q2r1rAf9Gr/yVQ8/L5H8UB5dHGB2RgF2Oq6ZWOO23gTAI+Pftl9Q2gYb1AVousYg
+p1t6AYYhzB9c3mSx+FiO/SP2NftLr7U81yHpmnVERGQdYBptwavFxBWYAtXqFozh
+DFpAWcPEhI4cdqDRzX5uqh6hbPUtqzb1iR/GyBrt1figwkZxlAUyolcNMm/lpduD
+dEqHcDJAonJiQSVqXgmQTyTaOqwSBljxBZkQJwV1vbhELLDxbrb+vfgzd/RfdMB5
+z9PMdUQ7YLDn6Ew3wcPd7uwn5MakeIAVikvi266eqdl2FnUs5ZaK2O+48HTLnG2+
+JIczXFrdJPIc++83U2RflQ4gk3WgGg==
+=8sJF
+-----END PGP SIGNATURE-----
+
+--WFObeyZWlUEldoi2AttoLHBgmDYcaOmcM--
 
