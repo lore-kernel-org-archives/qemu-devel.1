@@ -2,91 +2,85 @@ Return-Path: <SRS0=e5mL=UC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 61EE5C04AB5
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 19:55:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 93F0DC04AB5
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 19:55:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 38C4A26B24
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 19:55:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 38C4A26B24
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 22B8826B64
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 19:55:24 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BtH9HzHP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 22B8826B64
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:40093 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:40098 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hXt2s-0005fW-Ek
-	for qemu-devel@archiver.kernel.org; Mon, 03 Jun 2019 15:55:02 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:49437)
+	id 1hXt3D-0005wp-5q
+	for qemu-devel@archiver.kernel.org; Mon, 03 Jun 2019 15:55:23 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:51034)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1hXsyo-0002Mz-0m
-	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 15:50:50 -0400
+	(envelope-from <mrolnik@gmail.com>) id 1hXt1b-00051H-PQ
+	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 15:53:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1hXsqv-0006tB-Dr
-	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 15:42:42 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41196)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>)
-	id 1hXsqu-0006q2-7m; Mon, 03 Jun 2019 15:42:40 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 8263C300144E;
-	Mon,  3 Jun 2019 19:42:34 +0000 (UTC)
-Received: from [10.3.116.85] (ovpn-116-85.phx2.redhat.com [10.3.116.85])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 0605B17DD4;
-	Mon,  3 Jun 2019 19:42:33 +0000 (UTC)
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-References: <20190603162512.30422-1-mreitz@redhat.com>
-	<20190603162512.30422-3-mreitz@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=eblake@redhat.com; keydata=
-	xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
-	xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
-	TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
-	GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
-	sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
-	AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
-	CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
-	RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
-	wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
-	Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
-	gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
-	pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
-	zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
-	pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
-	3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
-	NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
-	cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
-	SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
-	I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
-	mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
-	Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
-	2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
-Organization: Red Hat, Inc.
-Message-ID: <c3a8e513-c659-641f-d9d8-ccd068978df5@redhat.com>
-Date: Mon, 3 Jun 2019 14:42:33 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	(envelope-from <mrolnik@gmail.com>) id 1hXt1a-0005Ce-KL
+	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 15:53:43 -0400
+Received: from mail-qk1-x741.google.com ([2607:f8b0:4864:20::741]:45553)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <mrolnik@gmail.com>) id 1hXt1a-0005AM-FC
+	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 15:53:42 -0400
+Received: by mail-qk1-x741.google.com with SMTP id s22so1253050qkj.12
+	for <qemu-devel@nongnu.org>; Mon, 03 Jun 2019 12:53:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+	:cc; bh=zdEgs1wJH0i3bBjSBd7DPVOfk8fjwHyXVwJbYdlnyH0=;
+	b=BtH9HzHPAmfN/afRSg+c3IxIHQN3eZ6Si+kxSfxGiHGYAG3ohDoySJYme1PKJkQrZ9
+	2RiiQGcbP3E1nUu7px8VQa6B6Y5T/qhnzYHKtowUZTzz9adILc+CDZirRWq/xx19WZoL
+	0R5vyHB4IDMx3okvGDQ/CEl0xBYawkCxHNCz10/gGOTz5BK6gXHz8ZQ7H126J9eOwrgY
+	mu1Vd/FQ+SgPOBS1YikTeTJ5fzVvEji/5gG9n4coEP4rJRw5xiYBQNXvY8QzKNs+7gv4
+	UDOyG5Y1oOavUdqQ//ebKyfqy8ZvXKnYLTRI2u+qhOOrGyLgbq25zp0Vfrwa+IwYvZ4V
+	FKnQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+	:message-id:subject:to:cc;
+	bh=zdEgs1wJH0i3bBjSBd7DPVOfk8fjwHyXVwJbYdlnyH0=;
+	b=IkqZ2h273rWkmDrsTmWjYE4+IQpAl7H2NzQR02Mvd1kH74eaEliDvbW/1zmYVlkWWL
+	GSPvGH3qgqm973DKepi6j6NYU9l3iqIBGnWXYb5tFqgLRx0RW2lZ67rnEYg8Cx7jEKl2
+	ViIlsIfO0Lm6v16msANtHInxH0FC2DwNthcC1Codw/N/CcIE+AZ4dFDookEDIok8Fp7l
+	+Q2MBoPxySfPR67MbXcyq38EIuyAyFtl01GyJstC5MTWGDUtxR1TdHMoP/G9DIFeCr4X
+	OON0OOmot6l+nr3RPwcjFXuHdPMMjbzubibV3ZFLTJzf+yd/MykOU6yUDJIyYDTwy153
+	Ul4w==
+X-Gm-Message-State: APjAAAXni1s5bphI7zA9iKgTZ4ywELjEVkwsy90HtKmmp8d3Rq8zLIq4
+	ixtxnJOjbjIEQih+QBxm6CP0pNOx7wjwNOBisv8=
+X-Google-Smtp-Source: APXvYqwMHeOYNQwEhcbAssgQhtOuUSSbrOgejC/Hy+YX1wjmxQAyQ+l2X3MKu6RBqWPCVcR6v3qtlBXfHa0zxcrn5fg=
+X-Received: by 2002:a05:620a:5b1:: with SMTP id
+	q17mr22962612qkq.174.1559591621006; 
+	Mon, 03 Jun 2019 12:53:41 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20190603162512.30422-3-mreitz@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="WFObeyZWlUEldoi2AttoLHBgmDYcaOmcM"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.43]);
-	Mon, 03 Jun 2019 19:42:34 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
+References: <20190530190738.22713-1-mrolnik@gmail.com>
+	<20190530190738.22713-9-mrolnik@gmail.com>
+	<c501a681-fc9b-1fec-f9bf-190f74c4bb73@redhat.com>
+	<CAK4993gA1TTKE74Z++r1d7fpGr6NHqosVCLoKaaVLF-AngynmA@mail.gmail.com>
+	<a71efc15-ec01-43b5-42e9-2393ac9450a5@redhat.com>
+In-Reply-To: <a71efc15-ec01-43b5-42e9-2393ac9450a5@redhat.com>
+From: Michael Rolnik <mrolnik@gmail.com>
+Date: Mon, 3 Jun 2019 22:53:03 +0300
+Message-ID: <CAK4993gPcebFNOUQtC83PXDR7GWcwTfvTtRs0ho3OYGoyi=FWw@mail.gmail.com>
+To: Eric Blake <eblake@redhat.com>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::741
+Content-Type: text/plain; charset="UTF-8"
 X-Content-Filtered-By: Mailman/MimeDel 2.1.21
-Subject: Re: [Qemu-devel] [PATCH 2/2] blockdev: Overlays are not snapshots
+Subject: Re: [Qemu-devel] [PATCH RFC v20 8/8] target/avr: Register AVR
+ support with the rest of QEMU, the build system, and the MAINTAINERS file
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -98,61 +92,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org,
-	Markus Armbruster <armbru@redhat.com>
+Cc: Sarah Harris <S.E.Harris@kent.ac.uk>,
+	QEMU Developers <qemu-devel@nongnu.org>,
+	Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---WFObeyZWlUEldoi2AttoLHBgmDYcaOmcM
-From: Eric Blake <eblake@redhat.com>
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
- Markus Armbruster <armbru@redhat.com>
-Message-ID: <c3a8e513-c659-641f-d9d8-ccd068978df5@redhat.com>
-Subject: Re: [PATCH 2/2] blockdev: Overlays are not snapshots
-References: <20190603162512.30422-1-mreitz@redhat.com>
- <20190603162512.30422-3-mreitz@redhat.com>
-In-Reply-To: <20190603162512.30422-3-mreitz@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Thanks!
 
-On 6/3/19 11:25 AM, Max Reitz wrote:
-> There are error messages which refer to an overlay node as the snapshot=
-=2E
-> That is wrong, those are two different things.
->=20
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
-> ---
->  blockdev.c | 10 +++++-----
->  1 file changed, 5 insertions(+), 5 deletions(-)
->=20
+On Mon, Jun 3, 2019 at 10:47 PM Eric Blake <eblake@redhat.com> wrote:
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+> On 6/1/19 4:20 PM, Michael Rolnik wrote:
+> > Hi Eric.
+> >
+> > please explain what should I do or point to an example or documentation.
+> >
+>
+> >>>  # Since: 3.0
+> >>>  ##
+> >>>  { 'enum' : 'SysEmuTarget',
+> >>> -  'data' : [ 'aarch64', 'alpha', 'arm', 'cris', 'hppa', 'i386',
+> 'lm32',
+> >>> +  'data' : [ 'aarch64', 'alpha', 'arm', 'avr', 'cris', 'hppa', 'i386',
+> >> 'lm32',
+> >>>               'm68k', 'microblaze', 'microblazeel', 'mips', 'mips64',
+> >>>               'mips64el', 'mipsel', 'moxie', 'nios2', 'or1k', 'ppc',
+> >>>               'ppc64', 'riscv32', 'riscv64', 's390x', 'sh4',
+> >>
+> >> Missing documentation that 'avr' is (since 4.1).
+>
+> Look above a few lines, where it says:
+>
+> # ppcemb: dropped in 3.1
+> #
+> # Since: 3.0
+> ##
+> { 'enum' : 'SysEmuTarget',
+>
+> You'll add a new line, right after ppcemb, which states
+>
+> # avr: since 4.1
+>
+> --
+> Eric Blake, Principal Software Engineer
+> Red Hat, Inc.           +1-919-301-3226
+> Virtualization:  qemu.org | libvirt.org
+>
+>
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
-
---WFObeyZWlUEldoi2AttoLHBgmDYcaOmcM
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlz1eCkACgkQp6FrSiUn
-Q2r1rAf9Gr/yVQ8/L5H8UB5dHGB2RgF2Oq6ZWOO23gTAI+Pftl9Q2gYb1AVousYg
-p1t6AYYhzB9c3mSx+FiO/SP2NftLr7U81yHpmnVERGQdYBptwavFxBWYAtXqFozh
-DFpAWcPEhI4cdqDRzX5uqh6hbPUtqzb1iR/GyBrt1figwkZxlAUyolcNMm/lpduD
-dEqHcDJAonJiQSVqXgmQTyTaOqwSBljxBZkQJwV1vbhELLDxbrb+vfgzd/RfdMB5
-z9PMdUQ7YLDn6Ew3wcPd7uwn5MakeIAVikvi266eqdl2FnUs5ZaK2O+48HTLnG2+
-JIczXFrdJPIc++83U2RflQ4gk3WgGg==
-=8sJF
------END PGP SIGNATURE-----
-
---WFObeyZWlUEldoi2AttoLHBgmDYcaOmcM--
-
+-- 
+Best Regards,
+Michael Rolnik
