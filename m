@@ -2,75 +2,140 @@ Return-Path: <SRS0=e5mL=UC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E934C04AB5
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 18:20:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7076FC04AB5
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 18:22:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 08AB8273CD
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 18:20:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 08AB8273CD
+	by mail.kernel.org (Postfix) with ESMTPS id 34B9C273D6
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 18:22:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 34B9C273D6
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:39125 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:39146 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hXrZU-0002wT-7d
-	for qemu-devel@archiver.kernel.org; Mon, 03 Jun 2019 14:20:36 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:56523)
+	id 1hXrb3-0004R0-DL
+	for qemu-devel@archiver.kernel.org; Mon, 03 Jun 2019 14:22:13 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:56645)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1hXrOR-0002Es-IQ
-	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 14:09:12 -0400
+	(envelope-from <jsnow@redhat.com>) id 1hXrOx-0002gn-47
+	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 14:09:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1hXrOQ-0000sD-AE
-	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 14:09:11 -0400
-Received: from mail-qt1-f196.google.com ([209.85.160.196]:46558)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1hXrOQ-0000r8-43
-	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 14:09:10 -0400
-Received: by mail-qt1-f196.google.com with SMTP id z19so10484142qtz.13
-	for <qemu-devel@nongnu.org>; Mon, 03 Jun 2019 11:09:10 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-	:mime-version:content-disposition:in-reply-to;
-	bh=1DkvQpNZ6CwyiPWrtu8aXp08JjOfs2dpwhlXm3wVrEk=;
-	b=ErtdDEx6/dBZGruXcGzjybjdhiVdUuc4YrVmumeL3Re6Pa/WTkR5dXh7JcHjewjUOy
-	nIR51OAyKthOnFzwYL/3pEnfdGM+IGw0eUAEDFqMz8YIsltYVqHfk5TvEUVv5Ybmt3dY
-	yAWlMvVmZj4Jra/GR9a9J8IIVXUfT5PeiyH7QaLX2Rv6sD6m2ZzMkrSz79XSwlaSW1db
-	WkjtzjIFPe5bEiehFykSzOqcG9E/b540cd9QZ8D13PqpYgQmxdJN7/kbH4VdwNmDo27w
-	Xs1sxSZNwti2b+rCB9ptGtSpx4EibyqjNoWI4TMb+Bl6S5q4WU5jgRx/HkO9RGC0OWiK
-	KFPA==
-X-Gm-Message-State: APjAAAVG/cETACgx1G1pmnm+wQS+gBg/J3fY3srfVQx7gI/66IKDeJoB
-	Lps7FQ3iNu8VNN0FmLTexr4s9/DPAzw=
-X-Google-Smtp-Source: APXvYqyjDJvHCmzx5tUPfUnxHbiiaE3kEmsae+b7uZnPWvr9WPDJUXVKkcaieR1G1tFdRg3WSBshxw==
-X-Received: by 2002:ad4:43c1:: with SMTP id o1mr10184670qvs.226.1559585349170; 
-	Mon, 03 Jun 2019 11:09:09 -0700 (PDT)
-Received: from redhat.com (pool-100-0-197-103.bstnma.fios.verizon.net.
-	[100.0.197.103]) by smtp.gmail.com with ESMTPSA id
-	f67sm9342457qtb.68.2019.06.03.11.09.07
-	(version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-	Mon, 03 Jun 2019 11:09:08 -0700 (PDT)
-Date: Mon, 3 Jun 2019 14:09:07 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: qemu-devel@nongnu.org
-Message-ID: <20190416125912.44001-4-liran.alon@oracle.com>
-References: <20190603180807.16140-1-mst@redhat.com>
+	(envelope-from <jsnow@redhat.com>) id 1hXrOw-0001zl-9B
+	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 14:09:43 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46658)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jsnow@redhat.com>)
+	id 1hXrK4-0007rU-2w; Mon, 03 Jun 2019 14:04:40 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 4EA2CC18B2E4;
+	Mon,  3 Jun 2019 18:04:27 +0000 (UTC)
+Received: from [10.18.17.164] (dhcp-17-164.bos.redhat.com [10.18.17.164])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 63E6B5D71A;
+	Mon,  3 Jun 2019 18:04:25 +0000 (UTC)
+To: Peter Maydell <peter.maydell@linaro.org>
+References: <20190523121230.17193-1-jsnow@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
+	mQINBFTKefwBEAChvwqYC6saTzawbih87LqBYq0d5A8jXYXaiFMV/EvMSDqqY4EY6whXliNO
+	IYzhgrPEe7ZmPxbCSe4iMykjhwMh5byIHDoPGDU+FsQty2KXuoxto+ZdrP9gymAgmyqdk3aV
+	vzzmCa3cOppcqKvA0Kqr10UeX/z4OMVV390V+DVWUvzXpda45/Sxup57pk+hyY52wxxjIqef
+	rj8u5BN93s5uCVTus0oiVA6W+iXYzTvVDStMFVqnTxSxlpZoH5RGKvmoWV3uutByQyBPHW2U
+	1Y6n6iEZ9MlP3hcDqlo0S8jeP03HaD4gOqCuqLceWF5+2WyHzNfylpNMFVi+Hp0H/nSDtCvQ
+	ua7j+6Pt7q5rvqgHvRipkDDVsjqwasuNc3wyoHexrBeLU/iJBuDld5iLy+dHXoYMB3HmjMxj
+	3K5/8XhGrDx6BDFeO3HIpi3u2z1jniB7RtyVEtdupED6lqsDj0oSz9NxaOFZrS3Jf6z/kHIf
+	h42mM9Sx7+s4c07N2LieUxcfqhFTaa/voRibF4cmkBVUhOD1AKXNfhEsTvmcz9NbUchCkcvA
+	T9119CrsxfVsE7bXiGvdXnzyGLXdsoosjzwacKdOrVaDmN3Uy+SHiQXo6TlkSdV0XH2PUxTM
+	LsBFIO9qXO43Ai6J6iPAP/01l8fuZfpJE0/L/c25yyaND7xA3wARAQABtCpKb2huIFNub3cg
+	KEpvaG4gSHVzdG9uKSA8anNub3dAcmVkaGF0LmNvbT6JAlQEEwECAD4CGwMCHgECF4AFCwkI
+	BwMFFQoJCAsFFgIDAQAWIQT665cRoSz0dYEvGPKIqQZNGDVh6wUCXF392gUJC1Xq3gAKCRCI
+	qQZNGDVh6558D/9pM4pu4njX5aT6uUW3vAmbWLF1jfPxiTQgSHAnm9EBMZED/fsvkzj97clo
+	LN7JKmbYZNgJmR01A7flG45V4iOR/249qAfaVuD+ZzZi1R4jFzr13WS+IEdn0hYp9ITndb7R
+	ezW+HGu6/rP2PnfmDnNowgJu6Dp6IUEabq8SXXwGHXZPuMIrsXJxUdKJdGnh1o2u7271yNO7
+	J9PEMuMDsgjsdnaGtv7aQ9CECtXvBleAc06pLW2HU10r5wQyBMZGITemJdBhhdzGmbHAL0M6
+	vKi/bafHRWqfMqOAdDkv3Jg4arl2NCG/uNateR1z5e529+UlB4XVAQT+f5T/YyI65DFTY940
+	il3aZhA8u788jZEPMXmt94u7uPZbEYp7V0jt68SrTaOgO7NaXsboXFjwEa42Ug5lB5d5/Qdp
+	1AITUv0NJ51kKwhHL1dEagGeloIsGVQILmpS0MLdtitBHqZLsnJkRvtMaxo47giyBlv2ewmq
+	tIGTlVLxHx9xkc9aVepOuiGlZaZB72c9AvZs9rKaAjgU2UfJHlB/Hr4uSk/1EY0IgMv4vnsG
+	1sA5gvS7A4T4euu0PqHtn2sZEWDrk5RDbw0yIb53JYdXboLFmFXKzVASfKh2ZVeXRBlQQSJi
+	3PBR1GzzqORlfryby7mkY857xzCI2NkIkD2eq+HhzFTfFOTdGrkCDQRUynn8ARAAwbhP45BE
+	d/zAMBPV2dk2WwIwKRSKULElP3kXpcuiDWYQob3UODUUqClO+3aXVRndaNmZX9WbzGYexVo3
+	5j+CVBCGr3DlU8AL9pp3KQ3SJihWcDed1LSmUf8tS+10d6mdGxDqgnd/OWU214isvhgWZtZG
+	MM/Xj7cx5pERIiP+jqu7PT1cibcfcEKhPjYdyV1QnLtKNGrTg/UMKaL+qkWBUI/8uBoa0HLs
+	NH63bXsRtNAG8w6qG7iiueYZUIXKc4IHINUguqYQJVdSe+u8b2N5XNhDSEUhdlqFYraJvX6d
+	TjxMTW5lzVG2KjztfErRNSUmu2gezbw1/CV0ztniOKDA7mkQi6UIUDRh4LxRm5mflfKiCyDQ
+	L6P/jxHBxFv+sIgjuLrfNhIC1p3z9rvCh+idAVJgtHtYl8p6GAVrF+4xQV2zZH45tgmHo2+S
+	JsLPjXZtWVsWANpepXnesyabWtNAV4qQB7/SfC77zZwsVX0OOY2Qc+iohmXo8U7DgXVDgl/R
+	/5Qgfnlv0/3rOdMt6ZPy5LJr8D9LJmcP0RvX98jyoBOf06Q9QtEwJsNLCOCo2LKNL71DNjZr
+	nXEwjUH66CXiRXDbDKprt71BiSTitkFhGGU88XCtrp8R9yArXPf4MN+wNYBjfT7K29gWTzxt
+	9DYQIvEf69oZD5Z5qHYGp031E90AEQEAAYkCPAQYAQIAJgIbDBYhBPrrlxGhLPR1gS8Y8oip
+	Bk0YNWHrBQJcXf3JBQkLVerNAAoJEIipBk0YNWHrU1AP/1FOK2SBGbyhHa5vDHuf47fgLipC
+	e0/h1E0vdSonzlhPxuZoQ47FjzG9uOhqqQG6/PqtWs/FJIyz8aGG4aV+pSA/9Ko3/2ND8MSY
+	ZflWs7Y8Peg08Ro01GTHFITjEUgHpTpHiT6TNcZB5aZNJ8jqCtW5UlqvXXbVeSTmO70ZiVtc
+	vUJbpvSxYmzhFfZWaXIPcNcKWL1rnmnzs67lDhMLdkYVf91aml/XtyMUlfB8Iaejzud9Ht3r
+	C0pA9MG57pLblX7okEshxAC0+tUdY2vANWFeX0mgqRt1GSuG9XM9H/cKP1czfUV/FgaWo/Ya
+	fM4eMhUAlL/y+/AJxxumPhBXftM4yuiktp2JMezoIMJI9fmhjfWDw7+2jVrx9ze1joLakFD1
+	rVAoHxVJ7ORfQ4Ni/qWbQm3T6qQkSMt4N/scNsMczibdTPxU7qtwQwIeFOOc3wEwmJ9Qe3ox
+	TODQ0agXiWVj0OXYCHJ6MxTDswtyTGQW+nUHpKBgHGwUaR6d1kr/LK9+5LpOfRlK9VRfEu7D
+	PGNiRkr8Abp8jHsrBqQWfUS1bAf62bq6XUel0kUCtb7qCq024aOczXYWPFpJFX+nhp4d7NeH
+	Edq+wlC13sBSiSHC7T5yssJ+7JPa2ATLlSKhEvBsLe2TsSTTtFlA0nBclqhfJXzimiuge9qU
+	E40lvMWBuQINBFTKimUBEADDbJ+pQ5M4QBMWkaWImRj7c598xIZ37oKM6rGaSnuB1SVb7YCr
+	Ci2MTwQcrQscA2jm80O8VFqWk+/XsEp62dty47GVwSfdGje/3zv3VTH2KhOCKOq3oPP5ZXWY
+	rz2d2WnTvx++o6lU7HLHDEC3NGLYNLkL1lyVxLhnhvcMxkf1EGA1DboEcMgnJrNB1pGP27ww
+	cSfvdyPGseV+qZZa8kuViDga1oxmnYDxFKMGLxrClqHrRt8geQL1Wj5KFM5hFtGTK4da5lPn
+	wGNd6/CINMeCT2AWZY5ySz7/tSZe5F22vPvVZGoPgQicYWdNc3ap7+7IKP86JNjmec/9RJcz
+	jvrYjJdiqBVldXou72CtDydKVLVSKv8c2wBDJghYZitfYIaL8cTvQfUHRYTfo0n5KKSec8Vo
+	vjDuxmdbOUBA+SkRxqmneP5OxGoZ92VusrwWCjry8HRsNdR+2T+ClDCO6Wpihu4V3CPkQwTy
+	eCuMHPAT0ka5paTwLrnZIxsdfnjUa96T10vzmQgAxpbbiaLvgKJ8+76OPdDnhddyxd2ldYfw
+	RkF5PEGg3mqZnYKNNBtwjvX49SAvgETQvLzQ8IKVgZS0m4z9qHHvtc1BsQnFfe+LJOFjzZr7
+	CrDNJMqk1JTHYsSi2JcN3vY32WMezXSQ0TzeMK4kdnclSQyp/h23GWod5QARAQABiQRbBBgB
+	AgAmAhsCFiEE+uuXEaEs9HWBLxjyiKkGTRg1YesFAlxd/coFCQtV2mQCKcFdIAQZAQIABgUC
+	VMqKZQAKCRB974EGqvw5DiJoEACLmuiRq9ifvOh5DyBFwRS7gvA14DsGQngmC57EzV0EFcfM
+	XVi1jX5OtwUyUe0Az5r6lHyyHDsDsIpLKBlWrYCeLpUhRR3oy181T7UNxvujGFeTkzvLAOo6
+	Hs3b8Wv9ARg+7acRYkQRNY7k0GIJ6YZz149tRyRKAy/vSjsaB9Lt0NOd1wf2EQMKwRVELwJD
+	y0AazGn+0PRP7Bua2YbtxaBmhBBDb2tPpwn8U9xdckB4Vlft9lcWNsC/18Gi9bpjd9FSbdH/
+	sOUI+3ToWYENeoT4IP09wn6EkgWaJS3nAUN/MOycNej2i4Yhy2wDDSKyTAnVkSSSoXk+tK91
+	HfqtokbDanB8daP+K5LgoiWHzjfWzsxA2jKisI4YCGjrYQzTyGOT6P6u6SEeoEx10865B/zc
+	8/vN50kncdjYz2naacIDEKQNZlnGLsGkpCbfmfdi3Zg4vuWKNdWr0wGUzDUcpqW0y/lUXna+
+	6uyQShX5e4JD2UPuf9WAQ9HtgSAkaDd4O1I2J41sleePzZOVB3DmYgy+ECRJJ5nw3ihdxpgc
+	y/v3lfcJaqiyCv0PF+K/gSOvwhH7CbVqARmptT7yhhxqFdaYWo2Z2ksuKyoKSRMFCXQY5oac
+	uTmyPIT4STFyUQFeqSCWDum/NFNoSKhmItw2Td+4VSJHShRVbg39KNFPZ7mXYAkQiKkGTRg1
+	YesWJA/+PV3qDUtPNEGwjVvjQqHSbrBy94tu6gJvPHgGPtRDYvxnCaJsmgiC0pGB2KFRsnfl
+	2zBNBEWF/XwsI081jQE5UO60GKmHTputChLXpVobyuc+lroG2YhknXRBAV969SLnZR4BS/1s
+	Gi046gOXfaKYatve8BiZr5it5Foq3FMPDNgZMit1H9Dk8rkKFfDMRf8EGS/Z+TmyEsIf99H7
+	TH3n7lco8qO81fSFwkh4pvo2kWRFYTC5vsIVQ+GqVUp+W1DZJHxX8LwWuF1AzUt4MUTtNAvy
+	TXl5EgsmoY9mpNNL7ZnW65oG63nEP5KNiybvuQJzXVxR8eqzOh2Mod4nHg3PE7UCd3DvLNsn
+	GXFRo44WyT/G2lArBtjpkut7bDm0i1nENABy2UgS+1QvdmgNu6aEZxdNthwRjUhuuvCCDMA4
+	rCDQYyakH2tJNQgkXkeLodBKF4bHiBbuwj0E39S9wmGgg+q4OTnAO/yhQGknle7a7G5xHBwE
+	i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
+	RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
+	glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
+Message-ID: <4216a20b-1b23-e1cd-3479-1d1011e9d683@redhat.com>
+Date: Mon, 3 Jun 2019 14:04:24 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Disposition: inline
-In-Reply-To: <20190603180807.16140-1-mst@redhat.com>
-X-Mailer: git-send-email 2.17.1.1206.gb667731e2e.dirty
-X-Mutt-Fcc: =sent
+In-Reply-To: <20190523121230.17193-1-jsnow@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.31]);
+	Mon, 03 Jun 2019 18:04:34 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-	[fuzzy]
-X-Received-From: 209.85.160.196
-Subject: [Qemu-devel] [PULL v2 13/14] vhost-scsi: Allow user to enable
- migration
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v2 0/2] Add QMP lexer for annotated JSON to
+ Sphinx
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -82,158 +147,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
-	Bijan Mottahedeh <bijan.mottahedeh@oracle.com>,
-	Liran Alon <liran.alon@oracle.com>, Stefan Hajnoczi <stefanha@redhat.com>,
-	Paolo Bonzini <pbonzini@redhat.com>, Nir Weiner <nir.weiner@oracle.com>
+Cc: Fam Zheng <fam@euphon.net>, Aarushi Mehta <mehta.aaru20@gmail.com>,
+	qemu-devel@nongnu.org, qemu-block@nongnu.org,
+	Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190603180907.Htz0yfGmYW9ZIjrqwTzpW3sBqmw7So7BTCXxLt__qCc@z>
 
-From: Liran Alon <liran.alon@oracle.com>
+Peter: I think this one would be through your tree if anyone's, yes? Any
+thoughts?
 
-In order to perform a valid migration of a vhost-scsi device,
-the following requirements must be met:
-(1) The virtio-scsi device state needs to be saved & loaded.
-(2) The vhost backend must be stopped before virtio-scsi device state
-is saved:
-  (2.1) Sync vhost backend state to virtio-scsi device state.
-  (2.2) No further I/O requests are made by vhost backend to target
-        SCSI device.
-  (2.3) No further guest memory access takes place after VM is stopped.
-(3) Requests in-flight to target SCSI device are completed before
-    migration handover.
-(4) Target SCSI device state needs to be saved & loaded into the
-    destination host target SCSI device.
+--js
 
-Previous commit ("vhost-scsi: Add VMState descriptor")
-add support to save & load the device state using VMState.
-This meets requirement (1).
-
-When VM is stopped by migration thread (On Pre-Copy complete), the
-following code path is executed:
-migration_completion() -> vm_stop_force_state() -> vm_stop() ->
-do_vm_stop().
-
-do_vm_stop() calls first pause_all_vcpus() which pause all guest
-vCPUs and then call vm_state_notify().
-In case of vhost-scsi device, this will lead to the following code path
-to be executed:
-vm_state_notify() -> virtio_vmstate_change() ->
-virtio_set_status() -> vhost_scsi_set_status() -> vhost_scsi_stop().
-vhost_scsi_stop() then calls vhost_scsi_clear_endpoint() and
-vhost_scsi_common_stop().
-
-vhost_scsi_clear_endpoint() sends VHOST_SCSI_CLEAR_ENDPOINT ioctl to
-vhost backend which will reach kernel's vhost_scsi_clear_endpoint()
-which process all pending I/O requests and wait for them to complete
-(vhost_scsi_flush()). This meets requirement (3).
-
-vhost_scsi_common_stop() will stop the vhost backend.
-As part of this stop, dirty-bitmap is synced and vhost backend state is
-synced with virtio-scsi device state. As at this point guest vCPUs are
-already paused, this meets requirement (2).
-
-At this point we are left with requirement (4) which is target SCSI
-device specific and therefore cannot be done by QEMU. Which is the main
-reason why vhost-scsi adds a migration blocker.
-However, as this can be handled either by an external orchestrator or
-by using shared-storage (i.e. iSCSI), there is no reason to limit the
-orchestrator from being able to explictly specify it wish to enable
-migration even when VM have a vhost-scsi device.
-
-Considering all the above, this commit allows orchestrator to explictly
-specify that it is responsbile for taking care of requirement (4) and
-therefore vhost-scsi should not add a migration blocker.
-
-Reviewed-by: Nir Weiner <nir.weiner@oracle.com>
-Reviewed-by: Bijan Mottahedeh <bijan.mottahedeh@oracle.com>
-Signed-off-by: Liran Alon <liran.alon@oracle.com>
-Message-Id: <20190416125912.44001-4-liran.alon@oracle.com>
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
----
- include/hw/virtio/vhost-scsi-common.h |  1 +
- hw/scsi/vhost-scsi.c                  | 30 ++++++++++++++++++---------
- 2 files changed, 21 insertions(+), 10 deletions(-)
-
-diff --git a/include/hw/virtio/vhost-scsi-common.h b/include/hw/virtio/vhost-scsi-common.h
-index 57fb1d87b5..4eab767ee8 100644
---- a/include/hw/virtio/vhost-scsi-common.h
-+++ b/include/hw/virtio/vhost-scsi-common.h
-@@ -36,6 +36,7 @@ typedef struct VHostSCSICommon {
-     int target;
-     int lun;
-     uint64_t host_features;
-+    bool migratable;
- } VHostSCSICommon;
- 
- int vhost_scsi_common_start(VHostSCSICommon *vsc);
-diff --git a/hw/scsi/vhost-scsi.c b/hw/scsi/vhost-scsi.c
-index eb0cf9e131..6b01accf61 100644
---- a/hw/scsi/vhost-scsi.c
-+++ b/hw/scsi/vhost-scsi.c
-@@ -199,13 +199,18 @@ static void vhost_scsi_realize(DeviceState *dev, Error **errp)
-         goto close_fd;
-     }
- 
--    error_setg(&vsc->migration_blocker,
--               "vhost-scsi does not support migration");
--    migrate_add_blocker(vsc->migration_blocker, &err);
--    if (err) {
--        error_propagate(errp, err);
--        error_free(vsc->migration_blocker);
--        goto close_fd;
-+    if (!vsc->migratable) {
-+        error_setg(&vsc->migration_blocker,
-+                "vhost-scsi does not support migration in all cases. "
-+                "When external environment supports it (Orchestrator migrates "
-+                "target SCSI device state or use shared storage over network), "
-+                "set 'migratable' property to true to enable migration.");
-+        migrate_add_blocker(vsc->migration_blocker, &err);
-+        if (err) {
-+            error_propagate(errp, err);
-+            error_free(vsc->migration_blocker);
-+            goto close_fd;
-+        }
-     }
- 
-     vsc->dev.nvqs = VHOST_SCSI_VQ_NUM_FIXED + vs->conf.num_queues;
-@@ -230,7 +235,9 @@ static void vhost_scsi_realize(DeviceState *dev, Error **errp)
-     return;
- 
-  free_vqs:
--    migrate_del_blocker(vsc->migration_blocker);
-+    if (!vsc->migratable) {
-+        migrate_del_blocker(vsc->migration_blocker);
-+    }
-     g_free(vsc->dev.vqs);
-  close_fd:
-     close(vhostfd);
-@@ -243,8 +250,10 @@ static void vhost_scsi_unrealize(DeviceState *dev, Error **errp)
-     VHostSCSICommon *vsc = VHOST_SCSI_COMMON(dev);
-     struct vhost_virtqueue *vqs = vsc->dev.vqs;
- 
--    migrate_del_blocker(vsc->migration_blocker);
--    error_free(vsc->migration_blocker);
-+    if (!vsc->migratable) {
-+        migrate_del_blocker(vsc->migration_blocker);
-+        error_free(vsc->migration_blocker);
-+    }
- 
-     /* This will stop vhost backend. */
-     vhost_scsi_set_status(vdev, 0);
-@@ -268,6 +277,7 @@ static Property vhost_scsi_properties[] = {
-     DEFINE_PROP_BIT64("t10_pi", VHostSCSICommon, host_features,
-                                                  VIRTIO_SCSI_F_T10_PI,
-                                                  false),
-+    DEFINE_PROP_BOOL("migratable", VHostSCSICommon, migratable, false),
-     DEFINE_PROP_END_OF_LIST(),
- };
- 
--- 
-MST
-
+On 5/23/19 8:12 AM, John Snow wrote:
+> QMP isn't json. It turns out Pygments cares about this.
+> Teach Pygments to go with the annotated flow.
+> 
+> V2:
+>  - Change GPL2 to GPLv2+ (Peter Maydell)
+>  - Change "highlights" to "lexes" in docstrings
+>  - Fix typo ("Sphinx()" => "Sphinx") in docstring
+> 
+> Reported-by: Aarushi Mehta <mehta.aaru20@gmail.com>
+> 
+> John Snow (2):
+>   sphinx: add qmp_lexer
+>   docs/bitmaps: use QMP lexer instead of json
+> 
+>  docs/conf.py             |  4 +--
+>  docs/interop/bitmaps.rst | 54 ++++++++++++++++++++--------------------
+>  docs/sphinx/qmp_lexer.py | 34 +++++++++++++++++++++++++
+>  3 files changed, 63 insertions(+), 29 deletions(-)
+>  create mode 100644 docs/sphinx/qmp_lexer.py
+> 
 
