@@ -2,58 +2,63 @@ Return-Path: <SRS0=e5mL=UC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 203C8C04AB6
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 06:58:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 30680C04AB6
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 06:59:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E031C27C6B
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 06:58:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E031C27C6B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id EC43E27C71
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 06:59:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EC43E27C71
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:58769 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:58771 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hXgve-0004us-57
-	for qemu-devel@archiver.kernel.org; Mon, 03 Jun 2019 02:58:46 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:49643)
+	id 1hXgwV-0005YH-5m
+	for qemu-devel@archiver.kernel.org; Mon, 03 Jun 2019 02:59:39 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:51211)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1hXgoj-0007ww-EK
-	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 02:51:39 -0400
+	(envelope-from <groug@kaod.org>) id 1hXguT-0004HT-84
+	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 02:57:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1hXgoh-0002Ud-Nr
-	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 02:51:37 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33800)
+	(envelope-from <groug@kaod.org>) id 1hXguR-0000qD-FV
+	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 02:57:33 -0400
+Received: from 1.mo2.mail-out.ovh.net ([46.105.63.121]:36238)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1hXgoh-0002To-Gj
-	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 02:51:35 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id DB6F9309265A
-	for <qemu-devel@nongnu.org>; Mon,  3 Jun 2019 06:51:34 +0000 (UTC)
-Received: from xz-x1.nay.redhat.com (dhcp-15-205.nay.redhat.com [10.66.15.205])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id CF0E3648B0;
-	Mon,  3 Jun 2019 06:51:32 +0000 (UTC)
-From: Peter Xu <peterx@redhat.com>
-To: qemu-devel@nongnu.org
-Date: Mon,  3 Jun 2019 14:50:55 +0800
-Message-Id: <20190603065056.25211-11-peterx@redhat.com>
-In-Reply-To: <20190603065056.25211-1-peterx@redhat.com>
-References: <20190603065056.25211-1-peterx@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.43]);
-	Mon, 03 Jun 2019 06:51:34 +0000 (UTC)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1hXguR-0000e9-8R
+	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 02:57:31 -0400
+Received: from player772.ha.ovh.net (unknown [10.109.159.159])
+	by mo2.mail-out.ovh.net (Postfix) with ESMTP id 8E14019B7DA
+	for <qemu-devel@nongnu.org>; Mon,  3 Jun 2019 08:57:20 +0200 (CEST)
+Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
+	[82.253.208.248]) (Authenticated sender: groug@kaod.org)
+	by player772.ha.ovh.net (Postfix) with ESMTPSA id 6F5AB661336B;
+	Mon,  3 Jun 2019 06:57:16 +0000 (UTC)
+Date: Mon, 3 Jun 2019 08:57:15 +0200
+From: Greg Kurz <groug@kaod.org>
+To: Christian Schoenebeck <qemu_oss@crudebyte.com>
+Message-ID: <20190603085715.6e737b0e@bahia.lab.toulouse-stg.fr.ibm.com>
+In-Reply-To: <3878644.JKHuFhRL4E@silver>
+References: <590216e2666653bac21d950aaba98f87d0a53324.1557093245.git.qemu_oss@crudebyte.com>
+	<4886143.bCxdSxxvz5@silver> <20190520160509.3a435d8b@bahia.lan>
+	<3878644.JKHuFhRL4E@silver>
+X-Mailer: Claws Mail 3.16.0 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Ovh-Tracer-Id: 14181835227963627840
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduuddrudefiedguddugecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v4 10/11] kvm: Support KVM_CLEAR_DIRTY_LOG
+X-Received-From: 46.105.63.121
+Subject: Re: [Qemu-devel] [libvirt patch] qemu: adds support for virtfs 9p
+ argument 'vii'
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -65,260 +70,166 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
-	"Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-	peterx@redhat.com, Juan Quintela <quintela@redhat.com>
+Cc: "Daniel P. =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>,
+	qemu-devel@nongnu.org, Antonios Motakis <antonios.motakis@huawei.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Firstly detect the interface using KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2
-and mark it.  When failed to enable the new feature we'll fall back to
-the old sync.
+On Wed, 22 May 2019 18:03:13 +0200
+Christian Schoenebeck <qemu_oss@crudebyte.com> wrote:
 
-Provide the log_clear() hook for the memory listeners for both address
-spaces of KVM (normal system memory, and SMM) and deliever the clear
-message to kernel.
+> On Montag, 20. Mai 2019 16:05:09 CEST Greg Kurz wrote:
+> > Hi Christian,  
+> 
+> Hi Greg,
+> 
+> > On the other hand, I'm afraid that having a functional solution won't
+> > motivate people to come up with a new spec... Anyway, I agree that the
+> > data corruption/loss issues must be prevented, ie, the 9p server should
+> > at least return an error to the client rather than returning a colliding
+> > QID.   
+> 
+> Ok, I will extend Antonios' patch to log that error on host. I thought about 
+> limiting that error message to once per session (for not flooding the logs), 
+> but it is probably not worth it, so if you don't veto then I will just log 
+> that error simply on every file access.
+> 
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Signed-off-by: Peter Xu <peterx@redhat.com>
----
- accel/kvm/kvm-all.c    | 182 +++++++++++++++++++++++++++++++++++++++++
- accel/kvm/trace-events |   1 +
- 2 files changed, 183 insertions(+)
+Please use error_report_once().
 
-diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-index e3006006ea..5511550d21 100644
---- a/accel/kvm/kvm-all.c
-+++ b/accel/kvm/kvm-all.c
-@@ -91,6 +91,7 @@ struct KVMState
-     int many_ioeventfds;
-     int intx_set_mask;
-     bool sync_mmu;
-+    bool manual_dirty_log_protect;
-     /* The man page (and posix) say ioctl numbers are signed int, but
-      * they're not.  Linux, glibc and *BSD all treat ioctl numbers as
-      * unsigned, and treating them as signed here can break things */
-@@ -555,6 +556,159 @@ out:
-     return ret;
- }
- 
-+/* Alignment requirement for KVM_CLEAR_DIRTY_LOG - 64 pages */
-+#define KVM_CLEAR_LOG_SHIFT  6
-+#define KVM_CLEAR_LOG_ALIGN  (qemu_real_host_page_size << KVM_CLEAR_LOG_SHIFT)
-+#define KVM_CLEAR_LOG_MASK   (-KVM_CLEAR_LOG_ALIGN)
-+
-+/**
-+ * kvm_physical_log_clear - Clear the kernel's dirty bitmap for range
-+ *
-+ * NOTE: this will be a no-op if we haven't enabled manual dirty log
-+ * protection in the host kernel because in that case this operation
-+ * will be done within log_sync().
-+ *
-+ * @kml:     the kvm memory listener
-+ * @section: the memory range to clear dirty bitmap
-+ */
-+static int kvm_physical_log_clear(KVMMemoryListener *kml,
-+                                  MemoryRegionSection *section)
-+{
-+    KVMState *s = kvm_state;
-+    struct kvm_clear_dirty_log d;
-+    uint64_t start, end, bmap_start, start_delta, bmap_npages, size;
-+    unsigned long *bmap_clear = NULL, psize = qemu_real_host_page_size;
-+    KVMSlot *mem = NULL;
-+    int ret, i;
-+
-+    if (!s->manual_dirty_log_protect) {
-+        /* No need to do explicit clear */
-+        return 0;
-+    }
-+
-+    start = section->offset_within_address_space;
-+    size = int128_get64(section->size);
-+
-+    if (!size) {
-+        /* Nothing more we can do... */
-+        return 0;
-+    }
-+
-+    kvm_slots_lock(kml);
-+
-+    /* Find any possible slot that covers the section */
-+    for (i = 0; i < s->nr_slots; i++) {
-+        mem = &kml->slots[i];
-+        if (mem->start_addr <= start &&
-+            start + size <= mem->start_addr + mem->memory_size) {
-+            break;
-+        }
-+    }
-+
-+    /*
-+     * We should always find one memslot until this point, otherwise
-+     * there could be something wrong from the upper layer
-+     */
-+    assert(mem && i != s->nr_slots);
-+
-+    /*
-+     * We need to extend either the start or the size or both to
-+     * satisfy the KVM interface requirement.  Firstly, do the start
-+     * page alignment on 64 host pages
-+     */
-+    bmap_start = (start - mem->start_addr) & KVM_CLEAR_LOG_MASK;
-+    start_delta = start - mem->start_addr - bmap_start;
-+    bmap_start /= psize;
-+
-+    /*
-+     * The kernel interface has restriction on the size too, that either:
-+     *
-+     * (1) the size is 64 host pages aligned (just like the start), or
-+     * (2) the size fills up until the end of the KVM memslot.
-+     */
-+    bmap_npages = DIV_ROUND_UP(size + start_delta, KVM_CLEAR_LOG_ALIGN)
-+        << KVM_CLEAR_LOG_SHIFT;
-+    end = mem->memory_size / psize;
-+    if (bmap_npages > end - bmap_start) {
-+        bmap_npages = end - bmap_start;
-+    }
-+    start_delta /= psize;
-+
-+    /*
-+     * Prepare the bitmap to clear dirty bits.  Here we must guarantee
-+     * that we won't clear any unknown dirty bits otherwise we might
-+     * accidentally clear some set bits which are not yet synced from
-+     * the kernel into QEMU's bitmap, then we'll lose track of the
-+     * guest modifications upon those pages (which can directly lead
-+     * to guest data loss or panic after migration).
-+     *
-+     * Layout of the KVMSlot.dirty_bmap:
-+     *
-+     *                   |<-------- bmap_npages -----------..>|
-+     *                                                     [1]
-+     *                     start_delta         size
-+     *  |----------------|-------------|------------------|------------|
-+     *  ^                ^             ^                               ^
-+     *  |                |             |                               |
-+     * start          bmap_start     (start)                         end
-+     * of memslot                                             of memslot
-+     *
-+     * [1] bmap_npages can be aligned to either 64 pages or the end of slot
-+     */
-+
-+    assert(bmap_start % BITS_PER_LONG == 0);
-+    /* We should never do log_clear before log_sync */
-+    assert(mem->dirty_bmap);
-+    if (start_delta) {
-+        /* Slow path - we need to manipulate a temp bitmap */
-+        bmap_clear = bitmap_new(bmap_npages);
-+        bitmap_copy_with_src_offset(bmap_clear, mem->dirty_bmap,
-+                                    bmap_start, start_delta + size / psize);
-+        /*
-+         * We need to fill the holes at start because that was not
-+         * specified by the caller and we extended the bitmap only for
-+         * 64 pages alignment
-+         */
-+        bitmap_clear(bmap_clear, 0, start_delta);
-+        d.dirty_bitmap = bmap_clear;
-+    } else {
-+        /* Fast path - start address aligns well with BITS_PER_LONG */
-+        d.dirty_bitmap = mem->dirty_bmap + BIT_WORD(bmap_start);
-+    }
-+
-+    d.first_page = bmap_start;
-+    /* It should never overflow.  If it happens, say something */
-+    assert(bmap_npages <= UINT32_MAX);
-+    d.num_pages = bmap_npages;
-+    d.slot = mem->slot | (kml->as_id << 16);
-+
-+    if (kvm_vm_ioctl(s, KVM_CLEAR_DIRTY_LOG, &d) == -1) {
-+        ret = -errno;
-+        error_report("%s: KVM_CLEAR_DIRTY_LOG failed, slot=%d, "
-+                     "start=0x%"PRIx64", size=0x%"PRIx32", errno=%d",
-+                     __func__, d.slot, (uint64_t)d.first_page,
-+                     (uint32_t)d.num_pages, ret);
-+    } else {
-+        ret = 0;
-+        trace_kvm_clear_dirty_log(d.slot, d.first_page, d.num_pages);
-+    }
-+
-+    /*
-+     * After we have updated the remote dirty bitmap, we update the
-+     * cached bitmap as well for the memslot, then if another user
-+     * clears the same region we know we shouldn't clear it again on
-+     * the remote otherwise it's data loss as well.
-+     */
-+    bitmap_clear(mem->dirty_bmap, bmap_start + start_delta,
-+                 size / psize);
-+    /* This handles the NULL case well */
-+    g_free(bmap_clear);
-+
-+    kvm_slots_unlock(kml);
-+
-+    return ret;
-+}
-+
- static void kvm_coalesce_mmio_region(MemoryListener *listener,
-                                      MemoryRegionSection *secion,
-                                      hwaddr start, hwaddr size)
-@@ -889,6 +1043,22 @@ static void kvm_log_sync(MemoryListener *listener,
-     }
- }
- 
-+static void kvm_log_clear(MemoryListener *listener,
-+                          MemoryRegionSection *section)
-+{
-+    KVMMemoryListener *kml = container_of(listener, KVMMemoryListener, listener);
-+    int r;
-+
-+    r = kvm_physical_log_clear(kml, section);
-+    if (r < 0) {
-+        error_report_once("%s: kvm log clear failed: mr=%s "
-+                          "offset=%"HWADDR_PRIx" size=%"PRIx64, __func__,
-+                          section->mr->name, section->offset_within_region,
-+                          int128_get64(section->size));
-+        abort();
-+    }
-+}
-+
- static void kvm_mem_ioeventfd_add(MemoryListener *listener,
-                                   MemoryRegionSection *section,
-                                   bool match_data, uint64_t data,
-@@ -976,6 +1146,7 @@ void kvm_memory_listener_register(KVMState *s, KVMMemoryListener *kml,
-     kml->listener.log_start = kvm_log_start;
-     kml->listener.log_stop = kvm_log_stop;
-     kml->listener.log_sync = kvm_log_sync;
-+    kml->listener.log_clear = kvm_log_clear;
-     kml->listener.priority = 10;
- 
-     memory_listener_register(&kml->listener, as);
-@@ -1700,6 +1871,17 @@ static int kvm_init(MachineState *ms)
-     s->coalesced_pio = s->coalesced_mmio &&
-                        kvm_check_extension(s, KVM_CAP_COALESCED_PIO);
- 
-+    s->manual_dirty_log_protect =
-+        kvm_check_extension(s, KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2);
-+    if (s->manual_dirty_log_protect) {
-+        ret = kvm_vm_enable_cap(s, KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2, 0, 1);
-+        if (ret) {
-+            warn_report("Trying to enable KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2 "
-+                        "but failed.  Falling back to the legacy mode. ");
-+            s->manual_dirty_log_protect = false;
-+        }
-+    }
-+
- #ifdef KVM_CAP_VCPU_EVENTS
-     s->vcpu_events = kvm_check_extension(s, KVM_CAP_VCPU_EVENTS);
- #endif
-diff --git a/accel/kvm/trace-events b/accel/kvm/trace-events
-index 33c5b1b3af..4fb6e59d19 100644
---- a/accel/kvm/trace-events
-+++ b/accel/kvm/trace-events
-@@ -15,4 +15,5 @@ kvm_irqchip_release_virq(int virq) "virq %d"
- kvm_set_ioeventfd_mmio(int fd, uint64_t addr, uint32_t val, bool assign, uint32_t size, bool datamatch) "fd: %d @0x%" PRIx64 " val=0x%x assign: %d size: %d match: %d"
- kvm_set_ioeventfd_pio(int fd, uint16_t addr, uint32_t val, bool assign, uint32_t size, bool datamatch) "fd: %d @0x%x val=0x%x assign: %d size: %d match: %d"
- kvm_set_user_memory(uint32_t slot, uint32_t flags, uint64_t guest_phys_addr, uint64_t memory_size, uint64_t userspace_addr, int ret) "Slot#%d flags=0x%x gpa=0x%"PRIx64 " size=0x%"PRIx64 " ua=0x%"PRIx64 " ret=%d"
-+kvm_clear_dirty_log(uint32_t slot, uint64_t start, uint32_t size) "slot#%"PRId32" start 0x%"PRIx64" size 0x%"PRIx32
- 
--- 
-2.17.1
+> > A simple way to avoid that is to enforce a single device, ie. patch
+> > 2 in Antonios's series. Of course this may break some setups where
+> > multiple devices are involved, but it is pure luck if they aren't already
+> > broken with the current code base.   
+> 
+> Yes, the worst thing you can have is this collision silently being ignored, 
+> like it is actually right now. Because you end up getting all sorts of 
+> different misbehaviours on guests, and these are just symptoms that take a 
+> while to debug and realise that the actual root cause is an inode collision. 
+> So enforcing a single device is still better than undefined behaviour.
+> 
+> > > Background: The concept of FS "data sets" combines the benefits of
+> > > classical partitions (e.g. logical file space separation, independent fs
+> > > configurations like compression on/off/algorithm, data deduplication
+> > > on/off, snapshot isolation, snapshots on/off) without the disadvantages
+> > > of classical real partitions (physical space is dynamically shared, no
+> > > space wasted on fixed boundaries; physical device pool management is
+> > > transparent for all data sets, configuration options can be inherited
+> > > from parent data sets).  
+> > 
+> > Ok. I must admit my ignorance around ZFS and "data sets"... so IIUC, even
+> > with a single underlying physical device you might end up with lstat()
+> > returning different st_dev values on the associated files, correct ?
+> > 
+> > I take your word for the likeliness of the issue to popup in such setups. :)  
+> 
+> Yes, that is correct, you _always_ get a different stat::st_dev value for each 
+> ZFS data set. Furthermore, each ZFS data set has its own inode number sequence 
+> generator starting from one. So consider you create two new ZFS data sets, 
+> then you create one file on each data set, then both files will have inode 
+> number 1.
+> 
+> That probably makes it clear why you hit this ID collision bug very easily 
+> when using the combination ZFS & 9p.
+> 
+> > > also a big difference giving the user the _optional_ possibility to define
+> > > e.g. one path (not device) on guest said to be sensitive regarding high
+> > > inode numbers on guest; and something completely different telling the
+> > > user that he _must_ configure every single device from host that is ever
+> > > supposed to pop up with 9p on guest and forcing the user to update that
+> > > configuration whenever a new device is added or removed on host. The
+> > > "vii" configuration feature does not require any knowledge of how many
+> > > and which kinds of devices are actually ever used on host (nor on any
+> > > higher level host in case of nested
+> > > virtualization), nor does that "vii" config require any changes ever when
+> > > host device setup changes. So 9p's core transparency feature would not be
+> > > touched at all.  
+> > 
+> > I guess this all boils down to I finding some time to read/understand more
+> > :)  
+> 
+> Yes, that helps sometimes. :)
+> 
+> > As usual, a series with smaller and simpler patches will be easier to
+> > review, and more likely to be merged.  
+> 
+> Of course.
+> 
+> In the next patch series I will completely drop a) the entire QID persistency 
+> feature code and b) that disputed "vii" feature. But I will still suggest the 
+> variable inode suffix length patch as last patch in that new patch series.
+> 
+> That should make the amount of changes manageable small.
+> 
+> > > Let me make a different suggestion: how about putting these fixes into a
+> > > separate C unit for now and making the default behaviour (if you really
+> > > want) to not use any of that code by default at all. So the user would
+> > > just get an error message in the qemu log files by default if he tries to
+> > > export several devices with one 9p device, suggesting him either to map
+> > > them as separate 9p devices (like you suggested) and informing the user
+> > > about the alternative of enabling support for the automatic inode
+> > > remapping code (from that separate C unit) instead by adding one
+> > > convenient config option if he/she really wants.  
+> > It seems that we may be reaching some consensus here :)
+> > 
+> > I like the approach, provided this is configurable from the command line,
+> > off by default and doesn't duplicate core 9p code. Not sure this needs to
+> > sit in its own C unit though.  
+> 
+> Any preference for a command line argument name and/or libvirt XML config tag/
+> attribute for switching the inode remapping code on?
+> 
+> About that separate C unit: I leave that up to you to decide, it does not 
+> matter to me. I just suggested it since you consider these patches as 
+> temporary workaround until there are appropriate protocol changes. So clear 
+> code separation for them might help to get rid of the entire code later on. 
+> Plus for distribution maintainers it might be easiert to cherry pick them as 
+> backports.
+> 
+> However since I will drop the persistency and "vii" feature in the next patch 
+> series, it probably does not make a huge difference anyway. As you prefer.
+> 
+> > The 9p code has a long history of CVEs and limitations that prevented it
+> > to reach full production grade quality. Combined with the poor quality of
+> > the code, this has scared off many experienced QEMU developpers, which
+> > prefer to work on finding an alternative solution.   
+> 
+> And I already wondered about the obvious low activity on this particular qemu 
+> feature. I mean I don't find it contemporary still running guests to use their 
+> own file system being emulated on a file ontop of yet another file system and 
+> loosing essentially all benefits of the host's actual backend file system 
+> features.
+> 
+> > Such alternative is virtio-fs, which is being actively worked on:
+> > 
+> > https://lists.gnu.org/archive/html/qemu-devel/2019-04/msg02746.html
+> > 
+> > Note: I'm not telling "stay away from 9p" but maybe worth taking a look,
+> >       because if virtio-fs gets merged, it is likely to become the official
+> >       and better supported way to share files between host and guest.  
+> 
+> Ah, good to know! That's new to me, thanks!
+> 
+> Makes sense to me, especially its performance will certainly be much better.
+> 
+> > Please repost a series, possibly based on some of Antonios's patches that
+> > allows to avoid the QID collision, returns an error to the client instead
+> > and possibly printing out some useful messages in the QEMU log. Then, on
+> > top of that, you can start introducing hashing and variable prefix length.  
+> 
+> So you want that as its own patch series first, or can I continue with my 
+> suggestion to deliver the hash patch and variable suffix length patch as last 
+> patches within the same series?
+> 
 
+Same series is okay.
+
+> Best regards,
+> Christian Schoenebeck
+
+Cheers,
+
+--
+Greg
 
