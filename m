@@ -2,59 +2,61 @@ Return-Path: <SRS0=e5mL=UC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 21103C04AB5
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 20:35:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 93E00C04AB5
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 20:35:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EA1D025687
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 20:35:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EA1D025687
+	by mail.kernel.org (Postfix) with ESMTPS id 6FD7825687
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 20:35:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6FD7825687
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:40627 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:40631 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hXtgG-0001iO-U4
-	for qemu-devel@archiver.kernel.org; Mon, 03 Jun 2019 16:35:44 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:58704)
+	id 1hXtgJ-0001lL-LI
+	for qemu-devel@archiver.kernel.org; Mon, 03 Jun 2019 16:35:47 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:58402)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hXteg-0000hP-99
-	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 16:34:07 -0400
+	(envelope-from <mreitz@redhat.com>) id 1hXteh-0000MH-A7
+	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 16:34:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hXtTw-0004yW-NH
-	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 16:23:01 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52628)
+	(envelope-from <mreitz@redhat.com>) id 1hXtTj-0004VI-Ll
+	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 16:22:48 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34696)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mreitz@redhat.com>)
-	id 1hXtTv-0004v6-IZ; Mon, 03 Jun 2019 16:22:59 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
-	[10.5.11.22])
+	id 1hXtTi-0004QF-8u; Mon, 03 Jun 2019 16:22:46 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id BA5A430860AE;
-	Mon,  3 Jun 2019 20:22:40 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 2037880F6D;
+	Mon,  3 Jun 2019 20:22:43 +0000 (UTC)
 Received: from localhost (unknown [10.40.205.221])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 3C598101E660;
-	Mon,  3 Jun 2019 20:22:37 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id AB736601B6;
+	Mon,  3 Jun 2019 20:22:42 +0000 (UTC)
 From: Max Reitz <mreitz@redhat.com>
 To: qemu-block@nongnu.org
-Date: Mon,  3 Jun 2019 22:22:34 +0200
-Message-Id: <20190603202236.1342-1-mreitz@redhat.com>
+Date: Mon,  3 Jun 2019 22:22:35 +0200
+Message-Id: <20190603202236.1342-2-mreitz@redhat.com>
+In-Reply-To: <20190603202236.1342-1-mreitz@redhat.com>
+References: <20190603202236.1342-1-mreitz@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.44]);
-	Mon, 03 Jun 2019 20:22:53 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.27]);
+	Mon, 03 Jun 2019 20:22:43 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v2 0/2] blockdev: Overlays are not snapshots
+Subject: [Qemu-devel] [PATCH v2 1/2] qapi/block-core: Overlays are not
+ snapshots
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -72,55 +74,81 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-QEMU=E2=80=99s always been confused over what a snapshot is: Is it the ov=
-erlay?
-Is it the backing image?
+A snapshot is something that reflects the state of something at a
+certain point in time.  It does not change.
 
-Confusion is rarely a good thing.  I can=E2=80=99t think of any objective=
- reason
-why the overlay would be a snapshot.  A snapshot is something that does
-not change over time; the overlay does.
+The file our snapshot commands create (or the node they install) is not
+a snapshot, as it does change over time.  It is an overlay.  We cannot
+do anything about the parameter names, but we can at least adjust the
+descriptions to reflect that fact.
 
-(I suppose historically the reason is that =E2=80=9CTaking an overlay=E2=80=
-=9D makes no
-sense, so the operations are called =E2=80=9CTaking a snapshot=E2=80=9D. =
- Somehow, this
-meaning carried over to the new file that is created during that
-operation; if =E2=80=9CCreating a snapshot=E2=80=9D creates a file, that =
-file must be
-the snapshot, right?  Well, no, it isn=E2=80=99t.)
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+---
+ qapi/block-core.json | 20 ++++++++++----------
+ 1 file changed, 10 insertions(+), 10 deletions(-)
 
-Let=E2=80=99s fix this as best as we can.  Better Nate than lever.
-
-
-v2:
-- Don=E2=80=99t break the iotests for a change
-  (kept Eric=E2=80=99s R-b, because it felt like the right thing to do)
-
-
-git backport-diff against v1:
-
-Key:
-[----] : patches are identical
-[####] : number of functional differences between upstream/downstream pat=
-ch
-[down] : patch is downstream-only
-The flags [FC] indicate (F)unctional and (C)ontextual differences, respec=
-tively
-
-001/2:[----] [--] 'qapi/block-core: Overlays are not snapshots'
-002/2:[0010] [FC] 'blockdev: Overlays are not snapshots'
-
-
-Max Reitz (2):
-  qapi/block-core: Overlays are not snapshots
-  blockdev: Overlays are not snapshots
-
- qapi/block-core.json       | 20 ++++++++++----------
- blockdev.c                 | 10 +++++-----
- tests/qemu-iotests/085.out | 10 +++++-----
- 3 files changed, 20 insertions(+), 20 deletions(-)
-
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index 1defcde048..df52a90736 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -1279,17 +1279,17 @@
+ #
+ # Either @device or @node-name must be set but not both.
+ #
+-# @device: the name of the device to generate the snapshot from.
++# @device: the name of the device to take a snapshot of.
+ #
+ # @node-name: graph node name to generate the snapshot from (Since 2.0)
+ #
+-# @snapshot-file: the target of the new image. If the file exists, or
+-# if it is a device, the snapshot will be created in the existing
+-# file/device. Otherwise, a new file will be created.
++# @snapshot-file: the target of the new overlay image. If the file
++# exists, or if it is a device, the overlay will be created in the
++# existing file/device. Otherwise, a new file will be created.
+ #
+ # @snapshot-node-name: the graph node name of the new image (Since 2.0)
+ #
+-# @format: the format of the snapshot image, default is 'qcow2'.
++# @format: the format of the overlay image, default is 'qcow2'.
+ #
+ # @mode: whether and how QEMU should create a new image, default is
+ #        'absolute-paths'.
+@@ -1302,10 +1302,10 @@
+ ##
+ # @BlockdevSnapshot:
+ #
+-# @node: device or node name that will have a snapshot created.
++# @node: device or node name that will have a snapshot taken.
+ #
+ # @overlay: reference to the existing block device that will become
+-#           the overlay of @node, as part of creating the snapshot.
++#           the overlay of @node, as part of taking the snapshot.
+ #           It must not have a current backing file (this can be
+ #           achieved by passing "backing": null to blockdev-add).
+ #
+@@ -1443,7 +1443,7 @@
+ ##
+ # @blockdev-snapshot-sync:
+ #
+-# Generates a synchronous snapshot of a block device.
++# Takes a synchronous snapshot of a block device.
+ #
+ # For the arguments, see the documentation of BlockdevSnapshotSync.
+ #
+@@ -1469,9 +1469,9 @@
+ ##
+ # @blockdev-snapshot:
+ #
+-# Generates a snapshot of a block device.
++# Takes a snapshot of a block device.
+ #
+-# Create a snapshot, by installing 'node' as the backing image of
++# Take a snapshot, by installing 'node' as the backing image of
+ # 'overlay'. Additionally, if 'node' is associated with a block
+ # device, the block device changes to using 'overlay' as its new active
+ # image.
 --=20
 2.21.0
 
