@@ -6,58 +6,73 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 359F0C04AB5
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 21:52:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 94114C04AB5
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 21:53:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F1B4C26B27
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 21:52:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F1B4C26B27
+	by mail.kernel.org (Postfix) with ESMTPS id 674A22575B
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 21:53:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 674A22575B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:41355 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:41367 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hXusM-0002zt-Ai
-	for qemu-devel@archiver.kernel.org; Mon, 03 Jun 2019 17:52:18 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:39736)
+	id 1hXutX-0003fh-Ok
+	for qemu-devel@archiver.kernel.org; Mon, 03 Jun 2019 17:53:31 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:42673)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1hXuni-0008F4-Pe
-	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 17:47:37 -0400
+	(envelope-from <mst@redhat.com>) id 1hXurY-0002eY-Vz
+	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 17:51:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1hXunb-0003Cs-G3
-	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 17:47:30 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52224)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jsnow@redhat.com>)
-	id 1hXunR-0002XA-8w; Mon, 03 Jun 2019 17:47:13 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 3161530C31A1;
-	Mon,  3 Jun 2019 21:47:06 +0000 (UTC)
-Received: from probe.bos.redhat.com (dhcp-17-164.bos.redhat.com [10.18.17.164])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 67FFD17278;
-	Mon,  3 Jun 2019 21:47:04 +0000 (UTC)
-From: John Snow <jsnow@redhat.com>
-To: qemu-devel@nongnu.org,
-	qemu-block@nongnu.org
-Date: Mon,  3 Jun 2019 17:46:53 -0400
-Message-Id: <20190603214653.29369-4-jsnow@redhat.com>
-In-Reply-To: <20190603214653.29369-1-jsnow@redhat.com>
-References: <20190603214653.29369-1-jsnow@redhat.com>
+	(envelope-from <mst@redhat.com>) id 1hXurW-0005eT-Ny
+	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 17:51:28 -0400
+Received: from mail-qk1-f193.google.com ([209.85.222.193]:44490)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1hXurW-0005X4-1w
+	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 17:51:26 -0400
+Received: by mail-qk1-f193.google.com with SMTP id w187so1491545qkb.11
+	for <qemu-devel@nongnu.org>; Mon, 03 Jun 2019 14:51:25 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+	:mime-version:content-disposition:in-reply-to;
+	bh=GcStr2ubdmunwNaw8lt1FGYv59Vq0tvzoAvu9tqV0w4=;
+	b=ioE4v/OItDurX3FPplitcHTSW1pDehORc4R5ZX5f3Ek+8PF88GbWMy0nOdy/K7ZXwu
+	6v/So4J5wuljSYG8Zjd1X5mqDlYqgvs5H7rbrVCU6qD2/FY1OjYHmWWzb8W1H/fFSwIc
+	sGGb6A5SG+KM1TulhwHfsUwt8xtd+mtCwwEcXlZ+p88KQ9aXrCc4sGXdFkYba5z7TxEb
+	Z0VGCxUscxLWYq0gFSUqguQxWW9+yESwrWmURi0mTPRxw4w84MjiKd5mtDQoLOjNxWS9
+	VlIsi0aEsmTsWcwVgkrCQs87xGIaZjawUl/hpRQfGiMw1L+aHw1g6vyH9c2qN8oJ83Jc
+	fRJA==
+X-Gm-Message-State: APjAAAWIJwl6fj0IBvzW/okldsUBvJdlkgxz95Xdyu0F453sw6ZwleEF
+	ng4U1J3uNNpnD8y7coEa9R21nw==
+X-Google-Smtp-Source: APXvYqzkQ3aGGyX1dGLdeQx9z13STDLRSzZ9mvNd+9UKLQD46iCsaTYDlWNNZpd/ejBLovqZV446CA==
+X-Received: by 2002:ae9:f10b:: with SMTP id k11mr23259659qkg.238.1559598684763;
+	Mon, 03 Jun 2019 14:51:24 -0700 (PDT)
+Received: from redhat.com (pool-100-0-197-103.bstnma.fios.verizon.net.
+	[100.0.197.103]) by smtp.gmail.com with ESMTPSA id
+	f33sm11071536qtf.64.2019.06.03.14.51.23
+	(version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+	Mon, 03 Jun 2019 14:51:23 -0700 (PDT)
+Date: Mon, 3 Jun 2019 17:51:21 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Greg Kurz <groug@kaod.org>
+Message-ID: <20190603175057-mutt-send-email-mst@kernel.org>
+References: <20190529070955.25565-1-xieyongji@baidu.com>
+	<20190529070955.25565-3-xieyongji@baidu.com>
+	<20190603221639.5e4ddac1@bahia.lab.toulouse-stg.fr.ibm.com>
+	<20190603170137-mutt-send-email-mst@kernel.org>
+	<20190603232523.2fa5ccac@bahia.lab.toulouse-stg.fr.ibm.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.40]);
-	Mon, 03 Jun 2019 21:47:07 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190603232523.2fa5ccac@bahia.lab.toulouse-stg.fr.ibm.com>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v3 3/3] docs/bitmaps: use QMP lexer instead of
- json
+	[fuzzy]
+X-Received-From: 209.85.222.193
+Subject: Re: [Qemu-devel] [PATCH 2/5] virtio: Migrate the "start_on_kick"
+ flag
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -69,301 +84,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
-	John Snow <jsnow@redhat.com>, Aarushi Mehta <mehta.aaru20@gmail.com>,
-	Eduardo Habkost <ehabkost@redhat.com>
+Cc: elohimes@gmail.com, Xie Yongji <xieyongji@baidu.com>, dgilbert@redhat.com,
+	qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The annotated style json we use in QMP documentation is not strict json
-and depending on the version of Sphinx (2.0+) or Pygments installed,
-might cause the build to fail.
+On Mon, Jun 03, 2019 at 11:25:23PM +0200, Greg Kurz wrote:
+> On Mon, 3 Jun 2019 17:03:06 -0400
+> "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> 
+> > On Mon, Jun 03, 2019 at 10:16:39PM +0200, Greg Kurz wrote:
+> > > On Wed, 29 May 2019 15:09:52 +0800
+> > > elohimes@gmail.com wrote:
+> > >   
+> > > > From: Xie Yongji <xieyongji@baidu.com>
+> > > > 
+> > > > We should migrate the "start_on_kick" flag so that we
+> > > > would not miss starting device on kicking at startup
+> > > > after migration.
+> > > >   
+> > > 
+> > > Hmm... IIUC "start_on_kick" means "virtio 1.0 transitional device that has
+> > > not been started yet", ie:
+> > > 
+> > > !vdev->started &&
+> > > (virtio_host_has_feature(vdev, VIRTIO_F_VERSION_1) &&
+> > >  !virtio_vdev_has_feature(vdev, VIRTIO_F_VERSION_1))  
+> > 
+> > Or a legacy device I guess?
+> > 
+> 
+> Do you mean "start_on_kick" should be set for both legacy
+> and virtio 1.0 transitional devices ?
 
-Use the new QMP lexer.
+Yes - generally when virtio 1 feature has not
+been negotiated.
 
-Further, some versions of Sphinx can not apply custom lexers to "code"
-directives and require the use of "code-block" directives instead, so
-make that change at this time as well.
-
-Tested under:
-- Sphinx 1.3.6 and Pygments 2.4
-- Sphinx 1.7.6 and Pygments 2.2 (Fedora 29 packages)
-- Sphinx 2.0.1 and Pygments 2.4
-- Sphinx 3.0.0+/f396b3a783 and Pygments 2.4 (From Sphinx git c4f44bdd)
-
-Reported-by: Aarushi Mehta <mehta.aaru20@gmail.com>
-Signed-off-by: John Snow <jsnow@redhat.com>
-Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
----
- docs/interop/bitmaps.rst | 54 ++++++++++++++++++++--------------------
- 1 file changed, 27 insertions(+), 27 deletions(-)
-
-diff --git a/docs/interop/bitmaps.rst b/docs/interop/bitmaps.rst
-index c29ac4a854..c20bd37a79 100644
---- a/docs/interop/bitmaps.rst
-+++ b/docs/interop/bitmaps.rst
-@@ -199,7 +199,7 @@ persistence, and recording state can be adjusted at c=
-reation time.
-=20
-  to create a new, actively recording persistent bitmap:
-=20
-- .. code:: json
-+ .. code-block:: QMP
-=20
-   -> { "execute": "block-dirty-bitmap-add",
-        "arguments": {
-@@ -220,7 +220,7 @@ persistence, and recording state can be adjusted at c=
-reation time.
-  To create a new, disabled (``-recording``), transient bitmap that track=
-s
-  changes in 32KiB segments:
-=20
-- .. code:: json
-+ .. code-block:: QMP
-=20
-   -> { "execute": "block-dirty-bitmap-add",
-        "arguments": {
-@@ -254,7 +254,7 @@ Deletes a bitmap. Bitmaps that are ``+busy`` cannot b=
-e removed.
-=20
-  Remove a bitmap named ``bitmap0`` from node ``drive0``:
-=20
-- .. code:: json
-+ .. code-block:: QMP
-=20
-   -> { "execute": "block-dirty-bitmap-remove",
-        "arguments": {
-@@ -280,7 +280,7 @@ Clears all dirty bits from a bitmap. ``+busy`` bitmap=
-s cannot be cleared.
-=20
-  Clear all dirty bits from bitmap ``bitmap0`` on node ``drive0``:
-=20
-- .. code:: json
-+ .. code-block:: QMP
-=20
-   -> { "execute": "block-dirty-bitmap-clear",
-        "arguments": {
-@@ -309,7 +309,7 @@ begin being recorded. ``+busy`` bitmaps cannot be ena=
-bled.
-=20
-  To set ``+recording`` on bitmap ``bitmap0`` on node ``drive0``:
-=20
-- .. code:: json
-+ .. code-block:: QMP
-=20
-   -> { "execute": "block-dirty-bitmap-enable",
-        "arguments": {
-@@ -347,7 +347,7 @@ writes to begin being ignored. ``+busy`` bitmaps cann=
-ot be disabled.
-=20
-  To set ``-recording`` on bitmap ``bitmap0`` on node ``drive0``:
-=20
-- .. code:: json
-+ .. code-block:: QMP
-=20
-   -> { "execute": "block-dirty-bitmap-disable",
-        "arguments": {
-@@ -393,7 +393,7 @@ in any one source bitmap, the target bitmap will mark=
- that segment dirty.
-  ``drive0``. If ``new_bitmap`` was empty prior to this command, this ach=
-ieves
-  a copy.
-=20
-- .. code:: json
-+ .. code-block:: QMP
-=20
-   -> { "execute": "block-dirty-bitmap-merge",
-        "arguments": {
-@@ -424,7 +424,7 @@ attached to nodes serving as the root for guest devic=
-es.
-  API. This result highlights a bitmap ``bitmap0`` attached to the root n=
-ode of
-  device ``drive0``.
-=20
-- .. code:: json
-+ .. code-block:: QMP
-=20
-   -> {
-        "execute": "query-block",
-@@ -562,7 +562,7 @@ new, empty bitmap that records writes from this point=
- in time forward.
-           destination. These writes will be recorded in the bitmap
-           accordingly.
-=20
--.. code:: json
-+.. code-block:: QMP
-=20
-   -> {
-        "execute": "transaction",
-@@ -650,7 +650,7 @@ Example: Resetting an Incremental Backup Anchor Point
- If we want to start a new backup chain with an existing bitmap, we can a=
-lso
- use a transaction to reset the bitmap while making a new full backup:
-=20
--.. code:: json
-+.. code-block:: QMP
-=20
-   -> {
-        "execute": "transaction",
-@@ -730,7 +730,7 @@ Example: First Incremental Backup
-=20
- #. Issue an incremental backup command:
-=20
--   .. code:: json
-+   .. code-block:: QMP
-=20
-     -> {
-          "execute": "drive-backup",
-@@ -788,7 +788,7 @@ Example: Second Incremental Backup
- #. Issue a new incremental backup command. The only difference here is t=
-hat we
-    have changed the target image below.
-=20
--   .. code:: json
-+   .. code-block:: QMP
-=20
-     -> {
-          "execute": "drive-backup",
-@@ -869,7 +869,7 @@ image:
- #. Issue a new incremental backup command. Apart from the new destinatio=
-n
-    image, there is no difference from the last two examples.
-=20
--   .. code:: json
-+   .. code-block:: QMP
-=20
-     -> {
-          "execute": "drive-backup",
-@@ -932,7 +932,7 @@ point in time.
-=20
- #. Create a full (anchor) backup for each drive, with accompanying bitma=
-ps:
-=20
--   .. code:: json
-+   .. code-block:: QMP
-=20
-     -> {
-          "execute": "transaction",
-@@ -1018,7 +1018,7 @@ point in time.
-=20
- #. Issue a multi-drive incremental push backup transaction:
-=20
--   .. code:: json
-+   .. code-block:: QMP
-=20
-     -> {
-          "execute": "transaction",
-@@ -1121,7 +1121,7 @@ described above. This example demonstrates the sing=
-le-job failure case:
-=20
- #. Attempt to create an incremental backup via QMP:
-=20
--   .. code:: json
-+   .. code-block:: QMP
-=20
-     -> {
-          "execute": "drive-backup",
-@@ -1139,7 +1139,7 @@ described above. This example demonstrates the sing=
-le-job failure case:
-=20
- #. Receive a pair of events indicating failure:
-=20
--   .. code:: json
-+   .. code-block:: QMP
-=20
-     <- {
-          "timestamp": {...},
-@@ -1175,7 +1175,7 @@ described above. This example demonstrates the sing=
-le-job failure case:
- #. Retry the command after fixing the underlying problem, such as
-    freeing up space on the backup volume:
-=20
--   .. code:: json
-+   .. code-block:: QMP
-=20
-     -> {
-          "execute": "drive-backup",
-@@ -1193,7 +1193,7 @@ described above. This example demonstrates the sing=
-le-job failure case:
-=20
- #. Receive confirmation that the job completed successfully:
-=20
--   .. code:: json
-+   .. code-block:: QMP
-=20
-     <- {
-          "timestamp": {...},
-@@ -1233,7 +1233,7 @@ and one succeeds:
-=20
- #. Issue the transaction to start a backup of both drives.
-=20
--   .. code:: json
-+   .. code-block:: QMP
-=20
-     -> {
-          "execute": "transaction",
-@@ -1267,13 +1267,13 @@ and one succeeds:
- #. Receive notice that the Transaction was accepted, and jobs were
-    launched:
-=20
--   .. code:: json
-+   .. code-block:: QMP
-=20
-     <- { "return": {} }
-=20
- #. Receive notice that the first job has completed:
-=20
--   .. code:: json
-+   .. code-block:: QMP
-=20
-     <- {
-          "timestamp": {...},
-@@ -1289,7 +1289,7 @@ and one succeeds:
-=20
- #. Receive notice that the second job has failed:
-=20
--   .. code:: json
-+   .. code-block:: QMP
-=20
-     <- {
-          "timestamp": {...},
-@@ -1365,7 +1365,7 @@ applied:
-=20
- #. Issue the multi-drive incremental backup transaction:
-=20
--   .. code:: json
-+   .. code-block:: QMP
-=20
-     -> {
-          "execute": "transaction",
-@@ -1401,13 +1401,13 @@ applied:
-=20
- #. Receive notice that the Transaction was accepted, and jobs were launc=
-hed:
-=20
--   .. code:: json
-+   .. code-block:: QMP
-=20
-     <- { "return": {} }
-=20
- #. Receive notification that the backup job for ``drive1`` has failed:
-=20
--   .. code:: json
-+   .. code-block:: QMP
-=20
-     <- {
-          "timestamp": {...},
-@@ -1434,7 +1434,7 @@ applied:
-=20
- #. Receive notification that the job for ``drive0`` has been cancelled:
-=20
--   .. code:: json
-+   .. code-block:: QMP
-=20
-     <- {
-          "timestamp": {...},
---=20
-2.20.1
-
+> > > If so, not sure why you need this extra field in the first place, but
+> > > you probably don't need to migrate it. Just recalculate in a post load
+> > > callback.
+> > >   
+> > > > Signed-off-by: Xie Yongji <xieyongji@baidu.com>
+> > > > ---
+> > > >  hw/virtio/virtio.c | 19 +++++++++++++++++++
+> > > >  1 file changed, 19 insertions(+)
+> > > > 
+> > > > diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
+> > > > index fc8fca81ad..4d4ff67791 100644
+> > > > --- a/hw/virtio/virtio.c
+> > > > +++ b/hw/virtio/virtio.c
+> > > > @@ -1802,6 +1802,13 @@ static bool virtio_started_needed(void *opaque)
+> > > >      return vdev->started;
+> > > >  }
+> > > >  
+> > > > +static bool virtio_start_on_kick_needed(void *opaque)
+> > > > +{
+> > > > +    VirtIODevice *vdev = opaque;
+> > > > +
+> > > > +    return vdev->start_on_kick;
+> > > > +}
+> > > > +
+> > > >  static const VMStateDescription vmstate_virtqueue = {
+> > > >      .name = "virtqueue_state",
+> > > >      .version_id = 1,
+> > > > @@ -1941,6 +1948,17 @@ static const VMStateDescription vmstate_virtio_started = {
+> > > >      }
+> > > >  };
+> > > >  
+> > > > +static const VMStateDescription vmstate_virtio_start_on_kick = {
+> > > > +    .name = "virtio/start_on_kick",
+> > > > +    .version_id = 1,
+> > > > +    .minimum_version_id = 1,
+> > > > +    .needed = &virtio_start_on_kick_needed,
+> > > > +    .fields = (VMStateField[]) {
+> > > > +        VMSTATE_BOOL(start_on_kick, VirtIODevice),
+> > > > +        VMSTATE_END_OF_LIST()
+> > > > +    }
+> > > > +};
+> > > > +
+> > > >  static const VMStateDescription vmstate_virtio = {
+> > > >      .name = "virtio",
+> > > >      .version_id = 1,
+> > > > @@ -1957,6 +1975,7 @@ static const VMStateDescription vmstate_virtio = {
+> > > >          &vmstate_virtio_broken,
+> > > >          &vmstate_virtio_extra_state,
+> > > >          &vmstate_virtio_started,
+> > > > +        &vmstate_virtio_start_on_kick,
+> > > >          NULL
+> > > >      }
+> > > >  };  
 
