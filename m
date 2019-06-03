@@ -2,47 +2,47 @@ Return-Path: <SRS0=e5mL=UC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8ABAEC282CE
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 22:11:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 16840C04AB5
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 22:17:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 52E3726799
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 22:11:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 52E3726799
+	by mail.kernel.org (Postfix) with ESMTPS id D0BA72673C
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 22:17:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D0BA72673C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:41560 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:41661 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hXvAT-0007YL-En
-	for qemu-devel@archiver.kernel.org; Mon, 03 Jun 2019 18:11:01 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:53442)
+	id 1hXvGH-0000az-1R
+	for qemu-devel@archiver.kernel.org; Mon, 03 Jun 2019 18:17:01 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:58202)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1hXv9Z-00077D-EW
-	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 18:10:06 -0400
+	(envelope-from <jsnow@redhat.com>) id 1hXvF3-0000B4-9s
+	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 18:15:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1hXv9Y-0007Mn-6U
-	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 18:10:05 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45850)
+	(envelope-from <jsnow@redhat.com>) id 1hXvEz-0003yj-IH
+	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 18:15:43 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37898)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <jsnow@redhat.com>)
-	id 1hXv9U-0005Mn-C3; Mon, 03 Jun 2019 18:10:00 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
+	id 1hXvEb-0003ZI-Tc; Mon, 03 Jun 2019 18:15:19 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 1CF653082134;
-	Mon,  3 Jun 2019 22:09:25 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id B7B8E30821FF;
+	Mon,  3 Jun 2019 22:15:12 +0000 (UTC)
 Received: from [10.18.17.164] (dhcp-17-164.bos.redhat.com [10.18.17.164])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 7D25B5C239;
-	Mon,  3 Jun 2019 22:09:23 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 212985D9C6;
+	Mon,  3 Jun 2019 22:15:11 +0000 (UTC)
 To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-References: <20190603202236.1342-1-mreitz@redhat.com>
+References: <20190528195338.12376-1-mreitz@redhat.com>
 From: John Snow <jsnow@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
@@ -119,23 +119,23 @@ Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
 	i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
 	RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
 	glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
-Message-ID: <e128b50e-88fb-b2bb-e773-b9c02db0cd28@redhat.com>
-Date: Mon, 3 Jun 2019 18:09:22 -0400
+Message-ID: <52cc7e39-5f86-9c55-9a6c-77df910569f6@redhat.com>
+Date: Mon, 3 Jun 2019 18:15:11 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190603202236.1342-1-mreitz@redhat.com>
+In-Reply-To: <20190528195338.12376-1-mreitz@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.42]);
-	Mon, 03 Jun 2019 22:09:25 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+	(mx1.redhat.com [10.5.110.47]);
+	Mon, 03 Jun 2019 22:15:12 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v2 0/2] blockdev: Overlays are
- not snapshots
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] qemu-img: Fix options leakage
+ in img_rebase()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -147,69 +147,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>,
-	qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
 
-On 6/3/19 4:22 PM, Max Reitz wrote:
-> QEMU=E2=80=99s always been confused over what a snapshot is: Is it the =
-overlay?
-> Is it the backing image?
->=20
-> Confusion is rarely a good thing.  I can=E2=80=99t think of any objecti=
-ve reason
-> why the overlay would be a snapshot.  A snapshot is something that does
-> not change over time; the overlay does.
->=20
-> (I suppose historically the reason is that =E2=80=9CTaking an overlay=E2=
-=80=9D makes no
-> sense, so the operations are called =E2=80=9CTaking a snapshot=E2=80=9D=
-.  Somehow, this
-> meaning carried over to the new file that is created during that
-> operation; if =E2=80=9CCreating a snapshot=E2=80=9D creates a file, tha=
-t file must be
-> the snapshot, right?  Well, no, it isn=E2=80=99t.)
->=20
-> Let=E2=80=99s fix this as best as we can.  Better Nate than lever.
->=20
->=20
-> v2:
-> - Don=E2=80=99t break the iotests for a change
->   (kept Eric=E2=80=99s R-b, because it felt like the right thing to do)
->=20
->=20
-> git backport-diff against v1:
->=20
-> Key:
-> [----] : patches are identical
-> [####] : number of functional differences between upstream/downstream p=
-atch
-> [down] : patch is downstream-only
-> The flags [FC] indicate (F)unctional and (C)ontextual differences, resp=
-ectively
->=20
-> 001/2:[----] [--] 'qapi/block-core: Overlays are not snapshots'
-> 002/2:[0010] [FC] 'blockdev: Overlays are not snapshots'
->=20
->=20
-> Max Reitz (2):
->   qapi/block-core: Overlays are not snapshots
->   blockdev: Overlays are not snapshots
->=20
->  qapi/block-core.json       | 20 ++++++++++----------
->  blockdev.c                 | 10 +++++-----
->  tests/qemu-iotests/085.out | 10 +++++-----
->  3 files changed, 20 insertions(+), 20 deletions(-)
->=20
+On 5/28/19 3:53 PM, Max Reitz wrote:
+> img_rebase() can leak a QDict in two occasions.  Fix it.
+> 
+> Coverity: CID 1401416
+> Fixes: d16699b64671466b42079c45b89127aeea1ca565
+> Fixes: 330c72957196e0ae382abcaa97ebf4eb9bc8574f
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> ---
+>  qemu-img.c | 3 +++
+>  1 file changed, 3 insertions(+)
+> 
+> diff --git a/qemu-img.c b/qemu-img.c
+> index b0535919b1..86e1923acf 100644
+> --- a/qemu-img.c
+> +++ b/qemu-img.c
+> @@ -3347,6 +3347,7 @@ static int img_rebase(int argc, char **argv)
+>                                                               out_baseimg,
+>                                                               &local_err);
+>              if (local_err) {
+> +                qobject_unref(options);
+>                  error_reportf_err(local_err,
+>                                    "Could not resolve backing filename: ");
+>                  ret = -1;
+> @@ -3359,7 +3360,9 @@ static int img_rebase(int argc, char **argv)
+>               */
+>              prefix_chain_bs = bdrv_find_backing_image(bs, out_real_path);
+>              if (prefix_chain_bs) {
+> +                qobject_unref(options);
+>                  g_free(out_real_path);
+> +
+>                  blk_new_backing = blk_new(BLK_PERM_CONSISTENT_READ,
+>                                            BLK_PERM_ALL);
+>                  ret = blk_insert_bs(blk_new_backing, prefix_chain_bs,
+> 
 
-Makes good sense to me.
+I was going to ask about the other branch after this one, but:
+"The reference to the QDict belongs to the block layer after the call
+(even on failure)"
 
-There are only 3,283 things named "snapshot" in QEMU so one less is
-probably not the worst.
+"Oh, well... OK."
 
 Reviewed-by: John Snow <jsnow@redhat.com>
 
