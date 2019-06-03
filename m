@@ -2,62 +2,141 @@ Return-Path: <SRS0=e5mL=UC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 897B2C04AB5
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 17:41:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E6456C04AB5
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 18:03:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6557523D13
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 17:41:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6557523D13
+	by mail.kernel.org (Postfix) with ESMTPS id AD838218BC
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 18:03:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AD838218BC
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:38714 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:38881 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hXqy1-0004vh-EO
-	for qemu-devel@archiver.kernel.org; Mon, 03 Jun 2019 13:41:53 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:51670)
+	id 1hXrJ0-0000B0-Uk
+	for qemu-devel@archiver.kernel.org; Mon, 03 Jun 2019 14:03:34 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:55312)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@pond.sub.org>) id 1hXqxH-0004cG-KA
-	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 13:41:08 -0400
+	(envelope-from <jsnow@redhat.com>) id 1hXrI8-0008GK-Cd
+	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 14:02:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@pond.sub.org>) id 1hXqxE-0002T6-5X
-	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 13:41:05 -0400
-Received: from oxygen.pond.sub.org ([94.130.129.15]:55600)
+	(envelope-from <jsnow@redhat.com>) id 1hXrI6-0003QU-TN
+	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 14:02:40 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36296)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@pond.sub.org>) id 1hXqx2-0001kJ-AT
-	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 13:40:57 -0400
-Received: from blackfin.pond.sub.org (p4FD0507F.dip0.t-ipconnect.de
-	[79.208.80.127])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest
-	SHA256) (Client did not present a certificate)
-	by oxygen.pond.sub.org (Postfix) with ESMTPSA id E617E3A0EA
-	for <qemu-devel@nongnu.org>; Mon,  3 Jun 2019 19:40:32 +0200 (CEST)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
-	id A2F7C11386A0; Mon,  3 Jun 2019 19:40:32 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Michal Privoznik <mprivozn@redhat.com>
-References: <20190311220843.4026-1-armbru@redhat.com>
-	<20190311220843.4026-23-armbru@redhat.com>
-	<76d4a7b2-3c13-beea-2dc0-4fda7025030b@redhat.com>
-	<878sv6tyjy.fsf@dusky.pond.sub.org>
-	<ea01ee11-8888-444d-1f51-387dc73464f5@redhat.com>
-Date: Mon, 03 Jun 2019 19:40:32 +0200
-Message-ID: <87zhmysh2n.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
+	(Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1hXrI6-0002s8-L2
+	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 14:02:38 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id C7CF8223882;
+	Mon,  3 Jun 2019 18:02:20 +0000 (UTC)
+Received: from [10.18.17.164] (dhcp-17-164.bos.redhat.com [10.18.17.164])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id E5D03601B6;
+	Mon,  3 Jun 2019 18:02:17 +0000 (UTC)
+To: Markus Armbruster <armbru@redhat.com>
+References: <20190531192429.GH22103@habkost.net>
+	<93e5101f-67f1-a416-5e80-f16371a35e6a@redhat.com>
+	<871s0asvli.fsf@dusky.pond.sub.org>
+From: John Snow <jsnow@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
+	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
+Message-ID: <236db86d-52df-5537-4f33-f3c09bbb6289@redhat.com>
+Date: Mon, 3 Jun 2019 14:02:16 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
+In-Reply-To: <871s0asvli.fsf@dusky.pond.sub.org>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.39]);
+	Mon, 03 Jun 2019 18:02:20 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 94.130.129.15
-Subject: Re: [Qemu-devel] [PULL 22/27] vl: Create block backends before
- setting machine properties
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] Deprecation policy and build dependencies
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -69,133 +148,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+	"Daniel P. Berrange" <berrange@redhat.com>,
+	Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org,
+	Cleber Rosa <crosa@redhat.com>,
+	=?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-I apologize for the delay, got distracted.
 
-Michal Privoznik <mprivozn@redhat.com> writes:
 
-> On 5/16/19 1:43 PM, Markus Armbruster wrote:
-> <snip/>
->
->>> Actually, there is more problems with this. Trying to run a guest with
->>> persistent reservations fails after this patch is applied (git bisect
->>> points me to this commit). My command line is:
+On 6/3/19 8:26 AM, Markus Armbruster wrote:
+> John Snow <jsnow@redhat.com> writes:
+> 
+>> On 5/31/19 3:24 PM, Eduardo Habkost wrote:
+>>> Long story short: I would really like to drop support for Python
+>>> 2 in QEMU 4.1.
+> 
+> The sooner, the better, as far as I'm concerned.
+> 
+>>> What exactly prevents us from doing this?  Does our deprecation
+>>> policy really apply to build dependencies?
 >>>
->>> qemu.git $ ./x86_64-softmmu/qemu-system-x86_64 \
->>> -monitor stdio \
->>> -object pr-manager-helper,id=3Dpr-helper0,path=3D/tmp/pr-helper0.sock
->>> -drive
->>> file=3D/dev/mapper/crypt,file.pr-manager=3Dpr-helper0,format=3Draw,if=
-=3Dnone,id=3Ddrive-scsi0-0-0-2
->>> \
->>> -device
->>> scsi-block,bus=3Dscsi0.0,channel=3D0,scsi-id=3D0,lun=3D2,drive=3Ddrive-=
-scsi0-0-0-2,id=3Dscsi0-0-0-2
->>>
->>> Honestly, I have no idea how to fix it, so I'm just raising this issue
->>> here. Do you want me to open a bug or something?
 >>
->> Let's skip the bug filing bureaucracy and go straight to debugging.
->
-> Agreed.
->
+>> Normally I'd say it's only nice to also follow the depreciation policy
+>> for tooling as well to give people a chance to switch away, but with
+>> regards to Python2, I feel like we're in the clear to drop it for the
+>> first release that will happen after the Python2 doomsday clock.
 >>
->> Actual and expected behavior of your reproducer, please :)
->>
->
-> Actual is that qemu fails to parse cmd line:
->
->
-> qemu-system-x86_64: -drive
-> file=3D/dev/mapper/crypt,file.pr-manager=3Dpr-helper0,format=3Draw,if=3Dn=
-one,id=3Ddrive-scsi0-0-0-2:
-> No persistent reservation manager with id 'pr-helper0'
->
->
-> Which obviously is not correct, because pr-helper0 is specified.
-> Expected result is that qemu suceeds in parsing the cmd line and
-> starts the guest. To test it you don't need /dev/mapper/* really, I
-> mean, if qemu fails with a different error message (e.g. it can't open
-> the disk or EPERM or whatever), it's a sign it got past the cmd line
-> parsing successfuly.
+>> (So, probably 4.2.)
+> 
+> In addition to our feature deprecation policity, we have a "Supported
+> build platforms" policy (commit 45b47130f4b).  The most common holdback
+> is this one:
+> 
+>     For distributions with long-lifetime releases, the project will aim
+>     to support the most recent major version at all times. Support for
+>     the previous major version will be dropped 2 years after the new
+>     major version is released. For the purposes of identifying supported
+>     software versions, the project will look at RHEL, Debian, Ubuntu
+>     LTS, and SLES distros. Other long-lifetime distros will be assumed
+>     to ship similar software versions.
+> 
+> RHEL-7 has Python 3 only in EPEL.  RHEL-8 came out last month.  Unless
+> we interpret our policy to include EPEL, this means supporting Python 2
+> for some 16 months after upstream Python retires it.  My personal
+> opinion: nuts.
+> 
 
-Reproduced, thanks!
+I would rather not support Python2 a day after the clock expires.
 
-Here's what happens.  Our general problem is that qemu-system-FOO's
-main() acts on command line arguments in its own idiosyncratic order.
-There's not much method to its madness.  Whenever we find a case where
-one kind of command line argument needs to refer to something created
-for another kind later, we rejigger the order.
+> I didn't bother checking Debian, Ubuntu LTS and SLES.
+> 
+> For hosts other than Linux, we're less ambitious.
+> 
 
-Some time back, Dan Berrang=C3=A9 ran into an "impossible" instance of this
-general problem: some kinds of -object get referenced by certain
-character devices (therefore, -object must be acted on before character
-devices), but other kinds of -object reference other character devices
-(therefore, -object must be acted on after character devices).  He
-solved the problem by sorting the -object into two buckets (commit
-f08f9271bfe):
+That policy strikes me as weird, because RHEL7 is not going to be, in
+general, using the latest and greatest QEMU. Usually stable versions of
+distros stick with the versions of the programs that came out at the time.
 
-* Normal ones are created pretty early, so they can be referenced by
-  (most) other things.
+What's the benefit of making sure that stable platforms can continue to
+run the *newest* QEMU? Is this even a reasonable restriction? If you are
+running RHEL7, how many projects do you expect to be able to git clone
+and build and have that work with the rest of your legacy/stable
+dependencies?
 
-* Delayed ones are created pretty late, so they can reference (most)
-  other things.
-
-The pr-manager-helper object is a delayed one (commit 7c9e527659c).
-
-Worked because block backends got created even after delayed objects:
-
-    qemu_opts_foreach(qemu_find_opts("object"),
-                      user_creatable_add_opts_foreach,
-                      object_create_initial, &error_fatal);
-    [...]
-    qemu_opts_foreach(qemu_find_opts("object"),
-                      user_creatable_add_opts_foreach,
-                      object_create_delayed, &error_fatal);
-    [...]
-    configure_blockdev(&bdo_queue, machine_class, snapshot);
-
-Commit cda4aa9a5a0 moved the configure_blockdev() up:
-
-    qemu_opts_foreach(qemu_find_opts("object"),
-                      user_creatable_add_opts_foreach,
-                      object_create_initial, &error_fatal);
-    [...]
-    /*
-     * Note: we need to create block backends before
-     * machine_set_property(), so machine properties can refer to
-     * them.
-     */
-    configure_blockdev(&bdo_queue, machine_class, snapshot);
-    [...]
-    qemu_opts_foreach(qemu_find_opts("object"),
-                      user_creatable_add_opts_foreach,
-                      object_create_delayed, &error_fatal);
-
-Now file-posix property "pr-manager" can no longer reference a
-pr-manager-helper object.  Regression.
-
-If I make pr-manager-helper a normal object, it again can reference it.
-
-Paolo, why is pr-manager-helper a delayed object?  Why this hunk of
-commit 7c9e527659c:
-
-    diff --git a/vl.c b/vl.c
-    index 9bb5058c3a..a121a65731 100644
-    --- a/vl.c
-    +++ b/vl.c
-    @@ -2893,7 +2893,8 @@ static int machine_set_property(void *opaque,
-      */
-     static bool object_create_initial(const char *type)
-     {
-    -    if (g_str_equal(type, "rng-egd")) {
-    +    if (g_str_equal(type, "rng-egd") ||
-    +        g_str_has_prefix(type, "pr-manager-")) {
-             return false;
-         }
-
+RHEL7 uses a 1.5.3 based version. I don't think it matters if we update
+4.2 to be Python3 only, really.
 
