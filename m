@@ -7,77 +7,77 @@ X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F971C04AB5
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 17:25:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 62E9DC04AB5
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 17:25:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D48C12744C
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 17:25:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 225B6274F4
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 17:25:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="W6F7jAxu"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D48C12744C
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YUWApCI4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 225B6274F4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:38460 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:38462 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hXqiI-0001YW-W8
-	for qemu-devel@archiver.kernel.org; Mon, 03 Jun 2019 13:25:39 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:43462)
+	id 1hXqiX-0001gO-Af
+	for qemu-devel@archiver.kernel.org; Mon, 03 Jun 2019 13:25:53 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:43561)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1hXqUT-0007Sd-Ur
-	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 13:11:25 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1hXqUW-0007X2-Fx
+	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 13:11:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1hXqUQ-0004Ww-56
-	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 13:11:19 -0400
-Received: from mail-wr1-x431.google.com ([2a00:1450:4864:20::431]:34651)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1hXqUT-0004dZ-VE
+	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 13:11:24 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:43224)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1hXqUO-0004MJ-1L
-	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 13:11:18 -0400
-Received: by mail-wr1-x431.google.com with SMTP id e16so4656460wrn.1
-	for <qemu-devel@nongnu.org>; Mon, 03 Jun 2019 10:11:12 -0700 (PDT)
+	id 1hXqUQ-00047I-8t
+	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 13:11:20 -0400
+Received: by mail-wr1-x442.google.com with SMTP id r18so3896357wrm.10
+	for <qemu-devel@nongnu.org>; Mon, 03 Jun 2019 10:11:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
-	bh=6lNgOMh83d+owFjOzMGpgB7V4MpxWZDFyB9agcLkI6o=;
-	b=W6F7jAxuFJ0IytjGJ/MCkygD434A4TBTkxNE/31KtuKrLF2uw9D5r6rh4J4q0s7yL8
-	2CRZZoXP0J5aOCmIfC/gqSqCsSeiyhKk8+lG2epZY8eMypIbUBuoeZZQXNmsXFEunFdW
-	KKlPEdj5hhJ2uTMFie4cq/+go6hzHfQ0TIsbachat4PqBxoYgEW1ZRfKXPzykAdhuDUq
-	Oq3kXqS+h/bp+L5FXE9d9ODm422tF31vZKS34xu9/V5F+f1RSo/pFC8K0QyBpT1OTYYA
-	WYQmVeKF9efIfid4XXgyWyY3IZxaRQHZmNsJ0NxxKKpXvsG1woesl4NNqru1R8a/Cl1C
-	q7Sw==
+	h=sender:from:to:subject:date:message-id:in-reply-to:references;
+	bh=bJ2qIHf63bhhWnV7Wbzv5gU351b7CRfeRe9/gqKuOzs=;
+	b=YUWApCI4H/tD5toWS94OuyOmu/tuU1nO/Y3hOr0AKpTWxykyg2C4MzyJMnrw0B0bYc
+	xW/XMK0IHtl0FO7qU7LFl9ZKK1cnXcug5LcOjDak9DlV40dERzROmqLuciXlyqIcIn5N
+	ryYIm8ImXl/mmIAoAl/3tqwcJ7erjGZXttozJXCLRKOrrMUtH4hZhcDUPvU6YQM7NyV/
+	c7dFi6hu+2MRBqGWBUc/w4mGLcJsabGMgH6pqASacSUMltYdJ59rWzG+Wau4rpaKy1fD
+	XF9zLstZkeZtyRu2xt1m+6ochiBHxqVuBq/djA9F0fbINtUHj5F47MUMCxHyZ441cnmP
+	GgbQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+	h=x-gm-message-state:sender:from:to:subject:date:message-id
 	:in-reply-to:references;
-	bh=6lNgOMh83d+owFjOzMGpgB7V4MpxWZDFyB9agcLkI6o=;
-	b=SPGGVAdbwbUmz+eCRCnPdjb7q74g1gN1JuUqhcmEzfJYjecomFoji4PXfsi49QSoHU
-	K9B0dsoc7QaYwqUMmPrUVir60Z1AHDMeSksnTUvuUPF5JND3Dq1DO69m96gEgbSRm710
-	iadwL5CslGfGCDeTr/yXftEjIk2Wqn917D4vXHGxwU1/wYOoeUcUm0dXM6gRxuu7KK4Y
-	gt45Yi15wF21j7ilpJpkV3O9wYwHkEJdnIj4QOacNEgI8QmN+IiK327sz7y2veTDfNhw
-	TlOh53Bx2Ur/LGvrY9UFqcsL54TMfJ3O1Oja5baRzWWQwLYsstY03OtZG32Twhwnl2a+
-	lNIA==
-X-Gm-Message-State: APjAAAXgJKb7DnPXn4SeTsuH4g032iJhwhRjFI9tVf09IXozNJ5ddLyH
-	q7/PH96N4L16ne6l6ChBeebCdJ8v
-X-Google-Smtp-Source: APXvYqyHwYcPi2dph6ZAi1NWsmYXE7z1y+3+pbOFYvb4mxADKj3IxLTKTFoF2IjiJ9KRRc+h9u3GcA==
-X-Received: by 2002:adf:dfc4:: with SMTP id q4mr3499660wrn.201.1559581871572; 
-	Mon, 03 Jun 2019 10:11:11 -0700 (PDT)
+	bh=bJ2qIHf63bhhWnV7Wbzv5gU351b7CRfeRe9/gqKuOzs=;
+	b=YePUzXmLLdJG65ezQrn3VSrhuN0Agt/xpBc4Wc4gZHf+hseBGT1b/+EpaK3yIpaNfx
+	Qp3X//3b4WEQDQpyNxKBSD0XdCAlAkK7rVH4b0yFOaEcFobtE+6E95DOup9C6W9nEZ/S
+	jBvo+uL2FoNWg7gE4Oy30WZE1gajN+SasFXQgV4WIn7WMV7P3ufoHbuNwPOy0xVicxMN
+	F/7Vkdu92rkak6ns1TEETtV3g1hAS2Tsenu0Q3ZM51+jKpWQa1XGnSIL9CJ9bStZAErH
+	RRGmhhUG4c9zDLb3dNnllg55uW5WdGh9k6UGaO74i1AAP4rY0bpehg4lgpEjFN5HZGBY
+	iMJg==
+X-Gm-Message-State: APjAAAU11bTEpa4MuqOHb1U+n8cLnCEH4qUile6ASTvBYwz5bnFJl0Y4
+	9+nbxqg0+/XQbpilMYqI79t4VbDV
+X-Google-Smtp-Source: APXvYqxlIZfrl4xE4sQua0yyMKlBEQlN7WGwI5pv6y5t0dtEmX52cGxMMZqA5taAgiUoY+2T3lqarA==
+X-Received: by 2002:adf:fe0a:: with SMTP id n10mr3364303wrr.40.1559581862363; 
+	Mon, 03 Jun 2019 10:11:02 -0700 (PDT)
 Received: from 640k.lan ([93.56.166.5]) by smtp.gmail.com with ESMTPSA id
-	r131sm3325045wmf.4.2019.06.03.10.11.10
+	r131sm3325045wmf.4.2019.06.03.10.11.01 for <qemu-devel@nongnu.org>
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Mon, 03 Jun 2019 10:11:10 -0700 (PDT)
+	Mon, 03 Jun 2019 10:11:01 -0700 (PDT)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Mon,  3 Jun 2019 19:10:43 +0200
-Message-Id: <1559581843-3968-25-git-send-email-pbonzini@redhat.com>
+Date: Mon,  3 Jun 2019 19:10:35 +0200
+Message-Id: <1559581843-3968-17-git-send-email-pbonzini@redhat.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1559581843-3968-1-git-send-email-pbonzini@redhat.com>
 References: <1559581843-3968-1-git-send-email-pbonzini@redhat.com>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2a00:1450:4864:20::431
-Subject: [Qemu-devel] [PULL 24/24] q35: Revert to kernel irqchip
+X-Received-From: 2a00:1450:4864:20::442
+Subject: [Qemu-devel] [PULL 16/24] libqos: convert I2C to qgraph
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -89,137 +89,214 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alex Williamson <alex.williamson@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Alex Williamson <alex.williamson@redhat.com>
+Create an i2c-bus interface, corresponding to the I2CAdapter struct.
+Wrap IMXI2C and OMAPI2C with a QOSGraphObject, and add the get_driver
+function to retrieve the I2CAdapter.
 
-Commit b2fc91db8447 ("q35: set split kernel irqchip as default") changed
-the default for the pc-q35-4.0 machine type to use split irqchip, which
-turned out to have disasterous effects on vfio-pci INTx support.  KVM
-resampling irqfds are registered for handling these interrupts, but
-these are non-functional in split irqchip mode.  We can't simply test
-for split irqchip in QEMU as userspace handling of this interrupt is a
-significant performance regression versus KVM handling (GeForce GPUs
-assigned to Windows VMs are non-functional without forcing MSI mode or
-re-enabling kernel irqchip).
+The conversion is still not complete; for simplicity, i2c_recv and
+i2c_send (along with their wrappers) still take an adapter/address
+pair.  Fixing that would be complicated until the tests are converted
+to qgraph, so it is left for after the conversion.
 
-The resolution is to revert the change in default irqchip mode in the
-pc-q35-4.1 machine and create a pc-q35-4.0.1 machine for the 4.0-stable
-branch.  The qemu-q35-4.0 machine type should not be used in vfio-pci
-configurations for devices requiring legacy INTx support without
-explicitly modifying the VM configuration to use kernel irqchip.
-
-Link: https://bugs.launchpad.net/qemu/+bug/1826422
-Fixes: b2fc91db8447 ("q35: set split kernel irqchip as default")
-Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
-Reviewed-by: Peter Xu <peterx@redhat.com>
-Message-Id: <155786484688.13873.6037015630912983760.stgit@gimli.home>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/core/machine.c    |  3 +++
- hw/i386/pc.c         |  3 +++
- hw/i386/pc_q35.c     | 16 ++++++++++++++--
- include/hw/boards.h  |  3 +++
- include/hw/i386/pc.h |  3 +++
- 5 files changed, 26 insertions(+), 2 deletions(-)
+ tests/Makefile.include  |  2 ++
+ tests/libqos/i2c-imx.c  | 20 ++++++++++++++++++++
+ tests/libqos/i2c-omap.c | 40 ++++++++++++++++++++++++++++++++--------
+ tests/libqos/i2c.c      |  8 ++++++++
+ tests/libqos/i2c.h      | 21 +++++++++++++++++++++
+ 5 files changed, 83 insertions(+), 8 deletions(-)
 
-diff --git a/hw/core/machine.c b/hw/core/machine.c
-index 16ba667..f1a0f45 100644
---- a/hw/core/machine.c
-+++ b/hw/core/machine.c
-@@ -24,6 +24,9 @@
- #include "hw/pci/pci.h"
- #include "hw/mem/nvdimm.h"
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index 1865f6b..63f646a 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -694,6 +694,8 @@ libqos-usb-obj-y = $(libqos-spapr-obj-y) $(libqos-pc-obj-y) tests/libqos/usb.o
+ qos-test-obj-y = tests/qos-test.o $(libqgraph-obj-y)
+ qos-test-obj-y += $(libqos-pc-obj-y) $(libqos-spapr-obj-y)
+ qos-test-obj-y += tests/libqos/e1000e.o
++qos-test-obj-y += $(libqos-imx-obj-y)
++qos-test-obj-y += $(libqos-omap-obj-y)
+ qos-test-obj-y += tests/libqos/sdhci.o
+ qos-test-obj-y += tests/libqos/tpci200.o
+ qos-test-obj-y += tests/libqos/virtio.o
+diff --git a/tests/libqos/i2c-imx.c b/tests/libqos/i2c-imx.c
+index 28289c5..86d84a7 100644
+--- a/tests/libqos/i2c-imx.c
++++ b/tests/libqos/i2c-imx.c
+@@ -186,10 +186,22 @@ static void imx_i2c_recv(I2CAdapter *i2c, uint8_t addr,
+     g_assert((status & I2SR_IBB) == 0);
+ }
  
-+GlobalProperty hw_compat_4_0_1[] = {};
-+const size_t hw_compat_4_0_1_len = G_N_ELEMENTS(hw_compat_4_0_1);
-+
- GlobalProperty hw_compat_4_0[] = {};
- const size_t hw_compat_4_0_len = G_N_ELEMENTS(hw_compat_4_0);
- 
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index 2632b73..edc240b 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -110,6 +110,9 @@ struct hpet_fw_config hpet_cfg = {.count = UINT8_MAX};
- /* Physical Address of PVH entry point read from kernel ELF NOTE */
- static size_t pvh_start_addr;
- 
-+GlobalProperty pc_compat_4_0_1[] = {};
-+const size_t pc_compat_4_0_1_len = G_N_ELEMENTS(pc_compat_4_0_1);
-+
- GlobalProperty pc_compat_4_0[] = {};
- const size_t pc_compat_4_0_len = G_N_ELEMENTS(pc_compat_4_0);
- 
-diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
-index 37dd350..dcddc64 100644
---- a/hw/i386/pc_q35.c
-+++ b/hw/i386/pc_q35.c
-@@ -357,7 +357,7 @@ static void pc_q35_machine_options(MachineClass *m)
-     m->units_per_default_bus = 1;
-     m->default_machine_opts = "firmware=bios-256k.bin";
-     m->default_display = "std";
--    m->default_kernel_irqchip_split = true;
-+    m->default_kernel_irqchip_split = false;
-     m->no_floppy = 1;
-     machine_class_allow_dynamic_sysbus_dev(m, TYPE_AMD_IOMMU_DEVICE);
-     machine_class_allow_dynamic_sysbus_dev(m, TYPE_INTEL_IOMMU_DEVICE);
-@@ -374,10 +374,22 @@ static void pc_q35_4_1_machine_options(MachineClass *m)
- DEFINE_Q35_MACHINE(v4_1, "pc-q35-4.1", NULL,
-                    pc_q35_4_1_machine_options);
- 
--static void pc_q35_4_0_machine_options(MachineClass *m)
-+static void pc_q35_4_0_1_machine_options(MachineClass *m)
- {
-     pc_q35_4_1_machine_options(m);
-     m->alias = NULL;
-+    compat_props_add(m->compat_props, hw_compat_4_0_1, hw_compat_4_0_1_len);
-+    compat_props_add(m->compat_props, pc_compat_4_0_1, pc_compat_4_0_1_len);
++static void *imx_i2c_get_driver(void *obj, const char *interface)
++{
++    IMXI2C *s = obj;
++    if (!g_strcmp0(interface, "i2c-bus")) {
++        return &s->parent;
++    }
++    fprintf(stderr, "%s not present in imx-i2c\n", interface);
++    g_assert_not_reached();
 +}
 +
-+DEFINE_Q35_MACHINE(v4_0_1, "pc-q35-4.0.1", NULL,
-+                   pc_q35_4_0_1_machine_options);
+ void imx_i2c_init(IMXI2C *s, QTestState *qts, uint64_t addr)
+ {
+     s->addr = addr;
+ 
++    s->obj.get_driver = imx_i2c_get_driver;
 +
-+static void pc_q35_4_0_machine_options(MachineClass *m)
-+{
-+    pc_q35_4_0_1_machine_options(m);
-+    m->default_kernel_irqchip_split = true;
-+    m->alias = NULL;
-     compat_props_add(m->compat_props, hw_compat_4_0, hw_compat_4_0_len);
-     compat_props_add(m->compat_props, pc_compat_4_0, pc_compat_4_0_len);
+     s->parent.send = imx_i2c_send;
+     s->parent.recv = imx_i2c_recv;
+     s->parent.qts = qts;
+@@ -213,3 +225,11 @@ void imx_i2c_free(I2CAdapter *i2c)
+     s = container_of(i2c, IMXI2C, parent);
+     g_free(s);
  }
-diff --git a/include/hw/boards.h b/include/hw/boards.h
-index 6f7916f..6ff02bf 100644
---- a/include/hw/boards.h
-+++ b/include/hw/boards.h
-@@ -292,6 +292,9 @@ struct MachineState {
-     } \
-     type_init(machine_initfn##_register_types)
- 
-+extern GlobalProperty hw_compat_4_0_1[];
-+extern const size_t hw_compat_4_0_1_len;
 +
- extern GlobalProperty hw_compat_4_0[];
- extern const size_t hw_compat_4_0_len;
- 
-diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-index 43df723..5d56362 100644
---- a/include/hw/i386/pc.h
-+++ b/include/hw/i386/pc.h
-@@ -293,6 +293,9 @@ int e820_add_entry(uint64_t, uint64_t, uint32_t);
- int e820_get_num_entries(void);
- bool e820_get_entry(int, uint32_t, uint64_t *, uint64_t *);
- 
-+extern GlobalProperty pc_compat_4_0_1[];
-+extern const size_t pc_compat_4_0_1_len;
++static void imx_i2c_register_nodes(void)
++{
++    qos_node_create_driver("imx.i2c", NULL);
++    qos_node_produces("imx.i2c", "i2c-bus");
++}
 +
- extern GlobalProperty pc_compat_4_0[];
- extern const size_t pc_compat_4_0_len;
++libqos_init(imx_i2c_register_nodes);
+diff --git a/tests/libqos/i2c-omap.c b/tests/libqos/i2c-omap.c
+index c7cbb9e..f949564 100644
+--- a/tests/libqos/i2c-omap.c
++++ b/tests/libqos/i2c-omap.c
+@@ -155,20 +155,36 @@ static void omap_i2c_recv(I2CAdapter *i2c, uint8_t addr,
+     g_assert((data & OMAP_I2C_CON_STP) == 0);
+ }
  
+-void omap_i2c_init(OMAPI2C *s, QTestState *qts, uint64_t addr)
++static void *omap_i2c_get_driver(void *obj, const char *interface)
++{
++    OMAPI2C *s = obj;
++    if (!g_strcmp0(interface, "i2c-bus")) {
++        return &s->parent;
++    }
++    fprintf(stderr, "%s not present in omap_i2c\n", interface);
++    g_assert_not_reached();
++}
++
++static void omap_i2c_start_hw(QOSGraphObject *object)
+ {
+-    I2CAdapter *i2c = (I2CAdapter *)s;
++    OMAPI2C *s = (OMAPI2C *) object;
+     uint16_t data;
+ 
++    /* verify the mmio address by looking for a known signature */
++    data = qtest_readw(s->parent.qts, s->addr + OMAP_I2C_REV);
++    g_assert_cmphex(data, ==, 0x34);
++}
++
++void omap_i2c_init(OMAPI2C *s, QTestState *qts, uint64_t addr)
++{
+     s->addr = addr;
+ 
+-    i2c->send = omap_i2c_send;
+-    i2c->recv = omap_i2c_recv;
+-    i2c->qts = qts;
++    s->obj.get_driver = omap_i2c_get_driver;
++    s->obj.start_hw = omap_i2c_start_hw;
+ 
+-    /* verify the mmio address by looking for a known signature */
+-    data = qtest_readw(qts, addr + OMAP_I2C_REV);
+-    g_assert_cmphex(data, ==, 0x34);
++    s->parent.send = omap_i2c_send;
++    s->parent.recv = omap_i2c_recv;
++    s->parent.qts = qts;
+ }
+ 
+ I2CAdapter *omap_i2c_create(QTestState *qts, uint64_t addr)
+@@ -189,3 +205,11 @@ void omap_i2c_free(I2CAdapter *i2c)
+     s = container_of(i2c, OMAPI2C, parent);
+     g_free(s);
+ }
++
++static void omap_i2c_register_nodes(void)
++{
++    qos_node_create_driver("omap_i2c", NULL);
++    qos_node_produces("omap_i2c", "i2c-bus");
++}
++
++libqos_init(omap_i2c_register_nodes);
+diff --git a/tests/libqos/i2c.c b/tests/libqos/i2c.c
+index daf9a96..8117d13 100644
+--- a/tests/libqos/i2c.c
++++ b/tests/libqos/i2c.c
+@@ -68,3 +68,11 @@ void i2c_set16(I2CAdapter *i2c, uint8_t addr, uint8_t reg,
+     data[1] = value & 255;
+     i2c_write_block(i2c, addr, reg, data, sizeof(data));
+ }
++
++void *i2c_device_create(void *i2c_bus, QGuestAllocator *alloc, void *addr)
++{
++    QI2CDevice *i2cdev = g_new0(QI2CDevice, 1);
++
++    i2cdev->bus = i2c_bus;
++    return &i2cdev->obj;
++}
+diff --git a/tests/libqos/i2c.h b/tests/libqos/i2c.h
+index 877d2ab..0107cfc 100644
+--- a/tests/libqos/i2c.h
++++ b/tests/libqos/i2c.h
+@@ -10,6 +10,7 @@
+ #define LIBQOS_I2C_H
+ 
+ #include "libqtest.h"
++#include "libqos/qgraph.h"
+ 
+ typedef struct I2CAdapter I2CAdapter;
+ struct I2CAdapter {
+@@ -21,8 +22,26 @@ struct I2CAdapter {
+     QTestState *qts;
+ };
+ 
++typedef struct QI2CDevice QI2CDevice;
++struct QI2CDevice {
++    /*
++     * For now, all devices are simple enough that there is no need for
++     * them to define their own constructor and get_driver functions.
++     * Therefore, QOSGraphObject is included directly in QI2CDevice;
++     * the tests expect to get a QI2CDevice rather than doing something
++     * like obj->get_driver("i2c-device").
++     *
++     * In fact there is no i2c-device interface even, because there are
++     * no generic I2C tests).
++     */
++    QOSGraphObject obj;
++    I2CAdapter *bus;
++};
++
+ #define OMAP2_I2C_1_BASE 0x48070000
+ 
++void *i2c_device_create(void *i2c_bus, QGuestAllocator *alloc, void *addr);
++
+ void i2c_send(I2CAdapter *i2c, uint8_t addr,
+               const uint8_t *buf, uint16_t len);
+ void i2c_recv(I2CAdapter *i2c, uint8_t addr,
+@@ -41,6 +60,7 @@ void i2c_set16(I2CAdapter *i2c, uint8_t addr, uint8_t reg,
+ 
+ /* i2c-omap.c */
+ typedef struct OMAPI2C {
++    QOSGraphObject obj;
+     I2CAdapter parent;
+ 
+     uint64_t addr;
+@@ -52,6 +72,7 @@ void omap_i2c_free(I2CAdapter *i2c);
+ 
+ /* i2c-imx.c */
+ typedef struct IMXI2C {
++    QOSGraphObject obj;
+     I2CAdapter parent;
+ 
+     uint64_t addr;
 -- 
 1.8.3.1
+
 
 
