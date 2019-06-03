@@ -2,50 +2,51 @@ Return-Path: <SRS0=e5mL=UC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11112C28CC6
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 12:15:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 47A30C04AB5
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 12:17:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E271228012
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 12:15:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E271228012
+	by mail.kernel.org (Postfix) with ESMTPS id 19091280C0
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 12:17:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 19091280C0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:34277 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:34289 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hXlsL-0007TP-4w
-	for qemu-devel@archiver.kernel.org; Mon, 03 Jun 2019 08:15:41 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:59881)
+	id 1hXltl-0000Kx-B2
+	for qemu-devel@archiver.kernel.org; Mon, 03 Jun 2019 08:17:09 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:60239)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hXlqU-000676-Ty
-	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 08:13:47 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1hXlqV-0006EI-6D
+	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 08:13:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hXldZ-0001qp-SP
-	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 08:00:27 -0400
-Received: from relay.sw.ru ([185.231.240.75]:39518)
+	(envelope-from <vsementsov@virtuozzo.com>) id 1hXldU-0001be-F5
+	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 08:00:25 -0400
+Received: from relay.sw.ru ([185.231.240.75]:39510)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1hXldV-000126-KO; Mon, 03 Jun 2019 08:00:22 -0400
+	id 1hXldR-000128-0x; Mon, 03 Jun 2019 08:00:20 -0400
 Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
 	by relay.sw.ru with esmtp (Exim 4.91)
 	(envelope-from <vsementsov@virtuozzo.com>)
-	id 1hXldG-0002hc-1e; Mon, 03 Jun 2019 15:00:06 +0300
+	id 1hXldG-0002hc-HO; Mon, 03 Jun 2019 15:00:06 +0300
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-devel@nongnu.org,
 	qemu-block@nongnu.org
-Date: Mon,  3 Jun 2019 15:00:01 +0300
-Message-Id: <20190603120005.37394-1-vsementsov@virtuozzo.com>
+Date: Mon,  3 Jun 2019 15:00:03 +0300
+Message-Id: <20190603120005.37394-3-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.18.0
+In-Reply-To: <20190603120005.37394-1-vsementsov@virtuozzo.com>
+References: <20190603120005.37394-1-vsementsov@virtuozzo.com>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
 X-Received-From: 185.231.240.75
-Subject: [Qemu-devel] [PATCH 0/4] qapi: block-dirty-bitmap-remove
- transaction action
+Subject: [Qemu-devel] [PATCH 2/4] block/dirty-bitmap: add hide/unhide API
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -64,40 +65,69 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi all!
+Add functionality to make bitmap temporary anonymous. It will be used
+to implement bitmap remove transaction action. We need hide bitmap
+persistence too, as there are should not be unnamed persistent bitmaps.
 
-Here is block-dirty-bitmap-remove transaction action.
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+---
+ include/block/dirty-bitmap.h |  2 ++
+ block/dirty-bitmap.c         | 26 ++++++++++++++++++++++++++
+ 2 files changed, 28 insertions(+)
 
-It is used to do transactional movement of the bitmap (which is
-possible in conjunction with merge command). Transactional bitmap
-movement is needed in scenarios with external snapshot, when we don't
-want to leave copy of the bitmap in the base image.
-
-Implementation itself in 03, in short:
-
-.prepare: make bitmap unnamed and non-persistent, delete stored version
-          of the bitmap from the image
-
-.commit: release bitmap
-
-.abort: restore bitmap name and persistence. We don't restore bitmap
-        version in the image. It's not critical, we have in-RAM version,
-        it will be stored on shutdown
-
-Vladimir Sementsov-Ogievskiy (4):
-  blockdev: reduce aio_context locked sections in bitmap add/remove
-  block/dirty-bitmap: add hide/unhide API
-  qapi: implement block-dirty-bitmap-remove transaction action
-  iotests: test bitmap moving inside 254
-
- qapi/transaction.json        |   2 +
- include/block/dirty-bitmap.h |   2 +
- block/dirty-bitmap.c         |  26 +++++++++
- blockdev.c                   | 100 +++++++++++++++++++++++++++--------
- tests/qemu-iotests/254       |  30 ++++++++++-
- tests/qemu-iotests/254.out   |  82 ++++++++++++++++++++++++++++
- 6 files changed, 219 insertions(+), 23 deletions(-)
-
+diff --git a/include/block/dirty-bitmap.h b/include/block/dirty-bitmap.h
+index 8044ace63e..542e437123 100644
+--- a/include/block/dirty-bitmap.h
++++ b/include/block/dirty-bitmap.h
+@@ -116,5 +116,7 @@ bool bdrv_dirty_bitmap_next_dirty_area(BdrvDirtyBitmap *bitmap,
+ BdrvDirtyBitmap *bdrv_reclaim_dirty_bitmap_locked(BlockDriverState *bs,
+                                                   BdrvDirtyBitmap *bitmap,
+                                                   Error **errp);
++void bdrv_dirty_bitmap_hide(BdrvDirtyBitmap *bitmap);
++void bdrv_dirty_bitmap_unhide(BdrvDirtyBitmap *bitmap);
+ 
+ #endif
+diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
+index 49646a30e6..592964635e 100644
+--- a/block/dirty-bitmap.c
++++ b/block/dirty-bitmap.c
+@@ -35,6 +35,10 @@ struct BdrvDirtyBitmap {
+     bool busy;                  /* Bitmap is busy, it can't be used via QMP */
+     BdrvDirtyBitmap *successor; /* Anonymous child, if any. */
+     char *name;                 /* Optional non-empty unique ID */
++    char *hidden_name;          /* Backup of @name for removal transaction
++                                   action. Used for hide/unhide API. */
++    bool hidden_persistent;     /* Backup of @persistent for removal transaction
++                                   action. */
+     int64_t size;               /* Size of the bitmap, in bytes */
+     bool disabled;              /* Bitmap is disabled. It ignores all writes to
+                                    the device */
+@@ -849,3 +853,25 @@ out:
+         qemu_mutex_unlock(src->mutex);
+     }
+ }
++
++void bdrv_dirty_bitmap_hide(BdrvDirtyBitmap *bitmap)
++{
++    qemu_mutex_lock(bitmap->mutex);
++    assert(!bitmap->hidden_name);
++    bitmap->hidden_name = bitmap->name;
++    bitmap->hidden_persistent = bitmap->persistent;
++    bitmap->name = NULL;
++    bitmap->persistent = false;
++    qemu_mutex_unlock(bitmap->mutex);
++}
++
++void bdrv_dirty_bitmap_unhide(BdrvDirtyBitmap *bitmap)
++{
++    qemu_mutex_lock(bitmap->mutex);
++    assert(!bitmap->name);
++    bitmap->name = bitmap->hidden_name;
++    bitmap->persistent = bitmap->hidden_persistent;
++    bitmap->hidden_name = NULL;
++    bitmap->hidden_persistent = false;
++    qemu_mutex_unlock(bitmap->mutex);
++}
 -- 
 2.18.0
 
