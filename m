@@ -2,94 +2,66 @@ Return-Path: <SRS0=e5mL=UC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_MUTT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 999FDC04AB5
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 19:51:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 10453C04AB5
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 19:52:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6D7AD268AE
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 19:51:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6D7AD268AE
+	by mail.kernel.org (Postfix) with ESMTPS id DC358268EC
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 19:52:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DC358268EC
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:40065 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:40067 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hXszU-0003Co-Jt
-	for qemu-devel@archiver.kernel.org; Mon, 03 Jun 2019 15:51:32 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:49351)
+	id 1hXt05-0003dS-6R
+	for qemu-devel@archiver.kernel.org; Mon, 03 Jun 2019 15:52:09 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:49437)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1hXsy9-0002M9-5Y
-	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 15:50:10 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1hXsyd-0002Mz-Vi
+	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 15:50:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1hXsvQ-00083N-29
-	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 15:47:21 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:62950)
+	(envelope-from <ehabkost@redhat.com>) id 1hXst8-0003KJ-9G
+	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 15:44:59 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37290)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1hXsvP-0007zV-Pu
-	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 15:47:20 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hXst8-0003IW-0m
+	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 15:44:58 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 9A7982F8BC1;
-	Mon,  3 Jun 2019 19:47:17 +0000 (UTC)
-Received: from [10.3.116.85] (ovpn-116-85.phx2.redhat.com [10.3.116.85])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id C49E2679CE;
-	Mon,  3 Jun 2019 19:47:16 +0000 (UTC)
-To: Michael Rolnik <mrolnik@gmail.com>
-References: <20190530190738.22713-1-mrolnik@gmail.com>
-	<20190530190738.22713-9-mrolnik@gmail.com>
-	<c501a681-fc9b-1fec-f9bf-190f74c4bb73@redhat.com>
-	<CAK4993gA1TTKE74Z++r1d7fpGr6NHqosVCLoKaaVLF-AngynmA@mail.gmail.com>
-From: Eric Blake <eblake@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=eblake@redhat.com; keydata=
-	xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
-	xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
-	TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
-	GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
-	sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
-	AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
-	CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
-	RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
-	wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
-	Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
-	gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
-	pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
-	zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
-	pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
-	3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
-	NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
-	cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
-	SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
-	I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
-	mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
-	Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
-	2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
-Organization: Red Hat, Inc.
-Message-ID: <a71efc15-ec01-43b5-42e9-2393ac9450a5@redhat.com>
-Date: Mon, 3 Jun 2019 14:47:15 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	by mx1.redhat.com (Postfix) with ESMTPS id 55B5F85543;
+	Mon,  3 Jun 2019 19:44:57 +0000 (UTC)
+Received: from localhost (ovpn-120-246.rdu2.redhat.com [10.10.120.246])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id BFD4A5D9C6;
+	Mon,  3 Jun 2019 19:44:49 +0000 (UTC)
+Date: Mon, 3 Jun 2019 16:44:48 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+To: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20190603194448.GR22103@habkost.net>
+References: <20190531192429.GH22103@habkost.net>
+	<93e5101f-67f1-a416-5e80-f16371a35e6a@redhat.com>
+	<871s0asvli.fsf@dusky.pond.sub.org>
+	<236db86d-52df-5537-4f33-f3c09bbb6289@redhat.com>
+	<20190603201629.0880a337.cohuck@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAK4993gA1TTKE74Z++r1d7fpGr6NHqosVCLoKaaVLF-AngynmA@mail.gmail.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="GDSGiFpuL8rVtI11hR0gG99qj15VZeMbu"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190603201629.0880a337.cohuck@redhat.com>
+User-Agent: Mutt/1.11.3 (2019-02-01)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.38]);
-	Mon, 03 Jun 2019 19:47:17 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.28]);
+	Mon, 03 Jun 2019 19:44:57 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-X-Content-Filtered-By: Mailman/MimeDel 2.1.21
-Subject: Re: [Qemu-devel] [PATCH RFC v20 8/8] target/avr: Register AVR
- support with the rest of QEMU, the build system, and the MAINTAINERS file
+Subject: Re: [Qemu-devel] Deprecation policy and build dependencies
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -101,86 +73,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Sarah Harris <S.E.Harris@kent.ac.uk>,
-	QEMU Developers <qemu-devel@nongnu.org>,
-	Richard Henderson <rth@twiddle.net>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+	"Daniel P. Berrange" <berrange@redhat.com>,
+	Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
+	Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org,
+	Cleber Rosa <crosa@redhat.com>, John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---GDSGiFpuL8rVtI11hR0gG99qj15VZeMbu
-From: Eric Blake <eblake@redhat.com>
-To: Michael Rolnik <mrolnik@gmail.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>,
- Sarah Harris <S.E.Harris@kent.ac.uk>, Richard Henderson <rth@twiddle.net>
-Message-ID: <a71efc15-ec01-43b5-42e9-2393ac9450a5@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH RFC v20 8/8] target/avr: Register AVR support
- with the rest of QEMU, the build system, and the MAINTAINERS file
-References: <20190530190738.22713-1-mrolnik@gmail.com>
- <20190530190738.22713-9-mrolnik@gmail.com>
- <c501a681-fc9b-1fec-f9bf-190f74c4bb73@redhat.com>
- <CAK4993gA1TTKE74Z++r1d7fpGr6NHqosVCLoKaaVLF-AngynmA@mail.gmail.com>
-In-Reply-To: <CAK4993gA1TTKE74Z++r1d7fpGr6NHqosVCLoKaaVLF-AngynmA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Mon, Jun 03, 2019 at 08:16:29PM +0200, Cornelia Huck wrote:
+> On Mon, 3 Jun 2019 14:02:16 -0400
+> John Snow <jsnow@redhat.com> wrote:
+> 
+> > On 6/3/19 8:26 AM, Markus Armbruster wrote:
+> > > John Snow <jsnow@redhat.com> writes:
+> > >   
+> > >> On 5/31/19 3:24 PM, Eduardo Habkost wrote:  
+> > >>> Long story short: I would really like to drop support for Python
+> > >>> 2 in QEMU 4.1.  
+> > > 
+> > > The sooner, the better, as far as I'm concerned.
+> > >   
+> > >>> What exactly prevents us from doing this?  Does our deprecation
+> > >>> policy really apply to build dependencies?
+> > >>>  
+> > >>
+> > >> Normally I'd say it's only nice to also follow the depreciation policy
+> > >> for tooling as well to give people a chance to switch away, but with
+> > >> regards to Python2, I feel like we're in the clear to drop it for the
+> > >> first release that will happen after the Python2 doomsday clock.
+> > >>
+> > >> (So, probably 4.2.)  
+> > > 
+> > > In addition to our feature deprecation policity, we have a "Supported
+> > > build platforms" policy (commit 45b47130f4b).  The most common holdback
+> > > is this one:
+> > > 
+> > >     For distributions with long-lifetime releases, the project will aim
+> > >     to support the most recent major version at all times. Support for
+> > >     the previous major version will be dropped 2 years after the new
+> > >     major version is released. For the purposes of identifying supported
+> > >     software versions, the project will look at RHEL, Debian, Ubuntu
+> > >     LTS, and SLES distros. Other long-lifetime distros will be assumed
+> > >     to ship similar software versions.
+> > > 
+> > > RHEL-7 has Python 3 only in EPEL.  RHEL-8 came out last month.  Unless
+> > > we interpret our policy to include EPEL, this means supporting Python 2
+> > > for some 16 months after upstream Python retires it.  My personal
+> > > opinion: nuts.
+> > >   
+> > 
+> > I would rather not support Python2 a day after the clock expires.
 
-On 6/1/19 4:20 PM, Michael Rolnik wrote:
-> Hi Eric.
->=20
-> please explain what should I do or point to an example or documentation=
-=2E
->=20
+Me neither.
 
->>>  # Since: 3.0
->>>  ##
->>>  { 'enum' : 'SysEmuTarget',
->>> -  'data' : [ 'aarch64', 'alpha', 'arm', 'cris', 'hppa', 'i386', 'lm3=
-2',
->>> +  'data' : [ 'aarch64', 'alpha', 'arm', 'avr', 'cris', 'hppa', 'i386=
-',
->> 'lm32',
->>>               'm68k', 'microblaze', 'microblazeel', 'mips', 'mips64',=
+> > 
+> > > I didn't bother checking Debian, Ubuntu LTS and SLES.
+> > > 
+> > > For hosts other than Linux, we're less ambitious.
+> > >   
+> > 
+> > That policy strikes me as weird, because RHEL7 is not going to be, in
+> > general, using the latest and greatest QEMU. Usually stable versions of
+> > distros stick with the versions of the programs that came out at the time.
+> 
+> I think the idea was that folks might actually develop on a 'stable'
+> distro (in a previous life, I used to complain quite often that
+> building QEMU on a stable distro broke... it was one of my main
+> development machines, but not controlled by me).
 
->>>               'mips64el', 'mipsel', 'moxie', 'nios2', 'or1k', 'ppc',
->>>               'ppc64', 'riscv32', 'riscv64', 's390x', 'sh4',
->>
->> Missing documentation that 'avr' is (since 4.1).
+Good point.
 
-Look above a few lines, where it says:
+> 
+> > 
+> > What's the benefit of making sure that stable platforms can continue to
+> > run the *newest* QEMU? Is this even a reasonable restriction? If you are
+> > running RHEL7, how many projects do you expect to be able to git clone
+> > and build and have that work with the rest of your legacy/stable
+> > dependencies?
+> > 
+> > RHEL7 uses a 1.5.3 based version. I don't think it matters if we update
+> > 4.2 to be Python3 only, really.
+> 
+> It depends on how old the distro is and what update policy it
+> uses... if parts of it are regularly updated, it might actually be
+> usable. In this case, I think we really need to interpret our policy
+> to include EPEL, or it is completely nuts.
 
-# ppcemb: dropped in 3.1
-#
-# Since: 3.0
-##
-{ 'enum' : 'SysEmuTarget',
+Let's do that, please.  If we simply include EPEL in our policy
+we don't need to treat Python as special.
 
-You'll add a new line, right after ppcemb, which states
-
-# avr: since 4.1
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
-
---GDSGiFpuL8rVtI11hR0gG99qj15VZeMbu
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlz1eUMACgkQp6FrSiUn
-Q2p0xAf+IC56CPJeEJJpC88EQoYapRDosg/onWsV1EGWwXYHB9wYs0prgJZWx2Eo
-XK0u5NAg1/YLIg2xL2uuG48qPKzpJf3yrIvL0rtpWyTcFWb8XGzlb/OItwFRG7jN
-iZf6GZWkxESEFPn9BgIRR+Av4TrC18rgeGzJ8ggwn3UO1d/6WLn0tMNGHxQqb2k7
-+uSko1MRlIM+pe7v2/eAVvcA+YJs2CB0gpKV8W1G9NLG/4p6wIZmrjbGqBWZHefL
-i1S4p6Pk9FMO7MVrzR5o75+ZUUDG9+lzGTZ57rQn/t2qWxpAKr2NNyTm34dDzL1l
-7RQy+NHNAf8UG2ovaV/dfk0rFBr6yQ==
-=78iO
------END PGP SIGNATURE-----
-
---GDSGiFpuL8rVtI11hR0gG99qj15VZeMbu--
+-- 
+Eduardo
 
