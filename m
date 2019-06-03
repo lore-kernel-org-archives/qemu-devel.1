@@ -2,72 +2,67 @@ Return-Path: <SRS0=e5mL=UC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BE15FC04AB5
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 18:40:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 97F16C04AB5
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 18:41:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 86F9B27278
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 18:40:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 86F9B27278
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 506BC2731D
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 18:41:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 506BC2731D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:39361 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:39366 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hXrsw-0003zM-Ns
-	for qemu-devel@archiver.kernel.org; Mon, 03 Jun 2019 14:40:42 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:35267)
+	id 1hXrtQ-0004Pc-Dv
+	for qemu-devel@archiver.kernel.org; Mon, 03 Jun 2019 14:41:12 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:35105)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hXrr4-0002iJ-KG
-	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 14:38:48 -0400
+	(envelope-from <alex.williamson@redhat.com>) id 1hXrr1-0002d2-HA
+	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 14:38:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hXrjL-0004Mt-Or
-	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 14:30:49 -0400
-Received: from indium.canonical.com ([91.189.90.7]:36584)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hXrjL-0004KI-Ho
-	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 14:30:47 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hXrjJ-000867-FX
-	for <qemu-devel@nongnu.org>; Mon, 03 Jun 2019 18:30:45 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 713322E80C8
-	for <qemu-devel@nongnu.org>; Mon,  3 Jun 2019 18:30:45 +0000 (UTC)
+	(envelope-from <alex.williamson@redhat.com>) id 1hXrkS-0006AQ-RB
+	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 14:31:59 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36614)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+	id 1hXrkJ-0005F8-Pi
+	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 14:31:49 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 449333098558;
+	Mon,  3 Jun 2019 18:31:24 +0000 (UTC)
+Received: from x1.home (ovpn-116-22.phx2.redhat.com [10.3.116.22])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 8C0C361B6A;
+	Mon,  3 Jun 2019 18:31:17 +0000 (UTC)
+Date: Mon, 3 Jun 2019 12:31:16 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Eric Auger <eric.auger@redhat.com>
+Message-ID: <20190603123116.10e4578a@x1.home>
+In-Reply-To: <20190527095904.1079-1-eric.auger@redhat.com>
+References: <20190527095904.1079-1-eric.auger@redhat.com>
+Organization: Red Hat
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 03 Jun 2019 18:22:13 -0000
-From: elmarco <marcandre.lureau@gmail.com>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: marcandre-lureau
-X-Launchpad-Bug-Reporter: elmarco (marcandre-lureau)
-X-Launchpad-Bug-Modifier: elmarco (marcandre-lureau)
-Message-Id: <155958613349.25037.18347376667379404456.malonedeb@gac.canonical.com>
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="18968";
-	Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: b4a7f8091aeaa260d815a11c897160aa85df4042
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.49]);
+	Mon, 03 Jun 2019 18:31:24 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1831486] [NEW] qmp monitor deadlock (with spice
- events for ex)
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v2] vfio/common: Introduce
+ vfio_set_irq_signaling helper
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -76,187 +71,564 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1831486 <1831486@bugs.launchpad.net>
+Cc: aik@ozlabs.ru, cohuck@redhat.com, qemu-devel@nongnu.org,
+	eric.auger.pro@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Public bug reported:
+On Mon, 27 May 2019 11:59:04 +0200
+Eric Auger <eric.auger@redhat.com> wrote:
 
-If an event is emitted during monitor_flush_locked() it will deadlock.
+> The code used to assign an interrupt index/subindex to an
+> eventfd is duplicated many times. Let's introduce an helper that
+> allows to set/unset the signaling for an ACTION_TRIGGER,
+> ACTION_MASK or ACTION_UNMASK action.
+> 
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> 
+> ---
+> 
+> v1 -> v2:
+> - don't call GET_IRQ_INFO in vfio_set_irq_signaling()
+>   and restore quiet check in vfio_register_req_notifier.
+>   Nicer display of the IRQ name.
 
-Thread 1 (Thread 0x7f14f1854000 (LWP 7245)):
-#0  0x00007f14fc30592d in __lll_lock_wait () at /lib64/libpthread.so.0
-#1  0x00007f14fc2fedc9 in pthread_mutex_lock () at /lib64/libpthread.so.0
-#2  0x000055de60e19327 in qemu_mutex_lock_impl (mutex=3D0x55de61859e58, fil=
-e=3D0x55de60f1a640 "/home/elmarco/src/qq/monitor.c", line=3D438) at /home/e=
-lmarco/src/qq/util/qemu-thread-posix.c:66
-#3  0x000055de6085c5af in monitor_puts (mon=3D0x55de61859d30, str=3D0x55de6=
-2a61d30 "{\"timestamp\": {\"seconds\": 1559585795, \"microseconds\": 508720=
-}, \"event\": \"SPICE_DISCONNECTED\", \"data\": {\"server\": {\"port\": \"/=
-tmp/.9IW52Z/spice.sock\", \"family\": \"unix\", \"host\": \"localhost\"}, \=
-"client\": {"...) at /home/elmarco/src/qq/monitor.c:438
-#4  0x000055de6085c85a in qmp_send_response (mon=3D0x55de61859d30, rsp=3D0x=
-55de61ed19a0) at /home/elmarco/src/qq/monitor.c:493
-#5  0x000055de6085c8ee in monitor_qapi_event_emit (event=3DQAPI_EVENT_SPICE=
-_DISCONNECTED, qdict=3D0x55de61ed19a0) at /home/elmarco/src/qq/monitor.c:521
-#6  0x000055de6085c9ea in monitor_qapi_event_queue_no_reenter (event=3DQAPI=
-_EVENT_SPICE_DISCONNECTED, qdict=3D0x55de61ed19a0) at /home/elmarco/src/qq/=
-monitor.c:546
-#7  0x000055de6085cd7a in qapi_event_emit (event=3DQAPI_EVENT_SPICE_DISCONN=
-ECTED, qdict=3D0x55de61ed19a0) at /home/elmarco/src/qq/monitor.c:621
-#8  0x000055de60e04bc3 in qapi_event_send_spice_disconnected (server=3D0x55=
-de61ee7b30, client=3D0x55de620c9090) at qapi/qapi-events-ui.c:101
-#9  0x000055de60c84381 in channel_event (event=3D3, info=3D0x55de6222f4c0) =
-at /home/elmarco/src/qq/ui/spice-core.c:234
-#10 0x00007f14fc70ba3b in reds_handle_channel_event (reds=3D<optimized out>=
-, event=3D3, info=3D0x55de6222f4c0) at reds.c:318
-#11 0x00007f14fc6f407b in main_dispatcher_self_handle_channel_event (info=
-=3D0x55de6222f4c0, event=3D3, self=3D0x55de61a5b0b0) at main-dispatcher.c:1=
-91
-#12 0x00007f14fc6f407b in main_dispatcher_channel_event (self=3D0x55de61a5b=
-0b0, event=3Devent@entry=3D3, info=3D0x55de6222f4c0) at main-dispatcher.c:1=
-91
-#13 0x00007f14fc713cf3 in red_stream_push_channel_event (s=3Ds@entry=3D0x55=
-de6222f400, event=3Devent@entry=3D3) at red-stream.c:416
-#14 0x00007f14fc713d2b in red_stream_free (s=3D0x55de6222f400) at red-strea=
-m.c:390
-#15 0x00007f14fc6fa67c in red_channel_client_finalize (object=3D0x55de62511=
-360) at red-channel-client.c:347
-#16 0x00007f14fe4cfcf0 in g_object_unref () at /lib64/libgobject-2.0.so.0
-#17 0x00007f14fc6fca12 in red_channel_client_push (rcc=3D0x55de62511360) at=
- red-channel-client.c:1340
-#18 0x00007f14fc6fca12 in red_channel_client_push (rcc=3D0x55de62511360) at=
- red-channel-client.c:1303
-#19 0x00007f14fc6cd479 in red_char_device_send_msg_to_client (client=3D<opt=
-imized out>, msg=3D0x55de62512c00, dev=3D0x55de61a5b3b0) at char-device.c:3=
-07
-#20 0x00007f14fc6cd479 in red_char_device_send_msg_to_clients (msg=3D0x55de=
-62512c00, dev=3D0x55de61a5b3b0) at char-device.c:307
-#21 0x00007f14fc6cd479 in red_char_device_read_from_device (dev=3D0x55de61a=
-5b3b0) at char-device.c:355
-#22 0x000055de60a27dba in spice_chr_write (chr=3D0x55de61924c00, buf=3D0x55=
-de6236c070 "{\"return\": {}, \"id\": 2}\r\n", len=3D25) at /home/elmarco/sr=
-c/qq/chardev/spice.c:201
-#23 0x000055de60d89e29 in qemu_chr_write_buffer (s=3D0x55de61924c00, buf=3D=
-0x55de6236c070 "{\"return\": {}, \"id\": 2}\r\n", len=3D25, offset=3D0x7ffc=
-d5e1a860, write_all=3Dfalse) at /home/elmarco/src/qq/chardev/char.c:113
-#24 0x000055de60d89f96 in qemu_chr_write (s=3D0x55de61924c00, buf=3D0x55de6=
-236c070 "{\"return\": {}, \"id\": 2}\r\n", len=3D25, write_all=3Dfalse) at =
-/home/elmarco/src/qq/chardev/char.c:148
-#25 0x000055de60d8cf78 in qemu_chr_fe_write (be=3D0x55de61859d30, buf=3D0x5=
-5de6236c070 "{\"return\": {}, \"id\": 2}\r\n", len=3D25) at /home/elmarco/s=
-rc/qq/chardev/char-fe.c:42
-#26 0x000055de6085c40f in monitor_flush_locked (mon=3D0x55de61859d30) at /h=
-ome/elmarco/src/qq/monitor.c:404
-#27 0x000055de6085c614 in monitor_puts (mon=3D0x55de61859d30, str=3D0x55de6=
-22f6a40 "{\"return\": {}, \"id\": 2}\n") at /home/elmarco/src/qq/monitor.c:=
-446
-#28 0x000055de6085c85a in qmp_send_response (mon=3D0x55de61859d30, rsp=3D0x=
-55de61ecf960) at /home/elmarco/src/qq/monitor.c:493
-#29 0x000055de60865902 in monitor_qmp_respond (mon=3D0x55de61859d30, rsp=3D=
-0x55de61ecf960) at /home/elmarco/src/qq/monitor.c:4128
-#30 0x000055de60865a19 in monitor_qmp_dispatch (mon=3D0x55de61859d30, req=
-=3D0x55de622ec000) at /home/elmarco/src/qq/monitor.c:4157
-#31 0x000055de60865ce2 in monitor_qmp_bh_dispatcher (data=3D0x0) at /home/e=
-lmarco/src/qq/monitor.c:4224
+Hi Eric,
 
-** Affects: qemu
-     Importance: Undecided
-         Status: New
+On this last item, it looks like irq_to_str() is now PCI specific, but
+used generically.  Do you really want error messages with PCI interrupt
+names on platform devices?  If we were to include PCI specific names,
+we'd need to test the device is PCI or else default to simply printing
+the index as you has previously.  Thanks,
 
--- =
+Alex
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1831486
+> This is a follow-up to
+> [PATCH v2 0/2] vfio-pci: Introduce vfio_set_event_handler().
+> It looks to me that introducing vfio_set_irq_signaling() has more
+> benefits in term of code reduction and the helper abstraction
+> looks cleaner.
+> ---
+>  hw/vfio/common.c              |  78 ++++++++++++
+>  hw/vfio/pci.c                 | 217 ++++++++--------------------------
+>  hw/vfio/platform.c            |  54 +++------
+>  include/hw/vfio/vfio-common.h |   2 +
+>  4 files changed, 150 insertions(+), 201 deletions(-)
+> 
+> diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+> index 4374cc6176..1f1deff360 100644
+> --- a/hw/vfio/common.c
+> +++ b/hw/vfio/common.c
+> @@ -95,6 +95,84 @@ void vfio_mask_single_irqindex(VFIODevice *vbasedev, int index)
+>      ioctl(vbasedev->fd, VFIO_DEVICE_SET_IRQS, &irq_set);
+>  }
+>  
+> +static inline const char *action_to_str(int action)
+> +{
+> +    switch (action) {
+> +    case VFIO_IRQ_SET_ACTION_MASK:
+> +        return "MASK";
+> +    case VFIO_IRQ_SET_ACTION_UNMASK:
+> +        return "UNMASK";
+> +    case VFIO_IRQ_SET_ACTION_TRIGGER:
+> +        return "TRIGGER";
+> +    default:
+> +        return "UNKNOWN ACTION";
+> +    }
+> +}
+> +
+> +static char *irq_to_str(int index, int subindex)
+> +{
+> +    char *str;
+> +
+> +    switch (index) {
+> +    case VFIO_PCI_INTX_IRQ_INDEX:
+> +        str = g_strdup_printf("INTX-%d", subindex);
+> +        break;
+> +    case VFIO_PCI_MSI_IRQ_INDEX:
+> +        str = g_strdup_printf("MSI-%d", subindex);
+> +        break;
+> +    case VFIO_PCI_MSIX_IRQ_INDEX:
+> +        str = g_strdup_printf("MSIX-%d", subindex);
+> +        break;
+> +    case VFIO_PCI_ERR_IRQ_INDEX:
+> +        str = g_strdup_printf("ERR-%d", subindex);
+> +        break;
+> +    case VFIO_PCI_REQ_IRQ_INDEX:
+> +        str = g_strdup_printf("REQ-%d", subindex);
+> +        break;
+> +    default:
+> +        str = g_strdup_printf("index %d (unknown)", index);
+> +        break;
+> +    }
+> +    return str;
+> +}
+> +
+> +int vfio_set_irq_signaling(VFIODevice *vbasedev, int index, int subindex,
+> +                           int action, int fd, Error **errp)
+> +{
+> +    struct vfio_irq_set *irq_set;
+> +    int argsz, ret = 0;
+> +    int32_t *pfd;
+> +    char *irq_name;
+> +
+> +    argsz = sizeof(*irq_set) + sizeof(*pfd);
+> +
+> +    irq_set = g_malloc0(argsz);
+> +    irq_set->argsz = argsz;
+> +    irq_set->flags = VFIO_IRQ_SET_DATA_EVENTFD | action;
+> +    irq_set->index = index;
+> +    irq_set->start = subindex;
+> +    irq_set->count = 1;
+> +    pfd = (int32_t *)&irq_set->data;
+> +    *pfd = fd;
+> +
+> +    ret = ioctl(vbasedev->fd, VFIO_DEVICE_SET_IRQS, irq_set);
+> +
+> +    g_free(irq_set);
+> +
+> +    if (!ret) {
+> +        return 0;
+> +    }
+> +
+> +    error_setg_errno(errp, -ret, "VFIO_DEVICE_SET_IRQS failure");
+> +    irq_name = irq_to_str(index, subindex);
+> +    error_prepend(errp,
+> +                  "Failed to %s %s eventfd signaling for interrupt %s: ",
+> +                  fd < 0 ? "tear down" : "set up", action_to_str(action),
+> +                  irq_name);
+> +    g_free(irq_name);
+> +    return ret;
+> +}
+> +
+>  /*
+>   * IO Port/MMIO - Beware of the endians, VFIO is always little endian
+>   */
+> diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+> index 8cecb53d5c..e42901bd66 100644
+> --- a/hw/vfio/pci.c
+> +++ b/hw/vfio/pci.c
+> @@ -113,9 +113,7 @@ static void vfio_intx_enable_kvm(VFIOPCIDevice *vdev, Error **errp)
+>          .gsi = vdev->intx.route.irq,
+>          .flags = KVM_IRQFD_FLAG_RESAMPLE,
+>      };
+> -    struct vfio_irq_set *irq_set;
+> -    int ret, argsz;
+> -    int32_t *pfd;
+> +    Error *err = NULL;
+>  
+>      if (vdev->no_kvm_intx || !kvm_irqfds_enabled() ||
+>          vdev->intx.route.mode != PCI_INTX_ENABLED ||
+> @@ -143,22 +141,10 @@ static void vfio_intx_enable_kvm(VFIOPCIDevice *vdev, Error **errp)
+>          goto fail_irqfd;
+>      }
+>  
+> -    argsz = sizeof(*irq_set) + sizeof(*pfd);
+> -
+> -    irq_set = g_malloc0(argsz);
+> -    irq_set->argsz = argsz;
+> -    irq_set->flags = VFIO_IRQ_SET_DATA_EVENTFD | VFIO_IRQ_SET_ACTION_UNMASK;
+> -    irq_set->index = VFIO_PCI_INTX_IRQ_INDEX;
+> -    irq_set->start = 0;
+> -    irq_set->count = 1;
+> -    pfd = (int32_t *)&irq_set->data;
+> -
+> -    *pfd = irqfd.resamplefd;
+> -
+> -    ret = ioctl(vdev->vbasedev.fd, VFIO_DEVICE_SET_IRQS, irq_set);
+> -    g_free(irq_set);
+> -    if (ret) {
+> -        error_setg_errno(errp, -ret, "failed to setup INTx unmask fd");
+> +    if (vfio_set_irq_signaling(&vdev->vbasedev, VFIO_PCI_INTX_IRQ_INDEX, 0,
+> +                               VFIO_IRQ_SET_ACTION_UNMASK,
+> +                               irqfd.resamplefd, &err)) {
+> +        error_propagate(errp, err);
+>          goto fail_vfio;
+>      }
+>  
+> @@ -262,10 +248,10 @@ static void vfio_intx_update(PCIDevice *pdev)
+>  static int vfio_intx_enable(VFIOPCIDevice *vdev, Error **errp)
+>  {
+>      uint8_t pin = vfio_pci_read_config(&vdev->pdev, PCI_INTERRUPT_PIN, 1);
+> -    int ret, argsz, retval = 0;
+> -    struct vfio_irq_set *irq_set;
+> -    int32_t *pfd;
+>      Error *err = NULL;
+> +    int32_t fd;
+> +    int ret;
+> +
+>  
+>      if (!pin) {
+>          return 0;
+> @@ -292,27 +278,15 @@ static int vfio_intx_enable(VFIOPCIDevice *vdev, Error **errp)
+>          error_setg_errno(errp, -ret, "event_notifier_init failed");
+>          return ret;
+>      }
+> +    fd = event_notifier_get_fd(&vdev->intx.interrupt);
+> +    qemu_set_fd_handler(fd, vfio_intx_interrupt, NULL, vdev);
+>  
+> -    argsz = sizeof(*irq_set) + sizeof(*pfd);
+> -
+> -    irq_set = g_malloc0(argsz);
+> -    irq_set->argsz = argsz;
+> -    irq_set->flags = VFIO_IRQ_SET_DATA_EVENTFD | VFIO_IRQ_SET_ACTION_TRIGGER;
+> -    irq_set->index = VFIO_PCI_INTX_IRQ_INDEX;
+> -    irq_set->start = 0;
+> -    irq_set->count = 1;
+> -    pfd = (int32_t *)&irq_set->data;
+> -
+> -    *pfd = event_notifier_get_fd(&vdev->intx.interrupt);
+> -    qemu_set_fd_handler(*pfd, vfio_intx_interrupt, NULL, vdev);
+> -
+> -    ret = ioctl(vdev->vbasedev.fd, VFIO_DEVICE_SET_IRQS, irq_set);
+> -    if (ret) {
+> -        error_setg_errno(errp, -ret, "failed to setup INTx fd");
+> -        qemu_set_fd_handler(*pfd, NULL, NULL, vdev);
+> +    if (vfio_set_irq_signaling(&vdev->vbasedev, VFIO_PCI_INTX_IRQ_INDEX, 0,
+> +                               VFIO_IRQ_SET_ACTION_TRIGGER, fd, &err)) {
+> +        error_propagate(errp, err);
+> +        qemu_set_fd_handler(fd, NULL, NULL, vdev);
+>          event_notifier_cleanup(&vdev->intx.interrupt);
+> -        retval = -errno;
+> -        goto cleanup;
+> +        return -errno;
+>      }
+>  
+>      vfio_intx_enable_kvm(vdev, &err);
+> @@ -323,11 +297,7 @@ static int vfio_intx_enable(VFIOPCIDevice *vdev, Error **errp)
+>      vdev->interrupt = VFIO_INT_INTx;
+>  
+>      trace_vfio_intx_enable(vdev->vbasedev.name);
+> -
+> -cleanup:
+> -    g_free(irq_set);
+> -
+> -    return retval;
+> +    return 0;
+>  }
+>  
+>  static void vfio_intx_disable(VFIOPCIDevice *vdev)
+> @@ -530,31 +500,19 @@ static int vfio_msix_vector_do_use(PCIDevice *pdev, unsigned int nr,
+>              error_report("vfio: failed to enable vectors, %d", ret);
+>          }
+>      } else {
+> -        int argsz;
+> -        struct vfio_irq_set *irq_set;
+> -        int32_t *pfd;
+> -
+> -        argsz = sizeof(*irq_set) + sizeof(*pfd);
+> -
+> -        irq_set = g_malloc0(argsz);
+> -        irq_set->argsz = argsz;
+> -        irq_set->flags = VFIO_IRQ_SET_DATA_EVENTFD |
+> -                         VFIO_IRQ_SET_ACTION_TRIGGER;
+> -        irq_set->index = VFIO_PCI_MSIX_IRQ_INDEX;
+> -        irq_set->start = nr;
+> -        irq_set->count = 1;
+> -        pfd = (int32_t *)&irq_set->data;
+> +        Error *err = NULL;
+> +        int32_t fd;
+>  
+>          if (vector->virq >= 0) {
+> -            *pfd = event_notifier_get_fd(&vector->kvm_interrupt);
+> +            fd = event_notifier_get_fd(&vector->kvm_interrupt);
+>          } else {
+> -            *pfd = event_notifier_get_fd(&vector->interrupt);
+> +            fd = event_notifier_get_fd(&vector->interrupt);
+>          }
+>  
+> -        ret = ioctl(vdev->vbasedev.fd, VFIO_DEVICE_SET_IRQS, irq_set);
+> -        g_free(irq_set);
+> -        if (ret) {
+> -            error_report("vfio: failed to modify vector, %d", ret);
+> +        if (vfio_set_irq_signaling(&vdev->vbasedev,
+> +                                     VFIO_PCI_MSIX_IRQ_INDEX, nr,
+> +                                     VFIO_IRQ_SET_ACTION_TRIGGER, fd, &err)) {
+> +            error_reportf_err(err, VFIO_MSG_PREFIX, vdev->vbasedev.name);
+>          }
+>      }
+>  
+> @@ -591,26 +549,10 @@ static void vfio_msix_vector_release(PCIDevice *pdev, unsigned int nr)
+>       * be re-asserted on unmask.  Nothing to do if already using QEMU mode.
+>       */
+>      if (vector->virq >= 0) {
+> -        int argsz;
+> -        struct vfio_irq_set *irq_set;
+> -        int32_t *pfd;
+> +        int32_t fd = event_notifier_get_fd(&vector->interrupt);
+>  
+> -        argsz = sizeof(*irq_set) + sizeof(*pfd);
+> -
+> -        irq_set = g_malloc0(argsz);
+> -        irq_set->argsz = argsz;
+> -        irq_set->flags = VFIO_IRQ_SET_DATA_EVENTFD |
+> -                         VFIO_IRQ_SET_ACTION_TRIGGER;
+> -        irq_set->index = VFIO_PCI_MSIX_IRQ_INDEX;
+> -        irq_set->start = nr;
+> -        irq_set->count = 1;
+> -        pfd = (int32_t *)&irq_set->data;
+> -
+> -        *pfd = event_notifier_get_fd(&vector->interrupt);
+> -
+> -        ioctl(vdev->vbasedev.fd, VFIO_DEVICE_SET_IRQS, irq_set);
+> -
+> -        g_free(irq_set);
+> +        vfio_set_irq_signaling(&vdev->vbasedev, VFIO_PCI_MSIX_IRQ_INDEX, nr,
+> +                               VFIO_IRQ_SET_ACTION_TRIGGER, fd, NULL);
+>      }
+>  }
+>  
+> @@ -2636,10 +2578,8 @@ static void vfio_err_notifier_handler(void *opaque)
+>   */
+>  static void vfio_register_err_notifier(VFIOPCIDevice *vdev)
+>  {
+> -    int ret;
+> -    int argsz;
+> -    struct vfio_irq_set *irq_set;
+> -    int32_t *pfd;
+> +    Error *err = NULL;
+> +    int32_t fd;
+>  
+>      if (!vdev->pci_aer) {
+>          return;
+> @@ -2651,58 +2591,30 @@ static void vfio_register_err_notifier(VFIOPCIDevice *vdev)
+>          return;
+>      }
+>  
+> -    argsz = sizeof(*irq_set) + sizeof(*pfd);
+> +    fd = event_notifier_get_fd(&vdev->err_notifier);
+> +    qemu_set_fd_handler(fd, vfio_err_notifier_handler, NULL, vdev);
+>  
+> -    irq_set = g_malloc0(argsz);
+> -    irq_set->argsz = argsz;
+> -    irq_set->flags = VFIO_IRQ_SET_DATA_EVENTFD |
+> -                     VFIO_IRQ_SET_ACTION_TRIGGER;
+> -    irq_set->index = VFIO_PCI_ERR_IRQ_INDEX;
+> -    irq_set->start = 0;
+> -    irq_set->count = 1;
+> -    pfd = (int32_t *)&irq_set->data;
+> -
+> -    *pfd = event_notifier_get_fd(&vdev->err_notifier);
+> -    qemu_set_fd_handler(*pfd, vfio_err_notifier_handler, NULL, vdev);
+> -
+> -    ret = ioctl(vdev->vbasedev.fd, VFIO_DEVICE_SET_IRQS, irq_set);
+> -    if (ret) {
+> -        error_report("vfio: Failed to set up error notification");
+> -        qemu_set_fd_handler(*pfd, NULL, NULL, vdev);
+> +    if (vfio_set_irq_signaling(&vdev->vbasedev, VFIO_PCI_ERR_IRQ_INDEX, 0,
+> +                               VFIO_IRQ_SET_ACTION_TRIGGER, fd, &err)) {
+> +        error_reportf_err(err, VFIO_MSG_PREFIX, vdev->vbasedev.name);
+> +        qemu_set_fd_handler(fd, NULL, NULL, vdev);
+>          event_notifier_cleanup(&vdev->err_notifier);
+>          vdev->pci_aer = false;
+>      }
+> -    g_free(irq_set);
+>  }
+>  
+>  static void vfio_unregister_err_notifier(VFIOPCIDevice *vdev)
+>  {
+> -    int argsz;
+> -    struct vfio_irq_set *irq_set;
+> -    int32_t *pfd;
+> -    int ret;
+> +    Error *err = NULL;
+>  
+>      if (!vdev->pci_aer) {
+>          return;
+>      }
+>  
+> -    argsz = sizeof(*irq_set) + sizeof(*pfd);
+> -
+> -    irq_set = g_malloc0(argsz);
+> -    irq_set->argsz = argsz;
+> -    irq_set->flags = VFIO_IRQ_SET_DATA_EVENTFD |
+> -                     VFIO_IRQ_SET_ACTION_TRIGGER;
+> -    irq_set->index = VFIO_PCI_ERR_IRQ_INDEX;
+> -    irq_set->start = 0;
+> -    irq_set->count = 1;
+> -    pfd = (int32_t *)&irq_set->data;
+> -    *pfd = -1;
+> -
+> -    ret = ioctl(vdev->vbasedev.fd, VFIO_DEVICE_SET_IRQS, irq_set);
+> -    if (ret) {
+> -        error_report("vfio: Failed to de-assign error fd: %m");
+> +    if (vfio_set_irq_signaling(&vdev->vbasedev, VFIO_PCI_ERR_IRQ_INDEX, 0,
+> +                               VFIO_IRQ_SET_ACTION_TRIGGER, -1, &err)) {
+> +        error_reportf_err(err, VFIO_MSG_PREFIX, vdev->vbasedev.name);
+>      }
+> -    g_free(irq_set);
+>      qemu_set_fd_handler(event_notifier_get_fd(&vdev->err_notifier),
+>                          NULL, NULL, vdev);
+>      event_notifier_cleanup(&vdev->err_notifier);
+> @@ -2727,9 +2639,8 @@ static void vfio_register_req_notifier(VFIOPCIDevice *vdev)
+>  {
+>      struct vfio_irq_info irq_info = { .argsz = sizeof(irq_info),
+>                                        .index = VFIO_PCI_REQ_IRQ_INDEX };
+> -    int argsz;
+> -    struct vfio_irq_set *irq_set;
+> -    int32_t *pfd;
+> +    Error *err = NULL;
+> +    int32_t fd;
+>  
+>      if (!(vdev->features & VFIO_FEATURE_ENABLE_REQ)) {
+>          return;
+> @@ -2745,57 +2656,31 @@ static void vfio_register_req_notifier(VFIOPCIDevice *vdev)
+>          return;
+>      }
+>  
+> -    argsz = sizeof(*irq_set) + sizeof(*pfd);
+> +    fd = event_notifier_get_fd(&vdev->req_notifier);
+> +    qemu_set_fd_handler(fd, vfio_req_notifier_handler, NULL, vdev);
+>  
+> -    irq_set = g_malloc0(argsz);
+> -    irq_set->argsz = argsz;
+> -    irq_set->flags = VFIO_IRQ_SET_DATA_EVENTFD |
+> -                     VFIO_IRQ_SET_ACTION_TRIGGER;
+> -    irq_set->index = VFIO_PCI_REQ_IRQ_INDEX;
+> -    irq_set->start = 0;
+> -    irq_set->count = 1;
+> -    pfd = (int32_t *)&irq_set->data;
+> -
+> -    *pfd = event_notifier_get_fd(&vdev->req_notifier);
+> -    qemu_set_fd_handler(*pfd, vfio_req_notifier_handler, NULL, vdev);
+> -
+> -    if (ioctl(vdev->vbasedev.fd, VFIO_DEVICE_SET_IRQS, irq_set)) {
+> -        error_report("vfio: Failed to set up device request notification");
+> -        qemu_set_fd_handler(*pfd, NULL, NULL, vdev);
+> +    if (vfio_set_irq_signaling(&vdev->vbasedev, VFIO_PCI_REQ_IRQ_INDEX, 0,
+> +                           VFIO_IRQ_SET_ACTION_TRIGGER, fd, &err)) {
+> +        error_reportf_err(err, VFIO_MSG_PREFIX, vdev->vbasedev.name);
+> +        qemu_set_fd_handler(fd, NULL, NULL, vdev);
+>          event_notifier_cleanup(&vdev->req_notifier);
+>      } else {
+>          vdev->req_enabled = true;
+>      }
+> -
+> -    g_free(irq_set);
+>  }
+>  
+>  static void vfio_unregister_req_notifier(VFIOPCIDevice *vdev)
+>  {
+> -    int argsz;
+> -    struct vfio_irq_set *irq_set;
+> -    int32_t *pfd;
+> +    Error *err = NULL;
+>  
+>      if (!vdev->req_enabled) {
+>          return;
+>      }
+>  
+> -    argsz = sizeof(*irq_set) + sizeof(*pfd);
+> -
+> -    irq_set = g_malloc0(argsz);
+> -    irq_set->argsz = argsz;
+> -    irq_set->flags = VFIO_IRQ_SET_DATA_EVENTFD |
+> -                     VFIO_IRQ_SET_ACTION_TRIGGER;
+> -    irq_set->index = VFIO_PCI_REQ_IRQ_INDEX;
+> -    irq_set->start = 0;
+> -    irq_set->count = 1;
+> -    pfd = (int32_t *)&irq_set->data;
+> -    *pfd = -1;
+> -
+> -    if (ioctl(vdev->vbasedev.fd, VFIO_DEVICE_SET_IRQS, irq_set)) {
+> -        error_report("vfio: Failed to de-assign device request fd: %m");
+> +    if (vfio_set_irq_signaling(&vdev->vbasedev, VFIO_PCI_REQ_IRQ_INDEX, 0,
+> +                               VFIO_IRQ_SET_ACTION_TRIGGER, -1, &err)) {
+> +        error_reportf_err(err, VFIO_MSG_PREFIX, vdev->vbasedev.name);
+>      }
+> -    g_free(irq_set);
+>      qemu_set_fd_handler(event_notifier_get_fd(&vdev->req_notifier),
+>                          NULL, NULL, vdev);
+>      event_notifier_cleanup(&vdev->req_notifier);
+> diff --git a/hw/vfio/platform.c b/hw/vfio/platform.c
+> index 398db38f14..6e64d42c96 100644
+> --- a/hw/vfio/platform.c
+> +++ b/hw/vfio/platform.c
+> @@ -106,26 +106,19 @@ static int vfio_set_trigger_eventfd(VFIOINTp *intp,
+>                                      eventfd_user_side_handler_t handler)
+>  {
+>      VFIODevice *vbasedev = &intp->vdev->vbasedev;
+> -    struct vfio_irq_set *irq_set;
+> -    int argsz, ret;
+> -    int32_t *pfd;
+> +    int32_t fd = event_notifier_get_fd(intp->interrupt);
+> +    Error *err = NULL;
+> +    int ret;
+>  
+> -    argsz = sizeof(*irq_set) + sizeof(*pfd);
+> -    irq_set = g_malloc0(argsz);
+> -    irq_set->argsz = argsz;
+> -    irq_set->flags = VFIO_IRQ_SET_DATA_EVENTFD | VFIO_IRQ_SET_ACTION_TRIGGER;
+> -    irq_set->index = intp->pin;
+> -    irq_set->start = 0;
+> -    irq_set->count = 1;
+> -    pfd = (int32_t *)&irq_set->data;
+> -    *pfd = event_notifier_get_fd(intp->interrupt);
+> -    qemu_set_fd_handler(*pfd, (IOHandler *)handler, NULL, intp);
+> -    ret = ioctl(vbasedev->fd, VFIO_DEVICE_SET_IRQS, irq_set);
+> -    if (ret < 0) {
+> -        error_report("vfio: Failed to set trigger eventfd: %m");
+> -        qemu_set_fd_handler(*pfd, NULL, NULL, NULL);
+> +    qemu_set_fd_handler(fd, (IOHandler *)handler, NULL, intp);
+> +
+> +    ret = vfio_set_irq_signaling(vbasedev, intp->pin, 0,
+> +                                 VFIO_IRQ_SET_ACTION_TRIGGER, fd, &err);
+> +    if (ret) {
+> +        error_reportf_err(err, VFIO_MSG_PREFIX, vbasedev->name);
+> +        qemu_set_fd_handler(fd, NULL, NULL, NULL);
+>      }
+> -    g_free(irq_set);
+> +
+>      return ret;
+>  }
+>  
+> @@ -361,25 +354,16 @@ static void vfio_start_eventfd_injection(SysBusDevice *sbdev, qemu_irq irq)
+>   */
+>  static int vfio_set_resample_eventfd(VFIOINTp *intp)
+>  {
+> +    int32_t fd = event_notifier_get_fd(intp->unmask);
+>      VFIODevice *vbasedev = &intp->vdev->vbasedev;
+> -    struct vfio_irq_set *irq_set;
+> -    int argsz, ret;
+> -    int32_t *pfd;
+> +    Error *err = NULL;
+> +    int ret;
+>  
+> -    argsz = sizeof(*irq_set) + sizeof(*pfd);
+> -    irq_set = g_malloc0(argsz);
+> -    irq_set->argsz = argsz;
+> -    irq_set->flags = VFIO_IRQ_SET_DATA_EVENTFD | VFIO_IRQ_SET_ACTION_UNMASK;
+> -    irq_set->index = intp->pin;
+> -    irq_set->start = 0;
+> -    irq_set->count = 1;
+> -    pfd = (int32_t *)&irq_set->data;
+> -    *pfd = event_notifier_get_fd(intp->unmask);
+> -    qemu_set_fd_handler(*pfd, NULL, NULL, NULL);
+> -    ret = ioctl(vbasedev->fd, VFIO_DEVICE_SET_IRQS, irq_set);
+> -    g_free(irq_set);
+> -    if (ret < 0) {
+> -        error_report("vfio: Failed to set resample eventfd: %m");
+> +    qemu_set_fd_handler(fd, NULL, NULL, NULL);
+> +    ret = vfio_set_irq_signaling(vbasedev, intp->pin, 0,
+> +                                 VFIO_IRQ_SET_ACTION_UNMASK, fd, &err);
+> +    if (ret) {
+> +        error_reportf_err(err, VFIO_MSG_PREFIX, vbasedev->name);
+>      }
+>      return ret;
+>  }
+> diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
+> index 1155b79678..686d99ff8c 100644
+> --- a/include/hw/vfio/vfio-common.h
+> +++ b/include/hw/vfio/vfio-common.h
+> @@ -167,6 +167,8 @@ void vfio_put_base_device(VFIODevice *vbasedev);
+>  void vfio_disable_irqindex(VFIODevice *vbasedev, int index);
+>  void vfio_unmask_single_irqindex(VFIODevice *vbasedev, int index);
+>  void vfio_mask_single_irqindex(VFIODevice *vbasedev, int index);
+> +int vfio_set_irq_signaling(VFIODevice *vbasedev, int index, int subindex,
+> +                           int action, int fd, Error **errp);
+>  void vfio_region_write(void *opaque, hwaddr addr,
+>                             uint64_t data, unsigned size);
+>  uint64_t vfio_region_read(void *opaque,
 
-Title:
-  qmp monitor deadlock (with spice events for ex)
-
-Status in QEMU:
-  New
-
-Bug description:
-  If an event is emitted during monitor_flush_locked() it will deadlock.
-
-  Thread 1 (Thread 0x7f14f1854000 (LWP 7245)):
-  #0  0x00007f14fc30592d in __lll_lock_wait () at /lib64/libpthread.so.0
-  #1  0x00007f14fc2fedc9 in pthread_mutex_lock () at /lib64/libpthread.so.0
-  #2  0x000055de60e19327 in qemu_mutex_lock_impl (mutex=3D0x55de61859e58, f=
-ile=3D0x55de60f1a640 "/home/elmarco/src/qq/monitor.c", line=3D438) at /home=
-/elmarco/src/qq/util/qemu-thread-posix.c:66
-  #3  0x000055de6085c5af in monitor_puts (mon=3D0x55de61859d30, str=3D0x55d=
-e62a61d30 "{\"timestamp\": {\"seconds\": 1559585795, \"microseconds\": 5087=
-20}, \"event\": \"SPICE_DISCONNECTED\", \"data\": {\"server\": {\"port\": \=
-"/tmp/.9IW52Z/spice.sock\", \"family\": \"unix\", \"host\": \"localhost\"},=
- \"client\": {"...) at /home/elmarco/src/qq/monitor.c:438
-  #4  0x000055de6085c85a in qmp_send_response (mon=3D0x55de61859d30, rsp=3D=
-0x55de61ed19a0) at /home/elmarco/src/qq/monitor.c:493
-  #5  0x000055de6085c8ee in monitor_qapi_event_emit (event=3DQAPI_EVENT_SPI=
-CE_DISCONNECTED, qdict=3D0x55de61ed19a0) at /home/elmarco/src/qq/monitor.c:=
-521
-  #6  0x000055de6085c9ea in monitor_qapi_event_queue_no_reenter (event=3DQA=
-PI_EVENT_SPICE_DISCONNECTED, qdict=3D0x55de61ed19a0) at /home/elmarco/src/q=
-q/monitor.c:546
-  #7  0x000055de6085cd7a in qapi_event_emit (event=3DQAPI_EVENT_SPICE_DISCO=
-NNECTED, qdict=3D0x55de61ed19a0) at /home/elmarco/src/qq/monitor.c:621
-  #8  0x000055de60e04bc3 in qapi_event_send_spice_disconnected (server=3D0x=
-55de61ee7b30, client=3D0x55de620c9090) at qapi/qapi-events-ui.c:101
-  #9  0x000055de60c84381 in channel_event (event=3D3, info=3D0x55de6222f4c0=
-) at /home/elmarco/src/qq/ui/spice-core.c:234
-  #10 0x00007f14fc70ba3b in reds_handle_channel_event (reds=3D<optimized ou=
-t>, event=3D3, info=3D0x55de6222f4c0) at reds.c:318
-  #11 0x00007f14fc6f407b in main_dispatcher_self_handle_channel_event (info=
-=3D0x55de6222f4c0, event=3D3, self=3D0x55de61a5b0b0) at main-dispatcher.c:1=
-91
-  #12 0x00007f14fc6f407b in main_dispatcher_channel_event (self=3D0x55de61a=
-5b0b0, event=3Devent@entry=3D3, info=3D0x55de6222f4c0) at main-dispatcher.c=
-:191
-  #13 0x00007f14fc713cf3 in red_stream_push_channel_event (s=3Ds@entry=3D0x=
-55de6222f400, event=3Devent@entry=3D3) at red-stream.c:416
-  #14 0x00007f14fc713d2b in red_stream_free (s=3D0x55de6222f400) at red-str=
-eam.c:390
-  #15 0x00007f14fc6fa67c in red_channel_client_finalize (object=3D0x55de625=
-11360) at red-channel-client.c:347
-  #16 0x00007f14fe4cfcf0 in g_object_unref () at /lib64/libgobject-2.0.so.0
-  #17 0x00007f14fc6fca12 in red_channel_client_push (rcc=3D0x55de62511360) =
-at red-channel-client.c:1340
-  #18 0x00007f14fc6fca12 in red_channel_client_push (rcc=3D0x55de62511360) =
-at red-channel-client.c:1303
-  #19 0x00007f14fc6cd479 in red_char_device_send_msg_to_client (client=3D<o=
-ptimized out>, msg=3D0x55de62512c00, dev=3D0x55de61a5b3b0) at char-device.c=
-:307
-  #20 0x00007f14fc6cd479 in red_char_device_send_msg_to_clients (msg=3D0x55=
-de62512c00, dev=3D0x55de61a5b3b0) at char-device.c:307
-  #21 0x00007f14fc6cd479 in red_char_device_read_from_device (dev=3D0x55de6=
-1a5b3b0) at char-device.c:355
-  #22 0x000055de60a27dba in spice_chr_write (chr=3D0x55de61924c00, buf=3D0x=
-55de6236c070 "{\"return\": {}, \"id\": 2}\r\n", len=3D25) at /home/elmarco/=
-src/qq/chardev/spice.c:201
-  #23 0x000055de60d89e29 in qemu_chr_write_buffer (s=3D0x55de61924c00, buf=
-=3D0x55de6236c070 "{\"return\": {}, \"id\": 2}\r\n", len=3D25, offset=3D0x7=
-ffcd5e1a860, write_all=3Dfalse) at /home/elmarco/src/qq/chardev/char.c:113
-  #24 0x000055de60d89f96 in qemu_chr_write (s=3D0x55de61924c00, buf=3D0x55d=
-e6236c070 "{\"return\": {}, \"id\": 2}\r\n", len=3D25, write_all=3Dfalse) a=
-t /home/elmarco/src/qq/chardev/char.c:148
-  #25 0x000055de60d8cf78 in qemu_chr_fe_write (be=3D0x55de61859d30, buf=3D0=
-x55de6236c070 "{\"return\": {}, \"id\": 2}\r\n", len=3D25) at /home/elmarco=
-/src/qq/chardev/char-fe.c:42
-  #26 0x000055de6085c40f in monitor_flush_locked (mon=3D0x55de61859d30) at =
-/home/elmarco/src/qq/monitor.c:404
-  #27 0x000055de6085c614 in monitor_puts (mon=3D0x55de61859d30, str=3D0x55d=
-e622f6a40 "{\"return\": {}, \"id\": 2}\n") at /home/elmarco/src/qq/monitor.=
-c:446
-  #28 0x000055de6085c85a in qmp_send_response (mon=3D0x55de61859d30, rsp=3D=
-0x55de61ecf960) at /home/elmarco/src/qq/monitor.c:493
-  #29 0x000055de60865902 in monitor_qmp_respond (mon=3D0x55de61859d30, rsp=
-=3D0x55de61ecf960) at /home/elmarco/src/qq/monitor.c:4128
-  #30 0x000055de60865a19 in monitor_qmp_dispatch (mon=3D0x55de61859d30, req=
-=3D0x55de622ec000) at /home/elmarco/src/qq/monitor.c:4157
-  #31 0x000055de60865ce2 in monitor_qmp_bh_dispatcher (data=3D0x0) at /home=
-/elmarco/src/qq/monitor.c:4224
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1831486/+subscriptions
 
