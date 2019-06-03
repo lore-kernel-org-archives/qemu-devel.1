@@ -4,49 +4,50 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 47A30C04AB5
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 12:17:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D769C04AB5
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 12:18:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 19091280C0
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 12:17:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 19091280C0
+	by mail.kernel.org (Postfix) with ESMTPS id E211525123
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 12:18:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E211525123
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:34289 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:34327 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hXltl-0000Kx-B2
-	for qemu-devel@archiver.kernel.org; Mon, 03 Jun 2019 08:17:09 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:60239)
+	id 1hXlv6-0001Rs-30
+	for qemu-devel@archiver.kernel.org; Mon, 03 Jun 2019 08:18:32 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:60202)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hXlqV-0006EI-6D
+	(envelope-from <vsementsov@virtuozzo.com>) id 1hXlqU-0006DT-Si
 	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 08:13:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hXldU-0001be-F5
-	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 08:00:25 -0400
-Received: from relay.sw.ru ([185.231.240.75]:39510)
+	(envelope-from <vsementsov@virtuozzo.com>) id 1hXldZ-0001qF-OX
+	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 08:00:27 -0400
+Received: from relay.sw.ru ([185.231.240.75]:39524)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1hXldR-000128-0x; Mon, 03 Jun 2019 08:00:20 -0400
+	id 1hXldU-00012C-Im; Mon, 03 Jun 2019 08:00:22 -0400
 Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
 	by relay.sw.ru with esmtp (Exim 4.91)
 	(envelope-from <vsementsov@virtuozzo.com>)
-	id 1hXldG-0002hc-HO; Mon, 03 Jun 2019 15:00:06 +0300
+	id 1hXldG-0002hc-Pt; Mon, 03 Jun 2019 15:00:07 +0300
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-devel@nongnu.org,
 	qemu-block@nongnu.org
-Date: Mon,  3 Jun 2019 15:00:03 +0300
-Message-Id: <20190603120005.37394-3-vsementsov@virtuozzo.com>
+Date: Mon,  3 Jun 2019 15:00:04 +0300
+Message-Id: <20190603120005.37394-4-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.18.0
 In-Reply-To: <20190603120005.37394-1-vsementsov@virtuozzo.com>
 References: <20190603120005.37394-1-vsementsov@virtuozzo.com>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
 X-Received-From: 185.231.240.75
-Subject: [Qemu-devel] [PATCH 2/4] block/dirty-bitmap: add hide/unhide API
+Subject: [Qemu-devel] [PATCH 3/4] qapi: implement block-dirty-bitmap-remove
+ transaction action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -65,69 +66,158 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add functionality to make bitmap temporary anonymous. It will be used
-to implement bitmap remove transaction action. We need hide bitmap
-persistence too, as there are should not be unnamed persistent bitmaps.
+It is used to do transactional movement of the bitmap (which is
+possible in conjunction with merge command). Transactional bitmap
+movement is needed in scenarios with external snapshot, when we don't
+want to leave copy of the bitmap in the base image.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- include/block/dirty-bitmap.h |  2 ++
- block/dirty-bitmap.c         | 26 ++++++++++++++++++++++++++
- 2 files changed, 28 insertions(+)
+ qapi/transaction.json |  2 ++
+ blockdev.c            | 74 +++++++++++++++++++++++++++++++++++++++----
+ 2 files changed, 70 insertions(+), 6 deletions(-)
 
-diff --git a/include/block/dirty-bitmap.h b/include/block/dirty-bitmap.h
-index 8044ace63e..542e437123 100644
---- a/include/block/dirty-bitmap.h
-+++ b/include/block/dirty-bitmap.h
-@@ -116,5 +116,7 @@ bool bdrv_dirty_bitmap_next_dirty_area(BdrvDirtyBitmap *bitmap,
- BdrvDirtyBitmap *bdrv_reclaim_dirty_bitmap_locked(BlockDriverState *bs,
-                                                   BdrvDirtyBitmap *bitmap,
-                                                   Error **errp);
-+void bdrv_dirty_bitmap_hide(BdrvDirtyBitmap *bitmap);
-+void bdrv_dirty_bitmap_unhide(BdrvDirtyBitmap *bitmap);
- 
- #endif
-diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
-index 49646a30e6..592964635e 100644
---- a/block/dirty-bitmap.c
-+++ b/block/dirty-bitmap.c
-@@ -35,6 +35,10 @@ struct BdrvDirtyBitmap {
-     bool busy;                  /* Bitmap is busy, it can't be used via QMP */
-     BdrvDirtyBitmap *successor; /* Anonymous child, if any. */
-     char *name;                 /* Optional non-empty unique ID */
-+    char *hidden_name;          /* Backup of @name for removal transaction
-+                                   action. Used for hide/unhide API. */
-+    bool hidden_persistent;     /* Backup of @persistent for removal transaction
-+                                   action. */
-     int64_t size;               /* Size of the bitmap, in bytes */
-     bool disabled;              /* Bitmap is disabled. It ignores all writes to
-                                    the device */
-@@ -849,3 +853,25 @@ out:
-         qemu_mutex_unlock(src->mutex);
-     }
+diff --git a/qapi/transaction.json b/qapi/transaction.json
+index 95edb78227..da95b804aa 100644
+--- a/qapi/transaction.json
++++ b/qapi/transaction.json
+@@ -45,6 +45,7 @@
+ #
+ # - @abort: since 1.6
+ # - @block-dirty-bitmap-add: since 2.5
++# - @block-dirty-bitmap-remove: since 4.1
+ # - @block-dirty-bitmap-clear: since 2.5
+ # - @block-dirty-bitmap-enable: since 4.0
+ # - @block-dirty-bitmap-disable: since 4.0
+@@ -61,6 +62,7 @@
+   'data': {
+        'abort': 'Abort',
+        'block-dirty-bitmap-add': 'BlockDirtyBitmapAdd',
++       'block-dirty-bitmap-remove': 'BlockDirtyBitmap',
+        'block-dirty-bitmap-clear': 'BlockDirtyBitmap',
+        'block-dirty-bitmap-enable': 'BlockDirtyBitmap',
+        'block-dirty-bitmap-disable': 'BlockDirtyBitmap',
+diff --git a/blockdev.c b/blockdev.c
+index 5b3eef0d3e..0d9aa7f0a1 100644
+--- a/blockdev.c
++++ b/blockdev.c
+@@ -2135,6 +2135,46 @@ static void block_dirty_bitmap_merge_prepare(BlkActionState *common,
+                                                 errp);
  }
+ 
++static BdrvDirtyBitmap *do_block_dirty_bitmap_remove(
++        const char *node, const char *name, bool release,
++        BlockDriverState **bitmap_bs, Error **errp);
 +
-+void bdrv_dirty_bitmap_hide(BdrvDirtyBitmap *bitmap)
++static void block_dirty_bitmap_remove_prepare(BlkActionState *common,
++                                              Error **errp)
 +{
-+    qemu_mutex_lock(bitmap->mutex);
-+    assert(!bitmap->hidden_name);
-+    bitmap->hidden_name = bitmap->name;
-+    bitmap->hidden_persistent = bitmap->persistent;
-+    bitmap->name = NULL;
-+    bitmap->persistent = false;
-+    qemu_mutex_unlock(bitmap->mutex);
++    BlockDirtyBitmap *action;
++    BlockDirtyBitmapState *state = DO_UPCAST(BlockDirtyBitmapState,
++                                             common, common);
++
++    if (action_check_completion_mode(common, errp) < 0) {
++        return;
++    }
++
++    action = common->action->u.block_dirty_bitmap_remove.data;
++
++    state->bitmap = do_block_dirty_bitmap_remove(action->node, action->name,
++                                                 false, &state->bs, errp);
++    if (state->bitmap) {
++        bdrv_dirty_bitmap_hide(state->bitmap);
++    }
 +}
 +
-+void bdrv_dirty_bitmap_unhide(BdrvDirtyBitmap *bitmap)
++static void block_dirty_bitmap_remove_abort(BlkActionState *common)
 +{
-+    qemu_mutex_lock(bitmap->mutex);
-+    assert(!bitmap->name);
-+    bitmap->name = bitmap->hidden_name;
-+    bitmap->persistent = bitmap->hidden_persistent;
-+    bitmap->hidden_name = NULL;
-+    bitmap->hidden_persistent = false;
-+    qemu_mutex_unlock(bitmap->mutex);
++    BlockDirtyBitmapState *state = DO_UPCAST(BlockDirtyBitmapState,
++                                             common, common);
++
++    bdrv_dirty_bitmap_unhide(state->bitmap);
 +}
++
++static void block_dirty_bitmap_remove_commit(BlkActionState *common)
++{
++    BlockDirtyBitmapState *state = DO_UPCAST(BlockDirtyBitmapState,
++                                             common, common);
++
++    bdrv_release_dirty_bitmap(state->bs, state->bitmap);
++}
++
+ static void abort_prepare(BlkActionState *common, Error **errp)
+ {
+     error_setg(errp, "Transaction aborted using Abort action");
+@@ -2212,6 +2252,12 @@ static const BlkActionOps actions[] = {
+         .commit = block_dirty_bitmap_free_backup,
+         .abort = block_dirty_bitmap_restore,
+     },
++    [TRANSACTION_ACTION_KIND_BLOCK_DIRTY_BITMAP_REMOVE] = {
++        .instance_size = sizeof(BlockDirtyBitmapState),
++        .prepare = block_dirty_bitmap_remove_prepare,
++        .commit = block_dirty_bitmap_remove_commit,
++        .abort = block_dirty_bitmap_remove_abort,
++    },
+     /* Where are transactions for MIRROR, COMMIT and STREAM?
+      * Although these blockjobs use transaction callbacks like the backup job,
+      * these jobs do not necessarily adhere to transaction semantics.
+@@ -2870,20 +2916,21 @@ void qmp_block_dirty_bitmap_add(const char *node, const char *name,
+     bdrv_dirty_bitmap_set_persistence(bitmap, persistent);
+ }
+ 
+-void qmp_block_dirty_bitmap_remove(const char *node, const char *name,
+-                                   Error **errp)
++static BdrvDirtyBitmap *do_block_dirty_bitmap_remove(
++        const char *node, const char *name, bool release,
++        BlockDriverState **bitmap_bs, Error **errp)
+ {
+     BlockDriverState *bs;
+     BdrvDirtyBitmap *bitmap;
+ 
+     bitmap = block_dirty_bitmap_lookup(node, name, &bs, errp);
+     if (!bitmap || !bs) {
+-        return;
++        return NULL;
+     }
+ 
+     if (bdrv_dirty_bitmap_check(bitmap, BDRV_BITMAP_BUSY | BDRV_BITMAP_RO,
+                                 errp)) {
+-        return;
++        return NULL;
+     }
+ 
+     if (bdrv_dirty_bitmap_get_persistence(bitmap)) {
+@@ -2893,13 +2940,28 @@ void qmp_block_dirty_bitmap_remove(const char *node, const char *name,
+         aio_context_acquire(aio_context);
+         bdrv_remove_persistent_dirty_bitmap(bs, name, &local_err);
+         aio_context_release(aio_context);
++
+         if (local_err != NULL) {
+             error_propagate(errp, local_err);
+-            return;
++            return NULL;
+         }
+     }
+ 
+-    bdrv_release_dirty_bitmap(bs, bitmap);
++    if (release) {
++        bdrv_release_dirty_bitmap(bs, bitmap);
++    }
++
++    if (bitmap_bs) {
++        *bitmap_bs = bs;
++    }
++
++    return bitmap;
++}
++
++void qmp_block_dirty_bitmap_remove(const char *node, const char *name,
++                                   Error **errp)
++{
++    do_block_dirty_bitmap_remove(node, name, true, NULL, errp);
+ }
+ 
+ /**
 -- 
 2.18.0
 
