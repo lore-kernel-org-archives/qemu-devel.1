@@ -6,45 +6,45 @@ X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 77C87C04AB5
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 15:56:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F25CBC04AB5
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 16:05:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 53C9727B57
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 15:56:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 53C9727B57
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id CF02027867
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 16:05:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CF02027867
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:37098 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:37421 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hXpK6-0002rH-Lp
-	for qemu-devel@archiver.kernel.org; Mon, 03 Jun 2019 11:56:34 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:53739)
+	id 1hXpTC-0007Ks-LA
+	for qemu-devel@archiver.kernel.org; Mon, 03 Jun 2019 12:05:58 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:54822)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hXpJJ-0002ZY-JH
-	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 11:55:47 -0400
+	(envelope-from <bounces@canonical.com>) id 1hXpOC-0003zZ-Tw
+	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 12:00:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1hXpJH-0002bZ-Gm
-	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 11:55:45 -0400
-Received: from indium.canonical.com ([91.189.90.7]:34812)
+	(envelope-from <bounces@canonical.com>) id 1hXpOA-0001n1-Tp
+	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 12:00:48 -0400
+Received: from indium.canonical.com ([91.189.90.7]:35896)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1hXpJH-0002X7-Ah
-	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 11:55:43 -0400
+	id 1hXpOA-0001kG-O2
+	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 12:00:46 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1hXpJD-0001B6-UO
-	for <qemu-devel@nongnu.org>; Mon, 03 Jun 2019 15:55:39 +0000
+	id 1hXpO8-0001av-Tl
+	for <qemu-devel@nongnu.org>; Mon, 03 Jun 2019 16:00:44 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id E1F762E80CB
-	for <qemu-devel@nongnu.org>; Mon,  3 Jun 2019 15:55:39 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id CA4092E80C9
+	for <qemu-devel@nongnu.org>; Mon,  3 Jun 2019 16:00:44 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 03 Jun 2019 15:45:48 -0000
-From: "Laszlo Ersek \(Red Hat\)" <lersek@redhat.com>
+Date: Mon, 03 Jun 2019 15:51:40 -0000
+From: =?utf-8?q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
 X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
@@ -54,15 +54,15 @@ X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
 X-Launchpad-Bug-Commenters: ajbennee andrew-randrianasulu lersek
 X-Launchpad-Bug-Reporter: Laszlo Ersek (Red Hat) (lersek)
-X-Launchpad-Bug-Modifier: Laszlo Ersek (Red Hat) (lersek)
+X-Launchpad-Bug-Modifier: =?utf-8?q?Alex_Benn=C3=A9e_=28ajbennee=29?=
 References: <155912118291.12579.8926874795813611531.malonedeb@soybean.canonical.com>
-Message-Id: <155957674858.13135.3063469366081336073.malone@soybean.canonical.com>
+Message-Id: <155957710101.12370.12687211354500875831.malone@soybean.canonical.com>
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com); Revision="18968";
 	Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: 63f8cc924e665f6869fb906da767dbb4f3c80086
+X-Launchpad-Hash: 657bf331500a88338c7898e598bec5dffa29e6b4
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 91.189.90.7
 Subject: [Qemu-devel] [Bug 1830872] Re: AARCH64 to ARMv7 mistranslation in
@@ -82,8 +82,9 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Sorry the patch in comment #5 wasn't visible when I wrote what would end
-up as comment #6. I'll test the patch later. Thanks!
+I managed to tweak the memory test enough to detect the failure on
+aarch64-on-armv7 and I the attached patch fixes it. Could you please
+double check with your test case?
 
 -- =
 
