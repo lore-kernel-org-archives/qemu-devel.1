@@ -2,69 +2,67 @@ Return-Path: <SRS0=e5mL=UC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 07535C04AB5
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 12:58:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2AA3EC04AB5
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 13:03:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D454B26756
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 12:58:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D454B26756
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=baidu.com
+	by mail.kernel.org (Postfix) with ESMTPS id EB4F724E42
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 13:03:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EB4F724E42
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:34829 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:35017 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hXmXp-00016T-5t
-	for qemu-devel@archiver.kernel.org; Mon, 03 Jun 2019 08:58:33 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:44675)
+	id 1hXmcX-00034I-Q6
+	for qemu-devel@archiver.kernel.org; Mon, 03 Jun 2019 09:03:25 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:42602)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lihangjing@baidu.com>) id 1hXgMW-0006TI-8L
-	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 02:22:29 -0400
+	(envelope-from <armbru@redhat.com>) id 1hXmbM-0002Y1-M4
+	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 09:02:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lihangjing@baidu.com>) id 1hXgGi-0006uR-3w
-	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 02:16:29 -0400
-Received: from mx22.baidu.com ([220.181.50.185]:57703 helo=baidu.com)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lihangjing@baidu.com>) id 1hXgGh-0006Nd-LB
-	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 02:16:28 -0400
-Received: from m1-mail-ex09.internal.baidu.com (unknown [10.44.89.49])
-	by Forcepoint Email with ESMTPS id 20AB4864EA32A;
-	Mon,  3 Jun 2019 14:16:14 +0800 (CST)
-Received: from BC-Mail-Ex03.internal.baidu.com (172.31.40.17) by
-	m1-mail-ex09.internal.baidu.com (10.44.89.49) with Microsoft SMTP
-	Server
-	(version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
-	15.1.1531.3; Mon, 3 Jun 2019 14:16:15 +0800
-Received: from DDAFF7EBB9FF247.internal.baidu.com (172.31.63.8) by
-	BC-Mail-Ex03.internal.baidu.com (172.31.40.17) with Microsoft SMTP
-	Server
-	(version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
-	15.1.1531.3; Mon, 3 Jun 2019 14:16:08 +0800
-From: "lihangjing@baidu.com" <lihangjing@baidu.com>
-To: <mst@redhat.com>
-Date: Mon, 3 Jun 2019 14:15:24 +0800
-Message-ID: <20190603061524.24076-1-lihangjing@baidu.com>
-X-Mailer: git-send-email 2.15.1.windows.2
+	(envelope-from <armbru@redhat.com>) id 1hXmbK-0007Ci-PS
+	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 09:02:12 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42544)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hXmbJ-0006Fg-1M
+	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 09:02:10 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 237C13097052;
+	Mon,  3 Jun 2019 13:01:06 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-117-223.ams2.redhat.com
+	[10.36.117.223])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 9D8AE60491;
+	Mon,  3 Jun 2019 12:59:57 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+	id 1AC5D11386A0; Mon,  3 Jun 2019 14:59:56 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Laszlo Ersek <lersek@redhat.com>
+References: <87lfyqla7r.fsf@dusky.pond.sub.org>
+	<4397594e-ccba-3f54-6359-2cb061b8fcc0@redhat.com>
+Date: Mon, 03 Jun 2019 14:59:56 +0200
+In-Reply-To: <4397594e-ccba-3f54-6359-2cb061b8fcc0@redhat.com> (Laszlo Ersek's
+	message of "Mon, 3 Jun 2019 12:55:01 +0200")
+Message-ID: <875zpmrfhv.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [172.31.63.8]
-X-ClientProxiedBy: BC-MAIL-EX01.internal.baidu.com (172.31.40.15) To
-	BC-Mail-Ex03.internal.baidu.com (172.31.40.17)
-X-Baidu-BdMsfe-DateCheck: 1_BC-Mail-Ex03_2019-06-03 14:16:08:671
-X-Baidu-BdMsfe-VirusCheck: BC-Mail-Ex03_GRAY_Inside_WithoutAtta_2019-06-03
-	14:16:08:718
-X-Baidu-BdMsfe-DateCheck: 1_BC-Mail-Ex03_2019-06-03 14:16:08:733
-X-Baidu-BdMsfe-DateCheck: 1_m1-mail-ex09_2019-06-03 14:16:15:794
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 220.181.50.185
-X-Mailman-Approved-At: Mon, 03 Jun 2019 08:50:25 -0400
-Subject: [Qemu-devel] [PATCH] vhost: fix vhost_log size overflow during
- migration
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.43]);
+	Mon, 03 Jun 2019 13:01:43 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] Headers without multiple inclusion guards
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -76,70 +74,139 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Li Hangjing <lihangjing@baidu.com>, qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+	Dmitry Fleytman <dmitry.fleytman@gmail.com>,
+	Sagar Karandikar <sagark@eecs.berkeley.edu>,
+	"Michael S. Tsirkin" <mst@redhat.com>, James Hogan <jhogan@kernel.org>,
+	Anthony Green <green@moxielogic.com>, Palmer Dabbelt <palmer@sifive.com>,
+	Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org,
+	Philippe =?utf-8?Q?Mathieu-Daud?= =?utf-8?Q?=C3=A9?= <f4bug@amsat.org>,
+	Max Filippov <jcmvbkbc@gmail.com>,
+	Alistair Francis <Alistair.Francis@wdc.com>,
+	Gerd Hoffmann <kraxel@redhat.com>,
+	"Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+	Guan Xuetao <gxt@mprc.pku.edu.cn>, Marek Vasut <marex@denx.de>,
+	Stefano Stabellini <sstabellini@kernel.org>,
+	Aleksandar Rikalo <arikalo@wavecomp.com>, Helge Deller <deller@gmx.de>,
+	David Hildenbrand <david@redhat.com>, Halil Pasic <pasic@linux.ibm.com>,
+	Christian Borntraeger <borntraeger@de.ibm.com>,
+	Anthony Perard <anthony.perard@citrix.com>,
+	David Gibson <david@gibson.dropbear.id.au>,
+	Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+	Jason Wang <jasowang@redhat.com>, Artyom Tarasenko <atar4qemu@gmail.com>,
+	Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
+	Alistair Francis <alistair@alistair23.me>,
+	Eduardo Habkost <ehabkost@redhat.com>,
+	Riku Voipio <riku.voipio@iki.fi>, Greg Kurz <groug@kaod.org>,
+	Marcelo Tosatti <mtosatti@redhat.com>,
+	Beniamino Galvani <b.galvani@gmail.com>,
+	Eric Auger <eric.auger@redhat.com>, Paul Durrant <paul.durrant@citrix.com>,
+	Stafford Horne <shorne@gmail.com>,
+	Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>,
+	Richard Henderson <rth@twiddle.net>,
+	"Daniel P. Berrange" <berrange@redhat.com>,
+	Claudio Fontana <claudio.fontana@gmail.com>,
+	Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+	Chris Wulff <crwulff@gmail.com>,
+	Claudio Fontana <claudio.fontana@huawei.com>,
+	Laurent Vivier <laurent@vivier.eu>,
+	Andrew Baumann <Andrew.Baumann@microsoft.com>,
+	Michael Walle <michael@walle.cc>,
+	Aleksandar Markovic <amarkovic@wavecomp.com>,
+	Cornelia Huck <cohuck@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+	Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Li Hangjing <lihangjing@baidu.com>
+Laszlo Ersek <lersek@redhat.com> writes:
 
-When a guest which doesn't support multiqueue is migrated with a multi queues
-vhost-user-blk deivce, a crash will occur like:
+> Hi Markus,
+>
+> (sorry about the late reply, I've been away.)
+>
+> On 05/28/19 20:12, Markus Armbruster wrote:
+>
+>> EDK2 Firmware
+>> M: Laszlo Ersek <lersek@redhat.com>
+>> M: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+>> tests/uefi-test-tools/UefiTestToolsPkg/Include/Guid/BiosTablesTest.h
+>
+> This header file does have a multiple inclusion guard:
+>
+>> /** @file
+>>   Expose the address(es) of the ACPI RSD PTR table(s) and the SMBIOS ent=
+ry
+>>   point(s) in a MB-aligned structure to the hypervisor.
+>>
+>>   [...]
+>> **/
+>>
+>> #ifndef __BIOS_TABLES_TEST_H__
+>> #define __BIOS_TABLES_TEST_H__
+>>
+>> [...]
+>>
+>> #endif // __BIOS_TABLES_TEST_H__
+>
+> It's possible that "scripts/clean-header-guards.pl" does not recognize
+> the guard.
 
-0 qemu_memfd_alloc (name=<value optimized out>, size=562949953421312, seals=<value optimized out>, fd=0x7f87171fe8b4, errp=0x7f87171fe8a8) at util/memfd.c:153
-1 0x00007f883559d7cf in vhost_log_alloc (size=70368744177664, share=true) at hw/virtio/vhost.c:186
-2 0x00007f88355a0758 in vhost_log_get (listener=0x7f8838bd7940, enable=1) at qemu-2-12/hw/virtio/vhost.c:211
-3 vhost_dev_log_resize (listener=0x7f8838bd7940, enable=1) at hw/virtio/vhost.c:263
-4 vhost_migration_log (listener=0x7f8838bd7940, enable=1) at hw/virtio/vhost.c:787
-5 0x00007f88355463d6 in memory_global_dirty_log_start () at memory.c:2503
-6 0x00007f8835550577 in ram_init_bitmaps (f=0x7f88384ce600, opaque=0x7f8836024098) at migration/ram.c:2173
-7 ram_init_all (f=0x7f88384ce600, opaque=0x7f8836024098) at migration/ram.c:2192
-8 ram_save_setup (f=0x7f88384ce600, opaque=0x7f8836024098) at migration/ram.c:2219
-9 0x00007f88357a419d in qemu_savevm_state_setup (f=0x7f88384ce600) at migration/savevm.c:1002
-10 0x00007f883579fc3e in migration_thread (opaque=0x7f8837530400) at migration/migration.c:2382
-11 0x00007f8832447893 in start_thread () from /lib64/libpthread.so.0
-12 0x00007f8832178bfd in clone () from /lib64/libc.so.6
+Correct.  I fixed the script in my tree.
 
-This is because vhost_get_log_size() returns a overflowed vhost-log size.
-In this function, it uses the uninitialized variable vqs->used_phys and
-vqs->used_size to get the vhost-log size.
+> According to the ISO C standard, "All identifiers that begin with an
+> underscore and either an uppercase letter or another underscore are
+> always reserved for any use". Therefore, technically speaking, the above
+> inclusion guard implies undefined behavior. In practice, this particular
+> style for header guards is extremely common in the edk2 codebase:
+>
+> $ git grep '^#ifndef __' -- '*.h'  | wc -l
+> 1012
+>
+> And, "tests/uefi-test-tools/UefiTestToolsPkg" follows the edk2 coding
+> style.
+>
+> That said, if you'd like to remove the leading "__" from the macro name,
+> I'd be fully OK with that.
 
-Signed-off-by: Li Hangjing <lihangjing@baidu.com>
-Reviewed-by: Xie Yongji <xieyongji@baidu.com>
-Reviewed-by: Chai Wen <chaiwen@baidu.com>
----
- hw/virtio/vhost.c | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+We routinely exempt files from style cleanups when we have a reason.  If
+you want this one to be exempted, that's fine with me.
 
-diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
-index 7f61018f2a..6d3a013f49 100644
---- a/hw/virtio/vhost.c
-+++ b/hw/virtio/vhost.c
-@@ -131,6 +131,11 @@ static int vhost_sync_dirty_bitmap(struct vhost_dev *dev,
-     }
-     for (i = 0; i < dev->nvqs; ++i) {
-         struct vhost_virtqueue *vq = dev->vqs + i;
-+
-+        if (!vq->used_phys && !vq->used_size) {
-+            continue;
-+        }
-+
-         vhost_dev_sync_region(dev, section, start_addr, end_addr, vq->used_phys,
-                               range_get_last(vq->used_phys, vq->used_size));
-     }
-@@ -168,6 +173,11 @@ static uint64_t vhost_get_log_size(struct vhost_dev *dev)
-     }
-     for (i = 0; i < dev->nvqs; ++i) {
-         struct vhost_virtqueue *vq = dev->vqs + i;
-+
-+        if (!vq->used_phys && !vq->used_size) {
-+            continue;
-+        }
-+
-         uint64_t last = vq->used_phys + vq->used_size - 1;
-         log_size = MAX(log_size, last / VHOST_LOG_CHUNK + 1);
-     }
--- 
-2.15.1.windows.2
+If we decide not to exempt it, then I want a header guard that makes my
+(fixed) script happy.  It isn't right now:
 
+    $ scripts/clean-header-guards.pl -nv tests/uefi-test-tools/UefiTestTool=
+sPkg/Include/Guid/BiosTablesTest.h=20
+    tests/uefi-test-tools/UefiTestToolsPkg/Include/Guid/BiosTablesTest.h gu=
+ard __BIOS_TABLES_TEST_H__ needs cleanup:
+        is a reserved identifier, doesn't end with _H, doesn't match the fi=
+le name
+    [...]
+
+Removing the leading "__" takes care of the first complaint:
+
+    tests/uefi-test-tools/UefiTestToolsPkg/Include/Guid/BiosTablesTest.h gu=
+ard BIOS_TABLES_TEST_H__ needs cleanup:
+        doesn't end with _H, doesn't match the file name
+
+Removing the trailing "__" as well takes care of the second one:
+
+    tests/uefi-test-tools/UefiTestToolsPkg/Include/Guid/BiosTablesTest.h gu=
+ard BIOS_TABLES_TEST_H needs cleanup:
+        doesn't match the file name
+
+To get rid of the last one, we can:
+
+* Rename to BIOSTABLESTEST_H.  Easy.
+
+* Teach scripts/clean-header-guards.pl to capitalize StudlyCaps
+  filenames to STUDLY_CAPS rather than STUDLYCAPS.  But that would break
+  include/libdecnumber/*.h.
+
+* Teach scripts/clean-header-guards to accept either STUDLYCAPS or
+  STUDLY_CAPS.  Considering we have exactly one filename that needs
+  this, I'd prefer not to.
+
+My first preference is BIOSTABLESTEST_H, second is to exempt the file.
+Yours?
 
