@@ -2,67 +2,90 @@ Return-Path: <SRS0=e5mL=UC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_NEOMUTT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1AFDEC04AB5
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 14:26:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C618BC04AB5
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 14:26:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E1214276D9
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 14:26:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E1214276D9
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 93CCC276D9
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 14:26:32 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="FCcta2wu"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 93CCC276D9
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:35882 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:35886 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hXnug-0008Ay-1z
-	for qemu-devel@archiver.kernel.org; Mon, 03 Jun 2019 10:26:14 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:58894)
+	id 1hXnux-0008Pz-O1
+	for qemu-devel@archiver.kernel.org; Mon, 03 Jun 2019 10:26:31 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:59015)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1hXntC-0007Fl-OH
-	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 10:24:43 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1hXntU-0007Ow-08
+	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 10:25:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1hXntB-0003x1-SL
-	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 10:24:42 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53362)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1hXntB-0003w0-MW
-	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 10:24:41 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 708C43107B0F;
-	Mon,  3 Jun 2019 14:24:37 +0000 (UTC)
-Received: from sirius.home.kraxel.org (ovpn-117-131.ams2.redhat.com
-	[10.36.117.131])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 007966090E;
-	Mon,  3 Jun 2019 14:24:33 +0000 (UTC)
-Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
-	id 3F3F116E1A; Mon,  3 Jun 2019 16:24:33 +0200 (CEST)
-Date: Mon, 3 Jun 2019 16:24:33 +0200
-From: Gerd Hoffmann <kraxel@redhat.com>
-To: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <20190603142433.eydpb7vhdj7o7r26@sirius.home.kraxel.org>
-References: <20190528204331.5280-1-kraxel@redhat.com>
-	<6068295f-5a36-5d16-8895-95385f0b44be@redhat.com>
+	(envelope-from <alex.bennee@linaro.org>) id 1hXntS-0004Nj-OY
+	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 10:24:59 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:39084)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1hXntS-0004LZ-Es
+	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 10:24:58 -0400
+Received: by mail-wm1-x341.google.com with SMTP id z23so11305070wma.4
+	for <qemu-devel@nongnu.org>; Mon, 03 Jun 2019 07:24:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=references:user-agent:from:to:cc:subject:in-reply-to:date
+	:message-id:mime-version:content-transfer-encoding;
+	bh=1aS5o9vpGmvunqllZGpoLG35euSGNQ+oCPTwjKu8l34=;
+	b=FCcta2wu/QEkIm4yDyVrtcqUbmDp+QDmZbDqagjU5IzDBjuU3qBivaJBh4F58Z4yb/
+	7w+C9sGOCXIe+VEOo0ykWX/UpII97mlDHj7aFzRkEkdAiyj03jlRN16rsl9cu6JzxXQ8
+	cX5y3SafZRn9IzaEmZbFo86XBR3x4J6PbmqZ+rL8yebwJcBCo/Aqwv9SbuHwwvY+NvJN
+	TduRp7lIcwvTomGrGf8P/7AIcJg7xBzirqh8nfbm05lUc2MFos3wnk9ZCWpgIOw+brVE
+	dn6RG1HQCi4Vz6z0Au3OVBd0RUcXh4ofgSIug797RvNkO8DP2q4Ec0vM8oIZvGzE5eof
+	IdrQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:references:user-agent:from:to:cc:subject
+	:in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+	bh=1aS5o9vpGmvunqllZGpoLG35euSGNQ+oCPTwjKu8l34=;
+	b=UPcHkPI/gkAcPOqxkSO2SyBzWdqsXGGdVUStHwYZY6JxKzzUOx2qpxkFy3NC8RfVpL
+	Rya0sj8+kU4/pMi0EbBOmKRsJUQSsJsNvm7O4+r4baJ1ppkfM1DgOoFNLSnq5P2J4heO
+	qK1AZjYYdO84kK0nfLxswhgPU/CKC0ZsyVnqvG4hMYCOBwMUaue1x5wzRmGX9Vkt0U+f
+	/6SyLYajla/0Ap0pPXoAssdevmQ3HM0k7K4EAqWMo/bjU26R7P47FpTPIxL6j1b3EQc1
+	s4QNMUq6p05vVQp2qrd2mu6IDBi4VlUC0/AOZffn+v16dcMNWLA1JN8XvPwmBigPeVrZ
+	y8Bw==
+X-Gm-Message-State: APjAAAWtTP6OhKY2KQEluUWge8E2kCUxvc4tg39Hwp2W2F2pLpivlrnP
+	+PPQUAsXfZ3yFmAWXU9rse0iig==
+X-Google-Smtp-Source: APXvYqy0kv/Cnfw4zj+ppw4jBDGIB59vdhfXIjaJYkuYVWVSbaqUCbEFecdRsn2WWy2ZluPDRzk3RQ==
+X-Received: by 2002:a7b:cd04:: with SMTP id f4mr15027626wmj.64.1559571896919; 
+	Mon, 03 Jun 2019 07:24:56 -0700 (PDT)
+Received: from zen.linaroharston ([81.128.185.34])
+	by smtp.gmail.com with ESMTPSA id
+	e15sm11489406wme.0.2019.06.03.07.24.56
+	(version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+	Mon, 03 Jun 2019 07:24:56 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+	by zen.linaroharston (Postfix) with ESMTP id EC6861FF87;
+	Mon,  3 Jun 2019 15:24:55 +0100 (BST)
+References: <20190603134857.32359-1-kwolf@redhat.com>
+User-agent: mu4e 1.3.2; emacs 26.1
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Kevin Wolf <kwolf@redhat.com>
+In-reply-to: <20190603134857.32359-1-kwolf@redhat.com>
+Date: Mon, 03 Jun 2019 15:24:55 +0100
+Message-ID: <8736kqbvbc.fsf@zen.linaroharston>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <6068295f-5a36-5d16-8895-95385f0b44be@redhat.com>
-User-Agent: NeoMutt/20180716
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.47]);
-	Mon, 03 Jun 2019 14:24:41 +0000 (UTC)
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH] q35: fix mmconfig and PCI0._CRS
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2a00:1450:4864:20::341
+Subject: Re: [Qemu-devel] [PATCH] iotests: Fix duplicated diff output on
+ failure
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -74,44 +97,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
-	Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
-	Richard Henderson <rth@twiddle.net>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-  Hi,=20
 
-> One question: are we sure all guest OSes we care about can deal with
-> discontiguous 32-bit PCI MMIO aperture(s)? Personally, I've got no clue=
-.
-> Is a "na=EFve" OS imaginable that looks only at the first suitable rang=
-e
-> in the _CRS?
+Kevin Wolf <kwolf@redhat.com> writes:
 
-Well, I know there is physical hardware doing the same thing,
-my work station for example:
+> Commit 70ff5b07 wanted to move the diff between actual and reference
+> output to the end after printing the test result line. It really only
+> copied it, though, so the diff is now displayed twice. Remove the old
+> one.
+>
+> Fixes: 70ff5b07fcdd378180ad2d5cc0b0d5e67e7ef325
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 
-[ ... ]
-c8000000-f7ffffff : PCI Bus 0000:00
-  c8000000-c81fffff : PCI Bus 0000:01
-  e0000000-efffffff : 0000:00:02.0
-    e0000000-e02fffff : BOOTFB
-[ ... ]
-f8000000-fbffffff : PCI MMCONFIG 0000 [bus 00-3f]
-  f8000000-fbffffff : Reserved
-    f8000000-fbffffff : pnp 00:06
-fd000000-fe7fffff : PCI Bus 0000:00
-  fd000000-fdabffff : pnp 00:07
-[ ... ]
+Queued to testing/next, thanks.
 
-Which of course is no guarantee that no na=EFve OS exists, but I think th=
-e
-chances that we'll run into trouble with this are rather small.
+> ---
+>  tests/qemu-iotests/check | 1 -
+>  1 file changed, 1 deletion(-)
+>
+> diff --git a/tests/qemu-iotests/check b/tests/qemu-iotests/check
+> index 95162c6cf9..44ebf24080 100755
+> --- a/tests/qemu-iotests/check
+> +++ b/tests/qemu-iotests/check
+> @@ -876,7 +876,6 @@ do
+>                      fi
+>                  else
+>                      mv $tmp.out $seq.out.bad
+> -                    $diff -w "$reference" "$PWD"/$seq.out.bad
+>                      status=3D"fail"
+>                      results=3D"output mismatch (see $seq.out.bad)"
+>                      printdiff=3Dtrue
 
-cheers,
-  Gerd
 
+--
+Alex Benn=C3=A9e
 
