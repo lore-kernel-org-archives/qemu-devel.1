@@ -2,91 +2,82 @@ Return-Path: <SRS0=e5mL=UC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 90E6AC04AB5
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 20:09:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F27CCC04AB5
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 20:15:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6864826CA6
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 20:09:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6864826CA6
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id BDE5A26CE0
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 20:15:27 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KgYGZOZm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BDE5A26CE0
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:40291 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:40360 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hXtGa-0003KW-Es
-	for qemu-devel@archiver.kernel.org; Mon, 03 Jun 2019 16:09:12 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:53912)
+	id 1hXtMc-0004pJ-UB
+	for qemu-devel@archiver.kernel.org; Mon, 03 Jun 2019 16:15:26 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:55215)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hXtFD-0002iN-59
-	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 16:07:47 -0400
+	(envelope-from <mrolnik@gmail.com>) id 1hXtLq-0004S3-NQ
+	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 16:14:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hXtFC-0005Gd-88
-	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 16:07:47 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40184)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mreitz@redhat.com>)
-	id 1hXtFA-00059H-1j; Mon, 03 Jun 2019 16:07:44 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id AE0693D953;
-	Mon,  3 Jun 2019 20:07:29 +0000 (UTC)
-Received: from dresden.str.redhat.com (unknown [10.40.205.221])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 45196607AD;
-	Mon,  3 Jun 2019 20:07:27 +0000 (UTC)
-To: qemu-block@nongnu.org
-References: <20190603162512.30422-1-mreitz@redhat.com>
-	<20190603162512.30422-3-mreitz@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
-	mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
-	/PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
-	U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
-	mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
-	awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
-	AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
-	CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
-	B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
-	2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
-	AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
-	8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
-	4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
-	BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
-	xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
-	W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
-	DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
-	64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
-	ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
-	sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
-	alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
-	/ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
-	bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
-	R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <d37d3593-ac6b-4d53-ff97-952e4a4be638@redhat.com>
-Date: Mon, 3 Jun 2019 22:07:25 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.7.0
+	(envelope-from <mrolnik@gmail.com>) id 1hXtLp-0004Vb-Hy
+	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 16:14:38 -0400
+Received: from mail-qt1-x842.google.com ([2607:f8b0:4864:20::842]:44483)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <mrolnik@gmail.com>) id 1hXtLp-0004Tb-CQ
+	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 16:14:37 -0400
+Received: by mail-qt1-x842.google.com with SMTP id x47so10995276qtk.11
+	for <qemu-devel@nongnu.org>; Mon, 03 Jun 2019 13:14:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+	:cc; bh=7xlfSkjM9Vrx3/KcN7c7SUxUDFw+s50Xht8zDa712GM=;
+	b=KgYGZOZmNk+PxMUijYvYHtQ8+jIcA2lfwgb0FtBPvgT49z1UaASylB5JFQOYdzNFun
+	23Dw3jC2oP97V+lS/J78Nx5YQj5Tfi1WOp/0jPUPYYEFFDDT3eU7N6sSLrqMDGVXY+P7
+	LKf9iKRyhKUSq7fXgra6WrbIA40N3rVk78rAsImtPdI1fyupJZxWsL8mOwaqfkAiNOPZ
+	jSTDRQ/RTEu4k1s3S3vd4EL4DLJri+GH0/opAQ5qO0U25kJzOiURPFaDQPvspaK7dCTP
+	b7OAh6OZ1xVeGT+634GYz2rAXZCbJYJdiYpekZWjMnNbsb913fUELHh07nZvqxzQNlOq
+	sX0g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+	:message-id:subject:to:cc;
+	bh=7xlfSkjM9Vrx3/KcN7c7SUxUDFw+s50Xht8zDa712GM=;
+	b=ZJQqRdrDBGkgeYCxYfVCQ/eBYTBPLetu8DMJ0tUoA+I0KZA61yPxhdDqaB3uDKlhmf
+	KHcDbPOymavC6v5//6LxvYEbUt99Ozgvn6SphnHU40d9afyjURQIpTGGCWvIKfvo4mDI
+	8cZ0nJaOIS7KLO4N5Tsodby17zyHNJlgb64T5l+f24I3YO+iQafyV97J5I5rrgDBVhxJ
+	bpYqHVa8Gtz/4bc0AsMTxlDwfXUKBurbMM49yECJOvKZNa2t3HLWt5gTFgrw93cqavz4
+	31ttJRnzTzvZiqwIcmoLNYe70HUlZHDJ62ffVy/Ou647THktZrCsW4BUSFdsCIk1IEqC
+	hquw==
+X-Gm-Message-State: APjAAAV+rKl7KKYK3F7eOcrzr9KJ6G/JumNWGf7LyifdqFokNCDFiDA6
+	jUPBIHcRWDUD1zXzrf1pbi1TjG4tBA3u6i5c1eA=
+X-Google-Smtp-Source: APXvYqwiFDD0Iaava/bzUbbR30s+hRTTJyaf02rdKmjU+qepgTPvK+xYq+70pwM3dqIgsCv3w+tIrjOX8GsdwZstYjI=
+X-Received: by 2002:ac8:5315:: with SMTP id t21mr15068938qtn.229.1559592876083;
+	Mon, 03 Jun 2019 13:14:36 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20190603162512.30422-3-mreitz@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="3jjBuJYMfugV8Zq3xVDnlbbhf1V4PsCCX"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.30]);
-	Mon, 03 Jun 2019 20:07:37 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
+References: <20190530190738.22713-1-mrolnik@gmail.com>
+	<20190530190738.22713-5-mrolnik@gmail.com>
+	<17b55a6e-af48-861d-6c2c-20bab1e45155@linaro.org>
+In-Reply-To: <17b55a6e-af48-861d-6c2c-20bab1e45155@linaro.org>
+From: Michael Rolnik <mrolnik@gmail.com>
+Date: Mon, 3 Jun 2019 23:13:59 +0300
+Message-ID: <CAK4993i6gM4v_dmOUbhHZOpDxXxKTueqRd-6COVk+z5U7VXK6w@mail.gmail.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::842
+Content-Type: text/plain; charset="UTF-8"
 X-Content-Filtered-By: Mailman/MimeDel 2.1.21
-Subject: Re: [Qemu-devel] [PATCH 2/2] blockdev: Overlays are not snapshots
+Subject: Re: [Qemu-devel] [PATCH RFC v20 4/8] target-avr: Add instruction
+ decoding
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -98,59 +89,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org,
-	Markus Armbruster <armbru@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>,
+	Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---3jjBuJYMfugV8Zq3xVDnlbbhf1V4PsCCX
-From: Max Reitz <mreitz@redhat.com>
-To: qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
- Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>
-Message-ID: <d37d3593-ac6b-4d53-ff97-952e4a4be638@redhat.com>
-Subject: Re: [PATCH 2/2] blockdev: Overlays are not snapshots
-References: <20190603162512.30422-1-mreitz@redhat.com>
- <20190603162512.30422-3-mreitz@redhat.com>
-In-Reply-To: <20190603162512.30422-3-mreitz@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Richard,
+I don't understand what I should do. Do you want me to merge decode files?
 
-On 03.06.19 18:25, Max Reitz wrote:
-> There are error messages which refer to an overlay node as the snapshot=
-=2E
-> That is wrong, those are two different things.
->=20
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
-> ---
->  blockdev.c | 10 +++++-----
->  1 file changed, 5 insertions(+), 5 deletions(-)
+On Fri, May 31, 2019 at 5:45 PM Richard Henderson <
+richard.henderson@linaro.org> wrote:
 
-Oops.  I remember I wanted to run the iotests and see what fails, but
-then I forgot to do so.  Of course something fails, so I=E2=80=99ll send =
-a v2.
+> On 5/30/19 2:07 PM, Michael Rolnik wrote:
+> > This includes:
+> > - encoding of all 16 bit instructions
+> > - encoding of all 32 bit instructions
+> >
+> > Signed-off-by: Michael Rolnik <mrolnik@gmail.com>
+> > ---
+> >  target/avr/insn16.decode | 160 +++++++++++++++++++++++++++++++++++++++
+> >  target/avr/insn32.decode |  10 +++
+> >  2 files changed, 170 insertions(+)
+> >  create mode 100644 target/avr/insn16.decode
+> >  create mode 100644 target/avr/insn32.decode
+>
+> Two things:
+>
+> (1) decodetree can handle variable-width ISA now.
+>
+> It's slightly ugly in that the %field numbering is little-endian and thus
+> varies for each insn size.  But the in-flight patch set for target/rx shows
+> that it works.
+>
+> That said, I don't think you need that because,
+>
+> (2) The four instructions that are 32-bits do not have
+>     any opcode bits in the second 16-bits.
+>
+> E.g.
+>
+> # The 22-bit immediate is partially in the opcode word,
+> # and partially in the next.  Use append_16 to build the
+> # complete 22-bit value.
+> %imm_call       4:5 0:1                 !function=append_16
+> CALL            1001 010. .... 111.     imm=%imm_call
+> JMP             1001 010. .... 110.     imm=%imm_call
+>
+> # The 16-bit immediate is completely in the next word.
+> # Fields cannot be defined with no bits, so we cannot play
+> # the same trick and append to a zero-bit value.
+> # Defer reading the immediate until trans_{LDS,STS}.
+> @ldst_s         .... ... rd:5 ....      imm=0
+> LDS             1001 000 ..... 0000     @ldst_s
+> STS             1001 001 ..... 0000     @ldst_s
+>
+>
+> static uint16_t next_word(DisasContext *ctx)
+> {
+>     return cpu_lduw_code(ctx->env, ctx->npc++ * 2);
+> }
+>
+> static int append_16(DisasContext *ctx, int x)
+> {
+>     return x << 16 | next_word(ctx);
+> }
+>
+> static bool trans_LDS(DisasContext *ctx, arg_ldst_s *a)
+> {
+>     a->imm = next_word(ctx);
+>     // other stuff
+> }
+>
+> I realize that next_word as written does not fit in to how you currently
+> process instructions in the loop, but I also think that's a mistake.  I'll
+> respond to that in its place in the next patch.
+>
+> That said, next_word *could* be written to use ctx->inst[0].opcode.
+>
+>
+> r~
+>
 
-Max
 
-
---3jjBuJYMfugV8Zq3xVDnlbbhf1V4PsCCX
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlz1ff0ACgkQ9AfbAGHV
-z0DA/gf8DzIcPd24h0jmh9gHSfyjHaKbfrE6bgAa8cdy1AX4r0zz2aqI3GhHvdsf
-TgXgiisHzwMEiQByyoStHMmrYaA1nrhzPSE75DYdruID3qS96ZHX/7jnZcFVdGLR
-mcrA1hlJqTRlEDvj1bqoGngy0AVtE46NQqtpI1Iax08UBz2GHYhJvy4v/GFDjTtQ
-06Xom1PcIRNFceKJS/5ppUhYwY+XGsK4MwK18xtEIhlburJiqgEOJwowRWjYnrVf
-7ZadaflxdbIR+D8fB9VI1LUGmIfwdGCcC2VdAPd1rf5gNmFMAs/udhUXrgteBH6/
-yhEzAdzEWE5WxoisFs22rVnixDRUPg==
-=oD8u
------END PGP SIGNATURE-----
-
---3jjBuJYMfugV8Zq3xVDnlbbhf1V4PsCCX--
-
+-- 
+Best Regards,
+Michael Rolnik
