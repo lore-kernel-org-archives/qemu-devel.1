@@ -6,62 +6,57 @@ X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9985DC04AB5
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 12:27:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BFC3DC04AB5
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 12:29:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 735E1250BB
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 12:27:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 735E1250BB
+	by mail.kernel.org (Postfix) with ESMTPS id 9CF61263F4
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 12:29:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9CF61263F4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:34449 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:34461 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hXm48-0004XU-GH
-	for qemu-devel@archiver.kernel.org; Mon, 03 Jun 2019 08:27:52 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:34984)
+	id 1hXm5F-000589-T4
+	for qemu-devel@archiver.kernel.org; Mon, 03 Jun 2019 08:29:01 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:35094)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hXm3F-0004BT-7R
-	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 08:26:58 -0400
+	(envelope-from <mlevitsk@redhat.com>) id 1hXm3d-0004K9-7b
+	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 08:27:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hXm3E-0007lS-7Y
-	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 08:26:57 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35400)
+	(envelope-from <mlevitsk@redhat.com>) id 1hXm3c-00008u-7m
+	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 08:27:21 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59506)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hXm3E-0007kX-2P
-	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 08:26:56 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
+	(Exim 4.71) (envelope-from <mlevitsk@redhat.com>)
+	id 1hXm3Y-0007wb-40; Mon, 03 Jun 2019 08:27:16 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+	[10.5.11.23])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 4CDB9356FE;
-	Mon,  3 Jun 2019 12:26:55 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-117-223.ams2.redhat.com
-	[10.36.117.223])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 908FF61994;
-	Mon,  3 Jun 2019 12:26:50 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
-	id 22F2D11386A0; Mon,  3 Jun 2019 14:26:49 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: John Snow <jsnow@redhat.com>
-References: <20190531192429.GH22103@habkost.net>
-	<93e5101f-67f1-a416-5e80-f16371a35e6a@redhat.com>
-Date: Mon, 03 Jun 2019 14:26:49 +0200
-In-Reply-To: <93e5101f-67f1-a416-5e80-f16371a35e6a@redhat.com> (John Snow's
-	message of "Fri, 31 May 2019 18:06:37 -0400")
-Message-ID: <871s0asvli.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
-MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+	by mx1.redhat.com (Postfix) with ESMTPS id 0B3AD30C1AFC;
+	Mon,  3 Jun 2019 12:26:49 +0000 (UTC)
+Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.49])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 47A7E45CD;
+	Mon,  3 Jun 2019 12:26:45 +0000 (UTC)
+Message-ID: <9f33152c244d64be67b80ad920c6f735a41b6f2f.camel@redhat.com>
+From: Maxim Levitsky <mlevitsk@redhat.com>
+To: qemu-block@nongnu.org
+Date: Mon, 03 Jun 2019 15:26:45 +0300
+In-Reply-To: <20190417195355.16123-1-mlevitsk@redhat.com>
+References: <20190417195355.16123-1-mlevitsk@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.30]);
-	Mon, 03 Jun 2019 12:26:55 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.40]);
+	Mon, 03 Jun 2019 12:27:01 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] Deprecation policy and build dependencies
+Subject: Re: [Qemu-devel] [PATCH v2 0/5] Few fixes for userspace NVME driver
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -73,52 +68,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
-	"Daniel P. Berrange" <berrange@redhat.com>,
-	Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org,
-	Cleber Rosa <crosa@redhat.com>,
-	Philippe =?utf-8?Q?Mathieu-?= =?utf-8?Q?Daud=C3=A9?= <philmd@redhat.com>
+Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
+	qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-John Snow <jsnow@redhat.com> writes:
+On Wed, 2019-04-17 at 22:53 +0300, Maxim Levitsky wrote:
+> Hi!
+> These are few assorted fixes and features for the userspace
+> nvme driver.
+> 
+> Tested that on my laptop with my Samsung X5 thunderbolt drive, which
+> happens to have 4K sectors, support for discard and write zeros.
+> 
+> Also bunch of fixes sitting in my queue from the period when I developed
+> the nvme-mdev driver.
+> 
+> Best regards,
+>         Maxim Levitsky
+> 
+> Maxim Levitsky (5):
+>   block/nvme: don't flip CQ phase bits
+>   block/nvme: fix doorbell stride
+>   block/nvme: support larger that 512 bytes sector devices
+>   block/nvme: add support for write zeros
+>   block/nvme: add support for discard
+> 
+>  block/nvme.c         | 193 +++++++++++++++++++++++++++++++++++++++++--
+>  block/trace-events   |   3 +
+>  include/block/nvme.h |  19 ++++-
+>  3 files changed, 205 insertions(+), 10 deletions(-)
+> 
 
-> On 5/31/19 3:24 PM, Eduardo Habkost wrote:
->> Long story short: I would really like to drop support for Python
->> 2 in QEMU 4.1.
+Ping.
 
-The sooner, the better, as far as I'm concerned.
+Best regards,
+	Maxim Levitsky
 
->> What exactly prevents us from doing this?  Does our deprecation
->> policy really apply to build dependencies?
->> 
->
-> Normally I'd say it's only nice to also follow the depreciation policy
-> for tooling as well to give people a chance to switch away, but with
-> regards to Python2, I feel like we're in the clear to drop it for the
-> first release that will happen after the Python2 doomsday clock.
->
-> (So, probably 4.2.)
-
-In addition to our feature deprecation policity, we have a "Supported
-build platforms" policy (commit 45b47130f4b).  The most common holdback
-is this one:
-
-    For distributions with long-lifetime releases, the project will aim
-    to support the most recent major version at all times. Support for
-    the previous major version will be dropped 2 years after the new
-    major version is released. For the purposes of identifying supported
-    software versions, the project will look at RHEL, Debian, Ubuntu
-    LTS, and SLES distros. Other long-lifetime distros will be assumed
-    to ship similar software versions.
-
-RHEL-7 has Python 3 only in EPEL.  RHEL-8 came out last month.  Unless
-we interpret our policy to include EPEL, this means supporting Python 2
-for some 16 months after upstream Python retires it.  My personal
-opinion: nuts.
-
-I didn't bother checking Debian, Ubuntu LTS and SLES.
-
-For hosts other than Linux, we're less ambitious.
 
