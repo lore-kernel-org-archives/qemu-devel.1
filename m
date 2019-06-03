@@ -2,61 +2,103 @@ Return-Path: <SRS0=e5mL=UC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 05E9DC04AB5
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 20:50:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CE96AC04AB5
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 20:56:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B81952654C
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 20:50:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B81952654C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 838D52418C
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 20:56:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 838D52418C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:40768 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:40815 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hXtuy-0005iX-1Y
-	for qemu-devel@archiver.kernel.org; Mon, 03 Jun 2019 16:50:56 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:34957)
+	id 1hXu0f-0007a5-P0
+	for qemu-devel@archiver.kernel.org; Mon, 03 Jun 2019 16:56:49 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:42516)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1hXttx-0005KD-Uf
-	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 16:49:55 -0400
+	(envelope-from <anoo@linux.ibm.com>) id 1hXsML-0005cm-2i
+	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 15:11:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1hXttt-000121-Sz
-	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 16:49:52 -0400
-Received: from 6.mo173.mail-out.ovh.net ([46.105.43.93]:56400)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1hXtto-0000f5-Ld
-	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 16:49:47 -0400
-Received: from player787.ha.ovh.net (unknown [10.108.35.210])
-	by mo173.mail-out.ovh.net (Postfix) with ESMTP id 667C710BFDD
-	for <qemu-devel@nongnu.org>; Mon,  3 Jun 2019 22:49:37 +0200 (CEST)
-Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
-	[82.253.208.248]) (Authenticated sender: groug@kaod.org)
-	by player787.ha.ovh.net (Postfix) with ESMTPSA id 7238468AE89E;
-	Mon,  3 Jun 2019 20:49:31 +0000 (UTC)
-Date: Mon, 3 Jun 2019 22:49:30 +0200
-From: Greg Kurz <groug@kaod.org>
-To: elohimes@gmail.com
-Message-ID: <20190603224930.4f3c14fe@bahia.lab.toulouse-stg.fr.ibm.com>
-In-Reply-To: <20190529070955.25565-6-xieyongji@baidu.com>
-References: <20190529070955.25565-1-xieyongji@baidu.com>
-	<20190529070955.25565-6-xieyongji@baidu.com>
-X-Mailer: Claws Mail 3.16.0 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+	(envelope-from <anoo@linux.ibm.com>) id 1hXsMK-0001QT-0p
+	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 15:11:05 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:54344
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <anoo@linux.ibm.com>) id 1hXsMJ-0001N6-Ri
+	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 15:11:03 -0400
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+	x53J7vi0104711
+	for <qemu-devel@nongnu.org>; Mon, 3 Jun 2019 15:11:02 -0400
+Received: from e33.co.us.ibm.com (e33.co.us.ibm.com [32.97.110.151])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2sw82b3p5y-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 03 Jun 2019 15:11:01 -0400
+Received: from localhost
+	by e33.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <anoo@linux.ibm.com>;
+	Mon, 3 Jun 2019 20:11:00 +0100
+Received: from b03cxnp08025.gho.boulder.ibm.com (9.17.130.17)
+	by e33.co.us.ibm.com (192.168.1.133) with IBM ESMTP SMTP Gateway:
+	Authorized Use Only! Violators will be prosecuted; 
+	(version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+	Mon, 3 Jun 2019 20:10:58 +0100
+Received: from b03ledav004.gho.boulder.ibm.com
+	(b03ledav004.gho.boulder.ibm.com [9.17.130.235])
+	by b03cxnp08025.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with
+	ESMTP id x53JAvgM25756064
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256
+	verify=OK); Mon, 3 Jun 2019 19:10:57 GMT
+Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 9D7FE7805F;
+	Mon,  3 Jun 2019 19:10:57 +0000 (GMT)
+Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 264817805C;
+	Mon,  3 Jun 2019 19:10:57 +0000 (GMT)
+Received: from habcap11p1.aus.stglabs.ibm.com (unknown [9.41.164.53])
+	by b03ledav004.gho.boulder.ibm.com (Postfix) with ESMTP;
+	Mon,  3 Jun 2019 19:10:56 +0000 (GMT)
+From: Adriana Kobylak <anoo@linux.ibm.com>
+To: clg@kaod.org, peter.maydell@linaro.org, andrew@aj.id.au, joel@jms.id.au,
+	qemu-arm@nongnu.org
+Date: Mon,  3 Jun 2019 14:10:55 -0500
+X-Mailer: git-send-email 2.7.4
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Ovh-Tracer-Id: 9790825592104261933
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduuddrudefjedgudehvdcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 46.105.43.93
-Subject: Re: [Qemu-devel] [PATCH 5/5] virtio: add "use-started" property
+Content-Type: text/plain; charset=UTF-8
+X-TM-AS-GCONF: 00
+x-cbid: 19060319-0036-0000-0000-00000AC65D99
+X-IBM-SpamModules-Scores: 
+X-IBM-SpamModules-Versions: BY=3.00011209; HX=3.00000242; KW=3.00000007;
+	PH=3.00000004; SC=3.00000286; SDB=6.01212763; UDB=6.00637359;
+	IPR=6.00993823; 
+	MB=3.00027167; MTD=3.00000008; XFM=3.00000015; UTC=2019-06-03 19:11:00
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19060319-0037-0000-0000-00004C0E0A8E
+Message-Id: <1559589055-71202-1-git-send-email-anoo@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
+	definitions=2019-06-03_15:, , signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+	priorityscore=1501
+	malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+	clxscore=1011 lowpriorityscore=0 mlxscore=0 impostorscore=0
+	mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+	scancount=1 engine=8.0.1-1810050000 definitions=main-1906030129
+Content-Transfer-Encoding: quoted-printable
+X-MIME-Autoconverted: from 8bit to quoted-printable by
+	mx0b-001b2d01.pphosted.com id x53J7vi0104711
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 148.163.158.5
+X-Mailman-Approved-At: Mon, 03 Jun 2019 16:56:01 -0400
+Subject: [Qemu-devel] [PATCH qemu] aspeed: Add support for the swift-bmc
+ board
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -68,157 +110,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, Xie Yongji <xieyongji@baidu.com>,
-	dgilbert@redhat.com, mst@redhat.com
+Cc: Adriana Kobylak <anoo@us.ibm.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 29 May 2019 15:09:55 +0800
-elohimes@gmail.com wrote:
+From: Adriana Kobylak <anoo@us.ibm.com>
 
-> From: Xie Yongji <xieyongji@baidu.com>
-> 
-> In order to avoid migration issues, we introduce a "use-started"
-> property to the base virtio device to indicate whether "started"
-> and "start_on_kick" flag could be used. This property will be
-> true by default and set to false when machine type <= 4.0.
-> 
-> Suggested-by: Greg Kurz <groug@kaod.org>
-> Signed-off-by: Xie Yongji <xieyongji@baidu.com>
-> ---
->  hw/block/vhost-user-blk.c  |  8 ++++++--
->  hw/core/machine.c          |  4 +++-
->  hw/virtio/virtio.c         |  7 ++++---
->  include/hw/virtio/virtio.h | 10 ++++++++++
->  4 files changed, 23 insertions(+), 6 deletions(-)
-> 
-> diff --git a/hw/block/vhost-user-blk.c b/hw/block/vhost-user-blk.c
-> index 9cb61336a6..520c5d3d4b 100644
-> --- a/hw/block/vhost-user-blk.c
-> +++ b/hw/block/vhost-user-blk.c
-> @@ -191,9 +191,13 @@ static void vhost_user_blk_stop(VirtIODevice *vdev)
->  static void vhost_user_blk_set_status(VirtIODevice *vdev, uint8_t status)
->  {
->      VHostUserBlk *s = VHOST_USER_BLK(vdev);
-> -    bool should_start = vdev->started;
-> +    bool should_start = status & VIRTIO_CONFIG_S_DRIVER_OK;
+The Swift board is an OpenPOWER system hosting POWER processors.
+Add support for their BMC including the I2C devices as found on HW.
 
-I guess you need the above because the set_status callback is called
-before setting vdev->status, and virtio_device_started() thus doesn't
-return the expected result for older machine types ?
+Signed-off-by: Adriana Kobylak <anoo@us.ibm.com>
+Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
+---
+ hw/arm/aspeed.c | 42 ++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 42 insertions(+)
 
-What about adding a status argument to virtio_device_started() ?
-
-    bool should_start = virtio_device_started(vdev, status);
-
->      int ret;
->  
-> +    if (virtio_device_started(vdev)) {
-> +        should_start = true;
-> +    }
-> +
->      if (!vdev->vm_running) {
->          should_start = false;
->      }
-> @@ -317,7 +321,7 @@ static int vhost_user_blk_connect(DeviceState *dev)
->      }
->  
->      /* restore vhost state */
-> -    if (vdev->started) {
-> +    if (virtio_device_started(vdev)) {
-
-    if (virtio_device_started(vdev, vdev->status)) {
-
-and so on...
-
->          ret = vhost_user_blk_start(vdev);
->          if (ret < 0) {
->              error_report("vhost-user-blk: vhost start failed: %s",
-> diff --git a/hw/core/machine.c b/hw/core/machine.c
-> index 934c1bcceb..1730d28c1b 100644
-> --- a/hw/core/machine.c
-> +++ b/hw/core/machine.c
-> @@ -24,7 +24,9 @@
->  #include "hw/pci/pci.h"
->  #include "hw/mem/nvdimm.h"
->  
-> -GlobalProperty hw_compat_4_0[] = {};
-> +GlobalProperty hw_compat_4_0[] = {
-> +    { "virtio-device", "use-started", "false" },
-> +};
->  const size_t hw_compat_4_0_len = G_N_ELEMENTS(hw_compat_4_0);
->  
->  GlobalProperty hw_compat_3_1[] = {
-> diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
-> index 9e17293d46..4c05a9efe3 100644
-> --- a/hw/virtio/virtio.c
-> +++ b/hw/virtio/virtio.c
-> @@ -1803,14 +1803,14 @@ static bool virtio_started_needed(void *opaque)
->  {
->      VirtIODevice *vdev = opaque;
->  
-> -    return vdev->started;
-> +    return vdev->started && vdev->use_started;
-
-Hmm... the idea is that vdev->started should never be set when
-"use-started" is "off". Instead of checking vdev->use_started
-here, you should rather assign it to vdev->started everywhere
-you currently assign true.
-
->  }
->  
->  static bool virtio_start_on_kick_needed(void *opaque)
->  {
->      VirtIODevice *vdev = opaque;
->  
-> -    return vdev->start_on_kick;
-> +    return vdev->start_on_kick && vdev->use_started;
->  }
->  
->  static const VMStateDescription vmstate_virtqueue = {
-> @@ -2320,7 +2320,7 @@ static void virtio_vmstate_change(void *opaque, int running, RunState state)
->      VirtIODevice *vdev = opaque;
->      BusState *qbus = qdev_get_parent_bus(DEVICE(vdev));
->      VirtioBusClass *k = VIRTIO_BUS_GET_CLASS(qbus);
-> -    bool backend_run = running && vdev->started;
-> +    bool backend_run = running && virtio_device_started(vdev);
->      vdev->vm_running = running;
->  
->      if (backend_run) {
-> @@ -2698,6 +2698,7 @@ static void virtio_device_instance_finalize(Object *obj)
->  
->  static Property virtio_properties[] = {
->      DEFINE_VIRTIO_COMMON_FEATURES(VirtIODevice, host_features),
-> +    DEFINE_PROP_BOOL("use-started", VirtIODevice, use_started, true),
->      DEFINE_PROP_END_OF_LIST(),
->  };
->  
-> diff --git a/include/hw/virtio/virtio.h b/include/hw/virtio/virtio.h
-> index 27c0efc3d0..ba4dbd7480 100644
-> --- a/include/hw/virtio/virtio.h
-> +++ b/include/hw/virtio/virtio.h
-> @@ -105,6 +105,7 @@ struct VirtIODevice
->      uint16_t device_id;
->      bool vm_running;
->      bool broken; /* device in invalid state, needs reset */
-> +    bool use_started;
->      bool started;
->      bool start_on_kick; /* virtio 1.0 transitional devices support that */
->      VMChangeStateEntry *vmstate;
-> @@ -351,4 +352,13 @@ static inline bool virtio_is_big_endian(VirtIODevice *vdev)
->      /* Devices conforming to VIRTIO 1.0 or later are always LE. */
->      return false;
->  }
-> +
-> +static inline bool virtio_device_started(VirtIODevice *vdev)
-> +{
-> +    if (vdev->use_started) {
-> +        return vdev->started;
-> +    }
-> +
-> +    return vdev->status & VIRTIO_CONFIG_S_DRIVER_OK;
-> +}
->  #endif
+diff --git a/hw/arm/aspeed.c b/hw/arm/aspeed.c
+index 33070a6..cd95b3c 100644
+--- a/hw/arm/aspeed.c
++++ b/hw/arm/aspeed.c
+@@ -73,6 +73,9 @@ struct AspeedBoardState {
+         SCU_AST2500_HW_STRAP_ACPI_ENABLE |                              =
+\
+         SCU_HW_STRAP_SPI_MODE(SCU_HW_STRAP_SPI_MASTER))
+=20
++/* TODO: Swift hardware value: ? (use romulus definition for now) */
++#define SWIFT_BMC_HW_STRAP1 ROMULUS_BMC_HW_STRAP1
++
+ /* Witherspoon hardware value: 0xF10AD216 (but use romulus definition) *=
+/
+ #define WITHERSPOON_BMC_HW_STRAP1 ROMULUS_BMC_HW_STRAP1
+=20
+@@ -287,6 +290,35 @@ static void romulus_bmc_i2c_init(AspeedBoardState *b=
+mc)
+     i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 11), "ds1338"=
+, 0x32);
+ }
+=20
++static void swift_bmc_i2c_init(AspeedBoardState *bmc)
++{
++    AspeedSoCState *soc =3D &bmc->soc;
++
++    i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 3), "pca9552"=
+, 0x60);
++
++    /* The swift board expects a TMP275 but a TMP105 is compatible */
++    i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 7), "tmp105",=
+ 0x48);
++    /* The swift board expects a pca9551 but a pca9552 is compatible */
++    i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 7), "pca9552"=
+, 0x60);
++
++    /* The swift board expects an Epson RX8900 RTC but a ds1338 is compa=
+tible */
++    i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 8), "ds1338",=
+ 0x32);
++    i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 8), "pca9552"=
+, 0x60);
++
++    i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 9), "tmp423",=
+ 0x4c);
++    /* The swift board expects a pca9539 but a pca9552 is compatible */
++    i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 9), "pca9552"=
+, 0x74);
++
++    i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 10), "tmp423"=
+, 0x4c);
++    /* The swift board expects a pca9539 but a pca9552 is compatible */
++    i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 10), "pca9552=
+",
++                     0x74);
++
++    /* The swift board expects a TMP275 but a TMP105 is compatible */
++    i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 12), "tmp105"=
+, 0x48);
++    i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 12), "tmp105"=
+, 0x4a);
++}
++
+ static void witherspoon_bmc_i2c_init(AspeedBoardState *bmc)
+ {
+     AspeedSoCState *soc =3D &bmc->soc;
+@@ -378,6 +410,16 @@ static const AspeedBoardConfig aspeed_boards[] =3D {
+         .i2c_init  =3D romulus_bmc_i2c_init,
+         .ram       =3D 512 * MiB,
+     }, {
++        .name      =3D MACHINE_TYPE_NAME("swift-bmc"),
++        .desc      =3D "OpenPOWER Swift BMC (ARM1176)",
++        .soc_name  =3D "ast2500-a1",
++        .hw_strap1 =3D SWIFT_BMC_HW_STRAP1,
++        .fmc_model =3D "mx66l1g45g",
++        .spi_model =3D "mx66l1g45g",
++        .num_cs    =3D 2,
++        .i2c_init  =3D swift_bmc_i2c_init,
++        .ram       =3D 512 * MiB,
++    }, {
+         .name      =3D MACHINE_TYPE_NAME("witherspoon-bmc"),
+         .desc      =3D "OpenPOWER Witherspoon BMC (ARM1176)",
+         .soc_name  =3D "ast2500-a1",
+--=20
+1.8.3.1
 
 
