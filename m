@@ -2,68 +2,65 @@ Return-Path: <SRS0=e5mL=UC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 92220C04AB5
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 10:27:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CA4CC04AB5
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 10:44:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5C4732809B
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 10:27:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5C4732809B
+	by mail.kernel.org (Postfix) with ESMTPS id 663AD280AB
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 10:44:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 663AD280AB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:32796 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:32961 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hXkBH-0000Za-1V
-	for qemu-devel@archiver.kernel.org; Mon, 03 Jun 2019 06:27:07 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:38586)
+	id 1hXkSD-0003ip-4N
+	for qemu-devel@archiver.kernel.org; Mon, 03 Jun 2019 06:44:37 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:42379)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1hXkAR-0000Az-P8
-	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 06:26:17 -0400
+	(envelope-from <lersek@redhat.com>) id 1hXkRM-0003Oa-Bv
+	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 06:43:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1hXkAP-0003X6-8q
-	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 06:26:15 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39306)
+	(envelope-from <lersek@redhat.com>) id 1hXkRL-0007Es-0H
+	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 06:43:44 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34566)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1hXkAI-00031D-Uz
-	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 06:26:09 -0400
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1hXkRK-0007DH-Oi
+	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 06:43:42 -0400
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
 	[10.5.11.22])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 9DFE72F8BCF;
-	Mon,  3 Jun 2019 10:25:53 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 8C1113082E68;
+	Mon,  3 Jun 2019 10:43:41 +0000 (UTC)
 Received: from lacos-laptop-7.usersys.redhat.com (ovpn-121-13.rdu2.redhat.com
 	[10.10.121.13])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 60682104B4C2;
-	Mon,  3 Jun 2019 10:25:46 +0000 (UTC)
-To: Gerd Hoffmann <kraxel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
-References: <20190528204838.21568-1-kraxel@redhat.com>
-	<bf45adf2-1594-89b4-6a4d-9af6d9e8ac6e@redhat.com>
-	<20190528224810-mutt-send-email-mst@kernel.org>
-	<20190529044701.skqpsdna3c5yvbnm@sirius.home.kraxel.org>
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 0BEC01001E69;
+	Mon,  3 Jun 2019 10:43:34 +0000 (UTC)
+To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
+References: <20190528204331.5280-1-kraxel@redhat.com>
 From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <d8b99f5b-301c-317a-2a8a-db687ebd1e52@redhat.com>
-Date: Mon, 3 Jun 2019 12:25:45 +0200
+Message-ID: <6068295f-5a36-5d16-8895-95385f0b44be@redhat.com>
+Date: Mon, 3 Jun 2019 12:43:33 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
 	Thunderbird/52.9.1
 MIME-Version: 1.0
-In-Reply-To: <20190529044701.skqpsdna3c5yvbnm@sirius.home.kraxel.org>
+In-Reply-To: <20190528204331.5280-1-kraxel@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.38]);
-	Mon, 03 Jun 2019 10:25:53 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.46]);
+	Mon, 03 Jun 2019 10:43:41 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH] q35: split memory at 2G
+Subject: Re: [Qemu-devel] [PATCH] q35: fix mmconfig and PCI0._CRS
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -75,98 +72,160 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
-	qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>
+Cc: Eduardo Habkost <ehabkost@redhat.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+	Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 05/29/19 06:47, Gerd Hoffmann wrote:
-> On Tue, May 28, 2019 at 10:49:55PM -0400, Michael S. Tsirkin wrote:
->> On Wed, May 29, 2019 at 03:21:16AM +0200, Paolo Bonzini wrote:
->>> On 28/05/19 22:48, Gerd Hoffmann wrote:
->>>> Original q35 behavior was to split memory 2.75 GB, leaving space for the
->>>> mmconfig bar at 0xb000000 and pci I/O window starting at 0xc0000000.
->>>>
->>>> Note: Those machine types have been removed from the qemu codebase
->>>> meanwhile because they could not be live-migrated so there was little
->>>> value in keeping them around.
->>>>
->>>> With the effort to allow for gigabyte-alignment of guest memory that
->>>> behavior was changed:  The split was moved to 2G, but only in case the
->>>> memory didn't fit below 2.75 GB.
->>>>
->>>> So today the address space between 2G and 2,75G is not used for guest
->>>> memory in typical use cases, where the guest memory sized at a power of
->>>> two or a gigabyte number.  But if you configure your guest with some odd
->>>> amout of memory (such as 2.5G) the address space is used.
->>>
->>> Wasn't it done to ensure pre-PAE OSes could use as much memory as
->>> possible?  (If you run pre-PAE OSes with more RAM than can fit below 4G,
->>> you can just reduce the amount of memory and get all the 2.75G).
->>>
->>> Paolo
->>
->> Absolutely. Gerd is just saying the configuration is rare enough that
->> it's not worth worrying about. I don't know myself - why do
->> we bother making this change? What's the advantage?
-> 
-> Some ovmf versions place the mmconfig @ 2G.  Which works fine in 99% of
-> the cases, but with memory sizes between 2G and 2.75G it doesn't.
+On 05/28/19 22:43, Gerd Hoffmann wrote:
+> This patch changes the handling of the mmconfig area.  Thanks to the
+> pci(e) expander devices we already have the logic to exclude address
+> ranges from PCI0._CRS.  We can simply add the mmconfig address range
+> to the list get it excluded as well.
+>=20
+> With that in place we can go with a fixed pci hole which covers the
+> whole area from the end of (low) ram to the ioapic.
+>=20
+> This will make the whole logic alot less fragile.  No matter where the
+> firmware places the mmconfig xbar, things should work correctly.  The
+> guest also gets a bit more PCI address space (seabios boot):
+>=20
+>     # cat /proc/iomem
+>     [ ... ]
+>     7ffdd000-7fffffff : reserved
+>     80000000-afffffff : PCI Bus 0000:00            <<-- this is new
+>     b0000000-bfffffff : PCI MMCONFIG 0000 [bus 00-ff]
+>       b0000000-bfffffff : reserved
+>     c0000000-febfffff : PCI Bus 0000:00
+>       f8000000-fbffffff : 0000:00:01.0
+>     [ ... ]
+>=20
+> So this is a guest visible change.
+>=20
+> Cc: L=C3=A1szl=C3=B3 =C3=89rsek <lersek@redhat.com>
+> Cc: Igor Mammedov <imammedo@redhat.com>
+> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+> ---
+>  hw/i386/acpi-build.c | 14 ++++++++++++++
+>  hw/pci-host/q35.c    | 31 ++++++++-----------------------
+>  2 files changed, 22 insertions(+), 23 deletions(-)
+>=20
+> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+> index 0d78d738948c..abb0e0ce9f27 100644
+> --- a/hw/i386/acpi-build.c
+> +++ b/hw/i386/acpi-build.c
+> @@ -122,6 +122,8 @@ typedef struct FwCfgTPMConfig {
+>      uint8_t tpmppi_version;
+>  } QEMU_PACKED FwCfgTPMConfig;
+> =20
+> +static bool acpi_get_mcfg(AcpiMcfgInfo *mcfg);
+> +
+>  static void init_common_fadt_data(Object *o, AcpiFadtData *data)
+>  {
+>      uint32_t io =3D object_property_get_uint(o, ACPI_PM_PROP_PM_IO_BAS=
+E, NULL);
+> @@ -1807,6 +1809,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker=
+,
+>      CrsRangeSet crs_range_set;
+>      PCMachineState *pcms =3D PC_MACHINE(machine);
+>      PCMachineClass *pcmc =3D PC_MACHINE_GET_CLASS(machine);
+> +    AcpiMcfgInfo mcfg;
+>      uint32_t nr_mem =3D machine->ram_slots;
+>      int root_bus_limit =3D 0xFF;
+>      PCIBus *bus =3D NULL;
+> @@ -1921,6 +1924,17 @@ build_dsdt(GArray *table_data, BIOSLinker *linke=
+r,
+>          }
+>      }
+> =20
+> +    /*
+> +     * At this point crs_range_set has all the ranges used by pci
+> +     * busses *other* than PCI0.  These ranges will be excluded from
+> +     * the PCI0._CRS.  Add mmconfig to the set so it will be excluded
+> +     * too.
+> +     */
+> +    if (acpi_get_mcfg(&mcfg)) {
+> +        crs_range_insert(crs_range_set.mem_ranges,
+> +                         mcfg.base, mcfg.base + mcfg.size - 1);
+> +    }
+> +
+>      scope =3D aml_scope("\\_SB.PCI0");
+>      /* build PCI0._CRS */
+>      crs =3D aml_resource_template();
+> diff --git a/hw/pci-host/q35.c b/hw/pci-host/q35.c
+> index 960939f5ed3e..72093320befe 100644
+> --- a/hw/pci-host/q35.c
+> +++ b/hw/pci-host/q35.c
+> @@ -258,15 +258,6 @@ static void q35_host_initfn(Object *obj)
+>      object_property_add_link(obj, MCH_HOST_PROP_IO_MEM, TYPE_MEMORY_RE=
+GION,
+>                               (Object **) &s->mch.address_space_io,
+>                               qdev_prop_allow_set_link_before_realize, =
+0, NULL);
+> -
+> -    /* Leave enough space for the biggest MCFG BAR */
+> -    /* TODO: this matches current bios behaviour, but
+> -     * it's not a power of two, which means an MTRR
+> -     * can't cover it exactly.
+> -     */
+> -    range_set_bounds(&s->mch.pci_hole,
+> -            MCH_HOST_BRIDGE_PCIEXBAR_DEFAULT + MCH_HOST_BRIDGE_PCIEXBA=
+R_MAX,
+> -            IO_APIC_DEFAULT_ADDRESS - 1);
+>  }
+> =20
+>  static const TypeInfo q35_host_info =3D {
+> @@ -338,20 +329,6 @@ static void mch_update_pciexbar(MCHPCIState *mch)
+>      }
+>      addr =3D pciexbar & addr_mask;
+>      pcie_host_mmcfg_update(pehb, enable, addr, length);
+> -    /* Leave enough space for the MCFG BAR */
+> -    /*
+> -     * TODO: this matches current bios behaviour, but it's not a power=
+ of two,
+> -     * which means an MTRR can't cover it exactly.
+> -     */
+> -    if (enable) {
+> -        range_set_bounds(&mch->pci_hole,
+> -                         addr + length,
+> -                         IO_APIC_DEFAULT_ADDRESS - 1);
+> -    } else {
+> -        range_set_bounds(&mch->pci_hole,
+> -                         MCH_HOST_BRIDGE_PCIEXBAR_DEFAULT,
+> -                         IO_APIC_DEFAULT_ADDRESS - 1);
+> -    }
+>  }
+> =20
+>  /* PAM */
+> @@ -484,6 +461,14 @@ static void mch_update(MCHPCIState *mch)
+>      mch_update_pam(mch);
+>      mch_update_smram(mch);
+>      mch_update_ext_tseg_mbytes(mch);
+> +
+> +    /*
+> +     * pci hole goes from end-of-low-ram to io-apic.
+> +     * mmconfig will be excluded by the dsdt builder.
+> +     */
+> +    range_set_bounds(&mch->pci_hole,
+> +                     mch->below_4g_mem_size,
+> +                     IO_APIC_DEFAULT_ADDRESS - 1);
+>  }
+> =20
+>  static int mch_post_load(void *opaque, int version_id)
+>=20
 
-Here's the stages of PCIEXBAR placement in OVMF:
+Looks plausible to me, but I've burned myself with this so frequently
+that I'm not comfortable giving a formal feedback tag. I'll defer to
+other reviewers (thankfully, there seem to be many, in this instance!)
 
-#1 Commit 7b8fe63561b4 ("OvmfPkg: PlatformPei: enable PCIEXBAR (aka
-MMCONFIG / ECAM) on Q35", 2016-03-10): places the PCIEXBAR at 2GB.
-Behaves according to your description.
+One question: are we sure all guest OSes we care about can deal with
+discontiguous 32-bit PCI MMIO aperture(s)? Personally, I've got no clue.
+Is a "na=C3=AFve" OS imaginable that looks only at the first suitable ran=
+ge
+in the _CRS?
 
-#2 Commit 75136b29541b ("OvmfPkg/PlatformPei: reorder the 32-bit PCI
-window vs. the PCIEXBAR on q35", 2019-05-16): made for the 1% of cases
-(according to your description) where the previous logic would fail,
-namely with RAM between 2G and 2.75G. Places the PCIEXBAR at
-0xE000_0000, and the 32-bit MMIO window below it. Unfortunately, this
-causes a regression for end-users, because this ordering of areas
-triggers a bug in QEMU's ACPI generator somewhere. The 32-bit MMIO
-window will be clamped *above* 0xF000_0000, when it should actually end
-at 0xE000_0000. Causes confusion for some guest OSes (the mildest
-symptom is PCI resource reassignment).
-
-#3 Patch series linked in
-<https://bugzilla.tianocore.org/show_bug.cgi?id=1859#c1>: restores the
-original order (so as to pacify the ACPI generator in QEMU). Places the
-PCIEXBAR at 0xB000_0000. Places the 32-bit MMIO window at 0xC000_0000.
-This wastes a bit of 32-bit MMIO space, but it has the best
-compatibility. The cases under which the waste occurs are: (a) pre-4.1
-Q35 machine types with low RAM side *outside* of 2GB..2.75GB, and (b)
-4.1+ Q35 machine types (with this patch applied), regardless of low RAM
-size. Effectively this patch set returns to the first variant, except it
-bumps the PCIEXBAR base from 2GB to 2.75GB.
-
-Once all pre-4.1 Q35 machine types can be considered obsolete, we can
-return OVMF to option#1 again. Until then, it's best to fix the host
-side and the guest side both, for best compatibility for end-users.
-(This is generally what we do, i.e. fix both sides, when there is a
-host-guest disagreement.)
-
-So, for this patch:
-
-Acked-by: Laszlo Ersek <lersek@redhat.com>
-
-I'll also push (soon) the edk2 patches for option#3 above.
-
-(
-
-Things I haven't discussed here: (a) why we'd like to continue
-specifying the PXIEXBAR base in OVMF as a build-time constant (because
-making it dynamic might introduce complications for module dispatch
-order), (b) MTRR aspects (both the PCIEXBAR and the 32-bit MMIO window
-should be marked UC through variable MTRRs, and while SeaBIOS currently
-ignores the first, I wouldn't like to, in OVMF). All of options #1
-through #3 can be made work correctly wrt. variable MTRRs, but *some*
-OVMF patches are necessary for either of those.
-
-)
-
-Thanks
+Thanks,
 Laszlo
 
