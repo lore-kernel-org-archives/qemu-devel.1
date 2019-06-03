@@ -4,81 +4,80 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F686C04AB5
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 17:20:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 62E18C04AB5
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 17:22:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C0937273E8
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 17:20:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2A4F624C34
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 17:22:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hj7e8FEF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C0937273E8
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pdQq65K+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2A4F624C34
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:38385 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:38407 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hXqdh-0005rH-T6
-	for qemu-devel@archiver.kernel.org; Mon, 03 Jun 2019 13:20:53 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:43337)
+	id 1hXqfT-0007fi-Ah
+	for qemu-devel@archiver.kernel.org; Mon, 03 Jun 2019 13:22:43 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:43385)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1hXqUN-0007In-Pv
-	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 13:11:17 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1hXqUQ-0007LK-2I
+	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 13:11:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1hXqUL-0004Oo-RS
-	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 13:11:15 -0400
-Received: from mail-wm1-x332.google.com ([2a00:1450:4864:20::332]:52202)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1hXqUN-0004SC-Rr
+	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 13:11:17 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:52018)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1hXqUK-0004Dk-3D
-	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 13:11:13 -0400
-Received: by mail-wm1-x332.google.com with SMTP id f10so12032738wmb.1
-	for <qemu-devel@nongnu.org>; Mon, 03 Jun 2019 10:11:08 -0700 (PDT)
+	id 1hXqUL-0004AR-RQ
+	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 13:11:15 -0400
+Received: by mail-wm1-x342.google.com with SMTP id f10so12032624wmb.1
+	for <qemu-devel@nongnu.org>; Mon, 03 Jun 2019 10:11:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
 	h=sender:from:to:subject:date:message-id:in-reply-to:references;
-	bh=h9pzJqBxd1kk+NLb46bmp/qSs2GUDyrQqgzMDq+2xko=;
-	b=hj7e8FEFqKcjeeUtbFPHKlavoi+VdSRPx1eo1J/nNba+Qu8/fm/x5fxagN5We+fnJG
-	LFxGNQkYuc+uBCf6/ygC5CdaL4luMYIZbaghVEgsIiSoPiYMQVAlS6Xm9VnzfUfCAKr/
-	/9SYqLkbhuYNy6Pv6rdcZbrwiJvJw1fjJu4Rm3Fhjk7KaGaRi0adsuerJc3Zb6IbP5jQ
-	d1qMoCTsazk57rxFjWs48LT8ufUvQAYjsR9pTElSPwvmg597F+4R8jRdYe01cynhzBLH
-	F6I92gcGeG8FLkfg32Gc1NFBoJB/sauU+/mbu39xIPSLUzFEAuZBO+m2a4kfXM65DmTv
-	xMOw==
+	bh=WUPOWQby9NyOWCL8EdgXH+awKj5mu9CtF/Idmcmf/vA=;
+	b=pdQq65K+tzU/Uopn7teSy9MFNofoQvVKbRYJaK9m4QdhKIuMBm+oSvfN1isfe125PN
+	h6R5yNxSr2oupR6Nu8CP1qKSc9WkseXMaEoloEy7lvJsxo7g4lEGdl7Y/TpWJroVbkbl
+	WPnPijoq/yDWUClB3cIBN30w14CHBSySOKBQdvYzvIYrbKl9mJPiocqDpWcJs5FBWAne
+	wZujnzkp10VpEDKEgkLJCN8ffaQiVQAPsq+s5RJVwHeU6+YxDshjMcIHF3tNuEOGsdu6
+	v5aB5xueHkF+cGrq1vYY1NiU213UE5xzm3N0R4vJKtzPZhaiJbktRmMgQiCQZrv3+5sE
+	PXKA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:sender:from:to:subject:date:message-id
 	:in-reply-to:references;
-	bh=h9pzJqBxd1kk+NLb46bmp/qSs2GUDyrQqgzMDq+2xko=;
-	b=SbUqemZEpIbkUudE9jSvkpTRkZpvYFpa1yjuAOxDWKCWFh8tnDngB7jS3hrlPfLHNe
-	VbV5EQREmitAlRRVPKevCUXFL+XcbWrc+Gora9a2MOU0g7eCHlY6JNKyGf3DggjTalNN
-	C/Ffd+iHkiq1B/wdwd1tIDcRZXTem0SdxsKa1uK29L8M3OiYNw4g15BWFBegUzwy08XC
-	H8cY20d51P/vKMHqgpoE7/qt97nWzyO2cI0nKzL+gFLbYZWQsqjLhx+dbiQDbI5VMrW3
-	AUb9YdkUcNRsAlFM04LtFq2VfONgn2ASS/x/TG3THzaRJT2sOmzv5L7b8GaFTVGD2orY
-	2ugw==
-X-Gm-Message-State: APjAAAXKPkl2A8Z28NpCg9DKonX4RCzMm1WI6hC6GesIJ7Tz99nGb2Kh
-	AuyrXgnqFietLQv0VqSUNZNXTWJg
-X-Google-Smtp-Source: APXvYqxffzkArju12RGf1wqQQhU3KLhy9sC8RcZGSHNDaOQrTt6BTvnoJzaXeS1AKWceb2y2pJhLhQ==
-X-Received: by 2002:a05:600c:2182:: with SMTP id
-	e2mr11000461wme.55.1559581866680; 
-	Mon, 03 Jun 2019 10:11:06 -0700 (PDT)
+	bh=WUPOWQby9NyOWCL8EdgXH+awKj5mu9CtF/Idmcmf/vA=;
+	b=G2IEfGs/mOGNYDsTO3A3xIWbZkBPnPBSHKemUDpktceMQe2t/Tnocq0PEew8vunXMw
+	PyZJZcpFZCPz24UnH60sO0tyeQm4XqpRSR9eJWmXM8Jf+H7H+12r0hW0o56Qw+v0uip3
+	NXdRqkMrYd18Lqkh22uOSzjjRLnCiAtWI6Wg7zTSZUp6OKNmw+/ArbVrb1W+raT5kzgO
+	zhqN1MMJVUVehOqs7C6yl+WlTYi20vSJlUt8F65TPJLbwjqWs2AeEfRjLvZAtAba/ZLj
+	knQt/aEeFL5X9VwmJZTfGm+5nNFj3lK2Dw1gXnrxAR+O9VGDg2ZIFDvY2/nVkkMhVJ5W
+	ye4w==
+X-Gm-Message-State: APjAAAVzeBav0S3y2jXxwTM2AEDigELIpV2hLv77xDwSbAmMpJffc8FA
+	6gq+RIyjrbdLcbQEcAwZp+mpi8i2
+X-Google-Smtp-Source: APXvYqy8K2jv9HSpzpY11JtpiAMoCkuViVJCwLY/E+dL9ry12eAEpxothmlo7j7Lq/FA3qOQAPQZww==
+X-Received: by 2002:a1c:4054:: with SMTP id n81mr15413787wma.78.1559581864650; 
+	Mon, 03 Jun 2019 10:11:04 -0700 (PDT)
 Received: from 640k.lan ([93.56.166.5]) by smtp.gmail.com with ESMTPSA id
-	r131sm3325045wmf.4.2019.06.03.10.11.05 for <qemu-devel@nongnu.org>
+	r131sm3325045wmf.4.2019.06.03.10.11.03 for <qemu-devel@nongnu.org>
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Mon, 03 Jun 2019 10:11:05 -0700 (PDT)
+	Mon, 03 Jun 2019 10:11:03 -0700 (PDT)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Mon,  3 Jun 2019 19:10:39 +0200
-Message-Id: <1559581843-3968-21-git-send-email-pbonzini@redhat.com>
+Date: Mon,  3 Jun 2019 19:10:37 +0200
+Message-Id: <1559581843-3968-19-git-send-email-pbonzini@redhat.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1559581843-3968-1-git-send-email-pbonzini@redhat.com>
 References: <1559581843-3968-1-git-send-email-pbonzini@redhat.com>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2a00:1450:4864:20::332
-Subject: [Qemu-devel] [PULL 20/24] tests: convert ds1338-test to qtest
+X-Received-From: 2a00:1450:4864:20::342
+Subject: [Qemu-devel] [PULL 18/24] libqos: add ARM imx25-pdk machine object
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -94,180 +93,125 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This way, ds1338-test will run for every machine that exposes
-an i2c-bus.
+This is used to test imx_i2c.
 
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- tests/Makefile.include |  9 ++++-----
- tests/ds1338-test.c    | 37 +++++++++++++------------------------
- tests/libqos/i2c-imx.c | 19 -------------------
- tests/libqos/i2c.h     |  2 --
- 4 files changed, 17 insertions(+), 50 deletions(-)
+ tests/Makefile.include               |  1 +
+ tests/libqos/arm-imx25-pdk-machine.c | 92 ++++++++++++++++++++++++++++++++++++
+ 2 files changed, 93 insertions(+)
+ create mode 100644 tests/libqos/arm-imx25-pdk-machine.c
 
 diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 0f1ddde..46a36c2 100644
+index 03a6483..506181e 100644
 --- a/tests/Makefile.include
 +++ b/tests/Makefile.include
-@@ -255,7 +255,6 @@ check-qtest-sparc64-$(CONFIG_ISA_TESTDEV) = tests/endianness-test$(EXESUF)
- check-qtest-sparc64-y += tests/prom-env-test$(EXESUF)
- check-qtest-sparc64-y += tests/boot-serial-test$(EXESUF)
+@@ -711,6 +711,7 @@ qos-test-obj-y += tests/libqos/virtio-serial.o
  
--check-qtest-arm-y += tests/ds1338-test$(EXESUF)
- check-qtest-arm-y += tests/microbit-test$(EXESUF)
- check-qtest-arm-y += tests/m25p80-test$(EXESUF)
- check-qtest-arm-y += tests/test-arm-mptimer$(EXESUF)
-@@ -676,7 +675,7 @@ libqgraph-obj-y = tests/libqos/qgraph.o
- 
- libqos-obj-y = $(libqgraph-obj-y) tests/libqos/pci.o tests/libqos/fw_cfg.o
- libqos-obj-y += tests/libqos/malloc.o
--libqos-obj-y += tests/libqos/i2c.o tests/libqos/libqos.o
-+libqos-obj-y += tests/libqos/libqos.o
- libqos-spapr-obj-y = $(libqos-obj-y) tests/libqos/malloc-spapr.o
- libqos-spapr-obj-y += tests/libqos/libqos-spapr.o
- libqos-spapr-obj-y += tests/libqos/rtas.o
-@@ -684,14 +683,14 @@ libqos-spapr-obj-y += tests/libqos/pci-spapr.o
- libqos-pc-obj-y = $(libqos-obj-y) tests/libqos/pci-pc.o
- libqos-pc-obj-y += tests/libqos/malloc-pc.o tests/libqos/libqos-pc.o
- libqos-pc-obj-y += tests/libqos/ahci.o
--libqos-imx-obj-y = $(libqos-obj-y) tests/libqos/i2c-imx.o
- libqos-usb-obj-y = $(libqos-spapr-obj-y) $(libqos-pc-obj-y) tests/libqos/usb.o
- 
- # Devices
- qos-test-obj-y = tests/qos-test.o $(libqgraph-obj-y)
- qos-test-obj-y += $(libqos-pc-obj-y) $(libqos-spapr-obj-y)
- qos-test-obj-y += tests/libqos/e1000e.o
--qos-test-obj-y += $(libqos-imx-obj-y)
-+qos-test-obj-y += tests/libqos/i2c.o
-+qos-test-obj-y += tests/libqos/i2c-imx.o
- qos-test-obj-y += tests/libqos/i2c-omap.o
- qos-test-obj-y += tests/libqos/sdhci.o
- qos-test-obj-y += tests/libqos/tpci200.o
-@@ -720,6 +719,7 @@ qos-test-obj-y += tests/libqos/x86_64_pc-machine.o
- 
- # Tests
- qos-test-obj-y += tests/ac97-test.o
-+qos-test-obj-y += tests/ds1338-test.o
- qos-test-obj-y += tests/e1000-test.o
- qos-test-obj-y += tests/e1000e-test.o
- qos-test-obj-y += tests/eepro100-test.o
-@@ -771,7 +771,6 @@ tests/boot-serial-test$(EXESUF): tests/boot-serial-test.o $(libqos-obj-y)
- tests/bios-tables-test$(EXESUF): tests/bios-tables-test.o \
- 	tests/boot-sector.o tests/acpi-utils.o $(libqos-obj-y)
- tests/pxe-test$(EXESUF): tests/pxe-test.o tests/boot-sector.o $(libqos-obj-y)
--tests/ds1338-test$(EXESUF): tests/ds1338-test.o $(libqos-imx-obj-y)
- tests/microbit-test$(EXESUF): tests/microbit-test.o
- tests/m25p80-test$(EXESUF): tests/m25p80-test.o
- tests/i440fx-test$(EXESUF): tests/i440fx-test.o $(libqos-pc-obj-y)
-diff --git a/tests/ds1338-test.c b/tests/ds1338-test.c
-index bd72a15..fd8fbad 100644
---- a/tests/ds1338-test.c
-+++ b/tests/ds1338-test.c
-@@ -21,25 +21,23 @@
- #include "libqtest.h"
- #include "libqos/i2c.h"
- 
--#define IMX25_I2C_0_BASE 0x43F80000
--
- #define DS1338_ADDR 0x68
- 
--static I2CAdapter *i2c;
--static uint8_t addr;
--
- static inline uint8_t bcd2bin(uint8_t x)
- {
-     return ((x) & 0x0f) + ((x) >> 4) * 10;
- }
- 
--static void send_and_receive(void)
-+static void send_and_receive(void *obj, void *data, QGuestAllocator *alloc)
- {
-+    QI2CDevice *i2cdev = (QI2CDevice *)obj;
-+    I2CAdapter *i2c = i2cdev->bus;
+ # Machines
+ qos-test-obj-y += tests/libqos/aarch64-xlnx-zcu102-machine.o
++qos-test-obj-y += tests/libqos/arm-imx25-pdk-machine.o
+ qos-test-obj-y += tests/libqos/arm-n800-machine.o
+ qos-test-obj-y += tests/libqos/arm-raspi2-machine.o
+ qos-test-obj-y += tests/libqos/arm-sabrelite-machine.o
+diff --git a/tests/libqos/arm-imx25-pdk-machine.c b/tests/libqos/arm-imx25-pdk-machine.c
+new file mode 100644
+index 0000000..25066fb
+--- /dev/null
++++ b/tests/libqos/arm-imx25-pdk-machine.c
+@@ -0,0 +1,92 @@
++/*
++ * libqos driver framework
++ *
++ * Copyright (c) 2019 Red Hat, Inc.
++ *
++ * Author: Paolo Bonzini <pbonzini@redhat.com>
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License version 2 as published by the Free Software Foundation.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see <http://www.gnu.org/licenses/>
++ */
 +
-     uint8_t resp[7];
-     time_t now = time(NULL);
-     struct tm *tm_ptr = gmtime(&now);
- 
--    i2c_read_block(i2c, addr, 0, resp, sizeof(resp));
-+    i2c_read_block(i2c, DS1338_ADDR, 0, resp, sizeof(resp));
- 
-     /* check retrieved time againt local time */
-     g_assert_cmpuint(bcd2bin(resp[4]), == , tm_ptr->tm_mday);
-@@ -47,23 +45,14 @@ static void send_and_receive(void)
-     g_assert_cmpuint(2000 + bcd2bin(resp[6]), == , 1900 + tm_ptr->tm_year);
- }
- 
--int main(int argc, char **argv)
-+static void ds1338_register_nodes(void)
- {
--    QTestState *s = NULL;
--    int ret;
--
--    g_test_init(&argc, &argv, NULL);
--
--    s = qtest_start("-display none -machine imx25-pdk -device ds1338,address=0x68");
--    i2c = imx_i2c_create(s, IMX25_I2C_0_BASE);
--    addr = DS1338_ADDR;
--
--    qtest_add_func("/ds1338/tx-rx", send_and_receive);
--
--    ret = g_test_run();
--
--    qtest_quit(s);
--    g_free(i2c);
-+    QOSGraphEdgeOptions opts = {
-+        .extra_device_opts = "address=0x68"
++#include "qemu/osdep.h"
++#include "libqtest.h"
++#include "libqos/malloc.h"
++#include "libqos/qgraph.h"
++#include "libqos/i2c.h"
++
++#define ARM_PAGE_SIZE            4096
++#define IMX25_PDK_RAM_START      0x80000000
++#define IMX25_PDK_RAM_END        0x88000000
++
++typedef struct QIMX25PDKMachine QIMX25PDKMachine;
++
++struct QIMX25PDKMachine {
++    QOSGraphObject obj;
++    QGuestAllocator alloc;
++    IMXI2C i2c_1;
++};
++
++static void *imx25_pdk_get_driver(void *object, const char *interface)
++{
++    QIMX25PDKMachine *machine = object;
++    if (!g_strcmp0(interface, "memory")) {
++        return &machine->alloc;
++    }
++
++    fprintf(stderr, "%s not present in arm/imx25_pdk\n", interface);
++    g_assert_not_reached();
++}
++
++static QOSGraphObject *imx25_pdk_get_device(void *obj, const char *device)
++{
++    QIMX25PDKMachine *machine = obj;
++    if (!g_strcmp0(device, "imx.i2c")) {
++        return &machine->i2c_1.obj;
++    }
++
++    fprintf(stderr, "%s not present in arm/imx25_pdk\n", device);
++    g_assert_not_reached();
++}
++
++static void imx25_pdk_destructor(QOSGraphObject *obj)
++{
++    QIMX25PDKMachine *machine = (QIMX25PDKMachine *) obj;
++    alloc_destroy(&machine->alloc);
++}
++
++static void *qos_create_machine_arm_imx25_pdk(QTestState *qts)
++{
++    QIMX25PDKMachine *machine = g_new0(QIMX25PDKMachine, 1);
++
++    alloc_init(&machine->alloc, 0,
++               IMX25_PDK_RAM_START,
++               IMX25_PDK_RAM_END,
++               ARM_PAGE_SIZE);
++    machine->obj.get_device = imx25_pdk_get_device;
++    machine->obj.get_driver = imx25_pdk_get_driver;
++    machine->obj.destructor = imx25_pdk_destructor;
++
++    imx_i2c_init(&machine->i2c_1, qts, 0x43f80000);
++    return &machine->obj;
++}
++
++static void imx25_pdk_register_nodes(void)
++{
++    QOSGraphEdgeOptions edge = {
++        .extra_device_opts = "bus=i2c-bus.0"
 +    };
- 
--    return ret;
-+    qos_node_create_driver("ds1338", i2c_device_create);
-+    qos_node_consumes("ds1338", "i2c-bus", &opts);
-+    qos_add_test("tx-rx", "ds1338", send_and_receive, NULL);
- }
-+libqos_init(ds1338_register_nodes);
-diff --git a/tests/libqos/i2c-imx.c b/tests/libqos/i2c-imx.c
-index 86d84a7..f33ece5 100644
---- a/tests/libqos/i2c-imx.c
-+++ b/tests/libqos/i2c-imx.c
-@@ -207,25 +207,6 @@ void imx_i2c_init(IMXI2C *s, QTestState *qts, uint64_t addr)
-     s->parent.qts = qts;
- }
- 
--I2CAdapter *imx_i2c_create(QTestState *qts, uint64_t addr)
--{
--    IMXI2C *s = g_malloc0(sizeof(*s));
--
--    imx_i2c_init(s, qts, addr);
--    return &s->parent;
--}
--
--void imx_i2c_free(I2CAdapter *i2c)
--{
--    IMXI2C *s;
--
--    if (!i2c) {
--        return;
--    }
--    s = container_of(i2c, IMXI2C, parent);
--    g_free(s);
--}
--
- static void imx_i2c_register_nodes(void)
- {
-     qos_node_create_driver("imx.i2c", NULL);
-diff --git a/tests/libqos/i2c.h b/tests/libqos/i2c.h
-index 66b0e0d..2c8cc3e 100644
---- a/tests/libqos/i2c.h
-+++ b/tests/libqos/i2c.h
-@@ -75,7 +75,5 @@ typedef struct IMXI2C {
- } IMXI2C;
- 
- void imx_i2c_init(IMXI2C *s, QTestState *qts, uint64_t addr);
--I2CAdapter *imx_i2c_create(QTestState *qts, uint64_t addr);
--void imx_i2c_free(I2CAdapter *i2c);
- 
- #endif
++    qos_node_create_machine("arm/imx25-pdk", qos_create_machine_arm_imx25_pdk);
++    qos_node_contains("arm/imx25-pdk", "imx.i2c", &edge, NULL);
++}
++
++libqos_init(imx25_pdk_register_nodes);
 -- 
 1.8.3.1
 
