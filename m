@@ -6,59 +6,59 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D32F4C28CC6
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 11:23:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 48931C46460
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 11:24:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A0810259F0
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 11:23:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A0810259F0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 15A8D259F0
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 11:24:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 15A8D259F0
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:33297 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:33301 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hXl48-0003fY-T7
-	for qemu-devel@archiver.kernel.org; Mon, 03 Jun 2019 07:23:48 -0400
+	id 1hXl4Q-0003tl-9C
+	for qemu-devel@archiver.kernel.org; Mon, 03 Jun 2019 07:24:06 -0400
 Received: from eggs.gnu.org ([209.51.188.92]:48945)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1hXl2a-0002jP-Ez
-	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 07:22:14 -0400
+	(envelope-from <groug@kaod.org>) id 1hXl2o-0002jP-Cc
+	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 07:22:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1hXl2C-0000tE-3N
-	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 07:21:49 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51616)
+	(envelope-from <groug@kaod.org>) id 1hXky8-0000Nn-SH
+	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 07:17:38 -0400
+Received: from 3.mo6.mail-out.ovh.net ([178.33.253.26]:55480)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1hXl2B-0000qS-LL
-	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 07:21:47 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 3C07DC04BD44;
-	Mon,  3 Jun 2019 11:21:38 +0000 (UTC)
-Received: from dell-r430-03.lab.eng.brq.redhat.com
-	(dell-r430-03.lab.eng.brq.redhat.com [10.37.153.18])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 4A5C667263;
-	Mon,  3 Jun 2019 11:21:36 +0000 (UTC)
-From: Igor Mammedov <imammedo@redhat.com>
-To: qemu-devel@nongnu.org
-Date: Mon,  3 Jun 2019 13:22:08 +0200
-Message-Id: <1559560929-260254-2-git-send-email-imammedo@redhat.com>
-In-Reply-To: <1559560929-260254-1-git-send-email-imammedo@redhat.com>
-References: <1559560929-260254-1-git-send-email-imammedo@redhat.com>
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1hXky8-0000Ga-KI
+	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 07:17:36 -0400
+Received: from player796.ha.ovh.net (unknown [10.108.54.38])
+	by mo6.mail-out.ovh.net (Postfix) with ESMTP id 9C74D1CEC26
+	for <qemu-devel@nongnu.org>; Mon,  3 Jun 2019 13:17:32 +0200 (CEST)
+Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
+	[82.253.208.248]) (Authenticated sender: groug@kaod.org)
+	by player796.ha.ovh.net (Postfix) with ESMTPSA id 99ACD652B494;
+	Mon,  3 Jun 2019 11:17:24 +0000 (UTC)
+Date: Mon, 3 Jun 2019 13:17:23 +0200
+From: Greg Kurz <groug@kaod.org>
+To: Aravinda Prasad <aravinda@linux.vnet.ibm.com>
+Message-ID: <20190603131723.261eba99@bahia.lab.toulouse-stg.fr.ibm.com>
+In-Reply-To: <20190603121243.687d8d75@bahia.lab.toulouse-stg.fr.ibm.com>
+References: <155910829070.13149.5215948335633966328.stgit@aravinda>
+	<155910841478.13149.2830700794862210739.stgit@aravinda>
+	<20190603121243.687d8d75@bahia.lab.toulouse-stg.fr.ibm.com>
+X-Mailer: Claws Mail 3.16.0 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.31]);
-	Mon, 03 Jun 2019 11:21:38 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Ovh-Tracer-Id: 129478490207066516
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduuddrudefjedgfeehucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddm
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v6 1/2] tests: add expected ACPI tables for
- arm/virt board
+X-Received-From: 178.33.253.26
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v9 1/6] ppc: spapr: Handle "ibm,
+ nmi-register" and "ibm, nmi-interlock" RTAS calls
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -70,182 +70,218 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Andrew Jones <drjones@redhat.com>, Ben Warren <ben@skyportsystems.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>, Laszlo Ersek <lersek@redhat.com>,
-	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-	Shannon Zhao <shannon.zhaosl@gmail.com>, Gonglei <arei.gonglei@huawei.com>,
-	Wei Yang <richardw.yang@linux.intel.com>,
-	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: aik@au1.ibm.com, qemu-devel@nongnu.org, paulus@ozlabs.org,
+	qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
----
-this patch is ahead fo "tests: acpi: add simple  arm/virt testcase"
-to keep 'make check' working during bisection and not to pollute
-code with binary blobs which are not reviewable.
+On Mon, 3 Jun 2019 12:12:43 +0200
+Greg Kurz <groug@kaod.org> wrote:
 
- tests/data/acpi/virt/APIC | Bin 0 -> 168 bytes
- tests/data/acpi/virt/DSDT | Bin 0 -> 18476 bytes
- tests/data/acpi/virt/FACP | Bin 0 -> 268 bytes
- tests/data/acpi/virt/GTDT | Bin 0 -> 96 bytes
- tests/data/acpi/virt/MCFG | Bin 0 -> 60 bytes
- tests/data/acpi/virt/SPCR | Bin 0 -> 80 bytes
- 6 files changed, 0 insertions(+), 0 deletions(-)
- create mode 100644 tests/data/acpi/virt/APIC
- create mode 100644 tests/data/acpi/virt/DSDT
- create mode 100644 tests/data/acpi/virt/FACP
- create mode 100644 tests/data/acpi/virt/GTDT
- create mode 100644 tests/data/acpi/virt/MCFG
- create mode 100644 tests/data/acpi/virt/SPCR
+> On Wed, 29 May 2019 11:10:14 +0530
+> Aravinda Prasad <aravinda@linux.vnet.ibm.com> wrote:
+> 
+> > This patch adds support in QEMU to handle "ibm,nmi-register"
+> > and "ibm,nmi-interlock" RTAS calls.
+> > 
+> > The machine check notification address is saved when the
+> > OS issues "ibm,nmi-register" RTAS call.
+> > 
+> > This patch also handles the case when multiple processors
+> > experience machine check at or about the same time by
+> > handling "ibm,nmi-interlock" call. In such cases, as per
+> > PAPR, subsequent processors serialize waiting for the first
+> > processor to issue the "ibm,nmi-interlock" call. The second
+> > processor that also received a machine check error waits
+> > till the first processor is done reading the error log.
+> > The first processor issues "ibm,nmi-interlock" call
+> > when the error log is consumed. This patch implements the
+> > releasing part of the error-log while subsequent patch
+> > (which builds error log) handles the locking part.
+> > 
+> > Signed-off-by: Aravinda Prasad <aravinda@linux.vnet.ibm.com>
+> > Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+> > ---  
+> 
+> The code looks okay but it still seems wrong to advertise the RTAS
+> calls to the guest that early in the series. The linux kernel in
+> the guest will assume FWNMI is functional, which isn't true until
+> patch 6 (yes, migration is part of the feature, it should be
+> supported upfront, not fixed afterwards).
+> 
+> It doesn't help much to introduce the RTAS calls early and to
+> modify them in the other patches. I'd rather see the rest of
+> the code first and a final patch that introduces the fully
+> functional RTAS calls and calls spapr_rtas_register().
+> 
 
-diff --git a/tests/data/acpi/virt/APIC b/tests/data/acpi/virt/APIC
-new file mode 100644
-index 0000000000000000000000000000000000000000..797dfde2841c51b7e72065602=
-e99ce1714347f0d
-GIT binary patch
-literal 168
-zcmZ<^@N{0mz`($~*~#D8BUr&HBEZ=3DZD8>jB1F=3DCg4Dd+6SPUF6788)c?E~X6Fu>G{
-hBZPn~MyPrgD9sGlkD?67;f3451Xcqw&w(L;0RYV=3D2>}2A
+Thinking again, you should introduce the "fwnmi-mce" spapr capability in
+its own patch first, default to "off" and and have the last patch in the
+series to switch the default to "on" for newer machine types only.
 
-literal 0
-HcmV?d00001
+This patch should then only register the RTAS calls if "fwnmi-mcr" is set
+to "on".
 
-diff --git a/tests/data/acpi/virt/DSDT b/tests/data/acpi/virt/DSDT
-new file mode 100644
-index 0000000000000000000000000000000000000000..20e85c7f89f645c69935c615c=
-07084e221419960
-GIT binary patch
-literal 18476
-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
+This should address the fact that we don't want to expose a partially
+implemented FWNMI feature to the guest, and we don't want to support
+FWNMI at all with older machine types for the sake of compatibility.
 
-literal 0
-HcmV?d00001
-
-diff --git a/tests/data/acpi/virt/FACP b/tests/data/acpi/virt/FACP
-new file mode 100644
-index 0000000000000000000000000000000000000000..27de99f51bfe846b1f8796ace=
-49d83f5b33a1aed
-GIT binary patch
-literal 268
-ycmZ>BbPnKQWME+3?d0$55v<@85#a0w6axw|fY>0Kx<CNcIA#XwTY+i=3D(L4a*H3tCz
-
-literal 0
-HcmV?d00001
-
-diff --git a/tests/data/acpi/virt/GTDT b/tests/data/acpi/virt/GTDT
-new file mode 100644
-index 0000000000000000000000000000000000000000..10107a65e958ff6495bb8c17d=
-63d0539690f59f6
-GIT binary patch
-literal 96
-zcmZ<{aS2IaU|?Xn>E!S15v<@85#a0&6k`O6f!H7#8OTC8azL5|h^3)?DJYFj0RVOU
-B2mt^9
-
-literal 0
-HcmV?d00001
-
-diff --git a/tests/data/acpi/virt/MCFG b/tests/data/acpi/virt/MCFG
-new file mode 100644
-index 0000000000000000000000000000000000000000..e8987e1af0ec3829770bf4fe1=
-1fab02b06160dd2
-GIT binary patch
-literal 60
-scmeZuc5}C3U|?YMck*}k2v%^42ypfViZKGkKx`0=3D1Oyx)oc|yS05YNo0RR91
-
-literal 0
-HcmV?d00001
-
-diff --git a/tests/data/acpi/virt/SPCR b/tests/data/acpi/virt/SPCR
-new file mode 100644
-index 0000000000000000000000000000000000000000..377271a0e7817cc21a28c0212=
-3a89facad63604f
-GIT binary patch
-literal 80
-zcmWFza1IJ!U|?VpcJg=3Dj2v%^42yhMtiZKGkKx`1r48#l^3?L>agsBLmm>C$E7#RKo
-I0Z0r60QF4^0RR91
-
-literal 0
-HcmV?d00001
-
---=20
-2.7.4
+> >  hw/ppc/spapr.c         |    7 +++++
+> >  hw/ppc/spapr_rtas.c    |   65 ++++++++++++++++++++++++++++++++++++++++++++++++
+> >  include/hw/ppc/spapr.h |    9 ++++++-
+> >  3 files changed, 80 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> > index e2b33e5..fae28a9 100644
+> > --- a/hw/ppc/spapr.c
+> > +++ b/hw/ppc/spapr.c
+> > @@ -1808,6 +1808,11 @@ static void spapr_machine_reset(void)
+> >      first_ppc_cpu->env.gpr[5] = 0;
+> >  
+> >      spapr->cas_reboot = false;
+> > +
+> > +    spapr->guest_machine_check_addr = -1;
+> > +
+> > +    /* Signal all vCPUs waiting on this condition */
+> > +    qemu_cond_broadcast(&spapr->mc_delivery_cond);
+> >  }
+> >  
+> >  static void spapr_create_nvram(SpaprMachineState *spapr)
+> > @@ -3072,6 +3077,8 @@ static void spapr_machine_init(MachineState *machine)
+> >  
+> >          kvmppc_spapr_enable_inkernel_multitce();
+> >      }
+> > +
+> > +    qemu_cond_init(&spapr->mc_delivery_cond);
+> >  }
+> >  
+> >  static int spapr_kvm_type(MachineState *machine, const char *vm_type)
+> > diff --git a/hw/ppc/spapr_rtas.c b/hw/ppc/spapr_rtas.c
+> > index 5bc1a93..e7509cf 100644
+> > --- a/hw/ppc/spapr_rtas.c
+> > +++ b/hw/ppc/spapr_rtas.c
+> > @@ -352,6 +352,38 @@ static void rtas_get_power_level(PowerPCCPU *cpu, SpaprMachineState *spapr,
+> >      rtas_st(rets, 1, 100);
+> >  }
+> >  
+> > +static void rtas_ibm_nmi_register(PowerPCCPU *cpu,
+> > +                                  SpaprMachineState *spapr,
+> > +                                  uint32_t token, uint32_t nargs,
+> > +                                  target_ulong args,
+> > +                                  uint32_t nret, target_ulong rets)
+> > +{
+> > +    hwaddr rtas_addr = spapr_get_rtas_addr();
+> > +
+> > +    if (!rtas_addr) {
+> > +        rtas_st(rets, 0, RTAS_OUT_NOT_SUPPORTED);
+> > +        return;
+> > +    }
+> > +
+> > +    spapr->guest_machine_check_addr = rtas_ld(args, 1);
+> > +    rtas_st(rets, 0, RTAS_OUT_SUCCESS);
+> > +}
+> > +
+> > +static void rtas_ibm_nmi_interlock(PowerPCCPU *cpu,
+> > +                                   SpaprMachineState *spapr,
+> > +                                   uint32_t token, uint32_t nargs,
+> > +                                   target_ulong args,
+> > +                                   uint32_t nret, target_ulong rets)
+> > +{
+> > +    if (spapr->guest_machine_check_addr == -1) {
+> > +        /* NMI register not called */
+> > +        rtas_st(rets, 0, RTAS_OUT_PARAM_ERROR);
+> > +    } else {
+> > +        qemu_cond_signal(&spapr->mc_delivery_cond);
+> > +        rtas_st(rets, 0, RTAS_OUT_SUCCESS);
+> > +    }
+> > +}
+> > +
+> >  static struct rtas_call {
+> >      const char *name;
+> >      spapr_rtas_fn fn;
+> > @@ -470,6 +502,35 @@ void spapr_load_rtas(SpaprMachineState *spapr, void *fdt, hwaddr addr)
+> >      }
+> >  }
+> >  
+> > +hwaddr spapr_get_rtas_addr(void)
+> > +{
+> > +    SpaprMachineState *spapr = SPAPR_MACHINE(qdev_get_machine());
+> > +    int rtas_node;
+> > +    const struct fdt_property *rtas_addr_prop;
+> > +    void *fdt = spapr->fdt_blob;
+> > +    uint32_t rtas_addr;
+> > +
+> > +    /* fetch rtas addr from fdt */
+> > +    rtas_node = fdt_path_offset(fdt, "/rtas");
+> > +    if (rtas_node == 0) {
+> > +        return 0;
+> > +    }
+> > +
+> > +    rtas_addr_prop = fdt_get_property(fdt, rtas_node, "linux,rtas-base", NULL);
+> > +    if (!rtas_addr_prop) {
+> > +        return 0;
+> > +    }
+> > +
+> > +    /*
+> > +     * We assume that the OS called RTAS instantiate-rtas, but some other
+> > +     * OS might call RTAS instantiate-rtas-64 instead. This fine as of now
+> > +     * as SLOF only supports 32-bit variant.
+> > +     */
+> > +    rtas_addr = fdt32_to_cpu(*(uint32_t *)rtas_addr_prop->data);
+> > +    return (hwaddr)rtas_addr;
+> > +}
+> > +
+> > +
+> >  static void core_rtas_register_types(void)
+> >  {
+> >      spapr_rtas_register(RTAS_DISPLAY_CHARACTER, "display-character",
+> > @@ -493,6 +554,10 @@ static void core_rtas_register_types(void)
+> >                          rtas_set_power_level);
+> >      spapr_rtas_register(RTAS_GET_POWER_LEVEL, "get-power-level",
+> >                          rtas_get_power_level);
+> > +    spapr_rtas_register(RTAS_IBM_NMI_REGISTER, "ibm,nmi-register",
+> > +                        rtas_ibm_nmi_register);
+> > +    spapr_rtas_register(RTAS_IBM_NMI_INTERLOCK, "ibm,nmi-interlock",
+> > +                        rtas_ibm_nmi_interlock);
+> >  }
+> >  
+> >  type_init(core_rtas_register_types)
+> > diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+> > index 4f5becf..9dc5e30 100644
+> > --- a/include/hw/ppc/spapr.h
+> > +++ b/include/hw/ppc/spapr.h
+> > @@ -188,6 +188,10 @@ struct SpaprMachineState {
+> >       * occurs during the unplug process. */
+> >      QTAILQ_HEAD(, SpaprDimmState) pending_dimm_unplugs;
+> >  
+> > +    /* State related to "ibm,nmi-register" and "ibm,nmi-interlock" calls */
+> > +    target_ulong guest_machine_check_addr;
+> > +    QemuCond mc_delivery_cond;
+> > +
+> >      /*< public >*/
+> >      char *kvm_type;
+> >      char *host_model;
+> > @@ -624,8 +628,10 @@ target_ulong spapr_hypercall(PowerPCCPU *cpu, target_ulong opcode,
+> >  #define RTAS_IBM_CREATE_PE_DMA_WINDOW           (RTAS_TOKEN_BASE + 0x27)
+> >  #define RTAS_IBM_REMOVE_PE_DMA_WINDOW           (RTAS_TOKEN_BASE + 0x28)
+> >  #define RTAS_IBM_RESET_PE_DMA_WINDOW            (RTAS_TOKEN_BASE + 0x29)
+> > +#define RTAS_IBM_NMI_REGISTER                   (RTAS_TOKEN_BASE + 0x2A)
+> > +#define RTAS_IBM_NMI_INTERLOCK                  (RTAS_TOKEN_BASE + 0x2B)
+> >  
+> > -#define RTAS_TOKEN_MAX                          (RTAS_TOKEN_BASE + 0x2A)
+> > +#define RTAS_TOKEN_MAX                          (RTAS_TOKEN_BASE + 0x2C)
+> >  
+> >  /* RTAS ibm,get-system-parameter token values */
+> >  #define RTAS_SYSPARM_SPLPAR_CHARACTERISTICS      20
+> > @@ -876,4 +882,5 @@ void spapr_check_pagesize(SpaprMachineState *spapr, hwaddr pagesize,
+> >  #define SPAPR_OV5_XIVE_BOTH     0x80 /* Only to advertise on the platform */
+> >  
+> >  void spapr_set_all_lpcrs(target_ulong value, target_ulong mask);
+> > +uint64_t spapr_get_rtas_addr(void);
+> >  #endif /* HW_SPAPR_H */
+> >   
+> 
+> 
 
 
