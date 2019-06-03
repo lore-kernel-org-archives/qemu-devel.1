@@ -2,111 +2,69 @@ Return-Path: <SRS0=e5mL=UC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AE7C4C04AB5
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 12:57:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 07535C04AB5
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 12:58:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6DB6125EAC
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 12:57:51 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="Vvyx8Sr5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6DB6125EAC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id D454B26756
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 12:58:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D454B26756
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=baidu.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:34825 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:34829 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hXmX8-0000f7-NG
-	for qemu-devel@archiver.kernel.org; Mon, 03 Jun 2019 08:57:50 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:38344)
+	id 1hXmXp-00016T-5t
+	for qemu-devel@archiver.kernel.org; Mon, 03 Jun 2019 08:58:33 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:44675)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hXmLS-0007ds-ID
-	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 08:45:47 -0400
+	(envelope-from <lihangjing@baidu.com>) id 1hXgMW-0006TI-8L
+	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 02:22:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hXm6h-0000Wp-Q4
-	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 08:30:33 -0400
-Received: from mail-ve1eur02on071a.outbound.protection.outlook.com
-	([2a01:111:f400:fe06::71a]:64832
-	helo=EUR02-VE1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1hXm6b-0000Cc-Ix; Mon, 03 Jun 2019 08:30:26 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
-	s=selector1;
-	h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
-	bh=g76GAh6EFwGJVi9aIAF6O4S/pIVWVHktHKFDY6oVxj4=;
-	b=Vvyx8Sr5h5UDdrJ8XzXdBaY12T8IWYgJMWNrIZUypwZpZXc3WKzoJMovtjSuzKIwkU1TgHEgoDCLuDuUEXOEXzfBIkznvipWgKbEoJpfZobt+xMaKhcsCgFUOWoyAe8r/ZJd9UrsGKS8n82r8IQUPx2QhS1fzxxig13FnHB68DY=
-Received: from AM0PR08MB2961.eurprd08.prod.outlook.com (52.134.126.11) by
-	AM0PR08MB4516.eurprd08.prod.outlook.com (20.179.36.76) with Microsoft
-	SMTP
-	Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
-	15.20.1943.22; Mon, 3 Jun 2019 12:30:21 +0000
-Received: from AM0PR08MB2961.eurprd08.prod.outlook.com
-	([fe80::8d90:32ae:bdd6:48e8]) by
-	AM0PR08MB2961.eurprd08.prod.outlook.com
-	([fe80::8d90:32ae:bdd6:48e8%7]) with mapi id 15.20.1943.018;
-	Mon, 3 Jun 2019 12:30:21 +0000
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org"
-	<qemu-block@nongnu.org>
-Thread-Topic: ping Re: [PATCH v5 0/3] Fix overflow bug in qcow2 discard
-Thread-Index: AQHU+dQTIRtQy84OJ0+wrrxOKT4l3aZ1sJyAgBRr6QA=
-Date: Mon, 3 Jun 2019 12:30:21 +0000
-Message-ID: <88b122de-aa79-0606-4718-1f2d9e543454@virtuozzo.com>
-References: <20190423125706.26989-1-vsementsov@virtuozzo.com>
-	<4d40c6f9-36c3-076e-16e2-84b8344704b1@virtuozzo.com>
-In-Reply-To: <4d40c6f9-36c3-076e-16e2-84b8344704b1@virtuozzo.com>
-Accept-Language: ru-RU, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: HE1PR07CA0036.eurprd07.prod.outlook.com
-	(2603:10a6:7:66::22) To AM0PR08MB2961.eurprd08.prod.outlook.com
-	(2603:10a6:208:66::11)
-authentication-results: spf=none (sender IP is )
-	smtp.mailfrom=vsementsov@virtuozzo.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-tagtoolbar-keys: D20190603153011949
-x-originating-ip: [185.231.240.5]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: de4f1622-265f-4a3f-5ea2-08d6e81f3e9d
-x-microsoft-antispam: BCL:0; PCL:0;
-	RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(2017052603328)(7193020);
-	SRVR:AM0PR08MB4516; 
-x-ms-traffictypediagnostic: AM0PR08MB4516:
-x-microsoft-antispam-prvs: <AM0PR08MB4516EC946AC0CF213109420EC1140@AM0PR08MB4516.eurprd08.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:2887;
-x-forefront-prvs: 0057EE387C
-x-forefront-antispam-report: SFV:NSPM;
-	SFS:(10019020)(366004)(136003)(376002)(396003)(39850400004)(346002)(189003)(199004)(478600001)(7736002)(66476007)(5660300002)(66946007)(73956011)(4744005)(6512007)(68736007)(66556008)(305945005)(66446008)(64756008)(486006)(25786009)(476003)(14454004)(71200400001)(2501003)(6436002)(2616005)(11346002)(31686004)(6486002)(256004)(66066001)(71190400001)(446003)(316002)(110136005)(4326008)(6506007)(386003)(54906003)(81166006)(81156014)(8936002)(8676002)(31696002)(102836004)(86362001)(99286004)(6116002)(52116002)(2906002)(186003)(53936002)(76176011)(36756003)(3846002)(26005);
-	DIR:OUT; SFP:1102; SCL:1; SRVR:AM0PR08MB4516;
-	H:AM0PR08MB2961.eurprd08.prod.outlook.com; FPR:; SPF:None;
-	LANG:en; PTR:InfoNoRecords; MX:1; A:1; 
-received-spf: None (protection.outlook.com: virtuozzo.com does not designate
-	permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: +jiHfdT1Eg2t8l2sJwK09Kq7NS8GcgGOp6O+yKn3hlp/cgLNdEunBjG6t9dLoW0V4P4ae0M/vdq6hco/B260PZ13cPGNLlwkpqYSMliGC4tGKg+F2OEAs1ziCzNu+6WV3FQst02Wl6EMYdLb/FLJne4bYpuwW0js//DvIFCyZYkrdxMuVnQEwZ4Znz3B+CfRdiny1rWoNTUBklAn/3INim+xJ7mBod9/b9AT0DiAMFxgA3zpOo1ifFg95IR2KiVGy/xgymIvfQf8lRYwYb7trY/XKI2+7x0P62pbaBR9E92F3dKTyODYZ6uuIw/AW5Qn5mOZiZoSoBlAPOc/nD8rDHGz2mW1uEXRVXQWjaXBoFGwJro8ydSTozFYr7Kl2avlnEpWqamm0LIUJ4zXcHaKx0Fh/2mLf/hZkayTnNVGe78=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <EA7B8D2FE0FAFD4B80E5E9CF7D492D0A@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <lihangjing@baidu.com>) id 1hXgGi-0006uR-3w
+	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 02:16:29 -0400
+Received: from mx22.baidu.com ([220.181.50.185]:57703 helo=baidu.com)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <lihangjing@baidu.com>) id 1hXgGh-0006Nd-LB
+	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 02:16:28 -0400
+Received: from m1-mail-ex09.internal.baidu.com (unknown [10.44.89.49])
+	by Forcepoint Email with ESMTPS id 20AB4864EA32A;
+	Mon,  3 Jun 2019 14:16:14 +0800 (CST)
+Received: from BC-Mail-Ex03.internal.baidu.com (172.31.40.17) by
+	m1-mail-ex09.internal.baidu.com (10.44.89.49) with Microsoft SMTP
+	Server
+	(version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+	15.1.1531.3; Mon, 3 Jun 2019 14:16:15 +0800
+Received: from DDAFF7EBB9FF247.internal.baidu.com (172.31.63.8) by
+	BC-Mail-Ex03.internal.baidu.com (172.31.40.17) with Microsoft SMTP
+	Server
+	(version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+	15.1.1531.3; Mon, 3 Jun 2019 14:16:08 +0800
+From: "lihangjing@baidu.com" <lihangjing@baidu.com>
+To: <mst@redhat.com>
+Date: Mon, 3 Jun 2019 14:15:24 +0800
+Message-ID: <20190603061524.24076-1-lihangjing@baidu.com>
+X-Mailer: git-send-email 2.15.1.windows.2
 MIME-Version: 1.0
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: de4f1622-265f-4a3f-5ea2-08d6e81f3e9d
-X-MS-Exchange-CrossTenant-originalarrivaltime: 03 Jun 2019 12:30:21.5432 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: vsementsov@virtuozzo.com
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR08MB4516
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 2a01:111:f400:fe06::71a
-Subject: [Qemu-devel] ping Re: [PATCH v5 0/3] Fix overflow bug in qcow2
- discard
+Content-Type: text/plain
+X-Originating-IP: [172.31.63.8]
+X-ClientProxiedBy: BC-MAIL-EX01.internal.baidu.com (172.31.40.15) To
+	BC-Mail-Ex03.internal.baidu.com (172.31.40.17)
+X-Baidu-BdMsfe-DateCheck: 1_BC-Mail-Ex03_2019-06-03 14:16:08:671
+X-Baidu-BdMsfe-VirusCheck: BC-Mail-Ex03_GRAY_Inside_WithoutAtta_2019-06-03
+	14:16:08:718
+X-Baidu-BdMsfe-DateCheck: 1_BC-Mail-Ex03_2019-06-03 14:16:08:733
+X-Baidu-BdMsfe-DateCheck: 1_m1-mail-ex09_2019-06-03 14:16:15:794
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
+X-Received-From: 220.181.50.185
+X-Mailman-Approved-At: Mon, 03 Jun 2019 08:50:25 -0400
+Subject: [Qemu-devel] [PATCH] vhost: fix vhost_log size overflow during
+ migration
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -118,31 +76,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "kwolf@redhat.com" <kwolf@redhat.com>, "fam@euphon.net" <fam@euphon.net>,
-	Denis Lunev <den@virtuozzo.com>, "mreitz@redhat.com" <mreitz@redhat.com>,
-	"stefanha@redhat.com" <stefanha@redhat.com>
+Cc: Li Hangjing <lihangjing@baidu.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-cGluZyAyMS4wNS4yMDE5IDEyOjM4LCBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IHdyb3Rl
-Og0KPiBwaW5nDQo+IA0KPiAyMy4wNC4yMDE5IDE1OjU3LCBWbGFkaW1pciBTZW1lbnRzb3YtT2dp
-ZXZza2l5IHdyb3RlOg0KPj4gdjU6IGJ5IEtldmluJ3MgY29tbWVudHMNCj4+IDAyOiBhZGQgY2hl
-Y2sgZm9yIGludmFsaWQgQGJ5dGVzIHBhcmFtZXRlciwgZHJvcCByLWINCj4+IDAzOiBtb3ZlIGZy
-b20gcWVtdS1pbWcgaW5mbyB0byBxZW11LWltZyBtYXAgLWYgcmF3LCBkcm9wIHItYiBhbmQgdC1i
-DQo+Pg0KPj4gVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSAoMyk6DQo+PiDCoMKgIGJsb2Nr
-L3Fjb3cyLXJlZmNvdW50OiBhZGQgdHJhY2UtcG9pbnQgdG8gcWNvdzJfcHJvY2Vzc19kaXNjYXJk
-cw0KPj4gwqDCoCBibG9jay9pbzogYmRydl9wZGlzY2FyZDogc3VwcG9ydCBpbnQ2NF90IGJ5dGVz
-IHBhcmFtZXRlcg0KPj4gwqDCoCBpb3Rlc3RzOiB0ZXN0IGJpZyBxY293MiBzaHJpbmsNCj4+DQo+
-PiDCoCBpbmNsdWRlL2Jsb2NrL2Jsb2NrLmjCoMKgwqDCoMKgIHzCoCA0ICstLQ0KPj4gwqAgYmxv
-Y2svaW8uY8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHwgMTYgKysrKy0tLS0tDQo+
-PiDCoCBibG9jay9xY293Mi1yZWZjb3VudC5jwqDCoMKgwqAgfMKgIDcgKysrLQ0KPj4gwqAgYmxv
-Y2svdHJhY2UtZXZlbnRzwqDCoMKgwqDCoMKgwqDCoCB8wqAgMyArKw0KPj4gwqAgdGVzdHMvcWVt
-dS1pb3Rlc3RzLzI1MMKgwqDCoMKgIHwgNzMgKysrKysrKysrKysrKysrKysrKysrKysrKysrKysr
-KysrKysrKysNCj4+IMKgIHRlc3RzL3FlbXUtaW90ZXN0cy8yNTAub3V0IHwgMjMgKysrKysrKysr
-KysrDQo+PiDCoCB0ZXN0cy9xZW11LWlvdGVzdHMvZ3JvdXDCoMKgIHzCoCAxICsNCj4+IMKgIDcg
-ZmlsZXMgY2hhbmdlZCwgMTE2IGluc2VydGlvbnMoKyksIDExIGRlbGV0aW9ucygtKQ0KPj4gwqAg
-Y3JlYXRlIG1vZGUgMTAwNzU1IHRlc3RzL3FlbXUtaW90ZXN0cy8yNTANCj4+IMKgIGNyZWF0ZSBt
-b2RlIDEwMDY0NCB0ZXN0cy9xZW11LWlvdGVzdHMvMjUwLm91dA0KPj4NCj4gDQo+IA0KDQoNCi0t
-IA0KQmVzdCByZWdhcmRzLA0KVmxhZGltaXINCg==
+From: Li Hangjing <lihangjing@baidu.com>
+
+When a guest which doesn't support multiqueue is migrated with a multi queues
+vhost-user-blk deivce, a crash will occur like:
+
+0 qemu_memfd_alloc (name=<value optimized out>, size=562949953421312, seals=<value optimized out>, fd=0x7f87171fe8b4, errp=0x7f87171fe8a8) at util/memfd.c:153
+1 0x00007f883559d7cf in vhost_log_alloc (size=70368744177664, share=true) at hw/virtio/vhost.c:186
+2 0x00007f88355a0758 in vhost_log_get (listener=0x7f8838bd7940, enable=1) at qemu-2-12/hw/virtio/vhost.c:211
+3 vhost_dev_log_resize (listener=0x7f8838bd7940, enable=1) at hw/virtio/vhost.c:263
+4 vhost_migration_log (listener=0x7f8838bd7940, enable=1) at hw/virtio/vhost.c:787
+5 0x00007f88355463d6 in memory_global_dirty_log_start () at memory.c:2503
+6 0x00007f8835550577 in ram_init_bitmaps (f=0x7f88384ce600, opaque=0x7f8836024098) at migration/ram.c:2173
+7 ram_init_all (f=0x7f88384ce600, opaque=0x7f8836024098) at migration/ram.c:2192
+8 ram_save_setup (f=0x7f88384ce600, opaque=0x7f8836024098) at migration/ram.c:2219
+9 0x00007f88357a419d in qemu_savevm_state_setup (f=0x7f88384ce600) at migration/savevm.c:1002
+10 0x00007f883579fc3e in migration_thread (opaque=0x7f8837530400) at migration/migration.c:2382
+11 0x00007f8832447893 in start_thread () from /lib64/libpthread.so.0
+12 0x00007f8832178bfd in clone () from /lib64/libc.so.6
+
+This is because vhost_get_log_size() returns a overflowed vhost-log size.
+In this function, it uses the uninitialized variable vqs->used_phys and
+vqs->used_size to get the vhost-log size.
+
+Signed-off-by: Li Hangjing <lihangjing@baidu.com>
+Reviewed-by: Xie Yongji <xieyongji@baidu.com>
+Reviewed-by: Chai Wen <chaiwen@baidu.com>
+---
+ hw/virtio/vhost.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
+index 7f61018f2a..6d3a013f49 100644
+--- a/hw/virtio/vhost.c
++++ b/hw/virtio/vhost.c
+@@ -131,6 +131,11 @@ static int vhost_sync_dirty_bitmap(struct vhost_dev *dev,
+     }
+     for (i = 0; i < dev->nvqs; ++i) {
+         struct vhost_virtqueue *vq = dev->vqs + i;
++
++        if (!vq->used_phys && !vq->used_size) {
++            continue;
++        }
++
+         vhost_dev_sync_region(dev, section, start_addr, end_addr, vq->used_phys,
+                               range_get_last(vq->used_phys, vq->used_size));
+     }
+@@ -168,6 +173,11 @@ static uint64_t vhost_get_log_size(struct vhost_dev *dev)
+     }
+     for (i = 0; i < dev->nvqs; ++i) {
+         struct vhost_virtqueue *vq = dev->vqs + i;
++
++        if (!vq->used_phys && !vq->used_size) {
++            continue;
++        }
++
+         uint64_t last = vq->used_phys + vq->used_size - 1;
+         log_size = MAX(log_size, last / VHOST_LOG_CHUNK + 1);
+     }
+-- 
+2.15.1.windows.2
+
 
