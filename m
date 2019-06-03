@@ -6,47 +6,49 @@ X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 60288C04AB5
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 18:30:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 45DC4C04AB5
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 18:40:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 28F8326C51
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 18:30:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 28F8326C51
+	by mail.kernel.org (Postfix) with ESMTPS id 0FA7D26D41
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 18:40:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0FA7D26D41
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:39242 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:39339 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hXrio-0001HH-Ea
-	for qemu-devel@archiver.kernel.org; Mon, 03 Jun 2019 14:30:14 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:59924)
+	id 1hXrsf-0003nh-1h
+	for qemu-devel@archiver.kernel.org; Mon, 03 Jun 2019 14:40:25 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:35181)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1hXraA-00044Q-Si
-	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 14:21:20 -0400
+	(envelope-from <jsnow@redhat.com>) id 1hXrqr-0002fK-8F
+	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 14:38:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1hXra9-00064E-RI
-	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 14:21:18 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38052)
+	(envelope-from <jsnow@redhat.com>) id 1hXrqq-00082p-7a
+	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 14:38:33 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:21154)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1hXra9-00062Z-Jf
-	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 14:21:17 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
+	(Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1hXrqp-0007z7-U5
+	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 14:38:32 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B3F3B2F8BF1;
-	Mon,  3 Jun 2019 18:21:16 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id B86AC30C31B7;
+	Mon,  3 Jun 2019 18:38:21 +0000 (UTC)
 Received: from [10.18.17.164] (dhcp-17-164.bos.redhat.com [10.18.17.164])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 6A67417CC0;
-	Mon,  3 Jun 2019 18:21:11 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 82B435B68A;
+	Mon,  3 Jun 2019 18:38:15 +0000 (UTC)
 To: Peter Maydell <peter.maydell@linaro.org>
 References: <20190531192429.GH22103@habkost.net>
 	<93e5101f-67f1-a416-5e80-f16371a35e6a@redhat.com>
 	<871s0asvli.fsf@dusky.pond.sub.org>
 	<236db86d-52df-5537-4f33-f3c09bbb6289@redhat.com>
 	<CAFEAcA_bSzWYu5Oa_knq2SAK9Z3RN3LZjxeirVncgRQ9FsDZXA@mail.gmail.com>
+	<b4de3161-7b9c-debc-a652-21832612ebf4@redhat.com>
+	<CAFEAcA-+2Csn4wW8xLaogJrQiqc2xHrGKFc_zdaOMKNn-yas9g@mail.gmail.com>
 From: John Snow <jsnow@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
@@ -123,19 +125,19 @@ Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
 	i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
 	RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
 	glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
-Message-ID: <b4de3161-7b9c-debc-a652-21832612ebf4@redhat.com>
-Date: Mon, 3 Jun 2019 14:21:10 -0400
+Message-ID: <d96ee938-e741-7d59-ee69-e9b9ee53b3e6@redhat.com>
+Date: Mon, 3 Jun 2019 14:38:14 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_bSzWYu5Oa_knq2SAK9Z3RN3LZjxeirVncgRQ9FsDZXA@mail.gmail.com>
+In-Reply-To: <CAFEAcA-+2Csn4wW8xLaogJrQiqc2xHrGKFc_zdaOMKNn-yas9g@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.38]);
-	Mon, 03 Jun 2019 18:21:16 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.40]);
+	Mon, 03 Jun 2019 18:38:29 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
 Subject: Re: [Qemu-devel] Deprecation policy and build dependencies
@@ -161,39 +163,40 @@ Sender: "Qemu-devel"
 
 
 
-On 6/3/19 2:17 PM, Peter Maydell wrote:
-> On Mon, 3 Jun 2019 at 19:02, John Snow <jsnow@redhat.com> wrote:
->> That policy strikes me as weird, because RHEL7 is not going to be, in
->> general, using the latest and greatest QEMU. Usually stable versions of
->> distros stick with the versions of the programs that came out at the time.
+On 6/3/19 2:27 PM, Peter Maydell wrote:
+> On Mon, 3 Jun 2019 at 19:21, John Snow <jsnow@redhat.com> wrote:
+>> I get it, we don't want to require Python 3.8 because some dev wanted
+>> assignment conditionals -- but we're talking about Python 2 here, which
+>> suffers its EOL by the end of this calendar year.
 >>
->> What's the benefit of making sure that stable platforms can continue to
->> run the *newest* QEMU? Is this even a reasonable restriction? If you are
->> running RHEL7, how many projects do you expect to be able to git clone
->> and build and have that work with the rest of your legacy/stable
->> dependencies?
+>> So do we think it's reasonable to drop support for Python2 for the
+>> release that comes out after Python2's EOL, or do we insist on 2x3
+>> simultaneous support for years more?
 > 
-> The benefit is that in general people who want to build QEMU
-> from source can do so. I don't want us to be the kind of
-> project that needs latest-and-greatest-foo for everything
-> to build, because that sort of project is pretty infuriating
-> to try to work with if you're an occasional contributor.
-> "Builds on LTS distros" is an easy-to-express way to keep
-> things from getting out of hand.
+> I don't have a strong opinion on Python in particular, but
+> I think it would be nicer to avoid the "python is a special
+> snowflake" effect. Would it really be so bad for it to just
+> be "drop it when it falls off the last LTS distro" like the
+> rest of our dependencies ?
 > 
-> Plus a bunch of the build machines we do testing on are
-> not running bleeding edge distros, and as Connie says plenty
-> of developers do QEMU development on non-bleeding-edge versions
-> (my primary dev box run an LTS Ubuntu).
+> thanks
+> -- PMM
 > 
 
-I get it, we don't want to require Python 3.8 because some dev wanted
-assignment conditionals -- but we're talking about Python 2 here, which
-suffers its EOL by the end of this calendar year.
+When it comes to supporting both 2 and 3 simultaneously yes; it's in my
+opinion not trivial to maintain a growing testing and utility
+infrastructure that works in versions as disparate as 2.7 and 3.7 from
+RHEL7 all the way to Fedora 30. It's not going to get easier, either.
+(Especially not after EOL.)
 
-So do we think it's reasonable to drop support for Python2 for the
-release that comes out after Python2's EOL, or do we insist on 2x3
-simultaneous support for years more?
+For comparison, at least when we target different versions of compilers,
+we are at least targeting the same version of the language...
+
+If you are running a stable or outdated distro and you want to build
+bleeding edge QEMU and you cannot somehow find out how to get Python3 on
+your machine after the official EOL of python2, I am not sure that
+should become the developer's burden. I don't think we are being too
+unreasonably avant-garde about adopting technologies that are too new.
 
 --js
 
