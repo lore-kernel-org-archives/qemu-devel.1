@@ -2,61 +2,110 @@ Return-Path: <SRS0=e5mL=UC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 01117C04AB6
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 09:26:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 31285C04AB6
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 09:26:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CF19127FEF
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 09:26:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CF19127FEF
+	by mail.kernel.org (Postfix) with ESMTPS id F02D227FEE
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 09:26:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F02D227FEE
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:60333 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:60335 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hXjEB-0003Oi-37
-	for qemu-devel@archiver.kernel.org; Mon, 03 Jun 2019 05:26:03 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:47236)
+	id 1hXjED-0003QM-4v
+	for qemu-devel@archiver.kernel.org; Mon, 03 Jun 2019 05:26:05 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:48013)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hXiwE-0004sm-43
-	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 05:07:31 -0400
+	(envelope-from <david@redhat.com>) id 1hXixq-0006cw-8g
+	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 05:09:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hXiwC-0003BT-Ts
-	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 05:07:30 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56440)
+	(envelope-from <david@redhat.com>) id 1hXixo-0005Y5-Rz
+	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 05:09:10 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59674)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <david@redhat.com>)
-	id 1hXiwC-0003AW-Lq; Mon, 03 Jun 2019 05:07:28 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
+	id 1hXixo-0005Wz-IQ; Mon, 03 Jun 2019 05:09:08 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id F1C393086227;
-	Mon,  3 Jun 2019 09:07:27 +0000 (UTC)
-Received: from t460s.redhat.com (unknown [10.36.117.0])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 2537360FFE;
-	Mon,  3 Jun 2019 09:07:25 +0000 (UTC)
-From: David Hildenbrand <david@redhat.com>
+	by mx1.redhat.com (Postfix) with ESMTPS id DBD793082E69;
+	Mon,  3 Jun 2019 09:09:07 +0000 (UTC)
+Received: from [10.36.117.0] (unknown [10.36.117.0])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 963E660490;
+	Mon,  3 Jun 2019 09:09:04 +0000 (UTC)
 To: qemu-devel@nongnu.org
-Date: Mon,  3 Jun 2019 11:06:30 +0200
-Message-Id: <20190603090635.10631-18-david@redhat.com>
-In-Reply-To: <20190603090635.10631-1-david@redhat.com>
 References: <20190603090635.10631-1-david@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+	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
+	SE+xAvmumFBY
+Organization: Red Hat GmbH
+Message-ID: <f542ad06-d02c-1162-7919-9bfef7516f9c@redhat.com>
+Date: Mon, 3 Jun 2019 11:09:03 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.7.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+In-Reply-To: <20190603090635.10631-1-david@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.42]);
-	Mon, 03 Jun 2019 09:07:28 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+	(mx1.redhat.com [10.5.110.46]);
+	Mon, 03 Jun 2019 09:09:07 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v2 17/22] s390x/tcg: Implement VECTOR FP
- PERFORM SIGN OPERATION
+Subject: Re: [Qemu-devel] [PATCH v2 00/22] s390x/tcg: Vector Instruction
+ Support Part 4
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -69,98 +118,106 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Thomas Huth <thuth@redhat.com>, Denys Vlasenko <dvlasenk@redhat.com>,
-	David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
-	Pino Toscano <ptoscano@redhat.com>,
+	Cornelia Huck <cohuck@redhat.com>, Pino Toscano <ptoscano@redhat.com>,
 	Christian Borntraeger <borntraeger@de.ibm.com>,
 	qemu-s390x@nongnu.org, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The only FP instruction we can implement without an helper.
+On 03.06.19 11:06, David Hildenbrand wrote:
+> This is the final part of vector instruction support for s390x.
+> 
+> Part 1: Vector Support Instructions
+> Part 2: Vector Integer Instructions
+> Part 3: Vector String Instructions
+> Part 4: Vector Floating-Point Instructions
+> 
+> The current state can be found at (kept updated):
+>     https://github.com/davidhildenbrand/qemu/tree/vx
+> 
+> It is based on:
+> - [PATCH v2 0/5] s390x/tcg: Vector Instruction Support Part 3
+> - [PATCH v1 0/2] s390x: Fix vector register alignment
+> 
+> With the current state I can boot Linux kernel + user space compiled with
+> SIMD support. This allows to boot distributions compiled exclusively for
+> z13, requiring SIMD support. Also, it is now possible to build a complete
+> kernel using rpmbuild as quite some issues have been sorted out.
+> 
+> While the current state works fine for me with RHEL 8, I am experiencing
+> some issues with newer userspace versions. I already found and fixed
+> some stack overflow protection issues (stfle instruction). I still see
+> random rpm database corruptions and rpmbuild doesn't work correctly
+> (looks like another stack protection issue).
+> 
+> In this part, all Vector Floating-Point Instructions introduced with the
+> "Vector Facility" are added. Also, the "qemu" model is changed to a
+> z13 machine.
+> 
+> v1 -> v2:
+> - get rid of make_float64() and float64_val().
+> - fixed two cc calculation issues (thanks Richard)
+> - Rework "VECTOR FP COMPARE (EQUAL|HIGH|HIGH OR EQUAL)"
+> - Rework "VECTOR FP MULTIPLY AND (ADD|SUBTRACT)"
+> - Use gvec expansion in "s390x/tcg: Implement VECTOR FP PERFORM SIGN
+>   OPERATION"
+> 
+> Cc: Denys Vlasenko <dvlasenk@redhat.com>
+> Cc: Christian Borntraeger <borntraeger@de.ibm.com>
+> Cc: Pino Toscano <ptoscano@redhat.com>
+> 
+> David Hildenbrand (22):
+>   s390x/tcg: Store only the necessary amount of doublewords for STFLE
+>   s390x/tcg: Introduce tcg_s390_vector_exception()
+>   s390x/tcg: Export float_comp_to_cc() and float(32|64|128)_dcmask()
+>   s390x/tcg: Implement VECTOR FP ADD
+>   s390x/tcg: Implement VECTOR FP COMPARE (AND SIGNAL) SCALAR
+>   s390x/tcg: Implement VECTOR FP COMPARE (EQUAL|HIGH|HIGH OR EQUAL)
+>   s390x/tcg: Implement VECTOR FP CONVERT FROM FIXED 64-BIT
+>   s390x/tcg: Implement VECTOR FP CONVERT FROM LOGICAL 64-BIT
+>   s390x/tcg: Implement VECTOR FP CONVERT TO FIXED 64-BIT
+>   s390x/tcg: Implement VECTOR FP CONVERT TO LOGICAL 64-BIT
+>   s390x/tcg: Implement VECTOR FP DIVIDE
+>   s390x/tcg: Implement VECTOR LOAD FP INTEGER
+>   s390x/tcg: Implement VECTOR LOAD LENGTHENED
+>   s390x/tcg: Implement VECTOR LOAD ROUNDED
+>   s390x/tcg: Implement VECTOR FP MULTIPLY
+>   s390x/tcg: Implement VECTOR FP MULTIPLY AND (ADD|SUBTRACT)
+>   s390x/tcg: Implement VECTOR FP PERFORM SIGN OPERATION
+>   s390x/tcg: Implement VECTOR FP SQUARE ROOT
+>   s390x/tcg: Implement VECTOR FP SUBTRACT
+>   s390x/tcg: Implement VECTOR FP TEST DATA CLASS IMMEDIATE
+>   s390x/tcg: Allow linux-user to use vector instructions
+>   s390x/tcg: We support the Vector Facility
+> 
+>  target/s390x/Makefile.objs      |   1 +
+>  target/s390x/cpu.c              |   3 +
+>  target/s390x/cpu.h              |   1 +
+>  target/s390x/excp_helper.c      |  15 +
+>  target/s390x/fpu_helper.c       |   4 +-
+>  target/s390x/gen-features.c     |   1 +
+>  target/s390x/helper.h           |  46 +++
+>  target/s390x/insn-data.def      |  45 +++
+>  target/s390x/internal.h         |   4 +
+>  target/s390x/misc_helper.c      |   8 +-
+>  target/s390x/tcg_s390x.h        |   2 +
+>  target/s390x/translate_vx.inc.c | 284 +++++++++++++++
+>  target/s390x/vec_fpu_helper.c   | 625 ++++++++++++++++++++++++++++++++
+>  13 files changed, 1036 insertions(+), 3 deletions(-)
+>  create mode 100644 target/s390x/vec_fpu_helper.c
+> 
 
-Signed-off-by: David Hildenbrand <david@redhat.com>
----
- target/s390x/insn-data.def      |  2 ++
- target/s390x/translate_vx.inc.c | 52 +++++++++++++++++++++++++++++++++
- 2 files changed, 54 insertions(+)
+Still tired, the unchanged patch
 
-diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
-index e86ade9e44..fa2e801747 100644
---- a/target/s390x/insn-data.def
-+++ b/target/s390x/insn-data.def
-@@ -1240,6 +1240,8 @@
-     F(0xe78f, VFMA,    VRR_e, V,   0, 0, 0, 0, vfma, 0, IF_VEC)
- /* VECTOR FP MULTIPLY AND SUBTRACT */
-     F(0xe78e, VFMS,    VRR_e, V,   0, 0, 0, 0, vfma, 0, IF_VEC)
-+/* VECTOR FP PERFORM SIGN OPERATION */
-+    F(0xe7cc, VFPSO,   VRR_a, V,   0, 0, 0, 0, vfpso, 0, IF_VEC)
-=20
- #ifndef CONFIG_USER_ONLY
- /* COMPARE AND SWAP AND PURGE */
-diff --git a/target/s390x/translate_vx.inc.c b/target/s390x/translate_vx.=
-inc.c
-index b624c7a8aa..9b8606ba25 100644
---- a/target/s390x/translate_vx.inc.c
-+++ b/target/s390x/translate_vx.inc.c
-@@ -2727,3 +2727,55 @@ static DisasJumpType op_vfma(DisasContext *s, Disa=
-sOps *o)
-                    0, fn);
-     return DISAS_NEXT;
- }
-+
-+static DisasJumpType op_vfpso(DisasContext *s, DisasOps *o)
-+{
-+    const uint8_t v1 =3D get_field(s->fields, v1);
-+    const uint8_t v2 =3D get_field(s->fields, v2);
-+    const uint8_t fpf =3D get_field(s->fields, m3);
-+    const uint8_t m4 =3D get_field(s->fields, m4);
-+    const uint8_t m5 =3D get_field(s->fields, m5);
-+    TCGv_i64 tmp;
-+
-+    if (fpf !=3D FPF_LONG || extract32(m4, 0, 3) || m5 > 2) {
-+        gen_program_exception(s, PGM_SPECIFICATION);
-+        return DISAS_NORETURN;
-+    }
-+
-+    if (extract32(m4, 3, 1)) {
-+        tmp =3D tcg_temp_new_i64();
-+        read_vec_element_i64(tmp, v2, 0, ES_64);
-+        switch (m5) {
-+        case 0:
-+            /* sign bit is inverted (complement) */
-+            tcg_gen_xori_i64(tmp, tmp, 1ull << 63);
-+            break;
-+        case 1:
-+            /* sign bit is set to one (negative) */
-+            tcg_gen_ori_i64(tmp, tmp, 1ull << 63);
-+            break;
-+        case 2:
-+            /* sign bit is set to zero (positive) */
-+            tcg_gen_andi_i64(tmp, tmp, (1ull << 63) - 1);
-+            break;
-+        }
-+        write_vec_element_i64(tmp, v1, 0, ES_64);
-+        tcg_temp_free_i64(tmp);
-+    } else {
-+        switch (m5) {
-+        case 0:
-+            /* sign bit is inverted (complement) */
-+            gen_gvec_fn_2i(xori, ES_64, v1, v2, 1ull << 63);
-+            break;
-+        case 1:
-+            /* sign bit is set to one (negative) */
-+            gen_gvec_fn_2i(ori, ES_64, v1, v2, 1ull << 63);
-+            break;
-+        case 2:
-+            /* sign bit is set to zero (positive) */
-+            gen_gvec_fn_2i(andi, ES_64, v1, v2, (1ull << 63) - 1);
-+            break;
-+        }
-+    }
-+    return DISAS_NEXT;
-+}
---=20
-2.21.0
+"[PATCH v1 23/23] s390x: Bump the "qemu" CPU model up to a stripped-down
+z13"
 
+is missing from this series (already reviewed by Richard)
+
+-- 
+
+Thanks,
+
+David / dhildenb
 
