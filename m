@@ -6,58 +6,58 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E8985C04AB5
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 15:09:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 11EFDC28CC6
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 15:09:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B4FEE279D7
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 15:09:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B4FEE279D7
+	by mail.kernel.org (Postfix) with ESMTPS id D322927A87
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 15:09:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D322927A87
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:36342 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:36344 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hXoaT-0004ll-04
-	for qemu-devel@archiver.kernel.org; Mon, 03 Jun 2019 11:09:25 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:39822)
+	id 1hXoaa-0004ph-V2
+	for qemu-devel@archiver.kernel.org; Mon, 03 Jun 2019 11:09:32 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:39817)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1hXoUz-0000j1-Ku
+	(envelope-from <kwolf@redhat.com>) id 1hXoUz-0000iy-5J
 	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 11:03:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1hXoUy-0007xG-Fr
+	(envelope-from <kwolf@redhat.com>) id 1hXoUx-0007wP-OI
 	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 11:03:45 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48552)
+Received: from mx1.redhat.com ([209.132.183.28]:39258)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <kwolf@redhat.com>)
-	id 1hXoUv-0007sG-Ux; Mon, 03 Jun 2019 11:03:42 -0400
+	id 1hXoUq-0007jT-LB; Mon, 03 Jun 2019 11:03:36 -0400
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
 	[10.5.11.16])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 46C443107B1C;
-	Mon,  3 Jun 2019 15:03:36 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 33889308404B;
+	Mon,  3 Jun 2019 15:03:25 +0000 (UTC)
 Received: from linux.fritz.box.com (ovpn-116-129.ams2.redhat.com
 	[10.36.116.129])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 87A5867279;
-	Mon,  3 Jun 2019 15:03:31 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id B1B6A6726F;
+	Mon,  3 Jun 2019 15:03:16 +0000 (UTC)
 From: Kevin Wolf <kwolf@redhat.com>
 To: qemu-block@nongnu.org
-Date: Mon,  3 Jun 2019 17:02:15 +0200
-Message-Id: <20190603150233.6614-11-kwolf@redhat.com>
+Date: Mon,  3 Jun 2019 17:02:12 +0200
+Message-Id: <20190603150233.6614-8-kwolf@redhat.com>
 In-Reply-To: <20190603150233.6614-1-kwolf@redhat.com>
 References: <20190603150233.6614-1-kwolf@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.47]);
-	Mon, 03 Jun 2019 15:03:41 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.40]);
+	Mon, 03 Jun 2019 15:03:30 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 10/28] test-block-iothread: Check filter node in
- test_propagate_mirror
+Subject: [Qemu-devel] [PULL 07/28] iotests: Test cancelling a job and
+ closing the VM
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -74,65 +74,154 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Just make the test cover the AioContext of the filter node as well.
+From: Max Reitz <mreitz@redhat.com>
 
+This patch adds a test where we cancel a throttled mirror job and
+immediately close the VM before it can be cancelled.  Doing so will
+invoke bdrv_drain_all() while the mirror job tries to drain the
+throttled node.  When bdrv_drain_all_end() tries to lift its drain on
+the throttle node, the job will exit and replace the current root node
+of the BB drive0 (which is the job's filter node) by the throttle node.
+Before the previous patch, this replacement did not increase drive0's
+quiesce_counter by a sufficient amount, so when
+bdrv_parent_drained_end() (invoked by bdrv_do_drained_end(), invoked by
+bdrv_drain_all_end()) tried to end the drain on all of the throttle
+node's parents, it decreased drive0's quiesce_counter below 0 -- which
+fails an assertion.
+
+Signed-off-by: Max Reitz <mreitz@redhat.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- tests/test-block-iothread.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+ tests/qemu-iotests/255     | 52 ++++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/255.out | 24 ++++++++++++++++++
+ 2 files changed, 76 insertions(+)
 
-diff --git a/tests/test-block-iothread.c b/tests/test-block-iothread.c
-index 59f692892e..e424d360c8 100644
---- a/tests/test-block-iothread.c
-+++ b/tests/test-block-iothread.c
-@@ -593,7 +593,7 @@ static void test_propagate_mirror(void)
-     IOThread *iothread =3D iothread_new();
-     AioContext *ctx =3D iothread_get_aio_context(iothread);
-     AioContext *main_ctx =3D qemu_get_aio_context();
--    BlockDriverState *src, *target;
-+    BlockDriverState *src, *target, *filter;
-     BlockBackend *blk;
-     Job *job;
-     Error *local_err =3D NULL;
-@@ -610,11 +610,13 @@ static void test_propagate_mirror(void)
-                  false, "filter_node", MIRROR_COPY_MODE_BACKGROUND,
-                  &error_abort);
-     job =3D job_get("job0");
-+    filter =3D bdrv_find_node("filter_node");
+diff --git a/tests/qemu-iotests/255 b/tests/qemu-iotests/255
+index c0bb37a9b0..49433ec122 100755
+--- a/tests/qemu-iotests/255
++++ b/tests/qemu-iotests/255
+@@ -35,6 +35,10 @@ def blockdev_create(vm, options):
+         vm.run_job('job0')
+     iotests.log("")
 =20
-     /* Change the AioContext of src */
-     bdrv_try_set_aio_context(src, ctx, &error_abort);
-     g_assert(bdrv_get_aio_context(src) =3D=3D ctx);
-     g_assert(bdrv_get_aio_context(target) =3D=3D ctx);
-+    g_assert(bdrv_get_aio_context(filter) =3D=3D ctx);
-     g_assert(job->aio_context =3D=3D ctx);
++iotests.log('Finishing a commit job with background reads')
++iotests.log('=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D'=
+)
++iotests.log('')
++
+ with iotests.FilePath('t.qcow2') as disk_path, \
+      iotests.FilePath('t.qcow2.mid') as mid_path, \
+      iotests.FilePath('t.qcow2.base') as base_path, \
+@@ -81,3 +85,51 @@ with iotests.FilePath('t.qcow2') as disk_path, \
+                 auto_dismiss=3DTrue)
 =20
-     /* Change the AioContext of target */
-@@ -623,6 +625,7 @@ static void test_propagate_mirror(void)
-     aio_context_release(ctx);
-     g_assert(bdrv_get_aio_context(src) =3D=3D main_ctx);
-     g_assert(bdrv_get_aio_context(target) =3D=3D main_ctx);
-+    g_assert(bdrv_get_aio_context(filter) =3D=3D main_ctx);
+     vm.shutdown()
++
++iotests.log('')
++iotests.log('Closing the VM while a job is being cancelled')
++iotests.log('=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+')
++iotests.log('')
++
++with iotests.FilePath('src.qcow2') as src_path, \
++     iotests.FilePath('dst.qcow2') as dst_path, \
++     iotests.VM() as vm:
++
++    iotests.log('=3D=3D=3D Create images and start VM =3D=3D=3D')
++    iotests.log('')
++
++    size =3D 128 * 1024 * 1024
++    size_str =3D str(size)
++
++    iotests.qemu_img_log('create', '-f', iotests.imgfmt, src_path, size_=
+str)
++    iotests.qemu_img_log('create', '-f', iotests.imgfmt, dst_path, size_=
+str)
++
++    iotests.log(iotests.qemu_io('-f', iotests.imgfmt, '-c', 'write 0 1M'=
+,
++                                src_path),
++                filters=3D[iotests.filter_test_dir, iotests.filter_qemu_=
+io])
++
++    vm.add_object('throttle-group,x-bps-read=3D4096,id=3Dthrottle0')
++
++    vm.add_blockdev('file,node-name=3Dsrc-file,filename=3D%s' % (src_pat=
+h))
++    vm.add_blockdev('%s,node-name=3Dsrc,file=3Dsrc-file' % (iotests.imgf=
+mt))
++
++    vm.add_blockdev('file,node-name=3Ddst-file,filename=3D%s' % (dst_pat=
+h))
++    vm.add_blockdev('%s,node-name=3Ddst,file=3Ddst-file' % (iotests.imgf=
+mt))
++
++    vm.add_blockdev('throttle,node-name=3Dsrc-throttled,' +
++                    'throttle-group=3Dthrottle0,file=3Dsrc')
++
++    vm.add_device('virtio-blk,drive=3Dsrc-throttled')
++
++    vm.launch()
++
++    iotests.log('=3D=3D=3D Start a mirror job =3D=3D=3D')
++    iotests.log('')
++
++    vm.qmp_log('blockdev-mirror', job_id=3D'job0', device=3D'src-throttl=
+ed',
++                                  target=3D'dst', sync=3D'full')
++
++    vm.qmp_log('block-job-cancel', device=3D'job0')
++    vm.qmp_log('quit')
++
++    vm.shutdown()
+diff --git a/tests/qemu-iotests/255.out b/tests/qemu-iotests/255.out
+index 9a2d7cbb77..348909fdef 100644
+--- a/tests/qemu-iotests/255.out
++++ b/tests/qemu-iotests/255.out
+@@ -1,3 +1,6 @@
++Finishing a commit job with background reads
++=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
++
+ =3D=3D=3D Create backing chain and start VM =3D=3D=3D
 =20
-     /* With a BlockBackend on src, changing target must fail */
-     blk =3D blk_new(0, BLK_PERM_ALL);
-@@ -635,6 +638,7 @@ static void test_propagate_mirror(void)
-     g_assert(blk_get_aio_context(blk) =3D=3D main_ctx);
-     g_assert(bdrv_get_aio_context(src) =3D=3D main_ctx);
-     g_assert(bdrv_get_aio_context(target) =3D=3D main_ctx);
-+    g_assert(bdrv_get_aio_context(filter) =3D=3D main_ctx);
-=20
-     /* ...unless we explicitly allow it */
-     aio_context_acquire(ctx);
-@@ -645,6 +649,7 @@ static void test_propagate_mirror(void)
-     g_assert(blk_get_aio_context(blk) =3D=3D ctx);
-     g_assert(bdrv_get_aio_context(src) =3D=3D ctx);
-     g_assert(bdrv_get_aio_context(target) =3D=3D ctx);
-+    g_assert(bdrv_get_aio_context(filter) =3D=3D ctx);
-=20
-     job_cancel_sync_all();
-=20
+ Formatting 'TEST_DIR/PID-t.qcow2.mid', fmt=3Dqcow2 size=3D134217728 clus=
+ter_size=3D65536 lazy_refcounts=3Doff refcount_bits=3D16
+@@ -14,3 +17,24 @@ Formatting 'TEST_DIR/PID-t.qcow2', fmt=3Dqcow2 size=3D=
+134217728 cluster_size=3D65536 l
+ {"return": {}}
+ {"data": {"id": "job0", "type": "commit"}, "event": "BLOCK_JOB_PENDING",=
+ "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
+ {"data": {"device": "job0", "len": 134217728, "offset": 134217728, "spee=
+d": 0, "type": "commit"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"=
+microseconds": "USECS", "seconds": "SECS"}}
++
++Closing the VM while a job is being cancelled
++=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
++
++=3D=3D=3D Create images and start VM =3D=3D=3D
++
++Formatting 'TEST_DIR/PID-src.qcow2', fmt=3Dqcow2 size=3D134217728 cluste=
+r_size=3D65536 lazy_refcounts=3Doff refcount_bits=3D16
++
++Formatting 'TEST_DIR/PID-dst.qcow2', fmt=3Dqcow2 size=3D134217728 cluste=
+r_size=3D65536 lazy_refcounts=3Doff refcount_bits=3D16
++
++wrote 1048576/1048576 bytes at offset 0
++1 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++
++=3D=3D=3D Start a mirror job =3D=3D=3D
++
++{"execute": "blockdev-mirror", "arguments": {"device": "src-throttled", =
+"job-id": "job0", "sync": "full", "target": "dst"}}
++{"return": {}}
++{"execute": "block-job-cancel", "arguments": {"device": "job0"}}
++{"return": {}}
++{"execute": "quit", "arguments": {}}
++{"return": {}}
 --=20
 2.20.1
 
