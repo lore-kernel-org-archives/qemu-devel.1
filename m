@@ -6,58 +6,58 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B92DC04AB5
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 15:12:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EAB0DC04AB5
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 15:14:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 74DD323F6C
-	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 15:12:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 74DD323F6C
+	by mail.kernel.org (Postfix) with ESMTPS id C2D7E2407D
+	for <qemu-devel@archiver.kernel.org>; Mon,  3 Jun 2019 15:14:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C2D7E2407D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:36408 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:36426 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hXodj-0007YI-J9
-	for qemu-devel@archiver.kernel.org; Mon, 03 Jun 2019 11:12:47 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:39952)
+	id 1hXof5-0000LB-1i
+	for qemu-devel@archiver.kernel.org; Mon, 03 Jun 2019 11:14:11 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:40106)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1hXoVQ-00012H-41
-	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 11:04:13 -0400
+	(envelope-from <kwolf@redhat.com>) id 1hXoVs-0001Ok-5c
+	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 11:04:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1hXoVK-0000Az-7P
-	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 11:04:08 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39498)
+	(envelope-from <kwolf@redhat.com>) id 1hXoVo-00011x-AL
+	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 11:04:39 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46564)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <kwolf@redhat.com>)
-	id 1hXoV8-0008Hr-AP; Mon, 03 Jun 2019 11:03:54 -0400
+	id 1hXoVO-00007u-Gi; Mon, 03 Jun 2019 11:04:14 -0400
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
 	[10.5.11.16])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 2EF8E30C1AD7;
-	Mon,  3 Jun 2019 15:03:41 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 401653001464;
+	Mon,  3 Jun 2019 15:04:04 +0000 (UTC)
 Received: from linux.fritz.box.com (ovpn-116-129.ams2.redhat.com
 	[10.36.116.129])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 988216726F;
-	Mon,  3 Jun 2019 15:03:36 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 4B2706727B;
+	Mon,  3 Jun 2019 15:04:01 +0000 (UTC)
 From: Kevin Wolf <kwolf@redhat.com>
 To: qemu-block@nongnu.org
-Date: Mon,  3 Jun 2019 17:02:16 +0200
-Message-Id: <20190603150233.6614-12-kwolf@redhat.com>
+Date: Mon,  3 Jun 2019 17:02:22 +0200
+Message-Id: <20190603150233.6614-18-kwolf@redhat.com>
 In-Reply-To: <20190603150233.6614-1-kwolf@redhat.com>
 References: <20190603150233.6614-1-kwolf@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.40]);
-	Mon, 03 Jun 2019 15:03:48 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.43]);
+	Mon, 03 Jun 2019 15:04:04 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 11/28] nbd-server: Call
- blk_set_allow_aio_context_change()
+Subject: [Qemu-devel] [PULL 17/28] test-block-iothread: Test adding parent
+ to iothread node
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -74,101 +74,68 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The NBD server uses an AioContext notifier, so it can tolerate that its
-BlockBackend is switched to a different AioContext. Before we start
-actually calling bdrv_try_set_aio_context(), which checks for
-consistency, outside of test cases, we need to make sure that the NBD
-server actually allows this.
+Opening a new parent node for a node that has already been moved into a
+different AioContext must cause the new parent to move into the same
+context.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- nbd/server.c               |  1 +
- tests/qemu-iotests/240     | 21 +++++++++++++++++++++
- tests/qemu-iotests/240.out | 13 +++++++++++++
- 3 files changed, 35 insertions(+)
+ tests/test-block-iothread.c | 33 +++++++++++++++++++++++++++++++++
+ 1 file changed, 33 insertions(+)
 
-diff --git a/nbd/server.c b/nbd/server.c
-index e21bd501dc..d1375350bc 100644
---- a/nbd/server.c
-+++ b/nbd/server.c
-@@ -1491,6 +1491,7 @@ NBDExport *nbd_export_new(BlockDriverState *bs, uin=
-t64_t dev_offset,
-         goto fail;
-     }
-     blk_set_enable_write_cache(blk, !writethrough);
-+    blk_set_allow_aio_context_change(blk, true);
+diff --git a/tests/test-block-iothread.c b/tests/test-block-iothread.c
+index 2200487d76..38f59999ab 100644
+--- a/tests/test-block-iothread.c
++++ b/tests/test-block-iothread.c
+@@ -663,6 +663,38 @@ static void test_propagate_mirror(void)
+     bdrv_unref(target);
+ }
 =20
-     exp->refcount =3D 1;
-     QTAILQ_INIT(&exp->clients);
-diff --git a/tests/qemu-iotests/240 b/tests/qemu-iotests/240
-index b4cf95096d..5be6b9c0f7 100755
---- a/tests/qemu-iotests/240
-+++ b/tests/qemu-iotests/240
-@@ -27,6 +27,12 @@ echo "QA output created by $seq"
-=20
- status=3D1	# failure is the default!
-=20
-+_cleanup()
++static void test_attach_second_node(void)
 +{
-+    rm -f "$TEST_DIR/nbd"
++    IOThread *iothread =3D iothread_new();
++    AioContext *ctx =3D iothread_get_aio_context(iothread);
++    AioContext *main_ctx =3D qemu_get_aio_context();
++    BlockBackend *blk;
++    BlockDriverState *bs, *filter;
++    QDict *options;
++
++    blk =3D blk_new(ctx, BLK_PERM_ALL, BLK_PERM_ALL);
++    bs =3D bdrv_new_open_driver(&bdrv_test, "base", BDRV_O_RDWR, &error_=
+abort);
++    blk_insert_bs(blk, bs, &error_abort);
++
++    options =3D qdict_new();
++    qdict_put_str(options, "driver", "raw");
++    qdict_put_str(options, "file", "base");
++
++    filter =3D bdrv_open(NULL, NULL, options, BDRV_O_RDWR, &error_abort)=
+;
++    g_assert(blk_get_aio_context(blk) =3D=3D ctx);
++    g_assert(bdrv_get_aio_context(bs) =3D=3D ctx);
++    g_assert(bdrv_get_aio_context(filter) =3D=3D ctx);
++
++    blk_set_aio_context(blk, main_ctx, &error_abort);
++    g_assert(blk_get_aio_context(blk) =3D=3D main_ctx);
++    g_assert(bdrv_get_aio_context(bs) =3D=3D main_ctx);
++    g_assert(bdrv_get_aio_context(filter) =3D=3D main_ctx);
++
++    bdrv_unref(filter);
++    bdrv_unref(bs);
++    blk_unref(blk);
 +}
-+trap "_cleanup; exit \$status" 0 1 2 3 15
 +
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-@@ -122,6 +128,21 @@ run_qemu <<EOF
- { "execute": "quit"}
- EOF
+ int main(int argc, char **argv)
+ {
+     int i;
+@@ -678,6 +710,7 @@ int main(int argc, char **argv)
+     }
 =20
-+echo
-+echo =3D=3D=3D Attach a SCSI disks using the same block device as a NBD =
-server =3D=3D=3D
-+echo
-+
-+run_qemu <<EOF
-+{ "execute": "qmp_capabilities" }
-+{ "execute": "blockdev-add", "arguments": {"driver": "null-co", "node-na=
-me": "hd0", "read-only": true}}
-+{ "execute": "nbd-server-start", "arguments": {"addr":{"type":"unix","da=
-ta":{"path":"$TEST_DIR/nbd"}}}}
-+{ "execute": "nbd-server-add", "arguments": {"device":"hd0"}}
-+{ "execute": "object-add", "arguments": {"qom-type": "iothread", "id": "=
-iothread0"}}
-+{ "execute": "device_add", "arguments": {"id": "scsi0", "driver": "${vir=
-tio_scsi}", "iothread": "iothread0"}}
-+{ "execute": "device_add", "arguments": {"id": "scsi-hd0", "driver": "sc=
-si-hd", "drive": "hd0", "bus": "scsi0.0"}}
-+{ "execute": "quit"}
-+EOF
-+
- # success, all done
- echo "*** done"
- rm -f $seq.full
-diff --git a/tests/qemu-iotests/240.out b/tests/qemu-iotests/240.out
-index d76392966c..84e0a43ce5 100644
---- a/tests/qemu-iotests/240.out
-+++ b/tests/qemu-iotests/240.out
-@@ -51,4 +51,17 @@ QMP_VERSION
- {"return": {}}
- {"return": {}}
- {"return": {}}
-+
-+=3D=3D=3D Attach a SCSI disks using the same block device as a NBD serve=
-r =3D=3D=3D
-+
-+Testing:
-+QMP_VERSION
-+{"return": {}}
-+{"return": {}}
-+{"return": {}}
-+{"return": {}}
-+{"return": {}}
-+{"return": {}}
-+{"return": {}}
-+{"return": {}}
- *** done
+     g_test_add_func("/attach/blockjob", test_attach_blockjob);
++    g_test_add_func("/attach/second_node", test_attach_second_node);
+     g_test_add_func("/propagate/basic", test_propagate_basic);
+     g_test_add_func("/propagate/diamond", test_propagate_diamond);
+     g_test_add_func("/propagate/mirror", test_propagate_mirror);
 --=20
 2.20.1
 
