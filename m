@@ -7,79 +7,79 @@ X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 21CD2C282CE
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 20:37:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2ED40C282CE
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 20:37:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E45332070B
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 20:37:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DD609207E0
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 20:37:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="VnTpZ6bd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E45332070B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="GJobI6Gd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DD609207E0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:57620 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:57624 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hYGB8-0003Ch-2t
-	for qemu-devel@archiver.kernel.org; Tue, 04 Jun 2019 16:37:06 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:35571)
+	id 1hYGBN-0003RN-VZ
+	for qemu-devel@archiver.kernel.org; Tue, 04 Jun 2019 16:37:22 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:35779)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hYG8I-00010K-Lb
-	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 16:34:11 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hYG8U-0001A2-IF
+	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 16:34:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hYG8H-00047e-IG
-	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 16:34:10 -0400
-Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:42143)
+	(envelope-from <richard.henderson@linaro.org>) id 1hYG8T-0004HB-BX
+	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 16:34:22 -0400
+Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:44166)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hYG8H-00047B-Cr
-	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 16:34:09 -0400
-Received: by mail-oi1-x242.google.com with SMTP id s184so5590511oie.9
-	for <qemu-devel@nongnu.org>; Tue, 04 Jun 2019 13:34:09 -0700 (PDT)
+	id 1hYG8T-0004Gi-6l
+	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 16:34:21 -0400
+Received: by mail-ot1-x343.google.com with SMTP id b7so7252002otl.11
+	for <qemu-devel@nongnu.org>; Tue, 04 Jun 2019 13:34:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
 	h=from:to:subject:date:message-id:in-reply-to:references;
-	bh=98JOxuqlJVZoGMNI/F+3Atqcd/SU0QC/Vy6EmOYsiac=;
-	b=VnTpZ6bdb7MM+iod+J2HKdFaLyn1EOd/hOxQkdXbAOmsNm19WZ9OLXuMA48QV0w+zH
-	DajQbhYH406NkMw1RUtH17EGfWt0u8qfxdPbbb+gROqv4lJwYvvja7PnOHSGRelV7ZdJ
-	7gvqgJ25EdoEii2zpD9h3eX7jxpvQiyXK1SmldCKuRH0FtxyEdEZQ0QFpGQS+fPQzxNO
-	0aOJoeWEV0RkKCxSY9dhqrts7srlwUkXNGvHxELMehj3hFGcFvHbr6IlnUzwXlHOVysA
-	crhyem6BgwrVrwa5xQFLJ65lx9YChdSeJthnEDxbeVb2oj0BP8Xfhy+ntmc+ZOF+bRQl
-	my1w==
+	bh=TkngbE1sypwzNw5h/VQnw7E5NCmBkYtpc+Uhii5AlrQ=;
+	b=GJobI6GdOpbwAfuPyeym7Clk4GjX2Vx31FB2NEmuZkrJ4yQotula7TKIWsO1js+eLa
+	RvTZcitUnsRXWZnDx1Q94lWUSffXSiTOrAs62PlKPVS7lQfHEd6Jk7kkgNo/7DpjCOrK
+	T11ZJaibMe7d6g687A+HBCNFWpz2F1TdOn62ctDp/IbTL863fI5wleWcBt8fMdVabmMa
+	g+ABxrQRFmC8fdKQXk6GQdZL/BabDw7Rv09lWHMDoabvmoWcnuTTg4ZuaFjcVslu91ox
+	ekbYSXJaURvwExRIVN1iGhHYOD9QtnfOGv8X3m6Q3UgQheBm+GWo0L1aUNkkr6/U5FHp
+	ZAsg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
 	:references;
-	bh=98JOxuqlJVZoGMNI/F+3Atqcd/SU0QC/Vy6EmOYsiac=;
-	b=odsnGFS345WeHMVKz7oWN00hm8bJbYgvzl3wfyIgrcbXPPQWo9pZYYvrOksMVv7u/f
-	qsK8OMD0ovaBhTalgP+zAetRfV9PilsNYJBoIBf3SO2ycYyyryqH1XU5WVjCLNSEffPB
-	7GMQgbevM77IVW5nxKGbYXO7HKIJ0K12j0vjG4lcS7nQw1uTPlczyiyHzgX40NIhme/X
-	ud1aaf99Lxi6XV7r4vNIrJ75MENuigZEZakLey1Udr6SVdR1vpox7CcfvpHTzNwBzPfx
-	gdDhYYsQ+edkUpike/EYd91PI+nUos/sKHkxzdzjKvWDKgWDN5gdMHn9ekjEt5xSHL2g
-	7c+A==
-X-Gm-Message-State: APjAAAWoAixE6jWgZqcJuhLQbQp2o3cBzrrGN8rq7Gyo/HKLjE8ellVY
-	z3RiyMJ3bEwDBP/necbiQaiJGF3U26ltjw==
-X-Google-Smtp-Source: APXvYqyoTDg28I6UJbS+TaOxwsQqphAXju5hEafGZer80OPP0BppIr8fqQJJOiIRSd9ySlKLlfJubA==
-X-Received: by 2002:aca:4708:: with SMTP id u8mr5680448oia.166.1559680448152; 
-	Tue, 04 Jun 2019 13:34:08 -0700 (PDT)
+	bh=TkngbE1sypwzNw5h/VQnw7E5NCmBkYtpc+Uhii5AlrQ=;
+	b=ZzXUR8KkiXGoyqlk/ShpylAAbLT2oRpmYSNDTbmHKCq4Hk5TXO7RCgxzbB4DC0mdqp
+	gQl/8kXuWmf2RL/SMBloSp9Emu0lUiP1s9A/N4gvwILR21FNgS02/hy/5a3fCVeOeSIz
+	NFw8a+8H0Avpo7VyOV/x2+YXlEZgJiOzD7t5I1VK8VPTXg9mv/dIdBKnMwD4dK4o1ZBY
+	hxxpz4h6CsyPUOWXkAvCcEohAw0vgVutzi7Z+5IzaLRE4N6wa950UEMR6GQMTji3zxUM
+	EVFiL0h3y3CfNs8mNp7FvafDYB80L1vectO0TfjLgQGmOxrQCbm5qEHA9Kqs1cLDQMdT
+	io9g==
+X-Gm-Message-State: APjAAAVskf6cetX93UQ0KReFi8Jvib5Pue/Au9y1REzCrag+fgt7S19I
+	XI2EqHY1KIv7iNgqyK1bt9SuthdhEseCYw==
+X-Google-Smtp-Source: APXvYqz+ggfrvJU5LGP6ISY4hEOFbXI3NmR1elxd0XC5EiIqm7xgOCq19Mi48VADFpdAihet5ASwPg==
+X-Received: by 2002:a9d:5e83:: with SMTP id f3mr1884658otl.90.1559680459991;
+	Tue, 04 Jun 2019 13:34:19 -0700 (PDT)
 Received: from localhost.localdomain (200-56-192-86-cable.cybercable.net.mx.
 	[200.56.192.86])
-	by smtp.gmail.com with ESMTPSA id h1sm5979901otj.78.2019.06.04.13.34.06
+	by smtp.gmail.com with ESMTPSA id h1sm5979901otj.78.2019.06.04.13.34.18
 	for <qemu-devel@nongnu.org>
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Tue, 04 Jun 2019 13:34:07 -0700 (PDT)
+	Tue, 04 Jun 2019 13:34:19 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Tue,  4 Jun 2019 15:33:20 -0500
-Message-Id: <20190604203351.27778-9-richard.henderson@linaro.org>
+Date: Tue,  4 Jun 2019 15:33:27 -0500
+Message-Id: <20190604203351.27778-16-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190604203351.27778-1-richard.henderson@linaro.org>
 References: <20190604203351.27778-1-richard.henderson@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2607:f8b0:4864:20::242
-Subject: [Qemu-devel] [PATCH v4 08/39] target/alpha: Use env_cpu, env_archcpu
+X-Received-From: 2607:f8b0:4864:20::343
+Subject: [Qemu-devel] [PATCH v4 15/39] target/lm32: Use env_cpu, env_archcpu
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -96,116 +96,146 @@ Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 Cleanup in the boilerplate that each target must define.
-Replace alpha_env_get_cpu with env_archcpu.  The combination
-CPU(alpha_env_get_cpu) should have used ENV_GET_CPU to begin;
+Replace lm32_env_get_cpu with env_archcpu.  The combination
+CPU(lm32_env_get_cpu) should have used ENV_GET_CPU to begin;
 use env_cpu now.
 
 Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/alpha/cpu.h          | 5 -----
- linux-user/alpha/cpu_loop.c | 2 +-
- target/alpha/helper.c       | 8 +++-----
- target/alpha/sys_helper.c   | 8 ++++----
- 4 files changed, 8 insertions(+), 15 deletions(-)
+ target/lm32/cpu.h       |  5 -----
+ target/lm32/helper.c    | 19 ++++++-------------
+ target/lm32/op_helper.c |  6 +++---
+ target/lm32/translate.c |  2 +-
+ 4 files changed, 10 insertions(+), 22 deletions(-)
 
-diff --git a/target/alpha/cpu.h b/target/alpha/cpu.h
-index e391195be0..86d3e953b9 100644
---- a/target/alpha/cpu.h
-+++ b/target/alpha/cpu.h
-@@ -278,11 +278,6 @@ struct AlphaCPU {
-     QEMUTimer *alarm_timer;
+diff --git a/target/lm32/cpu.h b/target/lm32/cpu.h
+index ad9452eb9f..7fb65fb4b6 100644
+--- a/target/lm32/cpu.h
++++ b/target/lm32/cpu.h
+@@ -195,11 +195,6 @@ struct LM32CPU {
+     uint32_t features;
  };
  
--static inline AlphaCPU *alpha_env_get_cpu(CPUAlphaState *env)
+-static inline LM32CPU *lm32_env_get_cpu(CPULM32State *env)
 -{
--    return container_of(env, AlphaCPU, env);
+-    return container_of(env, LM32CPU, env);
 -}
 -
- #define ENV_OFFSET offsetof(AlphaCPU, env)
+ #define ENV_OFFSET offsetof(LM32CPU, env)
  
  #ifndef CONFIG_USER_ONLY
-diff --git a/linux-user/alpha/cpu_loop.c b/linux-user/alpha/cpu_loop.c
-index 61992571e1..7a94eee84c 100644
---- a/linux-user/alpha/cpu_loop.c
-+++ b/linux-user/alpha/cpu_loop.c
-@@ -23,7 +23,7 @@
+diff --git a/target/lm32/helper.c b/target/lm32/helper.c
+index 8cd4840052..9f3b107474 100644
+--- a/target/lm32/helper.c
++++ b/target/lm32/helper.c
+@@ -58,28 +58,23 @@ hwaddr lm32_cpu_get_phys_page_debug(CPUState *cs, vaddr addr)
  
- void cpu_loop(CPUAlphaState *env)
+ void lm32_breakpoint_insert(CPULM32State *env, int idx, target_ulong address)
  {
--    CPUState *cs = CPU(alpha_env_get_cpu(env));
-+    CPUState *cs = env_cpu(env);
-     int trapnr;
-     target_siginfo_t info;
-     abi_long sysret;
-diff --git a/target/alpha/helper.c b/target/alpha/helper.c
-index 2134ee1e9d..93b8e788b1 100644
---- a/target/alpha/helper.c
-+++ b/target/alpha/helper.c
-@@ -136,7 +136,7 @@ static int get_physical_address(CPUAlphaState *env, target_ulong addr,
-                                 int prot_need, int mmu_idx,
-                                 target_ulong *pphys, int *pprot)
+-    LM32CPU *cpu = lm32_env_get_cpu(env);
+-
+-    cpu_breakpoint_insert(CPU(cpu), address, BP_CPU,
++    cpu_breakpoint_insert(env_cpu(env), address, BP_CPU,
+                           &env->cpu_breakpoint[idx]);
+ }
+ 
+ void lm32_breakpoint_remove(CPULM32State *env, int idx)
  {
--    CPUState *cs = CPU(alpha_env_get_cpu(env));
-+    CPUState *cs = env_cpu(env);
-     target_long saddr = addr;
-     target_ulong phys = 0;
-     target_ulong L1pte, L2pte, L3pte;
-@@ -486,8 +486,7 @@ void alpha_cpu_dump_state(CPUState *cs, FILE *f, int flags)
-    We expect that ENV->PC has already been updated.  */
- void QEMU_NORETURN helper_excp(CPUAlphaState *env, int excp, int error)
+-    LM32CPU *cpu = lm32_env_get_cpu(env);
+-
+     if (!env->cpu_breakpoint[idx]) {
+         return;
+     }
+ 
+-    cpu_breakpoint_remove_by_ref(CPU(cpu), env->cpu_breakpoint[idx]);
++    cpu_breakpoint_remove_by_ref(env_cpu(env), env->cpu_breakpoint[idx]);
+     env->cpu_breakpoint[idx] = NULL;
+ }
+ 
+ void lm32_watchpoint_insert(CPULM32State *env, int idx, target_ulong address,
+                             lm32_wp_t wp_type)
  {
--    AlphaCPU *cpu = alpha_env_get_cpu(env);
--    CPUState *cs = CPU(cpu);
+-    LM32CPU *cpu = lm32_env_get_cpu(env);
+     int flags = 0;
+ 
+     switch (wp_type) {
+@@ -98,26 +93,24 @@ void lm32_watchpoint_insert(CPULM32State *env, int idx, target_ulong address,
+     }
+ 
+     if (flags != 0) {
+-        cpu_watchpoint_insert(CPU(cpu), address, 1, flags,
+-                &env->cpu_watchpoint[idx]);
++        cpu_watchpoint_insert(env_cpu(env), address, 1, flags,
++                              &env->cpu_watchpoint[idx]);
+     }
+ }
+ 
+ void lm32_watchpoint_remove(CPULM32State *env, int idx)
+ {
+-    LM32CPU *cpu = lm32_env_get_cpu(env);
+-
+     if (!env->cpu_watchpoint[idx]) {
+         return;
+     }
+ 
+-    cpu_watchpoint_remove_by_ref(CPU(cpu), env->cpu_watchpoint[idx]);
++    cpu_watchpoint_remove_by_ref(env_cpu(env), env->cpu_watchpoint[idx]);
+     env->cpu_watchpoint[idx] = NULL;
+ }
+ 
+ static bool check_watchpoints(CPULM32State *env)
+ {
+-    LM32CPU *cpu = lm32_env_get_cpu(env);
++    LM32CPU *cpu = env_archcpu(env);
+     int i;
+ 
+     for (i = 0; i < cpu->num_watchpoints; i++) {
+diff --git a/target/lm32/op_helper.c b/target/lm32/op_helper.c
+index be12b11b02..d184550a7b 100644
+--- a/target/lm32/op_helper.c
++++ b/target/lm32/op_helper.c
+@@ -16,7 +16,7 @@
+ #if !defined(CONFIG_USER_ONLY)
+ void raise_exception(CPULM32State *env, int index)
+ {
+-    CPUState *cs = CPU(lm32_env_get_cpu(env));
 +    CPUState *cs = env_cpu(env);
  
-     cs->exception_index = excp;
-     env->error_code = error;
-@@ -498,8 +497,7 @@ void QEMU_NORETURN helper_excp(CPUAlphaState *env, int excp, int error)
- void QEMU_NORETURN dynamic_excp(CPUAlphaState *env, uintptr_t retaddr,
-                                 int excp, int error)
+     cs->exception_index = index;
+     cpu_loop_exit(cs);
+@@ -29,7 +29,7 @@ void HELPER(raise_exception)(CPULM32State *env, uint32_t index)
+ 
+ void HELPER(hlt)(CPULM32State *env)
  {
--    AlphaCPU *cpu = alpha_env_get_cpu(env);
--    CPUState *cs = CPU(cpu);
+-    CPUState *cs = CPU(lm32_env_get_cpu(env));
 +    CPUState *cs = env_cpu(env);
  
-     cs->exception_index = excp;
-     env->error_code = error;
-diff --git a/target/alpha/sys_helper.c b/target/alpha/sys_helper.c
-index ac22323191..f9c34b1144 100644
---- a/target/alpha/sys_helper.c
-+++ b/target/alpha/sys_helper.c
-@@ -44,17 +44,17 @@ uint64_t helper_load_pcc(CPUAlphaState *env)
+     cs->halted = 1;
+     cs->exception_index = EXCP_HLT;
+@@ -39,7 +39,7 @@ void HELPER(hlt)(CPULM32State *env)
+ void HELPER(ill)(CPULM32State *env)
+ {
  #ifndef CONFIG_USER_ONLY
- void helper_tbia(CPUAlphaState *env)
+-    CPUState *cs = CPU(lm32_env_get_cpu(env));
++    CPUState *cs = env_cpu(env);
+     fprintf(stderr, "VM paused due to illegal instruction. "
+             "Connect a debugger or switch to the monitor console "
+             "to find out more.\n");
+diff --git a/target/lm32/translate.c b/target/lm32/translate.c
+index f0e0e7058e..b9f2f2c4a7 100644
+--- a/target/lm32/translate.c
++++ b/target/lm32/translate.c
+@@ -1053,7 +1053,7 @@ static inline void decode(DisasContext *dc, uint32_t ir)
+ void gen_intermediate_code(CPUState *cs, TranslationBlock *tb, int max_insns)
  {
--    tlb_flush(CPU(alpha_env_get_cpu(env)));
-+    tlb_flush(env_cpu(env));
- }
- 
- void helper_tbis(CPUAlphaState *env, uint64_t p)
- {
--    tlb_flush_page(CPU(alpha_env_get_cpu(env)), p);
-+    tlb_flush_page(env_cpu(env), p);
- }
- 
- void helper_tb_flush(CPUAlphaState *env)
- {
--    tb_flush(CPU(alpha_env_get_cpu(env)));
-+    tb_flush(env_cpu(env));
- }
- 
- void helper_halt(uint64_t restart)
-@@ -78,7 +78,7 @@ uint64_t helper_get_walltime(void)
- 
- void helper_set_alarm(CPUAlphaState *env, uint64_t expire)
- {
--    AlphaCPU *cpu = alpha_env_get_cpu(env);
-+    AlphaCPU *cpu = env_archcpu(env);
- 
-     if (expire) {
-         env->alarm_expire = expire;
+     CPULM32State *env = cs->env_ptr;
+-    LM32CPU *cpu = lm32_env_get_cpu(env);
++    LM32CPU *cpu = env_archcpu(env);
+     struct DisasContext ctx, *dc = &ctx;
+     uint32_t pc_start;
+     uint32_t page_start;
 -- 
 2.17.1
 
