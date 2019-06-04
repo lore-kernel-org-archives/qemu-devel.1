@@ -2,60 +2,52 @@ Return-Path: <SRS0=GUf1=UD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.0 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A595C282CE
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 16:16:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C0C1AC282CE
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 16:18:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 403F220883
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 16:16:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 403F220883
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 8A4E523CBC
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 16:18:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8A4E523CBC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:54842 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:54850 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hYC6h-000130-AG
-	for qemu-devel@archiver.kernel.org; Tue, 04 Jun 2019 12:16:15 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:35629)
+	id 1hYC8S-0002Op-N9
+	for qemu-devel@archiver.kernel.org; Tue, 04 Jun 2019 12:18:04 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:35701)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1hYC5c-0000cm-MK
-	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 12:15:09 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1hYC66-0000zS-Tj
+	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 12:15:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1hYC5a-0004uo-A0
-	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 12:15:07 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:32794)
+	(envelope-from <vsementsov@virtuozzo.com>) id 1hYC61-0005S2-Ff
+	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 12:15:37 -0400
+Received: from relay.sw.ru ([185.231.240.75]:41678)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kwolf@redhat.com>)
-	id 1hYC5R-0004cI-Im; Tue, 04 Jun 2019 12:14:58 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
-	[10.5.11.22])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D27BFC1EB1F3;
-	Tue,  4 Jun 2019 16:14:46 +0000 (UTC)
-Received: from linux.fritz.box.com (ovpn-116-220.ams2.redhat.com
-	[10.36.116.220])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 83EF31001DE4;
-	Tue,  4 Jun 2019 16:14:43 +0000 (UTC)
-From: Kevin Wolf <kwolf@redhat.com>
-To: qemu-block@nongnu.org
-Date: Tue,  4 Jun 2019 18:14:30 +0200
-Message-Id: <20190604161430.32105-1-kwolf@redhat.com>
-MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.32]);
-	Tue, 04 Jun 2019 16:14:50 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL v2 00/29] Block layer patches
+	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+	id 1hYC5x-0005C5-Cj; Tue, 04 Jun 2019 12:15:30 -0400
+Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
+	by relay.sw.ru with esmtp (Exim 4.91)
+	(envelope-from <vsementsov@virtuozzo.com>)
+	id 1hYC5k-0005Pq-Vi; Tue, 04 Jun 2019 19:15:17 +0300
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: qemu-devel@nongnu.org,
+	qemu-block@nongnu.org
+Date: Tue,  4 Jun 2019 19:15:14 +0300
+Message-Id: <20190604161514.262241-13-vsementsov@virtuozzo.com>
+X-Mailer: git-send-email 2.18.0
+In-Reply-To: <20190604161514.262241-1-vsementsov@virtuozzo.com>
+References: <20190604161514.262241-1-vsementsov@virtuozzo.com>
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
+X-Received-From: 185.231.240.75
+Subject: [Qemu-devel] [PATCH v2 12/12] block/qcow2: implement
+ .bdrv_co_pwritev(_compressed)_part
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -67,157 +59,283 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
+Cc: fam@euphon.net, kwolf@redhat.com, vsementsov@virtuozzo.com,
+	mreitz@redhat.com, stefanha@redhat.com, den@openvz.org, jsnow@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The following changes since commit e2a58ff493a2e00db3e963c1839c5374500110=
-f2:
+Implement and use new interface to get rid of hd_qiov.
 
-  Merge remote-tracking branch 'remotes/bonzini/tags/for-upstream' into s=
-taging (2019-06-03 18:26:21 +0100)
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+---
+ block/qcow2.h         |  1 +
+ include/qemu/iov.h    |  1 +
+ block/qcow2-cluster.c |  9 ++++---
+ block/qcow2.c         | 60 +++++++++++++++++++++----------------------
+ util/iov.c            | 10 ++++++++
+ 5 files changed, 48 insertions(+), 33 deletions(-)
 
-are available in the Git repository at:
+diff --git a/block/qcow2.h b/block/qcow2.h
+index 567375e56c..ea3bdb0699 100644
+--- a/block/qcow2.h
++++ b/block/qcow2.h
+@@ -417,6 +417,7 @@ typedef struct QCowL2Meta
+      * from @cow_start and @cow_end into one single write operation.
+      */
+     QEMUIOVector *data_qiov;
++    size_t data_qiov_offset;
+ 
+     /** Pointer to next L2Meta of the same write request */
+     struct QCowL2Meta *next;
+diff --git a/include/qemu/iov.h b/include/qemu/iov.h
+index 29957c8a72..bffc151282 100644
+--- a/include/qemu/iov.h
++++ b/include/qemu/iov.h
+@@ -206,6 +206,7 @@ void qemu_iovec_init_extended(
+         void *tail_buf, size_t tail_len);
+ void qemu_iovec_init_slice(QEMUIOVector *qiov, QEMUIOVector *source,
+                            size_t offset, size_t len);
++int qemu_iovec_subvec_niov(QEMUIOVector *qiov, size_t offset, size_t len);
+ void qemu_iovec_add(QEMUIOVector *qiov, void *base, size_t len);
+ void qemu_iovec_concat(QEMUIOVector *dst,
+                        QEMUIOVector *src, size_t soffset, size_t sbytes);
+diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
+index 1159d6ed2f..00b1a9ab8d 100644
+--- a/block/qcow2-cluster.c
++++ b/block/qcow2-cluster.c
+@@ -830,7 +830,6 @@ static int perform_cow(BlockDriverState *bs, QCowL2Meta *m)
+     assert(start->nb_bytes <= UINT_MAX - end->nb_bytes);
+     assert(start->nb_bytes + end->nb_bytes <= UINT_MAX - data_bytes);
+     assert(start->offset + start->nb_bytes <= end->offset);
+-    assert(!m->data_qiov || m->data_qiov->size == data_bytes);
+ 
+     if ((start->nb_bytes == 0 && end->nb_bytes == 0) || m->skip_cow) {
+         return 0;
+@@ -862,7 +861,11 @@ static int perform_cow(BlockDriverState *bs, QCowL2Meta *m)
+     /* The part of the buffer where the end region is located */
+     end_buffer = start_buffer + buffer_size - end->nb_bytes;
+ 
+-    qemu_iovec_init(&qiov, 2 + (m->data_qiov ? m->data_qiov->niov : 0));
++    qemu_iovec_init(&qiov, 2 + (m->data_qiov ?
++                                qemu_iovec_subvec_niov(m->data_qiov,
++                                                       m->data_qiov_offset,
++                                                       data_bytes)
++                                : 0));
+ 
+     qemu_co_mutex_unlock(&s->lock);
+     /* First we read the existing data from both COW regions. We
+@@ -905,7 +908,7 @@ static int perform_cow(BlockDriverState *bs, QCowL2Meta *m)
+         if (start->nb_bytes) {
+             qemu_iovec_add(&qiov, start_buffer, start->nb_bytes);
+         }
+-        qemu_iovec_concat(&qiov, m->data_qiov, 0, data_bytes);
++        qemu_iovec_concat(&qiov, m->data_qiov, m->data_qiov_offset, data_bytes);
+         if (end->nb_bytes) {
+             qemu_iovec_add(&qiov, end_buffer, end->nb_bytes);
+         }
+diff --git a/block/qcow2.c b/block/qcow2.c
+index c389ef07b0..850117cfa2 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -2091,7 +2091,8 @@ fail:
+ /* Check if it's possible to merge a write request with the writing of
+  * the data from the COW regions */
+ static bool merge_cow(uint64_t offset, unsigned bytes,
+-                      QEMUIOVector *hd_qiov, QCowL2Meta *l2meta)
++                      QEMUIOVector *qiov, size_t qiov_offset,
++                      QCowL2Meta *l2meta)
+ {
+     QCowL2Meta *m;
+ 
+@@ -2120,11 +2121,12 @@ static bool merge_cow(uint64_t offset, unsigned bytes,
+ 
+         /* Make sure that adding both COW regions to the QEMUIOVector
+          * does not exceed IOV_MAX */
+-        if (hd_qiov->niov > IOV_MAX - 2) {
++        if (qemu_iovec_subvec_niov(qiov, qiov_offset, bytes) > IOV_MAX - 2) {
+             continue;
+         }
+ 
+-        m->data_qiov = hd_qiov;
++        m->data_qiov = qiov;
++        m->data_qiov_offset = qiov_offset;
+         return true;
+     }
+ 
+@@ -2205,24 +2207,22 @@ static int handle_alloc_space(BlockDriverState *bs, QCowL2Meta *l2meta)
+     return 0;
+ }
+ 
+-static coroutine_fn int qcow2_co_pwritev(BlockDriverState *bs, uint64_t offset,
+-                                         uint64_t bytes, QEMUIOVector *qiov,
+-                                         int flags)
++static coroutine_fn int qcow2_co_pwritev_part(
++        BlockDriverState *bs, uint64_t offset, uint64_t bytes,
++        QEMUIOVector *qiov, size_t qiov_offset, int flags)
+ {
+     BDRVQcow2State *s = bs->opaque;
+     int offset_in_cluster;
+     int ret;
+     unsigned int cur_bytes; /* number of sectors in current iteration */
+     uint64_t cluster_offset;
+-    QEMUIOVector hd_qiov;
++    QEMUIOVector encrypted_qiov;
+     uint64_t bytes_done = 0;
+     uint8_t *cluster_data = NULL;
+     QCowL2Meta *l2meta = NULL;
+ 
+     trace_qcow2_writev_start_req(qemu_coroutine_self(), offset, bytes);
+ 
+-    qemu_iovec_init(&hd_qiov, qiov->niov);
+-
+     qemu_co_mutex_lock(&s->lock);
+ 
+     while (bytes != 0) {
+@@ -2255,9 +2255,6 @@ static coroutine_fn int qcow2_co_pwritev(BlockDriverState *bs, uint64_t offset,
+ 
+         qemu_co_mutex_unlock(&s->lock);
+ 
+-        qemu_iovec_reset(&hd_qiov);
+-        qemu_iovec_concat(&hd_qiov, qiov, bytes_done, cur_bytes);
+-
+         if (bs->encrypted) {
+             assert(s->crypto);
+             if (!cluster_data) {
+@@ -2270,9 +2267,9 @@ static coroutine_fn int qcow2_co_pwritev(BlockDriverState *bs, uint64_t offset,
+                 }
+             }
+ 
+-            assert(hd_qiov.size <=
+-                   QCOW_MAX_CRYPT_CLUSTERS * s->cluster_size);
+-            qemu_iovec_to_buf(&hd_qiov, 0, cluster_data, hd_qiov.size);
++            assert(cur_bytes <= QCOW_MAX_CRYPT_CLUSTERS * s->cluster_size);
++            qemu_iovec_to_buf(qiov, qiov_offset + bytes_done,
++                              cluster_data, cur_bytes);
+ 
+             if (qcow2_co_encrypt(bs, cluster_offset, offset,
+                                  cluster_data, cur_bytes) < 0) {
+@@ -2280,8 +2277,7 @@ static coroutine_fn int qcow2_co_pwritev(BlockDriverState *bs, uint64_t offset,
+                 goto out_unlocked;
+             }
+ 
+-            qemu_iovec_reset(&hd_qiov);
+-            qemu_iovec_add(&hd_qiov, cluster_data, cur_bytes);
++            qemu_iovec_init_buf(&encrypted_qiov, cluster_data, cur_bytes);
+         }
+ 
+         /* Try to efficiently initialize the physical space with zeroes */
+@@ -2294,13 +2290,17 @@ static coroutine_fn int qcow2_co_pwritev(BlockDriverState *bs, uint64_t offset,
+          * writing of the guest data together with that of the COW regions.
+          * If it's not possible (or not necessary) then write the
+          * guest data now. */
+-        if (!merge_cow(offset, cur_bytes, &hd_qiov, l2meta)) {
++        if (!merge_cow(offset, cur_bytes,
++                       bs->encrypted ? &encrypted_qiov : qiov,
++                       bs->encrypted ? 0 : qiov_offset + bytes_done, l2meta))
++        {
+             BLKDBG_EVENT(bs->file, BLKDBG_WRITE_AIO);
+             trace_qcow2_writev_data(qemu_coroutine_self(),
+                                     cluster_offset + offset_in_cluster);
+-            ret = bdrv_co_pwritev(s->data_file,
+-                                  cluster_offset + offset_in_cluster,
+-                                  cur_bytes, &hd_qiov, 0);
++            ret = bdrv_co_pwritev_part(
++                    s->data_file, cluster_offset + offset_in_cluster, cur_bytes,
++                    bs->encrypted ? &encrypted_qiov : qiov,
++                    bs->encrypted ? 0 : qiov_offset + bytes_done, 0);
+             if (ret < 0) {
+                 goto out_unlocked;
+             }
+@@ -2329,7 +2329,6 @@ out_locked:
+ 
+     qemu_co_mutex_unlock(&s->lock);
+ 
+-    qemu_iovec_destroy(&hd_qiov);
+     qemu_vfree(cluster_data);
+     trace_qcow2_writev_done_req(qemu_coroutine_self(), ret);
+ 
+@@ -3993,8 +3992,9 @@ fail:
+ /* XXX: put compressed sectors first, then all the cluster aligned
+    tables to avoid losing bytes in alignment */
+ static coroutine_fn int
+-qcow2_co_pwritev_compressed(BlockDriverState *bs, uint64_t offset,
+-                            uint64_t bytes, QEMUIOVector *qiov)
++qcow2_co_pwritev_compressed_part(BlockDriverState *bs,
++                                 uint64_t offset, uint64_t bytes,
++                                 QEMUIOVector *qiov, size_t qiov_offset)
+ {
+     BDRVQcow2State *s = bs->opaque;
+     int ret;
+@@ -4031,7 +4031,7 @@ qcow2_co_pwritev_compressed(BlockDriverState *bs, uint64_t offset,
+         /* Zero-pad last write if image size is not cluster aligned */
+         memset(buf + bytes, 0, s->cluster_size - bytes);
+     }
+-    qemu_iovec_to_buf(qiov, 0, buf, bytes);
++    qemu_iovec_to_buf(qiov, qiov_offset, buf, bytes);
+ 
+     out_buf = g_malloc(s->cluster_size);
+ 
+@@ -4039,7 +4039,7 @@ qcow2_co_pwritev_compressed(BlockDriverState *bs, uint64_t offset,
+                                 buf, s->cluster_size);
+     if (out_len == -ENOMEM) {
+         /* could not compress: write normal cluster */
+-        ret = qcow2_co_pwritev(bs, offset, bytes, qiov, 0);
++        ret = qcow2_co_pwritev_part(bs, offset, bytes, qiov, qiov_offset, 0);
+         if (ret < 0) {
+             goto fail;
+         }
+@@ -4623,8 +4623,8 @@ static int qcow2_save_vmstate(BlockDriverState *bs, QEMUIOVector *qiov,
+     BDRVQcow2State *s = bs->opaque;
+ 
+     BLKDBG_EVENT(bs->file, BLKDBG_VMSTATE_SAVE);
+-    return bs->drv->bdrv_co_pwritev(bs, qcow2_vm_state_offset(s) + pos,
+-                                    qiov->size, qiov, 0);
++    return bs->drv->bdrv_co_pwritev_part(bs, qcow2_vm_state_offset(s) + pos,
++                                         qiov->size, qiov, 0, 0);
+ }
+ 
+ static int qcow2_load_vmstate(BlockDriverState *bs, QEMUIOVector *qiov,
+@@ -5175,7 +5175,7 @@ BlockDriver bdrv_qcow2 = {
+     .bdrv_co_block_status = qcow2_co_block_status,
+ 
+     .bdrv_co_preadv_part    = qcow2_co_preadv_part,
+-    .bdrv_co_pwritev        = qcow2_co_pwritev,
++    .bdrv_co_pwritev_part   = qcow2_co_pwritev_part,
+     .bdrv_co_flush_to_os    = qcow2_co_flush_to_os,
+ 
+     .bdrv_co_pwrite_zeroes  = qcow2_co_pwrite_zeroes,
+@@ -5183,7 +5183,7 @@ BlockDriver bdrv_qcow2 = {
+     .bdrv_co_copy_range_from = qcow2_co_copy_range_from,
+     .bdrv_co_copy_range_to  = qcow2_co_copy_range_to,
+     .bdrv_co_truncate       = qcow2_co_truncate,
+-    .bdrv_co_pwritev_compressed = qcow2_co_pwritev_compressed,
++    .bdrv_co_pwritev_compressed_part = qcow2_co_pwritev_compressed_part,
+     .bdrv_make_empty        = qcow2_make_empty,
+ 
+     .bdrv_snapshot_create   = qcow2_snapshot_create,
+diff --git a/util/iov.c b/util/iov.c
+index d988a533ce..0ed75e764c 100644
+--- a/util/iov.c
++++ b/util/iov.c
+@@ -401,6 +401,16 @@ static struct iovec *qiov_slice(QEMUIOVector *qiov,
+     return iov;
+ }
+ 
++int qemu_iovec_subvec_niov(QEMUIOVector *qiov, size_t offset, size_t len)
++{
++    size_t head, tail;
++    int niov;
++
++    qiov_slice(qiov, offset, len, &head, &tail, &niov);
++
++    return niov;
++}
++
+ /*
+  * Compile new iovec, combining @head_buf buffer, sub-qiov of @mid_qiov,
+  * and @tail_buf buffer into new qiov.
+-- 
+2.18.0
 
-  git://repo.or.cz/qemu/kevin.git tags/for-upstream
-
-for you to fetch changes up to 11ba81c3cde0bc070cced6e8ef2835fab4fe90c8:
-
-  iotests: Fix duplicated diff output on failure (2019-06-04 16:55:58 +02=
-00)
-
-----------------------------------------------------------------
-Block layer patches:
-
-- block: AioContext management, part 2
-- Avoid recursive block_status call (i.e. lseek() calls) if possible
-- linux-aio: Drop unused BlockAIOCB submission method
-- nvme: add Get/Set Feature Timestamp support
-- Fix crash on commit job start with active I/O on base node
-- Fix crash in bdrv_drained_end
-- Fix integer overflow in qcow2 discard
-
-----------------------------------------------------------------
-John Snow (1):
-      blockdev: fix missed target unref for drive-backup
-
-Julia Suvorova (1):
-      block/linux-aio: Drop unused BlockAIOCB submission method
-
-Kenneth Heitke (1):
-      nvme: add Get/Set Feature Timestamp support
-
-Kevin Wolf (19):
-      block: Drain source node in bdrv_replace_node()
-      iotests: Test commit job start with concurrent I/O
-      test-block-iothread: Check filter node in test_propagate_mirror
-      nbd-server: Call blk_set_allow_aio_context_change()
-      block: Add Error to blk_set_aio_context()
-      block: Add BlockBackend.ctx
-      block: Add qdev_prop_drive_iothread property type
-      scsi-disk: Use qdev_prop_drive_iothread
-      block: Adjust AioContexts when attaching nodes
-      test-block-iothread: Test adding parent to iothread node
-      test-block-iothread: BlockBackend AioContext across root node chang=
-e
-      block: Move node without parents to main AioContext
-      blockdev: Use bdrv_try_set_aio_context() for monitor commands
-      block: Remove wrong bdrv_set_aio_context() calls
-      virtio-scsi-test: Test attaching new overlay with iothreads
-      iotests: Attach new devices to node in non-default iothread
-      test-bdrv-drain: Use bdrv_try_set_aio_context()
-      block: Remove bdrv_set_aio_context()
-      iotests: Fix duplicated diff output on failure
-
-Max Reitz (2):
-      block/io: Delay decrementing the quiesce_counter
-      iotests: Test cancelling a job and closing the VM
-
-Vladimir Sementsov-Ogievskiy (5):
-      tests/perf: Test lseek influence on qcow2 block-status
-      block: avoid recursive block_status call if possible
-      block/qcow2-refcount: add trace-point to qcow2_process_discards
-      block/io: bdrv_pdiscard: support int64_t bytes parameter
-      iotests: test big qcow2 shrink
-
- docs/devel/multiple-iothreads.txt          |   4 +-
- block/qcow2.h                              |   4 +
- hw/block/nvme.h                            |   2 +
- include/block/block.h                      |  21 ++---
- include/block/block_int.h                  |   1 +
- include/block/nvme.h                       |   2 +
- include/block/raw-aio.h                    |   3 -
- include/hw/block/block.h                   |   7 +-
- include/hw/qdev-properties.h               |   3 +
- include/hw/scsi/scsi.h                     |   1 +
- include/sysemu/block-backend.h             |   5 +-
- tests/libqtest.h                           |  11 +++
- block.c                                    |  79 ++++++++++++-----
- block/backup.c                             |   3 +-
- block/block-backend.c                      |  47 ++++++----
- block/commit.c                             |  13 +--
- block/crypto.c                             |   3 +-
- block/io.c                                 |  28 +++---
- block/linux-aio.c                          |  72 +++------------
- block/mirror.c                             |   4 +-
- block/parallels.c                          |   3 +-
- block/qcow.c                               |   3 +-
- block/qcow2-refcount.c                     |  39 ++++++++-
- block/qcow2.c                              |  17 +++-
- block/qed.c                                |   3 +-
- block/sheepdog.c                           |   3 +-
- block/vdi.c                                |   3 +-
- block/vhdx.c                               |   3 +-
- block/vmdk.c                               |   3 +-
- block/vpc.c                                |   3 +-
- blockdev.c                                 |  61 +++++++------
- blockjob.c                                 |  12 ++-
- hmp.c                                      |   3 +-
- hw/block/dataplane/virtio-blk.c            |  12 ++-
- hw/block/dataplane/xen-block.c             |   6 +-
- hw/block/fdc.c                             |   2 +-
- hw/block/nvme.c                            | 106 +++++++++++++++++++++-
- hw/block/xen-block.c                       |   2 +-
- hw/core/qdev-properties-system.c           |  41 ++++++++-
- hw/ide/qdev.c                              |   2 +-
- hw/scsi/scsi-disk.c                        |  24 +++--
- hw/scsi/virtio-scsi.c                      |  25 +++---
- migration/block.c                          |   3 +-
- nbd/server.c                               |   6 +-
- qemu-img.c                                 |   6 +-
- tests/libqtest.c                           |  19 ++++
- tests/test-bdrv-drain.c                    |  50 ++++++-----
- tests/test-bdrv-graph-mod.c                |   5 +-
- tests/test-block-backend.c                 |   6 +-
- tests/test-block-iothread.c                | 104 ++++++++++++++++++----
- tests/test-blockjob.c                      |   2 +-
- tests/test-throttle.c                      |   6 +-
- tests/virtio-scsi-test.c                   |  63 ++++++++++++++
- block/trace-events                         |   3 +
- hw/block/trace-events                      |   2 +
- tests/perf/block/qcow2/convert-blockstatus |  71 +++++++++++++++
- tests/qemu-iotests/051                     |  24 +++++
- tests/qemu-iotests/051.out                 |   3 +
- tests/qemu-iotests/051.pc.out              |  27 ++++++
- tests/qemu-iotests/102                     |   2 +-
- tests/qemu-iotests/102.out                 |   3 +-
- tests/qemu-iotests/141.out                 |   2 +-
- tests/qemu-iotests/144.out                 |   2 +-
- tests/qemu-iotests/240                     |  21 +++++
- tests/qemu-iotests/240.out                 |  15 +++-
- tests/qemu-iotests/250                     |  78 +++++++++++++++++
- tests/qemu-iotests/250.out                 |  16 ++++
- tests/qemu-iotests/255                     | 135 +++++++++++++++++++++++=
-++++++
- tests/qemu-iotests/255.out                 |  40 +++++++++
- tests/qemu-iotests/check                   |   1 -
- tests/qemu-iotests/group                   |   2 +
- tests/qemu-iotests/iotests.py              |  10 ++-
- 72 files changed, 1144 insertions(+), 272 deletions(-)
- create mode 100755 tests/perf/block/qcow2/convert-blockstatus
- create mode 100755 tests/qemu-iotests/250
- create mode 100644 tests/qemu-iotests/250.out
- create mode 100755 tests/qemu-iotests/255
- create mode 100644 tests/qemu-iotests/255.out
 
