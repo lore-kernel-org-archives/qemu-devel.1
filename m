@@ -7,79 +7,80 @@ X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C029C28CC3
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 20:40:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2079DC282CE
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 20:41:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E340A207E0
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 20:40:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D2665207E0
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 20:41:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="gONT1/tG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E340A207E0
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="IMrzjTut"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D2665207E0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:57646 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:57692 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hYGE5-0005pp-4x
-	for qemu-devel@archiver.kernel.org; Tue, 04 Jun 2019 16:40:09 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:35794)
+	id 1hYGFW-00077c-4N
+	for qemu-devel@archiver.kernel.org; Tue, 04 Jun 2019 16:41:38 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:35498)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hYG8W-0001Bb-3k
-	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 16:34:25 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hYG8E-0000yD-57
+	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 16:34:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hYG8U-0004Hr-E8
-	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 16:34:24 -0400
-Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:46443)
+	(envelope-from <richard.henderson@linaro.org>) id 1hYG8C-00043g-LP
+	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 16:34:06 -0400
+Received: from mail-ot1-x329.google.com ([2607:f8b0:4864:20::329]:42487)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hYG8U-0004HU-89
-	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 16:34:22 -0400
-Received: by mail-oi1-x242.google.com with SMTP id 203so16575667oid.13
-	for <qemu-devel@nongnu.org>; Tue, 04 Jun 2019 13:34:22 -0700 (PDT)
+	id 1hYG8C-00043F-F1
+	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 16:34:04 -0400
+Received: by mail-ot1-x329.google.com with SMTP id l15so1105506otn.9
+	for <qemu-devel@nongnu.org>; Tue, 04 Jun 2019 13:34:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
 	h=from:to:subject:date:message-id:in-reply-to:references;
-	bh=r2euVyUV+cLCvC2LxVd/hVa/8V0irmgvDixd4QUTeBo=;
-	b=gONT1/tGZYLchH9oEl4TZLGOwRfXH2Z8gOjeaU/eso3ttNNUh+zfD88O7B3S4HqSZZ
-	CngufVV0Mw3NQcEsla41vMwy9X6IkjjGtmLFhiKKg2oUj/uSsVz92SGRV8ZQfnT5+qVY
-	Yc+K4XkB51fK3zoJjCzGkg2F2ehq1N1Kn4IwNv3vocfZo8TVobY+ox08bKJ6zN3Qhxca
-	kUHlQ5fdz2OWrfu14XGyvkE3f5GKFWEWD8TrLVtEEjzfOVcg9lNDCSUvHX4ofow+E+Ym
-	erlj9oKBnw98fk2yoZzxtL4K9q8mxTmqk6V6H9Sbk/oE9t8+MofIMM9QOLE6qtohWm6x
-	SpIQ==
+	bh=PI0su7trYCoD3sct0VZFP1uvxziQurlc4L3/S26QeHg=;
+	b=IMrzjTutNl8LhWPKdClnBXF94HnlQORWIbb4TIkg/5oBwCmRl2SqRbnfZNDltP1Kd3
+	pFycdfWVQaajAJ8YrNlsmvgEXl6WLzOWF1U56sgUvgIEFxDRc0mH3o/zOIr5jR5GtbdG
+	jRgjOyjFMtRkj5/f9FqOL9IttVfBPHEm4BYzacgeQPepzwHCiqOuAz631EiYdVpJzT+/
+	VAERGSEBhMA+Nfw+5XS8V3yF3LrhDyRhOQtf/2X6dEoYXNG8PuTkddfhm8gcmZRmVhYP
+	A0AEEKgTGcBLORMRrSjjRafMLb7zhygxGxi+YFyGFA5EeKMfJpYHI/JTRe/lUVM1xk1/
+	npRw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
 	:references;
-	bh=r2euVyUV+cLCvC2LxVd/hVa/8V0irmgvDixd4QUTeBo=;
-	b=AFbjTor+AcNH9pN10FtHlUry5H9ievMc5Tg+tr0LbNL1YgHE2DNFe71aKJLHtcHZ1z
-	9DzCz8ITF/j00WzVci4xNrKAQImaDmrQlmIaGFIQJcX7Y/H4R5vnRdg6e3oHQrU/oOFc
-	lS9gQSl74HZ8yxd64M2c47qZ4+YLhvFdcV82Nm47wKtqvRJT+iMIxMfbq+8RuFl3m2bu
-	Moui5v80wML2rNEvzc2KQEtgDgQHZHhGJbKZxZVPiYtMRtc3Zw9vYjWq+hW9Qetc/kSe
-	f4uV6Nnzyz2z/NhoLcxHTPK/GaBmNIxT+12//W8fds8Y9RsHMdV2gozh1KSeT+TWaicg
-	XIsg==
-X-Gm-Message-State: APjAAAV2Sxt/AAp6+S7fvq5O/yWEfN79x6viWFx7b1UJebZD0JliCnhf
-	GKYOTEiozK4gYTg7qKfOyCiIhRvHrrcEMQ==
-X-Google-Smtp-Source: APXvYqyXI6huscZurkNTk1aAVwg7l91p8LnME4KuoDNmX9QmL+HS+lVLs/W74M/VDlW+6GXD+cVNvA==
-X-Received: by 2002:aca:5c54:: with SMTP id q81mr5618461oib.91.1559680461185; 
-	Tue, 04 Jun 2019 13:34:21 -0700 (PDT)
+	bh=PI0su7trYCoD3sct0VZFP1uvxziQurlc4L3/S26QeHg=;
+	b=Ny4yFdE+5IFqlU6OcfkUcCfOhozWuy26TQiuefGz/tUcQ6pY9jYZnvDIlI51hkhGS3
+	IzhcJb3YKnPgtEVYcghOnV9QN6yCjSvUiB0cbcRJg8BWytmmsU1ueAiDjaWCN87bVVgY
+	9C6PgMevO3GS+WSg80vUtruHJlsHm8v/jfY5VydiGRZFHbMlJOsHej7/TbxOor+k/tOu
+	ESymo0pA6IGP4tFKPhRHXnsmmhaS6WyWrpK5wIbNi8HIoSBl5jWXd8Fg3y14T/8nZwsh
+	v1tiTcYlIOsvgP+jQpoDsRO5xJ4S1nH4aXxiuAXZRd02r48wJjQlRhL5ROA0uCUEWeo/
+	ZeJQ==
+X-Gm-Message-State: APjAAAXe6aQDDS0y/Alq/4kIBAaBDrdl+41C95FWxuWkTpTYQrQjqlGb
+	fUDFGPyYwQw3o3NqwPKN0gNbWLzSQ1PnIg==
+X-Google-Smtp-Source: APXvYqyB1fUrtGb7XuIZ4wyrcEMVZJnk36IwIWCgtyouQa76UK46MIVN17QdCxB/lKYPLdGY5fh7mA==
+X-Received: by 2002:a05:6830:1050:: with SMTP id
+	b16mr1744690otp.228.1559680443219; 
+	Tue, 04 Jun 2019 13:34:03 -0700 (PDT)
 Received: from localhost.localdomain (200-56-192-86-cable.cybercable.net.mx.
 	[200.56.192.86])
-	by smtp.gmail.com with ESMTPSA id h1sm5979901otj.78.2019.06.04.13.34.20
+	by smtp.gmail.com with ESMTPSA id h1sm5979901otj.78.2019.06.04.13.34.01
 	for <qemu-devel@nongnu.org>
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Tue, 04 Jun 2019 13:34:20 -0700 (PDT)
+	Tue, 04 Jun 2019 13:34:02 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Tue,  4 Jun 2019 15:33:28 -0500
-Message-Id: <20190604203351.27778-17-richard.henderson@linaro.org>
+Date: Tue,  4 Jun 2019 15:33:17 -0500
+Message-Id: <20190604203351.27778-6-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190604203351.27778-1-richard.henderson@linaro.org>
 References: <20190604203351.27778-1-richard.henderson@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2607:f8b0:4864:20::242
-Subject: [Qemu-devel] [PATCH v4 16/39] target/m68k: Use env_cpu, env_archcpu
+X-Received-From: 2607:f8b0:4864:20::329
+Subject: [Qemu-devel] [PATCH v4 05/39] cpu: Define ArchCPU
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -95,313 +96,286 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Cleanup in the boilerplate that each target must define.
-Replace m68k_env_get_cpu with env_archcpu.  The combination
-CPU(m68k_env_get_cpu) should have used ENV_GET_CPU to begin;
-use env_cpu now.
+For all targets, do this just before including exec/cpu-all.h.
 
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Acked-by: Alistair Francis <alistair.francis@wdc.com>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- linux-user/m68k/target_cpu.h |  2 +-
- target/m68k/cpu.h            |  5 -----
- linux-user/m68k-sim.c        |  3 +--
- linux-user/m68k/cpu_loop.c   |  2 +-
- target/m68k/helper.c         | 33 ++++++++++++---------------------
- target/m68k/m68k-semi.c      |  4 ++--
- target/m68k/op_helper.c      | 12 ++++++------
- target/m68k/translate.c      |  4 +---
- 8 files changed, 24 insertions(+), 41 deletions(-)
+ target/alpha/cpu.h      | 1 +
+ target/arm/cpu.h        | 1 +
+ target/cris/cpu.h       | 1 +
+ target/hppa/cpu.h       | 1 +
+ target/i386/cpu.h       | 1 +
+ target/lm32/cpu.h       | 1 +
+ target/m68k/cpu.h       | 1 +
+ target/microblaze/cpu.h | 1 +
+ target/mips/cpu.h       | 1 +
+ target/moxie/cpu.h      | 1 +
+ target/nios2/cpu.h      | 1 +
+ target/openrisc/cpu.h   | 1 +
+ target/ppc/cpu.h        | 1 +
+ target/riscv/cpu.h      | 1 +
+ target/s390x/cpu.h      | 1 +
+ target/sh4/cpu.h        | 1 +
+ target/sparc/cpu.h      | 1 +
+ target/tilegx/cpu.h     | 1 +
+ target/tricore/cpu.h    | 1 +
+ target/unicore32/cpu.h  | 1 +
+ target/xtensa/cpu.h     | 1 +
+ 21 files changed, 21 insertions(+)
 
-diff --git a/linux-user/m68k/target_cpu.h b/linux-user/m68k/target_cpu.h
-index 7a26f3c3fc..bc7446fbaf 100644
---- a/linux-user/m68k/target_cpu.h
-+++ b/linux-user/m68k/target_cpu.h
-@@ -31,7 +31,7 @@ static inline void cpu_clone_regs(CPUM68KState *env, target_ulong newsp)
+diff --git a/target/alpha/cpu.h b/target/alpha/cpu.h
+index 9ec92bf09d..5af0b6c542 100644
+--- a/target/alpha/cpu.h
++++ b/target/alpha/cpu.h
+@@ -305,6 +305,7 @@ void alpha_cpu_do_unaligned_access(CPUState *cpu, vaddr addr,
+ #define cpu_signal_handler cpu_alpha_signal_handler
  
- static inline void cpu_set_tls(CPUM68KState *env, target_ulong newtls)
- {
--    CPUState *cs = CPU(m68k_env_get_cpu(env));
-+    CPUState *cs = env_cpu(env);
-     TaskState *ts = cs->opaque;
+ typedef CPUAlphaState CPUArchState;
++typedef AlphaCPU ArchCPU;
  
-     ts->tp_value = newtls;
+ #include "exec/cpu-all.h"
+ 
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index ccf581a84c..4ebb6349f1 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -3126,6 +3126,7 @@ static inline bool arm_cpu_data_is_big_endian(CPUARMState *env)
+ }
+ 
+ typedef CPUARMState CPUArchState;
++typedef ARMCPU ArchCPU;
+ 
+ #include "exec/cpu-all.h"
+ 
+diff --git a/target/cris/cpu.h b/target/cris/cpu.h
+index 2ee5417ead..e978eb9539 100644
+--- a/target/cris/cpu.h
++++ b/target/cris/cpu.h
+@@ -285,6 +285,7 @@ bool cris_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
+ #define SFR_RW_MM_TLB_HI   env->pregs[PR_SRS]][6
+ 
+ typedef CPUCRISState CPUArchState;
++typedef CRISCPU ArchCPU;
+ 
+ #include "exec/cpu-all.h"
+ 
+diff --git a/target/hppa/cpu.h b/target/hppa/cpu.h
+index 7fd755a753..6eef107370 100644
+--- a/target/hppa/cpu.h
++++ b/target/hppa/cpu.h
+@@ -231,6 +231,7 @@ static inline HPPACPU *hppa_env_get_cpu(CPUHPPAState *env)
+ #define ENV_OFFSET      offsetof(HPPACPU, env)
+ 
+ typedef CPUHPPAState CPUArchState;
++typedef HPPACPU ArchCPU;
+ 
+ #include "exec/cpu-all.h"
+ 
+diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+index 81931fc510..65f8f4d16c 100644
+--- a/target/i386/cpu.h
++++ b/target/i386/cpu.h
+@@ -1753,6 +1753,7 @@ static inline target_long lshift(target_long x, int n)
+ void tcg_x86_init(void);
+ 
+ typedef CPUX86State CPUArchState;
++typedef X86CPU ArchCPU;
+ 
+ #include "exec/cpu-all.h"
+ #include "svm.h"
+diff --git a/target/lm32/cpu.h b/target/lm32/cpu.h
+index 86f6c7b0af..08c360bd16 100644
+--- a/target/lm32/cpu.h
++++ b/target/lm32/cpu.h
+@@ -257,6 +257,7 @@ bool lm32_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
+                        bool probe, uintptr_t retaddr);
+ 
+ typedef CPULM32State CPUArchState;
++typedef LM32CPU ArchCPU;
+ 
+ #include "exec/cpu-all.h"
+ 
 diff --git a/target/m68k/cpu.h b/target/m68k/cpu.h
-index 2e53cde076..7f3fa8d141 100644
+index 4465a66145..1d30b73bdf 100644
 --- a/target/m68k/cpu.h
 +++ b/target/m68k/cpu.h
-@@ -163,11 +163,6 @@ struct M68kCPU {
-     CPUM68KState env;
- };
+@@ -537,6 +537,7 @@ void m68k_cpu_transaction_failed(CPUState *cs, hwaddr physaddr, vaddr addr,
+                                  MemTxResult response, uintptr_t retaddr);
  
--static inline M68kCPU *m68k_env_get_cpu(CPUM68KState *env)
--{
--    return container_of(env, M68kCPU, env);
--}
--
- #define ENV_OFFSET offsetof(M68kCPU, env)
+ typedef CPUM68KState CPUArchState;
++typedef M68kCPU ArchCPU;
  
- void m68k_cpu_do_interrupt(CPUState *cpu);
-diff --git a/linux-user/m68k-sim.c b/linux-user/m68k-sim.c
-index 34d332d8b1..9bc6ff3d3a 100644
---- a/linux-user/m68k-sim.c
-+++ b/linux-user/m68k-sim.c
-@@ -91,7 +91,6 @@ static int translate_openflags(int flags)
- #define ARG(x) tswap32(args[x])
- void do_m68k_simcall(CPUM68KState *env, int nr)
- {
--    M68kCPU *cpu = m68k_env_get_cpu(env);
-     uint32_t *args;
+ #include "exec/cpu-all.h"
  
-     args = (uint32_t *)(unsigned long)(env->aregs[7] + 4);
-@@ -159,6 +158,6 @@ void do_m68k_simcall(CPUM68KState *env, int nr)
-         check_err(env, lseek(ARG(0), (int32_t)ARG(1), ARG(2)));
-         break;
-     default:
--        cpu_abort(CPU(cpu), "Unsupported m68k sim syscall %d\n", nr);
-+        cpu_abort(env_cpu(env), "Unsupported m68k sim syscall %d\n", nr);
-     }
- }
-diff --git a/linux-user/m68k/cpu_loop.c b/linux-user/m68k/cpu_loop.c
-index 42d8d841ea..f2c33057b3 100644
---- a/linux-user/m68k/cpu_loop.c
-+++ b/linux-user/m68k/cpu_loop.c
-@@ -23,7 +23,7 @@
+diff --git a/target/microblaze/cpu.h b/target/microblaze/cpu.h
+index 6170fd452f..5a7fe3cbf8 100644
+--- a/target/microblaze/cpu.h
++++ b/target/microblaze/cpu.h
+@@ -366,6 +366,7 @@ bool mb_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
+                      bool probe, uintptr_t retaddr);
  
- void cpu_loop(CPUM68KState *env)
- {
--    CPUState *cs = CPU(m68k_env_get_cpu(env));
-+    CPUState *cs = env_cpu(env);
-     int trapnr;
-     unsigned int n;
-     target_siginfo_t info;
-diff --git a/target/m68k/helper.c b/target/m68k/helper.c
-index 6db93bdd81..31aacb51c6 100644
---- a/target/m68k/helper.c
-+++ b/target/m68k/helper.c
-@@ -168,8 +168,6 @@ void m68k_cpu_init_gdb(M68kCPU *cpu)
+ typedef CPUMBState CPUArchState;
++typedef MicroBlazeCPU ArchCPU;
  
- void HELPER(cf_movec_to)(CPUM68KState *env, uint32_t reg, uint32_t val)
- {
--    M68kCPU *cpu = m68k_env_get_cpu(env);
--
-     switch (reg) {
-     case M68K_CR_CACR:
-         env->cacr = val;
-@@ -186,7 +184,7 @@ void HELPER(cf_movec_to)(CPUM68KState *env, uint32_t reg, uint32_t val)
-         break;
-     /* TODO: Implement control registers.  */
-     default:
--        cpu_abort(CPU(cpu),
-+        cpu_abort(env_cpu(env),
-                   "Unimplemented control register write 0x%x = 0x%x\n",
-                   reg, val);
-     }
-@@ -194,8 +192,6 @@ void HELPER(cf_movec_to)(CPUM68KState *env, uint32_t reg, uint32_t val)
+ #include "exec/cpu-all.h"
  
- void HELPER(m68k_movec_to)(CPUM68KState *env, uint32_t reg, uint32_t val)
- {
--    M68kCPU *cpu = m68k_env_get_cpu(env);
--
-     switch (reg) {
-     /* MC680[1234]0 */
-     case M68K_CR_SFC:
-@@ -248,14 +244,13 @@ void HELPER(m68k_movec_to)(CPUM68KState *env, uint32_t reg, uint32_t val)
-         env->mmu.ttr[M68K_DTTR1] = val;
-         return;
-     }
--    cpu_abort(CPU(cpu), "Unimplemented control register write 0x%x = 0x%x\n",
-+    cpu_abort(env_cpu(env),
-+              "Unimplemented control register write 0x%x = 0x%x\n",
-               reg, val);
+diff --git a/target/mips/cpu.h b/target/mips/cpu.h
+index 6f65822bb1..12527ca104 100644
+--- a/target/mips/cpu.h
++++ b/target/mips/cpu.h
+@@ -1113,6 +1113,7 @@ static inline int cpu_mmu_index(CPUMIPSState *env, bool ifetch)
  }
  
- uint32_t HELPER(m68k_movec_from)(CPUM68KState *env, uint32_t reg)
- {
--    M68kCPU *cpu = m68k_env_get_cpu(env);
--
-     switch (reg) {
-     /* MC680[1234]0 */
-     case M68K_CR_SFC:
-@@ -292,7 +287,7 @@ uint32_t HELPER(m68k_movec_from)(CPUM68KState *env, uint32_t reg)
-     case M68K_CR_DTT1:
-         return env->mmu.ttr[M68K_DTTR1];
-     }
--    cpu_abort(CPU(cpu), "Unimplemented control register read 0x%x\n",
-+    cpu_abort(env_cpu(env), "Unimplemented control register read 0x%x\n",
-               reg);
+ typedef CPUMIPSState CPUArchState;
++typedef MIPSCPU ArchCPU;
+ 
+ #include "exec/cpu-all.h"
+ 
+diff --git a/target/moxie/cpu.h b/target/moxie/cpu.h
+index 1de0515848..b27b0eabae 100644
+--- a/target/moxie/cpu.h
++++ b/target/moxie/cpu.h
+@@ -118,6 +118,7 @@ static inline int cpu_mmu_index(CPUMoxieState *env, bool ifetch)
  }
  
-@@ -388,8 +383,7 @@ static void dump_address_map(CPUM68KState *env, uint32_t root_pointer)
-     uint32_t last_logical, last_physical;
-     int32_t size;
-     int last_attr = -1, attr = -1;
--    M68kCPU *cpu = m68k_env_get_cpu(env);
--    CPUState *cs = CPU(cpu);
-+    CPUState *cs = env_cpu(env);
-     MemTxResult txres;
+ typedef CPUMoxieState CPUArchState;
++typedef MoxieCPU ArchCPU;
  
-     if (env->mmu.tcr & M68K_TCR_PAGE_8K) {
-@@ -630,8 +624,7 @@ static int get_physical_address(CPUM68KState *env, hwaddr *physical,
-                                 int *prot, target_ulong address,
-                                 int access_type, target_ulong *page_size)
- {
--    M68kCPU *cpu = m68k_env_get_cpu(env);
--    CPUState *cs = CPU(cpu);
-+    CPUState *cs = env_cpu(env);
-     uint32_t entry;
-     uint32_t next;
-     target_ulong page_mask;
-@@ -1175,7 +1168,7 @@ void HELPER(mac_set_flags)(CPUM68KState *env, uint32_t acc)
-         z = n;                                                             \
-         break;                                                             \
-     default:                                                               \
--        cpu_abort(CPU(m68k_env_get_cpu(env)), "Bad CC_OP %d", op);         \
-+        cpu_abort(env_cpu(env), "Bad CC_OP %d", op);                       \
-     }                                                                      \
- } while (0)
+ #include "exec/cpu-all.h"
  
-@@ -1358,8 +1351,6 @@ void HELPER(set_mac_extu)(CPUM68KState *env, uint32_t val, uint32_t acc)
- #if defined(CONFIG_SOFTMMU)
- void HELPER(ptest)(CPUM68KState *env, uint32_t addr, uint32_t is_read)
- {
--    M68kCPU *cpu = m68k_env_get_cpu(env);
--    CPUState *cs = CPU(cpu);
-     hwaddr physical;
-     int access_type;
-     int prot;
-@@ -1384,7 +1375,7 @@ void HELPER(ptest)(CPUM68KState *env, uint32_t addr, uint32_t is_read)
-     if (ret == 0) {
-         addr &= TARGET_PAGE_MASK;
-         physical += addr & (page_size - 1);
--        tlb_set_page(cs, addr, physical,
-+        tlb_set_page(env_cpu(env), addr, physical,
-                      prot, access_type & ACCESS_SUPER ?
-                      MMU_KERNEL_IDX : MMU_USER_IDX, page_size);
-     }
-@@ -1392,18 +1383,18 @@ void HELPER(ptest)(CPUM68KState *env, uint32_t addr, uint32_t is_read)
- 
- void HELPER(pflush)(CPUM68KState *env, uint32_t addr, uint32_t opmode)
- {
--    M68kCPU *cpu = m68k_env_get_cpu(env);
-+    CPUState *cs = env_cpu(env);
- 
-     switch (opmode) {
-     case 0: /* Flush page entry if not global */
-     case 1: /* Flush page entry */
--        tlb_flush_page(CPU(cpu), addr);
-+        tlb_flush_page(cs, addr);
-         break;
-     case 2: /* Flush all except global entries */
--        tlb_flush(CPU(cpu));
-+        tlb_flush(cs);
-         break;
-     case 3: /* Flush all entries */
--        tlb_flush(CPU(cpu));
-+        tlb_flush(cs);
-         break;
-     }
+diff --git a/target/nios2/cpu.h b/target/nios2/cpu.h
+index cc8e0ab771..5e51f1ae3f 100644
+--- a/target/nios2/cpu.h
++++ b/target/nios2/cpu.h
+@@ -247,6 +247,7 @@ static inline int cpu_interrupts_enabled(CPUNios2State *env)
  }
-diff --git a/target/m68k/m68k-semi.c b/target/m68k/m68k-semi.c
-index 1402145c8f..6716b93b5a 100644
---- a/target/m68k/m68k-semi.c
-+++ b/target/m68k/m68k-semi.c
-@@ -421,7 +421,7 @@ void do_m68k_semihosting(CPUM68KState *env, int nr)
-     case HOSTED_INIT_SIM:
- #if defined(CONFIG_USER_ONLY)
-         {
--        CPUState *cs = CPU(m68k_env_get_cpu(env));
-+        CPUState *cs = env_cpu(env);
-         TaskState *ts = cs->opaque;
-         /* Allocate the heap using sbrk.  */
-         if (!ts->heap_limit) {
-@@ -454,7 +454,7 @@ void do_m68k_semihosting(CPUM68KState *env, int nr)
- #endif
-         return;
-     default:
--        cpu_abort(CPU(m68k_env_get_cpu(env)), "Unsupported semihosting syscall %d\n", nr);
-+        cpu_abort(env_cpu(env), "Unsupported semihosting syscall %d\n", nr);
-         result = 0;
-     }
- failed:
-diff --git a/target/m68k/op_helper.c b/target/m68k/op_helper.c
-index 3d1aa23a02..ebcfe3dfdd 100644
---- a/target/m68k/op_helper.c
-+++ b/target/m68k/op_helper.c
-@@ -196,7 +196,7 @@ static const char *m68k_exception_name(int index)
  
- static void cf_interrupt_all(CPUM68KState *env, int is_hw)
- {
--    CPUState *cs = CPU(m68k_env_get_cpu(env));
-+    CPUState *cs = env_cpu(env);
-     uint32_t sp;
-     uint32_t sr;
-     uint32_t fmt;
-@@ -274,7 +274,7 @@ static inline void do_stack_frame(CPUM68KState *env, uint32_t *sp,
- {
-     if (m68k_feature(env, M68K_FEATURE_QUAD_MULDIV)) {
-         /*  all except 68000 */
--        CPUState *cs = CPU(m68k_env_get_cpu(env));
-+        CPUState *cs = env_cpu(env);
-         switch (format) {
-         case 4:
-             *sp -= 4;
-@@ -299,7 +299,7 @@ static inline void do_stack_frame(CPUM68KState *env, uint32_t *sp,
+ typedef CPUNios2State CPUArchState;
++typedef Nios2CPU ArchCPU;
  
- static void m68k_interrupt_all(CPUM68KState *env, int is_hw)
- {
--    CPUState *cs = CPU(m68k_env_get_cpu(env));
-+    CPUState *cs = env_cpu(env);
-     uint32_t sp;
-     uint32_t retaddr;
-     uint32_t vector;
-@@ -507,7 +507,7 @@ bool m68k_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
+ #include "exec/cpu-all.h"
  
- static void raise_exception_ra(CPUM68KState *env, int tt, uintptr_t raddr)
- {
--    CPUState *cs = CPU(m68k_env_get_cpu(env));
-+    CPUState *cs = env_cpu(env);
+diff --git a/target/openrisc/cpu.h b/target/openrisc/cpu.h
+index 98361cb041..496895693e 100644
+--- a/target/openrisc/cpu.h
++++ b/target/openrisc/cpu.h
+@@ -364,6 +364,7 @@ void cpu_openrisc_count_stop(OpenRISCCPU *cpu);
+ #define CPU_RESOLVING_TYPE TYPE_OPENRISC_CPU
  
-     cs->exception_index = tt;
-     cpu_loop_exit_restore(cs, raddr);
-@@ -1037,7 +1037,7 @@ void HELPER(chk)(CPUM68KState *env, int32_t val, int32_t ub)
-     env->cc_c = 0 <= ub ? val < 0 || val > ub : val > ub && val < 0;
+ typedef CPUOpenRISCState CPUArchState;
++typedef OpenRISCCPU ArchCPU;
  
-     if (val < 0 || val > ub) {
--        CPUState *cs = CPU(m68k_env_get_cpu(env));
-+        CPUState *cs = env_cpu(env);
+ #include "exec/cpu-all.h"
  
-         /* Recover PC and CC_OP for the beginning of the insn.  */
-         cpu_restore_state(cs, GETPC(), true);
-@@ -1068,7 +1068,7 @@ void HELPER(chk2)(CPUM68KState *env, int32_t val, int32_t lb, int32_t ub)
-     env->cc_c = lb <= ub ? val < lb || val > ub : val > ub && val < lb;
+diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+index 6478fe7c91..17e7213be9 100644
+--- a/target/ppc/cpu.h
++++ b/target/ppc/cpu.h
+@@ -1376,6 +1376,7 @@ void ppc_compat_add_property(Object *obj, const char *name,
+ #endif /* defined(TARGET_PPC64) */
  
-     if (env->cc_c) {
--        CPUState *cs = CPU(m68k_env_get_cpu(env));
-+        CPUState *cs = env_cpu(env);
+ typedef CPUPPCState CPUArchState;
++typedef PowerPCCPU ArchCPU;
  
-         /* Recover PC and CC_OP for the beginning of the insn.  */
-         cpu_restore_state(cs, GETPC(), true);
-diff --git a/target/m68k/translate.c b/target/m68k/translate.c
-index f0534a4ba0..2ae537461f 100644
---- a/target/m68k/translate.c
-+++ b/target/m68k/translate.c
-@@ -4777,14 +4777,12 @@ DISAS_INSN(wddata)
+ #include "exec/cpu-all.h"
  
- DISAS_INSN(wdebug)
- {
--    M68kCPU *cpu = m68k_env_get_cpu(env);
--
-     if (IS_USER(s)) {
-         gen_exception(s, s->base.pc_next, EXCP_PRIVILEGE);
-         return;
-     }
-     /* TODO: Implement wdebug.  */
--    cpu_abort(CPU(cpu), "WDEBUG not implemented");
-+    cpu_abort(env_cpu(env), "WDEBUG not implemented");
+diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
+index 509aae0613..8ee5051119 100644
+--- a/target/riscv/cpu.h
++++ b/target/riscv/cpu.h
+@@ -335,6 +335,7 @@ void riscv_set_csr_ops(int csrno, riscv_csr_operations *ops);
+ void riscv_cpu_register_gdb_regs_for_features(CPUState *cs);
+ 
+ typedef CPURISCVState CPUArchState;
++typedef RISCVCPU ArchCPU;
+ 
+ #include "exec/cpu-all.h"
+ 
+diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
+index 5ca53f48f8..6d1b0f273a 100644
+--- a/target/s390x/cpu.h
++++ b/target/s390x/cpu.h
+@@ -794,6 +794,7 @@ void s390_init_sigp(void);
+ S390CPU *s390_cpu_addr2state(uint16_t cpu_addr);
+ 
+ typedef CPUS390XState CPUArchState;
++typedef S390CPU ArchCPU;
+ 
+ #include "exec/cpu-all.h"
+ 
+diff --git a/target/sh4/cpu.h b/target/sh4/cpu.h
+index d7a8723d39..1bdc997290 100644
+--- a/target/sh4/cpu.h
++++ b/target/sh4/cpu.h
+@@ -281,6 +281,7 @@ static inline int cpu_mmu_index (CPUSH4State *env, bool ifetch)
  }
- #endif
+ 
+ typedef CPUSH4State CPUArchState;
++typedef SuperHCPU ArchCPU;
+ 
+ #include "exec/cpu-all.h"
+ 
+diff --git a/target/sparc/cpu.h b/target/sparc/cpu.h
+index fc392c6e87..ba5904e05a 100644
+--- a/target/sparc/cpu.h
++++ b/target/sparc/cpu.h
+@@ -730,6 +730,7 @@ static inline int cpu_pil_allowed(CPUSPARCState *env1, int pil)
+ }
+ 
+ typedef CPUSPARCState CPUArchState;
++typedef SPARCCPU ArchCPU;
+ 
+ #include "exec/cpu-all.h"
+ 
+diff --git a/target/tilegx/cpu.h b/target/tilegx/cpu.h
+index 2fbf14d508..042a7a0c71 100644
+--- a/target/tilegx/cpu.h
++++ b/target/tilegx/cpu.h
+@@ -151,6 +151,7 @@ static inline TileGXCPU *tilegx_env_get_cpu(CPUTLGState *env)
+ #define MMU_USER_IDX    0  /* Current memory operation is in user mode */
+ 
+ typedef CPUTLGState CPUArchState;
++typedef TileGXCPU ArchCPU;
+ 
+ #include "exec/cpu-all.h"
+ 
+diff --git a/target/tricore/cpu.h b/target/tricore/cpu.h
+index 5d3072f2db..8d660df34a 100644
+--- a/target/tricore/cpu.h
++++ b/target/tricore/cpu.h
+@@ -379,6 +379,7 @@ static inline int cpu_mmu_index(CPUTriCoreState *env, bool ifetch)
+ }
+ 
+ typedef CPUTriCoreState CPUArchState;
++typedef TriCoreCPU ArchCPU;
+ 
+ #include "exec/cpu-all.h"
+ 
+diff --git a/target/unicore32/cpu.h b/target/unicore32/cpu.h
+index 48562949b1..5c9c4d98c0 100644
+--- a/target/unicore32/cpu.h
++++ b/target/unicore32/cpu.h
+@@ -152,6 +152,7 @@ static inline int cpu_mmu_index(CPUUniCore32State *env, bool ifetch)
+ }
+ 
+ typedef CPUUniCore32State CPUArchState;
++typedef UniCore32CPU ArchCPU;
+ 
+ #include "exec/cpu-all.h"
+ 
+diff --git a/target/xtensa/cpu.h b/target/xtensa/cpu.h
+index e164e18f18..6e6fb1d893 100644
+--- a/target/xtensa/cpu.h
++++ b/target/xtensa/cpu.h
+@@ -800,6 +800,7 @@ static inline void cpu_get_tb_cpu_state(CPUXtensaState *env, target_ulong *pc,
+ }
+ 
+ typedef CPUXtensaState CPUArchState;
++typedef XtensaCPU ArchCPU;
+ 
+ #include "exec/cpu-all.h"
  
 -- 
 2.17.1
