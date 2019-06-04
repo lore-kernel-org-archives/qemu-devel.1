@@ -7,80 +7,79 @@ X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 98124C282CE
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 20:47:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F3B0C282CE
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 20:48:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F3DDC207E0
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 20:47:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C02A9207E0
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 20:48:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Vq1F3fey"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F3DDC207E0
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="EY322XWA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C02A9207E0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:57775 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:57777 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hYGL2-0003pL-57
-	for qemu-devel@archiver.kernel.org; Tue, 04 Jun 2019 16:47:20 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:35630)
+	id 1hYGLl-0004Oy-Tg
+	for qemu-devel@archiver.kernel.org; Tue, 04 Jun 2019 16:48:06 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:35647)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hYG8N-00012v-KF
-	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 16:34:17 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hYG8P-000144-IJ
+	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 16:34:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hYG8L-0004AA-Cg
-	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 16:34:15 -0400
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:35307)
+	(envelope-from <richard.henderson@linaro.org>) id 1hYG8O-0004CJ-93
+	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 16:34:17 -0400
+Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:42711)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hYG8L-00049p-4y
-	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 16:34:13 -0400
-Received: by mail-ot1-x343.google.com with SMTP id n14so20872651otk.2
-	for <qemu-devel@nongnu.org>; Tue, 04 Jun 2019 13:34:13 -0700 (PDT)
+	id 1hYG8O-0004C5-3g
+	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 16:34:16 -0400
+Received: by mail-ot1-x342.google.com with SMTP id l15so1106097otn.9
+	for <qemu-devel@nongnu.org>; Tue, 04 Jun 2019 13:34:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
 	h=from:to:subject:date:message-id:in-reply-to:references;
-	bh=WuT5rI1C9TB6zptCkEe3qyzwnnSRPjZmxlIxnT04Fdc=;
-	b=Vq1F3feyY5dqdYBTu9Ez3ETncDKMkmadktqEi18yN2xeym5xKZSJIaNSlcIta5M1rR
-	hEJ3/T50bYkz1UDjIuvWCf3PgBw18upZNFOAJxUiIygvJlDFcdD2rzXpGZzW1RJw7RuE
-	7X+EgaqmrmiX60+P/UEx0VkIx+qOUfzSciZRCvEm5tHSRIZF7EpU/tJvOOYEA9P1o+oo
-	GgdmUbLpj5ZtVsRGQMQWje79ZMrerz6RQoFaLYK+iFofd2rHttiujegfYq+yyNYE4xSD
-	+Hv96LnhIPBHBS15MfWAeb0vFMmk4JeXt55yA51jO411GjPZ6rMflnBJIQphdz8nzAPM
-	mQnw==
+	bh=2YlJXMPiyvFoAXCG6DRvfJeW5V6xBJbkISsj/LLUjoo=;
+	b=EY322XWAvZvQJVV4QAqcLMUr0r7lRokt6qf7jl/Ge+RbsZGwQhbU+mjmGZfARFljvI
+	9COuTn3++nZZNCLrTOmx16t0E4EGkpz+V3fGcmTiuTFevGNByiKHHJPOwBDdOhria1nH
+	JS0QZw3BgJf2crmT/nmOqP7eXpdQxHcJ3rctFGUN7vWc9jN1k+wxGeYMZMrZt46A+HPb
+	llfHOI4LPljcsPfDTV0/5PDAkxayd19Q4zmPgelU5VLM24AKaAEA3eU5Y7ASfkpuRcKr
+	+bVuTPjvrBc+agIPm928DRwdYik6eop8P4T+8g7gpUFqEYcac/h4su1rXmoTVjH8FZqQ
+	OkPA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
 	:references;
-	bh=WuT5rI1C9TB6zptCkEe3qyzwnnSRPjZmxlIxnT04Fdc=;
-	b=QSow0DWH3DRD6Du08f4hKDNO4YzzQE8qML2EKWr8rcjPmC2yFSuBA277EcZ8SK6nLu
-	1ivI/ap4BLW2lk+TRprXAmuiEjc/wGpIycoYjCd12pGHeTo39vQnWZjGjPqeu3ZkJtGt
-	dC4JVYnzRcStWTnpNFZoYf0yvyJVLlqKsLXHMXAKcGlrK5RrLKMfCX4NAZyk3nLK+62o
-	xpmIxpNQDlQ4GKhJo8M0+cvdvKe/3RAE9YcqrPIk0JLg47EBuSLoquiGnnsY5lESzzpV
-	Ij3JAY6EXWipm1hZovnYMsOW2+i/UNX4uVqWWF4J49ohYsbQvHgHJNM8KFrPIU2ShDgF
-	Btdg==
-X-Gm-Message-State: APjAAAUiIsakfc96+NYeG9w4GcIY/U/eB8zuua4O6yNSMmXQrQOBV4Bp
-	iA2giVPFCm344hOVGmCbiVzH9UjLGIJdzA==
-X-Google-Smtp-Source: APXvYqzMCGTNxMKo1v3CX+9ngxb62Mv5ws8logDj+z3i4gNzQen+zwbwV7wEZ+bMH7bVS6LgjI1efQ==
-X-Received: by 2002:a05:6830:12d6:: with SMTP id
-	a22mr6337440otq.236.1559680451193; 
-	Tue, 04 Jun 2019 13:34:11 -0700 (PDT)
+	bh=2YlJXMPiyvFoAXCG6DRvfJeW5V6xBJbkISsj/LLUjoo=;
+	b=uNGP4PExo4M/0atpnalHCu9kwQZCSeQ6gxqLZZ018dLalhEHHb66WiZWHcdYdAwizT
+	cVEiWOfvLJPbq/0GAogC0JZhHvIoPZlCI1jYoX7KuWb4HNn09/bReqHfwZjvRrNMZ55g
+	xfqftp9sMwiPOwvlxLLPLZuSOt/sPNDeqMfASw1tnO0+f4iNBhuh20/ipurz2+kqIZnd
+	hzbPbEa6kV+w4XnLKiSR/WhUahzADvBMRWEdNCo9uQg9ZdcP/pDk8L0gXSkpVTh7SwF8
+	WHPX+M3oiJHCmqTfNCaSr5Q5jyku8s5p4SPAiozg/XTp9ThTfsBy4G5yXL808Qqvn7fA
+	vSxA==
+X-Gm-Message-State: APjAAAURYx2Vf9elj/Ay/gkD5xEEL9ElMtPWDYlNtxRJV3o6QlK3BOaR
+	fmYsjIwqBoon6efM2UV9t3LbMBdku9hJEw==
+X-Google-Smtp-Source: APXvYqzPAd2r1a21gYCNg+87yC8OzL05OdIP8rQ57voHWufr0fhm9wbnosS8kLngWqLX7r5JSzZP8w==
+X-Received: by 2002:a9d:4c17:: with SMTP id l23mr6515409otf.367.1559680455136; 
+	Tue, 04 Jun 2019 13:34:15 -0700 (PDT)
 Received: from localhost.localdomain (200-56-192-86-cable.cybercable.net.mx.
 	[200.56.192.86])
-	by smtp.gmail.com with ESMTPSA id h1sm5979901otj.78.2019.06.04.13.34.09
+	by smtp.gmail.com with ESMTPSA id h1sm5979901otj.78.2019.06.04.13.34.13
 	for <qemu-devel@nongnu.org>
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Tue, 04 Jun 2019 13:34:10 -0700 (PDT)
+	Tue, 04 Jun 2019 13:34:14 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Tue,  4 Jun 2019 15:33:22 -0500
-Message-Id: <20190604203351.27778-11-richard.henderson@linaro.org>
+Date: Tue,  4 Jun 2019 15:33:24 -0500
+Message-Id: <20190604203351.27778-13-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190604203351.27778-1-richard.henderson@linaro.org>
 References: <20190604203351.27778-1-richard.henderson@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2607:f8b0:4864:20::343
-Subject: [Qemu-devel] [PATCH v4 10/39] target/cris: Reindent mmu.c
+X-Received-From: 2607:f8b0:4864:20::342
+Subject: [Qemu-devel] [PATCH v4 12/39] target/cris: Use env_cpu, env_archcpu
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -96,585 +95,127 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Fix all of the coding style errors in this file at once.
+Cleanup in the boilerplate that each target must define.
+Replace cris_env_get_cpu with env_archcpu.  The combination
+CPU(cris_env_get_cpu) should have used ENV_GET_CPU to begin;
+use env_cpu now.
 
 Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/cris/mmu.c | 479 +++++++++++++++++++++++-----------------------
- 1 file changed, 237 insertions(+), 242 deletions(-)
+ target/cris/cpu.h          |  5 -----
+ linux-user/cris/cpu_loop.c |  2 +-
+ target/cris/mmu.c          |  3 +--
+ target/cris/op_helper.c    | 10 +++-------
+ target/cris/translate.c    |  2 +-
+ 5 files changed, 6 insertions(+), 16 deletions(-)
 
+diff --git a/target/cris/cpu.h b/target/cris/cpu.h
+index 0746d19f38..e9e4e39a40 100644
+--- a/target/cris/cpu.h
++++ b/target/cris/cpu.h
+@@ -183,11 +183,6 @@ struct CRISCPU {
+     CPUCRISState env;
+ };
+ 
+-static inline CRISCPU *cris_env_get_cpu(CPUCRISState *env)
+-{
+-    return container_of(env, CRISCPU, env);
+-}
+-
+ #define ENV_OFFSET offsetof(CRISCPU, env)
+ 
+ #ifndef CONFIG_USER_ONLY
+diff --git a/linux-user/cris/cpu_loop.c b/linux-user/cris/cpu_loop.c
+index 7ec36cb0b5..86e711108d 100644
+--- a/linux-user/cris/cpu_loop.c
++++ b/linux-user/cris/cpu_loop.c
+@@ -23,7 +23,7 @@
+ 
+ void cpu_loop(CPUCRISState *env)
+ {
+-    CPUState *cs = CPU(cris_env_get_cpu(env));
++    CPUState *cs = env_cpu(env);
+     int trapnr, ret;
+     target_siginfo_t info;
+     
 diff --git a/target/cris/mmu.c b/target/cris/mmu.c
-index b8db908823..9cb73bbfec 100644
+index 9cb73bbfec..2acbcfd1c7 100644
 --- a/target/cris/mmu.c
 +++ b/target/cris/mmu.c
-@@ -33,96 +33,99 @@
- 
- void cris_mmu_init(CPUCRISState *env)
- {
--	env->mmu_rand_lfsr = 0xcccc;
-+    env->mmu_rand_lfsr = 0xcccc;
- }
- 
- #define SR_POLYNOM 0x8805
- static inline unsigned int compute_polynom(unsigned int sr)
- {
--	unsigned int i;
--	unsigned int f;
-+    unsigned int i;
-+    unsigned int f;
- 
--	f = 0;
--	for (i = 0; i < 16; i++)
--		f += ((SR_POLYNOM >> i) & 1) & ((sr >> i) & 1);
-+    f = 0;
-+    for (i = 0; i < 16; i++) {
-+        f += ((SR_POLYNOM >> i) & 1) & ((sr >> i) & 1);
-+    }
- 
--	return f;
-+    return f;
- }
- 
- static void cris_mmu_update_rand_lfsr(CPUCRISState *env)
- {
--	unsigned int f;
-+    unsigned int f;
- 
--	/* Update lfsr at every fault.  */
--	f = compute_polynom(env->mmu_rand_lfsr);
--	env->mmu_rand_lfsr >>= 1;
--	env->mmu_rand_lfsr |= (f << 15);
--	env->mmu_rand_lfsr &= 0xffff;
-+    /* Update lfsr at every fault.  */
-+    f = compute_polynom(env->mmu_rand_lfsr);
-+    env->mmu_rand_lfsr >>= 1;
-+    env->mmu_rand_lfsr |= (f << 15);
-+    env->mmu_rand_lfsr &= 0xffff;
- }
- 
- static inline int cris_mmu_enabled(uint32_t rw_gc_cfg)
- {
--	return (rw_gc_cfg & 12) != 0;
-+    return (rw_gc_cfg & 12) != 0;
- }
- 
- static inline int cris_mmu_segmented_addr(int seg, uint32_t rw_mm_cfg)
- {
--	return (1 << seg) & rw_mm_cfg;
-+    return (1 << seg) & rw_mm_cfg;
- }
- 
- static uint32_t cris_mmu_translate_seg(CPUCRISState *env, int seg)
- {
--	uint32_t base;
--	int i;
-+    uint32_t base;
-+    int i;
- 
--	if (seg < 8)
--		base = env->sregs[SFR_RW_MM_KBASE_LO];
--	else
--		base = env->sregs[SFR_RW_MM_KBASE_HI];
-+    if (seg < 8) {
-+        base = env->sregs[SFR_RW_MM_KBASE_LO];
-+    } else {
-+        base = env->sregs[SFR_RW_MM_KBASE_HI];
-+    }
- 
--	i = seg & 7;
--	base >>= i * 4;
--	base &= 15;
-+    i = seg & 7;
-+    base >>= i * 4;
-+    base &= 15;
- 
--	base <<= 28;
--	return base;
-+    base <<= 28;
-+    return base;
- }
--/* Used by the tlb decoder.  */
--#define EXTRACT_FIELD(src, start, end) \
--	    (((src) >> start) & ((1 << (end - start + 1)) - 1))
- 
--static inline void set_field(uint32_t *dst, unsigned int val, 
-+/* Used by the tlb decoder.  */
-+#define EXTRACT_FIELD(src, start, end)                  \
-+    (((src) >> start) & ((1 << (end - start + 1)) - 1))
-+
-+static inline void set_field(uint32_t *dst, unsigned int val,
- 			     unsigned int offset, unsigned int width)
- {
--	uint32_t mask;
-+    uint32_t mask;
- 
--	mask = (1 << width) - 1;
--	mask <<= offset;
--	val <<= offset;
-+    mask = (1 << width) - 1;
-+    mask <<= offset;
-+    val <<= offset;
- 
--	val &= mask;
--	*dst &= ~(mask);
--	*dst |= val;
-+    val &= mask;
-+    *dst &= ~(mask);
-+    *dst |= val;
- }
- 
- #ifdef DEBUG
- static void dump_tlb(CPUCRISState *env, int mmu)
- {
--	int set;
--	int idx;
--	uint32_t hi, lo, tlb_vpn, tlb_pfn;
-+    int set;
-+    int idx;
-+    uint32_t hi, lo, tlb_vpn, tlb_pfn;
- 
--	for (set = 0; set < 4; set++) {
--		for (idx = 0; idx < 16; idx++) {
--			lo = env->tlbsets[mmu][set][idx].lo;
--			hi = env->tlbsets[mmu][set][idx].hi;
--			tlb_vpn = EXTRACT_FIELD(hi, 13, 31);
--			tlb_pfn = EXTRACT_FIELD(lo, 13, 31);
-+    for (set = 0; set < 4; set++) {
-+        for (idx = 0; idx < 16; idx++) {
-+            lo = env->tlbsets[mmu][set][idx].lo;
-+            hi = env->tlbsets[mmu][set][idx].hi;
-+            tlb_vpn = EXTRACT_FIELD(hi, 13, 31);
-+            tlb_pfn = EXTRACT_FIELD(lo, 13, 31);
- 
--			printf ("TLB: [%d][%d] hi=%x lo=%x v=%x p=%x\n", 
--					set, idx, hi, lo, tlb_vpn, tlb_pfn);
--		}
--	}
-+            printf("TLB: [%d][%d] hi=%x lo=%x v=%x p=%x\n",
-+                   set, idx, hi, lo, tlb_vpn, tlb_pfn);
-+        }
-+    }
- }
- #endif
- 
-@@ -131,232 +134,224 @@ static int cris_mmu_translate_page(struct cris_mmu_result *res,
- 				   CPUCRISState *env, uint32_t vaddr,
- 				   int rw, int usermode, int debug)
- {
--	unsigned int vpage;
--	unsigned int idx;
--	uint32_t pid, lo, hi;
--	uint32_t tlb_vpn, tlb_pfn = 0;
--	int tlb_pid, tlb_g, tlb_v, tlb_k, tlb_w, tlb_x;
--	int cfg_v, cfg_k, cfg_w, cfg_x;	
--	int set, match = 0;
--	uint32_t r_cause;
--	uint32_t r_cfg;
--	int rwcause;
--	int mmu = 1; /* Data mmu is default.  */
--	int vect_base;
-+    unsigned int vpage;
-+    unsigned int idx;
-+    uint32_t pid, lo, hi;
-+    uint32_t tlb_vpn, tlb_pfn = 0;
-+    int tlb_pid, tlb_g, tlb_v, tlb_k, tlb_w, tlb_x;
-+    int cfg_v, cfg_k, cfg_w, cfg_x;
-+    int set, match = 0;
-+    uint32_t r_cause;
-+    uint32_t r_cfg;
-+    int rwcause;
-+    int mmu = 1; /* Data mmu is default.  */
-+    int vect_base;
- 
--	r_cause = env->sregs[SFR_R_MM_CAUSE];
--	r_cfg = env->sregs[SFR_RW_MM_CFG];
--	pid = env->pregs[PR_PID] & 0xff;
-+    r_cause = env->sregs[SFR_R_MM_CAUSE];
-+    r_cfg = env->sregs[SFR_RW_MM_CFG];
-+    pid = env->pregs[PR_PID] & 0xff;
- 
--	switch (rw) {
--		case 2: rwcause = CRIS_MMU_ERR_EXEC; mmu = 0; break;
--		case 1: rwcause = CRIS_MMU_ERR_WRITE; break;
--		default:
--		case 0: rwcause = CRIS_MMU_ERR_READ; break;
--	}
-+    switch (rw) {
-+    case 2:
-+        rwcause = CRIS_MMU_ERR_EXEC;
-+        mmu = 0;
-+        break;
-+    case 1:
-+        rwcause = CRIS_MMU_ERR_WRITE;
-+        break;
-+    default:
-+    case 0:
-+        rwcause = CRIS_MMU_ERR_READ;
-+        break;
-+    }
- 
--	/* I exception vectors 4 - 7, D 8 - 11.  */
--	vect_base = (mmu + 1) * 4;
-+    /* I exception vectors 4 - 7, D 8 - 11.  */
-+    vect_base = (mmu + 1) * 4;
- 
--	vpage = vaddr >> 13;
-+    vpage = vaddr >> 13;
- 
--	/* We know the index which to check on each set.
--	   Scan both I and D.  */
--#if 0
--	for (set = 0; set < 4; set++) {
--		for (idx = 0; idx < 16; idx++) {
--			lo = env->tlbsets[mmu][set][idx].lo;
--			hi = env->tlbsets[mmu][set][idx].hi;
--			tlb_vpn = EXTRACT_FIELD(hi, 13, 31);
--			tlb_pfn = EXTRACT_FIELD(lo, 13, 31);
-+    /*
-+     * We know the index which to check on each set.
-+     * Scan both I and D.
-+     */
-+    idx = vpage & 15;
-+    for (set = 0; set < 4; set++) {
-+        lo = env->tlbsets[mmu][set][idx].lo;
-+        hi = env->tlbsets[mmu][set][idx].hi;
- 
--			printf ("TLB: [%d][%d] hi=%x lo=%x v=%x p=%x\n", 
--					set, idx, hi, lo, tlb_vpn, tlb_pfn);
--		}
--	}
--#endif
-+        tlb_vpn = hi >> 13;
-+        tlb_pid = EXTRACT_FIELD(hi, 0, 7);
-+        tlb_g  = EXTRACT_FIELD(lo, 4, 4);
- 
--	idx = vpage & 15;
--	for (set = 0; set < 4; set++)
--	{
--		lo = env->tlbsets[mmu][set][idx].lo;
--		hi = env->tlbsets[mmu][set][idx].hi;
-+        D_LOG("TLB[%d][%d][%d] v=%x vpage=%x lo=%x hi=%x\n",
-+              mmu, set, idx, tlb_vpn, vpage, lo, hi);
-+        if ((tlb_g || (tlb_pid == pid)) && tlb_vpn == vpage) {
-+            match = 1;
-+            break;
-+        }
-+    }
- 
--		tlb_vpn = hi >> 13;
--		tlb_pid = EXTRACT_FIELD(hi, 0, 7);
--		tlb_g  = EXTRACT_FIELD(lo, 4, 4);
-+    res->bf_vec = vect_base;
-+    if (match) {
-+        cfg_w  = EXTRACT_FIELD(r_cfg, 19, 19);
-+        cfg_k  = EXTRACT_FIELD(r_cfg, 18, 18);
-+        cfg_x  = EXTRACT_FIELD(r_cfg, 17, 17);
-+        cfg_v  = EXTRACT_FIELD(r_cfg, 16, 16);
- 
--		D_LOG("TLB[%d][%d][%d] v=%x vpage=%x lo=%x hi=%x\n", 
--			 mmu, set, idx, tlb_vpn, vpage, lo, hi);
--		if ((tlb_g || (tlb_pid == pid))
--		    && tlb_vpn == vpage) {
--			match = 1;
--			break;
--		}
--	}
-+        tlb_pfn = EXTRACT_FIELD(lo, 13, 31);
-+        tlb_v = EXTRACT_FIELD(lo, 3, 3);
-+        tlb_k = EXTRACT_FIELD(lo, 2, 2);
-+        tlb_w = EXTRACT_FIELD(lo, 1, 1);
-+        tlb_x = EXTRACT_FIELD(lo, 0, 0);
- 
--	res->bf_vec = vect_base;
--	if (match) {
--		cfg_w  = EXTRACT_FIELD(r_cfg, 19, 19);
--		cfg_k  = EXTRACT_FIELD(r_cfg, 18, 18);
--		cfg_x  = EXTRACT_FIELD(r_cfg, 17, 17);
--		cfg_v  = EXTRACT_FIELD(r_cfg, 16, 16);
-+        /*
-+         * set_exception_vector(0x04, i_mmu_refill);
-+         * set_exception_vector(0x05, i_mmu_invalid);
-+         * set_exception_vector(0x06, i_mmu_access);
-+         * set_exception_vector(0x07, i_mmu_execute);
-+         * set_exception_vector(0x08, d_mmu_refill);
-+         * set_exception_vector(0x09, d_mmu_invalid);
-+         * set_exception_vector(0x0a, d_mmu_access);
-+         * set_exception_vector(0x0b, d_mmu_write);
-+         */
-+        if (cfg_k && tlb_k && usermode) {
-+            D(printf("tlb: kernel protected %x lo=%x pc=%x\n",
-+                     vaddr, lo, env->pc));
-+            match = 0;
-+            res->bf_vec = vect_base + 2;
-+        } else if (rw == 1 && cfg_w && !tlb_w) {
-+            D(printf("tlb: write protected %x lo=%x pc=%x\n",
-+                     vaddr, lo, env->pc));
-+            match = 0;
-+            /* write accesses never go through the I mmu.  */
-+            res->bf_vec = vect_base + 3;
-+        } else if (rw == 2 && cfg_x && !tlb_x) {
-+            D(printf("tlb: exec protected %x lo=%x pc=%x\n",
-+                     vaddr, lo, env->pc));
-+            match = 0;
-+            res->bf_vec = vect_base + 3;
-+        } else if (cfg_v && !tlb_v) {
-+            D(printf("tlb: invalid %x\n", vaddr));
-+            match = 0;
-+            res->bf_vec = vect_base + 1;
-+        }
- 
--		tlb_pfn = EXTRACT_FIELD(lo, 13, 31);
--		tlb_v = EXTRACT_FIELD(lo, 3, 3);
--		tlb_k = EXTRACT_FIELD(lo, 2, 2);
--		tlb_w = EXTRACT_FIELD(lo, 1, 1);
--		tlb_x = EXTRACT_FIELD(lo, 0, 0);
-+        res->prot = 0;
-+        if (match) {
-+            res->prot |= PAGE_READ;
-+            if (tlb_w) {
-+                res->prot |= PAGE_WRITE;
-+            }
-+            if (mmu == 0 && (cfg_x || tlb_x)) {
-+                res->prot |= PAGE_EXEC;
-+            }
-+        } else {
-+            D(dump_tlb(env, mmu));
-+        }
-+    } else {
-+        /* If refill, provide a randomized set.  */
-+        set = env->mmu_rand_lfsr & 3;
-+    }
- 
--		/*
--		set_exception_vector(0x04, i_mmu_refill);
--		set_exception_vector(0x05, i_mmu_invalid);
--		set_exception_vector(0x06, i_mmu_access);
--		set_exception_vector(0x07, i_mmu_execute);
--		set_exception_vector(0x08, d_mmu_refill);
--		set_exception_vector(0x09, d_mmu_invalid);
--		set_exception_vector(0x0a, d_mmu_access);
--		set_exception_vector(0x0b, d_mmu_write);
--		*/
--		if (cfg_k && tlb_k && usermode) {
--			D(printf ("tlb: kernel protected %x lo=%x pc=%x\n", 
--				  vaddr, lo, env->pc));
--			match = 0;
--			res->bf_vec = vect_base + 2;
--		} else if (rw == 1 && cfg_w && !tlb_w) {
--			D(printf ("tlb: write protected %x lo=%x pc=%x\n", 
--				  vaddr, lo, env->pc));
--			match = 0;
--			/* write accesses never go through the I mmu.  */
--			res->bf_vec = vect_base + 3;
--		} else if (rw == 2 && cfg_x && !tlb_x) {
--			D(printf ("tlb: exec protected %x lo=%x pc=%x\n", 
--				 vaddr, lo, env->pc));
--			match = 0;
--			res->bf_vec = vect_base + 3;
--		} else if (cfg_v && !tlb_v) {
--			D(printf ("tlb: invalid %x\n", vaddr));
--			match = 0;
--			res->bf_vec = vect_base + 1;
--		}
-+    if (!match && !debug) {
-+        cris_mmu_update_rand_lfsr(env);
- 
--		res->prot = 0;
--		if (match) {
--			res->prot |= PAGE_READ;
--			if (tlb_w)
--				res->prot |= PAGE_WRITE;
--			if (mmu == 0 && (cfg_x || tlb_x))
--				res->prot |= PAGE_EXEC;
--		}
--		else
--			D(dump_tlb(env, mmu));
--	} else {
--		/* If refill, provide a randomized set.  */
--		set = env->mmu_rand_lfsr & 3;
--	}
-+        /* Compute index.  */
-+        idx = vpage & 15;
- 
--	if (!match && !debug) {
--		cris_mmu_update_rand_lfsr(env);
-+        /* Update RW_MM_TLB_SEL.  */
-+        env->sregs[SFR_RW_MM_TLB_SEL] = 0;
-+        set_field(&env->sregs[SFR_RW_MM_TLB_SEL], idx, 0, 4);
-+        set_field(&env->sregs[SFR_RW_MM_TLB_SEL], set, 4, 2);
- 
--		/* Compute index.  */
--		idx = vpage & 15;
-+        /* Update RW_MM_CAUSE.  */
-+        set_field(&r_cause, rwcause, 8, 2);
-+        set_field(&r_cause, vpage, 13, 19);
-+        set_field(&r_cause, pid, 0, 8);
-+        env->sregs[SFR_R_MM_CAUSE] = r_cause;
-+        D(printf("refill vaddr=%x pc=%x\n", vaddr, env->pc));
-+    }
- 
--		/* Update RW_MM_TLB_SEL.  */
--		env->sregs[SFR_RW_MM_TLB_SEL] = 0;
--		set_field(&env->sregs[SFR_RW_MM_TLB_SEL], idx, 0, 4);
--		set_field(&env->sregs[SFR_RW_MM_TLB_SEL], set, 4, 2);
-+    D(printf("%s rw=%d mtch=%d pc=%x va=%x vpn=%x tlbvpn=%x pfn=%x pid=%x"
-+             " %x cause=%x sel=%x sp=%x %x %x\n",
-+             __func__, rw, match, env->pc,
-+             vaddr, vpage,
-+             tlb_vpn, tlb_pfn, tlb_pid,
-+             pid,
-+             r_cause,
-+             env->sregs[SFR_RW_MM_TLB_SEL],
-+             env->regs[R_SP], env->pregs[PR_USP], env->ksp));
- 
--		/* Update RW_MM_CAUSE.  */
--		set_field(&r_cause, rwcause, 8, 2);
--		set_field(&r_cause, vpage, 13, 19);
--		set_field(&r_cause, pid, 0, 8);
--		env->sregs[SFR_R_MM_CAUSE] = r_cause;
--		D(printf("refill vaddr=%x pc=%x\n", vaddr, env->pc));
--	}
--
--	D(printf ("%s rw=%d mtch=%d pc=%x va=%x vpn=%x tlbvpn=%x pfn=%x pid=%x"
--		  " %x cause=%x sel=%x sp=%x %x %x\n",
--		  __func__, rw, match, env->pc,
--		  vaddr, vpage,
--		  tlb_vpn, tlb_pfn, tlb_pid, 
--		  pid,
--		  r_cause,
--		  env->sregs[SFR_RW_MM_TLB_SEL],
--		  env->regs[R_SP], env->pregs[PR_USP], env->ksp));
--
--	res->phy = tlb_pfn << TARGET_PAGE_BITS;
--	return !match;
-+    res->phy = tlb_pfn << TARGET_PAGE_BITS;
-+    return !match;
- }
+@@ -288,7 +288,6 @@ static int cris_mmu_translate_page(struct cris_mmu_result *res,
  
  void cris_mmu_flush_pid(CPUCRISState *env, uint32_t pid)
  {
-     CRISCPU *cpu = cris_env_get_cpu(env);
--	target_ulong vaddr;
--	unsigned int idx;
--	uint32_t lo, hi;
--	uint32_t tlb_vpn;
--	int tlb_pid, tlb_g, tlb_v;
--	unsigned int set;
--	unsigned int mmu;
-+    target_ulong vaddr;
-+    unsigned int idx;
-+    uint32_t lo, hi;
-+    uint32_t tlb_vpn;
-+    int tlb_pid, tlb_g, tlb_v;
-+    unsigned int set;
-+    unsigned int mmu;
+-    CRISCPU *cpu = cris_env_get_cpu(env);
+     target_ulong vaddr;
+     unsigned int idx;
+     uint32_t lo, hi;
+@@ -312,7 +311,7 @@ void cris_mmu_flush_pid(CPUCRISState *env, uint32_t pid)
+                 if (tlb_v && !tlb_g && (tlb_pid == pid)) {
+                     vaddr = tlb_vpn << TARGET_PAGE_BITS;
+                     D_LOG("flush pid=%x vaddr=%x\n", pid, vaddr);
+-                    tlb_flush_page(CPU(cpu), vaddr);
++                    tlb_flush_page(env_cpu(env), vaddr);
+                 }
+             }
+         }
+diff --git a/target/cris/op_helper.c b/target/cris/op_helper.c
+index e4c6942922..6b1e7ae4a8 100644
+--- a/target/cris/op_helper.c
++++ b/target/cris/op_helper.c
+@@ -39,7 +39,7 @@
  
--	pid &= 0xff;
--	for (mmu = 0; mmu < 2; mmu++) {
--		for (set = 0; set < 4; set++)
--		{
--			for (idx = 0; idx < 16; idx++) {
--				lo = env->tlbsets[mmu][set][idx].lo;
--				hi = env->tlbsets[mmu][set][idx].hi;
--				
--				tlb_vpn = EXTRACT_FIELD(hi, 13, 31);
--				tlb_pid = EXTRACT_FIELD(hi, 0, 7);
--				tlb_g  = EXTRACT_FIELD(lo, 4, 4);
--				tlb_v = EXTRACT_FIELD(lo, 3, 3);
-+    pid &= 0xff;
-+    for (mmu = 0; mmu < 2; mmu++) {
-+        for (set = 0; set < 4; set++) {
-+            for (idx = 0; idx < 16; idx++) {
-+                lo = env->tlbsets[mmu][set][idx].lo;
-+                hi = env->tlbsets[mmu][set][idx].hi;
- 
--				if (tlb_v && !tlb_g && (tlb_pid == pid)) {
--					vaddr = tlb_vpn << TARGET_PAGE_BITS;
--					D_LOG("flush pid=%x vaddr=%x\n", 
--						  pid, vaddr);
-+                tlb_vpn = EXTRACT_FIELD(hi, 13, 31);
-+                tlb_pid = EXTRACT_FIELD(hi, 0, 7);
-+                tlb_g  = EXTRACT_FIELD(lo, 4, 4);
-+                tlb_v = EXTRACT_FIELD(lo, 3, 3);
-+
-+                if (tlb_v && !tlb_g && (tlb_pid == pid)) {
-+                    vaddr = tlb_vpn << TARGET_PAGE_BITS;
-+                    D_LOG("flush pid=%x vaddr=%x\n", pid, vaddr);
-                     tlb_flush_page(CPU(cpu), vaddr);
--				}
--			}
--		}
--	}
-+                }
-+            }
-+        }
-+    }
- }
- 
- int cris_mmu_translate(struct cris_mmu_result *res,
- 		       CPUCRISState *env, uint32_t vaddr,
- 		       int rw, int mmu_idx, int debug)
+ void helper_raise_exception(CPUCRISState *env, uint32_t index)
  {
--	int seg;
--	int miss = 0;
--	int is_user = mmu_idx == MMU_USER_IDX;
--	uint32_t old_srs;
-+    int seg;
-+    int miss = 0;
-+    int is_user = mmu_idx == MMU_USER_IDX;
-+    uint32_t old_srs;
+-    CPUState *cs = CPU(cris_env_get_cpu(env));
++    CPUState *cs = env_cpu(env);
  
--	old_srs= env->pregs[PR_SRS];
-+    old_srs = env->pregs[PR_SRS];
+     cs->exception_index = index;
+     cpu_loop_exit(cs);
+@@ -58,8 +58,7 @@ void helper_tlb_flush_pid(CPUCRISState *env, uint32_t pid)
+ void helper_spc_write(CPUCRISState *env, uint32_t new_spc)
+ {
+ #if !defined(CONFIG_USER_ONLY)
+-    CRISCPU *cpu = cris_env_get_cpu(env);
+-    CPUState *cs = CPU(cpu);
++    CPUState *cs = env_cpu(env);
  
--	/* rw == 2 means exec, map the access to the insn mmu.  */
--	env->pregs[PR_SRS] = rw == 2 ? 1 : 2;
-+    /* rw == 2 means exec, map the access to the insn mmu.  */
-+    env->pregs[PR_SRS] = rw == 2 ? 1 : 2;
+     tlb_flush_page(cs, env->pregs[PR_SPC]);
+     tlb_flush_page(cs, new_spc);
+@@ -72,9 +71,6 @@ void helper_spc_write(CPUCRISState *env, uint32_t new_spc)
  
--	if (!cris_mmu_enabled(env->sregs[SFR_RW_GC_CFG])) {
--		res->phy = vaddr;
--		res->prot = PAGE_BITS;
--		goto done;
--	}
-+    if (!cris_mmu_enabled(env->sregs[SFR_RW_GC_CFG])) {
-+        res->phy = vaddr;
-+        res->prot = PAGE_BITS;
-+        goto done;
-+    }
+ void helper_movl_sreg_reg(CPUCRISState *env, uint32_t sreg, uint32_t reg)
+ {
+-#if !defined(CONFIG_USER_ONLY)
+-    CRISCPU *cpu = cris_env_get_cpu(env);
+-#endif
+     uint32_t srs;
+     srs = env->pregs[PR_SRS];
+     srs &= 3;
+@@ -112,7 +108,7 @@ void helper_movl_sreg_reg(CPUCRISState *env, uint32_t sreg, uint32_t reg)
+             D_LOG("tlb flush vaddr=%x v=%d pc=%x\n",
+                   vaddr, tlb_v, env->pc);
+             if (tlb_v) {
+-                tlb_flush_page(CPU(cpu), vaddr);
++                tlb_flush_page(env_cpu(env), vaddr);
+             }
+         }
+     }
+diff --git a/target/cris/translate.c b/target/cris/translate.c
+index 31b40a57f9..3429a3b768 100644
+--- a/target/cris/translate.c
++++ b/target/cris/translate.c
+@@ -3097,7 +3097,7 @@ void gen_intermediate_code(CPUState *cs, TranslationBlock *tb, int max_insns)
+      * delayslot, like in real hw.
+      */
+     pc_start = tb->pc & ~1;
+-    dc->cpu = cris_env_get_cpu(env);
++    dc->cpu = env_archcpu(env);
+     dc->tb = tb;
  
--	seg = vaddr >> 28;
--	if (!is_user && cris_mmu_segmented_addr(seg, env->sregs[SFR_RW_MM_CFG]))
--	{
--		uint32_t base;
-+    seg = vaddr >> 28;
-+    if (!is_user && cris_mmu_segmented_addr(seg, env->sregs[SFR_RW_MM_CFG])) {
-+        uint32_t base;
- 
--		miss = 0;
--		base = cris_mmu_translate_seg(env, seg);
--                res->phy = base | (0x0fffffff & vaddr);
--		res->prot = PAGE_BITS;
--	} else {
--		miss = cris_mmu_translate_page(res, env, vaddr, rw,
--					       is_user, debug);
--	}
--  done:
--	env->pregs[PR_SRS] = old_srs;
--	return miss;
-+        miss = 0;
-+        base = cris_mmu_translate_seg(env, seg);
-+        res->phy = base | (0x0fffffff & vaddr);
-+        res->prot = PAGE_BITS;
-+    } else {
-+        miss = cris_mmu_translate_page(res, env, vaddr, rw,
-+                                       is_user, debug);
-+    }
-+ done:
-+    env->pregs[PR_SRS] = old_srs;
-+    return miss;
- }
+     dc->is_jmp = DISAS_NEXT;
 -- 
 2.17.1
 
