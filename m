@@ -6,55 +6,52 @@ X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C3A6C282CE
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 19:38:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B0FBBC282CE
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 19:39:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 17D992075B
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 19:38:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 17D992075B
+	by mail.kernel.org (Postfix) with ESMTPS id 7B09A2075B
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 19:39:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7B09A2075B
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:57031 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:57047 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hYFGC-0006de-8a
-	for qemu-devel@archiver.kernel.org; Tue, 04 Jun 2019 15:38:16 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:51162)
+	id 1hYFHU-0007c5-NB
+	for qemu-devel@archiver.kernel.org; Tue, 04 Jun 2019 15:39:36 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:51273)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1hYFEh-0005kR-21
-	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 15:36:44 -0400
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1hYFEq-0005u8-VS
+	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 15:36:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1hYFEg-0002Zw-11
-	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 15:36:43 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:36035 helo=mail.rt-rk.com)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1hYFEp-0002sa-89
+	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 15:36:52 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:36167 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1hYFEf-0002Yl-OT
-	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 15:36:41 -0400
+	id 1hYFEo-0002n9-Sg
+	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 15:36:51 -0400
 Received: from localhost (localhost [127.0.0.1])
-	by mail.rt-rk.com (Postfix) with ESMTP id 9C3D01A2078;
-	Tue,  4 Jun 2019 21:36:39 +0200 (CEST)
+	by mail.rt-rk.com (Postfix) with ESMTP id CEADA1A21D2;
+	Tue,  4 Jun 2019 21:36:48 +0200 (CEST)
 X-Virus-Scanned: amavisd-new at rt-rk.com
 Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
 	[10.10.13.43])
-	by mail.rt-rk.com (Postfix) with ESMTPSA id 5C98A1A2029;
-	Tue,  4 Jun 2019 21:36:39 +0200 (CEST)
+	by mail.rt-rk.com (Postfix) with ESMTPSA id 8F9FD1A2029;
+	Tue,  4 Jun 2019 21:36:48 +0200 (CEST)
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
 To: qemu-devel@nongnu.org
-Date: Tue,  4 Jun 2019 21:35:51 +0200
-Message-Id: <1559676952-17927-3-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Tue,  4 Jun 2019 21:35:52 +0200
+Message-Id: <1559676952-17927-4-git-send-email-aleksandar.markovic@rt-rk.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1559676952-17927-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1559676952-17927-1-git-send-email-aleksandar.markovic@rt-rk.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
 X-Received-From: 89.216.37.149
-Subject: [Qemu-devel] [PATCH v9 2/3] linux-user: Add support for
- setsockopt() option SOL_ALG
+Subject: [Qemu-devel] [PATCH v9 3/3] linux-user: Add support for statx()
+ syscall
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -72,80 +69,257 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Yunqiang Su <ysu@wavecomp.com>
+From: Aleksandar Rikalo <arikalo@wavecomp.com>
 
-Add support for options SOL_ALG of the syscall setsockopt(). This
-option is used in relation to Linux kernel Crypto API, and allows
-a user to set additional information for the cipher operation via
-syscall setsockopt(). The field "optname" must be one of the
-following:
+Implement support for translation of system call statx(). The
+implementation includes invoking other (more mature) system calls
+(from the same 'stat' family) on the host side. This way, the
+problems of potential lack of statx() availability of on the host
+side are avoided.
 
-  - ALG_SET_KEY =E2=80=93 seting the key
-  - ALG_SET_AEAD_AUTHSIZE =E2=80=93 set the authentication tag size
+Support for statx() in kernel and glibc was unfortunately introduced
+in different points of time (the difference is more than a year):
 
-SOL_ALG is relatively newer setsockopt() option. Therefore, the
-code that handles SOL_ALG is enclosed in "ifdef" so that the build
-does not fail for older kernels that do not contain support for
-SOL_ALG.
+  - kernel: Linux 4.11 (30 April 2017)
+  - glibc: glibc 2.28 (1 Aug 2018)
 
-Signed-off-by: Yunqiang Su <ysu@wavecomp.com>
+In this patch, the availability of statx() support is established
+via __NR_statx (if it is defined, statx() is considered available).
+This coincedes with statx() introduction in kernel.
+
+However, the structure statx definition may not be available for hosts
+with glibc older than 2.28 (it is, by design, to be defined in one of
+glibc headers), even though the full statx() functionality may be
+supported in kernel, if the kernel is not older than 4.11. Hence,
+a structure "target_statx" is defined in this patch, to remove that
+dependency on glibc headers, and to use statx() functionality as soon
+as the host kernel is capable of supporting it. Such structure statx
+definition is used for both target and host structures statx (of
+course, this doesn't mean the endian arrangement is the same on
+target and host, and endian conversion is done in all necessary
+cases).
+
+Signed-off-by: Aleksandar Rikalo <arikalo@wavecomp.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 ---
- linux-user/syscall.c | 31 +++++++++++++++++++++++++++++++
- 1 file changed, 31 insertions(+)
+ linux-user/syscall.c      | 135 +++++++++++++++++++++++++++++++++++++++++++++-
+ linux-user/syscall_defs.h |  37 +++++++++++++
+ 2 files changed, 171 insertions(+), 1 deletion(-)
 
 diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index dde6889..82c08b6 100644
+index 82c08b6..b78ed45 100644
 --- a/linux-user/syscall.c
 +++ b/linux-user/syscall.c
-@@ -103,6 +103,7 @@
- #include <linux/blkpg.h>
- #include <netpacket/packet.h>
- #include <linux/netlink.h>
-+#include <linux/if_alg.h>
- #include "linux_loop.h"
- #include "uname.h"
-=20
-@@ -1998,6 +1999,36 @@ static abi_long do_setsockopt(int sockfd, int leve=
-l, int optname,
-             goto unimplemented;
-         }
-         break;
-+#if defined(SOL_ALG) && defined(ALG_SET_KEY) && defined(ALG_SET_AEAD_AUT=
-HSIZE)
-+    case SOL_ALG:
-+        switch (optname) {
-+        case ALG_SET_KEY:
-+        {
-+            char *alg_key =3D g_malloc(optlen);
+@@ -43,6 +43,7 @@
+ #include <sys/times.h>
+ #include <sys/shm.h>
+ #include <sys/sem.h>
++#include <sys/stat.h>
+ #include <sys/statfs.h>
+ #include <utime.h>
+ #include <sys/sysinfo.h>
+@@ -6526,6 +6527,48 @@ static inline abi_long host_to_target_stat64(void *cpu_env,
+ }
+ #endif
+ 
++#if defined(TARGET_NR_statx) && defined(__NR_statx)
++static inline abi_long host_to_target_statx(struct target_statx *host_stx,
++                                            abi_ulong target_addr)
++{
++    struct target_statx *target_stx;
 +
-+            if (!alg_key) {
-+                return -TARGET_ENOMEM;
-+            }
-+            if (copy_from_user(alg_key, optval_addr, optlen)) {
-+                g_free(alg_key);
++    if (!lock_user_struct(VERIFY_WRITE, target_stx, target_addr,  0)) {
++        return -TARGET_EFAULT;
++    }
++    memset(target_stx, 0, sizeof(*target_stx));
++
++    __put_user(host_stx->stx_mask, &target_stx->stx_mask);
++    __put_user(host_stx->stx_blksize, &target_stx->stx_blksize);
++    __put_user(host_stx->stx_attributes, &target_stx->stx_attributes);
++    __put_user(host_stx->stx_nlink, &target_stx->stx_nlink);
++    __put_user(host_stx->stx_uid, &target_stx->stx_uid);
++    __put_user(host_stx->stx_gid, &target_stx->stx_gid);
++    __put_user(host_stx->stx_mode, &target_stx->stx_mode);
++    __put_user(host_stx->stx_ino, &target_stx->stx_ino);
++    __put_user(host_stx->stx_size, &target_stx->stx_size);
++    __put_user(host_stx->stx_blocks, &target_stx->stx_blocks);
++    __put_user(host_stx->stx_attributes_mask, &target_stx->stx_attributes_mask);
++    __put_user(host_stx->stx_atime.tv_sec, &target_stx->stx_atime.tv_sec);
++    __put_user(host_stx->stx_atime.tv_nsec, &target_stx->stx_atime.tv_nsec);
++    __put_user(host_stx->stx_btime.tv_sec, &target_stx->stx_atime.tv_sec);
++    __put_user(host_stx->stx_btime.tv_nsec, &target_stx->stx_atime.tv_nsec);
++    __put_user(host_stx->stx_ctime.tv_sec, &target_stx->stx_atime.tv_sec);
++    __put_user(host_stx->stx_ctime.tv_nsec, &target_stx->stx_atime.tv_nsec);
++    __put_user(host_stx->stx_mtime.tv_sec, &target_stx->stx_atime.tv_sec);
++    __put_user(host_stx->stx_mtime.tv_nsec, &target_stx->stx_atime.tv_nsec);
++    __put_user(host_stx->stx_rdev_major, &target_stx->stx_rdev_major);
++    __put_user(host_stx->stx_rdev_minor, &target_stx->stx_rdev_minor);
++    __put_user(host_stx->stx_dev_major, &target_stx->stx_dev_major);
++    __put_user(host_stx->stx_dev_minor, &target_stx->stx_dev_minor);
++
++    unlock_user_struct(target_stx, target_addr, 1);
++
++    return 0;
++}
++#endif
++
++
+ /* ??? Using host futex calls even when target atomic operations
+    are not really atomic probably breaks things.  However implementing
+    futexes locally would make futexes shared between multiple processes
+@@ -7104,7 +7147,8 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
+     abi_long ret;
+ #if defined(TARGET_NR_stat) || defined(TARGET_NR_stat64) \
+     || defined(TARGET_NR_lstat) || defined(TARGET_NR_lstat64) \
+-    || defined(TARGET_NR_fstat) || defined(TARGET_NR_fstat64)
++    || defined(TARGET_NR_fstat) || defined(TARGET_NR_fstat64) \
++    || defined(TARGET_NR_statx)
+     struct stat st;
+ #endif
+ #if defined(TARGET_NR_statfs) || defined(TARGET_NR_statfs64) \
+@@ -10182,6 +10226,95 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
+             ret = host_to_target_stat64(cpu_env, arg3, &st);
+         return ret;
+ #endif
++#if defined(TARGET_NR_statx)
++    case TARGET_NR_statx:
++        {
++            struct target_statx *target_stx;
++            int dirfd = arg1;
++            int flags = arg3;
++
++            p = lock_user_string(arg2);
++            if (p == NULL) {
 +                return -TARGET_EFAULT;
 +            }
-+            ret =3D get_errno(setsockopt(sockfd, level, optname,
-+                                       alg_key, optlen));
-+            g_free(alg_key);
-+            break;
-+        }
-+        case ALG_SET_AEAD_AUTHSIZE:
-+        {
-+            ret =3D get_errno(setsockopt(sockfd, level, optname,
-+                                       NULL, optlen));
-+            break;
-+        }
-+        default:
-+            goto unimplemented;
-+        }
-+        break;
++#if defined(__NR_statx)
++            {
++                /*
++                 * It is assumed that struct statx is arhitecture independent
++                 */
++                struct target_statx host_stx;
++                int mask = arg4;
++
++                ret = get_errno(syscall(__NR_statx, dirfd, p, flags, mask,
++                                        &host_stx));
++                if (!is_error(ret)) {
++                    if (host_to_target_statx(&host_stx, arg5) != 0) {
++                        unlock_user(p, arg2, 0);
++                        return -TARGET_EFAULT;
++                    }
++                }
++
++                if (ret != TARGET_ENOSYS) {
++                    unlock_user(p, arg2, 0);
++                    return ret;
++                }
++            }
 +#endif
-     case TARGET_SOL_SOCKET:
-         switch (optname) {
-         case TARGET_SO_RCVTIMEO:
---=20
++            if ((p == NULL) || (*((char *)p) == 0)) {
++                /*
++                 * By file descriptor
++                 */
++                if (flags & AT_EMPTY_PATH) {
++                    unlock_user(p, arg2, 0);
++                    return -TARGET_ENOENT;
++                }
++                ret = get_errno(fstat(dirfd, &st));
++            } else if (*((char *)p) == '/') {
++                /*
++                 * By absolute pathname
++                 */
++                ret = get_errno(stat(path(p), &st));
++            } else {
++                if (dirfd == AT_FDCWD) {
++                    /*
++                     * By pathname relative to the current working directory
++                     */
++                    ret = get_errno(stat(path(p), &st));
++                } else {
++                    /*
++                     * By pathname relative to the directory referred to by
++                     * the file descriptor 'dirfd'
++                     */
++                    ret = get_errno(fstatat(dirfd, path(p), &st, flags));
++                }
++            }
++            unlock_user(p, arg2, 0);
++
++            if (!is_error(ret)) {
++                if (!lock_user_struct(VERIFY_WRITE, target_stx, arg5, 0)) {
++                    return -TARGET_EFAULT;
++                }
++                memset(target_stx, 0, sizeof(*target_stx));
++                __put_user(major(st.st_dev), &target_stx->stx_dev_major);
++                __put_user(minor(st.st_dev), &target_stx->stx_dev_minor);
++                __put_user(st.st_ino, &target_stx->stx_ino);
++                __put_user(st.st_mode, &target_stx->stx_mode);
++                __put_user(st.st_uid, &target_stx->stx_uid);
++                __put_user(st.st_gid, &target_stx->stx_gid);
++                __put_user(st.st_nlink, &target_stx->stx_nlink);
++                __put_user(major(st.st_rdev), &target_stx->stx_rdev_major);
++                __put_user(minor(st.st_rdev), &target_stx->stx_rdev_minor);
++                __put_user(st.st_size, &target_stx->stx_size);
++                __put_user(st.st_blksize, &target_stx->stx_blksize);
++                __put_user(st.st_blocks, &target_stx->stx_blocks);
++                __put_user(st.st_atime, &target_stx->stx_atime.tv_sec);
++                __put_user(st.st_mtime, &target_stx->stx_mtime.tv_sec);
++                __put_user(st.st_ctime, &target_stx->stx_ctime.tv_sec);
++                unlock_user_struct(target_stx, arg5, 1);
++            }
++        }
++        return ret;
++#endif
+ #ifdef TARGET_NR_lchown
+     case TARGET_NR_lchown:
+         if (!(p = lock_user_string(arg1)))
+diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
+index 7f141f6..170c4dd 100644
+--- a/linux-user/syscall_defs.h
++++ b/linux-user/syscall_defs.h
+@@ -2536,4 +2536,41 @@ struct target_user_cap_data {
+ /* Return size of the log buffer */
+ #define TARGET_SYSLOG_ACTION_SIZE_BUFFER   10
+ 
++struct target_statx_timestamp {
++   int64_t tv_sec;
++   uint32_t tv_nsec;
++   int32_t __reserved;
++};
++
++struct target_statx {
++   /* 0x00 */
++   uint32_t stx_mask;       /* What results were written [uncond] */
++   uint32_t stx_blksize;    /* Preferred general I/O size [uncond] */
++   uint64_t stx_attributes; /* Flags conveying information about the file */
++   /* 0x10 */
++   uint32_t stx_nlink;      /* Number of hard links */
++   uint32_t stx_uid;        /* User ID of owner */
++   uint32_t stx_gid;        /* Group ID of owner */
++   uint16_t stx_mode;       /* File mode */
++   uint16_t __spare0[1];
++   /* 0x20 */
++   uint64_t stx_ino;        /* Inode number */
++   uint64_t stx_size;       /* File size */
++   uint64_t stx_blocks;     /* Number of 512-byte blocks allocated */
++   uint64_t stx_attributes_mask; /* Mask to show what is supported */
++   /* 0x40 */
++   struct target_statx_timestamp  stx_atime;  /* Last access time */
++   struct target_statx_timestamp  stx_btime;  /* File creation time */
++   struct target_statx_timestamp  stx_ctime;  /* Last attribute change time */
++   struct target_statx_timestamp  stx_mtime;  /* Last data modification time */
++   /* 0x80 */
++   uint32_t stx_rdev_major;   /* Device ID of special file [if bdev/cdev] */
++   uint32_t stx_rdev_minor;
++   uint32_t stx_dev_major; /* ID of device containing file [uncond] */
++   uint32_t stx_dev_minor;
++   /* 0x90 */
++   uint64_t __spare2[14];  /* Spare space for future expansion */
++   /* 0x100 */
++};
++
+ #endif
+-- 
 2.7.4
 
 
