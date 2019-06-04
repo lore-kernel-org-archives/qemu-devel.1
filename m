@@ -2,63 +2,90 @@ Return-Path: <SRS0=GUf1=UD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CA5FC282CE
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 18:20:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DF337C282CE
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 18:35:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 27E50207E0
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 18:20:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 27E50207E0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id AB93220848
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 18:35:08 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="uizvNHHy"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AB93220848
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:56252 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:56325 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hYE30-0002aq-99
-	for qemu-devel@archiver.kernel.org; Tue, 04 Jun 2019 14:20:34 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:35954)
+	id 1hYEH5-00052s-Ul
+	for qemu-devel@archiver.kernel.org; Tue, 04 Jun 2019 14:35:07 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:39209)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hYDyw-00085n-SG
-	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 14:16:24 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1hYEGD-0004k4-Pw
+	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 14:34:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hYDyv-0002wA-2b
-	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 14:16:22 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50324)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hYDyu-0002vA-R1
-	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 14:16:21 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
-	[10.5.11.22])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 2AE487E436
-	for <qemu-devel@nongnu.org>; Tue,  4 Jun 2019 18:16:20 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-148.ams2.redhat.com
-	[10.36.116.148])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id C4E971017E2E
-	for <qemu-devel@nongnu.org>; Tue,  4 Jun 2019 18:16:19 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
-	id 37E9211386A3; Tue,  4 Jun 2019 20:16:18 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: qemu-devel@nongnu.org
-Date: Tue,  4 Jun 2019 20:16:15 +0200
-Message-Id: <20190604181618.19980-2-armbru@redhat.com>
-In-Reply-To: <20190604181618.19980-1-armbru@redhat.com>
-References: <20190604181618.19980-1-armbru@redhat.com>
+	(envelope-from <alex.bennee@linaro.org>) id 1hYEGC-0006aD-L6
+	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 14:34:13 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:45855)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1hYEGC-0006Ti-F6
+	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 14:34:12 -0400
+Received: by mail-wr1-x444.google.com with SMTP id f9so2166710wre.12
+	for <qemu-devel@nongnu.org>; Tue, 04 Jun 2019 11:34:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=references:user-agent:from:to:cc:subject:in-reply-to:date
+	:message-id:mime-version:content-transfer-encoding;
+	bh=xWZmk+BD6U/Ihkq553JF8vJyhLol2/PBy+yfXTaDGsg=;
+	b=uizvNHHyRN66XerfatJRqMTYwoLHhfQzTu+DRDCy+c5gOiBFtRW+5/BJfzhrDZbqR1
+	McUxEU0DUlP+kdHO6q+v6IshL1kuyREQklV3h21Ac1MzBckJ4cE4WlJ4DiEFlFU3a0wx
+	iijvRaRud80KzFHv2+269cSwuQ+5QoEmqZgl3+ZHsE/5C5KoVwDyzuJIuAXhTN2u26eB
+	Oh4yNpvdT1nu+iSxQMHId3WnxY1d8I6e7JCyBYIawK11bf6nulww6z85M+WobVsjC935
+	0lFdtSjXgz1GsDOTMSZkS6MgkyGkyIOzUM0WkzMphjiTPwy8QMYtJOGTSuun3lCJ0jkR
+	ENTQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:references:user-agent:from:to:cc:subject
+	:in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+	bh=xWZmk+BD6U/Ihkq553JF8vJyhLol2/PBy+yfXTaDGsg=;
+	b=FK8dyqW7GVP3O5A2GVpkiUc+Lmgosz5VgDAbN0E9w/KP6hao8yTC0gmVZf6RnP6eDT
+	9OvDrOr4cx8oL1blkKgnydwmAZErob3vePYENC71+cW62IJf7muhvmvwX74aAvmr/VW4
+	pnp9uHk0F/E0z2zl9TcWgNh73uCCoqnszEQtn9It5UzGaXr8u9kiQkUzXuk6Y17mc4Q9
+	Iqjlmyqi5PU2QKNsTRw2M+x24IUAramhbDiyMK+M+HVFEprIpPXGAB88rTbxcov50jLf
+	Hvo4PcI9lsXySxU3OKRrUE11q4rBXh8w2ujwQzeOOcAa4RQIpddVkTyljsOsTSGRq1SR
+	Wbng==
+X-Gm-Message-State: APjAAAV0KkhxVHj74QylZb44HDSS7tPyfkyAzVIUPCPdshCscv+7m2nO
+	eQPe71/u1Mn9eNkW16bFRHchWQ==
+X-Google-Smtp-Source: APXvYqy5r9TDDKRYSbALhMz+9FbNWPMZj//HswMnZ/o/r6iNvWMZYFY0AQTro5XgAk+bdReQi/plXA==
+X-Received: by 2002:adf:f00d:: with SMTP id j13mr22299698wro.178.1559673250202;
+	Tue, 04 Jun 2019 11:34:10 -0700 (PDT)
+Received: from zen.linaroharston ([81.128.185.34])
+	by smtp.gmail.com with ESMTPSA id
+	65sm35143517wro.85.2019.06.04.11.34.09
+	(version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+	Tue, 04 Jun 2019 11:34:09 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+	by zen.linaroharston (Postfix) with ESMTP id 2EEC01FF87;
+	Tue,  4 Jun 2019 19:34:09 +0100 (BST)
+References: <87va0vgad2.fsf@zen.linaroharston>
+	<20190311092956.woo6mfecw3qyxxet@steredhat>
+User-agent: mu4e 1.3.2; emacs 26.1
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Stefano Garzarella <sgarzare@redhat.com>
+In-reply-to: <20190311092956.woo6mfecw3qyxxet@steredhat>
+Date: Tue, 04 Jun 2019 19:34:09 +0100
+Message-ID: <87y32hryhq.fsf@zen.linaroharston>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.27]);
-	Tue, 04 Jun 2019 18:16:20 +0000 (UTC)
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH 1/4] Normalize position of header guard
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2a00:1450:4864:20::444
+Subject: Re: [Qemu-devel] Booting kernels with PVHVM documentation?
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -70,348 +97,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Paolo Bonzini <bonzini@gnu.org>,
+	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is the common header guard idiom:
 
-    /*
-     * File comment
-     */
+Stefano Garzarella <sgarzare@redhat.com> writes:
 
-    #ifndef GUARD_SYMBOL_H
-    #define GUARD_SYMBOL_H
+> Hi Alex,
+> sorry for the big delay, but I was traveling without my PC.
+>
+> On Wed, Mar 06, 2019 at 05:51:05PM +0000, Alex Benn=C3=A9e wrote:
+>>
+>> Hi,
+>>
+>> I've been looking at using PVH as an alternative to a long bios boot
+>> sequence to boot some x86_64 test kernels for tests/tcg. I'm finding it
+>> hard to piece together all the bits but I naively thought it would just
+>> be a case of adding a few ELF NOTES to my boot.S with something like:
+>>
+>>           ELFNOTE(Xen, XEN_ELFNOTE_VIRT_BASE,      _ASM_PTR 0x100000)
+>>           ELFNOTE(Xen, XEN_ELFNOTE_ENTRY,          _ASM_PTR _start)
+>>           ELFNOTE(Xen, XEN_ELFNOTE_PHYS32_ENTRY,   _ASM_PTR 0)    /* ent=
+ry =3D=3D virtbase */
+>>           ELFNOTE(Xen, XEN_ELFNOTE_PADDR_OFFSET,   _ASM_PTR 0)
+>>
+>>           .code64
+>
+> Can you try to use .code32?
+> The pvh.bin optionrom will jump to the image in 32-bit mode.
+> I don't have a lot of experience, but looking at arch/x86/platform/pvh/he=
+ad.S
+> (Linux), I saw that entry point is under .code32, than it will switch to
+> 64-bit mode.
 
-    ... actual contents ...
+That doesn't seem to make any difference:
 
-    #endif
+./qemu-system-x86_64 -monitor none -display none -chardev stdio,id=3Dout -d=
+evice isa-debugcon,chardev=3Dout -device isa-debug-exit,iobase=3D0xf4,iosiz=
+e=3D0x4 -kernel ./tests/hello -vga none
+qemu-system-x86_64: Error loading uncompressed kernel without PVH ELF Note
 
-A few of our headers have some #include before the guard.
-target/tilegx/spr_def_64.h has #ifndef __DOXYGEN__ outside the guard.
-A few more have the #define elsewhere.
 
-Change them to match the common idiom.  For spr_def_64.h, that means
-dropping #ifndef __DOXYGEN__.  While there, rename guard symbols to
-make scripts/clean-header-guards.pl happy.
+<snip>
+>
+>>   * are they any special linker rules required for the Xen.notes?
+>
+> I don't know, but I'll investigate on it.
+>
+>>
+>> And finally:
+>>
+>>   * is this idea of mine a weird abuse of the PVHVM boot protocol or
+>>     does it make sense?
+>
+> IMHO it isn't an abuse and make sense to boot a bare-metal application
+> directly in 32-bit mode using the PVH loader.
+>
+> If you want to share with me a part of your code, I'll try to play with
+> it.
 
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
----
- crypto/ivgen-essiv.h              |  9 ++++-----
- crypto/ivgen-plain.h              |  5 ++---
- crypto/ivgen-plain64.h            |  9 ++++-----
- include/hw/arm/allwinner-a10.h    |  4 ++--
- include/hw/arm/omap.h             |  8 +++++---
- include/hw/arm/xlnx-zynqmp.h      |  2 +-
- include/hw/char/cadence_uart.h    |  2 +-
- include/hw/display/xlnx_dp.h      |  9 ++++-----
- include/hw/dma/xlnx-zynq-devcfg.h |  2 +-
- include/hw/net/cadence_gem.h      |  2 +-
- target/i386/whp-dispatch.h        |  7 +++----
- target/tilegx/spr_def_64.h        | 10 +++-------
- tests/io-channel-helpers.h        |  9 ++++-----
- 13 files changed, 35 insertions(+), 43 deletions(-)
+My current hacking branch is:
 
-diff --git a/crypto/ivgen-essiv.h b/crypto/ivgen-essiv.h
-index f34dbab57b..6c35c0b5ab 100644
---- a/crypto/ivgen-essiv.h
-+++ b/crypto/ivgen-essiv.h
-@@ -15,14 +15,13 @@
-  *
-  * You should have received a copy of the GNU Lesser General Public
-  * License along with this library; if not, see <http://www.gnu.org/lice=
-nses/>.
-- *
-  */
-=20
-+#ifndef QCRYPTO_IVGEN_ESSIV_H
-+#define QCRYPTO_IVGEN_ESSIV_H
-+
- #include "ivgenpriv.h"
-=20
--#ifndef QCRYPTO_IVGEN_ESSIV_H__
--#define QCRYPTO_IVGEN_ESSIV_H__
--
- extern struct QCryptoIVGenDriver qcrypto_ivgen_essiv;
-=20
--#endif /* QCRYPTO_IVGEN_ESSIV_H__ */
-+#endif /* QCRYPTO_IVGEN_ESSIV_H */
-diff --git a/crypto/ivgen-plain.h b/crypto/ivgen-plain.h
-index 16e1ae5b27..395501f693 100644
---- a/crypto/ivgen-plain.h
-+++ b/crypto/ivgen-plain.h
-@@ -15,14 +15,13 @@
-  *
-  * You should have received a copy of the GNU Lesser General Public
-  * License along with this library; if not, see <http://www.gnu.org/lice=
-nses/>.
-- *
-  */
-=20
--#include "ivgenpriv.h"
--
- #ifndef QCRYPTO_IVGEN_PLAIN_H__
- #define QCRYPTO_IVGEN_PLAIN_H__
-=20
-+#include "ivgenpriv.h"
-+
- extern struct QCryptoIVGenDriver qcrypto_ivgen_plain;
-=20
- #endif /* QCRYPTO_IVGEN_PLAIN_H__ */
-diff --git a/crypto/ivgen-plain64.h b/crypto/ivgen-plain64.h
-index f8611bd705..0a20fd1fd8 100644
---- a/crypto/ivgen-plain64.h
-+++ b/crypto/ivgen-plain64.h
-@@ -15,14 +15,13 @@
-  *
-  * You should have received a copy of the GNU Lesser General Public
-  * License along with this library; if not, see <http://www.gnu.org/lice=
-nses/>.
-- *
-  */
-=20
-+#ifndef QCRYPTO_IVGEN_PLAIN64_H
-+#define QCRYPTO_IVGEN_PLAIN64_H
-+
- #include "ivgenpriv.h"
-=20
--#ifndef QCRYPTO_IVGEN_PLAIN64_H__
--#define QCRYPTO_IVGEN_PLAIN64_H__
--
- extern struct QCryptoIVGenDriver qcrypto_ivgen_plain64;
-=20
--#endif /* QCRYPTO_IVGEN_PLAIN64_H__ */
-+#endif /* QCRYPTO_IVGEN_PLAIN64_H */
-diff --git a/include/hw/arm/allwinner-a10.h b/include/hw/arm/allwinner-a1=
-0.h
-index 6305b9c586..2c728efe07 100644
---- a/include/hw/arm/allwinner-a10.h
-+++ b/include/hw/arm/allwinner-a10.h
-@@ -1,4 +1,5 @@
--#ifndef ALLWINNER_H_
-+#ifndef HW_ARM_ALLWINNER_A10_H
-+#define HW_ARM_ALLWINNER_A10_H
-=20
- #include "qemu-common.h"
- #include "qemu/error-report.h"
-@@ -38,5 +39,4 @@ typedef struct AwA10State {
-     MemoryRegion sram_a;
- } AwA10State;
-=20
--#define ALLWINNER_H_
- #endif
-diff --git a/include/hw/arm/omap.h b/include/hw/arm/omap.h
-index 9de867daa4..d21e418242 100644
---- a/include/hw/arm/omap.h
-+++ b/include/hw/arm/omap.h
-@@ -16,9 +16,11 @@
-  * You should have received a copy of the GNU General Public License alo=
-ng
-  * with this program; if not, see <http://www.gnu.org/licenses/>.
-  */
--#ifndef hw_omap_h
-+
-+#ifndef HW_ARM_OMAP_H
-+#define HW_ARM_OMAP_H
-+
- #include "exec/memory.h"
--# define hw_omap_h		"omap.h"
- #include "hw/irq.h"
- #include "hw/input/tsc2xxx.h"
- #include "target/arm/cpu-qom.h"
-@@ -991,4 +993,4 @@ enum {
-=20
- # define OMAP_MPUI_REG_MASK		0x000007ff
-=20
--#endif /* hw_omap_h */
-+#endif
-diff --git a/include/hw/arm/xlnx-zynqmp.h b/include/hw/arm/xlnx-zynqmp.h
-index cd90b04310..604aabfdc6 100644
---- a/include/hw/arm/xlnx-zynqmp.h
-+++ b/include/hw/arm/xlnx-zynqmp.h
-@@ -16,6 +16,7 @@
-  */
-=20
- #ifndef XLNX_ZYNQMP_H
-+#define XLNX_ZYNQMP_H
-=20
- #include "qemu-common.h"
- #include "hw/arm/boot.h"
-@@ -114,5 +115,4 @@ typedef struct XlnxZynqMPState {
-     bool has_rpu;
- }  XlnxZynqMPState;
-=20
--#define XLNX_ZYNQMP_H
- #endif
-diff --git a/include/hw/char/cadence_uart.h b/include/hw/char/cadence_uar=
-t.h
-index 118e3f10de..e1cf33e94c 100644
---- a/include/hw/char/cadence_uart.h
-+++ b/include/hw/char/cadence_uart.h
-@@ -17,6 +17,7 @@
-  */
-=20
- #ifndef CADENCE_UART_H
-+#define CADENCE_UART_H
-=20
- #include "hw/sysbus.h"
- #include "chardev/char-fe.h"
-@@ -66,5 +67,4 @@ static inline DeviceState *cadence_uart_create(hwaddr a=
-ddr,
-     return dev;
- }
-=20
--#define CADENCE_UART_H
- #endif
-diff --git a/include/hw/display/xlnx_dp.h b/include/hw/display/xlnx_dp.h
-index 45a805033a..ab0dd250cc 100644
---- a/include/hw/display/xlnx_dp.h
-+++ b/include/hw/display/xlnx_dp.h
-@@ -19,9 +19,11 @@
-  *
-  * You should have received a copy of the GNU General Public License alo=
-ng
-  * with this program; if not, see <http://www.gnu.org/licenses/>.
-- *
-  */
-=20
-+#ifndef XLNX_DP_H
-+#define XLNX_DP_H
-+
- #include "hw/sysbus.h"
- #include "ui/console.h"
- #include "hw/misc/auxbus.h"
-@@ -33,9 +35,6 @@
- #include "hw/dma/xlnx_dpdma.h"
- #include "audio/audio.h"
-=20
--#ifndef XLNX_DP_H
--#define XLNX_DP_H
--
- #define AUD_CHBUF_MAX_DEPTH                 (32 * KiB)
- #define MAX_QEMU_BUFFER_SIZE                (4 * KiB)
-=20
-@@ -107,4 +106,4 @@ typedef struct XlnxDPState {
- #define TYPE_XLNX_DP "xlnx.v-dp"
- #define XLNX_DP(obj) OBJECT_CHECK(XlnxDPState, (obj), TYPE_XLNX_DP)
-=20
--#endif /* !XLNX_DP_H */
-+#endif
-diff --git a/include/hw/dma/xlnx-zynq-devcfg.h b/include/hw/dma/xlnx-zynq=
--devcfg.h
-index 9f5119a89a..1d3969d91f 100644
---- a/include/hw/dma/xlnx-zynq-devcfg.h
-+++ b/include/hw/dma/xlnx-zynq-devcfg.h
-@@ -25,6 +25,7 @@
-  */
-=20
- #ifndef XLNX_ZYNQ_DEVCFG_H
-+#define XLNX_ZYNQ_DEVCFG_H
-=20
- #include "hw/register.h"
- #include "hw/sysbus.h"
-@@ -58,5 +59,4 @@ typedef struct XlnxZynqDevcfg {
-     RegisterInfo regs_info[XLNX_ZYNQ_DEVCFG_R_MAX];
- } XlnxZynqDevcfg;
-=20
--#define XLNX_ZYNQ_DEVCFG_H
- #endif
-diff --git a/include/hw/net/cadence_gem.h b/include/hw/net/cadence_gem.h
-index 5426961d91..5c83036ade 100644
---- a/include/hw/net/cadence_gem.h
-+++ b/include/hw/net/cadence_gem.h
-@@ -23,6 +23,7 @@
-  */
-=20
- #ifndef CADENCE_GEM_H
-+#define CADENCE_GEM_H
-=20
- #define TYPE_CADENCE_GEM "cadence_gem"
- #define CADENCE_GEM(obj) OBJECT_CHECK(CadenceGEMState, (obj), TYPE_CADEN=
-CE_GEM)
-@@ -84,5 +85,4 @@ typedef struct CadenceGEMState {
-     bool sar_active[4];
- } CadenceGEMState;
-=20
--#define CADENCE_GEM_H
- #endif
-diff --git a/target/i386/whp-dispatch.h b/target/i386/whp-dispatch.h
-index a23fb33a29..23791fbb47 100644
---- a/target/i386/whp-dispatch.h
-+++ b/target/i386/whp-dispatch.h
-@@ -1,12 +1,11 @@
-+#ifndef WHP_DISPATCH_H
-+#define WHP_DISPATCH_H
-+
- #include <windows.h>
-=20
- #include <WinHvPlatform.h>
- #include <WinHvEmulation.h>
-=20
--#ifndef WHP_DISPATCH_H
--#define WHP_DISPATCH_H
--
--
- #define LIST_WINHVPLATFORM_FUNCTIONS(X) \
-   X(HRESULT, WHvGetCapability, (WHV_CAPABILITY_CODE CapabilityCode, VOID=
-* CapabilityBuffer, UINT32 CapabilityBufferSizeInBytes, UINT32* WrittenSi=
-zeInBytes)) \
-   X(HRESULT, WHvCreatePartition, (WHV_PARTITION_HANDLE* Partition)) \
-diff --git a/target/tilegx/spr_def_64.h b/target/tilegx/spr_def_64.h
-index 67a6c1751e..d3c0cc26d8 100644
---- a/target/tilegx/spr_def_64.h
-+++ b/target/tilegx/spr_def_64.h
-@@ -12,10 +12,8 @@
-  *   more details.
-  */
-=20
--#ifndef __DOXYGEN__
--
--#ifndef __ARCH_SPR_DEF_64_H__
--#define __ARCH_SPR_DEF_64_H__
-+#ifndef ARCH_SPR_DEF_64_H
-+#define ARCH_SPR_DEF_64_H
-=20
- #define SPR_AUX_PERF_COUNT_0 0x2105
- #define SPR_AUX_PERF_COUNT_1 0x2106
-@@ -211,6 +209,4 @@
- #define SPR_WATCH_MASK 0x200a
- #define SPR_WATCH_VAL 0x200b
-=20
--#endif /* !defined(__ARCH_SPR_DEF_64_H__) */
--
--#endif /* !defined(__DOXYGEN__) */
-+#endif
-diff --git a/tests/io-channel-helpers.h b/tests/io-channel-helpers.h
-index fedc64fd5a..bb2de6fbb9 100644
---- a/tests/io-channel-helpers.h
-+++ b/tests/io-channel-helpers.h
-@@ -15,14 +15,13 @@
-  *
-  * You should have received a copy of the GNU Lesser General Public
-  * License along with this library; if not, see <http://www.gnu.org/lice=
-nses/>.
-- *
-  */
-=20
-+#ifndef TEST_IO_CHANNEL_HELPERS_H
-+#define TEST_IO_CHANNEL_HELPERS_H
-+
- #include "io/channel.h"
-=20
--#ifndef TEST_IO_CHANNEL_HELPERS
--#define TEST_IO_CHANNEL_HELPERS
--
- typedef struct QIOChannelTest QIOChannelTest;
-=20
- QIOChannelTest *qio_channel_test_new(void);
-@@ -39,4 +38,4 @@ void qio_channel_test_run_reader(QIOChannelTest *test,
-=20
- void qio_channel_test_validate(QIOChannelTest *test);
-=20
--#endif /* TEST_IO_CHANNEL_HELPERS */
-+#endif /* TEST_IO_CHANNEL_HELPERS_H */
---=20
-2.21.0
+  https://github.com/stsquad/qemu/tree/testing/next-with-x86-64-tests
 
+--
+Alex Benn=C3=A9e
 
