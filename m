@@ -3,64 +3,85 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CD907C282CE
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 18:38:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BC38FC282CE
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 18:53:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 90C0D2075B
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 18:38:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 90C0D2075B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 886522075C
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 18:53:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 886522075C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:56370 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:56504 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hYEKL-0006FE-Oa
-	for qemu-devel@archiver.kernel.org; Tue, 04 Jun 2019 14:38:29 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:39752)
+	id 1hYEZE-0000cM-PX
+	for qemu-devel@archiver.kernel.org; Tue, 04 Jun 2019 14:53:52 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:42524)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1hYEJQ-0005uc-I1
-	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 14:37:33 -0400
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hYEYM-0000GJ-Ps
+	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 14:53:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1hYEJO-0002XF-Ve
-	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 14:37:32 -0400
-Resent-Date: Tue, 04 Jun 2019 14:37:32 -0400
-Resent-Message-Id: <E1hYEJO-0002XF-Ve@eggs.gnu.org>
-Received: from sender4-of-o55.zoho.com ([136.143.188.55]:21545)
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hYEYL-00012f-9v
+	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 14:52:58 -0400
+Received: from mail.ilande.co.uk ([46.43.2.167]:54770
+	helo=mail.default.ilande.uk0.bigv.io)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1hYEJO-0002Tz-Ow
-	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 14:37:30 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1559558913; cv=none; d=zoho.com; s=zohoarc; 
-	b=auYM/as2WMyu5WPUeQ0bNPBKkXkTy6LgnZBKbE2UQUZwtubG125+xLXwNA1MS36hJO0W7dsXpqrorXtYz5PAhpA67S4cv5r0GZNB0QRRiRImrMh95u1awJX0ZGbD3RKUsq0oVdxyGDjMXEWGvyB9y4Y0ZB+lVndIH+cPRaJcPH0=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
-	s=zohoarc; t=1559558913;
-	h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
-	bh=OdGSMS/H7RqU+SVATIxOxCJvklc+vcm++wjllBWFJR8=; 
-	b=eT5x6+qbc8wJhKA0twoqP7fI6Nz5AzzEVfvoG6nyCKfL9z7GPrO1mhMuSX6J7SN2fwjMx3ab9z6rk0PaCIMoPix3rMqILiju098dw6s8xmd+SxGsXTCxJfUHeeQ6CSViD3xZYr1bzCEHqWXSbMXXj11nlxHXpgZElWzNpnrjiHU=
-ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
-	spf=pass  smtp.mailfrom=no-reply@patchew.org;
-	dmarc=pass header.from=<no-reply@patchew.org>
-	header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
-	mx.zohomail.com with SMTPS id 1559558911192967.5167011686991;
-	Mon, 3 Jun 2019 03:48:31 -0700 (PDT)
-In-Reply-To: <20190602110903.3431-1-mark.cave-ayland@ilande.co.uk>
-Message-ID: <155955891012.32260.9064081470614985823@ce79690b2cb9>
+	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+	id 1hYEYB-0000BH-0y; Tue, 04 Jun 2019 14:52:50 -0400
+Received: from host81-158-188-206.range81-158.btcentralplus.com
+	([81.158.188.206] helo=[192.168.1.65])
+	by mail.default.ilande.uk0.bigv.io with esmtpsa
+	(TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.89)
+	(envelope-from <mark.cave-ayland@ilande.co.uk>)
+	id 1hYETV-0000zo-DU; Tue, 04 Jun 2019 19:47:59 +0100
+To: qemu-devel@nongnu.org, no-reply@patchew.org
+References: <155955891012.32260.9064081470614985823@ce79690b2cb9>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Openpgp: preference=signencrypt
+Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
+	mQENBFQJuzwBCADAYvxrwUh1p/PvUlNFwKosVtVHHplgWi5p29t58QlOUkceZG0DBYSNqk93
+	3JzBTbtd4JfFcSupo6MNNOrCzdCbCjZ64ik8ycaUOSzK2tKbeQLEXzXoaDL1Y7vuVO7nL9bG
+	E5Ru3wkhCFc7SkoypIoAUqz8EtiB6T89/D9TDEyjdXUacc53R5gu8wEWiMg5MQQuGwzbQy9n
+	PFI+mXC7AaEUqBVc2lBQVpAYXkN0EyqNNT12UfDLdxaxaFpUAE2pCa2LTyo5vn5hEW+i3VdN
+	PkmjyPvL6DdY03fvC01PyY8zaw+UI94QqjlrDisHpUH40IUPpC/NB0LwzL2aQOMkzT2NABEB
+	AAG0ME1hcmsgQ2F2ZS1BeWxhbmQgPG1hcmsuY2F2ZS1heWxhbmRAaWxhbmRlLmNvLnVrPokB
+	OAQTAQIAIgUCVAm7PAIbAwYLCQgHAwIGFQgCCQoLBBYCAwECHgECF4AACgkQW8LFb64PMh9f
+	NAgAuc3ObOEY8NbZko72AGrg2tWKdybcMVITxmcor4hb9155o/OWcA4IDbeATR6cfiDL/oxU
+	mcmtXVgPqOwtW3NYAKr5g/FrZZ3uluQ2mtNYAyTFeALy8YF7N3yhs7LOcpbFP7tEbkSzoXNG
+	z8iYMiYtKwttt40WaheWuRs0ZOLbs6yoczZBDhna3Nj0LA3GpeJKlaV03O4umjKJgACP1c/q
+	T2Pkg+FCBHHFP454+waqojHp4OCBo6HyK+8I4wJRa9Z0EFqXIu8lTDYoggeX0Xd6bWeCFHK3
+	DhD0/Xi/kegSW33unsp8oVcM4kcFxTkpBgj39dB4KwAUznhTJR0zUHf63LkBDQRUCbs8AQgA
+	y7kyevA4bpetM/EjtuqQX4U05MBhEz/2SFkX6IaGtTG2NNw5wbcAfhOIuNNBYbw6ExuaJ3um
+	2uLseHnudmvN4VSJ5Hfbd8rhqoMmmO71szgT/ZD9MEe2KHzBdmhmhxJdp+zQNivy215j6H27
+	14mbC2dia7ktwP1rxPIX1OOfQwPuqlkmYPuVwZP19S4EYnCELOrnJ0m56tZLn5Zj+1jZX9Co
+	YbNLMa28qsktYJ4oU4jtn6V79H+/zpERZAHmH40IRXdR3hA+Ye7iC/ZpWzT2VSDlPbGY9Yja
+	Sp7w2347L5G+LLbAfaVoejHlfy/msPeehUcuKjAdBLoEhSPYzzdvEQARAQABiQEfBBgBAgAJ
+	BQJUCbs8AhsMAAoJEFvCxW+uDzIfabYIAJXmBepHJpvCPiMNEQJNJ2ZSzSjhic84LTMWMbJ+
+	opQgr5cb8SPQyyb508fc8b4uD8ejlF/cdbbBNktp3BXsHlO5BrmcABgxSP8HYYNsX0n9kERv
+	NMToU0oiBuAaX7O/0K9+BW+3+PGMwiu5ml0cwDqljxfVN0dUBZnQ8kZpLsY+WDrIHmQWjtH+
+	Ir6VauZs5Gp25XLrL6bh/SL8aK0BX6y79m5nhfKI1/6qtzHAjtMAjqy8ChPvOqVVVqmGUzFg
+	KPsrrIoklWcYHXPyMLj9afispPVR8e0tMKvxzFBWzrWX1mzljbBlnV2n8BIwVXWNbgwpHSsj
+	imgcU9TTGC5qd9g=
+Message-ID: <5c9a9f70-304b-8f19-361c-9951dfa854db@ilande.co.uk>
+Date: Tue, 4 Jun 2019 19:48:51 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: mark.cave-ayland@ilande.co.uk
-Date: Mon, 3 Jun 2019 03:48:31 -0700 (PDT)
-X-ZohoMailClient: External
+In-Reply-To: <155955891012.32260.9064081470614985823@ce79690b2cb9>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
+X-SA-Exim-Connect-IP: 81.158.188.206
+X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
+X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
+X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 136.143.188.55
+X-Received-From: 46.43.2.167
 Subject: Re: [Qemu-devel] [PATCH v2 00/15] target/ppc: remove
  getVSR()/putVSR() and further tidy-up
 X-BeenThere: qemu-devel@nongnu.org
@@ -74,101 +95,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: gkurz@kaod.org, rth@twiddle.net, qemu-ppc@nongnu.org, qemu-devel@nongnu.org,
-	david@gibson.dropbear.id.au
+Cc: gkurz@kaod.org, david@gibson.dropbear.id.au, qemu-ppc@nongnu.org,
+	rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDYwMjExMDkwMy4zNDMx
-LTEtbWFyay5jYXZlLWF5bGFuZEBpbGFuZGUuY28udWsvCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2Vl
-bXMgdG8gaGF2ZSBzb21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBm
-b3IKbW9yZSBpbmZvcm1hdGlvbjoKClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjIgMDAv
-MTVdIHRhcmdldC9wcGM6IHJlbW92ZSBnZXRWU1IoKS9wdXRWU1IoKSBhbmQgZnVydGhlciB0aWR5
-LXVwClR5cGU6IHNlcmllcwpNZXNzYWdlLWlkOiAyMDE5MDYwMjExMDkwMy4zNDMxLTEtbWFyay5j
-YXZlLWF5bGFuZEBpbGFuZGUuY28udWsKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmlu
-L2Jhc2gKZ2l0IHJldi1wYXJzZSBiYXNlID4gL2Rldi9udWxsIHx8IGV4aXQgMApnaXQgY29uZmln
-IC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFt
-ZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCi4vc2Ny
-aXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4uCj09PSBURVNUIFNDUklQVCBFTkQg
-PT09CgpGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogICA2MDkw
-NTI4NmNiLi5hZDg4ZTQyNTJmICBtYXN0ZXIgICAgIC0+IG1hc3RlcgpGcm9tIGh0dHBzOi8vZ2l0
-aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogKiBbbmV3IHRhZ10gICAgICAgICAgICAgICBw
-YXRjaGV3LzIwMTkwNjAyMTEwOTAzLjM0MzEtMS1tYXJrLmNhdmUtYXlsYW5kQGlsYW5kZS5jby51
-ayAtPiBwYXRjaGV3LzIwMTkwNjAyMTEwOTAzLjM0MzEtMS1tYXJrLmNhdmUtYXlsYW5kQGlsYW5k
-ZS5jby51awpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjg2OGY2NDA1MDEgdGFyZ2V0
-L3BwYzogaW1wcm92ZSBWU1hfRk1BREQgd2l0aCBuZXcgR0VOX1ZTWF9IRUxQRVJfVlNYX01BREQg
-bWFjcm8KMTE2NTg0MzVmOSB0YXJnZXQvcHBjOiBkZWNvZGUgdGFyZ2V0IHJlZ2lzdGVyIGluIFZT
-WF9FWFRSQUNUX0lOU0VSVCBhdCB0cmFuc2xhdGlvbiB0aW1lCmU5ZTUyZTNmMGEgdGFyZ2V0L3Bw
-YzogZGVjb2RlIHRhcmdldCByZWdpc3RlciBpbiBWU1hfVkVDVE9SX0xPQURfU1RPUkVfTEVOR1RI
-IGF0IHRyYW5zbGF0aW9uIHRpbWUKMjM5ZTA3YTBjZiB0YXJnZXQvcHBjOiBpbnRyb2R1Y2UgR0VO
-X1ZTWF9IRUxQRVJfUjJfQUIgbWFjcm8gdG8gZnB1X2hlbHBlci5jCjZhZWI4YTJlMzYgdGFyZ2V0
-L3BwYzogaW50cm9kdWNlIEdFTl9WU1hfSEVMUEVSX1IyIG1hY3JvIHRvIGZwdV9oZWxwZXIuYwpi
-NDM4MzZkNGU4IHRhcmdldC9wcGM6IGludHJvZHVjZSBHRU5fVlNYX0hFTFBFUl9SMyBtYWNybyB0
-byBmcHVfaGVscGVyLmMKMjQxOTIwMDU2YSB0YXJnZXQvcHBjOiBpbnRyb2R1Y2UgR0VOX1ZTWF9I
-RUxQRVJfWDEgbWFjcm8gdG8gZnB1X2hlbHBlci5jCjk1OTI2MWEwNzQgdGFyZ2V0L3BwYzogaW50
-cm9kdWNlIEdFTl9WU1hfSEVMUEVSX1gyX0FCIG1hY3JvIHRvIGZwdV9oZWxwZXIuYwplY2Q1MTli
-ODZlIHRhcmdldC9wcGM6IGludHJvZHVjZSBHRU5fVlNYX0hFTFBFUl9YMiBtYWNybyB0byBmcHVf
-aGVscGVyLmMKNjJiNDY2NzcwYiB0YXJnZXQvcHBjOiBpbnRyb2R1Y2Ugc2VwYXJhdGUgZ2VuZXJh
-dG9yIGFuZCBoZWxwZXIgZm9yIHhzY3ZxcGRwCmQ4YTViZWVjMzMgdGFyZ2V0L3BwYzogaW50cm9k
-dWNlIEdFTl9WU1hfSEVMUEVSX1gzIG1hY3JvIHRvIGZwdV9oZWxwZXIuYwpiMmRlMTc2MWU1IHRh
-cmdldC9wcGM6IGludHJvZHVjZSBzZXBhcmF0ZSBWU1hfQ01QIG1hY3JvIGZvciB4dmNtcCogaW5z
-dHJ1Y3Rpb25zCjg5NWI5NTNmODEgdGFyZ2V0L3BwYzogcmVtb3ZlIGdldFZTUigpL3B1dFZTUigp
-IGZyb20gaW50X2hlbHBlci5jCmNhOTQxZmZlOWUgdGFyZ2V0L3BwYzogcmVtb3ZlIGdldFZTUigp
-L3B1dFZTUigpIGZyb20gbWVtX2hlbHBlci5jCmVhZTU5Yzc5YzUgdGFyZ2V0L3BwYzogcmVtb3Zl
-IGdldFZTUigpL3B1dFZTUigpIGZyb20gZnB1X2hlbHBlci5jCgo9PT0gT1VUUFVUIEJFR0lOID09
-PQoxLzE1IENoZWNraW5nIGNvbW1pdCBlYWU1OWM3OWM1ZWEgKHRhcmdldC9wcGM6IHJlbW92ZSBn
-ZXRWU1IoKS9wdXRWU1IoKSBmcm9tIGZwdV9oZWxwZXIuYykKMi8xNSBDaGVja2luZyBjb21taXQg
-Y2E5NDFmZmU5ZWFmICh0YXJnZXQvcHBjOiByZW1vdmUgZ2V0VlNSKCkvcHV0VlNSKCkgZnJvbSBt
-ZW1faGVscGVyLmMpCjMvMTUgQ2hlY2tpbmcgY29tbWl0IDg5NWI5NTNmODE3NSAodGFyZ2V0L3Bw
-YzogcmVtb3ZlIGdldFZTUigpL3B1dFZTUigpIGZyb20gaW50X2hlbHBlci5jKQo0LzE1IENoZWNr
-aW5nIGNvbW1pdCBiMmRlMTc2MWU1ODEgKHRhcmdldC9wcGM6IGludHJvZHVjZSBzZXBhcmF0ZSBW
-U1hfQ01QIG1hY3JvIGZvciB4dmNtcCogaW5zdHJ1Y3Rpb25zKQo1LzE1IENoZWNraW5nIGNvbW1p
-dCBkOGE1YmVlYzMzYmQgKHRhcmdldC9wcGM6IGludHJvZHVjZSBHRU5fVlNYX0hFTFBFUl9YMyBt
-YWNybyB0byBmcHVfaGVscGVyLmMpCjYvMTUgQ2hlY2tpbmcgY29tbWl0IDYyYjQ2Njc3MGJhYSAo
-dGFyZ2V0L3BwYzogaW50cm9kdWNlIHNlcGFyYXRlIGdlbmVyYXRvciBhbmQgaGVscGVyIGZvciB4
-c2N2cXBkcCkKNy8xNSBDaGVja2luZyBjb21taXQgZWNkNTE5Yjg2ZWVjICh0YXJnZXQvcHBjOiBp
-bnRyb2R1Y2UgR0VOX1ZTWF9IRUxQRVJfWDIgbWFjcm8gdG8gZnB1X2hlbHBlci5jKQo4LzE1IENo
-ZWNraW5nIGNvbW1pdCA5NTkyNjFhMDc0ODAgKHRhcmdldC9wcGM6IGludHJvZHVjZSBHRU5fVlNY
-X0hFTFBFUl9YMl9BQiBtYWNybyB0byBmcHVfaGVscGVyLmMpCjkvMTUgQ2hlY2tpbmcgY29tbWl0
-IDI0MTkyMDA1NmFiMCAodGFyZ2V0L3BwYzogaW50cm9kdWNlIEdFTl9WU1hfSEVMUEVSX1gxIG1h
-Y3JvIHRvIGZwdV9oZWxwZXIuYykKMTAvMTUgQ2hlY2tpbmcgY29tbWl0IGI0MzgzNmQ0ZThiYiAo
-dGFyZ2V0L3BwYzogaW50cm9kdWNlIEdFTl9WU1hfSEVMUEVSX1IzIG1hY3JvIHRvIGZwdV9oZWxw
-ZXIuYykKMTEvMTUgQ2hlY2tpbmcgY29tbWl0IDZhZWI4YTJlMzZjNyAodGFyZ2V0L3BwYzogaW50
-cm9kdWNlIEdFTl9WU1hfSEVMUEVSX1IyIG1hY3JvIHRvIGZwdV9oZWxwZXIuYykKMTIvMTUgQ2hl
-Y2tpbmcgY29tbWl0IDIzOWUwN2EwY2ZmYSAodGFyZ2V0L3BwYzogaW50cm9kdWNlIEdFTl9WU1hf
-SEVMUEVSX1IyX0FCIG1hY3JvIHRvIGZwdV9oZWxwZXIuYykKMTMvMTUgQ2hlY2tpbmcgY29tbWl0
-IGU5ZTUyZTNmMGEzOSAodGFyZ2V0L3BwYzogZGVjb2RlIHRhcmdldCByZWdpc3RlciBpbiBWU1hf
-VkVDVE9SX0xPQURfU1RPUkVfTEVOR1RIIGF0IHRyYW5zbGF0aW9uIHRpbWUpCjE0LzE1IENoZWNr
-aW5nIGNvbW1pdCAxMTY1ODQzNWY5ZmYgKHRhcmdldC9wcGM6IGRlY29kZSB0YXJnZXQgcmVnaXN0
-ZXIgaW4gVlNYX0VYVFJBQ1RfSU5TRVJUIGF0IHRyYW5zbGF0aW9uIHRpbWUpCjE1LzE1IENoZWNr
-aW5nIGNvbW1pdCA4NjhmNjQwNTAxNWMgKHRhcmdldC9wcGM6IGltcHJvdmUgVlNYX0ZNQUREIHdp
-dGggbmV3IEdFTl9WU1hfSEVMUEVSX1ZTWF9NQUREIG1hY3JvKQpXQVJOSU5HOiBCbG9jayBjb21t
-ZW50cyB1c2UgYSBsZWFkaW5nIC8qIG9uIGEgc2VwYXJhdGUgbGluZQojMjc4OiBGSUxFOiB0YXJn
-ZXQvcHBjL3RyYW5zbGF0ZS92c3gtaW1wbC5pbmMuYzoxMzExOgorICAgICAgICAvKiAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgXAoKV0FSTklORzogQmxvY2sgY29tbWVudHMgdXNlIGEgbGVhZGluZyAvKiBvbiBhIHNlcGFy
-YXRlIGxpbmUKIzI4NDogRklMRTogdGFyZ2V0L3BwYy90cmFuc2xhdGUvdnN4LWltcGwuaW5jLmM6
-MTMxNzoKKyAgICAgICAgLyogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgIFwKCkVSUk9SOiBNYWNyb3Mgd2l0aCBjb21wbGV4
-IHZhbHVlcyBzaG91bGQgYmUgZW5jbG9zZWQgaW4gcGFyZW50aGVzaXMKIzMyNTogRklMRTogdGFy
-Z2V0L3BwYy90cmFuc2xhdGUvdnN4LW9wcy5pbmMuYzo2NjoKKyNkZWZpbmUgR0VOX1hYM0ZPUk1f
-TkFNRShuYW1lLCBvcGNuYW1lLCBvcGMyLCBvcGMzLCBmbDIpICAgICAgICAgICAgICAgXAorR0VO
-X0hBTkRMRVIyX0UobmFtZSwgb3BjbmFtZSwgMHgzQywgb3BjMiB8IDAsIG9wYzMsIDAsIFBQQ19O
-T05FLCBmbDIpLCBcCitHRU5fSEFORExFUjJfRShuYW1lLCBvcGNuYW1lLCAweDNDLCBvcGMyIHwg
-MSwgb3BjMywgMCwgUFBDX05PTkUsIGZsMiksIFwKK0dFTl9IQU5ETEVSMl9FKG5hbWUsIG9wY25h
-bWUsIDB4M0MsIG9wYzIgfCAyLCBvcGMzLCAwLCBQUENfTk9ORSwgZmwyKSwgXAorR0VOX0hBTkRM
-RVIyX0UobmFtZSwgb3BjbmFtZSwgMHgzQywgb3BjMiB8IDMsIG9wYzMsIDAsIFBQQ19OT05FLCBm
-bDIpCgp0b3RhbDogMSBlcnJvcnMsIDIgd2FybmluZ3MsIDM3NyBsaW5lcyBjaGVja2VkCgpQYXRj
-aCAxNS8xNSBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhl
-c2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWlu
-ZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKPT09IE9VVFBVVCBFTkQgPT09CgpU
-ZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFi
-bGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAxOTA2MDIxMTA5MDMuMzQzMS0xLW1hcmsu
-Y2F2ZS1heWxhbmRAaWxhbmRlLmNvLnVrL3Rlc3RpbmcuY2hlY2twYXRjaC8/dHlwZT1tZXNzYWdl
-LgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6Ly9w
-YXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxA
-cmVkaGF0LmNvbQ==
+On 03/06/2019 11:48, no-reply@patchew.org wrote:
 
+> Patchew URL: https://patchew.org/QEMU/20190602110903.3431-1-mark.cave-ayland@ilande.co.uk/
+> 
+> 
+> 
+> Hi,
+> 
+> This series seems to have some coding style problems. See output below for
+> more information:
+> 
+> Subject: [Qemu-devel] [PATCH v2 00/15] target/ppc: remove getVSR()/putVSR() and further tidy-up
+> Type: series
+> Message-id: 20190602110903.3431-1-mark.cave-ayland@ilande.co.uk
+> 
+> === TEST SCRIPT BEGIN ===
+> #!/bin/bash
+> git rev-parse base > /dev/null || exit 0
+> git config --local diff.renamelimit 0
+> git config --local diff.renames True
+> git config --local diff.algorithm histogram
+> ./scripts/checkpatch.pl --mailback base..
+> === TEST SCRIPT END ===
+> 
+> From https://github.com/patchew-project/qemu
+>    60905286cb..ad88e4252f  master     -> master
+> From https://github.com/patchew-project/qemu
+>  * [new tag]               patchew/20190602110903.3431-1-mark.cave-ayland@ilande.co.uk -> patchew/20190602110903.3431-1-mark.cave-ayland@ilande.co.uk
+> Switched to a new branch 'test'
+> 868f640501 target/ppc: improve VSX_FMADD with new GEN_VSX_HELPER_VSX_MADD macro
+> 11658435f9 target/ppc: decode target register in VSX_EXTRACT_INSERT at translation time
+> e9e52e3f0a target/ppc: decode target register in VSX_VECTOR_LOAD_STORE_LENGTH at translation time
+> 239e07a0cf target/ppc: introduce GEN_VSX_HELPER_R2_AB macro to fpu_helper.c
+> 6aeb8a2e36 target/ppc: introduce GEN_VSX_HELPER_R2 macro to fpu_helper.c
+> b43836d4e8 target/ppc: introduce GEN_VSX_HELPER_R3 macro to fpu_helper.c
+> 241920056a target/ppc: introduce GEN_VSX_HELPER_X1 macro to fpu_helper.c
+> 959261a074 target/ppc: introduce GEN_VSX_HELPER_X2_AB macro to fpu_helper.c
+> ecd519b86e target/ppc: introduce GEN_VSX_HELPER_X2 macro to fpu_helper.c
+> 62b466770b target/ppc: introduce separate generator and helper for xscvqpdp
+> d8a5beec33 target/ppc: introduce GEN_VSX_HELPER_X3 macro to fpu_helper.c
+> b2de1761e5 target/ppc: introduce separate VSX_CMP macro for xvcmp* instructions
+> 895b953f81 target/ppc: remove getVSR()/putVSR() from int_helper.c
+> ca941ffe9e target/ppc: remove getVSR()/putVSR() from mem_helper.c
+> eae59c79c5 target/ppc: remove getVSR()/putVSR() from fpu_helper.c
+> 
+> === OUTPUT BEGIN ===
+> 1/15 Checking commit eae59c79c5ea (target/ppc: remove getVSR()/putVSR() from fpu_helper.c)
+> 2/15 Checking commit ca941ffe9eaf (target/ppc: remove getVSR()/putVSR() from mem_helper.c)
+> 3/15 Checking commit 895b953f8175 (target/ppc: remove getVSR()/putVSR() from int_helper.c)
+> 4/15 Checking commit b2de1761e581 (target/ppc: introduce separate VSX_CMP macro for xvcmp* instructions)
+> 5/15 Checking commit d8a5beec33bd (target/ppc: introduce GEN_VSX_HELPER_X3 macro to fpu_helper.c)
+> 6/15 Checking commit 62b466770baa (target/ppc: introduce separate generator and helper for xscvqpdp)
+> 7/15 Checking commit ecd519b86eec (target/ppc: introduce GEN_VSX_HELPER_X2 macro to fpu_helper.c)
+> 8/15 Checking commit 959261a07480 (target/ppc: introduce GEN_VSX_HELPER_X2_AB macro to fpu_helper.c)
+> 9/15 Checking commit 241920056ab0 (target/ppc: introduce GEN_VSX_HELPER_X1 macro to fpu_helper.c)
+> 10/15 Checking commit b43836d4e8bb (target/ppc: introduce GEN_VSX_HELPER_R3 macro to fpu_helper.c)
+> 11/15 Checking commit 6aeb8a2e36c7 (target/ppc: introduce GEN_VSX_HELPER_R2 macro to fpu_helper.c)
+> 12/15 Checking commit 239e07a0cffa (target/ppc: introduce GEN_VSX_HELPER_R2_AB macro to fpu_helper.c)
+> 13/15 Checking commit e9e52e3f0a39 (target/ppc: decode target register in VSX_VECTOR_LOAD_STORE_LENGTH at translation time)
+> 14/15 Checking commit 11658435f9ff (target/ppc: decode target register in VSX_EXTRACT_INSERT at translation time)
+> 15/15 Checking commit 868f6405015c (target/ppc: improve VSX_FMADD with new GEN_VSX_HELPER_VSX_MADD macro)
+> WARNING: Block comments use a leading /* on a separate line
+> #278: FILE: target/ppc/translate/vsx-impl.inc.c:1311:
+> +        /*                                                                    \
+
+It looks like checkpatch is getting confused here because the comment is part of a
+macro definition with the '\' continuation marker at the end of the line.
+
+> WARNING: Block comments use a leading /* on a separate line
+> #284: FILE: target/ppc/translate/vsx-impl.inc.c:1317:
+> +        /*                                                                    \
+> 
+> ERROR: Macros with complex values should be enclosed in parenthesis
+> #325: FILE: target/ppc/translate/vsx-ops.inc.c:66:
+> +#define GEN_XX3FORM_NAME(name, opcname, opc2, opc3, fl2)               \
+> +GEN_HANDLER2_E(name, opcname, 0x3C, opc2 | 0, opc3, 0, PPC_NONE, fl2), \
+> +GEN_HANDLER2_E(name, opcname, 0x3C, opc2 | 1, opc3, 0, PPC_NONE, fl2), \
+> +GEN_HANDLER2_E(name, opcname, 0x3C, opc2 | 2, opc3, 0, PPC_NONE, fl2), \
+> +GEN_HANDLER2_E(name, opcname, 0x3C, opc2 | 3, opc3, 0, PPC_NONE, fl2)
+> 
+> total: 1 errors, 2 warnings, 377 lines checked
+
+And this is just another "macro of macros" in the same style as all the others within
+the file so I'm not convinced that this is relevant here either.
+
+> Patch 15/15 has style problems, please review.  If any of these errors
+> are false positives report them to the maintainer, see
+> CHECKPATCH in MAINTAINERS.
+> 
+> === OUTPUT END ===
+> 
+> Test command exited with code: 1
+> 
+> 
+> The full log is available at
+> http://patchew.org/logs/20190602110903.3431-1-mark.cave-ayland@ilande.co.uk/testing.checkpatch/?type=message.
+> ---
+> Email generated automatically by Patchew [https://patchew.org/].
+> Please send your feedback to patchew-devel@redhat.com
+
+
+ATB,
+
+Mark.
 
