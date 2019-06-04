@@ -2,58 +2,108 @@ Return-Path: <SRS0=GUf1=UD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F227CC282CE
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 10:08:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C363CC282CE
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 10:11:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B830824C28
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 10:08:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B830824C28
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 6836F24C2B
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 10:11:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6836F24C2B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:49722 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:49797 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hY6N5-0002u8-0C
-	for qemu-devel@archiver.kernel.org; Tue, 04 Jun 2019 06:08:47 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:55960)
+	id 1hY6Px-0004Hm-Na
+	for qemu-devel@archiver.kernel.org; Tue, 04 Jun 2019 06:11:45 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:57857)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tina.zhang@intel.com>) id 1hY6J8-00085K-4F
-	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 06:04:44 -0400
+	(envelope-from <aravinda@linux.vnet.ibm.com>) id 1hY6P5-0003dm-0j
+	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 06:10:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tina.zhang@intel.com>) id 1hY6J6-0000oP-8X
-	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 06:04:42 -0400
-Received: from mga18.intel.com ([134.134.136.126]:33967)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <tina.zhang@intel.com>)
-	id 1hY6J4-0000aq-K8
-	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 06:04:39 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-	by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
-	04 Jun 2019 03:04:33 -0700
-X-ExtLoop1: 1
-Received: from gvt.bj.intel.com ([10.238.158.187])
-	by orsmga007.jf.intel.com with ESMTP; 04 Jun 2019 03:04:31 -0700
-From: Tina Zhang <tina.zhang@intel.com>
-To: intel-gvt-dev@lists.freedesktop.org,
-	qemu-devel@nongnu.org
-Date: Tue,  4 Jun 2019 17:58:47 +0800
-Message-Id: <20190604095847.10532-4-tina.zhang@intel.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20190604095847.10532-1-tina.zhang@intel.com>
-References: <20190604095847.10532-1-tina.zhang@intel.com>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 134.134.136.126
-Subject: [Qemu-devel] [RFC PATCH 3/3] vfio/display: Refresh display
- depending on vGPU page flip events
+	(envelope-from <aravinda@linux.vnet.ibm.com>) id 1hY6P2-0006eT-Kw
+	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 06:10:51 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:44838
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <aravinda@linux.vnet.ibm.com>)
+	id 1hY6P2-0006dw-Fj
+	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 06:10:48 -0400
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+	x54A7qZI156554
+	for <qemu-devel@nongnu.org>; Tue, 4 Jun 2019 06:10:47 -0400
+Received: from e13.ny.us.ibm.com (e13.ny.us.ibm.com [129.33.205.203])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2swpedgmuq-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 04 Jun 2019 06:10:47 -0400
+Received: from localhost
+	by e13.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <aravinda@linux.vnet.ibm.com>;
+	Tue, 4 Jun 2019 11:10:46 +0100
+Received: from b01cxnp23033.gho.pok.ibm.com (9.57.198.28)
+	by e13.ny.us.ibm.com (146.89.104.200) with IBM ESMTP SMTP Gateway:
+	Authorized Use Only! Violators will be prosecuted; 
+	(version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+	Tue, 4 Jun 2019 11:10:45 +0100
+Received: from b01ledav001.gho.pok.ibm.com (b01ledav001.gho.pok.ibm.com
+	[9.57.199.106])
+	by b01cxnp23033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+	x54AAifn24379818
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256
+	verify=OK); Tue, 4 Jun 2019 10:10:44 GMT
+Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 4F9312805E;
+	Tue,  4 Jun 2019 10:10:44 +0000 (GMT)
+Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 835F028058;
+	Tue,  4 Jun 2019 10:10:41 +0000 (GMT)
+Received: from [9.199.59.54] (unknown [9.199.59.54])
+	by b01ledav001.gho.pok.ibm.com (Postfix) with ESMTP;
+	Tue,  4 Jun 2019 10:10:41 +0000 (GMT)
+To: Greg Kurz <groug@kaod.org>
+References: <155910829070.13149.5215948335633966328.stgit@aravinda>
+	<155910844057.13149.1476616524987244293.stgit@aravinda>
+	<20190603160030.03e3c691@bahia.lab.toulouse-stg.fr.ibm.com>
+	<e7c7ea6a-e377-aa24-dc4b-e56a9973093c@linux.vnet.ibm.com>
+	<20190604110119.7bbb4716@bahia.lab.toulouse-stg.fr.ibm.com>
+From: Aravinda Prasad <aravinda@linux.vnet.ibm.com>
+Date: Tue, 4 Jun 2019 15:40:40 +0530
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+	Thunderbird/52.6.0
+MIME-Version: 1.0
+In-Reply-To: <20190604110119.7bbb4716@bahia.lab.toulouse-stg.fr.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+x-cbid: 19060410-0064-0000-0000-000003E9797A
+X-IBM-SpamModules-Scores: 
+X-IBM-SpamModules-Versions: BY=3.00011213; HX=3.00000242; KW=3.00000007;
+	PH=3.00000004; SC=3.00000286; SDB=6.01213056; UDB=6.00637539;
+	IPR=6.00994123; 
+	MB=3.00027179; MTD=3.00000008; XFM=3.00000015; UTC=2019-06-04 10:10:46
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19060410-0065-0000-0000-00003DBC1550
+Message-Id: <1e92a438-7555-5b89-355b-a2387f745ebc@linux.vnet.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
+	definitions=2019-06-04_08:, , signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+	priorityscore=1501
+	malwarescore=0 suspectscore=2 phishscore=0 bulkscore=0 spamscore=0
+	clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+	mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+	scancount=1 engine=8.0.1-1810050000 definitions=main-1906040068
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 148.163.158.5
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v9 4/6] target/ppc: Build rtas
+ error log upon an MCE
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -65,350 +115,407 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kevin.tian@intel.com, zhenyuw@linux.intel.com,
-	Tina Zhang <tina.zhang@intel.com>, alex.williamson@redhat.com,
-	zhiyuan.lv@intel.com, hang.yuan@intel.com, zhi.a.wang@intel.com,
-	kraxel@redhat.com
+Cc: aik@au1.ibm.com, qemu-devel@nongnu.org, paulus@ozlabs.org,
+	qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Use vGPU plane page flip events to refresh display.
 
-Signed-off-by: Tina Zhang <tina.zhang@intel.com>
----
- hw/vfio/display.c             | 249 +++++++++++++++++++++++++++++-----
- include/hw/vfio/vfio-common.h |   8 ++
- 2 files changed, 225 insertions(+), 32 deletions(-)
 
-diff --git a/hw/vfio/display.c b/hw/vfio/display.c
-index 2c2d3e5b71..6ef383b5e8 100644
---- a/hw/vfio/display.c
-+++ b/hw/vfio/display.c
-@@ -288,44 +288,54 @@ static void vfio_display_dmabuf_update(void *opaque)
-     VFIODMABuf *primary, *cursor;
-     bool free_bufs = false, new_cursor = false;;
- 
--    primary = vfio_display_get_dmabuf(vdev, DRM_PLANE_TYPE_PRIMARY);
--    if (primary == NULL) {
--        if (dpy->ramfb) {
--            ramfb_display_update(dpy->con, dpy->ramfb);
--        }
--        return;
-+    if (dpy->event_flags & VFIO_IRQ_EVENT_ENABLE) {
-+        dpy_update_interval(dpy->con, GUI_REFRESH_INTERVAL_IDLE);
-     }
- 
--    if (dpy->dmabuf.primary != primary) {
--        dpy->dmabuf.primary = primary;
--        qemu_console_resize(dpy->con,
--                            primary->buf.width, primary->buf.height);
--        dpy_gl_scanout_dmabuf(dpy->con, &primary->buf);
--        free_bufs = true;
--    }
-+    if (!dpy->event_flags ||
-+        (dpy->event_flags & VFIO_IRQ_EVENT_PRIMRAY_PLANE_FLIP)) {
-+        primary = vfio_display_get_dmabuf(vdev, DRM_PLANE_TYPE_PRIMARY);
-+        if (primary == NULL) {
-+            if (dpy->ramfb) {
-+                ramfb_display_update(dpy->con, dpy->ramfb);
-+            }
-+            return;
-+        }
- 
--    cursor = vfio_display_get_dmabuf(vdev, DRM_PLANE_TYPE_CURSOR);
--    if (dpy->dmabuf.cursor != cursor) {
--        dpy->dmabuf.cursor = cursor;
--        new_cursor = true;
--        free_bufs = true;
-+        if (dpy->dmabuf.primary != primary) {
-+            dpy->dmabuf.primary = primary;
-+            qemu_console_resize(dpy->con,
-+                                primary->buf.width, primary->buf.height);
-+            dpy_gl_scanout_dmabuf(dpy->con, &primary->buf);
-+            free_bufs = true;
-+        }
-     }
- 
--    if (cursor && (new_cursor || cursor->hot_updates)) {
--        bool have_hot = (cursor->hot_x != 0xffffffff &&
--                         cursor->hot_y != 0xffffffff);
--        dpy_gl_cursor_dmabuf(dpy->con, &cursor->buf, have_hot,
--                             cursor->hot_x, cursor->hot_y);
--        cursor->hot_updates = 0;
--    } else if (!cursor && new_cursor) {
--        dpy_gl_cursor_dmabuf(dpy->con, NULL, false, 0, 0);
--    }
-+    if (!dpy->event_flags ||
-+        (dpy->event_flags & VFIO_IRQ_EVENT_CURSOR_PLANE_FLIP)) {
-+        cursor = vfio_display_get_dmabuf(vdev, DRM_PLANE_TYPE_CURSOR);
-+        if (dpy->dmabuf.cursor != cursor) {
-+            dpy->dmabuf.cursor = cursor;
-+            new_cursor = true;
-+            free_bufs = true;
-+        }
-+
-+        if (cursor && (new_cursor || cursor->hot_updates)) {
-+            bool have_hot = (cursor->hot_x != 0xffffffff &&
-+                             cursor->hot_y != 0xffffffff);
-+            dpy_gl_cursor_dmabuf(dpy->con, &cursor->buf, have_hot,
-+                                 cursor->hot_x, cursor->hot_y);
-+            cursor->hot_updates = 0;
-+        } else if (!cursor && new_cursor) {
-+            dpy_gl_cursor_dmabuf(dpy->con, NULL, false, 0, 0);
-+        }
- 
--    if (cursor && cursor->pos_updates) {
--        dpy_gl_cursor_position(dpy->con,
--                               cursor->pos_x,
--                               cursor->pos_y);
--        cursor->pos_updates = 0;
-+        if (cursor && cursor->pos_updates) {
-+            dpy_gl_cursor_position(dpy->con,
-+                                   cursor->pos_x,
-+                                   cursor->pos_y);
-+            cursor->pos_updates = 0;
-+        }
-     }
- 
-     dpy_gl_update(dpy->con, 0, 0, primary->buf.width, primary->buf.height);
-@@ -340,6 +350,7 @@ static const GraphicHwOps vfio_display_dmabuf_ops = {
-     .ui_info    = vfio_display_edid_ui_info,
- };
- 
-+static int vfio_register_display_notifier(VFIOPCIDevice *vdev);
- static int vfio_display_dmabuf_init(VFIOPCIDevice *vdev, Error **errp)
- {
-     if (!display_opengl) {
-@@ -355,6 +366,8 @@ static int vfio_display_dmabuf_init(VFIOPCIDevice *vdev, Error **errp)
-         vdev->dpy->ramfb = ramfb_setup(DEVICE(vdev), errp);
-     }
-     vfio_display_edid_init(vdev);
-+    vfio_register_display_notifier(vdev);
-+
-     return 0;
- }
- 
-@@ -495,6 +508,177 @@ static void vfio_display_region_exit(VFIODisplay *dpy)
- 
- /* ---------------------------------------------------------------------- */
- 
-+static void primary_plane_update(void *opaque)
-+{
-+    VFIOPCIDevice *vdev = opaque;
-+    VFIODisplay *dpy = vdev->dpy;
-+
-+    if (!event_notifier_test_and_clear(&dpy->pri_event_notifier)) {
-+        return;
-+    }
-+
-+    dpy->event_flags |= VFIO_IRQ_EVENT_PRIMRAY_PLANE_FLIP;
-+    graphic_hw_refresh(dpy->con);
-+    dpy->event_flags &= ~VFIO_IRQ_EVENT_PRIMRAY_PLANE_FLIP;
-+}
-+
-+static void cursor_plane_update(void *opaque)
-+{
-+    VFIOPCIDevice *vdev = opaque;
-+    VFIODisplay *dpy = vdev->dpy;
-+    static int times;
-+
-+    if (!event_notifier_test_and_clear(&dpy->cur_event_notifier)) {
-+        return;
-+    }
-+
-+    /* Have to skip some cursor events due to performance impact */
-+    if (times++ / 2) {
-+        times = 0;
-+        dpy->event_flags |= VFIO_IRQ_EVENT_CURSOR_PLANE_FLIP;
-+        graphic_hw_refresh(dpy->con);
-+        dpy->event_flags &= ~VFIO_IRQ_EVENT_CURSOR_PLANE_FLIP;
-+    }
-+}
-+
-+static int register_display_notifier(VFIOPCIDevice *vdev,
-+                                     uint32_t type, uint32_t subtype,
-+                                     EventNotifier *notifier,
-+                                     void (*handler)(void *opaque))
-+{
-+    struct vfio_irq_info *irq;
-+    struct vfio_irq_set *irq_set;
-+    int argsz;
-+    int32_t *pfd;
-+    int ret;
-+
-+    ret = vfio_get_dev_irq_info(&vdev->vbasedev,
-+                                type,
-+                                subtype,
-+                                &irq);
-+    if (ret) {
-+        goto out;
-+    }
-+
-+    ret = event_notifier_init(notifier, 0);
-+    if (ret) {
-+        error_report("vfio: Unable to init event notifier for device request");
-+        goto out;
-+    }
-+
-+    argsz = sizeof(*irq_set) + sizeof(*pfd);
-+
-+    irq_set = g_malloc0(argsz);
-+    irq_set->argsz = argsz;
-+    irq_set->flags = VFIO_IRQ_SET_DATA_EVENTFD |
-+                     VFIO_IRQ_SET_ACTION_TRIGGER;
-+    irq_set->index = irq->index;
-+    irq_set->start = 0;
-+    irq_set->count = 1;
-+    pfd = (int32_t *)&irq_set->data;
-+
-+    *pfd = event_notifier_get_fd(notifier);
-+    qemu_set_fd_handler(*pfd, handler, NULL, vdev);
-+
-+    ret = ioctl(vdev->vbasedev.fd, VFIO_DEVICE_SET_IRQS, irq_set);
-+    if (ret) {
-+        error_report("vfio: Failed to set up device request notification");
-+        qemu_set_fd_handler(*pfd, NULL, NULL, vdev);
-+        event_notifier_cleanup(notifier);
-+    }
-+
-+    g_free(irq_set);
-+
-+out:
-+    return ret;
-+}
-+
-+static int vfio_register_display_notifier(VFIOPCIDevice *vdev)
-+{
-+    VFIODisplay *dpy = vdev->dpy;
-+    int ret;
-+
-+    ret = register_display_notifier(vdev, VFIO_IRQ_TYPE_GFX,
-+                                    VFIO_IRQ_SUBTYPE_GFX_PRI_PLANE_FLIP,
-+                                    &dpy->pri_event_notifier,
-+                                    primary_plane_update);
-+
-+    if (ret) {
-+        goto out;
-+    }
-+
-+    ret = register_display_notifier(vdev, VFIO_IRQ_TYPE_GFX,
-+                                   VFIO_IRQ_SUBTYPE_GFX_CUR_PLANE_FLIP,
-+                                   &dpy->cur_event_notifier,
-+                                   cursor_plane_update);
-+out:
-+    if (ret) {
-+        dpy->event_flags = 0;
-+    } else {
-+        dpy->event_flags = VFIO_IRQ_EVENT_ENABLE;
-+    }
-+
-+    return ret;
-+}
-+
-+static void unregister_display_notifier(VFIOPCIDevice *vdev,
-+                                       uint32_t type, uint32_t subtype,
-+                                       EventNotifier *notifier)
-+{
-+    VFIODisplay *dpy = vdev->dpy;
-+    int argsz;
-+    struct vfio_irq_info *irq;
-+    struct vfio_irq_set *irq_set;
-+    int32_t *pfd;
-+    int ret;
-+
-+    if (!dpy->event_flags) {
-+        return;
-+    }
-+
-+    ret = vfio_get_dev_irq_info(&vdev->vbasedev,
-+                                type,
-+                                subtype,
-+                                &irq);
-+    if (ret) {
-+        return ;
-+    }
-+
-+    argsz = sizeof(*irq_set) + sizeof(*pfd);
-+
-+    irq_set = g_malloc0(argsz);
-+    irq_set->argsz = argsz;
-+    irq_set->flags = VFIO_IRQ_SET_DATA_EVENTFD |
-+                     VFIO_IRQ_SET_ACTION_TRIGGER;
-+    irq_set->index = irq->index;
-+    irq_set->start = 0;
-+    irq_set->count = 1;
-+    pfd = (int32_t *)&irq_set->data;
-+    *pfd = -1;
-+
-+    if (ioctl(vdev->vbasedev.fd, VFIO_DEVICE_SET_IRQS, irq_set)) {
-+        error_report("vfio: Failed to de-assign device request fd: %m");
-+    }
-+    g_free(irq_set);
-+    qemu_set_fd_handler(event_notifier_get_fd(notifier),
-+                        NULL, NULL, vdev);
-+    event_notifier_cleanup(notifier);
-+}
-+
-+static void vfio_unregister_display_notifier(VFIOPCIDevice *vdev)
-+{
-+    VFIODisplay *dpy = vdev->dpy;
-+
-+    unregister_display_notifier(vdev, VFIO_IRQ_TYPE_GFX,
-+                                VFIO_IRQ_SUBTYPE_GFX_PRI_PLANE_FLIP,
-+                                &dpy->pri_event_notifier);
-+
-+    unregister_display_notifier(vdev, VFIO_IRQ_TYPE_GFX,
-+                                VFIO_IRQ_SUBTYPE_GFX_CUR_PLANE_FLIP,
-+                                &dpy->cur_event_notifier);
-+    dpy->event_flags = false;
-+}
-+
- int vfio_display_probe(VFIOPCIDevice *vdev, Error **errp)
- {
-     struct vfio_device_gfx_plane_info probe;
-@@ -531,6 +715,7 @@ void vfio_display_finalize(VFIOPCIDevice *vdev)
-         return;
-     }
- 
-+    vfio_unregister_display_notifier(vdev);
-     graphic_console_close(vdev->dpy->con);
-     vfio_display_dmabuf_exit(vdev->dpy);
-     vfio_display_region_exit(vdev->dpy);
-diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
-index 5cab6a1b81..a3f03b20e8 100644
---- a/include/hw/vfio/vfio-common.h
-+++ b/include/hw/vfio/vfio-common.h
-@@ -27,6 +27,7 @@
- #include "qemu/notify.h"
- #include "ui/console.h"
- #include "hw/display/ramfb.h"
-+#include "qemu/event_notifier.h"
- #ifdef CONFIG_LINUX
- #include <linux/vfio.h>
- #endif
-@@ -145,6 +146,10 @@ typedef struct VFIODMABuf {
-     QTAILQ_ENTRY(VFIODMABuf) next;
- } VFIODMABuf;
- 
-+#define VFIO_IRQ_EVENT_ENABLE              (1 << 0)
-+#define VFIO_IRQ_EVENT_PRIMRAY_PLANE_FLIP  (1 << 1)
-+#define VFIO_IRQ_EVENT_CURSOR_PLANE_FLIP   (1 << 2)
-+
- typedef struct VFIODisplay {
-     QemuConsole *con;
-     RAMFBState *ramfb;
-@@ -152,6 +157,9 @@ typedef struct VFIODisplay {
-     struct vfio_region_gfx_edid *edid_regs;
-     uint8_t *edid_blob;
-     QEMUTimer *edid_link_timer;
-+    EventNotifier pri_event_notifier;
-+    EventNotifier cur_event_notifier;
-+    uint32_t event_flags;
-     struct {
-         VFIORegion buffer;
-         DisplaySurface *surface;
+On Tuesday 04 June 2019 02:31 PM, Greg Kurz wrote:
+> On Tue, 4 Jun 2019 11:59:13 +0530
+> Aravinda Prasad <aravinda@linux.vnet.ibm.com> wrote:
+> 
+>> On Monday 03 June 2019 07:30 PM, Greg Kurz wrote:
+>>> On Wed, 29 May 2019 11:10:40 +0530
+>>> Aravinda Prasad <aravinda@linux.vnet.ibm.com> wrote:
+>>>   
+>>>> Upon a machine check exception (MCE) in a guest address space,
+>>>> KVM causes a guest exit to enable QEMU to build and pass the
+>>>> error to the guest in the PAPR defined rtas error log format.
+>>>>
+>>>> This patch builds the rtas error log, copies it to the rtas_addr
+>>>> and then invokes the guest registered machine check handler. The
+>>>> handler in the guest takes suitable action(s) depending on the type
+>>>> and criticality of the error. For example, if an error is
+>>>> unrecoverable memory corruption in an application inside the
+>>>> guest, then the guest kernel sends a SIGBUS to the application.
+>>>> For recoverable errors, the guest performs recovery actions and
+>>>> logs the error.
+>>>>
+>>>> Signed-off-by: Aravinda Prasad <aravinda@linux.vnet.ibm.com>
+>>>> ---
+>>>>  hw/ppc/spapr.c         |    5 +
+>>>>  hw/ppc/spapr_events.c  |  236 ++++++++++++++++++++++++++++++++++++++++++++++++
+>>>>  include/hw/ppc/spapr.h |    4 +
+>>>>  3 files changed, 245 insertions(+)
+>>>>
+>>>> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+>>>> index 6b6c962..c97f6a6 100644
+>>>> --- a/hw/ppc/spapr.c
+>>>> +++ b/hw/ppc/spapr.c
+>>>> @@ -2910,6 +2910,11 @@ static void spapr_machine_init(MachineState *machine)
+>>>>          error_report("Could not get size of LPAR rtas '%s'", filename);
+>>>>          exit(1);
+>>>>      }
+>>>> +
+>>>> +    /* Resize blob to accommodate error log. */
+>>>> +    g_assert(spapr->rtas_size < RTAS_ERROR_LOG_OFFSET);  
+>>>
+>>> I don't see the point of this assertion... especially with the assignment
+>>> below.  
+>>
+>> It is required because we want to ensure that the rtas image size is
+>> less than RTAS_ERROR_LOG_OFFSET, or else we will overwrite the rtas
+>> image with rtas error when we hit machine check exception. But I think a
+>> comment in the code will help. Will add it.
+>>
+> 
+> I'd rather exit QEMU properly instead of aborting then. Also this is only
+> needed if the guest has a chance to use FWNMI, ie. the spapr cap is set.
+
+ok..
+
+> 
+>>
+>>>   
+>>>> +    spapr->rtas_size = RTAS_ERROR_LOG_MAX;  
+>>>
+>>> As requested by David, this should only be done when the spapr cap is set,
+>>> so that 4.0 machine types and older continue to use the current size.  
+>>
+>> Due to other issue of re-allocating the blob and as this is not that
+>> much space, we agreed to keep the size to RTAS_ERROR_LOG_MAX always.
+>>
+>> Link to the discussion on this:
+>> http://lists.nongnu.org/archive/html/qemu-ppc/2019-05/msg00275.html
+>>
+> 
+> Indeed, and in the next mail in that thread, David writes:
+> 
+>> No, that's not right.  It's impractical to change the allocation
+>> depending on whether fwnmi is currently active.  But you *can* (and
+>> should) base the allocation on whether fwnmi is *possible* - that is,
+>> the value of the spapr cap.
+> 
+> ie, allocate RTAS_ERROR_LOG_MAX when the spapr cap is set, allocate
+> the file size otherwise.
+
+Ah.. somehow this slipped off my mind...
+
+Regards,
+Aravinda
+
+> 
+>>>   
+>>>> +
+>>>>      spapr->rtas_blob = g_malloc(spapr->rtas_size);
+>>>>      if (load_image_size(filename, spapr->rtas_blob, spapr->rtas_size) < 0) {
+>>>>          error_report("Could not load LPAR rtas '%s'", filename);
+>>>> diff --git a/hw/ppc/spapr_events.c b/hw/ppc/spapr_events.c
+>>>> index a18446b..573c0b7 100644
+>>>> --- a/hw/ppc/spapr_events.c
+>>>> +++ b/hw/ppc/spapr_events.c
+>>>> @@ -212,6 +212,106 @@ struct hp_extended_log {
+>>>>      struct rtas_event_log_v6_hp hp;
+>>>>  } QEMU_PACKED;
+>>>>  
+>>>> +struct rtas_event_log_v6_mc {
+>>>> +#define RTAS_LOG_V6_SECTION_ID_MC                   0x4D43 /* MC */
+>>>> +    struct rtas_event_log_v6_section_header hdr;
+>>>> +    uint32_t fru_id;
+>>>> +    uint32_t proc_id;
+>>>> +    uint8_t error_type;
+>>>> +#define RTAS_LOG_V6_MC_TYPE_UE                           0
+>>>> +#define RTAS_LOG_V6_MC_TYPE_SLB                          1
+>>>> +#define RTAS_LOG_V6_MC_TYPE_ERAT                         2
+>>>> +#define RTAS_LOG_V6_MC_TYPE_TLB                          4
+>>>> +#define RTAS_LOG_V6_MC_TYPE_D_CACHE                      5
+>>>> +#define RTAS_LOG_V6_MC_TYPE_I_CACHE                      7
+>>>> +    uint8_t sub_err_type;
+>>>> +#define RTAS_LOG_V6_MC_UE_INDETERMINATE                  0
+>>>> +#define RTAS_LOG_V6_MC_UE_IFETCH                         1
+>>>> +#define RTAS_LOG_V6_MC_UE_PAGE_TABLE_WALK_IFETCH         2
+>>>> +#define RTAS_LOG_V6_MC_UE_LOAD_STORE                     3
+>>>> +#define RTAS_LOG_V6_MC_UE_PAGE_TABLE_WALK_LOAD_STORE     4
+>>>> +#define RTAS_LOG_V6_MC_SLB_PARITY                        0
+>>>> +#define RTAS_LOG_V6_MC_SLB_MULTIHIT                      1
+>>>> +#define RTAS_LOG_V6_MC_SLB_INDETERMINATE                 2
+>>>> +#define RTAS_LOG_V6_MC_ERAT_PARITY                       1
+>>>> +#define RTAS_LOG_V6_MC_ERAT_MULTIHIT                     2
+>>>> +#define RTAS_LOG_V6_MC_ERAT_INDETERMINATE                3
+>>>> +#define RTAS_LOG_V6_MC_TLB_PARITY                        1
+>>>> +#define RTAS_LOG_V6_MC_TLB_MULTIHIT                      2
+>>>> +#define RTAS_LOG_V6_MC_TLB_INDETERMINATE                 3
+>>>> +    uint8_t reserved_1[6];
+>>>> +    uint64_t effective_address;
+>>>> +    uint64_t logical_address;
+>>>> +} QEMU_PACKED;
+>>>> +
+>>>> +struct mc_extended_log {
+>>>> +    struct rtas_event_log_v6 v6hdr;
+>>>> +    struct rtas_event_log_v6_mc mc;
+>>>> +} QEMU_PACKED;
+>>>> +
+>>>> +struct MC_ierror_table {
+>>>> +    unsigned long srr1_mask;
+>>>> +    unsigned long srr1_value;
+>>>> +    bool nip_valid; /* nip is a valid indicator of faulting address */
+>>>> +    uint8_t error_type;
+>>>> +    uint8_t error_subtype;
+>>>> +    unsigned int initiator;
+>>>> +    unsigned int severity;
+>>>> +};
+>>>> +
+>>>> +static const struct MC_ierror_table mc_ierror_table[] = {
+>>>> +{ 0x00000000081c0000, 0x0000000000040000, true,
+>>>> +  RTAS_LOG_V6_MC_TYPE_UE, RTAS_LOG_V6_MC_UE_IFETCH,
+>>>> +  RTAS_LOG_INITIATOR_CPU, RTAS_LOG_SEVERITY_ERROR_SYNC, },
+>>>> +{ 0x00000000081c0000, 0x0000000000080000, true,
+>>>> +  RTAS_LOG_V6_MC_TYPE_SLB, RTAS_LOG_V6_MC_SLB_PARITY,
+>>>> +  RTAS_LOG_INITIATOR_CPU, RTAS_LOG_SEVERITY_ERROR_SYNC, },
+>>>> +{ 0x00000000081c0000, 0x00000000000c0000, true,
+>>>> +  RTAS_LOG_V6_MC_TYPE_SLB, RTAS_LOG_V6_MC_SLB_MULTIHIT,
+>>>> +  RTAS_LOG_INITIATOR_CPU, RTAS_LOG_SEVERITY_ERROR_SYNC, },
+>>>> +{ 0x00000000081c0000, 0x0000000000100000, true,
+>>>> +  RTAS_LOG_V6_MC_TYPE_ERAT, RTAS_LOG_V6_MC_ERAT_MULTIHIT,
+>>>> +  RTAS_LOG_INITIATOR_CPU, RTAS_LOG_SEVERITY_ERROR_SYNC, },
+>>>> +{ 0x00000000081c0000, 0x0000000000140000, true,
+>>>> +  RTAS_LOG_V6_MC_TYPE_TLB, RTAS_LOG_V6_MC_TLB_MULTIHIT,
+>>>> +  RTAS_LOG_INITIATOR_CPU, RTAS_LOG_SEVERITY_ERROR_SYNC, },
+>>>> +{ 0x00000000081c0000, 0x0000000000180000, true,
+>>>> +  RTAS_LOG_V6_MC_TYPE_UE, RTAS_LOG_V6_MC_UE_PAGE_TABLE_WALK_IFETCH,
+>>>> +  RTAS_LOG_INITIATOR_CPU, RTAS_LOG_SEVERITY_ERROR_SYNC, },
+>>>> +{ 0, 0, 0, 0, 0, 0 } };
+>>>> +
+>>>> +struct MC_derror_table {
+>>>> +    unsigned long dsisr_value;
+>>>> +    bool dar_valid; /* dar is a valid indicator of faulting address */
+>>>> +    uint8_t error_type;
+>>>> +    uint8_t error_subtype;
+>>>> +    unsigned int initiator;
+>>>> +    unsigned int severity;
+>>>> +};
+>>>> +
+>>>> +static const struct MC_derror_table mc_derror_table[] = {
+>>>> +{ 0x00008000, false,
+>>>> +  RTAS_LOG_V6_MC_TYPE_UE, RTAS_LOG_V6_MC_UE_LOAD_STORE,
+>>>> +  RTAS_LOG_INITIATOR_CPU, RTAS_LOG_SEVERITY_ERROR_SYNC, },
+>>>> +{ 0x00004000, true,
+>>>> +  RTAS_LOG_V6_MC_TYPE_UE, RTAS_LOG_V6_MC_UE_PAGE_TABLE_WALK_LOAD_STORE,
+>>>> +  RTAS_LOG_INITIATOR_CPU, RTAS_LOG_SEVERITY_ERROR_SYNC, },
+>>>> +{ 0x00000800, true,
+>>>> +  RTAS_LOG_V6_MC_TYPE_ERAT, RTAS_LOG_V6_MC_ERAT_MULTIHIT,
+>>>> +  RTAS_LOG_INITIATOR_CPU, RTAS_LOG_SEVERITY_ERROR_SYNC, },
+>>>> +{ 0x00000400, true,
+>>>> +  RTAS_LOG_V6_MC_TYPE_TLB, RTAS_LOG_V6_MC_TLB_MULTIHIT,
+>>>> +  RTAS_LOG_INITIATOR_CPU, RTAS_LOG_SEVERITY_ERROR_SYNC, },
+>>>> +{ 0x00000080, true,
+>>>> +  RTAS_LOG_V6_MC_TYPE_SLB, RTAS_LOG_V6_MC_SLB_MULTIHIT,  /* Before PARITY */
+>>>> +  RTAS_LOG_INITIATOR_CPU, RTAS_LOG_SEVERITY_ERROR_SYNC, },
+>>>> +{ 0x00000100, true,
+>>>> +  RTAS_LOG_V6_MC_TYPE_SLB, RTAS_LOG_V6_MC_SLB_PARITY,
+>>>> +  RTAS_LOG_INITIATOR_CPU, RTAS_LOG_SEVERITY_ERROR_SYNC, },
+>>>> +{ 0, false, 0, 0, 0, 0 } };
+>>>> +
+>>>> +#define SRR1_MC_LOADSTORE(srr1) ((srr1) & PPC_BIT(42))
+>>>> +
+>>>>  typedef enum EventClass {
+>>>>      EVENT_CLASS_INTERNAL_ERRORS     = 0,
+>>>>      EVENT_CLASS_EPOW                = 1,
+>>>> @@ -620,6 +720,138 @@ void spapr_hotplug_req_remove_by_count_indexed(SpaprDrcType drc_type,
+>>>>                              RTAS_LOG_V6_HP_ACTION_REMOVE, drc_type, &drc_id);
+>>>>  }
+>>>>  
+>>>> +static uint32_t spapr_mce_get_elog_type(PowerPCCPU *cpu, bool recovered,
+>>>> +                                        struct mc_extended_log *ext_elog)
+>>>> +{
+>>>> +    int i;
+>>>> +    CPUPPCState *env = &cpu->env;
+>>>> +    uint32_t summary;
+>>>> +    uint64_t dsisr = env->spr[SPR_DSISR];
+>>>> +
+>>>> +    summary = RTAS_LOG_VERSION_6 | RTAS_LOG_OPTIONAL_PART_PRESENT;
+>>>> +    if (recovered) {
+>>>> +        summary |= RTAS_LOG_DISPOSITION_FULLY_RECOVERED;
+>>>> +    } else {
+>>>> +        summary |= RTAS_LOG_DISPOSITION_NOT_RECOVERED;
+>>>> +    }
+>>>> +
+>>>> +    if (SRR1_MC_LOADSTORE(env->spr[SPR_SRR1])) {
+>>>> +        for (i = 0; mc_derror_table[i].dsisr_value; i++) {
+>>>> +            if (!(dsisr & mc_derror_table[i].dsisr_value)) {
+>>>> +                continue;
+>>>> +            }
+>>>> +
+>>>> +            ext_elog->mc.error_type = mc_derror_table[i].error_type;
+>>>> +            ext_elog->mc.sub_err_type = mc_derror_table[i].error_subtype;
+>>>> +            if (mc_derror_table[i].dar_valid) {
+>>>> +                ext_elog->mc.effective_address = cpu_to_be64(env->spr[SPR_DAR]);
+>>>> +            }
+>>>> +
+>>>> +            summary |= mc_derror_table[i].initiator
+>>>> +                        | mc_derror_table[i].severity;
+>>>> +
+>>>> +            return summary;
+>>>> +        }
+>>>> +    } else {
+>>>> +        for (i = 0; mc_ierror_table[i].srr1_mask; i++) {
+>>>> +            if ((env->spr[SPR_SRR1] & mc_ierror_table[i].srr1_mask) !=
+>>>> +                    mc_ierror_table[i].srr1_value) {
+>>>> +                continue;
+>>>> +            }
+>>>> +
+>>>> +            ext_elog->mc.error_type = mc_ierror_table[i].error_type;
+>>>> +            ext_elog->mc.sub_err_type = mc_ierror_table[i].error_subtype;
+>>>> +            if (mc_ierror_table[i].nip_valid) {
+>>>> +                ext_elog->mc.effective_address = cpu_to_be64(env->nip);
+>>>> +            }
+>>>> +
+>>>> +            summary |= mc_ierror_table[i].initiator
+>>>> +                        | mc_ierror_table[i].severity;
+>>>> +
+>>>> +            return summary;
+>>>> +        }
+>>>> +    }
+>>>> +
+>>>> +    summary |= RTAS_LOG_INITIATOR_CPU;
+>>>> +    return summary;
+>>>> +}
+>>>> +
+>>>> +static void spapr_mce_dispatch_elog(PowerPCCPU *cpu, bool recovered)
+>>>> +{
+>>>> +    SpaprMachineState *spapr = SPAPR_MACHINE(qdev_get_machine());
+>>>> +    CPUState *cs = CPU(cpu);
+>>>> +    uint64_t rtas_addr;
+>>>> +    CPUPPCState *env = &cpu->env;
+>>>> +    PowerPCCPUClass *pcc = POWERPC_CPU_GET_CLASS(cpu);
+>>>> +    target_ulong r3, msr = 0;
+>>>> +    struct rtas_error_log log;
+>>>> +    struct mc_extended_log *ext_elog;
+>>>> +    uint32_t summary;
+>>>> +
+>>>> +    /*
+>>>> +     * Properly set bits in MSR before we invoke the handler.
+>>>> +     * SRR0/1, DAR and DSISR are properly set by KVM
+>>>> +     */
+>>>> +    if (!(*pcc->interrupts_big_endian)(cpu)) {
+>>>> +        msr |= (1ULL << MSR_LE);
+>>>> +    }
+>>>> +
+>>>> +    if (env->msr & (1ULL << MSR_SF)) {
+>>>> +        msr |= (1ULL << MSR_SF);
+>>>> +    }
+>>>> +
+>>>> +    msr |= (1ULL << MSR_ME);
+>>>> +
+>>>> +    if (spapr->guest_machine_check_addr == -1) {
+>>>> +        /*
+>>>> +         * This implies that we have hit a machine check between system
+>>>> +         * reset and "ibm,nmi-register". Fall back to the old machine
+>>>> +         * check behavior in such cases.
+>>>> +         */
+>>>> +        env->spr[SPR_SRR0] = env->nip;
+>>>> +        env->spr[SPR_SRR1] = env->msr;
+>>>> +        env->msr = msr;
+>>>> +        env->nip = 0x200;
+>>>> +        return;
+>>>> +    }
+>>>> +
+>>>> +    ext_elog = g_malloc0(sizeof(*ext_elog));
+>>>> +    summary = spapr_mce_get_elog_type(cpu, recovered, ext_elog);
+>>>> +
+>>>> +    log.summary = cpu_to_be32(summary);
+>>>> +    log.extended_length = cpu_to_be32(sizeof(*ext_elog));
+>>>> +
+>>>> +    /* r3 should be in BE always */
+>>>> +    r3 = cpu_to_be64(env->gpr[3]);
+>>>> +    env->msr = msr;
+>>>> +
+>>>> +    spapr_init_v6hdr(&ext_elog->v6hdr);
+>>>> +    ext_elog->mc.hdr.section_id = cpu_to_be16(RTAS_LOG_V6_SECTION_ID_MC);
+>>>> +    ext_elog->mc.hdr.section_length =
+>>>> +                    cpu_to_be16(sizeof(struct rtas_event_log_v6_mc));
+>>>> +    ext_elog->mc.hdr.section_version = 1;
+>>>> +
+>>>> +    /* get rtas addr from fdt */
+>>>> +    rtas_addr = spapr_get_rtas_addr();
+>>>> +    if (!rtas_addr) {
+>>>> +        /* Unable to fetch rtas_addr. Hence reset the guest */
+>>>> +        ppc_cpu_do_system_reset(cs);
+>>>> +    }
+>>>> +
+>>>> +    cpu_physical_memory_write(rtas_addr + RTAS_ERROR_LOG_OFFSET, &r3,
+>>>> +                              sizeof(r3));
+>>>> +    cpu_physical_memory_write(rtas_addr + RTAS_ERROR_LOG_OFFSET + sizeof(r3),
+>>>> +                              &log, sizeof(log));
+>>>> +    cpu_physical_memory_write(rtas_addr + RTAS_ERROR_LOG_OFFSET + sizeof(r3) +
+>>>> +                              sizeof(log), ext_elog,
+>>>> +                              sizeof(*ext_elog));
+>>>> +
+>>>> +    env->gpr[3] = rtas_addr + RTAS_ERROR_LOG_OFFSET;
+>>>> +    env->nip = spapr->guest_machine_check_addr;
+>>>> +
+>>>> +    g_free(ext_elog);
+>>>> +}
+>>>> +
+>>>>  void spapr_mce_req_event(PowerPCCPU *cpu, bool recovered)
+>>>>  {
+>>>>      SpaprMachineState *spapr = SPAPR_MACHINE(qdev_get_machine());
+>>>> @@ -641,6 +873,10 @@ void spapr_mce_req_event(PowerPCCPU *cpu, bool recovered)
+>>>>          }
+>>>>      }
+>>>>      spapr->mc_status = cpu->vcpu_id;
+>>>> +
+>>>> +    spapr_mce_dispatch_elog(cpu, recovered);
+>>>> +
+>>>> +    return;  
+>>>
+>>> Drop the last two lines.  
+>>
+>> ok.
+>>
+>>>   
+>>>>  }
+>>>>  
+>>>>  static void check_exception(PowerPCCPU *cpu, SpaprMachineState *spapr,
+>>>> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+>>>> index fc3a776..c717ab2 100644
+>>>> --- a/include/hw/ppc/spapr.h
+>>>> +++ b/include/hw/ppc/spapr.h
+>>>> @@ -710,6 +710,9 @@ void spapr_load_rtas(SpaprMachineState *spapr, void *fdt, hwaddr addr);
+>>>>  
+>>>>  #define RTAS_ERROR_LOG_MAX      2048
+>>>>  
+>>>> +/* Offset from rtas-base where error log is placed */
+>>>> +#define RTAS_ERROR_LOG_OFFSET       0x30
+>>>> +
+>>>>  #define RTAS_EVENT_SCAN_RATE    1
+>>>>  
+>>>>  /* This helper should be used to encode interrupt specifiers when the related
+>>>> @@ -799,6 +802,7 @@ int spapr_max_server_number(SpaprMachineState *spapr);
+>>>>  void spapr_store_hpte(PowerPCCPU *cpu, hwaddr ptex,
+>>>>                        uint64_t pte0, uint64_t pte1);
+>>>>  void spapr_mce_req_event(PowerPCCPU *cpu, bool recovered);
+>>>> +ssize_t spapr_get_rtas_size(ssize_t old_rtas_sizea);
+>>>>    
+>>>
+>>> Looks like a leftover.  
+>>
+>> ah.. yes.
+>>
+>>>   
+>>>>  /* DRC callbacks. */
+>>>>  void spapr_core_release(DeviceState *dev);
+>>>>  
+>>>   
+>>
+> 
+> 
+
 -- 
-2.17.1
+Regards,
+Aravinda
 
 
