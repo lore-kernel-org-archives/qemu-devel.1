@@ -6,47 +6,48 @@ X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AE190C282CE
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 07:26:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 41B68C282CE
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 07:32:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 86EEA24AEC
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 07:26:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 86EEA24AEC
+	by mail.kernel.org (Postfix) with ESMTPS id 06DC224708
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 07:32:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 06DC224708
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:47317 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:47379 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hY3qH-0007lQ-OU
-	for qemu-devel@archiver.kernel.org; Tue, 04 Jun 2019 03:26:45 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:43640)
+	id 1hY3vg-0000eR-P6
+	for qemu-devel@archiver.kernel.org; Tue, 04 Jun 2019 03:32:20 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:45028)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hY3pO-0007JI-Nf
-	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 03:25:51 -0400
+	(envelope-from <david@redhat.com>) id 1hY3uq-0000I7-VK
+	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 03:31:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hY3pN-0000Eh-OG
-	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 03:25:50 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33178)
+	(envelope-from <david@redhat.com>) id 1hY3up-0006to-K0
+	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 03:31:28 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43760)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <david@redhat.com>)
-	id 1hY3pN-0000Ax-Gc; Tue, 04 Jun 2019 03:25:49 -0400
+	id 1hY3un-0006m0-RN; Tue, 04 Jun 2019 03:31:27 -0400
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
 	[10.5.11.14])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 08CD022387A;
-	Tue,  4 Jun 2019 07:25:48 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id AF5FD19CF7B;
+	Tue,  4 Jun 2019 07:31:23 +0000 (UTC)
 Received: from [10.36.117.37] (ovpn-117-37.ams2.redhat.com [10.36.117.37])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id F3A285DD6D;
-	Tue,  4 Jun 2019 07:25:46 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 95C3717D94;
+	Tue,  4 Jun 2019 07:31:19 +0000 (UTC)
 From: David Hildenbrand <david@redhat.com>
 To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
 	Richard Henderson <richard.henderson@linaro.org>,
 	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
 	qemu-s390x <qemu-s390x@nongnu.org>
 References: <65b0acd5-e919-73a3-e313-cb01da12afb4@redhat.com>
+	<78b8e397-8bf3-ac52-02f5-dba79372480f@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
 	xsFNBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
@@ -92,19 +93,19 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
 	+8Umfre0Xt4713VxMygW0PnQt5aSQdMD58jHFxTk092mU+yIHj5LeYgvwSgZN4airXk5yRXl
 	SE+xAvmumFBY
 Organization: Red Hat GmbH
-Message-ID: <78b8e397-8bf3-ac52-02f5-dba79372480f@redhat.com>
-Date: Tue, 4 Jun 2019 09:25:46 +0200
+Message-ID: <ae439814-4ed1-eb40-7a44-cea1a566a850@redhat.com>
+Date: Tue, 4 Jun 2019 09:31:18 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <65b0acd5-e919-73a3-e313-cb01da12afb4@redhat.com>
+In-Reply-To: <78b8e397-8bf3-ac52-02f5-dba79372480f@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.39]);
-	Tue, 04 Jun 2019 07:25:48 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.29]);
+	Tue, 04 Jun 2019 07:31:23 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
 Subject: Re: [Qemu-devel] "make run-tcg-tests-s390x-linux-user" not working
@@ -124,45 +125,52 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 04.06.19 09:17, David Hildenbrand wrote:
-> Hi,
+On 04.06.19 09:25, David Hildenbrand wrote:
+> On 04.06.19 09:17, David Hildenbrand wrote:
+>> Hi,
+>>
+>> for now I was able to run TCG tests using "make
+>> run-tcg-tests-s390x-linux-user". Lately, trying to run the tests always
+>> results in
+>>
+>> t460s: ~/git/qemu vx $ LANG=C make run-tcg-tests-s390x-linux-user
+>> make[1]: Entering directory '/home/dhildenb/git/qemu/slirp'
+>> make[1]: Nothing to be done for 'all'.
+>> make[1]: Leaving directory '/home/dhildenb/git/qemu/slirp'
+>>         CHK version_gen.h
+>>   BUILD   TCG tests for s390x-linux-user
+>>   BUILD   s390x guest-tests SKIPPED
+>>   RUN     TCG tests for s390x-linux-user
+>>   RUN     tests for s390x SKIPPED
+>>
+>> t460s: ~/git/qemu vx $ LANG=C make check-tcg
+>> make[1]: Entering directory '/home/dhildenb/git/qemu/slirp'
+>> make[1]: Nothing to be done for 'all'.
+>> make[1]: Leaving directory '/home/dhildenb/git/qemu/slirp'
+>>         CHK version_gen.h
+>>   BUILD   TCG tests for s390x-softmmu
+>>   BUILD   s390x guest-tests SKIPPED
+>>   RUN     TCG tests for s390x-softmmu
+>>   RUN     tests for s390x SKIPPED
+>>   BUILD   TCG tests for s390x-linux-user
+>>   BUILD   s390x guest-tests SKIPPED
+>>   RUN     TCG tests for s390x-linux-user
+>>   RUN     tests for s390x SKIPPED
+>>
+>> I am using "./configure --target-list=s390x-softmmu,s390x-linux-user
+>> --enable-sdl --enable-spice --enable-kvm"
+>>
+>> What am I missing? Why is the build skipped?
+>>
 > 
-> for now I was able to run TCG tests using "make
-> run-tcg-tests-s390x-linux-user". Lately, trying to run the tests always
-> results in
-> 
-> t460s: ~/git/qemu vx $ LANG=C make run-tcg-tests-s390x-linux-user
-> make[1]: Entering directory '/home/dhildenb/git/qemu/slirp'
-> make[1]: Nothing to be done for 'all'.
-> make[1]: Leaving directory '/home/dhildenb/git/qemu/slirp'
->         CHK version_gen.h
->   BUILD   TCG tests for s390x-linux-user
->   BUILD   s390x guest-tests SKIPPED
->   RUN     TCG tests for s390x-linux-user
->   RUN     tests for s390x SKIPPED
-> 
-> t460s: ~/git/qemu vx $ LANG=C make check-tcg
-> make[1]: Entering directory '/home/dhildenb/git/qemu/slirp'
-> make[1]: Nothing to be done for 'all'.
-> make[1]: Leaving directory '/home/dhildenb/git/qemu/slirp'
->         CHK version_gen.h
->   BUILD   TCG tests for s390x-softmmu
->   BUILD   s390x guest-tests SKIPPED
->   RUN     TCG tests for s390x-softmmu
->   RUN     tests for s390x SKIPPED
->   BUILD   TCG tests for s390x-linux-user
->   BUILD   s390x guest-tests SKIPPED
->   RUN     TCG tests for s390x-linux-user
->   RUN     tests for s390x SKIPPED
-> 
-> I am using "./configure --target-list=s390x-softmmu,s390x-linux-user
-> --enable-sdl --enable-spice --enable-kvm"
-> 
-> What am I missing? Why is the build skipped?
+> BTW, docker seems to be working fine, just tried with "make
+> docker-test-build@debian-armhf-cross J=n"
 > 
 
-BTW, docker seems to be working fine, just tried with "make
-docker-test-build@debian-armhf-cross J=n"
+Turns out I had to rerun ./configure (it didn't include HAVE_USER_DOCKER
+for some reason).
+
+Sorry for the noise :)
 
 -- 
 
