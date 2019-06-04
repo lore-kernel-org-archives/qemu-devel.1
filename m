@@ -6,57 +6,58 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E65B2C282CE
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 19:29:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3247DC282CE
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 19:30:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B8B9C2075B
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 19:29:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B8B9C2075B
+	by mail.kernel.org (Postfix) with ESMTPS id 0D7682075B
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 19:30:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0D7682075B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:56934 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:56938 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hYF7n-0003XL-IP
-	for qemu-devel@archiver.kernel.org; Tue, 04 Jun 2019 15:29:35 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:49727)
+	id 1hYF8S-0004Cr-Ag
+	for qemu-devel@archiver.kernel.org; Tue, 04 Jun 2019 15:30:16 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:49816)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1hYF6p-0003D1-Ez
-	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 15:28:36 -0400
+	(envelope-from <alex.williamson@redhat.com>) id 1hYF7H-0003QV-HW
+	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 15:29:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1hYF6o-00078y-Hz
-	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 15:28:35 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60418)
+	(envelope-from <alex.williamson@redhat.com>) id 1hYF7F-0000PB-Hu
+	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 15:29:03 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37088)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1hYF6o-0006Qm-Br
-	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 15:28:34 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
+	id 1hYF7D-0000FN-HD
+	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 15:29:00 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 02A294ACDF;
-	Tue,  4 Jun 2019 19:28:20 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 19B35307D963
+	for <qemu-devel@nongnu.org>; Tue,  4 Jun 2019 19:28:56 +0000 (UTC)
 Received: from gimli.home (ovpn-116-22.phx2.redhat.com [10.3.116.22])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 9E84A60FD5;
-	Tue,  4 Jun 2019 19:28:16 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id D40E65D9CC;
+	Tue,  4 Jun 2019 19:28:53 +0000 (UTC)
 From: Alex Williamson <alex.williamson@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Tue, 04 Jun 2019 13:28:16 -0600
-Message-ID: <155967644964.13849.2755992114077073414.stgit@gimli.home>
+Date: Tue, 04 Jun 2019 13:28:53 -0600
+Message-ID: <155967651268.13907.5906121092622267460.stgit@gimli.home>
 User-Agent: StGit/0.19-dirty
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.38]);
-	Tue, 04 Jun 2019 19:28:25 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.48]);
+	Tue, 04 Jun 2019 19:28:58 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH] vfio/pci: Hide Resizable BAR capability
+Subject: [Qemu-devel] [PATCH] vfio/pci: Allow MSI-X relocation to fixup
+ bogus PBA
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -68,41 +69,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: alex.williamson@redhat.com, James Courtier-Dutton <james.dutton@gmail.com>
+Cc: alex.williamson@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The resizable BAR capability is currently exposed read-only from the
-kernel and we don't yet implement a protocol for virtualizing it to
-the VM.  Exposing it to the guest read-only introduces poor behavior
-as the guest has no reason to test that a control register write is
-accepted by the hardware.  This can lead to cases where the guest OS
-assumes the BAR has been resized, but it hasn't.  This has been
-observed when assigning AMD Vega GPUs.
+The MSI-X relocation code can sometimes be used to work around bogus
+MSI-X capabilities, but this test for whether the PBA is outside of
+the specified BAR causes the device to error before we can apply a
+relocation.  Let it proceed if we intend to relocate MSI-X anyway.
 
-Note, this does not preclude future enablement of resizable BARs, but
-it's currently incorrect to expose this capability as read-only, so
-better to not expose it at all.
-
-Reported-by: James Courtier-Dutton <james.dutton@gmail.com>
-Tested-by: James Courtier-Dutton <james.dutton@gmail.com>
 Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
 ---
- hw/vfio/pci.c |    1 +
- 1 file changed, 1 insertion(+)
+ hw/vfio/pci.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-index 8e555db12ec0..948e7aac5b0b 100644
+index 948e7aac5b0b..8a10bd310065 100644
 --- a/hw/vfio/pci.c
 +++ b/hw/vfio/pci.c
-@@ -2118,6 +2118,7 @@ static void vfio_add_ext_cap(VFIOPCIDevice *vdev)
-         case 0: /* kernel masked capability */
-         case PCI_EXT_CAP_ID_SRIOV: /* Read-only VF BARs confuse OVMF */
-         case PCI_EXT_CAP_ID_ARI: /* XXX Needs next function virtualization */
-+        case PCI_EXT_CAP_ID_REBAR: /* Can't expose read-only */
-             trace_vfio_add_ext_cap_dropped(vdev->vbasedev.name, cap_id, next);
-             break;
-         default:
+@@ -1532,7 +1532,7 @@ static void vfio_msix_early_setup(VFIOPCIDevice *vdev, Error **errp)
+         if (vdev->vendor_id == PCI_VENDOR_ID_CHELSIO &&
+             (vdev->device_id & 0xff00) == 0x5800) {
+             msix->pba_offset = 0x1000;
+-        } else {
++        } else if (vdev->msix_relo == OFF_AUTOPCIBAR_OFF) {
+             error_setg(errp, "hardware reports invalid configuration, "
+                        "MSIX PBA outside of specified BAR");
+             g_free(msix);
 
 
