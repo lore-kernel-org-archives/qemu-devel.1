@@ -2,109 +2,113 @@ Return-Path: <SRS0=GUf1=UD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 56D5DC282CE
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 12:44:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C09E9C282CE
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 12:55:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D79DA24C0B
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 12:44:13 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="OewkWCgi"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D79DA24C0B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id 893DE23A79
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 12:55:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 893DE23A79
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:51794 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:51939 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hY8nV-00058M-5N
-	for qemu-devel@archiver.kernel.org; Tue, 04 Jun 2019 08:44:13 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:40069)
+	id 1hY8yr-0007rL-Jn
+	for qemu-devel@archiver.kernel.org; Tue, 04 Jun 2019 08:55:57 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:42887)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hY8mY-0004ee-2P
-	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 08:43:15 -0400
+	(envelope-from <laurent@vivier.eu>) id 1hY8xx-0007Sp-Fa
+	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 08:55:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hY8mW-0006D8-Vz
-	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 08:43:14 -0400
-Received: from mail-eopbgr130138.outbound.protection.outlook.com
-	([40.107.13.138]:64899
-	helo=EUR01-HE1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1hY8mT-00068q-PH; Tue, 04 Jun 2019 08:43:10 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
-	s=selector1;
-	h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
-	bh=p0yQYzm53Bi4Xozsg493LTXgJtkN61Cjx9PxKuQbsWY=;
-	b=OewkWCginKeRaR2omM6M8qhcmKb+6l8jmA3y/nEzGfflJ8FaXdI4v++7/Nt0YKN3FTz5wjst1o03EYYE93y4PrFPSZm80IptuyiaqlErDssLSBM/z4o3AFx1tWAFpXIgh4s3UpjaDe0G3hux0pSDcvu/zytFYZ/KHuDkjrvbqRw=
-Received: from AM0PR08MB2961.eurprd08.prod.outlook.com (52.134.126.11) by
-	AM0PR08MB3011.eurprd08.prod.outlook.com (52.134.92.160) with Microsoft
-	SMTP
-	Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
-	15.20.1943.22; Tue, 4 Jun 2019 12:42:51 +0000
-Received: from AM0PR08MB2961.eurprd08.prod.outlook.com
-	([fe80::8d90:32ae:bdd6:48e8]) by
-	AM0PR08MB2961.eurprd08.prod.outlook.com
-	([fe80::8d90:32ae:bdd6:48e8%7]) with mapi id 15.20.1965.011;
-	Tue, 4 Jun 2019 12:42:51 +0000
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org"
-	<qemu-block@nongnu.org>
-Thread-Topic: ping Re: [PATCH v6 0/7] NBD reconnect
-Thread-Index: AQHU8IvOCpyInqV0y0qAbRG9faO+L6aLxO8A
-Date: Tue, 4 Jun 2019 12:42:51 +0000
-Message-ID: <90495089-7d05-e127-837f-4207d802231d@virtuozzo.com>
-References: <20190411172709.205032-1-vsementsov@virtuozzo.com>
-In-Reply-To: <20190411172709.205032-1-vsementsov@virtuozzo.com>
-Accept-Language: ru-RU, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: HE1PR06CA0135.eurprd06.prod.outlook.com
-	(2603:10a6:7:16::22) To AM0PR08MB2961.eurprd08.prod.outlook.com
-	(2603:10a6:208:66::11)
-authentication-results: spf=none (sender IP is )
-	smtp.mailfrom=vsementsov@virtuozzo.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-tagtoolbar-keys: D20190604154248789
-x-originating-ip: [185.231.240.5]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: cdf8ad12-dde5-44c1-8189-08d6e8ea27df
-x-microsoft-antispam: BCL:0; PCL:0;
-	RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(2017052603328)(7193020);
-	SRVR:AM0PR08MB3011; 
-x-ms-traffictypediagnostic: AM0PR08MB3011:
-x-microsoft-antispam-prvs: <AM0PR08MB30112E22828A1C2FC725521BC1150@AM0PR08MB3011.eurprd08.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:1923;
-x-forefront-prvs: 0058ABBBC7
-x-forefront-antispam-report: SFV:NSPM;
-	SFS:(10019020)(376002)(366004)(136003)(346002)(39850400004)(396003)(189003)(199004)(76176011)(73956011)(86362001)(14444005)(256004)(81156014)(31686004)(305945005)(81166006)(66556008)(102836004)(66476007)(8676002)(107886003)(25786009)(71190400001)(68736007)(6506007)(386003)(5024004)(64756008)(71200400001)(186003)(36756003)(31696002)(26005)(2501003)(478600001)(66446008)(8936002)(99286004)(66946007)(316002)(446003)(14454004)(7736002)(66066001)(53936002)(6486002)(2906002)(4326008)(3846002)(476003)(6436002)(11346002)(54906003)(6116002)(2616005)(6512007)(52116002)(5660300002)(110136005)(486006);
-	DIR:OUT; SFP:1102; SCL:1; SRVR:AM0PR08MB3011;
-	H:AM0PR08MB2961.eurprd08.prod.outlook.com; FPR:; SPF:None;
-	LANG:en; PTR:InfoNoRecords; MX:1; A:1; 
-received-spf: None (protection.outlook.com: virtuozzo.com does not designate
-	permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: zKNip792OIi2d0v6YJ/MWErh0uc9secYOjM9K6rbFwIaVaEJZ/RbHGxXXxuP+xx1sLgPuzec2mYt79DKrM5w/85Lg5XYpQdE+El85M/0UDx7kJbjBIx7zlVeWIaEo2WLFiOSSJZtjUbx8akqMq/XdxIBbJJwFdfIQL4JVa5cdeYpJdpcWIEjvmhvLP4TDlRWworfBEQsE9AuuHkfR1WP4VtU6aLj4RxD8aJ0e8M5zU9lue+aEtMzG0BTbtoVQegCImB4VneWsGH5+zvSLO2CIHlXBFalS9aFzxPKOCYL/295hd/LuH9t57y+cwYyPOk38xxrQOJivPSQ/ZIgQ4kfqOf7R579FNv/I3xo6cnyZjePQyEuHYT9PZUh5aS+CAn+5vhTbVAVZt7gzvpVKecp7WhokTIBt6Uok/7TRZMq2mw=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <6DCC5167D50F084F91076FB2583AD284@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <laurent@vivier.eu>) id 1hY8xv-0002WN-UT
+	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 08:55:01 -0400
+Received: from mout.kundenserver.de ([212.227.126.133]:56243)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>)
+	id 1hY8xv-0002TL-Jh; Tue, 04 Jun 2019 08:54:59 -0400
+Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
+	(mreue012 [213.165.67.103]) with ESMTPSA (Nemesis) id
+	1N5UoU-1gVqF812jK-016uXx; Tue, 04 Jun 2019 14:54:16 +0200
+To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
+References: <20190604093656.23565-1-david@redhat.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Openpgp: preference=signencrypt
+Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
+	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
+Message-ID: <a813de86-33eb-b22e-8d06-054e85e4f074@vivier.eu>
+Date: Tue, 4 Jun 2019 14:54:13 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.7.0
 MIME-Version: 1.0
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: cdf8ad12-dde5-44c1-8189-08d6e8ea27df
-X-MS-Exchange-CrossTenant-originalarrivaltime: 04 Jun 2019 12:42:51.1332 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: vsementsov@virtuozzo.com
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR08MB3011
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.13.138
-Subject: [Qemu-devel] ping Re: [PATCH v6 0/7] NBD reconnect
+In-Reply-To: <20190604093656.23565-1-david@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:U+8TygqZj0tRMADMwaoEIj1EeR1RjTQYJ0pNmFXr2u4SoTJyjWw
+	nyeGfqhDzK9OvDoizbYyv9KFNDA9Wp6nQ+d2cQlTXr/eqFAsH8WVjnApWwpaWCVb0q1EB9l
+	BUmzVq6FivEysehfO2n2M7CH2399JWWHm+++Y1W7bnxswSKSGyN2fzzQvz/4+NeJPhNVCLX
+	Brepbe0JlaNW1BCDJ3IHA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:TNvlzzBS7gE=:nUiPm59sP7M3+CivyqTJZa
+	WZK8NxQ8vXnm0HySuOy0Dqhy7ShR1Y+k6Ig2Xdytb0GokP/OQYAGhEEzbsi/PcXdCsoCoX98g
+	u6LPBPPc5o5Ic3316VFpi2cd6L58ocD2vG4kepTbqwtp+xMbC0AW9ToJasGpsd11knYVqYe0n
+	581+1l7jmioVRb4vpG7Q2sTDpVJjuJgeEfRBihuxtNCe9Ei+9jePT2CKvOItX25SjJtjyR4dK
+	9BkVWZwrlXH77q4+W3fOlmce8T1WxyKiALW1HpOq/LlgCQl0RfUG0u0E5HZrGnpzn7JfrF9WH
+	ewIDDGyz4vY4fDHkxh/jdOj0l6S9o94DMtRawbgm/ecN9YokR0qtg5VnsmrJYicGX2qnlw7f4
+	GlUzz1Ure59KLvnfN6d56LG+jNC9B8KQSTiY4IdAIVoG+3Ro7R2UzQSpcF4JYpK6uLV/wOxO1
+	ExibTFk3KTzX9ETlkOrI1a/XaPYVTqyfqQSs39O9qtNh8Rh7nycl21Pl9GAR3v8Pe7yIfGzOz
+	bSqCVh/+gKYgPyy10PWSHatGCB60OONpWIrbMjLSRhXX8KMbRW5XxVtGKlzMvQZeJYv9E4XC3
+	DMNtek0FpoatRTHIowbEdqO+eP6tpJtPErbxxYAxpKAVyy3YnyirnrQdpdR2etuys97oOZlqU
+	bO0nDz/imGpyUEo2o5je3e7qjEfJ4PFkHDA62cNUQt5buXcrCm9Mz3Pk27otulChJcX7W7FsY
+	Sot6wWWjzR7Zc3QR7OBNtWd1hxjQqxEbWg07ds//8FDTSWWVl+ZPSuSC/Jg=
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 212.227.126.133
+Subject: Re: [Qemu-devel] [PATCH v1] linux-user: elf: ELF_HWCAP for s390x
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -116,67 +120,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "kwolf@redhat.com" <kwolf@redhat.com>, Denis Lunev <den@virtuozzo.com>,
-	"armbru@redhat.com" <armbru@redhat.com>,
-	"mreitz@redhat.com" <mreitz@redhat.com>,
-	"stefanha@redhat.com" <stefanha@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
+	Riku Voipio <riku.voipio@iki.fi>,
+	Richard Henderson <richard.henderson@linaro.org>,
+	qemu-s390x@nongnu.org, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-cGluZw0KDQoxMS4wNC4yMDE5IDIwOjI3LCBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IHdy
-b3RlOg0KPiBIZXJlIGlzIE5CRCByZWNvbm5lY3QuIFByZXZpb3VzbHksIGlmIGNvbm5lY3Rpb24g
-ZmFpbGVkIGFsbCBjdXJyZW50DQo+IGFuZCBmdXR1cmUgcmVxdWVzdHMgd2lsbCBmYWlsLiBBZnRl
-ciB0aGUgc2VyaWVzLCBuYmQtY2xpZW50IGRyaXZlcg0KPiB3aWxsIHRyeSB0byByZWNvbm5lY3Qg
-dW5saW1pdGVkIHRpbWVzLiBEdXJpbmcgZmlyc3QgQHJlY29ubmVjdC1kZWxheQ0KPiBzZWNvbmRz
-IG9mIHJlY29ubmVjdGluZyBhbGwgcmVxdWVzdHMgd2lsbCB3YWl0IGZvciB0aGUgY29ubmVjdGlv
-biwNCj4gYW5kIGlmIGl0IGlzIGVzdGFibGlzaGVkIHJlcXVlc3RzIHdpbGwgYmUgcmVzZW50LiBB
-ZnRlcg0KPiBAcmVjb25uZWN0LWRlbGF5IHBlcmlvZCBhbGwgcmVxdWVzdHMgd2lsbCBiZSBmYWls
-ZWQgKHVudGlsIHN1Y2Nlc3NmdWwNCj4gcmVjb25uZWN0KS4NCj4gDQo+IHY0LT52NjoNCj4gICAo
-c29tZSBwcmVwYXJpbmcgcGF0Y2hlcyBmcm9tIHY0IHdhcyBtZXJnZWQgYXMgdjUpDQo+IDAxOiBu
-ZXcNCj4gMDI6IG5ldw0KPiAwMzogLSBkcm9wIHVudXNlZCB0aGluZ3MNCj4gICAgICAgICAtIGZ1
-dHVyZSBzdGF0ZXMNCj4gICAgICAgICAtIGZ1dHVyZSBzL2JyZWFrL2NvbnRpbnVlLw0KPiAwNDog
-LSBmaXggdHlwb3MNCj4gICAgICAtIHMvMy4xLzQuMS8NCj4gICAgICAtIHNldCAwIGFzIGRlZmF1
-bHQNCj4gMDU6IG5ldw0KPiAwNjogLSBuZXcgc3RhdGVzIGFuZCBzL2JyZWFrL2NvbnRpbnVlLyBt
-b3ZlZCBoZXJlIGZyb20gMDMNCj4gICAgICAtIGRyb3AgTkJEQ2xpZW50U2Vzc2lvbi5yZWNlaXZp
-bmcsIGFzIG5vdyBpbl9mbGlnaHQNCj4gICAgICAgIHJlcXVlc3RzIHVzZWQgaW5zdHJlYWQNCj4g
-ICAgICAtIGFkZCBjb3B5cmlnaHQNCj4gICAgICAtIGdvIHRvIE5CRF9DTElFTlRfQ09OTkVDVElO
-R19OT1dBSVQgaW1tZWRpYXRlbHkgaWYNCj4gICAgICAgIHJlY29ubmVjdF9kZWxheSBpcyAwIChz
-bywgcmVjb25uZWN0X2RlbGF5IG1vdmVkIHRvDQo+ICAgICAgICBOQkRDbGllbnRTZXNzaW9uKQ0K
-PiAgICAgIC0gb24gY2xvc2UsIGRvIHFlbXVfY29fc2xlZXBfd2FrZShjbGllbnQtPmNvbm5lY3Rp
-b25fY28pLA0KPiAgICAgICAgdG8gbm90IHdhaXQgZm9yIHJlY29ubmVjdCBsb29wIGl0ZXJhdGlv
-bg0KPiAgICAgIC0gaGFuZGxlIHN0YXRlIHRyYW5zaXRpb24gdG8gUVVJVCBkdXJpbmcgcmVjb25u
-ZWN0IGxvb3ANCj4gICAgICAgIChhc3NlcnQobmJkX2NsaWVudF9jb25uZWN0aW5nKHMpKSB3YXMg
-YmFkIGlkZWEpDQo+ICAgICAgLSBkb24ndCB0cnkgdG8gZmFpbCBvbiBwcm90b2NvbCBlcnJvcnMg
-YWZ0ZXINCj4gICAgICAgIG5iZF9jbGllbnRfY29ubmVjdCwgYXMgd2UgY2FuJ3QgZGlzdGluZ3Vp
-c2ggdGhlbQ0KPiAgICAgIC0gZGVjcmVtZW50IGluX2ZsaWdodCBhcm91bmQgcmVjb25uZWN0IHNs
-ZWVwIHRvIG1ha2UNCj4gICAgICAgIGl0IHBvc3NpYmxlIHRvIGRyYWluIGFuZCBleGl0IGR1cmlu
-ZyBpdA0KPiAgICAgICAgKHY0IHdhcyBiYXNlZCBvbiBzb21ldGhpbmcgYmVmb3JlIGluX2ZsaWdo
-dCBsb2dpYw0KPiAgICAgICAgIGludHJvZHVjZWQgaW50byBuYmQtY2xpZW50KQ0KPiAgICAgIC0g
-Y2hhbmdlZCBsb2dpYyBpbiBuYmRfY2xpZW50X2F0dGFjaF9haW9fY29udGV4dA0KPiAwNzogLSBy
-ZWZhY3RvciwgdXNpbmcgbG9nIGFuZCBxbXBfbG9nDQo+ICAgICAgLSBkcm9wIGV4cG9ydCBuYW1l
-DQo+ICAgICAgLSBkcm9wIHN0cmFuZ2UgdHJ5L2V4Y2VwdA0KPiAgICAgIC0gYWRkIHJlY29ubmVj
-dC1kZWxheSBvcHRpb24gKGFzIDAgaXMgYSBkZWZhdWx0IG5vdykNCj4gDQo+IA0KPiBWbGFkaW1p
-ciBTZW1lbnRzb3YtT2dpZXZza2l5ICg3KToNCj4gICAgYmxvY2svbmJkLWNsaWVudDogc3BsaXQg
-Y29ubmVjdGlvbl9jbyBzdGFydCBvdXQgb2YgbmJkX2NsaWVudF9jb25uZWN0DQo+ICAgIGJsb2Nr
-L25iZC1jbGllbnQ6IHVzZSBub24tYmxvY2tpbmcgaW8gY2hhbm5lbCBmb3IgbmJkIG5lZ290aWF0
-aW9uDQo+ICAgIGJsb2NrL25iZC1jbGllbnQ6IG1vdmUgZnJvbSBxdWl0IHRvIHN0YXRlDQo+ICAg
-IGJsb2NrL25iZDogYWRkIGNtZGxpbmUgYW5kIHFhcGkgcGFyYW1ldGVyIHJlY29ubmVjdC1kZWxh
-eQ0KPiAgICBxZW11LWNvcm91dGluZS1zbGVlcDogaW50cm9kdWNlIHFlbXVfY29fc2xlZXBfd2Fr
-ZQ0KPiAgICBibG9jay9uYmQtY2xpZW50OiBuYmQgcmVjb25uZWN0DQo+ICAgIGlvdGVzdHM6IHRl
-c3QgbmJkIHJlY29ubmVjdA0KPiANCj4gICBxYXBpL2Jsb2NrLWNvcmUuanNvbiAgICAgICAgICB8
-ICAxMiArLQ0KPiAgIGJsb2NrL25iZC1jbGllbnQuaCAgICAgICAgICAgIHwgIDE1ICstDQo+ICAg
-aW5jbHVkZS9ibG9jay9uYmQuaCAgICAgICAgICAgfCAgIDMgKy0NCj4gICBpbmNsdWRlL3FlbXUv
-Y29yb3V0aW5lLmggICAgICB8ICAgNiArDQo+ICAgYmxvY2svbmJkLWNsaWVudC5jICAgICAgICAg
-ICAgfCA0MTYgKysrKysrKysrKysrKysrKysrKysrKysrKy0tLS0tLS0tLQ0KPiAgIGJsb2NrL25i
-ZC5jICAgICAgICAgICAgICAgICAgIHwgIDE2ICstDQo+ICAgbmJkL2NsaWVudC5jICAgICAgICAg
-ICAgICAgICAgfCAgMTYgKy0NCj4gICBxZW11LW5iZC5jICAgICAgICAgICAgICAgICAgICB8ICAg
-MiArLQ0KPiAgIHV0aWwvcWVtdS1jb3JvdXRpbmUtc2xlZXAuYyAgIHwgIDIwICstDQo+ICAgdGVz
-dHMvcWVtdS1pb3Rlc3RzLzI0OSAgICAgICAgfCAgNjMgKysrKysNCj4gICB0ZXN0cy9xZW11LWlv
-dGVzdHMvMjQ5Lm91dCAgICB8ICAxMCArDQo+ICAgdGVzdHMvcWVtdS1pb3Rlc3RzL2dyb3VwICAg
-ICAgfCAgIDEgKw0KPiAgIHRlc3RzL3FlbXUtaW90ZXN0cy9pb3Rlc3RzLnB5IHwgICA0ICsNCj4g
-ICAxMyBmaWxlcyBjaGFuZ2VkLCA0NjggaW5zZXJ0aW9ucygrKSwgMTE2IGRlbGV0aW9ucygtKQ0K
-PiAgIGNyZWF0ZSBtb2RlIDEwMDc1NSB0ZXN0cy9xZW11LWlvdGVzdHMvMjQ5DQo+ICAgY3JlYXRl
-IG1vZGUgMTAwNjQ0IHRlc3RzL3FlbXUtaW90ZXN0cy8yNDkub3V0DQo+IA0KDQoNCi0tIA0KQmVz
-dCByZWdhcmRzLA0KVmxhZGltaXINCg==
+Le 04/06/2019 à 11:36, David Hildenbrand a écrit :
+> Let's add all HWCAPs that we can support under TCG right now, when the
+> respective CPU facilities are enabled.
+> 
+> Cc: Riku Voipio <riku.voipio@iki.fi>
+> Cc: Laurent Vivier <laurent@vivier.eu>
+> Cc: Cornelia Huck <cohuck@redhat.com>
+> Cc: Laurent Vivier <laurent@vivier.eu>
+> Cc: Richard Henderson <richard.henderson@linaro.org>
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+> ---
+> 
+> This patch is based on "[PATCH v2 00/22] s390x/tcg: Vector Instruction
+> Support Part 4". I guess it is best if I just include it in my next
+> pull request.
+Based-on: <20190603090635.10631-1-david@redhat.com>
+          [PATCH v2 00/22] s390x/tcg: Vector Instruction Support Part 4
+
+> 
+> ---
+>  include/elf.h        |  1 +
+>  linux-user/elfload.c | 39 +++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 40 insertions(+)
+> 
+> diff --git a/include/elf.h b/include/elf.h
+> index ea7708a4ea..3501e0c8d0 100644
+> --- a/include/elf.h
+> +++ b/include/elf.h
+> @@ -598,6 +598,7 @@ typedef struct {
+>  #define HWCAP_S390_ETF3EH       256
+>  #define HWCAP_S390_HIGH_GPRS    512
+>  #define HWCAP_S390_TE           1024
+> +#define HWCAP_S390_VXRS         2048
+>  
+>  /* M68K specific definitions. */
+>  /* We use the top 24 bits to encode information about the
+> diff --git a/linux-user/elfload.c b/linux-user/elfload.c
+> index a57b7049dd..59b813066c 100644
+> --- a/linux-user/elfload.c
+> +++ b/linux-user/elfload.c
+> @@ -1308,6 +1308,45 @@ static inline void init_thread(struct target_pt_regs *regs,
+>  #define ELF_DATA	ELFDATA2MSB
+>  #define ELF_ARCH	EM_S390
+>  
+> +#include "elf.h"
+> +
+> +#define ELF_HWCAP get_elf_hwcap()
+> +
+> +static uint32_t get_elf_hwcap(void)
+> +{
+> +    uint32_t hwcap = 0;
+> +
+> +    if (s390_has_feat(S390_FEAT_ESAN3)) {
+> +        hwcap |= HWCAP_S390_ESAN3;
+> +    }
+> +    if (s390_has_feat(S390_FEAT_ZARCH)) {
+> +        hwcap |= HWCAP_S390_ZARCH;
+> +    }
+> +    if (s390_has_feat(S390_FEAT_STFLE)) {
+> +        hwcap |= HWCAP_S390_STFLE;
+> +    }
+> +    if (s390_has_feat(S390_FEAT_MSA)) {
+> +        hwcap |= HWCAP_S390_MSA;
+> +    }
+> +    if (s390_has_feat(S390_FEAT_LONG_DISPLACEMENT)) {
+> +        hwcap |= HWCAP_S390_LDISP;
+> +    }
+> +    if (s390_has_feat(S390_FEAT_EXTENDED_IMMEDIATE)) {
+> +        hwcap |= HWCAP_S390_EIMM;
+> +    }
+> +    if (s390_has_feat(S390_FEAT_EXTENDED_TRANSLATION_3) &&
+> +        s390_has_feat(S390_FEAT_ETF3_ENH)) {
+> +        hwcap |= HWCAP_S390_ETF3EH;
+> +    }
+> +    /* 31-bit processes can use 64-bit registers */
+> +    hwcap |= HWCAP_S390_HIGH_GPRS;
+> +    if (s390_has_feat(S390_FEAT_VECTOR)) {
+> +        hwcap |= HWCAP_S390_VXRS;
+> +    }
+> +
+> +    return hwcap;
+> +}
+> +
+>  static inline void init_thread(struct target_pt_regs *regs, struct image_info *infop)
+>  {
+>      regs->psw.addr = infop->entry;
+> 
+
+Acked-by: Laurent Vivier <laurent@vivier.eu>
+
+You can also do like the other architectures that use shortcuts like this:
+
+#define GET_FEATURE(feat, hwcap) \
+    do { if (s390_has_feat(feat)) { hwcaps |= hwcap; } } while (0)
+...
+GET_FEATURE(S390_FEAT_VECTOR, HWCAP_S390_VXRS);
+...
+
+
+Thanks,
+Laurent
 
