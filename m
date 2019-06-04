@@ -8,79 +8,80 @@ X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 71FE3C282CE
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 07:39:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CC17C282CE
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 07:39:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3E65724C4F
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 07:39:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 29C7324C4F
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 07:39:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MK92V1Hg"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3E65724C4F
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eRY7kWAU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 29C7324C4F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:47460 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:47462 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hY42j-0004ME-1Y
-	for qemu-devel@archiver.kernel.org; Tue, 04 Jun 2019 03:39:37 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:46111)
+	id 1hY42p-0004Qo-EU
+	for qemu-devel@archiver.kernel.org; Tue, 04 Jun 2019 03:39:43 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:46151)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <elohimes@gmail.com>) id 1hY3yo-0001F2-JU
-	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 03:35:35 -0400
+	(envelope-from <elohimes@gmail.com>) id 1hY3yu-0001IS-9o
+	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 03:35:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <elohimes@gmail.com>) id 1hY3yn-0003fS-HQ
-	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 03:35:34 -0400
-Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:42692)
+	(envelope-from <elohimes@gmail.com>) id 1hY3yt-00045Y-ER
+	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 03:35:40 -0400
+Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:34498)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <elohimes@gmail.com>) id 1hY3yn-0003bq-97
-	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 03:35:33 -0400
-Received: by mail-pf1-x444.google.com with SMTP id q10so1935602pff.9
-	for <qemu-devel@nongnu.org>; Tue, 04 Jun 2019 00:35:33 -0700 (PDT)
+	(Exim 4.71) (envelope-from <elohimes@gmail.com>) id 1hY3yt-0003y4-8E
+	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 03:35:39 -0400
+Received: by mail-pg1-x541.google.com with SMTP id h2so6598602pgg.1
+	for <qemu-devel@nongnu.org>; Tue, 04 Jun 2019 00:35:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
 	h=from:to:cc:subject:date:message-id:in-reply-to:references;
-	bh=kr819H7lf43YtonHy3KPFOGfzuzf63KXY2ivIp5O1R0=;
-	b=MK92V1Hgrn/hsMFylc7hj2LnV3wXX11rAB9Eta32S35opPYOOdlpYR2jEURZKXyeVM
-	czKPdr0MQhGoHIh5M9kITpTzmmkuS+c6YPJl7LQqeQGsJ/z2/3RWS0zjHkMPSwY+safp
-	uRuFgQbZM6K2W+JjKiLmRtG23D9dW9ZvIffVwDTm7W0GHEX3wkHZsd/mh7J2moxp7Tqa
-	w60QfT/E+r9vPKETb4cDK73gQxFcZ7JBAeDWnB/eHrCxzpV0ioz9t0EHFXv6B5fVG69m
-	dmfgy/jbn+oYkYG8VgOs9VXKVb/m1mrMRzUEwk/DjMIyxpp0tPn2llsHe/rKUNuK3TOo
-	giZg==
+	bh=XTNMBKN2X1BkfbMgr70LpEg84K+wAte084VIv3k+D1I=;
+	b=eRY7kWAUZ8kn8Qqjp0Boz4O+CM1SK9RoFVjsxl4IlCWcIT0XPsDCg0rY6hBO1QZy/k
+	OIqwzZQf6tJWZMbD5I+3ssuCzh9vNOmWcUTn4fd3rWHjoVO5WoB8eDzNmCv2ihGZenAS
+	+InfQzqHdphxpS46Ng40pLDGH6sbLF/WSUZOUbPJZbtyYq9PqlaXrNBrYHV2h1CtgafL
+	wVsKZv8IMPB1R/GXXEBYfUede9bWmbXDfA8q59vLUfN3v79jJQxWEpVQ3DBNUx5CGMmw
+	cOSd3Ymj9SFCz08t6KNiO+na2J8UNr2HGQW//fpGKxv2d/bQwV7vqB+aI5SI1tMsmY/p
+	j3xA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
 	:references;
-	bh=kr819H7lf43YtonHy3KPFOGfzuzf63KXY2ivIp5O1R0=;
-	b=MJqHuU6FYl54UrWY34rMkr0V8t3w+W7Yg+ZlZrf79Kma8pNdgo4zM83/+qZQ1L2fx3
-	22lhotlGiwiBJjX055Ws7jFwEHO9NZEU1VrBq6JMhINYMFB94Qo9WHwCvdZxwO8segxD
-	s9qb6mzlJ5QiTn/yMTLbCR/fACn5cZFju1rnFC0GDALJ7KFypM6cxR5eY5UK0vs9rPm+
-	J2mIiOWaii8JJaMJuz5h6h5c9r72r8L9MRF68AEDNtYNwt167sjUubJKeR2P/GlBDM8m
-	ZEsUVoRHD3tMVmrvG5uqPBeUmFS9iKSpqowVl909oQIYl53utp64bmOCzSOYzbtW5Uhy
-	O9rg==
-X-Gm-Message-State: APjAAAUFexMrIgnMKdaY0BBegI6ozvGswJqLIgJDkR3rfOd5WAhp+9uj
-	TQjG9tUSlpYyP9pqObnP+Vk=
-X-Google-Smtp-Source: APXvYqwuMS0dJ7cxNZCohtYFJjt4GsyYFUIGCVZ3dLdjYoEZ1NImmL/yEHWLGzH7x/uduqxJIwdl7A==
-X-Received: by 2002:a63:e408:: with SMTP id a8mr34019828pgi.146.1559633732044; 
-	Tue, 04 Jun 2019 00:35:32 -0700 (PDT)
+	bh=XTNMBKN2X1BkfbMgr70LpEg84K+wAte084VIv3k+D1I=;
+	b=H6rZqgWMLOVMEi6lZL3vyaLnwaxir8V5wys7s0eiICP8kLA1LsdhKp60NEU26X/5ia
+	CLtCTMPAQCABPlegR4r7Ucav+KJlQ1fFhVPR6dhCyPg8SYua/FgD49AippAAhpOLVguf
+	coVEjJ9/Oz8+594VhFnz4uef4oSUKZX0DXD/xLl7dUHmxBYydKVvqZPpWuup7aIbtAFn
+	AGTqdwE5olZViHSEwTvrYtFDVDfvjWZv/SlH2snkZAK7pJy3TeHzf16tqEpRV2NUDBnB
+	UswIaisO23eNbggRR6gDffveeepMqjgFYnZkJbQvRv3bHnXv8qyXdZ4hUFkaFo4Nj1nG
+	88mw==
+X-Gm-Message-State: APjAAAU0P9aZ30crxFd4WF3G9R78su1dk2P0/79bDXwxDAmH6W+8hdbA
+	89GrXTvruAvNWXJvjoZ7s40=
+X-Google-Smtp-Source: APXvYqybLj7SVGuaVCTwtM8siXHKLSXVO1OnORlyJUFJmtcl5/6c0LO2gFkEgMz1OAfPGgsY7ltXcA==
+X-Received: by 2002:a17:90a:62c6:: with SMTP id
+	k6mr33981582pjs.7.1559633738223; 
+	Tue, 04 Jun 2019 00:35:38 -0700 (PDT)
 Received: from localhost ([116.247.112.152]) by smtp.gmail.com with ESMTPSA id
-	v4sm20017907pfe.180.2019.06.04.00.35.31
+	b16sm17232845pfd.12.2019.06.04.00.35.37
 	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Tue, 04 Jun 2019 00:35:31 -0700 (PDT)
+	Tue, 04 Jun 2019 00:35:37 -0700 (PDT)
 From: elohimes@gmail.com
 X-Google-Original-From: xieyongji@baidu.com
 To: mst@redhat.com,
 	groug@kaod.org
-Date: Tue,  4 Jun 2019 15:34:55 +0800
-Message-Id: <20190604073459.15651-2-xieyongji@baidu.com>
+Date: Tue,  4 Jun 2019 15:34:57 +0800
+Message-Id: <20190604073459.15651-4-xieyongji@baidu.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190604073459.15651-1-xieyongji@baidu.com>
 References: <20190604073459.15651-1-xieyongji@baidu.com>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2607:f8b0:4864:20::444
-Subject: [Qemu-devel] [PATCH v2 1/5] virtio: Set "start_on_kick" on
- virtio_set_features()
+X-Received-From: 2607:f8b0:4864:20::541
+Subject: [Qemu-devel] [PATCH v2 3/5] virtio: Make sure we get correct state
+ of device on handle_aio_output()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -100,83 +101,34 @@ Sender: "Qemu-devel"
 
 From: Xie Yongji <xieyongji@baidu.com>
 
-The guest feature is not set correctly on virtio_reset() and
-virtio_init(). So we should not use it to set "start_on_kick" at that
-point. This patch set "start_on_kick" on virtio_set_features() instead.
+We should set the flags: "start_on_kick" and "started" after we call
+the kick functions (handle_aio_output() and handle_output()).
 
-Fixes: badaf79cfdbd3 ("virtio: Introduce started flag to VirtioDevice")
 Signed-off-by: Xie Yongji <xieyongji@baidu.com>
-Reviewed-by: Greg Kurz <groug@kaod.org>
 ---
- hw/virtio/virtio.c | 32 ++++++++++++++++++++++----------
- 1 file changed, 22 insertions(+), 10 deletions(-)
+ hw/virtio/virtio.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
 diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
-index 07f4a64b48..6508b2faad 100644
+index 6ec45d8f0a..3dc2f8c223 100644
 --- a/hw/virtio/virtio.c
 +++ b/hw/virtio/virtio.c
-@@ -1214,8 +1214,7 @@ void virtio_reset(void *opaque)
-         k->reset(vdev);
-     }
+@@ -1575,11 +1575,11 @@ void virtio_queue_notify(VirtIODevice *vdev, int n)
+         event_notifier_set(&vq->host_notifier);
+     } else if (vq->handle_output) {
+         vq->handle_output(vdev, vq);
+-    }
  
--    vdev->start_on_kick = (virtio_host_has_feature(vdev, VIRTIO_F_VERSION_1) &&
--                          !virtio_vdev_has_feature(vdev, VIRTIO_F_VERSION_1));
-+    vdev->start_on_kick = false;
-     vdev->started = false;
-     vdev->broken = false;
-     vdev->guest_features = 0;
-@@ -2069,14 +2068,22 @@ int virtio_set_features(VirtIODevice *vdev, uint64_t val)
-         return -EINVAL;
-     }
-     ret = virtio_set_features_nocheck(vdev, val);
--    if (!ret && virtio_vdev_has_feature(vdev, VIRTIO_RING_F_EVENT_IDX)) {
--        /* VIRTIO_RING_F_EVENT_IDX changes the size of the caches.  */
--        int i;
--        for (i = 0; i < VIRTIO_QUEUE_MAX; i++) {
--            if (vdev->vq[i].vring.num != 0) {
--                virtio_init_region_cache(vdev, i);
-+    if (!ret) {
-+        if (virtio_vdev_has_feature(vdev, VIRTIO_RING_F_EVENT_IDX)) {
-+            /* VIRTIO_RING_F_EVENT_IDX changes the size of the caches.  */
-+            int i;
-+            for (i = 0; i < VIRTIO_QUEUE_MAX; i++) {
-+                if (vdev->vq[i].vring.num != 0) {
-+                    virtio_init_region_cache(vdev, i);
-+                }
-             }
-         }
-+
-+        if (!vdev->started &&
-+            virtio_host_has_feature(vdev, VIRTIO_F_VERSION_1) &&
-+            !virtio_vdev_has_feature(vdev, VIRTIO_F_VERSION_1)) {
-+            vdev->start_on_kick = true;
+-    if (unlikely(vdev->start_on_kick)) {
+-        vdev->started = true;
+-        vdev->start_on_kick = false;
++        if (unlikely(vdev->start_on_kick)) {
++            vdev->started = true;
++            vdev->start_on_kick = false;
 +        }
      }
-     return ret;
  }
-@@ -2228,6 +2235,12 @@ int virtio_load(VirtIODevice *vdev, QEMUFile *f, int version_id)
-         }
-     }
  
-+    if (!vdev->started &&
-+        virtio_host_has_feature(vdev, VIRTIO_F_VERSION_1) &&
-+        !virtio_vdev_has_feature(vdev, VIRTIO_F_VERSION_1)) {
-+        vdev->start_on_kick = true;
-+    }
-+
-     rcu_read_lock();
-     for (i = 0; i < num; i++) {
-         if (vdev->vq[i].vring.desc) {
-@@ -2330,8 +2343,7 @@ void virtio_init(VirtIODevice *vdev, const char *name,
-             g_malloc0(sizeof(*vdev->vector_queues) * nvectors);
-     }
- 
--    vdev->start_on_kick = (virtio_host_has_feature(vdev, VIRTIO_F_VERSION_1) &&
--                          !virtio_vdev_has_feature(vdev, VIRTIO_F_VERSION_1));
-+    vdev->start_on_kick = false;
-     vdev->started = false;
-     vdev->device_id = device_id;
-     vdev->status = 0;
 -- 
 2.17.1
 
