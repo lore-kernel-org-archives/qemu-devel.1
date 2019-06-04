@@ -3,79 +3,105 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EA59EC282CE
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 05:42:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 46932C282CE
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 06:09:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B38D02342A
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 05:42:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B38D02342A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 0E33824A9A
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 06:09:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0E33824A9A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:46146 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:46452 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hY2DW-0001BP-Vm
-	for qemu-devel@archiver.kernel.org; Tue, 04 Jun 2019 01:42:39 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:46859)
+	id 1hY2dq-00051C-4n
+	for qemu-devel@archiver.kernel.org; Tue, 04 Jun 2019 02:09:50 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:52970)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hY2CQ-0000cP-Dd
-	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 01:41:31 -0400
+	(envelope-from <aravinda@linux.vnet.ibm.com>) id 1hY2cp-0004eL-F7
+	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 02:08:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hY2CP-0005xy-Ap
-	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 01:41:30 -0400
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:37302)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hY2CP-0005tw-4Z
-	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 01:41:29 -0400
-Received: by mail-wm1-f67.google.com with SMTP id 22so5047378wmg.2
-	for <qemu-devel@nongnu.org>; Mon, 03 Jun 2019 22:41:28 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-	:date:user-agent:mime-version:in-reply-to:content-language
-	:content-transfer-encoding;
-	bh=62Z11njhhYUk706I6uYG8BsZxBDI+RDe73b/Jet8hJI=;
-	b=Ybezs3Wb0OgrkYn14nuDQGFzq0Cv/VqiT4NboJE8jMTVsDq+/WhjZITPjHLRNsQKCt
-	8hDRy25s30IdyTNBgTn8gTJ5OduMOoXHDCpyE/BuxWQtpduitncTcvaVMltpYK154Mce
-	KQ7fq7fJ6w6IHEQcccIBxLekT24GM6RzKh2VdB7IzwfLWeesZYlGxlfdT/9WTdI4/I0J
-	tfix5Jo5vjpUhWOutveDwcsPWfAQM1hNctfSLhaR82gx+r3okOC2ZI2jB8Hc0G3ApKS1
-	e2gpazHtmuR4E0Rtfek0DDI9240cnaR9+Gmb0Uxo+x/xFmWib6YXcqDokEYueAhNBcP/
-	zSGg==
-X-Gm-Message-State: APjAAAVPWIQQqAOvocSjF7eWhJSbcFXrLu9zqR8dKFkXdIEPwOuaA9OX
-	aOOSF72CkHFXDmuai/PoiUM+kA==
-X-Google-Smtp-Source: APXvYqzbufunQ4Gw7sY2/lteVM2laeuE0soOGGAPd592G95PdA45iSn3WEGdWflRM5mx4yUEusBmsg==
-X-Received: by 2002:a1c:618a:: with SMTP id v132mr8892392wmb.17.1559626887558; 
-	Mon, 03 Jun 2019 22:41:27 -0700 (PDT)
-Received: from [192.168.1.38] (183.red-88-21-202.staticip.rima-tde.net.
-	[88.21.202.183]) by smtp.gmail.com with ESMTPSA id
-	z5sm15109638wma.36.2019.06.03.22.41.26
-	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-	Mon, 03 Jun 2019 22:41:27 -0700 (PDT)
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-References: <20190531134315.4109-1-richard.henderson@linaro.org>
-	<20190531134315.4109-23-richard.henderson@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
-	url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <c196a6b1-c8cc-1ba4-01f5-be83f2683b14@redhat.com>
-Date: Tue, 4 Jun 2019 07:41:26 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	(envelope-from <aravinda@linux.vnet.ibm.com>) id 1hY2cn-0003C8-Ow
+	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 02:08:47 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:54498)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <aravinda@linux.vnet.ibm.com>)
+	id 1hY2cl-00039K-Ge
+	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 02:08:45 -0400
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+	x5467FTw057318
+	for <qemu-devel@nongnu.org>; Tue, 4 Jun 2019 02:08:40 -0400
+Received: from e17.ny.us.ibm.com (e17.ny.us.ibm.com [129.33.205.207])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2swgtrd34q-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 04 Jun 2019 02:08:40 -0400
+Received: from localhost
+	by e17.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <aravinda@linux.vnet.ibm.com>;
+	Tue, 4 Jun 2019 07:08:39 +0100
+Received: from b01cxnp22035.gho.pok.ibm.com (9.57.198.25)
+	by e17.ny.us.ibm.com (146.89.104.204) with IBM ESMTP SMTP Gateway:
+	Authorized Use Only! Violators will be prosecuted; 
+	(version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+	Tue, 4 Jun 2019 07:08:36 +0100
+Received: from b01ledav001.gho.pok.ibm.com (b01ledav001.gho.pok.ibm.com
+	[9.57.199.106])
+	by b01cxnp22035.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+	x5468ZJL39714974
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256
+	verify=OK); Tue, 4 Jun 2019 06:08:35 GMT
+Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 4D0CD2805C;
+	Tue,  4 Jun 2019 06:08:35 +0000 (GMT)
+Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id CB3372805A;
+	Tue,  4 Jun 2019 06:08:32 +0000 (GMT)
+Received: from [9.199.59.54] (unknown [9.199.59.54])
+	by b01ledav001.gho.pok.ibm.com (Postfix) with ESMTP;
+	Tue,  4 Jun 2019 06:08:32 +0000 (GMT)
+To: Greg Kurz <groug@kaod.org>
+References: <155910829070.13149.5215948335633966328.stgit@aravinda>
+	<155910841478.13149.2830700794862210739.stgit@aravinda>
+	<20190603121243.687d8d75@bahia.lab.toulouse-stg.fr.ibm.com>
+	<20190603131723.261eba99@bahia.lab.toulouse-stg.fr.ibm.com>
+From: Aravinda Prasad <aravinda@linux.vnet.ibm.com>
+Date: Tue, 4 Jun 2019 11:38:31 +0530
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+	Thunderbird/52.6.0
 MIME-Version: 1.0
-In-Reply-To: <20190531134315.4109-23-richard.henderson@linaro.org>
+In-Reply-To: <20190603131723.261eba99@bahia.lab.toulouse-stg.fr.ibm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-	[fuzzy]
-X-Received-From: 209.85.128.67
-Subject: Re: [Qemu-devel] [PATCH v16 22/23] target/rx: Collect all bytes
- during disassembly
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+x-cbid: 19060406-0040-0000-0000-000004F8541B
+X-IBM-SpamModules-Scores: 
+X-IBM-SpamModules-Versions: BY=3.00011212; HX=3.00000242; KW=3.00000007;
+	PH=3.00000004; SC=3.00000286; SDB=6.01212975; UDB=6.00637490;
+	IPR=6.00994042; 
+	MB=3.00027175; MTD=3.00000008; XFM=3.00000015; UTC=2019-06-04 06:08:37
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19060406-0041-0000-0000-000009047206
+Message-Id: <4689dbb8-1ba1-2def-f9a7-b2f5a35bad18@linux.vnet.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
+	definitions=2019-06-04_05:, , signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+	priorityscore=1501
+	malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+	clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+	mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+	scancount=1 engine=8.0.1-1810050000 definitions=main-1906040042
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 148.163.156.1
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v9 1/6] ppc: spapr: Handle "ibm,
+ nmi-register" and "ibm, nmi-interlock" RTAS calls
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -87,143 +113,250 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: ysato@users.sourceforge.jp
+Cc: aik@au1.ibm.com, qemu-devel@nongnu.org, paulus@ozlabs.org,
+	qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/31/19 3:43 PM, Richard Henderson wrote:
-> Collected, to be used in the next patch.
+
+
+On Monday 03 June 2019 04:47 PM, Greg Kurz wrote:
+> On Mon, 3 Jun 2019 12:12:43 +0200
+> Greg Kurz <groug@kaod.org> wrote:
 > 
-> Reviewed-by: Yoshinori Sato <ysato@users.sourceforge.jp>
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->  target/rx/disas.c | 62 ++++++++++++++++++++++++++++++++---------------
->  1 file changed, 42 insertions(+), 20 deletions(-)
+>> On Wed, 29 May 2019 11:10:14 +0530
+>> Aravinda Prasad <aravinda@linux.vnet.ibm.com> wrote:
+>>
+>>> This patch adds support in QEMU to handle "ibm,nmi-register"
+>>> and "ibm,nmi-interlock" RTAS calls.
+>>>
+>>> The machine check notification address is saved when the
+>>> OS issues "ibm,nmi-register" RTAS call.
+>>>
+>>> This patch also handles the case when multiple processors
+>>> experience machine check at or about the same time by
+>>> handling "ibm,nmi-interlock" call. In such cases, as per
+>>> PAPR, subsequent processors serialize waiting for the first
+>>> processor to issue the "ibm,nmi-interlock" call. The second
+>>> processor that also received a machine check error waits
+>>> till the first processor is done reading the error log.
+>>> The first processor issues "ibm,nmi-interlock" call
+>>> when the error log is consumed. This patch implements the
+>>> releasing part of the error-log while subsequent patch
+>>> (which builds error log) handles the locking part.
+>>>
+>>> Signed-off-by: Aravinda Prasad <aravinda@linux.vnet.ibm.com>
+>>> Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+>>> ---  
+>>
+>> The code looks okay but it still seems wrong to advertise the RTAS
+>> calls to the guest that early in the series. The linux kernel in
+>> the guest will assume FWNMI is functional, which isn't true until
+>> patch 6 (yes, migration is part of the feature, it should be
+>> supported upfront, not fixed afterwards).
+>>
+>> It doesn't help much to introduce the RTAS calls early and to
+>> modify them in the other patches. I'd rather see the rest of
+>> the code first and a final patch that introduces the fully
+>> functional RTAS calls and calls spapr_rtas_register().
+>>
 > 
-> diff --git a/target/rx/disas.c b/target/rx/disas.c
-> index ebc1a44249..5a32a87534 100644
-> --- a/target/rx/disas.c
-> +++ b/target/rx/disas.c
-> @@ -25,43 +25,59 @@ typedef struct DisasContext {
->      disassemble_info *dis;
->      uint32_t addr;
->      uint32_t pc;
-> +    uint8_t len;
-> +    uint8_t bytes[8];
->  } DisasContext;
->  
->  
->  static uint32_t decode_load_bytes(DisasContext *ctx, uint32_t insn,
-> -                           int i, int n)
-> +                                  int i, int n)
->  {
-> -    bfd_byte buf;
-> +    uint32_t addr = ctx->addr;
-> +
-> +    g_assert(ctx->len == i);
-> +    g_assert(n <= ARRAY_SIZE(ctx->bytes));
-> +
->      while (++i <= n) {
-> -        ctx->dis->read_memory_func(ctx->addr++, &buf, 1, ctx->dis);
-> -        insn |= buf << (32 - i * 8);
-> +        ctx->dis->read_memory_func(addr++, &ctx->bytes[i - 1], 1, ctx->dis);
-> +        insn |= ctx->bytes[i - 1] << (32 - i * 8);
->      }
-> +    ctx->addr = addr;
-> +    ctx->len = n;
-> +
->      return insn;
->  }
->  
->  static int32_t li(DisasContext *ctx, int sz)
->  {
-> -    int32_t addr;
-> -    bfd_byte buf[4];
-> -    addr = ctx->addr;
-> +    uint32_t addr = ctx->addr;
-> +    uintptr_t len = ctx->len;
->  
->      switch (sz) {
->      case 1:
-> +        g_assert(len + 1 <= ARRAY_SIZE(ctx->bytes));
->          ctx->addr += 1;
-> -        ctx->dis->read_memory_func(addr, buf, 1, ctx->dis);
-> -        return (int8_t)buf[0];
-> +        ctx->len += 1;
-> +        ctx->dis->read_memory_func(addr, ctx->bytes + len, 1, ctx->dis);
-> +        return (int8_t)ctx->bytes[len];
->      case 2:
-> +        g_assert(len + 2 <= ARRAY_SIZE(ctx->bytes));
->          ctx->addr += 2;
-> -        ctx->dis->read_memory_func(addr, buf, 2, ctx->dis);
-> -        return ldsw_le_p(buf);
-> +        ctx->len += 2;
-> +        ctx->dis->read_memory_func(addr, ctx->bytes + len, 2, ctx->dis);
-> +        return ldsw_le_p(ctx->bytes + len);
->      case 3:
-> +        g_assert(len + 3 <= ARRAY_SIZE(ctx->bytes));
->          ctx->addr += 3;
-> -        ctx->dis->read_memory_func(addr, buf, 3, ctx->dis);
-> -        return (int8_t)buf[2] << 16 | lduw_le_p(buf);
-> +        ctx->len += 3;
-> +        ctx->dis->read_memory_func(addr, ctx->bytes + len, 3, ctx->dis);
-> +        return (int8_t)ctx->bytes[len + 2] << 16 | lduw_le_p(ctx->bytes + len);
->      case 0:
-> +        g_assert(len + 4 <= ARRAY_SIZE(ctx->bytes));
->          ctx->addr += 4;
-> -        ctx->dis->read_memory_func(addr, buf, 4, ctx->dis);
-> -        return ldl_le_p(buf);
-> +        ctx->len += 4;
-> +        ctx->dis->read_memory_func(addr, ctx->bytes + len, 4, ctx->dis);
-> +        return ldl_le_p(ctx->bytes + len);
->      default:
->          g_assert_not_reached();
->      }
-> @@ -110,7 +126,7 @@ static const char psw[] = {
->  static void rx_index_addr(DisasContext *ctx, char out[8], int ld, int mi)
->  {
->      uint32_t addr = ctx->addr;
-> -    uint8_t buf[2];
-> +    uintptr_t len = ctx->len;
->      uint16_t dsp;
->  
->      switch (ld) {
-> @@ -119,14 +135,18 @@ static void rx_index_addr(DisasContext *ctx, char out[8], int ld, int mi)
->          out[0] = '\0';
->          return;
->      case 1:
-> +        g_assert(len + 1 <= ARRAY_SIZE(ctx->bytes));
->          ctx->addr += 1;
-> -        ctx->dis->read_memory_func(addr, buf, 1, ctx->dis);
-> -        dsp = buf[0];
-> +        ctx->len += 1;
-> +        ctx->dis->read_memory_func(addr, ctx->bytes + len, 1, ctx->dis);
-> +        dsp = ctx->bytes[len];
->          break;
->      case 2:
-> +        g_assert(len + 2 <= ARRAY_SIZE(ctx->bytes));
->          ctx->addr += 2;
-> -        ctx->dis->read_memory_func(addr, buf, 2, ctx->dis);
-> -        dsp = lduw_le_p(buf);
-> +        ctx->len += 2;
-> +        ctx->dis->read_memory_func(addr, ctx->bytes + len, 2, ctx->dis);
-> +        dsp = lduw_le_p(ctx->bytes + len);
->          break;
->      default:
->          g_assert_not_reached();
-> @@ -1392,8 +1412,10 @@ int print_insn_rx(bfd_vma addr, disassemble_info *dis)
->      DisasContext ctx;
->      uint32_t insn;
->      int i;
-> +
->      ctx.dis = dis;
->      ctx.pc = ctx.addr = addr;
-> +    ctx.len = 0;
->  
->      insn = decode_load(&ctx);
->      if (!decode(&ctx, insn)) {
+> Thinking again, you should introduce the "fwnmi-mce" spapr capability in
+> its own patch first, default to "off" and and have the last patch in the
+> series to switch the default to "on" for newer machine types only.
+> 
+> This patch should then only register the RTAS calls if "fwnmi-mcr" is set
+> to "on".
+> 
+> This should address the fact that we don't want to expose a partially
+> implemented FWNMI feature to the guest, and we don't want to support
+> FWNMI at all with older machine types for the sake of compatibility.
+
+When you say "expose a partially implemented FWNMI feature to the
+guest", do you mean while debugging/bisect we may end up with exposing
+the partially implemented FWNMI feature? Otherwise it is expected that
+QEMU runs with all the 6 patches.
+
+If that is the case, I will have the rtas nmi register functionality as
+the last patch in the series. This way we don't have to have spapr cap
+turned off first and later turned on. However, as mentioned earlier
+(when David raised the same concern), use of guest_machine_check_addr
+may look odd at other patches as it is set only during rtas nmi register.
+
+Or else, as a workaround, I can return RTAS_OUT_NOT_SUPPORTED for rtas
+nmi register till the entire functionality is implemented and only in
+the last patch in the series I will return RTAS_OUT_SUCCESS. This will
+ensure that we have a logical connection between the patches and the
+partially implemented fwnmi is not exposed to the guest kernel.
+
+Regards,
+Aravinda
+
+
+
+
+> 
+>>>  hw/ppc/spapr.c         |    7 +++++
+>>>  hw/ppc/spapr_rtas.c    |   65 ++++++++++++++++++++++++++++++++++++++++++++++++
+>>>  include/hw/ppc/spapr.h |    9 ++++++-
+>>>  3 files changed, 80 insertions(+), 1 deletion(-)
+>>>
+>>> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+>>> index e2b33e5..fae28a9 100644
+>>> --- a/hw/ppc/spapr.c
+>>> +++ b/hw/ppc/spapr.c
+>>> @@ -1808,6 +1808,11 @@ static void spapr_machine_reset(void)
+>>>      first_ppc_cpu->env.gpr[5] = 0;
+>>>  
+>>>      spapr->cas_reboot = false;
+>>> +
+>>> +    spapr->guest_machine_check_addr = -1;
+>>> +
+>>> +    /* Signal all vCPUs waiting on this condition */
+>>> +    qemu_cond_broadcast(&spapr->mc_delivery_cond);
+>>>  }
+>>>  
+>>>  static void spapr_create_nvram(SpaprMachineState *spapr)
+>>> @@ -3072,6 +3077,8 @@ static void spapr_machine_init(MachineState *machine)
+>>>  
+>>>          kvmppc_spapr_enable_inkernel_multitce();
+>>>      }
+>>> +
+>>> +    qemu_cond_init(&spapr->mc_delivery_cond);
+>>>  }
+>>>  
+>>>  static int spapr_kvm_type(MachineState *machine, const char *vm_type)
+>>> diff --git a/hw/ppc/spapr_rtas.c b/hw/ppc/spapr_rtas.c
+>>> index 5bc1a93..e7509cf 100644
+>>> --- a/hw/ppc/spapr_rtas.c
+>>> +++ b/hw/ppc/spapr_rtas.c
+>>> @@ -352,6 +352,38 @@ static void rtas_get_power_level(PowerPCCPU *cpu, SpaprMachineState *spapr,
+>>>      rtas_st(rets, 1, 100);
+>>>  }
+>>>  
+>>> +static void rtas_ibm_nmi_register(PowerPCCPU *cpu,
+>>> +                                  SpaprMachineState *spapr,
+>>> +                                  uint32_t token, uint32_t nargs,
+>>> +                                  target_ulong args,
+>>> +                                  uint32_t nret, target_ulong rets)
+>>> +{
+>>> +    hwaddr rtas_addr = spapr_get_rtas_addr();
+>>> +
+>>> +    if (!rtas_addr) {
+>>> +        rtas_st(rets, 0, RTAS_OUT_NOT_SUPPORTED);
+>>> +        return;
+>>> +    }
+>>> +
+>>> +    spapr->guest_machine_check_addr = rtas_ld(args, 1);
+>>> +    rtas_st(rets, 0, RTAS_OUT_SUCCESS);
+>>> +}
+>>> +
+>>> +static void rtas_ibm_nmi_interlock(PowerPCCPU *cpu,
+>>> +                                   SpaprMachineState *spapr,
+>>> +                                   uint32_t token, uint32_t nargs,
+>>> +                                   target_ulong args,
+>>> +                                   uint32_t nret, target_ulong rets)
+>>> +{
+>>> +    if (spapr->guest_machine_check_addr == -1) {
+>>> +        /* NMI register not called */
+>>> +        rtas_st(rets, 0, RTAS_OUT_PARAM_ERROR);
+>>> +    } else {
+>>> +        qemu_cond_signal(&spapr->mc_delivery_cond);
+>>> +        rtas_st(rets, 0, RTAS_OUT_SUCCESS);
+>>> +    }
+>>> +}
+>>> +
+>>>  static struct rtas_call {
+>>>      const char *name;
+>>>      spapr_rtas_fn fn;
+>>> @@ -470,6 +502,35 @@ void spapr_load_rtas(SpaprMachineState *spapr, void *fdt, hwaddr addr)
+>>>      }
+>>>  }
+>>>  
+>>> +hwaddr spapr_get_rtas_addr(void)
+>>> +{
+>>> +    SpaprMachineState *spapr = SPAPR_MACHINE(qdev_get_machine());
+>>> +    int rtas_node;
+>>> +    const struct fdt_property *rtas_addr_prop;
+>>> +    void *fdt = spapr->fdt_blob;
+>>> +    uint32_t rtas_addr;
+>>> +
+>>> +    /* fetch rtas addr from fdt */
+>>> +    rtas_node = fdt_path_offset(fdt, "/rtas");
+>>> +    if (rtas_node == 0) {
+>>> +        return 0;
+>>> +    }
+>>> +
+>>> +    rtas_addr_prop = fdt_get_property(fdt, rtas_node, "linux,rtas-base", NULL);
+>>> +    if (!rtas_addr_prop) {
+>>> +        return 0;
+>>> +    }
+>>> +
+>>> +    /*
+>>> +     * We assume that the OS called RTAS instantiate-rtas, but some other
+>>> +     * OS might call RTAS instantiate-rtas-64 instead. This fine as of now
+>>> +     * as SLOF only supports 32-bit variant.
+>>> +     */
+>>> +    rtas_addr = fdt32_to_cpu(*(uint32_t *)rtas_addr_prop->data);
+>>> +    return (hwaddr)rtas_addr;
+>>> +}
+>>> +
+>>> +
+>>>  static void core_rtas_register_types(void)
+>>>  {
+>>>      spapr_rtas_register(RTAS_DISPLAY_CHARACTER, "display-character",
+>>> @@ -493,6 +554,10 @@ static void core_rtas_register_types(void)
+>>>                          rtas_set_power_level);
+>>>      spapr_rtas_register(RTAS_GET_POWER_LEVEL, "get-power-level",
+>>>                          rtas_get_power_level);
+>>> +    spapr_rtas_register(RTAS_IBM_NMI_REGISTER, "ibm,nmi-register",
+>>> +                        rtas_ibm_nmi_register);
+>>> +    spapr_rtas_register(RTAS_IBM_NMI_INTERLOCK, "ibm,nmi-interlock",
+>>> +                        rtas_ibm_nmi_interlock);
+>>>  }
+>>>  
+>>>  type_init(core_rtas_register_types)
+>>> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+>>> index 4f5becf..9dc5e30 100644
+>>> --- a/include/hw/ppc/spapr.h
+>>> +++ b/include/hw/ppc/spapr.h
+>>> @@ -188,6 +188,10 @@ struct SpaprMachineState {
+>>>       * occurs during the unplug process. */
+>>>      QTAILQ_HEAD(, SpaprDimmState) pending_dimm_unplugs;
+>>>  
+>>> +    /* State related to "ibm,nmi-register" and "ibm,nmi-interlock" calls */
+>>> +    target_ulong guest_machine_check_addr;
+>>> +    QemuCond mc_delivery_cond;
+>>> +
+>>>      /*< public >*/
+>>>      char *kvm_type;
+>>>      char *host_model;
+>>> @@ -624,8 +628,10 @@ target_ulong spapr_hypercall(PowerPCCPU *cpu, target_ulong opcode,
+>>>  #define RTAS_IBM_CREATE_PE_DMA_WINDOW           (RTAS_TOKEN_BASE + 0x27)
+>>>  #define RTAS_IBM_REMOVE_PE_DMA_WINDOW           (RTAS_TOKEN_BASE + 0x28)
+>>>  #define RTAS_IBM_RESET_PE_DMA_WINDOW            (RTAS_TOKEN_BASE + 0x29)
+>>> +#define RTAS_IBM_NMI_REGISTER                   (RTAS_TOKEN_BASE + 0x2A)
+>>> +#define RTAS_IBM_NMI_INTERLOCK                  (RTAS_TOKEN_BASE + 0x2B)
+>>>  
+>>> -#define RTAS_TOKEN_MAX                          (RTAS_TOKEN_BASE + 0x2A)
+>>> +#define RTAS_TOKEN_MAX                          (RTAS_TOKEN_BASE + 0x2C)
+>>>  
+>>>  /* RTAS ibm,get-system-parameter token values */
+>>>  #define RTAS_SYSPARM_SPLPAR_CHARACTERISTICS      20
+>>> @@ -876,4 +882,5 @@ void spapr_check_pagesize(SpaprMachineState *spapr, hwaddr pagesize,
+>>>  #define SPAPR_OV5_XIVE_BOTH     0x80 /* Only to advertise on the platform */
+>>>  
+>>>  void spapr_set_all_lpcrs(target_ulong value, target_ulong mask);
+>>> +uint64_t spapr_get_rtas_addr(void);
+>>>  #endif /* HW_SPAPR_H */
+>>>   
+>>
+>>
 > 
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+-- 
+Regards,
+Aravinda
+
 
