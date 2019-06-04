@@ -2,92 +2,69 @@ Return-Path: <SRS0=GUf1=UD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 24179C282CE
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 08:53:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2BB61C282CE
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 08:53:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DA93823F04
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 08:53:38 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="I2DMNqvY"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DA93823F04
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 057BF23F04
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 08:53:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 057BF23F04
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:48839 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:48841 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hY5CM-00062t-3O
-	for qemu-devel@archiver.kernel.org; Tue, 04 Jun 2019 04:53:38 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:39756)
+	id 1hY5CP-00065A-7E
+	for qemu-devel@archiver.kernel.org; Tue, 04 Jun 2019 04:53:41 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:39781)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hY5Al-00058W-FM
-	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 04:52:00 -0400
+	(envelope-from <kwolf@redhat.com>) id 1hY5As-0005CR-Ky
+	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 04:52:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hY5Ak-0001Ox-F6
-	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 04:51:59 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:35693)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1hY5Ak-0001OL-4Y
-	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 04:51:58 -0400
-Received: by mail-wm1-x342.google.com with SMTP id c6so10870302wml.0
-	for <qemu-devel@nongnu.org>; Tue, 04 Jun 2019 01:51:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=references:user-agent:from:to:cc:subject:in-reply-to:date
-	:message-id:mime-version:content-transfer-encoding;
-	bh=E+0gdnk2zFsqvhIMvOxfAZSOkzi7ahsa38Rv7Htkmd8=;
-	b=I2DMNqvYyrPIupnpdaQI/vxNoxNH3Qims/ePWZNZNS2cYkRen3Lp8MJ4TCyQ7WJsLd
-	/Xi++0ueA4bBvvKYf+/bDdpRVknCVoPuQJeBtZDnN/yuIucSIfKD/RLWMZeKJAOxbGfM
-	0MX+rJrxWkDXVszAAQmhSgtafF28XCF9XduYcp7FehgrDHGEHyfXr3Hv5ufajeJhsXCg
-	eFuZCXfVQYUyGkn9JKTy+QuNXdC61PCJj6fiTCbg5MYZ2Ff08+PPPYaFJDQr6s6d/MkA
-	NNSkOzKosjtfJSdoF485HQmiQpS4TY6Bmz44J0m7zmfH3PUHRGlloKT8f7fA1FAM7plc
-	2Ijw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:references:user-agent:from:to:cc:subject
-	:in-reply-to:date:message-id:mime-version:content-transfer-encoding;
-	bh=E+0gdnk2zFsqvhIMvOxfAZSOkzi7ahsa38Rv7Htkmd8=;
-	b=CPT12A1U3CzcjsMerWhhyNtk0k340HT27I0KI0k4NXo8b7CaOTW8kGSPi1fQGShI1L
-	JcSr7/F9RADiOT34VKlwTW47aqSS1BGb0YDylDW2X9r5BwwIRqew/giB1lhsqcJySl4j
-	gMp1hZcr/lXVWN8F9jpczFtj85Ul7ZWTYjTj9ZW+vEj2AP3qz/HzOhEkDLeiH7QBA6om
-	nKCc+NMr1JDKZvn8NQEvSg62ZnVq1ygeZYA4aL5aEWWmrnweeIoXyuxk3lBZBcoYCUVj
-	LRmZK19TloIJEA/R7mewSHTa9s9lGtAtzFUh9+3DzpI/1hKTpe32zFz1KZ5/fUNk0h/e
-	Ng6A==
-X-Gm-Message-State: APjAAAU9uerRdhfDaTW5B33lEz2ZcpdXQNM2tolt1O1CyZlPVT2y+B7i
-	780o1O1dPZqNZANDPn+bmZUNhg==
-X-Google-Smtp-Source: APXvYqzy2N0MwDd/Qg0EPjfhdR8J3cioub7fDEpM1fRsKgbmSNVHGCQv4tLlGZC8iCjPJSMAhy7/GQ==
-X-Received: by 2002:a1c:21c4:: with SMTP id h187mr17631216wmh.27.1559638316486;
-	Tue, 04 Jun 2019 01:51:56 -0700 (PDT)
-Received: from zen.linaroharston ([81.128.185.34])
-	by smtp.gmail.com with ESMTPSA id
-	u205sm20552858wmu.47.2019.06.04.01.51.55
-	(version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-	Tue, 04 Jun 2019 01:51:55 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
-	by zen.linaroharston (Postfix) with ESMTP id 293C61FF87;
-	Tue,  4 Jun 2019 09:51:55 +0100 (BST)
-References: <65b0acd5-e919-73a3-e313-cb01da12afb4@redhat.com>
-	<78b8e397-8bf3-ac52-02f5-dba79372480f@redhat.com>
-	<ae439814-4ed1-eb40-7a44-cea1a566a850@redhat.com>
-User-agent: mu4e 1.3.2; emacs 26.1
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: David Hildenbrand <david@redhat.com>
-In-reply-to: <ae439814-4ed1-eb40-7a44-cea1a566a850@redhat.com>
-Date: Tue, 04 Jun 2019 09:51:55 +0100
-Message-ID: <871s09u40k.fsf@zen.linaroharston>
+	(envelope-from <kwolf@redhat.com>) id 1hY5Ar-0001SA-JO
+	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 04:52:06 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44762)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kwolf@redhat.com>)
+	id 1hY55y-0007Gi-Le; Tue, 04 Jun 2019 04:47:02 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 118A6104C1;
+	Tue,  4 Jun 2019 08:46:51 +0000 (UTC)
+Received: from linux.fritz.box (ovpn-116-215.ams2.redhat.com [10.36.116.215])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 6D3FC5B689;
+	Tue,  4 Jun 2019 08:46:47 +0000 (UTC)
+Date: Tue, 4 Jun 2019 10:46:45 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+To: "Heitke, Kenneth" <kenneth.heitke@intel.com>, mreitz@redhat.com,
+	keith.busch@intel.com, qemu-block@nongnu.org, philmd@redhat.com,
+	qemu-devel@nongnu.org
+Message-ID: <20190604084645.GB14925@linux.fritz.box>
+References: <20190520174030.1647-1-kenneth.heitke@intel.com>
+	<20190528061836.GB32236@apples.localdomain>
+	<20190603111409.GD6523@linux.fritz.box>
+	<a58ef975-78f2-9c5c-35c2-b2dd359a4c03@intel.com>
+	<20190604082828.GA11013@apples.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2a00:1450:4864:20::342
-Subject: Re: [Qemu-devel] "make run-tcg-tests-s390x-linux-user" not working
- for me
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190604082828.GA11013@apples.localdomain>
+User-Agent: Mutt/1.11.3 (2019-02-01)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.38]);
+	Tue, 04 Jun 2019 08:46:51 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v2] nvme: add Get/Set Feature
+ Timestamp support
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -99,68 +76,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-s390x <qemu-s390x@nongnu.org>,
-	Richard Henderson <richard.henderson@linaro.org>,
-	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Am 04.06.2019 um 10:28 hat Klaus Birkelund geschrieben:
+> On Mon, Jun 03, 2019 at 09:30:53AM -0600, Heitke, Kenneth wrote:
+> > 
+> > 
+> > On 6/3/2019 5:14 AM, Kevin Wolf wrote:
+> > > Am 28.05.2019 um 08:18 hat Klaus Birkelund geschrieben:
+> > > > On Mon, May 20, 2019 at 11:40:30AM -0600, Kenneth Heitke wrote:
+> > > > > Signed-off-by: Kenneth Heitke <kenneth.heitke@intel.com>
+> > > 
+> > > > > diff --git a/hw/block/nvme.h b/hw/block/nvme.h
+> > > > > index 56c9d4b4b1..d7277e72b7 100644
+> > > > > --- a/hw/block/nvme.h
+> > > > > +++ b/hw/block/nvme.h
+> > > > > @@ -69,6 +69,7 @@ typedef struct NvmeCtrl {
+> > > > >       uint16_t    max_prp_ents;
+> > > > >       uint16_t    cqe_size;
+> > > > >       uint16_t    sqe_size;
+> > > > > +    uint16_t    oncs;
+> > > > 
+> > > > Looks like this unused member snuck its way into the patch. But I see no
+> > > > harm in it being there.
+> > > 
+> > > Good catch. I'll just remove it again from my branch.
+> > > 
+> > > > > +static inline void nvme_set_timestamp(NvmeCtrl *n, uint64_t ts)
+> > > > > +{
+> > > > > +    trace_nvme_setfeat_timestamp(ts);
+> > > > > +
+> > > > > +    n->host_timestamp = le64_to_cpu(ts);
+> > > > > +    n->timestamp_set_qemu_clock_ms = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
+> > > > > +}
+> > > > > +
+> > > > > +static inline uint64_t nvme_get_timestamp(const NvmeCtrl *n)
+> > > > > +{
+> > > > > +    uint64_t current_time = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
+> > > 
+> > > Here I wonder why we use QEMU_CLOCK_REALTIME in a device emulation.
+> > > Wouldn't QEMU_CLOCK_VIRTUAL make more sense?
+> > > 
+> > 
+> > QEMU_CLOCK_VIRTUAL probably would make more sense. When I was reading
+> > through the differences I wasn't really sure what to pick. iven that this is
+> > the time within the device's context, the virtual time seems more correct.
+> > 
+>  
+> I thought about this too when I reviewed, but came to the conclusion
+> that REALTIME was correct. The timestamp is basically a value that the
+> host stores in the controller. When the host uses Get Features to get
+> the the current time it would expect it to match the progression for its
+> own wall clockright? If I understand REALTIME vs VIRTUAL correctly,
+> using VIRTUAL, it would go way out of sync.
 
-David Hildenbrand <david@redhat.com> writes:
+Which two things would go out of sync with VIRTUAL?
 
-> On 04.06.19 09:25, David Hildenbrand wrote:
->> On 04.06.19 09:17, David Hildenbrand wrote:
->>> Hi,
->>>
->>> for now I was able to run TCG tests using "make
->>> run-tcg-tests-s390x-linux-user". Lately, trying to run the tests always
->>> results in
->>>
->>> t460s: ~/git/qemu vx $ LANG=3DC make run-tcg-tests-s390x-linux-user
->>> make[1]: Entering directory '/home/dhildenb/git/qemu/slirp'
->>> make[1]: Nothing to be done for 'all'.
->>> make[1]: Leaving directory '/home/dhildenb/git/qemu/slirp'
->>>         CHK version_gen.h
->>>   BUILD   TCG tests for s390x-linux-user
->>>   BUILD   s390x guest-tests SKIPPED
->>>   RUN     TCG tests for s390x-linux-user
->>>   RUN     tests for s390x SKIPPED
->>>
->>> t460s: ~/git/qemu vx $ LANG=3DC make check-tcg
->>> make[1]: Entering directory '/home/dhildenb/git/qemu/slirp'
->>> make[1]: Nothing to be done for 'all'.
->>> make[1]: Leaving directory '/home/dhildenb/git/qemu/slirp'
->>>         CHK version_gen.h
->>>   BUILD   TCG tests for s390x-softmmu
->>>   BUILD   s390x guest-tests SKIPPED
->>>   RUN     TCG tests for s390x-softmmu
->>>   RUN     tests for s390x SKIPPED
->>>   BUILD   TCG tests for s390x-linux-user
->>>   BUILD   s390x guest-tests SKIPPED
->>>   RUN     TCG tests for s390x-linux-user
->>>   RUN     tests for s390x SKIPPED
->>>
->>> I am using "./configure --target-list=3Ds390x-softmmu,s390x-linux-user
->>> --enable-sdl --enable-spice --enable-kvm"
->>>
->>> What am I missing? Why is the build skipped?
->>>
->>
->> BTW, docker seems to be working fine, just tried with "make
->> docker-test-build@debian-armhf-cross J=3Dn"
->>
->
-> Turns out I had to rerun ./configure (it didn't include HAVE_USER_DOCKER
-> for some reason).
+Not an expert on clocks myself, but I think the main question is what
+happens to the clock while the VM is stopped. REALTIME continues running
+where as VIRTUAL is stopped. If we expose REALTIME measurements to the
+guest, the time passed may look a lot longer than what the guest's clock
+actually says. So this is the thing I am worried would go out of sync
+with REALTIME.
 
-Yeah that was a relatively recent addition rather than dynamically
-probing everytime we ran.
+Or did I read the code wrong and this isn't actually exposed to the
+guest?
 
->
-> Sorry for the noise :)
-
-
---
-Alex Benn=C3=A9e
+Kevin
 
