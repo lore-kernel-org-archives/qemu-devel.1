@@ -2,85 +2,85 @@ Return-Path: <SRS0=GUf1=UD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 276BFC282CE
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 21:01:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F9F5C282CE
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 21:02:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C5DB52075B
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 21:01:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E002B2075B
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 21:02:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="SNgfQUeH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C5DB52075B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="q1zjSdon"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E002B2075B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:58024 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:58046 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hYGYz-0007Js-2m
-	for qemu-devel@archiver.kernel.org; Tue, 04 Jun 2019 17:01:45 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:36063)
+	id 1hYGa7-0008K3-7V
+	for qemu-devel@archiver.kernel.org; Tue, 04 Jun 2019 17:02:55 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:35992)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hYG91-0001fl-HI
-	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 16:34:57 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hYG8q-0001W6-9G
+	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 16:34:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hYG8y-0004sB-Ay
-	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 16:34:55 -0400
-Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:43720)
+	(envelope-from <richard.henderson@linaro.org>) id 1hYG8o-0004hB-23
+	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 16:34:43 -0400
+Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:35317)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hYG8u-0004nD-N9
-	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 16:34:50 -0400
-Received: by mail-ot1-x344.google.com with SMTP id i8so20829032oth.10
-	for <qemu-devel@nongnu.org>; Tue, 04 Jun 2019 13:34:48 -0700 (PDT)
+	id 1hYG8n-0004fl-SO
+	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 16:34:42 -0400
+Received: by mail-ot1-x342.google.com with SMTP id n14so20873989otk.2
+	for <qemu-devel@nongnu.org>; Tue, 04 Jun 2019 13:34:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
 	h=from:to:subject:date:message-id:in-reply-to:references;
-	bh=PYpVsDECn50S2iyRZN0fZ1fEzaZW8+7DmxjFRcVQ65o=;
-	b=SNgfQUeHb6yhrsOM1h+GkXlqqOeqNSivVzYqCTW5ewigzePOuzkVVjdvjODC9RAB50
-	UcQdCe5CunAL4AuQa2DPFHXqbi8qAyvM2QWxcaH/j2pbMegxyKJPd51s+WWWl0riwuXN
-	39I9/VpK8fw8m6dfP0we9ArVuDsUcG1mrTNLOHr9T/cXc0naffcB003e70J035SPh8AR
-	k6xMqoVzHSqe4Rff9xTHa5iTaPlr4lqmu9+cT98vRKLed5Ur+/QfWLVys9RotpOvh/bI
-	3O750k5IJn/LE+u1cUr4UL15AIp8FURl2ccqp9zj7Y5HOMG98L1thM2u2J0tBUCGEoks
-	L9Dg==
+	bh=8TtqTmBnQgsNdelS4/2zOiTH2Ne6fCH7LBgKkWFYMCA=;
+	b=q1zjSdonzryn6WEg7j5mevPE6PHAIHR44lKoyJ+Oh4VTMhHtomHR6VGVP0JsLM2pCu
+	wM0k8DZmqHRT+XsFQr143sV1Yjtj8REYkKPQtOBZSehDXhPVo6om/Wz4Q0n7kV/gPit+
+	/nWDsoerQ2iAzpC2zIMSB1t85prmWnOLxi90BuP2521nAV3GzhbIGA/ze+mAq3qLoFRp
+	8Q5AhNQDAr1Ml7Igz7amLMpqb9WwdXyNRXyr9rMccgh3rNYgN/TURJVHzy8sh9HxZ6JE
+	r6u4EWEQodnwEEpcbzNsG7EM9AZj2KKf4fr2xwksVZ1bKN4r4EG00RpnvifmtOTL+9Zh
+	PGKQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
 	:references;
-	bh=PYpVsDECn50S2iyRZN0fZ1fEzaZW8+7DmxjFRcVQ65o=;
-	b=J9sJypf2eCh5Ju1+xc5uNJ1sauqGFU7OZ38VxnVqNU7JALu8KGiL+1onaN8kFr+e69
-	7QOGMd1YFSlguerM3+jktDrHfdCZggjm9D4xLlFZeGlXaYGl8mCC9lIXkQfAPvJWUzfG
-	0S+mB7cL9sZLXY5pv2hePEt7Szqvr82EELc4Pgvba5+8kA+8hErMMBku9IJpYSu2h3o1
-	6Hwo2AD8HK1y4Ofi9W28Xx7OUklY4+FWxuoWIBHNG2HsalwCtEbDqpQ7JDGn3hZOrWyd
-	SOF/LEsRU34NVYiNsTaHDyLCsFbmb14cpYljsNSXCXts4wrlApv03DyzLoyFF3a4uhj4
-	2jDg==
-X-Gm-Message-State: APjAAAX3vU27TYmDf5e533q7zG6XM8MCynaVUDSUErFT7iudhAZnKmL+
-	mKVMVvT2s3GvyR+KyEhiYd6XSjIaw96wyQ==
-X-Google-Smtp-Source: APXvYqznvEFzA5gQZa/9Q11QrqcT2qA6jImT/ejQQ4ReafIQfXdFy5DqknPms/EFbsf40PA2IKOowQ==
-X-Received: by 2002:a9d:4c17:: with SMTP id l23mr6516898otf.367.1559680487251; 
-	Tue, 04 Jun 2019 13:34:47 -0700 (PDT)
+	bh=8TtqTmBnQgsNdelS4/2zOiTH2Ne6fCH7LBgKkWFYMCA=;
+	b=osfcGsFXGE/GvuFJ7+MZnylh4dxxsDMfyzhFz51KaUx0CuS6uFDKACW2hbJkHvT20A
+	qY2MNecOgn80vqx8AIBdLPifvCleYrrqKYmr2QNjqzvK2ooju93rzxqtphcEw2b+m5DA
+	pU9vSddg3WPBBRq3SJ7skQxUk2+OkqW+SAto1yXjCPyxdZfxWhMoYdlLJ1pGU0zTBY+C
+	YTBCCpNSNQjKYXomdyI0qUSIOqqO0cbHNfmF4nlZK/RIyf4SALHLBVJcD20p9xvBAKgi
+	SsY2GTyNx8pKFNU3gClyLiZ4Az3s6XlMy66IHoL9MtxBUDmGKRpewDQLa/ULjcVVCihI
+	cB0Q==
+X-Gm-Message-State: APjAAAVTD6aPLuyEFo5mZ1jyZKf1nTFexAmfuuQq+u/jI9mMogJia/XT
+	WjSD9ME7/J1iu+WVa3GBKvkAc6y2B1Qh9A==
+X-Google-Smtp-Source: APXvYqyFf6QYeUPzI4AFwkTcjeRgYUZHiaVtJL6fjO+srT0FWbXxSLRsEdcn/JUKT1Y9UPXD2ieXBA==
+X-Received: by 2002:a9d:72da:: with SMTP id d26mr7104441otk.327.1559680480806; 
+	Tue, 04 Jun 2019 13:34:40 -0700 (PDT)
 Received: from localhost.localdomain (200-56-192-86-cable.cybercable.net.mx.
 	[200.56.192.86])
-	by smtp.gmail.com with ESMTPSA id h1sm5979901otj.78.2019.06.04.13.34.46
+	by smtp.gmail.com with ESMTPSA id h1sm5979901otj.78.2019.06.04.13.34.39
 	for <qemu-devel@nongnu.org>
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Tue, 04 Jun 2019 13:34:46 -0700 (PDT)
+	Tue, 04 Jun 2019 13:34:40 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Tue,  4 Jun 2019 15:33:46 -0500
-Message-Id: <20190604203351.27778-35-richard.henderson@linaro.org>
+Date: Tue,  4 Jun 2019 15:33:41 -0500
+Message-Id: <20190604203351.27778-30-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190604203351.27778-1-richard.henderson@linaro.org>
 References: <20190604203351.27778-1-richard.henderson@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2607:f8b0:4864:20::344
-Subject: [Qemu-devel] [PATCH v4 34/39] cpu: Move icount_decr to
- CPUNegativeOffsetState
+X-Received-From: 2607:f8b0:4864:20::342
+Subject: [Qemu-devel] [PATCH v4 29/39] target/unicore32: Use env_cpu,
+ env_archcpu
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -96,422 +96,309 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Amusingly, we had already ignored the comment to keep this value
-at the end of CPUState.  This restores the minimum negative offset
-from TCG_AREG0 for code generation.
-
-For the couple of uses within qom/cpu.c, without NEED_CPU_H, add
-a pointer from the CPUState object to the IcountDecr object within
-CPUNegativeOffsetState.
+Cleanup in the boilerplate that each target must define.
+Replace uc32_env_get_cpu with env_archcpu.  The combination
+CPU(uc32_env_get_cpu) should have used ENV_GET_CPU to begin;
+use env_cpu now.
 
 Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- include/exec/cpu-all.h    |  1 +
- include/exec/cpu-defs.h   |  3 ++-
- include/exec/gen-icount.h | 16 ++++++++++------
- include/qom/cpu.h         | 40 ++++++++++++++++++---------------------
- accel/tcg/cpu-exec.c      | 23 +++++++++++-----------
- accel/tcg/tcg-all.c       |  6 ++----
- accel/tcg/translate-all.c |  8 ++++----
- cpus.c                    |  9 +++++----
- qom/cpu.c                 |  4 ++--
- 9 files changed, 56 insertions(+), 54 deletions(-)
+ target/unicore32/cpu.h          |  5 -----
+ hw/unicore32/puv3.c             |  2 +-
+ target/unicore32/helper.c       |  4 +---
+ target/unicore32/op_helper.c    |  2 +-
+ target/unicore32/softmmu.c      | 11 ++++-------
+ target/unicore32/translate.c    | 26 ++------------------------
+ target/unicore32/ucf64_helper.c |  2 +-
+ 7 files changed, 10 insertions(+), 42 deletions(-)
 
-diff --git a/include/exec/cpu-all.h b/include/exec/cpu-all.h
-index 5ae83405c8..253dd1d9a5 100644
---- a/include/exec/cpu-all.h
-+++ b/include/exec/cpu-all.h
-@@ -380,6 +380,7 @@ int cpu_exec(CPUState *cpu);
- static inline void cpu_set_cpustate_pointers(ArchCPU *cpu)
- {
-     cpu->parent_obj.env_ptr = &cpu->env;
-+    cpu->parent_obj.icount_decr_ptr = &cpu->neg.icount_decr;
- }
+diff --git a/target/unicore32/cpu.h b/target/unicore32/cpu.h
+index e91cec4d2e..595dc43c99 100644
+--- a/target/unicore32/cpu.h
++++ b/target/unicore32/cpu.h
+@@ -76,11 +76,6 @@ struct UniCore32CPU {
+     CPUUniCore32State env;
+ };
  
- /**
-diff --git a/include/exec/cpu-defs.h b/include/exec/cpu-defs.h
-index 921fbb4c36..c067994e5c 100644
---- a/include/exec/cpu-defs.h
-+++ b/include/exec/cpu-defs.h
-@@ -33,6 +33,7 @@
- #include "exec/hwaddr.h"
- #endif
- #include "exec/memattrs.h"
-+#include "qom/cpu.h"
- 
- #include "cpu-param.h"
- 
-@@ -232,7 +233,7 @@ typedef struct CPUTLB {
-  * before CPUArchState, as a field named "neg".
-  */
- typedef struct CPUNegativeOffsetState {
--    /* Empty */
-+    IcountDecr icount_decr;
- } CPUNegativeOffsetState;
- 
- #endif
-diff --git a/include/exec/gen-icount.h b/include/exec/gen-icount.h
-index 9cfa6ccce5..f7669b6841 100644
---- a/include/exec/gen-icount.h
-+++ b/include/exec/gen-icount.h
-@@ -5,8 +5,6 @@
- 
- /* Helpers for instruction counting code generation.  */
- 
--#define ENV_OFFSET   offsetof(ArchCPU, env)
+-static inline UniCore32CPU *uc32_env_get_cpu(CPUUniCore32State *env)
+-{
+-    return container_of(env, UniCore32CPU, env);
+-}
 -
- static TCGOp *icount_start_insn;
+ #define ENV_OFFSET offsetof(UniCore32CPU, env)
  
- static inline void gen_tb_start(TranslationBlock *tb)
-@@ -21,7 +19,8 @@ static inline void gen_tb_start(TranslationBlock *tb)
-     }
+ void uc32_cpu_do_interrupt(CPUState *cpu);
+diff --git a/hw/unicore32/puv3.c b/hw/unicore32/puv3.c
+index b42e600f74..132e6086ee 100644
+--- a/hw/unicore32/puv3.c
++++ b/hw/unicore32/puv3.c
+@@ -56,7 +56,7 @@ static void puv3_soc_init(CPUUniCore32State *env)
  
-     tcg_gen_ld_i32(count, cpu_env,
--                   -ENV_OFFSET + offsetof(CPUState, icount_decr.u32));
-+                   offsetof(ArchCPU, neg.icount_decr.u32) -
-+                   offsetof(ArchCPU, env));
- 
-     if (tb_cflags(tb) & CF_USE_ICOUNT) {
-         imm = tcg_temp_new_i32();
-@@ -39,7 +38,8 @@ static inline void gen_tb_start(TranslationBlock *tb)
- 
-     if (tb_cflags(tb) & CF_USE_ICOUNT) {
-         tcg_gen_st16_i32(count, cpu_env,
--                         -ENV_OFFSET + offsetof(CPUState, icount_decr.u16.low));
-+                         offsetof(ArchCPU, neg.icount_decr.u16.low) -
-+                         offsetof(ArchCPU, env));
-     }
- 
-     tcg_temp_free_i32(count);
-@@ -60,14 +60,18 @@ static inline void gen_tb_end(TranslationBlock *tb, int num_insns)
- static inline void gen_io_start(void)
+     /* Initialize interrupt controller */
+     cpu_intc = qemu_allocate_irq(puv3_intc_cpu_handler,
+-                                 uc32_env_get_cpu(env), 0);
++                                 env_archcpu(env), 0);
+     dev = sysbus_create_simple("puv3_intc", PUV3_INTC_BASE, cpu_intc);
+     for (i = 0; i < PUV3_IRQS_NR; i++) {
+         irqs[i] = qdev_get_gpio_in(dev, i);
+diff --git a/target/unicore32/helper.c b/target/unicore32/helper.c
+index 0d4914b48d..7d538e2144 100644
+--- a/target/unicore32/helper.c
++++ b/target/unicore32/helper.c
+@@ -31,8 +31,6 @@
+ void helper_cp0_set(CPUUniCore32State *env, uint32_t val, uint32_t creg,
+         uint32_t cop)
  {
-     TCGv_i32 tmp = tcg_const_i32(1);
--    tcg_gen_st_i32(tmp, cpu_env, -ENV_OFFSET + offsetof(CPUState, can_do_io));
-+    tcg_gen_st_i32(tmp, cpu_env,
-+                   offsetof(ArchCPU, parent_obj.can_do_io) -
-+                   offsetof(ArchCPU, env));
-     tcg_temp_free_i32(tmp);
- }
- 
- static inline void gen_io_end(void)
- {
-     TCGv_i32 tmp = tcg_const_i32(0);
--    tcg_gen_st_i32(tmp, cpu_env, -ENV_OFFSET + offsetof(CPUState, can_do_io));
-+    tcg_gen_st_i32(tmp, cpu_env,
-+                   offsetof(ArchCPU, parent_obj.can_do_io) -
-+                   offsetof(ArchCPU, env));
-     tcg_temp_free_i32(tmp);
- }
- 
-diff --git a/include/qom/cpu.h b/include/qom/cpu.h
-index 98e12d914c..5ee0046b62 100644
---- a/include/qom/cpu.h
-+++ b/include/qom/cpu.h
-@@ -232,17 +232,25 @@ typedef struct CPUClass {
-     bool gdb_stop_before_watchpoint;
- } CPUClass;
- 
-+/*
-+ * Low 16 bits: number of cycles left, used only in icount mode.
-+ * High 16 bits: Set to -1 to force TCG to stop executing linked TBs
-+ * for this CPU and return to its top level loop (even in non-icount mode).
-+ * This allows a single read-compare-cbranch-write sequence to test
-+ * for both decrementer underflow and exceptions.
-+ */
-+typedef union IcountDecr {
-+    uint32_t u32;
-+    struct {
- #ifdef HOST_WORDS_BIGENDIAN
--typedef struct icount_decr_u16 {
--    uint16_t high;
--    uint16_t low;
--} icount_decr_u16;
-+        uint16_t high;
-+        uint16_t low;
- #else
--typedef struct icount_decr_u16 {
--    uint16_t low;
--    uint16_t high;
--} icount_decr_u16;
-+        uint16_t low;
-+        uint16_t high;
- #endif
-+    } u16;
-+} IcountDecr;
- 
- typedef struct CPUBreakpoint {
-     vaddr pc;
-@@ -314,11 +322,6 @@ struct qemu_work_item;
-  * @crash_occurred: Indicates the OS reported a crash (panic) for this CPU
-  * @singlestep_enabled: Flags for single-stepping.
-  * @icount_extra: Instructions until next timer event.
-- * @icount_decr: Low 16 bits: number of cycles left, only used in icount mode.
-- * High 16 bits: Set to -1 to force TCG to stop executing linked TBs for this
-- * CPU and return to its top level loop (even in non-icount mode).
-- * This allows a single read-compare-cbranch-write sequence to test
-- * for both decrementer underflow and exceptions.
-  * @can_do_io: Nonzero if memory-mapped IO is safe. Deterministic execution
-  * requires that IO only be performed on the last instruction of a TB
-  * so that interrupts take effect immediately.
-@@ -328,6 +331,7 @@ struct qemu_work_item;
-  * @as: Pointer to the first AddressSpace, for the convenience of targets which
-  *      only have a single AddressSpace
-  * @env_ptr: Pointer to subclass-specific CPUArchState field.
-+ * @icount_decr_ptr: Pointer to IcountDecr field within subclass.
-  * @gdb_regs: Additional GDB registers.
-  * @gdb_num_regs: Number of total registers accessible to GDB.
-  * @gdb_num_g_regs: Number of registers in GDB 'g' packets.
-@@ -387,6 +391,7 @@ struct CPUState {
-     MemoryRegion *memory;
- 
-     void *env_ptr; /* CPUArchState */
-+    IcountDecr *icount_decr_ptr;
- 
-     /* Accessed in parallel; all accesses must be atomic */
-     struct TranslationBlock *tb_jmp_cache[TB_JMP_CACHE_SIZE];
-@@ -441,15 +446,6 @@ struct CPUState {
- 
-     bool ignore_memory_transaction_failures;
- 
--    /* Note that this is accessed at the start of every TB via a negative
--       offset from AREG0.  Leave this field at the end so as to make the
--       (absolute value) offset as small as possible.  This reduces code
--       size, especially for hosts without large memory offsets.  */
--    union {
--        uint32_t u32;
--        icount_decr_u16 u16;
--    } icount_decr;
+-    UniCore32CPU *cpu = uc32_env_get_cpu(env);
 -
-     struct hax_vcpu_state *hax_vcpu;
+     /*
+      * movc pp.nn, rn, #imm9
+      *      rn: UCOP_REG_D
+@@ -101,7 +99,7 @@ void helper_cp0_set(CPUUniCore32State *env, uint32_t val, uint32_t creg,
+     case 6:
+         if ((cop <= 6) && (cop >= 2)) {
+             /* invalid all tlb */
+-            tlb_flush(CPU(cpu));
++            tlb_flush(env_cpu(env));
+             return;
+         }
+         break;
+diff --git a/target/unicore32/op_helper.c b/target/unicore32/op_helper.c
+index 797ba60dc9..eeaa78601a 100644
+--- a/target/unicore32/op_helper.c
++++ b/target/unicore32/op_helper.c
+@@ -19,7 +19,7 @@
  
-     int hvf_fd;
-diff --git a/accel/tcg/cpu-exec.c b/accel/tcg/cpu-exec.c
-index 45ef41ebb2..032a62672e 100644
---- a/accel/tcg/cpu-exec.c
-+++ b/accel/tcg/cpu-exec.c
-@@ -54,7 +54,7 @@ typedef struct SyncClocks {
- #define MAX_DELAY_PRINT_RATE 2000000000LL
- #define MAX_NB_PRINTS 100
- 
--static void align_clocks(SyncClocks *sc, const CPUState *cpu)
-+static void align_clocks(SyncClocks *sc, CPUState *cpu)
+ void HELPER(exception)(CPUUniCore32State *env, uint32_t excp)
  {
-     int64_t cpu_icount;
+-    CPUState *cs = CPU(uc32_env_get_cpu(env));
++    CPUState *cs = env_cpu(env);
  
-@@ -62,7 +62,7 @@ static void align_clocks(SyncClocks *sc, const CPUState *cpu)
-         return;
+     cs->exception_index = excp;
+     cpu_loop_exit(cs);
+diff --git a/target/unicore32/softmmu.c b/target/unicore32/softmmu.c
+index 27f218abf0..cbdaa500b7 100644
+--- a/target/unicore32/softmmu.c
++++ b/target/unicore32/softmmu.c
+@@ -36,8 +36,6 @@
+ /* Map CPU modes onto saved register banks.  */
+ static inline int bank_number(CPUUniCore32State *env, int mode)
+ {
+-    UniCore32CPU *cpu = uc32_env_get_cpu(env);
+-
+     switch (mode) {
+     case ASR_MODE_USER:
+     case ASR_MODE_SUSR:
+@@ -51,7 +49,7 @@ static inline int bank_number(CPUUniCore32State *env, int mode)
+     case ASR_MODE_INTR:
+         return 4;
      }
- 
--    cpu_icount = cpu->icount_extra + cpu->icount_decr.u16.low;
-+    cpu_icount = cpu->icount_extra + cpu_neg(cpu)->icount_decr.u16.low;
-     sc->diff_clk += cpu_icount_to_ns(sc->last_cpu_icount - cpu_icount);
-     sc->last_cpu_icount = cpu_icount;
- 
-@@ -105,15 +105,15 @@ static void print_delay(const SyncClocks *sc)
-     }
+-    cpu_abort(CPU(cpu), "Bad mode %x\n", mode);
++    cpu_abort(env_cpu(env), "Bad mode %x\n", mode);
+     return -1;
  }
  
--static void init_delay_params(SyncClocks *sc,
--                              const CPUState *cpu)
-+static void init_delay_params(SyncClocks *sc, CPUState *cpu)
+@@ -126,8 +124,7 @@ static int get_phys_addr_ucv2(CPUUniCore32State *env, uint32_t address,
+         int access_type, int is_user, uint32_t *phys_ptr, int *prot,
+         target_ulong *page_size)
  {
-     if (!icount_align_option) {
-         return;
+-    UniCore32CPU *cpu = uc32_env_get_cpu(env);
+-    CPUState *cs = CPU(cpu);
++    CPUState *cs = env_cpu(env);
+     int code;
+     uint32_t table;
+     uint32_t desc;
+@@ -174,11 +171,11 @@ static int get_phys_addr_ucv2(CPUUniCore32State *env, uint32_t address,
+             *page_size = TARGET_PAGE_SIZE;
+             break;
+         default:
+-            cpu_abort(CPU(cpu), "wrong page type!");
++            cpu_abort(cs, "wrong page type!");
+         }
+         break;
+     default:
+-        cpu_abort(CPU(cpu), "wrong page type!");
++        cpu_abort(cs, "wrong page type!");
      }
-     sc->realtime_clock = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL_RT);
-     sc->diff_clk = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) - sc->realtime_clock;
--    sc->last_cpu_icount = cpu->icount_extra + cpu->icount_decr.u16.low;
-+    sc->last_cpu_icount
-+        = cpu->icount_extra + cpu_neg(cpu)->icount_decr.u16.low;
-     if (sc->diff_clk < max_delay) {
-         max_delay = sc->diff_clk;
+ 
+     *phys_ptr = phys_addr;
+diff --git a/target/unicore32/translate.c b/target/unicore32/translate.c
+index 89b02d1c3c..d27451eed3 100644
+--- a/target/unicore32/translate.c
++++ b/target/unicore32/translate.c
+@@ -180,7 +180,7 @@ static void store_reg(DisasContext *s, int reg, TCGv var)
+ #define UCOP_SET_L              UCOP_SET(24)
+ #define UCOP_SET_S              UCOP_SET(24)
+ 
+-#define ILLEGAL         cpu_abort(CPU(cpu),                             \
++#define ILLEGAL         cpu_abort(env_cpu(env),                         \
+                         "Illegal UniCore32 instruction %x at line %d!", \
+                         insn, __LINE__)
+ 
+@@ -188,7 +188,6 @@ static void store_reg(DisasContext *s, int reg, TCGv var)
+ static void disas_cp0_insn(CPUUniCore32State *env, DisasContext *s,
+         uint32_t insn)
+ {
+-    UniCore32CPU *cpu = uc32_env_get_cpu(env);
+     TCGv tmp, tmp2, tmp3;
+     if ((insn & 0xfe000000) == 0xe0000000) {
+         tmp2 = new_tmp();
+@@ -214,7 +213,6 @@ static void disas_cp0_insn(CPUUniCore32State *env, DisasContext *s,
+ static void disas_ocd_insn(CPUUniCore32State *env, DisasContext *s,
+         uint32_t insn)
+ {
+-    UniCore32CPU *cpu = uc32_env_get_cpu(env);
+     TCGv tmp;
+ 
+     if ((insn & 0xff003fff) == 0xe1000400) {
+@@ -682,7 +680,6 @@ static inline long ucf64_reg_offset(int reg)
+ /* UniCore-F64 single load/store I_offset */
+ static void do_ucf64_ldst_i(CPUUniCore32State *env, DisasContext *s, uint32_t insn)
+ {
+-    UniCore32CPU *cpu = uc32_env_get_cpu(env);
+     int offset;
+     TCGv tmp;
+     TCGv addr;
+@@ -729,7 +726,6 @@ static void do_ucf64_ldst_i(CPUUniCore32State *env, DisasContext *s, uint32_t in
+ /* UniCore-F64 load/store multiple words */
+ static void do_ucf64_ldst_m(CPUUniCore32State *env, DisasContext *s, uint32_t insn)
+ {
+-    UniCore32CPU *cpu = uc32_env_get_cpu(env);
+     unsigned int i;
+     int j, n, freg;
+     TCGv tmp;
+@@ -815,7 +811,6 @@ static void do_ucf64_ldst_m(CPUUniCore32State *env, DisasContext *s, uint32_t in
+ /* UniCore-F64 mrc/mcr */
+ static void do_ucf64_trans(CPUUniCore32State *env, DisasContext *s, uint32_t insn)
+ {
+-    UniCore32CPU *cpu = uc32_env_get_cpu(env);
+     TCGv tmp;
+ 
+     if ((insn & 0xfe0003ff) == 0xe2000000) {
+@@ -880,8 +875,6 @@ static void do_ucf64_trans(CPUUniCore32State *env, DisasContext *s, uint32_t ins
+ /* UniCore-F64 convert instructions */
+ static void do_ucf64_fcvt(CPUUniCore32State *env, DisasContext *s, uint32_t insn)
+ {
+-    UniCore32CPU *cpu = uc32_env_get_cpu(env);
+-
+     if (UCOP_UCF64_FMT == 3) {
+         ILLEGAL;
      }
-@@ -467,7 +467,7 @@ static inline bool cpu_handle_exception(CPUState *cpu, int *ret)
-     if (cpu->exception_index < 0) {
+@@ -948,8 +941,6 @@ static void do_ucf64_fcvt(CPUUniCore32State *env, DisasContext *s, uint32_t insn
+ /* UniCore-F64 compare instructions */
+ static void do_ucf64_fcmp(CPUUniCore32State *env, DisasContext *s, uint32_t insn)
+ {
+-    UniCore32CPU *cpu = uc32_env_get_cpu(env);
+-
+     if (UCOP_SET(25)) {
+         ILLEGAL;
+     }
+@@ -1028,8 +1019,6 @@ static void do_ucf64_fcmp(CPUUniCore32State *env, DisasContext *s, uint32_t insn
+ /* UniCore-F64 data processing */
+ static void do_ucf64_datap(CPUUniCore32State *env, DisasContext *s, uint32_t insn)
+ {
+-    UniCore32CPU *cpu = uc32_env_get_cpu(env);
+-
+     if (UCOP_UCF64_FMT == 3) {
+         ILLEGAL;
+     }
+@@ -1063,8 +1052,6 @@ static void do_ucf64_datap(CPUUniCore32State *env, DisasContext *s, uint32_t ins
+ /* Disassemble an F64 instruction */
+ static void disas_ucf64_insn(CPUUniCore32State *env, DisasContext *s, uint32_t insn)
+ {
+-    UniCore32CPU *cpu = uc32_env_get_cpu(env);
+-
+     if (!UCOP_SET(29)) {
+         if (UCOP_SET(26)) {
+             do_ucf64_ldst_m(env, s, insn);
+@@ -1162,8 +1149,6 @@ static void gen_exception_return(DisasContext *s, TCGv pc)
+ static void disas_coproc_insn(CPUUniCore32State *env, DisasContext *s,
+         uint32_t insn)
+ {
+-    UniCore32CPU *cpu = uc32_env_get_cpu(env);
+-
+     switch (UCOP_CPNUM) {
  #ifndef CONFIG_USER_ONLY
-         if (replay_has_exception()
--               && cpu->icount_decr.u16.low + cpu->icount_extra == 0) {
-+            && cpu_neg(cpu)->icount_decr.u16.low + cpu->icount_extra == 0) {
-             /* try to cause an exception pending in the log */
-             cpu_exec_nocache(cpu, 1, tb_find(cpu, NULL, 0, curr_cflags()), true);
-         }
-@@ -525,7 +525,7 @@ static inline bool cpu_handle_interrupt(CPUState *cpu,
-      * Ensure zeroing happens before reading cpu->exit_request or
-      * cpu->interrupt_request (see also smp_wmb in cpu_exit())
-      */
--    atomic_mb_set(&cpu->icount_decr.u16.high, 0);
-+    atomic_mb_set(&cpu_neg(cpu)->icount_decr.u16.high, 0);
- 
-     if (unlikely(atomic_read(&cpu->interrupt_request))) {
-         int interrupt_request;
-@@ -596,8 +596,9 @@ static inline bool cpu_handle_interrupt(CPUState *cpu,
-     }
- 
-     /* Finally, check if we need to exit to the main loop.  */
--    if (unlikely(atomic_read(&cpu->exit_request)
--        || (use_icount && cpu->icount_decr.u16.low + cpu->icount_extra == 0))) {
-+    if (unlikely(atomic_read(&cpu->exit_request))
-+        || (use_icount
-+            && cpu_neg(cpu)->icount_decr.u16.low + cpu->icount_extra == 0)) {
-         atomic_set(&cpu->exit_request, 0);
-         if (cpu->exception_index == -1) {
-             cpu->exception_index = EXCP_INTERRUPT;
-@@ -624,7 +625,7 @@ static inline void cpu_loop_exec_tb(CPUState *cpu, TranslationBlock *tb,
-     }
- 
-     *last_tb = NULL;
--    insns_left = atomic_read(&cpu->icount_decr.u32);
-+    insns_left = atomic_read(&cpu_neg(cpu)->icount_decr.u32);
-     if (insns_left < 0) {
-         /* Something asked us to stop executing chained TBs; just
-          * continue round the main loop. Whatever requested the exit
-@@ -643,7 +644,7 @@ static inline void cpu_loop_exec_tb(CPUState *cpu, TranslationBlock *tb,
-     cpu_update_icount(cpu);
-     /* Refill decrementer and continue execution.  */
-     insns_left = MIN(0xffff, cpu->icount_budget);
--    cpu->icount_decr.u16.low = insns_left;
-+    cpu_neg(cpu)->icount_decr.u16.low = insns_left;
-     cpu->icount_extra = cpu->icount_budget - insns_left;
-     if (!cpu->icount_extra) {
-         /* Execute any remaining instructions, then let the main loop
-diff --git a/accel/tcg/tcg-all.c b/accel/tcg/tcg-all.c
-index 3d25bdcc17..9b215dcc5a 100644
---- a/accel/tcg/tcg-all.c
-+++ b/accel/tcg/tcg-all.c
-@@ -28,13 +28,12 @@
- #include "sysemu/sysemu.h"
- #include "qom/object.h"
- #include "qemu-common.h"
--#include "qom/cpu.h"
-+#include "cpu.h"
- #include "sysemu/cpus.h"
- #include "qemu/main-loop.h"
- 
- unsigned long tcg_tb_size;
- 
--#ifndef CONFIG_USER_ONLY
- /* mask must never be zero, except for A20 change call */
- static void tcg_handle_interrupt(CPUState *cpu, int mask)
- {
-@@ -51,7 +50,7 @@ static void tcg_handle_interrupt(CPUState *cpu, int mask)
-     if (!qemu_cpu_is_self(cpu)) {
-         qemu_cpu_kick(cpu);
-     } else {
--        atomic_set(&cpu->icount_decr.u16.high, -1);
-+        atomic_set(&cpu_neg(cpu)->icount_decr.u16.high, -1);
-         if (use_icount &&
-             !cpu->can_do_io
-             && (mask & ~old_mask) != 0) {
-@@ -59,7 +58,6 @@ static void tcg_handle_interrupt(CPUState *cpu, int mask)
-         }
+     case 0:
+@@ -1178,14 +1163,13 @@ static void disas_coproc_insn(CPUUniCore32State *env, DisasContext *s,
+         break;
+     default:
+         /* Unknown coprocessor. */
+-        cpu_abort(CPU(cpu), "Unknown coprocessor!");
++        cpu_abort(env_cpu(env), "Unknown coprocessor!");
      }
  }
--#endif
  
- static int tcg_init(MachineState *ms)
+ /* data processing instructions */
+ static void do_datap(CPUUniCore32State *env, DisasContext *s, uint32_t insn)
  {
-diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
-index 52d94facf0..e24ee3a172 100644
---- a/accel/tcg/translate-all.c
-+++ b/accel/tcg/translate-all.c
-@@ -364,7 +364,7 @@ static int cpu_restore_state_from_tb(CPUState *cpu, TranslationBlock *tb,
-         assert(use_icount);
-         /* Reset the cycle counter to the start of the block
-            and shift if to the number of actually executed instructions */
--        cpu->icount_decr.u16.low += num_insns - i;
-+        cpu_neg(cpu)->icount_decr.u16.low += num_insns - i;
-     }
-     restore_state_to_opc(env, tb, data);
- 
-@@ -2200,7 +2200,7 @@ void cpu_io_recompile(CPUState *cpu, uintptr_t retaddr)
-     if ((env->hflags & MIPS_HFLAG_BMASK) != 0
-         && env->active_tc.PC != tb->pc) {
-         env->active_tc.PC -= (env->hflags & MIPS_HFLAG_B16 ? 2 : 4);
--        cpu->icount_decr.u16.low++;
-+        cpu_neg(cpu)->icount_decr.u16.low++;
-         env->hflags &= ~MIPS_HFLAG_BMASK;
-         n = 2;
-     }
-@@ -2208,7 +2208,7 @@ void cpu_io_recompile(CPUState *cpu, uintptr_t retaddr)
-     if ((env->flags & ((DELAY_SLOT | DELAY_SLOT_CONDITIONAL))) != 0
-         && env->pc != tb->pc) {
-         env->pc -= 2;
--        cpu->icount_decr.u16.low++;
-+        cpu_neg(cpu)->icount_decr.u16.low++;
-         env->flags &= ~(DELAY_SLOT | DELAY_SLOT_CONDITIONAL);
-         n = 2;
-     }
-@@ -2382,7 +2382,7 @@ void cpu_interrupt(CPUState *cpu, int mask)
+-    UniCore32CPU *cpu = uc32_env_get_cpu(env);
+     TCGv tmp;
+     TCGv tmp2;
+     int logic_cc;
+@@ -1419,7 +1403,6 @@ static void do_mult(CPUUniCore32State *env, DisasContext *s, uint32_t insn)
+ /* miscellaneous instructions */
+ static void do_misc(CPUUniCore32State *env, DisasContext *s, uint32_t insn)
  {
-     g_assert(qemu_mutex_iothread_locked());
-     cpu->interrupt_request |= mask;
--    atomic_set(&cpu->icount_decr.u16.high, -1);
-+    atomic_set(&cpu_neg(cpu)->icount_decr.u16.high, -1);
- }
+-    UniCore32CPU *cpu = uc32_env_get_cpu(env);
+     unsigned int val;
+     TCGv tmp;
  
- /*
-diff --git a/cpus.c b/cpus.c
-index ffc57119ca..111ca4ed1c 100644
---- a/cpus.c
-+++ b/cpus.c
-@@ -239,7 +239,8 @@ void qemu_tcg_configure(QemuOpts *opts, Error **errp)
-  */
- static int64_t cpu_get_icount_executed(CPUState *cpu)
+@@ -1545,7 +1528,6 @@ static void do_ldst_ir(CPUUniCore32State *env, DisasContext *s, uint32_t insn)
+ /* SWP instruction */
+ static void do_swap(CPUUniCore32State *env, DisasContext *s, uint32_t insn)
  {
--    return cpu->icount_budget - (cpu->icount_decr.u16.low + cpu->icount_extra);
-+    return (cpu->icount_budget -
-+            (cpu_neg(cpu)->icount_decr.u16.low + cpu->icount_extra));
- }
+-    UniCore32CPU *cpu = uc32_env_get_cpu(env);
+     TCGv addr;
+     TCGv tmp;
+     TCGv tmp2;
+@@ -1573,7 +1555,6 @@ static void do_swap(CPUUniCore32State *env, DisasContext *s, uint32_t insn)
+ /* load/store hw/sb */
+ static void do_ldst_hwsb(CPUUniCore32State *env, DisasContext *s, uint32_t insn)
+ {
+-    UniCore32CPU *cpu = uc32_env_get_cpu(env);
+     TCGv addr;
+     TCGv tmp;
  
- /*
-@@ -1389,12 +1390,12 @@ static void prepare_icount_for_run(CPUState *cpu)
-          * each vCPU execution. However u16.high can be raised
-          * asynchronously by cpu_exit/cpu_interrupt/tcg_handle_interrupt
-          */
--        g_assert(cpu->icount_decr.u16.low == 0);
-+        g_assert(cpu_neg(cpu)->icount_decr.u16.low == 0);
-         g_assert(cpu->icount_extra == 0);
+@@ -1626,7 +1607,6 @@ static void do_ldst_hwsb(CPUUniCore32State *env, DisasContext *s, uint32_t insn)
+ /* load/store multiple words */
+ static void do_ldst_m(CPUUniCore32State *env, DisasContext *s, uint32_t insn)
+ {
+-    UniCore32CPU *cpu = uc32_env_get_cpu(env);
+     unsigned int val, i, mmu_idx;
+     int j, n, reg, user, loaded_base;
+     TCGv tmp;
+@@ -1768,7 +1748,6 @@ static void do_ldst_m(CPUUniCore32State *env, DisasContext *s, uint32_t insn)
+ /* branch (and link) */
+ static void do_branch(CPUUniCore32State *env, DisasContext *s, uint32_t insn)
+ {
+-    UniCore32CPU *cpu = uc32_env_get_cpu(env);
+     unsigned int val;
+     int32_t offset;
+     TCGv tmp;
+@@ -1798,7 +1777,6 @@ static void do_branch(CPUUniCore32State *env, DisasContext *s, uint32_t insn)
  
-         cpu->icount_budget = tcg_get_icount_limit();
-         insns_left = MIN(0xffff, cpu->icount_budget);
--        cpu->icount_decr.u16.low = insns_left;
-+        cpu_neg(cpu)->icount_decr.u16.low = insns_left;
-         cpu->icount_extra = cpu->icount_budget - insns_left;
+ static void disas_uc32_insn(CPUUniCore32State *env, DisasContext *s)
+ {
+-    UniCore32CPU *cpu = uc32_env_get_cpu(env);
+     unsigned int insn;
  
-         replay_mutex_lock();
-@@ -1408,7 +1409,7 @@ static void process_icount_data(CPUState *cpu)
-         cpu_update_icount(cpu);
+     insn = cpu_ldl_code(env, s->pc);
+diff --git a/target/unicore32/ucf64_helper.c b/target/unicore32/ucf64_helper.c
+index fad3fa6618..e078e84437 100644
+--- a/target/unicore32/ucf64_helper.c
++++ b/target/unicore32/ucf64_helper.c
+@@ -78,7 +78,7 @@ static inline int ucf64_exceptbits_to_host(int target_bits)
  
-         /* Reset the counters */
--        cpu->icount_decr.u16.low = 0;
-+        cpu_neg(cpu)->icount_decr.u16.low = 0;
-         cpu->icount_extra = 0;
-         cpu->icount_budget = 0;
+ void HELPER(ucf64_set_fpscr)(CPUUniCore32State *env, uint32_t val)
+ {
+-    UniCore32CPU *cpu = uc32_env_get_cpu(env);
++    UniCore32CPU *cpu = env_archcpu(env);
+     int i;
+     uint32_t changed;
  
-diff --git a/qom/cpu.c b/qom/cpu.c
-index 3c5493c96c..6b4632abda 100644
---- a/qom/cpu.c
-+++ b/qom/cpu.c
-@@ -115,7 +115,7 @@ void cpu_exit(CPUState *cpu)
-     atomic_set(&cpu->exit_request, 1);
-     /* Ensure cpu_exec will see the exit request after TCG has exited.  */
-     smp_wmb();
--    atomic_set(&cpu->icount_decr.u16.high, -1);
-+    atomic_set(&cpu->icount_decr_ptr->u16.high, -1);
- }
- 
- int cpu_write_elf32_qemunote(WriteCoreDumpFunction f, CPUState *cpu,
-@@ -264,7 +264,7 @@ static void cpu_common_reset(CPUState *cpu)
-     cpu->mem_io_pc = 0;
-     cpu->mem_io_vaddr = 0;
-     cpu->icount_extra = 0;
--    atomic_set(&cpu->icount_decr.u32, 0);
-+    atomic_set(&cpu->icount_decr_ptr->u32, 0);
-     cpu->can_do_io = 1;
-     cpu->exception_index = -1;
-     cpu->crash_occurred = false;
 -- 
 2.17.1
 
