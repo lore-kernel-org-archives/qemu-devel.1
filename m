@@ -2,81 +2,63 @@ Return-Path: <SRS0=GUf1=UD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2256C04AB5
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 02:16:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 88EF1C04AB5
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 02:17:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8ECB1250FB
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 02:16:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4602C2441C
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 02:17:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hewHdWzf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8ECB1250FB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="oQohS2nH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4602C2441C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:43977 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:43992 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hXz04-0008VN-LX
-	for qemu-devel@archiver.kernel.org; Mon, 03 Jun 2019 22:16:32 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:59541)
+	id 1hXz1I-0000o7-BW
+	for qemu-devel@archiver.kernel.org; Mon, 03 Jun 2019 22:17:48 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:60169)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <elohimes@gmail.com>) id 1hXyzF-000853-UH
-	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 22:15:43 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1hXyzZ-0008D9-Fq
+	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 22:16:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <elohimes@gmail.com>) id 1hXyzE-0006eS-Ee
-	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 22:15:41 -0400
-Received: from mail-qk1-x744.google.com ([2607:f8b0:4864:20::744]:36064)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <elohimes@gmail.com>) id 1hXyzD-0006Ep-Tw
-	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 22:15:40 -0400
-Received: by mail-qk1-x744.google.com with SMTP id g18so1852423qkl.3
-	for <qemu-devel@nongnu.org>; Mon, 03 Jun 2019 19:15:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-	:cc; bh=JLiv5abDVFbLnIY1IKuCfX1ZsuGLizQfKZM4y3KF+48=;
-	b=hewHdWzf0zkVWQ1kUxQ9RI5u4+WTZqKkD6OOFuTh8epNeLJ5yg2Y0vqarsRrdglZ7Z
-	UAInBgVSwe+taGsR4t1pJVD5v6h1t0/0+VocNj+CHJJL70WAdq80XWaT5enYVBMFCZ/0
-	ERf/DWCsOGKnvC3i+FWtGIJ7WytaeJL4QAY1alKSWmaoc+RC/raIIzF1u/6DH9fDMv7l
-	kIX3SSiRBvze2jCO/qj0s6npD+wrC5V5E0GFtqTh/zBdOgoz0sZHYQ2WFoHoanQkoEjd
-	/04jtQJTZ3Vlu8f5uA0lcbUF54G29ngtah+w8B9DyqyzmTWPbfRMhSkoYBDZ6fvyGozl
-	eb7Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-	:message-id:subject:to:cc;
-	bh=JLiv5abDVFbLnIY1IKuCfX1ZsuGLizQfKZM4y3KF+48=;
-	b=iYmFR1e9QlazCBFn9XHNmh1DWMtfvYvyxIzoKrvMNDMcmprI+nOi611pqEubgcPQ3V
-	6lLQ9g9efwFMv6UXo3LN5XKkkvDTfC/qIz9z3laHZonDxoocO1Rsn3P3/fH2wo2oz9X9
-	r1pQc9sTdEI3CFFy/CBZllxX1wgcfAh9WEHk92XXUXJtdolonenTkDp3YaksLyde59D1
-	CPssKypvZ3EZtWcbhkn6yNv3/XQ5ZJ0EkmUfGIjoSN5ZYlpEDylaiZlPlMckroXQ5G9i
-	BPbyS79ZfsVFmIvw4R6+fuk+916TACpcRbCP+8d0kVaETZEDM8moLdY90cDiu95HYF0T
-	OEWA==
-X-Gm-Message-State: APjAAAUqQ6ePLEleRxhTav1wQXCBO2kKgjSzuBFCm0Ceq4tquVc3DPUA
-	tvhoOlcm9dk9K/jH2+wZsuJUBe0kOm5l23/DETo=
-X-Google-Smtp-Source: APXvYqxMVTJrOaOjX7FdEmRNOrbr/PAP5T66XjaZUElkxv+QWfGTALTzF0VdXre5UHgTbQqwX/dCv2kOm5MK9vuyDgI=
-X-Received: by 2002:a37:e40a:: with SMTP id y10mr1314135qkf.303.1559614515923; 
-	Mon, 03 Jun 2019 19:15:15 -0700 (PDT)
+	(envelope-from <dgibson@ozlabs.org>) id 1hXyzY-0007SM-6a
+	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 22:16:01 -0400
+Received: from ozlabs.org ([2401:3900:2:1::2]:55455)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1hXyzW-0006tb-OB
+	for qemu-devel@nongnu.org; Mon, 03 Jun 2019 22:16:00 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+	id 45HwWD3fX5z9s5c; Tue,  4 Jun 2019 12:15:36 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+	d=gibson.dropbear.id.au; s=201602; t=1559614536;
+	bh=98A1GoWUfcboLTp6dEMOQ8XvfPmi2CSa8rTYlXY+I0A=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=oQohS2nH+u5u8vg42S3epeOsJkxRw6ta9JPYdBKPBq2Afk8O3wcXZYf9HEzDCEynI
+	F+JpWmEfrkhka9tel07uMhhorlbNLzi9087ktDb1XSu013Io1CfEjY+VoJg7dNA51C
+	micm+mAdvfIfw6YVr5rfdi2n9FLyQYAA4vncDCyk=
+Date: Tue, 4 Jun 2019 11:21:48 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+To: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <20190604012147.GB9045@umbus.fritz.box>
+References: <20190603164927.8336-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
-References: <20190529070955.25565-1-xieyongji@baidu.com>
-	<20190529070955.25565-3-xieyongji@baidu.com>
-	<20190603221639.5e4ddac1@bahia.lab.toulouse-stg.fr.ibm.com>
-In-Reply-To: <20190603221639.5e4ddac1@bahia.lab.toulouse-stg.fr.ibm.com>
-From: Yongji Xie <elohimes@gmail.com>
-Date: Tue, 4 Jun 2019 10:15:04 +0800
-Message-ID: <CAONzpcZrDS0XiEz7san49FQ1BT3CeHTe3k+F6Z=L-mhVTdcfzQ@mail.gmail.com>
-To: Greg Kurz <groug@kaod.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="f2QGlHpHGjS2mn6Y"
+Content-Disposition: inline
+In-Reply-To: <20190603164927.8336-1-richard.henderson@linaro.org>
+User-Agent: Mutt/1.11.4 (2019-03-13)
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2607:f8b0:4864:20::744
-Subject: Re: [Qemu-devel] [PATCH 2/5] virtio: Migrate the "start_on_kick"
- flag
+X-Received-From: 2401:3900:2:1::2
+Subject: Re: [Qemu-devel] [PATCH] target/ppc: Use tcg_gen_gvec_bitsel
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -88,39 +70,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Xie Yongji <xieyongji@baidu.com>,
-	"Dr. David Alan Gilbert" <dgilbert@redhat.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 4 Jun 2019 at 04:16, Greg Kurz <groug@kaod.org> wrote:
->
-> On Wed, 29 May 2019 15:09:52 +0800
-> elohimes@gmail.com wrote:
->
-> > From: Xie Yongji <xieyongji@baidu.com>
-> >
-> > We should migrate the "start_on_kick" flag so that we
-> > would not miss starting device on kicking at startup
-> > after migration.
-> >
->
-> Hmm... IIUC "start_on_kick" means "virtio 1.0 transitional device that has
-> not been started yet", ie:
->
-> !vdev->started &&
-> (virtio_host_has_feature(vdev, VIRTIO_F_VERSION_1) &&
->  !virtio_vdev_has_feature(vdev, VIRTIO_F_VERSION_1))
->
-> If so, not sure why you need this extra field in the first place, but
-> you probably don't need to migrate it. Just recalculate in a post load
-> callback.
->
 
-Good idea! Will recalculate this in virtio_load() in v2. Thank you.
+--f2QGlHpHGjS2mn6Y
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Thanks,
-Yongji
+On Mon, Jun 03, 2019 at 11:49:27AM -0500, Richard Henderson wrote:
+> Replace the target-specific implementation of XXSEL.
+
+Applied, thanks.
+
+>=20
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  target/ppc/translate/vsx-impl.inc.c | 24 ++----------------------
+>  1 file changed, 2 insertions(+), 22 deletions(-)
+>=20
+> diff --git a/target/ppc/translate/vsx-impl.inc.c b/target/ppc/translate/v=
+sx-impl.inc.c
+> index 199d22da97..a7a0a88975 100644
+> --- a/target/ppc/translate/vsx-impl.inc.c
+> +++ b/target/ppc/translate/vsx-impl.inc.c
+> @@ -1338,28 +1338,8 @@ static void glue(gen_, name)(DisasContext *ctx)   =
+          \
+>  VSX_XXMRG(xxmrghw, 1)
+>  VSX_XXMRG(xxmrglw, 0)
+> =20
+> -static void xxsel_i64(TCGv_i64 t, TCGv_i64 a, TCGv_i64 b, TCGv_i64 c)
+> -{
+> -    tcg_gen_and_i64(b, b, c);
+> -    tcg_gen_andc_i64(a, a, c);
+> -    tcg_gen_or_i64(t, a, b);
+> -}
+> -
+> -static void xxsel_vec(unsigned vece, TCGv_vec t, TCGv_vec a,
+> -                      TCGv_vec b, TCGv_vec c)
+> -{
+> -    tcg_gen_and_vec(vece, b, b, c);
+> -    tcg_gen_andc_vec(vece, a, a, c);
+> -    tcg_gen_or_vec(vece, t, a, b);
+> -}
+> -
+>  static void gen_xxsel(DisasContext *ctx)
+>  {
+> -    static const GVecGen4 g =3D {
+> -        .fni8 =3D xxsel_i64,
+> -        .fniv =3D xxsel_vec,
+> -        .vece =3D MO_64,
+> -    };
+>      int rt =3D xT(ctx->opcode);
+>      int ra =3D xA(ctx->opcode);
+>      int rb =3D xB(ctx->opcode);
+> @@ -1369,8 +1349,8 @@ static void gen_xxsel(DisasContext *ctx)
+>          gen_exception(ctx, POWERPC_EXCP_VSXU);
+>          return;
+>      }
+> -    tcg_gen_gvec_4(vsr_full_offset(rt), vsr_full_offset(ra),
+> -                   vsr_full_offset(rb), vsr_full_offset(rc), 16, 16, &g);
+> +    tcg_gen_gvec_bitsel(MO_64, vsr_full_offset(rt), vsr_full_offset(rc),
+> +                        vsr_full_offset(rb), vsr_full_offset(ra), 16, 16=
+);
+>  }
+> =20
+>  static void gen_xxspltw(DisasContext *ctx)
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--f2QGlHpHGjS2mn6Y
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlz1x6kACgkQbDjKyiDZ
+s5KXpxAAtPs6yoR1aghVLej4nlscZZ599yGdqIZQZEfr9AiCrrQQMmQavN1XyQDI
+b2qhhJAybaTh2M2btZLPvY7I+aqMerQTZo2/FYXJoJHnan2ga9MsvmuAOQoF6lok
+NxVlPLKQP8mHFRgkATguiLA7YKfDZoQd8H+tE9SUf9XHaK4qPiJxgU1wOkL06nL8
+I7zek1eTFCIAXJNnpd4gQVAQ9Jx4nQ6dGOGbk29fRfDS3qZON544PbzP+0O8/Dmf
+7vytu3Q1cXJHi8Truh/ptvnlYsh6zm6YJ6Lm7rr5/tTxDRFpmO9f+nOykQmBrmMx
+69LDeYzWlDlAKixGDhWWg8diutt7MzdKx7YxkTx6dT53ResSgKtdgQvYZ3CBCHBq
+OJKugcXOgDkxPlrtVAtx3NO7UydZ26i8+aIWa3wjWxeaYV9+PhU6Q0JSZRLddYfE
+Angk/uGrmpwVvJH+jOhP15maSSGWKMR1UBLxfvoYcvN3o6h1LWtxjH5EPMBk3jkJ
+m3WmcOhFO9QQvcHtaW8VQ9mV5nZZL/Z/b/Nnz84odWKrYj6EwQbNMHD8EZR+VLx7
+jbAmWryh948UWpshw6jyPYvb4WBWumpQ4a8Dfhurc6uoTx0x+G946WJy4JhPEhot
+LMCkXXFJ9cUo4PkgT9IRhDNt+tRv6HpQhXYvq4Yz5jVnoo1xFTo=
+=WQHf
+-----END PGP SIGNATURE-----
+
+--f2QGlHpHGjS2mn6Y--
 
