@@ -2,62 +2,57 @@ Return-Path: <SRS0=GUf1=UD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_MUTT
+X-Spam-Status: No, score=0.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MSGID_MULTIPLE_AT,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 054D1C282CE
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 08:34:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 133CAC282CE
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 08:38:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8AB152173E
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 08:34:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8AB152173E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id E0B3E24AE2
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 08:38:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E0B3E24AE2
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=ispras.ru
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:48628 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:48680 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hY4ta-0008MX-CT
-	for qemu-devel@archiver.kernel.org; Tue, 04 Jun 2019 04:34:14 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:35290)
+	id 1hY4xr-0001Wf-5m
+	for qemu-devel@archiver.kernel.org; Tue, 04 Jun 2019 04:38:39 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:36833)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richardw.yang@linux.intel.com>) id 1hY4sY-0007zw-GU
-	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 04:33:13 -0400
+	(envelope-from <Natalia.Fursova@ispras.ru>) id 1hY4x4-0001De-Rk
+	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 04:37:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richardw.yang@linux.intel.com>) id 1hY4sX-0007pB-Hv
-	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 04:33:10 -0400
-Received: from mga04.intel.com ([192.55.52.120]:18047)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <richardw.yang@linux.intel.com>)
-	id 1hY4sX-0007oR-AR
-	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 04:33:09 -0400
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-	by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
-	04 Jun 2019 01:33:07 -0700
-X-ExtLoop1: 1
-Received: from richard.sh.intel.com (HELO localhost) ([10.239.159.54])
-	by orsmga004.jf.intel.com with ESMTP; 04 Jun 2019 01:33:06 -0700
-Date: Tue, 4 Jun 2019 16:32:37 +0800
-From: Wei Yang <richardw.yang@linux.intel.com>
-To: Peter Xu <peterx@redhat.com>
-Message-ID: <20190604083237.GB28403@richard>
-References: <20190604061727.6857-1-richardw.yang@linux.intel.com>
-	<20190604070614.GD15459@xz-x1>
+	(envelope-from <Natalia.Fursova@ispras.ru>) id 1hY4x2-0002BD-ST
+	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 04:37:50 -0400
+Received: from mail.ispras.ru ([83.149.199.45]:40918)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <Natalia.Fursova@ispras.ru>) id 1hY4x0-00026u-Qi
+	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 04:37:47 -0400
+Received: from NATALIAFURSOVA (unknown [85.142.117.226])
+	by mail.ispras.ru (Postfix) with ESMTPSA id 5299F54006B;
+	Tue,  4 Jun 2019 11:37:40 +0300 (MSK)
+From: "Natalia Fursova" <Natalia.Fursova@ispras.ru>
+To: <qemu-devel@nongnu.org>, <pbonzini@redhat.com>,
+	=?koi8-r?B?8MHbwQ==?= <Pavel.Dovgaluk@ispras.ru>
+References: 
+In-Reply-To: 
+Date: Tue, 4 Jun 2019 11:37:37 +0300
+Message-ID: <000301d51ab0$c3f1aee0$4bd50ca0$@Fursova@ispras.ru>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190604070614.GD15459@xz-x1>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 192.55.52.120
-Subject: Re: [Qemu-devel] [PATCH v3] migratioin/ram: leave RAMBlock->bmap
- blank on allocating
+X-Mailer: Microsoft Office Outlook 12.0
+Thread-Index: AdUWFZgjwxE4OQxbTXG9Tx3j6WX9aQEmxUUw
+Content-Language: ru
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
+X-Received-From: 83.149.199.45
+Content-Type: text/plain;
+	charset="koi8-r"
+Content-Transfer-Encoding: quoted-printable
+X-Content-Filtered-By: Mailman/MimeDel 2.1.21
+Subject: Re: [Qemu-devel] qgraph
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -69,41 +64,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Wei Yang <richardw.yang@linux.intel.com>
-Cc: quintela@redhat.com, Wei Yang <richardw.yang@linux.intel.com>,
-	dgilbert@redhat.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Jun 04, 2019 at 03:06:14PM +0800, Peter Xu wrote:
->On Tue, Jun 04, 2019 at 02:17:27PM +0800, Wei Yang wrote:
->> During migration, we would sync bitmap from ram_list.dirty_memory to
->> RAMBlock.bmap in cpu_physical_memory_sync_dirty_bitmap().
->> 
->> Since we set RAMBlock.bmap and ram_list.dirty_memory both to all 1, this
->> means at the first round this sync is meaningless and is a duplicated
->> work.
->> 
->> Leaving RAMBlock->bmap blank on allocating would have a side effect on
->> migration_dirty_pages, since it is calculated from the result of
->> cpu_physical_memory_sync_dirty_bitmap(). To keep it right, we need to
->> set migration_dirty_pages to 0 in ram_state_init().
->> 
->> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
->> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
->
->Thanks for updating the comments.
->
+ping
 
-My pleasure :-)
+=20
 
->Acked-by: Peter Xu <peterx@redhat.com>
->
->-- 
->Peter Xu
+=20
 
--- 
-Wei Yang
-Help you, Help me
+Best regards,=20
+
+Natalia
+
+=20
+
+From: =EE=C1=D4=C1=CC=D8=D1 =E6=D5=D2=D3=CF=D7=C1 =
+[mailto:Natalia.Fursova@ispras.ru]=20
+Sent: Wednesday, May 29, 2019 2:57 PM
+To: 'qemu-devel@nongnu.org'; 'pbonzini@redhat.com'; =F0=C1=DB=C1
+(Pavel.Dovgaluk@ispras.ru)
+Subject: qgraph
+
+=20
+
+Hello, Paolo!
+
+=20
+
+We develop GUI for Qemu and want to implement graphical interface for
+configuring the device tree. To do this we need to detect list of the
+devices supported by any specific platform.
+
+Then we use this tree for command line generation.
+
+=20
+
+Existing qmp commands don't supply enough information to build the tree.
+They miss bus and interface data.
+
+=20
+
+There is something called 'qgraph' in Qemu. It looks similar to data
+structures in our GUI tool.
+
+=20
+
+Tell me please, do you have a plan on improving this interface? We found =
+the
+following hardcoded lines in the tests:
+
+qos_node_consumes("megasas", "pci-bus", &opts);
+
+qos_node_produces("megasas", "pci-device");
+
+=20
+
+And we wanted to extend QMP to query this kind of information.
+
+=20
+
+=20
+
+Best regards,=20
+
+Natalia
+
+=20
 
