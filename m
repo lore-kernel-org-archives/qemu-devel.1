@@ -6,52 +6,55 @@ X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EDB03C282CE
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 19:38:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C3A6C282CE
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 19:38:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C57A62075B
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 19:38:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C57A62075B
+	by mail.kernel.org (Postfix) with ESMTPS id 17D992075B
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 19:38:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 17D992075B
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:57029 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:57031 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hYFG6-0006YE-3i
-	for qemu-devel@archiver.kernel.org; Tue, 04 Jun 2019 15:38:10 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:51134)
+	id 1hYFGC-0006de-8a
+	for qemu-devel@archiver.kernel.org; Tue, 04 Jun 2019 15:38:16 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:51162)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1hYFEY-0005fo-OO
-	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 15:36:36 -0400
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1hYFEh-0005kR-21
+	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 15:36:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1hYFEW-0002Oh-RO
-	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 15:36:34 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:35955 helo=mail.rt-rk.com)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1hYFEg-0002Zw-11
+	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 15:36:43 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:36035 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1hYFEV-0002GK-4h
-	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 15:36:32 -0400
+	id 1hYFEf-0002Yl-OT
+	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 15:36:41 -0400
 Received: from localhost (localhost [127.0.0.1])
-	by mail.rt-rk.com (Postfix) with ESMTP id 002871A2141;
-	Tue,  4 Jun 2019 21:36:29 +0200 (CEST)
+	by mail.rt-rk.com (Postfix) with ESMTP id 9C3D01A2078;
+	Tue,  4 Jun 2019 21:36:39 +0200 (CEST)
 X-Virus-Scanned: amavisd-new at rt-rk.com
 Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
 	[10.10.13.43])
-	by mail.rt-rk.com (Postfix) with ESMTPSA id B777C1A2029;
-	Tue,  4 Jun 2019 21:36:28 +0200 (CEST)
+	by mail.rt-rk.com (Postfix) with ESMTPSA id 5C98A1A2029;
+	Tue,  4 Jun 2019 21:36:39 +0200 (CEST)
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
 To: qemu-devel@nongnu.org
-Date: Tue,  4 Jun 2019 21:35:50 +0200
-Message-Id: <1559676952-17927-2-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Tue,  4 Jun 2019 21:35:51 +0200
+Message-Id: <1559676952-17927-3-git-send-email-aleksandar.markovic@rt-rk.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1559676952-17927-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1559676952-17927-1-git-send-email-aleksandar.markovic@rt-rk.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
 X-Received-From: 89.216.37.149
-Subject: [Qemu-devel] [PATCH v9 1/3] linux-user: Add support for
- setsockopt() options IPV6_<ADD|DROP>_MEMBERSHIP
+Subject: [Qemu-devel] [PATCH v9 2/3] linux-user: Add support for
+ setsockopt() option SOL_ALG
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -63,95 +66,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: arikalo@wavecomp.com, lvivier@redhat.com, Neng Chen <nchen@wavecomp.com>,
-	ysu@wavecomp.com, amarkovic@wavecomp.com
+Cc: arikalo@wavecomp.com, lvivier@redhat.com, ysu@wavecomp.com,
+	amarkovic@wavecomp.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Neng Chen <nchen@wavecomp.com>
+From: Yunqiang Su <ysu@wavecomp.com>
 
-Add support for options IPV6_ADD_MEMBERSHIP and IPV6_DROP_MEMPEMBERSHIP
-of the syscall setsockopt(). These options control membership in
-multicast groups. Their argument is a pointer to a struct ipv6_mreq,
-which is in turn defined in IP v6 header netinet/in.h as:
+Add support for options SOL_ALG of the syscall setsockopt(). This
+option is used in relation to Linux kernel Crypto API, and allows
+a user to set additional information for the cipher operation via
+syscall setsockopt(). The field "optname" must be one of the
+following:
 
- struct ipv6_mreq {
-     /* IPv6 multicast address of group */
-     struct  in6_addr  ipv6mr_multiaddr;
-     /* local IPv6 address of interface */
-     int     ipv6mr_interface;
- };
+  - ALG_SET_KEY =E2=80=93 seting the key
+  - ALG_SET_AEAD_AUTHSIZE =E2=80=93 set the authentication tag size
 
-...whereas its definition in kernel's include/uapi/linux/in6.h is:
+SOL_ALG is relatively newer setsockopt() option. Therefore, the
+code that handles SOL_ALG is enclosed in "ifdef" so that the build
+does not fail for older kernels that do not contain support for
+SOL_ALG.
 
- #if __UAPI_DEF_IPV6_MREQ
- struct ipv6_mreq {
-     /* IPv6 multicast address of group */
-         struct  in6_addr ipv6mr_multiaddr;
-     /* local IPv6 address of interface */
-     int     ipv6mr_ifindex;
- };
- #endif
-
-The first field of ipv6_mreq has the same name ("ipv6mr_multiaddr")
-and type ("in6_addr") in both cases. Moreover, the in6_addr structure
-consists of fields that are always big-endian (on host of any endian),
-therefore the ipv6_mreq's field ipv6mr_multiaddr doesn't need any
-endian conversion.
-
-The second field of ipv6_mreq may, however, depending on the build
-environment, have different names. This is the reason why the lines
-"#if __UAPI_DEF_IPV6_MREQ" and "#if defined(__UAPI_DEF_IPV6_MREQ)"
-are used in this patch - to establish the right choice for the field
-name. Also, endian conversion is needed for this field, since it is
-of type "int".
-
-Signed-off-by: Neng Chen <nchen@wavecomp.com>
+Signed-off-by: Yunqiang Su <ysu@wavecomp.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 ---
- linux-user/syscall.c | 27 +++++++++++++++++++++++++++
- 1 file changed, 27 insertions(+)
+ linux-user/syscall.c | 31 +++++++++++++++++++++++++++++++
+ 1 file changed, 31 insertions(+)
 
 diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index 5e29e67..dde6889 100644
+index dde6889..82c08b6 100644
 --- a/linux-user/syscall.c
 +++ b/linux-user/syscall.c
-@@ -1921,6 +1921,33 @@ static abi_long do_setsockopt(int sockfd, int level, int optname,
-                                        &pki, sizeof(pki)));
-             break;
-         }
-+        case IPV6_ADD_MEMBERSHIP:
-+        case IPV6_DROP_MEMBERSHIP:
-+        {
-+            struct ipv6_mreq ipv6mreq;
-+
-+            if (optlen < sizeof(ipv6mreq)) {
-+                return -TARGET_EINVAL;
-+            }
-+
-+            if (copy_from_user(&ipv6mreq, optval_addr, sizeof(ipv6mreq))) {
-+                return -TARGET_EFAULT;
-+            }
-+
-+#if defined(__UAPI_DEF_IPV6_MREQ)
-+#if __UAPI_DEF_IPV6_MREQ
-+            ipv6mreq.ipv6mr_ifindex = tswap32(ipv6mreq.ipv6mr_ifindex);
-+#else
-+            ipv6mreq.ipv6mr_interface = tswap32(ipv6mreq.ipv6mr_interface);
-+#endif /* __UAPI_DEF_IVP6_MREQ */
-+#else
-+            ipv6mreq.ipv6mr_interface = tswap32(ipv6mreq.ipv6mr_interface);
-+#endif /* defined (__UAPI_DEF_IPV6_MREQ) */
-+
-+            ret = get_errno(setsockopt(sockfd, level, optname,
-+                                       &ipv6mreq, sizeof(ipv6mreq)));
-+            break;
-+        }
-         default:
+@@ -103,6 +103,7 @@
+ #include <linux/blkpg.h>
+ #include <netpacket/packet.h>
+ #include <linux/netlink.h>
++#include <linux/if_alg.h>
+ #include "linux_loop.h"
+ #include "uname.h"
+=20
+@@ -1998,6 +1999,36 @@ static abi_long do_setsockopt(int sockfd, int leve=
+l, int optname,
              goto unimplemented;
          }
--- 
+         break;
++#if defined(SOL_ALG) && defined(ALG_SET_KEY) && defined(ALG_SET_AEAD_AUT=
+HSIZE)
++    case SOL_ALG:
++        switch (optname) {
++        case ALG_SET_KEY:
++        {
++            char *alg_key =3D g_malloc(optlen);
++
++            if (!alg_key) {
++                return -TARGET_ENOMEM;
++            }
++            if (copy_from_user(alg_key, optval_addr, optlen)) {
++                g_free(alg_key);
++                return -TARGET_EFAULT;
++            }
++            ret =3D get_errno(setsockopt(sockfd, level, optname,
++                                       alg_key, optlen));
++            g_free(alg_key);
++            break;
++        }
++        case ALG_SET_AEAD_AUTHSIZE:
++        {
++            ret =3D get_errno(setsockopt(sockfd, level, optname,
++                                       NULL, optlen));
++            break;
++        }
++        default:
++            goto unimplemented;
++        }
++        break;
++#endif
+     case TARGET_SOL_SOCKET:
+         switch (optname) {
+         case TARGET_SO_RCVTIMEO:
+--=20
 2.7.4
 
 
