@@ -4,86 +4,82 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 67D1BC282CE
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 20:42:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ECCB8C282CE
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 20:43:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 277B6207E0
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 20:42:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AFFA5207E0
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 20:43:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="yAZKSF7R"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 277B6207E0
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="r3wNXQSW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AFFA5207E0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:57703 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:57711 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hYGGl-0008ON-9G
-	for qemu-devel@archiver.kernel.org; Tue, 04 Jun 2019 16:42:55 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:35824)
+	id 1hYGHl-0000sd-0L
+	for qemu-devel@archiver.kernel.org; Tue, 04 Jun 2019 16:43:57 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:35734)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hYG8Z-0001EZ-4G
-	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 16:34:28 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hYG8R-00016S-Jl
+	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 16:34:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hYG8X-0004LJ-Ho
-	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 16:34:27 -0400
-Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:36212)
+	(envelope-from <richard.henderson@linaro.org>) id 1hYG8Q-0004EM-4p
+	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 16:34:19 -0400
+Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:40972)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hYG8X-0004Ko-BI
-	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 16:34:25 -0400
-Received: by mail-oi1-x241.google.com with SMTP id w7so5244503oic.3
-	for <qemu-devel@nongnu.org>; Tue, 04 Jun 2019 13:34:25 -0700 (PDT)
+	id 1hYG8P-0004Cy-Vd
+	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 16:34:18 -0400
+Received: by mail-oi1-x241.google.com with SMTP id b21so12668317oic.8
+	for <qemu-devel@nongnu.org>; Tue, 04 Jun 2019 13:34:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=from:to:subject:date:message-id:in-reply-to:references:mime-version
-	:content-transfer-encoding;
-	bh=YlNyMLJrebyqTNe9alCGCP+GtKEH43Bwhp0Gyfzj14A=;
-	b=yAZKSF7R+C/1FHcIIS5yKKRJNkEiLcI3uJYegZlcBYem+T0rBrKw7xkDvCcEkqVkT9
-	d3KRe3098cxD0t3H9nJi3rV6fGFdU+Y84ae6Vg76s5+Tw5pYegaDyeAlBeaIgUS7O0w+
-	QkY5G73Zz8xqmNsf7Wr2+V2rxjCtrLMJr9JJ12mC9p3L/5WvbIyw+AlBIi7Cm2SVvmga
-	XIwNu1sAXKXqHl5jcES/BNVSuU1MMVr77NuoIIgwSkCEVm0JHThLfDrFRyczhQkZr989
-	yWzicY2sKn6jv6zKf7Nnt4H8GaODqzPXqYWYGh0drWcdO+xlDqiPmHEK4znYqMfrCjCA
-	B6xg==
+	h=from:to:subject:date:message-id:in-reply-to:references;
+	bh=3eEZ43+foZOHsJH12yR7I4WMYSzG6ykvnQtbtEqnbDs=;
+	b=r3wNXQSWE0KBY++rKoL85Ou3wukzAVz1/VJHrrErBFc899eCqZF0Kiy4b3MOQMEeP0
+	p33LgbNYFwbGh5JfkOZc6/EbSaO3c8fdgxLa13eJlQllWHnxAO4D+zE8oqbkVhor0Ut0
+	JJDz366FysAXDysVDzO8ncnoX80NA6NXCKeWU6CLemJi7S3jjYcNUxGjjXhQKTWhyBQ3
+	bc4DYN1TFBHpxhJ493f4eNQ3M1cmapQrhb0ZBKMnS+hvyaniQGGW/FHfdAqHuEQ6fxzs
+	SJoTap9rLYSKYjhrzihC8qAD3ppUm9MTs89Psz+YbpdnDRfBIyCeK4y9Y2F37/pjFGOx
+	TJnA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
-	:references:mime-version:content-transfer-encoding;
-	bh=YlNyMLJrebyqTNe9alCGCP+GtKEH43Bwhp0Gyfzj14A=;
-	b=exFxd/AOtaq2VizrEGKeK6/ODTvsQM10tLoYhqZ+xd4/qVUEIJ8BeRJ+wnbogEoQ+G
-	MAypM3wieRKATRwOlRR7TBcuuwp7WGwW+rg8C1AQfkGYHfgKjqw2llIaHec9KV0Z5bYv
-	hEnVE8S/npAGhPSj9OgizoBbPbXkkNV1v2fn22qfEjOwFz7xJS0ZznNsiLJBIgPe+mBK
-	kXDSiUVh4b9nH4C832+IR4LM1vpUVQY2bgO4y3iosg335fzl7xrxmhwzZ6HPbsPo8FvW
-	Std0XR4VEHL2SjO1cu+9FwB/UozoIchoUve9SHGksUQHynofQck3Mt2/UH2P+KsiW3hZ
-	OWug==
-X-Gm-Message-State: APjAAAVdyFN/avyiUoZC8iBNf9eVvYokE6ro6eUnvBnssP1Hk0o10Pdy
-	X1Ozo0xC1ONwops2HRjX+wEMYyxojNA6hw==
-X-Google-Smtp-Source: APXvYqy69HTCo8KZ7blNxFdNd0wtDo8pxm4APYG8Nk3pO7l8jqs9UElL92MAhAbOx1sXDN3edeFzbQ==
-X-Received: by 2002:aca:c695:: with SMTP id w143mr1113212oif.11.1559680464138; 
-	Tue, 04 Jun 2019 13:34:24 -0700 (PDT)
+	:references;
+	bh=3eEZ43+foZOHsJH12yR7I4WMYSzG6ykvnQtbtEqnbDs=;
+	b=rpgg4PDjlePJ/ps9EJoA8NYGfWoGPLUpCSGsrRH+P7TUtzmZysFnSGt3q+MJPa4nkc
+	NTTL6BBA0B0/M6vRAQakrxb1HI85rZCtYSzFMA7/VRwhSXUSIglrYJqzdGSxMldOMQGm
+	jUgBjthtgExEply21PDRFhOA6+7Ms9wiu7/5Wr3JEvg5991pjt0eBMK+MfD2+eOex1Wi
+	00330OlrEzx6CMG+p8rKjWCYZDq92wktmg3JQewpp+V8s8jvlhu5/EbLJK1gH/TJWVbk
+	2vP3fX6PA7JDeDhrB/80Fi2hGlWgPPkL/GzFOf38/j2c3Of0nwabdO+DujlvoDDTzyHU
+	LV1w==
+X-Gm-Message-State: APjAAAWMJpuHoI2b2XxpvjFFPIDUs3XtW1cLdB6CkgAFbdqao/+pdotx
+	1lvckX7Fxz36bdzx/+Q9bQHDRH14IzTbIA==
+X-Google-Smtp-Source: APXvYqyasOz7WlN5+FxpIfJs+IXH8vw6ywZkKDupThC4IhNL241mnxZX4dJKO2clg2f6rjSgNYHBvw==
+X-Received: by 2002:aca:3fc6:: with SMTP id m189mr3475894oia.124.1559680456690;
+	Tue, 04 Jun 2019 13:34:16 -0700 (PDT)
 Received: from localhost.localdomain (200-56-192-86-cable.cybercable.net.mx.
 	[200.56.192.86])
-	by smtp.gmail.com with ESMTPSA id h1sm5979901otj.78.2019.06.04.13.34.22
+	by smtp.gmail.com with ESMTPSA id h1sm5979901otj.78.2019.06.04.13.34.15
 	for <qemu-devel@nongnu.org>
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Tue, 04 Jun 2019 13:34:23 -0700 (PDT)
+	Tue, 04 Jun 2019 13:34:15 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Tue,  4 Jun 2019 15:33:30 -0500
-Message-Id: <20190604203351.27778-19-richard.henderson@linaro.org>
+Date: Tue,  4 Jun 2019 15:33:25 -0500
+Message-Id: <20190604203351.27778-14-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190604203351.27778-1-richard.henderson@linaro.org>
 References: <20190604203351.27778-1-richard.henderson@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
 X-Received-From: 2607:f8b0:4864:20::241
-Subject: [Qemu-devel] [PATCH v4 18/39] target/mips: Use env_cpu, env_archcpu
+Subject: [Qemu-devel] [PATCH v4 13/39] target/hppa: Use env_cpu, env_archcpu
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -100,303 +96,162 @@ Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 Cleanup in the boilerplate that each target must define.
-Replace mips_env_get_cpu with env_archcpu.  The combination
-CPU(mips_env_get_cpu) should have used ENV_GET_CPU to begin;
+Replace hppa_env_get_cpu with env_archcpu.  The combination
+CPU(hppa_env_get_cpu) should have used ENV_GET_CPU to begin;
 use env_cpu now.
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/mips/cpu.h                |  5 -----
- hw/intc/mips_gic.c               |  2 +-
- hw/mips/mips_int.c               |  2 +-
- linux-user/mips/cpu_loop.c       |  2 +-
- target/mips/helper.c             | 15 +++++----------
- target/mips/op_helper.c          | 25 +++++++++++--------------
- target/mips/translate.c          |  3 +--
- target/mips/translate_init.inc.c |  4 +---
- 8 files changed, 21 insertions(+), 37 deletions(-)
+ target/hppa/cpu.h          |  5 -----
+ linux-user/hppa/cpu_loop.c |  2 +-
+ target/hppa/helper.c       |  3 +--
+ target/hppa/int_helper.c   |  4 ++--
+ target/hppa/mem_helper.c   | 10 ++++------
+ target/hppa/op_helper.c    |  8 +++-----
+ 6 files changed, 11 insertions(+), 21 deletions(-)
 
-diff --git a/target/mips/cpu.h b/target/mips/cpu.h
-index e684572dda..cb09425476 100644
---- a/target/mips/cpu.h
-+++ b/target/mips/cpu.h
-@@ -1071,11 +1071,6 @@ struct MIPSCPU {
-     CPUMIPSState env;
+diff --git a/target/hppa/cpu.h b/target/hppa/cpu.h
+index 0cb1fc8800..75e6a91a5e 100644
+--- a/target/hppa/cpu.h
++++ b/target/hppa/cpu.h
+@@ -222,11 +222,6 @@ struct HPPACPU {
+     QEMUTimer *alarm_timer;
  };
  
--static inline MIPSCPU *mips_env_get_cpu(CPUMIPSState *env)
+-static inline HPPACPU *hppa_env_get_cpu(CPUHPPAState *env)
 -{
--    return container_of(env, MIPSCPU, env);
+-    return container_of(env, HPPACPU, env);
 -}
 -
- #define ENV_OFFSET offsetof(MIPSCPU, env)
+ #define ENV_OFFSET      offsetof(HPPACPU, env)
  
- void mips_cpu_list(void);
-diff --git a/hw/intc/mips_gic.c b/hw/intc/mips_gic.c
-index 15e6e40f9f..8f509493ea 100644
---- a/hw/intc/mips_gic.c
-+++ b/hw/intc/mips_gic.c
-@@ -44,7 +44,7 @@ static void mips_gic_set_vp_irq(MIPSGICState *gic, int vp, int pin)
-                       GIC_VP_MASK_CMP_SHF;
-     }
-     if (kvm_enabled())  {
--        kvm_mips_set_ipi_interrupt(mips_env_get_cpu(gic->vps[vp].env),
-+        kvm_mips_set_ipi_interrupt(env_archcpu(gic->vps[vp].env),
-                                    pin + GIC_CPU_PIN_OFFSET,
-                                    ored_level);
-     } else {
-diff --git a/hw/mips/mips_int.c b/hw/mips/mips_int.c
-index 5ddeb15848..f899f6ceb3 100644
---- a/hw/mips/mips_int.c
-+++ b/hw/mips/mips_int.c
-@@ -76,7 +76,7 @@ void cpu_mips_irq_init_cpu(MIPSCPU *cpu)
-     qemu_irq *qi;
-     int i;
+ typedef CPUHPPAState CPUArchState;
+diff --git a/linux-user/hppa/cpu_loop.c b/linux-user/hppa/cpu_loop.c
+index 880955fdef..9915456a1d 100644
+--- a/linux-user/hppa/cpu_loop.c
++++ b/linux-user/hppa/cpu_loop.c
+@@ -105,7 +105,7 @@ static abi_ulong hppa_lws(CPUHPPAState *env)
  
--    qi = qemu_allocate_irqs(cpu_mips_irq_request, mips_env_get_cpu(env), 8);
-+    qi = qemu_allocate_irqs(cpu_mips_irq_request, env_archcpu(env), 8);
-     for (i = 0; i < 8; i++) {
-         env->irq[i] = qi[i];
-     }
-diff --git a/linux-user/mips/cpu_loop.c b/linux-user/mips/cpu_loop.c
-index 828137cd84..ac6c6d1504 100644
---- a/linux-user/mips/cpu_loop.c
-+++ b/linux-user/mips/cpu_loop.c
-@@ -425,7 +425,7 @@ static int do_break(CPUMIPSState *env, target_siginfo_t *info,
- 
- void cpu_loop(CPUMIPSState *env)
+ void cpu_loop(CPUHPPAState *env)
  {
--    CPUState *cs = CPU(mips_env_get_cpu(env));
+-    CPUState *cs = CPU(hppa_env_get_cpu(env));
 +    CPUState *cs = env_cpu(env);
      target_siginfo_t info;
+     abi_ulong ret;
      int trapnr;
-     abi_long ret;
-diff --git a/target/mips/helper.c b/target/mips/helper.c
-index 68e44df4da..6e6a44292f 100644
---- a/target/mips/helper.c
-+++ b/target/mips/helper.c
-@@ -339,10 +339,8 @@ static int get_physical_address (CPUMIPSState *env, hwaddr *physical,
- 
- void cpu_mips_tlb_flush(CPUMIPSState *env)
- {
--    MIPSCPU *cpu = mips_env_get_cpu(env);
--
-     /* Flush qemu's TLB and discard all shadowed entries.  */
--    tlb_flush(CPU(cpu));
-+    tlb_flush(env_cpu(env));
-     env->tlb->tlb_in_use = env->tlb->nb_tlb;
- }
- 
-@@ -404,7 +402,7 @@ void cpu_mips_store_status(CPUMIPSState *env, target_ulong val)
- #if defined(TARGET_MIPS64)
-     if ((env->CP0_Status ^ old) & (old & (7 << CP0St_UX))) {
-         /* Access to at least one of the 64-bit segments has been disabled */
--        tlb_flush(CPU(mips_env_get_cpu(env)));
-+        tlb_flush(env_cpu(env));
-     }
+diff --git a/target/hppa/helper.c b/target/hppa/helper.c
+index 11c61b3ca2..0dcd105b88 100644
+--- a/target/hppa/helper.c
++++ b/target/hppa/helper.c
+@@ -71,8 +71,7 @@ void cpu_hppa_put_psw(CPUHPPAState *env, target_ureg psw)
+     /* If PSW_P changes, it affects how we translate addresses.  */
+     if ((psw ^ old_psw) & PSW_P) {
+ #ifndef CONFIG_USER_ONLY
+-        CPUState *src = CPU(hppa_env_get_cpu(env));
+-        tlb_flush_by_mmuidx(src, 0xf);
++        tlb_flush_by_mmuidx(env_cpu(env), 0xf);
  #endif
-     if (env->CP0_Config3 & (1 << CP0C3_MT)) {
-@@ -449,7 +447,7 @@ void cpu_mips_store_cause(CPUMIPSState *env, target_ulong val)
- static void raise_mmu_exception(CPUMIPSState *env, target_ulong address,
-                                 int rw, int tlb_error)
- {
--    CPUState *cs = CPU(mips_env_get_cpu(env));
-+    CPUState *cs = env_cpu(env);
-     int exception = 0, error_code = 0;
- 
-     if (rw == MMU_INST_FETCH) {
-@@ -1394,8 +1392,7 @@ bool mips_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
- #if !defined(CONFIG_USER_ONLY)
- void r4k_invalidate_tlb (CPUMIPSState *env, int idx, int use_extra)
- {
--    MIPSCPU *cpu = mips_env_get_cpu(env);
--    CPUState *cs;
-+    CPUState *cs = env_cpu(env);
-     r4k_tlb_t *tlb;
-     target_ulong addr;
-     target_ulong end;
-@@ -1421,7 +1418,6 @@ void r4k_invalidate_tlb (CPUMIPSState *env, int idx, int use_extra)
-     /* 1k pages are not supported. */
-     mask = tlb->PageMask | ~(TARGET_PAGE_MASK << 1);
-     if (tlb->V0) {
--        cs = CPU(cpu);
-         addr = tlb->VPN & ~mask;
- #if defined(TARGET_MIPS64)
-         if (addr >= (0xFFFFFFFF80000000ULL & env->SEGMask)) {
-@@ -1435,7 +1431,6 @@ void r4k_invalidate_tlb (CPUMIPSState *env, int idx, int use_extra)
-         }
      }
-     if (tlb->V1) {
--        cs = CPU(cpu);
-         addr = (tlb->VPN & ~mask) | ((mask >> 1) + 1);
- #if defined(TARGET_MIPS64)
-         if (addr >= (0xFFFFFFFF80000000ULL & env->SEGMask)) {
-@@ -1456,7 +1451,7 @@ void QEMU_NORETURN do_raise_exception_err(CPUMIPSState *env,
-                                           int error_code,
-                                           uintptr_t pc)
+ }
+diff --git a/target/hppa/int_helper.c b/target/hppa/int_helper.c
+index 8d5edd3a20..89241c31e7 100644
+--- a/target/hppa/int_helper.c
++++ b/target/hppa/int_helper.c
+@@ -77,7 +77,7 @@ void HELPER(write_eirr)(CPUHPPAState *env, target_ureg val)
  {
--    CPUState *cs = CPU(mips_env_get_cpu(env));
+     env->cr[CR_EIRR] &= ~val;
+     qemu_mutex_lock_iothread();
+-    eval_interrupt(hppa_env_get_cpu(env));
++    eval_interrupt(env_archcpu(env));
+     qemu_mutex_unlock_iothread();
+ }
+ 
+@@ -85,7 +85,7 @@ void HELPER(write_eiem)(CPUHPPAState *env, target_ureg val)
+ {
+     env->cr[CR_EIEM] = val;
+     qemu_mutex_lock_iothread();
+-    eval_interrupt(hppa_env_get_cpu(env));
++    eval_interrupt(env_archcpu(env));
+     qemu_mutex_unlock_iothread();
+ }
+ #endif /* !CONFIG_USER_ONLY */
+diff --git a/target/hppa/mem_helper.c b/target/hppa/mem_helper.c
+index 0fd3ac6645..b12c5b5054 100644
+--- a/target/hppa/mem_helper.c
++++ b/target/hppa/mem_helper.c
+@@ -56,7 +56,7 @@ static hppa_tlb_entry *hppa_find_tlb(CPUHPPAState *env, vaddr addr)
+ 
+ static void hppa_flush_tlb_ent(CPUHPPAState *env, hppa_tlb_entry *ent)
+ {
+-    CPUState *cs = CPU(hppa_env_get_cpu(env));
 +    CPUState *cs = env_cpu(env);
+     unsigned i, n = 1 << (2 * ent->page_size);
+     uint64_t addr = ent->va_b;
  
-     qemu_log_mask(CPU_LOG_INT, "%s: %d %d\n",
-                   __func__, exception, error_code);
-diff --git a/target/mips/op_helper.c b/target/mips/op_helper.c
-index 39180275b5..9e2e02f858 100644
---- a/target/mips/op_helper.c
-+++ b/target/mips/op_helper.c
-@@ -350,7 +350,7 @@ static inline hwaddr do_translate_address(CPUMIPSState *env,
-                                                       int rw, uintptr_t retaddr)
+@@ -329,7 +329,7 @@ static void ptlb_work(CPUState *cpu, run_on_cpu_data data)
+ 
+ void HELPER(ptlb)(CPUHPPAState *env, target_ulong addr)
  {
-     hwaddr paddr;
--    CPUState *cs = CPU(mips_env_get_cpu(env));
-+    CPUState *cs = env_cpu(env);
- 
-     paddr = cpu_mips_translate_address(env, address, rw);
- 
-@@ -699,7 +699,7 @@ static CPUMIPSState *mips_cpu_map_tc(CPUMIPSState *env, int *tc)
-         return env;
-     }
- 
--    cs = CPU(mips_env_get_cpu(env));
-+    cs = env_cpu(env);
-     vpe_idx = tc_idx / cs->nr_threads;
-     *tc = tc_idx % cs->nr_threads;
-     other_cs = qemu_get_cpu(vpe_idx);
-@@ -1298,7 +1298,7 @@ void helper_mttc0_tcrestart(CPUMIPSState *env, target_ulong arg1)
- 
- void helper_mtc0_tchalt(CPUMIPSState *env, target_ulong arg1)
+-    CPUState *src = CPU(hppa_env_get_cpu(env));
++    CPUState *src = env_cpu(env);
+     CPUState *cpu;
+     trace_hppa_tlb_ptlb(env);
+     run_on_cpu_data data = RUN_ON_CPU_TARGET_PTR(addr);
+@@ -346,17 +346,15 @@ void HELPER(ptlb)(CPUHPPAState *env, target_ulong addr)
+    number of pages/entries (we choose all), and is local to the cpu.  */
+ void HELPER(ptlbe)(CPUHPPAState *env)
  {
--    MIPSCPU *cpu = mips_env_get_cpu(env);
-+    MIPSCPU *cpu = env_archcpu(env);
+-    CPUState *src = CPU(hppa_env_get_cpu(env));
+     trace_hppa_tlb_ptlbe(env);
+     memset(env->tlb, 0, sizeof(env->tlb));
+-    tlb_flush_by_mmuidx(src, 0xf);
++    tlb_flush_by_mmuidx(env_cpu(env), 0xf);
+ }
  
-     env->active_tc.CP0_TCHalt = arg1 & 0x1;
- 
-@@ -1314,7 +1314,7 @@ void helper_mttc0_tchalt(CPUMIPSState *env, target_ulong arg1)
+ void cpu_hppa_change_prot_id(CPUHPPAState *env)
  {
-     int other_tc = env->CP0_VPEControl & (0xff << CP0VPECo_TargTC);
-     CPUMIPSState *other = mips_cpu_map_tc(env, &other_tc);
--    MIPSCPU *other_cpu = mips_env_get_cpu(other);
-+    MIPSCPU *other_cpu = env_archcpu(other);
- 
-     // TODO: Halt TC / Restart (if allocated+active) TC.
- 
-@@ -1427,7 +1427,7 @@ void helper_mtc0_pagegrain(CPUMIPSState *env, target_ulong arg1)
- 
- void helper_mtc0_segctl0(CPUMIPSState *env, target_ulong arg1)
- {
--    CPUState *cs = CPU(mips_env_get_cpu(env));
-+    CPUState *cs = env_cpu(env);
- 
-     env->CP0_SegCtl0 = arg1 & CP0SC0_MASK;
-     tlb_flush(cs);
-@@ -1435,7 +1435,7 @@ void helper_mtc0_segctl0(CPUMIPSState *env, target_ulong arg1)
- 
- void helper_mtc0_segctl1(CPUMIPSState *env, target_ulong arg1)
- {
--    CPUState *cs = CPU(mips_env_get_cpu(env));
-+    CPUState *cs = env_cpu(env);
- 
-     env->CP0_SegCtl1 = arg1 & CP0SC1_MASK;
-     tlb_flush(cs);
-@@ -1443,7 +1443,7 @@ void helper_mtc0_segctl1(CPUMIPSState *env, target_ulong arg1)
- 
- void helper_mtc0_segctl2(CPUMIPSState *env, target_ulong arg1)
- {
--    CPUState *cs = CPU(mips_env_get_cpu(env));
-+    CPUState *cs = env_cpu(env);
- 
-     env->CP0_SegCtl2 = arg1 & CP0SC2_MASK;
-     tlb_flush(cs);
-@@ -1666,7 +1666,7 @@ void helper_mtc0_entryhi(CPUMIPSState *env, target_ulong arg1)
-     /* If the ASID changes, flush qemu's TLB.  */
-     if ((old & env->CP0_EntryHi_ASID_mask) !=
-         (val & env->CP0_EntryHi_ASID_mask)) {
--        tlb_flush(CPU(mips_env_get_cpu(env)));
-+        tlb_flush(env_cpu(env));
+     if (env->psw & PSW_P) {
+-        CPUState *src = CPU(hppa_env_get_cpu(env));
+-        tlb_flush_by_mmuidx(src, 0xf);
++        tlb_flush_by_mmuidx(env_cpu(env), 0xf);
      }
  }
  
-@@ -1686,7 +1686,6 @@ void helper_mtc0_compare(CPUMIPSState *env, target_ulong arg1)
+diff --git a/target/hppa/op_helper.c b/target/hppa/op_helper.c
+index 952e97a7d7..04d23c1b22 100644
+--- a/target/hppa/op_helper.c
++++ b/target/hppa/op_helper.c
+@@ -29,8 +29,7 @@
  
- void helper_mtc0_status(CPUMIPSState *env, target_ulong arg1)
+ void QEMU_NORETURN HELPER(excp)(CPUHPPAState *env, int excp)
  {
--    MIPSCPU *cpu = mips_env_get_cpu(env);
-     uint32_t val, old;
- 
-     old = env->CP0_Status;
-@@ -1706,7 +1705,7 @@ void helper_mtc0_status(CPUMIPSState *env, target_ulong arg1)
-         case MIPS_HFLAG_SM: qemu_log(", SM\n"); break;
-         case MIPS_HFLAG_KM: qemu_log("\n"); break;
-         default:
--            cpu_abort(CPU(cpu), "Invalid MMU mode!\n");
-+            cpu_abort(env_cpu(env), "Invalid MMU mode!\n");
-             break;
-         }
-     }
-@@ -2485,8 +2484,6 @@ static void debug_pre_eret(CPUMIPSState *env)
- 
- static void debug_post_eret(CPUMIPSState *env)
- {
--    MIPSCPU *cpu = mips_env_get_cpu(env);
--
-     if (qemu_loglevel_mask(CPU_LOG_EXEC)) {
-         qemu_log("  =>  PC " TARGET_FMT_lx " EPC " TARGET_FMT_lx,
-                 env->active_tc.PC, env->CP0_EPC);
-@@ -2502,7 +2499,7 @@ static void debug_post_eret(CPUMIPSState *env)
-         case MIPS_HFLAG_SM: qemu_log(", SM\n"); break;
-         case MIPS_HFLAG_KM: qemu_log("\n"); break;
-         default:
--            cpu_abort(CPU(cpu), "Invalid MMU mode!\n");
-+            cpu_abort(env_cpu(env), "Invalid MMU mode!\n");
-             break;
-         }
-     }
-@@ -2633,7 +2630,7 @@ void helper_pmon(CPUMIPSState *env, int function)
- 
- void helper_wait(CPUMIPSState *env)
- {
--    CPUState *cs = CPU(mips_env_get_cpu(env));
-+    CPUState *cs = env_cpu(env);
- 
-     cs->halted = 1;
-     cpu_reset_interrupt(cs, CPU_INTERRUPT_WAKE);
-diff --git a/target/mips/translate.c b/target/mips/translate.c
-index e37722dfff..a3cf976ab6 100644
---- a/target/mips/translate.c
-+++ b/target/mips/translate.c
-@@ -30119,8 +30119,7 @@ void cpu_set_exception_base(int vp_index, target_ulong address)
- 
- void cpu_state_reset(CPUMIPSState *env)
- {
--    MIPSCPU *cpu = mips_env_get_cpu(env);
+-    HPPACPU *cpu = hppa_env_get_cpu(env);
 -    CPUState *cs = CPU(cpu);
 +    CPUState *cs = env_cpu(env);
  
-     /* Reset registers to their default values */
-     env->CP0_PRid = env->cpu_model->CP0_PRid;
-diff --git a/target/mips/translate_init.inc.c b/target/mips/translate_init.inc.c
-index 1c2d017d36..6d145a905a 100644
---- a/target/mips/translate_init.inc.c
-+++ b/target/mips/translate_init.inc.c
-@@ -871,8 +871,6 @@ static void r4k_mmu_init (CPUMIPSState *env, const mips_def_t *def)
+     cs->exception_index = excp;
+     cpu_loop_exit(cs);
+@@ -38,8 +37,7 @@ void QEMU_NORETURN HELPER(excp)(CPUHPPAState *env, int excp)
  
- static void mmu_init (CPUMIPSState *env, const mips_def_t *def)
+ void QEMU_NORETURN hppa_dynamic_excp(CPUHPPAState *env, int excp, uintptr_t ra)
  {
--    MIPSCPU *cpu = mips_env_get_cpu(env);
--
-     env->tlb = g_malloc0(sizeof(CPUMIPSTLBContext));
+-    HPPACPU *cpu = hppa_env_get_cpu(env);
+-    CPUState *cs = CPU(cpu);
++    CPUState *cs = env_cpu(env);
  
-     switch (def->mmu_type) {
-@@ -889,7 +887,7 @@ static void mmu_init (CPUMIPSState *env, const mips_def_t *def)
-         case MMU_TYPE_R6000:
-         case MMU_TYPE_R8000:
-         default:
--            cpu_abort(CPU(cpu), "MMU type not supported\n");
-+            cpu_abort(env_cpu(env), "MMU type not supported\n");
-     }
- }
- #endif /* CONFIG_USER_ONLY */
+     cs->exception_index = excp;
+     cpu_loop_exit_restore(cs, ra);
+@@ -630,7 +628,7 @@ target_ureg HELPER(read_interval_timer)(void)
+ #ifndef CONFIG_USER_ONLY
+ void HELPER(write_interval_timer)(CPUHPPAState *env, target_ureg val)
+ {
+-    HPPACPU *cpu = hppa_env_get_cpu(env);
++    HPPACPU *cpu = env_archcpu(env);
+     uint64_t current = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
+     uint64_t timeout;
+ 
 -- 
 2.17.1
 
