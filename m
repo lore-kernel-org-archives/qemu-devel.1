@@ -7,79 +7,79 @@ X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 50416C28CC6
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 20:50:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 373ACC282CE
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 20:50:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E79C0207E0
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 20:50:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DADB6207E0
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 20:50:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="FFkovk0R"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E79C0207E0
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ilQIYcm2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DADB6207E0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:57795 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:57799 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hYGNm-0005pg-69
-	for qemu-devel@archiver.kernel.org; Tue, 04 Jun 2019 16:50:10 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:35911)
+	id 1hYGO5-00068A-3I
+	for qemu-devel@archiver.kernel.org; Tue, 04 Jun 2019 16:50:29 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:35923)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hYG8i-0001Pm-5p
+	(envelope-from <richard.henderson@linaro.org>) id 1hYG8j-0001QB-P7
 	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 16:34:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hYG8d-0004Td-Pd
-	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 16:34:36 -0400
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:44170)
+	(envelope-from <richard.henderson@linaro.org>) id 1hYG8h-0004Xx-7S
+	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 16:34:37 -0400
+Received: from mail-oi1-x236.google.com ([2607:f8b0:4864:20::236]:44830)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hYG8d-0004Sp-Gd
-	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 16:34:31 -0400
-Received: by mail-ot1-x342.google.com with SMTP id b7so7252464otl.11
-	for <qemu-devel@nongnu.org>; Tue, 04 Jun 2019 13:34:31 -0700 (PDT)
+	id 1hYG8h-0004Ww-0y
+	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 16:34:35 -0400
+Received: by mail-oi1-x236.google.com with SMTP id e189so9884351oib.11
+	for <qemu-devel@nongnu.org>; Tue, 04 Jun 2019 13:34:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
 	h=from:to:subject:date:message-id:in-reply-to:references;
-	bh=lf5icV2lVCkIWEYrBl+I62jKJuQAE3cwX0XZzw8SlLo=;
-	b=FFkovk0R4KCwBUpWOPHE0x9s8PQS0yNl/4hv/bdFGwUZVeWbBQ1nIrAlwyW6E3ajZl
-	8Qq+iJVZBUHwUIXH1ZclBIMwsXlXfiQPcjvANpABGq8JyqcuoJmHO1+HeQw87W+eaZVK
-	6dmyBRNVTLIBeI5kZfFaSQnvq3AwXt4FfN5iSOuBdRTChlkQjolMib9v9SDFYyi3Hm/m
-	ATwGwTbdFGDCliTgDVoSSax484QJZ4cu2uWaOY7Ioz7q12+hi3D0njt21W4th0sdtved
-	lhAXbBEHV+v3chg7483HBhFId2pkrhOp29YHE8mnGvzJyUc60Xo2nloonHwNxySa4YnR
-	sJ/Q==
+	bh=fq9eJodKPUjXUT0wTPDnO6cE+6R1a7GOx1eVKOsBlxY=;
+	b=ilQIYcm2yk7zoCDMAYupCk6ER8FvIarTGiPDbuBBgEVGizz4l5RMgp1wN78awgeAGb
+	ltOVWuDOyK742fYuKde7GOwKqzHIzWat89VuqyoKeJEngd6rxm4xdm9WuFvYm23uxn4x
+	IRfBEi1k/yaJwAXUk4exXnbAT+wqNm+c7AfQtl5bMl59HHyRi1TznYFOc4G8Zt2teHCp
+	I1oeWwJNfu0SnhVJuQvJ1o0BkBgTOSKk2RG6g5owYEVj513c0Hufs4AIy2kDPwfLOmom
+	OZTDx2FomKU8P2owcvNJboSbAugAq6SE5ALkHFEtaiXzxQyro4alDz8v+XT+cirt9nqn
+	BoDw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
 	:references;
-	bh=lf5icV2lVCkIWEYrBl+I62jKJuQAE3cwX0XZzw8SlLo=;
-	b=bbhm9A0KEcYaCNrwuEMh1TCnhjNNuttlVgyUUmGRJ90ag+cCIKCuHmg/WwvI38LBe5
-	JZGpATibAM8SrvbZpSErIihATeVSU/+usjXq3Q308oV6pmDPFmvedzFvd+pPQSwJDoZC
-	7+JuHbJrV4GmpxneIyHiL3PeUIcAPrOaHpkYirOyl+TZySQ/iESBPamUIFzwu0e9f/QJ
-	qdsPX3HZVBExb6H7yIBp0HklNdJTBJ4Vd4esFZ0R0dj7aSvfP9mVfmekTmIGsbPSW/Mh
-	VRvAjNWQqi866BbJ4yhq5RYhuLqGzsqnebQdOJc/bbPWpmsKNP7hxXjUh+198yzUPPBT
-	E+Ig==
-X-Gm-Message-State: APjAAAVJPXlKp1HS4w9mcTWL/tKN9LUvGjo6iojsdH7AYcTsvqyCMwT/
-	Kgbrencxonurkydo+uNEFGtOQosUSk5jig==
-X-Google-Smtp-Source: APXvYqwfyBlKR3jjzBa6cL9DTaV2G3MDanfoffKG38ITzmAbc5pUiILg3E1+q34xtTsoQvu/DWqI/Q==
-X-Received: by 2002:a9d:3bb4:: with SMTP id k49mr6446753otc.332.1559680469817; 
-	Tue, 04 Jun 2019 13:34:29 -0700 (PDT)
+	bh=fq9eJodKPUjXUT0wTPDnO6cE+6R1a7GOx1eVKOsBlxY=;
+	b=YL0lVzjVOM3b4tMUSilaxxUYtGBhCqPBwFTs6BHS9xeabZbONg6RSueSwGnapOesTA
+	p2tCNiB9BvXEFA9iEFXptkEoejJ3t4q3c5lyGh80kO7u/FqMOgly4E2hqCtfnH4aQB+T
+	aYMyDWY2ylgcscd6/zgCALeKtJrKzLaLOD5r5Wi0ywF4RLmUj6MbFE7w+hcYhh0KHcai
+	iBds91nlo/7XZ4OEjvOJXI0Nh2p0F0ekbRUEqJhEY+hRiq3Hbt5eNiNGmf/UhmGcsj2x
+	bUW7s2O1rsZS9xDkQxGNoLRqAAsjM+ZKIqQZv9GGi3B5qxcCHulT929frMCaYc891+JA
+	Vcow==
+X-Gm-Message-State: APjAAAX9xvyHyWof0itiuz5dBWRHBbn3Jzm74exRXqdH0SsPtBJDje/d
+	LUrn0+3NkKIG1dz9xsWzOG/ELUi5wazdsg==
+X-Google-Smtp-Source: APXvYqxEAvLZmS4fk41s9Mrl5Xo7VQWcUGi/Xb8a5yTKUKw+RNRwUeLa7dBRE3gVRuASKGjNDKLxoA==
+X-Received: by 2002:aca:3fc6:: with SMTP id m189mr3476504oia.124.1559680473657;
+	Tue, 04 Jun 2019 13:34:33 -0700 (PDT)
 Received: from localhost.localdomain (200-56-192-86-cable.cybercable.net.mx.
 	[200.56.192.86])
-	by smtp.gmail.com with ESMTPSA id h1sm5979901otj.78.2019.06.04.13.34.28
+	by smtp.gmail.com with ESMTPSA id h1sm5979901otj.78.2019.06.04.13.34.32
 	for <qemu-devel@nongnu.org>
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Tue, 04 Jun 2019 13:34:29 -0700 (PDT)
+	Tue, 04 Jun 2019 13:34:32 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Tue,  4 Jun 2019 15:33:34 -0500
-Message-Id: <20190604203351.27778-23-richard.henderson@linaro.org>
+Date: Tue,  4 Jun 2019 15:33:36 -0500
+Message-Id: <20190604203351.27778-25-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190604203351.27778-1-richard.henderson@linaro.org>
 References: <20190604203351.27778-1-richard.henderson@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2607:f8b0:4864:20::342
-Subject: [Qemu-devel] [PATCH v4 22/39] target/ppc: Use env_cpu, env_archcpu
+X-Received-From: 2607:f8b0:4864:20::236
+Subject: [Qemu-devel] [PATCH v4 24/39] target/s390x: Use env_cpu, env_archcpu
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -96,1359 +96,619 @@ Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 Cleanup in the boilerplate that each target must define.
-Replace ppc_env_get_cpu with env_archcpu.  The combination
-CPU(ppc_env_get_cpu) should have used ENV_GET_CPU to begin;
+Replace s390_env_get_cpu with env_archcpu.  The combination
+CPU(s390_env_get_cpu) should have used ENV_GET_CPU to begin;
 use env_cpu now.
 
 Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/ppc/cpu.h                |   7 +-
- target/ppc/helper_regs.h        |   4 +-
- hw/ppc/ppc.c                    |  18 ++---
- hw/ppc/ppc405_uc.c              |   2 +-
- hw/ppc/ppc_booke.c              |   4 +-
- linux-user/ppc/cpu_loop.c       |   2 +-
- target/ppc/excp_helper.c        |  14 ++--
- target/ppc/fpu_helper.c         |  14 ++--
- target/ppc/kvm.c                |   5 +-
- target/ppc/misc_helper.c        |  22 ++----
- target/ppc/mmu-hash64.c         |  14 ++--
- target/ppc/mmu_helper.c         | 115 +++++++++++++-------------------
- target/ppc/translate_init.inc.c |  85 ++++++++++++-----------
- 13 files changed, 134 insertions(+), 172 deletions(-)
+ target/s390x/cpu.h          |  5 ----
+ linux-user/s390x/cpu_loop.c |  2 +-
+ target/s390x/cc_helper.c    |  5 ++--
+ target/s390x/diag.c         |  2 +-
+ target/s390x/excp_helper.c  |  6 ++---
+ target/s390x/fpu_helper.c   |  4 +--
+ target/s390x/helper.c       |  7 +++---
+ target/s390x/int_helper.c   |  3 +--
+ target/s390x/interrupt.c    |  6 ++---
+ target/s390x/mem_helper.c   | 28 ++++++++-------------
+ target/s390x/misc_helper.c  | 50 ++++++++++++++++++-------------------
+ target/s390x/mmu_helper.c   |  8 +++---
+ target/s390x/sigp.c         |  4 +--
+ 13 files changed, 56 insertions(+), 74 deletions(-)
 
-diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-index ec92a8e7af..73ef868a7b 100644
---- a/target/ppc/cpu.h
-+++ b/target/ppc/cpu.h
-@@ -1203,11 +1203,6 @@ struct PowerPCCPU {
-     int32_t mig_slb_nr;
+diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
+index 9cdd831a77..eefed6f509 100644
+--- a/target/s390x/cpu.h
++++ b/target/s390x/cpu.h
+@@ -163,11 +163,6 @@ struct S390CPU {
+     uint32_t irqstate_saved_size;
  };
  
--static inline PowerPCCPU *ppc_env_get_cpu(CPUPPCState *env)
+-static inline S390CPU *s390_env_get_cpu(CPUS390XState *env)
 -{
--    return container_of(env, PowerPCCPU, env);
+-    return container_of(env, S390CPU, env);
 -}
 -
- #define ENV_OFFSET offsetof(PowerPCCPU, env)
+ #define ENV_OFFSET offsetof(S390CPU, env)
  
- PowerPCCPUClass *ppc_cpu_class_by_pvr(uint32_t pvr);
-@@ -2450,7 +2445,7 @@ static inline int booke206_tlbm_to_tlbn(CPUPPCState *env, ppcmas_tlb_t *tlbm)
-         }
-     }
+ #ifndef CONFIG_USER_ONLY
+diff --git a/linux-user/s390x/cpu_loop.c b/linux-user/s390x/cpu_loop.c
+index b8bd1c956c..8211022ceb 100644
+--- a/linux-user/s390x/cpu_loop.c
++++ b/linux-user/s390x/cpu_loop.c
+@@ -26,7 +26,7 @@
  
--    cpu_abort(CPU(ppc_env_get_cpu(env)), "Unknown TLBe: %d\n", id);
-+    cpu_abort(env_cpu(env), "Unknown TLBe: %d\n", id);
-     return 0;
- }
- 
-diff --git a/target/ppc/helper_regs.h b/target/ppc/helper_regs.h
-index 922da76c6c..85dfe7687f 100644
---- a/target/ppc/helper_regs.h
-+++ b/target/ppc/helper_regs.h
-@@ -116,7 +116,7 @@ static inline int hreg_store_msr(CPUPPCState *env, target_ulong value,
+ void cpu_loop(CPUS390XState *env)
  {
-     int excp;
- #if !defined(CONFIG_USER_ONLY)
--    CPUState *cs = CPU(ppc_env_get_cpu(env));
+-    CPUState *cs = CPU(s390_env_get_cpu(env));
 +    CPUState *cs = env_cpu(env);
- #endif
- 
-     excp = 0;
-@@ -175,7 +175,7 @@ static inline int hreg_store_msr(CPUPPCState *env, target_ulong value,
- #if !defined(CONFIG_USER_ONLY)
- static inline void check_tlb_flush(CPUPPCState *env, bool global)
- {
--    CPUState *cs = CPU(ppc_env_get_cpu(env));
-+    CPUState *cs = env_cpu(env);
- 
-     /* Handle global flushes first */
-     if (global && (env->tlb_need_flush & TLB_NEED_GLOBAL_FLUSH)) {
-diff --git a/hw/ppc/ppc.c b/hw/ppc/ppc.c
-index ad20584f26..debcdab993 100644
---- a/hw/ppc/ppc.c
-+++ b/hw/ppc/ppc.c
-@@ -385,7 +385,7 @@ void ppc40x_system_reset(PowerPCCPU *cpu)
- 
- void store_40x_dbcr0(CPUPPCState *env, uint32_t val)
- {
--    PowerPCCPU *cpu = ppc_env_get_cpu(env);
-+    PowerPCCPU *cpu = env_archcpu(env);
- 
-     switch ((val >> 28) & 0x3) {
-     case 0x0:
-@@ -785,7 +785,7 @@ target_ulong cpu_ppc_load_decr(CPUPPCState *env)
- 
- target_ulong cpu_ppc_load_hdecr(CPUPPCState *env)
- {
--    PowerPCCPU *cpu = ppc_env_get_cpu(env);
-+    PowerPCCPU *cpu = env_archcpu(env);
-     PowerPCCPUClass *pcc = POWERPC_CPU_GET_CLASS(cpu);
-     ppc_tb_t *tb_env = env->tb_env;
-     uint64_t hdecr;
-@@ -923,7 +923,7 @@ static inline void _cpu_ppc_store_decr(PowerPCCPU *cpu, target_ulong decr,
- 
- void cpu_ppc_store_decr(CPUPPCState *env, target_ulong value)
- {
--    PowerPCCPU *cpu = ppc_env_get_cpu(env);
-+    PowerPCCPU *cpu = env_archcpu(env);
-     PowerPCCPUClass *pcc = POWERPC_CPU_GET_CLASS(cpu);
-     int nr_bits = 32;
- 
-@@ -955,7 +955,7 @@ static inline void _cpu_ppc_store_hdecr(PowerPCCPU *cpu, target_ulong hdecr,
- 
- void cpu_ppc_store_hdecr(CPUPPCState *env, target_ulong value)
- {
--    PowerPCCPU *cpu = ppc_env_get_cpu(env);
-+    PowerPCCPU *cpu = env_archcpu(env);
-     PowerPCCPUClass *pcc = POWERPC_CPU_GET_CLASS(cpu);
- 
-     _cpu_ppc_store_hdecr(cpu, cpu_ppc_load_hdecr(env), value,
-@@ -980,7 +980,7 @@ static void cpu_ppc_store_purr(PowerPCCPU *cpu, uint64_t value)
- static void cpu_ppc_set_tb_clk (void *opaque, uint32_t freq)
- {
-     CPUPPCState *env = opaque;
--    PowerPCCPU *cpu = ppc_env_get_cpu(env);
-+    PowerPCCPU *cpu = env_archcpu(env);
-     ppc_tb_t *tb_env = env->tb_env;
- 
-     tb_env->tb_freq = freq;
-@@ -1095,7 +1095,7 @@ const VMStateDescription vmstate_ppc_timebase = {
- /* Set up (once) timebase frequency (in Hz) */
- clk_setup_cb cpu_ppc_tb_init (CPUPPCState *env, uint32_t freq)
- {
--    PowerPCCPU *cpu = ppc_env_get_cpu(env);
-+    PowerPCCPU *cpu = env_archcpu(env);
-     ppc_tb_t *tb_env;
- 
-     tb_env = g_malloc0(sizeof(ppc_tb_t));
-@@ -1165,7 +1165,7 @@ static void cpu_4xx_fit_cb (void *opaque)
-     uint64_t now, next;
- 
-     env = opaque;
--    cpu = ppc_env_get_cpu(env);
-+    cpu = env_archcpu(env);
-     tb_env = env->tb_env;
-     ppc40x_timer = tb_env->opaque;
-     now = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
-@@ -1235,7 +1235,7 @@ static void cpu_4xx_pit_cb (void *opaque)
-     ppc40x_timer_t *ppc40x_timer;
- 
-     env = opaque;
--    cpu = ppc_env_get_cpu(env);
-+    cpu = env_archcpu(env);
-     tb_env = env->tb_env;
-     ppc40x_timer = tb_env->opaque;
-     env->spr[SPR_40x_TSR] |= 1 << 27;
-@@ -1261,7 +1261,7 @@ static void cpu_4xx_wdt_cb (void *opaque)
-     uint64_t now, next;
- 
-     env = opaque;
--    cpu = ppc_env_get_cpu(env);
-+    cpu = env_archcpu(env);
-     tb_env = env->tb_env;
-     ppc40x_timer = tb_env->opaque;
-     now = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
-diff --git a/hw/ppc/ppc405_uc.c b/hw/ppc/ppc405_uc.c
-index 3ae7f6d4df..018dcca888 100644
---- a/hw/ppc/ppc405_uc.c
-+++ b/hw/ppc/ppc405_uc.c
-@@ -49,7 +49,7 @@
- ram_addr_t ppc405_set_bootinfo (CPUPPCState *env, ppc4xx_bd_info_t *bd,
-                                 uint32_t flags)
- {
--    CPUState *cs = CPU(ppc_env_get_cpu(env));
-+    CPUState *cs = env_cpu(env);
-     ram_addr_t bdloc;
-     int i, n;
- 
-diff --git a/hw/ppc/ppc_booke.c b/hw/ppc/ppc_booke.c
-index 4f11e00a17..323413e074 100644
---- a/hw/ppc/ppc_booke.c
-+++ b/hw/ppc/ppc_booke.c
-@@ -249,7 +249,7 @@ static void booke_wdt_cb(void *opaque)
- 
- void store_booke_tsr(CPUPPCState *env, target_ulong val)
- {
--    PowerPCCPU *cpu = ppc_env_get_cpu(env);
-+    PowerPCCPU *cpu = env_archcpu(env);
-     ppc_tb_t *tb_env = env->tb_env;
-     booke_timer_t *booke_timer = tb_env->opaque;
- 
-@@ -277,7 +277,7 @@ void store_booke_tsr(CPUPPCState *env, target_ulong val)
- 
- void store_booke_tcr(CPUPPCState *env, target_ulong val)
- {
--    PowerPCCPU *cpu = ppc_env_get_cpu(env);
-+    PowerPCCPU *cpu = env_archcpu(env);
-     ppc_tb_t *tb_env = env->tb_env;
-     booke_timer_t *booke_timer = tb_env->opaque;
- 
-diff --git a/linux-user/ppc/cpu_loop.c b/linux-user/ppc/cpu_loop.c
-index 801f5ace29..24dfdba854 100644
---- a/linux-user/ppc/cpu_loop.c
-+++ b/linux-user/ppc/cpu_loop.c
-@@ -67,7 +67,7 @@ int ppc_dcr_write (ppc_dcr_t *dcr_env, int dcrn, uint32_t val)
- 
- void cpu_loop(CPUPPCState *env)
- {
--    CPUState *cs = CPU(ppc_env_get_cpu(env));
-+    CPUState *cs = env_cpu(env);
+     int trapnr, n, sig;
      target_siginfo_t info;
-     int trapnr;
-     target_ulong ret;
-diff --git a/target/ppc/excp_helper.c b/target/ppc/excp_helper.c
-index ec2c177091..50b004d00d 100644
---- a/target/ppc/excp_helper.c
-+++ b/target/ppc/excp_helper.c
-@@ -49,7 +49,7 @@ void ppc_cpu_do_interrupt(CPUState *cs)
- 
- static void ppc_hw_interrupt(CPUPPCState *env)
+     target_ulong addr;
+diff --git a/target/s390x/cc_helper.c b/target/s390x/cc_helper.c
+index a00294f183..cf68792733 100644
+--- a/target/s390x/cc_helper.c
++++ b/target/s390x/cc_helper.c
+@@ -419,7 +419,6 @@ static uint32_t cc_calc_vc(uint64_t low, uint64_t high)
+ static uint32_t do_calc_cc(CPUS390XState *env, uint32_t cc_op,
+                                   uint64_t src, uint64_t dst, uint64_t vr)
  {
--    CPUState *cs = CPU(ppc_env_get_cpu(env));
-+    CPUState *cs = env_cpu(env);
+-    S390CPU *cpu = s390_env_get_cpu(env);
+     uint32_t r = 0;
  
-     cs->exception_index = POWERPC_EXCP_NONE;
-     env->error_code = 0;
-@@ -792,7 +792,7 @@ void ppc_cpu_do_interrupt(CPUState *cs)
- 
- static void ppc_hw_interrupt(CPUPPCState *env)
- {
--    PowerPCCPU *cpu = ppc_env_get_cpu(env);
-+    PowerPCCPU *cpu = env_archcpu(env);
-     bool async_deliver;
- 
-     /* External reset */
-@@ -931,7 +931,7 @@ static void ppc_hw_interrupt(CPUPPCState *env)
-          * It generally means a discrepancy between the wakup conditions in the
-          * processor has_work implementation and the logic in this function.
-          */
--        cpu_abort(CPU(ppc_env_get_cpu(env)),
-+        cpu_abort(env_cpu(env),
-                   "Wakeup from PM state but interrupt Undelivered");
-     }
- }
-@@ -974,7 +974,7 @@ static void cpu_dump_rfi(target_ulong RA, target_ulong msr)
- void raise_exception_err_ra(CPUPPCState *env, uint32_t exception,
-                             uint32_t error_code, uintptr_t raddr)
- {
--    CPUState *cs = CPU(ppc_env_get_cpu(env));
-+    CPUState *cs = env_cpu(env);
- 
-     cs->exception_index = exception;
-     env->error_code = error_code;
-@@ -1015,7 +1015,7 @@ void helper_store_msr(CPUPPCState *env, target_ulong val)
-     uint32_t excp = hreg_store_msr(env, val, 0);
- 
-     if (excp != 0) {
--        CPUState *cs = CPU(ppc_env_get_cpu(env));
-+        CPUState *cs = env_cpu(env);
-         cpu_interrupt_exittb(cs);
-         raise_exception(env, excp);
-     }
-@@ -1026,7 +1026,7 @@ void helper_pminsn(CPUPPCState *env, powerpc_pm_insn_t insn)
- {
-     CPUState *cs;
- 
--    cs = CPU(ppc_env_get_cpu(env));
-+    cs = env_cpu(env);
-     cs->halted = 1;
- 
-     /*
-@@ -1043,7 +1043,7 @@ void helper_pminsn(CPUPPCState *env, powerpc_pm_insn_t insn)
- 
- static inline void do_rfi(CPUPPCState *env, target_ulong nip, target_ulong msr)
- {
--    CPUState *cs = CPU(ppc_env_get_cpu(env));
-+    CPUState *cs = env_cpu(env);
- 
-     /* MSR:POW cannot be set by any form of rfi */
-     msr &= ~(1ULL << MSR_POW);
-diff --git a/target/ppc/fpu_helper.c b/target/ppc/fpu_helper.c
-index 0b7308f539..ffbd19afa1 100644
---- a/target/ppc/fpu_helper.c
-+++ b/target/ppc/fpu_helper.c
-@@ -271,7 +271,7 @@ static void float_invalid_op_vxvc(CPUPPCState *env, bool set_fpcc,
-     env->fpscr |= FP_FX;
-     /* We must update the target FPR before raising the exception */
-     if (fpscr_ve != 0) {
--        CPUState *cs = CPU(ppc_env_get_cpu(env));
-+        CPUState *cs = env_cpu(env);
- 
-         cs->exception_index = POWERPC_EXCP_PROGRAM;
-         env->error_code = POWERPC_EXCP_FP | POWERPC_EXCP_FP_VXVC;
-@@ -315,7 +315,7 @@ static inline void float_zero_divide_excp(CPUPPCState *env, uintptr_t raddr)
- 
- static inline void float_overflow_excp(CPUPPCState *env)
- {
--    CPUState *cs = CPU(ppc_env_get_cpu(env));
-+    CPUState *cs = env_cpu(env);
- 
-     env->fpscr |= 1 << FPSCR_OX;
-     /* Update the floating-point exception summary */
-@@ -335,7 +335,7 @@ static inline void float_overflow_excp(CPUPPCState *env)
- 
- static inline void float_underflow_excp(CPUPPCState *env)
- {
--    CPUState *cs = CPU(ppc_env_get_cpu(env));
-+    CPUState *cs = env_cpu(env);
- 
-     env->fpscr |= 1 << FPSCR_UX;
-     /* Update the floating-point exception summary */
-@@ -352,7 +352,7 @@ static inline void float_underflow_excp(CPUPPCState *env)
- 
- static inline void float_inexact_excp(CPUPPCState *env)
- {
--    CPUState *cs = CPU(ppc_env_get_cpu(env));
-+    CPUState *cs = env_cpu(env);
- 
-     env->fpscr |= 1 << FPSCR_FI;
-     env->fpscr |= 1 << FPSCR_XX;
-@@ -442,7 +442,7 @@ void helper_fpscr_clrbit(CPUPPCState *env, uint32_t bit)
- 
- void helper_fpscr_setbit(CPUPPCState *env, uint32_t bit)
- {
--    CPUState *cs = CPU(ppc_env_get_cpu(env));
-+    CPUState *cs = env_cpu(env);
-     int prev;
- 
-     prev = (env->fpscr >> bit) & 1;
-@@ -574,7 +574,7 @@ void helper_fpscr_setbit(CPUPPCState *env, uint32_t bit)
- 
- void helper_store_fpscr(CPUPPCState *env, uint64_t arg, uint32_t mask)
- {
--    CPUState *cs = CPU(ppc_env_get_cpu(env));
-+    CPUState *cs = env_cpu(env);
-     target_ulong prev, new;
-     int i;
- 
-@@ -612,7 +612,7 @@ void store_fpscr(CPUPPCState *env, uint64_t arg, uint32_t mask)
- 
- static void do_float_check_status(CPUPPCState *env, uintptr_t raddr)
- {
--    CPUState *cs = CPU(ppc_env_get_cpu(env));
-+    CPUState *cs = env_cpu(env);
-     int status = get_float_exception_flags(&env->fp_status);
-     bool inexact_happened = false;
- 
-diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
-index 3bf0a46c33..d4107dd70d 100644
---- a/target/ppc/kvm.c
-+++ b/target/ppc/kvm.c
-@@ -1991,9 +1991,8 @@ static int kvmppc_get_dec_bits(void)
- }
- 
- static int kvmppc_get_pvinfo(CPUPPCState *env, struct kvm_ppc_pvinfo *pvinfo)
-- {
--     PowerPCCPU *cpu = ppc_env_get_cpu(env);
--     CPUState *cs = CPU(cpu);
-+{
-+    CPUState *cs = env_cpu(env);
- 
-     if (kvm_vm_check_extension(cs->kvm_state, KVM_CAP_PPC_GET_PVINFO) &&
-         !kvm_vm_ioctl(cs->kvm_state, KVM_PPC_GET_PVINFO, pvinfo)) {
-diff --git a/target/ppc/misc_helper.c b/target/ppc/misc_helper.c
-index 0a81e98ee9..49a8a02363 100644
---- a/target/ppc/misc_helper.c
-+++ b/target/ppc/misc_helper.c
-@@ -81,28 +81,24 @@ void helper_msr_facility_check(CPUPPCState *env, uint32_t bit,
- 
- void helper_store_sdr1(CPUPPCState *env, target_ulong val)
- {
--    PowerPCCPU *cpu = ppc_env_get_cpu(env);
--
-     if (env->spr[SPR_SDR1] != val) {
-         ppc_store_sdr1(env, val);
--        tlb_flush(CPU(cpu));
-+        tlb_flush(env_cpu(env));
-     }
- }
- 
- #if defined(TARGET_PPC64)
- void helper_store_ptcr(CPUPPCState *env, target_ulong val)
- {
--    PowerPCCPU *cpu = ppc_env_get_cpu(env);
--
-     if (env->spr[SPR_PTCR] != val) {
-         ppc_store_ptcr(env, val);
--        tlb_flush(CPU(cpu));
-+        tlb_flush(env_cpu(env));
-     }
- }
- 
- void helper_store_pcr(CPUPPCState *env, target_ulong value)
- {
--    PowerPCCPU *cpu = ppc_env_get_cpu(env);
-+    PowerPCCPU *cpu = env_archcpu(env);
-     PowerPCCPUClass *pcc = POWERPC_CPU_GET_CLASS(cpu);
- 
-     env->spr[SPR_PCR] = value & pcc->pcr_mask;
-@@ -111,16 +107,12 @@ void helper_store_pcr(CPUPPCState *env, target_ulong value)
- 
- void helper_store_pidr(CPUPPCState *env, target_ulong val)
- {
--    PowerPCCPU *cpu = ppc_env_get_cpu(env);
--
-     env->spr[SPR_BOOKS_PID] = val;
--    tlb_flush(CPU(cpu));
-+    tlb_flush(env_cpu(env));
- }
- 
- void helper_store_lpidr(CPUPPCState *env, target_ulong val)
- {
--    PowerPCCPU *cpu = ppc_env_get_cpu(env);
--
-     env->spr[SPR_LPIDR] = val;
- 
-     /*
-@@ -129,7 +121,7 @@ void helper_store_lpidr(CPUPPCState *env, target_ulong val)
-      * potentially access and cache entries for the current LPID as
-      * well.
-      */
--    tlb_flush(CPU(cpu));
-+    tlb_flush(env_cpu(env));
- }
- 
- void helper_store_hid0_601(CPUPPCState *env, target_ulong val)
-@@ -151,12 +143,10 @@ void helper_store_hid0_601(CPUPPCState *env, target_ulong val)
- 
- void helper_store_403_pbr(CPUPPCState *env, uint32_t num, target_ulong value)
- {
--    PowerPCCPU *cpu = ppc_env_get_cpu(env);
--
-     if (likely(env->pb[num] != value)) {
-         env->pb[num] = value;
-         /* Should be optimized */
--        tlb_flush(CPU(cpu));
-+        tlb_flush(env_cpu(env));
-     }
- }
- 
-diff --git a/target/ppc/mmu-hash64.c b/target/ppc/mmu-hash64.c
-index 7899eb2918..da8966ccf5 100644
---- a/target/ppc/mmu-hash64.c
-+++ b/target/ppc/mmu-hash64.c
-@@ -96,7 +96,7 @@ void dump_slb(PowerPCCPU *cpu)
- 
- void helper_slbia(CPUPPCState *env)
- {
--    PowerPCCPU *cpu = ppc_env_get_cpu(env);
-+    PowerPCCPU *cpu = env_archcpu(env);
-     int n;
- 
-     /* XXX: Warning: slbia never invalidates the first segment */
-@@ -118,7 +118,7 @@ void helper_slbia(CPUPPCState *env)
- static void __helper_slbie(CPUPPCState *env, target_ulong addr,
-                            target_ulong global)
- {
--    PowerPCCPU *cpu = ppc_env_get_cpu(env);
-+    PowerPCCPU *cpu = env_archcpu(env);
-     ppc_slb_t *slb;
- 
-     slb = slb_lookup(cpu, addr);
-@@ -251,7 +251,7 @@ static int ppc_find_slb_vsid(PowerPCCPU *cpu, target_ulong rb,
- 
- void helper_store_slb(CPUPPCState *env, target_ulong rb, target_ulong rs)
- {
--    PowerPCCPU *cpu = ppc_env_get_cpu(env);
-+    PowerPCCPU *cpu = env_archcpu(env);
- 
-     if (ppc_store_slb(cpu, rb & 0xfff, rb & ~0xfffULL, rs) < 0) {
-         raise_exception_err_ra(env, POWERPC_EXCP_PROGRAM,
-@@ -261,7 +261,7 @@ void helper_store_slb(CPUPPCState *env, target_ulong rb, target_ulong rs)
- 
- target_ulong helper_load_slb_esid(CPUPPCState *env, target_ulong rb)
- {
--    PowerPCCPU *cpu = ppc_env_get_cpu(env);
-+    PowerPCCPU *cpu = env_archcpu(env);
-     target_ulong rt = 0;
- 
-     if (ppc_load_slb_esid(cpu, rb, &rt) < 0) {
-@@ -273,7 +273,7 @@ target_ulong helper_load_slb_esid(CPUPPCState *env, target_ulong rb)
- 
- target_ulong helper_find_slb_vsid(CPUPPCState *env, target_ulong rb)
- {
--    PowerPCCPU *cpu = ppc_env_get_cpu(env);
-+    PowerPCCPU *cpu = env_archcpu(env);
-     target_ulong rt = 0;
- 
-     if (ppc_find_slb_vsid(cpu, rb, &rt) < 0) {
-@@ -285,7 +285,7 @@ target_ulong helper_find_slb_vsid(CPUPPCState *env, target_ulong rb)
- 
- target_ulong helper_load_slb_vsid(CPUPPCState *env, target_ulong rb)
- {
--    PowerPCCPU *cpu = ppc_env_get_cpu(env);
-+    PowerPCCPU *cpu = env_archcpu(env);
-     target_ulong rt = 0;
- 
-     if (ppc_load_slb_vsid(cpu, rb, &rt) < 0) {
-@@ -1163,7 +1163,7 @@ void ppc_store_lpcr(PowerPCCPU *cpu, target_ulong val)
- 
- void helper_store_lpcr(CPUPPCState *env, target_ulong val)
- {
--    PowerPCCPU *cpu = ppc_env_get_cpu(env);
-+    PowerPCCPU *cpu = env_archcpu(env);
- 
-     ppc_store_lpcr(cpu, val);
- }
-diff --git a/target/ppc/mmu_helper.c b/target/ppc/mmu_helper.c
-index e3149e4d3f..261a8fe707 100644
---- a/target/ppc/mmu_helper.c
-+++ b/target/ppc/mmu_helper.c
-@@ -239,7 +239,6 @@ static inline int ppc6xx_tlb_getnum(CPUPPCState *env, target_ulong eaddr,
- 
- static inline void ppc6xx_tlb_invalidate_all(CPUPPCState *env)
- {
--    PowerPCCPU *cpu = ppc_env_get_cpu(env);
-     ppc6xx_tlb_t *tlb;
-     int nr, max;
- 
-@@ -253,7 +252,7 @@ static inline void ppc6xx_tlb_invalidate_all(CPUPPCState *env)
-         tlb = &env->tlb.tlb6[nr];
-         pte_invalidate(&tlb->pte0);
-     }
--    tlb_flush(CPU(cpu));
-+    tlb_flush(env_cpu(env));
- }
- 
- static inline void ppc6xx_tlb_invalidate_virt2(CPUPPCState *env,
-@@ -261,7 +260,7 @@ static inline void ppc6xx_tlb_invalidate_virt2(CPUPPCState *env,
-                                                int is_code, int match_epn)
- {
- #if !defined(FLUSH_ALL_TLBS)
--    CPUState *cs = CPU(ppc_env_get_cpu(env));
-+    CPUState *cs = env_cpu(env);
-     ppc6xx_tlb_t *tlb;
-     int way, nr;
- 
-@@ -474,7 +473,7 @@ static int get_bat_6xx_tlb(CPUPPCState *env, mmu_ctx_t *ctx,
- static inline int get_segment_6xx_tlb(CPUPPCState *env, mmu_ctx_t *ctx,
-                                       target_ulong eaddr, int rw, int type)
- {
--    PowerPCCPU *cpu = ppc_env_get_cpu(env);
-+    PowerPCCPU *cpu = env_archcpu(env);
-     hwaddr hash;
-     target_ulong vsid;
-     int ds, pr, target_page_bits;
-@@ -670,7 +669,6 @@ static int ppcemb_tlb_search(CPUPPCState *env, target_ulong address,
- /* Helpers specific to PowerPC 40x implementations */
- static inline void ppc4xx_tlb_invalidate_all(CPUPPCState *env)
- {
--    PowerPCCPU *cpu = ppc_env_get_cpu(env);
-     ppcemb_tlb_t *tlb;
-     int i;
- 
-@@ -678,7 +676,7 @@ static inline void ppc4xx_tlb_invalidate_all(CPUPPCState *env)
-         tlb = &env->tlb.tlbe[i];
-         tlb->prot &= ~PAGE_VALID;
-     }
--    tlb_flush(CPU(cpu));
-+    tlb_flush(env_cpu(env));
- }
- 
- static int mmu40x_get_physical_address(CPUPPCState *env, mmu_ctx_t *ctx,
-@@ -749,11 +747,10 @@ static int mmu40x_get_physical_address(CPUPPCState *env, mmu_ctx_t *ctx,
- 
- void store_40x_sler(CPUPPCState *env, uint32_t val)
- {
--    PowerPCCPU *cpu = ppc_env_get_cpu(env);
--
-     /* XXX: TO BE FIXED */
-     if (val != 0x00000000) {
--        cpu_abort(CPU(cpu), "Little-endian regions are not supported by now\n");
-+        cpu_abort(env_cpu(env),
-+                  "Little-endian regions are not supported by now\n");
-     }
-     env->spr[SPR_405_SLER] = val;
- }
-@@ -863,7 +860,6 @@ static int mmubooke_get_physical_address(CPUPPCState *env, mmu_ctx_t *ctx,
- static void booke206_flush_tlb(CPUPPCState *env, int flags,
-                                const int check_iprot)
- {
--    PowerPCCPU *cpu = ppc_env_get_cpu(env);
-     int tlb_size;
-     int i, j;
-     ppcmas_tlb_t *tlb = env->tlb.tlbm;
-@@ -880,7 +876,7 @@ static void booke206_flush_tlb(CPUPPCState *env, int flags,
-         tlb += booke206_tlb_size(env, i);
-     }
- 
--    tlb_flush(CPU(cpu));
-+    tlb_flush(env_cpu(env));
- }
- 
- static hwaddr booke206_tlb_to_page_size(CPUPPCState *env,
-@@ -1275,7 +1271,7 @@ static void mmu6xx_dump_BATs(CPUPPCState *env, int type)
- 
- static void mmu6xx_dump_mmu(CPUPPCState *env)
- {
--    PowerPCCPU *cpu = ppc_env_get_cpu(env);
-+    PowerPCCPU *cpu = env_archcpu(env);
-     ppc6xx_tlb_t *tlb;
-     target_ulong sr;
-     int type, way, entry, i;
-@@ -1347,13 +1343,13 @@ void dump_mmu(CPUPPCState *env)
-     case POWERPC_MMU_2_03:
-     case POWERPC_MMU_2_06:
-     case POWERPC_MMU_2_07:
--        dump_slb(ppc_env_get_cpu(env));
-+        dump_slb(env_archcpu(env));
+     switch (cc_op) {
+@@ -543,7 +542,7 @@ static uint32_t do_calc_cc(CPUS390XState *env, uint32_t cc_op,
          break;
-     case POWERPC_MMU_3_00:
--        if (ppc64_v3_radix(ppc_env_get_cpu(env))) {
-+        if (ppc64_v3_radix(env_archcpu(env))) {
-             /* TODO - Unsupported */
-         } else {
--            dump_slb(ppc_env_get_cpu(env));
-+            dump_slb(env_archcpu(env));
-             break;
-         }
- #endif
-@@ -1419,7 +1415,6 @@ static int get_physical_address_wtlb(
-     target_ulong eaddr, int rw, int access_type,
-     int mmu_idx)
- {
--    PowerPCCPU *cpu = ppc_env_get_cpu(env);
-     int ret = -1;
-     bool real_mode = (access_type == ACCESS_CODE && msr_ir == 0)
-         || (access_type != ACCESS_CODE && msr_dr == 0);
-@@ -1460,18 +1455,18 @@ static int get_physical_address_wtlb(
-         break;
-     case POWERPC_MMU_MPC8xx:
-         /* XXX: TODO */
--        cpu_abort(CPU(cpu), "MPC8xx MMU model is not implemented\n");
-+        cpu_abort(env_cpu(env), "MPC8xx MMU model is not implemented\n");
-         break;
-     case POWERPC_MMU_REAL:
-         if (real_mode) {
-             ret = check_physical(env, ctx, eaddr, rw);
-         } else {
--            cpu_abort(CPU(cpu),
-+            cpu_abort(env_cpu(env),
-                       "PowerPC in real mode do not do any translation\n");
-         }
-         return -1;
+ 
      default:
--        cpu_abort(CPU(cpu), "Unknown or invalid MMU model\n");
-+        cpu_abort(env_cpu(env), "Unknown or invalid MMU model\n");
-         return -1;
+-        cpu_abort(CPU(cpu), "Unknown CC operation: %s\n", cc_name(cc_op));
++        cpu_abort(env_cpu(env), "Unknown CC operation: %s\n", cc_name(cc_op));
      }
  
-@@ -1583,7 +1578,7 @@ static void booke206_update_mas_tlb_miss(CPUPPCState *env, target_ulong address,
- static int cpu_ppc_handle_mmu_fault(CPUPPCState *env, target_ulong address,
-                                     int rw, int mmu_idx)
+     HELPER_LOG("%s: %15s 0x%016lx 0x%016lx 0x%016lx = %d\n", __func__,
+@@ -567,7 +566,7 @@ uint32_t HELPER(calc_cc)(CPUS390XState *env, uint32_t cc_op, uint64_t src,
+ void HELPER(load_psw)(CPUS390XState *env, uint64_t mask, uint64_t addr)
  {
--    CPUState *cs = CPU(ppc_env_get_cpu(env));
-+    CPUState *cs = env_cpu(env);
-     PowerPCCPU *cpu = POWERPC_CPU(cs);
-     mmu_ctx_t ctx;
-     int access_type;
-@@ -1815,7 +1810,7 @@ static int cpu_ppc_handle_mmu_fault(CPUPPCState *env, target_ulong address,
- static inline void do_invalidate_BAT(CPUPPCState *env, target_ulong BATu,
-                                      target_ulong mask)
- {
--    CPUState *cs = CPU(ppc_env_get_cpu(env));
-+    CPUState *cs = env_cpu(env);
-     target_ulong base, end, page;
- 
-     base = BATu & ~0x0001FFFF;
-@@ -1847,7 +1842,7 @@ void helper_store_ibatu(CPUPPCState *env, uint32_t nr, target_ulong value)
- {
-     target_ulong mask;
- #if defined(FLUSH_ALL_TLBS)
--    PowerPCCPU *cpu = ppc_env_get_cpu(env);
-+    PowerPCCPU *cpu = env_archcpu(env);
- #endif
- 
-     dump_store_bat(env, 'I', 0, nr, value);
-@@ -1868,7 +1863,7 @@ void helper_store_ibatu(CPUPPCState *env, uint32_t nr, target_ulong value)
- #if !defined(FLUSH_ALL_TLBS)
-         do_invalidate_BAT(env, env->IBAT[0][nr], mask);
- #else
--        tlb_flush(CPU(cpu));
-+        tlb_flush(env_cpu(env));
- #endif
-     }
+     load_psw(env, mask, addr);
+-    cpu_loop_exit(CPU(s390_env_get_cpu(env)));
++    cpu_loop_exit(env_cpu(env));
  }
-@@ -1883,7 +1878,7 @@ void helper_store_dbatu(CPUPPCState *env, uint32_t nr, target_ulong value)
+ 
+ void HELPER(sacf)(CPUS390XState *env, uint64_t a1)
+diff --git a/target/s390x/diag.c b/target/s390x/diag.c
+index aafa740f61..65eabf0461 100644
+--- a/target/s390x/diag.c
++++ b/target/s390x/diag.c
+@@ -55,7 +55,7 @@ int handle_diag_288(CPUS390XState *env, uint64_t r1, uint64_t r3)
+ 
+ void handle_diag_308(CPUS390XState *env, uint64_t r1, uint64_t r3, uintptr_t ra)
  {
-     target_ulong mask;
- #if defined(FLUSH_ALL_TLBS)
--    PowerPCCPU *cpu = ppc_env_get_cpu(env);
-+    PowerPCCPU *cpu = env_archcpu(env);
+-    CPUState *cs = CPU(s390_env_get_cpu(env));
++    CPUState *cs = env_cpu(env);
+     uint64_t addr =  env->regs[r1];
+     uint64_t subcode = env->regs[r3];
+     IplParameterBlock *iplb;
+diff --git a/target/s390x/excp_helper.c b/target/s390x/excp_helper.c
+index 3a467b72c5..b718760175 100644
+--- a/target/s390x/excp_helper.c
++++ b/target/s390x/excp_helper.c
+@@ -36,7 +36,7 @@
+ void QEMU_NORETURN tcg_s390_program_interrupt(CPUS390XState *env, uint32_t code,
+                                               int ilen, uintptr_t ra)
+ {
+-    CPUState *cs = CPU(s390_env_get_cpu(env));
++    CPUState *cs = env_cpu(env);
+ 
+     cpu_restore_state(cs, ra, true);
+     qemu_log_mask(CPU_LOG_INT, "program interrupt at %#" PRIx64 "\n",
+@@ -51,7 +51,7 @@ void QEMU_NORETURN tcg_s390_data_exception(CPUS390XState *env, uint32_t dxc,
+     g_assert(dxc <= 0xff);
+ #if !defined(CONFIG_USER_ONLY)
+     /* Store the DXC into the lowcore */
+-    stl_phys(CPU(s390_env_get_cpu(env))->as,
++    stl_phys(env_cpu(env)->as,
+              env->psa + offsetof(LowCore, data_exc_code), dxc);
  #endif
  
-     dump_store_bat(env, 'D', 0, nr, value);
-@@ -1904,7 +1899,7 @@ void helper_store_dbatu(CPUPPCState *env, uint32_t nr, target_ulong value)
- #if !defined(FLUSH_ALL_TLBS)
-         do_invalidate_BAT(env, env->DBAT[0][nr], mask);
- #else
--        tlb_flush(CPU(cpu));
-+        tlb_flush(env_cpu(env));
- #endif
-     }
- }
-@@ -1919,7 +1914,7 @@ void helper_store_601_batu(CPUPPCState *env, uint32_t nr, target_ulong value)
+@@ -282,7 +282,7 @@ static void do_svc_interrupt(CPUS390XState *env)
+ static void do_ext_interrupt(CPUS390XState *env)
  {
-     target_ulong mask;
- #if defined(FLUSH_ALL_TLBS)
--    PowerPCCPU *cpu = ppc_env_get_cpu(env);
-+    PowerPCCPU *cpu = env_archcpu(env);
-     int do_inval;
- #endif
+     QEMUS390FLICState *flic = QEMU_S390_FLIC(s390_get_flic());
+-    S390CPU *cpu = s390_env_get_cpu(env);
++    S390CPU *cpu = env_archcpu(env);
+     uint64_t mask, addr;
+     uint16_t cpu_addr;
+     LowCore *lowcore;
+diff --git a/target/s390x/fpu_helper.c b/target/s390x/fpu_helper.c
+index 1be68bafea..906fa8ce99 100644
+--- a/target/s390x/fpu_helper.c
++++ b/target/s390x/fpu_helper.c
+@@ -114,8 +114,6 @@ static void handle_exceptions(CPUS390XState *env, bool XxC, uintptr_t retaddr)
  
-@@ -1953,7 +1948,7 @@ void helper_store_601_batu(CPUPPCState *env, uint32_t nr, target_ulong value)
-         }
- #if defined(FLUSH_ALL_TLBS)
-         if (do_inval) {
--            tlb_flush(CPU(cpu));
-+            tlb_flush(env_cpu(env));
-         }
- #endif
-     }
-@@ -1964,7 +1959,7 @@ void helper_store_601_batl(CPUPPCState *env, uint32_t nr, target_ulong value)
- #if !defined(FLUSH_ALL_TLBS)
-     target_ulong mask;
- #else
--    PowerPCCPU *cpu = ppc_env_get_cpu(env);
-+    PowerPCCPU *cpu = env_archcpu(env);
-     int do_inval;
- #endif
- 
-@@ -1993,7 +1988,7 @@ void helper_store_601_batl(CPUPPCState *env, uint32_t nr, target_ulong value)
-         env->DBAT[1][nr] = value;
- #if defined(FLUSH_ALL_TLBS)
-         if (do_inval) {
--            tlb_flush(CPU(cpu));
-+            tlb_flush(env_cpu(env));
-         }
- #endif
-     }
-@@ -2003,12 +1998,10 @@ void helper_store_601_batl(CPUPPCState *env, uint32_t nr, target_ulong value)
- /* TLB management */
- void ppc_tlb_invalidate_all(CPUPPCState *env)
+ static inline int float_comp_to_cc(CPUS390XState *env, int float_compare)
  {
--    PowerPCCPU *cpu = ppc_env_get_cpu(env);
+-    S390CPU *cpu = s390_env_get_cpu(env);
 -
- #if defined(TARGET_PPC64)
-     if (env->mmu_model & POWERPC_MMU_64) {
-         env->tlb_need_flush = 0;
--        tlb_flush(CPU(cpu));
-+        tlb_flush(env_cpu(env));
-     } else
- #endif /* defined(TARGET_PPC64) */
-     switch (env->mmu_model) {
-@@ -2021,14 +2014,14 @@ void ppc_tlb_invalidate_all(CPUPPCState *env)
-         ppc4xx_tlb_invalidate_all(env);
-         break;
-     case POWERPC_MMU_REAL:
--        cpu_abort(CPU(cpu), "No TLB for PowerPC 4xx in real mode\n");
-+        cpu_abort(env_cpu(env), "No TLB for PowerPC 4xx in real mode\n");
-         break;
-     case POWERPC_MMU_MPC8xx:
-         /* XXX: TODO */
--        cpu_abort(CPU(cpu), "MPC8xx MMU model is not implemented\n");
-+        cpu_abort(env_cpu(env), "MPC8xx MMU model is not implemented\n");
-         break;
-     case POWERPC_MMU_BOOKE:
--        tlb_flush(CPU(cpu));
-+        tlb_flush(env_cpu(env));
-         break;
-     case POWERPC_MMU_BOOKE206:
-         booke206_flush_tlb(env, -1, 0);
-@@ -2036,11 +2029,11 @@ void ppc_tlb_invalidate_all(CPUPPCState *env)
-     case POWERPC_MMU_32B:
-     case POWERPC_MMU_601:
-         env->tlb_need_flush = 0;
--        tlb_flush(CPU(cpu));
-+        tlb_flush(env_cpu(env));
-         break;
+     switch (float_compare) {
+     case float_relation_equal:
+         return 0;
+@@ -126,7 +124,7 @@ static inline int float_comp_to_cc(CPUS390XState *env, int float_compare)
+     case float_relation_unordered:
+         return 3;
      default:
-         /* XXX: TODO */
--        cpu_abort(CPU(cpu), "Unknown MMU model %x\n", env->mmu_model);
-+        cpu_abort(env_cpu(env), "Unknown MMU model %x\n", env->mmu_model);
-         break;
+-        cpu_abort(CPU(cpu), "unknown return value for float compare\n");
++        cpu_abort(env_cpu(env), "unknown return value for float compare\n");
      }
  }
-@@ -2091,7 +2084,7 @@ void ppc_tlb_invalidate_one(CPUPPCState *env, target_ulong addr)
- /* Special registers manipulation */
- void ppc_store_sdr1(CPUPPCState *env, target_ulong value)
- {
--    PowerPCCPU *cpu = ppc_env_get_cpu(env);
-+    PowerPCCPU *cpu = env_archcpu(env);
-     qemu_log_mask(CPU_LOG_MMU, "%s: " TARGET_FMT_lx "\n", __func__, value);
-     assert(!cpu->vhyp);
- #if defined(TARGET_PPC64)
-@@ -2118,7 +2111,7 @@ void ppc_store_sdr1(CPUPPCState *env, target_ulong value)
- #if defined(TARGET_PPC64)
- void ppc_store_ptcr(CPUPPCState *env, target_ulong value)
- {
--    PowerPCCPU *cpu = ppc_env_get_cpu(env);
-+    PowerPCCPU *cpu = env_archcpu(env);
-     target_ulong ptcr_mask = PTCR_PATB | PTCR_PATS;
-     target_ulong patbsize = value & PTCR_PATS;
  
-@@ -2163,7 +2156,7 @@ void helper_store_sr(CPUPPCState *env, target_ulong srnum, target_ulong value)
-             (int)srnum, value, env->sr[srnum]);
- #if defined(TARGET_PPC64)
-     if (env->mmu_model & POWERPC_MMU_64) {
--        PowerPCCPU *cpu = ppc_env_get_cpu(env);
-+        PowerPCCPU *cpu = env_archcpu(env);
-         uint64_t esid, vsid;
+diff --git a/target/s390x/helper.c b/target/s390x/helper.c
+index 3c8f0a7615..398c2874e0 100644
+--- a/target/s390x/helper.c
++++ b/target/s390x/helper.c
+@@ -111,11 +111,11 @@ void load_psw(CPUS390XState *env, uint64_t mask, uint64_t addr)
+     env->cc_op = (mask >> 44) & 3;
  
-         /* ESID = srnum */
-@@ -2190,7 +2183,7 @@ void helper_store_sr(CPUPPCState *env, target_ulong srnum, target_ulong value)
-             page = (16 << 20) * srnum;
-             end = page + (16 << 20);
-             for (; page != end; page += TARGET_PAGE_SIZE) {
--                tlb_flush_page(CPU(cpu), page);
-+                tlb_flush_page(env_cpu(env), page);
-             }
+     if ((old_mask ^ mask) & PSW_MASK_PER) {
+-        s390_cpu_recompute_watchpoints(CPU(s390_env_get_cpu(env)));
++        s390_cpu_recompute_watchpoints(env_cpu(env));
+     }
+ 
+     if (mask & PSW_MASK_WAIT) {
+-        s390_handle_wait(s390_env_get_cpu(env));
++        s390_handle_wait(env_archcpu(env));
+     }
+ }
+ 
+@@ -137,14 +137,13 @@ uint64_t get_psw_mask(CPUS390XState *env)
+ 
+ LowCore *cpu_map_lowcore(CPUS390XState *env)
+ {
+-    S390CPU *cpu = s390_env_get_cpu(env);
+     LowCore *lowcore;
+     hwaddr len = sizeof(LowCore);
+ 
+     lowcore = cpu_physical_memory_map(env->psa, &len, 1);
+ 
+     if (len < sizeof(LowCore)) {
+-        cpu_abort(CPU(cpu), "Could not map lowcore\n");
++        cpu_abort(env_cpu(env), "Could not map lowcore\n");
+     }
+ 
+     return lowcore;
+diff --git a/target/s390x/int_helper.c b/target/s390x/int_helper.c
+index abbbc20d9c..d13cc49be6 100644
+--- a/target/s390x/int_helper.c
++++ b/target/s390x/int_helper.c
+@@ -109,10 +109,9 @@ uint64_t HELPER(divu64)(CPUS390XState *env, uint64_t ah, uint64_t al,
+             s390_program_interrupt(env, PGM_FIXPT_DIVIDE, ILEN_AUTO, GETPC());
          }
  #else
-@@ -2212,12 +2205,10 @@ void helper_tlbie(CPUPPCState *env, target_ulong addr)
- 
- void helper_tlbiva(CPUPPCState *env, target_ulong addr)
- {
--    PowerPCCPU *cpu = ppc_env_get_cpu(env);
--
-     /* tlbiva instruction only exists on BookE */
-     assert(env->mmu_model == POWERPC_MMU_BOOKE);
-     /* XXX: TODO */
--    cpu_abort(CPU(cpu), "BookE MMU model is not implemented\n");
-+    cpu_abort(env_cpu(env), "BookE MMU model is not implemented\n");
- }
- 
- /* Software driven TLBs management */
-@@ -2433,8 +2424,7 @@ target_ulong helper_4xx_tlbre_lo(CPUPPCState *env, target_ulong entry)
- void helper_4xx_tlbwe_hi(CPUPPCState *env, target_ulong entry,
-                          target_ulong val)
- {
--    PowerPCCPU *cpu = ppc_env_get_cpu(env);
--    CPUState *cs = CPU(cpu);
-+    CPUState *cs = env_cpu(env);
-     ppcemb_tlb_t *tlb;
-     target_ulong page, end;
- 
-@@ -2529,7 +2519,6 @@ target_ulong helper_4xx_tlbsx(CPUPPCState *env, target_ulong address)
- void helper_440_tlbwe(CPUPPCState *env, uint32_t word, target_ulong entry,
-                       target_ulong value)
- {
--    PowerPCCPU *cpu = ppc_env_get_cpu(env);
-     ppcemb_tlb_t *tlb;
-     target_ulong EPN, RPN, size;
-     int do_flush_tlbs;
-@@ -2565,13 +2554,13 @@ void helper_440_tlbwe(CPUPPCState *env, uint32_t word, target_ulong entry,
-         }
-         tlb->PID = env->spr[SPR_440_MMUCR] & 0x000000FF;
-         if (do_flush_tlbs) {
--            tlb_flush(CPU(cpu));
-+            tlb_flush(env_cpu(env));
-         }
-         break;
-     case 1:
-         RPN = value & 0xFFFFFC0F;
-         if ((tlb->prot & PAGE_VALID) && tlb->RPN != RPN) {
--            tlb_flush(CPU(cpu));
-+            tlb_flush(env_cpu(env));
-         }
-         tlb->RPN = RPN;
-         break;
-@@ -2665,7 +2654,6 @@ target_ulong helper_440_tlbsx(CPUPPCState *env, target_ulong address)
- 
- static ppcmas_tlb_t *booke206_cur_tlb(CPUPPCState *env)
- {
--    PowerPCCPU *cpu = ppc_env_get_cpu(env);
-     uint32_t tlbncfg = 0;
-     int esel = (env->spr[SPR_BOOKE_MAS0] & MAS0_ESEL_MASK) >> MAS0_ESEL_SHIFT;
-     int ea = (env->spr[SPR_BOOKE_MAS2] & MAS2_EPN_MASK);
-@@ -2675,7 +2663,7 @@ static ppcmas_tlb_t *booke206_cur_tlb(CPUPPCState *env)
-     tlbncfg = env->spr[SPR_BOOKE_TLB0CFG + tlb];
- 
-     if ((tlbncfg & TLBnCFG_HES) && (env->spr[SPR_BOOKE_MAS0] & MAS0_HES)) {
--        cpu_abort(CPU(cpu), "we don't support HES yet\n");
-+        cpu_abort(env_cpu(env), "we don't support HES yet\n");
+-        S390CPU *cpu = s390_env_get_cpu(env);
+         /* 32-bit hosts would need special wrapper functionality - just abort if
+            we encounter such a case; it's very unlikely anyways. */
+-        cpu_abort(CPU(cpu), "128 -> 64/64 division not implemented\n");
++        cpu_abort(env_cpu(env), "128 -> 64/64 division not implemented\n");
+ #endif
      }
- 
-     return booke206_get_tlbm(env, tlb, ea, esel);
-@@ -2683,40 +2671,33 @@ static ppcmas_tlb_t *booke206_cur_tlb(CPUPPCState *env)
- 
- void helper_booke_setpid(CPUPPCState *env, uint32_t pidn, target_ulong pid)
+     return ret;
+diff --git a/target/s390x/interrupt.c b/target/s390x/interrupt.c
+index a17eff5ebc..a8f9b38795 100644
+--- a/target/s390x/interrupt.c
++++ b/target/s390x/interrupt.c
+@@ -23,7 +23,7 @@
+ /* Ensure to exit the TB after this call! */
+ void trigger_pgm_exception(CPUS390XState *env, uint32_t code, uint32_t ilen)
  {
--    PowerPCCPU *cpu = ppc_env_get_cpu(env);
+-    CPUState *cs = CPU(s390_env_get_cpu(env));
++    CPUState *cs = env_cpu(env);
+ 
+     cs->exception_index = EXCP_PGM;
+     env->int_pgm_code = code;
+@@ -33,10 +33,8 @@ void trigger_pgm_exception(CPUS390XState *env, uint32_t code, uint32_t ilen)
+ void s390_program_interrupt(CPUS390XState *env, uint32_t code, int ilen,
+                             uintptr_t ra)
+ {
+-    S390CPU *cpu = s390_env_get_cpu(env);
 -
-     env->spr[pidn] = pid;
-     /* changing PIDs mean we're in a different address space now */
--    tlb_flush(CPU(cpu));
-+    tlb_flush(env_cpu(env));
- }
- 
- void helper_booke_set_eplc(CPUPPCState *env, target_ulong val)
- {
--    PowerPCCPU *cpu = ppc_env_get_cpu(env);
-     env->spr[SPR_BOOKE_EPLC] = val & EPID_MASK;
--    tlb_flush_by_mmuidx(CPU(cpu), 1 << PPC_TLB_EPID_LOAD);
-+    tlb_flush_by_mmuidx(env_cpu(env), 1 << PPC_TLB_EPID_LOAD);
- }
- void helper_booke_set_epsc(CPUPPCState *env, target_ulong val)
- {
--    PowerPCCPU *cpu = ppc_env_get_cpu(env);
-     env->spr[SPR_BOOKE_EPSC] = val & EPID_MASK;
--    tlb_flush_by_mmuidx(CPU(cpu), 1 << PPC_TLB_EPID_STORE);
-+    tlb_flush_by_mmuidx(env_cpu(env), 1 << PPC_TLB_EPID_STORE);
- }
- 
- static inline void flush_page(CPUPPCState *env, ppcmas_tlb_t *tlb)
- {
--    PowerPCCPU *cpu = ppc_env_get_cpu(env);
--
-     if (booke206_tlb_to_page_size(env, tlb) == TARGET_PAGE_SIZE) {
--        tlb_flush_page(CPU(cpu), tlb->mas2 & MAS2_EPN_MASK);
-+        tlb_flush_page(env_cpu(env), tlb->mas2 & MAS2_EPN_MASK);
+     if (kvm_enabled()) {
+-        kvm_s390_program_interrupt(cpu, code);
++        kvm_s390_program_interrupt(env_archcpu(env), code);
+     } else if (tcg_enabled()) {
+         tcg_s390_program_interrupt(env, code, ilen, ra);
      } else {
--        tlb_flush(CPU(cpu));
-+        tlb_flush(env_cpu(env));
-     }
- }
- 
- void helper_booke206_tlbwe(CPUPPCState *env)
+diff --git a/target/s390x/mem_helper.c b/target/s390x/mem_helper.c
+index 4a0161602f..29d9eaa5b7 100644
+--- a/target/s390x/mem_helper.c
++++ b/target/s390x/mem_helper.c
+@@ -1617,7 +1617,6 @@ uint32_t HELPER(csst_parallel)(CPUS390XState *env, uint32_t r3, uint64_t a1,
+ void HELPER(lctlg)(CPUS390XState *env, uint32_t r1, uint64_t a2, uint32_t r3)
  {
--    PowerPCCPU *cpu = ppc_env_get_cpu(env);
-     uint32_t tlbncfg, tlbn;
-     ppcmas_tlb_t *tlb;
-     uint32_t size_tlb, size_ps;
-@@ -2770,7 +2751,7 @@ void helper_booke206_tlbwe(CPUPPCState *env)
+     uintptr_t ra = GETPC();
+-    S390CPU *cpu = s390_env_get_cpu(env);
+     bool PERchanged = false;
+     uint64_t src = a2;
+     uint32_t i;
+@@ -1642,16 +1641,15 @@ void HELPER(lctlg)(CPUS390XState *env, uint32_t r1, uint64_t a2, uint32_t r3)
      }
  
-     if (msr_gs) {
--        cpu_abort(CPU(cpu), "missing HV implementation\n");
-+        cpu_abort(env_cpu(env), "missing HV implementation\n");
+     if (PERchanged && env->psw.mask & PSW_MASK_PER) {
+-        s390_cpu_recompute_watchpoints(CPU(cpu));
++        s390_cpu_recompute_watchpoints(env_cpu(env));
      }
  
-     if (tlb->mas1 & MAS1_VALID) {
-@@ -2968,7 +2949,6 @@ void helper_booke206_tlbilx0(CPUPPCState *env, target_ulong address)
- 
- void helper_booke206_tlbilx1(CPUPPCState *env, target_ulong address)
- {
--    PowerPCCPU *cpu = ppc_env_get_cpu(env);
-     int i, j;
-     int tid = (env->spr[SPR_BOOKE_MAS6] & MAS6_SPID);
-     ppcmas_tlb_t *tlb = env->tlb.tlbm;
-@@ -2985,12 +2965,11 @@ void helper_booke206_tlbilx1(CPUPPCState *env, target_ulong address)
-         }
-         tlb += booke206_tlb_size(env, i);
-     }
 -    tlb_flush(CPU(cpu));
 +    tlb_flush(env_cpu(env));
  }
  
- void helper_booke206_tlbilx3(CPUPPCState *env, target_ulong address)
+ void HELPER(lctl)(CPUS390XState *env, uint32_t r1, uint64_t a2, uint32_t r3)
  {
--    PowerPCCPU *cpu = ppc_env_get_cpu(env);
-     int i, j;
-     ppcmas_tlb_t *tlb;
-     int tid = (env->spr[SPR_BOOKE_MAS6] & MAS6_SPID);
-@@ -3026,7 +3005,7 @@ void helper_booke206_tlbilx3(CPUPPCState *env, target_ulong address)
-             tlb->mas1 &= ~MAS1_VALID;
-         }
+     uintptr_t ra = GETPC();
+-    S390CPU *cpu = s390_env_get_cpu(env);
+     bool PERchanged = false;
+     uint64_t src = a2;
+     uint32_t i;
+@@ -1675,10 +1673,10 @@ void HELPER(lctl)(CPUS390XState *env, uint32_t r1, uint64_t a2, uint32_t r3)
      }
+ 
+     if (PERchanged && env->psw.mask & PSW_MASK_PER) {
+-        s390_cpu_recompute_watchpoints(CPU(cpu));
++        s390_cpu_recompute_watchpoints(env_cpu(env));
+     }
+ 
 -    tlb_flush(CPU(cpu));
 +    tlb_flush(env_cpu(env));
  }
  
- void helper_booke206_tlbflush(CPUPPCState *env, target_ulong type)
-diff --git a/target/ppc/translate_init.inc.c b/target/ppc/translate_init.inc.c
-index ad5e14b16f..d161e95fb2 100644
---- a/target/ppc/translate_init.inc.c
-+++ b/target/ppc/translate_init.inc.c
-@@ -3432,7 +3432,7 @@ static void init_proc_401(CPUPPCState *env)
-     env->dcache_line_size = 32;
-     env->icache_line_size = 32;
-     /* Allocate hardware IRQ controller */
--    ppc40x_irq_init(ppc_env_get_cpu(env));
-+    ppc40x_irq_init(env_archcpu(env));
+ void HELPER(stctg)(CPUS390XState *env, uint32_t r1, uint64_t a2, uint32_t r3)
+@@ -1737,8 +1735,8 @@ uint32_t HELPER(testblock)(CPUS390XState *env, uint64_t real_addr)
  
-     SET_FIT_PERIOD(12, 16, 20, 24);
-     SET_WDT_PERIOD(16, 20, 24, 28);
-@@ -3486,7 +3486,7 @@ static void init_proc_401x2(CPUPPCState *env)
-     env->dcache_line_size = 32;
-     env->icache_line_size = 32;
-     /* Allocate hardware IRQ controller */
--    ppc40x_irq_init(ppc_env_get_cpu(env));
-+    ppc40x_irq_init(env_archcpu(env));
- 
-     SET_FIT_PERIOD(12, 16, 20, 24);
-     SET_WDT_PERIOD(16, 20, 24, 28);
-@@ -3538,7 +3538,7 @@ static void init_proc_401x3(CPUPPCState *env)
-     env->dcache_line_size = 32;
-     env->icache_line_size = 32;
-     /* Allocate hardware IRQ controller */
--    ppc40x_irq_init(ppc_env_get_cpu(env));
-+    ppc40x_irq_init(env_archcpu(env));
- 
-     SET_FIT_PERIOD(12, 16, 20, 24);
-     SET_WDT_PERIOD(16, 20, 24, 28);
-@@ -3597,7 +3597,7 @@ static void init_proc_IOP480(CPUPPCState *env)
-     env->dcache_line_size = 32;
-     env->icache_line_size = 32;
-     /* Allocate hardware IRQ controller */
--    ppc40x_irq_init(ppc_env_get_cpu(env));
-+    ppc40x_irq_init(env_archcpu(env));
- 
-     SET_FIT_PERIOD(8, 12, 16, 20);
-     SET_WDT_PERIOD(16, 20, 24, 28);
-@@ -3648,7 +3648,7 @@ static void init_proc_403(CPUPPCState *env)
-     env->dcache_line_size = 32;
-     env->icache_line_size = 32;
-     /* Allocate hardware IRQ controller */
--    ppc40x_irq_init(ppc_env_get_cpu(env));
-+    ppc40x_irq_init(env_archcpu(env));
- 
-     SET_FIT_PERIOD(8, 12, 16, 20);
-     SET_WDT_PERIOD(16, 20, 24, 28);
-@@ -3714,7 +3714,7 @@ static void init_proc_403GCX(CPUPPCState *env)
-     env->dcache_line_size = 32;
-     env->icache_line_size = 32;
-     /* Allocate hardware IRQ controller */
--    ppc40x_irq_init(ppc_env_get_cpu(env));
-+    ppc40x_irq_init(env_archcpu(env));
- 
-     SET_FIT_PERIOD(8, 12, 16, 20);
-     SET_WDT_PERIOD(16, 20, 24, 28);
-@@ -3780,7 +3780,7 @@ static void init_proc_405(CPUPPCState *env)
-     env->dcache_line_size = 32;
-     env->icache_line_size = 32;
-     /* Allocate hardware IRQ controller */
--    ppc40x_irq_init(ppc_env_get_cpu(env));
-+    ppc40x_irq_init(env_archcpu(env));
- 
-     SET_FIT_PERIOD(8, 12, 16, 20);
-     SET_WDT_PERIOD(16, 20, 24, 28);
-@@ -3878,7 +3878,7 @@ static void init_proc_440EP(CPUPPCState *env)
-     init_excp_BookE(env);
-     env->dcache_line_size = 32;
-     env->icache_line_size = 32;
--    ppc40x_irq_init(ppc_env_get_cpu(env));
-+    ppc40x_irq_init(env_archcpu(env));
- 
-     SET_FIT_PERIOD(12, 16, 20, 24);
-     SET_WDT_PERIOD(20, 24, 28, 32);
-@@ -4186,7 +4186,7 @@ static void init_proc_440x5(CPUPPCState *env)
-     init_excp_BookE(env);
-     env->dcache_line_size = 32;
-     env->icache_line_size = 32;
--    ppc40x_irq_init(ppc_env_get_cpu(env));
-+    ppc40x_irq_init(env_archcpu(env));
- 
-     SET_FIT_PERIOD(12, 16, 20, 24);
-     SET_WDT_PERIOD(20, 24, 28, 32);
-@@ -4392,7 +4392,7 @@ static void init_proc_G2(CPUPPCState *env)
-     env->dcache_line_size = 32;
-     env->icache_line_size = 32;
-     /* Allocate hardware IRQ controller */
--    ppc6xx_irq_init(ppc_env_get_cpu(env));
-+    ppc6xx_irq_init(env_archcpu(env));
- }
- 
- POWERPC_FAMILY(G2)(ObjectClass *oc, void *data)
-@@ -4472,7 +4472,7 @@ static void init_proc_G2LE(CPUPPCState *env)
-     env->dcache_line_size = 32;
-     env->icache_line_size = 32;
-     /* Allocate hardware IRQ controller */
--    ppc6xx_irq_init(ppc_env_get_cpu(env));
-+    ppc6xx_irq_init(env_archcpu(env));
- }
- 
- POWERPC_FAMILY(G2LE)(ObjectClass *oc, void *data)
-@@ -4727,7 +4727,7 @@ static void init_proc_e300(CPUPPCState *env)
-     env->dcache_line_size = 32;
-     env->icache_line_size = 32;
-     /* Allocate hardware IRQ controller */
--    ppc6xx_irq_init(ppc_env_get_cpu(env));
-+    ppc6xx_irq_init(env_archcpu(env));
- }
- 
- POWERPC_FAMILY(e300)(ObjectClass *oc, void *data)
-@@ -4805,7 +4805,6 @@ enum fsl_e500_version {
- 
- static void init_proc_e500(CPUPPCState *env, int version)
+ uint32_t HELPER(tprot)(CPUS390XState *env, uint64_t a1, uint64_t a2)
  {
--    PowerPCCPU *cpu = ppc_env_get_cpu(env);
-     uint32_t tlbncfg[2];
-     uint64_t ivor_mask;
-     uint64_t ivpr_mask = 0xFFFF0000ULL;
-@@ -4877,7 +4876,7 @@ static void init_proc_e500(CPUPPCState *env, int version)
-         tlbncfg[1] = 0x40028040;
-         break;
-     default:
--        cpu_abort(CPU(cpu), "Unknown CPU: " TARGET_FMT_lx "\n",
-+        cpu_abort(env_cpu(env), "Unknown CPU: " TARGET_FMT_lx "\n",
-                   env->spr[SPR_PVR]);
-     }
- #endif
-@@ -4902,7 +4901,7 @@ static void init_proc_e500(CPUPPCState *env, int version)
-         l1cfg1 |= 0x0B83820;
-         break;
-     default:
--        cpu_abort(CPU(cpu), "Unknown CPU: " TARGET_FMT_lx "\n",
-+        cpu_abort(env_cpu(env), "Unknown CPU: " TARGET_FMT_lx "\n",
-                   env->spr[SPR_PVR]);
-     }
-     gen_spr_BookE206(env, 0x000000DF, tlbncfg, mmucfg);
-@@ -5018,7 +5017,7 @@ static void init_proc_e500(CPUPPCState *env, int version)
+-    S390CPU *cpu = s390_env_get_cpu(env);
+-    CPUState *cs = CPU(cpu);
++    S390CPU *cpu = env_archcpu(env);
++    CPUState *cs = env_cpu(env);
  
-     init_excp_e200(env, ivpr_mask);
-     /* Allocate hardware IRQ controller */
--    ppce500_irq_init(ppc_env_get_cpu(env));
-+    ppce500_irq_init(env_archcpu(env));
+     /*
+      * TODO: we currently don't handle all access protection types
+@@ -1906,7 +1904,7 @@ uint32_t HELPER(mvcp)(CPUS390XState *env, uint64_t l, uint64_t a1, uint64_t a2)
+ 
+ void HELPER(idte)(CPUS390XState *env, uint64_t r1, uint64_t r2, uint32_t m4)
+ {
+-    CPUState *cs = CPU(s390_env_get_cpu(env));
++    CPUState *cs = env_cpu(env);
+     const uintptr_t ra = GETPC();
+     uint64_t table, entry, raddr;
+     uint16_t entries, i, index = 0;
+@@ -1958,7 +1956,7 @@ void HELPER(idte)(CPUS390XState *env, uint64_t r1, uint64_t r2, uint32_t m4)
+ void HELPER(ipte)(CPUS390XState *env, uint64_t pto, uint64_t vaddr,
+                   uint32_t m4)
+ {
+-    CPUState *cs = CPU(s390_env_get_cpu(env));
++    CPUState *cs = env_cpu(env);
+     const uintptr_t ra = GETPC();
+     uint64_t page = vaddr & TARGET_PAGE_MASK;
+     uint64_t pte_addr, pte;
+@@ -1998,17 +1996,13 @@ void HELPER(ipte)(CPUS390XState *env, uint64_t pto, uint64_t vaddr,
+ /* flush local tlb */
+ void HELPER(ptlb)(CPUS390XState *env)
+ {
+-    S390CPU *cpu = s390_env_get_cpu(env);
+-
+-    tlb_flush(CPU(cpu));
++    tlb_flush(env_cpu(env));
  }
  
- static void init_proc_e500v1(CPUPPCState *env)
-@@ -5291,7 +5290,7 @@ static void init_proc_601(CPUPPCState *env)
-     env->dcache_line_size = 32;
-     env->icache_line_size = 64;
-     /* Allocate hardware IRQ controller */
--    ppc6xx_irq_init(ppc_env_get_cpu(env));
-+    ppc6xx_irq_init(env_archcpu(env));
+ /* flush global tlb */
+ void HELPER(purge)(CPUS390XState *env)
+ {
+-    S390CPU *cpu = s390_env_get_cpu(env);
+-
+-    tlb_flush_all_cpus_synced(CPU(cpu));
++    tlb_flush_all_cpus_synced(env_cpu(env));
  }
  
- POWERPC_FAMILY(601)(ObjectClass *oc, void *data)
-@@ -5396,7 +5395,7 @@ static void init_proc_602(CPUPPCState *env)
-     env->dcache_line_size = 32;
-     env->icache_line_size = 32;
-     /* Allocate hardware IRQ controller */
--    ppc6xx_irq_init(ppc_env_get_cpu(env));
-+    ppc6xx_irq_init(env_archcpu(env));
- }
+ /* load using real address */
+@@ -2052,7 +2046,7 @@ void HELPER(sturg)(CPUS390XState *env, uint64_t addr, uint64_t v1)
+ /* load real address */
+ uint64_t HELPER(lra)(CPUS390XState *env, uint64_t addr)
+ {
+-    CPUState *cs = CPU(s390_env_get_cpu(env));
++    CPUState *cs = env_cpu(env);
+     uint32_t cc = 0;
+     uint64_t asc = env->psw.mask & PSW_MASK_ASC;
+     uint64_t ret;
+diff --git a/target/s390x/misc_helper.c b/target/s390x/misc_helper.c
+index ee67c1fa0c..c806c3ec00 100644
+--- a/target/s390x/misc_helper.c
++++ b/target/s390x/misc_helper.c
+@@ -55,7 +55,7 @@
+ /* Raise an exception statically from a TB.  */
+ void HELPER(exception)(CPUS390XState *env, uint32_t excp)
+ {
+-    CPUState *cs = CPU(s390_env_get_cpu(env));
++    CPUState *cs = env_cpu(env);
  
- POWERPC_FAMILY(602)(ObjectClass *oc, void *data)
-@@ -5466,7 +5465,7 @@ static void init_proc_603(CPUPPCState *env)
-     env->dcache_line_size = 32;
-     env->icache_line_size = 32;
-     /* Allocate hardware IRQ controller */
--    ppc6xx_irq_init(ppc_env_get_cpu(env));
-+    ppc6xx_irq_init(env_archcpu(env));
- }
+     HELPER_LOG("%s: exception %d\n", __func__, excp);
+     cs->exception_index = excp;
+@@ -150,7 +150,7 @@ void HELPER(diag)(CPUS390XState *env, uint32_t r1, uint32_t r3, uint32_t num)
+ /* Set Prefix */
+ void HELPER(spx)(CPUS390XState *env, uint64_t a1)
+ {
+-    CPUState *cs = CPU(s390_env_get_cpu(env));
++    CPUState *cs = env_cpu(env);
+     uint32_t prefix = a1 & 0x7fffe000;
  
- POWERPC_FAMILY(603)(ObjectClass *oc, void *data)
-@@ -5533,7 +5532,7 @@ static void init_proc_603E(CPUPPCState *env)
-     env->dcache_line_size = 32;
-     env->icache_line_size = 32;
-     /* Allocate hardware IRQ controller */
--    ppc6xx_irq_init(ppc_env_get_cpu(env));
-+    ppc6xx_irq_init(env_archcpu(env));
- }
+     env->psa = prefix;
+@@ -256,7 +256,7 @@ uint32_t HELPER(stsi)(CPUS390XState *env, uint64_t a0, uint64_t r0, uint64_t r1)
+     const uint32_t sel2 = r1 & STSI_R1_SEL2_MASK;
+     const MachineState *ms = MACHINE(qdev_get_machine());
+     uint16_t total_cpus = 0, conf_cpus = 0, reserved_cpus = 0;
+-    S390CPU *cpu = s390_env_get_cpu(env);
++    S390CPU *cpu = env_archcpu(env);
+     SysIB sysib = { };
+     int i, cc = 0;
  
- POWERPC_FAMILY(603E)(ObjectClass *oc, void *data)
-@@ -5594,7 +5593,7 @@ static void init_proc_604(CPUPPCState *env)
-     env->dcache_line_size = 32;
-     env->icache_line_size = 32;
-     /* Allocate hardware IRQ controller */
--    ppc6xx_irq_init(ppc_env_get_cpu(env));
-+    ppc6xx_irq_init(env_archcpu(env));
- }
+@@ -411,7 +411,7 @@ uint32_t HELPER(sigp)(CPUS390XState *env, uint64_t order_code, uint32_t r1,
+ #ifndef CONFIG_USER_ONLY
+ void HELPER(xsch)(CPUS390XState *env, uint64_t r1)
+ {
+-    S390CPU *cpu = s390_env_get_cpu(env);
++    S390CPU *cpu = env_archcpu(env);
+     qemu_mutex_lock_iothread();
+     ioinst_handle_xsch(cpu, r1, GETPC());
+     qemu_mutex_unlock_iothread();
+@@ -419,7 +419,7 @@ void HELPER(xsch)(CPUS390XState *env, uint64_t r1)
  
- POWERPC_FAMILY(604)(ObjectClass *oc, void *data)
-@@ -5678,7 +5677,7 @@ static void init_proc_604E(CPUPPCState *env)
-     env->dcache_line_size = 32;
-     env->icache_line_size = 32;
-     /* Allocate hardware IRQ controller */
--    ppc6xx_irq_init(ppc_env_get_cpu(env));
-+    ppc6xx_irq_init(env_archcpu(env));
- }
+ void HELPER(csch)(CPUS390XState *env, uint64_t r1)
+ {
+-    S390CPU *cpu = s390_env_get_cpu(env);
++    S390CPU *cpu = env_archcpu(env);
+     qemu_mutex_lock_iothread();
+     ioinst_handle_csch(cpu, r1, GETPC());
+     qemu_mutex_unlock_iothread();
+@@ -427,7 +427,7 @@ void HELPER(csch)(CPUS390XState *env, uint64_t r1)
  
- POWERPC_FAMILY(604E)(ObjectClass *oc, void *data)
-@@ -5749,7 +5748,7 @@ static void init_proc_740(CPUPPCState *env)
-     env->dcache_line_size = 32;
-     env->icache_line_size = 32;
-     /* Allocate hardware IRQ controller */
--    ppc6xx_irq_init(ppc_env_get_cpu(env));
-+    ppc6xx_irq_init(env_archcpu(env));
- }
+ void HELPER(hsch)(CPUS390XState *env, uint64_t r1)
+ {
+-    S390CPU *cpu = s390_env_get_cpu(env);
++    S390CPU *cpu = env_archcpu(env);
+     qemu_mutex_lock_iothread();
+     ioinst_handle_hsch(cpu, r1, GETPC());
+     qemu_mutex_unlock_iothread();
+@@ -435,7 +435,7 @@ void HELPER(hsch)(CPUS390XState *env, uint64_t r1)
  
- POWERPC_FAMILY(740)(ObjectClass *oc, void *data)
-@@ -5829,7 +5828,7 @@ static void init_proc_750(CPUPPCState *env)
-     env->dcache_line_size = 32;
-     env->icache_line_size = 32;
-     /* Allocate hardware IRQ controller */
--    ppc6xx_irq_init(ppc_env_get_cpu(env));
-+    ppc6xx_irq_init(env_archcpu(env));
- }
+ void HELPER(msch)(CPUS390XState *env, uint64_t r1, uint64_t inst)
+ {
+-    S390CPU *cpu = s390_env_get_cpu(env);
++    S390CPU *cpu = env_archcpu(env);
+     qemu_mutex_lock_iothread();
+     ioinst_handle_msch(cpu, r1, inst >> 16, GETPC());
+     qemu_mutex_unlock_iothread();
+@@ -443,7 +443,7 @@ void HELPER(msch)(CPUS390XState *env, uint64_t r1, uint64_t inst)
  
- POWERPC_FAMILY(750)(ObjectClass *oc, void *data)
-@@ -5993,7 +5992,7 @@ static void init_proc_750cl(CPUPPCState *env)
-     env->dcache_line_size = 32;
-     env->icache_line_size = 32;
-     /* Allocate hardware IRQ controller */
--    ppc6xx_irq_init(ppc_env_get_cpu(env));
-+    ppc6xx_irq_init(env_archcpu(env));
- }
+ void HELPER(rchp)(CPUS390XState *env, uint64_t r1)
+ {
+-    S390CPU *cpu = s390_env_get_cpu(env);
++    S390CPU *cpu = env_archcpu(env);
+     qemu_mutex_lock_iothread();
+     ioinst_handle_rchp(cpu, r1, GETPC());
+     qemu_mutex_unlock_iothread();
+@@ -451,7 +451,7 @@ void HELPER(rchp)(CPUS390XState *env, uint64_t r1)
  
- POWERPC_FAMILY(750cl)(ObjectClass *oc, void *data)
-@@ -6115,7 +6114,7 @@ static void init_proc_750cx(CPUPPCState *env)
-     env->dcache_line_size = 32;
-     env->icache_line_size = 32;
-     /* Allocate hardware IRQ controller */
--    ppc6xx_irq_init(ppc_env_get_cpu(env));
-+    ppc6xx_irq_init(env_archcpu(env));
- }
+ void HELPER(rsch)(CPUS390XState *env, uint64_t r1)
+ {
+-    S390CPU *cpu = s390_env_get_cpu(env);
++    S390CPU *cpu = env_archcpu(env);
+     qemu_mutex_lock_iothread();
+     ioinst_handle_rsch(cpu, r1, GETPC());
+     qemu_mutex_unlock_iothread();
+@@ -459,7 +459,7 @@ void HELPER(rsch)(CPUS390XState *env, uint64_t r1)
  
- POWERPC_FAMILY(750cx)(ObjectClass *oc, void *data)
-@@ -6203,7 +6202,7 @@ static void init_proc_750fx(CPUPPCState *env)
-     env->dcache_line_size = 32;
-     env->icache_line_size = 32;
-     /* Allocate hardware IRQ controller */
--    ppc6xx_irq_init(ppc_env_get_cpu(env));
-+    ppc6xx_irq_init(env_archcpu(env));
- }
+ void HELPER(sal)(CPUS390XState *env, uint64_t r1)
+ {
+-    S390CPU *cpu = s390_env_get_cpu(env);
++    S390CPU *cpu = env_archcpu(env);
  
- POWERPC_FAMILY(750fx)(ObjectClass *oc, void *data)
-@@ -6291,7 +6290,7 @@ static void init_proc_750gx(CPUPPCState *env)
-     env->dcache_line_size = 32;
-     env->icache_line_size = 32;
-     /* Allocate hardware IRQ controller */
--    ppc6xx_irq_init(ppc_env_get_cpu(env));
-+    ppc6xx_irq_init(env_archcpu(env));
- }
+     qemu_mutex_lock_iothread();
+     ioinst_handle_sal(cpu, r1, GETPC());
+@@ -468,7 +468,7 @@ void HELPER(sal)(CPUS390XState *env, uint64_t r1)
  
- POWERPC_FAMILY(750gx)(ObjectClass *oc, void *data)
-@@ -6370,7 +6369,7 @@ static void init_proc_745(CPUPPCState *env)
-     env->dcache_line_size = 32;
-     env->icache_line_size = 32;
-     /* Allocate hardware IRQ controller */
--    ppc6xx_irq_init(ppc_env_get_cpu(env));
-+    ppc6xx_irq_init(env_archcpu(env));
- }
+ void HELPER(schm)(CPUS390XState *env, uint64_t r1, uint64_t r2, uint64_t inst)
+ {
+-    S390CPU *cpu = s390_env_get_cpu(env);
++    S390CPU *cpu = env_archcpu(env);
  
- POWERPC_FAMILY(745)(ObjectClass *oc, void *data)
-@@ -6457,7 +6456,7 @@ static void init_proc_755(CPUPPCState *env)
-     env->dcache_line_size = 32;
-     env->icache_line_size = 32;
-     /* Allocate hardware IRQ controller */
--    ppc6xx_irq_init(ppc_env_get_cpu(env));
-+    ppc6xx_irq_init(env_archcpu(env));
- }
+     qemu_mutex_lock_iothread();
+     ioinst_handle_schm(cpu, r1, r2, inst >> 16, GETPC());
+@@ -477,7 +477,7 @@ void HELPER(schm)(CPUS390XState *env, uint64_t r1, uint64_t r2, uint64_t inst)
  
- POWERPC_FAMILY(755)(ObjectClass *oc, void *data)
-@@ -6527,7 +6526,7 @@ static void init_proc_7400(CPUPPCState *env)
-     env->dcache_line_size = 32;
-     env->icache_line_size = 32;
-     /* Allocate hardware IRQ controller */
--    ppc6xx_irq_init(ppc_env_get_cpu(env));
-+    ppc6xx_irq_init(env_archcpu(env));
- }
+ void HELPER(ssch)(CPUS390XState *env, uint64_t r1, uint64_t inst)
+ {
+-    S390CPU *cpu = s390_env_get_cpu(env);
++    S390CPU *cpu = env_archcpu(env);
+     qemu_mutex_lock_iothread();
+     ioinst_handle_ssch(cpu, r1, inst >> 16, GETPC());
+     qemu_mutex_unlock_iothread();
+@@ -485,7 +485,7 @@ void HELPER(ssch)(CPUS390XState *env, uint64_t r1, uint64_t inst)
  
- POWERPC_FAMILY(7400)(ObjectClass *oc, void *data)
-@@ -6612,7 +6611,7 @@ static void init_proc_7410(CPUPPCState *env)
-     env->dcache_line_size = 32;
-     env->icache_line_size = 32;
-     /* Allocate hardware IRQ controller */
--    ppc6xx_irq_init(ppc_env_get_cpu(env));
-+    ppc6xx_irq_init(env_archcpu(env));
- }
+ void HELPER(stcrw)(CPUS390XState *env, uint64_t inst)
+ {
+-    S390CPU *cpu = s390_env_get_cpu(env);
++    S390CPU *cpu = env_archcpu(env);
  
- POWERPC_FAMILY(7410)(ObjectClass *oc, void *data)
-@@ -6723,7 +6722,7 @@ static void init_proc_7440(CPUPPCState *env)
-     env->dcache_line_size = 32;
-     env->icache_line_size = 32;
-     /* Allocate hardware IRQ controller */
--    ppc6xx_irq_init(ppc_env_get_cpu(env));
-+    ppc6xx_irq_init(env_archcpu(env));
- }
+     qemu_mutex_lock_iothread();
+     ioinst_handle_stcrw(cpu, inst >> 16, GETPC());
+@@ -494,7 +494,7 @@ void HELPER(stcrw)(CPUS390XState *env, uint64_t inst)
  
- POWERPC_FAMILY(7440)(ObjectClass *oc, void *data)
-@@ -6857,7 +6856,7 @@ static void init_proc_7450(CPUPPCState *env)
-     env->dcache_line_size = 32;
-     env->icache_line_size = 32;
-     /* Allocate hardware IRQ controller */
--    ppc6xx_irq_init(ppc_env_get_cpu(env));
-+    ppc6xx_irq_init(env_archcpu(env));
- }
+ void HELPER(stsch)(CPUS390XState *env, uint64_t r1, uint64_t inst)
+ {
+-    S390CPU *cpu = s390_env_get_cpu(env);
++    S390CPU *cpu = env_archcpu(env);
+     qemu_mutex_lock_iothread();
+     ioinst_handle_stsch(cpu, r1, inst >> 16, GETPC());
+     qemu_mutex_unlock_iothread();
+@@ -503,7 +503,7 @@ void HELPER(stsch)(CPUS390XState *env, uint64_t r1, uint64_t inst)
+ uint32_t HELPER(tpi)(CPUS390XState *env, uint64_t addr)
+ {
+     const uintptr_t ra = GETPC();
+-    S390CPU *cpu = s390_env_get_cpu(env);
++    S390CPU *cpu = env_archcpu(env);
+     QEMUS390FLICState *flic = s390_get_qemu_flic(s390_get_flic());
+     QEMUS390FlicIO *io = NULL;
+     LowCore *lowcore;
+@@ -555,7 +555,7 @@ uint32_t HELPER(tpi)(CPUS390XState *env, uint64_t addr)
  
- POWERPC_FAMILY(7450)(ObjectClass *oc, void *data)
-@@ -6994,7 +6993,7 @@ static void init_proc_7445(CPUPPCState *env)
-     env->dcache_line_size = 32;
-     env->icache_line_size = 32;
-     /* Allocate hardware IRQ controller */
--    ppc6xx_irq_init(ppc_env_get_cpu(env));
-+    ppc6xx_irq_init(env_archcpu(env));
- }
+ void HELPER(tsch)(CPUS390XState *env, uint64_t r1, uint64_t inst)
+ {
+-    S390CPU *cpu = s390_env_get_cpu(env);
++    S390CPU *cpu = env_archcpu(env);
+     qemu_mutex_lock_iothread();
+     ioinst_handle_tsch(cpu, r1, inst >> 16, GETPC());
+     qemu_mutex_unlock_iothread();
+@@ -563,7 +563,7 @@ void HELPER(tsch)(CPUS390XState *env, uint64_t r1, uint64_t inst)
  
- POWERPC_FAMILY(7445)(ObjectClass *oc, void *data)
-@@ -7133,7 +7132,7 @@ static void init_proc_7455(CPUPPCState *env)
-     env->dcache_line_size = 32;
-     env->icache_line_size = 32;
-     /* Allocate hardware IRQ controller */
--    ppc6xx_irq_init(ppc_env_get_cpu(env));
-+    ppc6xx_irq_init(env_archcpu(env));
- }
+ void HELPER(chsc)(CPUS390XState *env, uint64_t inst)
+ {
+-    S390CPU *cpu = s390_env_get_cpu(env);
++    S390CPU *cpu = env_archcpu(env);
+     qemu_mutex_lock_iothread();
+     ioinst_handle_chsc(cpu, inst >> 16, GETPC());
+     qemu_mutex_unlock_iothread();
+@@ -618,7 +618,7 @@ void HELPER(per_ifetch)(CPUS390XState *env, uint64_t addr)
+         /* If the instruction has to be nullified, trigger the
+            exception immediately. */
+         if (env->cregs[9] & PER_CR9_EVENT_NULLIFICATION) {
+-            CPUState *cs = CPU(s390_env_get_cpu(env));
++            CPUState *cs = env_cpu(env);
  
- POWERPC_FAMILY(7455)(ObjectClass *oc, void *data)
-@@ -7296,7 +7295,7 @@ static void init_proc_7457(CPUPPCState *env)
-     env->dcache_line_size = 32;
-     env->icache_line_size = 32;
-     /* Allocate hardware IRQ controller */
--    ppc6xx_irq_init(ppc_env_get_cpu(env));
-+    ppc6xx_irq_init(env_archcpu(env));
- }
+             env->per_perc_atmid |= PER_CODE_EVENT_NULLIFICATION;
+             env->int_pgm_code = PGM_PER;
+@@ -695,7 +695,7 @@ uint32_t HELPER(stfle)(CPUS390XState *env, uint64_t addr)
+  */
+ void HELPER(clp)(CPUS390XState *env, uint32_t r2)
+ {
+-    S390CPU *cpu = s390_env_get_cpu(env);
++    S390CPU *cpu = env_archcpu(env);
  
- POWERPC_FAMILY(7457)(ObjectClass *oc, void *data)
-@@ -7434,7 +7433,7 @@ static void init_proc_e600(CPUPPCState *env)
-     env->dcache_line_size = 32;
-     env->icache_line_size = 32;
-     /* Allocate hardware IRQ controller */
--    ppc6xx_irq_init(ppc_env_get_cpu(env));
-+    ppc6xx_irq_init(env_archcpu(env));
- }
+     qemu_mutex_lock_iothread();
+     clp_service_call(cpu, r2, GETPC());
+@@ -704,7 +704,7 @@ void HELPER(clp)(CPUS390XState *env, uint32_t r2)
  
- POWERPC_FAMILY(e600)(ObjectClass *oc, void *data)
-@@ -8298,7 +8297,7 @@ static void init_proc_970(CPUPPCState *env)
+ void HELPER(pcilg)(CPUS390XState *env, uint32_t r1, uint32_t r2)
+ {
+-    S390CPU *cpu = s390_env_get_cpu(env);
++    S390CPU *cpu = env_archcpu(env);
  
-     /* Allocate hardware IRQ controller */
-     init_excp_970(env);
--    ppc970_irq_init(ppc_env_get_cpu(env));
-+    ppc970_irq_init(env_archcpu(env));
- }
+     qemu_mutex_lock_iothread();
+     pcilg_service_call(cpu, r1, r2, GETPC());
+@@ -713,7 +713,7 @@ void HELPER(pcilg)(CPUS390XState *env, uint32_t r1, uint32_t r2)
  
- POWERPC_FAMILY(970)(ObjectClass *oc, void *data)
-@@ -8372,7 +8371,7 @@ static void init_proc_power5plus(CPUPPCState *env)
+ void HELPER(pcistg)(CPUS390XState *env, uint32_t r1, uint32_t r2)
+ {
+-    S390CPU *cpu = s390_env_get_cpu(env);
++    S390CPU *cpu = env_archcpu(env);
  
-     /* Allocate hardware IRQ controller */
-     init_excp_970(env);
--    ppc970_irq_init(ppc_env_get_cpu(env));
-+    ppc970_irq_init(env_archcpu(env));
- }
+     qemu_mutex_lock_iothread();
+     pcistg_service_call(cpu, r1, r2, GETPC());
+@@ -723,7 +723,7 @@ void HELPER(pcistg)(CPUS390XState *env, uint32_t r1, uint32_t r2)
+ void HELPER(stpcifc)(CPUS390XState *env, uint32_t r1, uint64_t fiba,
+                      uint32_t ar)
+ {
+-    S390CPU *cpu = s390_env_get_cpu(env);
++    S390CPU *cpu = env_archcpu(env);
  
- POWERPC_FAMILY(POWER5P)(ObjectClass *oc, void *data)
-@@ -8487,7 +8486,7 @@ static void init_proc_POWER7(CPUPPCState *env)
+     qemu_mutex_lock_iothread();
+     stpcifc_service_call(cpu, r1, fiba, ar, GETPC());
+@@ -745,7 +745,7 @@ void HELPER(sic)(CPUS390XState *env, uint64_t r1, uint64_t r3)
  
-     /* Allocate hardware IRQ controller */
-     init_excp_POWER7(env);
--    ppcPOWER7_irq_init(ppc_env_get_cpu(env));
-+    ppcPOWER7_irq_init(env_archcpu(env));
- }
+ void HELPER(rpcit)(CPUS390XState *env, uint32_t r1, uint32_t r2)
+ {
+-    S390CPU *cpu = s390_env_get_cpu(env);
++    S390CPU *cpu = env_archcpu(env);
  
- static bool ppc_pvr_match_power7(PowerPCCPUClass *pcc, uint32_t pvr)
-@@ -8639,7 +8638,7 @@ static void init_proc_POWER8(CPUPPCState *env)
+     qemu_mutex_lock_iothread();
+     rpcit_service_call(cpu, r1, r2, GETPC());
+@@ -755,7 +755,7 @@ void HELPER(rpcit)(CPUS390XState *env, uint32_t r1, uint32_t r2)
+ void HELPER(pcistb)(CPUS390XState *env, uint32_t r1, uint32_t r3,
+                     uint64_t gaddr, uint32_t ar)
+ {
+-    S390CPU *cpu = s390_env_get_cpu(env);
++    S390CPU *cpu = env_archcpu(env);
  
-     /* Allocate hardware IRQ controller */
-     init_excp_POWER8(env);
--    ppcPOWER7_irq_init(ppc_env_get_cpu(env));
-+    ppcPOWER7_irq_init(env_archcpu(env));
- }
+     qemu_mutex_lock_iothread();
+     pcistb_service_call(cpu, r1, r3, gaddr, ar, GETPC());
+@@ -765,7 +765,7 @@ void HELPER(pcistb)(CPUS390XState *env, uint32_t r1, uint32_t r3,
+ void HELPER(mpcifc)(CPUS390XState *env, uint32_t r1, uint64_t fiba,
+                     uint32_t ar)
+ {
+-    S390CPU *cpu = s390_env_get_cpu(env);
++    S390CPU *cpu = env_archcpu(env);
  
- static bool ppc_pvr_match_power8(PowerPCCPUClass *pcc, uint32_t pvr)
-@@ -8838,7 +8837,7 @@ static void init_proc_POWER9(CPUPPCState *env)
+     qemu_mutex_lock_iothread();
+     mpcifc_service_call(cpu, r1, fiba, ar, GETPC());
+diff --git a/target/s390x/mmu_helper.c b/target/s390x/mmu_helper.c
+index 145b62a7ef..9669bae393 100644
+--- a/target/s390x/mmu_helper.c
++++ b/target/s390x/mmu_helper.c
+@@ -58,12 +58,12 @@
+ static void trigger_access_exception(CPUS390XState *env, uint32_t type,
+                                      uint32_t ilen, uint64_t tec)
+ {
+-    S390CPU *cpu = s390_env_get_cpu(env);
++    S390CPU *cpu = env_archcpu(env);
  
-     /* Allocate hardware IRQ controller */
-     init_excp_POWER9(env);
--    ppcPOWER9_irq_init(ppc_env_get_cpu(env));
-+    ppcPOWER9_irq_init(env_archcpu(env));
- }
+     if (kvm_enabled()) {
+         kvm_s390_access_exception(cpu, type, tec);
+     } else {
+-        CPUState *cs = CPU(cpu);
++        CPUState *cs = env_cpu(env);
+         if (type != PGM_ADDRESSING) {
+             stq_phys(cs->as, env->psa + offsetof(LowCore, trans_exc_code), tec);
+         }
+@@ -185,7 +185,7 @@ static int mmu_translate_segment(CPUS390XState *env, target_ulong vaddr,
+                                  target_ulong *raddr, int *flags, int rw,
+                                  bool exc)
+ {
+-    CPUState *cs = CPU(s390_env_get_cpu(env));
++    CPUState *cs = env_cpu(env);
+     uint64_t origin, offs, pt_entry;
  
- static bool ppc_pvr_match_power9(PowerPCCPUClass *pcc, uint32_t pvr)
+     if (st_entry & SEGMENT_ENTRY_RO) {
+@@ -214,7 +214,7 @@ static int mmu_translate_region(CPUS390XState *env, target_ulong vaddr,
+                                 target_ulong *raddr, int *flags, int rw,
+                                 bool exc)
+ {
+-    CPUState *cs = CPU(s390_env_get_cpu(env));
++    CPUState *cs = env_cpu(env);
+     uint64_t origin, offs, new_entry;
+     const int pchks[4] = {
+         PGM_SEGMENT_TRANS, PGM_REG_THIRD_TRANS,
+diff --git a/target/s390x/sigp.c b/target/s390x/sigp.c
+index c1f9245797..ea5f69d5d8 100644
+--- a/target/s390x/sigp.c
++++ b/target/s390x/sigp.c
+@@ -454,7 +454,7 @@ int handle_sigp(CPUS390XState *env, uint8_t order, uint64_t r1, uint64_t r3)
+ {
+     uint64_t *status_reg = &env->regs[r1];
+     uint64_t param = (r1 % 2) ? env->regs[r1] : env->regs[r1 + 1];
+-    S390CPU *cpu = s390_env_get_cpu(env);
++    S390CPU *cpu = env_archcpu(env);
+     S390CPU *dst_cpu = NULL;
+     int ret;
+ 
+@@ -492,7 +492,7 @@ int s390_cpu_restart(S390CPU *cpu)
+ 
+ void do_stop_interrupt(CPUS390XState *env)
+ {
+-    S390CPU *cpu = s390_env_get_cpu(env);
++    S390CPU *cpu = env_archcpu(env);
+ 
+     if (s390_cpu_set_state(S390_CPU_STATE_STOPPED, cpu) == 0) {
+         qemu_system_shutdown_request(SHUTDOWN_CAUSE_GUEST_SHUTDOWN);
 -- 
 2.17.1
 
