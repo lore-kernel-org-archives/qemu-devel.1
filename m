@@ -2,78 +2,60 @@ Return-Path: <SRS0=GUf1=UD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.0 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C1447C282CE
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 16:13:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A595C282CE
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 16:16:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7EB6020693
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 16:13:51 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="BvO8akZ7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7EB6020693
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 403F220883
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 16:16:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 403F220883
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:54799 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:54842 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hYC4L-00005p-Uy
-	for qemu-devel@archiver.kernel.org; Tue, 04 Jun 2019 12:13:49 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:35152)
+	id 1hYC6h-000130-AG
+	for qemu-devel@archiver.kernel.org; Tue, 04 Jun 2019 12:16:15 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:35629)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hYC3b-00086q-R3
-	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 12:13:04 -0400
+	(envelope-from <kwolf@redhat.com>) id 1hYC5c-0000cm-MK
+	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 12:15:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hYC3a-0001DP-UV
-	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 12:13:03 -0400
-Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:41503)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hYC3a-0001Bf-PB
-	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 12:13:02 -0400
-Received: by mail-ot1-x344.google.com with SMTP id 107so14255378otj.8
-	for <qemu-devel@nongnu.org>; Tue, 04 Jun 2019 09:13:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-	:cc; bh=aunJS4wmex7HPHE5PeWpmvBZom243rSsNdnUhZ4I23c=;
-	b=BvO8akZ7APDTiXdo0k+VUuIcNpAMtrpwBOi01dlPeGy5m/RmkRA79DvGQTW2BcFYH9
-	ArK0xh5BosmtRvW7wJHLZPe6Qi27rUmw4JpXRrj+5nGXMfv8roaTzgcKL5+0RMjnmuaM
-	WUXgi4XohVhk2IxNZIc9X4VUtLhn99UjEbbTnXfSKwIL51/6SQWnj956r+/5me7hlZ5q
-	uNQkFkQAu0YRZR5Fw8FxacY1OmnB0tCxA8qu7u8Dzx/WbgP6fqiLHyr07qQxy3W43cg4
-	QL0LQmCLs7Rh4lBBvIf9HgDH8P/gworG9PXks3BOhlcsqIsdZESbT4qzeVT3HInWwhY9
-	49hQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-	:message-id:subject:to:cc;
-	bh=aunJS4wmex7HPHE5PeWpmvBZom243rSsNdnUhZ4I23c=;
-	b=GxcAnN+SSlkojh8UL2HG8Ki/go+WiHJVr30Z/XEDprNaqQbewPiOW9fmm7cfh+48+B
-	IQIlhrynPpTOTgisidkePKnGqFCmn2zR0DioXGrlP5uMqQ+Nb2HGncVMxoW6V+hs/srE
-	jqrTX6q3Abgluv1BSeJtnoqLvzsAYzx8e0dmFC5gl+hIudV4qRcxKKr89moA2V2GVpXp
-	55VS30poDfmhd4338LwI6lFW9BdbsR6Gqiut2Jab/544D/W/3FiK8x0mxXJq2VYRHNGe
-	RCl981xZMLCL07GIQ/EK3/BuVncxvjnJ168kSmvWLuAwvfp1asQV+vUBIJg/G8iFq0wv
-	7CQA==
-X-Gm-Message-State: APjAAAXBdB/pNhMf8sf8DD+s+mqtZvKaofB8O+0cxmAu2HMvsjlOYJFh
-	Whm7xE5IslWAN18TeHVKLpyRLKsTbNhV5/wiCun5IA==
-X-Google-Smtp-Source: APXvYqwyNkLtX7HnLtH0glqdNViXy35Fc242DPhSGot0vF3aBvdDSKLFmEaS1iY8uP5MOUl/gK7UoGfxoFhXjO0bEM0=
-X-Received: by 2002:a9d:193:: with SMTP id e19mr5187743ote.135.1559664781774; 
-	Tue, 04 Jun 2019 09:13:01 -0700 (PDT)
+	(envelope-from <kwolf@redhat.com>) id 1hYC5a-0004uo-A0
+	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 12:15:07 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:32794)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kwolf@redhat.com>)
+	id 1hYC5R-0004cI-Im; Tue, 04 Jun 2019 12:14:58 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+	[10.5.11.22])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id D27BFC1EB1F3;
+	Tue,  4 Jun 2019 16:14:46 +0000 (UTC)
+Received: from linux.fritz.box.com (ovpn-116-220.ams2.redhat.com
+	[10.36.116.220])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 83EF31001DE4;
+	Tue,  4 Jun 2019 16:14:43 +0000 (UTC)
+From: Kevin Wolf <kwolf@redhat.com>
+To: qemu-block@nongnu.org
+Date: Tue,  4 Jun 2019 18:14:30 +0200
+Message-Id: <20190604161430.32105-1-kwolf@redhat.com>
 MIME-Version: 1.0
-References: <20190604154225.26992-1-richard.henderson@linaro.org>
-In-Reply-To: <20190604154225.26992-1-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 4 Jun 2019 17:12:50 +0100
-Message-ID: <CAFEAcA9KzVZLg4NdXMzU4jyWkV8rMjoZVAo_odgWSQh=zOMpHw@mail.gmail.com>
-To: Richard Henderson <richard.henderson@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::344
-Subject: Re: [Qemu-devel] [PATCH] decodetree: Fix comparison of Field
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.32]);
+	Tue, 04 Jun 2019 16:14:50 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PULL v2 00/29] Block layer patches
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -85,43 +67,157 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 4 Jun 2019 at 16:42, Richard Henderson
-<richard.henderson@linaro.org> wrote:
->
-> Typo comparing the sign of the field, twice, instead of also comparing
-> the mask of the field (which itself encodes both position and length).
->
-> Reported-by: Peter Maydell <peter.maydell@linaro.org>
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->  scripts/decodetree.py | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/scripts/decodetree.py b/scripts/decodetree.py
-> index 81874e22cc..d7a59d63ac 100755
-> --- a/scripts/decodetree.py
-> +++ b/scripts/decodetree.py
-> @@ -184,7 +184,7 @@ class Field:
->          return '{0}(insn, {1}, {2})'.format(extr, self.pos, self.len)
->
->      def __eq__(self, other):
-> -        return self.sign == other.sign and self.sign == other.sign
-> +        return self.sign == other.sign and self.mask == other.mask
->
->      def __ne__(self, other):
->          return not self.__eq__(other)
-> --
+The following changes since commit e2a58ff493a2e00db3e963c1839c5374500110=
+f2:
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+  Merge remote-tracking branch 'remotes/bonzini/tags/for-upstream' into s=
+taging (2019-06-03 18:26:21 +0100)
 
-This fixes the problems I was seeing with the VFP decodetree
-conversion I was working on.
+are available in the Git repository at:
 
-thanks
--- PMM
+  git://repo.or.cz/qemu/kevin.git tags/for-upstream
+
+for you to fetch changes up to 11ba81c3cde0bc070cced6e8ef2835fab4fe90c8:
+
+  iotests: Fix duplicated diff output on failure (2019-06-04 16:55:58 +02=
+00)
+
+----------------------------------------------------------------
+Block layer patches:
+
+- block: AioContext management, part 2
+- Avoid recursive block_status call (i.e. lseek() calls) if possible
+- linux-aio: Drop unused BlockAIOCB submission method
+- nvme: add Get/Set Feature Timestamp support
+- Fix crash on commit job start with active I/O on base node
+- Fix crash in bdrv_drained_end
+- Fix integer overflow in qcow2 discard
+
+----------------------------------------------------------------
+John Snow (1):
+      blockdev: fix missed target unref for drive-backup
+
+Julia Suvorova (1):
+      block/linux-aio: Drop unused BlockAIOCB submission method
+
+Kenneth Heitke (1):
+      nvme: add Get/Set Feature Timestamp support
+
+Kevin Wolf (19):
+      block: Drain source node in bdrv_replace_node()
+      iotests: Test commit job start with concurrent I/O
+      test-block-iothread: Check filter node in test_propagate_mirror
+      nbd-server: Call blk_set_allow_aio_context_change()
+      block: Add Error to blk_set_aio_context()
+      block: Add BlockBackend.ctx
+      block: Add qdev_prop_drive_iothread property type
+      scsi-disk: Use qdev_prop_drive_iothread
+      block: Adjust AioContexts when attaching nodes
+      test-block-iothread: Test adding parent to iothread node
+      test-block-iothread: BlockBackend AioContext across root node chang=
+e
+      block: Move node without parents to main AioContext
+      blockdev: Use bdrv_try_set_aio_context() for monitor commands
+      block: Remove wrong bdrv_set_aio_context() calls
+      virtio-scsi-test: Test attaching new overlay with iothreads
+      iotests: Attach new devices to node in non-default iothread
+      test-bdrv-drain: Use bdrv_try_set_aio_context()
+      block: Remove bdrv_set_aio_context()
+      iotests: Fix duplicated diff output on failure
+
+Max Reitz (2):
+      block/io: Delay decrementing the quiesce_counter
+      iotests: Test cancelling a job and closing the VM
+
+Vladimir Sementsov-Ogievskiy (5):
+      tests/perf: Test lseek influence on qcow2 block-status
+      block: avoid recursive block_status call if possible
+      block/qcow2-refcount: add trace-point to qcow2_process_discards
+      block/io: bdrv_pdiscard: support int64_t bytes parameter
+      iotests: test big qcow2 shrink
+
+ docs/devel/multiple-iothreads.txt          |   4 +-
+ block/qcow2.h                              |   4 +
+ hw/block/nvme.h                            |   2 +
+ include/block/block.h                      |  21 ++---
+ include/block/block_int.h                  |   1 +
+ include/block/nvme.h                       |   2 +
+ include/block/raw-aio.h                    |   3 -
+ include/hw/block/block.h                   |   7 +-
+ include/hw/qdev-properties.h               |   3 +
+ include/hw/scsi/scsi.h                     |   1 +
+ include/sysemu/block-backend.h             |   5 +-
+ tests/libqtest.h                           |  11 +++
+ block.c                                    |  79 ++++++++++++-----
+ block/backup.c                             |   3 +-
+ block/block-backend.c                      |  47 ++++++----
+ block/commit.c                             |  13 +--
+ block/crypto.c                             |   3 +-
+ block/io.c                                 |  28 +++---
+ block/linux-aio.c                          |  72 +++------------
+ block/mirror.c                             |   4 +-
+ block/parallels.c                          |   3 +-
+ block/qcow.c                               |   3 +-
+ block/qcow2-refcount.c                     |  39 ++++++++-
+ block/qcow2.c                              |  17 +++-
+ block/qed.c                                |   3 +-
+ block/sheepdog.c                           |   3 +-
+ block/vdi.c                                |   3 +-
+ block/vhdx.c                               |   3 +-
+ block/vmdk.c                               |   3 +-
+ block/vpc.c                                |   3 +-
+ blockdev.c                                 |  61 +++++++------
+ blockjob.c                                 |  12 ++-
+ hmp.c                                      |   3 +-
+ hw/block/dataplane/virtio-blk.c            |  12 ++-
+ hw/block/dataplane/xen-block.c             |   6 +-
+ hw/block/fdc.c                             |   2 +-
+ hw/block/nvme.c                            | 106 +++++++++++++++++++++-
+ hw/block/xen-block.c                       |   2 +-
+ hw/core/qdev-properties-system.c           |  41 ++++++++-
+ hw/ide/qdev.c                              |   2 +-
+ hw/scsi/scsi-disk.c                        |  24 +++--
+ hw/scsi/virtio-scsi.c                      |  25 +++---
+ migration/block.c                          |   3 +-
+ nbd/server.c                               |   6 +-
+ qemu-img.c                                 |   6 +-
+ tests/libqtest.c                           |  19 ++++
+ tests/test-bdrv-drain.c                    |  50 ++++++-----
+ tests/test-bdrv-graph-mod.c                |   5 +-
+ tests/test-block-backend.c                 |   6 +-
+ tests/test-block-iothread.c                | 104 ++++++++++++++++++----
+ tests/test-blockjob.c                      |   2 +-
+ tests/test-throttle.c                      |   6 +-
+ tests/virtio-scsi-test.c                   |  63 ++++++++++++++
+ block/trace-events                         |   3 +
+ hw/block/trace-events                      |   2 +
+ tests/perf/block/qcow2/convert-blockstatus |  71 +++++++++++++++
+ tests/qemu-iotests/051                     |  24 +++++
+ tests/qemu-iotests/051.out                 |   3 +
+ tests/qemu-iotests/051.pc.out              |  27 ++++++
+ tests/qemu-iotests/102                     |   2 +-
+ tests/qemu-iotests/102.out                 |   3 +-
+ tests/qemu-iotests/141.out                 |   2 +-
+ tests/qemu-iotests/144.out                 |   2 +-
+ tests/qemu-iotests/240                     |  21 +++++
+ tests/qemu-iotests/240.out                 |  15 +++-
+ tests/qemu-iotests/250                     |  78 +++++++++++++++++
+ tests/qemu-iotests/250.out                 |  16 ++++
+ tests/qemu-iotests/255                     | 135 +++++++++++++++++++++++=
+++++++
+ tests/qemu-iotests/255.out                 |  40 +++++++++
+ tests/qemu-iotests/check                   |   1 -
+ tests/qemu-iotests/group                   |   2 +
+ tests/qemu-iotests/iotests.py              |  10 ++-
+ 72 files changed, 1144 insertions(+), 272 deletions(-)
+ create mode 100755 tests/perf/block/qcow2/convert-blockstatus
+ create mode 100755 tests/qemu-iotests/250
+ create mode 100644 tests/qemu-iotests/250.out
+ create mode 100755 tests/qemu-iotests/255
+ create mode 100644 tests/qemu-iotests/255.out
 
