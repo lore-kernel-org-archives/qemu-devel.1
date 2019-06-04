@@ -2,85 +2,84 @@ Return-Path: <SRS0=GUf1=UD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F9F5C282CE
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 21:02:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B03AFC282CE
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 21:03:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E002B2075B
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 21:02:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6F4702075B
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 21:03:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="q1zjSdon"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E002B2075B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="wsfe2ZDc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6F4702075B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:58046 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:58049 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hYGa7-0008K3-7V
-	for qemu-devel@archiver.kernel.org; Tue, 04 Jun 2019 17:02:55 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:35992)
+	id 1hYGas-0000Q1-Mz
+	for qemu-devel@archiver.kernel.org; Tue, 04 Jun 2019 17:03:42 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:36079)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hYG8q-0001W6-9G
-	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 16:34:45 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hYG93-0001gO-CN
+	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 16:34:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hYG8o-0004hB-23
-	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 16:34:43 -0400
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:35317)
+	(envelope-from <richard.henderson@linaro.org>) id 1hYG8z-0004th-Li
+	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 16:34:55 -0400
+Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:33685)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hYG8n-0004fl-SO
-	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 16:34:42 -0400
-Received: by mail-ot1-x342.google.com with SMTP id n14so20873989otk.2
-	for <qemu-devel@nongnu.org>; Tue, 04 Jun 2019 13:34:41 -0700 (PDT)
+	id 1hYG8z-0004qI-Da
+	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 16:34:53 -0400
+Received: by mail-ot1-x343.google.com with SMTP id p4so4024706oti.0
+	for <qemu-devel@nongnu.org>; Tue, 04 Jun 2019 13:34:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
 	h=from:to:subject:date:message-id:in-reply-to:references;
-	bh=8TtqTmBnQgsNdelS4/2zOiTH2Ne6fCH7LBgKkWFYMCA=;
-	b=q1zjSdonzryn6WEg7j5mevPE6PHAIHR44lKoyJ+Oh4VTMhHtomHR6VGVP0JsLM2pCu
-	wM0k8DZmqHRT+XsFQr143sV1Yjtj8REYkKPQtOBZSehDXhPVo6om/Wz4Q0n7kV/gPit+
-	/nWDsoerQ2iAzpC2zIMSB1t85prmWnOLxi90BuP2521nAV3GzhbIGA/ze+mAq3qLoFRp
-	8Q5AhNQDAr1Ml7Igz7amLMpqb9WwdXyNRXyr9rMccgh3rNYgN/TURJVHzy8sh9HxZ6JE
-	r6u4EWEQodnwEEpcbzNsG7EM9AZj2KKf4fr2xwksVZ1bKN4r4EG00RpnvifmtOTL+9Zh
-	PGKQ==
+	bh=h67pDbY19Cg4UtoQKX9gtRcpiPsg13J7hEg0ny3fNUo=;
+	b=wsfe2ZDcMtOBg9wNOkf4IxyOAm5CNy8D+xcEBcaNKWt5Cs43ThJi5+hJaFKgPpLbLy
+	GKAWlYyPXCNSQNyWtMJsdRj7RX8g2uUihv3yend6wPV66d7BOSWMQh+UiiL+2kqDrHFm
+	JHFgCu3pdKXhlXQ3AQuX6lCHOajw9e/RDDWTmjivKOS5Mp000JprDDZIneB3TKG8Q29P
+	XZ/Q5GExLzD3jfu9bOgEqdweHwKBO7KPP2elJ6KCdog7KzDh0R5KJ1b5+jYIiPLhn3jx
+	ME/HEDWK7AwkI3lTpMYdpBZTMrnhALgNbR1/MUajkZza5eWU/v6B2KJD5DC8EhF5aN80
+	TWAQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
 	:references;
-	bh=8TtqTmBnQgsNdelS4/2zOiTH2Ne6fCH7LBgKkWFYMCA=;
-	b=osfcGsFXGE/GvuFJ7+MZnylh4dxxsDMfyzhFz51KaUx0CuS6uFDKACW2hbJkHvT20A
-	qY2MNecOgn80vqx8AIBdLPifvCleYrrqKYmr2QNjqzvK2ooju93rzxqtphcEw2b+m5DA
-	pU9vSddg3WPBBRq3SJ7skQxUk2+OkqW+SAto1yXjCPyxdZfxWhMoYdlLJ1pGU0zTBY+C
-	YTBCCpNSNQjKYXomdyI0qUSIOqqO0cbHNfmF4nlZK/RIyf4SALHLBVJcD20p9xvBAKgi
-	SsY2GTyNx8pKFNU3gClyLiZ4Az3s6XlMy66IHoL9MtxBUDmGKRpewDQLa/ULjcVVCihI
-	cB0Q==
-X-Gm-Message-State: APjAAAVTD6aPLuyEFo5mZ1jyZKf1nTFexAmfuuQq+u/jI9mMogJia/XT
-	WjSD9ME7/J1iu+WVa3GBKvkAc6y2B1Qh9A==
-X-Google-Smtp-Source: APXvYqyFf6QYeUPzI4AFwkTcjeRgYUZHiaVtJL6fjO+srT0FWbXxSLRsEdcn/JUKT1Y9UPXD2ieXBA==
-X-Received: by 2002:a9d:72da:: with SMTP id d26mr7104441otk.327.1559680480806; 
-	Tue, 04 Jun 2019 13:34:40 -0700 (PDT)
+	bh=h67pDbY19Cg4UtoQKX9gtRcpiPsg13J7hEg0ny3fNUo=;
+	b=cUcnVUjQ3EUPk/0JRC4AeqxnSrh5vxDGQduXprR65h95m94MWu/aBm9UNvqMG+pZBg
+	dk3hJ+Bzxle9PtroJqti1XV5gJFo95+8aytBpfuNx9xFqbdwZ4LhX49tq30sUDec5H09
+	f5JshY8ttZJorv/1CVWeNGfciU0gFRrmNiVYDjg7lb/CeyVzX1Gfu6BbiZ54W9c2sqy2
+	TIIG9nOlU5Txw+g30gxqODqs5TnOqvb66tj3VGJ0pgDpzLGJO2+CslCrPBPY2GMf0mW+
+	IX3tTc0NQwCcigeNiMzA/J70ba0OjIvi6LVWamFVLpN/nPYqXEu0bzU5A9PAMww/Yua6
+	XNmA==
+X-Gm-Message-State: APjAAAWmdt5EGZ4ocBKgewqMpV9KS9zmmFu1kXsp1UhP2PhQltNm6xGy
+	LP9O2nlTJhgyRa098RXENYstorrKMcGghQ==
+X-Google-Smtp-Source: APXvYqzH+NCJxzZ8cUr+7DMUSH+ch61vFbFUOxy4DogVMs0UFwJpeACApFW317/r+C7EI5zmTK2fkg==
+X-Received: by 2002:a9d:17e1:: with SMTP id j88mr5649551otj.369.1559680490336; 
+	Tue, 04 Jun 2019 13:34:50 -0700 (PDT)
 Received: from localhost.localdomain (200-56-192-86-cable.cybercable.net.mx.
 	[200.56.192.86])
-	by smtp.gmail.com with ESMTPSA id h1sm5979901otj.78.2019.06.04.13.34.39
+	by smtp.gmail.com with ESMTPSA id h1sm5979901otj.78.2019.06.04.13.34.49
 	for <qemu-devel@nongnu.org>
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Tue, 04 Jun 2019 13:34:40 -0700 (PDT)
+	Tue, 04 Jun 2019 13:34:49 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Tue,  4 Jun 2019 15:33:41 -0500
-Message-Id: <20190604203351.27778-30-richard.henderson@linaro.org>
+Date: Tue,  4 Jun 2019 15:33:48 -0500
+Message-Id: <20190604203351.27778-37-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190604203351.27778-1-richard.henderson@linaro.org>
 References: <20190604203351.27778-1-richard.henderson@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2607:f8b0:4864:20::342
-Subject: [Qemu-devel] [PATCH v4 29/39] target/unicore32: Use env_cpu,
- env_archcpu
+X-Received-From: 2607:f8b0:4864:20::343
+Subject: [Qemu-devel] [PATCH v4 36/39] cpu: Remove CPU_COMMON
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -96,309 +95,332 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Cleanup in the boilerplate that each target must define.
-Replace uc32_env_get_cpu with env_archcpu.  The combination
-CPU(uc32_env_get_cpu) should have used ENV_GET_CPU to begin;
-use env_cpu now.
+This macro is now always empty, so remove it.  This leaves the
+entire contents of CPUArchState under the control of the guest
+architecture.
 
 Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/unicore32/cpu.h          |  5 -----
- hw/unicore32/puv3.c             |  2 +-
- target/unicore32/helper.c       |  4 +---
- target/unicore32/op_helper.c    |  2 +-
- target/unicore32/softmmu.c      | 11 ++++-------
- target/unicore32/translate.c    | 26 ++------------------------
- target/unicore32/ucf64_helper.c |  2 +-
- 7 files changed, 10 insertions(+), 42 deletions(-)
+ include/exec/cpu-defs.h | 2 --
+ target/alpha/cpu.h      | 3 ---
+ target/arm/cpu.h        | 4 +---
+ target/cris/cpu.h       | 2 --
+ target/hppa/cpu.h       | 3 ---
+ target/i386/cpu.h       | 4 +---
+ target/lm32/cpu.h       | 2 --
+ target/m68k/cpu.h       | 2 --
+ target/microblaze/cpu.h | 2 --
+ target/mips/cpu.h       | 2 --
+ target/moxie/cpu.h      | 3 ---
+ target/nios2/cpu.h      | 2 --
+ target/openrisc/cpu.h   | 2 --
+ target/ppc/cpu.h        | 2 --
+ target/riscv/cpu.h      | 3 ---
+ target/s390x/cpu.h      | 2 --
+ target/sh4/cpu.h        | 2 --
+ target/sparc/cpu.h      | 2 --
+ target/tilegx/cpu.h     | 2 --
+ target/tricore/cpu.h    | 2 --
+ target/unicore32/cpu.h  | 2 --
+ target/xtensa/cpu.h     | 2 --
+ 22 files changed, 2 insertions(+), 50 deletions(-)
 
-diff --git a/target/unicore32/cpu.h b/target/unicore32/cpu.h
-index e91cec4d2e..595dc43c99 100644
---- a/target/unicore32/cpu.h
-+++ b/target/unicore32/cpu.h
-@@ -76,11 +76,6 @@ struct UniCore32CPU {
-     CPUUniCore32State env;
+diff --git a/include/exec/cpu-defs.h b/include/exec/cpu-defs.h
+index ac1aa9a1b6..03914abd10 100644
+--- a/include/exec/cpu-defs.h
++++ b/include/exec/cpu-defs.h
+@@ -233,8 +233,6 @@ typedef struct CPUTLB { } CPUTLB;
+ 
+ #endif  /* !CONFIG_USER_ONLY && CONFIG_TCG */
+ 
+-#define CPU_COMMON  /* Nothing */
+-
+ /*
+  * This structure must be placed in ArchCPU immedately
+  * before CPUArchState, as a field named "neg".
+diff --git a/target/alpha/cpu.h b/target/alpha/cpu.h
+index 94fbc00a3b..5d6fb222b5 100644
+--- a/target/alpha/cpu.h
++++ b/target/alpha/cpu.h
+@@ -251,9 +251,6 @@ struct CPUAlphaState {
+     /* This alarm doesn't exist in real hardware; we wish it did.  */
+     uint64_t alarm_expire;
+ 
+-    /* Those resources are used only in QEMU core */
+-    CPU_COMMON
+-
+     int error_code;
+ 
+     uint32_t features;
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index 5965c52f0c..8fa9772c9d 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -645,9 +645,7 @@ typedef struct CPUARMState {
+     /* Fields up to this point are cleared by a CPU reset */
+     struct {} end_reset_fields;
+ 
+-    CPU_COMMON
+-
+-    /* Fields after CPU_COMMON are preserved across CPU reset. */
++    /* Fields after this point are preserved across CPU reset. */
+ 
+     /* Internal CPU feature flags.  */
+     uint64_t features;
+diff --git a/target/cris/cpu.h b/target/cris/cpu.h
+index ad93d1a9ee..9d2a80d995 100644
+--- a/target/cris/cpu.h
++++ b/target/cris/cpu.h
+@@ -163,8 +163,6 @@ typedef struct CPUCRISState {
+         /* Fields up to this point are cleared by a CPU reset */
+         struct {} end_reset_fields;
+ 
+-        CPU_COMMON
+-
+         /* Members from load_info on are preserved across resets.  */
+         void *load_info;
+ } CPUCRISState;
+diff --git a/target/hppa/cpu.h b/target/hppa/cpu.h
+index f7c6205218..c7db2eca9a 100644
+--- a/target/hppa/cpu.h
++++ b/target/hppa/cpu.h
+@@ -197,9 +197,6 @@ struct CPUHPPAState {
+     target_ureg cr_back[2];  /* back of cr17/cr18 */
+     target_ureg shadow[7];   /* shadow registers */
+ 
+-    /* Those resources are used only in QEMU core */
+-    CPU_COMMON
+-
+     /* ??? The number of entries isn't specified by the architecture.  */
+     /* ??? Implement a unified itlb/dtlb for the moment.  */
+     /* ??? We should use a more intelligent data structure.  */
+diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+index e7580a86e5..edad6e1efb 100644
+--- a/target/i386/cpu.h
++++ b/target/i386/cpu.h
+@@ -1289,9 +1289,7 @@ typedef struct CPUX86State {
+     /* Fields up to this point are cleared by a CPU reset */
+     struct {} end_reset_fields;
+ 
+-    CPU_COMMON
+-
+-    /* Fields after CPU_COMMON are preserved across CPU reset. */
++    /* Fields after this point are preserved across CPU reset. */
+ 
+     /* processor features (e.g. for CPUID insn) */
+     /* Minimum level/xlevel/xlevel2, based on CPU model + features */
+diff --git a/target/lm32/cpu.h b/target/lm32/cpu.h
+index 324bc90f81..3e10a693a3 100644
+--- a/target/lm32/cpu.h
++++ b/target/lm32/cpu.h
+@@ -159,8 +159,6 @@ struct CPULM32State {
+     /* Fields up to this point are cleared by a CPU reset */
+     struct {} end_reset_fields;
+ 
+-    CPU_COMMON
+-
+     /* Fields from here on are preserved across CPU reset. */
+     uint32_t eba;       /* exception base address */
+     uint32_t deba;      /* debug exception base address */
+diff --git a/target/m68k/cpu.h b/target/m68k/cpu.h
+index d92263b750..1ebd360afb 100644
+--- a/target/m68k/cpu.h
++++ b/target/m68k/cpu.h
+@@ -143,8 +143,6 @@ typedef struct CPUM68KState {
+     /* Fields up to this point are cleared by a CPU reset */
+     struct {} end_reset_fields;
+ 
+-    CPU_COMMON
+-
+     /* Fields from here on are preserved across CPU reset. */
+     uint32_t features;
+ } CPUM68KState;
+diff --git a/target/microblaze/cpu.h b/target/microblaze/cpu.h
+index d90c4fbcb5..98b4d915d7 100644
+--- a/target/microblaze/cpu.h
++++ b/target/microblaze/cpu.h
+@@ -266,8 +266,6 @@ struct CPUMBState {
+     /* Fields up to this point are cleared by a CPU reset */
+     struct {} end_reset_fields;
+ 
+-    CPU_COMMON
+-
+     /* These fields are preserved on reset.  */
+ 
+     struct {
+diff --git a/target/mips/cpu.h b/target/mips/cpu.h
+index 62af24937d..bbf1aa8b0d 100644
+--- a/target/mips/cpu.h
++++ b/target/mips/cpu.h
+@@ -1041,8 +1041,6 @@ struct CPUMIPSState {
+     /* Fields up to this point are cleared by a CPU reset */
+     struct {} end_reset_fields;
+ 
+-    CPU_COMMON
+-
+     /* Fields from here on are preserved across CPU reset. */
+     CPUMIPSMVPContext *mvp;
+ #if !defined(CONFIG_USER_ONLY)
+diff --git a/target/moxie/cpu.h b/target/moxie/cpu.h
+index c6b681531d..2b596d5d45 100644
+--- a/target/moxie/cpu.h
++++ b/target/moxie/cpu.h
+@@ -45,9 +45,6 @@ typedef struct CPUMoxieState {
+ 
+     /* Fields up to this point are cleared by a CPU reset */
+     struct {} end_reset_fields;
+-
+-    CPU_COMMON
+-
+ } CPUMoxieState;
+ 
+ #include "qom/cpu.h"
+diff --git a/target/nios2/cpu.h b/target/nios2/cpu.h
+index 8cc3d4971e..e40ee27e53 100644
+--- a/target/nios2/cpu.h
++++ b/target/nios2/cpu.h
+@@ -167,8 +167,6 @@ struct CPUNios2State {
+ 
+     uint32_t irq_pending;
+ #endif
+-
+-    CPU_COMMON
  };
  
--static inline UniCore32CPU *uc32_env_get_cpu(CPUUniCore32State *env)
--{
--    return container_of(env, UniCore32CPU, env);
--}
+ /**
+diff --git a/target/openrisc/cpu.h b/target/openrisc/cpu.h
+index 51723e9312..9b80834d68 100644
+--- a/target/openrisc/cpu.h
++++ b/target/openrisc/cpu.h
+@@ -286,8 +286,6 @@ typedef struct CPUOpenRISCState {
+     /* Fields up to this point are cleared by a CPU reset */
+     struct {} end_reset_fields;
+ 
+-    CPU_COMMON
 -
- #define ENV_OFFSET offsetof(UniCore32CPU, env)
+     /* Fields from here on are preserved across CPU reset. */
+     uint32_t cpucfgr;         /* CPU configure register */
  
- void uc32_cpu_do_interrupt(CPUState *cpu);
-diff --git a/hw/unicore32/puv3.c b/hw/unicore32/puv3.c
-index b42e600f74..132e6086ee 100644
---- a/hw/unicore32/puv3.c
-+++ b/hw/unicore32/puv3.c
-@@ -56,7 +56,7 @@ static void puv3_soc_init(CPUUniCore32State *env)
+diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+index e8962e4655..c93ebc4c10 100644
+--- a/target/ppc/cpu.h
++++ b/target/ppc/cpu.h
+@@ -999,8 +999,6 @@ struct CPUPPCState {
+     /* when a memory exception occurs, the access type is stored here */
+     int access_type;
  
-     /* Initialize interrupt controller */
-     cpu_intc = qemu_allocate_irq(puv3_intc_cpu_handler,
--                                 uc32_env_get_cpu(env), 0);
-+                                 env_archcpu(env), 0);
-     dev = sysbus_create_simple("puv3_intc", PUV3_INTC_BASE, cpu_intc);
-     for (i = 0; i < PUV3_IRQS_NR; i++) {
-         irqs[i] = qdev_get_gpio_in(dev, i);
-diff --git a/target/unicore32/helper.c b/target/unicore32/helper.c
-index 0d4914b48d..7d538e2144 100644
---- a/target/unicore32/helper.c
-+++ b/target/unicore32/helper.c
-@@ -31,8 +31,6 @@
- void helper_cp0_set(CPUUniCore32State *env, uint32_t val, uint32_t creg,
-         uint32_t cop)
- {
--    UniCore32CPU *cpu = uc32_env_get_cpu(env);
+-    CPU_COMMON
 -
-     /*
-      * movc pp.nn, rn, #imm9
-      *      rn: UCOP_REG_D
-@@ -101,7 +99,7 @@ void helper_cp0_set(CPUUniCore32State *env, uint32_t val, uint32_t creg,
-     case 6:
-         if ((cop <= 6) && (cop >= 2)) {
-             /* invalid all tlb */
--            tlb_flush(CPU(cpu));
-+            tlb_flush(env_cpu(env));
-             return;
-         }
-         break;
-diff --git a/target/unicore32/op_helper.c b/target/unicore32/op_helper.c
-index 797ba60dc9..eeaa78601a 100644
---- a/target/unicore32/op_helper.c
-+++ b/target/unicore32/op_helper.c
-@@ -19,7 +19,7 @@
+     /* MMU context - only relevant for full system emulation */
+ #if !defined(CONFIG_USER_ONLY)
+ #if defined(TARGET_PPC64)
+diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
+index 0ed7031915..a935b17dbd 100644
+--- a/target/riscv/cpu.h
++++ b/target/riscv/cpu.h
+@@ -171,9 +171,6 @@ struct CPURISCVState {
  
- void HELPER(exception)(CPUUniCore32State *env, uint32_t excp)
- {
--    CPUState *cs = CPU(uc32_env_get_cpu(env));
-+    CPUState *cs = env_cpu(env);
+     float_status fp_status;
  
-     cs->exception_index = excp;
-     cpu_loop_exit(cs);
-diff --git a/target/unicore32/softmmu.c b/target/unicore32/softmmu.c
-index 27f218abf0..cbdaa500b7 100644
---- a/target/unicore32/softmmu.c
-+++ b/target/unicore32/softmmu.c
-@@ -36,8 +36,6 @@
- /* Map CPU modes onto saved register banks.  */
- static inline int bank_number(CPUUniCore32State *env, int mode)
- {
--    UniCore32CPU *cpu = uc32_env_get_cpu(env);
+-    /* QEMU */
+-    CPU_COMMON
 -
-     switch (mode) {
-     case ASR_MODE_USER:
-     case ASR_MODE_SUSR:
-@@ -51,7 +49,7 @@ static inline int bank_number(CPUUniCore32State *env, int mode)
-     case ASR_MODE_INTR:
-         return 4;
-     }
--    cpu_abort(CPU(cpu), "Bad mode %x\n", mode);
-+    cpu_abort(env_cpu(env), "Bad mode %x\n", mode);
-     return -1;
- }
+     /* Fields from here on are preserved across CPU reset. */
+     QEMUTimer *timer; /* Internal timer */
+ };
+diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
+index ebcf7863e4..17d54f9587 100644
+--- a/target/s390x/cpu.h
++++ b/target/s390x/cpu.h
+@@ -114,8 +114,6 @@ struct CPUS390XState {
+     /* Fields up to this point are cleared by a CPU reset */
+     struct {} end_reset_fields;
  
-@@ -126,8 +124,7 @@ static int get_phys_addr_ucv2(CPUUniCore32State *env, uint32_t address,
-         int access_type, int is_user, uint32_t *phys_ptr, int *prot,
-         target_ulong *page_size)
- {
--    UniCore32CPU *cpu = uc32_env_get_cpu(env);
--    CPUState *cs = CPU(cpu);
-+    CPUState *cs = env_cpu(env);
-     int code;
-     uint32_t table;
-     uint32_t desc;
-@@ -174,11 +171,11 @@ static int get_phys_addr_ucv2(CPUUniCore32State *env, uint32_t address,
-             *page_size = TARGET_PAGE_SIZE;
-             break;
-         default:
--            cpu_abort(CPU(cpu), "wrong page type!");
-+            cpu_abort(cs, "wrong page type!");
-         }
-         break;
-     default:
--        cpu_abort(CPU(cpu), "wrong page type!");
-+        cpu_abort(cs, "wrong page type!");
-     }
- 
-     *phys_ptr = phys_addr;
-diff --git a/target/unicore32/translate.c b/target/unicore32/translate.c
-index 89b02d1c3c..d27451eed3 100644
---- a/target/unicore32/translate.c
-+++ b/target/unicore32/translate.c
-@@ -180,7 +180,7 @@ static void store_reg(DisasContext *s, int reg, TCGv var)
- #define UCOP_SET_L              UCOP_SET(24)
- #define UCOP_SET_S              UCOP_SET(24)
- 
--#define ILLEGAL         cpu_abort(CPU(cpu),                             \
-+#define ILLEGAL         cpu_abort(env_cpu(env),                         \
-                         "Illegal UniCore32 instruction %x at line %d!", \
-                         insn, __LINE__)
- 
-@@ -188,7 +188,6 @@ static void store_reg(DisasContext *s, int reg, TCGv var)
- static void disas_cp0_insn(CPUUniCore32State *env, DisasContext *s,
-         uint32_t insn)
- {
--    UniCore32CPU *cpu = uc32_env_get_cpu(env);
-     TCGv tmp, tmp2, tmp3;
-     if ((insn & 0xfe000000) == 0xe0000000) {
-         tmp2 = new_tmp();
-@@ -214,7 +213,6 @@ static void disas_cp0_insn(CPUUniCore32State *env, DisasContext *s,
- static void disas_ocd_insn(CPUUniCore32State *env, DisasContext *s,
-         uint32_t insn)
- {
--    UniCore32CPU *cpu = uc32_env_get_cpu(env);
-     TCGv tmp;
- 
-     if ((insn & 0xff003fff) == 0xe1000400) {
-@@ -682,7 +680,6 @@ static inline long ucf64_reg_offset(int reg)
- /* UniCore-F64 single load/store I_offset */
- static void do_ucf64_ldst_i(CPUUniCore32State *env, DisasContext *s, uint32_t insn)
- {
--    UniCore32CPU *cpu = uc32_env_get_cpu(env);
-     int offset;
-     TCGv tmp;
-     TCGv addr;
-@@ -729,7 +726,6 @@ static void do_ucf64_ldst_i(CPUUniCore32State *env, DisasContext *s, uint32_t in
- /* UniCore-F64 load/store multiple words */
- static void do_ucf64_ldst_m(CPUUniCore32State *env, DisasContext *s, uint32_t insn)
- {
--    UniCore32CPU *cpu = uc32_env_get_cpu(env);
-     unsigned int i;
-     int j, n, freg;
-     TCGv tmp;
-@@ -815,7 +811,6 @@ static void do_ucf64_ldst_m(CPUUniCore32State *env, DisasContext *s, uint32_t in
- /* UniCore-F64 mrc/mcr */
- static void do_ucf64_trans(CPUUniCore32State *env, DisasContext *s, uint32_t insn)
- {
--    UniCore32CPU *cpu = uc32_env_get_cpu(env);
-     TCGv tmp;
- 
-     if ((insn & 0xfe0003ff) == 0xe2000000) {
-@@ -880,8 +875,6 @@ static void do_ucf64_trans(CPUUniCore32State *env, DisasContext *s, uint32_t ins
- /* UniCore-F64 convert instructions */
- static void do_ucf64_fcvt(CPUUniCore32State *env, DisasContext *s, uint32_t insn)
- {
--    UniCore32CPU *cpu = uc32_env_get_cpu(env);
+-    CPU_COMMON
 -
-     if (UCOP_UCF64_FMT == 3) {
-         ILLEGAL;
-     }
-@@ -948,8 +941,6 @@ static void do_ucf64_fcvt(CPUUniCore32State *env, DisasContext *s, uint32_t insn
- /* UniCore-F64 compare instructions */
- static void do_ucf64_fcmp(CPUUniCore32State *env, DisasContext *s, uint32_t insn)
- {
--    UniCore32CPU *cpu = uc32_env_get_cpu(env);
+ #if !defined(CONFIG_USER_ONLY)
+     uint32_t core_id; /* PoP "CPU address", same as cpu_index */
+     uint64_t cpuid;
+diff --git a/target/sh4/cpu.h b/target/sh4/cpu.h
+index e266db411f..08cf275f79 100644
+--- a/target/sh4/cpu.h
++++ b/target/sh4/cpu.h
+@@ -179,8 +179,6 @@ typedef struct CPUSH4State {
+     /* Fields up to this point are cleared by a CPU reset */
+     struct {} end_reset_fields;
+ 
+-    CPU_COMMON
 -
-     if (UCOP_SET(25)) {
-         ILLEGAL;
-     }
-@@ -1028,8 +1019,6 @@ static void do_ucf64_fcmp(CPUUniCore32State *env, DisasContext *s, uint32_t insn
- /* UniCore-F64 data processing */
- static void do_ucf64_datap(CPUUniCore32State *env, DisasContext *s, uint32_t insn)
- {
--    UniCore32CPU *cpu = uc32_env_get_cpu(env);
+     /* Fields from here on are preserved over CPU reset. */
+     int id;			/* CPU model */
+ 
+diff --git a/target/sparc/cpu.h b/target/sparc/cpu.h
+index a3c4f47d40..49e0349a81 100644
+--- a/target/sparc/cpu.h
++++ b/target/sparc/cpu.h
+@@ -446,8 +446,6 @@ struct CPUSPARCState {
+     /* Fields up to this point are cleared by a CPU reset */
+     struct {} end_reset_fields;
+ 
+-    CPU_COMMON
 -
-     if (UCOP_UCF64_FMT == 3) {
-         ILLEGAL;
-     }
-@@ -1063,8 +1052,6 @@ static void do_ucf64_datap(CPUUniCore32State *env, DisasContext *s, uint32_t ins
- /* Disassemble an F64 instruction */
- static void disas_ucf64_insn(CPUUniCore32State *env, DisasContext *s, uint32_t insn)
- {
--    UniCore32CPU *cpu = uc32_env_get_cpu(env);
+     /* Fields from here on are preserved across CPU reset. */
+     target_ulong version;
+     uint32_t nwindows;
+diff --git a/target/tilegx/cpu.h b/target/tilegx/cpu.h
+index deb3e836ea..c2acb43c2b 100644
+--- a/target/tilegx/cpu.h
++++ b/target/tilegx/cpu.h
+@@ -93,8 +93,6 @@ typedef struct CPUTLGState {
+ 
+     /* Fields up to this point are cleared by a CPU reset */
+     struct {} end_reset_fields;
 -
-     if (!UCOP_SET(29)) {
-         if (UCOP_SET(26)) {
-             do_ucf64_ldst_m(env, s, insn);
-@@ -1162,8 +1149,6 @@ static void gen_exception_return(DisasContext *s, TCGv pc)
- static void disas_coproc_insn(CPUUniCore32State *env, DisasContext *s,
-         uint32_t insn)
- {
--    UniCore32CPU *cpu = uc32_env_get_cpu(env);
+-    CPU_COMMON
+ } CPUTLGState;
+ 
+ #include "qom/cpu.h"
+diff --git a/target/tricore/cpu.h b/target/tricore/cpu.h
+index 03b293c1f6..52b07c73bf 100644
+--- a/target/tricore/cpu.h
++++ b/target/tricore/cpu.h
+@@ -184,8 +184,6 @@ struct CPUTriCoreState {
+     int error_code;
+     uint32_t hflags;    /* CPU State */
+ 
+-    CPU_COMMON
 -
-     switch (UCOP_CPNUM) {
- #ifndef CONFIG_USER_ONLY
-     case 0:
-@@ -1178,14 +1163,13 @@ static void disas_coproc_insn(CPUUniCore32State *env, DisasContext *s,
-         break;
-     default:
-         /* Unknown coprocessor. */
--        cpu_abort(CPU(cpu), "Unknown coprocessor!");
-+        cpu_abort(env_cpu(env), "Unknown coprocessor!");
-     }
- }
+     /* Internal CPU feature flags.  */
+     uint64_t features;
  
- /* data processing instructions */
- static void do_datap(CPUUniCore32State *env, DisasContext *s, uint32_t insn)
- {
--    UniCore32CPU *cpu = uc32_env_get_cpu(env);
-     TCGv tmp;
-     TCGv tmp2;
-     int logic_cc;
-@@ -1419,7 +1403,6 @@ static void do_mult(CPUUniCore32State *env, DisasContext *s, uint32_t insn)
- /* miscellaneous instructions */
- static void do_misc(CPUUniCore32State *env, DisasContext *s, uint32_t insn)
- {
--    UniCore32CPU *cpu = uc32_env_get_cpu(env);
-     unsigned int val;
-     TCGv tmp;
+diff --git a/target/unicore32/cpu.h b/target/unicore32/cpu.h
+index 39beb32366..6b459dacde 100644
+--- a/target/unicore32/cpu.h
++++ b/target/unicore32/cpu.h
+@@ -55,8 +55,6 @@ typedef struct CPUUniCore32State {
+         float_status fp_status;
+     } ucf64;
  
-@@ -1545,7 +1528,6 @@ static void do_ldst_ir(CPUUniCore32State *env, DisasContext *s, uint32_t insn)
- /* SWP instruction */
- static void do_swap(CPUUniCore32State *env, DisasContext *s, uint32_t insn)
- {
--    UniCore32CPU *cpu = uc32_env_get_cpu(env);
-     TCGv addr;
-     TCGv tmp;
-     TCGv tmp2;
-@@ -1573,7 +1555,6 @@ static void do_swap(CPUUniCore32State *env, DisasContext *s, uint32_t insn)
- /* load/store hw/sb */
- static void do_ldst_hwsb(CPUUniCore32State *env, DisasContext *s, uint32_t insn)
- {
--    UniCore32CPU *cpu = uc32_env_get_cpu(env);
-     TCGv addr;
-     TCGv tmp;
+-    CPU_COMMON
+-
+     /* Internal CPU feature flags.  */
+     uint32_t features;
  
-@@ -1626,7 +1607,6 @@ static void do_ldst_hwsb(CPUUniCore32State *env, DisasContext *s, uint32_t insn)
- /* load/store multiple words */
- static void do_ldst_m(CPUUniCore32State *env, DisasContext *s, uint32_t insn)
- {
--    UniCore32CPU *cpu = uc32_env_get_cpu(env);
-     unsigned int val, i, mmu_idx;
-     int j, n, reg, user, loaded_base;
-     TCGv tmp;
-@@ -1768,7 +1748,6 @@ static void do_ldst_m(CPUUniCore32State *env, DisasContext *s, uint32_t insn)
- /* branch (and link) */
- static void do_branch(CPUUniCore32State *env, DisasContext *s, uint32_t insn)
- {
--    UniCore32CPU *cpu = uc32_env_get_cpu(env);
-     unsigned int val;
-     int32_t offset;
-     TCGv tmp;
-@@ -1798,7 +1777,6 @@ static void do_branch(CPUUniCore32State *env, DisasContext *s, uint32_t insn)
+diff --git a/target/xtensa/cpu.h b/target/xtensa/cpu.h
+index e2d7e8371d..bfc6604b76 100644
+--- a/target/xtensa/cpu.h
++++ b/target/xtensa/cpu.h
+@@ -541,8 +541,6 @@ typedef struct CPUXtensaState {
  
- static void disas_uc32_insn(CPUUniCore32State *env, DisasContext *s)
- {
--    UniCore32CPU *cpu = uc32_env_get_cpu(env);
-     unsigned int insn;
+     /* Watchpoints for DBREAK registers */
+     struct CPUWatchpoint *cpu_watchpoint[MAX_NDBREAK];
+-
+-    CPU_COMMON
+ } CPUXtensaState;
  
-     insn = cpu_ldl_code(env, s->pc);
-diff --git a/target/unicore32/ucf64_helper.c b/target/unicore32/ucf64_helper.c
-index fad3fa6618..e078e84437 100644
---- a/target/unicore32/ucf64_helper.c
-+++ b/target/unicore32/ucf64_helper.c
-@@ -78,7 +78,7 @@ static inline int ucf64_exceptbits_to_host(int target_bits)
- 
- void HELPER(ucf64_set_fpscr)(CPUUniCore32State *env, uint32_t val)
- {
--    UniCore32CPU *cpu = uc32_env_get_cpu(env);
-+    UniCore32CPU *cpu = env_archcpu(env);
-     int i;
-     uint32_t changed;
- 
+ /**
 -- 
 2.17.1
 
