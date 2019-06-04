@@ -2,88 +2,70 @@ Return-Path: <SRS0=GUf1=UD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,T_HK_NAME_DR,USER_AGENT_MUTT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BC38FC282CE
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 18:53:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 01F7DC282CE
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 19:02:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 886522075C
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 18:53:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 886522075C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
+	by mail.kernel.org (Postfix) with ESMTPS id CFA792075C
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 19:02:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CFA792075C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:56504 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:56581 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hYEZE-0000cM-PX
-	for qemu-devel@archiver.kernel.org; Tue, 04 Jun 2019 14:53:52 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:42524)
+	id 1hYEh9-0002DK-S5
+	for qemu-devel@archiver.kernel.org; Tue, 04 Jun 2019 15:02:03 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:43824)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hYEYM-0000GJ-Ps
-	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 14:53:00 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1hYEg1-0001hi-VC
+	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 15:00:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hYEYL-00012f-9v
-	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 14:52:58 -0400
-Received: from mail.ilande.co.uk ([46.43.2.167]:54770
-	helo=mail.default.ilande.uk0.bigv.io)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1hYEYB-0000BH-0y; Tue, 04 Jun 2019 14:52:50 -0400
-Received: from host81-158-188-206.range81-158.btcentralplus.com
-	([81.158.188.206] helo=[192.168.1.65])
-	by mail.default.ilande.uk0.bigv.io with esmtpsa
-	(TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.89)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1hYETV-0000zo-DU; Tue, 04 Jun 2019 19:47:59 +0100
-To: qemu-devel@nongnu.org, no-reply@patchew.org
-References: <155955891012.32260.9064081470614985823@ce79690b2cb9>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Openpgp: preference=signencrypt
-Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
-	mQENBFQJuzwBCADAYvxrwUh1p/PvUlNFwKosVtVHHplgWi5p29t58QlOUkceZG0DBYSNqk93
-	3JzBTbtd4JfFcSupo6MNNOrCzdCbCjZ64ik8ycaUOSzK2tKbeQLEXzXoaDL1Y7vuVO7nL9bG
-	E5Ru3wkhCFc7SkoypIoAUqz8EtiB6T89/D9TDEyjdXUacc53R5gu8wEWiMg5MQQuGwzbQy9n
-	PFI+mXC7AaEUqBVc2lBQVpAYXkN0EyqNNT12UfDLdxaxaFpUAE2pCa2LTyo5vn5hEW+i3VdN
-	PkmjyPvL6DdY03fvC01PyY8zaw+UI94QqjlrDisHpUH40IUPpC/NB0LwzL2aQOMkzT2NABEB
-	AAG0ME1hcmsgQ2F2ZS1BeWxhbmQgPG1hcmsuY2F2ZS1heWxhbmRAaWxhbmRlLmNvLnVrPokB
-	OAQTAQIAIgUCVAm7PAIbAwYLCQgHAwIGFQgCCQoLBBYCAwECHgECF4AACgkQW8LFb64PMh9f
-	NAgAuc3ObOEY8NbZko72AGrg2tWKdybcMVITxmcor4hb9155o/OWcA4IDbeATR6cfiDL/oxU
-	mcmtXVgPqOwtW3NYAKr5g/FrZZ3uluQ2mtNYAyTFeALy8YF7N3yhs7LOcpbFP7tEbkSzoXNG
-	z8iYMiYtKwttt40WaheWuRs0ZOLbs6yoczZBDhna3Nj0LA3GpeJKlaV03O4umjKJgACP1c/q
-	T2Pkg+FCBHHFP454+waqojHp4OCBo6HyK+8I4wJRa9Z0EFqXIu8lTDYoggeX0Xd6bWeCFHK3
-	DhD0/Xi/kegSW33unsp8oVcM4kcFxTkpBgj39dB4KwAUznhTJR0zUHf63LkBDQRUCbs8AQgA
-	y7kyevA4bpetM/EjtuqQX4U05MBhEz/2SFkX6IaGtTG2NNw5wbcAfhOIuNNBYbw6ExuaJ3um
-	2uLseHnudmvN4VSJ5Hfbd8rhqoMmmO71szgT/ZD9MEe2KHzBdmhmhxJdp+zQNivy215j6H27
-	14mbC2dia7ktwP1rxPIX1OOfQwPuqlkmYPuVwZP19S4EYnCELOrnJ0m56tZLn5Zj+1jZX9Co
-	YbNLMa28qsktYJ4oU4jtn6V79H+/zpERZAHmH40IRXdR3hA+Ye7iC/ZpWzT2VSDlPbGY9Yja
-	Sp7w2347L5G+LLbAfaVoejHlfy/msPeehUcuKjAdBLoEhSPYzzdvEQARAQABiQEfBBgBAgAJ
-	BQJUCbs8AhsMAAoJEFvCxW+uDzIfabYIAJXmBepHJpvCPiMNEQJNJ2ZSzSjhic84LTMWMbJ+
-	opQgr5cb8SPQyyb508fc8b4uD8ejlF/cdbbBNktp3BXsHlO5BrmcABgxSP8HYYNsX0n9kERv
-	NMToU0oiBuAaX7O/0K9+BW+3+PGMwiu5ml0cwDqljxfVN0dUBZnQ8kZpLsY+WDrIHmQWjtH+
-	Ir6VauZs5Gp25XLrL6bh/SL8aK0BX6y79m5nhfKI1/6qtzHAjtMAjqy8ChPvOqVVVqmGUzFg
-	KPsrrIoklWcYHXPyMLj9afispPVR8e0tMKvxzFBWzrWX1mzljbBlnV2n8BIwVXWNbgwpHSsj
-	imgcU9TTGC5qd9g=
-Message-ID: <5c9a9f70-304b-8f19-361c-9951dfa854db@ilande.co.uk>
-Date: Tue, 4 Jun 2019 19:48:51 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.7.0
+	(envelope-from <dgilbert@redhat.com>) id 1hYEg0-00073A-O7
+	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 15:00:53 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42010)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hYEg0-0006s1-Eb
+	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 15:00:52 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id D246C7EBC4
+	for <qemu-devel@nongnu.org>; Tue,  4 Jun 2019 19:00:31 +0000 (UTC)
+Received: from work-vm (ovpn-117-216.ams2.redhat.com [10.36.117.216])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 4562B60C91;
+	Tue,  4 Jun 2019 19:00:21 +0000 (UTC)
+Date: Tue, 4 Jun 2019 20:00:19 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20190604190019.GM3851@work-vm>
+References: <20190517125820.2885-1-jfreimann@redhat.com>
+	<20190517125820.2885-4-jfreimann@redhat.com>
+	<20190521094504.GB2915@work-vm>
+	<20190530145645.tjwkgi4hae5yblsi@jenstp.localdomain>
+	<20190531214748.GN22103@habkost.net>
+	<20190603082456.vzpy256kj4o5e5wu@jenstp.localdomain>
+	<20190603193648.GQ22103@habkost.net>
+	<20190604134321.txlw7wjwe247g5ug@jenstp.localdomain>
+	<20190604125037-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <155955891012.32260.9064081470614985823@ce79690b2cb9>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 81.158.188.206
-X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
-X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
-X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190604125037-mutt-send-email-mst@kernel.org>
+User-Agent: Mutt/1.11.4 (2019-03-13)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.27]);
+	Tue, 04 Jun 2019 19:00:31 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 46.43.2.167
-Subject: Re: [Qemu-devel] [PATCH v2 00/15] target/ppc: remove
- getVSR()/putVSR() and further tidy-up
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH 3/4] net/virtio: add failover support
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -95,114 +77,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: gkurz@kaod.org, david@gibson.dropbear.id.au, qemu-ppc@nongnu.org,
-	rth@twiddle.net
+Cc: pkrempa@redhat.com, berrange@redhat.com,
+	Eduardo Habkost <ehabkost@redhat.com>, aadam@redhat.com,
+	qemu-devel@nongnu.org, laine@redhat.com,
+	Jens Freimann <jfreimann@redhat.com>, ailan@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 03/06/2019 11:48, no-reply@patchew.org wrote:
+* Michael S. Tsirkin (mst@redhat.com) wrote:
+> On Tue, Jun 04, 2019 at 03:43:21PM +0200, Jens Freimann wrote:
+> > On Mon, Jun 03, 2019 at 04:36:48PM -0300, Eduardo Habkost wrote:
+> > > On Mon, Jun 03, 2019 at 10:24:56AM +0200, Jens Freimann wrote:
+> > > > On Fri, May 31, 2019 at 06:47:48PM -0300, Eduardo Habkost wrote:
+> > > > > On Thu, May 30, 2019 at 04:56:45PM +0200, Jens Freimann wrote:
+> > > > > > On Tue, May 28, 2019 at 11:04:15AM -0400, Michael S. Tsirkin wrote:
+> > > > > > > On Tue, May 21, 2019 at 10:45:05AM +0100, Dr. David Alan Gilbert wrote:
+> > > > > > > > * Jens Freimann (jfreimann@redhat.com) wrote:
+> > > > Why is it bad to fully re-create the device in case of a failed migration?
+> > > 
+> > > Bad or not, I thought the whole point of doing it inside QEMU was
+> > > to do something libvirt wouldn't be able to do (namely,
+> > > unplugging the device while not freeing resources).  If we are
+> > > doing something that management software is already capable of
+> > > doing, what's the point?
+> > 
+> > Event though management software seems to be capable of it, a failover
+> > implementation has never happened. As Michael says network failover is
+> > a mechanism (there's no good reason not to use a PT device if it is
+> > available), not a policy. We are now trying to implement it in a
+> > simple way, contained within QEMU.
+> > 
+> > > Quoting a previous message from this thread:
+> > > 
+> > > On Thu, May 30, 2019 at 02:09:42PM -0400, Michael S. Tsirkin wrote:
+> > > | > On Thu, May 30, 2019 at 07:00:23PM +0100, Dr. David Alan Gilbert wrote:
+> > > | > >  This patch series is very
+> > > | > > odd precisely because it's trying to do the unplug itself in the
+> > > | > > migration phase rather than let the management layer do it - so unless
+> > > | > > it's nailed down how to make sure that's really really bullet proof
+> > > | > > then we've got to go back and ask the question about whether we should
+> > > | > > really fix it so it can be done by the management layer.
+> > > | > >
+> > > | > > Dave
+> > > | >
+> > > | > management already said they can't because files get closed and
+> > > | > resources freed on unplug and so they might not be able to re-add device
+> > > | > on migration failure. We do it in migration because that is
+> > > | > where failures can happen and we can recover.
+> > 
+> > This is something that I can work on as well, but it doesn't have to
+> > be part of this patch set in my opinion. Let's say migration fails and we can't
+> > re-plug the primary device. We can still use the standby (virtio-net)
+> > device which would only mean slower networking. How likely is it that
+> > the primary device is grabbed by another VM between unplugging and
+> > migration failure anyway?
+> > 
+> > regards,
+> > Jens
+> 
+> I think I agree with Eduardo it's very important to handle this corner
+> case correctly. Fast networking outside migration is why people use
+> failover at all.  Someone who can live with a slower virtio would use
+> just that.
+> 
+> And IIRC this corner case is exactly why libvirt could not
+> implement it correctly itself and had to push it up the stack
+> until it fell off the cliff :).
 
-> Patchew URL: https://patchew.org/QEMU/20190602110903.3431-1-mark.cave-ayland@ilande.co.uk/
-> 
-> 
-> 
-> Hi,
-> 
-> This series seems to have some coding style problems. See output below for
-> more information:
-> 
-> Subject: [Qemu-devel] [PATCH v2 00/15] target/ppc: remove getVSR()/putVSR() and further tidy-up
-> Type: series
-> Message-id: 20190602110903.3431-1-mark.cave-ayland@ilande.co.uk
-> 
-> === TEST SCRIPT BEGIN ===
-> #!/bin/bash
-> git rev-parse base > /dev/null || exit 0
-> git config --local diff.renamelimit 0
-> git config --local diff.renames True
-> git config --local diff.algorithm histogram
-> ./scripts/checkpatch.pl --mailback base..
-> === TEST SCRIPT END ===
-> 
-> From https://github.com/patchew-project/qemu
->    60905286cb..ad88e4252f  master     -> master
-> From https://github.com/patchew-project/qemu
->  * [new tag]               patchew/20190602110903.3431-1-mark.cave-ayland@ilande.co.uk -> patchew/20190602110903.3431-1-mark.cave-ayland@ilande.co.uk
-> Switched to a new branch 'test'
-> 868f640501 target/ppc: improve VSX_FMADD with new GEN_VSX_HELPER_VSX_MADD macro
-> 11658435f9 target/ppc: decode target register in VSX_EXTRACT_INSERT at translation time
-> e9e52e3f0a target/ppc: decode target register in VSX_VECTOR_LOAD_STORE_LENGTH at translation time
-> 239e07a0cf target/ppc: introduce GEN_VSX_HELPER_R2_AB macro to fpu_helper.c
-> 6aeb8a2e36 target/ppc: introduce GEN_VSX_HELPER_R2 macro to fpu_helper.c
-> b43836d4e8 target/ppc: introduce GEN_VSX_HELPER_R3 macro to fpu_helper.c
-> 241920056a target/ppc: introduce GEN_VSX_HELPER_X1 macro to fpu_helper.c
-> 959261a074 target/ppc: introduce GEN_VSX_HELPER_X2_AB macro to fpu_helper.c
-> ecd519b86e target/ppc: introduce GEN_VSX_HELPER_X2 macro to fpu_helper.c
-> 62b466770b target/ppc: introduce separate generator and helper for xscvqpdp
-> d8a5beec33 target/ppc: introduce GEN_VSX_HELPER_X3 macro to fpu_helper.c
-> b2de1761e5 target/ppc: introduce separate VSX_CMP macro for xvcmp* instructions
-> 895b953f81 target/ppc: remove getVSR()/putVSR() from int_helper.c
-> ca941ffe9e target/ppc: remove getVSR()/putVSR() from mem_helper.c
-> eae59c79c5 target/ppc: remove getVSR()/putVSR() from fpu_helper.c
-> 
-> === OUTPUT BEGIN ===
-> 1/15 Checking commit eae59c79c5ea (target/ppc: remove getVSR()/putVSR() from fpu_helper.c)
-> 2/15 Checking commit ca941ffe9eaf (target/ppc: remove getVSR()/putVSR() from mem_helper.c)
-> 3/15 Checking commit 895b953f8175 (target/ppc: remove getVSR()/putVSR() from int_helper.c)
-> 4/15 Checking commit b2de1761e581 (target/ppc: introduce separate VSX_CMP macro for xvcmp* instructions)
-> 5/15 Checking commit d8a5beec33bd (target/ppc: introduce GEN_VSX_HELPER_X3 macro to fpu_helper.c)
-> 6/15 Checking commit 62b466770baa (target/ppc: introduce separate generator and helper for xscvqpdp)
-> 7/15 Checking commit ecd519b86eec (target/ppc: introduce GEN_VSX_HELPER_X2 macro to fpu_helper.c)
-> 8/15 Checking commit 959261a07480 (target/ppc: introduce GEN_VSX_HELPER_X2_AB macro to fpu_helper.c)
-> 9/15 Checking commit 241920056ab0 (target/ppc: introduce GEN_VSX_HELPER_X1 macro to fpu_helper.c)
-> 10/15 Checking commit b43836d4e8bb (target/ppc: introduce GEN_VSX_HELPER_R3 macro to fpu_helper.c)
-> 11/15 Checking commit 6aeb8a2e36c7 (target/ppc: introduce GEN_VSX_HELPER_R2 macro to fpu_helper.c)
-> 12/15 Checking commit 239e07a0cffa (target/ppc: introduce GEN_VSX_HELPER_R2_AB macro to fpu_helper.c)
-> 13/15 Checking commit e9e52e3f0a39 (target/ppc: decode target register in VSX_VECTOR_LOAD_STORE_LENGTH at translation time)
-> 14/15 Checking commit 11658435f9ff (target/ppc: decode target register in VSX_EXTRACT_INSERT at translation time)
-> 15/15 Checking commit 868f6405015c (target/ppc: improve VSX_FMADD with new GEN_VSX_HELPER_VSX_MADD macro)
-> WARNING: Block comments use a leading /* on a separate line
-> #278: FILE: target/ppc/translate/vsx-impl.inc.c:1311:
-> +        /*                                                                    \
+So I think we need to have the code that shows we can cope with the
+corner cases - or provide a way for libvirt to handle it (which is
+my strong preference).
 
-It looks like checkpatch is getting confused here because the comment is part of a
-macro definition with the '\' continuation marker at the end of the line.
-
-> WARNING: Block comments use a leading /* on a separate line
-> #284: FILE: target/ppc/translate/vsx-impl.inc.c:1317:
-> +        /*                                                                    \
-> 
-> ERROR: Macros with complex values should be enclosed in parenthesis
-> #325: FILE: target/ppc/translate/vsx-ops.inc.c:66:
-> +#define GEN_XX3FORM_NAME(name, opcname, opc2, opc3, fl2)               \
-> +GEN_HANDLER2_E(name, opcname, 0x3C, opc2 | 0, opc3, 0, PPC_NONE, fl2), \
-> +GEN_HANDLER2_E(name, opcname, 0x3C, opc2 | 1, opc3, 0, PPC_NONE, fl2), \
-> +GEN_HANDLER2_E(name, opcname, 0x3C, opc2 | 2, opc3, 0, PPC_NONE, fl2), \
-> +GEN_HANDLER2_E(name, opcname, 0x3C, opc2 | 3, opc3, 0, PPC_NONE, fl2)
-> 
-> total: 1 errors, 2 warnings, 377 lines checked
-
-And this is just another "macro of macros" in the same style as all the others within
-the file so I'm not convinced that this is relevant here either.
-
-> Patch 15/15 has style problems, please review.  If any of these errors
-> are false positives report them to the maintainer, see
-> CHECKPATCH in MAINTAINERS.
-> 
-> === OUTPUT END ===
-> 
-> Test command exited with code: 1
-> 
-> 
-> The full log is available at
-> http://patchew.org/logs/20190602110903.3431-1-mark.cave-ayland@ilande.co.uk/testing.checkpatch/?type=message.
-> ---
-> Email generated automatically by Patchew [https://patchew.org/].
-> Please send your feedback to patchew-devel@redhat.com
+Dave
 
 
-ATB,
-
-Mark.
+> > 
+> > > 
+> > > -- 
+> > > Eduardo
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
