@@ -6,75 +6,72 @@ X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5ABA7C282CE
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 17:08:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F7F4C282CE
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 17:10:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 33B1B208E4
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 17:08:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 33B1B208E4
+	by mail.kernel.org (Postfix) with ESMTPS id 4A4BC20859
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 17:10:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4A4BC20859
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:55608 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:55624 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hYCuy-0005wD-De
-	for qemu-devel@archiver.kernel.org; Tue, 04 Jun 2019 13:08:12 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:52687)
+	id 1hYCwu-0006pt-Iv
+	for qemu-devel@archiver.kernel.org; Tue, 04 Jun 2019 13:10:12 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:53191)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1hYCts-0005L2-Sp
-	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 13:07:05 -0400
+	(envelope-from <mst@redhat.com>) id 1hYCw8-0006S6-Js
+	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 13:09:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1hYCtr-0004Yr-N8
-	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 13:07:04 -0400
-Received: from mail-qt1-f194.google.com ([209.85.160.194]:38493)
+	(envelope-from <mst@redhat.com>) id 1hYCw7-0001Nx-QO
+	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 13:09:24 -0400
+Received: from mail-qk1-f182.google.com ([209.85.222.182]:35956)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1hYCtr-0004V8-IH
-	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 13:07:03 -0400
-Received: by mail-qt1-f194.google.com with SMTP id l3so14648489qtj.5
-	for <qemu-devel@nongnu.org>; Tue, 04 Jun 2019 10:07:03 -0700 (PDT)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1hYCw7-0001MZ-Mk
+	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 13:09:23 -0400
+Received: by mail-qk1-f182.google.com with SMTP id g18so3332477qkl.3
+	for <qemu-devel@nongnu.org>; Tue, 04 Jun 2019 10:09:23 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:date:from:to:cc:subject:message-id:references
 	:mime-version:content-disposition:in-reply-to;
-	bh=laAolIxWEvzr93cRDvn4CwakgubkxX1QjICADAA9WT0=;
-	b=paagojnkqYgfcCZptBEFGpIvoRwpcG/hLD7yHVnZxTVDMi9nQp6TEhaMaTBa8QgjSU
-	CevJpaJOE1FlLLYxyEvo3S9DKPQTu8asXr0dczl5dFObiZmCj+OM79D2VfnrdI+PTBTD
-	haiep0IQyQosxyvf4S5d88QOlTu7NjtSLdXpFgmxrRX2+ADObTe75o41IEwuAH2sUd4a
-	RIKFOR2PUxPO2zlGAREoACkZ6qs9jzKBTmviyaau6PRmrQnExVADSon+78JpeGpl8IHA
-	kZHkzYTV5+fV7LCfNWjtZNMcz0S4Xj70M1d/AJAyKUOPF8PVsll2iRaeNiNQ9FHaGyE2
-	rSeQ==
-X-Gm-Message-State: APjAAAWKLex2jAmpnVq/Ga/Ch8B8Ce8Kj8pHEmeYKcdZGAWKHnseu123
-	FTv98Uys0Q74fEeP28k7GQAl8A==
-X-Google-Smtp-Source: APXvYqy3ca9XNl7j1EtkP6bcku0wPFHAAjpMXex7FnajDJvm22FRbC/FA3ENfhHVFXIjCGrXnRo3IQ==
-X-Received: by 2002:ac8:25dd:: with SMTP id f29mr20381519qtf.144.1559668022759;
-	Tue, 04 Jun 2019 10:07:02 -0700 (PDT)
+	bh=CgHV4HAQDmrS0Vr7HXW9J87neah4nBCQjYkHjF3J55s=;
+	b=pZKFPZBHoYTfPe8vQvwdYNDHiMad0b0vlQK4LBtOcG7/JnhdTIEeQkmkYZlEm8j4Fc
+	uQ5DJzXUsOjMo07YSYjK+V7vpgE88JOnD+MAY7TDT+zFu+NAAVdjRQ+FAwBnQ5ynu42U
+	IPCvGBjO4NSYT2Re9cdwo4kiikohUAoznltcdetNoLSZQa/tf9RRTycS9u8d5MLgb6hG
+	jNb32X35bX0DOh+j6OR/Q1QHK6QRahUWmlfLG6UU+UTHM1RSMZGav6uDf/w53K4nCMZ2
+	9ZJRMEuEVQzIwnErGcN00BqcwBq1wWaWj1zsVNTuSpOVZm/1NQXA3NBCS/UeL2LtB8EB
+	1cxw==
+X-Gm-Message-State: APjAAAXkdAzdmq6Rs2/0CQsbMO6ln3tUHdRL+7OkrrRPz6G834QFmd23
+	daF7EQC5m8gH7IWNETMPxeS+WcQsrsc=
+X-Google-Smtp-Source: APXvYqxz3i8oLwfqhm01+v1y0H3QdCr3MZbdnpmvjO85BEFABqM70ij5+5Zn7H1+JQrQBuvvu3XO7Q==
+X-Received: by 2002:a37:aa8e:: with SMTP id
+	t136mr28745429qke.222.1559668163123; 
+	Tue, 04 Jun 2019 10:09:23 -0700 (PDT)
 Received: from redhat.com (pool-100-0-197-103.bstnma.fios.verizon.net.
 	[100.0.197.103]) by smtp.gmail.com with ESMTPSA id
-	z123sm9671182qka.7.2019.06.04.10.07.00
+	l40sm3825986qtc.51.2019.06.04.10.09.21
 	(version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-	Tue, 04 Jun 2019 10:07:01 -0700 (PDT)
-Date: Tue, 4 Jun 2019 13:06:59 -0400
+	Tue, 04 Jun 2019 10:09:22 -0700 (PDT)
+Date: Tue, 4 Jun 2019 13:09:15 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Jens Freimann <jfreimann@redhat.com>
-Message-ID: <20190604125037-mutt-send-email-mst@kernel.org>
-References: <20190517125820.2885-1-jfreimann@redhat.com>
-	<20190517125820.2885-4-jfreimann@redhat.com>
-	<20190521094504.GB2915@work-vm>
-	<20190530145645.tjwkgi4hae5yblsi@jenstp.localdomain>
-	<20190531214748.GN22103@habkost.net>
-	<20190603082456.vzpy256kj4o5e5wu@jenstp.localdomain>
-	<20190603193648.GQ22103@habkost.net>
-	<20190604134321.txlw7wjwe247g5ug@jenstp.localdomain>
+To: Peter Maydell <peter.maydell@linaro.org>
+Message-ID: <20190604130738-mutt-send-email-mst@kernel.org>
+References: <20190603180807.16140-1-mst@redhat.com>
+	<CAFEAcA8zMLAs6-ssLhsKBfhRECzADUzpKWw+_jgJhQz0BnxciQ@mail.gmail.com>
+	<20190604122506-mutt-send-email-mst@kernel.org>
+	<CAFEAcA-d9cK_SOmFV6b6koA8j=xzdknkP=g3NHgBEG2Wr4Mx6A@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190604134321.txlw7wjwe247g5ug@jenstp.localdomain>
+In-Reply-To: <CAFEAcA-d9cK_SOmFV6b6koA8j=xzdknkP=g3NHgBEG2Wr4Mx6A@mail.gmail.com>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 	[fuzzy]
-X-Received-From: 209.85.160.194
-Subject: Re: [Qemu-devel] [PATCH 3/4] net/virtio: add failover support
+X-Received-From: 209.85.222.182
+Subject: Re: [Qemu-devel] [PULL v2 00/14] virtio, pci, pc: cleanups, features
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -86,76 +83,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pkrempa@redhat.com, berrange@redhat.com,
-	Eduardo Habkost <ehabkost@redhat.com>, aadam@redhat.com,
-	qemu-devel@nongnu.org,
-	"Dr. David Alan Gilbert" <dgilbert@redhat.com>, laine@redhat.com,
-	ailan@redhat.com
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Jun 04, 2019 at 03:43:21PM +0200, Jens Freimann wrote:
-> On Mon, Jun 03, 2019 at 04:36:48PM -0300, Eduardo Habkost wrote:
-> > On Mon, Jun 03, 2019 at 10:24:56AM +0200, Jens Freimann wrote:
-> > > On Fri, May 31, 2019 at 06:47:48PM -0300, Eduardo Habkost wrote:
-> > > > On Thu, May 30, 2019 at 04:56:45PM +0200, Jens Freimann wrote:
-> > > > > On Tue, May 28, 2019 at 11:04:15AM -0400, Michael S. Tsirkin wrote:
-> > > > > > On Tue, May 21, 2019 at 10:45:05AM +0100, Dr. David Alan Gilbert wrote:
-> > > > > > > * Jens Freimann (jfreimann@redhat.com) wrote:
-> > > Why is it bad to fully re-create the device in case of a failed migration?
-> > 
-> > Bad or not, I thought the whole point of doing it inside QEMU was
-> > to do something libvirt wouldn't be able to do (namely,
-> > unplugging the device while not freeing resources).  If we are
-> > doing something that management software is already capable of
-> > doing, what's the point?
+On Tue, Jun 04, 2019 at 05:55:36PM +0100, Peter Maydell wrote:
+> On Tue, 4 Jun 2019 at 17:48, Michael S. Tsirkin <mst@redhat.com> wrote:
+> > I see. I can drop this patch for now, but I suspect this
+> > means this host always produced warning and possibly
+> > that the tables are all wrong.
+> > Could you send me the actual and expected files please?
+> > Preferably both dsl and binary.
 > 
-> Event though management software seems to be capable of it, a failover
-> implementation has never happened. As Michael says network failover is
-> a mechanism (there's no good reason not to use a PT device if it is
-> available), not a policy. We are now trying to implement it in a
-> simple way, contained within QEMU.
+> Sure, if you can give me commands to run to do that.
 > 
-> > Quoting a previous message from this thread:
-> > 
-> > On Thu, May 30, 2019 at 02:09:42PM -0400, Michael S. Tsirkin wrote:
-> > | > On Thu, May 30, 2019 at 07:00:23PM +0100, Dr. David Alan Gilbert wrote:
-> > | > >  This patch series is very
-> > | > > odd precisely because it's trying to do the unplug itself in the
-> > | > > migration phase rather than let the management layer do it - so unless
-> > | > > it's nailed down how to make sure that's really really bullet proof
-> > | > > then we've got to go back and ask the question about whether we should
-> > | > > really fix it so it can be done by the management layer.
-> > | > >
-> > | > > Dave
-> > | >
-> > | > management already said they can't because files get closed and
-> > | > resources freed on unplug and so they might not be able to re-add device
-> > | > on migration failure. We do it in migration because that is
-> > | > where failures can happen and we can recover.
-> 
-> This is something that I can work on as well, but it doesn't have to
-> be part of this patch set in my opinion. Let's say migration fails and we can't
-> re-plug the primary device. We can still use the standby (virtio-net)
-> device which would only mean slower networking. How likely is it that
-> the primary device is grabbed by another VM between unplugging and
-> migration failure anyway?
-> 
-> regards,
-> Jens
+> thanks
+> -- PMM
 
-I think I agree with Eduardo it's very important to handle this corner
-case correctly. Fast networking outside migration is why people use
-failover at all.  Someone who can live with a slower virtio would use
-just that.
+They are produced as part of the test.
 
-And IIRC this corner case is exactly why libvirt could not
-implement it correctly itself and had to push it up the stack
-until it fell off the cliff :).
+So we have:
+acpi-test: Warning! DSDT mismatch. Actual [asl:/tmp/asl-NKUU2Z.dsl,
+aml:/tmp/aml-UERV2Z], Expected [asl:/tmp/asl-3ITW2Z.dsl,
+aml:tests/data/acpi/q35/DSDT].
 
-> 
-> > 
-> > -- 
-> > Eduardo
+You would do something like:
+
+tar cvzf tests.tgz /tmp/asl-NKUU2Z.dsl /tmp/aml-UERV2Z /tmp/asl-3ITW2Z.dsl tests/data/acpi/q35/DSDT
+
+And then send the tarball.
+
+-- 
+MST
 
