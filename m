@@ -2,147 +2,79 @@ Return-Path: <SRS0=GUf1=UD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-13.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BD258C282CE
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 15:52:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A89BC28CC3
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 15:58:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 864502053B
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 15:52:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 864502053B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 29ABC2053B
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 15:58:01 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="vgdgzIwB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 29ABC2053B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:54323 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:54364 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hYBja-00018Y-NH
-	for qemu-devel@archiver.kernel.org; Tue, 04 Jun 2019 11:52:22 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:58864)
+	id 1hYBp1-0002W1-Pd
+	for qemu-devel@archiver.kernel.org; Tue, 04 Jun 2019 11:57:59 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:60015)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1hYBip-0000ne-Mv
-	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 11:51:36 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1hYBoI-00027R-OR
+	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 11:57:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1hYBik-00072t-KP
-	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 11:51:35 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33548)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1hYBik-0006zW-BC
-	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 11:51:30 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C21F8309266E;
-	Tue,  4 Jun 2019 15:51:23 +0000 (UTC)
-Received: from [10.18.17.164] (dhcp-17-164.bos.redhat.com [10.18.17.164])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id E33E95D9D2;
-	Tue,  4 Jun 2019 15:51:20 +0000 (UTC)
-To: Markus Armbruster <armbru@redhat.com>,
-	Peter Maydell <peter.maydell@linaro.org>
-References: <20190531192429.GH22103@habkost.net>
-	<93e5101f-67f1-a416-5e80-f16371a35e6a@redhat.com>
-	<871s0asvli.fsf@dusky.pond.sub.org>
-	<236db86d-52df-5537-4f33-f3c09bbb6289@redhat.com>
-	<CAFEAcA_bSzWYu5Oa_knq2SAK9Z3RN3LZjxeirVncgRQ9FsDZXA@mail.gmail.com>
-	<b4de3161-7b9c-debc-a652-21832612ebf4@redhat.com>
-	<CAFEAcA-+2Csn4wW8xLaogJrQiqc2xHrGKFc_zdaOMKNn-yas9g@mail.gmail.com>
-	<87lfyhq5la.fsf@dusky.pond.sub.org>
-From: John Snow <jsnow@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
-	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
-Message-ID: <8f52c29b-82e2-8970-5fe1-a56a77fc0830@redhat.com>
-Date: Tue, 4 Jun 2019 11:51:20 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	(envelope-from <peter.maydell@linaro.org>) id 1hYBoH-0004LM-NZ
+	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 11:57:14 -0400
+Received: from mail-ot1-x335.google.com ([2607:f8b0:4864:20::335]:41237)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1hYBoH-0004Jc-Ho
+	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 11:57:13 -0400
+Received: by mail-ot1-x335.google.com with SMTP id 107so14202001otj.8
+	for <qemu-devel@nongnu.org>; Tue, 04 Jun 2019 08:57:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+	:cc; bh=hU4n3P3vkQHB4Fvyj6fU4EpSIzKCsQ1tR+oXly+Hhpc=;
+	b=vgdgzIwBvywVqO1PXyApVgi92/og5RoFKY6ZbjK2jIrTBBMK2HV+P6G+lEjSJYEQqg
+	jwJcede/FXJzgCsb+s4cMETYDbwm2uzPYKkqt50r5afjfsfRr2f9FsKjmFe96oXu0xYq
+	isntIflAmlh/rJIbqTh9qfFH9nCHVq2bAZLTBzoq94WgWg2MMLcn03qH0ZvcvM1eHipI
+	C9jlfg+1rlJeYSBZLa8tX23T7D1shgEwO06bHugBbZomwQ7Z6ihwwtTH48sHL+uTdEPu
+	L69icNb5MCLgIbGgM6oQu7CUPN/J/XOScZ5NA6WlQnaammVZj9naU4ibSq1rUhgOTARd
+	lFCQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+	:message-id:subject:to:cc;
+	bh=hU4n3P3vkQHB4Fvyj6fU4EpSIzKCsQ1tR+oXly+Hhpc=;
+	b=jD5Hk7dbZSfD0nm3vu9mTwygO+wIQAHFjJdpO72BR/oBE/WFbJPViI/Y5hZOhVDQ6R
+	hignFtaWqReqgbTciWCTIAxaHTEvf3iKC9xBV/lve/kiEiQQh1WtXVVXK1LOkQ0p1/SB
+	iRJWOQmBQFUcddPpm8HJnSkOAHgtM4vqXaNsROyoktInrdzLCVi1UfNEUxtef7cNq3O/
+	slHEM341nSe/bM/jn5cER/kca0Ldb2EvE0hYHG+3DDPnSZuTDZrP5APhImoFJI9PFN65
+	0mz3HgwKmzkZgKFuNhBuAX1fwo0CwCal5wZmCCa/PVP57tzQQFzhc8QBCobBzBQI8qYw
+	+Gwg==
+X-Gm-Message-State: APjAAAWOjhcSArsRlzEFuid5p2KB5vL0ZfA3PzoQuVN/qIcwlnQ7xXH7
+	AXOaCqfEALoR4WGqQmHNwVfros9AbxJ50X/vhx0/FQ==
+X-Google-Smtp-Source: APXvYqwPrwmfXDtpD/daG9s9Z3TItPXKFSXdXpoKKw4pOahOOzt0zpJOaDnaYRtsdIzXfN0j6xVBEvqdGAwzTrEduhI=
+X-Received: by 2002:a9d:6b0d:: with SMTP id g13mr5802416otp.91.1559663831727; 
+	Tue, 04 Jun 2019 08:57:11 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <87lfyhq5la.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.43]);
-	Tue, 04 Jun 2019 15:51:23 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] Deprecation policy and build dependencies
+References: <20190603180807.16140-1-mst@redhat.com>
+In-Reply-To: <20190603180807.16140-1-mst@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 4 Jun 2019 16:57:00 +0100
+Message-ID: <CAFEAcA8zMLAs6-ssLhsKBfhRECzADUzpKWw+_jgJhQz0BnxciQ@mail.gmail.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::335
+Subject: Re: [Qemu-devel] [PULL v2 00/14] virtio, pci, pc: cleanups, features
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -154,79 +86,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
-	Cleber Rosa <crosa@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>,
-	Eduardo Habkost <ehabkost@redhat.com>,
-	QEMU Developers <qemu-devel@nongnu.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Mon, 3 Jun 2019 at 19:08, Michael S. Tsirkin <mst@redhat.com> wrote:
+>
+> The following changes since commit 8c1ecb590497b0349c550607db923972b37f6963:
+>
+>   Merge remote-tracking branch 'remotes/stsquad/tags/pull-testing-next-280519-2' into staging (2019-05-28 17:38:32 +0100)
+>
+> are available in the Git repository at:
+>
+>   git://git.kernel.org/pub/scm/virt/kvm/mst/qemu.git tags/for_upstream
+>
+> for you to fetch changes up to df7cafdeb68b6572fa81d2be9a1910547c4dfafc:
+>
+>   bios-tables-test: list all tables that differ (2019-06-03 08:05:43 -0400)
+>
+> ----------------------------------------------------------------
+> virtio, pci, pc: cleanups, features
+>
+> stricter rules for acpi tables: we now fail
+> on any difference that isn't whitelisted.
+>
+> vhost-scsi migration.
+>
+> some cleanups all over the place
+>
+> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+>
+> ----------------------------------------------------------------
 
 
-On 6/4/19 1:31 AM, Markus Armbruster wrote:
-> Peter Maydell <peter.maydell@linaro.org> writes:
-> 
->> On Mon, 3 Jun 2019 at 19:21, John Snow <jsnow@redhat.com> wrote:
->>> I get it, we don't want to require Python 3.8 because some dev wanted
->>> assignment conditionals -- but we're talking about Python 2 here, which
->>> suffers its EOL by the end of this calendar year.
-> 
-> "Not because some dev wanted assignment conditionals" is the non-reason.
-> Let me spell out the reason: supporting Python 2 is expensive for us.
-> As the amount of Python code grows, it gets more and more expensive.
-> 
-> Is this really time and effort well spent?
-> 
+Hi; I'm afraid this fails 'make check' on my aarch32 build:
 
-I'd just like to clarify that you and I are arguing the same point. I
-used that non-reason intentionally, arguing that we don't want a trivial
-feature, we're talking about the major deprecation of an entire version
-of a language.
+MALLOC_PERTURB_=${MALLOC_PERTURB_:-$(( ${RANDOM:-0} % 255 + 1))}
+QTEST_QEMU_BINARY=i386-softmmu/qemu-system-i386
+QTEST_QEMU_IMG=qemu-img tests/bios-tables-test -m=quick -k --tap <
+/dev/null | ./scripts/tap-driver.pl --test-name="bios-tables-test"
 
-I picked a far-fetched, very bleeding edge version (and a feature in it
-that matched, sorry, been doing a lot of Python lately) to counter
-Peter's point that we didn't want to support bleeding-edge stuff "just
-because."
+Looking for expected file 'tests/data/acpi/pc/FACP'
+Using expected file 'tests/data/acpi/pc/FACP'
+Looking for expected file 'tests/data/acpi/pc/APIC'
+Using expected file 'tests/data/acpi/pc/APIC'
+Looking for expected file 'tests/data/acpi/pc/HPET'
+Using expected file 'tests/data/acpi/pc/HPET'
+Looking for expected file 'tests/data/acpi/pc/FACS'
+Using expected file 'tests/data/acpi/pc/FACS'
+Looking for expected file 'tests/data/acpi/pc/DSDT'
+Using expected file 'tests/data/acpi/pc/DSDT'
+PASS 1 bios-tables-test /i386/acpi/piix4
 
-Sorry if I didn't articulate this point well.
+Looking for expected file 'tests/data/acpi/q35/FACP'
+Using expected file 'tests/data/acpi/q35/FACP'
+Looking for expected file 'tests/data/acpi/q35/APIC'
+Using expected file 'tests/data/acpi/q35/APIC'
+Looking for expected file 'tests/data/acpi/q35/HPET'
+Using expected file 'tests/data/acpi/q35/HPET'
+Looking for expected file 'tests/data/acpi/q35/MCFG'
+Using expected file 'tests/data/acpi/q35/MCFG'
+Looking for expected file 'tests/data/acpi/q35/FACS'
+Using expected file 'tests/data/acpi/q35/FACS'
+Looking for expected file 'tests/data/acpi/q35/DSDT'
+Using expected file 'tests/data/acpi/q35/DSDT'
+acpi-test: Warning! DSDT mismatch. Actual [asl:/tmp/asl-NKUU2Z.dsl,
+aml:/tmp/aml-UERV2Z], Expected [asl:/tmp/asl-3ITW2Z.dsl,
+aml:tests/data/acpi/q35/DSDT].
+acpi-test: Warning. not showing difference since no diff utility is
+specified. Set 'DIFF' environment variable to a preferred diff utility
+and run 'make V=1 check' again to see ASL difference.**
+ERROR:/home/peter.maydell/qemu/tests/bios-tables-test.c:422:test_acpi_asl:
+assertion failed: (all_tables_match)
+Aborted
+ERROR - too few tests run (expected 15, got 1)
+/home/peter.maydell/qemu/tests/Makefile.include:884: recipe for target
+'check-qtest-i386' failed
 
->>> So do we think it's reasonable to drop support for Python2 for the
->>> release that comes out after Python2's EOL, or do we insist on 2x3
->>> simultaneous support for years more?
->>
->> I don't have a strong opinion on Python in particular, but
->> I think it would be nicer to avoid the "python is a special
->> snowflake" effect.
-> 
-> Lots of things are nice.  Limited resources dictate we can only get some
-> of them.
-> 
->>                    Would it really be so bad for it to just
->> be "drop it when it falls off the last LTS distro" like the
->> rest of our dependencies ?
-> 
-> In my experience maintaining and evolving the QAPI generators,
-> supporting both Python 2 and 3 is a constant distraction that adds up
-> over time.  It's all manual; we decided against adopting one of tool
-> chains made for dealing with this mess.  I'd rather think about how to
-> solve real user problems like deprecation information or command line
-> introspection than deal with Python 2 vs. 3 arcana.
-> 
-> Just the other day, I flagged an innocent-looking simplification of some
-> non-QAPI Python code that changed semantics subtly on Python 2, impact
-> unknown.  The developer did not know.  The fact that I waste precious
-> brain capacity on knowing this shit (pardon my French) is a bloody
-> shame.  Well, some of this shit, because I've screwed it up myself, too.
-> 
-> The sooner we stop the bleeding, the better.
-> 
 
-I agree, and it looks like we have consensus that because RHEL7 has
-EPEL, we can drop Python 2 support. I think.
+This is the only 32-bit host I test on, so it may be a generic
+32-bit host problem rather than arm-specific.
 
-What wasn't made clear to me yet is in which version we may do so. I
-think I suggested 4.2, and nobody agreed or disagreed with that point.
-
---js
+thanks
+-- PMM
 
