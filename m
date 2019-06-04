@@ -2,63 +2,68 @@ Return-Path: <SRS0=GUf1=UD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C6F19C282CE
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 09:15:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 65AC4C282CE
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 09:35:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 96B5121976
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 09:15:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 96B5121976
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=birkelund.eu
+	by mail.kernel.org (Postfix) with ESMTPS id 313EA24A3C
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 09:35:37 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=me.com header.i=@me.com header.b="wbIMPmxg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 313EA24A3C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=nongnu.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:49126 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:49379 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hY5X8-00054u-Gp
-	for qemu-devel@archiver.kernel.org; Tue, 04 Jun 2019 05:15:06 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:44567)
+	id 1hY5qx-0008N8-WF
+	for qemu-devel@archiver.kernel.org; Tue, 04 Jun 2019 05:35:36 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:48944)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <klaus@birkelund.eu>) id 1hY5WA-0004jX-9F
-	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 05:14:07 -0400
+	(envelope-from <tgfbeta@me.com>) id 1hY5qA-00085X-6y
+	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 05:34:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <klaus@birkelund.eu>) id 1hY5W8-0004zj-Uo
-	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 05:14:06 -0400
-Received: from charlie.dont.surf ([128.199.63.193]:36682)
+	(envelope-from <tgfbeta@me.com>) id 1hY5q9-0002dZ-DH
+	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 05:34:46 -0400
+Received: from pv50p00im-ztdg10011901.me.com ([17.58.6.50]:41091)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <klaus@birkelund.eu>)
-	id 1hY5W6-0004w9-GE; Tue, 04 Jun 2019 05:14:02 -0400
-Received: from apples.localdomain (soho-cph.cust-cnex.dsd101.net
-	[194.62.216.132])
-	by charlie.dont.surf (Postfix) with ESMTPSA id 4E955BFCD3;
-	Tue,  4 Jun 2019 09:14:00 +0000 (UTC)
-Date: Tue, 4 Jun 2019 11:13:58 +0200
-From: Klaus Birkelund <klaus@birkelund.eu>
-To: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20190604091358.GB11013@apples.localdomain>
-Mail-Followup-To: Kevin Wolf <kwolf@redhat.com>,
-	"Heitke, Kenneth" <kenneth.heitke@intel.com>, mreitz@redhat.com,
-	keith.busch@intel.com, qemu-block@nongnu.org, philmd@redhat.com,
-	qemu-devel@nongnu.org
-References: <20190520174030.1647-1-kenneth.heitke@intel.com>
-	<20190528061836.GB32236@apples.localdomain>
-	<20190603111409.GD6523@linux.fritz.box>
-	<a58ef975-78f2-9c5c-35c2-b2dd359a4c03@intel.com>
-	<20190604082828.GA11013@apples.localdomain>
-	<20190604084645.GB14925@linux.fritz.box>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190604084645.GB14925@linux.fritz.box>
-User-Agent: Mutt/1.12.0 (2019-05-25)
+	(Exim 4.71) (envelope-from <tgfbeta@me.com>) id 1hY5q9-0002cM-6w
+	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 05:34:45 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=me.com; s=04042017;
+	t=1559640883; bh=KyZ4nFDaBlQMg/i+h4/EBaBvs44iHJKqNx372aCKLhs=;
+	h=From:Content-Type:Mime-Version:Subject:Message-Id:Date:To;
+	b=wbIMPmxgdeZXavoTVfZCFbEeO7cZ13q0FD/VCKXtcw9m+NGZVoukTtBUj1bczuTNT
+	DqItWFOoXtiTIjgADy8/hMs+bM31GDf4oRabgo8ZzxvjPmz1GRsWn6tQ3gxOrgOqlO
+	qkljB2mHnOvLxnrmsWvoi55q++4xKSMuNozMnhCNqgeq7HSum6VhQ87PB/aEszfyTO
+	ecuughZ3Ly/Pk/nx+euyGfnUsh1yzbdcoCETddCnqzA7RyUqZ63sgJJ2ecpTQs5j1+
+	xvT/AJcFOckhvxlz+1uk/vMGXn04UozcPk1bEUFjgD7otL2BQwX4SIK+yx2sUZPVfn
+	l2UAIlHGo44hA==
+Received: from [172.18.2.102] (unknown [36.106.167.139])
+	by pv50p00im-ztdg10011901.me.com (Postfix) with ESMTPSA id 32FC880075C; 
+	Tue,  4 Jun 2019 09:34:41 +0000 (UTC)
+Content-Type: text/plain;
+	charset=us-ascii
+Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
+Message-Id: <B3540B0C-9A71-4733-8109-11B0DC7A17D2@me.com>
+Date: Tue, 4 Jun 2019 17:34:38 +0800
+To: Gerd Hoffmann <kraxel@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+X-Mailer: Apple Mail (2.3445.104.11)
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
+	definitions=2019-06-04_07:, , signatures=0
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
+	malwarescore=0
+	phishscore=0 bulkscore=0 spamscore=0 clxscore=1015 mlxscore=0
+	mlxlogscore=792 adultscore=0 classifier=spam adjust=0 reason=mlx
+	scancount=1 engine=8.0.1-1812120000 definitions=main-1906040064
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 128.199.63.193
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v2] nvme: add Get/Set Feature
- Timestamp support
+X-Received-From: 17.58.6.50
+Subject: [Qemu-devel] [PATCH 0/2] ui/cocoa: Fix input device issues on Mojave
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -70,81 +75,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-block@nongnu.org, "Heitke, Kenneth" <kenneth.heitke@intel.com>,
-	qemu-devel@nongnu.org, mreitz@redhat.com, keith.busch@intel.com,
-	philmd@redhat.com
+From: Chen Zhang via Qemu-devel <qemu-devel@nongnu.org>
+Reply-To: Chen Zhang <tgfbeta@me.com>
+Cc: qemu-devel@nongnu.org, tgfbeta@me.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Jun 04, 2019 at 10:46:45AM +0200, Kevin Wolf wrote:
-> Am 04.06.2019 um 10:28 hat Klaus Birkelund geschrieben:
-> > On Mon, Jun 03, 2019 at 09:30:53AM -0600, Heitke, Kenneth wrote:
-> > > 
-> > > 
-> > > On 6/3/2019 5:14 AM, Kevin Wolf wrote:
-> > > > Am 28.05.2019 um 08:18 hat Klaus Birkelund geschrieben:
-> > > > > On Mon, May 20, 2019 at 11:40:30AM -0600, Kenneth Heitke wrote:
-> > > > > > Signed-off-by: Kenneth Heitke <kenneth.heitke@intel.com>
-> > > > 
-> > > > > > diff --git a/hw/block/nvme.h b/hw/block/nvme.h
-> > > > > > index 56c9d4b4b1..d7277e72b7 100644
-> > > > > > --- a/hw/block/nvme.h
-> > > > > > +++ b/hw/block/nvme.h
-> > > > > > @@ -69,6 +69,7 @@ typedef struct NvmeCtrl {
-> > > > > >       uint16_t    max_prp_ents;
-> > > > > >       uint16_t    cqe_size;
-> > > > > >       uint16_t    sqe_size;
-> > > > > > +    uint16_t    oncs;
-> > > > > 
-> > > > > Looks like this unused member snuck its way into the patch. But I see no
-> > > > > harm in it being there.
-> > > > 
-> > > > Good catch. I'll just remove it again from my branch.
-> > > > 
-> > > > > > +static inline void nvme_set_timestamp(NvmeCtrl *n, uint64_t ts)
-> > > > > > +{
-> > > > > > +    trace_nvme_setfeat_timestamp(ts);
-> > > > > > +
-> > > > > > +    n->host_timestamp = le64_to_cpu(ts);
-> > > > > > +    n->timestamp_set_qemu_clock_ms = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
-> > > > > > +}
-> > > > > > +
-> > > > > > +static inline uint64_t nvme_get_timestamp(const NvmeCtrl *n)
-> > > > > > +{
-> > > > > > +    uint64_t current_time = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
-> > > > 
-> > > > Here I wonder why we use QEMU_CLOCK_REALTIME in a device emulation.
-> > > > Wouldn't QEMU_CLOCK_VIRTUAL make more sense?
-> > > > 
-> > > 
-> > > QEMU_CLOCK_VIRTUAL probably would make more sense. When I was reading
-> > > through the differences I wasn't really sure what to pick. iven that this is
-> > > the time within the device's context, the virtual time seems more correct.
-> > > 
-> >  
-> > I thought about this too when I reviewed, but came to the conclusion
-> > that REALTIME was correct. The timestamp is basically a value that the
-> > host stores in the controller. When the host uses Get Features to get
-> > the the current time it would expect it to match the progression for its
-> > own wall clockright? If I understand REALTIME vs VIRTUAL correctly,
-> > using VIRTUAL, it would go way out of sync.
-> 
-> Which two things would go out of sync with VIRTUAL?
-> 
-> Not an expert on clocks myself, but I think the main question is what
-> happens to the clock while the VM is stopped. REALTIME continues running
-> where as VIRTUAL is stopped. If we expose REALTIME measurements to the
-> guest, the time passed may look a lot longer than what the guest's clock
-> actually says. So this is the thing I am worried would go out of sync
-> with REALTIME.
-> 
+The following patches fixed issues of absolute and relative input devices 
+on macOS Mojave.
 
-OK, fair point.
+Chen Zhang (2):
+  ui/cocoa: Fix absolute input device grabbing issue on Mojave
+  ui/cocoa: Fix mouse grabbing in fullscreen mode for relative input
+    device
 
-Thinking about this some more, I agree that VIRTUAL is more correct. An
-application should never track elapsed time using real wall clock time,
-but some monotonic clock that is oblivious to say NTP adjustments.
+ ui/cocoa.m | 50 +++++++++++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 47 insertions(+), 3 deletions(-)
 
-Klaus
+-- 
+2.21.0
+
 
