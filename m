@@ -7,76 +7,76 @@ X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CB4BCC282CE
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 16:32:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 99107C282CE
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 16:32:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7E9E523CA1
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 16:32:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 67EF223CA1
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 16:32:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=greensocs.com header.i=@greensocs.com header.b="EHffHrqu"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7E9E523CA1
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=greensocs.com header.i=@greensocs.com header.b="GmrGNpaG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 67EF223CA1
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=greensocs.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:55144 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:55154 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hYCLx-0005ll-72
-	for qemu-devel@archiver.kernel.org; Tue, 04 Jun 2019 12:32:01 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:39266)
+	id 1hYCMA-00063z-Ls
+	for qemu-devel@archiver.kernel.org; Tue, 04 Jun 2019 12:32:14 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:39377)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <damien.hedde@greensocs.com>) id 1hYCFx-0000Zq-Df
-	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 12:25:51 -0400
+	(envelope-from <damien.hedde@greensocs.com>) id 1hYCG1-0000dB-Qh
+	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 12:25:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <damien.hedde@greensocs.com>) id 1hYCFv-0003a4-7o
-	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 12:25:49 -0400
-Received: from beetle.greensocs.com ([5.135.226.135]:40524)
+	(envelope-from <damien.hedde@greensocs.com>) id 1hYCFz-0003iU-W7
+	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 12:25:53 -0400
+Received: from beetle.greensocs.com ([5.135.226.135]:40634)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <damien.hedde@greensocs.com>)
-	id 1hYCFr-0003TS-59; Tue, 04 Jun 2019 12:25:43 -0400
+	id 1hYCFw-0003bS-Qu; Tue, 04 Jun 2019 12:25:49 -0400
 Received: from kouign-amann.bar.greensocs.com (unknown [172.17.10.6])
-	by beetle.greensocs.com (Postfix) with ESMTPSA id 9831296F5B;
-	Tue,  4 Jun 2019 16:25:41 +0000 (UTC)
+	by beetle.greensocs.com (Postfix) with ESMTPSA id 37ADC96F68;
+	Tue,  4 Jun 2019 16:25:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com;
-	s=mail; t=1559665542;
+	s=mail; t=1559665547;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	to:to:cc:cc:mime-version:mime-version:
 	content-transfer-encoding:content-transfer-encoding:
 	in-reply-to:in-reply-to:references:references;
-	bh=YYxCAcFY2f8T7dY7vwkEpubeXgbDt8PO/wb4DbcDzk8=;
-	b=EHffHrquEFGV8MLehGdJ56kI3+VIXA79OJVSDruYKa/2PKN+LbOKDqavaWQ5TW44/8EWze
-	TF7C81ZmWXWJuBmX+Q5TQsYH+2K+EJ6T8e+bK/01tHvaLTL0vXeVXKRsyCRhfpljtqjRCy
-	ILKkerL1QqWNIEefJ/hWT3YwlFzwevw=
+	bh=MCCvN1xRL6lomue9uOOMJhghQO1bTT/gZNsAko9dsf4=;
+	b=GmrGNpaGYaj/GCcw6VZxwbrpC4Q1wL85KYRt6NJ4UAJbWHQydp2Zrx7mRA3ZzlRYm5p89i
+	Q4dqcSMo8YvBd98hPHo4RrEiBK5VGkGGcibIuHwfGvN7sO5UKDSk6tgOgi+HAZWT3vWtLx
+	j3NPIw4jAzr4/FZGD47tT12utKWnaxQ=
 From: Damien Hedde <damien.hedde@greensocs.com>
 To: qemu-devel@nongnu.org
-Date: Tue,  4 Jun 2019 18:25:17 +0200
-Message-Id: <20190604162526.10655-4-damien.hedde@greensocs.com>
+Date: Tue,  4 Jun 2019 18:25:24 +0200
+Message-Id: <20190604162526.10655-11-damien.hedde@greensocs.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190604162526.10655-1-damien.hedde@greensocs.com>
 References: <20190604162526.10655-1-damien.hedde@greensocs.com>
 MIME-Version: 1.0
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com; 
-	s=mail; t=1559665542;
+	s=mail; t=1559665547;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	to:to:cc:cc:mime-version:mime-version:
 	content-transfer-encoding:content-transfer-encoding:
 	in-reply-to:in-reply-to:references:references;
-	bh=YYxCAcFY2f8T7dY7vwkEpubeXgbDt8PO/wb4DbcDzk8=;
-	b=o0yfScJQteo+Al3vaVVlZXA0yuwmiRY8t46mdtMzXO1IyVoxVu+niL1v84LgMg8Hzf9ihL
-	UB8luMrQ+Igk4Tz4PaSOX+iD1Ak4rpxCgWwz3cCvVvOjFwYhzLurk8JFWa9xYjY+Tb2BN8
-	cQsFOUYSVH+aB7P+9FPbbEtB97zSaM0=
-ARC-Seal: i=1; s=mail; d=greensocs.com; t=1559665542; a=rsa-sha256; cv=none;
-	b=iZJaKr1BlrXl88dJRnjqkz2RkJxS+odpVr41md+F5F/gWNyTxUV+uB/9L5tFFAlrqdlHug
-	oGvtYjruhR1gEVTE2ZrjGq9/M2HYq6vze1wQrtAE3cOW/S5gM3vfD26THbvZhTe2qv8MAA
-	oHAy3qzcQfPD1wTjYevFb34G6UZzqpA=
+	bh=MCCvN1xRL6lomue9uOOMJhghQO1bTT/gZNsAko9dsf4=;
+	b=y9PTVYdS5gJqOF9WIW+pVyiZtMINwiuL6Q7lcHJI5Xv8T4W+UMQlA1uhs55HPoo3t9b9ar
+	3DyIXe8DNRO7R+HKqsdNjmCjGYYyotUk7zipnbXYzthIchoEmgKZmWb8SxACJgAnbzv/SP
+	Nk1q82iry1uNTzvUalwqYmrDiyVINvU=
+ARC-Seal: i=1; s=mail; d=greensocs.com; t=1559665547; a=rsa-sha256; cv=none;
+	b=s/EMiGQIdfx0FfifSOGkN2n82/hoQJIL8RsbE+vg/h5T0iLTCH2txS20BzodAhXSRzTmxX
+	SlUElqwydkNzG5n4TVJd929DMatb664Fi8mv+Ce4UsS351tc+gXOl7A9cQoYLjwe6CDAov
+	rEv8yE27Pi6o7zy7Hji+izO6/DfkHwU=
 ARC-Authentication-Results: i=1; ORIGINATING;
 	auth=pass smtp.auth=damien smtp.mailfrom=damien.hedde@greensocs.com
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 5.135.226.135
-Subject: [Qemu-devel] [RFC PATCH v2 03/12] replace all occurences of
- device_reset by device_legacy_reset
+Subject: [Qemu-devel] [RFC PATCH v2 10/12] Convert zynq's slcr to 3-phases
+ reset
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -97,212 +97,119 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Change the legacy reset function into the init phase and test the
+resetting flag in register accesses.
+
 Signed-off-by: Damien Hedde <damien.hedde@greensocs.com>
 ---
- hw/audio/intel-hda.c     | 2 +-
- hw/hyperv/hyperv.c       | 2 +-
- hw/i386/pc.c             | 2 +-
- hw/ide/microdrive.c      | 8 ++++----
- hw/intc/spapr_xive.c     | 2 +-
- hw/ppc/pnv_psi.c         | 2 +-
- hw/ppc/spapr_pci.c       | 2 +-
- hw/ppc/spapr_vio.c       | 2 +-
- hw/s390x/s390-pci-inst.c | 2 +-
- hw/scsi/vmw_pvscsi.c     | 2 +-
- hw/sd/omap_mmc.c         | 2 +-
- hw/sd/pl181.c            | 2 +-
- 12 files changed, 15 insertions(+), 15 deletions(-)
+ hw/misc/zynq_slcr.c | 39 +++++++++++++++++++++++++++++++++++----
+ 1 file changed, 35 insertions(+), 4 deletions(-)
 
-diff --git a/hw/audio/intel-hda.c b/hw/audio/intel-hda.c
-index 33e333cc26..c674b9c0bb 100644
---- a/hw/audio/intel-hda.c
-+++ b/hw/audio/intel-hda.c
-@@ -1085,7 +1085,7 @@ static void intel_hda_reset(DeviceState *dev)
-     QTAILQ_FOREACH(kid, &d->codecs.qbus.children, sibling) {
-         DeviceState *qdev =3D kid->child;
-         cdev =3D HDA_CODEC_DEVICE(qdev);
--        device_reset(DEVICE(cdev));
-+        device_legacy_reset(DEVICE(cdev));
-         d->state_sts |=3D (1 << cdev->cad);
-     }
-     intel_hda_update_irq(d);
-diff --git a/hw/hyperv/hyperv.c b/hw/hyperv/hyperv.c
-index 8758635227..ec57417a3d 100644
---- a/hw/hyperv/hyperv.c
-+++ b/hw/hyperv/hyperv.c
-@@ -139,7 +139,7 @@ void hyperv_synic_reset(CPUState *cs)
-     SynICState *synic =3D get_synic(cs);
+diff --git a/hw/misc/zynq_slcr.c b/hw/misc/zynq_slcr.c
+index baa13d1316..c6d2bba966 100644
+--- a/hw/misc/zynq_slcr.c
++++ b/hw/misc/zynq_slcr.c
+@@ -171,6 +171,17 @@ REG32(DDRIOB, 0xb40)
 =20
-     if (synic) {
--        device_reset(DEVICE(synic));
-+        device_legacy_reset(DEVICE(synic));
-     }
- }
+ #define TYPE_ZYNQ_SLCR "xilinx,zynq_slcr"
+ #define ZYNQ_SLCR(obj) OBJECT_CHECK(ZynqSLCRState, (obj), TYPE_ZYNQ_SLCR=
+)
++#define ZYNQ_SLCR_CLASS(class) \
++        OBJECT_CLASS_CHECK(ZynqSLCRClass, (class), TYPE_ZYNQ_SLCR)
++#define ZYNQ_SLCR_GET_CLASS(obj) \
++        OBJECT_GET_CLASS(ZynqSLCRClass, (obj), TYPE_ZYNQ_SLCR)
++
++typedef struct ZynqSLCRClass {
++    /*< private >*/
++    SysBusDeviceClass parent_class;
++
++    struct ResettablePhases parent_reset_phases;
++} ZynqSLCRClass;
 =20
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index edc240bcbf..c6d72c9a5d 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -2634,7 +2634,7 @@ static void pc_machine_reset(void)
-         cpu =3D X86_CPU(cs);
+ typedef struct ZynqSLCRState {
+     SysBusDevice parent_obj;
+@@ -180,13 +191,18 @@ typedef struct ZynqSLCRState {
+     uint32_t regs[ZYNQ_SLCR_NUM_REGS];
+ } ZynqSLCRState;
 =20
-         if (cpu->apic_state) {
--            device_reset(cpu->apic_state);
-+            device_legacy_reset(cpu->apic_state);
-         }
-     }
- }
-diff --git a/hw/ide/microdrive.c b/hw/ide/microdrive.c
-index 34bb98dce8..b1350eb54f 100644
---- a/hw/ide/microdrive.c
-+++ b/hw/ide/microdrive.c
-@@ -171,7 +171,7 @@ static void md_attr_write(PCMCIACardState *card, uint=
-32_t at, uint8_t value)
-     case 0x00:	/* Configuration Option Register */
-         s->opt =3D value & 0xcf;
-         if (value & OPT_SRESET) {
--            device_reset(DEVICE(s));
-+            device_legacy_reset(DEVICE(s));
-         }
-         md_interrupt_update(s);
-         break;
-@@ -314,7 +314,7 @@ static void md_common_write(PCMCIACardState *card, ui=
-nt32_t at, uint16_t value)
-     case 0xe:	/* Device Control */
-         s->ctrl =3D value;
-         if (value & CTRL_SRST) {
--            device_reset(DEVICE(s));
-+            device_legacy_reset(DEVICE(s));
-         }
-         md_interrupt_update(s);
-         break;
-@@ -539,7 +539,7 @@ static int dscm1xxxx_attach(PCMCIACardState *card)
-     md->attr_base =3D pcc->cis[0x74] | (pcc->cis[0x76] << 8);
-     md->io_base =3D 0x0;
-=20
--    device_reset(DEVICE(md));
-+    device_legacy_reset(DEVICE(md));
-     md_interrupt_update(md);
-=20
-     return 0;
-@@ -549,7 +549,7 @@ static int dscm1xxxx_detach(PCMCIACardState *card)
+-static void zynq_slcr_reset(DeviceState *d)
++static void zynq_slcr_reset_init(Object *obj, bool cold)
  {
-     MicroDriveState *md =3D MICRODRIVE(card);
+-    ZynqSLCRState *s =3D ZYNQ_SLCR(d);
++    ZynqSLCRState *s =3D ZYNQ_SLCR(obj);
++    ZynqSLCRClass *zc =3D ZYNQ_SLCR_GET_CLASS(obj);
+     int i;
 =20
--    device_reset(DEVICE(md));
-+    device_legacy_reset(DEVICE(md));
-     return 0;
+     DB_PRINT("RESET\n");
+=20
++    if (zc->parent_reset_phases.init) {
++        zc->parent_reset_phases.init(obj, cold);
++    }
++
+     s->regs[R_LOCKSTA] =3D 1;
+     /* 0x100 - 0x11C */
+     s->regs[R_ARM_PLL_CTRL]   =3D 0x0001A008;
+@@ -276,7 +292,6 @@ static void zynq_slcr_reset(DeviceState *d)
+     s->regs[R_DDRIOB + 12] =3D 0x00000021;
  }
 =20
-diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
-index 62e0ef8fa5..bea4582f33 100644
---- a/hw/intc/spapr_xive.c
-+++ b/hw/intc/spapr_xive.c
-@@ -1528,7 +1528,7 @@ static target_ulong h_int_reset(PowerPCCPU *cpu,
-         return H_PARAMETER;
-     }
-=20
--    device_reset(DEVICE(xive));
-+    device_legacy_reset(DEVICE(xive));
-=20
-     if (kvm_irqchip_in_kernel()) {
-         Error *local_err =3D NULL;
-diff --git a/hw/ppc/pnv_psi.c b/hw/ppc/pnv_psi.c
-index 5345c8389e..d79c8c62be 100644
---- a/hw/ppc/pnv_psi.c
-+++ b/hw/ppc/pnv_psi.c
-@@ -702,7 +702,7 @@ static void pnv_psi_p9_mmio_write(void *opaque, hwadd=
-r addr,
-         break;
-     case PSIHB9_INTERRUPT_CONTROL:
-         if (val & PSIHB9_IRQ_RESET) {
--            device_reset(DEVICE(&psi9->source));
-+            device_legacy_reset(DEVICE(&psi9->source));
-         }
-         psi->regs[reg] =3D val;
-         break;
-diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
-index 97961b0128..d89290ac28 100644
---- a/hw/ppc/spapr_pci.c
-+++ b/hw/ppc/spapr_pci.c
-@@ -1858,7 +1858,7 @@ static int spapr_phb_children_reset(Object *child, =
-void *opaque)
-     DeviceState *dev =3D (DeviceState *) object_dynamic_cast(child, TYPE=
-_DEVICE);
-=20
-     if (dev) {
--        device_reset(dev);
-+        device_legacy_reset(dev);
-     }
-=20
-     return 0;
-diff --git a/hw/ppc/spapr_vio.c b/hw/ppc/spapr_vio.c
-index 583c13deda..5a0b5cc35c 100644
---- a/hw/ppc/spapr_vio.c
-+++ b/hw/ppc/spapr_vio.c
-@@ -306,7 +306,7 @@ int spapr_vio_send_crq(SpaprVioDevice *dev, uint8_t *=
-crq)
- static void spapr_vio_quiesce_one(SpaprVioDevice *dev)
+-
+ static bool zynq_slcr_check_offset(hwaddr offset, bool rnw)
  {
-     if (dev->tcet) {
--        device_reset(DEVICE(dev->tcet));
-+        device_legacy_reset(DEVICE(dev->tcet));
-     }
-     free_crq(dev);
- }
-diff --git a/hw/s390x/s390-pci-inst.c b/hw/s390x/s390-pci-inst.c
-index be2896232d..d532597566 100644
---- a/hw/s390x/s390-pci-inst.c
-+++ b/hw/s390x/s390-pci-inst.c
-@@ -243,7 +243,7 @@ int clp_service_call(S390CPU *cpu, uint8_t r2, uintpt=
-r_t ra)
-                 stw_p(&ressetpci->hdr.rsp, CLP_RC_SETPCIFN_FHOP);
-                 goto out;
-             }
--            device_reset(DEVICE(pbdev));
-+            device_legacy_reset(DEVICE(pbdev));
-             pbdev->fh &=3D ~FH_MASK_ENABLE;
-             pbdev->state =3D ZPCI_FS_DISABLED;
-             stl_p(&ressetpci->fh, pbdev->fh);
-diff --git a/hw/scsi/vmw_pvscsi.c b/hw/scsi/vmw_pvscsi.c
-index 584b4be07e..7ad3d05b9b 100644
---- a/hw/scsi/vmw_pvscsi.c
-+++ b/hw/scsi/vmw_pvscsi.c
-@@ -834,7 +834,7 @@ pvscsi_on_cmd_reset_device(PVSCSIState *s)
+     switch (offset) {
+@@ -346,6 +361,10 @@ static uint64_t zynq_slcr_read(void *opaque, hwaddr =
+offset,
+     offset /=3D 4;
+     uint32_t ret =3D s->regs[offset];
 =20
-     if (sdev !=3D NULL) {
-         s->resetting++;
--        device_reset(&sdev->qdev);
-+        device_legacy_reset(&sdev->qdev);
-         s->resetting--;
-         return PVSCSI_COMMAND_PROCESSING_SUCCEEDED;
-     }
-diff --git a/hw/sd/omap_mmc.c b/hw/sd/omap_mmc.c
-index d0c98ca021..24a1edc149 100644
---- a/hw/sd/omap_mmc.c
-+++ b/hw/sd/omap_mmc.c
-@@ -317,7 +317,7 @@ void omap_mmc_reset(struct omap_mmc_s *host)
-      * into any bus, and we must reset it manually. When omap_mmc is
-      * QOMified this must move into the QOM reset function.
-      */
--    device_reset(DEVICE(host->card));
-+    device_legacy_reset(DEVICE(host->card));
- }
++    if (device_is_resetting((DeviceState *) opaque)) {
++        return 0;
++    }
++
+     if (!zynq_slcr_check_offset(offset, true)) {
+         qemu_log_mask(LOG_GUEST_ERROR, "zynq_slcr: Invalid read access t=
+o "
+                       " addr %" HWADDR_PRIx "\n", offset * 4);
+@@ -361,6 +380,10 @@ static void zynq_slcr_write(void *opaque, hwaddr off=
+set,
+     ZynqSLCRState *s =3D (ZynqSLCRState *)opaque;
+     offset /=3D 4;
 =20
- static uint64_t omap_mmc_read(void *opaque, hwaddr offset,
-diff --git a/hw/sd/pl181.c b/hw/sd/pl181.c
-index 3ad7e925c5..03f859ec33 100644
---- a/hw/sd/pl181.c
-+++ b/hw/sd/pl181.c
-@@ -479,7 +479,7 @@ static void pl181_reset(DeviceState *d)
-     /* Since we're still using the legacy SD API the card is not plugged
-      * into any bus, and we must reset it manually.
-      */
--    device_reset(DEVICE(s->card));
-+    device_legacy_reset(DEVICE(s->card));
++    if (device_is_resetting((DeviceState *) opaque)) {
++        return;
++    }
++
+     DB_PRINT("addr: %08" HWADDR_PRIx " data: %08" PRIx64 "\n", offset * =
+4, val);
+=20
+     if (!zynq_slcr_check_offset(offset, false)) {
+@@ -439,9 +462,16 @@ static const VMStateDescription vmstate_zynq_slcr =3D=
+ {
+ static void zynq_slcr_class_init(ObjectClass *klass, void *data)
+ {
+     DeviceClass *dc =3D DEVICE_CLASS(klass);
++    ResettableClass *rc =3D RESETTABLE_CLASS(klass);
++    ZynqSLCRClass *zc =3D ZYNQ_SLCR_CLASS(klass);
+=20
+     dc->vmsd =3D &vmstate_zynq_slcr;
+-    dc->reset =3D zynq_slcr_reset;
++
++    resettable_class_set_parent_reset_phases(rc,
++                                             zynq_slcr_reset_init,
++                                             NULL,
++                                             NULL,
++                                             &zc->parent_reset_phases);
  }
 =20
- static void pl181_init(Object *obj)
+ static const TypeInfo zynq_slcr_info =3D {
+@@ -450,6 +480,7 @@ static const TypeInfo zynq_slcr_info =3D {
+     .parent =3D TYPE_SYS_BUS_DEVICE,
+     .instance_size  =3D sizeof(ZynqSLCRState),
+     .instance_init =3D zynq_slcr_init,
++    .class_size =3D sizeof(ZynqSLCRClass),
+ };
+=20
+ static void zynq_slcr_register_types(void)
 --=20
 2.21.0
 
