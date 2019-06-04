@@ -4,76 +4,66 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 30E7FC282CE
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 17:02:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6FE5C282CE
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 17:07:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 09AA423CB9
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 17:02:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 09AA423CB9
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 7DD0523CA1
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 17:07:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7DD0523CA1
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:55536 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:55602 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hYCp7-0003tS-A3
-	for qemu-devel@archiver.kernel.org; Tue, 04 Jun 2019 13:02:09 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:51330)
+	id 1hYCu8-0005LZ-Js
+	for qemu-devel@archiver.kernel.org; Tue, 04 Jun 2019 13:07:20 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:52489)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1hYCng-0003DI-RB
-	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 13:00:42 -0400
+	(envelope-from <kenneth.heitke@intel.com>) id 1hYCt7-0004u3-J9
+	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 13:06:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1hYCnf-0000vy-2d
-	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 13:00:40 -0400
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:42028)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hYCne-0000sf-SF
-	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 13:00:39 -0400
-Received: by mail-wr1-f65.google.com with SMTP id o12so9499644wrj.9
-	for <qemu-devel@nongnu.org>; Tue, 04 Jun 2019 10:00:38 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-	:user-agent:mime-version:in-reply-to:content-language
-	:content-transfer-encoding;
-	bh=riT6wEPLQ4KsZpojwzOKkZqvOV48mi/3Dou4pUvlc9w=;
-	b=rO2zmYmyCrMoqvn5R3fxTZL0PDSNHCE5u/2hftTMxxPzRELLjcA7Fpycwm77e56GQC
-	AreZvQj3HdsxDAqG3PXBcgVz/+aqwv/r/0hYKyCaW7+1QnsjcJivSrZzXs+RZ45K/Pxy
-	QIAv5TxMtbpZU56kLIWDNiQkugv4+HcpTMeojF0TmV0Xi647K1cPn77txFO7kEx2Glw9
-	eXDmkhS2twO7P27XG7dWYgPHF7+PUyBsFZ9U/Xv10dgmIDnfwAnEJNErcsdXsmz7Kndr
-	Wxw5ZRK6vHy9cjcm831GMW9zKiXLiIJcV/NafkCYdBC87psQwpCGs3LOaA3GY4MBuvgp
-	H3yA==
-X-Gm-Message-State: APjAAAWYARqGqfCUezHgrnkSXijTbE/IGapArCOr76a66xK7YAYNA5+y
-	bqNdaWss0B66kmMAWT6cq8/sSA==
-X-Google-Smtp-Source: APXvYqzICAVp6DhymatU3IrL4xvoXhOaS3p2RhSewcASAJYZDycpiY3vNJw2QBYIzbBrx3vwke4Xpg==
-X-Received: by 2002:adf:ef48:: with SMTP id c8mr3496934wrp.352.1559667637449; 
-	Tue, 04 Jun 2019 10:00:37 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:657f:501:149f:5617?
-	([2001:b07:6468:f312:657f:501:149f:5617])
-	by smtp.gmail.com with ESMTPSA id
-	u11sm12507046wrn.1.2019.06.04.10.00.36
-	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-	Tue, 04 Jun 2019 10:00:36 -0700 (PDT)
-To: Wanpeng Li <kernellwp@gmail.com>, qemu-devel@nongnu.org,
-	kvm@vger.kernel.org
-References: <1558419467-7155-1-git-send-email-wanpengli@tencent.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <7bca9a01-4450-df89-ac26-6b5fee103cbd@redhat.com>
-Date: Tue, 4 Jun 2019 19:00:36 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	(envelope-from <kenneth.heitke@intel.com>) id 1hYCt6-0002oF-Hu
+	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 13:06:17 -0400
+Received: from mga05.intel.com ([192.55.52.43]:39868)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kenneth.heitke@intel.com>)
+	id 1hYCt6-0002Qe-73; Tue, 04 Jun 2019 13:06:16 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+	by fmsmga105.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+	04 Jun 2019 10:06:07 -0700
+Received: from unknown (HELO [10.232.112.171]) ([10.232.112.171])
+	by orsmga008-auth.jf.intel.com with ESMTP/TLS/AES256-SHA;
+	04 Jun 2019 10:06:06 -0700
+To: Kevin Wolf <kwolf@redhat.com>, mreitz@redhat.com, keith.busch@intel.com,
+	qemu-block@nongnu.org, philmd@redhat.com, qemu-devel@nongnu.org
+References: <20190520174030.1647-1-kenneth.heitke@intel.com>
+	<20190528061836.GB32236@apples.localdomain>
+	<20190603111409.GD6523@linux.fritz.box>
+	<a58ef975-78f2-9c5c-35c2-b2dd359a4c03@intel.com>
+	<20190604082828.GA11013@apples.localdomain>
+	<20190604084645.GB14925@linux.fritz.box>
+	<20190604091358.GB11013@apples.localdomain>
+From: "Heitke, Kenneth" <kenneth.heitke@intel.com>
+Message-ID: <6eecf534-edaa-6763-c91a-8b159313a493@intel.com>
+Date: Tue, 4 Jun 2019 11:06:05 -0600
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+	Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <1558419467-7155-1-git-send-email-wanpengli@tencent.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20190604091358.GB11013@apples.localdomain>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-	[fuzzy]
-X-Received-From: 209.85.221.65
-Subject: Re: [Qemu-devel] [PATCH] kvm: support guest access CORE cstate
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 192.55.52.43
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v2] nvme: add Get/Set Feature
+ Timestamp support
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -85,66 +75,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>,
-	=?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 21/05/19 08:17, Wanpeng Li wrote:
-> From: Wanpeng Li <wanpengli@tencent.com>
+
+
+On 6/4/2019 3:13 AM, Klaus Birkelund wrote:
+> On Tue, Jun 04, 2019 at 10:46:45AM +0200, Kevin Wolf wrote:
+>> Am 04.06.2019 um 10:28 hat Klaus Birkelund geschrieben:
+>>> On Mon, Jun 03, 2019 at 09:30:53AM -0600, Heitke, Kenneth wrote:
+>>>>
+>>>>
+>>>> On 6/3/2019 5:14 AM, Kevin Wolf wrote:
+>>>>> Am 28.05.2019 um 08:18 hat Klaus Birkelund geschrieben:
+>>>>>> On Mon, May 20, 2019 at 11:40:30AM -0600, Kenneth Heitke wrote:
+>>>>>>> Signed-off-by: Kenneth Heitke <kenneth.heitke@intel.com>
+>>>>>
+>>>>>>> diff --git a/hw/block/nvme.h b/hw/block/nvme.h
+>>>>>>> index 56c9d4b4b1..d7277e72b7 100644
+>>>>>>> --- a/hw/block/nvme.h
+>>>>>>> +++ b/hw/block/nvme.h
+>>>>>>> @@ -69,6 +69,7 @@ typedef struct NvmeCtrl {
+>>>>>>>        uint16_t    max_prp_ents;
+>>>>>>>        uint16_t    cqe_size;
+>>>>>>>        uint16_t    sqe_size;
+>>>>>>> +    uint16_t    oncs;
+>>>>>>
+>>>>>> Looks like this unused member snuck its way into the patch. But I see no
+>>>>>> harm in it being there.
+>>>>>
+>>>>> Good catch. I'll just remove it again from my branch.
+>>>>>
+>>>>>>> +static inline void nvme_set_timestamp(NvmeCtrl *n, uint64_t ts)
+>>>>>>> +{
+>>>>>>> +    trace_nvme_setfeat_timestamp(ts);
+>>>>>>> +
+>>>>>>> +    n->host_timestamp = le64_to_cpu(ts);
+>>>>>>> +    n->timestamp_set_qemu_clock_ms = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
+>>>>>>> +}
+>>>>>>> +
+>>>>>>> +static inline uint64_t nvme_get_timestamp(const NvmeCtrl *n)
+>>>>>>> +{
+>>>>>>> +    uint64_t current_time = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
+>>>>>
+>>>>> Here I wonder why we use QEMU_CLOCK_REALTIME in a device emulation.
+>>>>> Wouldn't QEMU_CLOCK_VIRTUAL make more sense?
+>>>>>
+>>>>
+>>>> QEMU_CLOCK_VIRTUAL probably would make more sense. When I was reading
+>>>> through the differences I wasn't really sure what to pick. iven that this is
+>>>> the time within the device's context, the virtual time seems more correct.
+>>>>
+>>>   
+>>> I thought about this too when I reviewed, but came to the conclusion
+>>> that REALTIME was correct. The timestamp is basically a value that the
+>>> host stores in the controller. When the host uses Get Features to get
+>>> the the current time it would expect it to match the progression for its
+>>> own wall clockright? If I understand REALTIME vs VIRTUAL correctly,
+>>> using VIRTUAL, it would go way out of sync.
+>>
+>> Which two things would go out of sync with VIRTUAL?
+>>
+>> Not an expert on clocks myself, but I think the main question is what
+>> happens to the clock while the VM is stopped. REALTIME continues running
+>> where as VIRTUAL is stopped. If we expose REALTIME measurements to the
+>> guest, the time passed may look a lot longer than what the guest's clock
+>> actually says. So this is the thing I am worried would go out of sync
+>> with REALTIME.
+>>
 > 
-> Allow guest reads CORE cstate when exposing host CPU power management capabilities 
-> to the guest. PKG cstate is restricted to avoid a guest to get the whole package 
-> information in multi-tenant scenario.
+> OK, fair point.
 > 
-> Cc: Eduardo Habkost <ehabkost@redhat.com>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: Radim Krčmář <rkrcmar@redhat.com>
-> Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
-> ---
->  linux-headers/linux/kvm.h | 4 +++-
->  target/i386/kvm.c         | 3 ++-
->  2 files changed, 5 insertions(+), 2 deletions(-)
+> Thinking about this some more, I agree that VIRTUAL is more correct. An
+> application should never track elapsed time using real wall clock time,
+> but some monotonic clock that is oblivious to say NTP adjustments.
 > 
-> diff --git a/linux-headers/linux/kvm.h b/linux-headers/linux/kvm.h
-> index b53ee59..d648fde 100644
-> --- a/linux-headers/linux/kvm.h
-> +++ b/linux-headers/linux/kvm.h
-> @@ -696,9 +696,11 @@ struct kvm_ioeventfd {
->  #define KVM_X86_DISABLE_EXITS_MWAIT          (1 << 0)
->  #define KVM_X86_DISABLE_EXITS_HLT            (1 << 1)
->  #define KVM_X86_DISABLE_EXITS_PAUSE          (1 << 2)
-> +#define KVM_X86_DISABLE_EXITS_CSTATE         (1 << 3)
->  #define KVM_X86_DISABLE_VALID_EXITS          (KVM_X86_DISABLE_EXITS_MWAIT | \
->                                                KVM_X86_DISABLE_EXITS_HLT | \
-> -                                              KVM_X86_DISABLE_EXITS_PAUSE)
-> +                                              KVM_X86_DISABLE_EXITS_PAUSE | \
-> +                                              KVM_X86_DISABLE_EXITS_CSTATE)
->  
->  /* for KVM_ENABLE_CAP */
->  struct kvm_enable_cap {
-> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-> index 3b29ce5..49a0cc1 100644
-> --- a/target/i386/kvm.c
-> +++ b/target/i386/kvm.c
-> @@ -1645,7 +1645,8 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
->          if (disable_exits) {
->              disable_exits &= (KVM_X86_DISABLE_EXITS_MWAIT |
->                                KVM_X86_DISABLE_EXITS_HLT |
-> -                              KVM_X86_DISABLE_EXITS_PAUSE);
-> +                              KVM_X86_DISABLE_EXITS_PAUSE |
-> +                              KVM_X86_DISABLE_EXITS_CSTATE);
->          }
->  
->          ret = kvm_vm_enable_cap(s, KVM_CAP_X86_DISABLE_EXITS, 0,
+> Klaus
 > 
 
-Hi,
+Kevin, would you like me to update the patch to reflect this change or 
+will you make the change directly?
 
-instead of this, with the new design I've proposed QEMU will have to
-save/restore the MSRs, but otherwise no change is needed to
-kvm_arch_init and to the KVM headers.
-
-Paolo
+thanks,
+Ken
 
