@@ -2,79 +2,78 @@ Return-Path: <SRS0=GUf1=UD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1ACF6C282CE
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 17:01:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 30E7FC282CE
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 17:02:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DA9D323CB9
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 17:01:46 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="BRgJythS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DA9D323CB9
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 09AA423CB9
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 17:02:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 09AA423CB9
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:55534 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:55536 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hYCok-0003dG-1L
-	for qemu-devel@archiver.kernel.org; Tue, 04 Jun 2019 13:01:46 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:51277)
+	id 1hYCp7-0003tS-A3
+	for qemu-devel@archiver.kernel.org; Tue, 04 Jun 2019 13:02:09 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:51330)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hYCnR-000342-77
-	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 13:00:26 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1hYCng-0003DI-RB
+	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 13:00:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hYCnQ-0008TK-1R
-	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 13:00:25 -0400
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:40833)
+	(envelope-from <pbonzini@redhat.com>) id 1hYCnf-0000vy-2d
+	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 13:00:40 -0400
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:42028)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hYCnP-0008PM-R2
-	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 13:00:23 -0400
-Received: by mail-ot1-x342.google.com with SMTP id u11so20205895otq.7
-	for <qemu-devel@nongnu.org>; Tue, 04 Jun 2019 10:00:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-	:cc; bh=evoANUUn+ebYEBACzBsc9xs3u/EbBchLyljVWn/+VK8=;
-	b=BRgJythSyo4X/U0K1jA2MhhCdD8/OntUOhRuN3gMuqhkL9uv9Pp8f2Bv+8c8/qvXts
-	mdIEpbJciYhMJQ5MPwDMykIg6ZvOelDXoyDYYYs1TZYbRNl2nW+Jo3e0qvYiF+5QL7Lv
-	J3oEfzieklCW/7js6xSigzrqgWyMf6Hkbwxga9vi//dvvI9JKNIgU3jUgdwy+ZF+ldua
-	VC0qPzVQBW/wurrlwW2hTazDx4mnQZwvc2eYLUHA/EKBk4TIUJpdNBcetNd9drNDiP/i
-	gh9zPZTC1HjzGNj23vPqS/if5f+QddNb1zEYV8ImKAu5l636C5RDRAfL8ZEjqm40Zqu0
-	ONpg==
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hYCne-0000sf-SF
+	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 13:00:39 -0400
+Received: by mail-wr1-f65.google.com with SMTP id o12so9499644wrj.9
+	for <qemu-devel@nongnu.org>; Tue, 04 Jun 2019 10:00:38 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-	:message-id:subject:to:cc;
-	bh=evoANUUn+ebYEBACzBsc9xs3u/EbBchLyljVWn/+VK8=;
-	b=EOdjxfEpA801Kb+RuWiLRxl97rrVQWl95WIXqttPLdRbiDCJBCl6rIfBojmD/mwQ7r
-	q9YMgxjp0cJhs7Oio9RG0AjxZSR9aEDQi2twhzPB5sj2o1QFQ/87CdS4ytw48ppiPGh1
-	0c4WPQKzVIp6a7OBtWH642ok4ItFkveY6IvTN/Lc7H2FMsPiH+VvohQeg/QrXfQgyQNt
-	FKb/WVcQOZhOmNXVSrsvu+0y0CtGACuHwoqWQ+cluJGbFKaLc//k5xpD61KrSajp1+RO
-	sLI/FtPHwu5sAWH4ERjh975jVg6M3Jrw9b2Qxz2P9h7QyZww1MDPW3St49qGBau/c727
-	HCrA==
-X-Gm-Message-State: APjAAAX+Ct0zPFVyzGwC8bx2lqFVXQJoFZ7LjAqEKja/EgFjxLshbbT+
-	ojXbxNe5qJiwGe4c3DRzku/PHj0++MCHbwiM1nCFag==
-X-Google-Smtp-Source: APXvYqyq/e6iFngj3ipOE9rqDooukjZZ+7x1t3KenUc8/H8M4EW+SxrLLxQ1fzgAtBaoblDKcI5WnZCCy5GUdUZ7oEM=
-X-Received: by 2002:a9d:d17:: with SMTP id 23mr5720514oti.221.1559667622887;
-	Tue, 04 Jun 2019 10:00:22 -0700 (PDT)
+	h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+	:user-agent:mime-version:in-reply-to:content-language
+	:content-transfer-encoding;
+	bh=riT6wEPLQ4KsZpojwzOKkZqvOV48mi/3Dou4pUvlc9w=;
+	b=rO2zmYmyCrMoqvn5R3fxTZL0PDSNHCE5u/2hftTMxxPzRELLjcA7Fpycwm77e56GQC
+	AreZvQj3HdsxDAqG3PXBcgVz/+aqwv/r/0hYKyCaW7+1QnsjcJivSrZzXs+RZ45K/Pxy
+	QIAv5TxMtbpZU56kLIWDNiQkugv4+HcpTMeojF0TmV0Xi647K1cPn77txFO7kEx2Glw9
+	eXDmkhS2twO7P27XG7dWYgPHF7+PUyBsFZ9U/Xv10dgmIDnfwAnEJNErcsdXsmz7Kndr
+	Wxw5ZRK6vHy9cjcm831GMW9zKiXLiIJcV/NafkCYdBC87psQwpCGs3LOaA3GY4MBuvgp
+	H3yA==
+X-Gm-Message-State: APjAAAWYARqGqfCUezHgrnkSXijTbE/IGapArCOr76a66xK7YAYNA5+y
+	bqNdaWss0B66kmMAWT6cq8/sSA==
+X-Google-Smtp-Source: APXvYqzICAVp6DhymatU3IrL4xvoXhOaS3p2RhSewcASAJYZDycpiY3vNJw2QBYIzbBrx3vwke4Xpg==
+X-Received: by 2002:adf:ef48:: with SMTP id c8mr3496934wrp.352.1559667637449; 
+	Tue, 04 Jun 2019 10:00:37 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:657f:501:149f:5617?
+	([2001:b07:6468:f312:657f:501:149f:5617])
+	by smtp.gmail.com with ESMTPSA id
+	u11sm12507046wrn.1.2019.06.04.10.00.36
+	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+	Tue, 04 Jun 2019 10:00:36 -0700 (PDT)
+To: Wanpeng Li <kernellwp@gmail.com>, qemu-devel@nongnu.org,
+	kvm@vger.kernel.org
+References: <1558419467-7155-1-git-send-email-wanpengli@tencent.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <7bca9a01-4450-df89-ac26-6b5fee103cbd@redhat.com>
+Date: Tue, 4 Jun 2019 19:00:36 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-References: <20190604161430.32105-1-kwolf@redhat.com>
-In-Reply-To: <20190604161430.32105-1-kwolf@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 4 Jun 2019 18:00:11 +0100
-Message-ID: <CAFEAcA_jec5tVqOVkV=GyFS565YnXA7XV0Rww0HkUtVGHP=vew@mail.gmail.com>
-To: Kevin Wolf <kwolf@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::342
-Subject: Re: [Qemu-devel] [PULL v2 00/29] Block layer patches
+In-Reply-To: <1558419467-7155-1-git-send-email-wanpengli@tencent.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+	[fuzzy]
+X-Received-From: 209.85.221.65
+Subject: Re: [Qemu-devel] [PATCH] kvm: support guest access CORE cstate
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -86,42 +85,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Qemu-block <qemu-block@nongnu.org>
+Cc: Eduardo Habkost <ehabkost@redhat.com>,
+	=?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 4 Jun 2019 at 17:14, Kevin Wolf <kwolf@redhat.com> wrote:
->
-> The following changes since commit e2a58ff493a2e00db3e963c1839c5374500110f2:
->
->   Merge remote-tracking branch 'remotes/bonzini/tags/for-upstream' into staging (2019-06-03 18:26:21 +0100)
->
-> are available in the Git repository at:
->
->   git://repo.or.cz/qemu/kevin.git tags/for-upstream
->
-> for you to fetch changes up to 11ba81c3cde0bc070cced6e8ef2835fab4fe90c8:
->
->   iotests: Fix duplicated diff output on failure (2019-06-04 16:55:58 +0200)
->
-> ----------------------------------------------------------------
-> Block layer patches:
->
-> - block: AioContext management, part 2
-> - Avoid recursive block_status call (i.e. lseek() calls) if possible
-> - linux-aio: Drop unused BlockAIOCB submission method
-> - nvme: add Get/Set Feature Timestamp support
-> - Fix crash on commit job start with active I/O on base node
-> - Fix crash in bdrv_drained_end
-> - Fix integer overflow in qcow2 discard
->
-> ----------------------------------------------------------------
+On 21/05/19 08:17, Wanpeng Li wrote:
+> From: Wanpeng Li <wanpengli@tencent.com>
+> 
+> Allow guest reads CORE cstate when exposing host CPU power management capabilities 
+> to the guest. PKG cstate is restricted to avoid a guest to get the whole package 
+> information in multi-tenant scenario.
+> 
+> Cc: Eduardo Habkost <ehabkost@redhat.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Radim Krčmář <rkrcmar@redhat.com>
+> Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
+> ---
+>  linux-headers/linux/kvm.h | 4 +++-
+>  target/i386/kvm.c         | 3 ++-
+>  2 files changed, 5 insertions(+), 2 deletions(-)
+> 
+> diff --git a/linux-headers/linux/kvm.h b/linux-headers/linux/kvm.h
+> index b53ee59..d648fde 100644
+> --- a/linux-headers/linux/kvm.h
+> +++ b/linux-headers/linux/kvm.h
+> @@ -696,9 +696,11 @@ struct kvm_ioeventfd {
+>  #define KVM_X86_DISABLE_EXITS_MWAIT          (1 << 0)
+>  #define KVM_X86_DISABLE_EXITS_HLT            (1 << 1)
+>  #define KVM_X86_DISABLE_EXITS_PAUSE          (1 << 2)
+> +#define KVM_X86_DISABLE_EXITS_CSTATE         (1 << 3)
+>  #define KVM_X86_DISABLE_VALID_EXITS          (KVM_X86_DISABLE_EXITS_MWAIT | \
+>                                                KVM_X86_DISABLE_EXITS_HLT | \
+> -                                              KVM_X86_DISABLE_EXITS_PAUSE)
+> +                                              KVM_X86_DISABLE_EXITS_PAUSE | \
+> +                                              KVM_X86_DISABLE_EXITS_CSTATE)
+>  
+>  /* for KVM_ENABLE_CAP */
+>  struct kvm_enable_cap {
+> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+> index 3b29ce5..49a0cc1 100644
+> --- a/target/i386/kvm.c
+> +++ b/target/i386/kvm.c
+> @@ -1645,7 +1645,8 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
+>          if (disable_exits) {
+>              disable_exits &= (KVM_X86_DISABLE_EXITS_MWAIT |
+>                                KVM_X86_DISABLE_EXITS_HLT |
+> -                              KVM_X86_DISABLE_EXITS_PAUSE);
+> +                              KVM_X86_DISABLE_EXITS_PAUSE |
+> +                              KVM_X86_DISABLE_EXITS_CSTATE);
+>          }
+>  
+>          ret = kvm_vm_enable_cap(s, KVM_CAP_X86_DISABLE_EXITS, 0,
+> 
 
-Applied, thanks.
+Hi,
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/4.1
-for any user-visible changes.
+instead of this, with the new design I've proposed QEMU will have to
+save/restore the MSRs, but otherwise no change is needed to
+kvm_arch_init and to the KVM headers.
 
--- PMM
+Paolo
 
