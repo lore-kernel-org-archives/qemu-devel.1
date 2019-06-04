@@ -7,79 +7,83 @@ X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 373ACC282CE
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 20:50:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D47EFC282CE
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 20:51:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DADB6207E0
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 20:50:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 80712207E0
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 20:51:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ilQIYcm2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DADB6207E0
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="uB5mTd9H"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 80712207E0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:57799 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:57833 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hYGO5-00068A-3I
-	for qemu-devel@archiver.kernel.org; Tue, 04 Jun 2019 16:50:29 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:35923)
+	id 1hYGOu-0006lp-M3
+	for qemu-devel@archiver.kernel.org; Tue, 04 Jun 2019 16:51:20 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:35661)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hYG8j-0001QB-P7
-	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 16:34:40 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hYG8P-00014e-VN
+	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 16:34:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hYG8h-0004Xx-7S
-	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 16:34:37 -0400
-Received: from mail-oi1-x236.google.com ([2607:f8b0:4864:20::236]:44830)
+	(envelope-from <richard.henderson@linaro.org>) id 1hYG8N-0004Bf-2d
+	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 16:34:17 -0400
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:37335)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hYG8h-0004Ww-0y
-	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 16:34:35 -0400
-Received: by mail-oi1-x236.google.com with SMTP id e189so9884351oib.11
-	for <qemu-devel@nongnu.org>; Tue, 04 Jun 2019 13:34:34 -0700 (PDT)
+	id 1hYG8M-0004B0-RU
+	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 16:34:15 -0400
+Received: by mail-ot1-x344.google.com with SMTP id r10so20879844otd.4
+	for <qemu-devel@nongnu.org>; Tue, 04 Jun 2019 13:34:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=from:to:subject:date:message-id:in-reply-to:references;
-	bh=fq9eJodKPUjXUT0wTPDnO6cE+6R1a7GOx1eVKOsBlxY=;
-	b=ilQIYcm2yk7zoCDMAYupCk6ER8FvIarTGiPDbuBBgEVGizz4l5RMgp1wN78awgeAGb
-	ltOVWuDOyK742fYuKde7GOwKqzHIzWat89VuqyoKeJEngd6rxm4xdm9WuFvYm23uxn4x
-	IRfBEi1k/yaJwAXUk4exXnbAT+wqNm+c7AfQtl5bMl59HHyRi1TznYFOc4G8Zt2teHCp
-	I1oeWwJNfu0SnhVJuQvJ1o0BkBgTOSKk2RG6g5owYEVj513c0Hufs4AIy2kDPwfLOmom
-	OZTDx2FomKU8P2owcvNJboSbAugAq6SE5ALkHFEtaiXzxQyro4alDz8v+XT+cirt9nqn
-	BoDw==
+	h=from:to:subject:date:message-id:in-reply-to:references:mime-version
+	:content-transfer-encoding;
+	bh=p0tev9WgodjF1CThft5mVtLhk9/A+qxKvGcT8DHulyI=;
+	b=uB5mTd9HfW193BTpbYcv7jISo/XMoXP+78954B42EqBXMadC4pH0o3YHguyjLVLaTa
+	aguqXHmgAMZArWWQKuJYYcvvikK9KYFLR2691+bs/tgM3O+EzxCmy/hrchhMnfPuGOIY
+	rk9apBxp7HUHBXqbMPyD7i1RrWOtjlpVImZpj5f+m+QaP/vh2nF7D9wqhxqxj5zxWyCc
+	ICrDXJwImS/dM8/NmmClLAuZWbR95GfQo6dCuyDHgELHat3pgOT1y7fy2fyxJwK313Jy
+	4omRNCEfMmW/aacisVHMuUEtquXbrtJCsisE6i5gtZx3mpuxSbI54VXx9tGHKhrENO2L
+	tLmw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
-	:references;
-	bh=fq9eJodKPUjXUT0wTPDnO6cE+6R1a7GOx1eVKOsBlxY=;
-	b=YL0lVzjVOM3b4tMUSilaxxUYtGBhCqPBwFTs6BHS9xeabZbONg6RSueSwGnapOesTA
-	p2tCNiB9BvXEFA9iEFXptkEoejJ3t4q3c5lyGh80kO7u/FqMOgly4E2hqCtfnH4aQB+T
-	aYMyDWY2ylgcscd6/zgCALeKtJrKzLaLOD5r5Wi0ywF4RLmUj6MbFE7w+hcYhh0KHcai
-	iBds91nlo/7XZ4OEjvOJXI0Nh2p0F0ekbRUEqJhEY+hRiq3Hbt5eNiNGmf/UhmGcsj2x
-	bUW7s2O1rsZS9xDkQxGNoLRqAAsjM+ZKIqQZv9GGi3B5qxcCHulT929frMCaYc891+JA
-	Vcow==
-X-Gm-Message-State: APjAAAX9xvyHyWof0itiuz5dBWRHBbn3Jzm74exRXqdH0SsPtBJDje/d
-	LUrn0+3NkKIG1dz9xsWzOG/ELUi5wazdsg==
-X-Google-Smtp-Source: APXvYqxEAvLZmS4fk41s9Mrl5Xo7VQWcUGi/Xb8a5yTKUKw+RNRwUeLa7dBRE3gVRuASKGjNDKLxoA==
-X-Received: by 2002:aca:3fc6:: with SMTP id m189mr3476504oia.124.1559680473657;
-	Tue, 04 Jun 2019 13:34:33 -0700 (PDT)
+	:references:mime-version:content-transfer-encoding;
+	bh=p0tev9WgodjF1CThft5mVtLhk9/A+qxKvGcT8DHulyI=;
+	b=FsHJZOcwtLC0r8A6WckOZB95BvMSGa82OtaeePBBNc9AyI/MTfjJ+ruq3xgoP7Pwjp
+	P3r9vhxNNsTV3uR7DXbdvrUw2x0FV8cYdo6kopAcF3sbcY4snCrqOvtg/qZC14WleEpQ
+	y3dpFi4WFGQS0ew1wcjVtydpveZrFmIQCSW5Zti6rJzs9E+PXm5eW+1Qn2cFyziH9gSw
+	k86Z3bNf5i4rZM1tliFylYl06k1L3jGNI1iCoXDDCqZnHaGUgKeJ+c4Zn4AZoP2I9ycr
+	ZwyRjTKmt1L0JqyL9Jmg9FPqhRXhEcgEjdshxuBSKXWth4GDFYmRoU3q5CzdDLWGUBrG
+	MdMA==
+X-Gm-Message-State: APjAAAXbqtJSF3kXAPpEnYPvw3TO5yAR6TBEjYVC1Fl0o0Z5E/HghHox
+	J7M60hyR7WZhd7XDYHFbwosEIxB2IXNImw==
+X-Google-Smtp-Source: APXvYqwsqaLNmRGYY+gI0XHgIMeLHdu+xy2LUnc6Ums1WWRJCgOaiPyoc3MOOjz5YoITxuwoYkpEow==
+X-Received: by 2002:a9d:57c6:: with SMTP id q6mr26871oti.17.1559680453498;
+	Tue, 04 Jun 2019 13:34:13 -0700 (PDT)
 Received: from localhost.localdomain (200-56-192-86-cable.cybercable.net.mx.
 	[200.56.192.86])
-	by smtp.gmail.com with ESMTPSA id h1sm5979901otj.78.2019.06.04.13.34.32
+	by smtp.gmail.com with ESMTPSA id h1sm5979901otj.78.2019.06.04.13.34.11
 	for <qemu-devel@nongnu.org>
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Tue, 04 Jun 2019 13:34:32 -0700 (PDT)
+	Tue, 04 Jun 2019 13:34:12 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Tue,  4 Jun 2019 15:33:36 -0500
-Message-Id: <20190604203351.27778-25-richard.henderson@linaro.org>
+Date: Tue,  4 Jun 2019 15:33:23 -0500
+Message-Id: <20190604203351.27778-12-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190604203351.27778-1-richard.henderson@linaro.org>
 References: <20190604203351.27778-1-richard.henderson@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2607:f8b0:4864:20::236
-Subject: [Qemu-devel] [PATCH v4 24/39] target/s390x: Use env_cpu, env_archcpu
+X-Received-From: 2607:f8b0:4864:20::344
+Subject: [Qemu-devel] [PATCH v4 11/39] target/cris: Reindent op_helper.c
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -95,620 +99,969 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Cleanup in the boilerplate that each target must define.
-Replace s390_env_get_cpu with env_archcpu.  The combination
-CPU(s390_env_get_cpu) should have used ENV_GET_CPU to begin;
-use env_cpu now.
+Fix all of the coding style errors in this file at once.
 
 Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/s390x/cpu.h          |  5 ----
- linux-user/s390x/cpu_loop.c |  2 +-
- target/s390x/cc_helper.c    |  5 ++--
- target/s390x/diag.c         |  2 +-
- target/s390x/excp_helper.c  |  6 ++---
- target/s390x/fpu_helper.c   |  4 +--
- target/s390x/helper.c       |  7 +++---
- target/s390x/int_helper.c   |  3 +--
- target/s390x/interrupt.c    |  6 ++---
- target/s390x/mem_helper.c   | 28 ++++++++-------------
- target/s390x/misc_helper.c  | 50 ++++++++++++++++++-------------------
- target/s390x/mmu_helper.c   |  8 +++---
- target/s390x/sigp.c         |  4 +--
- 13 files changed, 56 insertions(+), 74 deletions(-)
+ target/cris/op_helper.c | 817 +++++++++++++++++++---------------------
+ 1 file changed, 398 insertions(+), 419 deletions(-)
 
-diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
-index 9cdd831a77..eefed6f509 100644
---- a/target/s390x/cpu.h
-+++ b/target/s390x/cpu.h
-@@ -163,11 +163,6 @@ struct S390CPU {
-     uint32_t irqstate_saved_size;
- };
- 
--static inline S390CPU *s390_env_get_cpu(CPUS390XState *env)
--{
--    return container_of(env, S390CPU, env);
--}
--
- #define ENV_OFFSET offsetof(S390CPU, env)
- 
- #ifndef CONFIG_USER_ONLY
-diff --git a/linux-user/s390x/cpu_loop.c b/linux-user/s390x/cpu_loop.c
-index b8bd1c956c..8211022ceb 100644
---- a/linux-user/s390x/cpu_loop.c
-+++ b/linux-user/s390x/cpu_loop.c
-@@ -26,7 +26,7 @@
- 
- void cpu_loop(CPUS390XState *env)
+diff --git a/target/cris/op_helper.c b/target/cris/op_helper.c
+index 26a395b413..e4c6942922 100644
+--- a/target/cris/op_helper.c
++++ b/target/cris/op_helper.c
+@@ -48,9 +48,10 @@ void helper_raise_exception(CPUCRISState *env, uint32_t index)
+ void helper_tlb_flush_pid(CPUCRISState *env, uint32_t pid)
  {
--    CPUState *cs = CPU(s390_env_get_cpu(env));
-+    CPUState *cs = env_cpu(env);
-     int trapnr, n, sig;
-     target_siginfo_t info;
-     target_ulong addr;
-diff --git a/target/s390x/cc_helper.c b/target/s390x/cc_helper.c
-index a00294f183..cf68792733 100644
---- a/target/s390x/cc_helper.c
-+++ b/target/s390x/cc_helper.c
-@@ -419,7 +419,6 @@ static uint32_t cc_calc_vc(uint64_t low, uint64_t high)
- static uint32_t do_calc_cc(CPUS390XState *env, uint32_t cc_op,
-                                   uint64_t src, uint64_t dst, uint64_t vr)
- {
--    S390CPU *cpu = s390_env_get_cpu(env);
-     uint32_t r = 0;
- 
-     switch (cc_op) {
-@@ -543,7 +542,7 @@ static uint32_t do_calc_cc(CPUS390XState *env, uint32_t cc_op,
-         break;
- 
-     default:
--        cpu_abort(CPU(cpu), "Unknown CC operation: %s\n", cc_name(cc_op));
-+        cpu_abort(env_cpu(env), "Unknown CC operation: %s\n", cc_name(cc_op));
-     }
- 
-     HELPER_LOG("%s: %15s 0x%016lx 0x%016lx 0x%016lx = %d\n", __func__,
-@@ -567,7 +566,7 @@ uint32_t HELPER(calc_cc)(CPUS390XState *env, uint32_t cc_op, uint64_t src,
- void HELPER(load_psw)(CPUS390XState *env, uint64_t mask, uint64_t addr)
- {
-     load_psw(env, mask, addr);
--    cpu_loop_exit(CPU(s390_env_get_cpu(env)));
-+    cpu_loop_exit(env_cpu(env));
- }
- 
- void HELPER(sacf)(CPUS390XState *env, uint64_t a1)
-diff --git a/target/s390x/diag.c b/target/s390x/diag.c
-index aafa740f61..65eabf0461 100644
---- a/target/s390x/diag.c
-+++ b/target/s390x/diag.c
-@@ -55,7 +55,7 @@ int handle_diag_288(CPUS390XState *env, uint64_t r1, uint64_t r3)
- 
- void handle_diag_308(CPUS390XState *env, uint64_t r1, uint64_t r3, uintptr_t ra)
- {
--    CPUState *cs = CPU(s390_env_get_cpu(env));
-+    CPUState *cs = env_cpu(env);
-     uint64_t addr =  env->regs[r1];
-     uint64_t subcode = env->regs[r3];
-     IplParameterBlock *iplb;
-diff --git a/target/s390x/excp_helper.c b/target/s390x/excp_helper.c
-index 3a467b72c5..b718760175 100644
---- a/target/s390x/excp_helper.c
-+++ b/target/s390x/excp_helper.c
-@@ -36,7 +36,7 @@
- void QEMU_NORETURN tcg_s390_program_interrupt(CPUS390XState *env, uint32_t code,
-                                               int ilen, uintptr_t ra)
- {
--    CPUState *cs = CPU(s390_env_get_cpu(env));
-+    CPUState *cs = env_cpu(env);
- 
-     cpu_restore_state(cs, ra, true);
-     qemu_log_mask(CPU_LOG_INT, "program interrupt at %#" PRIx64 "\n",
-@@ -51,7 +51,7 @@ void QEMU_NORETURN tcg_s390_data_exception(CPUS390XState *env, uint32_t dxc,
-     g_assert(dxc <= 0xff);
  #if !defined(CONFIG_USER_ONLY)
-     /* Store the DXC into the lowcore */
--    stl_phys(CPU(s390_env_get_cpu(env))->as,
-+    stl_phys(env_cpu(env)->as,
-              env->psa + offsetof(LowCore, data_exc_code), dxc);
+-	pid &= 0xff;
+-	if (pid != (env->pregs[PR_PID] & 0xff))
+-		cris_mmu_flush_pid(env, env->pregs[PR_PID]);
++    pid &= 0xff;
++    if (pid != (env->pregs[PR_PID] & 0xff)) {
++        cris_mmu_flush_pid(env, env->pregs[PR_PID]);
++    }
  #endif
- 
-@@ -282,7 +282,7 @@ static void do_svc_interrupt(CPUS390XState *env)
- static void do_ext_interrupt(CPUS390XState *env)
- {
-     QEMUS390FLICState *flic = QEMU_S390_FLIC(s390_get_flic());
--    S390CPU *cpu = s390_env_get_cpu(env);
-+    S390CPU *cpu = env_archcpu(env);
-     uint64_t mask, addr;
-     uint16_t cpu_addr;
-     LowCore *lowcore;
-diff --git a/target/s390x/fpu_helper.c b/target/s390x/fpu_helper.c
-index 1be68bafea..906fa8ce99 100644
---- a/target/s390x/fpu_helper.c
-+++ b/target/s390x/fpu_helper.c
-@@ -114,8 +114,6 @@ static void handle_exceptions(CPUS390XState *env, bool XxC, uintptr_t retaddr)
- 
- static inline int float_comp_to_cc(CPUS390XState *env, int float_compare)
- {
--    S390CPU *cpu = s390_env_get_cpu(env);
--
-     switch (float_compare) {
-     case float_relation_equal:
-         return 0;
-@@ -126,7 +124,7 @@ static inline int float_comp_to_cc(CPUS390XState *env, int float_compare)
-     case float_relation_unordered:
-         return 3;
-     default:
--        cpu_abort(CPU(cpu), "unknown return value for float compare\n");
-+        cpu_abort(env_cpu(env), "unknown return value for float compare\n");
-     }
  }
  
-diff --git a/target/s390x/helper.c b/target/s390x/helper.c
-index 3c8f0a7615..398c2874e0 100644
---- a/target/s390x/helper.c
-+++ b/target/s390x/helper.c
-@@ -111,11 +111,11 @@ void load_psw(CPUS390XState *env, uint64_t mask, uint64_t addr)
-     env->cc_op = (mask >> 44) & 3;
- 
-     if ((old_mask ^ mask) & PSW_MASK_PER) {
--        s390_cpu_recompute_watchpoints(CPU(s390_env_get_cpu(env)));
-+        s390_cpu_recompute_watchpoints(env_cpu(env));
-     }
- 
-     if (mask & PSW_MASK_WAIT) {
--        s390_handle_wait(s390_env_get_cpu(env));
-+        s390_handle_wait(env_archcpu(env));
-     }
+@@ -66,541 +67,519 @@ void helper_spc_write(CPUCRISState *env, uint32_t new_spc)
  }
  
-@@ -137,14 +137,13 @@ uint64_t get_psw_mask(CPUS390XState *env)
+ /* Used by the tlb decoder.  */
+-#define EXTRACT_FIELD(src, start, end) \
+-	    (((src) >> start) & ((1 << (end - start + 1)) - 1))
++#define EXTRACT_FIELD(src, start, end)                  \
++    (((src) >> start) & ((1 << (end - start + 1)) - 1))
  
- LowCore *cpu_map_lowcore(CPUS390XState *env)
+ void helper_movl_sreg_reg(CPUCRISState *env, uint32_t sreg, uint32_t reg)
  {
--    S390CPU *cpu = s390_env_get_cpu(env);
-     LowCore *lowcore;
-     hwaddr len = sizeof(LowCore);
- 
-     lowcore = cpu_physical_memory_map(env->psa, &len, 1);
- 
-     if (len < sizeof(LowCore)) {
--        cpu_abort(CPU(cpu), "Could not map lowcore\n");
-+        cpu_abort(env_cpu(env), "Could not map lowcore\n");
-     }
- 
-     return lowcore;
-diff --git a/target/s390x/int_helper.c b/target/s390x/int_helper.c
-index abbbc20d9c..d13cc49be6 100644
---- a/target/s390x/int_helper.c
-+++ b/target/s390x/int_helper.c
-@@ -109,10 +109,9 @@ uint64_t HELPER(divu64)(CPUS390XState *env, uint64_t ah, uint64_t al,
-             s390_program_interrupt(env, PGM_FIXPT_DIVIDE, ILEN_AUTO, GETPC());
-         }
- #else
--        S390CPU *cpu = s390_env_get_cpu(env);
-         /* 32-bit hosts would need special wrapper functionality - just abort if
-            we encounter such a case; it's very unlikely anyways. */
--        cpu_abort(CPU(cpu), "128 -> 64/64 division not implemented\n");
-+        cpu_abort(env_cpu(env), "128 -> 64/64 division not implemented\n");
+ #if !defined(CONFIG_USER_ONLY)
+     CRISCPU *cpu = cris_env_get_cpu(env);
  #endif
-     }
-     return ret;
-diff --git a/target/s390x/interrupt.c b/target/s390x/interrupt.c
-index a17eff5ebc..a8f9b38795 100644
---- a/target/s390x/interrupt.c
-+++ b/target/s390x/interrupt.c
-@@ -23,7 +23,7 @@
- /* Ensure to exit the TB after this call! */
- void trigger_pgm_exception(CPUS390XState *env, uint32_t code, uint32_t ilen)
- {
--    CPUState *cs = CPU(s390_env_get_cpu(env));
-+    CPUState *cs = env_cpu(env);
+-	uint32_t srs;
+-	srs = env->pregs[PR_SRS];
+-	srs &= 3;
+-	env->sregs[srs][sreg] = env->regs[reg];
++    uint32_t srs;
++    srs = env->pregs[PR_SRS];
++    srs &= 3;
++    env->sregs[srs][sreg] = env->regs[reg];
  
-     cs->exception_index = EXCP_PGM;
-     env->int_pgm_code = code;
-@@ -33,10 +33,8 @@ void trigger_pgm_exception(CPUS390XState *env, uint32_t code, uint32_t ilen)
- void s390_program_interrupt(CPUS390XState *env, uint32_t code, int ilen,
-                             uintptr_t ra)
- {
--    S390CPU *cpu = s390_env_get_cpu(env);
--
-     if (kvm_enabled()) {
--        kvm_s390_program_interrupt(cpu, code);
-+        kvm_s390_program_interrupt(env_archcpu(env), code);
-     } else if (tcg_enabled()) {
-         tcg_s390_program_interrupt(env, code, ilen, ra);
-     } else {
-diff --git a/target/s390x/mem_helper.c b/target/s390x/mem_helper.c
-index 4a0161602f..29d9eaa5b7 100644
---- a/target/s390x/mem_helper.c
-+++ b/target/s390x/mem_helper.c
-@@ -1617,7 +1617,6 @@ uint32_t HELPER(csst_parallel)(CPUS390XState *env, uint32_t r3, uint64_t a1,
- void HELPER(lctlg)(CPUS390XState *env, uint32_t r1, uint64_t a2, uint32_t r3)
- {
-     uintptr_t ra = GETPC();
--    S390CPU *cpu = s390_env_get_cpu(env);
-     bool PERchanged = false;
-     uint64_t src = a2;
-     uint32_t i;
-@@ -1642,16 +1641,15 @@ void HELPER(lctlg)(CPUS390XState *env, uint32_t r1, uint64_t a2, uint32_t r3)
-     }
+ #if !defined(CONFIG_USER_ONLY)
+-	if (srs == 1 || srs == 2) {
+-		if (sreg == 6) {
+-			/* Writes to tlb-hi write to mm_cause as a side 
+-			   effect.  */
+-			env->sregs[SFR_RW_MM_TLB_HI] = env->regs[reg];
+-			env->sregs[SFR_R_MM_CAUSE] = env->regs[reg];
+-		}
+-		else if (sreg == 5) {
+-			uint32_t set;
+-			uint32_t idx;
+-			uint32_t lo, hi;
+-			uint32_t vaddr;
+-			int tlb_v;
++    if (srs == 1 || srs == 2) {
++        if (sreg == 6) {
++            /* Writes to tlb-hi write to mm_cause as a side effect.  */
++            env->sregs[SFR_RW_MM_TLB_HI] = env->regs[reg];
++            env->sregs[SFR_R_MM_CAUSE] = env->regs[reg];
++        } else if (sreg == 5) {
++            uint32_t set;
++            uint32_t idx;
++            uint32_t lo, hi;
++            uint32_t vaddr;
++            int tlb_v;
  
-     if (PERchanged && env->psw.mask & PSW_MASK_PER) {
--        s390_cpu_recompute_watchpoints(CPU(cpu));
-+        s390_cpu_recompute_watchpoints(env_cpu(env));
-     }
+-			idx = set = env->sregs[SFR_RW_MM_TLB_SEL];
+-			set >>= 4;
+-			set &= 3;
++            idx = set = env->sregs[SFR_RW_MM_TLB_SEL];
++            set >>= 4;
++            set &= 3;
  
--    tlb_flush(CPU(cpu));
-+    tlb_flush(env_cpu(env));
+-			idx &= 15;
+-			/* We've just made a write to tlb_lo.  */
+-			lo = env->sregs[SFR_RW_MM_TLB_LO];
+-			/* Writes are done via r_mm_cause.  */
+-			hi = env->sregs[SFR_R_MM_CAUSE];
++            idx &= 15;
++            /* We've just made a write to tlb_lo.  */
++            lo = env->sregs[SFR_RW_MM_TLB_LO];
++            /* Writes are done via r_mm_cause.  */
++            hi = env->sregs[SFR_R_MM_CAUSE];
+ 
+-			vaddr = EXTRACT_FIELD(env->tlbsets[srs-1][set][idx].hi,
+-					      13, 31);
+-			vaddr <<= TARGET_PAGE_BITS;
+-			tlb_v = EXTRACT_FIELD(env->tlbsets[srs-1][set][idx].lo,
+-					    3, 3);
+-			env->tlbsets[srs - 1][set][idx].lo = lo;
+-			env->tlbsets[srs - 1][set][idx].hi = hi;
++            vaddr = EXTRACT_FIELD(env->tlbsets[srs - 1][set][idx].hi, 13, 31);
++            vaddr <<= TARGET_PAGE_BITS;
++            tlb_v = EXTRACT_FIELD(env->tlbsets[srs - 1][set][idx].lo, 3, 3);
++            env->tlbsets[srs - 1][set][idx].lo = lo;
++            env->tlbsets[srs - 1][set][idx].hi = hi;
+ 
+-			D_LOG("tlb flush vaddr=%x v=%d pc=%x\n", 
+-				  vaddr, tlb_v, env->pc);
+-			if (tlb_v) {
++            D_LOG("tlb flush vaddr=%x v=%d pc=%x\n",
++                  vaddr, tlb_v, env->pc);
++            if (tlb_v) {
+                 tlb_flush_page(CPU(cpu), vaddr);
+-			}
+-		}
+-	}
++            }
++        }
++    }
+ #endif
  }
  
- void HELPER(lctl)(CPUS390XState *env, uint32_t r1, uint64_t a2, uint32_t r3)
+ void helper_movl_reg_sreg(CPUCRISState *env, uint32_t reg, uint32_t sreg)
  {
-     uintptr_t ra = GETPC();
--    S390CPU *cpu = s390_env_get_cpu(env);
-     bool PERchanged = false;
-     uint64_t src = a2;
-     uint32_t i;
-@@ -1675,10 +1673,10 @@ void HELPER(lctl)(CPUS390XState *env, uint32_t r1, uint64_t a2, uint32_t r3)
-     }
+-	uint32_t srs;
+-	env->pregs[PR_SRS] &= 3;
+-	srs = env->pregs[PR_SRS];
+-	
++    uint32_t srs;
++    env->pregs[PR_SRS] &= 3;
++    srs = env->pregs[PR_SRS];
++
+ #if !defined(CONFIG_USER_ONLY)
+-	if (srs == 1 || srs == 2)
+-	{
+-		uint32_t set;
+-		uint32_t idx;
+-		uint32_t lo, hi;
++    if (srs == 1 || srs == 2) {
++        uint32_t set;
++        uint32_t idx;
++        uint32_t lo, hi;
  
-     if (PERchanged && env->psw.mask & PSW_MASK_PER) {
--        s390_cpu_recompute_watchpoints(CPU(cpu));
-+        s390_cpu_recompute_watchpoints(env_cpu(env));
-     }
+-		idx = set = env->sregs[SFR_RW_MM_TLB_SEL];
+-		set >>= 4;
+-		set &= 3;
+-		idx &= 15;
++        idx = set = env->sregs[SFR_RW_MM_TLB_SEL];
++        set >>= 4;
++        set &= 3;
++        idx &= 15;
  
--    tlb_flush(CPU(cpu));
-+    tlb_flush(env_cpu(env));
+-		/* Update the mirror regs.  */
+-		hi = env->tlbsets[srs - 1][set][idx].hi;
+-		lo = env->tlbsets[srs - 1][set][idx].lo;
+-		env->sregs[SFR_RW_MM_TLB_HI] = hi;
+-		env->sregs[SFR_RW_MM_TLB_LO] = lo;
+-	}
++        /* Update the mirror regs.  */
++        hi = env->tlbsets[srs - 1][set][idx].hi;
++        lo = env->tlbsets[srs - 1][set][idx].lo;
++        env->sregs[SFR_RW_MM_TLB_HI] = hi;
++        env->sregs[SFR_RW_MM_TLB_LO] = lo;
++    }
+ #endif
+-	env->regs[reg] = env->sregs[srs][sreg];
++    env->regs[reg] = env->sregs[srs][sreg];
  }
  
- void HELPER(stctg)(CPUS390XState *env, uint32_t r1, uint64_t a2, uint32_t r3)
-@@ -1737,8 +1735,8 @@ uint32_t HELPER(testblock)(CPUS390XState *env, uint64_t real_addr)
+ static void cris_ccs_rshift(CPUCRISState *env)
+ {
+-	uint32_t ccs;
++    uint32_t ccs;
  
- uint32_t HELPER(tprot)(CPUS390XState *env, uint64_t a1, uint64_t a2)
- {
--    S390CPU *cpu = s390_env_get_cpu(env);
--    CPUState *cs = CPU(cpu);
-+    S390CPU *cpu = env_archcpu(env);
-+    CPUState *cs = env_cpu(env);
+-	/* Apply the ccs shift.  */
+-	ccs = env->pregs[PR_CCS];
+-	ccs = (ccs & 0xc0000000) | ((ccs & 0x0fffffff) >> 10);
+-	if (ccs & U_FLAG)
+-	{
+-		/* Enter user mode.  */
+-		env->ksp = env->regs[R_SP];
+-		env->regs[R_SP] = env->pregs[PR_USP];
+-	}
++    /* Apply the ccs shift.  */
++    ccs = env->pregs[PR_CCS];
++    ccs = (ccs & 0xc0000000) | ((ccs & 0x0fffffff) >> 10);
++    if (ccs & U_FLAG) {
++        /* Enter user mode.  */
++        env->ksp = env->regs[R_SP];
++        env->regs[R_SP] = env->pregs[PR_USP];
++    }
  
-     /*
-      * TODO: we currently don't handle all access protection types
-@@ -1906,7 +1904,7 @@ uint32_t HELPER(mvcp)(CPUS390XState *env, uint64_t l, uint64_t a1, uint64_t a2)
- 
- void HELPER(idte)(CPUS390XState *env, uint64_t r1, uint64_t r2, uint32_t m4)
- {
--    CPUState *cs = CPU(s390_env_get_cpu(env));
-+    CPUState *cs = env_cpu(env);
-     const uintptr_t ra = GETPC();
-     uint64_t table, entry, raddr;
-     uint16_t entries, i, index = 0;
-@@ -1958,7 +1956,7 @@ void HELPER(idte)(CPUS390XState *env, uint64_t r1, uint64_t r2, uint32_t m4)
- void HELPER(ipte)(CPUS390XState *env, uint64_t pto, uint64_t vaddr,
-                   uint32_t m4)
- {
--    CPUState *cs = CPU(s390_env_get_cpu(env));
-+    CPUState *cs = env_cpu(env);
-     const uintptr_t ra = GETPC();
-     uint64_t page = vaddr & TARGET_PAGE_MASK;
-     uint64_t pte_addr, pte;
-@@ -1998,17 +1996,13 @@ void HELPER(ipte)(CPUS390XState *env, uint64_t pto, uint64_t vaddr,
- /* flush local tlb */
- void HELPER(ptlb)(CPUS390XState *env)
- {
--    S390CPU *cpu = s390_env_get_cpu(env);
--
--    tlb_flush(CPU(cpu));
-+    tlb_flush(env_cpu(env));
+-	env->pregs[PR_CCS] = ccs;
++    env->pregs[PR_CCS] = ccs;
  }
  
- /* flush global tlb */
- void HELPER(purge)(CPUS390XState *env)
+ void helper_rfe(CPUCRISState *env)
  {
--    S390CPU *cpu = s390_env_get_cpu(env);
--
--    tlb_flush_all_cpus_synced(CPU(cpu));
-+    tlb_flush_all_cpus_synced(env_cpu(env));
+-	int rflag = env->pregs[PR_CCS] & R_FLAG;
++    int rflag = env->pregs[PR_CCS] & R_FLAG;
+ 
+-	D_LOG("rfe: erp=%x pid=%x ccs=%x btarget=%x\n", 
+-		 env->pregs[PR_ERP], env->pregs[PR_PID],
+-		 env->pregs[PR_CCS],
+-		 env->btarget);
++    D_LOG("rfe: erp=%x pid=%x ccs=%x btarget=%x\n",
++          env->pregs[PR_ERP], env->pregs[PR_PID],
++          env->pregs[PR_CCS],
++          env->btarget);
+ 
+-	cris_ccs_rshift(env);
++    cris_ccs_rshift(env);
+ 
+-	/* RFE sets the P_FLAG only if the R_FLAG is not set.  */
+-	if (!rflag)
+-		env->pregs[PR_CCS] |= P_FLAG;
++    /* RFE sets the P_FLAG only if the R_FLAG is not set.  */
++    if (!rflag) {
++        env->pregs[PR_CCS] |= P_FLAG;
++    }
  }
  
- /* load using real address */
-@@ -2052,7 +2046,7 @@ void HELPER(sturg)(CPUS390XState *env, uint64_t addr, uint64_t v1)
- /* load real address */
- uint64_t HELPER(lra)(CPUS390XState *env, uint64_t addr)
+ void helper_rfn(CPUCRISState *env)
  {
--    CPUState *cs = CPU(s390_env_get_cpu(env));
-+    CPUState *cs = env_cpu(env);
-     uint32_t cc = 0;
-     uint64_t asc = env->psw.mask & PSW_MASK_ASC;
-     uint64_t ret;
-diff --git a/target/s390x/misc_helper.c b/target/s390x/misc_helper.c
-index ee67c1fa0c..c806c3ec00 100644
---- a/target/s390x/misc_helper.c
-+++ b/target/s390x/misc_helper.c
-@@ -55,7 +55,7 @@
- /* Raise an exception statically from a TB.  */
- void HELPER(exception)(CPUS390XState *env, uint32_t excp)
+-	int rflag = env->pregs[PR_CCS] & R_FLAG;
++    int rflag = env->pregs[PR_CCS] & R_FLAG;
+ 
+-	D_LOG("rfn: erp=%x pid=%x ccs=%x btarget=%x\n", 
+-		 env->pregs[PR_ERP], env->pregs[PR_PID],
+-		 env->pregs[PR_CCS],
+-		 env->btarget);
++    D_LOG("rfn: erp=%x pid=%x ccs=%x btarget=%x\n",
++          env->pregs[PR_ERP], env->pregs[PR_PID],
++          env->pregs[PR_CCS],
++          env->btarget);
+ 
+-	cris_ccs_rshift(env);
++    cris_ccs_rshift(env);
+ 
+-	/* Set the P_FLAG only if the R_FLAG is not set.  */
+-	if (!rflag)
+-		env->pregs[PR_CCS] |= P_FLAG;
++    /* Set the P_FLAG only if the R_FLAG is not set.  */
++    if (!rflag) {
++        env->pregs[PR_CCS] |= P_FLAG;
++    }
+ 
+-	/* Always set the M flag.  */
+-	env->pregs[PR_CCS] |= M_FLAG_V32;
++    /* Always set the M flag.  */
++    env->pregs[PR_CCS] |= M_FLAG_V32;
+ }
+ 
+ uint32_t helper_btst(CPUCRISState *env, uint32_t t0, uint32_t t1, uint32_t ccs)
  {
--    CPUState *cs = CPU(s390_env_get_cpu(env));
-+    CPUState *cs = env_cpu(env);
+-	/* FIXME: clean this up.  */
++    /* FIXME: clean this up.  */
  
-     HELPER_LOG("%s: exception %d\n", __func__, excp);
-     cs->exception_index = excp;
-@@ -150,7 +150,7 @@ void HELPER(diag)(CPUS390XState *env, uint32_t r1, uint32_t r3, uint32_t num)
- /* Set Prefix */
- void HELPER(spx)(CPUS390XState *env, uint64_t a1)
+-	/* des ref:
+-	   The N flag is set according to the selected bit in the dest reg.
+-	   The Z flag is set if the selected bit and all bits to the right are
+-	   zero.
+-	   The X flag is cleared.
+-	   Other flags are left untouched.
+-	   The destination reg is not affected.*/
+-	unsigned int fz, sbit, bset, mask, masked_t0;
++    /*
++     * des ref:
++     *  The N flag is set according to the selected bit in the dest reg.
++     *  The Z flag is set if the selected bit and all bits to the right are
++     *  zero.
++     *  The X flag is cleared.
++     *  Other flags are left untouched.
++     *  The destination reg is not affected.
++     */
++    unsigned int fz, sbit, bset, mask, masked_t0;
+ 
+-	sbit = t1 & 31;
+-	bset = !!(t0 & (1 << sbit));
+-	mask = sbit == 31 ? -1 : (1 << (sbit + 1)) - 1;
+-	masked_t0 = t0 & mask;
+-	fz = !(masked_t0 | bset);
++    sbit = t1 & 31;
++    bset = !!(t0 & (1 << sbit));
++    mask = sbit == 31 ? -1 : (1 << (sbit + 1)) - 1;
++    masked_t0 = t0 & mask;
++    fz = !(masked_t0 | bset);
+ 
+-	/* Clear the X, N and Z flags.  */
+-	ccs = ccs & ~(X_FLAG | N_FLAG | Z_FLAG);
+-	if (env->pregs[PR_VR] < 32)
+-		ccs &= ~(V_FLAG | C_FLAG);
+-	/* Set the N and Z flags accordingly.  */
+-	ccs |= (bset << 3) | (fz << 2);
+-	return ccs;
++    /* Clear the X, N and Z flags.  */
++    ccs = ccs & ~(X_FLAG | N_FLAG | Z_FLAG);
++    if (env->pregs[PR_VR] < 32) {
++        ccs &= ~(V_FLAG | C_FLAG);
++    }
++    /* Set the N and Z flags accordingly.  */
++    ccs |= (bset << 3) | (fz << 2);
++    return ccs;
+ }
+ 
+ static inline uint32_t evaluate_flags_writeback(CPUCRISState *env,
+                                                 uint32_t flags, uint32_t ccs)
  {
--    CPUState *cs = CPU(s390_env_get_cpu(env));
-+    CPUState *cs = env_cpu(env);
-     uint32_t prefix = a1 & 0x7fffe000;
+-	unsigned int x, z, mask;
++    unsigned int x, z, mask;
  
-     env->psa = prefix;
-@@ -256,7 +256,7 @@ uint32_t HELPER(stsi)(CPUS390XState *env, uint64_t a0, uint64_t r0, uint64_t r1)
-     const uint32_t sel2 = r1 & STSI_R1_SEL2_MASK;
-     const MachineState *ms = MACHINE(qdev_get_machine());
-     uint16_t total_cpus = 0, conf_cpus = 0, reserved_cpus = 0;
--    S390CPU *cpu = s390_env_get_cpu(env);
-+    S390CPU *cpu = env_archcpu(env);
-     SysIB sysib = { };
-     int i, cc = 0;
+-	/* Extended arithmetics, leave the z flag alone.  */
+-	x = env->cc_x;
+-	mask = env->cc_mask | X_FLAG;
+-        if (x) {
+-		z = flags & Z_FLAG;
+-		mask = mask & ~z;
+-	}
+-	flags &= mask;
++    /* Extended arithmetics, leave the z flag alone.  */
++    x = env->cc_x;
++    mask = env->cc_mask | X_FLAG;
++    if (x) {
++        z = flags & Z_FLAG;
++        mask = mask & ~z;
++    }
++    flags &= mask;
  
-@@ -411,7 +411,7 @@ uint32_t HELPER(sigp)(CPUS390XState *env, uint64_t order_code, uint32_t r1,
- #ifndef CONFIG_USER_ONLY
- void HELPER(xsch)(CPUS390XState *env, uint64_t r1)
+-	/* all insn clear the x-flag except setf or clrf.  */
+-	ccs &= ~mask;
+-	ccs |= flags;
+-	return ccs;
++    /* all insn clear the x-flag except setf or clrf.  */
++    ccs &= ~mask;
++    ccs |= flags;
++    return ccs;
+ }
+ 
+ uint32_t helper_evaluate_flags_muls(CPUCRISState *env,
+                                     uint32_t ccs, uint32_t res, uint32_t mof)
  {
--    S390CPU *cpu = s390_env_get_cpu(env);
-+    S390CPU *cpu = env_archcpu(env);
-     qemu_mutex_lock_iothread();
-     ioinst_handle_xsch(cpu, r1, GETPC());
-     qemu_mutex_unlock_iothread();
-@@ -419,7 +419,7 @@ void HELPER(xsch)(CPUS390XState *env, uint64_t r1)
+-	uint32_t flags = 0;
+-	int64_t tmp;
+-	int dneg;
++    uint32_t flags = 0;
++    int64_t tmp;
++    int dneg;
  
- void HELPER(csch)(CPUS390XState *env, uint64_t r1)
+-	dneg = ((int32_t)res) < 0;
++    dneg = ((int32_t)res) < 0;
+ 
+-	tmp = mof;
+-	tmp <<= 32;
+-	tmp |= res;
+-	if (tmp == 0)
+-		flags |= Z_FLAG;
+-	else if (tmp < 0)
+-		flags |= N_FLAG;
+-	if ((dneg && mof != -1)
+-	    || (!dneg && mof != 0))
+-		flags |= V_FLAG;
+-        return evaluate_flags_writeback(env, flags, ccs);
++    tmp = mof;
++    tmp <<= 32;
++    tmp |= res;
++    if (tmp == 0) {
++        flags |= Z_FLAG;
++    } else if (tmp < 0) {
++        flags |= N_FLAG;
++    }
++    if ((dneg && mof != -1) || (!dneg && mof != 0)) {
++        flags |= V_FLAG;
++    }
++    return evaluate_flags_writeback(env, flags, ccs);
+ }
+ 
+ uint32_t helper_evaluate_flags_mulu(CPUCRISState *env,
+                                     uint32_t ccs, uint32_t res, uint32_t mof)
  {
--    S390CPU *cpu = s390_env_get_cpu(env);
-+    S390CPU *cpu = env_archcpu(env);
-     qemu_mutex_lock_iothread();
-     ioinst_handle_csch(cpu, r1, GETPC());
-     qemu_mutex_unlock_iothread();
-@@ -427,7 +427,7 @@ void HELPER(csch)(CPUS390XState *env, uint64_t r1)
+-	uint32_t flags = 0;
+-	uint64_t tmp;
++    uint32_t flags = 0;
++    uint64_t tmp;
  
- void HELPER(hsch)(CPUS390XState *env, uint64_t r1)
+-	tmp = mof;
+-	tmp <<= 32;
+-	tmp |= res;
+-	if (tmp == 0)
+-		flags |= Z_FLAG;
+-	else if (tmp >> 63)
+-		flags |= N_FLAG;
+-	if (mof)
+-		flags |= V_FLAG;
++    tmp = mof;
++    tmp <<= 32;
++    tmp |= res;
++    if (tmp == 0) {
++        flags |= Z_FLAG;
++    } else if (tmp >> 63) {
++        flags |= N_FLAG;
++    }
++    if (mof) {
++        flags |= V_FLAG;
++    }
+ 
+-        return evaluate_flags_writeback(env, flags, ccs);
++    return evaluate_flags_writeback(env, flags, ccs);
+ }
+ 
+ uint32_t helper_evaluate_flags_mcp(CPUCRISState *env, uint32_t ccs,
+ 				   uint32_t src, uint32_t dst, uint32_t res)
  {
--    S390CPU *cpu = s390_env_get_cpu(env);
-+    S390CPU *cpu = env_archcpu(env);
-     qemu_mutex_lock_iothread();
-     ioinst_handle_hsch(cpu, r1, GETPC());
-     qemu_mutex_unlock_iothread();
-@@ -435,7 +435,7 @@ void HELPER(hsch)(CPUS390XState *env, uint64_t r1)
+-	uint32_t flags = 0;
++    uint32_t flags = 0;
  
- void HELPER(msch)(CPUS390XState *env, uint64_t r1, uint64_t inst)
+-	src = src & 0x80000000;
+-	dst = dst & 0x80000000;
++    src = src & 0x80000000;
++    dst = dst & 0x80000000;
+ 
+-	if ((res & 0x80000000L) != 0L)
+-	{
+-		flags |= N_FLAG;
+-		if (!src && !dst)
+-			flags |= V_FLAG;
+-		else if (src & dst)
+-			flags |= R_FLAG;
+-	}
+-	else
+-	{
+-		if (res == 0L)
+-			flags |= Z_FLAG;
+-		if (src & dst) 
+-			flags |= V_FLAG;
+-		if (dst | src) 
+-			flags |= R_FLAG;
+-	}
++    if ((res & 0x80000000L) != 0L) {
++        flags |= N_FLAG;
++        if (!src && !dst) {
++            flags |= V_FLAG;
++        } else if (src & dst) {
++            flags |= R_FLAG;
++        }
++    } else {
++        if (res == 0L) {
++            flags |= Z_FLAG;
++        }
++        if (src & dst) {
++            flags |= V_FLAG;
++        }
++        if (dst | src) {
++            flags |= R_FLAG;
++        }
++    }
+ 
+-        return evaluate_flags_writeback(env, flags, ccs);
++    return evaluate_flags_writeback(env, flags, ccs);
+ }
+ 
+ uint32_t helper_evaluate_flags_alu_4(CPUCRISState *env, uint32_t ccs,
+ 				     uint32_t src, uint32_t dst, uint32_t res)
  {
--    S390CPU *cpu = s390_env_get_cpu(env);
-+    S390CPU *cpu = env_archcpu(env);
-     qemu_mutex_lock_iothread();
-     ioinst_handle_msch(cpu, r1, inst >> 16, GETPC());
-     qemu_mutex_unlock_iothread();
-@@ -443,7 +443,7 @@ void HELPER(msch)(CPUS390XState *env, uint64_t r1, uint64_t inst)
+-	uint32_t flags = 0;
++    uint32_t flags = 0;
  
- void HELPER(rchp)(CPUS390XState *env, uint64_t r1)
+-	src = src & 0x80000000;
+-	dst = dst & 0x80000000;
++    src = src & 0x80000000;
++    dst = dst & 0x80000000;
+ 
+-	if ((res & 0x80000000L) != 0L)
+-	{
+-		flags |= N_FLAG;
+-		if (!src && !dst)
+-			flags |= V_FLAG;
+-		else if (src & dst)
+-			flags |= C_FLAG;
+-	}
+-	else
+-	{
+-		if (res == 0L)
+-			flags |= Z_FLAG;
+-		if (src & dst) 
+-			flags |= V_FLAG;
+-		if (dst | src) 
+-			flags |= C_FLAG;
+-	}
++    if ((res & 0x80000000L) != 0L) {
++        flags |= N_FLAG;
++        if (!src && !dst) {
++            flags |= V_FLAG;
++        } else if (src & dst) {
++            flags |= C_FLAG;
++        }
++    } else {
++        if (res == 0L) {
++            flags |= Z_FLAG;
++        }
++        if (src & dst) {
++            flags |= V_FLAG;
++        }
++        if (dst | src) {
++            flags |= C_FLAG;
++        }
++    }
+ 
+-        return evaluate_flags_writeback(env, flags, ccs);
++    return evaluate_flags_writeback(env, flags, ccs);
+ }
+ 
+ uint32_t helper_evaluate_flags_sub_4(CPUCRISState *env, uint32_t ccs,
+ 				     uint32_t src, uint32_t dst, uint32_t res)
  {
--    S390CPU *cpu = s390_env_get_cpu(env);
-+    S390CPU *cpu = env_archcpu(env);
-     qemu_mutex_lock_iothread();
-     ioinst_handle_rchp(cpu, r1, GETPC());
-     qemu_mutex_unlock_iothread();
-@@ -451,7 +451,7 @@ void HELPER(rchp)(CPUS390XState *env, uint64_t r1)
+-	uint32_t flags = 0;
++    uint32_t flags = 0;
  
- void HELPER(rsch)(CPUS390XState *env, uint64_t r1)
+-	src = (~src) & 0x80000000;
+-	dst = dst & 0x80000000;
++    src = (~src) & 0x80000000;
++    dst = dst & 0x80000000;
+ 
+-	if ((res & 0x80000000L) != 0L)
+-	{
+-		flags |= N_FLAG;
+-		if (!src && !dst)
+-			flags |= V_FLAG;
+-		else if (src & dst)
+-			flags |= C_FLAG;
+-	}
+-	else
+-	{
+-		if (res == 0L)
+-			flags |= Z_FLAG;
+-		if (src & dst) 
+-			flags |= V_FLAG;
+-		if (dst | src) 
+-			flags |= C_FLAG;
+-	}
++    if ((res & 0x80000000L) != 0L) {
++        flags |= N_FLAG;
++        if (!src && !dst) {
++            flags |= V_FLAG;
++        } else if (src & dst) {
++            flags |= C_FLAG;
++        }
++    } else {
++        if (res == 0L) {
++            flags |= Z_FLAG;
++        }
++        if (src & dst) {
++            flags |= V_FLAG;
++        }
++        if (dst | src) {
++            flags |= C_FLAG;
++        }
++    }
+ 
+-	flags ^= C_FLAG;
+-        return evaluate_flags_writeback(env, flags, ccs);
++    flags ^= C_FLAG;
++    return evaluate_flags_writeback(env, flags, ccs);
+ }
+ 
+ uint32_t helper_evaluate_flags_move_4(CPUCRISState *env,
+                                       uint32_t ccs, uint32_t res)
  {
--    S390CPU *cpu = s390_env_get_cpu(env);
-+    S390CPU *cpu = env_archcpu(env);
-     qemu_mutex_lock_iothread();
-     ioinst_handle_rsch(cpu, r1, GETPC());
-     qemu_mutex_unlock_iothread();
-@@ -459,7 +459,7 @@ void HELPER(rsch)(CPUS390XState *env, uint64_t r1)
+-	uint32_t flags = 0;
++    uint32_t flags = 0;
  
- void HELPER(sal)(CPUS390XState *env, uint64_t r1)
+-	if ((int32_t)res < 0)
+-		flags |= N_FLAG;
+-	else if (res == 0L)
+-		flags |= Z_FLAG;
++    if ((int32_t)res < 0) {
++        flags |= N_FLAG;
++    } else if (res == 0L) {
++        flags |= Z_FLAG;
++    }
+ 
+-        return evaluate_flags_writeback(env, flags, ccs);
++    return evaluate_flags_writeback(env, flags, ccs);
+ }
++
+ uint32_t helper_evaluate_flags_move_2(CPUCRISState *env,
+                                       uint32_t ccs, uint32_t res)
  {
--    S390CPU *cpu = s390_env_get_cpu(env);
-+    S390CPU *cpu = env_archcpu(env);
+-	uint32_t flags = 0;
++    uint32_t flags = 0;
  
-     qemu_mutex_lock_iothread();
-     ioinst_handle_sal(cpu, r1, GETPC());
-@@ -468,7 +468,7 @@ void HELPER(sal)(CPUS390XState *env, uint64_t r1)
+-	if ((int16_t)res < 0L)
+-		flags |= N_FLAG;
+-	else if (res == 0)
+-		flags |= Z_FLAG;
++    if ((int16_t)res < 0L) {
++        flags |= N_FLAG;
++    } else if (res == 0) {
++        flags |= Z_FLAG;
++    }
  
- void HELPER(schm)(CPUS390XState *env, uint64_t r1, uint64_t r2, uint64_t inst)
+-        return evaluate_flags_writeback(env, flags, ccs);
++    return evaluate_flags_writeback(env, flags, ccs);
+ }
+ 
+-/* TODO: This is expensive. We could split things up and only evaluate part of
+-   CCR on a need to know basis. For now, we simply re-evaluate everything.  */
++/*
++ * TODO: This is expensive. We could split things up and only evaluate part of
++ * CCR on a need to know basis. For now, we simply re-evaluate everything.
++ */
+ void helper_evaluate_flags(CPUCRISState *env)
  {
--    S390CPU *cpu = s390_env_get_cpu(env);
-+    S390CPU *cpu = env_archcpu(env);
+-	uint32_t src, dst, res;
+-	uint32_t flags = 0;
++    uint32_t src, dst, res;
++    uint32_t flags = 0;
  
-     qemu_mutex_lock_iothread();
-     ioinst_handle_schm(cpu, r1, r2, inst >> 16, GETPC());
-@@ -477,7 +477,7 @@ void HELPER(schm)(CPUS390XState *env, uint64_t r1, uint64_t r2, uint64_t inst)
+-	src = env->cc_src;
+-	dst = env->cc_dest;
+-	res = env->cc_result;
++    src = env->cc_src;
++    dst = env->cc_dest;
++    res = env->cc_result;
  
- void HELPER(ssch)(CPUS390XState *env, uint64_t r1, uint64_t inst)
+-	if (env->cc_op == CC_OP_SUB || env->cc_op == CC_OP_CMP)
+-		src = ~src;
++    if (env->cc_op == CC_OP_SUB || env->cc_op == CC_OP_CMP) {
++        src = ~src;
++    }
+ 
+-	/* Now, evaluate the flags. This stuff is based on
+-	   Per Zander's CRISv10 simulator.  */
+-	switch (env->cc_size)
+-	{
+-		case 1:
+-			if ((res & 0x80L) != 0L)
+-			{
+-				flags |= N_FLAG;
+-				if (((src & 0x80L) == 0L)
+-				    && ((dst & 0x80L) == 0L))
+-				{
+-					flags |= V_FLAG;
+-				}
+-				else if (((src & 0x80L) != 0L)
+-					 && ((dst & 0x80L) != 0L))
+-				{
+-					flags |= C_FLAG;
+-				}
+-			}
+-			else
+-			{
+-				if ((res & 0xFFL) == 0L)
+-				{
+-					flags |= Z_FLAG;
+-				}
+-				if (((src & 0x80L) != 0L)
+-				    && ((dst & 0x80L) != 0L))
+-				{
+-					flags |= V_FLAG;
+-				}
+-				if ((dst & 0x80L) != 0L
+-				    || (src & 0x80L) != 0L)
+-				{
+-					flags |= C_FLAG;
+-				}
+-			}
+-			break;
+-		case 2:
+-			if ((res & 0x8000L) != 0L)
+-			{
+-				flags |= N_FLAG;
+-				if (((src & 0x8000L) == 0L)
+-				    && ((dst & 0x8000L) == 0L))
+-				{
+-					flags |= V_FLAG;
+-				}
+-				else if (((src & 0x8000L) != 0L)
+-					 && ((dst & 0x8000L) != 0L))
+-				{
+-					flags |= C_FLAG;
+-				}
+-			}
+-			else
+-			{
+-				if ((res & 0xFFFFL) == 0L)
+-				{
+-					flags |= Z_FLAG;
+-				}
+-				if (((src & 0x8000L) != 0L)
+-				    && ((dst & 0x8000L) != 0L))
+-				{
+-					flags |= V_FLAG;
+-				}
+-				if ((dst & 0x8000L) != 0L
+-				    || (src & 0x8000L) != 0L)
+-				{
+-					flags |= C_FLAG;
+-				}
+-			}
+-			break;
+-		case 4:
+-			if ((res & 0x80000000L) != 0L)
+-			{
+-				flags |= N_FLAG;
+-				if (((src & 0x80000000L) == 0L)
+-				    && ((dst & 0x80000000L) == 0L))
+-				{
+-					flags |= V_FLAG;
+-				}
+-				else if (((src & 0x80000000L) != 0L) &&
+-					 ((dst & 0x80000000L) != 0L))
+-				{
+-					flags |= C_FLAG;
+-				}
+-			}
+-			else
+-			{
+-				if (res == 0L)
+-					flags |= Z_FLAG;
+-				if (((src & 0x80000000L) != 0L)
+-				    && ((dst & 0x80000000L) != 0L))
+-					flags |= V_FLAG;
+-				if ((dst & 0x80000000L) != 0L
+-				    || (src & 0x80000000L) != 0L)
+-					flags |= C_FLAG;
+-			}
+-			break;
+-		default:
+-			break;
+-	}
++    /*
++     * Now, evaluate the flags. This stuff is based on
++     * Per Zander's CRISv10 simulator.
++     */
++    switch (env->cc_size) {
++    case 1:
++        if ((res & 0x80L) != 0L) {
++            flags |= N_FLAG;
++            if (((src & 0x80L) == 0L) && ((dst & 0x80L) == 0L)) {
++                flags |= V_FLAG;
++            } else if (((src & 0x80L) != 0L) && ((dst & 0x80L) != 0L)) {
++                flags |= C_FLAG;
++            }
++        } else {
++            if ((res & 0xFFL) == 0L) {
++                flags |= Z_FLAG;
++            }
++            if (((src & 0x80L) != 0L) && ((dst & 0x80L) != 0L)) {
++                flags |= V_FLAG;
++            }
++            if ((dst & 0x80L) != 0L || (src & 0x80L) != 0L) {
++                flags |= C_FLAG;
++            }
++        }
++        break;
++    case 2:
++        if ((res & 0x8000L) != 0L) {
++            flags |= N_FLAG;
++            if (((src & 0x8000L) == 0L) && ((dst & 0x8000L) == 0L)) {
++                flags |= V_FLAG;
++            } else if (((src & 0x8000L) != 0L) && ((dst & 0x8000L) != 0L)) {
++                flags |= C_FLAG;
++            }
++        } else {
++            if ((res & 0xFFFFL) == 0L) {
++                flags |= Z_FLAG;
++            }
++            if (((src & 0x8000L) != 0L) && ((dst & 0x8000L) != 0L)) {
++                flags |= V_FLAG;
++            }
++            if ((dst & 0x8000L) != 0L || (src & 0x8000L) != 0L) {
++                flags |= C_FLAG;
++            }
++        }
++        break;
++    case 4:
++        if ((res & 0x80000000L) != 0L) {
++            flags |= N_FLAG;
++            if (((src & 0x80000000L) == 0L) && ((dst & 0x80000000L) == 0L)) {
++                flags |= V_FLAG;
++            } else if (((src & 0x80000000L) != 0L) &&
++                       ((dst & 0x80000000L) != 0L)) {
++                flags |= C_FLAG;
++            }
++        } else {
++            if (res == 0L) {
++                flags |= Z_FLAG;
++            }
++            if (((src & 0x80000000L) != 0L) && ((dst & 0x80000000L) != 0L)) {
++                flags |= V_FLAG;
++            }
++            if ((dst & 0x80000000L) != 0L || (src & 0x80000000L) != 0L) {
++                flags |= C_FLAG;
++            }
++        }
++        break;
++    default:
++        break;
++    }
+ 
+-	if (env->cc_op == CC_OP_SUB || env->cc_op == CC_OP_CMP)
+-		flags ^= C_FLAG;
++    if (env->cc_op == CC_OP_SUB || env->cc_op == CC_OP_CMP) {
++        flags ^= C_FLAG;
++    }
+ 
+-        env->pregs[PR_CCS] = evaluate_flags_writeback(env, flags,
+-                                                      env->pregs[PR_CCS]);
++    env->pregs[PR_CCS] = evaluate_flags_writeback(env, flags,
++                                                  env->pregs[PR_CCS]);
+ }
+ 
+ void helper_top_evaluate_flags(CPUCRISState *env)
  {
--    S390CPU *cpu = s390_env_get_cpu(env);
-+    S390CPU *cpu = env_archcpu(env);
-     qemu_mutex_lock_iothread();
-     ioinst_handle_ssch(cpu, r1, inst >> 16, GETPC());
-     qemu_mutex_unlock_iothread();
-@@ -485,7 +485,7 @@ void HELPER(ssch)(CPUS390XState *env, uint64_t r1, uint64_t inst)
- 
- void HELPER(stcrw)(CPUS390XState *env, uint64_t inst)
- {
--    S390CPU *cpu = s390_env_get_cpu(env);
-+    S390CPU *cpu = env_archcpu(env);
- 
-     qemu_mutex_lock_iothread();
-     ioinst_handle_stcrw(cpu, inst >> 16, GETPC());
-@@ -494,7 +494,7 @@ void HELPER(stcrw)(CPUS390XState *env, uint64_t inst)
- 
- void HELPER(stsch)(CPUS390XState *env, uint64_t r1, uint64_t inst)
- {
--    S390CPU *cpu = s390_env_get_cpu(env);
-+    S390CPU *cpu = env_archcpu(env);
-     qemu_mutex_lock_iothread();
-     ioinst_handle_stsch(cpu, r1, inst >> 16, GETPC());
-     qemu_mutex_unlock_iothread();
-@@ -503,7 +503,7 @@ void HELPER(stsch)(CPUS390XState *env, uint64_t r1, uint64_t inst)
- uint32_t HELPER(tpi)(CPUS390XState *env, uint64_t addr)
- {
-     const uintptr_t ra = GETPC();
--    S390CPU *cpu = s390_env_get_cpu(env);
-+    S390CPU *cpu = env_archcpu(env);
-     QEMUS390FLICState *flic = s390_get_qemu_flic(s390_get_flic());
-     QEMUS390FlicIO *io = NULL;
-     LowCore *lowcore;
-@@ -555,7 +555,7 @@ uint32_t HELPER(tpi)(CPUS390XState *env, uint64_t addr)
- 
- void HELPER(tsch)(CPUS390XState *env, uint64_t r1, uint64_t inst)
- {
--    S390CPU *cpu = s390_env_get_cpu(env);
-+    S390CPU *cpu = env_archcpu(env);
-     qemu_mutex_lock_iothread();
-     ioinst_handle_tsch(cpu, r1, inst >> 16, GETPC());
-     qemu_mutex_unlock_iothread();
-@@ -563,7 +563,7 @@ void HELPER(tsch)(CPUS390XState *env, uint64_t r1, uint64_t inst)
- 
- void HELPER(chsc)(CPUS390XState *env, uint64_t inst)
- {
--    S390CPU *cpu = s390_env_get_cpu(env);
-+    S390CPU *cpu = env_archcpu(env);
-     qemu_mutex_lock_iothread();
-     ioinst_handle_chsc(cpu, inst >> 16, GETPC());
-     qemu_mutex_unlock_iothread();
-@@ -618,7 +618,7 @@ void HELPER(per_ifetch)(CPUS390XState *env, uint64_t addr)
-         /* If the instruction has to be nullified, trigger the
-            exception immediately. */
-         if (env->cregs[9] & PER_CR9_EVENT_NULLIFICATION) {
--            CPUState *cs = CPU(s390_env_get_cpu(env));
-+            CPUState *cs = env_cpu(env);
- 
-             env->per_perc_atmid |= PER_CODE_EVENT_NULLIFICATION;
-             env->int_pgm_code = PGM_PER;
-@@ -695,7 +695,7 @@ uint32_t HELPER(stfle)(CPUS390XState *env, uint64_t addr)
-  */
- void HELPER(clp)(CPUS390XState *env, uint32_t r2)
- {
--    S390CPU *cpu = s390_env_get_cpu(env);
-+    S390CPU *cpu = env_archcpu(env);
- 
-     qemu_mutex_lock_iothread();
-     clp_service_call(cpu, r2, GETPC());
-@@ -704,7 +704,7 @@ void HELPER(clp)(CPUS390XState *env, uint32_t r2)
- 
- void HELPER(pcilg)(CPUS390XState *env, uint32_t r1, uint32_t r2)
- {
--    S390CPU *cpu = s390_env_get_cpu(env);
-+    S390CPU *cpu = env_archcpu(env);
- 
-     qemu_mutex_lock_iothread();
-     pcilg_service_call(cpu, r1, r2, GETPC());
-@@ -713,7 +713,7 @@ void HELPER(pcilg)(CPUS390XState *env, uint32_t r1, uint32_t r2)
- 
- void HELPER(pcistg)(CPUS390XState *env, uint32_t r1, uint32_t r2)
- {
--    S390CPU *cpu = s390_env_get_cpu(env);
-+    S390CPU *cpu = env_archcpu(env);
- 
-     qemu_mutex_lock_iothread();
-     pcistg_service_call(cpu, r1, r2, GETPC());
-@@ -723,7 +723,7 @@ void HELPER(pcistg)(CPUS390XState *env, uint32_t r1, uint32_t r2)
- void HELPER(stpcifc)(CPUS390XState *env, uint32_t r1, uint64_t fiba,
-                      uint32_t ar)
- {
--    S390CPU *cpu = s390_env_get_cpu(env);
-+    S390CPU *cpu = env_archcpu(env);
- 
-     qemu_mutex_lock_iothread();
-     stpcifc_service_call(cpu, r1, fiba, ar, GETPC());
-@@ -745,7 +745,7 @@ void HELPER(sic)(CPUS390XState *env, uint64_t r1, uint64_t r3)
- 
- void HELPER(rpcit)(CPUS390XState *env, uint32_t r1, uint32_t r2)
- {
--    S390CPU *cpu = s390_env_get_cpu(env);
-+    S390CPU *cpu = env_archcpu(env);
- 
-     qemu_mutex_lock_iothread();
-     rpcit_service_call(cpu, r1, r2, GETPC());
-@@ -755,7 +755,7 @@ void HELPER(rpcit)(CPUS390XState *env, uint32_t r1, uint32_t r2)
- void HELPER(pcistb)(CPUS390XState *env, uint32_t r1, uint32_t r3,
-                     uint64_t gaddr, uint32_t ar)
- {
--    S390CPU *cpu = s390_env_get_cpu(env);
-+    S390CPU *cpu = env_archcpu(env);
- 
-     qemu_mutex_lock_iothread();
-     pcistb_service_call(cpu, r1, r3, gaddr, ar, GETPC());
-@@ -765,7 +765,7 @@ void HELPER(pcistb)(CPUS390XState *env, uint32_t r1, uint32_t r3,
- void HELPER(mpcifc)(CPUS390XState *env, uint32_t r1, uint64_t fiba,
-                     uint32_t ar)
- {
--    S390CPU *cpu = s390_env_get_cpu(env);
-+    S390CPU *cpu = env_archcpu(env);
- 
-     qemu_mutex_lock_iothread();
-     mpcifc_service_call(cpu, r1, fiba, ar, GETPC());
-diff --git a/target/s390x/mmu_helper.c b/target/s390x/mmu_helper.c
-index 145b62a7ef..9669bae393 100644
---- a/target/s390x/mmu_helper.c
-+++ b/target/s390x/mmu_helper.c
-@@ -58,12 +58,12 @@
- static void trigger_access_exception(CPUS390XState *env, uint32_t type,
-                                      uint32_t ilen, uint64_t tec)
- {
--    S390CPU *cpu = s390_env_get_cpu(env);
-+    S390CPU *cpu = env_archcpu(env);
- 
-     if (kvm_enabled()) {
-         kvm_s390_access_exception(cpu, type, tec);
-     } else {
--        CPUState *cs = CPU(cpu);
-+        CPUState *cs = env_cpu(env);
-         if (type != PGM_ADDRESSING) {
-             stq_phys(cs->as, env->psa + offsetof(LowCore, trans_exc_code), tec);
-         }
-@@ -185,7 +185,7 @@ static int mmu_translate_segment(CPUS390XState *env, target_ulong vaddr,
-                                  target_ulong *raddr, int *flags, int rw,
-                                  bool exc)
- {
--    CPUState *cs = CPU(s390_env_get_cpu(env));
-+    CPUState *cs = env_cpu(env);
-     uint64_t origin, offs, pt_entry;
- 
-     if (st_entry & SEGMENT_ENTRY_RO) {
-@@ -214,7 +214,7 @@ static int mmu_translate_region(CPUS390XState *env, target_ulong vaddr,
-                                 target_ulong *raddr, int *flags, int rw,
-                                 bool exc)
- {
--    CPUState *cs = CPU(s390_env_get_cpu(env));
-+    CPUState *cs = env_cpu(env);
-     uint64_t origin, offs, new_entry;
-     const int pchks[4] = {
-         PGM_SEGMENT_TRANS, PGM_REG_THIRD_TRANS,
-diff --git a/target/s390x/sigp.c b/target/s390x/sigp.c
-index c1f9245797..ea5f69d5d8 100644
---- a/target/s390x/sigp.c
-+++ b/target/s390x/sigp.c
-@@ -454,7 +454,7 @@ int handle_sigp(CPUS390XState *env, uint8_t order, uint64_t r1, uint64_t r3)
- {
-     uint64_t *status_reg = &env->regs[r1];
-     uint64_t param = (r1 % 2) ? env->regs[r1] : env->regs[r1 + 1];
--    S390CPU *cpu = s390_env_get_cpu(env);
-+    S390CPU *cpu = env_archcpu(env);
-     S390CPU *dst_cpu = NULL;
-     int ret;
- 
-@@ -492,7 +492,7 @@ int s390_cpu_restart(S390CPU *cpu)
- 
- void do_stop_interrupt(CPUS390XState *env)
- {
--    S390CPU *cpu = s390_env_get_cpu(env);
-+    S390CPU *cpu = env_archcpu(env);
- 
-     if (s390_cpu_set_state(S390_CPU_STATE_STOPPED, cpu) == 0) {
-         qemu_system_shutdown_request(SHUTDOWN_CAUSE_GUEST_SHUTDOWN);
+-	switch (env->cc_op)
+-	{
+-		case CC_OP_MCP:
+-                        env->pregs[PR_CCS] = helper_evaluate_flags_mcp(env,
+-					env->pregs[PR_CCS], env->cc_src,
+-					env->cc_dest, env->cc_result);
+-			break;
+-		case CC_OP_MULS:
+-                        env->pregs[PR_CCS] = helper_evaluate_flags_muls(env,
+-					env->pregs[PR_CCS], env->cc_result,
+-					env->pregs[PR_MOF]);
+-			break;
+-		case CC_OP_MULU:
+-                        env->pregs[PR_CCS] = helper_evaluate_flags_mulu(env,
+-					env->pregs[PR_CCS], env->cc_result,
+-					env->pregs[PR_MOF]);
+-			break;
+-		case CC_OP_MOVE:
+-		case CC_OP_AND:
+-		case CC_OP_OR:
+-		case CC_OP_XOR:
+-		case CC_OP_ASR:
+-		case CC_OP_LSR:
+-		case CC_OP_LSL:
+-		switch (env->cc_size)
+-		{
+-			case 4:
+-				env->pregs[PR_CCS] =
+-                                        helper_evaluate_flags_move_4(env,
+-							env->pregs[PR_CCS],
+-							env->cc_result);
+-				break;
+-			case 2:
+-				env->pregs[PR_CCS] =
+-                                        helper_evaluate_flags_move_2(env,
+-							env->pregs[PR_CCS],
+-							env->cc_result);
+-				break;
+-			default:
+-                                helper_evaluate_flags(env);
+-				break;
+-		}
+-		break;
+-		case CC_OP_FLAGS:
+-			/* live.  */
+-			break;
+-		case CC_OP_SUB:
+-		case CC_OP_CMP:
+-			if (env->cc_size == 4)
+-				env->pregs[PR_CCS] =
+-                                        helper_evaluate_flags_sub_4(env,
+-						env->pregs[PR_CCS],
+-						env->cc_src, env->cc_dest,
+-						env->cc_result);
+-			else
+-                                helper_evaluate_flags(env);
+-			break;
+-		default:
+-		{
+-			switch (env->cc_size)
+-			{
+-			case 4:
+-				env->pregs[PR_CCS] =
+-                                        helper_evaluate_flags_alu_4(env,
+-						env->pregs[PR_CCS],
+-						env->cc_src, env->cc_dest,
+-						env->cc_result);
+-				break;
+-			default:
+-                                helper_evaluate_flags(env);
+-				break;
+-			}
+-		}
+-		break;
+-	}
++    switch (env->cc_op) {
++    case CC_OP_MCP:
++        env->pregs[PR_CCS]
++            = helper_evaluate_flags_mcp(env, env->pregs[PR_CCS],
++                                        env->cc_src, env->cc_dest,
++                                        env->cc_result);
++        break;
++    case CC_OP_MULS:
++        env->pregs[PR_CCS]
++            = helper_evaluate_flags_muls(env, env->pregs[PR_CCS],
++                                         env->cc_result, env->pregs[PR_MOF]);
++        break;
++    case CC_OP_MULU:
++        env->pregs[PR_CCS]
++            = helper_evaluate_flags_mulu(env, env->pregs[PR_CCS],
++                                         env->cc_result, env->pregs[PR_MOF]);
++        break;
++    case CC_OP_MOVE:
++    case CC_OP_AND:
++    case CC_OP_OR:
++    case CC_OP_XOR:
++    case CC_OP_ASR:
++    case CC_OP_LSR:
++    case CC_OP_LSL:
++        switch (env->cc_size) {
++        case 4:
++            env->pregs[PR_CCS] =
++                helper_evaluate_flags_move_4(env,
++                                             env->pregs[PR_CCS],
++                                             env->cc_result);
++            break;
++        case 2:
++            env->pregs[PR_CCS] =
++                helper_evaluate_flags_move_2(env,
++                                             env->pregs[PR_CCS],
++                                             env->cc_result);
++            break;
++        default:
++            helper_evaluate_flags(env);
++            break;
++        }
++        break;
++    case CC_OP_FLAGS:
++        /* live.  */
++        break;
++    case CC_OP_SUB:
++    case CC_OP_CMP:
++        if (env->cc_size == 4) {
++            env->pregs[PR_CCS] =
++                helper_evaluate_flags_sub_4(env,
++                                            env->pregs[PR_CCS],
++                                            env->cc_src, env->cc_dest,
++                                            env->cc_result);
++        } else {
++            helper_evaluate_flags(env);
++        }
++        break;
++    default:
++        switch (env->cc_size) {
++        case 4:
++            env->pregs[PR_CCS] =
++                helper_evaluate_flags_alu_4(env,
++                                            env->pregs[PR_CCS],
++                                            env->cc_src, env->cc_dest,
++                                            env->cc_result);
++            break;
++        default:
++            helper_evaluate_flags(env);
++            break;
++        }
++        break;
++    }
+ }
 -- 
 2.17.1
 
