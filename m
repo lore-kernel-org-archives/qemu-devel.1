@@ -2,91 +2,89 @@ Return-Path: <SRS0=GUf1=UD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8604FC282CE
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 09:45:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C0D3C282CE
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 09:45:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 53D6324A67
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 09:45:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CE65024A67
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 09:45:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="R1kTrD/t"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 53D6324A67
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HeDoLn3r"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CE65024A67
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:49476 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:49489 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hY60T-0004DR-CS
-	for qemu-devel@archiver.kernel.org; Tue, 04 Jun 2019 05:45:25 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:51547)
+	id 1hY60f-0004MV-Ve
+	for qemu-devel@archiver.kernel.org; Tue, 04 Jun 2019 05:45:37 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:51624)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hY5zC-0003Sk-8E
-	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 05:44:07 -0400
+	(envelope-from <clabbe.montjoie@gmail.com>) id 1hY5zT-0003dt-7u
+	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 05:44:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hY5zA-0003SD-B8
-	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 05:44:06 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:34055)
+	(envelope-from <clabbe.montjoie@gmail.com>) id 1hY5zR-0003ck-UW
+	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 05:44:23 -0400
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:54393)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1hY5z9-0003Qk-2T
-	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 05:44:04 -0400
-Received: by mail-wr1-x443.google.com with SMTP id e16so6816547wrn.1
-	for <qemu-devel@nongnu.org>; Tue, 04 Jun 2019 02:44:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=references:user-agent:from:to:cc:subject:in-reply-to:date
-	:message-id:mime-version:content-transfer-encoding;
-	bh=aylZ20QvLWPu2u6KQFXYM67CTXflwloeZ8LOqhgOpKE=;
-	b=R1kTrD/tNWnuXIyylMqJujeA3jzqyrp/Im+13iH6AjbH++seNB/7OyQFdYOQmKwR31
-	bac94Takg/6c++Ali+lcDN9kogjOdUvIPhQZ26KDR12HfXaenoRl/GxKjiBNIsQoJlaW
-	itPULU66vHuwO306fbmJ+Gxu0lEs5Daaa/Vj+pf05HK/GHjaYzzkiaPEsJwJcmaz/n6v
-	Pfp+/WZJxazF7eHtr91nFx4ZPnkbakPnbkmxdCHTh22Z+HzHsUgCw+RsRK5aCVA870+b
-	1eBOxYZviVoaMphQ1P9yZuG7H1GbQPTCfTi7GwBY48284p1/d95bWDVeoH1WG7se69DV
-	TuLA==
+	(Exim 4.71) (envelope-from <clabbe.montjoie@gmail.com>)
+	id 1hY5zR-0003aT-8h
+	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 05:44:21 -0400
+Received: by mail-wm1-x344.google.com with SMTP id g135so10931651wme.4
+	for <qemu-devel@nongnu.org>; Tue, 04 Jun 2019 02:44:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+	h=date:from:to:cc:subject:message-id:references:mime-version
+	:content-disposition:in-reply-to:user-agent;
+	bh=EoTFirwkcUMGV6qEYqMa/Ij3w52n1eYJPvzktcK+OLg=;
+	b=HeDoLn3rdeogRQmYnMHPU/ZmC8Zb/kA5VmsXkWoAfW7fOX84gcuM1GskRKYU45Mrst
+	JsS4AV6TltPnUNef3NilScWqDZ42WRFYwtz+wwz+yHC/pqx/h7YJGFoAfAbBtoBiKn4o
+	x+Yt3eda0kzwZES9kgjq43HnwCGmS1XoDdVJEJgM9EvWfob+IV4ZnYdE80iVA6+WNF4r
+	JoDLDwMY2RJyA2FEVnF1NdFFTOxaXfnceQlRToSK8RZF0bom3V7+vynObpNf0Qsl0PCI
+	ijUi5i5jgh7aqpxcnuh7o+ht/igy6ir3Yn146yt80wfEdQ7AFeK9esF0vKFx0cb7CHMT
+	UjDw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:references:user-agent:from:to:cc:subject
-	:in-reply-to:date:message-id:mime-version:content-transfer-encoding;
-	bh=aylZ20QvLWPu2u6KQFXYM67CTXflwloeZ8LOqhgOpKE=;
-	b=Eo0rFx+9u/7pu9VhD05ZYVRjsh0peRtCuJmu8LijGQBKBhlCb03NRQf7cAN8O5B/Ry
-	esRkycFAn2Be5suMnhGfFOsiEFVj/aikme+7EskRxSsRtQT11VKADKZVC/frKOlFw2b5
-	B8L6e2PJL3bpmIlnht0ZKqOow7S+PwNgto2plNy9fWjbmBhVbWeW0jYOfEKDjaJYAi+b
-	GMbcDIkn9RsMdUoNDzX2ifkfSMMLQY65Pfgu76MNDvPpgJdtqKsIEi6mWohigCRNs8ec
-	a4+j3ucIsb2ab2HJnsSYHsbWVnZcB8e85AtZBD74HrdY3PgFq9Ha0iC1Gh5z/7PcZJc6
-	Gpaw==
-X-Gm-Message-State: APjAAAWfVOaUM7L4Twzv8AEWDQCpLtVE9UD6+RSbAbagAuOYhG6BB4A9
-	2DrVTttMjWROgn5s+t7D0LSzHw==
-X-Google-Smtp-Source: APXvYqzLHY/g2nUh+xLC7pwZZIjl37kYihmLx//qjxVBpSiAbA0QfDJbvQQsf2oJOb1JGUZZH8opDQ==
-X-Received: by 2002:a5d:6a90:: with SMTP id s16mr19991225wru.288.1559641441031;
-	Tue, 04 Jun 2019 02:44:01 -0700 (PDT)
-Received: from zen.linaroharston ([81.128.185.34])
-	by smtp.gmail.com with ESMTPSA id
-	b8sm13159786wrr.88.2019.06.04.02.43.59
-	(version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-	Tue, 04 Jun 2019 02:43:59 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
-	by zen.linaroharston (Postfix) with ESMTP id 9D83C1FF87;
-	Tue,  4 Jun 2019 10:43:59 +0100 (BST)
-References: <20190603150120.29255-1-alex.bennee@linaro.org>
-	<201906031835.13420.randrianasulu@gmail.com>
-User-agent: mu4e 1.3.2; emacs 26.1
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Andrew Randrianasulu <randrianasulu@gmail.com>
-In-reply-to: <201906031835.13420.randrianasulu@gmail.com>
-Date: Tue, 04 Jun 2019 10:43:59 +0100
-Message-ID: <87zhmxsn1c.fsf@zen.linaroharston>
+	h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+	:mime-version:content-disposition:in-reply-to:user-agent;
+	bh=EoTFirwkcUMGV6qEYqMa/Ij3w52n1eYJPvzktcK+OLg=;
+	b=HIBRI5GuOPgcgYnHsu6jHfWtExsN0yvjc0HSPJ8UmYBfuq4WLJLY5kVHU1AXAslocO
+	5Ka1GNoWrvSurSjnJ6ImneX+/GDcvbFVC0A/7N9x7InlLWeSIMV2jeY8McRTVgcBvfTa
+	9kPtMGTx9FgRJEmwUoQvRaDxSTUg3Nz4v92wDmNIUZiA6aCvXrsAHNkRhM2bGaXfQUBl
+	2Qx2BEHvTJs8X4H+Wp7GHJJU/YZPWzfGavgAIF2zS8w9TGwCa2Ii6uozWvfOJQ7+xRNW
+	EwB07DaeQ47jcgCTXQQQu8wUD9RAGE2kRfa9MY9/84ZoI4DOXdNz3XDVQxCiEvREq2gh
+	ywmQ==
+X-Gm-Message-State: APjAAAWcDuFhPLZTgICGiyLcIbpbAIkFlQbXNOy5JZeiOAqfqDqx626W
+	wIkE2QsDiYClgxSyUhcYKSg=
+X-Google-Smtp-Source: APXvYqylyF3vA0f1qgs1OvwYGret4IAxdCHBlxIbs8Z8mlOYygcjNNXipPZP4rfcmoux3aXf3Ve5rw==
+X-Received: by 2002:a05:600c:2182:: with SMTP id
+	e2mr13342957wme.55.1559641456303; 
+	Tue, 04 Jun 2019 02:44:16 -0700 (PDT)
+Received: from Red ([2a01:cb1d:147:7200:2e56:dcff:fed2:c6d6])
+	by smtp.googlemail.com with ESMTPSA id
+	k66sm6004001wmb.34.2019.06.04.02.44.15
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Tue, 04 Jun 2019 02:44:15 -0700 (PDT)
+Date: Tue, 4 Jun 2019 11:44:13 +0200
+From: Corentin Labbe <clabbe.montjoie@gmail.com>
+To: Aaro Koskinen <aaro.koskinen@iki.fi>
+Message-ID: <20190604094413.GB15484@Red>
+References: <20190520190533.GA28160@Red>
+	<20190521232323.GD3621@darkstar.musicnaut.iki.fi>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190521232323.GD3621@darkstar.musicnaut.iki.fi>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2a00:1450:4864:20::443
-Subject: Re: [Qemu-devel] [RFC PATCH] cputlb: use uint64_t for interim
- values for unaligned load
+X-Received-From: 2a00:1450:4864:20::344
+Subject: Re: [Qemu-devel] Running linux on qemu omap
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -98,60 +96,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: 1830872@bugs.launchpad.net, qemu-arm@nongnu.org, qemu-devel@nongnu.org,
-	Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: Tony Lindgren <tony@atomide.com>, linux-omap@vger.kernel.org,
+	qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Wed, May 22, 2019 at 02:23:23AM +0300, Aaro Koskinen wrote:
+> Hi,
+> 
+> On Mon, May 20, 2019 at 09:05:33PM +0200, Corentin Labbe wrote:
+> > Hello
+> > 
+> > I am working on adding a maximum set of qemu machine on kernelCI.
+> 
+> That's cool.
+> 
+> > For OMAP, five machine exists and I fail to boot any of them.
+> 
+> Which machines?
+> 
+> > The maximum I can get with omap1_defconfig is
+> > qemu-system-arm -kernel zImage -nographic -machine cheetah -append 'root=/dev/ram0 console=ttyO0'
+> > Uncompressing Linux... done, booting the kernel.
+> > then nothing more.
+> 
+> It's known that omap1_defconfig doesn't work well for QEMU or
+> "multi-board" usage. Perhaps the kernel size is now just too big?
+> I'm using a custom config for every OMAP1 board anyway...
+> 
+> > Does someone have a working config+version to share ?
+> 
+> I have used the below config for OMAP1 SX1 board (the only one I got
+> working with QEMU). Unfortunately the functionality is quite limited,
+> but it still allows to run e.g. GCC bootstrap & testsuite, that is rare
+> nowadays for armv4t.
+> 
+> I'm using the following command line with qemu-system-arm 3.1.0:
+> 
+>         -M sx1 \
+>         -kernel "sx1-zImage" \
+>         -nographic \
+>         -drive file="sx1-mmc",if=sd,format=raw \
+>         -no-reboot
+> 
+> This should work with v5.1 kernel.
+> 
+> I'm also interested to run other OMAP kernels under QEMU, e.g. cheetah
+> (the real device, Palm TE works OK with the current mainline), and it
+> would be interesting to know why QEMU/kernel has regressed...
+> 
 
-Andrew Randrianasulu <randrianasulu@gmail.com> writes:
+Thanks, with your config as starting point, I was able to boot both sx1 and cheetah
 
-> =D0=92 =D1=81=D0=BE=D0=BE=D0=B1=D1=89=D0=B5=D0=BD=D0=B8=D0=B8 =D0=BE=D1=
-=82 Monday 03 June 2019 18:01:20 Alex Benn=C3=A9e =D0=BD=D0=B0=D0=BF=D0=B8=
-=D1=81=D0=B0=D0=BB(=D0=B0):
->> When running on 32 bit TCG backends a wide unaligned load ends up
->> truncating data before returning to the guest. We specifically have
->> the return type as uint64_t to avoid any premature truncation so we
->> should use the same for the interim types.
->>
->> Hopefully fixes #1830872
->>
->> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
->> ---
->>  accel/tcg/cputlb.c | 2 +-
->>  1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/accel/tcg/cputlb.c b/accel/tcg/cputlb.c
->> index cdcc3771020..b796ab1cbea 100644
->> --- a/accel/tcg/cputlb.c
->> +++ b/accel/tcg/cputlb.c
->> @@ -1303,7 +1303,7 @@ load_helper(CPUArchState *env, target_ulong addr, =
-TCGMemOpIdx oi,
->>          && unlikely((addr & ~TARGET_PAGE_MASK) + size - 1
->>                      >=3D TARGET_PAGE_SIZE)) {
->>          target_ulong addr1, addr2;
->> -        tcg_target_ulong r1, r2;
->> +        uint64_t r1, r2;
->>          unsigned shift;
->>      do_unaligned_access:
->>          addr1 =3D addr & ~(size - 1);
->
-> Unfortunatly, this doesn't fix 32-bit qemu-system-x86_64 .... so, my
-> bug is separate from #1830872 ?
+So I now use the omap1_defconfig and the only trick is to disable CONFIG_CPU_DCACHE_WRITETHROUGH.
+I need also to disable CONFIG_FB for cheetah to works.
 
-I think you've hit two - one of which we have just fixed. With my
-expanded memory test on i386 I'm seeing a hang but it's ok @
-pull-demacro-softmmu-100519-1. Unfortunately bisecting through the slirp
-move and other i386 Werror stuff is proving painful.
-
->
-> I also was unable to convince qemu to use my kernel-only x86_64 gcc 6.5.0=
- cross-compiler ..
-> probably x86-64 testing on i686 requires either docker (I don't have this
-> ) or 'real' cross-compiler (build with glibc support).
-
-
---
-Alex Benn=C3=A9e
+Regards
 
