@@ -2,92 +2,63 @@ Return-Path: <SRS0=GUf1=UD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C470C282CE
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 07:22:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3EAABC282CE
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 07:24:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4308624AEA
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 07:22:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4308624AEA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=de.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 16C0324AEC
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 07:24:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 16C0324AEC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:47224 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:47244 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hY3mZ-0005EZ-GF
-	for qemu-devel@archiver.kernel.org; Tue, 04 Jun 2019 03:22:55 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:41912)
+	id 1hY3o5-00067e-AE
+	for qemu-devel@archiver.kernel.org; Tue, 04 Jun 2019 03:24:29 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:41200)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1hY3js-00039q-D1
-	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 03:20:09 -0400
+	(envelope-from <like.xu@linux.intel.com>) id 1hY3ig-00027f-2Z
+	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 03:18:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1hY3jr-0007eR-Ex
-	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 03:20:08 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:34984)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1hY3jr-0007aX-2c
-	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 03:20:07 -0400
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x547JxvC068325
-	for <qemu-devel@nongnu.org>; Tue, 4 Jun 2019 03:20:05 -0400
-Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2swksss2y4-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 04 Jun 2019 03:20:03 -0400
-Received: from localhost
-	by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Tue, 4 Jun 2019 08:19:19 +0100
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
-	by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway:
-	Authorized Use Only! Violators will be prosecuted; 
-	(version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-	Tue, 4 Jun 2019 08:19:17 +0100
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com
-	[9.149.105.232])
-	by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with
-	ESMTP id x547JFgp56295608
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256
-	verify=OK); Tue, 4 Jun 2019 07:19:15 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id BECB85204F;
-	Tue,  4 Jun 2019 07:19:15 +0000 (GMT)
-Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
-	by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTPS id ABCCD52052;
-	Tue,  4 Jun 2019 07:19:15 +0000 (GMT)
-Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 25651)
-	id 62190E15C2; Tue,  4 Jun 2019 09:19:15 +0200 (CEST)
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-To: qemu-devel@nongnu.org
-Date: Tue,  4 Jun 2019 09:19:15 +0200
-X-Mailer: git-send-email 2.21.0
+	(envelope-from <like.xu@linux.intel.com>) id 1hY3av-0000Kq-Gj
+	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 03:10:54 -0400
+Received: from mga06.intel.com ([134.134.136.31]:34984)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <like.xu@linux.intel.com>)
+	id 1hY3au-0008TL-FE
+	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 03:10:53 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+	by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+	04 Jun 2019 00:10:46 -0700
+Received: from likexu-mobl1.ccr.corp.intel.com (HELO [10.239.196.173])
+	([10.239.196.173])
+	by orsmga008-auth.jf.intel.com with ESMTP/TLS/AES256-SHA;
+	04 Jun 2019 00:10:45 -0700
+To: "Michael S. Tsirkin (level 24/vhost) (qemu.patchwork.ozlabs)"
+	<mst@redhat.com>
+From: Like Xu <like.xu@linux.intel.com>
+Organization: Intel OTC
+Message-ID: <449c062f-373c-b310-ccc6-f14c702c8f19@linux.intel.com>
+Date: Tue, 4 Jun 2019 15:10:43 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+	Thunderbird/60.7.0
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-x-cbid: 19060407-0008-0000-0000-000002EDDC55
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19060407-0009-0000-0000-0000225ABECD
-Message-Id: <20190604071915.288045-1-borntraeger@de.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
-	definitions=2019-06-04_06:, , signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
-	priorityscore=1501
-	malwarescore=0 suspectscore=1 phishscore=0 bulkscore=0 spamscore=0
-	clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
-	mlxlogscore=847 adultscore=0 classifier=spam adjust=0 reason=mlx
-	scancount=1 engine=8.0.1-1810050000 definitions=main-1906040050
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.156.1
-Subject: [Qemu-devel] [PATCH] linux-user: fix build with 5.2-rc2 kernel
- headers
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 134.134.136.31
+Subject: [Qemu-devel] [QUESTION] How to reduce network latency to improve
+ netperf TCP_RR drastically?
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -99,47 +70,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Arnd Bergmann <arnd@arndb.de>, Gerhard Stenzel <gerhard.stenzel@de.ibm.com>,
-	Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>,
-	Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org
+Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Since kernel commit 0768e17073dc527ccd ("net: socket: implement 64-bit
-timestamps") the linux kernel headers (those installed on the build
-system, not those that are synced to QEMU) will make qemu-user fail to
-build:
+Hi Michael，
 
-/root/rpmbuild/BUILD/qemu-4.0.50/linux-user/ioctls.h:222:9: error: 'SIOCGSTAMP' undeclared here (not in a function); did you mean 'SIOCSRARP'?
-  222 |   IOCTL(SIOCGSTAMP, IOC_R, MK_PTR(MK_STRUCT(STRUCT_timeval)))
-      |         ^~~~~~~~~~
+At https://www.linux-kvm.org/page/NetworkingTodo, there is an entry for 
+network latency saying:
 
-Let us fix this by including  "linux/sockios.h" instead of relying on
-"sys/socket.h" providing those defines via an include chain.
-
-Cc: Riku Voipio <riku.voipio@iki.fi>
-Cc: Laurent Vivier <laurent@vivier.eu>
-Cc: Arnd Bergmann <arnd@arndb.de>
-Reported-by: Gerhard Stenzel <gerhard.stenzel@de.ibm.com>
-Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
 ---
- linux-user/syscall.c | 1 +
- 1 file changed, 1 insertion(+)
+reduce networking latency:
+  allow handling short packets from softirq or VCPU context
+  Plan:
+    We are going through the scheduler 3 times
+    (could be up to 5 if softirqd is involved)
+    Consider RX: host irq -> io thread -> VCPU thread ->
+    guest irq -> guest thread.
+    This adds a lot of latency.
+    We can cut it by some 1.5x if we do a bit of work
+    either in the VCPU or softirq context.
+  Testing: netperf TCP RR - should be improved drastically
+           netperf TCP STREAM guest to host - no regression
+  Contact: MST
+---
 
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index efa3ec2837..7332be9b06 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -34,6 +34,7 @@
- #include <sys/resource.h>
- #include <sys/swap.h>
- #include <linux/capability.h>
-+#include <linux/sockios.h>
- #include <sched.h>
- #include <sys/timex.h>
- #include <sys/socket.h>
--- 
-2.21.0
+I am trying to make some contributions to improving netperf TCP_RR.
+Could you please share more ideas or plans or implemental details to 
+make it happen?
 
+Thanks,
+Like Xu
 
