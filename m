@@ -7,79 +7,79 @@ X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AF0F5C282CE
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 20:45:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E8B4C282CE
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 20:46:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7DD29207E0
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 20:45:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CFB61207E0
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 20:46:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ZVThC9fv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7DD29207E0
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="zMKhz2Ad"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CFB61207E0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:57745 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:57769 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hYGJK-0002GZ-P6
-	for qemu-devel@archiver.kernel.org; Tue, 04 Jun 2019 16:45:34 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:35850)
+	id 1hYGKb-0003Pu-2s
+	for qemu-devel@archiver.kernel.org; Tue, 04 Jun 2019 16:46:53 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:35781)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hYG8b-0001Ix-4V
-	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 16:34:30 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hYG8U-0001A4-JN
+	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 16:34:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hYG8a-0004No-2n
-	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 16:34:29 -0400
-Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:43481)
+	(envelope-from <richard.henderson@linaro.org>) id 1hYG8S-0004GI-0v
+	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 16:34:22 -0400
+Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:35309)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hYG8Z-0004ND-UP
-	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 16:34:28 -0400
-Received: by mail-oi1-x244.google.com with SMTP id w79so7536730oif.10
-	for <qemu-devel@nongnu.org>; Tue, 04 Jun 2019 13:34:27 -0700 (PDT)
+	id 1hYG8R-0004Ff-P4
+	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 16:34:19 -0400
+Received: by mail-oi1-x241.google.com with SMTP id y6so13001466oix.2
+	for <qemu-devel@nongnu.org>; Tue, 04 Jun 2019 13:34:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
 	h=from:to:subject:date:message-id:in-reply-to:references;
-	bh=pnOBaWOuZI6RQh/0O1nDjt3Ap0L8f++M/zWc9l2w1jE=;
-	b=ZVThC9fvSeJE7W+JVmKtAVtQVEboSApjL1uni4bSucp1nj3W9UkCrr5rPcgGItZBiz
-	DNOp+3EDUqzJNhvzA9nLuI2XX307HfS/+haXIPvZps1//uc/3TbHts6rLgIJAYyW4+SI
-	pdk5kyDb4T6wTcZLrmJmeCi8qOhFPGTkNuItIdK/M9NEZQLHmQ7apLqaiZv2joFw3oVl
-	XWnpmYNbetfWdBgzCOmWygJOyC0UU2eMtlRiHBgwLU+Ulcqyls9KekelSOHkV+2uzCMn
-	V0nCLirOYBceBekCmay0gmA4iCyzA/4PttrXGn1zfgmn6CcUudHTFBnZt1B8JwNE0Imd
-	4VDw==
+	bh=defirvbA6023UE6OqyQA+R97OV+NvBSzbYLljfjvZQ0=;
+	b=zMKhz2Ad/5PUXsNRnXgMocuYeFUOAbsdwXdNH7AmFajX37lMvRlI3unA3Eqri47YBv
+	RZCwMeUz5qYdBmOwYy/WtCcCZ4U8ze+WzjJ9d7kSkpxXjedniXh/4KoCgAAd63wd6Vy/
+	8qHRdFdq7rjRw6R3UQWr6nJgoBk5KJCWi96dgGDcnmR4Q2lQpYrSg/DYtlBb7WpsQViX
+	POIPPxYruYqg646JMfoOqFpgxR9UX6Wl48K3zE90K5rAk5Xkc8a5wIsDMIjhldw6L2Ih
+	fqEVC1yMHaspf9dYhgrHsuVME8XwWgHfJ4F9N+/URtlCpGhWxVtQ7A1w9OOiuDzvaFGd
+	4RpQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
 	:references;
-	bh=pnOBaWOuZI6RQh/0O1nDjt3Ap0L8f++M/zWc9l2w1jE=;
-	b=qEviuKEW4rhj4RwDRTZ8EZHahIyXNJ6h8xSRq4VCw+Zcvs/9YDA8iklff0/p6x+/Uh
-	VHL5+Dawg2NLqX22kSmVoKwynrVLJNdwDkhoeVkxI1ZiwbDLfzxk8BkTDzlgUfjIKuEd
-	cukKBshHAiflJ15nZl64WGIc40cMMdMsdxA5JsYVf3S4hLbraILMf7HHUdF0+x87rM77
-	PVZAfwLYkg2FPAhy4G7sgxu6tYcoXouxgW4BHTULXSYxZwB0SfwjI1+snuBaIX2QUW2X
-	sH6GugAbh8UWzxP/8LvNra247w8Lukg84hNQNGwlsoGhZTaua57zGI3tg3WgAq8KMFig
-	kUfg==
-X-Gm-Message-State: APjAAAWYgT08Lt/ibHCPwVfv5ZS60yvP82DUzukx9fkNN5edle0za+5C
-	qUTEOCjEWfZVKsUiiuojmFOabHmE//yysA==
-X-Google-Smtp-Source: APXvYqwfPWqvLW5gLaRRqHjn4qvuxgAWLFWGKRjcSUSaRak51rMY69SstMDgzR2VnnE/1FEIAya2Jg==
-X-Received: by 2002:aca:5b57:: with SMTP id p84mr5550599oib.4.1559680466947;
-	Tue, 04 Jun 2019 13:34:26 -0700 (PDT)
+	bh=defirvbA6023UE6OqyQA+R97OV+NvBSzbYLljfjvZQ0=;
+	b=JLrXSA+1srwfx3VlBe616Xitrk26XpHkfVoTOQhk00Ig3O/C8E7rESVBGMivARB126
+	Ki1azKuY9WZvMBZeArVoWtgceK15m4+L0VVaoZUCo6cYVHtwHd2HpI2diaSm398yDnAC
+	uu/lVjMFq01IhJrZlAJlwr+Ob773GDJlpn/rqh2DZgT0hgtquF5CWR6hrCweVNP5GT16
+	JKM4/thfTo88pfUXx6UTsE95UrZ5eisWCP0Xo617t0raczp6wG3ukzXGHDmh0z+imAcC
+	GB/op2zfOvTBkXP88CiyWbsxd9LsJ1O83rvN+AJLeTDIsdqjTofEjArZ5ffX9MLPeUTm
+	LU8w==
+X-Gm-Message-State: APjAAAWCG27R7/NXYw3La1dVu6tHejUjgTusoiEE70nZt6p6LjPwnSBr
+	avdfEMtI8T+PJeJFi06PFvD625Si9nQtNA==
+X-Google-Smtp-Source: APXvYqzrbBFYjJpKC+xtOpsniBYlv4lkfzfHCYy2zhj2WSWGURcpwtNNbZJxR0Z0k7hlvnMOGC74uw==
+X-Received: by 2002:aca:845:: with SMTP id 66mr3638609oii.163.1559680458481;
+	Tue, 04 Jun 2019 13:34:18 -0700 (PDT)
 Received: from localhost.localdomain (200-56-192-86-cable.cybercable.net.mx.
 	[200.56.192.86])
-	by smtp.gmail.com with ESMTPSA id h1sm5979901otj.78.2019.06.04.13.34.25
+	by smtp.gmail.com with ESMTPSA id h1sm5979901otj.78.2019.06.04.13.34.16
 	for <qemu-devel@nongnu.org>
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Tue, 04 Jun 2019 13:34:26 -0700 (PDT)
+	Tue, 04 Jun 2019 13:34:17 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Tue,  4 Jun 2019 15:33:32 -0500
-Message-Id: <20190604203351.27778-21-richard.henderson@linaro.org>
+Date: Tue,  4 Jun 2019 15:33:26 -0500
+Message-Id: <20190604203351.27778-15-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190604203351.27778-1-richard.henderson@linaro.org>
 References: <20190604203351.27778-1-richard.henderson@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2607:f8b0:4864:20::244
-Subject: [Qemu-devel] [PATCH v4 20/39] target/nios2: Use env_cpu, env_archcpu
+X-Received-From: 2607:f8b0:4864:20::241
+Subject: [Qemu-devel] [PATCH v4 14/39] target/i386: Use env_cpu, env_archcpu
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -96,102 +96,625 @@ Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 Cleanup in the boilerplate that each target must define.
-Replace nios2_env_get_cpu with env_archcpu.  The combination
-CPU(nios2_env_get_cpu) should have used ENV_GET_CPU to begin;
+Replace x86_env_get_cpu with env_archcpu.  The combination
+CPU(x86_env_get_cpu) should have used ENV_GET_CPU to begin;
 use env_cpu now.
 
 Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/nios2/cpu.h |  5 -----
- hw/nios2/cpu_pic.c |  5 +----
- target/nios2/mmu.c | 10 +++++-----
- 3 files changed, 6 insertions(+), 14 deletions(-)
+ target/i386/cpu.h          |  5 -----
+ bsd-user/main.c            |  3 +--
+ hw/i386/kvmvapic.c         |  4 ++--
+ hw/i386/pc.c               |  2 +-
+ linux-user/i386/cpu_loop.c |  2 +-
+ linux-user/i386/signal.c   |  2 +-
+ linux-user/vm86.c          | 18 +++++++++---------
+ target/i386/bpt_helper.c   |  4 ++--
+ target/i386/cpu.c          |  4 ++--
+ target/i386/excp_helper.c  |  2 +-
+ target/i386/fpu_helper.c   |  2 +-
+ target/i386/helper.c       | 16 ++++++----------
+ target/i386/misc_helper.c  | 24 +++++++++++-------------
+ target/i386/seg_helper.c   | 14 +++++++-------
+ target/i386/smm_helper.c   |  4 ++--
+ target/i386/svm_helper.c   | 22 +++++++++++-----------
+ 16 files changed, 58 insertions(+), 70 deletions(-)
 
-diff --git a/target/nios2/cpu.h b/target/nios2/cpu.h
-index ae6cf1b4d1..9490ba83e4 100644
---- a/target/nios2/cpu.h
-+++ b/target/nios2/cpu.h
-@@ -194,11 +194,6 @@ typedef struct Nios2CPU {
-     uint32_t fast_tlb_miss_addr;
- } Nios2CPU;
+diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+index 103fd709b0..709d88cfcf 100644
+--- a/target/i386/cpu.h
++++ b/target/i386/cpu.h
+@@ -1480,11 +1480,6 @@ struct X86CPU {
+     int32_t hv_max_vps;
+ };
  
--static inline Nios2CPU *nios2_env_get_cpu(CPUNios2State *env)
+-static inline X86CPU *x86_env_get_cpu(CPUX86State *env)
 -{
--    return NIOS2_CPU(container_of(env, Nios2CPU, env));
+-    return container_of(env, X86CPU, env);
 -}
 -
- #define ENV_OFFSET offsetof(Nios2CPU, env)
+ #define ENV_OFFSET offsetof(X86CPU, env)
  
- void nios2_tcg_init(void);
-diff --git a/hw/nios2/cpu_pic.c b/hw/nios2/cpu_pic.c
-index 6bccce2f32..9e39955bd1 100644
---- a/hw/nios2/cpu_pic.c
-+++ b/hw/nios2/cpu_pic.c
-@@ -54,12 +54,9 @@ static void nios2_pic_cpu_handler(void *opaque, int irq, int level)
+ #ifndef CONFIG_USER_ONLY
+diff --git a/bsd-user/main.c b/bsd-user/main.c
+index 6192e9d91e..bfdcae4269 100644
+--- a/bsd-user/main.c
++++ b/bsd-user/main.c
+@@ -140,8 +140,7 @@ static void set_idt(int n, unsigned int dpl)
  
- void nios2_check_interrupts(CPUNios2State *env)
+ void cpu_loop(CPUX86State *env)
  {
--    Nios2CPU *cpu = nios2_env_get_cpu(env);
+-    X86CPU *cpu = x86_env_get_cpu(env);
 -    CPUState *cs = CPU(cpu);
++    CPUState *cs = env_cpu(cpu);
+     int trapnr;
+     abi_ulong pc;
+     //target_siginfo_t info;
+diff --git a/hw/i386/kvmvapic.c b/hw/i386/kvmvapic.c
+index 70f6f26a94..fe5b12ef6e 100644
+--- a/hw/i386/kvmvapic.c
++++ b/hw/i386/kvmvapic.c
+@@ -152,7 +152,7 @@ static void update_guest_rom_state(VAPICROMState *s)
+ 
+ static int find_real_tpr_addr(VAPICROMState *s, CPUX86State *env)
+ {
+-    CPUState *cs = CPU(x86_env_get_cpu(env));
++    CPUState *cs = env_cpu(env);
+     hwaddr paddr;
+     target_ulong addr;
+ 
+@@ -279,7 +279,7 @@ instruction_ok:
+ 
+ static int update_rom_mapping(VAPICROMState *s, CPUX86State *env, target_ulong ip)
+ {
+-    CPUState *cs = CPU(x86_env_get_cpu(env));
++    CPUState *cs = env_cpu(env);
+     hwaddr paddr;
+     uint32_t rom_state_vaddr;
+     uint32_t pos, patch, offset;
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index edc240bcbf..1b08b56362 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -406,7 +406,7 @@ uint64_t cpu_get_tsc(CPUX86State *env)
+ /* IRQ handling */
+ int cpu_get_pic_interrupt(CPUX86State *env)
+ {
+-    X86CPU *cpu = x86_env_get_cpu(env);
++    X86CPU *cpu = env_archcpu(env);
+     int intno;
+ 
+     if (!kvm_irqchip_in_kernel()) {
+diff --git a/linux-user/i386/cpu_loop.c b/linux-user/i386/cpu_loop.c
+index 51cfa006c9..71da24384f 100644
+--- a/linux-user/i386/cpu_loop.c
++++ b/linux-user/i386/cpu_loop.c
+@@ -82,7 +82,7 @@ static void set_idt(int n, unsigned int dpl)
+ 
+ void cpu_loop(CPUX86State *env)
+ {
+-    CPUState *cs = CPU(x86_env_get_cpu(env));
++    CPUState *cs = env_cpu(env);
+     int trapnr;
+     abi_ulong pc;
+     abi_ulong ret;
+diff --git a/linux-user/i386/signal.c b/linux-user/i386/signal.c
+index fecb4c99c3..97a39204cc 100644
+--- a/linux-user/i386/signal.c
++++ b/linux-user/i386/signal.c
+@@ -198,7 +198,7 @@ static void setup_sigcontext(struct target_sigcontext *sc,
+         struct target_fpstate *fpstate, CPUX86State *env, abi_ulong mask,
+         abi_ulong fpstate_addr)
+ {
+-    CPUState *cs = CPU(x86_env_get_cpu(env));
++    CPUState *cs = env_cpu(env);
+ #ifndef TARGET_X86_64
+     uint16_t magic;
+ 
+diff --git a/linux-user/vm86.c b/linux-user/vm86.c
+index 9c393df424..2fa7a89edc 100644
+--- a/linux-user/vm86.c
++++ b/linux-user/vm86.c
+@@ -72,7 +72,7 @@ static inline unsigned int vm_getl(CPUX86State *env,
+ 
+ void save_v86_state(CPUX86State *env)
+ {
+-    CPUState *cs = CPU(x86_env_get_cpu(env));
++    CPUState *cs = env_cpu(env);
+     TaskState *ts = cs->opaque;
+     struct target_vm86plus_struct * target_v86;
+ 
+@@ -132,7 +132,7 @@ static inline void return_to_32bit(CPUX86State *env, int retval)
+ 
+ static inline int set_IF(CPUX86State *env)
+ {
+-    CPUState *cs = CPU(x86_env_get_cpu(env));
++    CPUState *cs = env_cpu(env);
+     TaskState *ts = cs->opaque;
+ 
+     ts->v86flags |= VIF_MASK;
+@@ -145,7 +145,7 @@ static inline int set_IF(CPUX86State *env)
+ 
+ static inline void clear_IF(CPUX86State *env)
+ {
+-    CPUState *cs = CPU(x86_env_get_cpu(env));
++    CPUState *cs = env_cpu(env);
+     TaskState *ts = cs->opaque;
+ 
+     ts->v86flags &= ~VIF_MASK;
+@@ -163,7 +163,7 @@ static inline void clear_AC(CPUX86State *env)
+ 
+ static inline int set_vflags_long(unsigned long eflags, CPUX86State *env)
+ {
+-    CPUState *cs = CPU(x86_env_get_cpu(env));
++    CPUState *cs = env_cpu(env);
+     TaskState *ts = cs->opaque;
+ 
+     set_flags(ts->v86flags, eflags, ts->v86mask);
+@@ -177,7 +177,7 @@ static inline int set_vflags_long(unsigned long eflags, CPUX86State *env)
+ 
+ static inline int set_vflags_short(unsigned short flags, CPUX86State *env)
+ {
+-    CPUState *cs = CPU(x86_env_get_cpu(env));
++    CPUState *cs = env_cpu(env);
+     TaskState *ts = cs->opaque;
+ 
+     set_flags(ts->v86flags, flags, ts->v86mask & 0xffff);
+@@ -191,7 +191,7 @@ static inline int set_vflags_short(unsigned short flags, CPUX86State *env)
+ 
+ static inline unsigned int get_vflags(CPUX86State *env)
+ {
+-    CPUState *cs = CPU(x86_env_get_cpu(env));
++    CPUState *cs = env_cpu(env);
+     TaskState *ts = cs->opaque;
+     unsigned int flags;
+ 
+@@ -208,7 +208,7 @@ static inline unsigned int get_vflags(CPUX86State *env)
+    support TSS interrupt revectoring, so this code is always executed) */
+ static void do_int(CPUX86State *env, int intno)
+ {
+-    CPUState *cs = CPU(x86_env_get_cpu(env));
++    CPUState *cs = env_cpu(env);
+     TaskState *ts = cs->opaque;
+     uint32_t int_addr, segoffs, ssp;
+     unsigned int sp;
+@@ -267,7 +267,7 @@ void handle_vm86_trap(CPUX86State *env, int trapno)
+ 
+ void handle_vm86_fault(CPUX86State *env)
+ {
+-    CPUState *cs = CPU(x86_env_get_cpu(env));
++    CPUState *cs = env_cpu(env);
+     TaskState *ts = cs->opaque;
+     uint32_t csp, ssp;
+     unsigned int ip, sp, newflags, newip, newcs, opcode, intno;
+@@ -392,7 +392,7 @@ void handle_vm86_fault(CPUX86State *env)
+ 
+ int do_vm86(CPUX86State *env, long subfunction, abi_ulong vm86_addr)
+ {
+-    CPUState *cs = CPU(x86_env_get_cpu(env));
++    CPUState *cs = env_cpu(env);
+     TaskState *ts = cs->opaque;
+     struct target_vm86plus_struct * target_v86;
+     int ret;
+diff --git a/target/i386/bpt_helper.c b/target/i386/bpt_helper.c
+index b3efdc77ec..c3a8ea73c9 100644
+--- a/target/i386/bpt_helper.c
++++ b/target/i386/bpt_helper.c
+@@ -53,7 +53,7 @@ static inline int hw_breakpoint_len(unsigned long dr7, int index)
+ 
+ static int hw_breakpoint_insert(CPUX86State *env, int index)
+ {
+-    CPUState *cs = CPU(x86_env_get_cpu(env));
++    CPUState *cs = env_cpu(env);
+     target_ulong dr7 = env->dr[7];
+     target_ulong drN = env->dr[index];
+     int err = 0;
+@@ -97,7 +97,7 @@ static int hw_breakpoint_insert(CPUX86State *env, int index)
+ 
+ static void hw_breakpoint_remove(CPUX86State *env, int index)
+ {
+-    CPUState *cs = CPU(x86_env_get_cpu(env));
++    CPUState *cs = env_cpu(env);
+ 
+     switch (hw_breakpoint_type(env->dr[7], index)) {
+     case DR7_TYPE_BP_INST:
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index c1ab86d63e..a461d8d92c 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -4222,8 +4222,8 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
+                    uint32_t *eax, uint32_t *ebx,
+                    uint32_t *ecx, uint32_t *edx)
+ {
+-    X86CPU *cpu = x86_env_get_cpu(env);
+-    CPUState *cs = CPU(cpu);
++    X86CPU *cpu = env_archcpu(env);
++    CPUState *cs = env_cpu(env);
+     uint32_t pkg_offset;
+     uint32_t limit;
+     uint32_t signature[3];
+diff --git a/target/i386/excp_helper.c b/target/i386/excp_helper.c
+index fa1ead6404..a9bca7c28b 100644
+--- a/target/i386/excp_helper.c
++++ b/target/i386/excp_helper.c
+@@ -90,7 +90,7 @@ static void QEMU_NORETURN raise_interrupt2(CPUX86State *env, int intno,
+                                            int next_eip_addend,
+                                            uintptr_t retaddr)
+ {
+-    CPUState *cs = CPU(x86_env_get_cpu(env));
++    CPUState *cs = env_cpu(env);
+ 
+     if (!is_int) {
+         cpu_svm_check_intercept_param(env, SVM_EXIT_EXCP_BASE + intno,
+diff --git a/target/i386/fpu_helper.c b/target/i386/fpu_helper.c
+index ea5a0c4861..005f1f68f8 100644
+--- a/target/i386/fpu_helper.c
++++ b/target/i386/fpu_helper.c
+@@ -1477,7 +1477,7 @@ void helper_xrstor(CPUX86State *env, target_ulong ptr, uint64_t rfbm)
+             env->pkru = 0;
+         }
+         if (env->pkru != old_pkru) {
+-            CPUState *cs = CPU(x86_env_get_cpu(env));
++            CPUState *cs = env_cpu(env);
+             tlb_flush(cs);
+         }
+     }
+diff --git a/target/i386/helper.c b/target/i386/helper.c
+index 96336055f3..ff3a60c7cf 100644
+--- a/target/i386/helper.c
++++ b/target/i386/helper.c
+@@ -622,7 +622,7 @@ void x86_cpu_set_a20(X86CPU *cpu, int a20_state)
+ 
+ void cpu_x86_update_cr0(CPUX86State *env, uint32_t new_cr0)
+ {
+-    X86CPU *cpu = x86_env_get_cpu(env);
++    X86CPU *cpu = env_archcpu(env);
+     int pe_state;
+ 
+     qemu_log_mask(CPU_LOG_MMU, "CR0 update: CR0=0x%08x\n", new_cr0);
+@@ -664,19 +664,16 @@ void cpu_x86_update_cr0(CPUX86State *env, uint32_t new_cr0)
+    the PDPT */
+ void cpu_x86_update_cr3(CPUX86State *env, target_ulong new_cr3)
+ {
+-    X86CPU *cpu = x86_env_get_cpu(env);
 -
-     if (env->irq_pending) {
-         env->irq_pending = 0;
--        cpu_interrupt(cs, CPU_INTERRUPT_HARD);
-+        cpu_interrupt(env_cpu(env), CPU_INTERRUPT_HARD);
+     env->cr[3] = new_cr3;
+     if (env->cr[0] & CR0_PG_MASK) {
+         qemu_log_mask(CPU_LOG_MMU,
+                         "CR3 update: CR3=" TARGET_FMT_lx "\n", new_cr3);
+-        tlb_flush(CPU(cpu));
++        tlb_flush(env_cpu(env));
      }
  }
  
-diff --git a/target/nios2/mmu.c b/target/nios2/mmu.c
-index 53ed6413b4..9a0bafe786 100644
---- a/target/nios2/mmu.c
-+++ b/target/nios2/mmu.c
-@@ -61,7 +61,7 @@ unsigned int mmu_translate(CPUNios2State *env,
-                            Nios2MMULookup *lu,
-                            target_ulong vaddr, int rw, int mmu_idx)
+ void cpu_x86_update_cr4(CPUX86State *env, uint32_t new_cr4)
  {
--    Nios2CPU *cpu = nios2_env_get_cpu(env);
-+    Nios2CPU *cpu = env_archcpu(env);
-     int pid = (env->mmu.tlbmisc_wr & CR_TLBMISC_PID_MASK) >> 4;
-     int vpn = vaddr >> 12;
+-    X86CPU *cpu = x86_env_get_cpu(env);
+     uint32_t hflags;
  
-@@ -103,7 +103,7 @@ unsigned int mmu_translate(CPUNios2State *env,
- static void mmu_flush_pid(CPUNios2State *env, uint32_t pid)
+ #if defined(DEBUG_MMU)
+@@ -685,7 +682,7 @@ void cpu_x86_update_cr4(CPUX86State *env, uint32_t new_cr4)
+     if ((new_cr4 ^ env->cr[4]) &
+         (CR4_PGE_MASK | CR4_PAE_MASK | CR4_PSE_MASK |
+          CR4_SMEP_MASK | CR4_SMAP_MASK | CR4_LA57_MASK)) {
+-        tlb_flush(CPU(cpu));
++        tlb_flush(env_cpu(env));
+     }
+ 
+     /* Clear bits we're going to recompute.  */
+@@ -977,8 +974,8 @@ void cpu_x86_inject_mce(Monitor *mon, X86CPU *cpu, int bank,
+ 
+ void cpu_report_tpr_access(CPUX86State *env, TPRAccess access)
  {
-     CPUState *cs = env_cpu(env);
--    Nios2CPU *cpu = nios2_env_get_cpu(env);
-+    Nios2CPU *cpu = env_archcpu(env);
-     int idx;
-     MMU_LOG(qemu_log("TLB Flush PID %d\n", pid));
+-    X86CPU *cpu = x86_env_get_cpu(env);
+-    CPUState *cs = CPU(cpu);
++    X86CPU *cpu = env_archcpu(env);
++    CPUState *cs = env_cpu(env);
  
-@@ -127,7 +127,7 @@ static void mmu_flush_pid(CPUNios2State *env, uint32_t pid)
- void mmu_write(CPUNios2State *env, uint32_t rn, uint32_t v)
+     if (kvm_enabled() || whpx_enabled()) {
+         env->tpr_access_type = access;
+@@ -996,8 +993,7 @@ int cpu_x86_get_descr_debug(CPUX86State *env, unsigned int selector,
+                             target_ulong *base, unsigned int *limit,
+                             unsigned int *flags)
  {
-     CPUState *cs = env_cpu(env);
--    Nios2CPU *cpu = nios2_env_get_cpu(env);
-+    Nios2CPU *cpu = env_archcpu(env);
+-    X86CPU *cpu = x86_env_get_cpu(env);
+-    CPUState *cs = CPU(cpu);
++    CPUState *cs = env_cpu(env);
+     SegmentCache *dt;
+     target_ulong ptr;
+     uint32_t e1, e2;
+diff --git a/target/i386/misc_helper.c b/target/i386/misc_helper.c
+index 78f2020ef2..3eff6885f8 100644
+--- a/target/i386/misc_helper.c
++++ b/target/i386/misc_helper.c
+@@ -133,7 +133,7 @@ target_ulong helper_read_crN(CPUX86State *env, int reg)
+         break;
+     case 8:
+         if (!(env->hflags2 & HF2_VINTR_MASK)) {
+-            val = cpu_get_apic_tpr(x86_env_get_cpu(env)->apic_state);
++            val = cpu_get_apic_tpr(env_archcpu(env)->apic_state);
+         } else {
+             val = env->v_tpr;
+         }
+@@ -158,7 +158,7 @@ void helper_write_crN(CPUX86State *env, int reg, target_ulong t0)
+     case 8:
+         if (!(env->hflags2 & HF2_VINTR_MASK)) {
+             qemu_mutex_lock_iothread();
+-            cpu_set_apic_tpr(x86_env_get_cpu(env)->apic_state, t0);
++            cpu_set_apic_tpr(env_archcpu(env)->apic_state, t0);
+             qemu_mutex_unlock_iothread();
+         }
+         env->v_tpr = t0 & 0x0f;
+@@ -180,7 +180,7 @@ void helper_lmsw(CPUX86State *env, target_ulong t0)
  
-     MMU_LOG(qemu_log("mmu_write %08X = %08X\n", rn, v));
- 
-@@ -244,7 +244,7 @@ void mmu_write(CPUNios2State *env, uint32_t rn, uint32_t v)
- 
- void mmu_init(CPUNios2State *env)
+ void helper_invlpg(CPUX86State *env, target_ulong addr)
  {
--    Nios2CPU *cpu = nios2_env_get_cpu(env);
-+    Nios2CPU *cpu = env_archcpu(env);
-     Nios2MMU *mmu = &env->mmu;
+-    X86CPU *cpu = x86_env_get_cpu(env);
++    X86CPU *cpu = env_archcpu(env);
  
-     MMU_LOG(qemu_log("mmu_init\n"));
-@@ -255,7 +255,7 @@ void mmu_init(CPUNios2State *env)
+     cpu_svm_check_intercept_param(env, SVM_EXIT_INVLPG, 0, GETPC());
+     tlb_flush_page(CPU(cpu), addr);
+@@ -247,7 +247,7 @@ void helper_wrmsr(CPUX86State *env)
+         env->sysenter_eip = val;
+         break;
+     case MSR_IA32_APICBASE:
+-        cpu_set_apic_base(x86_env_get_cpu(env)->apic_state, val);
++        cpu_set_apic_base(env_archcpu(env)->apic_state, val);
+         break;
+     case MSR_EFER:
+         {
+@@ -404,7 +404,7 @@ void helper_rdmsr(CPUX86State *env)
+         val = env->sysenter_eip;
+         break;
+     case MSR_IA32_APICBASE:
+-        val = cpu_get_apic_base(x86_env_get_cpu(env)->apic_state);
++        val = cpu_get_apic_base(env_archcpu(env)->apic_state);
+         break;
+     case MSR_EFER:
+         val = env->efer;
+@@ -561,7 +561,7 @@ static void do_hlt(X86CPU *cpu)
  
- void dump_mmu(CPUNios2State *env)
+ void helper_hlt(CPUX86State *env, int next_eip_addend)
  {
--    Nios2CPU *cpu = nios2_env_get_cpu(env);
-+    Nios2CPU *cpu = env_archcpu(env);
-     int i;
+-    X86CPU *cpu = x86_env_get_cpu(env);
++    X86CPU *cpu = env_archcpu(env);
  
-     qemu_printf("MMU: ways %d, entries %d, pid bits %d\n",
+     cpu_svm_check_intercept_param(env, SVM_EXIT_HLT, 0, GETPC());
+     env->eip += next_eip_addend;
+@@ -580,8 +580,8 @@ void helper_monitor(CPUX86State *env, target_ulong ptr)
+ 
+ void helper_mwait(CPUX86State *env, int next_eip_addend)
+ {
+-    CPUState *cs;
+-    X86CPU *cpu;
++    CPUState *cs = env_cpu(env);
++    X86CPU *cpu = env_archcpu(env);
+ 
+     if ((uint32_t)env->regs[R_ECX] != 0) {
+         raise_exception_ra(env, EXCP0D_GPF, GETPC());
+@@ -589,8 +589,6 @@ void helper_mwait(CPUX86State *env, int next_eip_addend)
+     cpu_svm_check_intercept_param(env, SVM_EXIT_MWAIT, 0, GETPC());
+     env->eip += next_eip_addend;
+ 
+-    cpu = x86_env_get_cpu(env);
+-    cs = CPU(cpu);
+     /* XXX: not complete but not completely erroneous */
+     if (cs->cpu_index != 0 || CPU_NEXT(cs) != NULL) {
+         do_pause(cpu);
+@@ -601,7 +599,7 @@ void helper_mwait(CPUX86State *env, int next_eip_addend)
+ 
+ void helper_pause(CPUX86State *env, int next_eip_addend)
+ {
+-    X86CPU *cpu = x86_env_get_cpu(env);
++    X86CPU *cpu = env_archcpu(env);
+ 
+     cpu_svm_check_intercept_param(env, SVM_EXIT_PAUSE, 0, GETPC());
+     env->eip += next_eip_addend;
+@@ -611,7 +609,7 @@ void helper_pause(CPUX86State *env, int next_eip_addend)
+ 
+ void helper_debug(CPUX86State *env)
+ {
+-    CPUState *cs = CPU(x86_env_get_cpu(env));
++    CPUState *cs = env_cpu(env);
+ 
+     cs->exception_index = EXCP_DEBUG;
+     cpu_loop_exit(cs);
+@@ -631,7 +629,7 @@ uint64_t helper_rdpkru(CPUX86State *env, uint32_t ecx)
+ 
+ void helper_wrpkru(CPUX86State *env, uint32_t ecx, uint64_t val)
+ {
+-    CPUState *cs = CPU(x86_env_get_cpu(env));
++    CPUState *cs = env_cpu(env);
+ 
+     if ((env->cr[4] & CR4_PKE_MASK) == 0) {
+         raise_exception_err_ra(env, EXCP06_ILLOP, 0, GETPC());
+diff --git a/target/i386/seg_helper.c b/target/i386/seg_helper.c
+index 63e265cb38..87a627f9dc 100644
+--- a/target/i386/seg_helper.c
++++ b/target/i386/seg_helper.c
+@@ -137,7 +137,7 @@ static inline void get_ss_esp_from_tss(CPUX86State *env, uint32_t *ss_ptr,
+                                        uint32_t *esp_ptr, int dpl,
+                                        uintptr_t retaddr)
+ {
+-    X86CPU *cpu = x86_env_get_cpu(env);
++    X86CPU *cpu = env_archcpu(env);
+     int type, index, shift;
+ 
+ #if 0
+@@ -830,7 +830,7 @@ static void do_interrupt_protected(CPUX86State *env, int intno, int is_int,
+ 
+ static inline target_ulong get_rsp_from_tss(CPUX86State *env, int level)
+ {
+-    X86CPU *cpu = x86_env_get_cpu(env);
++    X86CPU *cpu = env_archcpu(env);
+     int index;
+ 
+ #if 0
+@@ -972,7 +972,7 @@ static void do_interrupt64(CPUX86State *env, int intno, int is_int,
+ #if defined(CONFIG_USER_ONLY)
+ void helper_syscall(CPUX86State *env, int next_eip_addend)
+ {
+-    CPUState *cs = CPU(x86_env_get_cpu(env));
++    CPUState *cs = env_cpu(env);
+ 
+     cs->exception_index = EXCP_SYSCALL;
+     env->exception_next_eip = env->eip + next_eip_addend;
+@@ -1172,7 +1172,7 @@ static void do_interrupt_user(CPUX86State *env, int intno, int is_int,
+ static void handle_even_inj(CPUX86State *env, int intno, int is_int,
+                             int error_code, int is_hw, int rm)
+ {
+-    CPUState *cs = CPU(x86_env_get_cpu(env));
++    CPUState *cs = env_cpu(env);
+     uint32_t event_inj = x86_ldl_phys(cs, env->vm_vmcb + offsetof(struct vmcb,
+                                                           control.event_inj));
+ 
+@@ -1312,7 +1312,7 @@ void x86_cpu_do_interrupt(CPUState *cs)
+ 
+ void do_interrupt_x86_hardirq(CPUX86State *env, int intno, int is_hw)
+ {
+-    do_interrupt_all(x86_env_get_cpu(env), intno, 0, 0, 0, is_hw);
++    do_interrupt_all(env_archcpu(env), intno, 0, 0, 0, is_hw);
+ }
+ 
+ bool x86_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
+@@ -1763,7 +1763,7 @@ void helper_lcall_protected(CPUX86State *env, int new_cs, target_ulong new_eip,
+     target_ulong ssp, old_ssp, offset, sp;
+ 
+     LOG_PCALL("lcall %04x:" TARGET_FMT_lx " s=%d\n", new_cs, new_eip, shift);
+-    LOG_PCALL_STATE(CPU(x86_env_get_cpu(env)));
++    LOG_PCALL_STATE(env_cpu(env));
+     if ((new_cs & 0xfffc) == 0) {
+         raise_exception_err_ra(env, EXCP0D_GPF, 0, GETPC());
+     }
+@@ -2167,7 +2167,7 @@ static inline void helper_ret_protected(CPUX86State *env, int shift,
+     }
+     LOG_PCALL("lret new %04x:" TARGET_FMT_lx " s=%d addend=0x%x\n",
+               new_cs, new_eip, shift, addend);
+-    LOG_PCALL_STATE(CPU(x86_env_get_cpu(env)));
++    LOG_PCALL_STATE(env_cpu(env));
+     if ((new_cs & 0xfffc) == 0) {
+         raise_exception_err_ra(env, EXCP0D_GPF, new_cs & 0xfffc, retaddr);
+     }
+diff --git a/target/i386/smm_helper.c b/target/i386/smm_helper.c
+index c1c34a75db..eb5aa6eb3d 100644
+--- a/target/i386/smm_helper.c
++++ b/target/i386/smm_helper.c
+@@ -204,8 +204,8 @@ void do_smm_enter(X86CPU *cpu)
+ 
+ void helper_rsm(CPUX86State *env)
+ {
+-    X86CPU *cpu = x86_env_get_cpu(env);
+-    CPUState *cs = CPU(cpu);
++    X86CPU *cpu = env_archcpu(env);
++    CPUState *cs = env_cpu(env);
+     target_ulong sm_state;
+     int i, offset;
+     uint32_t val;
+diff --git a/target/i386/svm_helper.c b/target/i386/svm_helper.c
+index 9fd22a883b..7b8105a1c3 100644
+--- a/target/i386/svm_helper.c
++++ b/target/i386/svm_helper.c
+@@ -84,7 +84,7 @@ void helper_svm_check_io(CPUX86State *env, uint32_t port, uint32_t param,
+ static inline void svm_save_seg(CPUX86State *env, hwaddr addr,
+                                 const SegmentCache *sc)
+ {
+-    CPUState *cs = CPU(x86_env_get_cpu(env));
++    CPUState *cs = env_cpu(env);
+ 
+     x86_stw_phys(cs, addr + offsetof(struct vmcb_seg, selector),
+              sc->selector);
+@@ -99,7 +99,7 @@ static inline void svm_save_seg(CPUX86State *env, hwaddr addr,
+ static inline void svm_load_seg(CPUX86State *env, hwaddr addr,
+                                 SegmentCache *sc)
+ {
+-    CPUState *cs = CPU(x86_env_get_cpu(env));
++    CPUState *cs = env_cpu(env);
+     unsigned int flags;
+ 
+     sc->selector = x86_lduw_phys(cs,
+@@ -122,7 +122,7 @@ static inline void svm_load_seg_cache(CPUX86State *env, hwaddr addr,
+ 
+ void helper_vmrun(CPUX86State *env, int aflag, int next_eip_addend)
+ {
+-    CPUState *cs = CPU(x86_env_get_cpu(env));
++    CPUState *cs = env_cpu(env);
+     target_ulong addr;
+     uint64_t nested_ctl;
+     uint32_t event_inj;
+@@ -314,7 +314,7 @@ void helper_vmrun(CPUX86State *env, int aflag, int next_eip_addend)
+     env->hflags2 |= HF2_GIF_MASK;
+ 
+     if (int_ctl & V_IRQ_MASK) {
+-        CPUState *cs = CPU(x86_env_get_cpu(env));
++        CPUState *cs = env_cpu(env);
+ 
+         cs->interrupt_request |= CPU_INTERRUPT_VIRQ;
+     }
+@@ -379,7 +379,7 @@ void helper_vmmcall(CPUX86State *env)
+ 
+ void helper_vmload(CPUX86State *env, int aflag)
+ {
+-    CPUState *cs = CPU(x86_env_get_cpu(env));
++    CPUState *cs = env_cpu(env);
+     target_ulong addr;
+ 
+     cpu_svm_check_intercept_param(env, SVM_EXIT_VMLOAD, 0, GETPC());
+@@ -419,7 +419,7 @@ void helper_vmload(CPUX86State *env, int aflag)
+ 
+ void helper_vmsave(CPUX86State *env, int aflag)
+ {
+-    CPUState *cs = CPU(x86_env_get_cpu(env));
++    CPUState *cs = env_cpu(env);
+     target_ulong addr;
+ 
+     cpu_svm_check_intercept_param(env, SVM_EXIT_VMSAVE, 0, GETPC());
+@@ -482,7 +482,7 @@ void helper_skinit(CPUX86State *env)
+ 
+ void helper_invlpga(CPUX86State *env, int aflag)
+ {
+-    X86CPU *cpu = x86_env_get_cpu(env);
++    X86CPU *cpu = env_archcpu(env);
+     target_ulong addr;
+ 
+     cpu_svm_check_intercept_param(env, SVM_EXIT_INVLPGA, 0, GETPC());
+@@ -501,7 +501,7 @@ void helper_invlpga(CPUX86State *env, int aflag)
+ void cpu_svm_check_intercept_param(CPUX86State *env, uint32_t type,
+                                    uint64_t param, uintptr_t retaddr)
+ {
+-    CPUState *cs = CPU(x86_env_get_cpu(env));
++    CPUState *cs = env_cpu(env);
+ 
+     if (likely(!(env->hflags & HF_GUEST_MASK))) {
+         return;
+@@ -583,7 +583,7 @@ void helper_svm_check_intercept_param(CPUX86State *env, uint32_t type,
+ void helper_svm_check_io(CPUX86State *env, uint32_t port, uint32_t param,
+                          uint32_t next_eip_addend)
+ {
+-    CPUState *cs = CPU(x86_env_get_cpu(env));
++    CPUState *cs = env_cpu(env);
+ 
+     if (env->intercept & (1ULL << (SVM_EXIT_IOIO - SVM_EXIT_INTR))) {
+         /* FIXME: this should be read in at vmrun (faster this way?) */
+@@ -604,7 +604,7 @@ void helper_svm_check_io(CPUX86State *env, uint32_t port, uint32_t param,
+ void cpu_vmexit(CPUX86State *env, uint32_t exit_code, uint64_t exit_info_1,
+                 uintptr_t retaddr)
+ {
+-    CPUState *cs = CPU(x86_env_get_cpu(env));
++    CPUState *cs = env_cpu(env);
+ 
+     cpu_restore_state(cs, retaddr, true);
+ 
+@@ -625,7 +625,7 @@ void cpu_vmexit(CPUX86State *env, uint32_t exit_code, uint64_t exit_info_1,
+ 
+ void do_vmexit(CPUX86State *env, uint32_t exit_code, uint64_t exit_info_1)
+ {
+-    CPUState *cs = CPU(x86_env_get_cpu(env));
++    CPUState *cs = env_cpu(env);
+     uint32_t int_ctl;
+ 
+     if (env->hflags & HF_INHIBIT_IRQ_MASK) {
 -- 
 2.17.1
 
