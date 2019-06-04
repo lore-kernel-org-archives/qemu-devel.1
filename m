@@ -6,48 +6,48 @@ X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 68F2FC282CE
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 16:18:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3ABC2C282CE
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 16:19:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 431EA23CBC
-	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 16:18:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 431EA23CBC
+	by mail.kernel.org (Postfix) with ESMTPS id 14D8E23CCA
+	for <qemu-devel@archiver.kernel.org>; Tue,  4 Jun 2019 16:19:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 14D8E23CCA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:54860 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:54870 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hYC8t-0002os-FM
-	for qemu-devel@archiver.kernel.org; Tue, 04 Jun 2019 12:18:31 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:35893)
+	id 1hYCAI-0003lt-82
+	for qemu-devel@archiver.kernel.org; Tue, 04 Jun 2019 12:19:58 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:35822)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hYC6H-00018d-R8
-	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 12:15:51 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hYC6B-0005hJ-Bg
+	(envelope-from <vsementsov@virtuozzo.com>) id 1hYC6D-000149-KJ
 	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 12:15:46 -0400
-Received: from relay.sw.ru ([185.231.240.75]:41660)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <vsementsov@virtuozzo.com>) id 1hYC6A-0005fk-Mf
+	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 12:15:44 -0400
+Received: from relay.sw.ru ([185.231.240.75]:41662)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1hYC6A-0005C1-O6; Tue, 04 Jun 2019 12:15:43 -0400
+	id 1hYC6A-0005C4-EL; Tue, 04 Jun 2019 12:15:42 -0400
 Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
 	by relay.sw.ru with esmtp (Exim 4.91)
 	(envelope-from <vsementsov@virtuozzo.com>)
-	id 1hYC5j-0005Pq-8I; Tue, 04 Jun 2019 19:15:15 +0300
+	id 1hYC5k-0005Pq-GR; Tue, 04 Jun 2019 19:15:16 +0300
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-devel@nongnu.org,
 	qemu-block@nongnu.org
-Date: Tue,  4 Jun 2019 19:15:03 +0300
-Message-Id: <20190604161514.262241-2-vsementsov@virtuozzo.com>
+Date: Tue,  4 Jun 2019 19:15:11 +0300
+Message-Id: <20190604161514.262241-10-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.18.0
 In-Reply-To: <20190604161514.262241-1-vsementsov@virtuozzo.com>
 References: <20190604161514.262241-1-vsementsov@virtuozzo.com>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
 X-Received-From: 185.231.240.75
-Subject: [Qemu-devel] [PATCH v2 01/12] util/iov: introduce
- qemu_iovec_init_extended
+Subject: [Qemu-devel] [PATCH v2 09/12] block/io: introduce bdrv_co_p{read,
+ write}v_part
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -65,169 +65,124 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Introduce new initialization API, to create requests with padding. Will
-be used in the following patch. New API uses qemu_iovec_init_buf if
-resulting io vector has only one element, to avoid extra allocations.
-So, we need to update qemu_iovec_destroy to support destroying such
-QIOVs.
+Introduce extended variants of bdrv_co_preadv and bdrv_co_pwritev
+with qiov_offset parameter.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- include/qemu/iov.h |   7 +++
- util/iov.c         | 112 +++++++++++++++++++++++++++++++++++++++++++--
- 2 files changed, 114 insertions(+), 5 deletions(-)
+ include/block/block_int.h |  6 ++++++
+ block/io.c                | 29 +++++++++++++++++++++++------
+ 2 files changed, 29 insertions(+), 6 deletions(-)
 
-diff --git a/include/qemu/iov.h b/include/qemu/iov.h
-index 48b45987b7..f3787a0cf7 100644
---- a/include/qemu/iov.h
-+++ b/include/qemu/iov.h
-@@ -199,6 +199,13 @@ static inline void *qemu_iovec_buf(QEMUIOVector *qiov)
+diff --git a/include/block/block_int.h b/include/block/block_int.h
+index 46e17d2e2f..8b7b5d5b84 100644
+--- a/include/block/block_int.h
++++ b/include/block/block_int.h
+@@ -940,9 +940,15 @@ extern BlockDriver bdrv_qcow2;
+ int coroutine_fn bdrv_co_preadv(BdrvChild *child,
+     int64_t offset, unsigned int bytes, QEMUIOVector *qiov,
+     BdrvRequestFlags flags);
++int coroutine_fn bdrv_co_preadv_part(BdrvChild *child,
++    int64_t offset, unsigned int bytes,
++    QEMUIOVector *qiov, size_t qiov_offset, BdrvRequestFlags flags);
+ int coroutine_fn bdrv_co_pwritev(BdrvChild *child,
+     int64_t offset, unsigned int bytes, QEMUIOVector *qiov,
+     BdrvRequestFlags flags);
++int coroutine_fn bdrv_co_pwritev_part(BdrvChild *child,
++    int64_t offset, unsigned int bytes,
++    QEMUIOVector *qiov, size_t qiov_offset, BdrvRequestFlags flags);
  
- void qemu_iovec_init(QEMUIOVector *qiov, int alloc_hint);
- void qemu_iovec_init_external(QEMUIOVector *qiov, struct iovec *iov, int niov);
-+void qemu_iovec_init_extended(
-+        QEMUIOVector *qiov,
-+        void *head_buf, size_t head_len,
-+        QEMUIOVector *mid_qiov, size_t mid_offset, size_t mid_len,
-+        void *tail_buf, size_t tail_len);
-+void qemu_iovec_init_slice(QEMUIOVector *qiov, QEMUIOVector *source,
-+                           size_t offset, size_t len);
- void qemu_iovec_add(QEMUIOVector *qiov, void *base, size_t len);
- void qemu_iovec_concat(QEMUIOVector *dst,
-                        QEMUIOVector *src, size_t soffset, size_t sbytes);
-diff --git a/util/iov.c b/util/iov.c
-index 74e6ca8ed7..39b6e31494 100644
---- a/util/iov.c
-+++ b/util/iov.c
-@@ -353,6 +353,103 @@ void qemu_iovec_concat(QEMUIOVector *dst,
-     qemu_iovec_concat_iov(dst, src->iov, src->niov, soffset, sbytes);
- }
- 
-+/*
-+ * qiov_find_iov
-+ *
-+ * Return pointer to iovec structure, where byte at @offset in original vector
-+ * @iov exactly is.
-+ * Set @remaining_offset to be offset inside that iovec to the same byte.
-+ */
-+static struct iovec *iov_skip_offset(struct iovec *iov, size_t offset,
-+                                     size_t *remaining_offset)
-+{
-+    while (offset > 0 && offset >= iov->iov_len) {
-+        offset -= iov->iov_len;
-+        iov++;
-+    }
-+    *remaining_offset = offset;
-+
-+    return iov;
-+}
-+
-+/*
-+ * qiov_slice
-+ *
-+ * Find subarray of iovec's, containing requested range. @head would
-+ * be offset in first iov (returned by the function), @tail would be
-+ * count of extra bytes in last iovec (returned iov + @niov - 1).
-+ */
-+static struct iovec *qiov_slice(QEMUIOVector *qiov,
-+                                size_t offset, size_t len,
-+                                size_t *head, size_t *tail, int *niov)
-+{
-+    struct iovec *iov, *end_iov;
-+
-+    assert(offset + len <= qiov->size);
-+
-+    iov = iov_skip_offset(qiov->iov, offset, head);
-+    end_iov = iov_skip_offset(iov, *head + len, tail);
-+
-+    if (*tail > 0) {
-+        assert(*tail < end_iov->iov_len);
-+        *tail = end_iov->iov_len - *tail;
-+        end_iov++;
-+    }
-+
-+    *niov = end_iov - iov;
-+
-+    return iov;
-+}
-+
-+/*
-+ * Compile new iovec, combining @head_buf buffer, sub-qiov of @mid_qiov,
-+ * and @tail_buf buffer into new qiov.
-+ */
-+void qemu_iovec_init_extended(
-+        QEMUIOVector *qiov,
-+        void *head_buf, size_t head_len,
-+        QEMUIOVector *mid_qiov, size_t mid_offset, size_t mid_len,
-+        void *tail_buf, size_t tail_len)
-+{
-+    size_t mid_head, mid_tail;
-+    int total_niov, mid_niov;
-+    struct iovec *p, *mid_iov;
-+
-+    if (mid_len) {
-+        mid_iov = qiov_slice(mid_qiov, mid_offset, mid_len,
-+                             &mid_head, &mid_tail, &mid_niov);
-+    }
-+
-+    total_niov = !!head_len + mid_niov + !!tail_len;
-+    if (total_niov == 1) {
-+        qemu_iovec_init_buf(qiov, NULL, 0);
-+        p = &qiov->local_iov;
-+    } else {
-+        qiov->niov = qiov->nalloc = total_niov;
-+        qiov->size = head_len + mid_len + tail_len;
-+        p = qiov->iov = g_new(struct iovec, qiov->niov);
-+    }
-+
-+    if (head_len) {
-+        p->iov_base = head_buf;
-+        p->iov_len = head_len;
-+        p++;
-+    }
-+
-+    if (mid_len) {
-+        memcpy(p, mid_iov, mid_niov * sizeof(*p));
-+        p[0].iov_base = (uint8_t *)p[0].iov_base + mid_head;
-+        p[0].iov_len -= mid_head;
-+        p[mid_niov - 1].iov_len -= mid_tail;
-+        p += mid_niov;
-+    }
-+
-+    if (tail_len) {
-+        p->iov_base = tail_buf;
-+        p->iov_len = tail_len;
-+    }
-+}
-+
- /*
-  * Check if the contents of the iovecs are all zero
+ static inline int coroutine_fn bdrv_co_pread(BdrvChild *child,
+     int64_t offset, unsigned int bytes, void *buf, BdrvRequestFlags flags)
+diff --git a/block/io.c b/block/io.c
+index 660c96527d..82051730fd 100644
+--- a/block/io.c
++++ b/block/io.c
+@@ -1534,7 +1534,8 @@ static void bdrv_padding_destroy(BdrvRequestPadding *pad)
+  *
+  * Function always succeeds.
   */
-@@ -374,14 +471,19 @@ bool qemu_iovec_is_zero(QEMUIOVector *qiov)
+-static bool bdrv_pad_request(BlockDriverState *bs, QEMUIOVector **qiov,
++static bool bdrv_pad_request(BlockDriverState *bs,
++                             QEMUIOVector **qiov, size_t *qiov_offset,
+                              int64_t *offset, unsigned int *bytes,
+                              BdrvRequestPadding *pad)
+ {
+@@ -1543,11 +1544,12 @@ static bool bdrv_pad_request(BlockDriverState *bs, QEMUIOVector **qiov,
+     }
+ 
+     qemu_iovec_init_extended(&pad->local_qiov, pad->buf, pad->head,
+-                             *qiov, 0, *bytes,
++                             *qiov, *qiov_offset, *bytes,
+                              pad->buf + pad->buf_len - pad->tail, pad->tail);
+     *bytes += pad->head + pad->tail;
+     *offset -= pad->head;
+     *qiov = &pad->local_qiov;
++    *qiov_offset = 0;
+ 
      return true;
  }
- 
-+void qemu_iovec_init_slice(QEMUIOVector *qiov, QEMUIOVector *source,
-+                           size_t offset, size_t len)
+@@ -1555,6 +1557,14 @@ static bool bdrv_pad_request(BlockDriverState *bs, QEMUIOVector **qiov,
+ int coroutine_fn bdrv_co_preadv(BdrvChild *child,
+     int64_t offset, unsigned int bytes, QEMUIOVector *qiov,
+     BdrvRequestFlags flags)
 +{
-+    qemu_iovec_init_extended(qiov, NULL, 0, source, offset, len, NULL, 0);
++    return bdrv_co_preadv_part(child, offset, bytes, qiov, 0, flags);
 +}
 +
- void qemu_iovec_destroy(QEMUIOVector *qiov)
++int coroutine_fn bdrv_co_preadv_part(BdrvChild *child,
++    int64_t offset, unsigned int bytes,
++    QEMUIOVector *qiov, size_t qiov_offset,
++    BdrvRequestFlags flags)
  {
--    assert(qiov->nalloc != -1);
-+    if (qiov->nalloc != -1) {
-+        g_free(qiov->iov);
-+    }
+     BlockDriverState *bs = child->bs;
+     BdrvTrackedRequest req;
+@@ -1575,12 +1585,12 @@ int coroutine_fn bdrv_co_preadv(BdrvChild *child,
+         flags |= BDRV_REQ_COPY_ON_READ;
+     }
  
--    qemu_iovec_reset(qiov);
--    g_free(qiov->iov);
--    qiov->nalloc = 0;
--    qiov->iov = NULL;
-+    memset(qiov, 0, sizeof(*qiov));
- }
+-    bdrv_pad_request(bs, &qiov, &offset, &bytes, &pad);
++    bdrv_pad_request(bs, &qiov, &qiov_offset, &offset, &bytes, &pad);
  
- void qemu_iovec_reset(QEMUIOVector *qiov)
+     tracked_request_begin(&req, bs, offset, bytes, BDRV_TRACKED_READ);
+     ret = bdrv_aligned_preadv(child, &req, offset, bytes,
+                               bs->bl.request_alignment,
+-                              qiov, 0, flags);
++                              qiov, qiov_offset, flags);
+     tracked_request_end(&req);
+     bdrv_dec_in_flight(bs);
+ 
+@@ -1943,6 +1953,13 @@ out:
+ int coroutine_fn bdrv_co_pwritev(BdrvChild *child,
+     int64_t offset, unsigned int bytes, QEMUIOVector *qiov,
+     BdrvRequestFlags flags)
++{
++    return bdrv_co_pwritev_part(child, offset, bytes, qiov, 0, flags);
++}
++
++int coroutine_fn bdrv_co_pwritev_part(BdrvChild *child,
++    int64_t offset, unsigned int bytes, QEMUIOVector *qiov, size_t qiov_offset,
++    BdrvRequestFlags flags)
+ {
+     BlockDriverState *bs = child->bs;
+     BdrvTrackedRequest req;
+@@ -1974,14 +1991,14 @@ int coroutine_fn bdrv_co_pwritev(BdrvChild *child,
+         goto out;
+     }
+ 
+-    if (bdrv_pad_request(bs, &qiov, &offset, &bytes, &pad)) {
++    if (bdrv_pad_request(bs, &qiov, &qiov_offset, &offset, &bytes, &pad)) {
+         mark_request_serialising(&req, align);
+         wait_serialising_requests(&req);
+         bdrv_padding_rmw_read(child, &req, &pad, false);
+     }
+ 
+     ret = bdrv_aligned_pwritev(child, &req, offset, bytes, align,
+-                               qiov, 0, flags);
++                               qiov, qiov_offset, flags);
+ 
+     bdrv_padding_destroy(&pad);
+ 
 -- 
 2.18.0
 
