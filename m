@@ -2,66 +2,79 @@ Return-Path: <SRS0=3v23=UE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+X-Spam-Status: No, score=-11.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CB94C28CC5
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 22:59:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 69058C28CC5
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 23:00:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5F9672070B
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 22:59:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5F9672070B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 2FC802070B
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 23:00:46 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=cam.ac.uk header.i=@cam.ac.uk header.b="C5S7E/k4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2FC802070B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=cl.cam.ac.uk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:51438 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:51479 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hYesa-0008N3-5e
-	for qemu-devel@archiver.kernel.org; Wed, 05 Jun 2019 18:59:36 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:44884)
+	id 1hYeth-0000df-HX
+	for qemu-devel@archiver.kernel.org; Wed, 05 Jun 2019 19:00:45 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:45079)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1hYerh-00083c-Ob
-	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 18:58:42 -0400
+	(envelope-from <hmka2@hermes.cam.ac.uk>) id 1hYesa-0008VL-PN
+	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 18:59:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1hYerg-0007pu-Cr
-	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 18:58:41 -0400
-Resent-Date: Wed, 05 Jun 2019 18:58:41 -0400
-Resent-Message-Id: <E1hYerg-0007pu-Cr@eggs.gnu.org>
-Received: from sender4-of-o55.zoho.com ([136.143.188.55]:21595)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1hYerg-0007mv-4t
-	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 18:58:40 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1559775480; cv=none; d=zoho.com; s=zohoarc; 
-	b=RxDFDPXRxPfKBrYcU0tqQ52+YG3ixklJtHqXoLaBvwqFro9UnMdIBegySwenWw1Ipiz43u6V93crJPd5FO+PAqbFw3mDWYDRSYEadjh1rgENcNlHB10ssTEQk0BvnvYeOCoEKcPz8f5GDgfDztnPVaHpQfQUHqEp6d/5azavPB4=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
-	s=zohoarc; t=1559775480;
-	h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
-	bh=Bg+veaoops8DB5pJAmKcAvwZ5HkcJDla9Icl0ytnYzI=; 
-	b=Os462/qO2+FTJg5lZQsWrFEcJThDRBWvF8TuG+6qKyZ1ogPHrwyWCgkRSz1rhDFKS1xnILXeqTB9xtx41iJBm/SMgK7f4103NwFZEn+fK63RzLaTtvfj+440gqUGw2QoMQ0q3O/6egvjpkAbtiIcItcwh8xK7DaZ3F1EqNbb/hs=
-ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
-	spf=pass  smtp.mailfrom=no-reply@patchew.org;
-	dmarc=pass header.from=<no-reply@patchew.org>
-	header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
-	mx.zohomail.com with SMTPS id 1559775478180500.8245808038928;
-	Wed, 5 Jun 2019 15:57:58 -0700 (PDT)
-In-Reply-To: <20190605213654.9785-1-ptoscano@redhat.com>
-Message-ID: <155977547693.32260.8548021932284388381@ce79690b2cb9>
+	(envelope-from <hmka2@hermes.cam.ac.uk>) id 1hYesZ-0000D9-LQ
+	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 18:59:36 -0400
+Received: from ppsw-30.csi.cam.ac.uk ([131.111.8.130]:54092)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <hmka2@hermes.cam.ac.uk>)
+	id 1hYesV-000059-KV; Wed, 05 Jun 2019 18:59:32 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=cam.ac.uk; 
+	s=20180806.ppsw;
+	h=Sender:Content-Type:Cc:To:Subject:Message-ID:Date:From:
+	In-Reply-To:References:MIME-Version:Reply-To:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
+	Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
+	List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=rPqKVGqEkhf6Hz3PDm3Y8K3Dk6GsOLVDdx76QapZdkc=;
+	b=C5S7E/k4sNDUpg7kIkqiHBv8EH
+	uBY/ztciW5/yYH11Hapil52oxzeRZOh10BbT96uTK8mEy9JWezdIQVs5ZAFn6ZsZMPkPV3GRx9LXT
+	kBroaIvn+yksGTX1L2MGkMfYWBPxh57LnL6zSZM6Ez3PswZiK25vfYtDyjXoxZRHxclk=; 
+X-Cam-AntiVirus: no malware found
+X-Cam-ScannerInfo: http://help.uis.cam.ac.uk/email-scanner-virus
+Received: from mail-lf1-f53.google.com ([209.85.167.53]:36713)
+	by ppsw-30.csi.cam.ac.uk (smtp.hermes.cam.ac.uk [131.111.8.156]:587)
+	with esmtpsa (PLAIN:hmka2) (TLSv1.2:ECDHE-RSA-AES128-GCM-SHA256:128)
+	id 1hYesR-000xMF-fu (Exim 4.92)
+	(return-path <hmka2@hermes.cam.ac.uk>); Wed, 05 Jun 2019 23:59:28 +0100
+Received: by mail-lf1-f53.google.com with SMTP id q26so103506lfc.3;
+	Wed, 05 Jun 2019 15:59:27 -0700 (PDT)
+X-Gm-Message-State: APjAAAVvYOIcuWUT9CFwE3f50O4iUDhS8IOWBL98++RncDsUAJlOvnO3
+	MtFZkDXJvQrev68wvOx6r03/5oCdNvGAbjdPB88=
+X-Google-Smtp-Source: APXvYqx5ZNY+rsCDtQxGQnlvDk6KNKij1JtOx54IMNemym3AfuNR9Lhqwhs4s2QNvc65ZVw6n6AkXg2U2A4UF+/ccOI=
+X-Received: by 2002:a19:3f4b:: with SMTP id m72mr21167848lfa.91.1559775567487; 
+	Wed, 05 Jun 2019 15:59:27 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: ptoscano@redhat.com
-Date: Wed, 5 Jun 2019 15:57:58 -0700 (PDT)
-X-ZohoMailClient: External
+References: <20190530135135.19715-1-Hesham.Almatary@cl.cam.ac.uk>
+	<20190530135135.19715-4-Hesham.Almatary@cl.cam.ac.uk>
+	<CAKmqyKNwec3HaNZ_=vsA1eYa3yjRWe8Q9ZaNcQ9AXZcGvbsQdw@mail.gmail.com>
+In-Reply-To: <CAKmqyKNwec3HaNZ_=vsA1eYa3yjRWe8Q9ZaNcQ9AXZcGvbsQdw@mail.gmail.com>
+From: Hesham Almatary <hesham.almatary@cl.cam.ac.uk>
+Date: Thu, 6 Jun 2019 00:58:53 +0200
+X-Gmail-Original-Message-ID: <CA+wsVCDMHpM0BCvoWVz1mFPGpjMRSGZ8boGhBF5p2VTAAJaGNw@mail.gmail.com>
+Message-ID: <CA+wsVCDMHpM0BCvoWVz1mFPGpjMRSGZ8boGhBF5p2VTAAJaGNw@mail.gmail.com>
+To: Alistair Francis <alistair23@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 136.143.188.55
-Subject: Re: [Qemu-devel] [PATCH v6] ssh: switch from libssh2 to libssh
+X-Received-From: 131.111.8.130
+Subject: Re: [Qemu-devel] [PATCHv4 4/6] RISC-V: Check PMP during Page Table
+ Walks
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -73,59 +86,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, qemu-block@nongnu.org, rjones@redhat.com,
-	qemu-devel@nongnu.org, mreitz@redhat.com, ptoscano@redhat.com,
-	philmd@redhat.com
+Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
+	Sagar Karandikar <sagark@eecs.berkeley.edu>,
+	Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+	Palmer Dabbelt <palmer@sifive.com>,
+	"qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+	Alistair Francis <Alistair.Francis@wdc.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDYwNTIxMzY1NC45Nzg1
-LTEtcHRvc2Nhbm9AcmVkaGF0LmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZl
-IHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGlu
-Zm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAxOTA2MDUyMTM2NTQuOTc4NS0xLXB0b3NjYW5vQHJl
-ZGhhdC5jb20KVHlwZTogc2VyaWVzClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjZdIHNz
-aDogc3dpdGNoIGZyb20gbGlic3NoMiB0byBsaWJzc2gKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9
-PT0KIyEvYmluL2Jhc2gKZ2l0IHJldi1wYXJzZSBiYXNlID4gL2Rldi9udWxsIHx8IGV4aXQgMApn
-aXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBk
-aWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9n
-cmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4uCj09PSBURVNUIFND
-UklQVCBFTkQgPT09CgpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCmFiZWY4MTcgc3No
-OiBzd2l0Y2ggZnJvbSBsaWJzc2gyIHRvIGxpYnNzaAoKPT09IE9VVFBVVCBCRUdJTiA9PT0KV0FS
-TklORzogQmxvY2sgY29tbWVudHMgdXNlIGEgbGVhZGluZyAvKiBvbiBhIHNlcGFyYXRlIGxpbmUK
-IzY4OiBGSUxFOiBibG9jay9zc2guYzo0NjoKKy8qIFRSQUNFX0xJQlNTSD08bGV2ZWw+IGVuYWJs
-ZXMgdHJhY2luZyBpbiBsaWJzc2ggaXRzZWxmLgoKV0FSTklORzogQmxvY2sgY29tbWVudHMgdXNl
-IGEgbGVhZGluZyAvKiBvbiBhIHNlcGFyYXRlIGxpbmUKIzk1OiBGSUxFOiBibG9jay9zc2guYzo2
-NDoKKyAgICAvKiBGaWxlIGF0dHJpYnV0ZXMgYXQgb3Blbi4gIFdlIHRyeSB0byBrZWVwIHRoZSAu
-c2l6ZSBmaWVsZAoKV0FSTklORzogQmxvY2sgY29tbWVudHMgdXNlIGEgbGVhZGluZyAvKiBvbiBh
-IHNlcGFyYXRlIGxpbmUKIzQ4NDogRklMRTogYmxvY2svc3NoLmM6NDkxOgorICAgIC8qIFRyeSB0
-byBhdXRoZW50aWNhdGUgd2l0aCBwdWJsaWNrZXksIHVzaW5nIHRoZSBzc2gtYWdlbnQKCldBUk5J
-Tkc6IEJsb2NrIGNvbW1lbnRzIHVzZSBhIGxlYWRpbmcgLyogb24gYSBzZXBhcmF0ZSBsaW5lCiM1
-NTM6IEZJTEU6IGJsb2NrL3NzaC5jOjY2MjoKKyAgICAvKiBUcnkgdG8gZGlzYWJsZSB0aGUgTmFn
-bGUgYWxnb3JpdGhtIG9uIFRDUCBzb2NrZXRzIHRvIHJlZHVjZSBsYXRlbmN5LAoKV0FSTklORzog
-QmxvY2sgY29tbWVudHMgdXNlIGEgbGVhZGluZyAvKiBvbiBhIHNlcGFyYXRlIGxpbmUKIzU3NTog
-RklMRTogYmxvY2svc3NoLmM6Njc5OgorICAgIC8qIE1ha2Ugc3VyZSB3ZSBhcmUgaW4gYmxvY2tp
-bmcgbW9kZSBkdXJpbmcgdGhlIGNvbm5lY3Rpb24gYW5kCgpXQVJOSU5HOiBCbG9jayBjb21tZW50
-cyB1c2UgYSBsZWFkaW5nIC8qIG9uIGEgc2VwYXJhdGUgbGluZQojODk1OiBGSUxFOiBibG9jay9z
-c2guYzoxMDYyOgorICAgICAgICAvKiBUaGUgc2l6ZSBvZiBTRlRQIHBhY2tldHMgaXMgbGltaXRl
-ZCB0byAzMksgYnl0ZXMsIHNvIGxpbWl0CgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVy
-cwojOTQ3OiBGSUxFOiBibG9jay9zc2guYzoxMTM1OgorICAgICAgICB0cmFjZV9zc2hfd3JpdGVf
-YnVmKGJ1ZiwgZW5kX29mX3ZlYyAtIGJ1ZiwgTUlOKGVuZF9vZl92ZWMgLSBidWYsIDEzMTA3Mikp
-OwoKV0FSTklORzogQmxvY2sgY29tbWVudHMgdXNlIGEgbGVhZGluZyAvKiBvbiBhIHNlcGFyYXRl
-IGxpbmUKIzk0ODogRklMRTogYmxvY2svc3NoLmM6MTEzNjoKKyAgICAgICAgLyogQXZvaWQgdG9v
-IGxhcmdlIGRhdGEgcGFja2V0cywgYXMgbGlic3NoIGN1cnJlbnRseSBkb2VzIG5vdAoKRVJST1I6
-IEhleCBudW1iZXJzIG11c3QgYmUgcHJlZml4ZWQgd2l0aCAnMHgnCiMxMTIyOiBGSUxFOiBibG9j
-ay90cmFjZS1ldmVudHM6MTg1Ogorc3NoX2F1dGhfbWV0aG9kcyhpbnQgbWV0aG9kcykgImF1dGgg
-bWV0aG9kcz0leCIKCnRvdGFsOiAxIGVycm9ycywgOCB3YXJuaW5ncywgMTE3NSBsaW5lcyBjaGVj
-a2VkCgpDb21taXQgYWJlZjgxN2U0ZThmIChzc2g6IHN3aXRjaCBmcm9tIGxpYnNzaDIgdG8gbGli
-c3NoKSBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2Ug
-ZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIs
-IHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3Qg
-Y29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBh
-dApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDE5MDYwNTIxMzY1NC45Nzg1LTEtcHRvc2Nhbm9A
-cmVkaGF0LmNvbS90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdl
-bmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4K
-UGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+On Wed, 5 Jun 2019 at 23:07, Alistair Francis <alistair23@gmail.com> wrote:
+>
+> On Thu, May 30, 2019 at 6:52 AM Hesham Almatary
+> <Hesham.Almatary@cl.cam.ac.uk> wrote:
+> >
+> > The PMP should be checked when doing a page table walk, and report access
+> > fault exception if the to-be-read PTE failed the PMP check.
+> >
+> > Suggested-by: Jonathan Behrens <fintelia@gmail.com>
+> > Signed-off-by: Hesham Almatary <Hesham.Almatary@cl.cam.ac.uk>
+> > ---
+> >  target/riscv/cpu.h        |  1 +
+> >  target/riscv/cpu_helper.c | 10 +++++++++-
+> >  2 files changed, 10 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
+> > index c17184f4e4..ab3ba3f15a 100644
+> > --- a/target/riscv/cpu.h
+> > +++ b/target/riscv/cpu.h
+> > @@ -94,6 +94,7 @@ enum {
+> >  #define PRIV_VERSION_1_09_1 0x00010901
+> >  #define PRIV_VERSION_1_10_0 0x00011000
+> >
+> > +#define TRANSLATE_PMP_FAIL 2
+> >  #define TRANSLATE_FAIL 1
+> >  #define TRANSLATE_SUCCESS 0
+> >  #define NB_MMU_MODES 4
+> > diff --git a/target/riscv/cpu_helper.c b/target/riscv/cpu_helper.c
+> > index 5a1cd7cf96..00bc4f1712 100644
+> > --- a/target/riscv/cpu_helper.c
+> > +++ b/target/riscv/cpu_helper.c
+> > @@ -211,6 +211,12 @@ restart:
+> >
+> >          /* check that physical address of PTE is legal */
+> >          target_ulong pte_addr = base + idx * ptesize;
+> > +
+> > +        if (riscv_feature(env, RISCV_FEATURE_PMP) &&
+> > +            !pmp_hart_has_privs(env, pte_addr, sizeof(target_ulong),
+> > +            1 << MMU_DATA_LOAD, PRV_S)) {
+>
+> Shouldn't we be passing mode in here?
+>
+I actually thought this way at the start. But then I made it PRV_S for
+intentionality; as in PTW (in the current master, without hypervisor
+extensions) always goes under PMP protection in S-Mode.
+This also aligns with Spike implementation here [1].
 
+[1] https://github.com/riscv/riscv-isa-sim/blob/8ac902f6ff877e976af434bfe8fa8445930174a1/riscv/mmu.cc#L288
+
+
+> Alistair
+>
+> > +            return TRANSLATE_PMP_FAIL;
+> > +        }
+> >  #if defined(TARGET_RISCV32)
+> >          target_ulong pte = ldl_phys(cs->as, pte_addr);
+> >  #elif defined(TARGET_RISCV64)
+> > @@ -413,8 +419,10 @@ bool riscv_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
+> >          (ret == TRANSLATE_SUCCESS) &&
+> >          !pmp_hart_has_privs(env, pa, TARGET_PAGE_SIZE, 1 << access_type,
+> >          mode)) {
+> > +        ret = TRANSLATE_PMP_FAIL;
+> > +    }
+> > +    if (ret == TRANSLATE_PMP_FAIL) {
+> >          pmp_violation = true;
+> > -        ret = TRANSLATE_FAIL;
+> >      }
+> >      if (ret == TRANSLATE_SUCCESS) {
+> >          tlb_set_page(cs, address & TARGET_PAGE_MASK, pa & TARGET_PAGE_MASK,
+> > --
+> > 2.17.1
+> >
+> >
 
