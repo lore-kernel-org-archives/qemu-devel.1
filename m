@@ -2,95 +2,111 @@ Return-Path: <SRS0=3v23=UE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3955FC28CC5
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 17:14:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E12BBC28CC6
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 17:17:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 02DDD206C3
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 17:14:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 02DDD206C3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id B590E206C3
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 17:17:53 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="R4wmT4EG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B590E206C3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:47394 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:47467 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hYZUW-0008Lk-9I
-	for qemu-devel@archiver.kernel.org; Wed, 05 Jun 2019 13:14:24 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:53495)
+	id 1hYZXs-0000wW-Sf
+	for qemu-devel@archiver.kernel.org; Wed, 05 Jun 2019 13:17:52 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:55168)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1hYZTJ-0007ef-SE
-	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 13:13:10 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1hYZWq-0000b4-EC
+	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 13:16:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1hYZTI-0006eP-Mq
-	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 13:13:09 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39468)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>)
-	id 1hYZTA-0006Ib-Vb; Wed, 05 Jun 2019 13:13:01 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id F16C42CD801;
-	Wed,  5 Jun 2019 17:12:58 +0000 (UTC)
-Received: from [10.3.116.85] (ovpn-116-85.phx2.redhat.com [10.3.116.85])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 35E5C18E46;
-	Wed,  5 Jun 2019 17:12:58 +0000 (UTC)
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
-	=?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
-References: <20190605100913.34972-1-vsementsov@virtuozzo.com>
-	<20190605100913.34972-3-vsementsov@virtuozzo.com>
-	<cd780b66-ab31-1feb-0cce-0b6525df7d79@redhat.com>
-	<20190605163710.GP8956@redhat.com>
-	<e5a35aeb-21a4-449c-f8d5-9d2ac2968fd5@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=eblake@redhat.com; keydata=
-	xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
-	xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
-	TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
-	GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
-	sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
-	AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
-	CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
-	RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
-	wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
-	Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
-	gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
-	pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
-	zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
-	pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
-	3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
-	NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
-	cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
-	SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
-	I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
-	mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
-	Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
-	2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
-Organization: Red Hat, Inc.
-Message-ID: <19a96fc2-7f12-7b30-edef-b3da66eef759@redhat.com>
-Date: Wed, 5 Jun 2019 12:12:56 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	(envelope-from <vsementsov@virtuozzo.com>) id 1hYZWo-0003Sr-Ie
+	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 13:16:48 -0400
+Received: from mail-vi1eur04on0725.outbound.protection.outlook.com
+	([2a01:111:f400:fe0e::725]:65253
+	helo=EUR04-VI1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+	id 1hYZWj-0003IX-39; Wed, 05 Jun 2019 13:16:43 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+	s=selector1;
+	h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+	bh=/f2wC4uDHcSIyb8V7B/Uzz/p0qlM3wbrx2GJEndrAUk=;
+	b=R4wmT4EGcCDAg2B2tOD6AvfxIOT1fNcJNHg93gk1zm1YLF9sTEIghE8v0KB3UstUMaGYROYIZcP9BMptjBGj2lmv0vR7wpX7IGnCiCep+mycuH8Vf5Sm8/Ljs3cNumDyfZ9DMhwW18BimYPOd/KKl86EqH/cLVn4g2UCaHdkwmg=
+Received: from AM0PR08MB2961.eurprd08.prod.outlook.com (52.134.126.11) by
+	AM0PR08MB3763.eurprd08.prod.outlook.com (20.178.82.152) with Microsoft
+	SMTP
+	Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+	15.20.1943.22; Wed, 5 Jun 2019 17:16:36 +0000
+Received: from AM0PR08MB2961.eurprd08.prod.outlook.com
+	([fe80::8d90:32ae:bdd6:48e8]) by
+	AM0PR08MB2961.eurprd08.prod.outlook.com
+	([fe80::8d90:32ae:bdd6:48e8%7]) with mapi id 15.20.1965.011;
+	Wed, 5 Jun 2019 17:16:36 +0000
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Thread-Topic: [PATCH v2 2/2] blockjob: use blk_new_pinned in block_job_create
+Thread-Index: AQHVG8HBVdfqD7RC9UWdIT2PxMi18aaNTVYA
+Date: Wed, 5 Jun 2019 17:16:36 +0000
+Message-ID: <1b1a0ec6-88c7-d7a5-3d95-bde310693580@virtuozzo.com>
+References: <20190605123229.92848-1-vsementsov@virtuozzo.com>
+	<20190605123229.92848-3-vsementsov@virtuozzo.com>
+	<20190605171137.GC5491@linux.fritz.box>
+In-Reply-To: <20190605171137.GC5491@linux.fritz.box>
+Accept-Language: ru-RU, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-clientproxiedby: HE1P190CA0040.EURP190.PROD.OUTLOOK.COM (2603:10a6:7:52::29)
+	To AM0PR08MB2961.eurprd08.prod.outlook.com
+	(2603:10a6:208:66::11)
+authentication-results: spf=none (sender IP is )
+	smtp.mailfrom=vsementsov@virtuozzo.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-tagtoolbar-keys: D20190605201634392
+x-originating-ip: [185.231.240.5]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: f98a7ebd-23f2-4c5f-2db3-08d6e9d990b3
+x-microsoft-antispam: BCL:0; PCL:0;
+	RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(2017052603328)(7193020);
+	SRVR:AM0PR08MB3763; 
+x-ms-traffictypediagnostic: AM0PR08MB3763:
+x-microsoft-antispam-prvs: <AM0PR08MB376362123C506D91E4110AA0C1160@AM0PR08MB3763.eurprd08.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:8882;
+x-forefront-prvs: 00594E8DBA
+x-forefront-antispam-report: SFV:NSPM;
+	SFS:(10019020)(376002)(366004)(136003)(39850400004)(346002)(396003)(189003)(199004)(6486002)(305945005)(6916009)(7736002)(6512007)(36756003)(25786009)(6436002)(26005)(316002)(4326008)(66066001)(229853002)(256004)(478600001)(6116002)(86362001)(68736007)(386003)(6506007)(486006)(186003)(31686004)(3846002)(31696002)(2616005)(4744005)(11346002)(14454004)(102836004)(5660300002)(446003)(54906003)(476003)(2906002)(73956011)(71190400001)(6246003)(66476007)(71200400001)(66556008)(66446008)(64756008)(52116002)(76176011)(99286004)(81166006)(53936002)(8676002)(66946007)(8936002)(81156014);
+	DIR:OUT; SFP:1102; SCL:1; SRVR:AM0PR08MB3763;
+	H:AM0PR08MB2961.eurprd08.prod.outlook.com; FPR:; SPF:None;
+	LANG:en; PTR:InfoNoRecords; MX:1; A:1; 
+received-spf: None (protection.outlook.com: virtuozzo.com does not designate
+	permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: AQK254dK2LCx3/vJ4en6+dhFA/O872G0xc4Rcigqk5UM1m+oiojhxflf1oHpTz8Iw2252EbsCzd9VfLtgFdG2b/+6kpnqXHIpZVXYmYGP1kwmHWgFJF5+QQ8OXXx8lX/dT0mS99mkJ5bT6dYwPzQr48P3+vHQwCcp5BmZ7fGa15VGEfozj8YFk9ALZ6Un8+wJYDYEOeXX0bOs5B7DVWyT6j0byyz/pXa/+LMIbCqjloOD6MItm4l8ll3imTTuOPVKXvbn3T+p8a7oKuQDjMOiVoQAtMBB7/nk1bcYo/tV0h4dMj//EKSOCK2iF2YBj5znvDJfh82hUFiuOTQ6sDQ2chWsLfTKXjDOe9KARpSTwW9sdq6i13E/nzorcd+Wu13j/26ebLDmMMkBIUS9Sl1xYeBsD52EFtrvQYV8SyhDJI=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <23F435FF066DE44C8E092AFDC87100F1@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-In-Reply-To: <e5a35aeb-21a4-449c-f8d5-9d2ac2968fd5@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="c8GZ1fG4m8jDVlJI7I51gZljI7JrEkTz9"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.29]);
-	Wed, 05 Jun 2019 17:12:59 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-X-Content-Filtered-By: Mailman/MimeDel 2.1.21
-Subject: Re: [Qemu-devel] [PATCH 2/2] nbd-client: enable TCP keepalive
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: f98a7ebd-23f2-4c5f-2db3-08d6e9d990b3
+X-MS-Exchange-CrossTenant-originalarrivaltime: 05 Jun 2019 17:16:36.6419 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: vsementsov@virtuozzo.com
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR08MB3763
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 2a01:111:f400:fe0e::725
+Subject: Re: [Qemu-devel] [PATCH v2 2/2] blockjob: use blk_new_pinned in
+ block_job_create
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -102,7 +118,7 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "kwolf@redhat.com" <kwolf@redhat.com>, Denis Lunev <den@virtuozzo.com>,
+Cc: "jsnow@redhat.com" <jsnow@redhat.com>,
 	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
 	"qemu-block@nongnu.org" <qemu-block@nongnu.org>,
 	"mreitz@redhat.com" <mreitz@redhat.com>
@@ -110,90 +126,22 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---c8GZ1fG4m8jDVlJI7I51gZljI7JrEkTz9
-From: Eric Blake <eblake@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
- "mreitz@redhat.com" <mreitz@redhat.com>, "kwolf@redhat.com"
- <kwolf@redhat.com>, Denis Lunev <den@virtuozzo.com>
-Message-ID: <19a96fc2-7f12-7b30-edef-b3da66eef759@redhat.com>
-Subject: Re: [PATCH 2/2] nbd-client: enable TCP keepalive
-References: <20190605100913.34972-1-vsementsov@virtuozzo.com>
- <20190605100913.34972-3-vsementsov@virtuozzo.com>
- <cd780b66-ab31-1feb-0cce-0b6525df7d79@redhat.com>
- <20190605163710.GP8956@redhat.com>
- <e5a35aeb-21a4-449c-f8d5-9d2ac2968fd5@virtuozzo.com>
-In-Reply-To: <e5a35aeb-21a4-449c-f8d5-9d2ac2968fd5@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 6/5/19 12:05 PM, Vladimir Sementsov-Ogievskiy wrote:
-
->> By enabling TCP keepalives we are explicitly making the connection
->> less reliable by forcing it to be terminated when keepalive
->> threshold triggers, instead of waiting longer for TCP to recover.
->>
->> The rationale s that once a connection has been in a hung state for
->> so long that keepalive triggers, its (hopefully) not useful to the
->> mgmt app to carry on waiting anyway.
->>
->> If the connection is terminated by keepalive & the mgmt app then
->> spawns a new client to carry on with the work, what are the risks
->> involved ? eg Could packets from the stuck, terminated, connection
->> suddenly arrive later and trigger I/O with outdated data payload ?
->=20
-> Hmm, I believe that tcp guarantees isolation between different connecti=
-ons
->=20
->>
->> I guess this is no different a situation from an app explicitly
->> killing the QEMU NBD client process instead & spawning a new one.
->>
->> I'm still feeling a little uneasy about enabling it unconditionally
->> though, since pretty much everything I know which supports keepalives
->> has a way to turn them on/off at least, even if you can't tune the
->> individual timer settings.
->=20
-> Hm. So, I can add bool keepalive parameter for nbd format with default =
-to true.
-> And if needed, it may be later extended to be qapi 'alternate' of bool =
-or struct with
-> three numeric parameters, corresponding to TCP_KEEPCNT, TCP_KEEPIDLE an=
-d TCP_KEEPINTVL .
->=20
-> Opinions?
-
-Adding a bool that could later turn into a qapi 'alternate' for
-fine-tuning seems reasonable. Defaulting the bool to true is not
-backwards-compatible; better would be defaulting it to false and letting
-users opt-in; introspection will also work to let you know whether the
-feature is present.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
-
---c8GZ1fG4m8jDVlJI7I51gZljI7JrEkTz9
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlz3+BgACgkQp6FrSiUn
-Q2oLGAf/VHL4MkMKRaV6pNUil5qq6jkItgk3Ls3il0xhydOrzz3G12DY9K1pzHuK
-9R+Cq+Wj8bGSKb62Dfmakzu9EGoyx/yFZIJOCbTjUn0MKvcBMMkjvCxHr2Z2IyjW
-ZDZb/efhjLf8ZGQFKOGDeCR4wZU/RyxL0JQstHK//uTMtrXf+ieb4ZSHybHMUuk1
-3rEXYYsSTFh3dxN3746jZz1gfJltpsMJMJdF86VvsOXPUjJz5PYKxUtDtw/PlLpt
-UF8RoZxv2bt3thdjCZsTMZLjWDgqZVZ3WNmzWaD0mUcNfDzzw2KCKEKgkY+aYti9
-cwxaUw1zU22aR0Zy9xvFoZTL/ZBgPg==
-=MX4O
------END PGP SIGNATURE-----
-
---c8GZ1fG4m8jDVlJI7I51gZljI7JrEkTz9--
+MDUuMDYuMjAxOSAyMDoxMSwgS2V2aW4gV29sZiB3cm90ZToNCj4gQW0gMDUuMDYuMjAxOSB1bSAx
+NDozMiBoYXQgVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSBnZXNjaHJpZWJlbjoNCj4+IGNo
+aWxkX3JvbGUgam9iIGFscmVhZHkgaGFzIC5zdGF5X2F0X25vZGU9dHJ1ZSwgc28gb24gYmRydl9y
+ZXBsYWNlX25vZGUNCj4+IG9wZXJhdGlvbiB0aGVzZSBjaGlsZCBhcmUgdW5jaGFuZ2VkLiBNYWtl
+IGJsb2NrIGpvYiBibGsgYmVoYXZlIGluIHNhbWUNCj4+IG1hbm5lciwgdG8gYXZvaWQgaW5jb25z
+aXN0ZW50IGludGVybWVkaWF0ZSBncmFwaCBzdGF0ZXMgYW5kIHdvcmthcm91bmRzDQo+PiBsaWtl
+IGluIG1pcnJvci4NCj4+DQo+PiBTaWduZWQtb2ZmLWJ5OiBWbGFkaW1pciBTZW1lbnRzb3YtT2dp
+ZXZza2l5IDx2c2VtZW50c292QHZpcnR1b3p6by5jb20+DQo+IA0KPiBUaGlzIGZlZWxzIGRhbmdl
+cm91cy4gSXQgZG9lcyB3aGF0IHlvdSB3YW50IGl0IHRvIGRvIGlmIHRoZSBvbmx5IGdyYXBoDQo+
+IGNoYW5nZSBiZWxvdyB0aGUgQmxvY2tCYWNrZW5kIGlzIHRoZSBvbmUgaW4gbWlycm9yX2V4aXRf
+Y29tbW9uLiBCdXQgdGhlDQo+IHVzZXIgY291bGQgYWxzbyB0YWtlIGEgc25hcHNob3QsIG9yIGlu
+IHRoZSBmdXR1cmUgaG9wZWZ1bGx5IGluc2VydCBhDQo+IGZpbHRlciBub2RlLCBhbmQgeW91IHdv
+dWxkIHRoZW4gd2FudCB0aGUgQmxvY2tCYWNrZW5kIHRvIG1vdmUuDQo+IA0KPiBUbyBiZSBob25l
+c3QsIGV2ZW4gQmRydkNoaWxkUm9sZS5zdGF5X2F0X25vZGUgaXMgYSBiaXQgb2YgYSBoYWNrLiBC
+dXQgYXQNCj4gbGVhc3QgaXQncyBvbmx5IHVzZWQgZm9yIHBlcm1pc3Npb25zIGFuZCBub3QgZm9y
+IHRoZSBhY3R1YWwgZGF0YSBmbG93Lg0KPiANCg0KSG1tLiBUaGFuLCBtYXkgYmUganVzdCBhZGQg
+YSBwYXJhbWV0ZXIgdG8gYmRydl9yZXBsYWNlX25vZGUsIHdoaWNoIHBhcmVudHMNCnRvIGlnbm9y
+ZT8gV291bGQgaXQgd29yaz8NCg0KDQotLSANCkJlc3QgcmVnYXJkcywNClZsYWRpbWlyDQo=
 
