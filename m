@@ -2,90 +2,70 @@ Return-Path: <SRS0=3v23=UE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=FROM_EXCESS_BASE64,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D3D7C28CC5
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 15:20:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 044D2C28CC5
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 15:21:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3A49B2067C
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 15:20:20 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Oi51aB0P"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3A49B2067C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id D247E2067C
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 15:21:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D247E2067C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:44395 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:44428 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hYXi7-0002P7-Fk
-	for qemu-devel@archiver.kernel.org; Wed, 05 Jun 2019 11:20:19 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:40734)
+	id 1hYXjL-0003Id-5u
+	for qemu-devel@archiver.kernel.org; Wed, 05 Jun 2019 11:21:35 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:41195)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mrolnik@gmail.com>) id 1hYXhA-00026K-5g
-	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 11:19:21 -0400
+	(envelope-from <berrange@redhat.com>) id 1hYXia-0002ne-0z
+	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 11:20:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mrolnik@gmail.com>) id 1hYXh8-000486-Hx
-	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 11:19:20 -0400
-Received: from mail-qk1-x742.google.com ([2607:f8b0:4864:20::742]:40502)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mrolnik@gmail.com>) id 1hYXh8-00047A-Do
-	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 11:19:18 -0400
-Received: by mail-qk1-x742.google.com with SMTP id c70so5355410qkg.7
-	for <qemu-devel@nongnu.org>; Wed, 05 Jun 2019 08:19:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-	:cc; bh=LROlq/CnUShw/aJ9eLHb3kjKzLMl3nhEXcP1KyAgM3U=;
-	b=Oi51aB0PEER17ka78Z4c947jP5jn9JiJ7ZGknq1BondbMV5pepLjpiCthzXSRBQnvm
-	3bla5fSmMu3eGIXfUL2IzECvs6zTgKNU7A/UcTPEJYaNOpjyVjDwTQ5gOhCLJgi/lr20
-	ghyHifLkMU3tZikqAcIkFANnSwKwClQn2Hrjj1c/qbu6+Lx8CUy+kJirLTtrDUC89Nr6
-	l/sNoyHpndp7FksO9jsJbUeTxy/ulQ2tGHpb9hpvBMsy53ZlRR0jHqn/ie2sxO6Wwmce
-	1RLMyuD3d0+Ni80UobvmUz/R7NskT3s5pj8M9uyBx+OteeIU+z9ACUWSGbJS1OYdQz+B
-	bSFw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-	:message-id:subject:to:cc;
-	bh=LROlq/CnUShw/aJ9eLHb3kjKzLMl3nhEXcP1KyAgM3U=;
-	b=LhAI7iHPkGQYppbCRTkPHgs0TT84JDUX08NXRGu7RbcfLitX/2dT1/8eucmXXLbT5L
-	z3x/5Sd62QklSeI5gb6XBIsk+OaULoxLfUHjqtn11tL3YNyTBehhKRlfiwClFTqYiQX2
-	fRJM7r+q93NEgUdLf9DXxojRjZVNTC3QMhpWrhZWMlQgMumecbPxO+0p56qALnm7kQcZ
-	hqoGqe31uC2K4/Huf98Wh5225SfypRzLbnc/TJ+yR2o3u5B+8mIumX82eMh5c2QnlKRd
-	+piFriY/jiQortVBO6wCb7vpHlLevlJW0TAgqb6u85c7OBvP/AmjNuiYFeZ95R/NIelM
-	wS2A==
-X-Gm-Message-State: APjAAAVto/zxC93zPfz3QiwIG3gdF2q5dVn2NHhuGrPssNeu2m4hVrjf
-	aG4EKZjdaHaUDis0ZM1natEHvjbjI8wVWI3EY5w=
-X-Google-Smtp-Source: APXvYqwwO7TAUbiNcbUNuPwostUOGidx2Jhv4zCu0+Sh/sMPn9u5tVQlR+JZLXp1d14Wj3UyHv03rx7c9P2UTwu0DzY=
-X-Received: by 2002:a37:b8c5:: with SMTP id i188mr14015188qkf.7.1559747956834; 
-	Wed, 05 Jun 2019 08:19:16 -0700 (PDT)
+	(envelope-from <berrange@redhat.com>) id 1hYXiY-0006Bm-55
+	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 11:20:47 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45213)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1hYXiW-00065s-6J
+	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 11:20:46 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 6CB0530C34ED
+	for <qemu-devel@nongnu.org>; Wed,  5 Jun 2019 15:20:40 +0000 (UTC)
+Received: from redhat.com (ovpn-112-70.ams2.redhat.com [10.36.112.70])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id D589051DF3;
+	Wed,  5 Jun 2019 15:20:05 +0000 (UTC)
+Date: Wed, 5 Jun 2019 16:20:02 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Alex Williamson <alex.williamson@redhat.com>
+Message-ID: <20190605152002.GF8956@redhat.com>
+References: <20190517125820.2885-1-jfreimann@redhat.com>
+	<20190517125820.2885-4-jfreimann@redhat.com>
+	<20190521094504.GB2915@work-vm>
+	<20190530145645.tjwkgi4hae5yblsi@jenstp.localdomain>
+	<20190531214748.GN22103@habkost.net>
+	<20190603082456.vzpy256kj4o5e5wu@jenstp.localdomain>
+	<97b5f189-a75d-3efe-0af6-4570f6d38a58@redhat.com>
+	<20190603124652.10b3c0c2@x1.home>
 MIME-Version: 1.0
-References: <20190530190738.22713-1-mrolnik@gmail.com>
-	<20190530190738.22713-4-mrolnik@gmail.com>
-	<402ba0b2-e2e0-6b7a-1862-4588e5f83357@linaro.org>
-	<CAK4993iXV9oRr_VfabJHg4fCYEppW49i_PE9R0X_TBqk7TDkrQ@mail.gmail.com>
-	<9e2acbbe-7ede-c45d-5e9f-bb269aa25fcc@linaro.org>
-	<CAK4993hXTOSoW5FFjeur+pLzT18c-C=vwao-904ASyqMsT5eMQ@mail.gmail.com>
-	<3bc0d426-bd59-055d-a010-b136cba555bf@linaro.org>
-	<CAK4993j5JXgV9CYDckt99kwgQaG6w-GN-Tka7r2nahoh33rheQ@mail.gmail.com>
-	<CAK4993jWViasj8PKUCHcbMh-9SPJmELqua9eSbFvwL7gpm2e5A@mail.gmail.com>
-	<7b0c5e07-5b99-3344-7f80-847880f85b5b@linaro.org>
-In-Reply-To: <7b0c5e07-5b99-3344-7f80-847880f85b5b@linaro.org>
-From: Michael Rolnik <mrolnik@gmail.com>
-Date: Wed, 5 Jun 2019 18:19:02 +0300
-Message-ID: <CAK4993jPs_j9qvv8v2sfZ=npGkbkMAv3HaWSYRiSqFthkvfmdA@mail.gmail.com>
-To: Richard Henderson <richard.henderson@linaro.org>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::742
-Content-Type: text/plain; charset="UTF-8"
-X-Content-Filtered-By: Mailman/MimeDel 2.1.21
-Subject: Re: [Qemu-devel] [PATCH RFC v20 3/8] target/avr: Add mechanism to
- check for active debugger connection
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20190603124652.10b3c0c2@x1.home>
+User-Agent: Mutt/1.11.4 (2019-03-13)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.40]);
+	Wed, 05 Jun 2019 15:20:40 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH 3/4] net/virtio: add failover support
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -97,100 +77,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Sarah Harris <S.E.Harris@kent.ac.uk>,
-	QEMU Developers <qemu-devel@nongnu.org>,
-	Richard Henderson <rth@twiddle.net>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: pkrempa@redhat.com, Eduardo Habkost <ehabkost@redhat.com>, mst@redhat.com,
+	aadam@redhat.com, qemu-devel@nongnu.org,
+	"Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+	Laine Stump <laine@redhat.com>,
+	Jens Freimann <jfreimann@redhat.com>, ailan@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Richard.
+On Mon, Jun 03, 2019 at 12:46:52PM -0600, Alex Williamson wrote:
+> On Mon, 3 Jun 2019 14:10:52 -0400
+> Laine Stump <laine@redhat.com> wrote:
+>=20
+> > On 6/3/19 4:24 AM, Jens Freimann wrote:
+> > > On Fri, May 31, 2019 at 06:47:48PM -0300, Eduardo Habkost wrote: =20
+> > >> On Thu, May 30, 2019 at 04:56:45PM +0200, Jens Freimann wrote: =20
+> > >>> On Tue, May 28, 2019 at 11:04:15AM -0400, Michael S. Tsirkin wrot=
+e: =20
+> > >>> > On Tue, May 21, 2019 at 10:45:05AM +0100, Dr. David Alan Gilber=
+t  =20
+> > >>> wrote: =20
+> > >>> > > * Jens Freimann (jfreimann@redhat.com) wrote: =20
+> > >> [...] =20
+> > >>> > > > +=C2=A0=C2=A0=C2=A0 }
+> > >>> > > > +=C2=A0=C2=A0=C2=A0 if (migration_in_setup(s) && !should_be=
+_hidden &&  =20
+> > >>> n->primary_dev) { =20
+> > >>> > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 qdev_unplug(n->=
+primary_dev, &err); =20
+> > >>> > >
+> > >>> > > Not knowing unplug well; can you just explain - is that devic=
+e hard
+> > >>> > > unplugged and it's gone by the time this function returns or =
+is  =20
+> > >>> it still =20
+> > >>> > > hanging around for some indeterminate time? =20
+> > >>>
+> > >>> Qemu will trigger an unplug request via pcie attention button in=20
+> > >>> which case
+> > >>> there could be a delay by the guest operating system. We could gi=
+ve=20
+> > >>> it some
+> > >>> amount of time and if nothing happens try surpise removal or hand=
+le the
+> > >>> error otherwise. =20
+> > >>
+> > >> I'm missing something here:
+> > >>
+> > >> Isn't the whole point of the new device-hiding infrastructure to
+> > >> prevent QEMU from closing the VFIO until migration ended
+> > >> successfully? =20
+> > >=20
+> > > No. The point of hiding it is to only add the VFIO (that is configu=
+red
+> > > with the same MAC as the virtio-net device) until the
+> > > VIRTIO_NET_F_STANDBY feature is negotiated. We don't want to expose=
+ to
+> > > devices with the same MAC to guests who can't handle it.
+> > >  =20
+> > >> What exactly is preventing QEMU from closing the host VFIO device
+> > >> after the guest OS has handled the unplug request? =20
+> > >=20
+> > > We qdev_unplug() the VFIO device and want the virtio-net standby de=
+vice to
+> > > take over. If something goes wrong with unplug or
+> > > migration in general we have to qdev_plug() the device back.
+> > >=20
+> > > This series does not try to implement new functionality to close a
+> > > device without freeing the resources.
+> > >=20
+> > >  From the discussion in this thread I understand that is what libvi=
+rt
+> > > needs though. Something that will trigger the unplug from the
+> > > guest but not free the devices resources in the host system (which =
+is
+> > > what qdev_unplug() does). Correct?
+> > > Why is it bad to fully re-create the device in case of a failed mig=
+ration? =20
+> >=20
+> > I think the concern is that if the device was fully released by qemu=20
+> > during migration, it might have already been given to some other/new=20
+> > guest during the time that migration is trying to complete. If migrat=
+ion=20
+> > then fails, you may be unable to restore the guest to the previous st=
+ate.
+>=20
+> Yep, plus I think the memory pinning and IOMMU resources could be a
+> variable as well.  Essentially, there's no guaranteed reservation to
+> the device or any of the additional resources that the device implies
+> once it's released, so we want to keep as much of that on hot-standby
+> as we can in case the migration fails.  Unfortunately even just
+> unmapping the BARs for a guest-only hot-unplug unmaps those regions
+> from the IOMMU, but aside from catastrophic resource issues on the
+> host, we can essentially guarantee being able to remap those.  Thanks,
 
-We use break instruction for testing. (Here
-https://github.com/seharris/qemu-avr-tests/tree/master/instruction-tests).
-Each test is a big list of small tests with a break between them. We run
-the tests on HW and on QEMU then compare register after each break. If we
-don't implement break the way Sarah suggested we have no way of testing.
-What do you suggest?
+Yes its these other resource allocations that are the problem. Libvirt
+can easily ensure that the actual PCI device is not given away to a
+second guest until migration completes. The mgmt app above libvirt is
+likely ensure this exclusion of PCI devices too.
 
-Sent from my cell phone, please ignore typos
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
 
-On Wed, Jun 5, 2019, 5:37 PM Richard Henderson <richard.henderson@linaro.org>
-wrote:
-
-> On 6/5/19 2:20 AM, Michael Rolnik wrote:
-> > Hi Richard.
-> >
-> > I am still struggling with this one.
-> >
-> > The spec says.
-> > The BREAK instruction is used by the On-chip Debug system, and is
-> normally not
-> > used in the application software.
-> > When the BREAK instruction is executed, the AVR CPU is set in the
-> Stopped Mode.
-> > This gives the On-chip Debugger access to internal resources.
-> > If any Lock bits are set, or either the JTAGEN or OCDEN Fuses are
-> unprogrammed,
-> > the CPU will treat the BREAK instruction as a NOP and will not enter the
-> > Stopped mode.
->
-> Yep.
->
-> > I read is as follows
-> > - If user has an intention of using debugger, BREAK should be translated
-> to
-> > QEMU debug breakpoint
-> > - If user has no intention of using debugger, BREAK should be translated
-> into NOP.
->
-> I do not read it that way.  The spec is talking about a specific
-> implementation
-> of debugging -- fuses, jtag and all.  We do not need to implement
-> breakpoints
-> using any of those mechanisms, because we can insert breakpoints via
-> on-the-side data structures and re-translation.
->
->
-> r~
->
-
-On Wed, Jun 5, 2019, 5:37 PM Richard Henderson <richard.henderson@linaro.org>
-wrote:
-
-> On 6/5/19 2:20 AM, Michael Rolnik wrote:
-> > Hi Richard.
-> >
-> > I am still struggling with this one.
-> >
-> > The spec says.
-> > The BREAK instruction is used by the On-chip Debug system, and is
-> normally not
-> > used in the application software.
-> > When the BREAK instruction is executed, the AVR CPU is set in the
-> Stopped Mode.
-> > This gives the On-chip Debugger access to internal resources.
-> > If any Lock bits are set, or either the JTAGEN or OCDEN Fuses are
-> unprogrammed,
-> > the CPU will treat the BREAK instruction as a NOP and will not enter the
-> > Stopped mode.
->
-> Yep.
->
-> > I read is as follows
-> > - If user has an intention of using debugger, BREAK should be translated
-> to
-> > QEMU debug breakpoint
-> > - If user has no intention of using debugger, BREAK should be translated
-> into NOP.
->
-> I do not read it that way.  The spec is talking about a specific
-> implementation
-> of debugging -- fuses, jtag and all.  We do not need to implement
-> breakpoints
-> using any of those mechanisms, because we can insert breakpoints via
-> on-the-side data structures and re-translation.
->
->
-> r~
->
