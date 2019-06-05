@@ -2,63 +2,62 @@ Return-Path: <SRS0=3v23=UE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8809AC282DE
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 06:42:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 70409C282DE
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 06:43:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5C4B62075B
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 06:42:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5C4B62075B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 46EA72075B
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 06:43:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 46EA72075B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:36412 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:36421 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hYPcn-000667-Et
-	for qemu-devel@archiver.kernel.org; Wed, 05 Jun 2019 02:42:17 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:53354)
+	id 1hYPdt-0006qv-G1
+	for qemu-devel@archiver.kernel.org; Wed, 05 Jun 2019 02:43:25 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:53695)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1hYPc3-0005oR-9R
-	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 02:41:32 -0400
+	(envelope-from <groug@kaod.org>) id 1hYPd7-0006Sy-So
+	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 02:42:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1hYPc2-0007Vr-F4
-	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 02:41:31 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54148)
+	(envelope-from <groug@kaod.org>) id 1hYPd6-0001po-6T
+	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 02:42:37 -0400
+Received: from 13.mo1.mail-out.ovh.net ([178.33.253.128]:37251)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1hYPc2-0007Dj-95
-	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 02:41:30 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D058FC0624A1;
-	Wed,  5 Jun 2019 06:41:19 +0000 (UTC)
-Received: from xz-x1 (dhcp-15-205.nay.redhat.com [10.66.15.205])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 9F00B2CFCA;
-	Wed,  5 Jun 2019 06:41:11 +0000 (UTC)
-Date: Wed, 5 Jun 2019 14:41:08 +0800
-From: Peter Xu <peterx@redhat.com>
-To: Wei Yang <richardw.yang@linux.intel.com>
-Message-ID: <20190605064108.GH15459@xz-x1>
-References: <20190605010828.6969-1-richardw.yang@linux.intel.com>
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1hYPd5-0001mv-Ve
+	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 02:42:36 -0400
+Received: from player728.ha.ovh.net (unknown [10.108.54.217])
+	by mo1.mail-out.ovh.net (Postfix) with ESMTP id 69A8B17CD9E
+	for <qemu-devel@nongnu.org>; Wed,  5 Jun 2019 08:42:32 +0200 (CEST)
+Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
+	[82.253.208.248]) (Authenticated sender: groug@kaod.org)
+	by player728.ha.ovh.net (Postfix) with ESMTPSA id 5D61C66A9213;
+	Wed,  5 Jun 2019 06:42:25 +0000 (UTC)
+Date: Wed, 5 Jun 2019 08:42:24 +0200
+From: Greg Kurz <groug@kaod.org>
+To: elohimes@gmail.com
+Message-ID: <20190605084224.22e4cd92@bahia.lab.toulouse-stg.fr.ibm.com>
+In-Reply-To: <20190604073459.15651-3-xieyongji@baidu.com>
+References: <20190604073459.15651-1-xieyongji@baidu.com>
+	<20190604073459.15651-3-xieyongji@baidu.com>
+X-Mailer: Claws Mail 3.16.0 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20190605010828.6969-1-richardw.yang@linux.intel.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.32]);
-	Wed, 05 Jun 2019 06:41:21 +0000 (UTC)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Ovh-Tracer-Id: 7229966252579133741
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduuddrudeguddgudduvdcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH] migratioin/ram.c: reset complete_round
- when we gets a queued page
+X-Received-From: 178.33.253.128
+Subject: Re: [Qemu-devel] [PATCH v2 2/5] virtio: Set "start_on_kick" for
+ legacy devices
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -70,38 +69,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: quintela@redhat.com, qemu-devel@nongnu.org, dgilbert@redhat.com
+Cc: qemu-devel@nongnu.org, Xie Yongji <xieyongji@baidu.com>,
+	dgilbert@redhat.com, mst@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Jun 05, 2019 at 09:08:28AM +0800, Wei Yang wrote:
-> In case we gets a queued page, the order of block is interrupted. We may
-> not rely on the complete_round flag to say we have already searched the
-> whole blocks on the list.
+On Tue,  4 Jun 2019 15:34:56 +0800
+elohimes@gmail.com wrote:
+
+> From: Xie Yongji <xieyongji@baidu.com>
 > 
-> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
+> Besides virtio 1.0 transitional devices, we should also
+> set "start_on_kick" flag for legacy devices (virtio 0.9).
+> 
+> Signed-off-by: Xie Yongji <xieyongji@baidu.com>
 > ---
->  migration/ram.c | 6 ++++++
->  1 file changed, 6 insertions(+)
+
+Patch looks good but it would be even better if applied
+earlier so that it doesn't revert lines added by the
+previous patch...
+
+>  hw/virtio/virtio.c         | 2 --
+>  include/hw/virtio/virtio.h | 2 +-
+>  2 files changed, 1 insertion(+), 3 deletions(-)
 > 
-> diff --git a/migration/ram.c b/migration/ram.c
-> index d881981876..e9b40d636d 100644
-> --- a/migration/ram.c
-> +++ b/migration/ram.c
-> @@ -2290,6 +2290,12 @@ static bool get_queued_page(RAMState *rs, PageSearchStatus *pss)
->           */
->          pss->block = block;
->          pss->page = offset >> TARGET_PAGE_BITS;
-> +
-> +        /*
-> +         * This unqueued page would break the "one round" check, even is
-> +         * really rare.
+> diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
+> index 6508b2faad..6ec45d8f0a 100644
+> --- a/hw/virtio/virtio.c
+> +++ b/hw/virtio/virtio.c
+> @@ -2080,7 +2080,6 @@ int virtio_set_features(VirtIODevice *vdev, uint64_t val)
+>          }
+>  
+>          if (!vdev->started &&
+> -            virtio_host_has_feature(vdev, VIRTIO_F_VERSION_1) &&
 
-Why this is needed?  Could you help explain the problem first?
+... here and...
+>              !virtio_vdev_has_feature(vdev, VIRTIO_F_VERSION_1)) {
+>              vdev->start_on_kick = true;
+>          }
+> @@ -2236,7 +2235,6 @@ int virtio_load(VirtIODevice *vdev, QEMUFile *f, int version_id)
+>      }
+>  
+>      if (!vdev->started &&
+> -        virtio_host_has_feature(vdev, VIRTIO_F_VERSION_1) &&
 
-Thanks,
+... here.
 
--- 
-Peter Xu
+>          !virtio_vdev_has_feature(vdev, VIRTIO_F_VERSION_1)) {
+>          vdev->start_on_kick = true;
+>      }
+> diff --git a/include/hw/virtio/virtio.h b/include/hw/virtio/virtio.h
+> index 27c0efc3d0..303242b3c2 100644
+> --- a/include/hw/virtio/virtio.h
+> +++ b/include/hw/virtio/virtio.h
+> @@ -106,7 +106,7 @@ struct VirtIODevice
+>      bool vm_running;
+>      bool broken; /* device in invalid state, needs reset */
+>      bool started;
+> -    bool start_on_kick; /* virtio 1.0 transitional devices support that */
+> +    bool start_on_kick; /* when virtio 1.0 feature has not been negotiated */
+>      VMChangeStateEntry *vmstate;
+>      char *bus_name;
+>      uint8_t device_endian;
+
 
