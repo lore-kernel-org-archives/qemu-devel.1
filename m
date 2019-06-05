@@ -4,74 +4,75 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FE8AC28CC5
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 20:09:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CE8ECC28D18
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 20:09:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 13F5D206BB
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 20:09:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 13F5D206BB
+	by mail.kernel.org (Postfix) with ESMTPS id ACF5D206BB
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 20:09:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ACF5D206BB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:49173 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:49175 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hYcEH-0001Xb-8j
-	for qemu-devel@archiver.kernel.org; Wed, 05 Jun 2019 16:09:49 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:33978)
+	id 1hYcEI-0001Zc-SR
+	for qemu-devel@archiver.kernel.org; Wed, 05 Jun 2019 16:09:50 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:34148)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1hYc5K-00031a-7o
-	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 16:00:36 -0400
+	(envelope-from <mst@redhat.com>) id 1hYc5Y-0003EM-Kw
+	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 16:00:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1hYc5H-0005Rm-9s
-	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 16:00:33 -0400
-Received: from mail-qt1-f193.google.com ([209.85.160.193]:46654)
+	(envelope-from <mst@redhat.com>) id 1hYc5R-0005ml-UG
+	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 16:00:46 -0400
+Received: from mail-qt1-f194.google.com ([209.85.160.194]:40858)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1hYc55-0004lv-KC
-	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 16:00:23 -0400
-Received: by mail-qt1-f193.google.com with SMTP id z19so19458723qtz.13
-	for <qemu-devel@nongnu.org>; Wed, 05 Jun 2019 13:00:10 -0700 (PDT)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1hYc5O-0005aI-VT
+	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 16:00:39 -0400
+Received: by mail-qt1-f194.google.com with SMTP id a15so5013586qtn.7
+	for <qemu-devel@nongnu.org>; Wed, 05 Jun 2019 13:00:35 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-	:mime-version:content-disposition:in-reply-to;
-	bh=CSBnVJWUl++AOk+6oKojcpAmnlxqCg6oScq3C9+WfQI=;
-	b=LYnRwKUgToTCFhV+kvKHNSpnN9a84Nf0WLqSLg83bld2SUEvUYtjeeWVt8qDiWNrL7
-	vCeoyEdSsbPXOUVPkxLY4s1IyK+MzU9KDiNRpTSktWguNz5uSr3ZsNvdJPT1W9DiFmWG
-	ZD3+3eLVnHwBM9mr6zccONpee6irAPBnUppjqnK+hZ19sx9/Uw6MUaY2TkQkascBpo5X
-	18PmvVEvNb11TroypSorbMvfzOo4ncH/kn+1+FQmVRghjaS/QsR/vVT2LSnZjFtT9oKP
-	pihX+9I7j6RJloe64BRpSQfSX+K+XjWCsruSqceijvmPlPCkzI9SlLqrUhuos0oiQTMh
-	ii2Q==
-X-Gm-Message-State: APjAAAVC9JxEirmBgsbC114qprQNTgDpNilw5eKvqHQTpXEuCpP57VuQ
-	YpQ67W/SCz1aPWuBk59OQo4oVf3uoDo=
-X-Google-Smtp-Source: APXvYqza00rRaqRgV1ddzr+eSsuuu+T/ezFoI9qker3pILNNfFWeZdDLHX7gOCFRHsPeRSlcmNukGw==
-X-Received: by 2002:a05:6214:1cc:: with SMTP id
-	c12mr21765024qvt.119.1559764809025; 
-	Wed, 05 Jun 2019 13:00:09 -0700 (PDT)
+	:mime-version:content-disposition:content-transfer-encoding
+	:in-reply-to;
+	bh=k+AJ3Fh6N8GnLwjJBflOCLdYcgacwSZPHZMjqBixblY=;
+	b=Rsg0qorcKj51NYBfGC/5e+wJq5mLZz0U7nb2+odIYcbEtFF7XFoejBawdz0WE3nXUD
+	mOCDf5pz1YvXBo1c/KVqtGNpiQCxFencvx6wSuMOTaEmbMvYYm+zM6t4e5DJXT/UNi2D
+	WTjNNuK4myRjkWXdjq4TtjMvMMfyblyz41LdAE/54puBXWrGGHmAt6F79WfNrWmd4ecD
+	ThEZ4AS/wxGznCpNdgm97OsoGMJdPVajX63f54sglPWL/By94frtcF7RuzMCvRFVa6NV
+	U8OjNAT9rLa8dspdHRVaXlh9Eh28y1BQwMuiv+6Lz9OvY0R/INdJntXSUpj/SlaK9kpT
+	L5YQ==
+X-Gm-Message-State: APjAAAWTD5FGRgQQaoWEIwmgCmDsCN2DQmIO3fYAjiqE4cO1ahFAai5C
+	+EvVSEtwNMG/9j8mhfWyI04rkWcgY6Y=
+X-Google-Smtp-Source: APXvYqyOAgyshQ55J1J8QyAccDWTZ+hUQHLet398MUFVcUNHa/WjhQy9s4lDFABEYm7uhVB4juh+mw==
+X-Received: by 2002:ac8:87d:: with SMTP id x58mr36566795qth.368.1559764835011; 
+	Wed, 05 Jun 2019 13:00:35 -0700 (PDT)
 Received: from redhat.com (pool-100-0-197-103.bstnma.fios.verizon.net.
 	[100.0.197.103]) by smtp.gmail.com with ESMTPSA id
-	p37sm13545099qtc.35.2019.06.05.13.00.07
+	f9sm13488264qkb.97.2019.06.05.13.00.33
 	(version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-	Wed, 05 Jun 2019 13:00:08 -0700 (PDT)
-Date: Wed, 5 Jun 2019 16:00:06 -0400
+	Wed, 05 Jun 2019 13:00:34 -0700 (PDT)
+Date: Wed, 5 Jun 2019 16:00:33 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: qemu-devel@nongnu.org
-Message-ID: <20190521062836.6541-2-richardw.yang@linux.intel.com>
+Message-ID: <20190416125912.44001-2-liran.alon@oracle.com>
 References: <20190605195913.12243-1-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
 In-Reply-To: <20190605195913.12243-1-mst@redhat.com>
 X-Mailer: git-send-email 2.17.1.1206.gb667731e2e.dirty
 X-Mutt-Fcc: =sent
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 	[fuzzy]
-X-Received-From: 209.85.160.193
-Subject: [Qemu-devel] [PULL v3 01/17] hw/acpi: Consolidate build_mcfg to
- pci.c
+X-Received-From: 209.85.160.194
+Subject: [Qemu-devel] [PULL v3 11/17] vhost-scsi: The vhost backend should
+ be stopped when the VM is not running
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -83,220 +84,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
-	Eduardo Habkost <ehabkost@redhat.com>,
-	Shannon Zhao <shannon.zhaosl@gmail.com>, qemu-arm@nongnu.org,
-	Wei Yang <richardw.yang@linux.intel.com>,
-	Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
-	Richard Henderson <rth@twiddle.net>
+Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
+	Bijan Mottahedeh <bijan.mottahedeh@oracle.com>,
+	Liran Alon <liran.alon@oracle.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+	Paolo Bonzini <pbonzini@redhat.com>, Nir Weiner <nir.weiner@oracle.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190605200006.DuuGUutL8jorpEgcBh9cTXMkOwiazBPBz45UlMJ3JrY@z>
+Message-ID: <20190605200033.gyppgpfZ8Ug_3xv-dlRaFQ8tlNNy_WYdiGFdzmG22ys@z>
 
-From: Wei Yang <richardw.yang@linux.intel.com>
+From: Nir Weiner <nir.weiner@oracle.com>
 
-Now we have two identical build_mcfg functions.
+vhost-scsi doesn’t takes into account whether the VM is running or not in
+order to decide if it should start/stop vhost backend.
+This would lead to vhost backend still being active when VM's RunState
+suddenly change to stopped.
 
-Consolidate them in acpi/pci.c.
+An example of when this issue is encountered is when Live-Migration Pre-Copy
+phase completes. As in this case, VM state will be changed to stopped (while
+vhost backend is still active), which will result in
+virtio_vmstate_change() -> virtio_set_status() -> vhost_scsi_set_status()
+executed but vhost_scsi_set_status() will just return without stopping
+vhost backend.
 
-Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
+To handle this, change code to consider that vhost processing should be
+stopped when VM is not running. Similar to how it is done in vhost-vsock
+device at vhost_vsock_set_status().
 
-v4:
-  * ACPI_PCI depends on both ACPI and PCI
-  * rebase on latest master, adjust arm Kconfig
-v3:
-  * adjust changelog based on Igor's suggestion
-Message-Id: <20190521062836.6541-2-richardw.yang@linux.intel.com>
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+Fixes: 5e9be92d7752 ("vhost-scsi: new device supporting the tcm_vhost Linux kernel module”)
+Reviewed-by: Bijan Mottahedeh <bijan.mottahedeh@oracle.com>
+Reviewed-by: Liran Alon <liran.alon@oracle.com>
+Signed-off-by: Nir Weiner <nir.weiner@oracle.com>
+Message-Id: <20190416125912.44001-2-liran.alon@oracle.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- default-configs/i386-softmmu.mak |  1 +
- include/hw/acpi/pci.h            |  1 +
- hw/acpi/pci.c                    | 46 ++++++++++++++++++++++++++++++++
- hw/arm/virt-acpi-build.c         | 17 ------------
- hw/i386/acpi-build.c             | 18 +------------
- hw/acpi/Kconfig                  |  4 +++
- hw/acpi/Makefile.objs            |  1 +
- hw/arm/Kconfig                   |  1 +
- 8 files changed, 55 insertions(+), 34 deletions(-)
- create mode 100644 hw/acpi/pci.c
+ hw/scsi/vhost-scsi.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/default-configs/i386-softmmu.mak b/default-configs/i386-softmmu.mak
-index ba3fb3ff50..cd5ea391e8 100644
---- a/default-configs/i386-softmmu.mak
-+++ b/default-configs/i386-softmmu.mak
-@@ -25,3 +25,4 @@
- CONFIG_ISAPC=y
- CONFIG_I440FX=y
- CONFIG_Q35=y
-+CONFIG_ACPI_PCI=y
-diff --git a/include/hw/acpi/pci.h b/include/hw/acpi/pci.h
-index 124af7d32a..8bbd32cf45 100644
---- a/include/hw/acpi/pci.h
-+++ b/include/hw/acpi/pci.h
-@@ -30,4 +30,5 @@ typedef struct AcpiMcfgInfo {
-     uint32_t size;
- } AcpiMcfgInfo;
+diff --git a/hw/scsi/vhost-scsi.c b/hw/scsi/vhost-scsi.c
+index 61e2e57da9..ca42cff1b9 100644
+--- a/hw/scsi/vhost-scsi.c
++++ b/hw/scsi/vhost-scsi.c
+@@ -114,6 +114,10 @@ static void vhost_scsi_set_status(VirtIODevice *vdev, uint8_t val)
+     VHostSCSICommon *vsc = VHOST_SCSI_COMMON(s);
+     bool start = (val & VIRTIO_CONFIG_S_DRIVER_OK);
  
-+void build_mcfg(GArray *table_data, BIOSLinker *linker, AcpiMcfgInfo *info);
- #endif
-diff --git a/hw/acpi/pci.c b/hw/acpi/pci.c
-new file mode 100644
-index 0000000000..fa0fa30bb9
---- /dev/null
-+++ b/hw/acpi/pci.c
-@@ -0,0 +1,46 @@
-+/*
-+ * Support for generating PCI related ACPI tables and passing them to Guests
-+ *
-+ * Copyright (C) 2006 Fabrice Bellard
-+ * Copyright (C) 2008-2010  Kevin O'Connor <kevin@koconnor.net>
-+ * Copyright (C) 2013-2019 Red Hat Inc
-+ * Copyright (C) 2019 Intel Corporation
-+ *
-+ * Author: Wei Yang <richardw.yang@linux.intel.com>
-+ * Author: Michael S. Tsirkin <mst@redhat.com>
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License as published by
-+ * the Free Software Foundation; either version 2 of the License, or
-+ * (at your option) any later version.
++    if (!vdev->vm_running) {
++        start = false;
++    }
 +
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+
-+ * You should have received a copy of the GNU General Public License along
-+ * with this program; if not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "hw/acpi/aml-build.h"
-+#include "hw/acpi/pci.h"
-+#include "hw/pci/pcie_host.h"
-+
-+void build_mcfg(GArray *table_data, BIOSLinker *linker, AcpiMcfgInfo *info)
-+{
-+    AcpiTableMcfg *mcfg;
-+    int len = sizeof(*mcfg) + sizeof(mcfg->allocation[0]);
-+
-+    mcfg = acpi_data_push(table_data, len);
-+    mcfg->allocation[0].address = cpu_to_le64(info->base);
-+
-+    /* Only a single allocation so no need to play with segments */
-+    mcfg->allocation[0].pci_segment = cpu_to_le16(0);
-+    mcfg->allocation[0].start_bus_number = 0;
-+    mcfg->allocation[0].end_bus_number = PCIE_MMCFG_BUS(info->size - 1);
-+
-+    build_header(linker, table_data, (void *)mcfg, "MCFG", len, 1, NULL, NULL);
-+}
-+
-diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-index e7c96d658e..4a64f9985c 100644
---- a/hw/arm/virt-acpi-build.c
-+++ b/hw/arm/virt-acpi-build.c
-@@ -546,23 +546,6 @@ build_srat(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
-                  "SRAT", table_data->len - srat_start, 3, NULL, NULL);
- }
- 
--static void
--build_mcfg(GArray *table_data, BIOSLinker *linker, AcpiMcfgInfo *info)
--{
--    AcpiTableMcfg *mcfg;
--    int len = sizeof(*mcfg) + sizeof(mcfg->allocation[0]);
--
--    mcfg = acpi_data_push(table_data, len);
--    mcfg->allocation[0].address = cpu_to_le64(info->base);
--
--    /* Only a single allocation so no need to play with segments */
--    mcfg->allocation[0].pci_segment = cpu_to_le16(0);
--    mcfg->allocation[0].start_bus_number = 0;
--    mcfg->allocation[0].end_bus_number = PCIE_MMCFG_BUS(info->size - 1);
--
--    build_header(linker, table_data, (void *)mcfg, "MCFG", len, 1, NULL, NULL);
--}
--
- /* GTDT */
- static void
- build_gtdt(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
-diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-index 0d78d73894..85dc1640bc 100644
---- a/hw/i386/acpi-build.c
-+++ b/hw/i386/acpi-build.c
-@@ -2405,22 +2405,6 @@ build_srat(GArray *table_data, BIOSLinker *linker, MachineState *machine)
-                  table_data->len - srat_start, 1, NULL, NULL);
- }
- 
--static void
--build_mcfg_q35(GArray *table_data, BIOSLinker *linker, AcpiMcfgInfo *info)
--{
--    AcpiTableMcfg *mcfg;
--    int len = sizeof(*mcfg) + 1 * sizeof(mcfg->allocation[0]);
--
--    mcfg = acpi_data_push(table_data, len);
--    mcfg->allocation[0].address = cpu_to_le64(info->base);
--    /* Only a single allocation so no need to play with segments */
--    mcfg->allocation[0].pci_segment = cpu_to_le16(0);
--    mcfg->allocation[0].start_bus_number = 0;
--    mcfg->allocation[0].end_bus_number = PCIE_MMCFG_BUS(info->size - 1);
--
--    build_header(linker, table_data, (void *)mcfg, "MCFG", len, 1, NULL, NULL);
--}
--
- /*
-  * VT-d spec 8.1 DMA Remapping Reporting Structure
-  * (version Oct. 2014 or later)
-@@ -2690,7 +2674,7 @@ void acpi_build(AcpiBuildTables *tables, MachineState *machine)
+     if (vsc->dev.started == start) {
+         return;
      }
-     if (acpi_get_mcfg(&mcfg)) {
-         acpi_add_table(table_offsets, tables_blob);
--        build_mcfg_q35(tables_blob, tables->linker, &mcfg);
-+        build_mcfg(tables_blob, tables->linker, &mcfg);
-     }
-     if (x86_iommu_get_default()) {
-         IommuType IOMMUType = x86_iommu_get_type();
-diff --git a/hw/acpi/Kconfig b/hw/acpi/Kconfig
-index eca3beed75..7c59cf900b 100644
---- a/hw/acpi/Kconfig
-+++ b/hw/acpi/Kconfig
-@@ -23,6 +23,10 @@ config ACPI_NVDIMM
-     bool
-     depends on ACPI
- 
-+config ACPI_PCI
-+    bool
-+    depends on ACPI && PCI
-+
- config ACPI_VMGENID
-     bool
-     default y
-diff --git a/hw/acpi/Makefile.objs b/hw/acpi/Makefile.objs
-index 2d46e3789a..661a9b8c2f 100644
---- a/hw/acpi/Makefile.objs
-+++ b/hw/acpi/Makefile.objs
-@@ -11,6 +11,7 @@ common-obj-$(call lnot,$(CONFIG_ACPI_X86)) += acpi-stub.o
- common-obj-y += acpi_interface.o
- common-obj-y += bios-linker-loader.o
- common-obj-y += aml-build.o
-+common-obj-$(CONFIG_ACPI_PCI) += pci.o
- common-obj-$(CONFIG_TPM) += tpm.o
- 
- common-obj-$(CONFIG_IPMI) += ipmi.o
-diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
-index af8cffde9c..9aced9d54d 100644
---- a/hw/arm/Kconfig
-+++ b/hw/arm/Kconfig
-@@ -19,6 +19,7 @@ config ARM_VIRT
-     select PLATFORM_BUS
-     select SMBIOS
-     select VIRTIO_MMIO
-+    select ACPI_PCI
- 
- config CHEETAH
-     bool
 -- 
 MST
 
