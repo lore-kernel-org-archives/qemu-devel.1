@@ -6,52 +6,61 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8099FC282DE
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 10:27:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 66999C282DE
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 10:35:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5893D2075C
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 10:27:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5893D2075C
+	by mail.kernel.org (Postfix) with ESMTPS id 406B82075C
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 10:35:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 406B82075C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:38779 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:38854 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hYT8Q-0005Pe-DA
-	for qemu-devel@archiver.kernel.org; Wed, 05 Jun 2019 06:27:10 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:44907)
+	id 1hYTG3-0006zA-Bf
+	for qemu-devel@archiver.kernel.org; Wed, 05 Jun 2019 06:35:03 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:46852)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1hYT7N-0004uB-KG
-	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 06:26:06 -0400
+	(envelope-from <quintela@redhat.com>) id 1hYTFF-0006gD-2g
+	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 06:34:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1hYT7M-0001g1-CN
-	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 06:26:05 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54855)
+	(envelope-from <quintela@redhat.com>) id 1hYTFE-00036E-44
+	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 06:34:13 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56350)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1hYT7L-0001bK-LU
-	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 06:26:03 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
-	[10.5.11.22])
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1hYTFD-0002i8-Ut
+	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 06:34:12 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id F15D5308338F
-	for <qemu-devel@nongnu.org>; Wed,  5 Jun 2019 10:26:01 +0000 (UTC)
-Received: from xz-x1.nay.redhat.com (dhcp-15-205.nay.redhat.com [10.66.15.205])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 86CEA1001E73;
-	Wed,  5 Jun 2019 10:25:57 +0000 (UTC)
-From: Peter Xu <peterx@redhat.com>
-To: qemu-devel@nongnu.org
-Date: Wed,  5 Jun 2019 18:25:55 +0800
-Message-Id: <20190605102555.23050-1-peterx@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+	by mx1.redhat.com (Postfix) with ESMTPS id 11CBB3001E7E;
+	Wed,  5 Jun 2019 10:33:51 +0000 (UTC)
+Received: from redhat.com (ovpn-117-164.ams2.redhat.com [10.36.117.164])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 9EB455D9CD;
+	Wed,  5 Jun 2019 10:33:42 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+To: Peter Xu <peterx@redhat.com>
+In-Reply-To: <20190605093819.GL15459@xz-x1> (Peter Xu's message of "Wed, 5 Jun
+	2019 17:38:19 +0800")
+References: <20190605010828.6969-1-richardw.yang@linux.intel.com>
+	<20190605064108.GH15459@xz-x1> <20190605085207.GA1804@richard>
+	<20190605093819.GL15459@xz-x1>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
+Date: Wed, 05 Jun 2019 12:33:39 +0200
+Message-ID: <87d0js5njw.fsf@trasno.org>
+MIME-Version: 1.0
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.44]);
-	Wed, 05 Jun 2019 10:26:02 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.47]);
+	Wed, 05 Jun 2019 10:33:51 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH] tests: Add proper newlines for qmp_fd_receive
+Subject: Re: [Qemu-devel] [PATCH] migratioin/ram.c: reset complete_round
+ when we gets a queued page
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -63,54 +72,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
-	Juan Quintela <quintela@redhat.com>,
-	"Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-	peterx@redhat.com, Paolo Bonzini <pbonzini@redhat.com>
+Reply-To: quintela@redhat.com
+Cc: Wei Yang <richardw.yang@linux.intel.com>, dgilbert@redhat.com,
+	qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-It changes QTEST_LOG=1 results a bit more lovely, from:
+Peter Xu <peterx@redhat.com> wrote:
+> On Wed, Jun 05, 2019 at 04:52:07PM +0800, Wei Yang wrote:
+>> On Wed, Jun 05, 2019 at 02:41:08PM +0800, Peter Xu wrote:
+>> >On Wed, Jun 05, 2019 at 09:08:28AM +0800, Wei Yang wrote:
+>> >> In case we gets a queued page, the order of block is interrupted. We may
+>> >> not rely on the complete_round flag to say we have already searched the
+>> >> whole blocks on the list.
+>> >> 
+>> >> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
+>> >> ---
+>> >>  migration/ram.c | 6 ++++++
+>> >>  1 file changed, 6 insertions(+)
+>> >> 
+>> >> diff --git a/migration/ram.c b/migration/ram.c
+>> >> index d881981876..e9b40d636d 100644
+>> >> --- a/migration/ram.c
+>> >> +++ b/migration/ram.c
+>> >> @@ -2290,6 +2290,12 @@ static bool get_queued_page(RAMState *rs, PageSearchStatus *pss)
+>> >>           */
+>> >>          pss->block = block;
+>> >>          pss->page = offset >> TARGET_PAGE_BITS;
+>> >> +
+>> >> +        /*
+>> >> +         * This unqueued page would break the "one round" check, even is
+>> >> +         * really rare.
+>> >
 
-{"return": ... }{"execute": "query-migrate"}
 
-{"return": ... }{"execute": "query-migrate"}
+> Ah I see your point, but I don't think there is a problem - note that
+> complete_round will be reset for each ram_find_and_save_block(), so
+> even if we have that iteration of ram_find_and_save_block() to return
+> we'll still know we have dirty pages to migrate and in the next call
+> we'll be fine, no?
 
-Into:
+Reviewed-by: Juan Quintela <quintela@redhat.com>
 
-{"execute": "query-migrate"}
+I *think* that peter is perhaps right, but it is not clear at all, and
+it is easier to be safe.  I think that the only case that this could
+matter is if:
+- all pages are clean (so complete_round will get as true)
+- we went a queue_page request
 
-{"return": ... }
+Is that possible?  I am not completely sure after looking at the code.
+It *could* be if the page that got queued is the last page remaining,
+but ......  I fully agree that the case that _almost all_ pages are
+clean and we get a request for a queued page is really rare, so it
+should not matter in real life, but ....
 
-{"execute": "query-migrate"}
-
-{"return": ... }
-
-CC: Thomas Huth <thuth@redhat.com>
-CC: Laurent Vivier <lvivier@redhat.com>
-CC: Paolo Bonzini <pbonzini@redhat.com>
-Signed-off-by: Peter Xu <peterx@redhat.com>
----
- tests/libqtest.c | 4 ++++
- 1 file changed, 4 insertions(+)
-
-diff --git a/tests/libqtest.c b/tests/libqtest.c
-index 546a875913..d7301d773e 100644
---- a/tests/libqtest.c
-+++ b/tests/libqtest.c
-@@ -532,6 +532,10 @@ QDict *qmp_fd_receive(int fd)
-     }
-     json_message_parser_destroy(&qmp.parser);
- 
-+    if (log) {
-+        fprintf(stderr, "\n\n");
-+    }
-+
-     return qmp.response;
- }
- 
--- 
-2.17.1
-
+Later, Juan.
 
