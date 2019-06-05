@@ -2,66 +2,75 @@ Return-Path: <SRS0=3v23=UE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FF60C28CC5
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 19:56:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EB7A9C28CC5
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 20:02:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 58C61206C3
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 19:56:45 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="lXMZWUe7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 58C61206C3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=zytor.com
+	by mail.kernel.org (Postfix) with ESMTPS id 83B73207E0
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 20:02:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 83B73207E0
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:49023 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:49082 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hYc1c-0002SA-ER
-	for qemu-devel@archiver.kernel.org; Wed, 05 Jun 2019 15:56:44 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:33216)
+	id 1hYc78-0004Dk-H5
+	for qemu-devel@archiver.kernel.org; Wed, 05 Jun 2019 16:02:26 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:33983)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <hpa@zytor.com>) id 1hYc0u-0001yd-Es
-	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 15:56:01 -0400
+	(envelope-from <mst@redhat.com>) id 1hYc5K-00031b-AM
+	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 16:00:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <hpa@zytor.com>) id 1hYc0l-00068y-Db
-	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 15:55:55 -0400
-Received: from terminus.zytor.com ([198.137.202.136]:54939 helo=mail.zytor.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <hpa@zytor.com>) id 1hYc0e-0005Sc-5r
-	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 15:55:44 -0400
-Received: from carbon-x1.hos.anvin.org ([192.55.54.60]) (authenticated bits=0)
-	by mail.zytor.com (8.15.2/8.15.2) with ESMTPSA id x55JtN271660258
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
-	Wed, 5 Jun 2019 12:55:24 -0700
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com x55JtN271660258
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
-	s=2019051801; t=1559764528;
-	bh=nQ7d0NzVmeYZX5h42LR5kpiTw7aa4e3qC1p5rNhsCLg=;
-	h=To:From:Subject:Date:From;
-	b=lXMZWUe7VrrH563LJkeJ61WhbJ0G6PM/D9TifwKNtbP1+HQPlL+ltYOtXN/IFxejD
-	mTUJWJTXIBgzhuu9JsrsNxyftFmz5wioLiauB2bY/zp0Gkoag+Yc3tDJf/KaHi2cKD
-	7Gw2gtTz0E8xPzSYs4Ublffxl2tj6puM5bEAdaA3CQexFQJxKCu9zdmRzJX1G1/AF9
-	EsLCJzNkJueMO/m3Q2FPtn/2BsHFZw7mnRsXKyT8TNoWqd32CW3tatk6GRvx88ieSC
-	YDTjq1fD7M3zWbefLzwOYMxSBiK/zoQwrsR5xmIBQu2GftSX7cWmfRcmRTZfIYvNwL
-	w9GYTFR7bIMww==
+	(envelope-from <mst@redhat.com>) id 1hYc5I-0005Tg-9k
+	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 16:00:34 -0400
+Received: from mail-qk1-f193.google.com ([209.85.222.193]:46153)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1hYc5H-0004pZ-9u
+	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 16:00:32 -0400
+Received: by mail-qk1-f193.google.com with SMTP id a132so5948999qkb.13
+	for <qemu-devel@nongnu.org>; Wed, 05 Jun 2019 13:00:12 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+	:mime-version:content-disposition:in-reply-to;
+	bh=BMjQYyCdvFzPEzLYug8aCJTeB4WwbCrsrkhqi7chWAs=;
+	b=evxYy03cIp057QhZ1jw6w31BF840isgFGhoo6DELQv2DQRtIazHrHs5p2uFfE8awg5
+	RpjS8QR7+9PDAK5Mxd4nisxKv0Rxlgn3zlf92uihYrUYuRbgBk6zkcnMnie5Vju8n6gz
+	nNeYjXBCmzx2dR9EtW/4MNT6tJc1PVaLV/VBi52fLlsWFYBk3YDe2LXfDfWCDxaWJOza
+	cqE2Dhxjj7gBzotoOR8p6i0P6zdDaGqcgi4FiGstibVEkHaUSIC2ZIxe2yPnylZ8pVzI
+	yHnnfyQFFcAs7iPqpWe+PLPdc2WDKgPJAelR+KDm6ea+9dsHvX6ovkkvEWWKXYs8f8b7
+	sxjA==
+X-Gm-Message-State: APjAAAW2jOMnz7avv5UuJZgn4JGBECzDj/1YVxme8Hd+FcNTGkrHfKQ1
+	JghRem94bDHG4dU7ZXZKDrWk883Fe6o=
+X-Google-Smtp-Source: APXvYqyHV3r0g71Ao6PgYNSptkDRyqLUAR7qYH9Bn655ri7F8X9slvLWdt+o9KPEBIL/zsv+xMi4SA==
+X-Received: by 2002:a37:30c:: with SMTP id 12mr34362555qkd.175.1559764811326; 
+	Wed, 05 Jun 2019 13:00:11 -0700 (PDT)
+Received: from redhat.com (pool-100-0-197-103.bstnma.fios.verizon.net.
+	[100.0.197.103]) by smtp.gmail.com with ESMTPSA id
+	y129sm12117332qkc.63.2019.06.05.13.00.09
+	(version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+	Wed, 05 Jun 2019 13:00:10 -0700 (PDT)
+Date: Wed, 5 Jun 2019 16:00:09 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
 To: qemu-devel@nongnu.org
-From: "H. Peter Anvin" <hpa@zytor.com>
-Message-ID: <6364a057-23ab-db7f-cb2c-ccff70fb7aed@zytor.com>
-Date: Wed, 5 Jun 2019 12:55:22 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.7.0
+Message-ID: <20190521062836.6541-3-richardw.yang@linux.intel.com>
+References: <20190605195913.12243-1-mst@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="UTF-8"
+Content-Disposition: inline
+In-Reply-To: <20190605195913.12243-1-mst@redhat.com>
+X-Mailer: git-send-email 2.17.1.1206.gb667731e2e.dirty
+X-Mutt-Fcc: =sent
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 198.137.202.136
-Subject: [Qemu-devel] Qemu baseline requirements/portability?
+	[fuzzy]
+X-Received-From: 209.85.222.193
+Subject: [Qemu-devel] [PULL v3 02/17] acpi: pci: use build_append_foo() API
+ to construct MCFG
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -73,19 +82,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+	Wei Yang <richardw.yang@linux.intel.com>,
+	Igor Mammedov <imammedo@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
+Message-ID: <20190605200009.sXesnFeWlOjuMH8MZ5mH1Tkq3noE56vhpCDszZqlC18@z>
 
-Hi,
+From: Wei Yang <richardw.yang@linux.intel.com>
 
-I am writing some code I'm hoping will be able to make it into Qemu, but I
-can't seem to find what the baseline portability requirements are.  I'm
-specifically wondering about newer POSIX features like openat(), which seems
-to be used in the 9p filesystem and nowhere else, and what version of glib one
-can rely on?
+build_append_foo() API doesn't need explicit endianness conversions
+which eliminates a source of errors and it makes build_mcfg() look like
+declarative definition of MCFG table in ACPI spec, which makes it easy
+to review.
 
-Thanks,
+Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
+Suggested-by: Igor Mammedov <imammedo@redhat.com>
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 
-	-hpa
+v3:
+   * add some comment on the Configuration Space base address allocation
+     structure
+v2:
+   * miss the reserved[8] of MCFG in last version, add it back
+   * drop SOBs and make sure bios-tables-test all OK
+Message-Id: <20190521062836.6541-3-richardw.yang@linux.intel.com>
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+---
+ include/hw/acpi/acpi-defs.h | 18 ------------------
+ hw/acpi/pci.c               | 33 ++++++++++++++++++++++++---------
+ 2 files changed, 24 insertions(+), 27 deletions(-)
+
+diff --git a/include/hw/acpi/acpi-defs.h b/include/hw/acpi/acpi-defs.h
+index f9aa4bd398..57a3f58b0c 100644
+--- a/include/hw/acpi/acpi-defs.h
++++ b/include/hw/acpi/acpi-defs.h
+@@ -449,24 +449,6 @@ struct AcpiSratProcessorGiccAffinity {
+ 
+ typedef struct AcpiSratProcessorGiccAffinity AcpiSratProcessorGiccAffinity;
+ 
+-/* PCI fw r3.0 MCFG table. */
+-/* Subtable */
+-struct AcpiMcfgAllocation {
+-    uint64_t address;                /* Base address, processor-relative */
+-    uint16_t pci_segment;            /* PCI segment group number */
+-    uint8_t start_bus_number;       /* Starting PCI Bus number */
+-    uint8_t end_bus_number;         /* Final PCI Bus number */
+-    uint32_t reserved;
+-} QEMU_PACKED;
+-typedef struct AcpiMcfgAllocation AcpiMcfgAllocation;
+-
+-struct AcpiTableMcfg {
+-    ACPI_TABLE_HEADER_DEF;
+-    uint8_t reserved[8];
+-    AcpiMcfgAllocation allocation[0];
+-} QEMU_PACKED;
+-typedef struct AcpiTableMcfg AcpiTableMcfg;
+-
+ /*
+  * TCPA Description Table
+  *
+diff --git a/hw/acpi/pci.c b/hw/acpi/pci.c
+index fa0fa30bb9..9510597a19 100644
+--- a/hw/acpi/pci.c
++++ b/hw/acpi/pci.c
+@@ -30,17 +30,32 @@
+ 
+ void build_mcfg(GArray *table_data, BIOSLinker *linker, AcpiMcfgInfo *info)
+ {
+-    AcpiTableMcfg *mcfg;
+-    int len = sizeof(*mcfg) + sizeof(mcfg->allocation[0]);
++    int mcfg_start = table_data->len;
+ 
+-    mcfg = acpi_data_push(table_data, len);
+-    mcfg->allocation[0].address = cpu_to_le64(info->base);
++    /*
++     * PCI Firmware Specification, Revision 3.0
++     * 4.1.2 MCFG Table Description.
++     */
++    acpi_data_push(table_data, sizeof(AcpiTableHeader));
++    /* Reserved */
++    build_append_int_noprefix(table_data, 0, 8);
+ 
+-    /* Only a single allocation so no need to play with segments */
+-    mcfg->allocation[0].pci_segment = cpu_to_le16(0);
+-    mcfg->allocation[0].start_bus_number = 0;
+-    mcfg->allocation[0].end_bus_number = PCIE_MMCFG_BUS(info->size - 1);
++    /*
++     * Memory Mapped Enhanced Configuration Space Base Address Allocation
++     * Structure
++     */
++    /* Base address, processor-relative */
++    build_append_int_noprefix(table_data, info->base, 8);
++    /* PCI segment group number */
++    build_append_int_noprefix(table_data, 0, 2);
++    /* Starting PCI Bus number */
++    build_append_int_noprefix(table_data, 0, 1);
++    /* Final PCI Bus number */
++    build_append_int_noprefix(table_data, PCIE_MMCFG_BUS(info->size - 1), 1);
++    /* Reserved */
++    build_append_int_noprefix(table_data, 0, 4);
+ 
+-    build_header(linker, table_data, (void *)mcfg, "MCFG", len, 1, NULL, NULL);
++    build_header(linker, table_data, (void *)(table_data->data + mcfg_start),
++                 "MCFG", table_data->len - mcfg_start, 1, NULL, NULL);
+ }
+ 
+-- 
+MST
+
 
