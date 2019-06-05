@@ -3,66 +3,67 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B27DC28CC5
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 17:38:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 12DD5C28CC5
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 17:54:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 14E3E20717
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 17:38:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 14E3E20717
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id DF17B206C3
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 17:54:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DF17B206C3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:47761 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:47904 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hYZrx-0000gi-4e
-	for qemu-devel@archiver.kernel.org; Wed, 05 Jun 2019 13:38:37 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:60575)
+	id 1hYa7P-0003JM-PE
+	for qemu-devel@archiver.kernel.org; Wed, 05 Jun 2019 13:54:35 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:36282)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1hYZr3-0000IO-Q6
-	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 13:37:42 -0400
+	(envelope-from <armbru@redhat.com>) id 1hYa6e-00032W-Vh
+	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 13:53:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1hYZr1-0000ha-5X
-	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 13:37:41 -0400
-Resent-Date: Wed, 05 Jun 2019 13:37:40 -0400
-Resent-Message-Id: <E1hYZr1-0000ha-5X@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21403)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1hYZr0-0000b1-3x
-	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 13:37:39 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1559670511; cv=none; d=zoho.com; s=zohoarc; 
-	b=eYohwTz8QRClS4VOt4hkjTp0LFGwKLLCr8vNqb6QDtHUPczYtLCDebYWT890POPY78MQKgl8Q1cMDuQUIj3KuXI3mtGMrHLrv1plKBzZOTd3bLJNmvwoVIVsCXBiZ7zUtKrXbKsqvoz4TVOdcI56OYQC8sNm0FFpYjnHNc/AgXo=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
-	s=zohoarc; t=1559670511;
-	h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
-	bh=FN768EYvq+LaacDGAHiEJGxPV3tmthpjoFnaodlkK1s=; 
-	b=BGfWAk1UwfucOPAnRW6bW1PJ4yYmA+qkeDMPnRdDBQoLeS8ewQgcg0RjBQhnYFpyV+WEloDmhcmAyjTP+BVp6DucubpyIWG7a+G41mZkSjjJSQMp/3FKqVeTcPxjUieMSEVm0JqhAr6Xtwn57svU9zCBKPpCG3jzHF3mpZQxrJ0=
-ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
-	spf=pass  smtp.mailfrom=no-reply@patchew.org;
-	dmarc=pass header.from=<no-reply@patchew.org>
-	header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
-	mx.zohomail.com with SMTPS id 1559670509815498.45104372456433;
-	Tue, 4 Jun 2019 10:48:29 -0700 (PDT)
-In-Reply-To: <20190604161514.262241-1-vsementsov@virtuozzo.com>
-Message-ID: <155967050840.32260.4549003262973982966@ce79690b2cb9>
+	(envelope-from <armbru@redhat.com>) id 1hYa6e-00088n-0a
+	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 13:53:48 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48362)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hYa6c-00086e-L3
+	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 13:53:47 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 35E22309264D;
+	Wed,  5 Jun 2019 17:53:13 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-148.ams2.redhat.com
+	[10.36.116.148])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 5C5D95C582;
+	Wed,  5 Jun 2019 17:52:52 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+	id C96AD11386A0; Wed,  5 Jun 2019 19:52:50 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Daniel P. =?utf-8?Q?Berrang=C3=A9?= <berrange@redhat.com>
+References: <87lfyqla7r.fsf@dusky.pond.sub.org>
+	<20190605142300.GB8956@redhat.com>
+Date: Wed, 05 Jun 2019 19:52:50 +0200
+In-Reply-To: <20190605142300.GB8956@redhat.com> ("Daniel P. =?utf-8?Q?Berr?=
+	=?utf-8?Q?ang=C3=A9=22's?=
+	message of "Wed, 5 Jun 2019 15:23:00 +0100")
+Message-ID: <8736knnclp.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: vsementsov@virtuozzo.com
-Date: Tue, 4 Jun 2019 10:48:29 -0700 (PDT)
-X-ZohoMailClient: External
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.43]);
+	Wed, 05 Jun 2019 17:53:44 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 135.84.80.217
-Subject: Re: [Qemu-devel] [PATCH v2 00/12] block: qiov_offset parameter for
- io
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] Headers without multiple inclusion guards
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -74,31 +75,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: fam@euphon.net, kwolf@redhat.com, vsementsov@virtuozzo.com,
-	qemu-block@nongnu.org, qemu-devel@nongnu.org, mreitz@redhat.com,
-	stefanha@redhat.com, den@openvz.org, jsnow@redhat.com
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+	Dmitry Fleytman <dmitry.fleytman@gmail.com>,
+	Sagar Karandikar <sagark@eecs.berkeley.edu>,
+	"Michael S. Tsirkin" <mst@redhat.com>, James Hogan <jhogan@kernel.org>,
+	Anthony Green <green@moxielogic.com>, Palmer Dabbelt <palmer@sifive.com>,
+	Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org,
+	Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+	Max Filippov <jcmvbkbc@gmail.com>,
+	Alistair Francis <Alistair.Francis@wdc.com>,
+	Gerd Hoffmann <kraxel@redhat.com>,
+	"Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+	Guan Xuetao <gxt@mprc.pku.edu.cn>, Marek Vasut <marex@denx.de>,
+	Stefano Stabellini <sstabellini@kernel.org>,
+	Aleksandar Rikalo <arikalo@wavecomp.com>, Helge Deller <deller@gmx.de>,
+	David Hildenbrand <david@redhat.com>, Halil Pasic <pasic@linux.ibm.com>,
+	Christian Borntraeger <borntraeger@de.ibm.com>,
+	Anthony Perard <anthony.perard@citrix.com>,
+	David Gibson <david@gibson.dropbear.id.au>,
+	Laszlo Ersek <lersek@redhat.com>, Jason Wang <jasowang@redhat.com>,
+	Artyom Tarasenko <atar4qemu@gmail.com>,
+	Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
+	Alistair Francis <alistair@alistair23.me>,
+	Eduardo Habkost <ehabkost@redhat.com>,
+	Riku Voipio <riku.voipio@iki.fi>, Greg Kurz <groug@kaod.org>,
+	Marcelo Tosatti <mtosatti@redhat.com>,
+	Beniamino Galvani <b.galvani@gmail.com>,
+	Eric Auger <eric.auger@redhat.com>, Paul Durrant <paul.durrant@citrix.com>,
+	Stafford Horne <shorne@gmail.com>,
+	Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>,
+	Richard Henderson <rth@twiddle.net>,
+	Claudio Fontana <claudio.fontana@gmail.com>,
+	Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+	Chris Wulff <crwulff@gmail.com>,
+	Claudio Fontana <claudio.fontana@huawei.com>,
+	Laurent Vivier <laurent@vivier.eu>,
+	Andrew Baumann <Andrew.Baumann@microsoft.com>,
+	Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+	Michael Walle <michael@walle.cc>,
+	Aleksandar Markovic <amarkovic@wavecomp.com>,
+	Cornelia Huck <cohuck@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+	Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDYwNDE2MTUxNC4yNjIy
-NDEtMS12c2VtZW50c292QHZpcnR1b3p6by5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgZmFpbGVk
-IHRoZSBhc2FuIGJ1aWxkIHRlc3QuIFBsZWFzZSBmaW5kIHRoZSB0ZXN0aW5nIGNvbW1hbmRzIGFu
-ZAp0aGVpciBvdXRwdXQgYmVsb3cuIElmIHlvdSBoYXZlIERvY2tlciBpbnN0YWxsZWQsIHlvdSBj
-YW4gcHJvYmFibHkgcmVwcm9kdWNlIGl0CmxvY2FsbHkuCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4g
-PT09CiMhL2Jpbi9iYXNoCnRpbWUgbWFrZSBkb2NrZXItdGVzdC1kZWJ1Z0BmZWRvcmEgVEFSR0VU
-X0xJU1Q9eDg2XzY0LXNvZnRtbXUgSj0xNCBORVRXT1JLPTEKPT09IFRFU1QgU0NSSVBUIEVORCA9
-PT0KCiAgQ0MgICAgICBhY2NlbC90Y2cvdHJhY2UubwogIENDICAgICAgY3J5cHRvL3RyYWNlLm8K
-ICBDQyAgICAgIGF1dGh6L3RyYWNlLm8KL3RtcC9xZW11LXRlc3Qvc3JjL3V0aWwvaW92LmM6NDI4
-Ojk6IGVycm9yOiB2YXJpYWJsZSAnbWlkX25pb3YnIGlzIHVzZWQgdW5pbml0aWFsaXplZCB3aGVu
-ZXZlciAnaWYnIGNvbmRpdGlvbiBpcyBmYWxzZSBbLVdlcnJvciwtV3NvbWV0aW1lcy11bmluaXRp
-YWxpemVkXQogICAgaWYgKG1pZF9sZW4pIHsKICAgICAgICBefn5+fn5+Ci90bXAvcWVtdS10ZXN0
-L3NyYy91dGlsL2lvdi5jOjQzMzozMTogbm90ZTogdW5pbml0aWFsaXplZCB1c2Ugb2NjdXJzIGhl
-cmUKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dz
-LzIwMTkwNjA0MTYxNTE0LjI2MjI0MS0xLXZzZW1lbnRzb3ZAdmlydHVvenpvLmNvbS90ZXN0aW5n
-LmFzYW4vP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5
-IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFj
-ayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+Daniel P. Berrang=C3=A9 <berrange@redhat.com> writes:
 
+> On Tue, May 28, 2019 at 08:12:24PM +0200, Markus Armbruster wrote:
+>> We have a bunch of headers without multiple inclusion guards.  Some are
+>> clearly intentional, some look accidental.  Too many for me to find out
+>> by examining each of them, so I'm asking their maintainers.
+>>=20
+>> Why do I ask?  I'd like to mark the intentional ones and fix the
+>> accidental ones, so they don't flunk "make check-headers" from "[RFC v4
+>> 0/7] Baby steps towards saner headers" just because they lack multiple
+>> inclusion guards.
+>>=20
+>> Just in case: what's a multiple inclusion guard?  It's
+>>=20
+>>     #ifndef UNIQUE_GUARD_SYMBOL_H
+>>     #define UNIQUE_GUARD_SYMBOL_H
+>>     ...
+>>     #endif
+>>=20
+>> with nothing but comments outside the conditional, so that the header
+>> can safely be included more than once.
+>
+> Any opinions on using the less verbose syntax instead:
+>
+>   #pragma once
+>
+> It is not portable C, but we explicitly only care about GCC or CLang,
+> so portability isn't an issue for us.
+
+I doubt its worth the churn.  But I'm content to go with the flow here.
+
+>> Cryptography
+>> M: Daniel P. Berrange <berrange@redhat.com>
+>> crypto/ivgen-essiv.h
+>> crypto/ivgen-plain.h
+>> crypto/ivgen-plain64.h
+>
+> These have header guards present
+
+Yes.  They #include outside the header guard, which confuses my script.
+
+>> tests/crypto-tls-psk-helpers.h
+>> tests/crypto-tls-x509-helpers.h
+>
+> These should be fixed.
+
+Will do, thanks!
 
