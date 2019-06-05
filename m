@@ -6,47 +6,53 @@ X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C8FA7C28CC3
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 01:02:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DB1A9C282CE
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 01:09:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A50BE206B8
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 01:02:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A50BE206B8
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=nongnu.org
+	by mail.kernel.org (Postfix) with ESMTPS id B7F7F2070B
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 01:09:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B7F7F2070B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:33546 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:33602 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hYKJh-0007f8-Vg
-	for qemu-devel@archiver.kernel.org; Tue, 04 Jun 2019 21:02:14 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:52589)
+	id 1hYKR5-000120-Hz
+	for qemu-devel@archiver.kernel.org; Tue, 04 Jun 2019 21:09:51 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:57387)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cuser@cusers-Mac-mini.local>) id 1hYKIB-0006ax-IU
-	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 21:00:40 -0400
+	(envelope-from <richardw.yang@linux.intel.com>) id 1hYKQG-0000jV-VH
+	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 21:09:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cuser@cusers-Mac-mini.local>) id 1hYKI9-0007CC-QH
-	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 21:00:39 -0400
-Received: from [36.106.167.139] (port=63964 helo=cusers-Mac-mini.local)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cuser@cusers-Mac-mini.local>) id 1hYKI7-000703-OW
-	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 21:00:37 -0400
-Received: by cusers-Mac-mini.local (Postfix, from userid 501)
-	id 65397EFD867; Tue,  4 Jun 2019 17:13:58 +0800 (CST)
-To: peter.maydell@linaro.org,
-	kraxel@redhat.com
-Date: Tue,  4 Jun 2019 17:12:44 +0800
-Message-Id: <cd6cc9df4d256b39f9c43abb95b6fdf980e60fd4.1559638310.git.tgfbeta@me.com>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <cover.1559638310.git.tgfbeta@me.com>
-References: <cover.1559638310.git.tgfbeta@me.com>
+	(envelope-from <richardw.yang@linux.intel.com>) id 1hYKQG-0001Gu-0y
+	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 21:09:00 -0400
+Received: from mga12.intel.com ([192.55.52.136]:38830)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <richardw.yang@linux.intel.com>)
+	id 1hYKQF-0001Dl-OX
+	for qemu-devel@nongnu.org; Tue, 04 Jun 2019 21:08:59 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+	by fmsmga106.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+	04 Jun 2019 18:08:55 -0700
+X-ExtLoop1: 1
+Received: from richard.sh.intel.com (HELO localhost) ([10.239.159.54])
+	by fmsmga004.fm.intel.com with ESMTP; 04 Jun 2019 18:08:55 -0700
+From: Wei Yang <richardw.yang@linux.intel.com>
+To: qemu-devel@nongnu.org
+Date: Wed,  5 Jun 2019 09:08:28 +0800
+Message-Id: <20190605010828.6969-1-richardw.yang@linux.intel.com>
+X-Mailer: git-send-email 2.19.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Mac OS X  [generic] [fuzzy]
-X-Received-From: 36.106.167.139
-Subject: [Qemu-devel] [PATCH 1/2] ui/cocoa: Fix absolute input device
- grabbing issue on Mojave
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 192.55.52.136
+Subject: [Qemu-devel] [PATCH] migratioin/ram.c: reset complete_round when we
+ gets a queued page
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -58,119 +64,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-From: Chen Zhang via Qemu-devel <qemu-devel@nongnu.org>
-Reply-To: Chen Zhang <tgfbeta@me.com>
-Cc: qemu-devel@nongnu.org, Chen Zhang <tgfbeta@me.com>
+Cc: Wei Yang <richardw.yang@linux.intel.com>, dgilbert@redhat.com,
+	quintela@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mojave, absolute input device, i.e. tablet, had trouble re-grabbing
-the cursor in re-entry into the virtual screen area. In some cases,
-the `window` property of NSEvent object was nil after cursor exiting from
-window, hinting that the `-locationInWindow` method would return value in=
-=20
-screen coordinates. The current implementation used raw locations from=20
-NSEvent without considering whether the value was for the window coordina=
-tes
-or the macOS screen coordinates, nor the zooming factor for Zoom-to-Fit i=
-n
-fullscreen mode.
+In case we gets a queued page, the order of block is interrupted. We may
+not rely on the complete_round flag to say we have already searched the
+whole blocks on the list.
 
-In fullscreen mode, the fullscreen cocoa window might not be the key
-window, therefore the location of event in virtual coordinates should
-suffice.
-
-This patches fixed boundary check methods for cursor in normal
-and fullscreen with/without Zoom-to-Fit in Mojave.
-
-Note: CGRect, -convertRectToScreen: and -convertRectFromScreen: were
-used in coordinates conversion for compatibility reason.
-
-Signed-off-by: Chen Zhang <tgfbeta@me.com>
+Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
 ---
- ui/cocoa.m | 43 +++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 41 insertions(+), 2 deletions(-)
+ migration/ram.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/ui/cocoa.m b/ui/cocoa.m
-index 420b2411c1..474d44cb9f 100644
---- a/ui/cocoa.m
-+++ b/ui/cocoa.m
-@@ -405,6 +405,41 @@ QemuCocoaView *cocoaView;
-     return (p.x > -1 && p.x < screen.width && p.y > -1 && p.y < screen.h=
-eight);
- }
-=20
-+/* Get location of event and convert to virtual screen coordinate */
-+- (CGPoint) screenLocationOfEvent:(NSEvent *)ev
-+{
-+    NSWindow *eventWindow =3D [ev window];
-+    // XXX: Use CGRect and -convertRectFromScreen: to support macOS 10.1=
-0
-+    CGRect r =3D CGRectZero;
-+    r.origin =3D [ev locationInWindow];
-+    if (!eventWindow) {
-+        if (!isFullscreen) {
-+            return [[self window] convertRectFromScreen:r].origin;
-+        } else {
-+            CGPoint locationInSelfWindow =3D [[self window] convertRectF=
-romScreen:r].origin;
-+            CGPoint loc =3D [self convertPoint:locationInSelfWindow from=
-View:nil];
-+            if (stretch_video) {
-+                loc.x /=3D cdx;
-+                loc.y /=3D cdy;
-+            }
-+            return loc;
-+        }
-+    } else if ([[self window] isEqual:eventWindow]) {
-+        if (!isFullscreen) {
-+            return r.origin;
-+        } else {
-+            CGPoint loc =3D [self convertPoint:r.origin fromView:nil];
-+            if (stretch_video) {
-+                loc.x /=3D cdx;
-+                loc.y /=3D cdy;
-+            }
-+            return loc;
-+        }
-+    } else {
-+        return [[self window] convertRectFromScreen:[eventWindow convert=
-RectToScreen:r]].origin;
-+    }
-+}
+diff --git a/migration/ram.c b/migration/ram.c
+index d881981876..e9b40d636d 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -2290,6 +2290,12 @@ static bool get_queued_page(RAMState *rs, PageSearchStatus *pss)
+          */
+         pss->block = block;
+         pss->page = offset >> TARGET_PAGE_BITS;
 +
- - (void) hideCursor
- {
-     if (!cursor_hide) {
-@@ -704,7 +739,8 @@ QemuCocoaView *cocoaView;
-     int keycode =3D 0;
-     bool mouse_event =3D false;
-     static bool switched_to_fullscreen =3D false;
--    NSPoint p =3D [event locationInWindow];
-+    // Location of event in virtual screen coordinates
-+    NSPoint p =3D [self screenLocationOfEvent:event];
-=20
-     switch ([event type]) {
-         case NSEventTypeFlagsChanged:
-@@ -815,7 +851,10 @@ QemuCocoaView *cocoaView;
-             break;
-         case NSEventTypeMouseMoved:
-             if (isAbsoluteEnabled) {
--                if (![self screenContainsPoint:p] || ![[self window] isK=
-eyWindow]) {
-+                // Cursor re-entered into a window might generate events=
- bound to screen coordinates
-+                // and `nil` window property, and in full screen mode, c=
-urrent window might not be
-+                // key window, where event location alone should suffice=
-.
-+                if (![self screenContainsPoint:p] || !([[self window] is=
-KeyWindow] || isFullscreen)) {
-                     if (isMouseGrabbed) {
-                         [self ungrabMouse];
-                     }
---=20
-2.21.0
++        /*
++         * This unqueued page would break the "one round" check, even is
++         * really rare.
++         */
++        pss->complete_round = false;
+     }
+ 
+     return !!block;
+-- 
+2.19.1
 
 
