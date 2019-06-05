@@ -6,71 +6,71 @@ X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9662DC28CC6
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 20:02:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BAD3C28CC5
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 20:02:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 72126207E0
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 20:02:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 72126207E0
+	by mail.kernel.org (Postfix) with ESMTPS id 39F36207E0
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 20:02:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 39F36207E0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:49084 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:49088 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hYc7E-0004JL-I1
-	for qemu-devel@archiver.kernel.org; Wed, 05 Jun 2019 16:02:32 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:34070)
+	id 1hYc7X-0004U6-FE
+	for qemu-devel@archiver.kernel.org; Wed, 05 Jun 2019 16:02:51 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:34076)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1hYc5O-000347-VV
+	(envelope-from <mst@redhat.com>) id 1hYc5P-00034A-1J
 	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 16:00:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1hYc5K-0005Y0-Em
-	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 16:00:36 -0400
-Received: from mail-qt1-f182.google.com ([209.85.160.182]:33287)
+	(envelope-from <mst@redhat.com>) id 1hYc5K-0005YV-Ke
+	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 16:00:38 -0400
+Received: from mail-qk1-f170.google.com ([209.85.222.170]:43530)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1hYc5K-00059f-69
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1hYc5K-0005W5-Ad
 	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 16:00:34 -0400
-Received: by mail-qt1-f182.google.com with SMTP id 14so25257qtf.0
-	for <qemu-devel@nongnu.org>; Wed, 05 Jun 2019 13:00:20 -0700 (PDT)
+Received: by mail-qk1-f170.google.com with SMTP id m14so5980292qka.10
+	for <qemu-devel@nongnu.org>; Wed, 05 Jun 2019 13:00:33 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:date:from:to:cc:subject:message-id:references
 	:mime-version:content-disposition:in-reply-to;
-	bh=L0AgkiXhLjFVQRi+vsOb3iccAaKRvAtIDXeiJDWz4Hs=;
-	b=dt4f/t7wNrZz0kw+DYsArtWNo6YTE5wH0OyyTzKAOkf0qa87tAo6QIZ+DxTWiCg+MC
-	lC2Nm1nxOY7d5wcsTBnVxjKNpCWldV8hq656P7DNelaRRZ+FmV89D96sMtUPgDx59/0V
-	cd6wQoM28iPR/lFRX9xwKNcTe39tj2LWv2f3s357qUpRzwqk7BpjoloDjIx9PqJ86Sh+
-	awQ0Gpb0piY/yASPYf4dRAyY1lxto67cOY4ThL8WadmrldNzHQXGUQLqS5IPqOuEiiJC
-	Etk8/Avyd7qSoL9ZiE4RExoElutdVX0IhC0aKurENJ709uxKWUB0dsvezQ/kTUtC8od1
-	P5Yg==
-X-Gm-Message-State: APjAAAVdZRDwdd1WriLjc7Y8yWyPp/sjGhW2jiNQIwjzY/URcLK3sB8F
-	hHey9u24NBhlExykRD4uNax4g61qSWA=
-X-Google-Smtp-Source: APXvYqyuy4gUmXXX2cGyhJ6A+TAYm40Y4gbdCR3qr8t7ApSv3LM0M9DeaTROnncxC+wCbu1pbx2FDA==
-X-Received: by 2002:aed:33e6:: with SMTP id v93mr36877631qtd.157.1559764820063;
-	Wed, 05 Jun 2019 13:00:20 -0700 (PDT)
+	bh=nFPCh5odrVBik4hdEQQECWSU7rqWJuCuSRkfsEPasz4=;
+	b=ICbqLd3c0zjhVCFLa4O7ZqvWfrFDruVbyRZFi9Y8gT1OFoXl8GFLlu2+TMRZfQuE0f
+	dVnVEUkr3FjznLJ2iSWiP5A3BCC/QNTIIToIT5DR3mkdsBrqrXOeUyxHEc/msM8W8cQI
+	xSBkLnxyDmtbtjbEjt5o1LCyFlQG00dv9VJSmTnRocCrtLy4jREF4jDnAC+zMI0+gNVf
+	VKqsZKDTTEnr0v451TRUXEbRKXmc8E3YsY9mlCuAfbZ3PcYFc9rmEwH5IFaHqEs2I+D6
+	shLW0QEbUonPRxI4xW3B76r0HgmgxoOIZaBghhDUVBlGxZph3RI/9Qut/n8pjh6vGg0r
+	0i5w==
+X-Gm-Message-State: APjAAAX1bAAB0/Okts6Z0hifVxzaFloKkhnGfUj8O/P9TUVsYviWFF/b
+	7kfM94DPpgSch5qXTOBhI51AUixnMsI=
+X-Google-Smtp-Source: APXvYqzConzbxCeP9Vq6srhcvHD0HYhxkziruj5dUh18kk/RTx4jCgjFqE2HLqjQXwU1++sFnP4EDw==
+X-Received: by 2002:a37:9885:: with SMTP id
+	a127mr15381716qke.230.1559764832953; 
+	Wed, 05 Jun 2019 13:00:32 -0700 (PDT)
 Received: from redhat.com (pool-100-0-197-103.bstnma.fios.verizon.net.
-	[100.0.197.103]) by smtp.gmail.com with ESMTPSA id
-	x7sm13564627qth.37.2019.06.05.13.00.18
+	[100.0.197.103])
+	by smtp.gmail.com with ESMTPSA id 34sm8543730qtq.59.2019.06.05.13.00.31
 	(version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-	Wed, 05 Jun 2019 13:00:19 -0700 (PDT)
-Date: Wed, 5 Jun 2019 16:00:18 -0400
+	Wed, 05 Jun 2019 13:00:32 -0700 (PDT)
+Date: Wed, 5 Jun 2019 16:00:31 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: qemu-devel@nongnu.org
-Message-ID: <1558448611-315074-1-git-send-email-imammedo@redhat.com>
+Message-ID: <20190605195913.12243-11-mst@redhat.com>
 References: <20190605195913.12243-1-mst@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <20190605195913.12243-1-mst@redhat.com>
 X-Mailer: git-send-email 2.17.1.1206.gb667731e2e.dirty
 X-Mutt-Fcc: =sent
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 	[fuzzy]
-X-Received-From: 209.85.160.182
-Subject: [Qemu-devel] [PULL v3 06/17] docs: smbios: remove family=x from
- type2 entry description
+X-Received-From: 209.85.222.170
+Subject: [Qemu-devel] [PULL v3 10/17] bios-tables-test: add diff allowed list
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -82,44 +82,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
-	Thomas Huth <thuth@redhat.com>,
-	Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>,
-	Markus Armbruster <armbru@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
-	Paolo Bonzini <pbonzini@redhat.com>
+Cc: Laurent Vivier <lvivier@redhat.com>,
+	Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
+	Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190605200018.MzQcs6rFHTX2mHcP67NbvwSPxv6VUsGDA9Lc39ceByI@z>
 
-From: Igor Mammedov <imammedo@redhat.com>
+Expected table change is then handled like this:
+1. add table to diff allowed list
+2. change generating code (can be combined with 1)
+3. maintainer runs a script to update expected +
+   blows away allowed diff list
 
-'family' option is not part of type 2 table and if user tries to use it
-as such QEMU will error out with an unknow option error.
-Drop it from docs lest it confuse users.
-
-Fixes: b155eb1d04 ("smbios: document cmdline options for smbios type 2-4, 17 structures")
-Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-Message-Id: <1558448611-315074-1-git-send-email-imammedo@redhat.com>
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- qemu-options.hx | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ tests/bios-tables-test-allowed-diff.h |  1 +
+ tests/bios-tables-test.c              | 19 ++++++++++++++++++-
+ 2 files changed, 19 insertions(+), 1 deletion(-)
+ create mode 100644 tests/bios-tables-test-allowed-diff.h
 
-diff --git a/qemu-options.hx b/qemu-options.hx
-index 39dc170429..0d8beb4afd 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -2080,7 +2080,7 @@ Specify SMBIOS type 0 fields
- @item -smbios type=1[,manufacturer=@var{str}][,product=@var{str}][,version=@var{str}][,serial=@var{str}][,uuid=@var{uuid}][,sku=@var{str}][,family=@var{str}]
- Specify SMBIOS type 1 fields
+diff --git a/tests/bios-tables-test-allowed-diff.h b/tests/bios-tables-test-allowed-diff.h
+new file mode 100644
+index 0000000000..dfb8523c8b
+--- /dev/null
++++ b/tests/bios-tables-test-allowed-diff.h
+@@ -0,0 +1 @@
++/* List of comma-separated changed AML files to ignore */
+diff --git a/tests/bios-tables-test.c b/tests/bios-tables-test.c
+index 11e07be093..28d7d427e0 100644
+--- a/tests/bios-tables-test.c
++++ b/tests/bios-tables-test.c
+@@ -342,6 +342,22 @@ try_again:
+     return exp_tables;
+ }
  
--@item -smbios type=2[,manufacturer=@var{str}][,product=@var{str}][,version=@var{str}][,serial=@var{str}][,asset=@var{str}][,location=@var{str}][,family=@var{str}]
-+@item -smbios type=2[,manufacturer=@var{str}][,product=@var{str}][,version=@var{str}][,serial=@var{str}][,asset=@var{str}][,location=@var{str}]
- Specify SMBIOS type 2 fields
- 
- @item -smbios type=3[,manufacturer=@var{str}][,version=@var{str}][,serial=@var{str}][,asset=@var{str}][,sku=@var{str}]
++static bool test_acpi_find_diff_allowed(AcpiSdtTable *sdt)
++{
++    const gchar *allowed_diff_file[] = {
++#include "bios-tables-test-allowed-diff.h"
++        NULL
++    };
++    const gchar **f;
++
++    for (f = allowed_diff_file; *f; ++f) {
++        if (!g_strcmp0(sdt->aml_file, *f)) {
++            return true;
++        }
++    }
++    return false;
++}
++
+ /* test the list of tables in @data->tables against reference tables */
+ static void test_acpi_asl(test_data *data)
+ {
+@@ -396,7 +412,8 @@ static void test_acpi_asl(test_data *data)
+                             "see ASL difference.");
+                     }
+                 }
+-          }
++            }
++            g_assert(test_acpi_find_diff_allowed(exp_sdt));
+         }
+         g_string_free(asl, true);
+         g_string_free(exp_asl, true);
 -- 
 MST
 
