@@ -3,60 +3,110 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 24272C282DE
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 09:16:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E6CF4C282DE
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 09:20:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E267F2075B
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 09:16:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E267F2075B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id AF58F2075B
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 09:20:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AF58F2075B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:38081 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:38148 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hYS2C-0007hK-2w
-	for qemu-devel@archiver.kernel.org; Wed, 05 Jun 2019 05:16:40 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:58226)
+	id 1hYS5n-0000ee-Ks
+	for qemu-devel@archiver.kernel.org; Wed, 05 Jun 2019 05:20:23 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:59498)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1hYS0W-0006VX-NB
-	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 05:14:58 -0400
+	(envelope-from <david@redhat.com>) id 1hYS4v-0000KN-4q
+	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 05:19:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1hYS0V-0003xy-CS
-	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 05:14:56 -0400
-Received: from 16.mo7.mail-out.ovh.net ([46.105.72.216]:56569)
+	(envelope-from <david@redhat.com>) id 1hYS4t-0005kU-Lp
+	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 05:19:29 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59214)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1hYS0V-0003ji-5Q
-	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 05:14:55 -0400
-Received: from player739.ha.ovh.net (unknown [10.108.42.145])
-	by mo7.mail-out.ovh.net (Postfix) with ESMTP id 6761911561E
-	for <qemu-devel@nongnu.org>; Wed,  5 Jun 2019 11:14:51 +0200 (CEST)
-Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
-	[82.253.208.248]) (Authenticated sender: groug@kaod.org)
-	by player739.ha.ovh.net (Postfix) with ESMTPSA id 8FB526A0BD46;
-	Wed,  5 Jun 2019 09:14:44 +0000 (UTC)
-Date: Wed, 5 Jun 2019 11:14:43 +0200
-From: Greg Kurz <groug@kaod.org>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <20190605111443.0495bc3f@bahia.lab.toulouse-stg.fr.ibm.com>
-In-Reply-To: <1559581843-3968-25-git-send-email-pbonzini@redhat.com>
-References: <1559581843-3968-1-git-send-email-pbonzini@redhat.com>
-	<1559581843-3968-25-git-send-email-pbonzini@redhat.com>
-X-Mailer: Claws Mail 3.16.0 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+	(Exim 4.71) (envelope-from <david@redhat.com>)
+	id 1hYS4t-00059n-Cb; Wed, 05 Jun 2019 05:19:27 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id C067A308AA11;
+	Wed,  5 Jun 2019 09:19:15 +0000 (UTC)
+Received: from [10.36.118.48] (unknown [10.36.118.48])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 135975C22C;
+	Wed,  5 Jun 2019 09:19:06 +0000 (UTC)
+To: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>
+References: <20190603090635.10631-1-david@redhat.com>
+	<20190603090635.10631-7-david@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+	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
+	SE+xAvmumFBY
+Organization: Red Hat GmbH
+Message-ID: <ab465abb-4a36-8155-218e-450cfd8d5434@redhat.com>
+Date: Wed, 5 Jun 2019 11:19:06 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20190603090635.10631-7-david@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Ovh-Tracer-Id: 9802647541046483406
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduuddrudegvddgudefucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddm
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.41]);
+	Wed, 05 Jun 2019 09:19:15 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 46.105.72.216
-Subject: Re: [Qemu-devel] [PULL 24/24] q35: Revert to kernel irqchip
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v2 06/22] s390x/tcg: Implement VECTOR FP
+ COMPARE (EQUAL|HIGH|HIGH OR EQUAL)
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -68,149 +118,244 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: elohimes@gmail.com, Alex Williamson <alex.williamson@redhat.com>,
-	"Daniel P. =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>,
-	qemu-devel@nongnu.org, Peter Xu <peterx@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, Denys Vlasenko <dvlasenk@redhat.com>,
+	Cornelia Huck <cohuck@redhat.com>, Pino Toscano <ptoscano@redhat.com>,
+	Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon,  3 Jun 2019 19:10:43 +0200
-Paolo Bonzini <pbonzini@redhat.com> wrote:
-
-> From: Alex Williamson <alex.williamson@redhat.com>
+On 03.06.19 11:06, David Hildenbrand wrote:
+> Provide for all three instructions all four combinations of cc bit and
+> s bit.
 > 
-> Commit b2fc91db8447 ("q35: set split kernel irqchip as default") changed
-> the default for the pc-q35-4.0 machine type to use split irqchip, which
-> turned out to have disasterous effects on vfio-pci INTx support.  KVM
-> resampling irqfds are registered for handling these interrupts, but
-> these are non-functional in split irqchip mode.  We can't simply test
-> for split irqchip in QEMU as userspace handling of this interrupt is a
-> significant performance regression versus KVM handling (GeForce GPUs
-> assigned to Windows VMs are non-functional without forcing MSI mode or
-> re-enabling kernel irqchip).
-> 
-> The resolution is to revert the change in default irqchip mode in the
-> pc-q35-4.1 machine and create a pc-q35-4.0.1 machine for the 4.0-stable
-> branch.  The qemu-q35-4.0 machine type should not be used in vfio-pci
-> configurations for devices requiring legacy INTx support without
-> explicitly modifying the VM configuration to use kernel irqchip.
-> 
-> Link: https://bugs.launchpad.net/qemu/+bug/1826422
-> Fixes: b2fc91db8447 ("q35: set split kernel irqchip as default")
-> Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
-> Reviewed-by: Peter Xu <peterx@redhat.com>
-> Message-Id: <155786484688.13873.6037015630912983760.stgit@gimli.home>
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> Signed-off-by: David Hildenbrand <david@redhat.com>
 > ---
->  hw/core/machine.c    |  3 +++
->  hw/i386/pc.c         |  3 +++
->  hw/i386/pc_q35.c     | 16 ++++++++++++++--
->  include/hw/boards.h  |  3 +++
->  include/hw/i386/pc.h |  3 +++
->  5 files changed, 26 insertions(+), 2 deletions(-)
+>  target/s390x/helper.h           |  12 ++++
+>  target/s390x/insn-data.def      |   6 ++
+>  target/s390x/translate_vx.inc.c |  51 ++++++++++++++++
+>  target/s390x/vec_fpu_helper.c   | 104 ++++++++++++++++++++++++++++++++
+>  4 files changed, 173 insertions(+)
 > 
-> diff --git a/hw/core/machine.c b/hw/core/machine.c
-> index 16ba667..f1a0f45 100644
-> --- a/hw/core/machine.c
-> +++ b/hw/core/machine.c
-> @@ -24,6 +24,9 @@
->  #include "hw/pci/pci.h"
->  #include "hw/mem/nvdimm.h"
+> diff --git a/target/s390x/helper.h b/target/s390x/helper.h
+> index d34d6802a6..33d3bacf74 100644
+> --- a/target/s390x/helper.h
+> +++ b/target/s390x/helper.h
+> @@ -254,6 +254,18 @@ DEF_HELPER_FLAGS_5(gvec_vfa64, TCG_CALL_NO_WG, void, ptr, cptr, cptr, env, i32)
+>  DEF_HELPER_FLAGS_5(gvec_vfa64s, TCG_CALL_NO_WG, void, ptr, cptr, cptr, env, i32)
+>  DEF_HELPER_4(gvec_wfc64, void, cptr, cptr, env, i32)
+>  DEF_HELPER_4(gvec_wfk64, void, cptr, cptr, env, i32)
+> +DEF_HELPER_FLAGS_5(gvec_vfce64, TCG_CALL_NO_WG, void, ptr, cptr, cptr, env, i32)
+> +DEF_HELPER_FLAGS_5(gvec_vfce64s, TCG_CALL_NO_WG, void, ptr, cptr, cptr, env, i32)
+> +DEF_HELPER_5(gvec_vfce64_cc, void, ptr, cptr, cptr, env, i32)
+> +DEF_HELPER_5(gvec_vfce64s_cc, void, ptr, cptr, cptr, env, i32)
+> +DEF_HELPER_FLAGS_5(gvec_vfch64, TCG_CALL_NO_WG, void, ptr, cptr, cptr, env, i32)
+> +DEF_HELPER_FLAGS_5(gvec_vfch64s, TCG_CALL_NO_WG, void, ptr, cptr, cptr, env, i32)
+> +DEF_HELPER_5(gvec_vfch64_cc, void, ptr, cptr, cptr, env, i32)
+> +DEF_HELPER_5(gvec_vfch64s_cc, void, ptr, cptr, cptr, env, i32)
+> +DEF_HELPER_FLAGS_5(gvec_vfche64, TCG_CALL_NO_WG, void, ptr, cptr, cptr, env, i32)
+> +DEF_HELPER_FLAGS_5(gvec_vfche64s, TCG_CALL_NO_WG, void, ptr, cptr, cptr, env, i32)
+> +DEF_HELPER_5(gvec_vfche64_cc, void, ptr, cptr, cptr, env, i32)
+> +DEF_HELPER_5(gvec_vfche64s_cc, void, ptr, cptr, cptr, env, i32)
 >  
-> +GlobalProperty hw_compat_4_0_1[] = {};
-> +const size_t hw_compat_4_0_1_len = G_N_ELEMENTS(hw_compat_4_0_1);
+>  #ifndef CONFIG_USER_ONLY
+>  DEF_HELPER_3(servc, i32, env, i64, i64)
+> diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
+> index c45e101b10..446552f251 100644
+> --- a/target/s390x/insn-data.def
+> +++ b/target/s390x/insn-data.def
+> @@ -1212,6 +1212,12 @@
+>      F(0xe7cb, WFC,     VRR_a, V,   0, 0, 0, 0, wfc, 0, IF_VEC)
+>  /* VECTOR FP COMPARE AND SIGNAL SCALAR */
+>      F(0xe7ca, WFK,     VRR_a, V,   0, 0, 0, 0, wfc, 0, IF_VEC)
+> +/* VECTOR FP COMPARE EQUAL */
+> +    F(0xe7e8, VFCE,    VRR_c, V,   0, 0, 0, 0, vfc, 0, IF_VEC)
+> +/* VECTOR FP COMPARE HIGH */
+> +    F(0xe7eb, VFCH,    VRR_c, V,   0, 0, 0, 0, vfc, 0, IF_VEC)
+> +/* VECTOR FP COMPARE HIGH OR EQUAL */
+> +    F(0xe7ea, VFCHE,   VRR_c, V,   0, 0, 0, 0, vfc, 0, IF_VEC)
+>  
+>  #ifndef CONFIG_USER_ONLY
+>  /* COMPARE AND SWAP AND PURGE */
+> diff --git a/target/s390x/translate_vx.inc.c b/target/s390x/translate_vx.inc.c
+> index 283e8aa07a..5571a71e1a 100644
+> --- a/target/s390x/translate_vx.inc.c
+> +++ b/target/s390x/translate_vx.inc.c
+> @@ -2588,3 +2588,54 @@ static DisasJumpType op_wfc(DisasContext *s, DisasOps *o)
+>      set_cc_static(s);
+>      return DISAS_NEXT;
+>  }
 > +
->  GlobalProperty hw_compat_4_0[] = {};
->  const size_t hw_compat_4_0_len = G_N_ELEMENTS(hw_compat_4_0);
->  
-> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-> index 2632b73..edc240b 100644
-> --- a/hw/i386/pc.c
-> +++ b/hw/i386/pc.c
-> @@ -110,6 +110,9 @@ struct hpet_fw_config hpet_cfg = {.count = UINT8_MAX};
->  /* Physical Address of PVH entry point read from kernel ELF NOTE */
->  static size_t pvh_start_addr;
->  
-> +GlobalProperty pc_compat_4_0_1[] = {};
-> +const size_t pc_compat_4_0_1_len = G_N_ELEMENTS(pc_compat_4_0_1);
+> +static DisasJumpType op_vfc(DisasContext *s, DisasOps *o)
+> +{
+> +    const uint8_t fpf = get_field(s->fields, m4);
+> +    const uint8_t m5 = get_field(s->fields, m5);
+> +    const uint8_t m6 = get_field(s->fields, m6);
+> +    const bool se = extract32(m5, 3, 1);
+> +    const bool cs = extract32(m6, 0, 1);
+> +    gen_helper_gvec_3_ptr *fn;
 > +
->  GlobalProperty pc_compat_4_0[] = {};
->  const size_t pc_compat_4_0_len = G_N_ELEMENTS(pc_compat_4_0);
->  
-
-Do we hence need to add properties to both 4_0 and 4_0_1 ? Would it
-make sense to introduce a PC_COMPAT_4_0_COMMON macro to avoid this
-duplication ?
-
-The question arose while reviewing this patch:
-
-https://lists.gnu.org/archive/html/qemu-devel/2019-06/msg00409.html
-
-> diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
-> index 37dd350..dcddc64 100644
-> --- a/hw/i386/pc_q35.c
-> +++ b/hw/i386/pc_q35.c
-> @@ -357,7 +357,7 @@ static void pc_q35_machine_options(MachineClass *m)
->      m->units_per_default_bus = 1;
->      m->default_machine_opts = "firmware=bios-256k.bin";
->      m->default_display = "std";
-> -    m->default_kernel_irqchip_split = true;
-> +    m->default_kernel_irqchip_split = false;
->      m->no_floppy = 1;
->      machine_class_allow_dynamic_sysbus_dev(m, TYPE_AMD_IOMMU_DEVICE);
->      machine_class_allow_dynamic_sysbus_dev(m, TYPE_INTEL_IOMMU_DEVICE);
-> @@ -374,10 +374,22 @@ static void pc_q35_4_1_machine_options(MachineClass *m)
->  DEFINE_Q35_MACHINE(v4_1, "pc-q35-4.1", NULL,
->                     pc_q35_4_1_machine_options);
->  
-> -static void pc_q35_4_0_machine_options(MachineClass *m)
-> +static void pc_q35_4_0_1_machine_options(MachineClass *m)
+> +    if (fpf != FPF_LONG || extract32(m5, 0, 3) || extract32(m6, 1, 3)) {
+> +        gen_program_exception(s, PGM_SPECIFICATION);
+> +        return DISAS_NORETURN;
+> +    }
+> +
+> +    if (cs) {
+> +        switch (s->fields->op2) {
+> +        case 0xe8:
+> +            fn = se ? gen_helper_gvec_vfce64s_cc : gen_helper_gvec_vfce64_cc;
+> +            break;
+> +        case 0xeb:
+> +            fn = se ? gen_helper_gvec_vfch64s_cc : gen_helper_gvec_vfch64_cc;
+> +            break;
+> +        case 0xea:
+> +            fn = se ? gen_helper_gvec_vfche64s_cc : gen_helper_gvec_vfche64_cc;
+> +            break;
+> +        default:
+> +            g_assert_not_reached();
+> +        }
+> +    } else {
+> +        switch (s->fields->op2) {
+> +        case 0xe8:
+> +            fn = se ? gen_helper_gvec_vfce64s : gen_helper_gvec_vfce64;
+> +            break;
+> +        case 0xeb:
+> +            fn = se ? gen_helper_gvec_vfch64s : gen_helper_gvec_vfch64;
+> +            break;
+> +        case 0xea:
+> +            fn = se ? gen_helper_gvec_vfche64s : gen_helper_gvec_vfche64;
+> +            break;
+> +        default:
+> +            g_assert_not_reached();
+> +        }
+> +    }
+> +    gen_gvec_3_ptr(get_field(s->fields, v1), get_field(s->fields, v2),
+> +                   get_field(s->fields, v3), cpu_env, 0, fn);
+> +    if (cs) {
+> +        set_cc_static(s);
+> +    }
+> +    return DISAS_NEXT;
+> +}
+> diff --git a/target/s390x/vec_fpu_helper.c b/target/s390x/vec_fpu_helper.c
+> index f9357d9221..e72500d4d5 100644
+> --- a/target/s390x/vec_fpu_helper.c
+> +++ b/target/s390x/vec_fpu_helper.c
+> @@ -149,3 +149,107 @@ void HELPER(gvec_wfk64)(const void *v1, const void *v2, CPUS390XState *env,
 >  {
->      pc_q35_4_1_machine_options(m);
->      m->alias = NULL;
-> +    compat_props_add(m->compat_props, hw_compat_4_0_1, hw_compat_4_0_1_len);
-> +    compat_props_add(m->compat_props, pc_compat_4_0_1, pc_compat_4_0_1_len);
+>      env->cc_op = wfc64(v1, v2, env, true, GETPC());
+>  }
+> +
+> +typedef int (*vfc64_fn)(float64 a, float64 b, float_status *status);
+> +static int vfc64(S390Vector *v1, const S390Vector *v2, const S390Vector *v3,
+> +                 CPUS390XState *env, bool s, vfc64_fn fn, uintptr_t retaddr)
+> +{
+> +    uint8_t vxc, vec_exc = 0;
+> +    S390Vector tmp = {};
+> +    int match = 0;
+> +    int i;
+> +
+> +    for (i = 0; i < 2; i++) {
+> +        const float64 a = s390_vec_read_element64(v2, i);
+> +        const float64 b = s390_vec_read_element64(v3, i);
+> +
+> +        /* swap the order of the parameters, so we can use existing functions */
+> +        if (fn(b, a, &env->fpu_status)) {
+> +            match++;
+> +            s390_vec_write_element64(&tmp, i, -1ull);
+> +        }
+> +        vxc = check_ieee_exc(env, i, false, &vec_exc);
+> +        if (s || vxc) {
+> +            break;
+> +        }
+> +    }
+> +
+> +    handle_ieee_exc(env, vxc, vec_exc, retaddr);
+> +    *v1 = tmp;
+> +    if (match) {
+> +        return s || match == 2 ? 0 : 1;
+> +    }
+> +    return 3;
 > +}
 > +
-> +DEFINE_Q35_MACHINE(v4_0_1, "pc-q35-4.0.1", NULL,
-> +                   pc_q35_4_0_1_machine_options);
-> +
-> +static void pc_q35_4_0_machine_options(MachineClass *m)
+> +void HELPER(gvec_vfce64)(void *v1, const void *v2, const void *v3,
+> +                         CPUS390XState *env, uint32_t desc)
 > +{
-> +    pc_q35_4_0_1_machine_options(m);
-> +    m->default_kernel_irqchip_split = true;
-> +    m->alias = NULL;
->      compat_props_add(m->compat_props, hw_compat_4_0, hw_compat_4_0_len);
->      compat_props_add(m->compat_props, pc_compat_4_0, pc_compat_4_0_len);
->  }
-> diff --git a/include/hw/boards.h b/include/hw/boards.h
-> index 6f7916f..6ff02bf 100644
-> --- a/include/hw/boards.h
-> +++ b/include/hw/boards.h
-> @@ -292,6 +292,9 @@ struct MachineState {
->      } \
->      type_init(machine_initfn##_register_types)
->  
-> +extern GlobalProperty hw_compat_4_0_1[];
-> +extern const size_t hw_compat_4_0_1_len;
+> +    vfc64(v1, v2, v3, env, false, float64_eq_quiet, GETPC());
+> +}
 > +
->  extern GlobalProperty hw_compat_4_0[];
->  extern const size_t hw_compat_4_0_len;
->  
-> diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-> index 43df723..5d56362 100644
-> --- a/include/hw/i386/pc.h
-> +++ b/include/hw/i386/pc.h
-> @@ -293,6 +293,9 @@ int e820_add_entry(uint64_t, uint64_t, uint32_t);
->  int e820_get_num_entries(void);
->  bool e820_get_entry(int, uint32_t, uint64_t *, uint64_t *);
->  
-> +extern GlobalProperty pc_compat_4_0_1[];
-> +extern const size_t pc_compat_4_0_1_len;
+> +void HELPER(gvec_vfce64s)(void *v1, const void *v2, const void *v3,
+> +                          CPUS390XState *env, uint32_t desc)
+> +{
+> +    vfc64(v1, v2, v3, env, true, float64_eq_quiet, GETPC());
+> +}
 > +
->  extern GlobalProperty pc_compat_4_0[];
->  extern const size_t pc_compat_4_0_len;
->  
+> +void HELPER(gvec_vfce64_cc)(void *v1, const void *v2, const void *v3,
+> +                            CPUS390XState *env, uint32_t desc)
+> +{
+> +    env->cc_op = vfc64(v1, v2, v3, env, false, float64_eq_quiet, GETPC());
+> +}
+> +
+> +void HELPER(gvec_vfce64s_cc)(void *v1, const void *v2, const void *v3,
+> +                            CPUS390XState *env, uint32_t desc)
+> +{
+> +    env->cc_op = vfc64(v1, v2, v3, env, true, float64_eq_quiet, GETPC());
+> +}
+> +
+> +void HELPER(gvec_vfch64)(void *v1, const void *v2, const void *v3,
+> +                         CPUS390XState *env, uint32_t desc)
+> +{
+> +    vfc64(v1, v2, v3, env, false, float64_lt_quiet, GETPC());
+> +}
+> +
+> +void HELPER(gvec_vfch64s)(void *v1, const void *v2, const void *v3,
+> +                          CPUS390XState *env, uint32_t desc)
+> +{
+> +    vfc64(v1, v2, v3, env, true, float64_lt_quiet, GETPC());
+> +}
+> +
+> +void HELPER(gvec_vfch64_cc)(void *v1, const void *v2, const void *v3,
+> +                            CPUS390XState *env, uint32_t desc)
+> +{
+> +    env->cc_op = vfc64(v1, v2, v3, env, false, float64_lt_quiet, GETPC());
+> +}
+> +
+> +void HELPER(gvec_vfch64s_cc)(void *v1, const void *v2, const void *v3,
+> +                             CPUS390XState *env, uint32_t desc)
+> +{
+> +    env->cc_op = vfc64(v1, v2, v3, env, true, float64_lt_quiet, GETPC());
+> +}
+> +
+> +void HELPER(gvec_vfche64)(void *v1, const void *v2, const void *v3,
+> +                          CPUS390XState *env, uint32_t desc)
+> +{
+> +    vfc64(v1, v2, v3, env, false, float64_le_quiet, GETPC());
+> +}
+> +
+> +void HELPER(gvec_vfche64s)(void *v1, const void *v2, const void *v3,
+> +                           CPUS390XState *env, uint32_t desc)
+> +{
+> +    vfc64(v1, v2, v3, env, true, float64_le_quiet, GETPC());
+> +}
+> +
+> +void HELPER(gvec_vfche64_cc)(void *v1, const void *v2, const void *v3,
+> +                             CPUS390XState *env, uint32_t desc)
+> +{
+> +    env->cc_op = vfc64(v1, v2, v3, env, false, float64_le_quiet, GETPC());
+> +}
+> +
+> +void HELPER(gvec_vfche64s_cc)(void *v1, const void *v2, const void *v3,
+> +                              CPUS390XState *env, uint32_t desc)
+> +{
+> +    env->cc_op = vfc64(v1, v2, v3, env, true, float64_le_quiet, GETPC());
+> +}
+> 
 
+Richard, still want to review this patch? I'm planning to send a pull
+request soon.
+
+-- 
+
+Thanks,
+
+David / dhildenb
 
