@@ -2,94 +2,107 @@ Return-Path: <SRS0=3v23=UE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_NEOMUTT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 946B0C28CC5
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 19:37:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3AECEC28CC5
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 19:40:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5A7642075C
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 19:37:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5A7642075C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id AF0772075C
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 19:40:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AF0772075C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:48854 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:48894 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hYbjS-0006zc-NF
-	for qemu-devel@archiver.kernel.org; Wed, 05 Jun 2019 15:37:58 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:58284)
+	id 1hYbmC-0007oa-QB
+	for qemu-devel@archiver.kernel.org; Wed, 05 Jun 2019 15:40:48 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:58849)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hYbiY-0006gb-Cl
-	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 15:37:03 -0400
+	(envelope-from <maxiwell@linux.ibm.com>) id 1hYblL-0007N6-7J
+	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 15:39:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hYbiX-0005Cv-7U
-	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 15:37:02 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39848)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1hYbiW-00059n-T0
-	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 15:37:01 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 04AFE30F1BAF;
-	Wed,  5 Jun 2019 19:37:00 +0000 (UTC)
-Received: from dresden.str.redhat.com (unknown [10.40.205.15])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 6CF341836B;
-	Wed,  5 Jun 2019 19:36:54 +0000 (UTC)
-To: Paolo Bonzini <pbonzini@redhat.com>,
-	=?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
-	Alberto Garcia <berto@igalia.com>
-References: <cover.1550842915.git.berto@igalia.com>
-	<20190423165501.GA27867@redhat.com>
-	<b5fe7ed7-c11c-4f36-4973-c86031cbe046@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
-	mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
-	/PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
-	U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
-	mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
-	awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
-	AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
-	CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
-	B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
-	2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
-	AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
-	8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
-	4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
-	BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
-	xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
-	W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
-	DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
-	64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
-	ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
-	sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
-	alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
-	/ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
-	bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
-	R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <9a76848c-f499-6355-70ca-1d638dad3e8e@redhat.com>
-Date: Wed, 5 Jun 2019 21:36:52 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.7.0
+	(envelope-from <maxiwell@linux.ibm.com>) id 1hYblJ-0000tt-9D
+	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 15:39:55 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:50694
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <maxiwell@linux.ibm.com>)
+	id 1hYblJ-0000bn-3Z
+	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 15:39:53 -0400
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+	x55JbqnG025174
+	for <qemu-devel@nongnu.org>; Wed, 5 Jun 2019 15:39:38 -0400
+Received: from e32.co.us.ibm.com (e32.co.us.ibm.com [32.97.110.150])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2sxhttnpy9-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 05 Jun 2019 15:39:37 -0400
+Received: from localhost
+	by e32.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <maxiwell@linux.ibm.com>;
+	Wed, 5 Jun 2019 20:39:37 +0100
+Received: from b03cxnp08028.gho.boulder.ibm.com (9.17.130.20)
+	by e32.co.us.ibm.com (192.168.1.132) with IBM ESMTP SMTP Gateway:
+	Authorized Use Only! Violators will be prosecuted; 
+	(version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+	Wed, 5 Jun 2019 20:39:33 +0100
+Received: from b03ledav004.gho.boulder.ibm.com
+	(b03ledav004.gho.boulder.ibm.com [9.17.130.235])
+	by b03cxnp08028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with
+	ESMTP id x55JdWA320054436
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256
+	verify=OK); Wed, 5 Jun 2019 19:39:32 GMT
+Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 91AE178064;
+	Wed,  5 Jun 2019 19:39:32 +0000 (GMT)
+Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 3E52D7805E;
+	Wed,  5 Jun 2019 19:39:31 +0000 (GMT)
+Received: from maxibm (unknown [9.85.186.195])
+	by b03ledav004.gho.boulder.ibm.com (Postfix) with ESMTPS;
+	Wed,  5 Jun 2019 19:39:30 +0000 (GMT)
+Date: Wed, 5 Jun 2019 16:39:27 -0300
+From: "Maxiwell S. Garcia" <maxiwell@linux.ibm.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+References: <20190520204340.832-1-maxiwell@linux.ibm.com>
+	<20190520204340.832-2-maxiwell@linux.ibm.com>
+	<20190522232952.GN30423@umbus.fritz.box>
+	<20190523201851.llsufz6dfs3gzyc6@maxibm>
+	<20190530011341.GB2017@umbus.fritz.box>
 MIME-Version: 1.0
-In-Reply-To: <b5fe7ed7-c11c-4f36-4973-c86031cbe046@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="NozHBCRfU1MdzOw6LPkSDH0qSIZjzYPiM"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.43]);
-	Wed, 05 Jun 2019 19:37:00 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-X-Content-Filtered-By: Mailman/MimeDel 2.1.21
-Subject: Re: [Qemu-devel] [PATCH v3 0/3] char-socket: Fix race condition
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190530011341.GB2017@umbus.fritz.box>
+User-Agent: NeoMutt/20180716
+X-TM-AS-GCONF: 00
+x-cbid: 19060519-0004-0000-0000-00001518ACAA
+X-IBM-SpamModules-Scores: 
+X-IBM-SpamModules-Versions: BY=3.00011220; HX=3.00000242; KW=3.00000007;
+	PH=3.00000004; SC=3.00000286; SDB=6.01213719; UDB=6.00637941;
+	IPR=6.00994793; 
+	MB=3.00027198; MTD=3.00000008; XFM=3.00000015; UTC=2019-06-05 19:39:35
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19060519-0005-0000-0000-00008BF412FF
+Message-Id: <20190605193927.3lek4voay5stxtqt@maxibm>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
+	definitions=2019-06-05_12:, , signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+	priorityscore=1501
+	malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+	clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+	mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+	scancount=1 engine=8.0.1-1810050000 definitions=main-1906050123
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 148.163.158.5
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH 1/1] spapr: Do not re-read the
+ clock on pre_save handler on migration
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -101,109 +114,144 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
-	qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---NozHBCRfU1MdzOw6LPkSDH0qSIZjzYPiM
-From: Max Reitz <mreitz@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- Alberto Garcia <berto@igalia.com>
-Cc: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- qemu-devel@nongnu.org
-Message-ID: <9a76848c-f499-6355-70ca-1d638dad3e8e@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 0/3] char-socket: Fix race condition
-References: <cover.1550842915.git.berto@igalia.com>
- <20190423165501.GA27867@redhat.com>
- <b5fe7ed7-c11c-4f36-4973-c86031cbe046@redhat.com>
-In-Reply-To: <b5fe7ed7-c11c-4f36-4973-c86031cbe046@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Thu, May 30, 2019 at 11:13:41AM +1000, David Gibson wrote:
+> On Thu, May 23, 2019 at 05:18:51PM -0300, Maxiwell S. Garcia wrote:
+> > On Thu, May 23, 2019 at 09:29:52AM +1000, David Gibson wrote:
+> > > On Mon, May 20, 2019 at 05:43:40PM -0300, Maxiwell S. Garcia wrote:
+> > > > This handler was added in the commit:
+> > > >   42043e4f1241: spapr: clock should count only if vm is running
+> > > > 
+> > > > In a scenario without migration, this pre_save handler is not
+> > > > triggered, so the 'stop/cont' commands save and restore the clock
+> > > > in the function 'cpu_ppc_clock_vm_state_change.' The SW clock
+> > > > in the guest doesn't know about this pause.
+> > > > 
+> > > > If the command 'migrate' is called between 'stop' and 'cont',
+> > > > the pre_save handler re-read the clock, and the SW clock in the
+> > > > guest will know about the pause between 'stop' and 'migrate.'
+> > > > If the guest is running a workload like HTC, a side-effect of
+> > > > this is a lot of process stall messages (with call traces) in
+> > > > the kernel guest.
+> > > > 
+> > > > Signed-off-by: Maxiwell S. Garcia <maxiwell@linux.ibm.com>
+> > > 
+> > > What affect will this have on the clock for the case of migrations
+> > > without a stop/cont around?
+> > 
+> > The guest timebase is saved when the VM stop running and restored when
+> > the VM starts running again (cpu_ppc_clock_vm_state_change handler).
+> > Migrations without stop/cont save the clock when the VM go to the
+> > FINISH_MIGRATE state.
+> 
+> Right... which means the clock is effectively stopped for the
+> migration downtime window while we transfer the final state.  That
+> means the guest clock will drift from wall clock by a couple of
+> hundred ms across the migration which is not correct.
+> 
+> > > The complicated thing here is that for
+> > > *explicit* stops/continues we want to freeze the clock, however for
+> > > the implicit stop/continue during migration downtime, we want to keep
+> > > the clock running (logically), so that the guest time of day doesn't
+> > > get out of sync on migration.
+> > > 
+> > 
+> > Not sure if the *implicit* word here is about commands from the libvirt
+> > or any other orchestrator.
+> 
+> By implicit I mean the stopping of the VM which qemu does to transfer
+> the final part of the state, rather than because of an explicit
+> stop/cont command.
+> 
+> > QEMU itself doesn't know the intent behind the
+> > command stop/cont. So, If we are using a guest to process a workload and
+> > the manager tool decide to migrate our VM transparently, it's unpleasant
+> > to see a lot of process stalls with call traces in the kernel log.
+> 
+> If you have a lot of process stalls across a migration, that suggests
+> your permitted downtime window is *way* too long.
+> 
 
-On 26.04.19 09:51, Paolo Bonzini wrote:
-> On 23/04/19 18:55, Daniel P. Berrang=C3=A9 wrote:
->> ping - paolo/marc-andr=C3=A9 - unless I'm missing something, it looks =
-like
->> this chardev series slipped through the cracks and missed 4.0
->=20
-> Yeah, it had a bug unfortunately.  I'm looking at it RSN.
+I see a difference between live migration and 'cold' migration. In
+a cold migration scenario (where a user 'stop' the machine, wait an
+arbitrary time, move it to another server, and run it), the behavior
+should be the same as executing 'stop/cont' in a guest without migration.
 
-I=E2=80=99ll just leave another ping here
+This problem also emerges when the 'timeout' flag is used with 'virsh'
+tool to live-migrate a guest. After the 'timeout', the libvirt sends a
+'stop' command to QEMU to suspend the guest before migrate. If the NFS
+is slow, for example, this guest will wait many minutes to run again.
 
-> Paolo
->=20
->>
->> On Fri, Feb 22, 2019 at 03:46:23PM +0200, Alberto Garcia wrote:
->>> This fixes a race condition in which the tcp_chr_read() ioc handler
->>> can close a connection that is being written to from another thread.
->>>
->>> Note: vhost-user-test still fails if QTEST_VHOST_USER_FIXME is set.
->>>
->>> Berto
->>>
->>> RFC: https://lists.gnu.org/archive/html/qemu-devel/2019-02/msg01510.h=
-tml
->>>
->>> v1: https://lists.gnu.org/archive/html/qemu-devel/2019-02/msg01834.ht=
-ml
->>> - Fixes memory leaks and adds a qemu_idle_add() function
->>>
->>> v2: https://lists.gnu.org/archive/html/qemu-devel/2019-02/msg06137.ht=
-ml
->>> - Rebased on top of the current master (fc3dbb90f2eb069801bfb4cfe9cbc=
-)
->>> - Patches 1 and 2: Remove the changes in char-pty.c, they're not
->>>                    needed after the rebase.
->>> - Patch 3: Fix conflicts after the rebase.
->>>
->>> v3:
->>> - Patch 3: Add tcp_chr_disconnect_locked() [Daniel]
->>>
->>> Alberto Garcia (3):
->>>   main-loop: Fix GSource leak in qio_task_thread_worker()
->>>   main-loop: Add qemu_idle_add()
->>>   char-socket: Lock tcp_chr_disconnect() and socket_reconnect_timeout=
-()
->>>
->>>  chardev/char-socket.c    | 25 +++++++++++++++++++++----
->>>  include/qemu/main-loop.h | 12 ++++++++++++
->>>  io/task.c                |  9 +++------
->>>  util/main-loop.c         |  9 +++++++++
->>>  4 files changed, 45 insertions(+), 10 deletions(-)
->>>
->>> --=20
->>> 2.11.0
->>>
->>
->> Regards,
->> Daniel
->>
->=20
->=20
->=20
+Maybe a solution is to modify the timebase_pre_save handler to know the
+current vm_state and only save the timebase again when vm_state is not
+in 'stop' state. What do you think?
 
 
+> > The high-level tools could sync the SW clock with the HW clock if this
+> > behavior is required, keeping the QEMU stop/cont and stop/migrate/cont
+> > consistent.
+> > 
+> > > > ---
+> > > >  hw/ppc/ppc.c | 24 ------------------------
+> > > >  1 file changed, 24 deletions(-)
+> > > > 
+> > > > diff --git a/hw/ppc/ppc.c b/hw/ppc/ppc.c
+> > > > index ad20584f26..3fb50cbeee 100644
+> > > > --- a/hw/ppc/ppc.c
+> > > > +++ b/hw/ppc/ppc.c
+> > > > @@ -1056,35 +1056,11 @@ void cpu_ppc_clock_vm_state_change(void *opaque, int running,
+> > > >      }
+> > > >  }
+> > > >  
+> > > > -/*
+> > > > - * When migrating, read the clock just before migration,
+> > > > - * so that the guest clock counts during the events
+> > > > - * between:
+> > > > - *
+> > > > - *  * vm_stop()
+> > > > - *  *
+> > > > - *  * pre_save()
+> > > > - *
+> > > > - *  This reduces clock difference on migration from 5s
+> > > > - *  to 0.1s (when max_downtime == 5s), because sending the
+> > > > - *  final pages of memory (which happens between vm_stop()
+> > > > - *  and pre_save()) takes max_downtime.
+> > > 
+> > > Urgh.. this comment is confusing - 5s would be a ludicrously long
+> > > max_downtime by modern standards.
+> > > 
+> > > > - */
+> > > > -static int timebase_pre_save(void *opaque)
+> > > > -{
+> > > > -    PPCTimebase *tb = opaque;
+> > > > -
+> > > > -    timebase_save(tb);
+> > > > -
+> > > > -    return 0;
+> > > > -}
+> > > > -
+> > > >  const VMStateDescription vmstate_ppc_timebase = {
+> > > >      .name = "timebase",
+> > > >      .version_id = 1,
+> > > >      .minimum_version_id = 1,
+> > > >      .minimum_version_id_old = 1,
+> > > > -    .pre_save = timebase_pre_save,
+> > > >      .fields      = (VMStateField []) {
+> > > >          VMSTATE_UINT64(guest_timebase, PPCTimebase),
+> > > >          VMSTATE_INT64(time_of_the_day_ns, PPCTimebase),
+> > > 
+> > 
+> > 
+> 
+> -- 
+> David Gibson			| I'll have my music baroque, and my code
+> david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+> 				| _way_ _around_!
+> http://www.ozlabs.org/~dgibson
 
---NozHBCRfU1MdzOw6LPkSDH0qSIZjzYPiM
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
 
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlz4GdQACgkQ9AfbAGHV
-z0DGJgf/V1iJg8arQd12pvVKA/VeVB9SdkbgKtRFKquttIUQJnCLiXm94KHDMe6b
-14clbHn/kvJxs1Q+/rEGMQkSbnubagCNlEtfICGYxp69mTztEa7mrrVRKN2C5YCa
-cP/XMNml3+DrbBErZAKmG+kPLnFfWuqiRaKdzEQ4xr8khPeVrOW9a7AUrB5DlyW0
-LWHFx8j/gyxjku7WbcqmT7mz7SqPb/bQZ2mEHl4MFsv7Da/9HpjnGyNQvIzRJBE4
-PhUSQs4YZMZVjMe2E6bagiQTyog7N1VRAql96Tl4JskSO64WY8qx+dwK8xBP8BvS
-9p60I84PtQYKWej2ctiXlcZmRDEdyA==
-=2IZF
------END PGP SIGNATURE-----
-
---NozHBCRfU1MdzOw6LPkSDH0qSIZjzYPiM--
 
