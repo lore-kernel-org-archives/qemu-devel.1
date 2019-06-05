@@ -3,60 +3,60 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A04DDC28CC5
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 20:47:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E2AB8C28CC5
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 20:47:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 773AE20866
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 20:47:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 773AE20866
+	by mail.kernel.org (Postfix) with ESMTPS id AC69C20866
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 20:47:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AC69C20866
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:49692 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:49694 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hYcp0-00060h-NC
-	for qemu-devel@archiver.kernel.org; Wed, 05 Jun 2019 16:47:46 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:41309)
+	id 1hYcpC-0006Bm-UL
+	for qemu-devel@archiver.kernel.org; Wed, 05 Jun 2019 16:47:58 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:41369)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hYcdN-0003s8-2h
-	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 16:35:47 -0400
+	(envelope-from <david@redhat.com>) id 1hYcdO-0003t6-D9
+	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 16:35:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hYcdL-0008JJ-JZ
-	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 16:35:44 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41094)
+	(envelope-from <david@redhat.com>) id 1hYcdL-0008Jg-Q1
+	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 16:35:46 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36262)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <david@redhat.com>)
-	id 1hYcdL-0006Ev-8l; Wed, 05 Jun 2019 16:35:43 -0400
+	id 1hYcdL-0005i6-Ci; Wed, 05 Jun 2019 16:35:43 -0400
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
 	[10.5.11.12])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id A001383F3F;
-	Wed,  5 Jun 2019 20:34:31 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 90FF6308124D;
+	Wed,  5 Jun 2019 20:34:16 +0000 (UTC)
 Received: from t460s.redhat.com (ovpn-116-124.ams2.redhat.com [10.36.116.124])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 33379619A9;
-	Wed,  5 Jun 2019 20:34:28 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 180CD1969F;
+	Wed,  5 Jun 2019 20:34:14 +0000 (UTC)
 From: David Hildenbrand <david@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Wed,  5 Jun 2019 22:33:40 +0200
-Message-Id: <20190605203403.29461-11-david@redhat.com>
+Date: Wed,  5 Jun 2019 22:33:33 +0200
+Message-Id: <20190605203403.29461-4-david@redhat.com>
 In-Reply-To: <20190605203403.29461-1-david@redhat.com>
 References: <20190605203403.29461-1-david@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.27]);
-	Wed, 05 Jun 2019 20:34:31 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.49]);
+	Wed, 05 Jun 2019 20:34:16 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL SUBSYSTEM s390x 10/33] s390x/tcg: Introduce
- tcg_s390_vector_exception()
+Subject: [Qemu-devel] [PULL SUBSYSTEM s390x 03/33] s390x/tcg: Implement
+ VECTOR FIND ELEMENT NOT EQUAL
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -68,92 +68,251 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>,
-	David Hildenbrand <david@redhat.com>, Thomas Huth <thuth@redhat.com>,
-	Richard Henderson <rth@twiddle.net>
+Cc: Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>,
+	Cornelia Huck <cohuck@redhat.com>,
+	Richard Henderson <richard.henderson@linaro.org>,
+	qemu-s390x@nongnu.org, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Handling is similar to data exceptions, however we can always store the
-VXC into the lowore and the FPC:
+Similar to VECTOR FIND ELEMENT EQUAL. Core logic courtesy of Richard H.
 
-z14 PoP, 6-20, "Vector-Exception Code"
-    When a vector-processing exception causes a pro-
-    gram interruption, a vector-exception code (VXC) is
-    stored at location 147, and zeros are stored at loca-
-    tions 144-146. The VXC is also placed in the DXC
-    field of the floating-point-control (FPC) register if bit
-    45 of control register 0 is one. When bit 45 of control
-    register 0 is zero and bit 46 of control register 0 is
-    one, the DXC field of the FPC register and the con-
-    tents of storage at location 147 are unpredictable.
+Add s390_vec_read_element() that can deal with element sizes.
 
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- target/s390x/cpu.h         |  1 +
- target/s390x/excp_helper.c | 15 +++++++++++++++
- target/s390x/tcg_s390x.h   |  2 ++
- 3 files changed, 18 insertions(+)
+ target/s390x/helper.h            |  6 +++
+ target/s390x/insn-data.def       |  2 +
+ target/s390x/translate_vx.inc.c  | 31 +++++++++++++
+ target/s390x/vec.h               | 19 ++++++++
+ target/s390x/vec_string_helper.c | 74 ++++++++++++++++++++++++++++++++
+ 5 files changed, 132 insertions(+)
 
-diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
-index 317a1377e6..4fc08a2c88 100644
---- a/target/s390x/cpu.h
-+++ b/target/s390x/cpu.h
-@@ -215,6 +215,7 @@ extern const struct VMStateDescription vmstate_s390_c=
-pu;
- #define PGM_SPECIAL_OP                  0x0013
- #define PGM_OPERAND                     0x0015
- #define PGM_TRACE_TABLE                 0x0016
-+#define PGM_VECTOR_PROCESSING           0x001b
- #define PGM_SPACE_SWITCH                0x001c
- #define PGM_HFP_SQRT                    0x001d
- #define PGM_PC_TRANS_SPEC               0x001f
-diff --git a/target/s390x/excp_helper.c b/target/s390x/excp_helper.c
-index 85223d00c0..f21bcf79ae 100644
---- a/target/s390x/excp_helper.c
-+++ b/target/s390x/excp_helper.c
-@@ -62,6 +62,21 @@ void QEMU_NORETURN tcg_s390_data_exception(CPUS390XSta=
-te *env, uint32_t dxc,
-     tcg_s390_program_interrupt(env, PGM_DATA, ILEN_AUTO, ra);
+diff --git a/target/s390x/helper.h b/target/s390x/helper.h
+index a1b169b666..fb50b404db 100644
+--- a/target/s390x/helper.h
++++ b/target/s390x/helper.h
+@@ -224,6 +224,12 @@ DEF_HELPER_FLAGS_4(gvec_vfee32, TCG_CALL_NO_RWG, voi=
+d, ptr, cptr, cptr, i32)
+ DEF_HELPER_5(gvec_vfee_cc8, void, ptr, cptr, cptr, env, i32)
+ DEF_HELPER_5(gvec_vfee_cc16, void, ptr, cptr, cptr, env, i32)
+ DEF_HELPER_5(gvec_vfee_cc32, void, ptr, cptr, cptr, env, i32)
++DEF_HELPER_FLAGS_4(gvec_vfene8, TCG_CALL_NO_RWG, void, ptr, cptr, cptr, =
+i32)
++DEF_HELPER_FLAGS_4(gvec_vfene16, TCG_CALL_NO_RWG, void, ptr, cptr, cptr,=
+ i32)
++DEF_HELPER_FLAGS_4(gvec_vfene32, TCG_CALL_NO_RWG, void, ptr, cptr, cptr,=
+ i32)
++DEF_HELPER_5(gvec_vfene_cc8, void, ptr, cptr, cptr, env, i32)
++DEF_HELPER_5(gvec_vfene_cc16, void, ptr, cptr, cptr, env, i32)
++DEF_HELPER_5(gvec_vfene_cc32, void, ptr, cptr, cptr, env, i32)
+=20
+ #ifndef CONFIG_USER_ONLY
+ DEF_HELPER_3(servc, i32, env, i64, i64)
+diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
+index d8907ef6a5..d03c1ee0b3 100644
+--- a/target/s390x/insn-data.def
++++ b/target/s390x/insn-data.def
+@@ -1197,6 +1197,8 @@
+     F(0xe782, VFAE,    VRR_b, V,   0, 0, 0, 0, vfae, 0, IF_VEC)
+ /* VECTOR FIND ELEMENT EQUAL */
+     F(0xe780, VFEE,    VRR_b, V,   0, 0, 0, 0, vfee, 0, IF_VEC)
++/* VECTOR FIND ELEMENT NOT EQUAL */
++    F(0xe781, VFENE,   VRR_b, V,   0, 0, 0, 0, vfene, 0, IF_VEC)
+=20
+ #ifndef CONFIG_USER_ONLY
+ /* COMPARE AND SWAP AND PURGE */
+diff --git a/target/s390x/translate_vx.inc.c b/target/s390x/translate_vx.=
+inc.c
+index b25afbc011..1ad0b62517 100644
+--- a/target/s390x/translate_vx.inc.c
++++ b/target/s390x/translate_vx.inc.c
+@@ -2414,3 +2414,34 @@ static DisasJumpType op_vfee(DisasContext *s, Disa=
+sOps *o)
+     }
+     return DISAS_NEXT;
+ }
++
++static DisasJumpType op_vfene(DisasContext *s, DisasOps *o)
++{
++    const uint8_t es =3D get_field(s->fields, m4);
++    const uint8_t m5 =3D get_field(s->fields, m5);
++    static gen_helper_gvec_3 * const g[3] =3D {
++        gen_helper_gvec_vfene8,
++        gen_helper_gvec_vfene16,
++        gen_helper_gvec_vfene32,
++    };
++    static gen_helper_gvec_3_ptr * const g_cc[3] =3D {
++        gen_helper_gvec_vfene_cc8,
++        gen_helper_gvec_vfene_cc16,
++        gen_helper_gvec_vfene_cc32,
++    };
++
++    if (es > ES_32 || m5 & ~0x3) {
++        gen_program_exception(s, PGM_SPECIFICATION);
++        return DISAS_NORETURN;
++    }
++
++    if (extract32(m5, 0, 1)) {
++        gen_gvec_3_ptr(get_field(s->fields, v1), get_field(s->fields, v2=
+),
++                       get_field(s->fields, v3), cpu_env, m5, g_cc[es]);
++        set_cc_static(s);
++    } else {
++        gen_gvec_3_ool(get_field(s->fields, v1), get_field(s->fields, v2=
+),
++                       get_field(s->fields, v3), m5, g[es]);
++    }
++    return DISAS_NEXT;
++}
+diff --git a/target/s390x/vec.h b/target/s390x/vec.h
+index 3313fb43ee..affc62874c 100644
+--- a/target/s390x/vec.h
++++ b/target/s390x/vec.h
+@@ -12,6 +12,8 @@
+ #ifndef S390X_VEC_H
+ #define S390X_VEC_H
+=20
++#include "tcg/tcg.h"
++
+ typedef union S390Vector {
+     uint64_t doubleword[2];
+     uint32_t word[4];
+@@ -70,6 +72,23 @@ static inline uint64_t s390_vec_read_element64(const S=
+390Vector *v, uint8_t enr)
+     return v->doubleword[enr];
  }
 =20
-+void QEMU_NORETURN tcg_s390_vector_exception(CPUS390XState *env, uint32_=
-t vxc,
-+                                             uintptr_t ra)
++static inline uint64_t s390_vec_read_element(const S390Vector *v, uint8_=
+t enr,
++                                             uint8_t es)
 +{
-+    g_assert(vxc <=3D 0xff);
-+#if !defined(CONFIG_USER_ONLY)
-+    /* Always store the VXC into the lowcore, without AFP it is undefine=
-d */
-+    stl_phys(CPU(s390_env_get_cpu(env))->as,
-+             env->psa + offsetof(LowCore, data_exc_code), vxc);
-+#endif
-+
-+    /* Always store the VXC into the FPC, without AFP it is undefined */
-+    env->fpc =3D deposit32(env->fpc, 8, 8, vxc);
-+    tcg_s390_program_interrupt(env, PGM_VECTOR_PROCESSING, ILEN_AUTO, ra=
-);
++    switch (es) {
++    case MO_8:
++        return s390_vec_read_element8(v, enr);
++    case MO_16:
++        return s390_vec_read_element16(v, enr);
++    case MO_32:
++        return s390_vec_read_element32(v, enr);
++    case MO_64:
++        return s390_vec_read_element64(v, enr);
++    default:
++        g_assert_not_reached();
++    }
 +}
 +
- void HELPER(data_exception)(CPUS390XState *env, uint32_t dxc)
+ static inline void s390_vec_write_element8(S390Vector *v, uint8_t enr,
+                                            uint8_t data)
  {
-     tcg_s390_data_exception(env, dxc, GETPC());
-diff --git a/target/s390x/tcg_s390x.h b/target/s390x/tcg_s390x.h
-index ab2c4ba703..2813f9d48e 100644
---- a/target/s390x/tcg_s390x.h
-+++ b/target/s390x/tcg_s390x.h
-@@ -18,5 +18,7 @@ void QEMU_NORETURN tcg_s390_program_interrupt(CPUS390XS=
-tate *env, uint32_t code,
-                                               int ilen, uintptr_t ra);
- void QEMU_NORETURN tcg_s390_data_exception(CPUS390XState *env, uint32_t =
-dxc,
-                                            uintptr_t ra);
-+void QEMU_NORETURN tcg_s390_vector_exception(CPUS390XState *env, uint32_=
-t vxc,
-+                                             uintptr_t ra);
+diff --git a/target/s390x/vec_string_helper.c b/target/s390x/vec_string_h=
+elper.c
+index 05ad99e173..0ee3470112 100644
+--- a/target/s390x/vec_string_helper.c
++++ b/target/s390x/vec_string_helper.c
+@@ -27,6 +27,15 @@ static inline uint64_t zero_search(uint64_t a, uint64_=
+t mask)
+     return ~(((a & mask) + mask) | a | mask);
+ }
 =20
- #endif /* TCG_S390X_H */
++/*
++ * Returns a bit set in the MSB of each element that is not zero,
++ * as defined by the mask.
++ */
++static inline uint64_t nonzero_search(uint64_t a, uint64_t mask)
++{
++    return (((a & mask) + mask) | a) & ~mask;
++}
++
+ /*
+  * Returns the byte offset for the first match, or 16 for no match.
+  */
+@@ -209,3 +218,68 @@ void HELPER(gvec_vfee_cc##BITS)(void *v1, const void=
+ *v2, const void *v3,      \
+ DEF_VFEE_CC_HELPER(8)
+ DEF_VFEE_CC_HELPER(16)
+ DEF_VFEE_CC_HELPER(32)
++
++static int vfene(void *v1, const void *v2, const void *v3, bool zs, uint=
+8_t es)
++{
++    const uint64_t mask =3D get_element_lsbs_mask(es);
++    uint64_t a0, a1, b0, b1, e0, e1, z0, z1;
++    uint64_t first_zero =3D 16;
++    uint64_t first_inequal;
++    bool smaller =3D false;
++
++    a0 =3D s390_vec_read_element64(v2, 0);
++    a1 =3D s390_vec_read_element64(v2, 1);
++    b0 =3D s390_vec_read_element64(v3, 0);
++    b1 =3D s390_vec_read_element64(v3, 1);
++    e0 =3D nonzero_search(a0 ^ b0, mask);
++    e1 =3D nonzero_search(a1 ^ b1, mask);
++    first_inequal =3D match_index(e0, e1);
++
++    /* identify the smaller element */
++    if (first_inequal < 16) {
++        uint8_t enr =3D first_inequal / (1 << es);
++        uint32_t a =3D s390_vec_read_element(v2, enr, es);
++        uint32_t b =3D s390_vec_read_element(v3, enr, es);
++
++        smaller =3D a < b;
++    }
++
++    if (zs) {
++        z0 =3D zero_search(a0, mask);
++        z1 =3D zero_search(a1, mask);
++        first_zero =3D match_index(z0, z1);
++    }
++
++    s390_vec_write_element64(v1, 0, MIN(first_inequal, first_zero));
++    s390_vec_write_element64(v1, 1, 0);
++    if (first_zero =3D=3D 16 && first_inequal =3D=3D 16) {
++        return 3;
++    } else if (first_zero < first_inequal) {
++        return 0;
++    }
++    return smaller ? 1 : 2;
++}
++
++#define DEF_VFENE_HELPER(BITS)                                          =
+       \
++void HELPER(gvec_vfene##BITS)(void *v1, const void *v2, const void *v3, =
+       \
++                              uint32_t desc)                            =
+       \
++{                                                                       =
+       \
++    const bool zs =3D extract32(simd_data(desc), 1, 1);                 =
+         \
++                                                                        =
+       \
++    vfene(v1, v2, v3, zs, MO_##BITS);                                   =
+       \
++}
++DEF_VFENE_HELPER(8)
++DEF_VFENE_HELPER(16)
++DEF_VFENE_HELPER(32)
++
++#define DEF_VFENE_CC_HELPER(BITS)                                       =
+       \
++void HELPER(gvec_vfene_cc##BITS)(void *v1, const void *v2, const void *v=
+3,     \
++                                 CPUS390XState *env, uint32_t desc)     =
+       \
++{                                                                       =
+       \
++    const bool zs =3D extract32(simd_data(desc), 1, 1);                 =
+         \
++                                                                        =
+       \
++    env->cc_op =3D vfene(v1, v2, v3, zs, MO_##BITS);                    =
+         \
++}
++DEF_VFENE_CC_HELPER(8)
++DEF_VFENE_CC_HELPER(16)
++DEF_VFENE_CC_HELPER(32)
 --=20
 2.21.0
 
