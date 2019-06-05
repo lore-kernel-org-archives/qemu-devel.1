@@ -2,71 +2,90 @@ Return-Path: <SRS0=3v23=UE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D6F58C28CC5
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 15:12:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D3D7C28CC5
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 15:20:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A6D8D2067C
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 15:12:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3A49B2067C
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 15:20:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=mail.uni-paderborn.de header.i=@mail.uni-paderborn.de header.b="HSBbnfe3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A6D8D2067C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=mail.uni-paderborn.de
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Oi51aB0P"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3A49B2067C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:44300 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:44395 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hYXaw-0008V2-Vq
-	for qemu-devel@archiver.kernel.org; Wed, 05 Jun 2019 11:12:54 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:38638)
+	id 1hYXi7-0002P7-Fk
+	for qemu-devel@archiver.kernel.org; Wed, 05 Jun 2019 11:20:19 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:40734)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1hYXZB-0007SJ-2M
-	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 11:11:06 -0400
+	(envelope-from <mrolnik@gmail.com>) id 1hYXhA-00026K-5g
+	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 11:19:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1hYXZA-0001AU-0A
-	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 11:11:05 -0400
-Received: from zuban.uni-paderborn.de ([131.234.189.17]:53384)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kbastian@mail.uni-paderborn.de>)
-	id 1hYXZ8-0000ld-Mq
-	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 11:11:03 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=mail.uni-paderborn.de; s=20170601;
-	h=Content-Transfer-Encoding:Content-Type
-	:In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:
-	Sender:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=g13SMHpLF2ukBpYf9747dCTiSOcThrdT7VUIQ1chP9E=;
-	b=HSBbnfe3996crJu2TYL528Tovh
-	It9JFoAsclUTkUOges2MtxFqc9t11epFGqoUkJ4EAM9p3RE/rxNfRzm7UbLft9S7iJaGreBsJruZc
-	ypZIfTZoW7M1XQuzS9F4bEOh7QB53VS7aCqkwmGg1X+BiM+xhi15NtNwiAGuet6sHyrg=; 
-To: David Brenken <david.brenken@efs-auto.org>, qemu-devel@nongnu.org
-References: <20190605061126.10244-1-david.brenken@efs-auto.org>
-From: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-Message-ID: <1b2d4995-8a9c-887e-6b8a-f0c6936fbb91@mail.uni-paderborn.de>
-Date: Wed, 5 Jun 2019 17:10:39 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.7.0
+	(envelope-from <mrolnik@gmail.com>) id 1hYXh8-000486-Hx
+	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 11:19:20 -0400
+Received: from mail-qk1-x742.google.com ([2607:f8b0:4864:20::742]:40502)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <mrolnik@gmail.com>) id 1hYXh8-00047A-Do
+	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 11:19:18 -0400
+Received: by mail-qk1-x742.google.com with SMTP id c70so5355410qkg.7
+	for <qemu-devel@nongnu.org>; Wed, 05 Jun 2019 08:19:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+	:cc; bh=LROlq/CnUShw/aJ9eLHb3kjKzLMl3nhEXcP1KyAgM3U=;
+	b=Oi51aB0PEER17ka78Z4c947jP5jn9JiJ7ZGknq1BondbMV5pepLjpiCthzXSRBQnvm
+	3bla5fSmMu3eGIXfUL2IzECvs6zTgKNU7A/UcTPEJYaNOpjyVjDwTQ5gOhCLJgi/lr20
+	ghyHifLkMU3tZikqAcIkFANnSwKwClQn2Hrjj1c/qbu6+Lx8CUy+kJirLTtrDUC89Nr6
+	l/sNoyHpndp7FksO9jsJbUeTxy/ulQ2tGHpb9hpvBMsy53ZlRR0jHqn/ie2sxO6Wwmce
+	1RLMyuD3d0+Ni80UobvmUz/R7NskT3s5pj8M9uyBx+OteeIU+z9ACUWSGbJS1OYdQz+B
+	bSFw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+	:message-id:subject:to:cc;
+	bh=LROlq/CnUShw/aJ9eLHb3kjKzLMl3nhEXcP1KyAgM3U=;
+	b=LhAI7iHPkGQYppbCRTkPHgs0TT84JDUX08NXRGu7RbcfLitX/2dT1/8eucmXXLbT5L
+	z3x/5Sd62QklSeI5gb6XBIsk+OaULoxLfUHjqtn11tL3YNyTBehhKRlfiwClFTqYiQX2
+	fRJM7r+q93NEgUdLf9DXxojRjZVNTC3QMhpWrhZWMlQgMumecbPxO+0p56qALnm7kQcZ
+	hqoGqe31uC2K4/Huf98Wh5225SfypRzLbnc/TJ+yR2o3u5B+8mIumX82eMh5c2QnlKRd
+	+piFriY/jiQortVBO6wCb7vpHlLevlJW0TAgqb6u85c7OBvP/AmjNuiYFeZ95R/NIelM
+	wS2A==
+X-Gm-Message-State: APjAAAVto/zxC93zPfz3QiwIG3gdF2q5dVn2NHhuGrPssNeu2m4hVrjf
+	aG4EKZjdaHaUDis0ZM1natEHvjbjI8wVWI3EY5w=
+X-Google-Smtp-Source: APXvYqwwO7TAUbiNcbUNuPwostUOGidx2Jhv4zCu0+Sh/sMPn9u5tVQlR+JZLXp1d14Wj3UyHv03rx7c9P2UTwu0DzY=
+X-Received: by 2002:a37:b8c5:: with SMTP id i188mr14015188qkf.7.1559747956834; 
+	Wed, 05 Jun 2019 08:19:16 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20190605061126.10244-1-david.brenken@efs-auto.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US-large
-X-IMT-Spam-Score: 0.0 ()
-X-PMX-Version: 6.4.6.2792898, Antispam-Engine: 2.7.2.2107409,
-	Antispam-Data: 2019.6.5.150316, AntiVirus-Engine: 5.63.0,
-	AntiVirus-Data: 2019.6.4.5630002
-X-IMT-Authenticated-Sender: kbastian@UNI-PADERBORN.DE
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 131.234.189.17
-Subject: Re: [Qemu-devel] [PATCH 0/5] tricore: adding new instructions and
- fixing issues
+References: <20190530190738.22713-1-mrolnik@gmail.com>
+	<20190530190738.22713-4-mrolnik@gmail.com>
+	<402ba0b2-e2e0-6b7a-1862-4588e5f83357@linaro.org>
+	<CAK4993iXV9oRr_VfabJHg4fCYEppW49i_PE9R0X_TBqk7TDkrQ@mail.gmail.com>
+	<9e2acbbe-7ede-c45d-5e9f-bb269aa25fcc@linaro.org>
+	<CAK4993hXTOSoW5FFjeur+pLzT18c-C=vwao-904ASyqMsT5eMQ@mail.gmail.com>
+	<3bc0d426-bd59-055d-a010-b136cba555bf@linaro.org>
+	<CAK4993j5JXgV9CYDckt99kwgQaG6w-GN-Tka7r2nahoh33rheQ@mail.gmail.com>
+	<CAK4993jWViasj8PKUCHcbMh-9SPJmELqua9eSbFvwL7gpm2e5A@mail.gmail.com>
+	<7b0c5e07-5b99-3344-7f80-847880f85b5b@linaro.org>
+In-Reply-To: <7b0c5e07-5b99-3344-7f80-847880f85b5b@linaro.org>
+From: Michael Rolnik <mrolnik@gmail.com>
+Date: Wed, 5 Jun 2019 18:19:02 +0300
+Message-ID: <CAK4993jPs_j9qvv8v2sfZ=npGkbkMAv3HaWSYRiSqFthkvfmdA@mail.gmail.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::742
+Content-Type: text/plain; charset="UTF-8"
+X-Content-Filtered-By: Mailman/MimeDel 2.1.21
+Subject: Re: [Qemu-devel] [PATCH RFC v20 3/8] target/avr: Add mechanism to
+ check for active debugger connection
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -78,37 +97,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: David Brenken <david.brenken@efs-auto.de>
+Cc: Sarah Harris <S.E.Harris@kent.ac.uk>,
+	QEMU Developers <qemu-devel@nongnu.org>,
+	Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Guys,
+Richard.
 
-On 6/5/19 8:11 AM, David Brenken wrote:
-> From: David Brenken <david.brenken@efs-auto.de>
+We use break instruction for testing. (Here
+https://github.com/seharris/qemu-avr-tests/tree/master/instruction-tests).
+Each test is a big list of small tests with a break between them. We run
+the tests on HW and on QEMU then compare register after each break. If we
+don't implement break the way Sarah suggested we have no way of testing.
+What do you suggest?
+
+Sent from my cell phone, please ignore typos
+
+On Wed, Jun 5, 2019, 5:37 PM Richard Henderson <richard.henderson@linaro.org>
+wrote:
+
+> On 6/5/19 2:20 AM, Michael Rolnik wrote:
+> > Hi Richard.
+> >
+> > I am still struggling with this one.
+> >
+> > The spec says.
+> > The BREAK instruction is used by the On-chip Debug system, and is
+> normally not
+> > used in the application software.
+> > When the BREAK instruction is executed, the AVR CPU is set in the
+> Stopped Mode.
+> > This gives the On-chip Debugger access to internal resources.
+> > If any Lock bits are set, or either the JTAGEN or OCDEN Fuses are
+> unprogrammed,
+> > the CPU will treat the BREAK instruction as a NOP and will not enter the
+> > Stopped mode.
 >
-> Hello everyone,
+> Yep.
 >
-> in the scope of this patchset we added implementations for the following
-> instructions for the target TriCore:
+> > I read is as follows
+> > - If user has an intention of using debugger, BREAK should be translated
+> to
+> > QEMU debug breakpoint
+> > - If user has no intention of using debugger, BREAK should be translated
+> into NOP.
 >
-> QSEED, FTOIZ, UTOF
+> I do not read it that way.  The spec is talking about a specific
+> implementation
+> of debugging -- fuses, jtag and all.  We do not need to implement
+> breakpoints
+> using any of those mechanisms, because we can insert breakpoints via
+> on-the-side data structures and re-translation.
+>
+>
+> r~
+>
 
-first of all thanks for these patches. QSEED.F was one instruction that 
-was bugging me for some time and I didn't dare to do the grind figuring 
-out how it works in all details.
+On Wed, Jun 5, 2019, 5:37 PM Richard Henderson <richard.henderson@linaro.org>
+wrote:
 
-I left some comments in the patch emails but in general I think the 
-patches are nearly good to go. I created some scripts [1] to generate 
-random tricore asm programs that I run against tsim. This has been very 
-useful in catching bugs in the PSW calculation. You might want to run 
-them as well :)
-
-
-Cheers,
-Bastian
-
-[1] https://github.com/bkoppelmann/tricore-qemu-tests
-
-
+> On 6/5/19 2:20 AM, Michael Rolnik wrote:
+> > Hi Richard.
+> >
+> > I am still struggling with this one.
+> >
+> > The spec says.
+> > The BREAK instruction is used by the On-chip Debug system, and is
+> normally not
+> > used in the application software.
+> > When the BREAK instruction is executed, the AVR CPU is set in the
+> Stopped Mode.
+> > This gives the On-chip Debugger access to internal resources.
+> > If any Lock bits are set, or either the JTAGEN or OCDEN Fuses are
+> unprogrammed,
+> > the CPU will treat the BREAK instruction as a NOP and will not enter the
+> > Stopped mode.
+>
+> Yep.
+>
+> > I read is as follows
+> > - If user has an intention of using debugger, BREAK should be translated
+> to
+> > QEMU debug breakpoint
+> > - If user has no intention of using debugger, BREAK should be translated
+> into NOP.
+>
+> I do not read it that way.  The spec is talking about a specific
+> implementation
+> of debugging -- fuses, jtag and all.  We do not need to implement
+> breakpoints
+> using any of those mechanisms, because we can insert breakpoints via
+> on-the-side data structures and re-translation.
+>
+>
+> r~
+>
