@@ -2,79 +2,62 @@ Return-Path: <SRS0=3v23=UE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 92FF2C282DE
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 06:50:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 65EA8C282DE
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 07:15:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5EDCF2075B
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 06:50:58 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="P1dvBj0i"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5EDCF2075B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 3B19A2083E
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 07:15:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3B19A2083E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:36512 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:36691 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hYPlB-0000GT-Ks
-	for qemu-devel@archiver.kernel.org; Wed, 05 Jun 2019 02:50:57 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:55082)
+	id 1hYQ8V-0004IA-4C
+	for qemu-devel@archiver.kernel.org; Wed, 05 Jun 2019 03:15:03 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:60081)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <elohimes@gmail.com>) id 1hYPkL-0008KE-IP
-	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 02:50:06 -0400
+	(envelope-from <groug@kaod.org>) id 1hYQ7f-0003zH-Tv
+	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 03:14:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <elohimes@gmail.com>) id 1hYPkH-0002w5-Au
-	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 02:50:05 -0400
-Received: from mail-qt1-x842.google.com ([2607:f8b0:4864:20::842]:43506)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <elohimes@gmail.com>) id 1hYPk7-0002h8-Kd
-	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 02:49:53 -0400
-Received: by mail-qt1-x842.google.com with SMTP id z24so9655557qtj.10
-	for <qemu-devel@nongnu.org>; Tue, 04 Jun 2019 23:49:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-	:cc; bh=+lEZUZJkq3/vYLFYcECbii9P/fzadEXyqz+Lc/iHl80=;
-	b=P1dvBj0iX+PqveQBjg9M1Z29QcA0dC3D3szLdSc/FoXeWo8Jpico/fywaBi29MLDld
-	G/7PewyamaLzYfTLTb47pOETauelLRas3jdEShcm+qYYZ+uZIilg/TKEnpOrLRuQ4tXB
-	ZouVB6uQmgs/WNosNSYeQE2KP/0yMwzNGG3UCI0jVUV0G6FizEqN6204Rfdjp+jV8XTJ
-	p3SvInrIGAOKtDUyyKxL8nvRCAkLNZ16+w2JiKOZ5guPgd1FH/louMM1TFdETrv0VT8g
-	q1okFwk6JFAwlH+NTXAmFOXgwtDGyUqhekDSIIMaG8rNL6bOaikw96mIL3QwLVQa0QNN
-	qzhg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-	:message-id:subject:to:cc;
-	bh=+lEZUZJkq3/vYLFYcECbii9P/fzadEXyqz+Lc/iHl80=;
-	b=B9bx/PnT3EffRCpb8ZCvFaR2pqExogKw+RdUqbXzm5FW9X6rjYRJcbeMkwy1ZXQSjl
-	h0SusGcfkV/eSiW+BPyyAlc/t/y6XaF9i2IxQhRMY0y7iIKmzl40lKFi9qafEStj/pG4
-	miP2bh4xQxxjdp8tJJYwyeSaZNp6qmgr7U6foDuPHb8393XlsT+4gZskAjNc58mrG1pr
-	DR/726xFpGFPC3oytWNd39KeJ/1JTP0VshRnuGG7rq6WplyfEqbFebxHLbyUwEAwJngv
-	kUhCbQkZbfijepguXQFaCo5B7E7BClcKibsDtFJVvHxYTIkDNZ6DgaKNfHG1JmCs35LK
-	rd+A==
-X-Gm-Message-State: APjAAAWV9NvBRtiHuEc8we+8o31qkcjHlvWIZ2bnHVhB6njSYN3qO+2h
-	hKlfphCpkGXN5piQtctF19i2MWoSEOeEUqej4xY=
-X-Google-Smtp-Source: APXvYqwLDpxVPr9TXROUOKdsvwAS4JQJAOiOl7NgIO80r/hrrrbIR35XBUJ51kp0eC9pbd8lf13EPQ9FE+2rFeyWGqY=
-X-Received: by 2002:a0c:b084:: with SMTP id o4mr4855048qvc.227.1559717385521; 
-	Tue, 04 Jun 2019 23:49:45 -0700 (PDT)
-MIME-Version: 1.0
+	(envelope-from <groug@kaod.org>) id 1hYQ7e-0007x8-Ve
+	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 03:14:11 -0400
+Received: from 1.mo69.mail-out.ovh.net ([178.33.251.173]:48648)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1hYQ7e-0007tA-On
+	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 03:14:10 -0400
+Received: from player794.ha.ovh.net (unknown [10.109.160.244])
+	by mo69.mail-out.ovh.net (Postfix) with ESMTP id D7D0B5CD05
+	for <qemu-devel@nongnu.org>; Wed,  5 Jun 2019 09:14:07 +0200 (CEST)
+Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
+	[82.253.208.248]) (Authenticated sender: groug@kaod.org)
+	by player794.ha.ovh.net (Postfix) with ESMTPSA id 7D6DC67BC9BC;
+	Wed,  5 Jun 2019 07:14:02 +0000 (UTC)
+Date: Wed, 5 Jun 2019 09:14:01 +0200
+From: Greg Kurz <groug@kaod.org>
+To: Yongji Xie <elohimes@gmail.com>
+Message-ID: <20190605091401.5177daca@bahia.lab.toulouse-stg.fr.ibm.com>
+In-Reply-To: <CAONzpcZ_Wosy3BUZYDUp8UuEYk_3VSpSP+MQr7QRab8bKJ4-JQ@mail.gmail.com>
 References: <20190604073459.15651-1-xieyongji@baidu.com>
 	<20190604073459.15651-3-xieyongji@baidu.com>
 	<20190605084224.22e4cd92@bahia.lab.toulouse-stg.fr.ibm.com>
-In-Reply-To: <20190605084224.22e4cd92@bahia.lab.toulouse-stg.fr.ibm.com>
-From: Yongji Xie <elohimes@gmail.com>
-Date: Wed, 5 Jun 2019 14:49:34 +0800
-Message-ID: <CAONzpcZ_Wosy3BUZYDUp8UuEYk_3VSpSP+MQr7QRab8bKJ4-JQ@mail.gmail.com>
-To: Greg Kurz <groug@kaod.org>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::842
+	<CAONzpcZ_Wosy3BUZYDUp8UuEYk_3VSpSP+MQr7QRab8bKJ4-JQ@mail.gmail.com>
+X-Mailer: Claws Mail 3.16.0 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Ovh-Tracer-Id: 7763924283489818925
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduuddrudeguddguddukecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 178.33.251.173
 Subject: Re: [Qemu-devel] [PATCH v2 2/5] virtio: Set "start_on_kick" for
  legacy devices
 X-BeenThere: qemu-devel@nongnu.org
@@ -95,26 +78,39 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 5 Jun 2019 at 14:42, Greg Kurz <groug@kaod.org> wrote:
->
-> On Tue,  4 Jun 2019 15:34:56 +0800
-> elohimes@gmail.com wrote:
->
-> > From: Xie Yongji <xieyongji@baidu.com>
-> >
-> > Besides virtio 1.0 transitional devices, we should also
-> > set "start_on_kick" flag for legacy devices (virtio 0.9).
-> >
-> > Signed-off-by: Xie Yongji <xieyongji@baidu.com>
-> > ---
->
-> Patch looks good but it would be even better if applied
-> earlier so that it doesn't revert lines added by the
-> previous patch...
->
+On Wed, 5 Jun 2019 14:49:34 +0800
+Yongji Xie <elohimes@gmail.com> wrote:
 
-Fine with me. Will do it in v3.
+> On Wed, 5 Jun 2019 at 14:42, Greg Kurz <groug@kaod.org> wrote:
+> >
+> > On Tue,  4 Jun 2019 15:34:56 +0800
+> > elohimes@gmail.com wrote:
+> >  
+> > > From: Xie Yongji <xieyongji@baidu.com>
+> > >
+> > > Besides virtio 1.0 transitional devices, we should also
+> > > set "start_on_kick" flag for legacy devices (virtio 0.9).
+> > >
+> > > Signed-off-by: Xie Yongji <xieyongji@baidu.com>
+> > > ---  
+> >
+> > Patch looks good but it would be even better if applied
+> > earlier so that it doesn't revert lines added by the
+> > previous patch...
+> >  
+> 
+> Fine with me. Will do it in v3.
+> 
 
-Thanks,
-Yongji
+Hold on before posting, I've just learned about hw_compat_4_0_1 while
+reviewing patch 5... need so more time to understand the impact.
+
+Cheers,
+
+--
+Greg
+
+> Thanks,
+> Yongji
+
 
