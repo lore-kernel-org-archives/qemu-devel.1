@@ -6,91 +6,62 @@ X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6BCBCC28CC5
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 22:03:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CB94C28CC5
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 22:59:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2F8DE206BB
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 22:03:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2F8DE206BB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 5F9672070B
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 22:59:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5F9672070B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:50828 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:51438 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hYe0j-0006n7-Bc
-	for qemu-devel@archiver.kernel.org; Wed, 05 Jun 2019 18:03:57 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:35245)
+	id 1hYesa-0008N3-5e
+	for qemu-devel@archiver.kernel.org; Wed, 05 Jun 2019 18:59:36 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:44884)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1hYdzx-0006UQ-Dj
-	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 18:03:10 -0400
+	(envelope-from <no-reply@patchew.org>) id 1hYerh-00083c-Ob
+	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 18:58:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1hYdzv-0006fH-Nt
-	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 18:03:09 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60818)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1hYdzv-0006AV-8X
-	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 18:03:07 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 06244C04959F;
-	Wed,  5 Jun 2019 22:02:53 +0000 (UTC)
-Received: from [10.3.116.85] (ovpn-116-85.phx2.redhat.com [10.3.116.85])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 75ADF60BF3;
-	Wed,  5 Jun 2019 22:02:47 +0000 (UTC)
-To: Eduardo Habkost <ehabkost@redhat.com>
-References: <20190531192429.GH22103@habkost.net>
-	<93e5101f-67f1-a416-5e80-f16371a35e6a@redhat.com>
-	<871s0asvli.fsf@dusky.pond.sub.org> <20190605155006.GI8956@redhat.com>
-	<20190605201335.GD22416@habkost.net>
-	<c6a830b7-2892-6f05-faa1-3c8124e7e78a@redhat.com>
-	<20190605204920.GG22416@habkost.net>
-From: Eric Blake <eblake@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=eblake@redhat.com; keydata=
-	xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
-	xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
-	TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
-	GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
-	sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
-	AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
-	CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
-	RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
-	wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
-	Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
-	gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
-	pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
-	zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
-	pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
-	3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
-	NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
-	cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
-	SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
-	I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
-	mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
-	Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
-	2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
-Organization: Red Hat, Inc.
-Message-ID: <a0d8f7e3-17e8-0242-105d-4ed6062b712e@redhat.com>
-Date: Wed, 5 Jun 2019 17:02:46 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	(envelope-from <no-reply@patchew.org>) id 1hYerg-0007pu-Cr
+	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 18:58:41 -0400
+Resent-Date: Wed, 05 Jun 2019 18:58:41 -0400
+Resent-Message-Id: <E1hYerg-0007pu-Cr@eggs.gnu.org>
+Received: from sender4-of-o55.zoho.com ([136.143.188.55]:21595)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1hYerg-0007mv-4t
+	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 18:58:40 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1559775480; cv=none; d=zoho.com; s=zohoarc; 
+	b=RxDFDPXRxPfKBrYcU0tqQ52+YG3ixklJtHqXoLaBvwqFro9UnMdIBegySwenWw1Ipiz43u6V93crJPd5FO+PAqbFw3mDWYDRSYEadjh1rgENcNlHB10ssTEQk0BvnvYeOCoEKcPz8f5GDgfDztnPVaHpQfQUHqEp6d/5azavPB4=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
+	s=zohoarc; t=1559775480;
+	h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
+	bh=Bg+veaoops8DB5pJAmKcAvwZ5HkcJDla9Icl0ytnYzI=; 
+	b=Os462/qO2+FTJg5lZQsWrFEcJThDRBWvF8TuG+6qKyZ1ogPHrwyWCgkRSz1rhDFKS1xnILXeqTB9xtx41iJBm/SMgK7f4103NwFZEn+fK63RzLaTtvfj+440gqUGw2QoMQ0q3O/6egvjpkAbtiIcItcwh8xK7DaZ3F1EqNbb/hs=
+ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
+	spf=pass  smtp.mailfrom=no-reply@patchew.org;
+	dmarc=pass header.from=<no-reply@patchew.org>
+	header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+	mx.zohomail.com with SMTPS id 1559775478180500.8245808038928;
+	Wed, 5 Jun 2019 15:57:58 -0700 (PDT)
+In-Reply-To: <20190605213654.9785-1-ptoscano@redhat.com>
+Message-ID: <155977547693.32260.8548021932284388381@ce79690b2cb9>
 MIME-Version: 1.0
-In-Reply-To: <20190605204920.GG22416@habkost.net>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="8icoOcMmjw5l1fVYR0K9P9eAYg1JJTjlp"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.31]);
-	Wed, 05 Jun 2019 22:02:53 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: ptoscano@redhat.com
+Date: Wed, 5 Jun 2019 15:57:58 -0700 (PDT)
+X-ZohoMailClient: External
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-X-Content-Filtered-By: Mailman/MimeDel 2.1.21
-Subject: Re: [Qemu-devel] Deprecation policy and build dependencies
+X-Received-From: 136.143.188.55
+Subject: Re: [Qemu-devel] [PATCH v6] ssh: switch from libssh2 to libssh
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -102,96 +73,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
-	=?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
-	=?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
-	Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org,
-	Cleber Rosa <crosa@redhat.com>, John Snow <jsnow@redhat.com>
+Reply-To: qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, qemu-block@nongnu.org, rjones@redhat.com,
+	qemu-devel@nongnu.org, mreitz@redhat.com, ptoscano@redhat.com,
+	philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---8icoOcMmjw5l1fVYR0K9P9eAYg1JJTjlp
-From: Eric Blake <eblake@redhat.com>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- Peter Maydell <peter.maydell@linaro.org>, John Snow <jsnow@redhat.com>,
- Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org,
- Cleber Rosa <crosa@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?=
- <philmd@redhat.com>
-Message-ID: <a0d8f7e3-17e8-0242-105d-4ed6062b712e@redhat.com>
-Subject: Re: [Qemu-devel] Deprecation policy and build dependencies
-References: <20190531192429.GH22103@habkost.net>
- <93e5101f-67f1-a416-5e80-f16371a35e6a@redhat.com>
- <871s0asvli.fsf@dusky.pond.sub.org> <20190605155006.GI8956@redhat.com>
- <20190605201335.GD22416@habkost.net>
- <c6a830b7-2892-6f05-faa1-3c8124e7e78a@redhat.com>
- <20190605204920.GG22416@habkost.net>
-In-Reply-To: <20190605204920.GG22416@habkost.net>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDYwNTIxMzY1NC45Nzg1
+LTEtcHRvc2Nhbm9AcmVkaGF0LmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZl
+IHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGlu
+Zm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAxOTA2MDUyMTM2NTQuOTc4NS0xLXB0b3NjYW5vQHJl
+ZGhhdC5jb20KVHlwZTogc2VyaWVzClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjZdIHNz
+aDogc3dpdGNoIGZyb20gbGlic3NoMiB0byBsaWJzc2gKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9
+PT0KIyEvYmluL2Jhc2gKZ2l0IHJldi1wYXJzZSBiYXNlID4gL2Rldi9udWxsIHx8IGV4aXQgMApn
+aXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBk
+aWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9n
+cmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4uCj09PSBURVNUIFND
+UklQVCBFTkQgPT09CgpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCmFiZWY4MTcgc3No
+OiBzd2l0Y2ggZnJvbSBsaWJzc2gyIHRvIGxpYnNzaAoKPT09IE9VVFBVVCBCRUdJTiA9PT0KV0FS
+TklORzogQmxvY2sgY29tbWVudHMgdXNlIGEgbGVhZGluZyAvKiBvbiBhIHNlcGFyYXRlIGxpbmUK
+IzY4OiBGSUxFOiBibG9jay9zc2guYzo0NjoKKy8qIFRSQUNFX0xJQlNTSD08bGV2ZWw+IGVuYWJs
+ZXMgdHJhY2luZyBpbiBsaWJzc2ggaXRzZWxmLgoKV0FSTklORzogQmxvY2sgY29tbWVudHMgdXNl
+IGEgbGVhZGluZyAvKiBvbiBhIHNlcGFyYXRlIGxpbmUKIzk1OiBGSUxFOiBibG9jay9zc2guYzo2
+NDoKKyAgICAvKiBGaWxlIGF0dHJpYnV0ZXMgYXQgb3Blbi4gIFdlIHRyeSB0byBrZWVwIHRoZSAu
+c2l6ZSBmaWVsZAoKV0FSTklORzogQmxvY2sgY29tbWVudHMgdXNlIGEgbGVhZGluZyAvKiBvbiBh
+IHNlcGFyYXRlIGxpbmUKIzQ4NDogRklMRTogYmxvY2svc3NoLmM6NDkxOgorICAgIC8qIFRyeSB0
+byBhdXRoZW50aWNhdGUgd2l0aCBwdWJsaWNrZXksIHVzaW5nIHRoZSBzc2gtYWdlbnQKCldBUk5J
+Tkc6IEJsb2NrIGNvbW1lbnRzIHVzZSBhIGxlYWRpbmcgLyogb24gYSBzZXBhcmF0ZSBsaW5lCiM1
+NTM6IEZJTEU6IGJsb2NrL3NzaC5jOjY2MjoKKyAgICAvKiBUcnkgdG8gZGlzYWJsZSB0aGUgTmFn
+bGUgYWxnb3JpdGhtIG9uIFRDUCBzb2NrZXRzIHRvIHJlZHVjZSBsYXRlbmN5LAoKV0FSTklORzog
+QmxvY2sgY29tbWVudHMgdXNlIGEgbGVhZGluZyAvKiBvbiBhIHNlcGFyYXRlIGxpbmUKIzU3NTog
+RklMRTogYmxvY2svc3NoLmM6Njc5OgorICAgIC8qIE1ha2Ugc3VyZSB3ZSBhcmUgaW4gYmxvY2tp
+bmcgbW9kZSBkdXJpbmcgdGhlIGNvbm5lY3Rpb24gYW5kCgpXQVJOSU5HOiBCbG9jayBjb21tZW50
+cyB1c2UgYSBsZWFkaW5nIC8qIG9uIGEgc2VwYXJhdGUgbGluZQojODk1OiBGSUxFOiBibG9jay9z
+c2guYzoxMDYyOgorICAgICAgICAvKiBUaGUgc2l6ZSBvZiBTRlRQIHBhY2tldHMgaXMgbGltaXRl
+ZCB0byAzMksgYnl0ZXMsIHNvIGxpbWl0CgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVy
+cwojOTQ3OiBGSUxFOiBibG9jay9zc2guYzoxMTM1OgorICAgICAgICB0cmFjZV9zc2hfd3JpdGVf
+YnVmKGJ1ZiwgZW5kX29mX3ZlYyAtIGJ1ZiwgTUlOKGVuZF9vZl92ZWMgLSBidWYsIDEzMTA3Mikp
+OwoKV0FSTklORzogQmxvY2sgY29tbWVudHMgdXNlIGEgbGVhZGluZyAvKiBvbiBhIHNlcGFyYXRl
+IGxpbmUKIzk0ODogRklMRTogYmxvY2svc3NoLmM6MTEzNjoKKyAgICAgICAgLyogQXZvaWQgdG9v
+IGxhcmdlIGRhdGEgcGFja2V0cywgYXMgbGlic3NoIGN1cnJlbnRseSBkb2VzIG5vdAoKRVJST1I6
+IEhleCBudW1iZXJzIG11c3QgYmUgcHJlZml4ZWQgd2l0aCAnMHgnCiMxMTIyOiBGSUxFOiBibG9j
+ay90cmFjZS1ldmVudHM6MTg1Ogorc3NoX2F1dGhfbWV0aG9kcyhpbnQgbWV0aG9kcykgImF1dGgg
+bWV0aG9kcz0leCIKCnRvdGFsOiAxIGVycm9ycywgOCB3YXJuaW5ncywgMTE3NSBsaW5lcyBjaGVj
+a2VkCgpDb21taXQgYWJlZjgxN2U0ZThmIChzc2g6IHN3aXRjaCBmcm9tIGxpYnNzaDIgdG8gbGli
+c3NoKSBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2Ug
+ZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIs
+IHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3Qg
+Y29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBh
+dApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDE5MDYwNTIxMzY1NC45Nzg1LTEtcHRvc2Nhbm9A
+cmVkaGF0LmNvbS90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdl
+bmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4K
+UGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
 
-On 6/5/19 3:49 PM, Eduardo Habkost wrote:
-> On Wed, Jun 05, 2019 at 03:42:39PM -0500, Eric Blake wrote:
->> On 6/5/19 3:13 PM, Eduardo Habkost wrote:
->>
->>>> IOW, I don't think RHEL-7 support as a build platform blocks us from=
-
->>>> dropping py2. We merely need to tweak our build platforms doc to cla=
-rify
->>>> our intent wrt add-on yum repos.
->>>
->>> If we clarify the docs in QEMU 4.1, is there anything that
->>> prevents us from removing Python 2 support in QEMU 4.1 too?
->>
->> My take (but not definitive): if we have any CI setups that are testin=
-g
->> RHEL 7 without software collections and/or EPEL, then save Python 2
->> removal for 4.2 to give us time to update CI setups. But if all of our=
-
->> CI setups are already fine, and we clarify the docs, then I'm all for
->> getting rid of Python 2 support in 4.1.
->=20
-> If we do this soon, CI system owners will have at least 9 weeks
-> to fix them before 4.1.0 is released.
->=20
->>
->> Similarly, if we are going to outlaw in-tree builds, let's get that do=
-ne
->> in 4.1 instead of waiting yet another release.
->=20
-> I'm missing the context on this.  Is this from a separate discussion?
-
-Yes, separate threads (for example, this one:
-https://lists.gnu.org/archive/html/qemu-devel/2019-03/msg02553.html),
-but related in that it is a build change that would affect existing
-development and CI. If we're going to make life harder by pulling the
-plug on old ways, we might as well pull the plug on multiple things at on=
-ce.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
-
---8icoOcMmjw5l1fVYR0K9P9eAYg1JJTjlp
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlz4PAYACgkQp6FrSiUn
-Q2q5BAf9HdqnYb16rkpFpnyVseppUEPCqbPvzQ/tarIYgEoOYnGLAsBKwu2bH/BV
-vSebtOJqqMjvZIdqwzkOUDEmfljPQv/qHxs1GTJF9Um6ILz5wMlN//xrJyuIfDx3
-SQBCPizp68rakJNTzxYtSmEivCusae/6IQkXSf4MAr2/NqFx3W8R/wlt9aqwiHyN
-i/Roj2yRWGwPX2g8TVVrWGnCmh+3zSNTrO0QtKRZgjloNOAdPh3g+akcWzXx8xQN
-VWbwaHOZ1OCe3uxmDV2IIcQsFfWesHCCYY03EYhv5bc4vINFq31wKfcHJ6RW4qan
-yNU0Dxohuungs2BC36vN5PcjLq8TqQ==
-=fOmK
------END PGP SIGNATURE-----
-
---8icoOcMmjw5l1fVYR0K9P9eAYg1JJTjlp--
 
