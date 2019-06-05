@@ -2,62 +2,71 @@ Return-Path: <SRS0=3v23=UE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=FROM_EXCESS_BASE64,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CD8C5C28CC5
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 14:25:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B3DEC28CC5
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 14:28:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 835A6206B8
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 14:25:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 835A6206B8
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 27D75206B8
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 14:28:04 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=mail.uni-paderborn.de header.i=@mail.uni-paderborn.de header.b="suOlD5bM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 27D75206B8
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=mail.uni-paderborn.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:43536 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:43557 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hYWqz-0003Qz-Kq
-	for qemu-devel@archiver.kernel.org; Wed, 05 Jun 2019 10:25:25 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:52741)
+	id 1hYWtW-0004Pf-Vv
+	for qemu-devel@archiver.kernel.org; Wed, 05 Jun 2019 10:28:03 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:53267)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1hYWqE-00039Z-JU
-	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 10:24:39 -0400
+	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1hYWsl-00045o-EP
+	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 10:27:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1hYWqD-0007W2-GG
-	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 10:24:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40068)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1hYWqD-0007TM-8Z
-	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 10:24:37 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 75870309264D;
-	Wed,  5 Jun 2019 14:23:39 +0000 (UTC)
-Received: from redhat.com (ovpn-112-70.ams2.redhat.com [10.36.112.70])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 3AFEC5F7C0;
-	Wed,  5 Jun 2019 14:23:03 +0000 (UTC)
-Date: Wed, 5 Jun 2019 15:23:00 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>
-Message-ID: <20190605142300.GB8956@redhat.com>
-References: <87lfyqla7r.fsf@dusky.pond.sub.org>
+	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1hYWsh-0003iq-Tt
+	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 10:27:15 -0400
+Received: from zuban.uni-paderborn.de ([131.234.189.17]:39522)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kbastian@mail.uni-paderborn.de>)
+	id 1hYWse-0003bd-Az
+	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 10:27:10 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=mail.uni-paderborn.de; s=20170601;
+	h=Content-Transfer-Encoding:Content-Type
+	:In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:
+	Sender:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=HC0AcYGlQAsNzoxUJl7DspWemirRXdsK0o2gTwevU/E=;
+	b=suOlD5bMA8Xf+GX6CRlt4IvREK
+	4IcyLBF+/ghF3RPYJU7tw8vbFlCFSu2wGWaPu82LMaFdgZ+CFUrhKoLN2HCFdOlLwzAxG42FjabS/
+	GeXdoaFYXJgQiKHnS6BS9X8N1il4/oPkIjDkeIqtxGrx7DDcWYas9oJGGU3hWBbU1u+Q=; 
+To: David Brenken <david.brenken@efs-auto.org>, qemu-devel@nongnu.org
+References: <20190605061126.10244-1-david.brenken@efs-auto.org>
+	<20190605061126.10244-2-david.brenken@efs-auto.org>
+From: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+Message-ID: <b3ce28a1-4240-d9ea-35c4-8e0fb33fac7d@mail.uni-paderborn.de>
+Date: Wed, 5 Jun 2019 16:27:04 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <87lfyqla7r.fsf@dusky.pond.sub.org>
-User-Agent: Mutt/1.11.4 (2019-03-13)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.43]);
-	Wed, 05 Jun 2019 14:24:36 +0000 (UTC)
+In-Reply-To: <20190605061126.10244-2-david.brenken@efs-auto.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US-large
+X-IMT-Spam-Score: 0.0 ()
+X-PMX-Version: 6.4.6.2792898, Antispam-Engine: 2.7.2.2107409,
+	Antispam-Data: 2019.6.5.141516, AntiVirus-Engine: 5.63.0,
+	AntiVirus-Data: 2019.6.4.5630002
+X-IMT-Authenticated-Sender: kbastian@UNI-PADERBORN.DE
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] Headers without multiple inclusion guards
+X-Received-From: 131.234.189.17
+Subject: Re: [Qemu-devel] [PATCH 1/5] tricore: add FTOIZ instruction
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -69,96 +78,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Chris Wulff <crwulff@gmail.com>,
-	Sagar Karandikar <sagark@eecs.berkeley.edu>,
-	David Hildenbrand <david@redhat.com>, James Hogan <jhogan@kernel.org>,
-	Anthony Green <green@moxielogic.com>, Palmer Dabbelt <palmer@sifive.com>,
-	Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
-	qemu-devel@nongnu.org, Max Filippov <jcmvbkbc@gmail.com>,
-	Dmitry Fleytman <dmitry.fleytman@gmail.com>,
-	Alistair Francis <Alistair.Francis@wdc.com>,
-	Gerd Hoffmann <kraxel@redhat.com>,
-	"Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
-	Guan Xuetao <gxt@mprc.pku.edu.cn>, Marek Vasut <marex@denx.de>,
-	Stefano Stabellini <sstabellini@kernel.org>,
-	Aleksandar Rikalo <arikalo@wavecomp.com>, Helge Deller <deller@gmx.de>,
-	"Michael S. Tsirkin" <mst@redhat.com>, Laszlo Ersek <lersek@redhat.com>,
-	Halil Pasic <pasic@linux.ibm.com>,
-	Christian Borntraeger <borntraeger@de.ibm.com>,
-	Anthony Perard <anthony.perard@citrix.com>,
-	Richard Henderson <rth@twiddle.net>, Jason Wang <jasowang@redhat.com>,
-	Artyom Tarasenko <atar4qemu@gmail.com>,
-	Laurent Vivier <lvivier@redhat.com>,
-	Thomas Huth <thuth@redhat.com>, Riku Voipio <riku.voipio@iki.fi>,
-	Eduardo Habkost <ehabkost@redhat.com>,
-	Alistair Francis <alistair@alistair23.me>, Greg Kurz <groug@kaod.org>,
-	Marcelo Tosatti <mtosatti@redhat.com>,
-	Beniamino Galvani <b.galvani@gmail.com>,
-	Eric Auger <eric.auger@redhat.com>, Paul Durrant <paul.durrant@citrix.com>,
-	Stafford Horne <shorne@gmail.com>,
-	Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>,
-	David Gibson <david@gibson.dropbear.id.au>,
-	Claudio Fontana <claudio.fontana@gmail.com>,
-	Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
-	Cornelia Huck <cohuck@redhat.com>,
-	Claudio Fontana <claudio.fontana@huawei.com>,
-	Laurent Vivier <laurent@vivier.eu>,
-	Andrew Baumann <Andrew.Baumann@microsoft.com>,
-	Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
-	Michael Walle <michael@walle.cc>,
-	Aleksandar Markovic <amarkovic@wavecomp.com>,
-	Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>,
-	Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: Andreas Konopik <andreas.konopik@efs-auto.de>,
+	David Brenken <david.brenken@efs-auto.de>,
+	Robert Rasche <robert.rasche@efs-auto.de>,
+	Georg Hofstetter <georg.hofstetter@efs-auto.de>,
+	Lars Biermanski <lars.biermanski@efs-auto.de>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, May 28, 2019 at 08:12:24PM +0200, Markus Armbruster wrote:
-> We have a bunch of headers without multiple inclusion guards.  Some are
-> clearly intentional, some look accidental.  Too many for me to find out
-> by examining each of them, so I'm asking their maintainers.
-> 
-> Why do I ask?  I'd like to mark the intentional ones and fix the
-> accidental ones, so they don't flunk "make check-headers" from "[RFC v4
-> 0/7] Baby steps towards saner headers" just because they lack multiple
-> inclusion guards.
-> 
-> Just in case: what's a multiple inclusion guard?  It's
-> 
->     #ifndef UNIQUE_GUARD_SYMBOL_H
->     #define UNIQUE_GUARD_SYMBOL_H
->     ...
->     #endif
-> 
-> with nothing but comments outside the conditional, so that the header
-> can safely be included more than once.
 
-Any opinions on using the less verbose syntax instead:
+On 6/5/19 8:11 AM, David Brenken wrote:
+> From: David Brenken <david.brenken@efs-auto.de>
+>
+> Signed-off-by: Andreas Konopik <andreas.konopik@efs-auto.de>
+> Signed-off-by: David Brenken <david.brenken@efs-auto.de>
+> Signed-off-by: Georg Hofstetter <georg.hofstetter@efs-auto.de>
+> Signed-off-by: Robert Rasche <robert.rasche@efs-auto.de>
+> Signed-off-by: Lars Biermanski <lars.biermanski@efs-auto.de>
+>
+> ---
+>   target/tricore/fpu_helper.c | 25 +++++++++++++++++++++++++
+>   target/tricore/helper.h     |  1 +
+>   target/tricore/translate.c  |  3 +++
+>   3 files changed, 29 insertions(+)
 
-  #pragma once
+Reviewed-by: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
 
-It is not portable C, but we explicitly only care about GCC or CLang,
-so portability isn't an issue for us.
+Cheers,
 
+Bastian
 
-> Cryptography
-> M: Daniel P. Berrange <berrange@redhat.com>
-> crypto/ivgen-essiv.h
-> crypto/ivgen-plain.h
-> crypto/ivgen-plain64.h
-
-These have header guards present
-
-> tests/crypto-tls-psk-helpers.h
-> tests/crypto-tls-x509-helpers.h
-
-These should be fixed.
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
