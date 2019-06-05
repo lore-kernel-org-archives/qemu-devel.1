@@ -2,77 +2,79 @@ Return-Path: <SRS0=3v23=UE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5011FC282DE
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 08:34:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BF0AC282DE
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 08:41:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0FF9B2075B
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 08:34:43 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Wv5ls8rl"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0FF9B2075B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id C896B206B8
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 08:41:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C896B206B8
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:37459 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:37539 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hYRNb-0005ff-0d
-	for qemu-devel@archiver.kernel.org; Wed, 05 Jun 2019 04:34:43 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:49359)
+	id 1hYRUJ-00075C-Pd
+	for qemu-devel@archiver.kernel.org; Wed, 05 Jun 2019 04:41:39 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:51037)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <james.dutton@gmail.com>) id 1hYRMp-0005MY-ND
-	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 04:33:57 -0400
+	(envelope-from <philmd@redhat.com>) id 1hYRTR-0006cw-0X
+	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 04:40:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <james.dutton@gmail.com>) id 1hYRMo-00020E-Ai
-	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 04:33:55 -0400
-Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:38799)
+	(envelope-from <philmd@redhat.com>) id 1hYRTP-0003oq-FN
+	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 04:40:44 -0400
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:33213)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <james.dutton@gmail.com>)
-	id 1hYRMl-0001cJ-RA
-	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 04:33:53 -0400
-Received: by mail-oi1-x243.google.com with SMTP id v186so3329290oie.5
-	for <qemu-devel@nongnu.org>; Wed, 05 Jun 2019 01:33:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=mime-version:from:date:message-id:subject:to;
-	bh=SpyvTlbeSte07swkuSAASIUFzwEk9X8t7gDfA+dDPc4=;
-	b=Wv5ls8rlc5G6m0ESpZ7j818DfQyuxX/EkBTJYFst/kRYsk2+rT0fZx2WtyVXxihqV5
-	ummh9Ir2f+rd1BASxIVbwQ/IY9Jere4LRLDET3gWOzkZkirTYOXyI4GHD0nCq6Z0v/n+
-	gwrSiB0fYY0izEoBulvxXFsJVg3PjeMitOZuzRHHulR8PvIcKrM0kVwW+Svjfdr3CcV8
-	1BHuawGEvOoUtIEi2vB0xkOwnppVDsW8rdvra2rcM61s1XsCZFpeH+tPKP3KQS+mhaFk
-	OYFIjkIrNLQRk048h/0CI5gQY6pPzQ+kCgoLXjNEfNeI9L2/Y1XJwRO8Cl9XSJ5/uRvI
-	0cjA==
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hYRTP-0003ig-8q
+	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 04:40:43 -0400
+Received: by mail-wr1-f65.google.com with SMTP id n9so6112822wru.0
+	for <qemu-devel@nongnu.org>; Wed, 05 Jun 2019 01:40:43 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
-	bh=SpyvTlbeSte07swkuSAASIUFzwEk9X8t7gDfA+dDPc4=;
-	b=SNhXzxNgxUbPPFkPyRBwF9RMfq00afxRWwmrxAzfx8ZZfc7jOIN+KQIMZZHTvK46y/
-	Jl5JguwmbPcF822q2ualOg+4oBimrenxl/OZCz1IbYWYZmqTIX94UFRAiXZTo6ZTZSoq
-	2pLKNKAnr1s8HC/FocbejWIgWzCmlq6HqJzVKVr2oBA8/QrEcIMhM4vEwdoSVX9GHOAf
-	SdyOkq1SDyJUx05nSvCailev04/Ljv5oKk3m201e9gKLGTRlVYf55wp+rHunXzeOAtIk
-	cQf5f7uRgT+kR3tIg34T0AY4PxFOk3v+tFmuSArWKF7E3/7CGJ91CTSQQRJB4JuRYFTc
-	ss1w==
-X-Gm-Message-State: APjAAAV5lceW5uM2yI1davtqBUbVdGxJpF1w+9D2603e+hK0vQjXJzMi
-	lIEBA/HP4o26um8hO/hCwDTC1mbtuNuK8ckbUWkIw9Yjnuw=
-X-Google-Smtp-Source: APXvYqyUscE+odRNQ0BjwEHr0NKr/cW3EHSmzsWbGXuD3lJhXW4torkH5+Dj1eJVS9Utr3BjWp5624sg6IH9bhK5WxE=
-X-Received: by 2002:aca:4f0c:: with SMTP id d12mr3960529oib.35.1559723626368; 
-	Wed, 05 Jun 2019 01:33:46 -0700 (PDT)
+	h=x-gm-message-state:subject:to:references:from:openpgp:message-id
+	:date:user-agent:mime-version:in-reply-to:content-language
+	:content-transfer-encoding;
+	bh=5Zy0VKMS+/+Z6weJ5zHduLr6HV/gyWV6Xu/AW/LD2WQ=;
+	b=hR+YIVVpv5F//a1Xz1bZp4RAJzH3Ueq+RFUPlASHfMElbMf+AWbuKbhMz9aKiiBTJq
+	DfnLHsJajdCTTq8nmzXoG7V+4SnOimCPgct7xuSbp0mVg4N7BCfbABgt0tZpK9Be2chV
+	oMKoPxKVZEZg4qspiGoq9l2p0jUKW2WQVwfbanjg/WYFa3rJS5XYD0cc0NkuD328AHu9
+	9MK22rFZL6eZBpXB6cTsghKeA+jZ02M4KkkGKcBVF2lh+npNZMMoWC71o9AwCnbqjc0z
+	ROTy/0KMifHOhVXMhFT/FAmuLySjjSojHI+n5timC9a8pnGjb2GNi7V9m/lI4cbvyOPp
+	Qvyw==
+X-Gm-Message-State: APjAAAXrDWaHoaSga4cwhANeWRnTSVWDmVufU6iDDRLMGPccUy31jUpY
+	NA2PZdkrlUE4gm5c8ygzg9iNgR6Ukf4=
+X-Google-Smtp-Source: APXvYqwdzV4br/B6waH0GNhIWUon6scdjE4BK8cEpgOUZvEbsWQPJF3WW/gLAkujW8AdIO7CNp/oMQ==
+X-Received: by 2002:adf:8086:: with SMTP id 6mr15650178wrl.320.1559724041706; 
+	Wed, 05 Jun 2019 01:40:41 -0700 (PDT)
+Received: from [192.168.1.38] (183.red-88-21-202.staticip.rima-tde.net.
+	[88.21.202.183]) by smtp.gmail.com with ESMTPSA id
+	a17sm14747667wrr.80.2019.06.05.01.40.40
+	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+	Wed, 05 Jun 2019 01:40:41 -0700 (PDT)
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+References: <20190604181618.19980-1-armbru@redhat.com>
+	<20190604181618.19980-4-armbru@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+	url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <87eda0df-0f83-d70f-943d-9d8405351db9@redhat.com>
+Date: Wed, 5 Jun 2019 10:40:40 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-From: James Courtier-Dutton <james.dutton@gmail.com>
-Date: Wed, 5 Jun 2019 09:33:10 +0100
-Message-ID: <CAAMvbhGcKWRv8b5qEp+gopTFU1daUkVraJids=b3of0Q7zWqqA@mail.gmail.com>
-To: qemu-devel@nongnu.org
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::243
-Content-Type: text/plain; charset="UTF-8"
-X-Content-Filtered-By: Mailman/MimeDel 2.1.21
-Subject: [Qemu-devel] Problems with Pass through of a AMD Vega 56/64
+In-Reply-To: <20190604181618.19980-4-armbru@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+	[fuzzy]
+X-Received-From: 209.85.221.65
+Subject: Re: [Qemu-devel] [PATCH 3/4] Clean up a few header guard symbols
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -88,47 +90,181 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi,
+On 6/4/19 8:16 PM, Markus Armbruster wrote:
+> Commit 58ea30f5145 "Clean up header guards that don't match their file
+> name" messed up contrib/elf2dmp/qemu_elf.h and
+> tests/migration/migration-test.h.
+> 
+> It missed target/cris/opcode-cris.h and
+> tests/uefi-test-tools/UefiTestToolsPkg/Include/Guid/BiosTablesTest.h
+> due to the scripts/clean-header-guards.pl bug fixed in the previous
+> commit.
+> 
+> Commit a8b991b52dc "Clean up ill-advised or unusual header guards"
+> missed include/hw/xen/io/ring.h for the same reason.
+> 
+> Commit 3979fca4b69 "disas: Rename include/disas/bfd.h back to
+> include/disas/dis-asm.h" neglected to update the guard symbol for the
+> rename.
+> 
+> Commit a331c6d7741 "semihosting: implement a semihosting console"
+> created include/hw/semihosting/console.h with an ill-advised guard
+> symbol.
+> 
+> Clean them up.
+> 
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> ---
+>  contrib/elf2dmp/qemu_elf.h                                  | 5 ++---
+>  include/disas/dis-asm.h                                     | 6 +++---
+>  include/hw/semihosting/console.h                            | 6 +++---
+>  include/hw/xen/io/ring.h                                    | 6 +++---
+>  target/cris/opcode-cris.h                                   | 6 +++---
+>  tests/migration/migration-test.h                            | 2 +-
+>  .../UefiTestToolsPkg/Include/Guid/BiosTablesTest.h          | 6 +++---
+>  7 files changed, 18 insertions(+), 19 deletions(-)
+> 
+> diff --git a/contrib/elf2dmp/qemu_elf.h b/contrib/elf2dmp/qemu_elf.h
+> index 66ee1f0ed5..b2f0d9cbc9 100644
+> --- a/contrib/elf2dmp/qemu_elf.h
+> +++ b/contrib/elf2dmp/qemu_elf.h
+> @@ -2,11 +2,10 @@
+>   * Copyright (c) 2018 Virtuozzo International GmbH
+>   *
+>   * This work is licensed under the terms of the GNU GPL, version 2 or later.
+> - *
+>   */
+>  
+> -#ifndef EMPF2DMP_QEMU_ELF_H
+> -#define EMPF2DMP_QEMU_ELF_H
+> +#ifndef ELF2DMP_QEMU_ELF_H
+> +#define ELF2DMP_QEMU_ELF_H
+>  
+>  #include "elf.h"
+>  
+> diff --git a/include/disas/dis-asm.h b/include/disas/dis-asm.h
+> index 9240ec32c2..e9c7dd8eb4 100644
+> --- a/include/disas/dis-asm.h
+> +++ b/include/disas/dis-asm.h
+> @@ -6,8 +6,8 @@
+>     interface, for making instruction-processing programs more independent
+>     of the instruction set being processed.  */
+>  
+> -#ifndef DISAS_BFD_H
+> -#define DISAS_BFD_H
+> +#ifndef DISAS_DIS_ASM_H
+> +#define DISAS_DIS_ASM_H
+>  
+>  typedef void *PTR;
+>  typedef uint64_t bfd_vma;
+> @@ -508,4 +508,4 @@ bfd_vma bfd_getl16 (const bfd_byte *addr);
+>  bfd_vma bfd_getb16 (const bfd_byte *addr);
+>  typedef bool bfd_boolean;
+>  
+> -#endif /* DISAS_BFD_H */
+> +#endif /* DISAS_DIS_ASM_H */
+> diff --git a/include/hw/semihosting/console.h b/include/hw/semihosting/console.h
+> index 30e66ae20a..9eb45b7c53 100644
+> --- a/include/hw/semihosting/console.h
+> +++ b/include/hw/semihosting/console.h
+> @@ -6,8 +6,8 @@
+>   * SPDX-License-Identifier: GPL-2.0-or-later
+>   */
+>  
+> -#ifndef _SEMIHOST_CONSOLE_H_
+> -#define _SEMIHOST_CONSOLE_H_
+> +#ifndef SEMIHOST_CONSOLE_H
+> +#define SEMIHOST_CONSOLE_H
+>  
+>  /**
+>   * qemu_semihosting_console_out:
+> @@ -35,4 +35,4 @@ int qemu_semihosting_console_out(CPUArchState *env, target_ulong s, int len);
+>   */
+>  int qemu_semihosting_log_out(const char *s, int len);
+>  
+> -#endif /* _SEMIHOST_CONSOLE_H_ */
+> +#endif /* SEMIHOST_CONSOLE_H */
+> diff --git a/include/hw/xen/io/ring.h b/include/hw/xen/io/ring.h
+> index 1adacf09f9..62abfd7a6e 100644
+> --- a/include/hw/xen/io/ring.h
+> +++ b/include/hw/xen/io/ring.h
+> @@ -24,8 +24,8 @@
+>   * Tim Deegan and Andrew Warfield November 2004.
+>   */
+>  
+> -#ifndef __XEN_PUBLIC_IO_RING_H__
+> -#define __XEN_PUBLIC_IO_RING_H__
+> +#ifndef XEN_PUBLIC_IO_RING_H
+> +#define XEN_PUBLIC_IO_RING_H
+>  
+>  /*
+>   * When #include'ing this header, you need to provide the following
+> @@ -469,7 +469,7 @@ struct name##_data_intf {                                                     \
+>  };                                                                            \
+>  DEFINE_XEN_FLEX_RING(name)
+>  
+> -#endif /* __XEN_PUBLIC_IO_RING_H__ */
+> +#endif /* XEN_PUBLIC_IO_RING_H */
+>  
+>  /*
+>   * Local variables:
+> diff --git a/target/cris/opcode-cris.h b/target/cris/opcode-cris.h
+> index e7ebb98cd0..40509c88db 100644
+> --- a/target/cris/opcode-cris.h
+> +++ b/target/cris/opcode-cris.h
+> @@ -19,8 +19,8 @@ GNU General Public License for more details.
+>  You should have received a copy of the GNU General Public License
+>  along with this program; if not, see <http://www.gnu.org/licenses/>.  */
+>  
+> -#ifndef __CRIS_H_INCLUDED_
+> -#define __CRIS_H_INCLUDED_
+> +#ifndef TARGET_CRIS_OPCODE_CRIS_H
+> +#define TARGET_CRIS_OPCODE_CRIS_H
+>  
+>  #if !defined(__STDC__) && !defined(const)
+>  #define const
+> @@ -345,7 +345,7 @@ extern const struct cris_opcode cris_opcodes[];
+>     sign-extended before adding to "target".  */
+>  #define CRIS_DIS_FLAG_MEM_TARGET2_MEM_WORD (1 << 7)
+>  
+> -#endif /* __CRIS_H_INCLUDED_ */
+> +#endif /* TARGET_CRIS_OPCODE_CRIS_H */
+>  
+>  /*
+>   * Local variables:
+> diff --git a/tests/migration/migration-test.h b/tests/migration/migration-test.h
+> index aa3c3a9625..68512c0b1b 100644
+> --- a/tests/migration/migration-test.h
+> +++ b/tests/migration/migration-test.h
+> @@ -32,4 +32,4 @@
+>   */
+>  #define ARM_TEST_MAX_KERNEL_SIZE (512 * 1024)
+>  
+> -#endif /* _MIGRATION_TEST_H */
+> +#endif /* MIGRATION_TEST_H */
+> diff --git a/tests/uefi-test-tools/UefiTestToolsPkg/Include/Guid/BiosTablesTest.h b/tests/uefi-test-tools/UefiTestToolsPkg/Include/Guid/BiosTablesTest.h
+> index 7a74c121d5..07808787cc 100644
+> --- a/tests/uefi-test-tools/UefiTestToolsPkg/Include/Guid/BiosTablesTest.h
+> +++ b/tests/uefi-test-tools/UefiTestToolsPkg/Include/Guid/BiosTablesTest.h
+> @@ -21,8 +21,8 @@
+>    WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+>  **/
+>  
+> -#ifndef __BIOS_TABLES_TEST_H__
+> -#define __BIOS_TABLES_TEST_H__
+> +#ifndef BIOSTABLESTEST_H
+> +#define BIOSTABLESTEST_H
+>  
+>  #include <Uefi/UefiBaseType.h>
+>  
+> @@ -77,4 +77,4 @@ typedef struct {
+>  } BIOS_TABLES_TEST;
+>  #pragma pack ()
+>  
+> -#endif // __BIOS_TABLES_TEST_H__
+> +#endif /* BIOSTABLESTEST_H */
+> 
 
-Problem:
-Pass through of a AMD Vega 56 or 64 on a AMD Threadripper 1950X with X399
-Motherboard , Host OS: Linux Kernel 5.1.5, did not work.
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-Various problems were observed:
-1) PCI BAR resizing -  The GPU tries to resize the BAR from 256M to 8G. The
-resize fails, but the Guest does not know this, and continues on as if it
-was resized, resulting in a VM_L2_PROTECTION_FAULT_STATUS in the guest.
-Symptoms of (1):
-Able to passthru most PCI devices except the GPU.
-Solution:
-This problem has been worked-around with (See other email by Alex W):
-[PATCH] vfio/pci: Hide Resizable BAR capability
-The reason the GPU was problematic, is because it was the only device that
-tried to resize the BAR.
-Fortunately, the AMD GPU driver can work with a 256M or 8G BAR.
-The real fix will be the implementation of support for PCI BAR Resizing in
-QEMU and VFIO.
-
-2) The QEMU fails to start with GPU passthrough, in that it does not reach
-the Seabios messages and sits at 100% CPU.
-I verified that the AMD GPU card's option ROM contained both Legacy BIOS
-and EFI images in it.
-Removing the GPU PCI device in virt-manager allows the VM to boot, but
-adding the GPU PCI device causes it to fail to boot.
-Symptoms:
-VM won't start, left with blank screen.
-Solution:
-Using Q35 and OVMF EFI works.
-Using 440 and Seabios does not work.
-My guess is there is a bug in Seabios preventing it from working.
-
-3) Use case:  Have 2 AMD Vega CPUs and wish only one to be passthru to
-guest and the other to be used by the Host.
-Problem: Currently you can passthru both, or neither.
-Solution:
-I have written a patch for VFIO to handle this, but it is still work in
-progress before it will be accepted into kernel mainstream.
-
-Kind Regards
-
-James
