@@ -2,90 +2,65 @@ Return-Path: <SRS0=3v23=UE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=FROM_EXCESS_BASE64,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CFE78C28CC5
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 16:27:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 22E76C28CC5
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 16:28:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8EC38206BB
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 16:27:48 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="H0w6Xxfm"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8EC38206BB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id DEC41206C3
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 16:28:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DEC41206C3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:45997 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:46018 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hYYlP-0002KZ-SW
-	for qemu-devel@archiver.kernel.org; Wed, 05 Jun 2019 12:27:47 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:36315)
+	id 1hYYmX-0003BT-6i
+	for qemu-devel@archiver.kernel.org; Wed, 05 Jun 2019 12:28:57 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:36761)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hYYhH-0007N1-RS
-	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 12:23:33 -0400
+	(envelope-from <berrange@redhat.com>) id 1hYYie-00006U-MH
+	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 12:24:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hYYhG-0008Rl-Jm
-	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 12:23:31 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:35638)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1hYYhG-0008Py-Ad
-	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 12:23:30 -0400
-Received: by mail-wr1-x444.google.com with SMTP id m3so4297671wrv.2
-	for <qemu-devel@nongnu.org>; Wed, 05 Jun 2019 09:23:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=from:to:cc:subject:date:message-id:in-reply-to:references
-	:mime-version:content-transfer-encoding;
-	bh=rcKOmyd4ZaJmv55WtxWWnJZ8WFn3ij4YBnIuaHka/0g=;
-	b=H0w6XxfmZPjrAr6usSvL4nzgsJYDFQDo1HNicJwdUrCTSzThYkYoOQwRL/hjH5LMdC
-	MchbzrqgG9IMEpW1JY7bpZKIt227RUl9r8bGdSImmfhIM+ec6T4veUN3sBd7R6xiE4FJ
-	dDQWmwAGFz/8pVThvUkSiankXeVXrOLz54bxm7IeDo2tP89fDDZss2n1sEMfHaq0641F
-	dg9QDdjUnQh8pBBY1wPdTb5THKkvnbVG2tuXva0ZF7Gnrhvr66nzfU+N87baNTVoHDZ5
-	PpRcpzRbCi6P2kUIMLXUQQh0x7pfPGyyZlaq4EIndCo/os7syt01udm0ra7jQ/ARJ8fE
-	uAbw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-	:references:mime-version:content-transfer-encoding;
-	bh=rcKOmyd4ZaJmv55WtxWWnJZ8WFn3ij4YBnIuaHka/0g=;
-	b=OUAZS5sj0u+h1EhWv2px5vAgLvV/JHpNVJqG01cCkyYbRY2oKtOKYXplkh/PbxtNbU
-	O+upYZhKTQUKghXNj7J4N+r9efx/gcqOGwUaZ8iHI1qbmUuk8xo5qTNBw/PQHRoqHYhs
-	qFWdjWEZoHHJ8S7VfD/HAYD5oQgHqtHqv6hdKccsdFwpKXp3VVhkOgOJCdxHSdH4GGEm
-	Vh/wiQ9IPvW0/yApFSAvUzRmBCFJaehR+lJffRcFrvfiEHg6zUjN6haAYH2ecpJhZJnY
-	JdcZXZzw1fQ4l9XA1/HNzWVRw19URot++rKWS23PVW9/dIHH8s1BFZDOzQAb7WiLl3UV
-	JDJg==
-X-Gm-Message-State: APjAAAVNJChzoMo8B6mGgIYmSfKdp2MgHUwq/jLbZBWif0NxKZZsAeHR
-	CK98UoI4aG4ecD13jpGlD8D0cg==
-X-Google-Smtp-Source: APXvYqxU4GLaBDSW9YYV1IqGchVaC/aFXCBvPzwBWyoZ091v6gqQvvWiz74Ycqxwx0QAMUrnOeWAng==
-X-Received: by 2002:adf:e50c:: with SMTP id j12mr4963637wrm.117.1559751809247; 
-	Wed, 05 Jun 2019 09:23:29 -0700 (PDT)
-Received: from zen.linaroharston ([81.128.185.34])
-	by smtp.gmail.com with ESMTPSA id
-	o1sm36394944wre.76.2019.06.05.09.23.27
-	(version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-	Wed, 05 Jun 2019 09:23:27 -0700 (PDT)
-Received: from zen.linaroharston. (localhost [127.0.0.1])
-	by zen.linaroharston (Postfix) with ESMTP id CE7D31FF90;
-	Wed,  5 Jun 2019 17:23:26 +0100 (BST)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-devel@nongnu.org
-Date: Wed,  5 Jun 2019 17:23:25 +0100
-Message-Id: <20190605162326.13896-4-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190605162326.13896-1-alex.bennee@linaro.org>
-References: <20190605162326.13896-1-alex.bennee@linaro.org>
+	(envelope-from <berrange@redhat.com>) id 1hYYid-00038a-DR
+	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 12:24:56 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44504)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1hYYid-00036r-4k
+	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 12:24:55 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 817AD30821C2;
+	Wed,  5 Jun 2019 16:24:30 +0000 (UTC)
+Received: from redhat.com (ovpn-112-70.ams2.redhat.com [10.36.112.70])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 13A155D9D6;
+	Wed,  5 Jun 2019 16:23:50 +0000 (UTC)
+Date: Wed, 5 Jun 2019 17:23:48 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <20190605162348.GN8956@redhat.com>
+References: <87lfyqla7r.fsf@dusky.pond.sub.org>
+	<20190605142300.GB8956@redhat.com>
+	<a6739318-7837-6273-7afa-b19f941ee8aa@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2a00:1450:4864:20::444
-Subject: [Qemu-devel] [PATCH v1 3/4] tests/tcg: clean-up VPATH/TESTS for i386
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <a6739318-7837-6273-7afa-b19f941ee8aa@redhat.com>
+User-Agent: Mutt/1.11.4 (2019-03-13)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.47]);
+	Wed, 05 Jun 2019 16:24:54 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] Headers without multiple inclusion guards
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -97,58 +72,135 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
-	=?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
-	Eduardo Habkost <ehabkost@redhat.com>, Richard Henderson <rth@twiddle.net>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Chris Wulff <crwulff@gmail.com>,
+	Sagar Karandikar <sagark@eecs.berkeley.edu>,
+	David Hildenbrand <david@redhat.com>, James Hogan <jhogan@kernel.org>,
+	Anthony Green <green@moxielogic.com>, Palmer Dabbelt <palmer@sifive.com>,
+	Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+	qemu-devel@nongnu.org, Max Filippov <jcmvbkbc@gmail.com>,
+	Dmitry Fleytman <dmitry.fleytman@gmail.com>,
+	Alistair Francis <Alistair.Francis@wdc.com>,
+	Gerd Hoffmann <kraxel@redhat.com>,
+	"Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+	Guan Xuetao <gxt@mprc.pku.edu.cn>, Marek Vasut <marex@denx.de>,
+	Stefano Stabellini <sstabellini@kernel.org>,
+	Aleksandar Rikalo <arikalo@wavecomp.com>, Helge Deller <deller@gmx.de>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Markus Armbruster <armbru@redhat.com>, Halil Pasic <pasic@linux.ibm.com>,
+	Christian Borntraeger <borntraeger@de.ibm.com>,
+	Anthony Perard <anthony.perard@citrix.com>,
+	Richard Henderson <rth@twiddle.net>, Jason Wang <jasowang@redhat.com>,
+	Artyom Tarasenko <atar4qemu@gmail.com>,
+	Laurent Vivier <lvivier@redhat.com>,
+	Thomas Huth <thuth@redhat.com>, Riku Voipio <riku.voipio@iki.fi>,
+	Eduardo Habkost <ehabkost@redhat.com>,
+	Alistair Francis <alistair@alistair23.me>, Greg Kurz <groug@kaod.org>,
+	Marcelo Tosatti <mtosatti@redhat.com>,
+	Beniamino Galvani <b.galvani@gmail.com>,
+	Eric Auger <eric.auger@redhat.com>, Paul Durrant <paul.durrant@citrix.com>,
+	Stafford Horne <shorne@gmail.com>,
+	Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>,
+	David Gibson <david@gibson.dropbear.id.au>,
+	Claudio Fontana <claudio.fontana@gmail.com>,
+	Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+	Cornelia Huck <cohuck@redhat.com>,
+	Claudio Fontana <claudio.fontana@huawei.com>,
+	Laurent Vivier <laurent@vivier.eu>,
+	Andrew Baumann <Andrew.Baumann@microsoft.com>,
+	Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+	Michael Walle <michael@walle.cc>,
+	Aleksandar Markovic <amarkovic@wavecomp.com>,
+	Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>,
+	Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Since we only run build the multiarch tests and we use a fully
-resolved path for the crt object we don't need the wildcard or VPATH
-messing about.
+On Wed, Jun 05, 2019 at 06:18:38PM +0200, Laszlo Ersek wrote:
+> On 06/05/19 16:23, Daniel P. Berrang=C3=A9 wrote:
+> > On Tue, May 28, 2019 at 08:12:24PM +0200, Markus Armbruster wrote:
+> >> We have a bunch of headers without multiple inclusion guards.  Some =
+are
+> >> clearly intentional, some look accidental.  Too many for me to find =
+out
+> >> by examining each of them, so I'm asking their maintainers.
+> >>
+> >> Why do I ask?  I'd like to mark the intentional ones and fix the
+> >> accidental ones, so they don't flunk "make check-headers" from "[RFC=
+ v4
+> >> 0/7] Baby steps towards saner headers" just because they lack multip=
+le
+> >> inclusion guards.
+> >>
+> >> Just in case: what's a multiple inclusion guard?  It's
+> >>
+> >>     #ifndef UNIQUE_GUARD_SYMBOL_H
+> >>     #define UNIQUE_GUARD_SYMBOL_H
+> >>     ...
+> >>     #endif
+> >>
+> >> with nothing but comments outside the conditional, so that the heade=
+r
+> >> can safely be included more than once.
+> >=20
+> > Any opinions on using the less verbose syntax instead:
+> >=20
+> >   #pragma once
+> >=20
+> > It is not portable C, but we explicitly only care about GCC or CLang,
+> > so portability isn't an issue for us.
+>=20
+> I don't feel strongly about this particular question, so if folks prefe=
+r
+> "#pragma once", I won't complain. I'd just like to report that section =
+6
+> of "HACKING" appears the opposite of "we explicitly only care about GCC
+> or CLang".
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
----
- tests/tcg/i386/Makefile.softmmu-target | 9 ++-------
- 1 file changed, 2 insertions(+), 7 deletions(-)
+Heh, yeah that doc does require some updating, as we certainly don't
+require conformance to the vanilla C standard any more.  We now explicitl=
+y
+request "-std=3Dgnu99" as the conformance level which allows many GNU
+extensions to the standard.
 
-diff --git a/tests/tcg/i386/Makefile.softmmu-target b/tests/tcg/i386/Makefile.softmmu-target
-index e1f98177aa..e1d880f9b5 100644
---- a/tests/tcg/i386/Makefile.softmmu-target
-+++ b/tests/tcg/i386/Makefile.softmmu-target
-@@ -8,15 +8,10 @@
- 
- I386_SYSTEM_SRC=$(SRC_PATH)/tests/tcg/i386/system
- X64_SYSTEM_SRC=$(SRC_PATH)/tests/tcg/x86_64/system
--# Set search path for all sources
--VPATH+=$(I386_SYSTEM_SRC)
- 
- # These objects provide the basic boot code and helper functions for all tests
- CRT_OBJS=boot.o
- 
--X86_TEST_SRCS=$(wildcard $(I386_SYSTEM_SRC)/*.c)
--X86_TESTS = $(patsubst $(I386_SYSTEM_SRC)/%.c, %, $(X86_TEST_SRCS))
--
- ifeq ($(TARGET_X86_64), y)
- CRT_PATH=$(X64_SYSTEM_SRC)
- LINK_SCRIPT=$(X64_SYSTEM_SRC)/kernel.ld
-@@ -26,12 +21,12 @@ CRT_PATH=$(I386_SYSTEM_SRC)
- CFLAGS+=-m32
- LINK_SCRIPT=$(I386_SYSTEM_SRC)/kernel.ld
- LDFLAGS=-Wl,-T$(LINK_SCRIPT) -Wl,-melf_i386
--# FIXME: move to common once x86_64 is bootstrapped
--TESTS+=$(X86_TESTS) $(MULTIARCH_TESTS)
- endif
- CFLAGS+=-nostdlib -ggdb -O0 $(MINILIB_INC)
- LDFLAGS+=-static -nostdlib $(CRT_OBJS) $(MINILIB_OBJS) -lgcc
- 
-+TESTS+=$(MULTIARCH_TESTS)
-+
- # building head blobs
- .PRECIOUS: $(CRT_OBJS)
- 
--- 
-2.20.1
+commit 7be41675f7cb16be7c8d2554add7a63fa43781a8
+Author: Thomas Huth <thuth@redhat.com>
+Date:   Mon Jan 7 11:25:22 2019 +0100
 
+    configure: Force the C standard to gnu99
+   =20
+    Different versions of GCC and Clang use different versions of the C s=
+tandard.
+    This repeatedly caused problems already, e.g. with duplicated typedef=
+s:
+   =20
+     https://lists.gnu.org/archive/html/qemu-devel/2018-11/msg05829.html
+   =20
+    or with for-loop variable initializers:
+   =20
+     https://lists.gnu.org/archive/html/qemu-devel/2019-01/msg00237.html
+   =20
+    To avoid these problems, we should enforce the C language version to =
+the
+    same level for all compilers. Since our minimum compiler versions is
+    GCC v4.8, our best option is "gnu99" for C code right now ("gnu17" is=
+ not
+    available there yet, and "gnu11" is marked as "experimental"), and "g=
+nu++98"
+    for the few C++ code that we have in the repository.
+
+
+The HACKING docs predate this commit, and when reviewing, we failed to
+notice we needed to update HACKING to match our new policy.
+
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
 
