@@ -2,51 +2,49 @@ Return-Path: <SRS0=3v23=UE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 80A2EC282DE
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 10:10:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AE7FFC28CC5
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 10:10:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 57F50206B8
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 10:10:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 57F50206B8
+	by mail.kernel.org (Postfix) with ESMTPS id 8C2A5206B8
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 10:10:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8C2A5206B8
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:38574 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:38576 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hYSsV-0000jA-6W
-	for qemu-devel@archiver.kernel.org; Wed, 05 Jun 2019 06:10:43 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:40497)
+	id 1hYSsZ-0000mk-JG
+	for qemu-devel@archiver.kernel.org; Wed, 05 Jun 2019 06:10:49 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:40505)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hYSr9-0008HL-En
+	(envelope-from <vsementsov@virtuozzo.com>) id 1hYSr9-0008HN-OS
 	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 06:09:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hYSr8-0007ay-Hh
+	(envelope-from <vsementsov@virtuozzo.com>) id 1hYSr8-0007az-Hh
 	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 06:09:19 -0400
-Received: from relay.sw.ru ([185.231.240.75]:47168)
+Received: from relay.sw.ru ([185.231.240.75]:47174)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1hYSr8-0007Yu-9T; Wed, 05 Jun 2019 06:09:18 -0400
+	id 1hYSr8-0007Yt-9R; Wed, 05 Jun 2019 06:09:18 -0400
 Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
 	by relay.sw.ru with esmtp (Exim 4.91)
 	(envelope-from <vsementsov@virtuozzo.com>)
-	id 1hYSr4-0000xT-6Y; Wed, 05 Jun 2019 13:09:14 +0300
+	id 1hYSr3-0000xT-OZ; Wed, 05 Jun 2019 13:09:13 +0300
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-devel@nongnu.org,
 	qemu-block@nongnu.org
-Date: Wed,  5 Jun 2019 13:09:13 +0300
-Message-Id: <20190605100913.34972-3-vsementsov@virtuozzo.com>
+Date: Wed,  5 Jun 2019 13:09:11 +0300
+Message-Id: <20190605100913.34972-1-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.18.0
-In-Reply-To: <20190605100913.34972-1-vsementsov@virtuozzo.com>
-References: <20190605100913.34972-1-vsementsov@virtuozzo.com>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
 X-Received-From: 185.231.240.75
-Subject: [Qemu-devel] [PATCH 2/2] nbd-client: enable TCP keepalive
+Subject: [Qemu-devel] [PATCH 0/2] nbd: enable keepalive
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -64,26 +62,20 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Enable keepalive option to track server availablity.
+Hi all!
 
-Requested-by: Denis V. Lunev <den@openvz.org>
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
----
- block/nbd-client.c | 1 +
- 1 file changed, 1 insertion(+)
+Here is a suggestion to enable keepalive option to track server availablity.
 
-diff --git a/block/nbd-client.c b/block/nbd-client.c
-index 790ecc1ee1..b57cea8482 100644
---- a/block/nbd-client.c
-+++ b/block/nbd-client.c
-@@ -1137,6 +1137,7 @@ static int nbd_client_connect(BlockDriverState *bs,
- 
-     /* NBD handshake */
-     logout("session init %s\n", export);
-+    qio_channel_set_keepalive(QIO_CHANNEL(sioc), true, NULL);
-     qio_channel_set_blocking(QIO_CHANNEL(sioc), true, NULL);
- 
-     client->info.request_sizes = true;
+Vladimir Sementsov-Ogievskiy (2):
+  io/channel: add qio_channel_set_keepalive
+  nbd-client: enable TCP keepalive
+
+ include/io/channel.h | 13 +++++++++++++
+ block/nbd-client.c   |  1 +
+ io/channel-socket.c  | 19 +++++++++++++++++++
+ io/channel.c         | 14 ++++++++++++++
+ 4 files changed, 47 insertions(+)
+
 -- 
 2.18.0
 
