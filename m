@@ -2,67 +2,71 @@ Return-Path: <SRS0=3v23=UE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=FROM_EXCESS_BASE64,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 13B7CC28CC5
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 15:11:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D6F58C28CC5
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 15:12:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 267322067C
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 15:11:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 267322067C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id A6D8D2067C
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 15:12:55 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=mail.uni-paderborn.de header.i=@mail.uni-paderborn.de header.b="HSBbnfe3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A6D8D2067C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=mail.uni-paderborn.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:44284 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:44300 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hYXZr-0007ip-Cu
-	for qemu-devel@archiver.kernel.org; Wed, 05 Jun 2019 11:11:47 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:38454)
+	id 1hYXaw-0008V2-Vq
+	for qemu-devel@archiver.kernel.org; Wed, 05 Jun 2019 11:12:54 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:38638)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1hYXYh-00077f-Ex
-	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 11:10:36 -0400
+	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1hYXZB-0007SJ-2M
+	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 11:11:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1hYXYf-0000YA-1n
-	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 11:10:35 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:65386)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1hYXYc-0000Jh-Sk
-	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 11:10:32 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 536DE30ADC8F;
-	Wed,  5 Jun 2019 15:10:25 +0000 (UTC)
-Received: from redhat.com (ovpn-112-70.ams2.redhat.com [10.36.112.70])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 3E524619C4;
-	Wed,  5 Jun 2019 15:10:11 +0000 (UTC)
-Date: Wed, 5 Jun 2019 16:10:08 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Message-ID: <20190605151008.GE8956@redhat.com>
-References: <20190523234011.583-1-marcandre.lureau@redhat.com>
-	<20190523234011.583-4-marcandre.lureau@redhat.com>
-	<e0cf3112-62f6-aaff-0821-f472297dbb93@redhat.com>
-	<CAMxuvay+ZrdjhJg-juU0aTOtcy=cLshC+WGyPBQ6VysXZksa5w@mail.gmail.com>
+	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1hYXZA-0001AU-0A
+	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 11:11:05 -0400
+Received: from zuban.uni-paderborn.de ([131.234.189.17]:53384)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kbastian@mail.uni-paderborn.de>)
+	id 1hYXZ8-0000ld-Mq
+	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 11:11:03 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=mail.uni-paderborn.de; s=20170601;
+	h=Content-Transfer-Encoding:Content-Type
+	:In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:
+	Sender:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=g13SMHpLF2ukBpYf9747dCTiSOcThrdT7VUIQ1chP9E=;
+	b=HSBbnfe3996crJu2TYL528Tovh
+	It9JFoAsclUTkUOges2MtxFqc9t11epFGqoUkJ4EAM9p3RE/rxNfRzm7UbLft9S7iJaGreBsJruZc
+	ypZIfTZoW7M1XQuzS9F4bEOh7QB53VS7aCqkwmGg1X+BiM+xhi15NtNwiAGuet6sHyrg=; 
+To: David Brenken <david.brenken@efs-auto.org>, qemu-devel@nongnu.org
+References: <20190605061126.10244-1-david.brenken@efs-auto.org>
+From: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+Message-ID: <1b2d4995-8a9c-887e-6b8a-f0c6936fbb91@mail.uni-paderborn.de>
+Date: Wed, 5 Jun 2019 17:10:39 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAMxuvay+ZrdjhJg-juU0aTOtcy=cLshC+WGyPBQ6VysXZksa5w@mail.gmail.com>
-User-Agent: Mutt/1.11.4 (2019-03-13)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.47]);
-	Wed, 05 Jun 2019 15:10:25 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20190605061126.10244-1-david.brenken@efs-auto.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US-large
+X-IMT-Spam-Score: 0.0 ()
+X-PMX-Version: 6.4.6.2792898, Antispam-Engine: 2.7.2.2107409,
+	Antispam-Data: 2019.6.5.150316, AntiVirus-Engine: 5.63.0,
+	AntiVirus-Data: 2019.6.4.5630002
+X-IMT-Authenticated-Sender: kbastian@UNI-PADERBORN.DE
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 3/4] docker: update fedora to f30
+X-Received-From: 131.234.189.17
+Subject: Re: [Qemu-devel] [PATCH 0/5] tricore: adding new instructions and
+ fixing issues
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -74,81 +78,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: Fam Zheng <fam@euphon.net>,
-	Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>,
-	Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
-	qemu-devel <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>
+Cc: David Brenken <david.brenken@efs-auto.de>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, May 24, 2019 at 01:17:17PM +0200, Marc-Andr=C3=A9 Lureau wrote:
-> Hi
->=20
-> On Fri, May 24, 2019 at 9:41 AM Philippe Mathieu-Daud=C3=A9
-> <philmd@redhat.com> wrote:
-> >
-> > On 5/24/19 1:40 AM, Marc-Andr=C3=A9 Lureau wrote:
-> > > Released last month.
-> > >
-> > > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> > > ---
-> > >  tests/docker/dockerfiles/fedora.docker | 2 +-
-> > >  1 file changed, 1 insertion(+), 1 deletion(-)
-> > >
-> > > diff --git a/tests/docker/dockerfiles/fedora.docker b/tests/docker/=
-dockerfiles/fedora.docker
-> > > index 69d4a7f5d7..1496b68ba1 100644
-> > > --- a/tests/docker/dockerfiles/fedora.docker
-> > > +++ b/tests/docker/dockerfiles/fedora.docker
-> > > @@ -1,4 +1,4 @@
-> > > -FROM fedora:29
-> > > +FROM fedora:30
-> >
-> > Hmm this patch is pending for review:
-> > https://lists.gnu.org/archive/html/qemu-devel/2019-05/msg00819.html
->=20
-> Oh I missed that. Maybe we should use "latest" to avoid bumping the
-> version every 6 months.
->=20
-> fwiw we have different versions:
->=20
-> tests/docker/dockerfiles/fedora-cris-cross.docker:FROM fedora:latest
-> tests/docker/dockerfiles/fedora-i386-cross.docker:FROM fedora:29
-> tests/docker/dockerfiles/fedora.docker:FROM fedora:29
->=20
-> In 62559b916 "tests: update Fedora i386 cross image to Fedora 29", Dani=
-el said:
->=20
->     Using the "latest" tag is not a good idea because this changes what
->     release it points to every 6 months. Together with caching of docke=
-r
->     builds this can cause confusion where CI has cached & built with Fe=
-dora
->     N, while a developer tries to reproduce a CI problem with Fedora N =
-+ 1,
->     or vica-verca.
->=20
-> But at the same time, Daniel bumped f28 to f29 in commit 19a9978db1.
->=20
-> It's confusing, do we need some stability or follow the latest?
+Hi Guys,
 
-The problem is introduced by local caching. "latest" may point to "29"
-today, but the CI system had cached content meaining its use of "latest"
-still resolved to "28".
+On 6/5/19 8:11 AM, David Brenken wrote:
+> From: David Brenken <david.brenken@efs-auto.de>
+>
+> Hello everyone,
+>
+> in the scope of this patchset we added implementations for the following
+> instructions for the target TriCore:
+>
+> QSEED, FTOIZ, UTOF
 
-Using "29" meant both CI & developers saw the same image, even when
-caching is used.
+first of all thanks for these patches. QSEED.F was one instruction that 
+was bugging me for some time and I didn't dare to do the grind figuring 
+out how it works in all details.
+
+I left some comments in the patch emails but in general I think the 
+patches are nearly good to go. I created some scripts [1] to generate 
+random tricore asm programs that I run against tsim. This has been very 
+useful in catching bugs in the PSW calculation. You might want to run 
+them as well :)
 
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+Cheers,
+Bastian
+
+[1] https://github.com/bkoppelmann/tricore-qemu-tests
+
 
