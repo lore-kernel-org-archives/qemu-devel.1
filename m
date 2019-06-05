@@ -6,59 +6,59 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 54EDAC28CC5
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 15:02:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E13E0C28CC5
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 15:04:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2E442206B8
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 15:02:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2E442206B8
+	by mail.kernel.org (Postfix) with ESMTPS id B7918206B8
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 15:04:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B7918206B8
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:44139 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:44156 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hYXR3-0002uV-Cw
-	for qemu-devel@archiver.kernel.org; Wed, 05 Jun 2019 11:02:41 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:35068)
+	id 1hYXSn-0003uA-2S
+	for qemu-devel@archiver.kernel.org; Wed, 05 Jun 2019 11:04:29 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:35147)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1hYXNI-0000Ip-1b
-	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 10:58:48 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1hYXNW-0000U1-Vc
+	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 10:59:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1hYXNG-0002Hl-28
-	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 10:58:47 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44214)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1hYXNW-0002Wl-4W
+	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 10:59:02 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34646)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1hYXNF-0002El-TH
-	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 10:58:46 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
+	id 1hYXNV-0002WJ-Vq
+	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 10:59:02 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+	[10.5.11.22])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 38264308C383
-	for <qemu-devel@nongnu.org>; Wed,  5 Jun 2019 14:58:43 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 59068300513A
+	for <qemu-devel@nongnu.org>; Wed,  5 Jun 2019 14:59:01 +0000 (UTC)
 Received: from localhost (ovpn-112-54.ams2.redhat.com [10.36.112.54])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 3B6EA5B697;
-	Wed,  5 Jun 2019 14:58:42 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 56A421018A2C;
+	Wed,  5 Jun 2019 14:58:54 +0000 (UTC)
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Wed,  5 Jun 2019 16:58:26 +0200
-Message-Id: <20190605145829.7674-3-marcandre.lureau@redhat.com>
+Date: Wed,  5 Jun 2019 16:58:28 +0200
+Message-Id: <20190605145829.7674-5-marcandre.lureau@redhat.com>
 In-Reply-To: <20190605145829.7674-1-marcandre.lureau@redhat.com>
 References: <20190605145829.7674-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.48]);
-	Wed, 05 Jun 2019 14:58:43 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.43]);
+	Wed, 05 Jun 2019 14:59:01 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH 2/5] vhost-user: check unix_listen() return
- value
+Subject: [Qemu-devel] [PATCH 4/5] vhost-user-input: check ioctl(EVIOCGNAME)
+ return value
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -76,48 +76,32 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This check shouldn't be necessary, since &error_fatal is given as
-argument and will exit() on failure. However, this change should
-silence coverity CID 1401761 & 1401705.
+This should fix coverity CID 1401704.
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- contrib/vhost-user-gpu/main.c   | 4 ++++
- contrib/vhost-user-input/main.c | 4 ++++
- 2 files changed, 8 insertions(+)
+ contrib/vhost-user-input/main.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-diff --git a/contrib/vhost-user-gpu/main.c b/contrib/vhost-user-gpu/main.=
-c
-index 9614c9422c..e0b6df5b4d 100644
---- a/contrib/vhost-user-gpu/main.c
-+++ b/contrib/vhost-user-gpu/main.c
-@@ -1160,6 +1160,10 @@ main(int argc, char *argv[])
-=20
-     if (opt_socket_path) {
-         int lsock =3D unix_listen(opt_socket_path, &error_fatal);
-+        if (lsock < 0) {
-+            g_printerr("Failed to listen on %s.\n", opt_socket_path);
-+            exit(EXIT_FAILURE);
-+        }
-         fd =3D accept(lsock, NULL, NULL);
-         close(lsock);
-     } else {
 diff --git a/contrib/vhost-user-input/main.c b/contrib/vhost-user-input/m=
 ain.c
-index 8d493f598e..8b854117f5 100644
+index 54f882602a..8b4e7d2536 100644
 --- a/contrib/vhost-user-input/main.c
 +++ b/contrib/vhost-user-input/main.c
-@@ -367,6 +367,10 @@ main(int argc, char *argv[])
+@@ -342,7 +342,11 @@ main(int argc, char *argv[])
 =20
-     if (opt_socket_path) {
-         int lsock =3D unix_listen(opt_socket_path, &error_fatal);
-+        if (lsock < 0) {
-+            g_printerr("Failed to listen on %s.\n", opt_socket_path);
-+            exit(EXIT_FAILURE);
-+        }
-         fd =3D accept(lsock, NULL, NULL);
-         close(lsock);
-     } else {
+     vi.config =3D g_array_new(false, false, sizeof(virtio_input_config))=
+;
+     memset(&id, 0, sizeof(id));
+-    ioctl(vi.evdevfd, EVIOCGNAME(sizeof(id.u.string) - 1), id.u.string);
++    if (ioctl(vi.evdevfd, EVIOCGNAME(sizeof(id.u.string) - 1),
++              id.u.string) < 0) {
++        g_printerr("Failed to get evdev name: %s\n", g_strerror(errno));
++        exit(EXIT_FAILURE);
++    }
+     id.select =3D VIRTIO_INPUT_CFG_ID_NAME;
+     id.size =3D strlen(id.u.string);
+     g_array_append_val(vi.config, id);
 --=20
 2.22.0.rc2.384.g1a9a72ea1d
 
