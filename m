@@ -4,61 +4,62 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B66CC28D18
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 20:05:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 47121C28CC5
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 20:05:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0065E207E0
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 20:05:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0065E207E0
+	by mail.kernel.org (Postfix) with ESMTPS id 222C1207E0
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 20:05:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 222C1207E0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:49104 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:49106 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hYc9f-00066f-7i
-	for qemu-devel@archiver.kernel.org; Wed, 05 Jun 2019 16:05:03 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:34066)
+	id 1hYc9u-0006HI-Bg
+	for qemu-devel@archiver.kernel.org; Wed, 05 Jun 2019 16:05:18 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:34077)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1hYc5O-000345-VK
+	(envelope-from <mst@redhat.com>) id 1hYc5P-00034B-27
 	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 16:00:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1hYc5K-0005XK-9Y
-	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 16:00:36 -0400
-Received: from mail-qt1-f194.google.com ([209.85.160.194]:37491)
+	(envelope-from <mst@redhat.com>) id 1hYc5K-0005YP-Jz
+	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 16:00:38 -0400
+Received: from mail-qk1-f172.google.com ([209.85.222.172]:36784)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1hYc5I-000560-D4
-	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 16:00:33 -0400
-Received: by mail-qt1-f194.google.com with SMTP id y57so19521571qtk.4
-	for <qemu-devel@nongnu.org>; Wed, 05 Jun 2019 13:00:18 -0700 (PDT)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1hYc5K-0005Bi-Bs
+	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 16:00:34 -0400
+Received: by mail-qk1-f172.google.com with SMTP id g18so26835qkl.3
+	for <qemu-devel@nongnu.org>; Wed, 05 Jun 2019 13:00:22 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:date:from:to:cc:subject:message-id:references
 	:mime-version:content-disposition:in-reply-to;
-	bh=s3n2L882ltXjPfEswBbEwB7+zfGhmxcdhpoO8/YoZaM=;
-	b=pusVlMxyH38rWOqzN4my+dOAW4u341uqyhKUr4kDxtPyNlD06bndxlkRfaSK9x86DS
-	HHVgFTIpmhhAKh/mzVVxi33Zso99zGxq/dPR7KXVhaSYQCpe/9ssB7RAFftTunH0z3KM
-	ips9uUCzkzTLIk+/CgvTWtShVSYOVh2jf2YKwpXG7K/EQD7EgYB0jtycCNlWSd8HZw06
-	KadxzkLGjx529N8wEyu31gCPek5c68iuujkaN/q+4tCK+pgPAulCo1naPARnuZbynaLX
-	06fQYnC008B0FNW/rk9471Fl2ZkgNNNMo8NKTXCM4RWqt2J8bhFjvX75cwvLptm7qpTf
-	d1CA==
-X-Gm-Message-State: APjAAAULMSKTsUXigx4wViQciEW6YjmI4Ld0rMeIRPgJiWEWz4KFTDYj
-	oF9qPAfkloliucEIusDj9Ss36jrnb30=
-X-Google-Smtp-Source: APXvYqyhOSDCBf2+HUh/+LDH5GpUJFR1fUdMuCKaQ50ZS3NPvJsQohp4fyR/tdzk1ZRpEWNjOs5CFg==
-X-Received: by 2002:a0c:bf4a:: with SMTP id b10mr33929800qvj.120.1559764817947;
-	Wed, 05 Jun 2019 13:00:17 -0700 (PDT)
+	bh=v+ECkpJzkDVdVI5rLDwJXguPVOQxaO4yQjX4+F++UwY=;
+	b=iQOAowjvdO4BNJNGRjAlbgTBR0t2X9JWWD3XKRarZ87rbNEQKfmsl8Ih/KoSiCBH6I
+	sj6Zslfj8xusWUN3lt7y9G6Qq8hGwjsRpLy1thNI5anxZiaCKkcUASSdZXkOwfE2hCBW
+	0B/3CmEp2/QkaQdWFzaiYrt/Xlp5eJDPLQF5VM0/rcKOcQcc2xm4yhn1TYxV/l+BwYDd
+	vMf5gxHySGrWyXu3GG+XP+a1Z/fNckMYTlHST/8XQl9ni9ETVNuUXZiAxk6+qJ3F/+hF
+	B6ITBfO9OFhayL949I1f9TF7kkMta+Xm+hiti1US+RxN10HyaZBb5CAwMSPRUn1NCon5
+	1c4A==
+X-Gm-Message-State: APjAAAVNjBSQMe+jAuvYHs8UO8Z6lqoj/Jh/M4/Qu8kvqUOeUqmQXxZb
+	u7hzkuT5//W3TzUDgIpUp13+UGZJS+Q=
+X-Google-Smtp-Source: APXvYqxdVM8fzD5SnvnjlJT4x5IoavvSSHrw+LPYWFKStqf7ljki//aj6G1uhSo7NWE3Ad6iPW9pmA==
+X-Received: by 2002:a05:620a:1329:: with SMTP id
+	p9mr15864237qkj.224.1559764822016; 
+	Wed, 05 Jun 2019 13:00:22 -0700 (PDT)
 Received: from redhat.com (pool-100-0-197-103.bstnma.fios.verizon.net.
 	[100.0.197.103]) by smtp.gmail.com with ESMTPSA id
-	n10sm10511534qke.72.2019.06.05.13.00.16
+	p37sm13545546qtc.35.2019.06.05.13.00.20
 	(version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-	Wed, 05 Jun 2019 13:00:17 -0700 (PDT)
-Date: Wed, 5 Jun 2019 16:00:16 -0400
+	Wed, 05 Jun 2019 13:00:21 -0700 (PDT)
+Date: Wed, 5 Jun 2019 16:00:20 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: qemu-devel@nongnu.org
-Message-ID: <20190513061939.3464-6-david@gibson.dropbear.id.au>
+Message-ID: <1556604614-32081-1-git-send-email-wangjie88@huawei.com>
 References: <20190605195913.12243-1-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
@@ -68,9 +69,8 @@ X-Mailer: git-send-email 2.17.1.1206.gb667731e2e.dirty
 X-Mutt-Fcc: =sent
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 	[fuzzy]
-X-Received-From: 209.85.160.194
-Subject: [Qemu-devel] [PULL v3 05/17] pci: Fold pci_get_bus_devfn() into its
- sole caller
+X-Received-From: 209.85.222.172
+Subject: [Qemu-devel] [PULL v3 07/17] vhost: remove the dead code
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -82,115 +82,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Greg Kurz <groug@kaod.org>,
-	David Gibson <david@gibson.dropbear.id.au>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+	Stefan Hajnoczi <stefanha@redhat.com>, Jie Wang <wangjie88@huawei.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190605200016.hgm6xe7PH7LV3zRSuaYypGNV1v_CWALYb0iLnwolUzM@z>
+Message-ID: <20190605200020.5o8GAE0rLznEiR7_nf3-I882eak4YruUxrjwoDeOhJ8@z>
 
-From: David Gibson <david@gibson.dropbear.id.au>
+From: Jie Wang <wangjie88@huawei.com>
 
-The only remaining caller of pci_get_bus_devfn() is pci_nic_init_nofail(),
-itself an old compatibility function.  Fold the two together to avoid
-re-using the stale interface.
+remove the dead code
 
-While we're there replace the explicit fprintf()s with error_report().
-
-Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-Message-Id: <20190513061939.3464-6-david@gibson.dropbear.id.au>
+Signed-off-by: Jie Wang <wangjie88@huawei.com>
+Message-Id: <1556604614-32081-1-git-send-email-wangjie88@huawei.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-Reviewed-by: Greg Kurz <groug@kaod.org>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- hw/pci/pci.c | 60 ++++++++++++++++++++++++----------------------------
- 1 file changed, 28 insertions(+), 32 deletions(-)
+ hw/virtio/vhost.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-diff --git a/hw/pci/pci.c b/hw/pci/pci.c
-index 7e5f8d001b..d3893bdfe1 100644
---- a/hw/pci/pci.c
-+++ b/hw/pci/pci.c
-@@ -723,37 +723,6 @@ static int pci_parse_devaddr(const char *addr, int *domp, int *busp,
-     return 0;
- }
- 
--static PCIBus *pci_get_bus_devfn(int *devfnp, PCIBus *root,
--                                 const char *devaddr)
--{
--    int dom, bus;
--    unsigned slot;
--
--    if (!root) {
--        fprintf(stderr, "No primary PCI bus\n");
--        return NULL;
--    }
--
--    assert(!root->parent_dev);
--
--    if (!devaddr) {
--        *devfnp = -1;
--        return pci_find_bus_nr(root, 0);
--    }
--
--    if (pci_parse_devaddr(devaddr, &dom, &bus, &slot, NULL) < 0) {
--        return NULL;
--    }
--
--    if (dom != 0) {
--        fprintf(stderr, "No support for non-zero PCI domains\n");
--        return NULL;
--    }
--
--    *devfnp = PCI_DEVFN(slot, 0);
--    return pci_find_bus_nr(root, bus);
--}
--
- static void pci_init_cmask(PCIDevice *dev)
- {
-     pci_set_word(dev->cmask + PCI_VENDOR_ID, 0xffff);
-@@ -1895,6 +1864,8 @@ PCIDevice *pci_nic_init_nofail(NICInfo *nd, PCIBus *rootbus,
-     DeviceState *dev;
-     int devfn;
-     int i;
-+    int dom, busnr;
-+    unsigned slot;
- 
-     if (nd->model && !strcmp(nd->model, "virtio")) {
-         g_free(nd->model);
-@@ -1928,7 +1899,32 @@ PCIDevice *pci_nic_init_nofail(NICInfo *nd, PCIBus *rootbus,
-         exit(1);
+diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
+index 7f61018f2a..2303a8c206 100644
+--- a/hw/virtio/vhost.c
++++ b/hw/virtio/vhost.c
+@@ -1650,7 +1650,6 @@ fail_vq:
+                              hdev->vqs + i,
+                              hdev->vq_index + i);
      }
+-    i = hdev->nvqs;
  
--    bus = pci_get_bus_devfn(&devfn, rootbus, devaddr);
-+    if (!rootbus) {
-+        error_report("No primary PCI bus");
-+        exit(1);
-+    }
-+
-+    assert(!rootbus->parent_dev);
-+
-+    if (!devaddr) {
-+        devfn = -1;
-+        busnr = 0;
-+    } else {
-+        if (pci_parse_devaddr(devaddr, &dom, &busnr, &slot, NULL) < 0) {
-+            error_report("Invalid PCI device address %s for device %s",
-+                         devaddr, nd->model);
-+            exit(1);
-+        }
-+
-+        if (dom != 0) {
-+            error_report("No support for non-zero PCI domains");
-+            exit(1);
-+        }
-+
-+        devfn = PCI_DEVFN(slot, 0);
-+    }
-+
-+    bus = pci_find_bus_nr(rootbus, busnr);
-     if (!bus) {
-         error_report("Invalid PCI device address %s for device %s",
-                      devaddr, nd->model);
+ fail_mem:
+ fail_features:
 -- 
 MST
 
