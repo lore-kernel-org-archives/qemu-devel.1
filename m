@@ -2,66 +2,72 @@ Return-Path: <SRS0=3v23=UE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EEECEC28CC5
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 23:02:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0258DC28CC5
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 23:19:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 719582070B
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 23:02:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 719582070B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id B94BC2075B
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 23:19:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B94BC2075B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:51493 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:51610 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hYeuz-0001Xf-Kg
-	for qemu-devel@archiver.kernel.org; Wed, 05 Jun 2019 19:02:05 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:45383)
+	id 1hYfC2-0003g3-PP
+	for qemu-devel@archiver.kernel.org; Wed, 05 Jun 2019 19:19:42 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:47917)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1hYeu1-00010e-Dt
-	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 19:01:06 -0400
+	(envelope-from <palmer@dabbelt.com>) id 1hYfB8-0003O8-Cz
+	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 19:18:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1hYeu0-0001vK-2U
-	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 19:01:05 -0400
-Resent-Date: Wed, 05 Jun 2019 19:01:05 -0400
-Resent-Message-Id: <E1hYeu0-0001vK-2U@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21438)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1hYetz-0001qO-TB
-	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 19:01:04 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1559772927; cv=none; d=zoho.com; s=zohoarc; 
-	b=hd3tZt7rjEWg6mfZyC8pmojUDJ8ef/V97xOUMpyAglSPQxf9rSEi+sXG+d5x616dctliMA44WsWo1UOtNjd1AeHkEJVhbJW1jIZzU+30cv5Q9tc9m3n21sTYQiwQzItEHRWzU9JlUC5s639c8m1hIqqLTouLaDP7Khp3mV+XNXM=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
-	s=zohoarc; t=1559772927;
-	h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
-	bh=xayUvXyC1aHyi3VkEffCsOnZ+wKqgieqliXPEmXwCt8=; 
-	b=kOUFcooEMxO+697x3AdVyOmddk/av0dwQ+kpt89AMWA8AGmWmeQxehMzMSycoQO8NR78FaP9897EoDg/q/GNBiA7IJbk7bcA1rT+zuaSxDp5/vEatkrg4aLweag7+osKiS2qM8PtnSVzVuur3vLO/8NZFODuy6BG4wLgd68rBNE=
-ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
-	spf=pass  smtp.mailfrom=no-reply@patchew.org;
-	dmarc=pass header.from=<no-reply@patchew.org>
-	header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
-	mx.zohomail.com with SMTPS id 1559772925458563.1398641950854;
-	Wed, 5 Jun 2019 15:15:25 -0700 (PDT)
-In-Reply-To: <20190605205706.569-1-richard.henderson@linaro.org>
-Message-ID: <155977292443.32260.7266600611008191698@ce79690b2cb9>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: richard.henderson@linaro.org
-Date: Wed, 5 Jun 2019 15:15:25 -0700 (PDT)
-X-ZohoMailClient: External
+	(envelope-from <palmer@dabbelt.com>) id 1hYfB6-0006nE-Om
+	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 19:18:46 -0400
+Received: from mail-pg1-f170.google.com ([209.85.215.170]:39951)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <palmer@dabbelt.com>) id 1hYfB4-0006gV-KN
+	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 19:18:43 -0400
+Received: by mail-pg1-f170.google.com with SMTP id d30so183002pgm.7
+	for <qemu-devel@nongnu.org>; Wed, 05 Jun 2019 16:18:39 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:date:subject:in-reply-to:cc:from:to:message-id
+	:mime-version:content-transfer-encoding;
+	bh=1hvlKOc9w4Q3jxGo5vC2gxT2yoW3uiDs1SLjD/Ak6y8=;
+	b=f9Ximnyw4KIjoA8hENvmlh5PbVpzvZgxPZphHXXrsEXL7tl2hDGk6ts1ca0+QcdrUd
+	XxWEbKbDfxie+vA2oCPMBUqspu6ls0Efa4EVrJBnVwYoeWrIVRKlXfRgl7qNy+mCA7D/
+	mK5J7X/WaADC0DG7MdTXTFqxfOzLY8GY+gvHwStnYYEZrPInoRjaNUPeh9XqUvwvJ6CD
+	5F15MBzpEmOzMF/dKZrPZm4HbixSyn3aBOhje0GKYgCPGONu5vaVXtAO097rMYji4RFY
+	BhVFz6jDn8usr76sGf+gOWzl/lf3e1G/CxszQIZXgiF7yfKWxGl9QPTFJe1hUPWJGEft
+	9LAg==
+X-Gm-Message-State: APjAAAUbSQVq2SAYebPBUvjtl3EKE4GH/yYfZYpd0mLur4200FSf+lR0
+	1CJLxqzRoYYKZVO5xchP4pOZfsSGj9A=
+X-Google-Smtp-Source: APXvYqwGk2GeNAq0Bdypn3FnInQ7Y6vZE+/jjTOvfuby8cGlHN9m31aLjovLjTvzACqwanm/x88TZw==
+X-Received: by 2002:a62:b503:: with SMTP id y3mr47820106pfe.4.1559776717479;
+	Wed, 05 Jun 2019 16:18:37 -0700 (PDT)
+Received: from localhost ([12.206.222.5])
+	by smtp.gmail.com with ESMTPSA id s5sm15678pgj.60.2019.06.05.16.18.36
+	(version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+	Wed, 05 Jun 2019 16:18:36 -0700 (PDT)
+Date: Wed, 05 Jun 2019 16:18:36 -0700 (PDT)
+X-Google-Original-Date: Wed, 05 Jun 2019 16:18:21 PDT (-0700)
+In-Reply-To: <B1A3E8F6-F8C2-4EDB-A31B-EBB4CA636CA3@decred.org>
+From: Palmer Dabbelt <palmer@sifive.com>
+To: marco@decred.org
+Message-ID: <mhng-6493b48f-57c1-47cd-9157-50cb533f91df@palmer-si-x1e>
+Mime-Version: 1.0 (MHng)
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 135.84.80.217
-Subject: Re: [Qemu-devel] [PATCH v6 0/6] linux-user/aarch64: Support PROT_BTI
+	[fuzzy]
+X-Received-From: 209.85.215.170
+Subject: Re: [Qemu-devel] Fwd: [joel@sing.id.au: atomic failures on
+ qemu-system-riscv64]
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -73,76 +79,146 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org, qemu-devel@nongnu.org,
-	Dave.Martin@arm.com
+Cc: qemu-riscv@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDYwNTIwNTcwNi41Njkt
-MS1yaWNoYXJkLmhlbmRlcnNvbkBsaW5hcm8ub3JnLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1z
-IHRvIGhhdmUgc29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9y
-Cm1vcmUgaW5mb3JtYXRpb246CgpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIHY2IDAvNl0g
-bGludXgtdXNlci9hYXJjaDY0OiBTdXBwb3J0IFBST1RfQlRJClR5cGU6IHNlcmllcwpNZXNzYWdl
-LWlkOiAyMDE5MDYwNTIwNTcwNi41NjktMS1yaWNoYXJkLmhlbmRlcnNvbkBsaW5hcm8ub3JnCgo9
-PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCmdpdCByZXYtcGFyc2UgYmFzZSA+
-IC9kZXYvbnVsbCB8fCBleGl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQg
-MApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2Fs
-IGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxi
-YWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKRnJvbSBodHRwczovL2dpdGh1Yi5j
-b20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKICogW25ldyB0YWddICAgICAgICAgICAgICAgcGF0Y2hl
-dy8yMDE5MDYwNTIwNTcwNi41NjktMS1yaWNoYXJkLmhlbmRlcnNvbkBsaW5hcm8ub3JnIC0+IHBh
-dGNoZXcvMjAxOTA2MDUyMDU3MDYuNTY5LTEtcmljaGFyZC5oZW5kZXJzb25AbGluYXJvLm9yZwpT
-d2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjYwMzhjZTJlMGUgdGVzdHMvdGNnL2FhcmNo
-NjQ6IEFkZCBidGkgc21va2UgdGVzdApiMTZhZDViZDdiIGxpbnV4LXVzZXI6IFBhcnNlIE5UX0dO
-VV9QUk9QRVJUWV9UWVBFXzAgbm90ZXMKNjhmZWZlZjcxNyBpbmNsdWRlL2VsZjogQWRkIGRlZmlu
-ZXMgcmVsYXRlZCB0byBub3RlcyBmb3IgR05VIHN5c3RlbXMKOTUxNjY5ZDUyMyBsaW51eC11c2Vy
-OiBTZXQgUEFHRV9UQVJHRVRfMSBmb3IgVEFSR0VUX1BST1RfQlRJCjZlYzQ0ZWRkYTUgbGludXgt
-dXNlcjogVmFsaWRhdGUgbW1hcC9tcHJvdGVjdCBwcm90IHZhbHVlCjRlYjc3NTU2YWQgbGludXgt
-dXNlci9hYXJjaDY0OiBSZXNldCBidHlwZSBmb3Igc3lzY2FsbHMgYW5kIHNpZ25hbHMKCj09PSBP
-VVRQVVQgQkVHSU4gPT09CjEvNiBDaGVja2luZyBjb21taXQgNGViNzc1NTZhZDFlIChsaW51eC11
-c2VyL2FhcmNoNjQ6IFJlc2V0IGJ0eXBlIGZvciBzeXNjYWxscyBhbmQgc2lnbmFscykKMi82IENo
-ZWNraW5nIGNvbW1pdCA2ZWM0NGVkZGE1YTAgKGxpbnV4LXVzZXI6IFZhbGlkYXRlIG1tYXAvbXBy
-b3RlY3QgcHJvdCB2YWx1ZSkKMy82IENoZWNraW5nIGNvbW1pdCA5NTE2NjlkNTIzMWIgKGxpbnV4
-LXVzZXI6IFNldCBQQUdFX1RBUkdFVF8xIGZvciBUQVJHRVRfUFJPVF9CVEkpCjQvNiBDaGVja2lu
-ZyBjb21taXQgNjhmZWZlZjcxN2JlIChpbmNsdWRlL2VsZjogQWRkIGRlZmluZXMgcmVsYXRlZCB0
-byBub3RlcyBmb3IgR05VIHN5c3RlbXMpCjUvNiBDaGVja2luZyBjb21taXQgYjE2YWQ1YmQ3YjVj
-IChsaW51eC11c2VyOiBQYXJzZSBOVF9HTlVfUFJPUEVSVFlfVFlQRV8wIG5vdGVzKQo2LzYgQ2hl
-Y2tpbmcgY29tbWl0IDYwMzhjZTJlMGU0NCAodGVzdHMvdGNnL2FhcmNoNjQ6IEFkZCBidGkgc21v
-a2UgdGVzdCkKV0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBN
-QUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojMzM6IApuZXcgZmlsZSBtb2RlIDEwMDY0NAoKRVJS
-T1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojNTA6IEZJTEU6IHRlc3RzL3Rj
-Zy9hYXJjaDY0L2J0aS0xLmM6MTM6CiteSWhpbnReSSMzNFxuXCQKCkVSUk9SOiBjb2RlIGluZGVu
-dCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzUxOiBGSUxFOiB0ZXN0cy90Y2cvYWFyY2g2NC9idGkt
-MS5jOjE0OgorXkliXklza2lwMl9zaWdpbGwyXG5cJAoKRVJST1I6IGV4dGVybnMgc2hvdWxkIGJl
-IGF2b2lkZWQgaW4gLmMgZmlsZXMKIzEzMzogRklMRTogdGVzdHMvdGNnL2FhcmNoNjQvYnRpLWNy
-dC5pbmMuYzoxMzoKK2ludCBtYWluKHZvaWQpOwoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBu
-ZXZlciB1c2UgdGFicwojMTgwOiBGSUxFOiB0ZXN0cy90Y2cvYWFyY2g2NC9idGktY3J0LmluYy5j
-OjYwOgorXkkuYWxpZ25eSTNcblwkCgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVz
-ZSB0YWJzCiMxODE6IEZJTEU6IHRlc3RzL3RjZy9hYXJjaDY0L2J0aS1jcnQuaW5jLmM6NjE6Cite
-SS5sb25nXkk0XG5cJAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwoj
-MTgyOiBGSUxFOiB0ZXN0cy90Y2cvYWFyY2g2NC9idGktY3J0LmluYy5jOjYyOgorICAgICAgICAu
-bG9uZ15JMTZcblwkCgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiMx
-ODM6IEZJTEU6IHRlc3RzL3RjZy9hYXJjaDY0L2J0aS1jcnQuaW5jLmM6NjM6CisgICAgICAgIC5s
-b25nXkk1XG5cJAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMTg0
-OiBGSUxFOiB0ZXN0cy90Y2cvYWFyY2g2NC9idGktY3J0LmluYy5jOjY0OgorICAgICAgICAuc3Ry
-aW5nXklcIkdOVVwiXG5cJAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFi
-cwojMTg1OiBGSUxFOiB0ZXN0cy90Y2cvYWFyY2g2NC9idGktY3J0LmluYy5jOjY1OgorXkkubG9u
-Z15JMHhjMDAwMDAwMFxuXCQKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRh
-YnMKIzE4NjogRklMRTogdGVzdHMvdGNnL2FhcmNoNjQvYnRpLWNydC5pbmMuYzo2NjoKK15JLmxv
-bmdeSTRcblwkCgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiMxODc6
-IEZJTEU6IHRlc3RzL3RjZy9hYXJjaDY0L2J0aS1jcnQuaW5jLmM6Njc6CiteSS5sb25nXkkxXG5c
-JAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMTg5OiBGSUxFOiB0
-ZXN0cy90Y2cvYWFyY2g2NC9idGktY3J0LmluYy5jOjY5OgorXkkucHJldmlvdXMiKTskCgp0b3Rh
-bDogMTIgZXJyb3JzLCAxIHdhcm5pbmdzLCAxNTMgbGluZXMgY2hlY2tlZAoKUGF0Y2ggNi82IGhh
-cyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMK
-YXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNI
-RUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFu
-ZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRw
-Oi8vcGF0Y2hldy5vcmcvbG9ncy8yMDE5MDYwNTIwNTcwNi41NjktMS1yaWNoYXJkLmhlbmRlcnNv
-bkBsaW5hcm8ub3JnL3Rlc3RpbmcuY2hlY2twYXRjaC8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwg
-Z2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9d
-LgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
+On Wed, 05 Jun 2019 13:59:53 PDT (-0700), marco@decred.org wrote:
+> Joel is on vacation so here it is again.
+>
+>> Begin forwarded message:
+>> 
+>> From: Alistair Francis <Alistair.Francis@wdc.com>
+>> Subject: Re: [joel@sing.id.au: atomic failures on qemu-system-riscv64]
+>> Date: June 5, 2019 at 7:19:53 PM GMT+1
+>> To: "joel@sing.id.au" <joel@sing.id.au>, "palmer@sifive.com" <palmer@sifive.com>
+>> Cc: "marco@decred.org" <marco@decred.org>, "me@carlosedp.com" <me@carlosedp.com>
+>> 
+>> On Fri, 2019-05-31 at 03:21 +1000, Joel Sing wrote:
+>>> I've just sent this to qemu-riscv@nongnu.org - forwarding for
+>>> visibility...
+>> 
+>> Hello Joel,
+>> 
+>> Can you please send this to the QEMU mailing list?
+>> https://wiki.qemu.org/Contribute/MailingLists
+>> 
+>>> 
+>>> ----- Forwarded message from Joel Sing <joel@sing.id.au> -----
+>>> 
+>>> Date: Fri, 31 May 2019 03:20:03 +1000
+>>> From: Joel Sing <joel@sing.id.au>
+>>> To: qemu-riscv@nongnu.org
+>>> Subject: atomic failures on qemu-system-riscv64
+>>> User-Agent: Mutt/1.10.1 (2018-07-13)
+>>> 
+>>> While working on a Go (www.golang.org) port for riscv, I've run
+>>> into issues with atomics (namely LR/SC) on qemu-system-riscv64.
+>>> There are several reproducers for this problem including (using
+>>> gcc builtin atomics):
+>>> 
+>>>  https://gist.github.com/4a6f656c/8433032a3f70893a278259f8108aad90
+>>> 
+>>> And a version using inline assembly:
+>>> 
+>>>  https://gist.github.com/4a6f656c/d883091f5ca811822720213be343a75a
+>>> 
+>>> Depending on the qemu configuration the number of threads may
+>>> need increasing (to force context switching) and/or run in a
+>>> loop. Go's sync/atomic tests also fail regularly.
+>>> 
+>>> Having dug into the qemu code, what I believe is happening is
+>>> along the lines of the following:
+>>> 
+>>> 1. Thread 1 runs and executes an LR - this assigns an address
+>>>   to load_res and a value to load_val (say 1).
+>>> 
+>>> 2. A context switch occurs and thread 2 is now run - it runs
+>>>   an LR and SC on the same address modifying the stored value.
+>>>   Another LR is executed loading load_val with the current
+>>>   value (say 3).
+>>> 
+>>> 3. A context switch occurs and thread 1 is now run again, it
+>>>   continues on its LR/SC sequence and now runs the SC instruction.
+>>>   This is based on the assumption that it had a reservation
+>>>   and the SC will fail if the memory has changed. The underlying
+>>>   implementation of SC is a cmpxchg with the value in load_val
+>>>   - this no longer has the original value and hence successfully
+>>>   compares (as does the tcg_gen_setcond_tl() between the returned
+>>>   value and load_val) thus the SC succeeds when it should not.
+>>> 
+>>> The diff below clears load_res when the mode changes - with this
+>>> applied the reproducers work correctly, as do Go's atomic tests.
+>>> I'm not sure this "fix" is 100% correct, but it certainly verifies
+>>> where the problem lies. It does also fall inline with the RISCV
+>>> spec:
+>>> 
+>>> "The SC must fail if there is an observable memory access from
+>>> another hart to the address, or if there is an intervening context
+>>> switch on this hart, or if in the meantime the hart executed a
+>>> privileged exception-return instruction."
 
+Sorry about this, but that wording is actually a bug in the ISA manual.  The
+current version says
+
+    An SC must fail if there is
+    another SC (to any address) between the LR and the SC in program
+    order.  The precise statement of the atomicity requirements for
+    successful LR/SC sequences is defined by the Atomicity Axiom in
+    Section~\ref{sec:rvwmo}.
+    
+    \begin{commentary}
+    A store-conditional instruction to a scratch word of memory should be used
+    during a preemptive context switch to forcibly yield any existing load
+    reservation.
+    \end{commentary}
+
+The text in version 2.2 was changed because it doesn't really have meaning:
+harts are a hardware construct, but context switches are a software context.
+There were a few of these bugs floating around the ISA manual and we cleaned
+them up more than a year ago, but the version on the RISC-V website hasn't
+changed.  The ratified ISA manual will have the correct wording.
+
+That said, the Linux user ABI allows programs to rely on reservations being
+shot down on context switches -- if that wasn't the case then LR/SC would be
+useless.  That's how the ambiguous wording snuck into the user ISA manual: we
+confused the ISA behavior (ie, what the hardware does) with the user ABI
+behavior (ie, what programs can rely on).
+
+The reason you're only seeing this in QEMU is because the hardware has a
+timeout on load reservations of something like 1000 cycles, and the Linux
+context switching code takes longer than that timeout.  For some reason I
+remember having fixed this bug in Linux, but I must have forgotten to actually
+send out the patch.
+
+Also, unless I'm misunderstanding something our implementation of LR/SC is
+pretty broken.  We're just using a CAS to check if the value changed, which
+suffers from the ABA problem that LR/SC is there to fix in the first place.  I
+might be missing something here, though, as it looks like MIPS is doing
+essentially the same thing.
+
+>>> diff --git a/target/riscv/cpu_helper.c b/target/riscv/cpu_helper.c
+>>> index b17f169681..9875b8e5d3 100644
+>>> --- a/target/riscv/cpu_helper.c
+>>> +++ b/target/riscv/cpu_helper.c
+>>> @@ -113,6 +113,8 @@ void riscv_cpu_set_mode(CPURISCVState *env,
+>>> target_ulong newpriv)
+>>>     }
+>>>     /* tlb_flush is unnecessary as mode is contained in mmu_idx */
+>>>     env->priv = newpriv;
+>>> +
+>>> +    env->load_res = 0;
+>> 
+>> This looks ok to me, I'll read the spec to double check though. Do you
+>> mind adding a comment in the code as to why this is required?
+>> 
+>> Alistair
+>> 
+>>> }
+>>> 
+>>> /* get_physical_address - get the physical address for this virtual
+>>> address
+>>> 
+>>> ----- End forwarded message -----
 
