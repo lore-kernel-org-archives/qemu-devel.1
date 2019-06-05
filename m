@@ -2,107 +2,98 @@ Return-Path: <SRS0=3v23=UE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_NEOMUTT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3AECEC28CC5
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 19:40:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BC6C7C28CC5
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 19:50:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AF0772075C
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 19:40:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AF0772075C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 879D52083E
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 19:50:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 879D52083E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:48894 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:48948 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hYbmC-0007oa-QB
-	for qemu-devel@archiver.kernel.org; Wed, 05 Jun 2019 15:40:48 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:58849)
+	id 1hYbvG-00012C-Fv
+	for qemu-devel@archiver.kernel.org; Wed, 05 Jun 2019 15:50:10 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:60208)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maxiwell@linux.ibm.com>) id 1hYblL-0007N6-7J
-	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 15:39:56 -0400
+	(envelope-from <eblake@redhat.com>) id 1hYbuN-0000gw-4q
+	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 15:49:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <maxiwell@linux.ibm.com>) id 1hYblJ-0000tt-9D
-	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 15:39:55 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:50694
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <maxiwell@linux.ibm.com>)
-	id 1hYblJ-0000bn-3Z
-	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 15:39:53 -0400
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
-	x55JbqnG025174
-	for <qemu-devel@nongnu.org>; Wed, 5 Jun 2019 15:39:38 -0400
-Received: from e32.co.us.ibm.com (e32.co.us.ibm.com [32.97.110.150])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2sxhttnpy9-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 05 Jun 2019 15:39:37 -0400
-Received: from localhost
-	by e32.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <maxiwell@linux.ibm.com>;
-	Wed, 5 Jun 2019 20:39:37 +0100
-Received: from b03cxnp08028.gho.boulder.ibm.com (9.17.130.20)
-	by e32.co.us.ibm.com (192.168.1.132) with IBM ESMTP SMTP Gateway:
-	Authorized Use Only! Violators will be prosecuted; 
-	(version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-	Wed, 5 Jun 2019 20:39:33 +0100
-Received: from b03ledav004.gho.boulder.ibm.com
-	(b03ledav004.gho.boulder.ibm.com [9.17.130.235])
-	by b03cxnp08028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with
-	ESMTP id x55JdWA320054436
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256
-	verify=OK); Wed, 5 Jun 2019 19:39:32 GMT
-Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 91AE178064;
-	Wed,  5 Jun 2019 19:39:32 +0000 (GMT)
-Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 3E52D7805E;
-	Wed,  5 Jun 2019 19:39:31 +0000 (GMT)
-Received: from maxibm (unknown [9.85.186.195])
-	by b03ledav004.gho.boulder.ibm.com (Postfix) with ESMTPS;
-	Wed,  5 Jun 2019 19:39:30 +0000 (GMT)
-Date: Wed, 5 Jun 2019 16:39:27 -0300
-From: "Maxiwell S. Garcia" <maxiwell@linux.ibm.com>
-To: David Gibson <david@gibson.dropbear.id.au>
-References: <20190520204340.832-1-maxiwell@linux.ibm.com>
-	<20190520204340.832-2-maxiwell@linux.ibm.com>
-	<20190522232952.GN30423@umbus.fritz.box>
-	<20190523201851.llsufz6dfs3gzyc6@maxibm>
-	<20190530011341.GB2017@umbus.fritz.box>
+	(envelope-from <eblake@redhat.com>) id 1hYbuL-0003Ha-VS
+	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 15:49:15 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38140)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>)
+	id 1hYbuF-00036R-82; Wed, 05 Jun 2019 15:49:08 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+	[10.5.11.23])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 75846308421A;
+	Wed,  5 Jun 2019 19:48:51 +0000 (UTC)
+Received: from [10.3.116.85] (ovpn-116-85.phx2.redhat.com [10.3.116.85])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 2051919C6F;
+	Wed,  5 Jun 2019 19:48:46 +0000 (UTC)
+To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+	Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+References: <20190605100913.34972-1-vsementsov@virtuozzo.com>
+	<20190605100913.34972-3-vsementsov@virtuozzo.com>
+	<cd780b66-ab31-1feb-0cce-0b6525df7d79@redhat.com>
+	<20190605163710.GP8956@redhat.com>
+	<e5a35aeb-21a4-449c-f8d5-9d2ac2968fd5@virtuozzo.com>
+	<19a96fc2-7f12-7b30-edef-b3da66eef759@redhat.com>
+	<c0df2189-d90a-8a58-776b-646bbad76976@virtuozzo.com>
+	<20190605173601.GB13261@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=eblake@redhat.com; keydata=
+	xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
+	xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
+	TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
+	GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
+	sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
+	AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
+	CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
+	RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
+	wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
+	Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
+	gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
+	pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
+	zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
+	pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
+	3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
+	NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
+	cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
+	SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
+	I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
+	mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
+	Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
+	2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
+Organization: Red Hat, Inc.
+Message-ID: <d8d3da39-d136-a7b1-5ad4-ad3742f8ffa1@redhat.com>
+Date: Wed, 5 Jun 2019 14:48:45 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190530011341.GB2017@umbus.fritz.box>
-User-Agent: NeoMutt/20180716
-X-TM-AS-GCONF: 00
-x-cbid: 19060519-0004-0000-0000-00001518ACAA
-X-IBM-SpamModules-Scores: 
-X-IBM-SpamModules-Versions: BY=3.00011220; HX=3.00000242; KW=3.00000007;
-	PH=3.00000004; SC=3.00000286; SDB=6.01213719; UDB=6.00637941;
-	IPR=6.00994793; 
-	MB=3.00027198; MTD=3.00000008; XFM=3.00000015; UTC=2019-06-05 19:39:35
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19060519-0005-0000-0000-00008BF412FF
-Message-Id: <20190605193927.3lek4voay5stxtqt@maxibm>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
-	definitions=2019-06-05_12:, , signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
-	priorityscore=1501
-	malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
-	clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
-	mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
-	scancount=1 engine=8.0.1-1810050000 definitions=main-1906050123
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.158.5
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH 1/1] spapr: Do not re-read the
- clock on pre_save handler on migration
+In-Reply-To: <20190605173601.GB13261@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="LJvFiP5KyJSaQR7mN6J6URUXudP6t1NbB"
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.40]);
+	Wed, 05 Jun 2019 19:49:00 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+X-Content-Filtered-By: Mailman/MimeDel 2.1.21
+Subject: Re: [Qemu-devel] [PATCH 2/2] nbd-client: enable TCP keepalive
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -114,144 +105,143 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+Cc: "kwolf@redhat.com" <kwolf@redhat.com>, Denis Lunev <den@virtuozzo.com>,
+	"qemu-block@nongnu.org" <qemu-block@nongnu.org>,
+	Markus Armbruster <armbru@redhat.com>,
+	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+	Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, May 30, 2019 at 11:13:41AM +1000, David Gibson wrote:
-> On Thu, May 23, 2019 at 05:18:51PM -0300, Maxiwell S. Garcia wrote:
-> > On Thu, May 23, 2019 at 09:29:52AM +1000, David Gibson wrote:
-> > > On Mon, May 20, 2019 at 05:43:40PM -0300, Maxiwell S. Garcia wrote:
-> > > > This handler was added in the commit:
-> > > >   42043e4f1241: spapr: clock should count only if vm is running
-> > > > 
-> > > > In a scenario without migration, this pre_save handler is not
-> > > > triggered, so the 'stop/cont' commands save and restore the clock
-> > > > in the function 'cpu_ppc_clock_vm_state_change.' The SW clock
-> > > > in the guest doesn't know about this pause.
-> > > > 
-> > > > If the command 'migrate' is called between 'stop' and 'cont',
-> > > > the pre_save handler re-read the clock, and the SW clock in the
-> > > > guest will know about the pause between 'stop' and 'migrate.'
-> > > > If the guest is running a workload like HTC, a side-effect of
-> > > > this is a lot of process stall messages (with call traces) in
-> > > > the kernel guest.
-> > > > 
-> > > > Signed-off-by: Maxiwell S. Garcia <maxiwell@linux.ibm.com>
-> > > 
-> > > What affect will this have on the clock for the case of migrations
-> > > without a stop/cont around?
-> > 
-> > The guest timebase is saved when the VM stop running and restored when
-> > the VM starts running again (cpu_ppc_clock_vm_state_change handler).
-> > Migrations without stop/cont save the clock when the VM go to the
-> > FINISH_MIGRATE state.
-> 
-> Right... which means the clock is effectively stopped for the
-> migration downtime window while we transfer the final state.  That
-> means the guest clock will drift from wall clock by a couple of
-> hundred ms across the migration which is not correct.
-> 
-> > > The complicated thing here is that for
-> > > *explicit* stops/continues we want to freeze the clock, however for
-> > > the implicit stop/continue during migration downtime, we want to keep
-> > > the clock running (logically), so that the guest time of day doesn't
-> > > get out of sync on migration.
-> > > 
-> > 
-> > Not sure if the *implicit* word here is about commands from the libvirt
-> > or any other orchestrator.
-> 
-> By implicit I mean the stopping of the VM which qemu does to transfer
-> the final part of the state, rather than because of an explicit
-> stop/cont command.
-> 
-> > QEMU itself doesn't know the intent behind the
-> > command stop/cont. So, If we are using a guest to process a workload and
-> > the manager tool decide to migrate our VM transparently, it's unpleasant
-> > to see a lot of process stalls with call traces in the kernel log.
-> 
-> If you have a lot of process stalls across a migration, that suggests
-> your permitted downtime window is *way* too long.
-> 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--LJvFiP5KyJSaQR7mN6J6URUXudP6t1NbB
+From: Eric Blake <eblake@redhat.com>
+To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
+ "mreitz@redhat.com" <mreitz@redhat.com>, "kwolf@redhat.com"
+ <kwolf@redhat.com>, Denis Lunev <den@virtuozzo.com>,
+ Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>
+Message-ID: <d8d3da39-d136-a7b1-5ad4-ad3742f8ffa1@redhat.com>
+Subject: Re: [PATCH 2/2] nbd-client: enable TCP keepalive
+References: <20190605100913.34972-1-vsementsov@virtuozzo.com>
+ <20190605100913.34972-3-vsementsov@virtuozzo.com>
+ <cd780b66-ab31-1feb-0cce-0b6525df7d79@redhat.com>
+ <20190605163710.GP8956@redhat.com>
+ <e5a35aeb-21a4-449c-f8d5-9d2ac2968fd5@virtuozzo.com>
+ <19a96fc2-7f12-7b30-edef-b3da66eef759@redhat.com>
+ <c0df2189-d90a-8a58-776b-646bbad76976@virtuozzo.com>
+ <20190605173601.GB13261@redhat.com>
+In-Reply-To: <20190605173601.GB13261@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-I see a difference between live migration and 'cold' migration. In
-a cold migration scenario (where a user 'stop' the machine, wait an
-arbitrary time, move it to another server, and run it), the behavior
-should be the same as executing 'stop/cont' in a guest without migration.
+On 6/5/19 12:36 PM, Daniel P. Berrang=C3=A9 wrote:
 
-This problem also emerges when the 'timeout' flag is used with 'virsh'
-tool to live-migrate a guest. After the 'timeout', the libvirt sends a
-'stop' command to QEMU to suspend the guest before migrate. If the NFS
-is slow, for example, this guest will wait many minutes to run again.
+>>
+>> Ok.
+>>
+>> One more thing to discuss then. Should I add keepalive directly to Blo=
+ckdevOptionsNbd?
+>>
+>> Seems more useful to put it into SocketAddress, to be reused by other =
+socket users..
+>> But "SocketAddress" sounds like address, not like address+connection-o=
+ptions. On
+>> the other hand, structure names are not part of API. So, finally, is I=
+netSocketAddress
+>> a good place for such thing?
+>=20
+> That's an interesting idea. Using InetSocketAddress would mean that we =
+could
+> get support for this enabled "for free" everywhere in QEMU that uses an=
 
-Maybe a solution is to modify the timebase_pre_save handler to know the
-current vm_state and only save the timebase again when vm_state is not
-in 'stop' state. What do you think?
+> InetSocketAddress as its master config format.
 
+I like the idea as well.
 
-> > The high-level tools could sync the SW clock with the HW clock if this
-> > behavior is required, keeping the QEMU stop/cont and stop/migrate/cont
-> > consistent.
-> > 
-> > > > ---
-> > > >  hw/ppc/ppc.c | 24 ------------------------
-> > > >  1 file changed, 24 deletions(-)
-> > > > 
-> > > > diff --git a/hw/ppc/ppc.c b/hw/ppc/ppc.c
-> > > > index ad20584f26..3fb50cbeee 100644
-> > > > --- a/hw/ppc/ppc.c
-> > > > +++ b/hw/ppc/ppc.c
-> > > > @@ -1056,35 +1056,11 @@ void cpu_ppc_clock_vm_state_change(void *opaque, int running,
-> > > >      }
-> > > >  }
-> > > >  
-> > > > -/*
-> > > > - * When migrating, read the clock just before migration,
-> > > > - * so that the guest clock counts during the events
-> > > > - * between:
-> > > > - *
-> > > > - *  * vm_stop()
-> > > > - *  *
-> > > > - *  * pre_save()
-> > > > - *
-> > > > - *  This reduces clock difference on migration from 5s
-> > > > - *  to 0.1s (when max_downtime == 5s), because sending the
-> > > > - *  final pages of memory (which happens between vm_stop()
-> > > > - *  and pre_save()) takes max_downtime.
-> > > 
-> > > Urgh.. this comment is confusing - 5s would be a ludicrously long
-> > > max_downtime by modern standards.
-> > > 
-> > > > - */
-> > > > -static int timebase_pre_save(void *opaque)
-> > > > -{
-> > > > -    PPCTimebase *tb = opaque;
-> > > > -
-> > > > -    timebase_save(tb);
-> > > > -
-> > > > -    return 0;
-> > > > -}
-> > > > -
-> > > >  const VMStateDescription vmstate_ppc_timebase = {
-> > > >      .name = "timebase",
-> > > >      .version_id = 1,
-> > > >      .minimum_version_id = 1,
-> > > >      .minimum_version_id_old = 1,
-> > > > -    .pre_save = timebase_pre_save,
-> > > >      .fields      = (VMStateField []) {
-> > > >          VMSTATE_UINT64(guest_timebase, PPCTimebase),
-> > > >          VMSTATE_INT64(time_of_the_day_ns, PPCTimebase),
-> > > 
-> > 
-> > 
-> 
-> -- 
-> David Gibson			| I'll have my music baroque, and my code
-> david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-> 				| _way_ _around_!
-> http://www.ozlabs.org/~dgibson
+>=20
+> Of course there's plenty of places not using InetSocketAddress that wou=
+ld
+> still require some glue to wire up the code which converts the custom
+> format into InetSocketAddress
+
+Hmm - how many places are we using InetSocketAddress (which allows an
+optional 'to' port value) when we really meant InetSocketAddressBase?
+There may be some interesting hierarchy decisions to consider on where
+we stick a keepalive option.
+
+This also made me wonder if we should start a deprecation clock to
+improve the nbd-server-start command to use SocketAddress instead of
+SocketAddressLegacy.  If we revive Max's work on implementing a default
+branch for a union discriminator
+(https://lists.gnu.org/archive/html/qemu-devel/2019-02/msg01682.html),
+we could have something like:
+
+{ 'enum': 'NbdSocketAddressHack',
+  'data': [ 'legacy', 'inet', 'unix' ] }
+{ 'struct': 'NbdServerAddrLegacy',
+  'data': { 'addr', 'SocketAddressLegacy' } }
+{ 'union': 'NbdServerAddr',
+  'base': { 'type': 'NbdSocketAddressHack',
+            '*tls-creds': 'str',
+            '*tls-authz': 'str' },
+  'discriminator': 'type',
+  'default-variant': 'legacy',
+  'data': { 'legacy': 'NbdServerAddrLegacy',
+            'inet', 'InetSocketAddress',
+            'unix', 'UnixSocketAddress' } }
+{ 'command', 'nbd-server-start', 'data': 'NbdServerAddr' }
+
+which should be backwards compatible with the existing:
+
+{ "execute": "nbd-server-start", "arguments": {
+    "tls-authz": "authz0",
+    "addr": { "type": "inet", "data": {
+      "host": "localhost", "port": "10809" } } } }
+
+by relying on the discriminator's default expansion to:
+
+{ "execute": "nbd-server-start", "arguments": {
+    "tls-authz": "authz0",
+    "type": "legacy",
+    "addr": { "type": "inet", "data": {
+      "host": "localhost", "port": "10809" } } } }
+
+but also permit the flatter:
+
+{ "execute": "nbd-server-start", "arguments": {
+    "tls-authz": "authz0",
+    "type": "inet", "host": "localhost", "port": "10809" } }
+
+and let us start a deprecation clock to get rid of the "legacy" branch
+(especially if coupled with Kevin's work on adding introspectable
+deprecation annotations in QAPI).
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
 
+--LJvFiP5KyJSaQR7mN6J6URUXudP6t1NbB
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlz4HJ0ACgkQp6FrSiUn
+Q2rSBAf+IYia3h6pWHlFEScRSvqPUs+s53+zd4i2HENBtTz46ddJzD5FtAFk6+yk
+Yw322kXid3smV2tUpT1hfZuCXZ4Vpm3hhR2z0qkvErNiGwddKWBB3advZCiLjIQ4
+RtsZ58olzMKjIIMy0qRSwgSLbnLPoGGCcZiEUYf2zZz74d5P7sUazX7BJoVajIY4
+EYO6YllbboshENuLyffnvX0xrS1mTA+aUGwHFdnXzk8R/nr72/FhK0dqB4foqPKF
+FUMnJaxYPE7e7pkQ0tLnlyxqtQb/4tzpSTD9r1U2UE0IBeyM105MsRdiW6e98cKj
+kRsehFyBpcYcHA5LvDRAgcoH74ru4g==
+=A6RV
+-----END PGP SIGNATURE-----
+
+--LJvFiP5KyJSaQR7mN6J6URUXudP6t1NbB--
 
