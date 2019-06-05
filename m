@@ -2,90 +2,91 @@ Return-Path: <SRS0=3v23=UE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C4795C28CC5
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 16:23:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57C06C28CC5
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 16:24:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9E04C206C3
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 16:23:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9E04C206C3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 244BE206C3
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 16:24:57 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="eJpoWYTQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 244BE206C3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:45919 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:45927 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hYYhd-0007NT-Q4
-	for qemu-devel@archiver.kernel.org; Wed, 05 Jun 2019 12:23:53 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:36020)
+	id 1hYYie-0008Fw-D1
+	for qemu-devel@archiver.kernel.org; Wed, 05 Jun 2019 12:24:56 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:36289)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hYYge-0006xF-Gt
-	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 12:22:53 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1hYYhG-0007MP-RL
+	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 12:23:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hYYgd-0007Qc-F4
-	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 12:22:52 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45264)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1hYYgd-0007Ph-6d
-	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 12:22:51 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 7AC4C8830F
-	for <qemu-devel@nongnu.org>; Wed,  5 Jun 2019 16:22:50 +0000 (UTC)
-Received: from dresden.str.redhat.com (unknown [10.40.205.15])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 8C2395F7D7;
-	Wed,  5 Jun 2019 16:22:43 +0000 (UTC)
-To: John Snow <jsnow@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
-References: <e7401f4d-e69b-2930-b070-fb0da55e4b98@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
-	mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
-	/PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
-	U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
-	mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
-	awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
-	AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
-	CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
-	B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
-	2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
-	AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
-	8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
-	4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
-	BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
-	xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
-	W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
-	DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
-	64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
-	ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
-	sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
-	alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
-	/ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
-	bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
-	R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <aeafd8bd-4027-eb21-fe68-f76f656e514a@redhat.com>
-Date: Wed, 5 Jun 2019 18:22:41 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.7.0
+	(envelope-from <alex.bennee@linaro.org>) id 1hYYhF-0008QD-NJ
+	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 12:23:30 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:46070)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1hYYhF-0008Ns-EW
+	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 12:23:29 -0400
+Received: by mail-wr1-x443.google.com with SMTP id f9so5392907wre.12
+	for <qemu-devel@nongnu.org>; Wed, 05 Jun 2019 09:23:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=from:to:cc:subject:date:message-id:in-reply-to:references
+	:mime-version:content-transfer-encoding;
+	bh=IDHocoT/qOpynBO1Yp20nQkSUYa2LGHJNcgaV0GU3E0=;
+	b=eJpoWYTQmSpIk8itYd+znr5kZ/6/+hbXiC/N7oj8+8FxHOfPyqA0HsFN/chP/oWj0H
+	kJyxxKwYDcCUWhMOSV5cDMgvCq5XoiSuntmwx3K/5HgczsAHWdmPW006KY7309zylZWC
+	Z1wP3k/QoZzjnqQ/Zu6fALGm3venVAYuddEmFpLUjPhSciqiok/jdnDiphxSw+PR6F0i
+	ii+VkJki3wrTewDCALT8ErI9ov4mOc7T/1BpEOkncxt1Wfq4RlVELF0eAmZpzs0sEIDc
+	I4/N0lLONjltcnEqxU/55A9AH8Blo8yMAofA3q28aCkEP2YxzdPOFHrfwkm8TAKMrj1o
+	CBSQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+	:references:mime-version:content-transfer-encoding;
+	bh=IDHocoT/qOpynBO1Yp20nQkSUYa2LGHJNcgaV0GU3E0=;
+	b=fbtI5OXW8+hnVlAjtDBIu9HnJT4mHfRQJDNPy9EzNt2ezmrv1kpdPWTKwUdAHpHRih
+	s5698FDrP5cZ6Zi7WJ1D5sKm4tzDvWgUdUWhNIl+z8oaHgyEKXJcDcgdQTN3tP4eYAVg
+	drAWvB8MeTbSuQVbQOtVR83fOHoiD+g7MUCTVwBNg0hV4QhBMlywKvJ0NUOrxvR77y8j
+	LQoWDXctiY/serBOj+Nn8zh9LuZZLZMqDXUoObC5xSM5Txe+R1SyH336pqaYgIv0xgCR
+	PJ8O8KMI98XTDvSqZf6iC3WSQFu8QGZvs8s8MQnMK+j56CWtgsI4ulNoJV7eqw6IkO33
+	J5/w==
+X-Gm-Message-State: APjAAAWwi7H2ZAG705i10R0TqTZ+wd7SiZsSbj/a3EoGt1XhwjfVbmg0
+	mO0bz60vCn5mq6SL86UXIUmoQw==
+X-Google-Smtp-Source: APXvYqwv/GRukQkosxZ7cpaW6GcBU3k62AANwM34GjysyWdny74wMa+dJxalNE63Lk3JYrigCgl7ZQ==
+X-Received: by 2002:adf:90e7:: with SMTP id i94mr11221398wri.213.1559751808088;
+	Wed, 05 Jun 2019 09:23:28 -0700 (PDT)
+Received: from zen.linaroharston ([81.128.185.34])
+	by smtp.gmail.com with ESMTPSA id
+	w14sm5355889wrt.59.2019.06.05.09.23.27
+	(version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+	Wed, 05 Jun 2019 09:23:27 -0700 (PDT)
+Received: from zen.linaroharston. (localhost [127.0.0.1])
+	by zen.linaroharston (Postfix) with ESMTP id A51621FF8C;
+	Wed,  5 Jun 2019 17:23:26 +0100 (BST)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+Date: Wed,  5 Jun 2019 17:23:23 +0100
+Message-Id: <20190605162326.13896-2-alex.bennee@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190605162326.13896-1-alex.bennee@linaro.org>
+References: <20190605162326.13896-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <e7401f4d-e69b-2930-b070-fb0da55e4b98@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="Ayq8fE1kZFsM2g5zoKprtuzlwKSGiqQdz"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.28]);
-	Wed, 05 Jun 2019 16:22:50 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-X-Content-Filtered-By: Mailman/MimeDel 2.1.21
-Subject: Re: [Qemu-devel] sigsegv in chardev on iotest 045 (raw)
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2a00:1450:4864:20::443
+Subject: [Qemu-devel] [PATCH v1 1/4] cputlb: use uint64_t for interim values
+ for unaligned load
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -97,73 +98,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel <qemu-devel@nongnu.org>
+Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+	Richard Henderson <richard.henderson@linaro.org>,
+	Laszlo Ersek <lersek@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+	Igor Mammedov <imammedo@redhat.com>,
+	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+	Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---Ayq8fE1kZFsM2g5zoKprtuzlwKSGiqQdz
-From: Max Reitz <mreitz@redhat.com>
-To: John Snow <jsnow@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>
-Message-ID: <aeafd8bd-4027-eb21-fe68-f76f656e514a@redhat.com>
-Subject: Re: [Qemu-devel] sigsegv in chardev on iotest 045 (raw)
-References: <e7401f4d-e69b-2930-b070-fb0da55e4b98@redhat.com>
-In-Reply-To: <e7401f4d-e69b-2930-b070-fb0da55e4b98@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+When running on 32 bit TCG backends a wide unaligned load ends up
+truncating data before returning to the guest. We specifically have
+the return type as uint64_t to avoid any premature truncation so we
+should use the same for the interim types.
 
-On 05.06.19 03:15, John Snow wrote:
-> Running tests on a development branch (I haven't touched chardev stuff,=
+Fixes: https://bugs.launchpad.net/qemu/+bug/1830872
+Fixes: eed5664238e
 
-> I swear!); I ran into the below crash where s->ioc was NULL. I don't
-> have the time to investigate at this exact moment, so please excuse the=
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Tested-by: Laszlo Ersek <lersek@redhat.com>
+Tested-by: Igor Mammedov <imammedo@redhat.com>
+---
+ accel/tcg/cputlb.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> hasty report so I don't forget to tell someone.
->=20
-> It does not reproduce consistently, and I can't get it to show up again=
-=2E
->=20
-> (Is this maybe just a race on close where the device went away too fast=
+diff --git a/accel/tcg/cputlb.c b/accel/tcg/cputlb.c
+index cdcc377102..b796ab1cbe 100644
+--- a/accel/tcg/cputlb.c
++++ b/accel/tcg/cputlb.c
+@@ -1303,7 +1303,7 @@ load_helper(CPUArchState *env, target_ulong addr, TCGMemOpIdx oi,
+         && unlikely((addr & ~TARGET_PAGE_MASK) + size - 1
+                     >= TARGET_PAGE_SIZE)) {
+         target_ulong addr1, addr2;
+-        tcg_target_ulong r1, r2;
++        uint64_t r1, r2;
+         unsigned shift;
+     do_unaligned_access:
+         addr1 = addr & ~(size - 1);
+-- 
+2.20.1
 
-> and it had nowhere to print the information? --js)
-
-Your back trace looks exactly like what I posted in
-http://lists.nongnu.org/archive/html/qemu-devel/2018-12/msg05579.html .
-
-No, I don=E2=80=99t think anybody has posted a fix for this so far.  I kn=
-ow
-other people saw similar issues.
-
-I know what I have on my test branch (which contains various fixes to
-make all iotests run or at least pass those which are terminally broken):=
-
-
-https://git.xanclic.moe/XanClic/qemu/commit/c52433f218c61ef608ab4d9abb56e=
-1f705a3ae22
-
-I have a lot of patches on my test branch.  (15, to be exact.)
-
-Max
-
-
---Ayq8fE1kZFsM2g5zoKprtuzlwKSGiqQdz
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlz37FEACgkQ9AfbAGHV
-z0DARQgAj1G6RnLntDEKpKQu2XUiK+5izFyGrw90feKhf/7HdGpC4+qS0fq9IWUg
-enx6xZhrOQUaxGSjoDARk+FZyOeWhvbRARpLEOeMpP5+Rtfsl68x0/qa7rc1TOEo
-62iTeTlvhUoieX04qnjtONoysoXXc59XZAOBGONBK2U4JgJ9Hgeazpryj0jywye5
-4n6gIlZXgbvxJC0vGuHFnd9DGWUxz+yBA4jRM9lS/eAahjGV9IJWxDP0nvItoyi4
-OvUUFDYsS/FL55dlQIUX0zBuKkk/ZohSYpLdcKfy6nISzPE4nUOGvSiGlzAVEYWO
-TZUt3JAWvQP7jgtslfkx8CmSgClVhg==
-=su+T
------END PGP SIGNATURE-----
-
---Ayq8fE1kZFsM2g5zoKprtuzlwKSGiqQdz--
 
