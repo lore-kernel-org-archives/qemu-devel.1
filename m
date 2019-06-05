@@ -2,69 +2,66 @@ Return-Path: <SRS0=3v23=UE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=FROM_EXCESS_BASE64,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CD7DC28CC5
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 13:51:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 15927C28CC5
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 13:59:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 06E9120684
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 13:51:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 06E9120684
+	by mail.kernel.org (Postfix) with ESMTPS id E0EA7207E0
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 13:59:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E0EA7207E0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:42659 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:43069 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hYWKK-0000r3-7G
-	for qemu-devel@archiver.kernel.org; Wed, 05 Jun 2019 09:51:40 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:41458)
+	id 1hYWRv-0003Kh-1J
+	for qemu-devel@archiver.kernel.org; Wed, 05 Jun 2019 09:59:31 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:45411)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1hYWJ3-0008Nq-K1
-	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 09:50:22 -0400
+	(envelope-from <lvivier@redhat.com>) id 1hYWR9-0002zU-Bh
+	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 09:58:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1hYWIx-0001UI-Gp
-	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 09:50:21 -0400
-Received: from mail-oi1-f195.google.com ([209.85.167.195]:41386)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1hYWIv-0000wD-AZ
-	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 09:50:15 -0400
-Received: by mail-oi1-f195.google.com with SMTP id b21so14266724oic.8
-	for <qemu-devel@nongnu.org>; Wed, 05 Jun 2019 06:49:53 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-	:message-id:subject:to:cc:content-transfer-encoding;
-	bh=NTRQ6FArOEDXowCToUaBKAyC4OD8veaJOvwOPieKUZ4=;
-	b=U2VKvqrYiSu7Ls+xChJ4yLdYahyEPUK9RbQ33U2bE61U22H1Hxp98Hzx7NKibfdwHU
-	EFrCbYRUqlNVhpbFm7xYa0Mws6wz2Tq1sDleafKotZyrF9Ouq9K2DnRYNDxIAoIe2St+
-	2dKp2nLpggSYRWY1QOCbvdalUpNj6lCJWHzlTCzJWGtzJAJwLXeCLJstI5vbLkzl51hN
-	LFS5piX+1IYPrdCPj7SXA/E/KzfUo3P1FUjIpp0WmTj/1SJ8L+gn5wbIr/0AVtLuXYXP
-	fu3RDwb8KK6kstrVN2eAAoB6TVM4UUz8IBxvsfXH2LAU2VpbLoMeGc0ZztWCisvv8KGr
-	u0Dg==
-X-Gm-Message-State: APjAAAWQM+Qns5QA8ZHhbpewqgRHqb+M3vEaz1DkHH+NboW7VS63jYvv
-	TliO4sZXeqzKXCdsbZauExVW68kn1XvYVlOJIW0T6w==
-X-Google-Smtp-Source: APXvYqwLEcv6Ozlu1t2AF6YSnrqoq2eecowL3o1SIALZ394tilmZQQDQto3UpLWKKS4pJ/VWGSvXc8NWyfpf34XBcxg=
-X-Received: by 2002:aca:4d12:: with SMTP id a18mr6833844oib.33.1559742592425; 
-	Wed, 05 Jun 2019 06:49:52 -0700 (PDT)
+	(envelope-from <lvivier@redhat.com>) id 1hYWR8-000383-5K
+	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 09:58:43 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47548)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1hYWR7-00035B-Up
+	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 09:58:42 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 5E8ED30C120E;
+	Wed,  5 Jun 2019 13:58:35 +0000 (UTC)
+Received: from [10.40.204.44] (ovpn-204-44.brq.redhat.com [10.40.204.44])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 2E0335DF4C;
+	Wed,  5 Jun 2019 13:58:30 +0000 (UTC)
+To: Markus Armbruster <armbru@redhat.com>
+References: <20190529143106.11789-1-lvivier@redhat.com>
+	<87a7ewp4h4.fsf@dusky.pond.sub.org>
+From: Laurent Vivier <lvivier@redhat.com>
+Message-ID: <4601cfa8-732a-3063-7106-da8d3b990410@redhat.com>
+Date: Wed, 5 Jun 2019 15:58:29 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+	Thunderbird/52.8.0
 MIME-Version: 1.0
-References: <20190522082717.9354-1-kraxel@redhat.com>
-	<20190522082717.9354-4-kraxel@redhat.com>
-	<CAFEAcA_SwRQSxztT2_fOPjOgw8OZykC1+aH+eGaOvaj7UFMcYA@mail.gmail.com>
-In-Reply-To: <CAFEAcA_SwRQSxztT2_fOPjOgw8OZykC1+aH+eGaOvaj7UFMcYA@mail.gmail.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
-Date: Wed, 5 Jun 2019 15:49:41 +0200
-Message-ID: <CAMxuvayj3Oo6VUh=GNREYjisXZs-tsTOZeLAJ=sE=pTRXvo41w@mail.gmail.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <87a7ewp4h4.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.46]);
+	Wed, 05 Jun 2019 13:58:35 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-	[fuzzy]
-X-Received-From: 209.85.167.195
-Subject: Re: [Qemu-devel] [PULL 3/3] contrib: add vhost-user-input
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v7 0/4] rng-builtin: add an RNG backend
+ that uses qemu_guest_getrandom()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -76,147 +73,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
-	QEMU Developers <qemu-devel@nongnu.org>
+Cc: "=?UTF-8?Q?Daniel_P.Berrang=c3=a9?=" <berrange@redhat.com>,
+	Amit Shah <amit@kernel.org>, Kashyap Chamarthy <kchamart@redhat.com>,
+	Richard Henderson <richard.henderson@linaro.org>,
+	"Richard W . M . Jones" <rjones@redhat.com>,
+	qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi
+On 05/06/2019 15:05, Markus Armbruster wrote:
+> Laurent Vivier <lvivier@redhat.com> writes:
+> 
+>> Add a new RNG backend using QEMU builtin getrandom function.
+>>
+>> v7: rebase on master
+>>     Make rng-builtin asynchronous with QEMUBH (removed existing R-b)
+> 
+> Pardon the ignorant question: why is that necessary?
+> 
 
-On Thu, May 30, 2019 at 1:17 PM Peter Maydell <peter.maydell@linaro.org> wr=
-ote:
->
-> On Wed, 22 May 2019 at 09:29, Gerd Hoffmann <kraxel@redhat.com> wrote:
-> >
-> > From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> >
-> > Add a vhost-user input backend example, based on virtio-input-host
-> > device. It takes an evdev path as argument, and can be associated with
-> > a vhost-user-input device via a UNIX socket:
-> >
-> > $ vhost-user-input -p /dev/input/eventX -s /tmp/vui.sock
-> >
-> > $ qemu ... -chardev socket,id=3Dvuic,path=3D/tmp/vui.sock
-> >   -device vhost-user-input-pci,chardev=3Dvuic
-> >
-> > This example is intentionally not included in $TOOLS, and not
-> > installed by default.
-> >
-> > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> > Message-id: 20190514104126.6294-4-marcandre.lureau@redhat.com
-> > Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
->
-> Hi; Coverity spotted a problem with this patch:
->
-> > +int
-> > +main(int argc, char *argv[])
-> > +{
-> > +    GMainLoop *loop =3D NULL;
-> > +    VuInput vi =3D { 0, };
-> > +    int rc, ver, fd;
-> > +    virtio_input_config id;
-> > +    struct input_id ids;
-> > +    GError *error =3D NULL;
-> > +    GOptionContext *context;
-> > +
-> > +    context =3D g_option_context_new(NULL);
-> > +    g_option_context_add_main_entries(context, entries, NULL);
-> > +    if (!g_option_context_parse(context, &argc, &argv, &error)) {
-> > +        g_printerr("Option parsing failed: %s\n", error->message);
-> > +        exit(EXIT_FAILURE);
-> > +    }
-> > +    if (opt_print_caps) {
-> > +        g_print("{\n");
-> > +        g_print("  \"type\": \"input\",\n");
-> > +        g_print("  \"features\": [\n");
-> > +        g_print("    \"evdev-path\",\n");
-> > +        g_print("    \"no-grab\"\n");
-> > +        g_print("  ]\n");
-> > +        g_print("}\n");
-> > +        exit(EXIT_SUCCESS);
-> > +    }
-> > +    if (!opt_evdev) {
-> > +        g_printerr("Please specify an evdev path\n");
-> > +        exit(EXIT_FAILURE);
-> > +    }
-> > +    if ((!!opt_socket_path + (opt_fdnum !=3D -1)) !=3D 1) {
-> > +        g_printerr("Please specify either --fd or --socket-path\n");
-> > +        exit(EXIT_FAILURE);
-> > +    }
-> > +
-> > +    vi.evdevfd =3D open(opt_evdev, O_RDWR);
-> > +    if (vi.evdevfd < 0) {
-> > +        g_printerr("Failed to open evdev: %s\n", g_strerror(errno));
-> > +        exit(EXIT_FAILURE);
-> > +    }
-> > +
-> > +    rc =3D ioctl(vi.evdevfd, EVIOCGVERSION, &ver);
-> > +    if (rc < 0) {
-> > +        g_printerr("%s: is not an evdev device\n", argv[1]);
-> > +        exit(EXIT_FAILURE);
-> > +    }
-> > +
-> > +    if (!opt_nograb) {
-> > +        rc =3D ioctl(vi.evdevfd, EVIOCGRAB, 1);
-> > +        if (rc < 0) {
-> > +            g_printerr("Failed to grab device\n");
-> > +            exit(EXIT_FAILURE);
-> > +        }
-> > +    }
-> > +
-> > +    vi.config =3D g_array_new(false, false, sizeof(virtio_input_config=
-));
-> > +    memset(&id, 0, sizeof(id));
-> > +    ioctl(vi.evdevfd, EVIOCGNAME(sizeof(id.u.string) - 1), id.u.string=
-);
->
-> CID 1401704 -- we don't check the return value from ioctl().
+Because request_entropy() function is called while the request is not in
+the requests queue, so the loop on !QSIMPLEQ_EMPTY(&s->parent.requests)
+doens't process it. The request is added just after the call.
 
-ok, I'll send a fix
+thanks,
+Laurent
 
->
-> > +    id.select =3D VIRTIO_INPUT_CFG_ID_NAME;
-> > +    id.size =3D strlen(id.u.string);
-> > +    g_array_append_val(vi.config, id);
-> > +
-> > +    if (ioctl(vi.evdevfd, EVIOCGID, &ids) =3D=3D 0) {
-> > +        memset(&id, 0, sizeof(id));
-> > +        id.select =3D VIRTIO_INPUT_CFG_ID_DEVIDS;
-> > +        id.size =3D sizeof(struct virtio_input_devids);
-> > +        id.u.ids.bustype =3D cpu_to_le16(ids.bustype);
-> > +        id.u.ids.vendor  =3D cpu_to_le16(ids.vendor);
-> > +        id.u.ids.product =3D cpu_to_le16(ids.product);
-> > +        id.u.ids.version =3D cpu_to_le16(ids.version);
-> > +        g_array_append_val(vi.config, id);
-> > +    }
-> > +
-> > +    vi_bits_config(&vi, EV_KEY, KEY_CNT);
-> > +    vi_bits_config(&vi, EV_REL, REL_CNT);
-> > +    vi_bits_config(&vi, EV_ABS, ABS_CNT);
-> > +    vi_bits_config(&vi, EV_MSC, MSC_CNT);
-> > +    vi_bits_config(&vi, EV_SW,  SW_CNT);
-> > +    g_debug("config length: %u", vi.config->len);
-> > +
-> > +    if (opt_socket_path) {
-> > +        int lsock =3D unix_listen(opt_socket_path, &error_fatal);
-> > +        fd =3D accept(lsock, NULL, NULL);
-> > +        close(lsock);
->
-> This is CID 1401705 -- failure to check return value from
-> unix_listen() -- which I just realised I probably replied
-> to the wrong version of the patch to point out, so I mention
-> it again here.
 
-coverity should realize that passing &error_fatal will not return, no?
 
-Can we mark this as false-positive?
 
->
-> > +    } else {
-> > +        fd =3D opt_fdnum;
-> > +    }
->
-> thanks
-> -- PMM
 
