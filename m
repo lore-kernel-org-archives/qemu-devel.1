@@ -2,83 +2,66 @@ Return-Path: <SRS0=3v23=UE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 48DF3C282DE
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 07:18:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F1BB3C282DE
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 07:21:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 164BB2083E
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 07:18:19 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YawF5Bvl"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 164BB2083E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id CB5EE2083E
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 07:21:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CB5EE2083E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:36735 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:36789 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hYQBe-0005p2-8Q
-	for qemu-devel@archiver.kernel.org; Wed, 05 Jun 2019 03:18:18 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:60655)
+	id 1hYQFA-0007Jr-ON
+	for qemu-devel@archiver.kernel.org; Wed, 05 Jun 2019 03:21:56 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:33354)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <elohimes@gmail.com>) id 1hYQA7-0005D5-CL
-	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 03:16:44 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1hYQDs-0006Qo-RZ
+	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 03:20:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <elohimes@gmail.com>) id 1hYQA5-0002i6-BE
-	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 03:16:42 -0400
-Received: from mail-qk1-x742.google.com ([2607:f8b0:4864:20::742]:35200)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <elohimes@gmail.com>) id 1hYQA5-0002gi-6u
-	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 03:16:41 -0400
-Received: by mail-qk1-x742.google.com with SMTP id l128so4540501qke.2
-	for <qemu-devel@nongnu.org>; Wed, 05 Jun 2019 00:16:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-	:cc; bh=9buaXQLGdYJ/2B0U1Is3vnoPf5kkPieOFWEMjJJ+h84=;
-	b=YawF5BvlhnY7bHXhcAf6H6+MYzUbjCYmoRvd96QndWL4VsLcdIohXmkFVw45MIoK32
-	C1DuVQnjrCT4UiT0FIyVFDYyvFgsmEx9sIiMdLrgjta2APqPspv5ef1EffkUwM0KWZpT
-	jcOCZLuZyDIVuZkU5vuAgLNHiKQwlGm7wDQAugxOTf4EJPb0UWFCHXjQsdJXWn1OE9N2
-	cnykjotpsRNNuibiZYLvnFA7+hMeVWll+ldRIUgd2n2a4syb3LrVChDAAb7VD+ehfGUS
-	IjbF47ahtVPEDT6KHlFfkLmbJ/cvNjstZ0IxW6j3W9mWglUKcj5ENU9NzRhvpioPovWj
-	5tqw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-	:message-id:subject:to:cc;
-	bh=9buaXQLGdYJ/2B0U1Is3vnoPf5kkPieOFWEMjJJ+h84=;
-	b=ONqQN9tSmLe205nkTUXMnvFHi571+/elKtccuEdhDLI2MfR3m0H4OFyBzPFd1lHHwY
-	VeCOUCcReHHadOW/WUKH1C4EhF1ewSt4o/Jbw+ClUv8Rs6xsKJjBj2J0ld46OmsY7KsF
-	uB6l/R4fdF/6Av2gc5b3o3dPEHT2OUqxe0X/CqyObvqWgzQTVgiqu1XF6T2L/QBbe9tt
-	Z1IPnfrJbbW/zRBIYVSSBKPOIvh3UeS/FyqXoORlcQ4RFrHbhBIUwZeDbfIyRGALcVta
-	DpffiIvWC/7aIdgUkNxT1dU+8aVphtT6XnuhO4l7qEWdMBBZfwwDC7i9sDgVR1cFc+zZ
-	kaiw==
-X-Gm-Message-State: APjAAAXu6on9a6TU6WPPP0JaIKdBOsdNNB4zSCUvCcoU4YY6/K21blBv
-	MaRXMUP2pR1Za+OhhAc8Ul+h2pMrKKSrkf/aYlI=
-X-Google-Smtp-Source: APXvYqwbNOaaTaeMkh1uPzS1Bu1hQJPJhlSQrfADa5ETA/oSdZKC1e7PMBNPHQntxnWy2lty6IcwilSUepfx8gZa3nA=
-X-Received: by 2002:a37:9c15:: with SMTP id f21mr10914171qke.248.1559719000626;
-	Wed, 05 Jun 2019 00:16:40 -0700 (PDT)
+	(envelope-from <eric.auger@redhat.com>) id 1hYQDr-0008Cu-VF
+	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 03:20:36 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46420)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eric.auger@redhat.com>)
+	id 1hYQDp-000894-Qf; Wed, 05 Jun 2019 03:20:33 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+	[10.5.11.23])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id DCBEF3082B69;
+	Wed,  5 Jun 2019 07:20:32 +0000 (UTC)
+Received: from [10.36.116.67] (ovpn-116-67.ams2.redhat.com [10.36.116.67])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id A375E19741;
+	Wed,  5 Jun 2019 07:20:29 +0000 (UTC)
+To: Andrew Jones <drjones@redhat.com>, qemu-devel@nongnu.org,
+	qemu-arm@nongnu.org
+References: <20190512083624.8916-1-drjones@redhat.com>
+	<20190512083624.8916-2-drjones@redhat.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <9175d449-9b06-7c38-8804-ef454ab5942f@redhat.com>
+Date: Wed, 5 Jun 2019 09:20:28 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.4.0
 MIME-Version: 1.0
-References: <20190604073459.15651-1-xieyongji@baidu.com>
-	<20190604073459.15651-3-xieyongji@baidu.com>
-	<20190605084224.22e4cd92@bahia.lab.toulouse-stg.fr.ibm.com>
-	<CAONzpcZ_Wosy3BUZYDUp8UuEYk_3VSpSP+MQr7QRab8bKJ4-JQ@mail.gmail.com>
-	<20190605091401.5177daca@bahia.lab.toulouse-stg.fr.ibm.com>
-In-Reply-To: <20190605091401.5177daca@bahia.lab.toulouse-stg.fr.ibm.com>
-From: Yongji Xie <elohimes@gmail.com>
-Date: Wed, 5 Jun 2019 15:16:28 +0800
-Message-ID: <CAONzpcaw_KbtW5Y1KQd_Mo-gYPtydxRLwRVh0sUkk9a7BUQ+qw@mail.gmail.com>
-To: Greg Kurz <groug@kaod.org>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::742
-Subject: Re: [Qemu-devel] [PATCH v2 2/5] virtio: Set "start_on_kick" for
- legacy devices
+In-Reply-To: <20190512083624.8916-2-drjones@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.45]);
+	Wed, 05 Jun 2019 07:20:32 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH 01/13] target/arm/kvm64: fix error returns
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -90,45 +73,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Xie Yongji <xieyongji@baidu.com>,
-	"Dr. David Alan Gilbert" <dgilbert@redhat.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>
+Cc: peter.maydell@linaro.org, richard.henderson@linaro.org, armbru@redhat.com,
+	abologna@redhat.com, alex.bennee@linaro.org, Dave.Martin@arm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 5 Jun 2019 at 15:14, Greg Kurz <groug@kaod.org> wrote:
->
-> On Wed, 5 Jun 2019 14:49:34 +0800
-> Yongji Xie <elohimes@gmail.com> wrote:
->
-> > On Wed, 5 Jun 2019 at 14:42, Greg Kurz <groug@kaod.org> wrote:
-> > >
-> > > On Tue,  4 Jun 2019 15:34:56 +0800
-> > > elohimes@gmail.com wrote:
-> > >
-> > > > From: Xie Yongji <xieyongji@baidu.com>
-> > > >
-> > > > Besides virtio 1.0 transitional devices, we should also
-> > > > set "start_on_kick" flag for legacy devices (virtio 0.9).
-> > > >
-> > > > Signed-off-by: Xie Yongji <xieyongji@baidu.com>
-> > > > ---
-> > >
-> > > Patch looks good but it would be even better if applied
-> > > earlier so that it doesn't revert lines added by the
-> > > previous patch...
-> > >
-> >
-> > Fine with me. Will do it in v3.
-> >
->
-> Hold on before posting, I've just learned about hw_compat_4_0_1 while
-> reviewing patch 5... need so more time to understand the impact.
->
+Hi,
 
-Sure.
+On 5/12/19 10:36 AM, Andrew Jones wrote:
+> A couple return -EINVAL's forget their '-'s.
+> 
+> Signed-off-by: Andrew Jones <drjones@redhat.com>
+> ---
+>  target/arm/kvm64.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
+> index e3ba1492482f..ba232b27a6d3 100644
+> --- a/target/arm/kvm64.c
+> +++ b/target/arm/kvm64.c
+> @@ -841,7 +841,7 @@ int kvm_arch_put_registers(CPUState *cs, int level)
+>      write_cpustate_to_list(cpu, true);
+>  
+>      if (!write_list_to_kvmstate(cpu, level)) {
+> -        return EINVAL;
+> +        return -EINVAL;
+>      }
+>  
+>      kvm_arm_sync_mpstate_to_kvm(cpu);
+> @@ -982,7 +982,7 @@ int kvm_arch_get_registers(CPUState *cs)
+>      }
+>  
+>      if (!write_kvmstate_to_list(cpu)) {
+> -        return EINVAL;
+> +        return -EINVAL;
+>      }
+>      /* Note that it's OK to have registers which aren't in CPUState,
+>       * so we can ignore a failure return here.
+> 
+note, if I am not wrong, in existing call sites the returned value is
+never tested actually.
 
-Thanks,
-Yongji
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
+
+Thanks
+
+Eric
 
