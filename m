@@ -2,101 +2,66 @@ Return-Path: <SRS0=3v23=UE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AA0C5C28CC5
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 16:08:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 28E93C28CC5
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 16:08:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 79DA120866
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 16:08:34 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="EKJ5Vcac"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 79DA120866
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 019BC2075C
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 16:08:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 019BC2075C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:45495 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:45505 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hYYSn-0004r6-O3
-	for qemu-devel@archiver.kernel.org; Wed, 05 Jun 2019 12:08:33 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:57039)
+	id 1hYYSw-00050R-1i
+	for qemu-devel@archiver.kernel.org; Wed, 05 Jun 2019 12:08:42 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:57225)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hYYRa-0004B7-6O
-	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 12:07:20 -0400
+	(envelope-from <crosa@redhat.com>) id 1hYYRg-0004EC-H7
+	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 12:07:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hYYRY-0002Jx-Kt
-	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 12:07:18 -0400
-Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:39059)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hYYRY-0001HA-AF
-	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 12:07:16 -0400
-Received: by mail-oi1-x243.google.com with SMTP id m202so7443418oig.6
-	for <qemu-devel@nongnu.org>; Wed, 05 Jun 2019 09:06:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
-	:mime-version:in-reply-to:content-language:content-transfer-encoding;
-	bh=lsmwWSsz6/MI7PqsBhK2NXtLBVJJvW0Xg5zFZsjHZbo=;
-	b=EKJ5Vcac9KV73pDiQYTdSA0iSnYF9/GzYyAJ622EA8TvhmbMPqHwpZ5ZTGixzd1b5H
-	DM5PpidV5/2jUgVcKX6mbyldVzubyR4O4n68aG0Qf0b5zbxo/i/uTJgpzQm8Xc9qcieM
-	9PBERI2I2JivGuh43v3hKliHuNNV6gpmbAE83HEX+0fLAX9jaEM0lISP8abvu9wwAKSf
-	MrrejtKV2jbfIDmmyP4iVDZYA7P6k/QxTJ2lm2QnHrXuniy0Edj4R1jJcqQg37T/i79b
-	HSSdeJ9OKli3mAiUTp126pK1c2MtcCqtjpE0Bf6C53tN0dliF8twhZJDueZPpLBrgObz
-	+J1w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-	:date:user-agent:mime-version:in-reply-to:content-language
-	:content-transfer-encoding;
-	bh=lsmwWSsz6/MI7PqsBhK2NXtLBVJJvW0Xg5zFZsjHZbo=;
-	b=fX84DHx4mvP2VexNLAgncpvu2zz5MqLK9R9RcTS4k7Sh2ft1oxhws5dUKEPt2wk61j
-	W8Szx/CM70Y2I+gr1CYZCjn9PYs2uFlyEEUSAOHaER12f6Xx/TECAhhw9zX+8gAYQClI
-	jIQwL/5TS1L0M+gEVse1oIbQwZZrohJc/VbN2ULbePrygfqQPOxBFkx7gMD7Qqx/c9Wj
-	C/kwj84JL0V8/1loQ/mJA1tUKfxWunOBMEuDszKU5Qw5BaOa9pHuryKdkIHkRVXz66Jb
-	IfrwVaSwt3vK/+j1wBXgnBsIGQaxF452RcMZ2JsZwOtV80VXa2Vt93IC09uzCoth7uPz
-	CMew==
-X-Gm-Message-State: APjAAAV6EG/KwSYPffINIvnZFDXpWhdwp1KjtucG0VdpFjBCd9Sy8L8C
-	aQM5hthPx673aGFHoH9fKmLT8g==
-X-Google-Smtp-Source: APXvYqzxnQxbLsqIZIjWBRnt45ZtyYkN6CUYS7q3yxayRRrfeQWNpeyUO+N1wKEgOJ+GEPmFMWglzQ==
-X-Received: by 2002:aca:3485:: with SMTP id b127mr6794100oia.86.1559750816293; 
-	Wed, 05 Jun 2019 09:06:56 -0700 (PDT)
-Received: from [192.168.3.43] (200-56-192-86-cable.cybercable.net.mx.
-	[200.56.192.86])
-	by smtp.gmail.com with ESMTPSA id n2sm6763267otl.7.2019.06.05.09.06.54
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Wed, 05 Jun 2019 09:06:55 -0700 (PDT)
-To: Michael Rolnik <mrolnik@gmail.com>
-References: <20190530190738.22713-1-mrolnik@gmail.com>
-	<20190530190738.22713-4-mrolnik@gmail.com>
-	<402ba0b2-e2e0-6b7a-1862-4588e5f83357@linaro.org>
-	<CAK4993iXV9oRr_VfabJHg4fCYEppW49i_PE9R0X_TBqk7TDkrQ@mail.gmail.com>
-	<9e2acbbe-7ede-c45d-5e9f-bb269aa25fcc@linaro.org>
-	<CAK4993hXTOSoW5FFjeur+pLzT18c-C=vwao-904ASyqMsT5eMQ@mail.gmail.com>
-	<3bc0d426-bd59-055d-a010-b136cba555bf@linaro.org>
-	<CAK4993j5JXgV9CYDckt99kwgQaG6w-GN-Tka7r2nahoh33rheQ@mail.gmail.com>
-	<CAK4993jWViasj8PKUCHcbMh-9SPJmELqua9eSbFvwL7gpm2e5A@mail.gmail.com>
-	<7b0c5e07-5b99-3344-7f80-847880f85b5b@linaro.org>
-	<CAK4993jPs_j9qvv8v2sfZ=npGkbkMAv3HaWSYRiSqFthkvfmdA@mail.gmail.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <fd701964-3e5e-fde2-1103-d38881a39129@linaro.org>
-Date: Wed, 5 Jun 2019 11:06:51 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.7.0
+	(envelope-from <crosa@redhat.com>) id 1hYYRe-0002YM-Qr
+	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 12:07:24 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56870)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <crosa@redhat.com>)
+	id 1hYYRZ-0002LI-Lb; Wed, 05 Jun 2019 12:07:17 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 9D1B23007408;
+	Wed,  5 Jun 2019 16:07:06 +0000 (UTC)
+Received: from localhost.localdomain (ovpn-121-163.rdu2.redhat.com
+	[10.10.121.163])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 3E3C860BC3;
+	Wed,  5 Jun 2019 16:07:01 +0000 (UTC)
+Date: Wed, 5 Jun 2019 12:06:59 -0400
+From: Cleber Rosa <crosa@redhat.com>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
+Message-ID: <20190605160659.GB7080@localhost.localdomain>
+References: <20190520220635.10961-1-f4bug@amsat.org>
+	<20190520220635.10961-3-f4bug@amsat.org>
 MIME-Version: 1.0
-In-Reply-To: <CAK4993jPs_j9qvv8v2sfZ=npGkbkMAv3HaWSYRiSqFthkvfmdA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::243
-Subject: Re: [Qemu-devel] [PATCH RFC v20 3/8] target/avr: Add mechanism to
- check for active debugger connection
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20190520220635.10961-3-f4bug@amsat.org>
+User-Agent: Mutt/1.11.4 (2019-03-13)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.42]);
+	Wed, 05 Jun 2019 16:07:11 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH 2/2] BootLinuxConsoleTest: Test the
+ SmartFusion2 board
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -108,39 +73,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Sarah Harris <S.E.Harris@kent.ac.uk>,
-	=?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
-	QEMU Developers <qemu-devel@nongnu.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+	Eduardo Habkost <ehabkost@redhat.com>,
+	Alistair Francis <alistair@alistair23.me>, qemu-devel@nongnu.org,
+	Subbaraya Sundeep <sundeep.lkml@gmail.com>, qemu-arm@nongnu.org,
+	Caio Carrara <ccarrara@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/5/19 10:19 AM, Michael Rolnik wrote:
-> Richard.
-> 
-> We use break instruction for testing.
-> (Here https://github.com/seharris/qemu-avr-tests/tree/master/instruction-tests).
-> Each test is a big list of small tests with a break between them. We run the
-> tests on HW and on QEMU then compare register after each break. If we don't
-> implement break the way Sarah suggested we have no way of testing.
-> What do you suggest?
+On Tue, May 21, 2019 at 12:06:35AM +0200, Philippe Mathieu-Daud=E9 wrote:
+> Similar to the x86_64/pc test, it boots a Linux kernel on an
+> Emcraft board and verify the serial is working.
+>=20
+> If ARM is a target being built, "make check-acceptance" will
+> automatically include this test by the use of the "arch:arm" tags.
+>=20
+> Alternatively, this test can be run using:
+>=20
+>   $ avocado run -t arch:arm tests/acceptance
+>   $ avocado run -t machine:emcraft-sf2 tests/acceptance
+>
 
-Hmm.
+The pattern accepted as a tag currently doesn't include a dash, see:
 
-Ordinarily I would say to use some sort of syscall/exception/interrupt
-instruction, but I see that avr doesn't have any of those.
+   https://avocado-framework.readthedocs.io/en/68.0/ReferenceGuide.html#d=
+ocstring-directives-rules
 
-You could use "call breakpoint" instead of using raw BREAK instructions with
-the implementation just being
+My suggestion is to replace the dash for an underline.  This was done
+on the s390 test:
 
-breakpoint:
-	ret
+   :avocado: tags=3Dmachine:s390_ccw_virtio
 
-and have gdb issue "break breakpoint" before beginning.
+> Based on the recommended test setup from Subbaraya Sundeep:
+> https://lists.gnu.org/archive/html/qemu-devel/2017-05/msg03810.html
+>=20
+> Signed-off-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
+> ---
+>  tests/acceptance/boot_linux_console.py | 27 ++++++++++++++++++++++++++
+>  1 file changed, 27 insertions(+)
+>=20
+> diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/=
+boot_linux_console.py
+> index f593f3858e..844cb80bb5 100644
+> --- a/tests/acceptance/boot_linux_console.py
+> +++ b/tests/acceptance/boot_linux_console.py
+> @@ -178,6 +178,33 @@ class BootLinuxConsole(Test):
+>          console_pattern =3D 'Kernel command line: %s' % kernel_command=
+_line
+>          self.wait_for_console_pattern(console_pattern)
+> =20
+> +    def test_arm_emcraft_sf2(self):
+> +        """
+> +        :avocado: tags=3Darch:arm
+> +        :avocado: tags=3Dmachine:emcraft-sf2
 
-But perhaps I'm being over-pedantic about this, and someone else should weigh
-in.  Alex, I nominate you since you most recently touched gdbserver.  ;-)
+As per the previous comment, this would become:
 
+    :avocado: tags=3Dmachine:emcraft_sf2
 
-r~
+> +        :avocado: tags=3Dendian:little
+> +        """
+> +        uboot_url =3D ('https://raw.githubusercontent.com/'
+> +                     'Subbaraya-Sundeep/qemu-test-binaries/'
+> +                     'fa030bd77a014a0b8e360d3b7011df89283a2f0b/u-boot'=
+)
+> +        uboot_hash =3D 'abba5d9c24cdd2d49cdc2a8aa92976cf20737eff'
+> +        uboot_path =3D self.fetch_asset(uboot_url, asset_hash=3Duboot_=
+hash)
+> +        spi_url =3D ('https://raw.githubusercontent.com/'
+> +                   'Subbaraya-Sundeep/qemu-test-binaries/'
+> +                   'fa030bd77a014a0b8e360d3b7011df89283a2f0b/spi.bin')
+> +        spi_hash =3D '85f698329d38de63aea6e884a86fbde70890a78a'
+> +        spi_path =3D self.fetch_asset(spi_url, asset_hash=3Dspi_hash)
+> +
+> +        self.vm.set_machine('emcraft-sf2')
+> +        self.vm.set_console()
+> +        kernel_command_line =3D self.KERNEL_COMMON_COMMAND_LINE
+> +        self.vm.add_args('-kernel', uboot_path,
+> +                         '-append', kernel_command_line,
+> +                         '-drive', 'file=3D' + spi_path + ',if=3Dmtd,f=
+ormat=3Draw',
+
+Nitpick:
+
+   '-drive', 'file=3D%s,if=3Dmtd,format=3Draw' % spi_path,
+
+> +                         '-no-reboot')
+> +        self.vm.launch()
+> +        self.wait_for_console_pattern('init started: BusyBox')
+> +
+>      def test_s390x_s390_ccw_virtio(self):
+>          """
+>          :avocado: tags=3Darch:s390x
+> --=20
+> 2.19.1
+>=20
+
+Other than that, it looks good to me.
 
