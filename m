@@ -2,113 +2,67 @@ Return-Path: <SRS0=3v23=UE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=FROM_EXCESS_BASE64,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F0D97C28CC5
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 15:10:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 13B7CC28CC5
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 15:11:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BA7B82067C
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 15:10:59 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="hq4JhF4/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BA7B82067C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id 267322067C
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 15:11:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 267322067C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:44281 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:44284 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hYXZ5-0007DH-0B
-	for qemu-devel@archiver.kernel.org; Wed, 05 Jun 2019 11:10:59 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:38246)
+	id 1hYXZr-0007ip-Cu
+	for qemu-devel@archiver.kernel.org; Wed, 05 Jun 2019 11:11:47 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:38454)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hYXYB-0006la-KV
-	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 11:10:04 -0400
+	(envelope-from <berrange@redhat.com>) id 1hYXYh-00077f-Ex
+	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 11:10:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hYXY1-00080P-IX
-	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 11:09:57 -0400
-Received: from mail-eopbgr150129.outbound.protection.outlook.com
-	([40.107.15.129]:4417
-	helo=EUR01-DB5-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1hYXXl-0006lC-Du; Wed, 05 Jun 2019 11:09:38 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
-	s=selector1;
-	h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
-	bh=eosp8YtGF43WO03MvG+AFP3+JrXlmXPjXXcifZfy+YA=;
-	b=hq4JhF4/OWc8l9JGQa2qjRY7TSSB/WOXgEErvO/dKPro//aJ73yr3S6Htk5T5YnQ+Gt9IOpjdMLaGN+p9Qdb57V57JvoWEv4eYgtIAXXmo4RU6sPMXgHc4skGPmIID+gJTOCWojdn/la8teEaVHRreD6YCTkmqzRtK87EA+BFZQ=
-Received: from AM0PR08MB2961.eurprd08.prod.outlook.com (52.134.126.11) by
-	AM0PR08MB4578.eurprd08.prod.outlook.com (20.178.22.85) with Microsoft
-	SMTP
-	Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
-	15.20.1943.22; Wed, 5 Jun 2019 15:08:54 +0000
-Received: from AM0PR08MB2961.eurprd08.prod.outlook.com
-	([fe80::8d90:32ae:bdd6:48e8]) by
-	AM0PR08MB2961.eurprd08.prod.outlook.com
-	([fe80::8d90:32ae:bdd6:48e8%7]) with mapi id 15.20.1965.011;
-	Wed, 5 Jun 2019 15:08:54 +0000
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: Max Reitz <mreitz@redhat.com>, "qemu-devel@nongnu.org"
-	<qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Thread-Topic: [Qemu-block] [PATCH v2 2/2] iotests: test external snapshot with
-	bitmap copying
-Thread-Index: AQHVDMRByx866r1qO0izJzYzCi+V9KaNQtqAgAAEyQA=
-Date: Wed, 5 Jun 2019 15:08:54 +0000
-Message-ID: <81cc5a63-bd0e-4862-cf64-5390820d70d5@virtuozzo.com>
-References: <20190517152111.206494-1-vsementsov@virtuozzo.com>
-	<20190517152111.206494-3-vsementsov@virtuozzo.com>
-	<235f1fe9-d878-7afd-ccf4-2b4f899a93b3@redhat.com>
-In-Reply-To: <235f1fe9-d878-7afd-ccf4-2b4f899a93b3@redhat.com>
-Accept-Language: ru-RU, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: HE1PR05CA0285.eurprd05.prod.outlook.com
-	(2603:10a6:7:93::16) To AM0PR08MB2961.eurprd08.prod.outlook.com
-	(2603:10a6:208:66::11)
-authentication-results: spf=none (sender IP is )
-	smtp.mailfrom=vsementsov@virtuozzo.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-tagtoolbar-keys: D20190605180852296
-x-originating-ip: [185.231.240.5]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 521986eb-3624-4c60-0f87-08d6e9c7b9bf
-x-microsoft-antispam: BCL:0; PCL:0;
-	RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(2017052603328)(7193020);
-	SRVR:AM0PR08MB4578; 
-x-ms-traffictypediagnostic: AM0PR08MB4578:
-x-microsoft-antispam-prvs: <AM0PR08MB45788FC4E0056E51266AF547C1160@AM0PR08MB4578.eurprd08.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:1728;
-x-forefront-prvs: 00594E8DBA
-x-forefront-antispam-report: SFV:NSPM;
-	SFS:(10019020)(136003)(366004)(396003)(39850400004)(376002)(346002)(199004)(189003)(54906003)(31696002)(7736002)(110136005)(305945005)(6512007)(53546011)(6116002)(3846002)(86362001)(6506007)(4326008)(386003)(229853002)(8676002)(26005)(2906002)(36756003)(14454004)(256004)(2501003)(6486002)(81166006)(2201001)(53936002)(8936002)(186003)(316002)(81156014)(478600001)(66556008)(71200400001)(71190400001)(6436002)(66066001)(99286004)(25786009)(76176011)(73956011)(6246003)(31686004)(5660300002)(52116002)(66946007)(11346002)(486006)(446003)(476003)(2616005)(4744005)(66446008)(64756008)(102836004)(68736007)(66476007);
-	DIR:OUT; SFP:1102; SCL:1; SRVR:AM0PR08MB4578;
-	H:AM0PR08MB2961.eurprd08.prod.outlook.com; FPR:; SPF:None;
-	LANG:en; PTR:InfoNoRecords; A:1; MX:1; 
-received-spf: None (protection.outlook.com: virtuozzo.com does not designate
-	permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: rlyifdfwnHvB+vQ1ZpWFrvg5Y1KvQFQVEybn6TBw2YOUguPG5y1NgL1tFQPoH6cANMvktUw+iRBBalVQBknIZgkQanrPKqAuoklGOLyRjXxXhnwLDsVYc56Ep1IeV4mM6cq1t+en03G6GdoXwVcRaeAMCJuV8u3flgYks2i0houpMzwHdG1GwXkLVfpf5BLXcGzl5ynmVgGsivW352LknahfAhE3mnfgw26M23RsO+XjdQTbW73JKe5w9SI8GGdTTXHbhUfdREN4H3xP8iNvOUi9uw0A3tqQIWOGOUQmbeh222G6wX9uKY8lYuemxBqCylj8TytFYnrDVmgTLSoG2OF3wiOGWzIbHLty4C1acDEkB9L/EGK57j3WQHL9VWb7eW3f6ahjK66UnKYAUlVMlhBK4ZVmFWcbV9JvAqS+KoI=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <6C1E9F722C2A5B488CF1AA8DF52694D4@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <berrange@redhat.com>) id 1hYXYf-0000YA-1n
+	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 11:10:35 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:65386)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1hYXYc-0000Jh-Sk
+	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 11:10:32 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 536DE30ADC8F;
+	Wed,  5 Jun 2019 15:10:25 +0000 (UTC)
+Received: from redhat.com (ovpn-112-70.ams2.redhat.com [10.36.112.70])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 3E524619C4;
+	Wed,  5 Jun 2019 15:10:11 +0000 (UTC)
+Date: Wed, 5 Jun 2019 16:10:08 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Message-ID: <20190605151008.GE8956@redhat.com>
+References: <20190523234011.583-1-marcandre.lureau@redhat.com>
+	<20190523234011.583-4-marcandre.lureau@redhat.com>
+	<e0cf3112-62f6-aaff-0821-f472297dbb93@redhat.com>
+	<CAMxuvay+ZrdjhJg-juU0aTOtcy=cLshC+WGyPBQ6VysXZksa5w@mail.gmail.com>
 MIME-Version: 1.0
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 521986eb-3624-4c60-0f87-08d6e9c7b9bf
-X-MS-Exchange-CrossTenant-originalarrivaltime: 05 Jun 2019 15:08:54.5782 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: vsementsov@virtuozzo.com
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR08MB4578
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.15.129
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v2 2/2] iotests: test external
- snapshot with bitmap copying
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <CAMxuvay+ZrdjhJg-juU0aTOtcy=cLshC+WGyPBQ6VysXZksa5w@mail.gmail.com>
+User-Agent: Mutt/1.11.4 (2019-03-13)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.47]);
+	Wed, 05 Jun 2019 15:10:25 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH 3/4] docker: update fedora to f30
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -120,23 +74,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "kwolf@redhat.com" <kwolf@redhat.com>, "fam@euphon.net" <fam@euphon.net>,
-	Denis Lunev <den@virtuozzo.com>, "armbru@redhat.com" <armbru@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: Fam Zheng <fam@euphon.net>,
+	Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>,
+	Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+	qemu-devel <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-MDUuMDYuMjAxOSAxNzo1MSwgTWF4IFJlaXR6IHdyb3RlOg0KPiBPbiAxNy4wNS4xOSAxNzoyMSwg
-VmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSB3cm90ZToNCj4+IFRoaXMgdGVzdCBzaG93cyB0
-aGF0IGV4dGVybmFsIHNuYXBzaG90cyBhbmQgaW5jcmVtZW50YWwgYmFja3VwcyBhcmUNCj4+IGZy
-aWVuZHMuDQo+Pg0KPj4gU2lnbmVkLW9mZi1ieTogVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tp
-eSA8dnNlbWVudHNvdkB2aXJ0dW96em8uY29tPg0KPj4gLS0tDQo+PiAgIHRlc3RzL3FlbXUtaW90
-ZXN0cy8yNTQgICAgIHwgNTIgKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysN
-Cj4+ICAgdGVzdHMvcWVtdS1pb3Rlc3RzLzI1NC5vdXQgfCA1MiArKysrKysrKysrKysrKysrKysr
-KysrKysrKysrKysrKysrKysrKw0KPj4gICB0ZXN0cy9xZW11LWlvdGVzdHMvZ3JvdXAgICB8ICAx
-ICsNCj4+ICAgMyBmaWxlcyBjaGFuZ2VkLCAxMDUgaW5zZXJ0aW9ucygrKQ0KPj4gICBjcmVhdGUg
-bW9kZSAxMDA3NTUgdGVzdHMvcWVtdS1pb3Rlc3RzLzI1NA0KPj4gICBjcmVhdGUgbW9kZSAxMDA2
-NDQgdGVzdHMvcWVtdS1pb3Rlc3RzLzI1NC5vdXQNCj4gDQo+IFRoaXMgdGVzdCBmYWlscyBmb3Ig
-bWUgd2l0aCBxY293ICh2MSkuDQo+IA0KPiBNYXgNCj4gDQoNClRoYW5rcywgd2lsbCBmaXggc29t
-ZWhvdyBzb29uLg0KDQotLSANCkJlc3QgcmVnYXJkcywNClZsYWRpbWlyDQo=
+On Fri, May 24, 2019 at 01:17:17PM +0200, Marc-Andr=C3=A9 Lureau wrote:
+> Hi
+>=20
+> On Fri, May 24, 2019 at 9:41 AM Philippe Mathieu-Daud=C3=A9
+> <philmd@redhat.com> wrote:
+> >
+> > On 5/24/19 1:40 AM, Marc-Andr=C3=A9 Lureau wrote:
+> > > Released last month.
+> > >
+> > > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> > > ---
+> > >  tests/docker/dockerfiles/fedora.docker | 2 +-
+> > >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > >
+> > > diff --git a/tests/docker/dockerfiles/fedora.docker b/tests/docker/=
+dockerfiles/fedora.docker
+> > > index 69d4a7f5d7..1496b68ba1 100644
+> > > --- a/tests/docker/dockerfiles/fedora.docker
+> > > +++ b/tests/docker/dockerfiles/fedora.docker
+> > > @@ -1,4 +1,4 @@
+> > > -FROM fedora:29
+> > > +FROM fedora:30
+> >
+> > Hmm this patch is pending for review:
+> > https://lists.gnu.org/archive/html/qemu-devel/2019-05/msg00819.html
+>=20
+> Oh I missed that. Maybe we should use "latest" to avoid bumping the
+> version every 6 months.
+>=20
+> fwiw we have different versions:
+>=20
+> tests/docker/dockerfiles/fedora-cris-cross.docker:FROM fedora:latest
+> tests/docker/dockerfiles/fedora-i386-cross.docker:FROM fedora:29
+> tests/docker/dockerfiles/fedora.docker:FROM fedora:29
+>=20
+> In 62559b916 "tests: update Fedora i386 cross image to Fedora 29", Dani=
+el said:
+>=20
+>     Using the "latest" tag is not a good idea because this changes what
+>     release it points to every 6 months. Together with caching of docke=
+r
+>     builds this can cause confusion where CI has cached & built with Fe=
+dora
+>     N, while a developer tries to reproduce a CI problem with Fedora N =
++ 1,
+>     or vica-verca.
+>=20
+> But at the same time, Daniel bumped f28 to f29 in commit 19a9978db1.
+>=20
+> It's confusing, do we need some stability or follow the latest?
+
+The problem is introduced by local caching. "latest" may point to "29"
+today, but the CI system had cached content meaining its use of "latest"
+still resolved to "28".
+
+Using "29" meant both CI & developers saw the same image, even when
+caching is used.
+
+
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
 
