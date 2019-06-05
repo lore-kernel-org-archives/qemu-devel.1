@@ -2,65 +2,68 @@ Return-Path: <SRS0=3v23=UE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 72163C28CC5
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 20:17:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 35EB8C28CC5
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 20:35:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 467C62070B
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 20:17:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 467C62070B
+	by mail.kernel.org (Postfix) with ESMTPS id 0836A20866
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 20:35:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0836A20866
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:49319 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:49471 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hYcLt-0007ta-EL
-	for qemu-devel@archiver.kernel.org; Wed, 05 Jun 2019 16:17:41 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:37130)
+	id 1hYcdK-0003MD-Tl
+	for qemu-devel@archiver.kernel.org; Wed, 05 Jun 2019 16:35:42 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:40852)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1hYcI5-0005Ho-UO
-	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 16:13:48 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1hYcbq-0002SV-PY
+	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 16:34:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1hYcI3-00026p-Je
-	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 16:13:45 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59878)
+	(envelope-from <ehabkost@redhat.com>) id 1hYcbo-0005JX-4i
+	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 16:34:09 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40764)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hYcI3-00023i-Bh
-	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 16:13:43 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
-	[10.5.11.23])
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>)
+	id 1hYcbg-00051d-7y; Wed, 05 Jun 2019 16:34:01 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 9F4C481DE0;
-	Wed,  5 Jun 2019 20:13:42 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 5D8377E422;
+	Wed,  5 Jun 2019 20:33:50 +0000 (UTC)
 Received: from localhost (ovpn-116-9.gru2.redhat.com [10.97.116.9])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 8DD3B19C6F;
-	Wed,  5 Jun 2019 20:13:37 +0000 (UTC)
-Date: Wed, 5 Jun 2019 17:13:35 -0300
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 9798D619A9;
+	Wed,  5 Jun 2019 20:33:37 +0000 (UTC)
+Date: Wed, 5 Jun 2019 17:33:35 -0300
 From: Eduardo Habkost <ehabkost@redhat.com>
-To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
-Message-ID: <20190605201335.GD22416@habkost.net>
-References: <20190531192429.GH22103@habkost.net>
-	<93e5101f-67f1-a416-5e80-f16371a35e6a@redhat.com>
-	<871s0asvli.fsf@dusky.pond.sub.org>
-	<20190605155006.GI8956@redhat.com>
+To: Cleber Rosa <crosa@redhat.com>
+Message-ID: <20190605203335.GE22416@habkost.net>
+References: <20190312234541.2887-1-philmd@redhat.com>
+	<20190312234541.2887-3-philmd@redhat.com>
+	<20190522205234.GY10764@habkost.net>
+	<1204725743.24201394.1558559144548.JavaMail.zimbra@redhat.com>
+	<1088d160-20c1-00ed-b494-fede1a3a8410@redhat.com>
+	<1894627419.24355320.1558618806274.JavaMail.zimbra@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20190605155006.GI8956@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+In-Reply-To: <1894627419.24355320.1558618806274.JavaMail.zimbra@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.25]);
-	Wed, 05 Jun 2019 20:13:42 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.27]);
+	Wed, 05 Jun 2019 20:33:58 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] Deprecation policy and build dependencies
+Subject: Re: [Qemu-devel] [PATCH v2 2/2] Boot Linux Console Test: add a test
+ for the Raspberry Pi 2
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -72,77 +75,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, John Snow <jsnow@redhat.com>,
-	Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org,
-	Cleber Rosa <crosa@redhat.com>,
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+	Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>,
+	Andrew Baumann <Andrew.Baumann@microsoft.com>,
+	qemu-devel@nongnu.org, qemu-arm@nongnu.org,
+	Gerd Hoffmann <kraxel@redhat.com>,
 	Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Jun 05, 2019 at 04:50:06PM +0100, Daniel P. Berrang=E9 wrote:
-> On Mon, Jun 03, 2019 at 02:26:49PM +0200, Markus Armbruster wrote:
-> > John Snow <jsnow@redhat.com> writes:
+On Thu, May 23, 2019 at 09:40:06AM -0400, Cleber Rosa wrote:
+> ----- Original Message -----
+> > From: "Philippe Mathieu-Daud=E9" <philmd@redhat.com>
+> > To: "Cleber Rosa" <crosa@redhat.com>, "Eduardo Habkost" <ehabkost@red=
+hat.com>
+> > Cc: qemu-devel@nongnu.org, "Peter Maydell" <peter.maydell@linaro.org>=
+, qemu-arm@nongnu.org, "Philippe Mathieu-Daud=E9"
+> > <f4bug@amsat.org>, "Andrew Baumann" <Andrew.Baumann@microsoft.com>, "=
+Gerd Hoffmann" <kraxel@redhat.com>
+> > Sent: Thursday, May 23, 2019 5:29:22 AM
+> > Subject: Re: [Qemu-devel] [PATCH v2 2/2] Boot Linux Console Test: add=
+ a test for the Raspberry Pi 2
 > >=20
-> > > On 5/31/19 3:24 PM, Eduardo Habkost wrote:
-> > >> Long story short: I would really like to drop support for Python
-> > >> 2 in QEMU 4.1.
+> > On 5/22/19 11:05 PM, Cleber Rosa wrote:
+> > > ----- Original Message -----
+> > >> From: "Eduardo Habkost" <ehabkost@redhat.com>
+> > >> On Wed, Mar 13, 2019 at 12:45:41AM +0100, Philippe Mathieu-Daud=E9=
+ wrote:
+> > >>> From: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
+> > >>>
+> > >>> Similar to the x86_64/pc test, it boots a Linux kernel on a raspi=
+2
+> > >>> board and verify the serial is working.
+> > >>>
+> > >>> If ARM is a target being built, "make check-acceptance" will
+> > >>> automatically include this test by the use of the "arch:arm" tags=
+.
+> > >>>
+> > >>> Alternatively, this test can be run using:
+> > >>>
+> > >>>     $ avocado run -t arch:arm tests/acceptance
+> > >>>     $ avocado run -t machine:raspi2 tests/acceptance
+> > >>>
+> > >>> Signed-off-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
+> > >>
+> > >> We're getting timeouts on travis-ci:
+> > >> https://travis-ci.org/ehabkost/qemu/jobs/535468057#L3289
+> > >>
+> > >> I don't know yet if the guest is hanging, or if we just need to
+> > >> increase the timeout.  I could reproduce the timeout locally,
+> > >> too.
 > >=20
-> > The sooner, the better, as far as I'm concerned.
+> > That's odd, I can't reproduce (this test is quicker than the followin=
+g
+> > test_arm_emcraft_sf2 which start u-boot then timeouts and start the k=
+ernel).
 > >=20
-> > >> What exactly prevents us from doing this?  Does our deprecation
-> > >> policy really apply to build dependencies?
-> > >>=20
-> > >
-> > > Normally I'd say it's only nice to also follow the depreciation pol=
-icy
-> > > for tooling as well to give people a chance to switch away, but wit=
-h
-> > > regards to Python2, I feel like we're in the clear to drop it for t=
-he
-> > > first release that will happen after the Python2 doomsday clock.
-> > >
-> > > (So, probably 4.2.)
+> > My guess is network issues, since this test use a different mirror:
+> > archive.raspberrypi.org
 > >=20
-> > In addition to our feature deprecation policity, we have a "Supported
-> > build platforms" policy (commit 45b47130f4b).  The most common holdba=
-ck
-> > is this one:
-> >=20
-> >     For distributions with long-lifetime releases, the project will a=
-im
-> >     to support the most recent major version at all times. Support fo=
-r
-> >     the previous major version will be dropped 2 years after the new
-> >     major version is released. For the purposes of identifying suppor=
-ted
-> >     software versions, the project will look at RHEL, Debian, Ubuntu
-> >     LTS, and SLES distros. Other long-lifetime distros will be assume=
-d
-> >     to ship similar software versions.
-> >=20
-> > RHEL-7 has Python 3 only in EPEL.  RHEL-8 came out last month.  Unles=
-s
-> > we interpret our policy to include EPEL, this means supporting Python=
- 2
-> > for some 16 months after upstream Python retires it.  My personal
-> > opinion: nuts.
 >=20
-> We've not said whether this refers to only base repos, or whether addon
-> repos are accepted. IMHO, we are reasonably justified in saying RHEL-7
-> as a build platform covers any repo provided by Red Hat, which would
-> give us Python3 via software collections. I think it would be reasonabl=
-e
-> to also state it covers EPEL, since EPEL is such a commonly used repo
-> with RHEL.
+> It could be a network issue, it could be something else.  I think the v=
+ery
+> first step, and I'd urge us to get that on master ASAP, is to show the
+> entire logs in CI, I mean:
 >=20
-> IOW, I don't think RHEL-7 support as a build platform blocks us from
-> dropping py2. We merely need to tweak our build platforms doc to clarif=
-y
-> our intent wrt add-on yum repos.
+> ---
+>=20
+> diff --git a/.travis.yml b/.travis.yml
+> index 6fd89b3d91..fd8f6ca2d2 100644
+> --- a/.travis.yml
+> +++ b/.travis.yml
+> @@ -225,7 +225,7 @@ matrix:
+>      # Acceptance (Functional) tests
+>      - env:
+>          - CONFIG=3D"--python=3D/usr/bin/python3 --target-list=3Dx86_64=
+-softmmu,mips-softmmu,mips64el-softmmu,aarch64-softmmu,arm-softmmu,s390x-=
+softmmu,alpha-softmmu"
+> -        - TEST_CMD=3D"make check-acceptance"
+> +        - TEST_CMD=3D"make AVOCADO_SHOW=3Dtest check-acceptance"
+>        addons:
+>          apt:
+>            packages:
 
-If we clarify the docs in QEMU 4.1, is there anything that
-prevents us from removing Python 2 support in QEMU 4.1 too?
+I have applied this change on python-next.  The failure can be
+seen here:
+https://travis-ci.org/ehabkost/qemu/jobs/541758418#L4033
+
+While we don't fix this, I'm removing this test case from the
+queue, so I can send a pull request.  Sorry for taking so long to
+act on this.
 
 --=20
 Eduardo
