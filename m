@@ -2,93 +2,113 @@ Return-Path: <SRS0=3v23=UE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DA66FC28CC5
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 14:54:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B6FF6C28CC5
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 14:55:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B5939206B8
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 14:54:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B5939206B8
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 741F4206B8
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 14:55:00 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="KxxVY7IP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 741F4206B8
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=openvz.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:43967 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:43977 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hYXIq-0004z8-Ts
-	for qemu-devel@archiver.kernel.org; Wed, 05 Jun 2019 10:54:13 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:33153)
+	id 1hYXJb-0005am-LY
+	for qemu-devel@archiver.kernel.org; Wed, 05 Jun 2019 10:54:59 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:58416)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hYXGz-0003q7-Nn
-	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 10:52:21 -0400
+	(envelope-from <den@virtuozzo.com>) id 1hYX9C-0005uh-50
+	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 10:44:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1hYXGy-0007j3-QL
-	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 10:52:17 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37172)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mreitz@redhat.com>)
-	id 1hYXGw-00077q-AO; Wed, 05 Jun 2019 10:52:14 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D80EF5945D;
-	Wed,  5 Jun 2019 14:51:48 +0000 (UTC)
-Received: from dresden.str.redhat.com (unknown [10.40.205.15])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 4C2A2601B6;
-	Wed,  5 Jun 2019 14:51:47 +0000 (UTC)
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
-	qemu-devel@nongnu.org, qemu-block@nongnu.org
-References: <20190517152111.206494-1-vsementsov@virtuozzo.com>
-	<20190517152111.206494-3-vsementsov@virtuozzo.com>
-From: Max Reitz <mreitz@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
-	mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
-	/PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
-	U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
-	mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
-	awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
-	AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
-	CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
-	B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
-	2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
-	AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
-	8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
-	4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
-	BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
-	xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
-	W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
-	DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
-	64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
-	ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
-	sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
-	alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
-	/ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
-	bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
-	R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <235f1fe9-d878-7afd-ccf4-2b4f899a93b3@redhat.com>
-Date: Wed, 5 Jun 2019 16:51:45 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.7.0
+	(envelope-from <den@virtuozzo.com>) id 1hYX99-00087c-GB
+	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 10:44:13 -0400
+Received: from mail-eopbgr00128.outbound.protection.outlook.com
+	([40.107.0.128]:1812
+	helo=EUR02-AM5-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <den@virtuozzo.com>)
+	id 1hYX94-0007Yh-FE; Wed, 05 Jun 2019 10:44:09 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+	s=selector1;
+	h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+	bh=7t04TrhbiCwTZh3BkSOtoIh2z/Cw5CNnQ9fcBHgBXx8=;
+	b=KxxVY7IPGP3qVXZF4NXZs9Vxt6WpVzKEwZfdc7Afc4DFdFkg1ZZNBckDQpDGs2kfk+T7hJWdCZLFRL3MPkytDHlzNpJm7cmWh//gJ1OQ+/D0xJ2EbI9CPtFi8Z4PRyWCwSm+5/tSJy3praorcLGBieNeauW9ndaA5p+NBoqWz/4=
+Received: from DBBPR08MB4250.eurprd08.prod.outlook.com (20.179.40.149) by
+	DBBPR08MB4332.eurprd08.prod.outlook.com (20.179.41.206) with Microsoft
+	SMTP
+	Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+	15.20.1965.13; Wed, 5 Jun 2019 14:43:59 +0000
+Received: from DBBPR08MB4250.eurprd08.prod.outlook.com
+	([fe80::fcca:9f3e:dbc6:5a1f]) by
+	DBBPR08MB4250.eurprd08.prod.outlook.com
+	([fe80::fcca:9f3e:dbc6:5a1f%4]) with mapi id 15.20.1943.018;
+	Wed, 5 Jun 2019 14:43:59 +0000
+From: "Denis V. Lunev" <den@openvz.org>
+To: Eric Blake <eblake@redhat.com>, Vladimir Sementsov-Ogievskiy
+	<vsementsov@virtuozzo.com>,
+	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, 
+	"qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Thread-Topic: [PATCH 2/2] nbd-client: enable TCP keepalive
+Thread-Index: AQHVG4a/lcghbcFVAUyMliejkoc596aNIdEAgAABV4A=
+Date: Wed, 5 Jun 2019 14:43:59 +0000
+Message-ID: <9f2d9816-3539-666e-8ed7-5e4d95e9ba56@openvz.org>
+References: <20190605100913.34972-1-vsementsov@virtuozzo.com>
+	<20190605100913.34972-3-vsementsov@virtuozzo.com>
+	<cd780b66-ab31-1feb-0cce-0b6525df7d79@redhat.com>
+In-Reply-To: <cd780b66-ab31-1feb-0cce-0b6525df7d79@redhat.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-clientproxiedby: HE1P192CA0010.EURP192.PROD.OUTLOOK.COM (2603:10a6:3:fe::20)
+	To DBBPR08MB4250.eurprd08.prod.outlook.com
+	(2603:10a6:10:c2::21)
+authentication-results: spf=none (sender IP is )
+	smtp.mailfrom=den@virtuozzo.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-originating-ip: [185.231.240.5]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 40d2b227-5437-4ac1-0471-08d6e9c43ebc
+x-microsoft-antispam: BCL:0; PCL:0;
+	RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(2017052603328)(7193020);
+	SRVR:DBBPR08MB4332; 
+x-ms-traffictypediagnostic: DBBPR08MB4332:
+x-microsoft-antispam-prvs: <DBBPR08MB433257ED2DDA7BFA5E6E58A0B6160@DBBPR08MB4332.eurprd08.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:107;
+x-forefront-prvs: 00594E8DBA
+x-forefront-antispam-report: SFV:NSPM;
+	SFS:(10019020)(366004)(136003)(39850400004)(346002)(376002)(396003)(199004)(189003)(99286004)(102836004)(316002)(31686004)(3846002)(6116002)(386003)(53546011)(42882007)(6506007)(6246003)(256004)(26005)(14444005)(54906003)(110136005)(186003)(2501003)(52116002)(53936002)(76176011)(25786009)(4326008)(2616005)(66066001)(64756008)(66446008)(73956011)(66946007)(14454004)(6436002)(68736007)(229853002)(66556008)(478600001)(66476007)(2201001)(6512007)(31696002)(6486002)(5660300002)(8936002)(71190400001)(71200400001)(305945005)(7736002)(81156014)(81166006)(446003)(8676002)(11346002)(476003)(36756003)(486006)(2906002);
+	DIR:OUT; SFP:1102; SCL:1; SRVR:DBBPR08MB4332;
+	H:DBBPR08MB4250.eurprd08.prod.outlook.com; FPR:; SPF:None;
+	LANG:en; PTR:InfoNoRecords; A:1; MX:1; 
+received-spf: None (protection.outlook.com: virtuozzo.com does not designate
+	permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: TPTXyrOW+BWWMOXTjgRF+kdzyByv7MLJc0rnxtuMF6b46lG1w+wKtkLxgdCmDFCYqyA9LnN1u3KQU8PuRm8ndEE2M1FXvZLxMpc57RNFWBHtEYYHwRgDV0+NeqKGObPSf2cHXFXEDjfDFg9KEMoGig3ZM7qKwe5nC8lcLaTc8B7H88uxceMybgK+aVKUIno3vscghARk2MTAOWMzHU1wn7b05OIoRpbDmKwUA/7cJLsy0+j0zT+Atk/RVJzO+xj7+3L1UNz9/C34BOFuL8tciWJr2gBMWVsxE0hruipEkXPw0pYUB8XR0DqbUCGRIL5eqoL3aMDEnzXX5FSb+q6B/ZegSRoCfIE/9j4JJW6gixxFSUI40YBlKV5xxkVwrA99RE+pQQU414go0Jvcq2ZBL4VoBScT81d6ut6Bfww/BX8=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <82941F5A934CC140A0B60B3FA62C41F9@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-In-Reply-To: <20190517152111.206494-3-vsementsov@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="7iQ6JcvpLwZ4sItowyHznfjncoPek5sJ2"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.39]);
-	Wed, 05 Jun 2019 14:51:55 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-X-Content-Filtered-By: Mailman/MimeDel 2.1.21
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v2 2/2] iotests: test external
- snapshot with bitmap copying
+X-OriginatorOrg: openvz.org
+X-MS-Exchange-CrossTenant-Network-Message-Id: 40d2b227-5437-4ac1-0471-08d6e9c43ebc
+X-MS-Exchange-CrossTenant-originalarrivaltime: 05 Jun 2019 14:43:59.7143 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: den@virtuozzo.com
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DBBPR08MB4332
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.0.128
+Subject: Re: [Qemu-devel] [PATCH 2/2] nbd-client: enable TCP keepalive
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -100,62 +120,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, fam@euphon.net, den@virtuozzo.com, armbru@redhat.com
+Cc: "kwolf@redhat.com" <kwolf@redhat.com>,
+	"berrange@redhat.com" <berrange@redhat.com>,
+	"mreitz@redhat.com" <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---7iQ6JcvpLwZ4sItowyHznfjncoPek5sJ2
-From: Max Reitz <mreitz@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: kwolf@redhat.com, fam@euphon.net, den@virtuozzo.com, armbru@redhat.com
-Message-ID: <235f1fe9-d878-7afd-ccf4-2b4f899a93b3@redhat.com>
-Subject: Re: [Qemu-block] [PATCH v2 2/2] iotests: test external snapshot with
- bitmap copying
-References: <20190517152111.206494-1-vsementsov@virtuozzo.com>
- <20190517152111.206494-3-vsementsov@virtuozzo.com>
-In-Reply-To: <20190517152111.206494-3-vsementsov@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 17.05.19 17:21, Vladimir Sementsov-Ogievskiy wrote:
-> This test shows that external snapshots and incremental backups are
-> friends.
->=20
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->  tests/qemu-iotests/254     | 52 ++++++++++++++++++++++++++++++++++++++=
-
->  tests/qemu-iotests/254.out | 52 ++++++++++++++++++++++++++++++++++++++=
-
->  tests/qemu-iotests/group   |  1 +
->  3 files changed, 105 insertions(+)
->  create mode 100755 tests/qemu-iotests/254
->  create mode 100644 tests/qemu-iotests/254.out
-
-This test fails for me with qcow (v1).
-
-Max
-
-
---7iQ6JcvpLwZ4sItowyHznfjncoPek5sJ2
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlz31wEACgkQ9AfbAGHV
-z0DbjggAs6ubgaFboaGSv2vgLy74Rf9D3FDxZ/TPhXfwYCs694nBZiuBVxth2RUt
-CRdbJE7k0uicoKgkeys8N4Dk1MKcirgcHgbWxy5TKeHOnuYCdKMTkcqrRKs0AmmO
-AZYU+HO+71cmk8v7aPf1/0ULKJCMkLM/df9tC328UyC318GeCgmgLACe5EhmRWpG
-GAFBcZa1mS0Uq/8IR8M0GUflQDdTAcXOIQZDMOIa1UnSRk2lQEHXOc2rzAYQhlUD
-CuB/j2Ld7/lok4L4XhPIKVdTulsZZmJOqHg4snSMe6ie12BHUdw8wEFAskoGCAdI
-jILMBbXME0dyF9RQhjkRkydZV6Mnmg==
-=Or/X
------END PGP SIGNATURE-----
-
---7iQ6JcvpLwZ4sItowyHznfjncoPek5sJ2--
+T24gNi81LzE5IDU6MzkgUE0sIEVyaWMgQmxha2Ugd3JvdGU6DQo+IE9uIDYvNS8xOSA1OjA5IEFN
+LCBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IHdyb3RlOg0KPj4gRW5hYmxlIGtlZXBhbGl2
+ZSBvcHRpb24gdG8gdHJhY2sgc2VydmVyIGF2YWlsYWJsaXR5Lg0KPiBzL2F2YWlsYWJsaXR5L2F2
+YWlsYWJpbGl0eS8NCj4NCj4gRG8gd2Ugd2FudCB0aGlzIHVuY29uZGl0aW9uYWxseSwgb3Igc2hv
+dWxkIGl0IGJlIGFuIG9wdGlvbiAoYW5kIGhlbmNlDQo+IGV4cG9zZWQgb3ZlciBRTVApPw0KVGhh
+dCBpcyBnb29kIHF1ZXN0aW9uLCBpZiB3ZSB3b3VsZCBleHBvc2UgaXQsIHdlIHNob3VsZCBzcGVj
+aWZ5DQp0aW1lb3V0IGR1cmF0aW9uIGFzIGFuIG9wdGlvbi4gVGhvdWdoIElNSE8gaXQgd291bGQg
+YmUgc2FmZQ0KdG8gZ2V0IHRoaXMgdW5jb25kaXRpb25hbC4NCg0KDQo+PiBSZXF1ZXN0ZWQtYnk6
+IERlbmlzIFYuIEx1bmV2IDxkZW5Ab3BlbnZ6Lm9yZz4NCj4+IFNpZ25lZC1vZmYtYnk6IFZsYWRp
+bWlyIFNlbWVudHNvdi1PZ2lldnNraXkgPHZzZW1lbnRzb3ZAdmlydHVvenpvLmNvbT4NCj4+IC0t
+LQ0KPj4gIGJsb2NrL25iZC1jbGllbnQuYyB8IDEgKw0KPj4gIDEgZmlsZSBjaGFuZ2VkLCAxIGlu
+c2VydGlvbigrKQ0KPj4NCj4+IGRpZmYgLS1naXQgYS9ibG9jay9uYmQtY2xpZW50LmMgYi9ibG9j
+ay9uYmQtY2xpZW50LmMNCj4+IGluZGV4IDc5MGVjYzFlZTEuLmI1N2NlYTg0ODIgMTAwNjQ0DQo+
+PiAtLS0gYS9ibG9jay9uYmQtY2xpZW50LmMNCj4+ICsrKyBiL2Jsb2NrL25iZC1jbGllbnQuYw0K
+Pj4gQEAgLTExMzcsNiArMTEzNyw3IEBAIHN0YXRpYyBpbnQgbmJkX2NsaWVudF9jb25uZWN0KEJs
+b2NrRHJpdmVyU3RhdGUgKmJzLA0KPj4gIA0KPj4gICAgICAvKiBOQkQgaGFuZHNoYWtlICovDQo+
+PiAgICAgIGxvZ291dCgic2Vzc2lvbiBpbml0ICVzXG4iLCBleHBvcnQpOw0KPj4gKyAgICBxaW9f
+Y2hhbm5lbF9zZXRfa2VlcGFsaXZlKFFJT19DSEFOTkVMKHNpb2MpLCB0cnVlLCBOVUxMKTsNCj4+
+ICAgICAgcWlvX2NoYW5uZWxfc2V0X2Jsb2NraW5nKFFJT19DSEFOTkVMKHNpb2MpLCB0cnVlLCBO
+VUxMKTsNCj4+ICANCj4+ICAgICAgY2xpZW50LT5pbmZvLnJlcXVlc3Rfc2l6ZXMgPSB0cnVlOw0K
+Pj4NCg0K
 
