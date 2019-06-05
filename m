@@ -2,65 +2,79 @@ Return-Path: <SRS0=3v23=UE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F2D7BC28CC5
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 21:02:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 10BF3C28D18
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 21:02:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A68372075C
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 21:02:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A68372075C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id BFC0B2067C
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 21:02:15 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="q4HL3wPq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BFC0B2067C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:49969 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:49967 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hYd31-0001oC-NI
-	for qemu-devel@archiver.kernel.org; Wed, 05 Jun 2019 17:02:15 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:43952)
+	id 1hYd30-0001n9-RX
+	for qemu-devel@archiver.kernel.org; Wed, 05 Jun 2019 17:02:14 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:48018)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1hYcl8-0002g9-QH
-	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 16:43:47 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hYcyA-00068g-8f
+	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 16:57:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1hYcl7-0004YY-Ej
-	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 16:43:46 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40122)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>)
-	id 1hYcl3-0004H1-Su; Wed, 05 Jun 2019 16:43:42 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B1D6530593D8;
-	Wed,  5 Jun 2019 20:43:29 +0000 (UTC)
-Received: from localhost (ovpn-116-9.gru2.redhat.com [10.97.116.9])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 50C0A29AD9;
-	Wed,  5 Jun 2019 20:43:24 +0000 (UTC)
-Date: Wed, 5 Jun 2019 17:43:23 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-To: Cleber Rosa <crosa@redhat.com>
-Message-ID: <20190605204323.GF22416@habkost.net>
-References: <20190520220635.10961-1-f4bug@amsat.org>
-	<20190520220635.10961-3-f4bug@amsat.org>
-	<20190605160659.GB7080@localhost.localdomain>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20190605160659.GB7080@localhost.localdomain>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.49]);
-	Wed, 05 Jun 2019 20:43:34 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 2/2] BootLinuxConsoleTest: Test the
- SmartFusion2 board
+	(envelope-from <richard.henderson@linaro.org>) id 1hYcy9-00082H-1p
+	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 16:57:14 -0400
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:34602)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1hYcy8-0007zs-PR
+	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 16:57:12 -0400
+Received: by mail-ot1-x341.google.com with SMTP id z24so2087252oto.1
+	for <qemu-devel@nongnu.org>; Wed, 05 Jun 2019 13:57:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=from:to:cc:subject:date:message-id;
+	bh=W6HDhQJMBdxe5wJFgzRB2+t1x+cTtvvyIgBUjEbLKfs=;
+	b=q4HL3wPqkPUTCX1upK44DzH2jCj02ieD6b0YpeC0R/MEdah0OXekz6TmD6F5cWnHpE
+	9RKOu8xmj0bENhBs1Utf2n9JyQTVzR2ItMaIVhWx5tNkXHlEeDG3eAZw9ibK+x+ScRdM
+	kDYpw8DTmEqpcMrVAgH7oA4QwyNv+JmlqW94/hbv+AA/RUMotwdFYQKSG4bQA68p+iCa
+	pO5cmfXp8XrrZB9GIUERzJBXHl3iYdd0siEL4Yawnrd7u2uxRG9PS6BJw2Cfyf7Hf0yR
+	rhe6mW+swv5WxkrLKYXgP+mIbms/UobnPZ3o9ez9hg54ThKb7fFXFnNV4eM9KE6fqLVg
+	zypQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:from:to:cc:subject:date:message-id;
+	bh=W6HDhQJMBdxe5wJFgzRB2+t1x+cTtvvyIgBUjEbLKfs=;
+	b=OT/DJVnnoqvsAX2qtMU+gfhOg14gGvE/6/iiPsQZHZQu32f5EWJnx+NdzHu05MPBWM
+	3J5VIM29BVl1F9BJ2Nxx3lIpqIcVQwIeWMKJnnL7YzbDgopTiHrkvmte8iNTRKGFiVEB
+	5RrCk460rKfxk2+byLK9ezv8vxqRCREZ6ErP+imqjOgHfFjRkejP71GgH/4zc4Mjp4GM
+	UhxwqTsnyn/us9K1cFaULx4RGr3Bxf5ATrw40jCifjtGk+IFRDN6kC1rI3ZwsAFBy2/5
+	r1HRKSl8TU+vPMg3dYctSSDra2mgHHkEGTThhPVIx6wxvJBSaLHG38zrTZo9YcMF7JJA
+	+72Q==
+X-Gm-Message-State: APjAAAXgJqxgWBsvfaFavmxUYF0uq7yTtNBDJSzWdWlZvldpEpWiNL1i
+	ySGdjLvx/1c9rSiXdMb63Yyu7yh4YsRWIA==
+X-Google-Smtp-Source: APXvYqxRxK+q4iCU2GaNKmznya6CNXDRyJ3Wzk9lR6s2ercfVvslIzPp920K8R0q9lzKcEtPrwaRGg==
+X-Received: by 2002:a9d:5cc2:: with SMTP id r2mr11408179oti.122.1559768231571; 
+	Wed, 05 Jun 2019 13:57:11 -0700 (PDT)
+Received: from localhost.localdomain (200-56-192-86-cable.cybercable.net.mx.
+	[200.56.192.86])
+	by smtp.gmail.com with ESMTPSA id f5sm7414155otl.51.2019.06.05.13.57.09
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Wed, 05 Jun 2019 13:57:10 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
+To: qemu-devel@nongnu.org
+Date: Wed,  5 Jun 2019 15:57:00 -0500
+Message-Id: <20190605205706.569-1-richard.henderson@linaro.org>
+X-Mailer: git-send-email 2.17.1
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::341
+Subject: [Qemu-devel] [PATCH v6 0/6] linux-user/aarch64: Support PROT_BTI
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -72,64 +86,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org,
-	Alistair Francis <alistair@alistair23.me>,
-	Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>,
-	Subbaraya Sundeep <sundeep.lkml@gmail.com>, qemu-arm@nongnu.org
+Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org, Dave.Martin@arm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Jun 05, 2019 at 12:06:59PM -0400, Cleber Rosa wrote:
-> On Tue, May 21, 2019 at 12:06:35AM +0200, Philippe Mathieu-Daud=E9 wrot=
-e:
-> > Similar to the x86_64/pc test, it boots a Linux kernel on an
-> > Emcraft board and verify the serial is working.
-> >=20
-> > If ARM is a target being built, "make check-acceptance" will
-> > automatically include this test by the use of the "arch:arm" tags.
-> >=20
-> > Alternatively, this test can be run using:
-> >=20
-> >   $ avocado run -t arch:arm tests/acceptance
-> >   $ avocado run -t machine:emcraft-sf2 tests/acceptance
-> >
->=20
-> The pattern accepted as a tag currently doesn't include a dash, see:
->=20
->    https://avocado-framework.readthedocs.io/en/68.0/ReferenceGuide.html=
-#docstring-directives-rules
->=20
+Dave Martin has recently posted a kernel patch set for 
+supporting ARMv8.5 Branch Target Identification in userland.
 
-Why isn't this causing test jobs to fail?
+  http://lists.infradead.org/pipermail/linux-arm-kernel/2019-May/654654.html
 
-This patch is already queued on python-next, should I remove it?
+While that support is not yet in the upstream kernel, it looks
+to be close to its final form.  Note that the patch set spells
+this PROT_BTI_GUARDED, but review suggested to rename to PROT_BTI.
+
+Changes since v5:
+  * New function to validate the target PROT parameter for mmap/mprotect.
+  * Require BTI in the cpu for PROT_BTI set.
+  * Set PSTATE.BTYPE=2 for the signal handler.
+    Adjust the smoke test to match.
+  * Tidy up the note parsing.
 
 
-> My suggestion is to replace the dash for an underline.  This was done
-> on the s390 test:
->=20
->    :avocado: tags=3Dmachine:s390_ccw_virtio
-
-I would love if we stopped using the docstring to store
-machine-readable data and used Python class attributes or
-methods, like most Python APIs do.  e.g.:
-
-  class MyTest(avocado.Test):
-      tags =3D {'machine':'s390-ccw-virtio'}
-
-      def test_my_feature(self):
-          ...
+r~
 
 
-I understand the Avocado runner currently tries to not run any
-test code at the "list" step.  But can we have a mode where it
-will actually load the Python module and look at the class
-objects directly, instead of trying to parse the Python code
-without evaluating it?
+Richard Henderson (6):
+  linux-user/aarch64: Reset btype for syscalls and signals
+  linux-user: Validate mmap/mprotect prot value
+  linux-user: Set PAGE_TARGET_1 for TARGET_PROT_BTI
+  include/elf: Add defines related to notes for GNU systems
+  linux-user: Parse NT_GNU_PROPERTY_TYPE_0 notes
+  tests/tcg/aarch64: Add bti smoke test
 
-> [...]
+ include/elf.h                     |  48 ++++++++++++
+ include/exec/cpu-all.h            |   2 +
+ linux-user/syscall_defs.h         |   4 +
+ linux-user/aarch64/cpu_loop.c     |   7 ++
+ linux-user/aarch64/signal.c       |  10 ++-
+ linux-user/elfload.c              |  83 ++++++++++++++++++--
+ linux-user/mmap.c                 | 122 ++++++++++++++++++++++--------
+ target/arm/translate-a64.c        |   6 +-
+ tests/tcg/aarch64/bti-1.c         |  77 +++++++++++++++++++
+ tests/tcg/aarch64/bti-crt.inc.c   |  69 +++++++++++++++++
+ tests/tcg/aarch64/Makefile.target |   3 +
+ 11 files changed, 387 insertions(+), 44 deletions(-)
+ create mode 100644 tests/tcg/aarch64/bti-1.c
+ create mode 100644 tests/tcg/aarch64/bti-crt.inc.c
 
---=20
-Eduardo
+-- 
+2.17.1
+
 
