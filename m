@@ -2,87 +2,169 @@ Return-Path: <SRS0=3v23=UE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 24041C282DE
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 07:22:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E86BC282DE
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 07:22:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CAE6420657
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 07:22:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2B39220657
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 07:22:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IRb9Vn98"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CAE6420657
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=ozlabs-ru.20150623.gappssmtp.com header.i=@ozlabs-ru.20150623.gappssmtp.com header.b="ZgiNSB4j"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B39220657
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ozlabs.ru
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:36791 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:36796 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hYQFr-0007jv-VF
-	for qemu-devel@archiver.kernel.org; Wed, 05 Jun 2019 03:22:40 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:33405)
+	id 1hYQG0-0007pa-Cf
+	for qemu-devel@archiver.kernel.org; Wed, 05 Jun 2019 03:22:48 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:33438)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mrolnik@gmail.com>) id 1hYQED-0006bQ-SU
-	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 03:20:59 -0400
+	(envelope-from <aik@ozlabs.ru>) id 1hYQEK-0006gh-6l
+	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 03:21:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mrolnik@gmail.com>) id 1hYQEC-0000H9-5e
-	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 03:20:57 -0400
-Received: from mail-qk1-x742.google.com ([2607:f8b0:4864:20::742]:39016)
+	(envelope-from <aik@ozlabs.ru>) id 1hYQEI-0000SH-CH
+	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 03:21:04 -0400
+Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:42517)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mrolnik@gmail.com>) id 1hYQEB-0000Fz-Ub
-	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 03:20:56 -0400
-Received: by mail-qk1-x742.google.com with SMTP id i125so4531458qkd.6
-	for <qemu-devel@nongnu.org>; Wed, 05 Jun 2019 00:20:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-	:cc; bh=U1zLkU5pz1XuVG4+G1IidtZr8Fv8ZxQTJnfojFUkkpc=;
-	b=IRb9Vn98aTDmpg+yqzBOgkzP+hha6/8MKgBzYGxow0jKg2CaSNYK84xHC2YC/U8xsI
-	IbbVZO+MG17+MqtWDe9Hhw0wKEHFTTDl4T3iHBGvLjTuCSGGPgLwdyad+uplIvOWRhkb
-	NIGDqh+o9zjt8wI8LfnkQI52dectRO1c/hmjy23YKPoZlSxKRbYqfDdzI1GN4ZmIa8Jo
-	sjpQceDFKMgoRk9CGE/m8rlPDnhNDriS30ke1Zfv6BxqFH/qQ3tVPpk9FfggHnhim7nm
-	7XueinyBgeOoPGZ6goUkb03mpjQnXz8sz9Od7WDeC0vxa1nUxEl5H10f7uqgNTli+qg/
-	V79g==
+	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1hYQEH-0000OV-SI
+	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 03:21:02 -0400
+Received: by mail-pf1-x442.google.com with SMTP id q10so4103372pff.9
+	for <qemu-devel@nongnu.org>; Wed, 05 Jun 2019 00:21:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=ozlabs-ru.20150623.gappssmtp.com; s=20150623;
+	h=subject:to:cc:references:from:openpgp:autocrypt:message-id:date
+	:user-agent:mime-version:in-reply-to:content-language
+	:content-transfer-encoding;
+	bh=JtgL8SVVkOChCT3Yo0NjnagGdgj/kOiq1J4EXFG7GoA=;
+	b=ZgiNSB4jqIo6/H/+7pFi0DJw2+PrxwyqCDXTAV5PHbAqjutp/xlA9CamHfEx2iVrUu
+	zoo4E33lKddp8DVEjAzgZm/fDzksDfiKFb3OaUJuvLvUtD/BK8h6kMFYMlNT1XVuSOlR
+	P88eazKsKDO9iPYS61kJcsGSA/XVUn6QcffVTYNpSgFmsix2faWVnGfN9aClcVYxcbXg
+	XR6fQIkg1qWEVascbQXNaeGcS8SwGVEmNYBAKVGGFY83MxglLfWwsGDj3OpOy83rIy8B
+	XDB0piY0W44IKj/nvKb1NEOTzxrE8+9SUKsLN8h6YuRrSu7t5DXd6dk7jSGut5gRNnKz
+	SMEA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-	:message-id:subject:to:cc;
-	bh=U1zLkU5pz1XuVG4+G1IidtZr8Fv8ZxQTJnfojFUkkpc=;
-	b=GdGXlfb8LNRR0/ynfMoxkyVBwskWkgw+I5TXPzDleYLYnUL5UnX+5SDj/VOiV8mB1V
-	uR6+B7PTQWkbpWglzh5bNrxFOIQYEqrOedIdBe6Q8NonXw/xO5u8tA3Yla5u+B/eWlxQ
-	xWxfLCechRY7ZCD4vX3sGKPQq17TA18DRphBYs0cy9rnpkMiK4keKadzBU4J58Ofy4II
-	SxW/1lwW6iHD9H3eOjDxVizS8a7yVvxq01fLvgsFX+NRvFkJMsZfhVSslNnX8KU5psHF
-	S/vEMB5J3iGyPFVdTUpcz5iCQM5kvfeqkIwFJnIrnXHafohgRhUX7c/d3Ek3Cv6wAW0z
-	furg==
-X-Gm-Message-State: APjAAAX9T5GKPFfb8nC9HEvhqx1jWFmBYqTaVCVZOxKruVF9KPhzsMiB
-	1yr7c4b+wfK32z21lCZLZuOZk11CGFtH4poQLDsS7k24M3cHeQ==
-X-Google-Smtp-Source: APXvYqx/O0UCneqXWJN6HvCdi2wwwD3UEli8llnKbbtvqpeWBNZg8FVSHz0KP2RgY4Vcx/Bb85r0M4qphOGXFQOUVrs=
-X-Received: by 2002:a37:b8c5:: with SMTP id i188mr11847654qkf.7.1559719254686; 
-	Wed, 05 Jun 2019 00:20:54 -0700 (PDT)
+	h=x-gm-message-state:subject:to:cc:references:from:openpgp:autocrypt
+	:message-id:date:user-agent:mime-version:in-reply-to
+	:content-language:content-transfer-encoding;
+	bh=JtgL8SVVkOChCT3Yo0NjnagGdgj/kOiq1J4EXFG7GoA=;
+	b=sAWhiw/bdw8PuKkUFmdbMB/hz8E5vQ0djNnwweaVuojWRfVnaJjoZtD8dQZAKN7rg5
+	OJJS4TzVWMZlL59YizSMmwCW/stA9ddtU5V9wee5KG2ZIKMIsMSSPGUarm0oCK/0RkrJ
+	KnoAuqyucCfye3ci0dyNAtli+vQbVM3ZfAMFGls6AZprcx+Ei9mi92XNQh5HNb89J/st
+	QjkcTniqQND3BuNxyAw+uxUJsOYzABBypLwgezZNDxnfZYsZz6OANIITehVDABcD8Egz
+	Oy643TNVTph364a6aoAtE73FZloA/oG/OFO1/eX1T437naXK7Qn23paaw2oymu6BjwNw
+	B7Fg==
+X-Gm-Message-State: APjAAAXRAFe21/4JcPLgXoqdIMcYG3yr4EtZGsho4WaJK6uoqUgQ9EiF
+	V/6WrCqkrknVWhtqCeYcbDcwUg==
+X-Google-Smtp-Source: APXvYqx284Go1NsxaSdXlSsPaFAlCKLdupquTadTGWe4kFiU16ho8B5sAvW0GjeldMsaZZQbx1SnCw==
+X-Received: by 2002:a17:90b:14e:: with SMTP id
+	em14mr42392654pjb.19.1559719260542; 
+	Wed, 05 Jun 2019 00:21:00 -0700 (PDT)
+Received: from [10.61.2.175] ([122.99.82.10])
+	by smtp.gmail.com with ESMTPSA id i4sm1010696pjd.31.2019.06.05.00.20.57
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Wed, 05 Jun 2019 00:20:59 -0700 (PDT)
+To: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+References: <20190529065017.15149-1-david@gibson.dropbear.id.au>
+	<20190529065017.15149-30-david@gibson.dropbear.id.au>
+	<9f6614b2-2f07-ef0c-cca3-d6fcc1f8f87f@ozlabs.ru>
+	<9bd9c2e3-60df-73c9-3d64-d03bb302ab23@kaod.org>
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+Openpgp: preference=signencrypt
+Autocrypt: addr=aik@ozlabs.ru; keydata=
+	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
+Message-ID: <13fed338-b93c-90fc-ac3a-56912a0a87cb@ozlabs.ru>
+Date: Wed, 5 Jun 2019 17:20:55 +1000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.7.0
 MIME-Version: 1.0
-References: <20190530190738.22713-1-mrolnik@gmail.com>
-	<20190530190738.22713-4-mrolnik@gmail.com>
-	<402ba0b2-e2e0-6b7a-1862-4588e5f83357@linaro.org>
-	<CAK4993iXV9oRr_VfabJHg4fCYEppW49i_PE9R0X_TBqk7TDkrQ@mail.gmail.com>
-	<9e2acbbe-7ede-c45d-5e9f-bb269aa25fcc@linaro.org>
-	<CAK4993hXTOSoW5FFjeur+pLzT18c-C=vwao-904ASyqMsT5eMQ@mail.gmail.com>
-	<3bc0d426-bd59-055d-a010-b136cba555bf@linaro.org>
-	<CAK4993j5JXgV9CYDckt99kwgQaG6w-GN-Tka7r2nahoh33rheQ@mail.gmail.com>
-In-Reply-To: <CAK4993j5JXgV9CYDckt99kwgQaG6w-GN-Tka7r2nahoh33rheQ@mail.gmail.com>
-From: Michael Rolnik <mrolnik@gmail.com>
-Date: Wed, 5 Jun 2019 10:20:18 +0300
-Message-ID: <CAK4993jWViasj8PKUCHcbMh-9SPJmELqua9eSbFvwL7gpm2e5A@mail.gmail.com>
-To: Richard Henderson <richard.henderson@linaro.org>
+In-Reply-To: <9bd9c2e3-60df-73c9-3d64-d03bb302ab23@kaod.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2607:f8b0:4864:20::742
-Content-Type: text/plain; charset="UTF-8"
-X-Content-Filtered-By: Mailman/MimeDel 2.1.21
-Subject: Re: [Qemu-devel] [PATCH RFC v20 3/8] target/avr: Add mechanism to
- check for active debugger connection
+X-Received-From: 2607:f8b0:4864:20::442
+Subject: Re: [Qemu-devel] [PULL 29/44] spapr/xive: introduce a VM state
+ change handler
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -94,130 +176,289 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Sarah Harris <S.E.Harris@kent.ac.uk>,
-	QEMU Developers <qemu-devel@nongnu.org>,
-	Richard Henderson <rth@twiddle.net>
+Cc: lvivier@redhat.com, peter.maydell@linaro.org, groug@kaod.org,
+	qemu-devel@nongnu.org, qemu-ppc@nongnu.org, rth@twiddle.net,
+	David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Richard.
-
-I am still struggling with this one.
-
-The spec says.
-The BREAK instruction is used by the On-chip Debug system, and is normally
-not used in the application software.
-When the BREAK instruction is executed, the AVR CPU is set in the Stopped
-Mode.
-This gives the On-chip Debugger access to internal resources.
-If any Lock bits are set, or either the JTAGEN or OCDEN Fuses are
-unprogrammed, the CPU will treat the BREAK instruction as a NOP and will
-not enter the Stopped mode.
-
-I read is as follows
-- If user has an intention of using debugger, BREAK should be translated to
-QEMU debug breakpoint
-- If user has no intention of using debugger, BREAK should be translated
-into NOP.
-
-however it seems that rising EXCP_DEBUG crashes QEMU when no debugger is
-present or *-s* was not supplied.
-
-This lead me to the following.
-- checking for active GDB connection is not good, because it might change
-but translated BREAK will not
-- if *-s* is supplied BREAK should always raise EXCP_DEBUG exception
-- if *-s* is not supplied BREAK should be translated into NOP
-
-What do you think? How to check existence of *-s* option?
-
-Regards,
-Michael
 
 
-
-On Mon, Jun 3, 2019 at 8:04 PM Michael Rolnik <mrolnik@gmail.com> wrote:
-
-> Got it.
->
-> Sent from my cell phone, please ignore typos
->
-> On Mon, Jun 3, 2019, 7:37 PM Richard Henderson <
-> richard.henderson@linaro.org> wrote:
->
->> On 6/3/19 11:29 AM, Michael Rolnik wrote:
->> > 1. There's a break
->> > instruction
->> https://www.microchip.com/webdoc/avrassembler/avrassembler.wb_BREAK.html
->> > 2. There's a set of tests that use break.
->> >
->> > So I assume I have to implement this instruction as described in the
->> spec.
+On 04/06/2019 18:10, Cédric Le Goater wrote:
+> On 04/06/2019 09:49, Alexey Kardashevskiy wrote:
 >>
->> The spec talks about fuses, not gdb.  A valid implementation of this
->> instruction is a no-op -- it say so right there in the spec.
 >>
->> What does it mean to "test" break?  AFAIK, you can't test this at all from
->> within the cpu itself, since it does not generate a cpu-level exception.
+>> On 29/05/2019 16:50, David Gibson wrote:
+>>> From: Cédric Le Goater <clg@kaod.org>
+>>>
+>>> This handler is in charge of stabilizing the flow of event notifications
+>>> in the XIVE controller before migrating a guest. This is a requirement
+>>> before transferring the guest EQ pages to a destination.
+>>>
+>>> When the VM is stopped, the handler sets the source PQs to PENDING to
+>>> stop the flow of events and to possibly catch a triggered interrupt
+>>> occuring while the VM is stopped. Their previous state is saved. The
+>>> XIVE controller is then synced through KVM to flush any in-flight
+>>> event notification and to stabilize the EQs. At this stage, the EQ
+>>> pages are marked dirty to make sure the EQ pages are transferred if a
+>>> migration sequence is in progress.
+>>>
+>>> The previous configuration of the sources is restored when the VM
+>>> resumes, after a migration or a stop. If an interrupt was queued while
+>>> the VM was stopped, the handler simply generates the missing trigger.
+>>>
+>>> Signed-off-by: Cédric Le Goater <clg@kaod.org>
+>>> Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+>>> Message-Id: <20190513084245.25755-6-clg@kaod.org>
+>>> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 >>
->> If gdb is setting a breakpoint via -S, it should be done via
->> cpu_breakpoint_test.
+>> This one breaks my nvlink2 passthru setup. The host is v5.2-rc2.
+>> v5.2-rc3 fixes it though so it is backward compatibility issue which we
+>> care about to what degree here? 
+> 
+> v5.2-rc2 had an ugly bug impacting passthru under some VM configuration,
+> XIVE + single CPU. See :
+> 
+> bcaa3110d584 ("KVM: PPC: Book3S HV: XIVE: Fix page offset when clearing 
+> ESB pages")
+> 
+> passthru also had a serious issue impacting the XICS-over-XIVE and the 
+> XIVE KVM devices :   
+> 
+> ef9740204051 ("KVM: PPC: Book3S HV: XIVE: Do not clear IRQ data of 
+> passthrough interrupts")
+> 
+> You need an v5.2-rc3 ! 
+
+
+Yeah, that works. And released v5.1 works too so we do not need to worry
+:) Thanks for explanation.
+
+
+> 
+>> I am forcing ic-mode=xive which is not the default so I am not so sure.
+> 
+> It should be OK.
+> 
+> C. 
+> 
 >>
 >>
 >>
->> > On Mon, Jun 3, 2019, 6:44 PM Richard Henderson <
->> richard.henderson@linaro.org
->> > <mailto:richard.henderson@linaro.org>> wrote:
->> >
->> >     On 6/1/19 4:12 PM, Michael Rolnik wrote:
->> >     > Hi Richard.
->> >     >
->> >     > If I implement it this way
->> >     >
->> >     > ```
->> >     >  static bool trans_BREAK(DisasContext *ctx, arg_BREAK *a)
->> >     >  {
->> >     >      if (avr_feature(ctx->env, AVR_FEATURE_BREAK) == false) {
->> >     >          gen_helper_unsupported(cpu_env);
->> >     >      } else {
->> >     >          tcg_gen_movi_tl(cpu_pc, ctx->inst[0].npc);
->> >     >          gen_helper_debug(cpu_env);
->> >     >      }
->> >     >
->> >     >      ctx->bstate = BS_EXCP;
->> >     >
->> >     >      return true;
->> >     >  }
->> >     > ```
->> >     >
->> >     > qemu (without -s -S flags) crashes when debugger is not connected
->> >
->> >     I was not suggesting using the internal qemu EXCP_DEBUG, but
->> another AVR
->> >     specific exception, much the same way as every other cpu has a
->> cpu-specific
->> >     debug exception.
->> >
->> >     Or perhaps always do nothing.  Why is gdb insertting BREAK in the
->> first place?
->> >      It should be using the "hardware breakpoint" support that qemu
->> advertises as
->> >     part of the gdbstub protocol, and that you support here:
->> >
->> >     > +        if (unlikely(cpu_breakpoint_test(cs, OFFSET_CODE + cpc *
->> 2, BP_ANY))
->> >     > +                 || cpu_breakpoint_test(cs, OFFSET_DATA + cpc *
->> 2,
->> >     BP_ANY)) {
->> >     > +            tcg_gen_movi_i32(cpu_pc, cpc);
->> >     > +            gen_helper_debug(cpu_env);
->> >     > +            ctx.bstate = BS_EXCP;
->> >     > +            goto done_generating;
->> >     > +        }
+>> aik@u1804kvm:~$ cat /proc/interrupts
+>>            CPU0
+>>  16:          0  XIVE-IPI   0 Edge      IPI
+>>  21:          0  XIVE-IRQ 4096 Edge      RAS_EPOW
+>>  22:          0  XIVE-IRQ 4097 Edge      RAS_HOTPLUG
+>> 257:      12372  XIVE-IRQ 4353 Edge      ibmvscsi
+>> 258:          0  XIVE-IRQ 4864 Edge      virtio0-config
+>> 259:       2157  XIVE-IRQ 4865 Edge      virtio0-input.0
+>> 260:          1  XIVE-IRQ 4866 Edge      virtio0-output.0
+>> 261:          0  XIVE-IRQ 4868 Edge      xhci_hcd
+>> 262:          0  XIVE-IRQ 4869 Edge      xhci_hcd
+>> 272:          1  XIVE-IRQ 4368 Edge      hvc_console
+>> LOC:      10508   Local timer interrupts for timer event device
+>> BCT:          0   Broadcast timer interrupts for timer event device
+>> LOC:          0   Local timer interrupts for others
+>> SPU:          5   Spurious interrupts
+>> PMI:          0   Performance monitoring interrupts
+>> MCE:          0   Machine check exceptions
+>> NMI:          0   System Reset interrupts
+>> DBL:          0   Doorbell interrupts
 >>
 >>
+>> and 7bfc759c02b8 "spapr/xive: add state synchronization with KVM" works:
+>>
+>>            CPU0
+>>  16:          0  XIVE-IPI   0 Edge      IPI
+>>  19:          0  XIVE-IRQ 4610 Level     NPU Device
+>>  20:          0  XIVE-IRQ 4611 Level     NPU Device
+>>  21:          0  XIVE-IRQ 4096 Edge      RAS_EPOW
+>>  22:          0  XIVE-IRQ 4097 Edge      RAS_HOTPLUG
+>> 257:      11833  XIVE-IRQ 4353 Edge      ibmvscsi
+>> 258:          0  XIVE-IRQ 4864 Edge      virtio0-config
+>> 259:       1632  XIVE-IRQ 4865 Edge      virtio0-input.0
+>> 260:          1  XIVE-IRQ 4866 Edge      virtio0-output.0
+>> 261:          0  XIVE-IRQ 4868 Edge      xhci_hcd
+>> 262:          0  XIVE-IRQ 4869 Edge      xhci_hcd
+>> 263:         60  XIVE-IRQ 4867 Edge      nvidia
+>> 272:          0  XIVE-IRQ 4368 Edge      hvc_console
+>> LOC:       2236   Local timer interrupts for timer event device
+>> BCT:          0   Broadcast timer interrupts for timer event device
+>> LOC:          0   Local timer interrupts for others
+>> SPU:          2   Spurious interrupts
+>> PMI:          0   Performance monitoring interrupts
+>> MCE:          0   Machine check exceptions
+>> NMI:          0   System Reset interrupts
+>> DBL:          0   Doorbell interrupts
+>>
+>>
+>>
+>> Here is the command line:
+>>
+>> /home/aik/pbuild/qemu-aikrhel74alt-ppc64/ppc64-softmmu/qemu-system-ppc64 \
+>> -nodefaults \
+>> -chardev stdio,id=STDIO0,signal=off,mux=on \
+>> -device spapr-vty,id=svty0,reg=0x71000110,chardev=STDIO0 \
+>> -mon id=MON0,chardev=STDIO0,mode=readline -nographic -vga none \
+>> -enable-kvm \
+>> -device nec-usb-xhci,id=nec-usb-xhci0 -m 16G \
+>> -netdev "user,id=USER0,hostfwd=tcp::2223-:22" \
+>> -device "virtio-net-pci,id=vnet0,mac=C0:41:49:4b:00:00,netdev=USER0" \
+>> img/u1804-64G-cuda10.1-418.67-swiotlb.qcow2 \
+>> -machine pseries,cap-cfpc=broken,cap-htm=off,ic-mode=xive \
+>> -device "vfio-pci,id=vfio0006_00_00_1,host=0006:00:00.1" \
+>> -device "vfio-pci,id=vfio0006_00_00_0,host=0006:00:00.0" \
+>> -device "vfio-pci,id=vfio0004_04_00_0,host=0004:04:00.0" \
+>> -kernel ./vmldbg -append "root=/dev/sda2 console=hvc0 debug loglevel=8" \
+>> -snapshot \
+>> -smp 1,threads=1 -bios ./slof.bin \
+>> -L /home/aik/t/qemu-ppc64-bios/ \
+>> -trace events=qemu_trace_events -d guest_errors \
+>> -chardev socket,id=SOCKET0,server,nowait,path=qemu.mon.user2223.6_0_0_1 \
+>> -mon chardev=SOCKET0,mode=control
+>>
+>>
+>>
+>>
+>>> ---
+>>>  hw/intc/spapr_xive_kvm.c    | 96 ++++++++++++++++++++++++++++++++++++-
+>>>  include/hw/ppc/spapr_xive.h |  1 +
+>>>  2 files changed, 96 insertions(+), 1 deletion(-)
+>>>
+>>> diff --git a/hw/intc/spapr_xive_kvm.c b/hw/intc/spapr_xive_kvm.c
+>>> index 8dd4f96e0b..735577a6f8 100644
+>>> --- a/hw/intc/spapr_xive_kvm.c
+>>> +++ b/hw/intc/spapr_xive_kvm.c
+>>> @@ -433,9 +433,100 @@ static void kvmppc_xive_get_queues(SpaprXive *xive, Error **errp)
+>>>      }
+>>>  }
+>>>  
+>>> +/*
+>>> + * The primary goal of the XIVE VM change handler is to mark the EQ
+>>> + * pages dirty when all XIVE event notifications have stopped.
+>>> + *
+>>> + * Whenever the VM is stopped, the VM change handler sets the source
+>>> + * PQs to PENDING to stop the flow of events and to possibly catch a
+>>> + * triggered interrupt occuring while the VM is stopped. The previous
+>>> + * state is saved in anticipation of a migration. The XIVE controller
+>>> + * is then synced through KVM to flush any in-flight event
+>>> + * notification and stabilize the EQs.
+>>> + *
+>>> + * At this stage, we can mark the EQ page dirty and let a migration
+>>> + * sequence transfer the EQ pages to the destination, which is done
+>>> + * just after the stop state.
+>>> + *
+>>> + * The previous configuration of the sources is restored when the VM
+>>> + * runs again. If an interrupt was queued while the VM was stopped,
+>>> + * simply generate a trigger.
+>>> + */
+>>> +static void kvmppc_xive_change_state_handler(void *opaque, int running,
+>>> +                                             RunState state)
+>>> +{
+>>> +    SpaprXive *xive = opaque;
+>>> +    XiveSource *xsrc = &xive->source;
+>>> +    Error *local_err = NULL;
+>>> +    int i;
+>>> +
+>>> +    /*
+>>> +     * Restore the sources to their initial state. This is called when
+>>> +     * the VM resumes after a stop or a migration.
+>>> +     */
+>>> +    if (running) {
+>>> +        for (i = 0; i < xsrc->nr_irqs; i++) {
+>>> +            uint8_t pq = xive_source_esb_get(xsrc, i);
+>>> +            uint8_t old_pq;
+>>> +
+>>> +            old_pq = xive_esb_read(xsrc, i, XIVE_ESB_SET_PQ_00 + (pq << 8));
+>>> +
+>>> +            /*
+>>> +             * An interrupt was queued while the VM was stopped,
+>>> +             * generate a trigger.
+>>> +             */
+>>> +            if (pq == XIVE_ESB_RESET && old_pq == XIVE_ESB_QUEUED) {
+>>> +                xive_esb_trigger(xsrc, i);
+>>> +            }
+>>> +        }
+>>> +
+>>> +        return;
+>>> +    }
+>>> +
+>>> +    /*
+>>> +     * Mask the sources, to stop the flow of event notifications, and
+>>> +     * save the PQs locally in the XiveSource object. The XiveSource
+>>> +     * state will be collected later on by its vmstate handler if a
+>>> +     * migration is in progress.
+>>> +     */
+>>> +    for (i = 0; i < xsrc->nr_irqs; i++) {
+>>> +        uint8_t pq = xive_esb_read(xsrc, i, XIVE_ESB_GET);
+>>> +
+>>> +        /*
+>>> +         * PQ is set to PENDING to possibly catch a triggered
+>>> +         * interrupt occuring while the VM is stopped (hotplug event
+>>> +         * for instance) .
+>>> +         */
+>>> +        if (pq != XIVE_ESB_OFF) {
+>>> +            pq = xive_esb_read(xsrc, i, XIVE_ESB_SET_PQ_10);
+>>> +        }
+>>> +        xive_source_esb_set(xsrc, i, pq);
+>>> +    }
+>>> +
+>>> +    /*
+>>> +     * Sync the XIVE controller in KVM, to flush in-flight event
+>>> +     * notification that should be enqueued in the EQs and mark the
+>>> +     * XIVE EQ pages dirty to collect all updates.
+>>> +     */
+>>> +    kvm_device_access(xive->fd, KVM_DEV_XIVE_GRP_CTRL,
+>>> +                      KVM_DEV_XIVE_EQ_SYNC, NULL, true, &local_err);
+>>> +    if (local_err) {
+>>> +        error_report_err(local_err);
+>>> +        return;
+>>> +    }
+>>> +}
+>>> +
+>>>  void kvmppc_xive_synchronize_state(SpaprXive *xive, Error **errp)
+>>>  {
+>>> -    kvmppc_xive_source_get_state(&xive->source);
+>>> +    /*
+>>> +     * When the VM is stopped, the sources are masked and the previous
+>>> +     * state is saved in anticipation of a migration. We should not
+>>> +     * synchronize the source state in that case else we will override
+>>> +     * the saved state.
+>>> +     */
+>>> +    if (runstate_is_running()) {
+>>> +        kvmppc_xive_source_get_state(&xive->source);
+>>> +    }
+>>>  
+>>>      /* EAT: there is no extra state to query from KVM */
+>>>  
+>>> @@ -515,6 +606,9 @@ void kvmppc_xive_connect(SpaprXive *xive, Error **errp)
+>>>                                        "xive.tima", tima_len, xive->tm_mmap);
+>>>      sysbus_init_mmio(SYS_BUS_DEVICE(xive), &xive->tm_mmio);
+>>>  
+>>> +    xive->change = qemu_add_vm_change_state_handler(
+>>> +        kvmppc_xive_change_state_handler, xive);
+>>> +
+>>>      kvm_kernel_irqchip = true;
+>>>      kvm_msi_via_irqfd_allowed = true;
+>>>      kvm_gsi_direct_mapping = true;
+>>> diff --git a/include/hw/ppc/spapr_xive.h b/include/hw/ppc/spapr_xive.h
+>>> index 7e49badd8c..734662c12a 100644
+>>> --- a/include/hw/ppc/spapr_xive.h
+>>> +++ b/include/hw/ppc/spapr_xive.h
+>>> @@ -42,6 +42,7 @@ typedef struct SpaprXive {
+>>>      /* KVM support */
+>>>      int           fd;
+>>>      void          *tm_mmap;
+>>> +    VMChangeStateEntry *change;
+>>>  } SpaprXive;
+>>>  
+>>>  /*
+>>>
+>>
+> 
 
 -- 
-Best Regards,
-Michael Rolnik
+Alexey
+
