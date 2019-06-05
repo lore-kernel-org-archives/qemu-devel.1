@@ -3,60 +3,60 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EE29CC28CC5
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 20:51:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A165C28CC5
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 20:53:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C954E20866
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 20:51:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C954E20866
+	by mail.kernel.org (Postfix) with ESMTPS id 2032D2070B
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 20:53:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2032D2070B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:49753 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:49772 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hYcsD-0000Fb-1v
-	for qemu-devel@archiver.kernel.org; Wed, 05 Jun 2019 16:51:05 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:41560)
+	id 1hYcu8-00024l-9b
+	for qemu-devel@archiver.kernel.org; Wed, 05 Jun 2019 16:53:04 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:41342)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hYcdU-0003yJ-6G
-	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 16:35:57 -0400
+	(envelope-from <david@redhat.com>) id 1hYcdN-0003su-US
+	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 16:35:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hYcdO-0008Rh-Dq
-	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 16:35:51 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33186)
+	(envelope-from <david@redhat.com>) id 1hYcdL-0008Ie-Bf
+	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 16:35:45 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59312)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <david@redhat.com>)
-	id 1hYcdO-0006tj-0A; Wed, 05 Jun 2019 16:35:46 -0400
+	id 1hYcdJ-0006Uq-CL; Wed, 05 Jun 2019 16:35:43 -0400
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
 	[10.5.11.12])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 52F51356DB;
-	Wed,  5 Jun 2019 20:34:57 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id DAAF33082E55;
+	Wed,  5 Jun 2019 20:34:38 +0000 (UTC)
 Received: from t460s.redhat.com (ovpn-116-124.ams2.redhat.com [10.36.116.124])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id CB04818BA6;
-	Wed,  5 Jun 2019 20:34:55 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 60330619A9;
+	Wed,  5 Jun 2019 20:34:37 +0000 (UTC)
 From: David Hildenbrand <david@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Wed,  5 Jun 2019 22:33:53 +0200
-Message-Id: <20190605203403.29461-24-david@redhat.com>
+Date: Wed,  5 Jun 2019 22:33:44 +0200
+Message-Id: <20190605203403.29461-15-david@redhat.com>
 In-Reply-To: <20190605203403.29461-1-david@redhat.com>
 References: <20190605203403.29461-1-david@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.30]);
-	Wed, 05 Jun 2019 20:34:57 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.46]);
+	Wed, 05 Jun 2019 20:34:38 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL SUBSYSTEM s390x 23/33] s390x/tcg: Implement
- VECTOR FP MULTIPLY
+Subject: [Qemu-devel] [PULL SUBSYSTEM s390x 14/33] s390x/tcg: Implement
+ VECTOR FP COMPARE (EQUAL|HIGH|HIGH OR EQUAL)
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -76,91 +76,256 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Very similar to VECTOR FP DIVIDE.
+Provide for all three instructions all four combinations of cc bit and
+s bit.
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- target/s390x/helper.h           |  2 ++
- target/s390x/insn-data.def      |  2 ++
- target/s390x/translate_vx.inc.c |  3 +++
- target/s390x/vec_fpu_helper.c   | 17 +++++++++++++++++
- 4 files changed, 24 insertions(+)
+ target/s390x/helper.h           |  12 ++++
+ target/s390x/insn-data.def      |   6 ++
+ target/s390x/translate_vx.inc.c |  51 ++++++++++++++++
+ target/s390x/vec_fpu_helper.c   | 104 ++++++++++++++++++++++++++++++++
+ 4 files changed, 173 insertions(+)
 
 diff --git a/target/s390x/helper.h b/target/s390x/helper.h
-index 7526f8e8c6..22e02a0178 100644
+index d34d6802a6..33d3bacf74 100644
 --- a/target/s390x/helper.h
 +++ b/target/s390x/helper.h
-@@ -282,6 +282,8 @@ DEF_HELPER_FLAGS_4(gvec_vfll32, TCG_CALL_NO_WG, void,=
- ptr, cptr, env, i32)
- DEF_HELPER_FLAGS_4(gvec_vfll32s, TCG_CALL_NO_WG, void, ptr, cptr, env, i=
-32)
- DEF_HELPER_FLAGS_4(gvec_vflr64, TCG_CALL_NO_WG, void, ptr, cptr, env, i3=
-2)
- DEF_HELPER_FLAGS_4(gvec_vflr64s, TCG_CALL_NO_WG, void, ptr, cptr, env, i=
-32)
-+DEF_HELPER_FLAGS_5(gvec_vfm64, TCG_CALL_NO_WG, void, ptr, cptr, cptr, en=
-v, i32)
-+DEF_HELPER_FLAGS_5(gvec_vfm64s, TCG_CALL_NO_WG, void, ptr, cptr, cptr, e=
+@@ -254,6 +254,18 @@ DEF_HELPER_FLAGS_5(gvec_vfa64, TCG_CALL_NO_WG, void,=
+ ptr, cptr, cptr, env, i32)
+ DEF_HELPER_FLAGS_5(gvec_vfa64s, TCG_CALL_NO_WG, void, ptr, cptr, cptr, e=
 nv, i32)
+ DEF_HELPER_4(gvec_wfc64, void, cptr, cptr, env, i32)
+ DEF_HELPER_4(gvec_wfk64, void, cptr, cptr, env, i32)
++DEF_HELPER_FLAGS_5(gvec_vfce64, TCG_CALL_NO_WG, void, ptr, cptr, cptr, e=
+nv, i32)
++DEF_HELPER_FLAGS_5(gvec_vfce64s, TCG_CALL_NO_WG, void, ptr, cptr, cptr, =
+env, i32)
++DEF_HELPER_5(gvec_vfce64_cc, void, ptr, cptr, cptr, env, i32)
++DEF_HELPER_5(gvec_vfce64s_cc, void, ptr, cptr, cptr, env, i32)
++DEF_HELPER_FLAGS_5(gvec_vfch64, TCG_CALL_NO_WG, void, ptr, cptr, cptr, e=
+nv, i32)
++DEF_HELPER_FLAGS_5(gvec_vfch64s, TCG_CALL_NO_WG, void, ptr, cptr, cptr, =
+env, i32)
++DEF_HELPER_5(gvec_vfch64_cc, void, ptr, cptr, cptr, env, i32)
++DEF_HELPER_5(gvec_vfch64s_cc, void, ptr, cptr, cptr, env, i32)
++DEF_HELPER_FLAGS_5(gvec_vfche64, TCG_CALL_NO_WG, void, ptr, cptr, cptr, =
+env, i32)
++DEF_HELPER_FLAGS_5(gvec_vfche64s, TCG_CALL_NO_WG, void, ptr, cptr, cptr,=
+ env, i32)
++DEF_HELPER_5(gvec_vfche64_cc, void, ptr, cptr, cptr, env, i32)
++DEF_HELPER_5(gvec_vfche64s_cc, void, ptr, cptr, cptr, env, i32)
 =20
  #ifndef CONFIG_USER_ONLY
  DEF_HELPER_3(servc, i32, env, i64, i64)
 diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
-index f03914d528..e56059ac34 100644
+index c45e101b10..446552f251 100644
 --- a/target/s390x/insn-data.def
 +++ b/target/s390x/insn-data.def
-@@ -1234,6 +1234,8 @@
-     F(0xe7c4, VFLL,    VRR_a, V,   0, 0, 0, 0, vfll, 0, IF_VEC)
- /* VECTOR LOAD ROUNDED */
-     F(0xe7c5, VFLR,    VRR_a, V,   0, 0, 0, 0, vcdg, 0, IF_VEC)
-+/* VECTOR FP MULTIPLY */
-+    F(0xe7e7, VFM,     VRR_c, V,   0, 0, 0, 0, vfa, 0, IF_VEC)
+@@ -1212,6 +1212,12 @@
+     F(0xe7cb, WFC,     VRR_a, V,   0, 0, 0, 0, wfc, 0, IF_VEC)
+ /* VECTOR FP COMPARE AND SIGNAL SCALAR */
+     F(0xe7ca, WFK,     VRR_a, V,   0, 0, 0, 0, wfc, 0, IF_VEC)
++/* VECTOR FP COMPARE EQUAL */
++    F(0xe7e8, VFCE,    VRR_c, V,   0, 0, 0, 0, vfc, 0, IF_VEC)
++/* VECTOR FP COMPARE HIGH */
++    F(0xe7eb, VFCH,    VRR_c, V,   0, 0, 0, 0, vfc, 0, IF_VEC)
++/* VECTOR FP COMPARE HIGH OR EQUAL */
++    F(0xe7ea, VFCHE,   VRR_c, V,   0, 0, 0, 0, vfc, 0, IF_VEC)
 =20
  #ifndef CONFIG_USER_ONLY
  /* COMPARE AND SWAP AND PURGE */
 diff --git a/target/s390x/translate_vx.inc.c b/target/s390x/translate_vx.=
 inc.c
-index 73e1b1062a..ae31a327cf 100644
+index 283e8aa07a..5571a71e1a 100644
 --- a/target/s390x/translate_vx.inc.c
 +++ b/target/s390x/translate_vx.inc.c
-@@ -2563,6 +2563,9 @@ static DisasJumpType op_vfa(DisasContext *s, DisasO=
-ps *o)
-     case 0xe5:
-         fn =3D se ? gen_helper_gvec_vfd64s : gen_helper_gvec_vfd64;
-         break;
-+    case 0xe7:
-+        fn =3D se ? gen_helper_gvec_vfm64s : gen_helper_gvec_vfm64;
-+        break;
-     default:
-         g_assert_not_reached();
-     }
-diff --git a/target/s390x/vec_fpu_helper.c b/target/s390x/vec_fpu_helper.=
-c
-index 764f7379da..57b7fe4aff 100644
---- a/target/s390x/vec_fpu_helper.c
-+++ b/target/s390x/vec_fpu_helper.c
-@@ -487,3 +487,20 @@ void HELPER(gvec_vflr64s)(void *v1, const void *v2, =
-CPUS390XState *env,
-=20
-     vflr64(v1, v2, env, true, XxC, erm, GETPC());
+@@ -2588,3 +2588,54 @@ static DisasJumpType op_wfc(DisasContext *s, Disas=
+Ops *o)
+     set_cc_static(s);
+     return DISAS_NEXT;
  }
 +
-+static uint64_t vfm64(uint64_t a, uint64_t b, float_status *s)
++static DisasJumpType op_vfc(DisasContext *s, DisasOps *o)
 +{
-+    return float64_mul(a, b, s);
++    const uint8_t fpf =3D get_field(s->fields, m4);
++    const uint8_t m5 =3D get_field(s->fields, m5);
++    const uint8_t m6 =3D get_field(s->fields, m6);
++    const bool se =3D extract32(m5, 3, 1);
++    const bool cs =3D extract32(m6, 0, 1);
++    gen_helper_gvec_3_ptr *fn;
++
++    if (fpf !=3D FPF_LONG || extract32(m5, 0, 3) || extract32(m6, 1, 3))=
+ {
++        gen_program_exception(s, PGM_SPECIFICATION);
++        return DISAS_NORETURN;
++    }
++
++    if (cs) {
++        switch (s->fields->op2) {
++        case 0xe8:
++            fn =3D se ? gen_helper_gvec_vfce64s_cc : gen_helper_gvec_vfc=
+e64_cc;
++            break;
++        case 0xeb:
++            fn =3D se ? gen_helper_gvec_vfch64s_cc : gen_helper_gvec_vfc=
+h64_cc;
++            break;
++        case 0xea:
++            fn =3D se ? gen_helper_gvec_vfche64s_cc : gen_helper_gvec_vf=
+che64_cc;
++            break;
++        default:
++            g_assert_not_reached();
++        }
++    } else {
++        switch (s->fields->op2) {
++        case 0xe8:
++            fn =3D se ? gen_helper_gvec_vfce64s : gen_helper_gvec_vfce64=
+;
++            break;
++        case 0xeb:
++            fn =3D se ? gen_helper_gvec_vfch64s : gen_helper_gvec_vfch64=
+;
++            break;
++        case 0xea:
++            fn =3D se ? gen_helper_gvec_vfche64s : gen_helper_gvec_vfche=
+64;
++            break;
++        default:
++            g_assert_not_reached();
++        }
++    }
++    gen_gvec_3_ptr(get_field(s->fields, v1), get_field(s->fields, v2),
++                   get_field(s->fields, v3), cpu_env, 0, fn);
++    if (cs) {
++        set_cc_static(s);
++    }
++    return DISAS_NEXT;
++}
+diff --git a/target/s390x/vec_fpu_helper.c b/target/s390x/vec_fpu_helper.=
+c
+index f9357d9221..e72500d4d5 100644
+--- a/target/s390x/vec_fpu_helper.c
++++ b/target/s390x/vec_fpu_helper.c
+@@ -149,3 +149,107 @@ void HELPER(gvec_wfk64)(const void *v1, const void =
+*v2, CPUS390XState *env,
+ {
+     env->cc_op =3D wfc64(v1, v2, env, true, GETPC());
+ }
++
++typedef int (*vfc64_fn)(float64 a, float64 b, float_status *status);
++static int vfc64(S390Vector *v1, const S390Vector *v2, const S390Vector =
+*v3,
++                 CPUS390XState *env, bool s, vfc64_fn fn, uintptr_t reta=
+ddr)
++{
++    uint8_t vxc, vec_exc =3D 0;
++    S390Vector tmp =3D {};
++    int match =3D 0;
++    int i;
++
++    for (i =3D 0; i < 2; i++) {
++        const float64 a =3D s390_vec_read_element64(v2, i);
++        const float64 b =3D s390_vec_read_element64(v3, i);
++
++        /* swap the order of the parameters, so we can use existing func=
+tions */
++        if (fn(b, a, &env->fpu_status)) {
++            match++;
++            s390_vec_write_element64(&tmp, i, -1ull);
++        }
++        vxc =3D check_ieee_exc(env, i, false, &vec_exc);
++        if (s || vxc) {
++            break;
++        }
++    }
++
++    handle_ieee_exc(env, vxc, vec_exc, retaddr);
++    *v1 =3D tmp;
++    if (match) {
++        return s || match =3D=3D 2 ? 0 : 1;
++    }
++    return 3;
 +}
 +
-+void HELPER(gvec_vfm64)(void *v1, const void *v2, const void *v3,
-+                        CPUS390XState *env, uint32_t desc)
-+{
-+    vop64_3(v1, v2, v3, env, false, vfm64, GETPC());
-+}
-+
-+void HELPER(gvec_vfm64s)(void *v1, const void *v2, const void *v3,
++void HELPER(gvec_vfce64)(void *v1, const void *v2, const void *v3,
 +                         CPUS390XState *env, uint32_t desc)
 +{
-+    vop64_3(v1, v2, v3, env, true, vfm64, GETPC());
++    vfc64(v1, v2, v3, env, false, float64_eq_quiet, GETPC());
++}
++
++void HELPER(gvec_vfce64s)(void *v1, const void *v2, const void *v3,
++                          CPUS390XState *env, uint32_t desc)
++{
++    vfc64(v1, v2, v3, env, true, float64_eq_quiet, GETPC());
++}
++
++void HELPER(gvec_vfce64_cc)(void *v1, const void *v2, const void *v3,
++                            CPUS390XState *env, uint32_t desc)
++{
++    env->cc_op =3D vfc64(v1, v2, v3, env, false, float64_eq_quiet, GETPC=
+());
++}
++
++void HELPER(gvec_vfce64s_cc)(void *v1, const void *v2, const void *v3,
++                            CPUS390XState *env, uint32_t desc)
++{
++    env->cc_op =3D vfc64(v1, v2, v3, env, true, float64_eq_quiet, GETPC(=
+));
++}
++
++void HELPER(gvec_vfch64)(void *v1, const void *v2, const void *v3,
++                         CPUS390XState *env, uint32_t desc)
++{
++    vfc64(v1, v2, v3, env, false, float64_lt_quiet, GETPC());
++}
++
++void HELPER(gvec_vfch64s)(void *v1, const void *v2, const void *v3,
++                          CPUS390XState *env, uint32_t desc)
++{
++    vfc64(v1, v2, v3, env, true, float64_lt_quiet, GETPC());
++}
++
++void HELPER(gvec_vfch64_cc)(void *v1, const void *v2, const void *v3,
++                            CPUS390XState *env, uint32_t desc)
++{
++    env->cc_op =3D vfc64(v1, v2, v3, env, false, float64_lt_quiet, GETPC=
+());
++}
++
++void HELPER(gvec_vfch64s_cc)(void *v1, const void *v2, const void *v3,
++                             CPUS390XState *env, uint32_t desc)
++{
++    env->cc_op =3D vfc64(v1, v2, v3, env, true, float64_lt_quiet, GETPC(=
+));
++}
++
++void HELPER(gvec_vfche64)(void *v1, const void *v2, const void *v3,
++                          CPUS390XState *env, uint32_t desc)
++{
++    vfc64(v1, v2, v3, env, false, float64_le_quiet, GETPC());
++}
++
++void HELPER(gvec_vfche64s)(void *v1, const void *v2, const void *v3,
++                           CPUS390XState *env, uint32_t desc)
++{
++    vfc64(v1, v2, v3, env, true, float64_le_quiet, GETPC());
++}
++
++void HELPER(gvec_vfche64_cc)(void *v1, const void *v2, const void *v3,
++                             CPUS390XState *env, uint32_t desc)
++{
++    env->cc_op =3D vfc64(v1, v2, v3, env, false, float64_le_quiet, GETPC=
+());
++}
++
++void HELPER(gvec_vfche64s_cc)(void *v1, const void *v2, const void *v3,
++                              CPUS390XState *env, uint32_t desc)
++{
++    env->cc_op =3D vfc64(v1, v2, v3, env, true, float64_le_quiet, GETPC(=
+));
 +}
 --=20
 2.21.0
