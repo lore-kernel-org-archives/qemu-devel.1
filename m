@@ -2,67 +2,105 @@ Return-Path: <SRS0=3v23=UE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 28152C28CC5
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 06:20:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AA611C282DE
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 06:22:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F3EE9206BA
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 06:20:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F3EE9206BA
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=efs-auto.org
+	by mail.kernel.org (Postfix) with ESMTPS id 766D32083E
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 06:22:22 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="e5udcJiJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 766D32083E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:36182 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:36209 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hYPHi-0000Mt-7v
-	for qemu-devel@archiver.kernel.org; Wed, 05 Jun 2019 02:20:30 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:45503)
+	id 1hYPJV-0001g7-O9
+	for qemu-devel@archiver.kernel.org; Wed, 05 Jun 2019 02:22:21 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:46915)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david.brenken@efs-auto.org>) id 1hYPER-0006zW-LG
-	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 02:17:08 -0400
+	(envelope-from <lidong.chen@oracle.com>) id 1hYPIh-0001PQ-La
+	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 02:21:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david.brenken@efs-auto.org>) id 1hYPEQ-0006hz-85
-	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 02:17:07 -0400
-Received: from mout.kundenserver.de ([217.72.192.73]:60013)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <david.brenken@efs-auto.org>)
-	id 1hYPEK-0006GC-2v
-	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 02:17:01 -0400
-Received: from localhost.localdomain ([178.239.76.114]) by
-	mrelayeu.kundenserver.de (mreue109 [212.227.15.183]) with ESMTPSA
-	(Nemesis)
-	id 1N8XHb-1gUDfz3aQj-014S32; Wed, 05 Jun 2019 08:11:42 +0200
-From: David Brenken <david.brenken@efs-auto.org>
+	(envelope-from <lidong.chen@oracle.com>) id 1hYPId-0005LE-Ua
+	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 02:21:29 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:35362)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lidong.chen@oracle.com>)
+	id 1hYPIb-0005AT-Su
+	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 02:21:27 -0400
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+	by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id
+	x556IiNV186969; Wed, 5 Jun 2019 06:21:21 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
+	h=from : to : cc :
+	subject : date : message-id : in-reply-to : references : in-reply-to :
+	references : mime-version : content-type : content-transfer-encoding;
+	s=corp-2018-07-02; bh=NkXgzSdPzOVUZDNJyEcRjrNqZpjA81OtuuhO4YYVHbc=;
+	b=e5udcJiJqjdnqCIOybFr8nLvyNyPtPjKyYF7VBTQ+RheehAciPLUmcUEDr9e1OyUcaHQ
+	7ELEhbMFAh/JPMMm3kGee7NGZ09xhxiYFsjVtxn3vCffacX/RVmMjEfxxHusrQzY/9mF
+	Bo02Voud93YAtNuFBa+WrYadgwhnJCTJjU2Jg6AlQUVl3J2DjfcI4zDicrSSv6cHnrN8
+	HnYSG6GI6x8E6/pbKTvMqrdDFtZzj8cHXq5mgm/3zkwhHUDPqENnZpLr9RILm1QNG7r2
+	UV3jHo58E+rMZQuI9Jtvu2ddTuJ+P8CzJOGHGO9kxm3XuWtZ5F+GdfNvl3nbzMw4+AHw
+	bQ== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+	by userp2130.oracle.com with ESMTP id 2sugstgx9c-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 05 Jun 2019 06:21:21 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+	by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id
+	x556Ju3R181522; Wed, 5 Jun 2019 06:21:20 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+	by aserp3020.oracle.com with ESMTP id 2swnghrbe9-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 05 Jun 2019 06:21:20 +0000
+Received: from abhmp0022.oracle.com (abhmp0022.oracle.com [141.146.116.28])
+	by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x556LJZq003993;
+	Wed, 5 Jun 2019 06:21:19 GMT
+Received: from ca-virt2-2.us.oracle.com (/10.211.11.112)
+	by default (Oracle Beehive Gateway v4.0)
+	with ESMTP ; Tue, 04 Jun 2019 23:21:18 -0700
+From: Lidong Chen <lidong.chen@oracle.com>
 To: qemu-devel@nongnu.org
-Date: Wed,  5 Jun 2019 08:11:22 +0200
-Message-Id: <20190605061126.10244-2-david.brenken@efs-auto.org>
-X-Mailer: git-send-email 2.16.1.windows.4
-In-Reply-To: <20190605061126.10244-1-david.brenken@efs-auto.org>
-References: <20190605061126.10244-1-david.brenken@efs-auto.org>
-X-Provags-ID: V03:K1:GnenMGQ7VAKZr/Cz9lBUqcAD5zucyJsQjMneTeJnYLc+OsBP81U
-	XpGrQel1yPjLC9A9Qjx+t7ldIyOfYEocH4xtUF53cz2u8sU6+DD1x6tgFki86FWZ0ebGiuj
-	q2DPkaEuLQo/MYpGC6xJJX6bYK8wxkxtnDAHjMDV5I8zbLHva9Ti8MGgkzpOKz6G9McexmB
-	eQDhlRdGcB6kGqJDxJmJg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:69Z7dGpGgkY=:HfpjiSKNbhVL9vjLKmeiGD
-	NKosQLI3nwdgHfbkcq6JmHhroUf1fqudCGkPcF1Iviu4swOovj4t3WfN0MV1qvzuma0n02ZfA
-	P5Dffd6VzJGdo+TLF6gQfCznYMpNP/mz5McMEbJYpcHt8lSwvAcf+G/IqtyfjDHJLR7AJC9XM
-	Nf8tWCkXK08PokO2D7+58V4D2EpgLsW5gQ4GGoGc2ScrfZS+GAEvOU1zW59+x2c/Ft4z5r2R0
-	37Xoxi+r2+XSBJJckkPX/U0iheJwXVuDB4s1qB64IglBatXThmFuTcSCSvOBQxcpHqhE1gCa5
-	cc1bVpa4B+Wx5tI2/VAxHjM9BAQxtRYxQqJYzz5RIsvw2XLehyYfS1YmMviYNl2oUDW1ZlJ5e
-	BJ4AJcCGWg2Wcnh6pLm/beOPlRuGcGWeAFwYVrCwAAZUwYJ/IJQERmNXTvBd9SLs/+b6ZggA1
-	cR0unxzace/HJtXmZs0xLoj2M6yriSjcjb6FNWAu24YNcM2W9MYw8knN6GpZ82ngm1dHWMZOP
-	fzWPEzhGxAACr70m5SNxqfeaT15ZjAIQ8YhAQO2SI7exlmwS5XcjwiPUrkCxRafBIj+KemcQt
-	Qjz1LRWNY/yxvL4Ch3UJ91HjATDz1ffddYMlceFe0CyfNKrWuw9xOUSAGQFmAkpYM96oAyP0n
-	/BY04v4kymM/t2XOpe6f8uYNtZOCO1iFgVep/a8SetK3r0IjmaLfJ0k4Nx4Nsncak1mVwqtEP
-	u6sbxGOTm/nBnz3wTEk8rT/ThGbB1L87Ab11yyHrOBLRBa6gB750k/eRd4c=
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 217.72.192.73
-Subject: [Qemu-devel] [PATCH 1/5] tricore: add FTOIZ instruction
+Date: Wed,  5 Jun 2019 02:21:05 -0400
+Message-Id: <6b19cb7359a10a6bedc3ea0fce22fed3ef93c102.1559710447.git.lidong.chen@oracle.com>
+X-Mailer: git-send-email 1.8.3.1
+In-Reply-To: <cover.1559710447.git.lidong.chen@oracle.com>
+References: <cover.1559710447.git.lidong.chen@oracle.com>
+In-Reply-To: <cover.1559710447.git.lidong.chen@oracle.com>
+References: <cover.1559710447.git.lidong.chen@oracle.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9278
+	signatures=668687
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=1
+	malwarescore=0
+	phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+	adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+	engine=8.0.1-1810050000 definitions=main-1906050040
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9278
+	signatures=668687
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
+	priorityscore=1501 malwarescore=0
+	suspectscore=1 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
+	lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999
+	adultscore=0
+	classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+	definitions=main-1906050040
+Content-Transfer-Encoding: quoted-printable
+X-MIME-Autoconverted: from 8bit to quoted-printable by userp2130.oracle.com id
+	x556IiNV186969
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 156.151.31.86
+Subject: [Qemu-devel] [Qemu-devel PATCH v2 1/2] sd: Fix out-of-bounds
+ assertions
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -74,93 +112,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kbastian@mail.uni-paderborn.de,
-	Lars Biermanski <lars.biermanski@efs-auto.de>,
-	Georg Hofstetter <georg.hofstetter@efs-auto.de>,
-	David Brenken <david.brenken@efs-auto.de>,
-	Robert Rasche <robert.rasche@efs-auto.de>,
-	Andreas Konopik <andreas.konopik@efs-auto.de>
+Cc: peter.maydell@linaro.org, berrange@redhat.com, liran.alon@oracle.com,
+	liq3ea@gmail.com, armbru@redhat.com, lidong.chen@oracle.com,
+	darren.kenny@oracle.com, marcandre.lureau@gmail.com,
+	amarkovic@wavecomp.com, philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: David Brenken <david.brenken@efs-auto.de>
+Due to an off-by-one error, the assert statements allow an
+out-of-bound array access.
 
-Signed-off-by: Andreas Konopik <andreas.konopik@efs-auto.de>
-Signed-off-by: David Brenken <david.brenken@efs-auto.de>
-Signed-off-by: Georg Hofstetter <georg.hofstetter@efs-auto.de>
-Signed-off-by: Robert Rasche <robert.rasche@efs-auto.de>
-Signed-off-by: Lars Biermanski <lars.biermanski@efs-auto.de>
-
+Signed-off-by: Lidong Chen <lidong.chen@oracle.com>
+Reviewed-by: Liam Merwick <liam.merwick@oracle.com>
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Reviewed-by: Li Qiang <liq3ea@gmail.com>
+Reviewed-by: Darren Kenny <darren.kenny@oracle.com>
 ---
- target/tricore/fpu_helper.c | 25 +++++++++++++++++++++++++
- target/tricore/helper.h     |  1 +
- target/tricore/translate.c  |  3 +++
- 3 files changed, 29 insertions(+)
+ hw/sd/sd.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/target/tricore/fpu_helper.c b/target/tricore/fpu_helper.c
-index d8a6c0d25b..f079d9e939 100644
---- a/target/tricore/fpu_helper.c
-+++ b/target/tricore/fpu_helper.c
-@@ -303,6 +303,31 @@ uint32_t helper_itof(CPUTriCoreState *env, uint32_t arg)
-     return (uint32_t)f_result;
- }
- 
-+uint32_t helper_ftoiz(CPUTriCoreState *env, uint32_t arg)
-+{
-+    float32 f_arg = make_float32(arg);
-+    uint32_t result;
-+    int32_t flags;
-+
-+    result = float32_to_int32_round_to_zero(f_arg, &env->fp_status);
-+
-+    flags = f_get_excp_flags(env);
-+    if (flags & float_flag_invalid) {
-+        flags &= ~float_flag_inexact;
-+        if (float32_is_any_nan(f_arg)) {
-+            result = 0;
-+        }
-+    }
-+
-+    if (flags) {
-+        f_update_psw_flags(env, flags);
-+    } else {
-+        env->FPU_FS = 0;
-+    }
-+
-+    return result;
-+}
-+
- uint32_t helper_ftouz(CPUTriCoreState *env, uint32_t arg)
- {
-     float32 f_arg = make_float32(arg);
-diff --git a/target/tricore/helper.h b/target/tricore/helper.h
-index f60e81096b..16b62edf7f 100644
---- a/target/tricore/helper.h
-+++ b/target/tricore/helper.h
-@@ -111,6 +111,7 @@ DEF_HELPER_4(fmsub, i32, env, i32, i32, i32)
- DEF_HELPER_3(fcmp, i32, env, i32, i32)
- DEF_HELPER_2(ftoi, i32, env, i32)
- DEF_HELPER_2(itof, i32, env, i32)
-+DEF_HELPER_2(ftoiz, i32, env, i32)
- DEF_HELPER_2(ftouz, i32, env, i32)
- DEF_HELPER_2(updfl, void, env, i32)
- /* dvinit */
-diff --git a/target/tricore/translate.c b/target/tricore/translate.c
-index 352f52bb4a..66cdc63286 100644
---- a/target/tricore/translate.c
-+++ b/target/tricore/translate.c
-@@ -6764,6 +6764,9 @@ static void decode_rr_divide(CPUTriCoreState *env, DisasContext *ctx)
-     case OPC2_32_RR_UPDFL:
-         gen_helper_updfl(cpu_env, cpu_gpr_d[r1]);
-         break;
-+    case OPC2_32_RR_FTOIZ:
-+        gen_helper_ftoiz(cpu_gpr_d[r3], cpu_env, cpu_gpr_d[r1]);
-+        break;
-     default:
-         generate_trap(ctx, TRAPC_INSN_ERR, TIN2_IOPC);
+diff --git a/hw/sd/sd.c b/hw/sd/sd.c
+index aaab15f..818f86c 100644
+--- a/hw/sd/sd.c
++++ b/hw/sd/sd.c
+@@ -144,7 +144,7 @@ static const char *sd_state_name(enum SDCardStates st=
+ate)
+     if (state =3D=3D sd_inactive_state) {
+         return "inactive";
      }
--- 
-2.17.1
+-    assert(state <=3D ARRAY_SIZE(state_name));
++    assert(state < ARRAY_SIZE(state_name));
+     return state_name[state];
+ }
+=20
+@@ -165,7 +165,7 @@ static const char *sd_response_name(sd_rsp_type_t rsp=
+)
+     if (rsp =3D=3D sd_r1b) {
+         rsp =3D sd_r1;
+     }
+-    assert(rsp <=3D ARRAY_SIZE(response_name));
++    assert(rsp < ARRAY_SIZE(response_name));
+     return response_name[rsp];
+ }
+=20
+--=20
+1.8.3.1
 
 
