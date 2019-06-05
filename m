@@ -2,69 +2,72 @@ Return-Path: <SRS0=3v23=UE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=FROM_EXCESS_BASE64,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DE6AFC28CC5
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 14:38:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BB8C4C28CC5
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 14:38:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ABE78206B8
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 14:38:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ABE78206B8
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 8B7AA20693
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 14:38:24 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=mail.uni-paderborn.de header.i=@mail.uni-paderborn.de header.b="VHgXHA+R"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8B7AA20693
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=mail.uni-paderborn.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:43696 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:43698 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hYX3R-00006n-Nv
-	for qemu-devel@archiver.kernel.org; Wed, 05 Jun 2019 10:38:17 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:55553)
+	id 1hYX3X-0000Cm-O9
+	for qemu-devel@archiver.kernel.org; Wed, 05 Jun 2019 10:38:23 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:55065)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1hYX1i-0007VI-CB
-	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 10:36:31 -0400
+	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1hYX0C-0006DA-Q0
+	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 10:34:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1hYX1g-0001m1-FT
-	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 10:36:30 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52248)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1hYX1e-0001bc-IZ
-	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 10:36:26 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 3EFB75945D
-	for <qemu-devel@nongnu.org>; Wed,  5 Jun 2019 14:36:18 +0000 (UTC)
-Received: from redhat.com (ovpn-112-70.ams2.redhat.com [10.36.112.70])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 5A4285C260;
-	Wed,  5 Jun 2019 14:36:07 +0000 (UTC)
-Date: Wed, 5 Jun 2019 15:36:05 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Jens Freimann <jfreimann@redhat.com>
-Message-ID: <20190605143605.GC8956@redhat.com>
-References: <20190517125820.2885-1-jfreimann@redhat.com>
-	<20190517125820.2885-4-jfreimann@redhat.com>
-	<20190521094504.GB2915@work-vm>
-	<20190530145645.tjwkgi4hae5yblsi@jenstp.localdomain>
-	<20190531214748.GN22103@habkost.net>
-	<20190603082456.vzpy256kj4o5e5wu@jenstp.localdomain>
-	<20190603193648.GQ22103@habkost.net>
-	<20190604134321.txlw7wjwe247g5ug@jenstp.localdomain>
+	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1hYX0B-0005gC-Qz
+	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 10:34:56 -0400
+Received: from zuban.uni-paderborn.de ([131.234.189.17]:42062)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kbastian@mail.uni-paderborn.de>)
+	id 1hYX0A-0005Xe-W7
+	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 10:34:55 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=mail.uni-paderborn.de; s=20170601;
+	h=Content-Transfer-Encoding:Content-Type
+	:In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:
+	Sender:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=zkEbc/dzofgQsyiWdFHVMsu+iVxuHVnDsY35gvk5YQU=;
+	b=VHgXHA+RxV3MJbIUwjsBo+nSLX
+	CXsODykKYyph3nwyqyOn4tJaXeWN37ilp2kvjJFZTSTHh0z/FTvPinDzel3013W1pWEpRaaxW9bHO
+	ZGAuBXvSzm0sLfmtYX5jDkz/JRIztw/vbdoKDswNuYozdBM/Kdl6Ot7kmeGzBWZ9OODk=; 
+To: David Brenken <david.brenken@efs-auto.org>, qemu-devel@nongnu.org
+References: <20190605061126.10244-1-david.brenken@efs-auto.org>
+	<20190605061126.10244-4-david.brenken@efs-auto.org>
+From: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+Message-ID: <ffb4ba2c-318e-6b08-c206-a90b000074d2@mail.uni-paderborn.de>
+Date: Wed, 5 Jun 2019 16:34:51 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20190604134321.txlw7wjwe247g5ug@jenstp.localdomain>
-User-Agent: Mutt/1.11.4 (2019-03-13)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.39]);
-	Wed, 05 Jun 2019 14:36:18 +0000 (UTC)
+In-Reply-To: <20190605061126.10244-4-david.brenken@efs-auto.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US-large
+X-IMT-Spam-Score: 0.0 ()
+X-PMX-Version: 6.4.6.2792898, Antispam-Engine: 2.7.2.2107409,
+	Antispam-Data: 2019.6.5.143016, AntiVirus-Engine: 5.63.0,
+	AntiVirus-Data: 2019.6.4.5630002
+X-IMT-Authenticated-Sender: kbastian@UNI-PADERBORN.DE
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 3/4] net/virtio: add failover support
+X-Received-From: 131.234.189.17
+Subject: Re: [Qemu-devel] [PATCH 3/5] tricore: fix RRPW_INSERT instruction
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -76,85 +79,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: pkrempa@redhat.com, Eduardo Habkost <ehabkost@redhat.com>, mst@redhat.com,
-	aadam@redhat.com, qemu-devel@nongnu.org,
-	"Dr. David Alan Gilbert" <dgilbert@redhat.com>, laine@redhat.com,
-	ailan@redhat.com
+Cc: Andreas Konopik <andreas.konopik@efs-auto.de>,
+	David Brenken <david.brenken@efs-auto.de>,
+	Robert Rasche <robert.rasche@efs-auto.de>,
+	Georg Hofstetter <georg.hofstetter@efs-auto.de>,
+	Lars Biermanski <lars.biermanski@efs-auto.de>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Jun 04, 2019 at 03:43:21PM +0200, Jens Freimann wrote:
-> On Mon, Jun 03, 2019 at 04:36:48PM -0300, Eduardo Habkost wrote:
-> > On Mon, Jun 03, 2019 at 10:24:56AM +0200, Jens Freimann wrote:
-> > > On Fri, May 31, 2019 at 06:47:48PM -0300, Eduardo Habkost wrote:
-> > > > On Thu, May 30, 2019 at 04:56:45PM +0200, Jens Freimann wrote:
-> > > > > On Tue, May 28, 2019 at 11:04:15AM -0400, Michael S. Tsirkin wrote:
-> > > > > > On Tue, May 21, 2019 at 10:45:05AM +0100, Dr. David Alan Gilbert wrote:
-> > > > > > > * Jens Freimann (jfreimann@redhat.com) wrote:
-> > > Why is it bad to fully re-create the device in case of a failed migration?
-> > 
-> > Bad or not, I thought the whole point of doing it inside QEMU was
-> > to do something libvirt wouldn't be able to do (namely,
-> > unplugging the device while not freeing resources).  If we are
-> > doing something that management software is already capable of
-> > doing, what's the point?
-> 
-> Event though management software seems to be capable of it, a failover
-> implementation has never happened. As Michael says network failover is
-> a mechanism (there's no good reason not to use a PT device if it is
-> available), not a policy. We are now trying to implement it in a
-> simple way, contained within QEMU.
-> 
-> > Quoting a previous message from this thread:
-> > 
-> > On Thu, May 30, 2019 at 02:09:42PM -0400, Michael S. Tsirkin wrote:
-> > | > On Thu, May 30, 2019 at 07:00:23PM +0100, Dr. David Alan Gilbert wrote:
-> > | > >  This patch series is very
-> > | > > odd precisely because it's trying to do the unplug itself in the
-> > | > > migration phase rather than let the management layer do it - so unless
-> > | > > it's nailed down how to make sure that's really really bullet proof
-> > | > > then we've got to go back and ask the question about whether we should
-> > | > > really fix it so it can be done by the management layer.
-> > | > >
-> > | > > Dave
-> > | >
-> > | > management already said they can't because files get closed and
-> > | > resources freed on unplug and so they might not be able to re-add device
-> > | > on migration failure. We do it in migration because that is
-> > | > where failures can happen and we can recover.
-> 
-> This is something that I can work on as well, but it doesn't have to
-> be part of this patch set in my opinion. Let's say migration fails and we can't
-> re-plug the primary device. We can still use the standby (virtio-net)
-> device which would only mean slower networking. How likely is it that
-> the primary device is grabbed by another VM between unplugging and
-> migration failure anyway?
+Hi David,
 
-The case of another VM taking the primary device is *not* a problem for
-libvirt. We keep track of which device is allocated for use by which
-guest, so even if its not currently plugged into the guest, we won't
-give it away to a second guest.
+On 6/5/19 8:11 AM, David Brenken wrote:
+> From: David Brenken <david.brenken@efs-auto.de>
+>
+> Signed-off-by: Andreas Konopik <andreas.konopik@efs-auto.de>
+> Signed-off-by: David Brenken <david.brenken@efs-auto.de>
+> Signed-off-by: Georg Hofstetter <georg.hofstetter@efs-auto.de>
+> Signed-off-by: Robert Rasche <robert.rasche@efs-auto.de>
+> Signed-off-by: Lars Biermanski <lars.biermanski@efs-auto.de>
+>
+> ---
+>   target/tricore/translate.c | 11 ++++++++---
+>   1 file changed, 8 insertions(+), 3 deletions(-)
+>
+> diff --git a/target/tricore/translate.c b/target/tricore/translate.c
+> index a8b4de647a..19d8db7a46 100644
+> --- a/target/tricore/translate.c
+> +++ b/target/tricore/translate.c
+> @@ -7004,6 +7004,7 @@ static void decode_rrpw_extract_insert(CPUTriCoreState *env, DisasContext *ctx)
+>       uint32_t op2;
+>       int r1, r2, r3;
+>       int32_t pos, width;
+> +    TCGv temp1, temp2;
+>   
+>       op2 = MASK_OP_RRPW_OP2(ctx->opcode);
+>       r1 = MASK_OP_RRPW_S1(ctx->opcode);
+> @@ -7042,9 +7043,13 @@ static void decode_rrpw_extract_insert(CPUTriCoreState *env, DisasContext *ctx)
+>           }
+>           break;
+>       case OPC2_32_RRPW_INSERT:
+> -        if (pos + width <= 31) {
+> -            tcg_gen_deposit_tl(cpu_gpr_d[r3], cpu_gpr_d[r1], cpu_gpr_d[r2],
+> -                               width, pos);
+Can you explain the problem causing the bug? Deposit looks fine to me. 
+After reading the specs again, I agree that the check needs to be <= 32.
 
-The failure scenario is the edge cases where replugging the device fails
-for some reason more outside libvirt's control. Running out of file
-descriptors, memory allocation failure when pinning guest RAM. Essentially
-any failure path that may arise from "device-add vfio..."
 
-In such a case the device won't get replugged. So the mgmt app will think
-the migration was rolled back, but the rollback won't be complete as the
-original device will be missing.
+> +        if (pos + width <= 32) {
+> +            temp1 = tcg_const_i32(pos);   /* pos */
+> +            temp2 = tcg_const_i32(width); /* width */
+Useless comments.
 
-I guess the question is whether that's really something to worry about ?
 
-Can we justifiably just leave this as a docs problem give that it would
-be very rare failure ?
+Cheers,
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+Bastian
+
 
