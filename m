@@ -8,78 +8,79 @@ X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_NEOMUTT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D463DC28CC5
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 13:41:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D347CC28CC5
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 13:42:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A141820684
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 13:41:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A094F20684
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 13:42:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qID1fwxu"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A141820684
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZQEUosMd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A094F20684
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:41969 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:42061 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hYWA5-0005Hd-Vg
-	for qemu-devel@archiver.kernel.org; Wed, 05 Jun 2019 09:41:06 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:36188)
+	id 1hYWBF-0006NF-Rg
+	for qemu-devel@archiver.kernel.org; Wed, 05 Jun 2019 09:42:17 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:36794)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.weiyang@gmail.com>) id 1hYW8x-0004aV-Ge
-	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 09:39:56 -0400
+	(envelope-from <richard.weiyang@gmail.com>) id 1hYWA8-0005cU-HC
+	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 09:41:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.weiyang@gmail.com>) id 1hYW8w-0002z5-Fi
-	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 09:39:55 -0400
-Received: from mail-ed1-x542.google.com ([2a00:1450:4864:20::542]:33688)
+	(envelope-from <richard.weiyang@gmail.com>) id 1hYWA7-0004fl-F2
+	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 09:41:08 -0400
+Received: from mail-ed1-x542.google.com ([2a00:1450:4864:20::542]:37255)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.weiyang@gmail.com>)
-	id 1hYW8w-0002xt-9L
-	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 09:39:54 -0400
-Received: by mail-ed1-x542.google.com with SMTP id h9so4457568edr.0
-	for <qemu-devel@nongnu.org>; Wed, 05 Jun 2019 06:39:54 -0700 (PDT)
+	id 1hYWA7-0004ee-7u
+	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 09:41:07 -0400
+Received: by mail-ed1-x542.google.com with SMTP id w13so5879000eds.4
+	for <qemu-devel@nongnu.org>; Wed, 05 Jun 2019 06:41:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
 	h=date:from:to:cc:subject:message-id:reply-to:references:mime-version
 	:content-disposition:in-reply-to:user-agent;
-	bh=VbmCRYKsUP4jCpSvLuMwO7sTzwO5PaETxOELKD7AldQ=;
-	b=qID1fwxuzydqYgKreM4I/Klr7uhNKTztEIF4j03ssoXICfIGo64SI7s5tucQqUeJeK
-	p1cEkZ4UyQV6S+LCn38UKogcp3fF+GEKW94qur4DN2lSan1gciOS1wzOaZUaVjhT8STa
-	M/Bv2DE8uuxhVPFhH2SlSsW+X0bt3EN1AY7Xd5DNpE6zeJ140dzSOgDqxTPq8AouUUln
-	55ENhu6/2XWNWarFKreSpu6sMCayI+tfXVjYvtRqXJQ0BXPNsoaKgkg8C5qraHSvN1FV
-	Z57JqPeNtspx1PleSQ/h/VhTFMxCgtGbH974DiSDHmcyeecvY093gvm1DxMx1hSvJBh7
-	/vlw==
+	bh=v4wXfzzbpOMHputlZvC7LBpVOfc9l++RPwzjtU/Gy/w=;
+	b=ZQEUosMdUrdNiJwwjLVvupLo77pG/arCEu7eKvcWufii6F54AYxVvBXNanSK2SFZ14
+	+gWvNULc/FaJE7QsyzlhwIvwJJ1QNfMFDO7re6Gtl+n62o5Vz09STvDQPj6BvcBVRYEn
+	wCdlYQ+4yzfT4QvxWvVZuUDzcXWlLbCIKeKrwwPS92bjRQYrNrO3171MQxeNP94unV8q
+	5QgBD1xAedyKBk+dEB16rpZjG8k7qIQUIQaGk6DBmAUzH5FcmEtk7MtcMTgKOPVmZHHX
+	C7p37qnbgPnlIMw+reskeW6R013s1lUWAtO+G66jxBS1pZ49k9BfRvWLlGD7Xv1GX7jB
+	zMeA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:date:from:to:cc:subject:message-id:reply-to
 	:references:mime-version:content-disposition:in-reply-to:user-agent;
-	bh=VbmCRYKsUP4jCpSvLuMwO7sTzwO5PaETxOELKD7AldQ=;
-	b=XetmPWFC98sKueFCxvVoJbrIOmn6+6j0SWe/H3QdGZ+K/swkh49J790Ec/Tk6L2Qil
-	/1unIeobIzKESbOklWXptNR9E68NBW+63i/yKHMS7rIATSlngWFUwVH8A390wD25u6l4
-	8XuC+8flx0tedf5l0OxyFJ2KM1feOVqEbcSDiCSkuD89aRUAWSzdSzbMQScCtkNXP6Sv
-	hYV8CZuzK2nHF45A6Vh+CrayzJBDbHIbffoJrQWuING+Eqs5Ayv8Rm+81Y45+ojWPN5s
-	aJGiRKjXEZw1+uKo12ZcGBvcXrhoXb2DYwm26DvkgFXMFXA1ITG3y+R/LwISt1987L/P
-	/VkA==
-X-Gm-Message-State: APjAAAXrzathRTsOm7tRv0+3O5kHq9+rnsX/YoqFBrvlvVYoO5E2nXe8
-	5T+jqh0H+Vk7XeikXTwpSps=
-X-Google-Smtp-Source: APXvYqz60JrA3IlrxHlnRbOVdRw2NoIoJCFeWmaLagyQel3u+c5ods4wNxbxb4WRrsa8pIddPN2npQ==
-X-Received: by 2002:aa7:c2d0:: with SMTP id m16mr4441115edp.94.1559741993230; 
-	Wed, 05 Jun 2019 06:39:53 -0700 (PDT)
-Received: from localhost ([185.92.221.13]) by smtp.gmail.com with ESMTPSA id
-	l26sm3742083eja.17.2019.06.05.06.39.52
+	bh=v4wXfzzbpOMHputlZvC7LBpVOfc9l++RPwzjtU/Gy/w=;
+	b=j4Sn4+vVieF+cfrMAr4nZylnb31JdGt8v8MQOlZfvJIJD7GQobq1QSbxVHm9EmytFf
+	kYe6kv8d0mQn0aNnpQY+Z/JP6HwWlwKXspAwOuW2OfA3I19HPT+TtqTgcx9oG9PDr1QA
+	cy+SKGWgMk8zBVIuyZX0NqHOC6xKktD82AZW8vXOFGJ/1ykX0FRKcZMjfXKDoL5SWfXA
+	+x/Uh7ZP6Ck8fLp8pU0l15Xx3CgBC30uPQg0y2zm7KYmW4L2ZiPd8jEWN5ZG9iuwa4Ss
+	IleoKCkt8JCpXa0x6eifwaI5pbtVZ9mjM5BMVwjwGf/8qJ3Gb+zhSh8NUT6q2WROTooS
+	ImSg==
+X-Gm-Message-State: APjAAAXTL1kBcRpNc7sWtotxOBzs4AP5aAdnwEODIrNwJVbIkVgmfIbi
+	Uhye0fPLP1MMzZUZuEwLbps=
+X-Google-Smtp-Source: APXvYqwDfTkZ78Y/SzrFPodp2Aa4+0mCBcPuNhDpdrZch4iwIwC0fJm8Plng7GxSfarjFfSHtGynQg==
+X-Received: by 2002:a17:906:3e8d:: with SMTP id
+	a13mr35828013ejj.71.1559742066221; 
+	Wed, 05 Jun 2019 06:41:06 -0700 (PDT)
+Received: from localhost ([185.92.221.13])
+	by smtp.gmail.com with ESMTPSA id v6sm471612eds.23.2019.06.05.06.41.05
 	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Wed, 05 Jun 2019 06:39:52 -0700 (PDT)
-Date: Wed, 5 Jun 2019 13:39:51 +0000
+	Wed, 05 Jun 2019 06:41:05 -0700 (PDT)
+Date: Wed, 5 Jun 2019 13:41:05 +0000
 From: Wei Yang <richard.weiyang@gmail.com>
-To: Juan Quintela <quintela@redhat.com>
-Message-ID: <20190605133951.saendlaiq4kfwoy3@master>
+To: Peter Xu <peterx@redhat.com>
+Message-ID: <20190605134105.tv7apqt4ekftqnyd@master>
 References: <20190605010828.6969-1-richardw.yang@linux.intel.com>
 	<20190605064108.GH15459@xz-x1> <20190605085207.GA1804@richard>
-	<20190605093819.GL15459@xz-x1> <87d0js5njw.fsf@trasno.org>
+	<20190605093819.GL15459@xz-x1>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <87d0js5njw.fsf@trasno.org>
+In-Reply-To: <20190605093819.GL15459@xz-x1>
 User-Agent: NeoMutt/20170113 (1.7.2)
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
@@ -99,64 +100,89 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Reply-To: Wei Yang <richard.weiyang@gmail.com>
 Cc: qemu-devel@nongnu.org, Wei Yang <richardw.yang@linux.intel.com>,
-	Peter Xu <peterx@redhat.com>, dgilbert@redhat.com
+	dgilbert@redhat.com, quintela@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Jun 05, 2019 at 12:33:39PM +0200, Juan Quintela wrote:
->Peter Xu <peterx@redhat.com> wrote:
->> On Wed, Jun 05, 2019 at 04:52:07PM +0800, Wei Yang wrote:
->>> On Wed, Jun 05, 2019 at 02:41:08PM +0800, Peter Xu wrote:
->>> >On Wed, Jun 05, 2019 at 09:08:28AM +0800, Wei Yang wrote:
->>> >> In case we gets a queued page, the order of block is interrupted. We may
->>> >> not rely on the complete_round flag to say we have already searched the
->>> >> whole blocks on the list.
->>> >> 
->>> >> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
->>> >> ---
->>> >>  migration/ram.c | 6 ++++++
->>> >>  1 file changed, 6 insertions(+)
->>> >> 
->>> >> diff --git a/migration/ram.c b/migration/ram.c
->>> >> index d881981876..e9b40d636d 100644
->>> >> --- a/migration/ram.c
->>> >> +++ b/migration/ram.c
->>> >> @@ -2290,6 +2290,12 @@ static bool get_queued_page(RAMState *rs, PageSearchStatus *pss)
->>> >>           */
->>> >>          pss->block = block;
->>> >>          pss->page = offset >> TARGET_PAGE_BITS;
->>> >> +
->>> >> +        /*
->>> >> +         * This unqueued page would break the "one round" check, even is
->>> >> +         * really rare.
->>> >
+On Wed, Jun 05, 2019 at 05:38:19PM +0800, Peter Xu wrote:
+>On Wed, Jun 05, 2019 at 04:52:07PM +0800, Wei Yang wrote:
+>> On Wed, Jun 05, 2019 at 02:41:08PM +0800, Peter Xu wrote:
+>> >On Wed, Jun 05, 2019 at 09:08:28AM +0800, Wei Yang wrote:
+>> >> In case we gets a queued page, the order of block is interrupted. We may
+>> >> not rely on the complete_round flag to say we have already searched the
+>> >> whole blocks on the list.
+>> >> 
+>> >> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
+>> >> ---
+>> >>  migration/ram.c | 6 ++++++
+>> >>  1 file changed, 6 insertions(+)
+>> >> 
+>> >> diff --git a/migration/ram.c b/migration/ram.c
+>> >> index d881981876..e9b40d636d 100644
+>> >> --- a/migration/ram.c
+>> >> +++ b/migration/ram.c
+>> >> @@ -2290,6 +2290,12 @@ static bool get_queued_page(RAMState *rs, PageSearchStatus *pss)
+>> >>           */
+>> >>          pss->block = block;
+>> >>          pss->page = offset >> TARGET_PAGE_BITS;
+>> >> +
+>> >> +        /*
+>> >> +         * This unqueued page would break the "one round" check, even is
+>> >> +         * really rare.
+>> >
+>> >Why this is needed?  Could you help explain the problem first?
+>> 
+>> Peter, Thanks for your question.
+>> 
+>> I found this issue during code review and I believe this is a corner case.
+>> 
+>> Below is a draft chart for ram_find_and_save_block:
+>> 
+>>     ram_find_and_save_block
+>>         do
+>>             get_queued_page()
+>>             find_dirty_block()
+>>             ram_save_host_page()
+>>         while
+>> 
+>> The basic logic here is : get a page need to migrate and migrate it.
+>> 
+>> In case we don't have get_queued_page(), find_dirty_block() will search the
+>> whole ram_list.blocks by order. pss->complete_round is used to indicate
+>> whether this search has looped.
+>> 
+>> Everything works fine after get_queued_page() involved. The block unqueued in
+>> get_queued_page() could be any block in the ram_list.blocks. This means we
+>> have very little chance to break the looped indicator.
+>> 
+>>                            unqueue_page()  last_seen_block
+>>                                      |     |
+>>     ram_list.blocks                  v     v
+>>     ---------------------------------+=====+---
+>> 
+>> 
+>> Just draw a raw picture to demonstrate a corner case.
+>> 
+>> For example, we start from last_seen_block and search till the end of
+>> ram_list.blocks. At this moment, pss->complete_round is set to true. Then we
+>> get a queued page from unqueue_page() at the point I pointed. So the loop
+>> continues may just continue the range as I marked as "=". We will skip all the
+>> other ranges.
 >
->
->> Ah I see your point, but I don't think there is a problem - note that
->> complete_round will be reset for each ram_find_and_save_block(), so
->> even if we have that iteration of ram_find_and_save_block() to return
->> we'll still know we have dirty pages to migrate and in the next call
->> we'll be fine, no?
->
->Reviewed-by: Juan Quintela <quintela@redhat.com>
->
->I *think* that peter is perhaps right, but it is not clear at all, and
->it is easier to be safe.  I think that the only case that this could
->matter is if:
->- all pages are clean (so complete_round will get as true)
->- we went a queue_page request
->
->Is that possible?  I am not completely sure after looking at the code.
->It *could* be if the page that got queued is the last page remaining,
->but ......  I fully agree that the case that _almost all_ pages are
->clean and we get a request for a queued page is really rare, so it
->should not matter in real life, but ....
+>Ah I see your point, but I don't think there is a problem - note that
+>complete_round will be reset for each ram_find_and_save_block(), so
+>even if we have that iteration of ram_find_and_save_block() to return
+>we'll still know we have dirty pages to migrate and in the next call
+>we'll be fine, no?
 >
 
-Agree
+This is really a rare case and hard to say whether it would be harmful.
 
->Later, Juan.
+The chance still exists.
+
+>-- 
+>Peter Xu
 
 -- 
 Wei Yang
