@@ -2,61 +2,85 @@ Return-Path: <SRS0=3v23=UE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6577FC28CC5
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 21:03:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 41A7CC28D18
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 21:05:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3AF6A2067C
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 21:03:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3AF6A2067C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id E97012075C
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 21:05:16 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="J8pG3bM/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E97012075C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:49985 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:50000 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hYd4O-0002pi-Fb
-	for qemu-devel@archiver.kernel.org; Wed, 05 Jun 2019 17:03:40 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:41471)
+	id 1hYd5v-0003u2-T9
+	for qemu-devel@archiver.kernel.org; Wed, 05 Jun 2019 17:05:15 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:48179)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hYcdR-0003vS-4Z
-	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 16:35:56 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hYcyL-0006KN-3J
+	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 16:57:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1hYcdM-0008LG-Ev
-	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 16:35:49 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49030)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>)
-	id 1hYcdL-0006q5-V1; Wed, 05 Jun 2019 16:35:44 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 7FF2930832C3;
-	Wed,  5 Jun 2019 20:34:55 +0000 (UTC)
-Received: from t460s.redhat.com (ovpn-116-124.ams2.redhat.com [10.36.116.124])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 06EEB619A9;
-	Wed,  5 Jun 2019 20:34:53 +0000 (UTC)
-From: David Hildenbrand <david@redhat.com>
+	(envelope-from <richard.henderson@linaro.org>) id 1hYcyH-00008m-Ik
+	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 16:57:23 -0400
+Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:39336)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1hYcyF-0008O5-Lg
+	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 16:57:19 -0400
+Received: by mail-ot1-x343.google.com with SMTP id r21so2063880otq.6
+	for <qemu-devel@nongnu.org>; Wed, 05 Jun 2019 13:57:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=from:to:cc:subject:date:message-id:in-reply-to:references;
+	bh=D6qDvZ2yUvasBaOhuVQfPLH+R2qFXowjyUNz4x5+OYc=;
+	b=J8pG3bM/LjB0cDoDlSI5UGePw0K1tCSNuNaoyOjXBz8CrSjK5paG3fYBqJdIU9EjZT
+	6I9JHV/67BUUsAVCVFl98PLGWRfYjn6WDXXPZ/gvFMnj3q2seoK9QlrAIr10B2c/SK5k
+	fhLhKuLSX7URKzTIAtnEw1l4W7p+YNEH6WxnD9ZosvxIcVOHpJVzJFtwPd7NSi98brsJ
+	29YPxB5Uyuvum2L+DAsJZaKkx6ezoz0kNfPUWZ21HyMFWsAGNc/GJEcqCFxKbxZj5RfE
+	1BwcKaCDhKf+WCMlHcDcTBe1Z2jGk4lZi5R0JKc6e+xUZYEr9suK8S8QO1yEbeBF28g4
+	mn7Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+	:references;
+	bh=D6qDvZ2yUvasBaOhuVQfPLH+R2qFXowjyUNz4x5+OYc=;
+	b=UZsWee8412HLjHPup9LQFrikuR7Tf2L4xIVHnkf8rDDCkDGBjM1rzj8/cX6NSOvKy0
+	LBmkASCADG5Hw7gsWc9dnSJYqicDQ1MIv3vEXKnwimseSHE1sV4zsENFTDt/lT6lM94j
+	wWQuPTFl2Tmy7ZvdZMt8Q5GyR1NX2IMeqcTuAVl3juEiRWSpChby7cNMRZZiily2KLkc
+	GUznKYjxVH6wQ4VqpsvCkFjKP3jcEOfjw+5AAE9Wtc88o+/LpGVEJ0NSoD6HKZMhbJuw
+	lmCK8EFCQKV0rFDqjHtuzOlShEC+BjCT3+lRVzkNhgAHsYb+JUJ3zRiz9wKnKcgamYgO
+	tH3g==
+X-Gm-Message-State: APjAAAW2Vrf5kdnWFGbbm6VXXz7JwN/NHpw9vPgma2VR4fJVNEyesO/e
+	5+U2XAr9EZHWuvdN6dw7eWO+a9NWzWZ4qA==
+X-Google-Smtp-Source: APXvYqwBcD2Gicrk7oIxpgPdL0Wu4yCSxx5ZXlZ7FdhHXh5LDaRCxw2VCbIX8elea933bf4J1keRPg==
+X-Received: by 2002:a05:6830:1698:: with SMTP id
+	k24mr6033344otr.323.1559768237896; 
+	Wed, 05 Jun 2019 13:57:17 -0700 (PDT)
+Received: from localhost.localdomain (200-56-192-86-cable.cybercable.net.mx.
+	[200.56.192.86])
+	by smtp.gmail.com with ESMTPSA id f5sm7414155otl.51.2019.06.05.13.57.16
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Wed, 05 Jun 2019 13:57:17 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Wed,  5 Jun 2019 22:33:52 +0200
-Message-Id: <20190605203403.29461-23-david@redhat.com>
-In-Reply-To: <20190605203403.29461-1-david@redhat.com>
-References: <20190605203403.29461-1-david@redhat.com>
-MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.44]);
-	Wed, 05 Jun 2019 20:34:55 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL SUBSYSTEM s390x 22/33] s390x/tcg: Implement
- VECTOR LOAD ROUNDED
+Date: Wed,  5 Jun 2019 15:57:04 -0500
+Message-Id: <20190605205706.569-5-richard.henderson@linaro.org>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20190605205706.569-1-richard.henderson@linaro.org>
+References: <20190605205706.569-1-richard.henderson@linaro.org>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::343
+Subject: [Qemu-devel] [PATCH v6 4/6] include/elf: Add defines related to
+ notes for GNU systems
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -68,129 +92,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>,
-	Cornelia Huck <cohuck@redhat.com>,
-	Richard Henderson <richard.henderson@linaro.org>,
-	qemu-s390x@nongnu.org, Richard Henderson <rth@twiddle.net>
+Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org, Dave.Martin@arm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We can reuse some of the infrastructure introduced for
-VECTOR FP CONVERT FROM FIXED 64-BIT and friends.
+This is a collection of related defines for notes, copied
+from glibc's <elf.h>.  We're not going to use all of these
+right away, but it seemed foolish to cherry-pick only the
+ones we need now.
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Signed-off-by: David Hildenbrand <david@redhat.com>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/s390x/helper.h           |  2 ++
- target/s390x/insn-data.def      |  2 ++
- target/s390x/translate_vx.inc.c |  3 +++
- target/s390x/vec_fpu_helper.c   | 43 +++++++++++++++++++++++++++++++++
- 4 files changed, 50 insertions(+)
+ include/elf.h | 48 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 48 insertions(+)
 
-diff --git a/target/s390x/helper.h b/target/s390x/helper.h
-index cb25141ffe..7526f8e8c6 100644
---- a/target/s390x/helper.h
-+++ b/target/s390x/helper.h
-@@ -280,6 +280,8 @@ DEF_HELPER_FLAGS_4(gvec_vfi64, TCG_CALL_NO_WG, void, =
-ptr, cptr, env, i32)
- DEF_HELPER_FLAGS_4(gvec_vfi64s, TCG_CALL_NO_WG, void, ptr, cptr, env, i3=
-2)
- DEF_HELPER_FLAGS_4(gvec_vfll32, TCG_CALL_NO_WG, void, ptr, cptr, env, i3=
-2)
- DEF_HELPER_FLAGS_4(gvec_vfll32s, TCG_CALL_NO_WG, void, ptr, cptr, env, i=
-32)
-+DEF_HELPER_FLAGS_4(gvec_vflr64, TCG_CALL_NO_WG, void, ptr, cptr, env, i3=
-2)
-+DEF_HELPER_FLAGS_4(gvec_vflr64s, TCG_CALL_NO_WG, void, ptr, cptr, env, i=
-32)
-=20
- #ifndef CONFIG_USER_ONLY
- DEF_HELPER_3(servc, i32, env, i64, i64)
-diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
-index 5afdb36aec..f03914d528 100644
---- a/target/s390x/insn-data.def
-+++ b/target/s390x/insn-data.def
-@@ -1232,6 +1232,8 @@
-     F(0xe7c7, VFI,     VRR_a, V,   0, 0, 0, 0, vcdg, 0, IF_VEC)
- /* VECTOR LOAD LENGTHENED */
-     F(0xe7c4, VFLL,    VRR_a, V,   0, 0, 0, 0, vfll, 0, IF_VEC)
-+/* VECTOR LOAD ROUNDED */
-+    F(0xe7c5, VFLR,    VRR_a, V,   0, 0, 0, 0, vcdg, 0, IF_VEC)
-=20
- #ifndef CONFIG_USER_ONLY
- /* COMPARE AND SWAP AND PURGE */
-diff --git a/target/s390x/translate_vx.inc.c b/target/s390x/translate_vx.=
-inc.c
-index a25985e5c9..73e1b1062a 100644
---- a/target/s390x/translate_vx.inc.c
-+++ b/target/s390x/translate_vx.inc.c
-@@ -2672,6 +2672,9 @@ static DisasJumpType op_vcdg(DisasContext *s, Disas=
-Ops *o)
-     case 0xc7:
-         fn =3D se ? gen_helper_gvec_vfi64s : gen_helper_gvec_vfi64;
-         break;
-+    case 0xc5:
-+        fn =3D se ? gen_helper_gvec_vflr64s : gen_helper_gvec_vflr64;
-+        break;
-     default:
-         g_assert_not_reached();
-     }
-diff --git a/target/s390x/vec_fpu_helper.c b/target/s390x/vec_fpu_helper.=
-c
-index f5b7fdf871..764f7379da 100644
---- a/target/s390x/vec_fpu_helper.c
-+++ b/target/s390x/vec_fpu_helper.c
-@@ -444,3 +444,46 @@ void HELPER(gvec_vfll32s)(void *v1, const void *v2, =
-CPUS390XState *env,
- {
-     vfll32(v1, v2, env, true, GETPC());
- }
+diff --git a/include/elf.h b/include/elf.h
+index ea7708a4ea..6f3eada36f 100644
+--- a/include/elf.h
++++ b/include/elf.h
+@@ -1650,6 +1650,54 @@ typedef struct elf64_shdr {
+ #define NT_ARM_HW_WATCH 0x403           /* ARM hardware watchpoint registers */
+ #define NT_ARM_SYSTEM_CALL      0x404   /* ARM system call number */
+ 
++/* Defined note types for GNU systems.  */
 +
-+static void vflr64(S390Vector *v1, const S390Vector *v2, CPUS390XState *=
-env,
-+                   bool s, bool XxC, uint8_t erm, uintptr_t retaddr)
-+{
-+    uint8_t vxc, vec_exc =3D 0;
-+    S390Vector tmp =3D {};
-+    int i, old_mode;
++#define NT_GNU_ABI_TAG          1       /* ABI information */
++#define NT_GNU_HWCAP            2       /* Synthetic hwcap information */
++#define NT_GNU_BUILD_ID         3       /* Build ID */
++#define NT_GNU_GOLD_VERSION     4       /* Version of ld.gold */
++#define NT_GNU_PROPERTY_TYPE_0  5       /* Program property */
 +
-+    old_mode =3D s390_swap_bfp_rounding_mode(env, erm);
-+    for (i =3D 0; i < 2; i++) {
-+        float64 a =3D s390_vec_read_element64(v2, i);
-+        uint32_t ret =3D float64_to_float32(a, &env->fpu_status);
++/* Values used in GNU .note.gnu.property notes (NT_GNU_PROPERTY_TYPE_0).  */
 +
-+        /* place at even element */
-+        s390_vec_write_element32(&tmp, i * 2, ret);
-+        /* indicate the source element */
-+        vxc =3D check_ieee_exc(env, i, XxC, &vec_exc);
-+        if (s || vxc) {
-+            break;
-+        }
-+    }
-+    s390_restore_bfp_rounding_mode(env, old_mode);
-+    handle_ieee_exc(env, vxc, vec_exc, retaddr);
-+    *v1 =3D tmp;
-+}
++#define GNU_PROPERTY_STACK_SIZE                 1
++#define GNU_PROPERTY_NO_COPY_ON_PROTECTED       2
 +
-+void HELPER(gvec_vflr64)(void *v1, const void *v2, CPUS390XState *env,
-+                         uint32_t desc)
-+{
-+    const uint8_t erm =3D extract32(simd_data(desc), 4, 4);
-+    const bool XxC =3D extract32(simd_data(desc), 2, 1);
++#define GNU_PROPERTY_LOPROC                     0xc0000000
++#define GNU_PROPERTY_HIPROC                     0xdfffffff
++#define GNU_PROPERTY_LOUSER                     0xe0000000
++#define GNU_PROPERTY_HIUSER                     0xffffffff
 +
-+    vflr64(v1, v2, env, false, XxC, erm, GETPC());
-+}
++#define GNU_PROPERTY_X86_ISA_1_USED             0xc0000000
++#define GNU_PROPERTY_X86_ISA_1_NEEDED           0xc0000001
 +
-+void HELPER(gvec_vflr64s)(void *v1, const void *v2, CPUS390XState *env,
-+                          uint32_t desc)
-+{
-+    const uint8_t erm =3D extract32(simd_data(desc), 4, 4);
-+    const bool XxC =3D extract32(simd_data(desc), 2, 1);
++#define GNU_PROPERTY_X86_ISA_1_486              (1U << 0)
++#define GNU_PROPERTY_X86_ISA_1_586              (1U << 1)
++#define GNU_PROPERTY_X86_ISA_1_686              (1U << 2)
++#define GNU_PROPERTY_X86_ISA_1_SSE              (1U << 3)
++#define GNU_PROPERTY_X86_ISA_1_SSE2             (1U << 4)
++#define GNU_PROPERTY_X86_ISA_1_SSE3             (1U << 5)
++#define GNU_PROPERTY_X86_ISA_1_SSSE3            (1U << 6)
++#define GNU_PROPERTY_X86_ISA_1_SSE4_1           (1U << 7)
++#define GNU_PROPERTY_X86_ISA_1_SSE4_2           (1U << 8)
++#define GNU_PROPERTY_X86_ISA_1_AVX              (1U << 9)
++#define GNU_PROPERTY_X86_ISA_1_AVX2             (1U << 10)
++#define GNU_PROPERTY_X86_ISA_1_AVX512F          (1U << 11)
++#define GNU_PROPERTY_X86_ISA_1_AVX512CD         (1U << 12)
++#define GNU_PROPERTY_X86_ISA_1_AVX512ER         (1U << 13)
++#define GNU_PROPERTY_X86_ISA_1_AVX512PF         (1U << 14)
++#define GNU_PROPERTY_X86_ISA_1_AVX512VL         (1U << 15)
++#define GNU_PROPERTY_X86_ISA_1_AVX512DQ         (1U << 16)
++#define GNU_PROPERTY_X86_ISA_1_AVX512BW         (1U << 17)
 +
-+    vflr64(v1, v2, env, true, XxC, erm, GETPC());
-+}
---=20
-2.21.0
++#define GNU_PROPERTY_X86_FEATURE_1_AND          0xc0000002
++#define GNU_PROPERTY_X86_FEATURE_1_IBT          (1U << 0)
++#define GNU_PROPERTY_X86_FEATURE_1_SHSTK        (1U << 1)
++
++#define GNU_PROPERTY_AARCH64_FEATURE_1_AND      0xc0000000
++#define GNU_PROPERTY_AARCH64_FEATURE_1_BTI      (1u << 0)
++#define GNU_PROPERTY_AARCH64_FEATURE_1_PAC      (1u << 1)
++
+ /*
+  * Physical entry point into the kernel.
+  *
+-- 
+2.17.1
 
 
