@@ -6,75 +6,76 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BF0AC282DE
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 08:41:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 87035C282DE
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 08:52:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C896B206B8
-	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 08:41:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C896B206B8
+	by mail.kernel.org (Postfix) with ESMTPS id 60D2320866
+	for <qemu-devel@archiver.kernel.org>; Wed,  5 Jun 2019 08:52:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 60D2320866
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:37539 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:37630 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hYRUJ-00075C-Pd
-	for qemu-devel@archiver.kernel.org; Wed, 05 Jun 2019 04:41:39 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:51037)
+	id 1hYRf4-0000SE-CV
+	for qemu-devel@archiver.kernel.org; Wed, 05 Jun 2019 04:52:46 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:53251)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hYRTR-0006cw-0X
-	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 04:40:46 -0400
+	(envelope-from <philmd@redhat.com>) id 1hYReE-0008T0-AO
+	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 04:51:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philmd@redhat.com>) id 1hYRTP-0003oq-FN
-	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 04:40:44 -0400
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:33213)
+	(envelope-from <philmd@redhat.com>) id 1hYReD-00088S-9f
+	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 04:51:54 -0400
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:38137)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hYRTP-0003ig-8q
-	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 04:40:43 -0400
-Received: by mail-wr1-f65.google.com with SMTP id n9so6112822wru.0
-	for <qemu-devel@nongnu.org>; Wed, 05 Jun 2019 01:40:43 -0700 (PDT)
+	(Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hYReD-00084z-49
+	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 04:51:53 -0400
+Received: by mail-wm1-f68.google.com with SMTP id t5so1387084wmh.3
+	for <qemu-devel@nongnu.org>; Wed, 05 Jun 2019 01:51:52 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
-	h=x-gm-message-state:subject:to:references:from:openpgp:message-id
+	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
 	:date:user-agent:mime-version:in-reply-to:content-language
 	:content-transfer-encoding;
-	bh=5Zy0VKMS+/+Z6weJ5zHduLr6HV/gyWV6Xu/AW/LD2WQ=;
-	b=hR+YIVVpv5F//a1Xz1bZp4RAJzH3Ueq+RFUPlASHfMElbMf+AWbuKbhMz9aKiiBTJq
-	DfnLHsJajdCTTq8nmzXoG7V+4SnOimCPgct7xuSbp0mVg4N7BCfbABgt0tZpK9Be2chV
-	oMKoPxKVZEZg4qspiGoq9l2p0jUKW2WQVwfbanjg/WYFa3rJS5XYD0cc0NkuD328AHu9
-	9MK22rFZL6eZBpXB6cTsghKeA+jZ02M4KkkGKcBVF2lh+npNZMMoWC71o9AwCnbqjc0z
-	ROTy/0KMifHOhVXMhFT/FAmuLySjjSojHI+n5timC9a8pnGjb2GNi7V9m/lI4cbvyOPp
-	Qvyw==
-X-Gm-Message-State: APjAAAXrDWaHoaSga4cwhANeWRnTSVWDmVufU6iDDRLMGPccUy31jUpY
-	NA2PZdkrlUE4gm5c8ygzg9iNgR6Ukf4=
-X-Google-Smtp-Source: APXvYqwdzV4br/B6waH0GNhIWUon6scdjE4BK8cEpgOUZvEbsWQPJF3WW/gLAkujW8AdIO7CNp/oMQ==
-X-Received: by 2002:adf:8086:: with SMTP id 6mr15650178wrl.320.1559724041706; 
-	Wed, 05 Jun 2019 01:40:41 -0700 (PDT)
+	bh=kGzHtjP0mDkJOxTVm+4nhftlxU2ng0j2pNJCF/dElDI=;
+	b=hHiGToHAj6FVQzPc9GyIxrOVkD1pXCLiQtGN9PlSLZATKISHavb3tpakHfYcLS+H/z
+	GYVLwdMvL4ai5LQkh6p6mhMvitQSeK3EelZdHj5HymKDnr1EWjGtywzfVntlJtajpGA0
+	Lzg1UN1J/aZp4Vm7kD5GEomOpoH+T4ILixqkmJTPO8C1NLWOgn6muS0pLTmLK400IGfp
+	Xpehrta9J2oU79x0pQ+dwgJxbtWTszScy9re+zu4b4BjaftMYv8/U0f0m4tRA4qIefOr
+	hp7A8mFEkPUQsNPSAtQl1EYCefohdDQE9OP8UnLJiHTTF8ZVEkMKuD1QKwRCskRJL59Z
+	bIIQ==
+X-Gm-Message-State: APjAAAXPKA+iST93Rl64umzXM78oU2Bv3UrmAe4M3kGO3rjGvSQumSKq
+	nvSZvG9L3oidjesi/b1tRZm3Kw==
+X-Google-Smtp-Source: APXvYqwzG87p3vncdRHnB48blkyVSRHGHK8rAjoHgEaPK3KqF1bmey4gWtf1OTGxSHZUksQa2kBkxA==
+X-Received: by 2002:a1c:9c08:: with SMTP id f8mr3735844wme.143.1559724711070; 
+	Wed, 05 Jun 2019 01:51:51 -0700 (PDT)
 Received: from [192.168.1.38] (183.red-88-21-202.staticip.rima-tde.net.
-	[88.21.202.183]) by smtp.gmail.com with ESMTPSA id
-	a17sm14747667wrr.80.2019.06.05.01.40.40
+	[88.21.202.183])
+	by smtp.gmail.com with ESMTPSA id s9sm17316241wmc.1.2019.06.05.01.51.49
 	(version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-	Wed, 05 Jun 2019 01:40:41 -0700 (PDT)
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-References: <20190604181618.19980-1-armbru@redhat.com>
-	<20190604181618.19980-4-armbru@redhat.com>
+	Wed, 05 Jun 2019 01:51:50 -0700 (PDT)
+To: Lidong Chen <lidong.chen@oracle.com>, qemu-devel@nongnu.org
+References: <cover.1559710447.git.lidong.chen@oracle.com>
+	<6b19cb7359a10a6bedc3ea0fce22fed3ef93c102.1559710447.git.lidong.chen@oracle.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
 	url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <87eda0df-0f83-d70f-943d-9d8405351db9@redhat.com>
-Date: Wed, 5 Jun 2019 10:40:40 +0200
+Message-ID: <0210503a-2309-4d6b-e956-d0d590076de3@redhat.com>
+Date: Wed, 5 Jun 2019 10:51:49 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190604181618.19980-4-armbru@redhat.com>
+In-Reply-To: <6b19cb7359a10a6bedc3ea0fce22fed3ef93c102.1559710447.git.lidong.chen@oracle.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 	[fuzzy]
-X-Received-From: 209.85.221.65
-Subject: Re: [Qemu-devel] [PATCH 3/4] Clean up a few header guard symbols
+X-Received-From: 209.85.128.68
+Subject: Re: [Qemu-devel] [Qemu-devel PATCH v2 1/2] sd: Fix out-of-bounds
+ assertions
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -86,185 +87,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: peter.maydell@linaro.org, berrange@redhat.com, liran.alon@oracle.com,
+	liq3ea@gmail.com, armbru@redhat.com, darren.kenny@oracle.com,
+	marcandre.lureau@gmail.com, amarkovic@wavecomp.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/4/19 8:16 PM, Markus Armbruster wrote:
-> Commit 58ea30f5145 "Clean up header guards that don't match their file
-> name" messed up contrib/elf2dmp/qemu_elf.h and
-> tests/migration/migration-test.h.
-> 
-> It missed target/cris/opcode-cris.h and
-> tests/uefi-test-tools/UefiTestToolsPkg/Include/Guid/BiosTablesTest.h
-> due to the scripts/clean-header-guards.pl bug fixed in the previous
-> commit.
-> 
-> Commit a8b991b52dc "Clean up ill-advised or unusual header guards"
-> missed include/hw/xen/io/ring.h for the same reason.
-> 
-> Commit 3979fca4b69 "disas: Rename include/disas/bfd.h back to
-> include/disas/dis-asm.h" neglected to update the guard symbol for the
-> rename.
-> 
-> Commit a331c6d7741 "semihosting: implement a semihosting console"
-> created include/hw/semihosting/console.h with an ill-advised guard
-> symbol.
-> 
-> Clean them up.
-> 
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> ---
->  contrib/elf2dmp/qemu_elf.h                                  | 5 ++---
->  include/disas/dis-asm.h                                     | 6 +++---
->  include/hw/semihosting/console.h                            | 6 +++---
->  include/hw/xen/io/ring.h                                    | 6 +++---
->  target/cris/opcode-cris.h                                   | 6 +++---
->  tests/migration/migration-test.h                            | 2 +-
->  .../UefiTestToolsPkg/Include/Guid/BiosTablesTest.h          | 6 +++---
->  7 files changed, 18 insertions(+), 19 deletions(-)
-> 
-> diff --git a/contrib/elf2dmp/qemu_elf.h b/contrib/elf2dmp/qemu_elf.h
-> index 66ee1f0ed5..b2f0d9cbc9 100644
-> --- a/contrib/elf2dmp/qemu_elf.h
-> +++ b/contrib/elf2dmp/qemu_elf.h
-> @@ -2,11 +2,10 @@
->   * Copyright (c) 2018 Virtuozzo International GmbH
->   *
->   * This work is licensed under the terms of the GNU GPL, version 2 or later.
-> - *
->   */
->  
-> -#ifndef EMPF2DMP_QEMU_ELF_H
-> -#define EMPF2DMP_QEMU_ELF_H
-> +#ifndef ELF2DMP_QEMU_ELF_H
-> +#define ELF2DMP_QEMU_ELF_H
->  
->  #include "elf.h"
->  
-> diff --git a/include/disas/dis-asm.h b/include/disas/dis-asm.h
-> index 9240ec32c2..e9c7dd8eb4 100644
-> --- a/include/disas/dis-asm.h
-> +++ b/include/disas/dis-asm.h
-> @@ -6,8 +6,8 @@
->     interface, for making instruction-processing programs more independent
->     of the instruction set being processed.  */
->  
-> -#ifndef DISAS_BFD_H
-> -#define DISAS_BFD_H
-> +#ifndef DISAS_DIS_ASM_H
-> +#define DISAS_DIS_ASM_H
->  
->  typedef void *PTR;
->  typedef uint64_t bfd_vma;
-> @@ -508,4 +508,4 @@ bfd_vma bfd_getl16 (const bfd_byte *addr);
->  bfd_vma bfd_getb16 (const bfd_byte *addr);
->  typedef bool bfd_boolean;
->  
-> -#endif /* DISAS_BFD_H */
-> +#endif /* DISAS_DIS_ASM_H */
-> diff --git a/include/hw/semihosting/console.h b/include/hw/semihosting/console.h
-> index 30e66ae20a..9eb45b7c53 100644
-> --- a/include/hw/semihosting/console.h
-> +++ b/include/hw/semihosting/console.h
-> @@ -6,8 +6,8 @@
->   * SPDX-License-Identifier: GPL-2.0-or-later
->   */
->  
-> -#ifndef _SEMIHOST_CONSOLE_H_
-> -#define _SEMIHOST_CONSOLE_H_
-> +#ifndef SEMIHOST_CONSOLE_H
-> +#define SEMIHOST_CONSOLE_H
->  
->  /**
->   * qemu_semihosting_console_out:
-> @@ -35,4 +35,4 @@ int qemu_semihosting_console_out(CPUArchState *env, target_ulong s, int len);
->   */
->  int qemu_semihosting_log_out(const char *s, int len);
->  
-> -#endif /* _SEMIHOST_CONSOLE_H_ */
-> +#endif /* SEMIHOST_CONSOLE_H */
-> diff --git a/include/hw/xen/io/ring.h b/include/hw/xen/io/ring.h
-> index 1adacf09f9..62abfd7a6e 100644
-> --- a/include/hw/xen/io/ring.h
-> +++ b/include/hw/xen/io/ring.h
-> @@ -24,8 +24,8 @@
->   * Tim Deegan and Andrew Warfield November 2004.
->   */
->  
-> -#ifndef __XEN_PUBLIC_IO_RING_H__
-> -#define __XEN_PUBLIC_IO_RING_H__
-> +#ifndef XEN_PUBLIC_IO_RING_H
-> +#define XEN_PUBLIC_IO_RING_H
->  
->  /*
->   * When #include'ing this header, you need to provide the following
-> @@ -469,7 +469,7 @@ struct name##_data_intf {                                                     \
->  };                                                                            \
->  DEFINE_XEN_FLEX_RING(name)
->  
-> -#endif /* __XEN_PUBLIC_IO_RING_H__ */
-> +#endif /* XEN_PUBLIC_IO_RING_H */
->  
->  /*
->   * Local variables:
-> diff --git a/target/cris/opcode-cris.h b/target/cris/opcode-cris.h
-> index e7ebb98cd0..40509c88db 100644
-> --- a/target/cris/opcode-cris.h
-> +++ b/target/cris/opcode-cris.h
-> @@ -19,8 +19,8 @@ GNU General Public License for more details.
->  You should have received a copy of the GNU General Public License
->  along with this program; if not, see <http://www.gnu.org/licenses/>.  */
->  
-> -#ifndef __CRIS_H_INCLUDED_
-> -#define __CRIS_H_INCLUDED_
-> +#ifndef TARGET_CRIS_OPCODE_CRIS_H
-> +#define TARGET_CRIS_OPCODE_CRIS_H
->  
->  #if !defined(__STDC__) && !defined(const)
->  #define const
-> @@ -345,7 +345,7 @@ extern const struct cris_opcode cris_opcodes[];
->     sign-extended before adding to "target".  */
->  #define CRIS_DIS_FLAG_MEM_TARGET2_MEM_WORD (1 << 7)
->  
-> -#endif /* __CRIS_H_INCLUDED_ */
-> +#endif /* TARGET_CRIS_OPCODE_CRIS_H */
->  
->  /*
->   * Local variables:
-> diff --git a/tests/migration/migration-test.h b/tests/migration/migration-test.h
-> index aa3c3a9625..68512c0b1b 100644
-> --- a/tests/migration/migration-test.h
-> +++ b/tests/migration/migration-test.h
-> @@ -32,4 +32,4 @@
->   */
->  #define ARM_TEST_MAX_KERNEL_SIZE (512 * 1024)
->  
-> -#endif /* _MIGRATION_TEST_H */
-> +#endif /* MIGRATION_TEST_H */
-> diff --git a/tests/uefi-test-tools/UefiTestToolsPkg/Include/Guid/BiosTablesTest.h b/tests/uefi-test-tools/UefiTestToolsPkg/Include/Guid/BiosTablesTest.h
-> index 7a74c121d5..07808787cc 100644
-> --- a/tests/uefi-test-tools/UefiTestToolsPkg/Include/Guid/BiosTablesTest.h
-> +++ b/tests/uefi-test-tools/UefiTestToolsPkg/Include/Guid/BiosTablesTest.h
-> @@ -21,8 +21,8 @@
->    WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
->  **/
->  
-> -#ifndef __BIOS_TABLES_TEST_H__
-> -#define __BIOS_TABLES_TEST_H__
-> +#ifndef BIOSTABLESTEST_H
-> +#define BIOSTABLESTEST_H
->  
->  #include <Uefi/UefiBaseType.h>
->  
-> @@ -77,4 +77,4 @@ typedef struct {
->  } BIOS_TABLES_TEST;
->  #pragma pack ()
->  
-> -#endif // __BIOS_TABLES_TEST_H__
-> +#endif /* BIOSTABLESTEST_H */
-> 
+On 6/5/19 8:21 AM, Lidong Chen wrote:
+> Due to an off-by-one error, the assert statements allow an
+> out-of-bound array access.
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Not sure via which tree this patch is going (trivial?).
+To the maintainer, please consider adding when applying:
+
+"This access can not happen. Fix to silent static analyzer warnings."
+
+As confirmed by Lidong in v1 here:
+https://lists.gnu.org/archive/html/qemu-devel/2019-04/msg01337.html
+
+Thanks,
+
+Phil.
+
+> Signed-off-by: Lidong Chen <lidong.chen@oracle.com>
+> Reviewed-by: Liam Merwick <liam.merwick@oracle.com>
+> Reviewed-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+> Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+> Reviewed-by: Li Qiang <liq3ea@gmail.com>
+> Reviewed-by: Darren Kenny <darren.kenny@oracle.com>
+> ---
+>  hw/sd/sd.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/hw/sd/sd.c b/hw/sd/sd.c
+> index aaab15f..818f86c 100644
+> --- a/hw/sd/sd.c
+> +++ b/hw/sd/sd.c
+> @@ -144,7 +144,7 @@ static const char *sd_state_name(enum SDCardStates state)
+>      if (state == sd_inactive_state) {
+>          return "inactive";
+>      }
+> -    assert(state <= ARRAY_SIZE(state_name));
+> +    assert(state < ARRAY_SIZE(state_name));
+>      return state_name[state];
+>  }
+>  
+> @@ -165,7 +165,7 @@ static const char *sd_response_name(sd_rsp_type_t rsp)
+>      if (rsp == sd_r1b) {
+>          rsp = sd_r1;
+>      }
+> -    assert(rsp <= ARRAY_SIZE(response_name));
+> +    assert(rsp < ARRAY_SIZE(response_name));
+>      return response_name[rsp];
+>  }
+>  
+> 
 
