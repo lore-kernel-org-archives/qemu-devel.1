@@ -6,66 +6,66 @@ X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1FFDDC28EB4
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 11:12:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3FD72C28EB4
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 11:13:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F08A9207E0
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 11:12:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F08A9207E0
+	by mail.kernel.org (Postfix) with ESMTPS id 167DB207E0
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 11:13:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 167DB207E0
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:58451 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:58453 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hYqJx-0004V2-63
-	for qemu-devel@archiver.kernel.org; Thu, 06 Jun 2019 07:12:37 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:60541)
+	id 1hYqKL-0004tb-AA
+	for qemu-devel@archiver.kernel.org; Thu, 06 Jun 2019 07:13:01 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:60373)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hYqFR-0000Sj-6C
-	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 07:07:58 -0400
+	(envelope-from <laurent@vivier.eu>) id 1hYqFL-0000P7-Tk
+	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 07:07:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hYqFQ-0003fy-10
-	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 07:07:57 -0400
-Received: from mout.kundenserver.de ([212.227.17.13]:60497)
+	(envelope-from <laurent@vivier.eu>) id 1hYqFI-0003X6-6V
+	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 07:07:50 -0400
+Received: from mout.kundenserver.de ([212.227.17.13]:38547)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <laurent@vivier.eu>)
-	id 1hYqFM-0003W7-7N; Thu, 06 Jun 2019 07:07:52 -0400
+	id 1hYqF6-0003EB-FB; Thu, 06 Jun 2019 07:07:36 -0400
 Received: from localhost.localdomain ([78.238.229.36]) by
 	mrelayeu.kundenserver.de (mreue107 [212.227.15.183]) with ESMTPSA
 	(Nemesis)
-	id 1N3KDM-1gZYHX0OdG-010LEk; Thu, 06 Jun 2019 13:06:53 +0200
+	id 1MkIAB-1gokqY1WHJ-00kkA9; Thu, 06 Jun 2019 13:06:51 +0200
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Date: Thu,  6 Jun 2019 13:06:18 +0200
-Message-Id: <20190606110625.32127-10-laurent@vivier.eu>
+Date: Thu,  6 Jun 2019 13:06:17 +0200
+Message-Id: <20190606110625.32127-9-laurent@vivier.eu>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190606110625.32127-1-laurent@vivier.eu>
 References: <20190606110625.32127-1-laurent@vivier.eu>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:8FmYLJqd6nXvaOA8F8eP5aRFDi4xgKrj8Ckn7so07AqnFefxKJf
-	bufSPAvf+aYwQgR9cG5GMvWhk1VEnOVUWd0r0yy8RSAQEFd+XSPDnGH2YOHjoODZstbDNBP
-	hfir2+Nxzizz1I6FPy4HeD4KhyTRzZQpBeTn7NODDPVZ6v91buO68l2eGYdtrRQKQARrDoj
-	ZwU3gVtBTmY/hY52GKerQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:TXGh83A+BFc=:ZlfeUp7i3lWhZ1IXQbS3vy
-	U2Bk0DiMUdTX8F+CvMczxQV8EQC+3NNdMMqRxki0S8iDZUb7knNsz+RY0/MWSRcL3sFAH2Qgs
-	iTMU5zsY/fRk++iZpKBsLf/77weaz/JLdHmuebICDCZr88+/f1h7z4njGpe2gMQQkbBXxDmiD
-	43VVnlr0AYXNUYcFubTEJHg1W+eBnaupuHDVbH5pKKfiKVZzYNukgrCyPJZHBSyC+o9dZMyh6
-	oZwo60W8Fh6nQ8NjKCYhVZq00OE9wAjuDOwxZbhrIMqBl4EfQ9e5XWXjBKIEP1erub0XdDOuq
-	PtMRlIP+O4osYQ0btM/Enw+jNZreHIjHP1MOfomcLVY0rzBra3aRUmEAuxmN2ziLaarW5pBQ1
-	HnQYhQQ77S9QPuHVM/wHaeSQwgcWhW16lSy069RS9SHri6NHt4zNg21Xr+OSCuQo1YbbYjrnV
-	BLXvD3MY2J3kPBmm+2lhDvjrxhKQajcLpQvHm72Ej49J7OXGtmD6UqPrlGxEM/Ny4hdVCZnSW
-	9NJULwNw9yPSrmCbPtK9Lvzxl/pstrBQ/0FRU3QxVF0kDCbQwTl8ORd5+gjT5lNq2s64yejtt
-	AWDONfS94OE1iPefipkTyvEtgQ/CCP3exZKiMuGSWVsaj/iMrHAJWqSU89Jiez3PyUzEOu+GC
-	ld7sutLLk9ni1LAGO0pUVF3YimlAScZs5LEFeM0miGuK+hAI3DPbw6/8Od+kPeNuTsuoTcjUn
-	UegRD73Qo5OO0CgaqpZPVkLwc1zfqhKugZUSxEQK5r2x0aqrFOI8d/4r0c8=
+X-Provags-ID: V03:K1:hp5C+eRkhKhZrL9ujfcR5R1twR4hIZGd7hOEgFE+5WIY2q2d8lY
+	kN/JEeng4lPu0Ecb53uf5a36SNII/prxc7ozqApBR4wgoSiD282kjxkkuv3171iGM7yuz+r
+	hONn0dYWoQi/b5920YVliGTFHcx0mDmfK75CcNl6N3MlE3EcdEwG1ZCC6ecgj9m33FqnDAN
+	jSJz3ir0wPZLxcfDxFnTw==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:WFMkMbI5+Qk=:l7BrzmzlCtS/uryTbB9SRq
+	UjqIEOfGTswngkSpPUcZpXPwpySk2vU3hbL4UIf8mB5WfpmlQlwPQGwchlNjb8lOnACSxA08F
+	db7lwXFr1dnLD4BV0GFXZ1OnNkSFuXdZqzYizIGmh7R9q9qpibg6UOZHtPlzJ00ikH4tFF9sW
+	zLAt1MzgY0vxILRJzrsVGA/eriWyAYUfh4FL+qpxqwngkunsk86+PmLmsRgjTGT/9AJxOgj3Y
+	3kksLEbdbBxR//IDg6AC2hGCheQ3LPYjQ4I9Lz5uNgchjdntKfhUm8R7LwB0rkqcIAB3jowY6
+	CoU4I6jA8iJ39VRflpFyobnM5jV642+W8kyU6YGKHnRbiV2QJJsvzg+V1uTxUmLVSQmF9aRZN
+	b48wRQ3TbUFX2UNpbAdb99WR4z8aiq4oaeAw5jZVdocc36+seHz0CqiM/+D1DEw4bYYQZjB8z
+	Z5oB7GN5hd13Av/VSaLpG0AjkT5tXYK4oFntOS93kDN6RacwFdD+p5iyg7s5mT8Ur5A77rQvP
+	/dhIQPcRxJ/rIe7xQaieAEPDyZ/2f4dXXL2MH78x6aThvfOcc0rvHW/d0IMVQ4KDVnr0AJUZ/
+	99+OKSg1ON+mDyPixOqeNQj94jgcU+k1nnfQHT2Uh8aaIihEqRVfdOYNP/Rye0bny4OOgYAFN
+	Dg79EVs9kP+U01ZTdjx7HCPrWvLjNLpksR2v+kf2i1dQ9C2L1gZ7Dr8VTcuDYlQnnQLN4zCqo
+	yxRFyOPap2hCxh5HggK7PmGcZp9NU16B4+zOrg0ppOewJ+GZCs5ebQoxs1A=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 212.227.17.13
-Subject: [Qemu-devel] [PULL 09/16] hw/s390x/event-facility: Use the QOM
- BUS() macro to access BusState.qbus
+Subject: [Qemu-devel] [PULL 08/16] hw/pci-bridge: Use the QOM BUS() macro to
+ access BusState.qbus
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -116,30 +116,24 @@ This patch was generated using the following Coccinelle script:
 
 Suggested-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
-Message-Id: <20190528164020.32250-5-philmd@redhat.com>
+Reviewed-by: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Message-Id: <20190528164020.32250-4-philmd@redhat.com>
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- hw/s390x/event-facility.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ hw/pci/pci_bridge.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/hw/s390x/event-facility.c b/hw/s390x/event-facility.c
-index ee5b83448b11..e574223a226b 100644
---- a/hw/s390x/event-facility.c
-+++ b/hw/s390x/event-facility.c
-@@ -466,12 +466,12 @@ static void init_event_facility(Object *obj)
-     new = object_new(TYPE_SCLP_QUIESCE);
-     object_property_add_child(obj, TYPE_SCLP_QUIESCE, new, NULL);
-     object_unref(new);
--    qdev_set_parent_bus(DEVICE(new), &event_facility->sbus.qbus);
-+    qdev_set_parent_bus(DEVICE(new), BUS(&event_facility->sbus));
- 
-     new = object_new(TYPE_SCLP_CPU_HOTPLUG);
-     object_property_add_child(obj, TYPE_SCLP_CPU_HOTPLUG, new, NULL);
-     object_unref(new);
--    qdev_set_parent_bus(DEVICE(new), &event_facility->sbus.qbus);
-+    qdev_set_parent_bus(DEVICE(new), BUS(&event_facility->sbus));
-     /* the facility will automatically realize the devices via the bus */
+diff --git a/hw/pci/pci_bridge.c b/hw/pci/pci_bridge.c
+index c6d9ded3203c..8d954885c0a1 100644
+--- a/hw/pci/pci_bridge.c
++++ b/hw/pci/pci_bridge.c
+@@ -273,7 +273,7 @@ void pci_bridge_write_config(PCIDevice *d,
+     newctl = pci_get_word(d->config + PCI_BRIDGE_CONTROL);
+     if (~oldctl & newctl & PCI_BRIDGE_CTL_BUS_RESET) {
+         /* Trigger hot reset on 0->1 transition. */
+-        qbus_reset_all(&s->sec_bus.qbus);
++        qbus_reset_all(BUS(&s->sec_bus));
+     }
  }
  
 -- 
