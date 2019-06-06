@@ -4,77 +4,76 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 28036C28EB4
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 18:17:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4896EC04AB5
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 18:19:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DD7C920868
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 18:17:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4B4172083D
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 18:19:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="NTpH9iUt"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DD7C920868
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="rQXq/pPz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4B4172083D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:36415 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:36437 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hYwws-0000Y6-1h
-	for qemu-devel@archiver.kernel.org; Thu, 06 Jun 2019 14:17:14 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:45171)
+	id 1hYwyh-00029a-JS
+	for qemu-devel@archiver.kernel.org; Thu, 06 Jun 2019 14:19:07 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:45166)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hYwUE-0004e8-Eh
+	(envelope-from <peter.maydell@linaro.org>) id 1hYwUE-0004e3-CY
 	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 13:47:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hYwU7-0004De-WF
+	(envelope-from <peter.maydell@linaro.org>) id 1hYwU8-0004Er-A3
 	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 13:47:38 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:52737)
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:40098)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hYwU7-00032T-Jz
-	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 13:47:31 -0400
-Received: by mail-wm1-x343.google.com with SMTP id s3so803341wms.2
-	for <qemu-devel@nongnu.org>; Thu, 06 Jun 2019 10:46:32 -0700 (PDT)
+	id 1hYwU7-0002xe-OQ
+	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 13:47:32 -0400
+Received: by mail-wr1-x444.google.com with SMTP id p11so3332834wre.7
+	for <qemu-devel@nongnu.org>; Thu, 06 Jun 2019 10:46:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
 	h=from:to:cc:subject:date:message-id:in-reply-to:references
 	:mime-version:content-transfer-encoding;
-	bh=6H2cYVZuxI3eixc96ejcRWcHNnY+ydDjL5UvKY4ybaI=;
-	b=NTpH9iUtS1/Z3z/fxQsLYiiaKeQzFhLzvcMrcUD4JbKuDx2vybXqrkCbwiuQ9GHvA9
-	B9UxJa7AH6KjfpKsP4Sl8yE8byaWJxnNLx1G072MHepu6FAGgGhUrM1mQ+CnBie3RPhS
-	farjbjz+VaQdYTm06E8epkLpNzaTeQdb6utINModO8M/bV8y0cng33wJ8IDmeof9xhi3
-	pCotDauSMiifeoT/0phchDLriZPLQNfRwkjfObrM0ayyM7+AcA4prBSFYihCY3NdbbVN
-	EKwHUizPPtLsCQcYEgVlRgVXSbqy/OHiMUIxKavlR3jC8F+kCs++oi2Yz4M3HdoF9o7c
-	zgLA==
+	bh=Oys2pmEwthhvLTKh87xxlHkMEmLQ8kuIT4y6ZbF9A9o=;
+	b=rQXq/pPzKk6lpkJ675D2B4sG0B6tT8vQWkodAI3aqDNT87W02H8GYhP5PdhvuF9GxI
+	0JFYrX3dE7jIGiDkEQWuNKLHhBF+IRd19dWAnnn4d+apM8m2aTeSibSjsV5Cz/+MCUVz
+	vww4UuIX2cJhgVwOsWmLAs5/mnbqFcYkH1Jk9u5z/7inaOuo3qW8sRwAS0lQbMtdP17e
+	06mxYwQj5KmBuvCZKVwiBz2W9Cxqr0UnlQ989TusColjFh3daQfqFUQoysnXh2QMLj+3
+	Q8ijiWfJNejTubOoJxHRAthOCEQ6NH6GRl9mOVdGInM7WaI3NFDr5Vn7cvM5IPae1Dyk
+	bubA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
 	:references:mime-version:content-transfer-encoding;
-	bh=6H2cYVZuxI3eixc96ejcRWcHNnY+ydDjL5UvKY4ybaI=;
-	b=qr0+PEgso3kvIP6Xv5cUsOcxDhCgG7yl9VlAWCecscicsbAviPDSsGD6Jb+GhIaxE1
-	RWMq7gRJiwe5w/8Sta+AzRBV3X23wi0Cz3KLMx24jk8NS6NZ2B6uQWoHH9ZePAa/rNYh
-	F/MM4/86VlAuBb53T/0ka2k2a0nwenc8wYFlHRi0mXMvKrHqU9JEGs0j8UuqGEyTzlKU
-	SAiMxAXfs1NMjcirj9TQQFpDgnRpVW7ZYciYaRKBzEVbGXcxq4C0nEvrQNGDM3KUipt+
-	N7Jirkdc7USLuFKNVVxaRjpus5WGWVIqcJqrb4HhkzwaGN4QZF0qoQa2iRB3+7DVv1+h
-	6hpw==
-X-Gm-Message-State: APjAAAUVzriFLtccYYeef634URXxuqSGyORDCUcCHo2mwbqV1hP/6w7F
-	KhqzjXTAVUen8x+SVeF8Bc0fzQ==
-X-Google-Smtp-Source: APXvYqx+wrwuAxxFJ6S1BEtg60MW/KolQaLeTrUrjz+2qhZCvKerHjT+AcIyh1QqQ/t3SknzAluxkg==
-X-Received: by 2002:a05:600c:21c6:: with SMTP id
-	x6mr837466wmj.102.1559843191698; 
-	Thu, 06 Jun 2019 10:46:31 -0700 (PDT)
+	bh=Oys2pmEwthhvLTKh87xxlHkMEmLQ8kuIT4y6ZbF9A9o=;
+	b=cwj2EPDXD6Q4kKjdRxf7xnY597Le9QmLU0rbeSyVJ2S3FgFgB9/7uBG/DLe3vORlCq
+	+SFHBjebY89qTfFhRUKAH4mRC0Pw7ldRocefbIG/dt3Gas29az4278eWZY2H+NtdT2mq
+	0agHVaUy4wX/0u7ukwOdd27e4tYTW7a3NUnOo0QcDNaCzCRahtWte/eSsIzhkaoatK/x
+	1HuZtVQVBSi+mrZnt1V+soh004mI2gHi5XDTH9Y3DhahIT7xVa8SzpkN3nvJ0u4P/Px6
+	Cpktzq9tg7cNhxKy7yLUAxRnny7mv/4P3ZAfii/nYMt/NGzCVTrl2lB01GiQULTmVa3U
+	4KzA==
+X-Gm-Message-State: APjAAAX958H/LQW2NZWz+juYqpBjScftOiyfM4hddbbLqz8a59zDcR0X
+	Ru4+99w+Euo4di7FGto35Ef20A==
+X-Google-Smtp-Source: APXvYqx03sq03pfxYB2fzNTEGul8dAwnbN0HJvgr5XtdVEqpplegZdvs1wcb380VKy7xdEbXYj/m6w==
+X-Received: by 2002:a5d:4a0b:: with SMTP id m11mr21175588wrq.251.1559843186128;
+	Thu, 06 Jun 2019 10:46:26 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
 	by smtp.gmail.com with ESMTPSA id
-	z135sm2596784wmc.45.2019.06.06.10.46.30
+	z135sm2596784wmc.45.2019.06.06.10.46.25
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Thu, 06 Jun 2019 10:46:31 -0700 (PDT)
+	Thu, 06 Jun 2019 10:46:25 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-arm@nongnu.org,
 	qemu-devel@nongnu.org
-Date: Thu,  6 Jun 2019 18:45:45 +0100
-Message-Id: <20190606174609.20487-19-peter.maydell@linaro.org>
+Date: Thu,  6 Jun 2019 18:45:40 +0100
+Message-Id: <20190606174609.20487-14-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190606174609.20487-1-peter.maydell@linaro.org>
 References: <20190606174609.20487-1-peter.maydell@linaro.org>
@@ -82,9 +81,9 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2a00:1450:4864:20::343
-Subject: [Qemu-devel] [PATCH 18/42] target/arm: Convert VFP VMLA to
- decodetree
+X-Received-From: 2a00:1450:4864:20::444
+Subject: [Qemu-devel] [PATCH 13/42] target/arm: Convert "single-precision"
+ register moves to decodetree
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -101,334 +100,395 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Convert the VFP VMLA instruction to decodetree.
+Convert the "single-precision" register moves to decodetree:
+ * VMSR
+ * VMRS
+ * VMOV between general purpose register and single precision
 
-This is the first of the VFP 3-operand data processing instructions,
-so we include in this patch the code which loops over the elements
-for an old-style VFP vector operation. The existing code to do this
-looping uses the deprecated cpu_F0s/F0d/F1s/F1d TCG globals; since
-we are going to be converting instructions one at a time anyway
-we can take the opportunity to make the new loop use TCG temporaries,
-which means we can do that conversion one operation at a time
-rather than needing to do it all in one go.
+Note that the VMSR/VMRS conversions make our handling of
+the "should this UNDEF?" checks consistent between the two
+instructions:
+ * VMSR to MVFR0, MVFR1, MVFR2 now UNDEF from EL0
+   (previously was a nop)
+ * VMSR to FPSID now UNDEFs from EL0 or if VFPv3 or better
+   (previously was a nop)
+ * VMSR to FPINST and FPINST2 now UNDEF if VFPv3 or better
+   (previously would write to the register, which had no
+   guest-visible effect because we always UNDEF reads)
 
-We include an UNDEF check which was missing in the old code:
-short-vector operations (with stride or length non-zero) were
-deprecated in v7A and must UNDEF in v8A, so if the MVFR0 FPShVec
-field does not indicate that support for short vectors is present
-we UNDEF the operations that would use them. (This is a change
-of behaviour for Cortex-A7, Cortex-A15 and the v8 CPUs, which
-previously were all incorrectly allowing short-vector operations.)
+We also tighten up the decode: we were previously underdecoding
+some SBZ or SBO bits.
 
-Note that the conversion fixes a bug in the old code for the
-case of VFP short-vector "mixed scalar/vector operations". These
-happen where the destination register is in a vector bank but
-but the second operand is in a scalar bank. For example
-  vmla.f64 d10, d1, d16   with length 2 stride 2
-is equivalent to the pair of scalar operations
-  vmla.f64 d10, d1, d16
-  vmla.f64 d8, d3, d16
-where the destination and first input register cycle through
-their vector but the second input is scalar (d16). In the
-old decoder the gen_vfp_F1_mul() operation uses cpu_F1{s,d}
-as a temporary output for the multiply, which trashes the
-second input operand. For the fully-scalar case (where we
-never do a second iteration) and the fully-vector case
-(where the loop loads the new second input operand) this
-doesn't matter, but for the mixed scalar/vector case we
-will end up using the wrong value for later loop iterations.
-In the new code we use TCG temporaries and so avoid the bug.
-This bug is present for all the multiply-accumulate insns
-that operate on short vectors: VMLA, VMLS, VNMLA, VNMLS.
-
-Note 2: the expression used to calculate the next register
-number in the vector bank is not in fact correct; we leave
-this behaviour unchanged from the old decoder and will
-fix this bug later in the series.
+The conversion of VMOV_single includes the expansion out of the
+gen_mov_F0_vreg()/gen_vfp_mrs() and gen_mov_vreg_F0()/gen_vfp_msr()
+sequences into the simpler direct load/store of the TCG temp via
+neon_{load,store}_reg32(): we know in the new function that we're
+always single-precision, we don't need to use the old-and-deprecated
+cpu_F0* TCG globals, and we don't happen to have the declaration of
+gen_vfp_msr() and gen_vfp_mrs() at the point in the file where the
+new function is.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- target/arm/cpu.h               |   5 +
- target/arm/translate-vfp.inc.c | 205 +++++++++++++++++++++++++++++++++
- target/arm/translate.c         |  14 ++-
- target/arm/vfp.decode          |   6 +
- 4 files changed, 224 insertions(+), 6 deletions(-)
+ target/arm/translate-vfp.inc.c | 161 +++++++++++++++++++++++++++++++++
+ target/arm/translate.c         | 148 +-----------------------------
+ target/arm/vfp.decode          |   4 +
+ 3 files changed, 168 insertions(+), 145 deletions(-)
 
-diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index 30fb107c605..c37f78f2032 100644
---- a/target/arm/cpu.h
-+++ b/target/arm/cpu.h
-@@ -3414,6 +3414,11 @@ static inline bool isar_feature_aa32_fp_d32(const ARMISARegisters *id)
-     return FIELD_EX64(id->mvfr0, MVFR0, SIMDREG) >= 2;
- }
- 
-+static inline bool isar_feature_aa32_fpshvec(const ARMISARegisters *id)
-+{
-+    return FIELD_EX64(id->mvfr0, MVFR0, FPSHVEC) > 0;
-+}
-+
- /*
-  * We always set the FP and SIMD FP16 fields to indicate identical
-  * levels of support (assuming SIMD is implemented at all), so
 diff --git a/target/arm/translate-vfp.inc.c b/target/arm/translate-vfp.inc.c
-index 9729946d734..4f922dc8405 100644
+index 8b0899fa05c..74c10f9024b 100644
 --- a/target/arm/translate-vfp.inc.c
 +++ b/target/arm/translate-vfp.inc.c
-@@ -1098,3 +1098,208 @@ static bool trans_VLDM_VSTM_dp(DisasContext *s, arg_VLDM_VSTM_dp *a)
+@@ -622,3 +622,164 @@ static bool trans_VDUP(DisasContext *s, arg_VDUP *a)
  
      return true;
  }
 +
-+/*
-+ * Types for callbacks for do_vfp_3op_sp() and do_vfp_3op_dp().
-+ * The callback should emit code to write a value to vd. If
-+ * do_vfp_3op_{sp,dp}() was passed reads_vd then the TCGv vd
-+ * will contain the old value of the relevant VFP register;
-+ * otherwise it must be written to only.
-+ */
-+typedef void VFPGen3OpSPFn(TCGv_i32 vd,
-+                           TCGv_i32 vn, TCGv_i32 vm, TCGv_ptr fpst);
-+typedef void VFPGen3OpDPFn(TCGv_i64 vd,
-+                           TCGv_i64 vn, TCGv_i64 vm, TCGv_ptr fpst);
-+
-+/*
-+ * Perform a 3-operand VFP data processing instruction. fn is the
-+ * callback to do the actual operation; this function deals with the
-+ * code to handle looping around for VFP vector processing.
-+ */
-+static bool do_vfp_3op_sp(DisasContext *s, VFPGen3OpSPFn *fn,
-+                          int vd, int vn, int vm, bool reads_vd)
++static bool trans_VMSR_VMRS(DisasContext *s, arg_VMSR_VMRS *a)
 +{
-+    uint32_t delta_m = 0;
-+    uint32_t delta_d = 0;
-+    uint32_t bank_mask = 0;
-+    int veclen = s->vec_len;
-+    TCGv_i32 f0, f1, fd;
-+    TCGv_ptr fpst;
++    TCGv_i32 tmp;
++    bool ignore_vfp_enabled = false;
 +
-+    if (!dc_isar_feature(aa32_fpshvec, s) &&
-+        (veclen != 0 || s->vec_stride != 0)) {
++    if (arm_dc_feature(s, ARM_FEATURE_M)) {
++        /*
++         * The only M-profile VFP vmrs/vmsr sysreg is FPSCR.
++         * Writes to R15 are UNPREDICTABLE; we choose to undef.
++         */
++        if (a->rt == 15 || a->reg != ARM_VFP_FPSCR) {
++            return false;
++        }
++    }
++
++    switch (a->reg) {
++    case ARM_VFP_FPSID:
++        /*
++         * VFPv2 allows access to FPSID from userspace; VFPv3 restricts
++         * all ID registers to privileged access only.
++         */
++        if (IS_USER(s) && arm_dc_feature(s, ARM_FEATURE_VFP3)) {
++            return false;
++        }
++        ignore_vfp_enabled = true;
++        break;
++    case ARM_VFP_MVFR0:
++    case ARM_VFP_MVFR1:
++        if (IS_USER(s) || !arm_dc_feature(s, ARM_FEATURE_MVFR)) {
++            return false;
++        }
++        ignore_vfp_enabled = true;
++        break;
++    case ARM_VFP_MVFR2:
++        if (IS_USER(s) || !arm_dc_feature(s, ARM_FEATURE_V8)) {
++            return false;
++        }
++        ignore_vfp_enabled = true;
++        break;
++    case ARM_VFP_FPSCR:
++        break;
++    case ARM_VFP_FPEXC:
++        if (IS_USER(s)) {
++            return false;
++        }
++        ignore_vfp_enabled = true;
++        break;
++    case ARM_VFP_FPINST:
++    case ARM_VFP_FPINST2:
++        /* Not present in VFPv3 */
++        if (IS_USER(s) || arm_dc_feature(s, ARM_FEATURE_VFP3)) {
++            return false;
++        }
++        break;
++    default:
 +        return false;
 +    }
++
++    if (!full_vfp_access_check(s, ignore_vfp_enabled)) {
++        return true;
++    }
++
++    if (a->l) {
++        /* VMRS, move VFP special register to gp register */
++        switch (a->reg) {
++        case ARM_VFP_FPSID:
++        case ARM_VFP_FPEXC:
++        case ARM_VFP_FPINST:
++        case ARM_VFP_FPINST2:
++        case ARM_VFP_MVFR0:
++        case ARM_VFP_MVFR1:
++        case ARM_VFP_MVFR2:
++            tmp = load_cpu_field(vfp.xregs[a->reg]);
++            break;
++        case ARM_VFP_FPSCR:
++            if (a->rt == 15) {
++                tmp = load_cpu_field(vfp.xregs[ARM_VFP_FPSCR]);
++                tcg_gen_andi_i32(tmp, tmp, 0xf0000000);
++            } else {
++                tmp = tcg_temp_new_i32();
++                gen_helper_vfp_get_fpscr(tmp, cpu_env);
++            }
++            break;
++        default:
++            g_assert_not_reached();
++        }
++
++        if (a->rt == 15) {
++            /* Set the 4 flag bits in the CPSR.  */
++            gen_set_nzcv(tmp);
++            tcg_temp_free_i32(tmp);
++        } else {
++            store_reg(s, a->rt, tmp);
++        }
++    } else {
++        /* VMSR, move gp register to VFP special register */
++        switch (a->reg) {
++        case ARM_VFP_FPSID:
++        case ARM_VFP_MVFR0:
++        case ARM_VFP_MVFR1:
++        case ARM_VFP_MVFR2:
++            /* Writes are ignored.  */
++            break;
++        case ARM_VFP_FPSCR:
++            tmp = load_reg(s, a->rt);
++            gen_helper_vfp_set_fpscr(cpu_env, tmp);
++            tcg_temp_free_i32(tmp);
++            gen_lookup_tb(s);
++            break;
++        case ARM_VFP_FPEXC:
++            /*
++             * TODO: VFP subarchitecture support.
++             * For now, keep the EN bit only
++             */
++            tmp = load_reg(s, a->rt);
++            tcg_gen_andi_i32(tmp, tmp, 1 << 30);
++            store_cpu_field(tmp, vfp.xregs[a->reg]);
++            gen_lookup_tb(s);
++            break;
++        case ARM_VFP_FPINST:
++        case ARM_VFP_FPINST2:
++            tmp = load_reg(s, a->rt);
++            store_cpu_field(tmp, vfp.xregs[a->reg]);
++            break;
++        default:
++            g_assert_not_reached();
++        }
++    }
++
++    return true;
++}
++
++static bool trans_VMOV_single(DisasContext *s, arg_VMOV_single *a)
++{
++    TCGv_i32 tmp;
 +
 +    if (!vfp_access_check(s)) {
 +        return true;
 +    }
 +
-+    if (veclen > 0) {
-+        bank_mask = 0x18;
-+
-+        /* Figure out what type of vector operation this is.  */
-+        if ((vd & bank_mask) == 0) {
-+            /* scalar */
-+            veclen = 0;
++    if (a->l) {
++        /* VFP to general purpose register */
++        tmp = tcg_temp_new_i32();
++        neon_load_reg32(tmp, a->vn);
++        if (a->rt == 15) {
++            /* Set the 4 flag bits in the CPSR.  */
++            gen_set_nzcv(tmp);
++            tcg_temp_free_i32(tmp);
 +        } else {
-+            delta_d = s->vec_stride + 1;
-+
-+            if ((vm & bank_mask) == 0) {
-+                /* mixed scalar/vector */
-+                delta_m = 0;
-+            } else {
-+                /* vector */
-+                delta_m = delta_d;
-+            }
++            store_reg(s, a->rt, tmp);
 +        }
++    } else {
++        /* general purpose register to VFP */
++        tmp = load_reg(s, a->rt);
++        neon_store_reg32(tmp, a->vn);
++        tcg_temp_free_i32(tmp);
 +    }
-+
-+    f0 = tcg_temp_new_i32();
-+    f1 = tcg_temp_new_i32();
-+    fd = tcg_temp_new_i32();
-+    fpst = get_fpstatus_ptr(0);
-+
-+    neon_load_reg32(f0, vn);
-+    neon_load_reg32(f1, vm);
-+
-+    for (;;) {
-+        if (reads_vd) {
-+            neon_load_reg32(fd, vd);
-+        }
-+        fn(fd, f0, f1, fpst);
-+        neon_store_reg32(fd, vd);
-+
-+        if (veclen == 0) {
-+            break;
-+        }
-+
-+        /* Set up the operands for the next iteration */
-+        veclen--;
-+        vd = ((vd + delta_d) & (bank_mask - 1)) | (vd & bank_mask);
-+        vn = ((vn + delta_d) & (bank_mask - 1)) | (vn & bank_mask);
-+        neon_load_reg32(f0, vn);
-+        if (delta_m) {
-+            vm = ((vm + delta_m) & (bank_mask - 1)) | (vm & bank_mask);
-+            neon_load_reg32(f1, vm);
-+        }
-+    }
-+
-+    tcg_temp_free_i32(f0);
-+    tcg_temp_free_i32(f1);
-+    tcg_temp_free_i32(fd);
-+    tcg_temp_free_ptr(fpst);
 +
 +    return true;
-+}
-+
-+static bool do_vfp_3op_dp(DisasContext *s, VFPGen3OpDPFn *fn,
-+                          int vd, int vn, int vm, bool reads_vd)
-+{
-+    uint32_t delta_m = 0;
-+    uint32_t delta_d = 0;
-+    uint32_t bank_mask = 0;
-+    int veclen = s->vec_len;
-+    TCGv_i64 f0, f1, fd;
-+    TCGv_ptr fpst;
-+
-+    /* UNDEF accesses to D16-D31 if they don't exist */
-+    if (!dc_isar_feature(aa32_fp_d32, s) && ((vd | vn | vm) & 0x10)) {
-+        return false;
-+    }
-+
-+    if (!dc_isar_feature(aa32_fpshvec, s) &&
-+        (veclen != 0 || s->vec_stride != 0)) {
-+        return false;
-+    }
-+
-+    if (!vfp_access_check(s)) {
-+        return true;
-+    }
-+
-+    if (veclen > 0) {
-+        bank_mask = 0xc;
-+
-+        /* Figure out what type of vector operation this is.  */
-+        if ((vd & bank_mask) == 0) {
-+            /* scalar */
-+            veclen = 0;
-+        } else {
-+            delta_d = (s->vec_stride >> 1) + 1;
-+
-+            if ((vm & bank_mask) == 0) {
-+                /* mixed scalar/vector */
-+                delta_m = 0;
-+            } else {
-+                /* vector */
-+                delta_m = delta_d;
-+            }
-+        }
-+    }
-+
-+    f0 = tcg_temp_new_i64();
-+    f1 = tcg_temp_new_i64();
-+    fd = tcg_temp_new_i64();
-+    fpst = get_fpstatus_ptr(0);
-+
-+    neon_load_reg64(f0, vn);
-+    neon_load_reg64(f1, vm);
-+
-+    for (;;) {
-+        if (reads_vd) {
-+            neon_load_reg64(fd, vd);
-+        }
-+        fn(fd, f0, f1, fpst);
-+        neon_store_reg64(fd, vd);
-+
-+        if (veclen == 0) {
-+            break;
-+        }
-+        /* Set up the operands for the next iteration */
-+        veclen--;
-+        vd = ((vd + delta_d) & (bank_mask - 1)) | (vd & bank_mask);
-+        vn = ((vn + delta_d) & (bank_mask - 1)) | (vn & bank_mask);
-+        neon_load_reg64(f0, vn);
-+        if (delta_m) {
-+            vm = ((vm + delta_m) & (bank_mask - 1)) | (vm & bank_mask);
-+            neon_load_reg64(f1, vm);
-+        }
-+    }
-+
-+    tcg_temp_free_i64(f0);
-+    tcg_temp_free_i64(f1);
-+    tcg_temp_free_i64(fd);
-+    tcg_temp_free_ptr(fpst);
-+
-+    return true;
-+}
-+
-+static void gen_VMLA_sp(TCGv_i32 vd, TCGv_i32 vn, TCGv_i32 vm, TCGv_ptr fpst)
-+{
-+    /* Note that order of inputs to the add matters for NaNs */
-+    TCGv_i32 tmp = tcg_temp_new_i32();
-+
-+    gen_helper_vfp_muls(tmp, vn, vm, fpst);
-+    gen_helper_vfp_adds(vd, vd, tmp, fpst);
-+    tcg_temp_free_i32(tmp);
-+}
-+
-+static bool trans_VMLA_sp(DisasContext *s, arg_VMLA_sp *a)
-+{
-+    return do_vfp_3op_sp(s, gen_VMLA_sp, a->vd, a->vn, a->vm, true);
-+}
-+
-+static void gen_VMLA_dp(TCGv_i64 vd, TCGv_i64 vn, TCGv_i64 vm, TCGv_ptr fpst)
-+{
-+    /* Note that order of inputs to the add matters for NaNs */
-+    TCGv_i64 tmp = tcg_temp_new_i64();
-+
-+    gen_helper_vfp_muld(tmp, vn, vm, fpst);
-+    gen_helper_vfp_addd(vd, vd, tmp, fpst);
-+    tcg_temp_free_i64(tmp);
-+}
-+
-+static bool trans_VMLA_dp(DisasContext *s, arg_VMLA_sp *a)
-+{
-+    return do_vfp_3op_dp(s, gen_VMLA_dp, a->vd, a->vn, a->vm, true);
 +}
 diff --git a/target/arm/translate.c b/target/arm/translate.c
-index cc4cb81a46e..2fa516364f3 100644
+index ff9c6a43d84..6bb0e994cc5 100644
 --- a/target/arm/translate.c
 +++ b/target/arm/translate.c
-@@ -3133,6 +3133,14 @@ static int disas_vfp_insn(DisasContext *s, uint32_t insn)
-             op = ((insn >> 20) & 8) | ((insn >> 19) & 6) | ((insn >> 6) & 1);
-             rn = VFP_SREG_N(insn);
+@@ -3097,7 +3097,6 @@ static int disas_vfp_insn(DisasContext *s, uint32_t insn)
+     TCGv_i32 addr;
+     TCGv_i32 tmp;
+     TCGv_i32 tmp2;
+-    bool ignore_vfp_enabled = false;
  
-+            switch (op) {
-+            case 0:
-+                /* Already handled by decodetree */
-+                return 1;
-+            default:
-+                break;
-+            }
-+
-             if (op == 15) {
-                 /* rn is opcode, encoded as per VFP_SREG_N. */
-                 switch (rn) {
-@@ -3312,12 +3320,6 @@ static int disas_vfp_insn(DisasContext *s, uint32_t insn)
-             for (;;) {
-                 /* Perform the calculation.  */
-                 switch (op) {
--                case 0: /* VMLA: fd + (fn * fm) */
--                    /* Note that order of inputs to the add matters for NaNs */
--                    gen_vfp_F1_mul(dp);
--                    gen_mov_F0_vreg(dp, rd);
--                    gen_vfp_add(dp);
--                    break;
-                 case 1: /* VMLS: fd + -(fn * fm) */
-                     gen_vfp_mul(dp);
-                     gen_vfp_F1_neg(dp);
+     if (!arm_dc_feature(s, ARM_FEATURE_VFP)) {
+         return 1;
+@@ -3133,14 +3132,7 @@ static int disas_vfp_insn(DisasContext *s, uint32_t insn)
+      * for invalid encodings; we will generate incorrect syndrome information
+      * for attempts to execute invalid vfp/neon encodings with FP disabled.
+      */
+-    if ((insn & 0x0fe00fff) == 0x0ee00a10) {
+-        rn = (insn >> 16) & 0xf;
+-        if (rn == ARM_VFP_FPSID || rn == ARM_VFP_FPEXC || rn == ARM_VFP_MVFR2
+-            || rn == ARM_VFP_MVFR1 || rn == ARM_VFP_MVFR0) {
+-            ignore_vfp_enabled = true;
+-        }
+-    }
+-    if (!full_vfp_access_check(s, ignore_vfp_enabled)) {
++    if (!vfp_access_check(s)) {
+         return 0;
+     }
+ 
+@@ -3148,142 +3140,8 @@ static int disas_vfp_insn(DisasContext *s, uint32_t insn)
+     switch ((insn >> 24) & 0xf) {
+     case 0xe:
+         if (insn & (1 << 4)) {
+-            /* single register transfer */
+-            rd = (insn >> 12) & 0xf;
+-            if (dp) {
+-                /* already handled by decodetree */
+-                return 1;
+-            } else { /* !dp */
+-                bool is_sysreg;
+-
+-                if ((insn & 0x6f) != 0x00)
+-                    return 1;
+-                rn = VFP_SREG_N(insn);
+-
+-                is_sysreg = extract32(insn, 21, 1);
+-
+-                if (arm_dc_feature(s, ARM_FEATURE_M)) {
+-                    /*
+-                     * The only M-profile VFP vmrs/vmsr sysreg is FPSCR.
+-                     * Writes to R15 are UNPREDICTABLE; we choose to undef.
+-                     */
+-                    if (is_sysreg && (rd == 15 || (rn >> 1) != ARM_VFP_FPSCR)) {
+-                        return 1;
+-                    }
+-                }
+-
+-                if (insn & ARM_CP_RW_BIT) {
+-                    /* vfp->arm */
+-                    if (is_sysreg) {
+-                        /* system register */
+-                        rn >>= 1;
+-
+-                        switch (rn) {
+-                        case ARM_VFP_FPSID:
+-                            /* VFP2 allows access to FSID from userspace.
+-                               VFP3 restricts all id registers to privileged
+-                               accesses.  */
+-                            if (IS_USER(s)
+-                                && arm_dc_feature(s, ARM_FEATURE_VFP3)) {
+-                                return 1;
+-                            }
+-                            tmp = load_cpu_field(vfp.xregs[rn]);
+-                            break;
+-                        case ARM_VFP_FPEXC:
+-                            if (IS_USER(s))
+-                                return 1;
+-                            tmp = load_cpu_field(vfp.xregs[rn]);
+-                            break;
+-                        case ARM_VFP_FPINST:
+-                        case ARM_VFP_FPINST2:
+-                            /* Not present in VFP3.  */
+-                            if (IS_USER(s)
+-                                || arm_dc_feature(s, ARM_FEATURE_VFP3)) {
+-                                return 1;
+-                            }
+-                            tmp = load_cpu_field(vfp.xregs[rn]);
+-                            break;
+-                        case ARM_VFP_FPSCR:
+-                            if (rd == 15) {
+-                                tmp = load_cpu_field(vfp.xregs[ARM_VFP_FPSCR]);
+-                                tcg_gen_andi_i32(tmp, tmp, 0xf0000000);
+-                            } else {
+-                                tmp = tcg_temp_new_i32();
+-                                gen_helper_vfp_get_fpscr(tmp, cpu_env);
+-                            }
+-                            break;
+-                        case ARM_VFP_MVFR2:
+-                            if (!arm_dc_feature(s, ARM_FEATURE_V8)) {
+-                                return 1;
+-                            }
+-                            /* fall through */
+-                        case ARM_VFP_MVFR0:
+-                        case ARM_VFP_MVFR1:
+-                            if (IS_USER(s)
+-                                || !arm_dc_feature(s, ARM_FEATURE_MVFR)) {
+-                                return 1;
+-                            }
+-                            tmp = load_cpu_field(vfp.xregs[rn]);
+-                            break;
+-                        default:
+-                            return 1;
+-                        }
+-                    } else {
+-                        gen_mov_F0_vreg(0, rn);
+-                        tmp = gen_vfp_mrs();
+-                    }
+-                    if (rd == 15) {
+-                        /* Set the 4 flag bits in the CPSR.  */
+-                        gen_set_nzcv(tmp);
+-                        tcg_temp_free_i32(tmp);
+-                    } else {
+-                        store_reg(s, rd, tmp);
+-                    }
+-                } else {
+-                    /* arm->vfp */
+-                    if (is_sysreg) {
+-                        rn >>= 1;
+-                        /* system register */
+-                        switch (rn) {
+-                        case ARM_VFP_FPSID:
+-                        case ARM_VFP_MVFR0:
+-                        case ARM_VFP_MVFR1:
+-                            /* Writes are ignored.  */
+-                            break;
+-                        case ARM_VFP_FPSCR:
+-                            tmp = load_reg(s, rd);
+-                            gen_helper_vfp_set_fpscr(cpu_env, tmp);
+-                            tcg_temp_free_i32(tmp);
+-                            gen_lookup_tb(s);
+-                            break;
+-                        case ARM_VFP_FPEXC:
+-                            if (IS_USER(s))
+-                                return 1;
+-                            /* TODO: VFP subarchitecture support.
+-                             * For now, keep the EN bit only */
+-                            tmp = load_reg(s, rd);
+-                            tcg_gen_andi_i32(tmp, tmp, 1 << 30);
+-                            store_cpu_field(tmp, vfp.xregs[rn]);
+-                            gen_lookup_tb(s);
+-                            break;
+-                        case ARM_VFP_FPINST:
+-                        case ARM_VFP_FPINST2:
+-                            if (IS_USER(s)) {
+-                                return 1;
+-                            }
+-                            tmp = load_reg(s, rd);
+-                            store_cpu_field(tmp, vfp.xregs[rn]);
+-                            break;
+-                        default:
+-                            return 1;
+-                        }
+-                    } else {
+-                        tmp = load_reg(s, rd);
+-                        gen_vfp_msr(tmp);
+-                        gen_mov_vreg_F0(0, rn);
+-                    }
+-                }
+-            }
++            /* already handled by decodetree */
++            return 1;
+         } else {
+             /* data processing */
+             bool rd_is_dp = dp;
 diff --git a/target/arm/vfp.decode b/target/arm/vfp.decode
-index 68c9ffcfd3c..9530e17ae02 100644
+index 8286bdc0729..bb7de403df3 100644
 --- a/target/arm/vfp.decode
 +++ b/target/arm/vfp.decode
-@@ -96,3 +96,9 @@ VLDM_VSTM_sp ---- 1101 0.1 l:1 rn:4 .... 1010 imm:8 \
-              vd=%vd_sp p=1 u=0 w=1
- VLDM_VSTM_dp ---- 1101 0.1 l:1 rn:4 .... 1011 imm:8 \
-              vd=%vd_dp p=1 u=0 w=1
+@@ -62,3 +62,7 @@ VMOV_from_gp ---- 1110 0 0 index:1 0 .... rt:4 1011 .00 1 0000 \
+ 
+ VDUP         ---- 1110 1 b:1 q:1 0 .... rt:4 1011 . 0 e:1 1 0000 \
+              vn=%vn_dp
 +
-+# 3-register VFP data-processing; bits [23,21:20,6] identify the operation.
-+VMLA_sp      ---- 1110 0.00 .... .... 1010 .0.0 .... \
-+             vm=%vm_sp vn=%vn_sp vd=%vd_sp
-+VMLA_dp      ---- 1110 0.00 .... .... 1011 .0.0 .... \
-+             vm=%vm_dp vn=%vn_dp vd=%vd_dp
++VMSR_VMRS    ---- 1110 111 l:1 reg:4 rt:4 1010 0001 0000
++VMOV_single  ---- 1110 000 l:1 .... rt:4 1010 . 001 0000 \
++             vn=%vn_sp
 -- 
 2.20.1
 
