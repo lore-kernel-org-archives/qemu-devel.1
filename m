@@ -2,43 +2,43 @@ Return-Path: <SRS0=9X/F=UF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 81D8AC04AB5
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 09:41:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D87FC28D1A
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 09:43:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4B16620868
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 09:41:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4B16620868
+	by mail.kernel.org (Postfix) with ESMTPS id EA7A220874
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 09:43:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EA7A220874
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:57342 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:57362 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hYotH-000618-Bl
-	for qemu-devel@archiver.kernel.org; Thu, 06 Jun 2019 05:40:59 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:41791)
+	id 1hYovK-00077y-6C
+	for qemu-devel@archiver.kernel.org; Thu, 06 Jun 2019 05:43:06 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:42384)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hYosS-0005bY-61
-	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 05:40:09 -0400
+	(envelope-from <laurent@vivier.eu>) id 1hYouI-0006dt-0a
+	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 05:42:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hYosR-000433-5H
-	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 05:40:08 -0400
-Received: from mout.kundenserver.de ([212.227.126.187]:52727)
+	(envelope-from <laurent@vivier.eu>) id 1hYouG-0005bn-0I
+	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 05:42:01 -0400
+Received: from mout.kundenserver.de ([212.227.126.187]:47797)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <laurent@vivier.eu>)
-	id 1hYosQ-0003zY-Rh; Thu, 06 Jun 2019 05:40:07 -0400
+	id 1hYouE-0005VW-05; Thu, 06 Jun 2019 05:41:59 -0400
 Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
 	(mreue011 [213.165.67.103]) with ESMTPSA (Nemesis) id
-	1MGQSj-1hKna730UH-00Gokv; Thu, 06 Jun 2019 11:39:26 +0200
+	1Mv3I0-1ghohW1fCy-00r1Xa; Thu, 06 Jun 2019 11:41:14 +0200
 To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
 	qemu-devel@nongnu.org, qemu-trivial@nongnu.org
 References: <20190528164020.32250-1-philmd@redhat.com>
-	<20190528164020.32250-10-philmd@redhat.com>
+	<20190528164020.32250-3-philmd@redhat.com>
 From: Laurent Vivier <laurent@vivier.eu>
 Openpgp: preference=signencrypt
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
@@ -83,35 +83,36 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
 	OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
 	JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
 	ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <baf168e1-f90f-bb44-092c-7ae311ec4644@vivier.eu>
-Date: Thu, 6 Jun 2019 11:39:23 +0200
+Message-ID: <cfba2e0e-9c31-d032-ba27-17b59b2eeb79@vivier.eu>
+Date: Thu, 6 Jun 2019 11:41:09 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <20190528164020.32250-10-philmd@redhat.com>
+In-Reply-To: <20190528164020.32250-3-philmd@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:nDh/8z7+D+2ideN4PS6GjDuY4f/29e4vkzHrg8Hli0Rk523qxXi
-	EMf7inEfymgU9auUq1CTfhOXBXBnoNK0YIhfCnfRfnnRNUEvs6z79+pgvpNV2q9bTY/UWUU
-	2orjTdzQQzwLywoAkERK+0n6l8Dq7W/SJjNaHVm9e9AYL4EEKnLNwWt0XhE4jud5vgTCqE1
-	E+QGPTXdDKPo13WyHmJWw==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:6cRT5u7Rx+0=:9vwYNj0ihWWnaiduPRd0s2
-	E1OId7gQ4r1v/r04zjhPw6GSl3xo0zrEDIPQJXbslYQ2d2OMsUXwJOm61otT1yODtSEzFRPWM
-	y2sUfGttGIr8s0lZRUycj9bXARRpUqrKELt817OFiZ/V1CvlF2a5y4WKKIyPpbQUt8+gXChPK
-	Mi7LJ1kuQfGKaAqY7DkjS3Ule5ooTPwkO1BHIYeOXdgiIUJyRxrb8thGt7MYsX8WNq4OWZbkW
-	5ov+8vVY6HDtzPRQ0vBr6e05vxQLRpzulnCdfLKwUYc0AwXNEIZimMwnXivf53ZKpPIk7YwvK
-	BuFZfaaekzmvLfTWh2CNy/jq+zfNpiFaEmFw9sAQ4207P3vdIpUswkCBkA7B9ihVR8G4iSk77
-	e1D8zZhK7B5H21ys2NgSVwE7P377A/odZ7WcdLVEuQKD5zKlZ91qixsJhzynUthhSYug9LoF5
-	PqnvWXIY9nUHmOcZ8RZ3Sbws9QkcQwtgEuT8Bu43eTnysYkn3/1il4YVKYmWyEuYbbsoLIOOu
-	PvjUp3K67iP2kCIweQDeUhYq6Q3rtniwdrWiX/HyTzwHodcrP/GCT2g/B393JP+LYXzlRANaI
-	Uhmodvl0iZlTUzfwCZ4f9hvXOSHQ5/sUTn+aqzHIiz4iPwpdxocfcGgdACzuMi1zm63T+E/lt
-	iQw3+PrvJOy+fvKt+OT3qMndYw0Yx0i2RRj8AgYyyhqZ2/UfnTXr+X+BUtI6PavoLMbTn4Zp9
-	928pFxzSl5oZUv1o4m6M2anLvVmE90tQpi7TeGBpZG/rKvxKrQcMR6SzgLM=
+X-Provags-ID: V03:K1:YzWi7DMPhBnS6+l0gQ0hJgTME9Y/sOscYzr/hZisweeE1+qzztH
+	JMB2ZO8FTHxTeIPiWf0+/gKllqBQneafb3Ew9CU2nPaM83/WsKZc73pByZysvTnP5u6eBAi
+	QqqzlPl3k8QrSRKauiqSJC2eXWoH0gGIZ85dOjpibhZm8d+D8pmZlADqdw8YTN1byN6bEqm
+	q7Fm44+Mb/PAjCXfmjJSQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:Em3HJatQlGI=:ojDW5oSdhF8tPS6sW7p6Zf
+	x4Bi9g1ZoRZvkFaxMht9uc0nWWu4jdq5WxkuqpZ/Bk2SVxrI2xdyS8UPAiczTXnNl68I89Qgn
+	H8DkNsLGJUOGkXBXOCMdodaVyZC3PgVJWCTnDvkFXfqnppHTBMMKU+VnKVIFT7ZZ1MQDLeaOs
+	L37mBdUFLKCUd5J0MATSEnnqxfzLq1ecDkI9pHuWydY1HO1Ly4ryrPKbBKrEY8+1KOOFv/9JU
+	0sGqi/oAh7C+o27o08u+Fnj+hBSQFaXcmoOrkrRVJk3WTNHRRRyStnARW5XB408RFyMWf+vOK
+	73CVnpEW00dwaAGYx7/olUKJYKJOgUHI1dlK6AMEp8DXTukApDJ4uSeqLtYg7a6ZsH2D4SIJT
+	FaRghcrqmVhh94UXhipmNLBdeFzMnxpNAjDvRHkUVh4wvtYKV3HnQY1OnQHakqcj2Hs59sd2s
+	zXaWeMA3rfUXkEqtY8tSYIcObymor6cgay+I8ymJR++D5tmxJn9L//08npLl9nSYapugTjztu
+	mbXpyV9rZ6YwpA6MALNeuEIeJzU1HkB1QSzOdGWOYIV/2FbU/+7EDb7opZ8ZuY7QP+o/NX9S9
+	2yUVjAWcenFkBNOMsla8mfnaBsny/27lJ5DaDb2WgrW/Zy2HtJL8rCw5UYJ7xwB7dhAHBtby+
+	pL1xCN/3u2uYMx7N8VS7lJLYHkrOp8z1LObeKavXdQVH8RR4lH9P4DLjpZiYNZoFe9OepRepb
+	+pXvVSczEvohJecF/wVmPE6BIqPKSAwdGdlZ+X2IekMoORXV8NBhbCIu70LQtv0JwRyqFW4Xc
+	QMhnLDKbf76sCpjXCkgPa8mG+VqWA==
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 212.227.126.187
-Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH v2 09/10] hw/vfio/pci: Use
- the QOM DEVICE() macro to access DeviceState.qdev
+Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH v2 02/10] hw/scsi: Use the
+ QOM BUS() macro to access BusState.qbus
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -142,51 +143,28 @@ Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 Le 28/05/2019 à 18:40, Philippe Mathieu-Daudé a écrit :
-> Rather than looking inside the definition of a DeviceState with
-> "s->qdev", use the QOM prefered style: "DEVICE(s)".
+> Rather than looking inside the definition of a BusState with "s->bus.qbus",
+> use the QOM prefered style: "BUS(&s->bus)".
 > 
 > This patch was generated using the following Coccinelle script:
 > 
->     // Use DEVICE() macros to access DeviceState.qdev
->     @use_device_macro_to_access_qdev@
+>     // Use BUS() macros to access BusState.qbus
+>     @use_bus_macro_to_access_qbus@
 >     expression obj;
->     identifier dev;
+>     identifier bus;
 >     @@
->     -&obj->dev.qdev
->     +DEVICE(obj)
+>     -&obj->bus.qbus
+>     +BUS(&obj->bus)
 > 
 > Suggested-by: Peter Maydell <peter.maydell@linaro.org>
 > Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 > ---
->  hw/vfio/pci.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-> index 8e555db12e..2a4091d216 100644
-> --- a/hw/vfio/pci.c
-> +++ b/hw/vfio/pci.c
-> @@ -2717,7 +2717,7 @@ static void vfio_req_notifier_handler(void *opaque)
->          return;
->      }
->  
-> -    qdev_unplug(&vdev->pdev.qdev, &err);
-> +    qdev_unplug(DEVICE(vdev), &err);
->      if (err) {
->          warn_reportf_err(err, VFIO_MSG_PREFIX, vdev->vbasedev.name);
->      }
-> @@ -2839,7 +2839,7 @@ static void vfio_realize(PCIDevice *pdev, Error **errp)
->      vdev->vbasedev.name = g_path_get_basename(vdev->vbasedev.sysfsdev);
->      vdev->vbasedev.ops = &vfio_pci_ops;
->      vdev->vbasedev.type = VFIO_DEVICE_TYPE_PCI;
-> -    vdev->vbasedev.dev = &vdev->pdev.qdev;
-> +    vdev->vbasedev.dev = DEVICE(vdev);
->  
->      tmp = g_strdup_printf("%s/iommu_group", vdev->vbasedev.sysfsdev);
->      len = readlink(tmp, group_path, sizeof(group_path));
+>  hw/scsi/lsi53c895a.c  | 2 +-
+>  hw/scsi/mptsas.c      | 4 ++--
+>  hw/scsi/virtio-scsi.c | 2 +-
+>  3 files changed, 4 insertions(+), 4 deletions(-)
 > 
 
-Applied to my trivial-patches branch.
+Reviewed-by: Laurent Vivier <laurent@vivier.eu>
 
-Thanks,
-Laurent
 
