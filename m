@@ -2,79 +2,105 @@ Return-Path: <SRS0=9X/F=UF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CEDECC28EB3
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 10:41:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51706C28EB5
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 10:59:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A13922083E
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 10:41:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0F52B20868
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 10:59:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="EChZBs4Z"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A13922083E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="1FW4LpDB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0F52B20868
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:58067 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:58242 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hYpq6-0003wf-Th
-	for qemu-devel@archiver.kernel.org; Thu, 06 Jun 2019 06:41:46 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:54606)
+	id 1hYq6n-0006e5-RM
+	for qemu-devel@archiver.kernel.org; Thu, 06 Jun 2019 06:59:01 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:58384)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hYpoW-0002p6-17
-	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 06:40:09 -0400
+	(envelope-from <liran.alon@oracle.com>) id 1hYq5v-0006IS-QQ
+	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 06:58:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hYphH-0006i4-4Y
-	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 06:32:40 -0400
-Received: from mail-ot1-x336.google.com ([2607:f8b0:4864:20::336]:45260)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hYphG-0006dd-NC
-	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 06:32:39 -0400
-Received: by mail-ot1-x336.google.com with SMTP id n2so471727otl.12
-	for <qemu-devel@nongnu.org>; Thu, 06 Jun 2019 03:32:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-	:cc; bh=y7Bf5rX/Ic8M6HBk8DSs2Mgy8ZhmzAejGLk1jC5FdN8=;
-	b=EChZBs4Zm3Z3QxUe7dYWIDiP4zBH+Wm1GicgcQ155hetNO22Ct/RiI3yD9p+rTf/aE
-	fSEyJD6J1js+iX6SiTU6SoaV9yc4E6m2gt/zEDN0zHeAod8mTFFEwUjpoe/+Nfga7f6n
-	Ms8gQS7P+xPAJJqOUVjoNa65h+muph9d177uMq3JLTOu4qMY78q1l2fO+fGgGbrNPQUt
-	Kyjk4tcmMdcy/dKE6VW7OSIRn8i5ZFVo0yHOmgEs4bFvBl6k7lZ9450xUEIPoZBNa7n5
-	fMwRiFWXGGnEn0jbZci1Grn8UQqEoEXwV7JdeAKUnFtV4qaAJ48xbuy3LID3gnjY5wBS
-	piUg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-	:message-id:subject:to:cc;
-	bh=y7Bf5rX/Ic8M6HBk8DSs2Mgy8ZhmzAejGLk1jC5FdN8=;
-	b=MT4+zYvPAWFxmiq0u9TPu/eJ8NsLLdPSycE9DVb7yapvImomtqtjwnvsoEr9i8wJSi
-	4GdPBXcP8r8eeulzjdRq5gwn1CDRzzBuWSlXhvcCbo9hx+aSORP1IYQKWUodiR6lkLYl
-	RVYqfGWc7uIcHo15VND0a7jAxxtmJ5v0Qa4N/ynChA9dpLUMR9UEg2RMTUvHZiE7OmvM
-	olRPZcLtSaka0eaX0uI71lT3Aq7lHxL0frKbU+exnjXuMVN+KakvE+fkLWNbr3cltCFE
-	JWP0BrWbU60yDwrfUP8ELl2ITbHDuGuR6RyxKwRFsH0aPULe47SpH1R5dh2t+VxPJAJ2
-	Kr6w==
-X-Gm-Message-State: APjAAAVUnvwlnnMSXYq8APVQF1Xc1oMAIXThnXZd0FGGsdeOiU/iZYuE
-	TPTw0/nRLjEA2EGa2Uh4EoSTF1sxAkJWjnwVMfmL3g==
-X-Google-Smtp-Source: APXvYqz/gXRnBTh6Ri5QJVNg5tYDOsct1hqMYXkIXvBOvtVo3cviae3UF7VPCLXwguMixA+A49/aAPh8F49PttapHog=
-X-Received: by 2002:a9d:d17:: with SMTP id 23mr13831789oti.221.1559817157439; 
-	Thu, 06 Jun 2019 03:32:37 -0700 (PDT)
-MIME-Version: 1.0
-References: <20190605115318.9972-1-quintela@redhat.com>
-In-Reply-To: <20190605115318.9972-1-quintela@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 6 Jun 2019 11:32:26 +0100
-Message-ID: <CAFEAcA_3y4QKXBPc8Fao9NvRcdtiQmyx398-Hf0fP9CMVYu66Q@mail.gmail.com>
-To: Juan Quintela <quintela@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::336
-Subject: Re: [Qemu-devel] [PULL 0/5] Migration patches
+	(envelope-from <liran.alon@oracle.com>) id 1hYq5t-0005j3-F7
+	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 06:58:07 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:59472)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <liran.alon@oracle.com>)
+	id 1hYq5s-0005CN-Jb
+	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 06:58:04 -0400
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+	by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id
+	x56Ara54111005; Thu, 6 Jun 2019 10:57:57 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
+	h=content-type :
+	mime-version : subject : from : in-reply-to : date : cc :
+	content-transfer-encoding : message-id : references : to;
+	s=corp-2018-07-02; bh=Ylzn8eVk/s6hO+klzTuSp9y3k5VDZBBSRdo8FvRej0o=;
+	b=1FW4LpDBHQmV0mRL/NCzvznWC1q3myNPyjP3w0fHCUMC7eg3/qM67oO7z3Td2+vVr3V4
+	TCvqVfmr0GSCSLckMRARNZDAqj7tR6PU6QinAIj6KeOvVQMfDSXtwxC+3U1i+um9NE84
+	LLyR8Qc7ILNJEQNgaKZSVO+2bndJwM77cs+u+eb4dzwtQbCf5cHZMPazK6G6nNl9hU/r
+	I/clcQ1XeVMsEPWKnJuI1CSNL9M/nttvwhJP7sjMDZxf73BjcSaHpXAm63qAO8rK/+Jt
+	U4R11SbwAclWHtqZ4zWVFGKlP9gNM3mzFQgW8ghyuvdo8u44PFJ6Tw9AhICDqFntQSiW
+	Vw== 
+Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
+	by userp2130.oracle.com with ESMTP id 2sugstqptx-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 06 Jun 2019 10:57:57 +0000
+Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
+	by userp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id
+	x56AvNnL075603; Thu, 6 Jun 2019 10:57:56 GMT
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+	by userp3030.oracle.com with ESMTP id 2swngmenyg-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 06 Jun 2019 10:57:56 +0000
+Received: from abhmp0018.oracle.com (abhmp0018.oracle.com [141.146.116.24])
+	by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x56AvtNb008077;
+	Thu, 6 Jun 2019 10:57:55 GMT
+Received: from [10.30.3.6] (/213.57.127.2)
+	by default (Oracle Beehive Gateway v4.0)
+	with ESMTP ; Thu, 06 Jun 2019 03:57:55 -0700
+Content-Type: text/plain;
+	charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 11.1 \(3445.4.7\))
+From: Liran Alon <liran.alon@oracle.com>
+In-Reply-To: <20190606103958.GJ2788@work-vm>
+Date: Thu, 6 Jun 2019 13:57:51 +0300
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <B7A9A778-9BD5-449E-A8F3-5D8E3471F4A6@oracle.com>
+References: <38B8F53B-F993-45C3-9A82-796A0D4A55EC@oracle.com>
+	<20190606084222.GA2788@work-vm>
+	<862DD946-EB3C-405A-BE88-4B22E0B9709C@oracle.com>
+	<20190606092358.GE2788@work-vm>
+	<8F3FD038-12DB-44BC-A262-3F1B55079753@oracle.com>
+	<20190606103958.GJ2788@work-vm>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+X-Mailer: Apple Mail (2.3445.4.7)
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9279
+	signatures=668687
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
+	malwarescore=0
+	phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+	adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+	engine=8.0.1-1810050000 definitions=main-1906060080
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9279
+	signatures=668687
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
+	priorityscore=1501 malwarescore=0
+	suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+	lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999
+	adultscore=0
+	classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+	definitions=main-1906060080
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 156.151.31.86
+Subject: Re: [Qemu-devel] QEMU/KVM migration backwards compatibility broken?
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -86,42 +112,339 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
-	zhanghailiang <zhang.zhanghailiang@huawei.com>,
-	Markus Armbruster <armbru@redhat.com>,
-	QEMU Developers <qemu-devel@nongnu.org>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	"Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org,
+	kvm list <kvm@vger.kernel.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 5 Jun 2019 at 12:55, Juan Quintela <quintela@redhat.com> wrote:
->
-> The following changes since commit 47fbad45d47af8af784bb12a5719489edcd89b4c:
->
->   Merge remote-tracking branch 'remotes/kevin/tags/for-upstream' into staging (2019-06-04 17:22:42 +0100)
->
-> are available in the Git repository at:
->
->   https://github.com/juanquintela/qemu.git tags/migration-pull-request
->
-> for you to fetch changes up to 03158519384f15890d587937bd1b3ea699898e55:
->
->   migratioin/ram: leave RAMBlock->bmap blank on allocating (2019-06-05 12:44:03 +0200)
->
-> ----------------------------------------------------------------
-> Migration Pull request
->
-> - Fd fixes and test (yuri)
-> - several fixes (wei)
->
 
 
-Applied, thanks.
+> On 6 Jun 2019, at 13:39, Dr. David Alan Gilbert <dgilbert@redhat.com> =
+wrote:
+>=20
+> * Liran Alon (liran.alon@oracle.com) wrote:
+>>=20
+>>=20
+>>> On 6 Jun 2019, at 12:23, Dr. David Alan Gilbert =
+<dgilbert@redhat.com> wrote:
+>>>=20
+>>> * Liran Alon (liran.alon@oracle.com) wrote:
+>>>>=20
+>>>>=20
+>>>>> On 6 Jun 2019, at 11:42, Dr. David Alan Gilbert =
+<dgilbert@redhat.com> wrote:
+>>>>>=20
+>>>>> * Liran Alon (liran.alon@oracle.com) wrote:
+>>>>>> Hi,
+>>>>>>=20
+>>>>>> Looking at QEMU source code, I am puzzled regarding how migration =
+backwards compatibility is preserved regarding X86CPU.
+>>>>>>=20
+>>>>>> As I understand it, fields that are based on KVM capabilities and =
+guest runtime usage are defined in VMState subsections in order to not =
+send them if not necessary.
+>>>>>> This is done such that in case they are not needed and we migrate =
+to an old QEMU which don=E2=80=99t support loading this state, migration =
+will still succeed
+>>>>>> (As .needed() method will return false and therefore this state =
+won=E2=80=99t be sent as part of migration stream).
+>>>>>> Furthermore, in case .needed() returns true and old QEMU don=E2=80=99=
+t support loading this state, migration fails. As it should because we =
+are aware that guest state
+>>>>>> is not going to be restored properly on destination.
+>>>>>>=20
+>>>>>> I=E2=80=99m puzzled about what will happen in the following =
+scenario:
+>>>>>> 1) Source is running new QEMU with new KVM that supports save of =
+some VMState subsection.
+>>>>>> 2) Destination is running new QEMU that supports load this state =
+but with old kernel that doesn=E2=80=99t know how to load this state.
+>>>>>>=20
+>>>>>> I would have expected in this case that if source .needed() =
+returns true, then migration will fail because of lack of support in =
+destination kernel.
+>>>>>> However, it seems from current QEMU code that this will actually =
+succeed in many cases.
+>>>>>>=20
+>>>>>> For example, if msr_smi_count is sent as part of migration stream =
+(See vmstate_msr_smi_count) and destination have =
+has_msr_smi_count=3D=3Dfalse,
+>>>>>> then destination will succeed loading migration stream but =
+kvm_put_msrs() will actually ignore env->msr_smi_count and will =
+successfully load guest state.
+>>>>>> Therefore, migration will succeed even though it should have =
+failed=E2=80=A6
+>>>>>>=20
+>>>>>> It seems to me that QEMU should have for every such VMState =
+subsection, a .post_load() method that verifies that relevant capability =
+is supported by kernel
+>>>>>> and otherwise fail migration.
+>>>>>>=20
+>>>>>> What do you think? Should I really create a patch to modify all =
+these CPUX86 VMState subsections to behave like this?
+>>>>>=20
+>>>>> I don't know the x86 specific side that much; but from my =
+migration side
+>>>>> the answer should mostly be through machine types - indeed for =
+smi-count
+>>>>> there's a property 'x-migrate-smi-count' which is off for machine =
+types
+>>>>> pre 2.11 (see hw/i386/pc.c pc_compat_2_11) - so if you've got an =
+old
+>>>>> kernel you should stick to the old machine types.
+>>>>>=20
+>>>>> There's nothing guarding running the new machine type on =
+old-kernels;
+>>>>> and arguably we should have a check at startup that complains if
+>>>>> your kernel is missing something the machine type uses.
+>>>>> However, that would mean that people running with -M pc   would =
+fail
+>>>>> on old kernels.
+>>>>>=20
+>>>>> A post-load is also a valid check; but one question is whether,
+>>>>> for a particular register, the pain is worth it - it depends on =
+the
+>>>>> symptom that the missing state causes.  If it's minor then you =
+might
+>>>>> conclude it's not worth a failed migration;  if it's a hung or
+>>>>> corrupt guest then yes it is.   Certainly a warning printed is =
+worth
+>>>>> it.
+>>>>>=20
+>>>>> Dave
+>>>>=20
+>>>> I think we should have flags that allow user to specify which =
+VMState subsections user explicitly allow to avoid restore even though =
+they are required to fully restore guest state.
+>>>> But it seems to me that the behaviour should be to always fail =
+migration in case we load a VMState subsections that we are unable to =
+restore unless user explicitly specified this is ok
+>>>> for this specific subsection.
+>>>> Therefore, it seems that for every VMState subsection that it=E2=80=99=
+s restore is based on kernel capability we should:
+>>>> 1) Have a user-controllable flag (which is also tied to =
+machine-type?) to explicitly allow avoid restoring this state if cannot. =
+Default should be =E2=80=9Cfalse=E2=80=9D.
+>>>> 2) Have a .post_load() method that verifies we have required kernel =
+capability to restore this state, unless flag (1) was specified as =
+=E2=80=9Ctrue=E2=80=9D.
+>>>=20
+>>> This seems a lot of flags; users aren't going to know what to do =
+with
+>>> all of them; I don't see what will set/control them.
+>>=20
+>> True but I think users will want to specify only for a handful of =
+VMState subsections that it is OK to not restore them even thought hey =
+are deemed needed by source QEMU.
+>> We can create flags only for those VMState subsections.
+>> User should set these flags explicitly on QEMU command-line. As a =
+=E2=80=9C-cpu=E2=80=9D property? I don=E2=80=99t think these flags =
+should be tied to machine-type.
+>=20
+> I don't see who is going to work out these flags and send them.
+>=20
+>>>=20
+>>>> Note that above mentioned flags is different than flags such as =
+=E2=80=9Cx-migrate-smi-count=E2=80=9D.
+>>>> The purpose of =E2=80=9Cx-migrate-smi-count=E2=80=9D flag is to =
+avoid sending the VMState subsection to begin with in case we know we =
+migrate to older QEMU which don=E2=80=99t even have the relevant VMState =
+subsection. But it is not relevant for the case both source and =
+destination runs QEMU which understands the VMState subsection but run =
+on kernels with different capabilities.
+>>>>=20
+>>>> Also note regarding your first paragraph, that specifying flags =
+based on kernel you are running on doesn=E2=80=99t help for the case =
+discussed here.
+>>>> As source QEMU is running on new kernel. Unless you meant that =
+source QEMU should use relevant machine-type based on the destination =
+kernel.
+>>>> i.e. You should launch QEMU with old machine-type as long as you =
+have hosts in your migration pool that runs with old kernel.
+>>>=20
+>>> That's what I meant; stick to the old machine-type unless you know =
+it's
+>>> safe to use a newer one.
+>>>=20
+>>>> I don=E2=80=99 think it=E2=80=99s the right approach though. As =
+there is no way to change flags such as =E2=80=9Cx-migrate-smi-count=E2=80=
+=9D dynamically after all hosts in migration pool have been upgraded.
+>>>>=20
+>>>> What do you think?
+>>>=20
+>>> I don't have an easy answer.  The users already have to make sure =
+they
+>>> use a machine type that's old enough for all the QEMUs installed in
+>>> their cluster; making sure it's also old enough for their oldest
+>>> kernel isn't too big a difference - *except* that it's much harder =
+to
+>>> tell which kernel corresponds to which feature/machine type etc - so
+>>> how does a user know what the newest supported machine type is?
+>>> Failing at startup when selecting a machine type that the current
+>>> kernel can't support would help that.
+>>>=20
+>>> Dave
+>>=20
+>> First, machine-type express the set of vHW behaviour and properties =
+that is exposed to guest.
+>> Therefore, machine-type shouldn=E2=80=99t change for a given guest =
+lifetime (including Live-Migrations).
+>> Otherwise, guest will experience different vHW behaviour and =
+properties before/after Live-Migration.
+>> So I think machine-type is not relevant for this discussion. We =
+should focus on flags which specify
+>> migration behaviour (such as =E2=80=9Cx-migrate-smi-count=E2=80=9D =
+which can also be controlled by machine-type but not only).
+>=20
+> Machine type specifies two things:
+>  a) The view from the guest
+>  b) Migration compatibility
+>=20
+> (b) is explicitly documented in qemu's docs/devel/migration.rst, see =
+the
+> subsection on subsections.
+>=20
+>> Second, this strategy results in inefficient migration management. =
+Consider the following scenario:
+>> 1) Guest running on new_qemu+old_kernel migrate to host with =
+new_qemu+new_kernel.
+>> Because source is old_kernel than destination QEMU is launched with =
+(x-migrate-smi-count =3D=3D false).
+>> 2) Assume at this point fleet of hosts have half of hosts with =
+old_kernel and half with new_kernel.
+>> 3) Further assume that guest workload indeed use msr_smi_count and =
+therefore relevant VMState subsection should be sent to properly =
+preserve guest state.
+>> 4) =46rom some reason, we decide to migrate again the guest in (1).
+>> Even if guest is migrated to a host with new_kernel, then QEMU still =
+avoids sending msr_smi_count VMState subsection because it is launched =
+with (x-migrate-smi-count =3D=3D false).
+>>=20
+>> Therefore, I think it makes more sense that source QEMU will always =
+send all VMState subsection that are deemed needed (i.e. .nedeed() =
+returns true)
+>> and let receive-side decide if migration should fail if this =
+subsection was sent but failed to be restored.
+>> The only case which I think sender should limit the VMState =
+subsection it sends to destination is because source is running older =
+QEMU
+>> which is not even aware of this VMState subsection (Which is to my =
+understanding the rational behind using =E2=80=9Cx-migrate-smi-count=E2=80=
+=9D and tie it up to machine-type).
+>=20
+> But we want to avoid failed migrations if we can; so in general we =
+don't
+> want to be sending subsections to destinations that can't handle them.
+> The only case where it's reasonable is when there's a migration bug =
+such
+> that the behaviour in the guest is really nasty; if there's a choice
+> between a failed migration or a hung/corrupt guest I'll take a failed
+> migration.
+>=20
+>> Third, let=E2=80=99s assume all hosts in fleet was upgraded to =
+new_kernel. How do I modify all launched QEMUs on these new hosts to now =
+have =E2=80=9Cx-migrate-smi-count=E2=80=9D set to true?
+>> As I would like future migrations to do send this VMState subsection. =
+Currently there is no QMP command to update these flags.
+>=20
+> I guess that's possible - it's pretty painful though; you're going to
+> have to teach your management layer about features/fixes of the =
+kernels
+> and which flags to tweak in qemu.  Having said that, if you could do =
+it,
+> then you'd avoid having to restart VMs to pick up a few fixes.
+>=20
+>> Fourth, I think it=E2=80=99s not trivial for management-plane to be =
+aware with which flags it should set on destination QEMU based on =
+currently running kernels on fleet.
+>> It=E2=80=99s not the same as machine-type, as already discussed above =
+doesn=E2=80=99t change during the entire lifetime of guest.
+>=20
+> Right, which is why I don't see your idea of adding flags will work.
+> I don't see how anything will figure out what the right flags to use
+> are.
+> (Getting the management layers to do sane things with the cpuid flags
+> is already a nightmare, and they're fairly well understood).
+>=20
+>> I=E2=80=99m also not sure it is a good idea that we currently control =
+flags such as =E2=80=9Cx-migrate-smi-count=E2=80=9D from machine-type.
+>> As it means that if a guest was initially launched using some old =
+QEMU, it will *forever* not migrate some VMState subsection during all =
+it=E2=80=99s Live-Migrations.
+>> Even if all hosts and all QEMUs on fleet are capable of migrating =
+this state properly.
+>> Maybe it is preferred that this flag was specified as part of =
+=E2=80=9Cmigrate=E2=80=9D command itself in case management-plane knows =
+it wishes to migrate even though dest QEMU
+>> is older and doesn=E2=80=99t understand this specific VMState =
+subsection.
+>>=20
+>> I=E2=80=99m left pretty confused about QEMU=E2=80=99s migration =
+compatibility strategy...
+>=20
+> The compatibility strategy is the machine type;  but yes it does
+> have a problem when it's not really just a qemu version - but also
+> kernel (and external libraries, etc).
+> My general advice is that users should be updating their kernels and
+> qemus together; but I realise there's lots of cases where that
+> doesn't work.
+>=20
+> Dave
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/4.1
-for any user-visible changes.
+I think it=E2=80=99s not practical advise to expect users to always =
+upgrade kernel and QEMU together.
+In fact, users prefer to upgrade them separately to avoid doing major =
+upgrades at once and to better pin-point root-cause of issues.
 
--- PMM
+Compiling all above very useful discussion (thanks for this!), I may =
+have a better suggestion that doesn=E2=80=99t require any additional =
+flags:
+1) Source QEMU will always send all all VMState subsections that is =
+deemed by source QEMU as required to not break guest semantic behaviour.
+This is done by .needed() methods that examine guest runtime state to =
+understand if this state is required to be sent or not.
+2) Destination QEMU will provide a generic QMP command which allows to =
+set names of VMState subsections that if accepted on migration stream
+and failed to be loaded (because either subsection name is not =
+implemented or because .post_load() method failed) then the failure =
+should be ignored
+and migration should continue as usual. By default, the list of this =
+names will be empty.
+3) Destination QEMU will implement .post_load() method for all these =
+VMState subsections that depend on kernel capability to be restored =
+properly
+such that it will fail subsection load in case kernel capability is not =
+present. (Note that this load failure will be ignored if subsection name =
+is specified in (2)).
+
+Above suggestion have the following properties:
+1) Doesn=E2=80=99t require any flag to be added to QEMU.
+2) Moves all control on whether to fail migration because of failure to =
+load VMState subsection to receiver side. Sender always attempts to send =
+max state he believes is required.
+3) We remove coupling of migration compatibility from machine-type.
+
+What do you think?
+
+-Liran
+
+>=20
+>> -Liran
+>>=20
+>>>=20
+>>>> -Liran
+>>>>=20
+>>>>>=20
+>>>>>> Thanks,
+>>>>>> -Liran
+>>>>> --
+>>>>> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>>>>=20
+>>> --
+>>> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>>=20
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+
 
