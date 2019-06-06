@@ -2,78 +2,75 @@ Return-Path: <SRS0=9X/F=UF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CDC42C04AB5
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 23:22:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84229C04AB5
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 23:26:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9E1B320717
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 23:22:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9E1B320717
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 4BF7520868
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 23:26:09 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dgephw/6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4BF7520868
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44942 helo=lists.gnu.org)
+Received: from localhost ([::1]:44964 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hZ1hn-0003yt-U0
-	for qemu-devel@archiver.kernel.org; Thu, 06 Jun 2019 19:21:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43972)
+	id 1hZ1lo-0004wj-8W
+	for qemu-devel@archiver.kernel.org; Thu, 06 Jun 2019 19:26:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44570)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <philmd@redhat.com>) id 1hZ1gY-0003WG-Th
- for qemu-devel@nongnu.org; Thu, 06 Jun 2019 19:20:43 -0400
+ (envelope-from <alistair23@gmail.com>) id 1hZ1lI-0004Wj-6E
+ for qemu-devel@nongnu.org; Thu, 06 Jun 2019 19:25:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1hZ1gY-0004tB-2D
- for qemu-devel@nongnu.org; Thu, 06 Jun 2019 19:20:42 -0400
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:42391)
+ (envelope-from <alistair23@gmail.com>) id 1hZ1lE-0004Nv-8m
+ for qemu-devel@nongnu.org; Thu, 06 Jun 2019 19:25:36 -0400
+Received: from mail-lj1-x243.google.com ([2a00:1450:4864:20::243]:45099)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hZ1gX-0004rl-Sx
- for qemu-devel@nongnu.org; Thu, 06 Jun 2019 19:20:42 -0400
-Received: by mail-wr1-f66.google.com with SMTP id x17so273351wrl.9
- for <qemu-devel@nongnu.org>; Thu, 06 Jun 2019 16:20:41 -0700 (PDT)
+ (Exim 4.71) (envelope-from <alistair23@gmail.com>)
+ id 1hZ1l6-00049P-Vn; Thu, 06 Jun 2019 19:25:26 -0400
+Received: by mail-lj1-x243.google.com with SMTP id m23so93910lje.12;
+ Thu, 06 Jun 2019 16:25:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:from:date:message-id:subject:to:cc;
+ bh=KNTvLFD7w+9/xP9677N4cwlkAJIGtf1kYYMVISpb9vM=;
+ b=dgephw/6QcFQKoYLWqQ5W48KeyHxELsJKsvKUuGERI2P/ZEW/mzKkf12nJ6wOaooOC
+ JRmQukj2DYP+BiobflwbEYIYBs+i8noo/kRen5bwVAZgh9+HDltjuRACrPc2JmcR5Es0
+ qmmiifPdbLccZVmL9jKRpuw2o/z/70yAY5qNrZJLisI6MlQYC0BBl/4Dfl7oI17ADXP7
+ gJWrnKWd+7pg50YHaIZKE23I/jtDOti98MgcE7Vh74RC33tRI2hhGxgF4M4oA+qiXYYT
+ SDbfXMdAHACfHMcjanofyIe1M3T1uv6/gSwd47NrotU3h0Wm/8QrqdYtcv6EYPGkUnLZ
+ IFhA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=AL7MkOIQG4wiEAA9Uep7oRen7Cjck9DMh1npa2nSyjw=;
- b=fBw0OlokQ39w+lr/hCuShzEv2gDjwhaHMijq7MPjFqwjXs3kwQCkrUN7pRNq2ygSgU
- T7CW2kL0m0aZAVbhZhI2T+Ug4OrnZsR548mb8C1nq4xSIwlr7+mMjNyUhiBmDInC1hxI
- zVGWiwZ7U75lMeBBw14M8jOA7wiXm5uuXB8710B2Q3cZuIvJlUFKtyt5o09mbWC8ZYE2
- yuGlATzAsgFNjfMxX9dUxTOrrYmeT9S2eU6eh1RgE3sB4iCCcRlhoDI9ESIb9ndIBH8e
- DLb8FJ6zoMadknIhQyVyLR1S7egA8EaMeqgXz+fTTLiYYpeGZY7ya959lxXXtVaXex5z
- 2WbQ==
-X-Gm-Message-State: APjAAAUtXZVsGeYfmFsTYOZoUi4BSgL8QKj2B6lqbPXUeLIcBScnN9Jo
- IqhG80giFr12MPfa0HnNozw5TG8U+wPpSg==
-X-Google-Smtp-Source: APXvYqwj+/Ebr/kCt5xJ9xrO801FL6nfSJoigZy9ei1gMEd/PTGBhduYFJRr3JGchYtKK0AQEmkR+w==
-X-Received: by 2002:a5d:4bd0:: with SMTP id l16mr916578wrt.141.1559863240411; 
- Thu, 06 Jun 2019 16:20:40 -0700 (PDT)
-Received: from [192.168.0.156] ([78.192.181.46])
- by smtp.gmail.com with ESMTPSA id j66sm504285wmb.24.2019.06.06.16.20.39
- (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
- Thu, 06 Jun 2019 16:20:39 -0700 (PDT)
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- qemu-devel@nongnu.org
-References: <20190606082900.6330-1-alex.bennee@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
- url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <674c0706-708a-6378-bf79-cca610249d31@redhat.com>
-Date: Fri, 7 Jun 2019 01:20:39 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+ h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
+ bh=KNTvLFD7w+9/xP9677N4cwlkAJIGtf1kYYMVISpb9vM=;
+ b=tESJZoHT2rjWShQYHm3PLwFjJM0TIeSLQkpu5bvENwVe8yvsK/G8/ZY/Ht6B6PJaWB
+ SKR+8f6DvCqdHh6T+hJO72THENyATDceyRy4s4cIL0E9c+jhSjZsaHWSijxBQs6AxRXc
+ yTP7rV5Hc8ggi3Wns/D9dnpoYAuKgnu8M0gxrmlLuo2Rv1YgINvIDgr8tzHwkzPj0vlP
+ bRyjnqHPUyM6WZBcClv+3qvzMeRZQAzOqeMiOAMQWJaW0zs0iXFCSfyHFmoY48xs0fYF
+ s7yczEZke4OVdAMAvLxcX1bMyjfP+XOtLWwimNAama94RraXq4XriLNefsujoQjnatzU
+ SMlw==
+X-Gm-Message-State: APjAAAXJKbwCw9Epmt/V/yK627Zul+47L8DGVPZVedN9fbhxQhzueCmk
+ SEErjDyRXfcB7mihOJC+e9+R00yAGAqvn1he1coJCsJy
+X-Google-Smtp-Source: APXvYqxp9KGYIBhXJzqaXJCOM+vImhdlM27WpIjsNdAeRbZmK/vfdbk+ch1jr5RphL2S9dhqOA2hxuBfpR2lUS/W9Nc=
+X-Received: by 2002:a2e:8988:: with SMTP id c8mr23515805lji.99.1559863521316; 
+ Thu, 06 Jun 2019 16:25:21 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20190606082900.6330-1-alex.bennee@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.221.66
-Subject: Re: [Qemu-devel] [PATCH] MAINTAINERS: put myself forward for gdbstub
+From: Alistair Francis <alistair23@gmail.com>
+Date: Thu, 6 Jun 2019 16:22:47 -0700
+Message-ID: <CAKmqyKMs4nt0eddFkXHG9vOdxnj=yB8jx8s9NivNiwvVg8TObA@mail.gmail.com>
+To: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::243
+Subject: [Qemu-devel] RISC-V: Include ROM in QEMU
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,43 +82,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>, onathan@fintelia.io,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ Palmer Dabbelt <palmer@sifive.com>,
+ Alistair Francis <Alistair.Francis@wdc.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Alex,
+Hello,
 
-On 6/6/19 10:29 AM, Alex Bennée wrote:
-> As I've been reviewing a lot of this recently and I'm going to put
-> together a pull request I'd better keep an eye on it.
-> 
-> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-> ---
->  MAINTAINERS | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index a96829ea83..8ef34cf1ce 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -1872,7 +1872,8 @@ F: util/error.c
->  F: util/qemu-error.c
->  
->  GDB stub
-> -S: Orphan
-> +M: Alex Bennée <alex.bennee@linaro.org>
+As a test of the waters, how would the QEMU community feel about
+including the RISC-V OpenSBI project as a ROM submodule?
 
-Feel free to add:
+The idea would be to have OpenSBI (similar to ATF for ARM and a BIOS
+for x86) included by default to simplify the QEMU RISC-V boot process
+for users. This would remove the requirement for users/developers to
+build a RISC-V firmware. The goal here is to allow people to just
+download and run their kernel as easily as they currently do for x86.
 
-R: Philippe Mathieu-Daudé <philmd@redhat.com>
+We would make sure that it can be disabled! That is users/developers
+can use their own (or none) if they want to. The idea here is just to
+simplify the boot process, not lock anyone out.
 
-> +S: Maintained
->  F: gdbstub*
->  F: gdb-xml/
-
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-
-Regards,
-
-Phil.
+Alistair
 
