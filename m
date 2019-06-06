@@ -2,74 +2,90 @@ Return-Path: <SRS0=9X/F=UF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A769FC04AB5
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 23:10:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3634FC04AB5
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 23:12:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7DD8A20684
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 23:10:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7DD8A20684
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=canonical.com
+	by mail.kernel.org (Postfix) with ESMTPS id EABE520684
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 23:12:46 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AJh5SSln"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EABE520684
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44792 helo=lists.gnu.org)
+Received: from localhost ([::1]:44818 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hZ1X7-00048p-Pe
-	for qemu-devel@archiver.kernel.org; Thu, 06 Jun 2019 19:10:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40261)
+	id 1hZ1Ys-00062z-8b
+	for qemu-devel@archiver.kernel.org; Thu, 06 Jun 2019 19:12:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41533)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <bounces@canonical.com>) id 1hZ1Rw-0007dS-Ci
- for qemu-devel@nongnu.org; Thu, 06 Jun 2019 19:05:37 -0400
+ (envelope-from <alistair23@gmail.com>) id 1hZ1Wt-0004N8-8D
+ for qemu-devel@nongnu.org; Thu, 06 Jun 2019 19:10:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1hZ1Ru-0005cL-SF
- for qemu-devel@nongnu.org; Thu, 06 Jun 2019 19:05:36 -0400
-Received: from indium.canonical.com ([91.189.90.7]:53428)
+ (envelope-from <alistair23@gmail.com>) id 1hZ1Wr-0004Ez-Vh
+ for qemu-devel@nongnu.org; Thu, 06 Jun 2019 19:10:43 -0400
+Received: from mail-lj1-x242.google.com ([2a00:1450:4864:20::242]:43118)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1hZ1Ru-0005XR-DT
- for qemu-devel@nongnu.org; Thu, 06 Jun 2019 19:05:34 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1hZ1Rs-0004ON-DL
- for <qemu-devel@nongnu.org>; Thu, 06 Jun 2019 23:05:32 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 41C752E80CC
- for <qemu-devel@nongnu.org>; Thu,  6 Jun 2019 23:05:32 +0000 (UTC)
+ (Exim 4.71) (envelope-from <alistair23@gmail.com>)
+ id 1hZ1Wr-0004BH-KQ; Thu, 06 Jun 2019 19:10:41 -0400
+Received: by mail-lj1-x242.google.com with SMTP id 16so77373ljv.10;
+ Thu, 06 Jun 2019 16:10:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=QnjzLAuecYO6cCduWJx1ezPBtP44QqdheBhzqRuvzg8=;
+ b=AJh5SSlnlfhqqiOhv7pCy4XJLGLcul7qOqd/36x7W9Wbiy6suQk/ZjGwh7vQAkK3tG
+ AanXuXDSwDoOAKHXhUJ1ftjkgcCD+FUn0zkLj5jHw/oGVsVoUsGeWWHJE/a/92IRn8Fd
+ Xx546aZcAxpUZ/L+ew6jGqFmdrtOPZYIaYaNgwi3NA7us/qdxtmHUPZMiQ9f+9Ql4aN0
+ dFeAfTtte9F79GxZYAnFXRqIjwSvi35y0eR6KFhqRckE4wBdMUnPF3yz+bcTu2uuTver
+ cLnUYkf2ce22bcqDtvCnWaZAZ4IejD57PRJJU3G3FesUgdoZWUEXYwFZAi4L1e6aQLY3
+ Yrqw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=QnjzLAuecYO6cCduWJx1ezPBtP44QqdheBhzqRuvzg8=;
+ b=rgmqPLBk53vqDmgxUj1ZoA5850k5s4iqKsCEXgKCbzf2NhKIU7Dpvi6WHGtLhuWbtx
+ PP9YwL94GGrjfstkGUJlBsKOK1Hv4Ml83usxSY4/JysusUEEz1EpKIhgtLKMXG6LQA7/
+ wlg0stZsO3rg2/+jZc1uHgK0D5wrBUdf88sY9qWuuIO6w+vqbmHAONtm6QnWa4k5Hl+d
+ sKbD2+P6Q6zYR7z5FaY+QTZJMdWyJ2jS4qYIlcnZxKRrHWy4Zdr7TcTJ9QwwYLG7/w0A
+ RNV2WUHoYj7+Uljl/N1iytF0JxqwFMbt6byrAGrtg9i3Q5+IrZA3rlXxk/hKWoMffwnR
+ uunQ==
+X-Gm-Message-State: APjAAAVFBaXTPo+mj8DOX8n3tzzlY1QBrMNSpemAK3q5LB/RTTcNt+fM
+ 1AQLviI6gvr0/QTww/xQgG+aWFmwzOrFGtM30n0=
+X-Google-Smtp-Source: APXvYqzIwgwTPbStoPu2NkiSHADKTP3pAz3haxc7lKDDplcrP3Om98o2oJWjEqfeIs7rCKfbjZKbCJRaEcfPAeujz+8=
+X-Received: by 2002:a2e:6313:: with SMTP id x19mr17108848ljb.25.1559862640106; 
+ Thu, 06 Jun 2019 16:10:40 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+References: <20190517222342.26394-1-jonathan@fintelia.io>
+ <20190517222342.26394-3-jonathan@fintelia.io>
+ <CAKmqyKMG6ffhQ5VYgLZ3XVfZ2-E_O9BH6UCanmLJ3awDDUfS_w@mail.gmail.com>
+ <CANnJOVFE51rFdV0h0T6_dV6r37kBLcBQCo7Csg8NOUoYkOELpQ@mail.gmail.com>
+ <CAKmqyKM3C59_w214=mqLFpfwPhUjcLL0EuOY0Yk3DQePx8ZTQg@mail.gmail.com>
+ <CANnJOVGyY71-aZd+dmZWAOUzEfFEOHjAAzVdbGTP_XfP4CmgkA@mail.gmail.com>
+In-Reply-To: <CANnJOVGyY71-aZd+dmZWAOUzEfFEOHjAAzVdbGTP_XfP4CmgkA@mail.gmail.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Thu, 6 Jun 2019 16:08:05 -0700
+Message-ID: <CAKmqyKNiPsoMSi0nnJTz8mTh-W4FwPDitxkmF1JGEK-VdfWpCQ@mail.gmail.com>
+To: Jonathan Behrens <jonathan@fintelia.io>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 06 Jun 2019 22:57:51 -0000
-From: dann frazier <dann.frazier@canonical.com>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Confirmed; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: jnsnow lizhengui th-huth
-X-Launchpad-Bug-Reporter: =?utf-8?b?6LSe6LS15p2OIChsaXpoZW5ndWkp?=
-X-Launchpad-Bug-Modifier: dann frazier (dannf)
-X-Launchpad-Bug-Duplicate: 1805256
-References: <155486495593.20543.13567634487304856304.malonedeb@chaenomeles.canonical.com>
-Message-Id: <155986187263.31090.1945800694514893498.launchpad@gac.canonical.com>
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="18978";
- Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: 558d6a7af180aeb883d6aeab736c532e36e38778
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1824053] Re: Qemu-img convert appears to be stuck
- on aarch64 host with low probability
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::242
+Subject: Re: [Qemu-devel] [PATCH for-4.1 2/2] target/riscv: Add support for
+ -bios "firmware_filename" flag
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -78,111 +94,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1824053 <1824053@bugs.launchpad.net>
+Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ Palmer Dabbelt <palmer@sifive.com>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ Alistair Francis <Alistair.Francis@wdc.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-*** This bug is a duplicate of bug 1805256 ***
-    https://bugs.launchpad.net/bugs/1805256
+On Fri, May 31, 2019 at 3:38 PM Jonathan Behrens <jonathan@fintelia.io> wro=
+te:
+>
+> I've thought some more about this issue, and long term I think there are =
+a couple different useful configurations:
+>
+> For end users, having default firmware that loaded the OS from a block de=
+vice would be easiest
+>
+> Current invocation: impossible
+> Proposed: empty command line (i.e. pass neither -bios nor -kernel)
+>
+> Custom firmware support would be good to test possible firmware improveme=
+nts or if the default is missing something
+>
+> Current invocation: -kernel firmware.elf
+> Proposed: -bios firmware.elf
+>
+> A kernel developer may want to test a kernel binary without having to mak=
+e a full disk image or bundle firmware (on x86 and perhaps other architectu=
+res this is done with the -kernel parameter, but for RISC-V that invocation=
+ currently is used to load M-mode code rather than supervisor code)
+>
+> Current invocation: impossible
+> Proposed: -bios firmware.elf -kernel kernel.bin
+> Ideally `-kernel kernel.bin` be the same except using default firmware, b=
+ut I don't know if QEMU would be willing to deprecate the current syntax to=
+ allow it
+>
+> For now, it is probably too early to add default firmware (but perhaps no=
+t?) which would leave only the firmware only and firmware + kernel variants=
+. What do other people think about this?
 
-** This bug has been marked a duplicate of bug 1805256
-   qemu-img hangs on high core count ARM system
+I generally agree with what you are saying. I know that x86 includes
+seabios (although I'm not sure how) and maybe that is something we can
+look at. There is now a default RISC-V firmware which would be useful
+to include so that users can just boot their kernel. We would have to
+make sure it's possible to overwrite this default one so that people
+can test their own.
 
--- =
+The hard part becomes building the firmware as we don't expect people
+to have a RISC-V toolchain installed.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1824053
+I think the best bet here is to look at what x86 does for their BIOS
+and we can start to move towards that.
 
-Title:
-  Qemu-img convert appears to be stuck on aarch64 host with low
-  probability
+Alistair
 
-Status in QEMU:
-  Confirmed
-
-Bug description:
-  Hi,  I found a problem that qemu-img convert appears to be stuck on
-  aarch64 host with low probability.
-
-  The convert command  line is  "qemu-img convert -f qcow2 -O raw
-  disk.qcow2 disk.raw ".
-
-  The bt is below:
-
-  Thread 2 (Thread 0x40000b776e50 (LWP 27215)):
-  #0  0x000040000a3f2994 in sigtimedwait () from /lib64/libc.so.6
-  #1  0x000040000a39c60c in sigwait () from /lib64/libpthread.so.0
-  #2  0x0000aaaaaae82610 in sigwait_compat (opaque=3D0xaaaac5163b00) at uti=
-l/compatfd.c:37
-  #3  0x0000aaaaaae85038 in qemu_thread_start (args=3Dargs@entry=3D0xaaaac5=
-163b90) at util/qemu_thread_posix.c:496
-  #4  0x000040000a3918bc in start_thread () from /lib64/libpthread.so.0
-  #5  0x000040000a492b2c in thread_start () from /lib64/libc.so.6
-
-  Thread 1 (Thread 0x40000b573370 (LWP 27214)):
-  #0  0x000040000a489020 in ppoll () from /lib64/libc.so.6
-  #1  0x0000aaaaaadaefc0 in ppoll (__ss=3D0x0, __timeout=3D0x0, __nfds=3D<o=
-ptimized out>, __fds=3D<optimized out>) at /usr/include/bits/poll2.h:77
-  #2  qemu_poll_ns (fds=3D<optimized out>, nfds=3D<optimized out>, timeout=
-=3D<optimized out>) at qemu_timer.c:391
-  #3  0x0000aaaaaadae014 in os_host_main_loop_wait (timeout=3D<optimized ou=
-t>) at main_loop.c:272
-  #4  0x0000aaaaaadae190 in main_loop_wait (nonblocking=3D<optimized out>) =
-at main_loop.c:534
-  #5  0x0000aaaaaad97be0 in convert_do_copy (s=3D0xffffdc32eb48) at qemu-im=
-g.c:1923
-  #6  0x0000aaaaaada2d70 in img_convert (argc=3D<optimized out>, argv=3D<op=
-timized out>) at qemu-img.c:2414
-  #7  0x0000aaaaaad99ac4 in main (argc=3D7, argv=3D<optimized out>) at qemu=
--img.c:5305
-
-  The problem seems to be very similar to the phenomenon described by
-  this patch (https://resources.ovirt.org/pub/ovirt-4.1/src/qemu-kvm-
-  ev/0025-aio_notify-force-main-loop-wakeup-with-SIGIO-aarch64.patch),
-
-  which force main loop wakeup with SIGIO.  But this patch was reverted
-  by the patch (http://ovirt.repo.nfrance.com/src/qemu-kvm-ev/kvm-
-  Revert-aio_notify-force-main-loop-wakeup-with-SIGIO-.patch).
-
-  I can reproduce this problem with qemu.git/matser. It still exists in qem=
-u.git/matser. I found that when an IO return in
-  worker threads and want to call aio_notify to wake up main_loop, but it f=
-ound that ctx->notify_me is cleared to 0 by main_loop in aio_ctx_check by c=
-alling atomic_and(&ctx->notify_me, ~1) . So worker thread won't write enven=
-tfd to notify main_loop. If such a scene happens, the main_loop will hang:
-      main loop                        worker thread1                      =
-   worker thread2
-  -------------------------------------------------------------------------=
------------------       =
-
-       qemu_poll_ns                     aio_worker        =
-
-                                      qemu_bh_schedule(pool->completion_bh)=
-                              =
-
-      glib_pollfds_poll
-      g_main_context_check
-      aio_ctx_check                                                        =
- aio_worker                                                                =
-                                    =
-
-      atomic_and(&ctx->notify_me, ~1)                 qemu_bh_schedule(pool=
-->completion_bh)                          =
-
-                                                                           =
-      =
-
-      /* do something for event */   =
-
-      qemu_poll_ns
-      /* hangs !!!*/
-
-  As we known ,ctx->notify_me will be visited by worker thread and main
-  loop. I thank we should add a lock protection for ctx->notify_me to
-  avoid this happend.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1824053/+subscriptions
+>
+> Jonathan
+>
+> On Mon, May 20, 2019 at 12:56 PM Alistair Francis <alistair23@gmail.com> =
+wrote:
+>>
+>> On Sat, May 18, 2019 at 2:57 PM Jonathan Behrens <jonathan@fintelia.io> =
+wrote:
+>> >
+>> > > I've never been fully convinced of this, why not just use the generi=
+c loader?
+>> >
+>> > If I understand you are proposing passing bbl (or other firmware) with=
+ the -kernel flag, and then vmlinux (or another kernel) with the -initrd fl=
+ag? Wouldn't this result in losing the ability to pass a real init ramdisk =
+to Linux? It also seems to open the possibility for strange bugs/compatibil=
+ity issues later if firmware starts recognizing any "initrd" entries in the=
+ device tree as kernel code to jump into.
+>>
+>> No I mean passing in OpenSBI (or some other boot loader) via the
+>> -kernel option and then passing in the kernel with QEMU's generic
+>> device loader. This is documented as part of the OpenSBI boot flow:
+>> https://github.com/riscv/opensbi/blob/master/docs/platform/qemu_virt.md
+>>
+>> The only disadvantage with that is that we don't get debug symbols
+>> from the kernel, but it does mean that the boot loader in QEMU is much
+>> simpler.
+>>
+>> >
+>> > I do wonder though how compatible the current design is with providing=
+ default firmware for riscv in the future.
+>> >
+>> > > This should be in a generic boot.c file and support added to all RIS=
+C-V boards.
+>> >
+>> > I can do this for v2.
+>>
+>> Thanks
+>>
+>> Alistair
+>>
+>> >
+>> > Jonathan
 
