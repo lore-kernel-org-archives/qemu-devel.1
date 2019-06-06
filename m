@@ -6,65 +6,66 @@ X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5459EC28EB3
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 11:18:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D5A66C28D1E
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 11:18:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2D1E5207E0
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 11:18:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2D1E5207E0
+	by mail.kernel.org (Postfix) with ESMTPS id AC490207E0
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 11:18:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AC490207E0
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:58545 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:58551 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hYqPM-00014T-Ap
-	for qemu-devel@archiver.kernel.org; Thu, 06 Jun 2019 07:18:12 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:60611)
+	id 1hYqPu-0001SQ-03
+	for qemu-devel@archiver.kernel.org; Thu, 06 Jun 2019 07:18:46 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:60804)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hYqFT-0000V3-BG
-	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 07:08:00 -0400
+	(envelope-from <laurent@vivier.eu>) id 1hYqFd-0000d2-E9
+	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 07:08:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hYqFS-0003ks-90
-	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 07:07:59 -0400
-Received: from mout.kundenserver.de ([212.227.17.10]:50607)
+	(envelope-from <laurent@vivier.eu>) id 1hYqFc-00042R-Au
+	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 07:08:09 -0400
+Received: from mout.kundenserver.de ([217.72.192.73]:45529)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <laurent@vivier.eu>)
-	id 1hYqFM-0003Oe-0o; Thu, 06 Jun 2019 07:07:52 -0400
+	id 1hYqFU-0003nF-Ly; Thu, 06 Jun 2019 07:08:00 -0400
 Received: from localhost.localdomain ([78.238.229.36]) by
 	mrelayeu.kundenserver.de (mreue107 [212.227.15.183]) with ESMTPSA
 	(Nemesis)
-	id 1N2VGj-1gYjrl13Wh-013vCt; Thu, 06 Jun 2019 13:06:46 +0200
+	id 1MxVbb-1gbVHP18Jd-00xp3V; Thu, 06 Jun 2019 13:06:58 +0200
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Date: Thu,  6 Jun 2019 13:06:14 +0200
-Message-Id: <20190606110625.32127-6-laurent@vivier.eu>
+Date: Thu,  6 Jun 2019 13:06:21 +0200
+Message-Id: <20190606110625.32127-13-laurent@vivier.eu>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190606110625.32127-1-laurent@vivier.eu>
 References: <20190606110625.32127-1-laurent@vivier.eu>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:mdZyVMDlhLtgzFVkGMKPwhd1vTCTlJ2n6UQbcL+A7mXIwzLbgVv
-	rdWaTvkzh9+ZGkjpPIEnoHOJoofHKJj03PiJSnWzmZUzqRXpOBY3jmF4C+vJZl5cnICB7cQ
-	L7j1xb5jAz4it73StJCFXFaTOJbwctRdg49ymr5t30LvpGOdZYXf6TUgWyYtZ4NUA3WF/i3
-	PFB3LNVa1ATntBhgNggXg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:lGxVdu6POuc=:c8Pj8N5H0zrV72OzuTHYjr
-	HvEThxZQTS39G9ir4HCYdnA/11jd7NfU2ekUEFMs2LPH87iAK/aQcoxTPBaVuvBRA2e7xbn+M
-	A+Dhz9E9JjU8Ly+u8D7P9CesJcnFPStUgdvdhFZWm4HITMM1gXddx3RLjRGo3eqv30Nh8hAOE
-	AQevROoOUgr53j5+TZv/2e425A0rT4KjV+RLjBGlB5L36Nq5bp/9+km5UAw4HtJvYAw2uvfYy
-	6Eb1QcFpWXBx3fosHlLdbiJpki7xj0CdfudtCd9f4wKfFnwIQyyISNeUB38zCmTfDlL89YoRo
-	72xZeDkiDORNcx/rW6EoHNAlkLZqEC7czmmo+ah/1ksqBYf69uuwgautN0at4fJtu8CI9/dAP
-	qfApkM4XCf0s+qJ8514u4xAGK0k1taB6cFBViwyVW997GnTVXg+TGEfWHJbWyqP6eVB6HsQ6i
-	MGzvxhkmrSLcmfGO4WNefexyU4sEabxATw+6LImE1Ff7/2a0eQGpAeKqM2lxxy1ICBWDe/tRN
-	htjEx1O/AhrsL1Qmf35pqRERYdZPlYJRLFz43WIpaDzObwEiB4x2j36HmAt6UdcE8RzeVIqk6
-	/7mkNzzk+aEgQ9a7k1G4YnRaGsV7068KeylLJFPzWAyy1RSUqe+MhLdRV+BEf9XDGukK99tPW
-	PrhGBgfsD9zRLt2wqcxudQvNaOmWVI+UU8TmCtGhf/gVMfqEY6NYvMihUaqPd9mKHbtHgC5I0
-	9xE614xtHBAUHPL7256GZLupxYmcWXuUR5ZkeXI1Qze5RIgg6WGIFD0YI4Y=
+X-Provags-ID: V03:K1:tp+rYBTeSmojRMJaBdyBwiM6HZA7HXAoWJTNrbm/XbfsIZGyr5c
+	bFYNMuwa8UFRYcuI0xeaWvVMG6ikGk+Tabzw/180r2IsFGYPc9kGQnqkFYJr3vvoCyA2Hmc
+	O/SFmaoC+qo6bhpQJNqtzbQI16lQV2XRXTH8vDtSVLfm/gsHc9Oa1EXXSd9Ac/+2w6KOU9R
+	AfXaqJjyRtyWkTYfZ0EpA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:UNc6Ohb4JzQ=:yLxa3ypR43F8VyTpKGx8Hz
+	dDldjE5xQnZPw0Fr9CbW6skDAsDFZckP05CZoGNm0A4B8DhI0oW/K2uj3y9TPCkto3sFLTJFS
+	24vU6c/aVrik6hAec0EUbP/npG2hpttLjzrSiiEFLPgIsHSZz9tnLEq02Fyi9+AC7LamlgL8w
+	iYMjNI43aEaHJ690EAWQXeU5zaUrH/rPh8XGxcPm+imaw1jFf8q2nckH1SHg6dbbdLaoBZfHh
+	raxNvD1/YvwTtFk79ElS5PvIasEI/XlL3NvxqhLVNICsHwmX+bKnS6xx1/n4mqLBuDNTwUwWT
+	eO9ZzAAwJxsk4lYdR17r2CwM2zaZVB+gmHOA8axs1Q9kcYPEgAh6bExU6aH9olCJnorA+x8OD
+	atycWsH7UsSvMRv2mFd3SzQwOMGeH+VBj8jKgWjfcnLYfepxvXg2I+brl/ACHigfLFw8mnhSk
+	8fRxLEdVDchrQbNAFWN4DM3oxjyq5icy4GUGf3LFQHU5LvB/wh/F+uI0iHDJeDuhTQWLCu64c
+	U+emYNHRcolYJqumF2AMK4cfkW6aN/Z1KZO609s0n83x3fKKTlRIpP/r6oRnK48EprgWAOSzr
+	/XWF5gcQ+rVeNoJuYU+Xo6oICNNhtI63eVVNBsnoqNDdDasPDsid1Aerdg1AFmsKWKdiKVpih
+	K5CKbsDT0WnkHrQb32/08g7WX3ru4WlJsqinxgIU4Vk6ZDsGJUjpU8x6AXyAFrxkvLIthpqc/
+	azZ7K1eMvzsAYX+1Wlv5lprGNq8rRlSBYbfwZVli2gl4bmmNhDp1jMFldDs=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.17.10
-Subject: [Qemu-devel] [PULL 05/16] test: Fix make target check-report.tap
+X-Received-From: 217.72.192.73
+Subject: [Qemu-devel] [PULL 12/16] hw/vfio/pci: Use the QOM DEVICE() macro
+ to access DeviceState.qdev
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -76,12 +77,12 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Dmitry Fleytman <dmitry.fleytman@gmail.com>,
+Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
+	Dmitry Fleytman <dmitry.fleytman@gmail.com>,
 	David Hildenbrand <david@redhat.com>, Michael Tokarev <mjt@tls.msk.ru>,
 	Gerd Hoffmann <kraxel@redhat.com>, Juan Quintela <quintela@redhat.com>,
 	Aleksandar Rikalo <arikalo@wavecomp.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Markus Armbruster <armbru@redhat.com>, Halil Pasic <pasic@linux.ibm.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>, Halil Pasic <pasic@linux.ibm.com>,
 	Christian Borntraeger <borntraeger@de.ibm.com>,
 	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
 	"Dr. David Alan Gilbert" <dgilbert@redhat.com>,
@@ -98,35 +99,52 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Markus Armbruster <armbru@redhat.com>
+From: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-Fix a fat-fingered invocation of tap-merge.pl in the recipe of target
-check-report.tap.
+Rather than looking inside the definition of a DeviceState with
+"s->qdev", use the QOM prefered style: "DEVICE(s)".
 
-Fixes: 9df43317b82 "test: replace gtester with a TAP driver"
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-Id: <20190604080010.23186-1-armbru@redhat.com>
+This patch was generated using the following Coccinelle script:
+
+    // Use DEVICE() macros to access DeviceState.qdev
+    @use_device_macro_to_access_qdev@
+    expression obj;
+    identifier dev;
+    @@
+    -&obj->dev.qdev
+    +DEVICE(obj)
+
+Suggested-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Acked-by: Alex Williamson <alex.williamson@redhat.com>
+Message-Id: <20190528164020.32250-10-philmd@redhat.com>
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- tests/Makefile.include | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ hw/vfio/pci.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 46a36c2c9527..34df040583dc 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -904,7 +904,7 @@ check-report-unit.tap: $(check-unit-y)
- # Reports and overall runs
+diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+index 8e555db12ec0..2a4091d216e2 100644
+--- a/hw/vfio/pci.c
++++ b/hw/vfio/pci.c
+@@ -2717,7 +2717,7 @@ static void vfio_req_notifier_handler(void *opaque)
+         return;
+     }
  
- check-report.tap: $(patsubst %,check-report-qtest-%.tap, $(QTEST_TARGETS)) check-report-unit.tap
--	$(call quiet-command,./scripts/tap-merge.py $^ > $@,"GEN","$@")
-+	$(call quiet-command, cat $^ | scripts/tap-merge.pl >$@,"GEN","$@")
+-    qdev_unplug(&vdev->pdev.qdev, &err);
++    qdev_unplug(DEVICE(vdev), &err);
+     if (err) {
+         warn_reportf_err(err, VFIO_MSG_PREFIX, vdev->vbasedev.name);
+     }
+@@ -2839,7 +2839,7 @@ static void vfio_realize(PCIDevice *pdev, Error **errp)
+     vdev->vbasedev.name = g_path_get_basename(vdev->vbasedev.sysfsdev);
+     vdev->vbasedev.ops = &vfio_pci_ops;
+     vdev->vbasedev.type = VFIO_DEVICE_TYPE_PCI;
+-    vdev->vbasedev.dev = &vdev->pdev.qdev;
++    vdev->vbasedev.dev = DEVICE(vdev);
  
- # FPU Emulation tests (aka softfloat)
- #
+     tmp = g_strdup_printf("%s/iommu_group", vdev->vbasedev.sysfsdev);
+     len = readlink(tmp, group_path, sizeof(group_path));
 -- 
 2.21.0
 
