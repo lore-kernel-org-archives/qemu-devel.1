@@ -6,55 +6,55 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CBE0FC28CC5
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 03:25:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D152C28CC5
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 03:33:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 91DEE20866
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 03:25:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 91DEE20866
+	by mail.kernel.org (Postfix) with ESMTPS id 1B1A720866
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 03:33:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1B1A720866
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:53747 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:53818 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hYj1j-00086H-JB
-	for qemu-devel@archiver.kernel.org; Wed, 05 Jun 2019 23:25:19 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:58924)
+	id 1hYj9b-0001VK-Qa
+	for qemu-devel@archiver.kernel.org; Wed, 05 Jun 2019 23:33:27 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:60046)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1hYj0v-0007n8-Ne
-	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 23:24:31 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1hYj8T-000175-Hm
+	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 23:32:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1hYj0u-0002Jq-4k
-	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 23:24:29 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49872)
+	(envelope-from <ehabkost@redhat.com>) id 1hYj8S-0004ci-6K
+	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 23:32:17 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59894)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hYj0s-0002IU-5P
-	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 23:24:28 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
-	[10.5.11.23])
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hYj8R-0004b7-U0
+	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 23:32:16 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E576936893;
-	Thu,  6 Jun 2019 03:24:22 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 13ADC5D619;
+	Thu,  6 Jun 2019 03:32:14 +0000 (UTC)
 Received: from localhost (ovpn-116-9.gru2.redhat.com [10.97.116.9])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 5A0002E02B;
-	Thu,  6 Jun 2019 03:24:20 +0000 (UTC)
-Date: Thu, 6 Jun 2019 00:24:18 -0300
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 69664183AE;
+	Thu,  6 Jun 2019 03:32:13 +0000 (UTC)
+Date: Thu, 6 Jun 2019 00:32:11 -0300
 From: Eduardo Habkost <ehabkost@redhat.com>
 To: Like Xu <like.xu@linux.intel.com>
-Message-ID: <20190606032418.GV22416@habkost.net>
+Message-ID: <20190606033211.GW22416@habkost.net>
 References: <20190520165056.175475-1-like.xu@linux.intel.com>
 	<20190520165056.175475-2-like.xu@linux.intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <20190520165056.175475-2-like.xu@linux.intel.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.30]);
-	Thu, 06 Jun 2019 03:24:24 +0000 (UTC)
+	(mx1.redhat.com [10.5.110.39]);
+	Thu, 06 Jun 2019 03:32:14 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
 Subject: Re: [Qemu-devel] [PATCH v2 1/5] target/i386: Add cpu die-level
@@ -156,6 +156,9 @@ On Tue, May 21, 2019 at 12:50:52AM +0800, Like Xu wrote:
 >  typedef struct X86CPUTopoInfo {
 >      unsigned pkg_id;
 > +    unsigned die_id;
+
+Isn't it better to add this field only on patch 4/5?
+
 >      unsigned core_id;
 >      unsigned smt_id;
 >  } X86CPUTopoInfo;
@@ -164,6 +167,13 @@ On Tue, May 21, 2019 at 12:50:52AM +0800, Like Xu wrote:
 >                     ~(0xFFFFFFFFUL << apicid_core_width(nr_cores, nr_threads));
 >      topo->pkg_id = apicid >> apicid_pkg_offset(nr_cores, nr_threads);
 > +    topo->die_id = -1;
+
+Why are you setting die_id = -1 here?
+
+If die_id isn't valid yet, isn't it better to keep has_die_id =
+false at pc_possible_cpu_arch_ids() above, and set has_die_id =
+true only on patch 4/5?
+
 >  }
 >  
 >  /* Make APIC ID for the CPU 'cpu_index'
@@ -202,10 +212,6 @@ On Tue, May 21, 2019 at 12:50:52AM +0800, Like Xu wrote:
 >  #include "hw/i386/apic_internal.h"
 >  #include "hw/boards.h"
 > +#include "hw/i386/pc.h"
-
-Now we have a circular dependency between target/i386/cpu.c and
-hw/i386/pc.c.
-
 >  #endif
 >  
 >  #include "disas/capstone.h"
@@ -219,12 +225,6 @@ hw/i386/pc.c.
 > +        object_dynamic_cast(OBJECT(machine), TYPE_PC_MACHINE);
 >  
 > +    env->nr_dies = pcms ? pcms->smp_dies : 1;
-
-If this is PC-specific, the best place to do it is probably
-pc_new_cpu() and pc_cpu_pre_plug().  x86_cpu_initfn() could just
-set nr_dies=1 by default.
-
-
 > +#endif
 >      cs->env_ptr = env;
 >  
