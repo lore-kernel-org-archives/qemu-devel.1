@@ -3,42 +3,42 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 75D0CC28D1E
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 09:56:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BB79C28D1E
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 09:57:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F30D92083E
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 09:56:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F30D92083E
+	by mail.kernel.org (Postfix) with ESMTPS id 953892083E
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 09:57:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 953892083E
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:57522 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:57537 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hYp7p-0003s9-2e
-	for qemu-devel@archiver.kernel.org; Thu, 06 Jun 2019 05:56:01 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:45375)
+	id 1hYp8v-0004fD-OP
+	for qemu-devel@archiver.kernel.org; Thu, 06 Jun 2019 05:57:09 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:45700)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hYp6w-0003LR-M6
-	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 05:55:07 -0400
+	(envelope-from <laurent@vivier.eu>) id 1hYp81-00045X-1N
+	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 05:56:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hYp6v-0001wn-Hf
-	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 05:55:06 -0400
-Received: from mout.kundenserver.de ([212.227.126.187]:42881)
+	(envelope-from <laurent@vivier.eu>) id 1hYp7z-00050V-P7
+	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 05:56:12 -0400
+Received: from mout.kundenserver.de ([212.227.126.130]:50545)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <laurent@vivier.eu>)
-	id 1hYp6q-0001fa-Mg; Thu, 06 Jun 2019 05:55:00 -0400
+	id 1hYp7t-0003wT-2S; Thu, 06 Jun 2019 05:56:07 -0400
 Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
-	(mreue009 [213.165.67.103]) with ESMTPSA (Nemesis) id
-	1N6srH-1gUL9L1tbr-018OQU; Thu, 06 Jun 2019 11:54:32 +0200
+	(mreue011 [213.165.67.103]) with ESMTPSA (Nemesis) id
+	1Mn2Fb-1gsa5P26lz-00k77Y; Thu, 06 Jun 2019 11:55:20 +0200
 To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
 	qemu-devel@nongnu.org, qemu-trivial@nongnu.org
 References: <20190528164020.32250-1-philmd@redhat.com>
-	<20190528164020.32250-3-philmd@redhat.com>
+	<20190528164020.32250-11-philmd@redhat.com>
 From: Laurent Vivier <laurent@vivier.eu>
 Openpgp: preference=signencrypt
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
@@ -83,35 +83,35 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
 	OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
 	JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
 	ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <bc27395d-e3b6-b2c6-17f2-7cbfc82a3498@vivier.eu>
-Date: Thu, 6 Jun 2019 11:54:27 +0200
+Message-ID: <be04bd5f-5f7f-5f92-568d-ef0004b851f3@vivier.eu>
+Date: Thu, 6 Jun 2019 11:55:18 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <20190528164020.32250-3-philmd@redhat.com>
+In-Reply-To: <20190528164020.32250-11-philmd@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:32l68PyGqgumeMJOnmhh5/nn6XfrZywbLGHDfNpgvVYdfc7+b8T
-	yFFy7fePY0yJzcutG2D9C+Jyc1Xys7O68neCfj4++eGmWUdUffwpOnztDzhc0awnHNi4/+n
-	KqS2RnsfXpaUbNEtXLuT0GVqu8kIRYA4dOmqTGzqpDdP23DcBGEKNe6wnpdjEUHiJyTKl9K
-	v6/GZTvFyF1aLTprXJKLA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:gdxgAGouVqQ=:/rHYq0WA9XFfRPhUJPb1NS
-	kgTXJdRcHo8rnXAjK+TM9MJpnl5ypQjZgTUD265zuUkK+w4zRVNhuwB+SqN79nH1oJFHhrMJq
-	3KgtNUV0zIlE2RVZIlRL2taraosRQkyQwl3ov3PBGZiA0pTdYuEGWpq1+cDaxvLFd6mX4yD3B
-	0petpEdLkqsN/HtOCccm8Ugy9yDsSEUHzUr24jYy2fgIMtzU6/DYISIzD/QCeXBFujcWKehjI
-	598CtymccNY3mUWF/JfYgjyTcg7RGKTBqYS2rMwvOtISc25rMeegDR8oNAdGVlBnOhCLF5QXF
-	wytY+UkP/AfySz+EX1yHUpQOopHW0+ZfBdzjJxbJ9IDrtFDeGnFbAB1ibAHxvB510Gad3Dz2E
-	4ybotL3gYBBGxSA5mdonYhnh552czic0/gQOzu6YDcFRRlwHlFAT8RWsmZo+fb4lu5tmD3S3V
-	j5UPYg16xywd8JOremEcc8TY/WHmkkqBJ4jSh+zx3pMwu6yBXBrbjjzFtnJhSLVcx5lyAWgt5
-	nnJtwdxjHZCIAWbD0BEBnk4u6AuQwWS4XMSlwcv0vctcw7C3WjOKRJjijvpiL0LsQWoSvkkR0
-	XA8buPI+s2UaSc3qchdMQlRFgIqk4tfAhGZ4SJjePhGrQ4tAhv8y+KhX4LzC62eRsm67XwSbU
-	NFfBaR5BxMNG9MZtgICm3iHFWC/v2H4ZKbOsm3nm6hjqO1bgQlNrYQUgysLEu4YqAOYbIGH0f
-	9wCiFMS7aqqlsXnOkwAyrxxNFK8gF90V1mG3hWu3PhvCB+VaTbdQCIWkSP8=
+X-Provags-ID: V03:K1:hkdlBuRzfNqot/E2JQ0Th2203OYjHukkX1dMwkosNUkVNxUjAAj
+	HcM7zgw/DKvQzgX7D8CqIxCK2OdZMbzmtSu1fXIBsUcBta8bEMN3421FfsvdiEhsOFoSDd3
+	3lAgIuXUri28wyCIE2DSap0AlEbR2ymjAbz8Hvh2yCTuh+3S0nSxPi1ZhT+631foOI6vMNl
+	3xLpl3ZAqwLpBfonSXElg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:xmZzg3i0GO8=:CQziJmmzeVMVVOwrn7MpFE
+	4QlxxGMcqmdfhmCoe3cfCaOm99UzBLVIJepTQOkekaThJ7EJH3nAqBkE2B4Seoyv3B+NaVRPr
+	OEItNRrep5cFJkVWqElN5MdXkA+DZ59UnbhoRFdo4da3ks0jt8TgbTJf1U2WdntCevjsnvs2T
+	xU5FfMjW14UkC9nmSEzMaWALvXHs1A1idukcQtomvB92Wi5RYN/E1hZHmhMR3eoZ1We0ONFTF
+	GKlLCcb/s8Npu+ZaSM4fD3sIBbEWne/aSMYZ/hirwmWgewJHozdjr9OQpa6wEakhXtoZ0WgVl
+	jW1CJb9UPNjDe5fWL+Y8r3V4rc2zqpwRsJcD2uy3HfZsKIwSXWv4bfKgFzQzI0PEqOPepJZjZ
+	D4zC+LxiOeZJPlSnYmNakIXFe4shcPGWm0VgfdCw23mdJzVLifH7eCyMxhawWxKy/lNZQVbSd
+	bOQ4X4JLmCFBUYspeSxYIJwFK7zoQbzSNhQxWerGvCWZeRl1VYg4bjeB8FyoUQPml8n49YRe2
+	p6/dQ9BwwAOJ4NOX37EHvKViYeCpY2empm/2BmpfJFPvLsSVbBzNCz1SN5GSaARi5Hm08zYQr
+	94cn0jH+4UTleKpwxzIRQftMdrQKSx84As+dO7v2BoDXkv3WkybCREzZKgj71mcaDFd32Hibd
+	v2hX5Fd02qa/1n/ng6Z5t6fqfdNIF5rE/DjpL5YX+69UDAQ5R1Z46unuIXTjYuZsZ/WuYnHL5
+	59+NvDraYsre6hguc04pKSVTnxKZVEETEpvs/bmoH+cn2MmhHohu4lg9Nuc=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.126.187
-Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH v2 02/10] hw/scsi: Use the
- QOM BUS() macro to access BusState.qbus
+X-Received-From: 212.227.126.130
+Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH v2 10/10]
+ hw/watchdog/wdt_i6300esb: Use DEVICE() macro to access DeviceState.qdev
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -142,75 +142,38 @@ Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 Le 28/05/2019 à 18:40, Philippe Mathieu-Daudé a écrit :
-> Rather than looking inside the definition of a BusState with "s->bus.qbus",
-> use the QOM prefered style: "BUS(&s->bus)".
+> Rather than looking inside the definition of a DeviceState with
+> "s->qdev", use the QOM prefered style: "DEVICE(s)".
 > 
 > This patch was generated using the following Coccinelle script:
 > 
->     // Use BUS() macros to access BusState.qbus
->     @use_bus_macro_to_access_qbus@
+>     // Use DEVICE() macros to access DeviceState.qdev
+>     @use_device_macro_to_access_qdev@
 >     expression obj;
->     identifier bus;
+>     identifier dev;
 >     @@
->     -&obj->bus.qbus
->     +BUS(&obj->bus)
+>     -&obj->dev.qdev
+>     +DEVICE(obj)
 > 
 > Suggested-by: Peter Maydell <peter.maydell@linaro.org>
 > Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 > ---
->  hw/scsi/lsi53c895a.c  | 2 +-
->  hw/scsi/mptsas.c      | 4 ++--
->  hw/scsi/virtio-scsi.c | 2 +-
->  3 files changed, 4 insertions(+), 4 deletions(-)
+>  hw/watchdog/wdt_i6300esb.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> diff --git a/hw/scsi/lsi53c895a.c b/hw/scsi/lsi53c895a.c
-> index da7239d94f..a8b7a199f9 100644
-> --- a/hw/scsi/lsi53c895a.c
-> +++ b/hw/scsi/lsi53c895a.c
-> @@ -1860,7 +1860,7 @@ static void lsi_reg_writeb(LSIState *s, int offset, uint8_t val)
+> diff --git a/hw/watchdog/wdt_i6300esb.c b/hw/watchdog/wdt_i6300esb.c
+> index 1c6eddf86a..f2d1e86526 100644
+> --- a/hw/watchdog/wdt_i6300esb.c
+> +++ b/hw/watchdog/wdt_i6300esb.c
+> @@ -200,7 +200,7 @@ static void i6300esb_timer_expired(void *vp)
+>          if (d->reboot_enabled) {
+>              d->previous_reboot_flag = 1;
+>              watchdog_perform_action(); /* This reboots, exits, etc */
+> -            i6300esb_reset(&d->dev.qdev);
+> +            i6300esb_reset(DEVICE(d));
 >          }
->          if (val & LSI_SCNTL1_RST) {
->              if (!(s->sstat0 & LSI_SSTAT0_RST)) {
-> -                qbus_reset_all(&s->bus.qbus);
-> +                qbus_reset_all(BUS(&s->bus));
->                  s->sstat0 |= LSI_SSTAT0_RST;
->                  lsi_script_scsi_interrupt(s, LSI_SIST0_RST, 0);
->              }
-> diff --git a/hw/scsi/mptsas.c b/hw/scsi/mptsas.c
-> index 929404fb48..e800683e91 100644
-> --- a/hw/scsi/mptsas.c
-> +++ b/hw/scsi/mptsas.c
-> @@ -540,7 +540,7 @@ reply_maybe_async:
->          break;
 >  
->      case MPI_SCSITASKMGMT_TASKTYPE_RESET_BUS:
-> -        qbus_reset_all(&s->bus.qbus);
-> +        qbus_reset_all(BUS(&s->bus));
->          break;
->  
->      default:
-> @@ -803,7 +803,7 @@ static void mptsas_soft_reset(MPTSASState *s)
->      s->intr_mask = MPI_HIM_DIM | MPI_HIM_RIM;
->      mptsas_update_interrupt(s);
->  
-> -    qbus_reset_all(&s->bus.qbus);
-> +    qbus_reset_all(BUS(&s->bus));
->      s->intr_status = 0;
->      s->intr_mask = save_mask;
->  
-> diff --git a/hw/scsi/virtio-scsi.c b/hw/scsi/virtio-scsi.c
-> index 839f120256..2a71b78e22 100644
-> --- a/hw/scsi/virtio-scsi.c
-> +++ b/hw/scsi/virtio-scsi.c
-> @@ -696,7 +696,7 @@ static void virtio_scsi_reset(VirtIODevice *vdev)
->  
->      assert(!s->dataplane_started);
->      s->resetting++;
-> -    qbus_reset_all(&s->bus.qbus);
-> +    qbus_reset_all(BUS(&s->bus));
->      s->resetting--;
->  
->      vs->sense_size = VIRTIO_SCSI_SENSE_DEFAULT_SIZE;
+>          /* In "free running mode" we start stage 1 again. */
 > 
 
 Applied to my trivial-patches branch.
