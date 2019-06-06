@@ -7,73 +7,73 @@ X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 782A0C04AB5
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 18:09:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 034D1C04AB5
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 18:10:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3CB602083D
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 18:09:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BA7AE2083D
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 18:10:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="FVkdeOsg"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3CB602083D
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="cOSoUsYM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BA7AE2083D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:36260 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:36291 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hYwpd-0001Vf-C2
-	for qemu-devel@archiver.kernel.org; Thu, 06 Jun 2019 14:09:45 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:45054)
+	id 1hYwqT-0002iP-Vj
+	for qemu-devel@archiver.kernel.org; Thu, 06 Jun 2019 14:10:38 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:44972)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hYwUB-0004bC-Ve
-	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 13:47:42 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1hYwU9-0004XV-Ko
+	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 13:47:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hYwU7-0004By-Aa
-	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 13:47:35 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:42582)
+	(envelope-from <peter.maydell@linaro.org>) id 1hYwU6-0004B3-V8
+	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 13:47:33 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:37181)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hYwU6-0003Hr-QE
-	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 13:47:31 -0400
-Received: by mail-wr1-x442.google.com with SMTP id x17so3323621wrl.9
-	for <qemu-devel@nongnu.org>; Thu, 06 Jun 2019 10:46:49 -0700 (PDT)
+	id 1hYwU6-0003Jm-Jv
+	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 13:47:30 -0400
+Received: by mail-wr1-x444.google.com with SMTP id v14so3347080wrr.4
+	for <qemu-devel@nongnu.org>; Thu, 06 Jun 2019 10:46:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
 	h=from:to:cc:subject:date:message-id:in-reply-to:references
 	:mime-version:content-transfer-encoding;
-	bh=Nhyme5lhykh5XVXz5eoRB8o/u66NAipPBCokmUZB+qw=;
-	b=FVkdeOsgjI6pu6E83Ue8VNDuvwldZ7TXUaWm/20n1q7nQE2Db478VLZM3u8AdyTYTa
-	sdmlb6AM0NV/Kon6yiTLu2rQuweW5a65d0vT3wkEurPm7UCsza7HEJsGhFb7f/ZR0d5u
-	P6XkBvKMhdUWV87mFY5RxzvhfrvrMV2mQiBXzqxcK9DiaWK2u5UBDNbvCRy0GLaNH8LP
-	Q3ggseLdoggALLa84NcZfHvIgupb/4kJhsLa9jNKN9mNbXNwFyzLmwBSeTufNN5w5iEG
-	/M2uX7ZzCr+fRriT82h/HoN4rjwVCgTbnfDQNww8JIQwIRklu9hXGI0nZ5WaJN1mA+7i
-	uX+g==
+	bh=46/bfSh4qTs1HLqCmXNVzF6OG+uw62+U38VNlBMJ2qI=;
+	b=cOSoUsYM+G2KfYZGf4O4+ZCJ0BrLVsGeHhwA7/LaH9nT2CjN81UD++uN+YUsy1IrKG
+	/zgWsHljek2DtOL+8qspdf7ZL8G7qSyQIGJsuzcdUVhdl4TY9FCMcu7MQQd75VngW0L2
+	oMxhW8O841JZf5ydfZghNxx6+YCAPLKg3WBIuYAueYShWppk0RpHXRlQYuudKBHN2wcd
+	JEn9h5V4c8hTOlssDbCFwQHdvtOzGmpzNPDyXnYxoBc3Bh6ppjxDfOM7R/fHns8Ip7Ex
+	uEYxeH8ZFLG1OcniK+gqLYCc2YIBDTSOP7kQ5QGBNPiQs/Ajd+B3IEDT8pE2dFMeUnDp
+	2RTg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
 	:references:mime-version:content-transfer-encoding;
-	bh=Nhyme5lhykh5XVXz5eoRB8o/u66NAipPBCokmUZB+qw=;
-	b=SUA9QzPrKC3kXXgXbuOLKDOGNo12q0OUtxaWNB14NhSgnj3ukU6CI6GFERybnFHQAS
-	+2IPbewqN472Sm9mW7dkskIsOufFGGmhY58QttlDEcesT/u13gCmHxBuj4kzc9D55BpS
-	3qTACmeYUk7KfkA4F16Iuu93xkGhmamLgUBpKkPieDR51E+zn1w0IO3rP+n/aXaaqfDi
-	WviFb+hHRIrwkL+CuABor3jkM9RMLp5ilGJx1v16QvE+lW3JfrFtfIOLRWGzq1snPf9o
-	0jwJf6ctyQyvbhfs3CDJkW8z1z9GiWf6keL3SXR5EIS3gfxkuEnr1AivzH/UANRgBpEq
-	F7Fg==
-X-Gm-Message-State: APjAAAXEAgVjh/gERQlArGu/uhE6DvGjdj0QplRbBvybUO+mpdvHbP5R
-	D2Dm8wJLhxE0pO94xdAOWx8p7w==
-X-Google-Smtp-Source: APXvYqwMau5Croc+2cvwcZ1iXUfJYAkgRnhHjOm1Beo5Eh9xwJSTWNuxTgSGzGfrVHU03TP4tl92yg==
-X-Received: by 2002:adf:a11d:: with SMTP id o29mr2087317wro.262.1559843209136; 
-	Thu, 06 Jun 2019 10:46:49 -0700 (PDT)
+	bh=46/bfSh4qTs1HLqCmXNVzF6OG+uw62+U38VNlBMJ2qI=;
+	b=YgFoGtDqzo65DUKU80+AQvy1qPW+sEA5ANq9T9MbUe2DGnWZN4oSP++yu0EdejRiFb
+	zrhUtGrCgwXQgIQAUpEPU16kGhnU/XMf1Et2SH6TbJRuttzFHzoT9cdumsiIWR4V4BIn
+	W6yb1/4As4PLw+k7rG78XNzu1zgmzgq9XLSmmiFFa7tTNkK/SL88rO+Y0iaECN61zYmK
+	WlH/7iXL670jxCSycPEP2uyF/h5us7G6FR3i69t5ikqasQ73IYkOEd1tqlYtxgCWBvN6
+	fccsk2K66hlRnVQLBc0kcEAQxRd2y8GUQhXuPRtFQGr6dlhSe1PF2Qk/edP1L0HavV80
+	50Vg==
+X-Gm-Message-State: APjAAAUxuzxw9/aPo73a5jnwBy/Q5JLpFyEAX4kjmXR4RWpAa/eprFSq
+	amNwI01TlMPseV+rfbZV/elyDg==
+X-Google-Smtp-Source: APXvYqwRJgtSe5qWJ4fapndd9iXgRDGdj4jGQGZAnQhvzZKjCCza7ubmMiApDf4gtqoCiIgSOXvNpA==
+X-Received: by 2002:a5d:4a0b:: with SMTP id m11mr21176615wrq.251.1559843211397;
+	Thu, 06 Jun 2019 10:46:51 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
 	by smtp.gmail.com with ESMTPSA id
-	z135sm2596784wmc.45.2019.06.06.10.46.48
+	z135sm2596784wmc.45.2019.06.06.10.46.50
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Thu, 06 Jun 2019 10:46:48 -0700 (PDT)
+	Thu, 06 Jun 2019 10:46:50 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-arm@nongnu.org,
 	qemu-devel@nongnu.org
-Date: Thu,  6 Jun 2019 18:46:01 +0100
-Message-Id: <20190606174609.20487-35-peter.maydell@linaro.org>
+Date: Thu,  6 Jun 2019 18:46:03 +0100
+Message-Id: <20190606174609.20487-37-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190606174609.20487-1-peter.maydell@linaro.org>
 References: <20190606174609.20487-1-peter.maydell@linaro.org>
@@ -81,9 +81,9 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2a00:1450:4864:20::442
-Subject: [Qemu-devel] [PATCH 34/42] target/arm: Convert the VCVT-from-f16
- insns to decodetree
+X-Received-From: 2a00:1450:4864:20::444
+Subject: [Qemu-devel] [PATCH 36/42] target/arm: Convert VFP round insns to
+ decodetree
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -100,65 +100,35 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Convert the VCVTT, VCVTB instructions that deal with conversion
-from half-precision floats to f32 or 64 to decodetree.
+Convert the VFP round-to-integer instructions VRINTR, VRINTZ and
+VRINTX to decodetree.
 
-Since we're no longer constrained to the old decoder's style
-using cpu_F0s and cpu_F0d we can perform a direct 16 bit
-load of the right half of the input single-precision register
-rather than loading the full 32 bits and then doing a
-separate shift or sign-extension.
+These instructions were only introduced as part of the "VFP misc"
+additions in v8A, so we check this. The old decoder's implementation
+was incorrectly providing them even for v7A CPUs.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- target/arm/translate-vfp.inc.c | 82 ++++++++++++++++++++++++++++++++++
- target/arm/translate.c         | 56 +----------------------
- target/arm/vfp.decode          |  6 +++
- 3 files changed, 89 insertions(+), 55 deletions(-)
+ target/arm/translate-vfp.inc.c | 163 +++++++++++++++++++++++++++++++++
+ target/arm/translate.c         |  45 +--------
+ target/arm/vfp.decode          |  15 +++
+ 3 files changed, 179 insertions(+), 44 deletions(-)
 
 diff --git a/target/arm/translate-vfp.inc.c b/target/arm/translate-vfp.inc.c
-index 872b01621cc..3ad93cc48f4 100644
+index d2ae148ca69..5768be40c3e 100644
 --- a/target/arm/translate-vfp.inc.c
 +++ b/target/arm/translate-vfp.inc.c
-@@ -30,6 +30,26 @@
- #include "decode-vfp.inc.c"
- #include "decode-vfp-uncond.inc.c"
- 
-+/*
-+ * Return the offset of a 16-bit half of the specified VFP single-precision
-+ * register. If top is true, returns the top 16 bits; otherwise the bottom
-+ * 16 bits.
-+ */
-+static inline long vfp_f16_offset(unsigned reg, bool top)
-+{
-+    long offs = vfp_reg_offset(false, reg);
-+#ifdef HOST_WORDS_BIGENDIAN
-+    if (!top) {
-+        offs += 2;
-+    }
-+#else
-+    if (top) {
-+        offs += 2;
-+    }
-+#endif
-+    return offs;
-+}
-+
- /*
-  * Check that VFP access is enabled. If it is, do the necessary
-  * M-profile lazy-FP handling and then return true.
-@@ -2005,3 +2025,65 @@ static bool trans_VCMP_dp(DisasContext *s, arg_VCMP_dp *a)
-     }
+@@ -2149,3 +2149,166 @@ static bool trans_VCVT_f16_f64(DisasContext *s, arg_VCVT_f16_f64 *a)
+     tcg_temp_free_i32(tmp);
      return true;
  }
 +
-+static bool trans_VCVT_f32_f16(DisasContext *s, arg_VCVT_f32_f16 *a)
++static bool trans_VRINTR_sp(DisasContext *s, arg_VRINTR_sp *a)
 +{
 +    TCGv_ptr fpst;
-+    TCGv_i32 ahp_mode;
 +    TCGv_i32 tmp;
 +
-+    if (!dc_isar_feature(aa32_fp16_spconv, s)) {
++    if (!dc_isar_feature(aa32_vrint, s)) {
 +        return false;
 +    }
 +
@@ -166,32 +136,27 @@ index 872b01621cc..3ad93cc48f4 100644
 +        return true;
 +    }
 +
-+    fpst = get_fpstatus_ptr(false);
-+    ahp_mode = get_ahp_flag();
 +    tmp = tcg_temp_new_i32();
-+    /* The T bit tells us if we want the low or high 16 bits of Vm */
-+    tcg_gen_ld16u_i32(tmp, cpu_env, vfp_f16_offset(a->vm, a->t));
-+    gen_helper_vfp_fcvt_f16_to_f32(tmp, tmp, fpst, ahp_mode);
++    neon_load_reg32(tmp, a->vm);
++    fpst = get_fpstatus_ptr(false);
++    gen_helper_rints(tmp, tmp, fpst);
 +    neon_store_reg32(tmp, a->vd);
-+    tcg_temp_free_i32(ahp_mode);
 +    tcg_temp_free_ptr(fpst);
 +    tcg_temp_free_i32(tmp);
 +    return true;
 +}
 +
-+static bool trans_VCVT_f64_f16(DisasContext *s, arg_VCVT_f64_f16 *a)
++static bool trans_VRINTR_dp(DisasContext *s, arg_VRINTR_sp *a)
 +{
 +    TCGv_ptr fpst;
-+    TCGv_i32 ahp_mode;
-+    TCGv_i32 tmp;
-+    TCGv_i64 vd;
++    TCGv_i64 tmp;
 +
-+    if (!dc_isar_feature(aa32_fp16_dpconv, s)) {
++    if (!dc_isar_feature(aa32_vrint, s)) {
 +        return false;
 +    }
 +
 +    /* UNDEF accesses to D16-D31 if they don't exist. */
-+    if (!dc_isar_feature(aa32_fp_d32, s) && (a->vd  & 0x10)) {
++    if (!dc_isar_feature(aa32_fp_d32, s) && ((a->vd | a->vm) & 0x10)) {
 +        return false;
 +    }
 +
@@ -199,115 +164,220 @@ index 872b01621cc..3ad93cc48f4 100644
 +        return true;
 +    }
 +
++    tmp = tcg_temp_new_i64();
++    neon_load_reg64(tmp, a->vm);
 +    fpst = get_fpstatus_ptr(false);
-+    ahp_mode = get_ahp_flag();
++    gen_helper_rintd(tmp, tmp, fpst);
++    neon_store_reg64(tmp, a->vd);
++    tcg_temp_free_ptr(fpst);
++    tcg_temp_free_i64(tmp);
++    return true;
++}
++
++static bool trans_VRINTZ_sp(DisasContext *s, arg_VRINTZ_sp *a)
++{
++    TCGv_ptr fpst;
++    TCGv_i32 tmp;
++    TCGv_i32 tcg_rmode;
++
++    if (!dc_isar_feature(aa32_vrint, s)) {
++        return false;
++    }
++
++    if (!vfp_access_check(s)) {
++        return true;
++    }
++
 +    tmp = tcg_temp_new_i32();
-+    /* The T bit tells us if we want the low or high 16 bits of Vm */
-+    tcg_gen_ld16u_i32(tmp, cpu_env, vfp_f16_offset(a->vm, a->t));
-+    vd = tcg_temp_new_i64();
-+    gen_helper_vfp_fcvt_f16_to_f64(vd, tmp, fpst, ahp_mode);
-+    neon_store_reg64(vd, a->vd);
-+    tcg_temp_free_i32(ahp_mode);
++    neon_load_reg32(tmp, a->vm);
++    fpst = get_fpstatus_ptr(false);
++    tcg_rmode = tcg_const_i32(float_round_to_zero);
++    gen_helper_set_rmode(tcg_rmode, tcg_rmode, fpst);
++    gen_helper_rints(tmp, tmp, fpst);
++    gen_helper_set_rmode(tcg_rmode, tcg_rmode, fpst);
++    neon_store_reg32(tmp, a->vd);
++    tcg_temp_free_ptr(fpst);
++    tcg_temp_free_i32(tcg_rmode);
++    tcg_temp_free_i32(tmp);
++    return true;
++}
++
++static bool trans_VRINTZ_dp(DisasContext *s, arg_VRINTZ_sp *a)
++{
++    TCGv_ptr fpst;
++    TCGv_i64 tmp;
++    TCGv_i32 tcg_rmode;
++
++    if (!dc_isar_feature(aa32_vrint, s)) {
++        return false;
++    }
++
++    /* UNDEF accesses to D16-D31 if they don't exist. */
++    if (!dc_isar_feature(aa32_fp_d32, s) && ((a->vd | a->vm) & 0x10)) {
++        return false;
++    }
++
++    if (!vfp_access_check(s)) {
++        return true;
++    }
++
++    tmp = tcg_temp_new_i64();
++    neon_load_reg64(tmp, a->vm);
++    fpst = get_fpstatus_ptr(false);
++    tcg_rmode = tcg_const_i32(float_round_to_zero);
++    gen_helper_set_rmode(tcg_rmode, tcg_rmode, fpst);
++    gen_helper_rintd(tmp, tmp, fpst);
++    gen_helper_set_rmode(tcg_rmode, tcg_rmode, fpst);
++    neon_store_reg64(tmp, a->vd);
++    tcg_temp_free_ptr(fpst);
++    tcg_temp_free_i64(tmp);
++    tcg_temp_free_i32(tcg_rmode);
++    return true;
++}
++
++static bool trans_VRINTX_sp(DisasContext *s, arg_VRINTX_sp *a)
++{
++    TCGv_ptr fpst;
++    TCGv_i32 tmp;
++
++    if (!dc_isar_feature(aa32_vrint, s)) {
++        return false;
++    }
++
++    if (!vfp_access_check(s)) {
++        return true;
++    }
++
++    tmp = tcg_temp_new_i32();
++    neon_load_reg32(tmp, a->vm);
++    fpst = get_fpstatus_ptr(false);
++    gen_helper_rints_exact(tmp, tmp, fpst);
++    neon_store_reg32(tmp, a->vd);
 +    tcg_temp_free_ptr(fpst);
 +    tcg_temp_free_i32(tmp);
-+    tcg_temp_free_i64(vd);
++    return true;
++}
++
++static bool trans_VRINTX_dp(DisasContext *s, arg_VRINTX_dp *a)
++{
++    TCGv_ptr fpst;
++    TCGv_i64 tmp;
++
++    if (!dc_isar_feature(aa32_vrint, s)) {
++        return false;
++    }
++
++    /* UNDEF accesses to D16-D31 if they don't exist. */
++    if (!dc_isar_feature(aa32_fp_d32, s) && ((a->vd | a->vm) & 0x10)) {
++        return false;
++    }
++
++    if (!vfp_access_check(s)) {
++        return true;
++    }
++
++    tmp = tcg_temp_new_i64();
++    neon_load_reg64(tmp, a->vm);
++    fpst = get_fpstatus_ptr(false);
++    gen_helper_rintd_exact(tmp, tmp, fpst);
++    neon_store_reg64(tmp, a->vd);
++    tcg_temp_free_ptr(fpst);
++    tcg_temp_free_i64(tmp);
 +    return true;
 +}
 diff --git a/target/arm/translate.c b/target/arm/translate.c
-index 26994e0d427..65e69873654 100644
+index 3edcd7beff3..e7831bf8abb 100644
 --- a/target/arm/translate.c
 +++ b/target/arm/translate.c
-@@ -3066,7 +3066,7 @@ static int disas_vfp_insn(DisasContext *s, uint32_t insn)
+@@ -3050,7 +3050,7 @@ static int disas_vfp_insn(DisasContext *s, uint32_t insn)
                  return 1;
              case 15:
                  switch (rn) {
--                case 0 ... 3:
-+                case 0 ... 5:
-                 case 8 ... 11:
+-                case 0 ... 11:
++                case 0 ... 14:
                      /* Already handled by decodetree */
                      return 1;
-@@ -3080,24 +3080,6 @@ static int disas_vfp_insn(DisasContext *s, uint32_t insn)
+                 default:
+@@ -3063,11 +3063,6 @@ static int disas_vfp_insn(DisasContext *s, uint32_t insn)
              if (op == 15) {
                  /* rn is opcode, encoded as per VFP_SREG_N. */
                  switch (rn) {
--                case 0x04: /* vcvtb.f64.f16, vcvtb.f32.f16 */
--                case 0x05: /* vcvtt.f64.f16, vcvtt.f32.f16 */
--                    /*
--                     * VCVTB, VCVTT: only present with the halfprec extension
--                     * UNPREDICTABLE if bit 8 is set prior to ARMv8
--                     * (we choose to UNDEF)
--                     */
--                    if (dp) {
--                        if (!dc_isar_feature(aa32_fp16_dpconv, s)) {
--                            return 1;
--                        }
--                    } else {
--                        if (!dc_isar_feature(aa32_fp16_spconv, s)) {
--                            return 1;
--                        }
--                    }
--                    rm_is_dp = false;
+-                case 0x0c: /* vrintr */
+-                case 0x0d: /* vrintz */
+-                case 0x0e: /* vrintx */
 -                    break;
-                 case 0x06: /* vcvtb.f16.f32, vcvtb.f16.f64 */
-                 case 0x07: /* vcvtt.f16.f32, vcvtt.f16.f64 */
-                     if (dp) {
-@@ -3239,42 +3221,6 @@ static int disas_vfp_insn(DisasContext *s, uint32_t insn)
+-
+                 case 0x0f: /* vcvt double<->single */
+                     rd_is_dp = !dp;
+                     break;
+@@ -3190,44 +3185,6 @@ static int disas_vfp_insn(DisasContext *s, uint32_t insn)
                  switch (op) {
                  case 15: /* extension space */
                      switch (rn) {
--                    case 4: /* vcvtb.f32.f16, vcvtb.f64.f16 */
+-                    case 12: /* vrintr */
 -                    {
--                        TCGv_ptr fpst = get_fpstatus_ptr(false);
--                        TCGv_i32 ahp_mode = get_ahp_flag();
--                        tmp = gen_vfp_mrs();
--                        tcg_gen_ext16u_i32(tmp, tmp);
+-                        TCGv_ptr fpst = get_fpstatus_ptr(0);
 -                        if (dp) {
--                            gen_helper_vfp_fcvt_f16_to_f64(cpu_F0d, tmp,
--                                                           fpst, ahp_mode);
+-                            gen_helper_rintd(cpu_F0d, cpu_F0d, fpst);
 -                        } else {
--                            gen_helper_vfp_fcvt_f16_to_f32(cpu_F0s, tmp,
--                                                           fpst, ahp_mode);
+-                            gen_helper_rints(cpu_F0s, cpu_F0s, fpst);
 -                        }
--                        tcg_temp_free_i32(ahp_mode);
--                        tcg_temp_free_ptr(fpst);
--                        tcg_temp_free_i32(tmp);
--                        break;
--                    }
--                    case 5: /* vcvtt.f32.f16, vcvtt.f64.f16 */
--                    {
--                        TCGv_ptr fpst = get_fpstatus_ptr(false);
--                        TCGv_i32 ahp = get_ahp_flag();
--                        tmp = gen_vfp_mrs();
--                        tcg_gen_shri_i32(tmp, tmp, 16);
--                        if (dp) {
--                            gen_helper_vfp_fcvt_f16_to_f64(cpu_F0d, tmp,
--                                                           fpst, ahp);
--                        } else {
--                            gen_helper_vfp_fcvt_f16_to_f32(cpu_F0s, tmp,
--                                                           fpst, ahp);
--                        }
--                        tcg_temp_free_i32(tmp);
--                        tcg_temp_free_i32(ahp);
 -                        tcg_temp_free_ptr(fpst);
 -                        break;
 -                    }
-                     case 6: /* vcvtb.f16.f32, vcvtb.f16.f64 */
-                     {
-                         TCGv_ptr fpst = get_fpstatus_ptr(false);
+-                    case 13: /* vrintz */
+-                    {
+-                        TCGv_ptr fpst = get_fpstatus_ptr(0);
+-                        TCGv_i32 tcg_rmode;
+-                        tcg_rmode = tcg_const_i32(float_round_to_zero);
+-                        gen_helper_set_rmode(tcg_rmode, tcg_rmode, fpst);
+-                        if (dp) {
+-                            gen_helper_rintd(cpu_F0d, cpu_F0d, fpst);
+-                        } else {
+-                            gen_helper_rints(cpu_F0s, cpu_F0s, fpst);
+-                        }
+-                        gen_helper_set_rmode(tcg_rmode, tcg_rmode, fpst);
+-                        tcg_temp_free_i32(tcg_rmode);
+-                        tcg_temp_free_ptr(fpst);
+-                        break;
+-                    }
+-                    case 14: /* vrintx */
+-                    {
+-                        TCGv_ptr fpst = get_fpstatus_ptr(0);
+-                        if (dp) {
+-                            gen_helper_rintd_exact(cpu_F0d, cpu_F0d, fpst);
+-                        } else {
+-                            gen_helper_rints_exact(cpu_F0s, cpu_F0s, fpst);
+-                        }
+-                        tcg_temp_free_ptr(fpst);
+-                        break;
+-                    }
+                     case 15: /* single<->double conversion */
+                         if (dp) {
+                             gen_helper_vfp_fcvtsd(cpu_F0s, cpu_F0d, cpu_env);
 diff --git a/target/arm/vfp.decode b/target/arm/vfp.decode
-index 9db7aa7021a..53d9544f7cd 100644
+index b88d1d06f02..9942d2ae7ad 100644
 --- a/target/arm/vfp.decode
 +++ b/target/arm/vfp.decode
-@@ -181,3 +181,9 @@ VCMP_sp      ---- 1110 1.11 010 z:1 .... 1010 e:1 1.0 .... \
+@@ -193,3 +193,18 @@ VCVT_f16_f32 ---- 1110 1.11 0011 .... 1010 t:1 1.0 .... \
               vd=%vd_sp vm=%vm_sp
- VCMP_dp      ---- 1110 1.11 010 z:1 .... 1011 e:1 1.0 .... \
-              vd=%vd_dp vm=%vm_dp
+ VCVT_f16_f64 ---- 1110 1.11 0011 .... 1011 t:1 1.0 .... \
+              vd=%vd_sp vm=%vm_dp
 +
-+# VCVTT and VCVTB from f16: Vd format depends on size bit; Vm is always vm_sp
-+VCVT_f32_f16 ---- 1110 1.11 0010 .... 1010 t:1 1.0 .... \
++VRINTR_sp    ---- 1110 1.11 0110 .... 1010 01.0 .... \
 +             vd=%vd_sp vm=%vm_sp
-+VCVT_f64_f16 ---- 1110 1.11 0010 .... 1011 t:1 1.0 .... \
-+             vd=%vd_dp vm=%vm_sp
++VRINTR_dp    ---- 1110 1.11 0110 .... 1011 01.0 .... \
++             vd=%vd_dp vm=%vm_dp
++
++VRINTZ_sp    ---- 1110 1.11 0110 .... 1010 11.0 .... \
++             vd=%vd_sp vm=%vm_sp
++VRINTZ_dp    ---- 1110 1.11 0110 .... 1011 11.0 .... \
++             vd=%vd_dp vm=%vm_dp
++
++VRINTX_sp    ---- 1110 1.11 0111 .... 1010 01.0 .... \
++             vd=%vd_sp vm=%vm_sp
++VRINTX_dp    ---- 1110 1.11 0111 .... 1011 01.0 .... \
++             vd=%vd_dp vm=%vm_dp
 -- 
 2.20.1
 
