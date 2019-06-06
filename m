@@ -2,68 +2,92 @@ Return-Path: <SRS0=9X/F=UF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DE247C04AB5
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 18:31:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E4E2C04AB5
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 18:35:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B6AA920872
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 18:31:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B6AA920872
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 293B420872
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 18:35:22 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="VIiEFrKM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 293B420872
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:36632 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:36656 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hYxAP-0003Pn-Pe
-	for qemu-devel@archiver.kernel.org; Thu, 06 Jun 2019 14:31:13 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:57510)
+	id 1hYxEP-0004mS-2l
+	for qemu-devel@archiver.kernel.org; Thu, 06 Jun 2019 14:35:21 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:58328)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1hYx9k-000365-Oi
-	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 14:30:34 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1hYxDW-0004L0-4y
+	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 14:34:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1hYx9X-00068Q-R5
-	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 14:30:23 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53620)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <crosa@redhat.com>)
-	id 1hYx9P-0005V2-8c; Thu, 06 Jun 2019 14:30:12 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 034AC81DE3;
-	Thu,  6 Jun 2019 18:29:34 +0000 (UTC)
-Received: from dhcp-17-47.bos.redhat.com (dhcp-17-47.bos.redhat.com
-	[10.18.17.47])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id C9FEF7DFF6;
-	Thu,  6 Jun 2019 18:29:27 +0000 (UTC)
-Date: Thu, 6 Jun 2019 14:29:26 -0400
-From: Cleber Rosa <crosa@redhat.com>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20190606182926.GA4501@dhcp-17-47.bos.redhat.com>
-References: <20190520220635.10961-1-f4bug@amsat.org>
-	<20190520220635.10961-3-f4bug@amsat.org>
-	<20190605160659.GB7080@localhost.localdomain>
-	<20190605204323.GF22416@habkost.net>
+	(envelope-from <richard.henderson@linaro.org>) id 1hYxDV-0003Sp-71
+	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 14:34:26 -0400
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:34577)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1hYxDU-0003KL-UB
+	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 14:34:25 -0400
+Received: by mail-ot1-x341.google.com with SMTP id z24so2939032oto.1
+	for <qemu-devel@nongnu.org>; Thu, 06 Jun 2019 11:34:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
+	:mime-version:in-reply-to:content-language:content-transfer-encoding;
+	bh=RlCYGH+221kIeiTRbc/5GBCNLC+DFHEoe//7Gf2/98w=;
+	b=VIiEFrKMsviaSBA+PC2ycGHJLG1ksnEf+FYoxzla012OXRAmRWCBlLfpXcHdfpmswp
+	Q3uAXWxsB7vhpKq352jDcO00A1WlLyKaka/cPnlAot4+g0lI+FUEvnIcjqq/ac3kUqm8
+	lskWQP+uu4eOsisInRiSdeJW8/BW3CBI9U/3Cxaq0IMLIhPOkIgaZysfdOu3ZA+2TWVK
+	uJEAINVUfhYVxTGplkHOBBFAWjq5ltD1eyHFBKNWFSIrgir+ydPKqTu780z3D/TCvEBF
+	uPEwCSMAHgNQTnKJatiKRSi2jYGwkA3/Z5lzIh3cRfeW6uPSeMA2O/WhxePLrNyTjKO/
+	ZCwg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+	:date:user-agent:mime-version:in-reply-to:content-language
+	:content-transfer-encoding;
+	bh=RlCYGH+221kIeiTRbc/5GBCNLC+DFHEoe//7Gf2/98w=;
+	b=KIiQJPpHMKqvkPSbQGmxqW8QWPKECVcmxKBG65I/odg9QmM/cj3jvrf8UDob1GtNI0
+	a81RSUR1uowKnG659+U3SS50dT36cGUZ3oSrmB/TaRglP2tyF0X0KcrCsK3uTGOS8OG7
+	YjNioe1/gRwtofunG5s2YRBPqW+0Uj14XU/8l6qjtm0Ffuo//qOUpcJ1Jya+UAGOFOzu
+	zhugTlb/o6NPsrR4qAhq7ATjUhKHq+ixX17VG42zRs4T122GoSi0bk302mDKLr/PddlV
+	fwUtFUfLa/opQik05xus/HLYmESpvka8g3EHifuOvdsB0TEI3Sb3cnBB8GHHX7D9VE2/
+	O5wA==
+X-Gm-Message-State: APjAAAXDufUdxDN7VK19wwDvtKUfV+NTYmMLvUe3Uuva469SgWcBAR2S
+	5ZIV7heiVvId/ULAmSpO24ayCQ==
+X-Google-Smtp-Source: APXvYqzR7nykvAaWcyjyaYyQ8Zsrl7DCr6ZKDA4x6dnK7rVoNyQ563J2qyennh8GIzWVoWCnGCnPGQ==
+X-Received: by 2002:a9d:7d16:: with SMTP id v22mr11417123otn.124.1559846061266;
+	Thu, 06 Jun 2019 11:34:21 -0700 (PDT)
+Received: from [192.168.3.43] (200-56-192-86-cable.cybercable.net.mx.
+	[200.56.192.86])
+	by smtp.gmail.com with ESMTPSA id o3sm822774otl.76.2019.06.06.11.34.20
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Thu, 06 Jun 2019 11:34:20 -0700 (PDT)
+To: Stefan Brankovic <stefan.brankovic@rt-rk.com>, qemu-devel@nongnu.org
+References: <1559816130-17113-1-git-send-email-stefan.brankovic@rt-rk.com>
+	<1559816130-17113-7-git-send-email-stefan.brankovic@rt-rk.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Openpgp: preference=signencrypt
+Message-ID: <18871125-cb2c-57e7-864d-c5c7a8846093@linaro.org>
+Date: Thu, 6 Jun 2019 13:34:17 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20190605204323.GF22416@habkost.net>
-User-Agent: Mutt/1.11.4 (2019-03-13)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.25]);
-	Thu, 06 Jun 2019 18:29:44 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 2/2] BootLinuxConsoleTest: Test the
- SmartFusion2 board
+In-Reply-To: <1559816130-17113-7-git-send-email-stefan.brankovic@rt-rk.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2607:f8b0:4864:20::341
+Subject: Re: [Qemu-devel] [PATCH 6/8] target/ppc: Optimize emulation of
+ vclzw instruction
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -75,103 +99,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org,
-	Alistair Francis <alistair@alistair23.me>,
-	Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>,
-	Subbaraya Sundeep <sundeep.lkml@gmail.com>, qemu-arm@nongnu.org
+Cc: david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Jun 05, 2019 at 05:43:23PM -0300, Eduardo Habkost wrote:
-> On Wed, Jun 05, 2019 at 12:06:59PM -0400, Cleber Rosa wrote:
-> > On Tue, May 21, 2019 at 12:06:35AM +0200, Philippe Mathieu-Daud=E9 wr=
-ote:
-> > > Similar to the x86_64/pc test, it boots a Linux kernel on an
-> > > Emcraft board and verify the serial is working.
-> > >=20
-> > > If ARM is a target being built, "make check-acceptance" will
-> > > automatically include this test by the use of the "arch:arm" tags.
-> > >=20
-> > > Alternatively, this test can be run using:
-> > >=20
-> > >   $ avocado run -t arch:arm tests/acceptance
-> > >   $ avocado run -t machine:emcraft-sf2 tests/acceptance
-> > >
-> >=20
-> > The pattern accepted as a tag currently doesn't include a dash, see:
-> >=20
-> >    https://avocado-framework.readthedocs.io/en/68.0/ReferenceGuide.ht=
-ml#docstring-directives-rules
-> >=20
->=20
-> Why isn't this causing test jobs to fail?
+On 6/6/19 5:15 AM, Stefan Brankovic wrote:
+> +    for (i = 0; i < 2; i++) {
+> +        if (i == 0) {
+> +            /* Get high doubleword element of vB in avr. */
+> +            get_avr64(avr, VB, true);
+> +        } else {
+> +            /* Get low doubleword element of vB in avr. */
+> +            get_avr64(avr, VB, false);
+> +        }
 
-Because docstring directives are searched for "gracefully", that is,
-if it doesn't match the pattern, it's not considered a docstring
-directive.
+Better as simply get_avr64(avr, VB, i);
 
-Also, there's nothing in the jobs that require or check for that
-specific machine tag.  The "check-acceptance" rule uses the built
-targets, and adds "arch:<$TARGET>" tags to the command line.
+> +        /*
+> +         * Perform count for every word element using tcg_gen_clzi_i64.
+> +         * Since it counts leading zeros on 64 bit lenght, we have to move
+> +         * ith word element to highest 32 bits of tmp, or it with mask(so we get
+> +         * all ones in lowest 32 bits), then perform tcg_gen_clzi_i64 and move
+> +         * it's result in appropriate word element of result.
+> +         */
+> +        tcg_gen_shli_i64(tmp, avr, 32);
+> +        tcg_gen_or_i64(tmp, tmp, mask);
+> +        tcg_gen_clzi_i64(result, tmp, 64);
+> +
+> +        tcg_gen_or_i64(tmp, avr, mask);
+> +        tcg_gen_clzi_i64(tmp, tmp, 64);
 
-Now, if one run this (as exemplified in the commit message):
+s/64/32.
 
-  $ avocado run -t machine:emcraft-sf2 tests/acceptance
+> +        tcg_gen_deposit_i64(result, result, tmp, 32, 32);
 
-The *tag* failure/limitation would have been noticed.  BTW, it should
-be easy to expand the docstring directive pattern and fix this
-limitation on newer Avocado versions.
+That said, it's probably better to treat this as 4 words, not 2 doublewords.
 
-You can also see the parsed key/val tags with:
+	for (i = 0; i < 4; i++) {
+	    tcg_gen_ld_i32(tmp, cpu_env, avr_full_offset(VB) + i * 4);
+	    tcg_gen_clzi_i32(tmp, tmp, 32);
+	    tcg_gen_st_i32(tmp, cpu_env, avr_full_offset(VT) + i * 4);
+	}
 
-  $ avocado list -V tests/acceptance
 
-Although only on new Avocado versions (>69.0), you can also see the
-parsed key:val tags.
-
->=20
-> This patch is already queued on python-next, should I remove it?
->
-
-Or ammended it?  It's a minor issue IMO (s/-/_/).
-
->=20
-> > My suggestion is to replace the dash for an underline.  This was done
-> > on the s390 test:
-> >=20
-> >    :avocado: tags=3Dmachine:s390_ccw_virtio
->=20
-> I would love if we stopped using the docstring to store
-> machine-readable data and used Python class attributes or
-> methods, like most Python APIs do.  e.g.:
->=20
->   class MyTest(avocado.Test):
->       tags =3D {'machine':'s390-ccw-virtio'}
->=20
->       def test_my_feature(self):
->           ...
->
->=20
-> I understand the Avocado runner currently tries to not run any
-> test code at the "list" step.  But can we have a mode where it
-> will actually load the Python module and look at the class
-> objects directly, instead of trying to parse the Python code
-> without evaluating it?
->=20
-> > [...]
->=20
-> --=20
-> Eduardo
-
-I get your point, and I'd love to have no "no learning wheels" mode
-too.  But given that the "safe loader" was a very basic architecture
-design, and we probably wouldn't be dropping it, this means twice the
-code to maintain.
-
-I'd be interested in collecting more use cases (besides this s/-/_/)
-to better justify such an effort.
-
-Regards,
-- Cleber.
+r~
 
