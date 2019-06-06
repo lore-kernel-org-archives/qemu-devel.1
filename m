@@ -2,63 +2,74 @@ Return-Path: <SRS0=9X/F=UF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F412C04AB5
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 13:56:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 35E78C04AB5
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 13:57:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0A3F420652
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 13:56:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0A3F420652
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id 0B0DF207E0
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 13:57:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0B0DF207E0
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:60998 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:32797 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hYss3-0003ZE-Qb
-	for qemu-devel@archiver.kernel.org; Thu, 06 Jun 2019 09:55:59 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:44116)
+	id 1hYstl-0005FX-7K
+	for qemu-devel@archiver.kernel.org; Thu, 06 Jun 2019 09:57:45 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:44164)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jonathan.cameron@huawei.com>) id 1hYsl5-0006L1-F6
-	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 09:48:52 -0400
+	(envelope-from <bounces@canonical.com>) id 1hYslW-0006LM-E3
+	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 09:49:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jonathan.cameron@huawei.com>) id 1hYsgg-0002YQ-Ki
-	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 09:44:16 -0400
-Received: from szxga05-in.huawei.com ([45.249.212.191]:2241 helo=huawei.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jonathan.cameron@huawei.com>)
-	id 1hYsgd-0001bx-DO; Thu, 06 Jun 2019 09:44:12 -0400
-Received: from DGGEMS401-HUB.china.huawei.com (unknown [172.30.72.60])
-	by Forcepoint Email with ESMTP id EE758BB6D7A7631EF9A7;
-	Thu,  6 Jun 2019 21:44:04 +0800 (CST)
-Received: from localhost (10.202.226.61) by DGGEMS401-HUB.china.huawei.com
-	(10.3.19.201) with Microsoft SMTP Server id 14.3.439.0; Thu, 6 Jun 2019
-	21:43:55 +0800
-Date: Thu, 6 Jun 2019 14:43:36 +0100
-From: Jonathan Cameron <jonathan.cameron@huawei.com>
-To: Dongjiu Geng <gengdongjiu@huawei.com>
-Message-ID: <20190606144336.00006a1d@huawei.com>
-In-Reply-To: <1557832703-42620-8-git-send-email-gengdongjiu@huawei.com>
-References: <1557832703-42620-1-git-send-email-gengdongjiu@huawei.com>
-	<1557832703-42620-8-git-send-email-gengdongjiu@huawei.com>
-Organization: Huawei
-X-Mailer: Claws Mail 3.17.3 (GTK+ 2.24.32; i686-w64-mingw32)
+	(envelope-from <bounces@canonical.com>) id 1hYsdS-0001Ie-1k
+	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 09:40:55 -0400
+Received: from indium.canonical.com ([91.189.90.7]:39142)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1hYsdR-00018w-QZ
+	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 09:40:53 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1hYsdO-00065T-Pq
+	for <qemu-devel@nongnu.org>; Thu, 06 Jun 2019 13:40:50 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id BEC3D2E80C8
+	for <qemu-devel@nongnu.org>; Thu,  6 Jun 2019 13:40:50 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.202.226.61]
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 06 Jun 2019 13:32:45 -0000
+From: "Laszlo Ersek \(Red Hat\)" <lersek@redhat.com>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=In Progress; importance=Undecided;
+	assignee=lersek@redhat.com; 
+X-Launchpad-Bug-Tags: feature-request
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: lersek
+X-Launchpad-Bug-Reporter: Laszlo Ersek (Red Hat) (lersek)
+X-Launchpad-Bug-Modifier: Laszlo Ersek (Red Hat) (lersek)
+References: <155958011528.16346.9132826883162987130.malonedeb@chaenomeles.canonical.com>
+Message-Id: <155982796566.18535.7537440264952343091.malone@wampee.canonical.com>
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="18978";
+	Instance="launchpad-lazr.conf"
+X-Launchpad-Hash: 32153177a08ce5bfb5383fcfa9d70e5b4505a172
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 45.249.212.191
-Subject: Re: [Qemu-devel] [PATCH v17 07/10] ACPI: Add APEI GHES table
- generation support
+X-Received-From: 91.189.90.7
+Subject: [Qemu-devel] [Bug 1831477] Re: update edk2 submodule & binaries to
+ edk2-stable201905
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -67,439 +78,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, ehabkost@redhat.com, kvm@vger.kernel.org,
-	mst@redhat.com, mtosatti@redhat.com, qemu-devel@nongnu.org,
-	linuxarm@huawei.com, shannon.zhaosl@gmail.com,
-	zhengxiang9@huawei.com, qemu-arm@nongnu.org, james.morse@arm.com,
-	xuwei5@huawei.com, imammedo@redhat.com, pbonzini@redhat.com,
-	lersek@redhat.com, rth@twiddle.net
+Reply-To: Bug 1831477 <1831477@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 14 May 2019 04:18:20 -0700
-Dongjiu Geng <gengdongjiu@huawei.com> wrote:
-
-> This implements APEI GHES Table generation via fw_cfg blobs.
-> Now it only support GPIO-Signal and ARMv8 SEA two types of GHESv2 error
-> source. Afterwards, we can extend the supported types if needed. For the
-> CPER section type, currently it is memory section because kernel
-> mainly wants userspace to handle the memory errors.
-> 
-> This patch follows the spec ACPI 6.2 to build the Hardware Error Source
-> table, for the detailed information, please refer to document:
-> docs/specs/acpi_hest_ghes.txt
-> 
-> Suggested-by: Laszlo Ersek <lersek@redhat.com>
-> Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
-
-Just one general question, why support the GPIO-Signal error source in this
-patch set?  Unless I'm missing something, it's not actually used and would
-require some additional infrastructure (instantiate the GEDD or similar).
-
-Might be better to drop it for now and simplify this set a little bit?
-
-Note I'm using the gpio path for CCIX PER error emulation so have it hooked up.
-The code here is fine, just not used (I think).
-
-Thanks,
-
-Jonathan
+Posted
+[PATCH 0/6] update edk2 submodule & binaries to edk2-stable201905
+http://mid.mail-archive.com/20190606133110.13754-1-lersek@redhat.com
 
 
+** Changed in: qemu
+       Status: New =3D> In Progress
 
-> ---
->  default-configs/arm-softmmu.mak |   1 +
->  hw/acpi/Kconfig                 |   4 +
->  hw/acpi/Makefile.objs           |   1 +
->  hw/acpi/acpi_ghes.c             | 171 ++++++++++++++++++++++++++++++++++++++++
->  hw/acpi/aml-build.c             |   2 +
->  hw/arm/virt-acpi-build.c        |  12 +++
->  include/hw/acpi/acpi_ghes.h     |  79 +++++++++++++++++++
->  include/hw/acpi/aml-build.h     |   1 +
->  8 files changed, 271 insertions(+)
->  create mode 100644 hw/acpi/acpi_ghes.c
->  create mode 100644 include/hw/acpi/acpi_ghes.h
-> 
-> diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
-> index 613d19a..7b33ae9 100644
-> --- a/default-configs/arm-softmmu.mak
-> +++ b/default-configs/arm-softmmu.mak
-> @@ -160,3 +160,4 @@ CONFIG_MUSICPAL=y
->  
->  # for realview and versatilepb
->  CONFIG_LSI_SCSI_PCI=y
-> +CONFIG_ACPI_APEI=y
-> diff --git a/hw/acpi/Kconfig b/hw/acpi/Kconfig
-> index eca3bee..5228a4b 100644
-> --- a/hw/acpi/Kconfig
-> +++ b/hw/acpi/Kconfig
-> @@ -23,6 +23,10 @@ config ACPI_NVDIMM
->      bool
->      depends on ACPI
->  
-> +config ACPI_APEI
-> +    bool
-> +    depends on ACPI
-> +
->  config ACPI_VMGENID
->      bool
->      default y
-> diff --git a/hw/acpi/Makefile.objs b/hw/acpi/Makefile.objs
-> index 2d46e37..5099ada 100644
-> --- a/hw/acpi/Makefile.objs
-> +++ b/hw/acpi/Makefile.objs
-> @@ -6,6 +6,7 @@ common-obj-$(CONFIG_ACPI_MEMORY_HOTPLUG) += memory_hotplug.o
->  common-obj-$(CONFIG_ACPI_CPU_HOTPLUG) += cpu.o
->  common-obj-$(CONFIG_ACPI_NVDIMM) += nvdimm.o
->  common-obj-$(CONFIG_ACPI_VMGENID) += vmgenid.o
-> +common-obj-$(CONFIG_ACPI_APEI) += acpi_ghes.o
->  common-obj-$(call lnot,$(CONFIG_ACPI_X86)) += acpi-stub.o
->  
->  common-obj-y += acpi_interface.o
-> diff --git a/hw/acpi/acpi_ghes.c b/hw/acpi/acpi_ghes.c
-> new file mode 100644
-> index 0000000..d03e797
-> --- /dev/null
-> +++ b/hw/acpi/acpi_ghes.c
-> @@ -0,0 +1,171 @@
-> +/* Support for generating APEI tables and record CPER for Guests
-> + *
-> + * Copyright (C) 2017 HuaWei Corporation.
-> + *
-> + * Author: Dongjiu Geng <gengdongjiu@huawei.com>
-> + *
-> + * This program is free software; you can redistribute it and/or modify
-> + * it under the terms of the GNU General Public License as published by
-> + * the Free Software Foundation; either version 2 of the License, or
-> + * (at your option) any later version.
-> +
-> + * This program is distributed in the hope that it will be useful,
-> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-> + * GNU General Public License for more details.
-> +
-> + * You should have received a copy of the GNU General Public License along
-> + * with this program; if not, see <http://www.gnu.org/licenses/>.
-> + */
-> +
-> +#include "qemu/osdep.h"
-> +#include "hw/acpi/acpi.h"
-> +#include "hw/acpi/aml-build.h"
-> +#include "hw/acpi/acpi_ghes.h"
-> +#include "hw/nvram/fw_cfg.h"
-> +#include "sysemu/sysemu.h"
-> +#include "qemu/error-report.h"
-> +
-> +/* Build table for the hardware error fw_cfg blob */
-> +void build_hardware_error_table(GArray *hardware_errors, BIOSLinker *linker)
-> +{
-> +    int i;
-> +
-> +    /*
-> +     * | +--------------------------+
-> +     * | |    error_block_address   |
-> +     * | |      ..........          |
-> +     * | +--------------------------+
-> +     * | |    read_ack_register     |
-> +     * | |     ...........          |
-> +     * | +--------------------------+
-> +     * | |  Error Status Data Block |
-> +     * | |      ........            |
-> +     * | +--------------------------+
-> +     */
-> +
-> +    /* Build error_block_address */
-> +    build_append_int_noprefix((void *)hardware_errors, 0,
-> +                    GHES_ADDRESS_SIZE * ACPI_HEST_ERROR_SOURCE_COUNT);
-> +
-> +    /* Build read_ack_register */
-> +    for (i = 0; i < ACPI_HEST_ERROR_SOURCE_COUNT; i++)
-> +        /* Initialize the value of read_ack_register to 1, so GHES can be
-> +         * writeable in the first time
-> +         */
-> +        build_append_int_noprefix((void *)hardware_errors, 1, GHES_ADDRESS_SIZE);
-> +
-> +     /* Build Error Status Data Block */
-> +    build_append_int_noprefix((void *)hardware_errors, 0,
-> +                    GHES_MAX_RAW_DATA_LENGTH * ACPI_HEST_ERROR_SOURCE_COUNT);
-> +
-> +    /* Allocate guest memory for the hardware error fw_cfg blob */
-> +    bios_linker_loader_alloc(linker, GHES_ERRORS_FW_CFG_FILE, hardware_errors,
-> +                            1, false);
-> +}
-> +
-> +/* Build Hardware Error Source Table */
-> +void build_apei_hest(GArray *table_data, GArray *hardware_errors,
-> +                                            BIOSLinker *linker)
-> +{
-> +    uint32_t i, error_status_block_offset, length = table_data->len;
-> +
-> +    /* Reserve Hardware Error Source Table header size */
-> +    acpi_data_push(table_data, sizeof(AcpiTableHeader));
-> +
-> +    /* Set the error source counts */
-> +    build_append_int_noprefix(table_data, ACPI_HEST_ERROR_SOURCE_COUNT, 4);
-> +
-> +    for (i = 0; i < ACPI_HEST_ERROR_SOURCE_COUNT; i++) {
-> +        /* Generic Hardware Error Source version 2(GHESv2 - Type 10)
-> +         */
-> +        build_append_int_noprefix(table_data,
-> +            ACPI_HEST_SOURCE_GENERIC_ERROR_V2, 2); /* type */
-> +        build_append_int_noprefix(table_data, cpu_to_le16(i), 2); /* source id */
-> +        build_append_int_noprefix(table_data, 0xffff, 2); /* related source id */
-> +        build_append_int_noprefix(table_data, 0, 1); /* flags */
-> +
-> +        build_append_int_noprefix(table_data, 1, 1); /* enabled */
-> +
-> +        /* Number of Records To Pre-allocate */
-> +        build_append_int_noprefix(table_data, 1, 4);
-> +        /* Max Sections Per Record */
-> +        build_append_int_noprefix(table_data, 1, 4);
-> +        /* Max Raw Data Length */
-> +        build_append_int_noprefix(table_data, GHES_MAX_RAW_DATA_LENGTH, 4);
-> +
-> +        /* Build error status address*/
-> +        build_append_gas(table_data, AML_SYSTEM_MEMORY, 0x40, 0, 4 /* QWord access */, 0);
-> +        bios_linker_loader_add_pointer(linker,
-> +            ACPI_BUILD_TABLE_FILE, ERROR_STATUS_ADDRESS_OFFSET(length, i),
-> +            GHES_ADDRESS_SIZE, GHES_ERRORS_FW_CFG_FILE, i * GHES_ADDRESS_SIZE);
-> +
-> +        /* Build Hardware Error Notification
-> +         * Now only enable GPIO-Signal and ARMv8 SEA notification types
-> +         */
-> +        if (i == 0) {
-> +            build_append_ghes_notify(table_data, ACPI_HEST_NOTIFY_GPIO, 28,
-> +                                     0, 0, 0, 0, 0, 0, 0);
-> +        } else if (i == 1) {
-> +            build_append_ghes_notify(table_data, ACPI_HEST_NOTIFY_SEA, 28, 0,
-> +                                     0, 0, 0, 0, 0, 0);
-> +        }
-> +
-> +        /* Error Status Block Length */
-> +        build_append_int_noprefix(table_data,
-> +            cpu_to_le32(GHES_MAX_RAW_DATA_LENGTH), 4);
-> +
-> +        /* Build Read ACK register
-> +         * ACPI 6.1/6.2: 18.3.2.8 Generic Hardware Error Source
-> +         * version 2 (GHESv2 - Type 10)
-> +         */
-> +        build_append_gas(table_data, AML_SYSTEM_MEMORY, 0x40, 0, 4 /* QWord access */, 0);
-> +        bios_linker_loader_add_pointer(linker, ACPI_BUILD_TABLE_FILE,
-> +            READ_ACK_REGISTER_ADDRESS_OFFSET(length, i), GHES_ADDRESS_SIZE,
-> +            GHES_ERRORS_FW_CFG_FILE,
-> +            (ACPI_HEST_ERROR_SOURCE_COUNT + i) * GHES_ADDRESS_SIZE);
-> +
-> +        /* Build Read Ack Preserve and Read Ack Writer */
-> +        build_append_int_noprefix(table_data, cpu_to_le64(ReadAckPreserve), 8);
-> +        build_append_int_noprefix(table_data, cpu_to_le64(ReadAckWrite), 8);
-> +    }
-> +
-> +    /* Generic Error Status Block offset in the hardware error fw_cfg blob */
-> +    error_status_block_offset = GHES_ADDRESS_SIZE * 2 *
-> +                                ACPI_HEST_ERROR_SOURCE_COUNT;
-> +
-> +    for (i = 0; i < ACPI_HEST_ERROR_SOURCE_COUNT; i++)
-> +        /* Patch address of Error Status Data Block into
-> +         * the error_block_address of hardware_errors fw_cfg blob
-> +         */
-> +        bios_linker_loader_add_pointer(linker,
-> +            GHES_ERRORS_FW_CFG_FILE, GHES_ADDRESS_SIZE * i, GHES_ADDRESS_SIZE,
-> +            GHES_ERRORS_FW_CFG_FILE,
-> +            error_status_block_offset + i * GHES_MAX_RAW_DATA_LENGTH);
-> +
-> +    /* write address of hardware_errors fw_cfg blob into the
-> +     * hardware_errors_addr fw_cfg blob.
-> +     */
-> +    bios_linker_loader_write_pointer(linker, GHES_DATA_ADDR_FW_CFG_FILE,
-> +        0, GHES_ADDRESS_SIZE, GHES_ERRORS_FW_CFG_FILE, 0);
-> +
-> +    build_header(linker, table_data,
-> +        (void *)(table_data->data + length), "HEST",
-> +        table_data->len - length, 1, NULL, "GHES");
-> +}
-> +
-> +static GhesState ges;
-> +void ghes_add_fw_cfg(FWCfgState *s, GArray *hardware_error)
-> +{
-> +
-> +    size_t size = 2 * GHES_ADDRESS_SIZE + GHES_MAX_RAW_DATA_LENGTH;
-> +    size_t request_block_size = ACPI_HEST_ERROR_SOURCE_COUNT * size;
-> +
-> +    /* Create a read-only fw_cfg file for GHES */
-> +    fw_cfg_add_file(s, GHES_ERRORS_FW_CFG_FILE, hardware_error->data,
-> +                    request_block_size);
-> +
-> +    /* Create a read-write fw_cfg file for Address */
-> +    fw_cfg_add_file_callback(s, GHES_DATA_ADDR_FW_CFG_FILE, NULL, NULL, NULL,
-> +        &ges.ghes_addr_le, sizeof(ges.ghes_addr_le), false);
-> +}
-> diff --git a/hw/acpi/aml-build.c b/hw/acpi/aml-build.c
-> index ce90970..3f2b84f 100644
-> --- a/hw/acpi/aml-build.c
-> +++ b/hw/acpi/aml-build.c
-> @@ -1645,6 +1645,7 @@ void acpi_build_tables_init(AcpiBuildTables *tables)
->      tables->table_data = g_array_new(false, true /* clear */, 1);
->      tables->tcpalog = g_array_new(false, true /* clear */, 1);
->      tables->vmgenid = g_array_new(false, true /* clear */, 1);
-> +    tables->hardware_errors = g_array_new(false, true /* clear */, 1);
->      tables->linker = bios_linker_loader_init();
->  }
->  
-> @@ -1655,6 +1656,7 @@ void acpi_build_tables_cleanup(AcpiBuildTables *tables, bool mfre)
->      g_array_free(tables->table_data, true);
->      g_array_free(tables->tcpalog, mfre);
->      g_array_free(tables->vmgenid, mfre);
-> +    g_array_free(tables->hardware_errors, mfre);
->  }
->  
->  /*
-> diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-> index bf9c0bc..54f4ba5 100644
-> --- a/hw/arm/virt-acpi-build.c
-> +++ b/hw/arm/virt-acpi-build.c
-> @@ -45,6 +45,7 @@
->  #include "hw/arm/virt.h"
->  #include "sysemu/numa.h"
->  #include "kvm_arm.h"
-> +#include "hw/acpi/acpi_ghes.h"
->  
->  #define ARM_SPI_BASE 32
->  #define ACPI_POWER_BUTTON_DEVICE "PWRB"
-> @@ -808,6 +809,12 @@ void virt_acpi_build(VirtMachineState *vms, AcpiBuildTables *tables)
->      acpi_add_table(table_offsets, tables_blob);
->      build_spcr(tables_blob, tables->linker, vms);
->  
-> +    if (!vmc->no_ras) {
-> +        acpi_add_table(table_offsets, tables_blob);
-> +        build_hardware_error_table(tables->hardware_errors, tables->linker);
-> +        build_apei_hest(tables_blob, tables->hardware_errors, tables->linker);
-> +    }
-> +
->      if (nb_numa_nodes > 0) {
->          acpi_add_table(table_offsets, tables_blob);
->          build_srat(tables_blob, tables->linker, vms);
-> @@ -901,6 +908,7 @@ static const VMStateDescription vmstate_virt_acpi_build = {
->  
->  void virt_acpi_setup(VirtMachineState *vms)
->  {
-> +    VirtMachineClass *vmc = VIRT_MACHINE_GET_CLASS(vms);
->      AcpiBuildTables tables;
->      AcpiBuildState *build_state;
->  
-> @@ -932,6 +940,10 @@ void virt_acpi_setup(VirtMachineState *vms)
->      fw_cfg_add_file(vms->fw_cfg, ACPI_BUILD_TPMLOG_FILE, tables.tcpalog->data,
->                      acpi_data_len(tables.tcpalog));
->  
-> +    if (!vmc->no_ras) {
-> +        ghes_add_fw_cfg(vms->fw_cfg, tables.hardware_errors);
-> +    }
-> +
->      build_state->rsdp_mr = acpi_add_rom_blob(build_state, tables.rsdp,
->                                                ACPI_BUILD_RSDP_FILE, 0);
->  
-> diff --git a/include/hw/acpi/acpi_ghes.h b/include/hw/acpi/acpi_ghes.h
-> new file mode 100644
-> index 0000000..38fd87c
-> --- /dev/null
-> +++ b/include/hw/acpi/acpi_ghes.h
-> @@ -0,0 +1,79 @@
-> +/* Support for generating APEI tables and record CPER for Guests
-> + *
-> + * Copyright (C) 2017 HuaWei Corporation.
-> + *
-> + * Author: Dongjiu Geng <gengdongjiu@huawei.com>
-> + *
-> + * This program is free software; you can redistribute it and/or modify
-> + * it under the terms of the GNU General Public License as published by
-> + * the Free Software Foundation; either version 2 of the License, or
-> + * (at your option) any later version.
-> +
-> + * This program is distributed in the hope that it will be useful,
-> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-> + * GNU General Public License for more details.
-> +
-> + * You should have received a copy of the GNU General Public License along
-> + * with this program; if not, see <http://www.gnu.org/licenses/>.
-> + */
-> +
-> +#ifndef ACPI_GHES_H
-> +#define ACPI_GHES_H
-> +
-> +#include "hw/acpi/bios-linker-loader.h"
-> +
-> +#define GHES_ERRORS_FW_CFG_FILE         "etc/hardware_errors"
-> +#define GHES_DATA_ADDR_FW_CFG_FILE      "etc/hardware_errors_addr"
-> +
-> +/* The size of Address field in Generic Address Structure,
-> + * ACPI 2.0/3.0: 5.2.3.1 Generic Address Structure.
-> + */
-> +#define GHES_ADDRESS_SIZE           8
-> +
-> +#define GHES_DATA_LENGTH            72
-> +#define GHES_CPER_LENGTH            80
-> +
-> +#define ReadAckPreserve             0xfffffffe
-> +#define ReadAckWrite                0x1
-> +
-> +/* The max size in bytes for one error block */
-> +#define GHES_MAX_RAW_DATA_LENGTH        0x1000
-> +/* Now only have GPIO-Signal and ARMv8 SEA notification types error sources
-> + */
-> +#define ACPI_HEST_ERROR_SOURCE_COUNT    2
+-- =
 
-The GPIO case is really handy when I'm abusing this code for error injection
-but I don't think you actually use it in this patch set.  Perhaps it
-makes sense to drop that block for now?
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1831477
 
-> +
-> +/*
-> + * | +--------------------------+ 0
-> + * | |        Header            |
-> + * | +--------------------------+ 40---+-
-> + * | | .................        |      |
-> + * | | error_status_address-----+ 60   |
-> + * | | .................        |      |
-> + * | | read_ack_register--------+ 104  92
-> + * | | read_ack_preserve        |      |
-> + * | | read_ack_write           |      |
-> + * + +--------------------------+ 132--+-
-> + *
-> + * From above GHES definition, the error status address offset is 60;
-> + * the Read ack register offset is 104, the whole size of GHESv2 is 92
-> + */
-> +
-> +/* The error status address offset in GHES */
-> +#define ERROR_STATUS_ADDRESS_OFFSET(start_addr, n)     (start_addr + 60 + \
-> +                    offsetof(struct AcpiGenericAddress, address) + n * 92)
-> +
-> +/* The read Ack register offset in GHES */
-> +#define READ_ACK_REGISTER_ADDRESS_OFFSET(start_addr, n) (start_addr + 104 + \
-> +                    offsetof(struct AcpiGenericAddress, address) + n * 92)
-> +
-> +typedef struct GhesState {
-> +    uint64_t ghes_addr_le;
-> +} GhesState;
-> +
-> +void build_apei_hest(GArray *table_data, GArray *hardware_error,
-> +                     BIOSLinker *linker);
-> +
-> +void build_hardware_error_table(GArray *hardware_errors, BIOSLinker *linker);
-> +void ghes_add_fw_cfg(FWCfgState *s, GArray *hardware_errors);
-> +#endif
-> diff --git a/include/hw/acpi/aml-build.h b/include/hw/acpi/aml-build.h
-> index 1ec7e1b..78c0252 100644
-> --- a/include/hw/acpi/aml-build.h
-> +++ b/include/hw/acpi/aml-build.h
-> @@ -220,6 +220,7 @@ struct AcpiBuildTables {
->      GArray *rsdp;
->      GArray *tcpalog;
->      GArray *vmgenid;
-> +    GArray *hardware_errors;
->      BIOSLinker *linker;
->  } AcpiBuildTables;
->  
+Title:
+  update edk2 submodule & binaries to edk2-stable201905
 
+Status in QEMU:
+  In Progress
 
+Bug description:
+  The edk2 project will soon release edk2-stable201905. Update the edk2
+  submodule in QEMU, and the bundled edk2 binaries, accordingly.
+
+  https://github.com/tianocore/tianocore.github.io/wiki/EDK-II-Release-Plan=
+ning#edk2-stable201905-tag-planning
+  https://github.com/tianocore/edk2/releases/tag/edk2-stable201905 [upcomin=
+g link]
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1831477/+subscriptions
 
