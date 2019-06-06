@@ -6,39 +6,37 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BB79C28D1E
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 09:57:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A350C04AB5
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 10:02:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 953892083E
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 09:57:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 953892083E
+	by mail.kernel.org (Postfix) with ESMTPS id 4DFCD20872
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 10:02:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4DFCD20872
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:57537 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:57602 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hYp8v-0004fD-OP
-	for qemu-devel@archiver.kernel.org; Thu, 06 Jun 2019 05:57:09 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:45700)
+	id 1hYpEC-0006Nt-Ct
+	for qemu-devel@archiver.kernel.org; Thu, 06 Jun 2019 06:02:36 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:46869)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hYp81-00045X-1N
-	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 05:56:14 -0400
+	(envelope-from <laurent@vivier.eu>) id 1hYpD5-0005sL-OD
+	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 06:01:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hYp7z-00050V-P7
-	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 05:56:12 -0400
-Received: from mout.kundenserver.de ([212.227.126.130]:50545)
+	(envelope-from <laurent@vivier.eu>) id 1hYpD4-0001WD-JZ
+	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 06:01:27 -0400
+Received: from mout.kundenserver.de ([212.227.126.130]:51139)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <laurent@vivier.eu>)
-	id 1hYp7t-0003wT-2S; Thu, 06 Jun 2019 05:56:07 -0400
+	id 1hYpCy-0001Kf-WF; Thu, 06 Jun 2019 06:01:22 -0400
 Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
 	(mreue011 [213.165.67.103]) with ESMTPSA (Nemesis) id
-	1Mn2Fb-1gsa5P26lz-00k77Y; Thu, 06 Jun 2019 11:55:20 +0200
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
-	qemu-devel@nongnu.org, qemu-trivial@nongnu.org
-References: <20190528164020.32250-1-philmd@redhat.com>
-	<20190528164020.32250-11-philmd@redhat.com>
+	1MryCb-1gne5A1l49-00nwdR; Thu, 06 Jun 2019 12:01:17 +0200
+To: Rami Rosen <ramirose@gmail.com>
+References: <20190507184102.4258-1-ramirose@gmail.com>
 From: Laurent Vivier <laurent@vivier.eu>
 Openpgp: preference=signencrypt
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
@@ -83,35 +81,35 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
 	OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
 	JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
 	ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <be04bd5f-5f7f-5f92-568d-ef0004b851f3@vivier.eu>
-Date: Thu, 6 Jun 2019 11:55:18 +0200
+Message-ID: <3c4507eb-31e0-effc-55b5-c8e1420ea901@vivier.eu>
+Date: Thu, 6 Jun 2019 12:01:12 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <20190528164020.32250-11-philmd@redhat.com>
+In-Reply-To: <20190507184102.4258-1-ramirose@gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:hkdlBuRzfNqot/E2JQ0Th2203OYjHukkX1dMwkosNUkVNxUjAAj
-	HcM7zgw/DKvQzgX7D8CqIxCK2OdZMbzmtSu1fXIBsUcBta8bEMN3421FfsvdiEhsOFoSDd3
-	3lAgIuXUri28wyCIE2DSap0AlEbR2ymjAbz8Hvh2yCTuh+3S0nSxPi1ZhT+631foOI6vMNl
-	3xLpl3ZAqwLpBfonSXElg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:xmZzg3i0GO8=:CQziJmmzeVMVVOwrn7MpFE
-	4QlxxGMcqmdfhmCoe3cfCaOm99UzBLVIJepTQOkekaThJ7EJH3nAqBkE2B4Seoyv3B+NaVRPr
-	OEItNRrep5cFJkVWqElN5MdXkA+DZ59UnbhoRFdo4da3ks0jt8TgbTJf1U2WdntCevjsnvs2T
-	xU5FfMjW14UkC9nmSEzMaWALvXHs1A1idukcQtomvB92Wi5RYN/E1hZHmhMR3eoZ1We0ONFTF
-	GKlLCcb/s8Npu+ZaSM4fD3sIBbEWne/aSMYZ/hirwmWgewJHozdjr9OQpa6wEakhXtoZ0WgVl
-	jW1CJb9UPNjDe5fWL+Y8r3V4rc2zqpwRsJcD2uy3HfZsKIwSXWv4bfKgFzQzI0PEqOPepJZjZ
-	D4zC+LxiOeZJPlSnYmNakIXFe4shcPGWm0VgfdCw23mdJzVLifH7eCyMxhawWxKy/lNZQVbSd
-	bOQ4X4JLmCFBUYspeSxYIJwFK7zoQbzSNhQxWerGvCWZeRl1VYg4bjeB8FyoUQPml8n49YRe2
-	p6/dQ9BwwAOJ4NOX37EHvKViYeCpY2empm/2BmpfJFPvLsSVbBzNCz1SN5GSaARi5Hm08zYQr
-	94cn0jH+4UTleKpwxzIRQftMdrQKSx84As+dO7v2BoDXkv3WkybCREzZKgj71mcaDFd32Hibd
-	v2hX5Fd02qa/1n/ng6Z5t6fqfdNIF5rE/DjpL5YX+69UDAQ5R1Z46unuIXTjYuZsZ/WuYnHL5
-	59+NvDraYsre6hguc04pKSVTnxKZVEETEpvs/bmoH+cn2MmhHohu4lg9Nuc=
+X-Provags-ID: V03:K1:bQrZKTR87JolmsEvP3eQvr6SM94uSvDSON3mHX6d4xHAl6aokkW
+	NRUT7NyqlJqgX3fdFuARmMxSMCctDIRdejuGW4lsKvfsLAls1boHw2OuVCp2oj4QG+DAwfi
+	63CasNLXKPEEOOytwBxgcMHGSsI6ttTVnL+QOcCFJiIhW2W/HsrSZd/EO/1VllzV1fcXqFh
+	nLQoD/7B6nscT0S3tgIFA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:rYEBsEf/Ftk=:0VzMC3opTTRbQjKQzrRbK6
+	OTXMSa0HLaFBGi2ClfxRcjs8jgfj9d3rxp/nfC2fSKg2zxXj+bfeJ9XzNS8s23n1kcCEu1DuP
+	HWLdLO1MFhAgZUiR2zc8HXi1D/osy1xp7HKiPP8rsOlRQPyP0P5+70J8S8JaoYIJI+KrBvkIJ
+	KXd0dE0FW22Sws4iNsPoM6tjstKqN0aaeTsnnMA3Z4g5Jbtghiq7DUC+rV7BYkpWOlQKJZJu1
+	XRfz6bP+vkamZFjiFQ8HaUER+NxHInxA9+fjkn91UH1tyTRd7KDeMCZ7Myg/9eP4uF5Te4+rr
+	BjYY9AuoezRht6d/b6iPcEIT7X11cO3z0+cupPBA7x71aj4zd1bLM6eLq9rDUYL6S+FMsZPaX
+	kKYYZzeX+IkfhdoEvfC6BaBhAre4ei5LPy+s66Ib+DKwXjNZXkR5U+PyeyF69fvK8U5v39FFu
+	UeTthAmEuFviA/hujqJGFoTt9uL89BCTQLJdTlhNgv/w0tMkrhrVSGZOJjUGcmzn1ZW6RwOLc
+	I0/GP+6fbak3LiGIoIMu/lkW3OmoCfzXv2oBl0EscDUwE235LDl77nc4lxe9pyz3Kwz2WAZdH
+	f9w5BuO+andkd/RdfCj4ZJrF7U9jNtdYB82dZSq2iI+njbdu49Zrjr696DQZHBD8+CPt+0Jjz
+	JXDatNgDiBGVVXMmgp9VFB0mKMRRZN+q6S8xJ19p2SF35gto+xnb65MKe1sMDAJkIG5QRBDVF
+	3Tvz+BCSm/1Ad8k1JWm0GjCjEnZBKiXOXYVscZ1K2wLe9QNksDDOtHAqOS0=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 212.227.126.130
-Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH v2 10/10]
- hw/watchdog/wdt_i6300esb: Use DEVICE() macro to access DeviceState.qdev
+Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH] scripts/qmp: fix deleted
+ link in qemu-ga-client script
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -123,61 +121,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
-	Dmitry Fleytman <dmitry.fleytman@gmail.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Aleksandar Rikalo <arikalo@wavecomp.com>,
-	David Hildenbrand <david@redhat.com>,
-	Markus Armbruster <armbru@redhat.com>,
-	Halil Pasic <pasic@linux.ibm.com>, qemu-s390x@nongnu.org,
-	Alex Williamson <alex.williamson@redhat.com>,
-	Michael Walle <michael@walle.cc>,
-	Aleksandar Markovic <amarkovic@wavecomp.com>,
-	Cornelia Huck <cohuck@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
-	Richard Henderson <rth@twiddle.net>,
-	Christian Borntraeger <borntraeger@de.ibm.com>,
-	Gerd Hoffmann <kraxel@redhat.com>
+Cc: qemu-trivial@nongnu.org, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 28/05/2019 à 18:40, Philippe Mathieu-Daudé a écrit :
-> Rather than looking inside the definition of a DeviceState with
-> "s->qdev", use the QOM prefered style: "DEVICE(s)".
+Le 07/05/2019 à 20:41, Rami Rosen a écrit :
+> This patch fixes a deleted link in qemu-ga-client script.
+> According to the old link, the page moved to 
+> https://wiki.qemu.org/Features/QAPI/GuestAgent.
 > 
-> This patch was generated using the following Coccinelle script:
-> 
->     // Use DEVICE() macros to access DeviceState.qdev
->     @use_device_macro_to_access_qdev@
->     expression obj;
->     identifier dev;
->     @@
->     -&obj->dev.qdev
->     +DEVICE(obj)
-> 
-> Suggested-by: Peter Maydell <peter.maydell@linaro.org>
-> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+> Signed-off-by: Rami Rosen <ramirose@gmail.com>
 > ---
->  hw/watchdog/wdt_i6300esb.c | 2 +-
+>  scripts/qmp/qemu-ga-client | 2 +-
 >  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> diff --git a/hw/watchdog/wdt_i6300esb.c b/hw/watchdog/wdt_i6300esb.c
-> index 1c6eddf86a..f2d1e86526 100644
-> --- a/hw/watchdog/wdt_i6300esb.c
-> +++ b/hw/watchdog/wdt_i6300esb.c
-> @@ -200,7 +200,7 @@ static void i6300esb_timer_expired(void *vp)
->          if (d->reboot_enabled) {
->              d->previous_reboot_flag = 1;
->              watchdog_perform_action(); /* This reboots, exits, etc */
-> -            i6300esb_reset(&d->dev.qdev);
-> +            i6300esb_reset(DEVICE(d));
->          }
+> diff --git a/scripts/qmp/qemu-ga-client b/scripts/qmp/qemu-ga-client
+> index 30cf8a9..50efc21 100755
+> --- a/scripts/qmp/qemu-ga-client
+> +++ b/scripts/qmp/qemu-ga-client
+> @@ -33,7 +33,7 @@
+>  # $ qemu-ga-client fsfreeze freeze
+>  # 2 filesystems frozen
+>  #
+> -# See also: https://wiki.qemu.org/Features/QAPI/GuestAgent
+> +# See also: https://wiki.qemu.org/Features/GuestAgent
+>  #
 >  
->          /* In "free running mode" we start stage 1 again. */
+>  from __future__ import print_function
 > 
 
-Applied to my trivial-patches branch.
+Please re-send your patch cc'ing qemu-devel@nongnu.org.
 
 Thanks,
-Laurent
+LAurent
 
