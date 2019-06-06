@@ -3,43 +3,40 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CFA07C04AB5
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 09:22:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 12BF0C04AB5
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 09:23:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 958AC20684
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 09:22:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 958AC20684
+	by mail.kernel.org (Postfix) with ESMTPS id E0E9520684
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 09:23:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E0E9520684
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:57017 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:57019 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hYob6-00042Y-SM
-	for qemu-devel@archiver.kernel.org; Thu, 06 Jun 2019 05:22:12 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:36927)
+	id 1hYobv-0004b3-6P
+	for qemu-devel@archiver.kernel.org; Thu, 06 Jun 2019 05:23:03 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:37062)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hYoa0-0003Ow-Ag
-	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 05:21:05 -0400
+	(envelope-from <laurent@vivier.eu>) id 1hYoal-00040I-NU
+	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 05:21:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hYoZz-0007jk-Cu
-	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 05:21:04 -0400
-Received: from mout.kundenserver.de ([212.227.126.130]:45975)
+	(envelope-from <laurent@vivier.eu>) id 1hYoak-0000yj-Qi
+	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 05:21:51 -0400
+Received: from mout.kundenserver.de ([212.227.126.130]:41455)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <laurent@vivier.eu>)
-	id 1hYoZw-0007bp-Rg; Thu, 06 Jun 2019 05:21:01 -0400
+	id 1hYoak-0000sM-H8; Thu, 06 Jun 2019 05:21:50 -0400
 Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
 	(mreue011 [213.165.67.103]) with ESMTPSA (Nemesis) id
-	1MqbI0-1gmIT33332-00mZYq; Thu, 06 Jun 2019 11:20:33 +0200
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
-	Jie Wang <wangjie88@huawei.com>, qemu-devel@nongnu.org
-References: <1556605773-42019-1-git-send-email-wangjie88@huawei.com>
-	<9bacd55b-4333-28fd-18cb-c0dbd771062c@redhat.com>
-	<43413f68-ef2e-27c3-d6e3-62dc6c7930c3@redhat.com>
+	1M5PyX-1haC2I2NmP-001OkO; Thu, 06 Jun 2019 11:21:47 +0200
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+References: <20190530173824.30699-1-richard.henderson@linaro.org>
 From: Laurent Vivier <laurent@vivier.eu>
 Openpgp: preference=signencrypt
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
@@ -84,35 +81,35 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
 	OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
 	JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
 	ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <d8c3261f-9a92-6f16-86a9-dfb06828adf8@vivier.eu>
-Date: Thu, 6 Jun 2019 11:20:32 +0200
+Message-ID: <843a18f1-6d21-41fc-4e89-81b8c5f51fba@vivier.eu>
+Date: Thu, 6 Jun 2019 11:21:46 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <43413f68-ef2e-27c3-d6e3-62dc6c7930c3@redhat.com>
+In-Reply-To: <20190530173824.30699-1-richard.henderson@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:t67vlXO+mpO2kusYyruJ5gqdzD13D0on62WyqZlXtV5nkAOjgIt
-	UPE7ewWkxFpBsgJE15TdUH24Xw6oManF4sl+174ta1KHXzEO6/+xm0mQlfe0V+HXMR/vJPQ
-	OfoyUztd4D7UDAfQxB90eYEnSFHl/ONSh4fhb/OalFX5T95FzzHbqui2Z5XvUDD6xqL15/R
-	MXUVETV/i8R58PJGITvRA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:TKXNb4aCr6U=:xqbX/fL/JvoDZ3ApLG3lBW
-	eh81PF0DWdOudGSNKOiIuToZKWH/y/Ae5OqaLs0/A2epr8KBrEo7Tp8+jPiIbuyLmMR/kG1oF
-	keN0QA078MX+vYPeWYWF0WVF3bNUE3SvoEuGyChvajXxtAp6yGnmyagqY/pJ2VLSwB+otLqkZ
-	Mh03qJepqmbJDTujlELBtGxa3UURm5hD7NDKHFGQdK5Mo8/Tb3vn0AzcS30rp5jELW84CSyzX
-	75kA8fK3VLfZV+mAVnPq0Jd3HgBN/5qPzcIBexOXXNuBFeiJ0esecmjT2EQz9Y9U1wqDLC96p
-	+/s3VE5a5SimakyoPLUMbNNAOM+4hb/+SzrWFpd3onV59HT6h2X3MGhXwDGJMHR/YFUPzmf10
-	qX55pC0OO+YS89NxcX6S80SZSthFmtAAx0Cf3C27uCMhWG05YIOvMEhrDP2qlOdgwd9O1S0Aj
-	BJt4vw3v2GrI6J6f4T/YfMK2vC54lqshZCU47o+GQvNOVK2K204mSFHnWAK1dnHazoOtHIeZT
-	gzIfVamIH1Qxux6EwxcLWwC6elYf64rJxTj88nyd5NclNfhgakFHXmpxeEZHQtaLdgSTz8JKj
-	ymLrEt5GJOobaW+eka8tyLU+6RToaVCFY+jy0/F4tFigPcBjJVGsCAhHDha30jQnCj+aN9lTi
-	SRhhxfcJZs36JlOUzSOOYwkaDepa8JjXUiSZAT5lJS3nDf1y+2TbArATivHDoMSR6OBxE/v+J
-	D8RIZh5h7Oa01iYMzNM5E1PLLCbzXnxdog8A6q3BHCou0yNchc3GW67awrA=
+X-Provags-ID: V03:K1:EEhQS2NuxrRhNUsIsYkxOhRgvVohjvggwNAA9EGV+FWFwj9WXlC
+	dKV50mCMolFfB09x44dGyFhy2IZm3nFkwZomGhmTZCzZ8zUDyg9Rm1281eRI/uhzOQwOU3i
+	GnocCJlB8tM8HdsGS5CYoOuDZwa9HuMGpfapYNQHEqHK2obJdw9WzTwhhJrE+XICdCiTtAp
+	TXDv7RMypSNM27IVI8ABQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:3NtbTELVJtI=:34ZTQLRw8Mobnb1Muzsnp3
+	PtXbB+2B4NV57pWnYj8CP8USPnpM3Id68DXiVjNXXey8IW0kI2JKB5gn0ylgCueQmCthhaoFL
+	itt5jiSe4fYUeghvssMYWR4FbZQAkxjBHvgjscX6UGpycqVQsrGDI4B1enQHw2yTVa0uSVqf2
+	P6DrkDOOuGss8PXxEhc6R0xXG4gBqiGJX5BwPLcKpR/SoCPxxOS4Rq9ZDvuGeBHoPImmJls2F
+	UV2ym5Gsk8J3bIx37XGRzrqau5BMl6Vag9lmmO4ku18KKxW9ruFOE2C79rkTIYENnrR6xe880
+	wJrWSiu2rR8PPu0XNMWaqdXyPAE4CmYIw7NNI9Bk5Kx2qkcZZTGQ9UFbHMJvixeTPxuuB9Hs+
+	rhXUwGNJxMX+7Hfnib8p+MLrNJgYXEFElzB/3OhatElWGixanGSy2O06m7r+Txtlf7OnWrV+L
+	C79P5GJPO7yzxM61TOA3sPKzbgenxM7Es4o5DBwVRY2vjaBYVRs0XQxrz5TTjQuDMS3aDZoDz
+	UXkedlwvCKIobNYFgXu+iSWXvRAk6LvKRihf0qnxwbPBiw4rBP4Ta+Msg1nnSBK4uqYkeHoXn
+	omGBa9E14vtSJHeduV1VZYBS6zmuGMBhdGNiuSuBF9RkCbjl8EnL6gkx02CeCpr/2k/uwZ9ZS
+	irek5YcdcWTFJTY2rS+KX5H1ZvN+eNF1q7R+JcgNk/JnT3Cx6xjnwyAa79t04HnKv4NuyvcAV
+	4p0j0C+WkgZBT9lgZrbiLL3ryABCeBZMQj9/LCD0g1wyGa2SxU4qW5I3EAU=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 212.227.126.130
-Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH] vhost: fix incorrect print
- type
+Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH] util: Adjust
+ qemu_guest_getrandom_nofail for Coverity
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -124,43 +121,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Trivial <qemu-trivial@nongnu.org>, eric.fangyi@huawei.com,
-	wu.wubin@huawei.com, mst@redhat.com
+Cc: qemu-trivial@nongnu.org, peter.maydell@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 29/05/2019 à 15:13, Philippe Mathieu-Daudé a écrit :
-> Cc'ing qemu-trivial
+Le 30/05/2019 à 19:38, Richard Henderson a écrit :
+> Explicitly ignore the return value of qemu_guest_getrandom.
+> Because we use error_fatal, all errors are already caught.
 > 
-> On 4/30/19 10:48 AM, Philippe Mathieu-Daudé wrote:
->> On 4/30/19 8:29 AM, Jie Wang wrote:
->>> fix incorrect print type in vhost_virtqueue_stop
->>>
->>> Signed-off-by: Jie Wang <wangjie88@huawei.com>
->>> ---
->>>  hw/virtio/vhost.c | 2 +-
->>>  1 file changed, 1 insertion(+), 1 deletion(-)
->>>
->>> diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
->>> index 7f61018f2a..286bb27c65 100644
->>> --- a/hw/virtio/vhost.c
->>> +++ b/hw/virtio/vhost.c
->>> @@ -1081,7 +1081,7 @@ static void vhost_virtqueue_stop(struct vhost_dev *dev,
->>>  
->>>      r = dev->vhost_ops->vhost_get_vring_base(dev, &state);
->>>      if (r < 0) {
->>> -        VHOST_OPS_DEBUG("vhost VQ %d ring restore failed: %d", idx, r);
->>> +        VHOST_OPS_DEBUG("vhost VQ %u ring restore failed: %d", idx, r);
->>
->> 'idx' is indeed unsigned.
->>
->> Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
->>
->>>          /* Connection to the backend is broken, so let's sync internal
->>>           * last avail idx to the device used idx.
->>>           */
->>>
+> Fixes: CID 1401701
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  util/guest-random.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/util/guest-random.c b/util/guest-random.c
+> index e8124a3cad..00a08fd981 100644
+> --- a/util/guest-random.c
+> +++ b/util/guest-random.c
+> @@ -56,7 +56,7 @@ int qemu_guest_getrandom(void *buf, size_t len, Error **errp)
+>  
+>  void qemu_guest_getrandom_nofail(void *buf, size_t len)
+>  {
+> -    qemu_guest_getrandom(buf, len, &error_fatal);
+> +    (void)qemu_guest_getrandom(buf, len, &error_fatal);
+>  }
+>  
+>  uint64_t qemu_guest_random_seed_thread_part1(void)
 > 
 
 Applied to my trivial-patches branch.
