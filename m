@@ -2,51 +2,64 @@ Return-Path: <SRS0=9X/F=UF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CA743C04AB5
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 15:43:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E6F10C04AB5
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 15:45:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A7F19206BB
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 15:43:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A7F19206BB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id B3F8A206BB
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 15:45:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B3F8A206BB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:34174 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:34199 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hYuXn-0001Ul-RZ
-	for qemu-devel@archiver.kernel.org; Thu, 06 Jun 2019 11:43:11 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:44559)
+	id 1hYuZn-0003Ch-Tw
+	for qemu-devel@archiver.kernel.org; Thu, 06 Jun 2019 11:45:15 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:43355)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hYuWK-0000Vl-E3
-	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 11:41:42 -0400
+	(envelope-from <armbru@redhat.com>) id 1hYuT8-0005sh-Rh
+	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 11:38:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hYuWJ-0004a9-7v
-	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 11:41:40 -0400
-Received: from relay.sw.ru ([185.231.240.75]:50226)
+	(envelope-from <armbru@redhat.com>) id 1hYuT7-0006BP-96
+	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 11:38:22 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33346)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1hYuWJ-0004X8-0F; Thu, 06 Jun 2019 11:41:39 -0400
-Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
-	by relay.sw.ru with esmtp (Exim 4.91)
-	(envelope-from <vsementsov@virtuozzo.com>)
-	id 1hYuWD-0000xX-CX; Thu, 06 Jun 2019 18:41:33 +0300
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: qemu-devel@nongnu.org,
-	qemu-block@nongnu.org
-Date: Thu,  6 Jun 2019 18:41:32 +0300
-Message-Id: <20190606154132.153330-5-vsementsov@virtuozzo.com>
-X-Mailer: git-send-email 2.18.0
-In-Reply-To: <20190606154132.153330-1-vsementsov@virtuozzo.com>
-References: <20190606154132.153330-1-vsementsov@virtuozzo.com>
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 185.231.240.75
-Subject: [Qemu-devel] [PATCH 4/4] block: drop bs->job
+	(Exim 4.71) (envelope-from <armbru@redhat.com>)
+	id 1hYuT3-0005yv-GW; Thu, 06 Jun 2019 11:38:17 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 20F8D7EBC1;
+	Thu,  6 Jun 2019 15:38:11 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-148.ams2.redhat.com
+	[10.36.116.148])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id BE8C1619B7;
+	Thu,  6 Jun 2019 15:38:08 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+	id 9CFEA11385DF; Thu,  6 Jun 2019 17:38:03 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: qemu-devel@nongnu.org
+Date: Thu,  6 Jun 2019 17:38:03 +0200
+Message-Id: <20190606153803.5278-8-armbru@redhat.com>
+In-Reply-To: <20190606153803.5278-1-armbru@redhat.com>
+References: <20190606153803.5278-1-armbru@redhat.com>
+MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.27]);
+	Thu, 06 Jun 2019 15:38:11 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PATCH 7/7] qapi: Simplify QAPIDoc implements its
+ state machine
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -58,133 +71,251 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, wencongyang2@huawei.com,
-	xiechanglong.d@gmail.com, armbru@redhat.com, mreitz@redhat.com,
-	den@openvz.org, jsnow@redhat.com
+Cc: kwolf@redhat.com, pkrempa@redhat.com, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Drop remaining users of bs->job:
-1. assertions actually duplicated by assert(!bs->refcnt)
-2. trace-point seems not enough reason to change stream_start to return
-   BlockJob pointer
-3. Restricting creation of two jobs based on same bs is bad idea, as
-   3.1 Some jobs creates filters to be their main node, so, this check
-   don't actually prevent creating second job on same real node (which
-   will create another filter node) (but I hope it is restricted by
-   other mechanisms)
-   3.2 Even without bs->job we have two systems of permissions:
-   op-blockers and BLK_PERM
-   3.3 We may want to run several jobs on one node one day
+QAPIDoc uses a state machine to for processing of documentation lines.
+Its state is encoded as an enum QAPIDoc._state (well, as enum-like
+class actually, thanks to our infatuation with Python 2).
 
-And finally, drop bs->job pointer itself. Hurrah!
+All we ever do with the state is calling the state's function to
+process a line of documentation.  The enum values effectively serve as
+handles for the functions.
 
-Suggested-by: Kevin Wolf <kwolf@redhat.com>
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Eliminate the rather wordy indirection: store the function to call in
+QAPIDoc._append_line.  Update and improve comments.
+
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- include/block/block_int.h | 3 ---
- block.c                   | 2 --
- blockdev.c                | 2 +-
- blockjob.c                | 8 --------
- block/trace-events        | 2 +-
- 5 files changed, 2 insertions(+), 15 deletions(-)
+ scripts/qapi/common.py | 125 ++++++++++++++++++++++-------------------
+ 1 file changed, 68 insertions(+), 57 deletions(-)
 
-diff --git a/include/block/block_int.h b/include/block/block_int.h
-index 8bb1cfb80a..a498c2670b 100644
---- a/include/block/block_int.h
-+++ b/include/block/block_int.h
-@@ -812,9 +812,6 @@ struct BlockDriverState {
-     /* operation blockers */
-     QLIST_HEAD(, BdrvOpBlocker) op_blockers[BLOCK_OP_TYPE_MAX];
- 
--    /* long-running background operation */
--    BlockJob *job;
+diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
+index 1164301edf..d61bfdc526 100644
+--- a/scripts/qapi/common.py
++++ b/scripts/qapi/common.py
+@@ -102,6 +102,24 @@ class QAPISemError(QAPIError):
+=20
+=20
+ class QAPIDoc(object):
++    """
++    A documentation comment block, either expression or free-form
++
++    Expression documentation blocks consist of
++
++    * a body section: one line naming the expression, followed by an
++      overview (any number of lines)
++
++    * argument sections: a description of each argument (for commands
++      and events) or member (for structs, unions and alternates)
++
++    * features sections: a description of each feature flag
++
++    * additional (non-argument) sections, possibly tagged
++
++    Free-form documentation blocks consist only of a body section.
++    """
++
+     class Section(object):
+         def __init__(self, name=3DNone):
+             # optional section name (argument/member or section name)
+@@ -120,26 +138,6 @@ class QAPIDoc(object):
+         def connect(self, member):
+             self.member =3D member
+=20
+-    class DocPart:
+-        """
+-        Describes which part of the documentation we're parsing right no=
+w.
 -
-     /* The node that this node inherited default options from (and a reopen on
-      * which can affect this node by changing these defaults). This is always a
-      * parent node of this node. */
-diff --git a/block.c b/block.c
-index e3e77feee0..ceb2ea23c5 100644
---- a/block.c
-+++ b/block.c
-@@ -3905,7 +3905,6 @@ static void bdrv_close(BlockDriverState *bs)
-     BdrvAioNotifier *ban, *ban_next;
-     BdrvChild *child, *next;
- 
--    assert(!bs->job);
-     assert(!bs->refcnt);
- 
-     bdrv_drained_begin(bs); /* complete I/O */
-@@ -4146,7 +4145,6 @@ out:
- 
- static void bdrv_delete(BlockDriverState *bs)
- {
--    assert(!bs->job);
-     assert(bdrv_op_blocker_is_empty(bs));
-     assert(!bs->refcnt);
- 
-diff --git a/blockdev.c b/blockdev.c
-index 58aa1369a4..51eb5e86d7 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -3264,7 +3264,7 @@ void qmp_block_stream(bool has_job_id, const char *job_id, const char *device,
-         goto out;
-     }
- 
--    trace_qmp_block_stream(bs, bs->job);
-+    trace_qmp_block_stream(bs);
- 
- out:
-     aio_context_release(aio_context);
-diff --git a/blockjob.c b/blockjob.c
-index 7b6737adde..d64ea2623a 100644
---- a/blockjob.c
-+++ b/blockjob.c
-@@ -84,9 +84,7 @@ BlockJob *block_job_get(const char *id)
- void block_job_free(Job *job)
- {
-     BlockJob *bjob = container_of(job, BlockJob, job);
--    BlockDriverState *bs = blk_bs(bjob->blk);
- 
--    bs->job = NULL;
-     block_job_remove_all_bdrv(bjob);
-     blk_unref(bjob->blk);
-     error_free(bjob->blocker);
-@@ -403,11 +401,6 @@ void *block_job_create(const char *job_id, const BlockJobDriver *driver,
-     BlockJob *job;
-     int ret;
- 
--    if (bs->job) {
--        error_setg(errp, QERR_DEVICE_IN_USE, bdrv_get_device_name(bs));
--        return NULL;
--    }
+-        Expression documentation blocks consist of
+-        * a BODY part: first line naming the expression, plus an
+-          optional overview
+-        * an ARGS part: description of each argument (for commands and
+-          events) or member (for structs, unions and alternates),
+-        * a FEATURES part: description of each feature,
+-        * a VARIOUS part: optional tagged sections.
 -
-     if (job_id == NULL && !(flags & JOB_INTERNAL)) {
-         job_id = bdrv_get_device_name(bs);
-     }
-@@ -450,7 +443,6 @@ void *block_job_create(const char *job_id, const BlockJobDriver *driver,
-     error_setg(&job->blocker, "block device is in use by block job: %s",
-                job_type_str(&job->job));
-     block_job_add_bdrv(job, "main node", bs, 0, BLK_PERM_ALL, &error_abort);
--    bs->job = job;
- 
-     bdrv_op_unblock(bs, BLOCK_OP_TYPE_DATAPLANE, job->blocker);
- 
-diff --git a/block/trace-events b/block/trace-events
-index eab51497fc..912f84af39 100644
---- a/block/trace-events
-+++ b/block/trace-events
-@@ -53,7 +53,7 @@ qmp_block_job_resume(void *job) "job %p"
- qmp_block_job_complete(void *job) "job %p"
- qmp_block_job_finalize(void *job) "job %p"
- qmp_block_job_dismiss(void *job) "job %p"
--qmp_block_stream(void *bs, void *job) "bs %p job %p"
-+qmp_block_stream(void *bs) "bs %p"
- 
- # file-posix.c
- # file-win32.c
--- 
-2.18.0
+-        Free-form documentation blocks consist only of a BODY part.
+-        """
+-        # TODO Make it a subclass of Enum when Python 2 support is remov=
+ed
+-        BODY =3D 1
+-        ARGS =3D 2
+-        FEATURES =3D 3
+-        VARIOUS =3D 4
+-
+     def __init__(self, parser, info):
+         # self._parser is used to report errors with QAPIParseError.  Th=
+e
+         # resulting error position depends on the state of the parser.
+@@ -156,7 +154,7 @@ class QAPIDoc(object):
+         self.sections =3D []
+         # the current section
+         self._section =3D self.body
+-        self._part =3D QAPIDoc.DocPart.BODY
++        self._append_line =3D self._append_body_line
+=20
+     def has_section(self, name):
+         """Return True if we have a section with this name."""
+@@ -171,21 +169,10 @@ class QAPIDoc(object):
+=20
+         The way that the line is dealt with depends on which part of
+         the documentation we're parsing right now:
+-
+-        BODY means that we're ready to process free-form text into
+-        self.body.  A symbol name is only allowed if no other text was
+-        parsed yet.  It is interpreted as the symbol name that
+-        describes the currently documented object.  On getting the
+-        second symbol name, we proceed to ARGS.
+-
+-        ARGS means that we're parsing the arguments section.  Any
+-        symbol name is interpreted as an argument and an ArgSection is
+-        created for it.
+-
+-        VARIOUS is the final part where free-form sections may appear.
+-        This includes named sections such as "Return:" as well as
+-        unnamed paragraphs.  Symbols are not allowed any more in this
+-        part.
++        * The body section: ._append_line is ._append_body_line
++        * An argument section: ._append_line is ._append_args_line
++        * A features section: ._append_line is ._append_features_line
++        * An additional section: ._append_line is ._append_various_line
+         """
+         line =3D line[1:]
+         if not line:
+@@ -195,17 +182,7 @@ class QAPIDoc(object):
+         if line[0] !=3D ' ':
+             raise QAPIParseError(self._parser, "Missing space after #")
+         line =3D line[1:]
+-
+-        if self._part =3D=3D QAPIDoc.DocPart.BODY:
+-            self._append_body_line(line)
+-        elif self._part =3D=3D QAPIDoc.DocPart.ARGS:
+-            self._append_args_line(line)
+-        elif self._part =3D=3D QAPIDoc.DocPart.FEATURES:
+-            self._append_features_line(line)
+-        elif self._part =3D=3D QAPIDoc.DocPart.VARIOUS:
+-            self._append_various_line(line)
+-        else:
+-            assert False
++        self._append_line(line)
+=20
+     def end_comment(self):
+         self._end_section()
+@@ -219,6 +196,19 @@ class QAPIDoc(object):
+                         'TODO:')
+=20
+     def _append_body_line(self, line):
++        """
++        Process a line of documentation text in the body section.
++
++        If this a symbol line and it is the section's first line, this
++        is an expression documentation block for that symbol.
++
++        If it's an expression documentation block, another symbol line
++        begins the argument section for the argument named by it, and
++        a section tag begins an additional section.  Start that
++        section and append the line to it.
++
++        Else, append the line to the current section.
++        """
+         name =3D line.split(' ', 1)[0]
+         # FIXME not nice: things like '#  @foo:' and '# @foo: ' aren't
+         # recognized, and get silently treated as ordinary text
+@@ -230,38 +220,49 @@ class QAPIDoc(object):
+             if not self.symbol:
+                 raise QAPIParseError(self._parser, "Invalid name")
+         elif self.symbol:
+-            # We already know that we document some symbol
++            # This is an expression documentation block
+             if name.startswith('@') and name.endswith(':'):
+-                self._part =3D QAPIDoc.DocPart.ARGS
++                self._append_line =3D self._append_args_line
+                 self._append_args_line(line)
+             elif line =3D=3D 'Features:':
+-                self._part =3D QAPIDoc.DocPart.FEATURES
++                self._append_line =3D self._append_features_line
+             elif self._is_section_tag(name):
+-                self._part =3D QAPIDoc.DocPart.VARIOUS
++                self._append_line =3D self._append_various_line
+                 self._append_various_line(line)
+             else:
+                 self._append_freeform(line.strip())
+         else:
+-            # This is free-form documentation without a symbol
++            # This is a free-form documentation block
+             self._append_freeform(line.strip())
+=20
+     def _append_args_line(self, line):
++        """
++        Process a line of documentation text in an argument section.
++
++        A symbol line begins the next argument section, a section tag
++        section or a non-indented line after a blank line begins an
++        additional section.  Start that section and append the line to
++        it.
++
++        Else, append the line to the current section.
++
++        """
+         name =3D line.split(' ', 1)[0]
+=20
+         if name.startswith('@') and name.endswith(':'):
+             line =3D line[len(name)+1:]
+             self._start_args_section(name[1:-1])
+         elif self._is_section_tag(name):
+-            self._part =3D QAPIDoc.DocPart.VARIOUS
++            self._append_line =3D self._append_various_line
+             self._append_various_line(line)
+             return
+         elif (self._section.text.endswith('\n\n')
+               and line and not line[0].isspace()):
+             if line =3D=3D 'Features:':
+-                self._part =3D QAPIDoc.DocPart.FEATURES
++                self._append_line =3D self._append_features_line
+             else:
+                 self._start_section()
+-                self._part =3D QAPIDoc.DocPart.VARIOUS
++                self._append_line =3D self._append_various_line
+                 self._append_various_line(line)
+             return
+=20
+@@ -274,19 +275,29 @@ class QAPIDoc(object):
+             line =3D line[len(name)+1:]
+             self._start_features_section(name[1:-1])
+         elif self._is_section_tag(name):
+-            self._part =3D QAPIDoc.DocPart.VARIOUS
++            self._append_line =3D self._append_various_line
+             self._append_various_line(line)
+             return
+         elif (self._section.text.endswith('\n\n')
+               and line and not line[0].isspace()):
+             self._start_section()
+-            self._part =3D QAPIDoc.DocPart.VARIOUS
++            self._append_line =3D self._append_various_line
+             self._append_various_line(line)
+             return
+=20
+         self._append_freeform(line.strip())
+=20
+     def _append_various_line(self, line):
++        """
++        Process a line of documentation text in an additional section.
++
++        A symbol line is an error.
++
++        A section tag begins an additional section.  Start that
++        section and append the line to it.
++
++        Else, append the line to the current section.
++        """
+         name =3D line.split(' ', 1)[0]
+=20
+         if name.startswith('@') and name.endswith(':'):
+--=20
+2.21.0
 
 
