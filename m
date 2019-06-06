@@ -2,58 +2,49 @@ Return-Path: <SRS0=9X/F=UF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C8AFC28EB3
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 10:14:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F763C28D1E
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 10:16:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 083A320866
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 10:14:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 083A320866
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 473B420866
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 10:16:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 473B420866
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:57713 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:57751 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hYpPJ-0001Rp-9Q
-	for qemu-devel@archiver.kernel.org; Thu, 06 Jun 2019 06:14:05 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:49200)
+	id 1hYpRx-0002Qe-I5
+	for qemu-devel@archiver.kernel.org; Thu, 06 Jun 2019 06:16:49 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:49776)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Dave.Martin@arm.com>) id 1hYpOQ-0000yl-8r
-	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 06:13:11 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1hYpR4-0001u7-RU
+	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 06:15:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Dave.Martin@arm.com>) id 1hYpON-0007wJ-Sf
-	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 06:13:09 -0400
-Received: from foss.arm.com ([217.140.101.70]:41330)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Dave.Martin@arm.com>)
-	id 1hYpOK-0007ml-LU; Thu, 06 Jun 2019 06:13:04 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.72.51.249])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A8CDD341;
-	Thu,  6 Jun 2019 03:13:02 -0700 (PDT)
-Received: from e103592.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com
-	[10.72.51.249])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id BACDF3F690;
-	Thu,  6 Jun 2019 03:13:01 -0700 (PDT)
-Date: Thu, 6 Jun 2019 11:12:59 +0100
-From: Dave Martin <Dave.Martin@arm.com>
-To: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <20190606101258.GA28398@e103592.cambridge.arm.com>
-References: <20190605205706.569-1-richard.henderson@linaro.org>
-	<20190605205706.569-6-richard.henderson@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190605205706.569-6-richard.henderson@linaro.org>
-User-Agent: Mutt/1.5.23 (2014-03-12)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 217.140.101.70
-Subject: Re: [Qemu-devel] [PATCH v6 5/6] linux-user: Parse
- NT_GNU_PROPERTY_TYPE_0 notes
+	(envelope-from <vsementsov@virtuozzo.com>) id 1hYpQz-0007OW-ND
+	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 06:15:51 -0400
+Received: from relay.sw.ru ([185.231.240.75]:38212)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+	id 1hYpQx-0006sf-86
+	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 06:15:48 -0400
+Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
+	by relay.sw.ru with esmtp (Exim 4.91)
+	(envelope-from <vsementsov@virtuozzo.com>)
+	id 1hYpQj-0007Qy-Uc; Thu, 06 Jun 2019 13:15:34 +0300
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: qemu-devel@nongnu.org
+Date: Thu,  6 Jun 2019 13:15:33 +0300
+Message-Id: <20190606101533.20228-1-vsementsov@virtuozzo.com>
+X-Mailer: git-send-email 2.18.0
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
+X-Received-From: 185.231.240.75
+Subject: [Qemu-devel] [PATCH] qapi: InitSocketAddress: add keepalive option
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -65,177 +56,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
-	"qemu-arm@nongnu.org" <qemu-arm@nongnu.org>,
-	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: vsementsov@virtuozzo.com, berrange@redhat.com, armbru@redhat.com,
+	kraxel@redhat.com, den@openvz.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Jun 05, 2019 at 09:57:05PM +0100, Richard Henderson wrote:
-> For aarch64, this includes the GNU_PROPERTY_AARCH64_FEATURE_1_BTI bit,
-> which indicates that the image should be mapped with guarded pages.
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+---
 
-Heads-up: for arm64 I plan to move to making PT_GNU_PROPERTY
-authoritiative for ELF on linux: if this is present, we use it to find
-the note directly and ignore any other notes; if there is no
-PT_GNU_PROPERTY entry then we assume there is no NT_GNU_PROPERTY_TYPE_0
-note.
+Hi all!
 
-This is not quite decided yet, but to avoid fragmentation I'd prefer
-qemu and Linux apply the same policy -- I'll keep you in the loop about
-the decision.
+This is a continuation of "[PATCH v2 0/2] nbd: enable keepalive", but
+it's a try from another side, so almost nothing common with v2.
 
-I think you can reasonable upstream this patch in qemu and then
-subsequently make it stricter without an ABI break.  Upstream GNU ld
-generates this entry today.
 
-> 
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->  linux-user/elfload.c | 83 +++++++++++++++++++++++++++++++++++++++-----
->  1 file changed, 75 insertions(+), 8 deletions(-)
-> 
-> diff --git a/linux-user/elfload.c b/linux-user/elfload.c
-> index a57b7049dd..1a12c60a33 100644
-> --- a/linux-user/elfload.c
-> +++ b/linux-user/elfload.c
-> @@ -2253,7 +2253,7 @@ static void load_elf_image(const char *image_name, int image_fd,
->      struct elfhdr *ehdr = (struct elfhdr *)bprm_buf;
->      struct elf_phdr *phdr;
->      abi_ulong load_addr, load_bias, loaddr, hiaddr, error;
-> -    int i, retval;
-> +    int i, retval, prot_exec = PROT_EXEC;
->      const char *errmsg;
->  
->      /* First of all, some simple consistency checks */
-> @@ -2288,17 +2288,78 @@ static void load_elf_image(const char *image_name, int image_fd,
->      loaddr = -1, hiaddr = 0;
->      info->alignment = 0;
->      for (i = 0; i < ehdr->e_phnum; ++i) {
-> -        if (phdr[i].p_type == PT_LOAD) {
-> -            abi_ulong a = phdr[i].p_vaddr - phdr[i].p_offset;
-> +        struct elf_phdr *eppnt = phdr + i;
-> +
-> +        if (eppnt->p_type == PT_LOAD) {
-> +            abi_ulong a = eppnt->p_vaddr - eppnt->p_offset;
->              if (a < loaddr) {
->                  loaddr = a;
->              }
-> -            a = phdr[i].p_vaddr + phdr[i].p_memsz;
-> +            a = eppnt->p_vaddr + eppnt->p_memsz;
->              if (a > hiaddr) {
->                  hiaddr = a;
->              }
->              ++info->nsegs;
-> -            info->alignment |= phdr[i].p_align;
-> +            info->alignment |= eppnt->p_align;
-> +        } else if (eppnt->p_type == PT_NOTE) {
-> +#ifdef TARGET_AARCH64
-> +            /*
-> +             * Process NT_GNU_PROPERTY_TYPE_0.
-> +             *
-> +             * TODO: The only item that is AArch64 specific is the
-> +             * GNU_PROPERTY_AARCH64_FEATURE_1_AND processing at the end.
-> +             * If we were to ever process GNU_PROPERTY_X86_*, all of the
-> +             * code through checking the gnu0 magic number is sharable.
-> +             * But for now, since this *is* only used by AArch64, don't
-> +             * process the note elsewhere.
-> +             */
-> +            const uint32_t gnu0_magic = const_le32('G' | 'N' << 8 | 'U' << 16);
-> +            uint32_t note[7];
-> +
-> +            /*
-> +             * The note contents are 7 words, but depending on LP64 vs ILP32
-> +             * there may be an 8th padding word at the end.  Check for and
-> +             * read the minimum size.  Further checks below will validate
-> +             * that the sizes of everything involved are as we expect.
-> +             */
-> +            if (eppnt->p_filesz < sizeof(note)) {
-> +                continue;
-> +            }
-> +            if (eppnt->p_offset + eppnt->p_filesz <= BPRM_BUF_SIZE) {
-> +                memcpy(note, bprm_buf + eppnt->p_offset, sizeof(note));
-> +            } else {
-> +                retval = pread(image_fd, note, sizeof(note), eppnt->p_offset);
-> +                if (retval != sizeof(note)) {
-> +                    goto exit_perror;
-> +                }
-> +            }
+ qapi/sockets.json   |  5 ++++-
+ util/qemu-sockets.c | 13 +++++++++++++
+ 2 files changed, 17 insertions(+), 1 deletion(-)
 
-Can we police that the segment alignment matches the ELF class (i.e., 8
-for 64-bit, 4 for 32-bit)?
+diff --git a/qapi/sockets.json b/qapi/sockets.json
+index fc81d8d5e8..aefa024051 100644
+--- a/qapi/sockets.json
++++ b/qapi/sockets.json
+@@ -53,6 +53,8 @@
+ #
+ # @ipv6: whether to accept IPv6 addresses, default try both IPv4 and IPv6
+ #
++# @keepalive: enable keepalive when connecting to this socket (Since 4.1)
++#
+ # Since: 1.3
+ ##
+ { 'struct': 'InetSocketAddress',
+@@ -61,7 +63,8 @@
+     '*numeric':  'bool',
+     '*to': 'uint16',
+     '*ipv4': 'bool',
+-    '*ipv6': 'bool' } }
++    '*ipv6': 'bool',
++    '*keepalive': 'bool' } }
+ 
+ ##
+ # @UnixSocketAddress:
+diff --git a/util/qemu-sockets.c b/util/qemu-sockets.c
+index 8850a280a8..d2cd2a9d4f 100644
+--- a/util/qemu-sockets.c
++++ b/util/qemu-sockets.c
+@@ -457,6 +457,19 @@ int inet_connect_saddr(InetSocketAddress *saddr, Error **errp)
+     }
+ 
+     freeaddrinfo(res);
++
++    if (saddr->keepalive) {
++        int val = 1;
++        int ret = qemu_setsockopt(sock, SOL_SOCKET, SO_KEEPALIVE,
++                                  &val, sizeof(val));
++
++        if (ret < 0) {
++            error_setg_errno(errp, errno, "Unable to set KEEPALIVE");
++            close(sock);
++            return -1;
++        }
++    }
++
+     return sock;
+ }
+ 
+-- 
+2.18.0
 
-hjl specifies this, but it's controversial and sometimes missed --
-there's a bug right now in GNU ld where --force-bti generates a note
-with alignment 1.
-
-Due to the high chance of screwing this up, it'd be good to police it
-wherever appropriate.
-
-> +#ifdef BSWAP_NEEDED
-> +            for (i = 0; i < ARRAY_SIZE(note); ++i) {
-> +                bswap32s(note + i);
-> +            }
-> +#endif
-> +            /*
-> +             * Check that this is a NT_GNU_PROPERTY_TYPE_0 note.
-> +             * Again, descsz includes padding.  Full size validation
-> +             * awaits checking the final payload.
-> +             */
-> +            if (note[0] != 4 ||                       /* namesz */
-> +                note[1] < 12 ||                       /* descsz */
-> +                note[2] != NT_GNU_PROPERTY_TYPE_0 ||  /* type */
-> +                note[3] != gnu0_magic) {              /* name */
-> +                continue;
-> +            }
-> +            /*
-> +             * Check for the BTI feature.  If present, this indicates
-> +             * that all the executable pages of the binary should be
-> +             * mapped with PROT_BTI, so that branch targets are enforced.
-> +             */
-> +            if (note[4] == GNU_PROPERTY_AARCH64_FEATURE_1_AND &&
-> +                note[5] == 4 &&
-> +                (note[6] & GNU_PROPERTY_AARCH64_FEATURE_1_BTI)) {
-> +                prot_exec |= TARGET_PROT_BTI;
-> +            }
-> +#endif /* TARGET_AARCH64 */
->          }
->      }
->  
-> @@ -2358,9 +2419,15 @@ static void load_elf_image(const char *image_name, int image_fd,
->              abi_ulong vaddr, vaddr_po, vaddr_ps, vaddr_ef, vaddr_em, vaddr_len;
->              int elf_prot = 0;
->  
-> -            if (eppnt->p_flags & PF_R) elf_prot =  PROT_READ;
-> -            if (eppnt->p_flags & PF_W) elf_prot |= PROT_WRITE;
-> -            if (eppnt->p_flags & PF_X) elf_prot |= PROT_EXEC;
-> +            if (eppnt->p_flags & PF_R) {
-> +                elf_prot |= PROT_READ;
-> +            }
-> +            if (eppnt->p_flags & PF_W) {
-> +                elf_prot |= PROT_WRITE;
-> +            }
-> +            if (eppnt->p_flags & PF_X) {
-> +                elf_prot |= prot_exec;
-> +            }
-
-Ack.
-
-There are interesting subtleties with segment alignments here: the prot
-flags on each segment "bleed" to an adjacent boundary.  I'm not sure
-that behaviour is well specified, but we at least get away with it due
-to conventions regarding the ordering of segments.
-
-I still have to think about whether this works right for PROT_BTI, which
-is a prohibition rather than a permission, suggesting that the bleed
-rules might need to be inverted for it.
-
-My current policy is that because and ELF is all-BTI if any page is BTI,
-we probably get away with it, without having to do anything special.
-
-[...]
-
-Cheers
----Dave
 
