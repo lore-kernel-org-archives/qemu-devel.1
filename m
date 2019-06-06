@@ -4,68 +4,68 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3FD72C28EB4
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 11:13:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FBF8C28D1E
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 11:13:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 167DB207E0
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 11:13:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 167DB207E0
+	by mail.kernel.org (Postfix) with ESMTPS id 28591207E0
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 11:13:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 28591207E0
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:58453 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:58457 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hYqKL-0004tb-AA
-	for qemu-devel@archiver.kernel.org; Thu, 06 Jun 2019 07:13:01 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:60373)
+	id 1hYqKj-0005EZ-7k
+	for qemu-devel@archiver.kernel.org; Thu, 06 Jun 2019 07:13:25 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:60747)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hYqFL-0000P7-Tk
-	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 07:07:52 -0400
+	(envelope-from <laurent@vivier.eu>) id 1hYqFZ-0000ad-BJ
+	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 07:08:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hYqFI-0003X6-6V
-	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 07:07:50 -0400
-Received: from mout.kundenserver.de ([212.227.17.13]:38547)
+	(envelope-from <laurent@vivier.eu>) id 1hYqFY-0003uH-CQ
+	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 07:08:05 -0400
+Received: from mout.kundenserver.de ([212.227.17.10]:55263)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <laurent@vivier.eu>)
-	id 1hYqF6-0003EB-FB; Thu, 06 Jun 2019 07:07:36 -0400
+	id 1hYqFV-0003op-VF; Thu, 06 Jun 2019 07:08:02 -0400
 Received: from localhost.localdomain ([78.238.229.36]) by
 	mrelayeu.kundenserver.de (mreue107 [212.227.15.183]) with ESMTPSA
 	(Nemesis)
-	id 1MkIAB-1gokqY1WHJ-00kkA9; Thu, 06 Jun 2019 13:06:51 +0200
+	id 1MVMJ7-1hAGXq33Ul-00SNSl; Thu, 06 Jun 2019 13:07:02 +0200
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Date: Thu,  6 Jun 2019 13:06:17 +0200
-Message-Id: <20190606110625.32127-9-laurent@vivier.eu>
+Date: Thu,  6 Jun 2019 13:06:23 +0200
+Message-Id: <20190606110625.32127-15-laurent@vivier.eu>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190606110625.32127-1-laurent@vivier.eu>
 References: <20190606110625.32127-1-laurent@vivier.eu>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:hp5C+eRkhKhZrL9ujfcR5R1twR4hIZGd7hOEgFE+5WIY2q2d8lY
-	kN/JEeng4lPu0Ecb53uf5a36SNII/prxc7ozqApBR4wgoSiD282kjxkkuv3171iGM7yuz+r
-	hONn0dYWoQi/b5920YVliGTFHcx0mDmfK75CcNl6N3MlE3EcdEwG1ZCC6ecgj9m33FqnDAN
-	jSJz3ir0wPZLxcfDxFnTw==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:WFMkMbI5+Qk=:l7BrzmzlCtS/uryTbB9SRq
-	UjqIEOfGTswngkSpPUcZpXPwpySk2vU3hbL4UIf8mB5WfpmlQlwPQGwchlNjb8lOnACSxA08F
-	db7lwXFr1dnLD4BV0GFXZ1OnNkSFuXdZqzYizIGmh7R9q9qpibg6UOZHtPlzJ00ikH4tFF9sW
-	zLAt1MzgY0vxILRJzrsVGA/eriWyAYUfh4FL+qpxqwngkunsk86+PmLmsRgjTGT/9AJxOgj3Y
-	3kksLEbdbBxR//IDg6AC2hGCheQ3LPYjQ4I9Lz5uNgchjdntKfhUm8R7LwB0rkqcIAB3jowY6
-	CoU4I6jA8iJ39VRflpFyobnM5jV642+W8kyU6YGKHnRbiV2QJJsvzg+V1uTxUmLVSQmF9aRZN
-	b48wRQ3TbUFX2UNpbAdb99WR4z8aiq4oaeAw5jZVdocc36+seHz0CqiM/+D1DEw4bYYQZjB8z
-	Z5oB7GN5hd13Av/VSaLpG0AjkT5tXYK4oFntOS93kDN6RacwFdD+p5iyg7s5mT8Ur5A77rQvP
-	/dhIQPcRxJ/rIe7xQaieAEPDyZ/2f4dXXL2MH78x6aThvfOcc0rvHW/d0IMVQ4KDVnr0AJUZ/
-	99+OKSg1ON+mDyPixOqeNQj94jgcU+k1nnfQHT2Uh8aaIihEqRVfdOYNP/Rye0bny4OOgYAFN
-	Dg79EVs9kP+U01ZTdjx7HCPrWvLjNLpksR2v+kf2i1dQ9C2L1gZ7Dr8VTcuDYlQnnQLN4zCqo
-	yxRFyOPap2hCxh5HggK7PmGcZp9NU16B4+zOrg0ppOewJ+GZCs5ebQoxs1A=
+X-Provags-ID: V03:K1:6yAVocbjKkdBthOG0ZynWAA9tjWYhTGgRctHDWFppOnRh6f2oMI
+	/vBXPjYl9uytwxPm04GLkOO7j2odwptj220yrssmmYDeu0p6f+nOslYEn2YV9RLY0AFoTwk
+	/Js5BQh+wgbFrluk1P3muu+XHFGrYBEikXnFBGguEjXFynE/RZr1ORbtbU3QrJfWVYTOjV3
+	XxNsfe0AepBWa+PepxPEQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:a7UhvE8kYu0=:HOw3Hj6Z+A6PP6wACCkwe9
+	h3cyl3LZAPts2BrmQ/Rcd31UoLU6jx31hJSCCGgbUC1g2CrBY3jegxvu8YVXXNBiuNwFUS+39
+	+NuWw015mgPDFwXEVPEDQM0ypqp17ulEa9LOzgTXqBnGEXujsQRncbHmWAAeU9ajurvchszGa
+	otlD7e9F6Wle+N/jgjgTbrdiI1FAqDjzpnVcdJFjPrUYML2gGkEpliu6/V9KKCiLsVVEjqqgG
+	HzIQj1xL6bTjDp2Ln2016N8dmg1pGMcD3crtSOn0qMabF/6cBezy2Ovo4eo1Rq2/rkZJlH0Hj
+	7BiMiuoDY3EAskoJj6l3nq1sHgVzkey3oEMXp4qpwCXbXbeqCouEsPouaEcVty5Wk2b/Ufoch
+	csvi8lzHGBDMM/P8mLvfgzWvUS/ktbSVViNZ3c+8Fv/154D90h7Ix1pueVFBASTyqYHpsEEHe
+	VPqnmuy1auUwIhcz2nFuXAFdwlS3VVPxMLRqkZKTdijfnRuXvDNPL7L5FvbAS28fCBa7d3xC2
+	UQkD52h9vNZ/hY5vcpFPJYPhOfC94ptFvolcAgB3XzHEoPmb3yQ5DiSPdHivRuQLV5hrnTYgE
+	MchukZicxKLDe5d3WNrliGpf2W9gCpS8SrEaGVHRJsVIQ4eMlumt80ShKfLtSaS4zUSg0+CTG
+	uxORGPOE3Ltsy+SEzjGF/g/YUfVh5miWlOLPcwaDgjtJ8KzS2swqtlLTDomgZ3x+JQ1vMPrAY
+	Ca/fe1I+ZmBs0B/r1hl4T7LVpC1cCcFg2yTGFNqysDvF2zW/YQ18TTOUmvY=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.17.13
-Subject: [Qemu-devel] [PULL 08/16] hw/pci-bridge: Use the QOM BUS() macro to
- access BusState.qbus
+X-Received-From: 212.227.17.10
+Subject: [Qemu-devel] [PULL 14/16] hw/sd: Use the QOM BUS() macro to access
+ BusState.qbus
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -116,26 +116,40 @@ This patch was generated using the following Coccinelle script:
 
 Suggested-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Reviewed-by: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Message-Id: <20190528164020.32250-4-philmd@redhat.com>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Message-Id: <20190528164020.32250-6-philmd@redhat.com>
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- hw/pci/pci_bridge.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ hw/sd/milkymist-memcard.c | 2 +-
+ hw/sd/ssi-sd.c            | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/hw/pci/pci_bridge.c b/hw/pci/pci_bridge.c
-index c6d9ded3203c..8d954885c0a1 100644
---- a/hw/pci/pci_bridge.c
-+++ b/hw/pci/pci_bridge.c
-@@ -273,7 +273,7 @@ void pci_bridge_write_config(PCIDevice *d,
-     newctl = pci_get_word(d->config + PCI_BRIDGE_CONTROL);
-     if (~oldctl & newctl & PCI_BRIDGE_CTL_BUS_RESET) {
-         /* Trigger hot reset on 0->1 transition. */
--        qbus_reset_all(&s->sec_bus.qbus);
-+        qbus_reset_all(BUS(&s->sec_bus));
+diff --git a/hw/sd/milkymist-memcard.c b/hw/sd/milkymist-memcard.c
+index df42aa1c545b..dd1ba649d9c0 100644
+--- a/hw/sd/milkymist-memcard.c
++++ b/hw/sd/milkymist-memcard.c
+@@ -277,7 +277,7 @@ static void milkymist_memcard_realize(DeviceState *dev, Error **errp)
+     /* FIXME use a qdev drive property instead of drive_get_next() */
+     dinfo = drive_get_next(IF_SD);
+     blk = dinfo ? blk_by_legacy_dinfo(dinfo) : NULL;
+-    carddev = qdev_create(&s->sdbus.qbus, TYPE_SD_CARD);
++    carddev = qdev_create(BUS(&s->sdbus), TYPE_SD_CARD);
+     qdev_prop_set_drive(carddev, "drive", blk, &err);
+     object_property_set_bool(OBJECT(carddev), true, "realized", &err);
+     if (err) {
+diff --git a/hw/sd/ssi-sd.c b/hw/sd/ssi-sd.c
+index 623d0333e863..25e1009277ed 100644
+--- a/hw/sd/ssi-sd.c
++++ b/hw/sd/ssi-sd.c
+@@ -249,7 +249,7 @@ static void ssi_sd_realize(SSISlave *d, Error **errp)
+     /* Create and plug in the sd card */
+     /* FIXME use a qdev drive property instead of drive_get_next() */
+     dinfo = drive_get_next(IF_SD);
+-    carddev = qdev_create(&s->sdbus.qbus, TYPE_SD_CARD);
++    carddev = qdev_create(BUS(&s->sdbus), TYPE_SD_CARD);
+     if (dinfo) {
+         qdev_prop_set_drive(carddev, "drive", blk_by_legacy_dinfo(dinfo), &err);
      }
- }
- 
 -- 
 2.21.0
 
