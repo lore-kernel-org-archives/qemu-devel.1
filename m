@@ -4,54 +4,54 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C6B7DC04AB5
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 16:29:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D481C04AB5
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 16:29:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9EDA620652
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 16:29:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9EDA620652
+	by mail.kernel.org (Postfix) with ESMTPS id 3779920652
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 16:29:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3779920652
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:34940 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:34942 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hYvGW-0004aZ-Pr
-	for qemu-devel@archiver.kernel.org; Thu, 06 Jun 2019 12:29:24 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:55377)
+	id 1hYvGe-0004gY-8d
+	for qemu-devel@archiver.kernel.org; Thu, 06 Jun 2019 12:29:32 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:55426)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1hYvEt-0003TI-Uq
-	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 12:27:45 -0400
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1hYvEy-0003Xp-KI
+	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 12:27:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1hYvEs-0003UH-2T
-	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 12:27:43 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:43423 helo=mail.rt-rk.com)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1hYvEu-0003X9-0u
+	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 12:27:46 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:43460 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1hYvEr-0003Rc-Cg
-	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 12:27:41 -0400
+	id 1hYvEs-0003TG-6y
+	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 12:27:43 -0400
 Received: from localhost (localhost [127.0.0.1])
-	by mail.rt-rk.com (Postfix) with ESMTP id 4B5B41A2183;
+	by mail.rt-rk.com (Postfix) with ESMTP id DF8B61A1FBD;
 	Thu,  6 Jun 2019 18:27:39 +0200 (CEST)
 X-Virus-Scanned: amavisd-new at rt-rk.com
 Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
 	[10.10.13.43])
-	by mail.rt-rk.com (Postfix) with ESMTPSA id 168071A1FBD;
+	by mail.rt-rk.com (Postfix) with ESMTPSA id B92451A1F8A;
 	Thu,  6 Jun 2019 18:27:39 +0200 (CEST)
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
 To: qemu-devel@nongnu.org
-Date: Thu,  6 Jun 2019 18:27:14 +0200
-Message-Id: <1559838440-9866-5-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Thu,  6 Jun 2019 18:27:17 +0200
+Message-Id: <1559838440-9866-8-git-send-email-aleksandar.markovic@rt-rk.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1559838440-9866-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1559838440-9866-1-git-send-email-aleksandar.markovic@rt-rk.com>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
 X-Received-From: 89.216.37.149
-Subject: [Qemu-devel] [PATCH v4 04/10] target/mips: Unroll loops in helpers
- for MSA logic instructions
+Subject: [Qemu-devel] [PATCH v4 07/10] tests/tcg: target/mips: Move four
+ tests to a better location
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -70,78 +70,39 @@ Sender: "Qemu-devel"
 
 From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-Unroll loops in helpers for MSA logic instructions for better
-performance.
+Move tests for <MUL|MULR>_Q.<H|B> from "integer multiply" directory
+to "fixed-point multiply" directory, since they do not operate on
+integers, but on fixed point numbers.
 
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-Reviewed-by: Aleksandar Rikalo <arikalo@wavecomp.com>
-Message-Id: <1559745316-1454-4-git-send-email-aleksandar.markovic@rt-rk.com>
+eviewed-by: Aleksandar Rikalo <arikalo@wavecomp.com>
 ---
- target/mips/msa_helper.c | 44 ++++++++++++++++++++++++++++++++++++++++----
- 1 file changed, 40 insertions(+), 4 deletions(-)
+ .../mips/user/ase/msa/{int-multiply => fixed-multiply}/test_msa_mul_q_h.c | 0
+ .../mips/user/ase/msa/{int-multiply => fixed-multiply}/test_msa_mul_q_w.c | 0
+ .../user/ase/msa/{int-multiply => fixed-multiply}/test_msa_mulr_q_h.c     | 0
+ .../user/ase/msa/{int-multiply => fixed-multiply}/test_msa_mulr_q_w.c     | 0
+ 4 files changed, 0 insertions(+), 0 deletions(-)
+ rename tests/tcg/mips/user/ase/msa/{int-multiply => fixed-multiply}/test_msa_mul_q_h.c (100%)
+ rename tests/tcg/mips/user/ase/msa/{int-multiply => fixed-multiply}/test_msa_mul_q_w.c (100%)
+ rename tests/tcg/mips/user/ase/msa/{int-multiply => fixed-multiply}/test_msa_mulr_q_h.c (100%)
+ rename tests/tcg/mips/user/ase/msa/{int-multiply => fixed-multiply}/test_msa_mulr_q_w.c (100%)
 
-diff --git a/target/mips/msa_helper.c b/target/mips/msa_helper.c
-index 7b73e22..a861155 100644
---- a/target/mips/msa_helper.c
-+++ b/target/mips/msa_helper.c
-@@ -268,10 +268,6 @@ void helper_msa_ ## FUNC(CPUMIPSState *env, uint32_t wd, uint32_t ws,   \
-     }                                                                   \
- }
- 
--MSA_FN_VECTOR(and_v, pwd->d[i], pws->d[i] & pwt->d[i])
--MSA_FN_VECTOR(or_v, pwd->d[i], pws->d[i] | pwt->d[i])
--MSA_FN_VECTOR(nor_v, pwd->d[i], ~(pws->d[i] | pwt->d[i]))
--MSA_FN_VECTOR(xor_v, pwd->d[i], pws->d[i] ^ pwt->d[i])
- MSA_FN_VECTOR(bmnz_v, pwd->d[i],
-         BIT_MOVE_IF_NOT_ZERO(pwd->d[i], pws->d[i], pwt->d[i], DF_DOUBLE))
- MSA_FN_VECTOR(bmz_v, pwd->d[i],
-@@ -283,6 +279,46 @@ MSA_FN_VECTOR(bsel_v, pwd->d[i],
- #undef BIT_SELECT
- #undef MSA_FN_VECTOR
- 
-+void helper_msa_and_v(CPUMIPSState *env, uint32_t wd, uint32_t ws, uint32_t wt)
-+{
-+    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
-+    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
-+    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
-+
-+    pwd->d[0] = pws->d[0] & pwt->d[0];
-+    pwd->d[1] = pws->d[1] & pwt->d[1];
-+}
-+
-+void helper_msa_or_v(CPUMIPSState *env, uint32_t wd, uint32_t ws, uint32_t wt)
-+{
-+    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
-+    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
-+    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
-+
-+    pwd->d[0] = pws->d[0] | pwt->d[0];
-+    pwd->d[1] = pws->d[1] | pwt->d[1];
-+}
-+
-+void helper_msa_nor_v(CPUMIPSState *env, uint32_t wd, uint32_t ws, uint32_t wt)
-+{
-+    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
-+    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
-+    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
-+
-+    pwd->d[0] = ~(pws->d[0] | pwt->d[0]);
-+    pwd->d[1] = ~(pws->d[1] | pwt->d[1]);
-+}
-+
-+void helper_msa_xor_v(CPUMIPSState *env, uint32_t wd, uint32_t ws, uint32_t wt)
-+{
-+    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
-+    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
-+    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
-+
-+    pwd->d[0] = pws->d[0] ^ pwt->d[0];
-+    pwd->d[1] = pws->d[1] ^ pwt->d[1];
-+}
-+
- static inline int64_t msa_addv_df(uint32_t df, int64_t arg1, int64_t arg2)
- {
-     return arg1 + arg2;
+diff --git a/tests/tcg/mips/user/ase/msa/int-multiply/test_msa_mul_q_h.c b/tests/tcg/mips/user/ase/msa/fixed-multiply/test_msa_mul_q_h.c
+similarity index 100%
+rename from tests/tcg/mips/user/ase/msa/int-multiply/test_msa_mul_q_h.c
+rename to tests/tcg/mips/user/ase/msa/fixed-multiply/test_msa_mul_q_h.c
+diff --git a/tests/tcg/mips/user/ase/msa/int-multiply/test_msa_mul_q_w.c b/tests/tcg/mips/user/ase/msa/fixed-multiply/test_msa_mul_q_w.c
+similarity index 100%
+rename from tests/tcg/mips/user/ase/msa/int-multiply/test_msa_mul_q_w.c
+rename to tests/tcg/mips/user/ase/msa/fixed-multiply/test_msa_mul_q_w.c
+diff --git a/tests/tcg/mips/user/ase/msa/int-multiply/test_msa_mulr_q_h.c b/tests/tcg/mips/user/ase/msa/fixed-multiply/test_msa_mulr_q_h.c
+similarity index 100%
+rename from tests/tcg/mips/user/ase/msa/int-multiply/test_msa_mulr_q_h.c
+rename to tests/tcg/mips/user/ase/msa/fixed-multiply/test_msa_mulr_q_h.c
+diff --git a/tests/tcg/mips/user/ase/msa/int-multiply/test_msa_mulr_q_w.c b/tests/tcg/mips/user/ase/msa/fixed-multiply/test_msa_mulr_q_w.c
+similarity index 100%
+rename from tests/tcg/mips/user/ase/msa/int-multiply/test_msa_mulr_q_w.c
+rename to tests/tcg/mips/user/ase/msa/fixed-multiply/test_msa_mulr_q_w.c
 -- 
 2.7.4
 
