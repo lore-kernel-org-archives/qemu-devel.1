@@ -3,42 +3,42 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CB4F5C04AB5
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 09:33:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A7C1C04AB5
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 09:34:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 530D720684
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 09:33:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 530D720684
+	by mail.kernel.org (Postfix) with ESMTPS id 11DE020684
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 09:34:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 11DE020684
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:57198 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:57213 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hYoly-0002Oy-3O
-	for qemu-devel@archiver.kernel.org; Thu, 06 Jun 2019 05:33:26 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:39654)
+	id 1hYon4-000381-8W
+	for qemu-devel@archiver.kernel.org; Thu, 06 Jun 2019 05:34:34 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:40022)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hYokl-00022X-Pb
-	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 05:32:12 -0400
+	(envelope-from <laurent@vivier.eu>) id 1hYolk-0002Uz-7Q
+	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 05:33:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hYoki-0001Vd-QV
-	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 05:32:10 -0400
-Received: from mout.kundenserver.de ([212.227.126.133]:55143)
+	(envelope-from <laurent@vivier.eu>) id 1hYolj-0003RH-7l
+	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 05:33:12 -0400
+Received: from mout.kundenserver.de ([212.227.126.187]:55537)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <laurent@vivier.eu>)
-	id 1hYokc-0001GO-EO; Thu, 06 Jun 2019 05:32:04 -0400
+	id 1hYole-0003Hh-Hv; Thu, 06 Jun 2019 05:33:06 -0400
 Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
-	(mreue011 [213.165.67.103]) with ESMTPSA (Nemesis) id
-	1MRT6b-1hE6OQ1wIP-00NRv7; Thu, 06 Jun 2019 11:31:35 +0200
+	(mreue012 [213.165.67.103]) with ESMTPSA (Nemesis) id
+	1MQ8OG-1hCjX215Hc-00M3IM; Thu, 06 Jun 2019 11:32:36 +0200
 To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
 	qemu-devel@nongnu.org, qemu-trivial@nongnu.org
 References: <20190528164020.32250-1-philmd@redhat.com>
-	<20190528164020.32250-4-philmd@redhat.com>
+	<20190528164020.32250-5-philmd@redhat.com>
 From: Laurent Vivier <laurent@vivier.eu>
 Openpgp: preference=signencrypt
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
@@ -83,35 +83,35 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
 	OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
 	JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
 	ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <c7e29772-5968-7bc5-a543-2c1866fd1135@vivier.eu>
-Date: Thu, 6 Jun 2019 11:31:32 +0200
+Message-ID: <a6d05ec7-fce9-4dab-46d1-5f89100b5ca3@vivier.eu>
+Date: Thu, 6 Jun 2019 11:32:31 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <20190528164020.32250-4-philmd@redhat.com>
+In-Reply-To: <20190528164020.32250-5-philmd@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:tkU5vNoJkwfSQC8R7wXkSyg4g9Tg/sBdSCmcpn9Hs0Rpw4BDEgn
-	qiQJLCQ+bUaiSJCfat3CtcTrAEGIfjI4W3D/LaO3ydV68tBMuuUEdoyKJkL3SbMGXIXc8E6
-	ZhyZyCFFjJpnlfSQ+zrvkJ8btq3pZIBfr58r0CcULO0Pgz9qDSgefEDBiqbv2iwCdQczHlo
-	b+LpnKmHp7ETBOc7Kv1NA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:RyQrphh9o5s=:j2FdppexCTHYw49y06jFHS
-	Fa2Jbsu6lDHqpq3jbk8quwy9UsOCxPdu69jH2bv58kiRDR6eLc9IME6imliJYH9y1kdttvJ4L
-	KSPiOYFY+4jYRIsJ9/7IoJnTUP5URlvmqpxRA9M3IvbxVNMkoAm876i5rCEBmpce3qdXw7cU+
-	5O65a4cINe2MHZ1TXqtMb3IDX9CDNCQB8j2I2f136BTsjafO22Y/qW2apDDyw/LeCM1L/Q5OW
-	jADVEpnmoAOKDTEmf+hECaDk8D/7raWaXUj5thVrNphsId0DYATaC1rG5OlZLfWa/ioW9kOV7
-	70VCEGzQ8Y03P43QBbSnwMCo6VhqZuRLKW+EIDLkq5Q0D7Ncm8XFKIGLaUDsUIzYPoSHqYB2n
-	tvwQcl8H71XhZS5K8kXHZmVxxYhB7euTXYf636smf4UtNwLT0LJDyaN2Se3uhi+Y+14LKElkD
-	FsMCiKNpGlsqDXWdE8DADNAWBQWUBTY3Lv0OvhnDB+OTYi2NxPmMRR19wBIRvWEl8Ib3NjCjA
-	jKbYpezM3RxBDX9IIHrSggGiXaRUAIgcqWJs/tToQd6gm6zWsEjQ+KEdTkpMnI1XZ+dbY1Dhr
-	ohGwzWnSB6lRawvK1ALB+6iQOo11+ieNoVPLHWhFlL8Kgzht9ZKUXUaiNrjPxxjW95uGBTafI
-	8MCSWhuvC6XZvAnnsrPrnWUmDdaB3cazszghFXEHBAA03iscDjbpzTaER4wXmBYSbAgvmYYxP
-	4WOkpClHXDW368M59guJCsxjwWV73ZHY+hgZH4UGgqyp9635efTTnyKr22s=
+X-Provags-ID: V03:K1:50tanNxAfylzd4Rt3RSAQVBfYQxNoKnbtgWnpkc7sZlN98FiaEo
+	Nk/LiCqjv8ZTXPYAn9PjFO57QaWqlhNFy929RGGefSQKcoKMNqkcKKVZ7B52511FviBu3hm
+	FXhwpj/YSbJnzfkYwkCnWZ5F45KxaAVInPLaYYPIumK7dYcx+d1vaJcRnaVneR2xP4PfgvP
+	zBaEXcajwUS8eQO9HK/CQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:3v6zO1MXgHw=:mQ9zymExVK3asF1OrYk2Zo
+	JaODknAh4iTDC2fkRJPSmOhWd4gN7Al/xmrYgP7ogY+uMCSzwb/ynKeHRPam9zObHLlJMLKID
+	CZc8CykTGCtvv0ipFzzhuq3fWJQ+bxP3IGV2upfuq8rXHnR0085ozB9y2bPY95RvG6rgJbj5F
+	CbqydlNX7mh9Em2nsS6bzaaVsSLznmOgbUTkRBVXRe55JpiNFca/wu12E8YnksKJBraeoEl0Q
+	mxJyLlxWMVsOrfPaymXcveSveUN/TEI0Y/LKv4V8sjWMPcAxsGs8CQKke0Ja0a+iSbkugsLuT
+	bGHXVTJfJCR0t405XyWJBJ7gdrOPzokmrNDpVui5spFkNiu0c+x5Bon5MqvE42OmRXig000cA
+	eSBEw+RAEa+CIu+rpOduTMCMPzRsDiXmA7acFgle+KSCvBynV/S66P6G/kqvewTwMorPwCqHf
+	cqzPm4edbrZa0Nn3D8/XOqL4m/aYzHOfZ3P7O2s1RprVyIVUAM6ClIzt0h3IMdOxOwV0WfyUn
+	yDRUx+A1JnmKbvTBG25Jebg1zurbxWkFD+R56E34qVNslbbIdfz4lmQmD85RFF1PrIEzdWelH
+	olR7Uvi3wItAL0UhAaAh2+a4IV7tthEi4yQql2npQK+Ucej9mpWJA2HG5vjXNdR43OG+ltQSI
+	bJwvKsyxaXDEMY08dWOgmOnIU2N5PtWvGQqmxh1lr3ZmEYPrc1IysfogyAY2n7lHdAaditG16
+	89uy0ozNK3H+RID77AqRODatoPBBSCgn+Dr2pFTGYfi6Hnd5VasTbsJcBe8=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.126.133
-Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH v2 03/10] hw/pci-bridge: Use
- the QOM BUS() macro to access BusState.qbus
+X-Received-From: 212.227.126.187
+Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH v2 04/10]
+ hw/s390x/event-facility: Use the QOM BUS() macro to access BusState.qbus
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -158,20 +158,26 @@ Le 28/05/2019 à 18:40, Philippe Mathieu-Daudé a écrit :
 > Suggested-by: Peter Maydell <peter.maydell@linaro.org>
 > Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 > ---
->  hw/pci/pci_bridge.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  hw/s390x/event-facility.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 > 
-> diff --git a/hw/pci/pci_bridge.c b/hw/pci/pci_bridge.c
-> index c6d9ded320..8d954885c0 100644
-> --- a/hw/pci/pci_bridge.c
-> +++ b/hw/pci/pci_bridge.c
-> @@ -273,7 +273,7 @@ void pci_bridge_write_config(PCIDevice *d,
->      newctl = pci_get_word(d->config + PCI_BRIDGE_CONTROL);
->      if (~oldctl & newctl & PCI_BRIDGE_CTL_BUS_RESET) {
->          /* Trigger hot reset on 0->1 transition. */
-> -        qbus_reset_all(&s->sec_bus.qbus);
-> +        qbus_reset_all(BUS(&s->sec_bus));
->      }
+> diff --git a/hw/s390x/event-facility.c b/hw/s390x/event-facility.c
+> index ee5b83448b..e574223a22 100644
+> --- a/hw/s390x/event-facility.c
+> +++ b/hw/s390x/event-facility.c
+> @@ -466,12 +466,12 @@ static void init_event_facility(Object *obj)
+>      new = object_new(TYPE_SCLP_QUIESCE);
+>      object_property_add_child(obj, TYPE_SCLP_QUIESCE, new, NULL);
+>      object_unref(new);
+> -    qdev_set_parent_bus(DEVICE(new), &event_facility->sbus.qbus);
+> +    qdev_set_parent_bus(DEVICE(new), BUS(&event_facility->sbus));
+>  
+>      new = object_new(TYPE_SCLP_CPU_HOTPLUG);
+>      object_property_add_child(obj, TYPE_SCLP_CPU_HOTPLUG, new, NULL);
+>      object_unref(new);
+> -    qdev_set_parent_bus(DEVICE(new), &event_facility->sbus.qbus);
+> +    qdev_set_parent_bus(DEVICE(new), BUS(&event_facility->sbus));
+>      /* the facility will automatically realize the devices via the bus */
 >  }
 >  
 > 
