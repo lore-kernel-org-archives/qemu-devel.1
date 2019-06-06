@@ -2,77 +2,63 @@ Return-Path: <SRS0=9X/F=UF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+X-Spam-Status: No, score=-12.0 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D3559C04AB5
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 22:29:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DD433C04AB5
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 23:07:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A3C6F20673
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 22:29:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A3C6F20673
+	by mail.kernel.org (Postfix) with ESMTPS id ADE6820684
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 23:07:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ADE6820684
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44690 helo=lists.gnu.org)
+Received: from localhost ([::1]:44748 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hZ0tE-0005IH-Rh
-	for qemu-devel@archiver.kernel.org; Thu, 06 Jun 2019 18:29:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35083)
+	id 1hZ1U4-0000Zz-Ri
+	for qemu-devel@archiver.kernel.org; Thu, 06 Jun 2019 19:07:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40040)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <philmd@redhat.com>) id 1hZ0se-0004hY-N2
- for qemu-devel@nongnu.org; Thu, 06 Jun 2019 18:29:09 -0400
+ (envelope-from <philmd@redhat.com>) id 1hZ1RX-0007Mw-K3
+ for qemu-devel@nongnu.org; Thu, 06 Jun 2019 19:05:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1hZ0sc-0003cV-J8
- for qemu-devel@nongnu.org; Thu, 06 Jun 2019 18:29:08 -0400
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:34920)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hZ0sX-0003NS-JP
- for qemu-devel@nongnu.org; Thu, 06 Jun 2019 18:29:02 -0400
-Received: by mail-wr1-f67.google.com with SMTP id m3so222409wrv.2
- for <qemu-devel@nongnu.org>; Thu, 06 Jun 2019 15:28:57 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=g05nqlPZqueh6GHM/y6R7bha3/gYOhV36leuPT9KDhk=;
- b=PCCQPkEPG8LrKeUX/GwpJRm9ALM6j93FU5CAAjhHtmyiLbB1zUjEMFEVJPj9vTgAxW
- 69emoaIU5iS6Q39YwazXGPNfrYi/A3B79xbfMgqs96mDxsyA1bFBDARVj1tiWSgmCAnl
- jrCzB5so9keetJAqgN6KBV4X5hyXwGMZnfmCR+rMk3aRrkIEpJzovwvHA/sn0Noudhyo
- P9l+0pF5NcLekH4nwWbSjWigK245nuwfqW99b3e5qFAstKetiCl/9u/4M0ipNgw0Xv6/
- 7gDz456U1uyr+ZJLHKmGa59ZNWBeNKHNT6o1+tLQSTFyEXon399SGUFY606QXJpQnHji
- wuRg==
-X-Gm-Message-State: APjAAAUeOEVcNyYoSR+xnAVBYhT2A2isvcBOV4FQyeXKdRZCa53PA0MS
- GMNilOCta5N4q/aZNWXxr0Dnkw==
-X-Google-Smtp-Source: APXvYqyjWJnniYOsRt1rRbQQJaRg0lsw/N6wLZEkseJEUXCNSzegXmd2LwJL1Ilcxk5JqE8lXhFENA==
-X-Received: by 2002:adf:a18a:: with SMTP id u10mr8934774wru.351.1559860136571; 
- Thu, 06 Jun 2019 15:28:56 -0700 (PDT)
-Received: from [192.168.0.156] ([78.192.181.46])
- by smtp.gmail.com with ESMTPSA id y5sm131228wrs.63.2019.06.06.15.28.55
- (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
- Thu, 06 Jun 2019 15:28:56 -0700 (PDT)
-To: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
-References: <20190503193721.18459-1-ehabkost@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
- url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <d1447249-9f93-f4d2-53db-c2617a41b43d@redhat.com>
-Date: Fri, 7 Jun 2019 00:28:55 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+ (envelope-from <philmd@redhat.com>) id 1hZ1PP-0001FO-4R
+ for qemu-devel@nongnu.org; Thu, 06 Jun 2019 19:03:01 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33336)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hZ1PO-0001ED-Se
+ for qemu-devel@nongnu.org; Thu, 06 Jun 2019 19:02:59 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id CFF7F8552A;
+ Thu,  6 Jun 2019 23:02:54 +0000 (UTC)
+Received: from x1w.redhat.com (ovpn-204-32.brq.redhat.com [10.40.204.32])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 533308B165;
+ Thu,  6 Jun 2019 23:02:49 +0000 (UTC)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>,
+	qemu-devel@nongnu.org
+Date: Fri,  7 Jun 2019 01:02:32 +0200
+Message-Id: <20190606230232.9888-3-philmd@redhat.com>
+In-Reply-To: <20190606230232.9888-1-philmd@redhat.com>
+References: <20190606230232.9888-1-philmd@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190503193721.18459-1-ehabkost@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.28]); Thu, 06 Jun 2019 23:02:58 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.221.67
-Subject: Re: [Qemu-devel] [PATCH] Deprecate Python 2 support
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PATCH v3 2/2] BootLinuxConsoleTest: Run kerneltests
+ BusyBox on Malta
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -84,58 +70,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
- "Daniel P. Berrange" <berrange@redhat.com>, Cleber Rosa <crosa@redhat.com>
+Cc: Aleksandar Rikalo <arikalo@wavecomp.com>, Cleber Rosa <crosa@redhat.com>,
+ Aleksandar Markovic <amarkovic@wavecomp.com>,
+ Aurelien Jarno <aurelien@aurel32.net>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 5/3/19 9:37 PM, Eduardo Habkost wrote:
-> Python 2 will reach end of life in January 1 2020.  Declare it as
-> deprecated.
-> 
-> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> ---
->  configure            | 8 ++++++++
->  qemu-deprecated.texi | 8 ++++++++
->  2 files changed, 16 insertions(+)
-> 
-> diff --git a/configure b/configure
-> index 5b183c2e39..50385061ed 100755
-> --- a/configure
-> +++ b/configure
-> @@ -6461,6 +6461,14 @@ if test "$supported_os" = "no"; then
->      echo "us upstream at qemu-devel@nongnu.org."
->  fi
->  
-> +# Note that if the Python conditional here evaluates True we will exit
-> +# with status 1 which is a shell 'false' value.
-> +if ! $python -c 'import sys; sys.exit(sys.version_info < (3,0))'; then
-> +  echo
-> +  echo "WARNING: Python 2 support is deprecated" >&2
-> +  echo "WARNING: Python 3 will be required for building future versions of QEMU" >&2
-> +fi
-> +
->  config_host_mak="config-host.mak"
->  
->  echo "# Automatically generated by configure - do not modify" >config-all-disas.mak
-> diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
-> index 842e71b11d..2f2d9a3e95 100644
-> --- a/qemu-deprecated.texi
-> +++ b/qemu-deprecated.texi
-> @@ -206,3 +206,11 @@ Note that if you are exposing the export via /dev/nbd0, it is easier
->  to just export the entire image and then mount only /dev/nbd0p1 than
->  it is to reinvoke @command{qemu-nbd -c /dev/nbd0} limited to just a
->  subset of the image.
-> +
-> +@section Build system
-> +
-> +@subsection Python 2 support (since 4.1.0)
-> +
-> +In the future, QEMU will require Python 3 to be available at
-> +build time.  Support for Python 2 in scripts shipped with QEMU
-> +is deprecated.
-> 
+From: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+This tests boots a Linux kernel on a Malta machine up to a
+busybox shell on the serial console. Few commands are executed
+before halting the machine (via reboot).
+
+We use the initrd cpio image from the kerneltests project:
+https://kerneltests.org/
+
+If MIPS is a target being built, "make check-acceptance" will
+automatically include this test by the use of the "arch:mips" tags.
+
+Alternatively, this test can be run using:
+
+  $ avocado --show=3Dconsole run -t arch:mips tests/acceptance/boot_linux=
+_console.py
+  [...]
+  console: Boot successful.
+  [...]
+  console: / # uname -a
+  console: Linux buildroot 4.5.0-2-4kc-malta #1 Debian 4.5.5-1 (2016-05-2=
+9) mips GNU/Linux
+  console: / # reboot
+  console: / # reboot: Restarting system
+
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Acked-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+Tested-by: Cleber Rosa <crosa@redhat.com>
+---
+v3: Use archive.extract() instead of shutil+gzip (Cleber)
+---
+ tests/acceptance/boot_linux_console.py | 44 ++++++++++++++++++++++++++
+ 1 file changed, 44 insertions(+)
+
+diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/bo=
+ot_linux_console.py
+index a7a735c90d..751e3bff86 100644
+--- a/tests/acceptance/boot_linux_console.py
++++ b/tests/acceptance/boot_linux_console.py
+@@ -49,6 +49,11 @@ class BootLinuxConsole(Test):
+                 fail =3D 'Failure message found in console: %s' % failur=
+e_message
+                 self.fail(fail)
+=20
++    def exec_command_and_wait_for_pattern(self, command, success_message=
+):
++        command +=3D '\n'
++        self.vm.console_socket.sendall(command.encode())
++        self.wait_for_console_pattern(success_message)
++
+     def extract_from_deb(self, deb, path):
+         """
+         Extracts a file from a deb package into the test workdir
+@@ -140,6 +145,45 @@ class BootLinuxConsole(Test):
+         console_pattern =3D 'Kernel command line: %s' % kernel_command_l=
+ine
+         self.wait_for_console_pattern(console_pattern)
+=20
++    def test_mips_malta_cpio(self):
++        """
++        :avocado: tags=3Darch:mips
++        :avocado: tags=3Dmachine:malta
++        :avocado: tags=3Dendian:big
++        """
++        deb_url =3D ('http://snapshot.debian.org/archive/debian/'
++                   '20160601T041800Z/pool/main/l/linux/'
++                   'linux-image-4.5.0-2-4kc-malta_4.5.5-1_mips.deb')
++        deb_hash =3D 'a3c84f3e88b54e06107d65a410d1d1e8e0f340f8'
++        deb_path =3D self.fetch_asset(deb_url, asset_hash=3Ddeb_hash)
++        kernel_path =3D self.extract_from_deb(deb_path,
++                                            '/boot/vmlinux-4.5.0-2-4kc-m=
+alta')
++        initrd_url =3D ('https://github.com/groeck/linux-build-test/raw/=
+'
++                      '8584a59ed9e5eb5ee7ca91f6d74bbb06619205b8/rootfs/'
++                      'mips/rootfs.cpio.gz')
++        initrd_hash =3D 'bf806e17009360a866bf537f6de66590de349a99'
++        initrd_path_gz =3D self.fetch_asset(initrd_url, asset_hash=3Dini=
+trd_hash)
++        initrd_path =3D archive.extract(initrd_path_gz,
++                                      os.path.join(self.workdir, 'rootfs=
+.cpio'))
++        self.vm.set_machine('malta')
++        self.vm.set_console()
++        kernel_command_line =3D (self.KERNEL_COMMON_COMMAND_LINE
++                               + 'console=3DttyS0 console=3Dtty '
++                               + 'rdinit=3D/sbin/init noreboot')
++        self.vm.add_args('-kernel', kernel_path,
++                         '-initrd', initrd_path,
++                         '-append', kernel_command_line,
++                         '-no-reboot')
++        self.vm.launch()
++        self.wait_for_console_pattern('Boot successful.')
++
++        self.exec_command_and_wait_for_pattern('cat /proc/cpuinfo',
++                                               'BogoMIPS')
++        self.exec_command_and_wait_for_pattern('uname -a',
++                                               'Debian')
++        self.exec_command_and_wait_for_pattern('reboot',
++                                               'reboot: Restarting syste=
+m')
++
+     def do_test_mips_malta32el_nanomips(self, kernel_url, kernel_hash):
+         kernel_path_xz =3D self.fetch_asset(kernel_url, asset_hash=3Dker=
+nel_hash)
+         kernel_path =3D self.workdir + "kernel"
+--=20
+2.20.1
+
 
