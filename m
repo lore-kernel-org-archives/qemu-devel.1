@@ -6,38 +6,39 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7CA8AC04AB5
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 09:28:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 92081C04AB5
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 09:31:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F24B020684
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 09:28:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F24B020684
+	by mail.kernel.org (Postfix) with ESMTPS id 56A0D20684
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 09:31:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 56A0D20684
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:57106 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:57176 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hYogi-0008Nl-5A
-	for qemu-devel@archiver.kernel.org; Thu, 06 Jun 2019 05:28:00 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:38316)
+	id 1hYok5-0001cx-6x
+	for qemu-devel@archiver.kernel.org; Thu, 06 Jun 2019 05:31:29 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:39212)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hYof2-0007NT-BR
-	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 05:26:17 -0400
+	(envelope-from <laurent@vivier.eu>) id 1hYoiw-0000rm-Bx
+	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 05:30:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hYof1-0004WQ-Ay
-	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 05:26:16 -0400
-Received: from mout.kundenserver.de ([212.227.126.130]:44609)
+	(envelope-from <laurent@vivier.eu>) id 1hYoiv-00061i-DF
+	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 05:30:18 -0400
+Received: from mout.kundenserver.de ([212.227.126.133]:42199)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <laurent@vivier.eu>)
-	id 1hYof0-0004V1-T5; Thu, 06 Jun 2019 05:26:15 -0400
+	id 1hYoir-0005mL-1R; Thu, 06 Jun 2019 05:30:13 -0400
 Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
-	(mreue010 [213.165.67.103]) with ESMTPSA (Nemesis) id
-	1MNtCi-1hAWVv32Ua-00OGi4; Thu, 06 Jun 2019 11:25:55 +0200
+	(mreue011 [213.165.67.103]) with ESMTPSA (Nemesis) id
+	1MBll6-1hOwH730DU-00CA2V; Thu, 06 Jun 2019 11:29:21 +0200
 To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
-	qemu-devel@nongnu.org
-References: <20190529140504.21580-1-philmd@redhat.com>
+	qemu-devel@nongnu.org, qemu-trivial@nongnu.org
+References: <20190528164020.32250-1-philmd@redhat.com>
+	<20190528164020.32250-2-philmd@redhat.com>
 From: Laurent Vivier <laurent@vivier.eu>
 Openpgp: preference=signencrypt
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
@@ -82,35 +83,35 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
 	OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
 	JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
 	ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <e980d325-c692-1700-2bdd-805f582900e0@vivier.eu>
-Date: Thu, 6 Jun 2019 11:25:54 +0200
+Message-ID: <aa834cb2-1d72-f62a-6095-e2bc6b973df7@vivier.eu>
+Date: Thu, 6 Jun 2019 11:29:16 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <20190529140504.21580-1-philmd@redhat.com>
+In-Reply-To: <20190528164020.32250-2-philmd@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:pq+yJ0DLBtmJd5HQDDdQH/axA9Th2lGAm4ZNeJ5e7Ch/Qr7GjkB
-	Wyz7OMnfcbjlJvicS3Rgh/gV/Y2D60PQ51zemCViv9Urvh3WXl/C1rqDJWWbkHOTclEd4uW
-	ej12aOfjtYZbyhuIHLt51pcYC+aYgrxSyd3eCQqN6Wh5FKQl0gKE/8twZixYMsTZIjLKwY6
-	6EvyuaZzyOD+eNtIDg9/w==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:bPeRM/QIHoY=:mVIS6hb19Eq4sRXxB57BAj
-	SU6X3hN4xDuxGlXJFJG3fAfR4409iniEL4qtzCl5IFxI1gPm4T4v2OgDkzlK3+R4ct6Ylyreq
-	xZWE85W1lG06K0OooZ3RvJeYWwHW/9aFj05w7aF1cV7qZ7shU6ukiw1BEmOIVbfm4FBwn3yeB
-	w5bXeOvG6P33TTB2tb/WrJyHUc3cu3MY/7I5K+SGrsZFT+VZqFnApjApvEwUC5bISnYg1AYKQ
-	vgDt3w9vEz6hMyYPJTri+HZfa/bwGy1P1+BW6ErwZRApAWXqt7mI4ZZBtojMFkEPGFLoGHQzr
-	JAgWjdJWueezLK3fHfcES+/Y6/viNxURdokelkf4QdV6JqxMXotyyoDkx8KPsP2mK60Abd0nK
-	v3xKfQvRTlJ1/+QoTXuBn2gi+JuUeWm9/2oFW/S4ft0HwuPdjbYCrBW+ah1LZ6K8poocrAHuC
-	Hg0ZvZkmYf8hmIZ6fNMxWJ2S3R8AMzsxgaWC+30tJddV4X9VDTXK8qrWIHgLdbnqpuhDhjmcu
-	SbX5QUdODcwjm7jEsSEQGosx/NCODnRSpbSXTmkjraJUPZghMNhQPiAvoyQxzed6RR2X8sW0y
-	lFAuV5kqFXQCt6lh/OslqQw5xLU+Dn8DjzTRWlUi/qDq2Awz8pC2/o/2NNiN1laMQrpTd+k51
-	ZY4Hqgp5+/Dask9hslInRwnRE4crkFWShPiTdNqnr9f7MQGaC3ktpfGYxDoD2rzakRslNPKWK
-	z4dR2xJYh5/rk3hot4Hz5GimZb4Dcg1O0hBehQBaHOHw6hwQ8BBhZIk8CZw=
+X-Provags-ID: V03:K1:FpxFokUw3inagld2oEoc6zlrENHn41ZtXSf08YusAOqDRM788X/
+	CQCylP0Gi9FggN/7/9qgz+oabDOGLrq53GGKv7hfgY4TymMT/2Rqi0QiahTTHmxxNBSfC5s
+	NHlf1fhz/hNIsdxqM34IO0/vnQmrtEcVro7uw1R0TGeELv+3AIAjYecm5YyQs9ss/WHgF1R
+	2TB15d98+/j+Dsbb2bb1g==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:1U8eLm0kBwU=:pBexdW+h36arjs1w+UakXt
+	k9Y5Cfz7TgwjTAJ0RfVmQ5IeDkVPPlxv98mKm64z77by604r++Ew0mEWrGOtuDaEn/ojMNvWk
+	1Pu40ZhMYCHKlvzKT+uuGIO3IZGOrk+tN+POS1okUqZJqGY7Q29FBCEeMAZyMA4sssNXRD05a
+	p80/LI9D4STrnyUC/G5KUhdCuf8WX3HioEjUn+0lXipdqkq/C735ijkZuJF843rn+SfW15AO6
+	u0tMEiG+qxjSu0i3ZrA7kiGbdtJsaL2N61ihscBzSmdhwFAm/0Ptj4Z+GyqH8dZpGFOfn8L/b
+	nhJmT6i969K2/TST9586ONT29nYarvUAEXub0ZaKdPhH3AKMkKthUaL+ju/xoYMyE6nVfMkH+
+	t7Fpk/wFZqGs8ldALrvI4p9tBFofX10N3KNOjHAfXyj3qg0sGv7JKgKV3rVqcHKonU6AjIF08
+	vG/PRpSHuaAl2U5aD7wZPeSOoMMHpkzlbygpAVM5FfopYwXKjMab9lMITJ3hjydfuMnv3jd8t
+	XWkBZRfgh3QtxDIlCczSMMJlw0FPIpxpA9Q1prjM1RXvADEDX8ZJSmMHN1CDI7ndOOsGRKSjl
+	6iMGdbPM+Z+q86rqpmtr+NUYCiSx0d/uQobFt3Kfsh71CqHf0URi8bVg0pqVIfrlrysgAINhH
+	Uj3ELgPTHd+FjNrqhitDjXAIpdtj75MKqLMWI2k/fnXkWHUTbvKvykydlwnA4ItWgHp3CVwFz
+	QtXZxfhGMMa4fHUYGVd3Tpt2H2q+H12Juttq2wLvZqhjrYsO6pFQE/S5/A0=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.126.130
-Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH v2] docs/devel/build-system:
- Update an example
+X-Received-From: 212.227.126.133
+Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH v2 01/10]
+ hw/scsi/vmw_pvscsi: Use qbus_reset_all() directly
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -122,59 +123,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
-	Thomas Huth <thuth@redhat.com>,
-	=?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
+Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
+	Dmitry Fleytman <dmitry.fleytman@gmail.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Aleksandar Rikalo <arikalo@wavecomp.com>,
+	David Hildenbrand <david@redhat.com>,
+	Markus Armbruster <armbru@redhat.com>,
+	Halil Pasic <pasic@linux.ibm.com>, qemu-s390x@nongnu.org,
+	Alex Williamson <alex.williamson@redhat.com>,
+	Michael Walle <michael@walle.cc>,
+	Aleksandar Markovic <amarkovic@wavecomp.com>,
+	Cornelia Huck <cohuck@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+	Richard Henderson <rth@twiddle.net>,
+	Christian Borntraeger <borntraeger@de.ibm.com>,
+	Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 29/05/2019 à 16:05, Philippe Mathieu-Daudé a écrit :
-> The default-configs/ example added in 717171bd2025 is no
-> more accurate since fa212a2b8b60 (and various further other
-> commits).
+Le 28/05/2019 à 18:40, Philippe Mathieu-Daudé a écrit :
+> Since the BusState is accesible from the SCSIBus object,
+> it is pointless to use qbus_reset_all_fn.
+> Use qbus_reset_all() directly.
 > 
-> The Kconfig build system is now in place.
-> Use the aarch64-softmmu config as example.
-> 
-> Reviewed-by: Thomas Huth <thuth@redhat.com>
 > Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 > ---
-> v2: rephrased the sentence using Thomas suggestion
-> ---
->  docs/devel/build-system.txt | 19 +++++++------------
->  1 file changed, 7 insertions(+), 12 deletions(-)
+> v2: Use BUS() macro (Peter Maydell)
 > 
-> diff --git a/docs/devel/build-system.txt b/docs/devel/build-system.txt
-> index addd274eeb..41bd08ea3a 100644
-> --- a/docs/devel/build-system.txt
-> +++ b/docs/devel/build-system.txt
-> @@ -413,18 +413,13 @@ context.
->  - default-configs/*.mak
+> One step toward removing qbus_reset_all_fn()
+> ---
+>  hw/scsi/vmw_pvscsi.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/hw/scsi/vmw_pvscsi.c b/hw/scsi/vmw_pvscsi.c
+> index 584b4be07e..c39e33fa35 100644
+> --- a/hw/scsi/vmw_pvscsi.c
+> +++ b/hw/scsi/vmw_pvscsi.c
+> @@ -440,7 +440,7 @@ static void
+>  pvscsi_reset_adapter(PVSCSIState *s)
+>  {
+>      s->resetting++;
+> -    qbus_reset_all_fn(&s->bus);
+> +    qbus_reset_all(BUS(&s->bus));
+>      s->resetting--;
+>      pvscsi_process_completion_queue(s);
+>      assert(QTAILQ_EMPTY(&s->pending_queue));
+> @@ -848,7 +848,7 @@ pvscsi_on_cmd_reset_bus(PVSCSIState *s)
+>      trace_pvscsi_on_cmd_arrived("PVSCSI_CMD_RESET_BUS");
 >  
->  The files under default-configs/ control what emulated hardware is built
-> -into each QEMU system and userspace emulator targets. They merely
-> -contain a long list of config variable definitions. For example,
-> -default-configs/x86_64-softmmu.mak has:
-> -
-> -  include sound.mak
-> -  include usb.mak
-> -  CONFIG_QXL=$(CONFIG_SPICE)
-> -  CONFIG_VGA_ISA=y
-> -  CONFIG_VGA_CIRRUS=y
-> -  CONFIG_VMWARE_VGA=y
-> -  CONFIG_VIRTIO_VGA=y
-> -  ...snip...
-> +into each QEMU system and userspace emulator targets. They merely contain
-> +a list of config variable definitions like the machines that should be
-> +included. For example, default-configs/aarch64-softmmu.mak has:
-> +
-> +  include arm-softmmu.mak
-> +  CONFIG_XLNX_ZYNQMP_ARM=y
-> +  CONFIG_XLNX_VERSAL=y
->  
->  These files rarely need changing unless new devices / hardware need to
->  be enabled for a particular system/userspace emulation target
+>      s->resetting++;
+> -    qbus_reset_all_fn(&s->bus);
+> +    qbus_reset_all(BUS(&s->bus));
+>      s->resetting--;
+>      return PVSCSI_COMMAND_PROCESSING_SUCCEEDED;
+>  }
 > 
 
 Applied to my trivial-patches branch.
