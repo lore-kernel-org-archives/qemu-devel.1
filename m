@@ -6,52 +6,52 @@ X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2CE29C04AB5
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E9BE1C28D1E
 	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 12:29:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B547C206E0
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 12:29:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B547C206E0
+	by mail.kernel.org (Postfix) with ESMTPS id C7939206E0
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 12:29:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C7939206E0
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:59743 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:59745 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hYrWk-0001bk-Q2
-	for qemu-devel@archiver.kernel.org; Thu, 06 Jun 2019 08:29:54 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:50881)
+	id 1hYrWl-0001cJ-TJ
+	for qemu-devel@archiver.kernel.org; Thu, 06 Jun 2019 08:29:55 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:50900)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1hYrSA-0006LC-1U
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1hYrSA-0006LZ-Iq
 	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 08:25:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1hYrS8-00062I-T3
-	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 08:25:09 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:33387 helo=mail.rt-rk.com)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1hYrS9-00063p-40
+	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 08:25:10 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:33379 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1hYrS6-0005oH-S6
-	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 08:25:07 -0400
+	id 1hYrS6-0005oC-US
+	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 08:25:08 -0400
 Received: from localhost (localhost [127.0.0.1])
-	by mail.rt-rk.com (Postfix) with ESMTP id E9F4A1A217B;
+	by mail.rt-rk.com (Postfix) with ESMTP id D8A6B1A216F;
 	Thu,  6 Jun 2019 14:25:02 +0200 (CEST)
 X-Virus-Scanned: amavisd-new at rt-rk.com
 Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
 	[10.10.13.43])
-	by mail.rt-rk.com (Postfix) with ESMTPSA id C77DC1A2199;
+	by mail.rt-rk.com (Postfix) with ESMTPSA id BD10D1A217B;
 	Thu,  6 Jun 2019 14:25:02 +0200 (CEST)
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
 To: qemu-devel@nongnu.org
-Date: Thu,  6 Jun 2019 14:24:33 +0200
-Message-Id: <1559823880-29103-4-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Thu,  6 Jun 2019 14:24:32 +0200
+Message-Id: <1559823880-29103-3-git-send-email-aleksandar.markovic@rt-rk.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1559823880-29103-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1559823880-29103-1-git-send-email-aleksandar.markovic@rt-rk.com>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
 X-Received-From: 89.216.37.149
-Subject: [Qemu-devel] [PATCH v2 03/10] target/mips: Outline places for
- future MSA helpers
+Subject: [Qemu-devel] [PATCH v2 02/10] target/mips: Fix
+ block-comment-related issues im msa_helper.c
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -70,165 +70,102 @@ Sender: "Qemu-devel"
 
 From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-Outline places for future MSA helpers to follow the same organization
-as in MSA tests.
+Fix block-comment-related issues reported by checkpatch for file
+msa_helper.c.
 
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 Reviewed-by: Aleksandar Rikalo <arikalo@wavecomp.com>
-Message-Id: <1559745316-1454-7-git-send-email-aleksandar.markovic@rt-rk.com>
+Message-Id: <1559745316-1454-3-git-send-email-aleksandar.markovic@rt-rk.com>
 ---
- target/mips/msa_helper.c | 138 +++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 138 insertions(+)
+ target/mips/msa_helper.c | 42 +++++++++++++++++++++++++++---------------
+ 1 file changed, 27 insertions(+), 15 deletions(-)
 
 diff --git a/target/mips/msa_helper.c b/target/mips/msa_helper.c
-index 851450c..7b73e22 100644
+index eacb5a4..851450c 100644
 --- a/target/mips/msa_helper.c
 +++ b/target/mips/msa_helper.c
-@@ -42,6 +42,144 @@
- /* Element-by-element access macros */
- #define DF_ELEMENTS(df) (MSA_WRLEN / DF_BITS(df))
+@@ -1975,8 +1975,10 @@ static inline int update_msacsr(CPUMIPSState *env, int action, int denormal)
+         c &= ~FP_UNDERFLOW;
+     }
  
-+
-+
-+/*
-+ * Bit Count
-+ * ---------
-+ */
-+
-+/* TODO: insert appropriate helpers here */
-+
-+
-+/*
-+ * Bit move
-+ * --------
-+ */
-+
-+/* TODO: insert appropriate helpers here */
-+
-+
-+/*
-+ * Bit Set
-+ * -------
-+ */
-+
-+/* TODO: insert appropriate helpers here */
-+
-+
-+/*
-+ * Fixed Multiply
-+ * --------------
-+ */
-+
-+/* TODO: insert appropriate helpers here */
-+
-+
-+/*
-+ * Int Add
-+ * -------
-+ */
-+
-+/* TODO: insert appropriate helpers here */
-+
-+
-+/*
-+ * Int Average
-+ * -----------
-+ */
-+
-+/* TODO: insert appropriate helpers here */
-+
-+
-+/*
-+ * Int Compare
-+ * -----------
-+ */
-+
-+/* TODO: insert appropriate helpers here */
-+
-+
-+/*
-+ * Int Divide
-+ * ----------
-+ */
-+
-+/* TODO: insert appropriate helpers here */
-+
-+
-+/*
-+ * Int Dot Product
-+ * ---------------
-+ */
-+
-+/* TODO: insert appropriate helpers here */
-+
-+
-+/*
-+ * Int Max Min
-+ * -----------
-+ */
-+
-+/* TODO: insert appropriate helpers here */
-+
-+
-+/*
-+ * Int Modulo
-+ * ----------
-+ */
-+
-+/* TODO: insert appropriate helpers here */
-+
-+
-+/*
-+ * Int Multiply
-+ * ------------
-+ */
-+
-+/* TODO: insert appropriate helpers here */
-+
-+
-+/*
-+ * Int Subtract
-+ * ------------
-+ */
-+
-+/* TODO: insert appropriate helpers here */
-+
-+
-+/*
-+ * Interleave
-+ * ----------
-+ */
-+
-+/* TODO: insert appropriate helpers here */
-+
-+
-+/*
-+ * Logic
-+ * -----
-+ */
-+
-+/* TODO: insert appropriate helpers here */
-+
-+
-+/*
-+ * Pack
-+ * ----
-+ */
-+
-+/* TODO: insert appropriate helpers here */
-+
-+
-+/*
-+ * Shift
-+ * -----
-+ */
-+
-+/* TODO: insert appropriate helpers here */
-+
-+
- static inline void msa_move_v(wr_t *pwd, wr_t *pws)
- {
-     uint32_t i;
+-    /* Reciprocal operations set only Inexact when valid and not
+-       divide by zero */
++    /*
++     * Reciprocal operations set only Inexact when valid and not
++     * divide by zero
++     */
+     if ((action & RECIPROCAL_INEXACT) &&
+             (c & (FP_INVALID | FP_DIV0)) == 0) {
+         c = FP_INEXACT;
+@@ -1985,15 +1987,19 @@ static inline int update_msacsr(CPUMIPSState *env, int action, int denormal)
+     cause = c & enable;    /* all current enabled exceptions */
+ 
+     if (cause == 0) {
+-        /* No enabled exception, update the MSACSR Cause
+-         with all current exceptions */
++        /*
++         * No enabled exception, update the MSACSR Cause
++         * with all current exceptions
++         */
+         SET_FP_CAUSE(env->active_tc.msacsr,
+                 (GET_FP_CAUSE(env->active_tc.msacsr) | c));
+     } else {
+         /* Current exceptions are enabled */
+         if ((env->active_tc.msacsr & MSACSR_NX_MASK) == 0) {
+-            /* Exception(s) will trap, update MSACSR Cause
+-           with all enabled exceptions */
++            /*
++             * Exception(s) will trap, update MSACSR Cause
++             * with all enabled exceptions
++             */
+             SET_FP_CAUSE(env->active_tc.msacsr,
+                     (GET_FP_CAUSE(env->active_tc.msacsr) | c));
+         }
+@@ -3059,9 +3065,11 @@ void helper_msa_fexdo_df(CPUMIPSState *env, uint32_t df, uint32_t wd,
+     switch (df) {
+     case DF_WORD:
+         for (i = 0; i < DF_ELEMENTS(DF_WORD); i++) {
+-            /* Half precision floats come in two formats: standard
+-               IEEE and "ARM" format.  The latter gains extra exponent
+-               range by omitting the NaN/Inf encodings.  */
++            /*
++             * Half precision floats come in two formats: standard
++             * IEEE and "ARM" format.  The latter gains extra exponent
++             * range by omitting the NaN/Inf encodings.
++             */
+             flag ieee = 1;
+ 
+             MSA_FLOAT_BINOP(Lh(pwx, i), from_float32, pws->w[i], ieee, 16);
+@@ -3617,9 +3625,11 @@ void helper_msa_fexupl_df(CPUMIPSState *env, uint32_t df, uint32_t wd,
+     switch (df) {
+     case DF_WORD:
+         for (i = 0; i < DF_ELEMENTS(DF_WORD); i++) {
+-            /* Half precision floats come in two formats: standard
+-               IEEE and "ARM" format.  The latter gains extra exponent
+-               range by omitting the NaN/Inf encodings.  */
++            /*
++             * Half precision floats come in two formats: standard
++             * IEEE and "ARM" format.  The latter gains extra exponent
++             * range by omitting the NaN/Inf encodings.
++             */
+             flag ieee = 1;
+ 
+             MSA_FLOAT_BINOP(pwx->w[i], from_float16, Lh(pws, i), ieee, 32);
+@@ -3651,9 +3661,11 @@ void helper_msa_fexupr_df(CPUMIPSState *env, uint32_t df, uint32_t wd,
+     switch (df) {
+     case DF_WORD:
+         for (i = 0; i < DF_ELEMENTS(DF_WORD); i++) {
+-            /* Half precision floats come in two formats: standard
+-               IEEE and "ARM" format.  The latter gains extra exponent
+-               range by omitting the NaN/Inf encodings.  */
++            /*
++             * Half precision floats come in two formats: standard
++             * IEEE and "ARM" format.  The latter gains extra exponent
++             * range by omitting the NaN/Inf encodings.
++             */
+             flag ieee = 1;
+ 
+             MSA_FLOAT_BINOP(pwx->w[i], from_float16, Rh(pws, i), ieee, 32);
 -- 
 2.7.4
 
