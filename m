@@ -2,68 +2,88 @@ Return-Path: <SRS0=9X/F=UF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 57E8CC28D1C
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 08:50:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FA4EC04AB5
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 08:51:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 33B362083E
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 08:50:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 33B362083E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 670F520684
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 08:51:43 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="tXDD8Ml1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 670F520684
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:56684 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:56695 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hYo6V-0001az-FS
-	for qemu-devel@archiver.kernel.org; Thu, 06 Jun 2019 04:50:35 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:55899)
+	id 1hYo7a-0002UZ-MC
+	for qemu-devel@archiver.kernel.org; Thu, 06 Jun 2019 04:51:42 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:55443)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hYnyq-00043u-LM
-	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 04:42:41 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1hYnyl-0003Zd-RG
+	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 04:42:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1hYnyp-0003jW-Ow
-	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 04:42:40 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44918)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>)
-	id 1hYnyR-0003B2-7o; Thu, 06 Jun 2019 04:42:16 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 317263092641;
-	Thu,  6 Jun 2019 08:42:14 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-148.ams2.redhat.com
-	[10.36.116.148])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 0045B18AC1;
-	Thu,  6 Jun 2019 08:42:13 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
-	id 8609D11386A0; Thu,  6 Jun 2019 10:42:12 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-References: <20190605205706.569-1-richard.henderson@linaro.org>
-	<20190605205706.569-5-richard.henderson@linaro.org>
-	<CAL1e-=jYwL9bb_YVp28pf=R4Gb0+1MgxYLsO=2927W=CtUrQ-A@mail.gmail.com>
-Date: Thu, 06 Jun 2019 10:42:12 +0200
-In-Reply-To: <CAL1e-=jYwL9bb_YVp28pf=R4Gb0+1MgxYLsO=2927W=CtUrQ-A@mail.gmail.com>
-	(Aleksandar Markovic's message of "Thu, 6 Jun 2019 07:45:58 +0200")
-Message-ID: <87o93bhzq3.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
+	(envelope-from <alex.bennee@linaro.org>) id 1hYnlq-0000lE-68
+	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 04:29:16 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:41914)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1hYnln-0000Y7-39
+	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 04:29:11 -0400
+Received: by mail-wr1-x444.google.com with SMTP id c2so1415398wrm.8
+	for <qemu-devel@nongnu.org>; Thu, 06 Jun 2019 01:29:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+	h=from:to:cc:subject:date:message-id:mime-version
+	:content-transfer-encoding;
+	bh=MVxKLXvv3XKjmXllNopXwy6owIzV+D4TJIoeCStLTxM=;
+	b=tXDD8Ml1nxNYVKfT3y2XyClwlG3zQNwov/UUmmuKB58WtNGRPHI0hVI7tyi1/8urU5
+	vtU2VVKuuEzhSzMrqda1ij9g6BUoQDav1TUOD66cojHW4CiJ4xjAW5pnjI4dl5FyBOBx
+	BEocfEXpOxziK3NCVL9RLCI1MCrFDgkJlVr3EwQ8fevTylpc3JphKhRLxOmKawWMgqFh
+	zv7egdGBFbDJA04c5oVeMkOAB+lyLD4byqJt3xIj05WFd/GRU4jeDbA6dGbi2KBFoPwU
+	pt53y9CVrrJ6q1Fvc83K6APLNN9CbR8yc7dPKdEUaoasNPeUtiZ1BrqbYkO5Fae6jFmm
+	ZFsQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+	:content-transfer-encoding;
+	bh=MVxKLXvv3XKjmXllNopXwy6owIzV+D4TJIoeCStLTxM=;
+	b=aFh3SP9rL8yFn98ysP4NlbUtsVvP7vQ8egEZlhgC/eAmS1C2bDQfavQ94pmgGwto88
+	je5Z472gHOOVRdfxEuwIu0NXH9sYBm+jget0oc6obv1TMd+5WM2eJXu0NE8f7KYBwItr
+	AD8caGkStDD3JtkTJP5/l2EVsWuNNmuSPTVilYkvGfWQwFIHmwaF912UnDplEdQU4PzU
+	vNixrwDP3GO7f8Z+GVdI9edkJtf8nQC2/fzyjxAvkSy5S9OLbbYWQMHI+dNvkQy/LJP4
+	PMk7OUgd7AdaNjieknz8OtttvhRcHo2ca8+egmFrWOoP+SU1BZ+0OfxAg7NGMm5YdB69
+	UgSg==
+X-Gm-Message-State: APjAAAWGsQXIXpTLbjjn3qtnoACQtLqbnLSRQvgvn8Fw6ngBvlW0VgjN
+	2TAiQWpdxQeowZYP3epm+syN7g==
+X-Google-Smtp-Source: APXvYqz+pwNszU9GWPToNpu4l8IXf5+Afw/LaospTeJa8aGxP1r4xOpgL3n00Z0lbVuhvz7yfQqg4Q==
+X-Received: by 2002:a05:6000:148:: with SMTP id
+	r8mr14988744wrx.210.1559809746485; 
+	Thu, 06 Jun 2019 01:29:06 -0700 (PDT)
+Received: from zen.linaroharston ([81.128.185.34])
+	by smtp.gmail.com with ESMTPSA id f3sm1065155wre.93.2019.06.06.01.29.05
+	(version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+	Thu, 06 Jun 2019 01:29:05 -0700 (PDT)
+Received: from zen.linaroharston. (localhost [127.0.0.1])
+	by zen.linaroharston (Postfix) with ESMTP id 20E721FF87;
+	Thu,  6 Jun 2019 09:29:05 +0100 (BST)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+Date: Thu,  6 Jun 2019 09:29:00 +0100
+Message-Id: <20190606082900.6330-1-alex.bennee@linaro.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.43]);
-	Thu, 06 Jun 2019 08:42:14 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v6 4/6] include/elf: Add defines related to
- notes for GNU systems
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2a00:1450:4864:20::444
+Subject: [Qemu-devel] [PATCH] MAINTAINERS: put myself forward for gdbstub
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -75,33 +95,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org,
-	Richard Henderson <richard.henderson@linaro.org>,
-	qemu-devel@nongnu.org, Dave.Martin@arm.com
+Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Aleksandar Markovic <aleksandar.m.mail@gmail.com> writes:
+As I've been reviewing a lot of this recently and I'm going to put
+together a pull request I'd better keep an eye on it.
 
-> On Jun 5, 2019 11:03 PM, "Richard Henderson" <richard.henderson@linaro.org>
-> wrote:
->>
->> This is a collection of related
->
-> Related to what?
->
->> defines for notes, copied
->> from glibc's <elf.h>.  We're not going to use all of these
->> right away, but it seemed foolish
->
-> I don't think this an appropriate word for a commit message.
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+---
+ MAINTAINERS | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-Calling an alternative you considered but rejected "foolish" feels
-perfectly alright to me.
+diff --git a/MAINTAINERS b/MAINTAINERS
+index a96829ea83..8ef34cf1ce 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -1872,7 +1872,8 @@ F: util/error.c
+ F: util/qemu-error.c
+ 
+ GDB stub
+-S: Orphan
++M: Alex Bennée <alex.bennee@linaro.org>
++S: Maintained
+ F: gdbstub*
+ F: gdb-xml/
+ 
+-- 
+2.20.1
 
->> to cherry-pick only the
->> ones we need now.
->>
->> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 
