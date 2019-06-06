@@ -2,90 +2,91 @@ Return-Path: <SRS0=9X/F=UF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 63900C04AB5
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 17:06:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D5659C04AB5
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 17:10:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2DC9820693
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 17:06:24 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="lBjXiBCX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2DC9820693
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id AEBFA20652
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 17:10:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AEBFA20652
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:35424 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:35441 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hYvqI-0005xT-Ny
-	for qemu-devel@archiver.kernel.org; Thu, 06 Jun 2019 13:06:22 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:34781)
+	id 1hYvtq-00078m-RX
+	for qemu-devel@archiver.kernel.org; Thu, 06 Jun 2019 13:10:02 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:36153)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hYvoJ-0004cY-Cq
-	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 13:04:20 -0400
+	(envelope-from <groug@kaod.org>) id 1hYvsz-0006m0-DS
+	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 13:09:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1hYvoF-0005Es-OD
-	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 13:04:17 -0400
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:50949)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1hYvoD-0004wi-82
-	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 13:04:14 -0400
-Received: by mail-wm1-x344.google.com with SMTP id f204so699005wme.0
-	for <qemu-devel@nongnu.org>; Thu, 06 Jun 2019 10:04:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=references:user-agent:from:to:cc:subject:in-reply-to:date
-	:message-id:mime-version:content-transfer-encoding;
-	bh=MFZwjqngAKMBaP+xnH3h39P7c7M9bUKbHgKuvIcCFk0=;
-	b=lBjXiBCXDmOoEFGOV+PD/hzXb5MdRoLp8xUaT+B95k//r03SP73U+sqDpZXTcqN/E6
-	tkvWRYhfUtWORT/5j4JnW0OUPyx64JrKrOuugrgBx9QD8cIdYInZv5CsOY0NuhRoLwrc
-	oguARcohr3ZZsfVSa6P4R0RFevZfWFPM/BwnbRdV9+S6AfjmNmbblWMZPysZPeX7nF1L
-	8iiwtgNbAPdEQw4LLlRPLok3aWo/Nn7WZsHuXV0lCj0kIS3SXz4WvCyQrNVnCrrfWetB
-	1Ai2PNrJTIC59Ru3uNc3cjRZuCgugMjL2zbNeRiAh8e4lpwfrnXDc2O8gC4Q/alO/J3t
-	m+yw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:references:user-agent:from:to:cc:subject
-	:in-reply-to:date:message-id:mime-version:content-transfer-encoding;
-	bh=MFZwjqngAKMBaP+xnH3h39P7c7M9bUKbHgKuvIcCFk0=;
-	b=rLjEIh6RWW27nXppodqQ+r3VJw2sIftPTHhnbBEhhoVcewJ/+Pqzive+VinDepvjnT
-	qNA1v72vThoSHxFTuUnk80BVI7DC+feXb+iU1XwlR4svsjfgmR7j/qnaIbKESB+uzVhn
-	WcXFy+zWavzQOpRapI+1I1Jj/GkuMXAHreYedJqM3Ga+GUN+x3fMdES/yU78FJSPtFGy
-	vK7gkuNUZ3dVkTRN5KhQtpJ0nwKfjlMB+DLKeoMFT+mbxm7EM3Mox753eVLfAHCk0DHo
-	B5w5xhk1+HrdXnxQ9HAcuK1sXcUxneJhz1RDAnhldWQR9sFIg6x5uKh2idTwLRIcrLze
-	2UEA==
-X-Gm-Message-State: APjAAAUrp28WFdBDD/euWZHY1THwCsQCAJRyYBCmRfyjCopqQTKQGjZf
-	268BiF5yao2ARQqeQWaG+NBnBQ==
-X-Google-Smtp-Source: APXvYqwPmUmY8SVZVyoqsH83iXhMQHzuMtSM4QfqTTzEtvSOicP7n/6ycDWdAu4eSqaEF/C2eD81Ew==
-X-Received: by 2002:a1c:a483:: with SMTP id n125mr684666wme.3.1559840648723;
-	Thu, 06 Jun 2019 10:04:08 -0700 (PDT)
-Received: from zen.linaroharston ([81.128.185.34])
-	by smtp.gmail.com with ESMTPSA id w3sm2423151wmc.8.2019.06.06.10.04.08
-	(version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-	Thu, 06 Jun 2019 10:04:08 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
-	by zen.linaroharston (Postfix) with ESMTP id AEB141FF87;
-	Thu,  6 Jun 2019 18:04:07 +0100 (BST)
-References: <20190606154310.15830-1-alex.bennee@linaro.org>
-	<201906061857.12470.randrianasulu@gmail.com>
-User-agent: mu4e 1.3.2; emacs 26.1
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Andrew Randrianasulu <randrianasulu@gmail.com>
-In-reply-to: <201906061857.12470.randrianasulu@gmail.com>
-Date: Thu, 06 Jun 2019 18:04:07 +0100
-Message-ID: <87k1dysl14.fsf@zen.linaroharston>
+	(envelope-from <groug@kaod.org>) id 1hYvsx-00018F-Ga
+	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 13:09:09 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:50068
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1hYvsx-00014G-6w
+	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 13:09:07 -0400
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+	x56H2RkE034707
+	for <qemu-devel@nongnu.org>; Thu, 6 Jun 2019 13:09:05 -0400
+Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2sy6q40r1t-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 06 Jun 2019 13:09:05 -0400
+Received: from localhost
+	by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <groug@kaod.org>;
+	Thu, 6 Jun 2019 18:09:03 +0100
+Received: from b06avi18878370.portsmouth.uk.ibm.com (9.149.26.194)
+	by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway:
+	Authorized Use Only! Violators will be prosecuted; 
+	(version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+	Thu, 6 Jun 2019 18:09:00 +0100
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com
+	[9.149.105.232])
+	by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with
+	ESMTP id x56H8xrl30146860
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256
+	verify=OK); Thu, 6 Jun 2019 17:08:59 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 74DFA52052;
+	Thu,  6 Jun 2019 17:08:59 +0000 (GMT)
+Received: from bahia.lan (unknown [9.145.50.113])
+	by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 3F43E52051;
+	Thu,  6 Jun 2019 17:08:59 +0000 (GMT)
+From: Greg Kurz <groug@kaod.org>
+To: David Gibson <david@gibson.dropbear.id.au>
+Date: Thu, 06 Jun 2019 19:08:59 +0200
+User-Agent: StGit/unknown-version
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2a00:1450:4864:20::344
-Subject: Re: [Qemu-devel] [PATCH] cputlb: cast size_t to target_ulong before
- using for address masks
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+x-cbid: 19060617-0016-0000-0000-0000028692A5
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19060617-0017-0000-0000-000032E3AFD4
+Message-Id: <155984093894.2803172.8618224129384655510.stgit@bahia.lan>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
+	definitions=2019-06-06_12:, , signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+	priorityscore=1501
+	malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+	clxscore=1034 lowpriorityscore=0 mlxscore=0 impostorscore=0
+	mlxlogscore=810 adultscore=0 classifier=spam adjust=0 reason=mlx
+	scancount=1 engine=8.0.1-1810050000 definitions=main-1906060115
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 148.163.158.5
+Subject: [Qemu-devel] [PATCH] spapr: Don't use the "dual" interrupt
+ controller mode with an old hypervisor
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -97,28 +98,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org,
-	Richard Henderson <rth@twiddle.net>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org,
+	=?utf-8?q?C=C3=A9dric?= Le Goater <clg@kaod.org>,
+	Greg Kurz <groug@kaod.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+If KVM is too old to support XIVE native exploitation mode, we might end
+up using the emulated XIVE after CAS. This is sub-optimal if KVM in-kernel
+XICS is available, which is the case most of the time.
 
-Andrew Randrianasulu <randrianasulu@gmail.com> writes:
+Also, an old KVM may not allow to destroy and re-create the KVM XICS, which
+is precisely what "dual" does during machine reset. This causes QEMU to try
+to switch to emulated XICS and to crash because RTAS call de-registration
+isn't handled correctly. We could possibly fix that, but again we would
+still end up with an emulated XICS or XIVE.
 
-> =D0=92 =D1=81=D0=BE=D0=BE=D0=B1=D1=89=D0=B5=D0=BD=D0=B8=D0=B8 =D0=BE=D1=
-=82 Thursday 06 June 2019 18:43:10 Alex Benn=C3=A9e =D0=BD=D0=B0=D0=BF=D0=
-=B8=D1=81=D0=B0=D0=BB(=D0=B0):
->> addr1 =3D addr & ~((target_ulong)size - 1);
->
-> yes, this fixes my hang! Thanks!
+"dual" is definitely not a good choice with older KVMs. Internally force
+XICS when we detect this.
 
-Can I take that as a:
+Signed-off-by: Greg Kurz <groug@kaod.org>
+---
+ hw/ppc/spapr_irq.c |   10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
-Tested-by: Andrew Randrianasulu <randrianasulu@gmail.com>
+diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
+index 3156daf09381..d788bd662a7a 100644
+--- a/hw/ppc/spapr_irq.c
++++ b/hw/ppc/spapr_irq.c
+@@ -18,6 +18,7 @@
+ #include "hw/ppc/xics_spapr.h"
+ #include "cpu-models.h"
+ #include "sysemu/kvm.h"
++#include "kvm_ppc.h"
+ 
+ #include "trace.h"
+ 
+@@ -668,6 +669,15 @@ static void spapr_irq_check(SpaprMachineState *spapr, Error **errp)
+             return;
+         }
+     }
++
++    /*
++     * KVM may be too old to support XIVE, in which case we'd rather try
++     * to use the in-kernel XICS instead of the emulated XIVE.
++     */
++    if (kvm_enabled() && !kvmppc_has_cap_xive() &&
++        spapr->irq == &spapr_irq_dual) {
++        spapr->irq = &spapr_irq_xics;
++    }
+ }
+ 
+ /*
 
-?
-
---
-Alex Benn=C3=A9e
 
