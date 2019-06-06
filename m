@@ -2,84 +2,94 @@ Return-Path: <SRS0=9X/F=UF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A633C04AB5
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 19:42:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8BD73C04AB5
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 20:26:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6648F20693
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 19:42:18 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OFTd23et"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6648F20693
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 6383D2083E
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 20:26:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6383D2083E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57700 helo=lists.gnu.org)
+Received: from localhost ([::1]:34854 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hYyHB-0000Aq-Ng
-	for qemu-devel@archiver.kernel.org; Thu, 06 Jun 2019 15:42:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59392)
+	id 1hYyyP-0006SW-H8
+	for qemu-devel@archiver.kernel.org; Thu, 06 Jun 2019 16:26:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41560)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mrolnik@gmail.com>) id 1hYy6Z-00081z-6f
- for qemu-devel@nongnu.org; Thu, 06 Jun 2019 15:31:22 -0400
+ (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hYyxH-0005vr-IM
+ for qemu-devel@nongnu.org; Thu, 06 Jun 2019 16:25:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mrolnik@gmail.com>) id 1hYy6U-00024T-Oz
- for qemu-devel@nongnu.org; Thu, 06 Jun 2019 15:31:17 -0400
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:50849)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <mrolnik@gmail.com>) id 1hYy6S-0000jg-2D
- for qemu-devel@nongnu.org; Thu, 06 Jun 2019 15:31:13 -0400
-Received: by mail-wm1-x341.google.com with SMTP id f204so1078281wme.0
- for <qemu-devel@nongnu.org>; Thu, 06 Jun 2019 12:30:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=PrOPjyYV0TYQYTy+XWhC+bHrUQAqtXXJDRLIlMWJNZU=;
- b=OFTd23et7WfNLguZWk5G+pY5FGKWF2Y4wpioKgOAUB/gz9j5eQHEqRK+W0dpj1gnsl
- x04xOtOhwtUAK9ZSzgukh0/CzyVJl1XIQoDVQ4qv6Lz9niXymkVsVpsh7PNSFDz3cYH8
- Z2I3lOg8SHYMhLW6+y7WdVpg+MiZ3vyuQSSjq4tZVWULPx9ymCwjzq+duYQMK6efryhw
- 6Cz+9noy29d1dRwMH0a4iOTIjw/2ax1DbLwhPc0YhmnMPs4SFji/qm8eaX+ELSXdU+Z9
- 5fv2A6pnsI+4C8GUxFpgHshRK+Uj7HE0LE5ogWuYqtyLirZdKehE5hyPBFdWv4Nt3FqW
- ILMA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references;
- bh=PrOPjyYV0TYQYTy+XWhC+bHrUQAqtXXJDRLIlMWJNZU=;
- b=T7l7E9wEZpvWju3qy1Uu25qYlQcvRQAOO8gbXnIHPFPRCuMSuX6t5eqhdEFXHRC0Rl
- Nsb+F+TxX9cX/R8h+3QJgLm6g6YAR+LlU/Db2eAxM4bH8KOuF+PGoH6EQ0HZtQ5ZEyXW
- urwVwORC6/P1Ieu2Ld43NDCatCqtQIZGxP7P/y1YFnFcJ6FyUTezRD1QjLpAB8fmXkBX
- CgF7qqiOZSooOtxK7XJeDHHBkiANTDftu2d3OuNsIsAbn1xHPuUREyxlW+7a92tLy8B9
- Son1eQw6k+BC/7PdU9BdPNGWlBbVECCJ8zYz4FNo2gyyEYKG/NP+a9aAm0unTRrIbjmj
- 3lrQ==
-X-Gm-Message-State: APjAAAXAP4af0K3a4yPzJAyU1/WcXHclfN+iugPX7fSbRyAW0SO1Yqpf
- zESmsDMIjpNxN360FIT+OxvdeDYc4AKeng==
-X-Google-Smtp-Source: APXvYqyjGdvuaY84zaAOVtmc5V7wuX4NElkaDYaXEjnofvQJXRk3tvFbAxX1zXoVBGNxtuE51b9ofg==
-X-Received: by 2002:a1c:f311:: with SMTP id q17mr1054943wmq.2.1559849434152;
- Thu, 06 Jun 2019 12:30:34 -0700 (PDT)
-Received: from localhost.localdomain (bzq-79-183-55-157.red.bezeqint.net.
- [79.183.55.157])
- by smtp.gmail.com with ESMTPSA id o126sm2942791wmo.31.2019.06.06.12.30.32
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Thu, 06 Jun 2019 12:30:33 -0700 (PDT)
-From: Michael Rolnik <mrolnik@gmail.com>
-To: qemu-devel@nongnu.org
-Date: Thu,  6 Jun 2019 22:30:12 +0300
-Message-Id: <20190606193012.37715-8-mrolnik@gmail.com>
-X-Mailer: git-send-email 2.18.0
-In-Reply-To: <20190606193012.37715-1-mrolnik@gmail.com>
-References: <20190606193012.37715-1-mrolnik@gmail.com>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::341
-Subject: [Qemu-devel] [PATCH v21 7/7] target/avr: Register AVR support with
- the rest of QEMU, the build system, and the MAINTAINERS file
+ (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1hYyxG-0006pi-03
+ for qemu-devel@nongnu.org; Thu, 06 Jun 2019 16:25:47 -0400
+Received: from mail.ilande.co.uk ([46.43.2.167]:59670
+ helo=mail.default.ilande.uk0.bigv.io)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+ id 1hYywy-0005mA-QY; Thu, 06 Jun 2019 16:25:35 -0400
+Received: from host81-158-188-206.range81-158.btcentralplus.com
+ ([81.158.188.206] helo=[192.168.1.65])
+ by mail.default.ilande.uk0.bigv.io with esmtpsa
+ (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.89)
+ (envelope-from <mark.cave-ayland@ilande.co.uk>)
+ id 1hYyte-00010S-0C; Thu, 06 Jun 2019 21:22:04 +0100
+To: Laurent Vivier <lvivier@redhat.com>,
+ David Gibson <david@gibson.dropbear.id.au>
+References: <20190108224600.23125-1-david@gibson.dropbear.id.au>
+ <20190108224600.23125-10-david@gibson.dropbear.id.au>
+ <759cdab3-6cf9-bb83-54f2-12d60063b15c@redhat.com>
+ <6d1c8b12-0e27-b3f3-9e0e-ad68c5572ed7@ilande.co.uk>
+ <09f7a354-b1be-48b4-15ea-4923386b6a77@redhat.com>
+ <cc1a09a4-9045-f71f-7d60-b638f59ac824@redhat.com>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Openpgp: preference=signencrypt
+Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
+ mQENBFQJuzwBCADAYvxrwUh1p/PvUlNFwKosVtVHHplgWi5p29t58QlOUkceZG0DBYSNqk93
+ 3JzBTbtd4JfFcSupo6MNNOrCzdCbCjZ64ik8ycaUOSzK2tKbeQLEXzXoaDL1Y7vuVO7nL9bG
+ E5Ru3wkhCFc7SkoypIoAUqz8EtiB6T89/D9TDEyjdXUacc53R5gu8wEWiMg5MQQuGwzbQy9n
+ PFI+mXC7AaEUqBVc2lBQVpAYXkN0EyqNNT12UfDLdxaxaFpUAE2pCa2LTyo5vn5hEW+i3VdN
+ PkmjyPvL6DdY03fvC01PyY8zaw+UI94QqjlrDisHpUH40IUPpC/NB0LwzL2aQOMkzT2NABEB
+ AAG0ME1hcmsgQ2F2ZS1BeWxhbmQgPG1hcmsuY2F2ZS1heWxhbmRAaWxhbmRlLmNvLnVrPokB
+ OAQTAQIAIgUCVAm7PAIbAwYLCQgHAwIGFQgCCQoLBBYCAwECHgECF4AACgkQW8LFb64PMh9f
+ NAgAuc3ObOEY8NbZko72AGrg2tWKdybcMVITxmcor4hb9155o/OWcA4IDbeATR6cfiDL/oxU
+ mcmtXVgPqOwtW3NYAKr5g/FrZZ3uluQ2mtNYAyTFeALy8YF7N3yhs7LOcpbFP7tEbkSzoXNG
+ z8iYMiYtKwttt40WaheWuRs0ZOLbs6yoczZBDhna3Nj0LA3GpeJKlaV03O4umjKJgACP1c/q
+ T2Pkg+FCBHHFP454+waqojHp4OCBo6HyK+8I4wJRa9Z0EFqXIu8lTDYoggeX0Xd6bWeCFHK3
+ DhD0/Xi/kegSW33unsp8oVcM4kcFxTkpBgj39dB4KwAUznhTJR0zUHf63LkBDQRUCbs8AQgA
+ y7kyevA4bpetM/EjtuqQX4U05MBhEz/2SFkX6IaGtTG2NNw5wbcAfhOIuNNBYbw6ExuaJ3um
+ 2uLseHnudmvN4VSJ5Hfbd8rhqoMmmO71szgT/ZD9MEe2KHzBdmhmhxJdp+zQNivy215j6H27
+ 14mbC2dia7ktwP1rxPIX1OOfQwPuqlkmYPuVwZP19S4EYnCELOrnJ0m56tZLn5Zj+1jZX9Co
+ YbNLMa28qsktYJ4oU4jtn6V79H+/zpERZAHmH40IRXdR3hA+Ye7iC/ZpWzT2VSDlPbGY9Yja
+ Sp7w2347L5G+LLbAfaVoejHlfy/msPeehUcuKjAdBLoEhSPYzzdvEQARAQABiQEfBBgBAgAJ
+ BQJUCbs8AhsMAAoJEFvCxW+uDzIfabYIAJXmBepHJpvCPiMNEQJNJ2ZSzSjhic84LTMWMbJ+
+ opQgr5cb8SPQyyb508fc8b4uD8ejlF/cdbbBNktp3BXsHlO5BrmcABgxSP8HYYNsX0n9kERv
+ NMToU0oiBuAaX7O/0K9+BW+3+PGMwiu5ml0cwDqljxfVN0dUBZnQ8kZpLsY+WDrIHmQWjtH+
+ Ir6VauZs5Gp25XLrL6bh/SL8aK0BX6y79m5nhfKI1/6qtzHAjtMAjqy8ChPvOqVVVqmGUzFg
+ KPsrrIoklWcYHXPyMLj9afispPVR8e0tMKvxzFBWzrWX1mzljbBlnV2n8BIwVXWNbgwpHSsj
+ imgcU9TTGC5qd9g=
+Message-ID: <3d67608e-5c14-b54c-a345-e1288a47ca74@ilande.co.uk>
+Date: Thu, 6 Jun 2019 21:21:58 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
+MIME-Version: 1.0
+In-Reply-To: <cc1a09a4-9045-f71f-7d60-b638f59ac824@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
+X-SA-Exim-Connect-IP: 81.158.188.206
+X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
+X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
+X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 46.43.2.167
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PULL 09/29] target/ppc: introduce
+ get_cpu_vsr{l, h}() and set_cpu_vsr{l, h}() helpers for VSR register access
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,193 +101,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Sarah Harris <S.E.Harris@kent.ac.uk>, Michael Rolnik <mrolnik@gmail.com>,
- rth@twiddle.net
+Cc: peter.maydell@linaro.org, Richard Henderson <richard.henderson@linaro.org>,
+ qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>, qemu-ppc@nongnu.org,
+ Anton Blanchard <anton@ozlabs.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Sarah Harris <S.E.Harris@kent.ac.uk>
+On 06/06/2019 20:24, Laurent Vivier wrote:
 
-Signed-off-by: Michael Rolnik <mrolnik@gmail.com>
----
- MAINTAINERS                     |  6 ++++++
- arch_init.c                     |  2 ++
- configure                       |  6 ++++++
- default-configs/avr-softmmu.mak |  5 +++++
- include/disas/dis-asm.h         |  6 ++++++
- include/sysemu/arch_init.h      |  1 +
- qapi/common.json                |  3 ++-
- target/avr/Makefile.objs        | 33 +++++++++++++++++++++++++++++++++
- tests/machine-none-test.c       |  1 +
- 9 files changed, 62 insertions(+), 1 deletion(-)
- create mode 100644 default-configs/avr-softmmu.mak
- create mode 100644 target/avr/Makefile.objs
+> On 05/06/2019 09:43, Laurent Vivier wrote:
+>> On 05/06/2019 08:32, Mark Cave-Ayland wrote:
+>>> On 04/06/2019 22:23, Laurent Vivier wrote:
+>>>
+>>>> This patch breaks something in the libcrypto.
+>>>>
+>>>> I've been able to reproduce the problem with Fedora 29:
+>>>>
+>>>> dnf install 'dnf-command(download)'
+>>>> dnf download --source coreutils-single
+>>>> rpm --verify coreutils-8.30-7.fc29.src.rpm
+>>>> error: coreutils-8.30-7.fc29.src.rpm: Header V3 RSA/SHA256 Signature, key ID 429476b4: BAD
+>>>> error: coreutils-8.30-7.fc29.src.rpm: Header SHA256 digest: BAD (Expected fa042669e74ac435bd5defaa8c2e4efe779a0329c24f2b6377591c53b38aa280 != d6e22527412fafc4aa12882432d0d157e5427097710eeb2d5fce8fbc52a47be6)
+>>>> error: coreutils-8.30-7.fc29.src.rpm: not an rpm package (or package manifest)
+>>>>
+>>>> See https://bugzilla.redhat.com/show_bug.cgi?id=1715017
+>>>>
+>>>> I've tested with origin/master (47fbad45d47af8af784bb12a5719489edcd89b4c) and all the 
+>>>> merged fixes for this patch don't fix this problem.
+>>>>
+>>>> We should be able to reproduce it on Debian Sid too: it breaks ssh (this is one of the rare binaries using libcrypto on debian).
+>>>>
+>>>> I've been able to reproduce it with qemu linux-user if I enable PPC_FEATURE2_VEC_CRYPTO in linux-user/elfload.c
+>>>> (git clone -b linux-user-ppc64-hwcap git@github.com:vivier/qemu.git).
+>>>>
+>>>> To ease debugging, you can install a Fedora 29 chroot with something like:
+>>>>
+>>>> curl -o container.tar.xz http://download-ib01.fedoraproject.org/pub/fedora-secondary/releases/29/Container/ppc64le/images/Fedora-Container-Base-29-1.2.ppc64le.tar.xz
+>>>> tar Jxvf container.tar.xz '*/layer.tar'
+>>>> mkdir -p chroot/ppc64le/29
+>>>> cd chroot/ppc64le/29
+>>>> tar xf $OLDPWD/*/layer.tar
+>>>> cd -
+>>>> cp ~/qemu/ppc64le-linux-user/qemu-ppc64le chroot/ppc64le/29/
+>>>> [use "configure --target-list=ppc64le-linux-user --static --disable-tools" and don't forget to run scripts/qemu-binfmt-conf.sh]
+>>>
+>>> One of Anton's VSX patches hasn't landed in master yet and is still queued in
+>>> ppc-for-4.1: "target/ppc: Fix lxvw4x, lxvh8x and lxvb16x".
+>>>
+>>> Can you try David's ppc-for-4.1 branch first and let me know if that solves the
+>>> issue? If not, I'll take a look at it later in the week when I have a bit more time.
+>>
+>> Thank you Mark.
+>>
+>> Anton's patch fixes the problem.
+> 
+> But there are two problems remaining with Fedora 29:
+> 
+> - in libssl (openssl-libs-1.1.1-3.fc29.ppc64le):
+> 
+>   $ curl -o /dev/null https://www.google.com
+>   ...
+>   curl: (35) error:1408F119:SSL routines:ssl3_get_record:decryption failed or bad record mac
+> 
+> - in the kernel (4.18.16-300.fc29.ppc64le):
+> 
+> [   39.742120] crypto_register_alg 'aes' = 0
+> [   39.919286] crypto_register_alg 'cbc(aes)' = 0
+> [   40.053942] crypto_register_alg 'ctr(aes)' = 0
+> [   40.372764] alg: skcipher: Test 1 failed (invalid result) on encryption for p8_aes_xts
+> [   40.373458] 00000000: 91 7c f6 9e bd 68 b2 ec 9b 9f e9 a3 ea dd a6 92
+> [   40.373568] 00000010: 98 10 35 57 5e dc 36 1e 9a f7 bc ba 39 f2 5c eb
+> [   40.374139] crypto_register_alg 'xts(aes)' = 0
+> [   40.389241] alg: hash: Test 2 failed for p8_ghash
+> [   40.389422] 00000000: 5f 89 ab f7 20 57 20 57 20 57 20 57 20 57 20 57
+> 
+> My qemu is on top of 
+> 
+> 0d74f3b427 Merge remote-tracking branch 'remotes/vivier2/tags/trivial-branch-pull-request' into staging
+> + "target/ppc: Fix lxvw4x, lxvh8x and lxvb16x"
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index a96829ea83..57fab2cfa9 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -162,6 +162,12 @@ S: Maintained
- F: hw/arm/smmu*
- F: include/hw/arm/smmu*
- 
-+AVR
-+M: Michael Rolnik <mrolnik@gmail.com>
-+S: Odd Fixes
-+F: target/avr/
-+F: hw/avr/
-+
- CRIS
- M: Edgar E. Iglesias <edgar.iglesias@gmail.com>
- S: Maintained
-diff --git a/arch_init.c b/arch_init.c
-index f4f3f610c8..184cdca6dd 100644
---- a/arch_init.c
-+++ b/arch_init.c
-@@ -86,6 +86,8 @@ int graphic_depth = 32;
- #define QEMU_ARCH QEMU_ARCH_UNICORE32
- #elif defined(TARGET_XTENSA)
- #define QEMU_ARCH QEMU_ARCH_XTENSA
-+#elif defined(TARGET_AVR)
-+#define QEMU_ARCH QEMU_ARCH_AVR
- #endif
- 
- const uint32_t arch_type = QEMU_ARCH;
-diff --git a/configure b/configure
-index b091b82cb3..6206a52eb9 100755
---- a/configure
-+++ b/configure
-@@ -7499,6 +7499,9 @@ case "$target_name" in
-     target_compiler=$cross_cc_aarch64
-     eval "target_compiler_cflags=\$cross_cc_cflags_${target_name}"
-   ;;
-+  avr)
-+    target_compiler=$cross_cc_avr
-+  ;;
-   cris)
-     target_compiler=$cross_cc_cris
-   ;;
-@@ -7776,6 +7779,9 @@ for i in $ARCH $TARGET_BASE_ARCH ; do
-       disas_config "ARM_A64"
-     fi
-   ;;
-+  avr)
-+    disas_config "AVR"
-+  ;;
-   cris)
-     disas_config "CRIS"
-   ;;
-diff --git a/default-configs/avr-softmmu.mak b/default-configs/avr-softmmu.mak
-new file mode 100644
-index 0000000000..d1e1c28118
---- /dev/null
-+++ b/default-configs/avr-softmmu.mak
-@@ -0,0 +1,5 @@
-+# Default configuration for avr-softmmu
-+
-+# Boards:
-+#
-+CONFIG_AVR_SAMPLE=y
-diff --git a/include/disas/dis-asm.h b/include/disas/dis-asm.h
-index 9240ec32c2..a7d230ba66 100644
---- a/include/disas/dis-asm.h
-+++ b/include/disas/dis-asm.h
-@@ -211,6 +211,12 @@ enum bfd_architecture
- #define bfd_mach_m32r          0  /* backwards compatibility */
-   bfd_arch_mn10200,    /* Matsushita MN10200 */
-   bfd_arch_mn10300,    /* Matsushita MN10300 */
-+  bfd_arch_avr,       /* Atmel AVR microcontrollers.  */
-+#define bfd_mach_avr1          1
-+#define bfd_mach_avr2          2
-+#define bfd_mach_avr3          3
-+#define bfd_mach_avr4          4
-+#define bfd_mach_avr5          5
-   bfd_arch_cris,       /* Axis CRIS */
- #define bfd_mach_cris_v0_v10   255
- #define bfd_mach_cris_v32      32
-diff --git a/include/sysemu/arch_init.h b/include/sysemu/arch_init.h
-index 10cbafe970..aff57bfe61 100644
---- a/include/sysemu/arch_init.h
-+++ b/include/sysemu/arch_init.h
-@@ -25,6 +25,7 @@ enum {
-     QEMU_ARCH_NIOS2 = (1 << 17),
-     QEMU_ARCH_HPPA = (1 << 18),
-     QEMU_ARCH_RISCV = (1 << 19),
-+    QEMU_ARCH_AVR = (1 << 20),
- };
- 
- extern const uint32_t arch_type;
-diff --git a/qapi/common.json b/qapi/common.json
-index 99d313ef3b..53f5018b9c 100644
---- a/qapi/common.json
-+++ b/qapi/common.json
-@@ -183,11 +183,12 @@
- #        is true even for "qemu-system-x86_64".
- #
- # ppcemb: dropped in 3.1
-+# avr: since 4.1
- #
- # Since: 3.0
- ##
- { 'enum' : 'SysEmuTarget',
--  'data' : [ 'aarch64', 'alpha', 'arm', 'cris', 'hppa', 'i386', 'lm32',
-+  'data' : [ 'aarch64', 'alpha', 'arm', 'avr', 'cris', 'hppa', 'i386', 'lm32',
-              'm68k', 'microblaze', 'microblazeel', 'mips', 'mips64',
-              'mips64el', 'mipsel', 'moxie', 'nios2', 'or1k', 'ppc',
-              'ppc64', 'riscv32', 'riscv64', 's390x', 'sh4',
-diff --git a/target/avr/Makefile.objs b/target/avr/Makefile.objs
-new file mode 100644
-index 0000000000..1034d87525
---- /dev/null
-+++ b/target/avr/Makefile.objs
-@@ -0,0 +1,33 @@
-+#
-+#  QEMU AVR CPU
-+#
-+#  Copyright (c) 2016 Michael Rolnik
-+#
-+#  This library is free software; you can redistribute it and/or
-+#  modify it under the terms of the GNU Lesser General Public
-+#  License as published by the Free Software Foundation; either
-+#  version 2.1 of the License, or (at your option) any later version.
-+#
-+#  This library is distributed in the hope that it will be useful,
-+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+#  Lesser General Public License for more details.
-+#
-+#  You should have received a copy of the GNU Lesser General Public
-+#  License along with this library; if not, see
-+#  <http://www.gnu.org/licenses/lgpl-2.1.html>
-+#
-+
-+DECODETREE = $(SRC_PATH)/scripts/decodetree.py
-+decode-y = $(SRC_PATH)/target/avr/insn.decode
-+
-+target/avr/decode_insn.inc.c: $(decode-y) $(DECODETREE)
-+	$(call quiet-command, \
-+	  $(PYTHON) $(DECODETREE) -o $@ --decode decode_insn --insnwidth 16 $<, \
-+	  "GEN", $(TARGET_DIR)$@)
-+
-+target/avr/translate.o: target/avr/decode_insn.inc.c
-+
-+obj-y += translate.o cpu.o helper.o
-+obj-y += gdbstub.o
-+obj-$(CONFIG_SOFTMMU) += machine.o
-diff --git a/tests/machine-none-test.c b/tests/machine-none-test.c
-index 4c6d470798..361927bb76 100644
---- a/tests/machine-none-test.c
-+++ b/tests/machine-none-test.c
-@@ -27,6 +27,7 @@ static struct arch2cpu cpus_map[] = {
-     /* tested targets list */
-     { "arm", "cortex-a15" },
-     { "aarch64", "cortex-a57" },
-+    { "avr", "avr6" },
-     { "x86_64", "qemu64,apic-id=0" },
-     { "i386", "qemu32,apic-id=0" },
-     { "alpha", "ev67" },
--- 
-2.18.0
+Hmmm and this is definitely a regression introduced by the same patch as given in the
+subject?
 
+
+ATB,
+
+Mark.
 
