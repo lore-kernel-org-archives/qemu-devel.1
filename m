@@ -2,87 +2,106 @@ Return-Path: <SRS0=9X/F=UF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CDD74C28D1E
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 11:26:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 24DB1C28EB3
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 11:28:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 87C612070B
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 11:26:43 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hGDFPvs4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 87C612070B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id A097F2070B
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 11:28:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A097F2070B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:58713 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:58736 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hYqXa-0007hu-RS
-	for qemu-devel@archiver.kernel.org; Thu, 06 Jun 2019 07:26:42 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:37960)
+	id 1hYqZ4-0000S8-0E
+	for qemu-devel@archiver.kernel.org; Thu, 06 Jun 2019 07:28:14 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:38452)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.m.mail@gmail.com>) id 1hYqW0-0006dM-5J
-	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 07:25:07 -0400
+	(envelope-from <aravinda@linux.vnet.ibm.com>) id 1hYqXf-0007we-Lp
+	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 07:26:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.m.mail@gmail.com>) id 1hYqVx-0002Cx-CA
-	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 07:25:04 -0400
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:33609)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
-	id 1hYqVx-0002Bm-25; Thu, 06 Jun 2019 07:25:01 -0400
-Received: by mail-ot1-x342.google.com with SMTP id p4so1620293oti.0;
-	Thu, 06 Jun 2019 04:25:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=mime-version:in-reply-to:references:from:date:message-id:subject:to
-	:cc; bh=TuKbpy20S50FOjzjtwzcjwAWM/ZcxnNh7Vn6W9kFWTI=;
-	b=hGDFPvs43bVUyoinkqH+263d5/fhyAedwwuoiOlF11rO+GlNzomkxf7XuCjG+zxSQO
-	0rfr6FMwlhvREr+4a9Gq/IAp3H5X2oEIK+HuqaST0CHMxtx66X5sm/g1AKN7dlbOQtzy
-	0Tpz743ta7XdrymwhTS/0ZQ0TxkTqtahN+ufJsM9yfEJUKc2WjSB88biZ27uCRLNRICJ
-	t+GBz4jschOfm9jQwhQRrfethx2KY8ADUFUpPA59JZIcFlJOPW664KoeeSY9KHVBeOBR
-	lGJaNY+8g6e88MFBCtmssPwnd+Y+1CBTSufbZjywYo8DFjZSMRS4FJ0b8zun8M2E/5PH
-	Qgpw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:in-reply-to:references:from:date
-	:message-id:subject:to:cc;
-	bh=TuKbpy20S50FOjzjtwzcjwAWM/ZcxnNh7Vn6W9kFWTI=;
-	b=nuM9p+EKll3JcRk8ZfriibCJlYzwrJRX6kCiU8XkTHhZAPsfrFD3uFTan5wgNpmxjH
-	4DWVyvX3Ceq2qPVuhQQtTYkECiHJXHFM2GKhbp+sG4N3QQWg4Az0yqk4q9Bz5NfxcBos
-	Wz+Rkz/tJhcEAOgLmEua7uGKEhK4ikZetifVywZtt0+8VNaWuCosjIIIon8nT2gq1pKH
-	dQe7+0yowyhqdtUlS2Kyr6HJHnY9n3gIX+Mye1hAYh0/ou21pcIui7sFNUKeaatXSSQF
-	NuJtTblS5qxhJ3RIBlZMgkcGZ8miZ+rEJZlSQjsdC/dTg6R/Rd+uGWeLAABGfrhw9JMB
-	uy7Q==
-X-Gm-Message-State: APjAAAWkViQtw4koS8g0EswLETp3wmKbDerZiTdk67kDCtffaNSQAvNx
-	g86Qs/8/2RKMMMMmnwzWqDIEC0g9y5NPdoXTIis=
-X-Google-Smtp-Source: APXvYqzuAdjkfK4lbxBHfxOW3QRt98qPviLTAyZAF8moEZxJCg1CTao0We2Jfk1HcwRq/3bgWrbKAOlzkpHqm9Qb9fQ=
-X-Received: by 2002:a9d:2aa:: with SMTP id 39mr13872417otl.121.1559820300038; 
-	Thu, 06 Jun 2019 04:25:00 -0700 (PDT)
+	(envelope-from <aravinda@linux.vnet.ibm.com>) id 1hYqXd-00054g-KR
+	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 07:26:46 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:60406
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <aravinda@linux.vnet.ibm.com>)
+	id 1hYqXb-00051Y-TC
+	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 07:26:45 -0400
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+	x56BLs12027432
+	for <qemu-devel@nongnu.org>; Thu, 6 Jun 2019 07:26:43 -0400
+Received: from e17.ny.us.ibm.com (e17.ny.us.ibm.com [129.33.205.207])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2sy13nar6y-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 06 Jun 2019 07:26:42 -0400
+Received: from localhost
+	by e17.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <aravinda@linux.vnet.ibm.com>;
+	Thu, 6 Jun 2019 12:26:41 +0100
+Received: from b01cxnp22034.gho.pok.ibm.com (9.57.198.24)
+	by e17.ny.us.ibm.com (146.89.104.204) with IBM ESMTP SMTP Gateway:
+	Authorized Use Only! Violators will be prosecuted; 
+	(version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+	Thu, 6 Jun 2019 12:26:38 +0100
+Received: from b01ledav004.gho.pok.ibm.com (b01ledav004.gho.pok.ibm.com
+	[9.57.199.109])
+	by b01cxnp22034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+	x56BPMAY18743570
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256
+	verify=OK); Thu, 6 Jun 2019 11:25:22 GMT
+Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 6FCDA112063;
+	Thu,  6 Jun 2019 11:25:22 +0000 (GMT)
+Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id D699B112062;
+	Thu,  6 Jun 2019 11:25:19 +0000 (GMT)
+Received: from [9.85.82.46] (unknown [9.85.82.46])
+	by b01ledav004.gho.pok.ibm.com (Postfix) with ESMTP;
+	Thu,  6 Jun 2019 11:25:19 +0000 (GMT)
+To: David Gibson <david@gibson.dropbear.id.au>
+References: <155910829070.13149.5215948335633966328.stgit@aravinda>
+	<155910845769.13149.8097972239187020170.stgit@aravinda>
+	<20190606030614.GK10319@umbus.fritz.box>
+From: Aravinda Prasad <aravinda@linux.vnet.ibm.com>
+Date: Thu, 6 Jun 2019 16:55:18 +0530
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+	Thunderbird/52.6.0
 MIME-Version: 1.0
-Received: by 2002:a9d:20e4:0:0:0:0:0 with HTTP;
-	Thu, 6 Jun 2019 04:24:59 -0700 (PDT)
-Received: by 2002:a9d:20e4:0:0:0:0:0 with HTTP;
-	Thu, 6 Jun 2019 04:24:59 -0700 (PDT)
-In-Reply-To: <20190605205706.569-3-richard.henderson@linaro.org>
-References: <20190605205706.569-1-richard.henderson@linaro.org>
-	<20190605205706.569-3-richard.henderson@linaro.org>
-From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Thu, 6 Jun 2019 13:24:59 +0200
-Message-ID: <CAL1e-=he9+=jC4XMD2jc2uhnWCkSxkncwat7UB=MSQMRjTsBhw@mail.gmail.com>
-To: Richard Henderson <richard.henderson@linaro.org>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::342
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Content-Filtered-By: Mailman/MimeDel 2.1.21
-Subject: Re: [Qemu-devel] [PATCH v6 2/6] linux-user: Validate mmap/mprotect
- prot value
+In-Reply-To: <20190606030614.GK10319@umbus.fritz.box>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+x-cbid: 19060611-0040-0000-0000-000004F982C5
+X-IBM-SpamModules-Scores: 
+X-IBM-SpamModules-Versions: BY=3.00011223; HX=3.00000242; KW=3.00000007;
+	PH=3.00000004; SC=3.00000286; SDB=6.01214026; UDB=6.00638130;
+	IPR=6.00995105; 
+	MB=3.00027206; MTD=3.00000008; XFM=3.00000015; UTC=2019-06-06 11:26:40
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19060611-0041-0000-0000-00000905A260
+Message-Id: <08b42ce8-2413-ce8f-980a-419146423be7@linux.vnet.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
+	definitions=2019-06-06_09:, , signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+	priorityscore=1501
+	malwarescore=0 suspectscore=2 phishscore=0 bulkscore=0 spamscore=0
+	clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+	mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+	scancount=1 engine=8.0.1-1810050000 definitions=main-1906060084
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 148.163.158.5
+Subject: Re: [Qemu-devel] [PATCH v9 6/6] migration: Include migration
+ support for machine check handling
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -94,303 +113,171 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org, qemu-devel@nongnu.org,
-	Dave.Martin@arm.com
+Cc: aik@au1.ibm.com, qemu-devel@nongnu.org, groug@kaod.org, paulus@ozlabs.org,
+	qemu-ppc@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Jun 5, 2019 11:13 PM, "Richard Henderson" <richard.henderson@linaro.org>
-wrote:
->
-> The kernel will return -EINVAL for bits set in the prot argument
-> that are unknown or invalid.  Previously we were simply cropping
-> out the bits that we care about.
->
-> Introduce validate_prot_to_pageflags to perform this check in a
-> single place between the two syscalls.  Differentiate between
-> the target and host versions of prot.  Compute the qemu internal
-> page_flags value at the same time.
->
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->  linux-user/mmap.c | 106 ++++++++++++++++++++++++++++++++--------------
->  1 file changed, 75 insertions(+), 31 deletions(-)
->
-> diff --git a/linux-user/mmap.c b/linux-user/mmap.c
-> index af41339d57..3117f57fd8 100644
-> --- a/linux-user/mmap.c
-> +++ b/linux-user/mmap.c
-> @@ -61,11 +61,38 @@ void mmap_fork_end(int child)
->          pthread_mutex_unlock(&mmap_mutex);
->  }
->
-> +/*
-> + * Validate target prot bitmask.
-> + * Return the prot bitmask for the host in *HOST_PROT.
-> + * Return 0 if the target prot bitmask is invalid, otherwise
-> + * the internal qemu page_flags (which will include PAGE_VALID).
-> + */
-> +static int validate_prot_to_pageflags(int *host_prot, int prot)
-> +{
-> +    int valid =3D PROT_READ | PROT_WRITE | PROT_EXEC | TARGET_PROT_SEM;
-> +    int page_flags =3D (prot & PAGE_BITS) | PAGE_VALID;
-> +
-> +    /*
-> +     * For the host, we need not pass anything except read/write/exec.
-> +     * While PROT_SEM is allowed by all hosts, it is also ignored, so
-> +     * don't bother transforming guest bit to host bit.
 
-I don't think that making assumptions based on an undocumented behavior is
-the best practice.
 
-Your =E2=80=9CLet's don't bother=E2=80=9D about such easy to implement thin=
-gs may create a
-lot of bothering in future.
+On Thursday 06 June 2019 08:36 AM, David Gibson wrote:
+> On Wed, May 29, 2019 at 11:10:57AM +0530, Aravinda Prasad wrote:
+>> This patch includes migration support for machine check
+>> handling. Especially this patch blocks VM migration
+>> requests until the machine check error handling is
+>> complete as (i) these errors are specific to the source
+>> hardware and is irrelevant on the target hardware,
+>> (ii) these errors cause data corruption and should
+>> be handled before migration.
+>>
+>> Signed-off-by: Aravinda Prasad <aravinda@linux.vnet.ibm.com>
+>> ---
+>>  hw/ppc/spapr.c         |   20 ++++++++++++++++++++
+>>  hw/ppc/spapr_events.c  |   17 +++++++++++++++++
+>>  hw/ppc/spapr_rtas.c    |    4 ++++
+>>  include/hw/ppc/spapr.h |    2 ++
+>>  4 files changed, 43 insertions(+)
+>>
+>> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+>> index e8a77636..31c4850 100644
+>> --- a/hw/ppc/spapr.c
+>> +++ b/hw/ppc/spapr.c
+>> @@ -2104,6 +2104,25 @@ static const VMStateDescription vmstate_spapr_dtb = {
+>>      },
+>>  };
+>>  
+>> +static bool spapr_fwnmi_needed(void *opaque)
+>> +{
+>> +    SpaprMachineState *spapr = (SpaprMachineState *)opaque;
+>> +
+>> +    return (spapr->guest_machine_check_addr == -1) ? 0 : 1;
+> 
+> Since we're introducing a PAPR capability to enable this, it would
+> actually be better to check that here, rather than the runtime state.
+> That leads to less cases and easier to understand semantics for the
+> migration stream.
+
+I am fine with this approach as well.
+
+> 
+>> +}
+>> +
+>> +static const VMStateDescription vmstate_spapr_machine_check = {
+>> +    .name = "spapr_machine_check",
+>> +    .version_id = 1,
+>> +    .minimum_version_id = 1,
+>> +    .needed = spapr_fwnmi_needed,
+>> +    .fields = (VMStateField[]) {
+>> +        VMSTATE_UINT64(guest_machine_check_addr, SpaprMachineState),
+>> +        VMSTATE_INT32(mc_status, SpaprMachineState),
+>> +        VMSTATE_END_OF_LIST()
+>> +    },
+>> +};
+>> +
+>>  static const VMStateDescription vmstate_spapr = {
+>>      .name = "spapr",
+>>      .version_id = 3,
+>> @@ -2137,6 +2156,7 @@ static const VMStateDescription vmstate_spapr = {
+>>          &vmstate_spapr_dtb,
+>>          &vmstate_spapr_cap_large_decr,
+>>          &vmstate_spapr_cap_ccf_assist,
+>> +        &vmstate_spapr_machine_check,
+>>          NULL
+>>      }
+>>  };
+>> diff --git a/hw/ppc/spapr_events.c b/hw/ppc/spapr_events.c
+>> index 573c0b7..35e21e4 100644
+>> --- a/hw/ppc/spapr_events.c
+>> +++ b/hw/ppc/spapr_events.c
+>> @@ -41,6 +41,7 @@
+>>  #include "qemu/bcd.h"
+>>  #include "hw/ppc/spapr_ovec.h"
+>>  #include <libfdt.h>
+>> +#include "migration/blocker.h"
+>>  
+>>  #define RTAS_LOG_VERSION_MASK                   0xff000000
+>>  #define   RTAS_LOG_VERSION_6                    0x06000000
+>> @@ -855,6 +856,22 @@ static void spapr_mce_dispatch_elog(PowerPCCPU *cpu, bool recovered)
+>>  void spapr_mce_req_event(PowerPCCPU *cpu, bool recovered)
+>>  {
+>>      SpaprMachineState *spapr = SPAPR_MACHINE(qdev_get_machine());
+>> +    int ret;
+>> +    Error *local_err = NULL;
+>> +
+>> +    error_setg(&spapr->fwnmi_migration_blocker,
+>> +            "Live migration not supported during machine check handling");
+>> +    ret = migrate_add_blocker(spapr->fwnmi_migration_blocker, &local_err);
+>> +    if (ret < 0) {
+>> +        /*
+>> +         * We don't want to abort and let the migration to continue. In a
+>> +         * rare case, the machine check handler will run on the target
+>> +         * hardware. Though this is not preferable, it is better than aborting
+>> +         * the migration or killing the VM.
+>> +         */
+>> +        error_free(spapr->fwnmi_migration_blocker);
+> 
+> You should set fwnmi_migration_blocker to NULL here as well.
+
+ok.
+
+> 
+> As mentioned on an earlier iteration, the migration blocker is the
+> same every time.  Couldn't you just create it once and free at final
+> teardown, rather than recreating it for every NMI?
+
+That means, we create the error string at the time when ibm,nmi-register
+is invoked and tear it down during machine reset?
 
 Regards,
-Aleksandar
+Aravinda
 
->  Any other
-> +     * target-specific prot bits will not be understood by the host
-> +     * and will need to be encoded into page_flags for qemu emulation.
-> +     *
-> +     * TODO: We do not actually have to map guest pages as executable,
-> +     * since they will not be directly executed by the host.  We only
-> +     * need to remember exec within page_flags.
-> +     */
-> +    *host_prot =3D prot & (PROT_READ | PROT_WRITE | PROT_EXEC);
-> +
-> +    return prot & ~valid ? 0 : page_flags;
-> +}
-> +
->  /* NOTE: all the constants are the HOST ones, but addresses are target.
-*/
-> -int target_mprotect(abi_ulong start, abi_ulong len, int prot)
-> +int target_mprotect(abi_ulong start, abi_ulong len, int target_prot)
->  {
->      abi_ulong end, host_start, host_end, addr;
-> -    int prot1, ret;
-> +    int prot1, ret, page_flags, host_prot;
->
->  #ifdef DEBUG_MMAP
->      printf("mprotect: start=3D0x" TARGET_ABI_FMT_lx
-> @@ -75,56 +102,65 @@ int target_mprotect(abi_ulong start, abi_ulong len,
-int prot)
->             prot & PROT_EXEC ? 'x' : '-');
->  #endif
->
-> -    if ((start & ~TARGET_PAGE_MASK) !=3D 0)
-> +    if ((start & ~TARGET_PAGE_MASK) !=3D 0) {
->          return -TARGET_EINVAL;
-> +    }
-> +    page_flags =3D validate_prot_to_pageflags(&host_prot, target_prot);
-> +    if (!page_flags) {
-> +        return -TARGET_EINVAL;
-> +    }
->      len =3D TARGET_PAGE_ALIGN(len);
->      end =3D start + len;
->      if (!guest_range_valid(start, len)) {
->          return -TARGET_ENOMEM;
->      }
-> -    prot &=3D PROT_READ | PROT_WRITE | PROT_EXEC;
-> -    if (len =3D=3D 0)
-> +    if (len =3D=3D 0) {
->          return 0;
-> +    }
->
->      mmap_lock();
->      host_start =3D start & qemu_host_page_mask;
->      host_end =3D HOST_PAGE_ALIGN(end);
->      if (start > host_start) {
->          /* handle host page containing start */
-> -        prot1 =3D prot;
-> -        for(addr =3D host_start; addr < start; addr +=3D TARGET_PAGE_SIZ=
-E) {
-> +        prot1 =3D host_prot;
-> +        for (addr =3D host_start; addr < start; addr +=3D TARGET_PAGE_SI=
-ZE) {
->              prot1 |=3D page_get_flags(addr);
->          }
->          if (host_end =3D=3D host_start + qemu_host_page_size) {
-> -            for(addr =3D end; addr < host_end; addr +=3D TARGET_PAGE_SIZ=
-E) {
-> +            for (addr =3D end; addr < host_end; addr +=3D TARGET_PAGE_SI=
-ZE) {
->                  prot1 |=3D page_get_flags(addr);
->              }
->              end =3D host_end;
->          }
-> -        ret =3D mprotect(g2h(host_start), qemu_host_page_size, prot1 &
-PAGE_BITS);
-> -        if (ret !=3D 0)
-> +        ret =3D mprotect(g2h(host_start), qemu_host_page_size,
-> +                       prot1 & PAGE_BITS);
-> +        if (ret !=3D 0) {
->              goto error;
-> +        }
->          host_start +=3D qemu_host_page_size;
->      }
->      if (end < host_end) {
-> -        prot1 =3D prot;
-> -        for(addr =3D end; addr < host_end; addr +=3D TARGET_PAGE_SIZE) {
-> +        prot1 =3D host_prot;
-> +        for (addr =3D end; addr < host_end; addr +=3D TARGET_PAGE_SIZE) =
-{
->              prot1 |=3D page_get_flags(addr);
->          }
-> -        ret =3D mprotect(g2h(host_end - qemu_host_page_size),
-qemu_host_page_size,
-> -                       prot1 & PAGE_BITS);
-> -        if (ret !=3D 0)
-> +        ret =3D mprotect(g2h(host_end - qemu_host_page_size),
-> +                       qemu_host_page_size, prot1 & PAGE_BITS);
-> +        if (ret !=3D 0) {
->              goto error;
-> +        }
->          host_end -=3D qemu_host_page_size;
->      }
->
->      /* handle the pages in the middle */
->      if (host_start < host_end) {
-> -        ret =3D mprotect(g2h(host_start), host_end - host_start, prot);
-> -        if (ret !=3D 0)
-> +        ret =3D mprotect(g2h(host_start), host_end - host_start,
-host_prot);
-> +        if (ret !=3D 0) {
->              goto error;
-> +        }
->      }
-> -    page_set_flags(start, start + len, prot | PAGE_VALID);
-> +    page_set_flags(start, start + len, page_flags);
->      mmap_unlock();
->      return 0;
->  error:
-> @@ -364,10 +400,11 @@ abi_ulong mmap_find_vma(abi_ulong start, abi_ulong
-size, abi_ulong align)
->  }
->
->  /* NOTE: all the constants are the HOST ones */
-> -abi_long target_mmap(abi_ulong start, abi_ulong len, int prot,
-> +abi_long target_mmap(abi_ulong start, abi_ulong len, int target_prot,
->                       int flags, int fd, abi_ulong offset)
->  {
->      abi_ulong ret, end, real_start, real_end, retaddr, host_offset,
-host_len;
-> +    int page_flags, host_prot;
->
->      mmap_lock();
->  #ifdef DEBUG_MMAP
-> @@ -402,6 +439,12 @@ abi_long target_mmap(abi_ulong start, abi_ulong len,
-int prot,
->          goto fail;
->      }
->
-> +    page_flags =3D validate_prot_to_pageflags(&host_prot, target_prot);
-> +    if (!page_flags) {
-> +        errno =3D EINVAL;
-> +        goto fail;
-> +    }
-> +
->      /* Also check for overflows... */
->      len =3D TARGET_PAGE_ALIGN(len);
->      if (!len) {
-> @@ -467,14 +510,15 @@ abi_long target_mmap(abi_ulong start, abi_ulong
-len, int prot,
->          /* Note: we prefer to control the mapping address. It is
->             especially important if qemu_host_page_size >
->             qemu_real_host_page_size */
-> -        p =3D mmap(g2h(start), host_len, prot,
-> +        p =3D mmap(g2h(start), host_len, host_prot,
->                   flags | MAP_FIXED | MAP_ANONYMOUS, -1, 0);
-> -        if (p =3D=3D MAP_FAILED)
-> +        if (p =3D=3D MAP_FAILED) {
->              goto fail;
-> +        }
->          /* update start so that it points to the file position at
-'offset' */
->          host_start =3D (unsigned long)p;
->          if (!(flags & MAP_ANONYMOUS)) {
-> -            p =3D mmap(g2h(start), len, prot,
-> +            p =3D mmap(g2h(start), len, host_prot,
->                       flags | MAP_FIXED, fd, host_offset);
->              if (p =3D=3D MAP_FAILED) {
->                  munmap(g2h(start), host_len);
-> @@ -508,19 +552,19 @@ abi_long target_mmap(abi_ulong start, abi_ulong
-len, int prot,
->              /* msync() won't work here, so we return an error if write i=
-s
->                 possible while it is a shared mapping */
->              if ((flags & MAP_TYPE) =3D=3D MAP_SHARED &&
-> -                (prot & PROT_WRITE)) {
-> +                (host_prot & PROT_WRITE)) {
->                  errno =3D EINVAL;
->                  goto fail;
->              }
-> -            retaddr =3D target_mmap(start, len, prot | PROT_WRITE,
-> +            retaddr =3D target_mmap(start, len, target_prot | PROT_WRITE=
-,
->                                    MAP_FIXED | MAP_PRIVATE |
-MAP_ANONYMOUS,
->                                    -1, 0);
->              if (retaddr =3D=3D -1)
->                  goto fail;
->              if (pread(fd, g2h(start), len, offset) =3D=3D -1)
->                  goto fail;
-> -            if (!(prot & PROT_WRITE)) {
-> -                ret =3D target_mprotect(start, len, prot);
-> +            if (!(host_prot & PROT_WRITE)) {
-> +                ret =3D target_mprotect(start, len, target_prot);
->                  assert(ret =3D=3D 0);
->              }
->              goto the_end;
-> @@ -531,13 +575,13 @@ abi_long target_mmap(abi_ulong start, abi_ulong
-len, int prot,
->              if (real_end =3D=3D real_start + qemu_host_page_size) {
->                  /* one single host page */
->                  ret =3D mmap_frag(real_start, start, end,
-> -                                prot, flags, fd, offset);
-> +                                host_prot, flags, fd, offset);
->                  if (ret =3D=3D -1)
->                      goto fail;
->                  goto the_end1;
->              }
->              ret =3D mmap_frag(real_start, start, real_start +
-qemu_host_page_size,
-> -                            prot, flags, fd, offset);
-> +                            host_prot, flags, fd, offset);
->              if (ret =3D=3D -1)
->                  goto fail;
->              real_start +=3D qemu_host_page_size;
-> @@ -546,7 +590,7 @@ abi_long target_mmap(abi_ulong start, abi_ulong len,
-int prot,
->          if (end < real_end) {
->              ret =3D mmap_frag(real_end - qemu_host_page_size,
->                              real_end - qemu_host_page_size, end,
-> -                            prot, flags, fd,
-> +                            host_prot, flags, fd,
->                              offset + real_end - qemu_host_page_size -
-start);
->              if (ret =3D=3D -1)
->                  goto fail;
-> @@ -562,13 +606,13 @@ abi_long target_mmap(abi_ulong start, abi_ulong
-len, int prot,
->              else
->                  offset1 =3D offset + real_start - start;
->              p =3D mmap(g2h(real_start), real_end - real_start,
-> -                     prot, flags, fd, offset1);
-> +                     host_prot, flags, fd, offset1);
->              if (p =3D=3D MAP_FAILED)
->                  goto fail;
->          }
->      }
->   the_end1:
-> -    page_set_flags(start, start + len, prot | PAGE_VALID);
-> +    page_set_flags(start, start + len, page_flags);
->   the_end:
->  #ifdef DEBUG_MMAP
->      printf("ret=3D0x" TARGET_ABI_FMT_lx "\n", start);
-> --
-> 2.17.1
->
->
+> 
+>> +        warn_report_err(local_err);
+>> +    }
+>>  
+>>      while (spapr->mc_status != -1) {
+>>          /*
+>> diff --git a/hw/ppc/spapr_rtas.c b/hw/ppc/spapr_rtas.c
+>> index 91a7ab9..c849223 100644
+>> --- a/hw/ppc/spapr_rtas.c
+>> +++ b/hw/ppc/spapr_rtas.c
+>> @@ -50,6 +50,7 @@
+>>  #include "target/ppc/mmu-hash64.h"
+>>  #include "target/ppc/mmu-book3s-v3.h"
+>>  #include "kvm_ppc.h"
+>> +#include "migration/blocker.h"
+>>  
+>>  static void rtas_display_character(PowerPCCPU *cpu, SpaprMachineState *spapr,
+>>                                     uint32_t token, uint32_t nargs,
+>> @@ -404,6 +405,9 @@ static void rtas_ibm_nmi_interlock(PowerPCCPU *cpu,
+>>          spapr->mc_status = -1;
+>>          qemu_cond_signal(&spapr->mc_delivery_cond);
+>>          rtas_st(rets, 0, RTAS_OUT_SUCCESS);
+>> +        migrate_del_blocker(spapr->fwnmi_migration_blocker);
+>> +        error_free(spapr->fwnmi_migration_blocker);
+>> +        spapr->fwnmi_migration_blocker = NULL;
+>>      }
+>>  }
+>>  
+>> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+>> index bd75d4b..6c0cfd8 100644
+>> --- a/include/hw/ppc/spapr.h
+>> +++ b/include/hw/ppc/spapr.h
+>> @@ -214,6 +214,8 @@ struct SpaprMachineState {
+>>      SpaprCapabilities def, eff, mig;
+>>  
+>>      unsigned gpu_numa_id;
+>> +
+>> +    Error *fwnmi_migration_blocker;
+>>  };
+>>  
+>>  #define H_SUCCESS         0
+>>
+> 
+
+-- 
+Regards,
+Aravinda
+
+
