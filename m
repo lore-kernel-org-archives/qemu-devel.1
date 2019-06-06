@@ -4,67 +4,68 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 849E5C28D1E
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 11:12:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1FFDDC28EB4
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 11:12:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5E6DD20868
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 11:12:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5E6DD20868
+	by mail.kernel.org (Postfix) with ESMTPS id F08A9207E0
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 11:12:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F08A9207E0
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:58447 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:58451 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hYqJU-000447-Ia
-	for qemu-devel@archiver.kernel.org; Thu, 06 Jun 2019 07:12:08 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:60310)
+	id 1hYqJx-0004V2-63
+	for qemu-devel@archiver.kernel.org; Thu, 06 Jun 2019 07:12:37 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:60541)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hYqF8-0000BT-LB
-	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 07:07:39 -0400
+	(envelope-from <laurent@vivier.eu>) id 1hYqFR-0000Sj-6C
+	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 07:07:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hYqF5-0003FA-Oa
-	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 07:07:36 -0400
-Received: from mout.kundenserver.de ([217.72.192.73]:58621)
+	(envelope-from <laurent@vivier.eu>) id 1hYqFQ-0003fy-10
+	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 07:07:57 -0400
+Received: from mout.kundenserver.de ([212.227.17.13]:60497)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <laurent@vivier.eu>)
-	id 1hYqF1-0002z6-0o; Thu, 06 Jun 2019 07:07:31 -0400
+	id 1hYqFM-0003W7-7N; Thu, 06 Jun 2019 07:07:52 -0400
 Received: from localhost.localdomain ([78.238.229.36]) by
 	mrelayeu.kundenserver.de (mreue107 [212.227.15.183]) with ESMTPSA
 	(Nemesis)
-	id 1MauFB-1gy8V734dX-00cSgp; Thu, 06 Jun 2019 13:06:43 +0200
+	id 1N3KDM-1gZYHX0OdG-010LEk; Thu, 06 Jun 2019 13:06:53 +0200
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Date: Thu,  6 Jun 2019 13:06:12 +0200
-Message-Id: <20190606110625.32127-4-laurent@vivier.eu>
+Date: Thu,  6 Jun 2019 13:06:18 +0200
+Message-Id: <20190606110625.32127-10-laurent@vivier.eu>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190606110625.32127-1-laurent@vivier.eu>
 References: <20190606110625.32127-1-laurent@vivier.eu>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:CaPomUUU0ZJp2dT6eUq05+g7tIBXfeNTk8JnnR47rG4Bb3m2Amu
-	FYawHFxHtEN6ZwcplHPtkRE8L99QdHTARU0DkOY5IX6Khlx0ZOP1VVSVn6jDU4cyT9rzXkh
-	OXaCHxOgKUg+NpeQ/u4xYfYdSNT/lncnGfEUNJS7Sjt6PStGn1qP322oM4iT75BrRb6CBMO
-	Cd9LcRhoU7u+7OHe0NImA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:41tRHKGJyP0=:4ymjpaXSKln4RHBYeKTaxe
-	eHWyXozSKm/GfW/N7OJ1Zc3S0QRUoGie3/x2d9eHdXM8jgRb3Bpn9trcYMOS7x23oa2QC51eF
-	rD3Ajl+Kko9qZVsUpoPb2ZCQe+ejJdBGwmLLeGP634ant7VNwHnNNv1z1zyhv/IkfdTWFzLDz
-	4fIOZ5dGwIBtoJSXHGGnfKMhaROJiy69Kc9jUQqIZKJRTuNAnGcYPSvagkCcwQ1WD8b3+6iAl
-	c4eLCHB/4PBsauGmZRy2oA+6aczUWZrK1KUFML2K/dkFkF14ikiuRgve99MLwTYjw1IbRrG2t
-	+xzLn7CXcojeu/kpbk+uqjJcSEMnzKm9iYey8ue05T0SV3y/5OKrYR8OZD1h9Kh7rZEnQvwd2
-	4+ZmV2UPrsTozj2CiuOeeF1bu5k4q9kRh0vJm6gxy82O+Ah3g1JLz+Fh/lAG5Qi3GJ1v6/bDo
-	/febZbm//dL/wxA/uqOSKjnqXZbtRuRZN2voi9/nvCrVYjWgsr2tqM/ejh6p6QgqxzwtfX4la
-	S1xjp5j6K0s0Bu6hRtGUkOQ+EOjKE1XhN8xuHiVi/eG0Bsl4Y6D3XyADr3sPb1tl1reywT2q/
-	sZpVLZwh6KWE/Kq735ggQAk+WI/Wy6QFC/5VYxHRGaxVp+Sd/8gGj/620fIP61ahFlb8rgyD5
-	XJliIqnJR5W0CtqVhKlNYvQp7uhZohjAuRTnMB7ZziPVyuVr8pSAvZOFErkNOY9nqB9KraFQr
-	WpyhXhuuvVMmOi/PNpcTo7iMvda2OWyk6sfLQsXAQBy8pliKk02eM/6Jlb8=
+X-Provags-ID: V03:K1:8FmYLJqd6nXvaOA8F8eP5aRFDi4xgKrj8Ckn7so07AqnFefxKJf
+	bufSPAvf+aYwQgR9cG5GMvWhk1VEnOVUWd0r0yy8RSAQEFd+XSPDnGH2YOHjoODZstbDNBP
+	hfir2+Nxzizz1I6FPy4HeD4KhyTRzZQpBeTn7NODDPVZ6v91buO68l2eGYdtrRQKQARrDoj
+	ZwU3gVtBTmY/hY52GKerQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:TXGh83A+BFc=:ZlfeUp7i3lWhZ1IXQbS3vy
+	U2Bk0DiMUdTX8F+CvMczxQV8EQC+3NNdMMqRxki0S8iDZUb7knNsz+RY0/MWSRcL3sFAH2Qgs
+	iTMU5zsY/fRk++iZpKBsLf/77weaz/JLdHmuebICDCZr88+/f1h7z4njGpe2gMQQkbBXxDmiD
+	43VVnlr0AYXNUYcFubTEJHg1W+eBnaupuHDVbH5pKKfiKVZzYNukgrCyPJZHBSyC+o9dZMyh6
+	oZwo60W8Fh6nQ8NjKCYhVZq00OE9wAjuDOwxZbhrIMqBl4EfQ9e5XWXjBKIEP1erub0XdDOuq
+	PtMRlIP+O4osYQ0btM/Enw+jNZreHIjHP1MOfomcLVY0rzBra3aRUmEAuxmN2ziLaarW5pBQ1
+	HnQYhQQ77S9QPuHVM/wHaeSQwgcWhW16lSy069RS9SHri6NHt4zNg21Xr+OSCuQo1YbbYjrnV
+	BLXvD3MY2J3kPBmm+2lhDvjrxhKQajcLpQvHm72Ej49J7OXGtmD6UqPrlGxEM/Ny4hdVCZnSW
+	9NJULwNw9yPSrmCbPtK9Lvzxl/pstrBQ/0FRU3QxVF0kDCbQwTl8ORd5+gjT5lNq2s64yejtt
+	AWDONfS94OE1iPefipkTyvEtgQ/CCP3exZKiMuGSWVsaj/iMrHAJWqSU89Jiez3PyUzEOu+GC
+	ld7sutLLk9ni1LAGO0pUVF3YimlAScZs5LEFeM0miGuK+hAI3DPbw6/8Od+kPeNuTsuoTcjUn
+	UegRD73Qo5OO0CgaqpZPVkLwc1zfqhKugZUSxEQK5r2x0aqrFOI8d/4r0c8=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 217.72.192.73
-Subject: [Qemu-devel] [PULL 03/16] vhost: fix incorrect print type
+X-Received-From: 212.227.17.13
+Subject: [Qemu-devel] [PULL 09/16] hw/s390x/event-facility: Use the QOM
+ BUS() macro to access BusState.qbus
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -76,10 +77,10 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Dmitry Fleytman <dmitry.fleytman@gmail.com>,
+Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
+	Dmitry Fleytman <dmitry.fleytman@gmail.com>,
 	David Hildenbrand <david@redhat.com>, Michael Tokarev <mjt@tls.msk.ru>,
-	Gerd Hoffmann <kraxel@redhat.com>, Jie Wang <wangjie88@huawei.com>,
-	Juan Quintela <quintela@redhat.com>,
+	Gerd Hoffmann <kraxel@redhat.com>, Juan Quintela <quintela@redhat.com>,
 	Aleksandar Rikalo <arikalo@wavecomp.com>,
 	"Michael S. Tsirkin" <mst@redhat.com>, Halil Pasic <pasic@linux.ibm.com>,
 	Christian Borntraeger <borntraeger@de.ibm.com>,
@@ -98,31 +99,49 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Jie Wang <wangjie88@huawei.com>
+From: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-fix incorrect print type in vhost_virtqueue_stop
+Rather than looking inside the definition of a BusState with "s->bus.qbus",
+use the QOM prefered style: "BUS(&s->bus)".
 
-Signed-off-by: Jie Wang <wangjie88@huawei.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-Id: <1556605773-42019-1-git-send-email-wangjie88@huawei.com>
+This patch was generated using the following Coccinelle script:
+
+    // Use BUS() macros to access BusState.qbus
+    @use_bus_macro_to_access_qbus@
+    expression obj;
+    identifier bus;
+    @@
+    -&obj->bus.qbus
+    +BUS(&obj->bus)
+
+Suggested-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+Message-Id: <20190528164020.32250-5-philmd@redhat.com>
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- hw/virtio/vhost.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ hw/s390x/event-facility.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
-index 7f61018f2a3f..286bb27c6539 100644
---- a/hw/virtio/vhost.c
-+++ b/hw/virtio/vhost.c
-@@ -1081,7 +1081,7 @@ static void vhost_virtqueue_stop(struct vhost_dev *dev,
+diff --git a/hw/s390x/event-facility.c b/hw/s390x/event-facility.c
+index ee5b83448b11..e574223a226b 100644
+--- a/hw/s390x/event-facility.c
++++ b/hw/s390x/event-facility.c
+@@ -466,12 +466,12 @@ static void init_event_facility(Object *obj)
+     new = object_new(TYPE_SCLP_QUIESCE);
+     object_property_add_child(obj, TYPE_SCLP_QUIESCE, new, NULL);
+     object_unref(new);
+-    qdev_set_parent_bus(DEVICE(new), &event_facility->sbus.qbus);
++    qdev_set_parent_bus(DEVICE(new), BUS(&event_facility->sbus));
  
-     r = dev->vhost_ops->vhost_get_vring_base(dev, &state);
-     if (r < 0) {
--        VHOST_OPS_DEBUG("vhost VQ %d ring restore failed: %d", idx, r);
-+        VHOST_OPS_DEBUG("vhost VQ %u ring restore failed: %d", idx, r);
-         /* Connection to the backend is broken, so let's sync internal
-          * last avail idx to the device used idx.
-          */
+     new = object_new(TYPE_SCLP_CPU_HOTPLUG);
+     object_property_add_child(obj, TYPE_SCLP_CPU_HOTPLUG, new, NULL);
+     object_unref(new);
+-    qdev_set_parent_bus(DEVICE(new), &event_facility->sbus.qbus);
++    qdev_set_parent_bus(DEVICE(new), BUS(&event_facility->sbus));
+     /* the facility will automatically realize the devices via the bus */
+ }
+ 
 -- 
 2.21.0
 
