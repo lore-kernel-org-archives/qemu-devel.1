@@ -2,67 +2,63 @@ Return-Path: <SRS0=9X/F=UF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EF79CC28CC5
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 03:12:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DB308C28CC5
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 03:16:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8A1E72070B
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 03:12:56 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="Nht3DY2K"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8A1E72070B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	by mail.kernel.org (Postfix) with ESMTPS id 9EC592070B
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 03:16:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9EC592070B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:53601 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:53672 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hYipj-0006CK-KS
-	for qemu-devel@archiver.kernel.org; Wed, 05 Jun 2019 23:12:55 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:56138)
+	id 1hYisk-0007j9-Tc
+	for qemu-devel@archiver.kernel.org; Wed, 05 Jun 2019 23:16:02 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:57742)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1hYiko-0002nC-7t
-	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 23:07:52 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1hYirw-0007OC-41
+	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 23:15:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1hYikj-0000Uu-J7
-	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 23:07:50 -0400
-Received: from ozlabs.org ([2401:3900:2:1::2]:60355)
+	(envelope-from <ehabkost@redhat.com>) id 1hYiru-0007mc-GW
+	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 23:15:12 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56054)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
-	id 1hYikh-0008Vh-CS; Wed, 05 Jun 2019 23:07:45 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
-	id 45K9ZN66Ggz9s9y; Thu,  6 Jun 2019 13:07:40 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-	d=gibson.dropbear.id.au; s=201602; t=1559790460;
-	bh=UbFRRGCpjaRPre/8KwJagQhq7z16re20x8946eKKOlo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Nht3DY2KlH5Vd7goZOLKER6ssNMS0KjUh/Fbf6ex870lb3Sl8dwsQi1JMyIlhUPMf
-	pQzzOu2YqroTzrDhNRRJ6WrrCYmBKmbMD1KOZLEv3BwtozSn4422KtWwXHFaLpzdcH
-	Ysh+w88VKpiG+m6cmcRXc2aiirLjDummDg+60Bc8=
-Date: Thu, 6 Jun 2019 13:07:32 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20190606030732.GL10319@umbus.fritz.box>
-References: <20190518205428.90532-1-like.xu@linux.intel.com>
-	<20190518205428.90532-5-like.xu@linux.intel.com>
-	<20190606025241.GM22416@habkost.net>
-	<20190606025456.GN22416@habkost.net>
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hYiru-0007iY-89
+	for qemu-devel@nongnu.org; Wed, 05 Jun 2019 23:15:10 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+	[10.5.11.22])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 1CEA8308A968;
+	Thu,  6 Jun 2019 03:15:09 +0000 (UTC)
+Received: from localhost (ovpn-116-9.gru2.redhat.com [10.97.116.9])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 0D2F1104B511;
+	Thu,  6 Jun 2019 03:15:07 +0000 (UTC)
+Date: Thu, 6 Jun 2019 00:15:06 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+To: Like Xu <like.xu@linux.intel.com>
+Message-ID: <20190606031506.GU22416@habkost.net>
+References: <20190520165056.175475-1-like.xu@linux.intel.com>
+	<20190520165056.175475-4-like.xu@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="J2pR2RtFp0tAjF3C"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190606025456.GN22416@habkost.net>
-User-Agent: Mutt/1.11.4 (2019-03-13)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2401:3900:2:1::2
-Subject: Re: [Qemu-devel] [PATCH v3 04/10] hw/ppc: Replace global smp
- variables with machine smp properties
+In-Reply-To: <20190520165056.175475-4-like.xu@linux.intel.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.41]);
+	Thu, 06 Jun 2019 03:15:09 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v2 3/5] vl.c: Add -smp,
+ dies=* command line support and update -smp doc
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -74,437 +70,217 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Like Xu <like.xu@linux.intel.com>,
-	qemu-trivial@nongnu.org, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
-	qemu-devel@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-	=?iso-8859-1?Q?Herv=E9?= Poussineau <hpoussin@reactos.org>,
-	=?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>,
-	Igor Mammedov <imammedo@redhat.com>,
-	Alistair Francis <alistair23@gmail.com>, qemu-ppc@nongnu.org
+Cc: Andrew Jones <drjones@redhat.com>,
+	Daniel P =?iso-8859-1?Q?=2E_Berrang=E9?= <berrange@redhat.com>,
+	Peter Crosthwaite <crosthwaite.peter@gmail.com>,
+	Markus Armbruster <armbru@redhat.com>,
+	Marcelo Tosatti <mtosatti@redhat.com>, qemu-devel@nongnu.org,
+	"Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+	Igor Mammedov <imammedo@redhat.com>, Brice Goglin <Brice.Goglin@inria.fr>,
+	Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Tue, May 21, 2019 at 12:50:54AM +0800, Like Xu wrote:
+> For PC target, users could configure the number of dies per one package
+> via command line with this patch, such as "-smp dies=2,cores=4".
+> 
+> A new pc-specified pc_smp_parse() is introduced and to keep the interface
+> consistent, refactoring legacy smp_parse() to __smp_parse() is necessary.
+> 
+> The parsing rules of new cpu-topology model obey the same restrictions/logic
+> as the legacy socket/core/thread model especially on missing values computing.
+> 
+> Signed-off-by: Like Xu <like.xu@linux.intel.com>
+> ---
+>  qemu-options.hx | 17 +++++-----
+>  vl.c            | 89 ++++++++++++++++++++++++++++++++++++++++++++++++-
+>  2 files changed, 97 insertions(+), 9 deletions(-)
+> 
+> diff --git a/qemu-options.hx b/qemu-options.hx
+> index 5daa5a8fb0..7fad5b50ff 100644
+> --- a/qemu-options.hx
+> +++ b/qemu-options.hx
+> @@ -138,25 +138,26 @@ no incompatible TCG features have been enabled (e.g. icount/replay).
+>  ETEXI
+>  
+>  DEF("smp", HAS_ARG, QEMU_OPTION_smp,
+> -    "-smp [cpus=]n[,maxcpus=cpus][,cores=cores][,threads=threads][,sockets=sockets]\n"
+> +    "-smp [cpus=]n[,maxcpus=cpus][,cores=cores][,threads=threads][,dies=dies][,sockets=sockets]\n"
+>      "                set the number of CPUs to 'n' [default=1]\n"
+>      "                maxcpus= maximum number of total cpus, including\n"
+>      "                offline CPUs for hotplug, etc\n"
+> -    "                cores= number of CPU cores on one socket\n"
+> +    "                cores= number of CPU cores on one socket (for PC, it's on one die)\n"
+>      "                threads= number of threads on one CPU core\n"
+> +    "                dies= number of CPU dies on one socket (for PC only)\n"
+>      "                sockets= number of discrete sockets in the system\n",
+>          QEMU_ARCH_ALL)
+>  STEXI
+> -@item -smp [cpus=]@var{n}[,cores=@var{cores}][,threads=@var{threads}][,sockets=@var{sockets}][,maxcpus=@var{maxcpus}]
+> +@item -smp [cpus=]@var{n}[,cores=@var{cores}][,threads=@var{threads}][,dies=dies][,sockets=@var{sockets}][,maxcpus=@var{maxcpus}]
+>  @findex -smp
+>  Simulate an SMP system with @var{n} CPUs. On the PC target, up to 255
+>  CPUs are supported. On Sparc32 target, Linux limits the number of usable CPUs
+>  to 4.
+> -For the PC target, the number of @var{cores} per socket, the number
+> -of @var{threads} per cores and the total number of @var{sockets} can be
+> -specified. Missing values will be computed. If any on the three values is
+> -given, the total number of CPUs @var{n} can be omitted. @var{maxcpus}
+> -specifies the maximum number of hotpluggable CPUs.
+> +For the PC target, the number of @var{cores} per die, the number of @var{threads}
+> +per cores, the number of @var{dies} per packages and the total number of
+> +@var{sockets} can be specified. Missing values will be computed.
+> +If any on the three values is given, the total number of CPUs @var{n} can be omitted.
+> +@var{maxcpus} specifies the maximum number of hotpluggable CPUs.
+>  ETEXI
+>  
+>  DEF("numa", HAS_ARG, QEMU_OPTION_numa,
+> diff --git a/vl.c b/vl.c
+> index 8d92e2d209..66b577f447 100644
+> --- a/vl.c
+> +++ b/vl.c
+> @@ -63,6 +63,7 @@ int main(int argc, char **argv)
+>  #include "sysemu/watchdog.h"
+>  #include "hw/firmware/smbios.h"
+>  #include "hw/acpi/acpi.h"
+> +#include "hw/i386/pc.h"
+>  #include "hw/xen/xen.h"
+>  #include "hw/qdev.h"
+>  #include "hw/loader.h"
+> @@ -1248,6 +1249,9 @@ static QemuOptsList qemu_smp_opts = {
+>          }, {
+>              .name = "sockets",
+>              .type = QEMU_OPT_NUMBER,
+> +        }, {
+> +            .name = "dies",
+> +            .type = QEMU_OPT_NUMBER,
+>          }, {
+>              .name = "cores",
+>              .type = QEMU_OPT_NUMBER,
+> @@ -1262,7 +1266,7 @@ static QemuOptsList qemu_smp_opts = {
+>      },
+>  };
+>  
+> -static void smp_parse(QemuOpts *opts)
+> +static void __smp_parse(QemuOpts *opts)
+>  {
+>      if (opts) {
+>          unsigned cpus    = qemu_opt_get_number(opts, "cpus", 0);
+> @@ -1334,6 +1338,89 @@ static void smp_parse(QemuOpts *opts)
+>      }
+>  }
+>  
+> +static void pc_smp_parse(QemuOpts *opts)
+> +{
+> +    PCMachineState *pcms = (PCMachineState *)
+> +        object_dynamic_cast(OBJECT(current_machine), TYPE_PC_MACHINE);
+> +
+> +    unsigned cpus    = qemu_opt_get_number(opts, "cpus", 0);
+> +    unsigned sockets = qemu_opt_get_number(opts, "sockets", 0);
+> +    unsigned dies = qemu_opt_get_number(opts, "dies", 1);
+> +    unsigned cores   = qemu_opt_get_number(opts, "cores", 0);
+> +    unsigned threads = qemu_opt_get_number(opts, "threads", 0);
+> +
+> +    /* compute missing values, prefer sockets over cores over threads */
+> +    if (cpus == 0 || sockets == 0) {
+> +        cores = cores > 0 ? cores : 1;
+> +        threads = threads > 0 ? threads : 1;
+> +        if (cpus == 0) {
+> +            sockets = sockets > 0 ? sockets : 1;
+> +            cpus = cores * threads * dies * sockets;
+> +        } else {
+> +            current_machine->smp.max_cpus =
+> +                    qemu_opt_get_number(opts, "maxcpus", cpus);
+> +            sockets = current_machine->smp.max_cpus / (cores * threads * dies);
+> +        }
+> +    } else if (cores == 0) {
+> +        threads = threads > 0 ? threads : 1;
+> +        cores = cpus / (sockets * dies * threads);
+> +        cores = cores > 0 ? cores : 1;
+> +    } else if (threads == 0) {
+> +        threads = cpus / (cores * dies * sockets);
+> +        threads = threads > 0 ? threads : 1;
+> +    } else if (sockets * dies * cores * threads < cpus) {
+> +        error_report("cpu topology: "
+> +                        "sockets (%u) * dies (%u) * cores (%u) * threads (%u) < "
+> +                        "smp_cpus (%u)",
+> +                        sockets, dies, cores, threads, cpus);
+> +        exit(1);
+> +    }
+> +
+> +    current_machine->smp.max_cpus =
+> +            qemu_opt_get_number(opts, "maxcpus", cpus);
+> +
+> +    if (current_machine->smp.max_cpus < cpus) {
+> +        error_report("maxcpus must be equal to or greater than smp");
+> +        exit(1);
+> +    }
+> +
+> +    if (sockets * dies * cores * threads > current_machine->smp.max_cpus) {
+> +        error_report("cpu topology: "
+> +                        "sockets (%u) * dies (%u) * cores (%u) * threads (%u) > "
+> +                        "maxcpus (%u)",
+> +                        sockets, dies, cores, threads,
+> +                        current_machine->smp.max_cpus);
+> +        exit(1);
+> +    }
+> +
+> +    if (sockets * dies * cores * threads != current_machine->smp.max_cpus) {
+> +        warn_report("Invalid CPU topology deprecated: "
+> +                    "sockets (%u) * dies (%u) * cores (%u) * threads (%u) "
+> +                    "!= maxcpus (%u)",
+> +                    sockets, dies, cores, threads,
+> +                    current_machine->smp.max_cpus);
+> +    }
+> +
+> +    current_machine->smp.cpus = cpus;
+> +    current_machine->smp.cores = cores;
+> +    current_machine->smp.threads = threads;
+> +    pcms->smp_dies = dies;
+> +
+> +    if (current_machine->smp.cpus > 1) {
+> +        Error *blocker = NULL;
+> +        error_setg(&blocker, QERR_REPLAY_NOT_SUPPORTED, "smp");
+> +        replay_add_blocker(blocker);
+> +    }
+> +}
+> +
+> +static void smp_parse(QemuOpts *opts)
+> +{
+> +    if (object_dynamic_cast(OBJECT(current_machine), TYPE_PC_MACHINE))
+> +        pc_smp_parse(opts);
 
---J2pR2RtFp0tAjF3C
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+This is not exactly what I meant when I suggested creating a
+pc_smp_parse() function.
 
-On Wed, Jun 05, 2019 at 11:54:56PM -0300, Eduardo Habkost wrote:
-> On Wed, Jun 05, 2019 at 11:52:41PM -0300, Eduardo Habkost wrote:
-> > On Sun, May 19, 2019 at 04:54:22AM +0800, Like Xu wrote:
-> > > The global smp variables in ppc are replaced with smp machine propert=
-ies.
-> > >=20
-> > > A local variable of the same name would be introduced in the declarat=
-ion
-> > > phase if it's used widely in the context OR replace it on the spot if=
- it's
-> > > only used once. No semantic changes.
-> > >=20
-> > > Signed-off-by: Like Xu <like.xu@linux.intel.com>
-> >=20
-> > Any objections from the ppc maintainers to queueing this through
-> > the Machine Core tree?
->=20
-> Oops, CCing the ppc maintainers.
+The idea was to place the PC-specific function inside
+hw/i386/pc.c, and have a MachineClass::smp_parse function pointer
+that machine types could override.
 
-No objection here.
+The existing generic smp_parse() code, on the other hand, could
+be moved to hw/core/machine.c, and be the default implementation
+of MachineClass::smp_parse.
 
-Acked-by: David Gibson <david@gibson.dropbear.id.au>
+Suggestion: If you first create a copy of smp_parse() in one
+patch, and then add CPU die support in another patch, it will be
+much easier to review the changes you added to the pc_smp_parse()
+code.
 
->=20
-> >=20
-> > > ---
-> > >  hw/ppc/e500.c         |  3 +++
-> > >  hw/ppc/mac_newworld.c |  3 ++-
-> > >  hw/ppc/mac_oldworld.c |  3 ++-
-> > >  hw/ppc/pnv.c          |  6 ++++--
-> > >  hw/ppc/prep.c         |  4 ++--
-> > >  hw/ppc/spapr.c        | 34 ++++++++++++++++++++++++++--------
-> > >  hw/ppc/spapr_rtas.c   |  4 +++-
-> > >  7 files changed, 42 insertions(+), 15 deletions(-)
-> > >=20
-> > > diff --git a/hw/ppc/e500.c b/hw/ppc/e500.c
-> > > index beb2efd694..5e42e5a059 100644
-> > > --- a/hw/ppc/e500.c
-> > > +++ b/hw/ppc/e500.c
-> > > @@ -307,6 +307,7 @@ static int ppce500_load_device_tree(PPCE500Machin=
-eState *pms,
-> > >                                      bool dry_run)
-> > >  {
-> > >      MachineState *machine =3D MACHINE(pms);
-> > > +    unsigned int smp_cpus =3D machine->smp.cpus;
-> > >      const PPCE500MachineClass *pmc =3D PPCE500_MACHINE_GET_CLASS(pms=
-);
-> > >      CPUPPCState *env =3D first_cpu->env_ptr;
-> > >      int ret =3D -1;
-> > > @@ -734,6 +735,7 @@ static DeviceState *ppce500_init_mpic_qemu(PPCE50=
-0MachineState *pms,
-> > >      SysBusDevice *s;
-> > >      int i, j, k;
-> > >      MachineState *machine =3D MACHINE(pms);
-> > > +    unsigned int smp_cpus =3D machine->smp.cpus;
-> > >      const PPCE500MachineClass *pmc =3D PPCE500_MACHINE_GET_CLASS(pms=
-);
-> > > =20
-> > >      dev =3D qdev_create(NULL, TYPE_OPENPIC);
-> > > @@ -846,6 +848,7 @@ void ppce500_init(MachineState *machine)
-> > >      struct boot_info *boot_info;
-> > >      int dt_size;
-> > >      int i;
-> > > +    unsigned int smp_cpus =3D machine->smp.cpus;
-> > >      /* irq num for pin INTA, INTB, INTC and INTD is 1, 2, 3 and
-> > >       * 4 respectively */
-> > >      unsigned int pci_irq_nrs[PCI_NUM_PINS] =3D {1, 2, 3, 4};
-> > > diff --git a/hw/ppc/mac_newworld.c b/hw/ppc/mac_newworld.c
-> > > index 02d8559621..257b26ee24 100644
-> > > --- a/hw/ppc/mac_newworld.c
-> > > +++ b/hw/ppc/mac_newworld.c
-> > > @@ -135,6 +135,7 @@ static void ppc_core99_init(MachineState *machine)
-> > >      DeviceState *dev, *pic_dev;
-> > >      hwaddr nvram_addr =3D 0xFFF04000;
-> > >      uint64_t tbfreq;
-> > > +    unsigned int smp_cpus =3D machine->smp.cpus;
-> > > =20
-> > >      linux_boot =3D (kernel_filename !=3D NULL);
-> > > =20
-> > > @@ -464,7 +465,7 @@ static void ppc_core99_init(MachineState *machine)
-> > >      sysbus_mmio_map(s, 1, CFG_ADDR + 2);
-> > > =20
-> > >      fw_cfg_add_i16(fw_cfg, FW_CFG_NB_CPUS, (uint16_t)smp_cpus);
-> > > -    fw_cfg_add_i16(fw_cfg, FW_CFG_MAX_CPUS, (uint16_t)max_cpus);
-> > > +    fw_cfg_add_i16(fw_cfg, FW_CFG_MAX_CPUS, (uint16_t)machine->smp.m=
-ax_cpus);
-> > >      fw_cfg_add_i64(fw_cfg, FW_CFG_RAM_SIZE, (uint64_t)ram_size);
-> > >      fw_cfg_add_i16(fw_cfg, FW_CFG_MACHINE_ID, machine_arch);
-> > >      fw_cfg_add_i32(fw_cfg, FW_CFG_KERNEL_ADDR, kernel_base);
-> > > diff --git a/hw/ppc/mac_oldworld.c b/hw/ppc/mac_oldworld.c
-> > > index 460cbc7923..1968f05a6c 100644
-> > > --- a/hw/ppc/mac_oldworld.c
-> > > +++ b/hw/ppc/mac_oldworld.c
-> > > @@ -99,6 +99,7 @@ static void ppc_heathrow_init(MachineState *machine)
-> > >      DeviceState *dev, *pic_dev;
-> > >      BusState *adb_bus;
-> > >      int bios_size;
-> > > +    unsigned int smp_cpus =3D machine->smp.cpus;
-> > >      uint16_t ppc_boot_device;
-> > >      DriveInfo *hd[MAX_IDE_BUS * MAX_IDE_DEVS];
-> > >      void *fw_cfg;
-> > > @@ -322,7 +323,7 @@ static void ppc_heathrow_init(MachineState *machi=
-ne)
-> > >      sysbus_mmio_map(s, 1, CFG_ADDR + 2);
-> > > =20
-> > >      fw_cfg_add_i16(fw_cfg, FW_CFG_NB_CPUS, (uint16_t)smp_cpus);
-> > > -    fw_cfg_add_i16(fw_cfg, FW_CFG_MAX_CPUS, (uint16_t)max_cpus);
-> > > +    fw_cfg_add_i16(fw_cfg, FW_CFG_MAX_CPUS, (uint16_t)machine->smp.m=
-ax_cpus);
-> > >      fw_cfg_add_i64(fw_cfg, FW_CFG_RAM_SIZE, (uint64_t)ram_size);
-> > >      fw_cfg_add_i16(fw_cfg, FW_CFG_MACHINE_ID, ARCH_HEATHROW);
-> > >      fw_cfg_add_i32(fw_cfg, FW_CFG_KERNEL_ADDR, kernel_base);
-> > > diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
-> > > index 1e8c505936..3bb15338de 100644
-> > > --- a/hw/ppc/pnv.c
-> > > +++ b/hw/ppc/pnv.c
-> > > @@ -678,7 +678,8 @@ static void pnv_init(MachineState *machine)
-> > >          object_property_add_child(OBJECT(pnv), chip_name, chip, &err=
-or_fatal);
-> > >          object_property_set_int(chip, PNV_CHIP_HWID(i), "chip-id",
-> > >                                  &error_fatal);
-> > > -        object_property_set_int(chip, smp_cores, "nr-cores", &error_=
-fatal);
-> > > +        object_property_set_int(chip, machine->smp.cores,
-> > > +                                "nr-cores", &error_fatal);
-> > >          object_property_set_bool(chip, true, "realized", &error_fata=
-l);
-> > >      }
-> > >      g_free(chip_typename);
-> > > @@ -1134,6 +1135,7 @@ static void pnv_chip_instance_init(Object *obj)
-> > > =20
-> > >  static void pnv_chip_core_realize(PnvChip *chip, Error **errp)
-> > >  {
-> > > +    MachineState *ms =3D MACHINE(qdev_get_machine());
-> > >      Error *error =3D NULL;
-> > >      PnvChipClass *pcc =3D PNV_CHIP_GET_CLASS(chip);
-> > >      const char *typename =3D pnv_chip_core_typename(chip);
-> > > @@ -1168,7 +1170,7 @@ static void pnv_chip_core_realize(PnvChip *chip=
-, Error **errp)
-> > >          snprintf(core_name, sizeof(core_name), "core[%d]", core_hwid=
-);
-> > >          object_property_add_child(OBJECT(chip), core_name, OBJECT(pn=
-v_core),
-> > >                                    &error_fatal);
-> > > -        object_property_set_int(OBJECT(pnv_core), smp_threads, "nr-t=
-hreads",
-> > > +        object_property_set_int(OBJECT(pnv_core), ms->smp.threads, "=
-nr-threads",
-> > >                                  &error_fatal);
-> > >          object_property_set_int(OBJECT(pnv_core), core_hwid,
-> > >                                  CPU_CORE_PROP_CORE_ID, &error_fatal);
-> > > diff --git a/hw/ppc/prep.c b/hw/ppc/prep.c
-> > > index b7f459d475..968fd3ade2 100644
-> > > --- a/hw/ppc/prep.c
-> > > +++ b/hw/ppc/prep.c
-> > > @@ -428,7 +428,7 @@ static void ppc_prep_init(MachineState *machine)
-> > >      linux_boot =3D (kernel_filename !=3D NULL);
-> > > =20
-> > >      /* init CPUs */
-> > > -    for (i =3D 0; i < smp_cpus; i++) {
-> > > +    for (i =3D 0; i < machine->smp.cpus; i++) {
-> > >          cpu =3D POWERPC_CPU(cpu_create(machine->cpu_type));
-> > >          env =3D &cpu->env;
-> > > =20
-> > > @@ -765,7 +765,7 @@ static void ibm_40p_init(MachineState *machine)
-> > >          boot_device =3D machine->boot_order[0];
-> > >      }
-> > > =20
-> > > -    fw_cfg_add_i16(fw_cfg, FW_CFG_MAX_CPUS, (uint16_t)max_cpus);
-> > > +    fw_cfg_add_i16(fw_cfg, FW_CFG_MAX_CPUS, (uint16_t)machine->smp.m=
-ax_cpus);
-> > >      fw_cfg_add_i64(fw_cfg, FW_CFG_RAM_SIZE, (uint64_t)machine->ram_s=
-ize);
-> > >      fw_cfg_add_i16(fw_cfg, FW_CFG_MACHINE_ID, ARCH_PREP);
-> > > =20
-> > > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> > > index 7fb34decb9..25da337f84 100644
-> > > --- a/hw/ppc/spapr.c
-> > > +++ b/hw/ppc/spapr.c
-> > > @@ -105,6 +105,9 @@
-> > >   */
-> > >  static int spapr_vcpu_id(SpaprMachineState *spapr, int cpu_index)
-> > >  {
-> > > +    MachineState *ms =3D MACHINE(spapr);
-> > > +    unsigned int smp_threads =3D ms->smp.threads;
-> > > +
-> > >      assert(spapr->vsmt);
-> > >      return
-> > >          (cpu_index / smp_threads) * spapr->vsmt + cpu_index % smp_th=
-reads;
-> > > @@ -152,8 +155,10 @@ static void pre_2_10_vmstate_unregister_dummy_ic=
-p(int i)
-> > > =20
-> > >  int spapr_max_server_number(SpaprMachineState *spapr)
-> > >  {
-> > > +    MachineState *ms =3D MACHINE(spapr);
-> > > +
-> > >      assert(spapr->vsmt);
-> > > -    return DIV_ROUND_UP(max_cpus * spapr->vsmt, smp_threads);
-> > > +    return DIV_ROUND_UP(ms->smp.max_cpus * spapr->vsmt, ms->smp.thre=
-ads);
-> > >  }
-> > > =20
-> > >  static int spapr_fixup_cpu_smt_dt(void *fdt, int offset, PowerPCCPU =
-*cpu,
-> > > @@ -286,6 +291,7 @@ static void spapr_populate_pa_features(SpaprMachi=
-neState *spapr,
-> > > =20
-> > >  static int spapr_fixup_cpu_dt(void *fdt, SpaprMachineState *spapr)
-> > >  {
-> > > +    MachineState *ms =3D MACHINE(spapr);
-> > >      int ret =3D 0, offset, cpus_offset;
-> > >      CPUState *cs;
-> > >      char cpu_model[32];
-> > > @@ -295,7 +301,7 @@ static int spapr_fixup_cpu_dt(void *fdt, SpaprMac=
-hineState *spapr)
-> > >          PowerPCCPU *cpu =3D POWERPC_CPU(cs);
-> > >          DeviceClass *dc =3D DEVICE_GET_CLASS(cs);
-> > >          int index =3D spapr_get_vcpu_id(cpu);
-> > > -        int compat_smt =3D MIN(smp_threads, ppc_compat_max_vthreads(=
-cpu));
-> > > +        int compat_smt =3D MIN(ms->smp.threads, ppc_compat_max_vthre=
-ads(cpu));
-> > > =20
-> > >          if (!spapr_is_thread0_in_vcore(spapr, cpu)) {
-> > >              continue;
-> > > @@ -441,6 +447,7 @@ static int spapr_populate_memory(SpaprMachineStat=
-e *spapr, void *fdt)
-> > >  static void spapr_populate_cpu_dt(CPUState *cs, void *fdt, int offse=
-t,
-> > >                                    SpaprMachineState *spapr)
-> > >  {
-> > > +    MachineState *ms =3D MACHINE(spapr);
-> > >      PowerPCCPU *cpu =3D POWERPC_CPU(cs);
-> > >      CPUPPCState *env =3D &cpu->env;
-> > >      PowerPCCPUClass *pcc =3D POWERPC_CPU_GET_CLASS(cs);
-> > > @@ -452,7 +459,8 @@ static void spapr_populate_cpu_dt(CPUState *cs, v=
-oid *fdt, int offset,
-> > >      uint32_t cpufreq =3D kvm_enabled() ? kvmppc_get_clockfreq() : 10=
-00000000;
-> > >      uint32_t page_sizes_prop[64];
-> > >      size_t page_sizes_prop_size;
-> > > -    uint32_t vcpus_per_socket =3D smp_threads * smp_cores;
-> > > +    unsigned int smp_threads =3D ms->smp.threads;
-> > > +    uint32_t vcpus_per_socket =3D smp_threads * ms->smp.cores;
-> > >      uint32_t pft_size_prop[] =3D {0, cpu_to_be32(spapr->htab_shift)};
-> > >      int compat_smt =3D MIN(smp_threads, ppc_compat_max_vthreads(cpu)=
-);
-> > >      SpaprDrc *drc;
-> > > @@ -1022,6 +1030,7 @@ int spapr_h_cas_compose_response(SpaprMachineSt=
-ate *spapr,
-> > > =20
-> > >  static void spapr_dt_rtas(SpaprMachineState *spapr, void *fdt)
-> > >  {
-> > > +    MachineState *ms =3D MACHINE(spapr);
-> > >      int rtas;
-> > >      GString *hypertas =3D g_string_sized_new(256);
-> > >      GString *qemu_hypertas =3D g_string_sized_new(256);
-> > > @@ -1032,7 +1041,7 @@ static void spapr_dt_rtas(SpaprMachineState *sp=
-apr, void *fdt)
-> > >          cpu_to_be32(max_device_addr >> 32),
-> > >          cpu_to_be32(max_device_addr & 0xffffffff),
-> > >          0, cpu_to_be32(SPAPR_MEMORY_BLOCK_SIZE),
-> > > -        cpu_to_be32(max_cpus / smp_threads),
-> > > +        cpu_to_be32(ms->smp.max_cpus / ms->smp.threads),
-> > >      };
-> > >      uint32_t maxdomain =3D cpu_to_be32(spapr->gpu_numa_id > 1 ? 1 : =
-0);
-> > >      uint32_t maxdomains[] =3D {
-> > > @@ -2540,7 +2549,7 @@ static void spapr_validate_node_memory(MachineS=
-tate *machine, Error **errp)
-> > >  /* find cpu slot in machine->possible_cpus by core_id */
-> > >  static CPUArchId *spapr_find_cpu_slot(MachineState *ms, uint32_t id,=
- int *idx)
-> > >  {
-> > > -    int index =3D id / smp_threads;
-> > > +    int index =3D id / ms->smp.threads;
-> > > =20
-> > >      if (index >=3D ms->possible_cpus->len) {
-> > >          return NULL;
-> > > @@ -2553,10 +2562,12 @@ static CPUArchId *spapr_find_cpu_slot(Machine=
-State *ms, uint32_t id, int *idx)
-> > > =20
-> > >  static void spapr_set_vsmt_mode(SpaprMachineState *spapr, Error **er=
-rp)
-> > >  {
-> > > +    MachineState *ms =3D MACHINE(spapr);
-> > >      Error *local_err =3D NULL;
-> > >      bool vsmt_user =3D !!spapr->vsmt;
-> > >      int kvm_smt =3D kvmppc_smt_threads();
-> > >      int ret;
-> > > +    unsigned int smp_threads =3D ms->smp.threads;
-> > > =20
-> > >      if (!kvm_enabled() && (smp_threads > 1)) {
-> > >          error_setg(&local_err, "TCG cannot support more than 1 threa=
-d/core "
-> > > @@ -2630,6 +2641,9 @@ static void spapr_init_cpus(SpaprMachineState *=
-spapr)
-> > >      SpaprMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(machine);
-> > >      const char *type =3D spapr_get_cpu_core_type(machine->cpu_type);
-> > >      const CPUArchIdList *possible_cpus;
-> > > +    unsigned int smp_cpus =3D machine->smp.cpus;
-> > > +    unsigned int smp_threads =3D machine->smp.threads;
-> > > +    unsigned int max_cpus =3D machine->smp.max_cpus;
-> > >      int boot_cores_nr =3D smp_cpus / smp_threads;
-> > >      int i;
-> > > =20
-> > > @@ -3856,6 +3870,7 @@ static void spapr_core_pre_plug(HotplugHandler =
-*hotplug_dev, DeviceState *dev,
-> > >      const char *type =3D object_get_typename(OBJECT(dev));
-> > >      CPUArchId *core_slot;
-> > >      int index;
-> > > +    unsigned int smp_threads =3D machine->smp.threads;
-> > > =20
-> > >      if (dev->hotplugged && !mc->has_hotpluggable_cpus) {
-> > >          error_setg(&local_err, "CPU hotplug not supported for this m=
-achine");
-> > > @@ -4110,14 +4125,16 @@ spapr_cpu_index_to_props(MachineState *machin=
-e, unsigned cpu_index)
-> > > =20
-> > >  static int64_t spapr_get_default_cpu_node_id(const MachineState *ms,=
- int idx)
-> > >  {
-> > > -    return idx / smp_cores % nb_numa_nodes;
-> > > +    return idx / ms->smp.cores % nb_numa_nodes;
-> > >  }
-> > > =20
-> > >  static const CPUArchIdList *spapr_possible_cpu_arch_ids(MachineState=
- *machine)
-> > >  {
-> > >      int i;
-> > > +    unsigned int smp_threads =3D machine->smp.threads;
-> > > +    unsigned int smp_cpus =3D machine->smp.cpus;
-> > >      const char *core_type;
-> > > -    int spapr_max_cores =3D max_cpus / smp_threads;
-> > > +    int spapr_max_cores =3D machine->smp.max_cpus / smp_threads;
-> > >      MachineClass *mc =3D MACHINE_GET_CLASS(machine);
-> > > =20
-> > >      if (!mc->has_hotpluggable_cpus) {
-> > > @@ -4240,6 +4257,7 @@ int spapr_get_vcpu_id(PowerPCCPU *cpu)
-> > >  void spapr_set_vcpu_id(PowerPCCPU *cpu, int cpu_index, Error **errp)
-> > >  {
-> > >      SpaprMachineState *spapr =3D SPAPR_MACHINE(qdev_get_machine());
-> > > +    MachineState *ms =3D MACHINE(spapr);
-> > >      int vcpu_id;
-> > > =20
-> > >      vcpu_id =3D spapr_vcpu_id(spapr, cpu_index);
-> > > @@ -4248,7 +4266,7 @@ void spapr_set_vcpu_id(PowerPCCPU *cpu, int cpu=
-_index, Error **errp)
-> > >          error_setg(errp, "Can't create CPU with id %d in KVM", vcpu_=
-id);
-> > >          error_append_hint(errp, "Adjust the number of cpus to %d "
-> > >                            "or try to raise the number of threads per=
- core\n",
-> > > -                          vcpu_id * smp_threads / spapr->vsmt);
-> > > +                          vcpu_id * ms->smp.threads / spapr->vsmt);
-> > >          return;
-> > >      }
-> > > =20
-> > > diff --git a/hw/ppc/spapr_rtas.c b/hw/ppc/spapr_rtas.c
-> > > index ee24212765..c9ffe9786c 100644
-> > > --- a/hw/ppc/spapr_rtas.c
-> > > +++ b/hw/ppc/spapr_rtas.c
-> > > @@ -231,6 +231,8 @@ static void rtas_ibm_get_system_parameter(PowerPC=
-CPU *cpu,
-> > >                                            target_ulong args,
-> > >                                            uint32_t nret, target_ulon=
-g rets)
-> > >  {
-> > > +    MachineState *ms =3D MACHINE(qdev_get_machine());
-> > > +    unsigned int max_cpus =3D ms->smp.max_cpus;
-> > >      target_ulong parameter =3D rtas_ld(args, 0);
-> > >      target_ulong buffer =3D rtas_ld(args, 1);
-> > >      target_ulong length =3D rtas_ld(args, 2);
-> > > @@ -244,7 +246,7 @@ static void rtas_ibm_get_system_parameter(PowerPC=
-CPU *cpu,
-> > >                                            "MaxPlatProcs=3D%d",
-> > >                                            max_cpus,
-> > >                                            current_machine->ram_size =
-/ MiB,
-> > > -                                          smp_cpus,
-> > > +                                          ms->smp.cpus,
-> > >                                            max_cpus);
-> > >          ret =3D sysparm_st(buffer, length, param_val, strlen(param_v=
-al) + 1);
-> > >          g_free(param_val);
-> >=20
->=20
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+> +    else
+> +        __smp_parse(opts);
+> +}
+> +
+>  static void realtime_init(void)
+>  {
+>      if (enable_mlock) {
+> -- 
+> 2.21.0
+> 
+> 
 
---J2pR2RtFp0tAjF3C
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlz4g3MACgkQbDjKyiDZ
-s5Jg6hAA44V2Vh6o5ZBwoLI1q1ZEp/nsjMpNmCu0NP/f6wN39L6Wu4J7vvkYnl0g
-MBKphnnZCevs5Y5Ap3vvxZqXv/CXB9JdXGiNDvxSHwcjoHylquOv+zzF9KxhkZ3v
-FSuuPr6w+4+k+XucI0J1gA8JqHdXTi0+ElnoBrZxwK+4DrTLcuM+Mp4lAxrum8AV
-BVZVPJKlVjQlHL0E2DFa/mPcbYZ804xFL4rVhOewIxTklriD2bsHfTOSZlu1Ps35
-3EqNTZrtu1/KKFol1BQpUgMVlSMTxQKnzN8S3LYG+iYqM2PZNZRb/U1UfL8i5ovm
-PmJRfvB05hiIljxXbn7I7iPzWNYQJxPyz6UIfTCxTcgsQsZVR5C5KgV0OCgBvs7D
-KZn9ZEWZo2MQwPxJ0/YFUzXIr2BVOZBVlLkhqW8Ro8hRBcN4hU7O4ghAw5/k7DZP
-B3HTJSFsFykL/ubWhHDoA3JIj0RNiO9GGtPOcAFsUoa7NdjsEUzBx1X+0n5Te+kh
-yzFp3ygjX83VD1pXW5IZ4kvJU0WfnPK2s8OMBldNLWPkHtnQ2Hyx/hrZVQh0J0Hr
-9VP+rdskJAEDCcGTUF57L2P9GJrGxJWxEd4phvShp7lBpCeSbS7yRVDZ+T1LGQwz
-A4LeuGn8/CjN0+WZd7Gk2mglq+KDK/rF8HkmsjmhE/5z153Dwn4=
-=uAO/
------END PGP SIGNATURE-----
-
---J2pR2RtFp0tAjF3C--
+-- 
+Eduardo
 
