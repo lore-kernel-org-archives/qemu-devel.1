@@ -6,39 +6,39 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B733C04AB5
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 09:36:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E8E96C04AB5
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 09:36:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 33DA220684
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 09:36:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 33DA220684
+	by mail.kernel.org (Postfix) with ESMTPS id B15FF20684
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 09:36:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B15FF20684
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:57267 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:57269 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hYoos-0004Gb-DB
-	for qemu-devel@archiver.kernel.org; Thu, 06 Jun 2019 05:36:26 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:40292)
+	id 1hYop0-0004N9-Uu
+	for qemu-devel@archiver.kernel.org; Thu, 06 Jun 2019 05:36:35 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:40489)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hYoms-00038d-7y
-	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 05:34:23 -0400
+	(envelope-from <laurent@vivier.eu>) id 1hYoni-0003gY-Pj
+	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 05:35:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hYomr-0004cj-8h
-	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 05:34:22 -0400
-Received: from mout.kundenserver.de ([212.227.126.130]:59349)
+	(envelope-from <laurent@vivier.eu>) id 1hYong-0006IU-TG
+	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 05:35:14 -0400
+Received: from mout.kundenserver.de ([212.227.126.131]:47777)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <laurent@vivier.eu>)
-	id 1hYomn-0004ZQ-GG; Thu, 06 Jun 2019 05:34:19 -0400
+	id 1hYonZ-0005vO-80; Thu, 06 Jun 2019 05:35:05 -0400
 Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
-	(mreue011 [213.165.67.103]) with ESMTPSA (Nemesis) id
-	1MrPyJ-1goDo00uFr-00oUst; Thu, 06 Jun 2019 11:33:43 +0200
+	(mreue010 [213.165.67.103]) with ESMTPSA (Nemesis) id
+	1MX00X-1h22Jk0K0f-00XNJJ; Thu, 06 Jun 2019 11:34:33 +0200
 To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
 	qemu-devel@nongnu.org, qemu-trivial@nongnu.org
 References: <20190528164020.32250-1-philmd@redhat.com>
-	<20190528164020.32250-8-philmd@redhat.com>
+	<20190528164020.32250-9-philmd@redhat.com>
 From: Laurent Vivier <laurent@vivier.eu>
 Openpgp: preference=signencrypt
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
@@ -83,36 +83,35 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
 	OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
 	JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
 	ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <e0fc0bf9-f0fe-9f2b-6847-ba90bcea5abe@vivier.eu>
-Date: Thu, 6 Jun 2019 11:33:38 +0200
+Message-ID: <cf1b7d54-b765-6c6a-741b-d6592405b97f@vivier.eu>
+Date: Thu, 6 Jun 2019 11:34:30 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <20190528164020.32250-8-philmd@redhat.com>
+In-Reply-To: <20190528164020.32250-9-philmd@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:isDqrmu4ZGgGBxFHg+rU8gjpEvf7QiPufuelRPlYcHabuKTJsq5
-	0PxcE1tU1Kjv2YXlCWnw0hMy/r8sJySIgghcQZPoaKTLufkuXVmUA5bagKDgDprpyL6PBKq
-	4LOdRrM1Z5qYWAEJKPIU3PBKJaURiF+/umGhprqQsmTYg9L8ek4wpRK5SPcJgbSRAh8M5zC
-	XXT7/iSrbTj7WT7bO0pWQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:+f4IDU99jUI=:nzK0I2+8GGqZsDwPt81ozc
-	VpiJbaF1TujqzekNJ3vWazEY4cf4/rOFXc7Y9smfw/1JW2qjNyOeRMgujJ3ZIklfl2qFwy/K2
-	DpK4O9A15RHQXVi0lMcyRBES/zNZQefesLabam9MuTJhwuHkGmXoVbfaH37mnTqs6VwOfR5H8
-	UCrLENyYJfjg9YmbsqzdfZyZk3fB1eTbCL4FNgBa30mSXBtZEy2JOodTaNDR0ROanEDuaxEdK
-	M4plGs8mi91iCmNDAZ00z1vtnrbSfiemOOKMXnoG2RhBkU6dWNmSldxqyrhuUd0JiKKSks00T
-	GMZ6sxxivTIziNR/kAG6hjXiaUVlqJjosv9DXGbsQxOFJNoVPSSEO4yDMb54WXAcr+KaYJhT9
-	A1zroqBtKpasxDXdrjGTDsq+dm0w8R3IYHPVb8rGZz58U7QnJXSf7qqhOlTUYjOsuduf4UhX4
-	iAh27vI+fDTdYMtMRYx7/0RaNr1ouUBKfrATrJaWwCmm+7Y/Ug8tiaB+QgIcHv79rZhxheORy
-	FbgdGYEww/x9Asen4YxJzUiik2jLCYe7eVo89TXtsMGU9DefkLVEMeWzmSfkCf+9LEpXPAENi
-	anxdBXgwPb32pi2G7O52IdRH8E6pO24dAdkC/f72T8D9yqXTBlc6+445SYAET2rXlm4Eo0tZh
-	/rOOJAFAi9GYC0Vkst2FuZRppHrbVveKtZYOGIDUnwjTE31/l5McMJZkLUiBXAdfBlm4eY5DW
-	c3tgxaVhWjlxK0YRv8vdlgkYOV+fbiyMPztiXLvP89LK/QJwaq6ZwsOL6t0lGmdOtFCHGnDnp
-	8bZNCVhJyIaeoY/Q0t9YTlgXbVtSw==
+X-Provags-ID: V03:K1:DxDVy2ZPBat1WYjT3Z78pTBd0xSOualC1cULcAmxhTFUPe0jYkS
+	6EgBAVhooorlN2l9NWK9ewW1pncWy4MZCmaZIFArIeXh9I4jPHNKoy5BCxPiv5q45LVgkJj
+	dSZgvkw23GM1QNkM1za6wGMt50CfC2ePeAtBHKh7Izb3LZCCiCrY2G9VvrtzTSnJea90E2n
+	lv7zFI2Mb2CeJyekH+mkg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:8F9gBSSk3GE=:8sy6C8Ik3cFBGYD0tMaliS
+	W5a9MOWrQZlQTJ1FS5lb18w9Jpswqh1J8dueJoADGLrERnIOQPsRunxa7owHIuvhLF4+HOryb
+	f3HIX6JOWzmbViqU8zwpiYI5PXXAPKyc/SY4egjWiNDfoTUD/XChnr1YWsgOZ2I2iDt08JOkm
+	fQ407T2HMyJOKb7qZDs1n+j+Mbo3KxKQ+l+yJWwBEenIf9fSPGaxp5AweB73bNjtsLvRm+Kte
+	Xwng0wqob1BSDXOiTCkdXXds9YMWpHFDJ6pFXPIpTp/JS9Sz/OqR2VIFxN9kmhCwNMtziEbau
+	ZPIUBIYXzTClBZp9wDP00rzD1HSGWpb28TuLS73j5qE0lSc6kAX9yaOIeQ/VFF9cfX3jYaepE
+	Ll0GWUBF70BvI0rHiQxe02NyruCMqBwwi9al1PMnk/YJtHCSmE42M89c+fxrm0TUDNQMEjGB0
+	k/nY0Y6SOEoikhldXPjjWMggsCB4eHHV91DPNKim5bNkitCITg1pk11vfmB1UH+ssrgVo8vjB
+	yEEyMZXFTx1aPhXTiS1hBLMGb0CXISEoZhOerzsdmU6Ol7gs6DjD3hJw2mn671Siz+jzK1Fbd
+	SeNwmfYjRx27SFk26KdnuRqkterbKvuyCcBEX1Wi4KlYotEFjv4kHIQsnrIQRRuJZytGiONKq
+	JAF4l5uQVZ5MNAwUIMsVmYhx9LcBGkkqdndb1iXArIxSNZTxMSLEe/l2aWisBucecs1otjj6M
+	we38XWdNQn4qlT91ey/SH6erdJDxgbdV2gNMclqXIvqXncPWKb/rt70oI6U=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.126.130
-Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH v2 07/10] hw/isa: Use the
- QOM DEVICE() macro to access DeviceState.qdev
+X-Received-From: 212.227.126.131
+Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH v2 08/10] hw/usb-storage:
+ Use the QOM DEVICE() macro to access DeviceState.qdev
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -159,36 +158,22 @@ Le 28/05/2019 à 18:40, Philippe Mathieu-Daudé a écrit :
 > Suggested-by: Peter Maydell <peter.maydell@linaro.org>
 > Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 > ---
->  hw/isa/lpc_ich9.c | 2 +-
->  hw/isa/vt82c686.c | 2 +-
->  2 files changed, 2 insertions(+), 2 deletions(-)
+>  hw/usb/dev-storage.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> diff --git a/hw/isa/lpc_ich9.c b/hw/isa/lpc_ich9.c
-> index 031ee9cd93..35d17246e9 100644
-> --- a/hw/isa/lpc_ich9.c
-> +++ b/hw/isa/lpc_ich9.c
-> @@ -412,7 +412,7 @@ void ich9_lpc_pm_init(PCIDevice *lpc_pci, bool smm_enabled)
->                                   true);
->      }
+> diff --git a/hw/usb/dev-storage.c b/hw/usb/dev-storage.c
+> index cd5551d94f..0e4e93ef16 100644
+> --- a/hw/usb/dev-storage.c
+> +++ b/hw/usb/dev-storage.c
+> @@ -616,7 +616,7 @@ static void usb_msd_storage_realize(USBDevice *dev, Error **errp)
+>       * The hack is probably a bad idea.
+>       */
+>      blk_ref(blk);
+> -    blk_detach_dev(blk, &s->dev.qdev);
+> +    blk_detach_dev(blk, DEVICE(s));
+>      s->conf.blk = NULL;
 >  
-> -    ich9_lpc_reset(&lpc->d.qdev);
-> +    ich9_lpc_reset(DEVICE(lpc));
->  }
->  
->  /* APM */
-> diff --git a/hw/isa/vt82c686.c b/hw/isa/vt82c686.c
-> index 85d0532dd5..d46754f61c 100644
-> --- a/hw/isa/vt82c686.c
-> +++ b/hw/isa/vt82c686.c
-> @@ -369,7 +369,7 @@ static void vt82c686b_pm_realize(PCIDevice *dev, Error **errp)
->      pci_conf[0x90] = s->smb_io_base | 1;
->      pci_conf[0x91] = s->smb_io_base >> 8;
->      pci_conf[0xd2] = 0x90;
-> -    pm_smbus_init(&s->dev.qdev, &s->smb, false);
-> +    pm_smbus_init(DEVICE(s), &s->smb, false);
->      memory_region_add_subregion(get_system_io(), s->smb_io_base, &s->smb.io);
->  
->      apm_init(dev, &s->apm, NULL, s);
+>      usb_desc_create_serial(dev);
 > 
 
 Applied to my trivial-patches branch.
