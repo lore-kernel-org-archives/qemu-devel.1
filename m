@@ -7,73 +7,73 @@ X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E0E9C28EB4
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 18:07:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 274A7C04AB5
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 18:07:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5DB9C20665
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 18:07:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 00BCA20665
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 18:07:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ykq12WR9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5DB9C20665
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="p8kaIRy4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 00BCA20665
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:36224 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:36226 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hYwnh-0007lf-I1
-	for qemu-devel@archiver.kernel.org; Thu, 06 Jun 2019 14:07:45 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:45000)
+	id 1hYwnl-0007p9-5m
+	for qemu-devel@archiver.kernel.org; Thu, 06 Jun 2019 14:07:49 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:45016)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hYwUA-0004ZE-Kg
+	(envelope-from <peter.maydell@linaro.org>) id 1hYwUB-0004Zy-5U
 	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 13:47:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1hYwU7-0004CK-Dw
-	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 13:47:34 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:36155)
+	(envelope-from <peter.maydell@linaro.org>) id 1hYwU8-0004EB-4Z
+	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 13:47:35 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:42579)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1hYwU7-0003ES-3e
+	id 1hYwU7-00035y-N5
 	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 13:47:31 -0400
-Received: by mail-wr1-x444.google.com with SMTP id n4so3351152wrs.3
-	for <qemu-devel@nongnu.org>; Thu, 06 Jun 2019 10:46:46 -0700 (PDT)
+Received: by mail-wr1-x444.google.com with SMTP id x17so3323023wrl.9
+	for <qemu-devel@nongnu.org>; Thu, 06 Jun 2019 10:46:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
 	h=from:to:cc:subject:date:message-id:in-reply-to:references
 	:mime-version:content-transfer-encoding;
-	bh=kCydqH+FEckzIy4SdO9TgeD3fKBJOY8MRSuCPKdNzwE=;
-	b=ykq12WR9buJhLcv13TZUE5HdDi0v/cQdfbOouc+Mm+VaJNsmGmLzr+H6hbVUNm7Yxq
-	B/ZiPTA0lEJ4KX2C/vTuwBJ2oWs3MJuhdqw9D+59/3OcMHKTKr9dJHQoPynCHpXI8euA
-	vSC7t0lurG7BplozEm5FGamQ82UZ/qWIWiqpV6RLgWWMpSNQ9AC2sLxdPfvyDyrL6CgA
-	Xd8hqG2itTgWIeYFIEDlJ66O1Jk8KnTUvASeAmUSBVd+2vHgCUgwIaZaXJR4TyD6oFb1
-	erupPwuyAxIlCXC1U1qwVOQ9L2KO3jxDmB3sZhek01EeqmdE8QHGOsZHqTm+TjafVWZy
-	ot+w==
+	bh=O5grNllV+sv27kAA5O3rl1i8qW/FtM8e/iepHVf3KD8=;
+	b=p8kaIRy4pZWp1AK0+YjVMmUWTVQxxPrT3d5rzcuG+7xKitRD1gc9N1kKuqrO/vjL+f
+	fKmx+2O9OzWJIQzC42CK31rdK8J6QrWAcSswUzCgrT3VsB8jPcQgS5ei9Cblf3P7lrUQ
+	CoUBaVKB59i+KxtZaKwWFrpLNIC0ma0yKMksOokoFPcICBHDz4QfomgOUtBQV3E4rwU6
+	9CBUJQCKlzOUpOWgcdjjCXhcR3HgjBucwdpryWsP6HLNGqT4A6KkMrUH3YE70ANwEiRx
+	aRrHdffAUDWgB3+/gJ4d/EIQhNVzq2unFwMkFoNVWL+AZS8AY6uoP7SBHq9axK5SR/mx
+	jzAA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
 	:references:mime-version:content-transfer-encoding;
-	bh=kCydqH+FEckzIy4SdO9TgeD3fKBJOY8MRSuCPKdNzwE=;
-	b=odQiwdetq4/WjT1OtIx3LeZSbDWCqMDhYVsWpKodxG6grXb9kyIVC1daC5ERF5qRJk
-	+RgsaZYH+YUevLUYDuIqCut9fbt6FH9ekWwGaZaq0mCghRrR7NQM6P64fBiGCgeZ0HW5
-	bHPU5iKXLuDTafKiNGZHIw6gyKbYi0tP47lMcMJZP+VyhaHVRd6RYJ2xAaZPb8meoOoa
-	nlaotastpJuXU97UYJ6C8kyDxbssHFdcOL1e903xw22AnntiayJb+oRFTwxdUmEsNq1f
-	COIkd8T6pCo6q4fEn5L9ThfeBbO4J9J7kkd9EuOdWfQP81Un6g/3TjeZiC1Mz2i1sH8q
-	7sHg==
-X-Gm-Message-State: APjAAAWe9w2Fv52rm2j3Mf+Z1snhMV2FLPzxTY6DJOeJFvQ5CJhpsStq
-	M9F5xRMVkruZ5Q0aSOSq5J+qFhU/mXmipQ==
-X-Google-Smtp-Source: APXvYqzUFKgRUW0HVU1mESlLHoyIT6eGangEybkNYM8CA0t/vpCZrIOQBKPGD3igN7X+x9cSp3KgMA==
-X-Received: by 2002:adf:db12:: with SMTP id s18mr6006866wri.335.1559843205858; 
-	Thu, 06 Jun 2019 10:46:45 -0700 (PDT)
+	bh=O5grNllV+sv27kAA5O3rl1i8qW/FtM8e/iepHVf3KD8=;
+	b=PY/Lz5wZNT2lwd0kfyThD1tWoJHJ7+k6Wl0YRZhyj659m1UuVIgpjm0LG3VyZfNTIr
+	9/8JSK2E5EiWCmLtnrWnGEoXP2ZfZAhA9Lb3NlGeHEjPIAkr/pvxAwQFaZqtbKn8/Upf
+	8J7Mlr7KdJBMOkGubG+2r5ca5KSQWs33XTa1s8YSzA0ZKSjBcNQIwKEU9bdXL6Y8XcYK
+	HU0bkdlqYG11QjXT12OA/yXoRU9escKdWhcaQvtKVsAF53VM+WkaLRKYCz/Ge481FdLR
+	HHrC+bKAhhGRALS2gF/nW4ucCym8v6InmpfQLVj6o/rYyzDmdzqcG7qWRJy0TrKWgJBC
+	rJMg==
+X-Gm-Message-State: APjAAAWZNU7N6AFadnR3PZBatrxVGY7SBi4aCeUgHr8hjHn6NE2MM0YC
+	LFH6fwWtybtcqkaZVaVooXfRMA==
+X-Google-Smtp-Source: APXvYqz1q6bLJI+Vj7CpTmKUxNMjB2p68bB+/xd2pWJyorFWeGVK4i3ODMpdNovY/VfC+Mj4d2jhBg==
+X-Received: by 2002:adf:e309:: with SMTP id b9mr30659068wrj.135.1559843195961; 
+	Thu, 06 Jun 2019 10:46:35 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
 	by smtp.gmail.com with ESMTPSA id
-	z135sm2596784wmc.45.2019.06.06.10.46.44
+	z135sm2596784wmc.45.2019.06.06.10.46.34
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Thu, 06 Jun 2019 10:46:45 -0700 (PDT)
+	Thu, 06 Jun 2019 10:46:35 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-arm@nongnu.org,
 	qemu-devel@nongnu.org
-Date: Thu,  6 Jun 2019 18:45:58 +0100
-Message-Id: <20190606174609.20487-32-peter.maydell@linaro.org>
+Date: Thu,  6 Jun 2019 18:45:49 +0100
+Message-Id: <20190606174609.20487-23-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190606174609.20487-1-peter.maydell@linaro.org>
 References: <20190606174609.20487-1-peter.maydell@linaro.org>
@@ -82,7 +82,7 @@ Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
 X-Received-From: 2a00:1450:4864:20::444
-Subject: [Qemu-devel] [PATCH 31/42] target/arm: Convert VSQRT to decodetree
+Subject: [Qemu-devel] [PATCH 22/42] target/arm: Convert VMUL to decodetree
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -99,102 +99,69 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Convert the VSQRT instruction to decodetree.
+Convert the VMUL instruction to decodetree.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- target/arm/translate-vfp.inc.c | 20 ++++++++++++++++++++
- target/arm/translate.c         | 14 +-------------
+ target/arm/translate-vfp.inc.c | 10 ++++++++++
+ target/arm/translate.c         |  5 +----
  target/arm/vfp.decode          |  5 +++++
- 3 files changed, 26 insertions(+), 13 deletions(-)
+ 3 files changed, 16 insertions(+), 4 deletions(-)
 
 diff --git a/target/arm/translate-vfp.inc.c b/target/arm/translate-vfp.inc.c
-index 6e06b2a130a..ae2f77a873b 100644
+index 8532bf4abcd..a2afe82b349 100644
 --- a/target/arm/translate-vfp.inc.c
 +++ b/target/arm/translate-vfp.inc.c
-@@ -1908,3 +1908,23 @@ static bool trans_VNEG_dp(DisasContext *s, arg_VNEG_dp *a)
+@@ -1417,3 +1417,13 @@ static bool trans_VNMLA_dp(DisasContext *s, arg_VNMLA_sp *a)
  {
-     return do_vfp_2op_dp(s, gen_helper_vfp_negd, a->vd, a->vm);
+     return do_vfp_3op_dp(s, gen_VNMLA_dp, a->vd, a->vn, a->vm, true);
  }
 +
-+static void gen_VSQRT_sp(TCGv_i32 vd, TCGv_i32 vm)
++static bool trans_VMUL_sp(DisasContext *s, arg_VMUL_sp *a)
 +{
-+    gen_helper_vfp_sqrts(vd, vm, cpu_env);
++    return do_vfp_3op_sp(s, gen_helper_vfp_muls, a->vd, a->vn, a->vm, false);
 +}
 +
-+static bool trans_VSQRT_sp(DisasContext *s, arg_VSQRT_sp *a)
++static bool trans_VMUL_dp(DisasContext *s, arg_VMUL_sp *a)
 +{
-+    return do_vfp_2op_sp(s, gen_VSQRT_sp, a->vd, a->vm);
-+}
-+
-+static void gen_VSQRT_dp(TCGv_i64 vd, TCGv_i64 vm)
-+{
-+    gen_helper_vfp_sqrtd(vd, vm, cpu_env);
-+}
-+
-+static bool trans_VSQRT_dp(DisasContext *s, arg_VSQRT_dp *a)
-+{
-+    return do_vfp_2op_dp(s, gen_VSQRT_dp, a->vd, a->vm);
++    return do_vfp_3op_dp(s, gen_helper_vfp_muld, a->vd, a->vn, a->vm, false);
 +}
 diff --git a/target/arm/translate.c b/target/arm/translate.c
-index cc67ab069bc..fda0962761f 100644
+index 73b30ed33d1..226f1006ced 100644
 --- a/target/arm/translate.c
 +++ b/target/arm/translate.c
-@@ -1390,14 +1390,6 @@ static inline void gen_vfp_neg(int dp)
-         gen_helper_vfp_negs(cpu_F0s, cpu_F0s);
- }
+@@ -3112,7 +3112,7 @@ static int disas_vfp_insn(DisasContext *s, uint32_t insn)
+             rn = VFP_SREG_N(insn);
  
--static inline void gen_vfp_sqrt(int dp)
--{
--    if (dp)
--        gen_helper_vfp_sqrtd(cpu_F0d, cpu_F0d, cpu_env);
--    else
--        gen_helper_vfp_sqrts(cpu_F0s, cpu_F0s, cpu_env);
--}
--
- static inline void gen_vfp_cmp(int dp)
- {
-     if (dp)
-@@ -3098,7 +3090,7 @@ static int disas_vfp_insn(DisasContext *s, uint32_t insn)
+             switch (op) {
+-            case 0 ... 3:
++            case 0 ... 4:
+                 /* Already handled by decodetree */
                  return 1;
-             case 15:
-                 switch (rn) {
--                case 1 ... 2:
-+                case 1 ... 3:
-                     /* Already handled by decodetree */
-                     return 1;
-                 default:
-@@ -3112,7 +3104,6 @@ static int disas_vfp_insn(DisasContext *s, uint32_t insn)
-                 /* rn is opcode, encoded as per VFP_SREG_N. */
-                 switch (rn) {
-                 case 0x00: /* vmov */
--                case 0x03: /* vsqrt */
-                     break;
- 
-                 case 0x04: /* vcvtb.f64.f16, vcvtb.f32.f16 */
-@@ -3290,9 +3281,6 @@ static int disas_vfp_insn(DisasContext *s, uint32_t insn)
-                     case 0: /* cpy */
-                         /* no-op */
-                         break;
--                    case 3: /* sqrt */
--                        gen_vfp_sqrt(dp);
--                        break;
-                     case 4: /* vcvtb.f32.f16, vcvtb.f64.f16 */
-                     {
-                         TCGv_ptr fpst = get_fpstatus_ptr(false);
+             default:
+@@ -3298,9 +3298,6 @@ static int disas_vfp_insn(DisasContext *s, uint32_t insn)
+             for (;;) {
+                 /* Perform the calculation.  */
+                 switch (op) {
+-                case 4: /* mul: fn * fm */
+-                    gen_vfp_mul(dp);
+-                    break;
+                 case 5: /* nmul: -(fn * fm) */
+                     gen_vfp_mul(dp);
+                     gen_vfp_neg(dp);
 diff --git a/target/arm/vfp.decode b/target/arm/vfp.decode
-index 79e41963be4..2780e1ed9ea 100644
+index c50d2c3ebf3..d7fcb9709a9 100644
 --- a/target/arm/vfp.decode
 +++ b/target/arm/vfp.decode
-@@ -166,3 +166,8 @@ VNEG_sp      ---- 1110 1.11 0001 .... 1010 01.0 .... \
-              vd=%vd_sp vm=%vm_sp
- VNEG_dp      ---- 1110 1.11 0001 .... 1011 01.0 .... \
-              vd=%vd_dp vm=%vm_dp
+@@ -117,3 +117,8 @@ VNMLA_sp     ---- 1110 0.01 .... .... 1010 .1.0 .... \
+              vm=%vm_sp vn=%vn_sp vd=%vd_sp
+ VNMLA_dp     ---- 1110 0.01 .... .... 1011 .1.0 .... \
+              vm=%vm_dp vn=%vn_dp vd=%vd_dp
 +
-+VSQRT_sp     ---- 1110 1.11 0001 .... 1010 11.0 .... \
-+             vd=%vd_sp vm=%vm_sp
-+VSQRT_dp     ---- 1110 1.11 0001 .... 1011 11.0 .... \
-+             vd=%vd_dp vm=%vm_dp
++VMUL_sp      ---- 1110 0.10 .... .... 1010 .0.0 .... \
++             vm=%vm_sp vn=%vn_sp vd=%vd_sp
++VMUL_dp      ---- 1110 0.10 .... .... 1011 .0.0 .... \
++             vm=%vm_dp vn=%vn_dp vd=%vd_dp
 -- 
 2.20.1
 
