@@ -2,91 +2,75 @@ Return-Path: <SRS0=9X/F=UF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EBD54C04AB5
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 13:58:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 35596C28EB4
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 14:00:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B36CA20652
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 13:58:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B36CA20652
+	by mail.kernel.org (Postfix) with ESMTPS id 034B7207E0
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 14:00:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 034B7207E0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:32817 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:32875 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hYsui-0005xZ-1V
-	for qemu-devel@archiver.kernel.org; Thu, 06 Jun 2019 09:58:44 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:46647)
+	id 1hYswL-0006cg-Ag
+	for qemu-devel@archiver.kernel.org; Thu, 06 Jun 2019 10:00:25 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:47514)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1hYssP-00047P-Fw
-	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 09:56:22 -0400
+	(envelope-from <mst@redhat.com>) id 1hYsvc-0006LB-Az
+	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 09:59:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1hYssO-0006z5-8a
-	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 09:56:21 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52842)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>)
-	id 1hYssL-0006Xn-LZ; Thu, 06 Jun 2019 09:56:17 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D6F862E97C5;
-	Thu,  6 Jun 2019 13:56:07 +0000 (UTC)
-Received: from [10.3.116.85] (ovpn-116-85.phx2.redhat.com [10.3.116.85])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id F2D707DE22;
-	Thu,  6 Jun 2019 13:55:59 +0000 (UTC)
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
-	qemu-devel@nongnu.org, qemu-block@nongnu.org
-References: <20190606134814.123689-1-vsementsov@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=eblake@redhat.com; keydata=
-	xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
-	xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
-	TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
-	GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
-	sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
-	AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
-	CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
-	RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
-	wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
-	Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
-	gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
-	pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
-	zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
-	pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
-	3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
-	NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
-	cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
-	SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
-	I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
-	mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
-	Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
-	2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
-Organization: Red Hat, Inc.
-Message-ID: <f92b274d-1949-3afa-7353-d3e3d67ae705@redhat.com>
-Date: Thu, 6 Jun 2019 08:55:58 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.6.1
+	(envelope-from <mst@redhat.com>) id 1hYsvb-00024Y-0G
+	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 09:59:40 -0400
+Received: from mail-qt1-f194.google.com ([209.85.160.194]:35958)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1hYsva-00021o-Rl
+	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 09:59:38 -0400
+Received: by mail-qt1-f194.google.com with SMTP id u12so2751419qth.3
+	for <qemu-devel@nongnu.org>; Thu, 06 Jun 2019 06:59:38 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+	:mime-version:content-disposition:content-transfer-encoding
+	:in-reply-to;
+	bh=SDolrGZBsv3NxYHq5o+X8BbY88/1jWmNQpcUHGUDfFI=;
+	b=ABSzFmavWKgnCGKdCfpRYhEaNMUyY7/7j36iGQoHdcSiYazXjZ2c1qxeDm5QgN19ge
+	DyKxto3oEYu0+hnWq38nz+fO+yRQww9E9+W8bxHnKt7due1KYADqO8rGPLExddkWWaGC
+	jKjFtOidPc2XauFUYlAr2jdBvpgsz4Y62bkA0YGYOZM0K5oo5ThN6xIN0t0ZF7bWZlef
+	gdNAapuFc3Xk8TlxnwYZ29M9beFw5SwrYRbwPkiwZrpaiRHN3upRU9DLhya1mKH3T90M
+	3DAstgvP5b1OHoew6jJL/A8uXTu0WzZAJyjeSLu4r8mJXK+pGtza/cR+2Yv3nDQxZ1VE
+	BCGw==
+X-Gm-Message-State: APjAAAUvQ0TapLS4kiQ1EhbHCHzgIwAIGJW2oBJtEB6Z0JAcDGW/hhac
+	2nsFFx1Z0KM05l3XpMvTki+XpA==
+X-Google-Smtp-Source: APXvYqwrfCr7GF/pHG0sooEwyFKsOJMKsy8rnqsoljMl7KrITua1nGNd+eLAkO1UVTBcmFua5Hgodw==
+X-Received: by 2002:ac8:31d6:: with SMTP id i22mr41913364qte.338.1559829578151;
+	Thu, 06 Jun 2019 06:59:38 -0700 (PDT)
+Received: from redhat.com (pool-100-0-197-103.bstnma.fios.verizon.net.
+	[100.0.197.103])
+	by smtp.gmail.com with ESMTPSA id p13sm907410qkj.4.2019.06.06.06.59.36
+	(version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+	Thu, 06 Jun 2019 06:59:37 -0700 (PDT)
+Date: Thu, 6 Jun 2019 09:59:34 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Message-ID: <20190606095921-mutt-send-email-mst@kernel.org>
+References: <20190528204331.5280-1-kraxel@redhat.com>
+	<20190529180324-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20190606134814.123689-1-vsementsov@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="hcrxaHlDneYggxEBK65XR9Leyr3pI4oxx"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
-	(mx1.redhat.com [10.5.110.29]);
-	Thu, 06 Jun 2019 13:56:08 +0000 (UTC)
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20190529180324-mutt-send-email-mst@kernel.org>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-X-Content-Filtered-By: Mailman/MimeDel 2.1.21
-Subject: Re: [Qemu-devel] [PATCH 0/3] block: blk_co_pcache
+	[fuzzy]
+X-Received-From: 209.85.160.194
+Subject: Re: [Qemu-devel] [PATCH] q35: fix mmconfig and PCI0._CRS
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -98,66 +82,157 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, fam@euphon.net, mreitz@redhat.com, stefanha@redhat.com,
-	den@openvz.org, jsnow@redhat.com
+Cc: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org,
+	Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
+	=?iso-8859-1?B?TOFzemzzIMlyc2Vr?= <lersek@redhat.com>,
+	Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---hcrxaHlDneYggxEBK65XR9Leyr3pI4oxx
-From: Eric Blake <eblake@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: jsnow@redhat.com, mreitz@redhat.com, kwolf@redhat.com, fam@euphon.net,
- stefanha@redhat.com, den@openvz.org
-Message-ID: <f92b274d-1949-3afa-7353-d3e3d67ae705@redhat.com>
-Subject: Re: [PATCH 0/3] block: blk_co_pcache
-References: <20190606134814.123689-1-vsementsov@virtuozzo.com>
-In-Reply-To: <20190606134814.123689-1-vsementsov@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Wed, May 29, 2019 at 06:05:41PM -0400, Michael S. Tsirkin wrote:
+> On Tue, May 28, 2019 at 10:43:31PM +0200, Gerd Hoffmann wrote:
+> > This patch changes the handling of the mmconfig area.  Thanks to the
+> > pci(e) expander devices we already have the logic to exclude address
+> > ranges from PCI0._CRS.  We can simply add the mmconfig address range
+> > to the list get it excluded as well.
+> > 
+> > With that in place we can go with a fixed pci hole which covers the
+> > whole area from the end of (low) ram to the ioapic.
+> > 
+> > This will make the whole logic alot less fragile.  No matter where the
+> > firmware places the mmconfig xbar, things should work correctly.  The
+> > guest also gets a bit more PCI address space (seabios boot):
+> > 
+> >     # cat /proc/iomem
+> >     [ ... ]
+> >     7ffdd000-7fffffff : reserved
+> >     80000000-afffffff : PCI Bus 0000:00            <<-- this is new
+> >     b0000000-bfffffff : PCI MMCONFIG 0000 [bus 00-ff]
+> >       b0000000-bfffffff : reserved
+> >     c0000000-febfffff : PCI Bus 0000:00
+> >       f8000000-fbffffff : 0000:00:01.0
+> >     [ ... ]
+> > 
+> > So this is a guest visible change.
+> > 
+> > Cc: László Érsek <lersek@redhat.com>
+> > Cc: Igor Mammedov <imammedo@redhat.com>
+> > Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+> 
+> Hi Gerd!
+> Please rebase on top of latest pci tree.
+> 
+> After the rebase this will start failing since we
+> are now asserting on any changes to ACPI tables - and the way to
+> fix it is to add a comma-separated list of
+> changed ACPI tables to tests/bios-tables-test-allowed-diff.h
+> 
+> As a maintainer I will notice this and update the expected
+> files before pushing.
 
-On 6/6/19 8:48 AM, Vladimir Sementsov-Ogievskiy wrote:
-> Hi all!
->=20
-> Here is small new io API: blk_co_pcache, which does copy-on-read withou=
-t
-> extra buffer for read data. This means that only parts that needs COR
-> will be actually read and only corresponding buffers allocated, no more=
-=2E
->=20
-> This allows to improve a bit block-stream and NBD_CMD_CACHE
+ping.
 
-I'd really like to see qemu-io gain access to calling this command, so
-that we can add iotests coverage of this new feature. Note that the
-in-development libnbd
-(https://github.com/libguestfs/libnbd/commits/master) is also usable as
-an NBD client that can drive NBD_CMD_CACHE, although it's still new
-enough that we probably don't want to rely on it being available yet.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
-
---hcrxaHlDneYggxEBK65XR9Leyr3pI4oxx
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlz5G24ACgkQp6FrSiUn
-Q2radgf/S1KUX1fjVKyCS/Dzay3v6XEUbZcd2bFj8xTiyLZsFGAUdW0DeGFcRVSs
-ORa0LodyEu9rLZm5ZLYXsekBUbzOLdS44olFUr8SYLalgX+SJFuTaxeQEwA9WDv6
-bHayjiQn0j1wGu0/C4HY0UHL/P+m293xbNUIcZSgQi6ZXFCMCewT9gyPJoxp9A2o
-b+tUQuJ3IWylkX0D6+joj+hbo39AVl1MQmZQyMba1dGTiB2YNsUqgLHpw2IJV3yB
-nJGaIPCHtgck2PT71FC8H5o1hMkKRbC+rEm7lo4zZYoezswY80rAsHMPmCKt9PmT
-bgf264VUbQHZVPmeUiWYJVzL7rTZGw==
-=PoCT
------END PGP SIGNATURE-----
-
---hcrxaHlDneYggxEBK65XR9Leyr3pI4oxx--
+> > ---
+> >  hw/i386/acpi-build.c | 14 ++++++++++++++
+> >  hw/pci-host/q35.c    | 31 ++++++++-----------------------
+> >  2 files changed, 22 insertions(+), 23 deletions(-)
+> > 
+> > diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+> > index 0d78d738948c..abb0e0ce9f27 100644
+> > --- a/hw/i386/acpi-build.c
+> > +++ b/hw/i386/acpi-build.c
+> > @@ -122,6 +122,8 @@ typedef struct FwCfgTPMConfig {
+> >      uint8_t tpmppi_version;
+> >  } QEMU_PACKED FwCfgTPMConfig;
+> >  
+> > +static bool acpi_get_mcfg(AcpiMcfgInfo *mcfg);
+> > +
+> >  static void init_common_fadt_data(Object *o, AcpiFadtData *data)
+> >  {
+> >      uint32_t io = object_property_get_uint(o, ACPI_PM_PROP_PM_IO_BASE, NULL);
+> > @@ -1807,6 +1809,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
+> >      CrsRangeSet crs_range_set;
+> >      PCMachineState *pcms = PC_MACHINE(machine);
+> >      PCMachineClass *pcmc = PC_MACHINE_GET_CLASS(machine);
+> > +    AcpiMcfgInfo mcfg;
+> >      uint32_t nr_mem = machine->ram_slots;
+> >      int root_bus_limit = 0xFF;
+> >      PCIBus *bus = NULL;
+> > @@ -1921,6 +1924,17 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
+> >          }
+> >      }
+> >  
+> > +    /*
+> > +     * At this point crs_range_set has all the ranges used by pci
+> > +     * busses *other* than PCI0.  These ranges will be excluded from
+> > +     * the PCI0._CRS.  Add mmconfig to the set so it will be excluded
+> > +     * too.
+> > +     */
+> > +    if (acpi_get_mcfg(&mcfg)) {
+> > +        crs_range_insert(crs_range_set.mem_ranges,
+> > +                         mcfg.base, mcfg.base + mcfg.size - 1);
+> > +    }
+> > +
+> >      scope = aml_scope("\\_SB.PCI0");
+> >      /* build PCI0._CRS */
+> >      crs = aml_resource_template();
+> > diff --git a/hw/pci-host/q35.c b/hw/pci-host/q35.c
+> > index 960939f5ed3e..72093320befe 100644
+> > --- a/hw/pci-host/q35.c
+> > +++ b/hw/pci-host/q35.c
+> > @@ -258,15 +258,6 @@ static void q35_host_initfn(Object *obj)
+> >      object_property_add_link(obj, MCH_HOST_PROP_IO_MEM, TYPE_MEMORY_REGION,
+> >                               (Object **) &s->mch.address_space_io,
+> >                               qdev_prop_allow_set_link_before_realize, 0, NULL);
+> > -
+> > -    /* Leave enough space for the biggest MCFG BAR */
+> > -    /* TODO: this matches current bios behaviour, but
+> > -     * it's not a power of two, which means an MTRR
+> > -     * can't cover it exactly.
+> > -     */
+> > -    range_set_bounds(&s->mch.pci_hole,
+> > -            MCH_HOST_BRIDGE_PCIEXBAR_DEFAULT + MCH_HOST_BRIDGE_PCIEXBAR_MAX,
+> > -            IO_APIC_DEFAULT_ADDRESS - 1);
+> >  }
+> >  
+> >  static const TypeInfo q35_host_info = {
+> > @@ -338,20 +329,6 @@ static void mch_update_pciexbar(MCHPCIState *mch)
+> >      }
+> >      addr = pciexbar & addr_mask;
+> >      pcie_host_mmcfg_update(pehb, enable, addr, length);
+> > -    /* Leave enough space for the MCFG BAR */
+> > -    /*
+> > -     * TODO: this matches current bios behaviour, but it's not a power of two,
+> > -     * which means an MTRR can't cover it exactly.
+> > -     */
+> > -    if (enable) {
+> > -        range_set_bounds(&mch->pci_hole,
+> > -                         addr + length,
+> > -                         IO_APIC_DEFAULT_ADDRESS - 1);
+> > -    } else {
+> > -        range_set_bounds(&mch->pci_hole,
+> > -                         MCH_HOST_BRIDGE_PCIEXBAR_DEFAULT,
+> > -                         IO_APIC_DEFAULT_ADDRESS - 1);
+> > -    }
+> >  }
+> >  
+> >  /* PAM */
+> > @@ -484,6 +461,14 @@ static void mch_update(MCHPCIState *mch)
+> >      mch_update_pam(mch);
+> >      mch_update_smram(mch);
+> >      mch_update_ext_tseg_mbytes(mch);
+> > +
+> > +    /*
+> > +     * pci hole goes from end-of-low-ram to io-apic.
+> > +     * mmconfig will be excluded by the dsdt builder.
+> > +     */
+> > +    range_set_bounds(&mch->pci_hole,
+> > +                     mch->below_4g_mem_size,
+> > +                     IO_APIC_DEFAULT_ADDRESS - 1);
+> >  }
+> >  
+> >  static int mch_post_load(void *opaque, int version_id)
+> > -- 
+> > 2.18.1
 
