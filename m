@@ -2,86 +2,64 @@ Return-Path: <SRS0=9X/F=UF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 476D6C04AB5
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 05:47:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B31EC04AB5
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 06:07:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 123C920673
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 05:47:00 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dvxOZ0Yw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 123C920673
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 1F5422064A
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 06:07:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1F5422064A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:55038 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:55189 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hYlEq-0008Qa-1N
-	for qemu-devel@archiver.kernel.org; Thu, 06 Jun 2019 01:47:00 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:51397)
+	id 1hYlYh-0003QE-1C
+	for qemu-devel@archiver.kernel.org; Thu, 06 Jun 2019 02:07:31 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:54635)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.m.mail@gmail.com>) id 1hYlDt-0007xj-RS
-	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 01:46:03 -0400
+	(envelope-from <groug@kaod.org>) id 1hYlXj-0002sg-Or
+	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 02:06:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.m.mail@gmail.com>) id 1hYlDs-0007Vv-Hr
-	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 01:46:01 -0400
-Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:46357)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
-	id 1hYlDs-0007VY-Bq; Thu, 06 Jun 2019 01:46:00 -0400
-Received: by mail-oi1-x243.google.com with SMTP id 203so707834oid.13;
-	Wed, 05 Jun 2019 22:46:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=mime-version:in-reply-to:references:from:date:message-id:subject:to
-	:cc; bh=d0c7qkLAXbMXz/RHiRSYXP1wkY5F+It0gp3SsnVS+IE=;
-	b=dvxOZ0Ywb06EWv4bxXNFxJr8aOy1mNU5NnH8nOG2LMB7Ze6us9ajxmwpkx8x29CY4/
-	Y4v+9N7riTInNweqGxWHi4a/0K+LyZqDvExc81/2G92WfujB5JbnZpRo2EkW2ichFtjP
-	KEf3oeNjBMBmABy24bnqrG8OB7ON7cIWZTv0ivjNCOWtO3pMtV0x0fIouBN+Zy5ia6nF
-	pNDHeGvAO79G0DqGVUvOUZOhtd5wRQWOphFGU8kf99YwUqKbX3epJKznWBpKc8ceixxQ
-	Ppz6mZoU0ktj2yVnETRy/KFezZS2fIvMLp4vYB5bfioP1ad1WEx1s2NgQ4PGziQHqQfW
-	SfGQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:in-reply-to:references:from:date
-	:message-id:subject:to:cc;
-	bh=d0c7qkLAXbMXz/RHiRSYXP1wkY5F+It0gp3SsnVS+IE=;
-	b=Ws7+RXu1TK8f9eOCqglf2Pm37xuoXo1OomjCjB2N4KbEbN/q6z5n8DGEf3/+V3tEuU
-	NGoj80u0pLGPzVwn1Ormm6DT/GX5zABv2NrvH34IJPARopwYmKEwogWxCgQ3uTIcLqzf
-	Khzg5pTVE6VX7xUJMAb2Mm/Kb2/FeKgzEEduwB4SfIm0yo5tVKT/L+cAcxBpxeD1vw/T
-	UKQdrSB+RNpSz+EubzM74iMxTp09HQGnkXJwlcIrotrJbX2C3jzV6XGjwUkdZz8O4Fgh
-	Rgdr0ZRzokqinYTbd/2lpM41GKxMN1q9xPBVa9FeEVzNH6Uj3W8M+o7nQRkGIA1w/4Bl
-	ooGQ==
-X-Gm-Message-State: APjAAAU9c1NmRJQs7otc5JQiNObdp7c9q+Xc5Xq32/hQ4ko3MN9kTPg8
-	VH4gcrBY3TqsVx0GTFvJhMqsT5iZfNu308QnzNc=
-X-Google-Smtp-Source: APXvYqy6CRCDYEgOaMqD8Yjr975s6SBFYfNOH8mp9SGmXwNWGzv1TZSUSv1wbSFVO2Gpd+tdP97FBQLwc+jIaweHgwU=
-X-Received: by 2002:aca:3906:: with SMTP id g6mr10513108oia.106.1559799959430; 
-	Wed, 05 Jun 2019 22:45:59 -0700 (PDT)
+	(envelope-from <groug@kaod.org>) id 1hYlXh-0001LE-S4
+	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 02:06:31 -0400
+Received: from 6.mo5.mail-out.ovh.net ([178.32.119.138]:54030)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1hYlXf-0001Gz-TG
+	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 02:06:29 -0400
+Received: from player699.ha.ovh.net (unknown [10.109.159.62])
+	by mo5.mail-out.ovh.net (Postfix) with ESMTP id DDE4A238828
+	for <qemu-devel@nongnu.org>; Thu,  6 Jun 2019 08:06:20 +0200 (CEST)
+Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
+	[82.253.208.248]) (Authenticated sender: groug@kaod.org)
+	by player699.ha.ovh.net (Postfix) with ESMTPSA id 13D63688A4C8;
+	Thu,  6 Jun 2019 06:06:10 +0000 (UTC)
+Date: Thu, 6 Jun 2019 08:06:09 +0200
+From: Greg Kurz <groug@kaod.org>
+To: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20190606080609.28b4dd15@bahia.lab.toulouse-stg.fr.ibm.com>
+In-Reply-To: <20190606030614.GK10319@umbus.fritz.box>
+References: <155910829070.13149.5215948335633966328.stgit@aravinda>
+	<155910845769.13149.8097972239187020170.stgit@aravinda>
+	<20190606030614.GK10319@umbus.fritz.box>
+X-Mailer: Claws Mail 3.16.0 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Received: by 2002:a9d:20e4:0:0:0:0:0 with HTTP;
-	Wed, 5 Jun 2019 22:45:58 -0700 (PDT)
-Received: by 2002:a9d:20e4:0:0:0:0:0 with HTTP;
-	Wed, 5 Jun 2019 22:45:58 -0700 (PDT)
-In-Reply-To: <20190605205706.569-5-richard.henderson@linaro.org>
-References: <20190605205706.569-1-richard.henderson@linaro.org>
-	<20190605205706.569-5-richard.henderson@linaro.org>
-From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Thu, 6 Jun 2019 07:45:58 +0200
-Message-ID: <CAL1e-=jYwL9bb_YVp28pf=R4Gb0+1MgxYLsO=2927W=CtUrQ-A@mail.gmail.com>
-To: Richard Henderson <richard.henderson@linaro.org>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::243
-Content-Type: text/plain; charset="UTF-8"
-X-Content-Filtered-By: Mailman/MimeDel 2.1.21
-Subject: Re: [Qemu-devel] [PATCH v6 4/6] include/elf: Add defines related to
- notes for GNU systems
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	boundary="Sig_/Ctw.5U/B2xL9ov7X7UN21b_";
+	protocol="application/pgp-signature"
+X-Ovh-Tracer-Id: 12491296517749053926
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduuddrudegfedguddtfecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 178.32.119.138
+Subject: Re: [Qemu-devel] [PATCH v9 6/6] migration: Include migration
+ support for machine check handling
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -93,95 +71,194 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org, qemu-devel@nongnu.org,
-	Dave.Martin@arm.com
+Cc: aik@au1.ibm.com, qemu-devel@nongnu.org, paulus@ozlabs.org,
+	qemu-ppc@nongnu.org, Aravinda Prasad <aravinda@linux.vnet.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Jun 5, 2019 11:03 PM, "Richard Henderson" <richard.henderson@linaro.org>
-wrote:
->
-> This is a collection of related
+--Sig_/Ctw.5U/B2xL9ov7X7UN21b_
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-Related to what?
+On Thu, 6 Jun 2019 13:06:14 +1000
+David Gibson <david@gibson.dropbear.id.au> wrote:
 
-> defines for notes, copied
-> from glibc's <elf.h>.  We're not going to use all of these
-> right away, but it seemed foolish
+> On Wed, May 29, 2019 at 11:10:57AM +0530, Aravinda Prasad wrote:
+> > This patch includes migration support for machine check
+> > handling. Especially this patch blocks VM migration
+> > requests until the machine check error handling is
+> > complete as (i) these errors are specific to the source
+> > hardware and is irrelevant on the target hardware,
+> > (ii) these errors cause data corruption and should
+> > be handled before migration.
+> >=20
+> > Signed-off-by: Aravinda Prasad <aravinda@linux.vnet.ibm.com>
+> > ---
+> >  hw/ppc/spapr.c         |   20 ++++++++++++++++++++
+> >  hw/ppc/spapr_events.c  |   17 +++++++++++++++++
+> >  hw/ppc/spapr_rtas.c    |    4 ++++
+> >  include/hw/ppc/spapr.h |    2 ++
+> >  4 files changed, 43 insertions(+)
+> >=20
+> > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> > index e8a77636..31c4850 100644
+> > --- a/hw/ppc/spapr.c
+> > +++ b/hw/ppc/spapr.c
+> > @@ -2104,6 +2104,25 @@ static const VMStateDescription vmstate_spapr_dt=
+b =3D {
+> >      },
+> >  };
+> > =20
+> > +static bool spapr_fwnmi_needed(void *opaque)
+> > +{
+> > +    SpaprMachineState *spapr =3D (SpaprMachineState *)opaque;
+> > +
+> > +    return (spapr->guest_machine_check_addr =3D=3D -1) ? 0 : 1; =20
+>=20
+> Since we're introducing a PAPR capability to enable this, it would
+> actually be better to check that here, rather than the runtime state.
+> That leads to less cases and easier to understand semantics for the
+> migration stream.
+>=20
 
-I don't think this an appropriate word for a commit message.
+Hmmm... the purpose of needed() VMState callbacks is precisely about
+runtime state: the subsection should only be migrated if an MCE is
+pending, ie. spapr->guest_machine_check_addr !=3D -1.
 
-> to cherry-pick only the
-> ones we need now.
->
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->  include/elf.h | 48 ++++++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 48 insertions(+)
->
-> diff --git a/include/elf.h b/include/elf.h
-> index ea7708a4ea..6f3eada36f 100644
-> --- a/include/elf.h
-> +++ b/include/elf.h
-> @@ -1650,6 +1650,54 @@ typedef struct elf64_shdr {
->  #define NT_ARM_HW_WATCH 0x403           /* ARM hardware watchpoint
-registers */
->  #define NT_ARM_SYSTEM_CALL      0x404   /* ARM system call number */
->
-> +/* Defined note types for GNU systems.  */
-> +
-> +#define NT_GNU_ABI_TAG          1       /* ABI information */
-> +#define NT_GNU_HWCAP            2       /* Synthetic hwcap information */
-> +#define NT_GNU_BUILD_ID         3       /* Build ID */
-> +#define NT_GNU_GOLD_VERSION     4       /* Version of ld.gold */
-> +#define NT_GNU_PROPERTY_TYPE_0  5       /* Program property */
-> +
-> +/* Values used in GNU .note.gnu.property notes
-(NT_GNU_PROPERTY_TYPE_0).  */
-> +
-> +#define GNU_PROPERTY_STACK_SIZE                 1
-> +#define GNU_PROPERTY_NO_COPY_ON_PROTECTED       2
-> +
-> +#define GNU_PROPERTY_LOPROC                     0xc0000000
-> +#define GNU_PROPERTY_HIPROC                     0xdfffffff
-> +#define GNU_PROPERTY_LOUSER                     0xe0000000
-> +#define GNU_PROPERTY_HIUSER                     0xffffffff
-> +
-> +#define GNU_PROPERTY_X86_ISA_1_USED             0xc0000000
-> +#define GNU_PROPERTY_X86_ISA_1_NEEDED           0xc0000001
-> +
-> +#define GNU_PROPERTY_X86_ISA_1_486              (1U << 0)
-> +#define GNU_PROPERTY_X86_ISA_1_586              (1U << 1)
-> +#define GNU_PROPERTY_X86_ISA_1_686              (1U << 2)
-> +#define GNU_PROPERTY_X86_ISA_1_SSE              (1U << 3)
-> +#define GNU_PROPERTY_X86_ISA_1_SSE2             (1U << 4)
-> +#define GNU_PROPERTY_X86_ISA_1_SSE3             (1U << 5)
-> +#define GNU_PROPERTY_X86_ISA_1_SSSE3            (1U << 6)
-> +#define GNU_PROPERTY_X86_ISA_1_SSE4_1           (1U << 7)
-> +#define GNU_PROPERTY_X86_ISA_1_SSE4_2           (1U << 8)
-> +#define GNU_PROPERTY_X86_ISA_1_AVX              (1U << 9)
-> +#define GNU_PROPERTY_X86_ISA_1_AVX2             (1U << 10)
-> +#define GNU_PROPERTY_X86_ISA_1_AVX512F          (1U << 11)
-> +#define GNU_PROPERTY_X86_ISA_1_AVX512CD         (1U << 12)
-> +#define GNU_PROPERTY_X86_ISA_1_AVX512ER         (1U << 13)
-> +#define GNU_PROPERTY_X86_ISA_1_AVX512PF         (1U << 14)
-> +#define GNU_PROPERTY_X86_ISA_1_AVX512VL         (1U << 15)
-> +#define GNU_PROPERTY_X86_ISA_1_AVX512DQ         (1U << 16)
-> +#define GNU_PROPERTY_X86_ISA_1_AVX512BW         (1U << 17)
-> +
-> +#define GNU_PROPERTY_X86_FEATURE_1_AND          0xc0000002
-> +#define GNU_PROPERTY_X86_FEATURE_1_IBT          (1U << 0)
-> +#define GNU_PROPERTY_X86_FEATURE_1_SHSTK        (1U << 1)
-> +
-> +#define GNU_PROPERTY_AARCH64_FEATURE_1_AND      0xc0000000
-> +#define GNU_PROPERTY_AARCH64_FEATURE_1_BTI      (1u << 0)
-> +#define GNU_PROPERTY_AARCH64_FEATURE_1_PAC      (1u << 1)
-> +
->  /*
->   * Physical entry point into the kernel.
->   *
-> --
-> 2.17.1
->
->
+> > +}
+> > +
+> > +static const VMStateDescription vmstate_spapr_machine_check =3D {
+> > +    .name =3D "spapr_machine_check",
+> > +    .version_id =3D 1,
+> > +    .minimum_version_id =3D 1,
+> > +    .needed =3D spapr_fwnmi_needed,
+> > +    .fields =3D (VMStateField[]) {
+> > +        VMSTATE_UINT64(guest_machine_check_addr, SpaprMachineState),
+> > +        VMSTATE_INT32(mc_status, SpaprMachineState),
+> > +        VMSTATE_END_OF_LIST()
+> > +    },
+> > +};
+> > +
+> >  static const VMStateDescription vmstate_spapr =3D {
+> >      .name =3D "spapr",
+> >      .version_id =3D 3,
+> > @@ -2137,6 +2156,7 @@ static const VMStateDescription vmstate_spapr =3D=
+ {
+> >          &vmstate_spapr_dtb,
+> >          &vmstate_spapr_cap_large_decr,
+> >          &vmstate_spapr_cap_ccf_assist,
+> > +        &vmstate_spapr_machine_check,
+> >          NULL
+> >      }
+> >  };
+> > diff --git a/hw/ppc/spapr_events.c b/hw/ppc/spapr_events.c
+> > index 573c0b7..35e21e4 100644
+> > --- a/hw/ppc/spapr_events.c
+> > +++ b/hw/ppc/spapr_events.c
+> > @@ -41,6 +41,7 @@
+> >  #include "qemu/bcd.h"
+> >  #include "hw/ppc/spapr_ovec.h"
+> >  #include <libfdt.h>
+> > +#include "migration/blocker.h"
+> > =20
+> >  #define RTAS_LOG_VERSION_MASK                   0xff000000
+> >  #define   RTAS_LOG_VERSION_6                    0x06000000
+> > @@ -855,6 +856,22 @@ static void spapr_mce_dispatch_elog(PowerPCCPU *cp=
+u, bool recovered)
+> >  void spapr_mce_req_event(PowerPCCPU *cpu, bool recovered)
+> >  {
+> >      SpaprMachineState *spapr =3D SPAPR_MACHINE(qdev_get_machine());
+> > +    int ret;
+> > +    Error *local_err =3D NULL;
+> > +
+> > +    error_setg(&spapr->fwnmi_migration_blocker,
+> > +            "Live migration not supported during machine check handlin=
+g");
+> > +    ret =3D migrate_add_blocker(spapr->fwnmi_migration_blocker, &local=
+_err);
+> > +    if (ret < 0) {
+> > +        /*
+> > +         * We don't want to abort and let the migration to continue. I=
+n a
+> > +         * rare case, the machine check handler will run on the target
+> > +         * hardware. Though this is not preferable, it is better than =
+aborting
+> > +         * the migration or killing the VM.
+> > +         */
+> > +        error_free(spapr->fwnmi_migration_blocker); =20
+>=20
+> You should set fwnmi_migration_blocker to NULL here as well.
+>=20
+> As mentioned on an earlier iteration, the migration blocker is the
+> same every time.  Couldn't you just create it once and free at final
+> teardown, rather than recreating it for every NMI?
+>=20
+> > +        warn_report_err(local_err);
+> > +    }
+> > =20
+> >      while (spapr->mc_status !=3D -1) {
+> >          /*
+> > diff --git a/hw/ppc/spapr_rtas.c b/hw/ppc/spapr_rtas.c
+> > index 91a7ab9..c849223 100644
+> > --- a/hw/ppc/spapr_rtas.c
+> > +++ b/hw/ppc/spapr_rtas.c
+> > @@ -50,6 +50,7 @@
+> >  #include "target/ppc/mmu-hash64.h"
+> >  #include "target/ppc/mmu-book3s-v3.h"
+> >  #include "kvm_ppc.h"
+> > +#include "migration/blocker.h"
+> > =20
+> >  static void rtas_display_character(PowerPCCPU *cpu, SpaprMachineState =
+*spapr,
+> >                                     uint32_t token, uint32_t nargs,
+> > @@ -404,6 +405,9 @@ static void rtas_ibm_nmi_interlock(PowerPCCPU *cpu,
+> >          spapr->mc_status =3D -1;
+> >          qemu_cond_signal(&spapr->mc_delivery_cond);
+> >          rtas_st(rets, 0, RTAS_OUT_SUCCESS);
+> > +        migrate_del_blocker(spapr->fwnmi_migration_blocker);
+> > +        error_free(spapr->fwnmi_migration_blocker);
+> > +        spapr->fwnmi_migration_blocker =3D NULL;
+> >      }
+> >  }
+> > =20
+> > diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+> > index bd75d4b..6c0cfd8 100644
+> > --- a/include/hw/ppc/spapr.h
+> > +++ b/include/hw/ppc/spapr.h
+> > @@ -214,6 +214,8 @@ struct SpaprMachineState {
+> >      SpaprCapabilities def, eff, mig;
+> > =20
+> >      unsigned gpu_numa_id;
+> > +
+> > +    Error *fwnmi_migration_blocker;
+> >  };
+> > =20
+> >  #define H_SUCCESS         0
+> >  =20
+>=20
+
+
+--Sig_/Ctw.5U/B2xL9ov7X7UN21b_
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEtIKLr5QxQM7yo0kQcdTV5YIvc9YFAlz4rVEACgkQcdTV5YIv
+c9YfRQ/9EzshMV4VlSL+DtSraRJ8RWXSJT/HI2OFKP+r4DjwXCR5zSPouazHNDqK
+OQchhlOGA+0lOfaCXVmgRFr+aVNRRPxRHxWrwrVwzCKU0x+MZWX6rr2h0Ol1HDR2
+xUY14wKZmvFxuAuEWip9eUeD5K+3DbatQYD+4Y7styeKgh5BZOnENr8QqtElyOUm
+HoB12tSxuV49czwU4bzN7lvt5K0GL6cYUOVTmAvL/pXLG25PPgVRVLomupIxFmZA
+l3q7Gmp2dtfvxXEs7IxT8tptlGYa1DaEOHBxLWVUSUUBe2fSIq58+YPEMNLOszaP
+ZUNnsvRSos+/FnEe4/ZrQ7m08NvqoRVqXNrLA+bHs+0JHUO3al0OBmbwKWViR2N6
+aiQlJ6msATI7LLR/rQQq3FbURc/qBW7N1/iU2Ku3vRiLAB9B+8YLWavJP405Jg6b
+HKKRLcs+SoIHJrNhSJL3mxdgNFPn4mPgI0yOYQhbJhCi46KqwSCFIFgQKnckSF0/
+s3Eolu84BXpzdfK2IcC6vtYZkb58c1ilfmR1dz1L8e7OGNSChb2u9GWu7Ct63pnc
+qIVLwQhsKJBj+IPHBdvTDXc8mx0KDzuBLxPywVgA1JiGfMob7rN1MQE5f4hCPxE6
+rEu1dvP5AUZ36euxRermIgKyp66Kfr0yRQQyK4nCaE3siFl5DN0=
+=GwzS
+-----END PGP SIGNATURE-----
+
+--Sig_/Ctw.5U/B2xL9ov7X7UN21b_--
+
