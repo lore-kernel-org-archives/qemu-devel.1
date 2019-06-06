@@ -2,93 +2,75 @@ Return-Path: <SRS0=9X/F=UF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 336D8C28EB4
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 14:25:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E96F5C04AB5
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 14:26:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 02CD420665
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 14:25:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B135620665
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 14:26:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="SGNNnhnk"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 02CD420665
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=mail.uni-paderborn.de header.i=@mail.uni-paderborn.de header.b="V2fLumuL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B135620665
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=mail.uni-paderborn.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:33156 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:33199 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hYtKG-0005xb-Ns
-	for qemu-devel@archiver.kernel.org; Thu, 06 Jun 2019 10:25:08 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:53880)
+	id 1hYtLI-0006e2-R4
+	for qemu-devel@archiver.kernel.org; Thu, 06 Jun 2019 10:26:12 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:54099)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hYtJP-0005a2-5V
-	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 10:24:16 -0400
+	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1hYtK2-0005xj-CC
+	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 10:24:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1hYtJO-0008He-A6
-	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 10:24:15 -0400
-Received: from mail-ot1-x32e.google.com ([2607:f8b0:4864:20::32e]:33305)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1hYtJO-0008EX-3B
-	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 10:24:14 -0400
-Received: by mail-ot1-x32e.google.com with SMTP id p4so2149837oti.0
-	for <qemu-devel@nongnu.org>; Thu, 06 Jun 2019 07:24:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
-	h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
-	:mime-version:in-reply-to:content-language:content-transfer-encoding;
-	bh=9HWynlXTySzrdPJ8cjfhtf4d8AhaQcIVfaAvSs/ASKk=;
-	b=SGNNnhnk/tE1OXfhrCGiFZu8BpJeUt4XvmXPIZHZ/caJYCwBVGm1WcsB+MQNYOmwtW
-	280dBOzfawJEunNHyJgZOGAh9b0v7lro3JG81cWk1omdAO+VQ7ARkX+HfL/jP5E9UNnD
-	ZWQhqXUtl7uHC+8ADwBqWISuUGr+v7g0bVQKENFI/v3EQ5xS04Md7HqUV/lOwxmhKMuo
-	Sfs/WBAISmPqwwvkyXSv/rk2r3NYuXA9lMuaz2c1bDh4EqOSHEO3r0vNDJovvqGAZZpf
-	5QdCXxo1N0sxcsPvvpHUXIo5R0mOmtAPSfhYhKD+mSdHalGa0gjZkKeuQBLv+fyukafN
-	AvXQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-	:date:user-agent:mime-version:in-reply-to:content-language
-	:content-transfer-encoding;
-	bh=9HWynlXTySzrdPJ8cjfhtf4d8AhaQcIVfaAvSs/ASKk=;
-	b=MI31UpT1Fm7PN5y0cWHiJAajReiWdzpbQsbIzFMMcAqrPzdbpOwo+3wt9oIJBr/rM4
-	y4yz6FDTCZQmfhALQIA/brm4erMc5rAA8zRvojGj9TGb71L3qSDeJM+KXBypdsz0CsQ/
-	CMJfH8KKdBYDJJotrOg9cADrz41e7ewopxClD907Uaopueww2PnL0cpQWcu/3LKq44lH
-	2fC+KCyboH3zZfAfM6ZU3lgdIF6eZS/9R4xy9G8llWWsJNG5wzfn9zml/g+VRrLOMPwp
-	FYxl+gPCGv/uSuJnpbf3rkq4/7uTHQsLlDWCgx8eCi60yyCUWFtbq8LbPwdIHLQPaFZC
-	K5ZA==
-X-Gm-Message-State: APjAAAXvvIxNQFL5CQaP7lhOM/3z+IrdJBRaE5oZK77Dl6DwvHqNkh9M
-	I3cbubG4ZfsJdLud4r6bAZLkmQ==
-X-Google-Smtp-Source: APXvYqwSYcNi+rnIM6RR8bBONRPXv93r06JG3/InlxuGdpI0Sr8eSq/hJQW+wOwlV+DWyJNTho2jIg==
-X-Received: by 2002:a9d:7c8f:: with SMTP id q15mr2357000otn.24.1559831052958; 
-	Thu, 06 Jun 2019 07:24:12 -0700 (PDT)
-Received: from [192.168.3.43] (200-56-192-86-cable.cybercable.net.mx.
-	[200.56.192.86])
-	by smtp.gmail.com with ESMTPSA id b9sm645437oti.43.2019.06.06.07.24.11
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Thu, 06 Jun 2019 07:24:12 -0700 (PDT)
-To: Dave Martin <Dave.Martin@arm.com>
-References: <20190605205706.569-1-richard.henderson@linaro.org>
-	<20190605205706.569-7-richard.henderson@linaro.org>
-	<20190606102141.GB28398@e103592.cambridge.arm.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <234bbba7-550a-9183-4bd4-6d0f75c8dbf1@linaro.org>
-Date: Thu, 6 Jun 2019 09:24:07 -0500
+	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1hYtK1-00024Z-8a
+	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 10:24:54 -0400
+Received: from spheron.uni-paderborn.de ([131.234.189.16]:45248)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kbastian@mail.uni-paderborn.de>)
+	id 1hYtK0-0001pS-L0
+	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 10:24:53 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=mail.uni-paderborn.de; s=20170601;
+	h=Content-Transfer-Encoding:Content-Type
+	:In-Reply-To:MIME-Version:Date:Message-ID:From:References:To:Subject:Sender:
+	Reply-To:Cc:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=FJGga+xSC7i+s2MmPh9iGSs3F7f5LDhMQDMshjJHN8Y=;
+	b=V2fLumuLwedIcqBDb+vadC5H8Y
+	/dYJyUvQCIsQvJaQDMA+9G2IFWN+3otyYa95/XYHu+b7mgt1OI5rAfhqmz18aW03SLGugAhX7NnCJ
+	mnFum0H2NyHtulhK4EVDn6tOr/QtFSjcWvV7TBre7Z4qlGsqY4nqlgsQUNEODCuxA/GM=; 
+To: "Hofstetter, Georg (EFS-GH2)" <Georg.Hofstetter@efs-auto.de>,
+	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+References: <20190605061126.10244-1-david.brenken@efs-auto.org>
+	<20190605061126.10244-6-david.brenken@efs-auto.org>
+	<aaf05b6e-fb2b-1aa8-da49-b6ce29616073@mail.uni-paderborn.de>
+	<69A9BBE82CEA98469F7BA51850C5B89CDC412063@AUDIINSX0364.audi.vwg>
+From: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+Message-ID: <66321909-d917-c52e-1416-0d76389ba903@mail.uni-paderborn.de>
+Date: Thu, 6 Jun 2019 16:24:43 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <20190606102141.GB28398@e103592.cambridge.arm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2607:f8b0:4864:20::32e
-Subject: Re: [Qemu-devel] [PATCH v6 6/6] tests/tcg/aarch64: Add bti smoke
- test
+In-Reply-To: <69A9BBE82CEA98469F7BA51850C5B89CDC412063@AUDIINSX0364.audi.vwg>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US-large
+X-IMT-Spam-Score: 0.0 ()
+X-PMX-Version: 6.4.6.2792898, Antispam-Engine: 2.7.2.2107409,
+	Antispam-Data: 2019.6.6.141817, AntiVirus-Engine: 5.63.0,
+	AntiVirus-Data: 2019.6.4.5630002
+X-IMT-Authenticated-Sender: kbastian@UNI-PADERBORN.DE
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 131.234.189.16
+Subject: Re: [Qemu-devel] [PATCH 5/5] tricore: reset DisasContext before
+ generating code
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -100,53 +82,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
-	"qemu-arm@nongnu.org" <qemu-arm@nongnu.org>,
-	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/6/19 5:21 AM, Dave Martin wrote:
->> +/*
->> + * Create the PT_NOTE that will enable BTI in the page tables.
->> + * This will be created by the compiler with -mbranch-protection=standard,
->> + * but as of 2019-03-29, this is has not been committed to gcc mainline.
->> + * This will probably be in GCC10.
-> 
-> FYI, GCC9 has it.
+Hi Georg,
 
-Thanks.
+On 6/6/19 1:44 PM, Hofstetter, Georg (EFS-GH2) wrote:
+> Hi Sebastian,
+>
+> in translate.c:gen_mtcr() code accesses hflags within the structure:
+>      if ((ctx->hflags & TRICORE_HFLAG_KUU) == TRICORE_HFLAG_SM) {
+>          /* since we're caching PSW make this a special case */
+>
+> The code expects the HFLAG set for kernel mode in (i guess) preparation for supporting operation modes.
+> There is no code modifying these flags.
+> The flags were introduced in 0aaeb11 and there it looks like it was expected to be zeroed - maybe you know a bit more.
 
->> + */
->> +asm(".section .note.gnu.property,\"a\"\n\
->> +	.align	3\n\
->> +	.long	4\n\
->> +        .long	16\n\
->> +        .long	5\n\
->> +        .string	\"GNU\"\n\
->> +	.long	0xc0000000\n\
->> +	.long	4\n\
->> +	.long	1\n\
->> +        .align  3\n\
->> +	.previous");
-> 
-> Note, this won't be enough to generate the PT_GNU_PROPERTY entry in the
-> program header table using older tools.
-> 
-> This may be work-round-able with a linker script, but I haven't looked
-> into it.
+Yep, the ctx->hflags is supposed to be synced by tb->flags (which is 
+normally synced with CPUTriCoreState via cpu_get_tb_cpu_state()) in 
+gen_intermediate_code(). Somehow I forgot to add the first sync. So, the 
+proper fix is:
 
-Yes, a linker script can create such an entry.
-
->> +AARCH64_TESTS += bti-1
->> +bti-1: LDFLAGS += -nostartfiles -nodefaultlibs -nostdlib
->> +
-> 
-> Doesn't -nostdlib imply -nodefaultlibs and -nostartfiles?
-
-I don't believe so, but I'll double-check.
+diff --git a/target/tricore/translate.c b/target/tricore/translate.c
+index 06c4485e55..44296b3fb1 100644
+--- a/target/tricore/translate.c
++++ b/target/tricore/translate.c
+@@ -8804,6 +8804,7 @@ void gen_intermediate_code(CPUState *cs, 
+TranslationBlock *tb, int max_insns)
+      ctx.singlestep_enabled = cs->singlestep_enabled;
+      ctx.bstate = BS_NONE;
+      ctx.mem_idx = cpu_mmu_index(env, false);
++    ctx.hflags = (uint32_t)tb->flags;
 
 
-r~
+      tcg_clear_temp_count();
+      gen_tb_start(tb);
+
+
+Cheers,
+
+Bastian
+
 
