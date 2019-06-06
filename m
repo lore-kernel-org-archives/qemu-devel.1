@@ -2,41 +2,47 @@ Return-Path: <SRS0=9X/F=UF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 12BF0C04AB5
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 09:23:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 14B31C04AB5
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 09:24:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E0E9520684
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 09:23:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E0E9520684
+	by mail.kernel.org (Postfix) with ESMTPS id DF21D20684
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 09:24:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DF21D20684
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:57019 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:57041 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hYobv-0004b3-6P
-	for qemu-devel@archiver.kernel.org; Thu, 06 Jun 2019 05:23:03 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:37062)
+	id 1hYodi-0005ou-3J
+	for qemu-devel@archiver.kernel.org; Thu, 06 Jun 2019 05:24:54 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:37512)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hYoal-00040I-NU
-	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 05:21:52 -0400
+	(envelope-from <laurent@vivier.eu>) id 1hYocL-00052D-Fh
+	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 05:23:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1hYoak-0000yj-Qi
-	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 05:21:51 -0400
-Received: from mout.kundenserver.de ([212.227.126.130]:41455)
+	(envelope-from <laurent@vivier.eu>) id 1hYocK-0005NJ-IU
+	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 05:23:29 -0400
+Received: from mout.kundenserver.de ([212.227.126.135]:59283)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <laurent@vivier.eu>)
-	id 1hYoak-0000sM-H8; Thu, 06 Jun 2019 05:21:50 -0400
+	id 1hYocI-0005Hx-Be; Thu, 06 Jun 2019 05:23:26 -0400
 Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
-	(mreue011 [213.165.67.103]) with ESMTPSA (Nemesis) id
-	1M5PyX-1haC2I2NmP-001OkO; Thu, 06 Jun 2019 11:21:47 +0200
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-References: <20190530173824.30699-1-richard.henderson@linaro.org>
+	(mreue009 [213.165.67.103]) with ESMTPSA (Nemesis) id
+	1MFbeI-1hL4on2diA-00H73S; Thu, 06 Jun 2019 11:23:07 +0200
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org,
+	"qemu-trivial@nongnu.org" <qemu-trivial@nongnu.org>
+References: <20190604080010.23186-1-armbru@redhat.com>
+	<ff72b9fc-003f-275a-d382-860f2a483d60@redhat.com>
+	<803fdb35-f28e-c033-b5ac-02d230dacf94@redhat.com>
+	<56d043be-efd0-cfb5-2c68-30855eb42d03@redhat.com>
 From: Laurent Vivier <laurent@vivier.eu>
 Openpgp: preference=signencrypt
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
@@ -81,35 +87,35 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
 	OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
 	JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
 	ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <843a18f1-6d21-41fc-4e89-81b8c5f51fba@vivier.eu>
-Date: Thu, 6 Jun 2019 11:21:46 +0200
+Message-ID: <9808b3e6-a7f6-cd4d-05f7-ed314965adbc@vivier.eu>
+Date: Thu, 6 Jun 2019 11:23:06 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
 	Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <20190530173824.30699-1-richard.henderson@linaro.org>
+In-Reply-To: <56d043be-efd0-cfb5-2c68-30855eb42d03@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:EEhQS2NuxrRhNUsIsYkxOhRgvVohjvggwNAA9EGV+FWFwj9WXlC
-	dKV50mCMolFfB09x44dGyFhy2IZm3nFkwZomGhmTZCzZ8zUDyg9Rm1281eRI/uhzOQwOU3i
-	GnocCJlB8tM8HdsGS5CYoOuDZwa9HuMGpfapYNQHEqHK2obJdw9WzTwhhJrE+XICdCiTtAp
-	TXDv7RMypSNM27IVI8ABQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:3NtbTELVJtI=:34ZTQLRw8Mobnb1Muzsnp3
-	PtXbB+2B4NV57pWnYj8CP8USPnpM3Id68DXiVjNXXey8IW0kI2JKB5gn0ylgCueQmCthhaoFL
-	itt5jiSe4fYUeghvssMYWR4FbZQAkxjBHvgjscX6UGpycqVQsrGDI4B1enQHw2yTVa0uSVqf2
-	P6DrkDOOuGss8PXxEhc6R0xXG4gBqiGJX5BwPLcKpR/SoCPxxOS4Rq9ZDvuGeBHoPImmJls2F
-	UV2ym5Gsk8J3bIx37XGRzrqau5BMl6Vag9lmmO4ku18KKxW9ruFOE2C79rkTIYENnrR6xe880
-	wJrWSiu2rR8PPu0XNMWaqdXyPAE4CmYIw7NNI9Bk5Kx2qkcZZTGQ9UFbHMJvixeTPxuuB9Hs+
-	rhXUwGNJxMX+7Hfnib8p+MLrNJgYXEFElzB/3OhatElWGixanGSy2O06m7r+Txtlf7OnWrV+L
-	C79P5GJPO7yzxM61TOA3sPKzbgenxM7Es4o5DBwVRY2vjaBYVRs0XQxrz5TTjQuDMS3aDZoDz
-	UXkedlwvCKIobNYFgXu+iSWXvRAk6LvKRihf0qnxwbPBiw4rBP4Ta+Msg1nnSBK4uqYkeHoXn
-	omGBa9E14vtSJHeduV1VZYBS6zmuGMBhdGNiuSuBF9RkCbjl8EnL6gkx02CeCpr/2k/uwZ9ZS
-	irek5YcdcWTFJTY2rS+KX5H1ZvN+eNF1q7R+JcgNk/JnT3Cx6xjnwyAa79t04HnKv4NuyvcAV
-	4p0j0C+WkgZBT9lgZrbiLL3ryABCeBZMQj9/LCD0g1wyGa2SxU4qW5I3EAU=
+X-Provags-ID: V03:K1:8byMmjlxvLjVs4vQ8Epfs1FL7be4u3zAPk0HFhMrJnztfEgpdbP
+	RWtUXcseWDUPtmgmnJXDUws/WCk8csQz4Q1+H7pUaxyztjoMbgQObsEWC+aLmRwmo/UXqYr
+	+q9Q+ivo9Yf2UbbqvbuqrUmVnLIcdFACnTL2DePaMT3bb54ubWSFRwajNQQ3kW6WU7hQO+N
+	aPXF5MhBVryTywmbceHAA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:FcX0Exxx+kU=:K6aH7REDbD/ZWq/2ebonHr
+	GtkqbpOElTa7nslp6b7f62pTORVAzETgQlkMmufZMEM7TPXTHyxecUZhN8gr1oE15HyfAdAWh
+	LBSy2iflP08hhJk7B80of7Gjd3Y/WV3lzY8NB/zn9/Bqv223zMlINY15fDVnGUBN+ZtTMFIed
+	5qqV90fRkIB4279altrmEPJRoXFG5pkOiT92g9g3/bz30nr0QBzIEh1oQKrm/LVrO0aTlC3Zh
+	nqrKTHOOmtQOjk7Dz5/I0D7RT4SB92qHXFMTITkIWXBbZqBOKv93ZXloKr3dbDVlN8XnpDGEN
+	tqi5qY5UzDkXSWq96/Kgrs9QVyuZVT+DFrIXm3rbnoMxlcMjktQ23JzX+AjWOwzMZ2LsAFA3B
+	h6gt7/bwR40s9ZAh96xIg1+7XfewOitl7DAmBkUBCd3lCfMAw0XJG4V3R/L0BLMaMs9UGot/L
+	44mlgwiRFD9v8c/sbFWeGlnnLDFRNwhh/tX4B0vNw1v/K7RXGEUJ3rVYtLrVLJ0ZzmLMn2mDI
+	g4Q/1PsQdJ4S0CEo6e8m4+AWg+fJwkm9BukP2+AkO+RMmlW9gCF1RE0PORNC6dDCfdf1CmVgg
+	4+MmC7lrS+ii0pIk3+XY78ou6uBTwZy29xOkRBdknCnCAmCEbjT55plR4PBOPU8RFgpF1VU9F
+	vQQF8bkmEdB0XF7CvwY+KDKlVMdIhdm6ZqmVug7F7sxsEqTOor1SCZOXiOcJ7VxBG9a80SktF
+	8L67Vku8IIj66XEBobGl7PY1tNxi8TaKZc3yqgfgG9VbERgHP6Kbm20YREU=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.126.130
-Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH] util: Adjust
- qemu_guest_getrandom_nofail for Coverity
+X-Received-From: 212.227.126.135
+Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH] test: Fix make target
+ check-report.tap
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -121,34 +127,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, peter.maydell@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 30/05/2019 à 19:38, Richard Henderson a écrit :
-> Explicitly ignore the return value of qemu_guest_getrandom.
-> Because we use error_fatal, all errors are already caught.
+Le 04/06/2019 à 10:42, Philippe Mathieu-Daudé a écrit :
+> On 6/4/19 10:28 AM, Paolo Bonzini wrote:
+>> On 04/06/19 10:09, Philippe Mathieu-Daudé wrote:
+>>>>  check-report.tap: $(patsubst %,check-report-qtest-%.tap, $(QTEST_TARGETS)) check-report-unit.tap
+>>>> -	$(call quiet-command,./scripts/tap-merge.py $^ > $@,"GEN","$@")
+>>>> +	$(call quiet-command, cat $^ | scripts/tap-merge.pl >$@,"GEN","$@")
+>>> Paolo, did you intend to submit a new tap-merge.py script in commit
+>>> 9df43317b82?
+>>>
+>>
+>> No, it's really just y vs l.
 > 
-> Fixes: CID 1401701
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->  util/guest-random.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> OK!
 > 
-> diff --git a/util/guest-random.c b/util/guest-random.c
-> index e8124a3cad..00a08fd981 100644
-> --- a/util/guest-random.c
-> +++ b/util/guest-random.c
-> @@ -56,7 +56,7 @@ int qemu_guest_getrandom(void *buf, size_t len, Error **errp)
->  
->  void qemu_guest_getrandom_nofail(void *buf, size_t len)
->  {
-> -    qemu_guest_getrandom(buf, len, &error_fatal);
-> +    (void)qemu_guest_getrandom(buf, len, &error_fatal);
->  }
->  
->  uint64_t qemu_guest_random_seed_thread_part1(void)
+>>
+>> Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+>> Cc: qemu-trivial@nongnu.org
+> 
+> Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+> Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 > 
 
 Applied to my trivial-patches branch.
