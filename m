@@ -2,75 +2,66 @@ Return-Path: <SRS0=9X/F=UF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E96F5C04AB5
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 14:26:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 02320C04AB5
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 14:29:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B135620665
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 14:26:13 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=mail.uni-paderborn.de header.i=@mail.uni-paderborn.de header.b="V2fLumuL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B135620665
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=mail.uni-paderborn.de
+	by mail.kernel.org (Postfix) with ESMTPS id CEA7220673
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 14:29:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CEA7220673
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:33199 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:33213 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hYtLI-0006e2-R4
-	for qemu-devel@archiver.kernel.org; Thu, 06 Jun 2019 10:26:12 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:54099)
+	id 1hYtOD-0007wT-Ut
+	for qemu-devel@archiver.kernel.org; Thu, 06 Jun 2019 10:29:13 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:54907)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1hYtK2-0005xj-CC
-	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 10:24:55 -0400
+	(envelope-from <armbru@redhat.com>) id 1hYtNR-0007cV-LW
+	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 10:28:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kbastian@mail.uni-paderborn.de>) id 1hYtK1-00024Z-8a
-	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 10:24:54 -0400
-Received: from spheron.uni-paderborn.de ([131.234.189.16]:45248)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kbastian@mail.uni-paderborn.de>)
-	id 1hYtK0-0001pS-L0
-	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 10:24:53 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=mail.uni-paderborn.de; s=20170601;
-	h=Content-Transfer-Encoding:Content-Type
-	:In-Reply-To:MIME-Version:Date:Message-ID:From:References:To:Subject:Sender:
-	Reply-To:Cc:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=FJGga+xSC7i+s2MmPh9iGSs3F7f5LDhMQDMshjJHN8Y=;
-	b=V2fLumuLwedIcqBDb+vadC5H8Y
-	/dYJyUvQCIsQvJaQDMA+9G2IFWN+3otyYa95/XYHu+b7mgt1OI5rAfhqmz18aW03SLGugAhX7NnCJ
-	mnFum0H2NyHtulhK4EVDn6tOr/QtFSjcWvV7TBre7Z4qlGsqY4nqlgsQUNEODCuxA/GM=; 
-To: "Hofstetter, Georg (EFS-GH2)" <Georg.Hofstetter@efs-auto.de>,
-	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-References: <20190605061126.10244-1-david.brenken@efs-auto.org>
-	<20190605061126.10244-6-david.brenken@efs-auto.org>
-	<aaf05b6e-fb2b-1aa8-da49-b6ce29616073@mail.uni-paderborn.de>
-	<69A9BBE82CEA98469F7BA51850C5B89CDC412063@AUDIINSX0364.audi.vwg>
-From: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-Message-ID: <66321909-d917-c52e-1416-0d76389ba903@mail.uni-paderborn.de>
-Date: Thu, 6 Jun 2019 16:24:43 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-	Thunderbird/60.7.0
+	(envelope-from <armbru@redhat.com>) id 1hYtNP-00045a-Gz
+	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 10:28:25 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57340)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>)
+	id 1hYtNJ-00035b-PS; Thu, 06 Jun 2019 10:28:19 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id C414FC04B93D;
+	Thu,  6 Jun 2019 14:27:54 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-148.ams2.redhat.com
+	[10.36.116.148])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 8F64D7D66A;
+	Thu,  6 Jun 2019 14:27:54 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+	id 2124711386A0; Thu,  6 Jun 2019 16:27:53 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+References: <20190530110255.16225-1-kwolf@redhat.com>
+Date: Thu, 06 Jun 2019 16:27:53 +0200
+In-Reply-To: <20190530110255.16225-1-kwolf@redhat.com> (Kevin Wolf's message
+	of "Thu, 30 May 2019 13:02:49 +0200")
+Message-ID: <871s06n5zq.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
 MIME-Version: 1.0
-In-Reply-To: <69A9BBE82CEA98469F7BA51850C5B89CDC412063@AUDIINSX0364.audi.vwg>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US-large
-X-IMT-Spam-Score: 0.0 ()
-X-PMX-Version: 6.4.6.2792898, Antispam-Engine: 2.7.2.2107409,
-	Antispam-Data: 2019.6.6.141817, AntiVirus-Engine: 5.63.0,
-	AntiVirus-Data: 2019.6.4.5630002
-X-IMT-Authenticated-Sender: kbastian@UNI-PADERBORN.DE
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.31]);
+	Thu, 06 Jun 2019 14:27:54 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 131.234.189.16
-Subject: Re: [Qemu-devel] [PATCH 5/5] tricore: reset DisasContext before
- generating code
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v4 0/6] file-posix: Add
+ dynamic-auto-read-only QAPI feature
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -82,46 +73,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: pkrempa@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Georg,
+Kevin Wolf <kwolf@redhat.com> writes:
 
-On 6/6/19 1:44 PM, Hofstetter, Georg (EFS-GH2) wrote:
-> Hi Sebastian,
->
-> in translate.c:gen_mtcr() code accesses hflags within the structure:
->      if ((ctx->hflags & TRICORE_HFLAG_KUU) == TRICORE_HFLAG_SM) {
->          /* since we're caching PSW make this a special case */
->
-> The code expects the HFLAG set for kernel mode in (i guess) preparation for supporting operation modes.
-> There is no code modifying these flags.
-> The flags were introduced in 0aaeb11 and there it looks like it was expected to be zeroed - maybe you know a bit more.
+> This series adds optional feature lists to struct definitions in the
+> QAPI schema and makes use of them to advertise the new behaviour of
+> auto-read-only=on in file-posix.
 
-Yep, the ctx->hflags is supposed to be synced by tb->flags (which is 
-normally synced with CPUTriCoreState via cpu_get_tb_cpu_state()) in 
-gen_intermediate_code(). Somehow I forgot to add the first sync. So, the 
-proper fix is:
+PATCH 1-3,5-6 are ready.  PATCH 4 could use a bit of love, but I think I
+don't need you to respin.  Let's review the issues briefly:
 
-diff --git a/target/tricore/translate.c b/target/tricore/translate.c
-index 06c4485e55..44296b3fb1 100644
---- a/target/tricore/translate.c
-+++ b/target/tricore/translate.c
-@@ -8804,6 +8804,7 @@ void gen_intermediate_code(CPUState *cs, 
-TranslationBlock *tb, int max_insns)
-      ctx.singlestep_enabled = cs->singlestep_enabled;
-      ctx.bstate = BS_NONE;
-      ctx.mem_idx = cpu_mmu_index(env, false);
-+    ctx.hflags = (uint32_t)tb->flags;
+(a) I found a few comment nits to pick.
 
+(b) QAPIDoc._check_named_section() confused me.  I proposed to replace
+    it by ._is_section_tag().
 
-      tcg_clear_temp_count();
-      gen_tb_start(tb);
+(c) I proposed to replace QAPIDoc._part by ._append_line.  Matter of
+    taste.  I find it simpler.
 
+I'd like to proceed as follows.  Since my follow-up patch for (b) is
+pretty trivial and you haven't expressed a dislike for it, I'll squash
+it in.  Since you do dislike my follow-up patch for (c), I'll keep it
+separate, so you don't get blamed for it.  Any comment nits that survive
+the two follow-up patches I'll address in the first one.  I'll post the
+result as v5.
 
-Cheers,
+Okay?
 
-Bastian
-
+Since PATCH 4 isn't actually wrong, series
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
 
