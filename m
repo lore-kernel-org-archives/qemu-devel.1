@@ -2,82 +2,69 @@ Return-Path: <SRS0=9X/F=UF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BA93C04AB5
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 12:56:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 786E5C04AB5
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 13:08:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 19A9A2070B
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 12:56:27 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HSRqDM0t"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 19A9A2070B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 42CF220684
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 13:08:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 42CF220684
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:60129 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:60327 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hYrwQ-00072N-5a
-	for qemu-devel@archiver.kernel.org; Thu, 06 Jun 2019 08:56:26 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:60070)
+	id 1hYs8E-0003hV-0B
+	for qemu-devel@archiver.kernel.org; Thu, 06 Jun 2019 09:08:38 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:34814)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bmeng.cn@gmail.com>) id 1hYrvh-0006dh-VO
-	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 08:55:42 -0400
+	(envelope-from <kwolf@redhat.com>) id 1hYs7F-0003Ds-6d
+	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 09:07:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bmeng.cn@gmail.com>) id 1hYrvh-0001aB-3K
-	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 08:55:41 -0400
-Received: from mail-ed1-x543.google.com ([2a00:1450:4864:20::543]:41192)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bmeng.cn@gmail.com>)
-	id 1hYrve-00007s-PD; Thu, 06 Jun 2019 08:55:38 -0400
-Received: by mail-ed1-x543.google.com with SMTP id p15so3172667eds.8;
-	Thu, 06 Jun 2019 05:55:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
-	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-	:cc; bh=qKOB3VuDlc0WnIjDjWXfVQ61z9FILkUE5p8n5dJH9dc=;
-	b=HSRqDM0tkQEmFFNFlL+unjNbBWQvoAG9/CnVf9n/vhMBtPRbMmamPTPhForYIxZ/+p
-	YITM5We/y5Z7jboRF8rImjP+C9bE/ARn2Fcy18nnX3b3vARt5GdLxj5Nj1NUbudBB4mw
-	QMPTdw3mgrxxFWdNiuMQ8KU0rFPQATrvSzcouoYwvvUzlqXO9fb/GJJyJZqTBz2vuGGM
-	HQ1exyIVdRoGkirKhgqbbPx+ZLwtAW0TJgxqEgpg/3+m9uzztzEJ+hLcX65x6Ba7QC95
-	uqt09xDzHxNGFO+HWUo/evxK7wis2IeEMkE0hTou+rHmU3mQZn7JR9mJL40FGJXsHAUy
-	XB/g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=1e100.net; s=20161025;
-	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-	:message-id:subject:to:cc;
-	bh=qKOB3VuDlc0WnIjDjWXfVQ61z9FILkUE5p8n5dJH9dc=;
-	b=gtP/d2ht8WORSFuUplVwpUOqzJHUe75QyEtXC1ue25QO/LfHYVbuz7zfrPLj1ITyl2
-	qXDXlLsBmEb8pmQ3WmPG2gDFOzT/hj1QO+L+gyLgSV625dyAdC7m4NHM3RY70e4+478i
-	vwNNs3ifiCzLoB0ROzPLeanbjkhZq4x6AdCQSE6jKgyVmdiWuUKMIJ7oWaZIaQVppo33
-	thXk2pND1idhbgDfhJACjz5vXsWkt8Knjy5gzkvQN6kRxYmYnz9orS7pmDmeo61pRr2o
-	IqAJHbWzVSzBSAqQTPUZGE/oXOgQYAjxQh91DIQmY8CtRnzVOIEGlEbBF1u4NbhRauXo
-	lO6Q==
-X-Gm-Message-State: APjAAAWbyLisiREqSTawxxuf3/h78o6AVTXE4UGhsYOEbku3IZGzIaZ7
-	+Em5Mq4jTbIygIwl/Z0T5pchLkNXsPww8bHFWt0=
-X-Google-Smtp-Source: APXvYqwjGUkmJZOkoFUulGipThJG9uhva1jCC8X3EQmGowTjLHtn4+oDhgAMnT9rbETTeWhhvwY4vvSABAX2ppalOCU=
-X-Received: by 2002:a17:906:1f55:: with SMTP id
-	d21mr40274342ejk.87.1559825725039; 
-	Thu, 06 Jun 2019 05:55:25 -0700 (PDT)
+	(envelope-from <kwolf@redhat.com>) id 1hYs79-0005Rn-Ni
+	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 09:07:35 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48830)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kwolf@redhat.com>)
+	id 1hYs6u-0004Sj-B1; Thu, 06 Jun 2019 09:07:18 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 2570C30C583D;
+	Thu,  6 Jun 2019 13:06:55 +0000 (UTC)
+Received: from localhost.localdomain (ovpn-117-165.ams2.redhat.com
+	[10.36.117.165])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 1DD386839B;
+	Thu,  6 Jun 2019 13:06:48 +0000 (UTC)
+Date: Thu, 6 Jun 2019 15:06:47 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <20190606130647.GB9241@localhost.localdomain>
+References: <20190605123229.92848-1-vsementsov@virtuozzo.com>
+	<20190605123229.92848-3-vsementsov@virtuozzo.com>
+	<20190605171137.GC5491@linux.fritz.box>
+	<1b1a0ec6-88c7-d7a5-3d95-bde310693580@virtuozzo.com>
+	<20190606100510.GA9241@localhost.localdomain>
+	<e7711782-004e-e27d-7ecf-afc04bd1a697@virtuozzo.com>
 MIME-Version: 1.0
-References: <1559119921-6098-1-git-send-email-bmeng.cn@gmail.com>
-	<CAKmqyKNAL8KtVgfCx6yhaNYEL=_wnZ5Vf1eSjxwtg0x6_q+UHw@mail.gmail.com>
-	<CAEUhbmXLr3zXhbphXRvqfyW1FH9qo3yoPwnFoRoYNtbwkrBBKw@mail.gmail.com>
-In-Reply-To: <CAEUhbmXLr3zXhbphXRvqfyW1FH9qo3yoPwnFoRoYNtbwkrBBKw@mail.gmail.com>
-From: Bin Meng <bmeng.cn@gmail.com>
-Date: Thu, 6 Jun 2019 20:55:13 +0800
-Message-ID: <CAEUhbmUAKoFPqBLVW4FHmiESaF8fqEtjqDb1LKf4ivG3g2z0ZQ@mail.gmail.com>
-To: Alistair Francis <alistair23@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 2a00:1450:4864:20::543
-Subject: Re: [Qemu-devel] [PATCH] riscv: virt: Correct pci "bus-range"
- encoding
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <e7711782-004e-e27d-7ecf-afc04bd1a697@virtuozzo.com>
+User-Agent: Mutt/1.11.3 (2019-02-01)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.46]);
+	Thu, 06 Jun 2019 13:06:59 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v2 2/2] blockjob: use blk_new_pinned in
+ block_job_create
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -89,35 +76,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alistair Francis <Alistair.Francis@wdc.com>,
-	Palmer Dabbelt <palmer@sifive.com>,
-	"open list:RISC-V" <qemu-riscv@nongnu.org>,
-	"qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+Cc: "jsnow@redhat.com" <jsnow@redhat.com>,
+	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+	"qemu-block@nongnu.org" <qemu-block@nongnu.org>,
+	"mreitz@redhat.com" <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, May 30, 2019 at 11:36 AM Bin Meng <bmeng.cn@gmail.com> wrote:
->
-> Hi Alistair,
->
-> On Thu, May 30, 2019 at 11:14 AM Alistair Francis <alistair23@gmail.com> wrote:
-> >
-> > On Wed, May 29, 2019 at 1:52 AM Bin Meng <bmeng.cn@gmail.com> wrote:
-> > >
-> > > The largest pci bus number should be calculated from ECAM size,
-> > > instead of its base address.
-> > >
-> > > Signed-off-by: Bin Meng <bmeng.cn@gmail.com>
-> >
-> > This seems ok, can you maybe explain what this fixes?
-> >
->
-> The logic is wrong, as the commit message said. With current wrong
-> logic, the largest pci bus number encoded in "bus-ranges" property was
-> wrongly set to 0x2ff in this case. Per pci spec, the bus number should
-> not exceed 0xff.
->
+Am 06.06.2019 um 14:29 hat Vladimir Sementsov-Ogievskiy geschrieben:
+> 06.06.2019 13:05, Kevin Wolf wrote:
+> > Am 05.06.2019 um 19:16 hat Vladimir Sementsov-Ogievskiy geschrieben:
+> >> 05.06.2019 20:11, Kevin Wolf wrote:
+> >>> Am 05.06.2019 um 14:32 hat Vladimir Sementsov-Ogievskiy geschrieben:
+> >>>> child_role job already has .stay_at_node=true, so on bdrv_replace_node
+> >>>> operation these child are unchanged. Make block job blk behave in same
+> >>>> manner, to avoid inconsistent intermediate graph states and workarounds
+> >>>> like in mirror.
+> >>>>
+> >>>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> >>>
+> >>> This feels dangerous. It does what you want it to do if the only graph
+> >>> change below the BlockBackend is the one in mirror_exit_common. But the
+> >>> user could also take a snapshot, or in the future hopefully insert a
+> >>> filter node, and you would then want the BlockBackend to move.
+> >>>
+> >>> To be honest, even BdrvChildRole.stay_at_node is a bit of a hack. But at
+> >>> least it's only used for permissions and not for the actual data flow.
+> >>
+> >> Hmm. Than, may be just add a parameter to bdrv_replace_node, which parents
+> >> to ignore? Would it work?
+> > 
+> > I would have to think a bit more about it, but it does sound safer.
+> > 
+> > Or we take a step back and ask why it's even a problem for the mirror
+> > block job if the BlockBackend is moved to a different node. The main
+> > reason I see is because of bs->job that is set for the root node of the
+> > BlockBackend and needs to be unset for the same node.
+> > 
+> > Maybe we can just finally get rid of bs->job? It doesn't have many users
+> > any more.
+> > 
+> 
+> Hmm, looked at it. Not sure what should be refactored around job to get rid
+> of "main node" concept.. Which seems to be in a bad relation with starting
+> job on implicit filters as a main node..
+> 
+> But about just removing bs->job pointer, I don't know at least what to do with
+> blk_iostatus_reset and blockdev_mark_auto_del..
 
-Ping?
+blk_iostatus_reset() looks easy. It has only two callers:
+
+1. blk_attach_dev(). This doesn't have anything to do with jobs and
+   attaching a new guest device won't solve any problem the job
+   encountered, so no reason to reset the iostatus for the job.
+
+2. qmp_cont(). This resets the iostatus for everything. We can just
+   call block_job_iostatus_reset() for all block jobs instead of going
+   through BlockBackend.
+
+blockdev_mark_auto_del() might be a bit trickier. The whole idea of the
+function is: When a guest device gets unplugged, automatically remove
+its root block node, too. Commit 12bde0eed6b made it cancel a block job
+because that should happen immediately when the device is actually
+released by the guest and not only after the job finishes and gives up
+its reference. I would like to just change the behaviour, but I'm afraid
+we can't do this because of compatibility.
+
+However, just checking bs->job is really only one special case of
+another user of the node to be deleted. Maybe we can extend it a little
+so that any block jobs that contain the node in job->nodes are
+cancelled.
+
+Kevin
 
