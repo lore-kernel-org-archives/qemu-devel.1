@@ -2,115 +2,82 @@ Return-Path: <SRS0=9X/F=UF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	FROM_EXCESS_BASE64,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 19681C04AB5
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 13:27:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A7B0EC04AB5
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 13:32:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C8DDF20866
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 13:27:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7625B20673
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 13:32:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="Tans2oe0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C8DDF20866
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LUa4B32f"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7625B20673
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:60576 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:60648 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hYsQ6-0003nW-VC
-	for qemu-devel@archiver.kernel.org; Thu, 06 Jun 2019 09:27:06 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:38917)
+	id 1hYsVE-0006hQ-AH
+	for qemu-devel@archiver.kernel.org; Thu, 06 Jun 2019 09:32:24 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:40253)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hYsOr-0002vj-6i
-	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 09:25:50 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1hYsTr-00065B-Cu
+	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 09:31:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hYsOp-0005Pr-Ak
-	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 09:25:49 -0400
-Received: from mail-eopbgr140099.outbound.protection.outlook.com
-	([40.107.14.99]:61807
-	helo=EUR01-VE1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1hYsOl-0004IG-8R; Thu, 06 Jun 2019 09:25:43 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
-	s=selector1;
-	h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
-	bh=mA4rsQuYFHMq/7+ZrUDbGOKUwFk88HvlbWzTrRPfBIk=;
-	b=Tans2oe0IhauMD9GJkSh1m2DoCjSx5mPrL+f/9jjpfC8JbgpVRR1UmYuBuHjDJ/h36R0xsNBwUfYtl/UN+ez890thhunNANMmiQSuNUx6VbNJSo/laVA/ts10VEZ6iE6zHNW5aduhRNF0aRUqxttmeRJDsafJI6VZKIuRjyA6Bo=
-Received: from AM0PR08MB2961.eurprd08.prod.outlook.com (52.134.126.11) by
-	AM0PR08MB4498.eurprd08.prod.outlook.com (20.179.33.74) with Microsoft
-	SMTP
-	Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
-	15.20.1965.14; Thu, 6 Jun 2019 13:25:31 +0000
-Received: from AM0PR08MB2961.eurprd08.prod.outlook.com
-	([fe80::8d90:32ae:bdd6:48e8]) by
-	AM0PR08MB2961.eurprd08.prod.outlook.com
-	([fe80::8d90:32ae:bdd6:48e8%7]) with mapi id 15.20.1965.011;
-	Thu, 6 Jun 2019 13:25:31 +0000
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: Kevin Wolf <kwolf@redhat.com>
-Thread-Topic: [PATCH v2 2/2] blockjob: use blk_new_pinned in block_job_create
-Thread-Index: AQHVG8HBVdfqD7RC9UWdIT2PxMi18aaNTVYAgAEZzACAAChdAIAACmGAgAAFOoA=
-Date: Thu, 6 Jun 2019 13:25:31 +0000
-Message-ID: <f659c0aa-5ae8-f43d-aa48-6d9f5700b919@virtuozzo.com>
-References: <20190605123229.92848-1-vsementsov@virtuozzo.com>
-	<20190605123229.92848-3-vsementsov@virtuozzo.com>
-	<20190605171137.GC5491@linux.fritz.box>
-	<1b1a0ec6-88c7-d7a5-3d95-bde310693580@virtuozzo.com>
-	<20190606100510.GA9241@localhost.localdomain>
-	<e7711782-004e-e27d-7ecf-afc04bd1a697@virtuozzo.com>
-	<20190606130647.GB9241@localhost.localdomain>
-In-Reply-To: <20190606130647.GB9241@localhost.localdomain>
-Accept-Language: ru-RU, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: HE1PR09CA0062.eurprd09.prod.outlook.com
-	(2603:10a6:7:3c::30) To AM0PR08MB2961.eurprd08.prod.outlook.com
-	(2603:10a6:208:66::11)
-authentication-results: spf=none (sender IP is )
-	smtp.mailfrom=vsementsov@virtuozzo.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-tagtoolbar-keys: D20190606162529579
-x-originating-ip: [185.231.240.5]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: a9649d5c-8dec-4393-10aa-08d6ea8272d9
-x-microsoft-antispam: BCL:0; PCL:0;
-	RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(2017052603328)(7193020);
-	SRVR:AM0PR08MB4498; 
-x-ms-traffictypediagnostic: AM0PR08MB4498:
-x-microsoft-antispam-prvs: <AM0PR08MB449896E6056590B5DC4FA013C1170@AM0PR08MB4498.eurprd08.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:10000;
-x-forefront-prvs: 00603B7EEF
-x-forefront-antispam-report: SFV:NSPM;
-	SFS:(10019020)(979002)(396003)(39850400004)(366004)(136003)(346002)(376002)(199004)(189003)(36756003)(68736007)(14454004)(6436002)(31696002)(64756008)(66556008)(6512007)(5660300002)(386003)(66446008)(6506007)(66946007)(102836004)(66476007)(73956011)(186003)(26005)(86362001)(52116002)(99286004)(76176011)(6246003)(5024004)(256004)(6116002)(31686004)(71200400001)(71190400001)(305945005)(6916009)(478600001)(25786009)(2906002)(8936002)(446003)(316002)(476003)(8676002)(2616005)(486006)(53936002)(66066001)(229853002)(3846002)(54906003)(7736002)(4326008)(81156014)(81166006)(11346002)(6486002)(969003)(989001)(999001)(1009001)(1019001);
-	DIR:OUT; SFP:1102; SCL:1; SRVR:AM0PR08MB4498;
-	H:AM0PR08MB2961.eurprd08.prod.outlook.com; FPR:; SPF:None;
-	LANG:en; PTR:InfoNoRecords; A:1; MX:1; 
-received-spf: None (protection.outlook.com: virtuozzo.com does not designate
-	permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: LIQtinZoy2IhciMjQ69+6smBH+UhtCjpSfuByN1Z4Lv5+62uqVaUEjCH2tNRodY3bMzHMkgMGad9fMNHURsfxJ27aqBR+Q70XCAKtDI8zUgbHUZ9WOa/TADEbkRMOaBh+NnOczCT78pC6OESzBzsWt00tFXFRJONbabFYWfTtjILaGzOo3vQ5hsPUcXF1iFy5Ri78syRqPBncnmtHwVdj58dIUbgAJ2r0OwNz0oKLG0o59q5V9E6MqC1SPJTqijG2JwEluj+HEQNSVD39i+EeVUEe9tzFpN4Gne8aP1K0bLpiht0W8GlXOjpjGu+pw7SqDON3O8HM4+ULXGZ5BZLm/eBau2M8vQu2rDGtCC5V2Y8CSvNOoGHDRL9SI4KLVoJQcCsx1EZo4sx1oX7qQl5oe4K8BzBVKy7w0df0/yxHHE=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <99D1DCAE1BA1CF4DBA4392EE751B71EF@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	(envelope-from <marcandre.lureau@gmail.com>) id 1hYsTa-0004gv-RO
+	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 09:30:48 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:44057)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1hYsTa-0004Zc-Ek; Thu, 06 Jun 2019 09:30:42 -0400
+Received: by mail-wr1-x442.google.com with SMTP id b17so1345029wrq.11;
+	Thu, 06 Jun 2019 06:30:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+	h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+	:cc:content-transfer-encoding;
+	bh=NclMiI9dNCtXTcVd2vBcghCgJYacivIg8AK4Wn8pWto=;
+	b=LUa4B32f1ZU6csxVlwgSzomkpKvkn7Q+eP4XKOJFw+1id0q+PBRbKyeZPxKBAw6sWD
+	Wuxn0UxKsKcj20Rtu8z8vBk4obYACDDVMqmutBAc6SYrsUIAFuaxvuPxm5fp3pLRHw2C
+	hSw5zSJ95Andgzm/XZ/m30ShhMblcBPqWFG0eQLosUKQyW1plpz49iFRf04XtjQGi2ou
+	NEA6j0+JPFEp0CvuiRC5J/TVBom3f1KfZnzo0KIa7SGjpvI4jMxgGjcZnNSlGWrcQt3h
+	wDYrICXBbFLlnr8SED7GyyeyaPvUi0U1h5wSwvEJmC2u/0kztGzGbWonuL262qYo7Zxo
+	sgiw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=1e100.net; s=20161025;
+	h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+	:message-id:subject:to:cc:content-transfer-encoding;
+	bh=NclMiI9dNCtXTcVd2vBcghCgJYacivIg8AK4Wn8pWto=;
+	b=REnkCdPnB1UD8FpYkwi08u4DqSOfkJ3hITms9D9keSAapaWdRlR9rPux4F23GDul6I
+	owMOLxlkDN6H1R21w6LjuofHNWmXn9017ixKzJRpTGtxF6hDKAFiolNpcygFK2Nv4Lle
+	3eUnPTwJ5zCoG9M2SnnsKxvYyP2m5liihztas5S/0H5V4Nr0z1VMOH7gIrg9xgwJ5yuZ
+	xMQYpqDk8Ak644aE78zk8ZfpQapnEitT/VnvgAWAGrlHzO84Yt4clAPLAWbktVgNxgwS
+	gR9L9XVR1bNQVIWaYT97Uu3mN7sEeKsK37HgWCLXJeoYPUxaInzfpYkhWZFDOzGnFaG1
+	R/tw==
+X-Gm-Message-State: APjAAAVVa1ld5jUXx8RV8Z6WlxF5IvD1yK1FGLjFR9ANRkxO5UXhAAPl
+	M49uBIIWBOaHBIJp5CxgfbISd/TJ79drPdBbQYY=
+X-Google-Smtp-Source: APXvYqyRJF1utCtBoqHB9/CbcgecAju6oAl9db8XrP09vcwrSKMOdKZbkecm3GvP40DTWnQheYpvu0FepnhO4tPo6Po=
+X-Received: by 2002:a5d:62c9:: with SMTP id o9mr28065335wrv.186.1559827841014; 
+	Thu, 06 Jun 2019 06:30:41 -0700 (PDT)
 MIME-Version: 1.0
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a9649d5c-8dec-4393-10aa-08d6ea8272d9
-X-MS-Exchange-CrossTenant-originalarrivaltime: 06 Jun 2019 13:25:31.5598 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: vsementsov@virtuozzo.com
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR08MB4498
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.14.99
-Subject: Re: [Qemu-devel] [PATCH v2 2/2] blockjob: use blk_new_pinned in
- block_job_create
+References: <20190426061815.6384-1-tiwei.bie@intel.com>
+In-Reply-To: <20190426061815.6384-1-tiwei.bie@intel.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Thu, 6 Jun 2019 15:30:29 +0200
+Message-ID: <CAJ+F1CKjHprs15oqrB8K2COUunjeGx-y7kBvAtaxJ17n5yt+iQ@mail.gmail.com>
+To: Tiwei Bie <tiwei.bie@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+	recognized.
+X-Received-From: 2a00:1450:4864:20::442
+Subject: Re: [Qemu-devel] [PATCH] vhost-user: fix reconnection support for
+ host notifier
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -122,71 +89,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "jsnow@redhat.com" <jsnow@redhat.com>,
-	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-	"qemu-block@nongnu.org" <qemu-block@nongnu.org>,
-	"mreitz@redhat.com" <mreitz@redhat.com>
+Cc: cunming.liang@intel.com, qemu-stable <qemu-stable@nongnu.org>,
+	QEMU <qemu-devel@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-MDYuMDYuMjAxOSAxNjowNiwgS2V2aW4gV29sZiB3cm90ZToNCj4gQW0gMDYuMDYuMjAxOSB1bSAx
-NDoyOSBoYXQgVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSBnZXNjaHJpZWJlbjoNCj4+IDA2
-LjA2LjIwMTkgMTM6MDUsIEtldmluIFdvbGYgd3JvdGU6DQo+Pj4gQW0gMDUuMDYuMjAxOSB1bSAx
-OToxNiBoYXQgVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSBnZXNjaHJpZWJlbjoNCj4+Pj4g
-MDUuMDYuMjAxOSAyMDoxMSwgS2V2aW4gV29sZiB3cm90ZToNCj4+Pj4+IEFtIDA1LjA2LjIwMTkg
-dW0gMTQ6MzIgaGF0IFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgZ2VzY2hyaWViZW46DQo+
-Pj4+Pj4gY2hpbGRfcm9sZSBqb2IgYWxyZWFkeSBoYXMgLnN0YXlfYXRfbm9kZT10cnVlLCBzbyBv
-biBiZHJ2X3JlcGxhY2Vfbm9kZQ0KPj4+Pj4+IG9wZXJhdGlvbiB0aGVzZSBjaGlsZCBhcmUgdW5j
-aGFuZ2VkLiBNYWtlIGJsb2NrIGpvYiBibGsgYmVoYXZlIGluIHNhbWUNCj4+Pj4+PiBtYW5uZXIs
-IHRvIGF2b2lkIGluY29uc2lzdGVudCBpbnRlcm1lZGlhdGUgZ3JhcGggc3RhdGVzIGFuZCB3b3Jr
-YXJvdW5kcw0KPj4+Pj4+IGxpa2UgaW4gbWlycm9yLg0KPj4+Pj4+DQo+Pj4+Pj4gU2lnbmVkLW9m
-Zi1ieTogVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSA8dnNlbWVudHNvdkB2aXJ0dW96em8u
-Y29tPg0KPj4+Pj4NCj4+Pj4+IFRoaXMgZmVlbHMgZGFuZ2Vyb3VzLiBJdCBkb2VzIHdoYXQgeW91
-IHdhbnQgaXQgdG8gZG8gaWYgdGhlIG9ubHkgZ3JhcGgNCj4+Pj4+IGNoYW5nZSBiZWxvdyB0aGUg
-QmxvY2tCYWNrZW5kIGlzIHRoZSBvbmUgaW4gbWlycm9yX2V4aXRfY29tbW9uLiBCdXQgdGhlDQo+
-Pj4+PiB1c2VyIGNvdWxkIGFsc28gdGFrZSBhIHNuYXBzaG90LCBvciBpbiB0aGUgZnV0dXJlIGhv
-cGVmdWxseSBpbnNlcnQgYQ0KPj4+Pj4gZmlsdGVyIG5vZGUsIGFuZCB5b3Ugd291bGQgdGhlbiB3
-YW50IHRoZSBCbG9ja0JhY2tlbmQgdG8gbW92ZS4NCj4+Pj4+DQo+Pj4+PiBUbyBiZSBob25lc3Qs
-IGV2ZW4gQmRydkNoaWxkUm9sZS5zdGF5X2F0X25vZGUgaXMgYSBiaXQgb2YgYSBoYWNrLiBCdXQg
-YXQNCj4+Pj4+IGxlYXN0IGl0J3Mgb25seSB1c2VkIGZvciBwZXJtaXNzaW9ucyBhbmQgbm90IGZv
-ciB0aGUgYWN0dWFsIGRhdGEgZmxvdy4NCj4+Pj4NCj4+Pj4gSG1tLiBUaGFuLCBtYXkgYmUganVz
-dCBhZGQgYSBwYXJhbWV0ZXIgdG8gYmRydl9yZXBsYWNlX25vZGUsIHdoaWNoIHBhcmVudHMNCj4+
-Pj4gdG8gaWdub3JlPyBXb3VsZCBpdCB3b3JrPw0KPj4+DQo+Pj4gSSB3b3VsZCBoYXZlIHRvIHRo
-aW5rIGEgYml0IG1vcmUgYWJvdXQgaXQsIGJ1dCBpdCBkb2VzIHNvdW5kIHNhZmVyLg0KPj4+DQo+
-Pj4gT3Igd2UgdGFrZSBhIHN0ZXAgYmFjayBhbmQgYXNrIHdoeSBpdCdzIGV2ZW4gYSBwcm9ibGVt
-IGZvciB0aGUgbWlycm9yDQo+Pj4gYmxvY2sgam9iIGlmIHRoZSBCbG9ja0JhY2tlbmQgaXMgbW92
-ZWQgdG8gYSBkaWZmZXJlbnQgbm9kZS4gVGhlIG1haW4NCj4+PiByZWFzb24gSSBzZWUgaXMgYmVj
-YXVzZSBvZiBicy0+am9iIHRoYXQgaXMgc2V0IGZvciB0aGUgcm9vdCBub2RlIG9mIHRoZQ0KPj4+
-IEJsb2NrQmFja2VuZCBhbmQgbmVlZHMgdG8gYmUgdW5zZXQgZm9yIHRoZSBzYW1lIG5vZGUuDQo+
-Pj4NCj4+PiBNYXliZSB3ZSBjYW4ganVzdCBmaW5hbGx5IGdldCByaWQgb2YgYnMtPmpvYj8gSXQg
-ZG9lc24ndCBoYXZlIG1hbnkgdXNlcnMNCj4+PiBhbnkgbW9yZS4NCj4+Pg0KPj4NCj4+IEhtbSwg
-bG9va2VkIGF0IGl0LiBOb3Qgc3VyZSB3aGF0IHNob3VsZCBiZSByZWZhY3RvcmVkIGFyb3VuZCBq
-b2IgdG8gZ2V0IHJpZA0KPj4gb2YgIm1haW4gbm9kZSIgY29uY2VwdC4uIFdoaWNoIHNlZW1zIHRv
-IGJlIGluIGEgYmFkIHJlbGF0aW9uIHdpdGggc3RhcnRpbmcNCj4+IGpvYiBvbiBpbXBsaWNpdCBm
-aWx0ZXJzIGFzIGEgbWFpbiBub2RlLi4NCj4+DQo+PiBCdXQgYWJvdXQganVzdCByZW1vdmluZyBi
-cy0+am9iIHBvaW50ZXIsIEkgZG9uJ3Qga25vdyBhdCBsZWFzdCB3aGF0IHRvIGRvIHdpdGgNCj4+
-IGJsa19pb3N0YXR1c19yZXNldCBhbmQgYmxvY2tkZXZfbWFya19hdXRvX2RlbC4uDQo+IA0KPiBi
-bGtfaW9zdGF0dXNfcmVzZXQoKSBsb29rcyBlYXN5LiBJdCBoYXMgb25seSB0d28gY2FsbGVyczoN
-Cj4gDQo+IDEuIGJsa19hdHRhY2hfZGV2KCkuIFRoaXMgZG9lc24ndCBoYXZlIGFueXRoaW5nIHRv
-IGRvIHdpdGggam9icyBhbmQNCj4gICAgIGF0dGFjaGluZyBhIG5ldyBndWVzdCBkZXZpY2Ugd29u
-J3Qgc29sdmUgYW55IHByb2JsZW0gdGhlIGpvYg0KPiAgICAgZW5jb3VudGVyZWQsIHNvIG5vIHJl
-YXNvbiB0byByZXNldCB0aGUgaW9zdGF0dXMgZm9yIHRoZSBqb2IuDQo+IA0KPiAyLiBxbXBfY29u
-dCgpLiBUaGlzIHJlc2V0cyB0aGUgaW9zdGF0dXMgZm9yIGV2ZXJ5dGhpbmcuIFdlIGNhbiBqdXN0
-DQo+ICAgICBjYWxsIGJsb2NrX2pvYl9pb3N0YXR1c19yZXNldCgpIGZvciBhbGwgYmxvY2sgam9i
-cyBpbnN0ZWFkIG9mIGdvaW5nDQo+ICAgICB0aHJvdWdoIEJsb2NrQmFja2VuZC4NCj4gDQo+IGJs
-b2NrZGV2X21hcmtfYXV0b19kZWwoKSBtaWdodCBiZSBhIGJpdCB0cmlja2llci4gVGhlIHdob2xl
-IGlkZWEgb2YgdGhlDQo+IGZ1bmN0aW9uIGlzOiBXaGVuIGEgZ3Vlc3QgZGV2aWNlIGdldHMgdW5w
-bHVnZ2VkLCBhdXRvbWF0aWNhbGx5IHJlbW92ZQ0KPiBpdHMgcm9vdCBibG9jayBub2RlLCB0b28u
-IENvbW1pdCAxMmJkZTBlZWQ2YiBtYWRlIGl0IGNhbmNlbCBhIGJsb2NrIGpvYg0KPiBiZWNhdXNl
-IHRoYXQgc2hvdWxkIGhhcHBlbiBpbW1lZGlhdGVseSB3aGVuIHRoZSBkZXZpY2UgaXMgYWN0dWFs
-bHkNCj4gcmVsZWFzZWQgYnkgdGhlIGd1ZXN0IGFuZCBub3Qgb25seSBhZnRlciB0aGUgam9iIGZp
-bmlzaGVzIGFuZCBnaXZlcyB1cA0KPiBpdHMgcmVmZXJlbmNlLiBJIHdvdWxkIGxpa2UgdG8ganVz
-dCBjaGFuZ2UgdGhlIGJlaGF2aW91ciwgYnV0IEknbSBhZnJhaWQNCj4gd2UgY2FuJ3QgZG8gdGhp
-cyBiZWNhdXNlIG9mIGNvbXBhdGliaWxpdHkuDQo+IA0KPiBIb3dldmVyLCBqdXN0IGNoZWNraW5n
-IGJzLT5qb2IgaXMgcmVhbGx5IG9ubHkgb25lIHNwZWNpYWwgY2FzZSBvZg0KPiBhbm90aGVyIHVz
-ZXIgb2YgdGhlIG5vZGUgdG8gYmUgZGVsZXRlZC4gTWF5YmUgd2UgY2FuIGV4dGVuZCBpdCBhIGxp
-dHRsZQ0KPiBzbyB0aGF0IGFueSBibG9jayBqb2JzIHRoYXQgY29udGFpbiB0aGUgbm9kZSBpbiBq
-b2ItPm5vZGVzIGFyZQ0KPiBjYW5jZWxsZWQuDQo+IA0KDQpPSywgdGhhbmtzLiBJJ2xsIHRyeSB0
-aGlzIHdheQ0KDQoNCi0tIA0KQmVzdCByZWdhcmRzLA0KVmxhZGltaXINCg==
+Hi
+
+On Fri, Apr 26, 2019 at 8:32 AM Tiwei Bie <tiwei.bie@intel.com> wrote:
+>
+> We need to destroy the host notifiers when cleaning up
+> the backend. Otherwise, some resources are not released
+> after the connection is closed, and it may prevent the
+> external backend from reopening them (e.g. VFIO files)
+> during restart.
+>
+> Fixes: 44866521bd6e ("vhost-user: support registering external host notif=
+iers")
+> Cc: qemu-stable@nongnu.org
+>
+> Signed-off-by: Tiwei Bie <tiwei.bie@intel.com>
+> ---
+>  hw/virtio/vhost-user.c | 16 ++++++++++++++++
+>  1 file changed, 16 insertions(+)
+>
+> diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
+> index 553319c7ac..56656629c0 100644
+> --- a/hw/virtio/vhost-user.c
+> +++ b/hw/virtio/vhost-user.c
+> @@ -1454,10 +1454,24 @@ static int vhost_user_backend_init(struct vhost_d=
+ev *dev, void *opaque)
+>  static int vhost_user_backend_cleanup(struct vhost_dev *dev)
+>  {
+>      struct vhost_user *u;
+> +    VhostUserState *user;
+> +    int i;
+>
+>      assert(dev->vhost_ops->backend_type =3D=3D VHOST_BACKEND_TYPE_USER);
+>
+>      u =3D dev->opaque;
+> +
+> +    if (dev->vq_index =3D=3D 0) {
+> +        user =3D u->user;
+> +        for (i =3D 0; i < VIRTIO_QUEUE_MAX; i++) {
+> +            if (user->notifier[i].addr) {
+> +                object_unparent(OBJECT(&user->notifier[i].mr));
+> +                munmap(user->notifier[i].addr, qemu_real_host_page_size)=
+;
+> +                user->notifier[i].addr =3D NULL;
+> +            }
+> +        }
+> +    }
+
+Why not call vhost_user_cleanup() ? Alternatively, factor the notifier
+code in a seperate vhost_user_notifiers_cleanup() ?
+
+> +
+>      if (u->postcopy_notifier.notify) {
+>          postcopy_remove_notifier(&u->postcopy_notifier);
+>          u->postcopy_notifier.notify =3D NULL;
+> @@ -1881,6 +1895,8 @@ bool vhost_user_init(VhostUserState *user, CharBack=
+end *chr, Error **errp)
+>          error_setg(errp, "Cannot initialize vhost-user state");
+>          return false;
+>      }
+> +
+> +    memset(user, 0, sizeof(*user));
+
+This looks superflous. Is it really needed?
+
+I wish there would be some basic tests for external host notifiers. Is
+it too much to ask to add it in vhost-user-test.c ?
+
+
+>      user->chr =3D chr;
+>      return true;
+>  }
+> --
+> 2.17.1
+>
+>
+
+
+--=20
+Marc-Andr=C3=A9 Lureau
 
