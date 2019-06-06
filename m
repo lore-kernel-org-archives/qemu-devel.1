@@ -8,81 +8,79 @@ X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AC020C04AB5
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 16:43:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4674CC28EB4
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 16:44:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 35B13206BB
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 16:43:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CCF62206BB
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 16:44:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CRhuy7gi"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 35B13206BB
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fPVc+vBX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CCF62206BB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:35141 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:35150 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hYvUH-0005Ez-Ay
-	for qemu-devel@archiver.kernel.org; Thu, 06 Jun 2019 12:43:37 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:55378)
+	id 1hYvVL-0005rv-5x
+	for qemu-devel@archiver.kernel.org; Thu, 06 Jun 2019 12:44:43 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:58773)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lucienmp.qemu@gmail.com>) id 1hYvEt-0003TJ-Ux
-	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 12:27:48 -0400
+	(envelope-from <lucienmp.qemu@gmail.com>) id 1hYvUO-0005QI-4c
+	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 12:43:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lucienmp.qemu@gmail.com>) id 1hYvEo-0003KX-27
-	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 12:27:43 -0400
-Received: from mail-pl1-x62d.google.com ([2607:f8b0:4864:20::62d]:35249)
+	(envelope-from <lucienmp.qemu@gmail.com>) id 1hYvUI-0007Lb-TL
+	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 12:43:43 -0400
+Received: from mail-pf1-x429.google.com ([2607:f8b0:4864:20::429]:41494)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <lucienmp.qemu@gmail.com>)
-	id 1hYvEn-0003Hm-E1
-	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 12:27:37 -0400
-Received: by mail-pl1-x62d.google.com with SMTP id p1so1142194plo.2
-	for <qemu-devel@nongnu.org>; Thu, 06 Jun 2019 09:27:37 -0700 (PDT)
+	id 1hYvUI-0007GZ-El
+	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 12:43:38 -0400
+Received: by mail-pf1-x429.google.com with SMTP id q17so1846790pfq.8
+	for <qemu-devel@nongnu.org>; Thu, 06 Jun 2019 09:43:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
 	h=date:from:to:subject:message-id:mime-version:content-disposition
 	:user-agent; bh=0FgGlFt41FoqdtMfjLBz9jRLkosqna/DDcv/l3Mwj0M=;
-	b=CRhuy7giIR2stTVxT/Ahoi0Ik4deJs756Jed4Fv5rDyIl9pLskI8jpOF3rRUuLrZpk
-	2xqah4FjK27Fkb4YJWOT6s+r/21hiKBkNe76s76DowOPZNDgYOmufGCOY7yl2ONfpmAP
-	HBBAekbdzRVU3N7JYsNv6/HIm6XqDY15oZbFcByETFYWw4GfGib9OH8cg+EObTg5P/Zk
-	U7tW8Gipnbftk9uxZz3m/QaxvDtIsaOhKNgogORJUUt+Cercm4LCuFkjSnA0ykWZN/ek
-	coGb8oF9fec+R7zSPoVBYS1JKpFCIvabO+/S82Q2yAdisNCDwG1pRZZ++MY6XV0Bk4p/
-	dQsw==
+	b=fPVc+vBXAY18mT6hnbRkUEwMiMFFGM+yR+RARHlNmYnSXA52VKJ/saeEY6QzzhXhJi
+	Gq6EQtY4GHirfes+QKVqBuH4Ecpu4HIxkl4w5UetlgOCNwiHoEMcNggnH7+d2sZ8f5Hv
+	rtpMLkD3QW0SrPVVRtB2sHqifUZvdC9EGKCmdXhuSOYr1R2qWwiRsbw1K7p6Vm2zfZof
+	0DFm5IFdHlYcwrX5KcFE4fvm0qcKNR0M/zQcBGqdBFzXGKEEYMYGKwZYnZPOa3Im9kwl
+	IB4ATXr3+SqbaHuBoc55IKGgr57+I/LV9UqXHvL+R0e1nXY8R0vBjkan/tEvIuHW1OUX
+	upHA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=1e100.net; s=20161025;
 	h=x-gm-message-state:date:from:to:subject:message-id:mime-version
 	:content-disposition:user-agent;
 	bh=0FgGlFt41FoqdtMfjLBz9jRLkosqna/DDcv/l3Mwj0M=;
-	b=Dp5/jda1K2xAomznqg/y5iOSnmIPGRuHvmv8depWl5WJ/NytK1/yv/Wzq8KzJU7igG
-	haNXv5ea34Ok2FJ8M76gYR1hrMpZwreSfqoZzJPOdI6odRqKkoS1ZOUA7R1Z8YugZ/LK
-	FQMfyabKOX5BX0gacI16DZ2FTFZuIhsWakWq0gRSI6UJWu5Q7hG4II726itv2HIRFIvB
-	0rXyUx4lAHBOj3QimWAzWCFJQIA5LYOOUZuUOmjKQIyn6zFCsvT1YJOkgLFQ0JdI4wUU
-	60RNKIxswhozikkLz2FlprJh17OhKUUEPloHSqTf1eYupCwMJeVqZbdD2yYUz7YtyyA1
-	1qxA==
-X-Gm-Message-State: APjAAAXuGXm99qPZNCr6m8T0BWmvZyczJ7qziM+64YIRY7OZ3sBCNURk
-	A3SXMd+x6oc0nBE0cnd3e4roJ6T/
-X-Google-Smtp-Source: APXvYqwUTPTgS2fP/vqkO/SqFyc399E4LbMD6kdqidcXFTITzUinT3QrQP9dfQ+BljBNA+tvj5/dow==
-X-Received: by 2002:a17:902:4381:: with SMTP id
-	j1mr50344366pld.286.1559838455200; 
-	Thu, 06 Jun 2019 09:27:35 -0700 (PDT)
+	b=nGsEbPe0Y2U1L3m3JOA/YQjrOJuBCRVs9ilizl0RCP6z3GTkoqm+xck/AqoYNvw8aC
+	z7IbRIMDqgChbGDgeWym6Yl75HNMObhqJJJCPelnlcfhPf25AIioQNSo7q1mpXawN2MG
+	LHC/pSs4dDyu8FaNLXB83+VgMMKMIK5nFjLo77piA4k4ihmMYpn6Ym0heGcQ3S9Zl8pR
+	QlrRhSvV1+C+6/5zB3fcXsXE2rPK5lWvp0wxct5u+5IP42+2Yb7woZatxvqn72qN01BL
+	NKRvGkfd4gwHJEVzmJNJ/1lJdWn44X8gc5iPrHB/ZYrdkUfFxu8gBBFHHB0ipxFXJDBF
+	ZVAA==
+X-Gm-Message-State: APjAAAVNG7VP5gfFmL0MTGRnWohea5K2I8jhbdIp+pBTb59smiNP4sD7
+	ZGXEV7BA6pDVTBxjQOKHVnB8K/6W
+X-Google-Smtp-Source: APXvYqyUuxUKG6It8tNZfmAbJXhn2d2SCJU1P3l3GEzu6GIBdBChQwL5p1W91KOyY0CRtYghWtgwcA==
+X-Received: by 2002:aa7:9159:: with SMTP id 25mr53721072pfi.64.1559839414621; 
+	Thu, 06 Jun 2019 09:43:34 -0700 (PDT)
 Received: from localhost.localdomain ([125.130.54.1])
 	by smtp.gmail.com with ESMTPSA id
-	q20sm2390604pgq.66.2019.06.06.09.27.33
+	f13sm2522261pfa.182.2019.06.06.09.43.32
 	(version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-	Thu, 06 Jun 2019 09:27:34 -0700 (PDT)
-Date: Fri, 7 Jun 2019 01:27:31 +0900
+	Thu, 06 Jun 2019 09:43:34 -0700 (PDT)
+Date: Fri, 7 Jun 2019 01:43:30 +0900
 From: Lucien Murray-Pitts <lucienmp.qemu@gmail.com>
 To: qemu-devel@nongnu.org, Laurent Vivier <laurent@vivier.eu>,
 	Lucien Murray-Pitts <lucienmp.qemu@gmail.com>
-Message-ID: <20190606162731.GA83390@localhost.localdomain>
+Message-ID: <20190606164330.GA83448@localhost.localdomain>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 User-Agent: Mutt/1.11.4 (2019-03-13)
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
 	recognized.
-X-Received-From: 2607:f8b0:4864:20::62d
-X-Mailman-Approved-At: Thu, 06 Jun 2019 12:42:54 -0400
+X-Received-From: 2607:f8b0:4864:20::429
 Subject: [Qemu-devel] [PATCH] m68k comments break patch submission due to
  being incorrectly formatted
 X-BeenThere: qemu-devel@nongnu.org
