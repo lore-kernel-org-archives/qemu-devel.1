@@ -2,56 +2,64 @@ Return-Path: <SRS0=9X/F=UF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 551A2C28D1E
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 12:27:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DF5E4C04AB5
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 12:27:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 32974206E0
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 12:27:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 32974206E0
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
+	by mail.kernel.org (Postfix) with ESMTPS id AD8BC20868
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 12:27:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AD8BC20868
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:59719 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:59721 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hYrU2-0007nw-BG
-	for qemu-devel@archiver.kernel.org; Thu, 06 Jun 2019 08:27:06 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:50888)
+	id 1hYrU5-0007qF-VH
+	for qemu-devel@archiver.kernel.org; Thu, 06 Jun 2019 08:27:10 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:50809)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1hYrSA-0006LL-7q
-	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 08:25:11 -0400
+	(envelope-from <groug@kaod.org>) id 1hYrS4-0006Io-QZ
+	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 08:25:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1hYrS9-00063S-0r
-	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 08:25:10 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:33391 helo=mail.rt-rk.com)
+	(envelope-from <groug@kaod.org>) id 1hYrS2-0005lm-PW
+	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 08:25:04 -0400
+Received: from 2.mo179.mail-out.ovh.net ([178.33.250.45]:37021)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1hYrS6-0005oN-Tc
-	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 08:25:08 -0400
-Received: from localhost (localhost [127.0.0.1])
-	by mail.rt-rk.com (Postfix) with ESMTP id F37B21A2199;
-	Thu,  6 Jun 2019 14:25:02 +0200 (CEST)
-X-Virus-Scanned: amavisd-new at rt-rk.com
-Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
-	[10.10.13.43])
-	by mail.rt-rk.com (Postfix) with ESMTPSA id D3DB21A21BE;
-	Thu,  6 Jun 2019 14:25:02 +0200 (CEST)
-From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-To: qemu-devel@nongnu.org
-Date: Thu,  6 Jun 2019 14:24:34 +0200
-Message-Id: <1559823880-29103-5-git-send-email-aleksandar.markovic@rt-rk.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1559823880-29103-1-git-send-email-aleksandar.markovic@rt-rk.com>
-References: <1559823880-29103-1-git-send-email-aleksandar.markovic@rt-rk.com>
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 89.216.37.149
-Subject: [Qemu-devel] [PATCH v2 04/10] target/mips: Unroll loops in helpers
- for MSA logic instructions
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1hYrS1-0005XY-Jb
+	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 08:25:02 -0400
+Received: from player774.ha.ovh.net (unknown [10.108.57.49])
+	by mo179.mail-out.ovh.net (Postfix) with ESMTP id 8F2DE133D81
+	for <qemu-devel@nongnu.org>; Thu,  6 Jun 2019 14:24:56 +0200 (CEST)
+Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
+	[82.253.208.248]) (Authenticated sender: groug@kaod.org)
+	by player774.ha.ovh.net (Postfix) with ESMTPSA id 620F568CF695;
+	Thu,  6 Jun 2019 12:24:47 +0000 (UTC)
+Date: Thu, 6 Jun 2019 14:24:46 +0200
+From: Greg Kurz <groug@kaod.org>
+To: Aravinda Prasad <aravinda@linux.vnet.ibm.com>
+Message-ID: <20190606142446.72acfd73@bahia.lab.toulouse-stg.fr.ibm.com>
+In-Reply-To: <08b42ce8-2413-ce8f-980a-419146423be7@linux.vnet.ibm.com>
+References: <155910829070.13149.5215948335633966328.stgit@aravinda>
+	<155910845769.13149.8097972239187020170.stgit@aravinda>
+	<20190606030614.GK10319@umbus.fritz.box>
+	<08b42ce8-2413-ce8f-980a-419146423be7@linux.vnet.ibm.com>
+X-Mailer: Claws Mail 3.16.0 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Ovh-Tracer-Id: 438819489063278996
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduuddrudeggedghedvucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddm
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 178.33.250.45
+Subject: Re: [Qemu-devel] [PATCH v9 6/6] migration: Include migration
+ support for machine check handling
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -63,86 +71,174 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: arikalo@wavecomp.com, amarkovic@wavecomp.com
+Cc: aik@au1.ibm.com, qemu-devel@nongnu.org, paulus@ozlabs.org,
+	qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
+On Thu, 6 Jun 2019 16:55:18 +0530
+Aravinda Prasad <aravinda@linux.vnet.ibm.com> wrote:
 
-Unroll loops in helpers for MSA logic instructions for better
-performance.
+> On Thursday 06 June 2019 08:36 AM, David Gibson wrote:
+> > On Wed, May 29, 2019 at 11:10:57AM +0530, Aravinda Prasad wrote:  
+> >> This patch includes migration support for machine check
+> >> handling. Especially this patch blocks VM migration
+> >> requests until the machine check error handling is
+> >> complete as (i) these errors are specific to the source
+> >> hardware and is irrelevant on the target hardware,
+> >> (ii) these errors cause data corruption and should
+> >> be handled before migration.
+> >>
+> >> Signed-off-by: Aravinda Prasad <aravinda@linux.vnet.ibm.com>
+> >> ---
+> >>  hw/ppc/spapr.c         |   20 ++++++++++++++++++++
+> >>  hw/ppc/spapr_events.c  |   17 +++++++++++++++++
+> >>  hw/ppc/spapr_rtas.c    |    4 ++++
+> >>  include/hw/ppc/spapr.h |    2 ++
+> >>  4 files changed, 43 insertions(+)
+> >>
+> >> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> >> index e8a77636..31c4850 100644
+> >> --- a/hw/ppc/spapr.c
+> >> +++ b/hw/ppc/spapr.c
+> >> @@ -2104,6 +2104,25 @@ static const VMStateDescription vmstate_spapr_dtb = {
+> >>      },
+> >>  };
+> >>  
+> >> +static bool spapr_fwnmi_needed(void *opaque)
+> >> +{
+> >> +    SpaprMachineState *spapr = (SpaprMachineState *)opaque;
+> >> +
+> >> +    return (spapr->guest_machine_check_addr == -1) ? 0 : 1;  
+> > 
+> > Since we're introducing a PAPR capability to enable this, it would
+> > actually be better to check that here, rather than the runtime state.
+> > That leads to less cases and easier to understand semantics for the
+> > migration stream.  
+> 
+> I am fine with this approach as well.
+> 
+> >   
+> >> +}
+> >> +
+> >> +static const VMStateDescription vmstate_spapr_machine_check = {
+> >> +    .name = "spapr_machine_check",
+> >> +    .version_id = 1,
+> >> +    .minimum_version_id = 1,
+> >> +    .needed = spapr_fwnmi_needed,
+> >> +    .fields = (VMStateField[]) {
+> >> +        VMSTATE_UINT64(guest_machine_check_addr, SpaprMachineState),
+> >> +        VMSTATE_INT32(mc_status, SpaprMachineState),
+> >> +        VMSTATE_END_OF_LIST()
+> >> +    },
+> >> +};
+> >> +
+> >>  static const VMStateDescription vmstate_spapr = {
+> >>      .name = "spapr",
+> >>      .version_id = 3,
+> >> @@ -2137,6 +2156,7 @@ static const VMStateDescription vmstate_spapr = {
+> >>          &vmstate_spapr_dtb,
+> >>          &vmstate_spapr_cap_large_decr,
+> >>          &vmstate_spapr_cap_ccf_assist,
+> >> +        &vmstate_spapr_machine_check,
+> >>          NULL
+> >>      }
+> >>  };
+> >> diff --git a/hw/ppc/spapr_events.c b/hw/ppc/spapr_events.c
+> >> index 573c0b7..35e21e4 100644
+> >> --- a/hw/ppc/spapr_events.c
+> >> +++ b/hw/ppc/spapr_events.c
+> >> @@ -41,6 +41,7 @@
+> >>  #include "qemu/bcd.h"
+> >>  #include "hw/ppc/spapr_ovec.h"
+> >>  #include <libfdt.h>
+> >> +#include "migration/blocker.h"
+> >>  
+> >>  #define RTAS_LOG_VERSION_MASK                   0xff000000
+> >>  #define   RTAS_LOG_VERSION_6                    0x06000000
+> >> @@ -855,6 +856,22 @@ static void spapr_mce_dispatch_elog(PowerPCCPU *cpu, bool recovered)
+> >>  void spapr_mce_req_event(PowerPCCPU *cpu, bool recovered)
+> >>  {
+> >>      SpaprMachineState *spapr = SPAPR_MACHINE(qdev_get_machine());
+> >> +    int ret;
+> >> +    Error *local_err = NULL;
+> >> +
+> >> +    error_setg(&spapr->fwnmi_migration_blocker,
+> >> +            "Live migration not supported during machine check handling");
+> >> +    ret = migrate_add_blocker(spapr->fwnmi_migration_blocker, &local_err);
+> >> +    if (ret < 0) {
+> >> +        /*
+> >> +         * We don't want to abort and let the migration to continue. In a
+> >> +         * rare case, the machine check handler will run on the target
+> >> +         * hardware. Though this is not preferable, it is better than aborting
+> >> +         * the migration or killing the VM.
+> >> +         */
+> >> +        error_free(spapr->fwnmi_migration_blocker);  
+> > 
+> > You should set fwnmi_migration_blocker to NULL here as well.  
+> 
+> ok.
+> 
+> > 
+> > As mentioned on an earlier iteration, the migration blocker is the
+> > same every time.  Couldn't you just create it once and free at final
+> > teardown, rather than recreating it for every NMI?  
+> 
+> That means, we create the error string at the time when ibm,nmi-register
+> is invoked and tear it down during machine reset?
+> 
 
-Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-Reviewed-by: Aleksandar Rikalo <arikalo@wavecomp.com>
-Message-Id: <1559745316-1454-4-git-send-email-aleksandar.markovic@rt-rk.com>
----
- target/mips/msa_helper.c | 44 ++++++++++++++++++++++++++++++++++++++++----
- 1 file changed, 40 insertions(+), 4 deletions(-)
+No, I think David is asking to create the error string during machine init,
+for all the machine lifetime. In which case, we don't even need to call
+error_free() at all.
 
-diff --git a/target/mips/msa_helper.c b/target/mips/msa_helper.c
-index 7b73e22..a861155 100644
---- a/target/mips/msa_helper.c
-+++ b/target/mips/msa_helper.c
-@@ -268,10 +268,6 @@ void helper_msa_ ## FUNC(CPUMIPSState *env, uint32_t wd, uint32_t ws,   \
-     }                                                                   \
- }
- 
--MSA_FN_VECTOR(and_v, pwd->d[i], pws->d[i] & pwt->d[i])
--MSA_FN_VECTOR(or_v, pwd->d[i], pws->d[i] | pwt->d[i])
--MSA_FN_VECTOR(nor_v, pwd->d[i], ~(pws->d[i] | pwt->d[i]))
--MSA_FN_VECTOR(xor_v, pwd->d[i], pws->d[i] ^ pwt->d[i])
- MSA_FN_VECTOR(bmnz_v, pwd->d[i],
-         BIT_MOVE_IF_NOT_ZERO(pwd->d[i], pws->d[i], pwt->d[i], DF_DOUBLE))
- MSA_FN_VECTOR(bmz_v, pwd->d[i],
-@@ -283,6 +279,46 @@ MSA_FN_VECTOR(bsel_v, pwd->d[i],
- #undef BIT_SELECT
- #undef MSA_FN_VECTOR
- 
-+void helper_msa_and_v(CPUMIPSState *env, uint32_t wd, uint32_t ws, uint32_t wt)
-+{
-+    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
-+    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
-+    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
-+
-+    pwd->d[0] = pws->d[0] & pwt->d[0];
-+    pwd->d[1] = pws->d[1] & pwt->d[1];
-+}
-+
-+void helper_msa_or_v(CPUMIPSState *env, uint32_t wd, uint32_t ws, uint32_t wt)
-+{
-+    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
-+    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
-+    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
-+
-+    pwd->d[0] = pws->d[0] | pwt->d[0];
-+    pwd->d[1] = pws->d[1] | pwt->d[1];
-+}
-+
-+void helper_msa_nor_v(CPUMIPSState *env, uint32_t wd, uint32_t ws, uint32_t wt)
-+{
-+    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
-+    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
-+    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
-+
-+    pwd->d[0] = ~(pws->d[0] | pwt->d[0]);
-+    pwd->d[1] = ~(pws->d[1] | pwt->d[1]);
-+}
-+
-+void helper_msa_xor_v(CPUMIPSState *env, uint32_t wd, uint32_t ws, uint32_t wt)
-+{
-+    wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
-+    wr_t *pws = &(env->active_fpu.fpr[ws].wr);
-+    wr_t *pwt = &(env->active_fpu.fpr[wt].wr);
-+
-+    pwd->d[0] = pws->d[0] ^ pwt->d[0];
-+    pwd->d[1] = pws->d[1] ^ pwt->d[1];
-+}
-+
- static inline int64_t msa_addv_df(uint32_t df, int64_t arg1, int64_t arg2)
- {
-     return arg1 + arg2;
--- 
-2.7.4
+> Regards,
+> Aravinda
+> 
+> >   
+> >> +        warn_report_err(local_err);
+> >> +    }
+> >>  
+> >>      while (spapr->mc_status != -1) {
+> >>          /*
+> >> diff --git a/hw/ppc/spapr_rtas.c b/hw/ppc/spapr_rtas.c
+> >> index 91a7ab9..c849223 100644
+> >> --- a/hw/ppc/spapr_rtas.c
+> >> +++ b/hw/ppc/spapr_rtas.c
+> >> @@ -50,6 +50,7 @@
+> >>  #include "target/ppc/mmu-hash64.h"
+> >>  #include "target/ppc/mmu-book3s-v3.h"
+> >>  #include "kvm_ppc.h"
+> >> +#include "migration/blocker.h"
+> >>  
+> >>  static void rtas_display_character(PowerPCCPU *cpu, SpaprMachineState *spapr,
+> >>                                     uint32_t token, uint32_t nargs,
+> >> @@ -404,6 +405,9 @@ static void rtas_ibm_nmi_interlock(PowerPCCPU *cpu,
+> >>          spapr->mc_status = -1;
+> >>          qemu_cond_signal(&spapr->mc_delivery_cond);
+> >>          rtas_st(rets, 0, RTAS_OUT_SUCCESS);
+> >> +        migrate_del_blocker(spapr->fwnmi_migration_blocker);
+> >> +        error_free(spapr->fwnmi_migration_blocker);
+> >> +        spapr->fwnmi_migration_blocker = NULL;
+> >>      }
+> >>  }
+> >>  
+> >> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+> >> index bd75d4b..6c0cfd8 100644
+> >> --- a/include/hw/ppc/spapr.h
+> >> +++ b/include/hw/ppc/spapr.h
+> >> @@ -214,6 +214,8 @@ struct SpaprMachineState {
+> >>      SpaprCapabilities def, eff, mig;
+> >>  
+> >>      unsigned gpu_numa_id;
+> >> +
+> >> +    Error *fwnmi_migration_blocker;
+> >>  };
+> >>  
+> >>  #define H_SUCCESS         0
+> >>  
+> >   
+> 
 
 
