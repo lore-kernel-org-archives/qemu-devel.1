@@ -2,92 +2,92 @@ Return-Path: <SRS0=9X/F=UF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6CE7DC04AB5
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 20:45:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AA058C04AB5
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 20:58:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D7C45207E0
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 20:45:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 762AA208C3
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 20:58:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="OstXaOiP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D7C45207E0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="up72pTzQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 762AA208C3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37034 helo=lists.gnu.org)
+Received: from localhost ([::1]:38628 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hYzFw-0000oY-Lh
-	for qemu-devel@archiver.kernel.org; Thu, 06 Jun 2019 16:45:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44421)
+	id 1hYzSV-000409-Fb
+	for qemu-devel@archiver.kernel.org; Thu, 06 Jun 2019 16:58:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47341)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <richard.henderson@linaro.org>) id 1hYzEN-0000LD-9g
- for qemu-devel@nongnu.org; Thu, 06 Jun 2019 16:43:28 -0400
+ (envelope-from <shorne@gmail.com>) id 1hYzRV-0003Xq-Hc
+ for qemu-devel@nongnu.org; Thu, 06 Jun 2019 16:57:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1hYzEM-0008TL-DP
- for qemu-devel@nongnu.org; Thu, 06 Jun 2019 16:43:27 -0400
-Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:35132)
+ (envelope-from <shorne@gmail.com>) id 1hYzRU-0007sB-6i
+ for qemu-devel@nongnu.org; Thu, 06 Jun 2019 16:57:01 -0400
+Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:37133)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1hYzEM-0008LY-5W
- for qemu-devel@nongnu.org; Thu, 06 Jun 2019 16:43:26 -0400
-Received: by mail-oi1-x244.google.com with SMTP id y6so2600262oix.2
- for <qemu-devel@nongnu.org>; Thu, 06 Jun 2019 13:43:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=ZHurbQIi7RvE8tR+KYE0KZJK4mjg7hO9GnvBF9ABeTs=;
- b=OstXaOiPEVtCMNnGU9I9Tf/+Bjs7/XlDU0YIwWujYXXJ0bU5oGZsiT86gTxv3q7oXv
- bwr+7YbSCw6Xlg+Fa2QCdXxR6D/N4BERNbKc2TwokqfUwzqDfxIJYxem9ei90ARU8ZPd
- aBpHnlxqulidSTUFvRXSGnhvKifzvZUGLWtDN/axsIUUuaCNAoHakwlaryS4GN3tkyIv
- +fz+YFpQ03PMDnix6zBmkBblnM6Tik6s3LA8hjTBtVt1DuNHG716fbnxyzmUGVB7Mlen
- Tkl9EjosV3KqCzmdhzzwbpOblWBoE9HAquUlsfXZXDI4EZKt5RQnwb7CH5Rl+hwaZ7+Y
- AbMw==
+ (Exim 4.71) (envelope-from <shorne@gmail.com>) id 1hYzRT-0007cp-QF
+ for qemu-devel@nongnu.org; Thu, 06 Jun 2019 16:57:00 -0400
+Received: by mail-pg1-x542.google.com with SMTP id 20so2026524pgr.4
+ for <qemu-devel@nongnu.org>; Thu, 06 Jun 2019 13:56:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:content-transfer-encoding:in-reply-to
+ :user-agent; bh=+yFU2XklpJN/BGpwwTA3GKba4zr29TgNk6pSAhQ4H6A=;
+ b=up72pTzQebU7SHLqz9Pi3CJsbG/mhiKew5t4Do0lA6tL4eFU5XzGKfVnHvgHCJ/nx1
+ IOh0o3o0IinA54fet5Rwv+yntk/idrscCgsZapmZaGo6lEYIwIOS4CV7VxLexsAD6Ys0
+ TJ1LQAERs9UoW0nFj+vzoBsMvY4KE5sREJHaPuTz0Y/WIQJY6O0TLwLzJSnEAx3x2lsp
+ yOQt4ydLhIyGSlVR9KargTpeBb5c42xDoq60vRZl+p5knM5EPUdCsJPu4cv3wJQfj0F5
+ 8VOxJjtLSp/X2AoAJtrs/VN+gARrfSNJ8/syQA9bgs2zpL9lG8R+vrhe2nHy1AIluGFn
+ bNhQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=ZHurbQIi7RvE8tR+KYE0KZJK4mjg7hO9GnvBF9ABeTs=;
- b=oD4cinA+zC3rdZ739IDZ5siPPvBxopm3R5FPqO87eOInmd9Xui+FJ+G+JNLyjLbZBy
- 7ZJN6Yn8wSWZxRLcfkh/sfqVTcxlH1Lan/bxKtqQe8vTVqqWG11LYAbv1iKfmBM5KVpt
- /7Gs81CO/D6qfpSKhY3nhwvB2+MZQCf13lNTenT1Ce6GIgDTc966tBa2cyDtM5jlAW5V
- 3paNTIOlnyGchXZFfnoddTxBD+1il5KLfPM4YcAIEXAdXJl16NAHyBGRkpf/k14meyUe
- DYZqHsgva68BGjcgp++3P1hILN29UTCQ/r08exw+nUZFp06iLe/fU1ZzGnSNHiGEp0bZ
- taEw==
-X-Gm-Message-State: APjAAAVoaF8uZt4L1FCPF8eK1YigzIwxRPr0DrrnwqXIjxLuP0Jhw15F
- H8flF8El4kp4gGLLbOAGyy7kYw==
-X-Google-Smtp-Source: APXvYqxtqoCHtCiLnzCO883U8n7ftvWXvOY7jyBXRuUcgo/zzBtGUC0mtHqJbgkTxc1SrjzubjD1AQ==
-X-Received: by 2002:aca:3545:: with SMTP id c66mr1467000oia.129.1559853804650; 
- Thu, 06 Jun 2019 13:43:24 -0700 (PDT)
-Received: from [192.168.3.43] (200-56-192-86-cable.cybercable.net.mx.
- [200.56.192.86])
- by smtp.gmail.com with ESMTPSA id q125sm1094590oih.33.2019.06.06.13.43.23
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Thu, 06 Jun 2019 13:43:24 -0700 (PDT)
-To: Stefan Brankovic <stefan.brankovic@rt-rk.com>, qemu-devel@nongnu.org
-References: <1559816130-17113-1-git-send-email-stefan.brankovic@rt-rk.com>
- <1559816130-17113-9-git-send-email-stefan.brankovic@rt-rk.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <7879c550-f333-7703-e47f-ca734ad47bf7@linaro.org>
-Date: Thu, 6 Jun 2019 15:43:19 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:content-transfer-encoding
+ :in-reply-to:user-agent;
+ bh=+yFU2XklpJN/BGpwwTA3GKba4zr29TgNk6pSAhQ4H6A=;
+ b=S0zU6JnnM/9Nvl5XCCPpQhJzocbS7qVNOwUKMWvSMU44T4mO+IicsWdjywsBdHJMTI
+ BuFbTtC64LXYoZ1ivJM6bHbSSVqxM/oEyx6RKYUWH5I/k4EEDXDv9WhZouOArLJ5RtUC
+ MLlvpF7u3zxii8NQS2bmgTVgDRMjcPIQbWqP7SWM4kTUBC8UxZQ8F0o1LhHfHJmiWvp/
+ MT/Xez5hw/0uQipwqTCEv86M1PlFLQ4DzXIzsnGmbSh8tiKy0eW/YVE6TfWK7AxuZQVh
+ Lq1OwL2a66A39VXV3ULbTbQck4jYR+8RfNPZjEEvAg5Rf36T8VvRtTgiHilbO2Gpw/m9
+ zOZQ==
+X-Gm-Message-State: APjAAAVg/x0vjqKuRN/trxEE8G6Xx2G8NCH8unalrlrbyHnsbrLBu5c2
+ FJGKejSS8dFxNLN2gpNc/u4=
+X-Google-Smtp-Source: APXvYqyj+9n/nKFDhN53Ln57L/BzKtonkZVdEUJ7LEw5+seG4mPNnpRTMDdZ9ify1SxfDRrj6gpErQ==
+X-Received: by 2002:a63:5d54:: with SMTP id o20mr405924pgm.97.1559854615296;
+ Thu, 06 Jun 2019 13:56:55 -0700 (PDT)
+Received: from localhost (g30.211-19-85.ppp.wakwak.ne.jp. [211.19.85.30])
+ by smtp.gmail.com with ESMTPSA id v126sm50642pfb.81.2019.06.06.13.56.54
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Thu, 06 Jun 2019 13:56:54 -0700 (PDT)
+Date: Fri, 7 Jun 2019 05:56:52 +0900
+From: Stafford Horne <shorne@gmail.com>
+To: Markus Armbruster <armbru@redhat.com>
+Message-ID: <20190606205652.GE3379@lianli.shorne-pla.net>
+References: <20190529150853.9772-1-armbru@redhat.com>
+ <20190529150853.9772-3-armbru@redhat.com>
+ <20190531033601.GB3379@lianli.shorne-pla.net>
+ <30db7d52-b304-da2d-f84d-42a57dc28135@redhat.com>
+ <20190604103349.GD3379@lianli.shorne-pla.net>
+ <875zpik5qa.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <1559816130-17113-9-git-send-email-stefan.brankovic@rt-rk.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=iso-8859-1; format=flowed
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <875zpik5qa.fsf@dusky.pond.sub.org>
+User-Agent: Mutt/1.11.4 (2019-03-13)
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::244
-Subject: Re: [Qemu-devel] [PATCH 8/8] target/ppc: Refactor emulation of
- vmrgew and vmrgow instructions
+X-Received-From: 2607:f8b0:4864:20::542
+Subject: Re: [Qemu-devel] [PATCH 2/3] MAINTAINERS: Improve section headlines
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,50 +99,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: david@gibson.dropbear.id.au
+Cc: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/6/19 5:15 AM, Stefan Brankovic wrote:
-> +/*
-> + * We use this macro if one instruction is realized with direct
-> + * translation, and second one with helper.
-> + */
-> +#define GEN_VXFORM_TRANS_DUAL(name0, flg0, flg2_0, name1, flg1, flg2_1)\
-> +static void glue(gen_, name0##_##name1)(DisasContext *ctx)             \
-> +{                                                                      \
-> +    if ((Rc(ctx->opcode) == 0) &&                                      \
-> +        ((ctx->insns_flags & flg0) || (ctx->insns_flags2 & flg2_0))) { \
-> +        trans_##name0(ctx);                                            \
-> +    } else if ((Rc(ctx->opcode) == 1) &&                               \
-> +        ((ctx->insns_flags & flg1) || (ctx->insns_flags2 & flg2_1))) { \
-> +        gen_##name1(ctx);                                              \
-> +    } else {                                                           \
-> +        gen_inval_exception(ctx, POWERPC_EXCP_INVAL_INVAL);            \
-> +    }                                                                  \
-> +}
-> +
->  /* Adds support to provide invalid mask */
->  #define GEN_VXFORM_DUAL_EXT(name0, flg0, flg2_0, inval0,                \
->                              name1, flg1, flg2_1, inval1)                \
-> @@ -431,20 +449,13 @@ GEN_VXFORM(vmrglb, 6, 4);
->  GEN_VXFORM(vmrglh, 6, 5);
->  GEN_VXFORM(vmrglw, 6, 6);
->  
-> -static void gen_vmrgew(DisasContext *ctx)
-> +static void trans_vmrgew(DisasContext *ctx)
->  {
-> -    TCGv_i64 tmp;
-> -    TCGv_i64 avr;
-> -    int VT, VA, VB;
-> -    if (unlikely(!ctx->altivec_enabled)) {
-> -        gen_exception(ctx, POWERPC_EXCP_VPU);
-> -        return;
-> -    }
+On Thu, Jun 06, 2019 at 07:01:49PM +0200, Markus Armbruster wrote:
+>Stafford Horne <shorne@gmail.com> writes:
+>
+>> On Mon, Jun 03, 2019 at 10:45:14AM +0200, Philippe Mathieu-Daudé wrote:
+>>> On 5/31/19 5:36 AM, Stafford Horne wrote:
+>>> > On Wed, May 29, 2019 at 05:08:52PM +0200, Markus Armbruster wrote:
+>>> >> When scripts/get_maintainer.pl reports something like
+>>> >>
+>>> >>     John Doe <jdoe@example.org> (maintainer:Overall)
+>>> >>
+>>> >> the user is left to wonder *which* of our three "Overall" sections
+>>> >> applies.  We have three, one each under "Guest CPU cores (TCG)",
+>>> >> "Guest CPU Cores (KVM)", and "Overall usermode emulation".
+>>> >>
+>>> >> Rename sections under
+>>> >>
+>>> >> * "Guest CPU cores (TCG)" from "FOO" to "FOO CPU cores (TCG)"
+>>> >>
+>>> >> * "Guest CPU Cores (KVM)" from "FOO" to "FOO CPU cores (KVM)"
+>>> >>
+>>> >> * "Guest CPU Cores (Xen)" from "FOO" to "FOO CPU cores (Xen)"
+>>> >>
+>>> >> * "Architecture support" from "FOO" to "FOO general architecture
+>>> >>   support"
+>>> >>
+>>> >> * "Tiny Code Generator (TCG)" from "FOO target" to "FOO TCG target"
+>>> >>
+>>> >> While there,
+>>> >>
+>>> >> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>>> >> ---
+>>> >>  MAINTAINERS | 78 ++++++++++++++++++++++++++---------------------------
+>>> >>  1 file changed, 39 insertions(+), 39 deletions(-)
+>>> >
+>>> > ...
+>>> >
+>>> >> -OpenRISC
+>>> >> +OpenRISC CPU cores (TCG)
+>>> >>  M: Stafford Horne <shorne@gmail.com>
+>>> >>  S: Odd Fixes
+>>> >>  F: target/openrisc/
+>>> >>  F: hw/openrisc/
+>>> >>  F: tests/tcg/openrisc/
+>>> >>
+>>> >
+>>> > As directories listed there I look over both target/ (TCG?) and hw/.
+>>> > Would it be better to be 'OpenRISC general architecture'?
+>>>
+>>> There is a historical separation between target/ and hw/ because they
+>>> cover different concepts, and have different maintainers/reviewers.
+>>>
+>>> - target/$arch/ is for TCG/KVM
+>>> - hw/ is for machines and their devices
+>>>   (some devices are reused by multiple archs)
+>>>
+>>> Although the separation is not always clear (some devices are tied to an
+>>> architecture, some architecture instruction directly access devices) I'd
+>>> prefer we keep 2 distincts MAINTAINERS sections (keeping you maintainer
+>>> of both). This will ease developper with specific background/interests
+>>> to volunteer to a particular section.
+>>
+>> Hello,
+>>
+>> Thanks for the explaination.  I think it makes sense to have 2 different
+>> maintainer sections.  In that case should this patch be amended to move the
+>> 'F: hw/openrisc/' etc out to a different section with the different header?
+>
+>This patch merely improves headlines.  Splitting up the OpenRISC section
+>above should be separate.  Care to send the patch?
 
-This appears to drop the check for altivec_enabled.
+Sure, now that I look at it, there is a section for 'OpenRISC Machines' and the
+maintainer is out of date.
 
-
-r~
+-Stafford
 
