@@ -2,66 +2,77 @@ Return-Path: <SRS0=9X/F=UF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.5 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	UNWANTED_LANGUAGE_BODY autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CED9C04AB5
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 23:29:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3377CC04AB5
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 23:36:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 63D8520868
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 23:29:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 63D8520868
+	by mail.kernel.org (Postfix) with ESMTPS id D46E720868
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 23:36:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D46E720868
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44974 helo=lists.gnu.org)
+Received: from localhost ([::1]:45006 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hZ1pA-0006D4-Nq
-	for qemu-devel@archiver.kernel.org; Thu, 06 Jun 2019 19:29:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45108)
+	id 1hZ1vw-00086W-Ul
+	for qemu-devel@archiver.kernel.org; Thu, 06 Jun 2019 19:36:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46295)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <crosa@redhat.com>) id 1hZ1oH-0005oA-IX
- for qemu-devel@nongnu.org; Thu, 06 Jun 2019 19:28:42 -0400
+ (envelope-from <philmd@redhat.com>) id 1hZ1uP-0007Q0-Oa
+ for qemu-devel@nongnu.org; Thu, 06 Jun 2019 19:35:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <crosa@redhat.com>) id 1hZ1oF-0008QL-GG
- for qemu-devel@nongnu.org; Thu, 06 Jun 2019 19:28:41 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48936)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <crosa@redhat.com>) id 1hZ1oE-0008Mq-LK
- for qemu-devel@nongnu.org; Thu, 06 Jun 2019 19:28:39 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id C11783081252;
- Thu,  6 Jun 2019 23:28:33 +0000 (UTC)
-Received: from dhcp-17-47.bos.redhat.com (dhcp-17-47.bos.redhat.com
- [10.18.17.47])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id DE0977E687;
- Thu,  6 Jun 2019 23:28:30 +0000 (UTC)
-Date: Thu, 6 Jun 2019 19:28:28 -0400
-From: Cleber Rosa <crosa@redhat.com>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
-Message-ID: <20190606232828.GA30644@dhcp-17-47.bos.redhat.com>
-References: <20190606230232.9888-1-philmd@redhat.com>
- <20190606230232.9888-3-philmd@redhat.com>
+ (envelope-from <philmd@redhat.com>) id 1hZ1uN-0000s9-OF
+ for qemu-devel@nongnu.org; Thu, 06 Jun 2019 19:35:01 -0400
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:43917)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hZ1uL-0000oH-S2
+ for qemu-devel@nongnu.org; Thu, 06 Jun 2019 19:34:59 -0400
+Received: by mail-wr1-f68.google.com with SMTP id r18so290872wrm.10
+ for <qemu-devel@nongnu.org>; Thu, 06 Jun 2019 16:34:56 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=ohX5dO1S3F1UEXL9KGCGLISev2OwPzeptWW2jNr/7GY=;
+ b=GLTMVNQp62aYIKGS6GJHohAGZttBwtPE4hfU44jQS5R3E5igdeYbmUHOuzLv2N1RKN
+ 6MhNahezz9kiqimWzyayVE5G6JDxsr/x2QXLJNi7YhxFMwV7fUFHX6NlJy7EXybXpCFA
+ 1/pTVZ1NJ68ekCgtL9H656G+GKRkWoF9qdZI/k/Dl4aUaecHywXNMMnw3pQnYGFDFBJq
+ jRXp5C5FjTpwvgc2kuXG66oy6rJP1anetNbZyWNyA2lkAWFLm0+AGxrgdS1jfhpjkRaF
+ MOYEU+vKJtZTxRRiAoEesV2/THZwNAIZ22v/cJEjrtE2ZeOCNW5QZnapiGwg/9tIR0K1
+ YZXw==
+X-Gm-Message-State: APjAAAWB+TH2GWsxar5ak+18ezJWgY2v7OuI34DAGNQMm/ylE/POLLZd
+ arYpcEISUqJuxEIO1RA2xNSTmQ==
+X-Google-Smtp-Source: APXvYqw3KWiV2eta09ZBNCDD/rXHC/ac1O1L40o4wQkKhCByOONfiS/sZC8nT9J1zzUKWwR5/hSwlw==
+X-Received: by 2002:adf:c541:: with SMTP id s1mr17165822wrf.44.1559864095132; 
+ Thu, 06 Jun 2019 16:34:55 -0700 (PDT)
+Received: from [192.168.0.156] ([78.192.181.46])
+ by smtp.gmail.com with ESMTPSA id d17sm308019wrx.9.2019.06.06.16.34.54
+ (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+ Thu, 06 Jun 2019 16:34:54 -0700 (PDT)
+To: Eddie James <eajames@linux.ibm.com>, qemu-arm@nongnu.org
+References: <1559599768-9176-1-git-send-email-eajames@linux.ibm.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+ url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <29f493c1-ac0c-684f-a33e-8226be8db48b@redhat.com>
+Date: Fri, 7 Jun 2019 01:34:54 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20190606230232.9888-3-philmd@redhat.com>
-User-Agent: Mutt/1.11.4 (2019-03-13)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.49]); Thu, 06 Jun 2019 23:28:36 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <1559599768-9176-1-git-send-email-eajames@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v3 2/2] BootLinuxConsoleTest: Run
- kerneltests BusyBox on Malta
+ [fuzzy]
+X-Received-From: 209.85.221.68
+Subject: Re: [Qemu-devel] [PATCH] hw: misc: Add Aspeed XDMA device
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,127 +84,333 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>,
- Aleksandar Rikalo <arikalo@wavecomp.com>,
- Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>,
- qemu-devel@nongnu.org, Aleksandar Markovic <amarkovic@wavecomp.com>,
- Aurelien Jarno <aurelien@aurel32.net>
+Cc: andrew@aj.id.au, peter.maydell@linaro.org, joel@jms.id.au,
+ qemu-devel@nongnu.org, clg@kaod.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Jun 07, 2019 at 01:02:32AM +0200, Philippe Mathieu-Daud=E9 wrote:
-> From: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
->=20
-> This tests boots a Linux kernel on a Malta machine up to a
-> busybox shell on the serial console. Few commands are executed
-> before halting the machine (via reboot).
->=20
-> We use the initrd cpio image from the kerneltests project:
-> https://kerneltests.org/
->=20
-> If MIPS is a target being built, "make check-acceptance" will
-> automatically include this test by the use of the "arch:mips" tags.
->=20
-> Alternatively, this test can be run using:
->=20
->   $ avocado --show=3Dconsole run -t arch:mips tests/acceptance/boot_lin=
-ux_console.py
->   [...]
->   console: Boot successful.
->   [...]
->   console: / # uname -a
->   console: Linux buildroot 4.5.0-2-4kc-malta #1 Debian 4.5.5-1 (2016-05=
--29) mips GNU/Linux
->   console: / # reboot
->   console: / # reboot: Restarting system
->=20
-> Signed-off-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
-> Acked-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-> Tested-by: Cleber Rosa <crosa@redhat.com>
-> ---
-> v3: Use archive.extract() instead of shutil+gzip (Cleber)
-> ---
->  tests/acceptance/boot_linux_console.py | 44 ++++++++++++++++++++++++++
->  1 file changed, 44 insertions(+)
->=20
-> diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/=
-boot_linux_console.py
-> index a7a735c90d..751e3bff86 100644
-> --- a/tests/acceptance/boot_linux_console.py
-> +++ b/tests/acceptance/boot_linux_console.py
-> @@ -49,6 +49,11 @@ class BootLinuxConsole(Test):
->                  fail =3D 'Failure message found in console: %s' % fail=
-ure_message
->                  self.fail(fail)
-> =20
-> +    def exec_command_and_wait_for_pattern(self, command, success_messa=
-ge):
-> +        command +=3D '\n'
-> +        self.vm.console_socket.sendall(command.encode())
-> +        self.wait_for_console_pattern(success_message)
-> +
->      def extract_from_deb(self, deb, path):
->          """
->          Extracts a file from a deb package into the test workdir
-> @@ -140,6 +145,45 @@ class BootLinuxConsole(Test):
->          console_pattern =3D 'Kernel command line: %s' % kernel_command=
-_line
->          self.wait_for_console_pattern(console_pattern)
-> =20
-> +    def test_mips_malta_cpio(self):
-> +        """
-> +        :avocado: tags=3Darch:mips
-> +        :avocado: tags=3Dmachine:malta
-> +        :avocado: tags=3Dendian:big
-> +        """
-> +        deb_url =3D ('http://snapshot.debian.org/archive/debian/'
-> +                   '20160601T041800Z/pool/main/l/linux/'
-> +                   'linux-image-4.5.0-2-4kc-malta_4.5.5-1_mips.deb')
-> +        deb_hash =3D 'a3c84f3e88b54e06107d65a410d1d1e8e0f340f8'
-> +        deb_path =3D self.fetch_asset(deb_url, asset_hash=3Ddeb_hash)
-> +        kernel_path =3D self.extract_from_deb(deb_path,
-> +                                            '/boot/vmlinux-4.5.0-2-4kc=
--malta')
-> +        initrd_url =3D ('https://github.com/groeck/linux-build-test/ra=
-w/'
-> +                      '8584a59ed9e5eb5ee7ca91f6d74bbb06619205b8/rootfs=
-/'
-> +                      'mips/rootfs.cpio.gz')
-> +        initrd_hash =3D 'bf806e17009360a866bf537f6de66590de349a99'
-> +        initrd_path_gz =3D self.fetch_asset(initrd_url, asset_hash=3Di=
-nitrd_hash)
-> +        initrd_path =3D archive.extract(initrd_path_gz,
-> +                                      os.path.join(self.workdir, 'root=
-fs.cpio'))
-> +        self.vm.set_machine('malta')
-> +        self.vm.set_console()
-> +        kernel_command_line =3D (self.KERNEL_COMMON_COMMAND_LINE
-> +                               + 'console=3DttyS0 console=3Dtty '
-> +                               + 'rdinit=3D/sbin/init noreboot')
-> +        self.vm.add_args('-kernel', kernel_path,
-> +                         '-initrd', initrd_path,
-> +                         '-append', kernel_command_line,
-> +                         '-no-reboot')
-> +        self.vm.launch()
-> +        self.wait_for_console_pattern('Boot successful.')
-> +
-> +        self.exec_command_and_wait_for_pattern('cat /proc/cpuinfo',
-> +                                               'BogoMIPS')
-> +        self.exec_command_and_wait_for_pattern('uname -a',
-> +                                               'Debian')
-> +        self.exec_command_and_wait_for_pattern('reboot',
-> +                                               'reboot: Restarting sys=
-tem')
-> +
->      def do_test_mips_malta32el_nanomips(self, kernel_url, kernel_hash)=
-:
->          kernel_path_xz =3D self.fetch_asset(kernel_url, asset_hash=3Dk=
-ernel_hash)
->          kernel_path =3D self.workdir + "kernel"
-> --=20
-> 2.20.1
->=20
+Hi Eddie,
 
-Reviewed-by: Cleber Rosa <crosa@redhat.com>
+On 6/4/19 12:09 AM, Eddie James wrote:
+> The XDMA engine embedded in the Aspeed SOCs performs PCI DMA operations
+> between the SOC (acting as a BMC) and a host processor in a server.
+
+If I got your model correctly, it does no DMA operation but simply
+answer correctly to the BMC, and set 'operation done' IRQ with no delay.
+So this is a dummy device. Then it would be more useful having ignored
+DMA ops traced with trace-events.
+
+> 
+> The XDMA engine exists on the AST2400, AST2500, and AST2600 SOCs, so
+> enable it for all of those.
+> 
+> Signed-off-by: Eddie James <eajames@linux.ibm.com>
+> ---
+>  hw/arm/aspeed_soc.c           |  14 ++++
+>  hw/misc/Makefile.objs         |   2 +-
+>  hw/misc/aspeed_xdma.c         | 156 ++++++++++++++++++++++++++++++++++++++++++
+>  include/hw/arm/aspeed_soc.h   |   2 +
+>  include/hw/misc/aspeed_xdma.h |  31 +++++++++
+>  5 files changed, 204 insertions(+), 1 deletion(-)
+>  create mode 100644 hw/misc/aspeed_xdma.c
+>  create mode 100644 include/hw/misc/aspeed_xdma.h
+> 
+> diff --git a/hw/arm/aspeed_soc.c b/hw/arm/aspeed_soc.c
+> index faff42b..b25bb18 100644
+> --- a/hw/arm/aspeed_soc.c
+> +++ b/hw/arm/aspeed_soc.c
+> @@ -31,6 +31,7 @@
+>  #define ASPEED_SOC_VIC_BASE         0x1E6C0000
+>  #define ASPEED_SOC_SDMC_BASE        0x1E6E0000
+>  #define ASPEED_SOC_SCU_BASE         0x1E6E2000
+> +#define ASPEED_SOC_XDMA_BASE        0x1E6E7000
+>  #define ASPEED_SOC_SRAM_BASE        0x1E720000
+>  #define ASPEED_SOC_TIMER_BASE       0x1E782000
+>  #define ASPEED_SOC_WDT_BASE         0x1E785000
+> @@ -159,6 +160,9 @@ static void aspeed_soc_init(Object *obj)
+>  
+>      sysbus_init_child_obj(obj, "ftgmac100", OBJECT(&s->ftgmac100),
+>                            sizeof(s->ftgmac100), TYPE_FTGMAC100);
+> +
+> +    sysbus_init_child_obj(obj, "xdma", OBJECT(&s->xdma), sizeof(s->xdma),
+> +                          TYPE_ASPEED_XDMA);
+>  }
+>  
+>  static void aspeed_soc_realize(DeviceState *dev, Error **errp)
+> @@ -298,6 +302,16 @@ static void aspeed_soc_realize(DeviceState *dev, Error **errp)
+>      sysbus_mmio_map(SYS_BUS_DEVICE(&s->ftgmac100), 0, ASPEED_SOC_ETH1_BASE);
+>      sysbus_connect_irq(SYS_BUS_DEVICE(&s->ftgmac100), 0,
+>                         qdev_get_gpio_in(DEVICE(&s->vic), 2));
+> +
+> +    /* XDMA */
+> +    object_property_set_bool(OBJECT(&s->xdma), true, "realized", &err);
+> +    if (err) {
+> +        error_propagate(errp, err);
+> +        return;
+> +    }
+> +    sysbus_mmio_map(SYS_BUS_DEVICE(&s->xdma), 0, ASPEED_SOC_XDMA_BASE);
+> +    sysbus_connect_irq(SYS_BUS_DEVICE(&s->xdma), 0,
+> +                       qdev_get_gpio_in(DEVICE(&s->vic), 6));
+>  }
+>  
+>  static void aspeed_soc_class_init(ObjectClass *oc, void *data)
+> diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
+> index 77b9df9..a4483af 100644
+> --- a/hw/misc/Makefile.objs
+> +++ b/hw/misc/Makefile.objs
+> @@ -74,7 +74,7 @@ obj-$(CONFIG_ARMSSE_MHU) += armsse-mhu.o
+>  
+>  obj-$(CONFIG_PVPANIC) += pvpanic.o
+>  obj-$(CONFIG_AUX) += auxbus.o
+> -obj-$(CONFIG_ASPEED_SOC) += aspeed_scu.o aspeed_sdmc.o
+> +obj-$(CONFIG_ASPEED_SOC) += aspeed_scu.o aspeed_sdmc.o aspeed_xdma.o
+>  obj-$(CONFIG_MSF2) += msf2-sysreg.o
+>  obj-$(CONFIG_NRF51_SOC) += nrf51_rng.o
+>  
+> diff --git a/hw/misc/aspeed_xdma.c b/hw/misc/aspeed_xdma.c
+> new file mode 100644
+> index 0000000..fe3a32e
+> --- /dev/null
+> +++ b/hw/misc/aspeed_xdma.c
+> @@ -0,0 +1,156 @@
+> +/*
+> + * ASPEED XDMA Controller
+> + * Eddie James <eajames@linux.ibm.com>
+> + *
+> + * Copyright (C) 2019 IBM Corp
+> + * SPDX-License-Identifer: GPL-2.0-or-later
+> + */
+> +
+> +#include "qemu/osdep.h"
+> +#include "qemu/log.h"
+> +#include "qemu/error-report.h"
+> +#include "hw/misc/aspeed_xdma.h"
+> +#include "qapi/error.h"
+> +
+> +#define XDMA_BMC_CMDQ_ADDR         0x10
+> +#define XDMA_BMC_CMDQ_ENDP         0x14
+> +#define XDMA_BMC_CMDQ_WRP          0x18
+> +#define  XDMA_BMC_CMDQ_W_MASK      0x0003FFFF
+> +#define XDMA_BMC_CMDQ_RDP          0x1C
+> +#define  XDMA_BMC_CMDQ_RDP_MAGIC   0xEE882266
+> +#define XDMA_IRQ_ENG_CTRL          0x20
+> +#define  XDMA_IRQ_ENG_CTRL_US_COMP BIT(4)
+> +#define  XDMA_IRQ_ENG_CTRL_DS_COMP BIT(5)
+> +#define  XDMA_IRQ_ENG_CTRL_W_MASK  0xBFEFF07F
+> +#define XDMA_IRQ_ENG_STAT          0x24
+> +#define  XDMA_IRQ_ENG_STAT_US_COMP BIT(4)
+> +#define  XDMA_IRQ_ENG_STAT_DS_COMP BIT(5)
+> +#define  XDMA_IRQ_ENG_STAT_RESET   0xF8000000
+> +
+> +#define TO_REG(addr) ((addr) / sizeof(uint32_t))
+> +
+> +static uint64_t aspeed_xdma_read(void *opaque, hwaddr addr, unsigned int size)
+> +{
+> +    uint32_t val = 0;
+> +    AspeedXDMAState *xdma = opaque;
+> +
+> +    if (addr < ASPEED_XDMA_REG_SIZE) {
+> +        val = xdma->regs[TO_REG(addr)];
+> +    }
+> +
+> +    return (uint64_t)val;
+> +}
+> +
+> +static void aspeed_xdma_write(void *opaque, hwaddr addr, uint64_t val,
+> +                              unsigned int size)
+> +{
+> +    unsigned int idx;
+> +    uint32_t val32 = (uint32_t)val;
+> +    AspeedXDMAState *xdma = opaque;
+> +
+> +    if (addr >= ASPEED_XDMA_REG_SIZE) {
+> +        return;
+> +    }
+> +
+> +    switch (addr) {
+> +    case XDMA_BMC_CMDQ_ENDP:
+> +        xdma->regs[TO_REG(addr)] = val32 & XDMA_BMC_CMDQ_W_MASK;
+> +        break;
+> +    case XDMA_BMC_CMDQ_WRP:
+> +        idx = TO_REG(addr);
+> +        xdma->regs[idx] = val32 & XDMA_BMC_CMDQ_W_MASK;
+> +        xdma->regs[TO_REG(XDMA_BMC_CMDQ_RDP)] = xdma->regs[idx];
+
+The two previous lines are odd. Are they inverted?
+
+I guess I'd trace here:
+
+           trace_aspeed_xdma_...(val, ...);
+
+> +
+> +        if (xdma->bmc_cmdq_readp_set) {
+> +            xdma->bmc_cmdq_readp_set = 0;
+> +        } else {
+> +            xdma->regs[TO_REG(XDMA_IRQ_ENG_STAT)] |=
+> +                XDMA_IRQ_ENG_STAT_US_COMP | XDMA_IRQ_ENG_STAT_DS_COMP;
+> +
+> +            if (xdma->regs[TO_REG(XDMA_IRQ_ENG_CTRL)] &
+> +                (XDMA_IRQ_ENG_CTRL_US_COMP | XDMA_IRQ_ENG_CTRL_DS_COMP))
+> +                qemu_irq_raise(xdma->irq);
+> +        }
+> +        break;
+> +    case XDMA_BMC_CMDQ_RDP:
+
+Trace here too.
+
+> +        if (val32 == XDMA_BMC_CMDQ_RDP_MAGIC) {
+> +            xdma->bmc_cmdq_readp_set = 1;
+> +        }
+> +        break;
+> +    case XDMA_IRQ_ENG_CTRL:
+> +        xdma->regs[TO_REG(addr)] = val32 & XDMA_IRQ_ENG_CTRL_W_MASK;
+> +        break;
+> +    case XDMA_IRQ_ENG_STAT:
+> +        idx = TO_REG(addr);
+> +        if (val32 & (XDMA_IRQ_ENG_STAT_US_COMP | XDMA_IRQ_ENG_STAT_DS_COMP)) {
+> +            xdma->regs[TO_REG(addr)] &=
+
+                          ^ idx
+
+> +                ~(XDMA_IRQ_ENG_STAT_US_COMP | XDMA_IRQ_ENG_STAT_DS_COMP);
+> +            qemu_irq_lower(xdma->irq);
+> +        }
+> +        break;
+> +    default:
+> +        xdma->regs[TO_REG(addr)] = val32;
+> +        break;
+> +    }
+> +}
+> +
+> +static const MemoryRegionOps aspeed_xdma_ops = {
+> +    .read = aspeed_xdma_read,
+> +    .write = aspeed_xdma_write,
+> +    .endianness = DEVICE_NATIVE_ENDIAN,
+> +    .valid.min_access_size = 4,
+> +    .valid.max_access_size = 4,
+> +};
+> +
+> +static void aspeed_xdma_realize(DeviceState *dev, Error **errp)
+> +{
+> +    SysBusDevice *sbd = SYS_BUS_DEVICE(dev);
+> +    AspeedXDMAState *xdma = ASPEED_XDMA(dev);
+> +
+> +    sysbus_init_irq(sbd, &xdma->irq);
+> +    memory_region_init_io(&xdma->iomem, OBJECT(xdma), &aspeed_xdma_ops, xdma,
+> +                          TYPE_ASPEED_XDMA, ASPEED_XDMA_MEM_SIZE);
+> +    sysbus_init_mmio(sbd, &xdma->iomem);
+> +}
+> +
+> +static void aspeed_xdma_reset(DeviceState *dev)
+> +{
+> +    AspeedXDMAState *xdma = ASPEED_XDMA(dev);
+> +
+> +    xdma->bmc_cmdq_readp_set = 0;
+> +    memset(xdma->regs, 0, ASPEED_XDMA_REG_SIZE);
+> +    xdma->regs[TO_REG(XDMA_IRQ_ENG_STAT)] = XDMA_IRQ_ENG_STAT_RESET;
+> +
+> +    qemu_irq_lower(xdma->irq);
+> +}
+> +
+> +static const VMStateDescription aspeed_xdma_vmstate = {
+> +    .name = TYPE_ASPEED_XDMA,
+> +    .version_id = 1,
+> +    .fields = (VMStateField[]) {
+> +        VMSTATE_UINT32_ARRAY(regs, AspeedXDMAState, ASPEED_XDMA_NUM_REGS),
+> +        VMSTATE_END_OF_LIST(),
+> +    },
+> +};
+> +
+> +static void aspeed_xdma_class_init(ObjectClass *classp, void *data)
+> +{
+> +    DeviceClass *dc = DEVICE_CLASS(classp);
+> +
+> +    dc->realize = aspeed_xdma_realize;
+> +    dc->reset = aspeed_xdma_reset;
+> +    dc->vmsd = &aspeed_xdma_vmstate;
+> +}
+> +
+> +static const TypeInfo aspeed_xdma_info = {
+> +    .name          = TYPE_ASPEED_XDMA,
+> +    .parent        = TYPE_SYS_BUS_DEVICE,
+> +    .instance_size = sizeof(AspeedXDMAState),
+> +    .class_init    = aspeed_xdma_class_init,
+> +};
+> +
+> +static void aspeed_xdma_register_type(void)
+> +{
+> +    type_register_static(&aspeed_xdma_info);
+> +}
+> +type_init(aspeed_xdma_register_type);
+> diff --git a/include/hw/arm/aspeed_soc.h b/include/hw/arm/aspeed_soc.h
+> index 836b2ba..0329247 100644
+> --- a/include/hw/arm/aspeed_soc.h
+> +++ b/include/hw/arm/aspeed_soc.h
+> @@ -20,6 +20,7 @@
+>  #include "hw/ssi/aspeed_smc.h"
+>  #include "hw/watchdog/wdt_aspeed.h"
+>  #include "hw/net/ftgmac100.h"
+> +#include "hw/misc/aspeed_xdma.h"
+>  
+>  #define ASPEED_SPIS_NUM  2
+>  #define ASPEED_WDTS_NUM  3
+> @@ -40,6 +41,7 @@ typedef struct AspeedSoCState {
+>      AspeedSDMCState sdmc;
+>      AspeedWDTState wdt[ASPEED_WDTS_NUM];
+>      FTGMAC100State ftgmac100;
+> +    AspeedXDMAState xdma;
+>  } AspeedSoCState;
+>  
+>  #define TYPE_ASPEED_SOC "aspeed-soc"
+> diff --git a/include/hw/misc/aspeed_xdma.h b/include/hw/misc/aspeed_xdma.h
+> new file mode 100644
+> index 0000000..d19e9a7
+> --- /dev/null
+> +++ b/include/hw/misc/aspeed_xdma.h
+> @@ -0,0 +1,31 @@
+> +/*
+> + * ASPEED XDMA Controller
+> + * Eddie James <eajames@linux.ibm.com>
+> + *
+> + * Copyright (C) 2019 IBM Corp.
+> + * SPDX-License-Identifer: GPL-2.0-or-later
+> + */
+> +
+> +#ifndef ASPEED_XDMA_H
+> +#define ASPEED_XDMA_H
+> +
+> +#include "hw/sysbus.h"
+> +
+> +#define TYPE_ASPEED_XDMA "aspeed.xdma"
+> +#define ASPEED_XDMA(obj) OBJECT_CHECK(AspeedXDMAState, (obj), TYPE_ASPEED_XDMA)
+> +
+> +#define ASPEED_XDMA_MEM_SIZE 0x1000
+
+Maybe you can keep ASPEED_XDMA_MEM_SIZE private in the source file.
+
+> +#define ASPEED_XDMA_NUM_REGS (ASPEED_XDMA_REG_SIZE / sizeof(uint32_t))
+> +#define ASPEED_XDMA_REG_SIZE 0x7C
+
+0x80?
+
+> +
+> +typedef struct AspeedXDMAState {
+> +    SysBusDevice parent;
+> +
+> +    MemoryRegion iomem;
+> +    qemu_irq irq;
+> +
+> +    char bmc_cmdq_readp_set;
+> +    uint32_t regs[ASPEED_XDMA_NUM_REGS];
+> +} AspeedXDMAState;
+> +
+> +#endif /* ASPEED_XDMA_H */
+> 
+
+Few questions, but otherwise LGTM.
+
+Regards,
+
+Phil.
 
