@@ -6,47 +6,47 @@ X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 50607C04AB5
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 13:50:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 62B1AC04AB5
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 13:51:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D6A032070B
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 13:50:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D6A032070B
+	by mail.kernel.org (Postfix) with ESMTPS id 3C8AE2070B
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 13:51:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3C8AE2070B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:60914 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:60916 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hYsnB-0007iU-Gx
-	for qemu-devel@archiver.kernel.org; Thu, 06 Jun 2019 09:50:57 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:44116)
+	id 1hYsnQ-0007us-C3
+	for qemu-devel@archiver.kernel.org; Thu, 06 Jun 2019 09:51:12 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:44139)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hYsku-0006L1-Ep
+	(envelope-from <vsementsov@virtuozzo.com>) id 1hYsku-0006L9-B4
 	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 09:48:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1hYskg-0001j4-Rk
-	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 09:48:23 -0400
-Received: from relay.sw.ru ([185.231.240.75]:45560)
+	(envelope-from <vsementsov@virtuozzo.com>) id 1hYskg-0001j2-Qf
+	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 09:48:24 -0400
+Received: from relay.sw.ru ([185.231.240.75]:45554)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1hYskf-0001Ha-3l; Thu, 06 Jun 2019 09:48:22 -0400
+	id 1hYskf-0001Hb-3j; Thu, 06 Jun 2019 09:48:22 -0400
 Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
 	by relay.sw.ru with esmtp (Exim 4.91)
 	(envelope-from <vsementsov@virtuozzo.com>)
-	id 1hYska-00004z-Ah; Thu, 06 Jun 2019 16:48:16 +0300
+	id 1hYska-00004z-0r; Thu, 06 Jun 2019 16:48:16 +0300
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-devel@nongnu.org,
 	qemu-block@nongnu.org
-Date: Thu,  6 Jun 2019 16:48:14 +0300
-Message-Id: <20190606134814.123689-4-vsementsov@virtuozzo.com>
+Date: Thu,  6 Jun 2019 16:48:12 +0300
+Message-Id: <20190606134814.123689-2-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.18.0
 In-Reply-To: <20190606134814.123689-1-vsementsov@virtuozzo.com>
 References: <20190606134814.123689-1-vsementsov@virtuozzo.com>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
 X-Received-From: 185.231.240.75
-Subject: [Qemu-devel] [PATCH 3/3] nbd: improve CMD_CACHE: use blk_co_pcache
+Subject: [Qemu-devel] [PATCH 1/3] block: implement blk_co_pcache
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -64,107 +64,104 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This helps to avoid extra io, allocations and memory copying.
-We assume here that CMD_CACHE is always used with copy-on-read, as
-otherwise it's a noop.
+Do effective copy-on-read request when we don't need data actually. It
+will be used for block-stream and NBD_CMD_CACHE.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- nbd/server.c | 43 +++++++++++++++++++++++++++++++++++--------
- 1 file changed, 35 insertions(+), 8 deletions(-)
+ include/block/block.h          |  8 +++++++-
+ include/sysemu/block-backend.h |  7 +++++++
+ block/io.c                     | 18 ++++++++++++------
+ 3 files changed, 26 insertions(+), 7 deletions(-)
 
-diff --git a/nbd/server.c b/nbd/server.c
-index aeca3893fe..a7e8dbaccd 100644
---- a/nbd/server.c
-+++ b/nbd/server.c
-@@ -2101,12 +2101,15 @@ static int nbd_co_receive_request(NBDRequestData *req, NBDRequest *request,
-             return -EINVAL;
-         }
+diff --git a/include/block/block.h b/include/block/block.h
+index f9415ed740..4662f25513 100644
+--- a/include/block/block.h
++++ b/include/block/block.h
+@@ -88,8 +88,14 @@ typedef enum {
+      * fallback. */
+     BDRV_REQ_NO_FALLBACK        = 0x100,
  
--        req->data = blk_try_blockalign(client->exp->blk, request->len);
--        if (req->data == NULL) {
--            error_setg(errp, "No memory");
--            return -ENOMEM;
-+        if (request->type != NBD_CMD_CACHE) {
-+            req->data = blk_try_blockalign(client->exp->blk, request->len);
-+            if (req->data == NULL) {
-+                error_setg(errp, "No memory");
-+                return -ENOMEM;
-+            }
-         }
-     }
-+
-     if (request->type == NBD_CMD_WRITE) {
-         if (nbd_read(client->ioc, req->data, request->len, "CMD_WRITE data",
-                      errp) < 0)
-@@ -2191,7 +2194,7 @@ static coroutine_fn int nbd_do_cmd_read(NBDClient *client, NBDRequest *request,
-     int ret;
-     NBDExport *exp = client->exp;
++    /*
++     * BDRV_REQ_CACHE may be used only together with BDRV_REQ_COPY_ON_READ
++     * on read request and means that caller don't really need data to be
++     * written to qiov parameter which may be NULL.
++     */
++    BDRV_REQ_CACHE  = 0x200,
+     /* Mask of valid flags */
+-    BDRV_REQ_MASK               = 0x1ff,
++    BDRV_REQ_MASK               = 0x3ff,
+ } BdrvRequestFlags;
  
--    assert(request->type == NBD_CMD_READ || request->type == NBD_CMD_CACHE);
-+    assert(request->type == NBD_CMD_READ);
- 
-     /* XXX: NBD Protocol only documents use of FUA with WRITE */
-     if (request->flags & NBD_CMD_FLAG_FUA) {
-@@ -2203,7 +2206,7 @@ static coroutine_fn int nbd_do_cmd_read(NBDClient *client, NBDRequest *request,
-     }
- 
-     if (client->structured_reply && !(request->flags & NBD_CMD_FLAG_DF) &&
--        request->len && request->type != NBD_CMD_CACHE)
-+        request->len)
-     {
-         return nbd_co_send_sparse_read(client, request->handle, request->from,
-                                        data, request->len, errp);
-@@ -2211,7 +2214,7 @@ static coroutine_fn int nbd_do_cmd_read(NBDClient *client, NBDRequest *request,
- 
-     ret = blk_pread(exp->blk, request->from + exp->dev_offset, data,
-                     request->len);
--    if (ret < 0 || request->type == NBD_CMD_CACHE) {
-+    if (ret < 0) {
-         return nbd_send_generic_reply(client, request->handle, ret,
-                                       "reading from file failed", errp);
-     }
-@@ -2230,6 +2233,28 @@ static coroutine_fn int nbd_do_cmd_read(NBDClient *client, NBDRequest *request,
-     }
+ typedef struct BlockSizes {
+diff --git a/include/sysemu/block-backend.h b/include/sysemu/block-backend.h
+index 733c4957eb..2bcecd1190 100644
+--- a/include/sysemu/block-backend.h
++++ b/include/sysemu/block-backend.h
+@@ -135,6 +135,13 @@ static inline int coroutine_fn blk_co_pread(BlockBackend *blk, int64_t offset,
+     return blk_co_preadv(blk, offset, bytes, &qiov, flags);
  }
  
-+/*
-+ * nbd_do_cmd_cache
-+ *
-+ * Handle NBD_CMD_CACHE request.
-+ * Return -errno if sending fails. Other errors are reported directly to the
-+ * client as an error reply.
-+ */
-+static coroutine_fn int nbd_do_cmd_cache(NBDClient *client, NBDRequest *request,
-+                                         Error **errp)
++static inline int coroutine_fn blk_co_pcache(BlockBackend *blk, int64_t offset,
++                                             unsigned int bytes)
 +{
-+    int ret;
-+    NBDExport *exp = client->exp;
-+
-+    assert(request->type == NBD_CMD_CACHE);
-+
-+    ret = blk_co_pcache(exp->blk, request->from + exp->dev_offset,
-+                        request->len);
-+
-+    return nbd_send_generic_reply(client, request->handle, ret,
-+                                  "caching data failed", errp);
++    return blk_co_preadv(blk, offset, bytes, NULL,
++                         BDRV_REQ_COPY_ON_READ | BDRV_REQ_CACHE);
 +}
 +
- /* Handle NBD request.
-  * Return -errno if sending fails. Other errors are reported directly to the
-  * client as an error reply. */
-@@ -2243,8 +2268,10 @@ static coroutine_fn int nbd_handle_request(NBDClient *client,
-     char *msg;
+ static inline int coroutine_fn blk_co_pwrite(BlockBackend *blk, int64_t offset,
+                                              unsigned int bytes, void *buf,
+                                              BdrvRequestFlags flags)
+diff --git a/block/io.c b/block/io.c
+index 9ba1bada36..9daf7332bd 100644
+--- a/block/io.c
++++ b/block/io.c
+@@ -1104,7 +1104,8 @@ bdrv_driver_pwritev_compressed(BlockDriverState *bs, uint64_t offset,
+ }
  
-     switch (request->type) {
--    case NBD_CMD_READ:
-     case NBD_CMD_CACHE:
-+        return nbd_do_cmd_cache(client, request, errp);
-+
-+    case NBD_CMD_READ:
-         return nbd_do_cmd_read(client, request, data, errp);
+ static int coroutine_fn bdrv_co_do_copy_on_readv(BdrvChild *child,
+-        int64_t offset, unsigned int bytes, QEMUIOVector *qiov)
++        int64_t offset, unsigned int bytes, QEMUIOVector *qiov,
++        int flags)
+ {
+     BlockDriverState *bs = child->bs;
  
-     case NBD_CMD_WRITE:
+@@ -1215,9 +1216,11 @@ static int coroutine_fn bdrv_co_do_copy_on_readv(BdrvChild *child,
+                 goto err;
+             }
+ 
+-            qemu_iovec_from_buf(qiov, progress, bounce_buffer + skip_bytes,
+-                                pnum - skip_bytes);
+-        } else {
++            if (!(flags & BDRV_REQ_CACHE)) {
++                qemu_iovec_from_buf(qiov, progress, bounce_buffer + skip_bytes,
++                                    pnum - skip_bytes);
++            }
++        } else if (!(flags & BDRV_REQ_CACHE)) {
+             /* Read directly into the destination */
+             qemu_iovec_init(&local_qiov, qiov->niov);
+             qemu_iovec_concat(&local_qiov, qiov, progress, pnum - skip_bytes);
+@@ -1268,7 +1271,8 @@ static int coroutine_fn bdrv_aligned_preadv(BdrvChild *child,
+      * potential fallback support, if we ever implement any read flags
+      * to pass through to drivers.  For now, there aren't any
+      * passthrough flags.  */
+-    assert(!(flags & ~(BDRV_REQ_NO_SERIALISING | BDRV_REQ_COPY_ON_READ)));
++    assert(!(flags & ~(BDRV_REQ_NO_SERIALISING | BDRV_REQ_COPY_ON_READ |
++                       BDRV_REQ_CACHE)));
+ 
+     /* Handle Copy on Read and associated serialisation */
+     if (flags & BDRV_REQ_COPY_ON_READ) {
+@@ -1296,7 +1300,9 @@ static int coroutine_fn bdrv_aligned_preadv(BdrvChild *child,
+         }
+ 
+         if (!ret || pnum != bytes) {
+-            ret = bdrv_co_do_copy_on_readv(child, offset, bytes, qiov);
++            ret = bdrv_co_do_copy_on_readv(child, offset, bytes, qiov, flags);
++            goto out;
++        } else if (flags & BDRV_REQ_CACHE) {
+             goto out;
+         }
+     }
 -- 
 2.18.0
 
