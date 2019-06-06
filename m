@@ -6,61 +6,107 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D4298C04AB5
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 12:12:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5FEC5C04AB5
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 12:13:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9C2E62070B
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 12:12:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9C2E62070B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 2A4BD2070B
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 12:13:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2A4BD2070B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:59550 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:59560 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hYrFU-0003lf-5G
-	for qemu-devel@archiver.kernel.org; Thu, 06 Jun 2019 08:12:04 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:47378)
+	id 1hYrH5-0004hG-Fc
+	for qemu-devel@archiver.kernel.org; Thu, 06 Jun 2019 08:13:43 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:47722)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1hYrEc-0003M3-Jw
-	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 08:11:11 -0400
+	(envelope-from <david@redhat.com>) id 1hYrGI-0004Kf-99
+	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 08:12:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1hYrEb-0001IM-7C
-	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 08:11:10 -0400
-Received: from 8.mo2.mail-out.ovh.net ([188.165.52.147]:43887)
+	(envelope-from <david@redhat.com>) id 1hYrGG-0003dg-9P
+	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 08:12:54 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57894)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1hYrEa-00013r-SA
-	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 08:11:09 -0400
-Received: from player773.ha.ovh.net (unknown [10.108.35.59])
-	by mo2.mail-out.ovh.net (Postfix) with ESMTP id 3175919AA3E
-	for <qemu-devel@nongnu.org>; Thu,  6 Jun 2019 14:10:58 +0200 (CEST)
-Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
-	[82.253.208.248]) (Authenticated sender: groug@kaod.org)
-	by player773.ha.ovh.net (Postfix) with ESMTPSA id 6EC0268FF81F;
-	Thu,  6 Jun 2019 12:10:50 +0000 (UTC)
-Date: Thu, 6 Jun 2019 14:10:48 +0200
-From: Greg Kurz <groug@kaod.org>
-To: Aravinda Prasad <aravinda@linux.vnet.ibm.com>
-Message-ID: <20190606141048.01e7d6be@bahia.lab.toulouse-stg.fr.ibm.com>
-In-Reply-To: <9a4291d3-2ae6-92f3-6922-e8924398cdb7@linux.vnet.ibm.com>
-References: <155910829070.13149.5215948335633966328.stgit@aravinda>
-	<155910845769.13149.8097972239187020170.stgit@aravinda>
-	<20190606030614.GK10319@umbus.fritz.box>
-	<20190606080609.28b4dd15@bahia.lab.toulouse-stg.fr.ibm.com>
-	<9a4291d3-2ae6-92f3-6922-e8924398cdb7@linux.vnet.ibm.com>
-X-Mailer: Claws Mail 3.16.0 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+	(Exim 4.71) (envelope-from <david@redhat.com>)
+	id 1hYrGG-0003C9-13; Thu, 06 Jun 2019 08:12:52 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id DDEA3307D98F;
+	Thu,  6 Jun 2019 12:12:18 +0000 (UTC)
+Received: from [10.36.116.60] (ovpn-116-60.ams2.redhat.com [10.36.116.60])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 70F9F679CA;
+	Thu,  6 Jun 2019 12:11:58 +0000 (UTC)
+To: Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org
+References: <20190606110625.32127-1-laurent@vivier.eu>
+	<20190606110625.32127-10-laurent@vivier.eu>
+From: David Hildenbrand <david@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+	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
+	SE+xAvmumFBY
+Organization: Red Hat GmbH
+Message-ID: <7548e59a-0b87-5389-2f69-dce24413b8f3@redhat.com>
+Date: Thu, 6 Jun 2019 14:11:57 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+	Thunderbird/60.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Ovh-Tracer-Id: 202943459306150292
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduuddrudeggedggeelucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddm
+In-Reply-To: <20190606110625.32127-10-laurent@vivier.eu>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.48]);
+	Thu, 06 Jun 2019 12:12:29 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 188.165.52.147
-Subject: Re: [Qemu-devel] [PATCH v9 6/6] migration: Include migration
- support for machine check handling
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PULL 09/16] hw/s390x/event-facility: Use the QOM
+ BUS() macro to access BusState.qbus
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -72,185 +118,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: aik@au1.ibm.com, qemu-devel@nongnu.org, paulus@ozlabs.org,
-	qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
+	Dmitry Fleytman <dmitry.fleytman@gmail.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>, Michael Tokarev <mjt@tls.msk.ru>,
+	Gerd Hoffmann <kraxel@redhat.com>, Juan Quintela <quintela@redhat.com>,
+	Aleksandar Rikalo <arikalo@wavecomp.com>,
+	Halil Pasic <pasic@linux.ibm.com>,
+	Christian Borntraeger <borntraeger@de.ibm.com>,
+	=?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+	"Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+	Yuval Shaia <yuval.shaia@oracle.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	Richard Henderson <rth@twiddle.net>,
+	=?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+	Cornelia Huck <cohuck@redhat.com>, qemu-s390x@nongnu.org,
+	qemu-trivial@nongnu.org, Michael Walle <michael@walle.cc>,
+	Aleksandar Markovic <amarkovic@wavecomp.com>,
+	Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 6 Jun 2019 16:45:30 +0530
-Aravinda Prasad <aravinda@linux.vnet.ibm.com> wrote:
+On 06.06.19 13:06, Laurent Vivier wrote:
+> From: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+>=20
+> Rather than looking inside the definition of a BusState with "s->bus.qb=
+us",
+> use the QOM prefered style: "BUS(&s->bus)".
+>=20
+> This patch was generated using the following Coccinelle script:
+>=20
+>     // Use BUS() macros to access BusState.qbus
+>     @use_bus_macro_to_access_qbus@
+>     expression obj;
+>     identifier bus;
+>     @@
+>     -&obj->bus.qbus
+>     +BUS(&obj->bus)
+>=20
+> Suggested-by: Peter Maydell <peter.maydell@linaro.org>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+> Message-Id: <20190528164020.32250-5-philmd@redhat.com>
+> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+> ---
+>  hw/s390x/event-facility.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/hw/s390x/event-facility.c b/hw/s390x/event-facility.c
+> index ee5b83448b11..e574223a226b 100644
+> --- a/hw/s390x/event-facility.c
+> +++ b/hw/s390x/event-facility.c
+> @@ -466,12 +466,12 @@ static void init_event_facility(Object *obj)
+>      new =3D object_new(TYPE_SCLP_QUIESCE);
+>      object_property_add_child(obj, TYPE_SCLP_QUIESCE, new, NULL);
+>      object_unref(new);
+> -    qdev_set_parent_bus(DEVICE(new), &event_facility->sbus.qbus);
+> +    qdev_set_parent_bus(DEVICE(new), BUS(&event_facility->sbus));
+> =20
+>      new =3D object_new(TYPE_SCLP_CPU_HOTPLUG);
+>      object_property_add_child(obj, TYPE_SCLP_CPU_HOTPLUG, new, NULL);
+>      object_unref(new);
+> -    qdev_set_parent_bus(DEVICE(new), &event_facility->sbus.qbus);
+> +    qdev_set_parent_bus(DEVICE(new), BUS(&event_facility->sbus));
+>      /* the facility will automatically realize the devices via the bus=
+ */
+>  }
+> =20
+>=20
 
-> On Thursday 06 June 2019 11:36 AM, Greg Kurz wrote:
-> > On Thu, 6 Jun 2019 13:06:14 +1000
-> > David Gibson <david@gibson.dropbear.id.au> wrote:
-> >   
-> >> On Wed, May 29, 2019 at 11:10:57AM +0530, Aravinda Prasad wrote:  
-> >>> This patch includes migration support for machine check
-> >>> handling. Especially this patch blocks VM migration
-> >>> requests until the machine check error handling is
-> >>> complete as (i) these errors are specific to the source
-> >>> hardware and is irrelevant on the target hardware,
-> >>> (ii) these errors cause data corruption and should
-> >>> be handled before migration.
-> >>>
-> >>> Signed-off-by: Aravinda Prasad <aravinda@linux.vnet.ibm.com>
-> >>> ---
-> >>>  hw/ppc/spapr.c         |   20 ++++++++++++++++++++
-> >>>  hw/ppc/spapr_events.c  |   17 +++++++++++++++++
-> >>>  hw/ppc/spapr_rtas.c    |    4 ++++
-> >>>  include/hw/ppc/spapr.h |    2 ++
-> >>>  4 files changed, 43 insertions(+)
-> >>>
-> >>> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> >>> index e8a77636..31c4850 100644
-> >>> --- a/hw/ppc/spapr.c
-> >>> +++ b/hw/ppc/spapr.c
-> >>> @@ -2104,6 +2104,25 @@ static const VMStateDescription vmstate_spapr_dtb = {
-> >>>      },
-> >>>  };
-> >>>  
-> >>> +static bool spapr_fwnmi_needed(void *opaque)
-> >>> +{
-> >>> +    SpaprMachineState *spapr = (SpaprMachineState *)opaque;
-> >>> +
-> >>> +    return (spapr->guest_machine_check_addr == -1) ? 0 : 1;    
-> >>
-> >> Since we're introducing a PAPR capability to enable this, it would
-> >> actually be better to check that here, rather than the runtime state.
-> >> That leads to less cases and easier to understand semantics for the
-> >> migration stream.
-> >>  
-> > 
-> > Hmmm... the purpose of needed() VMState callbacks is precisely about
-> > runtime state: the subsection should only be migrated if an MCE is
-> > pending, ie. spapr->guest_machine_check_addr != -1.  
-> 
-> spapr->guest_machine_check_addr is set when fwnmi is registered. Hence
-> an MCE might not be pending if it is set.
-> 
+Reviewed-by: David Hildenbrand <david@redhat.com>
 
-Oops sorry, got confused... should have written "if the guest has
-registered FWNMI", but the idea is the same. We only need to migrate
-the subsection if the state is different from reset. This is the way
-needed() callbacks are generally implemented.
+--=20
 
-> I am fine with both the approaches (checking for
-> guest_machine_check_addr or for SPAPR_CAP_FWNMI_MCE).
-> 
+Thanks,
 
-I would find ackward to migrate this always for new machine types,
-even if the guest doesn't register FWNMI...
-
-> Regards,
-> Aravinda
-> 
-> >   
-> >>> +}
-> >>> +
-> >>> +static const VMStateDescription vmstate_spapr_machine_check = {
-> >>> +    .name = "spapr_machine_check",
-> >>> +    .version_id = 1,
-> >>> +    .minimum_version_id = 1,
-> >>> +    .needed = spapr_fwnmi_needed,
-> >>> +    .fields = (VMStateField[]) {
-> >>> +        VMSTATE_UINT64(guest_machine_check_addr, SpaprMachineState),
-> >>> +        VMSTATE_INT32(mc_status, SpaprMachineState),
-> >>> +        VMSTATE_END_OF_LIST()
-> >>> +    },
-> >>> +};
-> >>> +
-> >>>  static const VMStateDescription vmstate_spapr = {
-> >>>      .name = "spapr",
-> >>>      .version_id = 3,
-> >>> @@ -2137,6 +2156,7 @@ static const VMStateDescription vmstate_spapr = {
-> >>>          &vmstate_spapr_dtb,
-> >>>          &vmstate_spapr_cap_large_decr,
-> >>>          &vmstate_spapr_cap_ccf_assist,
-> >>> +        &vmstate_spapr_machine_check,
-> >>>          NULL
-> >>>      }
-> >>>  };
-> >>> diff --git a/hw/ppc/spapr_events.c b/hw/ppc/spapr_events.c
-> >>> index 573c0b7..35e21e4 100644
-> >>> --- a/hw/ppc/spapr_events.c
-> >>> +++ b/hw/ppc/spapr_events.c
-> >>> @@ -41,6 +41,7 @@
-> >>>  #include "qemu/bcd.h"
-> >>>  #include "hw/ppc/spapr_ovec.h"
-> >>>  #include <libfdt.h>
-> >>> +#include "migration/blocker.h"
-> >>>  
-> >>>  #define RTAS_LOG_VERSION_MASK                   0xff000000
-> >>>  #define   RTAS_LOG_VERSION_6                    0x06000000
-> >>> @@ -855,6 +856,22 @@ static void spapr_mce_dispatch_elog(PowerPCCPU *cpu, bool recovered)
-> >>>  void spapr_mce_req_event(PowerPCCPU *cpu, bool recovered)
-> >>>  {
-> >>>      SpaprMachineState *spapr = SPAPR_MACHINE(qdev_get_machine());
-> >>> +    int ret;
-> >>> +    Error *local_err = NULL;
-> >>> +
-> >>> +    error_setg(&spapr->fwnmi_migration_blocker,
-> >>> +            "Live migration not supported during machine check handling");
-> >>> +    ret = migrate_add_blocker(spapr->fwnmi_migration_blocker, &local_err);
-> >>> +    if (ret < 0) {
-> >>> +        /*
-> >>> +         * We don't want to abort and let the migration to continue. In a
-> >>> +         * rare case, the machine check handler will run on the target
-> >>> +         * hardware. Though this is not preferable, it is better than aborting
-> >>> +         * the migration or killing the VM.
-> >>> +         */
-> >>> +        error_free(spapr->fwnmi_migration_blocker);    
-> >>
-> >> You should set fwnmi_migration_blocker to NULL here as well.
-> >>
-> >> As mentioned on an earlier iteration, the migration blocker is the
-> >> same every time.  Couldn't you just create it once and free at final
-> >> teardown, rather than recreating it for every NMI?
-> >>  
-> >>> +        warn_report_err(local_err);
-> >>> +    }
-> >>>  
-> >>>      while (spapr->mc_status != -1) {
-> >>>          /*
-> >>> diff --git a/hw/ppc/spapr_rtas.c b/hw/ppc/spapr_rtas.c
-> >>> index 91a7ab9..c849223 100644
-> >>> --- a/hw/ppc/spapr_rtas.c
-> >>> +++ b/hw/ppc/spapr_rtas.c
-> >>> @@ -50,6 +50,7 @@
-> >>>  #include "target/ppc/mmu-hash64.h"
-> >>>  #include "target/ppc/mmu-book3s-v3.h"
-> >>>  #include "kvm_ppc.h"
-> >>> +#include "migration/blocker.h"
-> >>>  
-> >>>  static void rtas_display_character(PowerPCCPU *cpu, SpaprMachineState *spapr,
-> >>>                                     uint32_t token, uint32_t nargs,
-> >>> @@ -404,6 +405,9 @@ static void rtas_ibm_nmi_interlock(PowerPCCPU *cpu,
-> >>>          spapr->mc_status = -1;
-> >>>          qemu_cond_signal(&spapr->mc_delivery_cond);
-> >>>          rtas_st(rets, 0, RTAS_OUT_SUCCESS);
-> >>> +        migrate_del_blocker(spapr->fwnmi_migration_blocker);
-> >>> +        error_free(spapr->fwnmi_migration_blocker);
-> >>> +        spapr->fwnmi_migration_blocker = NULL;
-> >>>      }
-> >>>  }
-> >>>  
-> >>> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-> >>> index bd75d4b..6c0cfd8 100644
-> >>> --- a/include/hw/ppc/spapr.h
-> >>> +++ b/include/hw/ppc/spapr.h
-> >>> @@ -214,6 +214,8 @@ struct SpaprMachineState {
-> >>>      SpaprCapabilities def, eff, mig;
-> >>>  
-> >>>      unsigned gpu_numa_id;
-> >>> +
-> >>> +    Error *fwnmi_migration_blocker;
-> >>>  };
-> >>>  
-> >>>  #define H_SUCCESS         0
-> >>>     
-> >>  
-> >   
-> 
-
+David / dhildenb
 
