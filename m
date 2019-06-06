@@ -6,52 +6,52 @@ X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 35178C04AB5
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 16:35:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 24027C04AB5
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 16:37:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 900AF20652
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 16:35:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 900AF20652
+	by mail.kernel.org (Postfix) with ESMTPS id 682D720652
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 16:37:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 682D720652
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:35062 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:35068 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hYvMg-00017v-Oo
-	for qemu-devel@archiver.kernel.org; Thu, 06 Jun 2019 12:35:46 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:55468)
+	id 1hYvNw-0001ms-JZ
+	for qemu-devel@archiver.kernel.org; Thu, 06 Jun 2019 12:37:04 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:55471)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1hYvF3-0003cJ-M9
-	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 12:27:58 -0400
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1hYvF3-0003ch-Us
+	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 12:27:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1hYvEy-0003d7-KW
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1hYvEy-0003dC-Kh
 	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 12:27:53 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:43522 helo=mail.rt-rk.com)
+Received: from mx2.rt-rk.com ([89.216.37.149]:43504 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1hYvEu-0003Ud-0C
-	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 12:27:46 -0400
+	id 1hYvEu-0003Tw-5H
+	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 12:27:47 -0400
 Received: from localhost (localhost [127.0.0.1])
-	by mail.rt-rk.com (Postfix) with ESMTP id 87D2A1A21DE;
+	by mail.rt-rk.com (Postfix) with ESMTP id 795861A21AF;
 	Thu,  6 Jun 2019 18:27:40 +0200 (CEST)
 X-Virus-Scanned: amavisd-new at rt-rk.com
 Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
 	[10.10.13.43])
-	by mail.rt-rk.com (Postfix) with ESMTPSA id 3F9571A21B0;
+	by mail.rt-rk.com (Postfix) with ESMTPSA id 1328A1A1F8A;
 	Thu,  6 Jun 2019 18:27:40 +0200 (CEST)
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
 To: qemu-devel@nongnu.org
-Date: Thu,  6 Jun 2019 18:27:20 +0200
-Message-Id: <1559838440-9866-11-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Thu,  6 Jun 2019 18:27:19 +0200
+Message-Id: <1559838440-9866-10-git-send-email-aleksandar.markovic@rt-rk.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1559838440-9866-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1559838440-9866-1-git-send-email-aleksandar.markovic@rt-rk.com>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
 X-Received-From: 89.216.37.149
-Subject: [Qemu-devel] [PATCH v4 10/10] tests/tcg: target/mips: Add README
- for MSA tests
+Subject: [Qemu-devel] [PATCH v4 09/10] tests/tcg: target/mips: Add tests for
+ MSA FP max/min instructions
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -70,946 +70,1327 @@ Sender: "Qemu-devel"
 
 From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-Add README for MSA tests. This is just to explain how to run tests even
-without Makefile. Makefile will be provided later on.
+Add tests for MSA FP max/min instructions. This includes following
+instructions:
+
+  * FMAX.W - float maximum (words)
+  * FMAX.D - float maximum (doublewords)
+  * FMAX_A.W - float maximum absolute (words)
+  * FMAX_A.D - float maximum absolute (doublewords)
+  * FMIN.W - float minimum (words)
+  * FMIN.D - float minimum (doublewords)
+  * FMIN_A.W - float minimum absolute (words)
+  * FMIN_A.D - float minimum absolute (doublewords)
 
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 Reviewed-by: Aleksandar Rikalo <arikalo@wavecomp.com>
-Message-Id: <1555699081-24577-6-git-send-email-aleksandar.markovic@rt-rk.com>
 ---
- tests/tcg/mips/user/ase/msa/README              |  20 +
- tests/tcg/mips/user/ase/msa/test_msa_compile.sh | 558 ++++++++++++++++++++++++
- tests/tcg/mips/user/ase/msa/test_msa_run.sh     | 329 ++++++++++++++
- 3 files changed, 907 insertions(+)
- create mode 100644 tests/tcg/mips/user/ase/msa/README
- create mode 100755 tests/tcg/mips/user/ase/msa/test_msa_compile.sh
- create mode 100755 tests/tcg/mips/user/ase/msa/test_msa_run.sh
+ .../user/ase/msa/float-max-min/test_msa_fmax_a_d.c | 155 +++++++++++++++++++++
+ .../user/ase/msa/float-max-min/test_msa_fmax_a_w.c | 155 +++++++++++++++++++++
+ .../user/ase/msa/float-max-min/test_msa_fmax_d.c   | 155 +++++++++++++++++++++
+ .../user/ase/msa/float-max-min/test_msa_fmax_w.c   | 155 +++++++++++++++++++++
+ .../user/ase/msa/float-max-min/test_msa_fmin_a_d.c | 155 +++++++++++++++++++++
+ .../user/ase/msa/float-max-min/test_msa_fmin_a_w.c | 155 +++++++++++++++++++++
+ .../user/ase/msa/float-max-min/test_msa_fmin_d.c   | 155 +++++++++++++++++++++
+ .../user/ase/msa/float-max-min/test_msa_fmin_w.c   | 155 +++++++++++++++++++++
+ 8 files changed, 1240 insertions(+)
+ create mode 100644 tests/tcg/mips/user/ase/msa/float-max-min/test_msa_fmax_a_d.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/float-max-min/test_msa_fmax_a_w.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/float-max-min/test_msa_fmax_d.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/float-max-min/test_msa_fmax_w.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/float-max-min/test_msa_fmin_a_d.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/float-max-min/test_msa_fmin_a_w.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/float-max-min/test_msa_fmin_d.c
+ create mode 100644 tests/tcg/mips/user/ase/msa/float-max-min/test_msa_fmin_w.c
 
-diff --git a/tests/tcg/mips/user/ase/msa/README b/tests/tcg/mips/user/ase/msa/README
+diff --git a/tests/tcg/mips/user/ase/msa/float-max-min/test_msa_fmax_a_d.c b/tests/tcg/mips/user/ase/msa/float-max-min/test_msa_fmax_a_d.c
 new file mode 100644
-index 0000000..ca4f070
+index 0000000..1807cab
 --- /dev/null
-+++ b/tests/tcg/mips/user/ase/msa/README
-@@ -0,0 +1,20 @@
-+The tests in subdirectories of this directory are supposed to be compiled for
-+mips64el MSA-enabled CPU (I6400, I6500), using an appropriate MIPS toolchain.
-+For example:
++++ b/tests/tcg/mips/user/ase/msa/float-max-min/test_msa_fmax_a_d.c
+@@ -0,0 +1,155 @@
++/*
++ *  Test program for MSA instruction FMAX_A.D
++ *
++ *  Copyright (C) 2019  Wave Computing, Inc.
++ *  Copyright (C) 2019  Aleksandar Markovic <amarkovic@wavecomp.com>
++ *
++ *  This program is free software: you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation, either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
++ *
++ */
 +
-+/opt/img/bin/mips-img-linux-gnu-gcc <source file>                  \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa  -o <executable file>
++#include <sys/time.h>
++#include <stdint.h>
 +
-+They are to be executed using QEMU user mode, using command line:
++#include "../../../../include/wrappers_msa.h"
++#include "../../../../include/test_inputs_128.h"
++#include "../../../../include/test_utils_128.h"
 +
-+mips64el-linux-user/qemu-mips64el -cpu I6400 <executable file>
++#define TEST_COUNT_TOTAL (                                                \
++            (PATTERN_INPUTS_SHORT_COUNT) * (PATTERN_INPUTS_SHORT_COUNT) + \
++            (RANDOM_INPUTS_SHORT_COUNT) * (RANDOM_INPUTS_SHORT_COUNT))
 +
-+Helper scripts test_msa_compile.sh and test_msa_run.sh are also
-+provided. This is an example of compilation and execution of all
-+MSA tests:
 +
-+cd <QEMU root directory>
-+cd tests/tcg/mips/user/ase/msa
++int32_t main(void)
++{
++    char *instruction_name = "FMAX_A.D";
++    int32_t ret;
++    uint32_t i, j;
++    struct timeval start, end;
++    double elapsed_time;
 +
-+./test_msa_compile.sh
-+./test_msa_run.sh
-diff --git a/tests/tcg/mips/user/ase/msa/test_msa_compile.sh b/tests/tcg/mips/user/ase/msa/test_msa_compile.sh
-new file mode 100755
-index 0000000..2a39d89
++    uint64_t b128_result[TEST_COUNT_TOTAL][2];
++    uint64_t b128_expect[TEST_COUNT_TOTAL][2] = {
++        { 0xffffffffffffffffULL, 0xffffffffffffffffULL, },    /*   0  */
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0x5555555555555555ULL, 0x5555555555555555ULL, },
++        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
++        { 0x3333333333333333ULL, 0x3333333333333333ULL, },
++        { 0xe38e38e38e38e38eULL, 0x38e38e38e38e38e3ULL, },
++        { 0x1c71c71c71c71c71ULL, 0xc71c71c71c71c71cULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },    /*   8  */
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0x5555555555555555ULL, 0x5555555555555555ULL, },
++        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
++        { 0x3333333333333333ULL, 0x3333333333333333ULL, },
++        { 0xe38e38e38e38e38eULL, 0x38e38e38e38e38e3ULL, },
++        { 0x1c71c71c71c71c71ULL, 0xc71c71c71c71c71cULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },    /*  16  */
++        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0x5555555555555555ULL, 0x5555555555555555ULL, },
++        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
++        { 0x3333333333333333ULL, 0x3333333333333333ULL, },
++        { 0xe38e38e38e38e38eULL, 0x38e38e38e38e38e3ULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0xc71c71c71c71c71cULL, },
++        { 0x5555555555555555ULL, 0x5555555555555555ULL, },    /*  24  */
++        { 0x5555555555555555ULL, 0x5555555555555555ULL, },
++        { 0x5555555555555555ULL, 0x5555555555555555ULL, },
++        { 0x5555555555555555ULL, 0x5555555555555555ULL, },
++        { 0x5555555555555555ULL, 0x5555555555555555ULL, },
++        { 0x5555555555555555ULL, 0x5555555555555555ULL, },
++        { 0xe38e38e38e38e38eULL, 0x5555555555555555ULL, },
++        { 0x5555555555555555ULL, 0x5555555555555555ULL, },
++        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },    /*  32  */
++        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
++        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
++        { 0x5555555555555555ULL, 0x5555555555555555ULL, },
++        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
++        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
++        { 0xe38e38e38e38e38eULL, 0xccccccccccccccccULL, },
++        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
++        { 0x3333333333333333ULL, 0x3333333333333333ULL, },    /*  40  */
++        { 0x3333333333333333ULL, 0x3333333333333333ULL, },
++        { 0x3333333333333333ULL, 0x3333333333333333ULL, },
++        { 0x5555555555555555ULL, 0x5555555555555555ULL, },
++        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
++        { 0x3333333333333333ULL, 0x3333333333333333ULL, },
++        { 0xe38e38e38e38e38eULL, 0x38e38e38e38e38e3ULL, },
++        { 0x3333333333333333ULL, 0xc71c71c71c71c71cULL, },
++        { 0xe38e38e38e38e38eULL, 0x38e38e38e38e38e3ULL, },    /*  48  */
++        { 0xe38e38e38e38e38eULL, 0x38e38e38e38e38e3ULL, },
++        { 0xe38e38e38e38e38eULL, 0x38e38e38e38e38e3ULL, },
++        { 0xe38e38e38e38e38eULL, 0x5555555555555555ULL, },
++        { 0xe38e38e38e38e38eULL, 0xccccccccccccccccULL, },
++        { 0xe38e38e38e38e38eULL, 0x38e38e38e38e38e3ULL, },
++        { 0xe38e38e38e38e38eULL, 0x38e38e38e38e38e3ULL, },
++        { 0xe38e38e38e38e38eULL, 0xc71c71c71c71c71cULL, },
++        { 0x1c71c71c71c71c71ULL, 0xc71c71c71c71c71cULL, },    /*  56  */
++        { 0x1c71c71c71c71c71ULL, 0xc71c71c71c71c71cULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0xc71c71c71c71c71cULL, },
++        { 0x5555555555555555ULL, 0x5555555555555555ULL, },
++        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
++        { 0x3333333333333333ULL, 0xc71c71c71c71c71cULL, },
++        { 0xe38e38e38e38e38eULL, 0xc71c71c71c71c71cULL, },
++        { 0x1c71c71c71c71c71ULL, 0xc71c71c71c71c71cULL, },
++        { 0x886ae6cc28625540ULL, 0x4b670b5efe7bb00cULL, },    /*  64  */
++        { 0xfbbe00634d93c708ULL, 0x4b670b5efe7bb00cULL, },
++        { 0xac5aaeaab9cf8b80ULL, 0x4b670b5efe7bb00cULL, },
++        { 0x704f164d5e31e24eULL, 0x4b670b5efe7bb00cULL, },
++        { 0xfbbe00634d93c708ULL, 0x4b670b5efe7bb00cULL, },
++        { 0xfbbe00634d93c708ULL, 0x12f7bb1a153f52fcULL, },
++        { 0xfbbe00634d93c708ULL, 0x27d8c6ffab2b2514ULL, },
++        { 0xfbbe00634d93c708ULL, 0x12f7bb1a153f52fcULL, },
++        { 0xac5aaeaab9cf8b80ULL, 0x4b670b5efe7bb00cULL, },    /*  72  */
++        { 0xfbbe00634d93c708ULL, 0x27d8c6ffab2b2514ULL, },
++        { 0xac5aaeaab9cf8b80ULL, 0x27d8c6ffab2b2514ULL, },
++        { 0x704f164d5e31e24eULL, 0x27d8c6ffab2b2514ULL, },
++        { 0x704f164d5e31e24eULL, 0x4b670b5efe7bb00cULL, },
++        { 0xfbbe00634d93c708ULL, 0x12f7bb1a153f52fcULL, },
++        { 0x704f164d5e31e24eULL, 0x27d8c6ffab2b2514ULL, },
++        { 0x704f164d5e31e24eULL, 0x8df188d8a942e2a0ULL, },
++};
++
++    reset_msa_registers();
++
++    gettimeofday(&start, NULL);
++
++    for (i = 0; i < PATTERN_INPUTS_SHORT_COUNT; i++) {
++        for (j = 0; j < PATTERN_INPUTS_SHORT_COUNT; j++) {
++            do_msa_FMAX_A_D(b128_pattern[i], b128_pattern[j],
++                            b128_result[PATTERN_INPUTS_SHORT_COUNT * i + j]);
++        }
++    }
++
++    for (i = 0; i < RANDOM_INPUTS_SHORT_COUNT; i++) {
++        for (j = 0; j < RANDOM_INPUTS_SHORT_COUNT; j++) {
++            do_msa_FMAX_A_D(b128_random[i], b128_random[j],
++                            b128_result[((PATTERN_INPUTS_SHORT_COUNT) *
++                                         (PATTERN_INPUTS_SHORT_COUNT)) +
++                                        RANDOM_INPUTS_SHORT_COUNT * i + j]);
++        }
++    }
++
++    gettimeofday(&end, NULL);
++
++    elapsed_time = (end.tv_sec - start.tv_sec) * 1000.0;
++    elapsed_time += (end.tv_usec - start.tv_usec) / 1000.0;
++
++    ret = check_results(instruction_name, TEST_COUNT_TOTAL, elapsed_time,
++                        &b128_result[0][0], &b128_expect[0][0]);
++
++    return ret;
++}
+diff --git a/tests/tcg/mips/user/ase/msa/float-max-min/test_msa_fmax_a_w.c b/tests/tcg/mips/user/ase/msa/float-max-min/test_msa_fmax_a_w.c
+new file mode 100644
+index 0000000..b999b1f
 --- /dev/null
-+++ b/tests/tcg/mips/user/ase/msa/test_msa_compile.sh
-@@ -0,0 +1,558 @@
++++ b/tests/tcg/mips/user/ase/msa/float-max-min/test_msa_fmax_a_w.c
+@@ -0,0 +1,155 @@
++/*
++ *  Test program for MSA instruction FMAX_A.W
++ *
++ *  Copyright (C) 2019  Wave Computing, Inc.
++ *  Copyright (C) 2019  Aleksandar Markovic <amarkovic@wavecomp.com>
++ *
++ *  This program is free software: you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation, either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
++ *
++ */
 +
-+#
-+# Bit Count
-+# ---------
-+#
-+/opt/img/bin/mips-img-linux-gnu-gcc       bit-count/test_msa_nloc_b.c          \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_nloc_b
-+/opt/img/bin/mips-img-linux-gnu-gcc       bit-count/test_msa_nloc_h.c          \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_nloc_h
-+/opt/img/bin/mips-img-linux-gnu-gcc       bit-count/test_msa_nloc_w.c          \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_nloc_w
-+/opt/img/bin/mips-img-linux-gnu-gcc       bit-count/test_msa_nloc_d.c          \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_nloc_d
-+/opt/img/bin/mips-img-linux-gnu-gcc       bit-count/test_msa_nlzc_b.c          \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_nlzc_b
-+/opt/img/bin/mips-img-linux-gnu-gcc       bit-count/test_msa_nlzc_h.c          \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_nlzc_h
-+/opt/img/bin/mips-img-linux-gnu-gcc       bit-count/test_msa_nlzc_w.c          \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_nlzc_w
-+/opt/img/bin/mips-img-linux-gnu-gcc       bit-count/test_msa_nlzc_d.c          \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_nlzc_d
-+/opt/img/bin/mips-img-linux-gnu-gcc       bit-count/test_msa_pcnt_b.c          \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_pcnt_b
-+/opt/img/bin/mips-img-linux-gnu-gcc       bit-count/test_msa_pcnt_h.c          \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_pcnt_h
-+/opt/img/bin/mips-img-linux-gnu-gcc       bit-count/test_msa_pcnt_w.c          \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_pcnt_w
-+/opt/img/bin/mips-img-linux-gnu-gcc       bit-count/test_msa_pcnt_d.c          \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_pcnt_d
++#include <sys/time.h>
++#include <stdint.h>
 +
-+#
-+# Bit move
-+# --------
-+#
++#include "../../../../include/wrappers_msa.h"
++#include "../../../../include/test_inputs_128.h"
++#include "../../../../include/test_utils_128.h"
 +
-+#
-+# Bit Set
-+# -------
-+#
-+/opt/img/bin/mips-img-linux-gnu-gcc         bit-set/test_msa_bclr_b.c          \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_bclr_b
-+/opt/img/bin/mips-img-linux-gnu-gcc         bit-set/test_msa_bclr_h.c          \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_bclr_h
-+/opt/img/bin/mips-img-linux-gnu-gcc         bit-set/test_msa_bclr_w.c          \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_bclr_w
-+/opt/img/bin/mips-img-linux-gnu-gcc         bit-set/test_msa_bclr_d.c          \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_bclr_d
-+/opt/img/bin/mips-img-linux-gnu-gcc         bit-set/test_msa_bneg_b.c          \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_bneg_b
-+/opt/img/bin/mips-img-linux-gnu-gcc         bit-set/test_msa_bneg_h.c          \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_bneg_h
-+/opt/img/bin/mips-img-linux-gnu-gcc         bit-set/test_msa_bneg_w.c          \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_bneg_w
-+/opt/img/bin/mips-img-linux-gnu-gcc         bit-set/test_msa_bneg_d.c          \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_bneg_d
-+/opt/img/bin/mips-img-linux-gnu-gcc         bit-set/test_msa_bset_b.c          \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_bset_b
-+/opt/img/bin/mips-img-linux-gnu-gcc         bit-set/test_msa_bset_h.c          \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_bset_h
-+/opt/img/bin/mips-img-linux-gnu-gcc         bit-set/test_msa_bset_w.c          \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_bset_w
-+/opt/img/bin/mips-img-linux-gnu-gcc         bit-set/test_msa_bset_d.c          \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_bset_d
++#define TEST_COUNT_TOTAL (                                                \
++            (PATTERN_INPUTS_SHORT_COUNT) * (PATTERN_INPUTS_SHORT_COUNT) + \
++            (RANDOM_INPUTS_SHORT_COUNT) * (RANDOM_INPUTS_SHORT_COUNT))
 +
-+#
-+# Fixed Multiply
-+# --------------
-+#
-+/opt/img/bin/mips-img-linux-gnu-gcc    fixed-multiply/test_msa_mul_q_h.c       \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_mul_q_h
-+/opt/img/bin/mips-img-linux-gnu-gcc    fixed-multiply/test_msa_mul_q_w.c       \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_mul_q_w
-+/opt/img/bin/mips-img-linux-gnu-gcc    fixed-multiply/test_msa_mulr_q_h.c      \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_mulr_q_h
-+/opt/img/bin/mips-img-linux-gnu-gcc    fixed-multiply/test_msa_mulr_q_w.c      \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_mulr_q_w
 +
-+#
-+# Float Max Min
-+# -------------
-+#
-+/opt/img/bin/mips-img-linux-gnu-gcc         float-max-min/test_msa_fmax_a_w.c  \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o        /tmp/test_msa_fmax_a_w
-+/opt/img/bin/mips-img-linux-gnu-gcc         float-max-min/test_msa_fmax_a_d.c  \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o        /tmp/test_msa_fmax_a_d
-+/opt/img/bin/mips-img-linux-gnu-gcc         float-max-min/test_msa_fmax_w.c    \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o        /tmp/test_msa_fmax_w
-+/opt/img/bin/mips-img-linux-gnu-gcc         float-max-min/test_msa_fmax_d.c    \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o        /tmp/test_msa_fmax_d
-+/opt/img/bin/mips-img-linux-gnu-gcc         float-max-min/test_msa_fmin_a_w.c  \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o        /tmp/test_msa_fmin_a_w
-+/opt/img/bin/mips-img-linux-gnu-gcc         float-max-min/test_msa_fmin_a_d.c  \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o        /tmp/test_msa_fmin_a_d
-+/opt/img/bin/mips-img-linux-gnu-gcc         float-max-min/test_msa_fmin_w.c    \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o        /tmp/test_msa_fmin_w
-+/opt/img/bin/mips-img-linux-gnu-gcc         float-max-min/test_msa_fmin_d.c    \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o        /tmp/test_msa_fmin_d
++int32_t main(void)
++{
++    char *instruction_name = "FMAX_A.W";
++    int32_t ret;
++    uint32_t i, j;
++    struct timeval start, end;
++    double elapsed_time;
 +
-+#
-+# Int Add
-+# -------
-+#
-+/opt/img/bin/mips-img-linux-gnu-gcc         int-add/test_msa_add_a_b.c         \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_add_a_b
-+/opt/img/bin/mips-img-linux-gnu-gcc         int-add/test_msa_add_a_h.c         \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_add_a_h
-+/opt/img/bin/mips-img-linux-gnu-gcc         int-add/test_msa_add_a_w.c         \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_add_a_w
-+/opt/img/bin/mips-img-linux-gnu-gcc         int-add/test_msa_add_a_d.c         \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_add_a_d
-+/opt/img/bin/mips-img-linux-gnu-gcc         int-add/test_msa_adds_a_b.c        \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_adds_a_b
-+/opt/img/bin/mips-img-linux-gnu-gcc         int-add/test_msa_adds_a_h.c        \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_adds_a_h
-+/opt/img/bin/mips-img-linux-gnu-gcc         int-add/test_msa_adds_a_w.c        \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_adds_a_w
-+/opt/img/bin/mips-img-linux-gnu-gcc         int-add/test_msa_adds_a_d.c        \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_adds_a_d
-+/opt/img/bin/mips-img-linux-gnu-gcc         int-add/test_msa_adds_s_b.c        \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_adds_s_b
-+/opt/img/bin/mips-img-linux-gnu-gcc         int-add/test_msa_adds_s_h.c        \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_adds_s_h
-+/opt/img/bin/mips-img-linux-gnu-gcc         int-add/test_msa_adds_s_w.c        \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_adds_s_w
-+/opt/img/bin/mips-img-linux-gnu-gcc         int-add/test_msa_adds_s_d.c        \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_adds_s_d
-+/opt/img/bin/mips-img-linux-gnu-gcc         int-add/test_msa_adds_u_b.c        \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_adds_u_b
-+/opt/img/bin/mips-img-linux-gnu-gcc         int-add/test_msa_adds_u_h.c        \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_adds_u_h
-+/opt/img/bin/mips-img-linux-gnu-gcc         int-add/test_msa_adds_u_w.c        \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_adds_u_w
-+/opt/img/bin/mips-img-linux-gnu-gcc         int-add/test_msa_adds_u_d.c        \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_adds_u_d
-+/opt/img/bin/mips-img-linux-gnu-gcc         int-add/test_msa_addv_b.c          \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_addv_b
-+/opt/img/bin/mips-img-linux-gnu-gcc         int-add/test_msa_addv_h.c          \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_addv_h
-+/opt/img/bin/mips-img-linux-gnu-gcc         int-add/test_msa_addv_w.c          \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_addv_w
-+/opt/img/bin/mips-img-linux-gnu-gcc         int-add/test_msa_addv_d.c          \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_addv_d
-+/opt/img/bin/mips-img-linux-gnu-gcc         int-add/test_msa_hadd_s_h.c        \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_hadd_s_h
-+/opt/img/bin/mips-img-linux-gnu-gcc         int-add/test_msa_hadd_s_w.c        \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_hadd_s_w
-+/opt/img/bin/mips-img-linux-gnu-gcc         int-add/test_msa_hadd_s_d.c        \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_hadd_s_d
-+/opt/img/bin/mips-img-linux-gnu-gcc         int-add/test_msa_hadd_u_h.c        \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_hadd_u_h
-+/opt/img/bin/mips-img-linux-gnu-gcc         int-add/test_msa_hadd_u_w.c        \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_hadd_u_w
-+/opt/img/bin/mips-img-linux-gnu-gcc         int-add/test_msa_hadd_u_d.c        \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_hadd_u_d
++    uint64_t b128_result[TEST_COUNT_TOTAL][2];
++    uint64_t b128_expect[TEST_COUNT_TOTAL][2] = {
++        { 0xffffffffffffffffULL, 0xffffffffffffffffULL, },    /*   0  */
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0x5555555555555555ULL, 0x5555555555555555ULL, },
++        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
++        { 0x3333333333333333ULL, 0x3333333333333333ULL, },
++        { 0xe38e38e38e38e38eULL, 0x38e38e38e38e38e3ULL, },
++        { 0x1c71c71c71c71c71ULL, 0xc71c71c71c71c71cULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },    /*   8  */
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0x5555555555555555ULL, 0x5555555555555555ULL, },
++        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
++        { 0x3333333333333333ULL, 0x3333333333333333ULL, },
++        { 0xe38e38e38e38e38eULL, 0x38e38e38e38e38e3ULL, },
++        { 0x1c71c71c71c71c71ULL, 0xc71c71c71c71c71cULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },    /*  16  */
++        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0x5555555555555555ULL, 0x5555555555555555ULL, },
++        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
++        { 0x3333333333333333ULL, 0x3333333333333333ULL, },
++        { 0xe38e38e3aaaaaaaaULL, 0x38e38e38e38e38e3ULL, },
++        { 0xaaaaaaaa71c71c71ULL, 0xc71c71c7aaaaaaaaULL, },
++        { 0x5555555555555555ULL, 0x5555555555555555ULL, },    /*  24  */
++        { 0x5555555555555555ULL, 0x5555555555555555ULL, },
++        { 0x5555555555555555ULL, 0x5555555555555555ULL, },
++        { 0x5555555555555555ULL, 0x5555555555555555ULL, },
++        { 0x5555555555555555ULL, 0x5555555555555555ULL, },
++        { 0x5555555555555555ULL, 0x5555555555555555ULL, },
++        { 0xe38e38e355555555ULL, 0x55555555e38e38e3ULL, },
++        { 0x5555555571c71c71ULL, 0x5555555555555555ULL, },
++        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },    /*  32  */
++        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
++        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
++        { 0x5555555555555555ULL, 0x5555555555555555ULL, },
++        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
++        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
++        { 0xe38e38e3ccccccccULL, 0xcccccccce38e38e3ULL, },
++        { 0xcccccccc71c71c71ULL, 0xccccccccccccccccULL, },
++        { 0x3333333333333333ULL, 0x3333333333333333ULL, },    /*  40  */
++        { 0x3333333333333333ULL, 0x3333333333333333ULL, },
++        { 0x3333333333333333ULL, 0x3333333333333333ULL, },
++        { 0x5555555555555555ULL, 0x5555555555555555ULL, },
++        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
++        { 0x3333333333333333ULL, 0x3333333333333333ULL, },
++        { 0xe38e38e333333333ULL, 0x38e38e38e38e38e3ULL, },
++        { 0x3333333371c71c71ULL, 0xc71c71c733333333ULL, },
++        { 0xe38e38e38e38e38eULL, 0x38e38e38e38e38e3ULL, },    /*  48  */
++        { 0xe38e38e38e38e38eULL, 0x38e38e38e38e38e3ULL, },
++        { 0xe38e38e3aaaaaaaaULL, 0x38e38e38e38e38e3ULL, },
++        { 0xe38e38e355555555ULL, 0x55555555e38e38e3ULL, },
++        { 0xe38e38e3ccccccccULL, 0xcccccccce38e38e3ULL, },
++        { 0xe38e38e333333333ULL, 0x38e38e38e38e38e3ULL, },
++        { 0xe38e38e38e38e38eULL, 0x38e38e38e38e38e3ULL, },
++        { 0xe38e38e371c71c71ULL, 0xc71c71c7e38e38e3ULL, },
++        { 0x1c71c71c71c71c71ULL, 0xc71c71c71c71c71cULL, },    /*  56  */
++        { 0x1c71c71c71c71c71ULL, 0xc71c71c71c71c71cULL, },
++        { 0xaaaaaaaa71c71c71ULL, 0xc71c71c7aaaaaaaaULL, },
++        { 0x5555555571c71c71ULL, 0x5555555555555555ULL, },
++        { 0xcccccccc71c71c71ULL, 0xccccccccccccccccULL, },
++        { 0x3333333371c71c71ULL, 0xc71c71c733333333ULL, },
++        { 0xe38e38e371c71c71ULL, 0xc71c71c7e38e38e3ULL, },
++        { 0x1c71c71c71c71c71ULL, 0xc71c71c71c71c71cULL, },
++        { 0x886ae6cc28625540ULL, 0x4b670b5efe7bb00cULL, },    /*  64  */
++        { 0xfbbe00634d93c708ULL, 0x4b670b5efe7bb00cULL, },
++        { 0xac5aaeaab9cf8b80ULL, 0x4b670b5efe7bb00cULL, },
++        { 0x704f164d5e31e24eULL, 0x4b670b5efe7bb00cULL, },
++        { 0xfbbe00634d93c708ULL, 0x4b670b5efe7bb00cULL, },
++        { 0xfbbe00634d93c708ULL, 0x12f7bb1a153f52fcULL, },
++        { 0xfbbe00634d93c708ULL, 0x27d8c6ffab2b2514ULL, },
++        { 0xfbbe00635e31e24eULL, 0x12f7bb1aa942e2a0ULL, },
++        { 0xac5aaeaab9cf8b80ULL, 0x4b670b5efe7bb00cULL, },    /*  72  */
++        { 0xfbbe00634d93c708ULL, 0x27d8c6ffab2b2514ULL, },
++        { 0xac5aaeaab9cf8b80ULL, 0x27d8c6ffab2b2514ULL, },
++        { 0x704f164d5e31e24eULL, 0x27d8c6ffab2b2514ULL, },
++        { 0x704f164d5e31e24eULL, 0x4b670b5efe7bb00cULL, },
++        { 0xfbbe00635e31e24eULL, 0x12f7bb1aa942e2a0ULL, },
++        { 0x704f164d5e31e24eULL, 0x27d8c6ffab2b2514ULL, },
++        { 0x704f164d5e31e24eULL, 0x8df188d8a942e2a0ULL, },
++};
 +
-+#
-+# Int Average
-+# -----------
-+#
-+/opt/img/bin/mips-img-linux-gnu-gcc     int-average/test_msa_ave_s_b.c         \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_ave_s_b
-+/opt/img/bin/mips-img-linux-gnu-gcc     int-average/test_msa_ave_s_h.c         \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_ave_s_h
-+/opt/img/bin/mips-img-linux-gnu-gcc     int-average/test_msa_ave_s_w.c         \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_ave_s_w
-+/opt/img/bin/mips-img-linux-gnu-gcc     int-average/test_msa_ave_s_d.c         \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_ave_s_d
-+/opt/img/bin/mips-img-linux-gnu-gcc     int-average/test_msa_ave_u_b.c         \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_ave_u_b
-+/opt/img/bin/mips-img-linux-gnu-gcc     int-average/test_msa_ave_u_h.c         \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_ave_u_h
-+/opt/img/bin/mips-img-linux-gnu-gcc     int-average/test_msa_ave_u_w.c         \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_ave_u_w
-+/opt/img/bin/mips-img-linux-gnu-gcc     int-average/test_msa_ave_u_d.c         \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_ave_u_d
-+/opt/img/bin/mips-img-linux-gnu-gcc     int-average/test_msa_aver_s_b.c        \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_aver_s_b
-+/opt/img/bin/mips-img-linux-gnu-gcc     int-average/test_msa_aver_s_h.c        \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_aver_s_h
-+/opt/img/bin/mips-img-linux-gnu-gcc     int-average/test_msa_aver_s_w.c        \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_aver_s_w
-+/opt/img/bin/mips-img-linux-gnu-gcc     int-average/test_msa_aver_s_d.c        \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_aver_s_d
-+/opt/img/bin/mips-img-linux-gnu-gcc     int-average/test_msa_aver_u_b.c        \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_aver_u_b
-+/opt/img/bin/mips-img-linux-gnu-gcc     int-average/test_msa_aver_u_h.c        \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_aver_u_h
-+/opt/img/bin/mips-img-linux-gnu-gcc     int-average/test_msa_aver_u_w.c        \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_aver_u_w
-+/opt/img/bin/mips-img-linux-gnu-gcc     int-average/test_msa_aver_u_d.c        \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_aver_u_d
++    reset_msa_registers();
 +
-+#
-+# Int Compare
-+# -----------
-+#
-+/opt/img/bin/mips-img-linux-gnu-gcc     int-compare/test_msa_ceq_b.c           \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_ceq_b
-+/opt/img/bin/mips-img-linux-gnu-gcc     int-compare/test_msa_ceq_h.c           \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_ceq_h
-+/opt/img/bin/mips-img-linux-gnu-gcc     int-compare/test_msa_ceq_w.c           \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_ceq_w
-+/opt/img/bin/mips-img-linux-gnu-gcc     int-compare/test_msa_ceq_d.c           \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_ceq_d
-+/opt/img/bin/mips-img-linux-gnu-gcc     int-compare/test_msa_cle_s_b.c         \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_cle_s_b
-+/opt/img/bin/mips-img-linux-gnu-gcc     int-compare/test_msa_cle_s_h.c         \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_cle_s_h
-+/opt/img/bin/mips-img-linux-gnu-gcc     int-compare/test_msa_cle_s_w.c         \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_cle_s_w
-+/opt/img/bin/mips-img-linux-gnu-gcc     int-compare/test_msa_cle_s_d.c         \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_cle_s_d
-+/opt/img/bin/mips-img-linux-gnu-gcc     int-compare/test_msa_cle_u_b.c         \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_cle_u_b
-+/opt/img/bin/mips-img-linux-gnu-gcc     int-compare/test_msa_cle_u_h.c         \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_cle_u_h
-+/opt/img/bin/mips-img-linux-gnu-gcc     int-compare/test_msa_cle_u_w.c         \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_cle_u_w
-+/opt/img/bin/mips-img-linux-gnu-gcc     int-compare/test_msa_cle_u_d.c         \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_cle_u_d
-+/opt/img/bin/mips-img-linux-gnu-gcc     int-compare/test_msa_clt_s_b.c         \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_clt_s_b
-+/opt/img/bin/mips-img-linux-gnu-gcc     int-compare/test_msa_clt_s_h.c         \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_clt_s_h
-+/opt/img/bin/mips-img-linux-gnu-gcc     int-compare/test_msa_clt_s_w.c         \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_clt_s_w
-+/opt/img/bin/mips-img-linux-gnu-gcc     int-compare/test_msa_clt_s_d.c         \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_clt_s_d
-+/opt/img/bin/mips-img-linux-gnu-gcc     int-compare/test_msa_clt_u_b.c         \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_clt_u_b
-+/opt/img/bin/mips-img-linux-gnu-gcc     int-compare/test_msa_clt_u_h.c         \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_clt_u_h
-+/opt/img/bin/mips-img-linux-gnu-gcc     int-compare/test_msa_clt_u_w.c         \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_clt_u_w
-+/opt/img/bin/mips-img-linux-gnu-gcc     int-compare/test_msa_clt_u_d.c         \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_clt_u_d
++    gettimeofday(&start, NULL);
 +
-+#
-+# Int Divide
-+# ----------
-+#
-+/opt/img/bin/mips-img-linux-gnu-gcc      int-divide/test_msa_div_s_b.c         \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_div_s_b
-+/opt/img/bin/mips-img-linux-gnu-gcc      int-divide/test_msa_div_s_h.c         \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_div_s_h
-+/opt/img/bin/mips-img-linux-gnu-gcc      int-divide/test_msa_div_s_w.c         \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_div_s_w
-+/opt/img/bin/mips-img-linux-gnu-gcc      int-divide/test_msa_div_s_d.c         \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_div_s_d
-+/opt/img/bin/mips-img-linux-gnu-gcc      int-divide/test_msa_div_u_b.c         \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_div_u_b
-+/opt/img/bin/mips-img-linux-gnu-gcc      int-divide/test_msa_div_u_h.c         \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_div_u_h
-+/opt/img/bin/mips-img-linux-gnu-gcc      int-divide/test_msa_div_u_w.c         \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_div_u_w
-+/opt/img/bin/mips-img-linux-gnu-gcc      int-divide/test_msa_div_u_d.c         \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_div_u_d
++    for (i = 0; i < PATTERN_INPUTS_SHORT_COUNT; i++) {
++        for (j = 0; j < PATTERN_INPUTS_SHORT_COUNT; j++) {
++            do_msa_FMAX_A_W(b128_pattern[i], b128_pattern[j],
++                            b128_result[PATTERN_INPUTS_SHORT_COUNT * i + j]);
++        }
++    }
 +
-+#
-+# Int Dot Product
-+# ---------------
-+#
-+/opt/img/bin/mips-img-linux-gnu-gcc int-dot-product/test_msa_dotp_s_h.c        \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_dotp_s_h
-+/opt/img/bin/mips-img-linux-gnu-gcc int-dot-product/test_msa_dotp_s_w.c        \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_dotp_s_w
-+/opt/img/bin/mips-img-linux-gnu-gcc int-dot-product/test_msa_dotp_s_d.c        \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_dotp_s_d
-+/opt/img/bin/mips-img-linux-gnu-gcc int-dot-product/test_msa_dotp_u_h.c        \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_dotp_u_h
-+/opt/img/bin/mips-img-linux-gnu-gcc int-dot-product/test_msa_dotp_u_w.c        \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_dotp_u_w
-+/opt/img/bin/mips-img-linux-gnu-gcc int-dot-product/test_msa_dotp_u_d.c        \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_dotp_u_d
++    for (i = 0; i < RANDOM_INPUTS_SHORT_COUNT; i++) {
++        for (j = 0; j < RANDOM_INPUTS_SHORT_COUNT; j++) {
++            do_msa_FMAX_A_W(b128_random[i], b128_random[j],
++                            b128_result[((PATTERN_INPUTS_SHORT_COUNT) *
++                                         (PATTERN_INPUTS_SHORT_COUNT)) +
++                                        RANDOM_INPUTS_SHORT_COUNT * i + j]);
++        }
++    }
 +
-+#
-+# Int Max Min
-+# -----------
-+#
-+/opt/img/bin/mips-img-linux-gnu-gcc     int-max-min/test_msa_max_a_b.c         \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_max_a_b
-+/opt/img/bin/mips-img-linux-gnu-gcc     int-max-min/test_msa_max_a_h.c         \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_max_a_h
-+/opt/img/bin/mips-img-linux-gnu-gcc     int-max-min/test_msa_max_a_w.c         \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_max_a_w
-+/opt/img/bin/mips-img-linux-gnu-gcc     int-max-min/test_msa_max_a_d.c         \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_max_a_d
-+/opt/img/bin/mips-img-linux-gnu-gcc     int-max-min/test_msa_max_s_b.c         \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_max_s_b
-+/opt/img/bin/mips-img-linux-gnu-gcc     int-max-min/test_msa_max_s_h.c         \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_max_s_h
-+/opt/img/bin/mips-img-linux-gnu-gcc     int-max-min/test_msa_max_s_w.c         \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_max_s_w
-+/opt/img/bin/mips-img-linux-gnu-gcc     int-max-min/test_msa_max_s_d.c         \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_max_s_d
-+/opt/img/bin/mips-img-linux-gnu-gcc     int-max-min/test_msa_max_u_b.c         \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_max_u_b
-+/opt/img/bin/mips-img-linux-gnu-gcc     int-max-min/test_msa_max_u_h.c         \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_max_u_h
-+/opt/img/bin/mips-img-linux-gnu-gcc     int-max-min/test_msa_max_u_w.c         \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_max_u_w
-+/opt/img/bin/mips-img-linux-gnu-gcc     int-max-min/test_msa_max_u_d.c         \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_max_u_d
-+/opt/img/bin/mips-img-linux-gnu-gcc     int-max-min/test_msa_min_a_b.c         \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_min_a_b
-+/opt/img/bin/mips-img-linux-gnu-gcc     int-max-min/test_msa_min_a_h.c         \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_min_a_h
-+/opt/img/bin/mips-img-linux-gnu-gcc     int-max-min/test_msa_min_a_w.c         \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_min_a_w
-+/opt/img/bin/mips-img-linux-gnu-gcc     int-max-min/test_msa_min_a_d.c         \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_min_a_d
-+/opt/img/bin/mips-img-linux-gnu-gcc     int-max-min/test_msa_min_s_b.c         \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_min_s_b
-+/opt/img/bin/mips-img-linux-gnu-gcc     int-max-min/test_msa_min_s_h.c         \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_min_s_h
-+/opt/img/bin/mips-img-linux-gnu-gcc     int-max-min/test_msa_min_s_w.c         \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_min_s_w
-+/opt/img/bin/mips-img-linux-gnu-gcc     int-max-min/test_msa_min_s_d.c         \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_min_s_d
-+/opt/img/bin/mips-img-linux-gnu-gcc     int-max-min/test_msa_min_u_b.c         \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_min_u_b
-+/opt/img/bin/mips-img-linux-gnu-gcc     int-max-min/test_msa_min_u_h.c         \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_min_u_h
-+/opt/img/bin/mips-img-linux-gnu-gcc     int-max-min/test_msa_min_u_w.c         \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_min_u_w
-+/opt/img/bin/mips-img-linux-gnu-gcc     int-max-min/test_msa_min_u_d.c         \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_min_u_d
++    gettimeofday(&end, NULL);
 +
-+#
-+# Int Modulo
-+# ----------
-+#
-+/opt/img/bin/mips-img-linux-gnu-gcc      int-modulo/test_msa_mod_s_b.c         \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_mod_s_b
-+/opt/img/bin/mips-img-linux-gnu-gcc      int-modulo/test_msa_mod_s_h.c         \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_mod_s_h
-+/opt/img/bin/mips-img-linux-gnu-gcc      int-modulo/test_msa_mod_s_w.c         \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_mod_s_w
-+/opt/img/bin/mips-img-linux-gnu-gcc      int-modulo/test_msa_mod_s_d.c         \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_mod_s_d
-+/opt/img/bin/mips-img-linux-gnu-gcc      int-modulo/test_msa_mod_u_b.c         \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_mod_u_b
-+/opt/img/bin/mips-img-linux-gnu-gcc      int-modulo/test_msa_mod_u_h.c         \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_mod_u_h
-+/opt/img/bin/mips-img-linux-gnu-gcc      int-modulo/test_msa_mod_u_w.c         \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_mod_u_w
-+/opt/img/bin/mips-img-linux-gnu-gcc      int-modulo/test_msa_mod_u_d.c         \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_mod_u_d
++    elapsed_time = (end.tv_sec - start.tv_sec) * 1000.0;
++    elapsed_time += (end.tv_usec - start.tv_usec) / 1000.0;
 +
-+#
-+# Int Multiply
-+# ------------
-+#
-+/opt/img/bin/mips-img-linux-gnu-gcc    int-multiply/test_msa_mulv_b.c          \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_mulv_b
-+/opt/img/bin/mips-img-linux-gnu-gcc    int-multiply/test_msa_mulv_h.c          \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_mulv_h
-+/opt/img/bin/mips-img-linux-gnu-gcc    int-multiply/test_msa_mulv_w.c          \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_mulv_w
-+/opt/img/bin/mips-img-linux-gnu-gcc    int-multiply/test_msa_mulv_d.c          \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_mulv_d
++    ret = check_results(instruction_name, TEST_COUNT_TOTAL, elapsed_time,
++                        &b128_result[0][0], &b128_expect[0][0]);
 +
-+#
-+# Int Subtract
-+# ------------
-+#
-+/opt/img/bin/mips-img-linux-gnu-gcc    int-subtract/test_msa_asub_s_b.c        \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_asub_s_b
-+/opt/img/bin/mips-img-linux-gnu-gcc    int-subtract/test_msa_asub_s_h.c        \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_asub_s_h
-+/opt/img/bin/mips-img-linux-gnu-gcc    int-subtract/test_msa_asub_s_w.c        \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_asub_s_w
-+/opt/img/bin/mips-img-linux-gnu-gcc    int-subtract/test_msa_asub_s_d.c        \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_asub_s_d
-+/opt/img/bin/mips-img-linux-gnu-gcc    int-subtract/test_msa_asub_u_b.c        \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_asub_u_b
-+/opt/img/bin/mips-img-linux-gnu-gcc    int-subtract/test_msa_asub_u_h.c        \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_asub_u_h
-+/opt/img/bin/mips-img-linux-gnu-gcc    int-subtract/test_msa_asub_u_w.c        \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_asub_u_w
-+/opt/img/bin/mips-img-linux-gnu-gcc    int-subtract/test_msa_asub_u_d.c        \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_asub_u_d
-+/opt/img/bin/mips-img-linux-gnu-gcc    int-subtract/test_msa_hsub_s_h.c        \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_hsub_s_h
-+/opt/img/bin/mips-img-linux-gnu-gcc    int-subtract/test_msa_hsub_s_w.c        \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_hsub_s_w
-+/opt/img/bin/mips-img-linux-gnu-gcc    int-subtract/test_msa_hsub_s_d.c        \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_hsub_s_d
-+/opt/img/bin/mips-img-linux-gnu-gcc    int-subtract/test_msa_hsub_u_h.c        \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_hsub_u_h
-+/opt/img/bin/mips-img-linux-gnu-gcc    int-subtract/test_msa_hsub_u_w.c        \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_hsub_u_w
-+/opt/img/bin/mips-img-linux-gnu-gcc    int-subtract/test_msa_hsub_u_d.c        \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_hsub_u_d
-+/opt/img/bin/mips-img-linux-gnu-gcc    int-subtract/test_msa_subs_s_b.c        \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_subs_s_b
-+/opt/img/bin/mips-img-linux-gnu-gcc    int-subtract/test_msa_subs_s_h.c        \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_subs_s_h
-+/opt/img/bin/mips-img-linux-gnu-gcc    int-subtract/test_msa_subs_s_w.c        \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_subs_s_w
-+/opt/img/bin/mips-img-linux-gnu-gcc    int-subtract/test_msa_subs_s_d.c        \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_subs_s_d
-+/opt/img/bin/mips-img-linux-gnu-gcc    int-subtract/test_msa_subs_u_b.c        \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_subs_u_b
-+/opt/img/bin/mips-img-linux-gnu-gcc    int-subtract/test_msa_subs_u_h.c        \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_subs_u_h
-+/opt/img/bin/mips-img-linux-gnu-gcc    int-subtract/test_msa_subs_u_w.c        \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_subs_u_w
-+/opt/img/bin/mips-img-linux-gnu-gcc    int-subtract/test_msa_subs_u_d.c        \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_subs_u_d
-+/opt/img/bin/mips-img-linux-gnu-gcc    int-subtract/test_msa_subsuu_s_b.c      \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_subsuu_s_b
-+/opt/img/bin/mips-img-linux-gnu-gcc    int-subtract/test_msa_subsuu_s_h.c      \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_subsuu_s_h
-+/opt/img/bin/mips-img-linux-gnu-gcc    int-subtract/test_msa_subsuu_s_w.c      \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_subsuu_s_w
-+/opt/img/bin/mips-img-linux-gnu-gcc    int-subtract/test_msa_subsuu_s_d.c      \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_subsuu_s_d
-+/opt/img/bin/mips-img-linux-gnu-gcc    int-subtract/test_msa_subsus_u_b.c      \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_subsus_u_b
-+/opt/img/bin/mips-img-linux-gnu-gcc    int-subtract/test_msa_subsus_u_h.c      \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_subsus_u_h
-+/opt/img/bin/mips-img-linux-gnu-gcc    int-subtract/test_msa_subsus_u_w.c      \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_subsus_u_w
-+/opt/img/bin/mips-img-linux-gnu-gcc    int-subtract/test_msa_subsus_u_d.c      \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_subsus_u_d
-+/opt/img/bin/mips-img-linux-gnu-gcc    int-subtract/test_msa_subv_b.c          \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_subv_b
-+/opt/img/bin/mips-img-linux-gnu-gcc    int-subtract/test_msa_subv_h.c          \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_subv_h
-+/opt/img/bin/mips-img-linux-gnu-gcc    int-subtract/test_msa_subv_w.c          \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_subv_w
-+/opt/img/bin/mips-img-linux-gnu-gcc    int-subtract/test_msa_subv_d.c          \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_subv_d
-+
-+#
-+# Interleave
-+# ----------
-+#
-+/opt/img/bin/mips-img-linux-gnu-gcc      interleave/test_msa_ilvev_b.c         \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_ilvev_b
-+/opt/img/bin/mips-img-linux-gnu-gcc      interleave/test_msa_ilvev_h.c         \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_ilvev_h
-+/opt/img/bin/mips-img-linux-gnu-gcc      interleave/test_msa_ilvev_w.c         \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_ilvev_w
-+/opt/img/bin/mips-img-linux-gnu-gcc      interleave/test_msa_ilvev_d.c         \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_ilvev_d
-+/opt/img/bin/mips-img-linux-gnu-gcc      interleave/test_msa_ilvod_b.c         \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_ilvod_b
-+/opt/img/bin/mips-img-linux-gnu-gcc      interleave/test_msa_ilvod_h.c         \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_ilvod_h
-+/opt/img/bin/mips-img-linux-gnu-gcc      interleave/test_msa_ilvod_w.c         \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_ilvod_w
-+/opt/img/bin/mips-img-linux-gnu-gcc      interleave/test_msa_ilvod_d.c         \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_ilvod_d
-+/opt/img/bin/mips-img-linux-gnu-gcc      interleave/test_msa_ilvl_b.c          \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_ilvl_b
-+/opt/img/bin/mips-img-linux-gnu-gcc      interleave/test_msa_ilvl_h.c          \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_ilvl_h
-+/opt/img/bin/mips-img-linux-gnu-gcc      interleave/test_msa_ilvl_w.c          \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_ilvl_w
-+/opt/img/bin/mips-img-linux-gnu-gcc      interleave/test_msa_ilvl_d.c          \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_ilvl_d
-+/opt/img/bin/mips-img-linux-gnu-gcc      interleave/test_msa_ilvr_b.c          \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_ilvr_b
-+/opt/img/bin/mips-img-linux-gnu-gcc      interleave/test_msa_ilvr_h.c          \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_ilvr_h
-+/opt/img/bin/mips-img-linux-gnu-gcc      interleave/test_msa_ilvr_w.c          \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_ilvr_w
-+/opt/img/bin/mips-img-linux-gnu-gcc      interleave/test_msa_ilvr_d.c          \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_ilvr_d
-+
-+#
-+# Logic
-+# -----
-+#
-+/opt/img/bin/mips-img-linux-gnu-gcc           logic/test_msa_and_v.c           \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_and_v
-+/opt/img/bin/mips-img-linux-gnu-gcc           logic/test_msa_nor_v.c           \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_nor_v
-+/opt/img/bin/mips-img-linux-gnu-gcc           logic/test_msa_or_v.c            \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_or_v
-+/opt/img/bin/mips-img-linux-gnu-gcc           logic/test_msa_xor_v.c           \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_xor_v
-+
-+#
-+# Pack
-+# ----
-+#
-+/opt/img/bin/mips-img-linux-gnu-gcc            pack/test_msa_pckev_b.c         \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_pckev_b
-+/opt/img/bin/mips-img-linux-gnu-gcc            pack/test_msa_pckev_h.c         \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_pckev_h
-+/opt/img/bin/mips-img-linux-gnu-gcc            pack/test_msa_pckev_w.c         \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_pckev_w
-+/opt/img/bin/mips-img-linux-gnu-gcc            pack/test_msa_pckev_d.c         \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_pckev_d
-+/opt/img/bin/mips-img-linux-gnu-gcc            pack/test_msa_pckod_b.c         \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_pckod_b
-+/opt/img/bin/mips-img-linux-gnu-gcc            pack/test_msa_pckod_h.c         \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_pckod_h
-+/opt/img/bin/mips-img-linux-gnu-gcc            pack/test_msa_pckod_w.c         \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_pckod_w
-+/opt/img/bin/mips-img-linux-gnu-gcc            pack/test_msa_pckod_d.c         \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_pckod_d
-+/opt/img/bin/mips-img-linux-gnu-gcc            pack/test_msa_vshf_b.c          \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_vshf_b
-+/opt/img/bin/mips-img-linux-gnu-gcc            pack/test_msa_vshf_h.c          \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_vshf_h
-+/opt/img/bin/mips-img-linux-gnu-gcc            pack/test_msa_vshf_w.c          \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_vshf_w
-+/opt/img/bin/mips-img-linux-gnu-gcc            pack/test_msa_vshf_d.c          \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o  /tmp/test_msa_vshf_d
-+
-+#
-+# Shift
-+# -----
-+#
-+/opt/img/bin/mips-img-linux-gnu-gcc            shift/test_msa_sll_b.c          \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o   /tmp/test_msa_sll_b
-+/opt/img/bin/mips-img-linux-gnu-gcc            shift/test_msa_sll_h.c          \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o   /tmp/test_msa_sll_h
-+/opt/img/bin/mips-img-linux-gnu-gcc            shift/test_msa_sll_w.c          \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o   /tmp/test_msa_sll_w
-+/opt/img/bin/mips-img-linux-gnu-gcc            shift/test_msa_sll_d.c          \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o   /tmp/test_msa_sll_d
-+/opt/img/bin/mips-img-linux-gnu-gcc            shift/test_msa_sra_b.c          \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o   /tmp/test_msa_sra_b
-+/opt/img/bin/mips-img-linux-gnu-gcc            shift/test_msa_sra_h.c          \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o   /tmp/test_msa_sra_h
-+/opt/img/bin/mips-img-linux-gnu-gcc            shift/test_msa_sra_w.c          \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o   /tmp/test_msa_sra_w
-+/opt/img/bin/mips-img-linux-gnu-gcc            shift/test_msa_sra_d.c          \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o   /tmp/test_msa_sra_d
-+/opt/img/bin/mips-img-linux-gnu-gcc            shift/test_msa_srar_b.c         \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o   /tmp/test_msa_srar_b
-+/opt/img/bin/mips-img-linux-gnu-gcc            shift/test_msa_srar_h.c         \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o   /tmp/test_msa_srar_h
-+/opt/img/bin/mips-img-linux-gnu-gcc            shift/test_msa_srar_w.c         \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o   /tmp/test_msa_srar_w
-+/opt/img/bin/mips-img-linux-gnu-gcc            shift/test_msa_srar_d.c         \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o   /tmp/test_msa_srar_d
-+/opt/img/bin/mips-img-linux-gnu-gcc            shift/test_msa_srl_b.c          \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o   /tmp/test_msa_srl_b
-+/opt/img/bin/mips-img-linux-gnu-gcc            shift/test_msa_srl_h.c          \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o   /tmp/test_msa_srl_h
-+/opt/img/bin/mips-img-linux-gnu-gcc            shift/test_msa_srl_w.c          \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o   /tmp/test_msa_srl_w
-+/opt/img/bin/mips-img-linux-gnu-gcc            shift/test_msa_srl_d.c          \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o   /tmp/test_msa_srl_d
-+/opt/img/bin/mips-img-linux-gnu-gcc            shift/test_msa_srlr_b.c         \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o   /tmp/test_msa_srlr_b
-+/opt/img/bin/mips-img-linux-gnu-gcc            shift/test_msa_srlr_h.c         \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o   /tmp/test_msa_srlr_h
-+/opt/img/bin/mips-img-linux-gnu-gcc            shift/test_msa_srlr_w.c         \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o   /tmp/test_msa_srlr_w
-+/opt/img/bin/mips-img-linux-gnu-gcc            shift/test_msa_srlr_d.c         \
-+-EL -static -mabi=64 -march=mips64r6 -mmsa -o   /tmp/test_msa_srlr_d
-diff --git a/tests/tcg/mips/user/ase/msa/test_msa_run.sh b/tests/tcg/mips/user/ase/msa/test_msa_run.sh
-new file mode 100755
-index 0000000..5001bca
++    return ret;
++}
+diff --git a/tests/tcg/mips/user/ase/msa/float-max-min/test_msa_fmax_d.c b/tests/tcg/mips/user/ase/msa/float-max-min/test_msa_fmax_d.c
+new file mode 100644
+index 0000000..b5ce6c7
 --- /dev/null
-+++ b/tests/tcg/mips/user/ase/msa/test_msa_run.sh
-@@ -0,0 +1,329 @@
-+PATH_TO_QEMU="../../../../../../mips64el-linux-user/qemu-mips64el"
++++ b/tests/tcg/mips/user/ase/msa/float-max-min/test_msa_fmax_d.c
+@@ -0,0 +1,155 @@
++/*
++ *  Test program for MSA instruction FMAX.D
++ *
++ *  Copyright (C) 2019  Wave Computing, Inc.
++ *  Copyright (C) 2019  Aleksandar Markovic <amarkovic@wavecomp.com>
++ *
++ *  This program is free software: you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation, either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
++ *
++ */
++
++#include <sys/time.h>
++#include <stdint.h>
++
++#include "../../../../include/wrappers_msa.h"
++#include "../../../../include/test_inputs_128.h"
++#include "../../../../include/test_utils_128.h"
++
++#define TEST_COUNT_TOTAL (                                                \
++            (PATTERN_INPUTS_SHORT_COUNT) * (PATTERN_INPUTS_SHORT_COUNT) + \
++            (RANDOM_INPUTS_SHORT_COUNT) * (RANDOM_INPUTS_SHORT_COUNT))
 +
 +
-+#
-+# Bit Count
-+# ---------
-+#
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_nloc_b
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_nloc_h
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_nloc_w
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_nloc_d
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_nlzc_b
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_nlzc_h
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_nlzc_w
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_nlzc_d
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_pcnt_b
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_pcnt_h
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_pcnt_w
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_pcnt_d
++int32_t main(void)
++{
++    char *instruction_name = "FMAX.D";
++    int32_t ret;
++    uint32_t i, j;
++    struct timeval start, end;
++    double elapsed_time;
 +
-+#
-+# Bit move
-+# --------
-+#
++    uint64_t b128_result[TEST_COUNT_TOTAL][2];
++    uint64_t b128_expect[TEST_COUNT_TOTAL][2] = {
++        { 0xffffffffffffffffULL, 0xffffffffffffffffULL, },    /*   0  */
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0x5555555555555555ULL, 0x5555555555555555ULL, },
++        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
++        { 0x3333333333333333ULL, 0x3333333333333333ULL, },
++        { 0xe38e38e38e38e38eULL, 0x38e38e38e38e38e3ULL, },
++        { 0x1c71c71c71c71c71ULL, 0xc71c71c71c71c71cULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },    /*   8  */
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0x5555555555555555ULL, 0x5555555555555555ULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0x3333333333333333ULL, 0x3333333333333333ULL, },
++        { 0x0000000000000000ULL, 0x38e38e38e38e38e3ULL, },
++        { 0x1c71c71c71c71c71ULL, 0x0000000000000000ULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },    /*  16  */
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0x5555555555555555ULL, 0x5555555555555555ULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0x3333333333333333ULL, 0x3333333333333333ULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0x38e38e38e38e38e3ULL, },
++        { 0x1c71c71c71c71c71ULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0x5555555555555555ULL, 0x5555555555555555ULL, },    /*  24  */
++        { 0x5555555555555555ULL, 0x5555555555555555ULL, },
++        { 0x5555555555555555ULL, 0x5555555555555555ULL, },
++        { 0x5555555555555555ULL, 0x5555555555555555ULL, },
++        { 0x5555555555555555ULL, 0x5555555555555555ULL, },
++        { 0x5555555555555555ULL, 0x5555555555555555ULL, },
++        { 0x5555555555555555ULL, 0x5555555555555555ULL, },
++        { 0x5555555555555555ULL, 0x5555555555555555ULL, },
++        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },    /*  32  */
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0x5555555555555555ULL, 0x5555555555555555ULL, },
++        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
++        { 0x3333333333333333ULL, 0x3333333333333333ULL, },
++        { 0xccccccccccccccccULL, 0x38e38e38e38e38e3ULL, },
++        { 0x1c71c71c71c71c71ULL, 0xc71c71c71c71c71cULL, },
++        { 0x3333333333333333ULL, 0x3333333333333333ULL, },    /*  40  */
++        { 0x3333333333333333ULL, 0x3333333333333333ULL, },
++        { 0x3333333333333333ULL, 0x3333333333333333ULL, },
++        { 0x5555555555555555ULL, 0x5555555555555555ULL, },
++        { 0x3333333333333333ULL, 0x3333333333333333ULL, },
++        { 0x3333333333333333ULL, 0x3333333333333333ULL, },
++        { 0x3333333333333333ULL, 0x38e38e38e38e38e3ULL, },
++        { 0x3333333333333333ULL, 0x3333333333333333ULL, },
++        { 0xe38e38e38e38e38eULL, 0x38e38e38e38e38e3ULL, },    /*  48  */
++        { 0x0000000000000000ULL, 0x38e38e38e38e38e3ULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0x38e38e38e38e38e3ULL, },
++        { 0x5555555555555555ULL, 0x5555555555555555ULL, },
++        { 0xccccccccccccccccULL, 0x38e38e38e38e38e3ULL, },
++        { 0x3333333333333333ULL, 0x38e38e38e38e38e3ULL, },
++        { 0xe38e38e38e38e38eULL, 0x38e38e38e38e38e3ULL, },
++        { 0x1c71c71c71c71c71ULL, 0x38e38e38e38e38e3ULL, },
++        { 0x1c71c71c71c71c71ULL, 0xc71c71c71c71c71cULL, },    /*  56  */
++        { 0x1c71c71c71c71c71ULL, 0x0000000000000000ULL, },
++        { 0x1c71c71c71c71c71ULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0x5555555555555555ULL, 0x5555555555555555ULL, },
++        { 0x1c71c71c71c71c71ULL, 0xc71c71c71c71c71cULL, },
++        { 0x3333333333333333ULL, 0x3333333333333333ULL, },
++        { 0x1c71c71c71c71c71ULL, 0x38e38e38e38e38e3ULL, },
++        { 0x1c71c71c71c71c71ULL, 0xc71c71c71c71c71cULL, },
++        { 0x886ae6cc28625540ULL, 0x4b670b5efe7bb00cULL, },    /*  64  */
++        { 0x886ae6cc28625540ULL, 0x4b670b5efe7bb00cULL, },
++        { 0x886ae6cc28625540ULL, 0x4b670b5efe7bb00cULL, },
++        { 0x704f164d5e31e24eULL, 0x4b670b5efe7bb00cULL, },
++        { 0x886ae6cc28625540ULL, 0x4b670b5efe7bb00cULL, },
++        { 0xfbbe00634d93c708ULL, 0x12f7bb1a153f52fcULL, },
++        { 0xac5aaeaab9cf8b80ULL, 0x27d8c6ffab2b2514ULL, },
++        { 0x704f164d5e31e24eULL, 0x12f7bb1a153f52fcULL, },
++        { 0x886ae6cc28625540ULL, 0x4b670b5efe7bb00cULL, },    /*  72  */
++        { 0xac5aaeaab9cf8b80ULL, 0x27d8c6ffab2b2514ULL, },
++        { 0xac5aaeaab9cf8b80ULL, 0x27d8c6ffab2b2514ULL, },
++        { 0x704f164d5e31e24eULL, 0x27d8c6ffab2b2514ULL, },
++        { 0x704f164d5e31e24eULL, 0x4b670b5efe7bb00cULL, },
++        { 0x704f164d5e31e24eULL, 0x12f7bb1a153f52fcULL, },
++        { 0x704f164d5e31e24eULL, 0x27d8c6ffab2b2514ULL, },
++        { 0x704f164d5e31e24eULL, 0x8df188d8a942e2a0ULL, },
++};
 +
-+#
-+# Bit Set
-+# -------
-+#
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_bclr_b
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_bclr_h
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_bclr_w
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_bclr_d
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_bneg_b
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_bneg_h
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_bneg_w
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_bneg_d
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_bset_b
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_bset_h
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_bset_w
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_bset_d
++    reset_msa_registers();
 +
-+#
-+# Fixed Multiply
-+# --------------
-+#
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_mul_q_h
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_mul_q_w
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_mulr_q_h
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_mulr_q_w
++    gettimeofday(&start, NULL);
 +
-+#
-+# Float Max Min
-+# -------------
-+#
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_fmax_a_w
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_fmax_a_d
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_fmax_w
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_fmax_d
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_fmin_a_w
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_fmin_a_d
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_fmin_w
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_fmin_d
++    for (i = 0; i < PATTERN_INPUTS_SHORT_COUNT; i++) {
++        for (j = 0; j < PATTERN_INPUTS_SHORT_COUNT; j++) {
++            do_msa_FMAX_D(b128_pattern[i], b128_pattern[j],
++                          b128_result[PATTERN_INPUTS_SHORT_COUNT * i + j]);
++        }
++    }
 +
-+#
-+# Int Add
-+# -------
-+#
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_add_a_b
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_add_a_h
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_add_a_w
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_add_a_d
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_adds_a_b
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_adds_a_h
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_adds_a_w
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_adds_a_d
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_adds_s_b
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_adds_s_h
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_adds_s_w
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_adds_s_d
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_adds_u_b
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_adds_u_h
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_adds_u_w
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_adds_u_d
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_addv_b
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_addv_h
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_addv_w
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_addv_d
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_hadd_s_h
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_hadd_s_w
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_hadd_s_d
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_hadd_u_h
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_hadd_u_w
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_hadd_u_d
++    for (i = 0; i < RANDOM_INPUTS_SHORT_COUNT; i++) {
++        for (j = 0; j < RANDOM_INPUTS_SHORT_COUNT; j++) {
++            do_msa_FMAX_D(b128_random[i], b128_random[j],
++                          b128_result[((PATTERN_INPUTS_SHORT_COUNT) *
++                                       (PATTERN_INPUTS_SHORT_COUNT)) +
++                                      RANDOM_INPUTS_SHORT_COUNT * i + j]);
++        }
++    }
 +
-+#
-+# Int Average
-+# -----------
-+#
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_ave_s_b
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_ave_s_h
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_ave_s_w
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_ave_s_d
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_ave_u_b
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_ave_u_h
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_ave_u_w
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_ave_u_d
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_aver_s_b
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_aver_s_h
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_aver_s_w
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_aver_s_d
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_aver_u_b
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_aver_u_h
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_aver_u_w
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_aver_u_d
++    gettimeofday(&end, NULL);
 +
-+#
-+# Int Compare
-+# -----------
-+#
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_ceq_b
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_ceq_h
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_ceq_w
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_ceq_d
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_cle_s_b
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_cle_s_h
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_cle_s_w
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_cle_s_d
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_cle_u_b
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_cle_u_h
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_cle_u_w
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_cle_u_d
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_clt_s_b
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_clt_s_h
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_clt_s_w
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_clt_s_d
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_clt_u_b
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_clt_u_h
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_clt_u_w
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_clt_u_d
++    elapsed_time = (end.tv_sec - start.tv_sec) * 1000.0;
++    elapsed_time += (end.tv_usec - start.tv_usec) / 1000.0;
 +
-+#
-+# Int Divide
-+# ----------
-+#
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_div_s_b
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_div_s_h
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_div_s_w
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_div_s_d
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_div_u_b
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_div_u_h
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_div_u_w
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_div_u_d
++    ret = check_results(instruction_name, TEST_COUNT_TOTAL, elapsed_time,
++                        &b128_result[0][0], &b128_expect[0][0]);
 +
-+#
-+# Int Dot Product
-+# ---------------
-+#
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_dotp_s_h
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_dotp_s_w
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_dotp_s_d
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_dotp_u_h
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_dotp_u_w
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_dotp_u_d
++    return ret;
++}
+diff --git a/tests/tcg/mips/user/ase/msa/float-max-min/test_msa_fmax_w.c b/tests/tcg/mips/user/ase/msa/float-max-min/test_msa_fmax_w.c
+new file mode 100644
+index 0000000..5fafd30
+--- /dev/null
++++ b/tests/tcg/mips/user/ase/msa/float-max-min/test_msa_fmax_w.c
+@@ -0,0 +1,155 @@
++/*
++ *  Test program for MSA instruction FMAX.W
++ *
++ *  Copyright (C) 2019  Wave Computing, Inc.
++ *  Copyright (C) 2019  Aleksandar Markovic <amarkovic@wavecomp.com>
++ *
++ *  This program is free software: you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation, either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
++ *
++ */
 +
-+#
-+# Int Max Min
-+# -----------
-+#
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_max_a_b
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_max_a_h
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_max_a_w
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_max_a_d
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_max_s_b
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_max_s_h
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_max_s_w
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_max_s_d
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_max_u_b
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_max_u_h
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_max_u_w
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_max_u_d
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_min_a_b
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_min_a_h
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_min_a_w
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_min_a_d
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_min_s_b
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_min_s_h
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_min_s_w
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_min_s_d
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_min_u_b
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_min_u_h
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_min_u_w
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_min_u_d
++#include <sys/time.h>
++#include <stdint.h>
 +
-+#
-+# Int Modulo
-+# ----------
-+#
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_mod_s_b
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_mod_s_h
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_mod_s_w
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_mod_s_d
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_mod_u_b
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_mod_u_h
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_mod_u_w
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_mod_u_d
++#include "../../../../include/wrappers_msa.h"
++#include "../../../../include/test_inputs_128.h"
++#include "../../../../include/test_utils_128.h"
 +
-+#
-+# Int Multiply
-+# ------------
-+#
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_mulv_b
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_mulv_h
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_mulv_w
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_mulv_d
-+
-+#
-+# Int Subtract
-+# ------------
-+#
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_asub_s_b
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_asub_s_h
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_asub_s_w
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_asub_s_d
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_asub_u_b
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_asub_u_h
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_asub_u_w
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_asub_u_d
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_hsub_s_h
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_hsub_s_w
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_hsub_s_d
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_hsub_u_h
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_hsub_u_w
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_hsub_u_d
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_subs_s_b
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_subs_s_h
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_subs_s_w
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_subs_s_d
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_subs_u_b
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_subs_u_h
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_subs_u_w
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_subs_u_d
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_subsuu_s_b
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_subsuu_s_h
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_subsuu_s_w
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_subsuu_s_d
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_subsus_u_b
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_subsus_u_h
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_subsus_u_w
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_subsus_u_d
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_subv_b
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_subv_h
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_subv_w
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_subv_d
-+
-+#
-+# Interleave
-+# ----------
-+#
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_ilvev_b
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_ilvev_h
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_ilvev_w
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_ilvev_d
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_ilvod_b
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_ilvod_h
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_ilvod_w
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_ilvod_d
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_ilvl_b
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_ilvl_h
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_ilvl_w
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_ilvl_d
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_ilvr_b
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_ilvr_h
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_ilvr_w
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_ilvr_d
-+
-+#
-+# Logic
-+# -----
-+#
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_and_v
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_nor_v
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_or_v
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_xor_v
-+
-+#
-+# Pack
-+# ----
-+#
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_pckev_b
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_pckev_h
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_pckev_w
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_pckev_d
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_pckod_b
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_pckod_h
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_pckod_w
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_pckod_d
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_vshf_b
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_vshf_h
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_vshf_w
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_vshf_d
-+
-+#
-+# Shift
-+# -----
-+#
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_sll_b
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_sll_h
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_sll_w
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_sll_d
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_sra_b
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_sra_h
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_sra_w
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_sra_d
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_srar_b
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_srar_h
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_srar_w
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_srar_d
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_srl_b
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_srl_h
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_srl_w
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_srl_d
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_srlr_b
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_srlr_h
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_srlr_w
-+$PATH_TO_QEMU -cpu I6400  /tmp/test_msa_srlr_d
++#define TEST_COUNT_TOTAL (                                                \
++            (PATTERN_INPUTS_SHORT_COUNT) * (PATTERN_INPUTS_SHORT_COUNT) + \
++            (RANDOM_INPUTS_SHORT_COUNT) * (RANDOM_INPUTS_SHORT_COUNT))
 +
 +
++int32_t main(void)
++{
++    char *instruction_name = "FMAX.W";
++    int32_t ret;
++    uint32_t i, j;
++    struct timeval start, end;
++    double elapsed_time;
 +
++    uint64_t b128_result[TEST_COUNT_TOTAL][2];
++    uint64_t b128_expect[TEST_COUNT_TOTAL][2] = {
++        { 0xffffffffffffffffULL, 0xffffffffffffffffULL, },    /*   0  */
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0x5555555555555555ULL, 0x5555555555555555ULL, },
++        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
++        { 0x3333333333333333ULL, 0x3333333333333333ULL, },
++        { 0xe38e38e38e38e38eULL, 0x38e38e38e38e38e3ULL, },
++        { 0x1c71c71c71c71c71ULL, 0xc71c71c71c71c71cULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },    /*   8  */
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0x5555555555555555ULL, 0x5555555555555555ULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0x3333333333333333ULL, 0x3333333333333333ULL, },
++        { 0x0000000000000000ULL, 0x38e38e3800000000ULL, },
++        { 0x1c71c71c71c71c71ULL, 0x000000001c71c71cULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },    /*  16  */
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0x5555555555555555ULL, 0x5555555555555555ULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0x3333333333333333ULL, 0x3333333333333333ULL, },
++        { 0xaaaaaaaa8e38e38eULL, 0x38e38e38aaaaaaaaULL, },
++        { 0x1c71c71c71c71c71ULL, 0xaaaaaaaa1c71c71cULL, },
++        { 0x5555555555555555ULL, 0x5555555555555555ULL, },    /*  24  */
++        { 0x5555555555555555ULL, 0x5555555555555555ULL, },
++        { 0x5555555555555555ULL, 0x5555555555555555ULL, },
++        { 0x5555555555555555ULL, 0x5555555555555555ULL, },
++        { 0x5555555555555555ULL, 0x5555555555555555ULL, },
++        { 0x5555555555555555ULL, 0x5555555555555555ULL, },
++        { 0x5555555555555555ULL, 0x5555555555555555ULL, },
++        { 0x5555555571c71c71ULL, 0x5555555555555555ULL, },
++        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },    /*  32  */
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0x5555555555555555ULL, 0x5555555555555555ULL, },
++        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
++        { 0x3333333333333333ULL, 0x3333333333333333ULL, },
++        { 0xcccccccc8e38e38eULL, 0x38e38e38ccccccccULL, },
++        { 0x1c71c71c71c71c71ULL, 0xc71c71c71c71c71cULL, },
++        { 0x3333333333333333ULL, 0x3333333333333333ULL, },    /*  40  */
++        { 0x3333333333333333ULL, 0x3333333333333333ULL, },
++        { 0x3333333333333333ULL, 0x3333333333333333ULL, },
++        { 0x5555555555555555ULL, 0x5555555555555555ULL, },
++        { 0x3333333333333333ULL, 0x3333333333333333ULL, },
++        { 0x3333333333333333ULL, 0x3333333333333333ULL, },
++        { 0x3333333333333333ULL, 0x38e38e3833333333ULL, },
++        { 0x3333333371c71c71ULL, 0x3333333333333333ULL, },
++        { 0xe38e38e38e38e38eULL, 0x38e38e38e38e38e3ULL, },    /*  48  */
++        { 0x0000000000000000ULL, 0x38e38e3800000000ULL, },
++        { 0xaaaaaaaa8e38e38eULL, 0x38e38e38aaaaaaaaULL, },
++        { 0x5555555555555555ULL, 0x5555555555555555ULL, },
++        { 0xcccccccc8e38e38eULL, 0x38e38e38ccccccccULL, },
++        { 0x3333333333333333ULL, 0x38e38e3833333333ULL, },
++        { 0xe38e38e38e38e38eULL, 0x38e38e38e38e38e3ULL, },
++        { 0x1c71c71c71c71c71ULL, 0x38e38e381c71c71cULL, },
++        { 0x1c71c71c71c71c71ULL, 0xc71c71c71c71c71cULL, },    /*  56  */
++        { 0x1c71c71c71c71c71ULL, 0x000000001c71c71cULL, },
++        { 0x1c71c71c71c71c71ULL, 0xaaaaaaaa1c71c71cULL, },
++        { 0x5555555571c71c71ULL, 0x5555555555555555ULL, },
++        { 0x1c71c71c71c71c71ULL, 0xc71c71c71c71c71cULL, },
++        { 0x3333333371c71c71ULL, 0x3333333333333333ULL, },
++        { 0x1c71c71c71c71c71ULL, 0x38e38e381c71c71cULL, },
++        { 0x1c71c71c71c71c71ULL, 0xc71c71c71c71c71cULL, },
++        { 0x886ae6cc28625540ULL, 0x4b670b5efe7bb00cULL, },    /*  64  */
++        { 0x886ae6cc4d93c708ULL, 0x4b670b5e153f52fcULL, },
++        { 0x886ae6cc28625540ULL, 0x4b670b5eab2b2514ULL, },
++        { 0x704f164d5e31e24eULL, 0x4b670b5ea942e2a0ULL, },
++        { 0x886ae6cc4d93c708ULL, 0x4b670b5e153f52fcULL, },
++        { 0xfbbe00634d93c708ULL, 0x12f7bb1a153f52fcULL, },
++        { 0xac5aaeaa4d93c708ULL, 0x27d8c6ff153f52fcULL, },
++        { 0x704f164d5e31e24eULL, 0x12f7bb1a153f52fcULL, },
++        { 0x886ae6cc28625540ULL, 0x4b670b5eab2b2514ULL, },    /*  72  */
++        { 0xac5aaeaa4d93c708ULL, 0x27d8c6ff153f52fcULL, },
++        { 0xac5aaeaab9cf8b80ULL, 0x27d8c6ffab2b2514ULL, },
++        { 0x704f164d5e31e24eULL, 0x27d8c6ffa942e2a0ULL, },
++        { 0x704f164d5e31e24eULL, 0x4b670b5ea942e2a0ULL, },
++        { 0x704f164d5e31e24eULL, 0x12f7bb1a153f52fcULL, },
++        { 0x704f164d5e31e24eULL, 0x27d8c6ffa942e2a0ULL, },
++        { 0x704f164d5e31e24eULL, 0x8df188d8a942e2a0ULL, },
++};
++
++    reset_msa_registers();
++
++    gettimeofday(&start, NULL);
++
++    for (i = 0; i < PATTERN_INPUTS_SHORT_COUNT; i++) {
++        for (j = 0; j < PATTERN_INPUTS_SHORT_COUNT; j++) {
++            do_msa_FMAX_W(b128_pattern[i], b128_pattern[j],
++                          b128_result[PATTERN_INPUTS_SHORT_COUNT * i + j]);
++        }
++    }
++
++    for (i = 0; i < RANDOM_INPUTS_SHORT_COUNT; i++) {
++        for (j = 0; j < RANDOM_INPUTS_SHORT_COUNT; j++) {
++            do_msa_FMAX_W(b128_random[i], b128_random[j],
++                          b128_result[((PATTERN_INPUTS_SHORT_COUNT) *
++                                       (PATTERN_INPUTS_SHORT_COUNT)) +
++                                      RANDOM_INPUTS_SHORT_COUNT * i + j]);
++        }
++    }
++
++    gettimeofday(&end, NULL);
++
++    elapsed_time = (end.tv_sec - start.tv_sec) * 1000.0;
++    elapsed_time += (end.tv_usec - start.tv_usec) / 1000.0;
++
++    ret = check_results(instruction_name, TEST_COUNT_TOTAL, elapsed_time,
++                        &b128_result[0][0], &b128_expect[0][0]);
++
++    return ret;
++}
+diff --git a/tests/tcg/mips/user/ase/msa/float-max-min/test_msa_fmin_a_d.c b/tests/tcg/mips/user/ase/msa/float-max-min/test_msa_fmin_a_d.c
+new file mode 100644
+index 0000000..c0b4001
+--- /dev/null
++++ b/tests/tcg/mips/user/ase/msa/float-max-min/test_msa_fmin_a_d.c
+@@ -0,0 +1,155 @@
++/*
++ *  Test program for MSA instruction FMIN_A.D
++ *
++ *  Copyright (C) 2019  Wave Computing, Inc.
++ *  Copyright (C) 2019  Aleksandar Markovic <amarkovic@wavecomp.com>
++ *
++ *  This program is free software: you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation, either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
++ *
++ */
++
++#include <sys/time.h>
++#include <stdint.h>
++
++#include "../../../../include/wrappers_msa.h"
++#include "../../../../include/test_inputs_128.h"
++#include "../../../../include/test_utils_128.h"
++
++#define TEST_COUNT_TOTAL (                                                \
++            (PATTERN_INPUTS_SHORT_COUNT) * (PATTERN_INPUTS_SHORT_COUNT) + \
++            (RANDOM_INPUTS_SHORT_COUNT) * (RANDOM_INPUTS_SHORT_COUNT))
++
++
++int32_t main(void)
++{
++    char *instruction_name = "FMIN_A.D";
++    int32_t ret;
++    uint32_t i, j;
++    struct timeval start, end;
++    double elapsed_time;
++
++    uint64_t b128_result[TEST_COUNT_TOTAL][2];
++    uint64_t b128_expect[TEST_COUNT_TOTAL][2] = {
++        { 0xffffffffffffffffULL, 0xffffffffffffffffULL, },    /*   0  */
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0x5555555555555555ULL, 0x5555555555555555ULL, },
++        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
++        { 0x3333333333333333ULL, 0x3333333333333333ULL, },
++        { 0xe38e38e38e38e38eULL, 0x38e38e38e38e38e3ULL, },
++        { 0x1c71c71c71c71c71ULL, 0xc71c71c71c71c71cULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },    /*   8  */
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },    /*  16  */
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0x1c71c71c71c71c71ULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0x5555555555555555ULL, 0x5555555555555555ULL, },    /*  24  */
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0x5555555555555555ULL, 0x5555555555555555ULL, },
++        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
++        { 0x3333333333333333ULL, 0x3333333333333333ULL, },
++        { 0x5555555555555555ULL, 0x38e38e38e38e38e3ULL, },
++        { 0x1c71c71c71c71c71ULL, 0xc71c71c71c71c71cULL, },
++        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },    /*  32  */
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
++        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
++        { 0x3333333333333333ULL, 0x3333333333333333ULL, },
++        { 0xccccccccccccccccULL, 0x38e38e38e38e38e3ULL, },
++        { 0x1c71c71c71c71c71ULL, 0xc71c71c71c71c71cULL, },
++        { 0x3333333333333333ULL, 0x3333333333333333ULL, },    /*  40  */
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0x3333333333333333ULL, 0x3333333333333333ULL, },
++        { 0x3333333333333333ULL, 0x3333333333333333ULL, },
++        { 0x3333333333333333ULL, 0x3333333333333333ULL, },
++        { 0x3333333333333333ULL, 0x3333333333333333ULL, },
++        { 0x1c71c71c71c71c71ULL, 0x3333333333333333ULL, },
++        { 0xe38e38e38e38e38eULL, 0x38e38e38e38e38e3ULL, },    /*  48  */
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0x5555555555555555ULL, 0x38e38e38e38e38e3ULL, },
++        { 0xccccccccccccccccULL, 0x38e38e38e38e38e3ULL, },
++        { 0x3333333333333333ULL, 0x3333333333333333ULL, },
++        { 0xe38e38e38e38e38eULL, 0x38e38e38e38e38e3ULL, },
++        { 0x1c71c71c71c71c71ULL, 0x38e38e38e38e38e3ULL, },
++        { 0x1c71c71c71c71c71ULL, 0xc71c71c71c71c71cULL, },    /*  56  */
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0x1c71c71c71c71c71ULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0x1c71c71c71c71c71ULL, 0xc71c71c71c71c71cULL, },
++        { 0x1c71c71c71c71c71ULL, 0xc71c71c71c71c71cULL, },
++        { 0x1c71c71c71c71c71ULL, 0x3333333333333333ULL, },
++        { 0x1c71c71c71c71c71ULL, 0x38e38e38e38e38e3ULL, },
++        { 0x1c71c71c71c71c71ULL, 0xc71c71c71c71c71cULL, },
++        { 0x886ae6cc28625540ULL, 0x4b670b5efe7bb00cULL, },    /*  64  */
++        { 0x886ae6cc28625540ULL, 0x12f7bb1a153f52fcULL, },
++        { 0x886ae6cc28625540ULL, 0x27d8c6ffab2b2514ULL, },
++        { 0x886ae6cc28625540ULL, 0x8df188d8a942e2a0ULL, },
++        { 0x886ae6cc28625540ULL, 0x12f7bb1a153f52fcULL, },
++        { 0xfbbe00634d93c708ULL, 0x12f7bb1a153f52fcULL, },
++        { 0xac5aaeaab9cf8b80ULL, 0x12f7bb1a153f52fcULL, },
++        { 0x704f164d5e31e24eULL, 0x8df188d8a942e2a0ULL, },
++        { 0x886ae6cc28625540ULL, 0x27d8c6ffab2b2514ULL, },    /*  72  */
++        { 0xac5aaeaab9cf8b80ULL, 0x12f7bb1a153f52fcULL, },
++        { 0xac5aaeaab9cf8b80ULL, 0x27d8c6ffab2b2514ULL, },
++        { 0xac5aaeaab9cf8b80ULL, 0x8df188d8a942e2a0ULL, },
++        { 0x886ae6cc28625540ULL, 0x8df188d8a942e2a0ULL, },
++        { 0x704f164d5e31e24eULL, 0x8df188d8a942e2a0ULL, },
++        { 0xac5aaeaab9cf8b80ULL, 0x8df188d8a942e2a0ULL, },
++        { 0x704f164d5e31e24eULL, 0x8df188d8a942e2a0ULL, },
++};
++
++    reset_msa_registers();
++
++    gettimeofday(&start, NULL);
++
++    for (i = 0; i < PATTERN_INPUTS_SHORT_COUNT; i++) {
++        for (j = 0; j < PATTERN_INPUTS_SHORT_COUNT; j++) {
++            do_msa_FMIN_A_D(b128_pattern[i], b128_pattern[j],
++                            b128_result[PATTERN_INPUTS_SHORT_COUNT * i + j]);
++        }
++    }
++
++    for (i = 0; i < RANDOM_INPUTS_SHORT_COUNT; i++) {
++        for (j = 0; j < RANDOM_INPUTS_SHORT_COUNT; j++) {
++            do_msa_FMIN_A_D(b128_random[i], b128_random[j],
++                            b128_result[((PATTERN_INPUTS_SHORT_COUNT) *
++                                         (PATTERN_INPUTS_SHORT_COUNT)) +
++                                        RANDOM_INPUTS_SHORT_COUNT * i + j]);
++        }
++    }
++
++    gettimeofday(&end, NULL);
++
++    elapsed_time = (end.tv_sec - start.tv_sec) * 1000.0;
++    elapsed_time += (end.tv_usec - start.tv_usec) / 1000.0;
++
++    ret = check_results(instruction_name, TEST_COUNT_TOTAL, elapsed_time,
++                        &b128_result[0][0], &b128_expect[0][0]);
++
++    return ret;
++}
+diff --git a/tests/tcg/mips/user/ase/msa/float-max-min/test_msa_fmin_a_w.c b/tests/tcg/mips/user/ase/msa/float-max-min/test_msa_fmin_a_w.c
+new file mode 100644
+index 0000000..d174fcd
+--- /dev/null
++++ b/tests/tcg/mips/user/ase/msa/float-max-min/test_msa_fmin_a_w.c
+@@ -0,0 +1,155 @@
++/*
++ *  Test program for MSA instruction FMIN_A.W
++ *
++ *  Copyright (C) 2019  Wave Computing, Inc.
++ *  Copyright (C) 2019  Aleksandar Markovic <amarkovic@wavecomp.com>
++ *
++ *  This program is free software: you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation, either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
++ *
++ */
++
++#include <sys/time.h>
++#include <stdint.h>
++
++#include "../../../../include/wrappers_msa.h"
++#include "../../../../include/test_inputs_128.h"
++#include "../../../../include/test_utils_128.h"
++
++#define TEST_COUNT_TOTAL (                                                \
++            (PATTERN_INPUTS_SHORT_COUNT) * (PATTERN_INPUTS_SHORT_COUNT) + \
++            (RANDOM_INPUTS_SHORT_COUNT) * (RANDOM_INPUTS_SHORT_COUNT))
++
++
++int32_t main(void)
++{
++    char *instruction_name = "FMIN_A.W";
++    int32_t ret;
++    uint32_t i, j;
++    struct timeval start, end;
++    double elapsed_time;
++
++    uint64_t b128_result[TEST_COUNT_TOTAL][2];
++    uint64_t b128_expect[TEST_COUNT_TOTAL][2] = {
++        { 0xffffffffffffffffULL, 0xffffffffffffffffULL, },    /*   0  */
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0x5555555555555555ULL, 0x5555555555555555ULL, },
++        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
++        { 0x3333333333333333ULL, 0x3333333333333333ULL, },
++        { 0xe38e38e38e38e38eULL, 0x38e38e38e38e38e3ULL, },
++        { 0x1c71c71c71c71c71ULL, 0xc71c71c71c71c71cULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },    /*   8  */
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },    /*  16  */
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0xaaaaaaaa8e38e38eULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0x1c71c71caaaaaaaaULL, 0xaaaaaaaa1c71c71cULL, },
++        { 0x5555555555555555ULL, 0x5555555555555555ULL, },    /*  24  */
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0x5555555555555555ULL, 0x5555555555555555ULL, },
++        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
++        { 0x3333333333333333ULL, 0x3333333333333333ULL, },
++        { 0x555555558e38e38eULL, 0x38e38e3855555555ULL, },
++        { 0x1c71c71c55555555ULL, 0xc71c71c71c71c71cULL, },
++        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },    /*  32  */
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
++        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
++        { 0x3333333333333333ULL, 0x3333333333333333ULL, },
++        { 0xcccccccc8e38e38eULL, 0x38e38e38ccccccccULL, },
++        { 0x1c71c71cccccccccULL, 0xc71c71c71c71c71cULL, },
++        { 0x3333333333333333ULL, 0x3333333333333333ULL, },    /*  40  */
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0x3333333333333333ULL, 0x3333333333333333ULL, },
++        { 0x3333333333333333ULL, 0x3333333333333333ULL, },
++        { 0x3333333333333333ULL, 0x3333333333333333ULL, },
++        { 0x333333338e38e38eULL, 0x3333333333333333ULL, },
++        { 0x1c71c71c33333333ULL, 0x333333331c71c71cULL, },
++        { 0xe38e38e38e38e38eULL, 0x38e38e38e38e38e3ULL, },    /*  48  */
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xaaaaaaaa8e38e38eULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0x555555558e38e38eULL, 0x38e38e3855555555ULL, },
++        { 0xcccccccc8e38e38eULL, 0x38e38e38ccccccccULL, },
++        { 0x333333338e38e38eULL, 0x3333333333333333ULL, },
++        { 0xe38e38e38e38e38eULL, 0x38e38e38e38e38e3ULL, },
++        { 0x1c71c71c8e38e38eULL, 0x38e38e381c71c71cULL, },
++        { 0x1c71c71c71c71c71ULL, 0xc71c71c71c71c71cULL, },    /*  56  */
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0x1c71c71caaaaaaaaULL, 0xaaaaaaaa1c71c71cULL, },
++        { 0x1c71c71c55555555ULL, 0xc71c71c71c71c71cULL, },
++        { 0x1c71c71cccccccccULL, 0xc71c71c71c71c71cULL, },
++        { 0x1c71c71c33333333ULL, 0x333333331c71c71cULL, },
++        { 0x1c71c71c8e38e38eULL, 0x38e38e381c71c71cULL, },
++        { 0x1c71c71c71c71c71ULL, 0xc71c71c71c71c71cULL, },
++        { 0x886ae6cc28625540ULL, 0x4b670b5efe7bb00cULL, },    /*  64  */
++        { 0x886ae6cc28625540ULL, 0x12f7bb1a153f52fcULL, },
++        { 0x886ae6cc28625540ULL, 0x27d8c6ffab2b2514ULL, },
++        { 0x886ae6cc28625540ULL, 0x8df188d8a942e2a0ULL, },
++        { 0x886ae6cc28625540ULL, 0x12f7bb1a153f52fcULL, },
++        { 0xfbbe00634d93c708ULL, 0x12f7bb1a153f52fcULL, },
++        { 0xac5aaeaab9cf8b80ULL, 0x12f7bb1a153f52fcULL, },
++        { 0x704f164d4d93c708ULL, 0x8df188d8153f52fcULL, },
++        { 0x886ae6cc28625540ULL, 0x27d8c6ffab2b2514ULL, },    /*  72  */
++        { 0xac5aaeaab9cf8b80ULL, 0x12f7bb1a153f52fcULL, },
++        { 0xac5aaeaab9cf8b80ULL, 0x27d8c6ffab2b2514ULL, },
++        { 0xac5aaeaab9cf8b80ULL, 0x8df188d8a942e2a0ULL, },
++        { 0x886ae6cc28625540ULL, 0x8df188d8a942e2a0ULL, },
++        { 0x704f164d4d93c708ULL, 0x8df188d8153f52fcULL, },
++        { 0xac5aaeaab9cf8b80ULL, 0x8df188d8a942e2a0ULL, },
++        { 0x704f164d5e31e24eULL, 0x8df188d8a942e2a0ULL, },
++};
++
++    reset_msa_registers();
++
++    gettimeofday(&start, NULL);
++
++    for (i = 0; i < PATTERN_INPUTS_SHORT_COUNT; i++) {
++        for (j = 0; j < PATTERN_INPUTS_SHORT_COUNT; j++) {
++            do_msa_FMIN_A_W(b128_pattern[i], b128_pattern[j],
++                            b128_result[PATTERN_INPUTS_SHORT_COUNT * i + j]);
++        }
++    }
++
++    for (i = 0; i < RANDOM_INPUTS_SHORT_COUNT; i++) {
++        for (j = 0; j < RANDOM_INPUTS_SHORT_COUNT; j++) {
++            do_msa_FMIN_A_W(b128_random[i], b128_random[j],
++                            b128_result[((PATTERN_INPUTS_SHORT_COUNT) *
++                                         (PATTERN_INPUTS_SHORT_COUNT)) +
++                                        RANDOM_INPUTS_SHORT_COUNT * i + j]);
++        }
++    }
++
++    gettimeofday(&end, NULL);
++
++    elapsed_time = (end.tv_sec - start.tv_sec) * 1000.0;
++    elapsed_time += (end.tv_usec - start.tv_usec) / 1000.0;
++
++    ret = check_results(instruction_name, TEST_COUNT_TOTAL, elapsed_time,
++                        &b128_result[0][0], &b128_expect[0][0]);
++
++    return ret;
++}
+diff --git a/tests/tcg/mips/user/ase/msa/float-max-min/test_msa_fmin_d.c b/tests/tcg/mips/user/ase/msa/float-max-min/test_msa_fmin_d.c
+new file mode 100644
+index 0000000..62c149f
+--- /dev/null
++++ b/tests/tcg/mips/user/ase/msa/float-max-min/test_msa_fmin_d.c
+@@ -0,0 +1,155 @@
++/*
++ *  Test program for MSA instruction FMIN.D
++ *
++ *  Copyright (C) 2019  Wave Computing, Inc.
++ *  Copyright (C) 2019  Aleksandar Markovic <amarkovic@wavecomp.com>
++ *
++ *  This program is free software: you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation, either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
++ *
++ */
++
++#include <sys/time.h>
++#include <stdint.h>
++
++#include "../../../../include/wrappers_msa.h"
++#include "../../../../include/test_inputs_128.h"
++#include "../../../../include/test_utils_128.h"
++
++#define TEST_COUNT_TOTAL (                                                \
++            (PATTERN_INPUTS_SHORT_COUNT) * (PATTERN_INPUTS_SHORT_COUNT) + \
++            (RANDOM_INPUTS_SHORT_COUNT) * (RANDOM_INPUTS_SHORT_COUNT))
++
++
++int32_t main(void)
++{
++    char *instruction_name = "FMIN.D";
++    int32_t ret;
++    uint32_t i, j;
++    struct timeval start, end;
++    double elapsed_time;
++
++    uint64_t b128_result[TEST_COUNT_TOTAL][2];
++    uint64_t b128_expect[TEST_COUNT_TOTAL][2] = {
++        { 0xffffffffffffffffULL, 0xffffffffffffffffULL, },    /*   0  */
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0x5555555555555555ULL, 0x5555555555555555ULL, },
++        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
++        { 0x3333333333333333ULL, 0x3333333333333333ULL, },
++        { 0xe38e38e38e38e38eULL, 0x38e38e38e38e38e3ULL, },
++        { 0x1c71c71c71c71c71ULL, 0xc71c71c71c71c71cULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },    /*   8  */
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xe38e38e38e38e38eULL, 0x0000000000000000ULL, },
++        { 0x0000000000000000ULL, 0xc71c71c71c71c71cULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },    /*  16  */
++        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0xe38e38e38e38e38eULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0xc71c71c71c71c71cULL, },
++        { 0x5555555555555555ULL, 0x5555555555555555ULL, },    /*  24  */
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0x5555555555555555ULL, 0x5555555555555555ULL, },
++        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
++        { 0x3333333333333333ULL, 0x3333333333333333ULL, },
++        { 0xe38e38e38e38e38eULL, 0x38e38e38e38e38e3ULL, },
++        { 0x1c71c71c71c71c71ULL, 0xc71c71c71c71c71cULL, },
++        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },    /*  32  */
++        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
++        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
++        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
++        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
++        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
++        { 0xe38e38e38e38e38eULL, 0xccccccccccccccccULL, },
++        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
++        { 0x3333333333333333ULL, 0x3333333333333333ULL, },    /*  40  */
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0x3333333333333333ULL, 0x3333333333333333ULL, },
++        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
++        { 0x3333333333333333ULL, 0x3333333333333333ULL, },
++        { 0xe38e38e38e38e38eULL, 0x3333333333333333ULL, },
++        { 0x1c71c71c71c71c71ULL, 0xc71c71c71c71c71cULL, },
++        { 0xe38e38e38e38e38eULL, 0x38e38e38e38e38e3ULL, },    /*  48  */
++        { 0xe38e38e38e38e38eULL, 0x0000000000000000ULL, },
++        { 0xe38e38e38e38e38eULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0xe38e38e38e38e38eULL, 0x38e38e38e38e38e3ULL, },
++        { 0xe38e38e38e38e38eULL, 0xccccccccccccccccULL, },
++        { 0xe38e38e38e38e38eULL, 0x3333333333333333ULL, },
++        { 0xe38e38e38e38e38eULL, 0x38e38e38e38e38e3ULL, },
++        { 0xe38e38e38e38e38eULL, 0xc71c71c71c71c71cULL, },
++        { 0x1c71c71c71c71c71ULL, 0xc71c71c71c71c71cULL, },    /*  56  */
++        { 0x0000000000000000ULL, 0xc71c71c71c71c71cULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0xc71c71c71c71c71cULL, },
++        { 0x1c71c71c71c71c71ULL, 0xc71c71c71c71c71cULL, },
++        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
++        { 0x1c71c71c71c71c71ULL, 0xc71c71c71c71c71cULL, },
++        { 0xe38e38e38e38e38eULL, 0xc71c71c71c71c71cULL, },
++        { 0x1c71c71c71c71c71ULL, 0xc71c71c71c71c71cULL, },
++        { 0x886ae6cc28625540ULL, 0x4b670b5efe7bb00cULL, },    /*  64  */
++        { 0xfbbe00634d93c708ULL, 0x12f7bb1a153f52fcULL, },
++        { 0xac5aaeaab9cf8b80ULL, 0x27d8c6ffab2b2514ULL, },
++        { 0x886ae6cc28625540ULL, 0x8df188d8a942e2a0ULL, },
++        { 0xfbbe00634d93c708ULL, 0x12f7bb1a153f52fcULL, },
++        { 0xfbbe00634d93c708ULL, 0x12f7bb1a153f52fcULL, },
++        { 0xfbbe00634d93c708ULL, 0x12f7bb1a153f52fcULL, },
++        { 0xfbbe00634d93c708ULL, 0x8df188d8a942e2a0ULL, },
++        { 0xac5aaeaab9cf8b80ULL, 0x27d8c6ffab2b2514ULL, },    /*  72  */
++        { 0xfbbe00634d93c708ULL, 0x12f7bb1a153f52fcULL, },
++        { 0xac5aaeaab9cf8b80ULL, 0x27d8c6ffab2b2514ULL, },
++        { 0xac5aaeaab9cf8b80ULL, 0x8df188d8a942e2a0ULL, },
++        { 0x886ae6cc28625540ULL, 0x8df188d8a942e2a0ULL, },
++        { 0xfbbe00634d93c708ULL, 0x8df188d8a942e2a0ULL, },
++        { 0xac5aaeaab9cf8b80ULL, 0x8df188d8a942e2a0ULL, },
++        { 0x704f164d5e31e24eULL, 0x8df188d8a942e2a0ULL, },
++};
++
++    reset_msa_registers();
++
++    gettimeofday(&start, NULL);
++
++    for (i = 0; i < PATTERN_INPUTS_SHORT_COUNT; i++) {
++        for (j = 0; j < PATTERN_INPUTS_SHORT_COUNT; j++) {
++            do_msa_FMIN_D(b128_pattern[i], b128_pattern[j],
++                          b128_result[PATTERN_INPUTS_SHORT_COUNT * i + j]);
++        }
++    }
++
++    for (i = 0; i < RANDOM_INPUTS_SHORT_COUNT; i++) {
++        for (j = 0; j < RANDOM_INPUTS_SHORT_COUNT; j++) {
++            do_msa_FMIN_D(b128_random[i], b128_random[j],
++                          b128_result[((PATTERN_INPUTS_SHORT_COUNT) *
++                                       (PATTERN_INPUTS_SHORT_COUNT)) +
++                                      RANDOM_INPUTS_SHORT_COUNT * i + j]);
++        }
++    }
++
++    gettimeofday(&end, NULL);
++
++    elapsed_time = (end.tv_sec - start.tv_sec) * 1000.0;
++    elapsed_time += (end.tv_usec - start.tv_usec) / 1000.0;
++
++    ret = check_results(instruction_name, TEST_COUNT_TOTAL, elapsed_time,
++                        &b128_result[0][0], &b128_expect[0][0]);
++
++    return ret;
++}
+diff --git a/tests/tcg/mips/user/ase/msa/float-max-min/test_msa_fmin_w.c b/tests/tcg/mips/user/ase/msa/float-max-min/test_msa_fmin_w.c
+new file mode 100644
+index 0000000..c5815a6
+--- /dev/null
++++ b/tests/tcg/mips/user/ase/msa/float-max-min/test_msa_fmin_w.c
+@@ -0,0 +1,155 @@
++/*
++ *  Test program for MSA instruction FMIN.W
++ *
++ *  Copyright (C) 2019  Wave Computing, Inc.
++ *  Copyright (C) 2019  Aleksandar Markovic <amarkovic@wavecomp.com>
++ *
++ *  This program is free software: you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation, either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
++ *
++ */
++
++#include <sys/time.h>
++#include <stdint.h>
++
++#include "../../../../include/wrappers_msa.h"
++#include "../../../../include/test_inputs_128.h"
++#include "../../../../include/test_utils_128.h"
++
++#define TEST_COUNT_TOTAL (                                                \
++            (PATTERN_INPUTS_SHORT_COUNT) * (PATTERN_INPUTS_SHORT_COUNT) + \
++            (RANDOM_INPUTS_SHORT_COUNT) * (RANDOM_INPUTS_SHORT_COUNT))
++
++
++int32_t main(void)
++{
++    char *instruction_name = "FMIN.W";
++    int32_t ret;
++    uint32_t i, j;
++    struct timeval start, end;
++    double elapsed_time;
++
++    uint64_t b128_result[TEST_COUNT_TOTAL][2];
++    uint64_t b128_expect[TEST_COUNT_TOTAL][2] = {
++        { 0xffffffffffffffffULL, 0xffffffffffffffffULL, },    /*   0  */
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0x5555555555555555ULL, 0x5555555555555555ULL, },
++        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
++        { 0x3333333333333333ULL, 0x3333333333333333ULL, },
++        { 0xe38e38e38e38e38eULL, 0x38e38e38e38e38e3ULL, },
++        { 0x1c71c71c71c71c71ULL, 0xc71c71c71c71c71cULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },    /*   8  */
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xe38e38e38e38e38eULL, 0x00000000e38e38e3ULL, },
++        { 0x0000000000000000ULL, 0xc71c71c700000000ULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },    /*  16  */
++        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0xe38e38e3aaaaaaaaULL, 0xaaaaaaaae38e38e3ULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0xc71c71c7aaaaaaaaULL, },
++        { 0x5555555555555555ULL, 0x5555555555555555ULL, },    /*  24  */
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0x5555555555555555ULL, 0x5555555555555555ULL, },
++        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
++        { 0x3333333333333333ULL, 0x3333333333333333ULL, },
++        { 0xe38e38e38e38e38eULL, 0x38e38e38e38e38e3ULL, },
++        { 0x1c71c71c55555555ULL, 0xc71c71c71c71c71cULL, },
++        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },    /*  32  */
++        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
++        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
++        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
++        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
++        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
++        { 0xe38e38e3ccccccccULL, 0xcccccccce38e38e3ULL, },
++        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
++        { 0x3333333333333333ULL, 0x3333333333333333ULL, },    /*  40  */
++        { 0x0000000000000000ULL, 0x0000000000000000ULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0xaaaaaaaaaaaaaaaaULL, },
++        { 0x3333333333333333ULL, 0x3333333333333333ULL, },
++        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
++        { 0x3333333333333333ULL, 0x3333333333333333ULL, },
++        { 0xe38e38e38e38e38eULL, 0x33333333e38e38e3ULL, },
++        { 0x1c71c71c33333333ULL, 0xc71c71c71c71c71cULL, },
++        { 0xe38e38e38e38e38eULL, 0x38e38e38e38e38e3ULL, },    /*  48  */
++        { 0xe38e38e38e38e38eULL, 0x00000000e38e38e3ULL, },
++        { 0xe38e38e3aaaaaaaaULL, 0xaaaaaaaae38e38e3ULL, },
++        { 0xe38e38e38e38e38eULL, 0x38e38e38e38e38e3ULL, },
++        { 0xe38e38e3ccccccccULL, 0xcccccccce38e38e3ULL, },
++        { 0xe38e38e38e38e38eULL, 0x33333333e38e38e3ULL, },
++        { 0xe38e38e38e38e38eULL, 0x38e38e38e38e38e3ULL, },
++        { 0xe38e38e38e38e38eULL, 0xc71c71c7e38e38e3ULL, },
++        { 0x1c71c71c71c71c71ULL, 0xc71c71c71c71c71cULL, },    /*  56  */
++        { 0x0000000000000000ULL, 0xc71c71c700000000ULL, },
++        { 0xaaaaaaaaaaaaaaaaULL, 0xc71c71c7aaaaaaaaULL, },
++        { 0x1c71c71c55555555ULL, 0xc71c71c71c71c71cULL, },
++        { 0xccccccccccccccccULL, 0xccccccccccccccccULL, },
++        { 0x1c71c71c33333333ULL, 0xc71c71c71c71c71cULL, },
++        { 0xe38e38e38e38e38eULL, 0xc71c71c7e38e38e3ULL, },
++        { 0x1c71c71c71c71c71ULL, 0xc71c71c71c71c71cULL, },
++        { 0x886ae6cc28625540ULL, 0x4b670b5efe7bb00cULL, },    /*  64  */
++        { 0xfbbe006328625540ULL, 0x12f7bb1afe7bb00cULL, },
++        { 0xac5aaeaab9cf8b80ULL, 0x27d8c6fffe7bb00cULL, },
++        { 0x886ae6cc28625540ULL, 0x8df188d8fe7bb00cULL, },
++        { 0xfbbe006328625540ULL, 0x12f7bb1afe7bb00cULL, },
++        { 0xfbbe00634d93c708ULL, 0x12f7bb1a153f52fcULL, },
++        { 0xfbbe0063b9cf8b80ULL, 0x12f7bb1aab2b2514ULL, },
++        { 0xfbbe00634d93c708ULL, 0x8df188d8a942e2a0ULL, },
++        { 0xac5aaeaab9cf8b80ULL, 0x27d8c6fffe7bb00cULL, },    /*  72  */
++        { 0xfbbe0063b9cf8b80ULL, 0x12f7bb1aab2b2514ULL, },
++        { 0xac5aaeaab9cf8b80ULL, 0x27d8c6ffab2b2514ULL, },
++        { 0xac5aaeaab9cf8b80ULL, 0x8df188d8ab2b2514ULL, },
++        { 0x886ae6cc28625540ULL, 0x8df188d8fe7bb00cULL, },
++        { 0xfbbe00634d93c708ULL, 0x8df188d8a942e2a0ULL, },
++        { 0xac5aaeaab9cf8b80ULL, 0x8df188d8ab2b2514ULL, },
++        { 0x704f164d5e31e24eULL, 0x8df188d8a942e2a0ULL, },
++};
++
++    reset_msa_registers();
++
++    gettimeofday(&start, NULL);
++
++    for (i = 0; i < PATTERN_INPUTS_SHORT_COUNT; i++) {
++        for (j = 0; j < PATTERN_INPUTS_SHORT_COUNT; j++) {
++            do_msa_FMIN_W(b128_pattern[i], b128_pattern[j],
++                          b128_result[PATTERN_INPUTS_SHORT_COUNT * i + j]);
++        }
++    }
++
++    for (i = 0; i < RANDOM_INPUTS_SHORT_COUNT; i++) {
++        for (j = 0; j < RANDOM_INPUTS_SHORT_COUNT; j++) {
++            do_msa_FMIN_W(b128_random[i], b128_random[j],
++                          b128_result[((PATTERN_INPUTS_SHORT_COUNT) *
++                                       (PATTERN_INPUTS_SHORT_COUNT)) +
++                                      RANDOM_INPUTS_SHORT_COUNT * i + j]);
++        }
++    }
++
++    gettimeofday(&end, NULL);
++
++    elapsed_time = (end.tv_sec - start.tv_sec) * 1000.0;
++    elapsed_time += (end.tv_usec - start.tv_usec) / 1000.0;
++
++    ret = check_results(instruction_name, TEST_COUNT_TOTAL, elapsed_time,
++                        &b128_result[0][0], &b128_expect[0][0]);
++
++    return ret;
++}
 -- 
 2.7.4
 
