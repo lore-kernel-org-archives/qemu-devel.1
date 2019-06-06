@@ -2,59 +2,68 @@ Return-Path: <SRS0=9X/F=UF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 637B4C04AB5
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 08:50:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57E8CC28D1C
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 08:50:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1 with cipher AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EFCDF2083E
-	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 08:50:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EFCDF2083E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 33B362083E
+	for <qemu-devel@archiver.kernel.org>; Thu,  6 Jun 2019 08:50:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 33B362083E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([127.0.0.1]:56654 helo=lists.gnu.org)
+Received: from localhost ([127.0.0.1]:56684 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hYo6M-0001QS-1h
-	for qemu-devel@archiver.kernel.org; Thu, 06 Jun 2019 04:50:26 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:55558)
+	id 1hYo6V-0001az-FS
+	for qemu-devel@archiver.kernel.org; Thu, 06 Jun 2019 04:50:35 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:55899)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richardw.yang@linux.intel.com>) id 1hYnyf-0003nK-5M
-	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 04:42:33 -0400
+	(envelope-from <armbru@redhat.com>) id 1hYnyq-00043u-LM
+	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 04:42:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richardw.yang@linux.intel.com>) id 1hYnsM-0003YH-Fa
-	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 04:35:59 -0400
-Received: from mga14.intel.com ([192.55.52.115]:4990)
+	(envelope-from <armbru@redhat.com>) id 1hYnyp-0003jW-Ow
+	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 04:42:40 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44918)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <richardw.yang@linux.intel.com>)
-	id 1hYnsM-0003TJ-80
-	for qemu-devel@nongnu.org; Thu, 06 Jun 2019 04:35:58 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-	by fmsmga103.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
-	06 Jun 2019 01:35:57 -0700
-X-ExtLoop1: 1
-Received: from richard.sh.intel.com (HELO localhost) ([10.239.159.54])
-	by fmsmga001.fm.intel.com with ESMTP; 06 Jun 2019 01:35:57 -0700
-From: Wei Yang <richardw.yang@linux.intel.com>
-To: qemu-devel@nongnu.org
-Date: Thu,  6 Jun 2019 16:35:00 +0800
-Message-Id: <20190606083501.2087-6-richardw.yang@linux.intel.com>
-X-Mailer: git-send-email 2.19.1
-In-Reply-To: <20190606083501.2087-1-richardw.yang@linux.intel.com>
-References: <20190606083501.2087-1-richardw.yang@linux.intel.com>
+	(Exim 4.71) (envelope-from <armbru@redhat.com>)
+	id 1hYnyR-0003B2-7o; Thu, 06 Jun 2019 04:42:16 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 317263092641;
+	Thu,  6 Jun 2019 08:42:14 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-148.ams2.redhat.com
+	[10.36.116.148])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 0045B18AC1;
+	Thu,  6 Jun 2019 08:42:13 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+	id 8609D11386A0; Thu,  6 Jun 2019 10:42:12 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+References: <20190605205706.569-1-richard.henderson@linaro.org>
+	<20190605205706.569-5-richard.henderson@linaro.org>
+	<CAL1e-=jYwL9bb_YVp28pf=R4Gb0+1MgxYLsO=2927W=CtUrQ-A@mail.gmail.com>
+Date: Thu, 06 Jun 2019 10:42:12 +0200
+In-Reply-To: <CAL1e-=jYwL9bb_YVp28pf=R4Gb0+1MgxYLsO=2927W=CtUrQ-A@mail.gmail.com>
+	(Aleksandar Markovic's message of "Thu, 6 Jun 2019 07:45:58 +0200")
+Message-ID: <87o93bhzq3.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
-	recognized.
-X-Received-From: 192.55.52.115
-Subject: [Qemu-devel] [PATCH 5/6] migration/multifd: use boolean for
- pending_job is enough
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+	(mx1.redhat.com [10.5.110.43]);
+	Thu, 06 Jun 2019 08:42:14 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v6 4/6] include/elf: Add defines related to
+ notes for GNU systems
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.21
 Precedence: list
@@ -66,64 +75,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Wei Yang <richardw.yang@linux.intel.com>, dgilbert@redhat.com,
-	quintela@redhat.com
+Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org,
+	Richard Henderson <richard.henderson@linaro.org>,
+	qemu-devel@nongnu.org, Dave.Martin@arm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
 	<qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-After synchronization request is handled in another case, there only
-could be one pending_job for one send thread at most.
+Aleksandar Markovic <aleksandar.m.mail@gmail.com> writes:
 
-This is fine to use boolean to represent this behavior.
+> On Jun 5, 2019 11:03 PM, "Richard Henderson" <richard.henderson@linaro.org>
+> wrote:
+>>
+>> This is a collection of related
+>
+> Related to what?
+>
+>> defines for notes, copied
+>> from glibc's <elf.h>.  We're not going to use all of these
+>> right away, but it seemed foolish
+>
+> I don't think this an appropriate word for a commit message.
 
-Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
----
- migration/ram.c | 9 ++++-----
- 1 file changed, 4 insertions(+), 5 deletions(-)
+Calling an alternative you considered but rejected "foolish" feels
+perfectly alright to me.
 
-diff --git a/migration/ram.c b/migration/ram.c
-index 3e48795608..831b15833b 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -645,7 +645,7 @@ typedef struct {
-     /* should this thread finish */
-     bool quit;
-     /* thread has work to do */
--    int pending_job;
-+    bool pending_job;
-     /* array of pages to sent */
-     MultiFDPages_t *pages;
-     /* packet allocated len */
-@@ -942,7 +942,7 @@ static void multifd_send_pages(void)
- 
-         qemu_mutex_lock(&p->mutex);
-         if (!p->pending_job) {
--            p->pending_job++;
-+            p->pending_job = true;
-             next_channel = (i + 1) % migrate_multifd_channels();
-             break;
-         }
-@@ -1126,7 +1126,7 @@ static void *multifd_send_thread(void *opaque)
-             }
- 
-             qemu_mutex_lock(&p->mutex);
--            p->pending_job--;
-+            p->pending_job = false;
-             qemu_mutex_unlock(&p->mutex);
- 
-             qemu_sem_post(&multifd_send_state->channels_ready);
-@@ -1213,8 +1213,7 @@ int multifd_save_setup(void)
- 
-         qemu_mutex_init(&p->mutex);
-         qemu_sem_init(&p->sem, 0);
--        p->sync = p->quit = false;
--        p->pending_job = 0;
-+        p->sync = p->quit = p->pending_job = false;
-         p->id = i;
-         p->pages = multifd_pages_init(page_count);
-         p->packet_len = sizeof(MultiFDPacket_t)
--- 
-2.19.1
-
+>> to cherry-pick only the
+>> ones we need now.
+>>
+>> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 
