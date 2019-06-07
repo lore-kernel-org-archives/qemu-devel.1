@@ -7,74 +7,74 @@ X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B0137C28CC3
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 09:54:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 01DC5C28CC3
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 09:54:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3EF0520B7C
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 09:54:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C59552133D
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 09:54:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Qggzb5Od"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3EF0520B7C
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="BY8nIR4+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C59552133D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47674 helo=lists.gnu.org)
+Received: from localhost ([::1]:47678 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hZBZZ-0002Xf-DV
-	for qemu-devel@archiver.kernel.org; Fri, 07 Jun 2019 05:54:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42067)
+	id 1hZBZs-0002es-39
+	for qemu-devel@archiver.kernel.org; Fri, 07 Jun 2019 05:54:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42206)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <alex.bennee@linaro.org>) id 1hZAvK-000299-97
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 05:12:36 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1hZAvT-0002Fd-BK
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 05:12:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1hZAvI-0004iS-AJ
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 05:12:34 -0400
-Received: from mail-wm1-x32d.google.com ([2a00:1450:4864:20::32d]:54136)
+ (envelope-from <alex.bennee@linaro.org>) id 1hZAvQ-0004xS-6K
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 05:12:43 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:43837)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1hZAvG-0004d1-95
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 05:12:32 -0400
-Received: by mail-wm1-x32d.google.com with SMTP id x15so1233511wmj.3
- for <qemu-devel@nongnu.org>; Fri, 07 Jun 2019 02:12:29 -0700 (PDT)
+ id 1hZAvJ-0004gb-WB
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 05:12:34 -0400
+Received: by mail-wr1-x444.google.com with SMTP id r18so1351444wrm.10
+ for <qemu-devel@nongnu.org>; Fri, 07 Jun 2019 02:12:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=mKQZU6ogd55Zge5HtRJs79TkvuWBYPKwIchB5EdBCmo=;
- b=Qggzb5Od3/dWyGwkOoAh+qFgw4boIabzrgi9tfJPj66CYfhxl06rxENpdMtso65NC7
- 4U1xufQH6hwR7vvZ0l7q01PAgdeNS6enF5kxDgvxO2+fYDn9ofvxMu35L7JREP1FNpO2
- RAokO4pYNoF3003yCqNVnbLTelpOWqDISmuIbKG4uSda9vUU9kM+io3WQcNrU9CS+T61
- r6xdsCMRtEullg+OsBTcbNA0ZhLo72rJzY4mEM9ZLF8D1Y/JkOWRsmkftCn80WFf47dj
- 1GxAsNTfJKMil9GWVy7MNlG8dH3yYTUoWhi/cJ3xjUMoppsZ18qVtfrT1t9UGIE4OvLE
- 9kYw==
+ bh=GG8+B2YKZAzbtPtKRtN7JHzNyOJ/PV6z6R/XdCaBQE8=;
+ b=BY8nIR4+QZBm0/gUj4RmkMPIBhyFVidI/CbukYfiBG8OF8bJu7oL9lqII8cG4jz0ZN
+ pd7zKMh8ib10Ws6kO4504O+Fk20BzOGma8JRe8sNvRD6afoYMtkQeZkQJEj6omIBVwKp
+ sq9jIezfX9jDnN4aJnZL83Mhb8pDQIoQeXhC5tFfbYkMBEyegqjMX4/dns/Jr4mwOD+0
+ TzdsB2rpgr4WrgzFIurusYtM02FlnkU00lZiUmJkQXojG4HEw3EZJLZOkrSR0dvOcJEx
+ jFplvSGzO/k8db+Yf4Ul6HZ6YEgjimrpv1HsjLu6c5SonVZ4I6Z7qlMqAfOea+QkjMHu
+ auqA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=mKQZU6ogd55Zge5HtRJs79TkvuWBYPKwIchB5EdBCmo=;
- b=K7czF6djdFPvjBg8BMSbEsd3haSK5ITDkcyWEUOkcLU3XNRpzrIx+KUl721mJsqEpq
- D4tXjqoMNYnY0zCtV4cVAKg/tcAWgTxM7KGB8zKOXGXcCte1b/GMZYoYv/6dh25QXgBM
- D3LTS8QlIrP2Qot4mlaE1/1P/vPFXETDaPKFP5+KbEJ5lJVA32ll9LQbMlCGpTfzxwD7
- NB2SyEAuMQD0LwzUOQLy6/d7yQ6/qvxRbwwlvNZoJMs9PPPL5UeIPRygKIl+4syNviex
- AiYqy0fFYsCoY3KizIxsnSPQ1HIPj/tp+Qyt25JIvB8bPAd8Lzaopg/1iMWLKDx13cEE
- YC4A==
-X-Gm-Message-State: APjAAAV3oiPhW9nrEC2bAfxNT313xkpPUru9gZORD85uwKxlPSzdPkD1
- SqkZaXzP6w7mictRH9JgggfRaw==
-X-Google-Smtp-Source: APXvYqzDdqSZHpuMCqEs7w+gYbkknWsH9jyj7s4SD/479qIHuFStqg955Q6w6Pwo5mKhPxSOKhgLpw==
-X-Received: by 2002:a7b:cbcb:: with SMTP id n11mr2788771wmi.146.1559898748529; 
- Fri, 07 Jun 2019 02:12:28 -0700 (PDT)
+ bh=GG8+B2YKZAzbtPtKRtN7JHzNyOJ/PV6z6R/XdCaBQE8=;
+ b=iYvNLGFzp6+R3/eVGlxZC2XoWChDX7Ved4kYspeLq7aWW9KQTSNi4zGJ1e8mouMJ0F
+ Gve9/ildtt+xUWfOrbrUY74RjYoGx2S73O+zgvr3NxorOY3/vUzFHIthZC6FnR0oM0mG
+ PDSTYeiP5f+q75rn/L10ohQGsV/9rIKxODMarZcJtd62fSa8Aig9z+kBIknhgkliBbJ4
+ cQkP0lntMMJC/z23r6X2rYraVH2p3BMT1PEY9JaD7jJvC41dkLuv4a2ajkVDfOazX8yL
+ D27pj0W9J0/btRHFq2RuvzQ6r7DC2S3sgNSWZ8NyCgxZgZYm+b1Pz0s6NlJ7dRTqB8iM
+ 5iQA==
+X-Gm-Message-State: APjAAAXNhp4zKOZhoHc501LDUNow9mFNGw6JFHetN/N1AU5sHBrZ9OXw
+ OUE6FlEdVsy3XJUc4qzDGKVk/A==
+X-Google-Smtp-Source: APXvYqxgXmga6zHPsQMYGUTNjOai2Z+t4G2Ji/ILvt7jEzotARh4sFkSh92Y626t/ktn1jiS+TfK0Q==
+X-Received: by 2002:a5d:4a46:: with SMTP id v6mr32615252wrs.105.1559898750930; 
+ Fri, 07 Jun 2019 02:12:30 -0700 (PDT)
 Received: from zen.linaroharston ([81.128.185.34])
- by smtp.gmail.com with ESMTPSA id x8sm1348899wmc.5.2019.06.07.02.12.26
+ by smtp.gmail.com with ESMTPSA id 74sm1180468wma.7.2019.06.07.02.12.27
  (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Fri, 07 Jun 2019 02:12:27 -0700 (PDT)
+ Fri, 07 Jun 2019 02:12:29 -0700 (PDT)
 Received: from zen.linaroharston. (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 964161FFC4;
- Fri,  7 Jun 2019 10:05:55 +0100 (BST)
+ by zen.linaroharston (Postfix) with ESMTP id 6E0C21FFB5;
+ Fri,  7 Jun 2019 10:05:54 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: peter.maydell@linaro.org
-Date: Fri,  7 Jun 2019 10:05:44 +0100
-Message-Id: <20190607090552.12434-46-alex.bennee@linaro.org>
+Date: Fri,  7 Jun 2019 10:05:29 +0100
+Message-Id: <20190607090552.12434-31-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190607090552.12434-1-alex.bennee@linaro.org>
 References: <20190607090552.12434-1-alex.bennee@linaro.org>
@@ -83,9 +83,9 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::32d
-Subject: [Qemu-devel] [PULL 45/52] gdbstub: Implement read all registers (g
- pkt) with new infra
+X-Received-From: 2a00:1450:4864:20::444
+Subject: [Qemu-devel] [PULL 30/52] tests/tcg/x86_64: add a PVH crt.o for
+ x86_64 system tests
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,77 +97,352 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
  =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org,
- Jon Doron <arilou@gmail.com>
+ Eduardo Habkost <ehabkost@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Jon Doron <arilou@gmail.com>
+Instead of doing the full real to 64 bit dance we are attempting to
+leverage Xen's PVH boot spec to go from 32 bit to 64 bit.
 
-Signed-off-by: Jon Doron <arilou@gmail.com>
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-Message-Id: <20190529064148.19856-14-arilou@gmail.com>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 
-diff --git a/gdbstub.c b/gdbstub.c
-index 880bbb469a..b3c5ced80d 100644
---- a/gdbstub.c
-+++ b/gdbstub.c
-@@ -1774,6 +1774,21 @@ static void handle_write_all_regs(GdbCmdContext *gdb_ctx, void *user_ctx)
-     put_packet(gdb_ctx->s, "OK");
- }
+diff --git a/tests/tcg/i386/Makefile.softmmu-target b/tests/tcg/i386/Makefile.softmmu-target
+index e1d880f9b5..0a4364868c 100644
+--- a/tests/tcg/i386/Makefile.softmmu-target
++++ b/tests/tcg/i386/Makefile.softmmu-target
+@@ -14,6 +14,7 @@ CRT_OBJS=boot.o
  
-+static void handle_read_all_regs(GdbCmdContext *gdb_ctx, void *user_ctx)
-+{
-+    target_ulong addr, len;
+ ifeq ($(TARGET_X86_64), y)
+ CRT_PATH=$(X64_SYSTEM_SRC)
++CFLAGS=-march=x86-64
+ LINK_SCRIPT=$(X64_SYSTEM_SRC)/kernel.ld
+ LDFLAGS=-Wl,-T$(LINK_SCRIPT) -Wl,-melf_x86_64
+ else
+diff --git a/tests/tcg/x86_64/system/boot.S b/tests/tcg/x86_64/system/boot.S
+new file mode 100644
+index 0000000000..205cfbd398
+--- /dev/null
++++ b/tests/tcg/x86_64/system/boot.S
+@@ -0,0 +1,277 @@
++/*
++ * x86_64 boot and support code
++ *
++ * Copyright 2019 Linaro
++ *
++ * This work is licensed under the terms of the GNU GPL, version 3 or later.
++ * See the COPYING file in the top-level directory.
++ *
++ * Unlike the i386 version we instead use Xen's PVHVM booting header
++ * which should drop us automatically into 32 bit mode ready to go. I've
++ * nabbed bits of the Linux kernel setup to achieve this.
++ *
++ * SPDX-License-Identifier: GPL-3.0-or-later
++ */
 +
-+    cpu_synchronize_state(gdb_ctx->s->g_cpu);
-+    len = 0;
-+    for (addr = 0; addr < gdb_ctx->s->g_cpu->gdb_num_g_regs; addr++) {
-+        len += gdb_read_register(gdb_ctx->s->g_cpu, gdb_ctx->mem_buf + len,
-+                                 addr);
-+    }
++        .section .head
 +
-+    memtohex(gdb_ctx->str_buf, gdb_ctx->mem_buf, len);
-+    put_packet(gdb_ctx->s, gdb_ctx->str_buf);
++#define ELFNOTE_START(name, type, flags)	\
++.pushsection .note.name, flags,@note	;	\
++  .balign 4				;	\
++  .long 2f - 1f		/* namesz */	;	\
++  .long 4484f - 3f	/* descsz */	;	\
++  .long type				;	\
++1:.asciz #name				;	\
++2:.balign 4				;	\
++3:
++
++#define ELFNOTE_END				\
++4484:.balign 4				;	\
++.popsection				;
++
++#define ELFNOTE(name, type, desc)		\
++	ELFNOTE_START(name, type, "")		\
++		desc			;	\
++	ELFNOTE_END
++
++#define XEN_ELFNOTE_ENTRY          1
++#define XEN_ELFNOTE_HYPERCALL_PAGE 2
++#define XEN_ELFNOTE_VIRT_BASE      3
++#define XEN_ELFNOTE_PADDR_OFFSET   4
++#define XEN_ELFNOTE_PHYS32_ENTRY  18
++
++#define __ASM_FORM(x)	x
++#define __ASM_FORM_RAW(x)     x
++#define __ASM_FORM_COMMA(x) x,
++#define __ASM_SEL(a,b)           __ASM_FORM(b)
++#define __ASM_SEL_RAW(a,b)      __ASM_FORM_RAW(b)
++#define _ASM_PTR	__ASM_SEL(.long, .quad)
++
++	ELFNOTE(Xen, XEN_ELFNOTE_VIRT_BASE,      _ASM_PTR 0x100000)
++	ELFNOTE(Xen, XEN_ELFNOTE_ENTRY,          _ASM_PTR _start)
++	ELFNOTE(Xen, XEN_ELFNOTE_PHYS32_ENTRY,   _ASM_PTR _start)    /* entry == virtbase */
++	ELFNOTE(Xen, XEN_ELFNOTE_PADDR_OFFSET,   _ASM_PTR 0)
++
++       /*
++	* Entry point for PVH guests.
++	*
++	* Xen ABI specifies the following register state when we come here:
++	*
++	* - `ebx`: contains the physical memory address where the loader has placed
++	*          the boot start info structure.
++	* - `cr0`: bit 0 (PE) must be set. All the other writeable bits are cleared.
++	* - `cr4`: all bits are cleared.
++	* - `cs `: must be a 32-bit read/execute code segment with a base of ‘0’
++	*          and a limit of ‘0xFFFFFFFF’. The selector value is unspecified.
++	* - `ds`, `es`: must be a 32-bit read/write data segment with a base of
++	*               ‘0’ and a limit of ‘0xFFFFFFFF’. The selector values are all
++	*               unspecified.
++	* - `tr`: must be a 32-bit TSS (active) with a base of '0' and a limit
++	*         of '0x67'.
++	* - `eflags`: bit 17 (VM) must be cleared. Bit 9 (IF) must be cleared.
++	*             Bit 8 (TF) must be cleared. Other bits are all unspecified.
++	*
++	* All other processor registers and flag bits are unspecified. The OS is in
++	* charge of setting up it's own stack, GDT and IDT.
++	*/
++        .code32
++        .section .text
++
++.global _start
++_start:
++	cld
++        lgdt gdtr
++
++        ljmp $0x8,$.Lloadcs
++.Lloadcs:
++        mov $0x10,%eax
++        mov %eax,%ds
++        mov %eax,%es
++        mov %eax,%fs
++        mov %eax,%gs
++        mov %eax,%ss
++
++	/* Enable PAE mode (bit 5). */
++	mov %cr4, %eax
++	btsl $5, %eax
++	mov %eax, %cr4
++
++#define MSR_EFER		0xc0000080 /* extended feature register */
++
++	/* Enable Long mode. */
++	mov $MSR_EFER, %ecx
++	rdmsr
++	btsl $8, %eax
++	wrmsr
++
++	/* Enable paging */
++	mov $.Lpml4, %ecx
++	mov %ecx, %cr3
++
++	mov %cr0, %eax
++	btsl $31, %eax
++	mov %eax, %cr0
++
++	/* Jump to 64-bit mode. */
++        lgdt gdtr64
++        ljmp $0x8,$.Lenter64
++
++        .code64
++        .section .text
++.Lenter64:
++
++
++	// Setup stack ASAP
++	movq $stack_end,%rsp
++
++        /* don't worry about stack frame, assume everthing is garbage when we return */
++	call main
++
++        /* output any non-zero result in eax to isa-debug-exit device */
++        test %al, %al
++        jz 1f
++        out %ax, $0xf4
++
++1:      /* QEMU ACPI poweroff */
++	mov $0x604,%edx
++	mov $0x2000,%eax
++	out %ax,%dx
++	hlt
++	jmp 1b
++
++        /*
++         * Helper Functions
++         *
++         * x86_64 calling convention is rdi, rsi, rdx, rcx, r8, r9
++         */
++
++        /* Output a single character to serial port */
++        .global __sys_outc
++__sys_outc:
++        pushq %rax
++        mov %rax, %rdx
++	out %al,$0xE9
++        popq %rax
++        ret
++
++	/* Interrupt Descriptor Table */
++
++        .section .data
++        .align 16
++
++idt_00: .int 0, 0
++idt_01: .int 0, 0
++idt_02: .int 0, 0
++idt_03: .int 0, 0
++idt_04: .int 0, 0
++idt_05: .int 0, 0
++idt_06: .int 0, 0 /* intr_6_opcode, Invalid Opcode */
++idt_07: .int 0, 0
++idt_08: .int 0, 0
++idt_09: .int 0, 0
++idt_0A: .int 0, 0
++idt_0B: .int 0, 0
++idt_0C: .int 0, 0
++idt_0D: .int 0, 0
++idt_0E: .int 0, 0
++idt_0F: .int 0, 0
++idt_10: .int 0, 0
++idt_11: .int 0, 0
++idt_12: .int 0, 0
++idt_13: .int 0, 0
++idt_14: .int 0, 0
++idt_15: .int 0, 0
++idt_16: .int 0, 0
++idt_17: .int 0, 0
++idt_18: .int 0, 0
++idt_19: .int 0, 0
++idt_1A: .int 0, 0
++idt_1B: .int 0, 0
++idt_1C: .int 0, 0
++idt_1D: .int 0, 0
++idt_1E: .int 0, 0
++idt_1F: .int 0, 0
++
++
++	/*
++	 * Global Descriptor Table (GDT)
++	 *
++	 * This describes various memory areas (segments) through
++	 * segment descriptors. In 32 bit mode each segment each
++	 * segement is associated with segment registers which are
++	 * implicitly (or explicitly) referenced depending on the
++	 * instruction. However in 64 bit mode selectors are flat and
++	 * segmented addressing isn't used.
++	 */
++gdt:
++        .short 0
++gdtr:
++        .short gdt_en - gdt - 1
++        .int gdt
++
++        // Code cs:
++        .short 0xFFFF
++        .short 0
++        .byte 0
++        .byte 0x9b
++        .byte 0xCF
++        .byte 0
++
++        // Data  ds:, ss:, es:, fs:, and gs:
++        .short 0xFFFF
++        .short 0
++        .byte 0
++        .byte 0x93
++        .byte 0xCF
++        .byte 0
++gdt_en:
++
++gdt64:
++        .short 0
++gdtr64:
++        .short gdt64_en - gdt64 - 1
++        .int gdt64
++
++        // Code
++        .short 0xFFFF
++        .short 0
++        .byte 0
++        .byte 0x9b
++        .byte 0xAF
++        .byte 0
++
++        // Data
++        .short 0xFFFF
++        .short 0
++        .byte 0
++        .byte 0x93
++        .byte 0xCF
++        .byte 0
++gdt64_en:
++
++	.section .bss
++        .align 16
++
++stack: .space 65536
++stack_end:
++
++	.section .data
++
++.align 4096
++.Lpd:
++i = 0
++        .rept 512 * 4
++        .quad 0x1e7 | (i << 21)
++        i = i + 1
++        .endr
++
++.align 4096
++.Lpdp:
++        .quad .Lpd + 7 + 0 * 4096 /* 0-1 GB */
++        .quad .Lpd + 7 + 1 * 4096 /* 1-2 GB */
++        .quad .Lpd + 7 + 2 * 4096 /* 2-3 GB */
++        .quad .Lpd + 7 + 3 * 4096 /* 3-4 GB */
++
++.align 4096
++.Lpml4:
++        .quad .Lpdp + 7 /* 0-512 GB */
+diff --git a/tests/tcg/x86_64/system/kernel.ld b/tests/tcg/x86_64/system/kernel.ld
+new file mode 100644
+index 0000000000..49c12b04ae
+--- /dev/null
++++ b/tests/tcg/x86_64/system/kernel.ld
+@@ -0,0 +1,33 @@
++PHDRS {
++	text PT_LOAD FLAGS(5);          /* R_E */
++	note PT_NOTE FLAGS(0);          /* ___ */
 +}
 +
- static int gdb_handle_packet(GDBState *s, const char *line_buf)
- {
-     CPUState *cpu;
-@@ -1781,7 +1796,7 @@ static int gdb_handle_packet(GDBState *s, const char *line_buf)
-     CPUClass *cc;
-     const char *p;
-     uint32_t pid, tid;
--    int ch, reg_size, type, res;
-+    int ch, type, res;
-     uint8_t mem_buf[MAX_PACKET_LENGTH];
-     char buf[sizeof(mem_buf) + 1 /* trailing NUL */];
-     char thread_id[16];
-@@ -1940,14 +1955,14 @@ static int gdb_handle_packet(GDBState *s, const char *line_buf)
-         }
-         break;
-     case 'g':
--        cpu_synchronize_state(s->g_cpu);
--        len = 0;
--        for (addr = 0; addr < s->g_cpu->gdb_num_g_regs; addr++) {
--            reg_size = gdb_read_register(s->g_cpu, mem_buf + len, addr);
--            len += reg_size;
-+        {
-+            static const GdbCmdParseEntry read_all_regs_cmd_desc = {
-+                .handler = handle_read_all_regs,
-+                .cmd = "g",
-+                .cmd_startswith = 1
-+            };
-+            cmd_parser = &read_all_regs_cmd_desc;
-         }
--        memtohex(buf, mem_buf, len);
--        put_packet(s, buf);
-         break;
-     case 'G':
-         {
++SECTIONS {
++	. = 0x100000;
++
++	.text : {
++		__load_st = .;
++		*(.head)
++		*(.text)
++	} :text
++
++	.rodata : {
++		*(.rodata)
++	} :text
++
++        /* Keep build ID and PVH notes in same section */
++        .notes :  {
++               *(.note.*)
++        } :note
++
++        .data : {
++		*(.data)
++		__load_en = .;
++	} :text
++
++	.bss : {
++		*(.bss)
++		__bss_en = .;
++	}
++}
 -- 
 2.20.1
 
