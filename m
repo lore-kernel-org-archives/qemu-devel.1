@@ -2,60 +2,56 @@ Return-Path: <SRS0=3yEa=UG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 53CB9C28CC3
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 09:47:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DA186C2BCA1
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 09:49:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 20750208C3
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 09:47:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 20750208C3
+	by mail.kernel.org (Postfix) with ESMTPS id B73AA208C3
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 09:49:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B73AA208C3
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=users.sourceforge.jp
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47612 helo=lists.gnu.org)
+Received: from localhost ([::1]:47632 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hZBTG-0003zF-0a
-	for qemu-devel@archiver.kernel.org; Fri, 07 Jun 2019 05:47:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41502)
+	id 1hZBUw-0005iM-17
+	for qemu-devel@archiver.kernel.org; Fri, 07 Jun 2019 05:49:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41490)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <ysato@users.sourceforge.jp>) id 1hZAuV-0000yS-LL
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 05:11:52 -0400
+ (envelope-from <ysato@users.sourceforge.jp>) id 1hZAuV-0000xp-F4
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 05:11:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ysato@users.sourceforge.jp>) id 1hZAuO-0002uI-TC
+ (envelope-from <ysato@users.sourceforge.jp>) id 1hZAuP-0002wm-FS
  for qemu-devel@nongnu.org; Fri, 07 Jun 2019 05:11:43 -0400
-Received: from mail01.asahi-net.or.jp ([202.224.55.13]:59744)
+Received: from mail02.asahi-net.or.jp ([202.224.55.14]:41551)
  by eggs.gnu.org with esmtp (Exim 4.71)
- (envelope-from <ysato@users.sourceforge.jp>) id 1hZAuO-0002pT-7J
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 05:11:36 -0400
+ (envelope-from <ysato@users.sourceforge.jp>) id 1hZAuO-0002qz-T0
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 05:11:37 -0400
 Received: from h61-195-96-97.vps.ablenet.jp (h61-195-96-97.ablenetvps.ne.jp
  [61.195.96.97]) (Authenticated sender: PQ4Y-STU)
- by mail01.asahi-net.or.jp (Postfix) with ESMTPA id 6087C123DA6;
- Fri,  7 Jun 2019 18:11:27 +0900 (JST)
+ by mail02.asahi-net.or.jp (Postfix) with ESMTPA id 098BD41900;
+ Fri,  7 Jun 2019 18:11:32 +0900 (JST)
 Received: from yo-satoh-debian.localdomain (ZM005235.ppp.dion.ne.jp
  [222.8.5.235])
- by h61-195-96-97.vps.ablenet.jp (Postfix) with ESMTPSA id A2ECE240086;
- Fri,  7 Jun 2019 18:11:26 +0900 (JST)
+ by h61-195-96-97.vps.ablenet.jp (Postfix) with ESMTPSA id B72A0240085;
+ Fri,  7 Jun 2019 18:11:31 +0900 (JST)
 From: Yoshinori Sato <ysato@users.sourceforge.jp>
 To: qemu-devel@nongnu.org
-Date: Fri,  7 Jun 2019 18:10:59 +0900
-Message-Id: <20190607091116.49044-8-ysato@users.sourceforge.jp>
+Date: Fri,  7 Jun 2019 18:11:13 +0900
+Message-Id: <20190607091116.49044-22-ysato@users.sourceforge.jp>
 X-Mailer: git-send-email 2.11.0
 In-Reply-To: <20190607091116.49044-1-ysato@users.sourceforge.jp>
 References: <20190607091116.49044-1-ysato@users.sourceforge.jp>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 202.224.55.13
-Subject: [Qemu-devel] [PATCH v17 07/24] hw/char: RX62N serial communication
- interface (SCI)
+X-Received-From: 202.224.55.14
+Subject: [Qemu-devel] [PATCH v17 21/24] target/rx: Emit all disassembly in
+ one prt()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -67,461 +63,194 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, richard.henderson@linaro.org,
+Cc: peter.maydell@linaro.org, Richard Henderson <richard.henderson@linaro.org>,
  Yoshinori Sato <ysato@users.sourceforge.jp>, philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This module supported only non FIFO type.
-Hardware manual.
-https://www.renesas.com/us/en/doc/products/mpumcu/doc/rx_family/r01uh0033=
-ej0140_rx62n.pdf
+From: Richard Henderson <richard.henderson@linaro.org>
 
-Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Message-Id: <20190516055244.95559-8-ysato@users.sourceforge.jp>
+Many of the multi-part prints have been eliminated by previous
+patches.  Eliminate the rest of them.
+
+Reviewed-by: Yoshinori Sato <ysato@users.sourceforge.jp>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
 ---
- include/hw/char/renesas_sci.h |  45 ++++++
- hw/char/renesas_sci.c         | 340 ++++++++++++++++++++++++++++++++++++=
-++++++
- hw/char/Kconfig               |   3 +
- hw/char/Makefile.objs         |   1 +
- 4 files changed, 389 insertions(+)
- create mode 100644 include/hw/char/renesas_sci.h
- create mode 100644 hw/char/renesas_sci.c
+ target/rx/disas.c | 75 +++++++++++++++++++++++++++++--------------------------
+ 1 file changed, 39 insertions(+), 36 deletions(-)
 
-diff --git a/include/hw/char/renesas_sci.h b/include/hw/char/renesas_sci.=
-h
-new file mode 100644
-index 0000000000..50d1336944
---- /dev/null
-+++ b/include/hw/char/renesas_sci.h
-@@ -0,0 +1,45 @@
-+/*
-+ * Renesas Serial Communication Interface
-+ *
-+ * Copyright (c) 2018 Yoshinori Sato
-+ *
-+ * This code is licensed under the GPL version 2 or later.
-+ *
-+ */
-+
-+#include "chardev/char-fe.h"
-+#include "qemu/timer.h"
-+#include "hw/sysbus.h"
-+
-+#define TYPE_RENESAS_SCI "renesas-sci"
-+#define RSCI(obj) OBJECT_CHECK(RSCIState, (obj), TYPE_RENESAS_SCI)
-+
-+enum {
-+    ERI =3D 0,
-+    RXI =3D 1,
-+    TXI =3D 2,
-+    TEI =3D 3,
-+    SCI_NR_IRQ =3D 4,
-+};
-+
-+typedef struct {
-+    SysBusDevice parent_obj;
-+    MemoryRegion memory;
-+
-+    uint8_t smr;
-+    uint8_t brr;
-+    uint8_t scr;
-+    uint8_t tdr;
-+    uint8_t ssr;
-+    uint8_t rdr;
-+    uint8_t scmr;
-+    uint8_t semr;
-+
-+    uint8_t read_ssr;
-+    int64_t trtime;
-+    int64_t rx_next;
-+    QEMUTimer *timer;
-+    CharBackend chr;
-+    uint64_t input_freq;
-+    qemu_irq irq[SCI_NR_IRQ];
-+} RSCIState;
-diff --git a/hw/char/renesas_sci.c b/hw/char/renesas_sci.c
-new file mode 100644
-index 0000000000..6298cbf43a
---- /dev/null
-+++ b/hw/char/renesas_sci.c
-@@ -0,0 +1,340 @@
-+/*
-+ * Renesas Serial Communication Interface
-+ *
-+ * Datasheet: RX62N Group, RX621 Group User's Manual: Hardware
-+ * (Rev.1.40 R01UH0033EJ0140)
-+ *
-+ * Copyright (c) 2019 Yoshinori Sato
-+ *
-+ * This program is free software; you can redistribute it and/or modify =
-it
-+ * under the terms and conditions of the GNU General Public License,
-+ * version 2 or later, as published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope it will be useful, but WITHOU=
-T
-+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License=
- for
-+ * more details.
-+ *
-+ * You should have received a copy of the GNU General Public License alo=
-ng with
-+ * this program.  If not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qemu/log.h"
-+#include "qapi/error.h"
-+#include "qemu-common.h"
-+#include "cpu.h"
-+#include "hw/hw.h"
-+#include "hw/sysbus.h"
-+#include "hw/registerfields.h"
-+#include "hw/char/renesas_sci.h"
-+#include "qemu/error-report.h"
-+
-+/* SCI register map */
-+REG8(SMR, 0)
-+  FIELD(SMR, CKS,  0, 2)
-+  FIELD(SMR, MP,   2, 1)
-+  FIELD(SMR, STOP, 3, 1)
-+  FIELD(SMR, PM,   4, 1)
-+  FIELD(SMR, PE,   5, 1)
-+  FIELD(SMR, CHR,  6, 1)
-+  FIELD(SMR, CM,   7, 1)
-+REG8(BRR, 1)
-+REG8(SCR, 2)
-+  FIELD(SCR, CKE, 0, 2)
-+  FIELD(SCR, TEIE, 2, 1)
-+  FIELD(SCR, MPIE, 3, 1)
-+  FIELD(SCR, RE,   4, 1)
-+  FIELD(SCR, TE,   5, 1)
-+  FIELD(SCR, RIE,  6, 1)
-+  FIELD(SCR, TIE,  7, 1)
-+REG8(TDR, 3)
-+REG8(SSR, 4)
-+  FIELD(SSR, MPBT, 0, 1)
-+  FIELD(SSR, MPB,  1, 1)
-+  FIELD(SSR, TEND, 2, 1)
-+  FIELD(SSR, ERR, 3, 3)
-+    FIELD(SSR, PER,  3, 1)
-+    FIELD(SSR, FER,  4, 1)
-+    FIELD(SSR, ORER, 5, 1)
-+  FIELD(SSR, RDRF, 6, 1)
-+  FIELD(SSR, TDRE, 7, 1)
-+REG8(RDR, 5)
-+REG8(SCMR, 6)
-+  FIELD(SCMR, SMIF, 0, 1)
-+  FIELD(SCMR, SINV, 2, 1)
-+  FIELD(SCMR, SDIR, 3, 1)
-+  FIELD(SCMR, BCP2, 7, 1)
-+REG8(SEMR, 7)
-+  FIELD(SEMR, ACS0, 0, 1)
-+  FIELD(SEMR, ABCS, 4, 1)
-+
-+static int can_receive(void *opaque)
-+{
-+    RSCIState *sci =3D RSCI(opaque);
-+    if (sci->rx_next > qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL)) {
-+        return 0;
+diff --git a/target/rx/disas.c b/target/rx/disas.c
+index db10385fd0..ebc1a44249 100644
+--- a/target/rx/disas.c
++++ b/target/rx/disas.c
+@@ -228,24 +228,21 @@ static bool trans_MOV_ra(DisasContext *ctx, arg_MOV_ra *a)
+ /* mov.[bwl] rs,rd */
+ static bool trans_MOV_mm(DisasContext *ctx, arg_MOV_mm *a)
+ {
+-    char dspd[8], dsps[8];
++    char dspd[8], dsps[8], szc = size[a->sz];
+ 
+-    prt("mov.%c\t", size[a->sz]);
+     if (a->lds == 3 && a->ldd == 3) {
+         /* mov.[bwl] rs,rd */
+-        prt("r%d, r%d", a->rs, a->rd);
+-        return true;
+-    }
+-    if (a->lds == 3) {
++        prt("mov.%c\tr%d, r%d", szc, a->rs, a->rd);
++    } else if (a->lds == 3) {
+         rx_index_addr(ctx, dspd, a->ldd, a->sz);
+-        prt("r%d, %s[r%d]", a->rs, dspd, a->rd);
++        prt("mov.%c\tr%d, %s[r%d]", szc, a->rs, dspd, a->rd);
+     } else if (a->ldd == 3) {
+         rx_index_addr(ctx, dsps, a->lds, a->sz);
+-        prt("%s[r%d], r%d", dsps, a->rs, a->rd);
++        prt("mov.%c\t%s[r%d], r%d", szc, dsps, a->rs, a->rd);
+     } else {
+         rx_index_addr(ctx, dsps, a->lds, a->sz);
+         rx_index_addr(ctx, dspd, a->ldd, a->sz);
+-        prt("%s[r%d], %s[r%d]", dsps, a->rs, dspd, a->rd);
++        prt("mov.%c\t%s[r%d], %s[r%d]", szc, dsps, a->rs, dspd, a->rd);
+     }
+     return true;
+ }
+@@ -254,8 +251,11 @@ static bool trans_MOV_mm(DisasContext *ctx, arg_MOV_mm *a)
+ /* mov.[bwl] rs,[-rd] */
+ static bool trans_MOV_rp(DisasContext *ctx, arg_MOV_rp *a)
+ {
+-    prt("mov.%c\tr%d, ", size[a->sz], a->rs);
+-    prt((a->ad == 0) ? "[r%d+]" : "[-r%d]", a->rd);
++    if (a->ad) {
++        prt("mov.%c\tr%d, [-r%d]", size[a->sz], a->rs, a->rd);
 +    } else {
-+        return FIELD_EX8(sci->scr, SCR, RE);
++        prt("mov.%c\tr%d, [r%d+]", size[a->sz], a->rs, a->rd);
 +    }
-+}
-+
-+static void receive(void *opaque, const uint8_t *buf, int size)
-+{
-+    RSCIState *sci =3D RSCI(opaque);
-+    sci->rx_next =3D qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) + sci->trtime=
-;
-+    if (FIELD_EX8(sci->ssr, SSR, RDRF) || size > 1) {
-+        sci->ssr =3D FIELD_DP8(sci->ssr, SSR, ORER, 1);
-+        if (FIELD_EX8(sci->scr, SCR, RIE)) {
-+            qemu_set_irq(sci->irq[ERI], 1);
-+        }
+     return true;
+ }
+ 
+@@ -263,9 +263,11 @@ static bool trans_MOV_rp(DisasContext *ctx, arg_MOV_rp *a)
+ /* mov.[bwl] [-rd],rs */
+ static bool trans_MOV_pr(DisasContext *ctx, arg_MOV_pr *a)
+ {
+-    prt("mov.%c\t", size[a->sz]);
+-    prt((a->ad == 0) ? "[r%d+]" : "[-r%d]", a->rd);
+-    prt(", r%d", a->rs);
++    if (a->ad) {
++        prt("mov.%c\t[-r%d], r%d", size[a->sz], a->rd, a->rs);
 +    } else {
-+        sci->rdr =3D buf[0];
-+        sci->ssr =3D FIELD_DP8(sci->ssr, SSR, RDRF, 1);
-+        if (FIELD_EX8(sci->scr, SCR, RIE)) {
-+            qemu_irq_pulse(sci->irq[RXI]);
-+        }
++        prt("mov.%c\t[r%d+], r%d", size[a->sz], a->rd, a->rs);
 +    }
-+}
-+
-+static void send_byte(RSCIState *sci)
-+{
-+    if (qemu_chr_fe_backend_connected(&sci->chr)) {
-+        qemu_chr_fe_write_all(&sci->chr, &sci->tdr, 1);
-+    }
-+    timer_mod(sci->timer,
-+              qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) + sci->trtime);
-+    sci->ssr =3D FIELD_DP8(sci->ssr, SSR, TEND, 0);
-+    sci->ssr =3D FIELD_DP8(sci->ssr, SSR, TDRE, 1);
-+    qemu_set_irq(sci->irq[TEI], 0);
-+    if (FIELD_EX8(sci->scr, SCR, TIE)) {
-+        qemu_irq_pulse(sci->irq[TXI]);
-+    }
-+}
-+
-+static void txend(void *opaque)
-+{
-+    RSCIState *sci =3D RSCI(opaque);
-+    if (!FIELD_EX8(sci->ssr, SSR, TDRE)) {
-+        send_byte(sci);
+     return true;
+ }
+ 
+@@ -299,9 +301,11 @@ static bool trans_MOVU_ar(DisasContext *ctx, arg_MOVU_ar *a)
+ /* movu.[bw] [-rs],rd */
+ static bool trans_MOVU_pr(DisasContext *ctx, arg_MOVU_pr *a)
+ {
+-    prt("movu.%c\t", size[a->sz]);
+-    prt((a->ad == 0) ? "[r%d+]" : "[-r%d]", a->rd);
+-    prt(", r%d", a->rs);
++    if (a->ad) {
++        prt("movu.%c\t[-r%d], r%d", size[a->sz], a->rd, a->rs);
 +    } else {
-+        sci->ssr =3D FIELD_DP8(sci->ssr, SSR, TEND, 1);
-+        if (FIELD_EX8(sci->scr, SCR, TEIE)) {
-+            qemu_set_irq(sci->irq[TEI], 1);
-+        }
++        prt("movu.%c\t[r%d+], r%d", size[a->sz], a->rd, a->rs);
 +    }
-+}
-+
-+static void update_trtime(RSCIState *sci)
-+{
-+    /* char per bits */
-+    sci->trtime =3D 8 - FIELD_EX8(sci->smr, SMR, CHR);
-+    sci->trtime +=3D FIELD_EX8(sci->smr, SMR, PE);
-+    sci->trtime +=3D FIELD_EX8(sci->smr, SMR, STOP) + 1;
-+    /* x bit transmit time (32 * divrate * brr) / base freq */
-+    sci->trtime *=3D 32 * sci->brr;
-+    sci->trtime *=3D 1 << (2 * FIELD_EX8(sci->smr, SMR, CKS));
-+    sci->trtime *=3D NANOSECONDS_PER_SECOND;
-+    sci->trtime /=3D sci->input_freq;
-+}
-+
-+#define IS_TR_ENABLED(scr) \
-+    (FIELD_EX8(scr, SCR, TE) || FIELD_EX8(scr, SCR, RE))
-+
-+static void sci_write(void *opaque, hwaddr addr, uint64_t val, unsigned =
-size)
-+{
-+    hwaddr offset =3D addr & 0x07;
-+    RSCIState *sci =3D RSCI(opaque);
-+
-+    switch (offset) {
-+    case A_SMR:
-+        if (!IS_TR_ENABLED(sci->scr)) {
-+            sci->smr =3D val;
-+            update_trtime(sci);
-+        }
-+        break;
-+    case A_BRR:
-+        if (!IS_TR_ENABLED(sci->scr)) {
-+            sci->brr =3D val;
-+            update_trtime(sci);
-+        }
-+        break;
-+    case A_SCR:
-+        sci->scr =3D val;
-+        if (FIELD_EX8(sci->scr, SCR, TE)) {
-+            sci->ssr =3D FIELD_DP8(sci->ssr, SSR, TDRE, 1);
-+            sci->ssr =3D FIELD_DP8(sci->ssr, SSR, TEND, 1);
-+            if (FIELD_EX8(sci->scr, SCR, TIE)) {
-+                qemu_irq_pulse(sci->irq[TXI]);
-+            }
-+        }
-+        if (!FIELD_EX8(sci->scr, SCR, TEIE)) {
-+            qemu_set_irq(sci->irq[TEI], 0);
-+        }
-+        if (!FIELD_EX8(sci->scr, SCR, RIE)) {
-+            qemu_set_irq(sci->irq[ERI], 0);
-+        }
-+        break;
-+    case A_TDR:
-+        sci->tdr =3D val;
-+        if (FIELD_EX8(sci->ssr, SSR, TEND)) {
-+            send_byte(sci);
-+        } else {
-+            sci->ssr =3D FIELD_DP8(sci->ssr, SSR, TDRE, 0);
-+        }
-+        break;
-+    case A_SSR:
-+        sci->ssr =3D FIELD_DP8(sci->ssr, SSR, MPBT,
-+                             FIELD_EX8(val, SSR, MPBT));
-+        sci->ssr =3D FIELD_DP8(sci->ssr, SSR, ERR,
-+                             FIELD_EX8(val, SSR, ERR) & 0x07);
-+        if (FIELD_EX8(sci->read_ssr, SSR, ERR) &&
-+            FIELD_EX8(sci->ssr, SSR, ERR) =3D=3D 0) {
-+            qemu_set_irq(sci->irq[ERI], 0);
-+        }
-+        break;
-+    case A_RDR:
-+        qemu_log_mask(LOG_GUEST_ERROR, "reneas_sci: RDR is read only.\n"=
-);
-+        break;
-+    case A_SCMR:
-+        sci->scmr =3D val; break;
-+    case A_SEMR: /* SEMR */
-+        sci->semr =3D val; break;
-+    default:
-+        qemu_log_mask(LOG_UNIMP, "renesas_sci: Register 0x%" HWADDR_PRIX
-+                      " not implemented\n", offset);
-+    }
-+}
-+
-+static uint64_t sci_read(void *opaque, hwaddr addr, unsigned size)
-+{
-+    hwaddr offset =3D addr & 0x07;
-+    RSCIState *sci =3D RSCI(opaque);
-+
-+    switch (offset) {
-+    case A_SMR:
-+        return sci->smr;
-+    case A_BRR:
-+        return sci->brr;
-+    case A_SCR:
-+        return sci->scr;
-+    case A_TDR:
-+        return sci->tdr;
-+    case A_SSR:
-+        sci->read_ssr =3D sci->ssr;
-+        return sci->ssr;
-+    case A_RDR:
-+        sci->ssr =3D FIELD_DP8(sci->ssr, SSR, RDRF, 0);
-+        return sci->rdr;
-+    case A_SCMR:
-+        return sci->scmr;
-+    case A_SEMR:
-+        return sci->semr;
-+    default:
-+        qemu_log_mask(LOG_UNIMP, "renesas_sci: Register 0x%" HWADDR_PRIX
-+                      " not implemented.\n", offset);
-+    }
-+    return UINT64_MAX;
-+}
-+
-+static const MemoryRegionOps sci_ops =3D {
-+    .write =3D sci_write,
-+    .read  =3D sci_read,
-+    .endianness =3D DEVICE_NATIVE_ENDIAN,
-+    .impl =3D {
-+        .max_access_size =3D 1,
-+    },
-+};
-+
-+static void rsci_reset(DeviceState *dev)
-+{
-+    RSCIState *sci =3D RSCI(dev);
-+    sci->smr =3D sci->scr =3D 0x00;
-+    sci->brr =3D 0xff;
-+    sci->tdr =3D 0xff;
-+    sci->rdr =3D 0x00;
-+    sci->ssr =3D 0x84;
-+    sci->scmr =3D 0x00;
-+    sci->semr =3D 0x00;
-+    sci->rx_next =3D qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
-+}
-+
-+static void sci_event(void *opaque, int event)
-+{
-+    RSCIState *sci =3D RSCI(opaque);
-+    if (event =3D=3D CHR_EVENT_BREAK) {
-+        sci->ssr =3D FIELD_DP8(sci->ssr, SSR, FER, 1);
-+        if (FIELD_EX8(sci->scr, SCR, RIE)) {
-+            qemu_set_irq(sci->irq[ERI], 1);
-+        }
-+    }
-+}
-+
-+static void rsci_realize(DeviceState *dev, Error **errp)
-+{
-+    RSCIState *sci =3D RSCI(dev);
-+
-+    if (sci->input_freq =3D=3D 0) {
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                      "renesas_sci: input-freq property must be set.");
-+        return;
-+    }
-+    qemu_chr_fe_set_handlers(&sci->chr, can_receive, receive,
-+                             sci_event, NULL, sci, NULL, true);
-+}
-+
-+static void rsci_init(Object *obj)
-+{
-+    SysBusDevice *d =3D SYS_BUS_DEVICE(obj);
-+    RSCIState *sci =3D RSCI(obj);
-+    int i;
-+
-+    memory_region_init_io(&sci->memory, OBJECT(sci), &sci_ops,
-+                          sci, "renesas-sci", 0x8);
-+    sysbus_init_mmio(d, &sci->memory);
-+
-+    for (i =3D 0; i < SCI_NR_IRQ; i++) {
-+        sysbus_init_irq(d, &sci->irq[i]);
-+    }
-+    sci->timer =3D timer_new_ns(QEMU_CLOCK_VIRTUAL, txend, sci);
-+}
-+
-+static const VMStateDescription vmstate_rcmt =3D {
-+    .name =3D "renesas-sci",
-+    .version_id =3D 1,
-+    .minimum_version_id =3D 1,
-+    .fields =3D (VMStateField[]) {
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
-+static Property rsci_properties[] =3D {
-+    DEFINE_PROP_UINT64("input-freq", RSCIState, input_freq, 0),
-+    DEFINE_PROP_CHR("chardev", RSCIState, chr),
-+    DEFINE_PROP_END_OF_LIST(),
-+};
-+
-+static void rsci_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc =3D DEVICE_CLASS(klass);
-+
-+    dc->realize =3D rsci_realize;
-+    dc->props =3D rsci_properties;
-+    dc->vmsd =3D &vmstate_rcmt;
-+    dc->reset =3D rsci_reset;
-+}
-+
-+static const TypeInfo rsci_info =3D {
-+    .name       =3D TYPE_RENESAS_SCI,
-+    .parent     =3D TYPE_SYS_BUS_DEVICE,
-+    .instance_size =3D sizeof(RSCIState),
-+    .instance_init =3D rsci_init,
-+    .class_init =3D rsci_class_init,
-+};
-+
-+static void rsci_register_types(void)
-+{
-+    type_register_static(&rsci_info);
-+}
-+
-+type_init(rsci_register_types)
-diff --git a/hw/char/Kconfig b/hw/char/Kconfig
-index 40e7a8b8bb..874627520c 100644
---- a/hw/char/Kconfig
-+++ b/hw/char/Kconfig
-@@ -46,3 +46,6 @@ config SCLPCONSOLE
-=20
- config TERMINAL3270
-     bool
-+
-+config RENESAS_SCI
-+    bool
-diff --git a/hw/char/Makefile.objs b/hw/char/Makefile.objs
-index 02d8a66925..4472d563b5 100644
---- a/hw/char/Makefile.objs
-+++ b/hw/char/Makefile.objs
-@@ -21,6 +21,7 @@ obj-$(CONFIG_PSERIES) +=3D spapr_vty.o
- obj-$(CONFIG_DIGIC) +=3D digic-uart.o
- obj-$(CONFIG_STM32F2XX_USART) +=3D stm32f2xx_usart.o
- obj-$(CONFIG_RASPI) +=3D bcm2835_aux.o
-+obj-$(CONFIG_RENESAS_SCI) +=3D renesas_sci.o
-=20
- common-obj-$(CONFIG_CMSDK_APB_UART) +=3D cmsdk-apb-uart.o
- common-obj-$(CONFIG_ETRAXFS) +=3D etraxfs_ser.o
---=20
+     return true;
+ }
+ 
+@@ -478,11 +482,11 @@ static bool trans_TST_mr(DisasContext *ctx, arg_TST_mr *a)
+ /* not rs, rd */
+ static bool trans_NOT_rr(DisasContext *ctx, arg_NOT_rr *a)
+ {
+-    prt("not\t");
+     if (a->rs != a->rd) {
+-        prt("r%d, ", a->rs);
++        prt("not\tr%d, r%d", a->rs, a->rd);
++    } else {
++        prt("not\tr%d", a->rs);
+     }
+-    prt("r%d", a->rd);
+     return true;
+ }
+ 
+@@ -490,11 +494,11 @@ static bool trans_NOT_rr(DisasContext *ctx, arg_NOT_rr *a)
+ /* neg rs, rd */
+ static bool trans_NEG_rr(DisasContext *ctx, arg_NEG_rr *a)
+ {
+-    prt("neg\t");
+     if (a->rs != a->rd) {
+-        prt("r%d, ", a->rs);
++        prt("neg\tr%d, r%d", a->rs, a->rd);
++    } else {
++        prt("neg\tr%d", a->rs);
+     }
+-    prt("r%d", a->rd);
+     return true;
+ }
+ 
+@@ -606,11 +610,10 @@ static bool trans_SBB_mr(DisasContext *ctx, arg_SBB_mr *a)
+ /* abs rs, rd */
+ static bool trans_ABS_rr(DisasContext *ctx, arg_ABS_rr *a)
+ {
+-    prt("abs\t");
+-    if (a->rs == a->rd) {
+-        prt("r%d", a->rd);
++    if (a->rs != a->rd) {
++        prt("abs\tr%d, r%d", a->rs, a->rd);
+     } else {
+-        prt("r%d, r%d", a->rs, a->rd);
++        prt("abs\tr%d", a->rs);
+     }
+     return true;
+ }
+@@ -733,11 +736,11 @@ static bool trans_DIVU_mr(DisasContext *ctx, arg_DIVU_mr *a)
+ /* shll #imm:5, rs, rd */
+ static bool trans_SHLL_irr(DisasContext *ctx, arg_SHLL_irr *a)
+ {
+-    prt("shll\t#%d, ", a->imm);
+     if (a->rs2 != a->rd) {
+-        prt("r%d, ", a->rs2);
++        prt("shll\t#%d, r%d, r%d", a->imm, a->rs2, a->rd);
++    } else {
++        prt("shll\t#%d, r%d", a->imm, a->rd);
+     }
+-    prt("r%d", a->rd);
+     return true;
+ }
+ 
+@@ -752,11 +755,11 @@ static bool trans_SHLL_rr(DisasContext *ctx, arg_SHLL_rr *a)
+ /* shar #imm:5, rs, rd */
+ static bool trans_SHAR_irr(DisasContext *ctx, arg_SHAR_irr *a)
+ {
+-    prt("shar\t#%d,", a->imm);
+     if (a->rs2 != a->rd) {
+-        prt("r%d, ", a->rs2);
++        prt("shar\t#%d, r%d, r%d", a->imm, a->rs2, a->rd);
++    } else {
++        prt("shar\t#%d, r%d", a->imm, a->rd);
+     }
+-    prt("r%d", a->rd);
+     return true;
+ }
+ 
+@@ -771,11 +774,11 @@ static bool trans_SHAR_rr(DisasContext *ctx, arg_SHAR_rr *a)
+ /* shlr #imm:5, rs, rd */
+ static bool trans_SHLR_irr(DisasContext *ctx, arg_SHLR_irr *a)
+ {
+-    prt("shlr\t#%d, ", a->imm);
+     if (a->rs2 != a->rd) {
+-        prt("r%d, ", a->rs2);
++        prt("shlr\t#%d, r%d, r%d", a->imm, a->rs2, a->rd);
++    } else {
++        prt("shlr\t#%d, r%d", a->imm, a->rd);
+     }
+-    prt("r%d", a->rd);
+     return true;
+ }
+ 
+-- 
 2.11.0
 
 
