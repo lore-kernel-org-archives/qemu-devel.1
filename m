@@ -2,81 +2,61 @@ Return-Path: <SRS0=3yEa=UG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 652F3C28CC3
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 03:52:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D717C28CC3
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 04:23:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2C24F20684
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 03:52:47 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="oLpZyfNp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2C24F20684
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 0003020825
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 04:23:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0003020825
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45796 helo=lists.gnu.org)
+Received: from localhost ([::1]:45870 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hZ5vp-0004MY-TU
-	for qemu-devel@archiver.kernel.org; Thu, 06 Jun 2019 23:52:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59179)
+	id 1hZ6PO-0006ip-1P
+	for qemu-devel@archiver.kernel.org; Fri, 07 Jun 2019 00:23:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34498)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <hsp.cat7@gmail.com>) id 1hZ5v0-0003vr-UR
- for qemu-devel@nongnu.org; Thu, 06 Jun 2019 23:51:56 -0400
+ (envelope-from <tiwei.bie@intel.com>) id 1hZ6OZ-0006At-Am
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 00:22:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <hsp.cat7@gmail.com>) id 1hZ5uz-0001hC-29
- for qemu-devel@nongnu.org; Thu, 06 Jun 2019 23:51:54 -0400
-Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:33830)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <hsp.cat7@gmail.com>) id 1hZ5uy-0001bG-Q8
- for qemu-devel@nongnu.org; Thu, 06 Jun 2019 23:51:53 -0400
-Received: by mail-oi1-x244.google.com with SMTP id u64so532168oib.1
- for <qemu-devel@nongnu.org>; Thu, 06 Jun 2019 20:51:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
- bh=Vqha7UHe1gywWApwtOU2vhANaW9Z2sPRiGR1Kz361r0=;
- b=oLpZyfNp9GOw8fwgMUB45CJ0s3voLDN1LS9RKgZ7ji/Z4NYJTnqL5W1cA9H8JEWR6P
- AjKZ8YDd9KwGYyWGYggIodWPhjU8vrcZVlIgqRCIc5riYXPpLqyN0kEUk+GYor1wlFSj
- JGH8rhiEo2TQzpNFdViteLKRyEK0JLq3ZoS/4rHJ8grC/MYfjQzbX52x22eBIpc8mRV7
- 7bRRpuqtcWVBi9vGsXiv8x8JUG7/taNSPG0leGnpIpNoebOV+bfok95r46Tvv7SqtgCN
- nqb2YTjsTE91X0Ew1QEFMFc/PgHy4OCq14R5GaJ3n476guVRZBPlZI7Qkw2KYNGKMtSs
- I1yQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to;
- bh=Vqha7UHe1gywWApwtOU2vhANaW9Z2sPRiGR1Kz361r0=;
- b=dyvVK7U7y2WrvkQBD1+u2HZmBv2/jnbf+JW8Mv2WkfkYsuUcYyiFvniMVAjAMWFVbV
- o86YrHQEb8BwdoHTOENQcPhIgy99VA2X0lWVoqbRZ5UR1JUkSvzdfxWneort/A6aXbZI
- doJDDD8i3jCuNhNxQ3MMctKoxcsMJcoebW1aCpb+mVT3gkccXRlqFglqZkRwDU5C2UBs
- PyWZkizfnC6EOslwvH9lR0nsm+QwjKkOJmZE51wHyzIDtUGHLsdgfREjMzmUY6ZUxHgi
- G3rvyiKaQFEIJ8QKrcjO7bKpmvPnP23O06LIkui5rxPLYhxCsPg4OjYaSzvLSJ01H9NI
- gaag==
-X-Gm-Message-State: APjAAAXXM+6nUMF3jI/6s1PRON56iW4CU1fqVXB9NvSFRM7lpqoPV4sL
- UgWuCiQAoY9C6AJXNq5AejwBCybDs2s3qmE0sz6aI8GJ
-X-Google-Smtp-Source: APXvYqzEt3wKR80TaFyQ9DIhSb8aWf87YrgRUvpDSleqM1z1+prS1QXgqW6fyCbwBCgDlNxKXyak2tfZmRolT4Cgr4o=
-X-Received: by 2002:a54:4686:: with SMTP id k6mr2518066oic.112.1559879510680; 
- Thu, 06 Jun 2019 20:51:50 -0700 (PDT)
+ (envelope-from <tiwei.bie@intel.com>) id 1hZ6OY-00064l-9g
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 00:22:27 -0400
+Received: from mga02.intel.com ([134.134.136.20]:8989)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <tiwei.bie@intel.com>)
+ id 1hZ6OV-0005Z3-Fw; Fri, 07 Jun 2019 00:22:23 -0400
+X-Amp-Result: UNSCANNABLE
+X-Amp-File-Uploaded: False
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+ by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 06 Jun 2019 21:22:11 -0700
+X-ExtLoop1: 1
+Received: from npg-dpdk-virtio-tbie-2.sh.intel.com (HELO ___) ([10.67.104.151])
+ by fmsmga004.fm.intel.com with ESMTP; 06 Jun 2019 21:22:09 -0700
+Date: Fri, 7 Jun 2019 12:21:00 +0800
+From: Tiwei Bie <tiwei.bie@intel.com>
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>
+Message-ID: <20190607042100.GB13920@___>
+References: <20190426061815.6384-1-tiwei.bie@intel.com>
+ <CAJ+F1CKjHprs15oqrB8K2COUunjeGx-y7kBvAtaxJ17n5yt+iQ@mail.gmail.com>
 MIME-Version: 1.0
-References: <1559816130-17113-1-git-send-email-stefan.brankovic@rt-rk.com>
-In-Reply-To: <1559816130-17113-1-git-send-email-stefan.brankovic@rt-rk.com>
-From: Howard Spoelstra <hsp.cat7@gmail.com>
-Date: Fri, 7 Jun 2019 05:51:39 +0200
-Message-ID: <CABLmASH-AD8hf9u6LLJPyH8huaH+KX+opPqYh1K9yxu+xc2PCA@mail.gmail.com>
-To: qemu-devel qemu-devel <qemu-devel@nongnu.org>
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAJ+F1CKjHprs15oqrB8K2COUunjeGx-y7kBvAtaxJ17n5yt+iQ@mail.gmail.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::244
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Content-Filtered-By: Mailman/MimeDel 2.1.23
-Subject: Re: [Qemu-devel] [PATCH 0/8] Optimize emulation of ten Altivec
- instructions: lvsl, 
+X-Received-From: 134.134.136.20
+Subject: Re: [Qemu-devel] [PATCH] vhost-user: fix reconnection support for
+ host notifier
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,142 +68,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: cunming.liang@intel.com, qemu-stable <qemu-stable@nongnu.org>,
+ QEMU <qemu-devel@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 Hi,
 
-This series gives me several compilation errors.
-When compiled with --disable-werror, OSX 10.3 guest on qemu-system-ppc
-shows corrupted desktop graphics.
+On Thu, Jun 06, 2019 at 03:30:29PM +0200, Marc-André Lureau wrote:
+> Hi
+> 
+> On Fri, Apr 26, 2019 at 8:32 AM Tiwei Bie <tiwei.bie@intel.com> wrote:
+> >
+> > We need to destroy the host notifiers when cleaning up
+> > the backend. Otherwise, some resources are not released
+> > after the connection is closed, and it may prevent the
+> > external backend from reopening them (e.g. VFIO files)
+> > during restart.
+> >
+> > Fixes: 44866521bd6e ("vhost-user: support registering external host notifiers")
+> > Cc: qemu-stable@nongnu.org
+> >
+> > Signed-off-by: Tiwei Bie <tiwei.bie@intel.com>
+> > ---
+> >  hw/virtio/vhost-user.c | 16 ++++++++++++++++
+> >  1 file changed, 16 insertions(+)
+> >
+> > diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
+> > index 553319c7ac..56656629c0 100644
+> > --- a/hw/virtio/vhost-user.c
+> > +++ b/hw/virtio/vhost-user.c
+> > @@ -1454,10 +1454,24 @@ static int vhost_user_backend_init(struct vhost_dev *dev, void *opaque)
+> >  static int vhost_user_backend_cleanup(struct vhost_dev *dev)
+> >  {
+> >      struct vhost_user *u;
+> > +    VhostUserState *user;
+> > +    int i;
+> >
+> >      assert(dev->vhost_ops->backend_type == VHOST_BACKEND_TYPE_USER);
+> >
+> >      u = dev->opaque;
+> > +
+> > +    if (dev->vq_index == 0) {
+> > +        user = u->user;
+> > +        for (i = 0; i < VIRTIO_QUEUE_MAX; i++) {
+> > +            if (user->notifier[i].addr) {
+> > +                object_unparent(OBJECT(&user->notifier[i].mr));
+> > +                munmap(user->notifier[i].addr, qemu_real_host_page_size);
+> > +                user->notifier[i].addr = NULL;
+> > +            }
+> > +        }
+> > +    }
+> 
+> Why not call vhost_user_cleanup() ? Alternatively, factor the notifier
+> code in a seperate vhost_user_notifiers_cleanup() ?
 
-Compiled with:
-./configure --target-list=3D"ppc-softmmu" --enable-sdl --enable-gtk  && mak=
-e
--j8
+I like the idea to factor the notifier code in a seperate
+vhost_user_notifiers_cleanup(). I can do it. Thanks!
 
-gcc is:
-[hsp@fedora30 qemu-master]$ gcc -v
-Using built-in specs.
-COLLECT_GCC=3Dgcc
-COLLECT_LTO_WRAPPER=3D/usr/libexec/gcc/x86_64-redhat-linux/9/lto-wrapper
-OFFLOAD_TARGET_NAMES=3Dnvptx-none
-OFFLOAD_TARGET_DEFAULT=3D1
-Target: x86_64-redhat-linux
-Configured with: ../configure --enable-bootstrap
---enable-languages=3Dc,c++,fortran,objc,obj-c++,ada,go,d,lto --prefix=3D/us=
-r
---mandir=3D/usr/share/man --infodir=3D/usr/share/info --with-bugurl=3D
-http://bugzilla.redhat.com/bugzilla --enable-shared --enable-threads=3Dposi=
-x
---enable-checking=3Drelease --enable-multilib --with-system-zlib
---enable-__cxa_atexit --disable-libunwind-exceptions
---enable-gnu-unique-object --enable-linker-build-id
---with-gcc-major-version-only --with-linker-hash-style=3Dgnu --enable-plugi=
-n
---enable-initfini-array --with-isl --enable-offload-targets=3Dnvptx-none
---without-cuda-driver --enable-gnu-indirect-function --enable-cet
---with-tune=3Dgeneric --with-arch_32=3Di686 --build=3Dx86_64-redhat-linux
-Thread model: posix
-gcc version 9.1.1 20190503 (Red Hat 9.1.1-1) (GCC)
+> 
+> > +
+> >      if (u->postcopy_notifier.notify) {
+> >          postcopy_remove_notifier(&u->postcopy_notifier);
+> >          u->postcopy_notifier.notify = NULL;
+> > @@ -1881,6 +1895,8 @@ bool vhost_user_init(VhostUserState *user, CharBackend *chr, Error **errp)
+> >          error_setg(errp, "Cannot initialize vhost-user state");
+> >          return false;
+> >      }
+> > +
+> > +    memset(user, 0, sizeof(*user));
+> 
+> This looks superflous. Is it really needed?
 
-Errors are:
+I think you are right. We already checked whether user->chr
+is zero. The caller should make sure that the VhostUserState
+will be zero initialized.
 
-/home/hsp/src/qemu-master/tcg/tcg-op.h:837:24: error: initialization of
-=E2=80=98TCGv_i64=E2=80=99 {aka =E2=80=98struct TCGv_i64_d *=E2=80=99} from=
- incompatible pointer type
-=E2=80=98TCGv_i32=E2=80=99 {aka =E2=80=98struct TCGv_i32_d *=E2=80=99} [-We=
-rror=3Dincompatible-pointer-types]
-  837 | #define tcg_temp_new() tcg_temp_new_i32()
-      |                        ^~~~~~~~~~~~~~~~
-/home/hsp/src/qemu-master/target/ppc/translate/vmx-impl.inc.c:513:19: note:
-in expansion of macro =E2=80=98tcg_temp_new=E2=80=99
-  513 |     TCGv_i64 EA =3D tcg_temp_new();
-      |                   ^~~~~~~~~~~~
-In file included from /home/hsp/src/qemu-master/target/ppc/translate.c:6826=
-:
-/home/hsp/src/qemu-master/target/ppc/translate/vmx-impl.inc.c:517:29:
-error: passing argument 2 of =E2=80=98gen_addr_reg_index=E2=80=99 from inco=
-mpatible pointer
-type [-Werror=3Dincompatible-pointer-types]
-  517 |     gen_addr_reg_index(ctx, EA);
-      |                             ^~
-      |                             |
-      |                             TCGv_i64 {aka struct TCGv_i64_d *}
-/home/hsp/src/qemu-master/target/ppc/translate.c:2398:63: note: expected
-=E2=80=98TCGv_i32=E2=80=99 {aka =E2=80=98struct TCGv_i32_d *=E2=80=99} but =
-argument is of type =E2=80=98TCGv_i64=E2=80=99
-{aka =E2=80=98struct TCGv_i64_d *=E2=80=99}
- 2398 | static inline void gen_addr_reg_index(DisasContext *ctx, TCGv EA)
-In file included from /home/hsp/src/qemu-master/target/ppc/translate.c:6826=
-:
-/home/hsp/src/qemu-master/target/ppc/translate/vmx-impl.inc.c:545:19:
-error: passing argument 1 of =E2=80=98tcg_temp_free_i32=E2=80=99 from incom=
-patible pointer
-type [-Werror=3Dincompatible-pointer-types]
-  545 |     tcg_temp_free(EA);
-      |                   ^~
-      |                   |
-      |                   TCGv_i64 {aka struct TCGv_i64_d *}
-In file included from /home/hsp/src/qemu-master/tcg/tcg-op.h:28,
-                 from /home/hsp/src/qemu-master/target/ppc/translate.c:26:
-/home/hsp/src/qemu-master/tcg/tcg.h:933:47: note: expected =E2=80=98TCGv_i3=
-2=E2=80=99 {aka
-=E2=80=98struct TCGv_i32_d *=E2=80=99} but argument is of type =E2=80=98TCG=
-v_i64=E2=80=99 {aka =E2=80=98struct
-TCGv_i64_d *=E2=80=99}
-  933 | static inline void tcg_temp_free_i32(TCGv_i32 arg)
-      |                                      ~~~~~~~~~^~~
-In file included from /home/hsp/src/qemu-master/target/ppc/translate.c:26:
-/home/hsp/src/qemu-master/target/ppc/translate/vmx-impl.inc.c: In function
-=E2=80=98trans_lvsr=E2=80=99:
-/home/hsp/src/qemu-master/tcg/tcg-op.h:837:24: error: initialization of
-=E2=80=98TCGv_i64=E2=80=99 {aka =E2=80=98struct TCGv_i64_d *=E2=80=99} from=
- incompatible pointer type
-=E2=80=98TCGv_i32=E2=80=99 {aka =E2=80=98struct TCGv_i32_d *=E2=80=99} [-We=
-rror=3Dincompatible-pointer-types]
-  837 | #define tcg_temp_new() tcg_temp_new_i32()
-      |                        ^~~~~~~~~~~~~~~~
-/home/hsp/src/qemu-master/target/ppc/translate/vmx-impl.inc.c:561:19: note:
-in expansion of macro =E2=80=98tcg_temp_new=E2=80=99
-  561 |     TCGv_i64 EA =3D tcg_temp_new();
-      |                   ^~~~~~~~~~~~
-In file included from /home/hsp/src/qemu-master/target/ppc/translate.c:6826=
-:
-/home/hsp/src/qemu-master/target/ppc/translate/vmx-impl.inc.c:565:29:
-error: passing argument 2 of =E2=80=98gen_addr_reg_index=E2=80=99 from inco=
-mpatible pointer
-type [-Werror=3Dincompatible-pointer-types]
-  565 |     gen_addr_reg_index(ctx, EA);
-      |                             ^~
-      |                             |
-      |                             TCGv_i64 {aka struct TCGv_i64_d *}
-/home/hsp/src/qemu-master/target/ppc/translate.c:2398:63: note: expected
-=E2=80=98TCGv_i32=E2=80=99 {aka =E2=80=98struct TCGv_i32_d *=E2=80=99} but =
-argument is of type =E2=80=98TCGv_i64=E2=80=99
-{aka =E2=80=98struct TCGv_i64_d *=E2=80=99}
- 2398 | static inline void gen_addr_reg_index(DisasContext *ctx, TCGv EA)
-In file included from /home/hsp/src/qemu-master/target/ppc/translate.c:6826=
-:
-/home/hsp/src/qemu-master/target/ppc/translate/vmx-impl.inc.c:596:19:
-error: passing argument 1 of =E2=80=98tcg_temp_free_i32=E2=80=99 from incom=
-patible pointer
-type [-Werror=3Dincompatible-pointer-types]
-  596 |     tcg_temp_free(EA);
-      |                   ^~
-      |                   |
-      |                   TCGv_i64 {aka struct TCGv_i64_d *}
-In file included from /home/hsp/src/qemu-master/tcg/tcg-op.h:28,
-                 from /home/hsp/src/qemu-master/target/ppc/translate.c:26:
-/home/hsp/src/qemu-master/tcg/tcg.h:933:47: note: expected =E2=80=98TCGv_i3=
-2=E2=80=99 {aka
-=E2=80=98struct TCGv_i32_d *=E2=80=99} but argument is of type =E2=80=98TCG=
-v_i64=E2=80=99 {aka =E2=80=98struct
-TCGv_i64_d *=E2=80=99}
-  933 | static inline void tcg_temp_free_i32(TCGv_i32 arg)
-      |                                      ~~~~~~~~~^~~
+> 
+> I wish there would be some basic tests for external host notifiers. Is
+> it too much to ask to add it in vhost-user-test.c ?
 
+Sounds good to me. Besides, there are already some basic
+external host notifier supports in tests/vhost-user-bridge.c
+that can be enabled with -H. I'm not sure whether that already
+met what you want. If adding some basic tests in vhost-user-test.c
+would help, I'd like to do it.
 
-Best,
-Howard
+Thanks for the review!
+Tiwei
+
+> 
+> 
+> >      user->chr = chr;
+> >      return true;
+> >  }
+> > --
+> > 2.17.1
+> >
+> >
+> 
+> 
+> -- 
+> Marc-André Lureau
+
