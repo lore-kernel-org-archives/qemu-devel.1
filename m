@@ -2,49 +2,53 @@ Return-Path: <SRS0=3yEa=UG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7419CC2BCA1
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 22:30:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7700CC2BCA1
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 22:34:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EC40E20449
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 22:30:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EC40E20449
+	by mail.kernel.org (Postfix) with ESMTPS id 3A0C52067C
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 22:34:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3A0C52067C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53872 helo=lists.gnu.org)
+Received: from localhost ([::1]:53944 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hZNNM-0004GS-Rm
-	for qemu-devel@archiver.kernel.org; Fri, 07 Jun 2019 18:30:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57523)
+	id 1hZNRB-0006Fc-Bl
+	for qemu-devel@archiver.kernel.org; Fri, 07 Jun 2019 18:34:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51388)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <jsnow@redhat.com>) id 1hZNLm-00026Q-SF
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 18:28:43 -0400
+ (envelope-from <jsnow@redhat.com>) id 1hZN2W-0005nV-Mb
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 18:08:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1hZNLl-0003PF-US
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 18:28:42 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39678)
+ (envelope-from <jsnow@redhat.com>) id 1hZN2Q-0003IV-Jh
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 18:08:47 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53262)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1hZNLj-0003Ly-Pq; Fri, 07 Jun 2019 18:28:39 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ id 1hZN28-0002sq-9E; Fri, 07 Jun 2019 18:08:24 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id EF42930832DE;
- Fri,  7 Jun 2019 22:28:33 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id B9B1188319;
+ Fri,  7 Jun 2019 22:08:20 +0000 (UTC)
 Received: from [10.10.120.179] (ovpn-120-179.rdu2.redhat.com [10.10.120.179])
- by smtp.corp.redhat.com (Postfix) with ESMTP id C19FA60BE2;
- Fri,  7 Jun 2019 22:28:31 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id E5B905D9CC;
+ Fri,  7 Jun 2019 22:08:18 +0000 (UTC)
 To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-devel@nongnu.org, qemu-block@nongnu.org
-References: <20190603120005.37394-1-vsementsov@virtuozzo.com>
- <20190603120005.37394-2-vsementsov@virtuozzo.com>
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+References: <20190606184159.979-1-jsnow@redhat.com>
+ <20190606184159.979-3-jsnow@redhat.com>
+ <70a53585-bdc6-1877-01f5-1b2d1aad8de6@virtuozzo.com>
+ <e5bb6d0b-567f-2c2d-6415-93d79fece228@redhat.com>
+ <5c62c56e-416c-e72e-e51f-8dcc1be96d53@virtuozzo.com>
 From: John Snow <jsnow@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
@@ -121,22 +125,22 @@ Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
  RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
  glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
-Message-ID: <2587ead5-85ef-4e25-b3b2-feb5feda60a5@redhat.com>
-Date: Fri, 7 Jun 2019 18:28:27 -0400
+Message-ID: <1992aeff-b0fc-381b-7364-b600094f75bf@redhat.com>
+Date: Fri, 7 Jun 2019 18:08:17 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190603120005.37394-2-vsementsov@virtuozzo.com>
+In-Reply-To: <5c62c56e-416c-e72e-e51f-8dcc1be96d53@virtuozzo.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.44]); Fri, 07 Jun 2019 22:28:34 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.28]); Fri, 07 Jun 2019 22:08:20 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 1/4] blockdev: reduce aio_context locked
- sections in bitmap add/remove
+Subject: Re: [Qemu-devel] [PATCH 2/5] block/dirty-bitmap: Refactor
+ bdrv_can_store_new_bitmap
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -148,25 +152,326 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, fam@euphon.net, armbru@redhat.com, mreitz@redhat.com,
- nshirokovskiy@virtuozzo.com, den@openvz.org
+Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
 
-On 6/3/19 8:00 AM, Vladimir Sementsov-Ogievskiy wrote:
-> Commit 0a6c86d024c52 returned these locks back to add/remove
-> functionality, to protect from intersection of persistent bitmap
-> related IO with other IO. But other bitmap-related functions called
-> here are unrelated to the problem, and there are no needs to keep these
-> calls inside critical sections.
+On 6/7/19 2:17 PM, Vladimir Sementsov-Ogievskiy wrote:
+> 07.06.2019 21:10, John Snow wrote:
+>>
+>>
+>> On 6/7/19 10:29 AM, Vladimir Sementsov-Ogievskiy wrote:
+>>> 06.06.2019 21:41, John Snow wrote:
+>>>> Instead of bdrv_can_store_new_bitmap, rework this as
+>>>> bdrv_add_persistent_dirty_bitmap. This makes a more obvious symmetry
+>>>> with bdrv_remove_persistent_dirty_bitmap. Most importantly, we are free
+>>>> to modify the driver state because we know we ARE adding a bitmap
+>>>> instead of simply being asked if we CAN store one.
+>>>>
+>>>> As part of this symmetry, move this function next to
+>>>> bdrv_remove_persistent_bitmap in block/dirty-bitmap.c.
+>>>>
+>>>> To cement this semantic distinction, use a bitmap object instead of the
+>>>> (name, granularity) pair as this allows us to set persistence as a
+>>>> condition of the "add" succeeding.
+>>>>
+>>>> Notably, the qcow2 implementation still does not actually store the new
+>>>> bitmap at add time, but merely ensures that it will be able to at store
+>>>> time.
+>>>>
+>>>> Signed-off-by: John Snow <jsnow@redhat.com>
+>>>> ---
+>>>>    block/qcow2.h                |  5 ++---
+>>>>    include/block/block.h        |  2 --
+>>>>    include/block/block_int.h    |  5 ++---
+>>>>    include/block/dirty-bitmap.h |  3 +++
+>>>>    block.c                      | 22 ---------------------
+>>>>    block/dirty-bitmap.c         | 38 ++++++++++++++++++++++++++++++++++++
+>>>>    block/qcow2-bitmap.c         | 24 ++++++++++++++---------
+>>>>    block/qcow2.c                |  2 +-
+>>>>    blockdev.c                   | 19 +++++++-----------
+>>>>    9 files changed, 68 insertions(+), 52 deletions(-)
+>>>>
+>>>> diff --git a/block/qcow2.h b/block/qcow2.h
+>>>> index fc1b0d3c1e..95d723d3c0 100644
+>>>> --- a/block/qcow2.h
+>>>> +++ b/block/qcow2.h
+>>>> @@ -742,9 +742,8 @@ int qcow2_reopen_bitmaps_rw(BlockDriverState *bs, Error **errp);
+>>>>    int qcow2_truncate_bitmaps_check(BlockDriverState *bs, Error **errp);
+>>>>    void qcow2_store_persistent_dirty_bitmaps(BlockDriverState *bs, Error **errp);
+>>>>    int qcow2_reopen_bitmaps_ro(BlockDriverState *bs, Error **errp);
+>>>> -bool qcow2_can_store_new_dirty_bitmap(BlockDriverState *bs,
+>>>> -                                      const char *name,
+>>>> -                                      uint32_t granularity,
+>>>> +int qcow2_add_persistent_dirty_bitmap(BlockDriverState *bs,
+>>>> +                                      BdrvDirtyBitmap *bitmap,
+>>>>                                          Error **errp);
+>>>>    void qcow2_remove_persistent_dirty_bitmap(BlockDriverState *bs,
+>>>>                                              const char *name,
+>>>> diff --git a/include/block/block.h b/include/block/block.h
+>>>> index f9415ed740..6d520f3b59 100644
+>>>> --- a/include/block/block.h
+>>>> +++ b/include/block/block.h
+>>>> @@ -683,8 +683,6 @@ void bdrv_add_child(BlockDriverState *parent, BlockDriverState *child,
+>>>>                        Error **errp);
+>>>>    void bdrv_del_child(BlockDriverState *parent, BdrvChild *child, Error **errp);
+>>>>    
+>>>> -bool bdrv_can_store_new_dirty_bitmap(BlockDriverState *bs, const char *name,
+>>>> -                                     uint32_t granularity, Error **errp);
+>>>>    /**
+>>>>     *
+>>>>     * bdrv_register_buf/bdrv_unregister_buf:
+>>>> diff --git a/include/block/block_int.h b/include/block/block_int.h
+>>>> index 06df2bda1b..93bbb66cd0 100644
+>>>> --- a/include/block/block_int.h
+>>>> +++ b/include/block/block_int.h
+>>>> @@ -537,9 +537,8 @@ struct BlockDriver {
+>>>>         * field of BlockDirtyBitmap's in case of success.
+>>>>         */
+>>>>        int (*bdrv_reopen_bitmaps_rw)(BlockDriverState *bs, Error **errp);
+>>>> -    bool (*bdrv_can_store_new_dirty_bitmap)(BlockDriverState *bs,
+>>>> -                                            const char *name,
+>>>> -                                            uint32_t granularity,
+>>>> +    int (*bdrv_add_persistent_dirty_bitmap)(BlockDriverState *bs,
+>>>> +                                            BdrvDirtyBitmap *bitmap,
+>>>>                                                Error **errp);
+>>>>        void (*bdrv_remove_persistent_dirty_bitmap)(BlockDriverState *bs,
+>>>>                                                    const char *name,
+>>>> diff --git a/include/block/dirty-bitmap.h b/include/block/dirty-bitmap.h
+>>>> index 8044ace63e..c37edbe05f 100644
+>>>> --- a/include/block/dirty-bitmap.h
+>>>> +++ b/include/block/dirty-bitmap.h
+>>>> @@ -38,6 +38,9 @@ int bdrv_dirty_bitmap_check(const BdrvDirtyBitmap *bitmap, uint32_t flags,
+>>>>                                Error **errp);
+>>>>    void bdrv_release_dirty_bitmap(BlockDriverState *bs, BdrvDirtyBitmap *bitmap);
+>>>>    void bdrv_release_named_dirty_bitmaps(BlockDriverState *bs);
+>>>> +int bdrv_add_persistent_dirty_bitmap(BlockDriverState *bs,
+>>>> +                                      BdrvDirtyBitmap *bitmap,
+>>>> +                                      Error **errp);
+>>>>    void bdrv_remove_persistent_dirty_bitmap(BlockDriverState *bs,
+>>>>                                             const char *name,
+>>>>                                             Error **errp);
+>>>> diff --git a/block.c b/block.c
+>>>> index e3e77feee0..6aec36b7c9 100644
+>>>> --- a/block.c
+>>>> +++ b/block.c
+>>>> @@ -6379,25 +6379,3 @@ void bdrv_del_child(BlockDriverState *parent_bs, BdrvChild *child, Error **errp)
+>>>>    
+>>>>        parent_bs->drv->bdrv_del_child(parent_bs, child, errp);
+>>>>    }
+>>>> -
+>>>> -bool bdrv_can_store_new_dirty_bitmap(BlockDriverState *bs, const char *name,
+>>>> -                                     uint32_t granularity, Error **errp)
+>>>> -{
+>>>> -    BlockDriver *drv = bs->drv;
+>>>> -
+>>>> -    if (!drv) {
+>>>> -        error_setg_errno(errp, ENOMEDIUM,
+>>>> -                         "Can't store persistent bitmaps to %s",
+>>>> -                         bdrv_get_device_or_node_name(bs));
+>>>> -        return false;
+>>>> -    }
+>>>> -
+>>>> -    if (!drv->bdrv_can_store_new_dirty_bitmap) {
+>>>> -        error_setg_errno(errp, ENOTSUP,
+>>>> -                         "Can't store persistent bitmaps to %s",
+>>>> -                         bdrv_get_device_or_node_name(bs));
+>>>> -        return false;
+>>>> -    }
+>>>> -
+>>>> -    return drv->bdrv_can_store_new_dirty_bitmap(bs, name, granularity, errp);
+>>>> -}
+>>>> diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
+>>>> index 49646a30e6..615f8480b2 100644
+>>>> --- a/block/dirty-bitmap.c
+>>>> +++ b/block/dirty-bitmap.c
+>>>> @@ -466,6 +466,44 @@ void bdrv_remove_persistent_dirty_bitmap(BlockDriverState *bs,
+>>>>        }
+>>>>    }
+>>>>    
+>>>> +int bdrv_add_persistent_dirty_bitmap(BlockDriverState *bs,
+>>>> +                                     BdrvDirtyBitmap *bitmap,
+>>>> +                                     Error **errp)
+>>>
+>>> strange thing for me: "bitmap" in function name is _not_ the same
+>>> thing as @bitmap argument.. as if it the same,
+>>> function adds "persistent bitmap", but @bitmap is not persistent yet,
+>>> so may be function, don't add persistent bitmap, but marks bitmap persistent?
+>>>
+>>>
+>>> Ok, I can think of it like "add persistent dirty bitmap to driver. if succeed, set
+>>> bitmap.persistent flag"
+>>>
+>>
+>> Yeah, I meant "Add bitmap to file", where the persistence is implied
+>> because it's part of the file. The bitmap is indeed not YET persistent,
+>> but becomes so as a condition of this call succeeding.
+>>
+>> Do you have a suggestion for a better name? I liked the symmetry with
+>> 'remove' so that there was an obvious "add bitmap" and "remove bitmap".
+>>
+>> Of course, when you remove, it is indeed persistent, so
+>> "remove_persistent_dirty_bitmap" makes sense there.
+>>
+>>>
+>>>> +{
+>>>> +    BlockDriver *drv = bs->drv;
+>>>> +    int ret;
+>>>> +
+>>>> +    if (bdrv_dirty_bitmap_get_persistence(bitmap)) {
+>>>> +        error_setg(errp, "Bitmap '%s' is already persistent, "
+>>>> +                   "and cannot be re-added to node '%s'",
+>>>> +                   bdrv_dirty_bitmap_name(bitmap),
+>>>> +                   bdrv_get_device_or_node_name(bs));
+>>>> +        return -EINVAL;
+>>>> +    }
+>>>> +
+>>>> +    if (!drv) {
+>>>> +        error_setg_errno(errp, ENOMEDIUM,
+>>>> +                         "Can't store persistent bitmaps to %s",
+>>>> +                         bdrv_get_device_or_node_name(bs));
+>>>> +        return -ENOMEDIUM;
+>>>> +    }
+>>>> +
+>>>> +    if (!drv->bdrv_add_persistent_dirty_bitmap) {
+>>>> +        error_setg_errno(errp, ENOTSUP,
+>>>> +                         "Can't store persistent bitmaps to %s",
+>>>> +                         bdrv_get_device_or_node_name(bs));
+>>>> +        return -ENOTSUP;
+>>>> +    }
+>>>> +
+>>>> +    ret = drv->bdrv_add_persistent_dirty_bitmap(bs, bitmap, errp);
+>>>> +    if (ret == 0) {
+>>>> +        bdrv_dirty_bitmap_set_persistence(bitmap, true);
+>>>> +    }
+>>>> +
+>>>> +    return ret;
+>>>> +}
+>>>> +
+>>>> +
+>>>>    void bdrv_disable_dirty_bitmap(BdrvDirtyBitmap *bitmap)
+>>>>    {
+>>>>        bdrv_dirty_bitmap_lock(bitmap);
+>>>> diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
+>>>> index 83aee1a42a..c3a72ca782 100644
+>>>> --- a/block/qcow2-bitmap.c
+>>>> +++ b/block/qcow2-bitmap.c
+>>>> @@ -1607,14 +1607,16 @@ int qcow2_reopen_bitmaps_ro(BlockDriverState *bs, Error **errp)
+>>>>        return 0;
+>>>>    }
+>>>>    
+>>>> -bool qcow2_can_store_new_dirty_bitmap(BlockDriverState *bs,
+>>>> -                                      const char *name,
+>>>> -                                      uint32_t granularity,
+>>>> +int qcow2_add_persistent_dirty_bitmap(BlockDriverState *bs,
+>>>> +                                      BdrvDirtyBitmap *bitmap,
+>>>>                                          Error **errp)
+>>>>    {
+>>>>        BDRVQcow2State *s = bs->opaque;
+>>>>        bool found;
+>>>>        Qcow2BitmapList *bm_list;
+>>>> +    const char *name = bdrv_dirty_bitmap_name(bitmap);
+>>>> +    uint32_t granularity = bdrv_dirty_bitmap_granularity(bitmap);
+>>>> +    int ret = 0;
+>>>
+>>> dead assignment
+>>>
+>>
+>> Will take care of.
+>>
+>>>>    
+>>>>        if (s->qcow_version < 3) {
+>>>>            /* Without autoclear_features, we would always have to assume
+>>>> @@ -1623,20 +1625,23 @@ bool qcow2_can_store_new_dirty_bitmap(BlockDriverState *bs,
+>>>>             * have to drop all dirty bitmaps (defeating their purpose).
+>>>>             */
+>>>>            error_setg(errp, "Cannot store dirty bitmaps in qcow2 v2 files");
+>>>> +        ret = -ENOTSUP;
+>>>>            goto fail;
+>>>>        }
+>>>>    
+>>>> -    if (check_constraints_on_bitmap(bs, name, granularity, errp) != 0) {
+>>>> +    ret = check_constraints_on_bitmap(bs, name, granularity, errp);
+>>>> +    if (ret) {
+>>>
+>>> hmm, in other places you prefere
+>>> if ((ret = ...)) {
+>>> syntax
+>>>
+>>
+>> I have to get rid of those anyway, they violate our coding style. I'll
+>> be replacing them all with this full style.
+>>
+>>>>            goto fail;
+>>>>        }
+>>>>    
+>>>>        if (s->nb_bitmaps == 0) {
+>>>> -        return true;
+>>>> +        return 0;
+>>>>        }
+>>>>    
+>>>>        if (s->nb_bitmaps >= QCOW2_MAX_BITMAPS) {
+>>>>            error_setg(errp,
+>>>>                       "Maximum number of persistent bitmaps is already reached");
+>>>> +        ret = -EOVERFLOW;
+>>>>            goto fail;
+>>>>        }
+>>>>    
+>>>> @@ -1644,24 +1649,25 @@ bool qcow2_can_store_new_dirty_bitmap(BlockDriverState *bs,
+>>>>            QCOW2_MAX_BITMAP_DIRECTORY_SIZE)
+>>>>        {
+>>>>            error_setg(errp, "Not enough space in the bitmap directory");
+>>>> +        ret = -EOVERFLOW;
+>>>>            goto fail;
+>>>>        }
+>>>>    
+>>>> -    if (bitmap_list_load(bs, &bm_list, errp)) {
+>>>> +    if ((ret = bitmap_list_load(bs, &bm_list, errp))) {
+>>>
+>>> interesting, now we load all bitmaps, so, may be, we don't need to load list every time,
+>>> but may use bs.dirty_bitmaps to check such things.. But it seems unsafe
+>>>
+>>
+>> Yeah, I would like to cache this list eventually, but I ran into a lot
+>> of hassle with it last time I tried and put it off for now.
+>>
+>> I think we should definitely be able to.
+>>
+>> And in fact, if we did, we could even add these bitmaps to the bm_list
+>> as soon as _add_ is called and drop the need for the queued counters.
 > 
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> Personally I like the old _can_add_ :)
+> 
+> But you want to make this function really do something with driver, so "_can_" is not good
+> ofcourse and _add_ is better. And any kind of _mark_persistent_ or _make_persistent_ will
+> be in a bad relation with simple setter _set_persistence() which we already have and which
+> doesn't imply any complicated logic..
+> 
 
-Fine, of course. I'll probably rebase my series on top of this if the
-rest of the patches look good.
+I think it's a simpler design to have "add" and "remove" callbacks and
+be more direct about it. Of course, the qcow2 implementation is free to
+avoid a write to disk on add if it wishes, but I don't like the idea of
+having to call "can_store" and then later a "do_store" or any such thing.
 
-Reviewed-by: John Snow <jsnow@redhat.com>
+You could say that can_store is the check and then mark persistent is
+the actual action, but then why keep them separate?
+
+I like the link between calling the driver and the later store to be
+obvious. I feel like marking the bitmap persistent without the knowledge
+or consent of the driver is bound to cause trouble sooner or later, so
+I'd rather make the persistent call a condition of the store check
+succeeding.
+
+> On the other hand I still not sure that we need track "queued" bitmaps in qcow2 driver, as we
+> can calculate their number and needed size of directory in any moment, not extending the qcow2
+> state..
+> 
+
+Do we want to add an O(N) check because we don't want to spend 12 bytes?
+
+--js
 
