@@ -2,91 +2,82 @@ Return-Path: <SRS0=3yEa=UG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0525DC2BCA1
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 12:02:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A7CEC2BCA1
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 12:02:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C477E20868
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 12:02:11 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ag+bclxr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C477E20868
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 3765C212F5
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 12:02:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3765C212F5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49046 helo=lists.gnu.org)
+Received: from localhost ([::1]:49048 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hZDZT-0007vx-45
-	for qemu-devel@archiver.kernel.org; Fri, 07 Jun 2019 08:02:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36946)
+	id 1hZDZX-0007xP-B9
+	for qemu-devel@archiver.kernel.org; Fri, 07 Jun 2019 08:02:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49843)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <alex.bennee@linaro.org>) id 1hZDW8-0006GY-Uu
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 07:58:46 -0400
+ (envelope-from <pbonzini@redhat.com>) id 1hZCjT-0005zE-Mm
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 07:08:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1hZDW8-0003HE-0w
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 07:58:44 -0400
-Received: from mail-wm1-x32f.google.com ([2a00:1450:4864:20::32f]:39475)
+ (envelope-from <pbonzini@redhat.com>) id 1hZCjR-0002Zr-2U
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 07:08:27 -0400
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:43199)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1hZDW7-0003Dv-8c
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 07:58:43 -0400
-Received: by mail-wm1-x32f.google.com with SMTP id z23so1639936wma.4
- for <qemu-devel@nongnu.org>; Fri, 07 Jun 2019 04:58:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=fS3Gd2gHj2AwL5z6/kpqN+7ZdteTF9As4r1HiLW9udE=;
- b=ag+bclxr0Dodq4+XWCaAQpXGuE3W3XhDd3shabhP3iFv6niEXzVKsKaoWzYRtwekBv
- hdNX8fU1VLTJ6q5qksz+rW78iEVQmJ8ZccXJD2jsBc0v4I0cT/opB1V1K2rN3kyTOuLK
- W0qDLctxe1c9ydNCXQ+p4RAtO5Y6/HZ5CdD8TiB7oaYqSGyqB4igo3uKvVJw+HvnLCou
- msaocFlnYDlN7zWdecmKojtqXT3HIe46cG46UzPVP0HbPMJyHF+tMxvChzv40a6unXpA
- WVhAS0Z3z2pvxCrD5qg19KG0Iz2DdVShUIaH3knFRyQX1LX7IqW9qZkowPqZhMxhdo2v
- E9LQ==
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hZCjM-0002KK-Tu
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 07:08:22 -0400
+Received: by mail-wr1-f65.google.com with SMTP id r18so1718968wrm.10
+ for <qemu-devel@nongnu.org>; Fri, 07 Jun 2019 04:08:19 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=fS3Gd2gHj2AwL5z6/kpqN+7ZdteTF9As4r1HiLW9udE=;
- b=tOwVOTGIoY/kctbgiJS8cxb0b+ahvFmtN79714YnKNyCh4rjWDDoBr48cGrEYJ/ICD
- HwGn0gR2Bf2KxiuDUmtuOFK9Xjhs/5/s5XwzmV4pvvBATdbT8DT23thPUJWHUuGhWlY1
- rW6yUN9qRpCVdfd0am2Tjka9as7vqmj4UohdF7A0askONdx15tjuJ6e7Y1DPAHr34m7x
- hGP332btTO54rl7wWDI0IJgz3ud6fwpdJPE/af1pFby+fUyqRzyFABPJG0S5hbQzYV2N
- efT9nJT6Sg0B6shpMo4/MvcLbtE5yxS4jdk5lnmUm/fIR0OC1bBVp5NnPwgfyV6RLfQr
- ZNmA==
-X-Gm-Message-State: APjAAAUiv87ltbLIWhRwofGCRc6GnAF0swy1HqyjsJqVt7IscWZc/rkZ
- aGe6l9Tn6t2e/o9pHcgdmIzcqg==
-X-Google-Smtp-Source: APXvYqz3BcYSGc9b8aE3UKDiW/Y3mmUSrTfUwUn8cK4G9RCWyI+xavDLxZSsxnot6EYGWGX+FP68/g==
-X-Received: by 2002:a1c:a387:: with SMTP id m129mr3442839wme.15.1559908721064; 
- Fri, 07 Jun 2019 04:58:41 -0700 (PDT)
-Received: from zen.linaroharston ([81.128.185.34])
- by smtp.gmail.com with ESMTPSA id x25sm1115704wmc.36.2019.06.07.04.58.40
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Fri, 07 Jun 2019 04:58:40 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 0F8DE1FF87;
- Fri,  7 Jun 2019 12:58:40 +0100 (BST)
-References: <20190523204409.21068-1-jan.bobek@gmail.com>
- <878suw194o.fsf@zen.linaroharston>
- <CAFEAcA-EN4cS-T3qKeVdGo6124J6e=7z3kjua5oYyomcw7LB4Q@mail.gmail.com>
-User-agent: mu4e 1.3.2; emacs 26.1
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Peter Maydell <peter.maydell@linaro.org>
-In-reply-to: <CAFEAcA-EN4cS-T3qKeVdGo6124J6e=7z3kjua5oYyomcw7LB4Q@mail.gmail.com>
-Date: Fri, 07 Jun 2019 12:58:40 +0100
-Message-ID: <87ftolsj2n.fsf@zen.linaroharston>
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=xAN5x32itYHsExlt58dM3Q1jhGvK/Oi1PGkIm5kb9No=;
+ b=dN9uAFxGld9LJmMH9HX/i5y0YvRBBUc3j13YTcr1IlMwYdxRuzZg0KgjYlOh3J1EAx
+ kfI7ahmersfbjA6/c4RL6zxBKti8ifCOYzBKR+IqEhaF7IPcFLjoY26c69kiVOh8Ig71
+ iZAjcbi52fiuwWpKIEluCDPlKhkdk9GMC2BTaY2l+Sf/0LklW00GtxXnhdXDfoRNo6bG
+ slecCiT0CF10cJfwcnDePj32P20CwgxltDgP22NzbTIj6jSJuK24/ljGbK0GlFyX+Fgj
+ Ib6+MLfrd4K/YmCvpZcv+TgVOSOY6Ck0BbbGO4OpSGIIqjjEnNFwgEPy1/LWD5/NlDPg
+ J3Qg==
+X-Gm-Message-State: APjAAAVzZd0kktHGifGTPMjE4yKlkCnXBEvCBq57zDnmALNnZxWSk80F
+ n2Pb7UZapO/jsZ1WmznBFVFYd06WCP4=
+X-Google-Smtp-Source: APXvYqxblyXgRWCxrbgpUrfJJ6Y8Ok05cDZrvjJ98Dr3JtPpYOgZiPyR+I+o0roU6PY3S4P05b68Aw==
+X-Received: by 2002:adf:b689:: with SMTP id j9mr12008058wre.76.1559905698818; 
+ Fri, 07 Jun 2019 04:08:18 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:d43d:6da3:9364:a775?
+ ([2001:b07:6468:f312:d43d:6da3:9364:a775])
+ by smtp.gmail.com with ESMTPSA id f21sm1720346wmb.2.2019.06.07.04.08.17
+ (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+ Fri, 07 Jun 2019 04:08:18 -0700 (PDT)
+To: John Snow <jsnow@redhat.com>, Maxim Levitsky <mlevitsk@redhat.com>,
+ qemu-block@nongnu.org
+References: <20190417195355.16123-1-mlevitsk@redhat.com>
+ <20190417195355.16123-2-mlevitsk@redhat.com>
+ <d1ab2f6e-a5b1-466b-7ad9-df47b8739579@redhat.com>
+ <7b9baac9a0b652105cebb681e9759cb4e9d3877b.camel@redhat.com>
+ <601a2a78-0ddb-ccc9-f3c2-46aa16e18629@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <dfd777d8-1241-7361-193d-02442a0d79ab@redhat.com>
+Date: Fri, 7 Jun 2019 13:08:18 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
+In-Reply-To: <601a2a78-0ddb-ccc9-f3c2-46aa16e18629@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::32f
-Subject: Re: [Qemu-devel] [RISU v3 00/11] Support for i386/x86_64 with
- vector extensions
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.85.221.65
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v2 1/5] block/nvme: don't flip
+ CQ phase bits
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,35 +89,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Richard Henderson <richard.henderson@linaro.org>,
- Jan Bobek <jan.bobek@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
+ qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On 06/06/19 23:23, John Snow wrote:
+> So: This looks right; does this fix a bug that can be observed? Do we
+> have any regression tests for block/NVMe?
 
-Peter Maydell <peter.maydell@linaro.org> writes:
+I don't think it fixes a bug; by the time the CQ entry is picked up by
+QEMU, the device is not supposed to touch it anymore.
 
-> On Fri, 24 May 2019 at 10:42, Alex Benn=C3=A9e <alex.bennee@linaro.org> w=
-rote:
->>
->>
->> Jan Bobek <jan.bobek@gmail.com> writes:
->>
->> > This patch series adds support for i386 and x86_64 architectures to
->> > RISU. Notably, vector registers (SSE, AVX, AVX-512) are supported for
->> > verification of the apprentice. This is V3 of the series posted in [1]
->> > and [2].
->>
->> I've sent a patch to enable x86 in the build-all-arches tests script but
->> otherwise I think this series looks good to merge.
->
-> Alex: So should I merge this series, or does it need a respin ?
+However, the idea behind the phase bits is that you can decide whether
+the driver has placed a completion in the queue.  When we get here, we have
 
-I think this can be merged. I assume there is more to come to actually
-generate the patterns but it doesn't break any of the existing stuff and
-has at least one test case.
+	le16_to_cpu(c->status) & 0x1) == !q->cq_phase
 
---
-Alex Benn=C3=A9e
+On the next pass through the ring buffer q->cq_phase will be flipped,
+and thus when we see this element we'll get
+
+	le16_to_cpu(c->status) & 0x1) == q->cq_phase
+
+and not process it.  Since block/nvme.c flips the bit, this mechanism
+does not work and the loop termination relies on the other part of the
+condition, "if (!c->cid) break;".
+
+So the patch is correct, but it would also be nice to also either remove
+phase handling altogether, or check that the phase handling works
+properly and drop the !c->cid test.
+
+Paolo
 
