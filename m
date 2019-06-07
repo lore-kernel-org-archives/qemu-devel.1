@@ -7,72 +7,72 @@ X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E9DDFC2BCA1
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 22:11:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 19A81C2BCA1
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 22:13:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B3467207E0
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 22:11:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D6ADA207E0
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 22:13:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="ialvrKUr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B3467207E0
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="d7AbKHkL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D6ADA207E0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53664 helo=lists.gnu.org)
+Received: from localhost ([::1]:53684 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hZN4w-0006ou-W8
-	for qemu-devel@archiver.kernel.org; Fri, 07 Jun 2019 18:11:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48067)
+	id 1hZN7I-0001cH-0w
+	for qemu-devel@archiver.kernel.org; Fri, 07 Jun 2019 18:13:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47883)
  by lists.gnu.org with esmtp (Exim 4.86_2)
  (envelope-from <prvs=0547f94d1=alistair.francis@wdc.com>)
- id 1hZMsb-0004q6-34
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 17:58:38 -0400
+ id 1hZMs6-0004VH-6C
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 17:58:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
  (envelope-from <prvs=0547f94d1=alistair.francis@wdc.com>)
- id 1hZMsX-0002FR-R2
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 17:58:31 -0400
-Received: from esa2.hgst.iphmx.com ([68.232.143.124]:38196)
+ id 1hZMs5-00020y-3e
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 17:58:02 -0400
+Received: from esa3.hgst.iphmx.com ([216.71.153.141]:8430)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <prvs=0547f94d1=alistair.francis@wdc.com>)
- id 1hZMsX-0002BV-JJ; Fri, 07 Jun 2019 17:58:29 -0400
+ id 1hZMs4-0001Pu-PL; Fri, 07 Jun 2019 17:58:01 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
- t=1559944722; x=1591480722;
+ t=1559944681; x=1591480681;
  h=from:to:cc:subject:date:message-id:in-reply-to:
  references:mime-version:content-transfer-encoding;
- bh=qDL5/qlAQFtYrCOkIfH5+w4MhTN/n5JyM640ZKPXzXk=;
- b=ialvrKUrqeTDm4Ggw2w99bFRH8kkwVg38EEjoPH0ehSANDS+VFIgK2wl
- trvtcYlsKMAHAhLEfxsVSGbZUJT7P6l8dwDeFLMUuaB8T6q3xu4ZEF7Pk
- 2bLWIMBEQHCNBhp8UVaJwxmaXC2y2L3qVvN0RsED1IFjvVhsqsnOkIhnS
- 0BqNPP9xTyhNY7j4MJy3Xg3V/b2mlltEQETPXpXj7oXJE2NMiBfe03tLG
- l/WTO8KxIeuU7bGmlmUpL1AWMr0NVZQeFjD8w2q2QUjBpUsTh7Wf6fXL/
- 5S/Epajo3y2/3XpzNgDSg0yHyN3jwCuhnIoaa12vi77PByBRiCJHxT9rG Q==;
-X-IronPort-AV: E=Sophos;i="5.63,564,1557158400"; d="scan'208";a="209711287"
-Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com)
- ([199.255.45.14])
- by ob1.hgst.iphmx.com with ESMTP; 08 Jun 2019 05:58:39 +0800
-IronPort-SDR: YkToNWuf3EZposF6k3G0YtA9V1QG3lJp6oEkAusnG8cxPwYIPnlIJRsFcrnBRHW/PgxJQJ3mG6
- 9hd+ATvxgVa1E3wowpLc+ysQhCUCDxymd39Yflhdp72lG1MmoYbf/5y+AyRDauio+4Hgat8yM+
- uu59vdeoN5JYq7XjF+s9rQn+EgC6tr6nzORndtVYw1qDISEqcqzVhKWxr+8LtJXx7gtjqnHSvP
- pz4wKNzIXh0FfS/wErbLkGXU3yF8diEYLaxIPEMgriPbd2ouArddZY4dASuD94bHdZK7qFnAtw
- S1d/h6/kxsVqAJaYv95D2muW
-Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
- by uls-op-cesaep01.wdc.com with ESMTP; 07 Jun 2019 14:33:20 -0700
-IronPort-SDR: K6XOMUP0nviRisQvhWO47CCKfxLr2N4UJ27pfjSsnEEHkF3higmkMISk8mttftnNNUOTJdp/S1
- x8zIcmL4UGlqv81gEcAc2BStSxrcQRamudfBfLiI1W+ThbHTySp/Uk1OYSZ3lDy9soYN0WK1b6
- AALVnESe/aqa6F8YcJh/5AxUUujcG+72k4w7LR9P/X5Gmm/H+a5MJNaYFu98u96W8puMRXUXYs
- 0qlD0wJi5UKtwHXESIFN995H+uy0vHaggYonjZ6RhajpBi64QHqeKyJpBg76t5/OTeoay2iPu/
- VZw=
+ bh=Rwaxc8+UmzqBdrerLU5CiH2MwqsxNCdmiNlmHygiVek=;
+ b=d7AbKHkLtrGq/y6egF/829iU4H/zAtM+50oW4XhHjhBYr39IFsVlW06H
+ /igGqqgFUsgyfc3TtjVlDY8s65IwtFNP0he3DC12ijGjstrtb6omRkNLt
+ McO2OeIpScKjnMJjuoRm/RAIkL5WJEUMm9Q2Ohcqs0vksJL8ox03QCEFe
+ J6d39pfn3xwD7UYDK0VH2/y80QuKOUzJQEMi3bGzwGNTxMrhgbUb4yJ5m
+ gU85c5Qdc2ov+VpdhP7UyMUCHCGyNBSZDkvLceWedkTmhKJGNCTEXgat/
+ LXPD0EoU2oMrm2X4usI6coAFxKBCZnVS7Ynq3+16GqF0LgfkWT2ujIQux Q==;
+X-IronPort-AV: E=Sophos;i="5.63,564,1557158400"; d="scan'208";a="115014099"
+Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com)
+ ([199.255.45.15])
+ by ob1.hgst.iphmx.com with ESMTP; 08 Jun 2019 05:58:01 +0800
+IronPort-SDR: Xmj14wj1RYcbR1/vy49mHs2LNiPJXgnMImAPs6/nYtzOzWfhu1ylFmrH3Udbr9VyuDnHKBfHpW
+ vOzYk4eQJ3j7JdXKsNzgOHOzcGlksiaJ9zNY24unlOObxVjLafGrk5yyXZWxIxOsOr6BxC45yo
+ TWpMZJW9NIZEBI/76/MN3jU104e1M0zJHG+BZegOimJmFRDTHoQYjfAod1FifKHSDDq89cUjIf
+ Gk8K2pcbH90Umj6B9FHAJW7zBDx3Tlrh0hE6jHAa7Fvl+BWoSXPILvwN3PCYcGTJKCWX3hG9AH
+ f3gvTH3wQLbB8PnHgNl86UXL
+Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
+ by uls-op-cesaep02.wdc.com with ESMTP; 07 Jun 2019 14:35:16 -0700
+IronPort-SDR: K8Y/7eNotBZRINYYtMvn53OZ3b3VSYmEOLrGmK8tuQWDIPkVowU7eckBNY7Me/9dpD+UuYJwNW
+ /zRc49uW6D709yoUtDnm63Fy/a1+1iJ/dNHXHkFsahE9DJo6Twc81eYDcJr8hsdAPcZLF77iSq
+ MIjPePAhMs9GBkKRTZM6p8lhP3GyregaR8jKwQ5kjYmv1sS/V+MGTL+6BltKlhhXGHOrgiNaXK
+ elRSdPso9vLZ7XQ7clLcrqipH4BFdKqg1u2hFY7Uadx1IKTfGh20PFi5BL/d2vqYR1uvH81rGN
+ xG0=
 Received: from risc6-mainframe.sdcorp.global.sandisk.com (HELO
  risc6-mainframe.int.fusionio.com) ([10.196.157.140])
- by uls-op-cesaip01.wdc.com with ESMTP; 07 Jun 2019 14:58:27 -0700
+ by uls-op-cesaip02.wdc.com with ESMTP; 07 Jun 2019 14:58:00 -0700
 From: Alistair Francis <alistair.francis@wdc.com>
 To: qemu-devel@nongnu.org,
 	qemu-riscv@nongnu.org
-Date: Fri,  7 Jun 2019 14:56:17 -0700
-Message-Id: <38a35baa3815eefd2e7a626aaa72f7d5f680e5e2.1559944445.git.alistair.francis@wdc.com>
+Date: Fri,  7 Jun 2019 14:55:50 -0700
+Message-Id: <deb9e025969ed780e38e7dcee496b215835b26f4.1559944445.git.alistair.francis@wdc.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <cover.1559944445.git.alistair.francis@wdc.com>
 References: <cover.1559944445.git.alistair.francis@wdc.com>
@@ -80,9 +80,9 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 68.232.143.124
-Subject: [Qemu-devel] [PATCH v1 18/27] target/riscv: Add Hypervisor trap
- return support
+X-Received-From: 216.71.153.141
+Subject: [Qemu-devel] [PATCH v1 10/27] target/riscv: Add Hypervisor CSR
+ access functions
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,106 +101,102 @@ Sender: "Qemu-devel"
 
 Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
 ---
- target/riscv/op_helper.c | 66 ++++++++++++++++++++++++++++++++--------
- 1 file changed, 54 insertions(+), 12 deletions(-)
+ target/riscv/csr.c | 68 ++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 68 insertions(+)
 
-diff --git a/target/riscv/op_helper.c b/target/riscv/op_helper.c
-index e08bb8dd5a..60dcd73fc7 100644
---- a/target/riscv/op_helper.c
-+++ b/target/riscv/op_helper.c
-@@ -73,6 +73,8 @@ target_ulong helper_csrrc(CPURISCVState *env, target_ulong src,
+diff --git a/target/riscv/csr.c b/target/riscv/csr.c
+index 4b1308d47c..911f83ef51 100644
+--- a/target/riscv/csr.c
++++ b/target/riscv/csr.c
+@@ -82,6 +82,20 @@ static int smode(CPURISCVState *env, int csrno)
+     return -!riscv_has_ext(env, RVS);
+ }
  
- target_ulong helper_sret(CPURISCVState *env, target_ulong cpu_pc_deb)
++static int hmode(CPURISCVState *env, int csrno)
++{
++    if (riscv_has_ext(env, RVS) &&
++        riscv_has_ext(env, RVH)) {
++        /* Hypervisor extension is supported */
++        if ((env->priv == PRV_S && !riscv_cpu_virt_enabled(env)) ||
++            env->priv == PRV_M) {
++            return 0;
++        }
++    }
++
++        return -1;
++}
++
+ static int pmp(CPURISCVState *env, int csrno)
  {
-+    target_ulong prev_priv, prev_virt, mstatus;
-+
-     if (!(env->priv >= PRV_S)) {
-         riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
-     }
-@@ -87,16 +89,46 @@ target_ulong helper_sret(CPURISCVState *env, target_ulong cpu_pc_deb)
-         riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
-     }
- 
--    target_ulong mstatus = env->mstatus;
--    target_ulong prev_priv = get_field(mstatus, MSTATUS_SPP);
--    mstatus = set_field(mstatus,
--        env->priv_ver >= PRIV_VERSION_1_10_0 ?
--        MSTATUS_SIE : MSTATUS_UIE << prev_priv,
--        get_field(mstatus, MSTATUS_SPIE));
--    mstatus = set_field(mstatus, MSTATUS_SPIE, 0);
--    mstatus = set_field(mstatus, MSTATUS_SPP, PRV_U);
-+    mstatus = env->mstatus;
-+
-+    if (riscv_has_ext(env, RVH) && !riscv_cpu_virt_enabled(env)) {
-+        /* We support Hypervisor extensions and virtulisation is disabled */
-+        target_ulong hstatus = env->hstatus;
-+
-+        prev_priv = get_field(mstatus, MSTATUS_SPP);
-+        prev_virt = get_field(hstatus, HSTATUS_SPV);
-+
-+        hstatus = set_field(hstatus, HSTATUS_SPV,
-+                                 get_field(hstatus, HSTATUS_SP2V));
-+        mstatus = set_field(mstatus, MSTATUS_SPP,
-+                            get_field(hstatus, HSTATUS_SP2P));
-+        hstatus = set_field(hstatus, HSTATUS_SP2V, 0);
-+        hstatus = set_field(hstatus, HSTATUS_SP2P, 0);
-+        mstatus = set_field(mstatus, SSTATUS_SIE,
-+                            get_field(mstatus, SSTATUS_SPIE));
-+        mstatus = set_field(mstatus, SSTATUS_SPIE, 1);
-+
-+        env->mstatus = mstatus;
-+        env->hstatus = hstatus;
-+
-+        if (prev_virt == VIRT_ON) {
-+            riscv_cpu_swap_background_regs(env);
-+        }
-+
-+        riscv_cpu_set_virt_enabled(env, prev_virt);
-+    } else {
-+        prev_priv = get_field(mstatus, MSTATUS_SPP);
-+
-+        mstatus = set_field(mstatus,
-+            env->priv_ver >= PRIV_VERSION_1_10_0 ?
-+            MSTATUS_SIE : MSTATUS_UIE << prev_priv,
-+            get_field(mstatus, MSTATUS_SPIE));
-+        mstatus = set_field(mstatus, MSTATUS_SPIE, 0);
-+        mstatus = set_field(mstatus, MSTATUS_SPP, PRV_U);
-+        env->mstatus = mstatus;
-+    }
-+
-     riscv_cpu_set_mode(env, prev_priv);
--    env->mstatus = mstatus;
- 
-     return retpc;
+     return -!riscv_feature(env, RISCV_FEATURE_PMP);
+@@ -736,6 +750,55 @@ static int write_satp(CPURISCVState *env, int csrno, target_ulong val)
+     return 0;
  }
-@@ -114,14 +146,24 @@ target_ulong helper_mret(CPURISCVState *env, target_ulong cpu_pc_deb)
  
-     target_ulong mstatus = env->mstatus;
-     target_ulong prev_priv = get_field(mstatus, MSTATUS_MPP);
-+    target_ulong prev_virt = get_field(mstatus, MSTATUS_MPV);
-     mstatus = set_field(mstatus,
-         env->priv_ver >= PRIV_VERSION_1_10_0 ?
-         MSTATUS_MIE : MSTATUS_UIE << prev_priv,
-         get_field(mstatus, MSTATUS_MPIE));
--    mstatus = set_field(mstatus, MSTATUS_MPIE, 0);
--    mstatus = set_field(mstatus, MSTATUS_MPP, PRV_U);
--    riscv_cpu_set_mode(env, prev_priv);
-+    mstatus = set_field(mstatus, MSTATUS_MPIE, 1);
-+    mstatus = set_field(mstatus, MSTATUS_MPP, 0);
-+    mstatus = set_field(mstatus, MSTATUS_MPV, 0);
-     env->mstatus = mstatus;
-+    riscv_cpu_set_mode(env, prev_priv);
++/* Hypervisor Extensions */
++static int read_hstatus(CPURISCVState *env, int csrno, target_ulong *val)
++{
++    *val = env->hstatus;
++    return 0;
++}
 +
-+    if (riscv_has_ext(env, RVH)) {
-+        if (prev_virt == VIRT_ON) {
-+            riscv_cpu_swap_background_regs(env);
-+        }
++static int write_hstatus(CPURISCVState *env, int csrno, target_ulong val)
++{
++    env->hstatus = val;
++    return 0;
++}
 +
-+        riscv_cpu_set_virt_enabled(env, prev_virt);
-+    }
++static int read_hedeleg(CPURISCVState *env, int csrno, target_ulong *val)
++{
++    *val = env->hedeleg;
++    return 0;
++}
++
++static int write_hedeleg(CPURISCVState *env, int csrno, target_ulong val)
++{
++    env->hedeleg = val;
++    return 0;
++}
++
++static int read_hideleg(CPURISCVState *env, int csrno, target_ulong *val)
++{
++    *val = env->hideleg;
++    return 0;
++}
++
++static int write_hideleg(CPURISCVState *env, int csrno, target_ulong val)
++{
++    env->hideleg = val;
++    return 0;
++}
++
++static int read_hgatp(CPURISCVState *env, int csrno, target_ulong *val)
++{
++    *val = env->hgatp;
++    return 0;
++}
++
++static int write_hgatp(CPURISCVState *env, int csrno, target_ulong val)
++{
++    env->hgatp = val;
++    return 0;
++}
++
+ /* Physical Memory Protection */
+ static int read_pmpcfg(CPURISCVState *env, int csrno, target_ulong *val)
+ {
+@@ -919,6 +982,11 @@ static riscv_csr_operations csr_ops[CSR_TABLE_SIZE] = {
+     /* Supervisor Protection and Translation */
+     [CSR_SATP] =                { smode, read_satp,        write_satp        },
  
-     return retpc;
- }
++    [CSR_HSTATUS] =             { hmode,   read_hstatus,     write_hstatus    },
++    [CSR_HEDELEG] =             { hmode,   read_hedeleg,     write_hedeleg    },
++    [CSR_HIDELEG] =             { hmode,   read_hideleg,     write_hideleg    },
++    [CSR_HGATP] =               { hmode,   read_hgatp,       write_hgatp      },
++
+     /* Physical Memory Protection */
+     [CSR_PMPCFG0  ... CSR_PMPADDR9] =  { pmp,   read_pmpcfg,  write_pmpcfg   },
+     [CSR_PMPADDR0 ... CSR_PMPADDR15] = { pmp,   read_pmpaddr, write_pmpaddr  },
 -- 
 2.21.0
 
