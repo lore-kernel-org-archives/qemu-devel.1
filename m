@@ -2,88 +2,64 @@ Return-Path: <SRS0=3yEa=UG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 02CE5C04AB5
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 00:17:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EAB03C04AB5
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 00:21:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 78CD5208E3
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 00:17:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6F13D208E3
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 00:21:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HsWeisih"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 78CD5208E3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="VsBFHkft"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6F13D208E3
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45168 helo=lists.gnu.org)
+Received: from localhost ([::1]:45206 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hZ2ZC-00064b-6a
-	for qemu-devel@archiver.kernel.org; Thu, 06 Jun 2019 20:17:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53137)
+	id 1hZ2d6-0007fJ-8X
+	for qemu-devel@archiver.kernel.org; Thu, 06 Jun 2019 20:21:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53594)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1hZ2Xt-0005eD-Uz
- for qemu-devel@nongnu.org; Thu, 06 Jun 2019 20:15:51 -0400
+ (envelope-from <dgibson@ozlabs.org>) id 1hZ2bK-0006cZ-DK
+ for qemu-devel@nongnu.org; Thu, 06 Jun 2019 20:19:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1hZ2Xs-0000hR-03
- for qemu-devel@nongnu.org; Thu, 06 Jun 2019 20:15:49 -0400
-Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:37525)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
- id 1hZ2Xq-0000aN-0t
- for qemu-devel@nongnu.org; Thu, 06 Jun 2019 20:15:47 -0400
-Received: by mail-ot1-x344.google.com with SMTP id r10so294647otd.4
- for <qemu-devel@nongnu.org>; Thu, 06 Jun 2019 17:15:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:in-reply-to:references:from:date:message-id:subject:to
- :cc; bh=Rbpd0sg4hJ+ppFHk3NhFULa6FQqlFxYGP17Pvq6/sBE=;
- b=HsWeisihG9KjEUFnROS0/AtSR/2gQgaNhWy4rw5Ud11nSCQFq+09DwPb2CjJggve1B
- c3yZte8dy+mBJq1wKSuRCJRbvtePodDo5WxuVU3FZre+gpgGLOVvWgPQGzYUYOqA4qVN
- 7PSac68hoIofujefOSaEsidve5nNSwanNRk6xl869gbHY5VvmFlAzjWXWaQXa4wRd+/k
- JB/WZnkhm1vvDQbEySYndLrs6SKbIkN/y6rkxsvFoSmogx9p5btoXNhZT42UiVPpn18L
- s9yBv0Mhos3evf3m+lBSwWyb35JxmTjU2eDSwwpDuR65E56oIriD+OPl1Uh9+BHLJjZS
- kFkw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:in-reply-to:references:from:date
- :message-id:subject:to:cc;
- bh=Rbpd0sg4hJ+ppFHk3NhFULa6FQqlFxYGP17Pvq6/sBE=;
- b=lLqzBIg74tv7usClofbu4laxTGMCNh75C4mcOCdJnwQLx+TjVkaFBgFKXbJulKnrPF
- rQGeHueP75jiwcW/XPZ/zjWe4mhTe0wPIbOGumNNGceDrezmLlYKG/Liv1YcQrujXPV+
- GhZBEXAVWNrqdfzqH8z3QeUS3Hc+di6glEYWbDJTSsS4MBWfniZRdn4BfA/jHvyahXbX
- 0UdXFT27NTiRY5VoEwjIkX2bKsPIq9k40Y90momZOOC2IylvJ18ygW+nCMirNEqJbT9o
- 9AkVMhjnrKVfOomGj13ChdWFHvcOci5rHcyJkE0pxviWU4vckp7OgvcAxtJuAZrUSzZQ
- iLTw==
-X-Gm-Message-State: APjAAAXoH76RgPa8CbczYoqvfDyUnWg99fP5XfbEjSBC8r8X29Fx0FIF
- nW96sL6r8r0tvSKVidw8uwo05hWEfSPzHoYB2wU=
-X-Google-Smtp-Source: APXvYqylpl/J9UH/fKCKQX9CQLhctxndAU9HYoO9LboLOFw4mAWj6yEU4WpcObXWO8j83Mq7k0s+s5geLD87725i6lM=
-X-Received: by 2002:a9d:63c1:: with SMTP id e1mr2651927otl.341.1559866541728; 
- Thu, 06 Jun 2019 17:15:41 -0700 (PDT)
+ (envelope-from <dgibson@ozlabs.org>) id 1hZ2bI-0003NM-Hq
+ for qemu-devel@nongnu.org; Thu, 06 Jun 2019 20:19:22 -0400
+Received: from ozlabs.org ([2401:3900:2:1::2]:49833)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
+ id 1hZ2bF-0003Jz-Js; Thu, 06 Jun 2019 20:19:19 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 45KjnX2nkvz9s9y; Fri,  7 Jun 2019 10:19:12 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1559866752;
+ bh=d2d8/zZKjP3NHBCqMRizTNvap0TvMAddTzj2SXuAhqE=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=VsBFHkftp7SXTmdTQvzycDNUiq10Bhug8Z9leSTw5LwVeqm0LryKRhWNsj5KEn/1h
+ VSYaFyMT+qt/txXO5mY/5VZK1mk6BYHcVePNbIkuRZ0x0S+1NuSy93bEg/hQw2EHhZ
+ PsrydQkyo4j8xOoD2Q+Af1GHH/zTAMbB2+VfQbxY=
+Date: Fri, 7 Jun 2019 10:15:28 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
+Message-ID: <20190607001528.GA3760@umbus.fritz.box>
+References: <20190606174732.13051-1-clg@kaod.org>
 MIME-Version: 1.0
-Received: by 2002:a9d:20e4:0:0:0:0:0 with HTTP;
- Thu, 6 Jun 2019 17:15:41 -0700 (PDT)
-Received: by 2002:a9d:20e4:0:0:0:0:0 with HTTP;
- Thu, 6 Jun 2019 17:15:41 -0700 (PDT)
-In-Reply-To: <20190606230232.9888-3-philmd@redhat.com>
-References: <20190606230232.9888-1-philmd@redhat.com>
- <20190606230232.9888-3-philmd@redhat.com>
-From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Fri, 7 Jun 2019 02:15:41 +0200
-Message-ID: <CAL1e-=hs7XpwbxYZt+VnmcJpA=bPxekhdYz0w8yTRc81eiMAGQ@mail.gmail.com>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="d6Gm4EdcadzBjdND"
+Content-Disposition: inline
+In-Reply-To: <20190606174732.13051-1-clg@kaod.org>
+User-Agent: Mutt/1.11.4 (2019-03-13)
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::344
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Content-Filtered-By: Mailman/MimeDel 2.1.23
-Subject: Re: [Qemu-devel] [PATCH v3 2/2] BootLinuxConsoleTest: Run
- kerneltests BusyBox on Malta
+X-Received-From: 2401:3900:2:1::2
+Subject: Re: [Qemu-devel] [PATCH] ppc/pnv: activate the "dumpdtb" option on
+ the powernv machine
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,133 +71,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>,
- Aleksandar Rikalo <arikalo@wavecomp.com>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>,
- qemu-devel@nongnu.org, Aleksandar Markovic <amarkovic@wavecomp.com>,
- Cleber Rosa <crosa@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Jun 7, 2019 1:06 AM, "Philippe Mathieu-Daud=C3=A9" <philmd@redhat.com> w=
-rote:
->
-> From: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
->
-> This tests boots a Linux kernel on a Malta machine up to a
-> busybox shell on the serial console. Few commands are executed
-> before halting the machine (via reboot).
->
-> We use the initrd cpio image from the kerneltests project:
-> https://kerneltests.org/
->
-> If MIPS is a target being built, "make check-acceptance" will
-> automatically include this test by the use of the "arch:mips" tags.
->
-> Alternatively, this test can be run using:
->
->   $ avocado --show=3Dconsole run -t arch:mips
-tests/acceptance/boot_linux_console.py
->   [...]
->   console: Boot successful.
->   [...]
->   console: / # uname -a
->   console: Linux buildroot 4.5.0-2-4kc-malta #1 Debian 4.5.5-1
-(2016-05-29) mips GNU/Linux
->   console: / # reboot
->   console: / # reboot: Restarting system
->
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> Acked-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-> Tested-by: Cleber Rosa <crosa@redhat.com>
+
+--d6Gm4EdcadzBjdND
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Thu, Jun 06, 2019 at 07:47:32PM +0200, C=E9dric Le Goater wrote:
+> This is a good way to debug the DT creation for current PowerNV
+> machines and new ones to come.
+>=20
+> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+
+Applied, thanks.
+
 > ---
+>  hw/ppc/pnv.c | 2 ++
+>  1 file changed, 2 insertions(+)
+>=20
+> diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
+> index 046f0a83c8e5..ed6892466793 100644
+> --- a/hw/ppc/pnv.c
+> +++ b/hw/ppc/pnv.c
+> @@ -23,6 +23,7 @@
+>  #include "sysemu/sysemu.h"
+>  #include "sysemu/numa.h"
+>  #include "sysemu/cpus.h"
+> +#include "sysemu/device_tree.h"
+>  #include "hw/hw.h"
+>  #include "target/ppc/cpu.h"
+>  #include "qemu/log.h"
+> @@ -554,6 +555,7 @@ static void pnv_reset(void)
+>      /* Pack resulting tree */
+>      _FDT((fdt_pack(fdt)));
+> =20
+> +    qemu_fdt_dumpdtb(fdt, fdt_totalsize(fdt));
+>      cpu_physical_memory_write(PNV_FDT_ADDR, fdt, fdt_totalsize(fdt));
+>  }
+> =20
 
-Excellent test, and commit message content too. May I suggest the test
-group inclusion of the text of this commit message (or similar text) to the
-documentation on QEMU Testing web page, as an example of the acceptance
-test usage?
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
-Yours, Aleksandar
+--d6Gm4EdcadzBjdND
+Content-Type: application/pgp-signature; name="signature.asc"
 
-> v3: Use archive.extract() instead of shutil+gzip (Cleber)
-> ---
->  tests/acceptance/boot_linux_console.py | 44 ++++++++++++++++++++++++++
->  1 file changed, 44 insertions(+)
->
-> diff --git a/tests/acceptance/boot_linux_console.py
-b/tests/acceptance/boot_linux_console.py
-> index a7a735c90d..751e3bff86 100644
-> --- a/tests/acceptance/boot_linux_console.py
-> +++ b/tests/acceptance/boot_linux_console.py
-> @@ -49,6 +49,11 @@ class BootLinuxConsole(Test):
->                  fail =3D 'Failure message found in console: %s' %
-failure_message
->                  self.fail(fail)
->
-> +    def exec_command_and_wait_for_pattern(self, command,
-success_message):
-> +        command +=3D '\n'
-> +        self.vm.console_socket.sendall(command.encode())
-> +        self.wait_for_console_pattern(success_message)
-> +
->      def extract_from_deb(self, deb, path):
->          """
->          Extracts a file from a deb package into the test workdir
-> @@ -140,6 +145,45 @@ class BootLinuxConsole(Test):
->          console_pattern =3D 'Kernel command line: %s' % kernel_command_l=
-ine
->          self.wait_for_console_pattern(console_pattern)
->
-> +    def test_mips_malta_cpio(self):
-> +        """
-> +        :avocado: tags=3Darch:mips
-> +        :avocado: tags=3Dmachine:malta
-> +        :avocado: tags=3Dendian:big
-> +        """
-> +        deb_url =3D ('http://snapshot.debian.org/archive/debian/'
-> +                   '20160601T041800Z/pool/main/l/linux/'
-> +                   'linux-image-4.5.0-2-4kc-malta_4.5.5-1_mips.deb')
-> +        deb_hash =3D 'a3c84f3e88b54e06107d65a410d1d1e8e0f340f8'
-> +        deb_path =3D self.fetch_asset(deb_url, asset_hash=3Ddeb_hash)
-> +        kernel_path =3D self.extract_from_deb(deb_path,
-> +
-'/boot/vmlinux-4.5.0-2-4kc-malta')
-> +        initrd_url =3D ('https://github.com/groeck/linux-build-test/raw/=
-'
-> +                      '8584a59ed9e5eb5ee7ca91f6d74bbb06619205b8/rootfs/'
-> +                      'mips/rootfs.cpio.gz')
-> +        initrd_hash =3D 'bf806e17009360a866bf537f6de66590de349a99'
-> +        initrd_path_gz =3D self.fetch_asset(initrd_url,
-asset_hash=3Dinitrd_hash)
-> +        initrd_path =3D archive.extract(initrd_path_gz,
-> +                                      os.path.join(self.workdir,
-'rootfs.cpio'))
-> +        self.vm.set_machine('malta')
-> +        self.vm.set_console()
-> +        kernel_command_line =3D (self.KERNEL_COMMON_COMMAND_LINE
-> +                               + 'console=3DttyS0 console=3Dtty '
-> +                               + 'rdinit=3D/sbin/init noreboot')
-> +        self.vm.add_args('-kernel', kernel_path,
-> +                         '-initrd', initrd_path,
-> +                         '-append', kernel_command_line,
-> +                         '-no-reboot')
-> +        self.vm.launch()
-> +        self.wait_for_console_pattern('Boot successful.')
-> +
-> +        self.exec_command_and_wait_for_pattern('cat /proc/cpuinfo',
-> +                                               'BogoMIPS')
-> +        self.exec_command_and_wait_for_pattern('uname -a',
-> +                                               'Debian')
-> +        self.exec_command_and_wait_for_pattern('reboot',
-> +                                               'reboot: Restarting
-system')
-> +
->      def do_test_mips_malta32el_nanomips(self, kernel_url, kernel_hash):
->          kernel_path_xz =3D self.fetch_asset(kernel_url,
-asset_hash=3Dkernel_hash)
->          kernel_path =3D self.workdir + "kernel"
-> --
-> 2.20.1
->
->
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlz5rKAACgkQbDjKyiDZ
+s5JSSxAAgzCg0sGvAQpEx8yfkzlFKK9hKnw9QBbkt3NOHSykyTdeKhv6DO82hmF8
+OjLsP397VdTurKjtmNIaBWWl/AKvZUkU4TfdShWdslTY6GzGs78SjvomgiiutXKt
+apanAf2WNZ6TnuMzI+22hstg18mXUAqehByah+T+nkCF3KfLjfIsp9PyUDcBm1wW
+nhiygtzpqIl6Ad5DpQPyoDXZ62ikNcKWYhC3cBGw7/F3/H0bnsF30hM8RKgWWc3e
+lW+JGHBEr0eP+FoqhsIz/08dK6uzPatdwtcLPtOhCgt70cP1HzXGauYW7cefwUFm
+n1IEZCVgDj/iKKOabMxILpJGX9UeqbMHu/XuQPH+qESkB0Y0Of/4tvr2e5KWqBLX
+n/NocZyBkYcLJlW3ofFntP2lx1+88m6XEDczw257WBE3Kp0BgJFP+om2jjAuBevj
+oIMNOaCbGYnSk3788XpBVYuqJwORvqNp2ZyjrW2OEr3w8MG/bV6GR7hjj4psJzgB
+nwZukAIvDBg4A/PjM9VXNPoVNb3VqBlNadsDlARhAVzQ9RBlyslHAVwDYRHD+g1+
+Sp5UQ5hv6rC+sIAjptlK2SDVCs8I830UnupSASzBEEUb4ViOf0rfweSeNPppksFn
+VvAU7U+228j0MhEaPGo5ZkzqD0kCQvdbpri4l7up2oFeVIOyXRo=
+=CAyb
+-----END PGP SIGNATURE-----
+
+--d6Gm4EdcadzBjdND--
+
