@@ -2,90 +2,59 @@ Return-Path: <SRS0=3yEa=UG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D7BD1C2BCA1
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 10:45:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C3D93C2BCA1
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 10:47:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9F92E20B7C
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 10:45:37 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="i2LxqWcZ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9F92E20B7C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 9B1FE20B7C
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 10:47:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9B1FE20B7C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48206 helo=lists.gnu.org)
+Received: from localhost ([::1]:48230 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hZCNM-0000uz-Tm
-	for qemu-devel@archiver.kernel.org; Fri, 07 Jun 2019 06:45:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45145)
+	id 1hZCPN-0002bK-RZ
+	for qemu-devel@archiver.kernel.org; Fri, 07 Jun 2019 06:47:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54598)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <alex.bennee@linaro.org>) id 1hZB57-0008Sl-HN
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 05:22:42 -0400
+ (envelope-from <cohuck@redhat.com>) id 1hZBYZ-0001uJ-Az
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 05:53:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1hZB56-00060X-Am
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 05:22:41 -0400
-Received: from mail-wm1-x336.google.com ([2a00:1450:4864:20::336]:50988)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1hZB56-0005zW-3w
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 05:22:40 -0400
-Received: by mail-wm1-x336.google.com with SMTP id c66so1283495wmf.0
- for <qemu-devel@nongnu.org>; Fri, 07 Jun 2019 02:22:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=nOqWwiE90nOP0TqVRDm/szto9/dNBu2y2hfwpJ0rtGA=;
- b=i2LxqWcZ7DwLaQImdxxzvQ28zftWMViFa8EQUTDemYH6FXhhiitHW6BUSTJB/DC80l
- /e6bhOy9L8nSLPXfnZJL9JTUPPTHLXbzyEBLNOArHrhSfHC+lhAf9VVH/g7C/GhAuqum
- zTWTO0kV3mcuub+w0d9b/WUR65oinfwxyUZ+LhQwPxpQJ48bjF87dD1t3p8XkrydxH23
- HpxlXpfwCHuRpROg8lKaoHTiV0VjvHZAkjIp9RPGjhiWs3RxAyIWiwouUYIk8NmNeYxQ
- F5cO5ThlzCHBrD0d+gJOkz7wgV080FaaIqCW2k7FEyCO+I8RAUC22w1d5eCA2wgqx/B8
- Sb3Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=nOqWwiE90nOP0TqVRDm/szto9/dNBu2y2hfwpJ0rtGA=;
- b=g3+gx7sEKmhg1fGUuOlHnaP17AM4Nuo9ih9EqOvxSpstRc7H+oFi2RNbZWd7KCk7R7
- GcEM6aD/D5T6V6qG3r+SqXIQXGRVKpFZBGlgFhld0LTEyJ0XB5oZiF03tzC9tiCGrIpT
- SdKLRo1PwNW4bG/xn6OfB3YjyWACXz2KlCFoJ1dWkJha1yB4QoL1nxR3QlzrzNAS5RKb
- Cl1IfrIhpB+nH60ETELyQYh9NJ4GbFVwX3FgT79n42exFk3+r90w5d+1Z3qgwHg/yhkv
- crPnTlU0+Wy54CgwPUsJcxQbD23K+ZGkVhduYeaFPl40EPfdfdrTgV1C9+EEK77f365E
- lGFA==
-X-Gm-Message-State: APjAAAXRZ6jtyf3ELtMmMsPIPjA97Mlny6C4elQ4pmCh3MkxhxeyJRNc
- f7vJL6GB5wIxbcnFUvXRhapwEQ==
-X-Google-Smtp-Source: APXvYqy3osjV1AzqBhJFNAl9SCEzXrCOnllGEpCB/ZLGL/9fUWkVthbXYrlq0i7kFTED3NRR9wu8Pw==
-X-Received: by 2002:a1c:b757:: with SMTP id h84mr3064686wmf.127.1559899358974; 
- Fri, 07 Jun 2019 02:22:38 -0700 (PDT)
-Received: from zen.linaroharston ([81.128.185.34])
- by smtp.gmail.com with ESMTPSA id a19sm1282324wmm.46.2019.06.07.02.22.30
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Fri, 07 Jun 2019 02:22:35 -0700 (PDT)
-Received: from zen.linaroharston. (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 280DC1FFCB;
- Fri,  7 Jun 2019 10:05:56 +0100 (BST)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: peter.maydell@linaro.org
-Date: Fri,  7 Jun 2019 10:05:51 +0100
-Message-Id: <20190607090552.12434-53-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190607090552.12434-1-alex.bennee@linaro.org>
-References: <20190607090552.12434-1-alex.bennee@linaro.org>
+ (envelope-from <cohuck@redhat.com>) id 1hZBYW-0000wS-PL
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 05:53:06 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52755)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <cohuck@redhat.com>)
+ id 1hZBYW-0000tg-JT; Fri, 07 Jun 2019 05:53:04 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id DEE2A6EF;
+ Fri,  7 Jun 2019 09:53:03 +0000 (UTC)
+Received: from localhost (dhcp-192-191.str.redhat.com [10.33.192.191])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 883077DFEE;
+ Fri,  7 Jun 2019 09:53:03 +0000 (UTC)
+From: Cornelia Huck <cohuck@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri,  7 Jun 2019 11:52:10 +0200
+Message-Id: <20190607095237.11364-9-cohuck@redhat.com>
+In-Reply-To: <20190607095237.11364-1-cohuck@redhat.com>
+References: <20190607095237.11364-1-cohuck@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::336
-Subject: [Qemu-devel] [PULL 52/52] gdbstub: Implement qemu physical memory
- mode
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.29]); Fri, 07 Jun 2019 09:53:03 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PULL 08/35] s390x: Align vector registers to 16 bytes
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,127 +66,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org,
- Jon Doron <arilou@gmail.com>
+Cc: qemu-s390x@nongnu.org, Richard Henderson <richard.henderson@linaro.org>,
+ qemu-devel@nongnu.org, David Hildenbrand <david@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Jon Doron <arilou@gmail.com>
+From: David Hildenbrand <david@redhat.com>
 
-Add a new query/set which changes the memory GDB sees to physical memory
-only.
+11e2bfef7990 ("tcg/i386: Use MOVDQA for TCG_TYPE_V128 load/store")
+revealed that the vregs are not aligned to 16 bytes. Align them to
+16 bytes, to avoid segfault'ing on x86.
 
-gdb> maint packet qqemu.PhyMemMode
-will reply the current phy_mem_mode state (1 for enabled, 0 for disabled)
-gdb> maint packet Qqemu.PhyMemMode:1
-Will make GDB read/write only to physical memory, set to 0 to disable
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: David Hildenbrand <david@redhat.com>
+---
+ target/s390x/cpu.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Signed-off-by: Jon Doron <arilou@gmail.com>
-Message-Id: <20190529064148.19856-21-arilou@gmail.com>
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-
-diff --git a/gdbstub.c b/gdbstub.c
-index 12671e6e11..14a9c22f5a 100644
---- a/gdbstub.c
-+++ b/gdbstub.c
-@@ -46,11 +46,27 @@
- #define GDB_ATTACHED "1"
- #endif
- 
-+#ifndef CONFIG_USER_ONLY
-+static int phy_memory_mode;
-+#endif
-+
- static inline int target_memory_rw_debug(CPUState *cpu, target_ulong addr,
-                                          uint8_t *buf, int len, bool is_write)
- {
--    CPUClass *cc = CPU_GET_CLASS(cpu);
-+    CPUClass *cc;
- 
-+#ifndef CONFIG_USER_ONLY
-+    if (phy_memory_mode) {
-+        if (is_write) {
-+            cpu_physical_memory_write(addr, buf, len);
-+        } else {
-+            cpu_physical_memory_read(addr, buf, len);
-+        }
-+        return 0;
-+    }
-+#endif
-+
-+    cc = CPU_GET_CLASS(cpu);
-     if (cc->memory_rw_debug) {
-         return cc->memory_rw_debug(cpu, addr, buf, len, is_write);
-     }
-@@ -2132,8 +2148,36 @@ static void handle_query_attached(GdbCmdContext *gdb_ctx, void *user_ctx)
- 
- static void handle_query_qemu_supported(GdbCmdContext *gdb_ctx, void *user_ctx)
- {
--    put_packet(gdb_ctx->s, "sstepbits;sstep");
-+    snprintf(gdb_ctx->str_buf, sizeof(gdb_ctx->str_buf), "sstepbits;sstep");
-+#ifndef CONFIG_USER_ONLY
-+    pstrcat(gdb_ctx->str_buf, sizeof(gdb_ctx->str_buf), ";PhyMemMode");
-+#endif
-+    put_packet(gdb_ctx->s, gdb_ctx->str_buf);
-+}
-+
-+#ifndef CONFIG_USER_ONLY
-+static void handle_query_qemu_phy_mem_mode(GdbCmdContext *gdb_ctx,
-+                                           void *user_ctx)
-+{
-+    snprintf(gdb_ctx->str_buf, sizeof(gdb_ctx->str_buf), "%d", phy_memory_mode);
-+    put_packet(gdb_ctx->s, gdb_ctx->str_buf);
-+}
-+
-+static void handle_set_qemu_phy_mem_mode(GdbCmdContext *gdb_ctx, void *user_ctx)
-+{
-+    if (!gdb_ctx->num_params) {
-+        put_packet(gdb_ctx->s, "E22");
-+        return;
-+    }
-+
-+    if (!gdb_ctx->params[0].val_ul) {
-+        phy_memory_mode = 0;
-+    } else {
-+        phy_memory_mode = 1;
-+    }
-+    put_packet(gdb_ctx->s, "OK");
- }
-+#endif
- 
- static GdbCmdParseEntry gdb_gen_query_set_common_table[] = {
-     /* Order is important if has same prefix */
-@@ -2215,6 +2259,12 @@ static GdbCmdParseEntry gdb_gen_query_table[] = {
-         .handler = handle_query_qemu_supported,
-         .cmd = "qemu.Supported",
-     },
-+#ifndef CONFIG_USER_ONLY
-+    {
-+        .handler = handle_query_qemu_phy_mem_mode,
-+        .cmd = "qemu.PhyMemMode",
-+    },
-+#endif
- };
- 
- static GdbCmdParseEntry gdb_gen_set_table[] = {
-@@ -2225,6 +2275,14 @@ static GdbCmdParseEntry gdb_gen_set_table[] = {
-         .cmd_startswith = 1,
-         .schema = "l0"
-     },
-+#ifndef CONFIG_USER_ONLY
-+    {
-+        .handler = handle_set_qemu_phy_mem_mode,
-+        .cmd = "qemu.PhyMemMode:",
-+        .cmd_startswith = 1,
-+        .schema = "l0"
-+    },
-+#endif
- };
- 
- static void handle_gen_query(GdbCmdContext *gdb_ctx, void *user_ctx)
--- 
+diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
+index 7305cacc7b77..1bed12b6c3e0 100644
+--- a/target/s390x/cpu.h
++++ b/target/s390x/cpu.h
+@@ -66,7 +66,7 @@ struct CPUS390XState {
+      * The floating point registers are part of the vector registers.
+      * vregs[0][0] -> vregs[15][0] are 16 floating point registers
+      */
+-    CPU_DoubleU vregs[32][2];  /* vector registers */
++    CPU_DoubleU vregs[32][2] QEMU_ALIGNED(16);  /* vector registers */
+     uint32_t aregs[16];    /* access registers */
+     uint8_t riccb[64];     /* runtime instrumentation control */
+     uint64_t gscb[4];      /* guarded storage control */
+--=20
 2.20.1
 
 
