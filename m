@@ -2,63 +2,63 @@ Return-Path: <SRS0=3yEa=UG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9AA75C2BCA1
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 18:09:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D43CDC2BCA1
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 18:13:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7775F20868
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 18:09:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7775F20868
+	by mail.kernel.org (Postfix) with ESMTPS id 715E220868
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 18:13:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 715E220868
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50010 helo=lists.gnu.org)
+Received: from localhost ([::1]:50106 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hZJJ0-0002Xk-OU
-	for qemu-devel@archiver.kernel.org; Fri, 07 Jun 2019 14:09:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53530)
+	id 1hZJN5-0008CP-Ff
+	for qemu-devel@archiver.kernel.org; Fri, 07 Jun 2019 14:13:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54300)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <crosa@redhat.com>) id 1hZH0Q-0003br-KU
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 11:42:20 -0400
+ (envelope-from <armbru@redhat.com>) id 1hZH0Q-0004JB-K5
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 11:42:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <crosa@redhat.com>) id 1hZGlr-0000VC-9v
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 11:27:13 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:12442)
+ (envelope-from <armbru@redhat.com>) id 1hZGlq-0000Tj-Ui
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 11:27:12 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37795)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <crosa@redhat.com>) id 1hZGlq-0007Yj-8L
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 11:27:11 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hZGlq-0008Le-3y
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 11:27:10 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id D9F966E769;
- Fri,  7 Jun 2019 15:26:32 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-122-62.rdu2.redhat.com
- [10.10.122.62])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 00EB610D8236;
- Fri,  7 Jun 2019 15:26:22 +0000 (UTC)
-Date: Fri, 7 Jun 2019 11:26:20 -0400
-From: Cleber Rosa <crosa@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id 5F3B92EED2A
+ for <qemu-devel@nongnu.org>; Fri,  7 Jun 2019 15:26:50 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-148.ams2.redhat.com
+ [10.36.116.148])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 2F6EE831B7
+ for <qemu-devel@nongnu.org>; Fri,  7 Jun 2019 15:26:50 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 0E14411385D0; Fri,  7 Jun 2019 17:26:47 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Message-ID: <20190607152620.GA9665@localhost.localdomain>
-References: <20190607152223.9467-1-crosa@redhat.com>
+Date: Fri,  7 Jun 2019 17:26:40 +0200
+Message-Id: <20190607152646.4822-7-armbru@redhat.com>
+In-Reply-To: <20190607152646.4822-1-armbru@redhat.com>
+References: <20190607152646.4822-1-armbru@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190607152223.9467-1-crosa@redhat.com>
-User-Agent: Mutt/1.11.4 (2019-03-13)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.25]); Fri, 07 Jun 2019 15:26:32 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.29]); Fri, 07 Jun 2019 15:26:50 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 0/8] Miscellaneous acceptance test and
- Travis CI improvements
+Subject: [Qemu-devel] [PULL 06/12] scripts/clean-header-guards: Fix handling
+ of trailing comments
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,57 +70,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>,
- Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>,
- Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>,
- Wainer dos Santos Moschetta <wainersm@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Jun 07, 2019 at 11:22:15AM -0400, Cleber Rosa wrote:
-> This is a collection of small improvements to some of the acceptance
-> tests, and the Travis CI experience.
-> 
-> The main goal was to make tests a bit more robust when run in parallel
-> (an Avocado feature pending review), and Travis CI diagnostics better
-> by printing out the full Avocado job log when any error or test
-> failure occurs.
+clean-header-guards.pl fails to recognize a header guard #endif when
+it's followed by a // comment, or multiple comments.  Fix that.
 
-Forgot to add these hopefully useful pointers:
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Message-Id: <20190604181618.19980-3-armbru@redhat.com>
+---
+ scripts/clean-header-guards.pl | 12 +++++++-----
+ 1 file changed, 7 insertions(+), 5 deletions(-)
 
-Git Info:
-  - URI: https://github.com/clebergnu/qemu/tree/misc_tests_improvements
-  - Remote: https://github.com/clebergnu/qemu
-  - Branch: misc_tests_improvements
+diff --git a/scripts/clean-header-guards.pl b/scripts/clean-header-guards=
+.pl
+index 5e67f1998c..f47d673ad5 100755
+--- a/scripts/clean-header-guards.pl
++++ b/scripts/clean-header-guards.pl
+@@ -103,7 +103,7 @@ sub preprocess {
+ for my $fname (@ARGV) {
+     my $text =3D slurp($fname);
+=20
+-    $text =3D~ m,\A(\s*\n|\s*//\N*\n|\s*/\*.*?\*/\s*\n)*|,msg;
++    $text =3D~ m,\A(\s*\n|\s*//\N*\n|\s*/\*.*?\*/\s*\n)*|,sg;
+     my $pre =3D $&;
+     unless ($text =3D~ /\G(.*\n)/g) {
+         $text =3D~ /\G.*/;
+@@ -137,14 +137,16 @@ for my $fname (@ARGV) {
+     }
+=20
+     unless ($body =3D~ m,\A((.*\n)*)
+-                       (\s*\#\s*endif\s*(/\*\s*.*\s*\*/\s*)?\n?)
+-                       (\n|\s)*\Z,x) {
++                       ([ \t]*\#[ \t]*endif([ \t]*\N*)\n)
++                       ((?s)(\s*\n|\s*//\N*\n|\s*/\*.*?\*/\s*\n)*)
++                       \Z,x) {
+         skipping($fname, "can't find end of header guard");
+         next;
+     }
+     $body =3D $1;
+     my $line3 =3D $3;
+     my $endif_comment =3D $4;
++    my $post =3D $5;
+=20
+     my $oldg =3D $guard;
+=20
+@@ -186,14 +188,14 @@ for my $fname (@ARGV) {
+         my $newl1 =3D "#ifndef $guard\n";
+         my $newl2 =3D "#define $guard\n";
+         my $newl3 =3D "#endif\n";
+-        $newl3 =3D~ s,\Z, /* $guard */, if defined $endif_comment;
++        $newl3 =3D~ s,\Z, /* $guard */, if $endif_comment;
+         if ($line1 ne $newl1 or $line2 ne $newl2 or $line3 ne $newl3) {
+             $pre =3D~ s/\n*\Z/\n\n/ if $pre =3D~ /\N/;
+             $body =3D~ s/\A\n*/\n/;
+             if ($opt_n) {
+                 print "$fname would be cleaned up\n" if $opt_v;
+             } else {
+-                unslurp($fname, "$pre$newl1$newl2$body$newl3");
++                unslurp($fname, "$pre$newl1$newl2$body$newl3$post");
+                 print "$fname cleaned up\n" if $opt_v;
+             }
+         }
+--=20
+2.21.0
 
-Travis CI Info:
-  - Build: https://travis-ci.org/clebergnu/qemu/builds/542815049
-  - Job: https://travis-ci.org/clebergnu/qemu/jobs/542815074
-
-Regards,
-- Cleber.
-
-> 
-> Cleber Rosa (8):
->   Travis: print acceptance tests logs in case of job failure
->   tests/requirements.txt: pin paramiko version requirement
->   Acceptance tests: drop left over usage of ":avocado: enable"
->   Boot Linux Console Test: add a test for ppc64 + pseries
->   VNC Acceptance test: use UNIX domain sockets to avoid port collisions
->   VNC Acceptance test: simplify test names
->   VNC Acceptance test: check protocol version
->   Migration acceptance test: reduce the possibility of port collisions
-> 
->  .travis.yml                            |  4 ++-
->  tests/acceptance/boot_linux_console.py | 19 ++++++++++++++
->  tests/acceptance/migration.py          |  5 +---
->  tests/acceptance/vnc.py                | 36 +++++++++++++++++++++++---
->  tests/requirements.txt                 |  2 +-
->  5 files changed, 56 insertions(+), 10 deletions(-)
-> 
-> -- 
-> 2.21.0
-> 
 
