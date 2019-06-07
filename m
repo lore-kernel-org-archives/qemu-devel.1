@@ -2,62 +2,65 @@ Return-Path: <SRS0=3yEa=UG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_MUTT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 44D70C2BCA1
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 15:23:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C42ABC2BCA1
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 15:23:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1D9D52089E
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 15:23:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1D9D52089E
+	by mail.kernel.org (Postfix) with ESMTPS id A0CEF2089E
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 15:23:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A0CEF2089E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48728 helo=lists.gnu.org)
+Received: from localhost ([::1]:48730 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hZGi8-0004ff-0w
-	for qemu-devel@archiver.kernel.org; Fri, 07 Jun 2019 11:23:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54256)
+	id 1hZGi9-0004nX-Th
+	for qemu-devel@archiver.kernel.org; Fri, 07 Jun 2019 11:23:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55888)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <imammedo@redhat.com>) id 1hZFj3-00059S-Ai
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 10:20:15 -0400
+ (envelope-from <kwolf@redhat.com>) id 1hZFo5-0000uW-9J
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 10:25:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1hZFiz-00065s-8O
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 10:20:11 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57702)
+ (envelope-from <kwolf@redhat.com>) id 1hZFo3-0006I7-Aa
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 10:25:25 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53488)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1hZFix-0005kR-42
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 10:20:07 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ (Exim 4.71) (envelope-from <kwolf@redhat.com>)
+ id 1hZFnx-0006CT-H7; Fri, 07 Jun 2019 10:25:17 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id E294230C318C;
- Fri,  7 Jun 2019 14:19:56 +0000 (UTC)
-Received: from localhost (unknown [10.43.2.182])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 6DFB47DE56;
- Fri,  7 Jun 2019 14:19:53 +0000 (UTC)
-Date: Fri, 7 Jun 2019 16:19:49 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-To: Yoshinori Sato <ysato@users.sourceforge.jp>
-Message-ID: <20190607161949.7d5b56d4@redhat.com>
-In-Reply-To: <20190607091116.49044-14-ysato@users.sourceforge.jp>
-References: <20190607091116.49044-1-ysato@users.sourceforge.jp>
- <20190607091116.49044-14-ysato@users.sourceforge.jp>
+ by mx1.redhat.com (Postfix) with ESMTPS id 6DDBE3079B81;
+ Fri,  7 Jun 2019 14:25:16 +0000 (UTC)
+Received: from dhcp-200-226.str.redhat.com (dhcp-200-226.str.redhat.com
+ [10.33.200.226])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 5974660624;
+ Fri,  7 Jun 2019 14:25:15 +0000 (UTC)
+Date: Fri, 7 Jun 2019 16:25:14 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
+Message-ID: <20190607142514.GE5055@dhcp-200-226.str.redhat.com>
+References: <20190607135430.22149-1-kwolf@redhat.com>
+ <20190607140357.GK28838@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20190607140357.GK28838@redhat.com>
+User-Agent: Mutt/1.11.3 (2019-02-01)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.40]); Fri, 07 Jun 2019 14:19:56 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.41]); Fri, 07 Jun 2019 14:25:16 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v17 13/24] target/rx: Fix cpu types and
- names
+Subject: Re: [Qemu-devel] [RFC PATCH 00/10] monitor: Split monitor.c in
+ core/HMP/QMP/misc
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,197 +72,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, Richard Henderson <richard.henderson@linaro.org>,
- qemu-devel@nongnu.org, philmd@redhat.com
+Cc: dgilbert@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org,
+ armbru@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri,  7 Jun 2019 18:11:05 +0900
-Yoshinori Sato <ysato@users.sourceforge.jp> wrote:
+Am 07.06.2019 um 16:03 hat Daniel P. Berrang=E9 geschrieben:
+> On Fri, Jun 07, 2019 at 03:54:20PM +0200, Kevin Wolf wrote:
+> > monitor.c mixes a lot of different things in a single file: The core
+> > monitor infrastructure, HMP infrastrcture, QMP infrastructure, and th=
+e
+> > implementation of several HMP and QMP commands. Almost worse, struct
+> > Monitor mixes state for HMP, for QMP, and state actually shared betwe=
+en
+> > all monitors. monitor.c must be linked with a system emulator and eve=
+n
+> > requires per-target compilation because some of the commands it
+> > implements access system emulator state.
+> >=20
+> > The reason why I care about this is that I'm working on a protoype fo=
+r a
+> > storage daemon, which wants to use QMP (but probably not HMP) and
+> > obviously doesn't have any system emulator state. So I'm interested i=
+n
+> > some core monitor parts that can be linked to non-system-emulator too=
+ls.
+> >=20
+> > This series first creates separate structs MonitorQMP and MonitorHMP
+> > which inherit from Monitor, and then moves the associated infrastruct=
+ure
+> > code into separate source files.
+> >=20
+> > While the split is probably not perfect, I think it's an improvement =
+of
+> > the current state even for QEMU proper, and it's good enough so I can
+> > link my storage daemon against just monitor/core.o and monitor/qmp.o =
+and
+> > get a useless QMP monitor that parses the JSON input and rejects
+> > everything as an unknown command.
+> >=20
+> > Next I'll try to teach it a subset of QMP commands that can actually =
+be
+> > supported in a tool, but while there will be a few follow-up patches =
+to
+> > achieve this, I don't expect that this work will bring up much that
+> > needs to be changed in the splitting process done in this series.
+> >=20
+> > Kevin Wolf (10):
+> >   monitor: Remove unused password prompting fields
+> >   monitor: Split monitor_init in HMP and QMP function
+> >   monitor: Make MonitorQMP a child class of Monitor
+> >   monitor: Create MonitorHMP with readline state
+> >   monitor: Move cmd_table to MonitorHMP
+> >   Move monitor.c to monitor/misc.c
+> >   monitor: Create monitor_int.h with common definitions
+> >   monitor: Split out monitor/qmp.c
+> >   monitor: Split out monitor/hmp.c
+> >   monitor: Split out monitor/core.c
+> >=20
+> >  include/monitor/monitor.h |    8 +-
+> >  monitor/monitor_int.h     |  207 ++
+> >  hmp.c                     |    4 +-
+> >  monitor.c                 | 4727 -----------------------------------=
+--
+> >  monitor/core.c            |  604 +++++
+> >  monitor/hmp.c             | 1351 +++++++++++
+> >  monitor/misc.c            | 2406 +++++++++++++++++++
+> >  monitor/qmp.c             |  404 ++++
+> >  Makefile.objs             |    1 +
+> >  Makefile.target           |    3 +-
+> >  monitor/Makefile.objs     |    2 +
+>=20
+> It will be nice to have the monitor code split up a bit more.
+>=20
+> I'm not a fan, however, of having both $ROOT/qmp.c and $ROOT/monitor/qm=
+p.c
+> Likwise  $ROOT/hmp.c and $ROOT/monitor/hmp.c.  Can we move those other
+> existing files out of the root dir, into monitor/, so we don't have two
+> files with the same name in different dirs.
 
-> From: Richard Henderson <richard.henderson@linaro.org>
-> 
-> There was confusion here about abstract classes and naming cpus.
-> We had registered a concrete class named "-rxcpu".  This was put
-> into the default cpu fields, and matched, so basic tests worked.
-> However, no value for -cpu could ever match in rx_cpu_class_by_name.
-> 
-> Rename the base class to "rx-cpu" and make it abstract.  This
-> matches what we do for most other targets.  Create a new concrete
-> cpu with the name "rx62n-rx-cpu".
-My comments on v16 weren't addressed at all.
+$ROOT/hmp.c and $ROOT/qmp.c contain various command implementations,
+just as $ROOT/monitor/misc.c. This is still a bit of a mess. I'll have
+to address this at least partially in the next step because I need to
+separate commands that can be linked with tools from those that require
+a system emulator.
 
-I don't see any valid reason for this patch to exist.
-It should be split and merged with patches that introduce 'confusion'
-so that broken code won't exist in the first place.
+My plan involves at least creating some monitor/qmp-cmds-*.c, which
+might already make $ROOT/qmp.c empty. Even though I don't strictly need
+it, there's no reason not to do the same for HMP, too. In any case, I'd
+rather address this in a separate follow-up series.
 
-more below ...
+But if people prefer, I can move the existing files in the root
+directory to monitor/{qmp,hmp}-cmds.c temporarily in this series and
+then work from there with follow-ups until they are empty (or maybe I
+don't even have to make them completely empty then).
 
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
-> ---
->  target/rx/cpu.h | 12 ++++++------
->  hw/rx/rx-virt.c |  2 +-
->  hw/rx/rx62n.c   |  2 +-
->  target/rx/cpu.c | 43 ++++++++++++++++++++++++++-----------------
->  4 files changed, 34 insertions(+), 25 deletions(-)
-> 
-> diff --git a/target/rx/cpu.h b/target/rx/cpu.h
-> index 8c1a4e448d..a0b6975963 100644
-> --- a/target/rx/cpu.h
-> +++ b/target/rx/cpu.h
-> @@ -24,14 +24,14 @@
->  #include "hw/registerfields.h"
->  #include "qom/cpu.h"
->  
-> -#define TYPE_RXCPU "rxcpu"
-> +#define TYPE_RX_CPU "rx-cpu"
->  
->  #define RXCPU_CLASS(klass)                                     \
-> -    OBJECT_CLASS_CHECK(RXCPUClass, (klass), TYPE_RXCPU)
-> +    OBJECT_CLASS_CHECK(RXCPUClass, (klass), TYPE_RX_CPU)
->  #define RXCPU(obj) \
-> -    OBJECT_CHECK(RXCPU, (obj), TYPE_RXCPU)
-> +    OBJECT_CHECK(RXCPU, (obj), TYPE_RX_CPU)
->  #define RXCPU_GET_CLASS(obj) \
-> -    OBJECT_GET_CLASS(RXCPUClass, (obj), TYPE_RXCPU)
-> +    OBJECT_GET_CLASS(RXCPUClass, (obj), TYPE_RX_CPU)
->  
->  /*
->   * RXCPUClass:
-> @@ -164,9 +164,9 @@ static inline RXCPU *rx_env_get_cpu(CPURXState *env)
->  
->  #define ENV_OFFSET offsetof(RXCPU, env)
->  
-> -#define RX_CPU_TYPE_SUFFIX "-" TYPE_RXCPU
-> +#define RX_CPU_TYPE_SUFFIX "-" TYPE_RX_CPU
->  #define RX_CPU_TYPE_NAME(model) model RX_CPU_TYPE_SUFFIX
-> -#define CPU_RESOLVING_TYPE TYPE_RXCPU
-> +#define CPU_RESOLVING_TYPE TYPE_RX_CPU
->  
->  extern const char rx_crname[][6];
->  
-> diff --git a/hw/rx/rx-virt.c b/hw/rx/rx-virt.c
-> index 3deb7cb335..72a2989fcf 100644
-> --- a/hw/rx/rx-virt.c
-> +++ b/hw/rx/rx-virt.c
-> @@ -88,7 +88,7 @@ static void rxvirt_class_init(ObjectClass *oc, void *data)
->      mc->desc = "RX QEMU Virtual Target";
->      mc->init = rxvirt_init;
->      mc->is_default = 1;
-> -    mc->default_cpu_type = TYPE_RXCPU;
-> +    mc->default_cpu_type = RX_CPU_TYPE_NAME("rx62n");
->  }
->  
->  static const TypeInfo rxvirt_type = {
-> diff --git a/hw/rx/rx62n.c b/hw/rx/rx62n.c
-> index c6660b75b4..3a8fe7b0bf 100644
-> --- a/hw/rx/rx62n.c
-> +++ b/hw/rx/rx62n.c
-> @@ -195,7 +195,7 @@ static void rx62n_realize(DeviceState *dev, Error **errp)
->      }
->  
->      object_initialize_child(OBJECT(s), "cpu", &s->cpu,
-> -                            sizeof(RXCPU), TYPE_RXCPU,
-> +                            sizeof(RXCPU), RX_CPU_TYPE_NAME("rx62n"),
->                              errp, NULL);
->      object_property_set_bool(OBJECT(&s->cpu), true, "realized", errp);
->  
-> diff --git a/target/rx/cpu.c b/target/rx/cpu.c
-> index 3268077d08..41fe1de4bb 100644
-> --- a/target/rx/cpu.c
-> +++ b/target/rx/cpu.c
-> @@ -74,13 +74,14 @@ static void rx_cpu_list_entry(gpointer data, gpointer user_data)
->      const char *typename = object_class_get_name(OBJECT_CLASS(data));
->      int len = strlen(typename) - strlen(RX_CPU_TYPE_SUFFIX);
->  
-> -    qemu_printf("%.*s\n", len, typename);
-> +    qemu_printf("  %.*s\n", len, typename);
->  }
->  
->  void rx_cpu_list(void)
->  {
-> -    GSList *list;
-> -    list = object_class_get_list_sorted(TYPE_RXCPU, false);
-> +    GSList *list = object_class_get_list_sorted(TYPE_RX_CPU, false);
-> +
-> +    qemu_printf("Available CPUs:\n");
->      g_slist_foreach(list, rx_cpu_list_entry, NULL);
->      g_slist_free(list);
->  }
-> @@ -88,15 +89,17 @@ void rx_cpu_list(void)
->  static ObjectClass *rx_cpu_class_by_name(const char *cpu_model)
->  {
->      ObjectClass *oc;
-> -    char *typename = NULL;
-> +    char *typename;
->  
-> -    typename = g_strdup_printf(RX_CPU_TYPE_NAME(""));
-> +    typename = g_strdup_printf(RX_CPU_TYPE_NAME("%s"), cpu_model);
->      oc = object_class_by_name(typename);
-
-again repeating v16: see alpha_cpu_class_by_name() as preferred
-way to use this method.
-
-> -    if (oc != NULL && object_class_is_abstract(oc)) {
-> -        oc = NULL;
-> -    }
-> -
->      g_free(typename);
-> +
-> +    if (oc == NULL ||
-> +        object_class_is_abstract(oc) ||
-> +        !object_class_dynamic_cast(oc, TYPE_RX_CPU)) {
-> +        return NULL;
-> +    }
->      return oc;
->  }
->  
-> @@ -166,7 +169,7 @@ static void rx_cpu_init(Object *obj)
->      qdev_init_gpio_in(DEVICE(cpu), rx_cpu_set_irq, 2);
->  }
->  
-> -static void rxcpu_class_init(ObjectClass *klass, void *data)
-> +static void rx_cpu_class_init(ObjectClass *klass, void *data)
->  {
->      DeviceClass *dc = DEVICE_CLASS(klass);
->      CPUClass *cc = CPU_CLASS(klass);
-> @@ -195,22 +198,28 @@ static void rxcpu_class_init(ObjectClass *klass, void *data)
->      cc->gdb_num_core_regs = 26;
->  }
->  
-> -static const TypeInfo rxcpu_info = {
-> -    .name = TYPE_RXCPU,
-> +static const TypeInfo rx_cpu_info = {
-> +    .name = TYPE_RX_CPU,
->      .parent = TYPE_CPU,
->      .instance_size = sizeof(RXCPU),
->      .instance_init = rx_cpu_init,
-> -    .abstract = false,
-> +    .abstract = true,
->      .class_size = sizeof(RXCPUClass),
-> -    .class_init = rxcpu_class_init,
-> +    .class_init = rx_cpu_class_init,
-> +};
-> +
-> +static const TypeInfo rx62n_rx_cpu_info = {
-> +    .name = RX_CPU_TYPE_NAME("rx62n"),
-> +    .parent = TYPE_RX_CPU,
->  };
->  
-> -static void rxcpu_register_types(void)
-> +static void rx_cpu_register_types(void)
->  {
-> -    type_register_static(&rxcpu_info);
-> +    type_register_static(&rx_cpu_info);
-> +    type_register_static(&rx62n_rx_cpu_info);
->  }
->  
-> -type_init(rxcpu_register_types)
-> +type_init(rx_cpu_register_types)
->  
->  static uint32_t extable[32];
->  
-
+Kevin
 
