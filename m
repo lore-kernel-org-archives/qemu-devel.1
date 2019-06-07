@@ -2,79 +2,79 @@ Return-Path: <SRS0=3yEa=UG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_SBL,URIBL_SBL_A,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BAEFCC2BCA1
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 09:07:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 174B3C28CC3
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 09:07:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8935D207E0
+	by mail.kernel.org (Postfix) with ESMTPS id D9D3F207E0
 	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 09:07:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="KtzQfhuH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8935D207E0
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="C1xkaCfP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D9D3F207E0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47124 helo=lists.gnu.org)
+Received: from localhost ([::1]:47126 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hZAqg-0005se-Ni
-	for qemu-devel@archiver.kernel.org; Fri, 07 Jun 2019 05:07:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39334)
+	id 1hZAqh-0005tg-0R
+	for qemu-devel@archiver.kernel.org; Fri, 07 Jun 2019 05:07:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39328)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <alex.bennee@linaro.org>) id 1hZAoz-00047O-RI
+ (envelope-from <alex.bennee@linaro.org>) id 1hZAoz-00047I-Qr
  for qemu-devel@nongnu.org; Fri, 07 Jun 2019 05:06:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1hZAox-0004Fk-6q
+ (envelope-from <alex.bennee@linaro.org>) id 1hZAox-0004G8-9Y
  for qemu-devel@nongnu.org; Fri, 07 Jun 2019 05:06:01 -0400
-Received: from mail-wr1-x42c.google.com ([2a00:1450:4864:20::42c]:41270)
+Received: from mail-wr1-x436.google.com ([2a00:1450:4864:20::436]:41279)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1hZAov-00045a-R7
+ id 1hZAou-0003yc-1U
  for qemu-devel@nongnu.org; Fri, 07 Jun 2019 05:05:58 -0400
-Received: by mail-wr1-x42c.google.com with SMTP id c2so1338018wrm.8
- for <qemu-devel@nongnu.org>; Fri, 07 Jun 2019 02:05:57 -0700 (PDT)
+Received: by mail-wr1-x436.google.com with SMTP id c2so1337965wrm.8
+ for <qemu-devel@nongnu.org>; Fri, 07 Jun 2019 02:05:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=Rd5+Go34lR5r032gcxkrHBNwDzwFUaH0wsbx46lnxds=;
- b=KtzQfhuHaLrRhn0hNES7YtosF42tXuzszpjKOXitI2MRSzfro0ec2jJunY0V0Io+2x
- rBOB+eyYQboGLbfn5Gl6O1EtaOupLR2n5GgEj/5gQcJW/XCTOVUJkgz860SOgA8rOTn2
- YVV2viExmPNU4An4LZlx7MI3M2mFGIPloUpylBuH2tVTKPBxXO2VCQVBd44y8sSnro+9
- uMMYmsWZ3mqVYP46Hog0rnIpfVxET5C2GHlpr08msI5zPz02pTYaWW+6aDXMnbDq0CLo
- Eh3af5khAIJVujIAchnB7xnOoSmOS78VEJoonI9S01zc6IAyYCbR0RVE6Y1xy9+iIwrz
- B4Mw==
+ bh=qCnUPR9lwJDCVN+3iAAkawz91A004gE5+vwI6CE6U4k=;
+ b=C1xkaCfPyiVd7QKIq+Jx8gMCa0vNYwcNBA7ZrqE7ZgsLK7JMkxqnA5jF2C3Vniyp8d
+ ryqpI9fQrhCYF3H5/6HQnOzLhUotjJKPhHaqZ2oAJHFNtFekKM52EOveiO203X6t7Mdr
+ aRrB00uqa2/EjDB3C0BHWTFvxCF9/EPilAmexy1ixJHDd8gFVTuxgvVH+bhxOY648sxR
+ wbnxFbEeyTyPwIWCg8kuaaORXl+RJ0VogkU5dySS3x106k9c31GnleOjc+EPXn2OK4m5
+ DDUtL30zXHlYkmzLkVfRgHLJbPEfUa+Tn4U6OC1y91Tv1RSRFYNH3kANFw7NOxmUHMkc
+ M59g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=Rd5+Go34lR5r032gcxkrHBNwDzwFUaH0wsbx46lnxds=;
- b=gP+l3Zmn9Bppr1h8JgBntSC4HEjZEhecknrjhiBfiQrCvwKFZa9p5MyWaArtz82e3I
- L6cKln7dcgjNFhur+b8BvchKANWF4+3RR5AEZ/WPjrBBAlh96W2fVw+vqpQJZLELTx8/
- lO+TyzTPoy3AY7IZ37lGv6DmXpcwvf4ldN0ysrvcVxv8q6KueaEvsyfU3cEB1eiio4f4
- 5jvIqccSbHwrqZYhFwgjfDLgsDPvbxkOEkAkr8B0/DLv5e6pxzD0xj4/sE6e9INk1ANw
- 9cJfu8vXCREDAHQklkVbXleFhXyR9iBPlbQorHp51cFjtoHC8jin4CVMEBshaLzk2z4a
- H+YA==
-X-Gm-Message-State: APjAAAVQez0e3w092QHyi4ID/CbIjU4tAvImcE6BaGGpmje8LN7iYg/8
- JpMw9ff02Q+a2EKCuaH2DqdOyg==
-X-Google-Smtp-Source: APXvYqw8bE4o9W+RCod07b72FTGh2ENf3I0AsxGJTeZ6hnOI+Lb6mqoI3hhiMuimRxywUIluzgTnUA==
-X-Received: by 2002:adf:f8cf:: with SMTP id f15mr18792478wrq.333.1559898356437; 
- Fri, 07 Jun 2019 02:05:56 -0700 (PDT)
+ bh=qCnUPR9lwJDCVN+3iAAkawz91A004gE5+vwI6CE6U4k=;
+ b=n+pA9xHT1JyDQ5JpFfVOglztH856VSAxP1m2t3H7VQ05g6gf0fxGXSVU+GfVqlBX/q
+ TeMCNO8Pbv5olJECX6RRhEM/bPkaeq7w0SCULYkJcTr8EoXWy3jNO7CLCmVuqmcJtzl8
+ oKWFkWwfRrG7XJPLbLKad4OUWjHtyAOhz5bVvNw+8vFm2rOrx14YrEMPl0mDJJIFsIR3
+ ogtKiMN+8oXZMLzjGf0Zc517Bw1ZTqSv0KEL2fVHncLG4kUgP/XchTuDb05MtifLujjw
+ PSDloAIgtvlffc/rSpRhnY+jev+qn1QHw/V69eW7dwTiCR+klYH3jABpCNcMo94sOAWz
+ /Ndw==
+X-Gm-Message-State: APjAAAXtR61z7G03pS+sQSt+7FpylGc/HPj0w6E7meZ40UQz6H0AAuWx
+ KIC+qG51YdWFlecFdhUcZhtoGw==
+X-Google-Smtp-Source: APXvYqwT8H9WJGY0HE4EzUbc/T3fUIupFXV6MXZk+NelMb9H4/98P61gXcmSUEbwB5A4YAjlhuJT+A==
+X-Received: by 2002:adf:de8b:: with SMTP id w11mr8791262wrl.134.1559898355024; 
+ Fri, 07 Jun 2019 02:05:55 -0700 (PDT)
 Received: from zen.linaroharston ([81.128.185.34])
- by smtp.gmail.com with ESMTPSA id y2sm1331087wra.58.2019.06.07.02.05.53
+ by smtp.gmail.com with ESMTPSA id f10sm1685621wrg.24.2019.06.07.02.05.52
  (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
  Fri, 07 Jun 2019 02:05:53 -0700 (PDT)
 Received: from zen.linaroharston. (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 6B5811FF92;
+ by zen.linaroharston (Postfix) with ESMTP id 4444C1FF90;
  Fri,  7 Jun 2019 10:05:52 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: peter.maydell@linaro.org
-Date: Fri,  7 Jun 2019 10:05:04 +0100
-Message-Id: <20190607090552.12434-6-alex.bennee@linaro.org>
+Date: Fri,  7 Jun 2019 10:05:02 +0100
+Message-Id: <20190607090552.12434-4-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190607090552.12434-1-alex.bennee@linaro.org>
 References: <20190607090552.12434-1-alex.bennee@linaro.org>
@@ -83,9 +83,9 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::42c
-Subject: [Qemu-devel] [PULL 05/52] tests/docker: Update the Ubuntu image to
- 19.04
+X-Received-From: 2a00:1450:4864:20::436
+Subject: [Qemu-devel] [PULL 03/52] tests/docker: Update the Fedora image to
+ Fedora 30
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,64 +98,38 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Fam Zheng <fam@euphon.net>,
- Richard Henderson <richard.henderson@linaro.org>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org,
+ =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Stefano Garzarella <sgarzare@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This has aged a little and we have a separate LTS image for testing on
-the older distros. Update it to a more recent release like its Fedora
-cousin.
+From: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-Besides it is useful to have something with gcc-9 on it for squashing
-those stringop truncation errors.
+Fedora 30 got released:
 
+  https://fedoramagazine.org/announcing-fedora-30/
+
+Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+Tested-by: Stefano Garzarella <sgarzare@redhat.com>
+Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+Message-Id: <20190528153304.27157-1-philmd@redhat.com>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-diff --git a/tests/docker/dockerfiles/ubuntu.docker b/tests/docker/dockerfiles/ubuntu.docker
-index 36e2b17de5..8d256961f0 100644
---- a/tests/docker/dockerfiles/ubuntu.docker
-+++ b/tests/docker/dockerfiles/ubuntu.docker
-@@ -1,6 +1,15 @@
--FROM ubuntu:16.04
--RUN echo "deb http://archive.ubuntu.com/ubuntu/ trusty universe multiverse" >> \
--    /etc/apt/sources.list
-+#
-+# Latest Ubuntu Release
-+#
-+# Useful for testing against relatively bleeding edge libraries and
-+# compilers. We also have seperate recipe for the most recent LTS
-+# release.
-+#
-+# When updating use the full tag not :latest otherwise the build
-+# system won't pick up that it has changed.
-+#
-+
-+FROM ubuntu:19.04
- ENV PACKAGES flex bison \
-     ccache \
-     clang \
-@@ -21,7 +30,7 @@ ENV PACKAGES flex bison \
-     libepoxy-dev \
-     libfdt-dev \
-     libgbm-dev \
--    libgnutls-dev \
-+    libgnutls28-dev \
-     libgtk-3-dev \
-     libibverbs-dev \
-     libiscsi-dev \
-@@ -34,7 +43,7 @@ ENV PACKAGES flex bison \
-     libnss3-dev \
-     libnuma-dev \
-     libpixman-1-dev \
--    libpng12-dev \
-+    libpng-dev \
-     librados-dev \
-     librbd-dev \
-     librdmacm-dev \
+diff --git a/tests/docker/dockerfiles/fedora.docker b/tests/docker/dockerfiles/fedora.docker
+index afbba29ada..12c460597e 100644
+--- a/tests/docker/dockerfiles/fedora.docker
++++ b/tests/docker/dockerfiles/fedora.docker
+@@ -1,4 +1,4 @@
+-FROM fedora:29
++FROM fedora:30
+ ENV PACKAGES \
+     bc \
+     bison \
 -- 
 2.20.1
 
