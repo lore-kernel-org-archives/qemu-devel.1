@@ -2,71 +2,64 @@ Return-Path: <SRS0=3yEa=UG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 67376C28CC3
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 07:43:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 38BEEC28CC3
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 07:51:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EAEE0208C3
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 07:43:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EAEE0208C3
+	by mail.kernel.org (Postfix) with ESMTPS id 1111120B7C
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 07:51:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1111120B7C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46470 helo=lists.gnu.org)
+Received: from localhost ([::1]:46564 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hZ9Ws-0003Pj-V9
-	for qemu-devel@archiver.kernel.org; Fri, 07 Jun 2019 03:43:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44964)
+	id 1hZ9eR-0005BA-0Z
+	for qemu-devel@archiver.kernel.org; Fri, 07 Jun 2019 03:51:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47027)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <lersek@redhat.com>) id 1hZ9Vg-0002wc-AT
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 03:42:01 -0400
+ (envelope-from <lersek@redhat.com>) id 1hZ9d2-0004ah-L8
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 03:49:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <lersek@redhat.com>) id 1hZ9Vf-00019Y-2y
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 03:42:00 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54200)
+ (envelope-from <lersek@redhat.com>) id 1hZ9d0-0004jy-QF
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 03:49:36 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40698)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <lersek@redhat.com>)
- id 1hZ9Ve-000180-Rc; Fri, 07 Jun 2019 03:41:59 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ (Exim 4.71) (envelope-from <lersek@redhat.com>) id 1hZ9d0-0004hH-Dp
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 03:49:34 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id A5A093082AC3;
- Fri,  7 Jun 2019 07:41:56 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 102F03082200;
+ Fri,  7 Jun 2019 07:49:28 +0000 (UTC)
 Received: from lacos-laptop-7.usersys.redhat.com (ovpn-117-111.ams2.redhat.com
  [10.36.117.111])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 1DF5C5B6B3;
- Fri,  7 Jun 2019 07:41:45 +0000 (UTC)
-To: Eduardo Habkost <ehabkost@redhat.com>, Cleber Rosa <crosa@redhat.com>
-References: <20190117185628.21862-1-crosa@redhat.com>
- <20190117185628.21862-16-crosa@redhat.com>
- <b235e7a9-57ad-5547-b8ca-693159820a8f@redhat.com>
- <e63a4ea3-e9ff-4920-cdfa-14bf04b5b08c@redhat.com>
- <84aa43ba-df19-51f6-e14d-fb82a7f2dfcc@redhat.com>
- <a638e504-f7ad-fa3a-f198-c3878cfc560e@redhat.com>
- <20190607032648.GA22416@habkost.net>
+ by smtp.corp.redhat.com (Postfix) with ESMTP id D9B331B467;
+ Fri,  7 Jun 2019 07:49:20 +0000 (UTC)
+To: Gerd Hoffmann <kraxel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+References: <20190607073429.3436-1-kraxel@redhat.com>
 From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <22ba99c6-0cd0-4733-2fc9-05e5fd5bee12@redhat.com>
-Date: Fri, 7 Jun 2019 09:41:45 +0200
+Message-ID: <dd35962a-2001-2206-e59f-3454cb520c52@redhat.com>
+Date: Fri, 7 Jun 2019 09:49:20 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
  Thunderbird/52.9.1
 MIME-Version: 1.0
-In-Reply-To: <20190607032648.GA22416@habkost.net>
+In-Reply-To: <20190607073429.3436-1-kraxel@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.45]); Fri, 07 Jun 2019 07:41:57 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.47]); Fri, 07 Jun 2019 07:49:28 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 15/18] Boot Linux Console Test: add a test
- for aarch64 + virt
+Subject: Re: [Qemu-devel] [PATCH v2] q35: fix mmconfig and PCI0._CRS
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -78,52 +71,171 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
- Stefan Markovic <smarkovic@wavecomp.com>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- Cornelia Huck <cohuck@redhat.com>,
- Claudio Fontana <claudio.fontana@huawei.com>, qemu-devel@nongnu.org,
- Wainer dos Santos Moschetta <wainersm@redhat.com>,
- Aleksandar Rikalo <arikalo@wavecomp.com>, qemu-s390x@nongnu.org,
- Aleksandar Markovic <amarkovic@wavecomp.com>,
- Caio Carrara <ccarrara@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Aurelien Jarno <aurelien@aurel32.net>
+Cc: Eduardo Habkost <ehabkost@redhat.com>,
+ "open list:All patches CC here" <qemu-devel@nongnu.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 06/07/19 05:26, Eduardo Habkost wrote:
+On 06/07/19 09:34, Gerd Hoffmann wrote:
+> This patch changes the handling of the mmconfig area.  Thanks to the
+> pci(e) expander devices we already have the logic to exclude address
+> ranges from PCI0._CRS.  We can simply add the mmconfig address range
+> to the list get it excluded as well.
+>=20
+> With that in place we can go with a fixed pci hole which covers the
+> whole area from the end of (low) ram to the ioapic.
+>=20
+> This will make the whole logic alot less fragile.  No matter where the
+> firmware places the mmconfig xbar, things should work correctly.  The
+> guest also gets a bit more PCI address space (seabios boot):
+>=20
+>     # cat /proc/iomem
+>     [ ... ]
+>     7ffdd000-7fffffff : reserved
+>     80000000-afffffff : PCI Bus 0000:00            <<-- this is new
+>     b0000000-bfffffff : PCI MMCONFIG 0000 [bus 00-ff]
+>       b0000000-bfffffff : reserved
+>     c0000000-febfffff : PCI Bus 0000:00
+>       f8000000-fbffffff : 0000:00:01.0
+>     [ ... ]
+>=20
+> So this is a guest visible change.
+>=20
+> Cc: L=C3=A1szl=C3=B3 =C3=89rsek <lersek@redhat.com>
+> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+> Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+> ---
+>  tests/bios-tables-test-allowed-diff.h |  8 +++++++
+>  hw/i386/acpi-build.c                  | 14 ++++++++++++
+>  hw/pci-host/q35.c                     | 31 +++++++--------------------
+>  3 files changed, 30 insertions(+), 23 deletions(-)
+>=20
+> diff --git a/tests/bios-tables-test-allowed-diff.h b/tests/bios-tables-=
+test-allowed-diff.h
+> index dfb8523c8bf4..3bbd22c62a3b 100644
+> --- a/tests/bios-tables-test-allowed-diff.h
+> +++ b/tests/bios-tables-test-allowed-diff.h
+> @@ -1 +1,9 @@
+>  /* List of comma-separated changed AML files to ignore */
+> +"tests/data/acpi/q35/DSDT",
+> +"tests/data/acpi/q35/DSDT.bridge",
+> +"tests/data/acpi/q35/DSDT.mmio64",
+> +"tests/data/acpi/q35/DSDT.ipmibt",
+> +"tests/data/acpi/q35/DSDT.cphp",
+> +"tests/data/acpi/q35/DSDT.memhp",
+> +"tests/data/acpi/q35/DSDT.numamem",
+> +"tests/data/acpi/q35/DSDT.dimmpxm",
+> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+> index 85dc1640bc67..8e4f26977619 100644
+> --- a/hw/i386/acpi-build.c
+> +++ b/hw/i386/acpi-build.c
+> @@ -122,6 +122,8 @@ typedef struct FwCfgTPMConfig {
+>      uint8_t tpmppi_version;
+>  } QEMU_PACKED FwCfgTPMConfig;
+> =20
+> +static bool acpi_get_mcfg(AcpiMcfgInfo *mcfg);
+> +
+>  static void init_common_fadt_data(Object *o, AcpiFadtData *data)
+>  {
+>      uint32_t io =3D object_property_get_uint(o, ACPI_PM_PROP_PM_IO_BAS=
+E, NULL);
+> @@ -1807,6 +1809,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker=
+,
+>      CrsRangeSet crs_range_set;
+>      PCMachineState *pcms =3D PC_MACHINE(machine);
+>      PCMachineClass *pcmc =3D PC_MACHINE_GET_CLASS(machine);
+> +    AcpiMcfgInfo mcfg;
+>      uint32_t nr_mem =3D machine->ram_slots;
+>      int root_bus_limit =3D 0xFF;
+>      PCIBus *bus =3D NULL;
+> @@ -1921,6 +1924,17 @@ build_dsdt(GArray *table_data, BIOSLinker *linke=
+r,
+>          }
+>      }
+> =20
+> +    /*
+> +     * At this point crs_range_set has all the ranges used by pci
+> +     * busses *other* than PCI0.  These ranges will be excluded from
+> +     * the PCI0._CRS.  Add mmconfig to the set so it will be excluded
+> +     * too.
+> +     */
+> +    if (acpi_get_mcfg(&mcfg)) {
+> +        crs_range_insert(crs_range_set.mem_ranges,
+> +                         mcfg.base, mcfg.base + mcfg.size - 1);
+> +    }
+> +
+>      scope =3D aml_scope("\\_SB.PCI0");
+>      /* build PCI0._CRS */
+>      crs =3D aml_resource_template();
+> diff --git a/hw/pci-host/q35.c b/hw/pci-host/q35.c
+> index 960939f5ed3e..72093320befe 100644
+> --- a/hw/pci-host/q35.c
+> +++ b/hw/pci-host/q35.c
+> @@ -258,15 +258,6 @@ static void q35_host_initfn(Object *obj)
+>      object_property_add_link(obj, MCH_HOST_PROP_IO_MEM, TYPE_MEMORY_RE=
+GION,
+>                               (Object **) &s->mch.address_space_io,
+>                               qdev_prop_allow_set_link_before_realize, =
+0, NULL);
+> -
+> -    /* Leave enough space for the biggest MCFG BAR */
+> -    /* TODO: this matches current bios behaviour, but
+> -     * it's not a power of two, which means an MTRR
+> -     * can't cover it exactly.
+> -     */
+> -    range_set_bounds(&s->mch.pci_hole,
+> -            MCH_HOST_BRIDGE_PCIEXBAR_DEFAULT + MCH_HOST_BRIDGE_PCIEXBA=
+R_MAX,
+> -            IO_APIC_DEFAULT_ADDRESS - 1);
+>  }
+> =20
+>  static const TypeInfo q35_host_info =3D {
+> @@ -338,20 +329,6 @@ static void mch_update_pciexbar(MCHPCIState *mch)
+>      }
+>      addr =3D pciexbar & addr_mask;
+>      pcie_host_mmcfg_update(pehb, enable, addr, length);
+> -    /* Leave enough space for the MCFG BAR */
+> -    /*
+> -     * TODO: this matches current bios behaviour, but it's not a power=
+ of two,
+> -     * which means an MTRR can't cover it exactly.
+> -     */
+> -    if (enable) {
+> -        range_set_bounds(&mch->pci_hole,
+> -                         addr + length,
+> -                         IO_APIC_DEFAULT_ADDRESS - 1);
+> -    } else {
+> -        range_set_bounds(&mch->pci_hole,
+> -                         MCH_HOST_BRIDGE_PCIEXBAR_DEFAULT,
+> -                         IO_APIC_DEFAULT_ADDRESS - 1);
+> -    }
+>  }
+> =20
+>  /* PAM */
+> @@ -484,6 +461,14 @@ static void mch_update(MCHPCIState *mch)
+>      mch_update_pam(mch);
+>      mch_update_smram(mch);
+>      mch_update_ext_tseg_mbytes(mch);
+> +
+> +    /*
+> +     * pci hole goes from end-of-low-ram to io-apic.
+> +     * mmconfig will be excluded by the dsdt builder.
+> +     */
+> +    range_set_bounds(&mch->pci_hole,
+> +                     mch->below_4g_mem_size,
+> +                     IO_APIC_DEFAULT_ADDRESS - 1);
+>  }
+> =20
+>  static int mch_post_load(void *opaque, int version_id)
+>=20
 
-> Thread 4 (Thread 0x7f2e45fff700 (LWP 6461)):
-> #0  0x00007f2e4ec03500 in nanosleep () at /lib64/libpthread.so.0
-> #1  0x00007f2e4fb229d7 in g_usleep () at /lib64/libglib-2.0.so.0
-> #2  0x0000559a4e7ca4c9 in qemu_chr_write_buffer (s=s@entry=0x559a502d0ac0, buf=buf@entry=0x7f2e45ffdd90 "7", len=1, offset=offset@entry=0x7f2e45ffdd60, write_all=true) at chardev/char.c:115
-> #3  0x0000559a4e7ca78f in qemu_chr_write (s=0x559a502d0ac0, buf=buf@entry=0x7f2e45ffdd90 "7", len=len@entry=1, write_all=write_all@entry=true) at chardev/char.c:148
-> #4  0x0000559a4e7cc7e2 in qemu_chr_fe_write_all (be=be@entry=0x559a504b4c50, buf=buf@entry=0x7f2e45ffdd90 "7", len=len@entry=1) at chardev/char-fe.c:53
-> #5  0x0000559a4e58f320 in pl011_write (opaque=0x559a504b47d0, offset=0, value=55, size=<optimized out>) at hw/char/pl011.c:183
-> #6  0x0000559a4e325121 in memory_region_write_accessor (mr=0x559a504b4ae0, addr=0, value=<optimized out>, size=2, shift=<optimized out>, mask=<optimized out>, attrs=...) at /home/ehabkost/rh/proj/virt/qemu/memory.c:503
-> #7  0x0000559a4e322cd6 in access_with_adjusted_size (addr=addr@entry=0, value=value@entry=0x7f2e45ffded8, size=size@entry=2, access_size_min=<optimized out>, access_size_max=<optimized out>, access_fn=access_fn@entry=
->     0x559a4e3250a0 <memory_region_write_accessor>, mr=0x559a504b4ae0, attrs=...) at /home/ehabkost/rh/proj/virt/qemu/memory.c:569
-> #8  0x0000559a4e32763f in memory_region_dispatch_write (mr=mr@entry=0x559a504b4ae0, addr=addr@entry=0, data=<optimized out>, data@entry=55, size=size@entry=2, attrs=...) at /home/ehabkost/rh/proj/virt/qemu/memory.c:1497
-> #9  0x0000559a4e338708 in io_writex (env=env@entry=0x559a503d5620, mmu_idx=mmu_idx@entry=1, val=val@entry=55, addr=addr@entry=18446462598867529728, retaddr=139836732143069, size=2, iotlbentry=<optimized out>, iotlbentry=<optimized out>)
->     at /home/ehabkost/rh/proj/virt/qemu/accel/tcg/cputlb.c:945
-> #10 0x0000559a4e33d203 in store_helper (big_endian=false, size=2, retaddr=<optimized out>, oi=<optimized out>, val=55, addr=18446462598867529728, env=0x559a503d5620) at /home/ehabkost/rh/proj/virt/qemu/accel/tcg/cputlb.c:1544
-> #11 0x0000559a4e33d203 in helper_le_stw_mmu (env=0x559a503d5620, addr=18446462598867529728, val=55, oi=<optimized out>, retaddr=139836732143069) at /home/ehabkost/rh/proj/virt/qemu/accel/tcg/cputlb.c:1636
-> #12 0x00007f2e46bef5dd in code_gen_buffer ()
-> #13 0x0000559a4e352381 in cpu_tb_exec (itb=<optimized out>, cpu=0x559a503d5620) at /home/ehabkost/rh/proj/virt/qemu/accel/tcg/cpu-exec.c:171
-> #14 0x0000559a4e352381 in cpu_loop_exec_tb (tb_exit=<synthetic pointer>, last_tb=<synthetic pointer>, tb=<optimized out>, cpu=0x559a503d5620) at /home/ehabkost/rh/proj/virt/qemu/accel/tcg/cpu-exec.c:618
-> #15 0x0000559a4e352381 in cpu_exec (cpu=cpu@entry=0x559a503cd360) at /home/ehabkost/rh/proj/virt/qemu/accel/tcg/cpu-exec.c:729
-> #16 0x0000559a4e30ea0f in tcg_cpu_exec (cpu=0x559a503cd360) at /home/ehabkost/rh/proj/virt/qemu/cpus.c:1434
-> #17 0x0000559a4e310b6b in qemu_tcg_cpu_thread_fn (arg=arg@entry=0x559a503cd360) at /home/ehabkost/rh/proj/virt/qemu/cpus.c:1743
-> #18 0x0000559a4e83669a in qemu_thread_start (args=<optimized out>) at util/qemu-thread-posix.c:502
-> #19 0x00007f2e4ebf958e in start_thread () at /lib64/libpthread.so.0
-> #20 0x00007f2e4eb266f3 in clone () at /lib64/libc.so.6
+For other reviewers: the only change relative to v1 is the
+"tests/bios-tables-test-allowed-diff.h" hunk, which is new in v2.
 
-See also <https://bugzilla.redhat.com/show_bug.cgi?id=1661940>.
+Acked-by: Laszlo Ersek <lersek@redhat.com>
 
-$ git show 6ab3fc32ea64 -- hw/char/pl011.c
-
-Thanks
 Laszlo
 
