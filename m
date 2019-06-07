@@ -2,49 +2,49 @@ Return-Path: <SRS0=3yEa=UG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 33849C28EBD
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 02:39:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 897FFC28EBD
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 02:44:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EF95D20868
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 02:39:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EF95D20868
+	by mail.kernel.org (Postfix) with ESMTPS id 5981920868
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 02:44:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5981920868
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45592 helo=lists.gnu.org)
+Received: from localhost ([::1]:45612 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hZ4md-0001kz-Rq
-	for qemu-devel@archiver.kernel.org; Thu, 06 Jun 2019 22:39:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48597)
+	id 1hZ4rM-0002sK-Cv
+	for qemu-devel@archiver.kernel.org; Thu, 06 Jun 2019 22:44:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49450)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <eblake@redhat.com>) id 1hZ4lv-0001G3-HO
- for qemu-devel@nongnu.org; Thu, 06 Jun 2019 22:38:28 -0400
+ (envelope-from <eblake@redhat.com>) id 1hZ4qs-0002Ph-5o
+ for qemu-devel@nongnu.org; Thu, 06 Jun 2019 22:43:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1hZ4lu-00031v-I6
- for qemu-devel@nongnu.org; Thu, 06 Jun 2019 22:38:27 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37134)
+ (envelope-from <eblake@redhat.com>) id 1hZ4qr-0002Ya-00
+ for qemu-devel@nongnu.org; Thu, 06 Jun 2019 22:43:34 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56640)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <eblake@redhat.com>)
- id 1hZ4ls-0002yT-7w; Thu, 06 Jun 2019 22:38:24 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ id 1hZ4qo-0002G3-5z; Thu, 06 Jun 2019 22:43:30 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id CACD736883;
- Fri,  7 Jun 2019 02:38:22 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 855A5883D7;
+ Fri,  7 Jun 2019 02:43:12 +0000 (UTC)
 Received: from [10.3.116.85] (ovpn-116-85.phx2.redhat.com [10.3.116.85])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 5A5B380D91;
- Fri,  7 Jun 2019 02:38:19 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id A657C8BE42;
+ Fri,  7 Jun 2019 02:43:06 +0000 (UTC)
 To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
  qemu-devel@nongnu.org, qemu-block@nongnu.org
 References: <20190411172709.205032-1-vsementsov@virtuozzo.com>
- <20190411172709.205032-4-vsementsov@virtuozzo.com>
+ <20190411172709.205032-5-vsementsov@virtuozzo.com>
 From: Eric Blake <eblake@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=eblake@redhat.com; keydata=
@@ -71,22 +71,22 @@ Autocrypt: addr=eblake@redhat.com; keydata=
  Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
  2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
 Organization: Red Hat, Inc.
-Message-ID: <5daebdcd-beb6-acf1-f323-7301f16f0da8@redhat.com>
-Date: Thu, 6 Jun 2019 21:38:18 -0500
+Message-ID: <823c5237-02f9-0c03-2658-6259405f696b@redhat.com>
+Date: Thu, 6 Jun 2019 21:43:05 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190411172709.205032-4-vsementsov@virtuozzo.com>
+In-Reply-To: <20190411172709.205032-5-vsementsov@virtuozzo.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="1aTMscCHw83Q4Y0SzhYkbPAzCQ8VDb06p"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+ boundary="ujPSzc5HW29FQJU8z4seQrYDdzrObrmmy"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.30]); Fri, 07 Jun 2019 02:38:22 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.26]); Fri, 07 Jun 2019 02:43:20 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v6 3/7] block/nbd-client: move from quit to
- state
+Subject: Re: [Qemu-devel] [PATCH v6 4/7] block/nbd: add cmdline and qapi
+ parameter reconnect-delay
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -105,53 +105,99 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---1aTMscCHw83Q4Y0SzhYkbPAzCQ8VDb06p
-Content-Type: multipart/mixed; boundary="Hjdz2Mf2VbqiBGxs15VSuqiD9MnRDO4XS";
+--ujPSzc5HW29FQJU8z4seQrYDdzrObrmmy
+Content-Type: multipart/mixed; boundary="T4QrU399j2v7ZnDEL2oDooB8e0K0ib2PV";
  protected-headers="v1"
 From: Eric Blake <eblake@redhat.com>
 To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
  qemu-devel@nongnu.org, qemu-block@nongnu.org
 Cc: armbru@redhat.com, stefanha@redhat.com, mreitz@redhat.com,
  kwolf@redhat.com, den@openvz.org
-Message-ID: <5daebdcd-beb6-acf1-f323-7301f16f0da8@redhat.com>
-Subject: Re: [PATCH v6 3/7] block/nbd-client: move from quit to state
+Message-ID: <823c5237-02f9-0c03-2658-6259405f696b@redhat.com>
+Subject: Re: [PATCH v6 4/7] block/nbd: add cmdline and qapi parameter
+ reconnect-delay
 References: <20190411172709.205032-1-vsementsov@virtuozzo.com>
- <20190411172709.205032-4-vsementsov@virtuozzo.com>
-In-Reply-To: <20190411172709.205032-4-vsementsov@virtuozzo.com>
+ <20190411172709.205032-5-vsementsov@virtuozzo.com>
+In-Reply-To: <20190411172709.205032-5-vsementsov@virtuozzo.com>
 
---Hjdz2Mf2VbqiBGxs15VSuqiD9MnRDO4XS
+--T4QrU399j2v7ZnDEL2oDooB8e0K0ib2PV
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
 On 4/11/19 12:27 PM, Vladimir Sementsov-Ogievskiy wrote:
-> To implement reconnect we need several states for the client:
-> CONNECTED, QUIT and two different CONNECTING states. CONNECTING states
-> will be added in the following patches. This patch implements CONNECTED=
-
-> and QUIT.
->=20
-> QUIT means, that we should close the connection and fail all current
-> and further requests (like old quit =3D true).
->=20
-> CONNECTED means that connection is ok, we can send requests (like old
-> quit =3D false).
->=20
-> For receiving loop we use a comparison of the current state with QUIT,
-> because reconnect will be in the same loop, so it should be looping
-> until the end.
->=20
-> Opposite, for requests we use a comparison of the current state with
-> CONNECTED, as we don't want to send requests in future CONNECTING
-> states.
+> Reconnect will be implemented in the following commit, so for now,
+> in semantics below, disconnect itself is a "serious error".
 >=20
 > Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 > ---
->  block/nbd-client.h |  7 ++++++-
->  block/nbd-client.c | 51 ++++++++++++++++++++++++++++------------------=
-
->  2 files changed, 37 insertions(+), 21 deletions(-)
+>  qapi/block-core.json | 12 +++++++++++-
+>  block/nbd-client.h   |  1 +
+>  block/nbd-client.c   |  1 +
+>  block/nbd.c          | 16 +++++++++++++++-
+>  4 files changed, 28 insertions(+), 2 deletions(-)
 >=20
+> diff --git a/qapi/block-core.json b/qapi/block-core.json
+> index 7ccbfff9d0..815258bd89 100644
+> --- a/qapi/block-core.json
+> +++ b/qapi/block-core.json
+> @@ -3798,13 +3798,23 @@
+>  #                  traditional "base:allocation" block status (see
+>  #                  NBD_OPT_LIST_META_CONTEXT in the NBD protocol) (sin=
+ce 3.0)
+>  #
+> +# @reconnect-delay: Reconnect delay. On unexpected disconnect, nbd cli=
+ent tries
+> +#                   to connect again, until success or serious error. =
+During
+> +#                   first @reconnect-delay seconds of reconnecting loo=
+p all
+> +#                   requests are paused and have a chance to rerun, if=
+
+> +#                   successful connect occurs during this time. After
+> +#                   @reconnect-delay seconds all delayed requests are =
+failed
+> +#                   and all following requests will be failed too (unt=
+il
+> +#                   successful reconnect). Default 0 (Since 4.1)
+
+Maybe:
+
+On an unexpected disconnect, the nbd client tries to connect again until
+succeeding or encountering a serious error.  During the first
+@reconnect-delay seconds, all requests are paused and will be rerun on a
+successful reconnect. After that time, any delayed requests and all
+future requests before a successful reconnect will immediately fail.
+
+
+> +++ b/block/nbd.c
+> @@ -360,6 +360,18 @@ static QemuOptsList nbd_runtime_opts =3D {
+>              .help =3D "experimental: expose named dirty bitmap in plac=
+e of "
+>                      "block status",
+>          },
+> +        {
+> +            .name =3D "reconnect-delay",
+> +            .type =3D QEMU_OPT_NUMBER,
+> +            .help =3D "Reconnect delay. On unexpected disconnect, nbd =
+client "
+> +                    "tries to connect again, until success or serious =
+error. "
+> +                    "During first @reconnect-delay seconds of reconnec=
+ting "
+> +                    "loop all requests are paused and have a chance to=
+ rerun, "
+> +                    "if successful connect occurs during this time. Af=
+ter"
+> +                    "@reconnect-delay seconds all delayed requests are=
+ failed"
+> +                    "and all following requests will be failed too (un=
+til"
+> +                    "successful reconnect). Default 0",
+
+And of course copy any changes to the QMP text to here.
+
+I can touch up grammar, so if there's no other reason to respin,
 
 Reviewed-by: Eric Blake <eblake@redhat.com>
 
@@ -161,24 +207,24 @@ Red Hat, Inc.           +1-919-301-3226
 Virtualization:  qemu.org | libvirt.org
 
 
---Hjdz2Mf2VbqiBGxs15VSuqiD9MnRDO4XS--
+--T4QrU399j2v7ZnDEL2oDooB8e0K0ib2PV--
 
---1aTMscCHw83Q4Y0SzhYkbPAzCQ8VDb06p
+--ujPSzc5HW29FQJU8z4seQrYDdzrObrmmy
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlz5zhoACgkQp6FrSiUn
-Q2rX9gf+PbTkLDNtSWjBL+3gWALm1TdiC2xx2dmqJlxwDe+Dk8hXpPql+nh7uS/c
-ECNVLlho8efAZ/fwaogPvSbWwrw794PFXQoZmrQbShZCFL3WV7eM5rEssdhxqD2o
-zniNH/VKCR17cHThbnyu8mqlTzcDYQUornzwRCQDH4MALDnNebNu6+bqJyrSB1LU
-0hXj1iJLw73RGoicu3oSsjYxg9KQrUmqCcrg3Srz0FR4OGskB2/xwnrn5zJIstMi
-9jzf2qjqsmurLxpb7rM7Bmz/aa9/BfZtRPQE6DqUGa/3bUSeaV0OLPhUIKsxkLLH
-/v5uS1tVPK6CPEPyVR0JNDesOeJgjg==
-=9EdO
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlz5zzkACgkQp6FrSiUn
+Q2qbUgf9F0R5esX7V3ZlqM4SN7O258tUdyBFrr4k6Uo8iynUhCtZBb90FvTN1eAk
+jXTfAvHYgK9aZE4iZ+LaHuwzrrOfagV0oxqd9LfsNcmza+qTphlsBcq0ck3MZCYw
+VbuYPkBFvDyBTdZT+kmLA0tmoCmGTEcSfGtDkwR71ZMCZ2/B22xrqMMAd9huXluL
+WGqGyO5O83PJrhDRjkqLcHu2W5MNIpU7y0kTkq3EJmwnIElJRTUfyjaMpH/ixWI/
+2kpvDif/jNqhZjX4tg+W/nYVthTtvmLS1/1Wq/LloMG5ReqVPfld62LvH87HaTnm
+cmxfwxGp1BS3J+L8cLmrvddj3ZwpbQ==
+=JB2g
 -----END PGP SIGNATURE-----
 
---1aTMscCHw83Q4Y0SzhYkbPAzCQ8VDb06p--
+--ujPSzc5HW29FQJU8z4seQrYDdzrObrmmy--
 
