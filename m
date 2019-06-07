@@ -2,93 +2,57 @@ Return-Path: <SRS0=3yEa=UG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 19AA0C2BCA1
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 14:26:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C685C2BCA1
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 14:27:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DAEDC20868
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 14:26:05 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ZMwgmAlr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DAEDC20868
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 7486320657
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 14:27:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7486320657
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51706 helo=lists.gnu.org)
+Received: from localhost ([::1]:51720 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hZFoh-00011Y-Dr
-	for qemu-devel@archiver.kernel.org; Fri, 07 Jun 2019 10:26:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48135)
+	id 1hZFpi-0002KV-Na
+	for qemu-devel@archiver.kernel.org; Fri, 07 Jun 2019 10:27:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49464)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <richard.henderson@linaro.org>) id 1hZFSq-0001VX-Rb
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 10:03:29 -0400
+ (envelope-from <mark.rutland@arm.com>) id 1hZFXF-0004Ea-GU
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 10:08:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1hZFSp-0005Q5-W9
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 10:03:28 -0400
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:35651)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1hZFSp-0005Nv-Mu
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 10:03:27 -0400
-Received: by mail-ot1-x342.google.com with SMTP id j19so1948593otq.2
- for <qemu-devel@nongnu.org>; Fri, 07 Jun 2019 07:03:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=nyXT5Ue0Y94DnC8f9elpeDgFvGtk+3tUE33UOb51E+k=;
- b=ZMwgmAlrIYYW7rSenDFYBJCLbG98Wj+c7MGbayAA7K11JsejDhz3YEDNWLbPmOnmnT
- Eo7AIbZz2RZMBS7rARQiq2QIILwH5ux+l1YR5pgZmZqKhFjyCIORFDmuv5NQyuC1PxPg
- CL97L3NLmIw4wjOmmUh8UW4JLoWJ+NA+eSRNnPU7xDWQl/sI/H9IGDQr6LsNSuXkt9lS
- zLoy2ulY32emk1ozBCmDsSyw2BKqh9CGbvkdJTOu0Kqd8j2+fJPmsSHAxrSNiFlWEVVi
- j7XU3cn36NBPpXnfm0sMhCaXukzD35A2oc2jh/5EgZSFeNIoOc1uq+XWrjc/C+lQRGFm
- EA8A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=nyXT5Ue0Y94DnC8f9elpeDgFvGtk+3tUE33UOb51E+k=;
- b=rVr43rNF1FlD3VP3860z5E96FCrTTfwHkD7AeTxYC6SFD/T4lxR19MpwuS5bluJO3c
- kQgi+1GhMl7aosf533nx7izNThzvL2eQR0nX7izjhMlIbcCLJh3FfEovQ8emP77G4XpU
- cB609QdW2jWZXc9IfdlfbmeO4WNAsMjKBDZVLqrUxRKkAnRI6bYDj1VNROwtZOiHqQ8+
- UmUFyA3l5M8x1E/OQ3n5UEbyeZYq/q5v/3q2nhCM7M28JaZFlLctZRVsaQDYCs1hO7GD
- HDMBsdrQWwFSf8/wd5ZNdTTEVzyWuvJiVGNwYceqKI61/j0RYGQlT8YgzobE5V1+HH9q
- N1bQ==
-X-Gm-Message-State: APjAAAX0ZEXhIn6enX4ZLid2dO+wHK+eYZBNq3XqRDEpntelIgyLxftO
- QGJ6+6vHMYf5AYx+6j4S4yq2Gw==
-X-Google-Smtp-Source: APXvYqzHAOn39yNWWFF4TJa3G2nWlD/8MmsqJ0N8RhWlUUApqWJZnmZwONwaAaiJ9K7OFnMdn95FGg==
-X-Received: by 2002:a9d:7190:: with SMTP id o16mr18850130otj.78.1559916206009; 
- Fri, 07 Jun 2019 07:03:26 -0700 (PDT)
-Received: from [192.168.3.43] (200-56-192-86-cable.cybercable.net.mx.
- [200.56.192.86])
- by smtp.gmail.com with ESMTPSA id w18sm724788oiw.24.2019.06.07.07.03.24
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Fri, 07 Jun 2019 07:03:25 -0700 (PDT)
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Yoshinori Sato <ysato@users.sourceforge.jp>, qemu-devel@nongnu.org
-References: <20190607091116.49044-1-ysato@users.sourceforge.jp>
- <20190607091116.49044-17-ysato@users.sourceforge.jp>
- <6e4b77b4-f05c-74e8-e128-1555ead951fc@redhat.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <04a5b9b8-7b33-5ad9-f8e1-f5752ec97607@linaro.org>
-Date: Fri, 7 Jun 2019 09:03:22 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ (envelope-from <mark.rutland@arm.com>) id 1hZFX9-00067r-8E
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 10:07:58 -0400
+Received: from foss.arm.com ([217.140.110.172]:39408)
+ by eggs.gnu.org with esmtp (Exim 4.71)
+ (envelope-from <mark.rutland@arm.com>)
+ id 1hZFWm-0005Qp-Km; Fri, 07 Jun 2019 10:07:32 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B0300337;
+ Fri,  7 Jun 2019 07:07:28 -0700 (PDT)
+Received: from lakrids.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com
+ [10.121.207.14])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 0A0583F71A;
+ Fri,  7 Jun 2019 07:07:27 -0700 (PDT)
+Date: Fri, 7 Jun 2019 15:07:21 +0100
+From: Mark Rutland <mark.rutland@arm.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Message-ID: <20190607140720.GA18706@lakrids.cambridge.arm.com>
+References: <20190516144733.32399-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <6e4b77b4-f05c-74e8-e128-1555ead951fc@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::342
-Subject: Re: [Qemu-devel] [PATCH v17 16/24] Add rx-softmmu
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190516144733.32399-1-peter.maydell@linaro.org>
+User-Agent: Mutt/1.11.1+11 (2f07cb52) (2018-12-01)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 217.140.110.172
+Subject: Re: [Qemu-devel] [PATCH v2 0/4] hw/arm/boot: handle large Images
+ more gracefully
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,30 +64,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org
+Cc: qemu-arm@nongnu.org, Richard Henderson <richard.henderson@linaro.org>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/7/19 8:44 AM, Philippe Mathieu-Daudé wrote:
-> Again:
+Hi Peter,
+
+Sorry for the delay in replying to this...
+
+On Thu, May 16, 2019 at 03:47:29PM +0100, Peter Maydell wrote:
 > 
-> Please squash in:
+> This patchset attempts to fix https://bugs.launchpad.net/qemu/+bug/1823998
+> which reports that we don't handle kernels larger than 128MB
+> correctly, because we allow the initrd to be placed over the
+> tail end of the kernel. AArch64 kernel Image files (since v3.17)
+> report the total size they require (including any BSS area that
+> isn't in the Image itself), so we can use that to be sure we
+> place the initrd sufficiently far into the RAM.
 > 
-> -- >8 --
-> --- a/include/exec/poison.h
-> +++ b/include/exec/poison.h
-> @@ -26,6 +26,7 @@
->  #pragma GCC poison TARGET_PPC
->  #pragma GCC poison TARGET_PPC64
->  #pragma GCC poison TARGET_ABI32
-> +#pragma GCC poison TARGET_RX
->  #pragma GCC poison TARGET_S390X
->  #pragma GCC poison TARGET_SH4
->  #pragma GCC poison TARGET_SPARC
+> Patches 1 and 2 are new since v1; patches 3 and 4 are the old
+> patches 1 and 2 (and are basically unchanged since v1).
+> 
+> Patches 1 and 2 in this series are new. Patch 1 fixes bugs
+> in the existing code where we were assuming that we could
+> treat info->ram_size as the address of the end of RAM, which
+> isn't true if the RAM doesn't start at address 0. (This
+> generally went unnoticed thanks to the magic of unsigned integer
+> underflow turning end-start calculations into very large max_size
+> values for load_ramdisk_as() and friends.)
+> Patch 2 adds some explicit checks that we don't try to put things
+> entirely off the end of RAM (which avoids those accidental
+> underflows).
+> Patch 3 in this series adjusts our "where do we put the initrd"
+> heuristic so that it always places it at least after whatever
+> our best guess at the kernel size is. (This might still not
+> be right for images like self-decompressing 32-bit kernels, where
+> there's no way to know how big the kernel will be after
+> decompression.)
+> Patch 4 makes load_aarch64_image() return the
+> kernel size as indicated in the Image file header, so that for
+> the specific case of AArch64 Image files we will definitely not
+> put the initrd on top of them.
 
-Done.  Any I've picked up all of your r-b tags.
+With all 4 patches applied, I'm able to boot kernels with large BSS
+segments (~128M, ~512M, and ~1G), and I get sensible warnings when they
+are impossible to boot, e.g.
 
+# 124M of RAM
+[mark@gravadlaks:~/repro]% ./vmboot.sh ~/Image.test-128M
+qemu-system-aarch64: kernel '/home/mark/Image.test-128M' is too large to fit in RAM (kernel size 155500544, RAM size 130023424)
 
-r~
+# 150M of RAM
+[mark@gravadlaks:~/repro]% ./vmboot.sh ~/Image.test-128M
+qemu-system-aarch64: Not enough space for DTB after kernel/initrd
+
+So feel free to add:
+
+Tested-by: Mark Rutland <mark.rutland@arm.com>
+
+Thanks for putting this together; this is _really_ useful for my testing
+setup, and the warnings above are likely to save people a lot of
+head-scratching in future. It would be great to see this merged. :)
+
+Thanks,
+Mark.
 
