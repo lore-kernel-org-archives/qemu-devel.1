@@ -2,59 +2,90 @@ Return-Path: <SRS0=3yEa=UG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CB7E3C2BCA1
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 10:43:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 08957C2BCA1
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 10:43:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A00CD20B7C
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 10:43:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A00CD20B7C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id CA0CA20B7C
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 10:43:46 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="NJUXJiWY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CA0CA20B7C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48182 helo=lists.gnu.org)
+Received: from localhost ([::1]:48184 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hZCLG-0007Qe-Ti
-	for qemu-devel@archiver.kernel.org; Fri, 07 Jun 2019 06:43:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54514)
+	id 1hZCLa-0007So-2F
+	for qemu-devel@archiver.kernel.org; Fri, 07 Jun 2019 06:43:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48598)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <cohuck@redhat.com>) id 1hZBYV-0001qF-DF
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 05:53:04 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1hZBGG-0000WN-9l
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 05:34:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <cohuck@redhat.com>) id 1hZBYR-0000g0-SJ
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 05:53:03 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55510)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <cohuck@redhat.com>)
- id 1hZBYR-0000Iy-HP; Fri, 07 Jun 2019 05:52:59 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id B08A7C04AC69;
- Fri,  7 Jun 2019 09:52:43 +0000 (UTC)
-Received: from localhost (dhcp-192-191.str.redhat.com [10.33.192.191])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 3A9538274F;
- Fri,  7 Jun 2019 09:52:43 +0000 (UTC)
-From: Cornelia Huck <cohuck@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri,  7 Jun 2019 11:52:04 +0200
-Message-Id: <20190607095237.11364-3-cohuck@redhat.com>
-In-Reply-To: <20190607095237.11364-1-cohuck@redhat.com>
-References: <20190607095237.11364-1-cohuck@redhat.com>
+ (envelope-from <alex.bennee@linaro.org>) id 1hZBGE-0004I7-FE
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 05:34:11 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:34378)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1hZBGC-0003iH-8U
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 05:34:08 -0400
+Received: by mail-wm1-x341.google.com with SMTP id w9so3649100wmd.1
+ for <qemu-devel@nongnu.org>; Fri, 07 Jun 2019 02:33:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=1V0A3lLlFR+/W3I7GyrZzT1wbmEG8To+8XsecQQAU4s=;
+ b=NJUXJiWYFgmT51A9TGkaBXTbdR3xJ7ohzKIlL7LjBHZYbdc/UnK5rRMQ33AIFCEAws
+ l2j/5K/62IIyuJuNejDWpHu0CVpCOpTmywLJmtzU4LOlrSxQf0xZ0FnSfmWpspP2ehIV
+ +cAydtGz9uwx19ZBa9lLiYfryJUmK13bvpjJMaypuJLctVCb24FPjJi1qWfDdqcrIvcZ
+ xlmVoXme8JGnH5153asJLvLB3Tswyx84iJXcayjsj3LISEi6SmFkAbspKlil5sI2k6i3
+ db1dOXWBOYRS0h9bNKWGGFmp+HbXKSi8kBD6sx6PWxwp6DT/blSDXUUyplT88t0R+hcJ
+ GxWg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=1V0A3lLlFR+/W3I7GyrZzT1wbmEG8To+8XsecQQAU4s=;
+ b=HGcvtpRo3ON9DcqCZHPoUKvtv5TM5c3oLDFrQBNkikijGnyZJ3d0lhH01y8kh/JAPY
+ jKtacgAaDfbvpN2WWBmwvFk29m4FxBrgFVgf3oDAUrjTZHsHRyvz6xvqRgzc/uYP5UmZ
+ VteHs1lmZmql9IyZk/nwRrF/cKu0iWzoeIN0jDiaKsUSYIC6+sSl4td3rDXmkzif4JJV
+ mcjSVk5W8Hfzs7XeA+as0XEVi0f4FcUutPa3xLlXHoCN/SNeAs9zuJC/HdwQ+RZJEzwz
+ 3NofV0KVq/9ukuRgGbhLe2WQB1aYDuY3zFyqZGMjivXSCwnay5mlfcld41eMmosDT3Pi
+ 8NxQ==
+X-Gm-Message-State: APjAAAWkIsZorHxLGfAS2YcqS0GuRdUkCJ/xF6LpTp0QK04HQUkhB3Dn
+ JGTrR8mi96/nYKG3M4g2odEOn+V9kPo=
+X-Google-Smtp-Source: APXvYqyvpV36/Xqqn/iIfM40pCHnRNfIN9YRWMVDawEXUAS5uNYDqcEbTmeiioztzmMWWV2ls8Xthw==
+X-Received: by 2002:a1c:cfc3:: with SMTP id f186mr2719646wmg.134.1559900030739; 
+ Fri, 07 Jun 2019 02:33:50 -0700 (PDT)
+Received: from zen.linaroharston ([81.128.185.34])
+ by smtp.gmail.com with ESMTPSA id c7sm1483173wrp.57.2019.06.07.02.33.49
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Fri, 07 Jun 2019 02:33:49 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 9BEB51FF8C;
+ Fri,  7 Jun 2019 10:33:49 +0100 (BST)
+References: <20190530101603.22254-1-alex.bennee@linaro.org>
+ <20190530101603.22254-4-alex.bennee@linaro.org>
+User-agent: mu4e 1.3.2; emacs 26.1
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+In-reply-to: <20190530101603.22254-4-alex.bennee@linaro.org>
+Date: Fri, 07 Jun 2019 10:33:49 +0100
+Message-ID: <87imthsps2.fsf@zen.linaroharston>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.31]); Fri, 07 Jun 2019 09:52:43 +0000 (UTC)
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 02/35] vfio-ccw: support async command subregion
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::341
+Subject: Re: [Qemu-devel] [PATCH v1 03/26] tests: Run the iotests during
+ "make check" again
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -66,263 +97,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eric Farman <farman@linux.ibm.com>, qemu-s390x@nongnu.org,
- Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org
+Cc: Thomas Huth <thuth@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-A vfio-ccw device may provide an async command subregion for
-issuing halt/clear subchannel requests. If it is present, use
-it for sending halt/clear request to the device; if not, fall
-back to emulation (as done today).
 
-Message-Id: <20190507154733.28604-3-cohuck@redhat.com>
-Reviewed-by: Eric Farman <farman@linux.ibm.com>
-Signed-off-by: Cornelia Huck <cohuck@redhat.com>
----
- hw/s390x/css.c              |  27 +++++++--
- hw/vfio/ccw.c               | 110 +++++++++++++++++++++++++++++++++++-
- include/hw/s390x/s390-ccw.h |   3 +
- 3 files changed, 134 insertions(+), 6 deletions(-)
+Alex Benn=C3=A9e <alex.bennee@linaro.org> writes:
 
-diff --git a/hw/s390x/css.c b/hw/s390x/css.c
-index ad310b9f94bc..18d38de39a17 100644
---- a/hw/s390x/css.c
-+++ b/hw/s390x/css.c
-@@ -22,6 +22,7 @@
- #include "trace.h"
- #include "hw/s390x/s390_flic.h"
- #include "hw/s390x/s390-virtio-ccw.h"
-+#include "hw/s390x/s390-ccw.h"
-=20
- typedef struct CrwContainer {
-     CRW crw;
-@@ -1205,6 +1206,26 @@ static void sch_handle_start_func_virtual(SubchDev=
- *sch)
-=20
- }
-=20
-+static void sch_handle_halt_func_passthrough(SubchDev *sch)
-+{
-+    int ret;
-+
-+    ret =3D vfio_ccw_handle_halt(sch);
-+    if (ret =3D=3D -ENOSYS) {
-+        sch_handle_halt_func(sch);
-+    }
-+}
-+
-+static void sch_handle_clear_func_passthrough(SubchDev *sch)
-+{
-+    int ret;
-+
-+    ret =3D vfio_ccw_handle_clear(sch);
-+    if (ret =3D=3D -ENOSYS) {
-+        sch_handle_clear_func(sch);
-+    }
-+}
-+
- static IOInstEnding sch_handle_start_func_passthrough(SubchDev *sch)
- {
-     SCHIB *schib =3D &sch->curr_status;
-@@ -1244,11 +1265,9 @@ IOInstEnding do_subchannel_work_passthrough(SubchD=
-ev *sch)
-     SCHIB *schib =3D &sch->curr_status;
-=20
-     if (schib->scsw.ctrl & SCSW_FCTL_CLEAR_FUNC) {
--        /* TODO: Clear handling */
--        sch_handle_clear_func(sch);
-+        sch_handle_clear_func_passthrough(sch);
-     } else if (schib->scsw.ctrl & SCSW_FCTL_HALT_FUNC) {
--        /* TODO: Halt handling */
--        sch_handle_halt_func(sch);
-+        sch_handle_halt_func_passthrough(sch);
-     } else if (schib->scsw.ctrl & SCSW_FCTL_START_FUNC) {
-         return sch_handle_start_func_passthrough(sch);
-     }
-diff --git a/hw/vfio/ccw.c b/hw/vfio/ccw.c
-index d9e39552e237..db97593196ad 100644
---- a/hw/vfio/ccw.c
-+++ b/hw/vfio/ccw.c
-@@ -2,9 +2,12 @@
-  * vfio based subchannel assignment support
-  *
-  * Copyright 2017 IBM Corp.
-+ * Copyright 2019 Red Hat, Inc.
-+ *
-  * Author(s): Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-  *            Xiao Feng Ren <renxiaof@linux.vnet.ibm.com>
-  *            Pierre Morel <pmorel@linux.vnet.ibm.com>
-+ *            Cornelia Huck <cohuck@redhat.com>
-  *
-  * This work is licensed under the terms of the GNU GPL, version 2 or (a=
-t
-  * your option) any later version. See the COPYING file in the top-level
-@@ -32,6 +35,9 @@ struct VFIOCCWDevice {
-     uint64_t io_region_size;
-     uint64_t io_region_offset;
-     struct ccw_io_region *io_region;
-+    uint64_t async_cmd_region_size;
-+    uint64_t async_cmd_region_offset;
-+    struct ccw_cmd_region *async_cmd_region;
-     EventNotifier io_notifier;
-     bool force_orb_pfch;
-     bool warned_orb_pfch;
-@@ -114,6 +120,87 @@ again:
-     }
- }
-=20
-+int vfio_ccw_handle_clear(SubchDev *sch)
-+{
-+    S390CCWDevice *cdev =3D sch->driver_data;
-+    VFIOCCWDevice *vcdev =3D DO_UPCAST(VFIOCCWDevice, cdev, cdev);
-+    struct ccw_cmd_region *region =3D vcdev->async_cmd_region;
-+    int ret;
-+
-+    if (!vcdev->async_cmd_region) {
-+        /* Async command region not available, fall back to emulation */
-+        return -ENOSYS;
-+    }
-+
-+    memset(region, 0, sizeof(*region));
-+    region->command =3D VFIO_CCW_ASYNC_CMD_CSCH;
-+
-+again:
-+    ret =3D pwrite(vcdev->vdev.fd, region,
-+                 vcdev->async_cmd_region_size, vcdev->async_cmd_region_o=
-ffset);
-+    if (ret !=3D vcdev->async_cmd_region_size) {
-+        if (errno =3D=3D EAGAIN) {
-+            goto again;
-+        }
-+        error_report("vfio-ccw: write cmd region failed with errno=3D%d"=
-, errno);
-+        ret =3D -errno;
-+    } else {
-+        ret =3D region->ret_code;
-+    }
-+    switch (ret) {
-+    case 0:
-+    case -ENODEV:
-+    case -EACCES:
-+        return 0;
-+    case -EFAULT:
-+    default:
-+        sch_gen_unit_exception(sch);
-+        css_inject_io_interrupt(sch);
-+        return 0;
-+    }
-+}
-+
-+int vfio_ccw_handle_halt(SubchDev *sch)
-+{
-+    S390CCWDevice *cdev =3D sch->driver_data;
-+    VFIOCCWDevice *vcdev =3D DO_UPCAST(VFIOCCWDevice, cdev, cdev);
-+    struct ccw_cmd_region *region =3D vcdev->async_cmd_region;
-+    int ret;
-+
-+    if (!vcdev->async_cmd_region) {
-+        /* Async command region not available, fall back to emulation */
-+        return -ENOSYS;
-+    }
-+
-+    memset(region, 0, sizeof(*region));
-+    region->command =3D VFIO_CCW_ASYNC_CMD_HSCH;
-+
-+again:
-+    ret =3D pwrite(vcdev->vdev.fd, region,
-+                 vcdev->async_cmd_region_size, vcdev->async_cmd_region_o=
-ffset);
-+    if (ret !=3D vcdev->async_cmd_region_size) {
-+        if (errno =3D=3D EAGAIN) {
-+            goto again;
-+        }
-+        error_report("vfio-ccw: write cmd region failed with errno=3D%d"=
-, errno);
-+        ret =3D -errno;
-+    } else {
-+        ret =3D region->ret_code;
-+    }
-+    switch (ret) {
-+    case 0:
-+    case -EBUSY:
-+    case -ENODEV:
-+    case -EACCES:
-+        return 0;
-+    case -EFAULT:
-+    default:
-+        sch_gen_unit_exception(sch);
-+        css_inject_io_interrupt(sch);
-+        return 0;
-+    }
-+}
-+
- static void vfio_ccw_reset(DeviceState *dev)
- {
-     CcwDevice *ccw_dev =3D DO_UPCAST(CcwDevice, parent_obj, dev);
-@@ -287,9 +374,13 @@ static void vfio_ccw_get_region(VFIOCCWDevice *vcdev=
-, Error **errp)
-         return;
-     }
-=20
-+    /*
-+     * We always expect at least the I/O region to be present. We also
-+     * may have a variable number of regions governed by capabilities.
-+     */
-     if (vdev->num_regions < VFIO_CCW_CONFIG_REGION_INDEX + 1) {
--        error_setg(errp, "vfio: Unexpected number of the I/O region %u",
--                   vdev->num_regions);
-+        error_setg(errp, "vfio: too few regions (%u), expected at least =
-%u",
-+                   vdev->num_regions, VFIO_CCW_CONFIG_REGION_INDEX + 1);
-         return;
-     }
-=20
-@@ -309,11 +400,26 @@ static void vfio_ccw_get_region(VFIOCCWDevice *vcde=
-v, Error **errp)
-     vcdev->io_region_offset =3D info->offset;
-     vcdev->io_region =3D g_malloc0(info->size);
-=20
-+    /* check for the optional async command region */
-+    ret =3D vfio_get_dev_region_info(vdev, VFIO_REGION_TYPE_CCW,
-+                                   VFIO_REGION_SUBTYPE_CCW_ASYNC_CMD, &i=
-nfo);
-+    if (!ret) {
-+        vcdev->async_cmd_region_size =3D info->size;
-+        if (sizeof(*vcdev->async_cmd_region) !=3D vcdev->async_cmd_regio=
-n_size) {
-+            error_setg(errp, "vfio: Unexpected size of the async cmd reg=
-ion");
-+            g_free(info);
-+            return;
-+        }
-+        vcdev->async_cmd_region_offset =3D info->offset;
-+        vcdev->async_cmd_region =3D g_malloc0(info->size);
-+    }
-+
-     g_free(info);
- }
-=20
- static void vfio_ccw_put_region(VFIOCCWDevice *vcdev)
- {
-+    g_free(vcdev->async_cmd_region);
-     g_free(vcdev->io_region);
- }
-=20
-diff --git a/include/hw/s390x/s390-ccw.h b/include/hw/s390x/s390-ccw.h
-index 901d805d79a3..e9c7e1db5761 100644
---- a/include/hw/s390x/s390-ccw.h
-+++ b/include/hw/s390x/s390-ccw.h
-@@ -37,4 +37,7 @@ typedef struct S390CCWDeviceClass {
-     IOInstEnding (*handle_request) (SubchDev *sch);
- } S390CCWDeviceClass;
-=20
-+int vfio_ccw_handle_clear(SubchDev *sch);
-+int vfio_ccw_handle_halt(SubchDev *sch);
-+
- #endif
---=20
-2.20.1
+> From: Thomas Huth <thuth@redhat.com>
+>
+> People often forget to run the iotests before submitting patches or
+> pull requests - this is likely due to the fact that we do not run the
+> tests during our mandatory "make check" tests yet. Now that we've got
+> a proper "auto" group of iotests that should be fine to run in every
+> environment, we can enable the iotests during "make check" again by
+> running the "auto" tests by default from the check-block.sh script.
+>
+> Some cases still need to be checked first, though: iotests need bash
+> and GNU sed (otherwise they fail), and if gprof is enabled, it spoils
+> the output of some test cases causing them to fail. So if we detect
+> that one of the required programs is missing or that gprof is enabled,
+> we still have to skip the iotests to avoid failures.
 
+Thomas,
+
+I've dropped this from the latest PR because I'm still seeing problems
+in some places. One of the issues is tests failing when the underlying
+file system doesn't support O_DIRECT. Some tests seem to have explicit
+feature checks for this but others just fail.
+
+--
+Alex Benn=C3=A9e
 
