@@ -2,89 +2,59 @@ Return-Path: <SRS0=3yEa=UG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 555F6C2BCA1
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 10:53:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 86C1AC468BD
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 10:54:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 21395208E3
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 10:53:20 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="aEuG+GzN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 21395208E3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 53945212F5
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 10:54:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 53945212F5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48286 helo=lists.gnu.org)
+Received: from localhost ([::1]:48300 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hZCUp-00088X-DD
-	for qemu-devel@archiver.kernel.org; Fri, 07 Jun 2019 06:53:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50991)
+	id 1hZCW4-0001I4-Sp
+	for qemu-devel@archiver.kernel.org; Fri, 07 Jun 2019 06:54:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54772)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <alex.bennee@linaro.org>) id 1hZBOM-0007e4-Ai
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 05:42:35 -0400
+ (envelope-from <cohuck@redhat.com>) id 1hZBYf-00024f-S8
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 05:53:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1hZBOK-0000pO-G7
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 05:42:34 -0400
-Received: from mail-wr1-x42c.google.com ([2a00:1450:4864:20::42c]:36569)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1hZBOK-0000lE-8j
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 05:42:32 -0400
-Received: by mail-wr1-x42c.google.com with SMTP id n4so1476650wrs.3
- for <qemu-devel@nongnu.org>; Fri, 07 Jun 2019 02:42:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=oJrbPHU6QMM17Z/P//VMEjEn9UEe0UK4q9allOg3/go=;
- b=aEuG+GzNMS4QTFB6KF60Z6oNGIGC5YokL7OlScAPDZ1vFIpphysthLUMfyt3CUp9ha
- 72G3QpoEfhmjpxwxyvGU8zkZNOpBscbf4yI5vAHBXE8CgKPhJlGAh0e1MNV3nNYvVhR9
- jfNMmTwf3QRKLyDWaSWWEbSjFIEF6zmKSZq8nkikJLCwURHbiPTHX+8JYfvFL8thLwE3
- MmyAwbcLwWl8iRQEt1t57BC5eB/eKgkCSAoSDqU+EKHcqf5I2p1H7ZYmMyFhLIcXQbM1
- jn7HNakEdNSu2RMABuJxvR+ydO00izMXZ5r1613ALvYMacptQbXX4H9GbmpS/lFOAxxc
- qiTA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=oJrbPHU6QMM17Z/P//VMEjEn9UEe0UK4q9allOg3/go=;
- b=iC15ZwkUY6kwL5WY2RmmfsAVcM6x47v7y02lAIHZEx8CTLevPIMwPdqp6/ZK3mOz/l
- 4Wc7xcaSfr7RIGuVQVbjTdvmT6Qv3ZmbTdu395TrjdmZt+W8N03Uanzel099WO1CrDfd
- MxMkIAT2n76MDQbt/TyCxFEVbkd/Vzj7Hg8676b1vFmOMicCUBP3K+zPaSyYa9a/z/e5
- 4xGP8AAUr9vpP3Nfw7guGzPUlULSPHIz8fKMiHoP2elUDspPnmLYH1MKccMMrvZRdXUg
- eJTcKv54ekIbhF/TY9j+1kX0zhwsFHbj0N5vEAed5fleoI0Ty19ycr+XqIIiy8ZTfscC
- QovQ==
-X-Gm-Message-State: APjAAAUK/xj98VNQYyptqKw7V9uF0NZmv9J5PI9cDwUGGluDNMxunjlE
- 4PbTjySXuD2+Cd2sUKt25rzzvA==
-X-Google-Smtp-Source: APXvYqzXu68gJ9cQ2zSxQ0MCz9iGNHDpKQQLClmj4OXsPVqHGi3NgU3Hv3TTFevVrn1JbXB+G8upxw==
-X-Received: by 2002:a5d:6583:: with SMTP id q3mr35571326wru.184.1559900549537; 
- Fri, 07 Jun 2019 02:42:29 -0700 (PDT)
-Received: from zen.linaroharston ([81.128.185.34])
- by smtp.gmail.com with ESMTPSA id k184sm2078868wmk.0.2019.06.07.02.42.28
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Fri, 07 Jun 2019 02:42:28 -0700 (PDT)
-Received: from zen.linaroharston. (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id EEA631FF9C;
- Fri,  7 Jun 2019 10:05:52 +0100 (BST)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: peter.maydell@linaro.org
-Date: Fri,  7 Jun 2019 10:05:11 +0100
-Message-Id: <20190607090552.12434-13-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190607090552.12434-1-alex.bennee@linaro.org>
-References: <20190607090552.12434-1-alex.bennee@linaro.org>
+ (envelope-from <cohuck@redhat.com>) id 1hZBYd-000183-7w
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 05:53:13 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45018)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <cohuck@redhat.com>)
+ id 1hZBYc-00014M-6X; Fri, 07 Jun 2019 05:53:11 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 0EE24356DB;
+ Fri,  7 Jun 2019 09:53:06 +0000 (UTC)
+Received: from localhost (dhcp-192-191.str.redhat.com [10.33.192.191])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 66A0A5BBC1;
+ Fri,  7 Jun 2019 09:53:05 +0000 (UTC)
+From: Cornelia Huck <cohuck@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri,  7 Jun 2019 11:52:11 +0200
+Message-Id: <20190607095237.11364-10-cohuck@redhat.com>
+In-Reply-To: <20190607095237.11364-1-cohuck@redhat.com>
+References: <20190607095237.11364-1-cohuck@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::42c
-Subject: [Qemu-devel] [PULL 12/52] scripts: use git archive in archive-source
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.30]); Fri, 07 Jun 2019 09:53:06 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PULL 09/35] s390x: Use uint64_t for vector registers
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,127 +66,471 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Thomas Huth <thuth@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: qemu-s390x@nongnu.org, Richard Henderson <richard.henderson@linaro.org>,
+ qemu-devel@nongnu.org, David Hildenbrand <david@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Gerd Hoffmann <kraxel@redhat.com>
+From: David Hildenbrand <david@redhat.com>
 
-Use git archive to create tarballs of qemu and submodules instead of
-cloning the repository and the submodules.  This is a order of magnitude
-faster because it doesn't fetch the submodules from the internet each
-time the script runs.
+CPU_DoubleU is primarily used to reinterpret between integer and floats.
+We don't really need this functionality. So let's just keep it simple
+and use an uint64_t.
 
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-Tested-by: Thomas Huth <thuth@redhat.com>
-Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-Id: <20190520124716.30472-2-kraxel@redhat.com>
-[AJB: fixed up tabs]
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: David Hildenbrand <david@redhat.com>
+---
+ linux-user/s390x/signal.c  |   4 +-
+ target/s390x/arch_dump.c   |   8 +--
+ target/s390x/cpu.h         |   4 +-
+ target/s390x/excp_helper.c |   6 +-
+ target/s390x/gdbstub.c     |  16 ++---
+ target/s390x/helper.c      |  10 +--
+ target/s390x/kvm.c         |  16 ++---
+ target/s390x/machine.c     | 128 ++++++++++++++++++-------------------
+ target/s390x/translate.c   |   2 +-
+ 9 files changed, 97 insertions(+), 97 deletions(-)
 
-diff --git a/scripts/archive-source.sh b/scripts/archive-source.sh
-index 8b89948260..ca94e49978 100755
---- a/scripts/archive-source.sh
-+++ b/scripts/archive-source.sh
-@@ -19,16 +19,25 @@ if test $# -lt 1; then
- fi
- 
- tar_file=$(realpath "$1")
--list_file="${tar_file}.list"
--vroot_dir="${tar_file}.vroot"
-+sub_tdir=$(mktemp -d "${tar_file%.tar}.sub.XXXXXXXX")
-+sub_file="${sub_tdir}/submodule.tar"
- 
- # We want a predictable list of submodules for builds, that is
- # independent of what the developer currently has initialized
- # in their checkout, because the build environment is completely
- # different to the host OS.
- submodules="dtc slirp ui/keycodemapdb tests/fp/berkeley-softfloat-3 tests/fp/berkeley-testfloat-3"
-+sub_deinit=""
- 
--trap "status=$?; rm -rf \"$list_file\" \"$vroot_dir\"; exit \$status" 0 1 2 3 15
-+function cleanup() {
-+    local status=$?
-+    rm -rf "$sub_tdir"
-+    if test "$sub_deinit" != ""; then
-+        git submodule deinit $sub_deinit
-+    fi
-+    exit $status
-+}
-+trap "cleanup" 0 1 2 3 15
- 
- if git diff-index --quiet HEAD -- &>/dev/null
- then
-@@ -36,45 +45,26 @@ then
- else
-     HEAD=$(git stash create)
- fi
--git clone --shared . "$vroot_dir"
--test $? -ne 0 && error "failed to clone into '$vroot_dir'"
--for sm in $submodules; do
--    if test -d "$sm/.git"
--    then
--       git clone --shared "$sm" "$vroot_dir/$sm"
--       test $? -ne 0 && error "failed to clone submodule $sm"
--    fi
--done
--
--cd "$vroot_dir"
--test $? -ne 0 && error "failed to change into '$vroot_dir'"
--
--git checkout $HEAD
--test $? -ne 0 && error "failed to checkout $HEAD revision"
- 
-+git archive --format tar $HEAD > "$tar_file"
-+test $? -ne 0 && error "failed to archive qemu"
- for sm in $submodules; do
--    git submodule update --init $sm
--    test $? -ne 0 && error "failed to init submodule $sm"
-+    status="$(git submodule status "$sm")"
-+    smhash="${status#[ +-]}"
-+    smhash="${smhash%% *}"
-+    case "$status" in
-+        -*)
-+            sub_deinit="$sub_deinit $sm"
-+            git submodule update --init "$sm"
-+            test $? -ne 0 && error "failed to update submodule $sm"
-+            ;;
-+        +*)
-+            echo "WARNING: submodule $sm is out of sync"
-+            ;;
-+    esac
-+    (cd $sm; git archive --format tar --prefix "$sm/" $smhash) > "$sub_file"
-+    test $? -ne 0 && error "failed to archive submodule $sm ($smhash)"
-+    tar --concatenate --file "$tar_file" "$sub_file"
-+    test $? -ne 0 && error "failed append submodule $sm to $tar_file"
- done
--
--if test -n "$submodules"; then
--    {
--        git ls-files || error "git ls-files failed"
--        for sm in $submodules; do
--            (cd $sm; git ls-files) | sed "s:^:$sm/:"
--            if test "${PIPESTATUS[*]}" != "0 0"; then
--                error "git ls-files in submodule $sm failed"
--            fi
--        done
--    } | grep -x -v $(for sm in $submodules; do echo "-e $sm"; done) > "$list_file"
--else
--    git ls-files > "$list_file"
--fi
--
--if test $? -ne 0; then
--    error "failed to generate list file"
--fi
--
--tar -cf "$tar_file" -T "$list_file" || error "failed to create tar file"
--
- exit 0
--- 
+diff --git a/linux-user/s390x/signal.c b/linux-user/s390x/signal.c
+index 3d3cb67bbe15..ecfa2a14a982 100644
+--- a/linux-user/s390x/signal.c
++++ b/linux-user/s390x/signal.c
+@@ -123,7 +123,7 @@ static void save_sigregs(CPUS390XState *env, target_s=
+igregs *sregs)
+      */
+     //save_fp_regs(&current->thread.fp_regs); FIXME
+     for (i =3D 0; i < 16; i++) {
+-        __put_user(get_freg(env, i)->ll, &sregs->fpregs.fprs[i]);
++        __put_user(*get_freg(env, i), &sregs->fpregs.fprs[i]);
+     }
+ }
+=20
+@@ -254,7 +254,7 @@ restore_sigregs(CPUS390XState *env, target_sigregs *s=
+c)
+         __get_user(env->aregs[i], &sc->regs.acrs[i]);
+     }
+     for (i =3D 0; i < 16; i++) {
+-        __get_user(get_freg(env, i)->ll, &sc->fpregs.fprs[i]);
++        __get_user(*get_freg(env, i), &sc->fpregs.fprs[i]);
+     }
+=20
+     return err;
+diff --git a/target/s390x/arch_dump.c b/target/s390x/arch_dump.c
+index c9ef0a6e60d2..50fa0ae4b679 100644
+--- a/target/s390x/arch_dump.c
++++ b/target/s390x/arch_dump.c
+@@ -104,7 +104,7 @@ static void s390x_write_elf64_fpregset(Note *note, S3=
+90CPU *cpu, int id)
+     note->hdr.n_type =3D cpu_to_be32(NT_FPREGSET);
+     note->contents.fpregset.fpc =3D cpu_to_be32(cpu->env.fpc);
+     for (i =3D 0; i <=3D 15; i++) {
+-        note->contents.fpregset.fprs[i] =3D cpu_to_be64(get_freg(cs, i)-=
+>ll);
++        note->contents.fpregset.fprs[i] =3D cpu_to_be64(*get_freg(cs, i)=
+);
+     }
+ }
+=20
+@@ -114,7 +114,7 @@ static void s390x_write_elf64_vregslo(Note *note, S39=
+0CPU *cpu,  int id)
+=20
+     note->hdr.n_type =3D cpu_to_be32(NT_S390_VXRS_LOW);
+     for (i =3D 0; i <=3D 15; i++) {
+-        note->contents.vregslo.vregs[i] =3D cpu_to_be64(cpu->env.vregs[i=
+][1].ll);
++        note->contents.vregslo.vregs[i] =3D cpu_to_be64(cpu->env.vregs[i=
+][1]);
+     }
+ }
+=20
+@@ -127,8 +127,8 @@ static void s390x_write_elf64_vregshi(Note *note, S39=
+0CPU *cpu, int id)
+=20
+     note->hdr.n_type =3D cpu_to_be32(NT_S390_VXRS_HIGH);
+     for (i =3D 0; i <=3D 15; i++) {
+-        temp_vregshi->vregs[i][0] =3D cpu_to_be64(cpu->env.vregs[i + 16]=
+[0].ll);
+-        temp_vregshi->vregs[i][1] =3D cpu_to_be64(cpu->env.vregs[i + 16]=
+[1].ll);
++        temp_vregshi->vregs[i][0] =3D cpu_to_be64(cpu->env.vregs[i + 16]=
+[0]);
++        temp_vregshi->vregs[i][1] =3D cpu_to_be64(cpu->env.vregs[i + 16]=
+[1]);
+     }
+ }
+=20
+diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
+index 1bed12b6c3e0..317a1377e6ce 100644
+--- a/target/s390x/cpu.h
++++ b/target/s390x/cpu.h
+@@ -66,7 +66,7 @@ struct CPUS390XState {
+      * The floating point registers are part of the vector registers.
+      * vregs[0][0] -> vregs[15][0] are 16 floating point registers
+      */
+-    CPU_DoubleU vregs[32][2] QEMU_ALIGNED(16);  /* vector registers */
++    uint64_t vregs[32][2] QEMU_ALIGNED(16);  /* vector registers */
+     uint32_t aregs[16];    /* access registers */
+     uint8_t riccb[64];     /* runtime instrumentation control */
+     uint64_t gscb[4];      /* guarded storage control */
+@@ -153,7 +153,7 @@ struct CPUS390XState {
+=20
+ };
+=20
+-static inline CPU_DoubleU *get_freg(CPUS390XState *cs, int nr)
++static inline uint64_t *get_freg(CPUS390XState *cs, int nr)
+ {
+     return &cs->vregs[nr][0];
+ }
+diff --git a/target/s390x/excp_helper.c b/target/s390x/excp_helper.c
+index 3a467b72c565..85223d00c01f 100644
+--- a/target/s390x/excp_helper.c
++++ b/target/s390x/excp_helper.c
+@@ -390,8 +390,8 @@ static int mchk_store_vregs(CPUS390XState *env, uint6=
+4_t mcesao)
+     }
+=20
+     for (i =3D 0; i < 32; i++) {
+-        sa->vregs[i][0] =3D cpu_to_be64(env->vregs[i][0].ll);
+-        sa->vregs[i][1] =3D cpu_to_be64(env->vregs[i][1].ll);
++        sa->vregs[i][0] =3D cpu_to_be64(env->vregs[i][0]);
++        sa->vregs[i][1] =3D cpu_to_be64(env->vregs[i][1]);
+     }
+=20
+     cpu_physical_memory_unmap(sa, len, 1, len);
+@@ -429,7 +429,7 @@ static void do_mchk_interrupt(CPUS390XState *env)
+     lowcore->ar_access_id =3D 1;
+=20
+     for (i =3D 0; i < 16; i++) {
+-        lowcore->floating_pt_save_area[i] =3D cpu_to_be64(get_freg(env, =
+i)->ll);
++        lowcore->floating_pt_save_area[i] =3D cpu_to_be64(*get_freg(env,=
+ i));
+         lowcore->gpregs_save_area[i] =3D cpu_to_be64(env->regs[i]);
+         lowcore->access_regs_save_area[i] =3D cpu_to_be32(env->aregs[i])=
+;
+         lowcore->cregs_save_area[i] =3D cpu_to_be64(env->cregs[i]);
+diff --git a/target/s390x/gdbstub.c b/target/s390x/gdbstub.c
+index df147596ce1f..9cfd8fe3e033 100644
+--- a/target/s390x/gdbstub.c
++++ b/target/s390x/gdbstub.c
+@@ -116,7 +116,7 @@ static int cpu_read_fp_reg(CPUS390XState *env, uint8_=
+t *mem_buf, int n)
+     case S390_FPC_REGNUM:
+         return gdb_get_reg32(mem_buf, env->fpc);
+     case S390_F0_REGNUM ... S390_F15_REGNUM:
+-        return gdb_get_reg64(mem_buf, get_freg(env, n - S390_F0_REGNUM)-=
+>ll);
++        return gdb_get_reg64(mem_buf, *get_freg(env, n - S390_F0_REGNUM)=
+);
+     default:
+         return 0;
+     }
+@@ -129,7 +129,7 @@ static int cpu_write_fp_reg(CPUS390XState *env, uint8=
+_t *mem_buf, int n)
+         env->fpc =3D ldl_p(mem_buf);
+         return 4;
+     case S390_F0_REGNUM ... S390_F15_REGNUM:
+-        get_freg(env, n - S390_F0_REGNUM)->ll =3D ldtul_p(mem_buf);
++        *get_freg(env, n - S390_F0_REGNUM) =3D ldtul_p(mem_buf);
+         return 8;
+     default:
+         return 0;
+@@ -150,11 +150,11 @@ static int cpu_read_vreg(CPUS390XState *env, uint8_=
+t *mem_buf, int n)
+=20
+     switch (n) {
+     case S390_V0L_REGNUM ... S390_V15L_REGNUM:
+-        ret =3D gdb_get_reg64(mem_buf, env->vregs[n][1].ll);
++        ret =3D gdb_get_reg64(mem_buf, env->vregs[n][1]);
+         break;
+     case S390_V16_REGNUM ... S390_V31_REGNUM:
+-        ret =3D gdb_get_reg64(mem_buf, env->vregs[n][0].ll);
+-        ret +=3D gdb_get_reg64(mem_buf + 8, env->vregs[n][1].ll);
++        ret =3D gdb_get_reg64(mem_buf, env->vregs[n][0]);
++        ret +=3D gdb_get_reg64(mem_buf + 8, env->vregs[n][1]);
+         break;
+     default:
+         ret =3D 0;
+@@ -167,11 +167,11 @@ static int cpu_write_vreg(CPUS390XState *env, uint8=
+_t *mem_buf, int n)
+ {
+     switch (n) {
+     case S390_V0L_REGNUM ... S390_V15L_REGNUM:
+-        env->vregs[n][1].ll =3D ldtul_p(mem_buf + 8);
++        env->vregs[n][1] =3D ldtul_p(mem_buf + 8);
+         return 8;
+     case S390_V16_REGNUM ... S390_V31_REGNUM:
+-        env->vregs[n][0].ll =3D ldtul_p(mem_buf);
+-        env->vregs[n][1].ll =3D ldtul_p(mem_buf + 8);
++        env->vregs[n][0] =3D ldtul_p(mem_buf);
++        env->vregs[n][1] =3D ldtul_p(mem_buf + 8);
+         return 16;
+     default:
+         return 0;
+diff --git a/target/s390x/helper.c b/target/s390x/helper.c
+index 3c8f0a761543..a69e5abf5f6c 100644
+--- a/target/s390x/helper.c
++++ b/target/s390x/helper.c
+@@ -249,7 +249,7 @@ int s390_store_status(S390CPU *cpu, hwaddr addr, bool=
+ store_arch)
+         cpu_physical_memory_write(offsetof(LowCore, ar_access_id), &ar_i=
+d, 1);
+     }
+     for (i =3D 0; i < 16; ++i) {
+-        sa->fprs[i] =3D cpu_to_be64(get_freg(&cpu->env, i)->ll);
++        sa->fprs[i] =3D cpu_to_be64(*get_freg(&cpu->env, i));
+     }
+     for (i =3D 0; i < 16; ++i) {
+         sa->grs[i] =3D cpu_to_be64(cpu->env.regs[i]);
+@@ -299,8 +299,8 @@ int s390_store_adtl_status(S390CPU *cpu, hwaddr addr,=
+ hwaddr len)
+=20
+     if (s390_has_feat(S390_FEAT_VECTOR)) {
+         for (i =3D 0; i < 32; i++) {
+-            sa->vregs[i][0] =3D cpu_to_be64(cpu->env.vregs[i][0].ll);
+-            sa->vregs[i][1] =3D cpu_to_be64(cpu->env.vregs[i][1].ll);
++            sa->vregs[i][0] =3D cpu_to_be64(cpu->env.vregs[i][0]);
++            sa->vregs[i][1] =3D cpu_to_be64(cpu->env.vregs[i][1]);
+         }
+     }
+     if (s390_has_feat(S390_FEAT_GUARDED_STORAGE) && len >=3D ADTL_GS_MIN=
+_SIZE) {
+@@ -341,13 +341,13 @@ void s390_cpu_dump_state(CPUState *cs, FILE *f, int=
+ flags)
+         if (s390_has_feat(S390_FEAT_VECTOR)) {
+             for (i =3D 0; i < 32; i++) {
+                 qemu_fprintf(f, "V%02d=3D%016" PRIx64 "%016" PRIx64 "%c"=
+,
+-                             i, env->vregs[i][0].ll, env->vregs[i][1].ll=
+,
++                             i, env->vregs[i][0], env->vregs[i][1],
+                              i % 2 ? '\n' : ' ');
+             }
+         } else {
+             for (i =3D 0; i < 16; i++) {
+                 qemu_fprintf(f, "F%02d=3D%016" PRIx64 "%c",
+-                             i, get_freg(env, i)->ll,
++                             i, *get_freg(env, i),
+                              (i % 4) =3D=3D 3 ? '\n' : ' ');
+             }
+         }
+diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
+index e5e2b691f253..bcec9795ec80 100644
+--- a/target/s390x/kvm.c
++++ b/target/s390x/kvm.c
+@@ -418,21 +418,21 @@ int kvm_arch_put_registers(CPUState *cs, int level)
+=20
+     if (can_sync_regs(cs, KVM_SYNC_VRS)) {
+         for (i =3D 0; i < 32; i++) {
+-            cs->kvm_run->s.regs.vrs[i][0] =3D env->vregs[i][0].ll;
+-            cs->kvm_run->s.regs.vrs[i][1] =3D env->vregs[i][1].ll;
++            cs->kvm_run->s.regs.vrs[i][0] =3D env->vregs[i][0];
++            cs->kvm_run->s.regs.vrs[i][1] =3D env->vregs[i][1];
+         }
+         cs->kvm_run->s.regs.fpc =3D env->fpc;
+         cs->kvm_run->kvm_dirty_regs |=3D KVM_SYNC_VRS;
+     } else if (can_sync_regs(cs, KVM_SYNC_FPRS)) {
+         for (i =3D 0; i < 16; i++) {
+-            cs->kvm_run->s.regs.fprs[i] =3D get_freg(env, i)->ll;
++            cs->kvm_run->s.regs.fprs[i] =3D *get_freg(env, i);
+         }
+         cs->kvm_run->s.regs.fpc =3D env->fpc;
+         cs->kvm_run->kvm_dirty_regs |=3D KVM_SYNC_FPRS;
+     } else {
+         /* Floating point */
+         for (i =3D 0; i < 16; i++) {
+-            fpu.fprs[i] =3D get_freg(env, i)->ll;
++            fpu.fprs[i] =3D *get_freg(env, i);
+         }
+         fpu.fpc =3D env->fpc;
+=20
+@@ -586,13 +586,13 @@ int kvm_arch_get_registers(CPUState *cs)
+     /* Floating point and vector registers */
+     if (can_sync_regs(cs, KVM_SYNC_VRS)) {
+         for (i =3D 0; i < 32; i++) {
+-            env->vregs[i][0].ll =3D cs->kvm_run->s.regs.vrs[i][0];
+-            env->vregs[i][1].ll =3D cs->kvm_run->s.regs.vrs[i][1];
++            env->vregs[i][0] =3D cs->kvm_run->s.regs.vrs[i][0];
++            env->vregs[i][1] =3D cs->kvm_run->s.regs.vrs[i][1];
+         }
+         env->fpc =3D cs->kvm_run->s.regs.fpc;
+     } else if (can_sync_regs(cs, KVM_SYNC_FPRS)) {
+         for (i =3D 0; i < 16; i++) {
+-            get_freg(env, i)->ll =3D cs->kvm_run->s.regs.fprs[i];
++            *get_freg(env, i) =3D cs->kvm_run->s.regs.fprs[i];
+         }
+         env->fpc =3D cs->kvm_run->s.regs.fpc;
+     } else {
+@@ -601,7 +601,7 @@ int kvm_arch_get_registers(CPUState *cs)
+             return r;
+         }
+         for (i =3D 0; i < 16; i++) {
+-            get_freg(env, i)->ll =3D fpu.fprs[i];
++            *get_freg(env, i) =3D fpu.fprs[i];
+         }
+         env->fpc =3D fpu.fpc;
+     }
+diff --git a/target/s390x/machine.c b/target/s390x/machine.c
+index cb792aa10395..e6851a57bcc6 100644
+--- a/target/s390x/machine.c
++++ b/target/s390x/machine.c
+@@ -66,22 +66,22 @@ static const VMStateDescription vmstate_fpu =3D {
+     .minimum_version_id =3D 1,
+     .needed =3D fpu_needed,
+     .fields =3D (VMStateField[]) {
+-        VMSTATE_UINT64(env.vregs[0][0].ll, S390CPU),
+-        VMSTATE_UINT64(env.vregs[1][0].ll, S390CPU),
+-        VMSTATE_UINT64(env.vregs[2][0].ll, S390CPU),
+-        VMSTATE_UINT64(env.vregs[3][0].ll, S390CPU),
+-        VMSTATE_UINT64(env.vregs[4][0].ll, S390CPU),
+-        VMSTATE_UINT64(env.vregs[5][0].ll, S390CPU),
+-        VMSTATE_UINT64(env.vregs[6][0].ll, S390CPU),
+-        VMSTATE_UINT64(env.vregs[7][0].ll, S390CPU),
+-        VMSTATE_UINT64(env.vregs[8][0].ll, S390CPU),
+-        VMSTATE_UINT64(env.vregs[9][0].ll, S390CPU),
+-        VMSTATE_UINT64(env.vregs[10][0].ll, S390CPU),
+-        VMSTATE_UINT64(env.vregs[11][0].ll, S390CPU),
+-        VMSTATE_UINT64(env.vregs[12][0].ll, S390CPU),
+-        VMSTATE_UINT64(env.vregs[13][0].ll, S390CPU),
+-        VMSTATE_UINT64(env.vregs[14][0].ll, S390CPU),
+-        VMSTATE_UINT64(env.vregs[15][0].ll, S390CPU),
++        VMSTATE_UINT64(env.vregs[0][0], S390CPU),
++        VMSTATE_UINT64(env.vregs[1][0], S390CPU),
++        VMSTATE_UINT64(env.vregs[2][0], S390CPU),
++        VMSTATE_UINT64(env.vregs[3][0], S390CPU),
++        VMSTATE_UINT64(env.vregs[4][0], S390CPU),
++        VMSTATE_UINT64(env.vregs[5][0], S390CPU),
++        VMSTATE_UINT64(env.vregs[6][0], S390CPU),
++        VMSTATE_UINT64(env.vregs[7][0], S390CPU),
++        VMSTATE_UINT64(env.vregs[8][0], S390CPU),
++        VMSTATE_UINT64(env.vregs[9][0], S390CPU),
++        VMSTATE_UINT64(env.vregs[10][0], S390CPU),
++        VMSTATE_UINT64(env.vregs[11][0], S390CPU),
++        VMSTATE_UINT64(env.vregs[12][0], S390CPU),
++        VMSTATE_UINT64(env.vregs[13][0], S390CPU),
++        VMSTATE_UINT64(env.vregs[14][0], S390CPU),
++        VMSTATE_UINT64(env.vregs[15][0], S390CPU),
+         VMSTATE_UINT32(env.fpc, S390CPU),
+         VMSTATE_END_OF_LIST()
+     }
+@@ -99,54 +99,54 @@ static const VMStateDescription vmstate_vregs =3D {
+     .needed =3D vregs_needed,
+     .fields =3D (VMStateField[]) {
+         /* vregs[0][0] -> vregs[15][0] and fregs are overlays */
+-        VMSTATE_UINT64(env.vregs[16][0].ll, S390CPU),
+-        VMSTATE_UINT64(env.vregs[17][0].ll, S390CPU),
+-        VMSTATE_UINT64(env.vregs[18][0].ll, S390CPU),
+-        VMSTATE_UINT64(env.vregs[19][0].ll, S390CPU),
+-        VMSTATE_UINT64(env.vregs[20][0].ll, S390CPU),
+-        VMSTATE_UINT64(env.vregs[21][0].ll, S390CPU),
+-        VMSTATE_UINT64(env.vregs[22][0].ll, S390CPU),
+-        VMSTATE_UINT64(env.vregs[23][0].ll, S390CPU),
+-        VMSTATE_UINT64(env.vregs[24][0].ll, S390CPU),
+-        VMSTATE_UINT64(env.vregs[25][0].ll, S390CPU),
+-        VMSTATE_UINT64(env.vregs[26][0].ll, S390CPU),
+-        VMSTATE_UINT64(env.vregs[27][0].ll, S390CPU),
+-        VMSTATE_UINT64(env.vregs[28][0].ll, S390CPU),
+-        VMSTATE_UINT64(env.vregs[29][0].ll, S390CPU),
+-        VMSTATE_UINT64(env.vregs[30][0].ll, S390CPU),
+-        VMSTATE_UINT64(env.vregs[31][0].ll, S390CPU),
+-        VMSTATE_UINT64(env.vregs[0][1].ll, S390CPU),
+-        VMSTATE_UINT64(env.vregs[1][1].ll, S390CPU),
+-        VMSTATE_UINT64(env.vregs[2][1].ll, S390CPU),
+-        VMSTATE_UINT64(env.vregs[3][1].ll, S390CPU),
+-        VMSTATE_UINT64(env.vregs[4][1].ll, S390CPU),
+-        VMSTATE_UINT64(env.vregs[5][1].ll, S390CPU),
+-        VMSTATE_UINT64(env.vregs[6][1].ll, S390CPU),
+-        VMSTATE_UINT64(env.vregs[7][1].ll, S390CPU),
+-        VMSTATE_UINT64(env.vregs[8][1].ll, S390CPU),
+-        VMSTATE_UINT64(env.vregs[9][1].ll, S390CPU),
+-        VMSTATE_UINT64(env.vregs[10][1].ll, S390CPU),
+-        VMSTATE_UINT64(env.vregs[11][1].ll, S390CPU),
+-        VMSTATE_UINT64(env.vregs[12][1].ll, S390CPU),
+-        VMSTATE_UINT64(env.vregs[13][1].ll, S390CPU),
+-        VMSTATE_UINT64(env.vregs[14][1].ll, S390CPU),
+-        VMSTATE_UINT64(env.vregs[15][1].ll, S390CPU),
+-        VMSTATE_UINT64(env.vregs[16][1].ll, S390CPU),
+-        VMSTATE_UINT64(env.vregs[17][1].ll, S390CPU),
+-        VMSTATE_UINT64(env.vregs[18][1].ll, S390CPU),
+-        VMSTATE_UINT64(env.vregs[19][1].ll, S390CPU),
+-        VMSTATE_UINT64(env.vregs[20][1].ll, S390CPU),
+-        VMSTATE_UINT64(env.vregs[21][1].ll, S390CPU),
+-        VMSTATE_UINT64(env.vregs[22][1].ll, S390CPU),
+-        VMSTATE_UINT64(env.vregs[23][1].ll, S390CPU),
+-        VMSTATE_UINT64(env.vregs[24][1].ll, S390CPU),
+-        VMSTATE_UINT64(env.vregs[25][1].ll, S390CPU),
+-        VMSTATE_UINT64(env.vregs[26][1].ll, S390CPU),
+-        VMSTATE_UINT64(env.vregs[27][1].ll, S390CPU),
+-        VMSTATE_UINT64(env.vregs[28][1].ll, S390CPU),
+-        VMSTATE_UINT64(env.vregs[29][1].ll, S390CPU),
+-        VMSTATE_UINT64(env.vregs[30][1].ll, S390CPU),
+-        VMSTATE_UINT64(env.vregs[31][1].ll, S390CPU),
++        VMSTATE_UINT64(env.vregs[16][0], S390CPU),
++        VMSTATE_UINT64(env.vregs[17][0], S390CPU),
++        VMSTATE_UINT64(env.vregs[18][0], S390CPU),
++        VMSTATE_UINT64(env.vregs[19][0], S390CPU),
++        VMSTATE_UINT64(env.vregs[20][0], S390CPU),
++        VMSTATE_UINT64(env.vregs[21][0], S390CPU),
++        VMSTATE_UINT64(env.vregs[22][0], S390CPU),
++        VMSTATE_UINT64(env.vregs[23][0], S390CPU),
++        VMSTATE_UINT64(env.vregs[24][0], S390CPU),
++        VMSTATE_UINT64(env.vregs[25][0], S390CPU),
++        VMSTATE_UINT64(env.vregs[26][0], S390CPU),
++        VMSTATE_UINT64(env.vregs[27][0], S390CPU),
++        VMSTATE_UINT64(env.vregs[28][0], S390CPU),
++        VMSTATE_UINT64(env.vregs[29][0], S390CPU),
++        VMSTATE_UINT64(env.vregs[30][0], S390CPU),
++        VMSTATE_UINT64(env.vregs[31][0], S390CPU),
++        VMSTATE_UINT64(env.vregs[0][1], S390CPU),
++        VMSTATE_UINT64(env.vregs[1][1], S390CPU),
++        VMSTATE_UINT64(env.vregs[2][1], S390CPU),
++        VMSTATE_UINT64(env.vregs[3][1], S390CPU),
++        VMSTATE_UINT64(env.vregs[4][1], S390CPU),
++        VMSTATE_UINT64(env.vregs[5][1], S390CPU),
++        VMSTATE_UINT64(env.vregs[6][1], S390CPU),
++        VMSTATE_UINT64(env.vregs[7][1], S390CPU),
++        VMSTATE_UINT64(env.vregs[8][1], S390CPU),
++        VMSTATE_UINT64(env.vregs[9][1], S390CPU),
++        VMSTATE_UINT64(env.vregs[10][1], S390CPU),
++        VMSTATE_UINT64(env.vregs[11][1], S390CPU),
++        VMSTATE_UINT64(env.vregs[12][1], S390CPU),
++        VMSTATE_UINT64(env.vregs[13][1], S390CPU),
++        VMSTATE_UINT64(env.vregs[14][1], S390CPU),
++        VMSTATE_UINT64(env.vregs[15][1], S390CPU),
++        VMSTATE_UINT64(env.vregs[16][1], S390CPU),
++        VMSTATE_UINT64(env.vregs[17][1], S390CPU),
++        VMSTATE_UINT64(env.vregs[18][1], S390CPU),
++        VMSTATE_UINT64(env.vregs[19][1], S390CPU),
++        VMSTATE_UINT64(env.vregs[20][1], S390CPU),
++        VMSTATE_UINT64(env.vregs[21][1], S390CPU),
++        VMSTATE_UINT64(env.vregs[22][1], S390CPU),
++        VMSTATE_UINT64(env.vregs[23][1], S390CPU),
++        VMSTATE_UINT64(env.vregs[24][1], S390CPU),
++        VMSTATE_UINT64(env.vregs[25][1], S390CPU),
++        VMSTATE_UINT64(env.vregs[26][1], S390CPU),
++        VMSTATE_UINT64(env.vregs[27][1], S390CPU),
++        VMSTATE_UINT64(env.vregs[28][1], S390CPU),
++        VMSTATE_UINT64(env.vregs[29][1], S390CPU),
++        VMSTATE_UINT64(env.vregs[30][1], S390CPU),
++        VMSTATE_UINT64(env.vregs[31][1], S390CPU),
+         VMSTATE_END_OF_LIST()
+     }
+ };
+diff --git a/target/s390x/translate.c b/target/s390x/translate.c
+index fa57b7550efc..ac0d8b641049 100644
+--- a/target/s390x/translate.c
++++ b/target/s390x/translate.c
+@@ -149,7 +149,7 @@ void s390x_translate_init(void)
+ static inline int vec_full_reg_offset(uint8_t reg)
+ {
+     g_assert(reg < 32);
+-    return offsetof(CPUS390XState, vregs[reg][0].d);
++    return offsetof(CPUS390XState, vregs[reg][0]);
+ }
+=20
+ static inline int vec_reg_offset(uint8_t reg, uint8_t enr, TCGMemOp es)
+--=20
 2.20.1
 
 
