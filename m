@@ -2,50 +2,53 @@ Return-Path: <SRS0=3yEa=UG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EFBCCC2BCA1
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 20:26:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 61F93C2BCA1
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 20:28:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C0E1520868
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 20:26:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C0E1520868
+	by mail.kernel.org (Postfix) with ESMTPS id 35A1320868
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 20:28:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 35A1320868
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52946 helo=lists.gnu.org)
+Received: from localhost ([::1]:52954 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hZLR8-0003p1-Sz
-	for qemu-devel@archiver.kernel.org; Fri, 07 Jun 2019 16:26:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38063)
+	id 1hZLT4-0004kW-Fz
+	for qemu-devel@archiver.kernel.org; Fri, 07 Jun 2019 16:28:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39305)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <jsnow@redhat.com>) id 1hZKUC-0000qr-Vg
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 15:25:13 -0400
+ (envelope-from <jsnow@redhat.com>) id 1hZKXi-0005wp-9D
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 15:28:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1hZKUC-0004iv-1F
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 15:25:12 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55206)
+ (envelope-from <jsnow@redhat.com>) id 1hZKXh-0001GX-7j
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 15:28:50 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40386)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1hZKU9-0003hb-Bn; Fri, 07 Jun 2019 15:25:09 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ id 1hZKXe-0001AL-TO; Fri, 07 Jun 2019 15:28:47 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id C1B2D30C31A0;
- Fri,  7 Jun 2019 19:24:39 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id E1B7081111;
+ Fri,  7 Jun 2019 19:28:45 +0000 (UTC)
 Received: from [10.10.120.179] (ovpn-120-179.rdu2.redhat.com [10.10.120.179])
- by smtp.corp.redhat.com (Postfix) with ESMTP id A76798CBB9;
- Fri,  7 Jun 2019 19:24:37 +0000 (UTC)
-To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org,
- qemu-devel@nongnu.org
-References: <20190606184159.979-1-jsnow@redhat.com>
- <20190606184159.979-6-jsnow@redhat.com>
- <07a09d35-769e-ff48-2e93-26c05ce5c9da@redhat.com>
+ by smtp.corp.redhat.com (Postfix) with ESMTP id E68A410018E0;
+ Fri,  7 Jun 2019 19:28:44 +0000 (UTC)
+To: Paolo Bonzini <pbonzini@redhat.com>, Maxim Levitsky
+ <mlevitsk@redhat.com>, qemu-block@nongnu.org
+References: <20190417195355.16123-1-mlevitsk@redhat.com>
+ <20190417195355.16123-2-mlevitsk@redhat.com>
+ <d1ab2f6e-a5b1-466b-7ad9-df47b8739579@redhat.com>
+ <7b9baac9a0b652105cebb681e9759cb4e9d3877b.camel@redhat.com>
+ <601a2a78-0ddb-ccc9-f3c2-46aa16e18629@redhat.com>
+ <dfd777d8-1241-7361-193d-02442a0d79ab@redhat.com>
 From: John Snow <jsnow@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
@@ -122,22 +125,22 @@ Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
  RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
  glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
-Message-ID: <4b4a8653-7d2a-4a3c-b3e7-53daf5031037@redhat.com>
-Date: Fri, 7 Jun 2019 15:24:35 -0400
+Message-ID: <449e8bb0-8936-bcdc-9142-c2730ac24f4e@redhat.com>
+Date: Fri, 7 Jun 2019 15:28:43 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <07a09d35-769e-ff48-2e93-26c05ce5c9da@redhat.com>
+In-Reply-To: <dfd777d8-1241-7361-193d-02442a0d79ab@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.40]); Fri, 07 Jun 2019 19:24:43 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.28]); Fri, 07 Jun 2019 19:28:45 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 5/5] block/qcow2-bitmap: Count queued
- bitmaps towards directory_size
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v2 1/5] block/nvme: don't flip
+ CQ phase bits
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -150,42 +153,43 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
- vsementsov@virtuozzo.com, Markus Armbruster <armbru@redhat.com>,
- Max Reitz <mreitz@redhat.com>
+ qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
 
-On 6/6/19 10:30 PM, Eric Blake wrote:
-> On 6/6/19 1:41 PM, John Snow wrote:
->> Similarly to the previous commit, we need to also keep a ledger of the
->> additional directory size burden that we've not yet committed so we can
->> reject new additions sooner instead of later.
->>
->> Signed-off-by: John Snow <jsnow@redhat.com>
->> ---
->>  block/qcow2.h        |  1 +
->>  block/qcow2-bitmap.c | 13 ++++++++++++-
->>  2 files changed, 13 insertions(+), 1 deletion(-)
->>
->> diff --git a/block/qcow2.h b/block/qcow2.h
->> index ebf60ac236..5aff97eb9c 100644
->> --- a/block/qcow2.h
->> +++ b/block/qcow2.h
->> @@ -318,6 +318,7 @@ typedef struct BDRVQcow2State {
->>  
->>      uint32_t nb_bitmaps;
->>      uint32_t nb_queued_bitmaps;
->> +    uint32_t queued_directory_size;
->>      uint64_t bitmap_directory_size;
+On 6/7/19 7:08 AM, Paolo Bonzini wrote:
+> On 06/06/19 23:23, John Snow wrote:
+>> So: This looks right; does this fix a bug that can be observed? Do we
+>> have any regression tests for block/NVMe?
 > 
-> Why can we get away with uint32_t for the queue size, but uint64_t for
-> the stored size? Something feels fishy.
+> I don't think it fixes a bug; by the time the CQ entry is picked up by
+> QEMU, the device is not supposed to touch it anymore.
+> 
+> However, the idea behind the phase bits is that you can decide whether
+> the driver has placed a completion in the queue.  When we get here, we have
+> 
+> 	le16_to_cpu(c->status) & 0x1) == !q->cq_phase
+> 
+> On the next pass through the ring buffer q->cq_phase will be flipped,
+> and thus when we see this element we'll get
+> 
+> 	le16_to_cpu(c->status) & 0x1) == q->cq_phase
+> 
+> and not process it.  Since block/nvme.c flips the bit, this mechanism
+> does not work and the loop termination relies on the other part of the
+> condition, "if (!c->cid) break;".
+> 
+> So the patch is correct, but it would also be nice to also either remove
+> phase handling altogether, or check that the phase handling works
+> properly and drop the !c->cid test.
+> 
+> Paolo
 > 
 
-That would be me using the wrong type.
+Gotcha, I see, that's why it doesn't cause problems. Thanks :)
 
 --js
 
