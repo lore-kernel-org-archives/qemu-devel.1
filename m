@@ -2,72 +2,63 @@ Return-Path: <SRS0=3yEa=UG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 602C9C2BCA1
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 15:25:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C073C2BCA1
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 15:25:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 34D0F2089E
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 15:25:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 34D0F2089E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 45F5C2089E
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 15:25:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 45F5C2089E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48758 helo=lists.gnu.org)
+Received: from localhost ([::1]:48760 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hZGjj-0006dj-7A
-	for qemu-devel@archiver.kernel.org; Fri, 07 Jun 2019 11:24:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36377)
+	id 1hZGjq-0006k4-II
+	for qemu-devel@archiver.kernel.org; Fri, 07 Jun 2019 11:25:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53500)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <bounces@canonical.com>) id 1hZG2B-0001xv-W4
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 10:40:01 -0400
+ (envelope-from <cohuck@redhat.com>) id 1hZFhs-0004SN-5j
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 10:19:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1hZFtQ-0005qw-9F
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 10:30:57 -0400
-Received: from indium.canonical.com ([91.189.90.7]:47156)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1hZFtQ-0005pc-47
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 10:30:56 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1hZFtL-0003dj-NU
- for <qemu-devel@nongnu.org>; Fri, 07 Jun 2019 14:30:51 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 891D32E80CC
- for <qemu-devel@nongnu.org>; Fri,  7 Jun 2019 14:30:51 +0000 (UTC)
+ (envelope-from <cohuck@redhat.com>) id 1hZFhq-0004K9-DP
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 10:19:00 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49714)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <cohuck@redhat.com>)
+ id 1hZFho-0004Ct-8B; Fri, 07 Jun 2019 10:18:58 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 7E7C83079B86;
+ Fri,  7 Jun 2019 14:18:53 +0000 (UTC)
+Received: from localhost (dhcp-192-191.str.redhat.com [10.33.192.191])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 267701001B00;
+ Fri,  7 Jun 2019 14:18:53 +0000 (UTC)
+From: Cornelia Huck <cohuck@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri,  7 Jun 2019 16:17:14 +0200
+Message-Id: <20190607141727.29018-22-cohuck@redhat.com>
+In-Reply-To: <20190607141727.29018-1-cohuck@redhat.com>
+References: <20190607141727.29018-1-cohuck@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.41]); Fri, 07 Jun 2019 14:18:53 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 07 Jun 2019 14:20:57 -0000
-From: Lukas Durfina <1774149@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: arnaudalies-py lukasdurfina
-X-Launchpad-Bug-Reporter: mou (arnaudalies-py)
-X-Launchpad-Bug-Modifier: Lukas Durfina (lukasdurfina)
-References: <152766936065.4012.2532535303592891582.malonedeb@chaenomeles.canonical.com>
-Message-Id: <155991725791.18155.4545920522883590142.malone@wampee.canonical.com>
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="18978";
- Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: 267184e5d9b69c6101be570127771ceaa64d9c81
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1774149] Re: qemu-user x86_64 x86 gdb call
- function from gdb doesn't work
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PULL v2 21/34] s390x/tcg: Implement VECTOR LOAD FP
+ INTEGER
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -76,118 +67,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1774149 <1774149@bugs.launchpad.net>
+Cc: qemu-s390x@nongnu.org, Richard Henderson <richard.henderson@linaro.org>,
+ qemu-devel@nongnu.org, David Hildenbrand <david@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-I have verified the second issue: the second call of function gives error "=
-Cannot access memory at address".
-I have tried it for various architectures. It is same for mips. But it work=
-s for aarch64.
+From: David Hildenbrand <david@redhat.com>
 
--- =
+We can reuse most of the infrastructure introduced for
+VECTOR FP CONVERT FROM FIXED 64-BIT and friends.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1774149
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: David Hildenbrand <david@redhat.com>
+---
+ target/s390x/helper.h           |  2 ++
+ target/s390x/insn-data.def      |  2 ++
+ target/s390x/translate_vx.inc.c |  3 +++
+ target/s390x/vec_fpu_helper.c   | 23 +++++++++++++++++++++++
+ 4 files changed, 30 insertions(+)
 
-Title:
-  qemu-user x86_64 x86 gdb call function from gdb doesn't work
+diff --git a/target/s390x/helper.h b/target/s390x/helper.h
+index 238bfa250963..10a9cb39b6e0 100644
+--- a/target/s390x/helper.h
++++ b/target/s390x/helper.h
+@@ -276,6 +276,8 @@ DEF_HELPER_FLAGS_4(gvec_vclgd64, TCG_CALL_NO_WG, void=
+, ptr, cptr, env, i32)
+ DEF_HELPER_FLAGS_4(gvec_vclgd64s, TCG_CALL_NO_WG, void, ptr, cptr, env, =
+i32)
+ DEF_HELPER_FLAGS_5(gvec_vfd64, TCG_CALL_NO_WG, void, ptr, cptr, cptr, en=
+v, i32)
+ DEF_HELPER_FLAGS_5(gvec_vfd64s, TCG_CALL_NO_WG, void, ptr, cptr, cptr, e=
+nv, i32)
++DEF_HELPER_FLAGS_4(gvec_vfi64, TCG_CALL_NO_WG, void, ptr, cptr, env, i32=
+)
++DEF_HELPER_FLAGS_4(gvec_vfi64s, TCG_CALL_NO_WG, void, ptr, cptr, env, i3=
+2)
+=20
+ #ifndef CONFIG_USER_ONLY
+ DEF_HELPER_3(servc, i32, env, i64, i64)
+diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
+index f9830deace1a..f77aa41253d1 100644
+--- a/target/s390x/insn-data.def
++++ b/target/s390x/insn-data.def
+@@ -1228,6 +1228,8 @@
+     F(0xe7c0, VCLGD,   VRR_a, V,   0, 0, 0, 0, vcdg, 0, IF_VEC)
+ /* VECTOR FP DIVIDE */
+     F(0xe7e5, VFD,     VRR_c, V,   0, 0, 0, 0, vfa, 0, IF_VEC)
++/* VECTOR LOAD FP INTEGER */
++    F(0xe7c7, VFI,     VRR_a, V,   0, 0, 0, 0, vcdg, 0, IF_VEC)
+=20
+ #ifndef CONFIG_USER_ONLY
+ /* COMPARE AND SWAP AND PURGE */
+diff --git a/target/s390x/translate_vx.inc.c b/target/s390x/translate_vx.=
+inc.c
+index 9e55d4488b77..59d8b971c01d 100644
+--- a/target/s390x/translate_vx.inc.c
++++ b/target/s390x/translate_vx.inc.c
+@@ -2669,6 +2669,9 @@ static DisasJumpType op_vcdg(DisasContext *s, Disas=
+Ops *o)
+     case 0xc0:
+         fn =3D se ? gen_helper_gvec_vclgd64s : gen_helper_gvec_vclgd64;
+         break;
++    case 0xc7:
++        fn =3D se ? gen_helper_gvec_vfi64s : gen_helper_gvec_vfi64;
++        break;
+     default:
+         g_assert_not_reached();
+     }
+diff --git a/target/s390x/vec_fpu_helper.c b/target/s390x/vec_fpu_helper.=
+c
+index 3c62eb578771..bdcafc6738ed 100644
+--- a/target/s390x/vec_fpu_helper.c
++++ b/target/s390x/vec_fpu_helper.c
+@@ -386,3 +386,26 @@ void HELPER(gvec_vfd64s)(void *v1, const void *v2, c=
+onst void *v3,
+ {
+     vop64_3(v1, v2, v3, env, true, vfd64, GETPC());
+ }
++
++static uint64_t vfi64(uint64_t a, float_status *s)
++{
++    return float64_round_to_int(a, s);
++}
++
++void HELPER(gvec_vfi64)(void *v1, const void *v2, CPUS390XState *env,
++                        uint32_t desc)
++{
++    const uint8_t erm =3D extract32(simd_data(desc), 4, 4);
++    const bool XxC =3D extract32(simd_data(desc), 2, 1);
++
++    vop64_2(v1, v2, env, false, XxC, erm, vfi64, GETPC());
++}
++
++void HELPER(gvec_vfi64s)(void *v1, const void *v2, CPUS390XState *env,
++                         uint32_t desc)
++{
++    const uint8_t erm =3D extract32(simd_data(desc), 4, 4);
++    const bool XxC =3D extract32(simd_data(desc), 2, 1);
++
++    vop64_2(v1, v2, env, true, XxC, erm, vfi64, GETPC());
++}
+--=20
+2.20.1
 
-Status in QEMU:
-  New
-
-Bug description:
-  While running qemu user x86_64 x86 with gdb server, calling functions
-  are not working.
-
-  Here is how to reproduce it:
-
-  run in a terminal:
-  $ qemu-x86_64 -g 12345 -L / /bin/ls
-
-  In another terminal run gdb:
-  (gdb) file /bin/ls
-  (gdb) target remote :12345
-  (gdb) b _init
-  (gdb) c
-  (gdb) call malloc(1)
-  Could not fetch register "fs_base"; remote failure reply 'E14'
-
-  In other cases we also got the error:
-  Could not fetch register "orig_rax"; remote failure reply 'E14'
-
-  Here is how I patched it (it is only a workaround):
-
-  diff --git a/gdbstub.c b/gdbstub.c
-  index 2a94030..5749efe 100644
-  --- a/gdbstub.c
-  +++ b/gdbstub.c
-  @@ -668,6 +668,11 @@ static int gdb_read_register(CPUState *cpu, uint8_t =
-*mem_buf, int reg)
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0return r->get_reg(env, mem_buf, reg - r->base_reg);
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}
-  +#ifdef TARGET_X86_64
-  +    return 8;
-  +#elif TARGET_I386
-  +    return 4;
-  +#endif
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0return 0;
-  =C2=A0}
-
-  (Our guess for this issue was, gdb is requesting for 'fake' registers
-  to know register size)
-
-  Once we patched that, we got another problem while calling functions
-  from gdb: We could call functions, but only once.
-
-  Here is how to reproduce it:
-  run in a terminal:
-  $ qemu-x86_64 -g 12345 -L / /bin/ls
-
-  In another terminal run gdb:
-  (gdb) file /bin/ls
-  (gdb) target remote :12345
-  (gdb) b _init
-  (gdb) c
-  (gdb) call malloc(1)
-  $1 =3D (void *) 0x620010
-  (gdb) call malloc(1)
-  Cannot access memory at address 0x40007ffb8f
-
-  Here is how we patched it to make it work:
-
-  diff --git a/exec.c b/exec.c
-  index 03238a3..d303922 100644
-  --- a/exec.c
-  +++ b/exec.c
-  @@ -2833,7 +2833,7 @@ int cpu_memory_rw_debug(CPUState *cpu, target_ulong=
- addr,
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (!(flags & PAGE_=
-VALID))
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0return -1;
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (is_write) {
-  -            if (!(flags & PAGE_WRITE))
-  +            if (!(flags & (PAGE_WRITE | PAGE_WRITE_ORG)))
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0return -1;
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0/* XXX: this code should not depend on lock_user */
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0if (!(p =3D lock_user(VERIFY_WRITE, addr, l, 0)))
-
-  From what we saw, there is a page which is passed to read-only after
-  first execution, and gdb need to write on that page to put a
-  breakpoint. (on the stack to get function return)
-
-  We suspect this is linked to this:
-  https://qemu.weilnetz.de/w64/2012/2012-06-28/qemu-tech.html#Self_002dmodi=
-fying-code-and-translated-code-invalidation
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1774149/+subscriptions
 
