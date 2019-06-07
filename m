@@ -4,82 +4,80 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AF135C28CC3
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 08:51:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C7D4C28CC3
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 08:52:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 40A4D208E3
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 08:51:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4A6AA208E3
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 08:52:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="jWoWjAFW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 40A4D208E3
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="J/TYSNQ0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4A6AA208E3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46982 helo=lists.gnu.org)
+Received: from localhost ([::1]:46984 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hZAbJ-00006t-Er
-	for qemu-devel@archiver.kernel.org; Fri, 07 Jun 2019 04:51:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35044)
+	id 1hZAbR-0000Cu-LF
+	for qemu-devel@archiver.kernel.org; Fri, 07 Jun 2019 04:52:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34705)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <peter.maydell@linaro.org>) id 1hZAaI-0007in-Bq
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 04:50:51 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1hZAZD-00079H-52
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 04:49:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1hZAaH-0004fB-Ci
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 04:50:50 -0400
-Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:46548)
+ (envelope-from <peter.maydell@linaro.org>) id 1hZAZC-0002Ph-1M
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 04:49:43 -0400
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:36479)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1hZAaH-0004cN-6z
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 04:50:49 -0400
-Received: by mail-oi1-x242.google.com with SMTP id 203so884027oid.13
- for <qemu-devel@nongnu.org>; Fri, 07 Jun 2019 01:50:48 -0700 (PDT)
+ id 1hZAZB-0002JC-RV
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 04:49:41 -0400
+Received: by mail-ot1-x341.google.com with SMTP id c3so1163604otr.3
+ for <qemu-devel@nongnu.org>; Fri, 07 Jun 2019 01:49:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
  :cc:content-transfer-encoding;
- bh=5bkijeq6wyj0TynwwIr9elawem3VCDBOcu1LqMo6RN0=;
- b=jWoWjAFWGtFe5ZUQksAR9IOyB2Xw6J5OjeyhmscesnjZqcYNoU+vMPIAGin8x6FufR
- UQFG3ZcOYUTax3CCKpcKV54lbjccFWE2kfZ3XSI1OmGWydPB2GZUoRSVSctepS8Y+ZI8
- NYhQHkC7yuFdJuq0D0QIuqIW1TwH8VsJ3j9B4cwPi3bZFhw28WITebDRfHHwILhwxJZ/
- yUN2uwbE0ggQm9NKftYc0c7sicz5qdc4+1cO94oTdCzbn4t/l7KS05xkIcV5lC4S3QBm
- +kkpF1zirhsTxjjxvbCVVxcUc5ujpwEd6fdfNea9bltvtF5ROriwnw2A385HoKnYcXP7
- BQVA==
+ bh=Up/VjuXxuZcPlN7p9+iFlb4bswqF/zXsRLKkmSmheFo=;
+ b=J/TYSNQ0mDavDP/2kkqiF8JztsQQ/tIBZOtOEue2qGGmBF+VUzxmhlEWfp5dh3mPXI
+ rEEtxKtFkUug5bljEZhkahZ5AujoZuoe5BCE97Qx79juCfWmRmmR288RaDAhpMNseRy7
+ rLUO+mELAh/ZwtSbi/cnUZn8pc1iAXOf8uKGYl1GcJzqrgmr1edg4A0I+mBEx2YO+c0w
+ +sSaQEelo3BapJVgw55FENgUsA6irjG+kGZHIieUSwEPAlKb4KzqHZMOv8EVnihMPNQ1
+ LbbypxhGh9ylhfxq8j5s75UKve7FAQxxNcE0varVMhET1En+4IAIkxTRq3ptL9oxoc3e
+ cZLw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc:content-transfer-encoding;
- bh=5bkijeq6wyj0TynwwIr9elawem3VCDBOcu1LqMo6RN0=;
- b=BnuV54vQz32smrLzve6FyNeVNe7vwdsadAlkIM5MvC+0m39IkJIXZ7VsNucvquowud
- +3dbilttfac4+BpM1GiVMQIES4o0yEOJ8ick7F7sErQgF7S3l5wr2FlGbhoPk6uU1w7p
- z4KC+w5oFwWjX/PcO1sHAAJrm+Ao0isSfb85O28W3MqKqkTd8WZeL6JQ2T0wdsmsQUCl
- HgcTSH2xW5c0YVKmUFsLZ3knruE+yzZ1+hgS6+tCkxtp4l7aeMy+1GKPIhMoTHbXgdUi
- TS2c5/qMToQnt0MNbxIMkbNY+0pxtM+dIyCoooIH2n5Nvn9e02poI8OHyLM4C4QvZgyb
- hbmQ==
-X-Gm-Message-State: APjAAAVyTQWEBDuOQeROrvA7q0zEgylX4DvnOE9fO0vMRXhsCUpjY93K
- ckGpHljx2gnm9cPDro/pohUN6NzsnUj5EJ0EJO8dEQ==
-X-Google-Smtp-Source: APXvYqwBdy5EE5kJ82HiNACR2QgBy8k4NhDUkkIk7U/ILJLPIh/MVF5CzWlNWSCB+nsCDYPaxC4b21Vz58LO9Nloy5c=
-X-Received: by 2002:a05:6808:8f1:: with SMTP id
- d17mr3031744oic.170.1559897447997; 
- Fri, 07 Jun 2019 01:50:47 -0700 (PDT)
+ bh=Up/VjuXxuZcPlN7p9+iFlb4bswqF/zXsRLKkmSmheFo=;
+ b=UEbW1bqajIufEhHsnCLVi7KjMexzA/TT57Pa+tDXE8OXt/wHwXgMfVinAfNrBFWspE
+ UeFLDN++7yZkYr98e2JqNaEulHhvXrJw9kExcmeZhdfAmrpnzvE+YDIPzhMd+mjf8P0k
+ lf2stQoaxoKcWbjzgOZNsTJdm3mblhGZPQjNT2d+wZ5YYoyYpfnurLll9nvNw1Q5qJiD
+ 4Xv51nescODffKJWV2cSoyNYbr6PZPT0yiIRQP4sLOmGSp8Fhz6tXKycplSwCzFEqx/x
+ LFaZqdbJja761vF6Vhduf8TlqQJ3xYEnQBa2KuXkf+biEg5vgYEIO4U9tQvctc1y8NMh
+ VX/A==
+X-Gm-Message-State: APjAAAWtHHQoVryhGBs7ftbvgg/9Rqr2GCu2Lgp0gXzyzkePiNJpIGax
+ dn1pwtlu+rFRR/p0CHf3orukm1ae/SPv4JeOX7keNA==
+X-Google-Smtp-Source: APXvYqzhQ9G03X4uVRWtcUkRPSwPOYelc2N16r5bfDfFv5XUv6UVV2FlvwgidvvwUpiIfP4aE/3A/YUFVpFA4UTx/6k=
+X-Received: by 2002:a9d:711e:: with SMTP id n30mr632753otj.97.1559897376707;
+ Fri, 07 Jun 2019 01:49:36 -0700 (PDT)
 MIME-Version: 1.0
 References: <20190605145829.7674-1-marcandre.lureau@redhat.com>
- <20190605145829.7674-5-marcandre.lureau@redhat.com>
-In-Reply-To: <20190605145829.7674-5-marcandre.lureau@redhat.com>
+ <20190605145829.7674-3-marcandre.lureau@redhat.com>
+In-Reply-To: <20190605145829.7674-3-marcandre.lureau@redhat.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 7 Jun 2019 09:50:36 +0100
-Message-ID: <CAFEAcA-shTf-Ha7+LXinyVu184eWe1hb9r80QfecSMYhz0A7Ag@mail.gmail.com>
+Date: Fri, 7 Jun 2019 09:49:25 +0100
+Message-ID: <CAFEAcA_4W+UGHUFFLW0V5bwoSt94DcSzkFcQqoOwA03Pd1JbAQ@mail.gmail.com>
 To: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::242
-Subject: Re: [Qemu-devel] [PATCH 4/5] vhost-user-input: check
- ioctl(EVIOCGNAME) return value
+X-Received-From: 2607:f8b0:4864:20::341
+Subject: Re: [Qemu-devel] [PATCH 2/5] vhost-user: check unix_listen() return
+ value
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,35 +95,58 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 5 Jun 2019 at 16:04, Marc-Andr=C3=A9 Lureau
+On Wed, 5 Jun 2019 at 16:02, Marc-Andr=C3=A9 Lureau
 <marcandre.lureau@redhat.com> wrote:
 >
-> This should fix coverity CID 1401704.
+> This check shouldn't be necessary, since &error_fatal is given as
+> argument and will exit() on failure. However, this change should
+> silence coverity CID 1401761 & 1401705.
 >
 > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 > ---
->  contrib/vhost-user-input/main.c | 6 +++++-
->  1 file changed, 5 insertions(+), 1 deletion(-)
+>  contrib/vhost-user-gpu/main.c   | 4 ++++
+>  contrib/vhost-user-input/main.c | 4 ++++
+>  2 files changed, 8 insertions(+)
 >
+> diff --git a/contrib/vhost-user-gpu/main.c b/contrib/vhost-user-gpu/main.=
+c
+> index 9614c9422c..e0b6df5b4d 100644
+> --- a/contrib/vhost-user-gpu/main.c
+> +++ b/contrib/vhost-user-gpu/main.c
+> @@ -1160,6 +1160,10 @@ main(int argc, char *argv[])
+>
+>      if (opt_socket_path) {
+>          int lsock =3D unix_listen(opt_socket_path, &error_fatal);
+> +        if (lsock < 0) {
+> +            g_printerr("Failed to listen on %s.\n", opt_socket_path);
+> +            exit(EXIT_FAILURE);
+> +        }
+>          fd =3D accept(lsock, NULL, NULL);
+>          close(lsock);
+>      } else {
 > diff --git a/contrib/vhost-user-input/main.c b/contrib/vhost-user-input/m=
 ain.c
-> index 54f882602a..8b4e7d2536 100644
+> index 8d493f598e..8b854117f5 100644
 > --- a/contrib/vhost-user-input/main.c
 > +++ b/contrib/vhost-user-input/main.c
-> @@ -342,7 +342,11 @@ main(int argc, char *argv[])
+> @@ -367,6 +367,10 @@ main(int argc, char *argv[])
 >
->      vi.config =3D g_array_new(false, false, sizeof(virtio_input_config))=
-;
->      memset(&id, 0, sizeof(id));
-> -    ioctl(vi.evdevfd, EVIOCGNAME(sizeof(id.u.string) - 1), id.u.string);
-> +    if (ioctl(vi.evdevfd, EVIOCGNAME(sizeof(id.u.string) - 1),
-> +              id.u.string) < 0) {
-> +        g_printerr("Failed to get evdev name: %s\n", g_strerror(errno));
-> +        exit(EXIT_FAILURE);
-> +    }
+>      if (opt_socket_path) {
+>          int lsock =3D unix_listen(opt_socket_path, &error_fatal);
+> +        if (lsock < 0) {
+> +            g_printerr("Failed to listen on %s.\n", opt_socket_path);
+> +            exit(EXIT_FAILURE);
+> +        }
+>          fd =3D accept(lsock, NULL, NULL);
+>          close(lsock);
+>      } else {
+> --
+> 2.22.0.rc2.384.g1a9a72ea1d
+>
 
-
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Maybe better to just assert(lsock >=3D 0) ?
+(I hadn't noticed the &error_fatal -- it means this new code
+is unreachable.)
 
 thanks
 -- PMM
