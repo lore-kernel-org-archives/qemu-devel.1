@@ -2,71 +2,142 @@ Return-Path: <SRS0=3yEa=UG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.0 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 45A99C2BCA1
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 20:20:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EFBCCC2BCA1
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 20:26:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B8BCD208C0
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 20:20:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B8BCD208C0
+	by mail.kernel.org (Postfix) with ESMTPS id C0E1520868
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 20:26:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C0E1520868
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52834 helo=lists.gnu.org)
+Received: from localhost ([::1]:52946 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hZLLo-000886-NX
-	for qemu-devel@archiver.kernel.org; Fri, 07 Jun 2019 16:20:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58972)
+	id 1hZLR8-0003p1-Sz
+	for qemu-devel@archiver.kernel.org; Fri, 07 Jun 2019 16:26:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38063)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <ehabkost@redhat.com>) id 1hZK5O-0004JK-G5
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 14:59:37 -0400
+ (envelope-from <jsnow@redhat.com>) id 1hZKUC-0000qr-Vg
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 15:25:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ehabkost@redhat.com>) id 1hZK5K-0001Nn-00
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 14:59:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60496)
+ (envelope-from <jsnow@redhat.com>) id 1hZKUC-0004iv-1F
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 15:25:12 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55206)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <ehabkost@redhat.com>)
- id 1hZK5G-0001KQ-Ua; Fri, 07 Jun 2019 14:59:28 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>)
+ id 1hZKU9-0003hb-Bn; Fri, 07 Jun 2019 15:25:09 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 0C8EF2F8BE2;
- Fri,  7 Jun 2019 18:59:14 +0000 (UTC)
-Received: from localhost (ovpn-116-9.gru2.redhat.com [10.97.116.9])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 7384419733;
- Fri,  7 Jun 2019 18:58:59 +0000 (UTC)
-Date: Fri, 7 Jun 2019 15:58:57 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-To: Cleber Rosa <crosa@redhat.com>
-Message-ID: <20190607185857.GD22416@habkost.net>
-References: <20190117185628.21862-1-crosa@redhat.com>
- <20190117185628.21862-16-crosa@redhat.com>
- <b235e7a9-57ad-5547-b8ca-693159820a8f@redhat.com>
- <e63a4ea3-e9ff-4920-cdfa-14bf04b5b08c@redhat.com>
- <84aa43ba-df19-51f6-e14d-fb82a7f2dfcc@redhat.com>
- <a638e504-f7ad-fa3a-f198-c3878cfc560e@redhat.com>
- <20190607032648.GA22416@habkost.net>
- <20190607034214.GB22416@habkost.net>
- <20190607154432.GA10275@localhost.localdomain>
+ by mx1.redhat.com (Postfix) with ESMTPS id C1B2D30C31A0;
+ Fri,  7 Jun 2019 19:24:39 +0000 (UTC)
+Received: from [10.10.120.179] (ovpn-120-179.rdu2.redhat.com [10.10.120.179])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id A76798CBB9;
+ Fri,  7 Jun 2019 19:24:37 +0000 (UTC)
+To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org,
+ qemu-devel@nongnu.org
+References: <20190606184159.979-1-jsnow@redhat.com>
+ <20190606184159.979-6-jsnow@redhat.com>
+ <07a09d35-769e-ff48-2e93-26c05ce5c9da@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <4b4a8653-7d2a-4a3c-b3e7-53daf5031037@redhat.com>
+Date: Fri, 7 Jun 2019 15:24:35 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20190607154432.GA10275@localhost.localdomain>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+In-Reply-To: <07a09d35-769e-ff48-2e93-26c05ce5c9da@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.38]); Fri, 07 Jun 2019 18:59:24 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+ (mx1.redhat.com [10.5.110.40]); Fri, 07 Jun 2019 19:24:43 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 15/18] Boot Linux Console Test: add a test
- for aarch64 + virt
+Subject: Re: [Qemu-devel] [PATCH 5/5] block/qcow2-bitmap: Count queued
+ bitmaps towards directory_size
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -78,322 +149,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
- "Daniel P. Berrange" <berrange@redhat.com>,
- Stefan Markovic <smarkovic@wavecomp.com>,
- Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
- Cornelia Huck <cohuck@redhat.com>,
- Claudio Fontana <claudio.fontana@huawei.com>, qemu-devel@nongnu.org,
- Wainer dos Santos Moschetta <wainersm@redhat.com>,
- Aleksandar Rikalo <arikalo@wavecomp.com>, qemu-s390x@nongnu.org,
- Aleksandar Markovic <amarkovic@wavecomp.com>,
- Caio Carrara <ccarrara@redhat.com>,
- Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>,
- Aurelien Jarno <aurelien@aurel32.net>
+Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
+ vsementsov@virtuozzo.com, Markus Armbruster <armbru@redhat.com>,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-CCing Daniel, who wrote commit 6ab3fc32ea64.
 
-On Fri, Jun 07, 2019 at 11:44:32AM -0400, Cleber Rosa wrote:
-> On Fri, Jun 07, 2019 at 12:42:14AM -0300, Eduardo Habkost wrote:
-> > On Fri, Jun 07, 2019 at 12:26:48AM -0300, Eduardo Habkost wrote:
-> > > On Fri, Feb 01, 2019 at 11:10:31AM -0500, Cleber Rosa wrote:
-> > > >=20
-> > > >=20
-> > > > On 1/31/19 4:26 PM, Cleber Rosa wrote:
-> > > > >=20
-> > > > >=20
-> > > > > On 1/31/19 3:21 PM, Cleber Rosa wrote:
-> > > > >>
-> > > > >>
-> > > > >> On 1/31/19 3:02 PM, Wainer dos Santos Moschetta wrote:
-> > > > >>>
-> > > > >>> On 01/17/2019 04:56 PM, Cleber Rosa wrote:
-> > > > >>>> Just like the previous tests, boots a Linux kernel on a aarc=
-h64 target
-> > > > >>>> using the virt machine.
-> > > > >>>>
-> > > > >>>> One special option added is the CPU type, given that the ker=
-nel
-> > > > >>>> selected fails to boot on the virt machine's default CPU (co=
-rtex-a15).
-> > > > >>>>
-> > > > >>>> Signed-off-by: Cleber Rosa <crosa@redhat.com>
-> > > > >>>> ---
-> > > > >>>> =A0 .travis.yml=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
-=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 |=A0 2 +-
-> > > > >>>> =A0 tests/acceptance/boot_linux_console.py | 20 ++++++++++++=
-++++++++
-> > > > >>>> =A0 2 files changed, 21 insertions(+), 1 deletion(-)
-> > > > >>>>
-> > > > >>>> diff --git a/.travis.yml b/.travis.yml
-> > > > >>>> index 54100eea5a..595e8c0b6c 100644
-> > > > >>>> --- a/.travis.yml
-> > > > >>>> +++ b/.travis.yml
-> > > > >>>> @@ -187,7 +187,7 @@ matrix:
-> > > > >>>> =A0 =A0=A0=A0=A0=A0 # Acceptance (Functional) tests
-> > > > >>>> =A0=A0=A0=A0=A0 - env:
-> > > > >>>> -=A0=A0=A0=A0=A0=A0=A0 - CONFIG=3D"--python=3D/usr/bin/pytho=
-n3
-> > > > >>>> --target-list=3Dx86_64-softmmu,mips-softmmu,mips64el-softmmu=
-,ppc64-softmmu"
-> > > > >>>> +=A0=A0=A0=A0=A0=A0=A0 - CONFIG=3D"--python=3D/usr/bin/pytho=
-n3
-> > > > >>>> --target-list=3Dx86_64-softmmu,mips-softmmu,mips64el-softmmu=
-,ppc64-softmmu,aarch64-softmmu"
-> > > > >>>>
-> > > > >>>> =A0=A0=A0=A0=A0=A0=A0=A0=A0 - TEST_CMD=3D"make check-accepta=
-nce"
-> > > > >>>> =A0=A0=A0=A0=A0=A0=A0 addons:
-> > > > >>>> =A0=A0=A0=A0=A0=A0=A0=A0=A0 apt:
-> > > > >>>> diff --git a/tests/acceptance/boot_linux_console.py
-> > > > >>>> b/tests/acceptance/boot_linux_console.py
-> > > > >>>> index f3ccd23a7a..107700b517 100644
-> > > > >>>> --- a/tests/acceptance/boot_linux_console.py
-> > > > >>>> +++ b/tests/acceptance/boot_linux_console.py
-> > > > >>>> @@ -138,3 +138,23 @@ class BootLinuxConsole(Test):
-> > > > >>>> =A0=A0=A0=A0=A0=A0=A0=A0=A0 self.vm.launch()
-> > > > >>>> =A0=A0=A0=A0=A0=A0=A0=A0=A0 console_pattern =3D 'Kernel comm=
-and line: %s' %
-> > > > >>>> kernel_command_line
-> > > > >>>> =A0=A0=A0=A0=A0=A0=A0=A0=A0 self.wait_for_console_pattern(co=
-nsole_pattern)
-> > > > >>>> +
-> > > > >>>> +=A0=A0=A0 def test_aarch64_virt(self):
-> > > > >>>
-> > > > >>> That test case fails on my system (Fedora 29 x86_64). Avocado=
- seems
-> > > > >>> unable to kill the VM so it=A0 reaches the timeout.
-> > > > >>>
-> > > > >>> I compiled QEMU with default configuration:
-> > > > >>>
-> > > > >>> $ configure --python=3D/usr/bin/python3 --target-list=3Dx86_6=
-4-softmmu
-> > > > >>> --target-list=3Dx86_64-softmmu,mips-softmmu,mips64el-softmmu,=
-ppc64-softmmu,aarch64-softmmu)
-> > > > >>>
-> > > > >>>
-> > > > >>> Follows a snippet of the Avocado's job.log file:
-> > > > >>> ----
-> > > > >>> 2019-01-31 14:41:34,912 test=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
-=A0 L0602 INFO | START
-> > > > >>> 07-/root/src/qemu/tests/acceptance/boot_linux_console.py:Boot=
-LinuxConsole.test_aarch64_virt
-> > > > >>>
-> > > > >>> 2019-01-31 14:41:34,912 test=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
-=A0 L0298 DEBUG| DATA
-> > > > >>> (filename=3Doutput.expected) =3D> NOT FOUND (data sources: va=
-riant, test, file)
-> > > > >>> 2019-01-31 14:41:34,913 parameters=A0=A0=A0=A0=A0=A0 L0146 DE=
-BUG| PARAMS (key=3Darch,
-> > > > >>> path=3D*, default=3Daarch64) =3D> 'aarch64'
-> > > > >>> 2019-01-31 14:41:34,913 parameters=A0=A0=A0=A0=A0=A0 L0146 DE=
-BUG| PARAMS
-> > > > >>> (key=3Dqemu_bin, path=3D*, default=3Daarch64-softmmu/qemu-sys=
-tem-aarch64) =3D>
-> > > > >>> 'aarch64-softmmu/qemu-system-aarch64'
-> > > > >>> 2019-01-31 14:41:34,915 download=A0=A0=A0=A0=A0=A0=A0=A0 L007=
-0 INFO | Fetching
-> > > > >>> https://sjc.edge.kernel.org/fedora-buffet/fedora/linux/releas=
-es/29/Server/aarch64/os/images/pxeboot/vmlinuz
-> > > > >>> -> /var/lib/avocado/data/cache/by_name/vmlinuz.3upct2pr
-> > > > >>> 2019-01-31 14:41:35,490 download=A0=A0=A0=A0=A0=A0=A0=A0 L005=
-4 DEBUG| Retrieved URL
-> > > > >>> "https://sjc.edge.kernel.org/fedora-buffet/fedora/linux/relea=
-ses/29/Server/aarch64/os/images/pxeboot/vmlinuz":
-> > > > >>> content-length 8623423, date: "Thu, 31 Jan 2019 19:41:35 GMT"=
-,
-> > > > >>> last-modified: "Sun, 21 Oct 2018 00:43:09 GMT"
-> > > > >>> 2019-01-31 14:41:41,765 qemu=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
-=A0 L0317 DEBUG| VM launch command:
-> > > > >>> 'aarch64-softmmu/qemu-system-aarch64 -chardev
-> > > > >>> socket,id=3Dmon,path=3D/var/tmp/tmpizirkcud/qemu-32609-monito=
-r.sock -mon
-> > > > >>> chardev=3Dmon,mode=3Dcontrol -display none -vga none -machine=
- virt -chardev
-> > > > >>> socket,id=3Dconsole,path=3D/var/tmp/tmpizirkcud/qemu-32609-co=
-nsole.sock,server,nowait
-> > > > >>> -serial chardev:console -cpu cortex-a53 -kernel
-> > > > >>> /var/lib/avocado/data/cache/by_name/vmlinuz -append console=3D=
-ttyAMA0'
-> > > > >>> 2019-01-31 14:41:41,779 qmp=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
-=A0 L0167 DEBUG| >>> {'execute':
-> > > > >>> 'qmp_capabilities'}
-> > > > >>> 2019-01-31 14:41:41,931 qmp=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
-=A0 L0175 DEBUG| <<< {'return': {}}
-> > > > >>> 2019-01-31 14:41:42,830 boot_linux_conso L0041 DEBUG| [=A0=A0=
-=A0 0.000000]
-> > > > >>> Booting Linux on physical CPU 0x0000000000 [0x410fd034]
-> > > > >>>
-> > > > >>> (...)
-> > > > >>>
-> > > > >>> 2019-01-31 14:41:42,833 boot_linux_conso L0041 DEBUG| [=A0=A0=
-=A0 0.000000]
-> > > > >>> Policy zone: DMA32
-> > > > >>> 2019-01-31 14:41:42,833 boot_linux_conso L0041 DEBUG| [=A0=A0=
-=A0 0.000000]
-> > > > >>> Kernel command line: console=3DttyAMA0
-> > > > >>> 2019-01-31 14:41:42,833 qmp=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
-=A0 L0167 DEBUG| >>> {'execute':
-> > > > >>> 'quit'}
-> > > > >>
-> > > > >> Here, a QMP response like "<<< {'return': {}}" would be expect=
-ed.
-> > > > >>
-> > > > >> Since I can not reproduce this on my system (or on Travis-CI j=
-obs I've
-> > > > >> sent), can you tell me on top of which commit you've applied t=
-hese patches?
-> > > > >>
-> > > > >=20
-> > > > > I spoke too soon:
-> > > > >=20
-> > > > > https://travis-ci.org/clebergnu/qemu/jobs/487121425#L3033
-> > > > >=20
-> > > > > This looks like a recent regression, and I'm guessing it's not =
-on the
-> > > > > test's side.  I'll try to bisect it and let you know.
-> > > > >=20
-> > > >=20
-> > > > On a fresh environment, I am able to get this reproduced on every=
- 2 of
-> > > > runs, more or less.  When I hit it, I attached GDB to it, and the
-> > > > backtrace shows:
-> > > >=20
-> > > > Thread debugging using libthread_db enabled]
-> > > > Using host libthread_db library "/lib64/libthread_db.so.1".
-> > > > warning: Loadable section ".note.gnu.property" outside of ELF seg=
-ments
-> > > > warning: Loadable section ".note.gnu.property" outside of ELF seg=
-ments
-> > > > __lll_lock_wait () at ../sysdeps/unix/sysv/linux/x86_64/lowlevell=
-ock.S:103
-> > > > 103     2:      movl    %edx, %eax
-> > > > (gdb) bt
-> > > > #0  __lll_lock_wait () at
-> > > > ../sysdeps/unix/sysv/linux/x86_64/lowlevellock.S:103
-> > > > #1  0x00007fc6ba1a2e09 in __GI___pthread_mutex_lock
-> > > > (mutex=3Dmutex@entry=3D0x5615a233d020 <qemu_global_mutex>) at
-> > > > ../nptl/pthread_mutex_lock.c:80
-> > > > #2  0x00005615a1bb7593 in qemu_mutex_lock_impl (mutex=3D0x5615a23=
-3d020
-> > > > <qemu_global_mutex>, file=3D0x5615a1db2d4c "util/main-loop.c", li=
-ne=3D236)
-> > > > at util/qemu-thread-posix.c:66
-> > > > #3  0x00005615a171125e in qemu_mutex_lock_iothread_impl
-> > > > (file=3Dfile@entry=3D0x5615a1db2d4c "util/main-loop.c", line=3Dli=
-ne@entry=3D236)
-> > > > at /home/cleber/src/qemu/cpus.c:1849
-> > > > #4  0x00005615a1bb415d in os_host_main_loop_wait (timeout=3D<opti=
-mized
-> > > > out>) at util/main-loop.c:236
-> > > > #5  main_loop_wait (nonblocking=3D<optimized out>) at util/main-l=
-oop.c:497
-> > > > #6  0x00005615a18fdd39 in main_loop () at vl.c:1928
-> > > > #7  0x00005615a16c9ee9 in main (argc=3D<optimized out>, argv=3D<o=
-ptimized
-> > > > out>, envp=3D<optimized out>) at vl.c:4665
-> > >=20
-> > > Tip: run "thread apply all bt" so you can get a backtrace of all
-> > > threads.
-> > >=20
-> > >=20
-> > > >=20
-> > > > Running it with `taskset -c 1` prevents this issue from happening=
-, which
-> > > > AFAICT, contributes even further towards this being a QEMU race c=
-ondition.
-> > > >=20
-> > > > I'm CC'ing Peter and Claudio (listed maintainers of aarch64), as =
-this
-> > > > seems to limited to that target.  Any tips on what to do here?
-> > >=20
-> > > I am hitting this on Travis, too, and I finally could reproduce
-> > > it locally,
-> > >=20
-> > > The guest is still writing on the serial console, but nobody is
-> > > reading the data on the other side.  A VCPU thread is stuck
-> > > inside the EAGAIN/nanosleep loop at qemu_chr_write_buffer(),
-> > > holding the QEMU global lock.
-> >=20
-> > Experimental fix below.
-> >=20
-> > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> > ---
-> >  python/qemu/__init__.py | 12 ++++++++----
-> >  1 file changed, 8 insertions(+), 4 deletions(-)
-> >=20
-> > diff --git a/python/qemu/__init__.py b/python/qemu/__init__.py
-> > index 81d9657ec0..4a691f34da 100644
-> > --- a/python/qemu/__init__.py
-> > +++ b/python/qemu/__init__.py
-> > @@ -274,10 +274,6 @@ class QEMUMachine(object):
-> > =20
-> >          self._qemu_log_path =3D None
-> > =20
-> > -        if self._console_socket is not None:
-> > -            self._console_socket.close()
-> > -            self._console_socket =3D None
-> > -
-> >          if self._temp_dir is not None:
-> >              shutil.rmtree(self._temp_dir)
-> >              self._temp_dir =3D None
-> > @@ -336,6 +332,14 @@ class QEMUMachine(object):
-> >          """
-> >          Terminate the VM and clean up
-> >          """
-> > +
-> > +        # If we keep the console socket open, we may deadlock waitin=
-g
-> > +        # for QEMU to exit, while QEMU is waiting for the socket to
-> > +        # become writeable.
-> > +        if self._console_socket is not None:
-> > +            self._console_socket.close()
-> > +            self._console_socket =3D None
-> > +
->=20
-> Right, this is somewhat equivalent to the following "workaround":
->=20
->    https://github.com/clebergnu/qemu/commit/e1713f3b91972ad57c089f276c5=
-4db3f3fa63423
->=20
-> I could not tell at the moment, though, if closing (or shutting down)
-> the console socket was the appropriate fix.
->=20
-> What I see is that Rick's commit pointed to by Lazlo is dated from
-> 2016, and it says that a virtio-console fix is necessary.  I'd imagine
-> that, if a fix was ever proposed, it'd have been incorporated in the
-> F29 kernel used in this test... and that this workaround/fix would
-> not be the best solution.
 
-If I understood this correctly, fixing the guest driver wouldn't
-help here.  The commit mentioned by Laszlo (6ab3fc32ea64 "hw:
-replace most use of qemu_chr_fe_write with qemu_chr_fe_write_all")
-fixes data loss bugs but introduces the potential for deadlocks
-like the one we are seeing.
+On 6/6/19 10:30 PM, Eric Blake wrote:
+> On 6/6/19 1:41 PM, John Snow wrote:
+>> Similarly to the previous commit, we need to also keep a ledger of the
+>> additional directory size burden that we've not yet committed so we can
+>> reject new additions sooner instead of later.
+>>
+>> Signed-off-by: John Snow <jsnow@redhat.com>
+>> ---
+>>  block/qcow2.h        |  1 +
+>>  block/qcow2-bitmap.c | 13 ++++++++++++-
+>>  2 files changed, 13 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/block/qcow2.h b/block/qcow2.h
+>> index ebf60ac236..5aff97eb9c 100644
+>> --- a/block/qcow2.h
+>> +++ b/block/qcow2.h
+>> @@ -318,6 +318,7 @@ typedef struct BDRVQcow2State {
+>>  
+>>      uint32_t nb_bitmaps;
+>>      uint32_t nb_queued_bitmaps;
+>> +    uint32_t queued_directory_size;
+>>      uint64_t bitmap_directory_size;
+> 
+> Why can we get away with uint32_t for the queue size, but uint64_t for
+> the stored size? Something feels fishy.
+> 
 
-Unless we replace the existing ~30 qemu_chr_fe_write_all() calls
-in device code, we need to make sure we are constantly reading
-data from the console socket.
+That would be me using the wrong type.
 
->=20
-> But, I'm mostly attempting to navigate this using my senses , few hard
-> data and even less background :).
->=20
-> Regards,
-> - Cleber.
->=20
-> >          if self.is_running():
-> >              try:
-> >                  self._qmp.cmd('quit')
-> > --=20
-> > 2.18.0.rc1.1.g3f1ff2140
-> >=20
-> > --=20
-> > Eduardo
-
---=20
-Eduardo
+--js
 
