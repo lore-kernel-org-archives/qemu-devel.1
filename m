@@ -3,56 +3,139 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A3C5C2BCA1
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 22:35:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 111ABC2BCA1
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 22:41:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4B0662067C
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 22:35:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4B0662067C
+	by mail.kernel.org (Postfix) with ESMTPS id D3E1320840
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 22:41:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D3E1320840
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53996 helo=lists.gnu.org)
+Received: from localhost ([::1]:54052 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hZNSn-0007ob-IJ
-	for qemu-devel@archiver.kernel.org; Fri, 07 Jun 2019 18:35:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52945)
+	id 1hZNXs-0002ix-0D
+	for qemu-devel@archiver.kernel.org; Fri, 07 Jun 2019 18:41:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60838)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <eblake@redhat.com>) id 1hZN7s-0002rU-0q
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 18:14:21 -0400
+ (envelope-from <jsnow@redhat.com>) id 1hZNWj-0001M0-Aw
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 18:40:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1hZN7q-0004JR-Dm
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 18:14:19 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36838)
+ (envelope-from <jsnow@redhat.com>) id 1hZNWi-0002sv-4l
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 18:40:01 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44908)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1hZN7q-0004GX-4p
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 18:14:18 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>)
+ id 1hZNWf-0002pz-L9; Fri, 07 Jun 2019 18:39:57 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 1D064308339A
- for <qemu-devel@nongnu.org>; Fri,  7 Jun 2019 22:14:17 +0000 (UTC)
-Received: from blue.redhat.com (ovpn-116-85.phx2.redhat.com [10.3.116.85])
- by smtp.corp.redhat.com (Postfix) with ESMTP id BB544600C0;
- Fri,  7 Jun 2019 22:14:16 +0000 (UTC)
-From: Eric Blake <eblake@redhat.com>
-To: qemu-devel@nongnu.org
-Date: Fri,  7 Jun 2019 17:14:14 -0500
-Message-Id: <20190607221414.15962-1-eblake@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id ACB6D30872C3;
+ Fri,  7 Jun 2019 22:39:46 +0000 (UTC)
+Received: from [10.10.120.179] (ovpn-120-179.rdu2.redhat.com [10.10.120.179])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 55FE61001DC0;
+ Fri,  7 Jun 2019 22:39:45 +0000 (UTC)
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-devel@nongnu.org, qemu-block@nongnu.org
+References: <20190603120005.37394-1-vsementsov@virtuozzo.com>
+ <20190603120005.37394-3-vsementsov@virtuozzo.com>
+From: John Snow <jsnow@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <1e937a40-5ce2-467a-a50b-e8f822f2dcdc@redhat.com>
+Date: Fri, 7 Jun 2019 18:39:44 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+In-Reply-To: <20190603120005.37394-3-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.44]); Fri, 07 Jun 2019 22:14:17 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+ (mx1.redhat.com [10.5.110.47]); Fri, 07 Jun 2019 22:39:51 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH] RFC: qio: Improve corking of TLS sessions
+Subject: Re: [Qemu-devel] [PATCH 2/4] block/dirty-bitmap: add hide/unhide API
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -64,245 +147,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+Cc: kwolf@redhat.com, fam@euphon.net, armbru@redhat.com, mreitz@redhat.com,
+ nshirokovskiy@virtuozzo.com, den@openvz.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Our current implementation of qio_channel_set_cork() is pointless for
-TLS sessions: we block the underlying channel, but still hand things
-piecemeal to gnutls which then produces multiple encryption packets.
-Better is to directly use gnutls corking, which collects multiple
-inputs into a single encryption packet.
-
-Signed-off-by: Eric Blake <eblake@redhat.com>
-
----
-
-RFC because unfortunately, I'm not sure I like the results.  My test
-case (using latest nbdkit.git) involves sending 10G of random data
-over NBD using parallel writes (and doing nothing on the server end;
-this is all about timing the data transfer):
-
-$ dd if=3D/dev/urandom of=3Drand bs=3D1M count=3D10k
-$ time nbdkit -p 10810 --tls=3Drequire --tls-verify-peer \
-   --tls-psk=3D/tmp/keys.psk --filter=3Dstats null 10g statsfile=3D/dev/s=
-tderr \
-   --run '~/qemu/qemu-img convert -f raw -W -n --target-image-opts \
-     --object tls-creds-psk,id=3Dtls0,endpoint=3Dclient,dir=3D/tmp,userna=
-me=3Deblake \
-     rand driver=3Dnbd,server.type=3Dinet,server.host=3Dlocalhost,server.=
-port=3D10810,tls-creds=3Dtls0'
-
-Pre-patch, I measured:
-real	0m34.536s
-user	0m29.264s
-sys	0m4.014s
-
-while post-patch, it changed to:
-real	0m36.055s
-user	0m27.685s
-sys	0m10.138s
-
-Less time spent in user space, but for this particular qemu-img
-behavior (writing 2M chunks at a time), gnutls is now uncorking huge
-packets and the kernel is doing enough extra work that the overall
-program actually takes longer. :(
-
-For smaller I/O patterns, the effects of corking are more likely to be
-beneficial, but I don't have a ready test case to produce that pattern
-(short of creating a guest running fio on a device backed by nbd).
-
-Ideas for improvements are welcome; see my recent thread on the
-libguestfs about how TCP_CORK is already a painful interface (it
-requires additional syscalls), and that we may be better off teaching
-qio_channel_writev about taking a flag similar to send(,MSG_MORE),
-which can achieve the same effect as setsockopt(TCP_CORK) but in fewer
-syscalls:
-https://www.redhat.com/archives/libguestfs/2019-June/msg00078.html
-https://www.redhat.com/archives/libguestfs/2019-June/msg00081.html
-
-Another idea might be teaching channel-tls.c to be smarter about the
-maximum size of data it is willing to cork, as well as to autocork
-during writev (it's a shame that gnutls doesn't have a sendmsg
-counterpart for sending vectors).  And after all, writev already
-auto-corks for sockets, which is why we already went to the effort of
-allowing clients to use writev-like interfaces to qio channels,
-whether or not we also add in an ability to exploit MSG_MORE when we
-have back-to-back writevs to further group where it makes sense.
----
- include/crypto/tlssession.h | 15 +++++++++++++++
- include/io/channel.h        |  4 ++--
- crypto/tlssession.c         | 16 ++++++++++++++++
- io/channel-socket.c         |  3 ++-
- io/channel-tls.c            |  9 ++++++---
- io/channel-websock.c        |  3 ++-
- io/channel.c                | 11 ++++++++++-
- 7 files changed, 53 insertions(+), 8 deletions(-)
-
-diff --git a/include/crypto/tlssession.h b/include/crypto/tlssession.h
-index 1c7414e4ffdd..451f58c2c742 100644
---- a/include/crypto/tlssession.h
-+++ b/include/crypto/tlssession.h
-@@ -319,4 +319,19 @@ int qcrypto_tls_session_get_key_size(QCryptoTLSSessi=
-on *sess,
-  */
- char *qcrypto_tls_session_get_peer_name(QCryptoTLSSession *sess);
-
-+/**
-+ * qcrypto_tls_session_cork:
-+ * @sess: the TLS session object
-+ * @enabled: the desired cork status
-+ *
-+ * Update the cork status of the session. If @enabled is true, this is
-+ * a hint that the next few writes should be batched together until
-+ * the session is uncorked again. If false, then proceed to write
-+ * batched data, and it is safe to call this in a loop in case
-+ * flushing the queue would block.
-+ *
-+ * Returns: 0 for success, or -EAGAIN if uncorking is incomplete.
-+ */
-+int qcrypto_tls_session_cork(QCryptoTLSSession *sess, bool enabled);
-+
- #endif /* QCRYPTO_TLSSESSION_H */
-diff --git a/include/io/channel.h b/include/io/channel.h
-index 59460cb1ec7a..e9565b9f7d65 100644
---- a/include/io/channel.h
-+++ b/include/io/channel.h
-@@ -129,8 +129,8 @@ struct QIOChannelClass {
-     int (*io_shutdown)(QIOChannel *ioc,
-                        QIOChannelShutdown how,
-                        Error **errp);
--    void (*io_set_cork)(QIOChannel *ioc,
--                        bool enabled);
-+    int (*io_set_cork)(QIOChannel *ioc,
-+                       bool enabled);
-     void (*io_set_delay)(QIOChannel *ioc,
-                          bool enabled);
-     off_t (*io_seek)(QIOChannel *ioc,
-diff --git a/crypto/tlssession.c b/crypto/tlssession.c
-index c3a920dfe80e..6ef5d9001375 100644
---- a/crypto/tlssession.c
-+++ b/crypto/tlssession.c
-@@ -547,6 +547,17 @@ qcrypto_tls_session_get_peer_name(QCryptoTLSSession =
-*session)
-     return NULL;
- }
-
-+int qcrypto_tls_session_cork(QCryptoTLSSession *session, bool enabled)
-+{
-+    return 0;
-+    if (enabled) {
-+        gnutls_record_cork(session->handle);
-+    } else if (gnutls_record_uncork(session->handle, 0) < 0) {
-+        return -EAGAIN;
-+    }
-+    return 0;
-+}
-+
-
- #else /* ! CONFIG_GNUTLS */
-
-@@ -639,4 +650,9 @@ qcrypto_tls_session_get_peer_name(QCryptoTLSSession *=
-sess)
-     return NULL;
- }
-
-+int qcrypto_tls_session_cork(QCryptoTLSSession *sess, bool enabled)
-+{
-+    return 0;
-+}
-+
- #endif
-diff --git a/io/channel-socket.c b/io/channel-socket.c
-index bc5f80e780eb..44eb85cd2ba4 100644
---- a/io/channel-socket.c
-+++ b/io/channel-socket.c
-@@ -669,7 +669,7 @@ qio_channel_socket_set_delay(QIOChannel *ioc,
- }
 
 
--static void
-+static int
- qio_channel_socket_set_cork(QIOChannel *ioc,
-                             bool enabled)
- {
-@@ -677,6 +677,7 @@ qio_channel_socket_set_cork(QIOChannel *ioc,
-     int v =3D enabled ? 1 : 0;
+On 6/3/19 8:00 AM, Vladimir Sementsov-Ogievskiy wrote:
+> Add functionality to make bitmap temporary anonymous. It will be used
+> to implement bitmap remove transaction action. We need hide bitmap
+> persistence too, as there are should not be unnamed persistent bitmaps.
+> 
 
-     socket_set_cork(sioc->fd, v);
-+    return 0;
- }
+Ah, so this effectively ... "hides" a bitmap from any further
+transaction actions. It also "hides" it from getting flushed to disk...
+sort of?
 
+The outer loop in store works with bdrv_dirty_bitmap_next, and we'll
+skip this bitmap because it's anonymous/not persistent.
 
-diff --git a/io/channel-tls.c b/io/channel-tls.c
-index c98ead21b01e..93162d5ecc85 100644
---- a/io/channel-tls.c
-+++ b/io/channel-tls.c
-@@ -346,12 +346,15 @@ static void qio_channel_tls_set_delay(QIOChannel *i=
-oc,
-     qio_channel_set_delay(tioc->master, enabled);
- }
+There's a second loop where we iterate bm_list, and we'll skip storing
+this bitmap because that entry won't have an in-memory bitmap associated
+with it in bm_list.
 
--static void qio_channel_tls_set_cork(QIOChannel *ioc,
--                                     bool enabled)
-+static int qio_channel_tls_set_cork(QIOChannel *ioc,
-+                                    bool enabled)
- {
-     QIOChannelTLS *tioc =3D QIO_CHANNEL_TLS(ioc);
+...But then we'll call update_ext_header_and_dir with the stale entries
+in bm_list?
 
--    qio_channel_set_cork(tioc->master, enabled);
-+    if (qcrypto_tls_session_cork(tioc->session, enabled) =3D=3D -EAGAIN)=
- {
-+        return QIO_CHANNEL_ERR_BLOCK;
-+    }
-+    return 0;
- }
-
- static int qio_channel_tls_shutdown(QIOChannel *ioc,
-diff --git a/io/channel-websock.c b/io/channel-websock.c
-index 77d30f0e4aa4..a288e21a2a75 100644
---- a/io/channel-websock.c
-+++ b/io/channel-websock.c
-@@ -1186,12 +1186,13 @@ static void qio_channel_websock_set_delay(QIOChan=
-nel *ioc,
-     qio_channel_set_delay(tioc->master, enabled);
- }
-
--static void qio_channel_websock_set_cork(QIOChannel *ioc,
-+static int qio_channel_websock_set_cork(QIOChannel *ioc,
-                                          bool enabled)
- {
-     QIOChannelWebsock *tioc =3D QIO_CHANNEL_WEBSOCK(ioc);
-
-     qio_channel_set_cork(tioc->master, enabled);
-+    return 0;
- }
-
- static int qio_channel_websock_shutdown(QIOChannel *ioc,
-diff --git a/io/channel.c b/io/channel.c
-index 2a26c2a2c0b9..3510912465ac 100644
---- a/io/channel.c
-+++ b/io/channel.c
-@@ -379,7 +379,16 @@ void qio_channel_set_cork(QIOChannel *ioc,
-     QIOChannelClass *klass =3D QIO_CHANNEL_GET_CLASS(ioc);
-
-     if (klass->io_set_cork) {
--        klass->io_set_cork(ioc, enabled);
-+        int r =3D klass->io_set_cork(ioc, enabled);
-+
-+        while (r =3D=3D QIO_CHANNEL_ERR_BLOCK) {
-+            if (qemu_in_coroutine()) {
-+                qio_channel_yield(ioc, G_IO_OUT);
-+            } else {
-+                qio_channel_wait(ioc, G_IO_OUT);
-+            }
-+            r =3D klass->io_set_cork(ioc, enabled);
-+        }
-     }
- }
-
---=20
-2.20.1
-
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>  include/block/dirty-bitmap.h |  2 ++
+>  block/dirty-bitmap.c         | 26 ++++++++++++++++++++++++++
+>  2 files changed, 28 insertions(+)
+> 
+> diff --git a/include/block/dirty-bitmap.h b/include/block/dirty-bitmap.h
+> index 8044ace63e..542e437123 100644
+> --- a/include/block/dirty-bitmap.h
+> +++ b/include/block/dirty-bitmap.h
+> @@ -116,5 +116,7 @@ bool bdrv_dirty_bitmap_next_dirty_area(BdrvDirtyBitmap *bitmap,
+>  BdrvDirtyBitmap *bdrv_reclaim_dirty_bitmap_locked(BlockDriverState *bs,
+>                                                    BdrvDirtyBitmap *bitmap,
+>                                                    Error **errp);
+> +void bdrv_dirty_bitmap_hide(BdrvDirtyBitmap *bitmap);
+> +void bdrv_dirty_bitmap_unhide(BdrvDirtyBitmap *bitmap);
+>  
+>  #endif
+> diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
+> index 49646a30e6..592964635e 100644
+> --- a/block/dirty-bitmap.c
+> +++ b/block/dirty-bitmap.c
+> @@ -35,6 +35,10 @@ struct BdrvDirtyBitmap {
+>      bool busy;                  /* Bitmap is busy, it can't be used via QMP */
+>      BdrvDirtyBitmap *successor; /* Anonymous child, if any. */
+>      char *name;                 /* Optional non-empty unique ID */
+> +    char *hidden_name;          /* Backup of @name for removal transaction
+> +                                   action. Used for hide/unhide API. */
+> +    bool hidden_persistent;     /* Backup of @persistent for removal transaction
+> +                                   action. */
+>      int64_t size;               /* Size of the bitmap, in bytes */
+>      bool disabled;              /* Bitmap is disabled. It ignores all writes to
+>                                     the device */
+> @@ -849,3 +853,25 @@ out:
+>          qemu_mutex_unlock(src->mutex);
+>      }
+>  }
+> +
+> +void bdrv_dirty_bitmap_hide(BdrvDirtyBitmap *bitmap)
+> +{
+> +    qemu_mutex_lock(bitmap->mutex);
+> +    assert(!bitmap->hidden_name);
+> +    bitmap->hidden_name = bitmap->name;
+> +    bitmap->hidden_persistent = bitmap->persistent;
+> +    bitmap->name = NULL;
+> +    bitmap->persistent = false;
+> +    qemu_mutex_unlock(bitmap->mutex);
+> +}
+> +
+> +void bdrv_dirty_bitmap_unhide(BdrvDirtyBitmap *bitmap)
+> +{
+> +    qemu_mutex_lock(bitmap->mutex);
+> +    assert(!bitmap->name);
+> +    bitmap->name = bitmap->hidden_name;
+> +    bitmap->persistent = bitmap->hidden_persistent;
+> +    bitmap->hidden_name = NULL;
+> +    bitmap->hidden_persistent = false;
+> +    qemu_mutex_unlock(bitmap->mutex);
+> +}
+> 
 
