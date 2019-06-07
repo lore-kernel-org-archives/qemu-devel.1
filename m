@@ -2,142 +2,93 @@ Return-Path: <SRS0=3yEa=UG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42777C2BCA1
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 19:48:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DB6DC2BCA1
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 19:50:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CDDAF20868
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 19:48:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CDDAF20868
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id ED5B320868
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 19:50:40 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ksyvPKsS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ED5B320868
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52424 helo=lists.gnu.org)
+Received: from localhost ([::1]:52474 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hZKqX-0003MI-Ff
-	for qemu-devel@archiver.kernel.org; Fri, 07 Jun 2019 15:48:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42234)
+	id 1hZKsp-0005iM-Vb
+	for qemu-devel@archiver.kernel.org; Fri, 07 Jun 2019 15:50:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44804)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <jsnow@redhat.com>) id 1hZJE0-0007tu-4Y
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 14:04:26 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1hZJI4-0002T1-Jq
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 14:08:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1hZJDy-0003Dx-QN
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 14:04:24 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40542)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1hZJDu-0002bU-Ck; Fri, 07 Jun 2019 14:04:18 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 678E1C1EB218;
- Fri,  7 Jun 2019 18:04:07 +0000 (UTC)
-Received: from [10.10.120.179] (ovpn-120-179.rdu2.redhat.com [10.10.120.179])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 4849A1711D;
- Fri,  7 Jun 2019 18:04:06 +0000 (UTC)
-To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org,
+ (envelope-from <richard.henderson@linaro.org>) id 1hZJI2-0001EA-Lm
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 14:08:36 -0400
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:35866)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1hZJI1-00014D-CR
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 14:08:34 -0400
+Received: by mail-ot1-x341.google.com with SMTP id c3so2697151otr.3
+ for <qemu-devel@nongnu.org>; Fri, 07 Jun 2019 11:08:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:references:from:openpgp:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=xSxr2khXk/E2wuomvgD1zBa6o7VMFaqnrO/SqCVlTc8=;
+ b=ksyvPKsSN8sSK8T0sDDfSAznRFlErxOKyt+r5n13AL5dFHLTrfRl69LmRTc0mlXbNk
+ 4SD8iOnPFAeq64f0F6LW9jqJgI1S82Df8zP7/S/b43N1HrzqdsLLpgzxkBJwhsGUysrI
+ ybMLsX9ixfzK8i3xEyu2dxQSp/iuex+mJgGtM5/j8+eaG7pTmXOXCSYne1EzsgxSObZj
+ B9I7dcGb5t5XEAKI79HYZc19tZFJaGbYm86idsESG6fUeelDIXgxRyRinvq+Ku6euG7Q
+ E41XscN0FNqEWuldDFkHak8ZT/4JGH6n5fehCIylI0LgUFhH9VnOrbETOAtYlNzvd7bj
+ EUhg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=xSxr2khXk/E2wuomvgD1zBa6o7VMFaqnrO/SqCVlTc8=;
+ b=RCapJxp590SR4/2qviP3cwLST1fg/BwDrcf8KvDvOFhtqT4lzeVxXN+0vsOWD8wIy2
+ eQ9qTiFPRszt/yIBLm1o5Vk7hrqSvDWEVewt2iwLtU+mOCxSZTKJQowN/tkF0qkfEurt
+ e0TPxuJ8ztOGZAK69IunINVcqp36Ih04cjZYbVWt7aLelRhNijRBZoTRljcVw1Cqea8y
+ FaAJitN6INnJHOy8DUD29urj0D0upZg/8gFDs8DI8j1XDo4wEqPxBhSftbpJS+xurwo6
+ auuFn6MBUYFZTIiNaZlp7NoYFykl8BSIbvrZJMAupxxJSgkKaeb4KHxJli9OPDwN247Y
+ YOHQ==
+X-Gm-Message-State: APjAAAXRyGsnjmYQ/Wr/bwjZqg2wwD0EN4ZxAgYlBQxJIhxsYrpJuMqr
+ xPzsvQFDbiNzz8q14FVZdOZkJILz6uSjlw==
+X-Google-Smtp-Source: APXvYqwob0bj2I88FRURw+21k0zJBZZh3hKZCXShb0Ioo17k87ktVOuj0CBsiq2UFIJYlKgDLJn8MQ==
+X-Received: by 2002:a9d:6453:: with SMTP id m19mr3172037otl.70.1559930905732; 
+ Fri, 07 Jun 2019 11:08:25 -0700 (PDT)
+Received: from [192.168.3.43] (200-56-192-86-cable.cybercable.net.mx.
+ [200.56.192.86])
+ by smtp.gmail.com with ESMTPSA id s110sm1021947otb.34.2019.06.07.11.08.24
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Fri, 07 Jun 2019 11:08:24 -0700 (PDT)
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
  qemu-devel@nongnu.org
-References: <20190606184159.979-1-jsnow@redhat.com>
- <20190606184159.979-5-jsnow@redhat.com>
- <0d0c47ea-20ce-ba00-0ffd-df35975b71ea@redhat.com>
-From: John Snow <jsnow@redhat.com>
+References: <20190606174609.20487-1-peter.maydell@linaro.org>
+ <20190606174609.20487-14-peter.maydell@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
 Openpgp: preference=signencrypt
-Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <35ec49d9-0000-f7f2-a3ae-7ac19787f54d@redhat.com>
-Date: Fri, 7 Jun 2019 14:04:05 -0400
+Message-ID: <119282bd-4a60-e9a6-99c2-4fa2ddb1ecc0@linaro.org>
+Date: Fri, 7 Jun 2019 13:08:21 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <0d0c47ea-20ce-ba00-0ffd-df35975b71ea@redhat.com>
+In-Reply-To: <20190606174609.20487-14-peter.maydell@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.32]); Fri, 07 Jun 2019 18:04:07 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 4/5] block/qcow2-bitmap: Count queued
- bitmaps towards nb_bitmaps
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::341
+Subject: Re: [Qemu-devel] [PATCH 13/42] target/arm: Convert
+ "single-precision" register moves to decodetree
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -149,72 +100,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
- vsementsov@virtuozzo.com, Markus Armbruster <armbru@redhat.com>,
- Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On 6/6/19 12:45 PM, Peter Maydell wrote:
+> Convert the "single-precision" register moves to decodetree:
+>  * VMSR
+>  * VMRS
+>  * VMOV between general purpose register and single precision
+> 
+> Note that the VMSR/VMRS conversions make our handling of
+> the "should this UNDEF?" checks consistent between the two
+> instructions:
+>  * VMSR to MVFR0, MVFR1, MVFR2 now UNDEF from EL0
+>    (previously was a nop)
+>  * VMSR to FPSID now UNDEFs from EL0 or if VFPv3 or better
+>    (previously was a nop)
+>  * VMSR to FPINST and FPINST2 now UNDEF if VFPv3 or better
+>    (previously would write to the register, which had no
+>    guest-visible effect because we always UNDEF reads)
+> 
+> We also tighten up the decode: we were previously underdecoding
+> some SBZ or SBO bits.
+> 
+> The conversion of VMOV_single includes the expansion out of the
+> gen_mov_F0_vreg()/gen_vfp_mrs() and gen_mov_vreg_F0()/gen_vfp_msr()
+> sequences into the simpler direct load/store of the TCG temp via
+> neon_{load,store}_reg32(): we know in the new function that we're
+> always single-precision, we don't need to use the old-and-deprecated
+> cpu_F0* TCG globals, and we don't happen to have the declaration of
+> gen_vfp_msr() and gen_vfp_mrs() at the point in the file where the
+> new function is.
+> 
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+>  target/arm/translate-vfp.inc.c | 161 +++++++++++++++++++++++++++++++++
+>  target/arm/translate.c         | 148 +-----------------------------
+>  target/arm/vfp.decode          |   4 +
+>  3 files changed, 168 insertions(+), 145 deletions(-)
+
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
 
-On 6/6/19 10:27 PM, Eric Blake wrote:
-> On 6/6/19 1:41 PM, John Snow wrote:
->> When we check to see if we can store a bitmap, we don't check how many
->> we've queued up. This can cause a problem saving bitmaps on close
->> instead of when we request them to be added. With the stricter add
->> interface, prohibit these bitmaps specifically.
->>
->> To match, make the remove interface more strict as well; now rejecting
->> any requests to remove bitmaps that were never queued for storage.
->>
->> We don't need to "find" the bitmap when the interface has been given the
->> bitmap explicitly, but this is done to make sure that the bitmap given
->> actually does belong to the bs we were passed as a paranoia check to
->> enforce consistency.
->>
->> ---
-> 
-> Oops - that marker...
-> 
->>
->> "What about directory size?" Please see the following patch.
->>
->> Signed-off-by: John Snow <jsnow@redhat.com>
-> 
-> ...renders the S-o-b invisible.
-> 
->> +++ b/block/qcow2-bitmap.c
->> @@ -1402,6 +1402,23 @@ static Qcow2Bitmap *find_bitmap_by_name(Qcow2BitmapList *bm_list,
->>      return NULL;
->>  }
->>  
->> +static int qcow2_remove_queued_dirty_bitmap(
->> +    BlockDriverState *bs, const char *name, Error **errp)
->> +{
->> +    BDRVQcow2State *s = bs->opaque;
->> +    BdrvDirtyBitmap *bitmap = bdrv_find_dirty_bitmap(bs, name);
->> +    if (!bitmap) {
->> +        error_setg(errp, "Node '%s' has no stored or enqueued bitmap '%s'",
->> +                   bdrv_get_node_name(bs), name);
->> +        return -ENOENT;
->> +    }
->> +    assert(s->nb_queued_bitmaps > 0);
->> +    assert(bdrv_dirty_bitmap_get_persistence(bitmap));
->> +    s->nb_queued_bitmaps -= 1;
-> 
-> I tend to use -- over -= 1.
-> 
->> @@ -1667,6 +1686,8 @@ int qcow2_add_persistent_dirty_bitmap(BlockDriverState *bs,
->>          goto fail;
->>      }
->>  
->> +    s->nb_queued_bitmaps += 1;
-> 
-> And again, for ++
-> 
-> Reviewed-by: Eric Blake <eblake@redhat.com>
-> 
-
-Wow, sorry, lots of Python lately!
+r~
 
