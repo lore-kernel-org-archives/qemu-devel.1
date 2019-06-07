@@ -2,64 +2,78 @@ Return-Path: <SRS0=3yEa=UG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=FROM_EXCESS_BASE64,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 62E3FC2BCA1
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 19:02:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 165EFC2BCA1
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 19:05:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3F6E120868
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 19:02:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3F6E120868
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 9C1F420868
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 19:05:47 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="RgFo4rji"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9C1F420868
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51134 helo=lists.gnu.org)
+Received: from localhost ([::1]:51178 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hZK7j-00054q-4q
-	for qemu-devel@archiver.kernel.org; Fri, 07 Jun 2019 15:02:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33525)
+	id 1hZKBO-0006bW-Lu
+	for qemu-devel@archiver.kernel.org; Fri, 07 Jun 2019 15:05:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35626)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <berrange@redhat.com>) id 1hZIgN-0004kg-Vc
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 13:29:41 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1hZIoN-0001hC-SZ
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 13:37:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berrange@redhat.com>) id 1hZIgM-0001ut-Os
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 13:29:39 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37546)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1hZIgM-0001tp-HA
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 13:29:38 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 4BFEB308FF30;
- Fri,  7 Jun 2019 17:29:28 +0000 (UTC)
-Received: from redhat.com (ovpn-112-33.ams2.redhat.com [10.36.112.33])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id A03E468D6B;
- Fri,  7 Jun 2019 17:29:18 +0000 (UTC)
-Date: Fri, 7 Jun 2019 18:29:15 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Cleber Rosa <crosa@redhat.com>
-Message-ID: <20190607172915.GN28838@redhat.com>
-References: <20190607152223.9467-1-crosa@redhat.com>
- <20190607152223.9467-8-crosa@redhat.com>
+ (envelope-from <peter.maydell@linaro.org>) id 1hZIoM-0006sK-2S
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 13:37:55 -0400
+Received: from mail-ot1-x335.google.com ([2607:f8b0:4864:20::335]:35461)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1hZIoL-0006pV-7k
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 13:37:53 -0400
+Received: by mail-ot1-x335.google.com with SMTP id j19so2613695otq.2
+ for <qemu-devel@nongnu.org>; Fri, 07 Jun 2019 10:37:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=UDFtgeBuUJbyVO78BVK1jvam/9/OM+P3NZpnL3d8rok=;
+ b=RgFo4rjiICyj/DZkMFNYiyogdhPRrsVoHyi+/hkDdHb4qyVqQnTeqt9ly7CDo1Cdl+
+ y6hpuZC2BJVP56I8N74bs5hNp96cWLhPkpigyP7uzQVwOAGPaQWb7xcoqBHUWTD5AFNq
+ ZDGIRPR2CsotK3bMnTZbIhSnBFMz2mhsMclJyeya8aJgshMw2LgR+qL+etB4uyqrPo1n
+ eXkHwivSifLZS8XIwpK6+n/QgQw1L+PsxL549fnN0Bkw7LaVRroShNu6eFZT9wNum3S2
+ agzRsmJ95UP2E3fu+lNDY73HJNG1p5By0p+THw6Sf7hJ7m3MGWtq8oBSXP2cmSmusa6/
+ n6GA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=UDFtgeBuUJbyVO78BVK1jvam/9/OM+P3NZpnL3d8rok=;
+ b=bc++SxeioVslMTAzKFAJLo31mLHNNaUyc5osTAwsLHut6iwBjNa1p63Q8wiCpewZRf
+ w16vCepTbMXBUxWNzd1nQaGkPQ39DBu7ZbgdT0QfSfpJUpIgeJOBtsQcG8UmATbj2Zs8
+ BSeM/GEz0Neq4TLIrAugr3/McqqKXgVOuKkcdLfl5WX+bbAWQmoy1j2pw8Wo1DRiECPh
+ aXx/AHOCzaX9UYMsfLA56JYTq4szV7TWPje7B7Fa48w1xAdzJkE3VHFJIIWkUKe9IUTK
+ 78clF55rgXtQU8Zx/+hdcP2eXXi/s6jCQ+JwRQs6XE5v7ScObiUZLh5J52vyF50Z0XW7
+ MeHA==
+X-Gm-Message-State: APjAAAXASM5+NiopPrkIk8kVBZVGaD3IKP6ZVY21efc5nswfbfWLigv0
+ ezZQXKsiS25S73CLRr3TflOPCbY7ewG7I9NeIBqtBiUharc=
+X-Google-Smtp-Source: APXvYqxYcisu+YkA9yjbUOxKPM2kWhOlzHB7nFaLDnmljJPdlLY+ufJgnIlSlIxdGlNKuWZxw80GLgRBxwX9jU0ZrVM=
+X-Received: by 2002:a9d:6b0d:: with SMTP id g13mr20507707otp.91.1559929071526; 
+ Fri, 07 Jun 2019 10:37:51 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20190607152223.9467-8-crosa@redhat.com>
-User-Agent: Mutt/1.11.4 (2019-03-13)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.49]); Fri, 07 Jun 2019 17:29:32 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 7/8] VNC Acceptance test: check protocol
- version
+References: <CAFEAcA_-DptTwe7dkbZ171HJ+DtXCAOKt08pja=4-QbQKJSEvQ@mail.gmail.com>
+In-Reply-To: <CAFEAcA_-DptTwe7dkbZ171HJ+DtXCAOKt08pja=4-QbQKJSEvQ@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 7 Jun 2019 18:37:40 +0100
+Message-ID: <CAFEAcA9MOWkMGAyV_efH+FRBErJgM_9gwX+kutqSzH_0ou58Dg@mail.gmail.com>
+To: QEMU Developers <qemu-devel@nongnu.org>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::335
+Subject: Re: [Qemu-devel] Sketch of a transition of QEMU docs to Sphinx
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,88 +85,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: Fam Zheng <fam@euphon.net>, Eduardo Habkost <ehabkost@redhat.com>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org, Wainer dos Santos Moschetta <wainersm@redhat.com>,
- Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ "Daniel P. Berrange" <berrange@redhat.com>, John Snow <jsnow@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Jun 07, 2019 at 11:22:22AM -0400, Cleber Rosa wrote:
-> This goes a bit further than the other tests, and does a basic (read
-> only) interaction with the VNC protocol.
-> 
-> This is not a enough to perform a handshake, but enough to make sure
-> that the socket is somewhat operational and that the expected initial
-> step of the handshake is performed by the server and that the version
-> matches.
+On Tue, 21 May 2019 at 19:56, Peter Maydell <peter.maydell@linaro.org> wrote:
+>
+> Currently we have a vague plan that we should migrate our
+> documentation away from Texinfo to using Sphinx, plus some isolated
+> bits of documentation already in .rst format. This email is an attempt
+> to sketch out a transition plan for getting us from where we are today
+> to where (I think) we want to be.
 
-The GTK-VNC project provides a low level library libgvnc that can
-be used to talk the RFB protocol in a fairly fine grained manner.
-This is built using GObject, so is accessible from Python thanks
-to GObject Introspection.
+Since nobody seemed to disagree particularly with this sketch,
+I have overhauled/rewritten the wiki page
+https://wiki.qemu.org/Features/Documentation
+to be more or less a copy of it.
 
-We could use libgvnc for exercising the VNC server instead of writing
-custom RFB code. For your simple test just sending/receiving the
-version it won't save much, but if we ever want to test TLS or
-SASL integration, it would save alot of work dealing wth the auth
-handshake and subsequent encryption needs.
+(I also sent out a patchset today which does the very easy
+step 2 "move some developer docs into the devel manual".)
 
-The main limitation it would have is that it would only work well
-for sending "well formed" RFB protocol messages. If we ever want to
-send intentionally evil/bad RFB data to check QEMU's VNC server
-security hardening it would be harder.
-
-As the maintainer of GTK-VNC though, I would be open to adding more
-APIs to the low level gvnc library to facilitate QEMU's testing
-needs if we want.
-
-> 
-> Signed-off-by: Cleber Rosa <crosa@redhat.com>
-> ---
->  tests/acceptance/vnc.py | 12 ++++++++++++
->  1 file changed, 12 insertions(+)
-> 
-> diff --git a/tests/acceptance/vnc.py b/tests/acceptance/vnc.py
-> index d32ae46685..b000446d7c 100644
-> --- a/tests/acceptance/vnc.py
-> +++ b/tests/acceptance/vnc.py
-> @@ -11,6 +11,7 @@
->  import os
->  import tempfile
->  import shutil
-> +import socket
->  
->  from avocado_qemu import Test
->  
-> @@ -71,5 +72,16 @@ class VncUnixSocket(Test):
->                                              arg='new_password')
->          self.assertEqual(set_password_response['return'], {})
->  
-> +    def test_protocol_version(self):
-> +        self.vm.add_args('-nodefaults', '-S',
-> +                         '-vnc', 'unix:%s' % self.socket_path)
-> +        self.vm.launch()
-> +        self.assertTrue(self.vm.qmp('query-vnc')['return']['enabled'])
-> +        client = socket.socket(socket.AF_UNIX)
-> +        client.connect(self.socket_path)
-> +        expected = b'RFB 003.008'
-> +        actual = client.recv(len(expected))
-> +        self.assertEqual(expected, actual, "Wrong protocol version")
-> +
->      def tearDown(self):
->          shutil.rmtree(self.socket_dir)
-> -- 
-> 2.21.0
-> 
-> 
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+thanks
+-- PMM
 
