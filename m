@@ -2,56 +2,90 @@ Return-Path: <SRS0=3yEa=UG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 41DB3C28CC3
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 09:30:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B1A7C46476
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 09:30:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1B6A0208E3
+	by mail.kernel.org (Postfix) with ESMTPS id C3121208E3
 	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 09:30:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1B6A0208E3
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=users.sourceforge.jp
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="yNe2eiwu"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C3121208E3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47486 helo=lists.gnu.org)
+Received: from localhost ([::1]:47488 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hZBCB-0006ti-Ca
-	for qemu-devel@archiver.kernel.org; Fri, 07 Jun 2019 05:29:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41426)
+	id 1hZBCC-0006u1-2U
+	for qemu-devel@archiver.kernel.org; Fri, 07 Jun 2019 05:30:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39489)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <ysato@users.sourceforge.jp>) id 1hZAuT-0000ss-Ia
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 05:11:45 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1hZAp8-0004CJ-9c
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 05:06:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ysato@users.sourceforge.jp>) id 1hZAuP-0002x5-Gy
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 05:11:41 -0400
-Received: from mail02.asahi-net.or.jp ([202.224.55.14]:41553)
- by eggs.gnu.org with esmtp (Exim 4.71)
- (envelope-from <ysato@users.sourceforge.jp>) id 1hZAuO-0002rE-UZ
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 05:11:37 -0400
-Received: from h61-195-96-97.vps.ablenet.jp (h61-195-96-97.ablenetvps.ne.jp
- [61.195.96.97]) (Authenticated sender: PQ4Y-STU)
- by mail02.asahi-net.or.jp (Postfix) with ESMTPA id 8E9F641B48;
- Fri,  7 Jun 2019 18:11:32 +0900 (JST)
-Received: from yo-satoh-debian.localdomain (ZM005235.ppp.dion.ne.jp
- [222.8.5.235])
- by h61-195-96-97.vps.ablenet.jp (Postfix) with ESMTPSA id 4CEFD240085;
- Fri,  7 Jun 2019 18:11:32 +0900 (JST)
-From: Yoshinori Sato <ysato@users.sourceforge.jp>
-To: qemu-devel@nongnu.org
-Date: Fri,  7 Jun 2019 18:11:15 +0900
-Message-Id: <20190607091116.49044-24-ysato@users.sourceforge.jp>
-X-Mailer: git-send-email 2.11.0
-In-Reply-To: <20190607091116.49044-1-ysato@users.sourceforge.jp>
-References: <20190607091116.49044-1-ysato@users.sourceforge.jp>
+ (envelope-from <alex.bennee@linaro.org>) id 1hZAp5-0004jb-OI
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 05:06:10 -0400
+Received: from mail-wr1-x42c.google.com ([2a00:1450:4864:20::42c]:36269)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1hZAp5-0004aA-H3
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 05:06:07 -0400
+Received: by mail-wr1-x42c.google.com with SMTP id n4so1360614wrs.3
+ for <qemu-devel@nongnu.org>; Fri, 07 Jun 2019 02:06:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=Ugqvq5hjETyvltT2YWuWOJiTLDqqAsBqsH4ZO7PK4SQ=;
+ b=yNe2eiwuWZwdjdrXOzN+vDRKbzkIyJRZBMgJCFoyI5loICauyVZ+q92+WM2L/NMn/n
+ 8EfnyVHoHnPBUVB/lzt+kmrgqBaK7rh3NWL3BJ4xr2QAu2kdg7vSLmHlpo2PyAghXTNi
+ YGf16aRjGzCJNqDmeZXfS6SWwav/XqSeR0yhGv5H3l7JSidubmQ8c87eyeZa+DZwjS0t
+ xhOirQkGOBQrG756ajz2Ow+wbUmvZJOhqmHZ4pEBKzB4iWOFv4mSBDGzjFn4QnbBlI0t
+ Unm2okZmgNh0iRhP5V/3wnGlVvTXIWOZQZ+h5PxXABKg8QtVFCE+QGj8QB5zGwyFfKst
+ 3Y5g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=Ugqvq5hjETyvltT2YWuWOJiTLDqqAsBqsH4ZO7PK4SQ=;
+ b=NYCpdkTDDA4JxM39UBGmX7Bw3BJU/hBrRkTTHRelBZGRE68158M7bTbJGQ5OXbFK9o
+ JxWTgnzY6Mhcvy+XWwZdJrlWDBrRjyzA84/Ba0XlFjtp8pg2pmy+yy5tZRnBWrWKl/jN
+ XGZfNQNAlClBWp9DNtZS/HtdQStKyJ+R3qAiVl49LTGHzef9Pk0Rh1ZjBkZIZdhhkwIs
+ EYMWrA7PdAnkTOywWlVz61+cSvGJPnbaNPegSubfgASfvjIWii/Bqxyb/dDNzdvKLHyO
+ jK9M9WJ/d4gFjpn3sSzrBmFyVi1O2ZC9eYDIeL33qvVOesgvfGRbxUm8P6fL+3qPuREd
+ ONBg==
+X-Gm-Message-State: APjAAAUpRx5CAxY+EV0e4lUBGgiPxaES3SgY65b0BQSP7EDU5epRfcDb
+ AulmAKfzCOugOSqXB3uU239iqg==
+X-Google-Smtp-Source: APXvYqwxlsUhn8GoZeKBE6VH+0ALCX3UdPDJq3f1qepyDm63XtACv1KhcZ53UpOZGQ75/66f4bgqig==
+X-Received: by 2002:a5d:43d0:: with SMTP id v16mr31389680wrr.252.1559898364026; 
+ Fri, 07 Jun 2019 02:06:04 -0700 (PDT)
+Received: from zen.linaroharston ([81.128.185.34])
+ by smtp.gmail.com with ESMTPSA id z17sm1115720wru.21.2019.06.07.02.05.57
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Fri, 07 Jun 2019 02:06:01 -0700 (PDT)
+Received: from zen.linaroharston. (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 130EF1FF90;
+ Fri,  7 Jun 2019 10:05:55 +0100 (BST)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: peter.maydell@linaro.org
+Date: Fri,  7 Jun 2019 10:05:37 +0100
+Message-Id: <20190607090552.12434-39-alex.bennee@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190607090552.12434-1-alex.bennee@linaro.org>
+References: <20190607090552.12434-1-alex.bennee@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 202.224.55.14
-Subject: [Qemu-devel] [PATCH v17 23/24] target/rx: Dump bytes for each insn
- during disassembly
+X-Received-From: 2a00:1450:4864:20::42c
+Subject: [Qemu-devel] [PULL 38/52] gdbstub: Implement set_thread (H pkt)
+ with new infra
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -63,53 +97,129 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, Richard Henderson <richard.henderson@linaro.org>,
- Yoshinori Sato <ysato@users.sourceforge.jp>, philmd@redhat.com
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org,
+ Jon Doron <arilou@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Richard Henderson <richard.henderson@linaro.org>
+From: Jon Doron <arilou@gmail.com>
 
-There are so many different forms of each RX instruction
-that it will be very useful to be able to look at the bytes
-to see on which path a bug may lie.
+Signed-off-by: Jon Doron <arilou@gmail.com>
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+Message-Id: <20190529064148.19856-7-arilou@gmail.com>
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 
-Reviewed-by: Yoshinori Sato <ysato@users.sourceforge.jp>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
----
- target/rx/disas.c | 16 +++++++++++++++-
- 1 file changed, 15 insertions(+), 1 deletion(-)
-
-diff --git a/target/rx/disas.c b/target/rx/disas.c
-index 5a32a87534..d73b53db44 100644
---- a/target/rx/disas.c
-+++ b/target/rx/disas.c
-@@ -102,7 +102,21 @@ static int bdsp_s(DisasContext *ctx, int d)
- /* Include the auto-generated decoder.  */
- #include "decode.inc.c"
+diff --git a/gdbstub.c b/gdbstub.c
+index 3425f0674d..7735c244b3 100644
+--- a/gdbstub.c
++++ b/gdbstub.c
+@@ -1560,6 +1560,51 @@ static void handle_cont_with_sig(GdbCmdContext *gdb_ctx, void *user_ctx)
+     gdb_continue(gdb_ctx->s);
+ }
  
--#define prt(...) (ctx->dis->fprintf_func)((ctx->dis->stream), __VA_ARGS__)
-+static void dump_bytes(DisasContext *ctx)
++static void handle_set_thread(GdbCmdContext *gdb_ctx, void *user_ctx)
 +{
-+    int i, len = ctx->len;
++    CPUState *cpu;
 +
-+    for (i = 0; i < len; ++i) {
-+        ctx->dis->fprintf_func(ctx->dis->stream, "%02x ", ctx->bytes[i]);
++    if (gdb_ctx->num_params != 2) {
++        put_packet(gdb_ctx->s, "E22");
++        return;
 +    }
-+    ctx->dis->fprintf_func(ctx->dis->stream, "%*c", (8 - i) * 3, '\t');
++
++    if (gdb_ctx->params[1].thread_id.kind == GDB_READ_THREAD_ERR) {
++        put_packet(gdb_ctx->s, "E22");
++        return;
++    }
++
++    if (gdb_ctx->params[1].thread_id.kind != GDB_ONE_THREAD) {
++        put_packet(gdb_ctx->s, "OK");
++        return;
++    }
++
++    cpu = gdb_get_cpu(gdb_ctx->s, gdb_ctx->params[1].thread_id.pid,
++                      gdb_ctx->params[1].thread_id.tid);
++    if (!cpu) {
++        put_packet(gdb_ctx->s, "E22");
++        return;
++    }
++
++    /*
++     * Note: This command is deprecated and modern gdb's will be using the
++     *       vCont command instead.
++     */
++    switch (gdb_ctx->params[0].opcode) {
++    case 'c':
++        gdb_ctx->s->c_cpu = cpu;
++        put_packet(gdb_ctx->s, "OK");
++        break;
++    case 'g':
++        gdb_ctx->s->g_cpu = cpu;
++        put_packet(gdb_ctx->s, "OK");
++        break;
++    default:
++        put_packet(gdb_ctx->s, "E22");
++        break;
++    }
 +}
 +
-+#define prt(...) \
-+    do {                                                        \
-+        dump_bytes(ctx);                                        \
-+        ctx->dis->fprintf_func(ctx->dis->stream, __VA_ARGS__);  \
-+    } while (0)
+ static int gdb_handle_packet(GDBState *s, const char *line_buf)
+ {
+     CPUState *cpu;
+@@ -1573,7 +1618,6 @@ static int gdb_handle_packet(GDBState *s, const char *line_buf)
+     char thread_id[16];
+     uint8_t *registers;
+     target_ulong addr, len;
+-    GDBThreadIdKind thread_kind;
+     const GdbCmdParseEntry *cmd_parser = NULL;
  
- #define RX_MEMORY_BYTE 0
- #define RX_MEMORY_WORD 1
+     trace_gdbstub_io_command(line_buf);
+@@ -1836,35 +1880,14 @@ static int gdb_handle_packet(GDBState *s, const char *line_buf)
+             put_packet(s, "E22");
+         break;
+     case 'H':
+-        type = *p++;
+-
+-        thread_kind = read_thread_id(p, &p, &pid, &tid);
+-        if (thread_kind == GDB_READ_THREAD_ERR) {
+-            put_packet(s, "E22");
+-            break;
+-        }
+-
+-        if (thread_kind != GDB_ONE_THREAD) {
+-            put_packet(s, "OK");
+-            break;
+-        }
+-        cpu = gdb_get_cpu(s, pid, tid);
+-        if (cpu == NULL) {
+-            put_packet(s, "E22");
+-            break;
+-        }
+-        switch (type) {
+-        case 'c':
+-            s->c_cpu = cpu;
+-            put_packet(s, "OK");
+-            break;
+-        case 'g':
+-            s->g_cpu = cpu;
+-            put_packet(s, "OK");
+-            break;
+-        default:
+-             put_packet(s, "E22");
+-             break;
++        {
++            static const GdbCmdParseEntry set_thread_cmd_desc = {
++                .handler = handle_set_thread,
++                .cmd = "H",
++                .cmd_startswith = 1,
++                .schema = "o.t0"
++            };
++            cmd_parser = &set_thread_cmd_desc;
+         }
+         break;
+     case 'T':
 -- 
-2.11.0
+2.20.1
 
 
