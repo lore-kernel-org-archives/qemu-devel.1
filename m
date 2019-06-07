@@ -6,55 +6,58 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B103C2BCA1
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 15:20:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 44D70C2BCA1
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 15:23:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5555D2089E
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 15:20:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5555D2089E
+	by mail.kernel.org (Postfix) with ESMTPS id 1D9D52089E
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 15:23:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1D9D52089E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48684 helo=lists.gnu.org)
+Received: from localhost ([::1]:48728 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hZGes-00026C-SC
-	for qemu-devel@archiver.kernel.org; Fri, 07 Jun 2019 11:19:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53449)
+	id 1hZGi8-0004ff-0w
+	for qemu-devel@archiver.kernel.org; Fri, 07 Jun 2019 11:23:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54256)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <cohuck@redhat.com>) id 1hZFho-0004Qi-C7
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 10:18:58 -0400
+ (envelope-from <imammedo@redhat.com>) id 1hZFj3-00059S-Ai
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 10:20:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <cohuck@redhat.com>) id 1hZFhm-0004Dk-Ea
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 10:18:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57030)
+ (envelope-from <imammedo@redhat.com>) id 1hZFiz-00065s-8O
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 10:20:11 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57702)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <cohuck@redhat.com>)
- id 1hZFhk-0004Ab-E6; Fri, 07 Jun 2019 10:18:54 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1hZFix-0005kR-42
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 10:20:07 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 94ED23001839;
- Fri,  7 Jun 2019 14:18:51 +0000 (UTC)
-Received: from localhost (dhcp-192-191.str.redhat.com [10.33.192.191])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 8AC73104B50D;
- Fri,  7 Jun 2019 14:18:47 +0000 (UTC)
-From: Cornelia Huck <cohuck@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri,  7 Jun 2019 16:17:13 +0200
-Message-Id: <20190607141727.29018-21-cohuck@redhat.com>
-In-Reply-To: <20190607141727.29018-1-cohuck@redhat.com>
-References: <20190607141727.29018-1-cohuck@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id E294230C318C;
+ Fri,  7 Jun 2019 14:19:56 +0000 (UTC)
+Received: from localhost (unknown [10.43.2.182])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 6DFB47DE56;
+ Fri,  7 Jun 2019 14:19:53 +0000 (UTC)
+Date: Fri, 7 Jun 2019 16:19:49 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+To: Yoshinori Sato <ysato@users.sourceforge.jp>
+Message-ID: <20190607161949.7d5b56d4@redhat.com>
+In-Reply-To: <20190607091116.49044-14-ysato@users.sourceforge.jp>
+References: <20190607091116.49044-1-ysato@users.sourceforge.jp>
+ <20190607091116.49044-14-ysato@users.sourceforge.jp>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.40]); Fri, 07 Jun 2019 14:18:51 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+ (mx1.redhat.com [10.5.110.40]); Fri, 07 Jun 2019 14:19:56 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL v2 20/34] s390x/tcg: Implement VECTOR FP DIVIDE
+Subject: Re: [Qemu-devel] [PATCH v17 13/24] target/rx: Fix cpu types and
+ names
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -66,101 +69,197 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-s390x@nongnu.org, Richard Henderson <richard.henderson@linaro.org>,
- qemu-devel@nongnu.org, David Hildenbrand <david@redhat.com>
+Cc: peter.maydell@linaro.org, Richard Henderson <richard.henderson@linaro.org>,
+ qemu-devel@nongnu.org, philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: David Hildenbrand <david@redhat.com>
+On Fri,  7 Jun 2019 18:11:05 +0900
+Yoshinori Sato <ysato@users.sourceforge.jp> wrote:
 
-We can reuse most of the infrastructure added for VECTOR FP ADD.
+> From: Richard Henderson <richard.henderson@linaro.org>
+> 
+> There was confusion here about abstract classes and naming cpus.
+> We had registered a concrete class named "-rxcpu".  This was put
+> into the default cpu fields, and matched, so basic tests worked.
+> However, no value for -cpu could ever match in rx_cpu_class_by_name.
+> 
+> Rename the base class to "rx-cpu" and make it abstract.  This
+> matches what we do for most other targets.  Create a new concrete
+> cpu with the name "rx62n-rx-cpu".
+My comments on v16 weren't addressed at all.
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Signed-off-by: David Hildenbrand <david@redhat.com>
----
- target/s390x/helper.h           |  2 ++
- target/s390x/insn-data.def      |  2 ++
- target/s390x/translate_vx.inc.c |  3 +++
- target/s390x/vec_fpu_helper.c   | 17 +++++++++++++++++
- 4 files changed, 24 insertions(+)
+I don't see any valid reason for this patch to exist.
+It should be split and merged with patches that introduce 'confusion'
+so that broken code won't exist in the first place.
 
-diff --git a/target/s390x/helper.h b/target/s390x/helper.h
-index 9b9062970ac4..238bfa250963 100644
---- a/target/s390x/helper.h
-+++ b/target/s390x/helper.h
-@@ -274,6 +274,8 @@ DEF_HELPER_FLAGS_4(gvec_vcgd64, TCG_CALL_NO_WG, void,=
- ptr, cptr, env, i32)
- DEF_HELPER_FLAGS_4(gvec_vcgd64s, TCG_CALL_NO_WG, void, ptr, cptr, env, i=
-32)
- DEF_HELPER_FLAGS_4(gvec_vclgd64, TCG_CALL_NO_WG, void, ptr, cptr, env, i=
-32)
- DEF_HELPER_FLAGS_4(gvec_vclgd64s, TCG_CALL_NO_WG, void, ptr, cptr, env, =
-i32)
-+DEF_HELPER_FLAGS_5(gvec_vfd64, TCG_CALL_NO_WG, void, ptr, cptr, cptr, en=
-v, i32)
-+DEF_HELPER_FLAGS_5(gvec_vfd64s, TCG_CALL_NO_WG, void, ptr, cptr, cptr, e=
-nv, i32)
-=20
- #ifndef CONFIG_USER_ONLY
- DEF_HELPER_3(servc, i32, env, i64, i64)
-diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
-index ed8b888d5908..f9830deace1a 100644
---- a/target/s390x/insn-data.def
-+++ b/target/s390x/insn-data.def
-@@ -1226,6 +1226,8 @@
-     F(0xe7c2, VCGD,    VRR_a, V,   0, 0, 0, 0, vcdg, 0, IF_VEC)
- /* VECTOR FP CONVERT TO LOGICAL 64-BIT */
-     F(0xe7c0, VCLGD,   VRR_a, V,   0, 0, 0, 0, vcdg, 0, IF_VEC)
-+/* VECTOR FP DIVIDE */
-+    F(0xe7e5, VFD,     VRR_c, V,   0, 0, 0, 0, vfa, 0, IF_VEC)
-=20
- #ifndef CONFIG_USER_ONLY
- /* COMPARE AND SWAP AND PURGE */
-diff --git a/target/s390x/translate_vx.inc.c b/target/s390x/translate_vx.=
-inc.c
-index 0395d69968da..9e55d4488b77 100644
---- a/target/s390x/translate_vx.inc.c
-+++ b/target/s390x/translate_vx.inc.c
-@@ -2560,6 +2560,9 @@ static DisasJumpType op_vfa(DisasContext *s, DisasO=
-ps *o)
-     case 0xe3:
-         fn =3D se ? gen_helper_gvec_vfa64s : gen_helper_gvec_vfa64;
-         break;
-+    case 0xe5:
-+        fn =3D se ? gen_helper_gvec_vfd64s : gen_helper_gvec_vfd64;
-+        break;
-     default:
-         g_assert_not_reached();
-     }
-diff --git a/target/s390x/vec_fpu_helper.c b/target/s390x/vec_fpu_helper.=
-c
-index 09ef0abfb0d8..3c62eb578771 100644
---- a/target/s390x/vec_fpu_helper.c
-+++ b/target/s390x/vec_fpu_helper.c
-@@ -369,3 +369,20 @@ void HELPER(gvec_vclgd64s)(void *v1, const void *v2,=
- CPUS390XState *env,
-=20
-     vop64_2(v1, v2, env, true, XxC, erm, vclgd64, GETPC());
- }
-+
-+static uint64_t vfd64(uint64_t a, uint64_t b, float_status *s)
-+{
-+    return float64_div(a, b, s);
-+}
-+
-+void HELPER(gvec_vfd64)(void *v1, const void *v2, const void *v3,
-+                        CPUS390XState *env, uint32_t desc)
-+{
-+    vop64_3(v1, v2, v3, env, false, vfd64, GETPC());
-+}
-+
-+void HELPER(gvec_vfd64s)(void *v1, const void *v2, const void *v3,
-+                         CPUS390XState *env, uint32_t desc)
-+{
-+    vop64_3(v1, v2, v3, env, true, vfd64, GETPC());
-+}
---=20
-2.20.1
+more below ...
+
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
+> ---
+>  target/rx/cpu.h | 12 ++++++------
+>  hw/rx/rx-virt.c |  2 +-
+>  hw/rx/rx62n.c   |  2 +-
+>  target/rx/cpu.c | 43 ++++++++++++++++++++++++++-----------------
+>  4 files changed, 34 insertions(+), 25 deletions(-)
+> 
+> diff --git a/target/rx/cpu.h b/target/rx/cpu.h
+> index 8c1a4e448d..a0b6975963 100644
+> --- a/target/rx/cpu.h
+> +++ b/target/rx/cpu.h
+> @@ -24,14 +24,14 @@
+>  #include "hw/registerfields.h"
+>  #include "qom/cpu.h"
+>  
+> -#define TYPE_RXCPU "rxcpu"
+> +#define TYPE_RX_CPU "rx-cpu"
+>  
+>  #define RXCPU_CLASS(klass)                                     \
+> -    OBJECT_CLASS_CHECK(RXCPUClass, (klass), TYPE_RXCPU)
+> +    OBJECT_CLASS_CHECK(RXCPUClass, (klass), TYPE_RX_CPU)
+>  #define RXCPU(obj) \
+> -    OBJECT_CHECK(RXCPU, (obj), TYPE_RXCPU)
+> +    OBJECT_CHECK(RXCPU, (obj), TYPE_RX_CPU)
+>  #define RXCPU_GET_CLASS(obj) \
+> -    OBJECT_GET_CLASS(RXCPUClass, (obj), TYPE_RXCPU)
+> +    OBJECT_GET_CLASS(RXCPUClass, (obj), TYPE_RX_CPU)
+>  
+>  /*
+>   * RXCPUClass:
+> @@ -164,9 +164,9 @@ static inline RXCPU *rx_env_get_cpu(CPURXState *env)
+>  
+>  #define ENV_OFFSET offsetof(RXCPU, env)
+>  
+> -#define RX_CPU_TYPE_SUFFIX "-" TYPE_RXCPU
+> +#define RX_CPU_TYPE_SUFFIX "-" TYPE_RX_CPU
+>  #define RX_CPU_TYPE_NAME(model) model RX_CPU_TYPE_SUFFIX
+> -#define CPU_RESOLVING_TYPE TYPE_RXCPU
+> +#define CPU_RESOLVING_TYPE TYPE_RX_CPU
+>  
+>  extern const char rx_crname[][6];
+>  
+> diff --git a/hw/rx/rx-virt.c b/hw/rx/rx-virt.c
+> index 3deb7cb335..72a2989fcf 100644
+> --- a/hw/rx/rx-virt.c
+> +++ b/hw/rx/rx-virt.c
+> @@ -88,7 +88,7 @@ static void rxvirt_class_init(ObjectClass *oc, void *data)
+>      mc->desc = "RX QEMU Virtual Target";
+>      mc->init = rxvirt_init;
+>      mc->is_default = 1;
+> -    mc->default_cpu_type = TYPE_RXCPU;
+> +    mc->default_cpu_type = RX_CPU_TYPE_NAME("rx62n");
+>  }
+>  
+>  static const TypeInfo rxvirt_type = {
+> diff --git a/hw/rx/rx62n.c b/hw/rx/rx62n.c
+> index c6660b75b4..3a8fe7b0bf 100644
+> --- a/hw/rx/rx62n.c
+> +++ b/hw/rx/rx62n.c
+> @@ -195,7 +195,7 @@ static void rx62n_realize(DeviceState *dev, Error **errp)
+>      }
+>  
+>      object_initialize_child(OBJECT(s), "cpu", &s->cpu,
+> -                            sizeof(RXCPU), TYPE_RXCPU,
+> +                            sizeof(RXCPU), RX_CPU_TYPE_NAME("rx62n"),
+>                              errp, NULL);
+>      object_property_set_bool(OBJECT(&s->cpu), true, "realized", errp);
+>  
+> diff --git a/target/rx/cpu.c b/target/rx/cpu.c
+> index 3268077d08..41fe1de4bb 100644
+> --- a/target/rx/cpu.c
+> +++ b/target/rx/cpu.c
+> @@ -74,13 +74,14 @@ static void rx_cpu_list_entry(gpointer data, gpointer user_data)
+>      const char *typename = object_class_get_name(OBJECT_CLASS(data));
+>      int len = strlen(typename) - strlen(RX_CPU_TYPE_SUFFIX);
+>  
+> -    qemu_printf("%.*s\n", len, typename);
+> +    qemu_printf("  %.*s\n", len, typename);
+>  }
+>  
+>  void rx_cpu_list(void)
+>  {
+> -    GSList *list;
+> -    list = object_class_get_list_sorted(TYPE_RXCPU, false);
+> +    GSList *list = object_class_get_list_sorted(TYPE_RX_CPU, false);
+> +
+> +    qemu_printf("Available CPUs:\n");
+>      g_slist_foreach(list, rx_cpu_list_entry, NULL);
+>      g_slist_free(list);
+>  }
+> @@ -88,15 +89,17 @@ void rx_cpu_list(void)
+>  static ObjectClass *rx_cpu_class_by_name(const char *cpu_model)
+>  {
+>      ObjectClass *oc;
+> -    char *typename = NULL;
+> +    char *typename;
+>  
+> -    typename = g_strdup_printf(RX_CPU_TYPE_NAME(""));
+> +    typename = g_strdup_printf(RX_CPU_TYPE_NAME("%s"), cpu_model);
+>      oc = object_class_by_name(typename);
+
+again repeating v16: see alpha_cpu_class_by_name() as preferred
+way to use this method.
+
+> -    if (oc != NULL && object_class_is_abstract(oc)) {
+> -        oc = NULL;
+> -    }
+> -
+>      g_free(typename);
+> +
+> +    if (oc == NULL ||
+> +        object_class_is_abstract(oc) ||
+> +        !object_class_dynamic_cast(oc, TYPE_RX_CPU)) {
+> +        return NULL;
+> +    }
+>      return oc;
+>  }
+>  
+> @@ -166,7 +169,7 @@ static void rx_cpu_init(Object *obj)
+>      qdev_init_gpio_in(DEVICE(cpu), rx_cpu_set_irq, 2);
+>  }
+>  
+> -static void rxcpu_class_init(ObjectClass *klass, void *data)
+> +static void rx_cpu_class_init(ObjectClass *klass, void *data)
+>  {
+>      DeviceClass *dc = DEVICE_CLASS(klass);
+>      CPUClass *cc = CPU_CLASS(klass);
+> @@ -195,22 +198,28 @@ static void rxcpu_class_init(ObjectClass *klass, void *data)
+>      cc->gdb_num_core_regs = 26;
+>  }
+>  
+> -static const TypeInfo rxcpu_info = {
+> -    .name = TYPE_RXCPU,
+> +static const TypeInfo rx_cpu_info = {
+> +    .name = TYPE_RX_CPU,
+>      .parent = TYPE_CPU,
+>      .instance_size = sizeof(RXCPU),
+>      .instance_init = rx_cpu_init,
+> -    .abstract = false,
+> +    .abstract = true,
+>      .class_size = sizeof(RXCPUClass),
+> -    .class_init = rxcpu_class_init,
+> +    .class_init = rx_cpu_class_init,
+> +};
+> +
+> +static const TypeInfo rx62n_rx_cpu_info = {
+> +    .name = RX_CPU_TYPE_NAME("rx62n"),
+> +    .parent = TYPE_RX_CPU,
+>  };
+>  
+> -static void rxcpu_register_types(void)
+> +static void rx_cpu_register_types(void)
+>  {
+> -    type_register_static(&rxcpu_info);
+> +    type_register_static(&rx_cpu_info);
+> +    type_register_static(&rx62n_rx_cpu_info);
+>  }
+>  
+> -type_init(rxcpu_register_types)
+> +type_init(rx_cpu_register_types)
+>  
+>  static uint32_t extable[32];
+>  
 
 
