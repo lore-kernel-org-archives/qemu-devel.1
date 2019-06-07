@@ -6,57 +6,54 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CEA3CC28CC3
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 07:35:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 23779C28CC3
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 07:38:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9E7D02089E
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 07:35:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9E7D02089E
+	by mail.kernel.org (Postfix) with ESMTPS id EF872208C3
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 07:38:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EF872208C3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46448 helo=lists.gnu.org)
+Received: from localhost ([::1]:46454 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hZ9Pj-0001K8-Sn
-	for qemu-devel@archiver.kernel.org; Fri, 07 Jun 2019 03:35:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43132)
+	id 1hZ9S8-0002Il-37
+	for qemu-devel@archiver.kernel.org; Fri, 07 Jun 2019 03:38:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43836)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <kraxel@redhat.com>) id 1hZ9PH-0000tN-R5
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 03:35:25 -0400
+ (envelope-from <kraxel@redhat.com>) id 1hZ9RV-0001sa-2V
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 03:37:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kraxel@redhat.com>) id 1hZ9PG-0003Im-J4
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 03:35:23 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59572)
+ (envelope-from <kraxel@redhat.com>) id 1hZ9RT-0007WX-VA
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 03:37:41 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46848)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1hZ9PG-0002eG-Az
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 03:35:22 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ (Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1hZ9RT-0007U9-NK
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 03:37:39 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 7F007C1EB20C;
- Fri,  7 Jun 2019 07:35:00 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 71ADF3082E4B;
+ Fri,  7 Jun 2019 07:37:38 +0000 (UTC)
 Received: from sirius.home.kraxel.org (ovpn-117-25.ams2.redhat.com
  [10.36.117.25])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 340FF78417;
- Fri,  7 Jun 2019 07:34:55 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id AFE0D82289;
+ Fri,  7 Jun 2019 07:37:33 +0000 (UTC)
 Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id 72E7116E1A; Fri,  7 Jun 2019 09:34:54 +0200 (CEST)
+ id D7C4C16E1A; Fri,  7 Jun 2019 09:37:32 +0200 (CEST)
 From: Gerd Hoffmann <kraxel@redhat.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Date: Fri,  7 Jun 2019 09:34:29 +0200
-Message-Id: <20190607073429.3436-1-kraxel@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+To: qemu-devel@nongnu.org
+Date: Fri,  7 Jun 2019 09:37:21 +0200
+Message-Id: <20190607073721.4960-1-kraxel@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.32]); Fri, 07 Jun 2019 07:35:00 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+ (mx1.redhat.com [10.5.110.46]); Fri, 07 Jun 2019 07:37:38 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v2] q35: fix mmconfig and PCI0._CRS
+Subject: [Qemu-devel] [PATCH v2] q35: split memory at 2G
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,164 +66,92 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Eduardo Habkost <ehabkost@redhat.com>,
- "open list:All patches CC here" <qemu-devel@nongnu.org>,
- Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Igor Mammedov <imammedo@redhat.com>,
- =?UTF-8?q?L=C3=A1szl=C3=B3=20=C3=89rsek?= <lersek@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+ "Michael S. Tsirkin" <mst@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This patch changes the handling of the mmconfig area.  Thanks to the
-pci(e) expander devices we already have the logic to exclude address
-ranges from PCI0._CRS.  We can simply add the mmconfig address range
-to the list get it excluded as well.
+Original q35 behavior was to split memory at 2.75 GB, leaving space for
+the mmconfig bar at 0xb000000 and pci I/O window starting at 0xc0000000.
 
-With that in place we can go with a fixed pci hole which covers the
-whole area from the end of (low) ram to the ioapic.
+Note: Those machine types have been removed from the qemu codebase
+meanwhile because they could not be live-migrated so there was little
+value in keeping them around.
 
-This will make the whole logic alot less fragile.  No matter where the
-firmware places the mmconfig xbar, things should work correctly.  The
-guest also gets a bit more PCI address space (seabios boot):
+With the effort to allow for gigabyte-alignment of guest memory that
+behavior was changed:  The split was moved to 2G, but only in case the
+memory didn't fit below 2.75 GB.
 
-    # cat /proc/iomem
-    [ ... ]
-    7ffdd000-7fffffff : reserved
-    80000000-afffffff : PCI Bus 0000:00            <<-- this is new
-    b0000000-bfffffff : PCI MMCONFIG 0000 [bus 00-ff]
-      b0000000-bfffffff : reserved
-    c0000000-febfffff : PCI Bus 0000:00
-      f8000000-fbffffff : 0000:00:01.0
-    [ ... ]
+So today the address space between 2G and 2,75G is not used for guest
+memory in typical use cases, where the guest memory is sized at a power
+of two or a gigabyte number.  But if you configure your guest with some
+odd amount of memory (such as 2.5G) the address space is used.
 
-So this is a guest visible change.
+This patch removes that oddity for 4.1+ machine types.  The memory is
+split at 2G no matter what.
 
-Cc: L=C3=A1szl=C3=B3 =C3=89rsek <lersek@redhat.com>
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+Acked-by: Laszlo Ersek <lersek@redhat.com>
 ---
- tests/bios-tables-test-allowed-diff.h |  8 +++++++
- hw/i386/acpi-build.c                  | 14 ++++++++++++
- hw/pci-host/q35.c                     | 31 +++++++--------------------
- 3 files changed, 30 insertions(+), 23 deletions(-)
+ include/hw/i386/pc.h | 1 +
+ hw/i386/pc.c         | 1 +
+ hw/i386/pc_q35.c     | 7 ++++++-
+ 3 files changed, 8 insertions(+), 1 deletion(-)
 
-diff --git a/tests/bios-tables-test-allowed-diff.h b/tests/bios-tables-te=
-st-allowed-diff.h
-index dfb8523c8bf4..3bbd22c62a3b 100644
---- a/tests/bios-tables-test-allowed-diff.h
-+++ b/tests/bios-tables-test-allowed-diff.h
-@@ -1 +1,9 @@
- /* List of comma-separated changed AML files to ignore */
-+"tests/data/acpi/q35/DSDT",
-+"tests/data/acpi/q35/DSDT.bridge",
-+"tests/data/acpi/q35/DSDT.mmio64",
-+"tests/data/acpi/q35/DSDT.ipmibt",
-+"tests/data/acpi/q35/DSDT.cphp",
-+"tests/data/acpi/q35/DSDT.memhp",
-+"tests/data/acpi/q35/DSDT.numamem",
-+"tests/data/acpi/q35/DSDT.dimmpxm",
-diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-index 85dc1640bc67..8e4f26977619 100644
---- a/hw/i386/acpi-build.c
-+++ b/hw/i386/acpi-build.c
-@@ -122,6 +122,8 @@ typedef struct FwCfgTPMConfig {
-     uint8_t tpmppi_version;
- } QEMU_PACKED FwCfgTPMConfig;
-=20
-+static bool acpi_get_mcfg(AcpiMcfgInfo *mcfg);
-+
- static void init_common_fadt_data(Object *o, AcpiFadtData *data)
+diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+index 5d5636241e34..dfe3e6104181 100644
+--- a/include/hw/i386/pc.h
++++ b/include/hw/i386/pc.h
+@@ -120,6 +120,7 @@ typedef struct PCMachineClass {
+ 
+     /* RAM / address space compat: */
+     bool gigabyte_align;
++    bool gigabyte_split;
+     bool has_reserved_memory;
+     bool enforce_aligned_dimm;
+     bool broken_reserved_end;
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index edc240bcbf59..3cc9432bd187 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -2722,6 +2722,7 @@ static void pc_machine_class_init(ObjectClass *oc, void *data)
+     pcmc->smbios_defaults = true;
+     pcmc->smbios_uuid_encoded = true;
+     pcmc->gigabyte_align = true;
++    pcmc->gigabyte_split = true;
+     pcmc->has_reserved_memory = true;
+     pcmc->kvmclock_enabled = true;
+     pcmc->enforce_aligned_dimm = true;
+diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
+index dcddc6466200..57d06d55ef4d 100644
+--- a/hw/i386/pc_q35.c
++++ b/hw/i386/pc_q35.c
+@@ -143,8 +143,10 @@ static void pc_q35_init(MachineState *machine)
+      * If it doesn't, we need to split it in chunks below and above 4G.
+      * In any case, try to make sure that guest addresses aligned at
+      * 1G boundaries get mapped to host addresses aligned at 1G boundaries.
++     *
++     * qemu 4.1+ machines: split at 2G unconditionally (gigabyte_split = true)
+      */
+-    if (machine->ram_size >= 0xb0000000) {
++    if (machine->ram_size >= 0xb0000000 || pcmc->gigabyte_split) {
+         lowmem = 0x80000000;
+     } else {
+         lowmem = 0xb0000000;
+@@ -376,8 +378,11 @@ DEFINE_Q35_MACHINE(v4_1, "pc-q35-4.1", NULL,
+ 
+ static void pc_q35_4_0_1_machine_options(MachineClass *m)
  {
-     uint32_t io =3D object_property_get_uint(o, ACPI_PM_PROP_PM_IO_BASE,=
- NULL);
-@@ -1807,6 +1809,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
-     CrsRangeSet crs_range_set;
-     PCMachineState *pcms =3D PC_MACHINE(machine);
-     PCMachineClass *pcmc =3D PC_MACHINE_GET_CLASS(machine);
-+    AcpiMcfgInfo mcfg;
-     uint32_t nr_mem =3D machine->ram_slots;
-     int root_bus_limit =3D 0xFF;
-     PCIBus *bus =3D NULL;
-@@ -1921,6 +1924,17 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
-         }
-     }
-=20
-+    /*
-+     * At this point crs_range_set has all the ranges used by pci
-+     * busses *other* than PCI0.  These ranges will be excluded from
-+     * the PCI0._CRS.  Add mmconfig to the set so it will be excluded
-+     * too.
-+     */
-+    if (acpi_get_mcfg(&mcfg)) {
-+        crs_range_insert(crs_range_set.mem_ranges,
-+                         mcfg.base, mcfg.base + mcfg.size - 1);
-+    }
++    PCMachineClass *pcmc = PC_MACHINE_CLASS(m);
 +
-     scope =3D aml_scope("\\_SB.PCI0");
-     /* build PCI0._CRS */
-     crs =3D aml_resource_template();
-diff --git a/hw/pci-host/q35.c b/hw/pci-host/q35.c
-index 960939f5ed3e..72093320befe 100644
---- a/hw/pci-host/q35.c
-+++ b/hw/pci-host/q35.c
-@@ -258,15 +258,6 @@ static void q35_host_initfn(Object *obj)
-     object_property_add_link(obj, MCH_HOST_PROP_IO_MEM, TYPE_MEMORY_REGI=
-ON,
-                              (Object **) &s->mch.address_space_io,
-                              qdev_prop_allow_set_link_before_realize, 0,=
- NULL);
--
--    /* Leave enough space for the biggest MCFG BAR */
--    /* TODO: this matches current bios behaviour, but
--     * it's not a power of two, which means an MTRR
--     * can't cover it exactly.
--     */
--    range_set_bounds(&s->mch.pci_hole,
--            MCH_HOST_BRIDGE_PCIEXBAR_DEFAULT + MCH_HOST_BRIDGE_PCIEXBAR_=
-MAX,
--            IO_APIC_DEFAULT_ADDRESS - 1);
+     pc_q35_4_1_machine_options(m);
+     m->alias = NULL;
++    pcmc->gigabyte_split = false;
+     compat_props_add(m->compat_props, hw_compat_4_0_1, hw_compat_4_0_1_len);
+     compat_props_add(m->compat_props, pc_compat_4_0_1, pc_compat_4_0_1_len);
  }
-=20
- static const TypeInfo q35_host_info =3D {
-@@ -338,20 +329,6 @@ static void mch_update_pciexbar(MCHPCIState *mch)
-     }
-     addr =3D pciexbar & addr_mask;
-     pcie_host_mmcfg_update(pehb, enable, addr, length);
--    /* Leave enough space for the MCFG BAR */
--    /*
--     * TODO: this matches current bios behaviour, but it's not a power o=
-f two,
--     * which means an MTRR can't cover it exactly.
--     */
--    if (enable) {
--        range_set_bounds(&mch->pci_hole,
--                         addr + length,
--                         IO_APIC_DEFAULT_ADDRESS - 1);
--    } else {
--        range_set_bounds(&mch->pci_hole,
--                         MCH_HOST_BRIDGE_PCIEXBAR_DEFAULT,
--                         IO_APIC_DEFAULT_ADDRESS - 1);
--    }
- }
-=20
- /* PAM */
-@@ -484,6 +461,14 @@ static void mch_update(MCHPCIState *mch)
-     mch_update_pam(mch);
-     mch_update_smram(mch);
-     mch_update_ext_tseg_mbytes(mch);
-+
-+    /*
-+     * pci hole goes from end-of-low-ram to io-apic.
-+     * mmconfig will be excluded by the dsdt builder.
-+     */
-+    range_set_bounds(&mch->pci_hole,
-+                     mch->below_4g_mem_size,
-+                     IO_APIC_DEFAULT_ADDRESS - 1);
- }
-=20
- static int mch_post_load(void *opaque, int version_id)
---=20
+-- 
 2.18.1
 
 
