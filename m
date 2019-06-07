@@ -2,49 +2,49 @@ Return-Path: <SRS0=3yEa=UG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 832E9C28EBD
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 02:55:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2690FC28CC3
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 03:19:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 581CE206DF
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 02:55:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 581CE206DF
+	by mail.kernel.org (Postfix) with ESMTPS id E0B35208C3
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 03:19:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E0B35208C3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45650 helo=lists.gnu.org)
+Received: from localhost ([::1]:45698 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hZ525-0005I8-HD
-	for qemu-devel@archiver.kernel.org; Thu, 06 Jun 2019 22:55:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50963)
+	id 1hZ5PD-0007VJ-MU
+	for qemu-devel@archiver.kernel.org; Thu, 06 Jun 2019 23:19:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54397)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <eblake@redhat.com>) id 1hZ514-0004aJ-FP
- for qemu-devel@nongnu.org; Thu, 06 Jun 2019 22:54:07 -0400
+ (envelope-from <eblake@redhat.com>) id 1hZ5O5-00070l-GZ
+ for qemu-devel@nongnu.org; Thu, 06 Jun 2019 23:17:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1hZ513-0006Cb-CA
- for qemu-devel@nongnu.org; Thu, 06 Jun 2019 22:54:06 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46068)
+ (envelope-from <eblake@redhat.com>) id 1hZ5O3-0002Oq-PB
+ for qemu-devel@nongnu.org; Thu, 06 Jun 2019 23:17:53 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52730)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <eblake@redhat.com>)
- id 1hZ4w5-0007yF-6V; Thu, 06 Jun 2019 22:48:57 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ id 1hZ5Nw-0002DY-V0; Thu, 06 Jun 2019 23:17:45 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 882A33082200;
- Fri,  7 Jun 2019 02:48:54 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id A38DAC04959F;
+ Fri,  7 Jun 2019 03:17:43 +0000 (UTC)
 Received: from [10.3.116.85] (ovpn-116-85.phx2.redhat.com [10.3.116.85])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 1B5448BE58;
- Fri,  7 Jun 2019 02:48:48 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 2A2F77C867;
+ Fri,  7 Jun 2019 03:17:40 +0000 (UTC)
 To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
  qemu-devel@nongnu.org, qemu-block@nongnu.org
 References: <20190411172709.205032-1-vsementsov@virtuozzo.com>
- <20190411172709.205032-6-vsementsov@virtuozzo.com>
+ <20190411172709.205032-7-vsementsov@virtuozzo.com>
 From: Eric Blake <eblake@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=eblake@redhat.com; keydata=
@@ -71,22 +71,21 @@ Autocrypt: addr=eblake@redhat.com; keydata=
  Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
  2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
 Organization: Red Hat, Inc.
-Message-ID: <834d25f9-23c9-287c-0599-905a7669a6c5@redhat.com>
-Date: Thu, 6 Jun 2019 21:48:47 -0500
+Message-ID: <0b64cff5-33fa-0945-504c-b1bdd004c42a@redhat.com>
+Date: Thu, 6 Jun 2019 22:17:39 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190411172709.205032-6-vsementsov@virtuozzo.com>
+In-Reply-To: <20190411172709.205032-7-vsementsov@virtuozzo.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="2U6CC7xS62OVCcNoU9QxIrucDq4bDmSOK"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+ boundary="RjhRo0EKlrmbOVE7deXCXZl6U9nkCQrez"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.47]); Fri, 07 Jun 2019 02:48:54 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.31]); Fri, 07 Jun 2019 03:17:43 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v6 5/7] qemu-coroutine-sleep: introduce
- qemu_co_sleep_wake
+Subject: Re: [Qemu-devel] [PATCH v6 6/7] block/nbd-client: nbd reconnect
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -105,111 +104,294 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---2U6CC7xS62OVCcNoU9QxIrucDq4bDmSOK
-Content-Type: multipart/mixed; boundary="u3DzIyC2y4l9f20KSbx9jdWvT8BfqVwUw";
+--RjhRo0EKlrmbOVE7deXCXZl6U9nkCQrez
+Content-Type: multipart/mixed; boundary="0LA3ZzChEWk7OQzmfAG8ZxgUTSuSUTMmI";
  protected-headers="v1"
 From: Eric Blake <eblake@redhat.com>
 To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
  qemu-devel@nongnu.org, qemu-block@nongnu.org
 Cc: armbru@redhat.com, stefanha@redhat.com, mreitz@redhat.com,
  kwolf@redhat.com, den@openvz.org
-Message-ID: <834d25f9-23c9-287c-0599-905a7669a6c5@redhat.com>
-Subject: Re: [PATCH v6 5/7] qemu-coroutine-sleep: introduce qemu_co_sleep_wake
+Message-ID: <0b64cff5-33fa-0945-504c-b1bdd004c42a@redhat.com>
+Subject: Re: [PATCH v6 6/7] block/nbd-client: nbd reconnect
 References: <20190411172709.205032-1-vsementsov@virtuozzo.com>
- <20190411172709.205032-6-vsementsov@virtuozzo.com>
-In-Reply-To: <20190411172709.205032-6-vsementsov@virtuozzo.com>
+ <20190411172709.205032-7-vsementsov@virtuozzo.com>
+In-Reply-To: <20190411172709.205032-7-vsementsov@virtuozzo.com>
 
---u3DzIyC2y4l9f20KSbx9jdWvT8BfqVwUw
+--0LA3ZzChEWk7OQzmfAG8ZxgUTSuSUTMmI
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
 On 4/11/19 12:27 PM, Vladimir Sementsov-Ogievskiy wrote:
-> Introduce a function to gracefully wake-up a coroutine, sleeping in
-> qemu_co_sleep_ns() sleep.
-
-Maybe:
-
-Introduce a function to gracefully short-circuit the remainder of the
-delay for a coroutine sleeping in qemu_co_sleep_ns().
-
+> Implement reconnect. To achieve this:
+>=20
+> 1. add new modes:
+>    connecting-wait: means, that reconnecting is in progress, and there
+>      were small number of reconnect attempts, so all requests are
+>      waiting for the connection.
+>    connecting-nowait: reconnecting is in progress, there were a lot of
+>      attempts of reconnect, all requests will return errors.
+>=20
+>    two old modes are used too:
+>    connected: normal state
+>    quit: exiting after fatal error or on close
+>=20
+> Possible transitions are:
+>=20
+>    * -> quit
+>    connecting-* -> connected
+>    connecting-wait -> connecting-nowait (transition is done after
+>                       reconnect-delay seconds in connecting-wait mode)
+>    connected -> connecting-wait
+>=20
+> 2. Implement reconnect in connection_co. So, in connecting-* mode,
+>     connection_co, tries to reconnect unlimited times.
+>=20
+> 3. Retry nbd queries on channel error, if we are in connecting-wait
+>     state.
 >=20
 > Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 > ---
->  include/qemu/coroutine.h    |  6 ++++++
->  util/qemu-coroutine-sleep.c | 20 ++++++++++++++++----
->  2 files changed, 22 insertions(+), 4 deletions(-)
+
+Does this also mean that we can start queuing up guest I/O even before
+the first time connected is reached?
+
+>  block/nbd-client.h |   7 +
+>  block/nbd-client.c | 336 +++++++++++++++++++++++++++++++++++----------=
+
+>  2 files changed, 273 insertions(+), 70 deletions(-)
 >=20
-> diff --git a/include/qemu/coroutine.h b/include/qemu/coroutine.h
-> index 9801e7f5a4..ec765c26f0 100644
-> --- a/include/qemu/coroutine.h
-> +++ b/include/qemu/coroutine.h
-> @@ -278,6 +278,12 @@ void qemu_co_rwlock_unlock(CoRwlock *lock);
->   */
->  void coroutine_fn qemu_co_sleep_ns(QEMUClockType type, int64_t ns);
+
+> +++ b/block/nbd-client.c
+> @@ -1,6 +1,7 @@
+>  /*
+>   * QEMU Block driver for  NBD
+>   *
+> + * Copyright (c) 2019 Virtuozzo International GmbH. All rights reserve=
+d.
+
+Adding copyright is fine - you are indeed adding a non-trivial amount of
+code to this file. Adding "All rights reserved" is questionable, in part
+because it no longer has legal status (see this recent nbdkit patch
+https://github.com/libguestfs/nbdkit/commit/952ffe0fc7 for example).
+
+Furthermore, I really cringe when I see it mixed with GPL, because the
+GPL works by explicitly stating that you are NOT reserving all rights,
+but are rather granting specific permissions to recipients. However, as
+this file is BSD licensed, and the various family tree of BSD licenses
+have (often due to copy-and-paste) used this phrase in the past, I'm not
+going to reject the patch because of the phrase, even though I can
+definitely ask if you can remove it.
+
+> @@ -59,24 +77,133 @@ static void nbd_teardown_connection(BlockDriverSta=
+te *bs)
+>  {
+>      NBDClientSession *client =3D nbd_get_client_session(bs);
 > =20
-> +/*
-> + * Wake a coroutine if it is sleeping by qemu_co_sleep_ns. Timer will =
-be
-> + * deleted.
-
-Maybe:
-
-Wake a coroutine if it is sleeping in qemu_co_sleep_ns, and delete the
-timer.
-
-> +++ b/util/qemu-coroutine-sleep.c
-> @@ -17,13 +17,24 @@
->  #include "qemu/timer.h"
->  #include "block/aio.h"
-> =20
-> +const char *qemu_co_sleep_ns__scheduled =3D "qemu_co_sleep_ns";
-> +
-> +void qemu_co_sleep_wake(Coroutine *co)
-> +{
-> +    /* Write of schedule protected by barrier write in aio_co_schedule=
- */
-> +    const char *scheduled =3D atomic_cmpxchg(&co->scheduled,
-> +                                           qemu_co_sleep_ns__scheduled=
-, NULL);
-> +
-> +    if (scheduled =3D=3D qemu_co_sleep_ns__scheduled) {
-> +        aio_co_wake(co);
+> -    assert(client->ioc);
+> -
+> -    /* finish any pending coroutines */
+> -    qio_channel_shutdown(client->ioc,
+> -                         QIO_CHANNEL_SHUTDOWN_BOTH,
+> -                         NULL);
+> +    if (client->state =3D=3D NBD_CLIENT_CONNECTED) {
+> +        /* finish any pending coroutines */
+> +        assert(client->ioc);
+> +        qio_channel_shutdown(client->ioc, QIO_CHANNEL_SHUTDOWN_BOTH, N=
+ULL);
 > +    }
+> +    client->state =3D NBD_CLIENT_QUIT;
+> +    if (client->connection_co) {
+> +        qemu_co_sleep_wake(client->connection_co);
+> +    }
+>      BDRV_POLL_WHILE(bs, client->connection_co);
+
+So you are using the qemu_co_sleep_wake code as a way to in effect
+cancel any ongoing sleep. I'm still not sure if there is already another
+way to achieve the same effect, perhaps by re-entering the coroutine?
+
+> +typedef struct NBDConnection {
+> +    BlockDriverState *bs;
+> +    SocketAddress *saddr;
+> +    const char *export;
+> +    QCryptoTLSCreds *tlscreds;
+> +    const char *hostname;
+> +    const char *x_dirty_bitmap;
+> +} NBDConnection;
+
+Can we put this type in a header, and use it instead of passing lots of
+individual parameters to nbd_client_connect()?  Probably as a separate
+pre-requisite cleanup patch.
+
+> +
+> +static bool nbd_client_connecting(NBDClientSession *client)
+> +{
+> +    return client->state =3D=3D NBD_CLIENT_CONNECTING_WAIT ||
+> +           client->state =3D=3D NBD_CLIENT_CONNECTING_NOWAIT;
+> +}
+
+I don't know what style we prefer to use here. If my returns split
+across lines, I tend to go with either 4-space indent instead of 7, or
+to use () so that the second line is indented to the column after (; but
+this is aesthetics and so I'm not going to change what you have.
+
+> +
+> +static bool nbd_client_connecting_wait(NBDClientSession *client)
+> +{
+> +    return client->state =3D=3D NBD_CLIENT_CONNECTING_WAIT;
 > +}
 > +
->  static void co_sleep_cb(void *opaque)
->  {
->      Coroutine *co =3D opaque;
+> +static coroutine_fn void nbd_reconnect_attempt(NBDConnection *con)
+> +{
+> +    NBDClientSession *s =3D nbd_get_client_session(con->bs);
+> +    Error *local_err =3D NULL;
+> +
+> +    if (!nbd_client_connecting(s)) {
+> +        return;
+> +    }
+> +    assert(nbd_client_connecting(s));
+> +
+> +    /* Wait completion of all in-flight requests */
+
+Wait for completion
+
+> +
+> +    qemu_co_mutex_lock(&s->send_mutex);
 > =20
-> -    /* Write of schedule protected by barrier write in aio_co_schedule=
- */
-> -    atomic_set(&co->scheduled, NULL);
-> -    aio_co_wake(co);
-> +    qemu_co_sleep_wake(co);
+> -    nbd_client_detach_aio_context(bs);
+> -    object_unref(OBJECT(client->sioc));
+> -    client->sioc =3D NULL;
+> -    object_unref(OBJECT(client->ioc));
+> -    client->ioc =3D NULL;
+> +    while (s->in_flight > 0) {
+> +        qemu_co_mutex_unlock(&s->send_mutex);
+> +        nbd_recv_coroutines_wake_all(s);
+> +        s->wait_in_flight =3D true;
+> +        qemu_coroutine_yield();
+> +        s->wait_in_flight =3D false;
+> +        qemu_co_mutex_lock(&s->send_mutex);
+> +    }
+> +
+> +    qemu_co_mutex_unlock(&s->send_mutex);
+> +
+> +    if (!nbd_client_connecting(s)) {
+> +        return;
+> +    }
+> +
+> +    /*
+> +     * Now we are sure, that nobody accessing the channel now and nobo=
+dy
+> +     * will try to access the channel, until we set state to CONNECTED=
+
+
+Now we are sure that nobody is accessing the channel, and no one will
+try until we set the state to CONNECTED
+
+> +     */
+> +
+> +    /* Finalize previous connection if any */
+> +    if (s->ioc) {
+> +        nbd_client_detach_aio_context(con->bs);
+> +        object_unref(OBJECT(s->sioc));
+> +        s->sioc =3D NULL;
+> +        object_unref(OBJECT(s->ioc));
+> +        s->ioc =3D NULL;
+> +    }
+> +
+> +    s->connect_status =3D nbd_client_connect(con->bs, con->saddr,
+> +                                           con->export, con->tlscreds,=
+
+> +                                           con->hostname, con->x_dirty=
+_bitmap,
+> +                                           &local_err);
+> +    error_free(s->connect_err);
+> +    s->connect_err =3D NULL;
+> +    error_propagate(&s->connect_err, local_err);
+> +    local_err =3D NULL;
+> +
+> +    if (s->connect_status < 0) {
+> +        /* failed attempt */
+> +        return;
+> +    }
+> +
+> +    /* successfully connected */
+> +    s->state =3D NBD_CLIENT_CONNECTED;
+> +    qemu_co_queue_restart_all(&s->free_sema);
+> +}
+> +
+> +static coroutine_fn void nbd_reconnect_loop(NBDConnection *con)
+> +{
+> +    NBDClientSession *s =3D nbd_get_client_session(con->bs);
+> +    uint64_t start_time_ns =3D qemu_clock_get_ns(QEMU_CLOCK_REALTIME);=
+
+> +    uint64_t delay_ns =3D s->reconnect_delay * 1000000000UL;
+
+Do we have a #define constant for nanoseconds in a second to make this
+more legible than counting '0's?
+
+> +    uint64_t timeout =3D 1000000000UL; /* 1 sec */
+> +    uint64_t max_timeout =3D 16000000000UL; /* 16 sec */
+
+1 * constant, 16 * constant
+
+> +
+> +    nbd_reconnect_attempt(con);
+> +
+> +    while (nbd_client_connecting(s)) {
+> +        if (s->state =3D=3D NBD_CLIENT_CONNECTING_WAIT &&
+> +            qemu_clock_get_ns(QEMU_CLOCK_REALTIME) - start_time_ns > d=
+elay_ns)
+> +        {
+> +            s->state =3D NBD_CLIENT_CONNECTING_NOWAIT;
+> +            qemu_co_queue_restart_all(&s->free_sema);
+> +        }
+> +
+> +        bdrv_dec_in_flight(con->bs);
+> +        qemu_co_sleep_ns(QEMU_CLOCK_REALTIME, timeout);
+
+Another place where I'd like someone more familiar with coroutines to
+also have a look.
+
+> +        bdrv_inc_in_flight(con->bs);
+> +        if (timeout < max_timeout) {
+> +            timeout *=3D 2;
+> +        }
+> +
+> +        nbd_reconnect_attempt(con);
+> +    }
 >  }
 > =20
->  void coroutine_fn qemu_co_sleep_ns(QEMUClockType type, int64_t ns)
-> @@ -32,7 +43,8 @@ void coroutine_fn qemu_co_sleep_ns(QEMUClockType type=
-, int64_t ns)
->      QEMUTimer *ts;
->      Coroutine *co =3D qemu_coroutine_self();
-> =20
-> -    const char *scheduled =3D atomic_cmpxchg(&co->scheduled, NULL, __f=
-unc__);
-> +    const char *scheduled =3D atomic_cmpxchg(&co->scheduled, NULL,
-> +                                           qemu_co_sleep_ns__scheduled=
-);
->      if (scheduled) {
->          fprintf(stderr,
->                  "%s: Co-routine was already scheduled in '%s'\n",
->=20
+>  static coroutine_fn void nbd_connection_entry(void *opaque)
+>  {
+> -    NBDClientSession *s =3D opaque;
+> +    NBDConnection *con =3D opaque;
+> +    NBDClientSession *s =3D nbd_get_client_session(con->bs);
+>      uint64_t i;
+>      int ret =3D 0;
+>      Error *local_err =3D NULL;
+> @@ -91,16 +218,25 @@ static coroutine_fn void nbd_connection_entry(void=
+ *opaque)
+>           * Therefore we keep an additional in_flight reference all the=
+ time and
+>           * only drop it temporarily here.
+>           */
+> +
+> +        if (nbd_client_connecting(s)) {
+> +            nbd_reconnect_loop(con);
+> +        }
+> +
+> +        if (s->state !=3D NBD_CLIENT_CONNECTED) {
+> +            continue;
+> +        }
+> +
 
-Here, I'd rather get an additional review from anyone more familiar with
-coroutine sleeps.  I'm guessing that your intent is to request a maximum
-timeout for a given operation to complete in, but to leave the sleep
-loop early if the operation completes earlier.  I don't know if any
-existing coroutine code can be used to express that same idea.
+If I understand, this is not a busy loop because nbd_reconnect_loop()
+will pause the coroutine until something interesting happens. Correct?
+
+It's late enough at night for me that I don't trust this to be a full
+review; I'll try and look again soon in more details, as well as play
+with this against iotests.
 
 --=20
 Eric Blake, Principal Software Engineer
@@ -217,24 +399,24 @@ Red Hat, Inc.           +1-919-301-3226
 Virtualization:  qemu.org | libvirt.org
 
 
---u3DzIyC2y4l9f20KSbx9jdWvT8BfqVwUw--
+--0LA3ZzChEWk7OQzmfAG8ZxgUTSuSUTMmI--
 
---2U6CC7xS62OVCcNoU9QxIrucDq4bDmSOK
+--RjhRo0EKlrmbOVE7deXCXZl6U9nkCQrez
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlz50I8ACgkQp6FrSiUn
-Q2pN3Qf9E7uyYyZ7VYk4ilCQe+eZYdw6z0Fuz4960MtrMOJWF35QDH6603l0gU0r
-E9MOyINp1rO4TkP3+amMh73zC6o6SQjWMMfYK0Wzji0yBylfT1tDsD+f/+bNOm0c
-V6z1oY8LLUqwA2mopxX++IHWkV061nCZU2vgxx0Stxq5WLY5nHAsbcyaC/ITR2rz
-3r/qNqNBh6m8yunoa5iVcmHYBN1Z4SsGlMIYTqtVouSPhDN9HLOBwTa/cGlqDn30
-UXKqPaX31YbGI85FsKqFdRLi6G1aOUps5at9AjetowhiRaXRxldACFzxwbgrpmpG
-Q3FRMgveTor0H8Qv9VJbXcIsQxGKHA==
-=R2sV
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlz511MACgkQp6FrSiUn
+Q2pvdggAlA+ODENokHMT1SPg5m+dVHmrXQ0nDq3HO1BqfqWlJQdqb7StNQgppHxl
+6X40roXPoLkeksoDJBm9+UVFGdfsvLm948Yk16xpJHRZOT6/LEKZ1KDizavEy22V
+AdFOYLmA2k7kBBIuIExUJcAysHorze69lq5zf0qYPgYwpwsRQ2VBrnyCmBQSIIwB
+NaD6LdgeaLxZNE+pP3y6jMCW6ZaX4IHS3B6UcisFjO/orCtwZAowJ2Vk1Enah20C
+KteNIFqTfz3Xstq5p8krBUOmquqTdBq/o31ymlG0IG7LP6+uN+ZJTPWmdthn5sDf
+DN03S2qpnONcSCy6BmVXzunhzzN8rQ==
+=XSt0
 -----END PGP SIGNATURE-----
 
---2U6CC7xS62OVCcNoU9QxIrucDq4bDmSOK--
+--RjhRo0EKlrmbOVE7deXCXZl6U9nkCQrez--
 
