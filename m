@@ -3,64 +3,81 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 28B5AC28CC3
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 08:28:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E238C28CC3
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 08:34:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 020F0212F5
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 08:28:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 020F0212F5
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 0644B20B7C
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 08:34:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0644B20B7C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46810 helo=lists.gnu.org)
+Received: from localhost ([::1]:46862 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hZAEg-00085p-BX
-	for qemu-devel@archiver.kernel.org; Fri, 07 Jun 2019 04:28:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56928)
+	id 1hZAKs-0001WZ-65
+	for qemu-devel@archiver.kernel.org; Fri, 07 Jun 2019 04:34:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58206)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <clg@kaod.org>) id 1hZADe-0007Ht-Fw
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 04:27:27 -0400
+ (envelope-from <philmd@redhat.com>) id 1hZAJd-0000fT-53
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 04:33:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <clg@kaod.org>) id 1hZADd-0000vU-Kh
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 04:27:26 -0400
-Received: from 17.mo6.mail-out.ovh.net ([46.105.36.150]:49956)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <clg@kaod.org>) id 1hZADd-0000sk-Ef
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 04:27:25 -0400
-Received: from player788.ha.ovh.net (unknown [10.109.160.251])
- by mo6.mail-out.ovh.net (Postfix) with ESMTP id 6EC851CFCDA
- for <qemu-devel@nongnu.org>; Fri,  7 Jun 2019 10:27:22 +0200 (CEST)
-Received: from kaod.org (lfbn-1-10649-41.w90-89.abo.wanadoo.fr [90.89.235.41])
- (Authenticated sender: clg@kaod.org)
- by player788.ha.ovh.net (Postfix) with ESMTPSA id C8CDB6917401;
- Fri,  7 Jun 2019 08:27:16 +0000 (UTC)
-To: David Gibson <david@gibson.dropbear.id.au>, Greg Kurz <groug@kaod.org>
-References: <155984093894.2803172.8618224129384655510.stgit@bahia.lan>
- <20190607001901.GC3760@umbus.fritz.box>
- <2d02c8d1-d9f4-efd0-5059-6ca24e622107@kaod.org>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <47163b65-3e3e-09a9-c80a-ac894b865de4@kaod.org>
-Date: Fri, 7 Jun 2019 10:27:16 +0200
+ (envelope-from <philmd@redhat.com>) id 1hZAJW-0000LC-Ts
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 04:33:33 -0400
+Received: from mail-wm1-f54.google.com ([209.85.128.54]:53489)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hZAJS-00006y-Em
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 04:33:26 -0400
+Received: by mail-wm1-f54.google.com with SMTP id x15so1098553wmj.3
+ for <qemu-devel@nongnu.org>; Fri, 07 Jun 2019 01:33:16 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=5ZQw4/n0dqYZBceUrFHhAfPiuOk/UGSk1gPjssKrYyY=;
+ b=YudChXgEMiEqMG8eXNLSsnyjW6lwyE3SfqG//w/3DInmv4Y4qlhlfFPqw+1FAzZHhS
+ ctGIvAPZvNLebHSMudS0mpvCgBJBTbrAjfR+1X4l8Xf7281q2aJTdOP2CX6lW5cg+Gvz
+ jlzLCfBBmtH1E5NlcTnr6ZxZ/jV5iHF+dnbNF9GEgisgMLvqho7fqLTGx7FsA9ei44BO
+ xa5Vy0PkFgmqDnRbUgz53xxcRhC/vTqeYdRyJR7YOVIt8n793ZK9iJ56DUDwl0f4rd36
+ ae349BRTg0Sj9bTRFRALEt0GrVS76ad8UpmqUPygD/2tedaTQK/hC+WTy+Pa8VuKm7y5
+ ZJPA==
+X-Gm-Message-State: APjAAAWHKXoG/5MXxizGqiI5sCi0HxN1FxIlPO1q4LDAJo05CXX9MlxI
+ jEZH46C1nriNC/dJsxsrFhgHow==
+X-Google-Smtp-Source: APXvYqz+jWxhRP6ttLVcY/6kdVKxI9UQP/ElSescesZkI/wcNFAgg5Vkwr7TnGf3Bhm0Rm/UiI5Eyw==
+X-Received: by 2002:a05:600c:2383:: with SMTP id
+ m3mr1552704wma.20.1559896395918; 
+ Fri, 07 Jun 2019 01:33:15 -0700 (PDT)
+Received: from [192.168.0.156] ([78.192.181.46])
+ by smtp.gmail.com with ESMTPSA id 65sm1356336wro.85.2019.06.07.01.33.15
+ (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+ Fri, 07 Jun 2019 01:33:15 -0700 (PDT)
+To: Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+References: <87woihi1wl.fsf@dusky.pond.sub.org>
+ <20190524185344.GJ10764@habkost.net> <87r28k1g4q.fsf@dusky.pond.sub.org>
+ <e5372760-7599-3155-44f7-dc704c9cbaa5@redhat.com>
+ <875zphg9t8.fsf@dusky.pond.sub.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+ url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <47942a1d-efa4-c20d-a854-bd0e3b4ec1f2@redhat.com>
+Date: Fri, 7 Jun 2019 10:33:14 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <2d02c8d1-d9f4-efd0-5059-6ca24e622107@kaod.org>
-Content-Type: text/plain; charset=windows-1252
+In-Reply-To: <875zphg9t8.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Ovh-Tracer-Id: 2299650563298200403
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduuddrudegiedgtdefucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddm
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 46.105.36.150
-Subject: Re: [Qemu-devel] [PATCH] spapr: Don't use the "dual" interrupt
- controller mode with an old hypervisor
+ [fuzzy]
+X-Received-From: 209.85.128.54
+Subject: Re: [Qemu-devel] qapi/misc.json is too big,
+ let's bite off a few chunks
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,31 +89,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+Cc: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org,
+ =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ =?UTF-8?Q?Andreas_F=c3=a4rber?= <afaerber@suse.de>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
->                         kernel_irqchip
+On 6/7/19 8:59 AM, Markus Armbruster wrote:
+[...]
+> QOM is not a particularly active subsystem now: 51 commits in two years.
 > 
->            (default) 
-> ic-mode     allowed           off            on 
+> We obviously need maintainers to review and merge patches.  The nominal
+> maintainer hasn't been doing that since 2015.  Git shows the following
+> top committers taking on / getting sucked into QOM:
 > 
-> dual        XICS KVM       XICS emul.(3)   XICS KVM         (default mode)
-> xics        XICS KVM       XICS emul.      XICS KVM    
-> xive        XIVE emul.(1)  XIVE emul.     QEMU failure (2)
+>     Markus Armbruster <armbru@redhat.com>
+>     Eduardo Habkost <ehabkost@redhat.com>
+>     Paolo Bonzini <pbonzini@redhat.com>
+>     Marc-André Lureau <marcandre.lureau@redhat.com>
+>     Eric Blake <eblake@redhat.com>
+> 
+> We really need nominal maintainer(s) again.
+> 
+> Of course, *active* maintainers would be even better: I consider QOM
+> stuck in an unhappy place where much of its potential is still
+> potential.
+> 
+> But let's start small.  Volunteers for the reviewer role, please step
+> forward :)
 > 
 > 
-> (1) QEMU warns with "warning: kernel_irqchip requested but unavailable: 
->     IRQ_XIVE capability must be present for KVM" 
-> (2) QEMU fails with "kernel_irqchip requested but unavailable: 
->     IRQ_XIVE capability must be present for KVM" 
-> (3) That is wrong I think, we should get XIVE emulated.
 > 
+> The details I promised:
 > 
-> what you would want is XIVE emulation when ic-mode=dual and 
-> kernel_irqchip=allowed, which is the behavior with this patch (but there
-                                                 ^
-                                              without
-> are reboot bugs)
+> Output of "scripts/get_maintainer.pl --git --git-since='2-years-ago' |
+> grep commit_signer" sorted by file size:
+> 
+[...]
+> = include/qom/object_interfaces.h =
+> Eduardo Habkost <ehabkost@redhat.com> (commit_signer:8/5=100%)
+> Igor Mammedov <imammedo@redhat.com> (commit_signer:3/5=60%)
+> "Marc-André Lureau" <marcandre.lureau@redhat.com> (commit_signer:2/5=40%)
+> "Philippe Mathieu-Daudé" <f4bug@amsat.org> (commit_signer:2/5=40%)
+> Eric Blake <eblake@redhat.com> (commit_signer:1/5=20%)
+
+get_maintainer's commit_signer is lying...
+
+[...]
+> = qom/trace-events =
+> Stefan Hajnoczi <stefanha@redhat.com> (commit_signer:2/2=100%)
+> "Philippe Mathieu-Daudé" <philmd@redhat.com> (commit_signer:2/2=100%)
+> Markus Armbruster <armbru@redhat.com> (commit_signer:1/2=50%)
+> Michael Tokarev <mjt@tls.msk.ru> (commit_signer:1/2=50%)
+
+This 'git log -p' history of this file is very interesting...
 
