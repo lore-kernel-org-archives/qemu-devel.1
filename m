@@ -2,90 +2,55 @@ Return-Path: <SRS0=3yEa=UG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B1A7C46476
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 09:30:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4EB4FC28CC3
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 09:34:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C3121208E3
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 09:30:00 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="yNe2eiwu"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C3121208E3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id CA440208E3
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 09:34:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CA440208E3
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=users.sourceforge.jp
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47488 helo=lists.gnu.org)
+Received: from localhost ([::1]:47498 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hZBCC-0006u1-2U
-	for qemu-devel@archiver.kernel.org; Fri, 07 Jun 2019 05:30:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39489)
+	id 1hZBGh-0008Qr-Lk
+	for qemu-devel@archiver.kernel.org; Fri, 07 Jun 2019 05:34:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41535)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <alex.bennee@linaro.org>) id 1hZAp8-0004CJ-9c
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 05:06:11 -0400
+ (envelope-from <ysato@users.sourceforge.jp>) id 1hZAuW-00011R-Pb
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 05:11:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1hZAp5-0004jb-OI
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 05:06:10 -0400
-Received: from mail-wr1-x42c.google.com ([2a00:1450:4864:20::42c]:36269)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1hZAp5-0004aA-H3
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 05:06:07 -0400
-Received: by mail-wr1-x42c.google.com with SMTP id n4so1360614wrs.3
- for <qemu-devel@nongnu.org>; Fri, 07 Jun 2019 02:06:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=Ugqvq5hjETyvltT2YWuWOJiTLDqqAsBqsH4ZO7PK4SQ=;
- b=yNe2eiwuWZwdjdrXOzN+vDRKbzkIyJRZBMgJCFoyI5loICauyVZ+q92+WM2L/NMn/n
- 8EfnyVHoHnPBUVB/lzt+kmrgqBaK7rh3NWL3BJ4xr2QAu2kdg7vSLmHlpo2PyAghXTNi
- YGf16aRjGzCJNqDmeZXfS6SWwav/XqSeR0yhGv5H3l7JSidubmQ8c87eyeZa+DZwjS0t
- xhOirQkGOBQrG756ajz2Ow+wbUmvZJOhqmHZ4pEBKzB4iWOFv4mSBDGzjFn4QnbBlI0t
- Unm2okZmgNh0iRhP5V/3wnGlVvTXIWOZQZ+h5PxXABKg8QtVFCE+QGj8QB5zGwyFfKst
- 3Y5g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=Ugqvq5hjETyvltT2YWuWOJiTLDqqAsBqsH4ZO7PK4SQ=;
- b=NYCpdkTDDA4JxM39UBGmX7Bw3BJU/hBrRkTTHRelBZGRE68158M7bTbJGQ5OXbFK9o
- JxWTgnzY6Mhcvy+XWwZdJrlWDBrRjyzA84/Ba0XlFjtp8pg2pmy+yy5tZRnBWrWKl/jN
- XGZfNQNAlClBWp9DNtZS/HtdQStKyJ+R3qAiVl49LTGHzef9Pk0Rh1ZjBkZIZdhhkwIs
- EYMWrA7PdAnkTOywWlVz61+cSvGJPnbaNPegSubfgASfvjIWii/Bqxyb/dDNzdvKLHyO
- jK9M9WJ/d4gFjpn3sSzrBmFyVi1O2ZC9eYDIeL33qvVOesgvfGRbxUm8P6fL+3qPuREd
- ONBg==
-X-Gm-Message-State: APjAAAUpRx5CAxY+EV0e4lUBGgiPxaES3SgY65b0BQSP7EDU5epRfcDb
- AulmAKfzCOugOSqXB3uU239iqg==
-X-Google-Smtp-Source: APXvYqwxlsUhn8GoZeKBE6VH+0ALCX3UdPDJq3f1qepyDm63XtACv1KhcZ53UpOZGQ75/66f4bgqig==
-X-Received: by 2002:a5d:43d0:: with SMTP id v16mr31389680wrr.252.1559898364026; 
- Fri, 07 Jun 2019 02:06:04 -0700 (PDT)
-Received: from zen.linaroharston ([81.128.185.34])
- by smtp.gmail.com with ESMTPSA id z17sm1115720wru.21.2019.06.07.02.05.57
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Fri, 07 Jun 2019 02:06:01 -0700 (PDT)
-Received: from zen.linaroharston. (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 130EF1FF90;
- Fri,  7 Jun 2019 10:05:55 +0100 (BST)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: peter.maydell@linaro.org
-Date: Fri,  7 Jun 2019 10:05:37 +0100
-Message-Id: <20190607090552.12434-39-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190607090552.12434-1-alex.bennee@linaro.org>
-References: <20190607090552.12434-1-alex.bennee@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+ (envelope-from <ysato@users.sourceforge.jp>) id 1hZAuO-0002s5-GE
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 05:11:44 -0400
+Received: from mail01.asahi-net.or.jp ([202.224.55.13]:59691)
+ by eggs.gnu.org with esmtp (Exim 4.71)
+ (envelope-from <ysato@users.sourceforge.jp>) id 1hZAuN-0002WE-LV
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 05:11:36 -0400
+Received: from h61-195-96-97.vps.ablenet.jp (h61-195-96-97.ablenetvps.ne.jp
+ [61.195.96.97]) (Authenticated sender: PQ4Y-STU)
+ by mail01.asahi-net.or.jp (Postfix) with ESMTPA id 14C381239CC;
+ Fri,  7 Jun 2019 18:11:25 +0900 (JST)
+Received: from yo-satoh-debian.localdomain (ZM005235.ppp.dion.ne.jp
+ [222.8.5.235])
+ by h61-195-96-97.vps.ablenet.jp (Postfix) with ESMTPSA id DBAE5240087;
+ Fri,  7 Jun 2019 18:11:23 +0900 (JST)
+From: Yoshinori Sato <ysato@users.sourceforge.jp>
+To: qemu-devel@nongnu.org
+Date: Fri,  7 Jun 2019 18:10:54 +0900
+Message-Id: <20190607091116.49044-3-ysato@users.sourceforge.jp>
+X-Mailer: git-send-email 2.11.0
+In-Reply-To: <20190607091116.49044-1-ysato@users.sourceforge.jp>
+References: <20190607091116.49044-1-ysato@users.sourceforge.jp>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::42c
-Subject: [Qemu-devel] [PULL 38/52] gdbstub: Implement set_thread (H pkt)
- with new infra
+X-Received-From: 202.224.55.13
+Subject: [Qemu-devel] [PATCH v17 02/24] target/rx: TCG helper
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,129 +62,704 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org,
- Jon Doron <arilou@gmail.com>
+Cc: peter.maydell@linaro.org, richard.henderson@linaro.org,
+ Yoshinori Sato <ysato@users.sourceforge.jp>, philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Jon Doron <arilou@gmail.com>
+Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Message-Id: <20190516055244.95559-3-ysato@users.sourceforge.jp>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ target/rx/helper.h    |  31 ++++
+ target/rx/helper.c    | 148 ++++++++++++++++
+ target/rx/op_helper.c | 481 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 660 insertions(+)
+ create mode 100644 target/rx/helper.h
+ create mode 100644 target/rx/helper.c
+ create mode 100644 target/rx/op_helper.c
 
-Signed-off-by: Jon Doron <arilou@gmail.com>
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-Message-Id: <20190529064148.19856-7-arilou@gmail.com>
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-
-diff --git a/gdbstub.c b/gdbstub.c
-index 3425f0674d..7735c244b3 100644
---- a/gdbstub.c
-+++ b/gdbstub.c
-@@ -1560,6 +1560,51 @@ static void handle_cont_with_sig(GdbCmdContext *gdb_ctx, void *user_ctx)
-     gdb_continue(gdb_ctx->s);
- }
- 
-+static void handle_set_thread(GdbCmdContext *gdb_ctx, void *user_ctx)
+diff --git a/target/rx/helper.h b/target/rx/helper.h
+new file mode 100644
+index 0000000000..f0b7ebbbf7
+--- /dev/null
++++ b/target/rx/helper.h
+@@ -0,0 +1,31 @@
++DEF_HELPER_1(raise_illegal_instruction, noreturn, env)
++DEF_HELPER_1(raise_access_fault, noreturn, env)
++DEF_HELPER_1(raise_privilege_violation, noreturn, env)
++DEF_HELPER_1(wait, noreturn, env)
++DEF_HELPER_1(debug, noreturn, env)
++DEF_HELPER_2(rxint, noreturn, env, i32)
++DEF_HELPER_1(rxbrk, noreturn, env)
++DEF_HELPER_FLAGS_3(fadd, TCG_CALL_NO_WG, f32, env, f32, f32)
++DEF_HELPER_FLAGS_3(fsub, TCG_CALL_NO_WG, f32, env, f32, f32)
++DEF_HELPER_FLAGS_3(fmul, TCG_CALL_NO_WG, f32, env, f32, f32)
++DEF_HELPER_FLAGS_3(fdiv, TCG_CALL_NO_WG, f32, env, f32, f32)
++DEF_HELPER_FLAGS_3(fcmp, TCG_CALL_NO_WG, void, env, f32, f32)
++DEF_HELPER_FLAGS_2(ftoi, TCG_CALL_NO_WG, i32, env, f32)
++DEF_HELPER_FLAGS_2(round, TCG_CALL_NO_WG, i32, env, f32)
++DEF_HELPER_FLAGS_2(itof, TCG_CALL_NO_WG, f32, env, i32)
++DEF_HELPER_2(set_fpsw, void, env, i32)
++DEF_HELPER_FLAGS_2(racw, TCG_CALL_NO_WG, void, env, i32)
++DEF_HELPER_FLAGS_2(set_psw_rte, TCG_CALL_NO_WG, void, env, i32)
++DEF_HELPER_FLAGS_2(set_psw, TCG_CALL_NO_WG, void, env, i32)
++DEF_HELPER_1(pack_psw, i32, env)
++DEF_HELPER_FLAGS_3(div, TCG_CALL_NO_WG, i32, env, i32, i32)
++DEF_HELPER_FLAGS_3(divu, TCG_CALL_NO_WG, i32, env, i32, i32)
++DEF_HELPER_FLAGS_1(scmpu, TCG_CALL_NO_WG, void, env)
++DEF_HELPER_1(smovu, void, env)
++DEF_HELPER_1(smovf, void, env)
++DEF_HELPER_1(smovb, void, env)
++DEF_HELPER_2(sstr, void, env, i32)
++DEF_HELPER_FLAGS_2(swhile, TCG_CALL_NO_WG, void, env, i32)
++DEF_HELPER_FLAGS_2(suntil, TCG_CALL_NO_WG, void, env, i32)
++DEF_HELPER_FLAGS_2(rmpa, TCG_CALL_NO_WG, void, env, i32)
++DEF_HELPER_1(satr, void, env)
+diff --git a/target/rx/helper.c b/target/rx/helper.c
+new file mode 100644
+index 0000000000..1dae74eae7
+--- /dev/null
++++ b/target/rx/helper.c
+@@ -0,0 +1,148 @@
++/*
++ *  RX emulation
++ *
++ *  Copyright (c) 2019 Yoshinori Sato
++ *
++ * This program is free software; you can redistribute it and/or modify it
++ * under the terms and conditions of the GNU General Public License,
++ * version 2 or later, as published by the Free Software Foundation.
++ *
++ * This program is distributed in the hope it will be useful, but WITHOUT
++ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
++ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
++ * more details.
++ *
++ * You should have received a copy of the GNU General Public License along with
++ * this program.  If not, see <http://www.gnu.org/licenses/>.
++ */
++
++#include "qemu/osdep.h"
++#include "qemu/bitops.h"
++#include "cpu.h"
++#include "exec/log.h"
++#include "exec/cpu_ldst.h"
++#include "sysemu/sysemu.h"
++
++void rx_cpu_unpack_psw(CPURXState *env, uint32_t psw, int rte)
 +{
-+    CPUState *cpu;
++    if (env->psw_pm == 0) {
++        env->psw_ipl = FIELD_EX32(psw, PSW, IPL);
++        if (rte) {
++            /* PSW.PM can write RTE and RTFI */
++            env->psw_pm = FIELD_EX32(psw, PSW, PM);
++        }
++        env->psw_u = FIELD_EX32(psw, PSW, U);
++        env->psw_i = FIELD_EX32(psw, PSW, I);
++    }
++    env->psw_o = FIELD_EX32(psw, PSW, O) << 31;
++    env->psw_s = FIELD_EX32(psw, PSW, S) << 31;
++    env->psw_z = 1 - FIELD_EX32(psw, PSW, Z);
++    env->psw_c = FIELD_EX32(psw, PSW, C);
++}
 +
-+    if (gdb_ctx->num_params != 2) {
-+        put_packet(gdb_ctx->s, "E22");
-+        return;
++#define INT_FLAGS (CPU_INTERRUPT_HARD | CPU_INTERRUPT_FIR)
++void rx_cpu_do_interrupt(CPUState *cs)
++{
++    RXCPU *cpu = RXCPU(cs);
++    CPURXState *env = &cpu->env;
++    int do_irq = cs->interrupt_request & INT_FLAGS;
++    uint32_t save_psw;
++
++    env->in_sleep = 0;
++
++    if (env->psw_u) {
++        env->usp = env->regs[0];
++    } else {
++        env->isp = env->regs[0];
++    }
++    save_psw = rx_cpu_pack_psw(env);
++    env->psw_pm = env->psw_i = env->psw_u = 0;
++
++    if (do_irq) {
++        if (do_irq & CPU_INTERRUPT_FIR) {
++            env->bpc = env->pc;
++            env->bpsw = save_psw;
++            env->pc = env->fintv;
++            env->psw_ipl = 15;
++            cs->interrupt_request &= ~CPU_INTERRUPT_FIR;
++            qemu_set_irq(env->ack, env->ack_irq);
++            qemu_log_mask(CPU_LOG_INT, "fast interrupt raised\n");
++        } else if (do_irq & CPU_INTERRUPT_HARD) {
++            env->isp -= 4;
++            cpu_stl_all(env, env->isp, save_psw);
++            env->isp -= 4;
++            cpu_stl_all(env, env->isp, env->pc);
++            env->pc = cpu_ldl_all(env, env->intb + env->ack_irq * 4);
++            env->psw_ipl = env->ack_ipl;
++            cs->interrupt_request &= ~CPU_INTERRUPT_HARD;
++            qemu_set_irq(env->ack, env->ack_irq);
++            qemu_log_mask(CPU_LOG_INT,
++                          "interrupt 0x%02x raised\n", env->ack_irq);
++        }
++    } else {
++        uint32_t vec = cs->exception_index;
++        const char *expname = "unknown exception";
++
++        env->isp -= 4;
++        cpu_stl_all(env, env->isp, save_psw);
++        env->isp -= 4;
++        cpu_stl_all(env, env->isp, env->pc);
++
++        if (vec < 0x100) {
++            env->pc = cpu_ldl_all(env, 0xffffffc0 + vec * 4);
++        } else {
++            env->pc = cpu_ldl_all(env, env->intb + (vec & 0xff) * 4);
++        }
++        switch (vec) {
++        case 20:
++            expname = "privilege violation";
++            break;
++        case 21:
++            expname = "access exception";
++            break;
++        case 23:
++            expname = "illegal instruction";
++            break;
++        case 25:
++            expname = "fpu exception";
++            break;
++        case 30:
++            expname = "non-maskable interrupt";
++            break;
++        case 0x100 ... 0x1ff:
++            expname = "unconditional trap";
++        }
++        qemu_log_mask(CPU_LOG_INT, "exception 0x%02x [%s] raised\n",
++                      (vec & 0xff), expname);
++    }
++    env->regs[0] = env->isp;
++}
++
++bool rx_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
++{
++    RXCPU *cpu = RXCPU(cs);
++    CPURXState *env = &cpu->env;
++    int accept = 0;
++    /* hardware interrupt (Normal) */
++    if ((interrupt_request & CPU_INTERRUPT_HARD) &&
++        env->psw_i && (env->psw_ipl < env->req_ipl)) {
++        env->ack_irq = env->req_irq;
++        env->ack_ipl = env->req_ipl;
++        accept = 1;
++    }
++    /* hardware interrupt (FIR) */
++    if ((interrupt_request & CPU_INTERRUPT_FIR) &&
++        env->psw_i && (env->psw_ipl < 15)) {
++        accept = 1;
++    }
++    if (accept) {
++        rx_cpu_do_interrupt(cs);
++        return true;
++    }
++    return false;
++}
++
++hwaddr rx_cpu_get_phys_page_debug(CPUState *cs, vaddr addr)
++{
++    return addr;
++}
+diff --git a/target/rx/op_helper.c b/target/rx/op_helper.c
+new file mode 100644
+index 0000000000..9a460070e9
+--- /dev/null
++++ b/target/rx/op_helper.c
+@@ -0,0 +1,481 @@
++/*
++ *  RX helper functions
++ *
++ *  Copyright (c) 2019 Yoshinori Sato
++ *
++ * This program is free software; you can redistribute it and/or modify it
++ * under the terms and conditions of the GNU General Public License,
++ * version 2 or later, as published by the Free Software Foundation.
++ *
++ * This program is distributed in the hope it will be useful, but WITHOUT
++ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
++ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
++ * more details.
++ *
++ * You should have received a copy of the GNU General Public License along with
++ * this program.  If not, see <http://www.gnu.org/licenses/>.
++ */
++
++#include "qemu/osdep.h"
++#include "qemu/bitops.h"
++#include "cpu.h"
++#include "exec/exec-all.h"
++#include "exec/helper-proto.h"
++#include "exec/cpu_ldst.h"
++#include "fpu/softfloat.h"
++
++static inline void QEMU_NORETURN raise_exception(CPURXState *env, int index,
++                                                 uintptr_t retaddr);
++
++static void _set_psw(CPURXState *env, uint32_t psw, uint32_t rte)
++{
++    uint32_t prev_u;
++    prev_u = env->psw_u;
++    rx_cpu_unpack_psw(env, psw, rte);
++    if (prev_u != env->psw_u) {
++        /* switch r0  */
++        if (env->psw_u) {
++            env->isp = env->regs[0];
++            env->regs[0] = env->usp;
++        } else {
++            env->usp = env->regs[0];
++            env->regs[0] = env->isp;
++        }
++    }
++}
++
++void helper_set_psw(CPURXState *env, uint32_t psw)
++{
++    _set_psw(env, psw, 0);
++}
++
++void helper_set_psw_rte(CPURXState *env, uint32_t psw)
++{
++    _set_psw(env, psw, 1);
++}
++
++uint32_t helper_pack_psw(CPURXState *env)
++{
++    return rx_cpu_pack_psw(env);
++}
++
++#define SET_FPSW(b)                                             \
++    do {                                                        \
++        env->fpsw = FIELD_DP32(env->fpsw, FPSW, C ## b, 1);     \
++        if (!FIELD_EX32(env->fpsw, FPSW, E ## b)) {             \
++            env->fpsw = FIELD_DP32(env->fpsw, FPSW, F ## b, 1); \
++        }                                                       \
++    } while (0)
++
++/* fp operations */
++static void update_fpsw(CPURXState *env, float32 ret, uintptr_t retaddr)
++{
++    int xcpt, cause, enable;
++
++    env->psw_z = ret & ~(1 << 31); /* mask sign bit */
++    env->psw_s = ret;
++
++    xcpt = get_float_exception_flags(&env->fp_status);
++
++    /* Clear the cause entries */
++    env->fpsw = FIELD_DP32(env->fpsw, FPSW, CAUSE, 0);
++
++    /* set FPSW */
++    if (unlikely(xcpt)) {
++        if (xcpt & float_flag_invalid) {
++            SET_FPSW(V);
++        }
++        if (xcpt & float_flag_divbyzero) {
++            SET_FPSW(Z);
++        }
++        if (xcpt & float_flag_overflow) {
++            SET_FPSW(O);
++        }
++        if (xcpt & float_flag_underflow) {
++            SET_FPSW(U);
++        }
++        if (xcpt & float_flag_inexact) {
++            SET_FPSW(X);
++        }
++        if ((xcpt & (float_flag_input_denormal
++                     | float_flag_output_denormal))
++            && !FIELD_EX32(env->fpsw, FPSW, DN)) {
++            env->fpsw = FIELD_DP32(env->fpsw, FPSW, CE, 1);
++        }
++
++        /* update FPSW_FLAG_S */
++        if (FIELD_EX32(env->fpsw, FPSW, FLAGS) != 0) {
++            env->fpsw = FIELD_DP32(env->fpsw, FPSW, FS, 1);
++        }
++
++        /* Generate an exception if enabled */
++        cause = FIELD_EX32(env->fpsw, FPSW, CAUSE);
++        enable = FIELD_EX32(env->fpsw, FPSW, ENABLE);
++        enable |= 1 << 5; /* CE always enabled */
++        if (cause & enable) {
++            raise_exception(env, 21, retaddr);
++        }
++    }
++}
++
++void helper_set_fpsw(CPURXState *env, uint32_t val)
++{
++    static const int roundmode[] = {
++        float_round_nearest_even,
++        float_round_to_zero,
++        float_round_up,
++        float_round_down,
++    };
++    uint32_t fpsw = env->fpsw;
++    fpsw |= 0x7fffff03;
++    val &= ~0x80000000;
++    fpsw &= val;
++    FIELD_DP32(fpsw, FPSW, FS, FIELD_EX32(fpsw, FPSW, FLAGS) != 0);
++    env->fpsw = fpsw;
++    set_float_rounding_mode(roundmode[FIELD_EX32(env->fpsw, FPSW, RM)],
++                            &env->fp_status);
++}
++
++#define FLOATOP(op, func)                                           \
++    float32 helper_##op(CPURXState *env, float32 t0, float32 t1)    \
++    {                                                               \
++        float32 ret;                                                \
++        ret = func(t0, t1, &env->fp_status);                        \
++        update_fpsw(env, *(uint32_t *)&ret, GETPC());               \
++        return ret;                                                 \
 +    }
 +
-+    if (gdb_ctx->params[1].thread_id.kind == GDB_READ_THREAD_ERR) {
-+        put_packet(gdb_ctx->s, "E22");
-+        return;
-+    }
++FLOATOP(fadd, float32_add)
++FLOATOP(fsub, float32_sub)
++FLOATOP(fmul, float32_mul)
++FLOATOP(fdiv, float32_div)
 +
-+    if (gdb_ctx->params[1].thread_id.kind != GDB_ONE_THREAD) {
-+        put_packet(gdb_ctx->s, "OK");
-+        return;
-+    }
-+
-+    cpu = gdb_get_cpu(gdb_ctx->s, gdb_ctx->params[1].thread_id.pid,
-+                      gdb_ctx->params[1].thread_id.tid);
-+    if (!cpu) {
-+        put_packet(gdb_ctx->s, "E22");
-+        return;
-+    }
-+
-+    /*
-+     * Note: This command is deprecated and modern gdb's will be using the
-+     *       vCont command instead.
-+     */
-+    switch (gdb_ctx->params[0].opcode) {
-+    case 'c':
-+        gdb_ctx->s->c_cpu = cpu;
-+        put_packet(gdb_ctx->s, "OK");
++void helper_fcmp(CPURXState *env, float32 t0, float32 t1)
++{
++    int st;
++    st = float32_compare(t0, t1, &env->fp_status);
++    update_fpsw(env, 0, GETPC());
++    env->psw_z = 1;
++    env->psw_s = env->psw_o = 0;
++    switch (st) {
++    case float_relation_equal:
++        env->psw_z = 0;
 +        break;
-+    case 'g':
-+        gdb_ctx->s->g_cpu = cpu;
-+        put_packet(gdb_ctx->s, "OK");
++    case float_relation_less:
++        env->psw_s = -1;
 +        break;
-+    default:
-+        put_packet(gdb_ctx->s, "E22");
++    case float_relation_unordered:
++        env->psw_o = -1;
 +        break;
 +    }
 +}
 +
- static int gdb_handle_packet(GDBState *s, const char *line_buf)
- {
-     CPUState *cpu;
-@@ -1573,7 +1618,6 @@ static int gdb_handle_packet(GDBState *s, const char *line_buf)
-     char thread_id[16];
-     uint8_t *registers;
-     target_ulong addr, len;
--    GDBThreadIdKind thread_kind;
-     const GdbCmdParseEntry *cmd_parser = NULL;
- 
-     trace_gdbstub_io_command(line_buf);
-@@ -1836,35 +1880,14 @@ static int gdb_handle_packet(GDBState *s, const char *line_buf)
-             put_packet(s, "E22");
-         break;
-     case 'H':
--        type = *p++;
--
--        thread_kind = read_thread_id(p, &p, &pid, &tid);
--        if (thread_kind == GDB_READ_THREAD_ERR) {
--            put_packet(s, "E22");
--            break;
--        }
--
--        if (thread_kind != GDB_ONE_THREAD) {
--            put_packet(s, "OK");
--            break;
--        }
--        cpu = gdb_get_cpu(s, pid, tid);
--        if (cpu == NULL) {
--            put_packet(s, "E22");
--            break;
--        }
--        switch (type) {
--        case 'c':
--            s->c_cpu = cpu;
--            put_packet(s, "OK");
--            break;
--        case 'g':
--            s->g_cpu = cpu;
--            put_packet(s, "OK");
--            break;
--        default:
--             put_packet(s, "E22");
--             break;
-+        {
-+            static const GdbCmdParseEntry set_thread_cmd_desc = {
-+                .handler = handle_set_thread,
-+                .cmd = "H",
-+                .cmd_startswith = 1,
-+                .schema = "o.t0"
-+            };
-+            cmd_parser = &set_thread_cmd_desc;
-         }
-         break;
-     case 'T':
++uint32_t helper_ftoi(CPURXState *env, float32 t0)
++{
++    uint32_t ret;
++    ret = float32_to_int32_round_to_zero(t0, &env->fp_status);
++    update_fpsw(env, ret, GETPC());
++    return ret;
++}
++
++uint32_t helper_round(CPURXState *env, float32 t0)
++{
++    uint32_t ret;
++    ret = float32_to_int32(t0, &env->fp_status);
++    update_fpsw(env, ret, GETPC());
++    return ret;
++}
++
++float32 helper_itof(CPURXState *env, uint32_t t0)
++{
++    float32 ret;
++    ret = int32_to_float32(t0, &env->fp_status);
++    update_fpsw(env, ret, GETPC());
++    return ret;
++}
++
++/* string operations */
++void helper_scmpu(CPURXState *env)
++{
++    uint8_t tmp0, tmp1;
++    if (env->regs[3] == 0) {
++        return;
++    }
++    while (env->regs[3] != 0) {
++        tmp0 = cpu_ldub_data_ra(env, env->regs[1]++, GETPC());
++        tmp1 = cpu_ldub_data_ra(env, env->regs[2]++, GETPC());
++        env->regs[3]--;
++        if (tmp0 != tmp1 || tmp0 == '\0') {
++            break;
++        }
++    }
++    env->psw_z = tmp0 - tmp1;
++    env->psw_c = (tmp0 >= tmp1);
++}
++
++static uint32_t (* const cpu_ldufn[])(CPUArchState *env,
++                                     target_ulong ptr,
++                                     uintptr_t retaddr) = {
++    cpu_ldub_data_ra, cpu_lduw_data_ra, cpu_ldl_data_ra,
++};
++
++static uint32_t (* const cpu_ldfn[])(CPUArchState *env,
++                                     target_ulong ptr,
++                                     uintptr_t retaddr) = {
++    cpu_ldub_data_ra, cpu_lduw_data_ra, cpu_ldl_data_ra,
++};
++
++static void (* const cpu_stfn[])(CPUArchState *env,
++                                 target_ulong ptr,
++                                 uint32_t val,
++                                 uintptr_t retaddr) = {
++    cpu_stb_data_ra, cpu_stw_data_ra, cpu_stl_data_ra,
++};
++
++void helper_sstr(CPURXState *env, uint32_t sz)
++{
++    tcg_debug_assert(sz < 3);
++    while (env->regs[3] != 0) {
++        cpu_stfn[sz](env, env->regs[1], env->regs[2], GETPC());
++        env->regs[1] += 1 << sz;
++        env->regs[3]--;
++    }
++}
++
++#define OP_SMOVU 1
++#define OP_SMOVF 0
++#define OP_SMOVB 2
++
++static void smov(uint32_t mode, CPURXState *env)
++{
++    uint8_t tmp;
++    int dir;
++
++    dir = (mode & OP_SMOVB) ? -1 : 1;
++    while (env->regs[3] != 0) {
++        tmp = cpu_ldub_data_ra(env, env->regs[2], GETPC());
++        cpu_stb_data_ra(env, env->regs[1], tmp, GETPC());
++        env->regs[1] += dir;
++        env->regs[2] += dir;
++        env->regs[3]--;
++        if ((mode & OP_SMOVU) && tmp == 0) {
++            break;
++        }
++    }
++}
++
++void helper_smovu(CPURXState *env)
++{
++    smov(OP_SMOVU, env);
++}
++
++void helper_smovf(CPURXState *env)
++{
++    smov(OP_SMOVF, env);
++}
++
++void helper_smovb(CPURXState *env)
++{
++    smov(OP_SMOVB, env);
++}
++
++
++void helper_suntil(CPURXState *env, uint32_t sz)
++{
++    uint32_t tmp;
++    tcg_debug_assert(sz < 3);
++    if (env->regs[3] == 0) {
++        return ;
++    }
++    while (env->regs[3] != 0) {
++        tmp = cpu_ldufn[sz](env, env->regs[1], GETPC());
++        env->regs[1] += 1 << sz;
++        env->regs[3]--;
++        if (tmp == env->regs[2]) {
++            break;
++        }
++    }
++    env->psw_z = tmp - env->regs[2];
++    env->psw_c = (tmp <= env->regs[2]);
++}
++
++void helper_swhile(CPURXState *env, uint32_t sz)
++{
++    uint32_t tmp;
++    tcg_debug_assert(sz < 3);
++    if (env->regs[3] == 0) {
++        return ;
++    }
++    while (env->regs[3] != 0) {
++        tmp = cpu_ldufn[sz](env, env->regs[1], GETPC());
++        env->regs[1] += 1 << sz;
++        env->regs[3]--;
++        if (tmp != env->regs[2]) {
++            break;
++        }
++    }
++    env->psw_z = env->regs[3];
++    env->psw_c = (tmp <= env->regs[2]);
++}
++
++/* accumlator operations */
++void helper_rmpa(CPURXState *env, uint32_t sz)
++{
++    uint64_t result_l, prev;
++    int32_t result_h;
++    int64_t tmp0, tmp1;
++
++    if (env->regs[3] == 0) {
++        return;
++    }
++    result_l = env->regs[5];
++    result_l <<= 32;
++    result_l |= env->regs[4];
++    result_h = env->regs[6];
++    env->psw_o = 0;
++
++    while (env->regs[3] != 0) {
++        tmp0 = cpu_ldfn[sz](env, env->regs[1], GETPC());
++        tmp1 = cpu_ldfn[sz](env, env->regs[2], GETPC());
++        tmp0 *= tmp1;
++        prev = result_l;
++        result_l += tmp0;
++        /* carry / bollow */
++        if (tmp0 < 0) {
++            if (prev > result_l) {
++                result_h--;
++            }
++        } else {
++            if (prev < result_l) {
++                result_h++;
++            }
++        }
++
++        env->regs[1] += 1 << sz;
++        env->regs[2] += 1 << sz;
++    }
++    env->psw_s = result_h;
++    env->psw_o = (result_h != 0 && result_h != -1) << 31;
++    env->regs[6] = result_h;
++    env->regs[5] = result_l >> 32;
++    env->regs[4] = result_l & 0xffffffff;
++}
++
++void helper_racw(CPURXState *env, uint32_t imm)
++{
++    int64_t acc;
++    acc = env->acc;
++    acc <<= (imm + 1);
++    acc += 0x0000000080000000LL;
++    if (acc > 0x00007fff00000000LL) {
++        acc = 0x00007fff00000000LL;
++    } else if (acc < -0x800000000000LL) {
++        acc = -0x800000000000LL;
++    } else {
++        acc &= 0xffffffff00000000LL;
++    }
++    env->acc = acc;
++}
++
++void helper_satr(CPURXState *env)
++{
++    if (env->psw_o >> 31) {
++        if ((int)env->psw_s < 0) {
++            env->regs[6] = 0x00000000;
++            env->regs[5] = 0x7fffffff;
++            env->regs[4] = 0xffffffff;
++        } else {
++            env->regs[6] = 0xffffffff;
++            env->regs[5] = 0x80000000;
++            env->regs[4] = 0x00000000;
++        }
++    }
++}
++
++/* div */
++uint32_t helper_div(CPURXState *env, uint32_t num, uint32_t den)
++{
++    uint32_t ret = num;
++    if (!((num == INT_MIN && den == -1) || den == 0)) {
++        ret = (int32_t)num / (int32_t)den;
++        env->psw_o = 0;
++    } else {
++        env->psw_o = -1;
++    }
++    return ret;
++}
++
++uint32_t helper_divu(CPURXState *env, uint32_t num, uint32_t den)
++{
++    uint32_t ret = num;
++    if (den != 0) {
++        ret = num / den;
++        env->psw_o = 0;
++    } else {
++        env->psw_o = -1;
++    }
++    return ret;
++}
++
++/* exception */
++static inline void QEMU_NORETURN raise_exception(CPURXState *env, int index,
++                                                 uintptr_t retaddr)
++{
++    CPUState *cs = CPU(rx_env_get_cpu(env));
++
++    cs->exception_index = index;
++    cpu_loop_exit_restore(cs, retaddr);
++}
++
++void QEMU_NORETURN helper_raise_privilege_violation(CPURXState *env)
++{
++    raise_exception(env, 20, GETPC());
++}
++
++void QEMU_NORETURN helper_raise_access_fault(CPURXState *env)
++{
++    raise_exception(env, 21, GETPC());
++}
++
++void QEMU_NORETURN helper_raise_illegal_instruction(CPURXState *env)
++{
++    raise_exception(env, 23, GETPC());
++}
++
++void QEMU_NORETURN helper_wait(CPURXState *env)
++{
++    CPUState *cs = CPU(rx_env_get_cpu(env));
++
++    cs->halted = 1;
++    env->in_sleep = 1;
++    raise_exception(env, EXCP_HLT, 0);
++}
++
++void QEMU_NORETURN helper_debug(CPURXState *env)
++{
++    CPUState *cs = CPU(rx_env_get_cpu(env));
++
++    cs->exception_index = EXCP_DEBUG;
++    cpu_loop_exit(cs);
++}
++
++void QEMU_NORETURN helper_rxint(CPURXState *env, uint32_t vec)
++{
++    raise_exception(env, 0x100 + vec, 0);
++}
++
++void QEMU_NORETURN helper_rxbrk(CPURXState *env)
++{
++    raise_exception(env, 0x100, 0);
++}
++
++void tlb_fill(CPUState *cs, target_ulong addr, int size,
++              MMUAccessType access_type, int mmu_idx, uintptr_t retaddr)
++{
++    uint32_t address, physical, prot;
++
++    /* Linear mapping */
++    address = physical = addr & TARGET_PAGE_MASK;
++    prot = PAGE_READ | PAGE_WRITE | PAGE_EXEC;
++    tlb_set_page(cs, address, physical, prot, mmu_idx, TARGET_PAGE_SIZE);
++}
 -- 
-2.20.1
+2.11.0
 
 
