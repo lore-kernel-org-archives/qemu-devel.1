@@ -7,74 +7,74 @@ X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DDFFC28CC3
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 10:14:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CA748C2BCA1
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 10:14:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ACC16208E3
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 10:14:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9CA9F2133D
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 10:14:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="fPLuKuwc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ACC16208E3
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="cmDTJKEt"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9CA9F2133D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47908 helo=lists.gnu.org)
+Received: from localhost ([::1]:47910 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hZBsv-0001yh-Az
-	for qemu-devel@archiver.kernel.org; Fri, 07 Jun 2019 06:14:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42202)
+	id 1hZBte-0002md-Rj
+	for qemu-devel@archiver.kernel.org; Fri, 07 Jun 2019 06:14:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45096)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <alex.bennee@linaro.org>) id 1hZAvT-0002FY-AQ
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 05:12:45 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1hZB55-0008Ns-J7
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 05:22:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1hZAvQ-0004z4-PA
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 05:12:43 -0400
-Received: from mail-wm1-x332.google.com ([2a00:1450:4864:20::332]:54778)
+ (envelope-from <alex.bennee@linaro.org>) id 1hZB54-0005ye-LE
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 05:22:39 -0400
+Received: from mail-wr1-x42b.google.com ([2a00:1450:4864:20::42b]:43671)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1hZAvQ-0004k3-E7
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 05:12:40 -0400
-Received: by mail-wm1-x332.google.com with SMTP id g135so1233880wme.4
- for <qemu-devel@nongnu.org>; Fri, 07 Jun 2019 02:12:33 -0700 (PDT)
+ id 1hZB54-0005xM-Ec
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 05:22:38 -0400
+Received: by mail-wr1-x42b.google.com with SMTP id r18so1383933wrm.10
+ for <qemu-devel@nongnu.org>; Fri, 07 Jun 2019 02:22:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=Kno1JHe4Nw5DNpZGIjJXu5QHXO+/4yvTRz2xZM/0txY=;
- b=fPLuKuwcdE23w8v3w974LXwbmBDbFl9vHRaFOyhB64LpZrwmbgiotLN8rzpwei/E7X
- 3PGMPiACY9nRuC4TQPl6xwXT9KQNsgyVPdpy1MlsU3MQASr/dx+RxsjFVE/uU30ZAhUZ
- Ub22ZuVqilQLspgqCtiF1gmDzpEe5zl8zLf4ra003OYL5p2Jmu7tndvgeLG2ore4eUOi
- kliwv2pqeIzdMtgCdwJjdFNfekbMyVSJNTN+8nQSCsJx0q1BXaYiMCuHWCaoHhKjIUml
- +MUsy9Xxnq71CJRxbJycVWXpJg93eb3eyszEB6rHD511ekLYXmzC26VzNI+6eRJZ6RdH
- T4wg==
+ bh=+ZfldLb9B7VeRUSVpRgzD28NkUAhkqFAzhazcc+u144=;
+ b=cmDTJKEtkMzcr6psA3LNpNyRnkhVyJKJ0w9cn2DW2WpQ8eGs94sCcn54vZ+YUuzKbN
+ kPvRiV1ZVUB1ajzcWuYMr0ui24lzQPm6aa42LOEYZr+RBtLeE3mHRM07Ivi6cgJDCoda
+ 3Ev4rKWnwolD2drdnnTvQUIkcxMWp3wrFWFyJfxnmmp9laDFGr8Qc9ynIQWaTNR+f4UO
+ AD+QuGWUmyirmwG52cSmLFfI9yrdJzmB50dIEHXM89C3uK0l6Gv7ZUkZzipzvS3lFdZR
+ ikwo99G/qvY4Q6HTdP+C1o6buLZqqBidXMky+kqpZQZpT9J5r5RqSHWDh+akIvKNQsZY
+ uplQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=Kno1JHe4Nw5DNpZGIjJXu5QHXO+/4yvTRz2xZM/0txY=;
- b=uVDcE5kmJoyLsN0tFkT4pdXw+gfITumk1vwsTKVFyGIUSNY8O36M9ocg41gpl8tbw6
- /X2unlqcpR+yoZotST+i4dZ1uh+w1c3CEnRPTSJmUIzux5HLbU65JoDrQPLTYTduZ1+I
- AfXJ7Ar9R4mbs0nsBNToTXemsWj0WEVrgQGjOnUpt9HIoqEoyFz7DbskX5hHHXCUKWmR
- 0vD3rY6EHawp7ogqVzZaq7tzwaLyuS6TSvst6RjEGuDLStww177PgyVWtrMN+SdXlEdF
- kvbeaeryfTOfPuuUeGDb5Kk+wO6cAR9m/syeYglt4ozUylbGn5OWVDnCC59/YND0yN+e
- GeoA==
-X-Gm-Message-State: APjAAAXV4ov3aGCzqgFVUsNH08aDRz3mOt3Nmf8RynNirGB56k1GWksu
- k3Q4HJgy6SpNCetNFR2YyNj//Q==
-X-Google-Smtp-Source: APXvYqxIVJCusdmG4NH2v23EPCWYMiuYwR5LtbHBIYYDhTvOVXyX19grqrv8I3NsOFNUIczpBESgJQ==
-X-Received: by 2002:a1c:c305:: with SMTP id t5mr2790706wmf.163.1559898752590; 
- Fri, 07 Jun 2019 02:12:32 -0700 (PDT)
+ bh=+ZfldLb9B7VeRUSVpRgzD28NkUAhkqFAzhazcc+u144=;
+ b=mLZvspwwkZ3Evn5kpToRbRkHJS+ruBzsWH0DVTYIvlcLXzxoCmJYx4qYJG31XvL/Df
+ cfmSSn0b3wRy045BJnSZkvdbVzvUZJtgzKXsGNgFKn0408zV43YgVVIs+ykTIIuQEvgX
+ UQMkq7YY216MCwqO1qgdAUOV32xltbX+RuagHeHwNpm3pjKsZqYIANKGERyXhdUdLw+P
+ hOfjcopZpqJGRXobxVGXfgW2iMlzJ+jufkQVS1agijKgu/ozn+j9NojgERgNO4GHzIpe
+ 9QZO94wIfAwV3rXSiPOUxpFFuP+6jyIb9U81eP7rtvScs44VucHZx/tgmubxWGNev/cq
+ b8KQ==
+X-Gm-Message-State: APjAAAXU2EC4egS53IiyYjdSjB+bmsBJCUbvAJKOe3pU/H7L8CRysv0X
+ PhEme/k1tixUewHdznzwwNyP2w==
+X-Google-Smtp-Source: APXvYqziNaH+upgth6XvX62bEsM1xfaHdBppgpaQ8sLDBBsXnbybR6lvgm/q1zrc7+VSGiKI6sZcow==
+X-Received: by 2002:a5d:4f8b:: with SMTP id d11mr16183565wru.264.1559899357141; 
+ Fri, 07 Jun 2019 02:22:37 -0700 (PDT)
 Received: from zen.linaroharston ([81.128.185.34])
- by smtp.gmail.com with ESMTPSA id q24sm1211067wmc.43.2019.06.07.02.12.27
+ by smtp.gmail.com with ESMTPSA id b136sm1669984wme.30.2019.06.07.02.22.30
  (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Fri, 07 Jun 2019 02:12:30 -0700 (PDT)
+ Fri, 07 Jun 2019 02:22:35 -0700 (PDT)
 Received: from zen.linaroharston. (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 39A9D1FFBF;
- Fri,  7 Jun 2019 10:05:55 +0100 (BST)
+ by zen.linaroharston (Postfix) with ESMTP id 834181FF8C;
+ Fri,  7 Jun 2019 10:05:53 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: peter.maydell@linaro.org
-Date: Fri,  7 Jun 2019 10:05:39 +0100
-Message-Id: <20190607090552.12434-41-alex.bennee@linaro.org>
+Date: Fri,  7 Jun 2019 10:05:18 +0100
+Message-Id: <20190607090552.12434-20-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190607090552.12434-1-alex.bennee@linaro.org>
 References: <20190607090552.12434-1-alex.bennee@linaro.org>
@@ -83,9 +83,8 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::332
-Subject: [Qemu-devel] [PULL 40/52] gdbstub: Implement set register (P pkt)
- with new infra
+X-Received-From: 2a00:1450:4864:20::42b
+Subject: [Qemu-devel] [PULL 19/52] tests/vm: add DEBUG=1 to help text
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,76 +96,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org,
- Jon Doron <arilou@gmail.com>
+Cc: Fam Zheng <fam@euphon.net>, Thomas Huth <thuth@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Jon Doron <arilou@gmail.com>
+From: Gerd Hoffmann <kraxel@redhat.com>
 
-Signed-off-by: Jon Doron <arilou@gmail.com>
-Message-Id: <20190529064148.19856-9-arilou@gmail.com>
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Tested-by: Thomas Huth <thuth@redhat.com>
+Message-Id: <20190520124716.30472-9-kraxel@redhat.com>
+[AJB: fix minor conflict]
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 
-diff --git a/gdbstub.c b/gdbstub.c
-index 8416f4c13f..630f931765 100644
---- a/gdbstub.c
-+++ b/gdbstub.c
-@@ -1651,6 +1651,27 @@ static void handle_remove_bp(GdbCmdContext *gdb_ctx, void *user_ctx)
-     put_packet(gdb_ctx->s, "E22");
- }
- 
-+static void handle_set_reg(GdbCmdContext *gdb_ctx, void *user_ctx)
-+{
-+    int reg_size;
-+
-+    if (!gdb_has_xml) {
-+        put_packet(gdb_ctx->s, "E00");
-+        return;
-+    }
-+
-+    if (gdb_ctx->num_params != 2) {
-+        put_packet(gdb_ctx->s, "E22");
-+        return;
-+    }
-+
-+    reg_size = strlen(gdb_ctx->params[1].data) / 2;
-+    hextomem(gdb_ctx->mem_buf, gdb_ctx->params[1].data, reg_size);
-+    gdb_write_register(gdb_ctx->s->g_cpu, gdb_ctx->mem_buf,
-+                       gdb_ctx->params[0].val_ull);
-+    put_packet(gdb_ctx->s, "OK");
-+}
-+
- static int gdb_handle_packet(GDBState *s, const char *line_buf)
- {
-     CPUState *cpu;
-@@ -1895,15 +1916,15 @@ static int gdb_handle_packet(GDBState *s, const char *line_buf)
-         }
-         break;
-     case 'P':
--        if (!gdb_has_xml)
--            goto unknown_command;
--        addr = strtoull(p, (char **)&p, 16);
--        if (*p == '=')
--            p++;
--        reg_size = strlen(p) / 2;
--        hextomem(mem_buf, p, reg_size);
--        gdb_write_register(s->g_cpu, mem_buf, addr);
--        put_packet(s, "OK");
-+        {
-+            static const GdbCmdParseEntry set_reg_cmd_desc = {
-+                .handler = handle_set_reg,
-+                .cmd = "P",
-+                .cmd_startswith = 1,
-+                .schema = "L?s0"
-+            };
-+            cmd_parser = &set_reg_cmd_desc;
-+        }
-         break;
-     case 'Z':
-         {
+diff --git a/tests/vm/Makefile.include b/tests/vm/Makefile.include
+index e329129bd6..628eecade7 100644
+--- a/tests/vm/Makefile.include
++++ b/tests/vm/Makefile.include
+@@ -25,6 +25,8 @@ vm-test:
+ 	@echo "  vm-boot-ssh-<guest>             - Boot guest and login via ssh"
+ 	@echo
+ 	@echo "Special variables:"
++	@echo "    DEBUG=1                       - be verbose, also start interactive"
++	@echo "	                                   shell on build failures"
+ 	@echo "    BUILD_TARGET=foo		 - Override the build target"
+ 	@echo "    TARGET_LIST=a,b,c    	 - Override target list in builds"
+ 	@echo '    EXTRA_CONFIGURE_OPTS="..."'
 -- 
 2.20.1
 
