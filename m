@@ -7,59 +7,59 @@ X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C10F3C04AB5
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 00:21:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6ACD1C28EBB
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 00:22:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 929E4208E3
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 00:21:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3D173206DF
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 00:22:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="UBMLeL2z"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 929E4208E3
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="UTaTPaMW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3D173206DF
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45208 helo=lists.gnu.org)
+Received: from localhost ([::1]:45232 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hZ2d9-0007i7-SV
-	for qemu-devel@archiver.kernel.org; Thu, 06 Jun 2019 20:21:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53595)
+	id 1hZ2ek-0000fa-Jh
+	for qemu-devel@archiver.kernel.org; Thu, 06 Jun 2019 20:22:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53596)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <dgibson@ozlabs.org>) id 1hZ2bK-0006ca-DW
+ (envelope-from <dgibson@ozlabs.org>) id 1hZ2bK-0006cb-DZ
  for qemu-devel@nongnu.org; Thu, 06 Jun 2019 20:19:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1hZ2bI-0003NK-Hs
+ (envelope-from <dgibson@ozlabs.org>) id 1hZ2bI-0003NE-HU
  for qemu-devel@nongnu.org; Thu, 06 Jun 2019 20:19:22 -0400
-Received: from ozlabs.org ([2401:3900:2:1::2]:57959)
+Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:55763 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1hZ2bF-0003K1-IZ; Thu, 06 Jun 2019 20:19:18 -0400
+ id 1hZ2bF-0003Jy-OO; Thu, 06 Jun 2019 20:19:18 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 45KjnX3xKBz9s00; Fri,  7 Jun 2019 10:19:12 +1000 (AEST)
+ id 45KjnX4jXbz9sCJ; Fri,  7 Jun 2019 10:19:12 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
  d=gibson.dropbear.id.au; s=201602; t=1559866752;
- bh=jXAH74gBgIPoSN8cJo7sk21jeoXBpK3BhIL3PaRpk1U=;
+ bh=3LDuNTLdZLYCfiKX8XxuRKNgDXi64qDWvMKcZ466MD0=;
  h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=UBMLeL2zNyRGJQGAQ1TDxOwV2/DKllH33t6Et/EzV4RRnL+3wEFv8kOjEsPDLOC5w
- Juy0XCs0M0YfJIO6ljNQWtmksgGKpjPjD9MhRThtxGlYdIA4zvD1IS2les4Pw+lgyf
- bodVrbHu9eVQJxLnyQO27yBTE3MRZoyTmylQ/GiQ=
-Date: Fri, 7 Jun 2019 10:16:32 +1000
+ b=UTaTPaMW//ru9filsAzEeKovpT6rFQdZ++ADzEwtyVBYZBnMj8JxplIAusqPOeoke
+ zkLmOX8RfnE2Ni9DGB398KHXfoyYwgzBgAhlbKAhX7XMvHBbnctxIdHE22Rvecxr4l
+ lD9WOWE/3owVSQpB7I+AyRZFc6HjetDkVCVX+VtY=
+Date: Fri, 7 Jun 2019 10:19:01 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
-Message-ID: <20190607001632.GB3760@umbus.fritz.box>
-References: <20190606174409.12502-1-clg@kaod.org>
+To: Greg Kurz <groug@kaod.org>
+Message-ID: <20190607001901.GC3760@umbus.fritz.box>
+References: <155984093894.2803172.8618224129384655510.stgit@bahia.lan>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="TakKZr9L6Hm6aLOc"
+ protocol="application/pgp-signature"; boundary="raC6veAxrt5nqIoY"
 Content-Disposition: inline
-In-Reply-To: <20190606174409.12502-1-clg@kaod.org>
+In-Reply-To: <155984093894.2803172.8618224129384655510.stgit@bahia.lan>
 User-Agent: Mutt/1.11.4 (2019-03-13)
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
 X-Received-From: 2401:3900:2:1::2
-Subject: Re: [Qemu-devel] [PATCH] ppc/xive: Make XIVE generate the proper
- interrupt types
+Subject: Re: [Qemu-devel] [PATCH] spapr: Don't use the "dual" interrupt
+ controller mode with an old hypervisor
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,110 +71,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>
+Cc: qemu-ppc@nongnu.org, =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---TakKZr9L6Hm6aLOc
-Content-Type: text/plain; charset=iso-8859-1
+--raC6veAxrt5nqIoY
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jun 06, 2019 at 07:44:09PM +0200, C=E9dric Le Goater wrote:
-> From: Benjamin Herrenschmidt <benh@kernel.crashing.org>
->=20
-> It should be generic Hypervisor Virtualization interrupts for HV
-> directed rings and traditional External Interrupts for the OS directed
-> ring.
->=20
-> Don't generate anything for the user ring as it isn't actually
-> supported.
->=20
-> Signed-off-by: Benjamin Herrenschmidt <benh@kernel.crashing.org>
-> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
-> Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+On Thu, Jun 06, 2019 at 07:08:59PM +0200, Greg Kurz wrote:
+> If KVM is too old to support XIVE native exploitation mode, we might end
+> up using the emulated XIVE after CAS. This is sub-optimal if KVM in-kernel
+> XICS is available, which is the case most of the time.
 
-Applied, thanks.
+This is intentional.  A predictable guest environment trumps performance.
 
+> Also, an old KVM may not allow to destroy and re-create the KVM XICS, whi=
+ch
+> is precisely what "dual" does during machine reset. This causes QEMU to t=
+ry
+> to switch to emulated XICS and to crash because RTAS call de-registration
+> isn't handled correctly. We could possibly fix that, but again we would
+> still end up with an emulated XICS or XIVE.
+
+Ugh, that's a problem.
+
+> "dual" is definitely not a good choice with older KVMs. Internally force
+> XICS when we detect this.
+
+But this is not an acceptable solution.  Silently changing the guest
+visible environment based on host capabilities is never ok.  We must
+either give the guest environment that the user has requested, or fail
+outright.
+
+>=20
+> Signed-off-by: Greg Kurz <groug@kaod.org>
 > ---
+>  hw/ppc/spapr_irq.c |   10 ++++++++++
+>  1 file changed, 10 insertions(+)
 >=20
->  I forgot to resend this patch, an important one for HV machines !
->=20
->  include/hw/ppc/xive.h |  3 ++-
->  hw/intc/xive.c        | 22 +++++++++++++++++++---
->  2 files changed, 21 insertions(+), 4 deletions(-)
->=20
-> diff --git a/include/hw/ppc/xive.h b/include/hw/ppc/xive.h
-> index d872f96d1a1b..a6ee7e831d8b 100644
-> --- a/include/hw/ppc/xive.h
-> +++ b/include/hw/ppc/xive.h
-> @@ -317,7 +317,8 @@ typedef struct XiveTCTX {
->      DeviceState parent_obj;
+> diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
+> index 3156daf09381..d788bd662a7a 100644
+> --- a/hw/ppc/spapr_irq.c
+> +++ b/hw/ppc/spapr_irq.c
+> @@ -18,6 +18,7 @@
+>  #include "hw/ppc/xics_spapr.h"
+>  #include "cpu-models.h"
+>  #include "sysemu/kvm.h"
+> +#include "kvm_ppc.h"
 > =20
->      CPUState    *cs;
-> -    qemu_irq    output;
-> +    qemu_irq    hv_output;
-> +    qemu_irq    os_output;
+>  #include "trace.h"
 > =20
->      uint8_t     regs[XIVE_TM_RING_COUNT * XIVE_TM_RING_SIZE];
->  } XiveTCTX;
-> diff --git a/hw/intc/xive.c b/hw/intc/xive.c
-> index 0c74e47aa49c..b2b92a92c84f 100644
-> --- a/hw/intc/xive.c
-> +++ b/hw/intc/xive.c
-> @@ -61,13 +61,28 @@ static uint8_t exception_mask(uint8_t ring)
->      }
->  }
-> =20
-> +static qemu_irq xive_tctx_output(XiveTCTX *tctx, uint8_t ring)
-> +{
-> +        switch (ring) {
-> +        case TM_QW0_USER:
-> +                return 0; /* Not supported */
-> +        case TM_QW1_OS:
-> +                return tctx->os_output;
-> +        case TM_QW2_HV_POOL:
-> +        case TM_QW3_HV_PHYS:
-> +                return tctx->hv_output;
-> +        default:
-> +                return 0;
-> +        }
-> +}
-> +
->  static uint64_t xive_tctx_accept(XiveTCTX *tctx, uint8_t ring)
->  {
->      uint8_t *regs =3D &tctx->regs[ring];
->      uint8_t nsr =3D regs[TM_NSR];
->      uint8_t mask =3D exception_mask(ring);
-> =20
-> -    qemu_irq_lower(tctx->output);
-> +    qemu_irq_lower(xive_tctx_output(tctx, ring));
-> =20
->      if (regs[TM_NSR] & mask) {
->          uint8_t cppr =3D regs[TM_PIPR];
-> @@ -100,7 +115,7 @@ static void xive_tctx_notify(XiveTCTX *tctx, uint8_t =
-ring)
->          default:
->              g_assert_not_reached();
+> @@ -668,6 +669,15 @@ static void spapr_irq_check(SpaprMachineState *spapr=
+, Error **errp)
+>              return;
 >          }
-> -        qemu_irq_raise(tctx->output);
-> +        qemu_irq_raise(xive_tctx_output(tctx, ring));
 >      }
+> +
+> +    /*
+> +     * KVM may be too old to support XIVE, in which case we'd rather try
+> +     * to use the in-kernel XICS instead of the emulated XIVE.
+> +     */
+> +    if (kvm_enabled() && !kvmppc_has_cap_xive() &&
+> +        spapr->irq =3D=3D &spapr_irq_dual) {
+> +        spapr->irq =3D &spapr_irq_xics;
+> +    }
 >  }
 > =20
-> @@ -556,7 +571,8 @@ static void xive_tctx_realize(DeviceState *dev, Error=
- **errp)
->      env =3D &cpu->env;
->      switch (PPC_INPUT(env)) {
->      case PPC_FLAGS_INPUT_POWER9:
-> -        tctx->output =3D env->irq_inputs[POWER9_INPUT_INT];
-> +        tctx->hv_output =3D env->irq_inputs[POWER9_INPUT_HINT];
-> +        tctx->os_output =3D env->irq_inputs[POWER9_INPUT_INT];
->          break;
-> =20
->      default:
+>  /*
+>=20
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -182,25 +151,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---TakKZr9L6Hm6aLOc
+--raC6veAxrt5nqIoY
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlz5rN8ACgkQbDjKyiDZ
-s5KNqBAAuZ06mLT4Yiiszm/LjJ+NtOqFIA76PDVSTwt67yY1fUAoJpOsfWns8NHe
-K2DxiCCfikw6Y7VQ+ERCNtbKeedkJBlNtJsP8wowcjZsc3F2WAS9zIvtycfhEYra
-+MLKULGWxPdk5TPp3uf5PHquBGkxUCbY9TKejp3qXfGK8kLnyKhYlSt7FSbR/THJ
-s/VWr5KnI8+vpA0xFrAfKsn6zMkqsm6kb3rRwdSuCBE5rLsVjrjYo3YfC9I82fjv
-9pa5r4bf3amS9Gnhp3qlmXm21qXdtHGxIK4+6nDQjjARKrpxACWZKUXjfhwgpM4h
-Ahmp502pXXl7Mynm9UlWasmUwe7w8vq8FXG5kq5QKWfdb1LWAcojjWkTAgzRp4xs
-TcF76SseiJ8WyVyQzgdoxre59+2zaNUxSEPd+phvsccF5xh3L+WBp4fAukWig4bc
-gOVbkJfgQsLqLmWQvgvBq8FDvk0Fklb6i7YPbrwZtSxHSOMzRLAM2zacyWK/eKaG
-Us2BTjjIl/YOr08JePu86D1oJpEsfW4ROow+2Ly93/oiWBbTOKmIIwsP+eKIWphA
-GuITMBYf4w2ctnMtuNN9AWJ45GJZo+sCsYWxYKL5iSb3O5lAXcbLBxcV1OFGh3zh
-e/vCIQKxUnG/LFTxbqFGlt1XrDsQUbzFtagUw0NMQ9FxEYsuXVE=
-=Bl0W
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlz5rXUACgkQbDjKyiDZ
+s5J4PA/+N17Q0yxjBz8F6EAzWU+QsPYUnGrwzgVYMi3D734nBHjosmJ1bUtT4NGs
+6mFMIhNHOGknd059AoVqWo4ezQz+lfAYMbKC63R7/fGxfxwiV/VQiaKRi0YMujFv
+ikrpuBhywLSdVttPG0hNG2HGOE60NxEDSQQ5W8QMGgCeDGeiTiaI0LQNzeiIHnxf
+3ocuAggJQCaLJvaJk0qAez51GJhbJNnHVIKPippOck5OdfmJnvbDajjJz9F+//dF
+rFnoWZYPAP2f7M6u/w6gEFQotkX0f2B1T0DVrTR8Q9dHEkyYKGEdcpQrHbRdzPPM
+lAsutt3eYXhjz9NryeK4p94IZJDNVtF26BFWny2NAzg69zCYSpoCLHEdxi8hBMBu
+gHRDQhTSbi0ebDKeLA9z6hZvSPw8BKGOXzPv3PUfdsfM97/qVN4gKfTUMfycmL75
+DtMev96/grFFDAkN5A5svT83L1lxZtH4bnHLnvfe+Zgu+gnhLa2Ej7y0hrKsChsJ
+5Lr8YDYc6DwRV9cPe5vHHPeU4LPw5Gj3Ifg/QtPrNGyS8vYE1q7oYEdwk1cf89ha
+DqKLfQpj1p8FqxgcJpuFqNRgzvdib3ulDisGlBtSEB1wH20ZpRKkEtaFO4rRh55R
+fZN0y/V0/W+53OTD+RMpvRAVvSryAuM/OwT/y6ZqUpyuYEO66P0=
+=Xx9s
 -----END PGP SIGNATURE-----
 
---TakKZr9L6Hm6aLOc--
+--raC6veAxrt5nqIoY--
 
