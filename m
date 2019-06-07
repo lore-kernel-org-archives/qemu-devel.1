@@ -6,45 +6,45 @@ X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FA2DC28EBD
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 02:33:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 74367C28EBD
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 02:35:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6A0E4207E0
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 02:33:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6A0E4207E0
+	by mail.kernel.org (Postfix) with ESMTPS id 4BD28207E0
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 02:35:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4BD28207E0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45550 helo=lists.gnu.org)
+Received: from localhost ([::1]:45564 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hZ4hV-0007du-O8
-	for qemu-devel@archiver.kernel.org; Thu, 06 Jun 2019 22:33:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46206)
+	id 1hZ4jB-0000WV-K4
+	for qemu-devel@archiver.kernel.org; Thu, 06 Jun 2019 22:35:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47082)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <eblake@redhat.com>) id 1hZ4gA-0006kR-Uy
- for qemu-devel@nongnu.org; Thu, 06 Jun 2019 22:32:34 -0400
+ (envelope-from <eblake@redhat.com>) id 1hZ4i6-0008RU-O1
+ for qemu-devel@nongnu.org; Thu, 06 Jun 2019 22:34:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1hZ4g6-0001dh-IE
- for qemu-devel@nongnu.org; Thu, 06 Jun 2019 22:32:29 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36142)
+ (envelope-from <eblake@redhat.com>) id 1hZ4i5-000470-Rm
+ for qemu-devel@nongnu.org; Thu, 06 Jun 2019 22:34:30 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42802)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <eblake@redhat.com>)
- id 1hZ4fw-0001Mz-6b; Thu, 06 Jun 2019 22:32:17 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ id 1hZ4i3-000432-MR; Thu, 06 Jun 2019 22:34:27 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id A41853680B;
- Fri,  7 Jun 2019 02:32:12 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id E98F53082200;
+ Fri,  7 Jun 2019 02:34:26 +0000 (UTC)
 Received: from [10.3.116.85] (ovpn-116-85.phx2.redhat.com [10.3.116.85])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 926F47C5C8;
- Fri,  7 Jun 2019 02:32:09 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id F2D386A492;
+ Fri,  7 Jun 2019 02:34:23 +0000 (UTC)
 To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
  qemu-devel@nongnu.org, qemu-block@nongnu.org
 References: <20190411172709.205032-1-vsementsov@virtuozzo.com>
- <20190411172709.205032-2-vsementsov@virtuozzo.com>
+ <20190411172709.205032-3-vsementsov@virtuozzo.com>
 From: Eric Blake <eblake@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=eblake@redhat.com; keydata=
@@ -71,22 +71,22 @@ Autocrypt: addr=eblake@redhat.com; keydata=
  Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
  2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
 Organization: Red Hat, Inc.
-Message-ID: <9c680240-046a-40be-ad4a-769d609c8965@redhat.com>
-Date: Thu, 6 Jun 2019 21:32:08 -0500
+Message-ID: <72b71e95-380d-41ee-31e8-d71b2fa7d3ec@redhat.com>
+Date: Thu, 6 Jun 2019 21:34:23 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190411172709.205032-2-vsementsov@virtuozzo.com>
+In-Reply-To: <20190411172709.205032-3-vsementsov@virtuozzo.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="w98PXdkWYmzGG0wsjAMZf5XDkyCO2Luc6"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+ boundary="h71WigzlXJQByROeDyp6ArVRlhXg4qGcu"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.30]); Fri, 07 Jun 2019 02:32:13 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.47]); Fri, 07 Jun 2019 02:34:27 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v6 1/7] block/nbd-client: split
- connection_co start out of nbd_client_connect
+Subject: Re: [Qemu-devel] [PATCH v6 2/7] block/nbd-client: use non-blocking
+ io channel for nbd negotiation
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -105,38 +105,41 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---w98PXdkWYmzGG0wsjAMZf5XDkyCO2Luc6
-Content-Type: multipart/mixed; boundary="evKjlDCe33V3E2oc6A2LvliJYDbW8tzhJ";
+--h71WigzlXJQByROeDyp6ArVRlhXg4qGcu
+Content-Type: multipart/mixed; boundary="IGjV3KzI4v9t3RC3m4yY3JyweMth1aqaH";
  protected-headers="v1"
 From: Eric Blake <eblake@redhat.com>
 To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
  qemu-devel@nongnu.org, qemu-block@nongnu.org
 Cc: armbru@redhat.com, stefanha@redhat.com, mreitz@redhat.com,
  kwolf@redhat.com, den@openvz.org
-Message-ID: <9c680240-046a-40be-ad4a-769d609c8965@redhat.com>
-Subject: Re: [PATCH v6 1/7] block/nbd-client: split connection_co start out of
- nbd_client_connect
+Message-ID: <72b71e95-380d-41ee-31e8-d71b2fa7d3ec@redhat.com>
+Subject: Re: [PATCH v6 2/7] block/nbd-client: use non-blocking io channel for
+ nbd negotiation
 References: <20190411172709.205032-1-vsementsov@virtuozzo.com>
- <20190411172709.205032-2-vsementsov@virtuozzo.com>
-In-Reply-To: <20190411172709.205032-2-vsementsov@virtuozzo.com>
+ <20190411172709.205032-3-vsementsov@virtuozzo.com>
+In-Reply-To: <20190411172709.205032-3-vsementsov@virtuozzo.com>
 
---evKjlDCe33V3E2oc6A2LvliJYDbW8tzhJ
+--IGjV3KzI4v9t3RC3m4yY3JyweMth1aqaH
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
 On 4/11/19 12:27 PM, Vladimir Sementsov-Ogievskiy wrote:
-> nbd_client_connect is going to be used from connection_co, so, let's
-> refactor nbd_client_connect in advance, leaving io channel
-> configuration all in nbd_client_connect.
+> No reason to use blocking channel for negotiation and we'll benefit in
+> further reconnect feature, as qio_channel reads and writes will do
+> qemu_coroutine_yield while waiting for io completion.
 >=20
 > Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 > ---
->  block/nbd-client.c | 20 +++++++++++++-------
->  1 file changed, 13 insertions(+), 7 deletions(-)
+>  include/block/nbd.h |  3 ++-
+>  block/nbd-client.c  | 16 +++++++---------
+>  nbd/client.c        | 16 +++++++++++-----
+>  qemu-nbd.c          |  2 +-
+>  4 files changed, 21 insertions(+), 16 deletions(-)
 >=20
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Eric Blake <eblake@Redhat.com>
 
 --=20
 Eric Blake, Principal Software Engineer
@@ -144,24 +147,24 @@ Red Hat, Inc.           +1-919-301-3226
 Virtualization:  qemu.org | libvirt.org
 
 
---evKjlDCe33V3E2oc6A2LvliJYDbW8tzhJ--
+--IGjV3KzI4v9t3RC3m4yY3JyweMth1aqaH--
 
---w98PXdkWYmzGG0wsjAMZf5XDkyCO2Luc6
+--h71WigzlXJQByROeDyp6ArVRlhXg4qGcu
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlz5zKgACgkQp6FrSiUn
-Q2qbrAf/Q7eyluM6tudgALr5unxjbj91sPC7FLlBuKVZ+70zXT0c5qq/FdMj4GWS
-b1qyRrVHvYMJRnMzeDEwqfNKljc42cQ26vi2ZuFv3toCL/6aAmLIcn8tzzLPkh6B
-OPzFpb37LhKEr2v1tNxmTFYDxzKBDv0hkouETT1OBkGq9rLnanV0Ve7TaqihjDrV
-8/GcMQon+yYdhu+hFGnv3lkEdkhDCFiNE4givpOWhhWiaFuOMWylEm3DygBcGUPF
-VheJ/QUpa8h6Bc/82QDhH+tsbvra236XG0nYLOEkLhq9pUT7mt9f2gqFvujjiAgC
-4urv6ODXUlkH3ZC665Y/zwI7J/PQEw==
-=yb4o
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlz5zS8ACgkQp6FrSiUn
+Q2qS5Af/XNdsR8aU7SFsVALQZidpwD2KX6tk+dJtu8cpTahJjCy8KY+mA0CCEGlL
+isv9+99cNZHxTWlJ45XCSXZQzrSwGV1Iw6W6QRZbt2sdyQWaraTXpfz5g4cxTaLO
+WLfyLM4h856O+1ugasfMq0MtxICYSY5PzebYwB6iOCqKnaHvbjBY719YKGmGotQ9
+kvM0lMdnCmEa0hxC9cgt62RD2Vyl1XE85fNFMoLC/0Geees7h4gPAgjIzH78CO2i
+Tx6txDcUtXveZSfjYAYig6A92sERYmSUX9LGzLPsJgzkka9taPdHIYQLugYAjwqp
+Nt272JefQ4VvADlbYbhG8FkpEDGnZw==
+=C5YP
 -----END PGP SIGNATURE-----
 
---w98PXdkWYmzGG0wsjAMZf5XDkyCO2Luc6--
+--h71WigzlXJQByROeDyp6ArVRlhXg4qGcu--
 
