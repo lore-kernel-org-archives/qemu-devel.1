@@ -2,65 +2,78 @@ Return-Path: <SRS0=3yEa=UG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=FROM_EXCESS_BASE64,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C58A5C2BCA1
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 12:08:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7835CC468BC
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 12:08:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5ABEE20B7C
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 12:08:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5ABEE20B7C
+	by mail.kernel.org (Postfix) with ESMTPS id 5481920B7C
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 12:08:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5481920B7C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49186 helo=lists.gnu.org)
+Received: from localhost ([::1]:49188 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hZDfQ-0003C5-AS
-	for qemu-devel@archiver.kernel.org; Fri, 07 Jun 2019 08:08:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60703)
+	id 1hZDfR-0003FM-Hm
+	for qemu-devel@archiver.kernel.org; Fri, 07 Jun 2019 08:08:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60680)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <berrange@redhat.com>) id 1hZBnb-0006ih-RM
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 06:08:41 -0400
+ (envelope-from <pbonzini@redhat.com>) id 1hZDKP-0004EJ-Tu
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 07:46:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berrange@redhat.com>) id 1hZBnZ-0004Xr-Qs
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 06:08:39 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52744)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <berrange@redhat.com>)
- id 1hZBnU-0004MT-9C; Fri, 07 Jun 2019 06:08:33 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 5029D81110;
- Fri,  7 Jun 2019 10:08:21 +0000 (UTC)
-Received: from redhat.com (ovpn-112-33.ams2.redhat.com [10.36.112.33])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 1630D80B0D;
- Fri,  7 Jun 2019 10:08:13 +0000 (UTC)
-Date: Fri, 7 Jun 2019 11:08:10 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Pino Toscano <ptoscano@redhat.com>
-Message-ID: <20190607100810.GB28838@redhat.com>
-References: <20190605213654.9785-1-ptoscano@redhat.com>
- <20190606111232.GG14300@redhat.com>
- <3631777.4JPVOlAZr6@lindworm.usersys.redhat.com>
+ (envelope-from <pbonzini@redhat.com>) id 1hZDKN-0007dY-Lc
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 07:46:37 -0400
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:54677)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hZDKF-00070V-8h
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 07:46:27 -0400
+Received: by mail-wm1-f65.google.com with SMTP id g135so1745746wme.4
+ for <qemu-devel@nongnu.org>; Fri, 07 Jun 2019 04:46:13 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=gnWFjc+G+xpkyU5e2RNt1AZsFiuo9mdL+PpgvRI2di8=;
+ b=nqOXs60bMjLxpUTFPYkEp+F71n5Wisv7ur0Xc0KDn6vxS+IRQiskAx6eO7TKZxpkoe
+ o7WpYVVkRgK0jJdjH8zuwa4zhI1nsB7CHRvozYo4urqx2HM8BU2x1BvdEoQKPyF+f0Rb
+ VU6ioC7bAfnNJv+MVr4wIhgzyjl3tOwBt11n4MkAl3BMak3Iybow8653ey1LxEfvRdoq
+ 8+6JNidJpFq+cE1CFiKeB+m1PM6dXxYtuATUnCudLWug11W4wjh8o9sZQvABaF2LFqhC
+ pL/M6K5nvNtELqhVqhikY5zN1uhL6jrjQc1MNdYyAAeMtUy9IfiVZblM9dJyjX0zOuTy
+ ViMQ==
+X-Gm-Message-State: APjAAAXJgvyw2yIFs8tiNu4VIzf3zjvN+fU9yi1U5YjoJhAGvEFCc7UB
+ db//HTK24VdP1LZCJ3/zCt3MOw==
+X-Google-Smtp-Source: APXvYqwyQtQtUyff6zE+6e1icSYEInlI+knM/+5RFsQArL9ncrcBcFrHvK/n2Dg12cbZhvLtL5qXeA==
+X-Received: by 2002:a7b:c251:: with SMTP id b17mr2140022wmj.143.1559907972587; 
+ Fri, 07 Jun 2019 04:46:12 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:d43d:6da3:9364:a775?
+ ([2001:b07:6468:f312:d43d:6da3:9364:a775])
+ by smtp.gmail.com with ESMTPSA id z135sm2111872wmc.45.2019.06.07.04.46.11
+ (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+ Fri, 07 Jun 2019 04:46:12 -0700 (PDT)
+To: Yury Kotov <yury-kotov@yandex-team.ru>,
+ "open list:Overall" <kvm@vger.kernel.org>
+References: <20190607090830.18807-1-yury-kotov@yandex-team.ru>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <99896404-c7d9-d2d0-ab01-ab67dcb0348f@redhat.com>
+Date: Fri, 7 Jun 2019 13:46:11 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
+In-Reply-To: <20190607090830.18807-1-yury-kotov@yandex-team.ru>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <3631777.4JPVOlAZr6@lindworm.usersys.redhat.com>
-User-Agent: Mutt/1.11.4 (2019-03-13)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.28]); Fri, 07 Jun 2019 10:08:26 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v6] ssh: switch from libssh2 to libssh
+ [fuzzy]
+X-Received-From: 209.85.128.65
+Subject: Re: [Qemu-devel] [PATCH] kvm-all: Add/update fprintf's for
+ kvm_*_ioeventfd_del
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,121 +85,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: kwolf@redhat.com, qemu-block@nongnu.org, rjones@redhat.com,
- qemu-devel@nongnu.org, mreitz@redhat.com, philmd@redhat.com
+Cc: "open list:All patches CC here" <qemu-devel@nongnu.org>,
+ yc-core@yandex-team.ru
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Jun 06, 2019 at 07:51:15PM +0200, Pino Toscano wrote:
-> On Thursday, 6 June 2019 13:12:32 CEST Daniel P. Berrang=C3=A9 wrote:
-> > On Wed, Jun 05, 2019 at 11:36:54PM +0200, Pino Toscano wrote:
-> > > Rewrite the implementation of the ssh block driver to use libssh in=
-stead
-> > > of libssh2.  The libssh library has various advantages over libssh2=
-:
-> > > - easier API for authentication (for example for using ssh-agent)
-> > > - easier API for known_hosts handling
-> > > - supports newer types of keys in known_hosts
-> > >=20
-> > > Use APIs/features available in libssh 0.8 conditionally, to support
-> > > older versions (which are not recommended though).
-> >=20
-> >=20
-> > >=20
-> > > Signed-off-by: Pino Toscano <ptoscano@redhat.com>
-> > > ---
-> > >=20
-> > > Changes from v5:
-> > > - adapt to newer tracing APIs
-> > > - disable ssh compression (mimic what libssh2 does by default)
-> > > - use build time checks for libssh 0.8, and use newer APIs directly
-> > >=20
-> > > Changes from v4:
-> > > - fix wrong usages of error_setg/session_error_setg/sftp_error_setg
-> > > - fix few return code checks
-> > > - remove now-unused parameters in few internal functions
-> > > - allow authentication with "none" method
-> > > - switch to unsigned int for the port number
-> > > - enable TCP_NODELAY on the socket
-> > > - fix one reference error message in iotest 207
-> > >=20
-> > > Changes from v3:
-> > > - fix socket cleanup in connect_to_ssh()
-> > > - add comments about the socket cleanup
-> > > - improve the error reporting (closer to what was with libssh2)
-> > > - improve EOF detection on sftp_read()
-> > >=20
-> > > Changes from v2:
-> > > - used again an own fd
-> > > - fixed co_yield() implementation
-> > >=20
-> > > Changes from v1:
-> > > - fixed jumbo packets writing
-> > > - fixed missing 'err' assignment
-> > > - fixed commit message
-> > >=20
-> > >  block/Makefile.objs        |   6 +-
-> > >  block/ssh.c                | 610 +++++++++++++++++++--------------=
-----
-> > >  block/trace-events         |  14 +-
-> > >  configure                  |  62 ++--
-> > >  tests/qemu-iotests/207.out |   2 +-
-> > >  5 files changed, 351 insertions(+), 343 deletions(-)
-> >=20
-> >=20
-> > > diff --git a/configure b/configure
-> > > index b091b82cb3..bfdd70c40a 100755
-> > > --- a/configure
-> > > +++ b/configure
-> >=20
-> > > @@ -3914,43 +3914,17 @@ EOF
-> > >  fi
-> > > =20
-> > >  ##########################################
-> > > -# libssh2 probe
-> > > -min_libssh2_version=3D1.2.8
-> >=20
-> > The commit message says we're conditionally using APIs from 0.8.0,
-> > but doesn't say what minimum version we actually need and there's
-> > no check here.
->=20
-> When I started to work on this, the libssh version available was
-> 0.6.x IIRC, which is very old.  This v6 uses APIs added in 0.8
-> conditionally, so it will still build with libssh < 0.8 -- of course,
-> using an older libssh results in a less performant ssh driver, although
-> I would think this can be considered somehow acceptable.
->=20
-> > In terms of our supported build platforms, the oldest libssh I
-> > see is RHEL-7 with 0.7.1.
-> >=20
-> > So assume it does actually compile on RHEL-7, then it is desirable
-> > to have a min_libssh_Version=3D0.7.1 set here & checked below.
->=20
-> For now I do not see the need to enforce a minimum version required;
-> it can be easily added in the future in case we need to use an API only
-> available starting from some version, and there is no fallback way for
-> older versions.
+On 07/06/19 11:08, Yury Kotov wrote:
+> Signed-off-by: Yury Kotov <yury-kotov@yandex-team.ru>
+> ---
+>  accel/kvm/kvm-all.c | 12 ++++++++----
+>  1 file changed, 8 insertions(+), 4 deletions(-)
+> 
+> diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+> index 524c4ddfbd..e4ac3386cb 100644
+> --- a/accel/kvm/kvm-all.c
+> +++ b/accel/kvm/kvm-all.c
+> @@ -864,8 +864,8 @@ static void kvm_mem_ioeventfd_add(MemoryListener *listener,
+>                                 data, true, int128_get64(section->size),
+>                                 match_data);
+>      if (r < 0) {
+> -        fprintf(stderr, "%s: error adding ioeventfd: %s\n",
+> -                __func__, strerror(-r));
+> +        fprintf(stderr, "%s: error adding ioeventfd: %s (%d)\n",
+> +                __func__, strerror(-r), -r);
+>          abort();
+>      }
+>  }
+> @@ -882,6 +882,8 @@ static void kvm_mem_ioeventfd_del(MemoryListener *listener,
+>                                 data, false, int128_get64(section->size),
+>                                 match_data);
+>      if (r < 0) {
+> +        fprintf(stderr, "%s: error deleting ioeventfd: %s (%d)\n",
+> +                __func__, strerror(-r), -r);
+>          abort();
+>      }
+>  }
+> @@ -898,8 +900,8 @@ static void kvm_io_ioeventfd_add(MemoryListener *listener,
+>                                data, true, int128_get64(section->size),
+>                                match_data);
+>      if (r < 0) {
+> -        fprintf(stderr, "%s: error adding ioeventfd: %s\n",
+> -                __func__, strerror(-r));
+> +        fprintf(stderr, "%s: error adding ioeventfd: %s (%d)\n",
+> +                __func__, strerror(-r), -r);
+>          abort();
+>      }
+>  }
+> @@ -917,6 +919,8 @@ static void kvm_io_ioeventfd_del(MemoryListener *listener,
+>                                data, false, int128_get64(section->size),
+>                                match_data);
+>      if (r < 0) {
+> +        fprintf(stderr, "%s: error deleting ioeventfd: %s (%d)\n",
+> +                __func__, strerror(-r), -r);
+>          abort();
+>      }
+>  }
+> 
 
-In general we aim to set a clear minimum version for all our third
-party deps based on our platform support policy. We don't want to
-keep backcompat code around forever even if it is posisble to add
-fallback with #ifdefs. So even if we might still work with 0.6.x,
-we should declare 0.7.1 our min version IMHO.
+Queued, thanks.
 
-Incidentally that reminds me that it is desirable to modify the
-various native arch tests/docker/dockerfiles/*docker files to
-list libssh as a package to install so that we get compile testing
-coverage.
-
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+Paolo
 
