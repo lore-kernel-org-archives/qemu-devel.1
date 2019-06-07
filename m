@@ -2,89 +2,79 @@ Return-Path: <SRS0=3yEa=UG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C41E5C2BCA1
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 14:21:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E2F38C2BCA1
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 14:24:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9152B206E0
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 14:21:12 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="sipoI0Nh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9152B206E0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id BF19320657
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 14:24:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BF19320657
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51656 helo=lists.gnu.org)
+Received: from localhost ([::1]:51674 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hZFjz-0005ZJ-Pj
-	for qemu-devel@archiver.kernel.org; Fri, 07 Jun 2019 10:21:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47100)
+	id 1hZFnB-0006zM-S0
+	for qemu-devel@archiver.kernel.org; Fri, 07 Jun 2019 10:24:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48924)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <alex.bennee@linaro.org>) id 1hZFPb-0007fA-Vw
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 10:00:13 -0400
+ (envelope-from <philmd@redhat.com>) id 1hZFVe-0002nV-IT
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 10:06:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1hZFPa-0006E9-8i
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 10:00:07 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:35751)
+ (envelope-from <philmd@redhat.com>) id 1hZFVZ-0003Pw-1W
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 10:06:18 -0400
+Received: from mail-wm1-f67.google.com ([209.85.128.67]:35026)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1hZFPZ-00068g-Ub
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 10:00:06 -0400
-Received: by mail-wr1-x444.google.com with SMTP id m3so2308013wrv.2
- for <qemu-devel@nongnu.org>; Fri, 07 Jun 2019 07:00:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=bbHrd+1oT1EGHZHobSPDVK3Bdjmbg6xGN6HNd64cG8s=;
- b=sipoI0NhONQAXhKd5VKsrWw/ZG3cP1vpLacRlO4SFXheuxTBX7JcsrvcOup1RSYzF3
- 0Qhqe09LpAIuivAvIWEEvpkbJvfSkM9eKPz4TgDgaxKqV9XCCtloVay6kNyUArwr8WCL
- jfXIvya2P38eHXvX1/vr6IMUCe3i+bsC6AVgmNgDQyjWIKuS4zeKm+4qwSK6O7Dx3f7o
- DRdL38tMdz5mTE/nMBvLaW+coHXFGrdCynkzUOw+5zyggfQxossXEWgSS8gDxh6kSlHg
- qubXEvlBJcPyh9g8XTQPG5/iFeiFw7KPsNRfI+ue0wNuKLuyZKbZSP+9iRMGne7cimJz
- fycw==
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hZFVX-0003Mm-1C
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 10:06:15 -0400
+Received: by mail-wm1-f67.google.com with SMTP id c6so2066043wml.0
+ for <qemu-devel@nongnu.org>; Fri, 07 Jun 2019 07:06:14 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=bbHrd+1oT1EGHZHobSPDVK3Bdjmbg6xGN6HNd64cG8s=;
- b=DOaZVDIzU56jXGEHYhqeSj8+b7pckvJFJ5az4+K9tFS/Go6BaSsMdZcwp0ClxYlX5H
- nR5GexJl8ngW17xkVfkkGKirDzgLfl4Ij86B+x9VqPINb1IRA/qP22M2n8iCfZKGKecx
- Z0ptlXfmJlIZp9i9C4Cu3QMZ/RAYZ97oNqOjdtIjJhD6o+yUT53AxSakku9AgoE/1hh4
- XnHVRUulEJD5FK5z5s3uy8Og03kbFX3KRwXMZyOP+1LzQM0um23O9I04HALAf4mrJJDI
- EX8N+KmePulxW7/2DCt/5gU4ZC0L5Y2o7DUT6rxtMU8pWqBTObRr3K6HrIrsuoCA00xJ
- m1UQ==
-X-Gm-Message-State: APjAAAVEh7ln2kSeDQvkewOsI9QyeUxatnfTWvWlEAZT461tpLdqMSIg
- OwUD91nD8Ji2VaUfBhOaVTjORg==
-X-Google-Smtp-Source: APXvYqyt6tOigKsUSFs48TIcaiz/MMNbaumheSIY/vmD0tnchQbKc2x0nTggy1cOI5g9y+JSlL9Kug==
-X-Received: by 2002:a5d:4044:: with SMTP id w4mr7951876wrp.171.1559916002687; 
- Fri, 07 Jun 2019 07:00:02 -0700 (PDT)
-Received: from zen.linaroharston ([81.128.185.34])
- by smtp.gmail.com with ESMTPSA id s7sm4655964wmc.2.2019.06.07.07.00.01
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Fri, 07 Jun 2019 07:00:02 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 878211FF87;
- Fri,  7 Jun 2019 15:00:01 +0100 (BST)
-References: <20190607132521.9637-1-peter.maydell@linaro.org>
-User-agent: mu4e 1.3.2; emacs 26.1
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Peter Maydell <peter.maydell@linaro.org>
-In-reply-to: <20190607132521.9637-1-peter.maydell@linaro.org>
-Date: Fri, 07 Jun 2019 15:00:01 +0100
-Message-ID: <87d0jpsdge.fsf@zen.linaroharston>
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=HMP3rEihFjBH9XU24/nsyZD/TaPyKAtcmVNJFg/mXzI=;
+ b=hacRh7cbQHj5K9/JKsFjE1nfYKP0C7nkR0EWjotOb8nYt0qVie+UruVKKjxpNID6xg
+ Y9DQUZpm286X1IDOUD8J9o603lpiXWJ5mSLmabhIor6x94bSP1Rs5pq6K7QNzhiN93hX
+ EI4NYjSrt7GlNsq3OGPEOkBam+B/yfu5irFOYhixvjDMwWp3Wm+4+b+W9rbud/w9CnIo
+ vCIyOkptZTKpr8Q+slvSmmsa7r33QTgAMQFZ0R9ecBMQwFKORAuxgQxL167Ln0syeIga
+ sv9J/o6jJHEWPZl2JUXWcWte4HggUYvLHREXcZa0A1jP1dRy/Nypgkt+STliwnCAFCof
+ AmTw==
+X-Gm-Message-State: APjAAAVOW6BnIHo+wTtRO/NxD/TYr96NsgsiWKcDhLoS7oNJbl7yQFmk
+ c7G+uagnn1yiia1c4/D6B57yww==
+X-Google-Smtp-Source: APXvYqx/7f8alZcgAV93+gneU9ablBvq9kv32oNwjghAQ8rVAfpRwOdFHPy8I2OEm7JP2ik4obCe2Q==
+X-Received: by 2002:a1c:c8:: with SMTP id 191mr3907645wma.6.1559916373787;
+ Fri, 07 Jun 2019 07:06:13 -0700 (PDT)
+Received: from [192.168.0.156] ([78.192.181.46])
+ by smtp.gmail.com with ESMTPSA id n19sm1776582wmk.6.2019.06.07.07.06.13
+ (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+ Fri, 07 Jun 2019 07:06:13 -0700 (PDT)
+To: Yoshinori Sato <ysato@users.sourceforge.jp>, qemu-devel@nongnu.org
+References: <20190607091116.49044-1-ysato@users.sourceforge.jp>
+ <20190607091116.49044-14-ysato@users.sourceforge.jp>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+ url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <8e2dc6b6-23bd-23fb-3fa3-ab7c7d553f69@redhat.com>
+Date: Fri, 7 Jun 2019 16:06:12 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
+In-Reply-To: <20190607091116.49044-14-ysato@users.sourceforge.jp>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::444
-Subject: Re: [Qemu-devel] [RISU PATCH] risu: Include <sys/user.h> on ppc64
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.85.128.67
+Subject: Re: [Qemu-devel] [PATCH v17 13/24] target/rx: Fix cpu types and
+ names
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,59 +86,185 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Sandipan Das <sandipan@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, Richard Henderson <richard.henderson@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-Peter Maydell <peter.maydell@linaro.org> writes:
-
-> To build the C parts of risu for ppc64le with recent glibc/kernel
-> headers, we need to include sys/user.h to avoid a compile error,
-> because sys/ucontext.h defines a struct which includes a pointer
-> to 'struct pt_regs' but does not provide a definition of that struct.
->
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-
+On 6/7/19 11:11 AM, Yoshinori Sato wrote:
+> From: Richard Henderson <richard.henderson@linaro.org>
+> 
+> There was confusion here about abstract classes and naming cpus.
+> We had registered a concrete class named "-rxcpu".  This was put
+> into the default cpu fields, and matched, so basic tests worked.
+> However, no value for -cpu could ever match in rx_cpu_class_by_name.
+> 
+> Rename the base class to "rx-cpu" and make it abstract.  This
+> matches what we do for most other targets.  Create a new concrete
+> cpu with the name "rx62n-rx-cpu".
+> 
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
 > ---
-> I need this to be able to do the ppc64le cross-build on my
-> Ubuntu Bionic x86-64 system.
->
->  risu_ppc64.c         | 2 ++
->  risu_reginfo_ppc64.c | 1 +
->  2 files changed, 3 insertions(+)
->
-> diff --git a/risu_ppc64.c b/risu_ppc64.c
-> index 83f8d1f..a3028f7 100644
-> --- a/risu_ppc64.c
-> +++ b/risu_ppc64.c
-> @@ -11,6 +11,8 @@
->   *     based on Peter Maydell's risu_arm.c
->   ***********************************************************************=
-******/
->
-> +#include <sys/user.h>
+>  target/rx/cpu.h | 12 ++++++------
+>  hw/rx/rx-virt.c |  2 +-
+>  hw/rx/rx62n.c   |  2 +-
+>  target/rx/cpu.c | 43 ++++++++++++++++++++++++++-----------------
+>  4 files changed, 34 insertions(+), 25 deletions(-)
+> 
+> diff --git a/target/rx/cpu.h b/target/rx/cpu.h
+> index 8c1a4e448d..a0b6975963 100644
+> --- a/target/rx/cpu.h
+> +++ b/target/rx/cpu.h
+> @@ -24,14 +24,14 @@
+>  #include "hw/registerfields.h"
+>  #include "qom/cpu.h"
+>  
+> -#define TYPE_RXCPU "rxcpu"
+> +#define TYPE_RX_CPU "rx-cpu"
+>  
+>  #define RXCPU_CLASS(klass)                                     \
+> -    OBJECT_CLASS_CHECK(RXCPUClass, (klass), TYPE_RXCPU)
+> +    OBJECT_CLASS_CHECK(RXCPUClass, (klass), TYPE_RX_CPU)
+>  #define RXCPU(obj) \
+> -    OBJECT_CHECK(RXCPU, (obj), TYPE_RXCPU)
+> +    OBJECT_CHECK(RXCPU, (obj), TYPE_RX_CPU)
+>  #define RXCPU_GET_CLASS(obj) \
+> -    OBJECT_GET_CLASS(RXCPUClass, (obj), TYPE_RXCPU)
+> +    OBJECT_GET_CLASS(RXCPUClass, (obj), TYPE_RX_CPU)
+>  
+>  /*
+>   * RXCPUClass:
+> @@ -164,9 +164,9 @@ static inline RXCPU *rx_env_get_cpu(CPURXState *env)
+>  
+>  #define ENV_OFFSET offsetof(RXCPU, env)
+>  
+> -#define RX_CPU_TYPE_SUFFIX "-" TYPE_RXCPU
+> +#define RX_CPU_TYPE_SUFFIX "-" TYPE_RX_CPU
+>  #define RX_CPU_TYPE_NAME(model) model RX_CPU_TYPE_SUFFIX
+> -#define CPU_RESOLVING_TYPE TYPE_RXCPU
+> +#define CPU_RESOLVING_TYPE TYPE_RX_CPU
+>  
+>  extern const char rx_crname[][6];
+>  
+> diff --git a/hw/rx/rx-virt.c b/hw/rx/rx-virt.c
+> index 3deb7cb335..72a2989fcf 100644
+> --- a/hw/rx/rx-virt.c
+> +++ b/hw/rx/rx-virt.c
+> @@ -88,7 +88,7 @@ static void rxvirt_class_init(ObjectClass *oc, void *data)
+>      mc->desc = "RX QEMU Virtual Target";
+>      mc->init = rxvirt_init;
+>      mc->is_default = 1;
+> -    mc->default_cpu_type = TYPE_RXCPU;
+> +    mc->default_cpu_type = RX_CPU_TYPE_NAME("rx62n");
+>  }
+>  
+>  static const TypeInfo rxvirt_type = {
+> diff --git a/hw/rx/rx62n.c b/hw/rx/rx62n.c
+> index c6660b75b4..3a8fe7b0bf 100644
+> --- a/hw/rx/rx62n.c
+> +++ b/hw/rx/rx62n.c
+> @@ -195,7 +195,7 @@ static void rx62n_realize(DeviceState *dev, Error **errp)
+>      }
+>  
+>      object_initialize_child(OBJECT(s), "cpu", &s->cpu,
+> -                            sizeof(RXCPU), TYPE_RXCPU,
+> +                            sizeof(RXCPU), RX_CPU_TYPE_NAME("rx62n"),
+>                              errp, NULL);
+>      object_property_set_bool(OBJECT(&s->cpu), true, "realized", errp);
+>  
+> diff --git a/target/rx/cpu.c b/target/rx/cpu.c
+> index 3268077d08..41fe1de4bb 100644
+> --- a/target/rx/cpu.c
+> +++ b/target/rx/cpu.c
+> @@ -74,13 +74,14 @@ static void rx_cpu_list_entry(gpointer data, gpointer user_data)
+>      const char *typename = object_class_get_name(OBJECT_CLASS(data));
+>      int len = strlen(typename) - strlen(RX_CPU_TYPE_SUFFIX);
+>  
+> -    qemu_printf("%.*s\n", len, typename);
+> +    qemu_printf("  %.*s\n", len, typename);
+>  }
+>  
+>  void rx_cpu_list(void)
+>  {
+> -    GSList *list;
+> -    list = object_class_get_list_sorted(TYPE_RXCPU, false);
+> +    GSList *list = object_class_get_list_sorted(TYPE_RX_CPU, false);
 > +
->  #include "risu.h"
->
->  void advance_pc(void *vuc)
-> diff --git a/risu_reginfo_ppc64.c b/risu_reginfo_ppc64.c
-> index f9d2f0d..071c951 100644
-> --- a/risu_reginfo_ppc64.c
-> +++ b/risu_reginfo_ppc64.c
-> @@ -16,6 +16,7 @@
->  #include <string.h>
->  #include <math.h>
->  #include <stdlib.h>
-> +#include <sys/user.h>
->
->  #include "risu.h"
->  #include "risu_reginfo_ppc64.h"
+> +    qemu_printf("Available CPUs:\n");
+>      g_slist_foreach(list, rx_cpu_list_entry, NULL);
+>      g_slist_free(list);
+>  }
+> @@ -88,15 +89,17 @@ void rx_cpu_list(void)
+>  static ObjectClass *rx_cpu_class_by_name(const char *cpu_model)
+>  {
+>      ObjectClass *oc;
+> -    char *typename = NULL;
+> +    char *typename;
+>  
+> -    typename = g_strdup_printf(RX_CPU_TYPE_NAME(""));
+> +    typename = g_strdup_printf(RX_CPU_TYPE_NAME("%s"), cpu_model);
+>      oc = object_class_by_name(typename);
+> -    if (oc != NULL && object_class_is_abstract(oc)) {
+> -        oc = NULL;
+> -    }
+> -
+>      g_free(typename);
+> +
+> +    if (oc == NULL ||
+> +        object_class_is_abstract(oc) ||
+> +        !object_class_dynamic_cast(oc, TYPE_RX_CPU)) {
+> +        return NULL;
+> +    }
+>      return oc;
+>  }
+>  
+> @@ -166,7 +169,7 @@ static void rx_cpu_init(Object *obj)
+>      qdev_init_gpio_in(DEVICE(cpu), rx_cpu_set_irq, 2);
+>  }
+>  
+> -static void rxcpu_class_init(ObjectClass *klass, void *data)
+> +static void rx_cpu_class_init(ObjectClass *klass, void *data)
+>  {
+>      DeviceClass *dc = DEVICE_CLASS(klass);
+>      CPUClass *cc = CPU_CLASS(klass);
+> @@ -195,22 +198,28 @@ static void rxcpu_class_init(ObjectClass *klass, void *data)
+>      cc->gdb_num_core_regs = 26;
+>  }
+>  
+> -static const TypeInfo rxcpu_info = {
+> -    .name = TYPE_RXCPU,
+> +static const TypeInfo rx_cpu_info = {
+> +    .name = TYPE_RX_CPU,
+>      .parent = TYPE_CPU,
+>      .instance_size = sizeof(RXCPU),
+>      .instance_init = rx_cpu_init,
+> -    .abstract = false,
+> +    .abstract = true,
+>      .class_size = sizeof(RXCPUClass),
+> -    .class_init = rxcpu_class_init,
+> +    .class_init = rx_cpu_class_init,
+> +};
+> +
+> +static const TypeInfo rx62n_rx_cpu_info = {
+> +    .name = RX_CPU_TYPE_NAME("rx62n"),
+> +    .parent = TYPE_RX_CPU,
+>  };
+>  
+> -static void rxcpu_register_types(void)
+> +static void rx_cpu_register_types(void)
+>  {
+> -    type_register_static(&rxcpu_info);
+> +    type_register_static(&rx_cpu_info);
+> +    type_register_static(&rx62n_rx_cpu_info);
+>  }
+>  
+> -type_init(rxcpu_register_types)
+> +type_init(rx_cpu_register_types)
+>  
+>  static uint32_t extable[32];
+>  
+> 
 
-
---
-Alex Benn=C3=A9e
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
