@@ -2,56 +2,89 @@ Return-Path: <SRS0=3yEa=UG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DA186C2BCA1
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 09:49:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E5B3EC28CC3
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 09:50:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B73AA208C3
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 09:49:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B73AA208C3
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=users.sourceforge.jp
+	by mail.kernel.org (Postfix) with ESMTPS id 72421208C3
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 09:50:49 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="j1d2RMPM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 72421208C3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47632 helo=lists.gnu.org)
+Received: from localhost ([::1]:47638 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hZBUw-0005iM-17
-	for qemu-devel@archiver.kernel.org; Fri, 07 Jun 2019 05:49:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41490)
+	id 1hZBWK-00078e-6A
+	for qemu-devel@archiver.kernel.org; Fri, 07 Jun 2019 05:50:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42217)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <ysato@users.sourceforge.jp>) id 1hZAuV-0000xp-F4
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 05:11:48 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1hZAvT-0002Ft-Ct
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 05:12:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ysato@users.sourceforge.jp>) id 1hZAuP-0002wm-FS
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 05:11:43 -0400
-Received: from mail02.asahi-net.or.jp ([202.224.55.14]:41551)
- by eggs.gnu.org with esmtp (Exim 4.71)
- (envelope-from <ysato@users.sourceforge.jp>) id 1hZAuO-0002qz-T0
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 05:11:37 -0400
-Received: from h61-195-96-97.vps.ablenet.jp (h61-195-96-97.ablenetvps.ne.jp
- [61.195.96.97]) (Authenticated sender: PQ4Y-STU)
- by mail02.asahi-net.or.jp (Postfix) with ESMTPA id 098BD41900;
- Fri,  7 Jun 2019 18:11:32 +0900 (JST)
-Received: from yo-satoh-debian.localdomain (ZM005235.ppp.dion.ne.jp
- [222.8.5.235])
- by h61-195-96-97.vps.ablenet.jp (Postfix) with ESMTPSA id B72A0240085;
- Fri,  7 Jun 2019 18:11:31 +0900 (JST)
-From: Yoshinori Sato <ysato@users.sourceforge.jp>
-To: qemu-devel@nongnu.org
-Date: Fri,  7 Jun 2019 18:11:13 +0900
-Message-Id: <20190607091116.49044-22-ysato@users.sourceforge.jp>
-X-Mailer: git-send-email 2.11.0
-In-Reply-To: <20190607091116.49044-1-ysato@users.sourceforge.jp>
-References: <20190607091116.49044-1-ysato@users.sourceforge.jp>
+ (envelope-from <alex.bennee@linaro.org>) id 1hZAvR-00050K-1d
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 05:12:43 -0400
+Received: from mail-wr1-x432.google.com ([2a00:1450:4864:20::432]:43592)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1hZAvQ-0004mk-M5
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 05:12:40 -0400
+Received: by mail-wr1-x432.google.com with SMTP id r18so1351590wrm.10
+ for <qemu-devel@nongnu.org>; Fri, 07 Jun 2019 02:12:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=/mgOWUVQfFqS8c2PmAMUGsA0PAuyGOHp1Inf8fc96Sk=;
+ b=j1d2RMPMtwyfSlpxp7P3wjBaDONJs3e34kgogE6dwdbGCbef3q4rAfnvRSmVj69BMI
+ +e6GxvTwpqSoWRyin6zvftQoPFfwHs4k3ahAI0LkbuwIpkDLuSTixDt2ZNw8TTUWj16e
+ k8PMbxHuxMq4ppH5Qq45R0v/8KGYO7p2gl3bZ/kJqvyDNgefLE9tja5AgrAQ2SrDtPq8
+ TGhgmQ0Lqyk6dI5zJG0THE4M2jyE/e6XB4IAG8v4y9fdhiIbOLMg6lcg31kqSt8dga2t
+ y+M8GRdhbIBa3z+3DU9BGUO9skOcgJMrn9oj0KkT4Q46oXmiU8RhZs5EX5jYLBnR8k0T
+ yXgg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=/mgOWUVQfFqS8c2PmAMUGsA0PAuyGOHp1Inf8fc96Sk=;
+ b=txelfEcLP0m0O95/S72VMLFhyrLr4jtB1WR1FuvpeWb00e9NIy5/0TT5ZoEU39jg8I
+ sTeGvdOOzbEn8gDDuUL2xR3FXCwGtfctyS1c3ON9li9l0p+I6mlNNuOMIt0cGdwfpluc
+ os/cR6sNisilSmc8hZRuXi60ltK0SwAXbakBcU2JGxovxICJb105e9YUizgaX/neIOIz
+ EYTp66fO16wur44lJpvmvwh4ILocm/iNcDC4h5DFq+BYoNTEvjfIEZpl6S5WGeJ16jxn
+ exMBuPdZ2XNMZHqpvxHOiM5egKb9hS1XD7lEhzMLISJjTHVSFUDG93migDsx0gxUMdBG
+ JD7A==
+X-Gm-Message-State: APjAAAWyhRE7owf9aZ+FWhxAIxVX9Sok+tQEcQDBZ5QSeA0hM62M9ewX
+ 6JqRL/Oqn1wWMk1pDnUhyLYH7Q==
+X-Google-Smtp-Source: APXvYqxAcmyNwdQPMMw70mD9eafnRSjj0zh3ct8AXnziKdiFNtfCm6Tp4C+yF0CgnNN5MPnBpzQ11A==
+X-Received: by 2002:adf:9267:: with SMTP id 94mr10741052wrj.338.1559898754163; 
+ Fri, 07 Jun 2019 02:12:34 -0700 (PDT)
+Received: from zen.linaroharston ([81.128.185.34])
+ by smtp.gmail.com with ESMTPSA id x3sm1654450wrp.78.2019.06.07.02.12.28
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Fri, 07 Jun 2019 02:12:30 -0700 (PDT)
+Received: from zen.linaroharston. (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 34CA01FF9E;
+ Fri,  7 Jun 2019 10:05:53 +0100 (BST)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: peter.maydell@linaro.org
+Date: Fri,  7 Jun 2019 10:05:14 +0100
+Message-Id: <20190607090552.12434-16-alex.bennee@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190607090552.12434-1-alex.bennee@linaro.org>
+References: <20190607090552.12434-1-alex.bennee@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 202.224.55.14
-Subject: [Qemu-devel] [PATCH v17 21/24] target/rx: Emit all disassembly in
- one prt()
+X-Received-From: 2a00:1450:4864:20::432
+Subject: [Qemu-devel] [PULL 15/52] tests/vm: use ssh with pty unconditionally
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -63,194 +96,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, Richard Henderson <richard.henderson@linaro.org>,
- Yoshinori Sato <ysato@users.sourceforge.jp>, philmd@redhat.com
+Cc: Fam Zheng <fam@euphon.net>, Thomas Huth <thuth@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Richard Henderson <richard.henderson@linaro.org>
+From: Gerd Hoffmann <kraxel@redhat.com>
 
-Many of the multi-part prints have been eliminated by previous
-patches.  Eliminate the rest of them.
+Allways ask ssh to run with a pseudo terminal.
+Not having a terminal causes problems now and then.
 
-Reviewed-by: Yoshinori Sato <ysato@users.sourceforge.jp>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
----
- target/rx/disas.c | 75 +++++++++++++++++++++++++++++--------------------------
- 1 file changed, 39 insertions(+), 36 deletions(-)
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+Tested-by: Thomas Huth <thuth@redhat.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Message-Id: <20190520124716.30472-5-kraxel@redhat.com>
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 
-diff --git a/target/rx/disas.c b/target/rx/disas.c
-index db10385fd0..ebc1a44249 100644
---- a/target/rx/disas.c
-+++ b/target/rx/disas.c
-@@ -228,24 +228,21 @@ static bool trans_MOV_ra(DisasContext *ctx, arg_MOV_ra *a)
- /* mov.[bwl] rs,rd */
- static bool trans_MOV_mm(DisasContext *ctx, arg_MOV_mm *a)
- {
--    char dspd[8], dsps[8];
-+    char dspd[8], dsps[8], szc = size[a->sz];
+diff --git a/tests/vm/basevm.py b/tests/vm/basevm.py
+index 5e30bac661..395eefaec9 100755
+--- a/tests/vm/basevm.py
++++ b/tests/vm/basevm.py
+@@ -107,16 +107,14 @@ class BaseVM(object):
+         os.rename(fname + ".download", fname)
+         return fname
  
--    prt("mov.%c\t", size[a->sz]);
-     if (a->lds == 3 && a->ldd == 3) {
-         /* mov.[bwl] rs,rd */
--        prt("r%d, r%d", a->rs, a->rd);
--        return true;
--    }
--    if (a->lds == 3) {
-+        prt("mov.%c\tr%d, r%d", szc, a->rs, a->rd);
-+    } else if (a->lds == 3) {
-         rx_index_addr(ctx, dspd, a->ldd, a->sz);
--        prt("r%d, %s[r%d]", a->rs, dspd, a->rd);
-+        prt("mov.%c\tr%d, %s[r%d]", szc, a->rs, dspd, a->rd);
-     } else if (a->ldd == 3) {
-         rx_index_addr(ctx, dsps, a->lds, a->sz);
--        prt("%s[r%d], r%d", dsps, a->rs, a->rd);
-+        prt("mov.%c\t%s[r%d], r%d", szc, dsps, a->rs, a->rd);
-     } else {
-         rx_index_addr(ctx, dsps, a->lds, a->sz);
-         rx_index_addr(ctx, dspd, a->ldd, a->sz);
--        prt("%s[r%d], %s[r%d]", dsps, a->rs, dspd, a->rd);
-+        prt("mov.%c\t%s[r%d], %s[r%d]", szc, dsps, a->rs, dspd, a->rd);
-     }
-     return true;
- }
-@@ -254,8 +251,11 @@ static bool trans_MOV_mm(DisasContext *ctx, arg_MOV_mm *a)
- /* mov.[bwl] rs,[-rd] */
- static bool trans_MOV_rp(DisasContext *ctx, arg_MOV_rp *a)
- {
--    prt("mov.%c\tr%d, ", size[a->sz], a->rs);
--    prt((a->ad == 0) ? "[r%d+]" : "[-r%d]", a->rd);
-+    if (a->ad) {
-+        prt("mov.%c\tr%d, [-r%d]", size[a->sz], a->rs, a->rd);
-+    } else {
-+        prt("mov.%c\tr%d, [r%d+]", size[a->sz], a->rs, a->rd);
-+    }
-     return true;
- }
+-    def _ssh_do(self, user, cmd, check, interactive=False):
+-        ssh_cmd = ["ssh", "-q",
++    def _ssh_do(self, user, cmd, check):
++        ssh_cmd = ["ssh", "-q", "-t",
+                    "-o", "StrictHostKeyChecking=no",
+                    "-o", "UserKnownHostsFile=" + os.devnull,
+                    "-o", "ConnectTimeout=1",
+                    "-p", self.ssh_port, "-i", self._ssh_key_file]
+         for var in self.envvars:
+             ssh_cmd += ['-o', "SendEnv=%s" % var ]
+-        if interactive:
+-            ssh_cmd += ['-t']
+         assert not isinstance(cmd, str)
+         ssh_cmd += ["%s@127.0.0.1" % user] + list(cmd)
+         logging.debug("ssh_cmd: %s", " ".join(ssh_cmd))
+@@ -128,9 +126,6 @@ class BaseVM(object):
+     def ssh(self, *cmd):
+         return self._ssh_do(self.GUEST_USER, cmd, False)
  
-@@ -263,9 +263,11 @@ static bool trans_MOV_rp(DisasContext *ctx, arg_MOV_rp *a)
- /* mov.[bwl] [-rd],rs */
- static bool trans_MOV_pr(DisasContext *ctx, arg_MOV_pr *a)
- {
--    prt("mov.%c\t", size[a->sz]);
--    prt((a->ad == 0) ? "[r%d+]" : "[-r%d]", a->rd);
--    prt(", r%d", a->rs);
-+    if (a->ad) {
-+        prt("mov.%c\t[-r%d], r%d", size[a->sz], a->rd, a->rs);
-+    } else {
-+        prt("mov.%c\t[r%d+], r%d", size[a->sz], a->rd, a->rs);
-+    }
-     return true;
- }
+-    def ssh_interactive(self, *cmd):
+-        return self._ssh_do(self.GUEST_USER, cmd, False, True)
+-
+     def ssh_root(self, *cmd):
+         return self._ssh_do("root", cmd, False)
  
-@@ -299,9 +301,11 @@ static bool trans_MOVU_ar(DisasContext *ctx, arg_MOVU_ar *a)
- /* movu.[bw] [-rs],rd */
- static bool trans_MOVU_pr(DisasContext *ctx, arg_MOVU_pr *a)
- {
--    prt("movu.%c\t", size[a->sz]);
--    prt((a->ad == 0) ? "[r%d+]" : "[-r%d]", a->rd);
--    prt(", r%d", a->rs);
-+    if (a->ad) {
-+        prt("movu.%c\t[-r%d], r%d", size[a->sz], a->rd, a->rs);
-+    } else {
-+        prt("movu.%c\t[r%d+], r%d", size[a->sz], a->rd, a->rs);
-+    }
-     return true;
- }
+@@ -284,9 +279,9 @@ def main(vmcls):
+         return 2
  
-@@ -478,11 +482,11 @@ static bool trans_TST_mr(DisasContext *ctx, arg_TST_mr *a)
- /* not rs, rd */
- static bool trans_NOT_rr(DisasContext *ctx, arg_NOT_rr *a)
- {
--    prt("not\t");
-     if (a->rs != a->rd) {
--        prt("r%d, ", a->rs);
-+        prt("not\tr%d, r%d", a->rs, a->rd);
-+    } else {
-+        prt("not\tr%d", a->rs);
-     }
--    prt("r%d", a->rd);
-     return true;
- }
- 
-@@ -490,11 +494,11 @@ static bool trans_NOT_rr(DisasContext *ctx, arg_NOT_rr *a)
- /* neg rs, rd */
- static bool trans_NEG_rr(DisasContext *ctx, arg_NEG_rr *a)
- {
--    prt("neg\t");
-     if (a->rs != a->rd) {
--        prt("r%d, ", a->rs);
-+        prt("neg\tr%d, r%d", a->rs, a->rd);
-+    } else {
-+        prt("neg\tr%d", a->rs);
-     }
--    prt("r%d", a->rd);
-     return true;
- }
- 
-@@ -606,11 +610,10 @@ static bool trans_SBB_mr(DisasContext *ctx, arg_SBB_mr *a)
- /* abs rs, rd */
- static bool trans_ABS_rr(DisasContext *ctx, arg_ABS_rr *a)
- {
--    prt("abs\t");
--    if (a->rs == a->rd) {
--        prt("r%d", a->rd);
-+    if (a->rs != a->rd) {
-+        prt("abs\tr%d, r%d", a->rs, a->rd);
-     } else {
--        prt("r%d, r%d", a->rs, a->rd);
-+        prt("abs\tr%d", a->rs);
-     }
-     return true;
- }
-@@ -733,11 +736,11 @@ static bool trans_DIVU_mr(DisasContext *ctx, arg_DIVU_mr *a)
- /* shll #imm:5, rs, rd */
- static bool trans_SHLL_irr(DisasContext *ctx, arg_SHLL_irr *a)
- {
--    prt("shll\t#%d, ", a->imm);
-     if (a->rs2 != a->rd) {
--        prt("r%d, ", a->rs2);
-+        prt("shll\t#%d, r%d, r%d", a->imm, a->rs2, a->rd);
-+    } else {
-+        prt("shll\t#%d, r%d", a->imm, a->rd);
-     }
--    prt("r%d", a->rd);
-     return true;
- }
- 
-@@ -752,11 +755,11 @@ static bool trans_SHLL_rr(DisasContext *ctx, arg_SHLL_rr *a)
- /* shar #imm:5, rs, rd */
- static bool trans_SHAR_irr(DisasContext *ctx, arg_SHAR_irr *a)
- {
--    prt("shar\t#%d,", a->imm);
-     if (a->rs2 != a->rd) {
--        prt("r%d, ", a->rs2);
-+        prt("shar\t#%d, r%d, r%d", a->imm, a->rs2, a->rd);
-+    } else {
-+        prt("shar\t#%d, r%d", a->imm, a->rd);
-     }
--    prt("r%d", a->rd);
-     return true;
- }
- 
-@@ -771,11 +774,11 @@ static bool trans_SHAR_rr(DisasContext *ctx, arg_SHAR_rr *a)
- /* shlr #imm:5, rs, rd */
- static bool trans_SHLR_irr(DisasContext *ctx, arg_SHLR_irr *a)
- {
--    prt("shlr\t#%d, ", a->imm);
-     if (a->rs2 != a->rd) {
--        prt("r%d, ", a->rs2);
-+        prt("shlr\t#%d, r%d, r%d", a->imm, a->rs2, a->rd);
-+    } else {
-+        prt("shlr\t#%d, r%d", a->imm, a->rd);
-     }
--    prt("r%d", a->rd);
-     return true;
- }
- 
+     if args.interactive:
+-        if vm.ssh_interactive(*cmd) == 0:
++        if vm.ssh(*cmd) == 0:
+             return 0
+-        vm.ssh_interactive()
++        vm.ssh()
+         return 3
+     else:
+         if vm.ssh(*cmd) != 0:
 -- 
-2.11.0
+2.20.1
 
 
