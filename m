@@ -6,56 +6,56 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A6C45C468BC
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 15:12:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B79ECC2BCA1
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 15:12:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7FF482089E
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 15:12:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7FF482089E
+	by mail.kernel.org (Postfix) with ESMTPS id 91A4B2089E
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 15:12:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 91A4B2089E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48636 helo=lists.gnu.org)
+Received: from localhost ([::1]:48638 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hZGXp-0004zr-Lt
-	for qemu-devel@archiver.kernel.org; Fri, 07 Jun 2019 11:12:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53161)
+	id 1hZGXq-00053J-QO
+	for qemu-devel@archiver.kernel.org; Fri, 07 Jun 2019 11:12:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53987)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <cohuck@redhat.com>) id 1hZFhT-0003lQ-SW
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 10:18:38 -0400
+ (envelope-from <cohuck@redhat.com>) id 1hZFif-00051G-4F
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 10:19:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <cohuck@redhat.com>) id 1hZFhS-0003on-2I
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 10:18:35 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36038)
+ (envelope-from <cohuck@redhat.com>) id 1hZFic-0005TR-OK
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 10:19:48 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55212)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <cohuck@redhat.com>)
- id 1hZFhO-0003dK-Hi; Fri, 07 Jun 2019 10:18:33 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ id 1hZFiS-0005IW-WF; Fri, 07 Jun 2019 10:19:41 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id A6F2730C1208;
- Fri,  7 Jun 2019 14:18:26 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id E77253091DD1;
+ Fri,  7 Jun 2019 14:19:35 +0000 (UTC)
 Received: from localhost (dhcp-192-191.str.redhat.com [10.33.192.191])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 1EBD48270A;
- Fri,  7 Jun 2019 14:18:23 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 4578E5C634;
+ Fri,  7 Jun 2019 14:19:33 +0000 (UTC)
 From: Cornelia Huck <cohuck@redhat.com>
 To: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri,  7 Jun 2019 16:17:07 +0200
-Message-Id: <20190607141727.29018-15-cohuck@redhat.com>
+Date: Fri,  7 Jun 2019 16:17:24 +0200
+Message-Id: <20190607141727.29018-32-cohuck@redhat.com>
 In-Reply-To: <20190607141727.29018-1-cohuck@redhat.com>
 References: <20190607141727.29018-1-cohuck@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.46]); Fri, 07 Jun 2019 14:18:26 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.42]); Fri, 07 Jun 2019 14:19:35 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL v2 14/34] s390x/tcg: Implement VECTOR FP COMPARE
- (AND SIGNAL) SCALAR
+Subject: [Qemu-devel] [PULL v2 31/34] s390x/tcg: We support the Vector
+ Facility
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,125 +75,26 @@ Sender: "Qemu-devel"
 
 From: David Hildenbrand <david@redhat.com>
 
-As far as I can see, there is only a tiny difference.
+Let's add it to the max model, so we can enable it.
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- target/s390x/helper.h           |  2 ++
- target/s390x/insn-data.def      |  4 ++++
- target/s390x/translate_vx.inc.c | 21 +++++++++++++++++++++
- target/s390x/vec_fpu_helper.c   | 32 ++++++++++++++++++++++++++++++++
- 4 files changed, 59 insertions(+)
+ target/s390x/gen-features.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/target/s390x/helper.h b/target/s390x/helper.h
-index 21658a277190..d34d6802a605 100644
---- a/target/s390x/helper.h
-+++ b/target/s390x/helper.h
-@@ -252,6 +252,8 @@ DEF_HELPER_6(gvec_vstrc_cc_rt32, void, ptr, cptr, cpt=
-r, cptr, env, i32)
- /* =3D=3D=3D Vector Floating-Point Instructions */
- DEF_HELPER_FLAGS_5(gvec_vfa64, TCG_CALL_NO_WG, void, ptr, cptr, cptr, en=
-v, i32)
- DEF_HELPER_FLAGS_5(gvec_vfa64s, TCG_CALL_NO_WG, void, ptr, cptr, cptr, e=
-nv, i32)
-+DEF_HELPER_4(gvec_wfc64, void, cptr, cptr, env, i32)
-+DEF_HELPER_4(gvec_wfk64, void, cptr, cptr, env, i32)
-=20
- #ifndef CONFIG_USER_ONLY
- DEF_HELPER_3(servc, i32, env, i64, i64)
-diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
-index 79892f6042f0..c45e101b1056 100644
---- a/target/s390x/insn-data.def
-+++ b/target/s390x/insn-data.def
-@@ -1208,6 +1208,10 @@
-=20
- /* VECTOR FP ADD */
-     F(0xe7e3, VFA,     VRR_c, V,   0, 0, 0, 0, vfa, 0, IF_VEC)
-+/* VECTOR FP COMPARE SCALAR */
-+    F(0xe7cb, WFC,     VRR_a, V,   0, 0, 0, 0, wfc, 0, IF_VEC)
-+/* VECTOR FP COMPARE AND SIGNAL SCALAR */
-+    F(0xe7ca, WFK,     VRR_a, V,   0, 0, 0, 0, wfc, 0, IF_VEC)
-=20
- #ifndef CONFIG_USER_ONLY
- /* COMPARE AND SWAP AND PURGE */
-diff --git a/target/s390x/translate_vx.inc.c b/target/s390x/translate_vx.=
-inc.c
-index 44da9f26457b..283e8aa07ae4 100644
---- a/target/s390x/translate_vx.inc.c
-+++ b/target/s390x/translate_vx.inc.c
-@@ -2567,3 +2567,24 @@ static DisasJumpType op_vfa(DisasContext *s, Disas=
-Ops *o)
-                    get_field(s->fields, v3), cpu_env, 0, fn);
-     return DISAS_NEXT;
- }
-+
-+static DisasJumpType op_wfc(DisasContext *s, DisasOps *o)
-+{
-+    const uint8_t fpf =3D get_field(s->fields, m3);
-+    const uint8_t m4 =3D get_field(s->fields, m4);
-+
-+    if (fpf !=3D FPF_LONG || m4) {
-+        gen_program_exception(s, PGM_SPECIFICATION);
-+        return DISAS_NORETURN;
-+    }
-+
-+    if (s->fields->op2 =3D=3D 0xcb) {
-+        gen_gvec_2_ptr(get_field(s->fields, v1), get_field(s->fields, v2=
-),
-+                       cpu_env, 0, gen_helper_gvec_wfc64);
-+    } else {
-+        gen_gvec_2_ptr(get_field(s->fields, v1), get_field(s->fields, v2=
-),
-+                       cpu_env, 0, gen_helper_gvec_wfk64);
-+    }
-+    set_cc_static(s);
-+    return DISAS_NEXT;
-+}
-diff --git a/target/s390x/vec_fpu_helper.c b/target/s390x/vec_fpu_helper.=
-c
-index c7db0791d7ca..f9357d922103 100644
---- a/target/s390x/vec_fpu_helper.c
-+++ b/target/s390x/vec_fpu_helper.c
-@@ -117,3 +117,35 @@ void HELPER(gvec_vfa64s)(void *v1, const void *v2, c=
-onst void *v3,
- {
-     vop64_3(v1, v2, v3, env, true, vfa64, GETPC());
- }
-+
-+static int wfc64(const S390Vector *v1, const S390Vector *v2,
-+                 CPUS390XState *env, bool signal, uintptr_t retaddr)
-+{
-+    /* only the zero-indexed elements are compared */
-+    const float64 a =3D s390_vec_read_element64(v1, 0);
-+    const float64 b =3D s390_vec_read_element64(v2, 0);
-+    uint8_t vxc, vec_exc =3D 0;
-+    int cmp;
-+
-+    if (signal) {
-+        cmp =3D float64_compare(a, b, &env->fpu_status);
-+    } else {
-+        cmp =3D float64_compare_quiet(a, b, &env->fpu_status);
-+    }
-+    vxc =3D check_ieee_exc(env, 0, false, &vec_exc);
-+    handle_ieee_exc(env, vxc, vec_exc, retaddr);
-+
-+    return float_comp_to_cc(env, cmp);
-+}
-+
-+void HELPER(gvec_wfc64)(const void *v1, const void *v2, CPUS390XState *e=
-nv,
-+                        uint32_t desc)
-+{
-+    env->cc_op =3D wfc64(v1, v2, env, false, GETPC());
-+}
-+
-+void HELPER(gvec_wfk64)(const void *v1, const void *v2, CPUS390XState *e=
-nv,
-+                        uint32_t desc)
-+{
-+    env->cc_op =3D wfc64(v1, v2, env, true, GETPC());
-+}
+diff --git a/target/s390x/gen-features.c b/target/s390x/gen-features.c
+index c346b76bdfbe..a818c8033285 100644
+--- a/target/s390x/gen-features.c
++++ b/target/s390x/gen-features.c
+@@ -702,6 +702,7 @@ static uint16_t qemu_LATEST[] =3D {
+ static uint16_t qemu_MAX[] =3D {
+     /* z13+ features */
+     S390_FEAT_STFLE_53,
++    S390_FEAT_VECTOR,
+     /* generates a dependency warning, leave it out for now */
+     S390_FEAT_MSA_EXT_5,
+ };
 --=20
 2.20.1
 
