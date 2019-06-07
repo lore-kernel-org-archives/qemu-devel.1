@@ -3,47 +3,47 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 73743C28EBD
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 02:26:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DACA4C28EBD
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 02:28:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4AC272064A
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 02:26:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4AC272064A
+	by mail.kernel.org (Postfix) with ESMTPS id B2A9720825
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 02:28:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B2A9720825
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45523 helo=lists.gnu.org)
+Received: from localhost ([::1]:45530 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hZ4aE-0004sn-Ee
-	for qemu-devel@archiver.kernel.org; Thu, 06 Jun 2019 22:26:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44623)
+	id 1hZ4ch-0005rk-1e
+	for qemu-devel@archiver.kernel.org; Thu, 06 Jun 2019 22:28:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45220)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <eblake@redhat.com>) id 1hZ4YH-0004Mw-SW
- for qemu-devel@nongnu.org; Thu, 06 Jun 2019 22:24:22 -0400
+ (envelope-from <eblake@redhat.com>) id 1hZ4bk-0005PE-EG
+ for qemu-devel@nongnu.org; Thu, 06 Jun 2019 22:27:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1hZ4YG-0007eO-Se
- for qemu-devel@nongnu.org; Thu, 06 Jun 2019 22:24:21 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43902)
+ (envelope-from <eblake@redhat.com>) id 1hZ4bj-0004td-G5
+ for qemu-devel@nongnu.org; Thu, 06 Jun 2019 22:27:56 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55340)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <eblake@redhat.com>)
- id 1hZ4YE-0007av-H8; Thu, 06 Jun 2019 22:24:18 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ id 1hZ4bh-0004qA-8A; Thu, 06 Jun 2019 22:27:53 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id D71C330C319D;
- Fri,  7 Jun 2019 02:24:12 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 877EAC045129;
+ Fri,  7 Jun 2019 02:27:38 +0000 (UTC)
 Received: from [10.3.116.85] (ovpn-116-85.phx2.redhat.com [10.3.116.85])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 538E67FA30;
- Fri,  7 Jun 2019 02:24:08 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 6435559471;
+ Fri,  7 Jun 2019 02:27:32 +0000 (UTC)
 To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
 References: <20190606184159.979-1-jsnow@redhat.com>
- <20190606184159.979-4-jsnow@redhat.com>
+ <20190606184159.979-5-jsnow@redhat.com>
 From: Eric Blake <eblake@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=eblake@redhat.com; keydata=
@@ -70,22 +70,22 @@ Autocrypt: addr=eblake@redhat.com; keydata=
  Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
  2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
 Organization: Red Hat, Inc.
-Message-ID: <bcb95d93-9411-3cb5-f436-5aacce839ccd@redhat.com>
-Date: Thu, 6 Jun 2019 21:24:07 -0500
+Message-ID: <0d0c47ea-20ce-ba00-0ffd-df35975b71ea@redhat.com>
+Date: Thu, 6 Jun 2019 21:27:31 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190606184159.979-4-jsnow@redhat.com>
+In-Reply-To: <20190606184159.979-5-jsnow@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="F8gQn3o89Bmc7M2rsqadR8DSHCnWCf8IC"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+ boundary="jW1Rcezs4WRTWfMmWxZQ4eKSOjoOsVKq2"
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.40]); Fri, 07 Jun 2019 02:24:17 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.32]); Fri, 07 Jun 2019 02:27:43 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 3/5] block/dirty-bitmap: rework
- bdrv_remove_persistent_dirty_bitmap
+Subject: Re: [Qemu-devel] [PATCH 4/5] block/qcow2-bitmap: Count queued
+ bitmaps towards nb_bitmaps
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -105,57 +105,83 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---F8gQn3o89Bmc7M2rsqadR8DSHCnWCf8IC
-Content-Type: multipart/mixed; boundary="bRe7Ch9w5zBv12IsZE55ju38W1Aj1Alt8";
+--jW1Rcezs4WRTWfMmWxZQ4eKSOjoOsVKq2
+Content-Type: multipart/mixed; boundary="r5NMZvXTj97187P2yCnWuaCXqnbw7sUQY";
  protected-headers="v1"
 From: Eric Blake <eblake@redhat.com>
 To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
 Cc: Fam Zheng <fam@euphon.net>, Max Reitz <mreitz@redhat.com>,
  Markus Armbruster <armbru@redhat.com>, Kevin Wolf <kwolf@redhat.com>,
  vsementsov@virtuozzo.com
-Message-ID: <bcb95d93-9411-3cb5-f436-5aacce839ccd@redhat.com>
-Subject: Re: [PATCH 3/5] block/dirty-bitmap: rework
- bdrv_remove_persistent_dirty_bitmap
+Message-ID: <0d0c47ea-20ce-ba00-0ffd-df35975b71ea@redhat.com>
+Subject: Re: [PATCH 4/5] block/qcow2-bitmap: Count queued bitmaps towards
+ nb_bitmaps
 References: <20190606184159.979-1-jsnow@redhat.com>
- <20190606184159.979-4-jsnow@redhat.com>
-In-Reply-To: <20190606184159.979-4-jsnow@redhat.com>
+ <20190606184159.979-5-jsnow@redhat.com>
+In-Reply-To: <20190606184159.979-5-jsnow@redhat.com>
 
---bRe7Ch9w5zBv12IsZE55ju38W1Aj1Alt8
+--r5NMZvXTj97187P2yCnWuaCXqnbw7sUQY
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
 On 6/6/19 1:41 PM, John Snow wrote:
-> Allow propagating error code information from
-> bdrv_remove_persistent_dirty_bitmap as well.
+> When we check to see if we can store a bitmap, we don't check how many
+> we've queued up. This can cause a problem saving bitmaps on close
+> instead of when we request them to be added. With the stricter add
+> interface, prohibit these bitmaps specifically.
 >=20
-> Give it an interface that matches the newly revised
-> bdrv_add_persistent_dirty_bitmap, including removing the persistent fla=
-g
-> when the operation succeeds and refusing to operate on bitmaps that are=
-
-> not persistent.
+> To match, make the remove interface more strict as well; now rejecting
+> any requests to remove bitmaps that were never queued for storage.
 >=20
-> Signed-off-by: John Snow <jsnow@redhat.com>
+> We don't need to "find" the bitmap when the interface has been given th=
+e
+> bitmap explicitly, but this is done to make sure that the bitmap given
+> actually does belong to the bs we were passed as a paranoia check to
+> enforce consistency.
+>=20
 > ---
 
-> +++ b/include/block/block_int.h
-> @@ -540,9 +540,9 @@ struct BlockDriver {
->      int (*bdrv_add_persistent_dirty_bitmap)(BlockDriverState *bs,
->                                              BdrvDirtyBitmap *bitmap,
->                                              Error **errp);
-> -    void (*bdrv_remove_persistent_dirty_bitmap)(BlockDriverState *bs,
-> -                                                const char *name,
-> -                                                Error **errp);
-> +    int (*bdrv_remove_persistent_dirty_bitmap)(BlockDriverState *bs,
-> +                                               BdrvDirtyBitmap *bitmap=
-,
-> +                                               Error **errp);
+Oops - that marker...
 
-Would it hurt us (in patch 2 and again here) to add a comment about what
-each callback is supposed to do? Just because we've been lousy at
-callback interfaces in the past does not mean that we should continue to
-omit them.
+>=20
+> "What about directory size?" Please see the following patch.
+>=20
+> Signed-off-by: John Snow <jsnow@redhat.com>
+
+=2E..renders the S-o-b invisible.
+
+> +++ b/block/qcow2-bitmap.c
+> @@ -1402,6 +1402,23 @@ static Qcow2Bitmap *find_bitmap_by_name(Qcow2Bit=
+mapList *bm_list,
+>      return NULL;
+>  }
+> =20
+> +static int qcow2_remove_queued_dirty_bitmap(
+> +    BlockDriverState *bs, const char *name, Error **errp)
+> +{
+> +    BDRVQcow2State *s =3D bs->opaque;
+> +    BdrvDirtyBitmap *bitmap =3D bdrv_find_dirty_bitmap(bs, name);
+> +    if (!bitmap) {
+> +        error_setg(errp, "Node '%s' has no stored or enqueued bitmap '=
+%s'",
+> +                   bdrv_get_node_name(bs), name);
+> +        return -ENOENT;
+> +    }
+> +    assert(s->nb_queued_bitmaps > 0);
+> +    assert(bdrv_dirty_bitmap_get_persistence(bitmap));
+> +    s->nb_queued_bitmaps -=3D 1;
+
+I tend to use -- over -=3D 1.
+
+> @@ -1667,6 +1686,8 @@ int qcow2_add_persistent_dirty_bitmap(BlockDriver=
+State *bs,
+>          goto fail;
+>      }
+> =20
+> +    s->nb_queued_bitmaps +=3D 1;
+
+And again, for ++
 
 Reviewed-by: Eric Blake <eblake@redhat.com>
 
@@ -165,24 +191,24 @@ Red Hat, Inc.           +1-919-301-3226
 Virtualization:  qemu.org | libvirt.org
 
 
---bRe7Ch9w5zBv12IsZE55ju38W1Aj1Alt8--
+--r5NMZvXTj97187P2yCnWuaCXqnbw7sUQY--
 
---F8gQn3o89Bmc7M2rsqadR8DSHCnWCf8IC
+--jW1Rcezs4WRTWfMmWxZQ4eKSOjoOsVKq2
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlz5yscACgkQp6FrSiUn
-Q2pr2gf/XVIwO/6iak2nPCeXPdKzNIMTo59zXnnWU5hONLp+Oqc86JVQTGjQp2Fm
-oI+rmLnacWvmHgpa3PxaEeUNQ7wEastR0gzbycL9o7g2sOfBZveDdjNtVDvjtkAN
-IWsONrzb50KIlxTmVPRpbPC2A0SE8IK0VTfOKbb426kydQje4jZR/8RnnnerXbFG
-hLmBprzuIOi1lsZ5tQW/MMVGKukruIeZNqwY+bgch/XrJWzv7KfhqDEyNcE3kYuC
-TEb7zGFegVnP6CAYLeSq3r0s7LQ8ql797M1pxRkDab+TFfG/JyDhfqLoMM7d9Hli
-FvS+NPsQGY+MdkJoo20xkmXnFjSeOQ==
-=otkr
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlz5y5MACgkQp6FrSiUn
+Q2owBAgAjzbKLSMOdhJi+x/t5Ko7t5UePMlENTDuZKoUifc9thIdA2SJYrcTYZkq
+1jniPvi00K4S0GeLLi7aXumwp83q2eqB+cFMMs7wIap3CtXOrWz7Rw6B3HtRFmwt
+vOYuBhvso4HQ/Z0xi2A35k0KueCQjs/8ZgtaR0BZN5nyt++uz89SGpfs34d9Bryl
+6H9EGeg9+Y9b8+K0OeKq4CeL/Oj2AI+ZLz0MFgYMO/FoPrlSJAiD/H1VwqkNU9Md
+G+GbkX5YrFOd8CwGmbPDxL4mVtUIy379eNdUgKBUFyxtOsVcvYacMOHTNZCjjPsQ
+MXyNE75zF+tOwXiQrQqrQgWdR8rzFA==
+=VYtn
 -----END PGP SIGNATURE-----
 
---F8gQn3o89Bmc7M2rsqadR8DSHCnWCf8IC--
+--jW1Rcezs4WRTWfMmWxZQ4eKSOjoOsVKq2--
 
