@@ -2,66 +2,92 @@ Return-Path: <SRS0=3yEa=UG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB87AC2BCA1
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 19:39:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B0C9C2BCA1
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 19:42:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9265C20868
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 19:39:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9265C20868
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 3293520868
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 19:42:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3293520868
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52026 helo=lists.gnu.org)
+Received: from localhost ([::1]:52096 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hZKiQ-0005cY-5o
-	for qemu-devel@archiver.kernel.org; Fri, 07 Jun 2019 15:39:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56375)
+	id 1hZKl8-0007lS-5G
+	for qemu-devel@archiver.kernel.org; Fri, 07 Jun 2019 15:42:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42206)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <no-reply@patchew.org>) id 1hZJwq-00042V-Vl
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 14:50:46 -0400
+ (envelope-from <eblake@redhat.com>) id 1hZJDy-0007tM-Fx
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 14:04:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1hZJwp-0006Ow-Gw
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 14:50:44 -0400
-Resent-Date: Fri, 07 Jun 2019 14:50:44 -0400
-Resent-Message-Id: <E1hZJwp-0006Ow-Gw@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21443)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1hZJwp-0006Mw-87
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 14:50:43 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1559862206; cv=none; d=zoho.com; s=zohoarc; 
- b=ACnV09N4Y3fRctfj/pZqadtXAmhjjRVizKkOoEH4eoAr13dFxblkq4Q5+eMgk931YMIz29jXEQwtVicVG36ep1hgtBc4bG4KYV3ForM48i96WSYRAZRQ8KrzT9Rk+uWomWz/4wxg6DiLBXebYvehUhjTollJ87gUVygmM/KlYhI=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
- s=zohoarc; t=1559862206;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
- bh=gi1+WhWYxX2Tmza/lvLNhXg8pYZU2p9OjWa/SzcxnfA=; 
- b=lPY7jwCFkl1lPdA50MG3Snkj+zdXKKI2iFQ3YMH1sFzCVZXHZV0IcfkbRlmo4IZxlhH3Lm6kv1Kjmgzx9FvwKJ5fCGS8lRl5XKW6271210tDvsmgvChXVx1zIoxi0CLPYwnmtcKUxDOVrnZkdQ7RcBk50/zoJZCts6GV81dgZMI=
-ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1559862203865426.08427601184496;
- Thu, 6 Jun 2019 16:03:23 -0700 (PDT)
-In-Reply-To: <20190606211414.8681-1-crosa@redhat.com>
-Message-ID: <155986220241.32260.14102034332620275193@ce79690b2cb9>
+ (envelope-from <eblake@redhat.com>) id 1hZJDw-00039S-In
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 14:04:22 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49732)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1hZJDw-00035v-46
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 14:04:20 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 214873082126;
+ Fri,  7 Jun 2019 18:04:14 +0000 (UTC)
+Received: from [10.3.116.85] (ovpn-116-85.phx2.redhat.com [10.3.116.85])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 4318D7D656;
+ Fri,  7 Jun 2019 18:04:11 +0000 (UTC)
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ Yoshinori Sato <ysato@users.sourceforge.jp>, qemu-devel@nongnu.org,
+ Igor Mammedov <imammedo@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>
+References: <20190607153725.18055-1-philmd@redhat.com>
+ <20190607153725.18055-16-philmd@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=eblake@redhat.com; keydata=
+ xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
+ xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
+ TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
+ GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
+ sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
+ AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
+ CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
+ RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
+ wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
+ Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
+ gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
+ pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
+ zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
+ pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
+ 3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
+ NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
+ cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
+ SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
+ I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
+ mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
+ Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
+ 2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
+Organization: Red Hat, Inc.
+Message-ID: <de0ec4fd-9041-4926-7920-d66618b78113@redhat.com>
+Date: Fri, 7 Jun 2019 13:04:10 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: crosa@redhat.com
-Date: Thu, 6 Jun 2019 16:03:23 -0700 (PDT)
-X-ZohoMailClient: External
+In-Reply-To: <20190607153725.18055-16-philmd@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="YXbAnx55SnimOjg3UfhNWUvPG0nQazRR8"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.42]); Fri, 07 Jun 2019 18:04:14 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 135.84.80.217
-Subject: Re: [Qemu-devel] [PATCH v6 0/7] Add "boot_linux" acceptance test
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v18 15/29] target/rx: Add RX to SysEmuTarget
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,76 +99,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: fam@euphon.net, ehabkost@redhat.com, alex.bennee@linaro.org,
- cohuck@redhat.com, qemu-devel@nongnu.org, wainersm@redhat.com,
- crosa@redhat.com, philmd@redhat.com, sameo@linux.intel.com
+Cc: Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDYwNjIxMTQxNC44Njgx
-LTEtY3Jvc2FAcmVkaGF0LmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNv
-bWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9y
-bWF0aW9uOgoKU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSCB2NiAwLzddIEFkZCAiYm9vdF9s
-aW51eCIgYWNjZXB0YW5jZSB0ZXN0ClR5cGU6IHNlcmllcwpNZXNzYWdlLWlkOiAyMDE5MDYwNjIx
-MTQxNC44NjgxLTEtY3Jvc2FAcmVkaGF0LmNvbQoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQoj
-IS9iaW4vYmFzaApnaXQgcmV2LXBhcnNlIGJhc2UgPiAvZGV2L251bGwgfHwgZXhpdCAwCmdpdCBj
-b25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYu
-cmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0b2dyYW0K
-Li9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayBiYXNlLi4KPT09IFRFU1QgU0NSSVBU
-IEVORCA9PT0KCkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9xZW11CiAq
-IFtuZXcgdGFnXSAgICAgICAgICAgICAgIHBhdGNoZXcvMjAxOTA2MDYyMTE0MTQuODY4MS0xLWNy
-b3NhQHJlZGhhdC5jb20gLT4gcGF0Y2hldy8yMDE5MDYwNjIxMTQxNC44NjgxLTEtY3Jvc2FAcmVk
-aGF0LmNvbQpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjczNjJkNjdiZWQgdXNlIEF2
-b2NhZG8gZGF0YSBkcmFpbmVyIGZvciBjb25zb2xlIGxvZ2dpbmcKMWM2YWM3MWUwNyBBZGQgImJv
-b3RfbGludXgiIHRlc3QgZm9yIGFhcmNoNjQgYW5kIHZpcnQgbWFjaGluZSB0eXBlCjc2ZGZjNmUy
-OGUgQWRkICJib290X2xpbnV4IiB0ZXN0IGZvciB4ODZfNjQgYW5kIHBjIGFuZCBxMzUgbWFjaGlu
-ZSB0eXBlcwowMWE2OTgwNGMyIEFjY2VwdGFuY2UgdGVzdHM6IGRlcGVuZCBvbiBxZW11LWltZwpi
-N2RjOTY5ZDMxIEFjY2VwdGFuY2UgdGVzdHM6IGFkZCB0aGUgYnVpbGQgZGlyZWN0b3J5IHRvIHRo
-ZSBzeXN0ZW0gUEFUSAo1ZjNiODRjM2I2IEFjY2VwdGFuY2UgdGVzdHM6IGtlZXAgYSBzdGFibGUg
-cmVmZXJlbmNlIHRvIHRoZSBRRU1VIGJ1aWxkIGRpcgo4ZDA4OTkwYzdjIEFjY2VwdGFuY2UgdGVz
-dHM6IHVzZSByZWxhdGl2ZSBsb2NhdGlvbiBmb3IgdGVzdHMKCj09PSBPVVRQVVQgQkVHSU4gPT09
-CjEvNyBDaGVja2luZyBjb21taXQgOGQwODk5MGM3Yzc4IChBY2NlcHRhbmNlIHRlc3RzOiB1c2Ug
-cmVsYXRpdmUgbG9jYXRpb24gZm9yIHRlc3RzKQoyLzcgQ2hlY2tpbmcgY29tbWl0IDVmM2I4NGMz
-YjZmNyAoQWNjZXB0YW5jZSB0ZXN0czoga2VlcCBhIHN0YWJsZSByZWZlcmVuY2UgdG8gdGhlIFFF
-TVUgYnVpbGQgZGlyKQpFUlJPUjogbGluZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzQ4OiBGSUxFOiB0
-ZXN0cy9hY2NlcHRhbmNlL2F2b2NhZG9fcWVtdS9fX2luaXRfXy5weToxNzoKK1NSQ19ST09UX0RJ
-UiA9IG9zLnBhdGguZGlybmFtZShvcy5wYXRoLmRpcm5hbWUob3MucGF0aC5kaXJuYW1lKG9zLnBh
-dGguZGlybmFtZShfX2ZpbGVfXykpKSkKCnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywgOCBs
-aW5lcyBjaGVja2VkCgpQYXRjaCAyLzcgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3
-LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVt
-IHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCjMvNyBD
-aGVja2luZyBjb21taXQgYjdkYzk2OWQzMTFhIChBY2NlcHRhbmNlIHRlc3RzOiBhZGQgdGhlIGJ1
-aWxkIGRpcmVjdG9yeSB0byB0aGUgc3lzdGVtIFBBVEgpCjQvNyBDaGVja2luZyBjb21taXQgMDFh
-Njk4MDRjMmIyIChBY2NlcHRhbmNlIHRlc3RzOiBkZXBlbmQgb24gcWVtdS1pbWcpCjUvNyBDaGVj
-a2luZyBjb21taXQgNzZkZmM2ZTI4ZTIxIChBZGQgImJvb3RfbGludXgiIHRlc3QgZm9yIHg4Nl82
-NCBhbmQgcGMgYW5kIHEzNSBtYWNoaW5lIHR5cGVzKQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3Ig
-ZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiM0MzogCm5l
-dyBmaWxlIG1vZGUgMTAwNjQ0CgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMTA3
-OiBGSUxFOiB0ZXN0cy9hY2NlcHRhbmNlL2Jvb3RfbGludXgucHk6NjA6CisgICAgICAgIGNsb3Vk
-aW5pdC53YWl0X2Zvcl9waG9uZV9ob21lKCgnMC4wLjAuMCcsIHNlbGYucGhvbmVfaG9tZV9wb3J0
-KSwgc2VsZi5uYW1lKQoKdG90YWw6IDAgZXJyb3JzLCAyIHdhcm5pbmdzLCA5NiBsaW5lcyBjaGVj
-a2VkCgpQYXRjaCA1LzcgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55
-IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBt
-YWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KNi83IENoZWNraW5nIGNv
-bW1pdCAxYzZhYzcxZTA3ZjIgKEFkZCAiYm9vdF9saW51eCIgdGVzdCBmb3IgYWFyY2g2NCBhbmQg
-dmlydCBtYWNoaW5lIHR5cGUpCjcvNyBDaGVja2luZyBjb21taXQgNzM2MmQ2N2JlZDM3ICh1c2Ug
-QXZvY2FkbyBkYXRhIGRyYWluZXIgZm9yIGNvbnNvbGUgbG9nZ2luZykKV0FSTklORzogbGluZSBv
-dmVyIDgwIGNoYXJhY3RlcnMKIzM4OiBGSUxFOiB0ZXN0cy9hY2NlcHRhbmNlL2Jvb3RfbGludXgu
-cHk6NjI6CisgICAgICAgIGNvbnNvbGVfZHJhaW5lciA9IGRhdGFkcmFpbmVyLkxpbmVMb2dnZXIo
-c2VsZi52bS5jb25zb2xlX3NvY2tldC5maWxlbm8oKSwKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBj
-aGFyYWN0ZXJzCiMzOTogRklMRTogdGVzdHMvYWNjZXB0YW5jZS9ib290X2xpbnV4LnB5OjYzOgor
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGxvZ2dlcj1z
-ZWxmLmxvZy5nZXRDaGlsZCgnY29uc29sZScpKQoKdG90YWw6IDAgZXJyb3JzLCAyIHdhcm5pbmdz
-LCA1MCBsaW5lcyBjaGVja2VkCgpQYXRjaCA3LzcgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2Ug
-cmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9y
-dCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4K
-PT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKClRo
-ZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAxOTA2
-MDYyMTE0MTQuODY4MS0xLWNyb3NhQHJlZGhhdC5jb20vdGVzdGluZy5jaGVja3BhdGNoLz90eXBl
-PW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFto
-dHRwczovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hl
-dy1kZXZlbEByZWRoYXQuY29t
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--YXbAnx55SnimOjg3UfhNWUvPG0nQazRR8
+Content-Type: multipart/mixed; boundary="s4RFRwRxmTEfkoZakyi6N5JuLugTVv08L";
+ protected-headers="v1"
+From: Eric Blake <eblake@redhat.com>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ Yoshinori Sato <ysato@users.sourceforge.jp>, qemu-devel@nongnu.org,
+ Igor Mammedov <imammedo@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>
+Cc: Markus Armbruster <armbru@redhat.com>
+Message-ID: <de0ec4fd-9041-4926-7920-d66618b78113@redhat.com>
+Subject: Re: [PATCH v18 15/29] target/rx: Add RX to SysEmuTarget
+References: <20190607153725.18055-1-philmd@redhat.com>
+ <20190607153725.18055-16-philmd@redhat.com>
+In-Reply-To: <20190607153725.18055-16-philmd@redhat.com>
 
+--s4RFRwRxmTEfkoZakyi6N5JuLugTVv08L
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+
+On 6/7/19 10:37 AM, Philippe Mathieu-Daud=C3=A9 wrote:
+> From: Richard Henderson <richard.henderson@linaro.org>
+>=20
+> Fixes check-qtest-rx: tests/qmp-cmd-test
+
+Is that in master? If so, what commit id; if not, why not just squash
+this into that patch before merging it?
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
+
+--s4RFRwRxmTEfkoZakyi6N5JuLugTVv08L--
+
+--YXbAnx55SnimOjg3UfhNWUvPG0nQazRR8
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlz6pxoACgkQp6FrSiUn
+Q2qjzAgAi1QIcbADGrE30tQ+ZQsYHcjB4BuY/rDQ33uEPsq/iMNdg4Zq5PGDEhev
+Nwg1J/OEPcc86rbOnkFk9+vgFfjm5HkLa6GclU912io16XG3MoNtoBHqnRqNb6Tk
+DddCZ3lKulAMtnhTvqbwnpirWRx+OQ0xYvOEQ5HNBRsEhYsnIMSen1Op5XuKOJiI
+BUbyzRkx13h8YIzZqFEuODG/Yd3bO+ZEzLeIIy0t7MFFXFU81NRa3e8UE4MDDdh6
+OqF9PoNsYH8ug+wc/rg1L5Rrhf5/JYp+ErZW0z9qQq8PscbMaGNyB8WT8cgUk4Wn
+uBUsovMobFUdZ/uPZpY8SSlhvLNxUQ==
+=VYaz
+-----END PGP SIGNATURE-----
+
+--YXbAnx55SnimOjg3UfhNWUvPG0nQazRR8--
 
