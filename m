@@ -2,87 +2,140 @@ Return-Path: <SRS0=3yEa=UG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C068C2BCA1
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 22:28:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 35003C2BCA1
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 22:28:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 32E1D205ED
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 22:28:15 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="ZO4sBoM7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 32E1D205ED
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
+	by mail.kernel.org (Postfix) with ESMTPS id 09B49205ED
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 22:28:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 09B49205ED
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53832 helo=lists.gnu.org)
+Received: from localhost ([::1]:53834 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hZNLK-0000hs-EJ
-	for qemu-devel@archiver.kernel.org; Fri, 07 Jun 2019 18:28:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48518)
+	id 1hZNLQ-0000uN-AV
+	for qemu-devel@archiver.kernel.org; Fri, 07 Jun 2019 18:28:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56721)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <prvs=0547f94d1=alistair.francis@wdc.com>)
- id 1hZMtB-0005Av-8L
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 17:59:11 -0400
+ (envelope-from <jsnow@redhat.com>) id 1hZNJe-0007t9-QZ
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 18:26:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <prvs=0547f94d1=alistair.francis@wdc.com>)
- id 1hZMtA-0002fN-1n
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 17:59:09 -0400
-Received: from esa1.hgst.iphmx.com ([68.232.141.245]:27163)
+ (envelope-from <jsnow@redhat.com>) id 1hZNJc-00086X-Vx
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 18:26:30 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46900)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <prvs=0547f94d1=alistair.francis@wdc.com>)
- id 1hZMt9-0002eS-EZ; Fri, 07 Jun 2019 17:59:07 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
- d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
- t=1559944747; x=1591480747;
- h=from:to:cc:subject:date:message-id:in-reply-to:
- references:mime-version:content-transfer-encoding;
- bh=N9MZWMpwXoggYB9M8lpugWwG2Kp5spU3B5Fv+B5KyOU=;
- b=ZO4sBoM78uKf8bew2RY5ZZSC1C5/y+Usn5lt31F7J/ScqjWWP6hNhZEc
- pYY6/1M/ycg+idHLqwUU673PBEmEtlo5O+Y/BjBH1slzMhxf9pdXd8T9O
- jLG3b1aXgjeThct/melRBrK+w1W2pGwuqk0jRvqQoz9tPhNPaAHIFT5N+
- GRUitSjRiA8/aTWogYeSPkPABprw/xzTIm7KnnbTrj5+ppukIzWu8hGI9
- PWWpbZfYOdS21bKBJ47iJVZpZn+zTyodEmK4oR71+vC18B+w47nTy0wXq
- YnaVpqDfXeUDXsPgKjZbtWvNT7Vdmv2JVI3hgi7r+Peaifg6FKB6IZwBA g==;
-X-IronPort-AV: E=Sophos;i="5.63,564,1557158400"; d="scan'208";a="216378111"
-Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com)
- ([199.255.45.15])
- by ob1.hgst.iphmx.com with ESMTP; 08 Jun 2019 05:58:53 +0800
-IronPort-SDR: 9sOMxpHKvFvskWiS3nH4EMTwoESP5jOOCo7IbbgQjOTas6+ovS9dIwxDZMN3BsINZ322HSAYAC
- nJQBXcb7zZdyU+G/R7nnZpk1vcnTTY7CWajQhLkwmOMaoJAoXGoVkP6LdcQQ6dzM81Oj4qbwGK
- P9b7X8phltXseC2Ty4M4OHCXIEddPzoqS9n5aUFJbn5eyyE1Op0cayLOyRyR4YLADQa0aJyQrU
- yXLmTLWXdOn29zA0ty3PBnm6vq4uwfB8+bZH1BgZKkDq2SJUBh/I49VosknFSuY4qcm/elbyMN
- nvp9uje3cAaev4J/VpZn0OmV
-Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
- by uls-op-cesaep02.wdc.com with ESMTP; 07 Jun 2019 14:36:09 -0700
-IronPort-SDR: CE3fJVof/5GDSr52x3AK56FS1t2AZJsoqCPWKyDpOine8mjHsBz2Dtno42b9arWfivpaADX1Dh
- 92/kQG10z8SOE2h8y15PseEfKN2g77LC5lQ1jDzzoBGJaeAk9ks/GOAdM0rD1mWQMcgoUY4rmH
- EowDDvf/ymTbiavJMW/ULNKVMvLD2Vri87ZM1lhgbeSOv/VmdQJaixsqZL/a08YyRt4IsQl6M1
- 3diKLiczClwvBZo2/VJ8xqbBN6vQtvHTdgaBIE1zM50gCbl506DB+m9y2B8scCKdE50W6LpvQr
- UOQ=
-Received: from risc6-mainframe.sdcorp.global.sandisk.com (HELO
- risc6-mainframe.int.fusionio.com) ([10.196.157.140])
- by uls-op-cesaip02.wdc.com with ESMTP; 07 Jun 2019 14:58:53 -0700
-From: Alistair Francis <alistair.francis@wdc.com>
-To: qemu-devel@nongnu.org,
-	qemu-riscv@nongnu.org
-Date: Fri,  7 Jun 2019 14:56:43 -0700
-Message-Id: <37e3a80ef4ba355fcaf1cc762b15ad96af8373f9.1559944445.git.alistair.francis@wdc.com>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <cover.1559944445.git.alistair.francis@wdc.com>
-References: <cover.1559944445.git.alistair.francis@wdc.com>
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>)
+ id 1hZNJZ-0007yo-C7; Fri, 07 Jun 2019 18:26:25 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 45214285AE;
+ Fri,  7 Jun 2019 22:26:14 +0000 (UTC)
+Received: from [10.10.120.179] (ovpn-120-179.rdu2.redhat.com [10.10.120.179])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 9DA6E5D707;
+ Fri,  7 Jun 2019 22:26:06 +0000 (UTC)
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-devel@nongnu.org, qemu-block@nongnu.org
+References: <20190603120005.37394-1-vsementsov@virtuozzo.com>
+From: John Snow <jsnow@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <54598cf4-a326-5385-2d86-d2dd43f26f47@redhat.com>
+Date: Fri, 7 Jun 2019 18:26:05 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 68.232.141.245
-Subject: [Qemu-devel] [PATCH v1 26/27] target/riscv: Call the second stage
- MMU in virtualisation mode
+In-Reply-To: <20190603120005.37394-1-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.30]); Fri, 07 Jun 2019 22:26:24 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH 0/4] qapi: block-dirty-bitmap-remove
+ transaction action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,174 +147,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: alistair23@gmail.com, palmer@sifive.com, alistair.francis@wdc.com
+Cc: kwolf@redhat.com, fam@euphon.net, armbru@redhat.com, mreitz@redhat.com,
+ nshirokovskiy@virtuozzo.com, den@openvz.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The qemu_log_mask(CPU_LOG_MMU,... calls trigger false positive
-checkpatch errors which are being ignored.
 
-Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
----
- target/riscv/cpu_helper.c | 118 ++++++++++++++++++++++++++++++++------
- 1 file changed, 99 insertions(+), 19 deletions(-)
 
-diff --git a/target/riscv/cpu_helper.c b/target/riscv/cpu_helper.c
-index ece3eadf66..023368c2ce 100644
---- a/target/riscv/cpu_helper.c
-+++ b/target/riscv/cpu_helper.c
-@@ -582,15 +582,23 @@ static void raise_mmu_exception(CPURISCVState *env, target_ulong address,
- hwaddr riscv_cpu_get_phys_page_debug(CPUState *cs, vaddr addr)
- {
-     RISCVCPU *cpu = RISCV_CPU(cs);
-+    CPURISCVState *env = &cpu->env;
-     hwaddr phys_addr;
-     int prot;
-     int mmu_idx = cpu_mmu_index(&cpu->env, false);
- 
--    if (get_physical_address(&cpu->env, &phys_addr, &prot, addr, 0, mmu_idx,
--                             true, false)) {
-+    if (get_physical_address(env, &phys_addr, &prot, addr, 0, mmu_idx,
-+                             true, riscv_cpu_virt_enabled(env))) {
-         return -1;
-     }
- 
-+    if (riscv_cpu_virt_enabled(env)) {
-+        if (get_physical_address(env, &phys_addr, &prot, phys_addr,
-+                                 0, mmu_idx, false, true)) {
-+            return -1;
-+        }
-+    }
-+
-     return phys_addr;
- }
- 
-@@ -641,34 +649,106 @@ bool riscv_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
- #ifndef CONFIG_USER_ONLY
-     RISCVCPU *cpu = RISCV_CPU(cs);
-     CPURISCVState *env = &cpu->env;
-+    vaddr im_address;
-     hwaddr pa = 0;
-     int prot;
-+    bool m_mode_two_stage = false;
-+    bool hs_mode_two_stage = false;
-     int ret = TRANSLATE_FAIL;
- 
-     qemu_log_mask(CPU_LOG_MMU, "%s ad %" VADDR_PRIx " rw %d mmu_idx %d\n",
-                   __func__, address, access_type, mmu_idx);
- 
--    ret = get_physical_address(env, &pa, &prot, address, access_type, mmu_idx,
--                               true, false);
-+    /*
-+     * Determine if we are in M mode and MPRV is set or in HS mode and SPRV is
-+     * set and we want to access a virtulisation address.
-+     */
-+    if (riscv_has_ext(env, RVH)) {
-+        m_mode_two_stage = env->priv == PRV_M &&
-+                           access_type != MMU_INST_FETCH &&
-+                           get_field(env->mstatus, MSTATUS_MPRV) &&
-+                           get_field(env->mstatus, MSTATUS_MPV);
-+
-+        hs_mode_two_stage = env->priv == PRV_S &&
-+                            !riscv_cpu_virt_enabled(env) &&
-+                            access_type != MMU_INST_FETCH &&
-+                            get_field(env->hstatus, HSTATUS_SPRV) &&
-+                            get_field(env->hstatus, HSTATUS_SPV);
-+    }
-+
-+    if (riscv_cpu_virt_enabled(env) || m_mode_two_stage || hs_mode_two_stage) {
-+        /* Two stage lookup */
-+        ret = get_physical_address(env, &pa, &prot, address, access_type,
-+                                   mmu_idx, true, true);
- 
--    qemu_log_mask(CPU_LOG_MMU,
--                  "%s address=%" VADDR_PRIx " ret %d physical " TARGET_FMT_plx
--                  " prot %d\n", __func__, address, ret, pa, prot);
-+        qemu_log_mask(CPU_LOG_MMU,
-+                      "%s 1st-stage address=%" VADDR_PRIx " ret %d physical "
-+                      TARGET_FMT_plx " prot %d\n",
-+                      __func__, address, ret, pa, prot);
- 
--    if (riscv_feature(env, RISCV_FEATURE_PMP) &&
--        !pmp_hart_has_privs(env, pa, TARGET_PAGE_SIZE, 1 << access_type)) {
--        ret = TRANSLATE_FAIL;
--    }
--    if (ret == TRANSLATE_SUCCESS) {
--        tlb_set_page(cs, address & TARGET_PAGE_MASK, pa & TARGET_PAGE_MASK,
--                     prot, mmu_idx, TARGET_PAGE_SIZE);
--        return true;
--    } else if (probe) {
--        return false;
-+        if (ret == TRANSLATE_FAIL) {
-+            if (!probe) {
-+                raise_mmu_exception(env, address, access_type, true);
-+                riscv_raise_exception(env, cs->exception_index, retaddr);
-+            }
-+            return ret;
-+        }
-+
-+        /* Second stage lookup */
-+        im_address = pa;
-+
-+        ret = get_physical_address(env, &pa, &prot, im_address, access_type, mmu_idx,
-+                                   false, true);
-+
-+        qemu_log_mask(CPU_LOG_MMU,
-+                "%s 2nd-stage address=%" VADDR_PRIx " ret %d physical "
-+                TARGET_FMT_plx " prot %d\n",
-+                __func__, im_address, ret, pa, prot);
-+
-+        if (riscv_feature(env, RISCV_FEATURE_PMP) &&
-+            !pmp_hart_has_privs(env, pa, TARGET_PAGE_SIZE, 1 << access_type)) {
-+            ret = TRANSLATE_FAIL;
-+        }
-+
-+        if (ret == TRANSLATE_FAIL) {
-+            /*
-+             * Guest physical address translation failed, this is a HS
-+             * level exception
-+             */
-+            if (!probe) {
-+                raise_mmu_exception(env, im_address | (address & (TARGET_PAGE_SIZE - 1)), access_type, false);
-+                riscv_raise_exception(env, cs->exception_index, retaddr);
-+            }
-+            return ret;
-+        }
-     } else {
--        raise_mmu_exception(env, address, access_type, true);
--        riscv_raise_exception(env, cs->exception_index, retaddr);
-+        /* Single stage lookup */
-+        ret = get_physical_address(env, &pa, &prot, address, access_type,
-+                                   mmu_idx, true, false);
-+
-+        qemu_log_mask(CPU_LOG_MMU,
-+                      "%s address=%" VADDR_PRIx " ret %d physical "
-+                      TARGET_FMT_plx " prot %d\n",
-+                      __func__, address, ret, pa, prot);
-+
-+        if (riscv_feature(env, RISCV_FEATURE_PMP) &&
-+            !pmp_hart_has_privs(env, pa, TARGET_PAGE_SIZE, 1 << access_type)) {
-+            ret = TRANSLATE_FAIL;
-+        }
-+
-+        if (ret == TRANSLATE_FAIL) {
-+            if (!probe) {
-+                raise_mmu_exception(env, address, access_type, true);
-+                riscv_raise_exception(env, cs->exception_index, retaddr);
-+            }
-+            return ret;
-+        }
-     }
-+
-+    tlb_set_page(cs, address & TARGET_PAGE_MASK, pa & TARGET_PAGE_MASK,
-+                 prot, mmu_idx, TARGET_PAGE_SIZE);
-+    return true;
-+
- #else
-     switch (access_type) {
-     case MMU_INST_FETCH:
--- 
-2.21.0
+On 6/3/19 8:00 AM, Vladimir Sementsov-Ogievskiy wrote:
+> Hi all!
+> 
+> Here is block-dirty-bitmap-remove transaction action.
+> 
+> It is used to do transactional movement of the bitmap (which is
+> possible in conjunction with merge command). Transactional bitmap
+> movement is needed in scenarios with external snapshot, when we don't
+> want to leave copy of the bitmap in the base image.
+> 
+
+Oh, interesting. I see why you want this now. OK, let's do it.
+
+> Implementation itself in 03, in short:
+> 
+> .prepare: make bitmap unnamed and non-persistent, delete stored version
+>           of the bitmap from the image
+> 
+> .commit: release bitmap
+> 
+> .abort: restore bitmap name and persistence. We don't restore bitmap
+>         version in the image. It's not critical, we have in-RAM version,
+>         it will be stored on shutdown
+> 
+> Vladimir Sementsov-Ogievskiy (4):
+>   blockdev: reduce aio_context locked sections in bitmap add/remove
+>   block/dirty-bitmap: add hide/unhide API
+>   qapi: implement block-dirty-bitmap-remove transaction action
+>   iotests: test bitmap moving inside 254
+> 
+>  qapi/transaction.json        |   2 +
+>  include/block/dirty-bitmap.h |   2 +
+>  block/dirty-bitmap.c         |  26 +++++++++
+>  blockdev.c                   | 100 +++++++++++++++++++++++++++--------
+>  tests/qemu-iotests/254       |  30 ++++++++++-
+>  tests/qemu-iotests/254.out   |  82 ++++++++++++++++++++++++++++
+>  6 files changed, 219 insertions(+), 23 deletions(-)
+> 
 
 
