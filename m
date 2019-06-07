@@ -2,64 +2,80 @@ Return-Path: <SRS0=3yEa=UG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.0 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A96EFC2BCA1
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 18:16:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AD060C2BCA1
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 18:17:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 428BE20868
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 18:16:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 428BE20868
+	by mail.kernel.org (Postfix) with ESMTPS id 8BA8E20868
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 18:17:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8BA8E20868
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50116 helo=lists.gnu.org)
+Received: from localhost ([::1]:50126 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hZJPv-0000xa-TO
-	for qemu-devel@archiver.kernel.org; Fri, 07 Jun 2019 14:16:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54140)
+	id 1hZJQj-0001hS-0L
+	for qemu-devel@archiver.kernel.org; Fri, 07 Jun 2019 14:17:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56219)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <armbru@redhat.com>) id 1hZH0Q-00043l-KJ
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 11:42:20 -0400
+ (envelope-from <philmd@redhat.com>) id 1hZH38-00068z-Cg
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 11:45:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1hZGlq-0000RQ-4l
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 11:27:13 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53442)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hZGlp-0008Ho-TP
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 11:27:10 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 2114FF9E9C
- for <qemu-devel@nongnu.org>; Fri,  7 Jun 2019 15:26:54 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-148.ams2.redhat.com
- [10.36.116.148])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id A5CAB7DE56;
- Fri,  7 Jun 2019 15:26:51 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 23D4211384D2; Fri,  7 Jun 2019 17:26:47 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: qemu-devel@nongnu.org
-Date: Fri,  7 Jun 2019 17:26:46 +0200
-Message-Id: <20190607152646.4822-13-armbru@redhat.com>
-In-Reply-To: <20190607152646.4822-1-armbru@redhat.com>
-References: <20190607152646.4822-1-armbru@redhat.com>
+ (envelope-from <philmd@redhat.com>) id 1hZH35-0003Tt-Ey
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 11:45:01 -0400
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:44485)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hZH33-0001l7-Sw
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 11:44:58 -0400
+Received: by mail-wr1-f68.google.com with SMTP id b17so2617626wrq.11
+ for <qemu-devel@nongnu.org>; Fri, 07 Jun 2019 08:43:39 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=FYRkl8iCUme4qVWAdiVljKg5yHotz5W0hkostJEMbVc=;
+ b=YNxgTEWt2p8RkFZzkxC1OLwMJXFYlhyuidkI73J+q+mXpY3yAtyyLLshlMq6HViWkk
+ +MDaK+89PeMenSG9WOwNgFsPKT+AHZ/B3IxpPXl/MM8sPRGUyDFRWn/7TRHFLI/xqpWB
+ z0F/IOrlkoVQDbiT6yEGhPk6da3NID+wqPUEShIqIa3zaNVaMXZGlCMJOJZdHf1/i7qU
+ 5fNM3E9tu2XRUjtk8PMzxOQ0mPIupSuG738jZIjp1krJFmUI5oC+qWSgFg4sX9huRRyC
+ ohnQF98nRvaUiszbN6TlFBdHZYy+G8GNzYQE1aPcmXLL4Bb2NB5mWdlSHFaNBklhc6ap
+ 01Tw==
+X-Gm-Message-State: APjAAAXeWgiUhYwGHc3L+tBX2j1c0kUh3j7kDtjXZCWpqtlmsgIOJWqa
+ F5IkcnK/7Bedn5j6Gg+DmBVLnQ==
+X-Google-Smtp-Source: APXvYqzxvseeuHIU4xEpZFP4LbxpxFvlAmcqkpnyJQBfWIfyioqiKwgtTutVO3p5oz1TR987j0wfVQ==
+X-Received: by 2002:a5d:474a:: with SMTP id o10mr8061764wrs.157.1559922218185; 
+ Fri, 07 Jun 2019 08:43:38 -0700 (PDT)
+Received: from [192.168.0.156] ([78.192.181.46])
+ by smtp.gmail.com with ESMTPSA id c17sm1830740wrv.82.2019.06.07.08.43.37
+ (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+ Fri, 07 Jun 2019 08:43:37 -0700 (PDT)
+To: Yoshinori Sato <ysato@users.sourceforge.jp>, qemu-devel@nongnu.org,
+ Igor Mammedov <imammedo@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>
+References: <20190607153725.18055-1-philmd@redhat.com>
+ <20190607153725.18055-6-philmd@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+ url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <c18e62f2-0c69-29ab-d447-9ca24315c549@redhat.com>
+Date: Fri, 7 Jun 2019 17:43:36 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.38]); Fri, 07 Jun 2019 15:26:54 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20190607153725.18055-6-philmd@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 12/12] MAINTAINERS: Polish headline decorations
+ [fuzzy]
+X-Received-From: 209.85.221.68
+Subject: Re: [Qemu-devel] [PATCH v18 05/29] !fixup target/rx: CPU definition
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,96 +87,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Message-Id: <20190606172408.18399-4-armbru@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
----
- MAINTAINERS | 24 +++++++++++-------------
- 1 file changed, 11 insertions(+), 13 deletions(-)
+On 6/7/19 5:37 PM, Philippe Mathieu-Daudé wrote:
+> New qom-cpu style requested by Igor.
+> 
+> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+> ---
+>  target/rx/cpu.c | 19 +++++++++++++++----
+>  1 file changed, 15 insertions(+), 4 deletions(-)
+> 
+> diff --git a/target/rx/cpu.c b/target/rx/cpu.c
+> index 3c43467534..c370f65faa 100644
+> --- a/target/rx/cpu.c
+> +++ b/target/rx/cpu.c
+> @@ -80,7 +80,7 @@ static void rx_cpu_list_entry(gpointer data, gpointer user_data)
+>  void rx_cpu_list(void)
+>  {
+>      GSList *list;
+> -    list = object_class_get_list_sorted(TYPE_RXCPU, false);
+> +    list = object_class_get_list_sorted(TYPE_RX_CPU, false);
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 5cef4aa5bd..3ec8f3b009 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -65,7 +65,7 @@ F: *
- F: */
-=20
- Responsible Disclosure, Reporting Security Issues
--------------------------------
-+-------------------------------------------------
- W: https://wiki.qemu.org/SecurityProcess
- M: Michael S. Tsirkin <mst@redhat.com>
- L: secalert@redhat.com
-@@ -106,8 +106,8 @@ K: ^Subject:.*(?i)s390x?
- T: git https://github.com/cohuck/qemu.git s390-next
- L: qemu-s390x@nongnu.org
-=20
--Guest CPU cores (TCG):
------------------------
-+Guest CPU cores (TCG)
-+---------------------
- Overall TCG CPUs
- M: Richard Henderson <rth@twiddle.net>
- R: Paolo Bonzini <pbonzini@redhat.com>
-@@ -343,9 +343,8 @@ M: Alex Benn=C3=A9e <alex.bennee@linaro.org>
- S: Maintained
- F: tests/tcg/multiarch/
-=20
--Guest CPU Cores (KVM):
------------------------
--
-+Guest CPU Cores (KVM)
-+---------------------
- Overall KVM CPUs
- M: Paolo Bonzini <pbonzini@redhat.com>
- L: kvm@vger.kernel.org
-@@ -401,9 +400,8 @@ S: Supported
- F: target/i386/kvm.c
- F: scripts/kvm/vmxcap
-=20
--Guest CPU Cores (Xen):
------------------------
--
-+Guest CPU Cores (Xen)
-+---------------------
- X86 Xen CPUs
- M: Stefano Stabellini <sstabellini@kernel.org>
- M: Anthony Perard <anthony.perard@citrix.com>
-@@ -424,9 +422,8 @@ F: include/hw/block/dataplane/xen*
- F: include/hw/xen/
- F: include/sysemu/xen-mapcache.h
-=20
--Hosts:
--------
--
-+Hosts
-+-----
- LINUX
- M: Michael S. Tsirkin <mst@redhat.com>
- M: Cornelia Huck <cohuck@redhat.com>
-@@ -463,6 +460,7 @@ X: qga/*win32*
- F: qemu.nsi
-=20
- Alpha Machines
-+--------------
- M: Richard Henderson <rth@twiddle.net>
- S: Maintained
- F: hw/alpha/
-@@ -1197,7 +1195,7 @@ F: hw/s390x/s390-pci*
- L: qemu-s390x@nongnu.org
-=20
- UniCore32 Machines
---------------
-+------------------
- PKUnity-3 SoC initramfs-with-busybox
- M: Guan Xuetao <gxt@mprc.pku.edu.cn>
- S: Maintained
---=20
-2.21.0
+This line belongs to the previous !fixup patch, but it is a fixup anyway...
 
+>      g_slist_foreach(list, rx_cpu_list_entry, NULL);
+>      g_slist_free(list);
+>  }
 
