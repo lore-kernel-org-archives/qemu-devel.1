@@ -6,75 +6,74 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C683C2BCA1
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 13:43:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 104D5C2BCA1
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 13:44:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4233A20840
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 13:43:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4233A20840
+	by mail.kernel.org (Postfix) with ESMTPS id DC8A620840
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 13:44:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DC8A620840
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51241 helo=lists.gnu.org)
+Received: from localhost ([::1]:51244 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hZF9k-0000ZD-E3
-	for qemu-devel@archiver.kernel.org; Fri, 07 Jun 2019 09:43:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41041)
+	id 1hZFAJ-00016x-6Q
+	for qemu-devel@archiver.kernel.org; Fri, 07 Jun 2019 09:44:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40636)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <philmd@redhat.com>) id 1hZF8K-0007tj-Jf
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 09:42:18 -0400
+ (envelope-from <philmd@redhat.com>) id 1hZF78-0006jO-88
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 09:41:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1hZF8I-00088a-Sp
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 09:42:16 -0400
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:37189)
+ (envelope-from <philmd@redhat.com>) id 1hZF77-0006Dh-6W
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 09:41:02 -0400
+Received: from mail-wm1-f66.google.com ([209.85.128.66]:51344)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hZF8I-00081D-MN
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 09:42:14 -0400
-Received: by mail-wr1-f68.google.com with SMTP id v14so2224090wrr.4
- for <qemu-devel@nongnu.org>; Fri, 07 Jun 2019 06:42:11 -0700 (PDT)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hZF75-00065d-Bw
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 09:41:00 -0400
+Received: by mail-wm1-f66.google.com with SMTP id f10so2146570wmb.1
+ for <qemu-devel@nongnu.org>; Fri, 07 Jun 2019 06:40:59 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
  :date:user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=Y1UgQePrZd4MkCNM6uaxtsR3eqH1fhysdjC9nkbB+5I=;
- b=HbHwIJcfYQjROMnlki/T/kQ8osW4vhQSiwk3H9bW85+wPXMuSYiDA7O+hAUg3y1H+q
- SDNLnXtcNJBAGqYy43WXMmXHk/mSwNORO2Dg9MA6fnPq9LcTkFUvbsQz2lpV+crQ9QnW
- FgL0FvHi0ZJSUpDw6OPmj/VfM1O/ycPWi8U4xfACwuNw9RB91+t0jUG/BbzNgvxLAkNt
- nWtbwgSpWx49YyO+Xax0zRaOq4fz7kN1sBtO5Wfttk2AKvoj7MYEvsjn4FrROY9nAadW
- +RRwcmyqlJdt7LudQoiYDdI9bGgTktc7GAM+uw2RdBB3HAOklDKJKeKItEGvBSxMWijY
- YXHw==
-X-Gm-Message-State: APjAAAUZ6hHly/bGPGrS9RT4ovVEbCiB959CAM/NfPObsWUTiIY1M9gc
- efcKQTyKekIR/AltiHZUsp3l4Q==
-X-Google-Smtp-Source: APXvYqyXupdha2fWALUtc3tSfB372FJ0I05pCigpOYwDpC3j3wpBUFBaNKdJV/wLDSmp8R+pRlrbyw==
-X-Received: by 2002:adf:ecca:: with SMTP id s10mr17196911wro.168.1559914930924; 
- Fri, 07 Jun 2019 06:42:10 -0700 (PDT)
+ bh=jFklL2F7wjhT84Oyot0hKw3PudVVsZ/uVvh9m/H4EFA=;
+ b=Kvks6/y9KaxPXYEqB5sFDXouEmP6ixhtq2h/3MvZMHcTwSDNrysfNECYsnhUjo1Deu
+ 6dti++/0UnTW9J+nLspQgjpN+WG9IBRLS/dMpJIz+Ct38Rc5YTKE4iZ5XewrI2FdEsQ4
+ pMIU0LhXgAqV72NfutZscYZ/ngzCLus3zfL/qs5oSwVfbD96GTW+PQdFypkyxUdeWlb2
+ oi8P+gtasRBO+aDOpc63tMUKzyyg4nt4h1Ia0kFnmRvJ5NTt8/8dzaNMlcDDI35GfjUa
+ 7FwEVArEZhTLor4NxZ3E0Z+t99dHYwnr6ynm2uTz4XZaSrKtTpoksIsD9xHnpricedfd
+ 3Pbw==
+X-Gm-Message-State: APjAAAWvh71yZ36UBIQN9O5xCWfDGI8dmsUNPiltKmACfaZqyIeGIsu7
+ iMrwf3oLyFSgX3yaNxcoZb6HOw==
+X-Google-Smtp-Source: APXvYqxKXCWzd8/a0Cd5TT2C4GUf8jm4ncRaamrmin3/bffqN/kPSDt4O/6IlnWfizbnOf2U1ffp5w==
+X-Received: by 2002:a1c:2358:: with SMTP id j85mr3877489wmj.46.1559914858301; 
+ Fri, 07 Jun 2019 06:40:58 -0700 (PDT)
 Received: from [192.168.0.156] ([78.192.181.46])
- by smtp.gmail.com with ESMTPSA id l4sm1706983wmh.18.2019.06.07.06.42.10
+ by smtp.gmail.com with ESMTPSA id j3sm2069966wrt.73.2019.06.07.06.40.57
  (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
- Fri, 07 Jun 2019 06:42:10 -0700 (PDT)
+ Fri, 07 Jun 2019 06:40:57 -0700 (PDT)
 To: Yoshinori Sato <ysato@users.sourceforge.jp>, qemu-devel@nongnu.org
 References: <20190607091116.49044-1-ysato@users.sourceforge.jp>
- <20190607091116.49044-24-ysato@users.sourceforge.jp>
+ <20190607091116.49044-16-ysato@users.sourceforge.jp>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
  url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <48581c4c-f3e1-9647-6701-ae79c2a50221@redhat.com>
-Date: Fri, 7 Jun 2019 15:42:10 +0200
+Message-ID: <52b99176-faf0-b72d-4514-02e600ec1124@redhat.com>
+Date: Fri, 7 Jun 2019 15:40:57 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190607091116.49044-24-ysato@users.sourceforge.jp>
+In-Reply-To: <20190607091116.49044-16-ysato@users.sourceforge.jp>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.85.221.68
-Subject: Re: [Qemu-devel] [PATCH v17 23/24] target/rx: Dump bytes for each
- insn during disassembly
+X-Received-From: 209.85.128.66
+Subject: Re: [Qemu-devel] [PATCH v17 15/24] hw/rx: Honor -accel qtest
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,47 +93,52 @@ Sender: "Qemu-devel"
 On 6/7/19 11:11 AM, Yoshinori Sato wrote:
 > From: Richard Henderson <richard.henderson@linaro.org>
 > 
-> There are so many different forms of each RX instruction
-> that it will be very useful to be able to look at the bytes
-> to see on which path a bug may lie.
+> Issue an error if no kernel, no bios, and not qtest'ing.
+> Fixes make check-qtest-rx: test/qom-test.
 > 
-> Reviewed-by: Yoshinori Sato <ysato@users.sourceforge.jp>
 > Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
 
 Again:
 Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-> Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
 > ---
->  target/rx/disas.c | 16 +++++++++++++++-
->  1 file changed, 15 insertions(+), 1 deletion(-)
+>  hw/rx/rx62n.c | 10 +++++++++-
+>  1 file changed, 9 insertions(+), 1 deletion(-)
 > 
-> diff --git a/target/rx/disas.c b/target/rx/disas.c
-> index 5a32a87534..d73b53db44 100644
-> --- a/target/rx/disas.c
-> +++ b/target/rx/disas.c
-> @@ -102,7 +102,21 @@ static int bdsp_s(DisasContext *ctx, int d)
->  /* Include the auto-generated decoder.  */
->  #include "decode.inc.c"
+> diff --git a/hw/rx/rx62n.c b/hw/rx/rx62n.c
+> index 3a8fe7b0bf..e55257c622 100644
+> --- a/hw/rx/rx62n.c
+> +++ b/hw/rx/rx62n.c
+> @@ -21,11 +21,13 @@
 >  
-> -#define prt(...) (ctx->dis->fprintf_func)((ctx->dis->stream), __VA_ARGS__)
-> +static void dump_bytes(DisasContext *ctx)
-> +{
-> +    int i, len = ctx->len;
-> +
-> +    for (i = 0; i < len; ++i) {
-> +        ctx->dis->fprintf_func(ctx->dis->stream, "%02x ", ctx->bytes[i]);
-> +    }
-> +    ctx->dis->fprintf_func(ctx->dis->stream, "%*c", (8 - i) * 3, '\t');
-> +}
-> +
-> +#define prt(...) \
-> +    do {                                                        \
-> +        dump_bytes(ctx);                                        \
-> +        ctx->dis->fprintf_func(ctx->dis->stream, __VA_ARGS__);  \
-> +    } while (0)
+>  #include "qemu/osdep.h"
+>  #include "qapi/error.h"
+> +#include "qemu/error-report.h"
+>  #include "hw/hw.h"
+>  #include "hw/rx/rx62n.h"
+>  #include "hw/loader.h"
+>  #include "hw/sysbus.h"
+>  #include "sysemu/sysemu.h"
+> +#include "sysemu/qtest.h"
+>  #include "cpu.h"
 >  
->  #define RX_MEMORY_BYTE 0
->  #define RX_MEMORY_WORD 1
+>  /*
+> @@ -190,8 +192,14 @@ static void rx62n_realize(DeviceState *dev, Error **errp)
+>      memory_region_init_rom(&s->c_flash, NULL, "codeflash",
+>                             RX62N_CFLASH_SIZE, errp);
+>      memory_region_add_subregion(s->sysmem, RX62N_CFLASH_BASE, &s->c_flash);
+> +
+>      if (!s->kernel) {
+> -        rom_add_file_fixed(bios_name, RX62N_CFLASH_BASE, 0);
+> +        if (bios_name) {
+> +            rom_add_file_fixed(bios_name, RX62N_CFLASH_BASE, 0);
+> +        }  else if (!qtest_enabled()) {
+> +            error_report("No bios or kernel specified");
+> +            exit(1);
+> +        }
+>      }
+>  
+>      object_initialize_child(OBJECT(s), "cpu", &s->cpu,
 > 
 
