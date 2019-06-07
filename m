@@ -3,61 +3,62 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 61920C2BCA1
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 17:51:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E9871C2BCA1
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 17:53:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 331D2208C3
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 17:51:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 331D2208C3
+	by mail.kernel.org (Postfix) with ESMTPS id 7E664208C0
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 17:53:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7E664208C0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49904 helo=lists.gnu.org)
+Received: from localhost ([::1]:49916 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hZJ1x-0007GP-Kf
-	for qemu-devel@archiver.kernel.org; Fri, 07 Jun 2019 13:51:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53389)
+	id 1hZJ3p-0000gp-Nj
+	for qemu-devel@archiver.kernel.org; Fri, 07 Jun 2019 13:53:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54159)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <philmd@redhat.com>) id 1hZGzz-0003Yj-Bo
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 11:41:56 -0400
+ (envelope-from <armbru@redhat.com>) id 1hZH0Q-00045E-92
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 11:42:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1hZGwn-0001UP-Uv
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 11:38:32 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51956)
+ (envelope-from <armbru@redhat.com>) id 1hZGls-0000aG-IQ
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 11:27:19 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58557)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hZGwk-0001Dm-R0
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 11:38:29 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hZGlr-000837-KN
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 11:27:11 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 317E0C1EB212;
- Fri,  7 Jun 2019 15:38:17 +0000 (UTC)
-Received: from x1w.redhat.com (unknown [10.40.205.135])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 940E080882;
- Fri,  7 Jun 2019 15:38:15 +0000 (UTC)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-To: Yoshinori Sato <ysato@users.sourceforge.jp>, qemu-devel@nongnu.org,
- Igor Mammedov <imammedo@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>
-Date: Fri,  7 Jun 2019 17:37:06 +0200
-Message-Id: <20190607153725.18055-11-philmd@redhat.com>
-In-Reply-To: <20190607153725.18055-1-philmd@redhat.com>
-References: <20190607153725.18055-1-philmd@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id C0EBDC010924;
+ Fri,  7 Jun 2019 15:26:48 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-148.ams2.redhat.com
+ [10.36.116.148])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 681AD10AFF08;
+ Fri,  7 Jun 2019 15:26:48 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id EB59111386B0; Fri,  7 Jun 2019 17:26:46 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: qemu-devel@nongnu.org
+Date: Fri,  7 Jun 2019 17:26:36 +0200
+Message-Id: <20190607152646.4822-3-armbru@redhat.com>
+In-Reply-To: <20190607152646.4822-1-armbru@redhat.com>
+References: <20190607152646.4822-1-armbru@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.32]); Fri, 07 Jun 2019 15:38:17 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.31]); Fri, 07 Jun 2019 15:26:50 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v18 10/29] hw/rx: RX Target hardware definition
+Subject: [Qemu-devel] [PULL 02/12] qemu-common: Move qemu_isalnum() etc. to
+ qemu/ctype.h
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,553 +70,374 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: Richard Henderson <richard.henderson@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Yoshinori Sato <ysato@users.sourceforge.jp>
-
-rx62n - RX62N cpu.
-rx-virt - RX QEMU virtual target.
-
-Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
-Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Message-Id: <20190607091116.49044-9-ysato@users.sourceforge.jp>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Message-Id: <20190523143508.25387-3-armbru@redhat.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- hw/rx/Kconfig         |  14 +++
- hw/rx/Makefile.objs   |   2 +
- hw/rx/rx-virt.c       | 105 +++++++++++++++++++
- hw/rx/rx62n.c         | 238 ++++++++++++++++++++++++++++++++++++++++++
- include/hw/rx/rx.h    |   7 ++
- include/hw/rx/rx62n.h |  94 +++++++++++++++++
- 6 files changed, 460 insertions(+)
- create mode 100644 hw/rx/Kconfig
- create mode 100644 hw/rx/Makefile.objs
- create mode 100644 hw/rx/rx-virt.c
- create mode 100644 hw/rx/rx62n.c
- create mode 100644 include/hw/rx/rx.h
- create mode 100644 include/hw/rx/rx62n.h
+ block/ssh.c                |  1 +
+ block/vvfat.c              |  1 +
+ gdbstub.c                  |  2 ++
+ hw/core/bus.c              |  2 +-
+ hw/core/qdev-properties.c  |  1 +
+ hw/s390x/s390-virtio-ccw.c |  1 +
+ hw/scsi/scsi-generic.c     |  2 +-
+ include/qemu-common.h      | 16 ----------------
+ include/qemu/ctype.h       | 27 +++++++++++++++++++++++++++
+ monitor.c                  |  1 +
+ net/net.c                  |  1 +
+ net/tap-solaris.c          |  1 +
+ qapi/qapi-util.c           |  2 +-
+ qobject/json-parser.c      |  2 +-
+ target/ppc/monitor.c       |  2 ++
+ target/riscv/cpu.c         |  1 +
+ tests/libqtest.c           |  1 +
+ tests/vhost-user-bridge.c  |  2 +-
+ ui/keymaps.c               |  1 +
+ util/cutils.c              |  3 ++-
+ util/id.c                  |  2 +-
+ util/readline.c            |  2 +-
+ 22 files changed, 50 insertions(+), 24 deletions(-)
+ create mode 100644 include/qemu/ctype.h
 
-diff --git a/hw/rx/Kconfig b/hw/rx/Kconfig
-new file mode 100644
-index 0000000000..a07490a65e
---- /dev/null
-+++ b/hw/rx/Kconfig
-@@ -0,0 +1,14 @@
-+config RX
-+    bool
+diff --git a/block/ssh.c b/block/ssh.c
+index 12fd4f39e8..584c302fe6 100644
+--- a/block/ssh.c
++++ b/block/ssh.c
+@@ -32,6 +32,7 @@
+ #include "qapi/error.h"
+ #include "qemu/error-report.h"
+ #include "qemu/option.h"
++#include "qemu/ctype.h"
+ #include "qemu/cutils.h"
+ #include "qemu/sockets.h"
+ #include "qemu/uri.h"
+diff --git a/block/vvfat.c b/block/vvfat.c
+index 253cc716dd..f6c28805dd 100644
+--- a/block/vvfat.c
++++ b/block/vvfat.c
+@@ -34,6 +34,7 @@
+ #include "migration/blocker.h"
+ #include "qapi/qmp/qdict.h"
+ #include "qapi/qmp/qstring.h"
++#include "qemu/ctype.h"
+ #include "qemu/cutils.h"
+ #include "qemu/error-report.h"
+=20
+diff --git a/gdbstub.c b/gdbstub.c
+index 462f89edfe..9159d7d153 100644
+--- a/gdbstub.c
++++ b/gdbstub.c
+@@ -16,9 +16,11 @@
+  * You should have received a copy of the GNU Lesser General Public
+  * License along with this library; if not, see <http://www.gnu.org/lice=
+nses/>.
+  */
 +
-+config RX62N
-+    bool
-+    select RX
-+    select RX_ICU
-+    select RENESAS_TMR8
-+    select RENESAS_CMT
-+    select RENESAS_SCI
-+
-+config RX_VIRT
-+    bool
-+    select RX62N
-diff --git a/hw/rx/Makefile.objs b/hw/rx/Makefile.objs
+ #include "qemu/osdep.h"
+ #include "qapi/error.h"
+ #include "qemu/error-report.h"
++#include "qemu/ctype.h"
+ #include "qemu/cutils.h"
+ #include "trace-root.h"
+ #ifdef CONFIG_USER_ONLY
+diff --git a/hw/core/bus.c b/hw/core/bus.c
+index e09843f6ab..60c4720379 100644
+--- a/hw/core/bus.c
++++ b/hw/core/bus.c
+@@ -18,7 +18,7 @@
+  */
+=20
+ #include "qemu/osdep.h"
+-#include "qemu-common.h"
++#include "qemu/ctype.h"
+ #include "hw/qdev.h"
+ #include "qapi/error.h"
+=20
+diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
+index 5da1439a8b..81c97f48a7 100644
+--- a/hw/core/qdev-properties.c
++++ b/hw/core/qdev-properties.c
+@@ -4,6 +4,7 @@
+ #include "qapi/error.h"
+ #include "hw/pci/pci.h"
+ #include "qapi/qmp/qerror.h"
++#include "qemu/ctype.h"
+ #include "qemu/error-report.h"
+ #include "hw/block/block.h"
+ #include "net/hub.h"
+diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+index bbc6e8fa0b..3af9308789 100644
+--- a/hw/s390x/s390-virtio-ccw.c
++++ b/hw/s390x/s390-virtio-ccw.c
+@@ -23,6 +23,7 @@
+ #include "hw/s390x/css.h"
+ #include "virtio-ccw.h"
+ #include "qemu/config-file.h"
++#include "qemu/ctype.h"
+ #include "qemu/error-report.h"
+ #include "qemu/option.h"
+ #include "s390-pci-bus.h"
+diff --git a/hw/scsi/scsi-generic.c b/hw/scsi/scsi-generic.c
+index d82b462be4..e8a8706a4f 100644
+--- a/hw/scsi/scsi-generic.c
++++ b/hw/scsi/scsi-generic.c
+@@ -13,7 +13,7 @@
+=20
+ #include "qemu/osdep.h"
+ #include "qapi/error.h"
+-#include "qemu-common.h"
++#include "qemu/ctype.h"
+ #include "qemu/error-report.h"
+ #include "hw/scsi/scsi.h"
+ #include "hw/scsi/emulation.h"
+diff --git a/include/qemu-common.h b/include/qemu-common.h
+index d7f4a4e7eb..9b01f6e7cb 100644
+--- a/include/qemu-common.h
++++ b/include/qemu-common.h
+@@ -31,22 +31,6 @@ int qemu_main(int argc, char **argv, char **envp);
+ void qemu_get_timedate(struct tm *tm, int offset);
+ int qemu_timedate_diff(struct tm *tm);
+=20
+-#define qemu_isalnum(c)		isalnum((unsigned char)(c))
+-#define qemu_isalpha(c)		isalpha((unsigned char)(c))
+-#define qemu_iscntrl(c)		iscntrl((unsigned char)(c))
+-#define qemu_isdigit(c)		isdigit((unsigned char)(c))
+-#define qemu_isgraph(c)		isgraph((unsigned char)(c))
+-#define qemu_islower(c)		islower((unsigned char)(c))
+-#define qemu_isprint(c)		isprint((unsigned char)(c))
+-#define qemu_ispunct(c)		ispunct((unsigned char)(c))
+-#define qemu_isspace(c)		isspace((unsigned char)(c))
+-#define qemu_isupper(c)		isupper((unsigned char)(c))
+-#define qemu_isxdigit(c)	isxdigit((unsigned char)(c))
+-#define qemu_tolower(c)		tolower((unsigned char)(c))
+-#define qemu_toupper(c)		toupper((unsigned char)(c))
+-#define qemu_isascii(c)		isascii((unsigned char)(c))
+-#define qemu_toascii(c)		toascii((unsigned char)(c))
+-
+ void *qemu_oom_check(void *ptr);
+=20
+ ssize_t qemu_write_full(int fd, const void *buf, size_t count)
+diff --git a/include/qemu/ctype.h b/include/qemu/ctype.h
 new file mode 100644
-index 0000000000..63f8be0e82
+index 0000000000..3691f0984d
 --- /dev/null
-+++ b/hw/rx/Makefile.objs
-@@ -0,0 +1,2 @@
-+obj-$(CONFIG_RX62N) +=3D rx62n.o
-+obj-$(CONFIG_RX_VIRT) +=3D rx-virt.o
-diff --git a/hw/rx/rx-virt.c b/hw/rx/rx-virt.c
-new file mode 100644
-index 0000000000..3deb7cb335
---- /dev/null
-+++ b/hw/rx/rx-virt.c
-@@ -0,0 +1,105 @@
++++ b/include/qemu/ctype.h
+@@ -0,0 +1,27 @@
 +/*
-+ * RX QEMU virtual platform
++ * QEMU TCG support
 + *
-+ * Copyright (c) 2019 Yoshinori Sato
-+ *
-+ * This program is free software; you can redistribute it and/or modify =
-it
-+ * under the terms and conditions of the GNU General Public License,
-+ * version 2 or later, as published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope it will be useful, but WITHOU=
-T
-+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License=
- for
-+ * more details.
-+ *
-+ * You should have received a copy of the GNU General Public License alo=
-ng with
-+ * this program.  If not, see <http://www.gnu.org/licenses/>.
++ * This work is licensed under the terms of the GNU GPL, version 2 or la=
+ter.
++ * See the COPYING file in the top-level directory.
 + */
 +
-+#include "qemu/osdep.h"
-+#include "qapi/error.h"
-+#include "qemu-common.h"
-+#include "cpu.h"
-+#include "hw/hw.h"
-+#include "hw/sysbus.h"
-+#include "hw/loader.h"
-+#include "hw/rx/rx62n.h"
-+#include "sysemu/sysemu.h"
-+#include "sysemu/qtest.h"
-+#include "sysemu/device_tree.h"
-+#include "hw/boards.h"
++#ifndef QEMU_CTYPE_H
++#define QEMU_CTYPE_H
 +
-+/* Same address of GDB integrated simulator */
-+#define SDRAM_BASE 0x01000000
-+
-+static void rxvirt_init(MachineState *machine)
-+{
-+    RX62NState *s =3D g_new(RX62NState, 1);
-+    MemoryRegion *sysmem =3D get_system_memory();
-+    MemoryRegion *sdram =3D g_new(MemoryRegion, 1);
-+    const char *kernel_filename =3D machine->kernel_filename;
-+    const char *dtb_filename =3D machine->dtb;
-+    void *dtb =3D NULL;
-+    int dtb_size;
-+
-+    /* Allocate memory space */
-+    memory_region_init_ram(sdram, NULL, "sdram", 16 * MiB,
-+                           &error_fatal);
-+    memory_region_add_subregion(sysmem, SDRAM_BASE, sdram);
-+
-+    /* Initalize CPU */
-+    object_initialize_child(OBJECT(machine), "mcu", s,
-+                            sizeof(RX62NState), TYPE_RX62N,
-+                            &error_fatal, NULL);
-+    object_property_set_link(OBJECT(s), OBJECT(get_system_memory()),
-+                             "memory", &error_abort);
-+    object_property_set_bool(OBJECT(s), kernel_filename !=3D NULL,
-+                             "load-kernel", &error_abort);
-+    object_property_set_bool(OBJECT(s), true, "realized", &error_abort);
-+
-+    /* Load kernel and dtb */
-+    if (kernel_filename) {
-+        rx_load_image(RXCPU(first_cpu), kernel_filename,
-+                      SDRAM_BASE + 8 * MiB, 8 * MiB);
-+        if (dtb_filename) {
-+            dtb =3D load_device_tree(dtb_filename, &dtb_size);
-+            if (dtb =3D=3D NULL) {
-+                fprintf(stderr, "Couldn't open dtb file %s\n", dtb_filen=
-ame);
-+                exit(1);
-+            }
-+            if (machine->kernel_cmdline &&
-+                qemu_fdt_setprop_string(dtb, "/chosen", "bootargs",
-+                                        machine->kernel_cmdline) < 0) {
-+                fprintf(stderr, "couldn't set /chosen/bootargs\n");
-+                exit(1);
-+            }
-+            rom_add_blob_fixed("dtb", dtb, dtb_size,
-+                               SDRAM_BASE + 16 * MiB - dtb_size);
-+            /* Set dtb address to R1 */
-+            RXCPU(first_cpu)->env.regs[1] =3D 0x02000000 - dtb_size;
-+        }
-+    }
-+}
-+
-+static void rxvirt_class_init(ObjectClass *oc, void *data)
-+{
-+    MachineClass *mc =3D MACHINE_CLASS(oc);
-+
-+    mc->desc =3D "RX QEMU Virtual Target";
-+    mc->init =3D rxvirt_init;
-+    mc->is_default =3D 1;
-+    mc->default_cpu_type =3D TYPE_RXCPU;
-+}
-+
-+static const TypeInfo rxvirt_type =3D {
-+    .name =3D MACHINE_TYPE_NAME("rx-virt"),
-+    .parent =3D TYPE_MACHINE,
-+    .class_init =3D rxvirt_class_init,
-+};
-+
-+static void rxvirt_machine_init(void)
-+{
-+    type_register_static(&rxvirt_type);
-+}
-+
-+type_init(rxvirt_machine_init)
-diff --git a/hw/rx/rx62n.c b/hw/rx/rx62n.c
-new file mode 100644
-index 0000000000..c6660b75b4
---- /dev/null
-+++ b/hw/rx/rx62n.c
-@@ -0,0 +1,238 @@
-+/*
-+ * RX62N device
-+ *
-+ * Datasheet: RX62N Group, RX621 Group User's Manual: Hardware
-+ * (Rev.1.40 R01UH0033EJ0140)
-+ *
-+ * Copyright (c) 2019 Yoshinori Sato
-+ *
-+ * This program is free software; you can redistribute it and/or modify =
-it
-+ * under the terms and conditions of the GNU General Public License,
-+ * version 2 or later, as published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope it will be useful, but WITHOU=
-T
-+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License=
- for
-+ * more details.
-+ *
-+ * You should have received a copy of the GNU General Public License alo=
-ng with
-+ * this program.  If not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qapi/error.h"
-+#include "hw/hw.h"
-+#include "hw/rx/rx62n.h"
-+#include "hw/loader.h"
-+#include "hw/sysbus.h"
-+#include "sysemu/sysemu.h"
-+#include "cpu.h"
-+
-+/*
-+ * IRQ -> IPR mapping table
-+ * 0x00 - 0x91: IPR no (IPR00 to IPR91)
-+ * 0xff: IPR not assigned
-+ * See "11.3.1 Interrupt Vector Table" in hardware manual.
-+ */
-+static const int ipr_table[NR_IRQS] =3D {
-+    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, /* 15 */
-+    0x00, 0xff, 0xff, 0xff, 0xff, 0x01, 0xff, 0x02,
-+    0xff, 0xff, 0xff, 0x03, 0x04, 0x05, 0x06, 0x07, /* 31 */
-+    0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
-+    0x10, 0x11, 0x12, 0x13, 0x14, 0x14, 0x14, 0x14, /* 47 */
-+    0x15, 0x15, 0x15, 0x15, 0xff, 0xff, 0xff, 0xff,
-+    0x18, 0x18, 0x18, 0x18, 0x18, 0x1d, 0x1e, 0x1f, /* 63 */
-+    0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27,
-+    0x28, 0x29, 0x2a, 0x2b, 0x2c, 0x2d, 0x2e, 0x2f, /* 79 */
-+    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+    0xff, 0xff, 0x3a, 0x3b, 0x3c, 0xff, 0xff, 0xff, /* 95 */
-+    0x40, 0xff, 0x44, 0x45, 0xff, 0xff, 0x48, 0xff,
-+    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, /* 111 */
-+    0xff, 0xff, 0x51, 0x51, 0x51, 0x51, 0x52, 0x52,
-+    0x52, 0x53, 0x53, 0x54, 0x54, 0x55, 0x55, 0x56, /* 127 */
-+    0x56, 0x57, 0x57, 0x57, 0x57, 0x58, 0x59, 0x59,
-+    0x59, 0x59, 0x5a, 0x5b, 0x5b, 0x5b, 0x5c, 0x5c, /* 143 */
-+    0x5c, 0x5c, 0x5d, 0x5d, 0x5d, 0x5e, 0x5e, 0x5f,
-+    0x5f, 0x60, 0x60, 0x61, 0x61, 0x62, 0x62, 0x62, /* 159 */
-+    0x62, 0x63, 0x64, 0x64, 0x64, 0x64, 0x65, 0x66,
-+    0x66, 0x66, 0x67, 0x67, 0x67, 0x67, 0x68, 0x68, /* 175 */
-+    0x68, 0x69, 0x69, 0x69, 0x6a, 0x6a, 0x6a, 0x6b,
-+    0x6b, 0x6b, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, /* 191 */
-+    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x70, 0x71,
-+    0x72, 0x73, 0x74, 0x75, 0xff, 0xff, 0xff, 0xff, /* 207 */
-+    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x80, 0x80,
-+    0x80, 0x80, 0x81, 0x81, 0x81, 0x81, 0x82, 0x82, /* 223 */
-+    0x82, 0x82, 0x83, 0x83, 0x83, 0x83, 0xff, 0xff,
-+    0xff, 0xff, 0x85, 0x85, 0x85, 0x85, 0x86, 0x86, /* 239 */
-+    0x86, 0x86, 0xff, 0xff, 0xff, 0xff, 0x88, 0x89,
-+    0x8a, 0x8b, 0x8c, 0x8d, 0x8e, 0x8f, 0x90, 0x91, /* 255 */
-+};
-+
-+/*
-+ * Level triggerd IRQ list
-+ * Not listed IRQ is Edge trigger.
-+ * See "11.3.1 Interrupt Vector Table" in hardware manual.
-+ */
-+static const uint32_t levelirq[] =3D {
-+     16,  21,  32,  44,  47,  48,  51,  64,  65,  66,
-+     67,  68,  69,  70,  71,  72,  73,  74,  75,  76,
-+     77,  78,  79,  90,  91, 170, 171, 172, 173, 214,
-+    217, 218, 221, 222, 225, 226, 229, 234, 237, 238,
-+    241, 246, 249, 250, 253,
-+};
-+
-+static void register_icu(RX62NState *s)
-+{
-+    int i;
-+    SysBusDevice *icu;
-+
-+    object_initialize_child(OBJECT(s), "icu", &s->icu, sizeof(RXICUState=
-),
-+                            TYPE_RXICU, &error_abort, NULL);
-+
-+    icu =3D SYS_BUS_DEVICE(&s->icu);
-+    sysbus_mmio_map(SYS_BUS_DEVICE(icu), 0, RX62N_ICUBASE);
-+    qdev_prop_set_uint32(DEVICE(icu), "len-ipr-map", NR_IRQS);
-+    for (i =3D 0; i < NR_IRQS; i++) {
-+        char propname[32];
-+        snprintf(propname, sizeof(propname), "ipr-map[%d]", i);
-+        qdev_prop_set_uint32(DEVICE(icu), propname, ipr_table[i]);
-+    }
-+    qdev_prop_set_uint32(DEVICE(icu), "len-trigger-level",
-+                         ARRAY_SIZE(levelirq));
-+    for (i =3D 0; i < ARRAY_SIZE(levelirq); i++) {
-+        char propname[32];
-+        snprintf(propname, sizeof(propname), "trigger-level[%d]", i);
-+        qdev_prop_set_uint32(DEVICE(icu), propname, levelirq[i]);
-+    }
-+
-+    for (i =3D 0; i < NR_IRQS; i++) {
-+        s->irq[i] =3D qdev_get_gpio_in(DEVICE(icu), i);
-+    }
-+
-+    qdev_init_nofail(DEVICE(icu));
-+    sysbus_connect_irq(icu, 0, qdev_get_gpio_in(DEVICE(&s->cpu), RX_CPU_=
-IRQ));
-+    sysbus_connect_irq(icu, 1, qdev_get_gpio_in(DEVICE(&s->cpu), RX_CPU_=
-FIR));
-+    sysbus_connect_irq(icu, 2, s->irq[SWI]);
-+
-+}
-+
-+static void register_tmr(RX62NState *s, int unit)
-+{
-+    SysBusDevice *tmr;
-+    int i, irqbase;
-+
-+    object_initialize_child(OBJECT(s), "tmr[*]", &s->tmr[unit],
-+                            sizeof(RTMRState), TYPE_RENESAS_TMR,
-+                            &error_abort, NULL);
-+
-+    tmr =3D SYS_BUS_DEVICE(&s->tmr[unit]);
-+    sysbus_mmio_map(tmr, 0, RX62N_TMRBASE + unit * 0x10);
-+    qdev_prop_set_uint64(DEVICE(tmr), "input-freq", RX62N_PCLK);
-+
-+    qdev_init_nofail(DEVICE(tmr));
-+    irqbase =3D RX62N_TMR_IRQBASE + TMR_NR_IRQ * unit;
-+    for (i =3D 0; i < TMR_NR_IRQ; i++) {
-+        sysbus_connect_irq(tmr, i, s->irq[irqbase + i]);
-+    }
-+}
-+
-+static void register_cmt(RX62NState *s, int unit)
-+{
-+    SysBusDevice *cmt;
-+    int i, irqbase;
-+
-+    object_initialize_child(OBJECT(s), "cmt[*]", &s->cmt[unit],
-+                            sizeof(RCMTState), TYPE_RENESAS_CMT,
-+                            &error_abort, NULL);
-+
-+    cmt =3D SYS_BUS_DEVICE(&s->cmt[unit]);
-+    sysbus_mmio_map(cmt, 0, RX62N_CMTBASE + unit * 0x10);
-+    qdev_prop_set_uint64(DEVICE(cmt), "input-freq", RX62N_PCLK);
-+
-+    qdev_init_nofail(DEVICE(cmt));
-+    irqbase =3D RX62N_CMT_IRQBASE + CMT_NR_IRQ * unit;
-+    for (i =3D 0; i < CMT_NR_IRQ; i++) {
-+        sysbus_connect_irq(cmt, i, s->irq[irqbase + i]);
-+    }
-+}
-+
-+static void register_sci(RX62NState *s, int unit)
-+{
-+    SysBusDevice *sci;
-+    int i, irqbase;
-+
-+    object_initialize_child(OBJECT(s), "sci[*]", &s->sci[unit],
-+                            sizeof(RSCIState), TYPE_RENESAS_SCI,
-+                            &error_abort, NULL);
-+
-+    sci =3D SYS_BUS_DEVICE(&s->sci[unit]);
-+    sysbus_mmio_map(sci, 0, RX62N_SCIBASE + unit * 0x08);
-+    qdev_prop_set_chr(DEVICE(sci), "chardev", serial_hd(unit));
-+    qdev_prop_set_uint64(DEVICE(sci), "input-freq", RX62N_PCLK);
-+
-+    qdev_init_nofail(DEVICE(sci));
-+    irqbase =3D RX62N_SCI_IRQBASE + SCI_NR_IRQ * unit;
-+    for (i =3D 0; i < SCI_NR_IRQ; i++) {
-+        sysbus_connect_irq(sci, i, s->irq[irqbase + i]);
-+    }
-+}
-+
-+static void rx62n_realize(DeviceState *dev, Error **errp)
-+{
-+    RX62NState *s =3D RX62N(dev);
-+
-+    memory_region_init_ram(&s->iram, NULL, "iram", RX62N_IRAM_SIZE, errp=
-);
-+    memory_region_add_subregion(s->sysmem, RX62N_IRAM_BASE, &s->iram);
-+    memory_region_init_rom(&s->d_flash, NULL, "dataflash",
-+                           RX62N_DFLASH_SIZE, errp);
-+    memory_region_add_subregion(s->sysmem, RX62N_DFLASH_BASE, &s->d_flas=
-h);
-+    memory_region_init_rom(&s->c_flash, NULL, "codeflash",
-+                           RX62N_CFLASH_SIZE, errp);
-+    memory_region_add_subregion(s->sysmem, RX62N_CFLASH_BASE, &s->c_flas=
-h);
-+    if (!s->kernel) {
-+        rom_add_file_fixed(bios_name, RX62N_CFLASH_BASE, 0);
-+    }
-+
-+    object_initialize_child(OBJECT(s), "cpu", &s->cpu,
-+                            sizeof(RXCPU), TYPE_RXCPU,
-+                            errp, NULL);
-+    object_property_set_bool(OBJECT(&s->cpu), true, "realized", errp);
-+
-+    register_icu(s);
-+    s->cpu.env.ack =3D qdev_get_gpio_in_named(DEVICE(&s->icu), "ack", 0)=
-;
-+    register_tmr(s, 0);
-+    register_tmr(s, 1);
-+    register_cmt(s, 0);
-+    register_cmt(s, 1);
-+    register_sci(s, 0);
-+}
-+
-+static Property rx62n_properties[] =3D {
-+    DEFINE_PROP_LINK("memory", RX62NState, sysmem, TYPE_MEMORY_REGION,
-+                     MemoryRegion *),
-+    DEFINE_PROP_BOOL("load-kernel", RX62NState, kernel, false),
-+    DEFINE_PROP_END_OF_LIST(),
-+};
-+
-+static void rx62n_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc =3D DEVICE_CLASS(klass);
-+
-+    dc->realize =3D rx62n_realize;
-+    dc->props =3D rx62n_properties;
-+}
-+
-+static const TypeInfo rx62n_info =3D {
-+    .name =3D TYPE_RX62N,
-+    .parent =3D TYPE_SYS_BUS_DEVICE,
-+    .instance_size =3D sizeof(RX62NState),
-+    .class_init =3D rx62n_class_init,
-+};
-+
-+static void rx62n_register_types(void)
-+{
-+    type_register_static(&rx62n_info);
-+}
-+
-+type_init(rx62n_register_types)
-diff --git a/include/hw/rx/rx.h b/include/hw/rx/rx.h
-new file mode 100644
-index 0000000000..ff5924b81f
---- /dev/null
-+++ b/include/hw/rx/rx.h
-@@ -0,0 +1,7 @@
-+#ifndef QEMU_RX_H
-+#define QEMU_RX_H
-+/* Definitions for RX board emulation.  */
-+
-+#include "target/rx/cpu-qom.h"
++#define qemu_isalnum(c)         isalnum((unsigned char)(c))
++#define qemu_isalpha(c)         isalpha((unsigned char)(c))
++#define qemu_iscntrl(c)         iscntrl((unsigned char)(c))
++#define qemu_isdigit(c)         isdigit((unsigned char)(c))
++#define qemu_isgraph(c)         isgraph((unsigned char)(c))
++#define qemu_islower(c)         islower((unsigned char)(c))
++#define qemu_isprint(c)         isprint((unsigned char)(c))
++#define qemu_ispunct(c)         ispunct((unsigned char)(c))
++#define qemu_isspace(c)         isspace((unsigned char)(c))
++#define qemu_isupper(c)         isupper((unsigned char)(c))
++#define qemu_isxdigit(c)        isxdigit((unsigned char)(c))
++#define qemu_tolower(c)         tolower((unsigned char)(c))
++#define qemu_toupper(c)         toupper((unsigned char)(c))
++#define qemu_isascii(c)         isascii((unsigned char)(c))
++#define qemu_toascii(c)         toascii((unsigned char)(c))
 +
 +#endif
-diff --git a/include/hw/rx/rx62n.h b/include/hw/rx/rx62n.h
-new file mode 100644
-index 0000000000..5f6912fe46
---- /dev/null
-+++ b/include/hw/rx/rx62n.h
-@@ -0,0 +1,94 @@
-+/*
-+ * RX62N MCU Object
-+ *
-+ * Datasheet: RX62N Group, RX621 Group User's Manual: Hardware
-+ * (Rev.1.40 R01UH0033EJ0140)
-+ *
-+ * Copyright (c) 2019 Yoshinori Sato
-+ *
-+ * This program is free software; you can redistribute it and/or modify =
-it
-+ * under the terms and conditions of the GNU General Public License,
-+ * version 2 or later, as published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope it will be useful, but WITHOU=
-T
-+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License=
- for
-+ * more details.
-+ *
-+ * You should have received a copy of the GNU General Public License alo=
-ng with
-+ * this program.  If not, see <http://www.gnu.org/licenses/>.
-+ */
+diff --git a/monitor.c b/monitor.c
+index 3650ceb574..5c5cbe254a 100644
+--- a/monitor.c
++++ b/monitor.c
+@@ -42,6 +42,7 @@
+ #include "sysemu/numa.h"
+ #include "monitor/monitor.h"
+ #include "qemu/config-file.h"
++#include "qemu/ctype.h"
+ #include "qemu/readline.h"
+ #include "ui/console.h"
+ #include "ui/input.h"
+diff --git a/net/net.c b/net/net.c
+index 2cf5e76469..3e65c93920 100644
+--- a/net/net.c
++++ b/net/net.c
+@@ -41,6 +41,7 @@
+ #include "qemu/sockets.h"
+ #include "qemu/cutils.h"
+ #include "qemu/config-file.h"
++#include "qemu/ctype.h"
+ #include "hw/qdev.h"
+ #include "qemu/iov.h"
+ #include "qemu/main-loop.h"
+diff --git a/net/tap-solaris.c b/net/tap-solaris.c
+index a2a92356c1..0e3f3e0a9b 100644
+--- a/net/tap-solaris.c
++++ b/net/tap-solaris.c
+@@ -26,6 +26,7 @@
+ #include "qapi/error.h"
+ #include "tap_int.h"
+ #include "sysemu/sysemu.h"
++#include "qemu/ctype.h"
+ #include "qemu/cutils.h"
+=20
+ #include <sys/ethernet.h>
+diff --git a/qapi/qapi-util.c b/qapi/qapi-util.c
+index e9b266bb70..29a6c98b53 100644
+--- a/qapi/qapi-util.c
++++ b/qapi/qapi-util.c
+@@ -12,7 +12,7 @@
+=20
+ #include "qemu/osdep.h"
+ #include "qapi/error.h"
+-#include "qemu-common.h"
++#include "qemu/ctype.h"
+=20
+ const char *qapi_enum_lookup(const QEnumLookup *lookup, int val)
+ {
+diff --git a/qobject/json-parser.c b/qobject/json-parser.c
+index d8eb210c0c..7d23e12e33 100644
+--- a/qobject/json-parser.c
++++ b/qobject/json-parser.c
+@@ -12,10 +12,10 @@
+  */
+=20
+ #include "qemu/osdep.h"
++#include "qemu/ctype.h"
+ #include "qemu/cutils.h"
+ #include "qemu/unicode.h"
+ #include "qapi/error.h"
+-#include "qemu-common.h"
+ #include "qapi/qmp/qbool.h"
+ #include "qapi/qmp/qdict.h"
+ #include "qapi/qmp/qlist.h"
+diff --git a/target/ppc/monitor.c b/target/ppc/monitor.c
+index ee9d6e81d2..7f8360d903 100644
+--- a/target/ppc/monitor.c
++++ b/target/ppc/monitor.c
+@@ -21,9 +21,11 @@
+  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALING=
+S IN
+  * THE SOFTWARE.
+  */
 +
-+#ifndef HW_RX_RX62N_H
-+#define HW_RX_RX62N_H
+ #include "qemu/osdep.h"
+ #include "cpu.h"
+ #include "monitor/monitor.h"
++#include "qemu/ctype.h"
+ #include "monitor/hmp-target.h"
+ #include "hmp.h"
+=20
+diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
+index e29879915f..04edda727b 100644
+--- a/target/riscv/cpu.c
++++ b/target/riscv/cpu.c
+@@ -19,6 +19,7 @@
+=20
+ #include "qemu/osdep.h"
+ #include "qemu/qemu-print.h"
++#include "qemu/ctype.h"
+ #include "qemu/log.h"
+ #include "cpu.h"
+ #include "exec/exec-all.h"
+diff --git a/tests/libqtest.c b/tests/libqtest.c
+index 9b9b5f37fc..3c5c3f49d8 100644
+--- a/tests/libqtest.c
++++ b/tests/libqtest.c
+@@ -22,6 +22,7 @@
+=20
+ #include "libqtest.h"
+ #include "qemu-common.h"
++#include "qemu/ctype.h"
+ #include "qemu/cutils.h"
+ #include "qapi/error.h"
+ #include "qapi/qmp/json-parser.h"
+diff --git a/tests/vhost-user-bridge.c b/tests/vhost-user-bridge.c
+index 5b771de7a3..0bb03af0e5 100644
+--- a/tests/vhost-user-bridge.c
++++ b/tests/vhost-user-bridge.c
+@@ -30,8 +30,8 @@
+ #define _FILE_OFFSET_BITS 64
+=20
+ #include "qemu/osdep.h"
+-#include "qemu-common.h"
+ #include "qemu/atomic.h"
++#include "qemu/ctype.h"
+ #include "qemu/iov.h"
+ #include "standard-headers/linux/virtio_net.h"
+ #include "contrib/libvhost-user/libvhost-user.h"
+diff --git a/ui/keymaps.c b/ui/keymaps.c
+index 544b55c27b..38fd22ed2b 100644
+--- a/ui/keymaps.c
++++ b/ui/keymaps.c
+@@ -26,6 +26,7 @@
+ #include "keymaps.h"
+ #include "sysemu/sysemu.h"
+ #include "trace.h"
++#include "qemu/ctype.h"
+ #include "qemu/error-report.h"
+ #include "qapi/error.h"
+ #include "ui/input.h"
+diff --git a/util/cutils.c b/util/cutils.c
+index 9aacc422ca..53e4af59f8 100644
+--- a/util/cutils.c
++++ b/util/cutils.c
+@@ -21,14 +21,15 @@
+  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALING=
+S IN
+  * THE SOFTWARE.
+  */
 +
-+#include "hw/sysbus.h"
-+#include "hw/intc/rx_icu.h"
-+#include "hw/timer/renesas_tmr.h"
-+#include "hw/timer/renesas_cmt.h"
-+#include "hw/char/renesas_sci.h"
-+#include "target/rx/cpu.h"
-+#include "qemu/units.h"
-+
-+#define TYPE_RX62N "rx62n"
-+#define TYPE_RX62N_CPU RX_CPU_TYPE_NAME(TYPE_RX62N)
-+#define RX62N(obj) OBJECT_CHECK(RX62NState, (obj), TYPE_RX62N)
-+
-+enum {
-+    RX62N_NR_TMR =3D 2,
-+    RX62N_NR_CMT =3D 2,
-+    RX62N_NR_SCI =3D 6,
-+};
-+
-+typedef struct RX62NState {
-+    SysBusDevice parent_obj;
-+
-+    RXCPU cpu;
-+    RXICUState icu;
-+    RTMRState tmr[RX62N_NR_TMR];
-+    RCMTState cmt[RX62N_NR_CMT];
-+    RSCIState sci[RX62N_NR_SCI];
-+
-+    MemoryRegion *sysmem;
-+    bool kernel;
-+
-+    MemoryRegion iram;
-+    MemoryRegion iomem1;
-+    MemoryRegion d_flash;
-+    MemoryRegion iomem2;
-+    MemoryRegion iomem3;
-+    MemoryRegion c_flash;
-+    qemu_irq irq[NR_IRQS];
-+} RX62NState;
-+
-+/*
-+ * RX62N Peripheral Address
-+ * See users manual section 5
-+ */
-+#define RX62N_ICUBASE 0x00087000
-+#define RX62N_TMRBASE 0x00088200
-+#define RX62N_CMTBASE 0x00088000
-+#define RX62N_SCIBASE 0x00088240
-+
-+/*
-+ * RX62N Peripheral IRQ
-+ * See users manual section 11
-+ */
-+#define RX62N_TMR_IRQBASE 174
-+#define RX62N_CMT_IRQBASE 28
-+#define RX62N_SCI_IRQBASE 214
-+
-+/*
-+ * RX62N Internal Memory
-+ * It is the value of R5F562N8.
-+ * Please change the size for R5F562N7.
-+ */
-+#define RX62N_IRAM_BASE 0x00000000
-+#define RX62N_IRAM_SIZE (96 * KiB)
-+#define RX62N_DFLASH_BASE 0x00100000
-+#define RX62N_DFLASH_SIZE (32 * KiB)
-+#define RX62N_CFLASH_BASE 0xfff80000
-+#define RX62N_CFLASH_SIZE (512 * KiB)
-+
-+#define RX62N_PCLK (48 * 1000 * 1000)
-+#endif
+ #include "qemu/osdep.h"
+-#include "qemu-common.h"
+ #include "qemu/host-utils.h"
+ #include <math.h>
+=20
+ #include "qemu/sockets.h"
+ #include "qemu/iov.h"
+ #include "net/net.h"
++#include "qemu/ctype.h"
+ #include "qemu/cutils.h"
+ #include "qemu/error-report.h"
+=20
+diff --git a/util/id.c b/util/id.c
+index 6141352955..af1c5f1b81 100644
+--- a/util/id.c
++++ b/util/id.c
+@@ -11,7 +11,7 @@
+  */
+=20
+ #include "qemu/osdep.h"
+-#include "qemu-common.h"
++#include "qemu/ctype.h"
+ #include "qemu/id.h"
+=20
+ bool id_wellformed(const char *id)
+diff --git a/util/readline.c b/util/readline.c
+index a7672b51c1..e534460da6 100644
+--- a/util/readline.c
++++ b/util/readline.c
+@@ -23,8 +23,8 @@
+  */
+=20
+ #include "qemu/osdep.h"
+-#include "qemu-common.h"
+ #include "qemu/readline.h"
++#include "qemu/ctype.h"
+ #include "qemu/cutils.h"
+=20
+ #define IS_NORM 0
 --=20
-2.20.1
+2.21.0
 
 
