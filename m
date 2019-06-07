@@ -2,93 +2,63 @@ Return-Path: <SRS0=3yEa=UG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	T_HK_NAME_DR,USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8ECFFC2BCA1
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 18:30:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BE5EC2BCA1
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 18:33:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 61B95208C3
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 18:30:58 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ceqOtyql"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 61B95208C3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 35CB1208C3
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 18:33:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 35CB1208C3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50376 helo=lists.gnu.org)
+Received: from localhost ([::1]:50454 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hZJdh-0004Tw-LL
-	for qemu-devel@archiver.kernel.org; Fri, 07 Jun 2019 14:30:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58511)
+	id 1hZJgZ-00072F-Ef
+	for qemu-devel@archiver.kernel.org; Fri, 07 Jun 2019 14:33:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57106)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <richard.henderson@linaro.org>) id 1hZHBK-000291-FZ
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 11:53:31 -0400
+ (envelope-from <dgilbert@redhat.com>) id 1hZH5o-0007Ze-0u
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 11:47:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1hZHBJ-0007iX-JF
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 11:53:30 -0400
-Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:41792)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1hZHBJ-0007hD-DY
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 11:53:29 -0400
-Received: by mail-oi1-x242.google.com with SMTP id b21so1754579oic.8
- for <qemu-devel@nongnu.org>; Fri, 07 Jun 2019 08:53:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:references:from:openpgp:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=jUGCXopUqagwavwf6nXHRMMQXU0j12H1RCQMa4QmlHM=;
- b=ceqOtyqlf+sEIKxkR3Dd7LYDTwX+eVf5igHVNxHt8c6Q11CQMkQ5fdXj4WKxiNsr7g
- ESuZO/zAsE9FVMa+c/TuVKu0DnL3nth7NAYSChvYv66tgeAaNcz7mO1wZrBvxpkcAEAW
- TJ57XTEsmQOmWO/W/iAq7Jepz0LaQZO8kkGSPy4Tl/dzGd2lndwLEAtfgJ4QfcbFJ4Ue
- 7Bp3Epeip+l7Z+WXlcKdMFft+zIdgYcWHz7sg65Udt6vB8Di1PBu6oC4ALR5n96tv2OC
- 0Lk0Q4onJPwJVnQ3Th782/+TUb+Sq0LdguoLPw+hPuOEwnDvQUPt+3jX+GNBd6a4GaM9
- /hDg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=jUGCXopUqagwavwf6nXHRMMQXU0j12H1RCQMa4QmlHM=;
- b=aiUD9n4WW22HCvnjYbWAbiWC6BmqyciNgM9/wgbvCia68EK9TDUljo6Zd+wHLCMalN
- o4CF9hBv1LQT/CSbN51uWQAaIaT5GGjp6DuJ1v+6WCWsBgGq3se78wqtN9ZYpZY1ikDb
- pRUpojofmDyiVmj9smzP/2TI3fh7iFQzaPZ7a/uLimj+9+oq90AsOHogfxBs33TQPDAF
- JVGPJm2axkH9QFQ0xBG9FH/JxYbyFuiin+jSIyfNEpSfxBuAXOxbMHIfB8kWS0GwqQJa
- Lr71Qksc/5a6zp5d4nqWW4UT3pXXpf1DEDRNX8y5wjS3geGND3DSxnrdvT3J8Cv9yeCs
- 6xow==
-X-Gm-Message-State: APjAAAVtSF5Gv2eQxYucB7z6lpwIoKf+dXI0F3AY+vftucSPc7NAo2ms
- f3c673gKZg1q1n+ysNT3dPIxiZGYGjqfmA==
-X-Google-Smtp-Source: APXvYqyuQLAnpnumH1BjX5HxJM4uCh46JvDco93Cr5dtuVy/00a5MZ1hEhZIEP4siE5Zn3zbxH0Ldg==
-X-Received: by 2002:a54:4686:: with SMTP id k6mr4301232oic.112.1559922808328; 
- Fri, 07 Jun 2019 08:53:28 -0700 (PDT)
-Received: from [192.168.3.43] (200-56-192-86-cable.cybercable.net.mx.
- [200.56.192.86])
- by smtp.gmail.com with ESMTPSA id e4sm860962oti.64.2019.06.07.08.53.27
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Fri, 07 Jun 2019 08:53:27 -0700 (PDT)
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
- qemu-devel@nongnu.org
-References: <20190606174609.20487-1-peter.maydell@linaro.org>
- <20190606174609.20487-11-peter.maydell@linaro.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <d18a03bb-e1c7-dacc-df52-45db40044eb6@linaro.org>
-Date: Fri, 7 Jun 2019 10:53:24 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ (envelope-from <dgilbert@redhat.com>) id 1hZH5g-0007eR-0e
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 11:47:43 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:27222)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>)
+ id 1hZH5N-0006zH-KH; Fri, 07 Jun 2019 11:47:21 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 57DFBC04BE09;
+ Fri,  7 Jun 2019 15:47:05 +0000 (UTC)
+Received: from work-vm (ovpn-116-24.ams2.redhat.com [10.36.116.24])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 141657A4CB;
+ Fri,  7 Jun 2019 15:47:01 +0000 (UTC)
+Date: Fri, 7 Jun 2019 16:46:59 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20190607154658.GL2631@work-vm>
+References: <20190607135430.22149-1-kwolf@redhat.com>
+ <20190607135430.22149-3-kwolf@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190606174609.20487-11-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::242
-Subject: Re: [Qemu-devel] [PATCH 10/42] target/arm: Move the VFP trans_*
- functions to translate-vfp.inc.c
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190607135430.22149-3-kwolf@redhat.com>
+User-Agent: Mutt/1.11.4 (2019-03-13)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.31]); Fri, 07 Jun 2019 15:47:10 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [RFC PATCH 02/10] monitor: Split monitor_init in
+ HMP and QMP function
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,25 +70,159 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, armbru@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/6/19 12:45 PM, Peter Maydell wrote:
-> Move the trans_*() functions we've just created from translate.c
-> to translate-vfp.inc.c. This is pure code motion with no textual
-> changes (this can be checked with 'git show --color-moved').
+* Kevin Wolf (kwolf@redhat.com) wrote:
+> Instead of mixing HMP and QMP monitors in the same function, separate
+> the monitor creation function for both.
 > 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+
 > ---
->  target/arm/translate-vfp.inc.c | 337 +++++++++++++++++++++++++++++++++
->  target/arm/translate.c         | 337 ---------------------------------
->  2 files changed, 337 insertions(+), 337 deletions(-)
-
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-
-
-r~
-
-
+>  monitor.c | 86 +++++++++++++++++++++++++++++++------------------------
+>  1 file changed, 49 insertions(+), 37 deletions(-)
+> 
+> diff --git a/monitor.c b/monitor.c
+> index 70ce9e8a77..bb23cc0450 100644
+> --- a/monitor.c
+> +++ b/monitor.c
+> @@ -702,7 +702,7 @@ static void handle_hmp_command(Monitor *mon, const char *cmdline);
+>  
+>  static void monitor_iothread_init(void);
+>  
+> -static void monitor_data_init(Monitor *mon, bool skip_flush,
+> +static void monitor_data_init(Monitor *mon, int flags, bool skip_flush,
+>                                bool use_io_thread)
+>  {
+>      if (use_io_thread && !mon_iothread) {
+> @@ -717,6 +717,7 @@ static void monitor_data_init(Monitor *mon, bool skip_flush,
+>      mon->skip_flush = skip_flush;
+>      mon->use_io_thread = use_io_thread;
+>      mon->qmp.qmp_requests = g_queue_new();
+> +    mon->flags = flags;
+>  }
+>  
+>  static void monitor_data_destroy(Monitor *mon)
+> @@ -740,7 +741,7 @@ char *qmp_human_monitor_command(const char *command_line, bool has_cpu_index,
+>      char *output = NULL;
+>      Monitor *old_mon, hmp;
+>  
+> -    monitor_data_init(&hmp, true, false);
+> +    monitor_data_init(&hmp, 0, true, false);
+>  
+>      old_mon = cur_mon;
+>      cur_mon = &hmp;
+> @@ -4603,19 +4604,48 @@ static void monitor_qmp_setup_handlers_bh(void *opaque)
+>      monitor_list_append(mon);
+>  }
+>  
+> -void monitor_init(Chardev *chr, int flags)
+> +static void monitor_init_qmp(Chardev *chr, int flags)
+>  {
+>      Monitor *mon = g_malloc(sizeof(*mon));
+> -    bool use_readline = flags & MONITOR_USE_READLINE;
+>  
+>      /* Note: we run QMP monitor in I/O thread when @chr supports that */
+> -    monitor_data_init(mon, false,
+> -                      (flags & MONITOR_USE_CONTROL)
+> -                      && qemu_chr_has_feature(chr,
+> -                                              QEMU_CHAR_FEATURE_GCONTEXT));
+> +    monitor_data_init(mon, flags, false,
+> +                      qemu_chr_has_feature(chr, QEMU_CHAR_FEATURE_GCONTEXT));
+>  
+>      qemu_chr_fe_init(&mon->chr, chr, &error_abort);
+> -    mon->flags = flags;
+> +    qemu_chr_fe_set_echo(&mon->chr, true);
+> +
+> +    json_message_parser_init(&mon->qmp.parser, handle_qmp_command, mon, NULL);
+> +    if (mon->use_io_thread) {
+> +        /*
+> +         * Make sure the old iowatch is gone.  It's possible when
+> +         * e.g. the chardev is in client mode, with wait=on.
+> +         */
+> +        remove_fd_in_watch(chr);
+> +        /*
+> +         * We can't call qemu_chr_fe_set_handlers() directly here
+> +         * since chardev might be running in the monitor I/O
+> +         * thread.  Schedule a bottom half.
+> +         */
+> +        aio_bh_schedule_oneshot(iothread_get_aio_context(mon_iothread),
+> +                                monitor_qmp_setup_handlers_bh, mon);
+> +        /* The bottom half will add @mon to @mon_list */
+> +    } else {
+> +        qemu_chr_fe_set_handlers(&mon->chr, monitor_can_read,
+> +                                 monitor_qmp_read, monitor_qmp_event,
+> +                                 NULL, mon, NULL, true);
+> +        monitor_list_append(mon);
+> +    }
+> +}
+> +
+> +static void monitor_init_hmp(Chardev *chr, int flags)
+> +{
+> +    Monitor *mon = g_malloc(sizeof(*mon));
+> +    bool use_readline = flags & MONITOR_USE_READLINE;
+> +
+> +    monitor_data_init(mon, flags, false, false);
+> +    qemu_chr_fe_init(&mon->chr, chr, &error_abort);
+> +
+>      if (use_readline) {
+>          mon->rs = readline_init(monitor_readline_printf,
+>                                  monitor_readline_flush,
+> @@ -4624,36 +4654,18 @@ void monitor_init(Chardev *chr, int flags)
+>          monitor_read_command(mon, 0);
+>      }
+>  
+> -    if (monitor_is_qmp(mon)) {
+> -        qemu_chr_fe_set_echo(&mon->chr, true);
+> -        json_message_parser_init(&mon->qmp.parser, handle_qmp_command,
+> -                                 mon, NULL);
+> -        if (mon->use_io_thread) {
+> -            /*
+> -             * Make sure the old iowatch is gone.  It's possible when
+> -             * e.g. the chardev is in client mode, with wait=on.
+> -             */
+> -            remove_fd_in_watch(chr);
+> -            /*
+> -             * We can't call qemu_chr_fe_set_handlers() directly here
+> -             * since chardev might be running in the monitor I/O
+> -             * thread.  Schedule a bottom half.
+> -             */
+> -            aio_bh_schedule_oneshot(iothread_get_aio_context(mon_iothread),
+> -                                    monitor_qmp_setup_handlers_bh, mon);
+> -            /* The bottom half will add @mon to @mon_list */
+> -            return;
+> -        } else {
+> -            qemu_chr_fe_set_handlers(&mon->chr, monitor_can_read,
+> -                                     monitor_qmp_read, monitor_qmp_event,
+> -                                     NULL, mon, NULL, true);
+> -        }
+> +    qemu_chr_fe_set_handlers(&mon->chr, monitor_can_read, monitor_read,
+> +                             monitor_event, NULL, mon, NULL, true);
+> +    monitor_list_append(mon);
+> +}
+> +
+> +void monitor_init(Chardev *chr, int flags)
+> +{
+> +    if (flags & MONITOR_USE_CONTROL) {
+> +        monitor_init_qmp(chr, flags);
+>      } else {
+> -        qemu_chr_fe_set_handlers(&mon->chr, monitor_can_read, monitor_read,
+> -                                 monitor_event, NULL, mon, NULL, true);
+> +        monitor_init_hmp(chr, flags);
+>      }
+> -
+> -    monitor_list_append(mon);
+>  }
+>  
+>  void monitor_cleanup(void)
+> -- 
+> 2.20.1
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
