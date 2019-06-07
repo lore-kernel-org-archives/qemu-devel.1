@@ -2,60 +2,79 @@ Return-Path: <SRS0=3yEa=UG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ED0F3C2BCA1
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 11:10:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A6E9C2BCA1
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 11:10:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CA2382080C
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 11:10:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CA2382080C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 07AFE212F5
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 11:10:59 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="XdkRpale"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 07AFE212F5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48448 helo=lists.gnu.org)
+Received: from localhost ([::1]:48452 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hZClo-0007gP-4s
-	for qemu-devel@archiver.kernel.org; Fri, 07 Jun 2019 07:10:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55176)
+	id 1hZClu-0007wf-Ab
+	for qemu-devel@archiver.kernel.org; Fri, 07 Jun 2019 07:10:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56667)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <cohuck@redhat.com>) id 1hZBZB-0002mx-MY
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 05:53:47 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1hZBd2-0005sP-D2
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 05:57:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <cohuck@redhat.com>) id 1hZBZ9-00021U-Bl
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 05:53:44 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57636)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <cohuck@redhat.com>)
- id 1hZBZ9-0001z6-05; Fri, 07 Jun 2019 05:53:43 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 26B953082DDD;
- Fri,  7 Jun 2019 09:53:42 +0000 (UTC)
-Received: from localhost (dhcp-192-191.str.redhat.com [10.33.192.191])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id BA78D5126D;
- Fri,  7 Jun 2019 09:53:39 +0000 (UTC)
-From: Cornelia Huck <cohuck@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri,  7 Jun 2019 11:52:21 +0200
-Message-Id: <20190607095237.11364-20-cohuck@redhat.com>
-In-Reply-To: <20190607095237.11364-1-cohuck@redhat.com>
-References: <20190607095237.11364-1-cohuck@redhat.com>
+ (envelope-from <peter.maydell@linaro.org>) id 1hZBd1-0001Gl-2S
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 05:57:44 -0400
+Received: from mail-ot1-x32e.google.com ([2607:f8b0:4864:20::32e]:39746)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1hZBd0-0001Dk-Qk
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 05:57:42 -0400
+Received: by mail-ot1-x32e.google.com with SMTP id r21so1305357otq.6
+ for <qemu-devel@nongnu.org>; Fri, 07 Jun 2019 02:57:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=oAtbI+rPI68kFubeDAVhuMcAqpzefisJEhDu9zkuloo=;
+ b=XdkRpaleqAPwt57RJU6Q5E+QtmOj59520qoE1Anp2ofEJXu4D0N4HYGpPpbquudnmU
+ z+GCUmj1a5XIuDv56p8jXyw9hnjK+YtcMPtyY996sBLC5DAYYtmLlzxfAxD1mzVJB7ve
+ 7jAamcEJORamTgKEfqGU/Q+1geHcNtPtfmcow9gTQwMbAiQVddFaDqGodN4YT/DOzJEN
+ RRkmq2Z3Av75Cei8eLxQTYyeMm/wRRcyMwd9jSy7EvTNfGOchjhYFEK7Z9BdrkdpjqSR
+ aSU1NA6YevJO4925FSHEITeNCaVTaq62+Y9WE0HfkoS5UdPoD7NXnDDIWyXKIFu1O9Sn
+ EYLA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=oAtbI+rPI68kFubeDAVhuMcAqpzefisJEhDu9zkuloo=;
+ b=TCYHoEQIU1Ny7fbUZYRxJkWQRRlpHnGaqdXqfjHBy5XhyoHFCdSHMQZNNRiuGE5Wfh
+ TpWXepzCVh4Q9L9g6VMIiIO0YmSqBkIFkj1bs5u34eGzrFxbakmRQgwKRhCzuO8U0UYt
+ RmmCTtn6buMbnEbrS87ejphDGPNXdaU1wm7qwjbqmH8c0BP6VEfrTiHHY+9i3OkWdh9F
+ 0WPXboV6MVKScyzLXs46PAqHrHYRERSTONbfbQ/GigsUlc8emr3VUrs3Fthg5dS400Cg
+ pxJxMrPuBuT+3Tx4oRBon6PuppMjqrZxpdasSKy1p+e3vAMguOWX6eHi++QXSWqfCLcz
+ Ryjg==
+X-Gm-Message-State: APjAAAWDgAuBeFQVLQiVE6W0+LiQH0iN6zAxMdO2szaW0bU/wWHc7H1m
+ 3Spe+d5ZckR9fIguDF8m/yZqT4+SWC33nuJ2I7Z/Wg==
+X-Google-Smtp-Source: APXvYqz+ahkOR0wNpufo08CdLSOek4KUnhVRSR0Fbdv10C7i1Cn5/G8INDADABC/1sHJHaYxSKxP0H6khWJQO0Yy0TQ=
+X-Received: by 2002:a9d:d17:: with SMTP id 23mr18277899oti.221.1559901461607; 
+ Fri, 07 Jun 2019 02:57:41 -0700 (PDT)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.46]); Fri, 07 Jun 2019 09:53:42 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 19/35] s390x/tcg: Implement VECTOR FP CONVERT TO
- FIXED 64-BIT
+References: <20190607095237.11364-1-cohuck@redhat.com>
+In-Reply-To: <20190607095237.11364-1-cohuck@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 7 Jun 2019 10:57:30 +0100
+Message-ID: <CAFEAcA8FXh-jPMwpGN-4ES4v=nE4ZOSNB8+rkdB03E=BBDh-jw@mail.gmail.com>
+To: Cornelia Huck <cohuck@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::32e
+Subject: Re: [Qemu-devel] [PULL 00/35] s390x updates
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -67,105 +86,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-s390x@nongnu.org, Richard Henderson <richard.henderson@linaro.org>,
- qemu-devel@nongnu.org, David Hildenbrand <david@redhat.com>
+Cc: qemu-s390x <qemu-s390x@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: David Hildenbrand <david@redhat.com>
+On Fri, 7 Jun 2019 at 10:52, Cornelia Huck <cohuck@redhat.com> wrote:
+>
+> The following changes since commit 47fbad45d47af8af784bb12a5719489edcd89b4c:
+>
+>   Merge remote-tracking branch 'remotes/kevin/tags/for-upstream' into staging (2019-06-04 17:22:42 +0100)
+>
+> are available in the Git repository at:
+>
+>   https://github.com/cohuck/qemu tags/s390x-20190607-1
+>
+> for you to fetch changes up to 39f04d18406862bd98d6bef5415dbe7360c652de:
+>
+>   Merge tag 's390x-tcg-2019-06-05' into s390-next-staging (2019-06-07 11:38:42 +0200)
+>
+> ----------------------------------------------------------------
+> s390x updates:
+> - tcg: finalize implementation for the vector facility and
+>   add it to the 'qemu' cpu model
+> - linux-user: properly generate ELF_HWCAP
+> - vfio-ccw: support async command subregion (for halt/clear
+>   subchannel handling)
+>
+> ----------------------------------------------------------------
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Signed-off-by: David Hildenbrand <david@redhat.com>
----
- target/s390x/helper.h           |  2 ++
- target/s390x/insn-data.def      |  2 ++
- target/s390x/translate_vx.inc.c |  3 +++
- target/s390x/vec_fpu_helper.c   | 23 +++++++++++++++++++++++
- 4 files changed, 30 insertions(+)
+Hi -- this fails to link on the windows build for me:
+  LINK    s390x-softmmu/qemu-system-s390xw.exe
+hw/s390x/css.o: In function `sch_handle_halt_func_passthrough':
+/home/petmay01/qemu-for-merges/hw/s390x/css.c:1213: undefined
+reference to `vfio_ccw_handle_halt'
+hw/s390x/css.o: In function `sch_handle_clear_func_passthrough':
+/home/petmay01/qemu-for-merges/hw/s390x/css.c:1223: undefined
+reference to `vfio_ccw_handle_clear'
+collect2: error: ld returned 1 exit status
 
-diff --git a/target/s390x/helper.h b/target/s390x/helper.h
-index 6fd996e924d0..9893c677da1b 100644
---- a/target/s390x/helper.h
-+++ b/target/s390x/helper.h
-@@ -270,6 +270,8 @@ DEF_HELPER_FLAGS_4(gvec_vcdg64, TCG_CALL_NO_WG, void,=
- ptr, cptr, env, i32)
- DEF_HELPER_FLAGS_4(gvec_vcdg64s, TCG_CALL_NO_WG, void, ptr, cptr, env, i=
-32)
- DEF_HELPER_FLAGS_4(gvec_vcdlg64, TCG_CALL_NO_WG, void, ptr, cptr, env, i=
-32)
- DEF_HELPER_FLAGS_4(gvec_vcdlg64s, TCG_CALL_NO_WG, void, ptr, cptr, env, =
-i32)
-+DEF_HELPER_FLAGS_4(gvec_vcgd64, TCG_CALL_NO_WG, void, ptr, cptr, env, i3=
-2)
-+DEF_HELPER_FLAGS_4(gvec_vcgd64s, TCG_CALL_NO_WG, void, ptr, cptr, env, i=
-32)
-=20
- #ifndef CONFIG_USER_ONLY
- DEF_HELPER_3(servc, i32, env, i64, i64)
-diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
-index 465b36dd70ba..97c62a8af5f4 100644
---- a/target/s390x/insn-data.def
-+++ b/target/s390x/insn-data.def
-@@ -1222,6 +1222,8 @@
-     F(0xe7c3, VCDG,    VRR_a, V,   0, 0, 0, 0, vcdg, 0, IF_VEC)
- /* VECTOR FP CONVERT FROM LOGICAL 64-BIT */
-     F(0xe7c1, VCDLG,   VRR_a, V,   0, 0, 0, 0, vcdg, 0, IF_VEC)
-+/* VECTOR FP CONVERT TO FIXED 64-BIT */
-+    F(0xe7c2, VCGD,    VRR_a, V,   0, 0, 0, 0, vcdg, 0, IF_VEC)
-=20
- #ifndef CONFIG_USER_ONLY
- /* COMPARE AND SWAP AND PURGE */
-diff --git a/target/s390x/translate_vx.inc.c b/target/s390x/translate_vx.=
-inc.c
-index fa755cd1d648..a42de2ff01e7 100644
---- a/target/s390x/translate_vx.inc.c
-+++ b/target/s390x/translate_vx.inc.c
-@@ -2660,6 +2660,9 @@ static DisasJumpType op_vcdg(DisasContext *s, Disas=
-Ops *o)
-     case 0xc1:
-         fn =3D se ? gen_helper_gvec_vcdlg64s : gen_helper_gvec_vcdlg64;
-         break;
-+    case 0xc2:
-+        fn =3D se ? gen_helper_gvec_vcgd64s : gen_helper_gvec_vcgd64;
-+        break;
-     default:
-         g_assert_not_reached();
-     }
-diff --git a/target/s390x/vec_fpu_helper.c b/target/s390x/vec_fpu_helper.=
-c
-index 181378e167d7..e7251aca0463 100644
---- a/target/s390x/vec_fpu_helper.c
-+++ b/target/s390x/vec_fpu_helper.c
-@@ -323,3 +323,26 @@ void HELPER(gvec_vcdlg64s)(void *v1, const void *v2,=
- CPUS390XState *env,
-=20
-     vop64_2(v1, v2, env, true, XxC, erm, vcdlg64, GETPC());
- }
-+
-+static uint64_t vcgd64(uint64_t a, float_status *s)
-+{
-+    return float64_to_int64(a, s);
-+}
-+
-+void HELPER(gvec_vcgd64)(void *v1, const void *v2, CPUS390XState *env,
-+                         uint32_t desc)
-+{
-+    const uint8_t erm =3D extract32(simd_data(desc), 4, 4);
-+    const bool XxC =3D extract32(simd_data(desc), 2, 1);
-+
-+    vop64_2(v1, v2, env, false, XxC, erm, vcgd64, GETPC());
-+}
-+
-+void HELPER(gvec_vcgd64s)(void *v1, const void *v2, CPUS390XState *env,
-+                          uint32_t desc)
-+{
-+    const uint8_t erm =3D extract32(simd_data(desc), 4, 4);
-+    const bool XxC =3D extract32(simd_data(desc), 2, 1);
-+
-+    vop64_2(v1, v2, env, true, XxC, erm, vcgd64, GETPC());
-+}
---=20
-2.20.1
-
+thanks
+-- PMM
 
