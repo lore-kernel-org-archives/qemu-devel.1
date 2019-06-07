@@ -2,69 +2,61 @@ Return-Path: <SRS0=3yEa=UG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D6427C28CC3
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 07:01:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CEA3CC28CC3
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 07:35:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6850C208C3
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 07:01:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6850C208C3
+	by mail.kernel.org (Postfix) with ESMTPS id 9E7D02089E
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 07:35:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9E7D02089E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46326 helo=lists.gnu.org)
+Received: from localhost ([::1]:46448 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hZ8so-0005qH-5r
-	for qemu-devel@archiver.kernel.org; Fri, 07 Jun 2019 03:01:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35223)
+	id 1hZ9Pj-0001K8-Sn
+	for qemu-devel@archiver.kernel.org; Fri, 07 Jun 2019 03:35:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43132)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <armbru@redhat.com>) id 1hZ8qs-0005OI-Cm
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 02:59:51 -0400
+ (envelope-from <kraxel@redhat.com>) id 1hZ9PH-0000tN-R5
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 03:35:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1hZ8qr-0003xM-59
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 02:59:50 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53436)
+ (envelope-from <kraxel@redhat.com>) id 1hZ9PG-0003Im-J4
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 03:35:23 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59572)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hZ8qq-0003tF-Sh
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 02:59:49 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ (Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1hZ9PG-0002eG-Az
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 03:35:22 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 8BBC93079B9D;
- Fri,  7 Jun 2019 06:59:46 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-148.ams2.redhat.com
- [10.36.116.148])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 9FFC05B2F1;
- Fri,  7 Jun 2019 06:59:37 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 15C0211386A0; Fri,  7 Jun 2019 08:59:31 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-References: <87woihi1wl.fsf@dusky.pond.sub.org>
- <20190524185344.GJ10764@habkost.net>
- <87r28k1g4q.fsf@dusky.pond.sub.org>
- <e5372760-7599-3155-44f7-dc704c9cbaa5@redhat.com>
-Date: Fri, 07 Jun 2019 08:59:31 +0200
-In-Reply-To: <e5372760-7599-3155-44f7-dc704c9cbaa5@redhat.com> (Paolo
- Bonzini's message of "Mon, 27 May 2019 12:03:50 +0200")
-Message-ID: <875zphg9t8.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
+ by mx1.redhat.com (Postfix) with ESMTPS id 7F007C1EB20C;
+ Fri,  7 Jun 2019 07:35:00 +0000 (UTC)
+Received: from sirius.home.kraxel.org (ovpn-117-25.ams2.redhat.com
+ [10.36.117.25])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 340FF78417;
+ Fri,  7 Jun 2019 07:34:55 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+ id 72E7116E1A; Fri,  7 Jun 2019 09:34:54 +0200 (CEST)
+From: Gerd Hoffmann <kraxel@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Date: Fri,  7 Jun 2019 09:34:29 +0200
+Message-Id: <20190607073429.3436-1-kraxel@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.41]); Fri, 07 Jun 2019 06:59:47 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.32]); Fri, 07 Jun 2019 07:35:00 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] qapi/misc.json is too big,
- let's bite off a few chunks
+Subject: [Qemu-devel] [PATCH v2] q35: fix mmconfig and PCI0._CRS
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -76,112 +68,165 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?utf-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>,
- =?utf-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org,
- =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
- =?utf-8?Q?Andreas_F=C3=A4rber?= <afaerber@suse.de>,
+Cc: Eduardo Habkost <ehabkost@redhat.com>,
+ "open list:All patches CC here" <qemu-devel@nongnu.org>,
+ Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Igor Mammedov <imammedo@redhat.com>,
+ =?UTF-8?q?L=C3=A1szl=C3=B3=20=C3=89rsek?= <lersek@redhat.com>,
  Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Paolo Bonzini <pbonzini@redhat.com> writes:
+This patch changes the handling of the mmconfig area.  Thanks to the
+pci(e) expander devices we already have the logic to exclude address
+ranges from PCI0._CRS.  We can simply add the mmconfig address range
+to the list get it excluded as well.
 
-> On 27/05/19 10:00, Markus Armbruster wrote:
->> As long as we don't have an active QOM maintainer[*], the benefit is
->> low.
->>=20
->>=20
->> [*] We need one.  I'm not volunteering.
->
-> I think Daniel, Eduardo and I could count as de facto maintainer.  I
-> guess I could maintain it if I get two partners in crime as reviewers.
+With that in place we can go with a fixed pci hole which covers the
+whole area from the end of (low) ram to the ioapic.
 
-Alright, we need two volunteers for the reviewer role, and one patch to
-MAINTAINERS.
+This will make the whole logic alot less fragile.  No matter where the
+firmware places the mmconfig xbar, things should work correctly.  The
+guest also gets a bit more PCI address space (seabios boot):
 
-A mention in MAINTAINERS is the traditional punishment for good work, so
-let's see who's been doing the work.  Aha:
+    # cat /proc/iomem
+    [ ... ]
+    7ffdd000-7fffffff : reserved
+    80000000-afffffff : PCI Bus 0000:00            <<-- this is new
+    b0000000-bfffffff : PCI MMCONFIG 0000 [bus 00-ff]
+      b0000000-bfffffff : reserved
+    c0000000-febfffff : PCI Bus 0000:00
+      f8000000-fbffffff : 0000:00:01.0
+    [ ... ]
 
-    Eduardo Habkost
-    Marc-Andr=C3=A9 Lureau
-    Markus Armbruster
-    Eric Blake
-    Philippe Mathieu-Daud=C3=A9
+So this is a guest visible change.
 
-Details appended.
+Cc: L=C3=A1szl=C3=B3 =C3=89rsek <lersek@redhat.com>
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+---
+ tests/bios-tables-test-allowed-diff.h |  8 +++++++
+ hw/i386/acpi-build.c                  | 14 ++++++++++++
+ hw/pci-host/q35.c                     | 31 +++++++--------------------
+ 3 files changed, 30 insertions(+), 23 deletions(-)
 
-QOM is not a particularly active subsystem now: 51 commits in two years.
+diff --git a/tests/bios-tables-test-allowed-diff.h b/tests/bios-tables-te=
+st-allowed-diff.h
+index dfb8523c8bf4..3bbd22c62a3b 100644
+--- a/tests/bios-tables-test-allowed-diff.h
++++ b/tests/bios-tables-test-allowed-diff.h
+@@ -1 +1,9 @@
+ /* List of comma-separated changed AML files to ignore */
++"tests/data/acpi/q35/DSDT",
++"tests/data/acpi/q35/DSDT.bridge",
++"tests/data/acpi/q35/DSDT.mmio64",
++"tests/data/acpi/q35/DSDT.ipmibt",
++"tests/data/acpi/q35/DSDT.cphp",
++"tests/data/acpi/q35/DSDT.memhp",
++"tests/data/acpi/q35/DSDT.numamem",
++"tests/data/acpi/q35/DSDT.dimmpxm",
+diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+index 85dc1640bc67..8e4f26977619 100644
+--- a/hw/i386/acpi-build.c
++++ b/hw/i386/acpi-build.c
+@@ -122,6 +122,8 @@ typedef struct FwCfgTPMConfig {
+     uint8_t tpmppi_version;
+ } QEMU_PACKED FwCfgTPMConfig;
+=20
++static bool acpi_get_mcfg(AcpiMcfgInfo *mcfg);
++
+ static void init_common_fadt_data(Object *o, AcpiFadtData *data)
+ {
+     uint32_t io =3D object_property_get_uint(o, ACPI_PM_PROP_PM_IO_BASE,=
+ NULL);
+@@ -1807,6 +1809,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
+     CrsRangeSet crs_range_set;
+     PCMachineState *pcms =3D PC_MACHINE(machine);
+     PCMachineClass *pcmc =3D PC_MACHINE_GET_CLASS(machine);
++    AcpiMcfgInfo mcfg;
+     uint32_t nr_mem =3D machine->ram_slots;
+     int root_bus_limit =3D 0xFF;
+     PCIBus *bus =3D NULL;
+@@ -1921,6 +1924,17 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
+         }
+     }
+=20
++    /*
++     * At this point crs_range_set has all the ranges used by pci
++     * busses *other* than PCI0.  These ranges will be excluded from
++     * the PCI0._CRS.  Add mmconfig to the set so it will be excluded
++     * too.
++     */
++    if (acpi_get_mcfg(&mcfg)) {
++        crs_range_insert(crs_range_set.mem_ranges,
++                         mcfg.base, mcfg.base + mcfg.size - 1);
++    }
++
+     scope =3D aml_scope("\\_SB.PCI0");
+     /* build PCI0._CRS */
+     crs =3D aml_resource_template();
+diff --git a/hw/pci-host/q35.c b/hw/pci-host/q35.c
+index 960939f5ed3e..72093320befe 100644
+--- a/hw/pci-host/q35.c
++++ b/hw/pci-host/q35.c
+@@ -258,15 +258,6 @@ static void q35_host_initfn(Object *obj)
+     object_property_add_link(obj, MCH_HOST_PROP_IO_MEM, TYPE_MEMORY_REGI=
+ON,
+                              (Object **) &s->mch.address_space_io,
+                              qdev_prop_allow_set_link_before_realize, 0,=
+ NULL);
+-
+-    /* Leave enough space for the biggest MCFG BAR */
+-    /* TODO: this matches current bios behaviour, but
+-     * it's not a power of two, which means an MTRR
+-     * can't cover it exactly.
+-     */
+-    range_set_bounds(&s->mch.pci_hole,
+-            MCH_HOST_BRIDGE_PCIEXBAR_DEFAULT + MCH_HOST_BRIDGE_PCIEXBAR_=
+MAX,
+-            IO_APIC_DEFAULT_ADDRESS - 1);
+ }
+=20
+ static const TypeInfo q35_host_info =3D {
+@@ -338,20 +329,6 @@ static void mch_update_pciexbar(MCHPCIState *mch)
+     }
+     addr =3D pciexbar & addr_mask;
+     pcie_host_mmcfg_update(pehb, enable, addr, length);
+-    /* Leave enough space for the MCFG BAR */
+-    /*
+-     * TODO: this matches current bios behaviour, but it's not a power o=
+f two,
+-     * which means an MTRR can't cover it exactly.
+-     */
+-    if (enable) {
+-        range_set_bounds(&mch->pci_hole,
+-                         addr + length,
+-                         IO_APIC_DEFAULT_ADDRESS - 1);
+-    } else {
+-        range_set_bounds(&mch->pci_hole,
+-                         MCH_HOST_BRIDGE_PCIEXBAR_DEFAULT,
+-                         IO_APIC_DEFAULT_ADDRESS - 1);
+-    }
+ }
+=20
+ /* PAM */
+@@ -484,6 +461,14 @@ static void mch_update(MCHPCIState *mch)
+     mch_update_pam(mch);
+     mch_update_smram(mch);
+     mch_update_ext_tseg_mbytes(mch);
++
++    /*
++     * pci hole goes from end-of-low-ram to io-apic.
++     * mmconfig will be excluded by the dsdt builder.
++     */
++    range_set_bounds(&mch->pci_hole,
++                     mch->below_4g_mem_size,
++                     IO_APIC_DEFAULT_ADDRESS - 1);
+ }
+=20
+ static int mch_post_load(void *opaque, int version_id)
+--=20
+2.18.1
 
-We obviously need maintainers to review and merge patches.  The nominal
-maintainer hasn't been doing that since 2015.  Git shows the following
-top committers taking on / getting sucked into QOM:
-
-    Markus Armbruster <armbru@redhat.com>
-    Eduardo Habkost <ehabkost@redhat.com>
-    Paolo Bonzini <pbonzini@redhat.com>
-    Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-    Eric Blake <eblake@redhat.com>
-
-We really need nominal maintainer(s) again.
-
-Of course, *active* maintainers would be even better: I consider QOM
-stuck in an unhappy place where much of its potential is still
-potential.
-
-But let's start small.  Volunteers for the reviewer role, please step
-forward :)
-
-
-
-The details I promised:
-
-Output of "scripts/get_maintainer.pl --git --git-since=3D'2-years-ago' |
-grep commit_signer" sorted by file size:
-
-=3D qom/object.c =3D
-"Marc-Andr=C3=A9 Lureau" <marcandre.lureau@redhat.com> (commit_signer:20/36=
-=3D56%)
-Markus Armbruster <armbru@redhat.com> (commit_signer:15/36=3D42%)
-Eric Blake <eblake@redhat.com> (commit_signer:14/36=3D39%)
-Eduardo Habkost <ehabkost@redhat.com> (commit_signer:14/36=3D39%)
-"Philippe Mathieu-Daud=C3=A9" <philmd@redhat.com> (commit_signer:9/36=3D25%)
-
-=3D include/qom/object.h =3D
-Eduardo Habkost <ehabkost@redhat.com> (commit_signer:9/18=3D50%)
-"Marc-Andr=C3=A9 Lureau" <marcandre.lureau@redhat.com> (commit_signer:8/18=
-=3D44%)
-Igor Mammedov <imammedo@redhat.com> (commit_signer:6/18=3D33%)
-Markus Armbruster <armbru@redhat.com> (commit_signer:6/18=3D33%)
-David Gibson <david@gibson.dropbear.id.au> (commit_signer:5/18=3D28%)
-
-=3D include/qom/object_interfaces.h =3D
-Eduardo Habkost <ehabkost@redhat.com> (commit_signer:8/5=3D100%)
-Igor Mammedov <imammedo@redhat.com> (commit_signer:3/5=3D60%)
-"Marc-Andr=C3=A9 Lureau" <marcandre.lureau@redhat.com> (commit_signer:2/5=
-=3D40%)
-"Philippe Mathieu-Daud=C3=A9" <f4bug@amsat.org> (commit_signer:2/5=3D40%)
-Eric Blake <eblake@redhat.com> (commit_signer:1/5=3D20%)
-
-=3D qom/object_interfaces.c =3D
-Eric Blake <eblake@redhat.com> (commit_signer:9/12=3D75%)
-"Marc-Andr=C3=A9 Lureau" <marcandre.lureau@redhat.com> (commit_signer:7/12=
-=3D58%)
-Markus Armbruster <armbru@redhat.com> (commit_signer:7/12=3D58%)
-Eduardo Habkost <ehabkost@redhat.com> (commit_signer:6/12=3D50%)
-"Philippe Mathieu-Daud=C3=A9" <philmd@redhat.com> (commit_signer:4/12=3D33%)
-
-=3D qom/qom-qobject.c =3D
-
-=3D include/qom/qom-qobject.h =3D
-
-=3D qom/trace-events =3D
-Stefan Hajnoczi <stefanha@redhat.com> (commit_signer:2/2=3D100%)
-"Philippe Mathieu-Daud=C3=A9" <philmd@redhat.com> (commit_signer:2/2=3D100%)
-Markus Armbruster <armbru@redhat.com> (commit_signer:1/2=3D50%)
-Michael Tokarev <mjt@tls.msk.ru> (commit_signer:1/2=3D50%)
-
-=3D qom/Makefile.objs =3D
 
