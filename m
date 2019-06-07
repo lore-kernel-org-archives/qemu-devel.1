@@ -2,66 +2,66 @@ Return-Path: <SRS0=3yEa=UG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_MUTT autolearn=ham
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AA12CC2BCA1
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 13:32:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5EAB5C2BCA1
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 13:34:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 80DE220B7C
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 13:32:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 80DE220B7C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 340BB20B7C
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 13:34:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 340BB20B7C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51150 helo=lists.gnu.org)
+Received: from localhost ([::1]:51166 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hZEyP-0007Rz-OG
-	for qemu-devel@archiver.kernel.org; Fri, 07 Jun 2019 09:32:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36908)
+	id 1hZF0K-0000JO-ED
+	for qemu-devel@archiver.kernel.org; Fri, 07 Jun 2019 09:34:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36686)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <kwolf@redhat.com>) id 1hZEtn-0005sU-EK
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 09:27:17 -0400
+ (envelope-from <no-reply@patchew.org>) id 1hZEsX-0005SI-V7
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 09:26:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1hZEtj-0004mh-VV
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 09:27:13 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45390)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>)
- id 1hZEtb-0004NL-NZ; Fri, 07 Jun 2019 09:27:04 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 5387A83F45;
- Fri,  7 Jun 2019 13:26:59 +0000 (UTC)
-Received: from dhcp-200-226.str.redhat.com (dhcp-200-226.str.redhat.com
- [10.33.200.226])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 61F3082F6E;
- Fri,  7 Jun 2019 13:26:54 +0000 (UTC)
-Date: Fri, 7 Jun 2019 15:26:52 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <20190607132652.GD5055@dhcp-200-226.str.redhat.com>
-References: <20190411172709.205032-1-vsementsov@virtuozzo.com>
- <20190411172709.205032-7-vsementsov@virtuozzo.com>
- <0b64cff5-33fa-0945-504c-b1bdd004c42a@redhat.com>
- <20190607080635.GB5055@dhcp-200-226.str.redhat.com>
- <c1414cfd-99cd-ea31-ab22-f7d76974e6b3@virtuozzo.com>
+ (envelope-from <no-reply@patchew.org>) id 1hZEsW-00021B-D7
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 09:25:57 -0400
+Resent-Date: Fri, 07 Jun 2019 09:25:57 -0400
+Resent-Message-Id: <E1hZEsW-00021B-D7@eggs.gnu.org>
+Received: from sender-of-o53.zoho.com ([135.84.80.218]:21804)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1hZEsW-0001y0-4d
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 09:25:56 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1559913902; cv=none; d=zoho.com; s=zohoarc; 
+ b=AZLONDpnsipwVMoiW5g6CASRTPJtRlbPCZzsPO+6kRhD27Kkjb9gh0OOvAVRKffiKI+lAHxaCjH5hy8t7bYyudY6neAYw4J04XKPV6tTyHqiAYeXfk3/6+i9PXzP7vonfMYmf6o5ueTTJjH07e3YTtEX0lbySwIwMCbg28/4Jrc=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
+ s=zohoarc; t=1559913902;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
+ bh=ESZ7E5gqLwtolyCgC78GlGm++/1FTQcXz7RpgqMVQD4=; 
+ b=HaDx99wG47c87FkpUoA+Nii/30X6ZVcc1LECD23bxfpf2CUBF2SVwH+TdjLa5+TUFO7rHqgC1hquTCLYgGe0YkLL1fvfLAaRS/4V13YdlUZMhGtxnEjdBt+4tpjWpXRZ+7+GIJVnRFOgHuK+wFi4MvLPgs+MVz/+eCLCRTUdFjQ=
+ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1559913900254155.58570294074025;
+ Fri, 7 Jun 2019 06:25:00 -0700 (PDT)
+In-Reply-To: <20190607091116.49044-1-ysato@users.sourceforge.jp>
+Message-ID: <155991389914.32260.3655957748072431947@ce79690b2cb9>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <c1414cfd-99cd-ea31-ab22-f7d76974e6b3@virtuozzo.com>
-User-Agent: Mutt/1.11.3 (2019-02-01)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.27]); Fri, 07 Jun 2019 13:26:59 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: ysato@users.sourceforge.jp
+Date: Fri, 7 Jun 2019 06:25:00 -0700 (PDT)
+X-ZohoMailClient: External
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v6 6/7] block/nbd-client: nbd reconnect
+X-Received-From: 135.84.80.218
+Subject: Re: [Qemu-devel] [PATCH v17 00/24] Add RX archtecture support
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,126 +73,144 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Denis Lunev <den@virtuozzo.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
- "armbru@redhat.com" <armbru@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "mreitz@redhat.com" <mreitz@redhat.com>,
- "stefanha@redhat.com" <stefanha@redhat.com>
+Reply-To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, richard.henderson@linaro.org,
+ qemu-devel@nongnu.org, ysato@users.sourceforge.jp, philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 07.06.2019 um 14:02 hat Vladimir Sementsov-Ogievskiy geschrieben:
-> 07.06.2019 11:06, Kevin Wolf wrote:
-> > Am 07.06.2019 um 05:17 hat Eric Blake geschrieben:
-> >> On 4/11/19 12:27 PM, Vladimir Sementsov-Ogievskiy wrote:
-> >>> +static coroutine_fn void nbd_reconnect_loop(NBDConnection *con)
-> >>> +{
-> >>> +    NBDClientSession *s = nbd_get_client_session(con->bs);
-> >>> +    uint64_t start_time_ns = qemu_clock_get_ns(QEMU_CLOCK_REALTIME);
-> >>> +    uint64_t delay_ns = s->reconnect_delay * 1000000000UL;
-> >>
-> >> Do we have a #define constant for nanoseconds in a second to make this
-> >> more legible than counting '0's?
-> >>
-> >>> +    uint64_t timeout = 1000000000UL; /* 1 sec */
-> >>> +    uint64_t max_timeout = 16000000000UL; /* 16 sec */
-> >>
-> >> 1 * constant, 16 * constant
-> >>
-> >>> +
-> >>> +    nbd_reconnect_attempt(con);
-> >>> +
-> >>> +    while (nbd_client_connecting(s)) {
-> >>> +        if (s->state == NBD_CLIENT_CONNECTING_WAIT &&
-> >>> +            qemu_clock_get_ns(QEMU_CLOCK_REALTIME) - start_time_ns > delay_ns)
-> >>> +        {
-> >>> +            s->state = NBD_CLIENT_CONNECTING_NOWAIT;
-> >>> +            qemu_co_queue_restart_all(&s->free_sema);
-> >>> +        }
-> >>> +
-> >>> +        bdrv_dec_in_flight(con->bs);
-> >>> +        qemu_co_sleep_ns(QEMU_CLOCK_REALTIME, timeout);
-> >>
-> >> Another place where I'd like someone more familiar with coroutines to
-> >> also have a look.
-> > 
-> > What's the exact question you'd like me to answer?
-> > 
-> > But anyway, bdrv_dec/inc_in_flight() around the sleep looks wrong to me.
-> > Either the operation must be waited for in drain, then you can't
-> > decrease the counter even during the sleep. Or drain doesn't have to
-> > consider it, then why is the counter even increased in the first place?
-> > 
-> > The way it currently is, drain can return assuming that there are no
-> > requests, but after the timeout the request automatically comes back
-> > while the drain caller assumes that there is no more activity. This
-> > doesn't look right.
-> 
-> Hmm.
-> 
-> This ind/dec around all lifetime of connection coroutine you added in
-> 
-> commit 5ad81b4946baf948c65cf7e1436d9b74803c1280
-> Author: Kevin Wolf <kwolf@redhat.com>
-> Date:   Fri Feb 15 16:53:51 2019 +0100
-> 
->      nbd: Restrict connection_co reentrance
-> 
-> 
-> And now I try to connect in endless loop, with qemu_co_sleep_ns() inside.
-> I need to get a change to bdrv_drain to complete, so I have to sometimes
-> drop this in_flight request. But I understand your point.
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDYwNzA5MTExNi40OTA0
+NC0xLXlzYXRvQHVzZXJzLnNvdXJjZWZvcmdlLmpwLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1z
+IHRvIGhhdmUgc29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9y
+Cm1vcmUgaW5mb3JtYXRpb246CgpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIHYxNyAwMC8y
+NF0gQWRkIFJYIGFyY2h0ZWN0dXJlIHN1cHBvcnQKTWVzc2FnZS1pZDogMjAxOTA2MDcwOTExMTYu
+NDkwNDQtMS15c2F0b0B1c2Vycy5zb3VyY2Vmb3JnZS5qcApUeXBlOiBzZXJpZXMKCj09PSBURVNU
+IFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0IHJldi1wYXJzZSBiYXNlID4gL2Rldi9u
+dWxsIHx8IGV4aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBj
+b25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5h
+bGdvcml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFz
+ZS4uCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rl
+c3QnCjBhODZmZjUgdGFyZ2V0L3J4OiBSZW1vdmUgc3VmZml4IGluIGNwdSBjbGFzcy4KN2MzNGI0
+MCB0YXJnZXQvcng6IER1bXAgYnl0ZXMgZm9yIGVhY2ggaW5zbiBkdXJpbmcgZGlzYXNzZW1ibHkK
+OTQ1ZmRlZiB0YXJnZXQvcng6IENvbGxlY3QgYWxsIGJ5dGVzIGR1cmluZyBkaXNhc3NlbWJseQo5
+YjcwY2Y2IHRhcmdldC9yeDogRW1pdCBhbGwgZGlzYXNzZW1ibHkgaW4gb25lIHBydCgpCjJiOTBj
+MDYgdGFyZ2V0L3J4OiBVc2UgcHJ0X2xkbWkgZm9yIFhDSEdfbXIgZGlzYXNzZW1ibHkKMmIzMmJm
+YSB0YXJnZXQvcng6IFJlcGxhY2Ugb3BlcmFuZCB3aXRoIHBydF9sZG1pIGluIGRpc2Fzc2VtYmxl
+cgpjMTA0M2Q3IHRhcmdldC9yeDogRGlzYXNzZW1ibGUgcnhfaW5kZXhfYWRkciBpbnRvIGEgc3Ry
+aW5nCmZmZmRkMjkgTUFJTlRBSU5FUlM6IEFkZCBSWAowYmJiNzk2IEFkZCByeC1zb2Z0bW11CmQ5
+M2FjOTIgaHcvcng6IEhvbm9yIC1hY2NlbCBxdGVzdApmZGFlMjQ0IHRlc3RzOiBBZGQgcnggdG8g
+bWFjaGluZS1ub25lLXRlc3QuYwoyOGY1YzY3IHRhcmdldC9yeDogRml4IGNwdSB0eXBlcyBhbmQg
+bmFtZXMKZDZkYzQzNiB0YXJnZXQvcng6IEFkZCBSWCB0byBTeXNFbXVUYXJnZXQKYWZlN2ZiYSB0
+YXJnZXQvcng6IENvbnZlcnQgdG8gQ1BVQ2xhc3M6OnRsYl9maWxsCjBhODI1N2IgaHcvcmVnaXN0
+ZXJmaWVsZHMuaDogQWRkIDhiaXQgYW5kIDE2Yml0IHJlZ2lzdGVyIG1hY3JvcwozMjAyMGY2IHFl
+bXUvYml0b3BzLmg6IEFkZCBleHRyYWN0OCBhbmQgZXh0cmFjdDE2CjhiZGNkMzIgaHcvcng6IFJY
+IFRhcmdldCBoYXJkd2FyZSBkZWZpbml0aW9uCjEyOWQ4MWMgaHcvY2hhcjogUlg2Mk4gc2VyaWFs
+IGNvbW11bmljYXRpb24gaW50ZXJmYWNlIChTQ0kpCmRhYjc0N2UgaHcvdGltZXI6IFJYNjJOIGlu
+dGVybmFsIHRpbWVyIG1vZHVsZXMKYmQwY2QxNyBody9pbnRjOiBSWDYyTiBpbnRlcnJ1cHQgY29u
+dHJvbGxlciAoSUNVYSkKNzdmNDJkNCB0YXJnZXQvcng6IFJYIGRpc2Fzc2VtYmxlcgowNWYyYWY1
+IHRhcmdldC9yeDogQ1BVIGRlZmluaXRpb24KMTZlYWFkMyB0YXJnZXQvcng6IFRDRyBoZWxwZXIK
+NTY2Y2ExZSB0YXJnZXQvcng6IFRDRyB0cmFuc2xhdGlvbgoKPT09IE9VVFBVVCBCRUdJTiA9PT0K
+MS8yNCBDaGVja2luZyBjb21taXQgNTY2Y2ExZTIyZjk4ICh0YXJnZXQvcng6IFRDRyB0cmFuc2xh
+dGlvbikKV0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlO
+VEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojMTk6IApuZXcgZmlsZSBtb2RlIDEwMDY0NAoKdG90YWw6
+IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCAzMDY1IGxpbmVzIGNoZWNrZWQKClBhdGNoIDEvMjQgaGFz
+IHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwph
+cmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hF
+Q0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KMi8yNCBDaGVja2luZyBjb21taXQgMTZlYWFkMzg2Y2Fh
+ICh0YXJnZXQvcng6IFRDRyBoZWxwZXIpCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVk
+IGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzE0OiAKbmV3IGZpbGUg
+bW9kZSAxMDA2NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgNjYwIGxpbmVzIGNoZWNr
+ZWQKClBhdGNoIDIvMjQgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55
+IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBt
+YWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KMy8yNCBDaGVja2luZyBj
+b21taXQgMDVmMmFmNTFkZmE4ICh0YXJnZXQvcng6IENQVSBkZWZpbml0aW9uKQpXQVJOSU5HOiBh
+ZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBk
+YXRpbmc/CiMxNDogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2Fy
+bmluZ3MsIDU5OSBsaW5lcyBjaGVja2VkCgpQYXRjaCAzLzI0IGhhcyBzdHlsZSBwcm9ibGVtcywg
+cGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZl
+cyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRB
+SU5FUlMuCjQvMjQgQ2hlY2tpbmcgY29tbWl0IDc3ZjQyZDRjMmViMiAodGFyZ2V0L3J4OiBSWCBk
+aXNhc3NlbWJsZXIpCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRv
+ZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzM4OiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQK
+CnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgMTQ5NyBsaW5lcyBjaGVja2VkCgpQYXRjaCA0
+LzI0IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBl
+cnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwg
+c2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjUvMjQgQ2hlY2tpbmcgY29tbWl0IGJkMGNk
+MTc3YWM5ZCAoaHcvaW50YzogUlg2Mk4gaW50ZXJydXB0IGNvbnRyb2xsZXIgKElDVWEpKQpXQVJO
+SU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5l
+ZWQgdXBkYXRpbmc/CiMzOTogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMs
+IDEgd2FybmluZ3MsIDQ0MiBsaW5lcyBjaGVja2VkCgpQYXRjaCA1LzI0IGhhcyBzdHlsZSBwcm9i
+bGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBv
+c2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4g
+TUFJTlRBSU5FUlMuCjYvMjQgQ2hlY2tpbmcgY29tbWl0IGRhYjc0N2UwNmYwYyAoaHcvdGltZXI6
+IFJYNjJOIGludGVybmFsIHRpbWVyIG1vZHVsZXMpCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBk
+ZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzQ5OiAKbmV3
+IGZpbGUgbW9kZSAxMDA2NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgODM5IGxpbmVz
+IGNoZWNrZWQKClBhdGNoIDYvMjQgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAg
+SWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRv
+IHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KNy8yNCBDaGVj
+a2luZyBjb21taXQgMTI5ZDgxYzUyNDUwIChody9jaGFyOiBSWDYyTiBzZXJpYWwgY29tbXVuaWNh
+dGlvbiBpbnRlcmZhY2UgKFNDSSkpCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZp
+bGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzQyOiAKbmV3IGZpbGUgbW9k
+ZSAxMDA2NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgMzk4IGxpbmVzIGNoZWNrZWQK
+ClBhdGNoIDcvMjQgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9m
+IHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWlu
+dGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KOC8yNCBDaGVja2luZyBjb21t
+aXQgOGJkY2QzMjUxZmU2IChody9yeDogUlggVGFyZ2V0IGhhcmR3YXJlIGRlZmluaXRpb24pCldB
+Uk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMg
+bmVlZCB1cGRhdGluZz8KIzE4OiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCnRvdGFsOiAwIGVycm9y
+cywgMSB3YXJuaW5ncywgNDYwIGxpbmVzIGNoZWNrZWQKClBhdGNoIDgvMjQgaGFzIHN0eWxlIHBy
+b2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2Ug
+cG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBp
+biBNQUlOVEFJTkVSUy4KOS8yNCBDaGVja2luZyBjb21taXQgMzIwMjBmNjI4OWQ3IChxZW11L2Jp
+dG9wcy5oOiBBZGQgZXh0cmFjdDggYW5kIGV4dHJhY3QxNikKMTAvMjQgQ2hlY2tpbmcgY29tbWl0
+IDBhODI1N2IxODUzYSAoaHcvcmVnaXN0ZXJmaWVsZHMuaDogQWRkIDhiaXQgYW5kIDE2Yml0IHJl
+Z2lzdGVyIG1hY3JvcykKVXNlIG9mIHVuaW5pdGlhbGl6ZWQgdmFsdWUgaW4gY29uY2F0ZW5hdGlv
+biAoLikgb3Igc3RyaW5nIGF0IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIGxpbmUgMjQ2Ny4KRVJS
+T1I6IE1hY3JvcyB3aXRoIG11bHRpcGxlIHN0YXRlbWVudHMgc2hvdWxkIGJlIGVuY2xvc2VkIGlu
+IGEgZG8gLSB3aGlsZSBsb29wCiMyNTogRklMRTogaW5jbHVkZS9ody9yZWdpc3RlcmZpZWxkcy5o
+OjI1OgorI2RlZmluZSBSRUc4KHJlZywgYWRkcikgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgIFwKKyAgICBlbnVtIHsgQV8gIyMgcmVnID0gKGFkZHIpIH07
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXAorICAgIGVudW0geyBS
+XyAjIyByZWcgPSAoYWRkcikgfTsKCkVSUk9SOiBNYWNyb3Mgd2l0aCBtdWx0aXBsZSBzdGF0ZW1l
+bnRzIHNob3VsZCBiZSBlbmNsb3NlZCBpbiBhIGRvIC0gd2hpbGUgbG9vcAojMjk6IEZJTEU6IGlu
+Y2x1ZGUvaHcvcmVnaXN0ZXJmaWVsZHMuaDoyOToKKyNkZWZpbmUgUkVHMTYocmVnLCBhZGRyKSAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXAorICAgIGVu
+dW0geyBBXyAjIyByZWcgPSAoYWRkcikgfTsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICBcCisgICAgZW51bSB7IFJfICMjIHJlZyA9IChhZGRyKSAvIDIgfTsKCnRvdGFs
+OiAyIGVycm9ycywgMCB3YXJuaW5ncywgNTYgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMTAvMjQgaGFz
+IHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwph
+cmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hF
+Q0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCjExLzI0IENoZWNraW5nIGNvbW1pdCBhZmU3ZmJhNjBk
+ODIgKHRhcmdldC9yeDogQ29udmVydCB0byBDUFVDbGFzczo6dGxiX2ZpbGwpCjEyLzI0IENoZWNr
+aW5nIGNvbW1pdCBkNmRjNDM2YzY3MDEgKHRhcmdldC9yeDogQWRkIFJYIHRvIFN5c0VtdVRhcmdl
+dCkKMTMvMjQgQ2hlY2tpbmcgY29tbWl0IDI4ZjVjNjc3OGEyOCAodGFyZ2V0L3J4OiBGaXggY3B1
+IHR5cGVzIGFuZCBuYW1lcykKMTQvMjQgQ2hlY2tpbmcgY29tbWl0IGZkYWUyNDRlZGVhYyAodGVz
+dHM6IEFkZCByeCB0byBtYWNoaW5lLW5vbmUtdGVzdC5jKQoxNS8yNCBDaGVja2luZyBjb21taXQg
+ZDkzYWM5MjM5OWIxIChody9yeDogSG9ub3IgLWFjY2VsIHF0ZXN0KQoxNi8yNCBDaGVja2luZyBj
+b21taXQgMGJiYjc5NmU5ZGQzIChBZGQgcngtc29mdG1tdSkKV0FSTklORzogYWRkZWQsIG1vdmVk
+IG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojNTQ6
+IApuZXcgZmlsZSBtb2RlIDEwMDY0NAoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCA0NSBs
+aW5lcyBjaGVja2VkCgpQYXRjaCAxNi8yNCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZp
+ZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRo
+ZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoxNy8y
+NCBDaGVja2luZyBjb21taXQgZmZmZGQyOWIxNWFkIChNQUlOVEFJTkVSUzogQWRkIFJYKQoxOC8y
+NCBDaGVja2luZyBjb21taXQgYzEwNDNkNzdkOTA4ICh0YXJnZXQvcng6IERpc2Fzc2VtYmxlIHJ4
+X2luZGV4X2FkZHIgaW50byBhIHN0cmluZykKMTkvMjQgQ2hlY2tpbmcgY29tbWl0IDJiMzJiZmEy
+MThlMCAodGFyZ2V0L3J4OiBSZXBsYWNlIG9wZXJhbmQgd2l0aCBwcnRfbGRtaSBpbiBkaXNhc3Nl
+bWJsZXIpCjIwLzI0IENoZWNraW5nIGNvbW1pdCAyYjkwYzA2MjRjNTcgKHRhcmdldC9yeDogVXNl
+IHBydF9sZG1pIGZvciBYQ0hHX21yIGRpc2Fzc2VtYmx5KQoyMS8yNCBDaGVja2luZyBjb21taXQg
+OWI3MGNmNjQ1ZDM2ICh0YXJnZXQvcng6IEVtaXQgYWxsIGRpc2Fzc2VtYmx5IGluIG9uZSBwcnQo
+KSkKMjIvMjQgQ2hlY2tpbmcgY29tbWl0IDk0NWZkZWY2ZjhlMCAodGFyZ2V0L3J4OiBDb2xsZWN0
+IGFsbCBieXRlcyBkdXJpbmcgZGlzYXNzZW1ibHkpCjIzLzI0IENoZWNraW5nIGNvbW1pdCA3YzM0
+YjQwZTc2YzYgKHRhcmdldC9yeDogRHVtcCBieXRlcyBmb3IgZWFjaCBpbnNuIGR1cmluZyBkaXNh
+c3NlbWJseSkKMjQvMjQgQ2hlY2tpbmcgY29tbWl0IDBhODZmZjViYjMxNiAodGFyZ2V0L3J4OiBS
+ZW1vdmUgc3VmZml4IGluIGNwdSBjbGFzcy4pCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21t
+YW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0
+dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMTkwNjA3MDkxMTE2LjQ5MDQ0LTEteXNhdG9AdXNlcnMu
+c291cmNlZm9yZ2UuanAvdGVzdGluZy5jaGVja3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFp
+bCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwczovL3BhdGNoZXcub3Jn
+L10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
 
-Ah, right, I see. I think it's fine to add a second point where we
-decrease the counter (though I would add a comment telling why we do
-this) as long as the right conditions are met.
-
-The right conditions are probably something like: Once drained, we
-guarantee that we don't call any callbacks until the drained section
-ends. In nbd_read_eof() this is true because we can't get an answer if
-we had no request running.
-
-Or actually... This assumes a nice compliant server that doesn't just
-arbitrarily send unexpected messages. Is the existing code broken if we
-connect to a malicious server?
-
-> Will the following work better?
-> 
-> bdrv_dec_in_flight(con->bs);
-> qemu_co_sleep_ns(...);
-> while (s->drained) {
->    s->wait_drained_end = true;
->    qemu_coroutine_yield();
-> }
-> bdrv_inc_in_flight(con->bs);
-> 
-> ...
-> .drained_begin() {
->     s->drained = true;
-> }
-> 
-> .drained_end() {
->     if (s->wait_drained_end) {
->        s->wait_drained_end = false;
->        aio_co_wake(s->connection_co);
->     }
-> }
-
-This should make sure that we don't call any callbacks before the drain
-section has ended.
-
-We probably still have a problem because nbd_client_attach_aio_context()
-reenters the coroutine with qemu_aio_coroutine_enter(), which will cause
-an assertion failure if co->scheduled is set. So this needs to use a
-version that can cancel a sleep.
-
-I see that your patch currently simply ignores attaching a new context,
-but then the coroutine stays in the old AioContext. Did I miss some
-additional code that moves it to the new context somehow or will it just
-stay where it was if the coroutine happens to be reconnecting when the
-AioContext was supposed to change?
-
-Kevin
 
