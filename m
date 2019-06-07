@@ -2,80 +2,59 @@ Return-Path: <SRS0=3yEa=UG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 430AAC468BE
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 11:36:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4578DC2BCA1
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 11:37:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0B23F20B7C
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 11:36:48 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="pueavyNx"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0B23F20B7C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 1DDDA208C3
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 11:37:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1DDDA208C3
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48698 helo=lists.gnu.org)
+Received: from localhost ([::1]:48706 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hZDAt-0005jm-Th
-	for qemu-devel@archiver.kernel.org; Fri, 07 Jun 2019 07:36:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33144)
+	id 1hZDBS-0006PS-Cv
+	for qemu-devel@archiver.kernel.org; Fri, 07 Jun 2019 07:37:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39917)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <peter.maydell@linaro.org>) id 1hZBq8-00084N-7B
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 06:11:18 -0400
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1hZCE2-000179-Pr
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 06:35:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1hZBq1-0000MI-9h
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 06:11:11 -0400
-Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:44393)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1hZBpz-00009S-00
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 06:11:08 -0400
-Received: by mail-oi1-x241.google.com with SMTP id e189so1027133oib.11
- for <qemu-devel@nongnu.org>; Fri, 07 Jun 2019 03:11:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=lwVsP3q3Na9chJgbRd91xhzekVCplSdN5e5V061lESs=;
- b=pueavyNxCQl3ytqWJooZczOtjzWX4cIRp7FhCcfSYnTHudZ8CRaShY9fbkmvFOLC/q
- WMVdAEtb9cl8wV7mHmCfJDmvaQGbQLvYNSXuTEtE5T0UGbyThTe6TxJQYpKGwhZGzkRz
- 0y8gthfMG7ouRti87iglTn+204s4PPFRRJfbi0M6pdeZVnydDuiOhd/QtjhMn1GD8xWj
- NjYdofF4FFnDNbO+tffwtsqTXHpI087G1K4FZLuMxHVXvV4FN+RJCZEZB5SbMIbiW+Gw
- TIVUglwKEE/5AkNYJefaxSBNXU319e0GJOyy4Z1GT5QXm1/xtgB89RXTMVdf70gijJeL
- CneA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=lwVsP3q3Na9chJgbRd91xhzekVCplSdN5e5V061lESs=;
- b=hiFIk6Xrtm7eYR2fgP1e7dQl4R/KUwSXkwDKU//UUuKyquRV+Et+N9nQpMI2Mq5p8d
- ZGhOxcrjzlyS0mGnOFEkgPhDNHWnxFzovDlPi6OAV4kV1I6jNDvPD3PLNq6hMpzv9OiP
- vRxg8eQJK4hU0uKahGPp2fUKtjIP2gyH6/nxCqXVmvy2TQpifugpupDW5NAVyP/OcX2N
- Pq0kUDmururpaDBnSpgZFeaYz3fjuMpicSxpVH2U4ERVM6Ll5zWyRmK6D+eZvXHFpAif
- uyb84f6kZ6wKg0A41q8cIgQQDLot9FcENMwthyLrkx+o1v4FUjFEjCzp2UJIygezHh2v
- 1lRQ==
-X-Gm-Message-State: APjAAAUP4TmX9pm/ohgnmjEmIMNnOm7pplb+9fh/OvD7tQ2cAuJ0q9b0
- RajTEti47tqF8FGMP7wyTpJsrjnzwxcGHz9J8xVdIQ==
-X-Google-Smtp-Source: APXvYqxeYqDAq2SNiQ/2Y2seS/3o5cE/qkSx8gY/c06C4Ep7xGemFg8BjxEWW03R3u/xkYEYEyIM//fQUmMIFQZYY7U=
-X-Received: by 2002:aca:c786:: with SMTP id x128mr3153673oif.146.1559902262487; 
- Fri, 07 Jun 2019 03:11:02 -0700 (PDT)
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1hZCE0-00015n-Jr
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 06:35:57 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:41784 helo=mail.rt-rk.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
+ id 1hZCDx-0000VN-In
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 06:35:54 -0400
+Received: from localhost (localhost [127.0.0.1])
+ by mail.rt-rk.com (Postfix) with ESMTP id 92A211A1D0E;
+ Fri,  7 Jun 2019 12:35:47 +0200 (CEST)
+X-Virus-Scanned: amavisd-new at rt-rk.com
+Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
+ [10.10.13.43])
+ by mail.rt-rk.com (Postfix) with ESMTPSA id 78BEB1A1D0B;
+ Fri,  7 Jun 2019 12:35:47 +0200 (CEST)
+From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
+To: qemu-devel@nongnu.org
+Date: Fri,  7 Jun 2019 12:35:18 +0200
+Message-Id: <1559903719-7162-3-git-send-email-aleksandar.markovic@rt-rk.com>
+X-Mailer: git-send-email 2.7.4
+In-Reply-To: <1559903719-7162-1-git-send-email-aleksandar.markovic@rt-rk.com>
+References: <1559903719-7162-1-git-send-email-aleksandar.markovic@rt-rk.com>
 MIME-Version: 1.0
-References: <20190525151241.5017-1-clg@kaod.org>
-In-Reply-To: <20190525151241.5017-1-clg@kaod.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 7 Jun 2019 11:10:51 +0100
-Message-ID: <CAFEAcA_JQLEWdmFuDivD5YwyqQGcFzr_tDr0H4p7fvwZFGj4Jw@mail.gmail.com>
-To: =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::241
-Subject: Re: [Qemu-devel] [PATCH 00/19] aspeed: machine extensions and fixes
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
+X-Received-From: 89.216.37.149
+Subject: [Qemu-devel] [PATCH v10 2/3] linux-user: Add support for
+ setsockopt() option SOL_ALG
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,37 +66,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Andrew Jeffery <andrew@aj.id.au>, qemu-arm <qemu-arm@nongnu.org>,
- QEMU Developers <qemu-devel@nongnu.org>, Joel Stanley <joel@jms.id.au>
+Cc: lvivier@redhat.com, Yunqiang Su <ysu@wavecomp.com>, amarkovic@wavecomp.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sat, 25 May 2019 at 16:12, C=C3=A9dric Le Goater <clg@kaod.org> wrote:
->
-> Hello,
->
-> This series improves the current models of the Aspeed machines in QEMU
-> and adds new ones. It also prepares ground for the future Aspeed SoC.
-> You will find patches for :
->
->  - per SoC mappings of the memory space and the interrupt number space
->  - a RTC model from Joel
->  - support for multiple CPUs and NICs
->  - fixes for the timer model from Joel, Andrew and Christian
->  - DMA support for the SMC controller, which was reworked to use a RAM
->    container region as suggested by Peter in September 2018
->
-> It is based on Eduardo's series" Machine Core queue, 2019-05-24"
->
->   http://patchwork.ozlabs.org/patch/1105091/
->
-> I have included Philippe's patch (comes first) in this patchset for
-> reference only.
+From: Yunqiang Su <ysu@wavecomp.com>
 
-...I'm hoping some of the other folks interested in Aspeed
-are going to review this series.
+Add support for options SOL_ALG of the syscall setsockopt(). This
+option is used in relation to Linux kernel Crypto API, and allows
+a user to set additional information for the cipher operation via
+syscall setsockopt(). The field "optname" must be one of the
+following:
 
-thanks
--- PMM
+  - ALG_SET_KEY =E2=80=93 seting the key
+  - ALG_SET_AEAD_AUTHSIZE =E2=80=93 set the authentication tag size
+
+SOL_ALG is relatively newer setsockopt() option. Therefore, the
+code that handles SOL_ALG is enclosed in "ifdef" so that the build
+does not fail for older kernels that do not contain support for
+SOL_ALG. "ifdef" also contains check if ALG_SET_KEY and
+ALG_SET_AEAD_AUTHSIZE are defined.
+
+Signed-off-by: Yunqiang Su <ysu@wavecomp.com>
+Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+---
+ linux-user/syscall.c | 31 +++++++++++++++++++++++++++++++
+ 1 file changed, 31 insertions(+)
+
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index dde6889..82c08b6 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -103,6 +103,7 @@
+ #include <linux/blkpg.h>
+ #include <netpacket/packet.h>
+ #include <linux/netlink.h>
++#include <linux/if_alg.h>
+ #include "linux_loop.h"
+ #include "uname.h"
+=20
+@@ -1998,6 +1999,36 @@ static abi_long do_setsockopt(int sockfd, int leve=
+l, int optname,
+             goto unimplemented;
+         }
+         break;
++#if defined(SOL_ALG) && defined(ALG_SET_KEY) && defined(ALG_SET_AEAD_AUT=
+HSIZE)
++    case SOL_ALG:
++        switch (optname) {
++        case ALG_SET_KEY:
++        {
++            char *alg_key =3D g_malloc(optlen);
++
++            if (!alg_key) {
++                return -TARGET_ENOMEM;
++            }
++            if (copy_from_user(alg_key, optval_addr, optlen)) {
++                g_free(alg_key);
++                return -TARGET_EFAULT;
++            }
++            ret =3D get_errno(setsockopt(sockfd, level, optname,
++                                       alg_key, optlen));
++            g_free(alg_key);
++            break;
++        }
++        case ALG_SET_AEAD_AUTHSIZE:
++        {
++            ret =3D get_errno(setsockopt(sockfd, level, optname,
++                                       NULL, optlen));
++            break;
++        }
++        default:
++            goto unimplemented;
++        }
++        break;
++#endif
+     case TARGET_SOL_SOCKET:
+         switch (optname) {
+         case TARGET_SO_RCVTIMEO:
+--=20
+2.7.4
+
 
