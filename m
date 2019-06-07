@@ -2,64 +2,87 @@ Return-Path: <SRS0=3yEa=UG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.0 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C02D0C2BCA1
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 17:57:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B02B8C2BCA1
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 18:02:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9E922208C0
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 17:57:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9E922208C0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 6F8D2208C0
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 18:02:16 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="KUOuFMsK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6F8D2208C0
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49948 helo=lists.gnu.org)
+Received: from localhost ([::1]:49984 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hZJ7b-0004cQ-TV
-	for qemu-devel@archiver.kernel.org; Fri, 07 Jun 2019 13:57:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54620)
+	id 1hZJBu-00068D-AF
+	for qemu-devel@archiver.kernel.org; Fri, 07 Jun 2019 14:02:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53762)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <armbru@redhat.com>) id 1hZH0Q-0004To-9D
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 11:42:21 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1hZH0O-0003kJ-2W
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 11:42:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1hZGlr-0000Ww-NI
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 11:27:18 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:11295)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hZGlr-0008Dn-Aa
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 11:27:11 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 02A7F30A7C55
- for <qemu-devel@nongnu.org>; Fri,  7 Jun 2019 15:26:53 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-148.ams2.redhat.com
- [10.36.116.148])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 9B21468C9A;
- Fri,  7 Jun 2019 15:26:51 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 20A46113853F; Fri,  7 Jun 2019 17:26:47 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
+ (envelope-from <peter.maydell@linaro.org>) id 1hZGnD-0002lC-U1
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 11:28:38 -0400
+Received: from mail-wm1-x32f.google.com ([2a00:1450:4864:20::32f]:36703)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1hZGnC-0002dK-PV
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 11:28:35 -0400
+Received: by mail-wm1-x32f.google.com with SMTP id u8so2345584wmm.1
+ for <qemu-devel@nongnu.org>; Fri, 07 Jun 2019 08:28:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:subject:date:message-id:in-reply-to:references:mime-version
+ :content-transfer-encoding;
+ bh=mSAmdCdaCTmYl7LkCraAz0UM+zk0iYFXclZjcH+jO4o=;
+ b=KUOuFMsKMliOljHa1HKE8MZEfGtz5YnIxf5j0CgQ7OzFJ7zlH9tV5EU9r2e458nJAy
+ wI5QrDwGk2HdjaUN1d1osmz6CsEJv/XO4/Vz5PFB5ojeLi3RuWrbQNb7SA1rRHnRJxko
+ LMxIeRAq6oxYCeEOF4FPDRBaY50n0q3cQzWHTQ/CGYkrpbie9nZdVuQ51oXg2XwnkWPq
+ EexZVMvHVzZo+nQRG4YWTCI3DSwNCi0c+1qNqQ+qVsOfjSrQS+Hwkwrs3GghBnliW7pR
+ AUXEW7bKfoWx61NrCwhU6/LvlOEE7WdeV9HPZQutQlfbC82/bAYxd71dsyWEMFH3pzPa
+ kKIw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=mSAmdCdaCTmYl7LkCraAz0UM+zk0iYFXclZjcH+jO4o=;
+ b=sN3Na0tDhKKpICZq7rCn9AZtz7osZs8zEj1vH9DnGtxS4d8ZP3cE26cAxm0j9ju2NK
+ nr3SYKJHX9Cc1q1FqjivvNxpGGA5NS7yedZ90nEOB2Wts/RJ41NNP62ogkQocCBYpH5o
+ M2gN5g8KHu5YlnOoWQ+gl0VrZr/7gv0kl/FJLVg3si8tAP/JiGCC2rgWIAOk/1hspph3
+ /jv1SJHAqHvg0rR8769hpwyqq3fcVMyeptplpFZuyTcFZVld8m2NH6quaUEMD9f/Vhfq
+ D4lZiKiXVLIPT9TuPemFIaKMqGXeHlSl1cAU5z26M4UdCMfGWjF5e/zvLOBiwGv9fKBW
+ BG7Q==
+X-Gm-Message-State: APjAAAXzh/43mG6n7090JTqvJjNiQWIjL6gpxRTRLAvVFKEQb7qAN2LX
+ t+DnmvmkW9daZZ8WtYxjoWXkQDvl+Q+DXQ==
+X-Google-Smtp-Source: APXvYqwbYaL8JYAb7+2CWBjFG1i4hG3QbTKMa6pWBfrnZLtIbsdnUN/g5iKtCBXCLIBCr2t5ywdKpg==
+X-Received: by 2002:a7b:cbc6:: with SMTP id n6mr4355683wmi.14.1559921311003;
+ Fri, 07 Jun 2019 08:28:31 -0700 (PDT)
+Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
+ by smtp.gmail.com with ESMTPSA id b7sm580224wrx.83.2019.06.07.08.28.30
+ for <qemu-devel@nongnu.org>
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Fri, 07 Jun 2019 08:28:30 -0700 (PDT)
+From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Fri,  7 Jun 2019 17:26:45 +0200
-Message-Id: <20190607152646.4822-12-armbru@redhat.com>
-In-Reply-To: <20190607152646.4822-1-armbru@redhat.com>
-References: <20190607152646.4822-1-armbru@redhat.com>
+Date: Fri,  7 Jun 2019 16:28:26 +0100
+Message-Id: <20190607152827.18003-2-peter.maydell@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190607152827.18003-1-peter.maydell@linaro.org>
+References: <20190607152827.18003-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.42]); Fri, 07 Jun 2019 15:26:53 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 11/12] MAINTAINERS: Improve section headlines
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::32f
+Subject: [Qemu-devel] [PATCH 1/2] Convert "translator internals" docs to RST,
+ move to devel manual
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,382 +94,264 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-When scripts/get_maintainer.pl reports something like
+Our user-facing manual currently has a section "translator internals"
+which has some high-level information about the design of the
+TCG translator. This should really be in our new devel/ manual.
+Convert it to RST format and move it there.
 
-    John Doe <jdoe@example.org> (maintainer:Overall)
-
-the user is left to wonder *which* of our three "Overall" sections
-applies: the one under "Guest CPU cores (TCG)", or the one under
-"Guest CPU Cores (KVM)", or the one under "Usermode emulation".
-
-Rename sections under
-
-* "Guest CPU cores (TCG)" from "FOO" to "FOO TCG CPUs"
-
-* "Guest CPU Cores (KVM)" from "FOO" to "FOO KVM CPUs"
-
-* "Guest CPU Cores (Xen)" from "FOO" to "FOO Xen CPUs"
-
-* "Architecture support" from "FOO" to "FOO general architecture
-  support"
-
-* "Usermode Emulation" from "Overall" to "Overall usermode emulation"
-
-* "Tiny Code Generator (TCG)" from "FOO target" to "FOO TCG target",
-  and from "Common code" to "Common TCG code"
-
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Message-Id: <20190606172408.18399-3-armbru@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- MAINTAINERS | 80 ++++++++++++++++++++++++++---------------------------
- 1 file changed, 40 insertions(+), 40 deletions(-)
+ docs/devel/index.rst |   1 +
+ docs/devel/tcg.rst   | 111 +++++++++++++++++++++++++++++++++++++++++++
+ qemu-tech.texi       | 103 ---------------------------------------
+ 3 files changed, 112 insertions(+), 103 deletions(-)
+ create mode 100644 docs/devel/tcg.rst
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 899f9e9d8c..5cef4aa5bd 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -83,7 +83,7 @@ T: git https://github.com/vivier/qemu.git trivial-patch=
-es
-=20
- Architecture support
- --------------------
--S390
-+S390 general architecture support
- M: Cornelia Huck <cohuck@redhat.com>
- S: Supported
- F: default-configs/s390x-softmmu.mak
-@@ -108,7 +108,7 @@ L: qemu-s390x@nongnu.org
-=20
- Guest CPU cores (TCG):
- ----------------------
--Overall
-+Overall TCG CPUs
- M: Richard Henderson <rth@twiddle.net>
- R: Paolo Bonzini <pbonzini@redhat.com>
- S: Maintained
-@@ -134,14 +134,14 @@ F: fpu/
- F: include/fpu/
- F: tests/fp/
-=20
--Alpha
-+Alpha TCG CPUs
- M: Richard Henderson <rth@twiddle.net>
- S: Maintained
- F: target/alpha/
- F: tests/tcg/alpha/
- F: disas/alpha.c
-=20
--ARM
-+ARM TCG CPUs
- M: Peter Maydell <peter.maydell@linaro.org>
- L: qemu-arm@nongnu.org
- S: Maintained
-@@ -162,7 +162,7 @@ S: Maintained
- F: hw/arm/smmu*
- F: include/hw/arm/smmu*
-=20
--CRIS
-+CRIS TCG CPUs
- M: Edgar E. Iglesias <edgar.iglesias@gmail.com>
- S: Maintained
- F: target/cris/
-@@ -171,14 +171,14 @@ F: include/hw/cris/
- F: tests/tcg/cris/
- F: disas/cris.c
-=20
--HPPA (PA-RISC)
-+HPPA (PA-RISC) TCG CPUs
- M: Richard Henderson <rth@twiddle.net>
- S: Maintained
- F: target/hppa/
- F: hw/hppa/
- F: disas/hppa.c
-=20
--LM32
-+LM32 TCG CPUs
- M: Michael Walle <michael@walle.cc>
- S: Maintained
- F: target/lm32/
-@@ -191,20 +191,20 @@ F: include/hw/char/lm32_juart.h
- F: include/hw/lm32/
- F: tests/tcg/lm32/
-=20
--M68K
-+M68K TCG CPUs
- M: Laurent Vivier <laurent@vivier.eu>
- S: Maintained
- F: target/m68k/
- F: disas/m68k.c
-=20
--MicroBlaze
-+MicroBlaze TCG CPUs
- M: Edgar E. Iglesias <edgar.iglesias@gmail.com>
- S: Maintained
- F: target/microblaze/
- F: hw/microblaze/
- F: disas/microblaze.c
-=20
--MIPS
-+MIPS TCG CPUs
- M: Aurelien Jarno <aurelien@aurel32.net>
- M: Aleksandar Markovic <amarkovic@wavecomp.com>
- R: Aleksandar Rikalo <arikalo@wavecomp.com>
-@@ -225,7 +225,7 @@ F: include/hw/timer/mips_gictimer.h
- F: tests/tcg/mips/
- K: ^Subject:.*(?i)mips
-=20
--Moxie
-+Moxie TCG CPUs
- M: Anthony Green <green@moxielogic.com>
- S: Maintained
- F: target/moxie/
-@@ -233,7 +233,7 @@ F: disas/moxie.c
- F: hw/moxie/
- F: default-configs/moxie-softmmu.mak
-=20
--NiosII
-+NiosII TCG CPUs
- M: Chris Wulff <crwulff@gmail.com>
- M: Marek Vasut <marex@denx.de>
- S: Maintained
-@@ -243,14 +243,14 @@ F: hw/intc/nios2_iic.c
- F: disas/nios2.c
- F: default-configs/nios2-softmmu.mak
-=20
--OpenRISC
-+OpenRISC TCG CPUs
- M: Stafford Horne <shorne@gmail.com>
- S: Odd Fixes
- F: target/openrisc/
- F: hw/openrisc/
- F: tests/tcg/openrisc/
-=20
--PowerPC
-+PowerPC TCG CPUs
- M: David Gibson <david@gibson.dropbear.id.au>
- L: qemu-ppc@nongnu.org
- S: Maintained
-@@ -259,7 +259,7 @@ F: hw/ppc/
- F: include/hw/ppc/
- F: disas/ppc.c
-=20
--RISC-V
-+RISC-V TCG CPUs
- M: Palmer Dabbelt <palmer@sifive.com>
- M: Alistair Francis <Alistair.Francis@wdc.com>
- M: Sagar Karandikar <sagark@eecs.berkeley.edu>
-@@ -272,7 +272,7 @@ F: include/hw/riscv/
- F: linux-user/host/riscv32/
- F: linux-user/host/riscv64/
-=20
--S390
-+S390 TCG CPUs
- M: Richard Henderson <rth@twiddle.net>
- M: David Hildenbrand <david@redhat.com>
- S: Maintained
-@@ -282,7 +282,7 @@ F: disas/s390.c
- F: tests/tcg/s390x/
- L: qemu-s390x@nongnu.org
-=20
--SH4
-+SH4 TCG CPUs
- M: Aurelien Jarno <aurelien@aurel32.net>
- S: Odd Fixes
- F: target/sh4/
-@@ -290,7 +290,7 @@ F: hw/sh4/
- F: disas/sh4.c
- F: include/hw/sh4/
-=20
--SPARC
-+SPARC TCG CPUs
- M: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
- M: Artyom Tarasenko <atar4qemu@gmail.com>
- S: Maintained
-@@ -300,14 +300,14 @@ F: hw/sparc64/
- F: include/hw/sparc/sparc64.h
- F: disas/sparc.c
-=20
--UniCore32
-+UniCore32 TCG CPUs
- M: Guan Xuetao <gxt@mprc.pku.edu.cn>
- S: Maintained
- F: target/unicore32/
- F: hw/unicore32/
- F: include/hw/unicore32/
-=20
--X86
-+X86 TCG CPUs
- M: Paolo Bonzini <pbonzini@redhat.com>
- M: Richard Henderson <rth@twiddle.net>
- M: Eduardo Habkost <ehabkost@redhat.com>
-@@ -320,7 +320,7 @@ F: disas/i386.c
- F: docs/qemu-cpu-models.texi
- T: git https://github.com/ehabkost/qemu.git x86-next
-=20
--Xtensa
-+Xtensa TCG CPUs
- M: Max Filippov <jcmvbkbc@gmail.com>
- W: http://wiki.osll.ru/doku.php?id=3Detc:users:jcmvbkbc:qemu-target-xten=
-sa
- S: Maintained
-@@ -331,7 +331,7 @@ F: disas/xtensa.c
- F: include/hw/xtensa/xtensa-isa.h
- F: default-configs/xtensa*.mak
-=20
--TriCore
-+TriCore TCG CPUs
- M: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
- S: Maintained
- F: target/tricore/
-@@ -346,7 +346,7 @@ F: tests/tcg/multiarch/
- Guest CPU Cores (KVM):
- ----------------------
-=20
--Overall
-+Overall KVM CPUs
- M: Paolo Bonzini <pbonzini@redhat.com>
- L: kvm@vger.kernel.org
- S: Supported
-@@ -357,24 +357,24 @@ F: include/hw/kvm/
- F: include/sysemu/kvm*.h
- F: scripts/kvm/kvm_flightrecorder
-=20
--ARM
-+ARM KVM CPUs
- M: Peter Maydell <peter.maydell@linaro.org>
- L: qemu-arm@nongnu.org
- S: Maintained
- F: target/arm/kvm.c
-=20
--MIPS
-+MIPS KVM CPUs
- M: James Hogan <jhogan@kernel.org>
- R: Aleksandar Rikalo <arikalo@wavecomp.com>
- S: Maintained
- F: target/mips/kvm.c
-=20
--PPC
-+PPC KVM CPUs
- M: David Gibson <david@gibson.dropbear.id.au>
- S: Maintained
- F: target/ppc/kvm.c
-=20
--S390
-+S390 KVM CPUs
- M: Halil Pasic <pasic@linux.ibm.com>
- M: Cornelia Huck <cohuck@redhat.com>
- M: Christian Borntraeger <borntraeger@de.ibm.com>
-@@ -393,7 +393,7 @@ T: git https://github.com/cohuck/qemu.git s390-next
- T: git https://github.com/borntraeger/qemu.git s390-next
- L: qemu-s390x@nongnu.org
-=20
--X86
-+X86 KVM CPUs
- M: Paolo Bonzini <pbonzini@redhat.com>
- M: Marcelo Tosatti <mtosatti@redhat.com>
- L: kvm@vger.kernel.org
-@@ -404,7 +404,7 @@ F: scripts/kvm/vmxcap
- Guest CPU Cores (Xen):
- ----------------------
-=20
--X86
-+X86 Xen CPUs
- M: Stefano Stabellini <sstabellini@kernel.org>
- M: Anthony Perard <anthony.perard@citrix.com>
- M: Paul Durrant <paul.durrant@citrix.com>
-@@ -2266,7 +2266,7 @@ F: tests/uefi-test-tools/
-=20
- Usermode Emulation
- ------------------
--Overall
-+Overall usermode emulation
- M: Riku Voipio <riku.voipio@iki.fi>
- S: Maintained
- F: thunk.c
-@@ -2287,12 +2287,12 @@ F: scripts/qemu-binfmt-conf.sh
-=20
- Tiny Code Generator (TCG)
- -------------------------
--Common code
-+Common TCG code
- M: Richard Henderson <rth@twiddle.net>
- S: Maintained
- F: tcg/
-=20
--AArch64 target
-+AArch64 TCG target
- M: Claudio Fontana <claudio.fontana@huawei.com>
- M: Claudio Fontana <claudio.fontana@gmail.com>
- S: Maintained
-@@ -2301,33 +2301,33 @@ F: tcg/aarch64/
- F: disas/arm-a64.cc
- F: disas/libvixl/
-=20
--ARM target
-+ARM TCG target
- M: Andrzej Zaborowski <balrogg@gmail.com>
- S: Maintained
- L: qemu-arm@nongnu.org
- F: tcg/arm/
- F: disas/arm.c
-=20
--i386 target
-+i386 TCG target
- M: Richard Henderson <rth@twiddle.net>
- S: Maintained
- F: tcg/i386/
- F: disas/i386.c
-=20
--MIPS target
-+MIPS TCG target
- M: Aurelien Jarno <aurelien@aurel32.net>
- R: Aleksandar Rikalo <arikalo@wavecomp.com>
- S: Maintained
- F: tcg/mips/
- F: disas/mips.c
-=20
--PPC
-+PPC TCG target
- M: Richard Henderson <rth@twiddle.net>
- S: Odd Fixes
- F: tcg/ppc/
- F: disas/ppc.c
-=20
--RISC-V
-+RISC-V TCG target
- M: Palmer Dabbelt <palmer@sifive.com>
- M: Alistair Francis <Alistair.Francis@wdc.com>
- L: qemu-riscv@nongnu.org
-@@ -2335,19 +2335,19 @@ S: Maintained
- F: tcg/riscv/
- F: disas/riscv.c
-=20
--S390 target
-+S390 TCG target
- M: Richard Henderson <rth@twiddle.net>
- S: Maintained
- F: tcg/s390/
- F: disas/s390.c
- L: qemu-s390x@nongnu.org
-=20
--SPARC target
-+SPARC TCG target
- S: Odd Fixes
- F: tcg/sparc/
- F: disas/sparc.c
-=20
--TCI target
-+TCI TCG target
- M: Stefan Weil <sw@weilnetz.de>
- S: Maintained
- F: tcg/tci/
---=20
-2.21.0
+diff --git a/docs/devel/index.rst b/docs/devel/index.rst
+index 2a4ddf40ad3..1ec61fcfed9 100644
+--- a/docs/devel/index.rst
++++ b/docs/devel/index.rst
+@@ -21,3 +21,4 @@ Contents:
+    testing
+    decodetree
+    secure-coding-practices
++   tcg
+diff --git a/docs/devel/tcg.rst b/docs/devel/tcg.rst
+new file mode 100644
+index 00000000000..4956a30a4e6
+--- /dev/null
++++ b/docs/devel/tcg.rst
+@@ -0,0 +1,111 @@
++====================
++Translator Internals
++====================
++
++QEMU is a dynamic translator. When it first encounters a piece of code,
++it converts it to the host instruction set. Usually dynamic translators
++are very complicated and highly CPU dependent. QEMU uses some tricks
++which make it relatively easily portable and simple while achieving good
++performances.
++
++QEMU's dynamic translation backend is called TCG, for "Tiny Code
++Generator". For more information, please take a look at ``tcg/README``.
++
++Some notable features of QEMU's dynamic translator are:
++
++CPU state optimisations
++-----------------------
++
++The target CPUs have many internal states which change the way it
++evaluates instructions. In order to achieve a good speed, the
++translation phase considers that some state information of the virtual
++CPU cannot change in it. The state is recorded in the Translation
++Block (TB). If the state changes (e.g. privilege level), a new TB will
++be generated and the previous TB won't be used anymore until the state
++matches the state recorded in the previous TB. The same idea can be applied
++to other aspects of the CPU state.  For example, on x86, if the SS,
++DS and ES segments have a zero base, then the translator does not even
++generate an addition for the segment base.
++
++Direct block chaining
++---------------------
++
++After each translated basic block is executed, QEMU uses the simulated
++Program Counter (PC) and other cpu state information (such as the CS
++segment base value) to find the next basic block.
++
++In order to accelerate the most common cases where the new simulated PC
++is known, QEMU can patch a basic block so that it jumps directly to the
++next one.
++
++The most portable code uses an indirect jump. An indirect jump makes
++it easier to make the jump target modification atomic. On some host
++architectures (such as x86 or PowerPC), the ``JUMP`` opcode is
++directly patched so that the block chaining has no overhead.
++
++Self-modifying code and translated code invalidation
++----------------------------------------------------
++
++Self-modifying code is a special challenge in x86 emulation because no
++instruction cache invalidation is signaled by the application when code
++is modified.
++
++User-mode emulation marks a host page as write-protected (if it is
++not already read-only) every time translated code is generated for a
++basic block.  Then, if a write access is done to the page, Linux raises
++a SEGV signal. QEMU then invalidates all the translated code in the page
++and enables write accesses to the page.  For system emulation, write
++protection is achieved through the software MMU.
++
++Correct translated code invalidation is done efficiently by maintaining
++a linked list of every translated block contained in a given page. Other
++linked lists are also maintained to undo direct block chaining.
++
++On RISC targets, correctly written software uses memory barriers and
++cache flushes, so some of the protection above would not be
++necessary. However, QEMU still requires that the generated code always
++matches the target instructions in memory in order to handle
++exceptions correctly.
++
++Exception support
++-----------------
++
++longjmp() is used when an exception such as division by zero is
++encountered.
++
++The host SIGSEGV and SIGBUS signal handlers are used to get invalid
++memory accesses.  QEMU keeps a map from host program counter to
++target program counter, and looks up where the exception happened
++based on the host program counter at the exception point.
++
++On some targets, some bits of the virtual CPU's state are not flushed to the
++memory until the end of the translation block.  This is done for internal
++emulation state that is rarely accessed directly by the program and/or changes
++very often throughout the execution of a translation block---this includes
++condition codes on x86, delay slots on SPARC, conditional execution on
++ARM, and so on.  This state is stored for each target instruction, and
++looked up on exceptions.
++
++MMU emulation
++-------------
++
++For system emulation QEMU uses a software MMU. In that mode, the MMU
++virtual to physical address translation is done at every memory
++access.
++
++QEMU uses an address translation cache (TLB) to speed up the translation.
++In order to avoid flushing the translated code each time the MMU
++mappings change, all caches in QEMU are physically indexed.  This
++means that each basic block is indexed with its physical address.
++
++In order to avoid invalidating the basic block chain when MMU mappings
++change, chaining is only performed when the destination of the jump
++shares a page with the basic block that is performing the jump.
++
++The MMU can also distinguish RAM and ROM memory areas from MMIO memory
++areas.  Access is faster for RAM and ROM because the translation cache also
++hosts the offset between guest address and host memory.  Accessing MMIO
++memory areas instead calls out to C code for device emulation.
++Finally, the MMU helps tracking dirty pages and pages pointed to by
++translation blocks.
++
+diff --git a/qemu-tech.texi b/qemu-tech.texi
+index 7c3d1f05e13..eb430daacf2 100644
+--- a/qemu-tech.texi
++++ b/qemu-tech.texi
+@@ -161,109 +161,6 @@ may be created from overlay with minimal amount of hand-written code.
+ 
+ @end itemize
+ 
+-@node Translator Internals
+-@section Translator Internals
+-
+-QEMU is a dynamic translator. When it first encounters a piece of code,
+-it converts it to the host instruction set. Usually dynamic translators
+-are very complicated and highly CPU dependent. QEMU uses some tricks
+-which make it relatively easily portable and simple while achieving good
+-performances.
+-
+-QEMU's dynamic translation backend is called TCG, for "Tiny Code
+-Generator". For more information, please take a look at @code{tcg/README}.
+-
+-Some notable features of QEMU's dynamic translator are:
+-
+-@table @strong
+-
+-@item CPU state optimisations:
+-The target CPUs have many internal states which change the way it
+-evaluates instructions. In order to achieve a good speed, the
+-translation phase considers that some state information of the virtual
+-CPU cannot change in it. The state is recorded in the Translation
+-Block (TB). If the state changes (e.g. privilege level), a new TB will
+-be generated and the previous TB won't be used anymore until the state
+-matches the state recorded in the previous TB. The same idea can be applied
+-to other aspects of the CPU state.  For example, on x86, if the SS,
+-DS and ES segments have a zero base, then the translator does not even
+-generate an addition for the segment base.
+-
+-@item Direct block chaining:
+-After each translated basic block is executed, QEMU uses the simulated
+-Program Counter (PC) and other cpu state information (such as the CS
+-segment base value) to find the next basic block.
+-
+-In order to accelerate the most common cases where the new simulated PC
+-is known, QEMU can patch a basic block so that it jumps directly to the
+-next one.
+-
+-The most portable code uses an indirect jump. An indirect jump makes
+-it easier to make the jump target modification atomic. On some host
+-architectures (such as x86 or PowerPC), the @code{JUMP} opcode is
+-directly patched so that the block chaining has no overhead.
+-
+-@item Self-modifying code and translated code invalidation:
+-Self-modifying code is a special challenge in x86 emulation because no
+-instruction cache invalidation is signaled by the application when code
+-is modified.
+-
+-User-mode emulation marks a host page as write-protected (if it is
+-not already read-only) every time translated code is generated for a
+-basic block.  Then, if a write access is done to the page, Linux raises
+-a SEGV signal. QEMU then invalidates all the translated code in the page
+-and enables write accesses to the page.  For system emulation, write
+-protection is achieved through the software MMU.
+-
+-Correct translated code invalidation is done efficiently by maintaining
+-a linked list of every translated block contained in a given page. Other
+-linked lists are also maintained to undo direct block chaining.
+-
+-On RISC targets, correctly written software uses memory barriers and
+-cache flushes, so some of the protection above would not be
+-necessary. However, QEMU still requires that the generated code always
+-matches the target instructions in memory in order to handle
+-exceptions correctly.
+-
+-@item Exception support:
+-longjmp() is used when an exception such as division by zero is
+-encountered.
+-
+-The host SIGSEGV and SIGBUS signal handlers are used to get invalid
+-memory accesses.  QEMU keeps a map from host program counter to
+-target program counter, and looks up where the exception happened
+-based on the host program counter at the exception point.
+-
+-On some targets, some bits of the virtual CPU's state are not flushed to the
+-memory until the end of the translation block.  This is done for internal
+-emulation state that is rarely accessed directly by the program and/or changes
+-very often throughout the execution of a translation block---this includes
+-condition codes on x86, delay slots on SPARC, conditional execution on
+-ARM, and so on.  This state is stored for each target instruction, and
+-looked up on exceptions.
+-
+-@item MMU emulation:
+-For system emulation QEMU uses a software MMU. In that mode, the MMU
+-virtual to physical address translation is done at every memory
+-access.
+-
+-QEMU uses an address translation cache (TLB) to speed up the translation.
+-In order to avoid flushing the translated code each time the MMU
+-mappings change, all caches in QEMU are physically indexed.  This
+-means that each basic block is indexed with its physical address.
+-
+-In order to avoid invalidating the basic block chain when MMU mappings
+-change, chaining is only performed when the destination of the jump
+-shares a page with the basic block that is performing the jump.
+-
+-The MMU can also distinguish RAM and ROM memory areas from MMIO memory
+-areas.  Access is faster for RAM and ROM because the translation cache also
+-hosts the offset between guest address and host memory.  Accessing MMIO
+-memory areas instead calls out to C code for device emulation.
+-Finally, the MMU helps tracking dirty pages and pages pointed to by
+-translation blocks.
+-@end table
+-
+ @node QEMU compared to other emulators
+ @section QEMU compared to other emulators
+ 
+-- 
+2.20.1
 
 
