@@ -6,75 +6,56 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E2F38C2BCA1
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 14:24:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D87CC2BCA1
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 14:24:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BF19320657
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 14:24:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BF19320657
+	by mail.kernel.org (Postfix) with ESMTPS id 3768D20657
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 14:24:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3768D20657
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51674 helo=lists.gnu.org)
+Received: from localhost ([::1]:51676 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hZFnB-0006zM-S0
-	for qemu-devel@archiver.kernel.org; Fri, 07 Jun 2019 10:24:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48924)
+	id 1hZFnG-0007Fe-F2
+	for qemu-devel@archiver.kernel.org; Fri, 07 Jun 2019 10:24:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52661)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <philmd@redhat.com>) id 1hZFVe-0002nV-IT
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 10:06:28 -0400
+ (envelope-from <cohuck@redhat.com>) id 1hZFgj-00031m-4q
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 10:17:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1hZFVZ-0003Pw-1W
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 10:06:18 -0400
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:35026)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hZFVX-0003Mm-1C
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 10:06:15 -0400
-Received: by mail-wm1-f67.google.com with SMTP id c6so2066043wml.0
- for <qemu-devel@nongnu.org>; Fri, 07 Jun 2019 07:06:14 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=HMP3rEihFjBH9XU24/nsyZD/TaPyKAtcmVNJFg/mXzI=;
- b=hacRh7cbQHj5K9/JKsFjE1nfYKP0C7nkR0EWjotOb8nYt0qVie+UruVKKjxpNID6xg
- Y9DQUZpm286X1IDOUD8J9o603lpiXWJ5mSLmabhIor6x94bSP1Rs5pq6K7QNzhiN93hX
- EI4NYjSrt7GlNsq3OGPEOkBam+B/yfu5irFOYhixvjDMwWp3Wm+4+b+W9rbud/w9CnIo
- vCIyOkptZTKpr8Q+slvSmmsa7r33QTgAMQFZ0R9ecBMQwFKORAuxgQxL167Ln0syeIga
- sv9J/o6jJHEWPZl2JUXWcWte4HggUYvLHREXcZa0A1jP1dRy/Nypgkt+STliwnCAFCof
- AmTw==
-X-Gm-Message-State: APjAAAVOW6BnIHo+wTtRO/NxD/TYr96NsgsiWKcDhLoS7oNJbl7yQFmk
- c7G+uagnn1yiia1c4/D6B57yww==
-X-Google-Smtp-Source: APXvYqx/7f8alZcgAV93+gneU9ablBvq9kv32oNwjghAQ8rVAfpRwOdFHPy8I2OEm7JP2ik4obCe2Q==
-X-Received: by 2002:a1c:c8:: with SMTP id 191mr3907645wma.6.1559916373787;
- Fri, 07 Jun 2019 07:06:13 -0700 (PDT)
-Received: from [192.168.0.156] ([78.192.181.46])
- by smtp.gmail.com with ESMTPSA id n19sm1776582wmk.6.2019.06.07.07.06.13
- (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
- Fri, 07 Jun 2019 07:06:13 -0700 (PDT)
-To: Yoshinori Sato <ysato@users.sourceforge.jp>, qemu-devel@nongnu.org
-References: <20190607091116.49044-1-ysato@users.sourceforge.jp>
- <20190607091116.49044-14-ysato@users.sourceforge.jp>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
- url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <8e2dc6b6-23bd-23fb-3fa3-ab7c7d553f69@redhat.com>
-Date: Fri, 7 Jun 2019 16:06:12 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+ (envelope-from <cohuck@redhat.com>) id 1hZFgh-0001s6-RF
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 10:17:49 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52724)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <cohuck@redhat.com>)
+ id 1hZFgh-0001oV-KH; Fri, 07 Jun 2019 10:17:47 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id D3C32285AE;
+ Fri,  7 Jun 2019 14:17:38 +0000 (UTC)
+Received: from localhost (dhcp-192-191.str.redhat.com [10.33.192.191])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id E492960606;
+ Fri,  7 Jun 2019 14:17:35 +0000 (UTC)
+From: Cornelia Huck <cohuck@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri,  7 Jun 2019 16:16:56 +0200
+Message-Id: <20190607141727.29018-4-cohuck@redhat.com>
+In-Reply-To: <20190607141727.29018-1-cohuck@redhat.com>
+References: <20190607141727.29018-1-cohuck@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190607091116.49044-14-ysato@users.sourceforge.jp>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.30]); Fri, 07 Jun 2019 14:17:38 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.128.67
-Subject: Re: [Qemu-devel] [PATCH v17 13/24] target/rx: Fix cpu types and
- names
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PULL v2 03/34] s390x/tcg: Implement VECTOR FIND
+ ELEMENT EQUAL
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,185 +67,185 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, Richard Henderson <richard.henderson@linaro.org>
+Cc: qemu-s390x@nongnu.org, Richard Henderson <richard.henderson@linaro.org>,
+ qemu-devel@nongnu.org, David Hildenbrand <david@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/7/19 11:11 AM, Yoshinori Sato wrote:
-> From: Richard Henderson <richard.henderson@linaro.org>
-> 
-> There was confusion here about abstract classes and naming cpus.
-> We had registered a concrete class named "-rxcpu".  This was put
-> into the default cpu fields, and matched, so basic tests worked.
-> However, no value for -cpu could ever match in rx_cpu_class_by_name.
-> 
-> Rename the base class to "rx-cpu" and make it abstract.  This
-> matches what we do for most other targets.  Create a new concrete
-> cpu with the name "rx62n-rx-cpu".
-> 
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
-> ---
->  target/rx/cpu.h | 12 ++++++------
->  hw/rx/rx-virt.c |  2 +-
->  hw/rx/rx62n.c   |  2 +-
->  target/rx/cpu.c | 43 ++++++++++++++++++++++++++-----------------
->  4 files changed, 34 insertions(+), 25 deletions(-)
-> 
-> diff --git a/target/rx/cpu.h b/target/rx/cpu.h
-> index 8c1a4e448d..a0b6975963 100644
-> --- a/target/rx/cpu.h
-> +++ b/target/rx/cpu.h
-> @@ -24,14 +24,14 @@
->  #include "hw/registerfields.h"
->  #include "qom/cpu.h"
->  
-> -#define TYPE_RXCPU "rxcpu"
-> +#define TYPE_RX_CPU "rx-cpu"
->  
->  #define RXCPU_CLASS(klass)                                     \
-> -    OBJECT_CLASS_CHECK(RXCPUClass, (klass), TYPE_RXCPU)
-> +    OBJECT_CLASS_CHECK(RXCPUClass, (klass), TYPE_RX_CPU)
->  #define RXCPU(obj) \
-> -    OBJECT_CHECK(RXCPU, (obj), TYPE_RXCPU)
-> +    OBJECT_CHECK(RXCPU, (obj), TYPE_RX_CPU)
->  #define RXCPU_GET_CLASS(obj) \
-> -    OBJECT_GET_CLASS(RXCPUClass, (obj), TYPE_RXCPU)
-> +    OBJECT_GET_CLASS(RXCPUClass, (obj), TYPE_RX_CPU)
->  
->  /*
->   * RXCPUClass:
-> @@ -164,9 +164,9 @@ static inline RXCPU *rx_env_get_cpu(CPURXState *env)
->  
->  #define ENV_OFFSET offsetof(RXCPU, env)
->  
-> -#define RX_CPU_TYPE_SUFFIX "-" TYPE_RXCPU
-> +#define RX_CPU_TYPE_SUFFIX "-" TYPE_RX_CPU
->  #define RX_CPU_TYPE_NAME(model) model RX_CPU_TYPE_SUFFIX
-> -#define CPU_RESOLVING_TYPE TYPE_RXCPU
-> +#define CPU_RESOLVING_TYPE TYPE_RX_CPU
->  
->  extern const char rx_crname[][6];
->  
-> diff --git a/hw/rx/rx-virt.c b/hw/rx/rx-virt.c
-> index 3deb7cb335..72a2989fcf 100644
-> --- a/hw/rx/rx-virt.c
-> +++ b/hw/rx/rx-virt.c
-> @@ -88,7 +88,7 @@ static void rxvirt_class_init(ObjectClass *oc, void *data)
->      mc->desc = "RX QEMU Virtual Target";
->      mc->init = rxvirt_init;
->      mc->is_default = 1;
-> -    mc->default_cpu_type = TYPE_RXCPU;
-> +    mc->default_cpu_type = RX_CPU_TYPE_NAME("rx62n");
->  }
->  
->  static const TypeInfo rxvirt_type = {
-> diff --git a/hw/rx/rx62n.c b/hw/rx/rx62n.c
-> index c6660b75b4..3a8fe7b0bf 100644
-> --- a/hw/rx/rx62n.c
-> +++ b/hw/rx/rx62n.c
-> @@ -195,7 +195,7 @@ static void rx62n_realize(DeviceState *dev, Error **errp)
->      }
->  
->      object_initialize_child(OBJECT(s), "cpu", &s->cpu,
-> -                            sizeof(RXCPU), TYPE_RXCPU,
-> +                            sizeof(RXCPU), RX_CPU_TYPE_NAME("rx62n"),
->                              errp, NULL);
->      object_property_set_bool(OBJECT(&s->cpu), true, "realized", errp);
->  
-> diff --git a/target/rx/cpu.c b/target/rx/cpu.c
-> index 3268077d08..41fe1de4bb 100644
-> --- a/target/rx/cpu.c
-> +++ b/target/rx/cpu.c
-> @@ -74,13 +74,14 @@ static void rx_cpu_list_entry(gpointer data, gpointer user_data)
->      const char *typename = object_class_get_name(OBJECT_CLASS(data));
->      int len = strlen(typename) - strlen(RX_CPU_TYPE_SUFFIX);
->  
-> -    qemu_printf("%.*s\n", len, typename);
-> +    qemu_printf("  %.*s\n", len, typename);
->  }
->  
->  void rx_cpu_list(void)
->  {
-> -    GSList *list;
-> -    list = object_class_get_list_sorted(TYPE_RXCPU, false);
-> +    GSList *list = object_class_get_list_sorted(TYPE_RX_CPU, false);
-> +
-> +    qemu_printf("Available CPUs:\n");
->      g_slist_foreach(list, rx_cpu_list_entry, NULL);
->      g_slist_free(list);
->  }
-> @@ -88,15 +89,17 @@ void rx_cpu_list(void)
->  static ObjectClass *rx_cpu_class_by_name(const char *cpu_model)
->  {
->      ObjectClass *oc;
-> -    char *typename = NULL;
-> +    char *typename;
->  
-> -    typename = g_strdup_printf(RX_CPU_TYPE_NAME(""));
-> +    typename = g_strdup_printf(RX_CPU_TYPE_NAME("%s"), cpu_model);
->      oc = object_class_by_name(typename);
-> -    if (oc != NULL && object_class_is_abstract(oc)) {
-> -        oc = NULL;
-> -    }
-> -
->      g_free(typename);
-> +
-> +    if (oc == NULL ||
-> +        object_class_is_abstract(oc) ||
-> +        !object_class_dynamic_cast(oc, TYPE_RX_CPU)) {
-> +        return NULL;
-> +    }
->      return oc;
->  }
->  
-> @@ -166,7 +169,7 @@ static void rx_cpu_init(Object *obj)
->      qdev_init_gpio_in(DEVICE(cpu), rx_cpu_set_irq, 2);
->  }
->  
-> -static void rxcpu_class_init(ObjectClass *klass, void *data)
-> +static void rx_cpu_class_init(ObjectClass *klass, void *data)
->  {
->      DeviceClass *dc = DEVICE_CLASS(klass);
->      CPUClass *cc = CPU_CLASS(klass);
-> @@ -195,22 +198,28 @@ static void rxcpu_class_init(ObjectClass *klass, void *data)
->      cc->gdb_num_core_regs = 26;
->  }
->  
-> -static const TypeInfo rxcpu_info = {
-> -    .name = TYPE_RXCPU,
-> +static const TypeInfo rx_cpu_info = {
-> +    .name = TYPE_RX_CPU,
->      .parent = TYPE_CPU,
->      .instance_size = sizeof(RXCPU),
->      .instance_init = rx_cpu_init,
-> -    .abstract = false,
-> +    .abstract = true,
->      .class_size = sizeof(RXCPUClass),
-> -    .class_init = rxcpu_class_init,
-> +    .class_init = rx_cpu_class_init,
-> +};
-> +
-> +static const TypeInfo rx62n_rx_cpu_info = {
-> +    .name = RX_CPU_TYPE_NAME("rx62n"),
-> +    .parent = TYPE_RX_CPU,
->  };
->  
-> -static void rxcpu_register_types(void)
-> +static void rx_cpu_register_types(void)
->  {
-> -    type_register_static(&rxcpu_info);
-> +    type_register_static(&rx_cpu_info);
-> +    type_register_static(&rx62n_rx_cpu_info);
->  }
->  
-> -type_init(rxcpu_register_types)
-> +type_init(rx_cpu_register_types)
->  
->  static uint32_t extable[32];
->  
-> 
+From: David Hildenbrand <david@redhat.com>
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Core logic courtesy of Richard H.
+
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: David Hildenbrand <david@redhat.com>
+---
+ target/s390x/helper.h            |  6 ++++
+ target/s390x/insn-data.def       |  2 ++
+ target/s390x/translate_vx.inc.c  | 31 +++++++++++++++++
+ target/s390x/vec_string_helper.c | 57 ++++++++++++++++++++++++++++++++
+ 4 files changed, 96 insertions(+)
+
+diff --git a/target/s390x/helper.h b/target/s390x/helper.h
+index c45328cf73c1..a1b169b666e9 100644
+--- a/target/s390x/helper.h
++++ b/target/s390x/helper.h
+@@ -218,6 +218,12 @@ DEF_HELPER_FLAGS_4(gvec_vfae32, TCG_CALL_NO_RWG, voi=
+d, ptr, cptr, cptr, i32)
+ DEF_HELPER_5(gvec_vfae_cc8, void, ptr, cptr, cptr, env, i32)
+ DEF_HELPER_5(gvec_vfae_cc16, void, ptr, cptr, cptr, env, i32)
+ DEF_HELPER_5(gvec_vfae_cc32, void, ptr, cptr, cptr, env, i32)
++DEF_HELPER_FLAGS_4(gvec_vfee8, TCG_CALL_NO_RWG, void, ptr, cptr, cptr, i=
+32)
++DEF_HELPER_FLAGS_4(gvec_vfee16, TCG_CALL_NO_RWG, void, ptr, cptr, cptr, =
+i32)
++DEF_HELPER_FLAGS_4(gvec_vfee32, TCG_CALL_NO_RWG, void, ptr, cptr, cptr, =
+i32)
++DEF_HELPER_5(gvec_vfee_cc8, void, ptr, cptr, cptr, env, i32)
++DEF_HELPER_5(gvec_vfee_cc16, void, ptr, cptr, cptr, env, i32)
++DEF_HELPER_5(gvec_vfee_cc32, void, ptr, cptr, cptr, env, i32)
+=20
+ #ifndef CONFIG_USER_ONLY
+ DEF_HELPER_3(servc, i32, env, i64, i64)
+diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
+index 070ce2a471e0..d8907ef6a575 100644
+--- a/target/s390x/insn-data.def
++++ b/target/s390x/insn-data.def
+@@ -1195,6 +1195,8 @@
+=20
+ /* VECTOR FIND ANY ELEMENT EQUAL */
+     F(0xe782, VFAE,    VRR_b, V,   0, 0, 0, 0, vfae, 0, IF_VEC)
++/* VECTOR FIND ELEMENT EQUAL */
++    F(0xe780, VFEE,    VRR_b, V,   0, 0, 0, 0, vfee, 0, IF_VEC)
+=20
+ #ifndef CONFIG_USER_ONLY
+ /* COMPARE AND SWAP AND PURGE */
+diff --git a/target/s390x/translate_vx.inc.c b/target/s390x/translate_vx.=
+inc.c
+index ebd7a877f17d..b25afbc011b3 100644
+--- a/target/s390x/translate_vx.inc.c
++++ b/target/s390x/translate_vx.inc.c
+@@ -2383,3 +2383,34 @@ static DisasJumpType op_vfae(DisasContext *s, Disa=
+sOps *o)
+     }
+     return DISAS_NEXT;
+ }
++
++static DisasJumpType op_vfee(DisasContext *s, DisasOps *o)
++{
++    const uint8_t es =3D get_field(s->fields, m4);
++    const uint8_t m5 =3D get_field(s->fields, m5);
++    static gen_helper_gvec_3 * const g[3] =3D {
++        gen_helper_gvec_vfee8,
++        gen_helper_gvec_vfee16,
++        gen_helper_gvec_vfee32,
++    };
++    static gen_helper_gvec_3_ptr * const g_cc[3] =3D {
++        gen_helper_gvec_vfee_cc8,
++        gen_helper_gvec_vfee_cc16,
++        gen_helper_gvec_vfee_cc32,
++    };
++
++    if (es > ES_32 || m5 & ~0x3) {
++        gen_program_exception(s, PGM_SPECIFICATION);
++        return DISAS_NORETURN;
++    }
++
++    if (extract32(m5, 0, 1)) {
++        gen_gvec_3_ptr(get_field(s->fields, v1), get_field(s->fields, v2=
+),
++                       get_field(s->fields, v3), cpu_env, m5, g_cc[es]);
++        set_cc_static(s);
++    } else {
++        gen_gvec_3_ool(get_field(s->fields, v1), get_field(s->fields, v2=
+),
++                       get_field(s->fields, v3), m5, g[es]);
++    }
++    return DISAS_NEXT;
++}
+diff --git a/target/s390x/vec_string_helper.c b/target/s390x/vec_string_h=
+elper.c
+index 56dc89c824de..05ad99e17360 100644
+--- a/target/s390x/vec_string_helper.c
++++ b/target/s390x/vec_string_helper.c
+@@ -152,3 +152,60 @@ void HELPER(gvec_vfae_cc##BITS)(void *v1, const void=
+ *v2, const void *v3,      \
+ DEF_VFAE_CC_HELPER(8)
+ DEF_VFAE_CC_HELPER(16)
+ DEF_VFAE_CC_HELPER(32)
++
++static int vfee(void *v1, const void *v2, const void *v3, bool zs, uint8=
+_t es)
++{
++    const uint64_t mask =3D get_element_lsbs_mask(es);
++    uint64_t a0, a1, b0, b1, e0, e1, z0, z1;
++    uint64_t first_zero =3D 16;
++    uint64_t first_equal;
++
++    a0 =3D s390_vec_read_element64(v2, 0);
++    a1 =3D s390_vec_read_element64(v2, 1);
++    b0 =3D s390_vec_read_element64(v3, 0);
++    b1 =3D s390_vec_read_element64(v3, 1);
++    e0 =3D zero_search(a0 ^ b0, mask);
++    e1 =3D zero_search(a1 ^ b1, mask);
++    first_equal =3D match_index(e0, e1);
++
++    if (zs) {
++        z0 =3D zero_search(a0, mask);
++        z1 =3D zero_search(a1, mask);
++        first_zero =3D match_index(z0, z1);
++    }
++
++    s390_vec_write_element64(v1, 0, MIN(first_equal, first_zero));
++    s390_vec_write_element64(v1, 1, 0);
++    if (first_zero =3D=3D 16 && first_equal =3D=3D 16) {
++        return 3; /* no match */
++    } else if (first_zero =3D=3D 16) {
++        return 1; /* matching elements, no match for zero */
++    } else if (first_equal < first_zero) {
++        return 2; /* matching elements before match for zero */
++    }
++    return 0; /* match for zero */
++}
++
++#define DEF_VFEE_HELPER(BITS)                                           =
+       \
++void HELPER(gvec_vfee##BITS)(void *v1, const void *v2, const void *v3,  =
+       \
++                             uint32_t desc)                             =
+       \
++{                                                                       =
+       \
++    const bool zs =3D extract32(simd_data(desc), 1, 1);                 =
+         \
++                                                                        =
+       \
++    vfee(v1, v2, v3, zs, MO_##BITS);                                    =
+       \
++}
++DEF_VFEE_HELPER(8)
++DEF_VFEE_HELPER(16)
++DEF_VFEE_HELPER(32)
++
++#define DEF_VFEE_CC_HELPER(BITS)                                        =
+       \
++void HELPER(gvec_vfee_cc##BITS)(void *v1, const void *v2, const void *v3=
+,      \
++                                CPUS390XState *env, uint32_t desc)      =
+       \
++{                                                                       =
+       \
++    const bool zs =3D extract32(simd_data(desc), 1, 1);                 =
+         \
++                                                                        =
+       \
++    env->cc_op =3D vfee(v1, v2, v3, zs, MO_##BITS);                     =
+         \
++}
++DEF_VFEE_CC_HELPER(8)
++DEF_VFEE_CC_HELPER(16)
++DEF_VFEE_CC_HELPER(32)
+--=20
+2.20.1
+
 
