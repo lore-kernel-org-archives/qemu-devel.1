@@ -2,79 +2,63 @@ Return-Path: <SRS0=3yEa=UG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_MUTT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B8266C2BCA1
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 14:17:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A164C468BE
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 14:18:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 906E2206E0
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 14:17:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 906E2206E0
+	by mail.kernel.org (Postfix) with ESMTPS id 070DB2083D
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 14:18:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 070DB2083D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51604 helo=lists.gnu.org)
+Received: from localhost ([::1]:51606 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hZFgq-0002gv-SO
-	for qemu-devel@archiver.kernel.org; Fri, 07 Jun 2019 10:17:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48741)
+	id 1hZFhW-0003C0-1y
+	for qemu-devel@archiver.kernel.org; Fri, 07 Jun 2019 10:18:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50258)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <philmd@redhat.com>) id 1hZFVM-0002Ol-J3
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 10:06:07 -0400
+ (envelope-from <stefanha@redhat.com>) id 1hZFZS-0005tx-Gq
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 10:10:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1hZFVK-0002s1-Am
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 10:06:04 -0400
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:37475)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hZFVI-0000Hw-Aq
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 10:06:00 -0400
-Received: by mail-wm1-f66.google.com with SMTP id 22so2050546wmg.2
- for <qemu-devel@nongnu.org>; Fri, 07 Jun 2019 07:04:48 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=QaEXhgGxTkEuUnt5fl83xiXadZpSnT3DsreXx9095N8=;
- b=AuQQ3ZJFkjzwy1oB4mFqRR1vRp2nCqcYycbyQX+oSNkK/vgP0wgQ8u0QdprA5HzV+j
- 7rO2zfbUEZmxCamwMskvtOD/chRu5HH+4d7o4ZxP61nM1vc/ZhjC/sGVMrzBuHafXJqi
- znI8g/+t1mXo1DC+ZbX9r3KSZ0nf4kq49C4y94wfAlNcJLHAxTTO4kSM7A7uTOp9wmZt
- IWfmfqTE7ciCrxtSlsrvwBMGfLwQW/7HigYVTTD49ujiW2HTLTat90PRpVLKp1LbokM3
- 5qAQoXR9rzuSh/cPKslp1oG/HblC0x9+OQgO0ASBnXjvTn2fjMBzuTjhBzqU5nXHoIGz
- Vaug==
-X-Gm-Message-State: APjAAAVLmXqpdT3FYPNB10vKYwzEdHMGGVD2JSHUCAovllPiYeK8w0vA
- Wu6SQpHQw7X3F1uQ4WwDfCrgNQ==
-X-Google-Smtp-Source: APXvYqzgLIkfiMmVJidTtXmlqkVFC+sKUYL7zMH1BSp1p8croif2srmm44Yn7mzTLWKCKw5gm52nDw==
-X-Received: by 2002:a1c:f50f:: with SMTP id t15mr3924402wmh.95.1559916287895; 
- Fri, 07 Jun 2019 07:04:47 -0700 (PDT)
-Received: from [192.168.0.156] ([78.192.181.46])
- by smtp.gmail.com with ESMTPSA id f21sm2205065wmb.2.2019.06.07.07.04.47
- (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
- Fri, 07 Jun 2019 07:04:47 -0700 (PDT)
-To: Yoshinori Sato <ysato@users.sourceforge.jp>, qemu-devel@nongnu.org
-References: <20190607091116.49044-1-ysato@users.sourceforge.jp>
- <20190607091116.49044-25-ysato@users.sourceforge.jp>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
- url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <32bb6ea7-2bd3-5c48-095f-f0adf1205a2d@redhat.com>
-Date: Fri, 7 Jun 2019 16:04:46 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+ (envelope-from <stefanha@redhat.com>) id 1hZFZR-0003B4-Cf
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 10:10:18 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49388)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <stefanha@redhat.com>)
+ id 1hZFZO-00030P-3S; Fri, 07 Jun 2019 10:10:14 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 448F730F1BC8;
+ Fri,  7 Jun 2019 14:10:13 +0000 (UTC)
+Received: from localhost (ovpn-117-94.ams2.redhat.com [10.36.117.94])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id C16DD7FE9A;
+ Fri,  7 Jun 2019 14:10:07 +0000 (UTC)
+Date: Fri, 7 Jun 2019 16:10:06 +0200
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: Sergio Lopez <slp@redhat.com>
+Message-ID: <20190607141006.GA13542@stefanha-x1.localdomain>
+References: <20190603123823.32661-1-mehta.aaru20@gmail.com>
+ <878sudu0d1.fsf@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190607091116.49044-25-ysato@users.sourceforge.jp>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="UlVJffcvxoiEqYs2"
+Content-Disposition: inline
+In-Reply-To: <878sudu0d1.fsf@redhat.com>
+User-Agent: Mutt/1.11.4 (2019-03-13)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.43]); Fri, 07 Jun 2019 14:10:13 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.128.66
-Subject: Re: [Qemu-devel] [PATCH v17 24/24] target/rx: Remove suffix in cpu
- class.
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v4 0/9] Add support for io_uring
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,77 +70,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, richard.henderson@linaro.org
+Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
+ qemu-block@nongnu.org, Markus Armbruster <armbru@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, saket.sinha89@gmail.com,
+ Paolo Bonzini <pbonzini@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ Julia Suvorova <jusual@mail.ru>, Aarushi Mehta <mehta.aaru20@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/7/19 11:11 AM, Yoshinori Sato wrote:
-> New CPUs should not be suffixed like other devices.
-> 
-> Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
-> ---
->  include/hw/rx/rx62n.h | 2 +-
->  target/rx/cpu.h       | 3 +--
->  target/rx/cpu.c       | 8 ++------
->  3 files changed, 4 insertions(+), 9 deletions(-)
-> 
-> diff --git a/include/hw/rx/rx62n.h b/include/hw/rx/rx62n.h
-> index 5f6912fe46..e57c5ec091 100644
-> --- a/include/hw/rx/rx62n.h
-> +++ b/include/hw/rx/rx62n.h
-> @@ -30,7 +30,7 @@
->  #include "target/rx/cpu.h"
->  #include "qemu/units.h"
->  
-> -#define TYPE_RX62N "rx62n"
-> +#define TYPE_RX62N "rx62n-mcu"
->  #define TYPE_RX62N_CPU RX_CPU_TYPE_NAME(TYPE_RX62N)
->  #define RX62N(obj) OBJECT_CHECK(RX62NState, (obj), TYPE_RX62N)
->  
-> diff --git a/target/rx/cpu.h b/target/rx/cpu.h
-> index a0b6975963..080ea604a3 100644
-> --- a/target/rx/cpu.h
-> +++ b/target/rx/cpu.h
-> @@ -164,8 +164,7 @@ static inline RXCPU *rx_env_get_cpu(CPURXState *env)
->  
->  #define ENV_OFFSET offsetof(RXCPU, env)
->  
-> -#define RX_CPU_TYPE_SUFFIX "-" TYPE_RX_CPU
-> -#define RX_CPU_TYPE_NAME(model) model RX_CPU_TYPE_SUFFIX
-> +#define RX_CPU_TYPE_NAME(model) model
->  #define CPU_RESOLVING_TYPE TYPE_RX_CPU
->  
->  extern const char rx_crname[][6];
-> diff --git a/target/rx/cpu.c b/target/rx/cpu.c
-> index 41fe1de4bb..d8c662b231 100644
-> --- a/target/rx/cpu.c
-> +++ b/target/rx/cpu.c
-> @@ -72,9 +72,8 @@ static void rx_cpu_reset(CPUState *s)
->  static void rx_cpu_list_entry(gpointer data, gpointer user_data)
->  {
->      const char *typename = object_class_get_name(OBJECT_CLASS(data));
-> -    int len = strlen(typename) - strlen(RX_CPU_TYPE_SUFFIX);
->  
-> -    qemu_printf("  %.*s\n", len, typename);
-> +    qemu_printf("  %s\n",  typename);
->  }
->  
->  void rx_cpu_list(void)
-> @@ -89,11 +88,8 @@ void rx_cpu_list(void)
->  static ObjectClass *rx_cpu_class_by_name(const char *cpu_model)
->  {
->      ObjectClass *oc;
-> -    char *typename;
->  
-> -    typename = g_strdup_printf(RX_CPU_TYPE_NAME("%s"), cpu_model);
-> -    oc = object_class_by_name(typename);
-> -    g_free(typename);
-> +    oc = object_class_by_name(cpu_model);
->  
->      if (oc == NULL ||
->          object_class_is_abstract(oc) ||
-> 
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+--UlVJffcvxoiEqYs2
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Fri, Jun 07, 2019 at 12:59:54PM +0200, Sergio Lopez wrote:
+> I gave this version of the patchset a try, and found that IO hangs when
+> the device is assigned to an IOThread. Sometimes is able to serve a few
+> requests getting through the Guest OS boot process, to hang the moment
+> you try generate some IO on the device, while others it hangs when Linux
+> tries to read the partitions from the device.
+>=20
+> I'm starting QEMU this way:
+>=20
+> ./x86_64-softmmu/qemu-system-x86_64 -enable-kvm -name rhel80,debug-thread=
+s=3Don -m 2g -smp 4 -object iothread,id=3Diothread0 -blockdev node-name=3Dr=
+hel80,driver=3Dqcow2,file.driver=3Dfile,file.filename=3D/home/VirtualMachin=
+es/rhel80.qcow2 -device virtio-blk,drive=3Drhel80 -serial tcp::6667,server,=
+nowait -qmp tcp::6668,server,nowait -nographic -net user,hostfwd=3Dtcp::666=
+6-:22 -net nic,model=3Dvirtio -device virtio-rng -drive file=3D/dev/nullb0,=
+format=3Draw,cache=3Dnone,aio=3Dio_uring,if=3Dnone,id=3Dtest -device virtio=
+-blk,drive=3Dtest,iothread=3Diothread0
+>=20
+> Could you please take a look at this issue?
+
+BTW I was referring to the inverted logic where qemu_luring_process_complet=
+ions_and_submit() fails to call ioq_submit().
+
+Stefan
+
+--UlVJffcvxoiEqYs2
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAlz6cD4ACgkQnKSrs4Gr
+c8jiQAf/YLgsRUmLpNrh9l5KwcDQkXb3WIcoBUslEVaXSK6Sq2cEDmqleQ0SCGrk
+eSNrSwBw8xYt++vXRAuJCgL+9uS4bimfY33uSk4gKCqPRT+WiqMErhORsymdPkch
+Er0WdvRg3DmR5I2ScYN0Q8gi//Fjfo2j2zffoOcjvz3ri9Dl1qWHd49JWcxzskfr
+TpEWnHevEM+1dh4gwEu6bmSAOuZcSWzRYSx9Dvb5RqK+27yDY4p8pR/jeU0hUHuN
+Anlo3lMisJIJZ1cVFh0Hgo1Dw5NY+1wmC1ORSF2BtYW77qxGzIwxW/g3il0Vd5+T
+Etne8tER4Xw45OoHu7dH0D1caTjIMg==
+=6fhB
+-----END PGP SIGNATURE-----
+
+--UlVJffcvxoiEqYs2--
 
