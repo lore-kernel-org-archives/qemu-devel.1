@@ -2,70 +2,59 @@ Return-Path: <SRS0=3yEa=UG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,T_HK_NAME_DR,USER_AGENT_MUTT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.0 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F4DCC2BCA1
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 19:14:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E7C28C2BCA1
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 19:14:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 46FD6208C3
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 19:14:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 46FD6208C3
+	by mail.kernel.org (Postfix) with ESMTPS id C3FD7208C3
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 19:14:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C3FD7208C3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51512 helo=lists.gnu.org)
+Received: from localhost ([::1]:51514 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hZKJh-0006RJ-Dw
-	for qemu-devel@archiver.kernel.org; Fri, 07 Jun 2019 15:14:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38842)
+	id 1hZKJx-00076j-VV
+	for qemu-devel@archiver.kernel.org; Fri, 07 Jun 2019 15:14:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51162)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <dgilbert@redhat.com>) id 1hZJ1h-0007zz-0Y
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 13:51:43 -0400
+ (envelope-from <kraxel@redhat.com>) id 1hZIAn-00043C-HO
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 12:57:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1hZJ1X-00010V-NV
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 13:51:37 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34070)
+ (envelope-from <kraxel@redhat.com>) id 1hZIAj-0001rI-Mx
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 12:56:59 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56164)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hZJ1Q-0000IQ-Ch
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 13:51:25 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ (Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1hZIAh-0001mM-VH
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 12:56:56 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id DA4F630C0DC2
- for <qemu-devel@nongnu.org>; Fri,  7 Jun 2019 17:51:22 +0000 (UTC)
-Received: from work-vm (ovpn-116-24.ams2.redhat.com [10.36.116.24])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 14E3418950;
- Fri,  7 Jun 2019 17:51:12 +0000 (UTC)
-Date: Fri, 7 Jun 2019 18:51:10 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Jens Freimann <jfreimann@redhat.com>
-Message-ID: <20190607175109.GW2631@work-vm>
-References: <20190517125820.2885-4-jfreimann@redhat.com>
- <20190521094504.GB2915@work-vm>
- <20190530145645.tjwkgi4hae5yblsi@jenstp.localdomain>
- <20190531214748.GN22103@habkost.net>
- <20190603082456.vzpy256kj4o5e5wu@jenstp.localdomain>
- <20190603193648.GQ22103@habkost.net>
- <20190604134321.txlw7wjwe247g5ug@jenstp.localdomain>
- <20190604125037-mutt-send-email-mst@kernel.org>
- <20190604190019.GM3851@work-vm>
- <20190607141407.73hzf5w6vqjegaja@jenstp.localdomain>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190607141407.73hzf5w6vqjegaja@jenstp.localdomain>
-User-Agent: Mutt/1.11.4 (2019-03-13)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+ by mx1.redhat.com (Postfix) with ESMTPS id EC9F83003A5A
+ for <qemu-devel@nongnu.org>; Fri,  7 Jun 2019 16:56:54 +0000 (UTC)
+Received: from sirius.home.kraxel.org (ovpn-117-25.ams2.redhat.com
+ [10.36.117.25])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 80E205F9DF;
+ Fri,  7 Jun 2019 16:56:52 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+ id 1CC6C16E1A; Fri,  7 Jun 2019 18:56:50 +0200 (CEST)
+From: Gerd Hoffmann <kraxel@redhat.com>
+To: qemu-devel@nongnu.org
+Date: Fri,  7 Jun 2019 18:56:49 +0200
+Message-Id: <20190607165650.8801-1-kraxel@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.45]); Fri, 07 Jun 2019 17:51:22 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.42]); Fri, 07 Jun 2019 16:56:54 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 3/4] net/virtio: add failover support
+Subject: [Qemu-devel] [PULL 0/1] Usb 20190607 patches
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -77,100 +66,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pkrempa@redhat.com, berrange@redhat.com,
- Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- aadam@redhat.com, qemu-devel@nongnu.org, laine@redhat.com, ailan@redhat.com
+Cc: Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Jens Freimann (jfreimann@redhat.com) wrote:
-> On Tue, Jun 04, 2019 at 08:00:19PM +0100, Dr. David Alan Gilbert wrote:
-> > * Michael S. Tsirkin (mst@redhat.com) wrote:
-> > > On Tue, Jun 04, 2019 at 03:43:21PM +0200, Jens Freimann wrote:
-> > > > On Mon, Jun 03, 2019 at 04:36:48PM -0300, Eduardo Habkost wrote:
-> > > > > On Mon, Jun 03, 2019 at 10:24:56AM +0200, Jens Freimann wrote:
-> > > > > > On Fri, May 31, 2019 at 06:47:48PM -0300, Eduardo Habkost wrote:
-> > > > > > > On Thu, May 30, 2019 at 04:56:45PM +0200, Jens Freimann wrote:
-> > > > > > > > On Tue, May 28, 2019 at 11:04:15AM -0400, Michael S. Tsirkin wrote:
-> > > > > > > > > On Tue, May 21, 2019 at 10:45:05AM +0100, Dr. David Alan Gilbert wrote:
-> > > > > > > > > > * Jens Freimann (jfreimann@redhat.com) wrote:
-> > > > > > Why is it bad to fully re-create the device in case of a failed migration?
-> > > > >
-> > > > > Bad or not, I thought the whole point of doing it inside QEMU was
-> > > > > to do something libvirt wouldn't be able to do (namely,
-> > > > > unplugging the device while not freeing resources).  If we are
-> > > > > doing something that management software is already capable of
-> > > > > doing, what's the point?
-> > > >
-> > > > Event though management software seems to be capable of it, a failover
-> > > > implementation has never happened. As Michael says network failover is
-> > > > a mechanism (there's no good reason not to use a PT device if it is
-> > > > available), not a policy. We are now trying to implement it in a
-> > > > simple way, contained within QEMU.
-> > > >
-> > > > > Quoting a previous message from this thread:
-> > > > >
-> > > > > On Thu, May 30, 2019 at 02:09:42PM -0400, Michael S. Tsirkin wrote:
-> > > > > | > On Thu, May 30, 2019 at 07:00:23PM +0100, Dr. David Alan Gilbert wrote:
-> > > > > | > >  This patch series is very
-> > > > > | > > odd precisely because it's trying to do the unplug itself in the
-> > > > > | > > migration phase rather than let the management layer do it - so unless
-> > > > > | > > it's nailed down how to make sure that's really really bullet proof
-> > > > > | > > then we've got to go back and ask the question about whether we should
-> > > > > | > > really fix it so it can be done by the management layer.
-> > > > > | > >
-> > > > > | > > Dave
-> > > > > | >
-> > > > > | > management already said they can't because files get closed and
-> > > > > | > resources freed on unplug and so they might not be able to re-add device
-> > > > > | > on migration failure. We do it in migration because that is
-> > > > > | > where failures can happen and we can recover.
-> > > >
-> > > > This is something that I can work on as well, but it doesn't have to
-> > > > be part of this patch set in my opinion. Let's say migration fails and we can't
-> > > > re-plug the primary device. We can still use the standby (virtio-net)
-> > > > device which would only mean slower networking. How likely is it that
-> > > > the primary device is grabbed by another VM between unplugging and
-> > > > migration failure anyway?
-> > > >
-> > > > regards,
-> > > > Jens
-> > > 
-> > > I think I agree with Eduardo it's very important to handle this corner
-> > > case correctly. Fast networking outside migration is why people use
-> > > failover at all.  Someone who can live with a slower virtio would use
-> > > just that.
-> > > 
-> > > And IIRC this corner case is exactly why libvirt could not
-> > > implement it correctly itself and had to push it up the stack
-> > > until it fell off the cliff :).
-> > 
-> > So I think we need to have the code that shows we can cope with the
-> > corner cases - or provide a way for libvirt to handle it (which is
-> > my strong preference).
-> 
-> Would this work: We add a new migration state MIGRATE_WAIT_UNPLUG (or
-> a better more generic name) which tells libvirt that migration has not
-> started yet because we are waiting for the guest. And extend the qmp
-> events for the migration state. When we know the device was
-> sucessfully unplugged we sent a qmp event DEVICE_DELETED or a new one
-> DEVICE_DELETED_PARTIALLY (not sure about that yet), let migration
-> start and set the migration state to active?
+The following changes since commit 442bac16a6cd708a9f87adb0a263f9d833f03ed5:
 
-Potentially; lets see what the libvirt people have to say.
-What happens if you have multiple devices and one of them unplugs OK and
-then the other fails?
+  usb-tablet: fix serial compat property (2019-05-29 07:10:02 +0200)
 
-> To do a partial unplug I imagine, we have to separate vfio(-pci) code
-> to differ between release of resources (fds, mappings etc) and unplug
-> (I haven't yet found out how it works in vfio). In the failover case
-> we only do the unplug part but not the release part.
+are available in the Git repository at:
 
-Dave
+  git://git.kraxel.org/qemu tags/usb-20190607-pull-request
 
-> regards,
-> Jens
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+for you to fetch changes up to e39b8a66d2af913e873256aa77ea71a179dfe5e0:
+
+  usb-mtp: refactor the flow of usb_mtp_write_data (2019-06-07 18:56:14 +0200)
+
+----------------------------------------------------------------
+usb-mtp: refactor the flow of usb_mtp_write_data
+
+----------------------------------------------------------------
+
+Bandan Das (1):
+  usb-mtp: refactor the flow of usb_mtp_write_data
+
+ hw/usb/dev-mtp.c | 57 +++++++++++++++++++++++++-----------------------
+ 1 file changed, 30 insertions(+), 27 deletions(-)
+
+-- 
+2.18.1
+
 
