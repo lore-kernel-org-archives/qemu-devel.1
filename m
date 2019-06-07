@@ -6,55 +6,55 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CCE7CC2BCA1
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 15:15:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B103C2BCA1
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 15:20:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 631432089E
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 15:15:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 631432089E
+	by mail.kernel.org (Postfix) with ESMTPS id 5555D2089E
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 15:20:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5555D2089E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48678 helo=lists.gnu.org)
+Received: from localhost ([::1]:48684 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hZGas-0000D1-Dx
-	for qemu-devel@archiver.kernel.org; Fri, 07 Jun 2019 11:15:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54181)
+	id 1hZGes-00026C-SC
+	for qemu-devel@archiver.kernel.org; Fri, 07 Jun 2019 11:19:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53449)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <cohuck@redhat.com>) id 1hZFiz-00057i-Bt
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 10:20:11 -0400
+ (envelope-from <cohuck@redhat.com>) id 1hZFho-0004Qi-C7
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 10:18:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <cohuck@redhat.com>) id 1hZFix-00060q-4q
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 10:20:09 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50938)
+ (envelope-from <cohuck@redhat.com>) id 1hZFhm-0004Dk-Ea
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 10:18:56 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57030)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <cohuck@redhat.com>)
- id 1hZFiw-0005mL-U3; Fri, 07 Jun 2019 10:20:07 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ id 1hZFhk-0004Ab-E6; Fri, 07 Jun 2019 10:18:54 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 9BE727F755;
- Fri,  7 Jun 2019 14:19:52 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 94ED23001839;
+ Fri,  7 Jun 2019 14:18:51 +0000 (UTC)
 Received: from localhost (dhcp-192-191.str.redhat.com [10.33.192.191])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id CC10F7FEA9;
- Fri,  7 Jun 2019 14:19:49 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 8AC73104B50D;
+ Fri,  7 Jun 2019 14:18:47 +0000 (UTC)
 From: Cornelia Huck <cohuck@redhat.com>
 To: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri,  7 Jun 2019 16:17:27 +0200
-Message-Id: <20190607141727.29018-35-cohuck@redhat.com>
+Date: Fri,  7 Jun 2019 16:17:13 +0200
+Message-Id: <20190607141727.29018-21-cohuck@redhat.com>
 In-Reply-To: <20190607141727.29018-1-cohuck@redhat.com>
 References: <20190607141727.29018-1-cohuck@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.27]); Fri, 07 Jun 2019 14:19:57 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.40]); Fri, 07 Jun 2019 14:18:51 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL v2 34/34] linux-user: elf: ELF_HWCAP for s390x
+Subject: [Qemu-devel] [PULL v2 20/34] s390x/tcg: Implement VECTOR FP DIVIDE
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -66,87 +66,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Riku Voipio <riku.voipio@iki.fi>, David Hildenbrand <david@redhat.com>,
- Cornelia Huck <cohuck@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org,
- qemu-s390x@nongnu.org
+Cc: qemu-s390x@nongnu.org, Richard Henderson <richard.henderson@linaro.org>,
+ qemu-devel@nongnu.org, David Hildenbrand <david@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 From: David Hildenbrand <david@redhat.com>
 
-Let's add all HWCAPs that we can support under TCG right now, when the
-respective CPU facilities are enabled.
+We can reuse most of the infrastructure added for VECTOR FP ADD.
 
-Cc: Riku Voipio <riku.voipio@iki.fi>
-Cc: Laurent Vivier <laurent@vivier.eu>
-Cc: Cornelia Huck <cohuck@redhat.com>
-Cc: Laurent Vivier <laurent@vivier.eu>
-Cc: Richard Henderson <richard.henderson@linaro.org>
-Acked-by: Laurent Vivier <laurent@vivier.eu>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- include/elf.h        |  1 +
- linux-user/elfload.c | 28 ++++++++++++++++++++++++++++
- 2 files changed, 29 insertions(+)
+ target/s390x/helper.h           |  2 ++
+ target/s390x/insn-data.def      |  2 ++
+ target/s390x/translate_vx.inc.c |  3 +++
+ target/s390x/vec_fpu_helper.c   | 17 +++++++++++++++++
+ 4 files changed, 24 insertions(+)
 
-diff --git a/include/elf.h b/include/elf.h
-index ea7708a4ea9a..3501e0c8d03a 100644
---- a/include/elf.h
-+++ b/include/elf.h
-@@ -598,6 +598,7 @@ typedef struct {
- #define HWCAP_S390_ETF3EH       256
- #define HWCAP_S390_HIGH_GPRS    512
- #define HWCAP_S390_TE           1024
-+#define HWCAP_S390_VXRS         2048
+diff --git a/target/s390x/helper.h b/target/s390x/helper.h
+index 9b9062970ac4..238bfa250963 100644
+--- a/target/s390x/helper.h
++++ b/target/s390x/helper.h
+@@ -274,6 +274,8 @@ DEF_HELPER_FLAGS_4(gvec_vcgd64, TCG_CALL_NO_WG, void,=
+ ptr, cptr, env, i32)
+ DEF_HELPER_FLAGS_4(gvec_vcgd64s, TCG_CALL_NO_WG, void, ptr, cptr, env, i=
+32)
+ DEF_HELPER_FLAGS_4(gvec_vclgd64, TCG_CALL_NO_WG, void, ptr, cptr, env, i=
+32)
+ DEF_HELPER_FLAGS_4(gvec_vclgd64s, TCG_CALL_NO_WG, void, ptr, cptr, env, =
+i32)
++DEF_HELPER_FLAGS_5(gvec_vfd64, TCG_CALL_NO_WG, void, ptr, cptr, cptr, en=
+v, i32)
++DEF_HELPER_FLAGS_5(gvec_vfd64s, TCG_CALL_NO_WG, void, ptr, cptr, cptr, e=
+nv, i32)
 =20
- /* M68K specific definitions. */
- /* We use the top 24 bits to encode information about the
-diff --git a/linux-user/elfload.c b/linux-user/elfload.c
-index a57b7049dd62..5451d262ec8e 100644
---- a/linux-user/elfload.c
-+++ b/linux-user/elfload.c
-@@ -1308,6 +1308,34 @@ static inline void init_thread(struct target_pt_re=
-gs *regs,
- #define ELF_DATA	ELFDATA2MSB
- #define ELF_ARCH	EM_S390
+ #ifndef CONFIG_USER_ONLY
+ DEF_HELPER_3(servc, i32, env, i64, i64)
+diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
+index ed8b888d5908..f9830deace1a 100644
+--- a/target/s390x/insn-data.def
++++ b/target/s390x/insn-data.def
+@@ -1226,6 +1226,8 @@
+     F(0xe7c2, VCGD,    VRR_a, V,   0, 0, 0, 0, vcdg, 0, IF_VEC)
+ /* VECTOR FP CONVERT TO LOGICAL 64-BIT */
+     F(0xe7c0, VCLGD,   VRR_a, V,   0, 0, 0, 0, vcdg, 0, IF_VEC)
++/* VECTOR FP DIVIDE */
++    F(0xe7e5, VFD,     VRR_c, V,   0, 0, 0, 0, vfa, 0, IF_VEC)
 =20
-+#include "elf.h"
+ #ifndef CONFIG_USER_ONLY
+ /* COMPARE AND SWAP AND PURGE */
+diff --git a/target/s390x/translate_vx.inc.c b/target/s390x/translate_vx.=
+inc.c
+index 0395d69968da..9e55d4488b77 100644
+--- a/target/s390x/translate_vx.inc.c
++++ b/target/s390x/translate_vx.inc.c
+@@ -2560,6 +2560,9 @@ static DisasJumpType op_vfa(DisasContext *s, DisasO=
+ps *o)
+     case 0xe3:
+         fn =3D se ? gen_helper_gvec_vfa64s : gen_helper_gvec_vfa64;
+         break;
++    case 0xe5:
++        fn =3D se ? gen_helper_gvec_vfd64s : gen_helper_gvec_vfd64;
++        break;
+     default:
+         g_assert_not_reached();
+     }
+diff --git a/target/s390x/vec_fpu_helper.c b/target/s390x/vec_fpu_helper.=
+c
+index 09ef0abfb0d8..3c62eb578771 100644
+--- a/target/s390x/vec_fpu_helper.c
++++ b/target/s390x/vec_fpu_helper.c
+@@ -369,3 +369,20 @@ void HELPER(gvec_vclgd64s)(void *v1, const void *v2,=
+ CPUS390XState *env,
+=20
+     vop64_2(v1, v2, env, true, XxC, erm, vclgd64, GETPC());
+ }
 +
-+#define ELF_HWCAP get_elf_hwcap()
-+
-+#define GET_FEATURE(_feat, _hwcap) \
-+    do { if (s390_has_feat(_feat)) { hwcap |=3D _hwcap; } } while (0)
-+
-+static uint32_t get_elf_hwcap(void)
++static uint64_t vfd64(uint64_t a, uint64_t b, float_status *s)
 +{
-+    /*
-+     * Let's assume we always have esan3 and zarch.
-+     * 31-bit processes can use 64-bit registers (high gprs).
-+     */
-+    uint32_t hwcap =3D HWCAP_S390_ESAN3 | HWCAP_S390_ZARCH | HWCAP_S390_=
-HIGH_GPRS;
-+
-+    GET_FEATURE(S390_FEAT_STFLE, HWCAP_S390_STFLE);
-+    GET_FEATURE(S390_FEAT_MSA, HWCAP_S390_MSA);
-+    GET_FEATURE(S390_FEAT_LONG_DISPLACEMENT, HWCAP_S390_LDISP);
-+    GET_FEATURE(S390_FEAT_EXTENDED_IMMEDIATE, HWCAP_S390_EIMM);
-+    if (s390_has_feat(S390_FEAT_EXTENDED_TRANSLATION_3) &&
-+        s390_has_feat(S390_FEAT_ETF3_ENH)) {
-+        hwcap |=3D HWCAP_S390_ETF3EH;
-+    }
-+    GET_FEATURE(S390_FEAT_VECTOR, HWCAP_S390_VXRS);
-+
-+    return hwcap;
++    return float64_div(a, b, s);
 +}
 +
- static inline void init_thread(struct target_pt_regs *regs, struct image=
-_info *infop)
- {
-     regs->psw.addr =3D infop->entry;
++void HELPER(gvec_vfd64)(void *v1, const void *v2, const void *v3,
++                        CPUS390XState *env, uint32_t desc)
++{
++    vop64_3(v1, v2, v3, env, false, vfd64, GETPC());
++}
++
++void HELPER(gvec_vfd64s)(void *v1, const void *v2, const void *v3,
++                         CPUS390XState *env, uint32_t desc)
++{
++    vop64_3(v1, v2, v3, env, true, vfd64, GETPC());
++}
 --=20
 2.20.1
 
