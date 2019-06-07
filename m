@@ -6,59 +6,59 @@ X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	T_HK_NAME_DR,USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BE5EC2BCA1
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 18:33:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EEB08C2BCA1
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 18:36:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 35CB1208C3
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 18:33:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 35CB1208C3
+	by mail.kernel.org (Postfix) with ESMTPS id B3C58208C3
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 18:36:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B3C58208C3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50454 helo=lists.gnu.org)
+Received: from localhost ([::1]:50470 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hZJgZ-00072F-Ef
-	for qemu-devel@archiver.kernel.org; Fri, 07 Jun 2019 14:33:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57106)
+	id 1hZJir-0008AQ-0w
+	for qemu-devel@archiver.kernel.org; Fri, 07 Jun 2019 14:36:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49804)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <dgilbert@redhat.com>) id 1hZH5o-0007Ze-0u
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 11:47:50 -0400
+ (envelope-from <dgilbert@redhat.com>) id 1hZI6F-0007SR-Nk
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 12:52:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1hZH5g-0007eR-0e
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 11:47:43 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:27222)
+ (envelope-from <dgilbert@redhat.com>) id 1hZI6D-0007t1-PI
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 12:52:19 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52914)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dgilbert@redhat.com>)
- id 1hZH5N-0006zH-KH; Fri, 07 Jun 2019 11:47:21 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ id 1hZI68-0007g4-Ee; Fri, 07 Jun 2019 12:52:12 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 57DFBC04BE09;
- Fri,  7 Jun 2019 15:47:05 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id CA756308FF32;
+ Fri,  7 Jun 2019 16:52:05 +0000 (UTC)
 Received: from work-vm (ovpn-116-24.ams2.redhat.com [10.36.116.24])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 141657A4CB;
- Fri,  7 Jun 2019 15:47:01 +0000 (UTC)
-Date: Fri, 7 Jun 2019 16:46:59 +0100
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 765375C730;
+ Fri,  7 Jun 2019 16:52:02 +0000 (UTC)
+Date: Fri, 7 Jun 2019 17:52:00 +0100
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 To: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20190607154658.GL2631@work-vm>
+Message-ID: <20190607165159.GR2631@work-vm>
 References: <20190607135430.22149-1-kwolf@redhat.com>
- <20190607135430.22149-3-kwolf@redhat.com>
+ <20190607135430.22149-8-kwolf@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190607135430.22149-3-kwolf@redhat.com>
+In-Reply-To: <20190607135430.22149-8-kwolf@redhat.com>
 User-Agent: Mutt/1.11.4 (2019-03-13)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.31]); Fri, 07 Jun 2019 15:47:10 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.49]); Fri, 07 Jun 2019 16:52:05 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [RFC PATCH 02/10] monitor: Split monitor_init in
- HMP and QMP function
+Subject: Re: [Qemu-devel] [RFC PATCH 07/10] monitor: Create monitor_int.h
+ with common definitions
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -76,150 +76,308 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 * Kevin Wolf (kwolf@redhat.com) wrote:
-> Instead of mixing HMP and QMP monitors in the same function, separate
-> the monitor creation function for both.
+> Before we can split monitor.c, we need to create a header file that
+> contains the common definitions that will be used by multiple source
+> files.
 > 
 > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 
 Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
 > ---
->  monitor.c | 86 +++++++++++++++++++++++++++++++------------------------
->  1 file changed, 49 insertions(+), 37 deletions(-)
+>  monitor/monitor_int.h | 147 ++++++++++++++++++++++++++++++++++++++++++
+>  monitor/misc.c        | 110 +------------------------------
+>  2 files changed, 148 insertions(+), 109 deletions(-)
+>  create mode 100644 monitor/monitor_int.h
 > 
-> diff --git a/monitor.c b/monitor.c
-> index 70ce9e8a77..bb23cc0450 100644
-> --- a/monitor.c
-> +++ b/monitor.c
-> @@ -702,7 +702,7 @@ static void handle_hmp_command(Monitor *mon, const char *cmdline);
->  
->  static void monitor_iothread_init(void);
->  
-> -static void monitor_data_init(Monitor *mon, bool skip_flush,
-> +static void monitor_data_init(Monitor *mon, int flags, bool skip_flush,
->                                bool use_io_thread)
->  {
->      if (use_io_thread && !mon_iothread) {
-> @@ -717,6 +717,7 @@ static void monitor_data_init(Monitor *mon, bool skip_flush,
->      mon->skip_flush = skip_flush;
->      mon->use_io_thread = use_io_thread;
->      mon->qmp.qmp_requests = g_queue_new();
-> +    mon->flags = flags;
->  }
->  
->  static void monitor_data_destroy(Monitor *mon)
-> @@ -740,7 +741,7 @@ char *qmp_human_monitor_command(const char *command_line, bool has_cpu_index,
->      char *output = NULL;
->      Monitor *old_mon, hmp;
->  
-> -    monitor_data_init(&hmp, true, false);
-> +    monitor_data_init(&hmp, 0, true, false);
->  
->      old_mon = cur_mon;
->      cur_mon = &hmp;
-> @@ -4603,19 +4604,48 @@ static void monitor_qmp_setup_handlers_bh(void *opaque)
->      monitor_list_append(mon);
->  }
->  
-> -void monitor_init(Chardev *chr, int flags)
-> +static void monitor_init_qmp(Chardev *chr, int flags)
->  {
->      Monitor *mon = g_malloc(sizeof(*mon));
-> -    bool use_readline = flags & MONITOR_USE_READLINE;
->  
->      /* Note: we run QMP monitor in I/O thread when @chr supports that */
-> -    monitor_data_init(mon, false,
-> -                      (flags & MONITOR_USE_CONTROL)
-> -                      && qemu_chr_has_feature(chr,
-> -                                              QEMU_CHAR_FEATURE_GCONTEXT));
-> +    monitor_data_init(mon, flags, false,
-> +                      qemu_chr_has_feature(chr, QEMU_CHAR_FEATURE_GCONTEXT));
->  
->      qemu_chr_fe_init(&mon->chr, chr, &error_abort);
-> -    mon->flags = flags;
-> +    qemu_chr_fe_set_echo(&mon->chr, true);
+> diff --git a/monitor/monitor_int.h b/monitor/monitor_int.h
+> new file mode 100644
+> index 0000000000..ab87013b6f
+> --- /dev/null
+> +++ b/monitor/monitor_int.h
+> @@ -0,0 +1,147 @@
+> +/*
+> + * QEMU monitor
+> + *
+> + * Copyright (c) 2003-2004 Fabrice Bellard
+> + *
+> + * Permission is hereby granted, free of charge, to any person obtaining a copy
+> + * of this software and associated documentation files (the "Software"), to deal
+> + * in the Software without restriction, including without limitation the rights
+> + * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+> + * copies of the Software, and to permit persons to whom the Software is
+> + * furnished to do so, subject to the following conditions:
+> + *
+> + * The above copyright notice and this permission notice shall be included in
+> + * all copies or substantial portions of the Software.
+> + *
+> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+> + * THE SOFTWARE.
+> + */
 > +
-> +    json_message_parser_init(&mon->qmp.parser, handle_qmp_command, mon, NULL);
-> +    if (mon->use_io_thread) {
-> +        /*
-> +         * Make sure the old iowatch is gone.  It's possible when
-> +         * e.g. the chardev is in client mode, with wait=on.
-> +         */
-> +        remove_fd_in_watch(chr);
-> +        /*
-> +         * We can't call qemu_chr_fe_set_handlers() directly here
-> +         * since chardev might be running in the monitor I/O
-> +         * thread.  Schedule a bottom half.
-> +         */
-> +        aio_bh_schedule_oneshot(iothread_get_aio_context(mon_iothread),
-> +                                monitor_qmp_setup_handlers_bh, mon);
-> +        /* The bottom half will add @mon to @mon_list */
-> +    } else {
-> +        qemu_chr_fe_set_handlers(&mon->chr, monitor_can_read,
-> +                                 monitor_qmp_read, monitor_qmp_event,
-> +                                 NULL, mon, NULL, true);
-> +        monitor_list_append(mon);
-> +    }
-> +}
+> +#ifndef MONITOR_INT_H
+> +#define MONITOR_INT_H
 > +
-> +static void monitor_init_hmp(Chardev *chr, int flags)
-> +{
-> +    Monitor *mon = g_malloc(sizeof(*mon));
-> +    bool use_readline = flags & MONITOR_USE_READLINE;
+> +#include "qemu-common.h"
+> +#include "monitor/monitor.h"
 > +
-> +    monitor_data_init(mon, flags, false, false);
-> +    qemu_chr_fe_init(&mon->chr, chr, &error_abort);
+> +#include "qapi/qmp/qdict.h"
+> +#include "qapi/qmp/json-parser.h"
+> +#include "qapi/qapi-commands.h"
 > +
->      if (use_readline) {
->          mon->rs = readline_init(monitor_readline_printf,
->                                  monitor_readline_flush,
-> @@ -4624,36 +4654,18 @@ void monitor_init(Chardev *chr, int flags)
->          monitor_read_command(mon, 0);
->      }
+> +#include "qemu/readline.h"
+> +#include "chardev/char-fe.h"
+> +
+> +/*
+> + * Supported types:
+> + *
+> + * 'F'          filename
+> + * 'B'          block device name
+> + * 's'          string (accept optional quote)
+> + * 'S'          it just appends the rest of the string (accept optional quote)
+> + * 'O'          option string of the form NAME=VALUE,...
+> + *              parsed according to QemuOptsList given by its name
+> + *              Example: 'device:O' uses qemu_device_opts.
+> + *              Restriction: only lists with empty desc are supported
+> + *              TODO lift the restriction
+> + * 'i'          32 bit integer
+> + * 'l'          target long (32 or 64 bit)
+> + * 'M'          Non-negative target long (32 or 64 bit), in user mode the
+> + *              value is multiplied by 2^20 (think Mebibyte)
+> + * 'o'          octets (aka bytes)
+> + *              user mode accepts an optional E, e, P, p, T, t, G, g, M, m,
+> + *              K, k suffix, which multiplies the value by 2^60 for suffixes E
+> + *              and e, 2^50 for suffixes P and p, 2^40 for suffixes T and t,
+> + *              2^30 for suffixes G and g, 2^20 for M and m, 2^10 for K and k
+> + * 'T'          double
+> + *              user mode accepts an optional ms, us, ns suffix,
+> + *              which divides the value by 1e3, 1e6, 1e9, respectively
+> + * '/'          optional gdb-like print format (like "/10x")
+> + *
+> + * '?'          optional type (for all types, except '/')
+> + * '.'          other form of optional type (for 'i' and 'l')
+> + * 'b'          boolean
+> + *              user mode accepts "on" or "off"
+> + * '-'          optional parameter (eg. '-f')
+> + *
+> + */
+> +
+> +typedef struct mon_cmd_t {
+> +    const char *name;
+> +    const char *args_type;
+> +    const char *params;
+> +    const char *help;
+> +    const char *flags; /* p=preconfig */
+> +    void (*cmd)(Monitor *mon, const QDict *qdict);
+> +    /* @sub_table is a list of 2nd level of commands. If it does not exist,
+> +     * cmd should be used. If it exists, sub_table[?].cmd should be
+> +     * used, and cmd of 1st level plays the role of help function.
+> +     */
+> +    struct mon_cmd_t *sub_table;
+> +    void (*command_completion)(ReadLineState *rs, int nb_args, const char *str);
+> +} mon_cmd_t;
+> +
+> +struct Monitor {
+> +    CharBackend chr;
+> +    int reset_seen;
+> +    int flags;
+> +    int suspend_cnt;            /* Needs to be accessed atomically */
+> +    bool skip_flush;
+> +    bool use_io_thread;
+> +
+> +    gchar *mon_cpu_path;
+> +    QTAILQ_ENTRY(Monitor) entry;
+> +
+> +    /*
+> +     * The per-monitor lock. We can't access guest memory when holding
+> +     * the lock.
+> +     */
+> +    QemuMutex mon_lock;
+> +
+> +    /*
+> +     * Members that are protected by the per-monitor lock
+> +     */
+> +    QLIST_HEAD(, mon_fd_t) fds;
+> +    QString *outbuf;
+> +    guint out_watch;
+> +    /* Read under either BQL or mon_lock, written with BQL+mon_lock.  */
+> +    int mux_out;
+> +};
+> +
+> +struct MonitorHMP {
+> +    Monitor common;
+> +    /*
+> +     * State used only in the thread "owning" the monitor.
+> +     * If @use_io_thread, this is @mon_iothread.
+> +     * Else, it's the main thread.
+> +     * These members can be safely accessed without locks.
+> +     */
+> +    ReadLineState *rs;
+> +    mon_cmd_t *cmd_table;
+> +};
+> +
+> +typedef struct {
+> +    Monitor common;
+> +    JSONMessageParser parser;
+> +    /*
+> +     * When a client connects, we're in capabilities negotiation mode.
+> +     * @commands is &qmp_cap_negotiation_commands then.  When command
+> +     * qmp_capabilities succeeds, we go into command mode, and
+> +     * @command becomes &qmp_commands.
+> +     */
+> +    QmpCommandList *commands;
+> +    bool capab_offered[QMP_CAPABILITY__MAX]; /* capabilities offered */
+> +    bool capab[QMP_CAPABILITY__MAX];         /* offered and accepted */
+> +    /*
+> +     * Protects qmp request/response queue.
+> +     * Take monitor_lock first when you need both.
+> +     */
+> +    QemuMutex qmp_queue_lock;
+> +    /* Input queue that holds all the parsed QMP requests */
+> +    GQueue *qmp_requests;
+> +} MonitorQMP;
+> +
+> +#endif
+> diff --git a/monitor/misc.c b/monitor/misc.c
+> index d964dd1969..6ae7561105 100644
+> --- a/monitor/misc.c
+> +++ b/monitor/misc.c
+> @@ -23,6 +23,7 @@
+>   */
 >  
-> -    if (monitor_is_qmp(mon)) {
-> -        qemu_chr_fe_set_echo(&mon->chr, true);
-> -        json_message_parser_init(&mon->qmp.parser, handle_qmp_command,
-> -                                 mon, NULL);
-> -        if (mon->use_io_thread) {
-> -            /*
-> -             * Make sure the old iowatch is gone.  It's possible when
-> -             * e.g. the chardev is in client mode, with wait=on.
-> -             */
-> -            remove_fd_in_watch(chr);
-> -            /*
-> -             * We can't call qemu_chr_fe_set_handlers() directly here
-> -             * since chardev might be running in the monitor I/O
-> -             * thread.  Schedule a bottom half.
-> -             */
-> -            aio_bh_schedule_oneshot(iothread_get_aio_context(mon_iothread),
-> -                                    monitor_qmp_setup_handlers_bh, mon);
-> -            /* The bottom half will add @mon to @mon_list */
-> -            return;
-> -        } else {
-> -            qemu_chr_fe_set_handlers(&mon->chr, monitor_can_read,
-> -                                     monitor_qmp_read, monitor_qmp_event,
-> -                                     NULL, mon, NULL, true);
-> -        }
-> +    qemu_chr_fe_set_handlers(&mon->chr, monitor_can_read, monitor_read,
-> +                             monitor_event, NULL, mon, NULL, true);
-> +    monitor_list_append(mon);
-> +}
-> +
-> +void monitor_init(Chardev *chr, int flags)
-> +{
-> +    if (flags & MONITOR_USE_CONTROL) {
-> +        monitor_init_qmp(chr, flags);
->      } else {
-> -        qemu_chr_fe_set_handlers(&mon->chr, monitor_can_read, monitor_read,
-> -                                 monitor_event, NULL, mon, NULL, true);
-> +        monitor_init_hmp(chr, flags);
->      }
+>  #include "qemu/osdep.h"
+> +#include "monitor_int.h"
+>  #include "qemu/units.h"
+>  #include <dirent.h>
+>  #include "cpu.h"
+> @@ -91,55 +92,6 @@
+>  #include "hw/s390x/storage-attributes.h"
+>  #endif
+>  
+> -/*
+> - * Supported types:
+> - *
+> - * 'F'          filename
+> - * 'B'          block device name
+> - * 's'          string (accept optional quote)
+> - * 'S'          it just appends the rest of the string (accept optional quote)
+> - * 'O'          option string of the form NAME=VALUE,...
+> - *              parsed according to QemuOptsList given by its name
+> - *              Example: 'device:O' uses qemu_device_opts.
+> - *              Restriction: only lists with empty desc are supported
+> - *              TODO lift the restriction
+> - * 'i'          32 bit integer
+> - * 'l'          target long (32 or 64 bit)
+> - * 'M'          Non-negative target long (32 or 64 bit), in user mode the
+> - *              value is multiplied by 2^20 (think Mebibyte)
+> - * 'o'          octets (aka bytes)
+> - *              user mode accepts an optional E, e, P, p, T, t, G, g, M, m,
+> - *              K, k suffix, which multiplies the value by 2^60 for suffixes E
+> - *              and e, 2^50 for suffixes P and p, 2^40 for suffixes T and t,
+> - *              2^30 for suffixes G and g, 2^20 for M and m, 2^10 for K and k
+> - * 'T'          double
+> - *              user mode accepts an optional ms, us, ns suffix,
+> - *              which divides the value by 1e3, 1e6, 1e9, respectively
+> - * '/'          optional gdb-like print format (like "/10x")
+> - *
+> - * '?'          optional type (for all types, except '/')
+> - * '.'          other form of optional type (for 'i' and 'l')
+> - * 'b'          boolean
+> - *              user mode accepts "on" or "off"
+> - * '-'          optional parameter (eg. '-f')
+> - *
+> - */
 > -
-> -    monitor_list_append(mon);
->  }
+> -typedef struct mon_cmd_t {
+> -    const char *name;
+> -    const char *args_type;
+> -    const char *params;
+> -    const char *help;
+> -    const char *flags; /* p=preconfig */
+> -    void (*cmd)(Monitor *mon, const QDict *qdict);
+> -    /* @sub_table is a list of 2nd level of commands. If it does not exist,
+> -     * cmd should be used. If it exists, sub_table[?].cmd should be
+> -     * used, and cmd of 1st level plays the role of help function.
+> -     */
+> -    struct mon_cmd_t *sub_table;
+> -    void (*command_completion)(ReadLineState *rs, int nb_args, const char *str);
+> -} mon_cmd_t;
+> -
+>  /* file descriptors passed via SCM_RIGHTS */
+>  typedef struct mon_fd_t mon_fd_t;
+>  struct mon_fd_t {
+> @@ -182,66 +134,6 @@ typedef struct {
+>      int64_t rate;       /* Minimum time (in ns) between two events */
+>  } MonitorQAPIEventConf;
 >  
->  void monitor_cleanup(void)
+> -struct Monitor {
+> -    CharBackend chr;
+> -    int reset_seen;
+> -    int flags;
+> -    int suspend_cnt;            /* Needs to be accessed atomically */
+> -    bool skip_flush;
+> -    bool use_io_thread;
+> -
+> -    gchar *mon_cpu_path;
+> -    QTAILQ_ENTRY(Monitor) entry;
+> -
+> -    /*
+> -     * The per-monitor lock. We can't access guest memory when holding
+> -     * the lock.
+> -     */
+> -    QemuMutex mon_lock;
+> -
+> -    /*
+> -     * Members that are protected by the per-monitor lock
+> -     */
+> -    QLIST_HEAD(, mon_fd_t) fds;
+> -    QString *outbuf;
+> -    guint out_watch;
+> -    /* Read under either BQL or mon_lock, written with BQL+mon_lock.  */
+> -    int mux_out;
+> -};
+> -
+> -struct MonitorHMP {
+> -    Monitor common;
+> -    /*
+> -     * State used only in the thread "owning" the monitor.
+> -     * If @use_io_thread, this is @mon_iothread.
+> -     * Else, it's the main thread.
+> -     * These members can be safely accessed without locks.
+> -     */
+> -    ReadLineState *rs;
+> -    mon_cmd_t *cmd_table;
+> -};
+> -
+> -typedef struct {
+> -    Monitor common;
+> -    JSONMessageParser parser;
+> -    /*
+> -     * When a client connects, we're in capabilities negotiation mode.
+> -     * @commands is &qmp_cap_negotiation_commands then.  When command
+> -     * qmp_capabilities succeeds, we go into command mode, and
+> -     * @command becomes &qmp_commands.
+> -     */
+> -    QmpCommandList *commands;
+> -    bool capab_offered[QMP_CAPABILITY__MAX]; /* capabilities offered */
+> -    bool capab[QMP_CAPABILITY__MAX];         /* offered and accepted */
+> -    /*
+> -     * Protects qmp request/response queue.
+> -     * Take monitor_lock first when you need both.
+> -     */
+> -    QemuMutex qmp_queue_lock;
+> -    /* Input queue that holds all the parsed QMP requests */
+> -    GQueue *qmp_requests;
+> -} MonitorQMP;
+> -
+>  /* Shared monitor I/O thread */
+>  IOThread *mon_iothread;
+>  
 > -- 
 > 2.20.1
 > 
