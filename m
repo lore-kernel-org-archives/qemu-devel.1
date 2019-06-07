@@ -2,93 +2,92 @@ Return-Path: <SRS0=3yEa=UG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 00083C2BCA1
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 19:21:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 907D8C2BCA1
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 19:21:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C7140208C3
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 19:21:06 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="YvIRYXXI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C7140208C3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 691AE2133D
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 19:21:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 691AE2133D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51668 helo=lists.gnu.org)
+Received: from localhost ([::1]:51676 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hZKQE-0004iN-3h
-	for qemu-devel@archiver.kernel.org; Fri, 07 Jun 2019 15:21:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56231)
+	id 1hZKQg-0005fx-Ht
+	for qemu-devel@archiver.kernel.org; Fri, 07 Jun 2019 15:21:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41773)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <richard.henderson@linaro.org>) id 1hZIPN-0000K7-99
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 13:12:07 -0400
+ (envelope-from <eblake@redhat.com>) id 1hZJD2-0007Vt-8n
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 14:03:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1hZIPL-00070v-5f
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 13:12:04 -0400
-Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:46170)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1hZIPK-0006tb-UZ
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 13:12:03 -0400
-Received: by mail-oi1-x242.google.com with SMTP id 203so1914686oid.13
- for <qemu-devel@nongnu.org>; Fri, 07 Jun 2019 10:12:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:references:from:openpgp:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=rmp/CIxrfYaQ3kAVAZxIGEbkm2dLESS36pKtPsSJcHM=;
- b=YvIRYXXI0yKEi91ekgNbKHxR3IE7Ep4qvlWeoE4FpY6x0V3rlmz4WdAEXqfOoBPrgR
- 64wlc5+65kjA+5YuIuMczkAMsdQVyJiIkiX6WWNkSc1k76zhYEKqhogosGyJOL5mR4to
- gSXJPwRBvEzbfBo1aQmaaArGTBX114PFLAhywqAy//N3Fh3+rbeFfV8OvWNpr5V1K8Z1
- jY3gSaVccfpAa7pNhdCeRiNWQrAEX+d/KOaKMxulsKCMPILEf6Qm2ThMA1caCuhMdk9C
- X0UV0lAyDv0O/fdqVV8sjADP/+Fy8S3WdYse8/YoIUI1yKdcOt4Q+xGEWIhpDcyBjwAN
- BrbQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=rmp/CIxrfYaQ3kAVAZxIGEbkm2dLESS36pKtPsSJcHM=;
- b=DVPKzDH6vnU0UWb6iXjRR7pyKtnQzl4PvC3h8ZZrb4m+bUu+49feDRGRgipeJGtmyS
- bJoL+ZlNxIdLl+R3HCD72TxDls9uqlOtydZM7T0veFyCXddfaf7gGGp294Pgr5OCzkjA
- d1ZOPcFamNDty5UpozjNwbr5Au4VoNX9Oun1HPi3FhPiqKcRXKMip6eKPvuU/OGOay7A
- LG3KbTYcb3XojIYrGty/h0Znf0uOVgvuMEvUGn2fEeKy24Qdo6IDBk4/l1qV3hbt1Ld/
- VNftD377JM7esqU/7misedIXpWnGJ4v+kxxIv0SulaxlewWcc9+y0s87i22kno/u1H+c
- UFow==
-X-Gm-Message-State: APjAAAUekV6WyQyO6HbwXx2hwmFDN3YuBpq2MbOs7Vg7UqAhStygkdtH
- f8poYOh4X5FS51ybTKiSFh6RDRj00SCbwg==
-X-Google-Smtp-Source: APXvYqzJ4lnZQyPlpI4ZY3ypq0vbpDCF1vf6mlCIjHZ+apPRZ9qpIND5nq82abXBLC5+7LkErVDyzw==
-X-Received: by 2002:aca:fc81:: with SMTP id a123mr4502841oii.75.1559927519526; 
- Fri, 07 Jun 2019 10:11:59 -0700 (PDT)
-Received: from [192.168.3.43] (200-56-192-86-cable.cybercable.net.mx.
- [200.56.192.86])
- by smtp.gmail.com with ESMTPSA id k17sm925040otl.13.2019.06.07.10.11.58
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Fri, 07 Jun 2019 10:11:58 -0700 (PDT)
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
- qemu-devel@nongnu.org
-References: <20190606174609.20487-1-peter.maydell@linaro.org>
- <20190606174609.20487-12-peter.maydell@linaro.org>
-From: Richard Henderson <richard.henderson@linaro.org>
+ (envelope-from <eblake@redhat.com>) id 1hZJCy-000186-6f
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 14:03:23 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52482)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1hZJCw-0008F1-7Z
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 14:03:19 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id B0A9285A07;
+ Fri,  7 Jun 2019 18:02:43 +0000 (UTC)
+Received: from [10.3.116.85] (ovpn-116-85.phx2.redhat.com [10.3.116.85])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 9A1556AD28;
+ Fri,  7 Jun 2019 18:02:38 +0000 (UTC)
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ Yoshinori Sato <ysato@users.sourceforge.jp>, qemu-devel@nongnu.org,
+ Igor Mammedov <imammedo@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>
+References: <20190607153725.18055-1-philmd@redhat.com>
+ <20190607153725.18055-5-philmd@redhat.com>
+From: Eric Blake <eblake@redhat.com>
 Openpgp: preference=signencrypt
-Message-ID: <4ad24b88-7013-e925-16ac-398d5e5c4619@linaro.org>
-Date: Fri, 7 Jun 2019 12:11:55 -0500
+Autocrypt: addr=eblake@redhat.com; keydata=
+ xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
+ xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
+ TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
+ GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
+ sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
+ AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
+ CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
+ RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
+ wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
+ Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
+ gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
+ pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
+ zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
+ pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
+ 3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
+ NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
+ cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
+ SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
+ I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
+ mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
+ Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
+ 2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
+Organization: Red Hat, Inc.
+Message-ID: <e6e5f4ef-27c1-ce7c-e404-621c86af43ea@redhat.com>
+Date: Fri, 7 Jun 2019 13:02:37 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190606174609.20487-12-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::242
-Subject: Re: [Qemu-devel] [PATCH 11/42] target/arm: Add helpers for VFP
- register loads and stores
+In-Reply-To: <20190607153725.18055-5-philmd@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="Ve4biE96Zbf6YSI2b2jPhU3lWZEYYHwFC"
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.26]); Fri, 07 Jun 2019 18:02:43 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v18 04/29] !fixup target/rx: CPU definition
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -104,43 +103,65 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/6/19 12:45 PM, Peter Maydell wrote:
-> The current VFP code has two different idioms for
-> loading and storing from the VFP register file:
->  1 using the gen_mov_F0_vreg() and similar functions,
->    which load and store to a fixed set of TCG globals
->    cpu_F0s, CPU_F0d, etc
->  2 by direct calls to tcg_gen_ld_f64() and friends
-> 
-> We want to phase out idiom 1 (because the use of the
-> fixed globals is a relic of a much older version of TCG),
-> but idiom 2 is quite longwinded:
->  tcg_gen_ld_f64(tmp, cpu_env, vfp_reg_offset(true, reg))
-> requires us to specify the 64-bitness twice, once in
-> the function name and once by passing 'true' to
-> vfp_reg_offset(). There's no guard against accidentally
-> passing the wrong flag.
-> 
-> Instead, let's move to a convention of accessing 64-bit
-> registers via the existing neon_load_reg64() and
-> neon_store_reg64(), and provide new neon_load_reg32()
-> and neon_store_reg32() for the 32-bit equivalents.
-> 
-> Implement the new functions and use them in the code in
-> translate-vfp.inc.c. We will convert the rest of the VFP
-> code as we do the decodetree conversion in subsequent
-> commits.
-> 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--Ve4biE96Zbf6YSI2b2jPhU3lWZEYYHwFC
+Content-Type: multipart/mixed; boundary="Cj9E3mHuRKxNQXyec07g3PjppHnLuP1U2";
+ protected-headers="v1"
+From: Eric Blake <eblake@redhat.com>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ Yoshinori Sato <ysato@users.sourceforge.jp>, qemu-devel@nongnu.org,
+ Igor Mammedov <imammedo@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <e6e5f4ef-27c1-ce7c-e404-621c86af43ea@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v18 04/29] !fixup target/rx: CPU definition
+References: <20190607153725.18055-1-philmd@redhat.com>
+ <20190607153725.18055-5-philmd@redhat.com>
+In-Reply-To: <20190607153725.18055-5-philmd@redhat.com>
+
+--Cj9E3mHuRKxNQXyec07g3PjppHnLuP1U2
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+
+On 6/7/19 10:37 AM, Philippe Mathieu-Daud=C3=A9 wrote:
+> Rename macros.
+
+Why is this marked '!fixup' in the subject instead of just merging the
+patches directly?
+
+>=20
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 > ---
->  target/arm/translate-vfp.inc.c | 40 +++++++++++++++++-----------------
->  target/arm/translate.c         | 10 +++++++++
->  2 files changed, 30 insertions(+), 20 deletions(-)
+>  target/rx/cpu.c | 22 ++++++++++++++--------
+>  target/rx/cpu.h | 12 ++++++------
+>  2 files changed, 20 insertions(+), 14 deletions(-)
+>=20
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
 
-r~
+--Cj9E3mHuRKxNQXyec07g3PjppHnLuP1U2--
 
+--Ve4biE96Zbf6YSI2b2jPhU3lWZEYYHwFC
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlz6pr0ACgkQp6FrSiUn
+Q2oLHAgArqy9KXEfN0lDWozh1kycd2xqRjlcji+RU/YnybqPlf0HXcg+ctwbWVGs
+yhv1Nh4iBjSnGpWvVPKnJQ9enK0iuYAyVcHrkyNReVf3BfW3ASnZWNrfeuh7RCih
+oXO8YslKR/yWfqaG2MG6XaF7TVDOWLvasUtJPsRLQd1XNM5c7VsYwJWp1wMCZc7H
+EKe6N9EOHrkF4ZhK7iLldaGdtIx+4hRLqaZ01MTsWwIGb0vs5TW5DEAx8i2n+FHh
+w9IpZ0tVJZKjk7NL46CST9+y7LtF8N9wxZmd+mXS+W9oV936PdlWCW/nq0mDVlHI
++tFl6cGzPKv1/gC0L4VUUe/7hh/pZQ==
+=ZoaO
+-----END PGP SIGNATURE-----
+
+--Ve4biE96Zbf6YSI2b2jPhU3lWZEYYHwFC--
 
