@@ -2,61 +2,93 @@ Return-Path: <SRS0=3yEa=UG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B6409C2BCA1
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 16:05:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E957BC2BCA1
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 16:06:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8DCBD20657
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 16:05:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8DCBD20657
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=efs-auto.de
+	by mail.kernel.org (Postfix) with ESMTPS id B403A20657
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 16:06:09 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="HMKBUAbp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B403A20657
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49148 helo=lists.gnu.org)
+Received: from localhost ([::1]:49150 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hZHNI-0004Bb-ME
-	for qemu-devel@archiver.kernel.org; Fri, 07 Jun 2019 12:05:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60847)
+	id 1hZHNY-00054q-W3
+	for qemu-devel@archiver.kernel.org; Fri, 07 Jun 2019 12:06:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41334)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <andreas.konopik@efs-auto.de>) id 1hZAQd-00066I-1P
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 04:40:52 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1hZGHf-0006G3-1y
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 10:56:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <andreas.konopik@efs-auto.de>) id 1hZAQb-0006vK-Fm
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 04:40:50 -0400
-Received: from mailin4.audi.de ([143.164.102.18]:44610)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <andreas.konopik@efs-auto.de>)
- id 1hZAQb-0006VJ-3T
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 04:40:49 -0400
-From: "Konopik, Andreas (EFS-GH2)" <andreas.konopik@efs-auto.de>
-To: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Thread-Topic: [Qemu-devel] [PATCH 4/5] tricore: add QSEED instruction
-Thread-Index: AQHVG2WPXjGEeP6bXEumMYkWdbcFpKaNB4kAgALS7FA=
-Date: Fri, 7 Jun 2019 08:40:28 +0000
-Message-ID: <F5B10EA5F04CF44F81B685A0E28157872022B0@AUDIINSX0385.audi.vwg>
-References: <20190605061126.10244-1-david.brenken@efs-auto.org>
- <20190605061126.10244-5-david.brenken@efs-auto.org>
- <9baa6207-17a2-7218-9ad2-9627de232304@mail.uni-paderborn.de>
-In-Reply-To: <9baa6207-17a2-7218-9ad2-9627de232304@mail.uni-paderborn.de>
-Accept-Language: de-DE, en-US
-Content-Language: de-DE
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.246.77.120]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+ (envelope-from <richard.henderson@linaro.org>) id 1hZGHe-0008QI-5i
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 10:55:58 -0400
+Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:45545)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1hZGHd-0008OU-Vz
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 10:55:58 -0400
+Received: by mail-ot1-x342.google.com with SMTP id n2so2071865otl.12
+ for <qemu-devel@nongnu.org>; Fri, 07 Jun 2019 07:55:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:references:from:openpgp:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=WILb82+ZMb6oXiXXQ/1X3V8uKxg2rHMLbJZJlZqK+TY=;
+ b=HMKBUAbp5BE0R1mEYQK0wBOWsUW6zD+gTencUxJm0C+w2Jy4ecsOXflGonuCn9g1qF
+ ERePWQ4d0QPNcFmZ0jZs0p+V0PxmXTI2HOLZgtOuApJdj2sCDv/OCD6UeRq9+3JtVDIm
+ AfsUPwaoKQO7oLTesfyrE9o/Ot4LTAVsk9j2Tp7wmlGLcgbcxrdU36wcC+qd3yOgAxl3
+ xAaAvmS1aoQJlDpKddtxxOnx1c94n/nYUSqb7qnkXIVYB3/W7Ii9zSrZECpAk3r0UaZt
+ 60BpdKUxpyXeC62LS8l4qSVqjjBtXVhGKgcqMm9w17NHaALK/HsBSllaArV6yDf6dMSx
+ tWig==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=WILb82+ZMb6oXiXXQ/1X3V8uKxg2rHMLbJZJlZqK+TY=;
+ b=G9uGbv9P+PX4tz9jlWOZhQWsYmPXukDcWZvdzySl3eO88prC2ZGvAypjLjGZdt+gEp
+ mU93dK4KzoD3E4PpnvV/jZARB9ojk6QS0sSU99LJ/uQGx5fwdLsv3ECXcJUppnamE0vb
+ zfbWfSYpsBosW5UcjK6iuOUEqRdEQJagLmuQfA9EEc+Ud9LwhY/hX+jVCxbM049p2r8u
+ g6YrWc6WW7I65Jz5u7ubyR4y2ZhMKQQTWfrdqK+LAXTO0gnkzm5KTB4Di8lKKNqQ3LWk
+ IPiEeaq2qjEFyy6U08LJ4e9tZu0xpjmTx/EafhnXAJAoDSocV/XireK0zq3lTkhmxLY+
+ YI3Q==
+X-Gm-Message-State: APjAAAVF+m52EK06K+9VDMmdHdM0DaAVPsK+P2nqswj9d4knHT66akvi
+ 6O7L4YL3KDb6mOBU5wx1aboMIqNx0Y4jCw==
+X-Google-Smtp-Source: APXvYqy1/rg8/pHdyNxN3rC7Gon8E4aQLULUELdsnMGH9Xb/QE3vYdnFa/H0l5q/wbVBZ4914/7R1A==
+X-Received: by 2002:a9d:6b98:: with SMTP id b24mr19207734otq.189.1559919356833; 
+ Fri, 07 Jun 2019 07:55:56 -0700 (PDT)
+Received: from [192.168.3.43] (200-56-192-86-cable.cybercable.net.mx.
+ [200.56.192.86])
+ by smtp.gmail.com with ESMTPSA id l31sm851663otc.30.2019.06.07.07.55.55
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Fri, 07 Jun 2019 07:55:56 -0700 (PDT)
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
+ qemu-devel@nongnu.org
+References: <20190606174609.20487-1-peter.maydell@linaro.org>
+ <20190606174609.20487-8-peter.maydell@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Openpgp: preference=signencrypt
+Message-ID: <9f3cba01-31fc-3acc-39df-36a38c323931@linaro.org>
+Date: Fri, 7 Jun 2019 09:55:53 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-X-TM-AS-GCONF: 00
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 143.164.102.18
-X-Mailman-Approved-At: Fri, 07 Jun 2019 11:13:35 -0400
-Subject: Re: [Qemu-devel] [PATCH 4/5] tricore: add QSEED instruction
+In-Reply-To: <20190606174609.20487-8-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::342
+Subject: Re: [Qemu-devel] [PATCH 07/42] target/arm: Convert VMINNM,
+ VMAXNM to decodetree
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,59 +100,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Brenken, David \(EFS-GH2\)" <david.brenken@efs-auto.de>, "Rasche,
- Robert \(EFS-GH2\)" <robert.rasche@efs-auto.de>, "Hofstetter, 
- Georg \(EFS-GH2\)" <Georg.Hofstetter@efs-auto.de>, "Biermanski,
- Lars \(EFS-GH3\)" <lars.biermanski@efs-auto.de>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-SGkgQmFzdGlhbiwNCg0KPiBIaSwNCj4gDQo+IE9uIDYvNS8xOSA4OjExIEFNLCBEYXZpZCBCcmVu
-a2VuIHdyb3RlOg0KPiA+ICsvKg0KPiA+ICsgKiBUYXJnZXQgVHJpQ29yZSBRU0VFRC5GIHNpZ25p
-ZmljYW5kIExvb2t1cCBUYWJsZQ0KPiA+ICsgKg0KPiA+ICsgKiBUaGUgUVNFRUQuRiBvdXRwdXQg
-c2lnbmlmaWNhbmQgZGVwZW5kcyBvbiB0aGUgbGVhc3Qtc2lnbmlmaWNhbnQNCj4gPiArICogZXhw
-b25lbnQgYml0IGFuZCB0aGUgNiBtb3N0LXNpZ25pZmljYW50IHNpZ25pZmljYW5kIGJpdHMuDQo+
-ID4gKyAqDQo+ID4gKyAqIElFRUUgNzU0IGZsb2F0IGRhdGF0eXBlDQo+ID4gKyAqIHBhcnRpdGlv
-bmVkIGludG8gU2lnbiAoUyksIEV4cG9uZW50IChFKSBhbmQgU2lnbmlmaWNhbmQgKE0pOg0KPiA+
-ICsgKg0KPiA+ICsgKiBTICAgRSBFIEUgRSBFIEUgRSBFICAgTSBNIE0gTSBNIE0gLi4uDQo+ID4g
-KyAqICAgIHwgICAgICAgICAgICAgfCAgICAgICAgICAgICAgIHwNCj4gPiArICogICAgKy0tLS0t
-LSstLS0tLS0rLS0tLS0tLSstLS0tLS0tKw0KPiA+ICsgKiAgICAgICAgICAgfCAgICAgICAgICAg
-ICAgfA0KPiA+ICsgKiAgICAgICAgICBmb3IgICAgICAgIGxvb2t1cCB0YWJsZQ0KPiA+ICsgKiAg
-ICAgIGNhbGN1bGF0aW5nICAgICBpbmRleCBmb3INCj4gPiArICogICAgICAgIG91dHB1dCBFICAg
-ICAgIG91dHB1dCBNDQo+ID4gKyAqLw0KPiA+ICtzdGF0aWMgY29uc3QgdWludDhfdCB0YXJnZXRf
-cXNlZWRfc2lnbmlmaWNhbmRfdGFibGVbMTI4XSA9IHsNCj4gPiArICAgIDI1MywgMjUyLCAyNDUs
-IDI0NCwgMjM5LCAyMzgsIDIzMSwgMjMwLCAyMjUsIDIyNCwgMjE3LCAyMTYsDQo+ID4gKyAgICAy
-MTEsIDIxMCwgMjA1LCAyMDQsIDIwMSwgMjAwLCAxOTUsIDE5NCwgMTg5LCAxODgsIDE4NSwgMTg0
-LA0KPiA+ICsgICAgMTc5LCAxNzgsIDE3NSwgMTc0LCAxNjksIDE2OCwgMTY1LCAxNjQsIDE2MSwg
-MTYwLCAxNTcsIDE1NiwNCj4gPiArICAgIDE1MywgMTUyLCAxNDksIDE0OCwgMTQ1LCAxNDQsIDE0
-MSwgMTQwLCAxMzcsIDEzNiwgMTMzLCAxMzIsDQo+ID4gKyAgICAxMzEsIDEzMCwgMTI3LCAxMjYs
-IDEyMywgMTIyLCAxMjEsIDEyMCwgMTE3LCAxMTYsIDExNSwgMTE0LA0KPiA+ICsgICAgMTExLCAx
-MTAsIDEwOSwgMTA4LCAxMDMsIDEwMiwgOTksIDk4LCA5MywgOTIsIDg5LCA4OCwgODMsDQo+ID4g
-KyAgICA4MiwgNzksIDc4LCA3NSwgNzQsIDcxLCA3MCwgNjcsIDY2LCA2MywgNjIsIDU5LCA1OCwg
-NTUsDQo+ID4gKyAgICA1NCwgNTMsIDUyLCA0OSwgNDgsIDQ1LCA0NCwgNDMsIDQyLCAzOSwgMzgs
-IDM3LCAzNiwgMzMsDQo+ID4gKyAgICAzMiwgMzEsIDMwLCAyNywgMjYsIDI1LCAyNCwgMjMsIDIy
-LCAxOSwgMTgsIDE3LCAxNiwgMTUsDQo+ID4gKyAgICAxNCwgMTMsIDEyLCAxMSwgMTAsIDksIDgs
-IDcsIDYsIDUsIDQsIDMsIDIgfTsNCj4gDQo+IA0KPiBDYW4geW91IGV4cGxhaW4gaW4gYSBjb21t
-ZW50IGhvdyB5b3UgYXJyaXZlZCBhdCB0aGlzIGxvb2t1cCB0YWJsZT8NCg0KV2UgZXh0cmFjdGVk
-IHRoaXMgbG9va3VwIHRhYmxlIGZyb20gcmVhbCBoYXJkd2FyZSByZXN1bHRzLg0KV2UgYWxzbyB2
-YWxpZGF0ZWQgUUVNVSBvdXRwdXQgdmFsdWVzIGJ5IGNvbXBhcmluZyBhZ2FpbiB3aXRoIHRoZSBy
-ZWFsDQpoYXJkd2FyZSBxc2VlZCBvdXRwdXQuDQpUZXN0aW5nIHdhcyBub3QgbWFkZSBmb3IgYWxs
-IDJeMzIgcG9zc2libGUgaW5wdXQgdmFsdWVzLGJ1dCBmb3IgYWxsDQpwb3NpdGl2ZSBmbG9hdHMg
-dGhhdCB5aWVsZCBkaWZmZXJlbnQgb3V0cHV0cyAod2l0aCBhIGJpZyBzdHJpZGUpLg0KDQpXZSB3
-aWxsIGFkZCBhIHNob3J0ZXIgY29tbWVudCB0byB0aGUgc2Vjb25kIHZlcnNpb24gb2YgdGhlIHBh
-dGNoc2V0DQoNCj4gPiArICAgIH0gZWxzZSBpZiAoZmxvYXQzMl9pc19uZWcoYXJnMSkpIHsNCj4g
-PiArICAgICAgICByZXN1bHQgPSBmbG9hdDMyX3NxcnRfbmFuOw0KPiA+ICsgICAgICAgIGVudi0+
-RlBVX0ZJID0gMTsNCj4gWy4uLl0NCj4gPiArDQo+ID4gKyAgICBmbGFncyA9IGZfZ2V0X2V4Y3Bf
-ZmxhZ3MoZW52KTsNCj4gPiArICAgIGlmIChmbGFncykgew0KPiA+ICsgICAgICAgIGlmIChmbGFn
-cyAmIGZsb2F0X2ZsYWdfaW52YWxpZCkgew0KPiA+ICsgICAgICAgICAgICBmX3VwZGF0ZV9wc3df
-ZmxhZ3MoZW52LCBmbGFncyk7DQo+ID4gKyAgICAgICAgfSBlbHNlIHsNCj4gPiArICAgICAgICAg
-ICAgZW52LT5GUFVfRlMgPSAwOw0KPiA+ICsgICAgICAgIH0NCj4gPiArICAgIH0gZWxzZSB7DQo+
-ID4gKyAgICAgICAgZW52LT5GUFVfRlMgPSAwOw0KPiANCj4gWW91IGFyZSBzZXR0aW5nIEZQVV9G
-UyB0byAwLCBldmVuIHRob3VnaCBGUFVfRkkgbWlnaHQgaGF2ZSBiZWVuIHNldCBpbiBjYXNlIG9m
-DQo+IGEgTmFOLiBJIHRoaW5rIGl0J3MgYmVzdCB0byByZW1vdmUgdGhlIHdob2xlIHNvZnRmbG9h
-dCBjaGVjaywgYXMgbm9uZSBvZiB0aGUNCj4gc29mdGZsb2F0IGZ1bmN0aW9ucyB5b3UgY2FsbCwg
-Y2FuIHJhaXNlIGFueSBmbGFncy4NCg0KSSB3aWxsIG1ha2UgdGhlIFBTVyB1cGRhdGUgb25seSBk
-ZXBlbmRlbnQgb24gaXNfTmFOKGlucHV0KSBhbmQgaXNfU1FSVF9OYU4ob3V0cHV0KS4NCg0KQmVz
-dCByZWdhcmRzLA0KDQpBbmRyZWFzDQo=
+On 6/6/19 12:45 PM, Peter Maydell wrote:
+> Convert the VMINNM and VMAXNM instructions to decodetree.
+> As with VSEL, we leave the trans_VMINMAXNM() function
+> in translate.c for the moment.
+> 
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+>  target/arm/translate.c       | 41 ++++++++++++++++++++++++------------
+>  target/arm/vfp-uncond.decode |  5 +++++
+>  2 files changed, 33 insertions(+), 13 deletions(-)
+
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+
+
+r~
+
 
