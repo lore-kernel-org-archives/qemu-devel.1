@@ -2,66 +2,80 @@ Return-Path: <SRS0=3yEa=UG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_MUTT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DD685C2BCA1
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 13:09:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D024CC2BCA1
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 13:10:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B69B3208E3
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 13:09:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B69B3208E3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 9C9E2208E3
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 13:10:54 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Dna8KVku"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9C9E2208E3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50942 helo=lists.gnu.org)
+Received: from localhost ([::1]:50956 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hZEcl-0002Ua-VA
-	for qemu-devel@archiver.kernel.org; Fri, 07 Jun 2019 09:09:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59407)
+	id 1hZEdx-0003rq-RV
+	for qemu-devel@archiver.kernel.org; Fri, 07 Jun 2019 09:10:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59443)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <kwolf@redhat.com>) id 1hZEat-0000nK-OY
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 09:07:45 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1hZEax-0000pM-K5
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 09:07:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1hZEar-0003yL-Nv
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 09:07:43 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38518)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>)
- id 1hZEVm-0002vm-J1; Fri, 07 Jun 2019 09:02:28 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 5ADEF30860C7;
- Fri,  7 Jun 2019 13:02:15 +0000 (UTC)
-Received: from dhcp-200-226.str.redhat.com (dhcp-200-226.str.redhat.com
- [10.33.200.226])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id AA5418CBA0;
- Fri,  7 Jun 2019 13:02:11 +0000 (UTC)
-Date: Fri, 7 Jun 2019 15:02:10 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <20190607130210.GC5055@dhcp-200-226.str.redhat.com>
-References: <20190411172709.205032-1-vsementsov@virtuozzo.com>
- <20190411172709.205032-6-vsementsov@virtuozzo.com>
- <20190607075740.GA5055@dhcp-200-226.str.redhat.com>
- <16b7ad42-611c-fc3e-2029-d491882b0750@virtuozzo.com>
+ (envelope-from <peter.maydell@linaro.org>) id 1hZEav-00048H-NP
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 09:07:47 -0400
+Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:38537)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1hZEav-00041M-I5
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 09:07:45 -0400
+Received: by mail-oi1-x244.google.com with SMTP id v186so1373665oie.5
+ for <qemu-devel@nongnu.org>; Fri, 07 Jun 2019 06:07:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
+ bh=qoKy7Saj12BIUDx2o/P3rez8CKgTVRuN+CfgSrIfYdE=;
+ b=Dna8KVku8xmLsApVdhbe+Ub3kTu3xvW6AXgeRay+YowUYX64rsF426DQUsYLSV3keW
+ l6qbAINawVG2qEAcClU41+OrV6WwzayQTY8nFlLc4NGhXoenpkGiJib1jgJ3xpd9kLc9
+ fZIClwZgVpk8LumdXldrCQz19lPrrRz7Z9qUnhdx1v3uCmEKsoaBJgAk5LlnSrSwgrr3
+ ymBLEBH8YHTMii9mpTcRDJty5NXlgXSIBBlLapvHtaPxKxkOALhF4XBO4DBZNZPOf23M
+ IQLWfxzD3q15sn1LQ7f8EqmhpBlsRm8jszIRbrdlsJrEsm2DiqS6KNhGE7zHq0931EGc
+ 64Gg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to;
+ bh=qoKy7Saj12BIUDx2o/P3rez8CKgTVRuN+CfgSrIfYdE=;
+ b=jBHRCtlrTo6YSyraxZ+z+1sfxI64mZ1uVgU99B85VFsbxGw1/zq0ShOVxkMPqBdOTB
+ YFE/4eEWwSHL7SgQTTcw9wGNk+nG81qal5bYU/mvrLS/Q5Yp7PwbmQDRgL1hcDarViDP
+ Xg3ZYc8r1to6s8+xUi95IGTiZm3MIZZ2ed5JgX6UDvF4trQZ1gFiGaEqiDa+Bnm8RAjV
+ c/RSqFBBBVkTAHdMCcETR5p6qixGNSBaOSUYEG0BG0PQi8VIPtSX2kGemtu8c0bh4u5q
+ uWTjGep2LR7qGPZ3DrPNEVjQRRLw+gebROO1m9LPYal1ZnRY9/Hu/NyFKg4oB1Lh5PLD
+ 7A2Q==
+X-Gm-Message-State: APjAAAXc/3YmDfcP4CjLQxH1JOyIQw53+sfR8uI/gia9cYJ0VXXro9G3
+ RPQFCcbMf3iqMTq2sfrPG69kqN7xXNMsFkAyhCc9ZNHY0RA=
+X-Google-Smtp-Source: APXvYqxgit95QDdrkZKFf+Ip41P3rb8CnqTQnCiCYtTjqvQlCG3cuYAoRScBOxzvGnYeQg7syXiLCcxeENhzTysFSkg=
+X-Received: by 2002:a05:6808:8f1:: with SMTP id
+ d17mr3674213oic.170.1559912862814; 
+ Fri, 07 Jun 2019 06:07:42 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <16b7ad42-611c-fc3e-2029-d491882b0750@virtuozzo.com>
-User-Agent: Mutt/1.11.3 (2019-02-01)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.44]); Fri, 07 Jun 2019 13:02:15 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v6 5/7] qemu-coroutine-sleep: introduce
- qemu_co_sleep_wake
+References: <20190517174046.11146-1-peter.maydell@linaro.org>
+In-Reply-To: <20190517174046.11146-1-peter.maydell@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 7 Jun 2019 14:07:31 +0100
+Message-ID: <CAFEAcA9G7ssOOg5ZtuGebsCh_Qs7dEk6k7RUiLAu9zhoOAvnKQ@mail.gmail.com>
+To: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::244
+Subject: Re: [Qemu-devel] [PATCH 0/4] Disable FPU/DSP for CPU0 on musca-a
+ and mps2-an521
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,48 +87,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Denis Lunev <den@virtuozzo.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
- "armbru@redhat.com" <armbru@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "mreitz@redhat.com" <mreitz@redhat.com>,
- "stefanha@redhat.com" <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 07.06.2019 um 13:18 hat Vladimir Sementsov-Ogievskiy geschrieben:
-> 07.06.2019 10:57, Kevin Wolf wrote:
-> > Am 11.04.2019 um 19:27 hat Vladimir Sementsov-Ogievskiy geschrieben:
-> >> Introduce a function to gracefully wake-up a coroutine, sleeping in
-> >> qemu_co_sleep_ns() sleep.
-> >>
-> >> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> > 
-> > You can simply reenter the coroutine while it has yielded in
-> > qemu_co_sleep_ns(). This is supported.
-> 
-> No it doesn't. qemu_aio_coroutine_enter checks for scheduled field,
-> and aborts if it is set.
+Ping for code review, please?
 
-Ah, yes, it has been broken since commit
+thanks
+-- PMM
 
-I actually tried to fix it once, but it turned out more complicated and
-I think we found a different solution for the problem at hand:
-
-    Subject: [PATCH for-2.11 0/4] Fix qemu-iotests failures
-    Message-Id: <20171128154350.21504-1-kwolf@redhat.com>
-
-In this case, I guess your approach with a new function to interrupt
-qemu_co_sleep_ns() is okay.
-
-Do we need to timer_del() when taking the shortcut? We don't necessarily
-reenter the coroutine immediately, but might only be scheduling it. In
-this case, the timer could fire before qemu_co_sleep_ns() has run and
-schedule the coroutine a second time (ignoring co->scheduled again -
-maybe we should actually not do that in the timer callback path, but
-instead let it run into the assertion because it would be a bug for the
-timer callback to end up in this situation).
-
-Kevin
+On Fri, 17 May 2019 at 18:40, Peter Maydell <peter.maydell@linaro.org> wrote:
+>
+> The SSE-200 hardware has configurable integration settings which
+> determine whether its two CPUs have the FPU and DSP:
+>  * CPU0_FPU (default 0)
+>  * CPU0_DSP (default 0)
+>  * CPU1_FPU (default 1)
+>  * CPU1_DSP (default 1)
+>
+> Similarly, the IoTKit has settings for its single CPU:
+>  * CPU0_FPU (default 1)
+>  * CPU0_DSP (default 1)
+>
+> Of our four boards that use either the IoTKit or the SSE-200:
+>  * mps2-an505, mps2-an521 and musca-a use the default settings
+>  * musca-b1 enables FPU and DSP on both CPUs
+>
+> Currently QEMU models all these boards using CPUs with
+> both FPU and DSP enabled. This means that we are incorrect
+> for mps2-an521 and musca-a, which should not have FPU or DSP
+> on CPU0.
+>
+> This patchset fixes this (fairly minor) inaccuracy by
+> implementing properties on the CPU to disable the relevant
+> CPU features and then wiring them up through the armv7m
+> object and the ARMSSE SoC container object, so that our
+> IotKit and SSE200 models behave by default the same way as
+> the hardware default does, and our Musca-B1 board model
+> forces the FPU/DSP to be present on CPU, as the hardware does.
+>
+> The 'neon' property is not strictly required for the M-profile
+> issues described above, but I implemented it on the CPU
+> object because disable-neon and disable-vfp interact
+> for A-profile CPUs.
+>
+> thanks
+> -- PMM
+>
+> Peter Maydell (4):
+>   target/arm: Allow VFP and Neon to be disabled via a CPU property
+>   target/arm: Allow M-profile CPUs to disable the DSP extension via CPU
+>     property
+>   hw/arm/armv7m: Forward "vfp" and "dsp" properties to CPU
+>   hw/arm: Correctly disable FPU/DSP for some ARMSSE-based boards
+>
+>  include/hw/arm/armsse.h |   7 ++
+>  include/hw/arm/armv7m.h |   4 +
+>  target/arm/cpu.h        |   6 ++
+>  hw/arm/armsse.c         |  58 ++++++++++---
+>  hw/arm/armv7m.c         |  18 ++++
+>  hw/arm/musca.c          |   8 ++
+>  target/arm/cpu.c        | 179 ++++++++++++++++++++++++++++++++++++++--
+>  7 files changed, 262 insertions(+), 18 deletions(-)
+>
+> --
+> 2.20.1
 
