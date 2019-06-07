@@ -2,60 +2,56 @@ Return-Path: <SRS0=3yEa=UG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20233C468BC
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 11:19:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3DA39C2BCA1
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 11:19:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F0B4F2080C
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 11:19:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F0B4F2080C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 1714E2080C
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 11:19:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1714E2080C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48524 helo=lists.gnu.org)
+Received: from localhost ([::1]:48526 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hZCuD-0006Oq-6m
-	for qemu-devel@archiver.kernel.org; Fri, 07 Jun 2019 07:19:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55061)
+	id 1hZCuT-00078g-9D
+	for qemu-devel@archiver.kernel.org; Fri, 07 Jun 2019 07:19:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59467)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <cohuck@redhat.com>) id 1hZBZ4-0002eL-7r
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 05:53:40 -0400
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1hZBl5-0003pJ-92
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 06:06:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <cohuck@redhat.com>) id 1hZBZ2-0001nZ-15
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 05:53:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:13193)
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1hZBl3-000888-2e
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 06:06:03 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:50154 helo=mail.rt-rk.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <cohuck@redhat.com>)
- id 1hZBYy-0001cu-Tr; Fri, 07 Jun 2019 05:53:34 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 213FFC049D67;
- Fri,  7 Jun 2019 09:53:30 +0000 (UTC)
-Received: from localhost (dhcp-192-191.str.redhat.com [10.33.192.191])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 4B6AB10AD789;
- Fri,  7 Jun 2019 09:53:27 +0000 (UTC)
-From: Cornelia Huck <cohuck@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri,  7 Jun 2019 11:52:18 +0200
-Message-Id: <20190607095237.11364-17-cohuck@redhat.com>
-In-Reply-To: <20190607095237.11364-1-cohuck@redhat.com>
-References: <20190607095237.11364-1-cohuck@redhat.com>
-MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.31]); Fri, 07 Jun 2019 09:53:30 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 16/35] s390x/tcg: Implement VECTOR FP COMPARE
- (EQUAL|HIGH|HIGH OR EQUAL)
+ (Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
+ id 1hZBl1-0007uz-0O
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 06:06:00 -0400
+Received: from localhost (localhost [127.0.0.1])
+ by mail.rt-rk.com (Postfix) with ESMTP id E90FF1A1DF2;
+ Fri,  7 Jun 2019 12:05:49 +0200 (CEST)
+X-Virus-Scanned: amavisd-new at rt-rk.com
+Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
+ [10.10.13.43])
+ by mail.rt-rk.com (Postfix) with ESMTPSA id CB8C51A1CFA;
+ Fri,  7 Jun 2019 12:05:49 +0200 (CEST)
+From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
+To: qemu-devel@nongnu.org
+Date: Fri,  7 Jun 2019 12:05:35 +0200
+Message-Id: <1559901944-4578-2-git-send-email-aleksandar.markovic@rt-rk.com>
+X-Mailer: git-send-email 2.7.4
+In-Reply-To: <1559901944-4578-1-git-send-email-aleksandar.markovic@rt-rk.com>
+References: <1559901944-4578-1-git-send-email-aleksandar.markovic@rt-rk.com>
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
+X-Received-From: 89.216.37.149
+Subject: [Qemu-devel] [PULL 01/10] target/mips: Fix space-related format
+ issues in msa_helper.c
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -67,266 +63,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-s390x@nongnu.org, Richard Henderson <richard.henderson@linaro.org>,
- qemu-devel@nongnu.org, David Hildenbrand <david@redhat.com>
+Cc: peter.maydell@linaro.org, amarkovic@wavecomp.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: David Hildenbrand <david@redhat.com>
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-Provide for all three instructions all four combinations of cc bit and
-s bit.
+Fix space-related format issues reported by checkpatch in file
+msa_helper.c.
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Signed-off-by: David Hildenbrand <david@redhat.com>
+Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+Reviewed-by: Aleksandar Rikalo <arikalo@wavecomp.com>
+Message-Id: <1559838440-9866-2-git-send-email-aleksandar.markovic@rt-rk.com>
 ---
- target/s390x/helper.h           |  12 ++++
- target/s390x/insn-data.def      |   6 ++
- target/s390x/translate_vx.inc.c |  51 ++++++++++++++++
- target/s390x/vec_fpu_helper.c   | 104 ++++++++++++++++++++++++++++++++
- 4 files changed, 173 insertions(+)
+ target/mips/msa_helper.c | 28 ++++++++++++++--------------
+ 1 file changed, 14 insertions(+), 14 deletions(-)
 
-diff --git a/target/s390x/helper.h b/target/s390x/helper.h
-index d34d6802a605..33d3bacf746e 100644
---- a/target/s390x/helper.h
-+++ b/target/s390x/helper.h
-@@ -254,6 +254,18 @@ DEF_HELPER_FLAGS_5(gvec_vfa64, TCG_CALL_NO_WG, void,=
- ptr, cptr, cptr, env, i32)
- DEF_HELPER_FLAGS_5(gvec_vfa64s, TCG_CALL_NO_WG, void, ptr, cptr, cptr, e=
-nv, i32)
- DEF_HELPER_4(gvec_wfc64, void, cptr, cptr, env, i32)
- DEF_HELPER_4(gvec_wfk64, void, cptr, cptr, env, i32)
-+DEF_HELPER_FLAGS_5(gvec_vfce64, TCG_CALL_NO_WG, void, ptr, cptr, cptr, e=
-nv, i32)
-+DEF_HELPER_FLAGS_5(gvec_vfce64s, TCG_CALL_NO_WG, void, ptr, cptr, cptr, =
-env, i32)
-+DEF_HELPER_5(gvec_vfce64_cc, void, ptr, cptr, cptr, env, i32)
-+DEF_HELPER_5(gvec_vfce64s_cc, void, ptr, cptr, cptr, env, i32)
-+DEF_HELPER_FLAGS_5(gvec_vfch64, TCG_CALL_NO_WG, void, ptr, cptr, cptr, e=
-nv, i32)
-+DEF_HELPER_FLAGS_5(gvec_vfch64s, TCG_CALL_NO_WG, void, ptr, cptr, cptr, =
-env, i32)
-+DEF_HELPER_5(gvec_vfch64_cc, void, ptr, cptr, cptr, env, i32)
-+DEF_HELPER_5(gvec_vfch64s_cc, void, ptr, cptr, cptr, env, i32)
-+DEF_HELPER_FLAGS_5(gvec_vfche64, TCG_CALL_NO_WG, void, ptr, cptr, cptr, =
-env, i32)
-+DEF_HELPER_FLAGS_5(gvec_vfche64s, TCG_CALL_NO_WG, void, ptr, cptr, cptr,=
- env, i32)
-+DEF_HELPER_5(gvec_vfche64_cc, void, ptr, cptr, cptr, env, i32)
-+DEF_HELPER_5(gvec_vfche64s_cc, void, ptr, cptr, cptr, env, i32)
-=20
- #ifndef CONFIG_USER_ONLY
- DEF_HELPER_3(servc, i32, env, i64, i64)
-diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
-index c45e101b1056..446552f2510e 100644
---- a/target/s390x/insn-data.def
-+++ b/target/s390x/insn-data.def
-@@ -1212,6 +1212,12 @@
-     F(0xe7cb, WFC,     VRR_a, V,   0, 0, 0, 0, wfc, 0, IF_VEC)
- /* VECTOR FP COMPARE AND SIGNAL SCALAR */
-     F(0xe7ca, WFK,     VRR_a, V,   0, 0, 0, 0, wfc, 0, IF_VEC)
-+/* VECTOR FP COMPARE EQUAL */
-+    F(0xe7e8, VFCE,    VRR_c, V,   0, 0, 0, 0, vfc, 0, IF_VEC)
-+/* VECTOR FP COMPARE HIGH */
-+    F(0xe7eb, VFCH,    VRR_c, V,   0, 0, 0, 0, vfc, 0, IF_VEC)
-+/* VECTOR FP COMPARE HIGH OR EQUAL */
-+    F(0xe7ea, VFCHE,   VRR_c, V,   0, 0, 0, 0, vfc, 0, IF_VEC)
-=20
- #ifndef CONFIG_USER_ONLY
- /* COMPARE AND SWAP AND PURGE */
-diff --git a/target/s390x/translate_vx.inc.c b/target/s390x/translate_vx.=
-inc.c
-index 283e8aa07ae4..5571a71e1a48 100644
---- a/target/s390x/translate_vx.inc.c
-+++ b/target/s390x/translate_vx.inc.c
-@@ -2588,3 +2588,54 @@ static DisasJumpType op_wfc(DisasContext *s, Disas=
-Ops *o)
-     set_cc_static(s);
-     return DISAS_NEXT;
- }
-+
-+static DisasJumpType op_vfc(DisasContext *s, DisasOps *o)
-+{
-+    const uint8_t fpf =3D get_field(s->fields, m4);
-+    const uint8_t m5 =3D get_field(s->fields, m5);
-+    const uint8_t m6 =3D get_field(s->fields, m6);
-+    const bool se =3D extract32(m5, 3, 1);
-+    const bool cs =3D extract32(m6, 0, 1);
-+    gen_helper_gvec_3_ptr *fn;
-+
-+    if (fpf !=3D FPF_LONG || extract32(m5, 0, 3) || extract32(m6, 1, 3))=
+diff --git a/target/mips/msa_helper.c b/target/mips/msa_helper.c
+index f6e16c2..eacb5a4 100644
+--- a/target/mips/msa_helper.c
++++ b/target/mips/msa_helper.c
+@@ -360,16 +360,16 @@ static inline int64_t msa_binsr_df(uint32_t df, int64_t dest, int64_t arg1,
+ 
+ static inline int64_t msa_sat_s_df(uint32_t df, int64_t arg, uint32_t m)
  {
-+        gen_program_exception(s, PGM_SPECIFICATION);
-+        return DISAS_NORETURN;
-+    }
-+
-+    if (cs) {
-+        switch (s->fields->op2) {
-+        case 0xe8:
-+            fn =3D se ? gen_helper_gvec_vfce64s_cc : gen_helper_gvec_vfc=
-e64_cc;
-+            break;
-+        case 0xeb:
-+            fn =3D se ? gen_helper_gvec_vfch64s_cc : gen_helper_gvec_vfc=
-h64_cc;
-+            break;
-+        case 0xea:
-+            fn =3D se ? gen_helper_gvec_vfche64s_cc : gen_helper_gvec_vf=
-che64_cc;
-+            break;
-+        default:
-+            g_assert_not_reached();
-+        }
-+    } else {
-+        switch (s->fields->op2) {
-+        case 0xe8:
-+            fn =3D se ? gen_helper_gvec_vfce64s : gen_helper_gvec_vfce64=
-;
-+            break;
-+        case 0xeb:
-+            fn =3D se ? gen_helper_gvec_vfch64s : gen_helper_gvec_vfch64=
-;
-+            break;
-+        case 0xea:
-+            fn =3D se ? gen_helper_gvec_vfche64s : gen_helper_gvec_vfche=
-64;
-+            break;
-+        default:
-+            g_assert_not_reached();
-+        }
-+    }
-+    gen_gvec_3_ptr(get_field(s->fields, v1), get_field(s->fields, v2),
-+                   get_field(s->fields, v3), cpu_env, 0, fn);
-+    if (cs) {
-+        set_cc_static(s);
-+    }
-+    return DISAS_NEXT;
-+}
-diff --git a/target/s390x/vec_fpu_helper.c b/target/s390x/vec_fpu_helper.=
-c
-index f9357d922103..e72500d4d55e 100644
---- a/target/s390x/vec_fpu_helper.c
-+++ b/target/s390x/vec_fpu_helper.c
-@@ -149,3 +149,107 @@ void HELPER(gvec_wfk64)(const void *v1, const void =
-*v2, CPUS390XState *env,
- {
-     env->cc_op =3D wfc64(v1, v2, env, true, GETPC());
+-    return arg < M_MIN_INT(m+1) ? M_MIN_INT(m+1) :
+-                                  arg > M_MAX_INT(m+1) ? M_MAX_INT(m+1) :
+-                                                         arg;
++    return arg < M_MIN_INT(m + 1) ? M_MIN_INT(m + 1) :
++                                    arg > M_MAX_INT(m + 1) ? M_MAX_INT(m + 1) :
++                                                             arg;
  }
-+
-+typedef int (*vfc64_fn)(float64 a, float64 b, float_status *status);
-+static int vfc64(S390Vector *v1, const S390Vector *v2, const S390Vector =
-*v3,
-+                 CPUS390XState *env, bool s, vfc64_fn fn, uintptr_t reta=
-ddr)
-+{
-+    uint8_t vxc, vec_exc =3D 0;
-+    S390Vector tmp =3D {};
-+    int match =3D 0;
-+    int i;
-+
-+    for (i =3D 0; i < 2; i++) {
-+        const float64 a =3D s390_vec_read_element64(v2, i);
-+        const float64 b =3D s390_vec_read_element64(v3, i);
-+
-+        /* swap the order of the parameters, so we can use existing func=
-tions */
-+        if (fn(b, a, &env->fpu_status)) {
-+            match++;
-+            s390_vec_write_element64(&tmp, i, -1ull);
-+        }
-+        vxc =3D check_ieee_exc(env, i, false, &vec_exc);
-+        if (s || vxc) {
-+            break;
-+        }
-+    }
-+
-+    handle_ieee_exc(env, vxc, vec_exc, retaddr);
-+    *v1 =3D tmp;
-+    if (match) {
-+        return s || match =3D=3D 2 ? 0 : 1;
-+    }
-+    return 3;
-+}
-+
-+void HELPER(gvec_vfce64)(void *v1, const void *v2, const void *v3,
-+                         CPUS390XState *env, uint32_t desc)
-+{
-+    vfc64(v1, v2, v3, env, false, float64_eq_quiet, GETPC());
-+}
-+
-+void HELPER(gvec_vfce64s)(void *v1, const void *v2, const void *v3,
-+                          CPUS390XState *env, uint32_t desc)
-+{
-+    vfc64(v1, v2, v3, env, true, float64_eq_quiet, GETPC());
-+}
-+
-+void HELPER(gvec_vfce64_cc)(void *v1, const void *v2, const void *v3,
-+                            CPUS390XState *env, uint32_t desc)
-+{
-+    env->cc_op =3D vfc64(v1, v2, v3, env, false, float64_eq_quiet, GETPC=
-());
-+}
-+
-+void HELPER(gvec_vfce64s_cc)(void *v1, const void *v2, const void *v3,
-+                            CPUS390XState *env, uint32_t desc)
-+{
-+    env->cc_op =3D vfc64(v1, v2, v3, env, true, float64_eq_quiet, GETPC(=
-));
-+}
-+
-+void HELPER(gvec_vfch64)(void *v1, const void *v2, const void *v3,
-+                         CPUS390XState *env, uint32_t desc)
-+{
-+    vfc64(v1, v2, v3, env, false, float64_lt_quiet, GETPC());
-+}
-+
-+void HELPER(gvec_vfch64s)(void *v1, const void *v2, const void *v3,
-+                          CPUS390XState *env, uint32_t desc)
-+{
-+    vfc64(v1, v2, v3, env, true, float64_lt_quiet, GETPC());
-+}
-+
-+void HELPER(gvec_vfch64_cc)(void *v1, const void *v2, const void *v3,
-+                            CPUS390XState *env, uint32_t desc)
-+{
-+    env->cc_op =3D vfc64(v1, v2, v3, env, false, float64_lt_quiet, GETPC=
-());
-+}
-+
-+void HELPER(gvec_vfch64s_cc)(void *v1, const void *v2, const void *v3,
-+                             CPUS390XState *env, uint32_t desc)
-+{
-+    env->cc_op =3D vfc64(v1, v2, v3, env, true, float64_lt_quiet, GETPC(=
-));
-+}
-+
-+void HELPER(gvec_vfche64)(void *v1, const void *v2, const void *v3,
-+                          CPUS390XState *env, uint32_t desc)
-+{
-+    vfc64(v1, v2, v3, env, false, float64_le_quiet, GETPC());
-+}
-+
-+void HELPER(gvec_vfche64s)(void *v1, const void *v2, const void *v3,
-+                           CPUS390XState *env, uint32_t desc)
-+{
-+    vfc64(v1, v2, v3, env, true, float64_le_quiet, GETPC());
-+}
-+
-+void HELPER(gvec_vfche64_cc)(void *v1, const void *v2, const void *v3,
-+                             CPUS390XState *env, uint32_t desc)
-+{
-+    env->cc_op =3D vfc64(v1, v2, v3, env, false, float64_le_quiet, GETPC=
-());
-+}
-+
-+void HELPER(gvec_vfche64s_cc)(void *v1, const void *v2, const void *v3,
-+                              CPUS390XState *env, uint32_t desc)
-+{
-+    env->cc_op =3D vfc64(v1, v2, v3, env, true, float64_le_quiet, GETPC(=
-));
-+}
---=20
-2.20.1
+ 
+ static inline int64_t msa_sat_u_df(uint32_t df, int64_t arg, uint32_t m)
+ {
+     uint64_t u_arg = UNSIGNED(arg, df);
+-    return  u_arg < M_MAX_UINT(m+1) ? u_arg :
+-                                      M_MAX_UINT(m+1);
++    return  u_arg < M_MAX_UINT(m + 1) ? u_arg :
++                                        M_MAX_UINT(m + 1);
+ }
+ 
+ static inline int64_t msa_srar_df(uint32_t df, int64_t arg1, int64_t arg2)
+@@ -668,16 +668,16 @@ static inline int64_t msa_mod_u_df(uint32_t df, int64_t arg1, int64_t arg2)
+ }
+ 
+ #define SIGNED_EVEN(a, df) \
+-        ((((int64_t)(a)) << (64 - DF_BITS(df)/2)) >> (64 - DF_BITS(df)/2))
++        ((((int64_t)(a)) << (64 - DF_BITS(df) / 2)) >> (64 - DF_BITS(df) / 2))
+ 
+ #define UNSIGNED_EVEN(a, df) \
+-        ((((uint64_t)(a)) << (64 - DF_BITS(df)/2)) >> (64 - DF_BITS(df)/2))
++        ((((uint64_t)(a)) << (64 - DF_BITS(df) / 2)) >> (64 - DF_BITS(df) / 2))
+ 
+ #define SIGNED_ODD(a, df) \
+-        ((((int64_t)(a)) << (64 - DF_BITS(df))) >> (64 - DF_BITS(df)/2))
++        ((((int64_t)(a)) << (64 - DF_BITS(df))) >> (64 - DF_BITS(df) / 2))
+ 
+ #define UNSIGNED_ODD(a, df) \
+-        ((((uint64_t)(a)) << (64 - DF_BITS(df))) >> (64 - DF_BITS(df)/2))
++        ((((uint64_t)(a)) << (64 - DF_BITS(df))) >> (64 - DF_BITS(df) / 2))
+ 
+ #define SIGNED_EXTRACT(e, o, a, df)     \
+     do {                                \
+@@ -1205,13 +1205,13 @@ void helper_msa_##FUNC(CPUMIPSState *env, uint32_t df, uint32_t wd, \
+             (DF_ELEMENTS(DF) / 2)
+ 
+ #define Rb(pwr, i) (pwr->b[i])
+-#define Lb(pwr, i) (pwr->b[i + DF_ELEMENTS(DF_BYTE)/2])
++#define Lb(pwr, i) (pwr->b[i + DF_ELEMENTS(DF_BYTE) / 2])
+ #define Rh(pwr, i) (pwr->h[i])
+-#define Lh(pwr, i) (pwr->h[i + DF_ELEMENTS(DF_HALF)/2])
++#define Lh(pwr, i) (pwr->h[i + DF_ELEMENTS(DF_HALF) / 2])
+ #define Rw(pwr, i) (pwr->w[i])
+-#define Lw(pwr, i) (pwr->w[i + DF_ELEMENTS(DF_WORD)/2])
++#define Lw(pwr, i) (pwr->w[i + DF_ELEMENTS(DF_WORD) / 2])
+ #define Rd(pwr, i) (pwr->d[i])
+-#define Ld(pwr, i) (pwr->d[i + DF_ELEMENTS(DF_DOUBLE)/2])
++#define Ld(pwr, i) (pwr->d[i + DF_ELEMENTS(DF_DOUBLE) / 2])
+ 
+ #undef MSA_LOOP_COND
+ 
+@@ -3320,7 +3320,7 @@ void helper_msa_fmax_a_df(CPUMIPSState *env, uint32_t df, uint32_t wd,
+ void helper_msa_fclass_df(CPUMIPSState *env, uint32_t df,
+         uint32_t wd, uint32_t ws)
+ {
+-    float_status* status = &env->active_tc.msa_fp_status;
++    float_status *status = &env->active_tc.msa_fp_status;
+ 
+     wr_t *pwd = &(env->active_fpu.fpr[wd].wr);
+     wr_t *pws = &(env->active_fpu.fpr[ws].wr);
+-- 
+2.7.4
 
 
