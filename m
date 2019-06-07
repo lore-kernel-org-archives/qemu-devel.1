@@ -2,72 +2,109 @@ Return-Path: <SRS0=3yEa=UG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 17B29C2BCA1
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 12:35:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D1D4CC2BCA1
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 12:39:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A0BFF208E3
-	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 12:35:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A0BFF208E3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 9A10D2089E
+	for <qemu-devel@archiver.kernel.org>; Fri,  7 Jun 2019 12:39:41 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="gBk93iRu"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9A10D2089E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50076 helo=lists.gnu.org)
+Received: from localhost ([::1]:50590 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hZE5e-00066s-JL
-	for qemu-devel@archiver.kernel.org; Fri, 07 Jun 2019 08:35:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60620)
+	id 1hZE9k-0000Nb-Lm
+	for qemu-devel@archiver.kernel.org; Fri, 07 Jun 2019 08:39:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49701)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mst@redhat.com>) id 1hZDK4-0004BO-RR
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 07:46:23 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1hZE6w-0007G9-Uq
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 08:36:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1hZDJz-0006yB-U9
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 07:46:15 -0400
-Received: from mail-qt1-f193.google.com ([209.85.160.193]:40329)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1hZDJz-0006xG-Md
- for qemu-devel@nongnu.org; Fri, 07 Jun 2019 07:46:11 -0400
-Received: by mail-qt1-f193.google.com with SMTP id a15so1813342qtn.7
- for <qemu-devel@nongnu.org>; Fri, 07 Jun 2019 04:46:11 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=85juaT/QTtDXAlpqsx7ncPXjy3Ja4G+zLiVr+S7ruSo=;
- b=Cf78M+o20CfXEfJD+fRDlPMDQVX8/9P7gMw5em8u872naCvoQ5L64JQBRK8gOotGBR
- oU2ZRpnnIM/Xqo//MzbbihfNIZkTbu/LkFrWrKEf+9CvTSTfY0po/qEzxgFX3k5RuHlb
- PK9HWeHM2NPRqTG2B4VdH2oS2sUV3baqw5NR+rCbkdiUUTrURs9Nq6YXT2xP6UZCJlc6
- sHYdVxjneBAgm2hmWgKdbwqgIQPv2QH63hiuxURJpIBVUvnY4fg+bWsRDnpDWiisrtHA
- h20NeHgWHJ29qgUpQ/ijaGNZKpfLVMbsVLjtJbrwGLZ3fq3F0caPGajWr6axIFURvLXD
- GjTw==
-X-Gm-Message-State: APjAAAWErznviDBVO0bkF7rlULs+4xA11ftNlaUnucLbTDhemBuFIpce
- 4zI+gs24pxoC2fWWpWXOTC1zcA==
-X-Google-Smtp-Source: APXvYqxKLznHglUl0Nj03sa9/gQept+KVPePOLqEyODW/zwkB9+VqHxrXxTDhLU2EFVJZ4eSCPPz6Q==
-X-Received: by 2002:ac8:7342:: with SMTP id q2mr4774497qtp.134.1559907971135; 
- Fri, 07 Jun 2019 04:46:11 -0700 (PDT)
-Received: from redhat.com (pool-100-0-197-103.bstnma.fios.verizon.net.
- [100.0.197.103])
- by smtp.gmail.com with ESMTPSA id p1sm934591qti.83.2019.06.07.04.46.09
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Fri, 07 Jun 2019 04:46:10 -0700 (PDT)
-Date: Fri, 7 Jun 2019 07:46:08 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20190607074602-mutt-send-email-mst@kernel.org>
-References: <20190607083444.32175-1-kraxel@redhat.com>
+ (envelope-from <vsementsov@virtuozzo.com>) id 1hZE6w-0004bb-2d
+ for qemu-devel@nongnu.org; Fri, 07 Jun 2019 08:36:46 -0400
+Received: from mail-eopbgr150092.outbound.protection.outlook.com
+ ([40.107.15.92]:58800 helo=EUR01-DB5-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1hZE6v-0004ZP-9D; Fri, 07 Jun 2019 08:36:45 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=RwIlpYNGEIoNCzQ57RSyacdXxHZKNS0MN56b+Mz6WLs=;
+ b=gBk93iRulmv+astB1hvJnuw3f+atutAEmVIYebQYI+bUwK6BxHEk92XV0aB8fiILP8vO+0meIliQH88yzUoxFf4XCvmaKIQleU12Xj2MFy0KMg295cAtyAJmILHHJcAOO2PjT360bl+YOS5W11z6vZ/Sy8JaI6MYE7cpOmKIIrM=
+Received: from AM0PR08MB2961.eurprd08.prod.outlook.com (52.134.126.11) by
+ AM0PR08MB4436.eurprd08.prod.outlook.com (20.179.32.207) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.1965.13; Fri, 7 Jun 2019 12:36:41 +0000
+Received: from AM0PR08MB2961.eurprd08.prod.outlook.com
+ ([fe80::8d90:32ae:bdd6:48e8]) by AM0PR08MB2961.eurprd08.prod.outlook.com
+ ([fe80::8d90:32ae:bdd6:48e8%7]) with mapi id 15.20.1965.011; Fri, 7 Jun 2019
+ 12:36:41 +0000
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: John Snow <jsnow@redhat.com>, "qemu-block@nongnu.org"
+ <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Thread-Topic: [PATCH 1/5] block/qcow2-bitmap: allow bitmap_list_load to return
+ an error code
+Thread-Index: AQHVHJeMYu+XPvwpb0unwqOx4AyWCqaQIh6A
+Date: Fri, 7 Jun 2019 12:36:41 +0000
+Message-ID: <517a2513-7b08-dcc5-34c7-750be9872c93@virtuozzo.com>
+References: <20190606184159.979-1-jsnow@redhat.com>
+ <20190606184159.979-2-jsnow@redhat.com>
+In-Reply-To: <20190606184159.979-2-jsnow@redhat.com>
+Accept-Language: ru-RU, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-clientproxiedby: HE1PR09CA0043.eurprd09.prod.outlook.com
+ (2603:10a6:7:3c::11) To AM0PR08MB2961.eurprd08.prod.outlook.com
+ (2603:10a6:208:66::11)
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=vsementsov@virtuozzo.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-tagtoolbar-keys: D20190607153639151
+x-originating-ip: [185.231.240.5]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 397f51d2-4cf8-4a6a-e01d-08d6eb44caaf
+x-microsoft-antispam: BCL:0; PCL:0;
+ RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(2017052603328)(7193020);
+ SRVR:AM0PR08MB4436; 
+x-ms-traffictypediagnostic: AM0PR08MB4436:
+x-microsoft-antispam-prvs: <AM0PR08MB44365138061F8FF070C6C0FCC1100@AM0PR08MB4436.eurprd08.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:7219;
+x-forefront-prvs: 0061C35778
+x-forefront-antispam-report: SFV:NSPM;
+ SFS:(10019020)(376002)(346002)(396003)(39850400004)(136003)(366004)(199004)(189003)(81156014)(36756003)(5660300002)(110136005)(4326008)(478600001)(14454004)(52116002)(446003)(2616005)(8676002)(66066001)(8936002)(6486002)(316002)(6246003)(71190400001)(71200400001)(6512007)(186003)(2906002)(6436002)(54906003)(486006)(11346002)(26005)(81166006)(102836004)(53936002)(229853002)(476003)(256004)(31686004)(99286004)(76176011)(31696002)(86362001)(7736002)(305945005)(25786009)(2201001)(68736007)(66946007)(64756008)(66556008)(73956011)(66476007)(386003)(66446008)(6506007)(4744005)(2501003)(6116002)(3846002);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:AM0PR08MB4436;
+ H:AM0PR08MB2961.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; A:1; MX:1; 
+received-spf: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: aXYbpKSiLRNOadkLnnaqf4U6QPItyFcYilq+7aY0+HoOmUHRifIedcOce6QIvg1STF7mQm5x8k904Hy5NOE+7V3juFfTWJjMiwEi7uZ+D6NEYHmVUQ5VHVW4Yufp07865WzxI8pSe6DjPkua5XA9saOonaQ+QCL/vWjKXCXSvWlj9WlgwFFdPvOR4I1kK6PWGDnyZl6xjJl/7zBg1eZjXGHhY7FDfQGotEwIsmPU094QGIJg23Xh9izq/ogG5u5J9iqSejZucLMmA2MyN5asGvDGVDgCPr5NdpApvYHamnifvEvC2c/KXXauqiH5U3hLI+RvA4YT2KfUH8XP9I8nB+5gEnibdMDIr9HFiYG+63mboqwQQgMTY/20RFYyIJ60ZSVS28I123tvUa0p3lU/VEyQ5kyfyVpw6ABm0mn/EN0=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <2D9EC0653C0F434686667FB78D0470E4@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190607083444.32175-1-kraxel@redhat.com>
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.160.193
-Subject: Re: [Qemu-devel] [PATCH] edid: flip the default to enabled
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 397f51d2-4cf8-4a6a-e01d-08d6eb44caaf
+X-MS-Exchange-CrossTenant-originalarrivaltime: 07 Jun 2019 12:36:41.5088 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: vsementsov@virtuozzo.com
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR08MB4436
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.15.92
+Subject: Re: [Qemu-devel] [PATCH 1/5] block/qcow2-bitmap: allow
+ bitmap_list_load to return an error code
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -79,90 +116,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>
+Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Jun 07, 2019 at 10:34:44AM +0200, Gerd Hoffmann wrote:
-> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-
-> ---
->  include/hw/virtio/virtio-gpu.h | 2 +-
->  hw/core/machine.c              | 8 +++++++-
->  hw/display/bochs-display.c     | 2 +-
->  hw/display/vga-pci.c           | 4 ++--
->  4 files changed, 11 insertions(+), 5 deletions(-)
-> 
-> diff --git a/include/hw/virtio/virtio-gpu.h b/include/hw/virtio/virtio-gpu.h
-> index 8ecac1987a7f..6dd57f2025ec 100644
-> --- a/include/hw/virtio/virtio-gpu.h
-> +++ b/include/hw/virtio/virtio-gpu.h
-> @@ -125,7 +125,7 @@ typedef struct VirtIOGPUBaseClass {
->  #define VIRTIO_GPU_BASE_PROPERTIES(_state, _conf)                       \
->      DEFINE_PROP_UINT32("max_outputs", _state, _conf.max_outputs, 1),    \
->      DEFINE_PROP_BIT("edid", _state, _conf.flags, \
-> -                    VIRTIO_GPU_FLAG_EDID_ENABLED, false), \
-> +                    VIRTIO_GPU_FLAG_EDID_ENABLED, true), \
->      DEFINE_PROP_UINT32("xres", _state, _conf.xres, 1024), \
->      DEFINE_PROP_UINT32("yres", _state, _conf.yres, 768)
->  
-> diff --git a/hw/core/machine.c b/hw/core/machine.c
-> index f1a0f45f9c83..84ebb8d24701 100644
-> --- a/hw/core/machine.c
-> +++ b/hw/core/machine.c
-> @@ -24,7 +24,13 @@
->  #include "hw/pci/pci.h"
->  #include "hw/mem/nvdimm.h"
->  
-> -GlobalProperty hw_compat_4_0_1[] = {};
-> +GlobalProperty hw_compat_4_0_1[] = {
-> +    { "VGA",            "edid", "false" },
-> +    { "secondary-vga",  "edid", "false" },
-> +    { "bochs-display",  "edid", "false" },
-> +    { "virtio-vga",     "edid", "false" },
-> +    { "virtio-gpu-pci", "edid", "false" },
-> +};
->  const size_t hw_compat_4_0_1_len = G_N_ELEMENTS(hw_compat_4_0_1);
->  
->  GlobalProperty hw_compat_4_0[] = {};
-> diff --git a/hw/display/bochs-display.c b/hw/display/bochs-display.c
-> index 3d439eb2407b..681a047d793c 100644
-> --- a/hw/display/bochs-display.c
-> +++ b/hw/display/bochs-display.c
-> @@ -336,7 +336,7 @@ static void bochs_display_exit(PCIDevice *dev)
->  
->  static Property bochs_display_properties[] = {
->      DEFINE_PROP_SIZE("vgamem", BochsDisplayState, vgamem, 16 * MiB),
-> -    DEFINE_PROP_BOOL("edid", BochsDisplayState, enable_edid, false),
-> +    DEFINE_PROP_BOOL("edid", BochsDisplayState, enable_edid, true),
->      DEFINE_EDID_PROPERTIES(BochsDisplayState, edid_info),
->      DEFINE_PROP_END_OF_LIST(),
->  };
-> diff --git a/hw/display/vga-pci.c b/hw/display/vga-pci.c
-> index a17c96e703fe..3b76457ab077 100644
-> --- a/hw/display/vga-pci.c
-> +++ b/hw/display/vga-pci.c
-> @@ -338,7 +338,7 @@ static Property vga_pci_properties[] = {
->      DEFINE_PROP_BIT("qemu-extended-regs",
->                      PCIVGAState, flags, PCI_VGA_FLAG_ENABLE_QEXT, true),
->      DEFINE_PROP_BIT("edid",
-> -                    PCIVGAState, flags, PCI_VGA_FLAG_ENABLE_EDID, false),
-> +                    PCIVGAState, flags, PCI_VGA_FLAG_ENABLE_EDID, true),
->      DEFINE_EDID_PROPERTIES(PCIVGAState, edid_info),
->      DEFINE_PROP_BOOL("global-vmstate", PCIVGAState, vga.global_vmstate, false),
->      DEFINE_PROP_END_OF_LIST(),
-> @@ -349,7 +349,7 @@ static Property secondary_pci_properties[] = {
->      DEFINE_PROP_BIT("qemu-extended-regs",
->                      PCIVGAState, flags, PCI_VGA_FLAG_ENABLE_QEXT, true),
->      DEFINE_PROP_BIT("edid",
-> -                    PCIVGAState, flags, PCI_VGA_FLAG_ENABLE_EDID, false),
-> +                    PCIVGAState, flags, PCI_VGA_FLAG_ENABLE_EDID, true),
->      DEFINE_EDID_PROPERTIES(PCIVGAState, edid_info),
->      DEFINE_PROP_END_OF_LIST(),
->  };
-> -- 
-> 2.18.1
+MDYuMDYuMjAxOSAyMTo0MSwgSm9obiBTbm93IHdyb3RlOg0KPiBUaGlzIHNpbXBseSBtYWtlcyB0
+aGlzIGZ1bmN0aW9uIGEgbGl0dGxlIG1vcmUgY29udmVuaWVudCB0byBjYWxsLCBhbmQgaW4NCj4g
+YSBmb3J0aGNvbWluZyBwYXRjaCBnaXZlcyB1cyBhIHJldHVybiBjb2RlIHdlIGNhbiByZXBvcnQg
+dG8gdGhlDQo+IGNhbGxlci4gKFdoaWNoIGluIHR1cm4gbWFrZXMgVEhPU0UgZnVuY3Rpb25zIGVh
+c2llciB0byBjYWxsLikNCj4gDQo+IFdoaWxlIHdlJ3JlIGhlcmUsIHJlbW92ZSB0aGUgb2Zmc2V0
+K3NpemUgYXJndW1lbnRzIHdoaWNoIGFyZSBvbmx5IGV2ZXINCj4gY2FsbGVkIHdpdGggdGhlIHNh
+bWUgdmFsdWVzIHRoYXQgY2FuIGJlIGRldGVybWluZWQgaW5zaWRlIHRoaXMgaGVscGVyLg0KPiAN
+Cj4gU2lnbmVkLW9mZi1ieTogSm9obiBTbm93PGpzbm93QHJlZGhhdC5jb20+DQoNCg0KUmV2aWV3
+ZWQtYnk6IFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgPHZzZW1lbnRzb3ZAdmlydHVvenpv
+LmNvbT4NCg0KLS0gDQpCZXN0IHJlZ2FyZHMsDQpWbGFkaW1pcg0K
 
