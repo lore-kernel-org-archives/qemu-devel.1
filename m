@@ -2,73 +2,93 @@ Return-Path: <SRS0=KvPE=UH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D78AC28CC5
-	for <qemu-devel@archiver.kernel.org>; Sat,  8 Jun 2019 05:42:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 22739C28CC5
+	for <qemu-devel@archiver.kernel.org>; Sat,  8 Jun 2019 13:48:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 225ED208E3
-	for <qemu-devel@archiver.kernel.org>; Sat,  8 Jun 2019 05:42:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 225ED208E3
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
+	by mail.kernel.org (Postfix) with ESMTPS id 99217214C6
+	for <qemu-devel@archiver.kernel.org>; Sat,  8 Jun 2019 13:48:09 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="BSl3HNDz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 99217214C6
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55210 helo=lists.gnu.org)
+Received: from localhost ([::1]:58532 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hZU7D-0001xK-2I
-	for qemu-devel@archiver.kernel.org; Sat, 08 Jun 2019 01:42:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59722)
+	id 1hZbhY-0005q1-Ns
+	for qemu-devel@archiver.kernel.org; Sat, 08 Jun 2019 09:48:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59298)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <palmer@dabbelt.com>) id 1hZU6P-0001Vq-Vj
- for qemu-devel@nongnu.org; Sat, 08 Jun 2019 01:41:19 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1hZbgD-0004tR-6b
+ for qemu-devel@nongnu.org; Sat, 08 Jun 2019 09:46:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <palmer@dabbelt.com>) id 1hZU6O-0001WP-UP
- for qemu-devel@nongnu.org; Sat, 08 Jun 2019 01:41:17 -0400
-Received: from mail-pg1-f178.google.com ([209.85.215.178]:43958)
+ (envelope-from <richard.henderson@linaro.org>) id 1hZbgC-0002h6-9o
+ for qemu-devel@nongnu.org; Sat, 08 Jun 2019 09:46:45 -0400
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:39306)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <palmer@dabbelt.com>) id 1hZU6N-0001Uu-16
- for qemu-devel@nongnu.org; Sat, 08 Jun 2019 01:41:16 -0400
-Received: by mail-pg1-f178.google.com with SMTP id f25so2220831pgv.10
- for <qemu-devel@nongnu.org>; Fri, 07 Jun 2019 22:41:13 -0700 (PDT)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1hZbgB-0002gH-IO
+ for qemu-devel@nongnu.org; Sat, 08 Jun 2019 09:46:44 -0400
+Received: by mail-ot1-x344.google.com with SMTP id r21so4445540otq.6
+ for <qemu-devel@nongnu.org>; Sat, 08 Jun 2019 06:46:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:references:from:openpgp:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=vZo7nzAqRjAizPJNgAsuN4rXu4QrALKrYOTntgEhOZs=;
+ b=BSl3HNDz9VtOsubWVBEpzAMLCd/B0xNZ/+zvhOEv0MG4aaRBLhkLVX47kELYG7B2jM
+ 4Y/KyCONn+9NdXuVCxrYuEAOdgKeVn9Y/kqlZoP4Vw3slnNLN9ofbpbQbRo0Y5hx1vLp
+ izN/sWWxPZyJyUDQ7OWc8F8NXobto0HCJIAHNajuFoMHInKUxLhaeuj8pzdaRSp17DHX
+ VxLUKBtHggfbO/I6CTmD6T9Mn3l2Dt8Qyrq1v8uLrvLfI7YtAQ1zIKzbDaS3WhVpDpsp
+ EVsC2TV/oXxFrjEuau9qoXQEebl6rdV1wypWYAfWoEx1hNG3W90CFtyzgydP7IXya24Y
+ nL3w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:subject:in-reply-to:cc:from:to:message-id
- :mime-version:content-transfer-encoding;
- bh=0xFujibSNYzWMLVp8zBawg+0B0c5vMsRBy4UZe+YTh8=;
- b=PHzP3Pjn+DmWL80i9bHaBrSx1k4hXhRepTt1mjmVhVB3jjRYDk9wn3XPaZAjq6N2sH
- ebmJp6VRRiJHbyKQRI7Dm4PBydGR+GWHkcpVxdx0SsYiKysJaDLhXFacHkbk6YiJA/oy
- RjDJZuQvPQo3C/dcPVUT3l7VKWAwEA5vxI6yvsQU7WE+u6mCIiLuFrfoKnme/Mu7OvMk
- H+XBtDUBr9ulhm6rXiShxYjvdoEF1f8c8aEK+2gFIwlkphK6w8qSX7TSALydycY3WR1x
- ZTt+UI+7H7FBUpj2TKAGR6kwrftT+9Le7oMQHhMLfAMqk4+NpfjTrIpoJ4VniLKAtxLH
- 9cNQ==
-X-Gm-Message-State: APjAAAWMLm8sZEPqU5sqmyUFvJLw2K4KH+sgY+u2AbRdMTKPF2Fmj7Wx
- FBe8QeQLhsNtWKGGzrhtz8gpxw==
-X-Google-Smtp-Source: APXvYqwWwPq6c5pMpiwr3aOT4NFXgsBFf+bMOBpBtkrZ19WmSIA9Uq49ihBfsjjwpEZqAqV6FW943A==
-X-Received: by 2002:a17:90a:9514:: with SMTP id
- t20mr9413798pjo.124.1559972472276; 
- Fri, 07 Jun 2019 22:41:12 -0700 (PDT)
-Received: from localhost ([12.206.222.5])
- by smtp.gmail.com with ESMTPSA id r11sm955628pgs.39.2019.06.07.22.41.10
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Fri, 07 Jun 2019 22:41:11 -0700 (PDT)
-Date: Fri, 07 Jun 2019 22:41:11 -0700 (PDT)
-X-Google-Original-Date: Fri, 07 Jun 2019 18:33:12 PDT (-0700)
-In-Reply-To: <CAFXwXrkEVJgPEZtvzyekJEZDk90XvntHkdfUe0s37RZ-ir1MKw@mail.gmail.com>
-From: Palmer Dabbelt <palmer@sifive.com>
-To: richard.henderson@linaro.org
-Message-ID: <mhng-9a9b8dc8-4249-4695-9b30-9303df3a9c6d@palmer-si-x1e>
-Mime-Version: 1.0 (MHng)
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.215.178
-Subject: Re: [Qemu-devel] Fwd: [joel@sing.id.au: atomic failures on
- qemu-system-riscv64]
+ h=x-gm-message-state:subject:to:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=vZo7nzAqRjAizPJNgAsuN4rXu4QrALKrYOTntgEhOZs=;
+ b=RdishQfLeu39YI5lGD8J3l/0UnvRjbdtxRXK9suBv2uhkkT2URgjmolat9SEUmNvWW
+ KiODtAWzIBMI68cevZnJ9zZ7fmpckI0qax7Q7I4PK8PxktIfLXLE/cREIyLHi/ILuqeH
+ T7hgFP4DN/n+x94UzzY/NYzLzgaB7sOZ8yGKKkphYCvil0pVH9jE/BKQTJc4/iF7EHuv
+ ER7D2etg2MMoULT8RJ3IUcwGEC96wm06liqPf7jyfYnh1qtY4/RP0T64uYWvOKI57ghg
+ qKxs8k1L1LB+CEEdhFKNdLyjsPR1PTnQuq5i3Ta9XoI01HFLC+UE8KxARh6DBqYHPfeQ
+ Cn9g==
+X-Gm-Message-State: APjAAAXfSfUrgyQNcd3Jgcg8sEK3Isvd7oAa8vi/GgGb+9G0eK7hdGQg
+ 4zzAJjGNgTLW0tZmoyWafn82Wij/aeM1ww==
+X-Google-Smtp-Source: APXvYqzjr7mp5/W5hNqoneYPRnXtFES0UVMqTdn4ovn8zBl4MRq2+4Xw4j9PGpJpSRLkhMy1QCBGgw==
+X-Received: by 2002:a9d:32a1:: with SMTP id u30mr22464552otb.371.1560001602335; 
+ Sat, 08 Jun 2019 06:46:42 -0700 (PDT)
+Received: from [192.168.3.43] (200-56-192-86-cable.cybercable.net.mx.
+ [200.56.192.86])
+ by smtp.gmail.com with ESMTPSA id w14sm1900239otq.1.2019.06.08.06.46.40
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Sat, 08 Jun 2019 06:46:41 -0700 (PDT)
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
+ qemu-devel@nongnu.org
+References: <20190606174609.20487-1-peter.maydell@linaro.org>
+ <20190606174609.20487-15-peter.maydell@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Openpgp: preference=signencrypt
+Message-ID: <8648d40f-7418-c3ea-3f01-c11dcbd2bfde@linaro.org>
+Date: Sat, 8 Jun 2019 08:46:37 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
+MIME-Version: 1.0
+In-Reply-To: <20190606174609.20487-15-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::344
+Subject: Re: [Qemu-devel] [PATCH 14/42] target/arm: Convert VFP two-register
+ transfer insns to decodetree
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -80,37 +100,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-riscv@nongnu.org, qemu-devel@nongnu.org, marco@decred.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 06 Jun 2019 19:50:57 PDT (-0700), richard.henderson@linaro.org wrote:
->>
->> Also, unless I'm misunderstanding something our implementation of LR/SC is
->>
-> pretty broken.  We're just using a CAS to check if the value changed, which
->> suffers from the ABA problem that LR/SC is there to fix in the first
->> place.  I
->> might be missing something here, though, as it looks like MIPS is doing
->> essentially the same thing.
->>
->
-> All of our load-lock/store-conditional implementations do the same.
->
-> You are correct that we do not implement the exact correct semantics.
-> Correct semantics, as far as I know, cannot be modeled without emulating
-> everything in a serial context, including caches.
->
-> We therefore make a considered choice to observe that while ll/sc can be
-> used to do all kinds of wild and woolly things, no one actually does so.
-> What people actually do is write portable code, using c/c++ atomic
-> primitives. And that all of these can be done with cmpxchg, because that's
-> what x86 has.
->
-> Using that choice, we can provide multi-threaded smp emulation that,
-> demonstrably, works.
+On 6/6/19 12:45 PM, Peter Maydell wrote:
+> Convert the VFP two-register transfer instructions to decodetree
+> (in the v8 Arm ARM these are the "Advanced SIMD and floating-point
+> 64-bit move" encoding group).
+> 
+> Again, we expand out the sequences involving gen_vfp_msr() and
+> gen_msr_vfp().
+> 
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+>  target/arm/translate-vfp.inc.c | 70 ++++++++++++++++++++++++++++++++++
+>  target/arm/translate.c         | 46 +---------------------
+>  target/arm/vfp.decode          |  5 +++
+>  3 files changed, 77 insertions(+), 44 deletions(-)
 
-OK, that makes sense.  I was just worried that we were screwing something up on
-our end.
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+
+
+r~
+
 
