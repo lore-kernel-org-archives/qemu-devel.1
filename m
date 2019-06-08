@@ -2,92 +2,58 @@ Return-Path: <SRS0=KvPE=UH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 78F0FC28CC5
-	for <qemu-devel@archiver.kernel.org>; Sat,  8 Jun 2019 20:03:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E2F08C28CC5
+	for <qemu-devel@archiver.kernel.org>; Sat,  8 Jun 2019 23:36:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 42A79208E3
-	for <qemu-devel@archiver.kernel.org>; Sat,  8 Jun 2019 20:03:05 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="MA/rJ2gl"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 42A79208E3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 65D98214AE
+	for <qemu-devel@archiver.kernel.org>; Sat,  8 Jun 2019 23:36:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 65D98214AE
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60296 helo=lists.gnu.org)
+Received: from localhost ([::1]:32844 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hZhYO-0001Ce-IN
-	for qemu-devel@archiver.kernel.org; Sat, 08 Jun 2019 16:03:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39116)
+	id 1hZktJ-0004yT-Uy
+	for qemu-devel@archiver.kernel.org; Sat, 08 Jun 2019 19:36:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59404)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <richard.henderson@linaro.org>) id 1hZh44-0001Cw-Cl
- for qemu-devel@nongnu.org; Sat, 08 Jun 2019 15:31:46 -0400
+ (envelope-from <ehabkost@redhat.com>) id 1hZkra-0003wh-0p
+ for qemu-devel@nongnu.org; Sat, 08 Jun 2019 19:35:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1hZh41-00015t-T3
- for qemu-devel@nongnu.org; Sat, 08 Jun 2019 15:31:44 -0400
-Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:46296)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1hZh41-0000rA-Dx
- for qemu-devel@nongnu.org; Sat, 08 Jun 2019 15:31:41 -0400
-Received: by mail-ot1-x344.google.com with SMTP id z23so4893962ote.13
- for <qemu-devel@nongnu.org>; Sat, 08 Jun 2019 12:31:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:references:from:openpgp:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=OmR05geqhI+CrTiQe1FRjXamoiDOgmToTEUoLNtYb+U=;
- b=MA/rJ2gl9EHfwsBa4iQetLIZ2zMp/qbcytrZR5kBCqhBB9qCm1kMhpOyYz94z49KWy
- IRtmXnZzm06NmQh/JDDlciz1246eJ0UdPb+jMwKDdC9z5dfK5ldetNZPTycotLfQPJkm
- FmKc/gyhQfDIMQCCZWbnXfGa5I9aS60mxPslvP9DfXo6U1QWS1m+nu8aE5LAhJ4FV/et
- RYccBC3B0hEoaYOW9p7ltwCCKvKGxKt1VxqfV0cgGi6sheCFAKlVqbyHTx/oS1OV4+Uf
- Xiac/fLp/cZX+MxF44n5XD1ivMShK4Fl8AG/nRQzfACtyJ//Wn+xCstATbuDWUDSByyG
- oNCw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=OmR05geqhI+CrTiQe1FRjXamoiDOgmToTEUoLNtYb+U=;
- b=G5+e3KaWQZyR5xprK/RC4kmI0JiIaL2CbtcJoFfaGUf1urQPpuSc9gq9nbrekxol7n
- 1dUod51C/y10vP6QSBK1gIUsHynSrV8qm5ZbA7LHeBvhvUu2Oa8mYfAeUTcW498zQdc0
- B0EkMiE8Rez4Ol3jtDcAlb6AYXtGEKN7T8Z0oarmvrZcPrt/6UNPO+k5u1Aq1RdPOaDl
- Lt5nwzA1dDSwrsJ48/u6GHz/HjCXWMC7fJD1YpQElt4NmCStrO4fiAcORz5u7gnV9GjA
- pVPH//IUeKUQvleziI46Vr3LiUtwSpr5gXmkTM5lGd8JLAtmJU76fhMiuW5mAfqPCUFH
- hOVA==
-X-Gm-Message-State: APjAAAXycojKXWZWF1s3oyS5NNlwgyEl7vnvzNSAqCt3iQ6pNpQX8pHH
- bHsFYJ/cSxeOt4eScOZahlDapQnWkOEoGQ==
-X-Google-Smtp-Source: APXvYqy8FofoJRwdFyaqkHZLMWcnacLgUeDE2ie6hUhtxMGsz48iXBFUR6DUKbLnlBKkZiulCpVzxA==
-X-Received: by 2002:a9d:7d83:: with SMTP id j3mr24830060otn.191.1560022281963; 
- Sat, 08 Jun 2019 12:31:21 -0700 (PDT)
-Received: from [10.219.49.199] ([187.217.230.84])
- by smtp.gmail.com with ESMTPSA id v20sm2023351otk.66.2019.06.08.12.31.19
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Sat, 08 Jun 2019 12:31:21 -0700 (PDT)
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
- qemu-devel@nongnu.org
-References: <20190606174609.20487-1-peter.maydell@linaro.org>
- <20190606174609.20487-43-peter.maydell@linaro.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <ea5749c1-e6c6-5c32-deaf-90e66ea5c2df@linaro.org>
-Date: Sat, 8 Jun 2019 14:26:13 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
-MIME-Version: 1.0
-In-Reply-To: <20190606174609.20487-43-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::344
-Subject: Re: [Qemu-devel] [PATCH 42/42] target/arm: Fix short-vector
- increment behaviour
+ (envelope-from <ehabkost@redhat.com>) id 1hZkrZ-0006aJ-3A
+ for qemu-devel@nongnu.org; Sat, 08 Jun 2019 19:35:05 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44260)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hZkrY-0006Yq-Td
+ for qemu-devel@nongnu.org; Sat, 08 Jun 2019 19:35:05 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 27F373082145;
+ Sat,  8 Jun 2019 23:35:02 +0000 (UTC)
+Received: from localhost (ovpn-116-9.gru2.redhat.com [10.97.116.9])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 33493608A5;
+ Sat,  8 Jun 2019 23:34:56 +0000 (UTC)
+From: Eduardo Habkost <ehabkost@redhat.com>
+To: qemu-devel@nongnu.org
+Date: Sat,  8 Jun 2019 20:34:47 -0300
+Message-Id: <20190608233447.27970-2-ehabkost@redhat.com>
+In-Reply-To: <20190608233447.27970-1-ehabkost@redhat.com>
+References: <20190608233447.27970-1-ehabkost@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.42]); Sat, 08 Jun 2019 23:35:02 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PATCH v2 1/1] qmp: Add deprecation information to
+ query-machines
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,48 +65,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Thomas Huth <thuth@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>,
+ Michal Privoznik <mprivozn@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/6/19 12:46 PM, Peter Maydell wrote:
-> For VFP short vectors, the VFP registers are divided into a
-> series of banks: for single-precision these are s0-s7, s8-s15,
-> s16-s23 and s24-s31; for double-precision they are d0-d3,
-> d4-d7, ... d28-d31. Some banks are "scalar" meaning that
-> use of a register within them triggers a pure-scalar or
-> mixed vector-scalar operation rather than a full vector
-> operation. The scalar banks are s0-s7, d0-d3 and d16-d19.
-> When using a bank as part of a vector operation, we
-> iterate through it, increasing the register number by
-> the specified stride each time, and wrapping around to
-> the beginning of the bank.
-> 
-> Unfortunately our calculation of the "increment" part of this
-> was incorrect:
->  vd = ((vd + delta_d) & (bank_mask - 1)) | (vd & bank_mask)
-> will only do the intended thing if bank_mask has exactly
-> one set high bit. For instance for doubles (bank_mask = 0xc),
-> if we start with vd = 6 and delta_d = 2 then vd is updated
-> to 12 rather than the intended 4.
-> 
-> This only causes problems in the unlikely case that the
-> starting register is not the first in its bank: if the
-> register number doesn't have to wrap around then the
-> expression happens to give the right answer.
-> 
-> Fix this bug by abstracting out the "check whether register
-> is in a scalar bank" and "advance register within bank"
-> operations to utility functions which use the right
-> bit masking operations.
-> 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
->  target/arm/translate-vfp.inc.c | 100 ++++++++++++++++++++-------------
->  1 file changed, 60 insertions(+), 40 deletions(-)
+Export machine type deprecation status through the query-machines
+QMP command.  With this, libvirt and management software will be
+able to show this information to users and/or suggest changes to
+VM configuration to avoid deprecated machines.
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+---
+Changes v1 -> v2:
+* Take a much simpler approach: add a simple `deprecated` bool
+  field, instead of including a human-readable message and
+  suggested alternatives
+---
+ qapi/misc.json | 7 ++++++-
+ vl.c           | 1 +
+ 2 files changed, 7 insertions(+), 1 deletion(-)
 
+diff --git a/qapi/misc.json b/qapi/misc.json
+index 8b3ca4fdd3..fca793d39c 100644
+--- a/qapi/misc.json
++++ b/qapi/misc.json
+@@ -2018,12 +2018,17 @@
+ #
+ # @hotpluggable-cpus: cpu hotplug via -device is supported (since 2.7.0)
+ #
++# @deprecated: if true, the machine type is deprecated and may be removed
++#              in future versions of QEMU according to the QEMU deprecation
++#              policy (since 4.1.0)
++#
+ # Since: 1.2.0
+ ##
+ { 'struct': 'MachineInfo',
+   'data': { 'name': 'str', '*alias': 'str',
+             '*is-default': 'bool', 'cpu-max': 'int',
+-            'hotpluggable-cpus': 'bool'} }
++            'hotpluggable-cpus': 'bool',
++            'deprecated': 'bool' } }
+ 
+ ##
+ # @query-machines:
+diff --git a/vl.c b/vl.c
+index cd1fbc4cdc..f825d2159c 100644
+--- a/vl.c
++++ b/vl.c
+@@ -1428,6 +1428,7 @@ MachineInfoList *qmp_query_machines(Error **errp)
+         info->name = g_strdup(mc->name);
+         info->cpu_max = !mc->max_cpus ? 1 : mc->max_cpus;
+         info->hotpluggable_cpus = mc->has_hotpluggable_cpus;
++        info->deprecated = !!mc->deprecation_reason;
+ 
+         entry = g_malloc0(sizeof(*entry));
+         entry->value = info;
+-- 
+2.18.0.rc1.1.g3f1ff2140
 
-r~
 
