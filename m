@@ -2,52 +2,90 @@ Return-Path: <SRS0=Ju6v=UI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_NEOMUTT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FE7AC28EBD
-	for <qemu-devel@archiver.kernel.org>; Sun,  9 Jun 2019 18:46:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DE944C28EBD
+	for <qemu-devel@archiver.kernel.org>; Sun,  9 Jun 2019 19:47:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1A82220645
-	for <qemu-devel@archiver.kernel.org>; Sun,  9 Jun 2019 18:46:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1A82220645
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id A3D5C206BB
+	for <qemu-devel@archiver.kernel.org>; Sun,  9 Jun 2019 19:47:33 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="F3X8LFHG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A3D5C206BB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37492 helo=lists.gnu.org)
+Received: from localhost ([::1]:37914 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ha2pj-0004qx-D3
-	for qemu-devel@archiver.kernel.org; Sun, 09 Jun 2019 14:46:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49283)
+	id 1ha3mu-00005H-DU
+	for qemu-devel@archiver.kernel.org; Sun, 09 Jun 2019 15:47:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35575)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1ha2fc-0004Rr-No
- for qemu-devel@nongnu.org; Sun, 09 Jun 2019 14:35:58 -0400
+ (envelope-from <richard.weiyang@gmail.com>) id 1ha3m9-00084z-6y
+ for qemu-devel@nongnu.org; Sun, 09 Jun 2019 15:46:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1ha2fa-00064L-MY
- for qemu-devel@nongnu.org; Sun, 09 Jun 2019 14:35:56 -0400
-Received: from relay.sw.ru ([185.231.240.75]:47568)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1ha2fa-00062V-D2; Sun, 09 Jun 2019 14:35:54 -0400
-Received: from [172.16.25.136] (helo=localhost.sw.ru)
- by relay.sw.ru with esmtp (Exim 4.91)
- (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1ha2fW-00087U-BY; Sun, 09 Jun 2019 21:35:50 +0300
-From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-To: qemu-devel@nongnu.org,
-	qemu-block@nongnu.org
-Date: Sun,  9 Jun 2019 21:35:44 +0300
-Message-Id: <1560105348-459129-4-git-send-email-andrey.shinkevich@virtuozzo.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1560105348-459129-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-References: <1560105348-459129-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 185.231.240.75
-Subject: [Qemu-devel] [PATCH 3/7] iotests: exclude killed processes from
- running under Valgrind
+ (envelope-from <richard.weiyang@gmail.com>) id 1ha3m7-0001mK-TY
+ for qemu-devel@nongnu.org; Sun, 09 Jun 2019 15:46:45 -0400
+Received: from mail-ed1-x544.google.com ([2a00:1450:4864:20::544]:40590)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.weiyang@gmail.com>)
+ id 1ha3m7-0001lL-Gi
+ for qemu-devel@nongnu.org; Sun, 09 Jun 2019 15:46:43 -0400
+Received: by mail-ed1-x544.google.com with SMTP id k8so9935332eds.7
+ for <qemu-devel@nongnu.org>; Sun, 09 Jun 2019 12:46:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:reply-to:references:mime-version
+ :content-disposition:in-reply-to:user-agent;
+ bh=C3N6OgnvfWn1kKiu3RV2wgW34LrK59aETmt8VcOs49k=;
+ b=F3X8LFHGSY7bmto/EUzEaHOyL9QGQZkoFsi8Xrv9C/0AlRjoHSoOdvcQ6/3bA6uqqe
+ GNhTYQptJ/jdSk3ONW8dRUMO+2evKnKJgfX8Nv/x5fIgJy/NqZb0cPQDT7IB6UCfG1b3
+ YvbMvqi3gvva2XAbSmoTHZG33U9CMRS0kRZhRJC+YvD4ye5i46hk/vXoJ6V3vx2IAZf9
+ MIgUncGeuD+Rx3Boga7SzZPksAZwO+RtazBoHaqIBkcH1+vU4LurdGxdQHWTP3FiVqYV
+ 0/XoqbHg/t00q/ll/++wwYlVZaszKOukOGZ5S86r895kwaAYJjMkzaSvZDngFkgjSGnr
+ Qqtg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:reply-to
+ :references:mime-version:content-disposition:in-reply-to:user-agent;
+ bh=C3N6OgnvfWn1kKiu3RV2wgW34LrK59aETmt8VcOs49k=;
+ b=GJ7KQFewKgAzIV6VSLgpkN82tyLvCkSM/mt3tfcET4lZMNfaNx5Uejdd7RKBRuikSU
+ I94o8I1AfV6+Nu9DSiMnbSveL6c1XpUKMmdOLlSj4YIE8q0uxEcoaWRXh0ggcbfg3BFc
+ XR3BM6ppR7piHNkHnX21EyLYcmlV8fdymFRrzkWALlNjJtRjfraYSuSpLU9ogDUQZi2j
+ NUJ8UTjhbSWomLzfom0260bWhPAL5pwqRiaOHedkvg6LISb50wur4JFoSpqBCOcpzgOS
+ qk9rRTDp51c/JZ6lFbDaS/pQhYR0AhbcBIO6oAdKpFC9teWVVq4Hubz+91ji8WQxEYKd
+ SWWw==
+X-Gm-Message-State: APjAAAXYkejeX5TMVpezI+GduANFZDjSjp5U0ZKM3K6PCM4rK+oXJmYB
+ YZeqDv6ptvBgkb7W8O2S/Rk=
+X-Google-Smtp-Source: APXvYqywPUUEZx2XVpsyj+lRi1kMAThcOYqLjOWycwYSb0eYn5bWA1O2NERMZ5gprnMhPfDhkYZDfA==
+X-Received: by 2002:a50:f286:: with SMTP id f6mr31071028edm.44.1560109601795; 
+ Sun, 09 Jun 2019 12:46:41 -0700 (PDT)
+Received: from localhost ([185.92.221.13])
+ by smtp.gmail.com with ESMTPSA id i6sm200168eda.79.2019.06.09.12.46.40
+ (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+ Sun, 09 Jun 2019 12:46:40 -0700 (PDT)
+Date: Sun, 9 Jun 2019 19:46:39 +0000
+From: Wei Yang <richard.weiyang@gmail.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20190609194639.h6elitk3sbvd3irh@master>
+References: <20190606013138.13312-1-richardw.yang@linux.intel.com>
+ <20190606013138.13312-2-richardw.yang@linux.intel.com>
+ <20190607185734.GZ2631@work-vm>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190607185734.GZ2631@work-vm>
+User-Agent: NeoMutt/20170113 (1.7.2)
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::544
+Subject: Re: [Qemu-devel] [PATCH 1/2] migration/xbzrle: update cache and
+ current_data in one place
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -59,100 +97,135 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, mreitz@redhat.com,
- rkagan@virtuozzo.com, andrey.shinkevich@virtuozzo.com, den@openvz.org
+Reply-To: Wei Yang <richard.weiyang@gmail.com>
+Cc: quintela@redhat.com, Wei Yang <richardw.yang@linux.intel.com>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The Valgrind tool fails to manage its termination when QEMU raises the
-signal SIGKILL. Lets exclude such test cases from running under the
-Valgrind because there is no sense to check memory issues that way.
+On Fri, Jun 07, 2019 at 07:57:34PM +0100, Dr. David Alan Gilbert wrote:
+>* Wei Yang (richardw.yang@linux.intel.com) wrote:
+>> When we are not in the last_stage, we need to update the cache if page
+>> is not the same.
+>> 
+>> Currently this procedure is scattered in two places and mixed with
+>> encoding status check.
+>> 
+>> This patch extract this general step out to make the code a little bit
+>> easy to read.
+>> 
+>> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
+>
+>This function is actually quite subtle, and I think your change will
+>work, but it has changed the behaviour slightly.
+>
+>When we enter the function the *current_data is pointing at actual guest
+>RAM and is changing as we're running.
+>It's critical that the contents of the cache match what was actually
+>sent, so that in the next cycle the correct delta is generated;
+>thus the reason for the two memcpy's is actually different.
+>
+>> ---
+>>  migration/ram.c | 19 +++++++++----------
+>>  1 file changed, 9 insertions(+), 10 deletions(-)
+>> 
+>> diff --git a/migration/ram.c b/migration/ram.c
+>> index e9b40d636d..878cd8de7a 100644
+>> --- a/migration/ram.c
+>> +++ b/migration/ram.c
+>> @@ -1594,25 +1594,24 @@ static int save_xbzrle_page(RAMState *rs, uint8_t **current_data,
+>>      encoded_len = xbzrle_encode_buffer(prev_cached_page, XBZRLE.current_buf,
+>>                                         TARGET_PAGE_SIZE, XBZRLE.encoded_buf,
+>>                                         TARGET_PAGE_SIZE);
+>> +
+>> +    /*
+>> +     * we need to update the data in the cache, in order to get the same data
+>> +     */
+>> +    if (!last_stage && encoded_len != 0) {
+>> +        memcpy(prev_cached_page, XBZRLE.current_buf, TARGET_PAGE_SIZE);
+>> +        *current_data = prev_cached_page;
+>> +    }
+>> +
+>>      if (encoded_len == 0) {
+>>          trace_save_xbzrle_page_skipping();
+>>          return 0;
+>>      } else if (encoded_len == -1) {
+>>          trace_save_xbzrle_page_overflow();
+>>          xbzrle_counters.overflow++;
+>> -        /* update data in the cache */
+>> -        if (!last_stage) {
+>> -            memcpy(prev_cached_page, *current_data, TARGET_PAGE_SIZE);
+>> -            *current_data = prev_cached_page;
+>> -        }
+>>          return -1;
+>
+>In this case, we've not managed to compress, so we're going to have to
+>transmit the whole page; but remember the guest is still writing. So we
+>update the cache, and then update *current_data to point to the cache
+>so that the caller sends from the cache directly rather than the guest
+>RAM, this ensures that the thing that's sent matches the cache contents.
+>
+>However, note the memcpy is from *current_data, not XBZRLE.current_buf,
+>so it might be slightly newer  - this is the first change you have made;
+>you might be sending data that's slightly older; but it's safe because
+>the data sent does match the cache contents.
+>
+>>      }
+>>  
+>> -    /* we need to update the data in the cache, in order to get the same data */
+>> -    if (!last_stage) {
+>> -        memcpy(prev_cached_page, XBZRLE.current_buf, TARGET_PAGE_SIZE);
+>> -    }
+>> -
+>
+>This memcpy is slightly different.
+>Here we've managed to do the compress; so now we update the cache based
+>on what was compressed (current_buf).  *current_data isn't used by the
+>caller in this case because it's actually sending the compressed data.
+>So it's safe for you to update it.
 
-Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
----
- tests/qemu-iotests/039 | 5 +++++
- tests/qemu-iotests/061 | 2 ++
- tests/qemu-iotests/137 | 1 +
- 3 files changed, 8 insertions(+)
+Yes, you are right. My change will alter the behavior a little. To be
+specific, when we didn't manage to compress content, the content we sent will
+be a little *old*.
 
-diff --git a/tests/qemu-iotests/039 b/tests/qemu-iotests/039
-index 0d4e963..95115e2 100755
---- a/tests/qemu-iotests/039
-+++ b/tests/qemu-iotests/039
-@@ -65,6 +65,7 @@ echo "== Creating a dirty image file =="
- IMGOPTS="compat=1.1,lazy_refcounts=on"
- _make_test_img $size
- 
-+VALGRIND_QEMU="" \
- $QEMU_IO -c "write -P 0x5a 0 512" \
-          -c "sigraise $(kill -l KILL)" "$TEST_IMG" 2>&1 \
-     | _filter_qemu_io
-@@ -100,6 +101,7 @@ echo "== Opening a dirty image read/write should repair it =="
- IMGOPTS="compat=1.1,lazy_refcounts=on"
- _make_test_img $size
- 
-+VALGRIND_QEMU="" \
- $QEMU_IO -c "write -P 0x5a 0 512" \
-          -c "sigraise $(kill -l KILL)" "$TEST_IMG" 2>&1 \
-     | _filter_qemu_io
-@@ -118,6 +120,7 @@ echo "== Creating an image file with lazy_refcounts=off =="
- IMGOPTS="compat=1.1,lazy_refcounts=off"
- _make_test_img $size
- 
-+VALGRIND_QEMU="" \
- $QEMU_IO -c "write -P 0x5a 0 512" \
-          -c "sigraise $(kill -l KILL)" "$TEST_IMG" 2>&1 \
-     | _filter_qemu_io
-@@ -151,6 +154,7 @@ echo "== Changing lazy_refcounts setting at runtime =="
- IMGOPTS="compat=1.1,lazy_refcounts=off"
- _make_test_img $size
- 
-+VALGRIND_QEMU="" \
- $QEMU_IO -c "reopen -o lazy-refcounts=on" \
-          -c "write -P 0x5a 0 512" \
-          -c "sigraise $(kill -l KILL)" "$TEST_IMG" 2>&1 \
-@@ -163,6 +167,7 @@ _check_test_img
- IMGOPTS="compat=1.1,lazy_refcounts=on"
- _make_test_img $size
- 
-+VALGRIND_QEMU="" \
- $QEMU_IO -c "reopen -o lazy-refcounts=off" \
-          -c "write -P 0x5a 0 512" \
-          -c "sigraise $(kill -l KILL)" "$TEST_IMG" 2>&1 \
-diff --git a/tests/qemu-iotests/061 b/tests/qemu-iotests/061
-index d7dbd7e..5d0724c 100755
---- a/tests/qemu-iotests/061
-+++ b/tests/qemu-iotests/061
-@@ -73,6 +73,7 @@ echo
- echo "=== Testing dirty version downgrade ==="
- echo
- IMGOPTS="compat=1.1,lazy_refcounts=on" _make_test_img 64M
-+VALGRIND_QEMU="" \
- $QEMU_IO -c "write -P 0x2a 0 128k" -c flush \
-          -c "sigraise $(kill -l KILL)" "$TEST_IMG" 2>&1 | _filter_qemu_io
- $PYTHON qcow2.py "$TEST_IMG" dump-header
-@@ -107,6 +108,7 @@ echo
- echo "=== Testing dirty lazy_refcounts=off ==="
- echo
- IMGOPTS="compat=1.1,lazy_refcounts=on" _make_test_img 64M
-+VALGRIND_QEMU="" \
- $QEMU_IO -c "write -P 0x2a 0 128k" -c flush \
-          -c "sigraise $(kill -l KILL)" "$TEST_IMG" 2>&1 | _filter_qemu_io
- $PYTHON qcow2.py "$TEST_IMG" dump-header
-diff --git a/tests/qemu-iotests/137 b/tests/qemu-iotests/137
-index 0c3d2a1..a442fc8 100755
---- a/tests/qemu-iotests/137
-+++ b/tests/qemu-iotests/137
-@@ -130,6 +130,7 @@ echo
- 
- # Whether lazy-refcounts was actually enabled can easily be tested: Check if
- # the dirty bit is set after a crash
-+VALGRIND_QEMU="" \
- $QEMU_IO \
-     -c "reopen -o lazy-refcounts=on,overlap-check=blubb" \
-     -c "write -P 0x5a 0 512" \
+>
+>So I think we need to add comments like that, how about:
+>
+>       /*
+>        * Update the cache contents, so that it corresponds to the data
+>        * sent, in allc ases except where we skip the page.
+>        */
+>> +    if (!last_stage && encoded_len != 0) {
+>> +        memcpy(prev_cached_page, XBZRLE.current_buf, TARGET_PAGE_SIZE);
+>       /*
+>        * In the case where we couldn't compress, ensure that the caller
+>        * sends the data from the cache, since the guest might have
+>        * changed the RAM since we copied it.
+>        */
+>
+>> +        *current_data = prev_cached_page;
+>> +    }
+>>      /* Send XBZRLE based compressed page */
+>>      bytes_xbzrle = save_page_header(rs, rs->f, block,
+>>                                      offset | RAM_SAVE_FLAG_XBZRLE);
+
+Yep, I agree with this comment.
+
+Let me add this in v2.
+
+Thanks :-)
+
+>
+>Dave
+>
+>> -- 
+>> 2.19.1
+>> 
+>--
+>Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+
 -- 
-1.8.3.1
-
+Wei Yang
+Help you, Help me
 
