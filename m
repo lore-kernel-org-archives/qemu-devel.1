@@ -6,47 +6,48 @@ X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 10F2DC468BD
-	for <qemu-devel@archiver.kernel.org>; Sun,  9 Jun 2019 18:43:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FE7AC28EBD
+	for <qemu-devel@archiver.kernel.org>; Sun,  9 Jun 2019 18:46:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E6BE220645
-	for <qemu-devel@archiver.kernel.org>; Sun,  9 Jun 2019 18:43:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E6BE220645
+	by mail.kernel.org (Postfix) with ESMTPS id 1A82220645
+	for <qemu-devel@archiver.kernel.org>; Sun,  9 Jun 2019 18:46:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1A82220645
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37466 helo=lists.gnu.org)
+Received: from localhost ([::1]:37492 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ha2nJ-0002Wn-9B
-	for qemu-devel@archiver.kernel.org; Sun, 09 Jun 2019 14:43:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49276)
+	id 1ha2pj-0004qx-D3
+	for qemu-devel@archiver.kernel.org; Sun, 09 Jun 2019 14:46:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49283)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1ha2fc-0004Rp-EF
+ (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1ha2fc-0004Rr-No
  for qemu-devel@nongnu.org; Sun, 09 Jun 2019 14:35:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1ha2fa-00064H-Lx
+ (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1ha2fa-00064L-MY
  for qemu-devel@nongnu.org; Sun, 09 Jun 2019 14:35:56 -0400
-Received: from relay.sw.ru ([185.231.240.75]:47590)
+Received: from relay.sw.ru ([185.231.240.75]:47568)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1ha2fa-00062W-Cu; Sun, 09 Jun 2019 14:35:54 -0400
+ id 1ha2fa-00062V-D2; Sun, 09 Jun 2019 14:35:54 -0400
 Received: from [172.16.25.136] (helo=localhost.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.91)
  (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1ha2fX-00087U-AD; Sun, 09 Jun 2019 21:35:51 +0300
+ id 1ha2fW-00087U-BY; Sun, 09 Jun 2019 21:35:50 +0300
 From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
 To: qemu-devel@nongnu.org,
 	qemu-block@nongnu.org
-Date: Sun,  9 Jun 2019 21:35:46 +0300
-Message-Id: <1560105348-459129-6-git-send-email-andrey.shinkevich@virtuozzo.com>
+Date: Sun,  9 Jun 2019 21:35:44 +0300
+Message-Id: <1560105348-459129-4-git-send-email-andrey.shinkevich@virtuozzo.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1560105348-459129-1-git-send-email-andrey.shinkevich@virtuozzo.com>
 References: <1560105348-459129-1-git-send-email-andrey.shinkevich@virtuozzo.com>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
 X-Received-From: 185.231.240.75
-Subject: [Qemu-devel] [PATCH 5/7] iotests: extended timeout under Valgrind
+Subject: [Qemu-devel] [PATCH 3/7] iotests: exclude killed processes from
+ running under Valgrind
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -64,73 +65,93 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-As the iotests run longer under the Valgrind, the QEMU_COMM_TIMEOUT is
-to be increased in the test cases 028, 183 and 192 when running under
-the Valgrind.
+The Valgrind tool fails to manage its termination when QEMU raises the
+signal SIGKILL. Lets exclude such test cases from running under the
+Valgrind because there is no sense to check memory issues that way.
 
-Suggested-by: Roman Kagan <rkagan@virtuozzo.com>
 Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
 ---
- tests/qemu-iotests/028 | 6 +++++-
- tests/qemu-iotests/183 | 9 ++++++++-
- tests/qemu-iotests/192 | 6 +++++-
- 3 files changed, 18 insertions(+), 3 deletions(-)
+ tests/qemu-iotests/039 | 5 +++++
+ tests/qemu-iotests/061 | 2 ++
+ tests/qemu-iotests/137 | 1 +
+ 3 files changed, 8 insertions(+)
 
-diff --git a/tests/qemu-iotests/028 b/tests/qemu-iotests/028
-index 01f4959..2fd4405 100755
---- a/tests/qemu-iotests/028
-+++ b/tests/qemu-iotests/028
-@@ -110,7 +110,11 @@ echo
- qemu_comm_method="monitor"
- _launch_qemu -drive file="${TEST_IMG}",cache=${CACHEMODE},id=disk
- h=$QEMU_HANDLE
--QEMU_COMM_TIMEOUT=1
-+if [ "${VALGRIND_QEMU}" == "y" ]; then
-+    QEMU_COMM_TIMEOUT=4
-+else
-+    QEMU_COMM_TIMEOUT=1
-+fi
+diff --git a/tests/qemu-iotests/039 b/tests/qemu-iotests/039
+index 0d4e963..95115e2 100755
+--- a/tests/qemu-iotests/039
++++ b/tests/qemu-iotests/039
+@@ -65,6 +65,7 @@ echo "== Creating a dirty image file =="
+ IMGOPTS="compat=1.1,lazy_refcounts=on"
+ _make_test_img $size
  
- # Silence output since it contains the disk image path and QEMU's readline
- # character echoing makes it very hard to filter the output. Plus, there
-diff --git a/tests/qemu-iotests/183 b/tests/qemu-iotests/183
-index fbe5a99..71feab8 100755
---- a/tests/qemu-iotests/183
-+++ b/tests/qemu-iotests/183
-@@ -94,8 +94,15 @@ if echo "$reply" | grep "compiled without old-style" > /dev/null; then
-     _notrun "migrate -b support not compiled in"
- fi
++VALGRIND_QEMU="" \
+ $QEMU_IO -c "write -P 0x5a 0 512" \
+          -c "sigraise $(kill -l KILL)" "$TEST_IMG" 2>&1 \
+     | _filter_qemu_io
+@@ -100,6 +101,7 @@ echo "== Opening a dirty image read/write should repair it =="
+ IMGOPTS="compat=1.1,lazy_refcounts=on"
+ _make_test_img $size
  
--QEMU_COMM_TIMEOUT=0.1 qemu_cmd_repeat=50 silent=yes \
-+timeout_comm=$QEMU_COMM_TIMEOUT
-+if [ "${VALGRIND_QEMU}" == "y" ]; then
-+    QEMU_COMM_TIMEOUT=1
-+else
-+    QEMU_COMM_TIMEOUT=0.1
-+fi
-+qemu_cmd_repeat=50 silent=yes \
-     _send_qemu_cmd $src "{ 'execute': 'query-migrate' }" '"status": "completed"'
-+QEMU_COMM_TIMEOUT=$timeout_comm
- _send_qemu_cmd $src "{ 'execute': 'query-status' }" "return"
++VALGRIND_QEMU="" \
+ $QEMU_IO -c "write -P 0x5a 0 512" \
+          -c "sigraise $(kill -l KILL)" "$TEST_IMG" 2>&1 \
+     | _filter_qemu_io
+@@ -118,6 +120,7 @@ echo "== Creating an image file with lazy_refcounts=off =="
+ IMGOPTS="compat=1.1,lazy_refcounts=off"
+ _make_test_img $size
  
++VALGRIND_QEMU="" \
+ $QEMU_IO -c "write -P 0x5a 0 512" \
+          -c "sigraise $(kill -l KILL)" "$TEST_IMG" 2>&1 \
+     | _filter_qemu_io
+@@ -151,6 +154,7 @@ echo "== Changing lazy_refcounts setting at runtime =="
+ IMGOPTS="compat=1.1,lazy_refcounts=off"
+ _make_test_img $size
+ 
++VALGRIND_QEMU="" \
+ $QEMU_IO -c "reopen -o lazy-refcounts=on" \
+          -c "write -P 0x5a 0 512" \
+          -c "sigraise $(kill -l KILL)" "$TEST_IMG" 2>&1 \
+@@ -163,6 +167,7 @@ _check_test_img
+ IMGOPTS="compat=1.1,lazy_refcounts=on"
+ _make_test_img $size
+ 
++VALGRIND_QEMU="" \
+ $QEMU_IO -c "reopen -o lazy-refcounts=off" \
+          -c "write -P 0x5a 0 512" \
+          -c "sigraise $(kill -l KILL)" "$TEST_IMG" 2>&1 \
+diff --git a/tests/qemu-iotests/061 b/tests/qemu-iotests/061
+index d7dbd7e..5d0724c 100755
+--- a/tests/qemu-iotests/061
++++ b/tests/qemu-iotests/061
+@@ -73,6 +73,7 @@ echo
+ echo "=== Testing dirty version downgrade ==="
  echo
-diff --git a/tests/qemu-iotests/192 b/tests/qemu-iotests/192
-index 6193257..11ea037 100755
---- a/tests/qemu-iotests/192
-+++ b/tests/qemu-iotests/192
-@@ -60,7 +60,11 @@ fi
- qemu_comm_method="monitor"
- _launch_qemu -drive $DRIVE_ARG -incoming defer
- h=$QEMU_HANDLE
--QEMU_COMM_TIMEOUT=1
-+if [ "${VALGRIND_QEMU}" == "y" ]; then
-+    QEMU_COMM_TIMEOUT=4
-+else
-+    QEMU_COMM_TIMEOUT=1
-+fi
+ IMGOPTS="compat=1.1,lazy_refcounts=on" _make_test_img 64M
++VALGRIND_QEMU="" \
+ $QEMU_IO -c "write -P 0x2a 0 128k" -c flush \
+          -c "sigraise $(kill -l KILL)" "$TEST_IMG" 2>&1 | _filter_qemu_io
+ $PYTHON qcow2.py "$TEST_IMG" dump-header
+@@ -107,6 +108,7 @@ echo
+ echo "=== Testing dirty lazy_refcounts=off ==="
+ echo
+ IMGOPTS="compat=1.1,lazy_refcounts=on" _make_test_img 64M
++VALGRIND_QEMU="" \
+ $QEMU_IO -c "write -P 0x2a 0 128k" -c flush \
+          -c "sigraise $(kill -l KILL)" "$TEST_IMG" 2>&1 | _filter_qemu_io
+ $PYTHON qcow2.py "$TEST_IMG" dump-header
+diff --git a/tests/qemu-iotests/137 b/tests/qemu-iotests/137
+index 0c3d2a1..a442fc8 100755
+--- a/tests/qemu-iotests/137
++++ b/tests/qemu-iotests/137
+@@ -130,6 +130,7 @@ echo
  
- _send_qemu_cmd $h "nbd_server_start unix:$TEST_DIR/nbd" "(qemu)"
- _send_qemu_cmd $h "nbd_server_add -w drive0" "(qemu)"
+ # Whether lazy-refcounts was actually enabled can easily be tested: Check if
+ # the dirty bit is set after a crash
++VALGRIND_QEMU="" \
+ $QEMU_IO \
+     -c "reopen -o lazy-refcounts=on,overlap-check=blubb" \
+     -c "write -P 0x5a 0 512" \
 -- 
 1.8.3.1
 
