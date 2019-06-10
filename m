@@ -2,91 +2,85 @@ Return-Path: <SRS0=Y1tr=UJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E1547C4321B
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 21:24:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3AE92C4321A
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 21:37:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B31BD2082E
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 21:24:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 091BF2089E
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 21:37:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="o02vdxRL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B31BD2082E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=extremeground.com header.i=@extremeground.com header.b="qMrHHnCs"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 091BF2089E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=extremeground.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49740 helo=lists.gnu.org)
+Received: from localhost ([::1]:49852 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1haRmD-0001e6-QC
-	for qemu-devel@archiver.kernel.org; Mon, 10 Jun 2019 17:24:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54913)
+	id 1haRyh-0008EB-2z
+	for qemu-devel@archiver.kernel.org; Mon, 10 Jun 2019 17:37:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59935)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <ali.mezgani@gmail.com>) id 1haPwr-00080v-EA
- for qemu-devel@nongnu.org; Mon, 10 Jun 2019 15:27:20 -0400
+ (envelope-from <gary@extremeground.com>) id 1haRrq-000401-JL
+ for qemu-devel@nongnu.org; Mon, 10 Jun 2019 17:30:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ali.mezgani@gmail.com>) id 1haPwq-0005J4-Bv
- for qemu-devel@nongnu.org; Mon, 10 Jun 2019 15:27:17 -0400
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:37970)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <ali.mezgani@gmail.com>)
- id 1haPwl-0005Dx-8j; Mon, 10 Jun 2019 15:27:12 -0400
-Received: by mail-wm1-x344.google.com with SMTP id s15so456953wmj.3;
- Mon, 10 Jun 2019 12:27:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=date:subject:message-id:references:from:to:cc:mime-version
- :content-transfer-encoding;
- bh=OfbsNFVwuZJcrP6HY83smkRTXaZ90KkPSNbUmAkVhYU=;
- b=o02vdxRLqV0x2TL0X9wjPfitgiU+GqQIAirNhHRAP0CpcCNvL0RpV/7ol1JVYOS+KI
- 6mKzjSzVgxPDAWuM6OmKfsKCt8/rdt1FaTFZwq7iSfeWkk1riI6wp2/4uoa1XcGqbfPj
- pBX9A3XH1coDj06At5RTQBqCGS1hoh+JyRzrlsz2SNjE/J75dW2kGtSPJTAoXZGyIkB/
- F9Z4I7XUWw5Gh8FD0/YB5T2P1I5E4JVWvDTYCoKJoXlCZFvuMOWmFi8DfFuXH+2bpuTt
- 0r4qZOpja0WXmhIXMrNRXDZ4P3yobvLI5o70y2MNoOS/8rF3UNoluVnN+lU0oslsoKp0
- sREA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:subject:message-id:references:from:to:cc
- :mime-version:content-transfer-encoding;
- bh=OfbsNFVwuZJcrP6HY83smkRTXaZ90KkPSNbUmAkVhYU=;
- b=VAUB2kUUppwIw4SYlVQDcVxt9UD/WzaTE6F8fLESMDMJ5ZtvbtRc6QEXjhPN579s5Q
- l96ZdJO95bMZkLMAOGkBq5oM7281Uce2EL3rpIipEbCdFrOwy5IELwbOUI+7y5aLVYVL
- FqS8LWFoVTVlcwov8cIyMB09VZlE5v9N0Os7KirRUAU6U8z42ChFZOF/6FHTSdF5ZlMz
- KjETrdTnYT+nb/Yrs/21Ac6KzAyHHOKQjoZa2kHWYkj13FKIrL8Xj4aw/MIyS67pz9iY
- OUCeLHA7ejVKD2rgeNtZOQp7nKddQiZYGScnj2SuTLDfNhdVhUkJlGfjdkcCOXNcTmfM
- DW+g==
-X-Gm-Message-State: APjAAAXSmbH6Y7M1FctkqS3lU5IEM681+ANxLJJHvrztkXxHQmTz2oFd
- 2VF00ntm7QsiorMWXWbQfmU=
-X-Google-Smtp-Source: APXvYqx7T22ARwou+/g2DEP9+q6Qz0p5SkDXHqyEvLGWpW6k0m88TXN6E6YHnGlowTnYsU6EpJJdCQ==
-X-Received: by 2002:a1c:c915:: with SMTP id f21mr13625368wmb.123.1560194828485; 
- Mon, 10 Jun 2019 12:27:08 -0700 (PDT)
-Received: from [192.168.1.220] ([41.250.232.80])
- by smtp.gmail.com with ESMTPSA id 88sm19573484wrl.68.2019.06.10.12.27.03
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Mon, 10 Jun 2019 12:27:07 -0700 (PDT)
-Date: Mon, 10 Jun 2019 20:27:01 +0100
-X-Priority: 3
-Message-ID: <-2xywm9-ifb5yxlyz8y68ukj0nxy24qv-dgwbua-uu49fa-7xmm95-lpocej7h67y1tkkit4-31nus5-2bayju4z2jwk-kie60g-zanq099a87cdol5jfg-f5bb5a-yxekc0-x2g2ruj2xqm3-y3jyo2-un0xhw.1560194821347@email.android.com>
-References: <20190606174609.20487-1-peter.maydell@linaro.org>
- <20190606174609.20487-29-peter.maydell@linaro.org>
- <da80c3ea-5a33-e7e0-209e-89a8413c8f06@linaro.org>
- <CAFEAcA8etr7_rmQsQcUY+cPHZEZna-An+r5TPJtMb4OQO-6Dsg@mail.gmail.com>
- <b9ac8354-6bb2-0080-f597-706b4b94009d@linaro.org>
-From: Ali Mezgani <ali.mezgani@gmail.com>
-To: Richard Henderson <richard.henderson@linaro.org>, Peter Maydell
- <peter.maydell@linaro.org>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::344
-X-Mailman-Approved-At: Mon, 10 Jun 2019 17:22:15 -0400
+ (envelope-from <gary@extremeground.com>) id 1haRpN-0007w9-AH
+ for qemu-devel@nongnu.org; Mon, 10 Jun 2019 17:27:43 -0400
+Received: from ahs5.r4l.com ([158.69.52.156]:53543)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <gary@extremeground.com>)
+ id 1haRpN-0007ve-3a
+ for qemu-devel@nongnu.org; Mon, 10 Jun 2019 17:27:41 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ d=extremeground.com; s=default; h=Content-Transfer-Encoding:Content-Type:
+ In-Reply-To:MIME-Version:Date:Message-ID:References:Cc:To:From:Subject:Sender
+ :Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+ Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+ List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+ bh=RZLN8hvskw7GjJRITfE7JT0hQDXiRFi6ecst0r9g1Pg=; b=qMrHHnCsAOJCJ5jzLm6VozMt0J
+ Ds4VkiUsXEajYbHugYRtM+x1+i7m9zulBNO74TFw5RPN7FwQ9Q16QiRBCkquy4iKxL5Zj567Caayk
+ KK2EGlvppYUs4GdiRM8bBQXbMtQdD4ztgoKZctQPD36wIsWl82GaGyvXI53Pifgl2tBVb8aJ+u/fH
+ 367n14lru1MPXYhgBJYCvpXiOiyAsJCJLZ9yKopZxXTE3Ca3+iIj74yy+Ap5MVwFhdm4zMlD/xOCh
+ uRxCHmJOgKOwHns1uxC5Td6noN4k9mhocxC7m1CSQQbPdQHrvuxZ7RVl9X+0RFkW+FZQ+Fq6+Kqlz
+ cAS8MAoQ==;
+Received: from cpeac202ed5e073-cmac202ed5e070.cpe.net.cable.rogers.com
+ ([99.237.87.227]:59718 helo=[192.168.1.20])
+ by ahs5.r4l.com with esmtpsa (TLSv1.2:ECDHE-RSA-AES128-GCM-SHA256:128)
+ (Exim 4.92) (envelope-from <gary@extremeground.com>)
+ id 1haRpM-0003iz-FY; Mon, 10 Jun 2019 17:27:40 -0400
+From: Gary Dale <gary@extremeground.com>
+To: Stefan Hajnoczi <stefanha@gmail.com>
+References: <abb7990e-0331-67a4-af92-05276366478c@extremeground.com>
+ <20190610121941.GI14257@stefanha-x1.localdomain>
+ <dc7a70ea-c94f-e975-df44-b0199da698e2@extremeground.com>
+Message-ID: <ab3e81c2-f0ce-2ef5-bbe7-948a87463b59@extremeground.com>
+Date: Mon, 10 Jun 2019 17:27:39 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-X-Content-Filtered-By: Mailman/MimeDel 2.1.23
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 28/42] target/arm: Convert VMOV
- (imm) to decodetree
+In-Reply-To: <dc7a70ea-c94f-e975-df44-b0199da698e2@extremeground.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-CA
+X-AntiAbuse: This header was added to track abuse,
+ please include it with any abuse report
+X-AntiAbuse: Primary Hostname - ahs5.r4l.com
+X-AntiAbuse: Original Domain - nongnu.org
+X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
+X-AntiAbuse: Sender Address Domain - extremeground.com
+X-Get-Message-Sender-Via: ahs5.r4l.com: authenticated_id:
+ gary@extremeground.com
+X-Authenticated-Sender: ahs5.r4l.com: gary@extremeground.com
+X-Source: 
+X-Source-Args: 
+X-Source-Dir: 
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 158.69.52.156
+Subject: Re: [Qemu-devel] kvm / virsh snapshot management
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,8 +92,200 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>,
+ qemu-devel@nongnu.org, kvm@vger.kernel.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
+
+On 2019-06-10 11:54 a.m., Gary Dale wrote:
+> On 2019-06-10 8:19 a.m., Stefan Hajnoczi wrote:
+>> On Sat, Jun 01, 2019 at 08:12:01PM -0400, Gary Dale wrote:
+>>> A while back I converted a raw disk image to qcow2 to be able to use
+>>> snapshots. However I realize that I may not really understand 
+>>> exactly how
+>>> snapshots work. In this particular case, I'm only talking about 
+>>> internal
+>>> snapshots currently as there seems to be some differences of opinion 
+>>> as to
+>>> whether internal or external are safer/more reliable. I'm also only 
+>>> talking
+>>> about shutdown state snapshots, so it should just be the disk that is
+>>> snapshotted.
+>>>
+>>> As I understand it, the first snapshot freezes the base image and 
+>>> subsequent
+>>> changes in the virtual machine's disk are stored elsewhere in the 
+>>> qcow2 file
+>>> (remember, only internal snapshots). If I take a second snapshot, that
+>>> freezes the first one, and subsequent changes are now in third 
+>>> location.
+>>> Each new snapshot is incremental to the one that preceded it rather 
+>>> than
+>>> differential to the base image. Each new snapshot is a child of the 
+>>> previous
+>>> one.
+>> Internal snapshots are not incremental or differential at the qcow2
+>> level, they are simply a separate L1/L2 table pointing to data clusters.
+>> In other words, they are an independent set of metadata showing the full
+>> state of the image at the point of the snapshot.  qcow2 does not track
+>> relationships between snapshots and parents/children.
+> Which sounds to me like they are incremental. Each snapshot starts a 
+> new L1/L2 table so that the state of the previous one is preserved.
+>>
+>>> One explanation I've seen of the process is if I delete a snapshot, the
+>>> changes it contains are merged with its immediate child.
+>> Nope.  Deleting a snapshot decrements the reference count on all its
+>> data clusters.  If a data cluster's reference count reaches zero it will
+>> be freed.  That's all, there is no additional data movement or
+>> reorganization aside from this.
+> Perhaps not physically but logically it would appear that the data 
+> clusters were merged.
+>>
+>>> So if I deleted the
+>>> first snapshot, the base image stays the same but any data that has 
+>>> changed
+>>> since the base image is now in the second snapshot's location. The 
+>>> merge
+>>> with children explanation also implies that the base image is never 
+>>> touched
+>>> even if the first snapshot is deleted.
+>>>
+>>> But if I delete a snapshot that has no children, is that essentially 
+>>> the
+>>> same as reverting to the point that snapshot was created and all 
+>>> subsequent
+>>> disk changes are lost? Or does it merge down to the parent snapshot? 
+>>> If I
+>>> delete all snapshots, would that revert to the base image?
+>> No.  qcow2 has the concept of the current disk state of the running VM -
+>> what you get when you boot the guest - and the snapshots - they are
+>> read-only.
+>>
+>> When you delete snapshots the current disk state (running VM) is
+>> unaffected.
+>>
+>> When you apply a snapshot this throws away the current disk state and
+>> uses the snapshot as the new current disk state.  The read-only snapshot
+>> itself is not modified in any way and you can apply the same snapshot
+>> again as many times as you wish later.
+> So in essence the current state is a pointer to the latest data 
+> cluster, which is the only data cluster that can be modified.
+>>
+>>> I've seen it explained that a snapshot is very much like a timestamp so
+>>> deleting a timestamp removes the dividing line between writes that 
+>>> occurred
+>>> before and after that time, so that data is really only removed if I 
+>>> revert
+>>> to some time stamp - all writes after that point are discarded. In this
+>>> explanation, deleting the oldest timestamp is essentially updating 
+>>> the base
+>>> image. Deleting all snapshots would leave me with the base image fully
+>>> updated.
+>>>
+>>> Frankly, the second explanation sounds more reasonable to me, 
+>>> without having
+>>> to figure out how copy-on-write works,  But I'm dealing with 
+>>> important data
+>>> here and I don't want to mess it up by mishandling the snapshots.
+>>>
+>>> Can some provide a little clarity on this? Thanks!
+>> If you want an analogy then git(1) is a pretty good one.  qcow2 internal
+>> snapshots are like git tags.  Unlike branches, tags are immutable.  In
+>> qcow2 you only have a master branch (the current disk state) from which
+>> you can create a new tag or you can use git-checkout(1) to apply a
+>> snapshot (discarding whatever your current disk state is).
+>>
+>> Stefan
+>
+> That's just making things less clear - I've never tried to understand 
+> git either. Thanks for the attempt though.
+>
+> If I've gotten things correct, once the base image is established, 
+> there is a current disk state that points to a table containing all 
+> the writes since the base image. Creating a snapshot essentially takes 
+> that pointer and gives it the snapshot name, while creating a new 
+> current disk state pointer and data table where subsequent writes are 
+> recorded.
+>
+> Deleting snapshots removes your ability to refer to a data table by 
+> name, but the table itself still exists anonymously as part of a chain 
+> of data tables between the base image and the current state.
+>
+> This leaves a problem. The chain will very quickly get quite long 
+> which will impact performance. To combat this, you can use blockcommit 
+> to merge a child with its parent or blockpull to merge a parent with 
+> its child.
+>
+> In my situation, I want to keep a week of daily snapshots in case 
+> something goes horribly wrong with the VM (I recently had a database 
+> file become corrupt, and reverting to the previous working day's image 
+> would have been a quick and easy solution, faster than recovering all 
+> the data tables from the prefious day). I've been shutting down the 
+> VM, deleting the oldest snapshot and creating a new one before 
+> restarting the VM.
+>
+> While your explanation confirms that this is safe, it also implies 
+> that I need to manage the data table chains. My first instinct is to 
+> use blockcommit before deleting the oldest snapshot, such as:
+>
+>     virsh blockcommit <vm name> <qcow2 file path> --top <oldest 
+> snapshot> --delete --wait
+>     virsh snapshot-delete  --domain <vm name> --snapshotname <oldest 
+> snapshot>
+>
+> so that the base image contains the state as of one week earlier and 
+> the snapshot chains are limited to 7 links.
+>
+> 1) does this sound reasonable?
+>
+> 2) I note that the syntax in virsh man page is different from the 
+> syntax at 
+> https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html/virtualization_deployment_and_administration_guide/sect-backing-chain 
+> (RedHat uses --top and --base while the man page just has optional 
+> base and top names). I believe the RedHat guide is correct because the 
+> man page doesn't allow distinguishing between the base and the top for 
+> a commit.
+>
+> However the need for specifying the path isn't obvious to me. Isn't 
+> the path contained in the VM definition?
+>
+> Since blockcommit would make it impossible for me to revert to an 
+> earlier state (because I'm committing the oldest snapshot, if it 
+> screws up, I can't undo within virsh), I need to make sure this 
+> command is correct.
+>
+Trying this against a test VM, I ran into a roadblock. My command line 
+and the results are:
+
+# virsh blockcommit stretch "/home/secure/virtual/stretch.qcow2" --top 
+stretchS3 --delete --wait
+error: unsupported flags (0x2) in function qemuDomainBlockCommit
+
+I get the same thing when the path to the qcow2 file isn't quoted.
+
+I noted in 
+https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/6/html/virtualization_administration_guide/sub-sect-domain_commands-using_blockcommit_to_shorten_a_backing_chain 
+that the options use a single "-". However the results for that were:
+# virsh blockcommit stretch /home/secure/virtual/stretch.qcow2 -top 
+stretchS3 -delete -wait
+error: Scaled numeric value '-top' for <--bandwidth> option is malformed 
+or out of range
+
+which looks like virsh doesn't like the single dashes and is trying to 
+interpret them as positional options.
+
+I also did a
+
+# virsh domblklist stretch
+Target     Source
+------------------------------------------------
+vda        /home/secure/virtual/stretch.qcow2
+hda        -
+
+and tried using vda instead of the full path in the blockcommit but got 
+the same error.
+
+Any ideas on what I'm doing wrong?
+
 
