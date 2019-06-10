@@ -7,78 +7,79 @@ X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 632B5C282DD
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 11:19:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BB7EC282DD
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 11:22:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 31A07207E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 11:19:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8CAB5206BB
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 11:22:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="r0cLEwzG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 31A07207E0
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ge8VqP9E"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8CAB5206BB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44544 helo=lists.gnu.org)
+Received: from localhost ([::1]:44566 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1haIKn-0001OI-Dp
-	for qemu-devel@archiver.kernel.org; Mon, 10 Jun 2019 07:19:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43084)
+	id 1haINM-00045e-Ha
+	for qemu-devel@archiver.kernel.org; Mon, 10 Jun 2019 07:22:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43034)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <paolo.bonzini@gmail.com>) id 1haIGf-00078b-CP
- for qemu-devel@nongnu.org; Mon, 10 Jun 2019 07:15:14 -0400
+ (envelope-from <paolo.bonzini@gmail.com>) id 1haIGa-00071t-OT
+ for qemu-devel@nongnu.org; Mon, 10 Jun 2019 07:15:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1haIGe-0000Zu-43
- for qemu-devel@nongnu.org; Mon, 10 Jun 2019 07:15:13 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:37396)
+ (envelope-from <paolo.bonzini@gmail.com>) id 1haIGZ-0000R5-JO
+ for qemu-devel@nongnu.org; Mon, 10 Jun 2019 07:15:08 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:35097)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1haIGd-0000YJ-Sz
- for qemu-devel@nongnu.org; Mon, 10 Jun 2019 07:15:12 -0400
-Received: by mail-wr1-x441.google.com with SMTP id v14so8744140wrr.4
- for <qemu-devel@nongnu.org>; Mon, 10 Jun 2019 04:15:11 -0700 (PDT)
+ id 1haIGZ-0000Q7-CR
+ for qemu-devel@nongnu.org; Mon, 10 Jun 2019 07:15:07 -0400
+Received: by mail-wr1-x443.google.com with SMTP id m3so8771252wrv.2
+ for <qemu-devel@nongnu.org>; Mon, 10 Jun 2019 04:15:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:subject:date:message-id:in-reply-to:references;
- bh=3rDTeC3Zw+Hw1sj7S+oSbSBKIxPHg3b0TKg/3EFDzXo=;
- b=r0cLEwzGba/WaEp6d0gFnLMaeVU60yjeIM61HpLGWV8O5b3QcLdXbmnC3aSm9Zsrdl
- VGDXS7h8lfwIo/MuSKFPbOeb1wYaLVF69LGlWKY+2KtmltJLBYXfl8XnCS15ti61qy4j
- 25An/RU72JAU08Pg87uwDT/RZ7JzhgIWWLWSRG5AcqUoDruZGsjMDIGyqc6yc7yX7+on
- WOc9LtD3Xr3eoH/5Gmw1vAdhLd5I3aFpCpnYIT/10/04k4YPBhj5G1rg0HeOT5QWxTcX
- cydJk5unBb/Sw+gVV2WDetlLUkj/tqLbePm1Y3o23ohEtht9OY7er4Ml89Xuxd8OWabr
- gQ7Q==
+ bh=1omRPDRi7iCVPq5GB5WX2fT+eVVyp3BW8K0GbfnTaX8=;
+ b=Ge8VqP9EoqailoiM5YlJbaNRMZz5BSRZMEK3HU0RJIdeplbQVbbvxMr3fYHG0a+/ZK
+ uBvLk06WNFu6Pmd86zL7SzMmeoFdlh9syLFUuZCZH9/C6DVet2NU1tfu6/bnY/88OMQz
+ jTFQ1PYZzg9PWdn+mYpYJ8ca6BUtg5ho3oU0YiJDVk65AL4zu6FfmZbJuq/3kac6K8Wh
+ S1zIesIFjhvp1vF68mPZHrlAT2WCGRqc5KYAjmooahKj2nKcVpD1syMIVJvefvLlrWW4
+ PRpTQ6u7bDVEtvrkEh9DtmTq88yt00Mav2MgnSiiKwDEvRQLCZ/ZGTOQ7bhFEwnzi5U6
+ nU6w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:subject:date:message-id
  :in-reply-to:references;
- bh=3rDTeC3Zw+Hw1sj7S+oSbSBKIxPHg3b0TKg/3EFDzXo=;
- b=EC1x9kRtbTh36B9l9hM+cAfsYkzU57MR7q0/f/jRaUVZQkWcki8LmUajVXiXGAJ2RN
- UF2KdFQiqpKjxuywEwLDaHb5kZDGM4aM+PwhIOG8xXuOs1UkNe4arIxDjdGLyTenoy9d
- PLpUQWoddG4FwNGudn4+JX7rzS83J/24gwicHyhbzxbw7gdOQsm+lXvf483/LKok+eHS
- Yb+Tl9/fU3BqxlXWP6BaaNqAG/6On/P/3mKKX8AS5jkflTiCo2NEwaoqn4aQwLhH2uKJ
- /5WDn+SQCrJLubMKx9tCaQP7dYbIPAMHmvaqiK65Y5eLoAfcdRwfZMNdDlcaqbrJRrKI
- 3IbA==
-X-Gm-Message-State: APjAAAUKeCxoKX047W2Y1hH2qEU6qDW2qN1gA6HV3ypUud8LmqkRQI3y
- HMmaHnaKKJzWVj8lZR5gM+Ht+OE/
-X-Google-Smtp-Source: APXvYqyX9e+xCRLViUCy/AIvH+iQQBxMG1iUQIPkEDNUR/H1qmPcJ/Xn7YN4H0B9s7+wmJLdeRy90g==
-X-Received: by 2002:adf:e485:: with SMTP id i5mr8912317wrm.75.1560165310664;
- Mon, 10 Jun 2019 04:15:10 -0700 (PDT)
+ bh=1omRPDRi7iCVPq5GB5WX2fT+eVVyp3BW8K0GbfnTaX8=;
+ b=XV31UPpX24yLXuy4umfZC1/OXNzmU2cB19+Q718pL0iSO36AWBy395hunKodLu3CrZ
+ tEJ/gAjP7i/0prullxxM8kD7L4cOZVfmtP0MaYCVU3G702R2xU3kmpufQYUexvbZUd1b
+ 40oN/Dp4ozvCWvUDfDIVonuf8f8cFxR6oBH6i5uMwFE7FvyF1DRRzqGSwAwSKFHWBhwA
+ J5xaOVkuPTosDEE/UhBIH7phAcMKGSh+mpikacVSM8dPAY9a6smpfgwWYVTFmG3FtA0S
+ p7Q9koJZdKEJRLvAOsU+AjVDBsQnHrOQZjZhpk40imQpFmEu/snOUltItxjiHbfOKcDl
+ EXxw==
+X-Gm-Message-State: APjAAAXqgajKHz4AWdEWyezujc+r6/0VPFrnPCYETp/WtSOyJWgW35S/
+ bXnavsY7a8aXZoKQGHBiUi55y70D
+X-Google-Smtp-Source: APXvYqypX8uI75F1/mPNi8c5XmVKBIe/R9Jzl3n4Co8pwLMRSgt3ur0lKl66TOp7WY9/aadigcmang==
+X-Received: by 2002:a5d:51cb:: with SMTP id n11mr5149562wrv.143.1560165305921; 
+ Mon, 10 Jun 2019 04:15:05 -0700 (PDT)
 Received: from 640k.lan ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id u13sm11934414wrq.62.2019.06.10.04.15.09
+ by smtp.gmail.com with ESMTPSA id u13sm11934414wrq.62.2019.06.10.04.15.04
  for <qemu-devel@nongnu.org>
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Mon, 10 Jun 2019 04:15:09 -0700 (PDT)
+ Mon, 10 Jun 2019 04:15:05 -0700 (PDT)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Mon, 10 Jun 2019 13:15:00 +0200
-Message-Id: <1560165301-39026-7-git-send-email-pbonzini@redhat.com>
+Date: Mon, 10 Jun 2019 13:14:55 +0200
+Message-Id: <1560165301-39026-2-git-send-email-pbonzini@redhat.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1560165301-39026-1-git-send-email-pbonzini@redhat.com>
 References: <1560165301-39026-1-git-send-email-pbonzini@redhat.com>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::441
-Subject: [Qemu-devel] [PATCH 6/7] vhost-user-scsi: convert to Meson
+X-Received-From: 2a00:1450:4864:20::443
+Subject: [Qemu-devel] [PATCH 1/7] configure: do not include $(...) variables
+ in config-host.mak
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,99 +95,104 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The libiscsi pkg-config information is extracted from config-host.mak and
-used to link vhost-user-blk.
+This ensures that Meson will be able to reuse the results of
+the tests that are performed in the configure script.
 
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- .gitignore                            | 2 +-
- Makefile                              | 3 ---
- Makefile.objs                         | 3 ---
- contrib/vhost-user-scsi/Makefile.objs | 1 -
- contrib/vhost-user-scsi/meson.build   | 3 +++
- meson.build                           | 3 +++
- 6 files changed, 7 insertions(+), 8 deletions(-)
- delete mode 100644 contrib/vhost-user-scsi/Makefile.objs
- create mode 100644 contrib/vhost-user-scsi/meson.build
+ configure | 32 ++++++++++++++++----------------
+ 1 file changed, 16 insertions(+), 16 deletions(-)
 
-diff --git a/.gitignore b/.gitignore
-index 20637a1..3934eff 100644
---- a/.gitignore
-+++ b/.gitignore
-@@ -63,7 +63,7 @@
- /qemu-version.h.tmp
- /module_block.h
- /scsi/qemu-pr-helper
--/vhost-user-scsi
-+/contrib/vhost-user-scsi/vhost-user-scsi
- /contrib/vhost-user-blk/vhost-user-blk
- /fsdev/virtfs-proxy-helper
- *.tmp
-diff --git a/Makefile b/Makefile
-index da290fa..bff097c 100644
---- a/Makefile
-+++ b/Makefile
-@@ -426,7 +426,6 @@ dummy := $(call unnest-vars,, \
-                 ivshmem-client-obj-y \
-                 ivshmem-server-obj-y \
-                 rdmacm-mux-obj-y \
--                vhost-user-scsi-obj-y \
-                 vhost-user-input-obj-y \
-                 vhost-user-gpu-obj-y \
-                 qga-vss-dll-obj-y \
-@@ -629,8 +628,6 @@ ivshmem-client$(EXESUF): $(ivshmem-client-obj-y) $(COMMON_LDADDS)
- ivshmem-server$(EXESUF): $(ivshmem-server-obj-y) $(COMMON_LDADDS)
- 	$(call LINK, $^)
- endif
--vhost-user-scsi$(EXESUF): $(vhost-user-scsi-obj-y) contrib/libvhost-user/libvhost-user.a
--	$(call LINK, $^)
+diff --git a/configure b/configure
+index 6cdcfb2..203dece 100755
+--- a/configure
++++ b/configure
+@@ -597,7 +597,7 @@ QEMU_CFLAGS="-fno-strict-aliasing -fno-common -fwrapv -std=gnu99 $QEMU_CFLAGS"
+ QEMU_CFLAGS="-Wall -Wundef -Wwrite-strings -Wmissing-prototypes $QEMU_CFLAGS"
+ QEMU_CFLAGS="-Wstrict-prototypes -Wredundant-decls $QEMU_CFLAGS"
+ QEMU_CFLAGS="-D_GNU_SOURCE -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE $QEMU_CFLAGS"
+-QEMU_INCLUDES="-iquote . -iquote \$(SRC_PATH) -iquote \$(SRC_PATH)/accel/tcg -iquote \$(SRC_PATH)/include"
++QEMU_INCLUDES="-iquote . -iquote ${source_path} -iquote ${source_path}/accel/tcg -iquote ${source_path}/include"
+ if test "$debug_info" = "yes"; then
+     CFLAGS="-g $CFLAGS"
+     LDFLAGS="-g $LDFLAGS"
+@@ -896,7 +896,7 @@ Linux)
+   linux="yes"
+   linux_user="yes"
+   kvm="yes"
+-  QEMU_INCLUDES="-I\$(SRC_PATH)/linux-headers -I$PWD/linux-headers $QEMU_INCLUDES"
++  QEMU_INCLUDES="-I${source_path}/linux-headers -I$PWD/linux-headers $QEMU_INCLUDES"
+   supported_os="yes"
+   libudev="yes"
+ ;;
+@@ -4090,8 +4090,8 @@ EOF
+               symlink "$source_path/dtc/Makefile" "dtc/Makefile"
+               symlink "$source_path/dtc/scripts" "dtc/scripts"
+           fi
+-          fdt_cflags="-I\$(SRC_PATH)/dtc/libfdt"
+-          fdt_ldflags="-L\$(BUILD_DIR)/dtc/libfdt"
++          fdt_cflags="-I${source_path}/dtc/libfdt"
++          fdt_ldflags="-L$PWD/dtc/libfdt"
+           fdt_libs="$fdt_libs"
+       elif test "$fdt" = "yes" ; then
+           # Not a git build & no libfdt found, prompt for system install
+@@ -5040,13 +5040,13 @@ case "$capstone" in
+       git_submodules="${git_submodules} capstone"
+     fi
+     mkdir -p capstone
+-    QEMU_CFLAGS="$QEMU_CFLAGS -I\$(SRC_PATH)/capstone/include"
++    QEMU_CFLAGS="$QEMU_CFLAGS -I${source_path}/capstone/include"
+     if test "$mingw32" = "yes"; then
+       LIBCAPSTONE=capstone.lib
+     else
+       LIBCAPSTONE=libcapstone.a
+     fi
+-    LIBS="-L\$(BUILD_DIR)/capstone -lcapstone $LIBS"
++    LIBS="-L$PWD/capstone -lcapstone $LIBS"
+     ;;
  
- rdmacm-mux$(EXESUF): LIBS += "-libumad"
- rdmacm-mux$(EXESUF): $(rdmacm-mux-obj-y) $(COMMON_LDADDS)
-diff --git a/Makefile.objs b/Makefile.objs
-index 644e2bd..adf2f92 100644
---- a/Makefile.objs
-+++ b/Makefile.objs
-@@ -116,9 +116,6 @@ qga-vss-dll-obj-y = qga/
- elf2dmp-obj-y = contrib/elf2dmp/
- ivshmem-client-obj-$(CONFIG_IVSHMEM) = contrib/ivshmem-client/
- ivshmem-server-obj-$(CONFIG_IVSHMEM) = contrib/ivshmem-server/
--vhost-user-scsi.o-cflags := $(LIBISCSI_CFLAGS)
--vhost-user-scsi.o-libs := $(LIBISCSI_LIBS)
--vhost-user-scsi-obj-y = contrib/vhost-user-scsi/
- rdmacm-mux-obj-y = contrib/rdmacm-mux/
- vhost-user-input-obj-y = contrib/vhost-user-input/
- vhost-user-gpu-obj-y = contrib/vhost-user-gpu/
-diff --git a/contrib/vhost-user-scsi/Makefile.objs b/contrib/vhost-user-scsi/Makefile.objs
-deleted file mode 100644
-index e83a38a..0000000
---- a/contrib/vhost-user-scsi/Makefile.objs
-+++ /dev/null
-@@ -1 +0,0 @@
--vhost-user-scsi-obj-y = vhost-user-scsi.o
-diff --git a/contrib/vhost-user-scsi/meson.build b/contrib/vhost-user-scsi/meson.build
-new file mode 100644
-index 0000000..b80398c
---- /dev/null
-+++ b/contrib/vhost-user-scsi/meson.build
-@@ -0,0 +1,3 @@
-+executable('vhost-user-scsi', files('vhost-user-scsi.c'),
-+           link_with: libvhost_user,
-+           dependencies: [glib, libiscsi])
-diff --git a/meson.build b/meson.build
-index c4cad8f..bc7fbea 100644
---- a/meson.build
-+++ b/meson.build
-@@ -10,6 +10,9 @@ add_project_arguments(config_host['QEMU_INCLUDES'].split(),
+   system)
+@@ -5951,8 +5951,8 @@ case "$slirp" in
+       git_submodules="${git_submodules} slirp"
+     fi
+     mkdir -p slirp
+-    slirp_cflags="-I\$(SRC_PATH)/slirp/src -I\$(BUILD_DIR)/slirp/src"
+-    slirp_libs="-L\$(BUILD_DIR)/slirp -lslirp"
++    slirp_cflags="-I${source_path}/slirp/src -I$PWD/slirp/src"
++    slirp_libs="-L$PWD/slirp -lslirp"
+     ;;
  
- glib = declare_dependency(compile_args: config_host['GLIB_CFLAGS'].split(),
-                           link_args: config_host['GLIB_LIBS'].split())
-+libiscsi = declare_dependency(compile_args: config_host['LIBISCSI_CFLAGS'].split(),
-+                          link_args: config_host['LIBISCSI_LIBS'].split())
+   system)
+@@ -7307,21 +7307,21 @@ if test "$sheepdog" = "yes" ; then
+ fi
  
- subdir('contrib/libvhost-user')
- subdir('contrib/vhost-user-blk')
-+subdir('contrib/vhost-user-scsi')
+ if test "$tcg_interpreter" = "yes"; then
+-  QEMU_INCLUDES="-iquote \$(SRC_PATH)/tcg/tci $QEMU_INCLUDES"
++  QEMU_INCLUDES="-iquote ${source_path}/tcg/tci $QEMU_INCLUDES"
+ elif test "$ARCH" = "sparc64" ; then
+-  QEMU_INCLUDES="-iquote \$(SRC_PATH)/tcg/sparc $QEMU_INCLUDES"
++  QEMU_INCLUDES="-iquote ${source_path}/tcg/sparc $QEMU_INCLUDES"
+ elif test "$ARCH" = "s390x" ; then
+-  QEMU_INCLUDES="-iquote \$(SRC_PATH)/tcg/s390 $QEMU_INCLUDES"
++  QEMU_INCLUDES="-iquote ${source_path}/tcg/s390 $QEMU_INCLUDES"
+ elif test "$ARCH" = "x86_64" || test "$ARCH" = "x32" ; then
+-  QEMU_INCLUDES="-iquote \$(SRC_PATH)/tcg/i386 $QEMU_INCLUDES"
++  QEMU_INCLUDES="-iquote ${source_path}/tcg/i386 $QEMU_INCLUDES"
+ elif test "$ARCH" = "ppc64" ; then
+-  QEMU_INCLUDES="-iquote \$(SRC_PATH)/tcg/ppc $QEMU_INCLUDES"
++  QEMU_INCLUDES="-iquote ${source_path}/tcg/ppc $QEMU_INCLUDES"
+ elif test "$ARCH" = "riscv32" || test "$ARCH" = "riscv64" ; then
+-  QEMU_INCLUDES="-I\$(SRC_PATH)/tcg/riscv $QEMU_INCLUDES"
++  QEMU_INCLUDES="-I${source_path}/tcg/riscv $QEMU_INCLUDES"
+ else
+-  QEMU_INCLUDES="-iquote \$(SRC_PATH)/tcg/\$(ARCH) $QEMU_INCLUDES"
++  QEMU_INCLUDES="-iquote ${source_path}/tcg/\$(ARCH) $QEMU_INCLUDES"
+ fi
+-QEMU_INCLUDES="-iquote \$(SRC_PATH)/tcg $QEMU_INCLUDES"
++QEMU_INCLUDES="-iquote ${source_path}/tcg $QEMU_INCLUDES"
+ 
+ echo "TOOLS=$tools" >> $config_host_mak
+ echo "ROMS=$roms" >> $config_host_mak
 -- 
 1.8.3.1
 
