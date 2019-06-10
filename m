@@ -2,95 +2,62 @@ Return-Path: <SRS0=Y1tr=UJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	T_HK_NAME_DR autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 91F53C43218
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 18:44:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 38624C4321A
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 18:48:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6100420820
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 18:44:21 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="N0jJM/Zh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6100420820
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 15AC920820
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 18:48:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 15AC920820
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48900 helo=lists.gnu.org)
+Received: from localhost ([::1]:48942 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1haPHF-0006qi-Mu
-	for qemu-devel@archiver.kernel.org; Mon, 10 Jun 2019 14:44:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43658)
+	id 1haPLV-0001TH-66
+	for qemu-devel@archiver.kernel.org; Mon, 10 Jun 2019 14:48:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44671)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <richard.henderson@linaro.org>) id 1haPFz-0005zs-Iu
- for qemu-devel@nongnu.org; Mon, 10 Jun 2019 14:43:00 -0400
+ (envelope-from <dgilbert@redhat.com>) id 1haPHI-0007Lo-F0
+ for qemu-devel@nongnu.org; Mon, 10 Jun 2019 14:44:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1haPDF-0007QF-74
- for qemu-devel@nongnu.org; Mon, 10 Jun 2019 14:40:10 -0400
-Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:34865)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1haPDE-0007OG-VA
- for qemu-devel@nongnu.org; Mon, 10 Jun 2019 14:40:09 -0400
-Received: by mail-pg1-x541.google.com with SMTP id s27so5498204pgl.2
- for <qemu-devel@nongnu.org>; Mon, 10 Jun 2019 11:40:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=x302XDK82B+4hwZDzLu0wtz7XgG5rL/XX5wh3BskLBE=;
- b=N0jJM/ZhJa1HfvzKP7dCdi0dvU2KpfHPznfVGt1L3AViJCOLtbUkFTHhTo78o51JQ/
- 0C3W+J4mha+2EGJUNdwyfZvC98C2yE7et/lYMh9NLEqys9iziSdrbzhkmlpsxvfPetSd
- vIiC3i8WwomthpIElvBQymEDiJxmoZndAdcDeEUGCU1KsyX/lwA5dceDPgUUX46j7yY3
- mhdKFK4P9r0LOfVRj9sFLcGVhab0lClhRozjQYHK8B2TpsMcbNK69LSvzuKZ1WthO1sK
- 2Rpp0mIQigQx6Lj8d7O+cN4JTh/UnaI0NwHkp3qgiwNUDGfel2fT2lMvRBIclQY4ea/5
- xELQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=x302XDK82B+4hwZDzLu0wtz7XgG5rL/XX5wh3BskLBE=;
- b=jbC7oHtKqyHq06X5iDfZBNBqsHV+i0E6Xye3rP60pkOwnQ/pvm5S9jpGbPPq3peLW/
- 6o4EnhG7ahKlOfflX1Am6RS2F0PHEZAs2o7HT7vFbifqMdd8b8/rlR1dLXh7RxoXtPw0
- 11anawsagzq17YW+fiM2jzhwIvk/8Dd4+9HrZzwruo6NJLksmpXY23qUuoOx8s2nt8rD
- CmLZ5aolG1luwcwLl3SuOu2xDx9F331kSqIIlX67OigJ6UWIor9Iag7fAQZUxkQLHuzt
- 6DFowSMnZjKhiaFZ/4t9mRQ3cQ6ui7//sBihnSn3yJCzD5bP55bUMIEU5hgtu6oNaHJi
- kDFw==
-X-Gm-Message-State: APjAAAWf/RUyJUbAhboyeWY0wiGOQjujqlQbKsT8NwG/Sm65bvZqbkWv
- kyL3Uv7SWgcnihCeZH5d7ZCcxshoH4I=
-X-Google-Smtp-Source: APXvYqxJ+cWyE0MJh8Rojpk8wJDlnbZktJb6OzB+oiccBh2KPjH7l1MuBTOcUKjASFUDCuZtL+8qdw==
-X-Received: by 2002:a17:90a:8c82:: with SMTP id
- b2mr22249152pjo.97.1560192006378; 
- Mon, 10 Jun 2019 11:40:06 -0700 (PDT)
-Received: from [192.168.1.11] (97-113-13-231.tukw.qwest.net. [97.113.13.231])
- by smtp.gmail.com with ESMTPSA id
- a192sm665715pfa.84.2019.06.10.11.40.05
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Mon, 10 Jun 2019 11:40:05 -0700 (PDT)
-To: Peter Maydell <peter.maydell@linaro.org>
-References: <20190606174609.20487-1-peter.maydell@linaro.org>
- <20190606174609.20487-29-peter.maydell@linaro.org>
- <da80c3ea-5a33-e7e0-209e-89a8413c8f06@linaro.org>
- <CAFEAcA8etr7_rmQsQcUY+cPHZEZna-An+r5TPJtMb4OQO-6Dsg@mail.gmail.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <b9ac8354-6bb2-0080-f597-706b4b94009d@linaro.org>
-Date: Mon, 10 Jun 2019 11:40:03 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ (envelope-from <dgilbert@redhat.com>) id 1haPHC-00025n-Oe
+ for qemu-devel@nongnu.org; Mon, 10 Jun 2019 14:44:17 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45832)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1haPHB-00022h-7v
+ for qemu-devel@nongnu.org; Mon, 10 Jun 2019 14:44:14 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 3BC32821F1
+ for <qemu-devel@nongnu.org>; Mon, 10 Jun 2019 18:44:11 +0000 (UTC)
+Received: from dgilbert-t580.localhost (ovpn-117-16.ams2.redhat.com
+ [10.36.117.16])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 11BB960BF1;
+ Mon, 10 Jun 2019 18:44:09 +0000 (UTC)
+From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+To: qemu-devel@nongnu.org, jasowang@redhat.com, eblake@redhat.com,
+ armbru@redhat.com, laine@redhat.com
+Date: Mon, 10 Jun 2019 19:44:00 +0100
+Message-Id: <20190610184402.7090-3-dgilbert@redhat.com>
+In-Reply-To: <20190610184402.7090-1-dgilbert@redhat.com>
+References: <20190610184402.7090-1-dgilbert@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8etr7_rmQsQcUY+cPHZEZna-An+r5TPJtMb4OQO-6Dsg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::541
-Subject: Re: [Qemu-devel] [PATCH 28/42] target/arm: Convert VMOV (imm) to
- decodetree
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.28]); Mon, 10 Jun 2019 18:44:11 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PATCH v3 2/4] net/announce: Add HMP optional
+ interface list
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -102,37 +69,129 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/10/19 10:12 AM, Peter Maydell wrote:
-> On Sat, 8 Jun 2019 at 20:29, Richard Henderson
-> <richard.henderson@linaro.org> wrote:
->>
->> On 6/6/19 12:45 PM, Peter Maydell wrote:
->>> +    n = (a->imm4h << 28) & 0x80000000;
->>> +    i = ((a->imm4h << 4) & 0x70) | a->imm4l;
->>> +    if (i & 0x40) {
->>> +        i |= 0x780;
->>> +    } else {
->>> +        i |= 0x800;
->>> +    }
->>> +    n |= i << 19;
->>
->> Can we reuse vfp_expand_imm here?  Given that you don't have pure code motion
->> from the old code (due to field extraction) it doesn't feel wrong to go ahead
->> and fix this wart now.
-> 
-> I dunno, I'd kind of prefer to do it later. We're already
-> drifting away from the old code as you say, and going
-> straight to vfp_expand_imm() makes it even less clear that
-> we're doing the same thing the old code was...
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-Fair enough.
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Add the optional interface list to the HMP command.
 
+i.e.
 
-r~
+   All interfaces
+        announce_self
+
+   Just the named interfaces:
+        announce_self vn1,vn2
+
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+---
+ hmp-commands.hx |  6 ++++--
+ hmp.c           | 38 +++++++++++++++++++++++++++++++++++++-
+ 2 files changed, 41 insertions(+), 3 deletions(-)
+
+diff --git a/hmp-commands.hx b/hmp-commands.hx
+index 3dc421cb6a..1b63372713 100644
+--- a/hmp-commands.hx
++++ b/hmp-commands.hx
+@@ -955,8 +955,8 @@ ETEXI
+=20
+     {
+         .name       =3D "announce_self",
+-        .args_type  =3D "",
+-        .params     =3D "",
++        .args_type  =3D "interfaces:s?",
++        .params     =3D "[interfaces]",
+         .help       =3D "Trigger GARP/RARP announcements",
+         .cmd        =3D hmp_announce_self,
+     },
+@@ -967,6 +967,8 @@ STEXI
+ Trigger a round of GARP/RARP broadcasts; this is useful for explicitly u=
+pdating the
+ network infrastructure after a reconfiguration or some forms of migratio=
+n.
+ The timings of the round are set by the migration announce parameters.
++An optional comma separated @var{interfaces} list restricts the announce=
+ to the
++named set of interfaces.
+ ETEXI
+=20
+     {
+diff --git a/hmp.c b/hmp.c
+index d4460992b6..52efb4a4fa 100644
+--- a/hmp.c
++++ b/hmp.c
+@@ -27,6 +27,7 @@
+ #include "monitor/monitor.h"
+ #include "monitor/qdev.h"
+ #include "qapi/error.h"
++#include "qapi/clone-visitor.h"
+ #include "qapi/opts-visitor.h"
+ #include "qapi/qapi-builtin-visit.h"
+ #include "qapi/qapi-commands-block.h"
+@@ -38,6 +39,7 @@
+ #include "qapi/qapi-commands-run-state.h"
+ #include "qapi/qapi-commands-tpm.h"
+ #include "qapi/qapi-commands-ui.h"
++#include "qapi/qapi-visit-net.h"
+ #include "qapi/qmp/qdict.h"
+ #include "qapi/qmp/qerror.h"
+ #include "qapi/string-input-visitor.h"
+@@ -67,6 +69,32 @@ static void hmp_handle_error(Monitor *mon, Error **err=
+p)
+     }
+ }
+=20
++/*
++ * Produce a strList from a comma separated list.
++ * A NULL or empty input string return NULL.
++ */
++static strList *strList_from_comma_list(const char *in)
++{
++    strList *res =3D NULL;
++    strList **hook =3D &res;
++
++    while (in && in[0]) {
++        char *comma =3D strchr(in, ',');
++        *hook =3D g_new0(strList, 1);
++
++        if (comma) {
++            (*hook)->value =3D g_strndup(in, comma - in);
++            in =3D comma + 1; /* skip the , */
++        } else {
++            (*hook)->value =3D g_strdup(in);
++            in =3D NULL;
++        }
++        hook =3D &(*hook)->next;
++    }
++
++    return res;
++}
++
+ void hmp_info_name(Monitor *mon, const QDict *qdict)
+ {
+     NameInfo *info;
+@@ -1640,7 +1668,15 @@ void hmp_info_snapshots(Monitor *mon, const QDict =
+*qdict)
+=20
+ void hmp_announce_self(Monitor *mon, const QDict *qdict)
+ {
+-    qmp_announce_self(migrate_announce_params(), NULL);
++    const char *interfaces_str =3D qdict_get_try_str(qdict, "interfaces"=
+);
++    AnnounceParameters *params =3D QAPI_CLONE(AnnounceParameters,
++                                            migrate_announce_params());
++
++    qapi_free_strList(params->interfaces);
++    params->interfaces =3D strList_from_comma_list(interfaces_str);
++    params->has_interfaces =3D params->interfaces !=3D NULL;
++    qmp_announce_self(params, NULL);
++    qapi_free_AnnounceParameters(params);
+ }
+=20
+ void hmp_migrate_cancel(Monitor *mon, const QDict *qdict)
+--=20
+2.21.0
+
 
