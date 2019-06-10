@@ -7,80 +7,79 @@ X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3673AC28EBD
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 02:43:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FA53C28EBD
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 02:43:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C2178207E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 02:42:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 665CC207E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 02:43:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="tndK2vVS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C2178207E0
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="xFE67NzH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 665CC207E0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39904 helo=lists.gnu.org)
+Received: from localhost ([::1]:39906 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1haAGx-00065B-2g
-	for qemu-devel@archiver.kernel.org; Sun, 09 Jun 2019 22:42:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53395)
+	id 1haAHO-0006PW-NO
+	for qemu-devel@archiver.kernel.org; Sun, 09 Jun 2019 22:43:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53443)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <richard.henderson@linaro.org>) id 1ha9eP-0006x7-Cg
- for qemu-devel@nongnu.org; Sun, 09 Jun 2019 22:03:11 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1ha9eT-0006yw-Eh
+ for qemu-devel@nongnu.org; Sun, 09 Jun 2019 22:03:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1ha9eJ-00023Z-MD
- for qemu-devel@nongnu.org; Sun, 09 Jun 2019 22:03:07 -0400
-Received: from mail-pf1-x429.google.com ([2607:f8b0:4864:20::429]:33940)
+ (envelope-from <richard.henderson@linaro.org>) id 1ha9eR-000286-H3
+ for qemu-devel@nongnu.org; Sun, 09 Jun 2019 22:03:13 -0400
+Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:37252)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1ha9eJ-00022f-D8
- for qemu-devel@nongnu.org; Sun, 09 Jun 2019 22:03:03 -0400
-Received: by mail-pf1-x429.google.com with SMTP id c85so4334717pfc.1
- for <qemu-devel@nongnu.org>; Sun, 09 Jun 2019 19:03:02 -0700 (PDT)
+ id 1ha9eP-00024S-Dn
+ for qemu-devel@nongnu.org; Sun, 09 Jun 2019 22:03:11 -0400
+Received: by mail-pg1-x542.google.com with SMTP id 20so4159989pgr.4
+ for <qemu-devel@nongnu.org>; Sun, 09 Jun 2019 19:03:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=PYpVsDECn50S2iyRZN0fZ1fEzaZW8+7DmxjFRcVQ65o=;
- b=tndK2vVSqUBih0y6U7hwin3As7YfWtcMRpnruJgF5ZvP0fUaAIhxI9BWUrkRqPRMWS
- 9B4d1YDl/Sre3r1ZldoJp6Rll82Mkt4pLa6OlrAvovU860VPy2OpP6q5uPigEvHiUdKw
- e6qoQFunaQymMLZUwM36uyXoBL2G654a+UNrXzpPQDE59ppypZok/3nwWCqKUcTL9N0M
- /VQy6VI3KjFHRtjP3sT+sibUqkW4E2+9uYRmPtRRx9N49s/+JkLa/fZ6H6IVM2HUjLbV
- NFEOe+wOAgWgs8TumxbTlYb3vleYQSFktnhwc4IHeXpT8hgGLJU9PFSfUsENo9JgD/+Y
- L+Pg==
+ bh=2m2+rpL1xWjB5db+GO//3xJA4pzKyCYCkFox2ZrQZRk=;
+ b=xFE67NzHxiUppK2yJCIC6/JnaqnLlAIWX7Q+pn4RmNDqRvQL8vYPcJv7XHfNe8ae9R
+ bXsbnoeygiuECEGt1dwUpo5RjFE5mVHfxh0XuOYatmSGh9vWbRs1GBKR4ApYJRDXgc1l
+ SBA7fIW9WQ6JqIbojSLhgg4fG4HWWQkoHpJ7CYZD6a73IlFTByj8JoZ4dj6IvQ+LLVf5
+ Y1+hP1V9mJjClbgbtpCf9JYK+0i/k/4T8Qx8m7NnEz+KaO/Wf9lN6sG1bsVMh1pIUkfV
+ eGjq8CRykofmwJ/wfvddCve9CgwVmHcQe4ceywSOjesZIg6mwYlTCE/qo+wDDnV03iOB
+ jnrg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references;
- bh=PYpVsDECn50S2iyRZN0fZ1fEzaZW8+7DmxjFRcVQ65o=;
- b=pMQH0QlX8eXPhD/DvCUDrB/LWFb/qput3yaE0Ukns7vEXmWEPzJDVoSc0sWeLvQBB3
- +86S45QkPTzmkDc1a2NvivAj94q/MhRFwZAZ0DHff32QIyMR9nln49iG9Axvw8bUhyKI
- t+AcNDpLlO2n2BGoVeAQ1HQyZxB7MotJItu8gNaKCLxZNO45kCUQu+zBRKzuccNeKbCQ
- y4oFSnCDao17mvH+CQXyUrIU73wW0fMzRMhp5ZDB1wMIrcydYkcKJXIBds4IcPB8WJZm
- KnSmr1RC8qOoix3GPnumLokSwQ78hPNtcqnrxdzrieWVVOmWesIKEF22Y+YgmNEMSBPI
- kacg==
-X-Gm-Message-State: APjAAAW3WtS/0CK+yv2kGTcJYiALOouWNuFgPeC5upV/jbuIOwyG49/C
- RBkUDaWWEpzmFVBRLRhRkPtLtwr0Qy8=
-X-Google-Smtp-Source: APXvYqzJHaKvhX4B5w/ezNPi3YDF3k5hNMdr/HbbKTe+PbbGdScM0qgebjrbxApUlmKWOuzkC91amQ==
-X-Received: by 2002:a17:90a:9514:: with SMTP id
- t20mr18450729pjo.124.1560132181145; 
- Sun, 09 Jun 2019 19:03:01 -0700 (PDT)
+ bh=2m2+rpL1xWjB5db+GO//3xJA4pzKyCYCkFox2ZrQZRk=;
+ b=n/eXltuTogjF8EgSdKByJi7IuJ5t6BvoKApxk6PoVuIAUqzXKJbO0iHBwbnagDCLQu
+ aME4CDqHj8ACl/yNsQztIbdhWhr83+7/v9U/dvsoebki3nwSQgPMiI/3DcZtZFQDp05T
+ QF/s/NZpIkcY16eUIQUmPkgJLtTkAAIokqOm5aqqHkq8ja/6b1PlNSNUV/sMa0ADOfgB
+ mlwDCqY2yWgKZ1dpBuo3FlJ+WgWT3wBqjoq7i4Qe3T9Gx383Pkdir4nDmqXAdrqLyfmB
+ d8Il26Phi4dESWUTYGq4ry+BtKSHjlxr/N9Sg8fqpRz0mUtqXZLOA8y+oWEmGQfKop6v
+ eF5w==
+X-Gm-Message-State: APjAAAUGQFQEyUyWbEmMK2C1DnvnR+LCDsNh6mizMVDHstwL1oyAxcTE
+ ZbC3HLpzIH312WiRrRV/5dNZh9Y0UKg=
+X-Google-Smtp-Source: APXvYqysj9SEeFE6o/zBtGanLkw4fjyEaQdnPm2s3ZiPZ8xhzFqoDsWi13oYk2rvKhE6APrYHLrVVA==
+X-Received: by 2002:a63:f10e:: with SMTP id f14mr13497066pgi.226.1560132184817; 
+ Sun, 09 Jun 2019 19:03:04 -0700 (PDT)
 Received: from localhost.localdomain (97-113-13-231.tukw.qwest.net.
  [97.113.13.231])
- by smtp.gmail.com with ESMTPSA id l63sm9749013pfl.181.2019.06.09.19.03.00
+ by smtp.gmail.com with ESMTPSA id l63sm9749013pfl.181.2019.06.09.19.03.03
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Sun, 09 Jun 2019 19:03:00 -0700 (PDT)
+ Sun, 09 Jun 2019 19:03:03 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Sun,  9 Jun 2019 19:02:13 -0700
-Message-Id: <20190610020218.9228-35-richard.henderson@linaro.org>
+Date: Sun,  9 Jun 2019 19:02:16 -0700
+Message-Id: <20190610020218.9228-38-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190610020218.9228-1-richard.henderson@linaro.org>
 References: <20190610020218.9228-1-richard.henderson@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::429
-Subject: [Qemu-devel] [PULL 34/39] cpu: Move icount_decr to
- CPUNegativeOffsetState
+X-Received-From: 2607:f8b0:4864:20::542
+Subject: [Qemu-devel] [PULL 37/39] tcg/aarch64: Use LDP to load tlb
+ mask+table
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,422 +96,72 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Amusingly, we had already ignored the comment to keep this value
-at the end of CPUState.  This restores the minimum negative offset
-from TCG_AREG0 for code generation.
+This changes the code generation for the tlb from e.g.
 
-For the couple of uses within qom/cpu.c, without NEED_CPU_H, add
-a pointer from the CPUState object to the IcountDecr object within
-CPUNegativeOffsetState.
+	ldur     x0, [x19, #0xffffffffffffffe0]
+	ldur     x1, [x19, #0xffffffffffffffe8]
+	and      x0, x0, x20, lsr #8
+	add      x1, x1, x0
+	ldr      x0, [x1]
+	ldr      x1, [x1, #0x18]
 
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+to
+
+	ldp      x0, x1, [x19, #-0x20]
+	and      x0, x0, x20, lsr #8
+	add      x1, x1, x0
+	ldr      x0, [x1]
+	ldr      x1, [x1, #0x18]
+
+Acked-by: Alistair Francis <alistair.francis@wdc.com>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- include/exec/cpu-all.h    |  1 +
- include/exec/cpu-defs.h   |  3 ++-
- include/exec/gen-icount.h | 16 ++++++++++------
- include/qom/cpu.h         | 40 ++++++++++++++++++---------------------
- accel/tcg/cpu-exec.c      | 23 +++++++++++-----------
- accel/tcg/tcg-all.c       |  6 ++----
- accel/tcg/translate-all.c |  8 ++++----
- cpus.c                    |  9 +++++----
- qom/cpu.c                 |  4 ++--
- 9 files changed, 56 insertions(+), 54 deletions(-)
+ tcg/aarch64/tcg-target.inc.c | 15 ++++++++-------
+ 1 file changed, 8 insertions(+), 7 deletions(-)
 
-diff --git a/include/exec/cpu-all.h b/include/exec/cpu-all.h
-index 5ae83405c8..253dd1d9a5 100644
---- a/include/exec/cpu-all.h
-+++ b/include/exec/cpu-all.h
-@@ -380,6 +380,7 @@ int cpu_exec(CPUState *cpu);
- static inline void cpu_set_cpustate_pointers(ArchCPU *cpu)
+diff --git a/tcg/aarch64/tcg-target.inc.c b/tcg/aarch64/tcg-target.inc.c
+index 57c297f9d7..b0f8106642 100644
+--- a/tcg/aarch64/tcg-target.inc.c
++++ b/tcg/aarch64/tcg-target.inc.c
+@@ -1641,6 +1641,10 @@ static void add_qemu_ldst_label(TCGContext *s, bool is_ld, TCGMemOpIdx oi,
+ QEMU_BUILD_BUG_ON(TLB_MASK_TABLE_OFS(0) > 0);
+ QEMU_BUILD_BUG_ON(TLB_MASK_TABLE_OFS(0) < -512);
+ 
++/* These offsets are built into the LDP below.  */
++QEMU_BUILD_BUG_ON(offsetof(CPUTLBDescFast, mask) != 0);
++QEMU_BUILD_BUG_ON(offsetof(CPUTLBDescFast, table) != 8);
++
+ /* Load and compare a TLB entry, emitting the conditional jump to the
+    slow path for the failure case, which will be patched later when finalizing
+    the slow path. Generated code returns the host addend in X1,
+@@ -1649,23 +1653,20 @@ static void tcg_out_tlb_read(TCGContext *s, TCGReg addr_reg, TCGMemOp opc,
+                              tcg_insn_unit **label_ptr, int mem_index,
+                              bool is_read)
  {
-     cpu->parent_obj.env_ptr = &cpu->env;
-+    cpu->parent_obj.icount_decr_ptr = &cpu->neg.icount_decr;
- }
+-    int fast_ofs = TLB_MASK_TABLE_OFS(mem_index);
+-    int mask_ofs = fast_ofs + offsetof(CPUTLBDescFast, mask);
+-    int table_ofs = fast_ofs + offsetof(CPUTLBDescFast, table);
+     unsigned a_bits = get_alignment_bits(opc);
+     unsigned s_bits = opc & MO_SIZE;
+     unsigned a_mask = (1u << a_bits) - 1;
+     unsigned s_mask = (1u << s_bits) - 1;
+-    TCGReg mask_base = TCG_AREG0, table_base = TCG_AREG0, x3;
++    TCGReg x3;
+     TCGType mask_type;
+     uint64_t compare_mask;
  
- /**
-diff --git a/include/exec/cpu-defs.h b/include/exec/cpu-defs.h
-index 921fbb4c36..c067994e5c 100644
---- a/include/exec/cpu-defs.h
-+++ b/include/exec/cpu-defs.h
-@@ -33,6 +33,7 @@
- #include "exec/hwaddr.h"
- #endif
- #include "exec/memattrs.h"
-+#include "qom/cpu.h"
+     mask_type = (TARGET_PAGE_BITS + CPU_TLB_DYN_MAX_BITS > 32
+                  ? TCG_TYPE_I64 : TCG_TYPE_I32);
  
- #include "cpu-param.h"
+-    /* Load tlb_mask[mmu_idx] and tlb_table[mmu_idx].  */
+-    tcg_out_ld(s, mask_type, TCG_REG_X0, mask_base, mask_ofs);
+-    tcg_out_ld(s, TCG_TYPE_PTR, TCG_REG_X1, table_base, table_ofs);
++    /* Load env_tlb(env)->f[mmu_idx].{mask,table} into {x0,x1}.  */
++    tcg_out_insn(s, 3314, LDP, TCG_REG_X0, TCG_REG_X1, TCG_AREG0,
++                 TLB_MASK_TABLE_OFS(mem_index), 1, 0);
  
-@@ -232,7 +233,7 @@ typedef struct CPUTLB {
-  * before CPUArchState, as a field named "neg".
-  */
- typedef struct CPUNegativeOffsetState {
--    /* Empty */
-+    IcountDecr icount_decr;
- } CPUNegativeOffsetState;
- 
- #endif
-diff --git a/include/exec/gen-icount.h b/include/exec/gen-icount.h
-index 9cfa6ccce5..f7669b6841 100644
---- a/include/exec/gen-icount.h
-+++ b/include/exec/gen-icount.h
-@@ -5,8 +5,6 @@
- 
- /* Helpers for instruction counting code generation.  */
- 
--#define ENV_OFFSET   offsetof(ArchCPU, env)
--
- static TCGOp *icount_start_insn;
- 
- static inline void gen_tb_start(TranslationBlock *tb)
-@@ -21,7 +19,8 @@ static inline void gen_tb_start(TranslationBlock *tb)
-     }
- 
-     tcg_gen_ld_i32(count, cpu_env,
--                   -ENV_OFFSET + offsetof(CPUState, icount_decr.u32));
-+                   offsetof(ArchCPU, neg.icount_decr.u32) -
-+                   offsetof(ArchCPU, env));
- 
-     if (tb_cflags(tb) & CF_USE_ICOUNT) {
-         imm = tcg_temp_new_i32();
-@@ -39,7 +38,8 @@ static inline void gen_tb_start(TranslationBlock *tb)
- 
-     if (tb_cflags(tb) & CF_USE_ICOUNT) {
-         tcg_gen_st16_i32(count, cpu_env,
--                         -ENV_OFFSET + offsetof(CPUState, icount_decr.u16.low));
-+                         offsetof(ArchCPU, neg.icount_decr.u16.low) -
-+                         offsetof(ArchCPU, env));
-     }
- 
-     tcg_temp_free_i32(count);
-@@ -60,14 +60,18 @@ static inline void gen_tb_end(TranslationBlock *tb, int num_insns)
- static inline void gen_io_start(void)
- {
-     TCGv_i32 tmp = tcg_const_i32(1);
--    tcg_gen_st_i32(tmp, cpu_env, -ENV_OFFSET + offsetof(CPUState, can_do_io));
-+    tcg_gen_st_i32(tmp, cpu_env,
-+                   offsetof(ArchCPU, parent_obj.can_do_io) -
-+                   offsetof(ArchCPU, env));
-     tcg_temp_free_i32(tmp);
- }
- 
- static inline void gen_io_end(void)
- {
-     TCGv_i32 tmp = tcg_const_i32(0);
--    tcg_gen_st_i32(tmp, cpu_env, -ENV_OFFSET + offsetof(CPUState, can_do_io));
-+    tcg_gen_st_i32(tmp, cpu_env,
-+                   offsetof(ArchCPU, parent_obj.can_do_io) -
-+                   offsetof(ArchCPU, env));
-     tcg_temp_free_i32(tmp);
- }
- 
-diff --git a/include/qom/cpu.h b/include/qom/cpu.h
-index 98e12d914c..5ee0046b62 100644
---- a/include/qom/cpu.h
-+++ b/include/qom/cpu.h
-@@ -232,17 +232,25 @@ typedef struct CPUClass {
-     bool gdb_stop_before_watchpoint;
- } CPUClass;
- 
-+/*
-+ * Low 16 bits: number of cycles left, used only in icount mode.
-+ * High 16 bits: Set to -1 to force TCG to stop executing linked TBs
-+ * for this CPU and return to its top level loop (even in non-icount mode).
-+ * This allows a single read-compare-cbranch-write sequence to test
-+ * for both decrementer underflow and exceptions.
-+ */
-+typedef union IcountDecr {
-+    uint32_t u32;
-+    struct {
- #ifdef HOST_WORDS_BIGENDIAN
--typedef struct icount_decr_u16 {
--    uint16_t high;
--    uint16_t low;
--} icount_decr_u16;
-+        uint16_t high;
-+        uint16_t low;
- #else
--typedef struct icount_decr_u16 {
--    uint16_t low;
--    uint16_t high;
--} icount_decr_u16;
-+        uint16_t low;
-+        uint16_t high;
- #endif
-+    } u16;
-+} IcountDecr;
- 
- typedef struct CPUBreakpoint {
-     vaddr pc;
-@@ -314,11 +322,6 @@ struct qemu_work_item;
-  * @crash_occurred: Indicates the OS reported a crash (panic) for this CPU
-  * @singlestep_enabled: Flags for single-stepping.
-  * @icount_extra: Instructions until next timer event.
-- * @icount_decr: Low 16 bits: number of cycles left, only used in icount mode.
-- * High 16 bits: Set to -1 to force TCG to stop executing linked TBs for this
-- * CPU and return to its top level loop (even in non-icount mode).
-- * This allows a single read-compare-cbranch-write sequence to test
-- * for both decrementer underflow and exceptions.
-  * @can_do_io: Nonzero if memory-mapped IO is safe. Deterministic execution
-  * requires that IO only be performed on the last instruction of a TB
-  * so that interrupts take effect immediately.
-@@ -328,6 +331,7 @@ struct qemu_work_item;
-  * @as: Pointer to the first AddressSpace, for the convenience of targets which
-  *      only have a single AddressSpace
-  * @env_ptr: Pointer to subclass-specific CPUArchState field.
-+ * @icount_decr_ptr: Pointer to IcountDecr field within subclass.
-  * @gdb_regs: Additional GDB registers.
-  * @gdb_num_regs: Number of total registers accessible to GDB.
-  * @gdb_num_g_regs: Number of registers in GDB 'g' packets.
-@@ -387,6 +391,7 @@ struct CPUState {
-     MemoryRegion *memory;
- 
-     void *env_ptr; /* CPUArchState */
-+    IcountDecr *icount_decr_ptr;
- 
-     /* Accessed in parallel; all accesses must be atomic */
-     struct TranslationBlock *tb_jmp_cache[TB_JMP_CACHE_SIZE];
-@@ -441,15 +446,6 @@ struct CPUState {
- 
-     bool ignore_memory_transaction_failures;
- 
--    /* Note that this is accessed at the start of every TB via a negative
--       offset from AREG0.  Leave this field at the end so as to make the
--       (absolute value) offset as small as possible.  This reduces code
--       size, especially for hosts without large memory offsets.  */
--    union {
--        uint32_t u32;
--        icount_decr_u16 u16;
--    } icount_decr;
--
-     struct hax_vcpu_state *hax_vcpu;
- 
-     int hvf_fd;
-diff --git a/accel/tcg/cpu-exec.c b/accel/tcg/cpu-exec.c
-index 45ef41ebb2..032a62672e 100644
---- a/accel/tcg/cpu-exec.c
-+++ b/accel/tcg/cpu-exec.c
-@@ -54,7 +54,7 @@ typedef struct SyncClocks {
- #define MAX_DELAY_PRINT_RATE 2000000000LL
- #define MAX_NB_PRINTS 100
- 
--static void align_clocks(SyncClocks *sc, const CPUState *cpu)
-+static void align_clocks(SyncClocks *sc, CPUState *cpu)
- {
-     int64_t cpu_icount;
- 
-@@ -62,7 +62,7 @@ static void align_clocks(SyncClocks *sc, const CPUState *cpu)
-         return;
-     }
- 
--    cpu_icount = cpu->icount_extra + cpu->icount_decr.u16.low;
-+    cpu_icount = cpu->icount_extra + cpu_neg(cpu)->icount_decr.u16.low;
-     sc->diff_clk += cpu_icount_to_ns(sc->last_cpu_icount - cpu_icount);
-     sc->last_cpu_icount = cpu_icount;
- 
-@@ -105,15 +105,15 @@ static void print_delay(const SyncClocks *sc)
-     }
- }
- 
--static void init_delay_params(SyncClocks *sc,
--                              const CPUState *cpu)
-+static void init_delay_params(SyncClocks *sc, CPUState *cpu)
- {
-     if (!icount_align_option) {
-         return;
-     }
-     sc->realtime_clock = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL_RT);
-     sc->diff_clk = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) - sc->realtime_clock;
--    sc->last_cpu_icount = cpu->icount_extra + cpu->icount_decr.u16.low;
-+    sc->last_cpu_icount
-+        = cpu->icount_extra + cpu_neg(cpu)->icount_decr.u16.low;
-     if (sc->diff_clk < max_delay) {
-         max_delay = sc->diff_clk;
-     }
-@@ -467,7 +467,7 @@ static inline bool cpu_handle_exception(CPUState *cpu, int *ret)
-     if (cpu->exception_index < 0) {
- #ifndef CONFIG_USER_ONLY
-         if (replay_has_exception()
--               && cpu->icount_decr.u16.low + cpu->icount_extra == 0) {
-+            && cpu_neg(cpu)->icount_decr.u16.low + cpu->icount_extra == 0) {
-             /* try to cause an exception pending in the log */
-             cpu_exec_nocache(cpu, 1, tb_find(cpu, NULL, 0, curr_cflags()), true);
-         }
-@@ -525,7 +525,7 @@ static inline bool cpu_handle_interrupt(CPUState *cpu,
-      * Ensure zeroing happens before reading cpu->exit_request or
-      * cpu->interrupt_request (see also smp_wmb in cpu_exit())
-      */
--    atomic_mb_set(&cpu->icount_decr.u16.high, 0);
-+    atomic_mb_set(&cpu_neg(cpu)->icount_decr.u16.high, 0);
- 
-     if (unlikely(atomic_read(&cpu->interrupt_request))) {
-         int interrupt_request;
-@@ -596,8 +596,9 @@ static inline bool cpu_handle_interrupt(CPUState *cpu,
-     }
- 
-     /* Finally, check if we need to exit to the main loop.  */
--    if (unlikely(atomic_read(&cpu->exit_request)
--        || (use_icount && cpu->icount_decr.u16.low + cpu->icount_extra == 0))) {
-+    if (unlikely(atomic_read(&cpu->exit_request))
-+        || (use_icount
-+            && cpu_neg(cpu)->icount_decr.u16.low + cpu->icount_extra == 0)) {
-         atomic_set(&cpu->exit_request, 0);
-         if (cpu->exception_index == -1) {
-             cpu->exception_index = EXCP_INTERRUPT;
-@@ -624,7 +625,7 @@ static inline void cpu_loop_exec_tb(CPUState *cpu, TranslationBlock *tb,
-     }
- 
-     *last_tb = NULL;
--    insns_left = atomic_read(&cpu->icount_decr.u32);
-+    insns_left = atomic_read(&cpu_neg(cpu)->icount_decr.u32);
-     if (insns_left < 0) {
-         /* Something asked us to stop executing chained TBs; just
-          * continue round the main loop. Whatever requested the exit
-@@ -643,7 +644,7 @@ static inline void cpu_loop_exec_tb(CPUState *cpu, TranslationBlock *tb,
-     cpu_update_icount(cpu);
-     /* Refill decrementer and continue execution.  */
-     insns_left = MIN(0xffff, cpu->icount_budget);
--    cpu->icount_decr.u16.low = insns_left;
-+    cpu_neg(cpu)->icount_decr.u16.low = insns_left;
-     cpu->icount_extra = cpu->icount_budget - insns_left;
-     if (!cpu->icount_extra) {
-         /* Execute any remaining instructions, then let the main loop
-diff --git a/accel/tcg/tcg-all.c b/accel/tcg/tcg-all.c
-index 3d25bdcc17..9b215dcc5a 100644
---- a/accel/tcg/tcg-all.c
-+++ b/accel/tcg/tcg-all.c
-@@ -28,13 +28,12 @@
- #include "sysemu/sysemu.h"
- #include "qom/object.h"
- #include "qemu-common.h"
--#include "qom/cpu.h"
-+#include "cpu.h"
- #include "sysemu/cpus.h"
- #include "qemu/main-loop.h"
- 
- unsigned long tcg_tb_size;
- 
--#ifndef CONFIG_USER_ONLY
- /* mask must never be zero, except for A20 change call */
- static void tcg_handle_interrupt(CPUState *cpu, int mask)
- {
-@@ -51,7 +50,7 @@ static void tcg_handle_interrupt(CPUState *cpu, int mask)
-     if (!qemu_cpu_is_self(cpu)) {
-         qemu_cpu_kick(cpu);
-     } else {
--        atomic_set(&cpu->icount_decr.u16.high, -1);
-+        atomic_set(&cpu_neg(cpu)->icount_decr.u16.high, -1);
-         if (use_icount &&
-             !cpu->can_do_io
-             && (mask & ~old_mask) != 0) {
-@@ -59,7 +58,6 @@ static void tcg_handle_interrupt(CPUState *cpu, int mask)
-         }
-     }
- }
--#endif
- 
- static int tcg_init(MachineState *ms)
- {
-diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
-index 52d94facf0..e24ee3a172 100644
---- a/accel/tcg/translate-all.c
-+++ b/accel/tcg/translate-all.c
-@@ -364,7 +364,7 @@ static int cpu_restore_state_from_tb(CPUState *cpu, TranslationBlock *tb,
-         assert(use_icount);
-         /* Reset the cycle counter to the start of the block
-            and shift if to the number of actually executed instructions */
--        cpu->icount_decr.u16.low += num_insns - i;
-+        cpu_neg(cpu)->icount_decr.u16.low += num_insns - i;
-     }
-     restore_state_to_opc(env, tb, data);
- 
-@@ -2200,7 +2200,7 @@ void cpu_io_recompile(CPUState *cpu, uintptr_t retaddr)
-     if ((env->hflags & MIPS_HFLAG_BMASK) != 0
-         && env->active_tc.PC != tb->pc) {
-         env->active_tc.PC -= (env->hflags & MIPS_HFLAG_B16 ? 2 : 4);
--        cpu->icount_decr.u16.low++;
-+        cpu_neg(cpu)->icount_decr.u16.low++;
-         env->hflags &= ~MIPS_HFLAG_BMASK;
-         n = 2;
-     }
-@@ -2208,7 +2208,7 @@ void cpu_io_recompile(CPUState *cpu, uintptr_t retaddr)
-     if ((env->flags & ((DELAY_SLOT | DELAY_SLOT_CONDITIONAL))) != 0
-         && env->pc != tb->pc) {
-         env->pc -= 2;
--        cpu->icount_decr.u16.low++;
-+        cpu_neg(cpu)->icount_decr.u16.low++;
-         env->flags &= ~(DELAY_SLOT | DELAY_SLOT_CONDITIONAL);
-         n = 2;
-     }
-@@ -2382,7 +2382,7 @@ void cpu_interrupt(CPUState *cpu, int mask)
- {
-     g_assert(qemu_mutex_iothread_locked());
-     cpu->interrupt_request |= mask;
--    atomic_set(&cpu->icount_decr.u16.high, -1);
-+    atomic_set(&cpu_neg(cpu)->icount_decr.u16.high, -1);
- }
- 
- /*
-diff --git a/cpus.c b/cpus.c
-index ffc57119ca..111ca4ed1c 100644
---- a/cpus.c
-+++ b/cpus.c
-@@ -239,7 +239,8 @@ void qemu_tcg_configure(QemuOpts *opts, Error **errp)
-  */
- static int64_t cpu_get_icount_executed(CPUState *cpu)
- {
--    return cpu->icount_budget - (cpu->icount_decr.u16.low + cpu->icount_extra);
-+    return (cpu->icount_budget -
-+            (cpu_neg(cpu)->icount_decr.u16.low + cpu->icount_extra));
- }
- 
- /*
-@@ -1389,12 +1390,12 @@ static void prepare_icount_for_run(CPUState *cpu)
-          * each vCPU execution. However u16.high can be raised
-          * asynchronously by cpu_exit/cpu_interrupt/tcg_handle_interrupt
-          */
--        g_assert(cpu->icount_decr.u16.low == 0);
-+        g_assert(cpu_neg(cpu)->icount_decr.u16.low == 0);
-         g_assert(cpu->icount_extra == 0);
- 
-         cpu->icount_budget = tcg_get_icount_limit();
-         insns_left = MIN(0xffff, cpu->icount_budget);
--        cpu->icount_decr.u16.low = insns_left;
-+        cpu_neg(cpu)->icount_decr.u16.low = insns_left;
-         cpu->icount_extra = cpu->icount_budget - insns_left;
- 
-         replay_mutex_lock();
-@@ -1408,7 +1409,7 @@ static void process_icount_data(CPUState *cpu)
-         cpu_update_icount(cpu);
- 
-         /* Reset the counters */
--        cpu->icount_decr.u16.low = 0;
-+        cpu_neg(cpu)->icount_decr.u16.low = 0;
-         cpu->icount_extra = 0;
-         cpu->icount_budget = 0;
- 
-diff --git a/qom/cpu.c b/qom/cpu.c
-index 3c5493c96c..6b4632abda 100644
---- a/qom/cpu.c
-+++ b/qom/cpu.c
-@@ -115,7 +115,7 @@ void cpu_exit(CPUState *cpu)
-     atomic_set(&cpu->exit_request, 1);
-     /* Ensure cpu_exec will see the exit request after TCG has exited.  */
-     smp_wmb();
--    atomic_set(&cpu->icount_decr.u16.high, -1);
-+    atomic_set(&cpu->icount_decr_ptr->u16.high, -1);
- }
- 
- int cpu_write_elf32_qemunote(WriteCoreDumpFunction f, CPUState *cpu,
-@@ -264,7 +264,7 @@ static void cpu_common_reset(CPUState *cpu)
-     cpu->mem_io_pc = 0;
-     cpu->mem_io_vaddr = 0;
-     cpu->icount_extra = 0;
--    atomic_set(&cpu->icount_decr.u32, 0);
-+    atomic_set(&cpu->icount_decr_ptr->u32, 0);
-     cpu->can_do_io = 1;
-     cpu->exception_index = -1;
-     cpu->crash_occurred = false;
+     /* Extract the TLB index from the address into X0.  */
+     tcg_out_insn(s, 3502S, AND_LSR, mask_type == TCG_TYPE_I64,
 -- 
 2.17.1
 
