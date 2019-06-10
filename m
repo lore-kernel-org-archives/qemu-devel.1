@@ -6,66 +6,57 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F7F1C468C1
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 05:11:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 29175C468C1
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 05:52:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DBFEB20862
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 05:11:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DBFEB20862
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id E997C20820
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 05:52:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E997C20820
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=users.sourceforge.jp
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40546 helo=lists.gnu.org)
+Received: from localhost ([::1]:40934 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1haCas-0003Wx-0h
-	for qemu-devel@archiver.kernel.org; Mon, 10 Jun 2019 01:11:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39170)
+	id 1haDE0-0006CS-WF
+	for qemu-devel@archiver.kernel.org; Mon, 10 Jun 2019 01:52:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48195)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <pagupta@redhat.com>) id 1haCYr-0002ln-GE
- for qemu-devel@nongnu.org; Mon, 10 Jun 2019 01:09:39 -0400
+ (envelope-from <ysato@users.sourceforge.jp>) id 1haDDG-0005lL-RO
+ for qemu-devel@nongnu.org; Mon, 10 Jun 2019 01:51:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pagupta@redhat.com>) id 1haCYp-0005b5-0a
- for qemu-devel@nongnu.org; Mon, 10 Jun 2019 01:09:36 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55852)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pagupta@redhat.com>) id 1haCYn-0005L8-HJ
- for qemu-devel@nongnu.org; Mon, 10 Jun 2019 01:09:34 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id D04DB30832EF;
- Mon, 10 Jun 2019 05:09:14 +0000 (UTC)
-Received: from colo-mx.corp.redhat.com
- (colo-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.20])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id C3DA15C28D;
- Mon, 10 Jun 2019 05:09:13 +0000 (UTC)
-Received: from zmail21.collab.prod.int.phx2.redhat.com
- (zmail21.collab.prod.int.phx2.redhat.com [10.5.83.24])
- by colo-mx.corp.redhat.com (Postfix) with ESMTP id 823E61806B12;
- Mon, 10 Jun 2019 05:09:11 +0000 (UTC)
-Date: Mon, 10 Jun 2019 01:09:11 -0400 (EDT)
-From: Pankaj Gupta <pagupta@redhat.com>
-To: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <979254239.33764171.1560143351469.JavaMail.zimbra@redhat.com>
-In-Reply-To: <20190604151540.1076d3d8.cohuck@redhat.com>
-References: <20190523102449.2642-1-pagupta@redhat.com>
- <20190523102449.2642-2-pagupta@redhat.com>
- <20190604151540.1076d3d8.cohuck@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.67.116.16, 10.4.195.3]
-Thread-Topic: virtio-pmem: add virtio device
-Thread-Index: 2kYt9shY+Rt7z5NLpVkf5QSMoLnvTQ==
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.44]); Mon, 10 Jun 2019 05:09:19 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 1/7] virtio-pmem: add virtio device
+ (envelope-from <ysato@users.sourceforge.jp>) id 1haDDF-0001Wh-En
+ for qemu-devel@nongnu.org; Mon, 10 Jun 2019 01:51:22 -0400
+Received: from mail02.asahi-net.or.jp ([202.224.55.14]:57469)
+ by eggs.gnu.org with esmtp (Exim 4.71)
+ (envelope-from <ysato@users.sourceforge.jp>) id 1haDDF-0001T1-6j
+ for qemu-devel@nongnu.org; Mon, 10 Jun 2019 01:51:21 -0400
+Received: from h61-195-96-97.vps.ablenet.jp (h61-195-96-97.ablenetvps.ne.jp
+ [61.195.96.97]) (Authenticated sender: PQ4Y-STU)
+ by mail02.asahi-net.or.jp (Postfix) with ESMTPA id A5E093F189;
+ Mon, 10 Jun 2019 14:51:09 +0900 (JST)
+Received: from yo-satoh-debian.ysato.ml (ZM005235.ppp.dion.ne.jp [222.8.5.235])
+ by h61-195-96-97.vps.ablenet.jp (Postfix) with ESMTPSA id CB8AE240085;
+ Mon, 10 Jun 2019 14:51:08 +0900 (JST)
+Date: Mon, 10 Jun 2019 14:51:08 +0900
+Message-ID: <87sgsiounn.wl-ysato@users.sourceforge.jp>
+From: Yoshinori Sato <ysato@users.sourceforge.jp>
+To: Igor Mammedov <imammedo@redhat.com>
+In-Reply-To: <20190607161949.7d5b56d4@redhat.com>
+References: <20190607091116.49044-1-ysato@users.sourceforge.jp>
+ <20190607091116.49044-14-ysato@users.sourceforge.jp>
+ <20190607161949.7d5b56d4@redhat.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM/1.14.9 (=?ISO-8859-4?Q?Goj=F2?=) APEL/10.8 EasyPG/1.0.0 Emacs/25.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 202.224.55.14
+Subject: Re: [Qemu-devel] [PATCH v17 13/24] target/rx: Fix cpu types and
+ names
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -77,71 +68,208 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, aarcange@redhat.com, nilal@redhat.com,
- xiaoguangrong eric <xiaoguangrong.eric@gmail.com>, riel@surriel.com,
- rth@twiddle.net, mst@redhat.com, david@redhat.com, armbru@redhat.com,
- qemu-devel@nongnu.org, stefanha@redhat.com, imammedo@redhat.com,
- pbonzini@redhat.com, dan j williams <dan.j.williams@intel.com>,
- lcapitulino@redhat.com, dgilbert@redhat.com, ehabkost@redhat.com
+Cc: peter.maydell@linaro.org, Richard Henderson <richard.henderson@linaro.org>,
+ qemu-devel@nongnu.org, philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
+On Fri, 07 Jun 2019 23:19:49 +0900,
+Igor Mammedov wrote:
 > 
-> > This is the implementation of virtio-pmem device. Support will require
-> > machine changes for the architectures that will support it, so it will
-> > not yet be compiled. It can be unlocked with VIRTIO_PMEM_SUPPORTED per
-> > machine and disabled globally via VIRTIO_PMEM.
+> On Fri,  7 Jun 2019 18:11:05 +0900
+> Yoshinori Sato <ysato@users.sourceforge.jp> wrote:
+> 
+> > From: Richard Henderson <richard.henderson@linaro.org>
 > > 
-> > We cannot use the "addr" property as that is already used e.g. for
-> > virtio-pci/pci devices. And we will have e.g. virtio-pmem-pci as a proxy.
-> > So we have to choose a different one (unfortunately). "memaddr" it is.
-> > That name should ideally be used by all other virtio-* based memory
-> > devices in the future.
-> >     -device virtio-pmem-pci,id=p0,bus=bux0,addr=0x01,memaddr=0x1000000...
+> > There was confusion here about abstract classes and naming cpus.
+> > We had registered a concrete class named "-rxcpu".  This was put
+> > into the default cpu fields, and matched, so basic tests worked.
+> > However, no value for -cpu could ever match in rx_cpu_class_by_name.
 > > 
-> > Acked-by: Markus Armbruster <armbru@redhat.com>
-> > [ QAPI bits ]
-> > Signed-off-by: Pankaj Gupta <pagupta@redhat.com>
-> > [ MemoryDevice/MemoryRegion changes, cleanups, addr property "memaddr",
-> >   split up patches, unplug handler ]
-> > Signed-off-by: David Hildenbrand <david@redhat.com>
+> > Rename the base class to "rx-cpu" and make it abstract.  This
+> > matches what we do for most other targets.  Create a new concrete
+> > cpu with the name "rx62n-rx-cpu".
+> My comments on v16 weren't addressed at all.
+> 
+> I don't see any valid reason for this patch to exist.
+> It should be split and merged with patches that introduce 'confusion'
+> so that broken code won't exist in the first place.
+> 
+> more below ...
+> 
+> > Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> > Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
 > > ---
-> >  hw/virtio/Kconfig               |  10 +++
-> >  hw/virtio/Makefile.objs         |   1 +
-> >  hw/virtio/virtio-pmem.c         | 190
-> >  ++++++++++++++++++++++++++++++++++++++++
-> >  include/hw/virtio/virtio-pmem.h |  49 +++++++++++
-> >  qapi/misc.json                  |  28 +++++-
-> >  5 files changed, 277 insertions(+), 1 deletion(-)
-> >  create mode 100644 hw/virtio/virtio-pmem.c
-> >  create mode 100644 include/hw/virtio/virtio-pmem.h
-> 
-> > diff --git a/hw/virtio/virtio-pmem.c b/hw/virtio/virtio-pmem.c
-> > new file mode 100644
-> > index 0000000000..c462d2c942
-> > --- /dev/null
-> > +++ b/hw/virtio/virtio-pmem.c
-> > @@ -0,0 +1,190 @@
-> 
-> > +static void virtio_pmem_unrealize(DeviceState *dev, Error **errp)
-> > +{
-> > +    VirtIODevice *vdev = VIRTIO_DEVICE(dev);
-> > +    VirtIOPMEM *pmem = VIRTIO_PMEM(dev);
+> >  target/rx/cpu.h | 12 ++++++------
+> >  hw/rx/rx-virt.c |  2 +-
+> >  hw/rx/rx62n.c   |  2 +-
+> >  target/rx/cpu.c | 43 ++++++++++++++++++++++++++-----------------
+> >  4 files changed, 34 insertions(+), 25 deletions(-)
+> > 
+> > diff --git a/target/rx/cpu.h b/target/rx/cpu.h
+> > index 8c1a4e448d..a0b6975963 100644
+> > --- a/target/rx/cpu.h
+> > +++ b/target/rx/cpu.h
+> > @@ -24,14 +24,14 @@
+> >  #include "hw/registerfields.h"
+> >  #include "qom/cpu.h"
+> >  
+> > -#define TYPE_RXCPU "rxcpu"
+> > +#define TYPE_RX_CPU "rx-cpu"
+> >  
+> >  #define RXCPU_CLASS(klass)                                     \
+> > -    OBJECT_CLASS_CHECK(RXCPUClass, (klass), TYPE_RXCPU)
+> > +    OBJECT_CLASS_CHECK(RXCPUClass, (klass), TYPE_RX_CPU)
+> >  #define RXCPU(obj) \
+> > -    OBJECT_CHECK(RXCPU, (obj), TYPE_RXCPU)
+> > +    OBJECT_CHECK(RXCPU, (obj), TYPE_RX_CPU)
+> >  #define RXCPU_GET_CLASS(obj) \
+> > -    OBJECT_GET_CLASS(RXCPUClass, (obj), TYPE_RXCPU)
+> > +    OBJECT_GET_CLASS(RXCPUClass, (obj), TYPE_RX_CPU)
+> >  
+> >  /*
+> >   * RXCPUClass:
+> > @@ -164,9 +164,9 @@ static inline RXCPU *rx_env_get_cpu(CPURXState *env)
+> >  
+> >  #define ENV_OFFSET offsetof(RXCPU, env)
+> >  
+> > -#define RX_CPU_TYPE_SUFFIX "-" TYPE_RXCPU
+> > +#define RX_CPU_TYPE_SUFFIX "-" TYPE_RX_CPU
+> >  #define RX_CPU_TYPE_NAME(model) model RX_CPU_TYPE_SUFFIX
+> > -#define CPU_RESOLVING_TYPE TYPE_RXCPU
+> > +#define CPU_RESOLVING_TYPE TYPE_RX_CPU
+> >  
+> >  extern const char rx_crname[][6];
+> >  
+> > diff --git a/hw/rx/rx-virt.c b/hw/rx/rx-virt.c
+> > index 3deb7cb335..72a2989fcf 100644
+> > --- a/hw/rx/rx-virt.c
+> > +++ b/hw/rx/rx-virt.c
+> > @@ -88,7 +88,7 @@ static void rxvirt_class_init(ObjectClass *oc, void *data)
+> >      mc->desc = "RX QEMU Virtual Target";
+> >      mc->init = rxvirt_init;
+> >      mc->is_default = 1;
+> > -    mc->default_cpu_type = TYPE_RXCPU;
+> > +    mc->default_cpu_type = RX_CPU_TYPE_NAME("rx62n");
+> >  }
+> >  
+> >  static const TypeInfo rxvirt_type = {
+> > diff --git a/hw/rx/rx62n.c b/hw/rx/rx62n.c
+> > index c6660b75b4..3a8fe7b0bf 100644
+> > --- a/hw/rx/rx62n.c
+> > +++ b/hw/rx/rx62n.c
+> > @@ -195,7 +195,7 @@ static void rx62n_realize(DeviceState *dev, Error **errp)
+> >      }
+> >  
+> >      object_initialize_child(OBJECT(s), "cpu", &s->cpu,
+> > -                            sizeof(RXCPU), TYPE_RXCPU,
+> > +                            sizeof(RXCPU), RX_CPU_TYPE_NAME("rx62n"),
+> >                              errp, NULL);
+> >      object_property_set_bool(OBJECT(&s->cpu), true, "realized", errp);
+> >  
+> > diff --git a/target/rx/cpu.c b/target/rx/cpu.c
+> > index 3268077d08..41fe1de4bb 100644
+> > --- a/target/rx/cpu.c
+> > +++ b/target/rx/cpu.c
+> > @@ -74,13 +74,14 @@ static void rx_cpu_list_entry(gpointer data, gpointer user_data)
+> >      const char *typename = object_class_get_name(OBJECT_CLASS(data));
+> >      int len = strlen(typename) - strlen(RX_CPU_TYPE_SUFFIX);
+> >  
+> > -    qemu_printf("%.*s\n", len, typename);
+> > +    qemu_printf("  %.*s\n", len, typename);
+> >  }
+> >  
+> >  void rx_cpu_list(void)
+> >  {
+> > -    GSList *list;
+> > -    list = object_class_get_list_sorted(TYPE_RXCPU, false);
+> > +    GSList *list = object_class_get_list_sorted(TYPE_RX_CPU, false);
 > > +
-> > +    host_memory_backend_set_mapped(pmem->memdev, false);
-> > +    pmem->rq_vq = virtio_add_queue(vdev, 128, virtio_pmem_flush);
+> > +    qemu_printf("Available CPUs:\n");
+> >      g_slist_foreach(list, rx_cpu_list_entry, NULL);
+> >      g_slist_free(list);
+> >  }
+> > @@ -88,15 +89,17 @@ void rx_cpu_list(void)
+> >  static ObjectClass *rx_cpu_class_by_name(const char *cpu_model)
+> >  {
+> >      ObjectClass *oc;
+> > -    char *typename = NULL;
+> > +    char *typename;
+> >  
+> > -    typename = g_strdup_printf(RX_CPU_TYPE_NAME(""));
+> > +    typename = g_strdup_printf(RX_CPU_TYPE_NAME("%s"), cpu_model);
+> >      oc = object_class_by_name(typename);
 > 
-> Adding a queue during unrealize looks weird... copy/paste error?
+> again repeating v16: see alpha_cpu_class_by_name() as preferred
+> way to use this method.
 
-Yes. Thanks for catching this. Will correct in v2.
+OK.
+I misunderstood. I'll fix like alpha cpu.
 
-Thanks,
-Pankaj
 > 
-> > +    virtio_cleanup(vdev);
-> > +}
+> > -    if (oc != NULL && object_class_is_abstract(oc)) {
+> > -        oc = NULL;
+> > -    }
+> > -
+> >      g_free(typename);
+> > +
+> > +    if (oc == NULL ||
+> > +        object_class_is_abstract(oc) ||
+> > +        !object_class_dynamic_cast(oc, TYPE_RX_CPU)) {
+> > +        return NULL;
+> > +    }
+> >      return oc;
+> >  }
+> >  
+> > @@ -166,7 +169,7 @@ static void rx_cpu_init(Object *obj)
+> >      qdev_init_gpio_in(DEVICE(cpu), rx_cpu_set_irq, 2);
+> >  }
+> >  
+> > -static void rxcpu_class_init(ObjectClass *klass, void *data)
+> > +static void rx_cpu_class_init(ObjectClass *klass, void *data)
+> >  {
+> >      DeviceClass *dc = DEVICE_CLASS(klass);
+> >      CPUClass *cc = CPU_CLASS(klass);
+> > @@ -195,22 +198,28 @@ static void rxcpu_class_init(ObjectClass *klass, void *data)
+> >      cc->gdb_num_core_regs = 26;
+> >  }
+> >  
+> > -static const TypeInfo rxcpu_info = {
+> > -    .name = TYPE_RXCPU,
+> > +static const TypeInfo rx_cpu_info = {
+> > +    .name = TYPE_RX_CPU,
+> >      .parent = TYPE_CPU,
+> >      .instance_size = sizeof(RXCPU),
+> >      .instance_init = rx_cpu_init,
+> > -    .abstract = false,
+> > +    .abstract = true,
+> >      .class_size = sizeof(RXCPUClass),
+> > -    .class_init = rxcpu_class_init,
+> > +    .class_init = rx_cpu_class_init,
+> > +};
+> > +
+> > +static const TypeInfo rx62n_rx_cpu_info = {
+> > +    .name = RX_CPU_TYPE_NAME("rx62n"),
+> > +    .parent = TYPE_RX_CPU,
+> >  };
+> >  
+> > -static void rxcpu_register_types(void)
+> > +static void rx_cpu_register_types(void)
+> >  {
+> > -    type_register_static(&rxcpu_info);
+> > +    type_register_static(&rx_cpu_info);
+> > +    type_register_static(&rx62n_rx_cpu_info);
+> >  }
+> >  
+> > -type_init(rxcpu_register_types)
+> > +type_init(rx_cpu_register_types)
+> >  
+> >  static uint32_t extable[32];
+> >  
 > 
 > 
+
+-- 
+Yosinori Sato
 
