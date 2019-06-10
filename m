@@ -2,55 +2,67 @@ Return-Path: <SRS0=Y1tr=UJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 64ACCC28EBD
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 02:48:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C9BEBC2BCA1
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 02:52:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3B618207E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 02:48:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3B618207E0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id A1CB220644
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 02:52:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A1CB220644
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39964 helo=lists.gnu.org)
+Received: from localhost ([::1]:40060 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1haAMN-0002kD-Dk
-	for qemu-devel@archiver.kernel.org; Sun, 09 Jun 2019 22:48:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56646)
+	id 1haAQN-0007bC-EG
+	for qemu-devel@archiver.kernel.org; Sun, 09 Jun 2019 22:52:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35925)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <colin.xu@intel.com>) id 1ha9uW-0005fI-3E
- for qemu-devel@nongnu.org; Sun, 09 Jun 2019 22:19:49 -0400
+ (envelope-from <no-reply@patchew.org>) id 1haAPX-00070M-2R
+ for qemu-devel@nongnu.org; Sun, 09 Jun 2019 22:51:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <colin.xu@intel.com>) id 1ha9uU-0000mx-Ub
- for qemu-devel@nongnu.org; Sun, 09 Jun 2019 22:19:48 -0400
-Received: from mga11.intel.com ([192.55.52.93]:11390)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <colin.xu@intel.com>) id 1ha9uU-0000lx-Mj
- for qemu-devel@nongnu.org; Sun, 09 Jun 2019 22:19:46 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
- by fmsmga102.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 09 Jun 2019 19:19:42 -0700
-X-ExtLoop1: 1
-Received: from coxu-arch-shz.sh.intel.com ([10.239.160.21])
- by orsmga008.jf.intel.com with ESMTP; 09 Jun 2019 19:19:41 -0700
-From: Colin Xu <colin.xu@intel.com>
-To: qemu-devel@nongnu.org
-Date: Mon, 10 Jun 2019 10:19:39 +0800
-Message-Id: <20190610021939.13669-1-colin.xu@intel.com>
-X-Mailer: git-send-email 2.21.0
+ (envelope-from <no-reply@patchew.org>) id 1haAPV-0002QI-Eq
+ for qemu-devel@nongnu.org; Sun, 09 Jun 2019 22:51:51 -0400
+Resent-Date: Sun, 09 Jun 2019 22:51:50 -0400
+Resent-Message-Id: <E1haAPV-0002QI-Eq@eggs.gnu.org>
+Received: from sender4-of-o55.zoho.com ([136.143.188.55]:21545)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1haAPV-0002Km-63
+ for qemu-devel@nongnu.org; Sun, 09 Jun 2019 22:51:49 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1560135090; cv=none; d=zoho.com; s=zohoarc; 
+ b=Rl1gHKOahtPTITfNLyyYPAIOFAE+TWS46roNg4w66mFJG4jmmniazJvMbcgR2h7iFbZjezlStODjXQkVMce1cvs7hXpUNZFd3dxzmoNppF/PEuDnCA/XdAn2b78XN1pzXdzZD0yb68QfgAMvkyjgRHiEgVdyo+SmpV3AgK/84CU=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
+ s=zohoarc; t=1560135090;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
+ bh=KZNkA0Xznve503wSAaOHclASVBDBOgZSRbMFh6pTWJ4=; 
+ b=HTqhCb/s9e/3z+E4AdkY2hAcW2vRkAXv2GHXuOFsDGNCzt9PrNT0g3NAATIeWeUpkQJ5/ecuV183crxOv9CIetnK3geYV172sBjTu1EcxlM2006zNDiRLo5mlsK6PscqK22klkIYsiPG/nbmAAh94aMk10ASHO3pHuQiKKXIP30=
+ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1560135088251105.70549871223807;
+ Sun, 9 Jun 2019 19:51:28 -0700 (PDT)
+In-Reply-To: <20190610020218.9228-1-richard.henderson@linaro.org>
+Message-ID: <156013508735.32260.4304390977083594739@ce79690b2cb9>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 192.55.52.93
-Subject: [Qemu-devel] [PATCH] hax: Honor CPUState::halted
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: richard.henderson@linaro.org
+Date: Sun, 9 Jun 2019 19:51:28 -0700 (PDT)
+X-ZohoMailClient: External
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 136.143.188.55
+Subject: Re: [Qemu-devel] [PULL 00/39] tcg: Move the softmmu tlb to
+ CPUNegativeOffsetState
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -62,128 +74,127 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: colin.xu@intel.com
+Reply-To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-QEMU tracks whether a vcpu is halted using CPUState::halted. E.g.,
-after initialization or reset, halted is 0 for the BSP (vcpu 0)
-and 1 for the APs (vcpu 1, 2, ...). A halted vcpu should not be
-handed to the hypervisor to run (e.g. hax_vcpu_run()).
-
-Under HAXM, Android Emulator sometimes boots into a "vcpu shutdown
-request" error while executing in SeaBIOS, with the HAXM driver
-logging a guest triple fault in vcpu 1, 2, ... at RIP 0x3. That is
-ultimately because the HAX accelerator asks HAXM to run those APs
-when they are still in the halted state.
-
-Normally, the vcpu thread for an AP will start by looping in
-qemu_wait_io_event(), until the BSP kicks it via a pair of IPIs
-(INIT followed by SIPI). But because the HAX accelerator does not
-honor cpu->halted, it allows the AP vcpu thread to proceed to
-hax_vcpu_run() as soon as it receives any kick, even if the kick
-does not come from the BSP. It turns out that emulator has a
-worker thread which periodically kicks every vcpu thread (possibly
-to collect CPU usage data), and if one of these kicks comes before
-those by the BSP, the AP will start execution from the wrong RIP,
-resulting in the aforementioned SMP boot failure.
-
-The solution is inspired by the KVM accelerator (credit to
-Chuanxiao Dong <chuanxiao.dong@intel.com> for the pointer):
-
-1. Get rid of questionable logic that unconditionally resets
-   cpu->halted before hax_vcpu_run(). Instead, only reset it at the
-   right moments (there are only a few "unhalt" events).
-2. Add a check for cpu->halted before hax_vcpu_run().
-
-Note that although the non-Unrestricted Guest (!ug_platform) code
-path also forcibly resets cpu->halted, it is left untouched,
-because only the UG code path supports SMP guests.
-
-The patch is first merged to android emulator with Change-Id:
-I9c5752cc737fd305d7eace1768ea12a07309d716
-
-Cc: Yu Ning <yu.ning@intel.com>
-Cc: Chuanxiao Dong <chuanxiao.dong@intel.com>
-Signed-off-by: Colin Xu <colin.xu@intel.com>
----
- cpus.c                |  1 -
- target/i386/hax-all.c | 36 ++++++++++++++++++++++++++++++++++--
- 2 files changed, 34 insertions(+), 3 deletions(-)
-
-diff --git a/cpus.c b/cpus.c
-index ffc57119ca5e..c1a56cd9ab01 100644
---- a/cpus.c
-+++ b/cpus.c
-@@ -1591,7 +1591,6 @@ static void *qemu_hax_cpu_thread_fn(void *arg)
- 
-     cpu->thread_id = qemu_get_thread_id();
-     cpu->created = true;
--    cpu->halted = 0;
-     current_cpu = cpu;
- 
-     hax_init_vcpu(cpu);
-diff --git a/target/i386/hax-all.c b/target/i386/hax-all.c
-index 44b89c1d74ae..58a27b475ec8 100644
---- a/target/i386/hax-all.c
-+++ b/target/i386/hax-all.c
-@@ -471,13 +471,35 @@ static int hax_vcpu_hax_exec(CPUArchState *env)
-         return 0;
-     }
- 
--    cpu->halted = 0;
--
-     if (cpu->interrupt_request & CPU_INTERRUPT_POLL) {
-         cpu->interrupt_request &= ~CPU_INTERRUPT_POLL;
-         apic_poll_irq(x86_cpu->apic_state);
-     }
- 
-+    /* After a vcpu is halted (either because it is an AP and has just been
-+     * reset, or because it has executed the HLT instruction), it will not be
-+     * run (hax_vcpu_run()) until it is unhalted. The next few if blocks check
-+     * for events that may change the halted state of this vcpu:
-+     *  a) Maskable interrupt, when RFLAGS.IF is 1;
-+     *     Note: env->eflags may not reflect the current RFLAGS state, because
-+     *           it is not updated after each hax_vcpu_run(). We cannot afford
-+     *           to fail to recognize any unhalt-by-maskable-interrupt event
-+     *           (in which case the vcpu will halt forever), and yet we cannot
-+     *           afford the overhead of hax_vcpu_sync_state(). The current
-+     *           solution is to err on the side of caution and have the HLT
-+     *           handler (see case HAX_EXIT_HLT below) unconditionally set the
-+     *           IF_MASK bit in env->eflags, which, in effect, disables the
-+     *           RFLAGS.IF check.
-+     *  b) NMI;
-+     *  c) INIT signal;
-+     *  d) SIPI signal.
-+     */
-+    if (((cpu->interrupt_request & CPU_INTERRUPT_HARD) &&
-+         (env->eflags & IF_MASK)) ||
-+        (cpu->interrupt_request & CPU_INTERRUPT_NMI)) {
-+        cpu->halted = 0;
-+    }
-+
-     if (cpu->interrupt_request & CPU_INTERRUPT_INIT) {
-         DPRINTF("\nhax_vcpu_hax_exec: handling INIT for %d\n",
-                 cpu->cpu_index);
-@@ -493,6 +515,16 @@ static int hax_vcpu_hax_exec(CPUArchState *env)
-         hax_vcpu_sync_state(env, 1);
-     }
- 
-+    if (cpu->halted) {
-+        /* If this vcpu is halted, we must not ask HAXM to run it. Instead, we
-+         * break out of hax_smp_cpu_exec() as if this vcpu had executed HLT.
-+         * That way, this vcpu thread will be trapped in qemu_wait_io_event(),
-+         * until the vcpu is unhalted.
-+         */
-+        cpu->exception_index = EXCP_HLT;
-+        return 0;
-+    }
-+
-     do {
-         int hax_ret;
- 
--- 
-2.21.0
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDYxMDAyMDIxOC45MjI4
+LTEtcmljaGFyZC5oZW5kZXJzb25AbGluYXJvLm9yZy8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVt
+cyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZv
+cgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQVUxMIDAwLzM5XSB0
+Y2c6IE1vdmUgdGhlIHNvZnRtbXUgdGxiIHRvIENQVU5lZ2F0aXZlT2Zmc2V0U3RhdGUKVHlwZTog
+c2VyaWVzCk1lc3NhZ2UtaWQ6IDIwMTkwNjEwMDIwMjE4LjkyMjgtMS1yaWNoYXJkLmhlbmRlcnNv
+bkBsaW5hcm8ub3JnCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCmdpdCBy
+ZXYtcGFyc2UgYmFzZSA+IC9kZXYvbnVsbCB8fCBleGl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRp
+ZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0
+IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2tw
+YXRjaC5wbCAtLW1haWxiYWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKRnJvbSBo
+dHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKICogW25ldyB0YWddICAgICAg
+ICAgICAgICAgcGF0Y2hldy8yMDE5MDYxMDAyMDIxOC45MjI4LTEtcmljaGFyZC5oZW5kZXJzb25A
+bGluYXJvLm9yZyAtPiBwYXRjaGV3LzIwMTkwNjEwMDIwMjE4LjkyMjgtMS1yaWNoYXJkLmhlbmRl
+cnNvbkBsaW5hcm8ub3JnClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKZjgwNjdhYmU1
+ZSB0Y2cvYXJtOiBSZW1vdmUgbW9zdGx5IHVucmVhY2hhYmxlIHRsYiBzcGVjaWFsIGNhc2UKYjRk
+MWQ3YmMwOSB0Y2cvYXJtOiBVc2UgTERSRCB0byBsb2FkIHRsYiBtYXNrK3RhYmxlCmJlNTk2MTFm
+ZTEgdGNnL2FhcmNoNjQ6IFVzZSBMRFAgdG8gbG9hZCB0bGIgbWFzayt0YWJsZQo5MDBlNjZmNTEy
+IGNwdTogUmVtb3ZlIENQVV9DT01NT04KYTRmYWMwYTViYiBjcHU6IE1vdmUgdGhlIHNvZnRtbXUg
+dGxiIHRvIENQVU5lZ2F0aXZlT2Zmc2V0U3RhdGUKNTkyZjljZDdiZSBjcHU6IE1vdmUgaWNvdW50
+X2RlY3IgdG8gQ1BVTmVnYXRpdmVPZmZzZXRTdGF0ZQo1ZDg4Y2I0Yzc0IGNwdTogSW50cm9kdWNl
+IENQVU5lZ2F0aXZlT2Zmc2V0U3RhdGUKODczODIwMzk3NCBjcHU6IEludHJvZHVjZSBjcHVfc2V0
+X2NwdXN0YXRlX3BvaW50ZXJzCmMwN2FkMWY3NTQgY3B1OiBNb3ZlIEVOVl9PRkZTRVQgdG8gZXhl
+Yy9nZW4taWNvdW50LmgKNjU0YjdjZDYxNyB0YXJnZXQveHRlbnNhOiBVc2UgZW52X2NwdSwgZW52
+X2FyY2hjcHUKMWEwNDAzMWVjZiB0YXJnZXQvdW5pY29yZTMyOiBVc2UgZW52X2NwdSwgZW52X2Fy
+Y2hjcHUKYjJmMGRiMTkwMiB0YXJnZXQvdHJpY29yZTogVXNlIGVudl9jcHUKNjljNzQwYjczZSB0
+YXJnZXQvdGlsZWd4OiBVc2UgZW52X2NwdQowNjU3MDM1ZmNmIHRhcmdldC9zcGFyYzogVXNlIGVu
+dl9jcHUsIGVudl9hcmNoY3B1CjYwNDIxYWEzZWEgdGFyZ2V0L3NoNDogVXNlIGVudl9jcHUsIGVu
+dl9hcmNoY3B1CmVmNWE2Y2RmMTkgdGFyZ2V0L3MzOTB4OiBVc2UgZW52X2NwdSwgZW52X2FyY2hj
+cHUKMWQ4Y2I5NmQwNiB0YXJnZXQvcmlzY3Y6IFVzZSBlbnZfY3B1LCBlbnZfYXJjaGNwdQpiYzVh
+ZjAzZjg2IHRhcmdldC9wcGM6IFVzZSBlbnZfY3B1LCBlbnZfYXJjaGNwdQo1MTY5YzQzMjM5IHRh
+cmdldC9vcGVucmlzYzogVXNlIGVudl9jcHUsIGVudl9hcmNoY3B1CmI3ZDZiNWE5ZjMgdGFyZ2V0
+L25pb3MyOiBVc2UgZW52X2NwdSwgZW52X2FyY2hjcHUKZWZiMWY5ZmM1ZiB0YXJnZXQvbW94aWU6
+IFVzZSBlbnZfY3B1LCBlbnZfYXJjaGNwdQo4MzAxMGNhODJkIHRhcmdldC9taXBzOiBVc2UgZW52
+X2NwdSwgZW52X2FyY2hjcHUKZTlkZjQxOGRhZSB0YXJnZXQvbWljcm9ibGF6ZTogVXNlIGVudl9j
+cHUsIGVudl9hcmNoY3B1CmM2MjU5ZGZjMTUgdGFyZ2V0L202OGs6IFVzZSBlbnZfY3B1CjBlNjA5
+MGE0OWEgdGFyZ2V0L2xtMzI6IFVzZSBlbnZfY3B1LCBlbnZfYXJjaGNwdQo4MWUzOGUwYWQ4IHRh
+cmdldC9pMzg2OiBVc2UgZW52X2NwdSwgZW52X2FyY2hjcHUKYjg2ZjAyODQ4ZSB0YXJnZXQvaHBw
+YTogVXNlIGVudl9jcHUsIGVudl9hcmNoY3B1CmQ1NGVhMTM4YTIgdGFyZ2V0L2NyaXM6IFVzZSBl
+bnZfY3B1LCBlbnZfYXJjaGNwdQoxMGFlOTM5NGNmIHRhcmdldC9jcmlzOiBSZWluZGVudCBvcF9o
+ZWxwZXIuYwpjODQyNTcxNTRjIHRhcmdldC9jcmlzOiBSZWluZGVudCBtbXUuYwowNzY1NWE5NDAw
+IHRhcmdldC9hcm06IFVzZSBlbnZfY3B1LCBlbnZfYXJjaGNwdQpiYTY5NTBlMDY1IHRhcmdldC9h
+bHBoYTogVXNlIGVudl9jcHUsIGVudl9hcmNoY3B1CmRlMWFmNDQ3NzIgY3B1OiBJbnRyb2R1Y2Ug
+ZW52X2FyY2hjcHUKNGI5Y2VlZmMyZCBjcHU6IFJlcGxhY2UgRU5WX0dFVF9DUFUgd2l0aCBlbnZf
+Y3B1CmZhZjVkNjNiMWYgY3B1OiBEZWZpbmUgQXJjaENQVQpkOGYzNWI1NGNlIGNwdTogRGVmaW5l
+IENQVUFyY2hTdGF0ZSB3aXRoIHR5cGVkZWYKNzhmMDY1OGY5MiB0Y2c6IENyZWF0ZSBzdHJ1Y3Qg
+Q1BVVExCCjljN2Y1NjZiOTIgdGNnOiBTcGxpdCBvdXQgdGFyZ2V0L2FyY2gvY3B1LXBhcmFtLmgK
+NjlhNjE5ZTVjNCB0Y2c6IEZvbGQgQ1BVVExCV2luZG93IGludG8gQ1BVVExCRGVzYwoKPT09IE9V
+VFBVVCBCRUdJTiA9PT0KMS8zOSBDaGVja2luZyBjb21taXQgNjlhNjE5ZTVjNDQ5ICh0Y2c6IEZv
+bGQgQ1BVVExCV2luZG93IGludG8gQ1BVVExCRGVzYykKMi8zOSBDaGVja2luZyBjb21taXQgOWM3
+ZjU2NmI5MjM5ICh0Y2c6IFNwbGl0IG91dCB0YXJnZXQvYXJjaC9jcHUtcGFyYW0uaCkKV0FSTklO
+RzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVk
+IHVwZGF0aW5nPwojNTc6IApuZXcgZmlsZSBtb2RlIDEwMDY0NAoKdG90YWw6IDAgZXJyb3JzLCAx
+IHdhcm5pbmdzLCAxMjkwIGxpbmVzIGNoZWNrZWQKClBhdGNoIDIvMzkgaGFzIHN0eWxlIHByb2Js
+ZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9z
+aXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBN
+QUlOVEFJTkVSUy4KMy8zOSBDaGVja2luZyBjb21taXQgNzhmMDY1OGY5MjcxICh0Y2c6IENyZWF0
+ZSBzdHJ1Y3QgQ1BVVExCKQo0LzM5IENoZWNraW5nIGNvbW1pdCBkOGYzNWI1NGNlNTggKGNwdTog
+RGVmaW5lIENQVUFyY2hTdGF0ZSB3aXRoIHR5cGVkZWYpCjUvMzkgQ2hlY2tpbmcgY29tbWl0IGZh
+ZjVkNjNiMWY1NiAoY3B1OiBEZWZpbmUgQXJjaENQVSkKNi8zOSBDaGVja2luZyBjb21taXQgNGI5
+Y2VlZmMyZDdiIChjcHU6IFJlcGxhY2UgRU5WX0dFVF9DUFUgd2l0aCBlbnZfY3B1KQo3LzM5IENo
+ZWNraW5nIGNvbW1pdCBkZTFhZjQ0NzcyMmIgKGNwdTogSW50cm9kdWNlIGVudl9hcmNoY3B1KQo4
+LzM5IENoZWNraW5nIGNvbW1pdCBiYTY5NTBlMDY1NjggKHRhcmdldC9hbHBoYTogVXNlIGVudl9j
+cHUsIGVudl9hcmNoY3B1KQo5LzM5IENoZWNraW5nIGNvbW1pdCAwNzY1NWE5NDAwOTggKHRhcmdl
+dC9hcm06IFVzZSBlbnZfY3B1LCBlbnZfYXJjaGNwdSkKMTAvMzkgQ2hlY2tpbmcgY29tbWl0IGM4
+NDI1NzE1NGM3OCAodGFyZ2V0L2NyaXM6IFJlaW5kZW50IG1tdS5jKQoxMS8zOSBDaGVja2luZyBj
+b21taXQgMTBhZTkzOTRjZmMwICh0YXJnZXQvY3JpczogUmVpbmRlbnQgb3BfaGVscGVyLmMpCjEy
+LzM5IENoZWNraW5nIGNvbW1pdCBkNTRlYTEzOGEyZTIgKHRhcmdldC9jcmlzOiBVc2UgZW52X2Nw
+dSwgZW52X2FyY2hjcHUpCjEzLzM5IENoZWNraW5nIGNvbW1pdCBiODZmMDI4NDhlMmIgKHRhcmdl
+dC9ocHBhOiBVc2UgZW52X2NwdSwgZW52X2FyY2hjcHUpCjE0LzM5IENoZWNraW5nIGNvbW1pdCA4
+MWUzOGUwYWQ4MGUgKHRhcmdldC9pMzg2OiBVc2UgZW52X2NwdSwgZW52X2FyY2hjcHUpCjE1LzM5
+IENoZWNraW5nIGNvbW1pdCAwZTYwOTBhNDlhMjkgKHRhcmdldC9sbTMyOiBVc2UgZW52X2NwdSwg
+ZW52X2FyY2hjcHUpCjE2LzM5IENoZWNraW5nIGNvbW1pdCBjNjI1OWRmYzE1YmYgKHRhcmdldC9t
+NjhrOiBVc2UgZW52X2NwdSkKMTcvMzkgQ2hlY2tpbmcgY29tbWl0IGU5ZGY0MThkYWVjOCAodGFy
+Z2V0L21pY3JvYmxhemU6IFVzZSBlbnZfY3B1LCBlbnZfYXJjaGNwdSkKMTgvMzkgQ2hlY2tpbmcg
+Y29tbWl0IDgzMDEwY2E4MmRkOSAodGFyZ2V0L21pcHM6IFVzZSBlbnZfY3B1LCBlbnZfYXJjaGNw
+dSkKMTkvMzkgQ2hlY2tpbmcgY29tbWl0IGVmYjFmOWZjNWZkZSAodGFyZ2V0L21veGllOiBVc2Ug
+ZW52X2NwdSwgZW52X2FyY2hjcHUpCjIwLzM5IENoZWNraW5nIGNvbW1pdCBiN2Q2YjVhOWYzY2Ig
+KHRhcmdldC9uaW9zMjogVXNlIGVudl9jcHUsIGVudl9hcmNoY3B1KQoyMS8zOSBDaGVja2luZyBj
+b21taXQgNTE2OWM0MzIzOTI5ICh0YXJnZXQvb3BlbnJpc2M6IFVzZSBlbnZfY3B1LCBlbnZfYXJj
+aGNwdSkKMjIvMzkgQ2hlY2tpbmcgY29tbWl0IGJjNWFmMDNmODZjYyAodGFyZ2V0L3BwYzogVXNl
+IGVudl9jcHUsIGVudl9hcmNoY3B1KQoyMy8zOSBDaGVja2luZyBjb21taXQgMWQ4Y2I5NmQwNmUx
+ICh0YXJnZXQvcmlzY3Y6IFVzZSBlbnZfY3B1LCBlbnZfYXJjaGNwdSkKMjQvMzkgQ2hlY2tpbmcg
+Y29tbWl0IGVmNWE2Y2RmMTkyOCAodGFyZ2V0L3MzOTB4OiBVc2UgZW52X2NwdSwgZW52X2FyY2hj
+cHUpCjI1LzM5IENoZWNraW5nIGNvbW1pdCA2MDQyMWFhM2VhN2UgKHRhcmdldC9zaDQ6IFVzZSBl
+bnZfY3B1LCBlbnZfYXJjaGNwdSkKMjYvMzkgQ2hlY2tpbmcgY29tbWl0IDA2NTcwMzVmY2ZkMiAo
+dGFyZ2V0L3NwYXJjOiBVc2UgZW52X2NwdSwgZW52X2FyY2hjcHUpCjI3LzM5IENoZWNraW5nIGNv
+bW1pdCA2OWM3NDBiNzNlMjIgKHRhcmdldC90aWxlZ3g6IFVzZSBlbnZfY3B1KQoyOC8zOSBDaGVj
+a2luZyBjb21taXQgYjJmMGRiMTkwMjZmICh0YXJnZXQvdHJpY29yZTogVXNlIGVudl9jcHUpCjI5
+LzM5IENoZWNraW5nIGNvbW1pdCAxYTA0MDMxZWNmNjggKHRhcmdldC91bmljb3JlMzI6IFVzZSBl
+bnZfY3B1LCBlbnZfYXJjaGNwdSkKMzAvMzkgQ2hlY2tpbmcgY29tbWl0IDY1NGI3Y2Q2MTdkOCAo
+dGFyZ2V0L3h0ZW5zYTogVXNlIGVudl9jcHUsIGVudl9hcmNoY3B1KQozMS8zOSBDaGVja2luZyBj
+b21taXQgYzA3YWQxZjc1NDdjIChjcHU6IE1vdmUgRU5WX09GRlNFVCB0byBleGVjL2dlbi1pY291
+bnQuaCkKMzIvMzkgQ2hlY2tpbmcgY29tbWl0IDg3MzgyMDM5NzQ2OSAoY3B1OiBJbnRyb2R1Y2Ug
+Y3B1X3NldF9jcHVzdGF0ZV9wb2ludGVycykKMzMvMzkgQ2hlY2tpbmcgY29tbWl0IDVkODhjYjRj
+NzQwMCAoY3B1OiBJbnRyb2R1Y2UgQ1BVTmVnYXRpdmVPZmZzZXRTdGF0ZSkKMzQvMzkgQ2hlY2tp
+bmcgY29tbWl0IDU5MmY5Y2Q3YmVkZiAoY3B1OiBNb3ZlIGljb3VudF9kZWNyIHRvIENQVU5lZ2F0
+aXZlT2Zmc2V0U3RhdGUpCkVSUk9SOiByZXR1cm4gaXMgbm90IGEgZnVuY3Rpb24sIHBhcmVudGhl
+c2VzIGFyZSBub3QgcmVxdWlyZWQKIzE5MzogRklMRTogY3B1cy5jOjI0MjoKKyAgICByZXR1cm4g
+KGNwdS0+aWNvdW50X2J1ZGdldCAtCgp0b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDMyNiBs
+aW5lcyBjaGVja2VkCgpQYXRjaCAzNC8zOSBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZp
+ZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRo
+ZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKMzUv
+MzkgQ2hlY2tpbmcgY29tbWl0IGE0ZmFjMGE1YmJkMCAoY3B1OiBNb3ZlIHRoZSBzb2Z0bW11IHRs
+YiB0byBDUFVOZWdhdGl2ZU9mZnNldFN0YXRlKQozNi8zOSBDaGVja2luZyBjb21taXQgOTAwZTY2
+ZjUxMmRjIChjcHU6IFJlbW92ZSBDUFVfQ09NTU9OKQozNy8zOSBDaGVja2luZyBjb21taXQgYmU1
+OTYxMWZlMTA2ICh0Y2cvYWFyY2g2NDogVXNlIExEUCB0byBsb2FkIHRsYiBtYXNrK3RhYmxlKQoz
+OC8zOSBDaGVja2luZyBjb21taXQgYjRkMWQ3YmMwOWNhICh0Y2cvYXJtOiBVc2UgTERSRCB0byBs
+b2FkIHRsYiBtYXNrK3RhYmxlKQozOS8zOSBDaGVja2luZyBjb21taXQgZjgwNjdhYmU1ZTNkICh0
+Y2cvYXJtOiBSZW1vdmUgbW9zdGx5IHVucmVhY2hhYmxlIHRsYiBzcGVjaWFsIGNhc2UpCj09PSBP
+VVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgpUaGUgZnVs
+bCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMTkwNjEwMDIw
+MjE4LjkyMjgtMS1yaWNoYXJkLmhlbmRlcnNvbkBsaW5hcm8ub3JnL3Rlc3RpbmcuY2hlY2twYXRj
+aC8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0
+Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRv
+IHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
 
 
