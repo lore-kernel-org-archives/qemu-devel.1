@@ -2,61 +2,64 @@ Return-Path: <SRS0=Y1tr=UJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=0.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MSGID_MULTIPLE_AT,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E9EA5C282DD
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 09:54:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D81DC282DD
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 09:56:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C20102082E
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 09:54:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C20102082E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=ispras.ru
+	by mail.kernel.org (Postfix) with ESMTPS id 2FCBB20833
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 09:56:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2FCBB20833
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43052 helo=lists.gnu.org)
+Received: from localhost ([::1]:43062 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1haH0P-0002pT-3p
-	for qemu-devel@archiver.kernel.org; Mon, 10 Jun 2019 05:54:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50143)
+	id 1haH24-0004YX-FK
+	for qemu-devel@archiver.kernel.org; Mon, 10 Jun 2019 05:56:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50343)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <Natalia.Fursova@ispras.ru>) id 1haGzv-0002FT-51
- for qemu-devel@nongnu.org; Mon, 10 Jun 2019 05:53:52 -0400
+ (envelope-from <quintela@redhat.com>) id 1haH0h-0003IA-3K
+ for qemu-devel@nongnu.org; Mon, 10 Jun 2019 05:54:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <Natalia.Fursova@ispras.ru>) id 1haGzt-0002oN-8T
- for qemu-devel@nongnu.org; Mon, 10 Jun 2019 05:53:51 -0400
-Received: from mail.ispras.ru ([83.149.199.45]:35742)
- by eggs.gnu.org with esmtp (Exim 4.71)
- (envelope-from <Natalia.Fursova@ispras.ru>) id 1haGzo-0002fP-3m
- for qemu-devel@nongnu.org; Mon, 10 Jun 2019 05:53:47 -0400
-Received: from NATALIAFURSOVA (unknown [85.142.117.226])
- by mail.ispras.ru (Postfix) with ESMTPSA id DE90254006B;
- Mon, 10 Jun 2019 12:53:36 +0300 (MSK)
-From: "Natalia Fursova" <Natalia.Fursova@ispras.ru>
-To: "'Natalia Fursova'" <Natalia.Fursova@ispras.ru>,
- "'Paolo Bonzini'" <pbonzini@redhat.com>, <qemu-devel@nongnu.org>,
- =?koi8-r?B?J/DB28En?= <Pavel.Dovgaluk@ispras.ru>, <afaerber@suse.de>,
- <armbru@redhat.com>
-References: <5cf62de9.1c69fb81.66fc.8f4fSMTPIN_ADDED_BROKEN@mx.google.com>
- <1e9e4edd-f4ad-d8d6-95a2-e0aeab89510d@redhat.com>
- <5cf7b6e6.1c69fb81.1cdca.e260SMTPIN_ADDED_BROKEN@mx.google.com>
- <ec5033a4-5c68-91b7-ca9e-a1f38c990221@redhat.com> 
-In-Reply-To: 
-Date: Mon, 10 Jun 2019 12:53:34 +0300
-Message-ID: <003b01d51f72$5e6f4160$1b4dc420$@Fursova@ispras.ru>
+ (envelope-from <quintela@redhat.com>) id 1haH0e-0003K9-SD
+ for qemu-devel@nongnu.org; Mon, 10 Jun 2019 05:54:38 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44622)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1haH0X-0003Ds-6B
+ for qemu-devel@nongnu.org; Mon, 10 Jun 2019 05:54:31 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id A30E4356E8;
+ Mon, 10 Jun 2019 09:54:25 +0000 (UTC)
+Received: from redhat.com (ovpn-116-138.ams2.redhat.com [10.36.116.138])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 380D15D705;
+ Mon, 10 Jun 2019 09:54:25 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+To: Wei Yang <richardw.yang@linux.intel.com>
+In-Reply-To: <20190521024748.GA23193@richard> (Wei Yang's message of "Tue, 21
+ May 2019 10:47:48 +0800")
+References: <20190515121544.4597-1-quintela@redhat.com>
+ <20190515121544.4597-7-quintela@redhat.com>
+ <20190521024748.GA23193@richard>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
+Date: Mon, 10 Jun 2019 11:54:22 +0200
+Message-ID: <87a7epvk8h.fsf@trasno.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="koi8-r"
-Content-Transfer-Encoding: quoted-printable
-X-Mailer: Microsoft Office Outlook 12.0
-Thread-Index: AdUbn5dVomEoJ1bbQxiyw0FvHJZsTgAClymwAPHgNOA=
-Content-Language: ru
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 83.149.199.45
-Subject: Re: [Qemu-devel] qgraph
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.30]); Mon, 10 Jun 2019 09:54:25 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v3 6/8] migration: Make none operations
+ into its own structure
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,60 +71,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Reply-To: quintela@redhat.com
+Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi there!
-Read please our correspondence and answer on last question (Will it ok =
-for
-QOM conception?)
-Also forwarding to QOM and QMP maintainers. Can you make comments on =
-this
-discussion?
+Wei Yang <richardw.yang@linux.intel.com> wrote:
+> On Wed, May 15, 2019 at 02:15:42PM +0200, Juan Quintela wrote:
+>>+
+>>+MultifdMethods multifd_none_ops = {
+>>+    .send_prepare = none_send_prepare,
+>>+    .send_write = none_send_write,
+>>+    .recv_pages = none_recv_pages
+>>+};
+>>+
+>> static int multifd_send_initial_packet(MultiFDSendParams *p, Error **errp)
+>> {
+>>     MultiFDInit_t msg;
+>>@@ -904,6 +938,8 @@ struct {
+>>     uint64_t packet_num;
+>>     /* send channels ready */
+>>     QemuSemaphore channels_ready;
+>>+    /* multifd ops */
+>>+    MultifdMethods *ops;
+>> } *multifd_send_state;
+>> 
+>> /*
+>>@@ -1093,6 +1129,8 @@ static void *multifd_send_thread(void *opaque)
+>>     /* initial packet */
+>>     p->num_packets = 1;
+>> 
+>>+    multifd_send_state->ops = &multifd_none_ops;
+>>+
+>
+> I am afraid it is not a good practice to assign ops when each thread starts
+> work.
 
+Agreed.
 
-Best regards,
-Natalia
-
------Original Message-----
-From: Natalia Fursova [mailto:Natalia.Fursova@ispras.ru]=20
-Sent: Wednesday, June 05, 2019 5:23 PM
-To: 'Paolo Bonzini'; 'qemu-devel@nongnu.org'; '=F0=C1=DB=C1'
-Subject: RE: [Qemu-devel] qgraph
-
-I see.
-We need this opportunity and want to implement it. Will it ok for QOM
-conception?
-
-
-
-Best regards,
-Natalia
-
------Original Message-----
-From: Paolo Bonzini [mailto:pbonzini@redhat.com]=20
-Sent: Wednesday, June 05, 2019 4:07 PM
-To: Natalia Fursova; qemu-devel@nongnu.org; '=F0=C1=DB=C1'
-Subject: Re: [Qemu-devel] qgraph
-
-On 05/06/19 14:34, Natalia Fursova wrote:
->=20
-> Thank you for your answer. I would like to clarify something about the =
-qmp
-> commands.
-> For example, consider SCSI controller "lsi53c895a". For getting
-information
-> we use two commands: "device-list-properties" and =
-"qom-list-properties".
-> Output consists of many properties, but there is no information about
-> provided buses by this device. Is there a qmp command which provides =
-this
-> information?
-
-Unfortunately there is no information in QMP about buses that are
-provided.   qom-list-types gives the buses that are requested.
-
-Paolo
-
+Thanks, Juan.
 
