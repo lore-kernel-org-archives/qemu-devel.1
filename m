@@ -2,93 +2,66 @@ Return-Path: <SRS0=Y1tr=UJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DB566C43218
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 20:09:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3274AC43218
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 20:30:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AAD0D20684
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 20:09:59 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="SwvWMMOv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AAD0D20684
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 0A0212082E
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 20:30:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0A0212082E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49444 helo=lists.gnu.org)
+Received: from localhost ([::1]:49488 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1haQcA-0001d2-Vi
-	for qemu-devel@archiver.kernel.org; Mon, 10 Jun 2019 16:09:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38792)
+	id 1haQvn-0006Wl-MJ
+	for qemu-devel@archiver.kernel.org; Mon, 10 Jun 2019 16:30:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42356)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <richard.henderson@linaro.org>) id 1haQbg-0001DI-Jz
- for qemu-devel@nongnu.org; Mon, 10 Jun 2019 16:09:29 -0400
+ (envelope-from <wainersm@redhat.com>) id 1haQtt-000544-Fz
+ for qemu-devel@nongnu.org; Mon, 10 Jun 2019 16:28:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1haQbf-0007wC-OS
- for qemu-devel@nongnu.org; Mon, 10 Jun 2019 16:09:28 -0400
-Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:35745)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1haQbf-0007vc-DC
- for qemu-devel@nongnu.org; Mon, 10 Jun 2019 16:09:27 -0400
-Received: by mail-pl1-x641.google.com with SMTP id p1so4087234plo.2
- for <qemu-devel@nongnu.org>; Mon, 10 Jun 2019 13:09:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=bPn1S4iNvMfWX8YAvlbnC/CV1rIJFFMUVUp7USfN5Y8=;
- b=SwvWMMOvsNqV3C1UZDOnFRfgzPk7NoCvLCto0LLfCe345lYvYj468hU9wMTuKrVSrH
- oXjshUXjktDSr3/qKu/aOVLn5E5d7d3pSZEMDQ/5JBk2/rAfV/DDybwAfkxd5n/z53nY
- m0MEyjZv7QdBRS/30QfIZ2Sf2O9tttko/vyN53pAxqbgXqiC6w1BHIa9YhrDZ3Zq6Puc
- jX+oqaPnAPehMjTUBzN2o/FI5T+x/ZOEdFHJ6boAzbm22Z229/q4FcWA9uKyNsbmxglr
- Zk5jlOLLJU0ztUK2fmTNXMkHZWXtmr3Hw7kc+pJbfFG87r5s8OmRHVx/hFJn0nMAA6hT
- 8RGA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=bPn1S4iNvMfWX8YAvlbnC/CV1rIJFFMUVUp7USfN5Y8=;
- b=cLn/APxbgJE1LB/+p2pdDTcNz9wsV+IaRW0NPKaCj6Sc8FB1Rn33TlCnFkByhpXJIu
- hw9uX+HVnH7imoTwkmsCNocz+6Qb0iDVIdBXOzhb3Nc9yoVvZ/tXQLVOHCWB+JKSLSZ0
- 81WLej7yGeXk9OrZgpUFhM7WK74Av32XRYKm/zS4RwNycRWgUJEzgg9v/GWfhS5va7dZ
- QOb/gH8ql0H8Wx52c3e9ZjKJvjyzK+1yRZon0VNh8pqgECf+P47waKnVtVWrDFUfBBdk
- CbEJKxkzVK1n8KF9DHPzAq7VnrZQBvzaCf+u6+qKyY9uva0weKHcmDNSpIUJncSo+T+f
- O8Fw==
-X-Gm-Message-State: APjAAAUnSlEEcXUNU250EHyFnZg/1maBoZTKcekI/uveM1wgJPJ8ldkv
- LLewIMebV0JOy9M4xtTkUhlRbw==
-X-Google-Smtp-Source: APXvYqzzHo57nuAimr2e2UFlYSmIDyivsYxcsIpBT4w2S2pL3NdIvSH8GtH0dmjNQUXlNWUPOFMTkg==
-X-Received: by 2002:a17:902:20ec:: with SMTP id
- v41mr68262734plg.142.1560197366139; 
- Mon, 10 Jun 2019 13:09:26 -0700 (PDT)
-Received: from [192.168.1.11] (97-113-13-231.tukw.qwest.net. [97.113.13.231])
- by smtp.gmail.com with ESMTPSA id
- o20sm9831971pgj.70.2019.06.10.13.09.24
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Mon, 10 Jun 2019 13:09:25 -0700 (PDT)
-To: Michael Rolnik <mrolnik@gmail.com>, qemu-devel@nongnu.org
-References: <20190606193012.37715-1-mrolnik@gmail.com>
- <20190606193012.37715-5-mrolnik@gmail.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <c868749e-61ea-8f8a-51c1-e6b9b9d445c6@linaro.org>
-Date: Mon, 10 Jun 2019 13:09:23 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ (envelope-from <wainersm@redhat.com>) id 1haQtC-0002eJ-6t
+ for qemu-devel@nongnu.org; Mon, 10 Jun 2019 16:27:36 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60254)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <wainersm@redhat.com>) id 1haQt6-0002YY-Fz
+ for qemu-devel@nongnu.org; Mon, 10 Jun 2019 16:27:31 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 08058C0586D8;
+ Mon, 10 Jun 2019 20:27:16 +0000 (UTC)
+Received: from localhost.localdomain (ovpn-123-147.rdu2.redhat.com
+ [10.10.123.147])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 1ACF8608CD;
+ Mon, 10 Jun 2019 20:27:06 +0000 (UTC)
+To: Cleber Rosa <crosa@redhat.com>, qemu-devel@nongnu.org
+References: <20190607152223.9467-1-crosa@redhat.com>
+ <20190607152223.9467-6-crosa@redhat.com>
+From: Wainer dos Santos Moschetta <wainersm@redhat.com>
+Message-ID: <0d622c97-02a4-7991-81e2-8974ca697a37@redhat.com>
+Date: Mon, 10 Jun 2019 17:27:05 -0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+ Thunderbird/52.5.2
 MIME-Version: 1.0
-In-Reply-To: <20190606193012.37715-5-mrolnik@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+In-Reply-To: <20190607152223.9467-6-crosa@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::641
-Subject: Re: [Qemu-devel] [PATCH v21 4/7] target/avr: Add instruction
- translation
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.31]); Mon, 10 Jun 2019 20:27:21 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH 5/8] VNC Acceptance test: use UNIX domain
+ sockets to avoid port collisions
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,31 +73,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Sarah Harris <S.E.Harris@kent.ac.uk>, rth@twiddle.net
+Cc: Fam Zheng <fam@euphon.net>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 6/6/19 12:30 PM, Michael Rolnik wrote:
-> +    target_long cpc;
-> +    target_long npc;
 
-CPC gets copied back and forth to NPC, but is now otherwise unused.
-You can drop that.
-
-> +static void translate(DisasContext *ctx)
-> +{
-> +    uint32_t opcode;
-> +    int res;
-> +    /* PC points to words.  */
-> +    opcode = cpu_ldl_code(ctx->env, ctx->cpc * 2) & 0x0000ffff;
+On 06/07/2019 12:22 PM, Cleber Rosa wrote:
+> While running in parallel, the VNC tests that use a TCP port easily
+> collide.  There's a number of possibilities to reduce the probability
+> of collisions, but none that completely prevents it from happening.
+>
+> So, to avoid those collisions, and given that the scope of the tests
+> are really not related to nature of the socket type, let's switch to
+> UNIX domain sockets created in temporary directories.
+>
+> Note: the amount of boiler plate code is far from the ideal, but it's
+> related to the fact that a test "workdir"[1] attribute can not be used
+> here, because of the 108 bytes limitation of the UNIX socket path (see
+> ad9579aaa16). There's a fair assumption here that the temporary
+> directory returned by Python's tempfile.mkdtemp() won't be anywhere
+> close to 100 bytes.
+>
+> [1] https://avocado-framework.readthedocs.io/en/68.0/api/test/avocado.html#avocado.Test.workdir
+>
+> Signed-off-by: Cleber Rosa <crosa@redhat.com>
+> ---
+>   tests/acceptance/vnc.py | 20 ++++++++++++++++++--
+>   1 file changed, 18 insertions(+), 2 deletions(-)
+>
+> diff --git a/tests/acceptance/vnc.py b/tests/acceptance/vnc.py
+> index 064ceabcc1..675fd507ed 100644
+> --- a/tests/acceptance/vnc.py
+> +++ b/tests/acceptance/vnc.py
+> @@ -8,6 +8,10 @@
+>   # This work is licensed under the terms of the GNU GPL, version 2 or
+>   # later.  See the COPYING file in the top-level directory.
+>   
+> +import os
+> +import tempfile
+> +import shutil
 > +
-> +    ctx->npc = ctx->cpc + 1;
+>   from avocado_qemu import Test
+>   
+>   
+> @@ -34,8 +38,16 @@ class Vnc(Test):
+>           self.assertEqual(set_password_response['error']['desc'],
+>                            'Could not set password')
+>   
+> +class VncUnixSocket(Test):
+> +
+> +    def setUp(self):
+> +        super(VncUnixSocket, self).setUp()
+> +        self.socket_dir = tempfile.mkdtemp()
+> +        self.socket_path = os.path.join(self.socket_dir, 'vnc-socket')
+> +
+>       def test_vnc_change_password_requires_a_password(self):
+> -        self.vm.add_args('-nodefaults', '-S', '-vnc', ':0')
+> +        self.vm.add_args('-nodefaults', '-S',
+> +                         '-vnc', 'unix:%s' % self.socket_path)
+>           self.vm.launch()
+>           self.assertTrue(self.vm.qmp('query-vnc')['return']['enabled'])
+>           set_password_response = self.vm.qmp('change',
+> @@ -49,7 +61,8 @@ class Vnc(Test):
+>                            'Could not set password')
+>   
+>       def test_vnc_change_password(self):
+> -        self.vm.add_args('-nodefaults', '-S', '-vnc', ':0,password')
+> +        self.vm.add_args('-nodefaults', '-S',
+> +                         '-vnc', 'unix:%s,password' % self.socket_path)
+>           self.vm.launch()
+>           self.assertTrue(self.vm.qmp('query-vnc')['return']['enabled'])
+>           set_password_response = self.vm.qmp('change',
+> @@ -57,3 +70,6 @@ class Vnc(Test):
+>                                               target='password',
+>                                               arg='new_password')
+>           self.assertEqual(set_password_response['return'], {})
+> +
+> +    def tearDown(self):
+> +        shutil.rmtree(self.socket_dir)
 
-Which allows this to become
+You missed to call super's tearDown in order to gently shutdown all VM 
+created in by the tests. Other than that, it looks good to me.
 
-    uint32_t opcode = next_word(ctx);
+- Wainer
 
 
-r~
 
