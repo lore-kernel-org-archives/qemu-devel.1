@@ -2,88 +2,71 @@ Return-Path: <SRS0=Y1tr=UJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DD07DC4321B
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 18:05:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D2DBC43218
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 18:18:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6F03B207E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 18:05:15 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=extremeground.com header.i=@extremeground.com header.b="LVeNUpF5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6F03B207E0
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=extremeground.com
+	by mail.kernel.org (Postfix) with ESMTPS id 1AADE207E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 18:18:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1AADE207E0
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48766 helo=lists.gnu.org)
+Received: from localhost ([::1]:48828 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1haOfS-00044P-Dx
-	for qemu-devel@archiver.kernel.org; Mon, 10 Jun 2019 14:05:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52056)
+	id 1haOs9-0000nX-4o
+	for qemu-devel@archiver.kernel.org; Mon, 10 Jun 2019 14:18:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37636)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <gary@extremeground.com>) id 1haNt1-0000t7-T5
- for qemu-devel@nongnu.org; Mon, 10 Jun 2019 13:15:14 -0400
+ (envelope-from <bounces@canonical.com>) id 1haOpc-0000Ii-Li
+ for qemu-devel@nongnu.org; Mon, 10 Jun 2019 14:15:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <gary@extremeground.com>) id 1haNsy-0001wU-FL
- for qemu-devel@nongnu.org; Mon, 10 Jun 2019 13:15:11 -0400
-Received: from ahs5.r4l.com ([158.69.52.156]:47433)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <gary@extremeground.com>)
- id 1haNsx-0001LW-QZ
- for qemu-devel@nongnu.org; Mon, 10 Jun 2019 13:15:07 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- d=extremeground.com; s=default; h=Content-Transfer-Encoding:Content-Type:
- In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
- :Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
- Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
- List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
- bh=hoYK19Vb/MIi2yfcMQlFWxqhkOCxSlzpAYdmJKeyjyY=; b=LVeNUpF5gW/rE4GfdeLAd66EgN
- OZqWhfjLnQqPxsJEGr4WP4qDiLC7GZhuJlEu8oAcyuFACjliqcmVMx6PklM3dGJoglC4H3fD7NN0V
- qyJSFMd3Qy2dhbPU5jt0B1ibZBhPGmQz2e/vA4AeZIr2vpTPGK8DFKONCJy+mlU6Zp7LQe7zViEac
- kTrDJOEa0t5APCHj6r20Up52GTihUqxuqmSfDi1K7hNPbx0H6OTXi7dqN2yG0IoNxB3imWbLrypmV
- 682yth/u29XJlqS/EsTl7B/UPOieSOZ0Cu4kO3vDs+7wSU5Jv0yYX8vK/IPpRbo7vjmHzhRD7B/oP
- PX+YWrlg==;
-Received: from cpeac202ed5e073-cmac202ed5e070.cpe.net.cable.rogers.com
- ([99.237.87.227]:44326 helo=[192.168.1.20])
- by ahs5.r4l.com with esmtpsa (TLSv1.2:ECDHE-RSA-AES128-GCM-SHA256:128)
- (Exim 4.92) (envelope-from <gary@extremeground.com>)
- id 1haMdL-0007fx-SQ; Mon, 10 Jun 2019 11:54:55 -0400
-To: Stefan Hajnoczi <stefanha@gmail.com>
-References: <abb7990e-0331-67a4-af92-05276366478c@extremeground.com>
- <20190610121941.GI14257@stefanha-x1.localdomain>
-From: Gary Dale <gary@extremeground.com>
-Message-ID: <dc7a70ea-c94f-e975-df44-b0199da698e2@extremeground.com>
-Date: Mon, 10 Jun 2019 11:54:55 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ (envelope-from <bounces@canonical.com>) id 1haOpa-00081G-M5
+ for qemu-devel@nongnu.org; Mon, 10 Jun 2019 14:15:44 -0400
+Received: from indium.canonical.com ([91.189.90.7]:37340)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1haOpa-0007ye-GN
+ for qemu-devel@nongnu.org; Mon, 10 Jun 2019 14:15:42 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1haOpU-0001xP-D1
+ for <qemu-devel@nongnu.org>; Mon, 10 Jun 2019 18:15:36 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 5D47A2E802E
+ for <qemu-devel@nongnu.org>; Mon, 10 Jun 2019 18:15:36 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20190610121941.GI14257@stefanha-x1.localdomain>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-CA
-X-AntiAbuse: This header was added to track abuse,
- please include it with any abuse report
-X-AntiAbuse: Primary Hostname - ahs5.r4l.com
-X-AntiAbuse: Original Domain - nongnu.org
-X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
-X-AntiAbuse: Sender Address Domain - extremeground.com
-X-Get-Message-Sender-Via: ahs5.r4l.com: authenticated_id:
- gary@extremeground.com
-X-Authenticated-Sender: ahs5.r4l.com: gary@extremeground.com
-X-Source: 
-X-Source-Args: 
-X-Source-Dir: 
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 10 Jun 2019 18:03:53 -0000
+From: Troy Fine <1832250@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: tfine
+X-Launchpad-Bug-Reporter: Troy Fine (tfine)
+X-Launchpad-Bug-Modifier: Troy Fine (tfine)
+Message-Id: <156018983401.31409.602642212914113436.malonedeb@gac.canonical.com>
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="18978";
+ Instance="launchpad-lazr.conf"
+X-Launchpad-Hash: 1b2949edd124c35b7564a2eedce555a9dd54e8fd
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 158.69.52.156
-X-Mailman-Approved-At: Mon, 10 Jun 2019 14:03:01 -0400
-Subject: Re: [Qemu-devel] kvm / virsh snapshot management
+X-Received-From: 91.189.90.7
+Subject: [Qemu-devel] [Bug 1832250] [NEW] arm32v6/golang:1.10-alpine is
+ broken for qemu 2.8 on MacOS cross-compilation
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -92,142 +75,176 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>,
- qemu-devel@nongnu.org, kvm@vger.kernel.org
+Reply-To: Bug 1832250 <1832250@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 2019-06-10 8:19 a.m., Stefan Hajnoczi wrote:
-> On Sat, Jun 01, 2019 at 08:12:01PM -0400, Gary Dale wrote:
->> A while back I converted a raw disk image to qcow2 to be able to use
->> snapshots. However I realize that I may not really understand exactly how
->> snapshots work. In this particular case, I'm only talking about internal
->> snapshots currently as there seems to be some differences of opinion as to
->> whether internal or external are safer/more reliable. I'm also only talking
->> about shutdown state snapshots, so it should just be the disk that is
->> snapshotted.
->>
->> As I understand it, the first snapshot freezes the base image and subsequent
->> changes in the virtual machine's disk are stored elsewhere in the qcow2 file
->> (remember, only internal snapshots). If I take a second snapshot, that
->> freezes the first one, and subsequent changes are now in third location.
->> Each new snapshot is incremental to the one that preceded it rather than
->> differential to the base image. Each new snapshot is a child of the previous
->> one.
-> Internal snapshots are not incremental or differential at the qcow2
-> level, they are simply a separate L1/L2 table pointing to data clusters.
-> In other words, they are an independent set of metadata showing the full
-> state of the image at the point of the snapshot.  qcow2 does not track
-> relationships between snapshots and parents/children.
-Which sounds to me like they are incremental. Each snapshot starts a new 
-L1/L2 table so that the state of the previous one is preserved.
->
->> One explanation I've seen of the process is if I delete a snapshot, the
->> changes it contains are merged with its immediate child.
-> Nope.  Deleting a snapshot decrements the reference count on all its
-> data clusters.  If a data cluster's reference count reaches zero it will
-> be freed.  That's all, there is no additional data movement or
-> reorganization aside from this.
-Perhaps not physically but logically it would appear that the data 
-clusters were merged.
->
->> So if I deleted the
->> first snapshot, the base image stays the same but any data that has changed
->> since the base image is now in the second snapshot's location. The merge
->> with children explanation also implies that the base image is never touched
->> even if the first snapshot is deleted.
->>
->> But if I delete a snapshot that has no children, is that essentially the
->> same as reverting to the point that snapshot was created and all subsequent
->> disk changes are lost? Or does it merge down to the parent snapshot? If I
->> delete all snapshots, would that revert to the base image?
-> No.  qcow2 has the concept of the current disk state of the running VM -
-> what you get when you boot the guest - and the snapshots - they are
-> read-only.
->
-> When you delete snapshots the current disk state (running VM) is
-> unaffected.
->
-> When you apply a snapshot this throws away the current disk state and
-> uses the snapshot as the new current disk state.  The read-only snapshot
-> itself is not modified in any way and you can apply the same snapshot
-> again as many times as you wish later.
-So in essence the current state is a pointer to the latest data cluster, 
-which is the only data cluster that can be modified.
->
->> I've seen it explained that a snapshot is very much like a timestamp so
->> deleting a timestamp removes the dividing line between writes that occurred
->> before and after that time, so that data is really only removed if I revert
->> to some time stamp - all writes after that point are discarded. In this
->> explanation, deleting the oldest timestamp is essentially updating the base
->> image. Deleting all snapshots would leave me with the base image fully
->> updated.
->>
->> Frankly, the second explanation sounds more reasonable to me, without having
->> to figure out how copy-on-write works,  But I'm dealing with important data
->> here and I don't want to mess it up by mishandling the snapshots.
->>
->> Can some provide a little clarity on this? Thanks!
-> If you want an analogy then git(1) is a pretty good one.  qcow2 internal
-> snapshots are like git tags.  Unlike branches, tags are immutable.  In
-> qcow2 you only have a master branch (the current disk state) from which
-> you can create a new tag or you can use git-checkout(1) to apply a
-> snapshot (discarding whatever your current disk state is).
->
-> Stefan
+Public bug reported:
 
-That's just making things less clear - I've never tried to understand 
-git either. Thanks for the attempt though.
+FROM arm32v6/golang:1.10-alpine
 
-If I've gotten things correct, once the base image is established, there 
-is a current disk state that points to a table containing all the writes 
-since the base image. Creating a snapshot essentially takes that pointer 
-and gives it the snapshot name, while creating a new current disk state 
-pointer and data table where subsequent writes are recorded.
+docker build -t openhorizon/ibm.gps_arm:2.0.7 -f ./Dockerfile.arm .
+Sending build context to Docker daemon  110.6kB
+Step 1/12 : FROM arm32v6/golang:1.10-alpine
+1.10-alpine: Pulling from arm32v6/golang
+05276f4299f2: Pull complete =
 
-Deleting snapshots removes your ability to refer to a data table by 
-name, but the table itself still exists anonymously as part of a chain 
-of data tables between the base image and the current state.
+5657e63df536: Pull complete =
 
-This leaves a problem. The chain will very quickly get quite long which 
-will impact performance. To combat this, you can use blockcommit to 
-merge a child with its parent or blockpull to merge a parent with its child.
+febca98d0249: Pull complete =
 
-In my situation, I want to keep a week of daily snapshots in case 
-something goes horribly wrong with the VM (I recently had a database 
-file become corrupt, and reverting to the previous working day's image 
-would have been a quick and easy solution, faster than recovering all 
-the data tables from the prefious day). I've been shutting down the VM, 
-deleting the oldest snapshot and creating a new one before restarting 
-the VM.
+5053a7aa5dea: Pull complete =
 
-While your explanation confirms that this is safe, it also implies that 
-I need to manage the data table chains. My first instinct is to use 
-blockcommit before deleting the oldest snapshot, such as:
+d048463a3701: Pull complete =
 
-     virsh blockcommit <vm name> <qcow2 file path> --top <oldest 
-snapshot> --delete --wait
-     virsh snapshot-delete  --domain <vm name> --snapshotname <oldest 
-snapshot>
+b628c679d668: Pull complete =
 
-so that the base image contains the state as of one week earlier and the 
-snapshot chains are limited to 7 links.
+Digest: sha256:94c5fd97b17d0e9fe89e011446bedda4784cb0af7a60494989e2a21c0dcb=
+a92f
+Status: Downloaded newer image for arm32v6/golang:1.10-alpine
+ ---> 3110964e8c9a
+Step 2/12 : RUN apk --no-cache update && apk add git
+ ---> Running in 14ffb11506bb
+fetch http://dl-cdn.alpinelinux.org/alpine/v3.9/main/armhf/APKINDEX.tar.gz
+fetch http://dl-cdn.alpinelinux.org/alpine/v3.9/community/armhf/APKINDEX.ta=
+r.gz
+v3.9.4-24-g4e2ff29bbe [http://dl-cdn.alpinelinux.org/alpine/v3.9/main]
+v3.9.4-25-g65097c9cdc [http://dl-cdn.alpinelinux.org/alpine/v3.9/community]
+OK: 9547 distinct packages available
+fetch http://dl-cdn.alpinelinux.org/alpine/v3.9/main/armhf/APKINDEX.tar.gz
+fetch http://dl-cdn.alpinelinux.org/alpine/v3.9/community/armhf/APKINDEX.ta=
+r.gz
+(1/7) Installing nghttp2-libs (1.35.1-r0)
+(2/7) Installing libssh2 (1.8.2-r0)
+(3/7) Installing libcurl (7.64.0-r2)
+(4/7) Installing libgcc (8.3.0-r0)
+(5/7) Installing expat (2.2.6-r0)
+(6/7) Installing pcre2 (10.32-r1)
+(7/7) Installing git (2.20.1-r0)
+Executing busybox-1.29.3-r10.trigger
+OK: 18 MiB in 22 packages
+Removing intermediate container 14ffb11506bb
+ ---> 6890ea7ed09b
+Step 3/12 : RUN mkdir -p /build/bin
+ ---> Running in 44e52d78d7b4
+Removing intermediate container 44e52d78d7b4
+ ---> 0763afda41d1
+Step 4/12 : COPY src /build/src
+ ---> 05bab9a72a34
+Step 5/12 : WORKDIR /build
+ ---> Running in 5a663caff249
+Removing intermediate container 5a663caff249
+ ---> 5a6ca53c00de
+Step 6/12 : RUN env GOPATH=3D/build GOOPTIONS_ARM=3D'CGO_ENABLED=3D0 GOOS=
+=3Dlinux GOARCH=3Darm GOARM=3D6' go get github.com/kellydunn/golang-geo
+ ---> Running in 05b09ee0c206
+Removing intermediate container 05b09ee0c206
+ ---> e68c6e222e51
+Step 7/12 : RUN env GOPATH=3D/build GOOPTIONS_ARM=3D'CGO_ENABLED=3D0 GOOS=
+=3Dlinux GOARCH=3Darm GOARM=3D6' go build -o /build/bin/armv6_gps /build/sr=
+c/main.go
+ ---> Running in ea6d2707e35f
+qemu-arm: /build/qemu-rwi8RH/qemu-2.8+dfsg/translate-all.c:175: tb_lock: As=
+sertion `!have_tb_lock' failed.
+qemu-arm: /build/qemu-rwi8RH/qemu-2.8+dfsg/translate-all.c:175: tb_lock: As=
+sertion `!have_tb_lock' failed.
+The command '/bin/sh -c env GOPATH=3D/build GOOPTIONS_ARM=3D'CGO_ENABLED=3D=
+0 GOOS=3Dlinux GOARCH=3Darm GOARM=3D6' go build -o /build/bin/armv6_gps /bu=
+ild/src/main.go' returned a non-zero code: 139
+make: *** [build] Error 139
 
-1) does this sound reasonable?
+** Affects: qemu
+     Importance: Undecided
+         Status: New
 
-2) I note that the syntax in virsh man page is different from the syntax 
-at 
-https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html/virtualization_deployment_and_administration_guide/sect-backing-chain 
-(RedHat uses --top and --base while the man page just has optional base 
-and top names). I believe the RedHat guide is correct because the man 
-page doesn't allow distinguishing between the base and the top for a commit.
+-- =
 
-However the need for specifying the path isn't obvious to me. Isn't the 
-path contained in the VM definition?
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1832250
 
-Since blockcommit would make it impossible for me to revert to an 
-earlier state (because I'm committing the oldest snapshot, if it screws 
-up, I can't undo within virsh), I need to make sure this command is correct.
+Title:
+  arm32v6/golang:1.10-alpine is broken for qemu 2.8 on MacOS cross-
+  compilation
 
+Status in QEMU:
+  New
+
+Bug description:
+  FROM arm32v6/golang:1.10-alpine
+
+  docker build -t openhorizon/ibm.gps_arm:2.0.7 -f ./Dockerfile.arm .
+  Sending build context to Docker daemon  110.6kB
+  Step 1/12 : FROM arm32v6/golang:1.10-alpine
+  1.10-alpine: Pulling from arm32v6/golang
+  05276f4299f2: Pull complete =
+
+  5657e63df536: Pull complete =
+
+  febca98d0249: Pull complete =
+
+  5053a7aa5dea: Pull complete =
+
+  d048463a3701: Pull complete =
+
+  b628c679d668: Pull complete =
+
+  Digest: sha256:94c5fd97b17d0e9fe89e011446bedda4784cb0af7a60494989e2a21c0d=
+cba92f
+  Status: Downloaded newer image for arm32v6/golang:1.10-alpine
+   ---> 3110964e8c9a
+  Step 2/12 : RUN apk --no-cache update && apk add git
+   ---> Running in 14ffb11506bb
+  fetch http://dl-cdn.alpinelinux.org/alpine/v3.9/main/armhf/APKINDEX.tar.gz
+  fetch http://dl-cdn.alpinelinux.org/alpine/v3.9/community/armhf/APKINDEX.=
+tar.gz
+  v3.9.4-24-g4e2ff29bbe [http://dl-cdn.alpinelinux.org/alpine/v3.9/main]
+  v3.9.4-25-g65097c9cdc [http://dl-cdn.alpinelinux.org/alpine/v3.9/communit=
+y]
+  OK: 9547 distinct packages available
+  fetch http://dl-cdn.alpinelinux.org/alpine/v3.9/main/armhf/APKINDEX.tar.gz
+  fetch http://dl-cdn.alpinelinux.org/alpine/v3.9/community/armhf/APKINDEX.=
+tar.gz
+  (1/7) Installing nghttp2-libs (1.35.1-r0)
+  (2/7) Installing libssh2 (1.8.2-r0)
+  (3/7) Installing libcurl (7.64.0-r2)
+  (4/7) Installing libgcc (8.3.0-r0)
+  (5/7) Installing expat (2.2.6-r0)
+  (6/7) Installing pcre2 (10.32-r1)
+  (7/7) Installing git (2.20.1-r0)
+  Executing busybox-1.29.3-r10.trigger
+  OK: 18 MiB in 22 packages
+  Removing intermediate container 14ffb11506bb
+   ---> 6890ea7ed09b
+  Step 3/12 : RUN mkdir -p /build/bin
+   ---> Running in 44e52d78d7b4
+  Removing intermediate container 44e52d78d7b4
+   ---> 0763afda41d1
+  Step 4/12 : COPY src /build/src
+   ---> 05bab9a72a34
+  Step 5/12 : WORKDIR /build
+   ---> Running in 5a663caff249
+  Removing intermediate container 5a663caff249
+   ---> 5a6ca53c00de
+  Step 6/12 : RUN env GOPATH=3D/build GOOPTIONS_ARM=3D'CGO_ENABLED=3D0 GOOS=
+=3Dlinux GOARCH=3Darm GOARM=3D6' go get github.com/kellydunn/golang-geo
+   ---> Running in 05b09ee0c206
+  Removing intermediate container 05b09ee0c206
+   ---> e68c6e222e51
+  Step 7/12 : RUN env GOPATH=3D/build GOOPTIONS_ARM=3D'CGO_ENABLED=3D0 GOOS=
+=3Dlinux GOARCH=3Darm GOARM=3D6' go build -o /build/bin/armv6_gps /build/sr=
+c/main.go
+   ---> Running in ea6d2707e35f
+  qemu-arm: /build/qemu-rwi8RH/qemu-2.8+dfsg/translate-all.c:175: tb_lock: =
+Assertion `!have_tb_lock' failed.
+  qemu-arm: /build/qemu-rwi8RH/qemu-2.8+dfsg/translate-all.c:175: tb_lock: =
+Assertion `!have_tb_lock' failed.
+  The command '/bin/sh -c env GOPATH=3D/build GOOPTIONS_ARM=3D'CGO_ENABLED=
+=3D0 GOOS=3Dlinux GOARCH=3Darm GOARM=3D6' go build -o /build/bin/armv6_gps =
+/build/src/main.go' returned a non-zero code: 139
+  make: *** [build] Error 139
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1832250/+subscriptions
 
