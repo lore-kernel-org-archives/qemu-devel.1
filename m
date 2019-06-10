@@ -2,81 +2,79 @@ Return-Path: <SRS0=Y1tr=UJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 08170C282DD
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 10:04:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D4B04C282DD
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 10:56:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CA4392082E
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 10:04:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8FF412082E
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 10:56:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="oS9+rjn6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CA4392082E
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="jyqBsTUA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8FF412082E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43098 helo=lists.gnu.org)
+Received: from localhost ([::1]:44274 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1haHAW-0007kU-1k
-	for qemu-devel@archiver.kernel.org; Mon, 10 Jun 2019 06:04:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52127)
+	id 1haHy1-0000JM-Od
+	for qemu-devel@archiver.kernel.org; Mon, 10 Jun 2019 06:55:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37085)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <peter.maydell@linaro.org>) id 1haH90-0007DD-PN
- for qemu-devel@nongnu.org; Mon, 10 Jun 2019 06:03:15 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1haHvV-0006LZ-7Z
+ for qemu-devel@nongnu.org; Mon, 10 Jun 2019 06:53:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1haH8w-00006m-Ih
- for qemu-devel@nongnu.org; Mon, 10 Jun 2019 06:03:12 -0400
-Received: from mail-ot1-x333.google.com ([2607:f8b0:4864:20::333]:33774)
+ (envelope-from <peter.maydell@linaro.org>) id 1haHvU-0007pd-1m
+ for qemu-devel@nongnu.org; Mon, 10 Jun 2019 06:53:21 -0400
+Received: from mail-oi1-x233.google.com ([2607:f8b0:4864:20::233]:35590)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1haH8s-0008Lu-VZ
- for qemu-devel@nongnu.org; Mon, 10 Jun 2019 06:03:08 -0400
-Received: by mail-ot1-x333.google.com with SMTP id p4so4523520oti.0
- for <qemu-devel@nongnu.org>; Mon, 10 Jun 2019 03:02:58 -0700 (PDT)
+ id 1haHvT-0007mU-PK
+ for qemu-devel@nongnu.org; Mon, 10 Jun 2019 06:53:19 -0400
+Received: by mail-oi1-x233.google.com with SMTP id y6so5903463oix.2
+ for <qemu-devel@nongnu.org>; Mon, 10 Jun 2019 03:53:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=7xRVadgGOGec3ZTlbpVtFVsT8JEI8+6BjaMdH7YDrBE=;
- b=oS9+rjn6kq++h0CzrmCKXrNKOzX0j61sksV+r7oF7FwDIvGtoG/XHBNFYAaLxCG1LZ
- BK/azD1eml74i4K7pk95uUfJ9Otme8G9KMV3kCW7wnj6x1ErCQNS8CZ9dhrAyTsWbUHg
- /6iGrFN575mwpgG+c6BxrR8uzDt9kuNlkeICgDaMf05/1ksqJnWAG0FVXz2fCM/jUDUH
- RUdUOtoF80L/ywfAHYC1pihRDGDI0/rO5tYad/x1g3BUQpKRD8y1Isnqpswg7bfpeWCq
- Ixu7t3Phc7FGhzetUtJOGHxL4qqGHcwtgRRsYNC5rI4EgyakPh+/O39r4uFPbDxTxe5y
- JDpA==
+ :cc; bh=C28I/h3Ux2Z1jb/k2a67OQHmiH1emte0mgTCdVs4or8=;
+ b=jyqBsTUAOU4f4KuYHREwV7CeXaVWKi2iNnwfu/31KP1r/mjMZtk3/HxNgIJo2kUczF
+ VrWbBfxcA0L7YfwU4mNzXLq6g/gZF4lqivl4ACTLhHIAzyeRd5BOrmkxu1+EjcQ4ECId
+ koJfd4vmQYhcO812DJnN7L/rhqVsvfv/3yfAiecglNBfh8qJLEHWt8uq66wXoIOOyDKh
+ +Qua1WUjzUuAYWXyNKc+Vc//1W2JQeVvyV4x5EML0p4mZs9FKCgG4E5RTwoLKo4VhJTp
+ kWcD4dWnJ/rQKJhbBgwLWyatUqk/DS5JXkrBSzaYd8vFWxNMCEkKhAZHpL/jRlwHD894
+ VBNw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=7xRVadgGOGec3ZTlbpVtFVsT8JEI8+6BjaMdH7YDrBE=;
- b=LzGAzxYT9rLopjhdrFvoA+DjZlMVVIHOXErjkzy7HBKQfEqZ6IOwXIOXLgicWlfxkV
- AMMNM4zQSP6CaybLMROK3REP9ye8xTA+vRWhAUwd0FNi9osYA+BHaqdm91CosYSoQdFH
- 84GtA5wdUOZNz47EtFf3Dzw3d7dXOfZRopEcnDtGawTBvwxvUtYJtjskIdsrWUG32twK
- u/tO0v1aFFAY+G1jf0sWCEBhxJdLUE4bO3cbeE4P6t/9g8vALLNTLjX3QjEFujw9zHsW
- wj9nrt80ycpZhCkW80fRNkk/S9kXKN4gR9RzxvdrRqtCeFmN0rs5Y/kkQbyFR/xQO24S
- FKkQ==
-X-Gm-Message-State: APjAAAXmirL/bznpVlzq5s9/Ik9kARRhTueUUF0oodGLJdac9itnkIML
- fIIAwg86HsTnuMyDSB+z04wiVSutuvNlTh4pSLNRuYoUiHI=
-X-Google-Smtp-Source: APXvYqwhBbUc7glIJ4ZpnfEL+ovgb2XTHL8GRVSAJVMAuPJHXuDeZVhf6zJ3+PSnjoNxrRhEipeI021zezjzqigFpEU=
-X-Received: by 2002:a9d:7245:: with SMTP id a5mr29998650otk.232.1560160978060; 
- Mon, 10 Jun 2019 03:02:58 -0700 (PDT)
+ :message-id:subject:to:cc;
+ bh=C28I/h3Ux2Z1jb/k2a67OQHmiH1emte0mgTCdVs4or8=;
+ b=Pj3Nj55WiRjfKrVJoz+hc4bE+MKdntdV6+wJwgU8wGCqrb7dF1h3r0EF2GN21G7Ylu
+ uc1hamHc8zMG14KnpOmHn6myHjkCUFXS/8jpUkDsJ9GRUJSaq5MMl2XRgo1RH9Zuv13Q
+ fJ5NekJQpAwpMpuJxRa0dx74AQStjXfJYstpx52nK8S1z9PC98X6RF8VwrXby9031Yba
+ AGzB3MmzX7W02qoIkbC9yWBjb1VS+QXX3yOjvWwMhxhqnD02VFoHSCeIf4i5poMFRnzm
+ AbcOvzpNkVkI7gPeNaGmX9eGkvFZwGlju5eyzY/+S2WkDg7fP3RbHMpLQiRWQbVnpmf2
+ Xs0Q==
+X-Gm-Message-State: APjAAAU7lKBZcWv7zIJro57qwpYV9hQaU2WUt5GzAWCyMHxyK+Cv4Eor
+ CHBn7fB4mFZXuGteeP/ddku5/rYX7iCoD4q2F99MrQ==
+X-Google-Smtp-Source: APXvYqy8hAnASETyfrHO66IaUwlzD1C4GKnxOVd2GvhVKt92byP7f/KFwXGkn7EZ6sI6DMNb446qxwLsAUBhxINxn3U=
+X-Received: by 2002:aca:ac48:: with SMTP id v69mr11228098oie.48.1560163998160; 
+ Mon, 10 Jun 2019 03:53:18 -0700 (PDT)
 MIME-Version: 1.0
-References: <20190607152646.4822-1-armbru@redhat.com>
-In-Reply-To: <20190607152646.4822-1-armbru@redhat.com>
+References: <20190607183228.22454-1-ehabkost@redhat.com>
+In-Reply-To: <20190607183228.22454-1-ehabkost@redhat.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 10 Jun 2019 11:02:47 +0100
-Message-ID: <CAFEAcA-2X2a_rNeg3Q4zmWgLDa=nfESMYR=rTE=+=1Mdsmw0kQ@mail.gmail.com>
-To: Markus Armbruster <armbru@redhat.com>
+Date: Mon, 10 Jun 2019 11:53:07 +0100
+Message-ID: <CAFEAcA8WjX3oGqx-oBhkXewNyPw6o-c5_W+MfYb+EpvQB+AVbQ@mail.gmail.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::333
-Subject: Re: [Qemu-devel] [PULL 00/12] Miscellaneous patches for 2019-06-07
+X-Received-From: 2607:f8b0:4864:20::233
+Subject: Re: [Qemu-devel] [PULL 0/2] Machine Core queue, 2019-06-07
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,53 +91,35 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 7 Jun 2019 at 19:21, Markus Armbruster <armbru@redhat.com> wrote:
+On Fri, 7 Jun 2019 at 19:32, Eduardo Habkost <ehabkost@redhat.com> wrote:
 >
-> The following changes since commit 0d74f3b4277a7ecb0ccb80c865797d11f8e466=
-f5:
+> The following changes since commit 185b7ccc11354cbd69b6d53bf8d831dd964f6c88:
 >
->   Merge remote-tracking branch 'remotes/vivier2/tags/trivial-branch-pull-=
-request' into staging (2019-06-06 14:09:14 +0100)
+>   Merge remote-tracking branch 'remotes/cohuck/tags/s390x-20190607-2' into staging (2019-06-07 15:24:13 +0100)
 >
 > are available in the Git repository at:
 >
->   git://repo.or.cz/qemu/armbru.git tags/pull-misc-2019-06-07
+>   git://github.com/ehabkost/qemu.git tags/machine-next-pull-request
 >
-> for you to fetch changes up to 516741ebae8e2baef456c10897569725663157dd:
+> for you to fetch changes up to 754f1dbcf1d4d543167e3212366055761c30bcf4:
 >
->   MAINTAINERS: Polish headline decorations (2019-06-07 16:30:59 +0200)
->
-> ----------------------------------------------------------------
-> Miscellaneous patches for 2019-06-07
+>   accel: Remove unused AccelClass::opt_name attribute (2019-06-07 15:28:46 -0300)
 >
 > ----------------------------------------------------------------
-> Markus Armbruster (11):
->       qemu-common: Move tcg_enabled() etc. to sysemu/tcg.h
->       qemu-common: Move qemu_isalnum() etc. to qemu/ctype.h
->       Include qemu/module.h where needed, drop it from qemu-common.h
->       Include qemu-common.h exactly where needed
->       Normalize position of header guard
->       scripts/clean-header-guards: Fix handling of trailing comments
->       Clean up a few header guard symbols
->       Supply missing header guards
->       Clean up a header guard symbols (again)
->       MAINTAINERS: Improve section headlines
->       MAINTAINERS: Polish headline decorations
+> Machine Core queue, 2019-06-07
 >
-> Philippe Mathieu-Daud=C3=A9 (1):
->       MAINTAINERS: Remove duplicate entries of qemu-devel@nongnu.org
+> * Improve CPU hotplug error message
+>   (Laurent Vivier)
+> * Remove unused AccelClass::opt_name field
+>   (Wainer dos Santos Moschetta)
 >
+> ----------------------------------------------------------------
 
-Compile failure, I'm afraid, on OSX, NetBSD, FreeBSD and OpenBSD:
 
-/Users/pm215/src/qemu-for-merges/net/tap-bsd.c:68:9: error: implicit
-declaration of function 'TFR' is invalid in C99
-[-Werror,-Wimplicit-function-declaration]
-        TFR(fd =3D open(dname, O_RDWR));
-        ^
-/Users/pm215/src/qemu-for-merges/net/tap-bsd.c:68:9: error: this
-function declaration is not a prototype [-Werror,-Wstrict-prototypes]
+Applied, thanks.
 
-thanks
+Please update the changelog at https://wiki.qemu.org/ChangeLog/4.1
+for any user-visible changes.
+
 -- PMM
 
