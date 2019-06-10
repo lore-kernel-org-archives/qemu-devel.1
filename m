@@ -2,85 +2,55 @@ Return-Path: <SRS0=Y1tr=UJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E6A8C28EBD
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 02:47:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 64ACCC28EBD
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 02:48:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1CBBF207E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 02:47:49 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Pa5sXyyU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1CBBF207E0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 3B618207E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 02:48:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3B618207E0
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39960 helo=lists.gnu.org)
+Received: from localhost ([::1]:39964 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1haALc-0001k8-CP
-	for qemu-devel@archiver.kernel.org; Sun, 09 Jun 2019 22:47:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53448)
+	id 1haAMN-0002kD-Dk
+	for qemu-devel@archiver.kernel.org; Sun, 09 Jun 2019 22:48:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56646)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <richard.henderson@linaro.org>) id 1ha9eT-0006z3-FR
- for qemu-devel@nongnu.org; Sun, 09 Jun 2019 22:03:14 -0400
+ (envelope-from <colin.xu@intel.com>) id 1ha9uW-0005fI-3E
+ for qemu-devel@nongnu.org; Sun, 09 Jun 2019 22:19:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1ha9eR-00028B-GM
- for qemu-devel@nongnu.org; Sun, 09 Jun 2019 22:03:13 -0400
-Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:44777)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1ha9eQ-00025L-El
- for qemu-devel@nongnu.org; Sun, 09 Jun 2019 22:03:11 -0400
-Received: by mail-pl1-x644.google.com with SMTP id t7so372726plr.11
- for <qemu-devel@nongnu.org>; Sun, 09 Jun 2019 19:03:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=8wDpuqt2tvKadOymhMpkkiKWS+EHs0ZcemyyrplJ7bs=;
- b=Pa5sXyyUli+7bcoMZwYI6ygYrsVmEagluOG/GkVNE9asG5yEHoe6fDsjkyL0wp7ujV
- AZlQHT1VStnhfIOyj96dbjmYOvpIv4Igt/V7nE4IL7Fz2HvUSZBFK462dWiFHeRLJbiT
- OOSKkrdOscSA5Sh1Pu8UMejgCOEYQHx6HhZnIje5jKM/wV1pV0akgZRVdV7YDvs8UUco
- 3HZyW+5iDSpq7edhX489/AAOyJMAXn0qVAmGy38umhSWs+gBpiN0tWBVpiivjx/teOL/
- IEDlpmhMLVavmhEFtad8DL8yZIhRSgGozuXeEOip0LGKxcqH70+DU3WdPuIyWO63BqUN
- pKeA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references;
- bh=8wDpuqt2tvKadOymhMpkkiKWS+EHs0ZcemyyrplJ7bs=;
- b=FBHVT2WIPxuyxdKyNmbIcnmmMFElz7wT8XyWhl6s6PSIII+8+AVowsYzqu/WIbXqh5
- hs9PrHHHsqJ+dpzLQ0g22WrA12dLLtCFLNh4RZsrDXWLSjkq+gwPXAFFDtSYbLZVo6Np
- 5iN5SQLpR9NEATdxHW3iv5FUJWVsBiogB0PaWxMUe0uM9aqWnxnxrcuU8LlHHLyFh1hb
- +HTQuk+0KTxw2QnL8g54F7Ivbk10reT6KZrkSgbZvdetxj0yHtuxw6vqnOFfiJvaeJ8K
- WeuIy/tX1wEZolzG39BjSye2R6ynAykCN9Jb7ysM4Dx92bxNuMy3iPoJ0R17qyAZecws
- nBBg==
-X-Gm-Message-State: APjAAAWKSonep2gpi4NB+tEOBRorCZMLcTTOt6yxaonWs+zlyEFx9Zh+
- ///ru+pOcV3G2kUU6hW94JmlH1wNDhU=
-X-Google-Smtp-Source: APXvYqxLbdbiH9/ywhrhSwHrEBr3YnxFbyc4TYfcd74MfddA4mJSibxUPok9L/SfdY9856T/nOMNZQ==
-X-Received: by 2002:a17:902:70c4:: with SMTP id
- l4mr32326368plt.171.1560132187540; 
- Sun, 09 Jun 2019 19:03:07 -0700 (PDT)
-Received: from localhost.localdomain (97-113-13-231.tukw.qwest.net.
- [97.113.13.231])
- by smtp.gmail.com with ESMTPSA id l63sm9749013pfl.181.2019.06.09.19.03.06
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Sun, 09 Jun 2019 19:03:06 -0700 (PDT)
-From: Richard Henderson <richard.henderson@linaro.org>
+ (envelope-from <colin.xu@intel.com>) id 1ha9uU-0000mx-Ub
+ for qemu-devel@nongnu.org; Sun, 09 Jun 2019 22:19:48 -0400
+Received: from mga11.intel.com ([192.55.52.93]:11390)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <colin.xu@intel.com>) id 1ha9uU-0000lx-Mj
+ for qemu-devel@nongnu.org; Sun, 09 Jun 2019 22:19:46 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+ by fmsmga102.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 09 Jun 2019 19:19:42 -0700
+X-ExtLoop1: 1
+Received: from coxu-arch-shz.sh.intel.com ([10.239.160.21])
+ by orsmga008.jf.intel.com with ESMTP; 09 Jun 2019 19:19:41 -0700
+From: Colin Xu <colin.xu@intel.com>
 To: qemu-devel@nongnu.org
-Date: Sun,  9 Jun 2019 19:02:18 -0700
-Message-Id: <20190610020218.9228-40-richard.henderson@linaro.org>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20190610020218.9228-1-richard.henderson@linaro.org>
-References: <20190610020218.9228-1-richard.henderson@linaro.org>
+Date: Mon, 10 Jun 2019 10:19:39 +0800
+Message-Id: <20190610021939.13669-1-colin.xu@intel.com>
+X-Mailer: git-send-email 2.21.0
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::644
-Subject: [Qemu-devel] [PULL 39/39] tcg/arm: Remove mostly unreachable tlb
- special case
+X-Received-From: 192.55.52.93
+Subject: [Qemu-devel] [PATCH] hax: Honor CPUState::halted
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,60 +62,128 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org
+Cc: colin.xu@intel.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-There was nothing armv7 specific about the bic+cmp sequence, however
-looking at the set of guests more closely shows that the 8-bit immediate
-operand for the bic can only be satisfied with one guest in tree:
-baseline m-profile -- 10-bit pages with aligned 4-byte memory ops.
-Therefore it does not seem useful to keep this path.
+QEMU tracks whether a vcpu is halted using CPUState::halted. E.g.,
+after initialization or reset, halted is 0 for the BSP (vcpu 0)
+and 1 for the APs (vcpu 1, 2, ...). A halted vcpu should not be
+handed to the hypervisor to run (e.g. hax_vcpu_run()).
 
-Acked-by: Alistair Francis <alistair.francis@wdc.com>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Under HAXM, Android Emulator sometimes boots into a "vcpu shutdown
+request" error while executing in SeaBIOS, with the HAXM driver
+logging a guest triple fault in vcpu 1, 2, ... at RIP 0x3. That is
+ultimately because the HAX accelerator asks HAXM to run those APs
+when they are still in the halted state.
+
+Normally, the vcpu thread for an AP will start by looping in
+qemu_wait_io_event(), until the BSP kicks it via a pair of IPIs
+(INIT followed by SIPI). But because the HAX accelerator does not
+honor cpu->halted, it allows the AP vcpu thread to proceed to
+hax_vcpu_run() as soon as it receives any kick, even if the kick
+does not come from the BSP. It turns out that emulator has a
+worker thread which periodically kicks every vcpu thread (possibly
+to collect CPU usage data), and if one of these kicks comes before
+those by the BSP, the AP will start execution from the wrong RIP,
+resulting in the aforementioned SMP boot failure.
+
+The solution is inspired by the KVM accelerator (credit to
+Chuanxiao Dong <chuanxiao.dong@intel.com> for the pointer):
+
+1. Get rid of questionable logic that unconditionally resets
+   cpu->halted before hax_vcpu_run(). Instead, only reset it at the
+   right moments (there are only a few "unhalt" events).
+2. Add a check for cpu->halted before hax_vcpu_run().
+
+Note that although the non-Unrestricted Guest (!ug_platform) code
+path also forcibly resets cpu->halted, it is left untouched,
+because only the UG code path supports SMP guests.
+
+The patch is first merged to android emulator with Change-Id:
+I9c5752cc737fd305d7eace1768ea12a07309d716
+
+Cc: Yu Ning <yu.ning@intel.com>
+Cc: Chuanxiao Dong <chuanxiao.dong@intel.com>
+Signed-off-by: Colin Xu <colin.xu@intel.com>
 ---
- tcg/arm/tcg-target.inc.c | 23 ++++++++++++-----------
- 1 file changed, 12 insertions(+), 11 deletions(-)
+ cpus.c                |  1 -
+ target/i386/hax-all.c | 36 ++++++++++++++++++++++++++++++++++--
+ 2 files changed, 34 insertions(+), 3 deletions(-)
 
-diff --git a/tcg/arm/tcg-target.inc.c b/tcg/arm/tcg-target.inc.c
-index 276e843627..ece88dc2eb 100644
---- a/tcg/arm/tcg-target.inc.c
-+++ b/tcg/arm/tcg-target.inc.c
-@@ -1290,19 +1290,20 @@ static TCGReg tcg_out_tlb_read(TCGContext *s, TCGReg addrlo, TCGReg addrhi,
-     tcg_out_ld32_12(s, COND_AL, TCG_REG_R1, TCG_REG_R1,
-                     offsetof(CPUTLBEntry, addend));
+diff --git a/cpus.c b/cpus.c
+index ffc57119ca5e..c1a56cd9ab01 100644
+--- a/cpus.c
++++ b/cpus.c
+@@ -1591,7 +1591,6 @@ static void *qemu_hax_cpu_thread_fn(void *arg)
  
--    /* Check alignment, check comparators.  */
--    if (use_armv7_instructions) {
-+    /*
-+     * Check alignment, check comparators.
-+     * Do this in no more than 3 insns.  Use MOVW for v7, if possible,
-+     * to reduce the number of sequential conditional instructions.
-+     * Almost all guests have at least 4k pages, which means that we need
-+     * to clear at least 9 bits even for an 8-byte memory, which means it
-+     * isn't worth checking for an immediate operand for BIC.
+     cpu->thread_id = qemu_get_thread_id();
+     cpu->created = true;
+-    cpu->halted = 0;
+     current_cpu = cpu;
+ 
+     hax_init_vcpu(cpu);
+diff --git a/target/i386/hax-all.c b/target/i386/hax-all.c
+index 44b89c1d74ae..58a27b475ec8 100644
+--- a/target/i386/hax-all.c
++++ b/target/i386/hax-all.c
+@@ -471,13 +471,35 @@ static int hax_vcpu_hax_exec(CPUArchState *env)
+         return 0;
+     }
+ 
+-    cpu->halted = 0;
+-
+     if (cpu->interrupt_request & CPU_INTERRUPT_POLL) {
+         cpu->interrupt_request &= ~CPU_INTERRUPT_POLL;
+         apic_poll_irq(x86_cpu->apic_state);
+     }
+ 
++    /* After a vcpu is halted (either because it is an AP and has just been
++     * reset, or because it has executed the HLT instruction), it will not be
++     * run (hax_vcpu_run()) until it is unhalted. The next few if blocks check
++     * for events that may change the halted state of this vcpu:
++     *  a) Maskable interrupt, when RFLAGS.IF is 1;
++     *     Note: env->eflags may not reflect the current RFLAGS state, because
++     *           it is not updated after each hax_vcpu_run(). We cannot afford
++     *           to fail to recognize any unhalt-by-maskable-interrupt event
++     *           (in which case the vcpu will halt forever), and yet we cannot
++     *           afford the overhead of hax_vcpu_sync_state(). The current
++     *           solution is to err on the side of caution and have the HLT
++     *           handler (see case HAX_EXIT_HLT below) unconditionally set the
++     *           IF_MASK bit in env->eflags, which, in effect, disables the
++     *           RFLAGS.IF check.
++     *  b) NMI;
++     *  c) INIT signal;
++     *  d) SIPI signal.
 +     */
-+    if (use_armv7_instructions && TARGET_PAGE_BITS <= 16) {
-         tcg_target_ulong mask = ~(TARGET_PAGE_MASK | ((1 << a_bits) - 1));
--        int rot = encode_imm(mask);
++    if (((cpu->interrupt_request & CPU_INTERRUPT_HARD) &&
++         (env->eflags & IF_MASK)) ||
++        (cpu->interrupt_request & CPU_INTERRUPT_NMI)) {
++        cpu->halted = 0;
++    }
++
+     if (cpu->interrupt_request & CPU_INTERRUPT_INIT) {
+         DPRINTF("\nhax_vcpu_hax_exec: handling INIT for %d\n",
+                 cpu->cpu_index);
+@@ -493,6 +515,16 @@ static int hax_vcpu_hax_exec(CPUArchState *env)
+         hax_vcpu_sync_state(env, 1);
+     }
  
--        if (rot >= 0) { 
--            tcg_out_dat_imm(s, COND_AL, ARITH_BIC, TCG_REG_TMP, addrlo,
--                            rotl(mask, rot) | (rot << 7));
--        } else {
--            tcg_out_movi32(s, COND_AL, TCG_REG_TMP, mask);
--            tcg_out_dat_reg(s, COND_AL, ARITH_BIC, TCG_REG_TMP,
--                            addrlo, TCG_REG_TMP, 0);
--        }
-+        tcg_out_movi32(s, COND_AL, TCG_REG_TMP, mask);
-+        tcg_out_dat_reg(s, COND_AL, ARITH_BIC, TCG_REG_TMP,
-+                        addrlo, TCG_REG_TMP, 0);
-         tcg_out_dat_reg(s, COND_AL, ARITH_CMP, 0, TCG_REG_R2, TCG_REG_TMP, 0);
-     } else {
-         if (a_bits) {
++    if (cpu->halted) {
++        /* If this vcpu is halted, we must not ask HAXM to run it. Instead, we
++         * break out of hax_smp_cpu_exec() as if this vcpu had executed HLT.
++         * That way, this vcpu thread will be trapped in qemu_wait_io_event(),
++         * until the vcpu is unhalted.
++         */
++        cpu->exception_index = EXCP_HLT;
++        return 0;
++    }
++
+     do {
+         int hax_ret;
+ 
 -- 
-2.17.1
+2.21.0
 
 
