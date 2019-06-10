@@ -2,62 +2,63 @@ Return-Path: <SRS0=Y1tr=UJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=FROM_EXCESS_BASE64,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C991C468BC
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 09:09:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5EF31C282DD
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 09:09:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E8B8F2085A
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 09:09:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E8B8F2085A
+	by mail.kernel.org (Postfix) with ESMTPS id 37AA2206E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 09:09:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 37AA2206E0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42602 helo=lists.gnu.org)
+Received: from localhost ([::1]:42604 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1haGIz-0007X9-Re
-	for qemu-devel@archiver.kernel.org; Mon, 10 Jun 2019 05:09:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37935)
+	id 1haGJB-00085t-EJ
+	for qemu-devel@archiver.kernel.org; Mon, 10 Jun 2019 05:09:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37998)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <berrange@redhat.com>) id 1haGHq-0006oO-A5
- for qemu-devel@nongnu.org; Mon, 10 Jun 2019 05:08:19 -0400
+ (envelope-from <pagupta@redhat.com>) id 1haGHw-0006ry-Fp
+ for qemu-devel@nongnu.org; Mon, 10 Jun 2019 05:08:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berrange@redhat.com>) id 1haGHp-0003dv-3T
- for qemu-devel@nongnu.org; Mon, 10 Jun 2019 05:08:18 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58258)
+ (envelope-from <pagupta@redhat.com>) id 1haGHu-0003ld-M2
+ for qemu-devel@nongnu.org; Mon, 10 Jun 2019 05:08:24 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47354)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1haGHo-0003c9-R4
- for qemu-devel@nongnu.org; Mon, 10 Jun 2019 05:08:17 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ (Exim 4.71) (envelope-from <pagupta@redhat.com>) id 1haGHu-0003kS-CU
+ for qemu-devel@nongnu.org; Mon, 10 Jun 2019 05:08:22 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id D1AE2C0AD2B4
- for <qemu-devel@nongnu.org>; Mon, 10 Jun 2019 09:08:15 +0000 (UTC)
-Received: from redhat.com (ovpn-112-50.ams2.redhat.com [10.36.112.50])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 8D54D614C1;
- Mon, 10 Jun 2019 09:08:14 +0000 (UTC)
-Date: Mon, 10 Jun 2019 10:08:11 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Eric Blake <eblake@redhat.com>
-Message-ID: <20190610090811.GC7809@redhat.com>
-References: <20190607221414.15962-1-eblake@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id 7368330984D1;
+ Mon, 10 Jun 2019 09:08:07 +0000 (UTC)
+Received: from dhcp201-121.englab.pnq.redhat.com (ovpn-116-103.sin2.redhat.com
+ [10.67.116.103])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id A9D5060BF1;
+ Mon, 10 Jun 2019 09:07:36 +0000 (UTC)
+From: Pankaj Gupta <pagupta@redhat.com>
+To: dm-devel@redhat.com, linux-nvdimm@lists.01.org,
+ linux-kernel@vger.kernel.org, virtualization@lists.linux-foundation.org,
+ kvm@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+ linux-acpi@vger.kernel.org, qemu-devel@nongnu.org,
+ linux-ext4@vger.kernel.org, linux-xfs@vger.kernel.org
+Date: Mon, 10 Jun 2019 14:37:23 +0530
+Message-Id: <20190610090730.8589-1-pagupta@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20190607221414.15962-1-eblake@redhat.com>
-User-Agent: Mutt/1.11.4 (2019-03-13)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.32]); Mon, 10 Jun 2019 09:08:15 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.49]); Mon, 10 Jun 2019 09:08:21 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH] RFC: qio: Improve corking of TLS sessions
+Subject: [Qemu-devel] [PATCH v11 0/7] virtio pmem driver
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,102 +70,241 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org
+Cc: pagupta@redhat.com, rdunlap@infradead.org, jack@suse.cz, snitzer@redhat.com,
+ mst@redhat.com, jasowang@redhat.com, david@fromorbit.com,
+ lcapitulino@redhat.com, adilger.kernel@dilger.ca, zwisler@kernel.org,
+ aarcange@redhat.com, dave.jiang@intel.com, jstaron@google.com,
+ darrick.wong@oracle.com, vishal.l.verma@intel.com, david@redhat.com,
+ willy@infradead.org, hch@infradead.org, jmoyer@redhat.com, nilal@redhat.com,
+ lenb@kernel.org, kilobyte@angband.pl, riel@surriel.com, yuval.shaia@oracle.com,
+ stefanha@redhat.com, pbonzini@redhat.com, dan.j.williams@intel.com,
+ kwolf@redhat.com, tytso@mit.edu, xiaoguangrong.eric@gmail.com,
+ cohuck@redhat.com, rjw@rjwysocki.net, imammedo@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Jun 07, 2019 at 05:14:14PM -0500, Eric Blake wrote:
-> Our current implementation of qio_channel_set_cork() is pointless for
-> TLS sessions: we block the underlying channel, but still hand things
-> piecemeal to gnutls which then produces multiple encryption packets.
-> Better is to directly use gnutls corking, which collects multiple
-> inputs into a single encryption packet.
-> 
-> Signed-off-by: Eric Blake <eblake@redhat.com>
-> 
-> ---
-> 
-> RFC because unfortunately, I'm not sure I like the results.  My test
-> case (using latest nbdkit.git) involves sending 10G of random data
-> over NBD using parallel writes (and doing nothing on the server end;
-> this is all about timing the data transfer):
-> 
-> $ dd if=/dev/urandom of=rand bs=1M count=10k
-> $ time nbdkit -p 10810 --tls=require --tls-verify-peer \
->    --tls-psk=/tmp/keys.psk --filter=stats null 10g statsfile=/dev/stderr \
->    --run '~/qemu/qemu-img convert -f raw -W -n --target-image-opts \
->      --object tls-creds-psk,id=tls0,endpoint=client,dir=/tmp,username=eblake \
->      rand driver=nbd,server.type=inet,server.host=localhost,server.port=10810,tls-creds=tls0'
-> 
-> Pre-patch, I measured:
-> real	0m34.536s
-> user	0m29.264s
-> sys	0m4.014s
-> 
-> while post-patch, it changed to:
-> real	0m36.055s
-> user	0m27.685s
-> sys	0m10.138s
-> 
-> Less time spent in user space, but for this particular qemu-img
-> behavior (writing 2M chunks at a time), gnutls is now uncorking huge
-> packets and the kernel is doing enough extra work that the overall
-> program actually takes longer. :(
+ This patch series is ready to be merged via nvdimm tree
+ as discussed with Dan. We have ack/review on XFS, EXT4 &
+ VIRTIO patches. Need an ack on device mapper change in
+ patch 4.
 
-I wonder if the problem is that we're hitting a tradeoff between
-time spent in encryption vs time spent in network I/O.
+ Mike, Can you please review and ack patch4.
 
-When we don't cork, the kernel has already sent the first packet
-during the time gnutls is burning CPU encrypting the second packet.
+ This version does not has any additonal code change from v10=20
+ and is only rebase of v10 on Linux 5.2-rc4 which is required=20
+ for patch4. Keeping all the existing r-o-bs. Jakob CCed also
+ tested the patch series and confirmed the working of v9.
+ ---
 
-When we do cork gnutls has to encrypt both packets before the kernel
-can send anything.
+ This patch series has implementation for "virtio pmem".=20
+ "virtio pmem" is fake persistent memory(nvdimm) in guest=20
+ which allows to bypass the guest page cache. This also
+ implements a VIRTIO based asynchronous flush mechanism. =20
+=20
+ Sharing guest kernel driver in this patchset with the=20
+ changes suggested in v4. Tested with Qemu side device=20
+ emulation [5] for virtio-pmem. Documented the impact of
+ possible page cache side channel attacks with suggested
+ countermeasures.
 
-> For smaller I/O patterns, the effects of corking are more likely to be
-> beneficial, but I don't have a ready test case to produce that pattern
-> (short of creating a guest running fio on a device backed by nbd).
+ Details of project idea for 'virtio pmem' flushing interface=20
+ is shared [3] & [4].
 
-I think it would probably be useful to see guest kernels with fio
-and definitely see results for something closer to sector sized
-I/O.
+ Implementation is divided into two parts:
+ New virtio pmem guest driver and qemu code changes for new=20
+ virtio pmem paravirtualized device.
 
-2 MB chunks is pretty unrealistic for a guest workload where there
-will be lots of sector sized I/O. Sure QEMU / guest OS can merge
-sectors, but it still feels like most I/O is going to be much smaller
-than 2 MB.
+1. Guest virtio-pmem kernel driver
+---------------------------------
+   - Reads persistent memory range from paravirt device and=20
+     registers with 'nvdimm_bus'. =20
+   - 'nvdimm/pmem' driver uses this information to allocate=20
+     persistent memory region and setup filesystem operations=20
+     to the allocated memory.=20
+   - virtio pmem driver implements asynchronous flushing=20
+     interface to flush from guest to host.
 
+2. Qemu virtio-pmem device
+---------------------------------
+   - Creates virtio pmem device and exposes a memory range to=20
+     KVM guest.=20
+   - At host side this is file backed memory which acts as=20
+     persistent memory.=20
+   - Qemu side flush uses aio thread pool API's and virtio=20
+     for asynchronous guest multi request handling.=20
 
-> diff --git a/io/channel.c b/io/channel.c
-> index 2a26c2a2c0b9..3510912465ac 100644
-> --- a/io/channel.c
-> +++ b/io/channel.c
-> @@ -379,7 +379,16 @@ void qio_channel_set_cork(QIOChannel *ioc,
->      QIOChannelClass *klass = QIO_CHANNEL_GET_CLASS(ioc);
-> 
->      if (klass->io_set_cork) {
-> -        klass->io_set_cork(ioc, enabled);
-> +        int r = klass->io_set_cork(ioc, enabled);
-> +
-> +        while (r == QIO_CHANNEL_ERR_BLOCK) {
-> +            if (qemu_in_coroutine()) {
-> +                qio_channel_yield(ioc, G_IO_OUT);
-> +            } else {
-> +                qio_channel_wait(ioc, G_IO_OUT);
-> +            }
-> +            r = klass->io_set_cork(ioc, enabled);
-> +        }
->      }
+ Virtio-pmem security implications and countermeasures:
+ -----------------------------------------------------
 
-Interesting - did you actually hit this EAGAIN behaviour ? I wouldn't
-have expected anything to be pending in gnutls that needs retry. 
+ In previous posting of kernel driver, there was discussion [7]
+ on possible implications of page cache side channel attacks with=20
+ virtio pmem. After thorough analysis of details of known side=20
+ channel attacks, below are the suggestions:
 
+ - Depends entirely on how host backing image file is mapped=20
+   into guest address space.=20
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+ - virtio-pmem device emulation, by default shared mapping is used
+   to map host backing file. It is recommended to use separate
+   backing file at host side for every guest. This will prevent
+   any possibility of executing common code from multiple guests
+   and any chance of inferring guest local data based based on=20
+   execution time.
+
+ - If backing file is required to be shared among multiple guests=20
+   it is recommended to don't support host page cache eviction=20
+   commands from the guest driver. This will avoid any possibility
+   of inferring guest local data or host data from another guest.=20
+
+ - Proposed device specification [6] for virtio-pmem device with=20
+   details of possible security implications and suggested=20
+   countermeasures for device emulation.
+
+ Virtio-pmem errors handling:
+ ----------------------------------------
+  Checked behaviour of virtio-pmem for below types of errors
+  Need suggestions on expected behaviour for handling these errors?
+
+  - Hardware Errors: Uncorrectable recoverable Errors:=20
+  a] virtio-pmem:=20
+    - As per current logic if error page belongs to Qemu process,=20
+      host MCE handler isolates(hwpoison) that page and send SIGBUS.=20
+      Qemu SIGBUS handler injects exception to KVM guest.=20
+    - KVM guest then isolates the page and send SIGBUS to guest=20
+      userspace process which has mapped the page.=20
+ =20
+  b] Existing implementation for ACPI pmem driver:=20
+    - Handles such errors with MCE notifier and creates a list=20
+      of bad blocks. Read/direct access DAX operation return EIO=20
+      if accessed memory page fall in bad block list.
+    - It also starts backgound scrubbing. =20
+    - Similar functionality can be reused in virtio-pmem with MCE=20
+      notifier but without scrubbing(no ACPI/ARS)? Need inputs to=20
+      confirm if this behaviour is ok or needs any change?
+
+Changes from PATCH v10: [1]=20
+ - Rebased on Linux-5.2-rc4
+
+Changes from PATCH v9: [2]=20
+ - Kconfig help text add two spaces - Randy
+ - Fixed libnvdimm 'bio' include warning - Dan
+ - virtio-pmem, separate request/resp struct and=20
+   move to uapi file with updated license - DavidH
+ - Use virtio32* type for req/resp endianess - DavidH
+ - Added tested-by & ack-by of Jakob
+ - Rebased to 5.2-rc1
+
+Changes from PATCH v8:
+ - Set device mapper synchronous if all target devices support - Dan
+ - Move virtio_pmem.h to nvdimm directory  - Dan
+ - Style, indentation & better error messages in patch 2 - DavidH
+ - Added MST's ack in patch 2.
+
+Changes from PATCH v7:
+ - Corrected pending request queue logic (patch 2) - Jakub Staro=C5=84
+ - Used unsigned long flags for passing DAXDEV_F_SYNC (patch 3) - Dan
+ - Fixed typo =3D>  vma 'flag' to 'vm_flag' (patch 4)
+ - Added rob in patch 6 & patch 2
+
+Changes from PATCH v6:=20
+ - Corrected comment format in patch 5 & patch 6. [Dave]
+ - Changed variable declaration indentation in patch 6 [Darrick]
+ - Add Reviewed-by tag by 'Jan Kara' in patch 4 & patch 5
+
+Changes from PATCH v5:=20
+  Changes suggested in by - [Cornelia, Yuval]
+- Remove assignment chaining in virtio driver
+- Better error message and remove not required free
+- Check nd_region before use
+
+  Changes suggested by - [Jan Kara]
+- dax_synchronous() for !CONFIG_DAX
+- Correct 'daxdev_mapping_supported' comment and non-dax implementation
+
+  Changes suggested by - [Dan Williams]
+- Pass meaningful flag 'DAXDEV_F_SYNC' to alloc_dax
+- Gate nvdimm_flush instead of additional async parameter
+- Move block chaining logic to flush callback than common nvdimm_flush
+- Use NULL flush callback for generic flush for better readability [Dan, =
+Jan]
+
+- Use virtio device id 27 from 25(already used) - [MST]
+
+Changes from PATCH v4:
+- Factor out MAP_SYNC supported functionality to a common helper
+				[Dave, Darrick, Jan]
+- Comment, indentation and virtqueue_kick failure handle - Yuval Shaia
+
+Changes from PATCH v3:=20
+- Use generic dax_synchronous() helper to check for DAXDEV_SYNC=20
+  flag - [Dan, Darrick, Jan]
+- Add 'is_nvdimm_async' function
+- Document page cache side channel attacks implications &=20
+  countermeasures - [Dave Chinner, Michael]
+
+Changes from PATCH v2:=20
+- Disable MAP_SYNC for ext4 & XFS filesystems - [Dan]=20
+- Use name 'virtio pmem' in place of 'fake dax'=20
+
+Changes from PATCH v1:=20
+- 0-day build test for build dependency on libnvdimm=20
+
+ Changes suggested by - [Dan Williams]
+- Split the driver into two parts virtio & pmem =20
+- Move queuing of async block request to block layer
+- Add "sync" parameter in nvdimm_flush function
+- Use indirect call for nvdimm_flush
+- Don=E2=80=99t move declarations to common global header e.g nd.h
+- nvdimm_flush() return 0 or -EIO if it fails
+- Teach nsio_rw_bytes() that the flush can fail
+- Rename nvdimm_flush() to generic_nvdimm_flush()
+- Use 'nd_region->provider_data' for long dereferencing
+- Remove virtio_pmem_freeze/restore functions
+- Remove BSD license text with SPDX license text
+
+- Add might_sleep() in virtio_pmem_flush - [Luiz]
+- Make spin_lock_irqsave() narrow
+
+Pankaj Gupta (7):
+   libnvdimm: nd_region flush callback support
+   virtio-pmem: Add virtio-pmem guest driver
+   libnvdimm: add nd_region buffered dax_dev flag
+   dax: check synchronous mapping is supported
+   dm: dm: Enable synchronous dax
+   ext4: disable map_sync for virtio pmem
+   xfs: disable map_sync for virtio pmem
+
+[1] https://lkml.org/lkml/2019/5/21/569
+[2] https://lkml.org/lkml/2019/5/14/465
+[3] https://www.spinics.net/lists/kvm/msg149761.html
+[4] https://www.spinics.net/lists/kvm/msg153095.html =20
+[5] https://marc.info/?l=3Dqemu-devel&m=3D155860751202202&w=3D2
+[6] https://lists.oasis-open.org/archives/virtio-dev/201903/msg00083.html
+[7] https://lkml.org/lkml/2019/1/9/1191
+
+ drivers/acpi/nfit/core.c         |    4 -
+ drivers/dax/bus.c                |    2=20
+ drivers/dax/super.c              |   19 +++++
+ drivers/md/dm-table.c            |   14 ++++
+ drivers/md/dm.c                  |    3=20
+ drivers/nvdimm/Makefile          |    1=20
+ drivers/nvdimm/claim.c           |    6 +
+ drivers/nvdimm/nd.h              |    1=20
+ drivers/nvdimm/nd_virtio.c       |  124 ++++++++++++++++++++++++++++++++=
++++++++
+ drivers/nvdimm/pmem.c            |   18 +++--
+ drivers/nvdimm/region_devs.c     |   33 +++++++++-
+ drivers/nvdimm/virtio_pmem.c     |  122 ++++++++++++++++++++++++++++++++=
+++++++
+ drivers/nvdimm/virtio_pmem.h     |   55 +++++++++++++++++
+ drivers/virtio/Kconfig           |   11 +++
+ fs/ext4/file.c                   |   10 +--
+ fs/xfs/xfs_file.c                |    9 +-
+ include/linux/dax.h              |   26 +++++++-
+ include/linux/libnvdimm.h        |   10 ++-
+ include/uapi/linux/virtio_ids.h  |    1=20
+ include/uapi/linux/virtio_pmem.h |   35 +++++++++++
+ 20 files changed, 479 insertions(+), 25 deletions(-)
+
 
