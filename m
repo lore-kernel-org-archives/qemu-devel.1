@@ -2,63 +2,67 @@ Return-Path: <SRS0=Y1tr=UJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A6D8C282DD
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 12:32:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 19C32C282DD
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 12:35:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 76AF920679
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 12:32:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 76AF920679
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id A268720679
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 12:35:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A268720679
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45980 helo=lists.gnu.org)
+Received: from localhost ([::1]:45996 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1haJTp-000553-Lt
-	for qemu-devel@archiver.kernel.org; Mon, 10 Jun 2019 08:32:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60748)
+	id 1haJWW-0006iF-Mz
+	for qemu-devel@archiver.kernel.org; Mon, 10 Jun 2019 08:35:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33060)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <imammedo@redhat.com>) id 1haJSR-0004Wg-Ux
- for qemu-devel@nongnu.org; Mon, 10 Jun 2019 08:31:29 -0400
+ (envelope-from <no-reply@patchew.org>) id 1haJUo-0005ro-0C
+ for qemu-devel@nongnu.org; Mon, 10 Jun 2019 08:33:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1haJSQ-0006Hu-MU
- for qemu-devel@nongnu.org; Mon, 10 Jun 2019 08:31:27 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49646)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1haJSO-0006GI-Ld
- for qemu-devel@nongnu.org; Mon, 10 Jun 2019 08:31:25 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 9F224128B5
- for <qemu-devel@nongnu.org>; Mon, 10 Jun 2019 12:31:22 +0000 (UTC)
-Received: from localhost (unknown [10.43.2.182])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 919792F299;
- Mon, 10 Jun 2019 12:31:13 +0000 (UTC)
-Date: Mon, 10 Jun 2019 14:31:08 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>
-Message-ID: <20190610143109.10c4979b@redhat.com>
-In-Reply-To: <87h8915m7u.fsf@dusky.pond.sub.org>
-References: <1559205199-233510-1-git-send-email-imammedo@redhat.com>
- <1559205199-233510-2-git-send-email-imammedo@redhat.com>
- <87h8915m7u.fsf@dusky.pond.sub.org>
+ (envelope-from <no-reply@patchew.org>) id 1haJUm-0007ZY-D1
+ for qemu-devel@nongnu.org; Mon, 10 Jun 2019 08:33:53 -0400
+Resent-Date: Mon, 10 Jun 2019 08:33:53 -0400
+Resent-Message-Id: <E1haJUm-0007ZY-D1@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21475)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1haJUm-0007Xx-4b
+ for qemu-devel@nongnu.org; Mon, 10 Jun 2019 08:33:52 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1560170008; cv=none; d=zoho.com; s=zohoarc; 
+ b=jJ7M1BvP0aoxL2MxtyrPpRrI4IzHwoq4uRrNMyvgAPahAoVEUczzT4zcA3YlI9wucxqjX44E4U5Fs8Koc/fGqI691HLSSecLofD9sPTBiO/NAqgFH7mC6qf/ZJ8TlaGnFv3PFLXktlAGxJlrU+6ahoPW5pQHGLnRtoLzXPb2eig=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
+ s=zohoarc; t=1560170008;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
+ bh=8I2cIoiLVVnK0ammOwBzUfl6fkJkVmdYQVbNkw2ASbE=; 
+ b=UR5wFNYjF/4ktlaL9jHeT957IlZ1oUpQJem0vpiOrUQzWla57IXRm2+aAvScu4vkjaU7cq2cbUP6LVd2UGETj9+tpGCxbTXAceDcvFnbc/WfEtAzYKo6B2sG1s1hRxMsNkAF8dIW98DaL6/4GWaS4fOVbjzyLlJPuFoTML6qzWg=
+ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1560170006702439.03359922418247;
+ Mon, 10 Jun 2019 05:33:26 -0700 (PDT)
+In-Reply-To: <1560165301-39026-1-git-send-email-pbonzini@redhat.com>
+Message-ID: <156017000576.32260.5126051000625747610@ce79690b2cb9>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.30]); Mon, 10 Jun 2019 12:31:22 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: pbonzini@redhat.com
+Date: Mon, 10 Jun 2019 05:33:26 -0700 (PDT)
+X-ZohoMailClient: External
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v4 1/3] machine: show if CLI option '-numa
- node, mem' is supported in QAPI schema
+X-Received-From: 135.84.80.217
+Subject: Re: [Qemu-devel] [RFC PATCH 0/7] Proof of concept for Meson
+ integration
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,163 +74,133 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: libvir-list@redhat.com, pbonzini@redhat.com, berrange@redhat.com,
- qemu-devel@nongnu.org, ehabkost@redhat.com
+Reply-To: qemu-devel@nongnu.org
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 07 Jun 2019 19:39:17 +0200
-Markus Armbruster <armbru@redhat.com> wrote:
-
-> Igor Mammedov <imammedo@redhat.com> writes:
-> 
-> > Legacy '-numa node,mem' option has a number of issues and mgmt often
-> > defaults to it. Unfortunately it's no possible to replace it with
-> > an alternative '-numa memdev' without breaking migration compatibility.
-> > What's possible though is to deprecate it, keeping option working with
-> > old machine types only.
-> >
-> > In order to help users to find out if being deprecated CLI option
-> > '-numa node,mem' is still supported by particular machine type, add new
-> > "numa-mem-supported" property to MachineInfo description in QAPI schema.  
-> 
-> Suggest s/to MachineInfo description in QAPI schema/to output of
-> query-machines/, because query-machines is the external interface people
-> know.
-
-fixed
-
-> 
-> > "numa-mem-supported" is set to 'true' for machines that currently support
-> > NUMA, but it will be flipped to 'false' later on, once deprecation period
-> > expires and kept 'true' only for old machine types that used to support
-> > the legacy option so it won't break existing configuration that are using
-> > it.
-> >
-> > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> > ---
-> >
-> > Notes:
-> >     v4:
-> >       * drop idea to use "qom-list-properties" and use MachineInfo instead
-> >         which could be inspected with 'query-machines'
-> >
-> >  include/hw/boards.h | 3 +++
-> >  hw/arm/virt.c       | 1 +
-> >  hw/i386/pc.c        | 1 +
-> >  hw/ppc/spapr.c      | 1 +
-> >  qapi/misc.json      | 5 ++++-
-> >  vl.c                | 1 +
-> >  6 files changed, 11 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/include/hw/boards.h b/include/hw/boards.h
-> > index 6f7916f..86894b6 100644
-> > --- a/include/hw/boards.h
-> > +++ b/include/hw/boards.h
-> > @@ -158,6 +158,8 @@ typedef struct {
-> >   * @kvm_type:
-> >   *    Return the type of KVM corresponding to the kvm-type string option or
-> >   *    computed based on other criteria such as the host kernel capabilities.
-> > + * @numa_mem_supported:
-> > + *    true if '--numa node.mem' option is supported and false otherwise
-> >   */
-> >  struct MachineClass {
-> >      /*< private >*/
-> > @@ -210,6 +212,7 @@ struct MachineClass {
-> >      bool ignore_boot_device_suffixes;
-> >      bool smbus_no_migration_support;
-> >      bool nvdimm_supported;
-> > +    bool numa_mem_supported;
-> >  
-> >      HotplugHandler *(*get_hotplug_handler)(MachineState *machine,
-> >                                             DeviceState *dev);
-> > diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-> > index bf54f10..481a603 100644
-> > --- a/hw/arm/virt.c
-> > +++ b/hw/arm/virt.c
-> > @@ -1943,6 +1943,7 @@ static void virt_machine_class_init(ObjectClass *oc, void *data)
-> >      assert(!mc->get_hotplug_handler);
-> >      mc->get_hotplug_handler = virt_machine_get_hotplug_handler;
-> >      hc->plug = virt_machine_device_plug_cb;
-> > +    mc->numa_mem_supported = true;
-> >  }
-> >  
-> >  static void virt_instance_init(Object *obj)
-> > diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-> > index 2632b73..05b8368 100644
-> > --- a/hw/i386/pc.c
-> > +++ b/hw/i386/pc.c
-> > @@ -2747,6 +2747,7 @@ static void pc_machine_class_init(ObjectClass *oc, void *data)
-> >      nc->nmi_monitor_handler = x86_nmi;
-> >      mc->default_cpu_type = TARGET_DEFAULT_CPU_TYPE;
-> >      mc->nvdimm_supported = true;
-> > +    mc->numa_mem_supported = true;
-> >  
-> >      object_class_property_add(oc, PC_MACHINE_DEVMEM_REGION_SIZE, "int",
-> >          pc_machine_get_device_memory_region_size, NULL,
-> > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> > index 2ef3ce4..265ecfb 100644
-> > --- a/hw/ppc/spapr.c
-> > +++ b/hw/ppc/spapr.c
-> > @@ -4336,6 +4336,7 @@ static void spapr_machine_class_init(ObjectClass *oc, void *data)
-> >       * in which LMBs are represented and hot-added
-> >       */
-> >      mc->numa_mem_align_shift = 28;
-> > +    mc->numa_mem_supported = true;
-> >  
-> >      smc->default_caps.caps[SPAPR_CAP_HTM] = SPAPR_CAP_OFF;
-> >      smc->default_caps.caps[SPAPR_CAP_VSX] = SPAPR_CAP_ON;  
-> 
-> This is correct when the TYPE_VIRT_MACHINE, TYPE_PC_MACHINE and
-> TYPE_SPAPR_MACHINE are exactly the machines supporting NUMA.  How could
-> I check that?
-
-We don't have an interface to communicate that to users as far as I know.
-
-Eduardo pointed out to the patch that might serve as starting point for it though.
-
-> 
-> > diff --git a/qapi/misc.json b/qapi/misc.json
-> > index 8b3ca4f..d0bdccb 100644
-> > --- a/qapi/misc.json
-> > +++ b/qapi/misc.json
-> > @@ -2018,12 +2018,15 @@
-> >  #
-> >  # @hotpluggable-cpus: cpu hotplug via -device is supported (since 2.7.0)
-> >  #
-> > +# @numa-mem-supported: true if '-numa node,mem' option is supported by machine
-> > +#                      type and false otherwise (since 4.1)  
-> 
-> 
-> "by the machine type", for consistency with @cpu-max.  Also, rather long
-> line.
-
-fixed
-
-> 
-> > +#
-> >  # Since: 1.2.0
-> >  ##
-> >  { 'struct': 'MachineInfo',
-> >    'data': { 'name': 'str', '*alias': 'str',
-> >              '*is-default': 'bool', 'cpu-max': 'int',
-> > -            'hotpluggable-cpus': 'bool'} }
-> > +            'hotpluggable-cpus': 'bool', 'numa-mem-supported': 'bool'} }
-> >  
-> >  ##
-> >  # @query-machines:
-> > diff --git a/vl.c b/vl.c
-> > index 5550bd7..5bf17f5 100644
-> > --- a/vl.c
-> > +++ b/vl.c
-> > @@ -1520,6 +1520,7 @@ MachineInfoList *qmp_query_machines(Error **errp)
-> >          info->name = g_strdup(mc->name);
-> >          info->cpu_max = !mc->max_cpus ? 1 : mc->max_cpus;
-> >          info->hotpluggable_cpus = mc->has_hotpluggable_cpus;
-> > +        info->numa_mem_supported = mc->numa_mem_supported;
-> >  
-> >          entry = g_malloc0(sizeof(*entry));
-> >          entry->value = info;  
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8xNTYwMTY1MzAxLTM5MDI2LTEt
+Z2l0LXNlbmQtZW1haWwtcGJvbnppbmlAcmVkaGF0LmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBz
+ZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93
+IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtSRkMgUEFUQ0gg
+MC83XSBQcm9vZiBvZiBjb25jZXB0IGZvciBNZXNvbiBpbnRlZ3JhdGlvbgpUeXBlOiBzZXJpZXMK
+TWVzc2FnZS1pZDogMTU2MDE2NTMwMS0zOTAyNi0xLWdpdC1zZW5kLWVtYWlsLXBib256aW5pQHJl
+ZGhhdC5jb20KCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0IHJldi1w
+YXJzZSBiYXNlID4gL2Rldi9udWxsIHx8IGV4aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5y
+ZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29u
+ZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNo
+LnBsIC0tbWFpbGJhY2sgYmFzZS4uCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpGcm9tIGh0dHBz
+Oi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogICA2OTYwMDA1MjEyLi4xOTczNWM4
+MzdhICBtYXN0ZXIgICAgIC0+IG1hc3RlcgpGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3
+LXByb2plY3QvcWVtdQogKiBbbmV3IHRhZ10gICAgICAgICAgICAgICBwYXRjaGV3LzE1NjAxNjUz
+MDEtMzkwMjYtMS1naXQtc2VuZC1lbWFpbC1wYm9uemluaUByZWRoYXQuY29tIC0+IHBhdGNoZXcv
+MTU2MDE2NTMwMS0zOTAyNi0xLWdpdC1zZW5kLWVtYWlsLXBib256aW5pQHJlZGhhdC5jb20KU3dp
+dGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwpkNjgxZmIwNjk1IHJkbWFjbS1tdXg6IGNvbnZl
+cnQgdG8gTWVzb24KMmMxMmZjYWZkMSB2aG9zdC11c2VyLXNjc2k6IGNvbnZlcnQgdG8gTWVzb24K
+N2I4NzgyM2E0YyB2aG9zdC11c2VyLWJsazogY29udmVydCB0byBNZXNvbgo0NTIzM2FiZTAzIGxp
+YnZob3N0LXVzZXI6IGNvbnZlcnQgdG8gTWVzb24KMDkwZjY3MGVmOCBjb25maWd1cmU6IGludGVn
+cmF0ZSBNZXNvbiBpbiB0aGUgYnVpbGQgc3lzdGVtCjlkOWE0YjE5MjYgY29uZmlndXJlOiBzZXQg
+JFBZVEhPTiB0byBhIGZ1bGwgcGF0aApkNDdkMWI3ZjEzIGNvbmZpZ3VyZTogZG8gbm90IGluY2x1
+ZGUgJCguLi4pIHZhcmlhYmxlcyBpbiBjb25maWctaG9zdC5tYWsKCj09PSBPVVRQVVQgQkVHSU4g
+PT09CjEvNyBDaGVja2luZyBjb21taXQgZDQ3ZDFiN2YxMzY2IChjb25maWd1cmU6IGRvIG5vdCBp
+bmNsdWRlICQoLi4uKSB2YXJpYWJsZXMgaW4gY29uZmlnLWhvc3QubWFrKQoyLzcgQ2hlY2tpbmcg
+Y29tbWl0IDlkOWE0YjE5MjYxNCAoY29uZmlndXJlOiBzZXQgJFBZVEhPTiB0byBhIGZ1bGwgcGF0
+aCkKMy83IENoZWNraW5nIGNvbW1pdCAwOTBmNjcwZWY4NGMgKGNvbmZpZ3VyZTogaW50ZWdyYXRl
+IE1lc29uIGluIHRoZSBidWlsZCBzeXN0ZW0pCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxl
+dGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzEwNDogCm5ldyBm
+aWxlIG1vZGUgMTAwNjQ0CgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMjgzOiBG
+SUxFOiBzY3JpcHRzL25pbmphdG9vbC5weToxNjA6CisgICAgICAgIHJhaXNlIExleGVyRXJyb3Io
+IiVzOiVkOiAlcyIgJSAoc2VsZi5zdGFja1stMV0uZmlsZW5hbWUsIHNlbGYubGluZW5vLCBtc2cp
+KQoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzI4NjogRklMRTogc2NyaXB0cy9u
+aW5qYXRvb2wucHk6MTYzOgorICAgICAgICByYWlzZSBQYXJzZUVycm9yKCIlczolZDogJXMiICUg
+KHNlbGYuc3RhY2tbLTFdLmZpbGVuYW1lLCBzZWxmLmxpbmVubywgbXNnKSkKCkVSUk9SOiBsaW5l
+IG92ZXIgOTAgY2hhcmFjdGVycwojNjY4OiBGSUxFOiBzY3JpcHRzL25pbmphdG9vbC5weTo1NDU6
+CisgICAgICAgIHNlbGYuc2NvcGUgPSBCdWlsZFNjb3BlKHNlbGYsIG91dCwgaW91dCwgcnVsZSwg
+aW5fLCBpaW4sIG9yZGVyZGVwLCBzZWxmLnJ1bGVfdmFyc1tydWxlXSkKCldBUk5JTkc6IGxpbmUg
+b3ZlciA4MCBjaGFyYWN0ZXJzCiM3MDM6IEZJTEU6IHNjcmlwdHMvbmluamF0b29sLnB5OjU4MDoK
+KyAgICBBUkdTID0gYXJncGFyc2UuQXJndW1lbnRQYXJzZXIoZGVzY3JpcHRpb249J1Jld3JpdGUg
+aW5wdXQgYnVpbGQubmluamEgdG8gc3Rkb3V0LicpCgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hh
+cmFjdGVycwojNzM4OiBGSUxFOiBzY3JpcHRzL25pbmphdG9vbC5weTo2MTU6CisgICAgZGVmIGJl
+Z2luX2J1aWxkKHNlbGYsIG91dHB1dHMsIGltcGxpY2l0X291dHB1dHMsIHJ1bGUsIGlucHV0cywg
+aW1wbGljaXQsIG9yZGVyX29ubHkpOgoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMK
+Izg0MzogRklMRTogc2NyaXB0cy9uaW5qYXRvb2wucHk6NzIwOgorICAgIEFSR1MgPSBhcmdwYXJz
+ZS5Bcmd1bWVudFBhcnNlcihkZXNjcmlwdGlvbj0nQ29udmVydCBidWlsZC5uaW5qYSB0byBhIE1h
+a2VmaWxlLicpCgpFUlJPUjogbGluZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzg5NzogRklMRTogc2Ny
+aXB0cy9uaW5qYXRvb2wucHk6Nzc0OgorICAgICAgICAgICAgc2VsZi5wcmludChyJ25pbmphLWNs
+ZWFuOjogbmluamEtY2xlYW4tc3RhcnQ7ICQoaWYgJFYsLEApcm0gLWYgJHtuaW5qYS1kZXBmaWxl
+c30nKQoKRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiM5MTE6IEZJTEU6IHNjcmlwdHMv
+bmluamF0b29sLnB5Ojc4ODoKKyAgICAgICAgc2VsZi5wcmludChyIm5pbmphLWNvbW1hbmQgPSAk
+KGlmICRWLCxAcHJpbnRmICclc1xuJyAnJChzdWJzdCAnLCdcJycsJHsudmFyLmRlc2NyaXB0aW9u
+fSknICYmICkkey52YXIuY29tbWFuZH0iKQoKRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJz
+CiM5Mzc6IEZJTEU6IHNjcmlwdHMvbmluamF0b29sLnB5OjgxNDoKKyAgICAgICAgICAgIHNlbGYu
+cHJpbnQoJ25pbmphLXRhcmdldHMtJXMgOj0gJXMnICUgKHJ1bGUsICcgJy5qb2luKHNlbGYucnVs
+ZV90YXJnZXRzW3J1bGVdKSkpCgpFUlJPUjogbGluZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzkzOTog
+RklMRTogc2NyaXB0cy9uaW5qYXRvb2wucHk6ODE2OgorICAgICAgICAgICAgICAgIHNlbGYucHJp
+bnQoJyQobmluamEtdGFyZ2V0cy0lcyk6IC52YXIuJXMgPSAlcycgJSAocnVsZSwgbmFtZSwgc2Vs
+Zi5tYW5nbGVfdmFyc19mb3JfbWFrZSh2YWx1ZSkpKQoKV0FSTklORzogbGluZSBvdmVyIDgwIGNo
+YXJhY3RlcnMKIzk0MDogRklMRTogc2NyaXB0cy9uaW5qYXRvb2wucHk6ODE3OgorICAgICAgICAg
+ICAgc2VsZi5wcmludCgnbmluamEtb3V0cHV0ZGlycyArPSAkKHNvcnQgJChkaXIgJHtuaW5qYS10
+YXJnZXRzLSVzfSkpJyAlIHJ1bGUpCgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwoj
+OTUxOiBGSUxFOiBzY3JpcHRzL25pbmphdG9vbC5weTo4Mjg6CisgICAgICAgICAgICBkZWZhdWx0
+X3RhcmdldHMgPSBzb3J0ZWQoc2VsZi5hbGxfb3V0cyAtIHNlbGYuYWxsX2lucywga2V5PW5hdHVy
+YWxfc29ydF9rZXkpCgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojOTYwOiBGSUxF
+OiBzY3JpcHRzL25pbmphdG9vbC5weTo4Mzc6CisgICAgICAgIHBob255X3RhcmdldHMgPSBzb3J0
+ZWQoc2VsZi5hbGxfcGhvbnkgLSBzZWxmLmFsbF9pbnMsIGtleT1uYXR1cmFsX3NvcnRfa2V5KQoK
+V0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzk2OTogRklMRTogc2NyaXB0cy9uaW5q
+YXRvb2wucHk6ODQ2OgorICAgICAgICAgICAgIyBUaGVzZSBoYXZlIHRvIGJlIHByaW50ZWQgbGFz
+dCwgYmVjYXVzZSB0aGV5IG92ZXJyaWRlIHJ1bGUgdmFyaWFibGVzCgpXQVJOSU5HOiBsaW5lIG92
+ZXIgODAgY2hhcmFjdGVycwojOTcwOiBGSUxFOiBzY3JpcHRzL25pbmphdG9vbC5weTo4NDc6Cisg
+ICAgICAgICAgICAjIGJ1dCB3ZSBjYW5ub3QgcHJpbnQgcnVsZSB2YXJpYWJsZXMgdW50aWwgd2Ug
+a25vdyB0aGUgbGlzdCBvZiB0YXJnZXRzCgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVy
+cwojOTcyOiBGSUxFOiBzY3JpcHRzL25pbmphdG9vbC5weTo4NDk6CisgICAgICAgICAgICBzZWxm
+LmJ1aWxkX3ZhcnNbc2VsZi5jdXJyZW50X3RhcmdldHNdW25hbWVdID0gc2VsZi5zY29wZS5idWls
+ZF92YXJzW25hbWVdCgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojOTkxOiBGSUxF
+OiBzY3JpcHRzL25pbmphdG9vbC5weTo4Njg6CisgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+IHNlbGYuc2NvcGUuaW5fICsgc2VsZi5zY29wZS5paW4gKyBzZWxmLnNjb3BlLm9yZGVyZGVwKQoK
+V0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzk5ODogRklMRTogc2NyaXB0cy9uaW5q
+YXRvb2wucHk6ODc1OgorICAgICAgICBzZWxmLnByaW50KCclczogJXMgfCAlczsgJHtuaW5qYS1j
+b21tYW5kfScgJSAodGFyZ2V0cywgaW5wdXRzLCBvcmRlcm9ubHkpKQoKRVJST1I6IGxpbmUgb3Zl
+ciA5MCBjaGFyYWN0ZXJzCiMxMDI0OiBGSUxFOiBzY3JpcHRzL25pbmphdG9vbC5weTo5MDE6Cisg
+ICAgZGVmIF9faW5pdF9fKHNlbGYsIG9wdGlvbl9zdHJpbmdzLCBkZXN0LCBjaG9pY2VzLCBtZXRh
+dmFyPSdUT09MJywgbmFyZ3M9Tm9uZSwgKiprd2FyZ3MpOgoKV0FSTklORzogbGluZSBvdmVyIDgw
+IGNoYXJhY3RlcnMKIzEwNTc6IEZJTEU6IHNjcmlwdHMvbmluamF0b29sLnB5OjkzNDoKK3BhcnNl
+ciA9IGFyZ3BhcnNlLkFyZ3VtZW50UGFyc2VyKGRlc2NyaXB0aW9uPSdQcm9jZXNzIGFuZCB0cmFu
+c2Zvcm0gYnVpbGQubmluamEgZmlsZXMuJywKCnRvdGFsOiA2IGVycm9ycywgMTUgd2FybmluZ3Ms
+IDEwNDggbGluZXMgY2hlY2tlZAoKUGF0Y2ggMy83IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNl
+IHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBv
+cnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMu
+Cgo0LzcgQ2hlY2tpbmcgY29tbWl0IDQ1MjMzYWJlMDNiYiAobGlidmhvc3QtdXNlcjogY29udmVy
+dCB0byBNZXNvbikKV0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9l
+cyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojNzM6IApkZWxldGVkIGZpbGUgbW9kZSAxMDA2
+NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgNTggbGluZXMgY2hlY2tlZAoKUGF0Y2gg
+NC83IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBl
+cnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwg
+c2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjUvNyBDaGVja2luZyBjb21taXQgN2I4Nzgy
+M2E0Y2JlICh2aG9zdC11c2VyLWJsazogY29udmVydCB0byBNZXNvbikKV0FSTklORzogYWRkZWQs
+IG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5n
+PwojNzM6IApkZWxldGVkIGZpbGUgbW9kZSAxMDA2NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJu
+aW5ncywgNDkgbGluZXMgY2hlY2tlZAoKUGF0Y2ggNS83IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxl
+YXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyBy
+ZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5F
+UlMuCjYvNyBDaGVja2luZyBjb21taXQgMmMxMmZjYWZkMTE5ICh2aG9zdC11c2VyLXNjc2k6IGNv
+bnZlcnQgdG8gTWVzb24pCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyks
+IGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzYyOiAKZGVsZXRlZCBmaWxlIG1vZGUg
+MTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDQ0IGxpbmVzIGNoZWNrZWQKClBh
+dGNoIDYvNyBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhl
+c2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWlu
+ZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgo3LzcgQ2hlY2tpbmcgY29tbWl0IGQ2
+ODFmYjA2OTVmMSAocmRtYWNtLW11eDogY29udmVydCB0byBNZXNvbikKV0FSTklORzogYWRkZWQs
+IG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5n
+PwojNjE6IApkZWxldGVkIGZpbGUgbW9kZSAxMDA2NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJu
+aW5ncywgNDggbGluZXMgY2hlY2tlZAoKUGF0Y2ggNy83IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxl
+YXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyBy
+ZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5F
+UlMuCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEK
+CgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzE1
+NjAxNjUzMDEtMzkwMjYtMS1naXQtc2VuZC1lbWFpbC1wYm9uemluaUByZWRoYXQuY29tL3Rlc3Rp
+bmcuY2hlY2twYXRjaC8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRp
+Y2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3Vy
+IGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
 
 
