@@ -6,44 +6,44 @@ X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2770EC468BC
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 04:32:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BB18C468C1
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 04:36:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B111720820
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 04:32:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B111720820
+	by mail.kernel.org (Postfix) with ESMTPS id 10E3420820
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 04:36:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 10E3420820
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40400 helo=lists.gnu.org)
+Received: from localhost ([::1]:40412 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1haBzK-00048v-Gr
-	for qemu-devel@archiver.kernel.org; Mon, 10 Jun 2019 00:32:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57075)
+	id 1haC2J-0006Pc-BJ
+	for qemu-devel@archiver.kernel.org; Mon, 10 Jun 2019 00:35:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57092)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <bounces@canonical.com>) id 1haBxh-0003G7-BX
- for qemu-devel@nongnu.org; Mon, 10 Jun 2019 00:31:15 -0400
+ (envelope-from <bounces@canonical.com>) id 1haBxn-0003Hu-NG
+ for qemu-devel@nongnu.org; Mon, 10 Jun 2019 00:31:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1haBxd-0002ih-G0
- for qemu-devel@nongnu.org; Mon, 10 Jun 2019 00:31:11 -0400
-Received: from indium.canonical.com ([91.189.90.7]:56296)
+ (envelope-from <bounces@canonical.com>) id 1haBxj-0002mc-VO
+ for qemu-devel@nongnu.org; Mon, 10 Jun 2019 00:31:17 -0400
+Received: from indium.canonical.com ([91.189.90.7]:56456)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1haBxc-0002hV-Ut
- for qemu-devel@nongnu.org; Mon, 10 Jun 2019 00:31:09 -0400
+ id 1haBxh-0002j7-AM
+ for qemu-devel@nongnu.org; Mon, 10 Jun 2019 00:31:15 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1haBxa-00021X-Le
- for <qemu-devel@nongnu.org>; Mon, 10 Jun 2019 04:31:06 +0000
+ id 1haBxd-00022h-7B
+ for <qemu-devel@nongnu.org>; Mon, 10 Jun 2019 04:31:09 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 98B9A2E807E
- for <qemu-devel@nongnu.org>; Mon, 10 Jun 2019 04:31:06 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 303D32E8079
+ for <qemu-devel@nongnu.org>; Mon, 10 Jun 2019 04:31:09 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 10 Jun 2019 04:17:27 -0000
+Date: Mon, 10 Jun 2019 04:17:28 -0000
 From: Launchpad Bug Tracker <1525676@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
@@ -58,13 +58,13 @@ X-Launchpad-Bug-Commenters: halfdog janitor paelzer sdeziel smb th-huth
 X-Launchpad-Bug-Reporter: halfdog (halfdog)
 X-Launchpad-Bug-Modifier: Launchpad Janitor (janitor)
 References: <20151213173042.25355.35514.malonedeb@soybean.canonical.com>
-Message-Id: <156014024744.22010.8675825205686115089.malone@loganberry.canonical.com>
+Message-Id: <156014024888.22010.7145895125458657220.malone@loganberry.canonical.com>
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com); Revision="18978";
  Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: 8b4892fdfa8d51bd471fc3d3d20bf76420c9b055
+X-Launchpad-Hash: 3e2daa7e65201719284f97f92da49aa81ea3b30a
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 91.189.90.7
 Subject: [Qemu-devel] [Bug 1525676] Re: qemu runas and sandbox option
@@ -84,10 +84,9 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-[Expired for qemu (Ubuntu) because there has been no activity for 60
-days.]
+[Expired for QEMU because there has been no activity for 60 days.]
 
-** Changed in: qemu (Ubuntu)
+** Changed in: qemu
        Status: Incomplete =3D> Expired
 
 -- =
