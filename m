@@ -2,67 +2,93 @@ Return-Path: <SRS0=Y1tr=UJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.0 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_SBL,
-	URIBL_SBL_A autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B880C4321A
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 20:03:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DB566C43218
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 20:09:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 227DB206E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 20:03:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 227DB206E0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id AAD0D20684
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 20:09:59 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="SwvWMMOv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AAD0D20684
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49434 helo=lists.gnu.org)
+Received: from localhost ([::1]:49444 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1haQWI-0008F5-Cm
-	for qemu-devel@archiver.kernel.org; Mon, 10 Jun 2019 16:03:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37430)
+	id 1haQcA-0001d2-Vi
+	for qemu-devel@archiver.kernel.org; Mon, 10 Jun 2019 16:09:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38792)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <wainersm@redhat.com>) id 1haQVK-0007n6-G4
- for qemu-devel@nongnu.org; Mon, 10 Jun 2019 16:02:55 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1haQbg-0001DI-Jz
+ for qemu-devel@nongnu.org; Mon, 10 Jun 2019 16:09:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <wainersm@redhat.com>) id 1haQVJ-0003yi-Ab
- for qemu-devel@nongnu.org; Mon, 10 Jun 2019 16:02:54 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46080)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <wainersm@redhat.com>) id 1haQVJ-0003yU-2D
- for qemu-devel@nongnu.org; Mon, 10 Jun 2019 16:02:53 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 236C830B46F1;
- Mon, 10 Jun 2019 20:02:50 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-123-147.rdu2.redhat.com
- [10.10.123.147])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 725BC1001B11;
- Mon, 10 Jun 2019 20:02:42 +0000 (UTC)
-To: Cleber Rosa <crosa@redhat.com>, qemu-devel@nongnu.org
-References: <20190607152223.9467-1-crosa@redhat.com>
- <20190607152223.9467-5-crosa@redhat.com>
-From: Wainer dos Santos Moschetta <wainersm@redhat.com>
-Message-ID: <aca0a208-9f6f-5d68-eedb-e10377eefdae@redhat.com>
-Date: Mon, 10 Jun 2019 17:02:39 -0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
- Thunderbird/52.5.2
+ (envelope-from <richard.henderson@linaro.org>) id 1haQbf-0007wC-OS
+ for qemu-devel@nongnu.org; Mon, 10 Jun 2019 16:09:28 -0400
+Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:35745)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1haQbf-0007vc-DC
+ for qemu-devel@nongnu.org; Mon, 10 Jun 2019 16:09:27 -0400
+Received: by mail-pl1-x641.google.com with SMTP id p1so4087234plo.2
+ for <qemu-devel@nongnu.org>; Mon, 10 Jun 2019 13:09:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=bPn1S4iNvMfWX8YAvlbnC/CV1rIJFFMUVUp7USfN5Y8=;
+ b=SwvWMMOvsNqV3C1UZDOnFRfgzPk7NoCvLCto0LLfCe345lYvYj468hU9wMTuKrVSrH
+ oXjshUXjktDSr3/qKu/aOVLn5E5d7d3pSZEMDQ/5JBk2/rAfV/DDybwAfkxd5n/z53nY
+ m0MEyjZv7QdBRS/30QfIZ2Sf2O9tttko/vyN53pAxqbgXqiC6w1BHIa9YhrDZ3Zq6Puc
+ jX+oqaPnAPehMjTUBzN2o/FI5T+x/ZOEdFHJ6boAzbm22Z229/q4FcWA9uKyNsbmxglr
+ Zk5jlOLLJU0ztUK2fmTNXMkHZWXtmr3Hw7kc+pJbfFG87r5s8OmRHVx/hFJn0nMAA6hT
+ 8RGA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=bPn1S4iNvMfWX8YAvlbnC/CV1rIJFFMUVUp7USfN5Y8=;
+ b=cLn/APxbgJE1LB/+p2pdDTcNz9wsV+IaRW0NPKaCj6Sc8FB1Rn33TlCnFkByhpXJIu
+ hw9uX+HVnH7imoTwkmsCNocz+6Qb0iDVIdBXOzhb3Nc9yoVvZ/tXQLVOHCWB+JKSLSZ0
+ 81WLej7yGeXk9OrZgpUFhM7WK74Av32XRYKm/zS4RwNycRWgUJEzgg9v/GWfhS5va7dZ
+ QOb/gH8ql0H8Wx52c3e9ZjKJvjyzK+1yRZon0VNh8pqgECf+P47waKnVtVWrDFUfBBdk
+ CbEJKxkzVK1n8KF9DHPzAq7VnrZQBvzaCf+u6+qKyY9uva0weKHcmDNSpIUJncSo+T+f
+ O8Fw==
+X-Gm-Message-State: APjAAAUnSlEEcXUNU250EHyFnZg/1maBoZTKcekI/uveM1wgJPJ8ldkv
+ LLewIMebV0JOy9M4xtTkUhlRbw==
+X-Google-Smtp-Source: APXvYqzzHo57nuAimr2e2UFlYSmIDyivsYxcsIpBT4w2S2pL3NdIvSH8GtH0dmjNQUXlNWUPOFMTkg==
+X-Received: by 2002:a17:902:20ec:: with SMTP id
+ v41mr68262734plg.142.1560197366139; 
+ Mon, 10 Jun 2019 13:09:26 -0700 (PDT)
+Received: from [192.168.1.11] (97-113-13-231.tukw.qwest.net. [97.113.13.231])
+ by smtp.gmail.com with ESMTPSA id
+ o20sm9831971pgj.70.2019.06.10.13.09.24
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Mon, 10 Jun 2019 13:09:25 -0700 (PDT)
+To: Michael Rolnik <mrolnik@gmail.com>, qemu-devel@nongnu.org
+References: <20190606193012.37715-1-mrolnik@gmail.com>
+ <20190606193012.37715-5-mrolnik@gmail.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Openpgp: preference=signencrypt
+Message-ID: <c868749e-61ea-8f8a-51c1-e6b9b9d445c6@linaro.org>
+Date: Mon, 10 Jun 2019 13:09:23 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <20190607152223.9467-5-crosa@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20190606193012.37715-5-mrolnik@gmail.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.46]); Mon, 10 Jun 2019 20:02:52 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 4/8] Boot Linux Console Test: add a test
- for ppc64 + pseries
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::641
+Subject: Re: [Qemu-devel] [PATCH v21 4/7] target/avr: Add instruction
+ translation
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,90 +100,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>,
- "=?UTF-8?Q?Daniel_P_._Berrang=c3=a9?=" <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Caio Carrara <ccarrara@redhat.com>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc: Sarah Harris <S.E.Harris@kent.ac.uk>, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Cleber,
+On 6/6/19 12:30 PM, Michael Rolnik wrote:
+> +    target_long cpc;
+> +    target_long npc;
 
-On 06/07/2019 12:22 PM, Cleber Rosa wrote:
-> Just like the previous tests, boots a Linux kernel on a ppc64 target
-> using the pseries machine.
->
-> Signed-off-by: Cleber Rosa <crosa@redhat.com>
-> Reviewed-by: Caio Carrara <ccarrara@redhat.com>
-> CC: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-> ---
->   .travis.yml                            |  2 +-
->   tests/acceptance/boot_linux_console.py | 19 +++++++++++++++++++
->   2 files changed, 20 insertions(+), 1 deletion(-)
->
-> diff --git a/.travis.yml b/.travis.yml
-> index 9f8e73f276..5592e458ab 100644
-> --- a/.travis.yml
-> +++ b/.travis.yml
-> @@ -224,7 +224,7 @@ matrix:
->  =20
->       # Acceptance (Functional) tests
->       - env:
-> -        - CONFIG=3D"--python=3D/usr/bin/python3 --target-list=3Dx86_64=
--softmmu,mips-softmmu,mips64el-softmmu,aarch64-softmmu,arm-softmmu,s390x-=
-softmmu,alpha-softmmu"
-> +        - CONFIG=3D"--python=3D/usr/bin/python3 --target-list=3Dx86_64=
--softmmu,mips-softmmu,mips64el-softmmu,aarch64-softmmu,arm-softmmu,s390x-=
-softmmu,alpha-softmmu,ppc64-softmmu"
->           - TEST_CMD=3D"make check-acceptance"
->         after_failure:
->           - cat tests/results/latest/job.log
-> diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/=
-boot_linux_console.py
-> index d5c500ea30..a196636367 100644
-> --- a/tests/acceptance/boot_linux_console.py
-> +++ b/tests/acceptance/boot_linux_console.py
-> @@ -217,3 +217,22 @@ class BootLinuxConsole(Test):
->           self.vm.launch()
->           console_pattern =3D 'Kernel command line: %s' % kernel_comman=
-d_line
->           self.wait_for_console_pattern(console_pattern)
+CPC gets copied back and forth to NPC, but is now otherwise unused.
+You can drop that.
+
+> +static void translate(DisasContext *ctx)
+> +{
+> +    uint32_t opcode;
+> +    int res;
+> +    /* PC points to words.  */
+> +    opcode = cpu_ldl_code(ctx->env, ctx->cpc * 2) & 0x0000ffff;
 > +
-> +    def test_ppc64_pseries(self):
-> +        """
-> +        :avocado: tags=3Darch:ppc64
-> +        :avocado: tags=3Dmachine:pseries
-> +        """
-> +        kernel_url =3D ('https://download.fedoraproject.org/pub/fedora=
--secondary/'
-> +                      'releases/29/Everything/ppc64le/os/ppc/ppc64/vml=
-inuz')
-> +        kernel_hash =3D '3fe04abfc852b66653b8c3c897a59a689270bc77'
-> +        kernel_path =3D self.fetch_asset(kernel_url, asset_hash=3Dkern=
-el_hash)
-> +
-> +        self.vm.set_machine('pseries')
-> +        self.vm.set_console()
-> +        kernel_command_line =3D self.KERNEL_COMMON_COMMAND_LINE + 'con=
-sole=3Dhvc0'
-> +        self.vm.add_args('-kernel', kernel_path,
-> +                         '-append', kernel_command_line)
-> +        self.vm.launch()
-> +        console_pattern =3D 'Kernel command line: %s' % kernel_command=
-_line
-> +        self.wait_for_console_pattern(console_pattern)
+> +    ctx->npc = ctx->cpc + 1;
 
-I'm refactoring the acceptance tests which boot a Linux Kernel so that=20
-they can share common functions. My latest implementation [1] was=20
-re-based on this patch, and it would help manage my contribution if we=20
-could merge this very soon.
+Which allows this to become
 
-Anyway, tested this patch on my Fedora 30 x86_64 machine. Passed.
+    uint32_t opcode = next_word(ctx);
 
-Reviewed-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
 
-[1]=C2=A0 https://github.com/wainersm/qemu/tree/acceptance_boot_linux
+r~
 
