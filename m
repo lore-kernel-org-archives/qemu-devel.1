@@ -2,59 +2,67 @@ Return-Path: <SRS0=Y1tr=UJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 09DF0C468BE
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 03:13:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B57DC468C1
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 04:04:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D34212067C
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 03:13:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D34212067C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id ED9C12063F
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 04:04:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ED9C12063F
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40164 helo=lists.gnu.org)
+Received: from localhost ([::1]:40298 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1haAkJ-0007kQ-6P
-	for qemu-devel@archiver.kernel.org; Sun, 09 Jun 2019 23:13:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39037)
+	id 1haBXa-0000o1-0v
+	for qemu-devel@archiver.kernel.org; Mon, 10 Jun 2019 00:04:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51654)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <richardw.yang@linux.intel.com>) id 1haAgv-0004aJ-Kn
- for qemu-devel@nongnu.org; Sun, 09 Jun 2019 23:09:50 -0400
+ (envelope-from <no-reply@patchew.org>) id 1haBUi-0008Ej-JB
+ for qemu-devel@nongnu.org; Mon, 10 Jun 2019 00:01:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richardw.yang@linux.intel.com>) id 1haAgu-0005sr-DJ
- for qemu-devel@nongnu.org; Sun, 09 Jun 2019 23:09:49 -0400
-Received: from mga02.intel.com ([134.134.136.20]:49683)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <richardw.yang@linux.intel.com>)
- id 1haAgu-0005rt-5p
- for qemu-devel@nongnu.org; Sun, 09 Jun 2019 23:09:48 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
- by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 09 Jun 2019 20:09:47 -0700
-X-ExtLoop1: 1
-Received: from richard.sh.intel.com (HELO localhost) ([10.239.159.54])
- by fmsmga006.fm.intel.com with ESMTP; 09 Jun 2019 20:09:46 -0700
-From: Wei Yang <richardw.yang@linux.intel.com>
-To: qemu-devel@nongnu.org
-Date: Mon, 10 Jun 2019 11:08:52 +0800
-Message-Id: <20190610030852.16039-3-richardw.yang@linux.intel.com>
-X-Mailer: git-send-email 2.19.1
-In-Reply-To: <20190610030852.16039-1-richardw.yang@linux.intel.com>
-References: <20190610030852.16039-1-richardw.yang@linux.intel.com>
+ (envelope-from <no-reply@patchew.org>) id 1haBUe-0007Zw-GO
+ for qemu-devel@nongnu.org; Mon, 10 Jun 2019 00:01:14 -0400
+Resent-Date: Mon, 10 Jun 2019 00:01:14 -0400
+Resent-Message-Id: <E1haBUe-0007Zw-GO@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21418)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1haBUa-0007St-Uj
+ for qemu-devel@nongnu.org; Mon, 10 Jun 2019 00:01:09 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1560139229; cv=none; d=zoho.com; s=zohoarc; 
+ b=dj/ZgHX0R+HKWhaHloaQRthtdUfbAAAOfQjH+VqCtZ3uRIPFIbj5qf0YRlaixd08eJiZgCtN8G1fByQ4PHle1O/0iSuAr8R7zwqTJIMPl5fWJEMNljaGyo7FiuZR7lX8hz/IDmqUHlAi4pWLy9vINOmvFh01VTOuwwsmelvceiU=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
+ s=zohoarc; t=1560139229;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
+ bh=pEOMPFVi5DKlSp0yBBMEiuZTxnSuZgmtAkCq2lS8guY=; 
+ b=X0IFZ0yGYXy2W+kHGGDIkQSFolfQtQWXFMZ/CdE0A0TUieLbsp73vFTwXC7v8HQXQQNWPcE4zwJ++odu/pL1PfC/uVTqgYX9jqzU/wceKI4XcnNBXiPPjXl8cPKzjGbL6FpUqyGHz8I2G6H5Ojeqkz55wzkVAe8cayvTTZtJRv4=
+ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1560139227951552.0087453115354;
+ Sun, 9 Jun 2019 21:00:27 -0700 (PDT)
+In-Reply-To: <20190610020218.9228-1-richard.henderson@linaro.org>
+Message-ID: <156013922705.32260.15041717050037463433@ce79690b2cb9>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 134.134.136.20
-Subject: [Qemu-devel] [PATCH 2/2] migration/xbzrle: make
- xbzrle_encode_buffer little easier to read
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: richard.henderson@linaro.org
+Date: Sun, 9 Jun 2019 21:00:27 -0700 (PDT)
+X-ZohoMailClient: External
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 135.84.80.217
+Subject: Re: [Qemu-devel] [PULL 00/39] tcg: Move the softmmu tlb to
+ CPUNegativeOffsetState
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -66,215 +74,127 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Wei Yang <richardw.yang@linux.intel.com>, dgilbert@redhat.com,
- quintela@redhat.com
+Reply-To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The encoding process could be described below:
-
-    for [content]
-        get length of a run
-        encode this run
-
-By refactoring the code with this logic, it maybe a little easier to
-understand.
-
-Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
----
- migration/xbzrle.c | 153 +++++++++++++++++++++------------------------
- 1 file changed, 73 insertions(+), 80 deletions(-)
-
-diff --git a/migration/xbzrle.c b/migration/xbzrle.c
-index 1ba482ded9..25c69708ec 100644
---- a/migration/xbzrle.c
-+++ b/migration/xbzrle.c
-@@ -14,6 +14,59 @@
- #include "qemu/cutils.h"
- #include "xbzrle.h"
- 
-+static int next_run(uint8_t *old_buf, uint8_t *new_buf, int off, int slen,
-+                    bool zrun)
-+{
-+    uint32_t len = 0;
-+    long res;
-+
-+    res = (slen - off) % sizeof(long);
-+
-+    /* first unaligned bytes */
-+    while (res) {
-+        uint8_t xor = old_buf[off + len] ^ new_buf[off + len];
-+
-+        if (!(zrun ^ !!xor)) {
-+            break;
-+        }
-+        len++;
-+        res--;
-+    }
-+
-+    if (res) {
-+        return len;
-+    }
-+
-+    /* word at a time for speed, use of 32-bit long okay */
-+    while (off + len < slen) {
-+        /* truncation to 32-bit long okay */
-+        unsigned long mask = (unsigned long)0x0101010101010101ULL;
-+        long xor = (*(long *)(old_buf + off + len)) ^
-+                   (*(long *)(new_buf + off + len));
-+
-+        if (zrun && !(zrun ^ !!xor)) {
-+            break;
-+        } else if (!zrun && ((xor - mask) & ~xor & (mask << 7))) {
-+            break;
-+        }
-+
-+        len += sizeof(long);
-+    }
-+
-+    /* go over the rest */
-+    while (off + len < slen) {
-+        uint8_t xor = old_buf[off + len] ^ new_buf[off + len];
-+
-+        if (!(zrun ^ !!xor)) {
-+            break;
-+        }
-+
-+        len++;
-+    }
-+
-+    return len;
-+}
-+
- /*
-   page = zrun nzrun
-        | zrun nzrun page
-@@ -27,103 +80,43 @@
- int xbzrle_encode_buffer(uint8_t *old_buf, uint8_t *new_buf, int slen,
-                          uint8_t *dst, int dlen)
- {
--    uint32_t zrun_len = 0, nzrun_len = 0;
--    int d = 0, i = 0;
--    long res;
--    uint8_t *nzrun_start = NULL;
-+    bool zrun = true;
-+    int len, src_off = 0, dst_off = 0;
- 
-     g_assert(!(((uintptr_t)old_buf | (uintptr_t)new_buf | slen) %
-                sizeof(long)));
- 
--    while (i < slen) {
-+    for (; src_off < slen; src_off += len, zrun = !zrun) {
-         /* overflow */
--        if (d + 2 > dlen) {
-+        if (dst_off + 2 > dlen) {
-             return -1;
-         }
- 
--        /* not aligned to sizeof(long) */
--        res = (slen - i) % sizeof(long);
--        while (res && old_buf[i] == new_buf[i]) {
--            zrun_len++;
--            i++;
--            res--;
--        }
-+        len = next_run(old_buf, new_buf, src_off, slen, zrun);
- 
--        /* word at a time for speed */
--        if (!res) {
--            while (i < slen &&
--                   (*(long *)(old_buf + i)) == (*(long *)(new_buf + i))) {
--                i += sizeof(long);
--                zrun_len += sizeof(long);
-+        if (zrun) {
-+            /* buffer unchanged */
-+            if (len == slen) {
-+                return 0;
-             }
--
--            /* go over the rest */
--            while (i < slen && old_buf[i] == new_buf[i]) {
--                zrun_len++;
--                i++;
-+            /* skip last zero run */
-+            if (src_off + len == slen) {
-+                return dst_off;
-             }
-         }
- 
--        /* buffer unchanged */
--        if (zrun_len == slen) {
--            return 0;
--        }
--
--        /* skip last zero run */
--        if (i == slen) {
--            return d;
--        }
--
--        d += uleb128_encode_small(dst + d, zrun_len);
--
--        zrun_len = 0;
--        nzrun_start = new_buf + i;
--
--        /* overflow */
--        if (d + 2 > dlen) {
--            return -1;
--        }
--        /* not aligned to sizeof(long) */
--        res = (slen - i) % sizeof(long);
--        while (res && old_buf[i] != new_buf[i]) {
--            i++;
--            nzrun_len++;
--            res--;
--        }
--
--        /* word at a time for speed, use of 32-bit long okay */
--        if (!res) {
--            /* truncation to 32-bit long okay */
--            unsigned long mask = (unsigned long)0x0101010101010101ULL;
--            while (i < slen) {
--                unsigned long xor;
--                xor = *(unsigned long *)(old_buf + i)
--                    ^ *(unsigned long *)(new_buf + i);
--                if ((xor - mask) & ~xor & (mask << 7)) {
--                    /* found the end of an nzrun within the current long */
--                    while (old_buf[i] != new_buf[i]) {
--                        nzrun_len++;
--                        i++;
--                    }
--                    break;
--                } else {
--                    i += sizeof(long);
--                    nzrun_len += sizeof(long);
--                }
-+        dst_off += uleb128_encode_small(dst + dst_off, len);
-+        if (!zrun) {
-+            /* overflow */
-+            if (dst_off + len > dlen) {
-+                return -1;
-             }
-+            memcpy(dst + dst_off, new_buf + src_off, len);
-+            dst_off += len;
-         }
--
--        d += uleb128_encode_small(dst + d, nzrun_len);
--        /* overflow */
--        if (d + nzrun_len > dlen) {
--            return -1;
--        }
--        memcpy(dst + d, nzrun_start, nzrun_len);
--        d += nzrun_len;
--        nzrun_len = 0;
-     }
- 
--    return d;
-+    return dst_off;
- }
- 
- int xbzrle_decode_buffer(uint8_t *src, int slen, uint8_t *dst, int dlen)
--- 
-2.19.1
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDYxMDAyMDIxOC45MjI4
+LTEtcmljaGFyZC5oZW5kZXJzb25AbGluYXJvLm9yZy8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVt
+cyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZv
+cgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQVUxMIDAwLzM5XSB0
+Y2c6IE1vdmUgdGhlIHNvZnRtbXUgdGxiIHRvIENQVU5lZ2F0aXZlT2Zmc2V0U3RhdGUKVHlwZTog
+c2VyaWVzCk1lc3NhZ2UtaWQ6IDIwMTkwNjEwMDIwMjE4LjkyMjgtMS1yaWNoYXJkLmhlbmRlcnNv
+bkBsaW5hcm8ub3JnCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCmdpdCBy
+ZXYtcGFyc2UgYmFzZSA+IC9kZXYvbnVsbCB8fCBleGl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRp
+ZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0
+IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2tw
+YXRjaC5wbCAtLW1haWxiYWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKRnJvbSBo
+dHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKIHQgW3RhZyB1cGRhdGVdICAg
+ICAgICAgICAgcGF0Y2hldy8yMDE5MDYxMDAyMDIxOC45MjI4LTEtcmljaGFyZC5oZW5kZXJzb25A
+bGluYXJvLm9yZyAtPiBwYXRjaGV3LzIwMTkwNjEwMDIwMjE4LjkyMjgtMS1yaWNoYXJkLmhlbmRl
+cnNvbkBsaW5hcm8ub3JnClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKNGIyZDhjMTg1
+MiB0Y2cvYXJtOiBSZW1vdmUgbW9zdGx5IHVucmVhY2hhYmxlIHRsYiBzcGVjaWFsIGNhc2UKOWVj
+YzE5ODU2YiB0Y2cvYXJtOiBVc2UgTERSRCB0byBsb2FkIHRsYiBtYXNrK3RhYmxlCjBhMWFjZDE4
+MTkgdGNnL2FhcmNoNjQ6IFVzZSBMRFAgdG8gbG9hZCB0bGIgbWFzayt0YWJsZQo2YWJjZmIyNTU4
+IGNwdTogUmVtb3ZlIENQVV9DT01NT04KMjFhNGJmODVkNCBjcHU6IE1vdmUgdGhlIHNvZnRtbXUg
+dGxiIHRvIENQVU5lZ2F0aXZlT2Zmc2V0U3RhdGUKMDIxYjJhZmRlNCBjcHU6IE1vdmUgaWNvdW50
+X2RlY3IgdG8gQ1BVTmVnYXRpdmVPZmZzZXRTdGF0ZQpkMGMyNTYwMjBiIGNwdTogSW50cm9kdWNl
+IENQVU5lZ2F0aXZlT2Zmc2V0U3RhdGUKNGM4MDc5NjU0NyBjcHU6IEludHJvZHVjZSBjcHVfc2V0
+X2NwdXN0YXRlX3BvaW50ZXJzCjBmY2Y5ODFjYzEgY3B1OiBNb3ZlIEVOVl9PRkZTRVQgdG8gZXhl
+Yy9nZW4taWNvdW50LmgKMTdjZmI1ZDk4NSB0YXJnZXQveHRlbnNhOiBVc2UgZW52X2NwdSwgZW52
+X2FyY2hjcHUKN2VlM2JjOWJkMSB0YXJnZXQvdW5pY29yZTMyOiBVc2UgZW52X2NwdSwgZW52X2Fy
+Y2hjcHUKYTMwMTg4MmExNiB0YXJnZXQvdHJpY29yZTogVXNlIGVudl9jcHUKZDZlZjI4ZmExYiB0
+YXJnZXQvdGlsZWd4OiBVc2UgZW52X2NwdQo1ZWRmNDM3ZDkzIHRhcmdldC9zcGFyYzogVXNlIGVu
+dl9jcHUsIGVudl9hcmNoY3B1CjUzODE1OTY2NGIgdGFyZ2V0L3NoNDogVXNlIGVudl9jcHUsIGVu
+dl9hcmNoY3B1CmFkMjkwNjU0MDIgdGFyZ2V0L3MzOTB4OiBVc2UgZW52X2NwdSwgZW52X2FyY2hj
+cHUKY2I3MTc5MGU3NCB0YXJnZXQvcmlzY3Y6IFVzZSBlbnZfY3B1LCBlbnZfYXJjaGNwdQo2ZDdk
+MTAwZWQ5IHRhcmdldC9wcGM6IFVzZSBlbnZfY3B1LCBlbnZfYXJjaGNwdQowNWU1OGUwZDhhIHRh
+cmdldC9vcGVucmlzYzogVXNlIGVudl9jcHUsIGVudl9hcmNoY3B1CjI1MTliMGM2NWEgdGFyZ2V0
+L25pb3MyOiBVc2UgZW52X2NwdSwgZW52X2FyY2hjcHUKMTEyZTgxOGJiZiB0YXJnZXQvbW94aWU6
+IFVzZSBlbnZfY3B1LCBlbnZfYXJjaGNwdQoyMjZlZGRkNzBiIHRhcmdldC9taXBzOiBVc2UgZW52
+X2NwdSwgZW52X2FyY2hjcHUKODQyY2VhODMwOCB0YXJnZXQvbWljcm9ibGF6ZTogVXNlIGVudl9j
+cHUsIGVudl9hcmNoY3B1CjgxY2ZkMzdlMWQgdGFyZ2V0L202OGs6IFVzZSBlbnZfY3B1CjJmYzY3
+MjdhNTQgdGFyZ2V0L2xtMzI6IFVzZSBlbnZfY3B1LCBlbnZfYXJjaGNwdQpiMjAwNzBhNmFlIHRh
+cmdldC9pMzg2OiBVc2UgZW52X2NwdSwgZW52X2FyY2hjcHUKMmJjMzA0MzA0NCB0YXJnZXQvaHBw
+YTogVXNlIGVudl9jcHUsIGVudl9hcmNoY3B1CjY1MGM0MWQyYzggdGFyZ2V0L2NyaXM6IFVzZSBl
+bnZfY3B1LCBlbnZfYXJjaGNwdQo5ZjA4YWUxM2Y1IHRhcmdldC9jcmlzOiBSZWluZGVudCBvcF9o
+ZWxwZXIuYwoxZTI3MjE4NjM1IHRhcmdldC9jcmlzOiBSZWluZGVudCBtbXUuYwoyYjIzNWU0N2Uw
+IHRhcmdldC9hcm06IFVzZSBlbnZfY3B1LCBlbnZfYXJjaGNwdQpkNDMzODAzNDExIHRhcmdldC9h
+bHBoYTogVXNlIGVudl9jcHUsIGVudl9hcmNoY3B1CmE5MTAxMWMxMGYgY3B1OiBJbnRyb2R1Y2Ug
+ZW52X2FyY2hjcHUKNmQ3OGYyZmMwMyBjcHU6IFJlcGxhY2UgRU5WX0dFVF9DUFUgd2l0aCBlbnZf
+Y3B1CjgzMDE5MDE0ZTMgY3B1OiBEZWZpbmUgQXJjaENQVQo0YzI1MjE1ZTgxIGNwdTogRGVmaW5l
+IENQVUFyY2hTdGF0ZSB3aXRoIHR5cGVkZWYKNmYwMTIxMDRlMiB0Y2c6IENyZWF0ZSBzdHJ1Y3Qg
+Q1BVVExCCjRhZjJiZWEzNmEgdGNnOiBTcGxpdCBvdXQgdGFyZ2V0L2FyY2gvY3B1LXBhcmFtLmgK
+NjVmN2EwNjU4YiB0Y2c6IEZvbGQgQ1BVVExCV2luZG93IGludG8gQ1BVVExCRGVzYwoKPT09IE9V
+VFBVVCBCRUdJTiA9PT0KMS8zOSBDaGVja2luZyBjb21taXQgNjVmN2EwNjU4YjgxICh0Y2c6IEZv
+bGQgQ1BVVExCV2luZG93IGludG8gQ1BVVExCRGVzYykKMi8zOSBDaGVja2luZyBjb21taXQgNGFm
+MmJlYTM2YWM5ICh0Y2c6IFNwbGl0IG91dCB0YXJnZXQvYXJjaC9jcHUtcGFyYW0uaCkKV0FSTklO
+RzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVk
+IHVwZGF0aW5nPwojNTc6IApuZXcgZmlsZSBtb2RlIDEwMDY0NAoKdG90YWw6IDAgZXJyb3JzLCAx
+IHdhcm5pbmdzLCAxMjkwIGxpbmVzIGNoZWNrZWQKClBhdGNoIDIvMzkgaGFzIHN0eWxlIHByb2Js
+ZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9z
+aXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBN
+QUlOVEFJTkVSUy4KMy8zOSBDaGVja2luZyBjb21taXQgNmYwMTIxMDRlMjE0ICh0Y2c6IENyZWF0
+ZSBzdHJ1Y3QgQ1BVVExCKQo0LzM5IENoZWNraW5nIGNvbW1pdCA0YzI1MjE1ZTgxZmYgKGNwdTog
+RGVmaW5lIENQVUFyY2hTdGF0ZSB3aXRoIHR5cGVkZWYpCjUvMzkgQ2hlY2tpbmcgY29tbWl0IDgz
+MDE5MDE0ZTMwNSAoY3B1OiBEZWZpbmUgQXJjaENQVSkKNi8zOSBDaGVja2luZyBjb21taXQgNmQ3
+OGYyZmMwM2YwIChjcHU6IFJlcGxhY2UgRU5WX0dFVF9DUFUgd2l0aCBlbnZfY3B1KQo3LzM5IENo
+ZWNraW5nIGNvbW1pdCBhOTEwMTFjMTBmMTAgKGNwdTogSW50cm9kdWNlIGVudl9hcmNoY3B1KQo4
+LzM5IENoZWNraW5nIGNvbW1pdCBkNDMzODAzNDExN2MgKHRhcmdldC9hbHBoYTogVXNlIGVudl9j
+cHUsIGVudl9hcmNoY3B1KQo5LzM5IENoZWNraW5nIGNvbW1pdCAyYjIzNWU0N2UwOTAgKHRhcmdl
+dC9hcm06IFVzZSBlbnZfY3B1LCBlbnZfYXJjaGNwdSkKMTAvMzkgQ2hlY2tpbmcgY29tbWl0IDFl
+MjcyMTg2MzVhNiAodGFyZ2V0L2NyaXM6IFJlaW5kZW50IG1tdS5jKQoxMS8zOSBDaGVja2luZyBj
+b21taXQgOWYwOGFlMTNmNTkyICh0YXJnZXQvY3JpczogUmVpbmRlbnQgb3BfaGVscGVyLmMpCjEy
+LzM5IENoZWNraW5nIGNvbW1pdCA2NTBjNDFkMmM4ZmYgKHRhcmdldC9jcmlzOiBVc2UgZW52X2Nw
+dSwgZW52X2FyY2hjcHUpCjEzLzM5IENoZWNraW5nIGNvbW1pdCAyYmMzMDQzMDQ0ZTEgKHRhcmdl
+dC9ocHBhOiBVc2UgZW52X2NwdSwgZW52X2FyY2hjcHUpCjE0LzM5IENoZWNraW5nIGNvbW1pdCBi
+MjAwNzBhNmFlMjkgKHRhcmdldC9pMzg2OiBVc2UgZW52X2NwdSwgZW52X2FyY2hjcHUpCjE1LzM5
+IENoZWNraW5nIGNvbW1pdCAyZmM2NzI3YTU0ZWIgKHRhcmdldC9sbTMyOiBVc2UgZW52X2NwdSwg
+ZW52X2FyY2hjcHUpCjE2LzM5IENoZWNraW5nIGNvbW1pdCA4MWNmZDM3ZTFkN2UgKHRhcmdldC9t
+NjhrOiBVc2UgZW52X2NwdSkKMTcvMzkgQ2hlY2tpbmcgY29tbWl0IDg0MmNlYTgzMDgxNiAodGFy
+Z2V0L21pY3JvYmxhemU6IFVzZSBlbnZfY3B1LCBlbnZfYXJjaGNwdSkKMTgvMzkgQ2hlY2tpbmcg
+Y29tbWl0IDIyNmVkZGQ3MGJjMyAodGFyZ2V0L21pcHM6IFVzZSBlbnZfY3B1LCBlbnZfYXJjaGNw
+dSkKMTkvMzkgQ2hlY2tpbmcgY29tbWl0IDExMmU4MThiYmY2MSAodGFyZ2V0L21veGllOiBVc2Ug
+ZW52X2NwdSwgZW52X2FyY2hjcHUpCjIwLzM5IENoZWNraW5nIGNvbW1pdCAyNTE5YjBjNjVhNTQg
+KHRhcmdldC9uaW9zMjogVXNlIGVudl9jcHUsIGVudl9hcmNoY3B1KQoyMS8zOSBDaGVja2luZyBj
+b21taXQgMDVlNThlMGQ4YWEzICh0YXJnZXQvb3BlbnJpc2M6IFVzZSBlbnZfY3B1LCBlbnZfYXJj
+aGNwdSkKMjIvMzkgQ2hlY2tpbmcgY29tbWl0IDZkN2QxMDBlZDlhZCAodGFyZ2V0L3BwYzogVXNl
+IGVudl9jcHUsIGVudl9hcmNoY3B1KQoyMy8zOSBDaGVja2luZyBjb21taXQgY2I3MTc5MGU3NDc0
+ICh0YXJnZXQvcmlzY3Y6IFVzZSBlbnZfY3B1LCBlbnZfYXJjaGNwdSkKMjQvMzkgQ2hlY2tpbmcg
+Y29tbWl0IGFkMjkwNjU0MDJmMiAodGFyZ2V0L3MzOTB4OiBVc2UgZW52X2NwdSwgZW52X2FyY2hj
+cHUpCjI1LzM5IENoZWNraW5nIGNvbW1pdCA1MzgxNTk2NjRiOTQgKHRhcmdldC9zaDQ6IFVzZSBl
+bnZfY3B1LCBlbnZfYXJjaGNwdSkKMjYvMzkgQ2hlY2tpbmcgY29tbWl0IDVlZGY0MzdkOTNkMyAo
+dGFyZ2V0L3NwYXJjOiBVc2UgZW52X2NwdSwgZW52X2FyY2hjcHUpCjI3LzM5IENoZWNraW5nIGNv
+bW1pdCBkNmVmMjhmYTFiNjkgKHRhcmdldC90aWxlZ3g6IFVzZSBlbnZfY3B1KQoyOC8zOSBDaGVj
+a2luZyBjb21taXQgYTMwMTg4MmExNjJmICh0YXJnZXQvdHJpY29yZTogVXNlIGVudl9jcHUpCjI5
+LzM5IENoZWNraW5nIGNvbW1pdCA3ZWUzYmM5YmQxMTcgKHRhcmdldC91bmljb3JlMzI6IFVzZSBl
+bnZfY3B1LCBlbnZfYXJjaGNwdSkKMzAvMzkgQ2hlY2tpbmcgY29tbWl0IDE3Y2ZiNWQ5ODU3MSAo
+dGFyZ2V0L3h0ZW5zYTogVXNlIGVudl9jcHUsIGVudl9hcmNoY3B1KQozMS8zOSBDaGVja2luZyBj
+b21taXQgMGZjZjk4MWNjMTY2IChjcHU6IE1vdmUgRU5WX09GRlNFVCB0byBleGVjL2dlbi1pY291
+bnQuaCkKMzIvMzkgQ2hlY2tpbmcgY29tbWl0IDRjODA3OTY1NDc3OSAoY3B1OiBJbnRyb2R1Y2Ug
+Y3B1X3NldF9jcHVzdGF0ZV9wb2ludGVycykKMzMvMzkgQ2hlY2tpbmcgY29tbWl0IGQwYzI1NjAy
+MGI5MCAoY3B1OiBJbnRyb2R1Y2UgQ1BVTmVnYXRpdmVPZmZzZXRTdGF0ZSkKMzQvMzkgQ2hlY2tp
+bmcgY29tbWl0IDAyMWIyYWZkZTQzZCAoY3B1OiBNb3ZlIGljb3VudF9kZWNyIHRvIENQVU5lZ2F0
+aXZlT2Zmc2V0U3RhdGUpCkVSUk9SOiByZXR1cm4gaXMgbm90IGEgZnVuY3Rpb24sIHBhcmVudGhl
+c2VzIGFyZSBub3QgcmVxdWlyZWQKIzE5MzogRklMRTogY3B1cy5jOjI0MjoKKyAgICByZXR1cm4g
+KGNwdS0+aWNvdW50X2J1ZGdldCAtCgp0b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDMyNiBs
+aW5lcyBjaGVja2VkCgpQYXRjaCAzNC8zOSBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZp
+ZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRo
+ZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKMzUv
+MzkgQ2hlY2tpbmcgY29tbWl0IDIxYTRiZjg1ZDQ3OCAoY3B1OiBNb3ZlIHRoZSBzb2Z0bW11IHRs
+YiB0byBDUFVOZWdhdGl2ZU9mZnNldFN0YXRlKQozNi8zOSBDaGVja2luZyBjb21taXQgNmFiY2Zi
+MjU1OGI0IChjcHU6IFJlbW92ZSBDUFVfQ09NTU9OKQozNy8zOSBDaGVja2luZyBjb21taXQgMGEx
+YWNkMTgxOWE3ICh0Y2cvYWFyY2g2NDogVXNlIExEUCB0byBsb2FkIHRsYiBtYXNrK3RhYmxlKQoz
+OC8zOSBDaGVja2luZyBjb21taXQgOWVjYzE5ODU2YmM4ICh0Y2cvYXJtOiBVc2UgTERSRCB0byBs
+b2FkIHRsYiBtYXNrK3RhYmxlKQozOS8zOSBDaGVja2luZyBjb21taXQgNGIyZDhjMTg1MmM5ICh0
+Y2cvYXJtOiBSZW1vdmUgbW9zdGx5IHVucmVhY2hhYmxlIHRsYiBzcGVjaWFsIGNhc2UpCj09PSBP
+VVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgpUaGUgZnVs
+bCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMTkwNjEwMDIw
+MjE4LjkyMjgtMS1yaWNoYXJkLmhlbmRlcnNvbkBsaW5hcm8ub3JnL3Rlc3RpbmcuY2hlY2twYXRj
+aC8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0
+Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRv
+IHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
 
 
