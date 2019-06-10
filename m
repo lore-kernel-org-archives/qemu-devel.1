@@ -7,82 +7,78 @@ X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 98BABC28EBD
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 02:04:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F9ABC28EBD
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 02:05:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5A859207E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 02:04:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4CEBA207E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 02:05:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="CBAm1099"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5A859207E0
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="gXHzoNgc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4CEBA207E0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39612 helo=lists.gnu.org)
+Received: from localhost ([::1]:39622 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ha9fz-0007Z4-OO
-	for qemu-devel@archiver.kernel.org; Sun, 09 Jun 2019 22:04:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52824)
+	id 1ha9gO-0007rN-HZ
+	for qemu-devel@archiver.kernel.org; Sun, 09 Jun 2019 22:05:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52871)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <richard.henderson@linaro.org>) id 1ha9di-0005Zq-Ct
- for qemu-devel@nongnu.org; Sun, 09 Jun 2019 22:02:27 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1ha9dm-0005gJ-Ny
+ for qemu-devel@nongnu.org; Sun, 09 Jun 2019 22:02:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1ha9dg-0001ZD-7g
- for qemu-devel@nongnu.org; Sun, 09 Jun 2019 22:02:26 -0400
-Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:35012)
+ (envelope-from <richard.henderson@linaro.org>) id 1ha9dk-0001br-UA
+ for qemu-devel@nongnu.org; Sun, 09 Jun 2019 22:02:30 -0400
+Received: from mail-pf1-x42d.google.com ([2607:f8b0:4864:20::42d]:36328)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1ha9dg-0001Yt-1X
- for qemu-devel@nongnu.org; Sun, 09 Jun 2019 22:02:24 -0400
-Received: by mail-pg1-x543.google.com with SMTP id s27so4160181pgl.2
- for <qemu-devel@nongnu.org>; Sun, 09 Jun 2019 19:02:23 -0700 (PDT)
+ id 1ha9dk-0001bR-LY
+ for qemu-devel@nongnu.org; Sun, 09 Jun 2019 22:02:28 -0400
+Received: by mail-pf1-x42d.google.com with SMTP id u22so4324655pfm.3
+ for <qemu-devel@nongnu.org>; Sun, 09 Jun 2019 19:02:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=SsD841efZqo7uciuvvdZgxC3XyiWIUZWbge19pY103g=;
- b=CBAm1099LtYSIKw0sl/uMXhR+PRHUjz7KHQV9pVsJXf1YGCNImXpZZahy/pLWNHMkK
- rdzw5H2ob1r6rOT3JBBUVwclbMxYVfWRQRVFfxUsF4EpYhHFfpMHrC0cgaZGY3TE3FaA
- FqtTU/A0yPJDFBwsPr9Hk2wHtYPJWrdBQ5Ea5tGYSDyGB2Eabsd9Lpqh7pfMb77y7kRO
- fOCPISv6Cn3b8dzZO3kUMojKDoXKEvxLE47L3Qd1pdUsSIGbExxDxQitYwebRODHFXZq
- s0OtoLhdtKPH3N9EI8dfbOjYEvBNr/4uW1SawJgbejOKrzIBbgAMOwZ68qc7tzrKa/in
- Uu0Q==
+ h=from:to:cc:subject:date:message-id:in-reply-to:references;
+ bh=JtIsT/WNCOCMI/Szmht2zv6NaV5uAlYWJB8sxOFHfs4=;
+ b=gXHzoNgcamc74E6Qtp16+P10ucXSP6v+BojdOQG4dmppBAEP8bU514rnQOLIhSZ/GR
+ t+PbpG7O0ZE1QTmq5HOTvexrzhGQEVQ18u+BvcPL//WkkT31Ab4LCZ5YhsxbdHaCu3VU
+ o1+FjuN9Ugi6PTEk+FixJUsSGE/I/9/6tpc1gzBj5NdLL6dVfnDiO9h8BvgfgFHeAGJI
+ 2+731Y7a8PxV0p5lyNthsvuHTla9b8Fhmj0e5yWc1dTMRjHFrjIwxSiJ564lidvokU0/
+ SZd3eGJQz0tlM+zosAe06xDsa5ZulS8e7gwaQG/A8vhzmCjtepJqQ9kOFs+7rtWnOIrq
+ Y2+g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=SsD841efZqo7uciuvvdZgxC3XyiWIUZWbge19pY103g=;
- b=kTJjDR2cGtj/wBB2yCbi5dOhAHAdYi3oHnIbhHmVnK39DwzZBD3IZ93BqTH86PS628
- pMOKKATarUyvj/QhnPW07NDXili8gTKMEIefeH28TDKIGTSWsRaBBMp2iKaf7aGz9XCI
- tJLSCDWNpahawld5G72mMdPqhUvM4sHVoZn1ZD7Ah1d4hSMlExwldA1Gsm1gu7S2GJm2
- sucwxzn/exZpogRqUOCDcnaU0Dq3xGVICpSHLLtCJo9TLzwWFCtszlOL+zlFBxNZhieU
- Ma5LFffG4FJYgRh5WSVig8s91kJ/wvHZwhujzADnOP2/B64zz3oYeEw/ZSvqoR+1j5bH
- 2SDw==
-X-Gm-Message-State: APjAAAVT9niqonjU0cJFgq0dps7s8rEuFTJHJJJCFTR0/Fro80nscA6D
- 5S/YGtCq39vPoMo6kJmxpecs2rLBwD8=
-X-Google-Smtp-Source: APXvYqxJbL5L+IsaVWHZ+SWvWFk4QO4gZkUVVYizGndzSkrJSVIEd2I7hpJDPLQjaabkrkvz6zQ2hw==
-X-Received: by 2002:a65:6495:: with SMTP id e21mr13441057pgv.383.1560132142263; 
- Sun, 09 Jun 2019 19:02:22 -0700 (PDT)
+ :references;
+ bh=JtIsT/WNCOCMI/Szmht2zv6NaV5uAlYWJB8sxOFHfs4=;
+ b=loHVGe18xieRApO2aecPr1dGH3l8Qq30+D8+mFwsft1ejqun15cfUPBZK5RTtOXo0U
+ jzjIIpfKtDsXh9CQdEubzER6MJpW0XNTKFGWJTvGHiuhPe9QtHaQpYdhdEm1vf1JCX3i
+ J5R9kUWNROAvsXDF0TJhdckP1/O+JR3Mh0efV/BBN8NrxhpoiJijCWPfh2w2SPHSe0iG
+ dfK6FMjsMvrl1k/ihrRj1wIA8Oh9MOt7ImPE/DJJkBCRaujqNVpmXnKGWcBIXqQ5NwxC
+ ZB+ek1w2wjtYggm8OaLqnn8NueqZsOhR2avxT5lOZEyp4tP2+ITkwpn9KQffGNaEHP6c
+ 66zw==
+X-Gm-Message-State: APjAAAXivQtLw7Ks7+u7q4UMhE98ETFr3T5xwrKQ5QQ2dmIt6CbacqD4
+ BIDK2zF21+SFvvNnw9Rxq4Uo1yYyk4o=
+X-Google-Smtp-Source: APXvYqxKS0PJLaX2RTb11pioAM5vlaeJ0+mmwv4sYz9CB41UiEhM807AkMHjgvvzQJrT5RD+Ca9OCw==
+X-Received: by 2002:a65:4209:: with SMTP id c9mr13977256pgq.111.1560132147031; 
+ Sun, 09 Jun 2019 19:02:27 -0700 (PDT)
 Received: from localhost.localdomain (97-113-13-231.tukw.qwest.net.
  [97.113.13.231])
- by smtp.gmail.com with ESMTPSA id l63sm9749013pfl.181.2019.06.09.19.02.21
+ by smtp.gmail.com with ESMTPSA id l63sm9749013pfl.181.2019.06.09.19.02.26
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Sun, 09 Jun 2019 19:02:21 -0700 (PDT)
+ Sun, 09 Jun 2019 19:02:26 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Sun,  9 Jun 2019 19:01:40 -0700
-Message-Id: <20190610020218.9228-2-richard.henderson@linaro.org>
+Date: Sun,  9 Jun 2019 19:01:44 -0700
+Message-Id: <20190610020218.9228-6-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190610020218.9228-1-richard.henderson@linaro.org>
 References: <20190610020218.9228-1-richard.henderson@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::543
-Subject: [Qemu-devel] [PULL 01/39] tcg: Fold CPUTLBWindow into CPUTLBDesc
+X-Received-From: 2607:f8b0:4864:20::42d
+Subject: [Qemu-devel] [PULL 05/39] cpu: Define ArchCPU
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,125 +95,287 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Both structures are allocated once per mmu_idx.
-There is no reason for them to be separate.
+For all targets, do this just before including exec/cpu-all.h.
 
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Acked-by: Alistair Francis <alistair.francis@wdc.com>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- include/exec/cpu-defs.h | 17 ++++-------------
- accel/tcg/cputlb.c      | 24 ++++++++++++------------
- 2 files changed, 16 insertions(+), 25 deletions(-)
+ target/alpha/cpu.h      | 1 +
+ target/arm/cpu.h        | 1 +
+ target/cris/cpu.h       | 1 +
+ target/hppa/cpu.h       | 1 +
+ target/i386/cpu.h       | 1 +
+ target/lm32/cpu.h       | 1 +
+ target/m68k/cpu.h       | 1 +
+ target/microblaze/cpu.h | 1 +
+ target/mips/cpu.h       | 1 +
+ target/moxie/cpu.h      | 1 +
+ target/nios2/cpu.h      | 1 +
+ target/openrisc/cpu.h   | 1 +
+ target/ppc/cpu.h        | 1 +
+ target/riscv/cpu.h      | 1 +
+ target/s390x/cpu.h      | 1 +
+ target/sh4/cpu.h        | 1 +
+ target/sparc/cpu.h      | 1 +
+ target/tilegx/cpu.h     | 1 +
+ target/tricore/cpu.h    | 1 +
+ target/unicore32/cpu.h  | 1 +
+ target/xtensa/cpu.h     | 1 +
+ 21 files changed, 21 insertions(+)
 
-diff --git a/include/exec/cpu-defs.h b/include/exec/cpu-defs.h
-index 8f2a848bf5..52d150aaf1 100644
---- a/include/exec/cpu-defs.h
-+++ b/include/exec/cpu-defs.h
-@@ -127,18 +127,6 @@ typedef struct CPUIOTLBEntry {
-     MemTxAttrs attrs;
- } CPUIOTLBEntry;
+diff --git a/target/alpha/cpu.h b/target/alpha/cpu.h
+index 9ec92bf09d..5af0b6c542 100644
+--- a/target/alpha/cpu.h
++++ b/target/alpha/cpu.h
+@@ -305,6 +305,7 @@ void alpha_cpu_do_unaligned_access(CPUState *cpu, vaddr addr,
+ #define cpu_signal_handler cpu_alpha_signal_handler
  
--/**
-- * struct CPUTLBWindow
-- * @begin_ns: host time (in ns) at the beginning of the time window
-- * @max_entries: maximum number of entries observed in the window
-- *
-- * See also: tlb_mmu_resize_locked()
-- */
--typedef struct CPUTLBWindow {
--    int64_t begin_ns;
--    size_t max_entries;
--} CPUTLBWindow;
--
- typedef struct CPUTLBDesc {
-     /*
-      * Describe a region covering all of the large pages allocated
-@@ -148,9 +136,12 @@ typedef struct CPUTLBDesc {
-      */
-     target_ulong large_page_addr;
-     target_ulong large_page_mask;
-+    /* host time (in ns) at the beginning of the time window */
-+    int64_t window_begin_ns;
-+    /* maximum number of entries observed in the window */
-+    size_t window_max_entries;
-     /* The next index to use in the tlb victim table.  */
-     size_t vindex;
--    CPUTLBWindow window;
-     size_t n_used_entries;
- } CPUTLBDesc;
+ typedef CPUAlphaState CPUArchState;
++typedef AlphaCPU ArchCPU;
  
-diff --git a/accel/tcg/cputlb.c b/accel/tcg/cputlb.c
-index cdcc377102..41f2296f93 100644
---- a/accel/tcg/cputlb.c
-+++ b/accel/tcg/cputlb.c
-@@ -79,11 +79,11 @@ static inline size_t sizeof_tlb(CPUArchState *env, uintptr_t mmu_idx)
-     return env->tlb_mask[mmu_idx] + (1 << CPU_TLB_ENTRY_BITS);
+ #include "exec/cpu-all.h"
+ 
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index ccf581a84c..4ebb6349f1 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -3126,6 +3126,7 @@ static inline bool arm_cpu_data_is_big_endian(CPUARMState *env)
  }
  
--static void tlb_window_reset(CPUTLBWindow *window, int64_t ns,
-+static void tlb_window_reset(CPUTLBDesc *desc, int64_t ns,
-                              size_t max_entries)
- {
--    window->begin_ns = ns;
--    window->max_entries = max_entries;
-+    desc->window_begin_ns = ns;
-+    desc->window_max_entries = max_entries;
+ typedef CPUARMState CPUArchState;
++typedef ARMCPU ArchCPU;
+ 
+ #include "exec/cpu-all.h"
+ 
+diff --git a/target/cris/cpu.h b/target/cris/cpu.h
+index 2ee5417ead..e978eb9539 100644
+--- a/target/cris/cpu.h
++++ b/target/cris/cpu.h
+@@ -285,6 +285,7 @@ bool cris_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
+ #define SFR_RW_MM_TLB_HI   env->pregs[PR_SRS]][6
+ 
+ typedef CPUCRISState CPUArchState;
++typedef CRISCPU ArchCPU;
+ 
+ #include "exec/cpu-all.h"
+ 
+diff --git a/target/hppa/cpu.h b/target/hppa/cpu.h
+index 7fd755a753..6eef107370 100644
+--- a/target/hppa/cpu.h
++++ b/target/hppa/cpu.h
+@@ -231,6 +231,7 @@ static inline HPPACPU *hppa_env_get_cpu(CPUHPPAState *env)
+ #define ENV_OFFSET      offsetof(HPPACPU, env)
+ 
+ typedef CPUHPPAState CPUArchState;
++typedef HPPACPU ArchCPU;
+ 
+ #include "exec/cpu-all.h"
+ 
+diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+index 81931fc510..65f8f4d16c 100644
+--- a/target/i386/cpu.h
++++ b/target/i386/cpu.h
+@@ -1753,6 +1753,7 @@ static inline target_long lshift(target_long x, int n)
+ void tcg_x86_init(void);
+ 
+ typedef CPUX86State CPUArchState;
++typedef X86CPU ArchCPU;
+ 
+ #include "exec/cpu-all.h"
+ #include "svm.h"
+diff --git a/target/lm32/cpu.h b/target/lm32/cpu.h
+index 86f6c7b0af..08c360bd16 100644
+--- a/target/lm32/cpu.h
++++ b/target/lm32/cpu.h
+@@ -257,6 +257,7 @@ bool lm32_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
+                        bool probe, uintptr_t retaddr);
+ 
+ typedef CPULM32State CPUArchState;
++typedef LM32CPU ArchCPU;
+ 
+ #include "exec/cpu-all.h"
+ 
+diff --git a/target/m68k/cpu.h b/target/m68k/cpu.h
+index 4465a66145..1d30b73bdf 100644
+--- a/target/m68k/cpu.h
++++ b/target/m68k/cpu.h
+@@ -537,6 +537,7 @@ void m68k_cpu_transaction_failed(CPUState *cs, hwaddr physaddr, vaddr addr,
+                                  MemTxResult response, uintptr_t retaddr);
+ 
+ typedef CPUM68KState CPUArchState;
++typedef M68kCPU ArchCPU;
+ 
+ #include "exec/cpu-all.h"
+ 
+diff --git a/target/microblaze/cpu.h b/target/microblaze/cpu.h
+index 6170fd452f..5a7fe3cbf8 100644
+--- a/target/microblaze/cpu.h
++++ b/target/microblaze/cpu.h
+@@ -366,6 +366,7 @@ bool mb_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
+                      bool probe, uintptr_t retaddr);
+ 
+ typedef CPUMBState CPUArchState;
++typedef MicroBlazeCPU ArchCPU;
+ 
+ #include "exec/cpu-all.h"
+ 
+diff --git a/target/mips/cpu.h b/target/mips/cpu.h
+index 6f65822bb1..12527ca104 100644
+--- a/target/mips/cpu.h
++++ b/target/mips/cpu.h
+@@ -1113,6 +1113,7 @@ static inline int cpu_mmu_index(CPUMIPSState *env, bool ifetch)
  }
  
- static void tlb_dyn_init(CPUArchState *env)
-@@ -94,7 +94,7 @@ static void tlb_dyn_init(CPUArchState *env)
-         CPUTLBDesc *desc = &env->tlb_d[i];
-         size_t n_entries = 1 << CPU_TLB_DYN_DEFAULT_BITS;
+ typedef CPUMIPSState CPUArchState;
++typedef MIPSCPU ArchCPU;
  
--        tlb_window_reset(&desc->window, get_clock_realtime(), 0);
-+        tlb_window_reset(desc, get_clock_realtime(), 0);
-         desc->n_used_entries = 0;
-         env->tlb_mask[i] = (n_entries - 1) << CPU_TLB_ENTRY_BITS;
-         env->tlb_table[i] = g_new(CPUTLBEntry, n_entries);
-@@ -151,18 +151,18 @@ static void tlb_mmu_resize_locked(CPUArchState *env, int mmu_idx)
-     int64_t now = get_clock_realtime();
-     int64_t window_len_ms = 100;
-     int64_t window_len_ns = window_len_ms * 1000 * 1000;
--    bool window_expired = now > desc->window.begin_ns + window_len_ns;
-+    bool window_expired = now > desc->window_begin_ns + window_len_ns;
+ #include "exec/cpu-all.h"
  
--    if (desc->n_used_entries > desc->window.max_entries) {
--        desc->window.max_entries = desc->n_used_entries;
-+    if (desc->n_used_entries > desc->window_max_entries) {
-+        desc->window_max_entries = desc->n_used_entries;
-     }
--    rate = desc->window.max_entries * 100 / old_size;
-+    rate = desc->window_max_entries * 100 / old_size;
+diff --git a/target/moxie/cpu.h b/target/moxie/cpu.h
+index 1de0515848..b27b0eabae 100644
+--- a/target/moxie/cpu.h
++++ b/target/moxie/cpu.h
+@@ -118,6 +118,7 @@ static inline int cpu_mmu_index(CPUMoxieState *env, bool ifetch)
+ }
  
-     if (rate > 70) {
-         new_size = MIN(old_size << 1, 1 << CPU_TLB_DYN_MAX_BITS);
-     } else if (rate < 30 && window_expired) {
--        size_t ceil = pow2ceil(desc->window.max_entries);
--        size_t expected_rate = desc->window.max_entries * 100 / ceil;
-+        size_t ceil = pow2ceil(desc->window_max_entries);
-+        size_t expected_rate = desc->window_max_entries * 100 / ceil;
+ typedef CPUMoxieState CPUArchState;
++typedef MoxieCPU ArchCPU;
  
-         /*
-          * Avoid undersizing when the max number of entries seen is just below
-@@ -182,7 +182,7 @@ static void tlb_mmu_resize_locked(CPUArchState *env, int mmu_idx)
+ #include "exec/cpu-all.h"
  
-     if (new_size == old_size) {
-         if (window_expired) {
--            tlb_window_reset(&desc->window, now, desc->n_used_entries);
-+            tlb_window_reset(desc, now, desc->n_used_entries);
-         }
-         return;
-     }
-@@ -190,7 +190,7 @@ static void tlb_mmu_resize_locked(CPUArchState *env, int mmu_idx)
-     g_free(env->tlb_table[mmu_idx]);
-     g_free(env->iotlb[mmu_idx]);
+diff --git a/target/nios2/cpu.h b/target/nios2/cpu.h
+index cc8e0ab771..5e51f1ae3f 100644
+--- a/target/nios2/cpu.h
++++ b/target/nios2/cpu.h
+@@ -247,6 +247,7 @@ static inline int cpu_interrupts_enabled(CPUNios2State *env)
+ }
  
--    tlb_window_reset(&desc->window, now, 0);
-+    tlb_window_reset(desc, now, 0);
-     /* desc->n_used_entries is cleared by the caller */
-     env->tlb_mask[mmu_idx] = (new_size - 1) << CPU_TLB_ENTRY_BITS;
-     env->tlb_table[mmu_idx] = g_try_new(CPUTLBEntry, new_size);
+ typedef CPUNios2State CPUArchState;
++typedef Nios2CPU ArchCPU;
+ 
+ #include "exec/cpu-all.h"
+ 
+diff --git a/target/openrisc/cpu.h b/target/openrisc/cpu.h
+index 98361cb041..496895693e 100644
+--- a/target/openrisc/cpu.h
++++ b/target/openrisc/cpu.h
+@@ -364,6 +364,7 @@ void cpu_openrisc_count_stop(OpenRISCCPU *cpu);
+ #define CPU_RESOLVING_TYPE TYPE_OPENRISC_CPU
+ 
+ typedef CPUOpenRISCState CPUArchState;
++typedef OpenRISCCPU ArchCPU;
+ 
+ #include "exec/cpu-all.h"
+ 
+diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+index 6478fe7c91..17e7213be9 100644
+--- a/target/ppc/cpu.h
++++ b/target/ppc/cpu.h
+@@ -1376,6 +1376,7 @@ void ppc_compat_add_property(Object *obj, const char *name,
+ #endif /* defined(TARGET_PPC64) */
+ 
+ typedef CPUPPCState CPUArchState;
++typedef PowerPCCPU ArchCPU;
+ 
+ #include "exec/cpu-all.h"
+ 
+diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
+index 509aae0613..8ee5051119 100644
+--- a/target/riscv/cpu.h
++++ b/target/riscv/cpu.h
+@@ -335,6 +335,7 @@ void riscv_set_csr_ops(int csrno, riscv_csr_operations *ops);
+ void riscv_cpu_register_gdb_regs_for_features(CPUState *cs);
+ 
+ typedef CPURISCVState CPUArchState;
++typedef RISCVCPU ArchCPU;
+ 
+ #include "exec/cpu-all.h"
+ 
+diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
+index 6614c05f30..a8c3d702d3 100644
+--- a/target/s390x/cpu.h
++++ b/target/s390x/cpu.h
+@@ -795,6 +795,7 @@ void s390_init_sigp(void);
+ S390CPU *s390_cpu_addr2state(uint16_t cpu_addr);
+ 
+ typedef CPUS390XState CPUArchState;
++typedef S390CPU ArchCPU;
+ 
+ #include "exec/cpu-all.h"
+ 
+diff --git a/target/sh4/cpu.h b/target/sh4/cpu.h
+index d7a8723d39..1bdc997290 100644
+--- a/target/sh4/cpu.h
++++ b/target/sh4/cpu.h
+@@ -281,6 +281,7 @@ static inline int cpu_mmu_index (CPUSH4State *env, bool ifetch)
+ }
+ 
+ typedef CPUSH4State CPUArchState;
++typedef SuperHCPU ArchCPU;
+ 
+ #include "exec/cpu-all.h"
+ 
+diff --git a/target/sparc/cpu.h b/target/sparc/cpu.h
+index fc392c6e87..ba5904e05a 100644
+--- a/target/sparc/cpu.h
++++ b/target/sparc/cpu.h
+@@ -730,6 +730,7 @@ static inline int cpu_pil_allowed(CPUSPARCState *env1, int pil)
+ }
+ 
+ typedef CPUSPARCState CPUArchState;
++typedef SPARCCPU ArchCPU;
+ 
+ #include "exec/cpu-all.h"
+ 
+diff --git a/target/tilegx/cpu.h b/target/tilegx/cpu.h
+index 2fbf14d508..042a7a0c71 100644
+--- a/target/tilegx/cpu.h
++++ b/target/tilegx/cpu.h
+@@ -151,6 +151,7 @@ static inline TileGXCPU *tilegx_env_get_cpu(CPUTLGState *env)
+ #define MMU_USER_IDX    0  /* Current memory operation is in user mode */
+ 
+ typedef CPUTLGState CPUArchState;
++typedef TileGXCPU ArchCPU;
+ 
+ #include "exec/cpu-all.h"
+ 
+diff --git a/target/tricore/cpu.h b/target/tricore/cpu.h
+index 5d3072f2db..8d660df34a 100644
+--- a/target/tricore/cpu.h
++++ b/target/tricore/cpu.h
+@@ -379,6 +379,7 @@ static inline int cpu_mmu_index(CPUTriCoreState *env, bool ifetch)
+ }
+ 
+ typedef CPUTriCoreState CPUArchState;
++typedef TriCoreCPU ArchCPU;
+ 
+ #include "exec/cpu-all.h"
+ 
+diff --git a/target/unicore32/cpu.h b/target/unicore32/cpu.h
+index 48562949b1..5c9c4d98c0 100644
+--- a/target/unicore32/cpu.h
++++ b/target/unicore32/cpu.h
+@@ -152,6 +152,7 @@ static inline int cpu_mmu_index(CPUUniCore32State *env, bool ifetch)
+ }
+ 
+ typedef CPUUniCore32State CPUArchState;
++typedef UniCore32CPU ArchCPU;
+ 
+ #include "exec/cpu-all.h"
+ 
+diff --git a/target/xtensa/cpu.h b/target/xtensa/cpu.h
+index e164e18f18..6e6fb1d893 100644
+--- a/target/xtensa/cpu.h
++++ b/target/xtensa/cpu.h
+@@ -800,6 +800,7 @@ static inline void cpu_get_tb_cpu_state(CPUXtensaState *env, target_ulong *pc,
+ }
+ 
+ typedef CPUXtensaState CPUArchState;
++typedef XtensaCPU ArchCPU;
+ 
+ #include "exec/cpu-all.h"
+ 
 -- 
 2.17.1
 
