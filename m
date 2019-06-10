@@ -2,71 +2,98 @@ Return-Path: <SRS0=Y1tr=UJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D2DBC43218
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 18:18:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91F53C43218
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 18:44:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1AADE207E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 18:18:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1AADE207E0
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 6100420820
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 18:44:21 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="N0jJM/Zh"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6100420820
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48828 helo=lists.gnu.org)
+Received: from localhost ([::1]:48900 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1haOs9-0000nX-4o
-	for qemu-devel@archiver.kernel.org; Mon, 10 Jun 2019 14:18:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37636)
+	id 1haPHF-0006qi-Mu
+	for qemu-devel@archiver.kernel.org; Mon, 10 Jun 2019 14:44:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43658)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <bounces@canonical.com>) id 1haOpc-0000Ii-Li
- for qemu-devel@nongnu.org; Mon, 10 Jun 2019 14:15:46 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1haPFz-0005zs-Iu
+ for qemu-devel@nongnu.org; Mon, 10 Jun 2019 14:43:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1haOpa-00081G-M5
- for qemu-devel@nongnu.org; Mon, 10 Jun 2019 14:15:44 -0400
-Received: from indium.canonical.com ([91.189.90.7]:37340)
+ (envelope-from <richard.henderson@linaro.org>) id 1haPDF-0007QF-74
+ for qemu-devel@nongnu.org; Mon, 10 Jun 2019 14:40:10 -0400
+Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:34865)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1haOpa-0007ye-GN
- for qemu-devel@nongnu.org; Mon, 10 Jun 2019 14:15:42 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1haOpU-0001xP-D1
- for <qemu-devel@nongnu.org>; Mon, 10 Jun 2019 18:15:36 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 5D47A2E802E
- for <qemu-devel@nongnu.org>; Mon, 10 Jun 2019 18:15:36 +0000 (UTC)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1haPDE-0007OG-VA
+ for qemu-devel@nongnu.org; Mon, 10 Jun 2019 14:40:09 -0400
+Received: by mail-pg1-x541.google.com with SMTP id s27so5498204pgl.2
+ for <qemu-devel@nongnu.org>; Mon, 10 Jun 2019 11:40:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=x302XDK82B+4hwZDzLu0wtz7XgG5rL/XX5wh3BskLBE=;
+ b=N0jJM/ZhJa1HfvzKP7dCdi0dvU2KpfHPznfVGt1L3AViJCOLtbUkFTHhTo78o51JQ/
+ 0C3W+J4mha+2EGJUNdwyfZvC98C2yE7et/lYMh9NLEqys9iziSdrbzhkmlpsxvfPetSd
+ vIiC3i8WwomthpIElvBQymEDiJxmoZndAdcDeEUGCU1KsyX/lwA5dceDPgUUX46j7yY3
+ mhdKFK4P9r0LOfVRj9sFLcGVhab0lClhRozjQYHK8B2TpsMcbNK69LSvzuKZ1WthO1sK
+ 2Rpp0mIQigQx6Lj8d7O+cN4JTh/UnaI0NwHkp3qgiwNUDGfel2fT2lMvRBIclQY4ea/5
+ xELQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=x302XDK82B+4hwZDzLu0wtz7XgG5rL/XX5wh3BskLBE=;
+ b=jbC7oHtKqyHq06X5iDfZBNBqsHV+i0E6Xye3rP60pkOwnQ/pvm5S9jpGbPPq3peLW/
+ 6o4EnhG7ahKlOfflX1Am6RS2F0PHEZAs2o7HT7vFbifqMdd8b8/rlR1dLXh7RxoXtPw0
+ 11anawsagzq17YW+fiM2jzhwIvk/8Dd4+9HrZzwruo6NJLksmpXY23qUuoOx8s2nt8rD
+ CmLZ5aolG1luwcwLl3SuOu2xDx9F331kSqIIlX67OigJ6UWIor9Iag7fAQZUxkQLHuzt
+ 6DFowSMnZjKhiaFZ/4t9mRQ3cQ6ui7//sBihnSn3yJCzD5bP55bUMIEU5hgtu6oNaHJi
+ kDFw==
+X-Gm-Message-State: APjAAAWf/RUyJUbAhboyeWY0wiGOQjujqlQbKsT8NwG/Sm65bvZqbkWv
+ kyL3Uv7SWgcnihCeZH5d7ZCcxshoH4I=
+X-Google-Smtp-Source: APXvYqxJ+cWyE0MJh8Rojpk8wJDlnbZktJb6OzB+oiccBh2KPjH7l1MuBTOcUKjASFUDCuZtL+8qdw==
+X-Received: by 2002:a17:90a:8c82:: with SMTP id
+ b2mr22249152pjo.97.1560192006378; 
+ Mon, 10 Jun 2019 11:40:06 -0700 (PDT)
+Received: from [192.168.1.11] (97-113-13-231.tukw.qwest.net. [97.113.13.231])
+ by smtp.gmail.com with ESMTPSA id
+ a192sm665715pfa.84.2019.06.10.11.40.05
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Mon, 10 Jun 2019 11:40:05 -0700 (PDT)
+To: Peter Maydell <peter.maydell@linaro.org>
+References: <20190606174609.20487-1-peter.maydell@linaro.org>
+ <20190606174609.20487-29-peter.maydell@linaro.org>
+ <da80c3ea-5a33-e7e0-209e-89a8413c8f06@linaro.org>
+ <CAFEAcA8etr7_rmQsQcUY+cPHZEZna-An+r5TPJtMb4OQO-6Dsg@mail.gmail.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Openpgp: preference=signencrypt
+Message-ID: <b9ac8354-6bb2-0080-f597-706b4b94009d@linaro.org>
+Date: Mon, 10 Jun 2019 11:40:03 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 10 Jun 2019 18:03:53 -0000
-From: Troy Fine <1832250@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: tfine
-X-Launchpad-Bug-Reporter: Troy Fine (tfine)
-X-Launchpad-Bug-Modifier: Troy Fine (tfine)
-Message-Id: <156018983401.31409.602642212914113436.malonedeb@gac.canonical.com>
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="18978";
- Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: 1b2949edd124c35b7564a2eedce555a9dd54e8fd
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1832250] [NEW] arm32v6/golang:1.10-alpine is
- broken for qemu 2.8 on MacOS cross-compilation
+In-Reply-To: <CAFEAcA8etr7_rmQsQcUY+cPHZEZna-An+r5TPJtMb4OQO-6Dsg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::541
+Subject: Re: [Qemu-devel] [PATCH 28/42] target/arm: Convert VMOV (imm) to
+ decodetree
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -75,176 +102,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1832250 <1832250@bugs.launchpad.net>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Public bug reported:
+On 6/10/19 10:12 AM, Peter Maydell wrote:
+> On Sat, 8 Jun 2019 at 20:29, Richard Henderson
+> <richard.henderson@linaro.org> wrote:
+>>
+>> On 6/6/19 12:45 PM, Peter Maydell wrote:
+>>> +    n = (a->imm4h << 28) & 0x80000000;
+>>> +    i = ((a->imm4h << 4) & 0x70) | a->imm4l;
+>>> +    if (i & 0x40) {
+>>> +        i |= 0x780;
+>>> +    } else {
+>>> +        i |= 0x800;
+>>> +    }
+>>> +    n |= i << 19;
+>>
+>> Can we reuse vfp_expand_imm here?  Given that you don't have pure code motion
+>> from the old code (due to field extraction) it doesn't feel wrong to go ahead
+>> and fix this wart now.
+> 
+> I dunno, I'd kind of prefer to do it later. We're already
+> drifting away from the old code as you say, and going
+> straight to vfp_expand_imm() makes it even less clear that
+> we're doing the same thing the old code was...
 
-FROM arm32v6/golang:1.10-alpine
+Fair enough.
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-docker build -t openhorizon/ibm.gps_arm:2.0.7 -f ./Dockerfile.arm .
-Sending build context to Docker daemon  110.6kB
-Step 1/12 : FROM arm32v6/golang:1.10-alpine
-1.10-alpine: Pulling from arm32v6/golang
-05276f4299f2: Pull complete =
 
-5657e63df536: Pull complete =
-
-febca98d0249: Pull complete =
-
-5053a7aa5dea: Pull complete =
-
-d048463a3701: Pull complete =
-
-b628c679d668: Pull complete =
-
-Digest: sha256:94c5fd97b17d0e9fe89e011446bedda4784cb0af7a60494989e2a21c0dcb=
-a92f
-Status: Downloaded newer image for arm32v6/golang:1.10-alpine
- ---> 3110964e8c9a
-Step 2/12 : RUN apk --no-cache update && apk add git
- ---> Running in 14ffb11506bb
-fetch http://dl-cdn.alpinelinux.org/alpine/v3.9/main/armhf/APKINDEX.tar.gz
-fetch http://dl-cdn.alpinelinux.org/alpine/v3.9/community/armhf/APKINDEX.ta=
-r.gz
-v3.9.4-24-g4e2ff29bbe [http://dl-cdn.alpinelinux.org/alpine/v3.9/main]
-v3.9.4-25-g65097c9cdc [http://dl-cdn.alpinelinux.org/alpine/v3.9/community]
-OK: 9547 distinct packages available
-fetch http://dl-cdn.alpinelinux.org/alpine/v3.9/main/armhf/APKINDEX.tar.gz
-fetch http://dl-cdn.alpinelinux.org/alpine/v3.9/community/armhf/APKINDEX.ta=
-r.gz
-(1/7) Installing nghttp2-libs (1.35.1-r0)
-(2/7) Installing libssh2 (1.8.2-r0)
-(3/7) Installing libcurl (7.64.0-r2)
-(4/7) Installing libgcc (8.3.0-r0)
-(5/7) Installing expat (2.2.6-r0)
-(6/7) Installing pcre2 (10.32-r1)
-(7/7) Installing git (2.20.1-r0)
-Executing busybox-1.29.3-r10.trigger
-OK: 18 MiB in 22 packages
-Removing intermediate container 14ffb11506bb
- ---> 6890ea7ed09b
-Step 3/12 : RUN mkdir -p /build/bin
- ---> Running in 44e52d78d7b4
-Removing intermediate container 44e52d78d7b4
- ---> 0763afda41d1
-Step 4/12 : COPY src /build/src
- ---> 05bab9a72a34
-Step 5/12 : WORKDIR /build
- ---> Running in 5a663caff249
-Removing intermediate container 5a663caff249
- ---> 5a6ca53c00de
-Step 6/12 : RUN env GOPATH=3D/build GOOPTIONS_ARM=3D'CGO_ENABLED=3D0 GOOS=
-=3Dlinux GOARCH=3Darm GOARM=3D6' go get github.com/kellydunn/golang-geo
- ---> Running in 05b09ee0c206
-Removing intermediate container 05b09ee0c206
- ---> e68c6e222e51
-Step 7/12 : RUN env GOPATH=3D/build GOOPTIONS_ARM=3D'CGO_ENABLED=3D0 GOOS=
-=3Dlinux GOARCH=3Darm GOARM=3D6' go build -o /build/bin/armv6_gps /build/sr=
-c/main.go
- ---> Running in ea6d2707e35f
-qemu-arm: /build/qemu-rwi8RH/qemu-2.8+dfsg/translate-all.c:175: tb_lock: As=
-sertion `!have_tb_lock' failed.
-qemu-arm: /build/qemu-rwi8RH/qemu-2.8+dfsg/translate-all.c:175: tb_lock: As=
-sertion `!have_tb_lock' failed.
-The command '/bin/sh -c env GOPATH=3D/build GOOPTIONS_ARM=3D'CGO_ENABLED=3D=
-0 GOOS=3Dlinux GOARCH=3Darm GOARM=3D6' go build -o /build/bin/armv6_gps /bu=
-ild/src/main.go' returned a non-zero code: 139
-make: *** [build] Error 139
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1832250
-
-Title:
-  arm32v6/golang:1.10-alpine is broken for qemu 2.8 on MacOS cross-
-  compilation
-
-Status in QEMU:
-  New
-
-Bug description:
-  FROM arm32v6/golang:1.10-alpine
-
-  docker build -t openhorizon/ibm.gps_arm:2.0.7 -f ./Dockerfile.arm .
-  Sending build context to Docker daemon  110.6kB
-  Step 1/12 : FROM arm32v6/golang:1.10-alpine
-  1.10-alpine: Pulling from arm32v6/golang
-  05276f4299f2: Pull complete =
-
-  5657e63df536: Pull complete =
-
-  febca98d0249: Pull complete =
-
-  5053a7aa5dea: Pull complete =
-
-  d048463a3701: Pull complete =
-
-  b628c679d668: Pull complete =
-
-  Digest: sha256:94c5fd97b17d0e9fe89e011446bedda4784cb0af7a60494989e2a21c0d=
-cba92f
-  Status: Downloaded newer image for arm32v6/golang:1.10-alpine
-   ---> 3110964e8c9a
-  Step 2/12 : RUN apk --no-cache update && apk add git
-   ---> Running in 14ffb11506bb
-  fetch http://dl-cdn.alpinelinux.org/alpine/v3.9/main/armhf/APKINDEX.tar.gz
-  fetch http://dl-cdn.alpinelinux.org/alpine/v3.9/community/armhf/APKINDEX.=
-tar.gz
-  v3.9.4-24-g4e2ff29bbe [http://dl-cdn.alpinelinux.org/alpine/v3.9/main]
-  v3.9.4-25-g65097c9cdc [http://dl-cdn.alpinelinux.org/alpine/v3.9/communit=
-y]
-  OK: 9547 distinct packages available
-  fetch http://dl-cdn.alpinelinux.org/alpine/v3.9/main/armhf/APKINDEX.tar.gz
-  fetch http://dl-cdn.alpinelinux.org/alpine/v3.9/community/armhf/APKINDEX.=
-tar.gz
-  (1/7) Installing nghttp2-libs (1.35.1-r0)
-  (2/7) Installing libssh2 (1.8.2-r0)
-  (3/7) Installing libcurl (7.64.0-r2)
-  (4/7) Installing libgcc (8.3.0-r0)
-  (5/7) Installing expat (2.2.6-r0)
-  (6/7) Installing pcre2 (10.32-r1)
-  (7/7) Installing git (2.20.1-r0)
-  Executing busybox-1.29.3-r10.trigger
-  OK: 18 MiB in 22 packages
-  Removing intermediate container 14ffb11506bb
-   ---> 6890ea7ed09b
-  Step 3/12 : RUN mkdir -p /build/bin
-   ---> Running in 44e52d78d7b4
-  Removing intermediate container 44e52d78d7b4
-   ---> 0763afda41d1
-  Step 4/12 : COPY src /build/src
-   ---> 05bab9a72a34
-  Step 5/12 : WORKDIR /build
-   ---> Running in 5a663caff249
-  Removing intermediate container 5a663caff249
-   ---> 5a6ca53c00de
-  Step 6/12 : RUN env GOPATH=3D/build GOOPTIONS_ARM=3D'CGO_ENABLED=3D0 GOOS=
-=3Dlinux GOARCH=3Darm GOARM=3D6' go get github.com/kellydunn/golang-geo
-   ---> Running in 05b09ee0c206
-  Removing intermediate container 05b09ee0c206
-   ---> e68c6e222e51
-  Step 7/12 : RUN env GOPATH=3D/build GOOPTIONS_ARM=3D'CGO_ENABLED=3D0 GOOS=
-=3Dlinux GOARCH=3Darm GOARM=3D6' go build -o /build/bin/armv6_gps /build/sr=
-c/main.go
-   ---> Running in ea6d2707e35f
-  qemu-arm: /build/qemu-rwi8RH/qemu-2.8+dfsg/translate-all.c:175: tb_lock: =
-Assertion `!have_tb_lock' failed.
-  qemu-arm: /build/qemu-rwi8RH/qemu-2.8+dfsg/translate-all.c:175: tb_lock: =
-Assertion `!have_tb_lock' failed.
-  The command '/bin/sh -c env GOPATH=3D/build GOOPTIONS_ARM=3D'CGO_ENABLED=
-=3D0 GOOS=3Dlinux GOARCH=3Darm GOARM=3D6' go build -o /build/bin/armv6_gps =
-/build/src/main.go' returned a non-zero code: 139
-  make: *** [build] Error 139
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1832250/+subscriptions
+r~
 
