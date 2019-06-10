@@ -6,90 +6,71 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 44842C31E41
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 15:37:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B23BEC31E41
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 15:57:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 10F8020859
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 15:37:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 10F8020859
+	by mail.kernel.org (Postfix) with ESMTPS id 8852921726
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 15:57:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8852921726
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47760 helo=lists.gnu.org)
+Received: from localhost ([::1]:47864 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1haMMn-0004cl-65
-	for qemu-devel@archiver.kernel.org; Mon, 10 Jun 2019 11:37:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51094)
+	id 1haMfz-0002C7-Nt
+	for qemu-devel@archiver.kernel.org; Mon, 10 Jun 2019 11:57:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55633)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <eblake@redhat.com>) id 1haMLi-0003qt-QU
- for qemu-devel@nongnu.org; Mon, 10 Jun 2019 11:36:43 -0400
+ (envelope-from <mst@redhat.com>) id 1haMeW-0001aw-IB
+ for qemu-devel@nongnu.org; Mon, 10 Jun 2019 11:56:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1haMLh-00056p-T4
- for qemu-devel@nongnu.org; Mon, 10 Jun 2019 11:36:42 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47016)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>)
- id 1haMLf-00054R-LT; Mon, 10 Jun 2019 11:36:39 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 2AA0F20264;
- Mon, 10 Jun 2019 15:36:33 +0000 (UTC)
-Received: from [10.3.116.85] (ovpn-116-85.phx2.redhat.com [10.3.116.85])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 0D650196AA;
- Mon, 10 Jun 2019 15:36:31 +0000 (UTC)
-To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-References: <1560105348-459129-1-git-send-email-andrey.shinkevich@virtuozzo.com>
- <1560105348-459129-2-git-send-email-andrey.shinkevich@virtuozzo.com>
- <96a6fd48-9e84-1285-1932-3ce1736cd08c@redhat.com>
- <786c3499-9bb4-0fa6-a4f1-f7537be73712@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=eblake@redhat.com; keydata=
- xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
- xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
- TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
- GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
- sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
- AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
- CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
- RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
- wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
- Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
- gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
- pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
- zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
- pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
- 3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
- NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
- cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
- SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
- I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
- mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
- Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
- 2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
-Organization: Red Hat, Inc.
-Message-ID: <023d5b7f-23c2-59e3-113e-684c9da6457a@redhat.com>
-Date: Mon, 10 Jun 2019 10:36:26 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+ (envelope-from <mst@redhat.com>) id 1haMeV-00045O-En
+ for qemu-devel@nongnu.org; Mon, 10 Jun 2019 11:56:08 -0400
+Received: from mail-ua1-f68.google.com ([209.85.222.68]:46203)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1haMeU-0003tw-A9
+ for qemu-devel@nongnu.org; Mon, 10 Jun 2019 11:56:06 -0400
+Received: by mail-ua1-f68.google.com with SMTP id o19so3213194uap.13
+ for <qemu-devel@nongnu.org>; Mon, 10 Jun 2019 08:55:46 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:content-transfer-encoding
+ :in-reply-to;
+ bh=7ZhX/TqkI2jBRtdjnfLMzlM6SsE9c/EC2fTs4Tvc2t4=;
+ b=BP2z02uLFmo9/LNEYNqCJBI/Op5qTl2fJyMhGsTXl8ECAMsycoTo4JgUvbpH1MLWYV
+ d9OLJfiPa8L3zl6X743M7dVDDD4V1ku77OF5nwRBALtfYqzQrwzxW2nkedachxMLmnhU
+ vfJCdoy7bhR1CfbSGyLJDTZzVm9yLEo/8+ISXi9pWXZaIa71ndjLIiEeiSRbHWTpv1NW
+ hZ9PAa+MJzOIFoSzKSptXzXMPLIPLwCtFoAKrAqzAta8/j9GPT4wi+083xml0m8JtUz6
+ NU58vxlhSqWzlOpPQtCcs2HSDeNOkFiuxpICJGH2m8WIr618AFLMcT4ERunxk0Jtigyx
+ 28vA==
+X-Gm-Message-State: APjAAAV/urtFOOy4Mco7nRoDIx4ers3vQi0N4yIN7Egj3jVXe7AhS+gP
+ FhphMgPEbDkVvgzoxeJY0MtrbQ==
+X-Google-Smtp-Source: APXvYqzFrtyMcE3mpcGV+FCZarQzhjG/aJZVf2IMC4VUlvqnxy2p444VAVwJ2RNJJcU+7fIiVgVnFQ==
+X-Received: by 2002:ab0:2a4e:: with SMTP id p14mr27618006uar.138.1560182146062; 
+ Mon, 10 Jun 2019 08:55:46 -0700 (PDT)
+Received: from redhat.com (pool-100-0-197-103.bstnma.fios.verizon.net.
+ [100.0.197.103])
+ by smtp.gmail.com with ESMTPSA id e7sm2660076vsc.28.2019.06.10.08.55.44
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Mon, 10 Jun 2019 08:55:44 -0700 (PDT)
+Date: Mon, 10 Jun 2019 11:55:42 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Like Xu <like.xu@linux.intel.com>
+Message-ID: <20190610114708-mutt-send-email-mst@kernel.org>
+References: <449c062f-373c-b310-ccc6-f14c702c8f19@linux.intel.com>
 MIME-Version: 1.0
-In-Reply-To: <786c3499-9bb4-0fa6-a4f1-f7537be73712@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="3e7xvH66woZdbAV4JI4OzUfwaRzCYRtjG"
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.29]); Mon, 10 Jun 2019 15:36:33 +0000 (UTC)
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <449c062f-373c-b310-ccc6-f14c702c8f19@linux.intel.com>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 1/7] iotests: allow Valgrind checking all
- QEMU processes
+ [fuzzy]
+X-Received-From: 209.85.222.68
+Subject: Re: [Qemu-devel] [QUESTION] How to reduce network latency to
+ improve netperf TCP_RR drastically?
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,90 +82,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "kwolf@redhat.com" <kwolf@redhat.com>, Denis Lunev <den@virtuozzo.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- Roman Kagan <rkagan@virtuozzo.com>, "mreitz@redhat.com" <mreitz@redhat.com>
+Cc: Jason Wang <jasowang@redhat.com>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---3e7xvH66woZdbAV4JI4OzUfwaRzCYRtjG
-Content-Type: multipart/mixed; boundary="Yry8N8jIwZSsKTExlU1mb0L5n2ldB8Ut5";
- protected-headers="v1"
-From: Eric Blake <eblake@redhat.com>
-To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: "kwolf@redhat.com" <kwolf@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "mreitz@redhat.com" <mreitz@redhat.com>, Roman Kagan <rkagan@virtuozzo.com>,
- Denis Lunev <den@virtuozzo.com>
-Message-ID: <023d5b7f-23c2-59e3-113e-684c9da6457a@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 1/7] iotests: allow Valgrind checking all
- QEMU processes
-References: <1560105348-459129-1-git-send-email-andrey.shinkevich@virtuozzo.com>
- <1560105348-459129-2-git-send-email-andrey.shinkevich@virtuozzo.com>
- <96a6fd48-9e84-1285-1932-3ce1736cd08c@redhat.com>
- <786c3499-9bb4-0fa6-a4f1-f7537be73712@virtuozzo.com>
-In-Reply-To: <786c3499-9bb4-0fa6-a4f1-f7537be73712@virtuozzo.com>
-
---Yry8N8jIwZSsKTExlU1mb0L5n2ldB8Ut5
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-
-On 6/10/19 10:02 AM, Andrey Shinkevich wrote:
->=20
->=20
-> On 10/06/2019 17:24, Eric Blake wrote:
->> On 6/9/19 1:35 PM, Andrey Shinkevich wrote:
->>> With the '-valgrind' option, let all the QEMU processes be run under
->>> the Valgrind tool. The Valgrind own parameters may be set with its
->>> environment variable VALGRIND_OPTS, e.g.
->>> VALGRIND_OPTS=3D"--leak-check=3Dyes" ./check -qcow2 -valgrind <test#>=
-
->>
->> Let's spell this --valgrind; long options should prefer the use of --
->> (as in getopt_long), whether or not we also have a reason to support
->> -valgrind (as in getopt_long_only). Yes, qemu is an oddball in this
->> regards, but no need to make it worse.
->>
->=20
-> Thank you, Eric. That sounds good but the short option'-valgrind' is
-> preexisting in QEMU. Should I create a new patch for the long option?
-> If so, will we have both options supported by QEMU?
-
-Oh, you're talking about qemu-iotests/check already supporting merely
-'-valgrind', not 'qemu-kvm' or '*/qemu-system-*'.  ./check is already an
-oddball for not permitting double dash, but at this point, normalizing
-it is a lot of churn. So it becomes a tradeoff on how much grunt work do
-you really want to do.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+On Tue, Jun 04, 2019 at 03:10:43PM +0800, Like Xu wrote:
+> Hi Michael，
+> 
+> At https://www.linux-kvm.org/page/NetworkingTodo, there is an entry for
+> network latency saying:
+> 
+> ---
+> reduce networking latency:
+>  allow handling short packets from softirq or VCPU context
+>  Plan:
+>    We are going through the scheduler 3 times
+>    (could be up to 5 if softirqd is involved)
+>    Consider RX: host irq -> io thread -> VCPU thread ->
+>    guest irq -> guest thread.
+>    This adds a lot of latency.
+>    We can cut it by some 1.5x if we do a bit of work
+>    either in the VCPU or softirq context.
+>  Testing: netperf TCP RR - should be improved drastically
+>           netperf TCP STREAM guest to host - no regression
+>  Contact: MST
+> ---
+> 
+> I am trying to make some contributions to improving netperf TCP_RR.
+> Could you please share more ideas or plans or implemental details to make it
+> happen?
+> 
+> Thanks,
+> Like Xu
 
 
---Yry8N8jIwZSsKTExlU1mb0L5n2ldB8Ut5--
+So some of this did happen. netif_receive_skb is now called
+directly from tun_get_user.
 
---3e7xvH66woZdbAV4JI4OzUfwaRzCYRtjG
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+Question is about the rx/tun_put_user path now.
 
------BEGIN PGP SIGNATURE-----
+If the vhost thread is idle, there's a single packet
+outstanding then maybe we can forward the packet to userspace
+directly from BH without waking up the thread.
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlz+ePoACgkQp6FrSiUn
-Q2rJQQf/RCTu5RYwOJ+r73rexIaWYLVdVjmoi2lHulGTWObUbt1Nr0GNHUgnPKON
-ODwuAo/Fses3bE+s3oX+NTjqjrrZ4gAR2PwU3MoXfHkWrME+4YU/IbOQuuvookKt
-Mi5Jc7g6H9bfyL+GrbkyFj49u5nZBbwYo0sHIG3EKjCvt+3NfeRocVU//nVIj9CW
-cCOWt+pCSGJQkj/CdA7hn9OVxHd+nROXwmeEMFWL5AolM5NmEYEOltdkb3ZI/k9O
-PmViham2yPkelFoHhhGxEfe4mgguE1/wkoci2sUf77ddB6m1XnhGntjQ2hJGppd6
-nj+8b+lCwROl7mSpE9mKUcqMwRbgqw==
-=sqAY
------END PGP SIGNATURE-----
+For this to work we need to map some userspace memory into kernel
+ahead of the time. For example, maybe it can happen when
+guest adds RX buffers? Copying Jason who's looking into
+memory mapping matters.
 
---3e7xvH66woZdbAV4JI4OzUfwaRzCYRtjG--
+-- 
+MST
 
