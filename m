@@ -7,72 +7,72 @@ X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2BB1CC31E40
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 15:26:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A1263C31E41
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 15:26:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EBD9C2085A
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 15:26:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6D4322085A
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 15:26:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="qCnz51+c"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EBD9C2085A
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="wjaPkB9V"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6D4322085A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47672 helo=lists.gnu.org)
+Received: from localhost ([::1]:47676 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1haMBs-0005Gb-6N
-	for qemu-devel@archiver.kernel.org; Mon, 10 Jun 2019 11:26:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47147)
+	id 1haMC0-0005Uz-LI
+	for qemu-devel@archiver.kernel.org; Mon, 10 Jun 2019 11:26:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47179)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <peter.maydell@linaro.org>) id 1haMAL-00045v-KG
- for qemu-devel@nongnu.org; Mon, 10 Jun 2019 11:25:00 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1haMAR-00047n-AD
+ for qemu-devel@nongnu.org; Mon, 10 Jun 2019 11:25:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1haMAE-0004h4-CJ
- for qemu-devel@nongnu.org; Mon, 10 Jun 2019 11:24:56 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:35185)
+ (envelope-from <peter.maydell@linaro.org>) id 1haMAL-0004lW-MM
+ for qemu-devel@nongnu.org; Mon, 10 Jun 2019 11:25:01 -0400
+Received: from mail-wr1-x429.google.com ([2a00:1450:4864:20::429]:40960)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1haMAD-0004fS-5B
- for qemu-devel@nongnu.org; Mon, 10 Jun 2019 11:24:49 -0400
-Received: by mail-wr1-x442.google.com with SMTP id m3so9649413wrv.2
- for <qemu-devel@nongnu.org>; Mon, 10 Jun 2019 08:24:48 -0700 (PDT)
+ id 1haMAJ-0004gE-SS
+ for qemu-devel@nongnu.org; Mon, 10 Jun 2019 11:24:57 -0400
+Received: by mail-wr1-x429.google.com with SMTP id c2so9612240wrm.8
+ for <qemu-devel@nongnu.org>; Mon, 10 Jun 2019 08:24:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=IgI2nYXtMTWQuZTo46tbwj7ydKAr5pCkN5Cp13BKZXc=;
- b=qCnz51+ce5UAT3cU/HBxcMyxzpuW93Q1N12QYcGSKlRM07DR04484zdYuU3HjOecOj
- EW2lVW+ZLhVzrrm3t2cMfcgNShY6gY2z1KKf6VpE2xiEXH4R5gpgYueviLZlCisZLntV
- ZU5aWioqaRl6aMdDeCjT2v1G0ReqwgzM6FP5mypdlQBT5a73OAiLdL99Z0kWySw7kHr8
- ivvLR1+WCJyHoSS4gdsJ+dVBy9PEY2WqbmGGsdpx7CIZ1RcI5GSZdmT6u56nhjZOv/Ne
- p0zHpRdt77Akj4QGPgh+EzGFGzJiPcaE1xMvcQ/w5Ws2hLUMHPG9VCilEKand1+H8IyY
- 59Pw==
+ bh=wf1rBZIYOLaVLqVG55fM2V+yvtysYWVZ87PUdH2633g=;
+ b=wjaPkB9VNtyhPdtjVqaEI/wNv+iFQkJg9SjNkTiKRwkJlEcW80U6JRPHoCroFGvWmH
+ VmAeZYm6Vxl0tQdin/Q4M3tFOTj7Krq7HoZOfNjLlRadhvwRCJj8JFYXlaClohyO272L
+ fAbWGjG8RIR44NOPD8sg1zWWMN236M5HhqbjZO1LkjOnBgPgg38DPISVSMwcyyeYmiHA
+ y2RAhjlp4DJXiMYbjzidujZRYVRQnUT+OrAR0yIwlgaMeI6pU0I49mPRyNc+8bzdUZ0t
+ jYaaKTyYozWMcAJ3RO575DRsPn2DaA5L5QfBgqLmKgRUrvTqvrfFQx+8AbrBQY2oGF0B
+ mTVA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=IgI2nYXtMTWQuZTo46tbwj7ydKAr5pCkN5Cp13BKZXc=;
- b=VwSrV6n1M9CvO7ybIcC3yFwWG6VbclhA48YYfK65Z4LBevmV115Wtln2WKeH3KOd1r
- wKvZT7T3PVySSCtCkle3xT+5HBhXlspoIG41DJf4fm99p7O+RWbp3hxw+sI6FisuUJmG
- I41GxU/7Ai83+CwpTb8JM7sTUULV+bj6HjdbQrwHMNIU5VwU/vZFwzvJ+vTGxiIxkj15
- Edx0OMuowyhScsUdHA01WcSIS2cphDGDOuX1DetcJUt7vtBnvBiDgkNGzvHTVwH+vaV0
- Z7Q+ZDmPwPE/Xh0WfIifPVQ3bohEbY2FW0v/rJD1mZSz5PvIk5jOe1FYKI592gXu18p3
- hWAg==
-X-Gm-Message-State: APjAAAU6cy7V1wPF4NPvN2w4a2vemquB5ffS5PaSw4TlcBNfXgIWB0Xt
- Jg2eSusP1u0xfzCH8+HblUgDJdvWDYkDow==
-X-Google-Smtp-Source: APXvYqxkxhB+Bxei8PVYb4jshaBR+NAv2hfcQcGFDSdU/PXALPxcVyRcz6TRL/KH9W5u7GmYWg0bUw==
-X-Received: by 2002:a05:6000:1289:: with SMTP id
- f9mr7319935wrx.125.1560180287503; 
- Mon, 10 Jun 2019 08:24:47 -0700 (PDT)
+ bh=wf1rBZIYOLaVLqVG55fM2V+yvtysYWVZ87PUdH2633g=;
+ b=pxQDY73YwgOrc5fP6/xD/BNqm8ZokdyHU9Y+P594FiIktlTOKDMoZKNAGGOeZqxxL9
+ 1W8EeRZc+E1/3gMB5jx/5uIZcR6EN8sftgqRFUNePmRkQCppGuWyZYjftiPj8UBSOS9m
+ jtBxu2XvEnmkwtCrgELJAAS00NUx0xY9S/7sMApO3PLnfLMeVOTVS/MtimF0io525Y2V
+ xuT+DkInUltXBpK/ubVIwRIPmfAYETI5avS+4JWZn07DOZ75DbtSe1kg6hpOcPV0oktd
+ X0Gl8hk2hSp18oIBOoR5kOy9mK09SShEVSX1TTT5J48WtHKlnihs+b3FP3qWAMCuZoj/
+ 39zw==
+X-Gm-Message-State: APjAAAUUfZENrcjEmNx10ds60ALQxS7ueFI5HdhXFonrxGhE56fPzZ2X
+ 4XvEU1E5b6TDKZGgQX6XH4d9rcU3bEgIpA==
+X-Google-Smtp-Source: APXvYqz+jAS8gcqDQjN6QcHK6jaaUn0mLBXMfnUX7jRK7qu4vqDtahkM9rOQLkARyOpRi+9PhbACcw==
+X-Received: by 2002:a05:6000:104e:: with SMTP id
+ c14mr33946197wrx.71.1560180288663; 
+ Mon, 10 Jun 2019 08:24:48 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id b203sm11945920wmd.41.2019.06.10.08.24.46
+ by smtp.gmail.com with ESMTPSA id b203sm11945920wmd.41.2019.06.10.08.24.47
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Mon, 10 Jun 2019 08:24:46 -0700 (PDT)
+ Mon, 10 Jun 2019 08:24:48 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Mon, 10 Jun 2019 16:24:43 +0100
-Message-Id: <20190610152444.20859-2-peter.maydell@linaro.org>
+Date: Mon, 10 Jun 2019 16:24:44 +0100
+Message-Id: <20190610152444.20859-3-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190610152444.20859-1-peter.maydell@linaro.org>
 References: <20190610152444.20859-1-peter.maydell@linaro.org>
@@ -80,9 +80,8 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::442
-Subject: [Qemu-devel] [PATCH 1/2] docs/specs/index.rst: Fix minor syntax
- issues
+X-Received-From: 2a00:1450:4864:20::429
+Subject: [Qemu-devel] [PATCH 2/2] docs: Build and install specs manual
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,47 +100,77 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The docs/specs/index.rst has a couple of minor issues which
-we didn't notice because we weren't building the manual:
- * the ToC entry for the new PPC XIVE docs points to
-   a nonexistent file
- * the initial comment needs to be marked by '..', not '.',
-   or it will appear in the output
- * the title doesn't match the capitialization used by
-   the existing interop or devel manuals, and uses
-   'full-system emulation' rather than the 'system emulation'
-   that the interop manual title uses
-
-Fix these minor issues before we start trying to build the manual.
+Now we have some rST format docs in the docs/specs/ manual, we should
+actually build and install it.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- docs/specs/index.rst | 9 +++++----
- 1 file changed, 5 insertions(+), 4 deletions(-)
+ Makefile           |  7 ++++++-
+ docs/specs/conf.py | 16 ++++++++++++++++
+ 2 files changed, 22 insertions(+), 1 deletion(-)
+ create mode 100644 docs/specs/conf.py
 
-diff --git a/docs/specs/index.rst b/docs/specs/index.rst
-index 2e927519c2e..40adb97c5eb 100644
---- a/docs/specs/index.rst
-+++ b/docs/specs/index.rst
-@@ -1,8 +1,8 @@
--. This is the top level page for the 'specs' manual
-+.. This is the top level page for the 'specs' manual
+diff --git a/Makefile b/Makefile
+index 8e2fc6624c3..cfb18f15254 100644
+--- a/Makefile
++++ b/Makefile
+@@ -731,6 +731,7 @@ distclean: clean
+ 	rm -rf .doctrees
+ 	$(call clean-manual,devel)
+ 	$(call clean-manual,interop)
++	$(call clean-manual,specs)
+ 	for d in $(TARGET_DIRS); do \
+ 	rm -rf $$d || exit 1 ; \
+         done
+@@ -781,6 +782,7 @@ endef
+ .PHONY: install-sphinxdocs
+ install-sphinxdocs: sphinxdocs
+ 	$(call install-manual,interop)
++	$(call install-manual,specs)
  
+ install-doc: $(DOCS) install-sphinxdocs
+ 	$(INSTALL_DIR) "$(DESTDIR)$(qemu_docdir)"
+@@ -962,7 +964,7 @@ docs/version.texi: $(SRC_PATH)/VERSION config-host.mak
+ # and handles "don't rebuild things unless necessary" itself.
+ # The '.doctrees' files are cached information to speed this up.
+ .PHONY: sphinxdocs
+-sphinxdocs: $(MANUAL_BUILDDIR)/devel/index.html $(MANUAL_BUILDDIR)/interop/index.html
++sphinxdocs: $(MANUAL_BUILDDIR)/devel/index.html $(MANUAL_BUILDDIR)/interop/index.html $(MANUAL_BUILDDIR)/specs/index.html
  
--QEMU full-system emulation guest hardware specifications
--========================================================
-+QEMU System Emulation Guest Hardware Specifications
-+===================================================
+ # Canned command to build a single manual
+ build-manual = $(call quiet-command,sphinx-build $(if $(V),,-q) -W -n -b html -D version=$(VERSION) -D release="$(FULL_VERSION)" -d .doctrees/$1 $(SRC_PATH)/docs/$1 $(MANUAL_BUILDDIR)/$1 ,"SPHINX","$(MANUAL_BUILDDIR)/$1")
+@@ -975,6 +977,9 @@ $(MANUAL_BUILDDIR)/devel/index.html: $(call manual-deps,devel)
+ $(MANUAL_BUILDDIR)/interop/index.html: $(call manual-deps,interop)
+ 	$(call build-manual,interop)
  
++$(MANUAL_BUILDDIR)/specs/index.html: $(call manual-deps,specs)
++	$(call build-manual,specs)
++
+ qemu-options.texi: $(SRC_PATH)/qemu-options.hx $(SRC_PATH)/scripts/hxtool
+ 	$(call quiet-command,sh $(SRC_PATH)/scripts/hxtool -t < $< > $@,"GEN","$@")
  
- Contents:
-@@ -10,4 +10,5 @@ Contents:
- .. toctree::
-    :maxdepth: 2
- 
--   xive
-+   ppc-xive
-+   ppc-spapr-xive
+diff --git a/docs/specs/conf.py b/docs/specs/conf.py
+new file mode 100644
+index 00000000000..4d56f3ae13c
+--- /dev/null
++++ b/docs/specs/conf.py
+@@ -0,0 +1,16 @@
++# -*- coding: utf-8 -*-
++#
++# QEMU documentation build configuration file for the 'specs' manual.
++#
++# This includes the top level conf file and then makes any necessary tweaks.
++import sys
++import os
++
++qemu_docdir = os.path.abspath("..")
++parent_config = os.path.join(qemu_docdir, "conf.py")
++exec(compile(open(parent_config, "rb").read(), parent_config, 'exec'))
++
++# This slightly misuses the 'description', but is the best way to get
++# the manual title to appear in the sidebar.
++html_theme_options['description'] = \
++    u'System Emulation Guest Hardware Specifications'
 -- 
 2.20.1
 
