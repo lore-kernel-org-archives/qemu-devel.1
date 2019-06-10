@@ -2,106 +2,85 @@ Return-Path: <SRS0=Y1tr=UJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNWANTED_LANGUAGE_BODY autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DB814C4321A
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DD07DC4321B
 	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 18:05:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7445B20859
+	by mail.kernel.org (Postfix) with ESMTPS id 6F03B207E0
 	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 18:05:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7445B20859
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=extremeground.com header.i=@extremeground.com header.b="LVeNUpF5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6F03B207E0
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=extremeground.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48768 helo=lists.gnu.org)
+Received: from localhost ([::1]:48766 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1haOfS-00044p-Pk
+	id 1haOfS-00044P-Dx
 	for qemu-devel@archiver.kernel.org; Mon, 10 Jun 2019 14:05:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34198)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52056)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <eajames@linux.vnet.ibm.com>) id 1haObe-0002BB-Ci
- for qemu-devel@nongnu.org; Mon, 10 Jun 2019 14:01:20 -0400
+ (envelope-from <gary@extremeground.com>) id 1haNt1-0000t7-T5
+ for qemu-devel@nongnu.org; Mon, 10 Jun 2019 13:15:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eajames@linux.vnet.ibm.com>) id 1haObb-0007Bw-Fw
- for qemu-devel@nongnu.org; Mon, 10 Jun 2019 14:01:18 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:45224)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eajames@linux.vnet.ibm.com>)
- id 1haObb-0006vp-3c
- for qemu-devel@nongnu.org; Mon, 10 Jun 2019 14:01:15 -0400
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
- x5AHvO43018167
- for <qemu-devel@nongnu.org>; Mon, 10 Jun 2019 14:00:56 -0400
-Received: from e35.co.us.ibm.com (e35.co.us.ibm.com [32.97.110.153])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2t1rynrsn1-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Mon, 10 Jun 2019 14:00:56 -0400
-Received: from localhost
- by e35.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <qemu-devel@nongnu.org> from <eajames@linux.vnet.ibm.com>;
- Mon, 10 Jun 2019 19:00:55 +0100
-Received: from b03cxnp07029.gho.boulder.ibm.com (9.17.130.16)
- by e35.co.us.ibm.com (192.168.1.135) with IBM ESMTP SMTP Gateway: Authorized
- Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Mon, 10 Jun 2019 19:00:53 +0100
-Received: from b03ledav001.gho.boulder.ibm.com
- (b03ledav001.gho.boulder.ibm.com [9.17.130.232])
- by b03cxnp07029.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- x5AI0qr421037482
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Mon, 10 Jun 2019 18:00:52 GMT
-Received: from b03ledav001.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 855266E05B;
- Mon, 10 Jun 2019 18:00:52 +0000 (GMT)
-Received: from b03ledav001.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 0AAE56E056;
- Mon, 10 Jun 2019 18:00:51 +0000 (GMT)
-Received: from [9.41.179.222] (unknown [9.41.179.222])
- by b03ledav001.gho.boulder.ibm.com (Postfix) with ESMTP;
- Mon, 10 Jun 2019 18:00:51 +0000 (GMT)
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Eddie James <eajames@linux.ibm.com>, qemu-arm@nongnu.org
-References: <1559599768-9176-1-git-send-email-eajames@linux.ibm.com>
- <29f493c1-ac0c-684f-a33e-8226be8db48b@redhat.com>
-From: Eddie James <eajames@linux.vnet.ibm.com>
-Date: Mon, 10 Jun 2019 13:00:51 -0500
+ (envelope-from <gary@extremeground.com>) id 1haNsy-0001wU-FL
+ for qemu-devel@nongnu.org; Mon, 10 Jun 2019 13:15:11 -0400
+Received: from ahs5.r4l.com ([158.69.52.156]:47433)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <gary@extremeground.com>)
+ id 1haNsx-0001LW-QZ
+ for qemu-devel@nongnu.org; Mon, 10 Jun 2019 13:15:07 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ d=extremeground.com; s=default; h=Content-Transfer-Encoding:Content-Type:
+ In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
+ :Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+ Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+ List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+ bh=hoYK19Vb/MIi2yfcMQlFWxqhkOCxSlzpAYdmJKeyjyY=; b=LVeNUpF5gW/rE4GfdeLAd66EgN
+ OZqWhfjLnQqPxsJEGr4WP4qDiLC7GZhuJlEu8oAcyuFACjliqcmVMx6PklM3dGJoglC4H3fD7NN0V
+ qyJSFMd3Qy2dhbPU5jt0B1ibZBhPGmQz2e/vA4AeZIr2vpTPGK8DFKONCJy+mlU6Zp7LQe7zViEac
+ kTrDJOEa0t5APCHj6r20Up52GTihUqxuqmSfDi1K7hNPbx0H6OTXi7dqN2yG0IoNxB3imWbLrypmV
+ 682yth/u29XJlqS/EsTl7B/UPOieSOZ0Cu4kO3vDs+7wSU5Jv0yYX8vK/IPpRbo7vjmHzhRD7B/oP
+ PX+YWrlg==;
+Received: from cpeac202ed5e073-cmac202ed5e070.cpe.net.cable.rogers.com
+ ([99.237.87.227]:44326 helo=[192.168.1.20])
+ by ahs5.r4l.com with esmtpsa (TLSv1.2:ECDHE-RSA-AES128-GCM-SHA256:128)
+ (Exim 4.92) (envelope-from <gary@extremeground.com>)
+ id 1haMdL-0007fx-SQ; Mon, 10 Jun 2019 11:54:55 -0400
+To: Stefan Hajnoczi <stefanha@gmail.com>
+References: <abb7990e-0331-67a4-af92-05276366478c@extremeground.com>
+ <20190610121941.GI14257@stefanha-x1.localdomain>
+From: Gary Dale <gary@extremeground.com>
+Message-ID: <dc7a70ea-c94f-e975-df44-b0199da698e2@extremeground.com>
+Date: Mon, 10 Jun 2019 11:54:55 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <29f493c1-ac0c-684f-a33e-8226be8db48b@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-X-TM-AS-GCONF: 00
-x-cbid: 19061018-0012-0000-0000-00001742B535
-X-IBM-SpamModules-Scores: 
-X-IBM-SpamModules-Versions: BY=3.00011243; HX=3.00000242; KW=3.00000007;
- PH=3.00000004; SC=3.00000286; SDB=6.01216054; UDB=6.00639360; IPR=6.00997154; 
- MB=3.00027254; MTD=3.00000008; XFM=3.00000015; UTC=2019-06-10 18:00:55
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19061018-0013-0000-0000-000057A3E9EB
-Message-Id: <e2ff35ed-8fb2-983c-1793-3a901ae2c6ec@linux.vnet.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
- definitions=2019-06-10_08:, , signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1011 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1810050000 definitions=main-1906100122
-Content-Transfer-Encoding: quoted-printable
-X-MIME-Autoconverted: from 8bit to quoted-printable by
- mx0a-001b2d01.pphosted.com id x5AHvO43018167
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.156.1
-X-Mailman-Approved-At: Mon, 10 Jun 2019 14:03:02 -0400
-Subject: Re: [Qemu-devel] [PATCH] hw: misc: Add Aspeed XDMA device
+In-Reply-To: <20190610121941.GI14257@stefanha-x1.localdomain>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-CA
+X-AntiAbuse: This header was added to track abuse,
+ please include it with any abuse report
+X-AntiAbuse: Primary Hostname - ahs5.r4l.com
+X-AntiAbuse: Original Domain - nongnu.org
+X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
+X-AntiAbuse: Sender Address Domain - extremeground.com
+X-Get-Message-Sender-Via: ahs5.r4l.com: authenticated_id:
+ gary@extremeground.com
+X-Authenticated-Sender: ahs5.r4l.com: gary@extremeground.com
+X-Source: 
+X-Source-Args: 
+X-Source-Dir: 
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 158.69.52.156
+X-Mailman-Approved-At: Mon, 10 Jun 2019 14:03:01 -0400
+Subject: Re: [Qemu-devel] kvm / virsh snapshot management
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -113,380 +92,142 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: andrew@aj.id.au, peter.maydell@linaro.org, joel@jms.id.au,
- qemu-devel@nongnu.org, clg@kaod.org
+Cc: Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>,
+ qemu-devel@nongnu.org, kvm@vger.kernel.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-On 6/6/19 6:34 PM, Philippe Mathieu-Daud=C3=A9 wrote:
-> Hi Eddie,
->
-> On 6/4/19 12:09 AM, Eddie James wrote:
->> The XDMA engine embedded in the Aspeed SOCs performs PCI DMA operation=
-s
->> between the SOC (acting as a BMC) and a host processor in a server.
-> If I got your model correctly, it does no DMA operation but simply
-> answer correctly to the BMC, and set 'operation done' IRQ with no delay.
-> So this is a dummy device. Then it would be more useful having ignored
-> DMA ops traced with trace-events.
-
-
-Thats correct. Good idea, I will add some tracing.
-
-
->
->> The XDMA engine exists on the AST2400, AST2500, and AST2600 SOCs, so
->> enable it for all of those.
+On 2019-06-10 8:19 a.m., Stefan Hajnoczi wrote:
+> On Sat, Jun 01, 2019 at 08:12:01PM -0400, Gary Dale wrote:
+>> A while back I converted a raw disk image to qcow2 to be able to use
+>> snapshots. However I realize that I may not really understand exactly how
+>> snapshots work. In this particular case, I'm only talking about internal
+>> snapshots currently as there seems to be some differences of opinion as to
+>> whether internal or external are safer/more reliable. I'm also only talking
+>> about shutdown state snapshots, so it should just be the disk that is
+>> snapshotted.
 >>
->> Signed-off-by: Eddie James <eajames@linux.ibm.com>
->> ---
->>   hw/arm/aspeed_soc.c           |  14 ++++
->>   hw/misc/Makefile.objs         |   2 +-
->>   hw/misc/aspeed_xdma.c         | 156 ++++++++++++++++++++++++++++++++=
-++++++++++
->>   include/hw/arm/aspeed_soc.h   |   2 +
->>   include/hw/misc/aspeed_xdma.h |  31 +++++++++
->>   5 files changed, 204 insertions(+), 1 deletion(-)
->>   create mode 100644 hw/misc/aspeed_xdma.c
->>   create mode 100644 include/hw/misc/aspeed_xdma.h
+>> As I understand it, the first snapshot freezes the base image and subsequent
+>> changes in the virtual machine's disk are stored elsewhere in the qcow2 file
+>> (remember, only internal snapshots). If I take a second snapshot, that
+>> freezes the first one, and subsequent changes are now in third location.
+>> Each new snapshot is incremental to the one that preceded it rather than
+>> differential to the base image. Each new snapshot is a child of the previous
+>> one.
+> Internal snapshots are not incremental or differential at the qcow2
+> level, they are simply a separate L1/L2 table pointing to data clusters.
+> In other words, they are an independent set of metadata showing the full
+> state of the image at the point of the snapshot.  qcow2 does not track
+> relationships between snapshots and parents/children.
+Which sounds to me like they are incremental. Each snapshot starts a new 
+L1/L2 table so that the state of the previous one is preserved.
+>
+>> One explanation I've seen of the process is if I delete a snapshot, the
+>> changes it contains are merged with its immediate child.
+> Nope.  Deleting a snapshot decrements the reference count on all its
+> data clusters.  If a data cluster's reference count reaches zero it will
+> be freed.  That's all, there is no additional data movement or
+> reorganization aside from this.
+Perhaps not physically but logically it would appear that the data 
+clusters were merged.
+>
+>> So if I deleted the
+>> first snapshot, the base image stays the same but any data that has changed
+>> since the base image is now in the second snapshot's location. The merge
+>> with children explanation also implies that the base image is never touched
+>> even if the first snapshot is deleted.
 >>
->> diff --git a/hw/arm/aspeed_soc.c b/hw/arm/aspeed_soc.c
->> index faff42b..b25bb18 100644
->> --- a/hw/arm/aspeed_soc.c
->> +++ b/hw/arm/aspeed_soc.c
->> @@ -31,6 +31,7 @@
->>   #define ASPEED_SOC_VIC_BASE         0x1E6C0000
->>   #define ASPEED_SOC_SDMC_BASE        0x1E6E0000
->>   #define ASPEED_SOC_SCU_BASE         0x1E6E2000
->> +#define ASPEED_SOC_XDMA_BASE        0x1E6E7000
->>   #define ASPEED_SOC_SRAM_BASE        0x1E720000
->>   #define ASPEED_SOC_TIMER_BASE       0x1E782000
->>   #define ASPEED_SOC_WDT_BASE         0x1E785000
->> @@ -159,6 +160,9 @@ static void aspeed_soc_init(Object *obj)
->>  =20
->>       sysbus_init_child_obj(obj, "ftgmac100", OBJECT(&s->ftgmac100),
->>                             sizeof(s->ftgmac100), TYPE_FTGMAC100);
->> +
->> +    sysbus_init_child_obj(obj, "xdma", OBJECT(&s->xdma), sizeof(s->xd=
-ma),
->> +                          TYPE_ASPEED_XDMA);
->>   }
->>  =20
->>   static void aspeed_soc_realize(DeviceState *dev, Error **errp)
->> @@ -298,6 +302,16 @@ static void aspeed_soc_realize(DeviceState *dev, =
-Error **errp)
->>       sysbus_mmio_map(SYS_BUS_DEVICE(&s->ftgmac100), 0, ASPEED_SOC_ETH=
-1_BASE);
->>       sysbus_connect_irq(SYS_BUS_DEVICE(&s->ftgmac100), 0,
->>                          qdev_get_gpio_in(DEVICE(&s->vic), 2));
->> +
->> +    /* XDMA */
->> +    object_property_set_bool(OBJECT(&s->xdma), true, "realized", &err=
-);
->> +    if (err) {
->> +        error_propagate(errp, err);
->> +        return;
->> +    }
->> +    sysbus_mmio_map(SYS_BUS_DEVICE(&s->xdma), 0, ASPEED_SOC_XDMA_BASE=
-);
->> +    sysbus_connect_irq(SYS_BUS_DEVICE(&s->xdma), 0,
->> +                       qdev_get_gpio_in(DEVICE(&s->vic), 6));
->>   }
->>  =20
->>   static void aspeed_soc_class_init(ObjectClass *oc, void *data)
->> diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
->> index 77b9df9..a4483af 100644
->> --- a/hw/misc/Makefile.objs
->> +++ b/hw/misc/Makefile.objs
->> @@ -74,7 +74,7 @@ obj-$(CONFIG_ARMSSE_MHU) +=3D armsse-mhu.o
->>  =20
->>   obj-$(CONFIG_PVPANIC) +=3D pvpanic.o
->>   obj-$(CONFIG_AUX) +=3D auxbus.o
->> -obj-$(CONFIG_ASPEED_SOC) +=3D aspeed_scu.o aspeed_sdmc.o
->> +obj-$(CONFIG_ASPEED_SOC) +=3D aspeed_scu.o aspeed_sdmc.o aspeed_xdma.=
-o
->>   obj-$(CONFIG_MSF2) +=3D msf2-sysreg.o
->>   obj-$(CONFIG_NRF51_SOC) +=3D nrf51_rng.o
->>  =20
->> diff --git a/hw/misc/aspeed_xdma.c b/hw/misc/aspeed_xdma.c
->> new file mode 100644
->> index 0000000..fe3a32e
->> --- /dev/null
->> +++ b/hw/misc/aspeed_xdma.c
->> @@ -0,0 +1,156 @@
->> +/*
->> + * ASPEED XDMA Controller
->> + * Eddie James <eajames@linux.ibm.com>
->> + *
->> + * Copyright (C) 2019 IBM Corp
->> + * SPDX-License-Identifer: GPL-2.0-or-later
->> + */
->> +
->> +#include "qemu/osdep.h"
->> +#include "qemu/log.h"
->> +#include "qemu/error-report.h"
->> +#include "hw/misc/aspeed_xdma.h"
->> +#include "qapi/error.h"
->> +
->> +#define XDMA_BMC_CMDQ_ADDR         0x10
->> +#define XDMA_BMC_CMDQ_ENDP         0x14
->> +#define XDMA_BMC_CMDQ_WRP          0x18
->> +#define  XDMA_BMC_CMDQ_W_MASK      0x0003FFFF
->> +#define XDMA_BMC_CMDQ_RDP          0x1C
->> +#define  XDMA_BMC_CMDQ_RDP_MAGIC   0xEE882266
->> +#define XDMA_IRQ_ENG_CTRL          0x20
->> +#define  XDMA_IRQ_ENG_CTRL_US_COMP BIT(4)
->> +#define  XDMA_IRQ_ENG_CTRL_DS_COMP BIT(5)
->> +#define  XDMA_IRQ_ENG_CTRL_W_MASK  0xBFEFF07F
->> +#define XDMA_IRQ_ENG_STAT          0x24
->> +#define  XDMA_IRQ_ENG_STAT_US_COMP BIT(4)
->> +#define  XDMA_IRQ_ENG_STAT_DS_COMP BIT(5)
->> +#define  XDMA_IRQ_ENG_STAT_RESET   0xF8000000
->> +
->> +#define TO_REG(addr) ((addr) / sizeof(uint32_t))
->> +
->> +static uint64_t aspeed_xdma_read(void *opaque, hwaddr addr, unsigned =
-int size)
->> +{
->> +    uint32_t val =3D 0;
->> +    AspeedXDMAState *xdma =3D opaque;
->> +
->> +    if (addr < ASPEED_XDMA_REG_SIZE) {
->> +        val =3D xdma->regs[TO_REG(addr)];
->> +    }
->> +
->> +    return (uint64_t)val;
->> +}
->> +
->> +static void aspeed_xdma_write(void *opaque, hwaddr addr, uint64_t val=
-,
->> +                              unsigned int size)
->> +{
->> +    unsigned int idx;
->> +    uint32_t val32 =3D (uint32_t)val;
->> +    AspeedXDMAState *xdma =3D opaque;
->> +
->> +    if (addr >=3D ASPEED_XDMA_REG_SIZE) {
->> +        return;
->> +    }
->> +
->> +    switch (addr) {
->> +    case XDMA_BMC_CMDQ_ENDP:
->> +        xdma->regs[TO_REG(addr)] =3D val32 & XDMA_BMC_CMDQ_W_MASK;
->> +        break;
->> +    case XDMA_BMC_CMDQ_WRP:
->> +        idx =3D TO_REG(addr);
->> +        xdma->regs[idx] =3D val32 & XDMA_BMC_CMDQ_W_MASK;
->> +        xdma->regs[TO_REG(XDMA_BMC_CMDQ_RDP)] =3D xdma->regs[idx];
-> The two previous lines are odd. Are they inverted?
-
-
-No, this should be correct. Since the command completes instantly, the=20
-engine "read pointer" is updated to the new "write pointer," with the=20
-expected result that no more commands need to be completed, since write=20
-=3D=3D read.
-
-
+>> But if I delete a snapshot that has no children, is that essentially the
+>> same as reverting to the point that snapshot was created and all subsequent
+>> disk changes are lost? Or does it merge down to the parent snapshot? If I
+>> delete all snapshots, would that revert to the base image?
+> No.  qcow2 has the concept of the current disk state of the running VM -
+> what you get when you boot the guest - and the snapshots - they are
+> read-only.
 >
-> I guess I'd trace here:
+> When you delete snapshots the current disk state (running VM) is
+> unaffected.
 >
->             trace_aspeed_xdma_...(val, ...);
+> When you apply a snapshot this throws away the current disk state and
+> uses the snapshot as the new current disk state.  The read-only snapshot
+> itself is not modified in any way and you can apply the same snapshot
+> again as many times as you wish later.
+So in essence the current state is a pointer to the latest data cluster, 
+which is the only data cluster that can be modified.
 >
->> +
->> +        if (xdma->bmc_cmdq_readp_set) {
->> +            xdma->bmc_cmdq_readp_set =3D 0;
->> +        } else {
->> +            xdma->regs[TO_REG(XDMA_IRQ_ENG_STAT)] |=3D
->> +                XDMA_IRQ_ENG_STAT_US_COMP | XDMA_IRQ_ENG_STAT_DS_COMP=
-;
->> +
->> +            if (xdma->regs[TO_REG(XDMA_IRQ_ENG_CTRL)] &
->> +                (XDMA_IRQ_ENG_CTRL_US_COMP | XDMA_IRQ_ENG_CTRL_DS_COM=
-P))
->> +                qemu_irq_raise(xdma->irq);
->> +        }
->> +        break;
->> +    case XDMA_BMC_CMDQ_RDP:
-> Trace here too.
->
->> +        if (val32 =3D=3D XDMA_BMC_CMDQ_RDP_MAGIC) {
->> +            xdma->bmc_cmdq_readp_set =3D 1;
->> +        }
->> +        break;
->> +    case XDMA_IRQ_ENG_CTRL:
->> +        xdma->regs[TO_REG(addr)] =3D val32 & XDMA_IRQ_ENG_CTRL_W_MASK=
-;
->> +        break;
->> +    case XDMA_IRQ_ENG_STAT:
->> +        idx =3D TO_REG(addr);
->> +        if (val32 & (XDMA_IRQ_ENG_STAT_US_COMP | XDMA_IRQ_ENG_STAT_DS=
-_COMP)) {
->> +            xdma->regs[TO_REG(addr)] &=3D
->                            ^ idx
-
-
-Thanks, will update.
-
-
->
->> +                ~(XDMA_IRQ_ENG_STAT_US_COMP | XDMA_IRQ_ENG_STAT_DS_CO=
-MP);
->> +            qemu_irq_lower(xdma->irq);
->> +        }
->> +        break;
->> +    default:
->> +        xdma->regs[TO_REG(addr)] =3D val32;
->> +        break;
->> +    }
->> +}
->> +
->> +static const MemoryRegionOps aspeed_xdma_ops =3D {
->> +    .read =3D aspeed_xdma_read,
->> +    .write =3D aspeed_xdma_write,
->> +    .endianness =3D DEVICE_NATIVE_ENDIAN,
->> +    .valid.min_access_size =3D 4,
->> +    .valid.max_access_size =3D 4,
->> +};
->> +
->> +static void aspeed_xdma_realize(DeviceState *dev, Error **errp)
->> +{
->> +    SysBusDevice *sbd =3D SYS_BUS_DEVICE(dev);
->> +    AspeedXDMAState *xdma =3D ASPEED_XDMA(dev);
->> +
->> +    sysbus_init_irq(sbd, &xdma->irq);
->> +    memory_region_init_io(&xdma->iomem, OBJECT(xdma), &aspeed_xdma_op=
-s, xdma,
->> +                          TYPE_ASPEED_XDMA, ASPEED_XDMA_MEM_SIZE);
->> +    sysbus_init_mmio(sbd, &xdma->iomem);
->> +}
->> +
->> +static void aspeed_xdma_reset(DeviceState *dev)
->> +{
->> +    AspeedXDMAState *xdma =3D ASPEED_XDMA(dev);
->> +
->> +    xdma->bmc_cmdq_readp_set =3D 0;
->> +    memset(xdma->regs, 0, ASPEED_XDMA_REG_SIZE);
->> +    xdma->regs[TO_REG(XDMA_IRQ_ENG_STAT)] =3D XDMA_IRQ_ENG_STAT_RESET=
-;
->> +
->> +    qemu_irq_lower(xdma->irq);
->> +}
->> +
->> +static const VMStateDescription aspeed_xdma_vmstate =3D {
->> +    .name =3D TYPE_ASPEED_XDMA,
->> +    .version_id =3D 1,
->> +    .fields =3D (VMStateField[]) {
->> +        VMSTATE_UINT32_ARRAY(regs, AspeedXDMAState, ASPEED_XDMA_NUM_R=
-EGS),
->> +        VMSTATE_END_OF_LIST(),
->> +    },
->> +};
->> +
->> +static void aspeed_xdma_class_init(ObjectClass *classp, void *data)
->> +{
->> +    DeviceClass *dc =3D DEVICE_CLASS(classp);
->> +
->> +    dc->realize =3D aspeed_xdma_realize;
->> +    dc->reset =3D aspeed_xdma_reset;
->> +    dc->vmsd =3D &aspeed_xdma_vmstate;
->> +}
->> +
->> +static const TypeInfo aspeed_xdma_info =3D {
->> +    .name          =3D TYPE_ASPEED_XDMA,
->> +    .parent        =3D TYPE_SYS_BUS_DEVICE,
->> +    .instance_size =3D sizeof(AspeedXDMAState),
->> +    .class_init    =3D aspeed_xdma_class_init,
->> +};
->> +
->> +static void aspeed_xdma_register_type(void)
->> +{
->> +    type_register_static(&aspeed_xdma_info);
->> +}
->> +type_init(aspeed_xdma_register_type);
->> diff --git a/include/hw/arm/aspeed_soc.h b/include/hw/arm/aspeed_soc.h
->> index 836b2ba..0329247 100644
->> --- a/include/hw/arm/aspeed_soc.h
->> +++ b/include/hw/arm/aspeed_soc.h
->> @@ -20,6 +20,7 @@
->>   #include "hw/ssi/aspeed_smc.h"
->>   #include "hw/watchdog/wdt_aspeed.h"
->>   #include "hw/net/ftgmac100.h"
->> +#include "hw/misc/aspeed_xdma.h"
->>  =20
->>   #define ASPEED_SPIS_NUM  2
->>   #define ASPEED_WDTS_NUM  3
->> @@ -40,6 +41,7 @@ typedef struct AspeedSoCState {
->>       AspeedSDMCState sdmc;
->>       AspeedWDTState wdt[ASPEED_WDTS_NUM];
->>       FTGMAC100State ftgmac100;
->> +    AspeedXDMAState xdma;
->>   } AspeedSoCState;
->>  =20
->>   #define TYPE_ASPEED_SOC "aspeed-soc"
->> diff --git a/include/hw/misc/aspeed_xdma.h b/include/hw/misc/aspeed_xd=
-ma.h
->> new file mode 100644
->> index 0000000..d19e9a7
->> --- /dev/null
->> +++ b/include/hw/misc/aspeed_xdma.h
->> @@ -0,0 +1,31 @@
->> +/*
->> + * ASPEED XDMA Controller
->> + * Eddie James <eajames@linux.ibm.com>
->> + *
->> + * Copyright (C) 2019 IBM Corp.
->> + * SPDX-License-Identifer: GPL-2.0-or-later
->> + */
->> +
->> +#ifndef ASPEED_XDMA_H
->> +#define ASPEED_XDMA_H
->> +
->> +#include "hw/sysbus.h"
->> +
->> +#define TYPE_ASPEED_XDMA "aspeed.xdma"
->> +#define ASPEED_XDMA(obj) OBJECT_CHECK(AspeedXDMAState, (obj), TYPE_AS=
-PEED_XDMA)
->> +
->> +#define ASPEED_XDMA_MEM_SIZE 0x1000
-> Maybe you can keep ASPEED_XDMA_MEM_SIZE private in the source file.
-
-
-Sure.
-
-
->
->> +#define ASPEED_XDMA_NUM_REGS (ASPEED_XDMA_REG_SIZE / sizeof(uint32_t)=
-)
->> +#define ASPEED_XDMA_REG_SIZE 0x7C
-> 0x80?
-
-
-Well 0x78 is the offset of the last register, so 0x7c would be the total=20
-register space. Of course the engine actually owns 4K bytes of register=20
-space but there's no reason to store all that.
-
-
->
->> +
->> +typedef struct AspeedXDMAState {
->> +    SysBusDevice parent;
->> +
->> +    MemoryRegion iomem;
->> +    qemu_irq irq;
->> +
->> +    char bmc_cmdq_readp_set;
->> +    uint32_t regs[ASPEED_XDMA_NUM_REGS];
->> +} AspeedXDMAState;
->> +
->> +#endif /* ASPEED_XDMA_H */
+>> I've seen it explained that a snapshot is very much like a timestamp so
+>> deleting a timestamp removes the dividing line between writes that occurred
+>> before and after that time, so that data is really only removed if I revert
+>> to some time stamp - all writes after that point are discarded. In this
+>> explanation, deleting the oldest timestamp is essentially updating the base
+>> image. Deleting all snapshots would leave me with the base image fully
+>> updated.
 >>
-> Few questions, but otherwise LGTM.
+>> Frankly, the second explanation sounds more reasonable to me, without having
+>> to figure out how copy-on-write works,  But I'm dealing with important data
+>> here and I don't want to mess it up by mishandling the snapshots.
+>>
+>> Can some provide a little clarity on this? Thanks!
+> If you want an analogy then git(1) is a pretty good one.  qcow2 internal
+> snapshots are like git tags.  Unlike branches, tags are immutable.  In
+> qcow2 you only have a master branch (the current disk state) from which
+> you can create a new tag or you can use git-checkout(1) to apply a
+> snapshot (discarding whatever your current disk state is).
 >
-> Regards,
->
-> Phil.
->
+> Stefan
+
+That's just making things less clear - I've never tried to understand 
+git either. Thanks for the attempt though.
+
+If I've gotten things correct, once the base image is established, there 
+is a current disk state that points to a table containing all the writes 
+since the base image. Creating a snapshot essentially takes that pointer 
+and gives it the snapshot name, while creating a new current disk state 
+pointer and data table where subsequent writes are recorded.
+
+Deleting snapshots removes your ability to refer to a data table by 
+name, but the table itself still exists anonymously as part of a chain 
+of data tables between the base image and the current state.
+
+This leaves a problem. The chain will very quickly get quite long which 
+will impact performance. To combat this, you can use blockcommit to 
+merge a child with its parent or blockpull to merge a parent with its child.
+
+In my situation, I want to keep a week of daily snapshots in case 
+something goes horribly wrong with the VM (I recently had a database 
+file become corrupt, and reverting to the previous working day's image 
+would have been a quick and easy solution, faster than recovering all 
+the data tables from the prefious day). I've been shutting down the VM, 
+deleting the oldest snapshot and creating a new one before restarting 
+the VM.
+
+While your explanation confirms that this is safe, it also implies that 
+I need to manage the data table chains. My first instinct is to use 
+blockcommit before deleting the oldest snapshot, such as:
+
+     virsh blockcommit <vm name> <qcow2 file path> --top <oldest 
+snapshot> --delete --wait
+     virsh snapshot-delete  --domain <vm name> --snapshotname <oldest 
+snapshot>
+
+so that the base image contains the state as of one week earlier and the 
+snapshot chains are limited to 7 links.
+
+1) does this sound reasonable?
+
+2) I note that the syntax in virsh man page is different from the syntax 
+at 
+https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html/virtualization_deployment_and_administration_guide/sect-backing-chain 
+(RedHat uses --top and --base while the man page just has optional base 
+and top names). I believe the RedHat guide is correct because the man 
+page doesn't allow distinguishing between the base and the top for a commit.
+
+However the need for specifying the path isn't obvious to me. Isn't the 
+path contained in the VM definition?
+
+Since blockcommit would make it impossible for me to revert to an 
+earlier state (because I'm committing the oldest snapshot, if it screws 
+up, I can't undo within virsh), I need to make sure this command is correct.
 
 
