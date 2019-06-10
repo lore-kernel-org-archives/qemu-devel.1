@@ -2,82 +2,63 @@ Return-Path: <SRS0=Y1tr=UJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FE96C282DD
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 13:00:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A396EC282DD
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 13:05:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CB16920859
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 13:00:13 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="DQHgVP2u"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CB16920859
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 36FE220859
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 13:05:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 36FE220859
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46138 helo=lists.gnu.org)
+Received: from localhost ([::1]:46242 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1haJuH-0007cf-0J
-	for qemu-devel@archiver.kernel.org; Mon, 10 Jun 2019 09:00:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38596)
+	id 1haJzl-00016Y-SW
+	for qemu-devel@archiver.kernel.org; Mon, 10 Jun 2019 09:05:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38984)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <peter.maydell@linaro.org>) id 1haJt9-00079Q-UN
- for qemu-devel@nongnu.org; Mon, 10 Jun 2019 08:59:05 -0400
+ (envelope-from <imammedo@redhat.com>) id 1haJuT-00080h-Uq
+ for qemu-devel@nongnu.org; Mon, 10 Jun 2019 09:00:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1haJt8-0001ab-W8
- for qemu-devel@nongnu.org; Mon, 10 Jun 2019 08:59:03 -0400
-Received: from mail-oi1-x235.google.com ([2607:f8b0:4864:20::235]:35211)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1haJt8-0001Zn-Pt
- for qemu-devel@nongnu.org; Mon, 10 Jun 2019 08:59:02 -0400
-Received: by mail-oi1-x235.google.com with SMTP id y6so6147549oix.2
- for <qemu-devel@nongnu.org>; Mon, 10 Jun 2019 05:59:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=mIF4tCWxTOXZcdBOa7biJqY33xVCSgmvQ17bRlLI3QM=;
- b=DQHgVP2uotPw++77R17nn6B4IBzkvbakjLx6ogig1/wL8xtwXlfba0y+8F+Ta+6inJ
- RlTNR5oY6xYyJn6zXy/lUdUrH423dVMYVnvPOBMg8FysZfJBh9vQt3mPfySA2NwpRpbq
- CG148Tes/MJVLUB9skqb8A/xMbdP5DzyCr1SoSR99nKdE3tKQyMjYrllX7RpyUeKKLTn
- pLuCaH2lVh//9qblDHT+M1fd24oCuxuenTcRUwjMeJQkb45Cxxb5zJbbbA3upqo/ZOO6
- pgw/7TPcklQHpb79/BJvaZ4U+IxHcZp6ZvvffTMSFduFg2mhwDgh98Y1RQmcA4azbjaR
- rNxw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=mIF4tCWxTOXZcdBOa7biJqY33xVCSgmvQ17bRlLI3QM=;
- b=AaxOXGJY+U6pT84iFLVx983OBuu/vo80+vuLl29LD2dRn4yQGC9resaU3c3t1dOqPo
- sUKhdz8Ed16IoZG9FQMIpkdrfV3OwR5iuz2FPXSYkF/sRQE10FDWD/MZgsFj0uiv4rSq
- x8Ij/sAgS2R5Lx06/RaKlrtIMqHEU7/2C4S4BqrUQ8/bgEUrlEwb5gqE+Y5yxuq9j5mL
- vmbt270+T2HMfakaH83n8MNRxjyxQwgEv5t+OkTbilnp++lVJhA3wozXlwxPf9vHwcOD
- 3e9IZH3EFj6uwkP6yiZONBclQPExtaBsBjn1wk05K98GPchCQ6DTgUPGVBoGCs8iY1yf
- WDNw==
-X-Gm-Message-State: APjAAAVOzQFLQLBQJi7ipYGbtS7aLswUi/EsXsxxHzC+Z03wzbUyyihP
- xejvi8GAVsXzS1fhK/pUNZ1jmW7XQ3P+Ft4SbI/ftg==
-X-Google-Smtp-Source: APXvYqxuuIx2bLxg/D2weOQeR4zsckU7MbWrkVCguFXkhx8XV/ur8TeXm4zyQ3ZwEtcX3DvyRnUaWr3ilO46Czk4q8c=
-X-Received: by 2002:a05:6808:8f1:: with SMTP id
- d17mr12094150oic.170.1560171541431; 
- Mon, 10 Jun 2019 05:59:01 -0700 (PDT)
+ (envelope-from <imammedo@redhat.com>) id 1haJuQ-0002VF-8H
+ for qemu-devel@nongnu.org; Mon, 10 Jun 2019 09:00:24 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55142)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1haJuO-0002TM-8U
+ for qemu-devel@nongnu.org; Mon, 10 Jun 2019 09:00:22 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 45D4A9C158;
+ Mon, 10 Jun 2019 13:00:08 +0000 (UTC)
+Received: from localhost (unknown [10.43.2.182])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 80DF560C69;
+ Mon, 10 Jun 2019 12:59:59 +0000 (UTC)
+Date: Mon, 10 Jun 2019 14:59:55 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+To: Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>
+Message-ID: <20190610145955.7877a408@redhat.com>
+In-Reply-To: <b65a3316-005a-02cb-8ea4-b956f9c26941@redhat.com>
+References: <20190607153725.18055-1-philmd@redhat.com>
+ <20190607153725.18055-5-philmd@redhat.com>
+ <e6e5f4ef-27c1-ce7c-e404-621c86af43ea@redhat.com>
+ <b65a3316-005a-02cb-8ea4-b956f9c26941@redhat.com>
 MIME-Version: 1.0
-References: <20190607211544.7964-1-ehabkost@redhat.com>
-In-Reply-To: <20190607211544.7964-1-ehabkost@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 10 Jun 2019 13:58:50 +0100
-Message-ID: <CAFEAcA-wCqppsi+gcrTqGjR3bSDOHs5btKKE8oHYxbAUDtu7Fw@mail.gmail.com>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::235
-Subject: Re: [Qemu-devel] [PULL 0/8] Python queue, 2019-06-07
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.26]); Mon, 10 Jun 2019 13:00:13 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v18 04/29] !fixup target/rx: CPU definition
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,52 +70,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Cleber Rosa <crosa@redhat.com>
+Cc: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
+ Yoshinori Sato <ysato@users.sourceforge.jp>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 7 Jun 2019 at 22:16, Eduardo Habkost <ehabkost@redhat.com> wrote:
->
-> The following changes since commit 185b7ccc11354cbd69b6d53bf8d831dd964f6c=
-88:
->
->   Merge remote-tracking branch 'remotes/cohuck/tags/s390x-20190607-2' int=
-o staging (2019-06-07 15:24:13 +0100)
->
-> are available in the Git repository at:
->
->   git://github.com/ehabkost/qemu.git tags/python-next-pull-request
->
-> for you to fetch changes up to 8297719709f1339506d6da93ec69e6118ace8676:
->
->   travis: Make check-acceptance job more verbose (2019-06-07 18:11:02 -03=
-00)
->
-> ----------------------------------------------------------------
-> Python queue, 2019-06-07
->
-> * New boot_linux_console test cases (Philippe Mathieu-Daud=C3=A9)
-> * Deprecate Python 2 support (Eduardo Habkost)
-> * Require python3 >=3D 3.5 (Eduardo Habkost)
-> * Make check-acceptance Travis job more verbose (Eduardo Habkost)
->
-> ----------------------------------------------------------------
+On Fri, 7 Jun 2019 20:06:12 +0200
+Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> wrote:
 
-Hi. This fails to build on one of my buildtest machines:
+> On 6/7/19 8:02 PM, Eric Blake wrote:
+> > On 6/7/19 10:37 AM, Philippe Mathieu-Daud=C3=A9 wrote: =20
+> >> Rename macros. =20
+> >=20
+> > Why is this marked '!fixup' in the subject instead of just merging the
+> > patches directly? =20
+>=20
+> Since all the series is reviewed/tested and Igor asked to amend a fixup
+> but we are having hard time to figure if we understand Igor request
+> correctly, I thought it would be easier for him to review this way, then
+> for Richard to squash the patches and send the pull request.
+I've explicitly asked for merging if I'm not mistaken.
 
-ERROR: Cannot use 'python3', Python 2 >=3D 2.7 or Python 3 >=3D 3.5 is requ=
-ired.
-       Use --python=3D/path/to/python to specify a supported Python.
+=20
+> Is it confuse/bad practice?
+it's confusing at least for me, since I have to review broken patch and fix=
+ ups
+on top doing merge in my head and still won't be sure if I've missed
+something in process on not.
 
-The machine has python 2.7.6 and 3.4.3. (It's an Ubuntu trusty
-box; it's one of the gcc compile farm machines so upgrades to its
-OS are not really under my control.)
+(Fix ups are fine for trivial change that affect only one patch,
+which isn't case here)
 
-The configure check also spits out deprecation warnings for
-the NetBSD/FreeBSD/OpenBSD tests/vm configurations. It would be nice
-to get those updated.
+Please respin.
 
-thanks
--- PMM
+>=20
+> In the cover I wrote:
+>=20
+>   If Igor aggrees with the fixup patches, Richard, can you squash
+>   them and send a pull request?  (without the last patch, which is
+>   expected to go via Eduardo's tree, but since it is helpful for
+>   testing this series, I included it).
+>=20
+> >>
+> >> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> >> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> >> ---
+> >>  target/rx/cpu.c | 22 ++++++++++++++--------
+> >>  target/rx/cpu.h | 12 ++++++------
+> >>  2 files changed, 20 insertions(+), 14 deletions(-)
+> >> =20
+
 
