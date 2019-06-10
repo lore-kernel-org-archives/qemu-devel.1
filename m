@@ -7,79 +7,79 @@ X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 39BB7C28EBD
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 02:43:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 86218C28EBD
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 02:47:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EA88E207E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 02:43:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2C101207E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 02:47:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="vKjg5vD8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EA88E207E0
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="NqkcScGM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2C101207E0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39908 helo=lists.gnu.org)
+Received: from localhost ([::1]:39942 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1haAHt-0006Yy-A5
-	for qemu-devel@archiver.kernel.org; Sun, 09 Jun 2019 22:43:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53414)
+	id 1haALS-000123-Oa
+	for qemu-devel@archiver.kernel.org; Sun, 09 Jun 2019 22:47:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53445)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <richard.henderson@linaro.org>) id 1ha9eR-0006yT-Fi
- for qemu-devel@nongnu.org; Sun, 09 Jun 2019 22:03:13 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1ha9eT-0006yy-F3
+ for qemu-devel@nongnu.org; Sun, 09 Jun 2019 22:03:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1ha9eP-00025n-EM
- for qemu-devel@nongnu.org; Sun, 09 Jun 2019 22:03:11 -0400
-Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:43871)
+ (envelope-from <richard.henderson@linaro.org>) id 1ha9eR-000281-Fq
+ for qemu-devel@nongnu.org; Sun, 09 Jun 2019 22:03:13 -0400
+Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:35214)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1ha9eL-00023j-Lt
- for qemu-devel@nongnu.org; Sun, 09 Jun 2019 22:03:07 -0400
-Received: by mail-pl1-x643.google.com with SMTP id cl9so2977512plb.10
- for <qemu-devel@nongnu.org>; Sun, 09 Jun 2019 19:03:04 -0700 (PDT)
+ id 1ha9eP-00024t-Bv
+ for qemu-devel@nongnu.org; Sun, 09 Jun 2019 22:03:11 -0400
+Received: by mail-pl1-x641.google.com with SMTP id p1so2996990plo.2
+ for <qemu-devel@nongnu.org>; Sun, 09 Jun 2019 19:03:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=8gZ72JCMlT8064Ktz+1j8wDvXoAY1RQH0DlIXahc3os=;
- b=vKjg5vD8yHfBnInz12k6i0FkjKxx4XKmqSZO28APi0A7MMidIQGQfPAKWWJIZFt+44
- xyx/TYagZ/qh3hswrpxdbp1iGeTT0hXzWqtkdsqijKj/c67DnqKjZUDerUl80qbuGLiR
- im27Nog4Fl3/iigTIQPZwdihNYN5vw1xuHUnlbDU6/rgVEb1FEWuxgF5tZSxOnId8zBb
- 4+qwAHk74wzsrpvSMT9uAgJfhVIvPIi8UYcBfm/bRKbUGiNbs9fMfSbFzx4BDjBYjH/u
- e99YG9ftjpzk6PKGf/XbohGoqQl0xP8BKQJos9h/gthYmqoQMjlMmMCaxJoDO/FW2YQ0
- 4Wyg==
+ bh=QijkDJtJCb3/ABVATHwY/gk3S5ygpJmh45wVvvS3fgY=;
+ b=NqkcScGM4d/uvBM/Vx7fPMZN9A72FgbmP57fcjXm/qntEZHCZDEyVo0XYlGdHwaqw+
+ +/IN7AOkfjozkFANSjRW48rZyylYP50EmAIJQ17VZehvvrTbK95csA4S3ENKsMU5nO9g
+ wwUoFZ63cXnezVXwlXNlKKwOpg6icFyiWWKCIh2LJazLQgt7OBxhZTkVAJRl18fUwLbk
+ 4lBPgD1GbPF/a2MNsD3/8ogHvknu/e0npS29QEL0/LrM8vCYVR2jV6/oDtGnenCT3jHJ
+ ZRJMJT9wyE9yWSYODLaOiFa421crrqF4JPNvRDRGSO3TU5UlY32SrZ48lTAt3/0ZKXke
+ Ikhw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references;
- bh=8gZ72JCMlT8064Ktz+1j8wDvXoAY1RQH0DlIXahc3os=;
- b=ib9LZY90v9O5i7aMMv8fwd4Zjmakz+OSuU25c2a50u4tdgB2Cc8e6Wf1fvbzcBXEVe
- J/5DBPAHJkBXS3+7yH2vG1vaj6dRCZwI5Cnk9DzCn4U/e5nTWI3tR3O8DzJ9o8HVUu3A
- uxo4Pi6I6ZtrYQ/deVPBIYOnZMvLqe9T+sea9laU1wElEjV7e4Z9cHMvflZwCGbnQyvB
- KJB1Uw+qtedrR1yh7vcbr8VbIKV1Id6suNVV8OvVgHJ96/cUSBTB5fgD7roASx2rv5po
- 32qUYvBUbEsnVdVqj3n7/LjsxwLZWN1AGi+RXFiExje6HlCLI/iAR1yiUGMVjWETWegX
- L1hQ==
-X-Gm-Message-State: APjAAAUCGCZmLqiSPxsz9q39PjLixERTz7Pv64+LmpTqDY1WmBLzH1ni
- nASxjIR6/aov/I/5QOt9fY/Rpl+erwo=
-X-Google-Smtp-Source: APXvYqzO6CBpcM2ufqtsHJWPPckJAQnukF9N7OI585iSBgvpviaZkTXynqJQXakd9nKgP8Bo4d59+g==
-X-Received: by 2002:a17:902:7043:: with SMTP id
- h3mr7255866plt.10.1560132183593; 
- Sun, 09 Jun 2019 19:03:03 -0700 (PDT)
+ bh=QijkDJtJCb3/ABVATHwY/gk3S5ygpJmh45wVvvS3fgY=;
+ b=iGSNLsAzc1yVVXiOkDlHvSfN7WbGEHfRoRATheIjLZsOIFMA78Bd2rch64J1l8jTeR
+ 9Y4HSokmOo9XtHx7w3GgH22IDyTq7VDcaQZ8Ah1msmLno2xayfK4gIgofeOQGXQl6pcf
+ J8wN+j73fAuyhCqngbG2I0CNRuBTbKEN7oizhfA+64F3MjYY4ka4hL+tqMTsun3gssOv
+ S7rwDEZ3HUuhOOHqJ+nPJ/qJ3QW4JPHrm+XRfxR6ocsqcvaVrenWam4CGmSYWlUBIL5e
+ rKNkN6CJhW9yN9Vi4Rp+nBgDUOlUFarNm5BR7+z+j2i8+gPOVbz0jfuGtPsCc8QZ7FY7
+ HVNA==
+X-Gm-Message-State: APjAAAWagKcIrhzyPTxlEKXL0PbZ2UHxjJ6WHreNGaN3Mt4p9448bOcT
+ pcTf5/moXULnkup2kbxTgXITZ/hZYJI=
+X-Google-Smtp-Source: APXvYqzqBrO3WQWYkqnm7z4Kmglrc16tWzQtyjz4A36I3bGgiHgL22UOgVGa7o/JRFd3BazaGVBv0w==
+X-Received: by 2002:a17:902:42a5:: with SMTP id
+ h34mr30518154pld.16.1560132186270; 
+ Sun, 09 Jun 2019 19:03:06 -0700 (PDT)
 Received: from localhost.localdomain (97-113-13-231.tukw.qwest.net.
  [97.113.13.231])
- by smtp.gmail.com with ESMTPSA id l63sm9749013pfl.181.2019.06.09.19.03.02
+ by smtp.gmail.com with ESMTPSA id l63sm9749013pfl.181.2019.06.09.19.03.05
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Sun, 09 Jun 2019 19:03:03 -0700 (PDT)
+ Sun, 09 Jun 2019 19:03:05 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Sun,  9 Jun 2019 19:02:15 -0700
-Message-Id: <20190610020218.9228-37-richard.henderson@linaro.org>
+Date: Sun,  9 Jun 2019 19:02:17 -0700
+Message-Id: <20190610020218.9228-39-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190610020218.9228-1-richard.henderson@linaro.org>
 References: <20190610020218.9228-1-richard.henderson@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::643
-Subject: [Qemu-devel] [PULL 36/39] cpu: Remove CPU_COMMON
+X-Received-From: 2607:f8b0:4864:20::641
+Subject: [Qemu-devel] [PULL 38/39] tcg/arm: Use LDRD to load tlb mask+table
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,332 +96,173 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This macro is now always empty, so remove it.  This leaves the
-entire contents of CPUArchState under the control of the guest
-architecture.
+This changes the code generation for the tlb from e.g.
 
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+	ldr      ip, [r6, #-0x10]
+	ldr      r2, [r6, #-0xc]
+	and      ip, ip, r4, lsr #8
+	ldrd     r0, r1, [r2, ip]!
+	ldr      r2, [r2, #0x18]
+
+to
+
+	ldrd     r0, r1, [r6, #-0x10]
+	and      r0, r0, r4, lsr #8
+	ldrd     r2, r3, [r1, r0]!
+	ldr      r1, [r1, #0x18]
+
+for armv7 hosts.  Rearranging the register allocation in
+order to avoid overlap between the two ldrd pairs causes
+the patch to be larger than it ordinarily would be.
+
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- include/exec/cpu-defs.h | 2 --
- target/alpha/cpu.h      | 3 ---
- target/arm/cpu.h        | 4 +---
- target/cris/cpu.h       | 2 --
- target/hppa/cpu.h       | 3 ---
- target/i386/cpu.h       | 4 +---
- target/lm32/cpu.h       | 2 --
- target/m68k/cpu.h       | 2 --
- target/microblaze/cpu.h | 2 --
- target/mips/cpu.h       | 2 --
- target/moxie/cpu.h      | 3 ---
- target/nios2/cpu.h      | 2 --
- target/openrisc/cpu.h   | 2 --
- target/ppc/cpu.h        | 2 --
- target/riscv/cpu.h      | 3 ---
- target/s390x/cpu.h      | 2 --
- target/sh4/cpu.h        | 2 --
- target/sparc/cpu.h      | 2 --
- target/tilegx/cpu.h     | 2 --
- target/tricore/cpu.h    | 2 --
- target/unicore32/cpu.h  | 2 --
- target/xtensa/cpu.h     | 2 --
- 22 files changed, 2 insertions(+), 50 deletions(-)
+ tcg/arm/tcg-target.inc.c | 92 +++++++++++++++++++++++-----------------
+ 1 file changed, 53 insertions(+), 39 deletions(-)
 
-diff --git a/include/exec/cpu-defs.h b/include/exec/cpu-defs.h
-index 006f8db9cf..9bc713a70b 100644
---- a/include/exec/cpu-defs.h
-+++ b/include/exec/cpu-defs.h
-@@ -231,8 +231,6 @@ typedef struct CPUTLB { } CPUTLB;
- 
- #endif  /* !CONFIG_USER_ONLY && CONFIG_TCG */
- 
--#define CPU_COMMON  /* Nothing */
--
- /*
-  * This structure must be placed in ArchCPU immedately
-  * before CPUArchState, as a field named "neg".
-diff --git a/target/alpha/cpu.h b/target/alpha/cpu.h
-index 94fbc00a3b..5d6fb222b5 100644
---- a/target/alpha/cpu.h
-+++ b/target/alpha/cpu.h
-@@ -251,9 +251,6 @@ struct CPUAlphaState {
-     /* This alarm doesn't exist in real hardware; we wish it did.  */
-     uint64_t alarm_expire;
- 
--    /* Those resources are used only in QEMU core */
--    CPU_COMMON
--
-     int error_code;
- 
-     uint32_t features;
-diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index 5965c52f0c..8fa9772c9d 100644
---- a/target/arm/cpu.h
-+++ b/target/arm/cpu.h
-@@ -645,9 +645,7 @@ typedef struct CPUARMState {
-     /* Fields up to this point are cleared by a CPU reset */
-     struct {} end_reset_fields;
- 
--    CPU_COMMON
--
--    /* Fields after CPU_COMMON are preserved across CPU reset. */
-+    /* Fields after this point are preserved across CPU reset. */
- 
-     /* Internal CPU feature flags.  */
-     uint64_t features;
-diff --git a/target/cris/cpu.h b/target/cris/cpu.h
-index ad93d1a9ee..9d2a80d995 100644
---- a/target/cris/cpu.h
-+++ b/target/cris/cpu.h
-@@ -163,8 +163,6 @@ typedef struct CPUCRISState {
-         /* Fields up to this point are cleared by a CPU reset */
-         struct {} end_reset_fields;
- 
--        CPU_COMMON
--
-         /* Members from load_info on are preserved across resets.  */
-         void *load_info;
- } CPUCRISState;
-diff --git a/target/hppa/cpu.h b/target/hppa/cpu.h
-index f7c6205218..c7db2eca9a 100644
---- a/target/hppa/cpu.h
-+++ b/target/hppa/cpu.h
-@@ -197,9 +197,6 @@ struct CPUHPPAState {
-     target_ureg cr_back[2];  /* back of cr17/cr18 */
-     target_ureg shadow[7];   /* shadow registers */
- 
--    /* Those resources are used only in QEMU core */
--    CPU_COMMON
--
-     /* ??? The number of entries isn't specified by the architecture.  */
-     /* ??? Implement a unified itlb/dtlb for the moment.  */
-     /* ??? We should use a more intelligent data structure.  */
-diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index e7580a86e5..edad6e1efb 100644
---- a/target/i386/cpu.h
-+++ b/target/i386/cpu.h
-@@ -1289,9 +1289,7 @@ typedef struct CPUX86State {
-     /* Fields up to this point are cleared by a CPU reset */
-     struct {} end_reset_fields;
- 
--    CPU_COMMON
--
--    /* Fields after CPU_COMMON are preserved across CPU reset. */
-+    /* Fields after this point are preserved across CPU reset. */
- 
-     /* processor features (e.g. for CPUID insn) */
-     /* Minimum level/xlevel/xlevel2, based on CPU model + features */
-diff --git a/target/lm32/cpu.h b/target/lm32/cpu.h
-index 324bc90f81..3e10a693a3 100644
---- a/target/lm32/cpu.h
-+++ b/target/lm32/cpu.h
-@@ -159,8 +159,6 @@ struct CPULM32State {
-     /* Fields up to this point are cleared by a CPU reset */
-     struct {} end_reset_fields;
- 
--    CPU_COMMON
--
-     /* Fields from here on are preserved across CPU reset. */
-     uint32_t eba;       /* exception base address */
-     uint32_t deba;      /* debug exception base address */
-diff --git a/target/m68k/cpu.h b/target/m68k/cpu.h
-index d92263b750..1ebd360afb 100644
---- a/target/m68k/cpu.h
-+++ b/target/m68k/cpu.h
-@@ -143,8 +143,6 @@ typedef struct CPUM68KState {
-     /* Fields up to this point are cleared by a CPU reset */
-     struct {} end_reset_fields;
- 
--    CPU_COMMON
--
-     /* Fields from here on are preserved across CPU reset. */
-     uint32_t features;
- } CPUM68KState;
-diff --git a/target/microblaze/cpu.h b/target/microblaze/cpu.h
-index d90c4fbcb5..98b4d915d7 100644
---- a/target/microblaze/cpu.h
-+++ b/target/microblaze/cpu.h
-@@ -266,8 +266,6 @@ struct CPUMBState {
-     /* Fields up to this point are cleared by a CPU reset */
-     struct {} end_reset_fields;
- 
--    CPU_COMMON
--
-     /* These fields are preserved on reset.  */
- 
-     struct {
-diff --git a/target/mips/cpu.h b/target/mips/cpu.h
-index 62af24937d..bbf1aa8b0d 100644
---- a/target/mips/cpu.h
-+++ b/target/mips/cpu.h
-@@ -1041,8 +1041,6 @@ struct CPUMIPSState {
-     /* Fields up to this point are cleared by a CPU reset */
-     struct {} end_reset_fields;
- 
--    CPU_COMMON
--
-     /* Fields from here on are preserved across CPU reset. */
-     CPUMIPSMVPContext *mvp;
- #if !defined(CONFIG_USER_ONLY)
-diff --git a/target/moxie/cpu.h b/target/moxie/cpu.h
-index c6b681531d..2b596d5d45 100644
---- a/target/moxie/cpu.h
-+++ b/target/moxie/cpu.h
-@@ -45,9 +45,6 @@ typedef struct CPUMoxieState {
- 
-     /* Fields up to this point are cleared by a CPU reset */
-     struct {} end_reset_fields;
--
--    CPU_COMMON
--
- } CPUMoxieState;
- 
- #include "qom/cpu.h"
-diff --git a/target/nios2/cpu.h b/target/nios2/cpu.h
-index 8cc3d4971e..e40ee27e53 100644
---- a/target/nios2/cpu.h
-+++ b/target/nios2/cpu.h
-@@ -167,8 +167,6 @@ struct CPUNios2State {
- 
-     uint32_t irq_pending;
+diff --git a/tcg/arm/tcg-target.inc.c b/tcg/arm/tcg-target.inc.c
+index b066e30f0e..276e843627 100644
+--- a/tcg/arm/tcg-target.inc.c
++++ b/tcg/arm/tcg-target.inc.c
+@@ -267,6 +267,7 @@ static const char *target_parse_constraint(TCGArgConstraint *ct,
+         tcg_regset_reset_reg(ct->u.regs, TCG_REG_R0);
+         tcg_regset_reset_reg(ct->u.regs, TCG_REG_R1);
+         tcg_regset_reset_reg(ct->u.regs, TCG_REG_R2);
++        tcg_regset_reset_reg(ct->u.regs, TCG_REG_R3);
+         tcg_regset_reset_reg(ct->u.regs, TCG_REG_R14);
  #endif
+         break;
+@@ -1224,6 +1225,10 @@ static TCGReg tcg_out_arg_reg64(TCGContext *s, TCGReg argreg,
+ QEMU_BUILD_BUG_ON(TLB_MASK_TABLE_OFS(0) > 0);
+ QEMU_BUILD_BUG_ON(TLB_MASK_TABLE_OFS(0) < -256);
+ 
++/* These offsets are built into the LDRD below.  */
++QEMU_BUILD_BUG_ON(offsetof(CPUTLBDescFast, mask) != 0);
++QEMU_BUILD_BUG_ON(offsetof(CPUTLBDescFast, table) != 4);
++
+ /* Load and compare a TLB entry, leaving the flags set.  Returns the register
+    containing the addend of the tlb entry.  Clobbers R0, R1, R2, TMP.  */
+ 
+@@ -1238,47 +1243,54 @@ static TCGReg tcg_out_tlb_read(TCGContext *s, TCGReg addrlo, TCGReg addrhi,
+     unsigned s_bits = opc & MO_SIZE;
+     unsigned a_bits = get_alignment_bits(opc);
+ 
+-    /* Load tlb_mask[mmu_idx] and tlb_table[mmu_idx].  */
+-    tcg_out_ld(s, TCG_TYPE_I32, TCG_REG_TMP, TCG_AREG0, mask_off);
+-    tcg_out_ld(s, TCG_TYPE_I32, TCG_REG_R2, TCG_AREG0, table_off);
 -
--    CPU_COMMON
- };
- 
- /**
-diff --git a/target/openrisc/cpu.h b/target/openrisc/cpu.h
-index 51723e9312..9b80834d68 100644
---- a/target/openrisc/cpu.h
-+++ b/target/openrisc/cpu.h
-@@ -286,8 +286,6 @@ typedef struct CPUOpenRISCState {
-     /* Fields up to this point are cleared by a CPU reset */
-     struct {} end_reset_fields;
- 
--    CPU_COMMON
+-    /* Extract the tlb index from the address into TMP.  */
+-    tcg_out_dat_reg(s, COND_AL, ARITH_AND, TCG_REG_TMP, TCG_REG_TMP, addrlo,
+-                    SHIFT_IMM_LSR(TARGET_PAGE_BITS - CPU_TLB_ENTRY_BITS));
 -
-     /* Fields from here on are preserved across CPU reset. */
-     uint32_t cpucfgr;         /* CPU configure register */
- 
-diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-index e8962e4655..c93ebc4c10 100644
---- a/target/ppc/cpu.h
-+++ b/target/ppc/cpu.h
-@@ -999,8 +999,6 @@ struct CPUPPCState {
-     /* when a memory exception occurs, the access type is stored here */
-     int access_type;
- 
--    CPU_COMMON
+     /*
+-     * Add the tlb_table pointer, creating the CPUTLBEntry address in R2.
+-     * Load the tlb comparator into R0/R1 and the fast path addend into R2.
++     * We don't support inline unaligned acceses, but we can easily
++     * support overalignment checks.
+      */
+-    if (cmp_off == 0) {
+-	if (use_armv6_instructions && TARGET_LONG_BITS == 64) {
+-            tcg_out_ldrd_rwb(s, COND_AL, TCG_REG_R0, TCG_REG_R2, TCG_REG_TMP);
+-        } else {
+-            tcg_out_ld32_rwb(s, COND_AL, TCG_REG_R0, TCG_REG_R2, TCG_REG_TMP);
+-        }
+-    } else {
+-        tcg_out_dat_reg(s, COND_AL, ARITH_ADD,
+-		        TCG_REG_R2, TCG_REG_R2, TCG_REG_TMP, 0);
+-        if (use_armv6_instructions && TARGET_LONG_BITS == 64) {
+-            tcg_out_ldrd_8(s, COND_AL, TCG_REG_R0, TCG_REG_R2, cmp_off);
+-        } else {
+-            tcg_out_ld32_12(s, COND_AL, TCG_REG_R0, TCG_REG_R2, cmp_off);
+-	}
+-    }
+-    if (!use_armv6_instructions && TARGET_LONG_BITS == 64) {
+-        tcg_out_ld32_12(s, COND_AL, TCG_REG_R1, TCG_REG_R2, cmp_off + 4);
+-    }
 -
-     /* MMU context - only relevant for full system emulation */
- #if !defined(CONFIG_USER_ONLY)
- #if defined(TARGET_PPC64)
-diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
-index 0ed7031915..a935b17dbd 100644
---- a/target/riscv/cpu.h
-+++ b/target/riscv/cpu.h
-@@ -171,9 +171,6 @@ struct CPURISCVState {
- 
-     float_status fp_status;
- 
--    /* QEMU */
--    CPU_COMMON
+-    /* Load the tlb addend.  */
+-    tcg_out_ld32_12(s, COND_AL, TCG_REG_R2, TCG_REG_R2,
+-                    offsetof(CPUTLBEntry, addend));
 -
-     /* Fields from here on are preserved across CPU reset. */
-     QEMUTimer *timer; /* Internal timer */
- };
-diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
-index 21688b7c8c..cb103bc3e7 100644
---- a/target/s390x/cpu.h
-+++ b/target/s390x/cpu.h
-@@ -114,8 +114,6 @@ struct CPUS390XState {
-     /* Fields up to this point are cleared by a CPU reset */
-     struct {} end_reset_fields;
+-    /* Check alignment.  We don't support inline unaligned acceses,
+-       but we can easily support overalignment checks.  */
+     if (a_bits < s_bits) {
+         a_bits = s_bits;
+     }
  
--    CPU_COMMON
--
- #if !defined(CONFIG_USER_ONLY)
-     uint32_t core_id; /* PoP "CPU address", same as cpu_index */
-     uint64_t cpuid;
-diff --git a/target/sh4/cpu.h b/target/sh4/cpu.h
-index e266db411f..08cf275f79 100644
---- a/target/sh4/cpu.h
-+++ b/target/sh4/cpu.h
-@@ -179,8 +179,6 @@ typedef struct CPUSH4State {
-     /* Fields up to this point are cleared by a CPU reset */
-     struct {} end_reset_fields;
++    /* Load env_tlb(env)->f[mmu_idx].{mask,table} into {r0,r1}.  */
++    if (use_armv6_instructions) {
++        tcg_out_ldrd_8(s, COND_AL, TCG_REG_R0, TCG_AREG0, fast_off);
++    } else {
++        tcg_out_ld(s, TCG_TYPE_I32, TCG_REG_R0, TCG_AREG0, mask_off);
++        tcg_out_ld(s, TCG_TYPE_I32, TCG_REG_R1, TCG_AREG0, table_off);
++    }
++
++    /* Extract the tlb index from the address into R0.  */
++    tcg_out_dat_reg(s, COND_AL, ARITH_AND, TCG_REG_R0, TCG_REG_R0, addrlo,
++                    SHIFT_IMM_LSR(TARGET_PAGE_BITS - CPU_TLB_ENTRY_BITS));
++
++    /*
++     * Add the tlb_table pointer, creating the CPUTLBEntry address in R1.
++     * Load the tlb comparator into R2/R3 and the fast path addend into R1.
++     */
++    if (cmp_off == 0) {
++        if (use_armv6_instructions && TARGET_LONG_BITS == 64) {
++            tcg_out_ldrd_rwb(s, COND_AL, TCG_REG_R2, TCG_REG_R1, TCG_REG_R0);
++        } else {
++            tcg_out_ld32_rwb(s, COND_AL, TCG_REG_R2, TCG_REG_R1, TCG_REG_R0);
++        }
++    } else {
++        tcg_out_dat_reg(s, COND_AL, ARITH_ADD,
++                        TCG_REG_R1, TCG_REG_R1, TCG_REG_R0, 0);
++        if (use_armv6_instructions && TARGET_LONG_BITS == 64) {
++            tcg_out_ldrd_8(s, COND_AL, TCG_REG_R2, TCG_REG_R1, cmp_off);
++        } else {
++            tcg_out_ld32_12(s, COND_AL, TCG_REG_R2, TCG_REG_R1, cmp_off);
++        }
++    }
++    if (!use_armv6_instructions && TARGET_LONG_BITS == 64) {
++        tcg_out_ld32_12(s, COND_AL, TCG_REG_R3, TCG_REG_R1, cmp_off + 4);
++    }
++
++    /* Load the tlb addend.  */
++    tcg_out_ld32_12(s, COND_AL, TCG_REG_R1, TCG_REG_R1,
++                    offsetof(CPUTLBEntry, addend));
++
++    /* Check alignment, check comparators.  */
+     if (use_armv7_instructions) {
+         tcg_target_ulong mask = ~(TARGET_PAGE_MASK | ((1 << a_bits) - 1));
+         int rot = encode_imm(mask);
+@@ -1291,22 +1303,24 @@ static TCGReg tcg_out_tlb_read(TCGContext *s, TCGReg addrlo, TCGReg addrhi,
+             tcg_out_dat_reg(s, COND_AL, ARITH_BIC, TCG_REG_TMP,
+                             addrlo, TCG_REG_TMP, 0);
+         }
+-        tcg_out_dat_reg(s, COND_AL, ARITH_CMP, 0, TCG_REG_R0, TCG_REG_TMP, 0);
++        tcg_out_dat_reg(s, COND_AL, ARITH_CMP, 0, TCG_REG_R2, TCG_REG_TMP, 0);
+     } else {
+         if (a_bits) {
+             tcg_out_dat_imm(s, COND_AL, ARITH_TST, 0, addrlo,
+                             (1 << a_bits) - 1);
+         }
++        tcg_out_dat_reg(s, COND_AL, ARITH_MOV, TCG_REG_TMP, 0, addrlo,
++                        SHIFT_IMM_LSR(TARGET_PAGE_BITS));
+         tcg_out_dat_reg(s, (a_bits ? COND_EQ : COND_AL), ARITH_CMP,
+-                        0, TCG_REG_R0, TCG_REG_TMP,
++                        0, TCG_REG_R2, TCG_REG_TMP,
+                         SHIFT_IMM_LSL(TARGET_PAGE_BITS));
+     }
  
--    CPU_COMMON
--
-     /* Fields from here on are preserved over CPU reset. */
-     int id;			/* CPU model */
+     if (TARGET_LONG_BITS == 64) {
+-        tcg_out_dat_reg(s, COND_EQ, ARITH_CMP, 0, TCG_REG_R1, addrhi, 0);
++        tcg_out_dat_reg(s, COND_EQ, ARITH_CMP, 0, TCG_REG_R3, addrhi, 0);
+     }
  
-diff --git a/target/sparc/cpu.h b/target/sparc/cpu.h
-index a3c4f47d40..49e0349a81 100644
---- a/target/sparc/cpu.h
-+++ b/target/sparc/cpu.h
-@@ -446,8 +446,6 @@ struct CPUSPARCState {
-     /* Fields up to this point are cleared by a CPU reset */
-     struct {} end_reset_fields;
+-    return TCG_REG_R2;
++    return TCG_REG_R1;
+ }
  
--    CPU_COMMON
--
-     /* Fields from here on are preserved across CPU reset. */
-     target_ulong version;
-     uint32_t nwindows;
-diff --git a/target/tilegx/cpu.h b/target/tilegx/cpu.h
-index deb3e836ea..c2acb43c2b 100644
---- a/target/tilegx/cpu.h
-+++ b/target/tilegx/cpu.h
-@@ -93,8 +93,6 @@ typedef struct CPUTLGState {
- 
-     /* Fields up to this point are cleared by a CPU reset */
-     struct {} end_reset_fields;
--
--    CPU_COMMON
- } CPUTLGState;
- 
- #include "qom/cpu.h"
-diff --git a/target/tricore/cpu.h b/target/tricore/cpu.h
-index 03b293c1f6..52b07c73bf 100644
---- a/target/tricore/cpu.h
-+++ b/target/tricore/cpu.h
-@@ -184,8 +184,6 @@ struct CPUTriCoreState {
-     int error_code;
-     uint32_t hflags;    /* CPU State */
- 
--    CPU_COMMON
--
-     /* Internal CPU feature flags.  */
-     uint64_t features;
- 
-diff --git a/target/unicore32/cpu.h b/target/unicore32/cpu.h
-index 39beb32366..6b459dacde 100644
---- a/target/unicore32/cpu.h
-+++ b/target/unicore32/cpu.h
-@@ -55,8 +55,6 @@ typedef struct CPUUniCore32State {
-         float_status fp_status;
-     } ucf64;
- 
--    CPU_COMMON
--
-     /* Internal CPU feature flags.  */
-     uint32_t features;
- 
-diff --git a/target/xtensa/cpu.h b/target/xtensa/cpu.h
-index e2d7e8371d..bfc6604b76 100644
---- a/target/xtensa/cpu.h
-+++ b/target/xtensa/cpu.h
-@@ -541,8 +541,6 @@ typedef struct CPUXtensaState {
- 
-     /* Watchpoints for DBREAK registers */
-     struct CPUWatchpoint *cpu_watchpoint[MAX_NDBREAK];
--
--    CPU_COMMON
- } CPUXtensaState;
- 
- /**
+ /* Record the context of a call to the out of line helper code for the slow
 -- 
 2.17.1
 
