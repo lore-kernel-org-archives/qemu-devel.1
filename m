@@ -2,84 +2,87 @@ Return-Path: <SRS0=Y1tr=UJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2CFB9C28EBD
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 02:23:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6197C28EBD
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 02:23:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CF22420820
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 02:23:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6408F20820
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 02:23:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="l6NvCHMN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CF22420820
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="GSRvuqr+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6408F20820
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39742 helo=lists.gnu.org)
+Received: from localhost ([::1]:39744 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ha9xp-0000As-3h
-	for qemu-devel@archiver.kernel.org; Sun, 09 Jun 2019 22:23:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53000)
+	id 1ha9xv-000124-Md
+	for qemu-devel@archiver.kernel.org; Sun, 09 Jun 2019 22:23:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53122)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <richard.henderson@linaro.org>) id 1ha9du-0005wS-Ld
- for qemu-devel@nongnu.org; Sun, 09 Jun 2019 22:02:45 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1ha9e2-0006Ed-0A
+ for qemu-devel@nongnu.org; Sun, 09 Jun 2019 22:02:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1ha9dn-0001dA-Fd
- for qemu-devel@nongnu.org; Sun, 09 Jun 2019 22:02:38 -0400
-Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:41532)
+ (envelope-from <richard.henderson@linaro.org>) id 1ha9e0-0001kP-4V
+ for qemu-devel@nongnu.org; Sun, 09 Jun 2019 22:02:45 -0400
+Received: from mail-pf1-x42c.google.com ([2607:f8b0:4864:20::42c]:41861)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1ha9dm-0001cU-VR
- for qemu-devel@nongnu.org; Sun, 09 Jun 2019 22:02:31 -0400
-Received: by mail-pl1-x643.google.com with SMTP id s24so2979692plr.8
- for <qemu-devel@nongnu.org>; Sun, 09 Jun 2019 19:02:30 -0700 (PDT)
+ id 1ha9dz-0001jz-RR
+ for qemu-devel@nongnu.org; Sun, 09 Jun 2019 22:02:44 -0400
+Received: by mail-pf1-x42c.google.com with SMTP id m30so3805283pff.8
+ for <qemu-devel@nongnu.org>; Sun, 09 Jun 2019 19:02:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=oQdFDRzjyLw+iCbm3ZjcbyS6nK9og1EWIC2LDxDK1LM=;
- b=l6NvCHMNcGTvYzwrca6xOMpltQmJydhkzXn9kkaUoLIick5ty+SMRfw6dwKX6PPwce
- p/756E5ZqUzrAIFjhpdkb0tdR2CeW0TxA5epzUpT/cgCX+m91F+tjkt+eG/Gp5nQXd6t
- 3H7aixI2R1psD3jTXen8ZMRaR7fxi4IEXQlzvqnpCqTn6SP1FVHMS3NfuMCUA3ovN2xr
- 0Bc8emYzYbJbFAnhieVGCOucbvQQHUVWWLTKaDvwSzRLYQoqyos8QR0YxckKDvAvlcH4
- /98D3kEBN88Pp8WDGtl81MEnXjRGLo26Sb0s6Zw52JH5As9yf1rlKvw/57ZuK5M5gS0b
- M1Mw==
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=YlNyMLJrebyqTNe9alCGCP+GtKEH43Bwhp0Gyfzj14A=;
+ b=GSRvuqr+IBHmFKoyqYTA6zLSCMXc2X8V5+8D7u2jST6F56XjdC7gIUhJP2BDB83jOC
+ EJ1NYvGq946F7VmpeIvExsgqHmtVPMWUlszbl6Eksf1m50eStRQ+4QBa2nLbDKzuEjwa
+ LgtSo33xyUiousQgp9U+UloOHdj9hGK/UMRaaNNIuZlDfMV3m3y1tJQ45WT87GwR1JUb
+ Vo7rbqGY1SW9KJ0Ywyzm2bMuofY2diLct4Owe6kW8KHl983lzXOvZpkSWaU77KH81YPt
+ TjdP7Zt5qMZX0Rnr5ncpeXV/r28VjrWaCqMGd2h19ZR9J1MoC3rfqtP7NiM23fe8GErY
+ ujGg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references;
- bh=oQdFDRzjyLw+iCbm3ZjcbyS6nK9og1EWIC2LDxDK1LM=;
- b=dIsWwSutDeaP96+8eHkIXFJzz/coe3w0IlPe/z9eNlc225qNVccmu/cGGEn+vVfYia
- IE+qOyw1zV0thrplH0/OIMNnf+BGkL8ui6p5DYeTxHgvIsGC/rY9S1wt64xSXPvT3HRM
- FAaNL50gz2wGuh/PNeDICEXN/rMecD9lS0IAT5Vo9UFsWCWmR9vduCR/FFx9VxeOMLe0
- cI6S3JTpB9fBCe347mwmAkoHbkeFp32rfqUftmGu5aYsJmDPNaAt8Ch8mUAzHZa1uLY4
- jFcDjJWElMEJq67xEFmJUMw5YBjZyQ7SdL5o2CAiXV4fiwTsr7Qm9hXxv6jbGmEZHDRi
- 9o7w==
-X-Gm-Message-State: APjAAAWKcWfCYXh8FGtmu47wVHVV7hOCXJDS91qU32da1MU3VNkMdcTk
- n9CU59D6niyAIhigOwck+k2GaRZnZt0=
-X-Google-Smtp-Source: APXvYqxMbHmRoXrmYUuvuRm9I0RXMJQiGAUhlXzIH17ygiENR/q7sSGZ2bIupbUm8pPod34s9bTihw==
-X-Received: by 2002:a17:902:7c03:: with SMTP id
- x3mr43378539pll.242.1560132148528; 
- Sun, 09 Jun 2019 19:02:28 -0700 (PDT)
+ :references:mime-version:content-transfer-encoding;
+ bh=YlNyMLJrebyqTNe9alCGCP+GtKEH43Bwhp0Gyfzj14A=;
+ b=C2Q8hLGB85YphGTJuS7n7k8jURH4BSXFsqYoeszKW16tZFmn8LjZFzkoKW56UIRjHM
+ GhnE28gu7UXaR2gA+zTS6d4eeFZR19iCokhOOiZKYp5ujpabWJS6GDyip7jbdqyloAuI
+ n8uEF6pH9tFq6XAjHrNTuYpGo9Fxhw3HMe01Hxlwh5Ft5jIKoylo+a8UVoZsoymKDw95
+ jBW62Hmrd/haI1xNz5FoJdP9lwqKNKXnF8a42hsGD0xHhH6uhX1P8X04l68Opam8Q9lt
+ 9elc0L007kgASa+58XNO3UtwdlGnpHuz3zohuflQltVpvi6XgXbSnVVb8MvmahEWq6/J
+ rzRg==
+X-Gm-Message-State: APjAAAWVooch5LofTHSvpb6BZPpInp4IKF0RmWWRN0vicUGimk4+9h9B
+ jwxCnYPyrNuPMf01ipi85ezYfNIroME=
+X-Google-Smtp-Source: APXvYqyz7YJqRE0bloXdQEhsFdunvLVuwZyY7KGbMjjYivTJ+tTPVo6pbPADgf6lfMti+vmFEodTEg==
+X-Received: by 2002:a62:cdc8:: with SMTP id o191mr2348241pfg.74.1560132162450; 
+ Sun, 09 Jun 2019 19:02:42 -0700 (PDT)
 Received: from localhost.localdomain (97-113-13-231.tukw.qwest.net.
  [97.113.13.231])
- by smtp.gmail.com with ESMTPSA id l63sm9749013pfl.181.2019.06.09.19.02.27
+ by smtp.gmail.com with ESMTPSA id l63sm9749013pfl.181.2019.06.09.19.02.41
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Sun, 09 Jun 2019 19:02:27 -0700 (PDT)
+ Sun, 09 Jun 2019 19:02:41 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Sun,  9 Jun 2019 19:01:45 -0700
-Message-Id: <20190610020218.9228-7-richard.henderson@linaro.org>
+Date: Sun,  9 Jun 2019 19:01:57 -0700
+Message-Id: <20190610020218.9228-19-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190610020218.9228-1-richard.henderson@linaro.org>
 References: <20190610020218.9228-1-richard.henderson@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::643
-Subject: [Qemu-devel] [PULL 06/39] cpu: Replace ENV_GET_CPU with env_cpu
+X-Received-From: 2607:f8b0:4864:20::42c
+Subject: [Qemu-devel] [PULL 18/39] target/mips: Use env_cpu, env_archcpu
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,1778 +99,304 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Now that we have both ArchCPU and CPUArchState, we can define
-this generically instead of via macro in each target's cpu.h.
+Cleanup in the boilerplate that each target must define.
+Replace mips_env_get_cpu with env_archcpu.  The combination
+CPU(mips_env_get_cpu) should have used ENV_GET_CPU to begin;
+use env_cpu now.
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Acked-by: Alistair Francis <alistair.francis@wdc.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- accel/tcg/atomic_template.h               |  8 +--
- include/exec/cpu-all.h                    | 12 +++++
- include/exec/cpu_ldst_template.h          |  6 +--
- include/exec/cpu_ldst_useronly_template.h |  6 +--
- include/exec/softmmu-semi.h               | 16 +++---
- linux-user/cpu_loop-common.h              |  2 +-
- target/alpha/cpu.h                        |  2 -
- target/arm/cpu.h                          |  2 -
- target/cris/cpu.h                         |  2 -
- target/hppa/cpu.h                         |  1 -
- target/i386/cpu.h                         |  2 -
- target/lm32/cpu.h                         |  2 -
- target/m68k/cpu.h                         |  2 -
- target/microblaze/cpu.h                   |  2 -
- target/mips/cpu.h                         |  2 -
- target/moxie/cpu.h                        |  2 -
- target/nios2/cpu.h                        |  2 -
- target/openrisc/cpu.h                     |  2 -
- target/ppc/cpu.h                          |  2 -
- target/riscv/cpu.h                        |  1 -
- target/s390x/cpu.h                        |  2 -
- target/sh4/cpu.h                          |  2 -
- target/sparc/cpu.h                        |  2 -
- target/tilegx/cpu.h                       |  2 -
- target/tricore/cpu.h                      |  2 -
- target/unicore32/cpu.h                    |  2 -
- target/xtensa/cpu.h                       |  2 -
- accel/tcg/cputlb.c                        | 38 +++++++-------
- accel/tcg/tcg-runtime.c                   |  4 +-
- accel/tcg/translate-all.c                 |  2 +-
- accel/tcg/user-exec.c                     |  2 +-
- bsd-user/syscall.c                        |  6 +--
- hw/semihosting/console.c                  |  2 +-
- linux-user/arm/cpu_loop.c                 |  2 +-
- linux-user/cris/cpu_loop.c                |  2 +-
- linux-user/elfload.c                      |  6 +--
- linux-user/m68k/cpu_loop.c                |  2 +-
- linux-user/main.c                         |  2 +-
- linux-user/mips/cpu_loop.c                |  2 +-
- linux-user/nios2/cpu_loop.c               |  2 +-
- linux-user/riscv/cpu_loop.c               |  2 +-
- linux-user/signal.c                       |  8 +--
- linux-user/syscall.c                      | 18 +++----
- linux-user/uname.c                        |  2 +-
- target/arm/helper.c                       | 42 ++++++++--------
- target/hppa/op_helper.c                   |  2 +-
- target/i386/hax-all.c                     |  6 +--
- target/i386/hvf/x86_decode.c              | 22 ++++-----
- target/i386/hvf/x86_emu.c                 | 60 +++++++++++++----------
- target/i386/mem_helper.c                  |  4 +-
- target/m68k/op_helper.c                   |  2 +-
- target/nios2/mmu.c                        |  4 +-
- target/nios2/op_helper.c                  |  2 +-
- target/ppc/mmu_helper.c                   |  2 +-
- target/s390x/gdbstub.c                    | 24 ++++-----
- target/s390x/mem_helper.c                 |  2 +-
- target/sh4/op_helper.c                    |  2 +-
- docs/devel/tracing.txt                    |  4 +-
- scripts/tracetool/format/tcg_helper_c.py  |  2 +-
- 59 files changed, 175 insertions(+), 197 deletions(-)
+ target/mips/cpu.h                |  5 -----
+ hw/intc/mips_gic.c               |  2 +-
+ hw/mips/mips_int.c               |  2 +-
+ linux-user/mips/cpu_loop.c       |  2 +-
+ target/mips/helper.c             | 15 +++++----------
+ target/mips/op_helper.c          | 25 +++++++++++--------------
+ target/mips/translate.c          |  3 +--
+ target/mips/translate_init.inc.c |  4 +---
+ 8 files changed, 21 insertions(+), 37 deletions(-)
 
-diff --git a/accel/tcg/atomic_template.h b/accel/tcg/atomic_template.h
-index 685602b076..5aaf186253 100644
---- a/accel/tcg/atomic_template.h
-+++ b/accel/tcg/atomic_template.h
-@@ -62,21 +62,21 @@
- #define ATOMIC_TRACE_RMW do {                                           \
-         uint8_t info = glue(trace_mem_build_info_no_se, MEND)(SHIFT, false); \
-                                                                         \
--        trace_guest_mem_before_exec(ENV_GET_CPU(env), addr, info);      \
--        trace_guest_mem_before_exec(ENV_GET_CPU(env), addr,             \
-+        trace_guest_mem_before_exec(env_cpu(env), addr, info);      \
-+        trace_guest_mem_before_exec(env_cpu(env), addr,             \
-                                     info | TRACE_MEM_ST);               \
-     } while (0)
- 
- #define ATOMIC_TRACE_LD do {                                            \
-         uint8_t info = glue(trace_mem_build_info_no_se, MEND)(SHIFT, false); \
-                                                                         \
--        trace_guest_mem_before_exec(ENV_GET_CPU(env), addr, info);      \
-+        trace_guest_mem_before_exec(env_cpu(env), addr, info);      \
-     } while (0)
- 
- # define ATOMIC_TRACE_ST do {                                           \
-         uint8_t info = glue(trace_mem_build_info_no_se, MEND)(SHIFT, true); \
-                                                                         \
--        trace_guest_mem_before_exec(ENV_GET_CPU(env), addr, info);      \
-+        trace_guest_mem_before_exec(env_cpu(env), addr, info);      \
-     } while (0)
- 
- /* Define host-endian atomic operations.  Note that END is used within
-diff --git a/include/exec/cpu-all.h b/include/exec/cpu-all.h
-index da07ce311f..454f6d663f 100644
---- a/include/exec/cpu-all.h
-+++ b/include/exec/cpu-all.h
-@@ -371,4 +371,16 @@ int cpu_memory_rw_debug(CPUState *cpu, target_ulong addr,
- 
- int cpu_exec(CPUState *cpu);
- 
-+/**
-+ * env_cpu(env)
-+ * @env: The architecture environment
-+ *
-+ * Return the CPUState associated with the environment.
-+ */
-+static inline CPUState *env_cpu(CPUArchState *env)
-+{
-+    ArchCPU *arch_cpu = container_of(env, ArchCPU, env);
-+    return &arch_cpu->parent_obj;
-+}
-+
- #endif /* CPU_ALL_H */
-diff --git a/include/exec/cpu_ldst_template.h b/include/exec/cpu_ldst_template.h
-index 0f061d47ef..af7e0b49f2 100644
---- a/include/exec/cpu_ldst_template.h
-+++ b/include/exec/cpu_ldst_template.h
-@@ -89,7 +89,7 @@ glue(glue(glue(cpu_ld, USUFFIX), MEMSUFFIX), _ra)(CPUArchState *env,
- 
- #if !defined(SOFTMMU_CODE_ACCESS)
-     trace_guest_mem_before_exec(
--        ENV_GET_CPU(env), ptr,
-+        env_cpu(env), ptr,
-         trace_mem_build_info(SHIFT, false, MO_TE, false));
- #endif
- 
-@@ -128,7 +128,7 @@ glue(glue(glue(cpu_lds, SUFFIX), MEMSUFFIX), _ra)(CPUArchState *env,
- 
- #if !defined(SOFTMMU_CODE_ACCESS)
-     trace_guest_mem_before_exec(
--        ENV_GET_CPU(env), ptr,
-+        env_cpu(env), ptr,
-         trace_mem_build_info(SHIFT, true, MO_TE, false));
- #endif
- 
-@@ -170,7 +170,7 @@ glue(glue(glue(cpu_st, SUFFIX), MEMSUFFIX), _ra)(CPUArchState *env,
- 
- #if !defined(SOFTMMU_CODE_ACCESS)
-     trace_guest_mem_before_exec(
--        ENV_GET_CPU(env), ptr,
-+        env_cpu(env), ptr,
-         trace_mem_build_info(SHIFT, false, MO_TE, true));
- #endif
- 
-diff --git a/include/exec/cpu_ldst_useronly_template.h b/include/exec/cpu_ldst_useronly_template.h
-index 0fd6019af0..bc45e2b8d4 100644
---- a/include/exec/cpu_ldst_useronly_template.h
-+++ b/include/exec/cpu_ldst_useronly_template.h
-@@ -66,7 +66,7 @@ glue(glue(cpu_ld, USUFFIX), MEMSUFFIX)(CPUArchState *env, abi_ptr ptr)
- {
- #if !defined(CODE_ACCESS)
-     trace_guest_mem_before_exec(
--        ENV_GET_CPU(env), ptr,
-+        env_cpu(env), ptr,
-         trace_mem_build_info(SHIFT, false, MO_TE, false));
- #endif
-     return glue(glue(ld, USUFFIX), _p)(g2h(ptr));
-@@ -90,7 +90,7 @@ glue(glue(cpu_lds, SUFFIX), MEMSUFFIX)(CPUArchState *env, abi_ptr ptr)
- {
- #if !defined(CODE_ACCESS)
-     trace_guest_mem_before_exec(
--        ENV_GET_CPU(env), ptr,
-+        env_cpu(env), ptr,
-         trace_mem_build_info(SHIFT, true, MO_TE, false));
- #endif
-     return glue(glue(lds, SUFFIX), _p)(g2h(ptr));
-@@ -116,7 +116,7 @@ glue(glue(cpu_st, SUFFIX), MEMSUFFIX)(CPUArchState *env, abi_ptr ptr,
- {
- #if !defined(CODE_ACCESS)
-     trace_guest_mem_before_exec(
--        ENV_GET_CPU(env), ptr,
-+        env_cpu(env), ptr,
-         trace_mem_build_info(SHIFT, false, MO_TE, true));
- #endif
-     glue(glue(st, SUFFIX), _p)(g2h(ptr), v);
-diff --git a/include/exec/softmmu-semi.h b/include/exec/softmmu-semi.h
-index 7eefad8f39..970837992e 100644
---- a/include/exec/softmmu-semi.h
-+++ b/include/exec/softmmu-semi.h
-@@ -14,7 +14,7 @@ static inline uint64_t softmmu_tget64(CPUArchState *env, target_ulong addr)
- {
-     uint64_t val;
- 
--    cpu_memory_rw_debug(ENV_GET_CPU(env), addr, (uint8_t *)&val, 8, 0);
-+    cpu_memory_rw_debug(env_cpu(env), addr, (uint8_t *)&val, 8, 0);
-     return tswap64(val);
- }
- 
-@@ -22,7 +22,7 @@ static inline uint32_t softmmu_tget32(CPUArchState *env, target_ulong addr)
- {
-     uint32_t val;
- 
--    cpu_memory_rw_debug(ENV_GET_CPU(env), addr, (uint8_t *)&val, 4, 0);
-+    cpu_memory_rw_debug(env_cpu(env), addr, (uint8_t *)&val, 4, 0);
-     return tswap32(val);
- }
- 
-@@ -30,7 +30,7 @@ static inline uint32_t softmmu_tget8(CPUArchState *env, target_ulong addr)
- {
-     uint8_t val;
- 
--    cpu_memory_rw_debug(ENV_GET_CPU(env), addr, &val, 1, 0);
-+    cpu_memory_rw_debug(env_cpu(env), addr, &val, 1, 0);
-     return val;
- }
- 
-@@ -43,14 +43,14 @@ static inline void softmmu_tput64(CPUArchState *env,
-                                   target_ulong addr, uint64_t val)
- {
-     val = tswap64(val);
--    cpu_memory_rw_debug(ENV_GET_CPU(env), addr, (uint8_t *)&val, 8, 1);
-+    cpu_memory_rw_debug(env_cpu(env), addr, (uint8_t *)&val, 8, 1);
- }
- 
- static inline void softmmu_tput32(CPUArchState *env,
-                                   target_ulong addr, uint32_t val)
- {
-     val = tswap32(val);
--    cpu_memory_rw_debug(ENV_GET_CPU(env), addr, (uint8_t *)&val, 4, 1);
-+    cpu_memory_rw_debug(env_cpu(env), addr, (uint8_t *)&val, 4, 1);
- }
- #define put_user_u64(arg, p) ({ softmmu_tput64(env, p, arg) ; 0; })
- #define put_user_u32(arg, p) ({ softmmu_tput32(env, p, arg) ; 0; })
-@@ -63,7 +63,7 @@ static void *softmmu_lock_user(CPUArchState *env,
-     /* TODO: Make this something that isn't fixed size.  */
-     p = malloc(len);
-     if (p && copy) {
--        cpu_memory_rw_debug(ENV_GET_CPU(env), addr, p, len, 0);
-+        cpu_memory_rw_debug(env_cpu(env), addr, p, len, 0);
-     }
-     return p;
- }
-@@ -79,7 +79,7 @@ static char *softmmu_lock_user_string(CPUArchState *env, target_ulong addr)
-         return NULL;
-     }
-     do {
--        cpu_memory_rw_debug(ENV_GET_CPU(env), addr, &c, 1, 0);
-+        cpu_memory_rw_debug(env_cpu(env), addr, &c, 1, 0);
-         addr++;
-         *(p++) = c;
-     } while (c);
-@@ -90,7 +90,7 @@ static void softmmu_unlock_user(CPUArchState *env, void *p, target_ulong addr,
-                                 target_ulong len)
- {
-     if (len) {
--        cpu_memory_rw_debug(ENV_GET_CPU(env), addr, p, len, 1);
-+        cpu_memory_rw_debug(env_cpu(env), addr, p, len, 1);
-     }
-     free(p);
- }
-diff --git a/linux-user/cpu_loop-common.h b/linux-user/cpu_loop-common.h
-index c1d554a249..8828af28a4 100644
---- a/linux-user/cpu_loop-common.h
-+++ b/linux-user/cpu_loop-common.h
-@@ -24,7 +24,7 @@
- 
- #define EXCP_DUMP(env, fmt, ...)                                        \
- do {                                                                    \
--    CPUState *cs = ENV_GET_CPU(env);                                    \
-+    CPUState *cs = env_cpu(env);                                        \
-     fprintf(stderr, fmt , ## __VA_ARGS__);                              \
-     cpu_dump_state(cs, stderr, 0);                                      \
-     if (qemu_log_separate()) {                                          \
-diff --git a/target/alpha/cpu.h b/target/alpha/cpu.h
-index 5af0b6c542..e391195be0 100644
---- a/target/alpha/cpu.h
-+++ b/target/alpha/cpu.h
-@@ -283,8 +283,6 @@ static inline AlphaCPU *alpha_env_get_cpu(CPUAlphaState *env)
-     return container_of(env, AlphaCPU, env);
- }
- 
--#define ENV_GET_CPU(e) CPU(alpha_env_get_cpu(e))
--
- #define ENV_OFFSET offsetof(AlphaCPU, env)
- 
- #ifndef CONFIG_USER_ONLY
-diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index 4ebb6349f1..1afd1da491 100644
---- a/target/arm/cpu.h
-+++ b/target/arm/cpu.h
-@@ -922,8 +922,6 @@ void arm_cpu_post_init(Object *obj);
- 
- uint64_t arm_cpu_mp_affinity(int idx, uint8_t clustersz);
- 
--#define ENV_GET_CPU(e) CPU(arm_env_get_cpu(e))
--
- #define ENV_OFFSET offsetof(ARMCPU, env)
- 
- #ifndef CONFIG_USER_ONLY
-diff --git a/target/cris/cpu.h b/target/cris/cpu.h
-index e978eb9539..0746d19f38 100644
---- a/target/cris/cpu.h
-+++ b/target/cris/cpu.h
-@@ -188,8 +188,6 @@ static inline CRISCPU *cris_env_get_cpu(CPUCRISState *env)
-     return container_of(env, CRISCPU, env);
- }
- 
--#define ENV_GET_CPU(e) CPU(cris_env_get_cpu(e))
--
- #define ENV_OFFSET offsetof(CRISCPU, env)
- 
- #ifndef CONFIG_USER_ONLY
-diff --git a/target/hppa/cpu.h b/target/hppa/cpu.h
-index 6eef107370..0cb1fc8800 100644
---- a/target/hppa/cpu.h
-+++ b/target/hppa/cpu.h
-@@ -227,7 +227,6 @@ static inline HPPACPU *hppa_env_get_cpu(CPUHPPAState *env)
-     return container_of(env, HPPACPU, env);
- }
- 
--#define ENV_GET_CPU(e)  CPU(hppa_env_get_cpu(e))
- #define ENV_OFFSET      offsetof(HPPACPU, env)
- 
- typedef CPUHPPAState CPUArchState;
-diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index 65f8f4d16c..103fd709b0 100644
---- a/target/i386/cpu.h
-+++ b/target/i386/cpu.h
-@@ -1485,8 +1485,6 @@ static inline X86CPU *x86_env_get_cpu(CPUX86State *env)
-     return container_of(env, X86CPU, env);
- }
- 
--#define ENV_GET_CPU(e) CPU(x86_env_get_cpu(e))
--
- #define ENV_OFFSET offsetof(X86CPU, env)
- 
- #ifndef CONFIG_USER_ONLY
-diff --git a/target/lm32/cpu.h b/target/lm32/cpu.h
-index 08c360bd16..ad9452eb9f 100644
---- a/target/lm32/cpu.h
-+++ b/target/lm32/cpu.h
-@@ -200,8 +200,6 @@ static inline LM32CPU *lm32_env_get_cpu(CPULM32State *env)
-     return container_of(env, LM32CPU, env);
- }
- 
--#define ENV_GET_CPU(e) CPU(lm32_env_get_cpu(e))
--
- #define ENV_OFFSET offsetof(LM32CPU, env)
- 
- #ifndef CONFIG_USER_ONLY
-diff --git a/target/m68k/cpu.h b/target/m68k/cpu.h
-index 1d30b73bdf..2e53cde076 100644
---- a/target/m68k/cpu.h
-+++ b/target/m68k/cpu.h
-@@ -168,8 +168,6 @@ static inline M68kCPU *m68k_env_get_cpu(CPUM68KState *env)
-     return container_of(env, M68kCPU, env);
- }
- 
--#define ENV_GET_CPU(e) CPU(m68k_env_get_cpu(e))
--
- #define ENV_OFFSET offsetof(M68kCPU, env)
- 
- void m68k_cpu_do_interrupt(CPUState *cpu);
-diff --git a/target/microblaze/cpu.h b/target/microblaze/cpu.h
-index 5a7fe3cbf8..6e68e00e1f 100644
---- a/target/microblaze/cpu.h
-+++ b/target/microblaze/cpu.h
-@@ -315,8 +315,6 @@ static inline MicroBlazeCPU *mb_env_get_cpu(CPUMBState *env)
-     return container_of(env, MicroBlazeCPU, env);
- }
- 
--#define ENV_GET_CPU(e) CPU(mb_env_get_cpu(e))
--
- #define ENV_OFFSET offsetof(MicroBlazeCPU, env)
- 
- void mb_cpu_do_interrupt(CPUState *cs);
 diff --git a/target/mips/cpu.h b/target/mips/cpu.h
-index 12527ca104..e684572dda 100644
+index e684572dda..cb09425476 100644
 --- a/target/mips/cpu.h
 +++ b/target/mips/cpu.h
-@@ -1076,8 +1076,6 @@ static inline MIPSCPU *mips_env_get_cpu(CPUMIPSState *env)
-     return container_of(env, MIPSCPU, env);
- }
+@@ -1071,11 +1071,6 @@ struct MIPSCPU {
+     CPUMIPSState env;
+ };
  
--#define ENV_GET_CPU(e) CPU(mips_env_get_cpu(e))
+-static inline MIPSCPU *mips_env_get_cpu(CPUMIPSState *env)
+-{
+-    return container_of(env, MIPSCPU, env);
+-}
 -
  #define ENV_OFFSET offsetof(MIPSCPU, env)
  
  void mips_cpu_list(void);
-diff --git a/target/moxie/cpu.h b/target/moxie/cpu.h
-index b27b0eabae..275fb9bfbb 100644
---- a/target/moxie/cpu.h
-+++ b/target/moxie/cpu.h
-@@ -95,8 +95,6 @@ static inline MoxieCPU *moxie_env_get_cpu(CPUMoxieState *env)
-     return container_of(env, MoxieCPU, env);
- }
- 
--#define ENV_GET_CPU(e) CPU(moxie_env_get_cpu(e))
--
- #define ENV_OFFSET offsetof(MoxieCPU, env)
- 
- void moxie_cpu_do_interrupt(CPUState *cs);
-diff --git a/target/nios2/cpu.h b/target/nios2/cpu.h
-index 5e51f1ae3f..ae6cf1b4d1 100644
---- a/target/nios2/cpu.h
-+++ b/target/nios2/cpu.h
-@@ -199,8 +199,6 @@ static inline Nios2CPU *nios2_env_get_cpu(CPUNios2State *env)
-     return NIOS2_CPU(container_of(env, Nios2CPU, env));
- }
- 
--#define ENV_GET_CPU(e) CPU(nios2_env_get_cpu(e))
--
- #define ENV_OFFSET offsetof(Nios2CPU, env)
- 
- void nios2_tcg_init(void);
-diff --git a/target/openrisc/cpu.h b/target/openrisc/cpu.h
-index 496895693e..50f79d540b 100644
---- a/target/openrisc/cpu.h
-+++ b/target/openrisc/cpu.h
-@@ -322,8 +322,6 @@ static inline OpenRISCCPU *openrisc_env_get_cpu(CPUOpenRISCState *env)
-     return container_of(env, OpenRISCCPU, env);
- }
- 
--#define ENV_GET_CPU(e) CPU(openrisc_env_get_cpu(e))
--
- #define ENV_OFFSET offsetof(OpenRISCCPU, env)
- 
- void cpu_openrisc_list(void);
-diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-index 17e7213be9..ec92a8e7af 100644
---- a/target/ppc/cpu.h
-+++ b/target/ppc/cpu.h
-@@ -1208,8 +1208,6 @@ static inline PowerPCCPU *ppc_env_get_cpu(CPUPPCState *env)
-     return container_of(env, PowerPCCPU, env);
- }
- 
--#define ENV_GET_CPU(e) CPU(ppc_env_get_cpu(e))
--
- #define ENV_OFFSET offsetof(PowerPCCPU, env)
- 
- PowerPCCPUClass *ppc_cpu_class_by_pvr(uint32_t pvr);
-diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
-index 8ee5051119..9ab038bac3 100644
---- a/target/riscv/cpu.h
-+++ b/target/riscv/cpu.h
-@@ -244,7 +244,6 @@ extern const char * const riscv_fpr_regnames[];
- extern const char * const riscv_excp_names[];
- extern const char * const riscv_intr_names[];
- 
--#define ENV_GET_CPU(e) CPU(riscv_env_get_cpu(e))
- #define ENV_OFFSET offsetof(RISCVCPU, env)
- 
- void riscv_cpu_do_interrupt(CPUState *cpu);
-diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
-index a8c3d702d3..56767f289d 100644
---- a/target/s390x/cpu.h
-+++ b/target/s390x/cpu.h
-@@ -168,8 +168,6 @@ static inline S390CPU *s390_env_get_cpu(CPUS390XState *env)
-     return container_of(env, S390CPU, env);
- }
- 
--#define ENV_GET_CPU(e) CPU(s390_env_get_cpu(e))
--
- #define ENV_OFFSET offsetof(S390CPU, env)
- 
- #ifndef CONFIG_USER_ONLY
-diff --git a/target/sh4/cpu.h b/target/sh4/cpu.h
-index 1bdc997290..8b17e6d63e 100644
---- a/target/sh4/cpu.h
-+++ b/target/sh4/cpu.h
-@@ -212,8 +212,6 @@ static inline SuperHCPU *sh_env_get_cpu(CPUSH4State *env)
-     return container_of(env, SuperHCPU, env);
- }
- 
--#define ENV_GET_CPU(e) CPU(sh_env_get_cpu(e))
--
- #define ENV_OFFSET offsetof(SuperHCPU, env)
- 
- void superh_cpu_do_interrupt(CPUState *cpu);
-diff --git a/target/sparc/cpu.h b/target/sparc/cpu.h
-index ba5904e05a..e29421349b 100644
---- a/target/sparc/cpu.h
-+++ b/target/sparc/cpu.h
-@@ -537,8 +537,6 @@ static inline SPARCCPU *sparc_env_get_cpu(CPUSPARCState *env)
-     return container_of(env, SPARCCPU, env);
- }
- 
--#define ENV_GET_CPU(e) CPU(sparc_env_get_cpu(e))
--
- #define ENV_OFFSET offsetof(SPARCCPU, env)
- 
- #ifndef CONFIG_USER_ONLY
-diff --git a/target/tilegx/cpu.h b/target/tilegx/cpu.h
-index 042a7a0c71..135df63523 100644
---- a/target/tilegx/cpu.h
-+++ b/target/tilegx/cpu.h
-@@ -143,8 +143,6 @@ static inline TileGXCPU *tilegx_env_get_cpu(CPUTLGState *env)
-     return container_of(env, TileGXCPU, env);
- }
- 
--#define ENV_GET_CPU(e) CPU(tilegx_env_get_cpu(e))
--
- #define ENV_OFFSET offsetof(TileGXCPU, env)
- 
- /* TILE-Gx memory attributes */
-diff --git a/target/tricore/cpu.h b/target/tricore/cpu.h
-index 8d660df34a..4a2a955cc5 100644
---- a/target/tricore/cpu.h
-+++ b/target/tricore/cpu.h
-@@ -213,8 +213,6 @@ static inline TriCoreCPU *tricore_env_get_cpu(CPUTriCoreState *env)
-     return TRICORE_CPU(container_of(env, TriCoreCPU, env));
- }
- 
--#define ENV_GET_CPU(e) CPU(tricore_env_get_cpu(e))
--
- #define ENV_OFFSET offsetof(TriCoreCPU, env)
- 
- hwaddr tricore_cpu_get_phys_page_debug(CPUState *cpu, vaddr addr);
-diff --git a/target/unicore32/cpu.h b/target/unicore32/cpu.h
-index 5c9c4d98c0..e91cec4d2e 100644
---- a/target/unicore32/cpu.h
-+++ b/target/unicore32/cpu.h
-@@ -81,8 +81,6 @@ static inline UniCore32CPU *uc32_env_get_cpu(CPUUniCore32State *env)
-     return container_of(env, UniCore32CPU, env);
- }
- 
--#define ENV_GET_CPU(e) CPU(uc32_env_get_cpu(e))
--
- #define ENV_OFFSET offsetof(UniCore32CPU, env)
- 
- void uc32_cpu_do_interrupt(CPUState *cpu);
-diff --git a/target/xtensa/cpu.h b/target/xtensa/cpu.h
-index 6e6fb1d893..3de53cb5d0 100644
---- a/target/xtensa/cpu.h
-+++ b/target/xtensa/cpu.h
-@@ -564,8 +564,6 @@ static inline XtensaCPU *xtensa_env_get_cpu(const CPUXtensaState *env)
-     return container_of(env, XtensaCPU, env);
- }
- 
--#define ENV_GET_CPU(e) CPU(xtensa_env_get_cpu(e))
--
- #define ENV_OFFSET offsetof(XtensaCPU, env)
- 
- 
-diff --git a/accel/tcg/cputlb.c b/accel/tcg/cputlb.c
-index a3a39e9a77..baa3eb8f92 100644
---- a/accel/tcg/cputlb.c
-+++ b/accel/tcg/cputlb.c
-@@ -415,7 +415,7 @@ static inline void tlb_flush_vtlb_page_locked(CPUArchState *env, int mmu_idx,
-     CPUTLBDesc *d = &env_tlb(env)->d[mmu_idx];
-     int k;
- 
--    assert_cpu_is_self(ENV_GET_CPU(env));
-+    assert_cpu_is_self(env_cpu(env));
-     for (k = 0; k < CPU_VTLB_SIZE; k++) {
-         if (tlb_flush_entry_locked(&d->vtable[k], page)) {
-             tlb_n_used_entries_dec(env, mmu_idx);
-@@ -883,7 +883,7 @@ static uint64_t io_readx(CPUArchState *env, CPUIOTLBEntry *iotlbentry,
-                          int mmu_idx, target_ulong addr, uintptr_t retaddr,
-                          MMUAccessType access_type, int size)
- {
--    CPUState *cpu = ENV_GET_CPU(env);
-+    CPUState *cpu = env_cpu(env);
-     hwaddr mr_offset;
-     MemoryRegionSection *section;
-     MemoryRegion *mr;
-@@ -927,7 +927,7 @@ static void io_writex(CPUArchState *env, CPUIOTLBEntry *iotlbentry,
-                       int mmu_idx, uint64_t val, target_ulong addr,
-                       uintptr_t retaddr, int size)
- {
--    CPUState *cpu = ENV_GET_CPU(env);
-+    CPUState *cpu = env_cpu(env);
-     hwaddr mr_offset;
-     MemoryRegionSection *section;
-     MemoryRegion *mr;
-@@ -979,7 +979,7 @@ static bool victim_tlb_hit(CPUArchState *env, size_t mmu_idx, size_t index,
- {
-     size_t vidx;
- 
--    assert_cpu_is_self(ENV_GET_CPU(env));
-+    assert_cpu_is_self(env_cpu(env));
-     for (vidx = 0; vidx < CPU_VTLB_SIZE; ++vidx) {
-         CPUTLBEntry *vtlb = &env_tlb(env)->d[mmu_idx].vtable[vidx];
-         target_ulong cmp;
-@@ -1029,7 +1029,7 @@ tb_page_addr_t get_page_addr_code(CPUArchState *env, target_ulong addr)
- 
-     if (unlikely(!tlb_hit(entry->addr_code, addr))) {
-         if (!VICTIM_TLB_HIT(addr_code, addr)) {
--            tlb_fill(ENV_GET_CPU(env), addr, 0, MMU_INST_FETCH, mmu_idx, 0);
-+            tlb_fill(env_cpu(env), addr, 0, MMU_INST_FETCH, mmu_idx, 0);
-             index = tlb_index(env, mmu_idx, addr);
-             entry = tlb_entry(env, mmu_idx, addr);
-         }
-@@ -1067,7 +1067,7 @@ void probe_write(CPUArchState *env, target_ulong addr, int size, int mmu_idx,
-     if (!tlb_hit(tlb_addr_write(entry), addr)) {
-         /* TLB entry is for a different page */
-         if (!VICTIM_TLB_HIT(addr_write, addr)) {
--            tlb_fill(ENV_GET_CPU(env), addr, size, MMU_DATA_STORE,
-+            tlb_fill(env_cpu(env), addr, size, MMU_DATA_STORE,
-                      mmu_idx, retaddr);
-         }
+diff --git a/hw/intc/mips_gic.c b/hw/intc/mips_gic.c
+index 15e6e40f9f..8f509493ea 100644
+--- a/hw/intc/mips_gic.c
++++ b/hw/intc/mips_gic.c
+@@ -44,7 +44,7 @@ static void mips_gic_set_vp_irq(MIPSGICState *gic, int vp, int pin)
+                       GIC_VP_MASK_CMP_SHF;
      }
-@@ -1101,7 +1101,7 @@ void *tlb_vaddr_to_host(CPUArchState *env, abi_ptr addr,
-         uintptr_t index = tlb_index(env, mmu_idx, addr);
- 
-         if (!victim_tlb_hit(env, mmu_idx, index, elt_ofs, page)) {
--            CPUState *cs = ENV_GET_CPU(env);
-+            CPUState *cs = env_cpu(env);
-             CPUClass *cc = CPU_GET_CLASS(cs);
- 
-             if (!cc->tlb_fill(cs, addr, 0, access_type, mmu_idx, true, 0)) {
-@@ -1144,7 +1144,7 @@ static void *atomic_mmu_lookup(CPUArchState *env, target_ulong addr,
-     /* Enforce guest required alignment.  */
-     if (unlikely(a_bits > 0 && (addr & ((1 << a_bits) - 1)))) {
-         /* ??? Maybe indicate atomic op to cpu_unaligned_access */
--        cpu_unaligned_access(ENV_GET_CPU(env), addr, MMU_DATA_STORE,
-+        cpu_unaligned_access(env_cpu(env), addr, MMU_DATA_STORE,
-                              mmu_idx, retaddr);
-     }
- 
-@@ -1160,7 +1160,7 @@ static void *atomic_mmu_lookup(CPUArchState *env, target_ulong addr,
-     /* Check TLB entry and enforce page permissions.  */
-     if (!tlb_hit(tlb_addr, addr)) {
-         if (!VICTIM_TLB_HIT(addr_write, addr)) {
--            tlb_fill(ENV_GET_CPU(env), addr, 1 << s_bits, MMU_DATA_STORE,
-+            tlb_fill(env_cpu(env), addr, 1 << s_bits, MMU_DATA_STORE,
-                      mmu_idx, retaddr);
-             index = tlb_index(env, mmu_idx, addr);
-             tlbe = tlb_entry(env, mmu_idx, addr);
-@@ -1177,7 +1177,7 @@ static void *atomic_mmu_lookup(CPUArchState *env, target_ulong addr,
- 
-     /* Let the guest notice RMW on a write-only page.  */
-     if (unlikely(tlbe->addr_read != (tlb_addr & ~TLB_NOTDIRTY))) {
--        tlb_fill(ENV_GET_CPU(env), addr, 1 << s_bits, MMU_DATA_LOAD,
-+        tlb_fill(env_cpu(env), addr, 1 << s_bits, MMU_DATA_LOAD,
-                  mmu_idx, retaddr);
-         /* Since we don't support reads and writes to different addresses,
-            and we do have the proper page loaded for write, this shouldn't
-@@ -1190,7 +1190,7 @@ static void *atomic_mmu_lookup(CPUArchState *env, target_ulong addr,
-     ndi->active = false;
-     if (unlikely(tlb_addr & TLB_NOTDIRTY)) {
-         ndi->active = true;
--        memory_notdirty_write_prepare(ndi, ENV_GET_CPU(env), addr,
-+        memory_notdirty_write_prepare(ndi, env_cpu(env), addr,
-                                       qemu_ram_addr_from_host_nofail(hostaddr),
-                                       1 << s_bits);
-     }
-@@ -1198,7 +1198,7 @@ static void *atomic_mmu_lookup(CPUArchState *env, target_ulong addr,
-     return hostaddr;
- 
-  stop_the_world:
--    cpu_loop_exit_atomic(ENV_GET_CPU(env), retaddr);
-+    cpu_loop_exit_atomic(env_cpu(env), retaddr);
- }
- 
- #ifdef TARGET_WORDS_BIGENDIAN
-@@ -1263,7 +1263,7 @@ load_helper(CPUArchState *env, target_ulong addr, TCGMemOpIdx oi,
- 
-     /* Handle CPU specific unaligned behaviour */
-     if (addr & ((1 << a_bits) - 1)) {
--        cpu_unaligned_access(ENV_GET_CPU(env), addr, access_type,
-+        cpu_unaligned_access(env_cpu(env), addr, access_type,
-                              mmu_idx, retaddr);
-     }
- 
-@@ -1271,7 +1271,7 @@ load_helper(CPUArchState *env, target_ulong addr, TCGMemOpIdx oi,
-     if (!tlb_hit(tlb_addr, addr)) {
-         if (!victim_tlb_hit(env, mmu_idx, index, tlb_off,
-                             addr & TARGET_PAGE_MASK)) {
--            tlb_fill(ENV_GET_CPU(env), addr, size,
-+            tlb_fill(env_cpu(env), addr, size,
-                      access_type, mmu_idx, retaddr);
-             index = tlb_index(env, mmu_idx, addr);
-             entry = tlb_entry(env, mmu_idx, addr);
-@@ -1292,7 +1292,7 @@ load_helper(CPUArchState *env, target_ulong addr, TCGMemOpIdx oi,
-              * repeat the MMU check here. This tlb_fill() call might
-              * longjump out if this access should cause a guest exception.
-              */
--            tlb_fill(ENV_GET_CPU(env), addr, size,
-+            tlb_fill(env_cpu(env), addr, size,
-                      access_type, mmu_idx, retaddr);
-             index = tlb_index(env, mmu_idx, addr);
-             entry = tlb_entry(env, mmu_idx, addr);
-@@ -1511,7 +1511,7 @@ store_helper(CPUArchState *env, target_ulong addr, uint64_t val,
- 
-     /* Handle CPU specific unaligned behaviour */
-     if (addr & ((1 << a_bits) - 1)) {
--        cpu_unaligned_access(ENV_GET_CPU(env), addr, MMU_DATA_STORE,
-+        cpu_unaligned_access(env_cpu(env), addr, MMU_DATA_STORE,
-                              mmu_idx, retaddr);
-     }
- 
-@@ -1519,7 +1519,7 @@ store_helper(CPUArchState *env, target_ulong addr, uint64_t val,
-     if (!tlb_hit(tlb_addr, addr)) {
-         if (!victim_tlb_hit(env, mmu_idx, index, tlb_off,
-             addr & TARGET_PAGE_MASK)) {
--            tlb_fill(ENV_GET_CPU(env), addr, size, MMU_DATA_STORE,
-+            tlb_fill(env_cpu(env), addr, size, MMU_DATA_STORE,
-                      mmu_idx, retaddr);
-             index = tlb_index(env, mmu_idx, addr);
-             entry = tlb_entry(env, mmu_idx, addr);
-@@ -1540,7 +1540,7 @@ store_helper(CPUArchState *env, target_ulong addr, uint64_t val,
-              * repeat the MMU check here. This tlb_fill() call might
-              * longjump out if this access should cause a guest exception.
-              */
--            tlb_fill(ENV_GET_CPU(env), addr, size, MMU_DATA_STORE,
-+            tlb_fill(env_cpu(env), addr, size, MMU_DATA_STORE,
-                      mmu_idx, retaddr);
-             index = tlb_index(env, mmu_idx, addr);
-             entry = tlb_entry(env, mmu_idx, addr);
-@@ -1580,7 +1580,7 @@ store_helper(CPUArchState *env, target_ulong addr, uint64_t val,
-         if (!tlb_hit_page(tlb_addr2, page2)
-             && !victim_tlb_hit(env, mmu_idx, index2, tlb_off,
-                                page2 & TARGET_PAGE_MASK)) {
--            tlb_fill(ENV_GET_CPU(env), page2, size, MMU_DATA_STORE,
-+            tlb_fill(env_cpu(env), page2, size, MMU_DATA_STORE,
-                      mmu_idx, retaddr);
-         }
- 
-diff --git a/accel/tcg/tcg-runtime.c b/accel/tcg/tcg-runtime.c
-index d0d4484406..8a1e408e31 100644
---- a/accel/tcg/tcg-runtime.c
-+++ b/accel/tcg/tcg-runtime.c
-@@ -146,7 +146,7 @@ uint64_t HELPER(ctpop_i64)(uint64_t arg)
- 
- void *HELPER(lookup_tb_ptr)(CPUArchState *env)
- {
--    CPUState *cpu = ENV_GET_CPU(env);
-+    CPUState *cpu = env_cpu(env);
-     TranslationBlock *tb;
-     target_ulong cs_base, pc;
-     uint32_t flags;
-@@ -165,5 +165,5 @@ void *HELPER(lookup_tb_ptr)(CPUArchState *env)
- 
- void HELPER(exit_atomic)(CPUArchState *env)
- {
--    cpu_loop_exit_atomic(ENV_GET_CPU(env), GETPC());
-+    cpu_loop_exit_atomic(env_cpu(env), GETPC());
- }
-diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
-index 20b59f93f4..52d94facf0 100644
---- a/accel/tcg/translate-all.c
-+++ b/accel/tcg/translate-all.c
-@@ -1732,7 +1732,7 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
- 
-     tcg_func_start(tcg_ctx);
- 
--    tcg_ctx->cpu = ENV_GET_CPU(env);
-+    tcg_ctx->cpu = env_cpu(env);
-     gen_intermediate_code(cpu, tb, max_insns);
-     tcg_ctx->cpu = NULL;
- 
-diff --git a/accel/tcg/user-exec.c b/accel/tcg/user-exec.c
-index 8cfbeb1b56..cb5f4b19c5 100644
---- a/accel/tcg/user-exec.c
-+++ b/accel/tcg/user-exec.c
-@@ -680,7 +680,7 @@ static void *atomic_mmu_lookup(CPUArchState *env, target_ulong addr,
- {
-     /* Enforce qemu required alignment.  */
-     if (unlikely(addr & (size - 1))) {
--        cpu_loop_exit_atomic(ENV_GET_CPU(env), retaddr);
-+        cpu_loop_exit_atomic(env_cpu(env), retaddr);
-     }
-     helper_retaddr = retaddr;
-     return g2h(addr);
-diff --git a/bsd-user/syscall.c b/bsd-user/syscall.c
-index 66492aaf5d..1ee6195d9f 100644
---- a/bsd-user/syscall.c
-+++ b/bsd-user/syscall.c
-@@ -315,7 +315,7 @@ abi_long do_freebsd_syscall(void *cpu_env, int num, abi_long arg1,
-                             abi_long arg5, abi_long arg6, abi_long arg7,
-                             abi_long arg8)
- {
--    CPUState *cpu = ENV_GET_CPU(cpu_env);
-+    CPUState *cpu = env_cpu(cpu_env);
-     abi_long ret;
-     void *p;
- 
-@@ -413,7 +413,7 @@ abi_long do_netbsd_syscall(void *cpu_env, int num, abi_long arg1,
-                            abi_long arg2, abi_long arg3, abi_long arg4,
-                            abi_long arg5, abi_long arg6)
- {
--    CPUState *cpu = ENV_GET_CPU(cpu_env);
-+    CPUState *cpu = env_cpu(cpu_env);
-     abi_long ret;
-     void *p;
- 
-@@ -488,7 +488,7 @@ abi_long do_openbsd_syscall(void *cpu_env, int num, abi_long arg1,
-                             abi_long arg2, abi_long arg3, abi_long arg4,
-                             abi_long arg5, abi_long arg6)
- {
--    CPUState *cpu = ENV_GET_CPU(cpu_env);
-+    CPUState *cpu = env_cpu(cpu_env);
-     abi_long ret;
-     void *p;
- 
-diff --git a/hw/semihosting/console.c b/hw/semihosting/console.c
-index 466ea6dade..4ab7533bb8 100644
---- a/hw/semihosting/console.c
-+++ b/hw/semihosting/console.c
-@@ -40,7 +40,7 @@ int qemu_semihosting_log_out(const char *s, int len)
-  */
- static GString *copy_user_string(CPUArchState *env, target_ulong addr, int len)
- {
--    CPUState *cpu = ENV_GET_CPU(env);
-+    CPUState *cpu = env_cpu(env);
-     GString *s = g_string_sized_new(len ? len : 128);
-     uint8_t c;
-     bool done;
-diff --git a/linux-user/arm/cpu_loop.c b/linux-user/arm/cpu_loop.c
-index ee68aa60bf..b7e7a6323c 100644
---- a/linux-user/arm/cpu_loop.c
-+++ b/linux-user/arm/cpu_loop.c
-@@ -423,7 +423,7 @@ void cpu_loop(CPUARMState *env)
- 
- void target_cpu_copy_regs(CPUArchState *env, struct target_pt_regs *regs)
- {
--    CPUState *cpu = ENV_GET_CPU(env);
-+    CPUState *cpu = env_cpu(env);
-     TaskState *ts = cpu->opaque;
-     struct image_info *info = ts->info;
-     int i;
-diff --git a/linux-user/cris/cpu_loop.c b/linux-user/cris/cpu_loop.c
-index af8c128bf8..7ec36cb0b5 100644
---- a/linux-user/cris/cpu_loop.c
-+++ b/linux-user/cris/cpu_loop.c
-@@ -83,7 +83,7 @@ void cpu_loop(CPUCRISState *env)
- 
- void target_cpu_copy_regs(CPUArchState *env, struct target_pt_regs *regs)
- {
--    CPUState *cpu = ENV_GET_CPU(env);
-+    CPUState *cpu = env_cpu(env);
-     TaskState *ts = cpu->opaque;
-     struct image_info *info = ts->info;
- 
-diff --git a/linux-user/elfload.c b/linux-user/elfload.c
-index 5451d262ec..9fd65708c4 100644
---- a/linux-user/elfload.c
-+++ b/linux-user/elfload.c
-@@ -3377,7 +3377,7 @@ static int write_note(struct memelfnote *men, int fd)
- 
- static void fill_thread_info(struct elf_note_info *info, const CPUArchState *env)
- {
--    CPUState *cpu = ENV_GET_CPU((CPUArchState *)env);
-+    CPUState *cpu = env_cpu((CPUArchState *)env);
-     TaskState *ts = (TaskState *)cpu->opaque;
-     struct elf_thread_status *ets;
- 
-@@ -3407,7 +3407,7 @@ static int fill_note_info(struct elf_note_info *info,
-                           long signr, const CPUArchState *env)
- {
- #define NUMNOTES 3
--    CPUState *cpu = ENV_GET_CPU((CPUArchState *)env);
-+    CPUState *cpu = env_cpu((CPUArchState *)env);
-     TaskState *ts = (TaskState *)cpu->opaque;
+     if (kvm_enabled())  {
+-        kvm_mips_set_ipi_interrupt(mips_env_get_cpu(gic->vps[vp].env),
++        kvm_mips_set_ipi_interrupt(env_archcpu(gic->vps[vp].env),
+                                    pin + GIC_CPU_PIN_OFFSET,
+                                    ored_level);
+     } else {
+diff --git a/hw/mips/mips_int.c b/hw/mips/mips_int.c
+index 5ddeb15848..f899f6ceb3 100644
+--- a/hw/mips/mips_int.c
++++ b/hw/mips/mips_int.c
+@@ -76,7 +76,7 @@ void cpu_mips_irq_init_cpu(MIPSCPU *cpu)
+     qemu_irq *qi;
      int i;
  
-@@ -3531,7 +3531,7 @@ static int write_note_info(struct elf_note_info *info, int fd)
-  */
- static int elf_core_dump(int signr, const CPUArchState *env)
- {
--    const CPUState *cpu = ENV_GET_CPU((CPUArchState *)env);
-+    const CPUState *cpu = env_cpu((CPUArchState *)env);
-     const TaskState *ts = (const TaskState *)cpu->opaque;
-     struct vm_area_struct *vma = NULL;
-     char corefile[PATH_MAX];
-diff --git a/linux-user/m68k/cpu_loop.c b/linux-user/m68k/cpu_loop.c
-index bfb41bbcc5..42d8d841ea 100644
---- a/linux-user/m68k/cpu_loop.c
-+++ b/linux-user/m68k/cpu_loop.c
-@@ -130,7 +130,7 @@ void cpu_loop(CPUM68KState *env)
- 
- void target_cpu_copy_regs(CPUArchState *env, struct target_pt_regs *regs)
- {
--    CPUState *cpu = ENV_GET_CPU(env);
-+    CPUState *cpu = env_cpu(env);
-     TaskState *ts = cpu->opaque;
-     struct image_info *info = ts->info;
- 
-diff --git a/linux-user/main.c b/linux-user/main.c
-index 689bcf436d..97ca22bb04 100644
---- a/linux-user/main.c
-+++ b/linux-user/main.c
-@@ -180,7 +180,7 @@ void init_task_state(TaskState *ts)
- 
- CPUArchState *cpu_copy(CPUArchState *env)
- {
--    CPUState *cpu = ENV_GET_CPU(env);
-+    CPUState *cpu = env_cpu(env);
-     CPUState *new_cpu = cpu_create(cpu_type);
-     CPUArchState *new_env = new_cpu->env_ptr;
-     CPUBreakpoint *bp;
+-    qi = qemu_allocate_irqs(cpu_mips_irq_request, mips_env_get_cpu(env), 8);
++    qi = qemu_allocate_irqs(cpu_mips_irq_request, env_archcpu(env), 8);
+     for (i = 0; i < 8; i++) {
+         env->irq[i] = qi[i];
+     }
 diff --git a/linux-user/mips/cpu_loop.c b/linux-user/mips/cpu_loop.c
-index 61dc90d51c..828137cd84 100644
+index 828137cd84..ac6c6d1504 100644
 --- a/linux-user/mips/cpu_loop.c
 +++ b/linux-user/mips/cpu_loop.c
-@@ -654,7 +654,7 @@ error:
+@@ -425,7 +425,7 @@ static int do_break(CPUMIPSState *env, target_siginfo_t *info,
  
- void target_cpu_copy_regs(CPUArchState *env, struct target_pt_regs *regs)
+ void cpu_loop(CPUMIPSState *env)
  {
--    CPUState *cpu = ENV_GET_CPU(env);
-+    CPUState *cpu = env_cpu(env);
-     TaskState *ts = cpu->opaque;
-     struct image_info *info = ts->info;
-     int i;
-diff --git a/linux-user/nios2/cpu_loop.c b/linux-user/nios2/cpu_loop.c
-index 5aa1eca740..9869083fa1 100644
---- a/linux-user/nios2/cpu_loop.c
-+++ b/linux-user/nios2/cpu_loop.c
-@@ -23,7 +23,7 @@
- 
- void cpu_loop(CPUNios2State *env)
- {
--    CPUState *cs = ENV_GET_CPU(env);
+-    CPUState *cs = CPU(mips_env_get_cpu(env));
 +    CPUState *cs = env_cpu(env);
-     Nios2CPU *cpu = NIOS2_CPU(cs);
      target_siginfo_t info;
-     int trapnr, ret;
-diff --git a/linux-user/riscv/cpu_loop.c b/linux-user/riscv/cpu_loop.c
-index a9bac4ca79..31700f75d0 100644
---- a/linux-user/riscv/cpu_loop.c
-+++ b/linux-user/riscv/cpu_loop.c
-@@ -116,7 +116,7 @@ void cpu_loop(CPURISCVState *env)
- 
- void target_cpu_copy_regs(CPUArchState *env, struct target_pt_regs *regs)
- {
--    CPUState *cpu = ENV_GET_CPU(env);
-+    CPUState *cpu = env_cpu(env);
-     TaskState *ts = cpu->opaque;
-     struct image_info *info = ts->info;
- 
-diff --git a/linux-user/signal.c b/linux-user/signal.c
-index 44b2d3b35a..7c5588adff 100644
---- a/linux-user/signal.c
-+++ b/linux-user/signal.c
-@@ -626,7 +626,7 @@ static void QEMU_NORETURN dump_core_and_abort(int target_sig)
- int queue_signal(CPUArchState *env, int sig, int si_type,
-                  target_siginfo_t *info)
- {
--    CPUState *cpu = ENV_GET_CPU(env);
-+    CPUState *cpu = env_cpu(env);
-     TaskState *ts = cpu->opaque;
- 
-     trace_user_queue_signal(env, sig);
-@@ -651,7 +651,7 @@ static void host_signal_handler(int host_signum, siginfo_t *info,
-                                 void *puc)
- {
-     CPUArchState *env = thread_cpu->env_ptr;
--    CPUState *cpu = ENV_GET_CPU(env);
-+    CPUState *cpu = env_cpu(env);
-     TaskState *ts = cpu->opaque;
- 
-     int sig;
-@@ -842,7 +842,7 @@ int do_sigaction(int sig, const struct target_sigaction *act,
- static void handle_pending_signal(CPUArchState *cpu_env, int sig,
-                                   struct emulated_sigtable *k)
- {
--    CPUState *cpu = ENV_GET_CPU(cpu_env);
-+    CPUState *cpu = env_cpu(cpu_env);
-     abi_ulong handler;
-     sigset_t set;
-     target_sigset_t target_old_set;
-@@ -927,7 +927,7 @@ static void handle_pending_signal(CPUArchState *cpu_env, int sig,
- 
- void process_pending_signals(CPUArchState *cpu_env)
- {
--    CPUState *cpu = ENV_GET_CPU(cpu_env);
-+    CPUState *cpu = env_cpu(cpu_env);
-     int sig;
-     TaskState *ts = cpu->opaque;
-     sigset_t set;
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index 5e29e675e9..d1a2c7831f 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -5484,7 +5484,7 @@ static void *clone_func(void *arg)
-     rcu_register_thread();
-     tcg_register_thread();
-     env = info->env;
--    cpu = ENV_GET_CPU(env);
-+    cpu = env_cpu(env);
-     thread_cpu = cpu;
-     ts = (TaskState *)cpu->opaque;
-     info->tid = sys_gettid();
-@@ -5514,7 +5514,7 @@ static int do_fork(CPUArchState *env, unsigned int flags, abi_ulong newsp,
-                    abi_ulong parent_tidptr, target_ulong newtls,
-                    abi_ulong child_tidptr)
- {
--    CPUState *cpu = ENV_GET_CPU(env);
-+    CPUState *cpu = env_cpu(env);
-     int ret;
-     TaskState *ts;
-     CPUState *new_cpu;
-@@ -5547,7 +5547,7 @@ static int do_fork(CPUArchState *env, unsigned int flags, abi_ulong newsp,
-         new_env = cpu_copy(env);
-         /* Init regs that differ from the parent.  */
-         cpu_clone_regs(new_env, newsp);
--        new_cpu = ENV_GET_CPU(new_env);
-+        new_cpu = env_cpu(new_env);
-         new_cpu->opaque = ts;
-         ts->bprm = parent_ts->bprm;
-         ts->info = parent_ts->info;
-@@ -6654,7 +6654,7 @@ int host_to_target_waitstatus(int status)
- 
- static int open_self_cmdline(void *cpu_env, int fd)
- {
--    CPUState *cpu = ENV_GET_CPU((CPUArchState *)cpu_env);
-+    CPUState *cpu = env_cpu((CPUArchState *)cpu_env);
-     struct linux_binprm *bprm = ((TaskState *)cpu->opaque)->bprm;
-     int i;
- 
-@@ -6671,7 +6671,7 @@ static int open_self_cmdline(void *cpu_env, int fd)
- 
- static int open_self_maps(void *cpu_env, int fd)
- {
--    CPUState *cpu = ENV_GET_CPU((CPUArchState *)cpu_env);
-+    CPUState *cpu = env_cpu((CPUArchState *)cpu_env);
-     TaskState *ts = cpu->opaque;
-     FILE *fp;
-     char *line = NULL;
-@@ -6720,7 +6720,7 @@ static int open_self_maps(void *cpu_env, int fd)
- 
- static int open_self_stat(void *cpu_env, int fd)
- {
--    CPUState *cpu = ENV_GET_CPU((CPUArchState *)cpu_env);
-+    CPUState *cpu = env_cpu((CPUArchState *)cpu_env);
-     TaskState *ts = cpu->opaque;
-     abi_ulong start_stack = ts->info->start_stack;
-     int i;
-@@ -6757,7 +6757,7 @@ static int open_self_stat(void *cpu_env, int fd)
- 
- static int open_self_auxv(void *cpu_env, int fd)
- {
--    CPUState *cpu = ENV_GET_CPU((CPUArchState *)cpu_env);
-+    CPUState *cpu = env_cpu((CPUArchState *)cpu_env);
-     TaskState *ts = cpu->opaque;
-     abi_ulong auxv = ts->info->saved_auxv;
-     abi_ulong len = ts->info->auxv_len;
-@@ -7042,7 +7042,7 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
-                             abi_long arg5, abi_long arg6, abi_long arg7,
-                             abi_long arg8)
- {
--    CPUState *cpu = ENV_GET_CPU(cpu_env);
-+    CPUState *cpu = env_cpu(cpu_env);
+     int trapnr;
      abi_long ret;
- #if defined(TARGET_NR_stat) || defined(TARGET_NR_stat64) \
-     || defined(TARGET_NR_lstat) || defined(TARGET_NR_lstat64) \
-@@ -11706,7 +11706,7 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
-                     abi_long arg5, abi_long arg6, abi_long arg7,
-                     abi_long arg8)
- {
--    CPUState *cpu = ENV_GET_CPU(cpu_env);
-+    CPUState *cpu = env_cpu(cpu_env);
-     abi_long ret;
+diff --git a/target/mips/helper.c b/target/mips/helper.c
+index 68e44df4da..6e6a44292f 100644
+--- a/target/mips/helper.c
++++ b/target/mips/helper.c
+@@ -339,10 +339,8 @@ static int get_physical_address (CPUMIPSState *env, hwaddr *physical,
  
- #ifdef DEBUG_ERESTARTSYS
-diff --git a/linux-user/uname.c b/linux-user/uname.c
-index 1c05f95387..a09ffe1ea7 100644
---- a/linux-user/uname.c
-+++ b/linux-user/uname.c
-@@ -54,7 +54,7 @@ const char *cpu_to_uname_machine(void *cpu_env)
-     return "armv5te" utsname_suffix;
- #elif defined(TARGET_I386) && !defined(TARGET_X86_64)
-     /* see arch/x86/kernel/cpu/bugs.c: check_bugs(), 386, 486, 586, 686 */
--    CPUState *cpu = ENV_GET_CPU((CPUX86State *)cpu_env);
-+    CPUState *cpu = env_cpu((CPUX86State *)cpu_env);
-     int family = object_property_get_int(OBJECT(cpu), "family", NULL);
-     if (family == 4) {
-         return "i486";
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 719fb92e60..f23989febf 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -587,7 +587,7 @@ static void contextidr_write(CPUARMState *env, const ARMCPRegInfo *ri,
- static void tlbiall_is_write(CPUARMState *env, const ARMCPRegInfo *ri,
-                              uint64_t value)
+ void cpu_mips_tlb_flush(CPUMIPSState *env)
  {
--    CPUState *cs = ENV_GET_CPU(env);
-+    CPUState *cs = env_cpu(env);
- 
-     tlb_flush_all_cpus_synced(cs);
+-    MIPSCPU *cpu = mips_env_get_cpu(env);
+-
+     /* Flush qemu's TLB and discard all shadowed entries.  */
+-    tlb_flush(CPU(cpu));
++    tlb_flush(env_cpu(env));
+     env->tlb->tlb_in_use = env->tlb->nb_tlb;
  }
-@@ -595,7 +595,7 @@ static void tlbiall_is_write(CPUARMState *env, const ARMCPRegInfo *ri,
- static void tlbiasid_is_write(CPUARMState *env, const ARMCPRegInfo *ri,
-                              uint64_t value)
- {
--    CPUState *cs = ENV_GET_CPU(env);
-+    CPUState *cs = env_cpu(env);
  
-     tlb_flush_all_cpus_synced(cs);
- }
-@@ -603,7 +603,7 @@ static void tlbiasid_is_write(CPUARMState *env, const ARMCPRegInfo *ri,
- static void tlbimva_is_write(CPUARMState *env, const ARMCPRegInfo *ri,
-                              uint64_t value)
- {
--    CPUState *cs = ENV_GET_CPU(env);
-+    CPUState *cs = env_cpu(env);
- 
-     tlb_flush_page_all_cpus_synced(cs, value & TARGET_PAGE_MASK);
- }
-@@ -611,7 +611,7 @@ static void tlbimva_is_write(CPUARMState *env, const ARMCPRegInfo *ri,
- static void tlbimvaa_is_write(CPUARMState *env, const ARMCPRegInfo *ri,
-                              uint64_t value)
- {
--    CPUState *cs = ENV_GET_CPU(env);
-+    CPUState *cs = env_cpu(env);
- 
-     tlb_flush_page_all_cpus_synced(cs, value & TARGET_PAGE_MASK);
- }
-@@ -686,7 +686,7 @@ static void tlbimvaa_write(CPUARMState *env, const ARMCPRegInfo *ri,
- static void tlbiall_nsnh_write(CPUARMState *env, const ARMCPRegInfo *ri,
-                                uint64_t value)
- {
--    CPUState *cs = ENV_GET_CPU(env);
-+    CPUState *cs = env_cpu(env);
- 
-     tlb_flush_by_mmuidx(cs,
-                         ARMMMUIdxBit_S12NSE1 |
-@@ -697,7 +697,7 @@ static void tlbiall_nsnh_write(CPUARMState *env, const ARMCPRegInfo *ri,
- static void tlbiall_nsnh_is_write(CPUARMState *env, const ARMCPRegInfo *ri,
-                                   uint64_t value)
- {
--    CPUState *cs = ENV_GET_CPU(env);
-+    CPUState *cs = env_cpu(env);
- 
-     tlb_flush_by_mmuidx_all_cpus_synced(cs,
-                                         ARMMMUIdxBit_S12NSE1 |
-@@ -714,7 +714,7 @@ static void tlbiipas2_write(CPUARMState *env, const ARMCPRegInfo *ri,
-      * translation information.
-      * This must NOP if EL2 isn't implemented or SCR_EL3.NS is zero.
-      */
--    CPUState *cs = ENV_GET_CPU(env);
-+    CPUState *cs = env_cpu(env);
-     uint64_t pageaddr;
- 
-     if (!arm_feature(env, ARM_FEATURE_EL2) || !(env->cp15.scr_el3 & SCR_NS)) {
-@@ -729,7 +729,7 @@ static void tlbiipas2_write(CPUARMState *env, const ARMCPRegInfo *ri,
- static void tlbiipas2_is_write(CPUARMState *env, const ARMCPRegInfo *ri,
-                                uint64_t value)
- {
--    CPUState *cs = ENV_GET_CPU(env);
-+    CPUState *cs = env_cpu(env);
-     uint64_t pageaddr;
- 
-     if (!arm_feature(env, ARM_FEATURE_EL2) || !(env->cp15.scr_el3 & SCR_NS)) {
-@@ -745,7 +745,7 @@ static void tlbiipas2_is_write(CPUARMState *env, const ARMCPRegInfo *ri,
- static void tlbiall_hyp_write(CPUARMState *env, const ARMCPRegInfo *ri,
-                               uint64_t value)
- {
--    CPUState *cs = ENV_GET_CPU(env);
-+    CPUState *cs = env_cpu(env);
- 
-     tlb_flush_by_mmuidx(cs, ARMMMUIdxBit_S1E2);
- }
-@@ -753,7 +753,7 @@ static void tlbiall_hyp_write(CPUARMState *env, const ARMCPRegInfo *ri,
- static void tlbiall_hyp_is_write(CPUARMState *env, const ARMCPRegInfo *ri,
-                                  uint64_t value)
- {
--    CPUState *cs = ENV_GET_CPU(env);
-+    CPUState *cs = env_cpu(env);
- 
-     tlb_flush_by_mmuidx_all_cpus_synced(cs, ARMMMUIdxBit_S1E2);
- }
-@@ -761,7 +761,7 @@ static void tlbiall_hyp_is_write(CPUARMState *env, const ARMCPRegInfo *ri,
- static void tlbimva_hyp_write(CPUARMState *env, const ARMCPRegInfo *ri,
-                               uint64_t value)
- {
--    CPUState *cs = ENV_GET_CPU(env);
-+    CPUState *cs = env_cpu(env);
-     uint64_t pageaddr = value & ~MAKE_64BIT_MASK(0, 12);
- 
-     tlb_flush_page_by_mmuidx(cs, pageaddr, ARMMMUIdxBit_S1E2);
-@@ -770,7 +770,7 @@ static void tlbimva_hyp_write(CPUARMState *env, const ARMCPRegInfo *ri,
- static void tlbimva_hyp_is_write(CPUARMState *env, const ARMCPRegInfo *ri,
-                                  uint64_t value)
- {
--    CPUState *cs = ENV_GET_CPU(env);
-+    CPUState *cs = env_cpu(env);
-     uint64_t pageaddr = value & ~MAKE_64BIT_MASK(0, 12);
- 
-     tlb_flush_page_by_mmuidx_all_cpus_synced(cs, pageaddr,
-@@ -1921,7 +1921,7 @@ static void csselr_write(CPUARMState *env, const ARMCPRegInfo *ri,
- 
- static uint64_t isr_read(CPUARMState *env, const ARMCPRegInfo *ri)
- {
--    CPUState *cs = ENV_GET_CPU(env);
-+    CPUState *cs = env_cpu(env);
-     uint64_t hcr_el2 = arm_hcr_el2_eff(env);
-     uint64_t ret = 0;
- 
-@@ -3773,7 +3773,7 @@ static CPAccessResult aa64_cacheop_access(CPUARMState *env,
- static void tlbi_aa64_vmalle1is_write(CPUARMState *env, const ARMCPRegInfo *ri,
-                                       uint64_t value)
- {
--    CPUState *cs = ENV_GET_CPU(env);
-+    CPUState *cs = env_cpu(env);
-     bool sec = arm_is_secure_below_el3(env);
- 
-     if (sec) {
-@@ -3790,7 +3790,7 @@ static void tlbi_aa64_vmalle1is_write(CPUARMState *env, const ARMCPRegInfo *ri,
- static void tlbi_aa64_vmalle1_write(CPUARMState *env, const ARMCPRegInfo *ri,
-                                     uint64_t value)
- {
--    CPUState *cs = ENV_GET_CPU(env);
-+    CPUState *cs = env_cpu(env);
- 
-     if (tlb_force_broadcast(env)) {
-         tlbi_aa64_vmalle1is_write(env, NULL, value);
-@@ -3861,7 +3861,7 @@ static void tlbi_aa64_alle1is_write(CPUARMState *env, const ARMCPRegInfo *ri,
-      * stage 2 translations, whereas most other scopes only invalidate
-      * stage 1 translations.
-      */
--    CPUState *cs = ENV_GET_CPU(env);
-+    CPUState *cs = env_cpu(env);
-     bool sec = arm_is_secure_below_el3(env);
-     bool has_el2 = arm_feature(env, ARM_FEATURE_EL2);
- 
-@@ -3884,7 +3884,7 @@ static void tlbi_aa64_alle1is_write(CPUARMState *env, const ARMCPRegInfo *ri,
- static void tlbi_aa64_alle2is_write(CPUARMState *env, const ARMCPRegInfo *ri,
-                                     uint64_t value)
- {
--    CPUState *cs = ENV_GET_CPU(env);
-+    CPUState *cs = env_cpu(env);
- 
-     tlb_flush_by_mmuidx_all_cpus_synced(cs, ARMMMUIdxBit_S1E2);
- }
-@@ -3892,7 +3892,7 @@ static void tlbi_aa64_alle2is_write(CPUARMState *env, const ARMCPRegInfo *ri,
- static void tlbi_aa64_alle3is_write(CPUARMState *env, const ARMCPRegInfo *ri,
-                                     uint64_t value)
- {
--    CPUState *cs = ENV_GET_CPU(env);
-+    CPUState *cs = env_cpu(env);
- 
-     tlb_flush_by_mmuidx_all_cpus_synced(cs, ARMMMUIdxBit_S1E3);
- }
-@@ -3975,7 +3975,7 @@ static void tlbi_aa64_vae1_write(CPUARMState *env, const ARMCPRegInfo *ri,
- static void tlbi_aa64_vae2is_write(CPUARMState *env, const ARMCPRegInfo *ri,
-                                    uint64_t value)
- {
--    CPUState *cs = ENV_GET_CPU(env);
-+    CPUState *cs = env_cpu(env);
-     uint64_t pageaddr = sextract64(value << 12, 0, 56);
- 
-     tlb_flush_page_by_mmuidx_all_cpus_synced(cs, pageaddr,
-@@ -3985,7 +3985,7 @@ static void tlbi_aa64_vae2is_write(CPUARMState *env, const ARMCPRegInfo *ri,
- static void tlbi_aa64_vae3is_write(CPUARMState *env, const ARMCPRegInfo *ri,
-                                    uint64_t value)
- {
--    CPUState *cs = ENV_GET_CPU(env);
-+    CPUState *cs = env_cpu(env);
-     uint64_t pageaddr = sextract64(value << 12, 0, 56);
- 
-     tlb_flush_page_by_mmuidx_all_cpus_synced(cs, pageaddr,
-@@ -4017,7 +4017,7 @@ static void tlbi_aa64_ipas2e1_write(CPUARMState *env, const ARMCPRegInfo *ri,
- static void tlbi_aa64_ipas2e1is_write(CPUARMState *env, const ARMCPRegInfo *ri,
-                                       uint64_t value)
- {
--    CPUState *cs = ENV_GET_CPU(env);
-+    CPUState *cs = env_cpu(env);
-     uint64_t pageaddr;
- 
-     if (!arm_feature(env, ARM_FEATURE_EL2) || !(env->cp15.scr_el3 & SCR_NS)) {
-diff --git a/target/hppa/op_helper.c b/target/hppa/op_helper.c
-index a55a5dfc02..952e97a7d7 100644
---- a/target/hppa/op_helper.c
-+++ b/target/hppa/op_helper.c
-@@ -77,7 +77,7 @@ static void atomic_store_3(CPUHPPAState *env, target_ulong addr, uint32_t val,
+@@ -404,7 +402,7 @@ void cpu_mips_store_status(CPUMIPSState *env, target_ulong val)
+ #if defined(TARGET_MIPS64)
+     if ((env->CP0_Status ^ old) & (old & (7 << CP0St_UX))) {
+         /* Access to at least one of the 64-bit segments has been disabled */
+-        tlb_flush(CPU(mips_env_get_cpu(env)));
++        tlb_flush(env_cpu(env));
      }
- #else
-     /* FIXME -- we can do better.  */
--    cpu_loop_exit_atomic(ENV_GET_CPU(env), ra);
-+    cpu_loop_exit_atomic(env_cpu(env), ra);
  #endif
+     if (env->CP0_Config3 & (1 << CP0C3_MT)) {
+@@ -449,7 +447,7 @@ void cpu_mips_store_cause(CPUMIPSState *env, target_ulong val)
+ static void raise_mmu_exception(CPUMIPSState *env, target_ulong address,
+                                 int rw, int tlb_error)
+ {
+-    CPUState *cs = CPU(mips_env_get_cpu(env));
++    CPUState *cs = env_cpu(env);
+     int exception = 0, error_code = 0;
+ 
+     if (rw == MMU_INST_FETCH) {
+@@ -1394,8 +1392,7 @@ bool mips_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
+ #if !defined(CONFIG_USER_ONLY)
+ void r4k_invalidate_tlb (CPUMIPSState *env, int idx, int use_extra)
+ {
+-    MIPSCPU *cpu = mips_env_get_cpu(env);
+-    CPUState *cs;
++    CPUState *cs = env_cpu(env);
+     r4k_tlb_t *tlb;
+     target_ulong addr;
+     target_ulong end;
+@@ -1421,7 +1418,6 @@ void r4k_invalidate_tlb (CPUMIPSState *env, int idx, int use_extra)
+     /* 1k pages are not supported. */
+     mask = tlb->PageMask | ~(TARGET_PAGE_MASK << 1);
+     if (tlb->V0) {
+-        cs = CPU(cpu);
+         addr = tlb->VPN & ~mask;
+ #if defined(TARGET_MIPS64)
+         if (addr >= (0xFFFFFFFF80000000ULL & env->SEGMask)) {
+@@ -1435,7 +1431,6 @@ void r4k_invalidate_tlb (CPUMIPSState *env, int idx, int use_extra)
+         }
+     }
+     if (tlb->V1) {
+-        cs = CPU(cpu);
+         addr = (tlb->VPN & ~mask) | ((mask >> 1) + 1);
+ #if defined(TARGET_MIPS64)
+         if (addr >= (0xFFFFFFFF80000000ULL & env->SEGMask)) {
+@@ -1456,7 +1451,7 @@ void QEMU_NORETURN do_raise_exception_err(CPUMIPSState *env,
+                                           int error_code,
+                                           uintptr_t pc)
+ {
+-    CPUState *cs = CPU(mips_env_get_cpu(env));
++    CPUState *cs = env_cpu(env);
+ 
+     qemu_log_mask(CPU_LOG_INT, "%s: %d %d\n",
+                   __func__, exception, error_code);
+diff --git a/target/mips/op_helper.c b/target/mips/op_helper.c
+index 39180275b5..9e2e02f858 100644
+--- a/target/mips/op_helper.c
++++ b/target/mips/op_helper.c
+@@ -350,7 +350,7 @@ static inline hwaddr do_translate_address(CPUMIPSState *env,
+                                                       int rw, uintptr_t retaddr)
+ {
+     hwaddr paddr;
+-    CPUState *cs = CPU(mips_env_get_cpu(env));
++    CPUState *cs = env_cpu(env);
+ 
+     paddr = cpu_mips_translate_address(env, address, rw);
+ 
+@@ -699,7 +699,7 @@ static CPUMIPSState *mips_cpu_map_tc(CPUMIPSState *env, int *tc)
+         return env;
+     }
+ 
+-    cs = CPU(mips_env_get_cpu(env));
++    cs = env_cpu(env);
+     vpe_idx = tc_idx / cs->nr_threads;
+     *tc = tc_idx % cs->nr_threads;
+     other_cs = qemu_get_cpu(vpe_idx);
+@@ -1298,7 +1298,7 @@ void helper_mttc0_tcrestart(CPUMIPSState *env, target_ulong arg1)
+ 
+ void helper_mtc0_tchalt(CPUMIPSState *env, target_ulong arg1)
+ {
+-    MIPSCPU *cpu = mips_env_get_cpu(env);
++    MIPSCPU *cpu = env_archcpu(env);
+ 
+     env->active_tc.CP0_TCHalt = arg1 & 0x1;
+ 
+@@ -1314,7 +1314,7 @@ void helper_mttc0_tchalt(CPUMIPSState *env, target_ulong arg1)
+ {
+     int other_tc = env->CP0_VPEControl & (0xff << CP0VPECo_TargTC);
+     CPUMIPSState *other = mips_cpu_map_tc(env, &other_tc);
+-    MIPSCPU *other_cpu = mips_env_get_cpu(other);
++    MIPSCPU *other_cpu = env_archcpu(other);
+ 
+     // TODO: Halt TC / Restart (if allocated+active) TC.
+ 
+@@ -1427,7 +1427,7 @@ void helper_mtc0_pagegrain(CPUMIPSState *env, target_ulong arg1)
+ 
+ void helper_mtc0_segctl0(CPUMIPSState *env, target_ulong arg1)
+ {
+-    CPUState *cs = CPU(mips_env_get_cpu(env));
++    CPUState *cs = env_cpu(env);
+ 
+     env->CP0_SegCtl0 = arg1 & CP0SC0_MASK;
+     tlb_flush(cs);
+@@ -1435,7 +1435,7 @@ void helper_mtc0_segctl0(CPUMIPSState *env, target_ulong arg1)
+ 
+ void helper_mtc0_segctl1(CPUMIPSState *env, target_ulong arg1)
+ {
+-    CPUState *cs = CPU(mips_env_get_cpu(env));
++    CPUState *cs = env_cpu(env);
+ 
+     env->CP0_SegCtl1 = arg1 & CP0SC1_MASK;
+     tlb_flush(cs);
+@@ -1443,7 +1443,7 @@ void helper_mtc0_segctl1(CPUMIPSState *env, target_ulong arg1)
+ 
+ void helper_mtc0_segctl2(CPUMIPSState *env, target_ulong arg1)
+ {
+-    CPUState *cs = CPU(mips_env_get_cpu(env));
++    CPUState *cs = env_cpu(env);
+ 
+     env->CP0_SegCtl2 = arg1 & CP0SC2_MASK;
+     tlb_flush(cs);
+@@ -1666,7 +1666,7 @@ void helper_mtc0_entryhi(CPUMIPSState *env, target_ulong arg1)
+     /* If the ASID changes, flush qemu's TLB.  */
+     if ((old & env->CP0_EntryHi_ASID_mask) !=
+         (val & env->CP0_EntryHi_ASID_mask)) {
+-        tlb_flush(CPU(mips_env_get_cpu(env)));
++        tlb_flush(env_cpu(env));
+     }
  }
  
-diff --git a/target/i386/hax-all.c b/target/i386/hax-all.c
-index 44b89c1d74..64fd51ad4a 100644
---- a/target/i386/hax-all.c
-+++ b/target/i386/hax-all.c
-@@ -67,7 +67,7 @@ int valid_hax_tunnel_size(uint16_t size)
+@@ -1686,7 +1686,6 @@ void helper_mtc0_compare(CPUMIPSState *env, target_ulong arg1)
  
- hax_fd hax_vcpu_get_fd(CPUArchState *env)
+ void helper_mtc0_status(CPUMIPSState *env, target_ulong arg1)
  {
--    struct hax_vcpu_state *vcpu = ENV_GET_CPU(env)->hax_vcpu;
-+    struct hax_vcpu_state *vcpu = env_cpu(env)->hax_vcpu;
-     if (!vcpu) {
-         return HAX_INVALID_FD;
-     }
-@@ -409,7 +409,7 @@ static int hax_handle_io(CPUArchState *env, uint32_t df, uint16_t port,
+-    MIPSCPU *cpu = mips_env_get_cpu(env);
+     uint32_t val, old;
  
- static int hax_vcpu_interrupt(CPUArchState *env)
- {
--    CPUState *cpu = ENV_GET_CPU(env);
-+    CPUState *cpu = env_cpu(env);
-     struct hax_vcpu_state *vcpu = cpu->hax_vcpu;
-     struct hax_tunnel *ht = vcpu->tunnel;
- 
-@@ -461,7 +461,7 @@ void hax_raise_event(CPUState *cpu)
- static int hax_vcpu_hax_exec(CPUArchState *env)
- {
-     int ret = 0;
--    CPUState *cpu = ENV_GET_CPU(env);
-+    CPUState *cpu = env_cpu(env);
-     X86CPU *x86_cpu = X86_CPU(cpu);
-     struct hax_vcpu_state *vcpu = cpu->hax_vcpu;
-     struct hax_tunnel *ht = vcpu->tunnel;
-diff --git a/target/i386/hvf/x86_decode.c b/target/i386/hvf/x86_decode.c
-index 9ef7d7513f..822fa1866e 100644
---- a/target/i386/hvf/x86_decode.c
-+++ b/target/i386/hvf/x86_decode.c
-@@ -75,8 +75,8 @@ static inline uint64_t decode_bytes(CPUX86State *env, struct x86_decode *decode,
-         VM_PANIC_EX("%s invalid size %d\n", __func__, size);
-         break;
-     }
--    target_ulong va  = linear_rip(ENV_GET_CPU(env), RIP(env)) + decode->len;
--    vmx_read_mem(ENV_GET_CPU(env), &val, va, size);
-+    target_ulong va  = linear_rip(env_cpu(env), RIP(env)) + decode->len;
-+    vmx_read_mem(env_cpu(env), &val, va, size);
-     decode->len += size;
-     
-     return val;
-@@ -1772,7 +1772,7 @@ void calc_modrm_operand32(CPUX86State *env, struct x86_decode *decode,
-     if (4 == decode->modrm.rm) {
-         ptr += get_sib_val(env, decode, &seg);
-     } else if (!decode->modrm.mod && 5 == decode->modrm.rm) {
--        if (x86_is_long_mode(ENV_GET_CPU(env))) {
-+        if (x86_is_long_mode(env_cpu(env))) {
-             ptr += RIP(env) + decode->len;
-         } else {
-             ptr = decode->displacement;
-@@ -1877,7 +1877,7 @@ static void decode_prefix(CPUX86State *env, struct x86_decode *decode)
-             decode->addr_size_override = byte;
+     old = env->CP0_Status;
+@@ -1706,7 +1705,7 @@ void helper_mtc0_status(CPUMIPSState *env, target_ulong arg1)
+         case MIPS_HFLAG_SM: qemu_log(", SM\n"); break;
+         case MIPS_HFLAG_KM: qemu_log("\n"); break;
+         default:
+-            cpu_abort(CPU(cpu), "Invalid MMU mode!\n");
++            cpu_abort(env_cpu(env), "Invalid MMU mode!\n");
              break;
-         case PREFIX_REX ... (PREFIX_REX + 0xf):
--            if (x86_is_long_mode(ENV_GET_CPU(env))) {
-+            if (x86_is_long_mode(env_cpu(env))) {
-                 decode->rex.rex = byte;
-                 break;
-             }
-@@ -1892,16 +1892,16 @@ static void decode_prefix(CPUX86State *env, struct x86_decode *decode)
- void set_addressing_size(CPUX86State *env, struct x86_decode *decode)
- {
-     decode->addressing_size = -1;
--    if (x86_is_real(ENV_GET_CPU(env)) || x86_is_v8086(ENV_GET_CPU(env))) {
-+    if (x86_is_real(env_cpu(env)) || x86_is_v8086(env_cpu(env))) {
-         if (decode->addr_size_override) {
-             decode->addressing_size = 4;
-         } else {
-             decode->addressing_size = 2;
          }
--    } else if (!x86_is_long_mode(ENV_GET_CPU(env))) {
-+    } else if (!x86_is_long_mode(env_cpu(env))) {
-         /* protected */
-         struct vmx_segment cs;
--        vmx_read_segment_descriptor(ENV_GET_CPU(env), &cs, R_CS);
-+        vmx_read_segment_descriptor(env_cpu(env), &cs, R_CS);
-         /* check db */
-         if ((cs.ar >> 14) & 1) {
-             if (decode->addr_size_override) {
-@@ -1929,16 +1929,16 @@ void set_addressing_size(CPUX86State *env, struct x86_decode *decode)
- void set_operand_size(CPUX86State *env, struct x86_decode *decode)
- {
-     decode->operand_size = -1;
--    if (x86_is_real(ENV_GET_CPU(env)) || x86_is_v8086(ENV_GET_CPU(env))) {
-+    if (x86_is_real(env_cpu(env)) || x86_is_v8086(env_cpu(env))) {
-         if (decode->op_size_override) {
-             decode->operand_size = 4;
-         } else {
-             decode->operand_size = 2;
-         }
--    } else if (!x86_is_long_mode(ENV_GET_CPU(env))) {
-+    } else if (!x86_is_long_mode(env_cpu(env))) {
-         /* protected */
-         struct vmx_segment cs;
--        vmx_read_segment_descriptor(ENV_GET_CPU(env), &cs, R_CS);
-+        vmx_read_segment_descriptor(env_cpu(env), &cs, R_CS);
-         /* check db */
-         if ((cs.ar >> 14) & 1) {
-             if (decode->op_size_override) {
-@@ -2188,5 +2188,5 @@ target_ulong decode_linear_addr(CPUX86State *env, struct x86_decode *decode,
-     default:
-         break;
      }
--    return linear_addr_size(ENV_GET_CPU(env), addr, decode->addressing_size, seg);
-+    return linear_addr_size(env_cpu(env), addr, decode->addressing_size, seg);
- }
-diff --git a/target/i386/hvf/x86_emu.c b/target/i386/hvf/x86_emu.c
-index 3ea18edc68..1b04bd7e94 100644
---- a/target/i386/hvf/x86_emu.c
-+++ b/target/i386/hvf/x86_emu.c
-@@ -182,12 +182,12 @@ void write_val_ext(struct CPUX86State *env, target_ulong ptr, target_ulong val,
-         write_val_to_reg(ptr, val, size);
-         return;
-     }
--    vmx_write_mem(ENV_GET_CPU(env), ptr, &val, size);
-+    vmx_write_mem(env_cpu(env), ptr, &val, size);
- }
+@@ -2485,8 +2484,6 @@ static void debug_pre_eret(CPUMIPSState *env)
  
- uint8_t *read_mmio(struct CPUX86State *env, target_ulong ptr, int bytes)
+ static void debug_post_eret(CPUMIPSState *env)
  {
--    vmx_read_mem(ENV_GET_CPU(env), env->hvf_emul->mmio_buf, ptr, bytes);
-+    vmx_read_mem(env_cpu(env), env->hvf_emul->mmio_buf, ptr, bytes);
-     return env->hvf_emul->mmio_buf;
- }
- 
-@@ -399,17 +399,18 @@ static void exec_out(struct CPUX86State *env, struct x86_decode *decode)
- {
-     switch (decode->opcode[0]) {
-     case 0xe6:
--        hvf_handle_io(ENV_GET_CPU(env), decode->op[0].val, &AL(env), 1, 1, 1);
-+        hvf_handle_io(env_cpu(env), decode->op[0].val, &AL(env), 1, 1, 1);
-         break;
-     case 0xe7:
--        hvf_handle_io(ENV_GET_CPU(env), decode->op[0].val, &RAX(env), 1,
-+        hvf_handle_io(env_cpu(env), decode->op[0].val, &RAX(env), 1,
-                       decode->operand_size, 1);
-         break;
-     case 0xee:
--        hvf_handle_io(ENV_GET_CPU(env), DX(env), &AL(env), 1, 1, 1);
-+        hvf_handle_io(env_cpu(env), DX(env), &AL(env), 1, 1, 1);
-         break;
-     case 0xef:
--        hvf_handle_io(ENV_GET_CPU(env), DX(env), &RAX(env), 1, decode->operand_size, 1);
-+        hvf_handle_io(env_cpu(env), DX(env), &RAX(env), 1,
-+                      decode->operand_size, 1);
-         break;
-     default:
-         VM_PANIC("Bad out opcode\n");
-@@ -423,10 +424,11 @@ static void exec_in(struct CPUX86State *env, struct x86_decode *decode)
-     target_ulong val = 0;
-     switch (decode->opcode[0]) {
-     case 0xe4:
--        hvf_handle_io(ENV_GET_CPU(env), decode->op[0].val, &AL(env), 0, 1, 1);
-+        hvf_handle_io(env_cpu(env), decode->op[0].val, &AL(env), 0, 1, 1);
-         break;
-     case 0xe5:
--        hvf_handle_io(ENV_GET_CPU(env), decode->op[0].val, &val, 0, decode->operand_size, 1);
-+        hvf_handle_io(env_cpu(env), decode->op[0].val, &val, 0,
-+                      decode->operand_size, 1);
-         if (decode->operand_size == 2) {
-             AX(env) = val;
-         } else {
-@@ -434,10 +436,10 @@ static void exec_in(struct CPUX86State *env, struct x86_decode *decode)
+-    MIPSCPU *cpu = mips_env_get_cpu(env);
+-
+     if (qemu_loglevel_mask(CPU_LOG_EXEC)) {
+         qemu_log("  =>  PC " TARGET_FMT_lx " EPC " TARGET_FMT_lx,
+                 env->active_tc.PC, env->CP0_EPC);
+@@ -2502,7 +2499,7 @@ static void debug_post_eret(CPUMIPSState *env)
+         case MIPS_HFLAG_SM: qemu_log(", SM\n"); break;
+         case MIPS_HFLAG_KM: qemu_log("\n"); break;
+         default:
+-            cpu_abort(CPU(cpu), "Invalid MMU mode!\n");
++            cpu_abort(env_cpu(env), "Invalid MMU mode!\n");
+             break;
          }
-         break;
-     case 0xec:
--        hvf_handle_io(ENV_GET_CPU(env), DX(env), &AL(env), 0, 1, 1);
-+        hvf_handle_io(env_cpu(env), DX(env), &AL(env), 0, 1, 1);
-         break;
-     case 0xed:
--        hvf_handle_io(ENV_GET_CPU(env), DX(env), &val, 0, decode->operand_size, 1);
-+        hvf_handle_io(env_cpu(env), DX(env), &val, 0, decode->operand_size, 1);
-         if (decode->operand_size == 2) {
-             AX(env) = val;
-         } else {
-@@ -484,12 +486,13 @@ static inline void string_rep(struct CPUX86State *env, struct x86_decode *decode
- 
- static void exec_ins_single(struct CPUX86State *env, struct x86_decode *decode)
- {
--    target_ulong addr = linear_addr_size(ENV_GET_CPU(env), RDI(env), decode->addressing_size,
--                                   R_ES);
-+    target_ulong addr = linear_addr_size(env_cpu(env), RDI(env),
-+                                         decode->addressing_size, R_ES);
- 
--    hvf_handle_io(ENV_GET_CPU(env), DX(env), env->hvf_emul->mmio_buf, 0,
-+    hvf_handle_io(env_cpu(env), DX(env), env->hvf_emul->mmio_buf, 0,
-                   decode->operand_size, 1);
--    vmx_write_mem(ENV_GET_CPU(env), addr, env->hvf_emul->mmio_buf, decode->operand_size);
-+    vmx_write_mem(env_cpu(env), addr, env->hvf_emul->mmio_buf,
-+                  decode->operand_size);
- 
-     string_increment_reg(env, R_EDI, decode);
- }
-@@ -509,8 +512,9 @@ static void exec_outs_single(struct CPUX86State *env, struct x86_decode *decode)
- {
-     target_ulong addr = decode_linear_addr(env, decode, RSI(env), R_DS);
- 
--    vmx_read_mem(ENV_GET_CPU(env), env->hvf_emul->mmio_buf, addr, decode->operand_size);
--    hvf_handle_io(ENV_GET_CPU(env), DX(env), env->hvf_emul->mmio_buf, 1,
-+    vmx_read_mem(env_cpu(env), env->hvf_emul->mmio_buf, addr,
-+                 decode->operand_size);
-+    hvf_handle_io(env_cpu(env), DX(env), env->hvf_emul->mmio_buf, 1,
-                   decode->operand_size, 1);
- 
-     string_increment_reg(env, R_ESI, decode);
-@@ -534,8 +538,8 @@ static void exec_movs_single(struct CPUX86State *env, struct x86_decode *decode)
-     target_ulong val;
- 
-     src_addr = decode_linear_addr(env, decode, RSI(env), R_DS);
--    dst_addr = linear_addr_size(ENV_GET_CPU(env), RDI(env), decode->addressing_size,
--                                R_ES);
-+    dst_addr = linear_addr_size(env_cpu(env), RDI(env),
-+                                decode->addressing_size, R_ES);
- 
-     val = read_val_ext(env, src_addr, decode->operand_size);
-     write_val_ext(env, dst_addr, val, decode->operand_size);
-@@ -561,8 +565,8 @@ static void exec_cmps_single(struct CPUX86State *env, struct x86_decode *decode)
-     target_ulong dst_addr;
- 
-     src_addr = decode_linear_addr(env, decode, RSI(env), R_DS);
--    dst_addr = linear_addr_size(ENV_GET_CPU(env), RDI(env), decode->addressing_size,
--                                R_ES);
-+    dst_addr = linear_addr_size(env_cpu(env), RDI(env),
-+                                decode->addressing_size, R_ES);
- 
-     decode->op[0].type = X86_VAR_IMMEDIATE;
-     decode->op[0].val = read_val_ext(env, src_addr, decode->operand_size);
-@@ -591,9 +595,10 @@ static void exec_stos_single(struct CPUX86State *env, struct x86_decode *decode)
-     target_ulong addr;
-     target_ulong val;
- 
--    addr = linear_addr_size(ENV_GET_CPU(env), RDI(env), decode->addressing_size, R_ES);
-+    addr = linear_addr_size(env_cpu(env), RDI(env),
-+                            decode->addressing_size, R_ES);
-     val = read_reg(env, R_EAX, decode->operand_size);
--    vmx_write_mem(ENV_GET_CPU(env), addr, &val, decode->operand_size);
-+    vmx_write_mem(env_cpu(env), addr, &val, decode->operand_size);
- 
-     string_increment_reg(env, R_EDI, decode);
- }
-@@ -614,9 +619,10 @@ static void exec_scas_single(struct CPUX86State *env, struct x86_decode *decode)
- {
-     target_ulong addr;
- 
--    addr = linear_addr_size(ENV_GET_CPU(env), RDI(env), decode->addressing_size, R_ES);
-+    addr = linear_addr_size(env_cpu(env), RDI(env),
-+                            decode->addressing_size, R_ES);
-     decode->op[1].type = X86_VAR_IMMEDIATE;
--    vmx_read_mem(ENV_GET_CPU(env), &decode->op[1].val, addr, decode->operand_size);
-+    vmx_read_mem(env_cpu(env), &decode->op[1].val, addr, decode->operand_size);
- 
-     EXEC_2OP_FLAGS_CMD(env, decode, -, SET_FLAGS_OSZAPC_SUB, false);
-     string_increment_reg(env, R_EDI, decode);
-@@ -641,7 +647,7 @@ static void exec_lods_single(struct CPUX86State *env, struct x86_decode *decode)
-     target_ulong val = 0;
- 
-     addr = decode_linear_addr(env, decode, RSI(env), R_DS);
--    vmx_read_mem(ENV_GET_CPU(env), &val, addr,  decode->operand_size);
-+    vmx_read_mem(env_cpu(env), &val, addr,  decode->operand_size);
-     write_reg(env, R_EAX, val, decode->operand_size);
- 
-     string_increment_reg(env, R_ESI, decode);
-@@ -753,7 +759,7 @@ void simulate_rdmsr(struct CPUState *cpu)
- 
- static void exec_rdmsr(struct CPUX86State *env, struct x86_decode *decode)
- {
--    simulate_rdmsr(ENV_GET_CPU(env));
-+    simulate_rdmsr(env_cpu(env));
-     RIP(env) += decode->len;
- }
- 
-@@ -851,7 +857,7 @@ void simulate_wrmsr(struct CPUState *cpu)
- 
- static void exec_wrmsr(struct CPUX86State *env, struct x86_decode *decode)
- {
--    simulate_wrmsr(ENV_GET_CPU(env));
-+    simulate_wrmsr(env_cpu(env));
-     RIP(env) += decode->len;
- }
- 
-diff --git a/target/i386/mem_helper.c b/target/i386/mem_helper.c
-index 1885df29d2..d50d4b0c40 100644
---- a/target/i386/mem_helper.c
-+++ b/target/i386/mem_helper.c
-@@ -89,7 +89,7 @@ void helper_cmpxchg8b(CPUX86State *env, target_ulong a0)
      }
-     CC_SRC = eflags;
- #else
--    cpu_loop_exit_atomic(ENV_GET_CPU(env), GETPC());
-+    cpu_loop_exit_atomic(env_cpu(env), GETPC());
- #endif /* CONFIG_ATOMIC64 */
- }
+@@ -2633,7 +2630,7 @@ void helper_pmon(CPUMIPSState *env, int function)
  
-@@ -158,7 +158,7 @@ void helper_cmpxchg16b(CPUX86State *env, target_ulong a0)
-         }
-         CC_SRC = eflags;
-     } else {
--        cpu_loop_exit_atomic(ENV_GET_CPU(env), ra);
-+        cpu_loop_exit_atomic(env_cpu(env), ra);
-     }
- }
- #endif
-diff --git a/target/m68k/op_helper.c b/target/m68k/op_helper.c
-index bde2d551ff..3d1aa23a02 100644
---- a/target/m68k/op_helper.c
-+++ b/target/m68k/op_helper.c
-@@ -781,7 +781,7 @@ static void do_cas2l(CPUM68KState *env, uint32_t regs, uint32_t a1, uint32_t a2,
- #endif
-         {
-             /* Tell the main loop we need to serialize this insn.  */
--            cpu_loop_exit_atomic(ENV_GET_CPU(env), ra);
-+            cpu_loop_exit_atomic(env_cpu(env), ra);
-         }
-     } else {
-         /* We're executing in a serial context -- no need to be atomic.  */
-diff --git a/target/nios2/mmu.c b/target/nios2/mmu.c
-index 47fa474efb..53ed6413b4 100644
---- a/target/nios2/mmu.c
-+++ b/target/nios2/mmu.c
-@@ -102,7 +102,7 @@ unsigned int mmu_translate(CPUNios2State *env,
- 
- static void mmu_flush_pid(CPUNios2State *env, uint32_t pid)
+ void helper_wait(CPUMIPSState *env)
  {
--    CPUState *cs = ENV_GET_CPU(env);
+-    CPUState *cs = CPU(mips_env_get_cpu(env));
 +    CPUState *cs = env_cpu(env);
-     Nios2CPU *cpu = nios2_env_get_cpu(env);
-     int idx;
-     MMU_LOG(qemu_log("TLB Flush PID %d\n", pid));
-@@ -126,7 +126,7 @@ static void mmu_flush_pid(CPUNios2State *env, uint32_t pid)
  
- void mmu_write(CPUNios2State *env, uint32_t rn, uint32_t v)
+     cs->halted = 1;
+     cpu_reset_interrupt(cs, CPU_INTERRUPT_WAKE);
+diff --git a/target/mips/translate.c b/target/mips/translate.c
+index e37722dfff..a3cf976ab6 100644
+--- a/target/mips/translate.c
++++ b/target/mips/translate.c
+@@ -30119,8 +30119,7 @@ void cpu_set_exception_base(int vp_index, target_ulong address)
+ 
+ void cpu_state_reset(CPUMIPSState *env)
  {
--    CPUState *cs = ENV_GET_CPU(env);
+-    MIPSCPU *cpu = mips_env_get_cpu(env);
+-    CPUState *cs = CPU(cpu);
 +    CPUState *cs = env_cpu(env);
-     Nios2CPU *cpu = nios2_env_get_cpu(env);
  
-     MMU_LOG(qemu_log("mmu_write %08X = %08X\n", rn, v));
-diff --git a/target/nios2/op_helper.c b/target/nios2/op_helper.c
-index 529ec6ac0e..a60730faac 100644
---- a/target/nios2/op_helper.c
-+++ b/target/nios2/op_helper.c
-@@ -46,7 +46,7 @@ void helper_check_interrupts(CPUNios2State *env)
+     /* Reset registers to their default values */
+     env->CP0_PRid = env->cpu_model->CP0_PRid;
+diff --git a/target/mips/translate_init.inc.c b/target/mips/translate_init.inc.c
+index 1c2d017d36..6d145a905a 100644
+--- a/target/mips/translate_init.inc.c
++++ b/target/mips/translate_init.inc.c
+@@ -871,8 +871,6 @@ static void r4k_mmu_init (CPUMIPSState *env, const mips_def_t *def)
  
- void helper_raise_exception(CPUNios2State *env, uint32_t index)
+ static void mmu_init (CPUMIPSState *env, const mips_def_t *def)
  {
--    CPUState *cs = ENV_GET_CPU(env);
-+    CPUState *cs = env_cpu(env);
-     cs->exception_index = index;
-     cpu_loop_exit(cs);
- }
-diff --git a/target/ppc/mmu_helper.c b/target/ppc/mmu_helper.c
-index e605efa883..e3149e4d3f 100644
---- a/target/ppc/mmu_helper.c
-+++ b/target/ppc/mmu_helper.c
-@@ -522,7 +522,7 @@ static inline int get_segment_6xx_tlb(CPUPPCState *env, mmu_ctx_t *ctx,
-             ret = ppc6xx_tlb_check(env, ctx, eaddr, rw, type);
- #if defined(DUMP_PAGE_TABLES)
-             if (qemu_loglevel_mask(CPU_LOG_MMU)) {
--                CPUState *cs = ENV_GET_CPU(env);
-+                CPUState *cs = env_cpu(env);
-                 hwaddr curaddr;
-                 uint32_t a0, a1, a2, a3;
+-    MIPSCPU *cpu = mips_env_get_cpu(env);
+-
+     env->tlb = g_malloc0(sizeof(CPUMIPSTLBContext));
  
-diff --git a/target/s390x/gdbstub.c b/target/s390x/gdbstub.c
-index 9cfd8fe3e0..a45d805a21 100644
---- a/target/s390x/gdbstub.c
-+++ b/target/s390x/gdbstub.c
-@@ -96,7 +96,7 @@ static int cpu_write_ac_reg(CPUS390XState *env, uint8_t *mem_buf, int n)
-     switch (n) {
-     case S390_A0_REGNUM ... S390_A15_REGNUM:
-         env->aregs[n] = ldl_p(mem_buf);
--        cpu_synchronize_post_init(ENV_GET_CPU(env));
-+        cpu_synchronize_post_init(env_cpu(env));
-         return 4;
-     default:
-         return 0;
-@@ -201,9 +201,9 @@ static int cpu_write_c_reg(CPUS390XState *env, uint8_t *mem_buf, int n)
-     case S390_C0_REGNUM ... S390_C15_REGNUM:
-         env->cregs[n] = ldtul_p(mem_buf);
-         if (tcg_enabled()) {
--            tlb_flush(ENV_GET_CPU(env));
-+            tlb_flush(env_cpu(env));
-         }
--        cpu_synchronize_post_init(ENV_GET_CPU(env));
-+        cpu_synchronize_post_init(env_cpu(env));
-         return 8;
-     default:
-         return 0;
-@@ -251,35 +251,35 @@ static int cpu_write_virt_reg(CPUS390XState *env, uint8_t *mem_buf, int n)
-     switch (n) {
-     case S390_VIRT_CKC_REGNUM:
-         env->ckc = ldtul_p(mem_buf);
--        cpu_synchronize_post_init(ENV_GET_CPU(env));
-+        cpu_synchronize_post_init(env_cpu(env));
-         return 8;
-     case S390_VIRT_CPUTM_REGNUM:
-         env->cputm = ldtul_p(mem_buf);
--        cpu_synchronize_post_init(ENV_GET_CPU(env));
-+        cpu_synchronize_post_init(env_cpu(env));
-         return 8;
-     case S390_VIRT_BEA_REGNUM:
-         env->gbea = ldtul_p(mem_buf);
--        cpu_synchronize_post_init(ENV_GET_CPU(env));
-+        cpu_synchronize_post_init(env_cpu(env));
-         return 8;
-     case S390_VIRT_PREFIX_REGNUM:
-         env->psa = ldtul_p(mem_buf);
--        cpu_synchronize_post_init(ENV_GET_CPU(env));
-+        cpu_synchronize_post_init(env_cpu(env));
-         return 8;
-     case S390_VIRT_PP_REGNUM:
-         env->pp = ldtul_p(mem_buf);
--        cpu_synchronize_post_init(ENV_GET_CPU(env));
-+        cpu_synchronize_post_init(env_cpu(env));
-         return 8;
-     case S390_VIRT_PFT_REGNUM:
-         env->pfault_token = ldtul_p(mem_buf);
--        cpu_synchronize_post_init(ENV_GET_CPU(env));
-+        cpu_synchronize_post_init(env_cpu(env));
-         return 8;
-     case S390_VIRT_PFS_REGNUM:
-         env->pfault_select = ldtul_p(mem_buf);
--        cpu_synchronize_post_init(ENV_GET_CPU(env));
-+        cpu_synchronize_post_init(env_cpu(env));
-         return 8;
-     case S390_VIRT_PFC_REGNUM:
-         env->pfault_compare = ldtul_p(mem_buf);
--        cpu_synchronize_post_init(ENV_GET_CPU(env));
-+        cpu_synchronize_post_init(env_cpu(env));
-         return 8;
-     default:
-         return 0;
-@@ -303,7 +303,7 @@ static int cpu_read_gs_reg(CPUS390XState *env, uint8_t *mem_buf, int n)
- static int cpu_write_gs_reg(CPUS390XState *env, uint8_t *mem_buf, int n)
- {
-     env->gscb[n] = ldtul_p(mem_buf);
--    cpu_synchronize_post_init(ENV_GET_CPU(env));
-+    cpu_synchronize_post_init(env_cpu(env));
-     return 8;
- }
- 
-diff --git a/target/s390x/mem_helper.c b/target/s390x/mem_helper.c
-index ffd5f02fbe..4a0161602f 100644
---- a/target/s390x/mem_helper.c
-+++ b/target/s390x/mem_helper.c
-@@ -1461,7 +1461,7 @@ static uint32_t do_csst(CPUS390XState *env, uint32_t r3, uint64_t a1,
- #endif
-         if ((HAVE_CMPXCHG128 ? 0 : fc + 2 > max) ||
-             (HAVE_ATOMIC128  ? 0 : sc > max)) {
--            cpu_loop_exit_atomic(ENV_GET_CPU(env), ra);
-+            cpu_loop_exit_atomic(env_cpu(env), ra);
-         }
+     switch (def->mmu_type) {
+@@ -889,7 +887,7 @@ static void mmu_init (CPUMIPSState *env, const mips_def_t *def)
+         case MMU_TYPE_R6000:
+         case MMU_TYPE_R8000:
+         default:
+-            cpu_abort(CPU(cpu), "MMU type not supported\n");
++            cpu_abort(env_cpu(env), "MMU type not supported\n");
      }
- 
-diff --git a/target/sh4/op_helper.c b/target/sh4/op_helper.c
-index bd5d782b50..932aa7a7c7 100644
---- a/target/sh4/op_helper.c
-+++ b/target/sh4/op_helper.c
-@@ -107,7 +107,7 @@ void helper_trapa(CPUSH4State *env, uint32_t tra)
- void helper_exclusive(CPUSH4State *env)
- {
-     /* We do not want cpu_restore_state to run.  */
--    cpu_loop_exit_atomic(ENV_GET_CPU(env), 0);
-+    cpu_loop_exit_atomic(env_cpu(env), 0);
  }
- 
- void helper_movcal(CPUSH4State *env, uint32_t address, uint32_t value)
-diff --git a/docs/devel/tracing.txt b/docs/devel/tracing.txt
-index 056aa56496..76e492a489 100644
---- a/docs/devel/tracing.txt
-+++ b/docs/devel/tracing.txt
-@@ -434,9 +434,9 @@ Can be used as:
-         /* trace emitted at this point */
-         trace_foo(0xd1);
-         /* trace emitted at this point */
--        trace_bar(ENV_GET_CPU(env), 0xd2);
-+        trace_bar(env_cpu(env), 0xd2);
-         /* trace emitted at this point (env) and when guest code is executed (cpu_env) */
--        trace_baz_tcg(ENV_GET_CPU(env), cpu_env, 0xd3);
-+        trace_baz_tcg(env_cpu(env), cpu_env, 0xd3);
-     }
- 
- If the translating vCPU has address 0xc1 and code is later executed by vCPU
-diff --git a/scripts/tracetool/format/tcg_helper_c.py b/scripts/tracetool/format/tcg_helper_c.py
-index bbbd6ad0f4..79aa63eada 100644
---- a/scripts/tracetool/format/tcg_helper_c.py
-+++ b/scripts/tracetool/format/tcg_helper_c.py
-@@ -25,7 +25,7 @@ def vcpu_transform_args(args, mode):
-     if mode == "code":
-         return Arguments([
-             # Does cast from helper requirements to tracing types
--            ("CPUState *", "ENV_GET_CPU(%s)" % args.names()[0]),
-+            ("CPUState *", "env_cpu(%s)" % args.names()[0]),
-         ])
-     else:
-         args = Arguments([
+ #endif /* CONFIG_USER_ONLY */
 -- 
 2.17.1
 
