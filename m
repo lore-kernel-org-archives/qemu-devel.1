@@ -2,75 +2,80 @@ Return-Path: <SRS0=Y1tr=UJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B23BEC31E41
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 15:57:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 19BE4C31E40
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 16:04:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8852921726
-	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 15:57:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8852921726
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 94DFF20820
+	for <qemu-devel@archiver.kernel.org>; Mon, 10 Jun 2019 16:04:06 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="lfjCP1EN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 94DFF20820
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47864 helo=lists.gnu.org)
+Received: from localhost ([::1]:47974 helo=lists.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1haMfz-0002C7-Nt
-	for qemu-devel@archiver.kernel.org; Mon, 10 Jun 2019 11:57:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55633)
+	id 1haMmD-0004pV-ET
+	for qemu-devel@archiver.kernel.org; Mon, 10 Jun 2019 12:04:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56569)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mst@redhat.com>) id 1haMeW-0001aw-IB
- for qemu-devel@nongnu.org; Mon, 10 Jun 2019 11:56:09 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1haMho-0002tH-PX
+ for qemu-devel@nongnu.org; Mon, 10 Jun 2019 11:59:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1haMeV-00045O-En
- for qemu-devel@nongnu.org; Mon, 10 Jun 2019 11:56:08 -0400
-Received: from mail-ua1-f68.google.com ([209.85.222.68]:46203)
+ (envelope-from <peter.maydell@linaro.org>) id 1haMhn-0006ks-Ns
+ for qemu-devel@nongnu.org; Mon, 10 Jun 2019 11:59:32 -0400
+Received: from mail-ot1-x330.google.com ([2607:f8b0:4864:20::330]:44815)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1haMeU-0003tw-A9
- for qemu-devel@nongnu.org; Mon, 10 Jun 2019 11:56:06 -0400
-Received: by mail-ua1-f68.google.com with SMTP id o19so3213194uap.13
- for <qemu-devel@nongnu.org>; Mon, 10 Jun 2019 08:55:46 -0700 (PDT)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1haMhn-0006kI-HU
+ for qemu-devel@nongnu.org; Mon, 10 Jun 2019 11:59:31 -0400
+Received: by mail-ot1-x330.google.com with SMTP id b7so8750589otl.11
+ for <qemu-devel@nongnu.org>; Mon, 10 Jun 2019 08:59:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=vYp89AbnzsDTymMdYdQhrc0ansjyxxSfgP3xmadWfY0=;
+ b=lfjCP1ENCfCyDuBNo387HfEXswY12uSZs9SEbpIU171HkJK5yfeJzLjBMZGK3LNuk8
+ dZCGFwAZK54kgGX+oP4IbUnC37C/10NZqPb3tMEcr2DhA/tiNLmZkxWM1A/eD9v7lOIA
+ 0Ov1gmQ4ujMslkKFTBeW3gBXzqzhPij1MJVoJEbYZynrp2SLkzIoF1Sg5wX6Uye9UE8y
+ fUr2floMjvtUBfn3WAj/lS1SIcCY8ln7duINZ9yqUQ9ePAjgOiszdxFf4cEDhml3axbI
+ 3/8tDc7UMOTS04Cko8XVCr9TPSPxfxEjCOKieTSCkDpFpNfLXLLIg5EuIAUFQBjNQSuv
+ O6Iw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:content-transfer-encoding
- :in-reply-to;
- bh=7ZhX/TqkI2jBRtdjnfLMzlM6SsE9c/EC2fTs4Tvc2t4=;
- b=BP2z02uLFmo9/LNEYNqCJBI/Op5qTl2fJyMhGsTXl8ECAMsycoTo4JgUvbpH1MLWYV
- d9OLJfiPa8L3zl6X743M7dVDDD4V1ku77OF5nwRBALtfYqzQrwzxW2nkedachxMLmnhU
- vfJCdoy7bhR1CfbSGyLJDTZzVm9yLEo/8+ISXi9pWXZaIa71ndjLIiEeiSRbHWTpv1NW
- hZ9PAa+MJzOIFoSzKSptXzXMPLIPLwCtFoAKrAqzAta8/j9GPT4wi+083xml0m8JtUz6
- NU58vxlhSqWzlOpPQtCcs2HSDeNOkFiuxpICJGH2m8WIr618AFLMcT4ERunxk0Jtigyx
- 28vA==
-X-Gm-Message-State: APjAAAV/urtFOOy4Mco7nRoDIx4ers3vQi0N4yIN7Egj3jVXe7AhS+gP
- FhphMgPEbDkVvgzoxeJY0MtrbQ==
-X-Google-Smtp-Source: APXvYqzFrtyMcE3mpcGV+FCZarQzhjG/aJZVf2IMC4VUlvqnxy2p444VAVwJ2RNJJcU+7fIiVgVnFQ==
-X-Received: by 2002:ab0:2a4e:: with SMTP id p14mr27618006uar.138.1560182146062; 
- Mon, 10 Jun 2019 08:55:46 -0700 (PDT)
-Received: from redhat.com (pool-100-0-197-103.bstnma.fios.verizon.net.
- [100.0.197.103])
- by smtp.gmail.com with ESMTPSA id e7sm2660076vsc.28.2019.06.10.08.55.44
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Mon, 10 Jun 2019 08:55:44 -0700 (PDT)
-Date: Mon, 10 Jun 2019 11:55:42 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Like Xu <like.xu@linux.intel.com>
-Message-ID: <20190610114708-mutt-send-email-mst@kernel.org>
-References: <449c062f-373c-b310-ccc6-f14c702c8f19@linux.intel.com>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=vYp89AbnzsDTymMdYdQhrc0ansjyxxSfgP3xmadWfY0=;
+ b=HCAVc55CdM6cnrP373OLdSiedDjZaoe4aN31x5G1Wbyl0IlmFc6GsK8wYLFDTS5iuQ
+ KXE3kvd1/CtEezFcnfkoYWGIbVNmNtMPK0vZ2sBDFUBIYJTp5xQY6cnDPuDFQRkJG4DK
+ X6a8bNKa9PLUAbFba/tNg22xmUerpF3nMGKKq01gGjL1O2bCqS1AtFD/UN0VfqWGzIvD
+ 0Y9VXhTX+eJeudUMxvwNo4fOH8bN6FRRb0h7TwYGbZYKxN4t2Y2xg15Zgy0Lqf3JQADq
+ E3OFmryMQF4rnWK3MicSpQgO6mRLBxxG65DrhiPp+/dVN2xUn3XTERkD+zDRi3RRAUE4
+ 5FUg==
+X-Gm-Message-State: APjAAAWNzhAoTqBPFJ1oTPP9w5/GjaJ6Wim8yFGiF47+g+nNOYL3BCOX
+ CA3+DcNGNEBzhdmU/xXuBzIcGW3eWtOrGNRRYoWMsA==
+X-Google-Smtp-Source: APXvYqxeKovD3kMPhafgt02ycJtVZaABru/FR5Hyf5Bb/2xd6jLtgNSScAkf4gfYlw9dtS8aH3ztS3Roio/ExSgmGl0=
+X-Received: by 2002:a9d:d17:: with SMTP id 23mr29992624oti.221.1560182370575; 
+ Mon, 10 Jun 2019 08:59:30 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <449c062f-373c-b310-ccc6-f14c702c8f19@linux.intel.com>
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.222.68
-Subject: Re: [Qemu-devel] [QUESTION] How to reduce network latency to
- improve netperf TCP_RR drastically?
+References: <20190610145859.9665-1-richard.henderson@linaro.org>
+In-Reply-To: <20190610145859.9665-1-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 10 Jun 2019 16:59:19 +0100
+Message-ID: <CAFEAcA_HkhKVoP2bu4L-7aZvKjLu32_30b24WqwC=4g0hmL6SA@mail.gmail.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::330
+Subject: Re: [Qemu-devel] [PULL v2 00/39] tcg: Move softmmu tlb into
+ CPUNegativeOffsetState
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -82,56 +87,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Jason Wang <jasowang@redhat.com>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Jun 04, 2019 at 03:10:43PM +0800, Like Xu wrote:
-> Hi Michael，
-> 
-> At https://www.linux-kvm.org/page/NetworkingTodo, there is an entry for
-> network latency saying:
-> 
-> ---
-> reduce networking latency:
->  allow handling short packets from softirq or VCPU context
->  Plan:
->    We are going through the scheduler 3 times
->    (could be up to 5 if softirqd is involved)
->    Consider RX: host irq -> io thread -> VCPU thread ->
->    guest irq -> guest thread.
->    This adds a lot of latency.
->    We can cut it by some 1.5x if we do a bit of work
->    either in the VCPU or softirq context.
->  Testing: netperf TCP RR - should be improved drastically
->           netperf TCP STREAM guest to host - no regression
->  Contact: MST
-> ---
-> 
-> I am trying to make some contributions to improving netperf TCP_RR.
-> Could you please share more ideas or plans or implemental details to make it
-> happen?
-> 
-> Thanks,
-> Like Xu
+On Mon, 10 Jun 2019 at 15:59, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+>
+> V2 should fix a typo affecting OpenBSD.
+>
+>
+> r~
+>
+> The following changes since commit 19735c837ae2056b4651720290eda59498eca65a:
+>
+>   Merge remote-tracking branch 'remotes/kraxel/tags/usb-20190607-pull-request' into staging (2019-06-10 11:53:19 +0100)
+>
+> are available in the Git repository at:
+>
+>   https://github.com/rth7680/qemu.git tags/pull-tcg-20190610
+>
+> for you to fetch changes up to 43b3952dea0f763ceeaa2f119c473b5cc6d29c90:
+>
+>   tcg/arm: Remove mostly unreachable tlb special case (2019-06-10 07:03:42 -0700)
+>
+> ----------------------------------------------------------------
+> Move softmmu tlb into CPUNegativeOffsetState
+>
 
 
-So some of this did happen. netif_receive_skb is now called
-directly from tun_get_user.
+Applied, thanks.
 
-Question is about the rx/tun_put_user path now.
+Please update the changelog at https://wiki.qemu.org/ChangeLog/4.1
+for any user-visible changes.
 
-If the vhost thread is idle, there's a single packet
-outstanding then maybe we can forward the packet to userspace
-directly from BH without waking up the thread.
-
-For this to work we need to map some userspace memory into kernel
-ahead of the time. For example, maybe it can happen when
-guest adds RX buffers? Copying Jason who's looking into
-memory mapping matters.
-
--- 
-MST
+-- PMM
 
